@@ -1242,7 +1242,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 		}
 	}
 
-	voronoiPartition->EndBuild(ndFloat64(1.0e-8f), false);
+	voronoiPartition->EndBuild(false);
 	//voronoiPartition->SaveOFF("xxx0.off");
 
 	dAssert(interiorMaterialIndex < m_materials.GetCount());

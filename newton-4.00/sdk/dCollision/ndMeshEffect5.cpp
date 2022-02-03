@@ -1284,7 +1284,7 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 	}
 	
 	delete intersection;
-	mergedOutput->EndBuild(ndFloat64(1.0e-8f), false);
+	mergedOutput->EndBuild(false);
 
 	if (!layer)
 	{

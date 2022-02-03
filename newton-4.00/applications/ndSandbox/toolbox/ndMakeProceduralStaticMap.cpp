@@ -19,7 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndMakeProceduralStaticMap.h"
 
-//#define D_USE_PORDEDURAL_COLLISION
+//#define D_USE_PROCEDURAL_COLLISION
 
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
@@ -165,7 +165,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndRegularProceduralGrid)
 
-ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
+ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
 	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
@@ -259,7 +259,7 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, ndInt32 grids,
 
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
-#ifdef D_USE_PORDEDURAL_COLLISION
+#ifdef D_USE_PROCEDURAL_COLLISION
 	ndPlane planeEquation(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
 	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
 #else
@@ -343,7 +343,7 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(plane);
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, BuildVisualEntiry(scene, grids, gridSize, perturbation)));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, BuildVisualEntity(scene, grids, gridSize, perturbation)));
 	world->AddBody(body);
 	return body;
 }

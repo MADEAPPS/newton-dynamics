@@ -32,11 +32,7 @@
 #include "ndPolyhedra.h"
 #include "ndPolygonSoupBuilder.h"
 
-//#include "ndMatrix.h"
-//#include "dgMemory.h"
-//#include "ndPolygonSoupBuilder.h"
-
-#define DG_POINTS_RUN (512 * 1024)
+#define ND_POINTS_RUN (512 * 1024)
 
 class ndPolygonSoupBuilder::dgFaceInfo
 {
@@ -138,7 +134,7 @@ ndPolygonSoupBuilder::ndPolygonSoupBuilder ()
 	,m_vertexPoints()
 	,m_normalPoints()
 {
-	m_run = DG_POINTS_RUN;
+	m_run = ND_POINTS_RUN;
 }
 
 ndPolygonSoupBuilder::ndPolygonSoupBuilder (const ndPolygonSoupBuilder& source)
@@ -148,7 +144,7 @@ ndPolygonSoupBuilder::ndPolygonSoupBuilder (const ndPolygonSoupBuilder& source)
 	,m_vertexPoints(source.m_vertexPoints.GetCount())
 	,m_normalPoints()
 {
-	m_run = DG_POINTS_RUN;
+	m_run = ND_POINTS_RUN;
 	m_faceVertexCount.SetCount(source.m_faceVertexCount.GetCount());
 	m_vertexIndex.SetCount(source.m_vertexIndex.GetCount());
 	m_vertexPoints.SetCount(source.m_vertexPoints.GetCount());
@@ -175,7 +171,7 @@ ndPolygonSoupBuilder::~ndPolygonSoupBuilder ()
 
 void ndPolygonSoupBuilder::Begin()
 {
-	m_run = DG_POINTS_RUN;
+	m_run = ND_POINTS_RUN;
 	m_vertexIndex.SetCount(0);
 	m_normalIndex.SetCount(0);
 	m_vertexPoints.SetCount(0);
@@ -310,7 +306,6 @@ void ndPolygonSoupBuilder::AddFace(const ndFloat32* const vertex, ndInt32 stride
 
 void ndPolygonSoupBuilder::PackArray()
 {
-	dAssert(0);
 	ndStack<ndInt32> indexMapPool (m_vertexPoints.GetCount());
 	ndInt32* const indexMap = &indexMapPool[0];
 	ndInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-6f));
@@ -331,7 +326,7 @@ void ndPolygonSoupBuilder::PackArray()
 
 	m_vertexPoints.Resize(vertexCount);
 	m_vertexPoints.SetCount(vertexCount);
-	m_run = DG_POINTS_RUN;
+	m_run = ND_POINTS_RUN;
 }
 
 void ndPolygonSoupBuilder::Finalize()
@@ -339,7 +334,6 @@ void ndPolygonSoupBuilder::Finalize()
 	const ndInt32 faceCount = m_faceVertexCount.GetCount();
 	if (faceCount)
 	{
-		//ndStack<ndInt32> indexMapPool (m_indexCount + m_vertexCount);
 		ndStack<ndInt32> indexMapPool(m_vertexIndex.GetCount());
 
 		ndInt32* const indexMap = &indexMapPool[0];

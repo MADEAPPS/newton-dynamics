@@ -25,6 +25,9 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
+//#define D_VERTEXLIST_INDEX_LIST_BASH (1024 * 16)
+#define D_VERTEXLIST_INDEX_LIST_BASH (1024 * 256)
+
 ndFloat64 dRoundToFloat(ndFloat64 val)
 {
 	ndInt32 exp;
@@ -282,7 +285,7 @@ static ndInt32 SortVertices(ndFloat64* const vertexList, ndInt32 stride, ndInt32
 static ndInt32 QuickSortVertices(ndFloat64* const vertList, ndInt32 stride, ndInt32 compareCount, ndInt32 vertexCount, ndFloat64 tolerance)
 {
 	ndInt32 count = 0;
-	if (vertexCount > (1024 * 256)) 
+	if (vertexCount > D_VERTEXLIST_INDEX_LIST_BASH)
 	{
 		ndFloat64 x = ndFloat32(0.0f);
 		ndFloat64 y = ndFloat32(0.0f);

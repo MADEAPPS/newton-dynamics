@@ -241,6 +241,8 @@ class ndMeshEffect: public ndPolyhedra
 	class dFormat
 	{
 		public:
+		class ndSortBatch;
+
 		class dSortKey
 		{
 			public:
@@ -256,9 +258,7 @@ class ndMeshEffect: public ndPolyhedra
 			ndInt32 m_vertexSortIndex;
 		};
 
-		ndInt32 GetSortIndex(const dChannel<ndBigVector, m_point>& points, ndFloat64& dist) const;
 		static ndInt32 CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context);
-		void GetStats(const dChannel<ndBigVector, m_point>& points, ndBigVector& min, ndBigVector& max, ndBigVector& origin, ndBigVector& median) const;
 	};
 
 	class dPointFormat: public dFormat
@@ -271,7 +271,11 @@ class ndMeshEffect: public ndPolyhedra
 		void Clear();
 		void SetCount(ndInt32 count);
 		void CompressData(ndInt32* const indexList);
+
+		private:
+		void CompressDataLow(dPointFormat& output, ndInt32 count, ndInt32* const indexList, dSortKey* const remapIndex, const ndSortBatch& batch);
 		
+		public:
 		dChannel<ndInt32, m_layer> m_layers;
 		dChannel<ndBigVector, m_point> m_vertex;
 	};
@@ -297,7 +301,7 @@ class ndMeshEffect: public ndPolyhedra
 		void CompressData(const dPointFormat& points, ndInt32* const indexList);
 
 		private:
-		void CompressDataLow(const dPointFormat& points, ndInt32* const indexList);
+		void CompressDataLow(dAttibutFormat& output, ndInt32 count, const dPointFormat& points, ndInt32* const indexList, dSortKey* const remapIndex, const ndSortBatch& batch);
 
 		public:
 		dChannel<ndInt32, m_vertex> m_pointChannel;
@@ -448,7 +452,7 @@ class ndMeshEffect: public ndPolyhedra
 			D_COLLISION_API void AddUV0(ndFloat32 u, ndFloat32 v);
 			D_COLLISION_API void AddUV1(ndFloat32 u, ndFloat32 v);
 		D_COLLISION_API void EndBuildFace();
-	D_COLLISION_API void EndBuild(ndFloat64 tol, bool fixTjoint = true);
+	D_COLLISION_API void EndBuild(bool fixTjoint = true);
 
 	D_COLLISION_API ndBigVector GetOrigin()const;
 	D_COLLISION_API void SphericalMapping(ndInt32 materialIndex, const ndMatrix& textureMatrix);
@@ -479,7 +483,7 @@ class ndMeshEffect: public ndPolyhedra
 	ndFloat64 QuantizeCordinade(ndFloat64 val) const;
 
 	bool Sanity() const;
-	void PackPoints(ndFloat64 tol);
+	void PackPoints();
 	void UnpackPoints();
 	void PackAttibuteData();
 	void UnpackAttibuteData();
