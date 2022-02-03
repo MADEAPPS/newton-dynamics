@@ -109,6 +109,18 @@ ndSetPrecisionDouble::~ndSetPrecisionDouble()
 #endif
 }
 
+class ndSplitSortBatch
+{
+	public:
+	ndBigVector m_p0;
+	ndBigVector m_p1;
+	ndBigVector m_sum;
+	ndBigVector m_variance;
+	ndInt32 m_start;
+	ndInt32 m_count;
+};
+
+
 static inline ndInt32 cmp_vertex(const ndFloat64* const v1, const ndFloat64* const v2, ndInt32 firstSortAxis)
 {
 	if (v1[firstSortAxis] < v2[firstSortAxis]) 
@@ -123,6 +135,8 @@ static inline ndInt32 cmp_vertex(const ndFloat64* const v1, const ndFloat64* con
 
 	return 0;
 }
+
+#if 1
 
 static ndInt32 SortVertices(ndFloat64* const vertexList, ndInt32 stride, ndInt32 compareCount, ndInt32 vertexCount, ndFloat64 tolerance)
 {
@@ -365,6 +379,295 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertList, ndInt32 stride, ndIn
 	return count;
 }
 
+#else
+static ndInt32 SortVertices(
+	ndFloat64* const vertexList, ndInt32 stride, 
+	ndInt32 compareCount, ndFloat64 tolerance,
+	const ndSplitSortBatch& batch, ndInt32 baseCount)
+{
+	ndBigVector del(batch.m_p1 - batch.m_p0);
+	ndFloat64 minDist = dMin(dMin(del.m_x, del.m_y), del.m_z);
+	if (minDist < ndFloat64(1.0e-3f)) 
+	{
+		minDist = ndFloat64(1.0e-3f);
+	}
+
+	ndFloat64 tol = tolerance * minDist + ndFloat64(1.0e-12f);
+	ndFloat64 sweptWindow = ndFloat64(2.0f) * tol;
+	sweptWindow += ndFloat64(1.0e-4f);
+
+	const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
+	const ndBigVector variance(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+
+	ndInt32 firstSortAxis = 2;
+	if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
+	{
+		firstSortAxis = 3;
+	}
+	else if ((variance.m_z >= variance.m_x) && (variance.m_z >= variance.m_y))
+	{
+		firstSortAxis = 4;
+	}
+
+	ndInt32 stack[1024][2];
+	stack[0][0] = 0;
+	stack[0][1] = batch.m_count - 1;
+	ndInt32 stackIndex = 1;
+	while (stackIndex) 
+	{
+		stackIndex--;
+		ndInt32 lo = stack[stackIndex][0];
+		ndInt32 hi = stack[stackIndex][1];
+		if ((hi - lo) > 8) 
+		{
+			ndInt32 i = lo;
+			ndInt32 j = hi;
+			ndFloat64 val[64];
+			ndInt32 k = (batch.m_start + ((lo + hi) >> 1)) * stride;
+			memcpy(val, &vertexList[k], stride * sizeof(ndFloat64));
+			do 
+			{
+				while (cmp_vertex(&vertexList[(batch.m_start + i) * stride], val, firstSortAxis) < 0) i++;
+				while (cmp_vertex(&vertexList[(batch.m_start + j) * stride], val, firstSortAxis) > 0) j--;
+	
+				if (i <= j) 
+				{
+					if (i < j) 
+					{
+						ndFloat64 tmp[64];
+						memcpy(tmp, &vertexList[(batch.m_start + i) * stride], stride * sizeof(ndFloat64));
+						memcpy(&vertexList[(batch.m_start + i) * stride], &vertexList[(batch.m_start + j) * stride], stride * sizeof(ndFloat64));
+						memcpy(&vertexList[(batch.m_start + j) * stride], tmp, stride * sizeof(ndFloat64));
+					}
+					i++;
+					j--;
+				}
+			} while (i <= j);
+	
+			if (i < hi)
+			{
+				stack[stackIndex][0] = i;
+				stack[stackIndex][1] = hi;
+				stackIndex++;
+			}
+			if (lo < j) 
+			{
+				stack[stackIndex][0] = lo;
+				stack[stackIndex][1] = j;
+				stackIndex++;
+			}
+			dAssert(stackIndex < ndInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
+		}
+		else 
+		{
+			for (ndInt32 i = lo + 1; i <= hi; ++i) 
+			{
+				ndFloat64 tmp[64];
+				memcpy(tmp, &vertexList[(batch.m_start + i) * stride], stride * sizeof(ndFloat64));
+	
+				ndInt32 j = i;
+				for (; j && (cmp_vertex(&vertexList[(batch.m_start + (j - 1)) * stride], tmp, firstSortAxis) > 0); --j)
+				{
+					memcpy(&vertexList[(batch.m_start + j) * stride], &vertexList[(batch.m_start + (j - 1)) * stride], stride * sizeof(ndFloat64));
+				}
+				memcpy(&vertexList[(batch.m_start + j) * stride], tmp, stride * sizeof(ndFloat64));
+			}
+		}
+	}
+	
+	#ifdef _DEBUG
+	for (ndInt32 i = 0; i < (batch.m_count - 1); ++i)
+	{
+		ndInt32 j = batch.m_start + i;
+		dAssert(cmp_vertex(&vertexList[j * stride], &vertexList[(j + 1) * stride], firstSortAxis) <= 0);
+	}
+	#endif
+
+	ndInt32 count = 0;
+	for (ndInt32 i = 0; i < batch.m_count; ++i)
+	{
+		ndInt32 m = (batch.m_start + i) * stride;
+		ndInt32 index = ndInt32(vertexList[m + 0]);
+		if (index == ndInt32(0xffffffff)) 
+		{
+			ndFloat64 swept = vertexList[m + firstSortAxis] + sweptWindow;
+			ndInt32 k = (batch.m_start + i) * stride + stride;
+			for (ndInt32 i1 = i + 1; i1 < batch.m_count; i1++)
+			{
+				index = ndInt32(vertexList[k + 0]);
+				if (index == ndInt32(0xffffffff)) 
+				{
+					ndFloat64 val = vertexList[k + firstSortAxis];
+					if (val >= swept) 
+					{
+						break;
+					}
+					bool test = true;
+					for (ndInt32 t = 0; test && (t < compareCount); t++) 
+					{
+						val = fabs(vertexList[m + t + 2] - vertexList[k + t + 2]);
+						test = test && (val <= tol);
+					}
+					if (test) 
+					{
+						vertexList[k + 0] = ndFloat64(count);
+					}
+				}
+				k += stride;
+			}
+	
+			dAssert(&vertexList[(batch.m_start + count) * stride + 2] <= &vertexList[m + 2]);
+			if (&vertexList[(batch.m_start + count) * stride + 2] < &vertexList[m + 2])
+			{
+				memcpy(&vertexList[(batch.m_start + count) * stride + 2], &vertexList[m + 2], (stride - 2) * sizeof(ndFloat64));
+			}
+
+			vertexList[m + 0] = ndFloat64(baseCount + count);
+			dAssert(m + 0 >= ((baseCount + count) * stride));
+			memcpy(&vertexList[(baseCount + count) * stride], &vertexList[m + 0], (stride - 2) * sizeof(ndFloat64));
+			count++;
+		}
+	}
+
+	return count;
+}
+
+static ndInt32 QuickSortVertices(ndFloat64* const vertList, ndInt32 stride, ndInt32 compareCount, ndInt32 vertexCount, ndFloat64 tolerance)
+{
+	ndInt32 baseCount = 0;
+
+	ndSplitSortBatch batch;
+
+	batch.m_start = 0;
+	batch.m_count = vertexCount;
+	batch.m_sum = ndBigVector::m_zero;
+	batch.m_variance = ndBigVector::m_zero;
+	batch.m_p0 = ndBigVector(ndFloat64(1.0e20f));
+	batch.m_p1 = ndBigVector(ndFloat64(-1.0e20f));
+
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		const ndBigVector x(vertList[i * stride + 2], vertList[i * stride + 3], vertList[i * stride + 4], ndFloat64(0.0f));
+		batch.m_sum += x;
+		batch.m_variance += x * x;
+		batch.m_p0 = batch.m_p0.GetMin(x);
+		batch.m_p1 = batch.m_p1.GetMax(x);
+	}
+	
+	if (vertexCount > D_VERTEXLIST_INDEX_LIST_BASH)
+	{
+		ndSplitSortBatch spliteStack[128];
+		spliteStack[0] = batch;
+
+		ndInt32 stack = 1;
+		while (stack)
+		{
+			stack--;
+			batch = spliteStack[stack];
+			if ((batch.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)))
+			{
+				baseCount += SortVertices(vertList, stride, compareCount, tolerance, batch, baseCount);
+			}
+			else
+			{
+				const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
+				const ndBigVector variance(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+
+				ndInt32 firstSortAxis = 2;
+				if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
+				{
+					firstSortAxis = 3;
+				}
+				else if ((variance.m_z >= variance.m_x) && (variance.m_z >= variance.m_y))
+				{
+					firstSortAxis = 4;
+				}
+				ndFloat64 axisVal = origin[firstSortAxis - 2];
+
+				ndInt32 i0 = 0;
+				ndInt32 i1 = batch.m_count - 1;
+				while (i0 < i1)
+				{
+					while ((vertList[(batch.m_start + i0) * stride + firstSortAxis] <= axisVal) && (i0 < i1))
+					{
+						++i0;
+					};
+
+					while ((vertList[(batch.m_start + i1) * stride + firstSortAxis] > axisVal) && (i0 < i1))
+					{
+						--i1;
+					}
+
+					dAssert(i0 <= i1);
+					if (i0 < i1)
+					{
+						for (ndInt32 i = 0; i < stride; ++i)
+						{
+							dSwap(vertList[(batch.m_start + i0) * stride + i], vertList[(batch.m_start + i1) * stride + i]);
+						}
+						++i0;
+						--i1;
+					}
+				}
+
+				while ((vertList[(batch.m_start + i0) * stride + firstSortAxis] <= axisVal) && (i0 < batch.m_count))
+				{
+					++i0;
+				};
+
+				#ifdef _DEBUG
+				for (ndInt32 i = 0; i < i0; ++i)
+				{
+					dAssert(vertList[(batch.m_start + i) * stride + firstSortAxis] <= axisVal);
+				}
+
+				for (ndInt32 i = i0; i < batch.m_count; ++i)
+				{
+					dAssert(vertList[(batch.m_start + i) * stride + firstSortAxis] > axisVal);
+				}
+				#endif
+
+				ndBigVector xc(ndBigVector::m_zero);
+				ndBigVector x2c(ndBigVector::m_zero);
+				ndBigVector maxP(ndFloat64(-1.0e20f));
+				for (ndInt32 i = 0; i < i0; ++i)
+				{
+					ndInt32 j = batch.m_start + i;
+					const ndBigVector x(vertList[j * stride + 2], vertList[j * stride + 3], vertList[j * stride + 4], ndFloat64(0.0f));
+					xc += x;
+					x2c += x * x;
+					maxP = maxP.GetMax(x);
+				}
+
+				ndSplitSortBatch pair_i1(batch);
+				pair_i1.m_start = batch.m_start + i0;
+				pair_i1.m_count = batch.m_count - i0;
+				pair_i1.m_p0[firstSortAxis - 2] = maxP[firstSortAxis - 2];
+				pair_i1.m_sum -= xc;
+				pair_i1.m_variance -= x2c;
+				spliteStack[stack] = pair_i1;
+				stack++;
+
+				ndSplitSortBatch pair_i0(batch);
+				pair_i0.m_start = batch.m_start;
+				pair_i0.m_count = i0;
+				pair_i0.m_p1[firstSortAxis - 2] = maxP[firstSortAxis - 2];
+				pair_i0.m_sum = xc;
+				pair_i0.m_variance = x2c;
+				spliteStack[stack] = pair_i0;
+				stack++;
+			}
+		}
+	}
+	else
+	{
+		baseCount = SortVertices(vertList, stride, compareCount, tolerance, batch, 0);
+	}
+
+	return baseCount;
+}
+#endif
+
 ndInt32 dVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
 {
 	ndSetPrecisionDouble precision;
@@ -388,7 +691,7 @@ ndInt32 dVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes,
 
 	ndInt32 k = 0;
 	ndInt32 m = 0;
-	for (ndInt32 i = 0; i < vertexCount; i++) 
+	for (ndInt32 i = 0; i < vertexCount; ++i) 
 	{
 		memcpy(&tmpVertexList[m + 2], &vertList[k], stride * sizeof(ndFloat64));
 		tmpVertexList[m + 0] = ndFloat64(-1.0f);
@@ -401,7 +704,7 @@ ndInt32 dVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes,
 
 	k = 0;
 	m = 0;
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		k = i * stride;
 		m = i * stride2;
@@ -411,7 +714,7 @@ ndInt32 dVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes,
 	}
 
 	m = 0;
-	for (ndInt32 i = 0; i < vertexCount; i++) 
+	for (ndInt32 i = 0; i < vertexCount; ++i) 
 	{
 		ndInt32 i1 = ndInt32(tmpVertexList[m + 1]);
 		ndInt32 index = ndInt32(tmpVertexList[m + 0]);
@@ -427,7 +730,7 @@ void ndSpinLock::Delay(ndInt32& exp)
 	//#if (defined(WIN32) || defined(_WIN32))
 	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 		// adding exponential pause delay
-		for (ndInt32 i = 0; i < exp; i++)
+		for (ndInt32 i = 0; i < exp; ++i)
 		{
 			_mm_pause();
 			_mm_pause();
@@ -436,7 +739,7 @@ void ndSpinLock::Delay(ndInt32& exp)
 		// use standard thread yield on non x86 platforms 
 		//std::this_thread::yield();
 		volatile ndInt32 acc = 0;
-		for (ndInt32 i = 0; i < exp; i++)
+		for (ndInt32 i = 0; i < exp; ++i)
 		{
 			acc++;
 			acc++;
