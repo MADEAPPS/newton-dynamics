@@ -102,7 +102,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	bodyJointPairs.SetCount(jointArray.GetCount() * 2);
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 
-	auto CountJointBodyPairs = ndMakeObject::ndFunction([this, jointArray](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CountJointBodyPairs = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		ndJointBodyPairIndex* const jointBodyBuffer = &GetJointBodyPairIndexBuffer()[0];
@@ -179,7 +179,7 @@ void ndDynamicsUpdate::BuildDisjointSets()
 {
 	D_TRACKTIME();
 
-	// to be parallelized. but not an eassy task
+	// to be parallelized. but not an easy task
 	ndScene* const scene = m_world->GetScene();
 
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();

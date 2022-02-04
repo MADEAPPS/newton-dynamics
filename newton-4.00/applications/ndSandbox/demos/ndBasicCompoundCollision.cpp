@@ -571,16 +571,14 @@ ndShapeInstance CreateCompondCollision()
 
 #if 1
 	ndShapeInstance shapeInstance(new ndShapeCompound());
-	ndShapeMaterial material1(shapeInstance.GetMaterial());
-	material1.m_userId = ndApplicationMaterial::m_aiCar;
-	shapeInstance.SetMaterial(material1);
 
 	shapeInstance.GetShape()->GetAsShapeCompound()->BeginAddRemove();
 	ndShapeInstance childShapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
 
-	ndShapeMaterial material(childShapeInstance.GetMaterial());
-	material.m_userId = ndApplicationMaterial::m_aiCar;
-	childShapeInstance.SetMaterial(material);
+	// set material ID
+	ndShapeMaterial childMaterial(childShapeInstance.GetMaterial());
+	childMaterial.m_userId = ndApplicationMaterial::m_aiCar;
+	childShapeInstance.SetMaterial(childMaterial);
 
 	childShapeInstance.SetLocalMatrix(mChildLocal);
 	shapeInstance.GetShape()->GetAsShapeCompound()->AddCollision(&childShapeInstance);
@@ -589,12 +587,23 @@ ndShapeInstance CreateCompondCollision()
 	ndShapeInstance shapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
 	shapeInstance.SetLocalMatrix(mChildLocal);
 #endif
+
+	// set material ID
+	ndShapeMaterial material(shapeInstance.GetMaterial());
+	material.m_userId = ndApplicationMaterial::m_aiCar;
+	shapeInstance.SetMaterial(material);
 	return shapeInstance;
 }
 
 ndShapeInstance CreateBoxCollision()
 {
-	return ndShapeInstance(new ndShapeBox(1.0, 0.5, 2.0));
+	ndShapeInstance shapeInstance(new ndShapeBox(1.0, 0.5, 2.0));
+
+	// set material ID
+	ndShapeMaterial material(shapeInstance.GetMaterial());
+	material.m_userId = ndApplicationMaterial::m_aiCar;
+	shapeInstance.SetMaterial(material);
+	return shapeInstance;
 }
 
 static void AddAiVehicle(ndDemoEntityManager* const scene, ndBodyKinematic* pHeightField)
@@ -620,9 +629,9 @@ ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene, const ndMatr
 {
 	// create the height field collision and rigid body
 	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_HEIGHTFIELD_WIDTH, D_HEIGHTFIELD_HEIGHT,
-		ndShapeHeightfield::m_invertedDiagonals,
-		1.0f / 100.0f, D_HEIGHTFIELD_GRID_SIZE, D_HEIGHTFIELD_GRID_SIZE));
+		ndShapeHeightfield::m_invertedDiagonals, 1.0f / 100.0f, D_HEIGHTFIELD_GRID_SIZE, D_HEIGHTFIELD_GRID_SIZE));
 
+	// set material ID
 	ndShapeMaterial material (heighfieldInstance.GetMaterial());
 	material.m_userId = ndApplicationMaterial::m_aiTerrain;
 	heighfieldInstance.SetMaterial(material);
@@ -660,9 +669,9 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	ndMatrix heighfieldLocation(dGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -16.0f;
 	heighfieldLocation.m_posit.m_z = -16.0f;
-	auto pHeightField = BuildHeightField(scene, heighfieldLocation);
-	//BuildProceduralMap(scene, 200, 2.0f, 0.0f);
-	AddAiVehicle(scene, pHeightField);
+	ndBodyKinematic* const mapBody = BuildHeightField(scene, heighfieldLocation);
+	//ndBodyKinematic* const mapBody = BuildProceduralMap(scene, 200, 2.0f, 0.0f);
+	AddAiVehicle(scene, mapBody);
 	//AddAiVehicle(scene, nullptr);
 }
 
