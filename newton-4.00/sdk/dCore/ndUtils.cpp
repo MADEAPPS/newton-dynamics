@@ -51,26 +51,25 @@ ndUnsigned64 dGetTimeInMicroseconds()
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
-#if	(defined(WIN32) || defined(_WIN32))
-	ndClearFP();
-	m_mask = ndControlFP(0, 0);
-	ndControlFP(m_mask & ~mask, _MCW_EM);
-#endif
-
-#if defined (__APPLE__)
-	#ifndef IOS
-		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+	#if	(defined(WIN32) || defined(_WIN32))
+		ndClearFP();
+		m_mask = ndControlFP(0, 0);
+		ndControlFP(m_mask & ~mask, _MCW_EM);
 	#endif
-//#elif (defined(WIN32) || defined(_WIN32))
-#elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	ndInt32 crs = _mm_getcsr();
-	ndInt32 sseDenormalMask = _MM_FLUSH_ZERO_MASK | _MM_MASK_DENORM;
-	_mm_setcsr(crs | sseDenormalMask);
-#elif (defined (_M_ARM) || defined (_M_ARM64))
-	//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
-#endif
+
+	#if defined (__APPLE__)
+		#ifndef IOS
+			fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+		#endif
+	#elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+		ndInt32 crs = _mm_getcsr();
+		ndInt32 sseDenormalMask = _MM_FLUSH_ZERO_MASK | _MM_MASK_DENORM;
+		_mm_setcsr(crs | sseDenormalMask);
+	#elif (defined (_M_ARM) || defined (_M_ARM64))
+		//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+		#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
+	#endif
 
 	//ndFloat32 a = ndFloat32(1.0f);
 	//ndFloat32 b = ndFloat32(0.5f);
@@ -85,57 +84,45 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 
 ndFloatExceptions::~ndFloatExceptions()
 {
-#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	ndClearFP();
-	ndControlFP(m_mask, _MCW_EM);
-#endif
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		ndClearFP();
+		ndControlFP(m_mask, _MCW_EM);
+	#endif
 }
 
 ndSetPrecisionDouble::ndSetPrecisionDouble()
 {
-#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	ndClearFP();
-	m_mask = ndInt32(ndControlFP(0, 0));
-	ndControlFP(_PC_53, _MCW_PC);
-#endif
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		ndClearFP();
+		m_mask = ndInt32(ndControlFP(0, 0));
+		ndControlFP(_PC_53, _MCW_PC);
+	#endif
 }
 
 ndSetPrecisionDouble::~ndSetPrecisionDouble()
 {
-#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	ndClearFP();
-	ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
-#endif
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		ndClearFP();
+		ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
+	#endif
 }
 
-class ndSplitSortBatch
-{
-	public:
-	ndBigVector m_p0;
-	ndBigVector m_p1;
-	ndBigVector m_sum;
-	ndBigVector m_variance;
-	ndInt32 m_start;
-	ndInt32 m_count;
-};
-
+#if 0
 
 static inline ndInt32 cmp_vertex(const ndFloat64* const v1, const ndFloat64* const v2, ndInt32 firstSortAxis)
 {
-	if (v1[firstSortAxis] < v2[firstSortAxis]) 
+	if (v1[firstSortAxis] < v2[firstSortAxis])
 	{
 		return -1;
 	}
 
-	if (v1[firstSortAxis] > v2[firstSortAxis]) 
+	if (v1[firstSortAxis] > v2[firstSortAxis])
 	{
 		return 1;
 	}
 
 	return 0;
 }
-
-#if 0
 
 static ndInt32 SortVertices(ndFloat64* const vertexList, ndInt32 stride, ndInt32 compareCount, ndInt32 vertexCount, ndFloat64 tolerance)
 {
@@ -436,6 +423,15 @@ ndInt32 dVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes,
 
 #else
 
+class ndSplitSortBatch
+{
+	public:
+	ndBigVector m_sum;
+	ndBigVector m_variance;
+	ndInt32 m_start;
+	ndInt32 m_count;
+};
+
 class ndSortKey
 {
 	public:
@@ -447,19 +443,19 @@ class ndSortKey
 static ndInt32 SortVertices(
 	ndFloat64* const vertListOut, ndInt32* const indexList,
 	const ndFloat64* const vertexList, ndInt32 stride, 
-	ndInt32 compareCount, ndFloat64 tolerance,
+	ndInt32 compareCount, ndFloat64 tol,
 	ndSortKey* const remapIndex,
 	const ndSplitSortBatch& batch, ndInt32 baseCount)
 {
-	const ndBigVector xc(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
-	const ndBigVector x2c(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - xc * xc);
+	const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
+	const ndBigVector variance(ndVector::m_zero.GetMax(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
-	if ((x2c.m_y >= x2c.m_x) && (x2c.m_y >= x2c.m_z))
+	if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
 	{
 		firstSortAxis = 1;
 	}
-	else if ((x2c.m_z >= x2c.m_x) && (x2c.m_z >= x2c.m_y))
+	else if ((variance.m_z >= variance.m_x) && (variance.m_z >= variance.m_y))
 	{
 		firstSortAxis = 2;
 	}
@@ -498,16 +494,9 @@ static ndInt32 SortVertices(
 	};
 	ndSort<ndSortKey, dCompareKey>(remapIndex, batch.m_count, &sortContext);
 
-	const ndBigVector del(batch.m_p1 - batch.m_p0);
-	ndFloat64 minDist = dMin(dMin(del.m_x, del.m_y), del.m_z);
-	if (minDist < ndFloat64(1.0e-3f))
-	{
-		minDist = ndFloat64(1.0e-3f);
-	}
-
-	ndFloat64 tol = tolerance * minDist + ndFloat64(1.0e-12f);
-	ndFloat64 sweptWindow = ndFloat64(2.0f) * tol;
-	sweptWindow += ndFloat64(1.0e-4f);
+	const ndFloat64 minDist = dMin(dMin(variance.m_x, variance.m_y), variance.m_z);
+	const ndFloat64 tolerance = dMax(dMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
+	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 	
 	ndInt32 newCount = 0;
 	for (ndInt32 i = 0; i < batch.m_count; ++i)
@@ -517,8 +506,6 @@ static ndInt32 SortVertices(
 		{
 			const ndInt32 i0 = remapIndex[i].m_ordinal;
 			const ndInt32 iii = remapIndex[i].m_vertexIndex;
-			//const ndBigVector& p = m_vertex[iii];
-			//const ndFloat64 swept = p[firstSortAxis] + sweptWindow;
 			const ndFloat64 swept = vertexList[iii * stride + firstSortAxis] + sweptWindow;;
 			for (ndInt32 j = i + 1; j < batch.m_count; ++j)
 			{
@@ -527,8 +514,6 @@ static ndInt32 SortVertices(
 				{
 					const ndInt32 j0 = remapIndex[j].m_ordinal;
 					const ndInt32 jjj = remapIndex[j].m_vertexIndex;
-					//const ndBigVector& q = m_vertex[jjj];
-					//ndFloat64 val = q[firstSortAxis];
 					ndFloat64 val = vertexList[jjj * stride + firstSortAxis];
 					if (val >= swept)
 					{
@@ -579,8 +564,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	batch.m_count = vertexCount;
 	batch.m_sum = ndBigVector::m_zero;
 	batch.m_variance = ndBigVector::m_zero;
-	batch.m_p0 = ndBigVector(ndFloat64(1.0e20f));
-	batch.m_p1 = ndBigVector(ndFloat64(-1.0e20f));
 
 	ndStack<ndFloat64>pool(stride  * vertexCount);
 	ndStack<ndSortKey> indirectListBuffer(vertexCount);
@@ -598,8 +581,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 		const ndBigVector x(vertList[i * stride + 0], vertList[i * stride + 1], vertList[i * stride + 2], ndFloat64(0.0f));
 		batch.m_sum += x;
 		batch.m_variance += x * x;
-		batch.m_p0 = batch.m_p0.GetMin(x);
-		batch.m_p1 = batch.m_p1.GetMax(x);
 	}
 
 	ndInt32 baseCount = 0;
@@ -615,22 +596,22 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			batch = spliteStack[stack];
 
 			const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
-			const ndBigVector variance(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
-			ndFloat64 maxVariance = dMax(dMax(variance.m_x, variance.m_y), variance.m_z);
+			const ndBigVector variance2(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+			ndFloat64 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			ndSortKey* const remapIndex = &indirectList[batch.m_start];
-			if ((batch.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance < ndFloat32(10.0f)))
+			if ((batch.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				baseCount += SortVertices(vertListOut, indexListOut, vertList, stride, compareCount, tolerance, remapIndex, batch, baseCount);
 			}
 			else
 			{
 				ndInt32 firstSortAxis = 0;
-				if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
+				if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
 				{
 					firstSortAxis = 1;
 				}
-				else if ((variance.m_z >= variance.m_x) && (variance.m_z >= variance.m_y))
+				else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
 				{
 					firstSortAxis = 2;
 				}
@@ -699,7 +680,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 				ndSplitSortBatch pair_i1(batch);
 				pair_i1.m_start = batch.m_start + i0;
 				pair_i1.m_count = batch.m_count - i0;
-				pair_i1.m_p0[firstSortAxis] = maxP[firstSortAxis];
 				pair_i1.m_sum -= xc;
 				pair_i1.m_variance -= x2c;
 				spliteStack[stack] = pair_i1;
@@ -708,7 +688,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 				ndSplitSortBatch pair_i0(batch);
 				pair_i0.m_start = batch.m_start;
 				pair_i0.m_count = i0;
-				pair_i0.m_p1[firstSortAxis] = maxP[firstSortAxis];
 				pair_i0.m_sum = xc;
 				pair_i0.m_variance = x2c;
 				spliteStack[stack] = pair_i0;

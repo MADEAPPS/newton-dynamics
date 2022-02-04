@@ -63,8 +63,14 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 			const T pivot(array[mid]);
 			do
 			{
-				while (comparator.Compare(array[i], pivot, context) < 0) i++;
-				while (comparator.Compare(array[j], pivot, context) > 0) j--;
+				while (comparator.Compare(array[i], pivot, context) < 0)
+				{
+					i++;
+				}
+				while (comparator.Compare(array[j], pivot, context) > 0)
+				{
+					j--;
+				}
 
 				if (i <= j)
 				{

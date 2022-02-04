@@ -270,10 +270,10 @@ class ndMeshEffect: public ndPolyhedra
 
 		void Clear();
 		void SetCount(ndInt32 count);
-		void CompactVertexData(ndInt32* const indexList);
+		void CompactVertexData(ndInt32* const indexList, ndFloat32 tol);
 
 		private:
-		void CompressData(dPointFormat& output, ndInt32* const indexList, dSortKey* const remapIndex, const ndSortBatch& batch);
+		void CompressData(dPointFormat& output, ndInt32* const indexList, dSortKey* const remapIndex, const ndSortBatch& batch, ndFloat32 tol);
 		
 		public:
 		dChannel<ndInt32, m_layer> m_layers;
@@ -298,10 +298,10 @@ class ndMeshEffect: public ndPolyhedra
 		void SetCount(ndInt32 count);
 		void CopyFrom(const dAttibutFormat& source);
 		void CopyEntryFrom(ndInt32 index, const dAttibutFormat& source, ndInt32 sourceIndex);
-		void CompactVertexData(const dPointFormat& points, ndInt32* const indexList);
+		void CompactVertexData(const dPointFormat& points, ndInt32* const indexList, ndFloat32 tol);
 
 		private:
-		void CompressData(dAttibutFormat& output, const dPointFormat& points, ndInt32* const indexList, dSortKey* const remapIndex, const ndSortBatch& batch);
+		void CompressData(dAttibutFormat& output, const dPointFormat& points, ndInt32* const indexList, dSortKey* const remapIndex, const ndSortBatch& batch, ndFloat32 tol);
 
 		public:
 		dChannel<ndInt32, m_vertex> m_pointChannel;
