@@ -46,13 +46,24 @@ class CAIMaterial : public ndApplicationMaterial
 	{
 		//dAssert(joint->IsActive());
 
+		static int xxxx;
+		if (xxxx == 4035)
+			xxxx *= 1;
 		const ndContactPointList& contactPoints = joint->GetContactPoints();
 		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 		{
 			ndContactPoint& contactPoint = contactPointsNode->GetInfo();
 			// quick hack to show the solution.
-			contactPoint.m_normal = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			//contactPoint.m_normal = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			if (contactPoint.m_normal.m_y < 0.999)
+			{
+				dTrace(("frame %d: this is when the bug happens\n", xxxx));
+			}
+			//dAssert(contactPoint.m_normal.m_y > 0.9f);
+			//dAssert(contactPoint.m_penetration < 0.02f);
+			//dAssert(contactPoint.m_point.m_y > -0.01f);
 		}
+		xxxx++;
 	}
 };
 

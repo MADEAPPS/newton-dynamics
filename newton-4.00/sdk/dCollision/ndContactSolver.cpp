@@ -2574,7 +2574,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 			if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
 			{
 				count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * ndVector::m_negOne);
-				if (!count)
+				if (!(count || m_instance1.GetShape()->GetAsShapeAsConvexPolygon()))
 				{
 					// poly line failed probably because of rounding error
 					// but we know the shapes are colliding
