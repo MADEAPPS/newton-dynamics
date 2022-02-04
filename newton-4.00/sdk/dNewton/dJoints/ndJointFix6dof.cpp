@@ -22,15 +22,14 @@ ndJointFix6dof::ndJointFix6dof(const ndMatrix& frameInGlbalSpace, ndBodyKinemati
 	,m_maxTorque(D_MAX_BOUND)
 {
 }
+
 ndJointFix6dof::ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0, const ndMatrix& globalMatrixBody1)
 	:ndJointBilateralConstraint(6, body0, body1, globalMatrixBody0, globalMatrixBody1)
-	, m_softness(ndFloat32(0.0f))
-	, m_maxForce(D_MAX_BOUND)
-	, m_maxTorque(D_MAX_BOUND)
+	,m_softness(ndFloat32(0.0f))
+	,m_maxForce(D_MAX_BOUND)
+	,m_maxTorque(D_MAX_BOUND)
 {
 }
-
-
 
 ndJointFix6dof::ndJointFix6dof(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
