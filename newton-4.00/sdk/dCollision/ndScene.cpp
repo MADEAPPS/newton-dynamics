@@ -837,6 +837,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 	dAssert(body0->GetScene() == this);
 	dAssert(body1->GetScene() == this);
 
+	dAssert(contact->m_material);
 	dAssert(m_contactNotifyCallback);
 	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
 	if (processContacts)
@@ -891,7 +892,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 	}
 }
 
-void ndScene::ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver)
+void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* const contactSolver)
 {
 	ndContact* const contact = contactSolver->m_contact;
 	contact->m_positAcc = ndVector::m_zero;
@@ -1007,7 +1008,7 @@ void ndScene::ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndConta
 		contactPoint->m_shapeInstance1 = contactArray[i].m_shapeInstance1;
 		contactPoint->m_shapeId0 = contactArray[i].m_shapeId0;
 		contactPoint->m_shapeId1 = contactArray[i].m_shapeId1;
-		contactPoint->m_material = contact->m_material;
+		contactPoint->m_material = *contact->m_material;
 	
 		if (staticMotion) 
 		{
@@ -1084,7 +1085,7 @@ void ndScene::ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndConta
 	}
 	
 	contact->m_maxDOF = ndUnsigned32(3 * contactPointList.GetCount());
-	m_contactNotifyCallback->OnContactCallback(threadIndex, contact, m_timestep);
+	m_contactNotifyCallback->OnContactCallback(contact, m_timestep);
 }
 
 void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
@@ -1251,7 +1252,8 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable) 
 		{
-			m_contactArray.CreateContact(body0, body1);
+			ndContact* const newContact = m_contactArray.CreateContact(body0, body1);
+			newContact->m_material = m_contactNotifyCallback->GetMaterial(newContact, body0->GetCollisionShape(), body1->GetCollisionShape());
 		}
 	}
 }

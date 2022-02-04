@@ -13,12 +13,14 @@
 
 #include "ndSandboxStdafx.h"
 
-class ndContactCallback: public ndContactNotify
+class ndApplicationMaterial : public ndMaterial
 {
-	public: 
+	public:
 	enum ndMaterialUserIDs
 	{
 		m_default = 0,
+		m_aiCar = 1,
+		m_aiTerrain = 2,
 		m_dedris = 100,
 	};
 
@@ -28,54 +30,80 @@ class ndContactCallback: public ndContactNotify
 		//m_debrisBody = 1 << 1,
 	};
 
-	class ndMaterailKey
+	ndApplicationMaterial();
+	ndApplicationMaterial(const ndApplicationMaterial& src);
+
+	virtual ndApplicationMaterial* Clone(const ndApplicationMaterial& src) const
 	{
-		public:
-		ndMaterailKey()
-			:m_key(0)
-		{
-		}
+		return new ndApplicationMaterial(src);
+	}
 
-		ndMaterailKey(ndUnsigned64 low, ndUnsigned64 high)
-			:m_lowKey(ndUnsigned32(dMin(low, high)))
-			,m_highKey(ndUnsigned32(dMax(low, high)))
-		{
-		}
+	virtual bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep) const;
+	virtual void OnContactCallback(const ndContact* const joint, ndFloat32 timestep) const;
+};
 
-		bool operator<(const ndMaterailKey& other) const
-		{
-			return (m_key < other.m_key);
-		}
+class ndMaterailKey
+{
+	public:
+	ndMaterailKey()
+		:m_key(0)
+	{
+	}
 
-		bool operator>(const ndMaterailKey& other) const
-		{
-			return (m_key > other.m_key);
-		}
+	ndMaterailKey(ndUnsigned64 low, ndUnsigned64 high)
+		:m_lowKey(ndUnsigned32(dMin(low, high)))
+		, m_highKey(ndUnsigned32(dMax(low, high)))
+	{
+	}
 
-		union
+	bool operator<(const ndMaterailKey& other) const
+	{
+		return (m_key < other.m_key);
+	}
+
+	bool operator>(const ndMaterailKey& other) const
+	{
+		return (m_key > other.m_key);
+	}
+
+	union
+	{
+		struct
 		{
-			struct 
-			{
-				ndUnsigned32 m_lowKey;
-				ndUnsigned32 m_highKey;
-			};
-			ndUnsigned64 m_key;
+			ndUnsigned32 m_lowKey;
+			ndUnsigned32 m_highKey;
 		};
+		ndUnsigned64 m_key;
 	};
+};
 
+class ndMaterialGraph : public ndTree<ndApplicationMaterial*, ndMaterailKey>
+{
+	public:
+	ndMaterialGraph();
+	~ndMaterialGraph();
+};
+
+class ndContactCallback: public ndContactNotify
+{
+	public: 
 	ndContactCallback();
 
-	virtual ndMaterial& RegisterMaterial(ndUnsigned32 id0, ndUnsigned32 id1);
+	virtual ndApplicationMaterial& RegisterMaterial(const ndApplicationMaterial& material, ndUnsigned32 id0, ndUnsigned32 id1);
 
 	virtual void OnBodyAdded(ndBodyKinematic* const body) const;
 	virtual void OnBodyRemoved(ndBodyKinematic* const body) const;
-	virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
+
 	virtual bool OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep);
-	virtual void OnContactCallback(ndInt32 threadIndex, const ndContact* const contactJoint, ndFloat32 timestep);
+	virtual void OnContactCallback(const ndContact* const contactJoint, ndFloat32 timestep);
+	virtual bool OnCompoundSubShapeOverlap(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+
+	virtual ndMaterial* GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
 
 	void PlaySoundTest(const ndContact* const contactJoint);
-
-	ndTree<ndMaterial, ndMaterailKey> m_materialMap;
+	
+	ndMaterialGraph m_materialGraph;
+	ndApplicationMaterial m_defaultMaterial;
 };
 
 

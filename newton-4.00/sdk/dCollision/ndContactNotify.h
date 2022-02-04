@@ -29,10 +29,11 @@ class ndScene;
 class ndContact;
 class ndShapeInstance;
 
-class ndMaterial
+class ndMaterial : public ndClassAlloc
 {
 	public:
 	ndMaterial()
+		:ndClassAlloc()
 	{
 		m_restitution = ndFloat32(0.4f);
 		m_staticFriction0 = ndFloat32(0.8f);
@@ -78,13 +79,13 @@ class ndContactNotify: public ndClassAlloc
 	{
 	}
 
-	virtual ndMaterial GetMaterial(const ndContact* const, const ndShapeInstance&, const ndShapeInstance&) const
+	virtual ndMaterial* GetMaterial(const ndContact* const, const ndShapeInstance&, const ndShapeInstance&) const
 	{
-		return ndMaterial();
+		return (ndMaterial*)&m_default;
 	}
 
 	//bool OnCompoundSubShapeOverlap(const ndContact* const contact, ndFloat32 timestep, const ndShapeInstance* const subShapeA, const ndShapeInstance* const subShapeB);
-	bool OnCompoundSubShapeOverlap(const ndContact* const, ndFloat32, const ndShapeInstance* const, const ndShapeInstance* const)
+	virtual bool OnCompoundSubShapeOverlap(const ndContact* const, ndFloat32, const ndShapeInstance* const, const ndShapeInstance* const)
 	{
 		return true;
 	}
@@ -95,11 +96,12 @@ class ndContactNotify: public ndClassAlloc
 		return true;
 	}
 
-	virtual void OnContactCallback(ndInt32, const ndContact* const, ndFloat32)
+	virtual void OnContactCallback(const ndContact* const, ndFloat32)
 	{
 	}
 
 	protected:
+	ndMaterial m_default;
 	ndScene* m_scene;
 	friend class ndScene;
 };

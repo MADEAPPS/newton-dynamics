@@ -12,11 +12,75 @@
 #include "ndSandboxStdafx.h"
 #include "ndContactCallback.h"
 
+ndApplicationMaterial::ndApplicationMaterial()
+	:ndMaterial()
+{
+}
+
+ndApplicationMaterial::ndApplicationMaterial(const ndApplicationMaterial& copy)
+	:ndMaterial(copy)
+{
+}
+
+bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32) const
+{
+	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
+	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
+
+	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+
+	if ((instanceShape0.GetUserDataID() == ndApplicationMaterial::m_dedris) && (instanceShape1.GetUserDataID() == ndApplicationMaterial::m_dedris))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+//void ndApplicationMaterial::OnContactCallback(const ndContact* const joint, ndFloat32) const
+void ndApplicationMaterial::OnContactCallback(const ndContact* const, ndFloat32) const
+{
+	if (m_userFlags & ndApplicationMaterial::m_playSound)
+	{
+		//PlaySoundTest(joint);
+	}
+
+#if 0
+	ndContactSolver solver;
+	ndFixSizeArray<ndContactPoint, 16> contactOut;
+	ndBodyKinematic* bodyA = contactJoint->GetBody0();
+	ndBodyKinematic* bodyB = contactJoint->GetBody1();
+	const ndShapeInstance& shapeA = bodyA->GetCollisionShape();
+	const ndShapeInstance& shapeB = bodyB->GetCollisionShape();
+	solver.CalculateContacts(
+		&shapeA, bodyA->GetMatrix(), bodyA->GetVelocity(),
+		&shapeB, bodyB->GetMatrix(), bodyB->GetVelocity(),
+		contactOut);
+#endif
+}
+
+ndMaterialGraph::ndMaterialGraph()
+	:ndTree<ndApplicationMaterial*, ndMaterailKey>()
+{
+}
+
+ndMaterialGraph::~ndMaterialGraph()
+{
+	Iterator it(*this);
+	for (it.Begin(); it; it++)
+	{
+		ndApplicationMaterial* const material = it.GetNode()->GetInfo();
+		delete material;
+	}
+}
+
+
 ndContactCallback::ndContactCallback()
 	:ndContactNotify()
-	,m_materialMap()
+	,m_materialGraph()
+	,m_defaultMaterial()
 {
-	m_materialMap.Insert(ndMaterial(), ndMaterailKey(0, 0));
 }
 
 void ndContactCallback::OnBodyAdded(ndBodyKinematic* const) const
@@ -27,47 +91,13 @@ void ndContactCallback::OnBodyRemoved(ndBodyKinematic* const) const
 {
 }
 
-ndMaterial& ndContactCallback::RegisterMaterial(ndUnsigned32 id0, ndUnsigned32 id1)
-{
-	ndMaterailKey key(id0, id1);
-	ndTree<ndMaterial, ndMaterailKey>::ndNode* node = m_materialMap.Find(key);
-	if (!node)
-	{
-		node = m_materialMap.Insert(ndMaterial(), key);
-	}
-	return node->GetInfo();
-}
-
-//ndMaterial ndContactCallback::GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
-ndMaterial ndContactCallback::GetMaterial(const ndContact* const, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
-{
-	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);
-	ndTree<ndMaterial, ndMaterailKey>::ndNode* const node = m_materialMap.Find(key);
-	return node ? node->GetInfo() : ndMaterial();
-}
-
-bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32)
-{
-	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
-	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
-
-	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
-	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-	if ((instanceShape0.GetUserDataID() == m_dedris) && (instanceShape1.GetUserDataID() == m_dedris))
-	{
-		return false;
-	}
-
-	return true;
-}
-
 void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 {
 	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
 	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
 	const ndContactPointList& contactPoints = contactJoint->GetContactPoints();
 
-	ndFloat32 maxNornalSpeed = ndFloat32 (0.0f);
+	ndFloat32 maxNornalSpeed = ndFloat32(0.0f);
 	ndFloat32 maxTangentSpeed = ndFloat32(0.0f);
 	const ndContactMaterial* normalContact = nullptr;
 	const ndContactMaterial* tangentContact = nullptr;
@@ -111,25 +141,42 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 	}
 }
 
-//void ndContactCallback::OnContactCallback(ndInt32 threadIndex, const ndContact* const contactJoint, ndFloat32 timestep)
-void ndContactCallback::OnContactCallback(ndInt32, const ndContact* const contactJoint, ndFloat32)
+ndApplicationMaterial& ndContactCallback::RegisterMaterial(const ndApplicationMaterial& material, ndUnsigned32 id0, ndUnsigned32 id1)
 {
-	const ndMaterial& material = contactJoint->GetMaterial();
-	if (material.m_userFlags & m_playSound)
+	ndMaterailKey key(id0, id1);
+	ndMaterialGraph::ndNode* node = m_materialGraph.Find(key);
+	if (!node)
 	{
-		PlaySoundTest(contactJoint);
+		node = m_materialGraph.Insert(material.Clone(material), key);
 	}
+	return *node->GetInfo();
+}
 
-#if 0
-	ndContactSolver solver;
-	ndFixSizeArray<ndContactPoint, 16> contactOut;
-	ndBodyKinematic* bodyA = contactJoint->GetBody0();
-	ndBodyKinematic* bodyB = contactJoint->GetBody1();
-	const ndShapeInstance& shapeA = bodyA->GetCollisionShape();
-	const ndShapeInstance& shapeB = bodyB->GetCollisionShape();
-	solver.CalculateContacts(
-		&shapeA, bodyA->GetMatrix(), bodyA->GetVelocity(),
-		&shapeB, bodyB->GetMatrix(), bodyB->GetVelocity(),
-		contactOut);
-#endif
+ndMaterial* ndContactCallback::GetMaterial(const ndContact* const, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
+{
+	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);
+	ndMaterialGraph::ndNode* const node = m_materialGraph.Find(key);
+	return node ? node->GetInfo() : (ndMaterial*)&m_defaultMaterial;
+}
+
+bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep)
+{
+	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();
+	dAssert(material);
+	return material->OnAabbOverlap(contactJoint, timestep);
+}
+
+//bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1)
+bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const, const ndShapeInstance&, const ndShapeInstance&)
+{
+	dAssert(0);
+	return 0;
+}
+
+//void ndContactCallback::OnContactCallback(ndInt32 threadIndex, const ndContact* const contactJoint, ndFloat32 timestep)
+void ndContactCallback::OnContactCallback(const ndContact* const contactJoint, ndFloat32 timestep)
+{
+	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();
+	dAssert(material);
+	material->OnContactCallback(contactJoint, timestep);
 }

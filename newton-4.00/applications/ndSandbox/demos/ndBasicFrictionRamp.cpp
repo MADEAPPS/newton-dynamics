@@ -64,7 +64,6 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	world->AddBody(body);
 	scene->AddEntity(entity);
 	
-
 	ndVector boxSize(1.0f, 0.5f, 1.5f, 0.0f);
 	matrix.m_posit.m_z -= 10.0f;
 	matrix.m_posit.m_x -= 12.0f;
@@ -95,7 +94,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 
 		// register a contact joint physics material pair and 
 		// set the physics parameters and application custom options 
-		ndMaterial& material = callback->RegisterMaterial(0, newId);
+		ndMaterial& material = callback->RegisterMaterial(ndApplicationMaterial(), 0, newId);
 		ndFloat32 frictionValue = ndFloat32(i) / 15.0f;
 		material.m_staticFriction0 = frictionValue;
 		material.m_staticFriction1 = frictionValue;
@@ -103,7 +102,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		material.m_dynamicFriction1 = frictionValue;
 
 		// set the user flag so that it is read in the contact callback for doing stuff
-		material.m_userFlags |= ndContactCallback::m_playSound;
+		material.m_userFlags |= ndApplicationMaterial::m_playSound;
 	}
 
 	boxGeometry->Release();

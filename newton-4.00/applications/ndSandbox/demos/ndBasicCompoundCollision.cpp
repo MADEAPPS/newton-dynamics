@@ -18,10 +18,43 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndCompoundScene.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndHeightFieldPrimitive.h"
 #include "ndMakeProceduralStaticMap.h"
+
+class CAIMaterial : public ndApplicationMaterial
+{
+	public:
+	CAIMaterial()
+		:ndApplicationMaterial()
+	{
+	}
+
+	CAIMaterial(const CAIMaterial& src)
+		:ndApplicationMaterial(src)
+	{
+	}
+
+	ndApplicationMaterial* Clone(const ndApplicationMaterial& src) const
+	{
+		return new CAIMaterial((CAIMaterial&)src);
+	}
+
+	virtual void OnContactCallback(const ndContact* const joint, ndFloat32) const
+	{
+		//dAssert(joint->IsActive());
+
+		const ndContactPointList& contactPoints = joint->GetContactPoints();
+		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+		{
+			ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+			// quick hack to show the solution.
+			contactPoint.m_normal = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+		}
+	}
+};
 
 #if 0
 static ndBodyDynamic* AddRigidBody(
@@ -527,8 +560,17 @@ ndShapeInstance CreateCompondCollision()
 
 #if 1
 	ndShapeInstance shapeInstance(new ndShapeCompound());
+	ndShapeMaterial material1(shapeInstance.GetMaterial());
+	material1.m_userId = ndApplicationMaterial::m_aiCar;
+	shapeInstance.SetMaterial(material1);
+
 	shapeInstance.GetShape()->GetAsShapeCompound()->BeginAddRemove();
 	ndShapeInstance childShapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
+
+	ndShapeMaterial material(childShapeInstance.GetMaterial());
+	material.m_userId = ndApplicationMaterial::m_aiCar;
+	childShapeInstance.SetMaterial(material);
+
 	childShapeInstance.SetLocalMatrix(mChildLocal);
 	shapeInstance.GetShape()->GetAsShapeCompound()->AddCollision(&childShapeInstance);
 	shapeInstance.GetShape()->GetAsShapeCompound()->EndAddRemove();
@@ -570,13 +612,17 @@ ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene, const ndMatr
 		ndShapeHeightfield::m_invertedDiagonals,
 		1.0f / 100.0f, D_HEIGHTFIELD_GRID_SIZE, D_HEIGHTFIELD_GRID_SIZE));
 
+	ndShapeMaterial material (heighfieldInstance.GetMaterial());
+	material.m_userId = ndApplicationMaterial::m_aiTerrain;
+	heighfieldInstance.SetMaterial(material);
+
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	ndArray<ndInt16>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == D_HEIGHTFIELD_WIDTH * D_HEIGHTFIELD_HEIGHT);
 	for (int i = 0; i < D_HEIGHTFIELD_WIDTH * D_HEIGHTFIELD_HEIGHT; ++i)
 	{
-		//ndFloat32 high = 0.0; //  heightfield[i].m_y * 100.0f;
-		ndFloat32 high = dGaussianRandom(4.0f);
+		ndFloat32 high = 0.0; //  heightfield[i].m_y * 100.0f;
+		//ndFloat32 high = dGaussianRandom(4.0f);
 		dAssert(high < ndFloat32(1 << 15));
 		dAssert(high > -ndFloat32(1 << 15));
 		hightMap[i] = ndInt16(high);
@@ -596,6 +642,10 @@ ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene, const ndMatr
 //void ndBasicAiDemo(ndDemoEntityManager* const scene)
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
+	CAIMaterial material;
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_aiCar, ndApplicationMaterial::m_aiTerrain);
+
 	ndMatrix heighfieldLocation(dGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -16.0f;
 	heighfieldLocation.m_posit.m_z = -16.0f;
