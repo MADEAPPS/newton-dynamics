@@ -19,22 +19,16 @@
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
-//#define D_TERRAIN_WIDTH			1024 * 4
-//#define D_TERRAIN_HEIGHT			1024 * 4
 #define D_TERRAIN_WIDTH			1024
 #define D_TERRAIN_HEIGHT		1024
-
-
 #define D_TERRAIN_NOISE_OCTAVES		8
 #define D_TERRAIN_NOISE_PERSISTANCE	0.5f
-//#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (ndFloat32 (D_TERRAIN_WIDTH) / 5)
 #define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)
+//#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (ndFloat32 (D_TERRAIN_WIDTH) / 5)
 
-#define D_TERRAIN_GRID_SIZE			4.0f
-//#define D_TERRAIN_ELEVATION_SCALE	0.0f
+#define D_TERRAIN_GRID_SIZE		4.0f
+#define D_TERRAIN_TILE_SIZE		128
 #define D_TERRAIN_ELEVATION_SCALE	64.0f
-
-#define D_TERRAIN_TILE_SIZE			128
 
 class ndHeightfieldMesh : public ndDemoMesh
 {
@@ -221,9 +215,10 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 
-	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
-		ndShapeHeightfield::m_invertedDiagonals,
-		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
+	ndShapeInstance heighfieldInstance(
+		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
+		ndShapeHeightfield::m_invertedDiagonals, 1.0f / 100.0f, 
+		D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	ndArray<ndInt16>& hightMap = shape->GetElevationMap();

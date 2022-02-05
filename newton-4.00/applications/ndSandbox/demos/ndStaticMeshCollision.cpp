@@ -33,9 +33,9 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildCompoundScene(scene, heighfieldLocation);
-	BuildHeightFieldTerrain(scene, heighfieldLocation);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
-	//BuildStaticMesh(scene, "track.fbx", false);
+	BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "excavator.fbx", false);
 
 	ndMatrix location(dGetIdentityMatrix());

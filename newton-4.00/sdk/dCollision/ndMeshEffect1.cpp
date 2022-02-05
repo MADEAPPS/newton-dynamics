@@ -30,7 +30,7 @@
 #include "ndShapeInstance.h"
 #include "ndShapeConvexHull.h"
 
-#define D_VERTEXLIST_INDEX_LIST_BASH (1024 * 16)
+#define D_VERTEXLIST_INDEX_LIST_BASH (1024)
 
 #if 0
 void ndMeshEffect::dAttibutFormat::CopyFrom(const dAttibutFormat& source)
@@ -1651,11 +1651,11 @@ ndInt32 ndMeshEffect::InterpolateVertex(const ndBigVector& srcPoint, const ndEdg
 
 #endif
 
-class ndMeshEffect::dFormat::ndSortBatch
+class ndMeshEffect::dFormat::dSortCluster
 {
 	public:
 	ndBigVector m_sum;
-	ndBigVector m_variance;
+	ndBigVector m_sum2;
 	ndInt32 m_start;
 	ndInt32 m_count;
 };
@@ -1681,10 +1681,10 @@ inline ndInt32 ndMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, 
 
 void ndMeshEffect::dPointFormat::CompressData(
 	dPointFormat& output, ndInt32* const indexList, 
-	dSortKey* const remapIndex, const ndSortBatch& batch, ndFloat32 tol)
+	dSortKey* const remapIndex, const dSortCluster& cluster, ndFloat32 tol)
 {
-	const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
-	const ndBigVector x2c(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
+	const ndBigVector x2c(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 	const ndBigVector variance((x2c.GetMax(ndVector::m_zero)).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
@@ -1708,7 +1708,7 @@ void ndMeshEffect::dPointFormat::CompressData(
 			return ndMeshEffect::dFormat::CompareVertex(&elementA, &elementB, context);
 		}
 	};
-	ndSort<dSortKey, CompareKey>(remapIndex, batch.m_count, &sortContext);
+	ndSort<dSortKey, CompareKey>(remapIndex, cluster.m_count, &sortContext);
 
 	const ndFloat64 minDist = dMin(dMin(variance.m_x, variance.m_y), variance.m_z);
 	const ndFloat64 tolerance = dMax(dMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
@@ -1717,7 +1717,7 @@ void ndMeshEffect::dPointFormat::CompressData(
 	const ndInt32 base = output.m_vertex.GetCount();
 	
 	ndInt32 newCount = 0;
-	for (ndInt32 i = 0; i < batch.m_count; ++i)
+	for (ndInt32 i = 0; i < cluster.m_count; ++i)
 	{
 		const ndInt32 ii = remapIndex[i].m_mask;
 		if (ii == -1) 
@@ -1726,7 +1726,7 @@ void ndMeshEffect::dPointFormat::CompressData(
 			const ndInt32 iii = remapIndex[i].m_vertexIndex;
 			const ndBigVector& p = m_vertex[iii];
 			const ndFloat64 swept = p[firstSortAxis] + sweptWindow;
-			for (ndInt32 j = i + 1; j < batch.m_count; ++j)
+			for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
 			{
 				const ndInt32 jj = remapIndex[j].m_mask;
 				if (jj == -1) 
@@ -1782,7 +1782,7 @@ void ndMeshEffect::dPointFormat::CompressData(
 		}
 	}
 	
-	for (ndInt32 i = 0; i < batch.m_count; ++i)
+	for (ndInt32 i = 0; i < cluster.m_count; ++i)
 	{
 		ndInt32 i1 = remapIndex[i].m_ordinal;
 		ndInt32 index = remapIndex[i].m_mask;
@@ -1799,11 +1799,11 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 	ndStack<dSortKey> indirectListBuffer(vertexCount);
 	dSortKey* const indirectList = &indirectListBuffer[0];
 
-	ndSortBatch batch;
-	batch.m_start = 0;
-	batch.m_count = vertexCount;
-	batch.m_sum = ndBigVector::m_zero;
-	batch.m_variance = ndBigVector::m_zero;
+	dSortCluster cluster;
+	cluster.m_start = 0;
+	cluster.m_count = vertexCount;
+	cluster.m_sum = ndBigVector::m_zero;
+	cluster.m_sum2 = ndBigVector::m_zero;
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		indirectList[i].m_mask = -1;
@@ -1812,29 +1812,29 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 		indirectList[i].m_attibuteIndex = -1;
 
 		const ndBigVector x(tmpFormat.m_vertex[i]);
-		batch.m_sum += x;
-		batch.m_variance += x * x;
+		cluster.m_sum += x;
+		cluster.m_sum2 += x * x;
 	}
 
 	if (vertexCount > D_VERTEXLIST_INDEX_LIST_BASH)
 	{
-		ndSortBatch spliteStack[128];
-		spliteStack[0] = batch;
+		dSortCluster spliteStack[128];
+		spliteStack[0] = cluster;
 
 		ndInt32 stack = 1;
 		while (stack)
 		{
 			stack--;
-			batch = spliteStack[stack];
-			dSortKey* const remapIndex = &indirectList[batch.m_start];
+			cluster = spliteStack[stack];
+			dSortKey* const remapIndex = &indirectList[cluster.m_start];
 
-			const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
-			const ndBigVector variance2(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
+			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 
 			ndFloat64 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
-			if ((batch.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
+			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
-				tmpFormat.CompressData(*this, indexList, remapIndex, batch, tol);
+				tmpFormat.CompressData(*this, indexList, remapIndex, cluster, tol);
 			}
 			else
 			{
@@ -1853,7 +1853,7 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 				plane.m_w = -origin[firstSortAxis];
 		
 				ndInt32 i0 = 0;
-				ndInt32 i1 = batch.m_count - 1;
+				ndInt32 i1 = cluster.m_count - 1;
 				while (i0 < i1)
 				{
 					ndInt32 index0 = remapIndex[i0].m_vertexIndex;
@@ -1885,7 +1885,7 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 		
 				ndInt32 index0 = remapIndex[i0].m_vertexIndex;
 				ndFloat64 side0 = plane.Evalue(tmpFormat.m_vertex[index0]);
-				while (side0 <= ndFloat32(0.0f) && (i0 < batch.m_count))
+				while (side0 <= ndFloat32(0.0f) && (i0 < cluster.m_count))
 				{
 					++i0;
 					index0 = remapIndex[i0].m_vertexIndex;
@@ -1900,7 +1900,7 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 					dAssert(side <= ndFloat32(0.0f));
 				}
 		
-				for (ndInt32 i = i0; i < batch.m_count; ++i)
+				for (ndInt32 i = i0; i < cluster.m_count; ++i)
 				{
 					ndInt32 index = remapIndex[i].m_vertexIndex;
 					ndFloat64 side = plane.Evalue(tmpFormat.m_vertex[index]);
@@ -1920,36 +1920,36 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 					maxP = maxP.GetMax(x);
 				}
 
-				ndSortBatch pair_i1(batch);
-				pair_i1.m_start = batch.m_start + i0;
-				pair_i1.m_count = batch.m_count - i0;
-				pair_i1.m_sum -= xc;
-				pair_i1.m_variance -= x2c;
-				spliteStack[stack] = pair_i1;
+				dSortCluster cluster_i1(cluster);
+				cluster_i1.m_start = cluster.m_start + i0;
+				cluster_i1.m_count = cluster.m_count - i0;
+				cluster_i1.m_sum -= xc;
+				cluster_i1.m_sum2 -= x2c;
+				spliteStack[stack] = cluster_i1;
 				stack++;
 		
-				ndSortBatch pair_i0(batch);
-				pair_i0.m_start = batch.m_start;
-				pair_i0.m_count = i0;
-				pair_i0.m_sum = xc;
-				pair_i0.m_variance = x2c;
-				spliteStack[stack] = pair_i0;
+				dSortCluster cluster_i0(cluster);
+				cluster_i0.m_start = cluster.m_start;
+				cluster_i0.m_count = i0;
+				cluster_i0.m_sum = xc;
+				cluster_i0.m_sum2 = x2c;
+				spliteStack[stack] = cluster_i0;
 				stack++;
 			}
 		}
 	}
 	else
 	{
-		tmpFormat.CompressData(*this, indexList, indirectList, batch, tol);
+		tmpFormat.CompressData(*this, indexList, indirectList, cluster, tol);
 	}
 }
 
 void ndMeshEffect::dAttibutFormat::CompressData(
 	dAttibutFormat& output,	const dPointFormat& points, ndInt32* const indexList, 
-	dSortKey* const remapIndex, const ndSortBatch& batch, ndFloat32 tol)
+	dSortKey* const remapIndex, const dSortCluster& cluster, ndFloat32 tol)
 {
-	const ndBigVector origin (batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
-	const ndBigVector x2c (batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+	const ndBigVector origin (cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
+	const ndBigVector x2c (cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 	const ndBigVector variance((x2c.GetMax(ndVector::m_zero)).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
@@ -1974,7 +1974,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(
 			return ndMeshEffect::dFormat::CompareVertex(&elementA, &elementB, context);
 		}
 	};
-	ndSort<dSortKey, CompareKey>(remapIndex, batch.m_count, &sortContext);
+	ndSort<dSortKey, CompareKey>(remapIndex, cluster.m_count, &sortContext);
 
 	const ndFloat64 minDist = dMin(dMin(variance.m_x, variance.m_y), variance.m_z);
 	const ndFloat64 tolerance = dMax(dMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
@@ -1983,7 +1983,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(
 	const ndInt32 base = output.m_pointChannel.GetCount();
 
 	ndInt32 newCount = 0;
-	for (ndInt32 i = 0; i < batch.m_count; ++i)
+	for (ndInt32 i = 0; i < cluster.m_count; ++i)
 	{
 		const ndInt32 ii = remapIndex[i].m_mask;
 		if (ii == -1)
@@ -1991,7 +1991,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(
 			const ndInt32 i0 = remapIndex[i].m_ordinal;
 			const ndInt32 iii = remapIndex[i].m_vertexIndex;
 			const ndFloat64 swept = points.m_vertex[iii][firstSortAxis] + sweptWindow;
-			for (ndInt32 j = i + 1; j < batch.m_count; ++j)
+			for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
 			{
 				const ndInt32 jj = remapIndex[j].m_mask;
 				if (jj == -1)
@@ -2143,7 +2143,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(
 		}
 	}
 
-	for (ndInt32 i = 0; i < batch.m_count; ++i)
+	for (ndInt32 i = 0; i < cluster.m_count; ++i)
 	{
 		ndInt32 i1 = remapIndex[i].m_ordinal;
 		ndInt32 index = remapIndex[i].m_mask;
@@ -2156,16 +2156,15 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 	dAttibutFormat tmpFormat(*this);
 	Clear();
 
-	const ndInt32 vertexCount = tmpFormat.m_pointChannel.GetCount();
-	ndStack<dSortKey> indirectListBuffer(vertexCount);
+	dSortCluster cluster;
+	cluster.m_start = 0;
+	cluster.m_sum = ndBigVector::m_zero;
+	cluster.m_sum2 = ndBigVector::m_zero;
+	cluster.m_count = tmpFormat.m_pointChannel.GetCount();
+	ndStack<dSortKey> indirectListBuffer(cluster.m_count);
 	dSortKey* const indirectList = &indirectListBuffer[0];
 
-	ndSortBatch batch;
-	batch.m_start = 0;
-	batch.m_count = vertexCount;
-	batch.m_sum = ndBigVector::m_zero;
-	batch.m_variance = ndBigVector::m_zero;
-	for (ndInt32 i = 0; i < vertexCount; ++i)
+	for (ndInt32 i = 0; i < cluster.m_count; ++i)
 	{
 		ndInt32 index = tmpFormat.m_pointChannel[i];
 		indirectList[i].m_mask = -1;
@@ -2174,30 +2173,30 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 		indirectList[i].m_vertexIndex = index;
 
 		const ndBigVector x(points.m_vertex[index]);
-		batch.m_sum += x;
-		batch.m_variance += x * x;
+		cluster.m_sum += x;
+		cluster.m_sum2 += x * x;
 	}
 
-	if (vertexCount > D_VERTEXLIST_INDEX_LIST_BASH)
+	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BASH)
 	{
-		ndSortBatch spliteStack[128];
-		spliteStack[0] = batch;
+		dSortCluster spliteStack[128];
+		spliteStack[0] = cluster;
 
 		ndInt32 stack = 1;
 		while (stack)
 		{
 			stack--;
 
-			batch = spliteStack[stack];
-			dSortKey* const remapIndex = &indirectList[batch.m_start];
+			cluster = spliteStack[stack];
+			dSortKey* const remapIndex = &indirectList[cluster.m_start];
 
-			const ndBigVector origin(batch.m_sum.Scale(ndFloat32(1.0f) / batch.m_count));
-			const ndBigVector variance2(batch.m_variance.Scale(ndFloat32(1.0f) / batch.m_count) - origin * origin);
+			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
+			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 			ndFloat64 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
-			if ((batch.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof (spliteStack) / sizeof (spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
+			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof (spliteStack) / sizeof (spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
-				tmpFormat.CompressData(*this, points, indexList, remapIndex, batch, tol);
+				tmpFormat.CompressData(*this, points, indexList, remapIndex, cluster, tol);
 			}
 			else
 			{
@@ -2216,7 +2215,7 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 				plane.m_w = -origin[firstSortAxis];
 
 				ndInt32 i0 = 0;
-				ndInt32 i1 = batch.m_count - 1;
+				ndInt32 i1 = cluster.m_count - 1;
 				while (i0 < i1)
 				{
 					ndInt32 index0 = remapIndex[i0].m_vertexIndex;
@@ -2248,7 +2247,7 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 
 				ndInt32 index0 = remapIndex[i0].m_vertexIndex;
 				ndFloat64 side0 = plane.Evalue(points.m_vertex[index0]);
-				while (side0 <= ndFloat32(0.0f) && (i0 < batch.m_count))
+				while (side0 <= ndFloat32(0.0f) && (i0 < cluster.m_count))
 				{
 					++i0;
 					index0 = remapIndex[i0].m_vertexIndex;
@@ -2263,7 +2262,7 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 					dAssert(side <= ndFloat32(0.0f));
 				}
 
-				for (ndInt32 i = i0; i < batch.m_count; ++i)
+				for (ndInt32 i = i0; i < cluster.m_count; ++i)
 				{
 					ndInt32 index = remapIndex[i].m_vertexIndex;
 					ndFloat64 side = plane.Evalue(points.m_vertex[index]);
@@ -2283,27 +2282,27 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 					maxP = maxP.GetMax(x);
 				}
 
-				ndSortBatch pair_i1(batch);
-				pair_i1.m_start = batch.m_start + i0;
-				pair_i1.m_count = batch.m_count - i0;
-				pair_i1.m_sum -= xc;
-				pair_i1.m_variance -= x2c;
-				spliteStack[stack] = pair_i1;
+				dSortCluster cluster_i1(cluster);
+				cluster_i1.m_start = cluster.m_start + i0;
+				cluster_i1.m_count = cluster.m_count - i0;
+				cluster_i1.m_sum -= xc;
+				cluster_i1.m_sum2 -= x2c;
+				spliteStack[stack] = cluster_i1;
 				stack++;
 
-				ndSortBatch pair_i0(batch);
-				pair_i0.m_start = batch.m_start;
-				pair_i0.m_count = i0;
-				pair_i0.m_sum = xc;
-				pair_i0.m_variance = x2c;
-				spliteStack[stack] = pair_i0;
+				dSortCluster cluster_i0(cluster);
+				cluster_i0.m_start = cluster.m_start;
+				cluster_i0.m_count = i0;
+				cluster_i0.m_sum = xc;
+				cluster_i0.m_sum2 = x2c;
+				spliteStack[stack] = cluster_i0;
 				stack++;
 			}
 		}
 	}
 	else
 	{
-		tmpFormat.CompressData(*this, points, indexList, indirectList, batch, tol);
+		tmpFormat.CompressData(*this, points, indexList, indirectList, cluster, tol);
 	}
 }
 
