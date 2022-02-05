@@ -605,7 +605,7 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * body0.GetMatrix());
 	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
 
-	ndContactSolver solver(&contact, m_scene->GetContactNotify(), m_scene->GetTimestep());
+	ndContactSolver solver(&contact, m_scene->GetContactNotify(), m_scene->GetTimestep(), 0);
 	bool ret = solver.CalculateClosestPoints();
 
 	m_normal = solver.m_separatingVector;

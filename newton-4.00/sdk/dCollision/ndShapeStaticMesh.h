@@ -54,6 +54,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 		:ndFastAabb()
 		,m_boxDistanceTravelInMeshSpace(ndFloat32 (0.0f))
 		,m_maxT(ndFloat32 (1.0f))
+		,m_threadId(0)
 		,m_doContinueCollisionTest(false)
 	{
 	}
@@ -94,7 +95,6 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndInt32 m_faceCount;
 	ndInt32 m_vertexStrideInBytes;
 	ndFloat32 m_skinMargin;
-	void* m_userData;
 	ndShapeInstance* m_convexInstance;
 	ndShapeInstance* m_polySoupInstance;
 	ndFloat32* m_vertex;
@@ -102,14 +102,15 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndInt32* m_faceVertexIndex;
 
 	// private data;
+	ndMesh m_meshData;
 	ndInt32* m_faceIndexStart;
 	ndFloat32* m_hitDistance;
 	const ndShapeStaticMesh* m_me;
-	ndInt32 m_globalIndexCount;
-	ndFloat32 m_maxT;
-	bool m_doContinueCollisionTest;
 	ndInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
-	ndMesh m_meshData;
+	ndFloat32 m_maxT;
+	ndInt32 m_globalIndexCount;
+	ndInt32 m_threadId;
+	bool m_doContinueCollisionTest;
 } D_GCC_NEWTON_ALIGN_32;
 
 class ndShapeStaticMesh: public ndShape

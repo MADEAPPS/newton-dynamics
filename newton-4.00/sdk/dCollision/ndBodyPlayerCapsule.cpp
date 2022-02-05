@@ -568,10 +568,9 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			}
 			ndContact contact;
 			contact.SetBodies(body0, body1);
-
+	
 			ndContactPoint contactBuffer[D_MAX_CONTATCS];
-			//ndContactSolver contactSolver(&contact, scene);
-			ndContactSolver contactSolver(&contact, scene->GetContactNotify(), ndFloat32(1.0f));
+			ndContactSolver contactSolver(&contact, scene->GetContactNotify(), ndFloat32(1.0f), 0);
 			contactSolver.m_instance0.SetGlobalMatrix(contactSolver.m_instance0.GetLocalMatrix() * body0->GetMatrix());
 			contactSolver.m_instance1.SetGlobalMatrix(contactSolver.m_instance1.GetLocalMatrix() * body1->GetMatrix());
 			contactSolver.m_separatingVector = srcContact->m_separatingVector;

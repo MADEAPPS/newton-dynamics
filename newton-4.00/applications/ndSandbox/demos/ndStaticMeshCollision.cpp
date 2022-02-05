@@ -31,7 +31,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	//BuildPlayArena(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
+	//BuildGridPlane(scene, 400, 4.0f, 0.0f);
 	//BuildCompoundScene(scene, heighfieldLocation);
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);

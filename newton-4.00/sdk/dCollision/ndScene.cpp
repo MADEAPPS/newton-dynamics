@@ -847,7 +847,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 			
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
-		ndContactSolver contactSolver(contact, m_contactNotifyCallback, m_timestep);
+		ndContactSolver contactSolver(contact, m_contactNotifyCallback, m_timestep, threadIndex);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_contactBuffer = contactBuffer;
 		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;

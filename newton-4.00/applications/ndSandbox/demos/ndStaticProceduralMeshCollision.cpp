@@ -25,7 +25,7 @@
 
 void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
-	BuildProceduralMap(scene, 120, 4.0f, 0.0f);
+	BuildProceduralMap(scene, 500, 4.0f, 0.0f);
 
 	ndMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;

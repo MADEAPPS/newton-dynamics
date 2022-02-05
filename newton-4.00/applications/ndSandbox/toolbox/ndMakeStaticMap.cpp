@@ -61,6 +61,18 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 
 	ndMeshEffect meshEffect;
 	meshEffect.BeginBuild();
+
+	ndMeshEffect::dMaterial material;
+	ndArray<ndMeshEffect::dMaterial>& materialArray = meshEffect.GetMaterials();
+	strcpy(material.m_textureName, "marbleCheckBoard.tga");
+	materialArray.PushBack(material);
+
+	ndPolygonSoupBuilder meshBuilder;
+	meshBuilder.Begin();
+
+	ndVector face[16];
+	ndFloat32 uvScale = 1.0 / 16.0f;
+	ndInt32 materialIndex = 0;
 	for (ndInt32 iz = 0; iz < grids; iz++)
 	{ 
 		for (ndInt32 ix = 0; ix < grids; ix++)
@@ -71,74 +83,66 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 			ndVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
 
 			meshEffect.BeginBuildFace();
-			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
-			meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
-			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+				meshEffect.AddMaterial(materialIndex);
+				meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
+				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+				meshEffect.AddUV0(p0.m_x * uvScale, p0.m_z * uvScale);
+
+				meshEffect.AddMaterial(materialIndex);
+				meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
+				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+				meshEffect.AddUV0(p1.m_x * uvScale, p1.m_z * uvScale);
+
+				meshEffect.AddMaterial(materialIndex);
+				meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+				meshEffect.AddUV0(p2.m_x * uvScale, p2.m_z * uvScale);
 			meshEffect.EndBuildFace();
+
+			face[0] = p0;
+			face[1] = p1;
+			face[2] = p2;
+			meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 
 			meshEffect.BeginBuildFace();
-			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
-			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
-			meshEffect.AddPoint(p3.m_x, p3.m_y, p3.m_z);
+				meshEffect.AddMaterial(0);
+				meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
+				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+				meshEffect.AddUV0(p0.m_x * uvScale, p0.m_z * uvScale);
+
+				meshEffect.AddMaterial(0);
+				meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+				meshEffect.AddUV0(p2.m_x * uvScale, p2.m_z * uvScale);
+
+				meshEffect.AddMaterial(0);
+				meshEffect.AddPoint(p3.m_x, p3.m_y, p3.m_z);
+				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+				meshEffect.AddUV0(p3.m_x * uvScale, p3.m_z * uvScale);
 			meshEffect.EndBuildFace();
-		}
-	}
-	meshEffect.EndBuild(0.0f);
 
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndPolygonSoupBuilder meshBuilder;
-	meshBuilder.Begin();
-
-	ndInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(ndFloat64);
-	const ndFloat64* const vertexData = meshEffect.GetVertexPool();
-
-	ndInt32 mark = meshEffect.IncLRU();
-
-	ndVector face[16];
-	ndPolyhedra::Iterator iter(meshEffect);
-	for (iter.Begin(); iter; iter++)
-	{
-		ndEdge* const edge = &(*iter);
-		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
-		{
-			ndInt32 count = 0;
-			ndEdge* ptr = edge;
-			do
-			{
-				ndInt32 i = ptr->m_incidentVertex * vertexStride;
-				ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
-				face[count] = point;
-				count++;
-				ptr->m_mark = mark;
-				ptr = ptr->m_next;
-			} while (ptr != edge);
-
-			ndInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
+			face[0] = p0;
+			face[1] = p2;
+			face[2] = p3;
 			meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 		}
 	}
+	meshEffect.EndBuild(0.0f);
 	meshBuilder.End(false);
 
-	ndFloat32 uvScale = 1.0 / 16.0f;
-
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
-	uvMatrix[0][0] *= uvScale;
-	uvMatrix[1][1] *= uvScale;
-	uvMatrix[2][2] *= uvScale;
-	ndDemoMesh* const geometry = new ndDemoMesh("plane", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	ndDemoMesh* const geometry = new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache());
 
 	ndMatrix matrix(dGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
+	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(plane);
-
 	world->AddBody(body);
-
 	scene->AddEntity(entity);
 	geometry->Release();
 	return body;

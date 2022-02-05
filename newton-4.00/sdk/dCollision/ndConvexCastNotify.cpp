@@ -46,7 +46,7 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * body0.GetMatrix());
 
 	m_contacts.SetCount(0);
-	ndContactSolver contactSolver(&contactJoint, &notify, ndFloat32(1.0f));
+	ndContactSolver contactSolver(&contactJoint, &notify, ndFloat32(1.0f), 0);
 	contactSolver.m_contactBuffer = &contactBuffer[0];
 
 	m_param = ndFloat32(1.2f);

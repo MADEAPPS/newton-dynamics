@@ -72,23 +72,21 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	private:
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
-	class ndLocalThreadData
+	class ndLocalData
 	{
 		public:
-		ndLocalThreadData()
-			:m_threadId()
+		ndLocalData()
+			:m_vertex(64)
 		{
 		}
-
 		ndArray<ndVector> m_vertex;
-		ndThreadId m_threadId;
 	};
 
 	void CalculateLocalObb();
-
+	
 	ndVector m_minBox;
 	ndVector m_maxBox;
-	mutable ndList<ndLocalThreadData> m_localData;
+	mutable ndLocalData m_localData[D_MAX_THREADS_COUNT];
 	ndInt32 m_maxFaceCount;
 	ndInt32 m_maxVertexCount;
 

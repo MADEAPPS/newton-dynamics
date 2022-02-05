@@ -70,8 +70,8 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 		ndFixSizeArray<ndContactPoint, 16>& contactOut);
 
 	private:
-	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, ndFloat32 timestep);
-	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, ndFloat32 timestep);
+	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, ndFloat32 timestep, ndInt32 threadId);
+	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, ndFloat32 timestep, ndInt32 threadId);
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 
 	ndInt32 CalculateContactsDiscrete(); // done
@@ -160,12 +160,13 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	ndFloat32 m_skinMargin;
 	ndFloat32 m_separationDistance;
 
+	ndInt32 m_threadId;
 	ndInt32 m_maxCount;
+	ndInt32 m_faceIndex;
 	ndInt32 m_vertexIndex;
-	ndUnsigned32 m_pruneContacts			: 1;
+	ndUnsigned32 m_pruneContacts		: 1;
 	ndUnsigned32 m_intersectionTestOnly	: 1;
 	
-	ndInt32 m_faceIndex;
 	ndMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
 	ndMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
 	ndMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
