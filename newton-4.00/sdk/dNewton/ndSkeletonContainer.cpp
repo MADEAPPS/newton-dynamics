@@ -97,6 +97,7 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 	ndSpatialMatrix& jointJ = m_data.m_joint.m_jt;
 	ndSpatialMatrix& jointMass = jointMassArray[m_index];
 
+	const ndVector negOne(ndVector::m_negOne);
 	const ndInt32 start = m_joint->m_rowStart;
 	const ndSpatialVector zero(ndSpatialVector::m_zero);
 	if (!m_swapJacobianBodiesIndex) 
@@ -128,8 +129,8 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 			jointMass[i] = zero;
 			jointMass[i][i] = -rhs->m_diagDamp;
 
-			jointJ[i] = ndSpatialVector(row->m_Jt.m_jacobianM0.m_linear * ndVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * ndVector::m_negOne);
-			bodyJt[i] = ndSpatialVector(row->m_Jt.m_jacobianM1.m_linear * ndVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * ndVector::m_negOne);
+			jointJ[i] = ndSpatialVector(row->m_Jt.m_jacobianM0.m_linear * negOne, row->m_Jt.m_jacobianM0.m_angular * negOne);
+			bodyJt[i] = ndSpatialVector(row->m_Jt.m_jacobianM1.m_linear * negOne, row->m_Jt.m_jacobianM1.m_angular * negOne);
 			for (ndInt32 j = 0; j < 4; ++j) 
 			{
 				bodyJt[i][3 + j] = bodyJt[i][4 + j];
@@ -436,7 +437,7 @@ void ndSkeletonContainer::SortGraph(ndNode* const root, ndInt32& index)
 
 	dAssert((m_nodeList.GetCount() - index - 1) >= 0);
 	m_nodesOrder[index] = root;
-	root->m_index = ndInt16(index);
+	root->m_index = index;
 	index++;
 	dAssert(index <= m_nodeList.GetCount());
 }
@@ -444,8 +445,6 @@ void ndSkeletonContainer::SortGraph(ndNode* const root, ndInt32& index)
 void ndSkeletonContainer::Finalize(ndInt32 loopJointsCount, ndJointBilateralConstraint** const loopJointArray)
 {
 	dAssert(m_nodeList.GetCount() >= 1);
-	//dAssert(((m_skeleton->m_body->GetInvMass() == ndFloat32(0.0f)) && (m_skeleton->m_child->m_sibling == nullptr)) || (m_skeleton->m_body->GetInvMass() != ndFloat32(0.0f)));
-	
 	m_nodesOrder = (ndNode**)ndMemory::Malloc(m_nodeList.GetCount() * sizeof(ndNode*));
 	
 	ndInt32 index = 0;
@@ -464,12 +463,12 @@ void ndSkeletonContainer::Finalize(ndInt32 loopJointsCount, ndJointBilateralCons
 	}
 }
 
-void ndSkeletonContainer::ClearSelfCollision()
+void ndSkeletonContainer::ClearCloseLoopJoints()
 {
 	m_dynamicsLoopCount = 0;
 }
 
-void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
+void ndSkeletonContainer::AddCloseLoopJoint(ndConstraint* const joint)
 {
 	ndScopeSpinLock lock(joint->GetBody0()->GetScene()->m_lock);
 	if (m_loopingJoints.GetCount() < (m_loopCount + m_dynamicsLoopCount + 1)) 
@@ -1426,8 +1425,8 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 		m_nodesOrder[nodeCount - 1]->Factorize(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
 	}
 
-	m_rowCount = ndInt16(rowCount);
-	m_auxiliaryRowCount = ndInt16(auxiliaryCount);
+	m_rowCount = rowCount;
+	m_auxiliaryRowCount = auxiliaryCount;
 
 	ndInt32 loopRowCount = 0;
 	const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
@@ -1437,7 +1436,7 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 		loopRowCount += joint->m_rowCount;
 	}
 
-	m_loopRowCount = ndInt16(loopRowCount);
+	m_loopRowCount = loopRowCount;
 	m_rowCount += m_loopRowCount;
 	m_auxiliaryRowCount += m_loopRowCount;
 

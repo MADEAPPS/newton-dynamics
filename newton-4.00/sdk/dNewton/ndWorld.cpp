@@ -874,7 +874,7 @@ void ndWorld::UpdateSkeletons()
 	for (ndInt32 i = 0; i < m_activeSkeletons.GetCount(); ++i)
 	{
 		ndSkeletonContainer* const skeleton = m_activeSkeletons[i];
-		skeleton->ClearSelfCollision();
+		skeleton->ClearCloseLoopJoints();
 	}
 }
 

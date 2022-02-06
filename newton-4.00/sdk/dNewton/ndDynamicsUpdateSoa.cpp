@@ -719,7 +719,7 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 			if (contactJoint->IsSkeletonSelftCollision())
 			{
 				contactJoint->m_isInSkeletonLoop = 1;
-				skeleton0->AddSelfCollisionJoint(contactJoint);
+				skeleton0->AddCloseLoopJoint(contactJoint);
 			}
 		}
 		else if (contactJoint->IsSkeletonIntraCollision())
@@ -727,12 +727,12 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 			if (skeleton0 && !skeleton1)
 			{
 				contactJoint->m_isInSkeletonLoop = 1;
-				skeleton0->AddSelfCollisionJoint(contactJoint);
+				skeleton0->AddCloseLoopJoint(contactJoint);
 			}
 			else if (skeleton1 && !skeleton0)
 			{
 				contactJoint->m_isInSkeletonLoop = 1;
-				skeleton1->AddSelfCollisionJoint(contactJoint);
+				skeleton1->AddCloseLoopJoint(contactJoint);
 			}
 		}
 	}
@@ -749,12 +749,12 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 				if (skeleton0 && !skeleton1)
 				{
 					bilareral->m_isInSkeletonLoop = 1;
-					skeleton0->AddSelfCollisionJoint(bilareral);
+					skeleton0->AddCloseLoopJoint(bilareral);
 				}
 				else if (skeleton1 && !skeleton0)
 				{
 					bilareral->m_isInSkeletonLoop = 1;
-					skeleton1->AddSelfCollisionJoint(bilareral);
+					skeleton1->AddCloseLoopJoint(bilareral);
 				}
 			}
 		}

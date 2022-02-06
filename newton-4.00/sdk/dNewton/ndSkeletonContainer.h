@@ -96,9 +96,9 @@ class ndSkeletonContainer
 			ndInt64 m_ordinals;
 			ndInt8 m_sourceJacobianIndex[8];
 		};
-		ndInt16 m_index;
-		ndInt8 m_dof;
-		ndInt8 m_swapJacobianBodiesIndex;
+		ndInt32 m_index;
+		ndInt16 m_dof;
+		ndInt16 m_swapJacobianBodiesIndex;
 		static ndInt64 m_ordinalInit;
 	};
 
@@ -117,8 +117,8 @@ class ndSkeletonContainer
 	ndNode* AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent);
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
-	void ClearSelfCollision();
-	void AddSelfCollisionJoint(ndConstraint* const joint);
+	void ClearCloseLoopJoints();
+	void AddCloseLoopJoint(ndConstraint* const joint);
 	void CalculateReactionForces(ndJacobian* const internalForces);
 	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
 
@@ -162,11 +162,11 @@ class ndSkeletonContainer
 	ndArray<ndInt8> m_auxiliaryMemoryBuffer;
 	ndSpinLock m_lock;
 	ndInt32 m_blockSize;
-	ndInt16 m_rowCount;
-	ndInt16 m_loopRowCount;
-	ndInt16 m_auxiliaryRowCount;
-	ndInt16 m_loopCount;
-	ndInt16 m_dynamicsLoopCount;
+	ndInt32 m_rowCount;
+	ndInt32 m_loopRowCount;
+	ndInt32 m_auxiliaryRowCount;
+	ndInt32 m_loopCount;
+	ndInt32 m_dynamicsLoopCount;
 	ndUnsigned8 m_isResting;
 
 	friend class ndWorld;
