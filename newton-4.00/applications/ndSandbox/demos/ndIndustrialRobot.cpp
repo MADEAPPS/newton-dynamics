@@ -114,6 +114,7 @@ class ndIndustrialRobot : public ndModel
 					{
 						const ndMatrix pivotMatrix(parentBody->GetMatrix());
 						m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
+						m_effector->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
 					}
 					break;
 				}
@@ -167,15 +168,18 @@ class ndIndustrialRobot : public ndModel
 		
 		// load effector joint
 		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
-		ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
-		ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
+		if (xmlGetInt(endEffectorNode, "hasEffector"))
+		{
+			ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
+			ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
 
-		ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
-		ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
-		dAssert(body1 == m_rootBody);
+			ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
+			ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
+			dAssert(body1 == m_rootBody);
 
-		const ndMatrix pivotMatrix(body0->GetMatrix());
-		m_effector = new ndJointKinematicController(body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic(), pivotMatrix);
+			const ndMatrix pivotMatrix(body0->GetMatrix());
+			m_effector = new ndJointKinematicController(body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic(), pivotMatrix);
+		}
 	}
 
 	~ndIndustrialRobot()
@@ -224,10 +228,14 @@ class ndIndustrialRobot : public ndModel
 		nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
 		modelRootNode->LinkEndChild(endEffectorNode);
 
-		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
-		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
-		xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
-		xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+		xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
+		if (m_effector)
+		{
+			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
+			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
+			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
+			xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+		}
 	}
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -272,6 +280,11 @@ class ndIndustrialRobot : public ndModel
 
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		dAssert(skeleton);
+
+		if (m_effector)
+		{
+			m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
+		}
 		m_invDynamicsSolver.Solve(skeleton, world, timestep);
 
 		// use solver result to set joint motors
@@ -279,9 +292,9 @@ class ndIndustrialRobot : public ndModel
 
 	ndBodyDynamic* m_rootBody;
 	ndJointKinematicController* m_effector;
-	ndFixSizeArray<ndJointHinge*, 16> m_jointArray;
-	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndSkeletonImmediateSolver m_invDynamicsSolver;
+	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
+	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIndustrialRobot);

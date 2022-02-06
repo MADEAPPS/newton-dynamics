@@ -32,29 +32,31 @@ class ndSkeletonImmediateSolver
 {
 	public:	
 	ndSkeletonImmediateSolver()
-		:m_internalForces(32)
-		,m_bodyArray(32)
+		:m_bodyArray(32)
 		,m_leftHandSide(64)
 		,m_rightHandSide(64)
+		,m_internalForces(32)
 	{
 	}
 
+	D_NEWTON_API void AddCloseLoopJoint(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
 	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
 
 	private:
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint);
 
-	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndBodyKinematic*> m_bodyArray;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
+	ndArray<ndJacobian> m_internalForces;
 	ndFloat32 m_timestep;
 	ndFloat32 m_invTimestep;
 
 	private:
 	ndWorld* m_world;
 	ndSkeletonContainer* m_skeleton;
+	friend class ndSkeletonContainer;
 };
 
 

@@ -38,6 +38,7 @@ class ndSkeletonContainer
 		public:
 		ndInt32 m_m0;
 		ndInt32 m_m1;
+		const ndJointBilateralConstraint* m_joint;
 	};
 
 	D_MSV_NEWTON_ALIGN_32
@@ -142,10 +143,12 @@ class ndSkeletonContainer
 	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
+	void SolveImmediate(ndSkeletonImmediateSolver& solverInfo);
+	void UpdateForcesImmediate(const ndForcePair* const force) const;
 	void CalculateJointForceImmediate(ndJacobian* const internalForces);
-	void UpdateForcesImmediate(ndJacobian* const internalForces, const ndForcePair* const force) const;
+	void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	void SolveAuxiliaryImmediate(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
-
+	
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
 	ndRightHandSide* m_rightHandSide;

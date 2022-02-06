@@ -160,13 +160,13 @@ class ndFunction<Type>
 	}
 
 	template<typename... Args> typename
-		std::result_of<Type(Args...)>::type operator()(Args... args)
+	std::result_of<Type(Args...)>::type operator()(Args... args)
 	{
 		m_object.operator()(args...);
 	}
 
 	template<typename... Args> typename
-		std::result_of<const Type(Args...)>::type operator()(Args... args) const
+	std::result_of<const Type(Args...)>::type operator()(Args... args) const
 	{
 		m_object.operator()(args...);
 	}
@@ -177,7 +177,6 @@ class ndFunction<Type>
 
 namespace ndMakeObject
 {
-	//template<typename Type> auto ndFunction(const Type & obj)
 	template<typename Type> auto ndFunction(const Type & obj) -> decltype (::ndFunction<Type>(obj))
 	{
 		return ::ndFunction<Type>(obj);

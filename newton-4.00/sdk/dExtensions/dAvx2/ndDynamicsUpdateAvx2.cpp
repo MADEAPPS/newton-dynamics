@@ -1756,8 +1756,9 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 		ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
 		const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 
-		const ndStartEnd startEnd(activeSkeletons.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		//const ndStartEnd startEnd(activeSkeletons.GetCount(), threadIndex, threadCount);
+		//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		for (ndInt32 i = threadIndex; i < activeSkeletons.GetCount(); i += threadCount)
 		{
 			ndSkeletonContainer* const skeleton = activeSkeletons[i];
 			skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
@@ -1781,8 +1782,9 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 	{
 		D_TRACKTIME();
 		ndJacobian* const internalForces = &GetInternalForces()[0];
-		const ndStartEnd startEnd(activeSkeletons.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		//const ndStartEnd startEnd(activeSkeletons.GetCount(), threadIndex, threadCount);
+		//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		for (ndInt32 i = threadIndex; i < activeSkeletons.GetCount(); i += threadCount)
 		{
 			ndSkeletonContainer* const skeleton = activeSkeletons[i];
 			skeleton->CalculateReactionForces(internalForces);
