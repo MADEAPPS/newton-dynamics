@@ -270,6 +270,22 @@ void ndSkeletonImmediateSolver::AddCloseLoopJoint(ndSkeletonContainer* const ske
 	skeleton->AddCloseLoopJoint(joint);
 }
 
+bool ndSkeletonImmediateSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
+{
+	return skeleton->m_isResting ? true : false;
+}
+
+ndVector ndSkeletonImmediateSolver::GetBodyForce(const ndBodyKinematic* const body) const
+{
+	return body->m_accel;
+}
+
+ndVector ndSkeletonImmediateSolver::GetBodyTorque(const ndBodyKinematic* const body) const
+{
+	return body->m_alpha;
+}
+
+
 void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
 	if (!skeleton->m_isResting)
@@ -281,32 +297,54 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 
 		m_leftHandSide.SetCount(0);
 		m_rightHandSide.SetCount(0);
-		m_bodyArray.SetCount(m_skeleton->m_nodeList.GetCount());
-		m_internalForces.SetCount(m_skeleton->m_nodeList.GetCount());
+		m_internalForces.SetCount(m_skeleton->m_nodeList.GetCount() * 2);
 
-		ndFixSizeArray<ndContact*, 128> contacts;
+		//const ndVector zero(ndVector::m_zero);
+		ndFixSizeArray<ndContact*, 256> contacts;
+		ndFixSizeArray<ndBodyKinematic*, 256> bodies;
+
+		ndBodyKinematic sentinelBody;
+		bodies.PushBack(&sentinelBody);
+		sentinelBody.m_index = 0;
+		//ndBodyKinematic* const sentinel = world->GetSentinelBody();
+
+		// add open loop bodies
 		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
 		{
 			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 			ndBodyKinematic* const body = node->m_body;
-			body->UpdateInvInertiaMatrix();
+			if (body->GetInvMass() > ndFloat32(0.0f))
+			{
+				bodies.PushBack(body);
+				body->m_rank = -1;
+			}
+		}
 
-			//const ndVector angularMomentum(body->CalculateAngularMomentum());
-			//body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
-			//body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
+		// add close loop 
+		const ndInt32 loopCount = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
+		for (ndInt32 i = 0; i < loopCount; i++)
+		{
+			ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
+			ndBodyKinematic* const body0 = joint->GetBody0();
+			ndBodyKinematic* const body1 = joint->GetBody1();
+			dAssert(body0->GetInvMass() > ndFloat32(0.0f));
+			if (body0->m_rank == 0)
+			{
+				bodies.PushBack(body0);
+				body0->m_rank = -1;
+			}
+			if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
+			{
+				bodies.PushBack(body0);
+				body0->m_rank = -1;
+			}
+		}
 
-			//body->m_accel = body->m_veloc;
-			//body->m_alpha = body->m_omega;
-			//body->m_gyroRotation = body->m_rotation;
-
-			body->m_rank = body->m_index;
-			body->m_index = i;
-
-			m_bodyArray[i] = body;
-
-			m_internalForces[i].m_linear = body->GetForce();
-			const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
-			m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
+		// add contacts loop bodies and joints
+		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+		{
+			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndBodyKinematic* const body = node->m_body;
 
 			ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 			ndBodyKinematic::ndContactMap::Iterator it(contactMap);
@@ -315,6 +353,7 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 				ndContact* const contact = it.GetNode()->GetInfo();
 				if (contact->IsActive())
 				{
+					dAssert(0);
 					bool duplicate = false;
 					const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
 					for (ndInt32 j = 0; j < loops; ++j)
@@ -324,9 +363,35 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 					if (!duplicate)
 					{
 						contacts.PushBack(contact);
+						ndBodyKinematic* const body0 = contact->GetBody0();
+						ndBodyKinematic* const body1 = contact->GetBody1();
+						dAssert(body0->GetInvMass() > ndFloat32(0.0f));
+						if (body0->m_rank == 0)
+						{
+							bodies.PushBack(body0);
+							body0->m_rank = -1;
+						}
+						if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
+						{
+							bodies.PushBack(body1);
+							body1->m_rank = -1;
+						}
 					}
 				}
 			}
+		}
+
+		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = bodies[i];
+			body->m_rank = body->m_index;
+			body->m_index = i;
+
+			body->UpdateInvInertiaMatrix();
+			const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
+
+			m_internalForces[i].m_linear = body->GetForce();
+			m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
 		}
 
 		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
@@ -355,10 +420,12 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 		m_skeleton->SolveImmediate(*this);
 
 		// restore body info
-		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+		for (ndInt32 i = 1; i < bodies.GetCount(); ++i)
 		{
-			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-			ndBodyKinematic* const body = node->m_body;
+			ndBodyKinematic* const body = bodies[i];
+			ndInt32 index = body->m_index;
+			body->m_accel = m_internalForces[index].m_linear;
+			body->m_alpha = m_internalForces[index].m_angular;
 			body->m_index = body->m_rank;
 			body->m_rank = 0;
 		}

@@ -68,6 +68,8 @@ class ndIndustrialRobot : public ndModel
 		ndMatrix matrix(location);
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
+
+		matrix.m_posit.m_y += 1.0f;
 		entity->ResetMatrix(matrix);
 		
 		// add the root body
@@ -114,7 +116,10 @@ class ndIndustrialRobot : public ndModel
 					{
 						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
+						m_effector->SetMaxLinearFriction(10000.0f);
+						m_effector->SetMaxAngularFriction(10000.0f);
 						m_effector->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+						world->AddJoint(m_effector);
 					}
 					break;
 				}
@@ -186,7 +191,7 @@ class ndIndustrialRobot : public ndModel
 	{
 		if (m_effector)
 		{
-			delete m_effector;
+//			delete m_effector;
 		}
 	}
 
@@ -285,22 +290,46 @@ class ndIndustrialRobot : public ndModel
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
-		if (m_effector)
+		//if (m_effector)
+		if (0)
 		{
-			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-			{
-				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-				joint->OverrideAccel(false, ndFloat32 (0.0f));
-			}
 			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 			dAssert(skeleton);
-			m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
-			m_invDynamicsSolver.Solve(skeleton, world, timestep);
-
-			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			if (!m_invDynamicsSolver.IsSleeping(skeleton))
 			{
-				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-				joint->OverrideAccel(true, ndFloat32(0.0f));
+				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+				{
+					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+					joint->OverrideAccel(false, ndFloat32(0.0f));
+
+					//joint->OverrideAccel(true, ndFloat32(0.0f));
+				}
+				m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
+				m_invDynamicsSolver.Solve(skeleton, world, timestep);
+
+				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+				{
+					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+					joint->OverrideAccel(true, ndFloat32(0.0f));
+
+					const ndBodyKinematic* const body0 = joint->GetBody0();
+					const ndBodyKinematic* const body1 = joint->GetBody1();
+
+					//ndFloat32 invMass0 = body0->GetInvMass();
+					//ndFloat32 invMass1 = body1->GetInvMass();
+					const ndMatrix& invInertia0 = body0->GetInvInertia();
+					const ndMatrix& invInertia1 = body1->GetInvInertia();
+
+					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
+					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
+					const ndVector alpha0(invInertia0.RotateVector(torque0));
+					const ndVector alpha1(invInertia1.RotateVector(torque1));
+
+					ndJacobianPair jacobian(joint->GetPinJacobian());
+					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+					accel *= 1;
+					joint->OverrideAccel(true, -accel);
+				}
 			}
 		}
 	}

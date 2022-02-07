@@ -220,6 +220,17 @@ void ndJointHinge::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 	}
 }
 
+ndJacobianPair ndJointHinge::GetPinJacobian() const
+{
+	ndMatrix matrix (GetLocalMatrix0() * GetBody0()->GetMatrix());
+	ndJacobianPair pair;
+	pair.m_jacobianM0.m_linear = ndVector::m_zero;
+	pair.m_jacobianM1.m_linear = ndVector::m_zero;
+	pair.m_jacobianM0.m_angular = matrix.m_front;
+	pair.m_jacobianM1.m_angular = matrix.m_front * ndVector::m_negOne;
+	return pair;
+}
+
 void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
