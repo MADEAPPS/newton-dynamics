@@ -146,7 +146,7 @@ class BackGroundVehicleController : public ndModel
 		ndVector vVelocityUp = vVelocity - vForward.Scale(vVelocity.DotProduct(vForward).GetScalar()) - vVelocitySideways;
 		ndVector vSidewaysMomentum = vVelocitySideways.Scale(m_pAiBody->GetMassMatrix().m_w);
 		ndVector vVerticalMomentum = vVelocityUp.Scale(m_pAiBody->GetMassMatrix().m_w);
-		m_pAiBody->ApplyImpulsePair(ndVector::m_negOne * vSidewaysMomentum * 0.8f, ndVector(0.0f), dTimestep);      // 0.8 = momentum cancelling factor
+		m_pAiBody->ApplyImpulsePair(ndVector::m_negOne * vSidewaysMomentum * 0.8f, ndVector(0.0f), dTimestep);      // 0.8 = momentum canceling factor
 		m_pAiBody->ApplyImpulsePair(ndVector::m_negOne * vVerticalMomentum * 0.0f, ndVector(0.0f), dTimestep);
 
 		// Work out steering forces

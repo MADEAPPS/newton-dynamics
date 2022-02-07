@@ -52,11 +52,12 @@
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
-#define DEFAULT_SCENE	16		// industrial robot
-//#define DEFAULT_SCENE	17		// simple voronoi fracture
-//#define DEFAULT_SCENE	18		// basic voronoi fracture
-//#define DEFAULT_SCENE	19		// linked voronoi fracture
-//#define DEFAULT_SCENE	20		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	16		// background vehicle prop
+#define DEFAULT_SCENE	17		// industrial robot
+//#define DEFAULT_SCENE	18		// simple voronoi fracture
+//#define DEFAULT_SCENE	19		// basic voronoi fracture
+//#define DEFAULT_SCENE	20		// linked voronoi fracture
+//#define DEFAULT_SCENE	21		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -74,6 +75,7 @@ void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
+void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
 //void ndBasicFracture_0(ndDemoEntityManager* const scene);
@@ -96,10 +98,11 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
-	{ "basic ragdoll", ndBasicRagdoll },
-	{ "active ragdoll", ndActiveRagdoll },
+	{ "basic rag doll", ndBasicRagdoll },
+	{ "active rag doll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
+	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "industrial robot", ndInsdustrialRobot },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
@@ -640,6 +643,7 @@ void ndDemoEntityManager::Cleanup ()
 	if (m_cameraManager) 
 	{
 		delete m_cameraManager;
+		m_cameraManager = nullptr;
 	}
 
 	m_sky = nullptr;
