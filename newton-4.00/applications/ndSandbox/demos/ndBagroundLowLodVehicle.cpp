@@ -68,10 +68,9 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 class BackGroundVehicleController : public ndModel
 {
 	public:
-	BackGroundVehicleController(ndDemoEntityManager* pScene, ndBodyDynamic* pBody, ndBodyKinematic* pHeightField)
+	BackGroundVehicleController(ndDemoEntityManager* pScene, ndBodyDynamic* pBody)
 		:m_pScene(pScene)
 		,m_pAiBody(pBody)
-		,m_pHeightField(pHeightField)
 		,m_dDesiredSpeed(4.1667f)      // 4.1667f m/s = 15 km/h (9.3 mph) 33.3333 m/s = 120km/h (74.6mph)
 		,m_dCurrentSpeed(0.0f)
 		,m_dSpeedProportional(3000.0f)
@@ -87,7 +86,8 @@ class BackGroundVehicleController : public ndModel
 	protected:
 	virtual void Update(ndWorld* const, ndFloat32 timestep) override
 	{
-		if (m_pAiBody->GetPosition().m_y < 1.5f)
+		//if (m_pAiBody->GetPosition().m_y < 1.5f)
+		if (1)
 		{
 			ndMatrix mMatrix(m_pAiBody->GetRotation(), ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0)));
 			ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
@@ -103,27 +103,6 @@ class BackGroundVehicleController : public ndModel
 			m_pAiBody->SetForce(m_pAiBody->GetForce() + vForceLS);
 			m_pAiBody->SetTorque(m_pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
 			_ApplyLateralForces(timestep);
-		}
-
-		if (m_pHeightField)
-		{
-			// Move the height field with the body
-			static int iFrameCount = 0;
-
-			if (iFrameCount == 100)      // Update the height field every 50 frames
-			{
-				ndVector heightPos = m_pAiBody->GetPosition();
-				heightPos.m_x -= 16.0f;
-				heightPos.m_y = 0.0f;
-				heightPos.m_z -= 16.0f;
-				ndMatrix mHeightField = m_pHeightField->GetMatrix();
-				mHeightField.m_posit = heightPos;
-				m_pHeightField->SetMatrixUpdateScene(mHeightField);
-
-				iFrameCount = 0;
-			}
-
-			++iFrameCount;
 		}
 
 		// Get the camera to follow the vehicle
@@ -191,7 +170,6 @@ class BackGroundVehicleController : public ndModel
 
 	ndDemoEntityManager* m_pScene;
 	ndBodyDynamic* m_pAiBody;
-	ndBodyKinematic* m_pHeightField;
 	ndFloat32 m_dDesiredSpeed;
 	ndFloat32 m_dCurrentSpeed;
 	ndFloat32 m_dSpeedProportional;
@@ -202,7 +180,7 @@ class BackGroundVehicleController : public ndModel
 	ndFloat32 m_dCombinedMaximumForce;
 };
 
-static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, ndFloat32 mass, ndBodyKinematic* pHeightField)
+static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)
 {
 	ndBodyDynamic* const pBody = new ndBodyDynamic();
 	ndDemoEntity* const pEntity = new ndDemoEntity(matrix, rootEntity);
@@ -210,7 +188,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMat
 	pBody->SetMatrix(matrix);
 	pBody->SetCollisionShape(shape);
 	pBody->SetMassMatrix(mass, shape);
-	BackGroundVehicleController* const pController = new BackGroundVehicleController(scene, pBody, pHeightField);
+	BackGroundVehicleController* const pController = new BackGroundVehicleController(scene, pBody);
 
 	ndWorld* const world = scene->GetWorld();
 	world->AddModel(pController);
@@ -253,7 +231,7 @@ static ndShapeInstance CreateCompondCollision()
 	mChildWorld.m_posit = ndVector(ndFloat32(0.0), ndFloat32(1.158), ndFloat32(-0.508), ndFloat32(1.0));
 	ndMatrix mChildLocal = mChildWorld * mParentInv;
 
-#if 1
+#if 0
 	ndShapeInstance shapeInstance(new ndShapeCompound());
 
 	shapeInstance.GetShape()->GetAsShapeCompound()->BeginAddRemove();
@@ -279,21 +257,9 @@ static ndShapeInstance CreateCompondCollision()
 	return shapeInstance;
 }
 
-static ndShapeInstance CreateBoxCollision()
+static void AddAiVehicle(ndDemoEntityManager* const scene)
 {
-	ndShapeInstance shapeInstance(new ndShapeBox(1.0, 0.5, 2.0));
-
-	// set material ID
-	ndShapeMaterial material(shapeInstance.GetMaterial());
-	material.m_userId = ndApplicationMaterial::m_aiCar;
-	shapeInstance.SetMaterial(material);
-	return shapeInstance;
-}
-
-static void AddAiVehicle(ndDemoEntityManager* const scene, ndBodyKinematic* pHeightField)
-{
-	ndShapeInstance shapeInstance = CreateBoxCollision();
-	//ndShapeInstance shapeInstance = CreateCompondCollision();
+	ndShapeInstance shapeInstance = CreateCompondCollision();
 
 	ndDemoMeshIntance* const aiGeometry = new ndDemoMeshIntance("AiVehicle", scene->GetShaderCache(), &shapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	ndDemoInstanceEntity* const aiEntity = new ndDemoInstanceEntity(aiGeometry);
@@ -301,46 +267,12 @@ static void AddAiVehicle(ndDemoEntityManager* const scene, ndBodyKinematic* pHei
 	ndMatrix mBodyMatrix = dGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(0.0f, 5.0f, 0.0f, 1.0f);
 	//mBodyMatrix.m_posit = ndVector(0.0f, 1.2f, 0.0f, 1.0f);
-	auto pAiBody = AddRigidBody(scene, mBodyMatrix, shapeInstance, aiEntity, 1000.0, pHeightField);
+	auto pAiBody = AddRigidBody(scene, mBodyMatrix, shapeInstance, aiEntity, 1000.0);
 
 	ndVector origin(pAiBody->GetPosition());
 	ndQuaternion rot(dYawMatrix(180.0f * ndDegreeToRad));
 	origin.m_x += 10.0f;
 	scene->SetCameraMatrix(rot, origin);
-}
-
-static ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene, const ndMatrix& location)
-{
-	// create the height field collision and rigid body
-	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_HEIGHTFIELD_WIDTH, D_HEIGHTFIELD_HEIGHT,
-		ndShapeHeightfield::m_invertedDiagonals, 1.0f / 100.0f, D_HEIGHTFIELD_GRID_SIZE, D_HEIGHTFIELD_GRID_SIZE));
-
-	// set material ID
-	ndShapeMaterial material (heighfieldInstance.GetMaterial());
-	material.m_userId = ndApplicationMaterial::m_aiTerrain;
-	heighfieldInstance.SetMaterial(material);
-
-	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<ndInt16>& hightMap = shape->GetElevationMap();
-	dAssert(hightMap.GetCount() == D_HEIGHTFIELD_WIDTH * D_HEIGHTFIELD_HEIGHT);
-	for (int i = 0; i < D_HEIGHTFIELD_WIDTH * D_HEIGHTFIELD_HEIGHT; ++i)
-	{
-		ndFloat32 high = 0.0; //  heightfield[i].m_y * 100.0f;
-		//ndFloat32 high = dGaussianRandom(4.0f);
-		dAssert(high < ndFloat32(1 << 15));
-		dAssert(high > -ndFloat32(1 << 15));
-		hightMap[i] = ndInt16(high);
-	}
-	shape->UpdateElevationMapAabb();
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(location);
-	body->SetCollisionShape(heighfieldInstance);
-
-	world->AddBody(body);
-	return body;
 }
 
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
@@ -350,10 +282,21 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_aiCar, ndApplicationMaterial::m_aiTerrain);
 
 	ndMatrix heighfieldLocation(dGetIdentityMatrix());
-	heighfieldLocation.m_posit.m_x = -16.0f;
-	heighfieldLocation.m_posit.m_z = -16.0f;
-	ndBodyKinematic* const mapBody = BuildHeightField(scene, heighfieldLocation);
+	heighfieldLocation.m_posit.m_x = -200.0f;
+	heighfieldLocation.m_posit.m_z = -200.0f;
+
+	//ndBodyKinematic* const mapBody = BuildPlayArena(scene);
+	//ndBodyKinematic* const mapBody = BuildFlatPlane(scene, true);
+	ndBodyKinematic* const mapBody = BuildGridPlane(scene, 400, 4.0f, 0.0f);
+	//ndBodyKinematic* const mapBody = BuildCompoundScene(scene, heighfieldLocation);
+	//ndBodyKinematic* const mapBody = BuildHeightFieldTerrain(scene, heighfieldLocation);
+	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//ndBodyKinematic* const mapBody = BuildProceduralMap(scene, 200, 2.0f, 0.0f);
-	AddAiVehicle(scene, mapBody);
-	//AddAiVehicle(scene, nullptr);
+	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "track.fbx", false);
+
+	ndShapeMaterial mapMaterial(mapBody->GetCollisionShape().GetMaterial());
+	mapMaterial.m_userId = ndApplicationMaterial::m_aiTerrain;
+	mapBody->GetCollisionShape().SetMaterial(mapMaterial);
+	
+	AddAiVehicle(scene);
 }
