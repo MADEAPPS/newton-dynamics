@@ -44,6 +44,18 @@ ndJointHingeActuator::~ndJointHingeActuator()
 {
 }
 
+void ndJointHingeActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointHinge::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "targetAngle", m_targetAngle);
+	xmlSaveParam(childNode, "motorSpeed", m_motorSpeed);
+	xmlSaveParam(childNode, "maxTorque", m_maxTorque);
+}
+
 ndFloat32 ndJointHingeActuator::GetMinAngularLimit() const
 {
 	return m_minLimit;
@@ -151,14 +163,4 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dAssert(desc.m_rowsCount <= 6);
 }
 
-void ndJointHingeActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointHinge::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "targetAngle", m_targetAngle);
-	xmlSaveParam(childNode, "motorSpeed", m_motorSpeed);
-	xmlSaveParam(childNode, "maxTorque", m_maxTorque);
-}

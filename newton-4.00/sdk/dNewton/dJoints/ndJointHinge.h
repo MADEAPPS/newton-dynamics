@@ -32,6 +32,7 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ndFloat32 GetFriction() const;
 
 	D_NEWTON_API virtual void SetFriction(ndFloat32 frictionTorque);
+	D_NEWTON_API virtual void OverrideAccel(bool state, ndFloat32 motorAccel);
 	D_NEWTON_API virtual void EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLimit);
 	D_NEWTON_API virtual void SetAsSpringDamper(bool state, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
@@ -50,9 +51,11 @@ class ndJointHinge: public ndJointBilateralConstraint
 	ndFloat32 m_minLimit;
 	ndFloat32 m_maxLimit;
 	ndFloat32 m_friction;
+	ndFloat32 m_axisAccel;
 	ndFloat32 m_springDamperRegularizer;
 
 	bool m_hasLimits;
+	bool m_overrideAccel;
 	bool m_isSpringDamper;
 };
 

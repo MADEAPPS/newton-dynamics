@@ -112,7 +112,7 @@ class ndIndustrialRobot : public ndModel
 					}
 					else
 					{
-						const ndMatrix pivotMatrix(parentBody->GetMatrix());
+						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
 						m_effector->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
 					}
@@ -264,6 +264,14 @@ class ndIndustrialRobot : public ndModel
 		return m_rootBody;
 	}
 
+	void Debug(ndConstraintDebugCallback& context) const
+	{
+		if (m_effector)
+		{
+			m_effector->DebugJoint(context);
+		}
+	}
+
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::PostUpdate(world, timestep);
@@ -277,17 +285,24 @@ class ndIndustrialRobot : public ndModel
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
-
-		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-		dAssert(skeleton);
-
 		if (m_effector)
 		{
+			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			{
+				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+				joint->OverrideAccel(false, ndFloat32 (0.0f));
+			}
+			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			dAssert(skeleton);
 			m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
-		}
-		m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			m_invDynamicsSolver.Solve(skeleton, world, timestep);
 
-		// use solver result to set joint motors
+			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			{
+				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+				joint->OverrideAccel(true, ndFloat32(0.0f));
+			}
+		}
 	}
 
 	ndBodyDynamic* m_rootBody;
@@ -312,12 +327,12 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
-
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
-	matrix.m_posit.m_x += 2.0f;
-	matrix.m_posit.m_z -= 2.0f;
-	scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
+
+	//matrix.m_posit.m_x += 2.0f;
+	//matrix.m_posit.m_z -= 2.0f;
+	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
 
 	delete robotEntity;
 

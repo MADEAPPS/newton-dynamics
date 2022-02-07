@@ -45,14 +45,14 @@
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// basic player
 //#define DEFAULT_SCENE	8		// particle fluid
-#define DEFAULT_SCENE	9		// static mesh collision 
+//#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic rag doll
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
-//#define DEFAULT_SCENE	16		// basic robot
+#define DEFAULT_SCENE	16		// industrial robot
 //#define DEFAULT_SCENE	17		// simple voronoi fracture
 //#define DEFAULT_SCENE	18		// basic voronoi fracture
 //#define DEFAULT_SCENE	19		// linked voronoi fracture
@@ -364,7 +364,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_showModelsDebugInfo = true;
+	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
