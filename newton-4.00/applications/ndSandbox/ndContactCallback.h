@@ -19,8 +19,9 @@ class ndApplicationMaterial : public ndMaterial
 	enum ndMaterialUserIDs
 	{
 		m_default = 0,
-		m_aiCar = 1,
-		m_aiTerrain = 2,
+		m_frictionTest = 1,
+		m_aiCar = 2,
+		m_aiTerrain = 3,
 		m_dedris = 100,
 	};
 
