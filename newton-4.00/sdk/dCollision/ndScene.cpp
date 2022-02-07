@@ -830,7 +830,6 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& tim
 
 void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact)
 {
-	//DG_TRACKTIME();
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 	
@@ -855,6 +854,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 		ndInt32 count = contactSolver.CalculateContactsDiscrete ();
 		if (count)
 		{
+			contact->SetActive(true);
 			if (contactSolver.m_intersectionTestOnly)
 			{
 				if (!contact->m_isIntersetionTestOnly)
@@ -877,7 +877,6 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 		}
 		else
 		{
-			//if (contact->m_isIntersetionTestOnly)
 			if (contactSolver.m_intersectionTestOnly)
 			{
 				ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
