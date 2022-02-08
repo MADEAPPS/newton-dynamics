@@ -190,7 +190,7 @@ class ndIndustrialRobot : public ndModel
 			dAssert(body1 == m_rootBody);
 
 			const ndMatrix pivotMatrix(body0->GetMatrix());
-			m_effector = new ndJointKinematicController(body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic(), pivotMatrix);
+			m_effector = new ndJointKinematicChain(body1->GetMatrix().m_posit, pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
 		}
 	}
 
@@ -280,7 +280,7 @@ class ndIndustrialRobot : public ndModel
 	{
 		if (m_effector)
 		{
-			m_effector->DebugJoint(context);
+			((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
 		}
 	}
 
@@ -324,8 +324,8 @@ class ndIndustrialRobot : public ndModel
 
 					//ndFloat32 invMass0 = body0->GetInvMass();
 					//ndFloat32 invMass1 = body1->GetInvMass();
-					const ndMatrix& invInertia0 = body0->GetInvInertia();
-					const ndMatrix& invInertia1 = body1->GetInvInertia();
+					const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
+					const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
 
 					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
 					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
@@ -342,7 +342,7 @@ class ndIndustrialRobot : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointKinematicController* m_effector;
+	ndJointKinematicChain* m_effector;
 	ndSkeletonImmediateSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
