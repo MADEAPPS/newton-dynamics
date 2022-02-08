@@ -114,9 +114,14 @@ class ndIndustrialRobot : public ndModel
 					}
 					else
 					{
-						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndJointKinematicChain(m_rootBody->GetMatrix().m_posit, pivotMatrix, parentBody, m_rootBody);
+						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						m_effector = new ndJointKinematicChain(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, false);
+
+						pivotMatrix.m_posit.m_y -= 0.5f;
+						pivotMatrix.m_posit.m_x += 2.5f;
+						pivotMatrix.m_posit.m_z += 2.5f;
+						m_effector->SetTargetGlobalMatrix(pivotMatrix);
 						world->AddJoint(m_effector);
 					}
 					break;
@@ -181,7 +186,7 @@ class ndIndustrialRobot : public ndModel
 			dAssert(body1 == m_rootBody);
 
 			const ndMatrix pivotMatrix(body0->GetMatrix());
-			m_effector = new ndJointKinematicChain(body1->GetMatrix().m_posit, pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+			m_effector = new ndJointKinematicChain(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
 		}
 	}
 
@@ -314,8 +319,6 @@ class ndIndustrialRobot : public ndModel
 				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 				{
 					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					joint->OverrideAccel(true, ndFloat32(0.0f));
-
 					const ndBodyKinematic* const body0 = joint->GetBody0();
 					const ndBodyKinematic* const body1 = joint->GetBody1();
 

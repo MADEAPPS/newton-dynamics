@@ -20,7 +20,7 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	public:
 	D_CLASS_REFLECTION(ndJointKinematicChain);
 	D_NEWTON_API ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointKinematicChain(const ndVector& globalHipPivot, const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointKinematicChain(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointKinematicChain();
 
 	D_NEWTON_API void SetTargetLocalMatrix(const ndMatrix& matrix);
@@ -39,10 +39,7 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
-
 	ndMatrix m_baseFrame;
-	ndVector m_hipPivot;
-
 	ndFloat32 m_angle;
 	ndFloat32 m_minAngle;
 	ndFloat32 m_maxAngle;
@@ -50,7 +47,6 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	ndFloat32 m_angularDamper;
 	ndFloat32 m_angularRegularizer;
 
-	ndFloat32 m_maxDist;
 	ndFloat32 m_linearSpring;
 	ndFloat32 m_linearDamper;
 	ndFloat32 m_linearRegularizer;

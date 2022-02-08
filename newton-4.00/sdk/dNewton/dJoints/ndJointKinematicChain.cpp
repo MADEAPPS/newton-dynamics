@@ -13,18 +13,11 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointKinematicChain.h"
 
-//#define D_TBIK_MAX_ANGLE	ndFloat32 (120.0f * ndDegreeToRad)
-//#define D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED ndFloat32 (0.1f) 
-//#define D_TBIK_PENETRATION_ANGULAR_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
-//#define D_TBIK_SMALL_DISTANCE_ERROR ndFloat32 (1.0e-2f)
-//#define D_TBIK_SMALL_DISTANCE_ERROR2 (D_TBIK_SMALL_DISTANCE_ERROR * D_TBIK_SMALL_DISTANCE_ERROR)
-
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointKinematicChain)
 
-ndJointKinematicChain::ndJointKinematicChain(const ndVector& globalHipPivot, const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointKinematicChain::ndJointKinematicChain(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, globalPinAndPivot)
-	,m_baseFrame(dGetIdentityMatrix())
-	,m_hipPivot(parent->GetMatrix().UntransformVector(globalHipPivot))
+	,m_baseFrame(m_localMatrix1)
 	,m_angle(ndFloat32(0.0f))
 	,m_minAngle(-ndFloat32(45.0f) * ndDegreeToRad)
 	,m_maxAngle(ndFloat32(45.0f) * ndDegreeToRad)
@@ -39,22 +32,20 @@ ndJointKinematicChain::ndJointKinematicChain(const ndVector& globalHipPivot, con
 {
 	SetSolverModel(m_jointkinematicCloseLoop);
 
-	m_baseFrame = m_localMatrix1;
-	ndVector dist(m_localMatrix1.m_posit - m_hipPivot);
-	m_maxDist = ndSqrt(dist.DotProduct(dist & ndVector::m_triplexMask).GetScalar());
-	dAssert(m_maxDist > ndFloat32(0.0f));
+	//m_baseFrame = m_localMatrix1;
+	//ndVector dist(m_localMatrix1.m_posit - m_hipPivot);
+	//m_maxDist = ndSqrt(dist.DotProduct(dist & ndVector::m_triplexMask).GetScalar());
+	//dAssert(m_maxDist > ndFloat32(0.0f));
 
 	// test joint positioning.
-	ndMatrix matrix(m_baseFrame);
-	matrix.m_posit += m_baseFrame.m_front.Scale(0.1f);
-	//matrix.m_posit += m_baseFrame.m_up.Scale(0.2f);
-	matrix.m_posit += m_baseFrame.m_right.Scale(-0.2f);
-	SetTargetGlobalMatrix(matrix * m_body1->GetMatrix());
+	//ndMatrix matrix(m_baseFrame);
+	//matrix.m_posit += m_baseFrame.m_front.Scale(0.1f);
+	//matrix.m_posit += m_baseFrame.m_right.Scale(-0.2f);
+	//SetTargetGlobalMatrix(matrix * m_body1->GetMatrix());
 }
 
 ndJointKinematicChain::ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_hipPivot(ndVector::m_wOne)
 	,m_angle(ndFloat32(0.0f))
 	,m_minAngle(-ndFloat32(45.0f) * ndDegreeToRad)
 	,m_maxAngle(ndFloat32(45.0f) * ndDegreeToRad)
@@ -185,23 +176,25 @@ void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback)
 	//}
 }
 
-void ndJointKinematicChain::SetTargetLocalMatrix(const ndMatrix& matrix)
+//void ndJointKinematicChain::SetTargetLocalMatrix(const ndMatrix& matrix)
+void ndJointKinematicChain::SetTargetLocalMatrix(const ndMatrix&)
 {
-	ndVector posit((matrix.m_posit - m_hipPivot) & ndVector::m_triplexMask);
-	ndFloat32 mag2 = posit.DotProduct(posit).GetScalar();
-	if (mag2 > (m_maxDist * m_maxDist))
-	{
-		posit = posit.Normalize().Scale(m_maxDist);
-	}
-
-	m_localMatrix1 = matrix;
-	m_localMatrix1.m_posit = m_hipPivot + posit;
-	m_localMatrix1.m_posit.m_w = ndFloat32(1.0f);
+	//ndVector posit((matrix.m_posit - m_hipPivot) & ndVector::m_triplexMask);
+	//ndFloat32 mag2 = posit.DotProduct(posit).GetScalar();
+	//if (mag2 > (m_maxDist * m_maxDist))
+	//{
+	//	posit = posit.Normalize().Scale(m_maxDist);
+	//}
+	//
+	//m_localMatrix1 = matrix;
+	//m_localMatrix1.m_posit = m_hipPivot + posit;
+	//m_localMatrix1.m_posit.m_w = ndFloat32(1.0f);
 }
 
 void ndJointKinematicChain::SetTargetGlobalMatrix(const ndMatrix& matrix)
 {
-	SetTargetLocalMatrix(matrix * m_body1->GetMatrix().Inverse());
+	//SetTargetLocalMatrix(matrix * m_body1->GetMatrix().Inverse());
+	m_localMatrix1 = matrix * m_body1->GetMatrix().Inverse();
 }
 
 void ndJointKinematicChain::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
@@ -260,13 +253,13 @@ void ndJointKinematicChain::SubmitAngularAxis(const ndMatrix& matrix0, const ndM
 void ndJointKinematicChain::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 	
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 	
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 }
 
 void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)

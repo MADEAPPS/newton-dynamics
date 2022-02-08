@@ -312,26 +312,27 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 
 void ndCharacter::CreateKinematicChain(const ndMatrix& globalOrientation, const ndCharacterNode* const footNode)
 {
-	ndCharacterNode* const calf = footNode->GetParent();
-	ndCharacterNode* const leg = calf->GetParent();
-	ndCharacterNode* const hip = leg->GetParent();
-
-	ndMatrix pinAndPivot(globalOrientation);
-	ndVector hipPivot(leg->GetBody()->GetMatrix().m_posit);
-	pinAndPivot.m_posit = footNode->GetBody()->GetMatrix().m_posit;
-	ndJointKinematicChain* const joint = new ndJointKinematicChain(hipPivot, pinAndPivot, footNode->GetBody(), hip->GetBody());
-
-
-	ndEffetorInfo& info = m_effectors.Append()->GetInfo();
-	//ndMatrix localPivot1(footNode->GetBody()->GetMatrix() * hip->GetBody()->GetMatrix().Inverse());
-	//ndMatrix localPivot0(pinAndPivot * hip->GetBody()->GetMatrix().Inverse());
-
-	const ndMatrix localPivot0(pinAndPivot);
-	const ndMatrix localPivot1(footNode->GetBody()->GetMatrix());
-
-	info.m_bindMatrix = localPivot0 * localPivot1.Inverse();
-	info.m_effector = joint;
-	info.m_controlNode = (ndCharacterNode*)footNode;
+	dAssert(0);
+	//ndCharacterNode* const calf = footNode->GetParent();
+	//ndCharacterNode* const leg = calf->GetParent();
+	//ndCharacterNode* const hip = leg->GetParent();
+	//
+	//ndMatrix pinAndPivot(globalOrientation);
+	//ndVector hipPivot(leg->GetBody()->GetMatrix().m_posit);
+	//pinAndPivot.m_posit = footNode->GetBody()->GetMatrix().m_posit;
+	//ndJointKinematicChain* const joint = new ndJointKinematicChain(hipPivot, pinAndPivot, footNode->GetBody(), hip->GetBody());
+	//
+	//
+	//ndEffetorInfo& info = m_effectors.Append()->GetInfo();
+	////ndMatrix localPivot1(footNode->GetBody()->GetMatrix() * hip->GetBody()->GetMatrix().Inverse());
+	////ndMatrix localPivot0(pinAndPivot * hip->GetBody()->GetMatrix().Inverse());
+	//
+	//const ndMatrix localPivot0(pinAndPivot);
+	//const ndMatrix localPivot1(footNode->GetBody()->GetMatrix());
+	//
+	//info.m_bindMatrix = localPivot0 * localPivot1.Inverse();
+	//info.m_effector = joint;
+	//info.m_controlNode = (ndCharacterNode*)footNode;
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, ndFloat32 timestep)
