@@ -13,11 +13,11 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointKinematicChain.h"
 
-#define D_TBIK_MAX_ANGLE	ndFloat32 (120.0f * ndDegreeToRad)
-#define D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED ndFloat32 (0.1f) 
-#define D_TBIK_PENETRATION_ANGULAR_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
-#define D_TBIK_SMALL_DISTANCE_ERROR ndFloat32 (1.0e-2f)
-#define D_TBIK_SMALL_DISTANCE_ERROR2 (D_TBIK_SMALL_DISTANCE_ERROR * D_TBIK_SMALL_DISTANCE_ERROR)
+//#define D_TBIK_MAX_ANGLE	ndFloat32 (120.0f * ndDegreeToRad)
+//#define D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED ndFloat32 (0.1f) 
+//#define D_TBIK_PENETRATION_ANGULAR_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
+//#define D_TBIK_SMALL_DISTANCE_ERROR ndFloat32 (1.0e-2f)
+//#define D_TBIK_SMALL_DISTANCE_ERROR2 (D_TBIK_SMALL_DISTANCE_ERROR * D_TBIK_SMALL_DISTANCE_ERROR)
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointKinematicChain)
 
@@ -237,12 +237,8 @@ void ndJointKinematicChain::SubmitAngularAxis(const ndMatrix& matrix0, const ndM
 	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 }
 
-void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointKinematicChain::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	ndMatrix matrix0;
-	ndMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
@@ -251,6 +247,14 @@ void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
 
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+}
+
+void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	SubmitLinearAxis(matrix0, matrix1, desc);
 
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))

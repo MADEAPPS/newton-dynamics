@@ -31,6 +31,7 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
+	void SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	

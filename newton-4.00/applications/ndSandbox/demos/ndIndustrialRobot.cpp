@@ -125,6 +125,7 @@ class ndIndustrialRobot : public ndModel
 						//world->AddJoint(m_effector);
 
 						ndJointAttachmentPoint* joint = new ndJointAttachmentPoint(pivotMatrix, parentBody, m_rootBody);
+						//ndJointKinematicChain* joint = new ndJointKinematicChain(m_rootBody->GetMatrix().m_posit, pivotMatrix, parentBody, m_rootBody);
 						world->AddJoint(joint);
 					}
 					break;
