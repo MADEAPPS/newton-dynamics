@@ -294,6 +294,14 @@ class ndIndustrialRobot : public ndModel
 		ndModel::PostTransformUpdate(world, timestep);
 	}
 
+	void ApplyControls(ndDemoEntityManager* const scene)
+	{
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "industrial robot control panel");
+
+	}
+	
+
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
@@ -350,6 +358,12 @@ class ndIndustrialRobot : public ndModel
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIndustrialRobot);
 
+static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
+{
+	ndIndustrialRobot* const me = (ndIndustrialRobot*)context;
+	me->ApplyControls(scene);
+}
+
 void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -366,6 +380,8 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
+	scene->Set2DDisplayRenderFunction(RenderHelp, nullptr, root);
+	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
 	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
