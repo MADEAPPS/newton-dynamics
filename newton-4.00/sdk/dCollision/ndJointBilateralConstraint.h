@@ -77,6 +77,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector GetForceBody1() const;
 	ndVector GetTorqueBody1() const;
 
+	bool IsInWorld() const;
 	bool IsBilateral() const;
 	bool IsCollidable() const;
 	void SetCollidable(bool state);
@@ -298,6 +299,11 @@ inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescr
 	dAssert(index >= 0);
 	dAssert(index < ndInt32(m_maxDof));
 	desc.m_diagonalRegularizer[index] = dClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
+}
+
+inline bool ndJointBilateralConstraint::IsInWorld() const
+{
+	return m_worldNode ? true : false;
 }
 
 inline bool ndJointBilateralConstraint::IsSkeleton() const

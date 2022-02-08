@@ -34,6 +34,8 @@ ndJointKinematicChain::ndJointKinematicChain(const ndVector& globalHipPivot, con
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_linearMode(true)
+	,m_angularMode(true)
 {
 	SetSolverModel(m_jointkinematicCloseLoop);
 
@@ -62,6 +64,8 @@ ndJointKinematicChain::ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescrip
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_linearMode(true)
+	,m_angularMode(true)
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -112,6 +116,22 @@ void ndJointKinematicChain::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) c
 	//xmlSaveParam(childNode, "linearSpring", m_linearSpring);
 	//xmlSaveParam(childNode, "linearDamper", m_linearDamper);
 	//xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
+}
+
+bool ndJointKinematicChain::IsLinearMode() const
+{
+	return m_linearMode;
+}
+
+bool ndJointKinematicChain::IsAngularMode() const
+{
+	return m_angularMode;
+}
+
+void ndJointKinematicChain::SetMode(bool linear, bool angular)
+{
+	m_linearMode = linear;
+	m_angularMode = angular;
 }
 
 void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -240,13 +260,13 @@ void ndJointKinematicChain::SubmitAngularAxis(const ndMatrix& matrix0, const ndM
 void ndJointKinematicChain::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-
+	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-
+	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 }
 
 void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
@@ -254,17 +274,23 @@ void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitLinearAxis(matrix0, matrix1, desc);
-
-	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	if (cosAngleCos >= ndFloat32(0.998f))
+	if (m_linearMode)
 	{
-		// special case where the front axis are almost aligned
-		// solve by using Cartesian approximation
-		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		SubmitLinearAxis(matrix0, matrix1, desc);
 	}
-	else
+
+	if (m_angularMode)
 	{
-		SubmitAngularAxis(matrix0, matrix1, desc);
+		ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+		if (cosAngleCos >= ndFloat32(0.998f))
+		{
+			// special case where the front axis are almost aligned
+			// solve by using Cartesian approximation
+			SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		}
+		else
+		{
+			SubmitAngularAxis(matrix0, matrix1, desc);
+		}
 	}
 }

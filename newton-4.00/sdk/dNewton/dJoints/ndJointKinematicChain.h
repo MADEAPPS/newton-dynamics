@@ -26,6 +26,10 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	D_NEWTON_API void SetTargetLocalMatrix(const ndMatrix& matrix);
 	D_NEWTON_API void SetTargetGlobalMatrix(const ndMatrix& matrix);
 
+	D_NEWTON_API bool IsLinearMode() const;
+	D_NEWTON_API bool IsAngularMode() const;
+	D_NEWTON_API void SetMode(bool linear, bool angular);
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
@@ -50,6 +54,8 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	ndFloat32 m_linearSpring;
 	ndFloat32 m_linearDamper;
 	ndFloat32 m_linearRegularizer;
+	bool m_linearMode;
+	bool m_angularMode;
 };
 
 

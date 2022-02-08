@@ -115,18 +115,9 @@ class ndIndustrialRobot : public ndModel
 					else
 					{
 						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						//m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
-						//m_effector->SetMaxLinearFriction(10000.0f);
-						//m_effector->SetMaxAngularFriction(10000.0f);
-						//m_effector->SetControlMode(ndJointKinematicController::m_linear);
-						//m_effector->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
-
-						//ndJointAttachmentPoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-						//world->AddJoint(m_effector);
-
-						ndJointAttachmentPoint* joint = new ndJointAttachmentPoint(pivotMatrix, parentBody, m_rootBody);
-						//ndJointKinematicChain* joint = new ndJointKinematicChain(m_rootBody->GetMatrix().m_posit, pivotMatrix, parentBody, m_rootBody);
-						world->AddJoint(joint);
+						m_effector = new ndJointKinematicChain(m_rootBody->GetMatrix().m_posit, pivotMatrix, parentBody, m_rootBody);
+						m_effector->SetMode(true, false);
+						world->AddJoint(m_effector);
 					}
 					break;
 				}
@@ -196,9 +187,9 @@ class ndIndustrialRobot : public ndModel
 
 	~ndIndustrialRobot()
 	{
-		if (m_effector)
+		if (m_effector && !m_effector->IsInWorld())
 		{
-//			delete m_effector;
+			delete m_effector;
 		}
 	}
 
@@ -298,15 +289,13 @@ class ndIndustrialRobot : public ndModel
 	{
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "industrial robot control panel");
-
 	}
-	
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
 		//if (m_effector)
-		if (0)
+		if (1)
 		{
 			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 			dAssert(skeleton);
@@ -319,7 +308,7 @@ class ndIndustrialRobot : public ndModel
 
 					//joint->OverrideAccel(true, ndFloat32(0.0f));
 				}
-				m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
+				//m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
 				m_invDynamicsSolver.Solve(skeleton, world, timestep);
 
 				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
@@ -343,7 +332,8 @@ class ndIndustrialRobot : public ndModel
 					ndJacobianPair jacobian(joint->GetPinJacobian());
 					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
 					accel *= 1;
-					joint->OverrideAccel(true, -accel);
+					//joint->OverrideAccel(true, -accel);
+					joint->OverrideAccel(false, -accel);
 				}
 			}
 		}
