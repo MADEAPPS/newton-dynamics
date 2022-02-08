@@ -42,9 +42,9 @@ static dRobotDefinition jointsDefinition[] =
 	{ "base_rotator", 50.0f, dRobotDefinition::m_hinge },
 	{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
 	{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
-	{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
-	{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
-	{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
+	//{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
+	//{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
+	//{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
 	{ "effector", 0.0f, dRobotDefinition::m_effector },
 };
 
@@ -115,11 +115,17 @@ class ndIndustrialRobot : public ndModel
 					else
 					{
 						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
-						m_effector->SetMaxLinearFriction(10000.0f);
-						m_effector->SetMaxAngularFriction(10000.0f);
-						m_effector->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
-						world->AddJoint(m_effector);
+						//m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
+						//m_effector->SetMaxLinearFriction(10000.0f);
+						//m_effector->SetMaxAngularFriction(10000.0f);
+						//m_effector->SetControlMode(ndJointKinematicController::m_linear);
+						//m_effector->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+
+						//ndJointAttachmentPoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+						//world->AddJoint(m_effector);
+
+						ndJointAttachmentPoint* joint = new ndJointAttachmentPoint(pivotMatrix, parentBody, m_rootBody);
+						world->AddJoint(joint);
 					}
 					break;
 				}

@@ -84,7 +84,5 @@ inline bool ndJointAttachmentPoint::GetDimnetionZ() const
 	return m_lockedDimnetions.m_lock_z ? true : false;
 }
 
-
-
 #endif 
 

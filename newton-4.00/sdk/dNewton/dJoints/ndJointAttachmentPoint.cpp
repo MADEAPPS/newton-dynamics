@@ -33,6 +33,16 @@ ndJointAttachmentPoint::~ndJointAttachmentPoint()
 {
 }
 
+void ndJointAttachmentPoint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "lockDof", m_lockedDimnetions.m_lockDof);
+}
+
 void ndJointAttachmentPoint::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -51,15 +61,3 @@ void ndJointAttachmentPoint::JacobianDerivative(ndConstraintDescritor& desc)
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 	}
 }
-
-void ndJointAttachmentPoint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "lockDof", m_lockedDimnetions.m_lockDof);
-}
-
-
