@@ -57,6 +57,8 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
+		,m_x(0.0f)
+		,m_y(0.0f)
 		,m_azimuth(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
@@ -135,6 +137,8 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
+		,m_x(0.0f)
+		,m_y(0.0f)
 		,m_azimuth(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
@@ -300,9 +304,12 @@ class dSimpleIndustrialRobot : public ndModel
 
 			ndMatrix xxxx(m_effector->GetReferenceMatrix());
 			m_azimuth += 0.02f;
-			xxxx.m_posit += xxxx.m_front.Scale(2.5f * ndCos(m_azimuth));
-			xxxx.m_posit += xxxx.m_right.Scale(2.5f * ndSin(m_azimuth));
-			xxxx.m_posit += xxxx.m_up.Scale(-0.5f);
+
+			m_x = 2.0f + 1.0f * ndCos(m_azimuth * 0.43f);
+			m_y = 1.0f * ndSin(m_azimuth);
+			xxxx.m_posit += xxxx.m_front.Scale(m_x * ndCos(m_azimuth));
+			xxxx.m_posit += xxxx.m_right.Scale(m_x * ndSin(m_azimuth));
+			xxxx.m_posit += xxxx.m_up.Scale(m_y);
 			ndMatrix xxxx1(xxxx * m_rootBody->GetMatrix());
 			m_effector->SetTargetMatrix(xxxx * m_rootBody->GetMatrix());
 		}
