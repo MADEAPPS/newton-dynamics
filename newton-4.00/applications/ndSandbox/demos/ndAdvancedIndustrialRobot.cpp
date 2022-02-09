@@ -121,11 +121,12 @@ class dAdvancedIndustrialRobot : public ndModel
 						m_effector = new ndJointKinematicChain(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, false);
 
-						pivotMatrix.m_posit.m_y -= 0.5f;
-						pivotMatrix.m_posit.m_x += 2.5f;
-						pivotMatrix.m_posit.m_z += 2.5f;
-						m_effector->SetTargetMatrix(pivotMatrix);
-						world->AddJoint(m_effector);
+						ndFloat32 regularizer;
+						ndFloat32 springConst;
+						ndFloat32 damperConst;
+						m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
+						m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+						//world->AddJoint(m_effector);
 					}
 					break;
 				}
@@ -317,8 +318,7 @@ class dAdvancedIndustrialRobot : public ndModel
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
-		//if (m_effector)
-		if (1)
+		if (m_effector)
 		{
 			// apply target position collected by control panel
 			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
@@ -338,43 +338,39 @@ class dAdvancedIndustrialRobot : public ndModel
 			targetMatrix.m_posit = newPosit;
 			m_effector->SetTargetMatrix(targetMatrix);
 
-			//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			//dAssert(skeleton);
-			//if (!m_invDynamicsSolver.IsSleeping(skeleton))
-			//{
-			//	for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-			//	{
-			//		ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-			//		joint->OverrideAccel(false, ndFloat32(0.0f));
-			//
-			//		//joint->OverrideAccel(true, ndFloat32(0.0f));
-			//	}
-			//	//m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
-			//	m_invDynamicsSolver.Solve(skeleton, world, timestep);
-			//
-			//	for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-			//	{
-			//		ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-			//		const ndBodyKinematic* const body0 = joint->GetBody0();
-			//		const ndBodyKinematic* const body1 = joint->GetBody1();
-			//
-			//		//ndFloat32 invMass0 = body0->GetInvMass();
-			//		//ndFloat32 invMass1 = body1->GetInvMass();
-			//		const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
-			//		const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
-			//
-			//		const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
-			//		const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
-			//		const ndVector alpha0(invInertia0.RotateVector(torque0));
-			//		const ndVector alpha1(invInertia1.RotateVector(torque1));
-			//
-			//		ndJacobianPair jacobian(joint->GetPinJacobian());
-			//		ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-			//		accel *= 1;
-			//		//joint->OverrideAccel(true, -accel);
-			//		joint->OverrideAccel(false, -accel);
-			//	}
-			//}
+			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			dAssert(skeleton);
+			if (!m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+				{
+					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+					joint->OverrideAccel(false, ndFloat32(0.0f));
+				}
+				m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
+				m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			
+				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+				{
+					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+					const ndBodyKinematic* const body0 = joint->GetBody0();
+					const ndBodyKinematic* const body1 = joint->GetBody1();
+			
+					//ndFloat32 invMass0 = body0->GetInvMass();
+					//ndFloat32 invMass1 = body1->GetInvMass();
+					const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
+					const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
+			
+					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
+					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
+					const ndVector alpha0(invInertia0.RotateVector(torque0));
+					const ndVector alpha1(invInertia1.RotateVector(torque1));
+			
+					ndJacobianPair jacobian(joint->GetPinJacobian());
+					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+					joint->OverrideAccel(true, accel);
+				}
+			}
 		}
 	}
 

@@ -35,6 +35,10 @@ class ndSkeletonImmediateSolver
 		:m_leftHandSide(64)
 		,m_rightHandSide(64)
 		,m_internalForces(32)
+		,m_timestep(ndFloat32 (0.0f))
+		,m_invTimestep(ndFloat32(0.0f))
+		,m_world(nullptr)
+		,m_skeleton(nullptr)
 	{
 	}
 
@@ -45,7 +49,6 @@ class ndSkeletonImmediateSolver
 	D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
 	D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
 	
-
 	private:
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint);

@@ -245,13 +245,14 @@ void ndJointKinematicChain::SubmitAngularAxis(const ndMatrix& matrix0, const ndM
 
 void ndJointKinematicChain::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+	const ndMatrix pins(m_baseFrame * m_body1->GetMatrix());
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, pins[0]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 	
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, pins[1]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 	
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, pins[2]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 }
 

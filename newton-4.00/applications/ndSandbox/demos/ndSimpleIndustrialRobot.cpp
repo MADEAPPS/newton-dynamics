@@ -300,10 +300,12 @@ class dSimpleIndustrialRobot : public ndModel
 		scene->Print(color, "Control panel");
 
 		bool change = false;
-		ImGui::Text("solver sub steps");
+		ImGui::Text("position x");
 		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
+		ImGui::Text("position y");
 		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.5f);
 		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.8f); // for testing limits
+		ImGui::Text("azimuth");
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
 		if (change)
