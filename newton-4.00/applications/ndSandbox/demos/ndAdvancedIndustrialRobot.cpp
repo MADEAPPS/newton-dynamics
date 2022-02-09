@@ -21,7 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-class dRobotDefinition
+class dAdvancedRobotDefinition
 {
 	public:
 	enum jointType
@@ -36,24 +36,24 @@ class dRobotDefinition
 	jointType m_type;
 };
 
-static dRobotDefinition jointsDefinition[] =
+static dAdvancedRobotDefinition jointsDefinition[] =
 {
-	{ "base", 100.0f, dRobotDefinition::m_root},
-	{ "base_rotator", 50.0f, dRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
-	//{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
-	//{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
-	//{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
-	{ "effector", 0.0f, dRobotDefinition::m_effector },
+	{ "base", 100.0f, dAdvancedRobotDefinition::m_root},
+	{ "base_rotator", 50.0f, dAdvancedRobotDefinition::m_hinge },
+	{ "arm_0", 5.0f, dAdvancedRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, dAdvancedRobotDefinition::m_hinge },
+	//{ "arm_2", 5.0f, dAdvancedRobotDefinition::m_hinge },
+	//{ "arm_3", 3.0f, dAdvancedRobotDefinition::m_hinge },
+	//{ "arm_4", 2.0f, dAdvancedRobotDefinition::m_hinge },
+	{ "effector", 0.0f, dAdvancedRobotDefinition::m_effector },
 };
 
-class ndIndustrialRobot : public ndModel
+class dAdvancedIndustrialRobot : public ndModel
 {
 	public:
-	D_CLASS_REFLECTION(ndIndustrialRobot);
+	D_CLASS_REFLECTION(dAdvancedIndustrialRobot);
 
-	ndIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
+	dAdvancedIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
@@ -97,11 +97,11 @@ class ndIndustrialRobot : public ndModel
 			const char* const name = childEntity->GetName().GetStr();
 			for (ndInt32 i = 0; i < definitionCount; i++) 
 			{
-				const dRobotDefinition& definition = jointsDefinition[i];
+				const dAdvancedRobotDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
 				{
 					dTrace(("name: %s\n", name));
-					if (definition.m_type == dRobotDefinition::m_hinge)
+					if (definition.m_type == dAdvancedRobotDefinition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
@@ -137,7 +137,7 @@ class ndIndustrialRobot : public ndModel
 		}
 	}
 
-	ndIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	dAdvancedIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
@@ -190,7 +190,7 @@ class ndIndustrialRobot : public ndModel
 		}
 	}
 
-	~ndIndustrialRobot()
+	~dAdvancedIndustrialRobot()
 	{
 		if (m_effector && !m_effector->IsInWorld())
 		{
@@ -349,15 +349,15 @@ class ndIndustrialRobot : public ndModel
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 };
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIndustrialRobot);
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAdvancedIndustrialRobot);
 
 static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
 {
-	ndIndustrialRobot* const me = (ndIndustrialRobot*)context;
+	dAdvancedIndustrialRobot* const me = (dAdvancedIndustrialRobot*)context;
 	me->ApplyControls(scene);
 }
 
-void ndInsdustrialRobot (ndDemoEntityManager* const scene)
+void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
@@ -367,7 +367,7 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
-	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, robotEntity, matrix);
+	dAdvancedIndustrialRobot* const robot = new dAdvancedIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
 	ndBodyDynamic* const root = robot->GetRoot();
@@ -377,7 +377,7 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
+	//scene->GetWorld()->AddModel(new dAdvancedIndustrialRobot(scene, robotEntity, matrix));
 
 	delete robotEntity;
 

@@ -53,11 +53,12 @@
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
 //#define DEFAULT_SCENE	16		// background vehicle prop
-#define DEFAULT_SCENE	17		// industrial robot
-//#define DEFAULT_SCENE	18		// simple voronoi fracture
-//#define DEFAULT_SCENE	19		// basic voronoi fracture
-//#define DEFAULT_SCENE	20		// linked voronoi fracture
-//#define DEFAULT_SCENE	21		// skin peel voronoi fracture
+#define DEFAULT_SCENE	17		// simple industrial robot
+//#define DEFAULT_SCENE	18		// advanced industrial robot
+//#define DEFAULT_SCENE	19		// simple voronoi fracture
+//#define DEFAULT_SCENE	10		// basic voronoi fracture
+//#define DEFAULT_SCENE	21		// linked voronoi fracture
+//#define DEFAULT_SCENE	22		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -69,15 +70,18 @@ void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndActiveRagdoll(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndInsdustrialRobot(ndDemoEntityManager* const scene);
+
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
+void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
+void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
+
 //void ndBasicFracture_0(ndDemoEntityManager* const scene);
 //void ndBasicFracture_2(ndDemoEntityManager* const scene);
 //void ndBasicFracture_4(ndDemoEntityManager* const scene);
@@ -103,7 +107,8 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
-	{ "industrial robot", ndInsdustrialRobot },
+	{ "simple industrial robot", ndSimpleIndustrialRobot },
+	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
