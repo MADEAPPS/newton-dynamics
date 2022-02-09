@@ -301,8 +301,9 @@ class dSimpleIndustrialRobot : public ndModel
 
 		bool change = false;
 		ImGui::Text("solver sub steps");
-		change = change | ImGui::SliderFloat("##x", &m_x, 0.5f, 3.5f);
-		change = change | ImGui::SliderFloat("##y", &m_y, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
+		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.5f);
+		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.8f); // for testing limits
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
 		if (change)
