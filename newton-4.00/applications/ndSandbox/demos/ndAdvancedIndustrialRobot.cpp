@@ -58,6 +58,9 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
+		,m_x(0.5f)
+		,m_y(0.0f)
+		,m_azimuth(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -142,6 +145,9 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
+		,m_x(0.5f)
+		,m_y(0.0f)
+		,m_azimuth(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -293,7 +299,18 @@ class dAdvancedIndustrialRobot : public ndModel
 	void ApplyControls(ndDemoEntityManager* const scene)
 	{
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "industrial robot control panel");
+		scene->Print(color, "Control panel");
+
+		bool change = false;
+		ImGui::Text("solver sub steps");
+		change = change | ImGui::SliderFloat("##x", &m_x, 0.5f, 3.5f);
+		change = change | ImGui::SliderFloat("##y", &m_y, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
+
+		if (change)
+		{
+			m_rootBody->SetSleepState(false);
+		}
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -302,43 +319,61 @@ class dAdvancedIndustrialRobot : public ndModel
 		//if (m_effector)
 		if (1)
 		{
-			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			dAssert(skeleton);
-			if (!m_invDynamicsSolver.IsSleeping(skeleton))
-			{
-				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-				{
-					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					joint->OverrideAccel(false, ndFloat32(0.0f));
+			// apply target position collected by control panel
+			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
+			ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
 
-					//joint->OverrideAccel(true, ndFloat32(0.0f));
-				}
-				//m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
-				m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			// get the reference matrix in local space 
+			// (this is because the robot has a build rotation in the model) 
+			ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
 
-				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-				{
-					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					const ndBodyKinematic* const body0 = joint->GetBody0();
-					const ndBodyKinematic* const body1 = joint->GetBody1();
+			// add the local frame displacement)
+			localPosit.m_x += m_x;
+			localPosit.m_y += m_y;
+			localPosit = aximuthMatrix.RotateVector(localPosit);
 
-					//ndFloat32 invMass0 = body0->GetInvMass();
-					//ndFloat32 invMass1 = body1->GetInvMass();
-					const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
-					const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
+			// take new position back to target space
+			const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
+			targetMatrix.m_posit = newPosit;
+			m_effector->SetTargetMatrix(targetMatrix);
 
-					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
-					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
-					const ndVector alpha0(invInertia0.RotateVector(torque0));
-					const ndVector alpha1(invInertia1.RotateVector(torque1));
-
-					ndJacobianPair jacobian(joint->GetPinJacobian());
-					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-					accel *= 1;
-					//joint->OverrideAccel(true, -accel);
-					joint->OverrideAccel(false, -accel);
-				}
-			}
+			//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			//dAssert(skeleton);
+			//if (!m_invDynamicsSolver.IsSleeping(skeleton))
+			//{
+			//	for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			//	{
+			//		ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+			//		joint->OverrideAccel(false, ndFloat32(0.0f));
+			//
+			//		//joint->OverrideAccel(true, ndFloat32(0.0f));
+			//	}
+			//	//m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
+			//	m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			//
+			//	for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			//	{
+			//		ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+			//		const ndBodyKinematic* const body0 = joint->GetBody0();
+			//		const ndBodyKinematic* const body1 = joint->GetBody1();
+			//
+			//		//ndFloat32 invMass0 = body0->GetInvMass();
+			//		//ndFloat32 invMass1 = body1->GetInvMass();
+			//		const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
+			//		const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
+			//
+			//		const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
+			//		const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
+			//		const ndVector alpha0(invInertia0.RotateVector(torque0));
+			//		const ndVector alpha1(invInertia1.RotateVector(torque1));
+			//
+			//		ndJacobianPair jacobian(joint->GetPinJacobian());
+			//		ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+			//		accel *= 1;
+			//		//joint->OverrideAccel(true, -accel);
+			//		joint->OverrideAccel(false, -accel);
+			//	}
+			//}
 		}
 	}
 
@@ -347,6 +382,10 @@ class dAdvancedIndustrialRobot : public ndModel
 	ndSkeletonImmediateSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
+
+	ndFloat32 m_x;
+	ndFloat32 m_y;
+	ndFloat32 m_azimuth;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAdvancedIndustrialRobot);
@@ -372,8 +411,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	world->AddModel(robot);
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
-
-	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, root);
+	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;

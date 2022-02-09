@@ -317,7 +317,6 @@ class dSimpleIndustrialRobot : public ndModel
 		if (m_effector)
 		{
 			// apply target position collected by control panel
-
 			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
 			ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
 
@@ -333,12 +332,6 @@ class dSimpleIndustrialRobot : public ndModel
 			// take new position back to target space
 			const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
 			targetMatrix.m_posit = newPosit;
-
-			//m_x = 2.0f + 1.0f * ndCos(m_azimuth * 0.43f);
-			//m_y = 1.0f * ndSin(m_azimuth);
-			//targetMatrix.m_posit += targetMatrix.m_front.Scale(m_x * ndCos(m_azimuth));
-			//targetMatrix.m_posit += targetMatrix.m_right.Scale(m_x * ndSin(m_azimuth));
-			//targetMatrix.m_posit += targetMatrix.m_up.Scale(m_y);
 			m_effector->SetTargetMatrix(targetMatrix);
 		}
 	}
