@@ -181,9 +181,9 @@ ndMatrix ndJointKinematicChain::GetReferenceMatrix() const
 	return m_baseFrame;
 }
 
-void ndJointKinematicChain::SetTargetMatrix(const ndMatrix& matrix)
+void ndJointKinematicChain::SetTargetMatrix(const ndMatrix& localMatrix)
 {
-	m_localMatrix1 = matrix * m_body1->GetMatrix().Inverse();
+	m_localMatrix1 = localMatrix;
 }
 
 void ndJointKinematicChain::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)

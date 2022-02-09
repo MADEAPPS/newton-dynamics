@@ -310,8 +310,7 @@ class dSimpleIndustrialRobot : public ndModel
 			xxxx.m_posit += xxxx.m_front.Scale(m_x * ndCos(m_azimuth));
 			xxxx.m_posit += xxxx.m_right.Scale(m_x * ndSin(m_azimuth));
 			xxxx.m_posit += xxxx.m_up.Scale(m_y);
-			ndMatrix xxxx1(xxxx * m_rootBody->GetMatrix());
-			m_effector->SetTargetMatrix(xxxx * m_rootBody->GetMatrix());
+			m_effector->SetTargetMatrix(xxxx);
 		}
 	}
 

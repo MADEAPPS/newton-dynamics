@@ -24,7 +24,7 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ~ndJointKinematicChain();
 
 	D_NEWTON_API ndMatrix GetReferenceMatrix() const;
-	D_NEWTON_API void SetTargetMatrix(const ndMatrix& matrix);
+	D_NEWTON_API void SetTargetMatrix(const ndMatrix& localMatrix);
 
 	D_NEWTON_API bool IsLinearMode() const;
 	D_NEWTON_API bool IsAngularMode() const;
