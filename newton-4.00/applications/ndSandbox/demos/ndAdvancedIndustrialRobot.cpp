@@ -351,7 +351,7 @@ class dAdvancedIndustrialRobot : public ndModel
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAdvancedIndustrialRobot);
 
-static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
+static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
 	dAdvancedIndustrialRobot* const me = (dAdvancedIndustrialRobot*)context;
 	me->ApplyControls(scene);
@@ -373,7 +373,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
-	scene->Set2DDisplayRenderFunction(RenderHelp, nullptr, root);
+	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, root);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;

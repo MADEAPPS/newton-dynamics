@@ -57,7 +57,7 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
-		,m_x(0.0f)
+		,m_x(0.5f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 	{
@@ -118,6 +118,12 @@ class dSimpleIndustrialRobot : public ndModel
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndJointKinematicChain(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, false);
+
+						ndFloat32 regularizer;
+						ndFloat32 springConst;
+						ndFloat32 damperConst;
+						m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
+						m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
 						world->AddJoint(m_effector);
 					}
 					break;
@@ -137,7 +143,7 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
-		,m_x(0.0f)
+		,m_x(0.5f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 	{
@@ -291,26 +297,49 @@ class dSimpleIndustrialRobot : public ndModel
 	void ApplyControls(ndDemoEntityManager* const scene)
 	{
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "industrial robot control panel");
+		scene->Print(color, "Control panel");
+
+		bool change = false;
+		ImGui::Text("solver sub steps");
+		change = change | ImGui::SliderFloat("##x", &m_x, 0.5f, 3.5f);
+		change = change | ImGui::SliderFloat("##y", &m_y, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
+
+		if (change)
+		{ 
+			m_rootBody->SetSleepState(false);
+		}
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
-		//if (m_effector)
-		if (1)
+		if (m_effector)
 		{
 			// apply target position collected by control panel
 
-			ndMatrix xxxx(m_effector->GetReferenceMatrix());
-			m_azimuth += 0.02f;
+			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
+			ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
 
-			m_x = 2.0f + 1.0f * ndCos(m_azimuth * 0.43f);
-			m_y = 1.0f * ndSin(m_azimuth);
-			xxxx.m_posit += xxxx.m_front.Scale(m_x * ndCos(m_azimuth));
-			xxxx.m_posit += xxxx.m_right.Scale(m_x * ndSin(m_azimuth));
-			xxxx.m_posit += xxxx.m_up.Scale(m_y);
-			m_effector->SetTargetMatrix(xxxx);
+			// get the reference matrix in local space 
+			// (this is because the robot has a build rotation in the model) 
+			ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
+
+			// add the local frame displacement)
+			localPosit.m_x += m_x;
+			localPosit.m_y += m_y;
+			localPosit = aximuthMatrix.RotateVector(localPosit);
+
+			// take new position back to target space
+			const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
+			targetMatrix.m_posit = newPosit;
+
+			//m_x = 2.0f + 1.0f * ndCos(m_azimuth * 0.43f);
+			//m_y = 1.0f * ndSin(m_azimuth);
+			//targetMatrix.m_posit += targetMatrix.m_front.Scale(m_x * ndCos(m_azimuth));
+			//targetMatrix.m_posit += targetMatrix.m_right.Scale(m_x * ndSin(m_azimuth));
+			//targetMatrix.m_posit += targetMatrix.m_up.Scale(m_y);
+			m_effector->SetTargetMatrix(targetMatrix);
 		}
 	}
 
@@ -326,7 +355,7 @@ class dSimpleIndustrialRobot : public ndModel
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dSimpleIndustrialRobot);
 
-static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
+static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
 	dSimpleIndustrialRobot* const me = (dSimpleIndustrialRobot*)context;
 	me->ApplyControls(scene);
@@ -348,7 +377,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
-	scene->Set2DDisplayRenderFunction(RenderHelp, nullptr, root);
+	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;

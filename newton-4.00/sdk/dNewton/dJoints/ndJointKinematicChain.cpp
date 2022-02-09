@@ -31,17 +31,6 @@ ndJointKinematicChain::ndJointKinematicChain(const ndMatrix& globalPinAndPivot, 
 	,m_angularMode(true)
 {
 	SetSolverModel(m_jointkinematicCloseLoop);
-
-	//m_baseFrame = m_localMatrix1;
-	//ndVector dist(m_localMatrix1.m_posit - m_hipPivot);
-	//m_maxDist = ndSqrt(dist.DotProduct(dist & ndVector::m_triplexMask).GetScalar());
-	//dAssert(m_maxDist > ndFloat32(0.0f));
-
-	// test joint positioning.
-	//ndMatrix matrix(m_baseFrame);
-	//matrix.m_posit += m_baseFrame.m_front.Scale(0.1f);
-	//matrix.m_posit += m_baseFrame.m_right.Scale(-0.2f);
-	//SetTargetGlobalMatrix(matrix * m_body1->GetMatrix());
 }
 
 ndJointKinematicChain::ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -124,6 +113,21 @@ void ndJointKinematicChain::SetMode(bool linear, bool angular)
 	m_linearMode = linear;
 	m_angularMode = angular;
 }
+
+void ndJointKinematicChain::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst)
+{
+	m_linearSpring = springConst;
+	m_linearDamper = damperConst;
+	m_linearRegularizer = regularizer;
+}
+
+void ndJointKinematicChain::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const
+{
+	springConst = m_linearSpring;
+	damperConst = m_linearDamper;
+	regularizer = m_linearRegularizer;
+}
+
 
 void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {

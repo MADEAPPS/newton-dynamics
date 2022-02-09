@@ -29,6 +29,9 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	D_NEWTON_API bool IsLinearMode() const;
 	D_NEWTON_API bool IsAngularMode() const;
 	D_NEWTON_API void SetMode(bool linear, bool angular);
+	
+	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
+	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
