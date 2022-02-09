@@ -57,7 +57,7 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
-		,m_invDynamicsSolver()
+		,m_azimuth(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -105,7 +105,6 @@ class dSimpleIndustrialRobot : public ndModel
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
-
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
 						m_jointArray.PushBack(hinge);
@@ -117,11 +116,6 @@ class dSimpleIndustrialRobot : public ndModel
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndJointKinematicChain(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, false);
-
-						pivotMatrix.m_posit.m_y -= 0.5f;
-						pivotMatrix.m_posit.m_x += 2.5f;
-						pivotMatrix.m_posit.m_z += 2.5f;
-						m_effector->SetTargetGlobalMatrix(pivotMatrix);
 						world->AddJoint(m_effector);
 					}
 					break;
@@ -141,7 +135,7 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
-		,m_invDynamicsSolver()
+		,m_azimuth(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -171,8 +165,8 @@ class dSimpleIndustrialRobot : public ndModel
 
 		// load root body
 		ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
-		ndBody* const body = (ndBody*)rootBodyNode->GetInfo();
-		m_rootBody = body->GetAsBodyDynamic();
+		ndBody* const rootbody = (ndBody*)rootBodyNode->GetInfo();
+		m_rootBody = rootbody->GetAsBodyDynamic();
 		
 		// load effector joint
 		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
@@ -302,51 +296,26 @@ class dSimpleIndustrialRobot : public ndModel
 		//if (m_effector)
 		if (1)
 		{
-			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			dAssert(skeleton);
-			if (!m_invDynamicsSolver.IsSleeping(skeleton))
-			{
-				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-				{
-					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					joint->OverrideAccel(false, ndFloat32(0.0f));
+			// apply target position collected by control panel
 
-					//joint->OverrideAccel(true, ndFloat32(0.0f));
-				}
-				//m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
-				m_invDynamicsSolver.Solve(skeleton, world, timestep);
-
-				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-				{
-					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					const ndBodyKinematic* const body0 = joint->GetBody0();
-					const ndBodyKinematic* const body1 = joint->GetBody1();
-
-					//ndFloat32 invMass0 = body0->GetInvMass();
-					//ndFloat32 invMass1 = body1->GetInvMass();
-					const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
-					const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
-
-					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
-					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
-					const ndVector alpha0(invInertia0.RotateVector(torque0));
-					const ndVector alpha1(invInertia1.RotateVector(torque1));
-
-					ndJacobianPair jacobian(joint->GetPinJacobian());
-					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-					accel *= 1;
-					//joint->OverrideAccel(true, -accel);
-					joint->OverrideAccel(false, -accel);
-				}
-			}
+			ndMatrix xxxx(m_effector->GetReferenceMatrix());
+			m_azimuth += 0.02f;
+			xxxx.m_posit += xxxx.m_front.Scale(2.5f * ndCos(m_azimuth));
+			xxxx.m_posit += xxxx.m_right.Scale(2.5f * ndSin(m_azimuth));
+			xxxx.m_posit += xxxx.m_up.Scale(-0.5f);
+			ndMatrix xxxx1(xxxx * m_rootBody->GetMatrix());
+			m_effector->SetTargetMatrix(xxxx * m_rootBody->GetMatrix());
 		}
 	}
 
 	ndBodyDynamic* m_rootBody;
 	ndJointKinematicChain* m_effector;
-	ndSkeletonImmediateSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
+
+	ndFloat32 m_x;
+	ndFloat32 m_y;
+	ndFloat32 m_azimuth;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dSimpleIndustrialRobot);

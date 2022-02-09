@@ -310,7 +310,8 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 	}
 }
 
-void ndCharacter::CreateKinematicChain(const ndMatrix& globalOrientation, const ndCharacterNode* const footNode)
+//void ndCharacter::CreateKinematicChain(const ndMatrix& globalOrientation, const ndCharacterNode* const footNode)
+void ndCharacter::CreateKinematicChain(const ndMatrix&, const ndCharacterNode* const)
 {
 	dAssert(0);
 	//ndCharacterNode* const calf = footNode->GetParent();
@@ -425,16 +426,17 @@ void ndCharacter::Update(ndWorld* const, ndFloat32)
 
 void ndCharacter::SetPose()
 {
-	for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
-	{
-		ndEffetorInfo& info = node->GetInfo();
-		ndJointKinematicChain* const joint = info.m_effector;
-		
-		ndMatrix matrix(info.m_bindMatrix * info.m_controlNode->GetLocalPose());
-		for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
-		{
-			matrix = matrix * bone->GetLocalPose();
-		}
-		joint->SetTargetLocalMatrix(matrix);
-	}
+	dAssert(0);
+	//for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndEffetorInfo& info = node->GetInfo();
+	//	ndJointKinematicChain* const joint = info.m_effector;
+	//	
+	//	ndMatrix matrix(info.m_bindMatrix * info.m_controlNode->GetLocalPose());
+	//	for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
+	//	{
+	//		matrix = matrix * bone->GetLocalPose();
+	//	}
+	//	joint->SetTargetLocalMatrix(matrix);
+	//}
 }

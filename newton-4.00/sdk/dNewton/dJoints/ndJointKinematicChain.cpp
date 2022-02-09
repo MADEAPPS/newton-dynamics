@@ -176,24 +176,13 @@ void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback)
 	//}
 }
 
-//void ndJointKinematicChain::SetTargetLocalMatrix(const ndMatrix& matrix)
-void ndJointKinematicChain::SetTargetLocalMatrix(const ndMatrix&)
+ndMatrix ndJointKinematicChain::GetReferenceMatrix() const
 {
-	//ndVector posit((matrix.m_posit - m_hipPivot) & ndVector::m_triplexMask);
-	//ndFloat32 mag2 = posit.DotProduct(posit).GetScalar();
-	//if (mag2 > (m_maxDist * m_maxDist))
-	//{
-	//	posit = posit.Normalize().Scale(m_maxDist);
-	//}
-	//
-	//m_localMatrix1 = matrix;
-	//m_localMatrix1.m_posit = m_hipPivot + posit;
-	//m_localMatrix1.m_posit.m_w = ndFloat32(1.0f);
+	return m_baseFrame;
 }
 
-void ndJointKinematicChain::SetTargetGlobalMatrix(const ndMatrix& matrix)
+void ndJointKinematicChain::SetTargetMatrix(const ndMatrix& matrix)
 {
-	//SetTargetLocalMatrix(matrix * m_body1->GetMatrix().Inverse());
 	m_localMatrix1 = matrix * m_body1->GetMatrix().Inverse();
 }
 

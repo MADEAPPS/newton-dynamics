@@ -121,7 +121,7 @@ class dAdvancedIndustrialRobot : public ndModel
 						pivotMatrix.m_posit.m_y -= 0.5f;
 						pivotMatrix.m_posit.m_x += 2.5f;
 						pivotMatrix.m_posit.m_z += 2.5f;
-						m_effector->SetTargetGlobalMatrix(pivotMatrix);
+						m_effector->SetTargetMatrix(pivotMatrix);
 						world->AddJoint(m_effector);
 					}
 					break;
@@ -171,8 +171,8 @@ class dAdvancedIndustrialRobot : public ndModel
 
 		// load root body
 		ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
-		ndBody* const body = (ndBody*)rootBodyNode->GetInfo();
-		m_rootBody = body->GetAsBodyDynamic();
+		ndBody* const rootbody = (ndBody*)rootBodyNode->GetInfo();
+		m_rootBody = rootbody->GetAsBodyDynamic();
 		
 		// load effector joint
 		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
