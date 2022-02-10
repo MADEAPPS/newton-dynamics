@@ -133,6 +133,12 @@ void ndJointHinge::EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLim
 	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
 }
 
+void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
+{
+	minLimit = m_minLimit;
+	maxLimit = m_maxLimit;
+}
+
 void ndJointHinge::SetFriction(ndFloat32 frictionTorque)
 {
 	m_friction = dAbs(frictionTorque);

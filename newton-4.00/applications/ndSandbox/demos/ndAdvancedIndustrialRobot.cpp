@@ -43,7 +43,7 @@ static dAdvancedRobotDefinition jointsDefinition[] =
 	{ "base", 100.0f, 0.0f, 0.0f, dAdvancedRobotDefinition::m_root},
 	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dAdvancedRobotDefinition::m_hinge },
 	{ "arm_0", 5.0f, -1.0e10f, 1.0e10f, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, -1.0e10f, 1.0e10f, dAdvancedRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, -10.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
 	//{ "arm_2", 5.0f, dAdvancedRobotDefinition::m_hinge },
 	//{ "arm_3", 3.0f, dAdvancedRobotDefinition::m_hinge },
 	//{ "arm_4", 2.0f, dAdvancedRobotDefinition::m_hinge },
@@ -121,6 +121,7 @@ class dAdvancedIndustrialRobot : public ndModel
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
+						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);
 						parentBody = childBody;
@@ -396,9 +397,11 @@ class dAdvancedIndustrialRobot : public ndModel
 
 			m_invDynamicsSolver.BeginSolve(skeleton, world, timestep);
 			m_invDynamicsSolver.Solve();
-			m_invDynamicsSolver.EndSolve();
 
 			dTrace(("frame:\n"));
+
+			bool isLegal = true;
+			ndFloat32 desiredAccel[256];
 			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 			{
 				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
@@ -415,9 +418,42 @@ class dAdvancedIndustrialRobot : public ndModel
 			
 				ndJacobianPair jacobian(joint->GetPinJacobian());
 				ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+
+				ndFloat32 minLimit;
+				ndFloat32 maxLimit;
+				joint->GetLimits(minLimit, maxLimit);
+
+				ndFloat32 angle = joint->GetAngle() + joint->GetOmega() * timestep + accel * timestep * timestep;
+				if (angle < minLimit)
+				{
+					angle *= 1;
+				}
+				else if (angle > maxLimit)
+				{
+					isLegal = false;
+				}
+				desiredAccel[i] = accel;
 				dTrace(("joint (%d %d)  accel=%f  omega=%f angle=%f\n", body0->GetId(), body1->GetId(), accel, joint->GetOmega(), joint->GetAngle() * ndRadToDegree));
-				joint->OverrideAccel(true, accel);
+
+				//joint->OverrideAccel(true, accel);
 			}
+
+			if (!isLegal)
+			{
+				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+				{
+					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+					desiredAccel[i] = -joint->GetOmega() / timestep;;
+				}
+			}
+
+			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			{
+				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+				joint->OverrideAccel(true, desiredAccel[i]);
+			}
+
+			m_invDynamicsSolver.EndSolve();
 		}
 	}
 
