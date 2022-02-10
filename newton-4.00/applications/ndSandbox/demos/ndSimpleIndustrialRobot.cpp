@@ -33,19 +33,21 @@ class dSimpleRobotDefinition
 
 	char m_boneName[32];
 	ndFloat32 m_mass;
+	ndFloat32 m_minLimit;
+	ndFloat32 m_maxLimit;
 	jointType m_type;
 };
 
 static dSimpleRobotDefinition jointsDefinition[] =
 {
-	{ "base", 100.0f, dSimpleRobotDefinition::m_root},
-	{ "base_rotator", 50.0f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, dSimpleRobotDefinition::m_hinge },
+	{ "base", 100.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_root },
+	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
+	{ "arm_0", 5.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
 	//{ "arm_2", 5.0f, dSimpleRobotDefinition::m_hinge },
 	//{ "arm_3", 3.0f, dSimpleRobotDefinition::m_hinge },
 	//{ "arm_4", 2.0f, dSimpleRobotDefinition::m_hinge },
-	{ "effector", 0.0f, dSimpleRobotDefinition::m_effector },
+	{ "effector", 0.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_effector },
 };
 
 class dSimpleIndustrialRobot : public ndModel
