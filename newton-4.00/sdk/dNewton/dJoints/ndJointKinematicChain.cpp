@@ -128,6 +128,19 @@ void ndJointKinematicChain::GetLinearSpringDamper(ndFloat32& regularizer, ndFloa
 	regularizer = m_linearRegularizer;
 }
 
+void ndJointKinematicChain::SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst)
+{
+	m_angularSpring = springConst;
+	m_angularDamper = damperConst;
+	m_angularRegularizer = regularizer;
+}
+
+void ndJointKinematicChain::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const
+{
+	springConst = m_angularSpring;
+	damperConst = m_angularDamper;
+	regularizer = m_angularRegularizer;
+}
 
 void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
