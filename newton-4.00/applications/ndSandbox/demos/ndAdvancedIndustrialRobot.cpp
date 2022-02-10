@@ -356,7 +356,11 @@ class dAdvancedIndustrialRobot : public ndModel
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
-		if (m_effector)
+
+		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+		dAssert(skeleton);
+
+		if (m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
 		{
 			// apply target position collected by control panel
 			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
@@ -381,38 +385,36 @@ class dAdvancedIndustrialRobot : public ndModel
 			targetMatrix.m_posit = newPosit;
 			m_effector->SetTargetMatrix(targetMatrix);
 
-			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			dAssert(skeleton);
-			if (!m_invDynamicsSolver.IsSleeping(skeleton))
+			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 			{
-				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-				{
-					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					joint->OverrideAccel(false, ndFloat32(0.0f));
-				}
-				m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
-				m_invDynamicsSolver.Solve(skeleton, world, timestep);
+				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+				joint->OverrideAccel(false, ndFloat32(0.0f));
+			}
+			m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
+
+			m_invDynamicsSolver.BeginSolve(skeleton, world, timestep);
+			m_invDynamicsSolver.Solve();
+			m_invDynamicsSolver.EndSolve();
+
+			dTrace(("frame:\n"));
+			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			{
+				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+				const ndBodyKinematic* const body0 = joint->GetBody0();
+				const ndBodyKinematic* const body1 = joint->GetBody1();
 			
-				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-				{
-					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					const ndBodyKinematic* const body0 = joint->GetBody0();
-					const ndBodyKinematic* const body1 = joint->GetBody1();
+				const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
+				const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
 			
-					//ndFloat32 invMass0 = body0->GetInvMass();
-					//ndFloat32 invMass1 = body1->GetInvMass();
-					const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
-					const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
+				const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
+				const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
+				const ndVector alpha0(invInertia0.RotateVector(torque0));
+				const ndVector alpha1(invInertia1.RotateVector(torque1));
 			
-					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
-					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
-					const ndVector alpha0(invInertia0.RotateVector(torque0));
-					const ndVector alpha1(invInertia1.RotateVector(torque1));
-			
-					ndJacobianPair jacobian(joint->GetPinJacobian());
-					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-					joint->OverrideAccel(true, accel);
-				}
+				ndJacobianPair jacobian(joint->GetPinJacobian());
+				ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+				dTrace(("joint (%d %d) accel = %f\n", body0->GetId(), body1->GetId(), accel));
+				joint->OverrideAccel(true, accel);
 			}
 		}
 	}

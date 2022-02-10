@@ -53,8 +53,8 @@
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
 //#define DEFAULT_SCENE	16		// background vehicle prop
-#define DEFAULT_SCENE	17		// simple industrial robot
-//#define DEFAULT_SCENE	18		// advanced industrial robot
+//#define DEFAULT_SCENE	17		// simple industrial robot
+#define DEFAULT_SCENE	18		// advanced industrial robot
 //#define DEFAULT_SCENE	19		// simple voronoi fracture
 //#define DEFAULT_SCENE	10		// basic voronoi fracture
 //#define DEFAULT_SCENE	21		// linked voronoi fracture

@@ -285,8 +285,7 @@ ndVector ndSkeletonImmediateSolver::GetBodyTorque(const ndBodyKinematic* const b
 	return body->m_alpha;
 }
 
-
-void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+void ndSkeletonImmediateSolver::BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
 	if (!skeleton->m_isResting)
 	{
@@ -295,18 +294,14 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 		m_timestep = timestep;
 		m_invTimestep = ndFloat32(1.0f) / timestep;
 
+		m_bodies.SetCount(0);
 		m_leftHandSide.SetCount(0);
 		m_rightHandSide.SetCount(0);
-		m_internalForces.SetCount(m_skeleton->m_nodeList.GetCount() * 2);
-
-		//const ndVector zero(ndVector::m_zero);
 		ndFixSizeArray<ndContact*, 256> contacts;
-		ndFixSizeArray<ndBodyKinematic*, 256> bodies;
 
 		ndBodyKinematic sentinelBody;
-		bodies.PushBack(&sentinelBody);
+		m_bodies.PushBack(&sentinelBody);
 		sentinelBody.m_index = 0;
-		//ndBodyKinematic* const sentinel = world->GetSentinelBody();
 
 		// add open loop bodies
 		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
@@ -315,7 +310,7 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 			ndBodyKinematic* const body = node->m_body;
 			if (body->GetInvMass() > ndFloat32(0.0f))
 			{
-				bodies.PushBack(body);
+				m_bodies.PushBack(body);
 				body->m_rank = -1;
 			}
 		}
@@ -330,12 +325,12 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 			dAssert(body0->GetInvMass() > ndFloat32(0.0f));
 			if (body0->m_rank == 0)
 			{
-				bodies.PushBack(body0);
+				m_bodies.PushBack(body0);
 				body0->m_rank = -1;
 			}
 			if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
 			{
-				bodies.PushBack(body0);
+				m_bodies.PushBack(body0);
 				body0->m_rank = -1;
 			}
 		}
@@ -367,12 +362,12 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 						dAssert(body0->GetInvMass() > ndFloat32(0.0f));
 						if (body0->m_rank == 0)
 						{
-							bodies.PushBack(body0);
+							m_bodies.PushBack(body0);
 							body0->m_rank = -1;
 						}
 						if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
 						{
-							bodies.PushBack(body1);
+							m_bodies.PushBack(body1);
 							body1->m_rank = -1;
 						}
 					}
@@ -380,9 +375,10 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 			}
 		}
 
-		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		m_internalForces.SetCount(m_bodies.GetCount());
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 		{
-			ndBodyKinematic* const body = bodies[i];
+			ndBodyKinematic* const body = m_bodies[i];
 			body->m_rank = body->m_index;
 			body->m_index = i;
 
@@ -415,19 +411,33 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 			GetJacobianDerivatives(contact);
 			BuildJacobianMatrix(contact);
 		}
+	}
+}
 
+void ndSkeletonImmediateSolver::Solve()
+{
+	if (!m_skeleton->m_isResting)
+	{
 		m_skeleton->SolveImmediate(*this);
 
-		// restore body info
-		for (ndInt32 i = 1; i < bodies.GetCount(); ++i)
+		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
 		{
-			ndBodyKinematic* const body = bodies[i];
-			ndInt32 index = body->m_index;
+			ndBodyKinematic* const body = m_bodies[i];
+			const ndInt32 index = body->m_index;
 			body->m_accel = m_internalForces[index].m_linear;
 			body->m_alpha = m_internalForces[index].m_angular;
+		}
+	}
+}
+
+void ndSkeletonImmediateSolver::EndSolve()
+{
+	// restore body info
+	for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body = m_bodies[i];
 			body->m_index = body->m_rank;
 			body->m_rank = 0;
 		}
-	}
-	skeleton->ClearCloseLoopJoints();
+	m_skeleton->ClearCloseLoopJoints();
 }

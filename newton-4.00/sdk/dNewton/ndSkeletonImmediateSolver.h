@@ -32,9 +32,10 @@ class ndSkeletonImmediateSolver
 {
 	public:	
 	ndSkeletonImmediateSolver()
-		:m_leftHandSide(64)
-		,m_rightHandSide(64)
+		:m_bodies(32)
 		,m_internalForces(32)
+		,m_leftHandSide(64)
+		,m_rightHandSide(64)
 		,m_timestep(ndFloat32 (0.0f))
 		,m_invTimestep(ndFloat32(0.0f))
 		,m_world(nullptr)
@@ -44,7 +45,10 @@ class ndSkeletonImmediateSolver
 
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
 	D_NEWTON_API void AddCloseLoopJoint(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
-	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
+
+	D_NEWTON_API void BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API void Solve();
+	D_NEWTON_API void EndSolve();
 
 	D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
 	D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
@@ -53,9 +57,10 @@ class ndSkeletonImmediateSolver
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint);
 
+	ndArray<ndBodyKinematic*> m_bodies;
+	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
-	ndArray<ndJacobian> m_internalForces;
 	ndFloat32 m_timestep;
 	ndFloat32 m_invTimestep;
 
