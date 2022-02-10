@@ -42,9 +42,9 @@ static dSimpleRobotDefinition jointsDefinition[] =
 	{ "base_rotator", 50.0f, dSimpleRobotDefinition::m_hinge },
 	{ "arm_0", 5.0f, dSimpleRobotDefinition::m_hinge },
 	{ "arm_1", 5.0f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_2", 5.0f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_3", 3.0f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_4", 2.0f, dSimpleRobotDefinition::m_hinge },
+	//{ "arm_2", 5.0f, dSimpleRobotDefinition::m_hinge },
+	//{ "arm_3", 3.0f, dSimpleRobotDefinition::m_hinge },
+	//{ "arm_4", 2.0f, dSimpleRobotDefinition::m_hinge },
 	{ "effector", 0.0f, dSimpleRobotDefinition::m_effector },
 };
 
@@ -67,6 +67,8 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_yaw0(0.0f)
 		,m_roll0(0.0f)
 	{
+		m_y = -1;
+
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
 		scene->AddEntity(entity);
@@ -325,7 +327,8 @@ class dSimpleIndustrialRobot : public ndModel
 
 		bool change = false;
 		ImGui::Text("position x");
-		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
+		//change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
+		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
 		ImGui::Text("position y");
 		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.5f);
 		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.8f); // for testing limits

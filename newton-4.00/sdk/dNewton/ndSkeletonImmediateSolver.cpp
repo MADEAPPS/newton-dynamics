@@ -353,7 +353,6 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 				ndContact* const contact = it.GetNode()->GetInfo();
 				if (contact->IsActive())
 				{
-					dAssert(0);
 					bool duplicate = false;
 					const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
 					for (ndInt32 j = 0; j < loops; ++j)
