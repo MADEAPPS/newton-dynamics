@@ -113,7 +113,7 @@ class dAdvancedIndustrialRobot : public ndModel
 				const dAdvancedRobotDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
 				{
-					dTrace(("name: %s\n", name));
+					//dTrace(("name: %s\n", name));
 					if (definition.m_type == dAdvancedRobotDefinition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
@@ -415,7 +415,7 @@ class dAdvancedIndustrialRobot : public ndModel
 			
 				ndJacobianPair jacobian(joint->GetPinJacobian());
 				ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-				dTrace(("joint (%d %d) accel = %f\n", body0->GetId(), body1->GetId(), accel));
+				dTrace(("joint (%d %d)  accel=%f  omega=%f angle=%f\n", body0->GetId(), body1->GetId(), accel, joint->GetOmega(), joint->GetAngle() * ndRadToDegree));
 				joint->OverrideAccel(true, accel);
 			}
 		}
