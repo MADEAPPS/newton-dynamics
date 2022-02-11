@@ -414,6 +414,11 @@ void ndSkeletonImmediateSolver::BeginSolve(ndSkeletonContainer* const skeleton, 
 	}
 }
 
+void ndSkeletonImmediateSolver::UpdateAccel()
+{
+
+}
+
 void ndSkeletonImmediateSolver::Solve()
 {
 	if (!m_skeleton->m_isResting)

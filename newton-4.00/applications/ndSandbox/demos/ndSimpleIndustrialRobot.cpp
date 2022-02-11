@@ -60,7 +60,7 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
-		,m_x(0.5f)
+		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 		,m_pitch(0.0f)
@@ -70,8 +70,6 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_yaw0(0.0f)
 		,m_roll0(0.0f)
 	{
-		m_y = -1;
-
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
 		scene->AddEntity(entity);
@@ -167,7 +165,7 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
-		,m_x(0.5f)
+		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 		,m_pitch(0.0f)

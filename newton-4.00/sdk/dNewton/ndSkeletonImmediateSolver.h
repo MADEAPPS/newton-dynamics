@@ -47,6 +47,7 @@ class ndSkeletonImmediateSolver
 	D_NEWTON_API void AddCloseLoopJoint(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
 
 	D_NEWTON_API void BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API void UpdateAccel();
 	D_NEWTON_API void Solve();
 	D_NEWTON_API void EndSolve();
 

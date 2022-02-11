@@ -60,7 +60,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
-		,m_x(0.5f)
+		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 		,m_pitch(0.0f)
@@ -70,8 +70,6 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_yaw0(0.0f)
 		,m_roll0(0.0f)
 	{
-		m_y = -1;
-
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
 		scene->AddEntity(entity);
@@ -170,7 +168,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
-		,m_x(0.5f)
+		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 		,m_pitch(0.0f)
@@ -391,7 +389,7 @@ class dAdvancedIndustrialRobot : public ndModel
 			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 			{
 				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-				joint->OverrideAccel(false, ndFloat32(0.0f));
+				joint->EnableMotorAccel(false, ndFloat32(0.0f));
 			}
 			m_invDynamicsSolver.AddCloseLoopJoint(skeleton, m_effector);
 
@@ -400,57 +398,65 @@ class dAdvancedIndustrialRobot : public ndModel
 
 			dTrace(("frame:\n"));
 
-			bool isLegal = true;
-			ndFloat32 desiredAccel[256];
-			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			ndInt32 maxPasses = 4;
+			bool accelerationsAreValid = false;
+
+			ndFixSizeArray<ndFloat32, 64> accelerations;
+			accelerations.SetCount(m_jointArray.GetCount());
+			while (!accelerationsAreValid && maxPasses)
 			{
-				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-				const ndBodyKinematic* const body0 = joint->GetBody0();
-				const ndBodyKinematic* const body1 = joint->GetBody1();
-			
-				const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
-				const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
-			
-				const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
-				const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
-				const ndVector alpha0(invInertia0.RotateVector(torque0));
-				const ndVector alpha1(invInertia1.RotateVector(torque1));
-			
-				ndJacobianPair jacobian(joint->GetPinJacobian());
-				ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-
-				ndFloat32 minLimit;
-				ndFloat32 maxLimit;
-				joint->GetLimits(minLimit, maxLimit);
-
-				ndFloat32 angle = joint->GetAngle() + joint->GetOmega() * timestep + accel * timestep * timestep;
-				if (angle < minLimit)
-				{
-					isLegal = false;
-				}
-				else if (angle > maxLimit)
-				{
-					isLegal = false;
-				}
-				desiredAccel[i] = accel;
-				dTrace(("joint (%d %d)  accel=%f  omega=%f angle=%f\n", body0->GetId(), body1->GetId(), accel, joint->GetOmega(), joint->GetAngle() * ndRadToDegree));
-
-				//joint->OverrideAccel(true, accel);
-			}
-
-			if (!isLegal)
-			{
+				maxPasses--;
+				accelerationsAreValid = true;
 				for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 				{
 					ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-					desiredAccel[i] = -joint->GetOmega() / timestep;;
+					const ndBodyKinematic* const body0 = joint->GetBody0();
+					const ndBodyKinematic* const body1 = joint->GetBody1();
+
+					const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
+					const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
+
+					const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
+					const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
+					const ndVector alpha0(invInertia0.RotateVector(torque0));
+					const ndVector alpha1(invInertia1.RotateVector(torque1));
+
+					ndFloat32 minLimit;
+					ndFloat32 maxLimit;
+					joint->GetLimits(minLimit, maxLimit);
+					ndJacobianPair jacobian(joint->GetPinJacobian());
+					ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+					ndFloat32 angle = joint->GetAngle() + joint->GetOmega() * timestep + accel * timestep * timestep;
+					if (!joint->IsMotor() && ((angle < minLimit) || (angle > maxLimit)))
+					{
+maxPasses = 0;
+						accelerationsAreValid = false;
+						accel = -joint->GetOmega() / timestep;
+						joint->EnableMotorAccel(true, accel);
+					}
+					accelerations[i] = accel;
+					dTrace(("joint (%d %d)  accel=%f  omega=%f angle=%f\n", body0->GetId(), body1->GetId(), accel, joint->GetOmega(), joint->GetAngle() * ndRadToDegree));
+				}
+
+				if (!maxPasses)
+				{
+					for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+					{
+						ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+						accelerations[i] = -joint->GetOmega() / timestep;;
+					}
+					break;
+				}
+				else if (!accelerationsAreValid)
+				{
+					dAssert(0);
 				}
 			}
 
 			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 			{
 				ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
-				joint->OverrideAccel(true, desiredAccel[i]);
+				joint->EnableMotorAccel(true, accelerations[i]);
 			}
 
 			m_invDynamicsSolver.EndSolve();

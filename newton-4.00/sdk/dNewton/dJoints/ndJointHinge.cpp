@@ -24,10 +24,10 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_minLimit(ndFloat32(0.0f))
 	,m_maxLimit(ndFloat32(0.0f))
 	,m_friction(ndFloat32(0.0f))
-	,m_axisAccel(ndFloat32(0.0f))
+	,m_motorAccel(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_isMotor(false)
 	,m_hasLimits(false)
-	,m_overrideAccel(false)
 	,m_isSpringDamper(false)
 {
 }
@@ -41,10 +41,10 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& p
 	,m_minLimit(ndFloat32(0.0f))
 	,m_maxLimit(ndFloat32(0.0f))
 	,m_friction(ndFloat32(0.0f))
-	,m_axisAccel(ndFloat32(0.0f))
+	,m_motorAccel(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_isMotor(false)
 	,m_hasLimits(false)
-	,m_overrideAccel(false)
 	,m_isSpringDamper(false)
 {
 	ndMatrix tmp;
@@ -61,10 +61,10 @@ ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_minLimit(ndFloat32(0.0f))
 	,m_maxLimit(ndFloat32(0.0f))
 	,m_friction(ndFloat32(0.0f))
-	,m_axisAccel(ndFloat32(0.0f))
+	,m_motorAccel(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_isMotor(false)
 	,m_hasLimits(false)
-	,m_overrideAccel(false)
 	,m_isSpringDamper(false)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -74,10 +74,10 @@ ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
 	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
 	m_friction = xmlGetFloat(xmlNode, "friction");
-	m_axisAccel = xmlGetFloat(xmlNode, "axisAccel");
+	m_motorAccel = xmlGetFloat(xmlNode, "axisAccel");
 	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
+	m_hasLimits = xmlGetInt(xmlNode, "isMotor") ? true : false;
 	m_hasLimits = xmlGetInt(xmlNode, "hasLimits") ? true : false;
-	m_overrideAccel = xmlGetInt(xmlNode, "overrideAccel") ? true : false;
 	m_isSpringDamper = xmlGetInt(xmlNode, "isSpringDamper") ? true : false;
 }
 
@@ -97,10 +97,10 @@ void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "minLimit", m_minLimit);
 	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
 	xmlSaveParam(childNode, "friction", m_friction);
-	xmlSaveParam(childNode, "axisAccel", m_axisAccel);
+	xmlSaveParam(childNode, "axisAccel", m_motorAccel);
 	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
+	xmlSaveParam(childNode, "isMotor", m_isMotor ? 1 : 0);
 	xmlSaveParam(childNode, "hasLimits", m_hasLimits ? 1 : 0);
-	xmlSaveParam(childNode, "overrideAccel", m_overrideAccel ? 1 : 0);
 	xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
 }
 
@@ -114,10 +114,15 @@ ndFloat32 ndJointHinge::GetOmega() const
 	return m_omega;
 }
 
-void ndJointHinge::OverrideAccel(bool state, ndFloat32 motorAccel)
+void ndJointHinge::EnableMotorAccel(bool state, ndFloat32 motorAccel)
 {
-	m_overrideAccel = state;
-	m_axisAccel = motorAccel;
+	m_isMotor = state;
+	m_motorAccel = motorAccel;
+}
+
+bool ndJointHinge::IsMotor() const
+{
+	return m_isMotor;
 }
 
 void ndJointHinge::EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLimit)
@@ -263,10 +268,10 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 
-	if (m_overrideAccel)
+	if (m_isMotor)
 	{
 		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32 (0.0f));
-		SetMotorAcceleration(desc, m_axisAccel);
+		SetMotorAcceleration(desc, m_motorAccel);
 	}
 	else if (m_hasLimits)
 	{
