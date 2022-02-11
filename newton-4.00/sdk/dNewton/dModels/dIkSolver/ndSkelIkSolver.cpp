@@ -264,7 +264,7 @@ void ndSkelIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	//outBody1.m_angular += torqueAcc1;
 }
 
-void ndSkelIkSolver::AddCloseLoopJoint(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
+void ndSkelIkSolver::AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
 {
 	dAssert (skeleton->m_dynamicsLoopCount == 0);
 	skeleton->AddCloseLoopJoint(joint);
@@ -285,165 +285,249 @@ ndVector ndSkelIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
 	return body->m_alpha;
 }
 
-void ndSkelIkSolver::BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+//void ndSkelIkSolver::BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+//{
+//	//for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+//	//{
+//	//	dAssert(0);
+//	//	//ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+//	//	//joint->EnableMotorAccel(false, ndFloat32(0.0f));
+//	//}
+//	//m_invDynamicsSolver.AddEffector(skeleton, m_effector);
+//	//
+//	//m_invDynamicsSolver.BeginSolve(skeleton, world, timestep);
+//	//m_invDynamicsSolver.Solve();
+//	//
+//	//dTrace(("frame:\n"));
+//	//
+//	//ndInt32 maxPasses = 4;
+//	//bool accelerationsAreValid = false;
+//	//
+//	//ndFixSizeArray<ndFloat32, 64> accelerations;
+//	//accelerations.SetCount(m_jointArray.GetCount());
+//	//while (!accelerationsAreValid && maxPasses)
+//	//{
+//	//	maxPasses--;
+//	//	accelerationsAreValid = true;
+//	//	for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+//	//	{
+//	//		ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+//	//		const ndBodyKinematic* const body0 = joint->GetBody0();
+//	//		const ndBodyKinematic* const body1 = joint->GetBody1();
+//	//
+//	//		const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
+//	//		const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
+//	//
+//	//		const ndVector torque0(m_invDynamicsSolver.GetBodyTorque(body0));
+//	//		const ndVector torque1(m_invDynamicsSolver.GetBodyTorque(body1));
+//	//		const ndVector alpha0(invInertia0.RotateVector(torque0));
+//	//		const ndVector alpha1(invInertia1.RotateVector(torque1));
+//	//
+//	//		ndFloat32 minLimit;
+//	//		ndFloat32 maxLimit;
+//	//		joint->GetLimits(minLimit, maxLimit);
+//	//		ndJacobianPair jacobian(joint->GetPinJacobian());
+//	//		ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
+//	//		ndFloat32 angle = joint->GetAngle() + joint->GetOmega() * timestep + accel * timestep * timestep;
+//	//		dAssert(0);
+//	//		//if (!joint->IsMotor() && ((angle < minLimit) || (angle > maxLimit)))
+//	//		{
+//	//			//maxPasses = 0;
+//	//			accelerationsAreValid = false;
+//	//			accel = -joint->GetOmega() / timestep;
+//	//			dAssert(0);
+//	//			//joint->EnableMotorAccel(true, accel);
+//	//		}
+//	//		accelerations[i] = accel;
+//	//		dTrace(("joint (%d %d)  accel=%f  omega=%f angle=%f\n", body0->GetId(), body1->GetId(), accel, joint->GetOmega(), joint->GetAngle() * ndRadToDegree));
+//	//	}
+//	//
+//	//	if (!maxPasses)
+//	//	{
+//	//		for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+//	//		{
+//	//			ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+//	//			accelerations[i] = -joint->GetOmega() / timestep;;
+//	//		}
+//	//		break;
+//	//	}
+//	//	else if (!accelerationsAreValid)
+//	//	{
+//	//		m_invDynamicsSolver.UpdateAccel();
+//	//		m_invDynamicsSolver.Solve();
+//	//	}
+//	//}
+//	//
+//	//for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+//	//{
+//	//	dAssert(0);
+//	//	//ndJointHinge* const joint = (ndJointHinge*)m_jointArray[i];
+//	//	//joint->EnableMotorAccel(true, accelerations[i]);
+//	//}
+//	//
+//	//m_invDynamicsSolver.EndSolve();
+//
+//	//if (!skeleton->m_isResting)
+//	//{
+//	//	m_world = world;
+//	//	m_skeleton = skeleton;
+//	//	m_timestep = timestep;
+//	//	m_invTimestep = ndFloat32(1.0f) / timestep;
+//	//
+//	//	m_bodies.SetCount(0);
+//	//	m_leftHandSide.SetCount(0);
+//	//	m_rightHandSide.SetCount(0);
+//	//	ndFixSizeArray<ndContact*, 256> contacts;
+//	//
+//	//	ndBodyKinematic sentinelBody;
+//	//	m_bodies.PushBack(&sentinelBody);
+//	//	sentinelBody.m_index = 0;
+//	//
+//	//	// add open loop bodies
+//	//	for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+//	//	{
+//	//		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+//	//		ndBodyKinematic* const body = node->m_body;
+//	//		if (body->GetInvMass() > ndFloat32(0.0f))
+//	//		{
+//	//			m_bodies.PushBack(body);
+//	//			body->m_rank = -1;
+//	//		}
+//	//	}
+//	//
+//	//	// add close loop 
+//	//	const ndInt32 loopCount = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
+//	//	for (ndInt32 i = 0; i < loopCount; i++)
+//	//	{
+//	//		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
+//	//		ndBodyKinematic* const body0 = joint->GetBody0();
+//	//		ndBodyKinematic* const body1 = joint->GetBody1();
+//	//		dAssert(body0->GetInvMass() > ndFloat32(0.0f));
+//	//		if (body0->m_rank == 0)
+//	//		{
+//	//			m_bodies.PushBack(body0);
+//	//			body0->m_rank = -1;
+//	//		}
+//	//		if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
+//	//		{
+//	//			m_bodies.PushBack(body0);
+//	//			body0->m_rank = -1;
+//	//		}
+//	//	}
+//	//
+//	//	// add contacts loop bodies and joints
+//	//	for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+//	//	{
+//	//		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+//	//		ndBodyKinematic* const body = node->m_body;
+//	//
+//	//		ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+//	//		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+//	//		for (it.Begin(); it; it++)
+//	//		{
+//	//			ndContact* const contact = it.GetNode()->GetInfo();
+//	//			if (contact->IsActive())
+//	//			{
+//	//				bool duplicate = false;
+//	//				const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
+//	//				for (ndInt32 j = 0; j < loops; ++j)
+//	//				{
+//	//					duplicate = duplicate | (m_skeleton->m_loopingJoints[j] == contact);
+//	//				}
+//	//				if (!duplicate)
+//	//				{
+//	//					contacts.PushBack(contact);
+//	//					ndBodyKinematic* const body0 = contact->GetBody0();
+//	//					ndBodyKinematic* const body1 = contact->GetBody1();
+//	//					dAssert(body0->GetInvMass() > ndFloat32(0.0f));
+//	//					if (body0->m_rank == 0)
+//	//					{
+//	//						m_bodies.PushBack(body0);
+//	//						body0->m_rank = -1;
+//	//					}
+//	//					if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
+//	//					{
+//	//						m_bodies.PushBack(body1);
+//	//						body1->m_rank = -1;
+//	//					}
+//	//				}
+//	//			}
+//	//		}
+//	//	}
+//	//
+//	//	m_internalForces.SetCount(m_bodies.GetCount());
+//	//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+//	//	{
+//	//		ndBodyKinematic* const body = m_bodies[i];
+//	//		body->m_rank = body->m_index;
+//	//		body->m_index = i;
+//	//
+//	//		body->UpdateInvInertiaMatrix();
+//	//		const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
+//	//
+//	//		m_internalForces[i].m_linear = body->GetForce();
+//	//		m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
+//	//	}
+//	//
+//	//	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
+//	//	{
+//	//		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+//	//		ndJointBilateralConstraint* const joint = node->m_joint;
+//	//		GetJacobianDerivatives(joint);
+//	//		BuildJacobianMatrix(joint);
+//	//	}
+//	//
+//	//	const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
+//	//	for (ndInt32 i = 0; i < loops; i++)
+//	//	{
+//	//		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
+//	//		GetJacobianDerivatives(joint);
+//	//		BuildJacobianMatrix(joint);
+//	//	}
+//	//
+//	//	for (ndInt32 i = 0; i < contacts.GetCount(); i++)
+//	//	{
+//	//		ndContact* const contact = contacts[i];
+//	//		GetJacobianDerivatives(contact);
+//	//		BuildJacobianMatrix(contact);
+//	//	}
+//	//	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
+//	//}
+//}
+//
+//void ndSkelIkSolver::UpdateAccel()
+//{
+//
+//}
+//
+//
+//
+//void ndSkelIkSolver::EndSolve()
+//{
+//	// restore body info
+//	//for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
+//	//{
+//	//	ndBodyKinematic* const body = m_bodies[i];
+//	//	body->m_index = body->m_rank;
+//	//	body->m_rank = 0;
+//	//}
+//	//m_skeleton->ClearCloseLoopJoints();
+//}
+
+void ndSkelIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
-	if (!skeleton->m_isResting)
-	{
-		m_world = world;
-		m_skeleton = skeleton;
-		m_timestep = timestep;
-		m_invTimestep = ndFloat32(1.0f) / timestep;
+	//if (!m_skeleton->m_isResting)
+	//{
+	//	m_skeleton->SolveImmediate(*this);
+	//
+	//	for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
+	//	{
+	//		ndBodyKinematic* const body = m_bodies[i];
+	//		const ndInt32 index = body->m_index;
+	//		body->m_accel = m_internalForces[index].m_linear;
+	//		body->m_alpha = m_internalForces[index].m_angular;
+	//	}
+	//}
 
-		m_bodies.SetCount(0);
-		m_leftHandSide.SetCount(0);
-		m_rightHandSide.SetCount(0);
-		ndFixSizeArray<ndContact*, 256> contacts;
-
-		ndBodyKinematic sentinelBody;
-		m_bodies.PushBack(&sentinelBody);
-		sentinelBody.m_index = 0;
-
-		// add open loop bodies
-		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
-		{
-			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-			ndBodyKinematic* const body = node->m_body;
-			if (body->GetInvMass() > ndFloat32(0.0f))
-			{
-				m_bodies.PushBack(body);
-				body->m_rank = -1;
-			}
-		}
-
-		// add close loop 
-		const ndInt32 loopCount = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-		for (ndInt32 i = 0; i < loopCount; i++)
-		{
-			ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
-			ndBodyKinematic* const body0 = joint->GetBody0();
-			ndBodyKinematic* const body1 = joint->GetBody1();
-			dAssert(body0->GetInvMass() > ndFloat32(0.0f));
-			if (body0->m_rank == 0)
-			{
-				m_bodies.PushBack(body0);
-				body0->m_rank = -1;
-			}
-			if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
-			{
-				m_bodies.PushBack(body0);
-				body0->m_rank = -1;
-			}
-		}
-
-		// add contacts loop bodies and joints
-		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
-		{
-			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-			ndBodyKinematic* const body = node->m_body;
-
-			ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
-			ndBodyKinematic::ndContactMap::Iterator it(contactMap);
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					bool duplicate = false;
-					const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-					for (ndInt32 j = 0; j < loops; ++j)
-					{
-						duplicate = duplicate | (m_skeleton->m_loopingJoints[j] == contact);
-					}
-					if (!duplicate)
-					{
-						contacts.PushBack(contact);
-						ndBodyKinematic* const body0 = contact->GetBody0();
-						ndBodyKinematic* const body1 = contact->GetBody1();
-						dAssert(body0->GetInvMass() > ndFloat32(0.0f));
-						if (body0->m_rank == 0)
-						{
-							m_bodies.PushBack(body0);
-							body0->m_rank = -1;
-						}
-						if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
-						{
-							m_bodies.PushBack(body1);
-							body1->m_rank = -1;
-						}
-					}
-				}
-			}
-		}
-
-		m_internalForces.SetCount(m_bodies.GetCount());
-		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		{
-			ndBodyKinematic* const body = m_bodies[i];
-			body->m_rank = body->m_index;
-			body->m_index = i;
-
-			body->UpdateInvInertiaMatrix();
-			const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
-
-			m_internalForces[i].m_linear = body->GetForce();
-			m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
-		}
-
-		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-		{
-			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-			ndJointBilateralConstraint* const joint = node->m_joint;
-			GetJacobianDerivatives(joint);
-			BuildJacobianMatrix(joint);
-		}
-
-		const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-		for (ndInt32 i = 0; i < loops; i++)
-		{
-			ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
-			GetJacobianDerivatives(joint);
-			BuildJacobianMatrix(joint);
-		}
-
-		for (ndInt32 i = 0; i < contacts.GetCount(); i++)
-		{
-			ndContact* const contact = contacts[i];
-			GetJacobianDerivatives(contact);
-			BuildJacobianMatrix(contact);
-		}
-		m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
-	}
-}
-
-void ndSkelIkSolver::UpdateAccel()
-{
-
-}
-
-void ndSkelIkSolver::Solve()
-{
-	if (!m_skeleton->m_isResting)
-	{
-		m_skeleton->SolveImmediate(*this);
-
-		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
-		{
-			ndBodyKinematic* const body = m_bodies[i];
-			const ndInt32 index = body->m_index;
-			body->m_accel = m_internalForces[index].m_linear;
-			body->m_alpha = m_internalForces[index].m_angular;
-		}
-	}
-}
-
-void ndSkelIkSolver::EndSolve()
-{
-	// restore body info
-	for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
-	{
-		ndBodyKinematic* const body = m_bodies[i];
-		body->m_index = body->m_rank;
-		body->m_rank = 0;
-	}
-	m_skeleton->ClearCloseLoopJoints();
+	skeleton->ClearCloseLoopJoints();
 }

@@ -50,6 +50,7 @@
 #include <ndJointPulley.h>
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
+#include <ndJointIkHinge.h>
 #include <ndBodySphFluid.h>
 #include <ndContactArray.h>
 #include <ndJointFix6dof.h>
