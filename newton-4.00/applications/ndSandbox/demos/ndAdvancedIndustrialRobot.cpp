@@ -42,8 +42,8 @@ static dAdvancedRobotDefinition jointsDefinition[] =
 {
 	{ "base", 100.0f, 0.0f, 0.0f, dAdvancedRobotDefinition::m_root},
 	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, -1.0e10f, 1.0e10f, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, -10.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
+	{ "arm_0", 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, - 5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
 	//{ "arm_2", 5.0f, dAdvancedRobotDefinition::m_hinge },
 	//{ "arm_3", 3.0f, dAdvancedRobotDefinition::m_hinge },
 	//{ "arm_4", 2.0f, dAdvancedRobotDefinition::m_hinge },
@@ -339,7 +339,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		//change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
 		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
 		ImGui::Text("position y");
-		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.5f);
+		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
 		ImGui::Text("azimuth");
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
@@ -426,7 +426,7 @@ class dAdvancedIndustrialRobot : public ndModel
 				ndFloat32 angle = joint->GetAngle() + joint->GetOmega() * timestep + accel * timestep * timestep;
 				if (angle < minLimit)
 				{
-					angle *= 1;
+					isLegal = false;
 				}
 				else if (angle > maxLimit)
 				{

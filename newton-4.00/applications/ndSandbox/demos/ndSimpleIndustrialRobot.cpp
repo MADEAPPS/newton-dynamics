@@ -42,8 +42,9 @@ static dSimpleRobotDefinition jointsDefinition[] =
 {
 	{ "base", 100.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_root },
 	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
+	{ "arm_0", 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, -5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+
 	//{ "arm_2", 5.0f, dSimpleRobotDefinition::m_hinge },
 	//{ "arm_3", 3.0f, dSimpleRobotDefinition::m_hinge },
 	//{ "arm_4", 2.0f, dSimpleRobotDefinition::m_hinge },
@@ -119,6 +120,7 @@ class dSimpleIndustrialRobot : public ndModel
 						m_bodyArray.PushBack(childBody);
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
+						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);
 						parentBody = childBody;
@@ -332,8 +334,7 @@ class dSimpleIndustrialRobot : public ndModel
 		//change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
 		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
 		ImGui::Text("position y");
-		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.5f);
-		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 1.8f); // for testing limits
+		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
 		ImGui::Text("azimuth");
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
