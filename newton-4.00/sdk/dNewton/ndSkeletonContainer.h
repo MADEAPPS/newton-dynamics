@@ -143,7 +143,7 @@ class ndSkeletonContainer
 	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
-	void SolveImmediate(ndSkeletonImmediateSolver& solverInfo);
+	void SolveImmediate(ndSkelIkSolver& solverInfo);
 	void UpdateForcesImmediate(ndJacobian* const internalForces, const ndForcePair* const force) const;
 	void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	void SolveAuxiliaryImmediate(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
@@ -173,11 +173,11 @@ class ndSkeletonContainer
 
 	friend class ndWorld;
 	friend class ndSkeletonList;
+	friend class ndSkelIkSolver;
 	friend class ndSkeletonQueue;
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
-	friend class ndSkeletonImmediateSolver;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const

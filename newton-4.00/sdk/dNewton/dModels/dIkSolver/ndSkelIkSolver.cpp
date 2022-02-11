@@ -23,12 +23,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
+#include "ndSkelIkSolver.h"
 #include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
-#include "ndSkeletonImmediateSolver.h"
 #include "ndJointBilateralConstraint.h"
 
-void ndSkeletonImmediateSolver::GetJacobianDerivatives(ndConstraint* const joint)
+void ndSkelIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
 	dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
@@ -132,7 +132,7 @@ void ndSkeletonImmediateSolver::GetJacobianDerivatives(ndConstraint* const joint
 	}
 }
 
-void ndSkeletonImmediateSolver::BuildJacobianMatrix (ndConstraint* const joint)
+void ndSkelIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 {
 	dAssert(joint->GetBody0());
 	dAssert(joint->GetBody1());
@@ -264,28 +264,28 @@ void ndSkeletonImmediateSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	//outBody1.m_angular += torqueAcc1;
 }
 
-void ndSkeletonImmediateSolver::AddCloseLoopJoint(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
+void ndSkelIkSolver::AddCloseLoopJoint(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
 {
 	dAssert (skeleton->m_dynamicsLoopCount == 0);
 	skeleton->AddCloseLoopJoint(joint);
 }
 
-bool ndSkeletonImmediateSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
+bool ndSkelIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 {
 	return skeleton->m_isResting ? true : false;
 }
 
-ndVector ndSkeletonImmediateSolver::GetBodyForce(const ndBodyKinematic* const body) const
+ndVector ndSkelIkSolver::GetBodyForce(const ndBodyKinematic* const body) const
 {
 	return body->m_accel;
 }
 
-ndVector ndSkeletonImmediateSolver::GetBodyTorque(const ndBodyKinematic* const body) const
+ndVector ndSkelIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
 {
 	return body->m_alpha;
 }
 
-void ndSkeletonImmediateSolver::BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+void ndSkelIkSolver::BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
 	if (!skeleton->m_isResting)
 	{
@@ -411,15 +411,16 @@ void ndSkeletonImmediateSolver::BeginSolve(ndSkeletonContainer* const skeleton, 
 			GetJacobianDerivatives(contact);
 			BuildJacobianMatrix(contact);
 		}
+		m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 	}
 }
 
-void ndSkeletonImmediateSolver::UpdateAccel()
+void ndSkelIkSolver::UpdateAccel()
 {
 
 }
 
-void ndSkeletonImmediateSolver::Solve()
+void ndSkelIkSolver::Solve()
 {
 	if (!m_skeleton->m_isResting)
 	{
@@ -435,14 +436,14 @@ void ndSkeletonImmediateSolver::Solve()
 	}
 }
 
-void ndSkeletonImmediateSolver::EndSolve()
+void ndSkelIkSolver::EndSolve()
 {
 	// restore body info
 	for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body = m_bodies[i];
-			body->m_index = body->m_rank;
-			body->m_rank = 0;
-		}
+		body->m_index = body->m_rank;
+		body->m_rank = 0;
+	}
 	m_skeleton->ClearCloseLoopJoints();
 }

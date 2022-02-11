@@ -465,7 +465,7 @@ maxPasses = 0;
 
 	ndBodyDynamic* m_rootBody;
 	ndJointKinematicChain* m_effector;
-	ndSkeletonImmediateSolver m_invDynamicsSolver;
+	ndSkelIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 

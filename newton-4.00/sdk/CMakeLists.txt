@@ -37,6 +37,7 @@ else()
 	include_directories(dNewton/dModels/)
 	include_directories(dNewton/dParticles/)
 	include_directories(dNewton/dModels/dVehicle)
+	include_directories(dNewton/dModels/dIkSolver)
 	include_directories(dNewton/dModels/dCharacter)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
@@ -68,6 +69,7 @@ else()
 		dNewton/dModels/*.h 
 		dNewton/dParticles/*.h 
 		dNewton/dModels/dVehicle/*.h
+		dNewton/dModels/dIkSolver/*.h
 		dNewton/dModels/dCharacter/*.h)
 
 	file(GLOB CPP_SOURCE 
@@ -87,6 +89,8 @@ else()
 		dNewton/dParticles/*.cpp
 		dNewton/dModels/dVehicle/*.h 
 		dNewton/dModels/dVehicle/*.cpp
+		dNewton/dModels/dIkSolver/*.h
+		dNewton/dModels/dIkSolver/*.cpp
 		dNewton/dModels/dCharacter/*.h
 		dNewton/dModels/dCharacter/*.cpp)
 

@@ -28,11 +28,12 @@ class ndWorld;
 class ndConstraint;
 class ndSkeletonContainer;
 
-class ndSkeletonImmediateSolver
+class ndSkelIkSolver: public ndClassAlloc
 {
 	public:	
-	ndSkeletonImmediateSolver()
-		:m_bodies(32)
+	ndSkelIkSolver()
+		:ndClassAlloc()
+		,m_bodies(32)
 		,m_internalForces(32)
 		,m_leftHandSide(64)
 		,m_rightHandSide(64)
@@ -53,7 +54,7 @@ class ndSkeletonImmediateSolver
 
 	D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
 	D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
-	
+
 	private:
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint);

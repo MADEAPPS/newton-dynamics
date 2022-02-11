@@ -216,13 +216,13 @@ class ndBodyKinematic : public ndBody
 	friend class ndWorld;
 	friend class ndScene;
 	friend class ndContact;
+	friend class ndSkelIkSolver;
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateOpencl;
-	friend class ndSkeletonImmediateSolver;
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 

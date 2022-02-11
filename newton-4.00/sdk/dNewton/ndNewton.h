@@ -55,6 +55,7 @@
 #include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
+#include <ndSkelIkSolver.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
 #include <ndShapeInstance.h>
@@ -77,7 +78,6 @@
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
 #include <ndMultiBodyVehicleMotor.h>
-#include <ndSkeletonImmediateSolver.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
 #include <ndJointKinematicController.h>

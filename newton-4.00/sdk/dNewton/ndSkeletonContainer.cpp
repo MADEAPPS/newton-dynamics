@@ -23,9 +23,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
+#include "ndSkelIkSolver.h"
 #include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
-#include "ndSkeletonImmediateSolver.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * ndFloat32 (0.25f))
@@ -1686,9 +1686,9 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndJacobian* const internalForc
 	}
 }
 
-void ndSkeletonContainer::SolveImmediate(ndSkeletonImmediateSolver& solverInfo)
+void ndSkeletonContainer::SolveImmediate(ndSkelIkSolver& solverInfo)
 {
-	InitMassMatrix(&solverInfo.m_leftHandSide[0], &solverInfo.m_rightHandSide[0]);
+	//InitMassMatrix(&solverInfo.m_leftHandSide[0], &solverInfo.m_rightHandSide[0]);
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
 	ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);

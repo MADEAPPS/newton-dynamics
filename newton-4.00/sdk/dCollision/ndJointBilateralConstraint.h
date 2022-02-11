@@ -121,12 +121,12 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndJointBilateralSolverModel m_solverModel;
 
 	friend class ndWorld;
+	friend class ndSkelIkSolver;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateOpencl;
-	friend class ndSkeletonImmediateSolver;
 };
 
 inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() const
