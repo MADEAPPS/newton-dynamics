@@ -24,6 +24,7 @@
 
 #include "ndNewtonStdafx.h"
 
+class ndSkelIkSolver;
 class ndJointBilateralConstraint;
 
 class ndSkeletonContainer 
