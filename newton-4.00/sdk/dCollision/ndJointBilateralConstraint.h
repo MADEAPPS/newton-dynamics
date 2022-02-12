@@ -80,6 +80,8 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	D_COLLISION_API virtual void SetIkSolver();
 	D_COLLISION_API virtual void ResetIkSolver();
+	D_COLLISION_API virtual void StopIkMotor(ndFloat32 timestep);
+	D_COLLISION_API virtual bool SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1);
 
 	bool IsInWorld() const;
 	bool IsBilateral() const;

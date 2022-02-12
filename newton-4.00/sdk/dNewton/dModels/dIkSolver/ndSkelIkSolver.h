@@ -31,19 +31,8 @@ class ndSkeletonContainer;
 class ndSkelIkSolver: public ndClassAlloc
 {
 	public:	
-	ndSkelIkSolver()
-		:ndClassAlloc()
-		,m_bodies(32)
-		,m_internalForces(32)
-		,m_leftHandSide(64)
-		,m_rightHandSide(64)
-		,m_timestep(ndFloat32 (0.0f))
-		,m_invTimestep(ndFloat32(0.0f))
-		,m_world(nullptr)
-		,m_skeleton(nullptr)
-	{
-	}
-
+	D_NEWTON_API ndSkelIkSolver();
+	D_NEWTON_API ~ndSkelIkSolver();
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
 	D_NEWTON_API void AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
 	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
@@ -56,16 +45,17 @@ class ndSkelIkSolver: public ndClassAlloc
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint);
 
+	private:
+	ndBodyKinematic m_sentinelBody;
 	ndArray<ndBodyKinematic*> m_bodies;
 	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
+	ndWorld* m_world;
+	ndSkeletonContainer* m_skeleton;
 	ndFloat32 m_timestep;
 	ndFloat32 m_invTimestep;
 
-	private:
-	ndWorld* m_world;
-	ndSkeletonContainer* m_skeleton;
 	friend class ndSkeletonContainer;
 };
 

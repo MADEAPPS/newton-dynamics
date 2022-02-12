@@ -179,6 +179,15 @@ void ndJointBilateralConstraint::ResetIkSolver()
 {
 }
 
+void ndJointBilateralConstraint::StopIkMotor(ndFloat32)
+{
+}
+
+bool ndJointBilateralConstraint::SetIkMotor(ndFloat32, const ndJacobian&, const ndJacobian&)
+{
+	return true;
+}
+
 void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndMatrix matrix0;
