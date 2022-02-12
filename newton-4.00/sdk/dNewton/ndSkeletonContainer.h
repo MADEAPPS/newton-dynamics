@@ -24,7 +24,7 @@
 
 #include "ndNewtonStdafx.h"
 
-class ndSkelIkSolver;
+class ndIkSolver;
 class ndJointBilateralConstraint;
 
 class ndSkeletonContainer 
@@ -144,7 +144,7 @@ class ndSkeletonContainer
 	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
-	void SolveImmediate(ndSkelIkSolver& solverInfo);
+	void SolveImmediate(ndIkSolver& solverInfo);
 	void UpdateForcesImmediate(ndBodyKinematic** const bodyArray, const ndForcePair* const force) const;
 	void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	void SolveAuxiliaryImmediate(ndBodyKinematic** const bodyArray, ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
@@ -173,8 +173,8 @@ class ndSkeletonContainer
 	ndUnsigned8 m_isResting;
 
 	friend class ndWorld;
+	friend class ndIkSolver;
 	friend class ndSkeletonList;
-	friend class ndSkelIkSolver;
 	friend class ndSkeletonQueue;
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;

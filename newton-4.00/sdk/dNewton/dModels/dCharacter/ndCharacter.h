@@ -29,7 +29,7 @@ class ndWorld;
 class ndCharacterNode;
 class ndCharacterRootNode;
 class ndCharacterSkeleton;
-class ndJointKinematicChain;
+class ndJointIkEndEffector;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
@@ -49,7 +49,7 @@ class ndCharacter: public ndModel
 		public:
 		ndMatrix m_bindMatrix;
 		ndCharacterNode* m_controlNode;
-		ndJointKinematicChain* m_effector;
+		ndJointIkEndEffector* m_effector;
 	};
 
 	D_CLASS_REFLECTION(ndCharacter);

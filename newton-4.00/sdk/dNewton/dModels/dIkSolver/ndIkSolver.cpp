@@ -22,13 +22,13 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndIkSolver.h"
 #include "ndBodyDynamic.h"
-#include "ndSkelIkSolver.h"
 #include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
 #include "ndJointBilateralConstraint.h"
 
-ndSkelIkSolver::ndSkelIkSolver()
+ndIkSolver::ndIkSolver()
 	:ndClassAlloc()
 	,m_sentinelBody()
 	,m_bodies(32)
@@ -43,16 +43,16 @@ ndSkelIkSolver::ndSkelIkSolver()
 {
 }
 
-ndSkelIkSolver::~ndSkelIkSolver()
+ndIkSolver::~ndIkSolver()
 {
 }
 
-void ndSkelIkSolver::SetMaxIterations(ndInt32 iterCount)
+void ndIkSolver::SetMaxIterations(ndInt32 iterCount)
 {
 	m_maxIterations = dClamp(iterCount, 1, 16);
 }
 
-void ndSkelIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
+void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
 	dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
@@ -156,7 +156,7 @@ void ndSkelIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 	}
 }
 
-void ndSkelIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
+void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 {
 	dAssert(joint->GetBody0());
 	dAssert(joint->GetBody1());
@@ -195,28 +195,28 @@ void ndSkelIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	}
 }
 
-void ndSkelIkSolver::AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
+void ndIkSolver::AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
 {
 	dAssert (skeleton->m_dynamicsLoopCount == 0);
 	skeleton->AddCloseLoopJoint(joint);
 }
 
-bool ndSkelIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
+bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 {
 	return skeleton->m_isResting ? true : false;
 }
 
-ndVector ndSkelIkSolver::GetBodyForce(const ndBodyKinematic* const body) const
+ndVector ndIkSolver::GetBodyForce(const ndBodyKinematic* const body) const
 {
 	return body->m_accel;
 }
 
-ndVector ndSkelIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
+ndVector ndIkSolver::GetBodyTorque(const ndBodyKinematic* const body) const
 {
 	return body->m_alpha;
 }
 
-void ndSkelIkSolver::BuildMassMatrix()
+void ndIkSolver::BuildMassMatrix()
 {
 	m_bodies.SetCount(0);
 	m_leftHandSide.SetCount(0);
@@ -342,7 +342,7 @@ void ndSkelIkSolver::BuildMassMatrix()
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 }
 
-void ndSkelIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+void ndIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
 	m_world = world;
 	m_skeleton = skeleton;

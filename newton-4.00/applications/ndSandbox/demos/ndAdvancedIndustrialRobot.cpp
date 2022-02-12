@@ -127,7 +127,7 @@ class dAdvancedIndustrialRobot : public ndModel
 					else
 					{
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndJointKinematicChain(pivotMatrix, parentBody, m_rootBody);
+						m_effector = new ndJointIkEndEffector(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, false);
 
 						ndVector euler0;
@@ -221,7 +221,7 @@ class dAdvancedIndustrialRobot : public ndModel
 			dAssert(body1 == m_rootBody);
 
 			const ndMatrix pivotMatrix(body0->GetMatrix());
-			m_effector = new ndJointKinematicChain(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+			m_effector = new ndJointIkEndEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
 		}
 	}
 
@@ -398,8 +398,8 @@ class dAdvancedIndustrialRobot : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointKinematicChain* m_effector;
-	ndSkelIkSolver m_invDynamicsSolver;
+	ndJointIkEndEffector* m_effector;
+	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 

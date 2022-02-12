@@ -9,19 +9,19 @@
 * freely
 */
 
-#ifndef __ND_JOINT_TWO_BODY_IK_H__
-#define __ND_JOINT_TWO_BODY_IK_H__
+#ifndef __ND_JOINT_IK_END_EFFECTOR_H__
+#define __ND_JOINT_IK_END_EFFECTOR_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBallAndSocket.h"
 
-class ndJointKinematicChain: public ndJointBilateralConstraint
+class ndJointIkEndEffector: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointKinematicChain);
-	D_NEWTON_API ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointKinematicChain(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointKinematicChain();
+	D_CLASS_REFLECTION(ndJointIkEndEffector);
+	D_NEWTON_API ndJointIkEndEffector(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndJointIkEndEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointIkEndEffector();
 
 	D_NEWTON_API ndMatrix GetReferenceMatrix() const;
 	D_NEWTON_API void SetTargetMatrix(const ndMatrix& localMatrix);

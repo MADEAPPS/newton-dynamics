@@ -127,7 +127,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndJointBilateralSolverModel m_solverModel;
 
 	friend class ndWorld;
-	friend class ndSkelIkSolver;
+	friend class ndIkSolver;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;

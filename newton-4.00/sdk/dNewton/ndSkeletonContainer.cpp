@@ -22,8 +22,8 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndIkSolver.h"
 #include "ndBodyDynamic.h"
-#include "ndSkelIkSolver.h"
 #include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
 #include "ndJointBilateralConstraint.h"
@@ -1687,7 +1687,7 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndBodyKinematic** const bodyAr
 	}
 }
 
-void ndSkeletonContainer::SolveImmediate(ndSkelIkSolver& solverInfo)
+void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 {
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const force = dAlloca(ndForcePair, nodeCount);

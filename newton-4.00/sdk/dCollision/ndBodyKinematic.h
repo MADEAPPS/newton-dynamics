@@ -216,7 +216,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndWorld;
 	friend class ndScene;
 	friend class ndContact;
-	friend class ndSkelIkSolver;
+	friend class ndIkSolver;
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;

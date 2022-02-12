@@ -35,6 +35,7 @@
 #include <ndScene.h>
 #include <ndModel.h>
 #include <ndContact.h>
+#include <ndIkSolver.h>
 #include <ndShapeBox.h>
 #include <ndLoadSave.h>
 #include <ndShapeNull.h>
@@ -56,7 +57,6 @@
 #include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
-#include <ndSkelIkSolver.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
 #include <ndShapeInstance.h>
@@ -75,7 +75,7 @@
 #include <ndDynamicsUpdateSoa.h>
 #include <ndJointHingeActuator.h>
 #include <ndJointBallAndSocket.h>
-#include <ndJointKinematicChain.h>
+#include <ndJointIkEndEffector.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
 #include <ndMultiBodyVehicleMotor.h>

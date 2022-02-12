@@ -28,11 +28,11 @@ class ndWorld;
 class ndConstraint;
 class ndSkeletonContainer;
 
-class ndSkelIkSolver: public ndClassAlloc
+class ndIkSolver: public ndClassAlloc
 {
 	public:	
-	D_NEWTON_API ndSkelIkSolver();
-	D_NEWTON_API ~ndSkelIkSolver();
+	D_NEWTON_API ndIkSolver();
+	D_NEWTON_API ~ndIkSolver();
 
 	D_NEWTON_API void SetMaxIterations(ndInt32 iterCount);
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
