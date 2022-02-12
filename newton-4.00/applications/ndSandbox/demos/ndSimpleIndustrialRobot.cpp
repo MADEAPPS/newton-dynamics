@@ -80,7 +80,7 @@ class dSimpleIndustrialRobot : public ndModel
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 1.0f;
+		//matrix.m_posit.m_y += 1.0f;
 		entity->ResetMatrix(matrix);
 		
 		// add the root body
@@ -427,7 +427,9 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 
 	delete robotEntity;
 
-	matrix.m_posit.m_x -= 8.0f;
+	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;
-	scene->SetCameraMatrix(ndQuaternion(), matrix.m_posit);
+	matrix.m_posit.m_z += 6.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 45.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
