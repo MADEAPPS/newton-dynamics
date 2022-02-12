@@ -64,6 +64,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const ndVector& dir, ndFloat32 relAngle);
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir);
 
+	D_COLLISION_API virtual bool IsIk() const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_COLLISION_API ndFloat32 CalculateSpringDamperAcceleration(ndFloat32 dt, ndFloat32 ks, ndFloat32 x, ndFloat32 kd, ndFloat32 v) const;
@@ -76,6 +77,9 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector GetTorqueBody0() const;
 	ndVector GetForceBody1() const;
 	ndVector GetTorqueBody1() const;
+
+	D_COLLISION_API virtual void SetIkSolver();
+	D_COLLISION_API virtual void ResetIkSolver();
 
 	bool IsInWorld() const;
 	bool IsBilateral() const;

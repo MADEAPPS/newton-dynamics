@@ -46,17 +46,13 @@ class ndSkelIkSolver: public ndClassAlloc
 
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
 	D_NEWTON_API void AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
-
-	//D_NEWTON_API void BeginSolve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
-	//D_NEWTON_API void UpdateAccel();
-	//D_NEWTON_API void Solve();
-	//D_NEWTON_API void EndSolve();
 	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
 
 	D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
 	D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
 
 	private:
+	void BuildMassMatrix();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint);
 

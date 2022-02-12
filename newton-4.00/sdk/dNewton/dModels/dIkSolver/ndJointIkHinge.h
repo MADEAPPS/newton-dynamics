@@ -24,40 +24,19 @@ class ndJointIkHinge: public ndJointHinge
 	D_NEWTON_API ndJointIkHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointIkHinge();
 
-	//D_NEWTON_API virtual ndFloat32 GetAngle() const;
-	//D_NEWTON_API virtual ndFloat32 GetOmega() const;
-	//D_NEWTON_API virtual ndFloat32 GetFriction() const;
-	//
-	//D_NEWTON_API virtual void SetFriction(ndFloat32 frictionTorque);
-	//D_NEWTON_API virtual void EnableMotorAccel(bool state, ndFloat32 motorAccel);
-	//D_NEWTON_API virtual void EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLimit);
-	//D_NEWTON_API virtual void SetAsSpringDamper(bool state, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
-	//
-	//D_NEWTON_API bool IsMotor() const;
-	//D_NEWTON_API ndJacobianPair GetPinJacobian() const;
-	//D_NEWTON_API void GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit);
-	//
-	//private:
-	//void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	//void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API virtual bool IsIk() const;
+	D_COLLISION_API virtual void SetIkSolver();
+	D_COLLISION_API virtual void ResetIkSolver();
 	
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	
-	//ndFloat32 m_angle;
-	//ndFloat32 m_omega;
-	//ndFloat32 m_springK;
-	//ndFloat32 m_damperC;
-	//ndFloat32 m_minLimit;
-	//ndFloat32 m_maxLimit;
-	//ndFloat32 m_friction;
-	//ndFloat32 m_motorAccel;
-	//ndFloat32 m_springDamperRegularizer;
-	//
-	//bool m_isMotor;
-	//bool m_hasLimits;
-	//bool m_isSpringDamper;
+	ndFloat32 m_minTorque;
+	ndFloat32 m_maxTorque;
+	ndFloat32 m_motorAccel;
+	ndFloat32 m_savedMinToque;
+	ndFloat32 m_savedMaxTorque;
 };
 
 #endif 

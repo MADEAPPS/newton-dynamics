@@ -166,6 +166,19 @@ void ndJointBilateralConstraint::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 	xmlSaveParam(childNode, "solverModel", ndInt32(m_solverModel));
 }
 
+bool ndJointBilateralConstraint::IsIk() const
+{
+	return false;
+}
+
+void ndJointBilateralConstraint::SetIkSolver()
+{
+}
+
+void ndJointBilateralConstraint::ResetIkSolver()
+{
+}
+
 void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndMatrix matrix0;
