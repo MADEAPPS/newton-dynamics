@@ -126,22 +126,15 @@ bool ndJointIkHinge::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0
 	ndJacobianPair jacobian(GetPinJacobian());
 	ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
 	ndFloat32 angle = GetAngle() + GetOmega() * timestep + accel * timestep * timestep;
-	//dAssert(0);
-	////if (!joint->IsMotor() && ((angle < minLimit) || (angle > maxLimit)))
+
 	bool ret = true;
 	if ((angle < minLimit) || (angle > maxLimit))
 	{
-	//	//maxPasses = 0;
-	//	accelerationsAreValid = false;
-	//	accel = -joint->GetOmega() / timestep;
-	//	dAssert(0);
-	//	//joint->EnableMotorAccel(true, accel);
-
 		ret = false;
 		accel = -GetOmega() / timestep;
+		m_minTorque = m_savedMinToque;
+		m_maxTorque = m_savedMaxTorque;
 	}
-	//accelerations[i] = accel;
-	//dTrace(("joint (%d %d)  accel=%f  omega=%f angle=%f\n", body0->GetId(), body1->GetId(), accel, joint->GetOmega(), joint->GetAngle() * ndRadToDegree));
 	m_motorAccel = accel;
 
 	return ret;

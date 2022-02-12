@@ -387,6 +387,8 @@ class dAdvancedIndustrialRobot : public ndModel
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		dAssert(skeleton);
 
+		m_invDynamicsSolver.SetMaxIterations(4);
+
 		if (m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
 		{
 			PlaceEffector();
