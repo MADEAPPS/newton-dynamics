@@ -44,10 +44,9 @@ static dSimpleRobotDefinition jointsDefinition[] =
 	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
 	{ "arm_0", 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
 	{ "arm_1", 5.0f, -5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-
-	//{ "arm_2", 5.0f, dSimpleRobotDefinition::m_hinge },
-	//{ "arm_3", 3.0f, dSimpleRobotDefinition::m_hinge },
-	//{ "arm_4", 2.0f, dSimpleRobotDefinition::m_hinge },
+	{ "arm_2", 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+	{ "arm_3", 3.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+	{ "arm_4", 2.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
 	{ "effector", 0.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_effector },
 };
 
@@ -127,7 +126,7 @@ class dSimpleIndustrialRobot : public ndModel
 					{
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndJointIkEndEffector(pivotMatrix, parentBody, m_rootBody);
-						m_effector->SetMode(true, false);
+						m_effector->SetMode(true, true);
 
 						ndVector euler0;
 						ndVector euler1;
@@ -219,6 +218,17 @@ class dSimpleIndustrialRobot : public ndModel
 
 			const ndMatrix pivotMatrix(body0->GetMatrix());
 			m_effector = new ndJointIkEndEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+			m_effector->SetMode(true, true);
+
+			ndFloat32 regularizer;
+			ndFloat32 springConst;
+			ndFloat32 damperConst;
+
+			m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
+			m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+
+			m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
+			m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
 		}
 	}
 
@@ -276,6 +286,16 @@ class dSimpleIndustrialRobot : public ndModel
 			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
 			xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
 		}
+
+		//m_x;
+		//m_y;
+		//m_azimuth;
+		//m_pitch;
+		//m_yaw;
+		//m_roll;
+		//m_pitch0;
+		//m_yaw0;
+		//m_roll0;
 	}
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
