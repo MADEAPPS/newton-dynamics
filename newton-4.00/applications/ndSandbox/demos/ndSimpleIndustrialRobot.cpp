@@ -44,9 +44,9 @@ static dSimpleRobotDefinition jointsDefinition[] =
 	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
 	{ "arm_0", 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
 	{ "arm_1", 5.0f, -5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_2", 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_3", 3.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_4", 2.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+	{ "arm_2", 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+	{ "arm_3", 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
+	{ "arm_4", 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
 	{ "effector", 0.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_effector },
 };
 
@@ -59,15 +59,13 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
+		,m_baseRotation(dGetIdentityMatrix())
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 		,m_pitch(0.0f)
 		,m_yaw(0.0f)
 		,m_roll(0.0f)
-		,m_pitch0(0.0f)
-		,m_yaw0(0.0f)
-		,m_roll0(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -127,13 +125,7 @@ class dSimpleIndustrialRobot : public ndModel
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndJointIkEndEffector(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, true);
-
-						ndVector euler0;
-						ndVector euler1;
-						m_effector->GetReferenceMatrix().CalcPitchYawRoll(euler0, euler1);
-						m_pitch0 = euler0.m_x * ndRadToDegree;
-						m_yaw0 = euler0.m_y * ndRadToDegree;
-						m_roll0 = euler0.m_z * ndRadToDegree;
+						m_baseRotation = m_effector->GetReferenceMatrix();
 
 						ndFloat32 regularizer;
 						ndFloat32 springConst;
@@ -164,15 +156,13 @@ class dSimpleIndustrialRobot : public ndModel
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
+		,m_baseRotation(dGetIdentityMatrix())
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
 		,m_pitch(0.0f)
 		,m_yaw(0.0f)
 		,m_roll(0.0f)
-		,m_pitch0(0.0f)
-		,m_yaw0(0.0f)
-		,m_roll0(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -391,9 +381,8 @@ class dSimpleIndustrialRobot : public ndModel
 			const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
 
 			targetMatrix = 
-				dPitchMatrix((m_pitch + m_pitch0) * ndDegreeToRad) *
-				dYawMatrix((m_yaw + m_yaw0) * ndDegreeToRad) *
-				dRollMatrix((m_roll + m_roll0) * ndDegreeToRad);
+				dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) *
+				dRollMatrix(m_roll * ndDegreeToRad) * m_baseRotation;
 			targetMatrix.m_posit = newPosit;
 			m_effector->SetTargetMatrix(targetMatrix);
 		}
@@ -404,15 +393,13 @@ class dSimpleIndustrialRobot : public ndModel
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 
+	ndMatrix m_baseRotation;
 	ndFloat32 m_x;
 	ndFloat32 m_y;
 	ndFloat32 m_azimuth;
 	ndFloat32 m_pitch;
 	ndFloat32 m_yaw;
 	ndFloat32 m_roll;
-	ndFloat32 m_pitch0;
-	ndFloat32 m_yaw0;
-	ndFloat32 m_roll0;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dSimpleIndustrialRobot);
