@@ -9,19 +9,19 @@
 * freely
 */
 
-#ifndef __ND_JOINT_PID_3DOF_ACTUATOR_H__
-#define __ND_JOINT_PID_3DOF_ACTUATOR_H__
+#ifndef __ND_JOINT_PD_BALL_AND_SOCKET_H__
+#define __ND_JOINT_PD_BALL_AND_SOCKET_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-class ndJointPdActuator : public ndJointBilateralConstraint
+class ndJointPdBallAndSocket : public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointPdActuator);
-	D_NEWTON_API ndJointPdActuator(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointPdActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointPdActuator();
+	D_CLASS_REFLECTION(ndJointPdBallAndSocket);
+	D_NEWTON_API ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndJointPdBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointPdBallAndSocket();
 
 	D_NEWTON_API void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
 	D_NEWTON_API void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
@@ -82,21 +82,21 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	ndFloat32 m_linearRegularizer;
 };
 
-inline ndMatrix ndJointPdActuator::GetTargetRotation() const
+inline ndMatrix ndJointPdBallAndSocket::GetTargetRotation() const
 {
 	ndMatrix tmp(m_localMatrix1);
 	tmp.m_posit = m_pivotFrame.m_posit;
 	return tmp;
 }
 
-inline void ndJointPdActuator::SetTargetRotation(const ndMatrix& matrix)
+inline void ndJointPdBallAndSocket::SetTargetRotation(const ndMatrix& matrix)
 {
 	ndMatrix tmp(matrix);
 	tmp.m_posit = m_localMatrix1.m_posit;
 	m_localMatrix1 = tmp;
 }
 
-inline const ndMatrix& ndJointPdActuator::GetReferenceMatrix() const
+inline const ndMatrix& ndJointPdBallAndSocket::GetReferenceMatrix() const
 {
 	return m_pivotFrame;
 }

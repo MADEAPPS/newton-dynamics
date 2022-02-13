@@ -375,7 +375,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-			ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
+			ndJointPdBallAndSocket* const joint = (ndJointPdBallAndSocket*)jointNode->GetJoint();
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);

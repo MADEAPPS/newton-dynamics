@@ -11,15 +11,15 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointPdActuator.h"
+#include "ndJointPdBallAndSocket.h"
 
 #define D_PD_MAX_ANGLE	ndFloat32 (120.0f * ndDegreeToRad)
 #define D_PD_PENETRATION_RECOVERY_ANGULAR_SPEED ndFloat32 (0.1f) 
 #define D_PD_PENETRATION_ANGULAR_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPdActuator)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPdBallAndSocket)
 
-ndJointPdActuator::ndJointPdActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_pivotFrame(m_localMatrix1)
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
@@ -37,7 +37,7 @@ ndJointPdActuator::ndJointPdActuator(const ndMatrix& pinAndPivotFrame, ndBodyKin
 {
 }
 
-ndJointPdActuator::ndJointPdActuator(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_pivotFrame(dGetIdentityMatrix())
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
@@ -72,11 +72,11 @@ ndJointPdActuator::ndJointPdActuator(const ndLoadSaveBase::ndLoadDescriptor& des
 	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
 }
 
-ndJointPdActuator::~ndJointPdActuator()
+ndJointPdBallAndSocket::~ndJointPdBallAndSocket()
 {
 }
 
-void ndJointPdActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointPdBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -100,92 +100,92 @@ void ndJointPdActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
-void ndJointPdActuator::GetConeAngleSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
+void ndJointPdBallAndSocket::GetConeAngleSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
 {
 	spring = m_coneAngleSpring;
 	damper = m_coneAngleDamper;
 	regularizer = m_coneAngleRegularizer;
 }
 
-void ndJointPdActuator::SetConeAngleSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
+void ndJointPdBallAndSocket::SetConeAngleSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
 {
 	m_coneAngleSpring = dMax(spring, ndFloat32(0.0f));
 	m_coneAngleDamper = dMax(damper, ndFloat32(0.0f));
 	m_coneAngleRegularizer = dMax(regularizer, ndFloat32(0.0f));
 }
 
-void ndJointPdActuator::GetTwistAngleSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
+void ndJointPdBallAndSocket::GetTwistAngleSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
 {
 	spring = m_twistAngleSpring;
 	damper = m_twistAngleDamper;
 	regularizer = m_twistAngleRegularizer;
 }
 
-void ndJointPdActuator::SetTwistAngleSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
+void ndJointPdBallAndSocket::SetTwistAngleSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
 {
 	m_twistAngleSpring = dMax(spring, ndFloat32(0.0f));
 	m_twistAngleDamper = dMax(damper, ndFloat32(0.0f));
 	m_twistAngleRegularizer = dMax(regularizer, ndFloat32(0.0f));
 }
 
-void ndJointPdActuator::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
+void ndJointPdBallAndSocket::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
 {
 	m_minTwistAngle = -dAbs(minAngle);
 	m_maxTwistAngle = dAbs(maxAngle);
 }
 
-void ndJointPdActuator::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
+void ndJointPdBallAndSocket::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
 {
 	minAngle = m_minTwistAngle;
 	maxAngle = m_maxTwistAngle;
 }
 
-ndFloat32 ndJointPdActuator::GetMaxConeAngle() const
+ndFloat32 ndJointPdBallAndSocket::GetMaxConeAngle() const
 {
 	return m_maxConeAngle;
 }
 
-void ndJointPdActuator::SetConeLimit(ndFloat32 maxConeAngle)
+void ndJointPdBallAndSocket::SetConeLimit(ndFloat32 maxConeAngle)
 {
 	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_PD_MAX_ANGLE * ndFloat32 (0.999f));
 }
 
-ndVector ndJointPdActuator::GetTargetPosition() const
+ndVector ndJointPdBallAndSocket::GetTargetPosition() const
 {
 	return m_localMatrix1.m_posit;
 }
 
-void ndJointPdActuator::SetTargetPosition(const ndVector& posit)
+void ndJointPdBallAndSocket::SetTargetPosition(const ndVector& posit)
 {
 	dAssert(posit.m_w == ndFloat32(1.0f));
 	m_localMatrix1.m_posit = posit;
 }
 
-void ndJointPdActuator::GetLinearSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
+void ndJointPdBallAndSocket::GetLinearSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
 {
 	spring = m_linearSpring;
 	damper = m_linearDamper;
 	regularizer = m_linearRegularizer;
 }
 
-void ndJointPdActuator::SetLinearSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
+void ndJointPdBallAndSocket::SetLinearSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
 {
 	m_linearSpring = dMax(spring, ndFloat32(0.0f));
 	m_linearDamper = dMax(damper, ndFloat32(0.0f));
 	m_linearRegularizer = dMax(regularizer, ndFloat32(0.0f));
 }
 
-ndMatrix ndJointPdActuator::GetTargetMatrix() const
+ndMatrix ndJointPdBallAndSocket::GetTargetMatrix() const
 {
 	return m_localMatrix1;
 }
 
-void ndJointPdActuator::SetTargetMatrix(const ndMatrix& matrix)
+void ndJointPdBallAndSocket::SetTargetMatrix(const ndMatrix& matrix)
 {
 	m_localMatrix1 = matrix;
 }
 
-void ndJointPdActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;
@@ -274,7 +274,7 @@ void ndJointPdActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) con
 	}
 }
 
-//void ndJointPdActuator::SubmitTwistLimits(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+//void ndJointPdBallAndSocket::SubmitTwistLimits(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 //{
 //	if((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 //	{ 
@@ -305,7 +305,7 @@ void ndJointPdActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) con
 //	}
 //}
 
-//void ndJointPdActuator::SubmitPdRotation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+//void ndJointPdBallAndSocket::SubmitPdRotation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 //{
 //	ndQuaternion q0(matrix0);
 //	ndQuaternion q1(matrix1);
@@ -350,7 +350,7 @@ void ndJointPdActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) con
 //	}
 //}
 
-void ndJointPdActuator::SubmitLinearLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPdBallAndSocket::SubmitLinearLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	if (m_linearRegularizer == ndFloat32(0.0f))
 	{
@@ -372,13 +372,13 @@ void ndJointPdActuator::SubmitLinearLimits(const ndMatrix& matrix0, const ndMatr
 	}
 }
 
-//void ndJointPdActuator::SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
-void ndJointPdActuator::SubmitTwistAngleOnlyRows(const ndMatrix&, const ndMatrix&, ndConstraintDescritor&)
+//void ndJointPdBallAndSocket::SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPdBallAndSocket::SubmitTwistAngleOnlyRows(const ndMatrix&, const ndMatrix&, ndConstraintDescritor&)
 {
 	dAssert(0);
 }
 
-void ndJointPdActuator::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPdBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))
@@ -427,7 +427,7 @@ void ndJointPdActuator::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const n
 	}
 }
 
-void ndJointPdActuator::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPdBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const ndVector dir0(matrix0.m_front);
 	const ndVector dir1(matrix1.m_front);
@@ -483,7 +483,7 @@ void ndJointPdActuator::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatri
 	}
 }
 
-void ndJointPdActuator::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPdBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 twistAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 	AddAngularRowJacobian(desc, matrix0.m_front, twistAngle);
@@ -519,7 +519,7 @@ void ndJointPdActuator::SubmitAngularAxisCartesianApproximation(const ndMatrix& 
 	}
 }
 
-void ndJointPdActuator::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointPdBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;

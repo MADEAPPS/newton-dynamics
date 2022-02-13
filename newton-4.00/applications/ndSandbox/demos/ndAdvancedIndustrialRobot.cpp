@@ -69,6 +69,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
+		,m_gripperPosit(0.0f)
 		,m_pitch(0.0f)
 		,m_yaw(0.0f)
 		,m_roll(0.0f)
@@ -194,6 +195,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
+		,m_gripperPosit(0.0f)
 		,m_pitch(0.0f)
 		,m_yaw(0.0f)
 		,m_roll(0.0f)
@@ -381,6 +383,9 @@ class dAdvancedIndustrialRobot : public ndModel
 		ImGui::Text("azimuth");
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
+		ImGui::Text("gripper");
+		change = change | ImGui::SliderFloat("##gripperPosit", &m_gripperPosit, -0.2f, 0.03f);
+
 		ImGui::Text("pitch");
 		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
 		ImGui::Text("yaw");
@@ -449,6 +454,7 @@ class dAdvancedIndustrialRobot : public ndModel
 	ndFloat32 m_x;
 	ndFloat32 m_y;
 	ndFloat32 m_azimuth;
+	ndFloat32 m_gripperPosit;
 	ndFloat32 m_pitch;
 	ndFloat32 m_yaw;
 	ndFloat32 m_roll;

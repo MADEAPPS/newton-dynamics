@@ -62,9 +62,9 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
+#include <ndJointPdSlider.h>
 #include <ndCharacterNode.h>
 #include <ndDynamicsUpdate.h>
-#include <ndJointPdActuator.h>
 #include <ndJointFollowPath.h>
 #include <ndBodyParticleSet.h>
 #include <ndJointDoubleHinge.h>
@@ -78,6 +78,7 @@
 #include <ndJointIkEndEffector.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
+#include <ndJointPdBallAndSocket.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
