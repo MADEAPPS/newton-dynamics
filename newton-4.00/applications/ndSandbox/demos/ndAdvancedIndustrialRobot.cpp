@@ -355,10 +355,10 @@ class dAdvancedIndustrialRobot : public ndModel
 		ImGui::Text("azimuth");
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
-		ImGui::Text("yaw");
-		change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
 		ImGui::Text("pitch");
 		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
+		ImGui::Text("yaw");
+		change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
 		ImGui::Text("roll");
 		change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
 
@@ -387,8 +387,9 @@ class dAdvancedIndustrialRobot : public ndModel
 		const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
 
 		targetMatrix = 
-			dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) *
-			dRollMatrix(m_roll * ndDegreeToRad) * m_baseRotation;
+			dRollMatrix(90.0f * ndDegreeToRad) *
+			dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) * 
+			dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
 		targetMatrix.m_posit = newPosit;
 		m_effector->SetTargetMatrix(targetMatrix);
 	}

@@ -339,7 +339,6 @@ class dSimpleIndustrialRobot : public ndModel
 
 		bool change = false;
 		ImGui::Text("position x");
-		//change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 3.5f);
 		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
 		ImGui::Text("position y");
 		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
@@ -349,7 +348,7 @@ class dSimpleIndustrialRobot : public ndModel
 		ImGui::Text("pitch");
 		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
 		ImGui::Text("yaw");
-		change = change | ImGui::SliderFloat("##yaw", &m_yaw, -90.0f, 90.0f);
+		change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
 		ImGui::Text("roll");
 		change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
 
@@ -380,9 +379,10 @@ class dSimpleIndustrialRobot : public ndModel
 			// take new position back to target space
 			const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
 
-			targetMatrix = 
-				dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) *
-				dRollMatrix(m_roll * ndDegreeToRad) * m_baseRotation;
+			targetMatrix =
+				dRollMatrix(90.0f * ndDegreeToRad) *
+				dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) *
+				dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
 			targetMatrix.m_posit = newPosit;
 			m_effector->SetTargetMatrix(targetMatrix);
 		}
