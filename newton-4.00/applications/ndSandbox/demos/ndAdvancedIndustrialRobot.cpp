@@ -28,6 +28,7 @@ class dAdvancedRobotDefinition
 	{
 		m_root,
 		m_hinge,
+		m_slider,
 		m_effector
 	};
 
@@ -47,6 +48,8 @@ static dAdvancedRobotDefinition jointsDefinition[] =
 	{ "arm_2", 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
 	{ "arm_3", 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
 	{ "arm_4", 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
+	{ "gripperLeft", 1.0f, -0.2f, 0.03f, dAdvancedRobotDefinition::m_slider },
+	{ "gripperRight", 1.0f, -0.2f, 0.03f, dAdvancedRobotDefinition::m_slider },
 	{ "effector", 0.0f, 0.0f, 0.0f, dAdvancedRobotDefinition::m_effector },
 };
 
@@ -58,6 +61,8 @@ class dAdvancedIndustrialRobot : public ndModel
 	dAdvancedIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
 		,m_rootBody(nullptr)
+		,m_leftGripper(nullptr)
+		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
 		,m_baseRotation(dGetIdentityMatrix())
@@ -122,6 +127,25 @@ class dAdvancedIndustrialRobot : public ndModel
 						world->AddJoint(hinge);
 						parentBody = childBody;
 					}
+					else if (definition.m_type == dAdvancedRobotDefinition::m_slider)
+					{
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+						m_bodyArray.PushBack(childBody);
+
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
+						slider->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
+						if (!strstr(definition.m_boneName, "Left"))
+						{
+							m_leftGripper = slider;
+						}
+						else
+						{
+							m_rightGripper = slider;
+						}
+						world->AddJoint(slider);
+						parentBody = childBody;
+					}
 					else
 					{
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
@@ -162,6 +186,8 @@ class dAdvancedIndustrialRobot : public ndModel
 	dAdvancedIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
+		,m_leftGripper(nullptr)
+		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
 		,m_baseRotation(dGetIdentityMatrix())
@@ -412,6 +438,8 @@ class dAdvancedIndustrialRobot : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
+	ndJointSlider* m_leftGripper;
+	ndJointSlider* m_rightGripper;
 	ndJointIkEndEffector* m_effector;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
@@ -449,6 +477,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	world->AddModel(robot);
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+
 	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
 	
 	//matrix.m_posit.m_x += 2.0f;
