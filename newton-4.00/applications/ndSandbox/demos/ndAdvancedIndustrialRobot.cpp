@@ -457,14 +457,6 @@ static void RobotControlPanel(ndDemoEntityManager* const scene, void* const cont
 	me->ApplyControls(scene);
 }
 
-static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density, ndFloat32 mass)
-{
-	ndBodyKinematic* const body = AddBox(scene, origin, mass, 0.3f, 0.4f, 0.7f);
-	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
-}
-
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -490,9 +482,15 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	delete robotEntity;
 
 	ndVector posit(matrix.m_posit);
-	posit.m_x += 2.0f;
-	posit.m_z += 2.0f;
-	AddBox(scene, posit, 0.6f, 1.0f);
+	posit.m_x += 1.5f;
+	posit.m_z += 1.5f;
+	AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
+
+	posit.m_x += 0.4f;
+	posit.m_z += 0.1f;
+	AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;
