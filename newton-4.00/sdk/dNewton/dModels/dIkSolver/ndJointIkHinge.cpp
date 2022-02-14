@@ -61,15 +61,14 @@ ndJointIkHinge::~ndJointIkHinge()
 {
 }
 
-//void ndJointIkHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-void ndJointIkHinge::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
+void ndJointIkHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointHinge::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
 	dAssert(0);
-	//nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	//desc.m_rootNode->LinkEndChild(childNode);
-	//childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	//ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	//
 	//xmlSaveParam(childNode, "springK", m_springK);
 	//xmlSaveParam(childNode, "damperC", m_damperC);
 	//xmlSaveParam(childNode, "minLimit", m_minLimit);

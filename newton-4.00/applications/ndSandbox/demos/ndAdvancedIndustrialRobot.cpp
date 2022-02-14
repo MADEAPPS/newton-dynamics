@@ -134,8 +134,10 @@ class dAdvancedIndustrialRobot : public ndModel
 						m_bodyArray.PushBack(childBody);
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
+						ndJointPdSlider* const slider = new ndJointPdSlider(pivotMatrix, childBody, parentBody);
 						slider->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
+						slider->SetAsSpringDamper(true, 0.01f, 2000.0f, 100.0f);
+
 						if (!strstr(definition.m_boneName, "Left"))
 						{
 							m_leftGripper = slider;
@@ -153,12 +155,6 @@ class dAdvancedIndustrialRobot : public ndModel
 						m_effector = new ndJointIkEndEffector(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, true);
 
-						//ndVector euler0;
-						//ndVector euler1;
-						//m_effector->GetReferenceMatrix().CalcPitchYawRoll(euler0, euler1);
-						//m_pitch0 = euler0.m_x * ndRadToDegree;
-						//m_yaw0 = euler0.m_y * ndRadToDegree;
-						//m_roll0 = euler0.m_z * ndRadToDegree;
 						m_baseRotation = m_effector->GetReferenceMatrix();
 
 						ndFloat32 regularizer;
@@ -312,16 +308,6 @@ class dAdvancedIndustrialRobot : public ndModel
 			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
 			xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
 		}
-
-		//m_x;
-		//m_y;
-		//m_azimuth;
-		//m_pitch;
-		//m_yaw;
-		//m_roll;
-		//m_pitch0;
-		//m_yaw0;
-		//m_roll0;
 	}
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -422,7 +408,10 @@ class dAdvancedIndustrialRobot : public ndModel
 			dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) * 
 			dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
 		targetMatrix.m_posit = newPosit;
+
 		m_effector->SetTargetMatrix(targetMatrix);
+		m_leftGripper->SetTarget(m_gripperPosit);
+		m_rightGripper->SetTarget(m_gripperPosit);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -443,8 +432,8 @@ class dAdvancedIndustrialRobot : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointSlider* m_leftGripper;
-	ndJointSlider* m_rightGripper;
+	ndJointPdSlider* m_leftGripper;
+	ndJointPdSlider* m_rightGripper;
 	ndJointIkEndEffector* m_effector;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;

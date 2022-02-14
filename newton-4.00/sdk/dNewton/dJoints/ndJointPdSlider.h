@@ -23,9 +23,14 @@ class ndJointPdSlider: public ndJointSlider
 	D_NEWTON_API ndJointPdSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPdSlider();
 
+	D_NEWTON_API ndFloat32 GetTarget() const;
+	D_NEWTON_API void SetTarget(ndFloat32 target);
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+
+	ndFloat32 n_targetPosit;
 };
 
 #endif 

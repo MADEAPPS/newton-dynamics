@@ -132,8 +132,10 @@ class dSimpleIndustrialRobot : public ndModel
 						m_bodyArray.PushBack(childBody);
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
+						ndJointPdSlider* const slider = new ndJointPdSlider(pivotMatrix, childBody, parentBody);
 						slider->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
+						slider->SetAsSpringDamper(true, 0.01f, 2000.0f, 100.0f);
+
 						if (!strstr(definition.m_boneName, "Left"))
 						{
 							m_leftGripper = slider;
@@ -415,13 +417,16 @@ class dSimpleIndustrialRobot : public ndModel
 				dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) *
 				dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
 			targetMatrix.m_posit = newPosit;
+
 			m_effector->SetTargetMatrix(targetMatrix);
+			m_leftGripper->SetTarget(m_gripperPosit);
+			m_rightGripper->SetTarget(m_gripperPosit);
 		}
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointSlider* m_leftGripper;
-	ndJointSlider* m_rightGripper;
+	ndJointPdSlider* m_leftGripper;
+	ndJointPdSlider* m_rightGripper;
 	ndJointIkEndEffector* m_effector;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;

@@ -59,6 +59,22 @@ ndJointSlider::~ndJointSlider()
 {
 }
 
+void ndJointSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "springK", m_springK);
+	xmlSaveParam(childNode, "damperC", m_damperC);
+	xmlSaveParam(childNode, "minLimit", m_minLimit);
+	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(childNode, "friction", m_friction);
+	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
+	xmlSaveParam(childNode, "hasLimits", m_hasLimits ? 1 : 0);
+	xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
+}
 ndFloat32 ndJointSlider::GetSpeed() const
 {
 	return m_speed;
@@ -235,20 +251,5 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "minLimit", m_minLimit);
-	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
-	xmlSaveParam(childNode, "friction", m_friction);
-	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
-	xmlSaveParam(childNode, "hasLimits", m_hasLimits ? 1 : 0);
-	xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
-}
 
