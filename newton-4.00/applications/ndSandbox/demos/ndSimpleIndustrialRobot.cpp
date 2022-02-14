@@ -33,24 +33,25 @@ class dSimpleRobotDefinition
 	};
 
 	char m_boneName[32];
+	jointType m_type;
 	ndFloat32 m_mass;
 	ndFloat32 m_minLimit;
 	ndFloat32 m_maxLimit;
-	jointType m_type;
+	ndFloat32 m_maxTorque;
 };
 
 static dSimpleRobotDefinition jointsDefinition[] =
 {
-	{ "base", 100.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_root },
-	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dSimpleRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, -5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_2", 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_3", 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "arm_4", 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dSimpleRobotDefinition::m_hinge },
-	{ "gripperLeft", 1.0f, -0.2f, 0.03f, dSimpleRobotDefinition::m_slider },
-	{ "gripperRight", 1.0f, -0.2f, 0.03f, dSimpleRobotDefinition::m_slider },
-	{ "effector", 0.0f, 0.0f, 0.0f, dSimpleRobotDefinition::m_effector },
+	{ "base", dSimpleRobotDefinition::m_root, 100.0f, 0.0f, 0.0f, 1.0e5f },
+	{ "base_rotator", dSimpleRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 1.0e5f },
+	{ "arm_0", dSimpleRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_1", dSimpleRobotDefinition::m_hinge , 5.0f, -5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_2", dSimpleRobotDefinition::m_hinge , 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_3", dSimpleRobotDefinition::m_hinge , 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_4", dSimpleRobotDefinition::m_hinge , 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
+	{ "gripperLeft", dSimpleRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
+	{ "gripperRight", dSimpleRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
+	{ "effector", dSimpleRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f, 1.0e5f },
 };
 
 class dSimpleIndustrialRobot : public ndModel

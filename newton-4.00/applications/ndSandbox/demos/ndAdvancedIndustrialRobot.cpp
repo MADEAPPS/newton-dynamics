@@ -33,24 +33,25 @@ class dAdvancedRobotDefinition
 	};
 
 	char m_boneName[32];
+	jointType m_type;
 	ndFloat32 m_mass;
 	ndFloat32 m_minLimit;
 	ndFloat32 m_maxLimit;
-	jointType m_type;
+	ndFloat32 m_maxTorque;
 };
 
 static dAdvancedRobotDefinition jointsDefinition[] =
 {
-	{ "base", 100.0f, 0.0f, 0.0f, dAdvancedRobotDefinition::m_root},
-	{ "base_rotator", 50.0f, -1.0e10f, 1.0e10f, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, - 5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_2", 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_3", 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
-	{ "arm_4", 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, dAdvancedRobotDefinition::m_hinge },
-	{ "gripperLeft", 1.0f, -0.2f, 0.03f, dAdvancedRobotDefinition::m_slider },
-	{ "gripperRight", 1.0f, -0.2f, 0.03f, dAdvancedRobotDefinition::m_slider },
-	{ "effector", 0.0f, 0.0f, 0.0f, dAdvancedRobotDefinition::m_effector },
+	{ "base", dAdvancedRobotDefinition::m_root, 100.0f, 0.0f, 0.0f, 1.0e4f},
+	{ "base_rotator", dAdvancedRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 1.0e4f },
+	{ "arm_0", dAdvancedRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_1", dAdvancedRobotDefinition::m_hinge , 5.0f, - 5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_2", dAdvancedRobotDefinition::m_hinge , 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_3", dAdvancedRobotDefinition::m_hinge , 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
+	{ "arm_4", dAdvancedRobotDefinition::m_hinge , 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
+	{ "gripperLeft", dAdvancedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
+	{ "gripperRight", dAdvancedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
+	{ "effector", dAdvancedRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f, 1.0e5f },
 };
 
 class dAdvancedIndustrialRobot : public ndModel
@@ -123,6 +124,7 @@ class dAdvancedIndustrialRobot : public ndModel
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
+						//hinge->SetTorqueLimits(-definition.m_maxTorque, definition.m_maxTorque);
 						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);
@@ -487,8 +489,8 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
 	AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
 
-	posit.m_x += 0.4f;
-	posit.m_z += 0.1f;
+	posit.m_x += 0.6f;
+	posit.m_z += 0.2f;
 	AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 

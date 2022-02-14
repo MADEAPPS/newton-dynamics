@@ -139,6 +139,18 @@ bool ndJointIkHinge::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0
 	return ret;
 }
 
+void ndJointIkHinge::SetTorqueLimits(ndFloat32 minTorque, ndFloat32 maxTorque)
+{
+	m_minTorque = minTorque;
+	m_maxTorque = maxTorque;
+}
+
+void ndJointIkHinge::GetTorqueLimits(ndFloat32& minTorque, ndFloat32& maxTorque) const
+{
+	minTorque = m_minTorque;
+	maxTorque = m_maxTorque;
+}
+
 void ndJointIkHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	m_hasLimits = false;
