@@ -54,9 +54,10 @@
 //#define DEFAULT_SCENE	15		// heavy vehicle
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
-#define DEFAULT_SCENE	18		// advanced industrial robot
-//#define DEFAULT_SCENE	19		// simple voronoi fracture
-//#define DEFAULT_SCENE	10		// basic voronoi fracture
+//#define DEFAULT_SCENE	18		// advanced industrial robot
+#define DEFAULT_SCENE	19		// quadruped robot
+//#define DEFAULT_SCENE	20		// simple voronoi fracture
+//#define DEFAULT_SCENE	21		// basic voronoi fracture
 //#define DEFAULT_SCENE	21		// linked voronoi fracture
 //#define DEFAULT_SCENE	22		// skin peel voronoi fracture
 						 
@@ -70,6 +71,7 @@ void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndActiveRagdoll(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndQuadrupedRobot(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -107,6 +109,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
+	{ "quadruped robot", ndQuadrupedRobot},
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
