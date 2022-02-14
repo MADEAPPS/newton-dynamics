@@ -484,13 +484,13 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	ndVector posit(matrix.m_posit);
 	posit.m_x += 1.5f;
 	posit.m_z += 1.5f;
-	AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
 	AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
 
 	posit.m_x += 0.4f;
 	posit.m_z += 0.1f;
-	AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 	AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;
