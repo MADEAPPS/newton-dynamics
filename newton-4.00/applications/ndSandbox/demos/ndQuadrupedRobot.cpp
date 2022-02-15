@@ -43,14 +43,17 @@ class dQuadrupedRobotDefinition
 static dQuadrupedRobotDefinition jointsDefinition[] =
 {
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f, 0.0f, 0.0f, 1.0e4f},
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 
 	//{ "gripperLeft", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
@@ -126,11 +129,11 @@ class dQuadrupedRobot : public ndModel
 					if (definition.m_type == dQuadrupedRobotDefinition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+						MakeLegSphericalInretia(childBody);
 						m_bodyArray.PushBack(childBody);
 
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
-						//hinge->SetTorqueLimits(-definition.m_maxTorque, definition.m_maxTorque);
 						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);
@@ -139,12 +142,13 @@ class dQuadrupedRobot : public ndModel
 					else if (definition.m_type == dQuadrupedRobotDefinition::m_socket)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+						MakeLegSphericalInretia(childBody);
 						m_bodyArray.PushBack(childBody);
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndJointIkBallAndSocket* const socket = new ndJointIkBallAndSocket(pivotMatrix, childBody, parentBody);
-						//socket->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
-						//socket->SetAsSpringDamper(true, 0.01f, 2000.0f, 100.0f);
+						socket->SetConeLimit(true, 120.0f * ndDegreeToRad);
+						socket->SetTwistLimits(true, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 						world->AddJoint(socket);
 						parentBody = childBody;
@@ -260,6 +264,16 @@ class dQuadrupedRobot : public ndModel
 		{
 			delete m_effector;
 		}
+	}
+
+	void MakeLegSphericalInretia(ndBodyDynamic* const body)
+	{
+		ndVector massMatrix(body->GetMassMatrix());
+		ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+		massMatrix.m_x = sphericalInertia;
+		massMatrix.m_y = sphericalInertia;
+		massMatrix.m_z = sphericalInertia;
+		body->SetMassMatrix(massMatrix);
 	}
 
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -471,8 +485,8 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	dQuadrupedRobot* const robot = new dQuadrupedRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
-	//ndBodyDynamic* const root = robot->GetRoot();
-	//world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	ndBodyDynamic* const root = robot->GetRoot();
+	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
 	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
 	

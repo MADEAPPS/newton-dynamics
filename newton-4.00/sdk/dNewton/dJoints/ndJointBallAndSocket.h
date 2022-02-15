@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_BALL_AND_SOCKED_MAX_ANGLE	ndFloat32 (120.0f * ndDegreeToRad)
+#define D_BALL_AND_SOCKED_MAX_ANGLE	ndFloat32 (150.0f * ndDegreeToRad)
 #define D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED ndFloat32 (0.1f) 
 #define D_BALL_AND_SOCKED_PENETRATION_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
 
@@ -27,11 +27,11 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
-	D_NEWTON_API virtual ndFloat32 GetMaxConeAngle() const;
-	D_NEWTON_API virtual void SetConeLimit(ndFloat32 maxConeAngle);
+	D_NEWTON_API virtual ndFloat32 GetConeLimit() const;
+	D_NEWTON_API virtual void SetConeLimit(bool state, ndFloat32 maxConeAngle);
 	D_NEWTON_API virtual void SetConeFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
 
-	D_NEWTON_API virtual void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
+	D_NEWTON_API virtual void SetTwistLimits(bool state, ndFloat32 minAngle, ndFloat32 maxAngle);
 	D_NEWTON_API virtual void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
 	D_NEWTON_API virtual void SetTwistFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
 
@@ -45,13 +45,17 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
-	ndFloat32 m_maxConeAngle;
-	ndFloat32 m_coneFriction;
 	ndFloat32 m_minTwistAngle;
 	ndFloat32 m_maxTwistAngle;
 	ndFloat32 m_twistFriction;
-	ndFloat32 m_coneFrictionRegularizer;
 	ndFloat32 m_twistFrictionRegularizer;
+
+	ndFloat32 m_maxConeAngle;
+	ndFloat32 m_coneFriction;
+	ndFloat32 m_coneFrictionRegularizer;
+
+	bool m_coneLimits;
+	bool m_twistLimits;
 };
 
 #endif 

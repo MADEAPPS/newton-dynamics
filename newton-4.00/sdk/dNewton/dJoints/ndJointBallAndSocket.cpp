@@ -17,25 +17,29 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBallAndSocket)
 
 ndJointBallAndSocket::ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	,m_maxConeAngle(ndFloat32 (1.0e10f))
-	,m_coneFriction(ndFloat32(0.0))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
-	,m_maxTwistAngle( ndFloat32(1.0e10f))
-	,m_twistFriction(ndFloat32 (0.0f))
-	,m_coneFrictionRegularizer(ndFloat32(0.0f))
+	,m_maxTwistAngle(ndFloat32(1.0e10f))
+	,m_twistFriction(ndFloat32(0.0f))
 	,m_twistFrictionRegularizer(ndFloat32(0.0f))
+	,m_maxConeAngle(ndFloat32(1.0e10f))
+	,m_coneFriction(ndFloat32(0.0f))
+	,m_coneFrictionRegularizer(ndFloat32(0.0f))
+	,m_coneLimits(false)
+	,m_twistLimits(false)
 {
 }
 
 ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_maxConeAngle(ndFloat32(1.0e10f))
-	,m_coneFriction(ndFloat32(0.0))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
 	,m_maxTwistAngle(ndFloat32(1.0e10f))
 	,m_twistFriction(ndFloat32(0.0f))
-	,m_coneFrictionRegularizer(ndFloat32(0.0f))
 	,m_twistFrictionRegularizer(ndFloat32(0.0f))
+	,m_maxConeAngle(ndFloat32(1.0e10f))
+	,m_coneFriction(ndFloat32(0.0f))
+	,m_coneFrictionRegularizer(ndFloat32(0.0f))
+	,m_coneLimits(false)
+	,m_twistLimits(false)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -74,8 +78,9 @@ void ndJointBallAndSocket::SetConeFriction(ndFloat32 regularizer, ndFloat32 visc
 	m_coneFrictionRegularizer = dMax(dAbs(regularizer), ndFloat32(0.0f));
 }
 
-void ndJointBallAndSocket::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
+void ndJointBallAndSocket::SetTwistLimits(bool state, ndFloat32 minAngle, ndFloat32 maxAngle)
 {
+	m_twistLimits = state;
 	m_minTwistAngle = dMin(minAngle, ndFloat32 (0.0f));
 	m_maxTwistAngle = dMax(maxAngle, ndFloat32(0.0f));
 }
@@ -92,14 +97,15 @@ void ndJointBallAndSocket::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAng
 	maxAngle = m_maxTwistAngle;
 }
 
-ndFloat32 ndJointBallAndSocket::GetMaxConeAngle() const
+ndFloat32 ndJointBallAndSocket::GetConeLimit() const
 {
 	return m_maxConeAngle;
 }
 
-void ndJointBallAndSocket::SetConeLimit(ndFloat32 maxConeAngle)
+void ndJointBallAndSocket::SetConeLimit(bool state, ndFloat32 maxConeAngle)
 {
 	//m_maxConeAngle = dMin (dAbs (maxConeAngle), D_BALL_AND_SOCKED_MAX_ANGLE * ndFloat32 (0.999f));
+	m_coneLimits = state;
 	m_maxConeAngle = maxConeAngle;
 }
 
@@ -338,31 +344,35 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
-	//ndFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
-	//if (deltaTwist < (2.0f * ndDegreeToRad))
-	//{
-	//	SubmitConeAngleOnlyRows(matrix0, matrix1, desc);
-	//}
-	//else
-	//{
-	//	//dAssert(0);
-	//}
-	//
-	////bool hasAngleRows = deltaTwist > ndFloat32(1.0e-3f);
-	////hasAngleRows = hasAngleRows && (deltaTwist < ndFloat32(2.0f) * ndPi);
-	////hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
-	////if (hasAngleRows)
-	////{
-	////	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	////	if (cosAngleCos >= ndFloat32(0.998f))
-	////	{
-	////		// special case where the front axis are almost aligned
-	////		// solve by using Cartesian approximation
-	////		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-	////	}
-	////	else
-	////	{
-	////		SubmitAngularAxis(matrix0, matrix1, desc);
-	////	}
-	////}
+	if (m_coneLimits || m_twistLimits)
+	{
+		dAssert(0);
+		//ndFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
+		//if (deltaTwist < (2.0f * ndDegreeToRad))
+		//{
+		//	SubmitConeAngleOnlyRows(matrix0, matrix1, desc);
+		//}
+		//else
+		//{
+		//	//dAssert(0);
+		//}
+		//
+		////bool hasAngleRows = deltaTwist > ndFloat32(1.0e-3f);
+		////hasAngleRows = hasAngleRows && (deltaTwist < ndFloat32(2.0f) * ndPi);
+		////hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
+		////if (hasAngleRows)
+		////{
+		////	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+		////	if (cosAngleCos >= ndFloat32(0.998f))
+		////	{
+		////		// special case where the front axis are almost aligned
+		////		// solve by using Cartesian approximation
+		////		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		////	}
+		////	else
+		////	{
+		////		SubmitAngularAxis(matrix0, matrix1, desc);
+		////	}
+		////}
+	}
 }

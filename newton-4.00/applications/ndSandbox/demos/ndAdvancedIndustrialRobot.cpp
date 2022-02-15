@@ -124,7 +124,6 @@ class dAdvancedIndustrialRobot : public ndModel
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
-						//hinge->SetTorqueLimits(-definition.m_maxTorque, definition.m_maxTorque);
 						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);

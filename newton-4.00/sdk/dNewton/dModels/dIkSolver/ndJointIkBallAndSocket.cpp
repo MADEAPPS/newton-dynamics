@@ -63,5 +63,7 @@ void ndJointIkBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 
 void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
+	m_coneLimits = false;
+	m_twistLimits = false;
 	ndJointBallAndSocket::JacobianDerivative(desc);
 }

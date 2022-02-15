@@ -394,8 +394,8 @@ class ndActiveRagdollModel : public ndCharacter
 			//dTrace (("do not forget to delete this debug\n"))
 			//joint->SetSolverModel(m_jointkinematicCloseLoop);
 
-			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+			joint->SetConeLimit(true, jointLimits.m_coneAngle * ndDegreeToRad);
+			joint->SetTwistLimits(true, jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 			joint->SetConeFriction(ndFloat32(0.0f), ndFloat32(0.0f));
 			joint->SetTwistFriction(ndFloat32(0.0f), ndFloat32(0.0f));
 
