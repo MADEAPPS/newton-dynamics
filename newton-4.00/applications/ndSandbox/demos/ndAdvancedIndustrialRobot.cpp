@@ -42,8 +42,8 @@ class dAdvancedRobotDefinition
 
 static dAdvancedRobotDefinition jointsDefinition[] =
 {
-	{ "base", dAdvancedRobotDefinition::m_root, 100.0f, 0.0f, 0.0f, 1.0e4f},
-	{ "base_rotator", dAdvancedRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 1.0e4f },
+	{ "base", dAdvancedRobotDefinition::m_root, 100.0f, 0.0f, 0.0f, 1.0e5f},
+	{ "base_rotator", dAdvancedRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 1.0e5f },
 	{ "arm_0", dAdvancedRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 1.0e5f },
 	{ "arm_1", dAdvancedRobotDefinition::m_hinge , 5.0f, - 5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, 1.0e5f },
 	{ "arm_2", dAdvancedRobotDefinition::m_hinge , 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },

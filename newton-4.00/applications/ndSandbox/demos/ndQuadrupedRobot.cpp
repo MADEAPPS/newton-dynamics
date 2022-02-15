@@ -42,16 +42,20 @@ class dQuadrupedRobotDefinition
 
 static dQuadrupedRobotDefinition jointsDefinition[] =
 {
-	{ "base", dQuadrupedRobotDefinition::m_root, 100.0f, 0.0f, 0.0f, 1.0e4f},
-	{ "base_rotator", dQuadrupedRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 1.0e4f },
-	{ "arm_0", dQuadrupedRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_1", dQuadrupedRobotDefinition::m_hinge , 5.0f, - 5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_2", dQuadrupedRobotDefinition::m_hinge , 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_3", dQuadrupedRobotDefinition::m_hinge , 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_4", dQuadrupedRobotDefinition::m_hinge , 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
-	{ "gripperLeft", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
-	{ "gripperRight", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
-	{ "effector", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f, 1.0e5f },
+	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f, 0.0f, 0.0f, 1.0e4f},
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+
+	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+
+	//{ "gripperLeft", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
+	//{ "gripperRight", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
+	//{ "effector", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f, 1.0e5f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -79,25 +83,26 @@ class dQuadrupedRobot : public ndModel
 		ndDemoEntity* const entity = robotMesh->CreateClone();
 		scene->AddEntity(entity);
 		ndWorld* const world = scene->GetWorld();
+
+		ndDemoEntity* const rootEntity = entity->Find(jointsDefinition[0].m_boneName);
 	
 		// find the floor location 
-		ndMatrix matrix(location);
+		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		//matrix.m_posit.m_y += 1.0f;
-		entity->ResetMatrix(matrix);
-return;
+		matrix.m_posit.m_y += 1.0f;
+		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
-		m_rootBody = CreateBodyPart(scene, entity, jointsDefinition[0].m_mass, nullptr);
+		m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
 		m_bodyArray.PushBack(m_rootBody);
-		
+
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 
 		ndInt32 stack = 0;
-		for (ndDemoEntity* child = entity->GetChild(); child; child = child->GetSibling())
+		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
 		{
 			childEntities[stack] = child;
 			parentBone[stack] = m_rootBody;
@@ -123,7 +128,7 @@ return;
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
 
-						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
 						//hinge->SetTorqueLimits(-definition.m_maxTorque, definition.m_maxTorque);
 						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
@@ -135,7 +140,7 @@ return;
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
-
+						
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointPdSlider* const slider = new ndJointPdSlider(pivotMatrix, childBody, parentBody);
 						slider->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
@@ -496,7 +501,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	matrix.m_posit.m_x -= 3.0f;
+	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.0f;
 	matrix.m_posit.m_z += 0.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
