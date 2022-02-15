@@ -205,6 +205,7 @@ ndScene::ndScene()
 	,m_fitness()
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
+	,m_forceBalanceSceneCounter(0)
 	,m_bodyListChanged(0)
 	,m_currentThreadsMem(0)
 	,m_forceBalanceScene(0)
@@ -602,6 +603,13 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 	if (*root) 
 	{
 		D_TRACKTIME();
+
+		m_forceBalanceSceneCounter++;
+		if (m_forceBalanceSceneCounter > 256)
+		{
+			m_forceBalanceScene = 1;
+		}
+
 		ndSceneNode* const parent = (*root)->m_parent;
 
 		(*root)->m_parent = nullptr;
@@ -664,9 +672,10 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				fitness.m_currentCost = entropy;
 			}
 			oldEntropy = entropy;
+			m_forceBalanceScene = 0;
+			m_forceBalanceSceneCounter = 0;
 		}
 		(*root)->m_parent = parent;
-		m_forceBalanceScene = 0;
 	}
 }
 

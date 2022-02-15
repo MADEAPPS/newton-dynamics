@@ -188,6 +188,7 @@ class ndScene : public ndThreadPool
 	ndFitnessList m_fitness;
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;
+	ndUnsigned32 m_forceBalanceSceneCounter;
 	ndUnsigned8 m_bodyListChanged;
 	ndUnsigned8 m_currentThreadsMem;
 	ndUnsigned8 m_forceBalanceScene;
