@@ -75,8 +75,9 @@
 #include <ndDynamicsUpdateSoa.h>
 #include <ndJointHingeActuator.h>
 #include <ndJointBallAndSocket.h>
-#include <ndJointIkEndEffector.h>
+#include <ndJointIk6DofEffector.h>
 #include <ndBodyParticleSetList.h>
+#include <ndJointIkBallAndSocket.h>
 #include <ndJointAttachmentPoint.h>
 #include <ndJointPdBallAndSocket.h>
 #include <ndMultiBodyVehicleMotor.h>

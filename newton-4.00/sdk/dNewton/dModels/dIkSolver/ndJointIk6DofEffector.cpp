@@ -11,11 +11,11 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointIkEndEffector.h"
+#include "ndJointIk6DofEffector.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointIkEndEffector)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointIk6DofEffector)
 
-ndJointIkEndEffector::ndJointIkEndEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointIk6DofEffector::ndJointIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, globalPinAndPivot)
 	,m_baseFrame(m_localMatrix1)
 	,m_angle(ndFloat32(0.0f))
@@ -33,7 +33,7 @@ ndJointIkEndEffector::ndJointIkEndEffector(const ndMatrix& globalPinAndPivot, nd
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndJointIkEndEffector::ndJointIkEndEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndJointIk6DofEffector::ndJointIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_angle(ndFloat32(0.0f))
 	,m_minAngle(-ndFloat32(45.0f) * ndDegreeToRad)
@@ -70,11 +70,11 @@ ndJointIkEndEffector::ndJointIkEndEffector(const ndLoadSaveBase::ndLoadDescripto
 	//SetTargetOffset(m_targetPosit);
 }
 
-ndJointIkEndEffector::~ndJointIkEndEffector()
+ndJointIk6DofEffector::~ndJointIk6DofEffector()
 {
 }
 
-void ndJointIkEndEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointIk6DofEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	dAssert(0);
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
@@ -98,51 +98,51 @@ void ndJointIkEndEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) co
 	//xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
-bool ndJointIkEndEffector::IsLinearMode() const
+bool ndJointIk6DofEffector::IsLinearMode() const
 {
 	return m_linearMode;
 }
 
-bool ndJointIkEndEffector::IsAngularMode() const
+bool ndJointIk6DofEffector::IsAngularMode() const
 {
 	return m_angularMode;
 }
 
-void ndJointIkEndEffector::SetMode(bool linear, bool angular)
+void ndJointIk6DofEffector::SetMode(bool linear, bool angular)
 {
 	m_linearMode = linear;
 	m_angularMode = angular;
 }
 
-void ndJointIkEndEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst)
+void ndJointIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst)
 {
 	m_linearSpring = springConst;
 	m_linearDamper = damperConst;
 	m_linearRegularizer = regularizer;
 }
 
-void ndJointIkEndEffector::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const
+void ndJointIk6DofEffector::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const
 {
 	springConst = m_linearSpring;
 	damperConst = m_linearDamper;
 	regularizer = m_linearRegularizer;
 }
 
-void ndJointIkEndEffector::SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst)
+void ndJointIk6DofEffector::SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst)
 {
 	m_angularSpring = springConst;
 	m_angularDamper = damperConst;
 	m_angularRegularizer = regularizer;
 }
 
-void ndJointIkEndEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const
+void ndJointIk6DofEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const
 {
 	springConst = m_angularSpring;
 	damperConst = m_angularDamper;
 	regularizer = m_angularRegularizer;
 }
 
-void ndJointIkEndEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndJointIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	//ndMatrix localRotationBody1(m_localRotationBody1);
 	//localRotationBody1.m_posit = m_targetPosit + m_pivot;
@@ -193,17 +193,17 @@ void ndJointIkEndEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	//}
 }
 
-ndMatrix ndJointIkEndEffector::GetReferenceMatrix() const
+ndMatrix ndJointIk6DofEffector::GetReferenceMatrix() const
 {
 	return m_baseFrame;
 }
 
-void ndJointIkEndEffector::SetTargetMatrix(const ndMatrix& localMatrix)
+void ndJointIk6DofEffector::SetTargetMatrix(const ndMatrix& localMatrix)
 {
 	m_localMatrix1 = localMatrix;
 }
 
-void ndJointIkEndEffector::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointIk6DofEffector::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 m_twistAngleSpring = m_angularSpring;
 	ndFloat32 m_twistAngleDamper = m_angularDamper;
@@ -225,7 +225,7 @@ void ndJointIkEndEffector::SubmitAngularAxisCartesianApproximation(const ndMatri
 	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 }
 
-void ndJointIkEndEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 m_twistAngleSpring = m_angularSpring;
 	ndFloat32 m_twistAngleDamper = m_angularDamper;
@@ -256,7 +256,7 @@ void ndJointIkEndEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMa
 	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 }
 
-void ndJointIkEndEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const ndMatrix pins(m_baseFrame * m_body1->GetMatrix());
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, pins[0]);
@@ -269,7 +269,7 @@ void ndJointIkEndEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMat
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 }
 
-void ndJointIkEndEffector::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;

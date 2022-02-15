@@ -26,7 +26,7 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterNode.h"
 #include "ndCharacterRootNode.h"
-#include "ndJointIkEndEffector.h"
+#include "ndJointIk6DofEffector.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 

@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __ND_JOINT_BALLANDSOCKET_H__
-#define __ND_JOINT_BALLANDSOCKET_H__
+#ifndef __ND_JOINT_BALL_AND_SOCKET_H__
+#define __ND_JOINT_BALL_AND_SOCKET_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

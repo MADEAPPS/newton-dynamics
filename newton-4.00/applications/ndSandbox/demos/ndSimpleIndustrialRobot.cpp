@@ -151,7 +151,7 @@ class dSimpleIndustrialRobot : public ndModel
 					else
 					{
 						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndJointIkEndEffector(pivotMatrix, parentBody, m_rootBody);
+						m_effector = new ndJointIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, true);
 						m_baseRotation = m_effector->GetReferenceMatrix();
 
@@ -238,7 +238,7 @@ class dSimpleIndustrialRobot : public ndModel
 			dAssert(body1 == m_rootBody);
 
 			const ndMatrix pivotMatrix(body0->GetMatrix());
-			m_effector = new ndJointIkEndEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+			m_effector = new ndJointIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
 			m_effector->SetMode(true, true);
 
 			ndFloat32 regularizer;
@@ -428,7 +428,7 @@ class dSimpleIndustrialRobot : public ndModel
 	ndBodyDynamic* m_rootBody;
 	ndJointPdSlider* m_leftGripper;
 	ndJointPdSlider* m_rightGripper;
-	ndJointIkEndEffector* m_effector;
+	ndJointIk6DofEffector* m_effector;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 
