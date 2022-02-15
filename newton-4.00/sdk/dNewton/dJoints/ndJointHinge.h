@@ -43,6 +43,7 @@ class ndJointHinge: public ndJointBilateralConstraint
 	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
 	protected:
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 

@@ -35,26 +35,23 @@ class dQuadrupedRobotDefinition
 	char m_boneName[32];
 	jointType m_type;
 	ndFloat32 m_mass;
-	ndFloat32 m_minLimit;
-	ndFloat32 m_maxLimit;
-	ndFloat32 m_maxTorque;
 };
 
 static dQuadrupedRobotDefinition jointsDefinition[] =
 {
-	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f, 0.0f, 0.0f, 1.0e4f},
+	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
 
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 
 	//{ "gripperLeft", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
 	//{ "gripperRight", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
@@ -134,7 +131,7 @@ class dQuadrupedRobot : public ndModel
 
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
-						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
+						hinge->EnableLimits(true, -60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);
 						parentBody = childBody;

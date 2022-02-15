@@ -146,6 +146,47 @@ void ndJointHinge::SetAsSpringDamper(bool state, ndFloat32 regularizer, ndFloat3
 	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
 }
 
+void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+{
+	//ndJointBilateralConstraint::DebugJoint(debugCallback);
+
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	debugCallback.DrawFrame(matrix0);
+	debugCallback.DrawFrame(matrix1);
+
+	const ndInt32 subdiv = 8;
+	const ndFloat32 radius = debugCallback.m_debugScale;
+	ndVector arch[subdiv + 1];
+
+	ndFloat32 deltaTwist = m_maxLimit - m_minLimit;
+	if ((deltaTwist > ndFloat32(1.0e-3f)) && (deltaTwist < ndFloat32(2.0f) * ndPi))
+	{
+		ndMatrix pitchMatrix(matrix1);
+		pitchMatrix.m_posit = matrix1.m_posit;
+
+		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
+
+		ndFloat32 angleStep = dMin(deltaTwist, ndFloat32(2.0f * ndPi)) / subdiv;
+		ndFloat32 angle0 = m_minLimit;
+
+		ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+		for (ndInt32 i = 0; i <= subdiv; i++)
+		{
+			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			debugCallback.DrawLine(pitchMatrix.m_posit, arch[i], color);
+			angle0 += angleStep;
+		}
+
+		for (ndInt32 i = 0; i < subdiv; i++)
+		{
+			debugCallback.DrawLine(arch[i], arch[i + 1], color);
+		}
+	}
+}
+
 void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if ((m_minLimit > ndFloat32 (-1.e-4f)) && (m_maxLimit < ndFloat32(1.e-4f)))
