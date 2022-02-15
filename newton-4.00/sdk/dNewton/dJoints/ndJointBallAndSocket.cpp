@@ -330,9 +330,6 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, cons
 
 void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	//if (m_body0->GetId() != 5)
-	//return ;
-
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -341,31 +338,31 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
-	ndFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
-	if (deltaTwist < (2.0f * ndDegreeToRad))
-	{
-		SubmitConeAngleOnlyRows(matrix0, matrix1, desc);
-	}
-	else
-	{
-		//dAssert(0);
-	}
-
-	//bool hasAngleRows = deltaTwist > ndFloat32(1.0e-3f);
-	//hasAngleRows = hasAngleRows && (deltaTwist < ndFloat32(2.0f) * ndPi);
-	//hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
-	//if (hasAngleRows)
+	//ndFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
+	//if (deltaTwist < (2.0f * ndDegreeToRad))
 	//{
-	//	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	//	if (cosAngleCos >= ndFloat32(0.998f))
-	//	{
-	//		// special case where the front axis are almost aligned
-	//		// solve by using Cartesian approximation
-	//		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-	//	}
-	//	else
-	//	{
-	//		SubmitAngularAxis(matrix0, matrix1, desc);
-	//	}
+	//	SubmitConeAngleOnlyRows(matrix0, matrix1, desc);
 	//}
+	//else
+	//{
+	//	//dAssert(0);
+	//}
+	//
+	////bool hasAngleRows = deltaTwist > ndFloat32(1.0e-3f);
+	////hasAngleRows = hasAngleRows && (deltaTwist < ndFloat32(2.0f) * ndPi);
+	////hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
+	////if (hasAngleRows)
+	////{
+	////	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	////	if (cosAngleCos >= ndFloat32(0.998f))
+	////	{
+	////		// special case where the front axis are almost aligned
+	////		// solve by using Cartesian approximation
+	////		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+	////	}
+	////	else
+	////	{
+	////		SubmitAngularAxis(matrix0, matrix1, desc);
+	////	}
+	////}
 }

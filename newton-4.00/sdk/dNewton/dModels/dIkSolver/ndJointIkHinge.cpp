@@ -44,7 +44,7 @@ ndJointIkHinge::ndJointIkHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_savedMaxTorque(ndFloat32(0.0f))
 {
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	//
+
 	//m_springK = xmlGetFloat(xmlNode, "springK");
 	//m_damperC = xmlGetFloat(xmlNode, "damperC");
 	//m_minLimit = xmlGetFloat(xmlNode, "minLimit");
