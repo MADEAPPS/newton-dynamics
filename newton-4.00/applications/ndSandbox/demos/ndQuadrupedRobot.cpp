@@ -28,7 +28,7 @@ class dQuadrupedRobotDefinition
 	{
 		m_root,
 		m_hinge,
-		m_slider,
+		m_socket,
 		m_effector
 	};
 
@@ -43,10 +43,10 @@ class dQuadrupedRobotDefinition
 static dQuadrupedRobotDefinition jointsDefinition[] =
 {
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f, 0.0f, 0.0f, 1.0e4f},
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
 	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 5.0f, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad, 1.0e5f },
@@ -136,25 +136,17 @@ class dQuadrupedRobot : public ndModel
 						world->AddJoint(hinge);
 						parentBody = childBody;
 					}
-					else if (definition.m_type == dQuadrupedRobotDefinition::m_slider)
+					else if (definition.m_type == dQuadrupedRobotDefinition::m_socket)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
 						
-						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointPdSlider* const slider = new ndJointPdSlider(pivotMatrix, childBody, parentBody);
-						slider->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
-						slider->SetAsSpringDamper(true, 0.01f, 2000.0f, 100.0f);
+						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+						ndJointIkHinge* const socket = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
+						socket->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
+						socket->SetAsSpringDamper(true, 0.01f, 2000.0f, 100.0f);
 
-						if (!strstr(definition.m_boneName, "Left"))
-						{
-							m_leftGripper = slider;
-						}
-						else
-						{
-							m_rightGripper = slider;
-						}
-						world->AddJoint(slider);
+						world->AddJoint(socket);
 						parentBody = childBody;
 					}
 					else
