@@ -26,6 +26,7 @@ include_directories(../../sdk/dNewton/dJoints)
 include_directories(../../sdk/dNewton/dModels)
 include_directories(../../sdk/dNewton/dParticles)
 include_directories(../../sdk/dNewton/dModels/dVehicle)
+include_directories(../../sdk/dNewton/dModels/dIkSolver)
 include_directories(../../sdk/dNewton/dModels/dCharacter)
 
 if(MSVC)

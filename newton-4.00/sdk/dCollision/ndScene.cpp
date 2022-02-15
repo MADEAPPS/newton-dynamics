@@ -207,6 +207,7 @@ ndScene::ndScene()
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_bodyListChanged(0)
 	,m_currentThreadsMem(0)
+	,m_forceBalanceScene(0)
 {
 	m_sentinelBody = new ndBodySentinel;
 	m_contactNotifyCallback->m_scene = this;
@@ -606,7 +607,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		(*root)->m_parent = nullptr;
 		ndFloat64 entropy = ReduceEntropy(fitness, root);
 
-		if ((entropy > (oldEntropy * ndFloat32(1.5f))) || (entropy < (oldEntropy * ndFloat32(0.75f)))) 
+		if (m_forceBalanceScene || (entropy > (oldEntropy * ndFloat32(1.5f))) || (entropy < (oldEntropy * ndFloat32(0.75f))))
 		{
 			if (fitness.GetFirst()) 
 			{
@@ -665,6 +666,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 			oldEntropy = entropy;
 		}
 		(*root)->m_parent = parent;
+		m_forceBalanceScene = 0;
 	}
 }
 
@@ -1098,7 +1100,7 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 	ndSceneNode* pool[D_SCENE_MAX_STACK_DEPTH];
 	pool[0] = node;
 
-	while (stack) 
+	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 16)))
 	{
 		stack--;
 		ndSceneNode* const rootNode = pool[stack];
@@ -1139,6 +1141,11 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 				dAssert(stack < ndInt32(sizeof(pool) / sizeof(pool[0])));
 			}
 		}
+	}
+
+	if (stack)
+	{
+		m_forceBalanceScene = 1;
 	}
 }
 

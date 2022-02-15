@@ -61,6 +61,8 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glGenBuffers(1, &m_vertexBuffer); //m_vbo
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	
+	// for some reason, this crash in debug mode in window 32 bit 
+	// since to be a problem with glatter
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);

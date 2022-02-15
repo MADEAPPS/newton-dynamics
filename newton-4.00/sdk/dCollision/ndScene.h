@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_SCENE_MAX_STACK_DEPTH		512
+#define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 
 class ndWorld;
@@ -190,6 +190,7 @@ class ndScene : public ndThreadPool
 	ndUnsigned32 m_lru;
 	ndUnsigned8 m_bodyListChanged;
 	ndUnsigned8 m_currentThreadsMem;
+	ndUnsigned8 m_forceBalanceScene;
 
 	static ndVector m_velocTol;
 	static ndVector m_linearContactError2;
