@@ -245,25 +245,25 @@ class ndTree: public ndClassAlloc
 	ndNode* Minimum () const;
 	ndNode* Maximum () const;
 
-	ndNode* Find (KEY key) const;
-	ndNode* FindGreater (KEY key) const;
-	ndNode* FindLessEqual(KEY key) const;
-	ndNode* FindGreaterEqual (KEY key) const;
-	ndNode* FindCreate(KEY key, bool& wasFound);
+	ndNode* Find (const KEY& key) const;
+	ndNode* FindGreater (const KEY& key) const;
+	ndNode* FindLessEqual(const KEY& key) const;
+	ndNode* FindGreaterEqual (const KEY& key) const;
+	ndNode* FindCreate(const KEY& key, bool& wasFound);
 
 	ndNode* GetNodeFromInfo (OBJECT &info) const;
 
-	ndNode* Insert(KEY key);
-	ndNode* Insert(ndNode* const node, KEY key);
-	ndNode* Insert(const OBJECT &element, KEY key);
-	ndNode* Insert (const OBJECT &element, KEY key, bool& wasFound);
+	ndNode* Insert(const KEY& key);
+	ndNode* Insert(ndNode* const node, const KEY& key);
+	ndNode* Insert(const OBJECT &element, const KEY& key);
+	ndNode* Insert (const OBJECT &element, const KEY& key, bool& wasFound);
 
-	ndNode* Replace (OBJECT &element, KEY key);
-	ndNode* ReplaceKey (KEY oldKey, KEY newKey);
-	ndNode* ReplaceKey (ndNode* const node, KEY key);
+	ndNode* Replace (OBJECT &element, const KEY& key);
+	ndNode* ReplaceKey (const KEY& oldKey, const KEY& newKey);
+	ndNode* ReplaceKey (ndNode* const node, const KEY& key);
 
 	void RemoveAll();
-	void Remove (KEY key);
+	void Remove (const KEY& key);
 	void Remove (ndNode* const node);
 
 	void Unlink (ndNode* const node);
@@ -368,7 +368,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Find (KEY key) const
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Find (const KEY& key) const
 {
 	if (m_head == nullptr) 
 	{
@@ -410,7 +410,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindGreater (KEY key) const
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindGreater (const KEY& key) const
 {
 	if (m_head == nullptr) 
 	{
@@ -454,7 +454,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindGreaterEqual (KEY key) const
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindGreaterEqual (const KEY& key) const
 {
 	if (m_head == nullptr) 
 	{
@@ -502,7 +502,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindLessEqual (KEY key) const
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindLessEqual (const KEY& key) const
 {
 	if (m_head == nullptr) 
 	{
@@ -552,7 +552,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (const OBJECT &element, KEY key, bool& wasFound)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (const OBJECT &element, const KEY& key, bool& wasFound)
 {
 	ndNode* parent = nullptr;
 	ndNode* ptr = m_head;
@@ -606,7 +606,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindCreate(KEY key, bool& wasFound)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::FindCreate(const KEY& key, bool& wasFound)
 {
 	ndNode* parent = nullptr;
 	ndNode* ptr = m_head;
@@ -659,7 +659,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (const OBJECT &element, KEY key)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (const OBJECT &element, const KEY& key)
 {
 	bool foundState;
 
@@ -672,14 +672,14 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert(KEY key)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert(const KEY& key)
 {
 	OBJECT element;
 	return Insert(element, key);
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (typename ndTree<OBJECT, KEY, allocator>::ndNode* const node, KEY key)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (typename ndTree<OBJECT, KEY, allocator>::ndNode* const node, const KEY& key)
 {
 	ndInt32 val = 0;
 	ndNode* ptr = m_head;
@@ -735,7 +735,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Replace (OBJECT &element, KEY key)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Replace (OBJECT &element, const KEY& key)
 {
 	ndNode* parent = nullptr;
 	ndNode* ptr = m_head;
@@ -785,7 +785,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::ReplaceKey (typename ndTree<OBJECT, KEY, allocator>::ndNode* const node, KEY key)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::ReplaceKey (typename ndTree<OBJECT, KEY, allocator>::ndNode* const node, const KEY& key)
 {
 	Unlink (node);
 	ndNode* const ptr = Insert (node, key);
@@ -794,7 +794,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::ReplaceKey (KEY oldKey, KEY newKey)
+typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::ReplaceKey (const KEY& oldKey, const KEY& newKey)
 {
 	ndNode* const node = Find (oldKey);
 	return node ? ReplaceKey (node, newKey) : nullptr;
@@ -819,7 +819,7 @@ void ndTree<OBJECT, KEY, allocator>::Remove (typename ndTree<OBJECT, KEY, alloca
 }
 
 template<class OBJECT, class KEY, class allocator>
-void ndTree<OBJECT, KEY, allocator>::Remove (KEY key) 
+void ndTree<OBJECT, KEY, allocator>::Remove (const KEY& key) 
 {
 	// find node in tree 
 	ndNode* const node = Find (key);

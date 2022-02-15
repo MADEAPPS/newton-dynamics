@@ -129,7 +129,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API void End();
 
 	template <typename Function>
-	void ParallelExecute(Function ndFunction);
+	void ParallelExecute(const Function& ndFunction);
 
 	private:
 	D_CORE_API virtual void Release();
@@ -187,7 +187,7 @@ template <typename Function>
 class ndTaskImplement : public ndTask
 {
 	public:
-	ndTaskImplement(ndInt32 threadIndex, ndThreadPool* const threadPool, Function ndFunction)
+	ndTaskImplement(ndInt32 threadIndex, ndThreadPool* const threadPool, const Function& ndFunction)
 		:ndTask()
 		,m_function(ndFunction)
 		,m_threadPool(threadPool)
@@ -214,7 +214,7 @@ class ndTaskImplement : public ndTask
 };
 
 template <typename Function>
-void ndThreadPool::ParallelExecute(Function ndFunction)
+void ndThreadPool::ParallelExecute(const Function& ndFunction)
 {
 	const ndInt32 threadCount = GetThreadCount();
 	ndTaskImplement<Function>* const jobsArray = dAlloca(ndTaskImplement<Function>, threadCount);

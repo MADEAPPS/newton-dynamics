@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_SCENE_MAX_STACK_DEPTH		256
+#define D_SCENE_MAX_STACK_DEPTH		512
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 
 class ndWorld;
