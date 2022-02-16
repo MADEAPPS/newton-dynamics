@@ -75,8 +75,8 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_roll(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const entity = robotMesh->CreateClone();
-		scene->AddEntity(entity);
+		ndDemoEntity* const rootEntity = robotMesh->CreateClone();
+		scene->AddEntity(rootEntity);
 		ndWorld* const world = scene->GetWorld();
 		
 		// find the floor location 
@@ -85,17 +85,17 @@ class dSimpleIndustrialRobot : public ndModel
 		matrix.m_posit.m_y = floor.m_y;
 
 		//matrix.m_posit.m_y += 1.0f;
-		entity->ResetMatrix(matrix);
+		rootEntity->ResetMatrix(matrix);
 		
 		// add the root body
-		m_rootBody = CreateBodyPart(scene, entity, jointsDefinition[0].m_mass, nullptr);
+		m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
 		m_bodyArray.PushBack(m_rootBody);
 		
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 
 		ndInt32 stack = 0;
-		for (ndDemoEntity* child = entity->GetChild(); child; child = child->GetSibling())
+		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
 		{
 			childEntities[stack] = child;
 			parentBone[stack] = m_rootBody;
@@ -150,7 +150,9 @@ class dSimpleIndustrialRobot : public ndModel
 					}
 					else
 					{
-						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						//ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						ndMatrix pivotMatrix(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						pivotMatrix.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 						m_effector = new ndJointIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, true);
 						m_baseRotation = m_effector->GetReferenceMatrix();
