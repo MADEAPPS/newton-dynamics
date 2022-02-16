@@ -1347,7 +1347,7 @@ void ndScene::InitBodyArray()
 
 			const ndInt32 key = body->m_equilibrium;
 			scan[key] ++;
-			if (!body->m_equilibrium)
+			if (!body->m_equilibrium || body->m_transformIsDirty)
 			{
 				UpdateAabb(threadIndex, body);
 			}
