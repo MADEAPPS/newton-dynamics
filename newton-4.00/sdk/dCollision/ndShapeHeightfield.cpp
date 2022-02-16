@@ -289,6 +289,9 @@ void ndShapeHeightfield::CalculateMinExtend3d(const ndVector& p0, const ndVector
 	
 	boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
 	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
+
+	dAssert(boxP0.m_x <= boxP1.m_x);
+	dAssert(boxP0.m_z <= boxP1.m_z);
 }
 
 void ndShapeHeightfield::GetLocalAabb(const ndVector& q0, const ndVector& q1, ndVector& boxP0, ndVector& boxP1) const
@@ -314,6 +317,9 @@ void ndShapeHeightfield::GetLocalAabb(const ndVector& q0, const ndVector& q1, nd
 	CalculateMinAndMaxElevation(x0, x1, z0, z1, minHeight, maxHeight);
 	boxP0.m_y = minHeight;
 	boxP1.m_y = maxHeight;
+	dAssert(boxP0.m_x <= boxP1.m_x);
+	dAssert(boxP0.m_y <= boxP1.m_y);
+	dAssert(boxP0.m_z <= boxP1.m_z);
 }
 
 ndFloat32 ndShapeHeightfield::RayCastCell(const ndFastRay& ray, ndInt32 xIndex0, ndInt32 zIndex0, ndVector& normalOut, ndFloat32 maxT) const
