@@ -27,7 +27,6 @@
 #endif // _OPENMP
 
 #include "../public/VHACD.h"
-#include "btConvexHullComputer.h"
 #include "vhacdICHull.h"
 #include "vhacdMesh.h"
 #include "vhacdSArray.h"
@@ -1258,32 +1257,34 @@ void AddPoints(const Mesh* const mesh, SArray<Vec3<double> >& pts)
 }
 void ComputeConvexHull(const Mesh* const ch1, const Mesh* const ch2, SArray<Vec3<double> >& pts, Mesh* const combinedCH)
 {
-    pts.Resize(0);
-    AddPoints(ch1, pts);
-    AddPoints(ch2, pts);
-
-    btConvexHullComputer ch;
-    ch.compute((double*)pts.Data(), 3 * sizeof(double), (int32_t)pts.Size(), -1.0, -1.0);
-    combinedCH->ResizePoints(0);
-    combinedCH->ResizeTriangles(0);
-    for (int32_t v = 0; v < ch.vertices.size(); v++) {
-        combinedCH->AddPoint(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
-    }
-    const int32_t nt = ch.faces.size();
-    for (int32_t t = 0; t < nt; ++t) {
-        const btConvexHullComputer::Edge* sourceEdge = &(ch.edges[ch.faces[t]]);
-        int32_t a = sourceEdge->getSourceVertex();
-        int32_t b = sourceEdge->getTargetVertex();
-        const btConvexHullComputer::Edge* edge = sourceEdge->getNextEdgeOfFace();
-        int32_t c = edge->getTargetVertex();
-        while (c != a) {
-            combinedCH->AddTriangle(Vec3<int32_t>(a, b, c));
-            edge = edge->getNextEdgeOfFace();
-            b = c;
-            c = edge->getTargetVertex();
-        }
-    }
+	_ASSERT(0);
+    //pts.Resize(0);
+    //AddPoints(ch1, pts);
+    //AddPoints(ch2, pts);
+	//
+    //btConvexHullComputer ch;
+    //ch.compute((double*)pts.Data(), 3 * sizeof(double), (int32_t)pts.Size(), -1.0, -1.0);
+    //combinedCH->ResizePoints(0);
+    //combinedCH->ResizeTriangles(0);
+    //for (int32_t v = 0; v < ch.vertices.size(); v++) {
+    //    combinedCH->AddPoint(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
+    //}
+    //const int32_t nt = ch.faces.size();
+    //for (int32_t t = 0; t < nt; ++t) {
+    //    const btConvexHullComputer::Edge* sourceEdge = &(ch.edges[ch.faces[t]]);
+    //    int32_t a = sourceEdge->getSourceVertex();
+    //    int32_t b = sourceEdge->getTargetVertex();
+    //    const btConvexHullComputer::Edge* edge = sourceEdge->getNextEdgeOfFace();
+    //    int32_t c = edge->getTargetVertex();
+    //    while (c != a) {
+    //        combinedCH->AddTriangle(Vec3<int32_t>(a, b, c));
+    //        edge = edge->getNextEdgeOfFace();
+    //        b = c;
+    //        c = edge->getTargetVertex();
+    //    }
+    //}
 }
+
 void VHACD::MergeConvexHulls(const Parameters& params)
 {
     if (GetCancel()) {

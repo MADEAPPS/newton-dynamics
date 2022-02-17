@@ -45,14 +45,15 @@ include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src/)
 include_directories(../../thirdParty/glfw/include/)
 include_directories(../../thirdParty/glatter/include/glatter/)
+include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
-	target_link_libraries (${projectName} ndNewton ndCollision ndCore glfw imgui glatter openfbx)
+	target_link_libraries (${projectName} ndNewton ndCollision ndCore glfw imgui glatter openfbx vhacd)
 else()
-	target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx)
+	target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx vhacd)
 endif()
 
 if (NEWTON_BUILD_PROFILER)

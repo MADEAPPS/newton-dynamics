@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndTargaToOpenGl.h"
+#include "VHACD.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
@@ -99,6 +100,7 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 
 static void AddBowls(ndDemoEntityManager* const scene)
 {
+#if 1
 	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh("bowl.fbx");
 
 	ndArray<ndVector> points;
@@ -116,6 +118,47 @@ static void AddBowls(ndDemoEntityManager* const scene)
 	}
 
 	delete bowlEntity;
+#else
+	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh("bowl.fbx");
+
+	ndArray<ndVector> points;
+	ndArray<ndInt32> indices;
+	ndDemoMesh* const mesh = (ndDemoMesh*)bowlEntity->GetMesh();
+	mesh->GetVertexArray(points);
+	mesh->GetIndexArray(indices);
+
+	//ndShapeInstance hullShape(new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), 0.01f, &points[0].m_x));
+	//hullShape.SetLocalMatrix(bowlEntity->GetMeshMatrix());
+
+	ndArray<ndTriplex> meshPoints;
+	for (ndInt32 i = 0; i < points.GetCount(); i++)
+	{
+		ndTriplex p;
+		p.m_x = points[i].m_x;
+		p.m_y = points[i].m_y;
+		p.m_z = points[i].m_z;
+		meshPoints.PushBack(p);
+	}
+	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
+
+	VHACD::IVHACD::Parameters paramsVHACD;
+	bool res = interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
+		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+
+
+	//for (ndInt32 i = 0; i < 2; i++)
+	//{
+	//	ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
+	//	ndMatrix mOrigMatrix = dGetIdentityMatrix();
+	//	mOrigMatrix.m_posit.m_y += 4.0f;
+	//	AddRigidBody(scene, mOrigMatrix, hullShape, entity, 5.0f);
+	//}
+	//
+	//delete bowlEntity;
+
+	interfaceVHACD->Clean();
+	interfaceVHACD->Release();
+#endif
 }
 
 //static void AddSphere(ndDemoEntityManager* const scene)
@@ -150,7 +193,7 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	AddEmptyBox(scene);
 	//AddSphere(scene);
-	AddBowls(scene);
+	//AddBowls(scene);
 
 	ndVector origin(ndVector::m_zero);
 	origin.m_x -= 15.0f;

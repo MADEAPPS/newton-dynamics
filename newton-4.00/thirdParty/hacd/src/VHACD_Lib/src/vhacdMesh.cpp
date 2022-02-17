@@ -17,7 +17,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "btConvexHullComputer.h"
 #include "vhacdMesh.h"
 #include "FloatMath.h"
 #include <fstream>
@@ -113,28 +112,30 @@ double Mesh::ComputeVolume() const
 void Mesh::ComputeConvexHull(const double* const pts,
     const size_t nPts)
 {
-    ResizePoints(0);
-    ResizeTriangles(0);
-    btConvexHullComputer ch;
-    ch.compute(pts, 3 * sizeof(double), (int32_t)nPts, -1.0, -1.0);
-    for (int32_t v = 0; v < ch.vertices.size(); v++) {
-        AddPoint(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
-    }
-    const int32_t nt = ch.faces.size();
-    for (int32_t t = 0; t < nt; ++t) {
-        const btConvexHullComputer::Edge* sourceEdge = &(ch.edges[ch.faces[t]]);
-        int32_t a = sourceEdge->getSourceVertex();
-        int32_t b = sourceEdge->getTargetVertex();
-        const btConvexHullComputer::Edge* edge = sourceEdge->getNextEdgeOfFace();
-        int32_t c = edge->getTargetVertex();
-        while (c != a) {
-            AddTriangle(Vec3<int32_t>(a, b, c));
-            edge = edge->getNextEdgeOfFace();
-            b = c;
-            c = edge->getTargetVertex();
-        }
-    }
+	_ASSERT(0);
+    //ResizePoints(0);
+    //ResizeTriangles(0);
+    //btConvexHullComputer ch;
+    //ch.compute(pts, 3 * sizeof(double), (int32_t)nPts, -1.0, -1.0);
+    //for (int32_t v = 0; v < ch.vertices.size(); v++) {
+    //    AddPoint(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
+    //}
+    //const int32_t nt = ch.faces.size();
+    //for (int32_t t = 0; t < nt; ++t) {
+    //    const btConvexHullComputer::Edge* sourceEdge = &(ch.edges[ch.faces[t]]);
+    //    int32_t a = sourceEdge->getSourceVertex();
+    //    int32_t b = sourceEdge->getTargetVertex();
+    //    const btConvexHullComputer::Edge* edge = sourceEdge->getNextEdgeOfFace();
+    //    int32_t c = edge->getTargetVertex();
+    //    while (c != a) {
+    //        AddTriangle(Vec3<int32_t>(a, b, c));
+    //        edge = edge->getNextEdgeOfFace();
+    //        b = c;
+    //        c = edge->getTargetVertex();
+    //    }
+    //}
 }
+
 void Mesh::Clip(const Plane& plane,
     SArray<Vec3<double> >& positivePart,
     SArray<Vec3<double> >& negativePart) const
