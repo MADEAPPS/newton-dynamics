@@ -64,7 +64,8 @@ class ndConvexHull3d::ndNormalMap
 
 	void TessellateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count)
 	{
-		if (level) {
+		if (level) 
+		{
 			dAssert(dAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 			dAssert(dAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 			dAssert(dAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
@@ -667,9 +668,9 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, cons
 
 ndFloat64 ndConvexHull3d::TetrahedrumVolume (const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const
 {
-	ndBigVector p1p0 (p1 - p0);
-	ndBigVector p2p0 (p2 - p0);
-	ndBigVector p3p0 (p3 - p0);
+	const ndBigVector p1p0 (p1 - p0);
+	const ndBigVector p2p0 (p2 - p0);
+	const ndBigVector p3p0 (p3 - p0);
 	dAssert (p1p0.m_w == ndFloat32 (0.0f));
 	dAssert (p2p0.m_w == ndFloat32 (0.0f));
 	dAssert (p3p0.m_w == ndFloat32 (0.0f));
@@ -703,10 +704,10 @@ ndInt32 ndConvexHull3d::SupportVertex (ndConvexHull3dAABBTreeNode** const treePo
 
 			if (me->m_left && me->m_right) 
 			{
-				ndBigVector leftSupportPoint (me->m_left->m_box[ix].m_x, me->m_left->m_box[iy].m_y, me->m_left->m_box[iz].m_z, ndFloat32 (0.0f));
+				const ndBigVector leftSupportPoint (me->m_left->m_box[ix].m_x, me->m_left->m_box[iy].m_y, me->m_left->m_box[iz].m_z, ndFloat32 (0.0f));
 				ndFloat64 leftSupportDist = leftSupportPoint.DotProduct(dir).GetScalar();
 
-				ndBigVector rightSupportPoint (me->m_right->m_box[ix].m_x, me->m_right->m_box[iy].m_y, me->m_right->m_box[iz].m_z, ndFloat32 (0.0f));
+				const ndBigVector rightSupportPoint (me->m_right->m_box[ix].m_x, me->m_right->m_box[iy].m_y, me->m_right->m_box[iz].m_z, ndFloat32 (0.0f));
 				ndFloat64 rightSupportDist = rightSupportPoint.DotProduct(dir).GetScalar();
 
 				if (rightSupportDist >= leftSupportDist) 

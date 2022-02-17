@@ -172,7 +172,8 @@ class dgTetraIsoSufaceStuffing
 		private:
 		void TessellateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count)
 		{
-			if (level) {
+			if (level) 
+			{
 				dAssert(dAbs(p0.DotProduct(p0).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
 				dAssert(dAbs(p1.DotProduct(p1).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
 				dAssert(dAbs(p2.DotProduct(p2).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));

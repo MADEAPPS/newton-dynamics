@@ -95,12 +95,15 @@ class hullVector : public VHACD::Vec3<double>
 		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
 	}
 
-
 	inline double DotProduct(const hullVector & rhs) const
 	{
 		return X() * rhs.X() + Y() * rhs.Y() + Z() * rhs.Z();
 	}
 
+	inline hullVector CrossProduct(const hullVector & rhs) const
+	{
+		return hullVector(Y() * rhs.Z() - Z() * rhs.Y(), Z() * rhs.X() - X() * rhs.Z(), X() * rhs.Y() - Y() * rhs.X(), 0.0);
+	}
 
 	inline hullVector operator= (const Vec3 & rhs)
 	{
@@ -167,12 +170,10 @@ class vhacdConvexHull: public std::list<vhacdConvexHullFace>
 	
 	//bool CheckFlatSurface(vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	//void CalculateConvexHull2d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
-	//void CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
-	//
-	//int SupportVertex (vhacdConvexHullAABBTreeNode** const tree, const vhacdConvexHullVertex* const points, const hullVector& dir, const bool removeEntry = true) const;
-	//double TetrahedrumVolume (const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
-
+	void CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	
+	int SupportVertex (vhacdConvexHullAABBTreeNode** const tree, const vhacdConvexHullVertex* const points, const hullVector& dir, const bool removeEntry = true) const;
+	double TetrahedrumVolume (const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
 	
 	////static int ConvexCompareVertex(const vhacdConvexHullVertex* const A, const vhacdConvexHullVertex* const B, void* const context);
 	//bool Sanity() const;

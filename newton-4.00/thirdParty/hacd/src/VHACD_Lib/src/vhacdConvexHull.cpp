@@ -31,6 +31,74 @@
 
 #define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 8
 
+inline int dExp2(int x)
+{
+	int exp;
+	for (exp = -1; x; x >>= 1)
+	{
+		exp++;
+	}
+	return exp;
+}
+
+inline int dBitReversal(int v, int base)
+{
+	int x = 0;
+	int power = dExp2(base) - 1;
+	do
+	{
+		x += (v & 1) << power;
+		v >>= 1;
+		power--;
+	} while (v);
+	return x;
+}
+
+class hullPlane : public hullVector
+{
+	public:
+	//hullPlane();
+	//hullPlane(const hullVector& point);
+	hullPlane(double x, double y, double z, double w)
+		:hullVector(x, y, z, 0.0)
+		,m_w(w)
+	{
+	}
+	//hullPlane(const hullVector &normal, double distance);
+	hullPlane(const hullVector &P0, const hullVector &P1, const hullVector &P2)
+		:hullVector((P1 - P0).CrossProduct(P2 - P0))
+	{
+		m_w = -DotProduct(P0);
+	}
+
+	hullPlane Scale(double s) const
+	{
+		return hullPlane(X() * s, Y() * s, Z() * s, m_w * s);
+	}
+
+	inline hullPlane operator= (const hullPlane &rhs)
+	{
+		X() = rhs.X();
+		Y() = rhs.Y();
+		Z() = rhs.Z();
+		m_w = rhs.m_w;
+		return *this;
+	}
+
+	inline hullVector operator*(const hullVector & rhs) const
+	{
+		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
+	}
+
+
+	//hullPlane Scale(double s) const;
+	//double Evalue(const double* const point) const;
+	//double Evalue(const hullVector &point) const;
+
+	double m_w;
+};
+
+
 template <class T>
 inline void vhacdSwap(T& A, T& B)
 {
@@ -187,12 +255,12 @@ double vhacdConvexHullFace::Evalue (const hullVector* const pointArray, const hu
 	return Determinant3x3(exactMatrix);
 }
 
-ndBigPlane vhacdConvexHullFace::GetPlaneEquation (const hullVector* const pointArray) const
+hullPlane vhacdConvexHullFace::GetPlaneEquation (const hullVector* const pointArray) const
 {
 	const hullVector& p0 = pointArray[m_index[0]];
 	const hullVector& p1 = pointArray[m_index[1]];
 	const hullVector& p2 = pointArray[m_index[2]];
-	ndBigPlane plane (p0, p1, p2);
+	hullPlane plane (p0, p1, p2);
 	plane = plane.Scale (1.0f / sqrt (plane.DotProduct(plane & hullVector::m_triplexMask).GetScalar()));
 	return plane;
 }
@@ -246,138 +314,6 @@ vhacdConvexHull::vhacdConvexHull(const vhacdConvexHull& source)
 
 vhacdConvexHull::~vhacdConvexHull(void)
 {
-}
-
-double vhacdConvexHull::TetrahedrumVolume (const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const
-{
-	hullVector p1p0 (p1 - p0);
-	hullVector p2p0 (p2 - p0);
-	hullVector p3p0 (p3 - p0);
-	_ASSERT (p1p0.m_w == double (0.0f));
-	_ASSERT (p2p0.m_w == double (0.0f));
-	_ASSERT (p3p0.m_w == double (0.0f));
-	return p3p0.DotProduct(p1p0.CrossProduct(p2p0)).GetScalar();
-}
-
-int vhacdConvexHull::SupportVertex (vhacdConvexHullAABBTreeNode** const treePointer, const vhacdConvexHullVertex* const points, const hullVector& dirPlane, const bool removeEntry) const
-{
-	#define DG_STACK_DEPTH_3D 64
-	double aabbProjection[DG_STACK_DEPTH_3D];
-	const vhacdConvexHullAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
-
-	hullVector dir(dirPlane & ndBigPlane::m_triplexMask);
-	_ASSERT (dir.m_w == double (0.0f));
-
-	int index = -1;
-	int stack = 1;
-	stackPool[0] = *treePointer;
-	aabbProjection[0] = double (1.0e20f);
-	double maxProj = double (-1.0e20f);
-	int ix = (dir[0] > double (0.0f)) ? 1 : 0;
-	int iy = (dir[1] > double (0.0f)) ? 1 : 0;
-	int iz = (dir[2] > double (0.0f)) ? 1 : 0;
-	while (stack) 
-	{
-		stack--;
-		double boxSupportValue = aabbProjection[stack];
-		if (boxSupportValue > maxProj) 
-		{
-			const vhacdConvexHullAABBTreeNode* const me = stackPool[stack];
-
-			if (me->m_left && me->m_right) 
-			{
-				hullVector leftSupportPoint (me->m_left->m_box[ix].m_x, me->m_left->m_box[iy].m_y, me->m_left->m_box[iz].m_z, double (0.0f));
-				double leftSupportDist = leftSupportPoint.DotProduct(dir).GetScalar();
-
-				hullVector rightSupportPoint (me->m_right->m_box[ix].m_x, me->m_right->m_box[iy].m_y, me->m_right->m_box[iz].m_z, double (0.0f));
-				double rightSupportDist = rightSupportPoint.DotProduct(dir).GetScalar();
-
-				if (rightSupportDist >= leftSupportDist) 
-				{
-					aabbProjection[stack] = leftSupportDist;
-					stackPool[stack] = me->m_left;
-					stack++;
-					_ASSERT (stack < DG_STACK_DEPTH_3D);
-					aabbProjection[stack] = rightSupportDist;
-					stackPool[stack] = me->m_right;
-					stack++;
-					_ASSERT (stack < DG_STACK_DEPTH_3D);
-				} 
-				else 
-				{
-					aabbProjection[stack] = rightSupportDist;
-					stackPool[stack] = me->m_right;
-					stack++;
-					_ASSERT (stack < DG_STACK_DEPTH_3D);
-					aabbProjection[stack] = leftSupportDist;
-					stackPool[stack] = me->m_left;
-					stack++;
-					_ASSERT (stack < DG_STACK_DEPTH_3D);
-				}
-			} 
-			else 
-			{
-				vhacdConvexHull3dPointCluster* const cluster = (vhacdConvexHull3dPointCluster*) me;
-				for (int i = 0; i < cluster->m_count; i ++) 
-				{
-					const vhacdConvexHullVertex& p = points[cluster->m_indices[i]];
-					_ASSERT (p.m_x >= cluster->m_box[0].m_x);
-					_ASSERT (p.m_x <= cluster->m_box[1].m_x);
-					_ASSERT (p.m_y >= cluster->m_box[0].m_y);
-					_ASSERT (p.m_y <= cluster->m_box[1].m_y);
-					_ASSERT (p.m_z >= cluster->m_box[0].m_z);
-					_ASSERT (p.m_z <= cluster->m_box[1].m_z);
-					if (!p.m_mark) 
-					{
-						_ASSERT (p.m_w == double (0.0f));
-						double dist = p.DotProduct(dir).GetScalar();
-						if (dist > maxProj) 
-						{
-							maxProj = dist;
-							index = cluster->m_indices[i];
-						}
-					} 
-					else if (removeEntry) 
-					{
-						cluster->m_indices[i] = cluster->m_indices[cluster->m_count - 1];
-						cluster->m_count = cluster->m_count - 1;
-						i --;
-					}
-				}
-
-				if (cluster->m_count == 0) 
-				{
-					vhacdConvexHullAABBTreeNode* const parent = cluster->m_parent;
-					if (parent) 
-					{
-						vhacdConvexHullAABBTreeNode* const sibling = (parent->m_left != cluster) ? parent->m_left : parent->m_right;
-						_ASSERT (sibling != cluster);
-						vhacdConvexHullAABBTreeNode* const grandParent = parent->m_parent;
-						if (grandParent) 
-						{
-							sibling->m_parent = grandParent;
-							if (grandParent->m_right == parent) 
-							{
-								grandParent->m_right = sibling;
-							} 
-							else 
-							{
-								grandParent->m_left = sibling;
-							}
-						} 
-						else 
-						{
-							sibling->m_parent = nullptr;
-							*treePointer = sibling;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	_ASSERT (index != -1);
-	return index;
 }
 
 vhacdConvexHull::ndNode* vhacdConvexHull::AddFace (int i0, int i1, int i2)
@@ -469,212 +405,6 @@ void vhacdConvexHull::CalculateConvexHull2d(vhacdConvexHullAABBTreeNode*, vhacdC
 
 }
 
-void vhacdConvexHull::CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount)
-{
-	distTol = fabs (distTol) * m_diag;
-	ndNode* const f0Node = AddFace (0, 1, 2);
-	ndNode* const f1Node = AddFace (0, 2, 3);
-	ndNode* const f2Node = AddFace (2, 1, 3);
-	ndNode* const f3Node = AddFace (1, 0, 3);
-
-	vhacdConvexHullFace* const f0 = &f0Node->GetInfo();
-	vhacdConvexHullFace* const f1 = &f1Node->GetInfo();
-	vhacdConvexHullFace* const f2 = &f2Node->GetInfo();
-	vhacdConvexHullFace* const f3 = &f3Node->GetInfo();
-
-	f0->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
-	f0->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
-	f0->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
-
-	f1->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
-	f1->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
-	f1->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
-
-	f2->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
-	f2->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
-	f2->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
-
-	f3->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
-	f3->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
-	f3->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
-
-	ndList<ndNode*> boundaryFaces;
-
-	boundaryFaces.Append(f0Node);
-	boundaryFaces.Append(f1Node);
-	boundaryFaces.Append(f2Node);
-	boundaryFaces.Append(f3Node);
-	count -= 4;
-	maxVertexCount -= 4;
-	int currentIndex = 4;
-
-	ndStack<ndNode*> stackPool(1024 + m_count);
-	ndStack<ndNode*> coneListPool(1024 + m_count);
-	ndStack<ndNode*> deleteListPool(1024 + m_count);
-
-	ndNode** const stack = &stackPool[0];
-	ndNode** const coneList = &stackPool[0];
-	ndNode** const deleteList = &deleteListPool[0];
-
-	while (boundaryFaces.GetCount() && count && (maxVertexCount > 0)) 
-	{
-		// my definition of the optimal convex hull of a given vertex count,
-		// is the convex hull formed by a subset of the input vertex that minimizes the volume difference
-		// between the perfect hull formed from all input vertex and the hull of the sub set of vertex.
-		// When using a priority heap this algorithms will generate the an optimal of a fix vertex count.
-		// Since all Newton's tools do not have a limit on the point count of a convex hull, I can use either a stack or a queue.
-		// a stack maximize construction speed, a Queue tend to maximize the volume of the generated Hull approaching a perfect Hull.
-		// For now we use a queue.
-		// For general hulls it does not make a difference if we use a stack, queue, or a priority heap.
-		// perfect optimal hull only apply for when build hull of a limited vertex count.
-		//
-		// Also when building Hulls of a limited vertex count, this function runs in constant time.
-		// yes that is correct, it does not makes a difference if you build a N point hull from 100 vertex
-		// or from 100000 vertex input array.
-
-		#if 0
-			// using stack (faster)
-			dNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
-		#else
-			// using a queue (some what slower by better hull when reduced vertex count is desired)
-			ndNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
-		#endif
-
-		vhacdConvexHullFace* const face = &faceNode->GetInfo();
-		ndBigPlane planeEquation (face->GetPlaneEquation (&m_points[0]));
-
-		int index = SupportVertex (&vertexTree, points, planeEquation);
-		const hullVector& p = points[index];
-		double dist = planeEquation.Evalue(p);
-
-		if ((dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f))) 
-		{
-			_ASSERT (Sanity());
-
-			_ASSERT (faceNode);
-			stack[0] = faceNode;
-
-			int stackIndex = 1;
-			int deletedCount = 0;
-
-			while (stackIndex) 
-			{
-				stackIndex --;
-				ndNode* const node1 = stack[stackIndex];
-				vhacdConvexHullFace* const face1 = &node1->GetInfo();
-
-				if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > double(0.0f))) 
-				{
-					#ifdef _DEBUG
-					for (int i = 0; i < deletedCount; i ++) 
-					{
-						_ASSERT (deleteList[i] != node1);
-					}
-					#endif
-
-					deleteList[deletedCount] = node1;
-					deletedCount ++;
-					_ASSERT (deletedCount < int (deleteListPool.GetElementsCount()));
-					face1->m_mark = 1;
-					for (int i = 0; i < 3; i ++) 
-					{
-						ndNode* const twinNode = (ndNode*)face1->m_twin[i];
-						_ASSERT (twinNode);
-						vhacdConvexHullFace* const twinFace = &twinNode->GetInfo();
-						if (!twinFace->m_mark) 
-						{
-							stack[stackIndex] = twinNode;
-							stackIndex ++;
-							_ASSERT (stackIndex < int (stackPool.GetElementsCount()));
-						}
-					}
-				}
-			}
-
-			m_points[currentIndex] = points[index];
-			points[index].m_mark = 1;
-
-			int newCount = 0;
-			for (int i = 0; i < deletedCount; i ++) 
-			{
-				ndNode* const node1 = deleteList[i];
-				vhacdConvexHullFace* const face1 = &node1->GetInfo();
-				_ASSERT (face1->m_mark == 1);
-				for (int j0 = 0; j0 < 3; j0 ++) 
-				{
-					ndNode* const twinNode = face1->m_twin[j0];
-					vhacdConvexHullFace* const twinFace = &twinNode->GetInfo();
-					if (!twinFace->m_mark) 
-					{
-						int j1 = (j0 == 2) ? 0 : j0 + 1;
-						ndNode* const newNode = AddFace (currentIndex, face1->m_index[j0], face1->m_index[j1]);
-						boundaryFaces.Addtop(newNode);
-
-						vhacdConvexHullFace* const newFace = &newNode->GetInfo();
-						newFace->m_twin[1] = twinNode;
-						for (int k = 0; k < 3; k ++) 
-						{
-							if (twinFace->m_twin[k] == node1) 
-							{
-								twinFace->m_twin[k] = newNode;
-							}
-						}
-						coneList[newCount] = newNode;
-						newCount ++;
-						_ASSERT (newCount < int (coneListPool.GetElementsCount()));
-					}
-				}
-			}
-
-			for (int i = 0; i < newCount - 1; i ++) 
-			{
-				ndNode* const nodeA = coneList[i];
-				vhacdConvexHullFace* const faceA = &nodeA->GetInfo();
-				_ASSERT (faceA->m_mark == 0);
-				for (int j = i + 1; j < newCount; j ++) {
-					ndNode* const nodeB = coneList[j];
-					vhacdConvexHullFace* const faceB = &nodeB->GetInfo();
-					_ASSERT (faceB->m_mark == 0);
-					if (faceA->m_index[2] == faceB->m_index[1]) 
-					{
-						faceA->m_twin[2] = nodeB;
-						faceB->m_twin[0] = nodeA;
-						break;
-					}
-				}
-
-				for (int j = i + 1; j < newCount; j ++) 
-				{
-					ndNode* const nodeB = coneList[j];
-					vhacdConvexHullFace* const faceB = &nodeB->GetInfo();
-					_ASSERT (faceB->m_mark == 0);
-					if (faceA->m_index[1] == faceB->m_index[2]) 
-					{
-						faceA->m_twin[0] = nodeB;
-						faceB->m_twin[2] = nodeA;
-						break;
-					}
-				}
-			}
-
-			for (int i = 0; i < deletedCount; i ++) 
-			{
-				ndNode* const node = deleteList[i];
-				boundaryFaces.Remove (node);
-				DeleteFace (node);
-			}
-
-			maxVertexCount --;
-			currentIndex ++;
-			count --;
-		} 
-		else 
-		{
-			boundaryFaces.Remove (faceNode);
-		}
-	}
-	m_count = currentIndex;
-}
 
 void vhacdConvexHull::CalculateVolumeAndSurfaceArea (double& volume, double& surfaceArea) const
 {
@@ -843,7 +573,8 @@ class vhacdConvexHull::ndNormalMap
 
 	void TessellateTriangle(int level, const hullVector& p0, const hullVector& p1, const hullVector& p2, int& count)
 	{
-		if (level) {
+		if (level) 
+		{
 			_ASSERT(fabs(p0.DotProduct(p0) - double(1.0f)) < double(1.0e-4f));
 			_ASSERT(fabs(p1.DotProduct(p1) - double(1.0f)) < double(1.0e-4f));
 			_ASSERT(fabs(p2.DotProduct(p2) - double(1.0f)) < double(1.0e-4f));
@@ -866,14 +597,13 @@ class vhacdConvexHull::ndNormalMap
 		}
 		else 
 		{
-			_ASSERT(0);
-			//ndBigPlane n(p0, p1, p2);
-			//n = n.Scale(double(1.0f) / sqrt(n.DotProduct(n).GetScalar()));
-			//n.m_w = double(0.0f);
-			//int index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
-			//m_normal[index] = n;
-			//count++;
-			//_ASSERT(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
+			hullPlane n(p0, p1, p2);
+			n = n.Scale(double(1.0f) / sqrt(n.DotProduct(n)));
+			n.m_w = double(0.0f);
+			int index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
+			m_normal[index] = n;
+			count++;
+			_ASSERT(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
 		}
 	}
 
@@ -910,26 +640,10 @@ void vhacdConvexHull::BuildHull(const double* const vertexCloud, int strideInByt
 	treePool.resize(treeCount + 256);
 	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], sizeof (vhacdConvexHull3dPointCluster) * int (treePool.size()));
 
-	_ASSERT(0);
-	//#ifdef	D_VHACD_OLD_CONVEXHULL_3D
-	//if (m_count >= 4)
-	//{
-	//	CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
-	//}
-	//#else
-	//if (m_count >= 3)
-	//{
-	//	if (CheckFlatSurface(&treePool[0], &points[0], count, distTol, maxVertexCount))
-	//	{
-	//		CalculateConvexHull2d(&treePool[0], &points[0], count, distTol, maxVertexCount);
-	//	}
-	//	else
-	//	{
-	//		_ASSERT(m_count == 4);
-	//		CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
-	//	}
-	//}
-	//#endif
+	if (m_count >= 4)
+	{
+		CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
+	}
 }
 
 int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const, int)
@@ -1098,6 +812,134 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 	return tree;
 }
 
+int vhacdConvexHull::SupportVertex(vhacdConvexHullAABBTreeNode** const treePointer, const vhacdConvexHullVertex* const points, const hullVector& dirPlane, const bool removeEntry) const
+{
+#define DG_STACK_DEPTH_3D 64
+	double aabbProjection[DG_STACK_DEPTH_3D];
+	const vhacdConvexHullAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
+
+	hullVector dir(dirPlane);
+
+	int index = -1;
+	int stack = 1;
+	stackPool[0] = *treePointer;
+	aabbProjection[0] = double(1.0e20f);
+	double maxProj = double(-1.0e20f);
+	int ix = (dir[0] > double(0.0f)) ? 1 : 0;
+	int iy = (dir[1] > double(0.0f)) ? 1 : 0;
+	int iz = (dir[2] > double(0.0f)) ? 1 : 0;
+	while (stack)
+	{
+		stack--;
+		double boxSupportValue = aabbProjection[stack];
+		if (boxSupportValue > maxProj)
+		{
+			const vhacdConvexHullAABBTreeNode* const me = stackPool[stack];
+
+			if (me->m_left && me->m_right)
+			{
+				const hullVector leftSupportPoint(me->m_left->m_box[ix].X(), me->m_left->m_box[iy].Y(), me->m_left->m_box[iz].Z(), 0.0f);
+				double leftSupportDist = leftSupportPoint.DotProduct(dir);
+
+				const hullVector rightSupportPoint(me->m_right->m_box[ix].X(), me->m_right->m_box[iy].Y(), me->m_right->m_box[iz].Z(), 0.0f);
+				double rightSupportDist = rightSupportPoint.DotProduct(dir);
+
+				if (rightSupportDist >= leftSupportDist)
+				{
+					aabbProjection[stack] = leftSupportDist;
+					stackPool[stack] = me->m_left;
+					stack++;
+					_ASSERT(stack < DG_STACK_DEPTH_3D);
+					aabbProjection[stack] = rightSupportDist;
+					stackPool[stack] = me->m_right;
+					stack++;
+					_ASSERT(stack < DG_STACK_DEPTH_3D);
+				}
+				else
+				{
+					aabbProjection[stack] = rightSupportDist;
+					stackPool[stack] = me->m_right;
+					stack++;
+					_ASSERT(stack < DG_STACK_DEPTH_3D);
+					aabbProjection[stack] = leftSupportDist;
+					stackPool[stack] = me->m_left;
+					stack++;
+					_ASSERT(stack < DG_STACK_DEPTH_3D);
+				}
+			}
+			else
+			{
+				vhacdConvexHull3dPointCluster* const cluster = (vhacdConvexHull3dPointCluster*)me;
+				for (int i = 0; i < cluster->m_count; i++)
+				{
+					const vhacdConvexHullVertex& p = points[cluster->m_indices[i]];
+					_ASSERT(p.X() >= cluster->m_box[0].X());
+					_ASSERT(p.X() <= cluster->m_box[1].X());
+					_ASSERT(p.Y() >= cluster->m_box[0].Y());
+					_ASSERT(p.Y() <= cluster->m_box[1].Y());
+					_ASSERT(p.Z() >= cluster->m_box[0].Z());
+					_ASSERT(p.Z() <= cluster->m_box[1].Z());
+					if (!p.m_mark)
+					{
+						//_ASSERT(p.m_w == double(0.0f));
+						double dist = p.DotProduct(dir);
+						if (dist > maxProj)
+						{
+							maxProj = dist;
+							index = cluster->m_indices[i];
+						}
+					}
+					else if (removeEntry)
+					{
+						cluster->m_indices[i] = cluster->m_indices[cluster->m_count - 1];
+						cluster->m_count = cluster->m_count - 1;
+						i--;
+					}
+				}
+
+				if (cluster->m_count == 0)
+				{
+					vhacdConvexHullAABBTreeNode* const parent = cluster->m_parent;
+					if (parent)
+					{
+						vhacdConvexHullAABBTreeNode* const sibling = (parent->m_left != cluster) ? parent->m_left : parent->m_right;
+						_ASSERT(sibling != cluster);
+						vhacdConvexHullAABBTreeNode* const grandParent = parent->m_parent;
+						if (grandParent)
+						{
+							sibling->m_parent = grandParent;
+							if (grandParent->m_right == parent)
+							{
+								grandParent->m_right = sibling;
+							}
+							else
+							{
+								grandParent->m_left = sibling;
+							}
+						}
+						else
+						{
+							sibling->m_parent = nullptr;
+							*treePointer = sibling;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	_ASSERT(index != -1);
+	return index;
+}
+
+double vhacdConvexHull::TetrahedrumVolume(const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const
+{
+	const hullVector p1p0(p1 - p0);
+	const hullVector p2p0(p2 - p0);
+	const hullVector p3p0(p3 - p0);
+	return p3p0.DotProduct(p1p0.CrossProduct(p2p0));
+}
+
 int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize)
 {
 	count = GetUniquePoints(points, vertexCloud, strideInBytes, count, memoryPool, maxMemSize);
@@ -1106,7 +948,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 		m_count = 0;
 		return count;
 	}
-	vhacdConvexHullAABBTreeNode* const tree = BuildTree(nullptr, points, count, 0, (char**)&memoryPool, maxMemSize);
+	vhacdConvexHullAABBTreeNode* tree = BuildTree(nullptr, points, count, 0, (char**)&memoryPool, maxMemSize);
 	
 	m_points.resize(count);
 	m_aabbP0 = tree->m_box[0];
@@ -1116,129 +958,332 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	m_diag = double(sqrt(boxSize.DotProduct(boxSize)));
 	const ndNormalMap& normalMap = ndNormalMap::GetNormaMap();
 	
-	//int index0 = SupportVertex(&tree, points, normalMap.m_normal[0]);
-	//m_points[0] = points[index0];
-	//points[index0].m_mark = 1;
-	//
-	//bool validTetrahedrum = false;
-	//hullVector e1(hullVector::m_zero);
-	//for (int i = 1; i < normalMap.m_count; i++)
-	//{
-	//	int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
-	//	_ASSERT(index >= 0);
-	//
-	//	e1 = points[index] - m_points[0];
-	//	_ASSERT(e1.m_w == double(0.0f));
-	//	double error2 = e1.DotProduct(e1).GetScalar();
-	//	if (error2 > (double(1.0e-4f) * m_diag * m_diag))
-	//	{
-	//		m_points[1] = points[index];
-	//		points[index].m_mark = 1;
-	//		validTetrahedrum = true;
-	//		break;
-	//	}
-	//}
-	//if (!validTetrahedrum)
-	//{
-	//	m_count = 0;
-	//	_ASSERT(0);
-	//	return count;
-	//}
-	//
-	//validTetrahedrum = false;
-	//hullVector e2(hullVector::m_zero);
-	//hullVector normal(hullVector::m_zero);
-	//for (int i = 2; i < normalMap.m_count; i++)
-	//{
-	//	int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
-	//	_ASSERT(index >= 0);
-	//	e2 = points[index] - m_points[0];
-	//	normal = e1.CrossProduct(e2);
-	//	_ASSERT(e2.m_w == double(0.0f));
-	//	_ASSERT(normal.m_w == double(0.0f));
-	//	double error2 = sqrt(normal.DotProduct(normal).GetScalar());
-	//	if (error2 > (double(1.0e-4f) * m_diag * m_diag))
-	//	{
-	//		m_points[2] = points[index];
-	//		points[index].m_mark = 1;
-	//		validTetrahedrum = true;
-	//		break;
-	//	}
-	//}
-	//
-	//_ASSERT(normal.m_w == double(0.0f));
-	//if (!validTetrahedrum)
-	//{
-	//	m_count = 0;
-	//	_ASSERT(0);
-	//	return count;
-	//}
-	//
-	//// find the largest possible tetrahedron
-	//validTetrahedrum = false;
-	//hullVector e3(hullVector::m_zero);
-	//
-	//index0 = SupportVertex(&tree, points, normal);
-	//e3 = points[index0] - m_points[0];
-	//_ASSERT(e3.m_w == double(0.0f));
-	//double err2 = normal.DotProduct(e3).GetScalar();
-	//if (fabs(err2) > (double(1.0e-6f) * m_diag * m_diag))
-	//{
-	//	// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
-	//	m_points[3] = points[index0];
-	//	points[index0].m_mark = 1;
-	//	validTetrahedrum = true;
-	//}
-	//if (!validTetrahedrum)
-	//{
-	//	hullVector n(normal.Scale(double(-1.0f)));
-	//	int index = SupportVertex(&tree, points, n);
-	//	e3 = points[index] - m_points[0];
-	//	_ASSERT(e3.m_w == double(0.0f));
-	//	double error2 = normal.DotProduct(e3).GetScalar();
-	//	if (fabs(error2) > (double(1.0e-6f) * m_diag * m_diag))
-	//	{
-	//		// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
-	//		m_points[3] = points[index];
-	//		points[index].m_mark = 1;
-	//		validTetrahedrum = true;
-	//	}
-	//}
-	//if (!validTetrahedrum)
-	//{
-	//	for (int i = 3; i < normalMap.m_count; i++)
-	//	{
-	//		int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
-	//		_ASSERT(index >= 0);
-	//
-	//		//make sure the volume of the fist tetrahedral is no negative
-	//		e3 = points[index] - m_points[0];
-	//		_ASSERT(e3.m_w == double(0.0f));
-	//		double error2 = normal.DotProduct(e3).GetScalar();
-	//		if (fabs(error2) > (double(1.0e-6f) * m_diag * m_diag))
-	//		{
-	//			// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
-	//			m_points[3] = points[index];
-	//			points[index].m_mark = 1;
-	//			validTetrahedrum = true;
-	//			break;
-	//		}
-	//	}
-	//}
-	//if (!validTetrahedrum)
-	//{
-	//	// the points do not form a convex hull
-	//	m_count = 0;
-	//	//_ASSERT (0);
-	//	return count;
-	//}
-	//
-	//m_count = 4;
-	//double volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
-	//if (volume > double(0.0f))
-	//{
-	//	vhacdSwap(m_points[2], m_points[3]);
-	//}
-	//_ASSERT(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < double(0.0f));
+	int index0 = SupportVertex(&tree, points, normalMap.m_normal[0]);
+	m_points[0] = points[index0];
+	points[index0].m_mark = 1;
+	
+	bool validTetrahedrum = false;
+	hullVector e1(0.0);
+	for (int i = 1; i < normalMap.m_count; i++)
+	{
+		int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
+		_ASSERT(index >= 0);
+	
+		e1 = points[index] - m_points[0];
+		double error2 = e1.DotProduct(e1);
+		if (error2 > (double(1.0e-4f) * m_diag * m_diag))
+		{
+			m_points[1] = points[index];
+			points[index].m_mark = 1;
+			validTetrahedrum = true;
+			break;
+		}
+	}
+	if (!validTetrahedrum)
+	{
+		m_count = 0;
+		_ASSERT(0);
+		return count;
+	}
+	
+	validTetrahedrum = false;
+	hullVector e2(0.0);
+	hullVector normal(0.0);
+	for (int i = 2; i < normalMap.m_count; i++)
+	{
+		int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
+		_ASSERT(index >= 0);
+		e2 = points[index] - m_points[0];
+		normal = e1.CrossProduct(e2);
+		double error2 = sqrt(normal.DotProduct(normal));
+		if (error2 > (double(1.0e-4f) * m_diag * m_diag))
+		{
+			m_points[2] = points[index];
+			points[index].m_mark = 1;
+			validTetrahedrum = true;
+			break;
+		}
+	}
+	
+	if (!validTetrahedrum)
+	{
+		m_count = 0;
+		_ASSERT(0);
+		return count;
+	}
+	
+	// find the largest possible tetrahedron
+	validTetrahedrum = false;
+	hullVector e3(0.0);
+	
+	index0 = SupportVertex(&tree, points, normal);
+	e3 = points[index0] - m_points[0];
+	double err2 = normal.DotProduct(e3);
+	if (fabs(err2) > (double(1.0e-6f) * m_diag * m_diag))
+	{
+		// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
+		m_points[3] = points[index0];
+		points[index0].m_mark = 1;
+		validTetrahedrum = true;
+	}
+	if (!validTetrahedrum)
+	{
+		hullVector n(normal.Scale(double(-1.0f)));
+		int index = SupportVertex(&tree, points, n);
+		e3 = points[index] - m_points[0];
+		double error2 = normal.DotProduct(e3);
+		if (fabs(error2) > (double(1.0e-6f) * m_diag * m_diag))
+		{
+			// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
+			m_points[3] = points[index];
+			points[index].m_mark = 1;
+			validTetrahedrum = true;
+		}
+	}
+	if (!validTetrahedrum)
+	{
+		for (int i = 3; i < normalMap.m_count; i++)
+		{
+			int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
+			_ASSERT(index >= 0);
+	
+			//make sure the volume of the fist tetrahedral is no negative
+			e3 = points[index] - m_points[0];
+			double error2 = normal.DotProduct(e3);
+			if (fabs(error2) > (double(1.0e-6f) * m_diag * m_diag))
+			{
+				// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
+				m_points[3] = points[index];
+				points[index].m_mark = 1;
+				validTetrahedrum = true;
+				break;
+			}
+		}
+	}
+	if (!validTetrahedrum)
+	{
+		// the points do not form a convex hull
+		m_count = 0;
+		//_ASSERT (0);
+		return count;
+	}
+	
+	m_count = 4;
+	double volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
+	if (volume > double(0.0f))
+	{
+		vhacdSwap(m_points[2], m_points[3]);
+	}
+	_ASSERT(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < double(0.0f));
 	return count;
+}
+
+
+void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount)
+{
+#if 0
+	distTol = fabs(distTol) * m_diag;
+	ndNode* const f0Node = AddFace(0, 1, 2);
+	ndNode* const f1Node = AddFace(0, 2, 3);
+	ndNode* const f2Node = AddFace(2, 1, 3);
+	ndNode* const f3Node = AddFace(1, 0, 3);
+
+	vhacdConvexHullFace* const f0 = &f0Node->GetInfo();
+	vhacdConvexHullFace* const f1 = &f1Node->GetInfo();
+	vhacdConvexHullFace* const f2 = &f2Node->GetInfo();
+	vhacdConvexHullFace* const f3 = &f3Node->GetInfo();
+
+	f0->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
+	f0->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
+	f0->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
+
+	f1->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
+	f1->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
+	f1->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
+
+	f2->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
+	f2->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
+	f2->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
+
+	f3->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
+	f3->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
+	f3->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
+
+	ndList<ndNode*> boundaryFaces;
+
+	boundaryFaces.Append(f0Node);
+	boundaryFaces.Append(f1Node);
+	boundaryFaces.Append(f2Node);
+	boundaryFaces.Append(f3Node);
+	count -= 4;
+	maxVertexCount -= 4;
+	int currentIndex = 4;
+
+	ndStack<ndNode*> stackPool(1024 + m_count);
+	ndStack<ndNode*> coneListPool(1024 + m_count);
+	ndStack<ndNode*> deleteListPool(1024 + m_count);
+
+	ndNode** const stack = &stackPool[0];
+	ndNode** const coneList = &stackPool[0];
+	ndNode** const deleteList = &deleteListPool[0];
+
+	while (boundaryFaces.GetCount() && count && (maxVertexCount > 0))
+	{
+		// my definition of the optimal convex hull of a given vertex count,
+		// is the convex hull formed by a subset of the input vertex that minimizes the volume difference
+		// between the perfect hull formed from all input vertex and the hull of the sub set of vertex.
+		// When using a priority heap this algorithms will generate the an optimal of a fix vertex count.
+		// Since all Newton's tools do not have a limit on the point count of a convex hull, I can use either a stack or a queue.
+		// a stack maximize construction speed, a Queue tend to maximize the volume of the generated Hull approaching a perfect Hull.
+		// For now we use a queue.
+		// For general hulls it does not make a difference if we use a stack, queue, or a priority heap.
+		// perfect optimal hull only apply for when build hull of a limited vertex count.
+		//
+		// Also when building Hulls of a limited vertex count, this function runs in constant time.
+		// yes that is correct, it does not makes a difference if you build a N point hull from 100 vertex
+		// or from 100000 vertex input array.
+
+#if 0
+		// using stack (faster)
+		dNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
+#else
+		// using a queue (some what slower by better hull when reduced vertex count is desired)
+		ndNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
+#endif
+
+		vhacdConvexHullFace* const face = &faceNode->GetInfo();
+		hullPlane planeEquation(face->GetPlaneEquation(&m_points[0]));
+
+		int index = SupportVertex(&vertexTree, points, planeEquation);
+		const hullVector& p = points[index];
+		double dist = planeEquation.Evalue(p);
+
+		if ((dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f)))
+		{
+			_ASSERT(Sanity());
+
+			_ASSERT(faceNode);
+			stack[0] = faceNode;
+
+			int stackIndex = 1;
+			int deletedCount = 0;
+
+			while (stackIndex)
+			{
+				stackIndex--;
+				ndNode* const node1 = stack[stackIndex];
+				vhacdConvexHullFace* const face1 = &node1->GetInfo();
+
+				if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > double(0.0f)))
+				{
+#ifdef _DEBUG
+					for (int i = 0; i < deletedCount; i++)
+					{
+						_ASSERT(deleteList[i] != node1);
+					}
+#endif
+
+					deleteList[deletedCount] = node1;
+					deletedCount++;
+					_ASSERT(deletedCount < int(deleteListPool.GetElementsCount()));
+					face1->m_mark = 1;
+					for (int i = 0; i < 3; i++)
+					{
+						ndNode* const twinNode = (ndNode*)face1->m_twin[i];
+						_ASSERT(twinNode);
+						vhacdConvexHullFace* const twinFace = &twinNode->GetInfo();
+						if (!twinFace->m_mark)
+						{
+							stack[stackIndex] = twinNode;
+							stackIndex++;
+							_ASSERT(stackIndex < int(stackPool.GetElementsCount()));
+						}
+					}
+				}
+			}
+
+			m_points[currentIndex] = points[index];
+			points[index].m_mark = 1;
+
+			int newCount = 0;
+			for (int i = 0; i < deletedCount; i++)
+			{
+				ndNode* const node1 = deleteList[i];
+				vhacdConvexHullFace* const face1 = &node1->GetInfo();
+				_ASSERT(face1->m_mark == 1);
+				for (int j0 = 0; j0 < 3; j0++)
+				{
+					ndNode* const twinNode = face1->m_twin[j0];
+					vhacdConvexHullFace* const twinFace = &twinNode->GetInfo();
+					if (!twinFace->m_mark)
+					{
+						int j1 = (j0 == 2) ? 0 : j0 + 1;
+						ndNode* const newNode = AddFace(currentIndex, face1->m_index[j0], face1->m_index[j1]);
+						boundaryFaces.Addtop(newNode);
+
+						vhacdConvexHullFace* const newFace = &newNode->GetInfo();
+						newFace->m_twin[1] = twinNode;
+						for (int k = 0; k < 3; k++)
+						{
+							if (twinFace->m_twin[k] == node1)
+							{
+								twinFace->m_twin[k] = newNode;
+							}
+						}
+						coneList[newCount] = newNode;
+						newCount++;
+						_ASSERT(newCount < int(coneListPool.GetElementsCount()));
+					}
+				}
+			}
+
+			for (int i = 0; i < newCount - 1; i++)
+			{
+				ndNode* const nodeA = coneList[i];
+				vhacdConvexHullFace* const faceA = &nodeA->GetInfo();
+				_ASSERT(faceA->m_mark == 0);
+				for (int j = i + 1; j < newCount; j++) {
+					ndNode* const nodeB = coneList[j];
+					vhacdConvexHullFace* const faceB = &nodeB->GetInfo();
+					_ASSERT(faceB->m_mark == 0);
+					if (faceA->m_index[2] == faceB->m_index[1])
+					{
+						faceA->m_twin[2] = nodeB;
+						faceB->m_twin[0] = nodeA;
+						break;
+					}
+				}
+
+				for (int j = i + 1; j < newCount; j++)
+				{
+					ndNode* const nodeB = coneList[j];
+					vhacdConvexHullFace* const faceB = &nodeB->GetInfo();
+					_ASSERT(faceB->m_mark == 0);
+					if (faceA->m_index[1] == faceB->m_index[2])
+					{
+						faceA->m_twin[0] = nodeB;
+						faceB->m_twin[2] = nodeA;
+						break;
+					}
+				}
+			}
+
+			for (int i = 0; i < deletedCount; i++)
+			{
+				ndNode* const node = deleteList[i];
+				boundaryFaces.Remove(node);
+				DeleteFace(node);
+			}
+
+			maxVertexCount--;
+			currentIndex++;
+			count--;
+		}
+		else
+		{
+			boundaryFaces.Remove(faceNode);
+		}
+	}
+	m_count = currentIndex;
+#endif
 }

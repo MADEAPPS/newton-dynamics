@@ -455,7 +455,7 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
 		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
         for (int32_t v = 0; v < convexPoints.size(); v++)
 		{
-            cpoints.PushBack(convexPoints[i]);
+            cpoints.PushBack(convexPoints[v]);
         }
     }
     delete[] points;
