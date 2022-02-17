@@ -89,8 +89,8 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildFlatPlane(scene, true);
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 	//BuildCompoundScene(scene, dGetIdentityMatrix());
-	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	BuildHeightFieldTerrain(scene, heighfieldLocation);
+	BuildGridPlane(scene, 120, 4.0f, 0.0f);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
@@ -109,7 +109,7 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	ndDemoInstanceEntity* const origEntity = new ndDemoInstanceEntity(origGeometry);
 	scene->AddEntity(origEntity);
 	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-	mOrigMatrix.m_posit.m_y += 2.0f;
+	mOrigMatrix.m_posit.m_y += 4.0f;
 	AddRigidBody(scene, mOrigMatrix, originShape, origEntity, 5.0);
 
 	ndVector origin(ndVector::m_zero);
