@@ -193,7 +193,7 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	AddEmptyBox(scene);
 	//AddSphere(scene);
-	//AddBowls(scene);
+	AddBowls(scene);
 
 	ndVector origin(ndVector::m_zero);
 	origin.m_x -= 15.0f;

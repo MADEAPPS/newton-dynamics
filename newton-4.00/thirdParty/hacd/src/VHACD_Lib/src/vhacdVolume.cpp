@@ -23,6 +23,7 @@
 #include <math.h>
 #include <queue>
 #include <string.h>
+#include "vhacdConvexHull.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4458 4100)
@@ -447,12 +448,15 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
             ++p;
         }
 
-		_ASSERT(0);
         //btConvexHullComputer ch;
+		vhacdConvexHull ch((double*)points, 3 * sizeof(double), int(q), 1.0e-5f);
+		
         //ch.compute((double*)points, 3 * sizeof(double), (int32_t)q, -1.0, -1.0);
-        //for (int32_t v = 0; v < ch.vertices.size(); v++) {
-        //    cpoints.PushBack(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
-        //}
+		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
+        for (int32_t v = 0; v < convexPoints.size(); v++)
+		{
+            cpoints.PushBack(convexPoints[i]);
+        }
     }
     delete[] points;
 	

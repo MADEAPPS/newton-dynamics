@@ -84,7 +84,9 @@ class ndConvexHull3d::ndNormalMap
 			TessellateTriangle(level - 1, p1, p12, p01, count);
 			TessellateTriangle(level - 1, p2, p20, p12, count);
 			TessellateTriangle(level - 1, p01, p12, p20, count);
-		} else {
+		} 
+		else 
+		{
 			ndBigPlane n(p0, p1, p2);
 			n = n.Scale(ndFloat64(1.0f) / sqrt(n.DotProduct(n).GetScalar()));
 			n.m_w = ndFloat64(0.0f);
@@ -115,7 +117,7 @@ class ndConvexHull3dAABBTreeNode
 	ndConvexHull3dAABBTreeNode* m_parent;
 };
 
-class dgConvexHull3dPointCluster: public ndConvexHull3dAABBTreeNode
+class ndConvexHull3dPointCluster: public ndConvexHull3dAABBTreeNode
 {
 	public:
 	ndInt32 m_count;
@@ -254,7 +256,7 @@ void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 	treeCount *= 2;
 
 	ndStack<ndConvexHull3dVertex> points (count);
-	ndStack<dgConvexHull3dPointCluster> treePool (treeCount + 256);
+	ndStack<ndConvexHull3dPointCluster> treePool (treeCount + 256);
 	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], treePool.GetSizeInBytes());
 
 #ifdef	D_OLD_CONVEXHULL_3D
@@ -287,9 +289,9 @@ ndConvexHull3dAABBTreeNode* ndConvexHull3d::BuildTree (ndConvexHull3dAABBTreeNod
 	ndBigVector maxP (-ndFloat32 (1.0e15f));
 	if (count <= DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE) 
 	{
-		dgConvexHull3dPointCluster* const clump = new (*memoryPool) dgConvexHull3dPointCluster;
-		*memoryPool += sizeof (dgConvexHull3dPointCluster);
-		maxMemSize -= sizeof (dgConvexHull3dPointCluster);
+		ndConvexHull3dPointCluster* const clump = new (*memoryPool) ndConvexHull3dPointCluster;
+		*memoryPool += sizeof (ndConvexHull3dPointCluster);
+		maxMemSize -= sizeof (ndConvexHull3dPointCluster);
 		dAssert (maxMemSize >= 0);
 
 		dAssert (clump);
@@ -732,7 +734,7 @@ ndInt32 ndConvexHull3d::SupportVertex (ndConvexHull3dAABBTreeNode** const treePo
 			} 
 			else 
 			{
-				dgConvexHull3dPointCluster* const cluster = (dgConvexHull3dPointCluster*) me;
+				ndConvexHull3dPointCluster* const cluster = (ndConvexHull3dPointCluster*) me;
 				for (ndInt32 i = 0; i < cluster->m_count; i ++) 
 				{
 					const ndConvexHull3dVertex& p = points[cluster->m_indices[i]];

@@ -22,6 +22,8 @@
 #ifndef __ND_CONVEXHULL_3D__
 #define __ND_CONVEXHULL_3D__
 
+#include <list>
+#include <vector>
 #include "vhacdVector.h"
 //#include "ndCoreStdafx.h"
 //#include "ndList.h"
@@ -31,18 +33,84 @@
 //#include "ndMatrix.h"
 //#include "ndQuaternion.h"
 
-#define D_VHACD_OLD_CONVEXHULL_3D
-
 class vhacdConvexHullVertex;
 class vhacdConvexHullAABBTreeNode;
 
 class hullVector : public VHACD::Vec3<double>
 {
 	public:
+	hullVector()
+		:Vec3<double>(0, 0, 0)
+	{
+	}
+
+	hullVector(double x)
+		:Vec3<double>(x, x, x)
+	{
+	}
+
+	hullVector(const hullVector& x)
+		:Vec3<double>(x.X(), x.Y(), x.Z())
+	{
+	}
+
 	hullVector(double x, double y, double z, double)
 		:Vec3<double>(x, y, z)
 	{
 	}
+
+	hullVector GetMin(const hullVector& p) const
+	{
+		return hullVector(
+			X() < p.X() ? X() : p.X(), 
+			Y() < p.Y() ? Y() : p.Y(), 
+			Z() < p.Z() ? Z() : p.Z(), 0.0);
+	}
+
+	hullVector GetMax(const hullVector& p) const
+	{
+		return hullVector(
+			X() > p.X() ? X() : p.X(),
+			Y() > p.Y() ? Y() : p.Y(),
+			Z() > p.Z() ? Z() : p.Z(), 0.0);
+	}
+
+	hullVector Scale(double s) const
+	{
+		return hullVector(X() * s, Y() * s, Z() * s, 0.0);
+	}
+
+	inline hullVector operator+(const hullVector & rhs) const
+	{
+		return hullVector(X() + rhs.X(), Y() + rhs.Y(), Z() + rhs.Z(), 0.0f);
+	}
+
+	inline hullVector operator-(const hullVector & rhs) const
+	{
+		return hullVector(X() - rhs.X(), Y() - rhs.Y(), Z() - rhs.Z(), 0.0f);
+	}
+
+	inline hullVector operator*(const hullVector & rhs) const
+	{
+		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
+	}
+
+
+	inline double DotProduct(const hullVector & rhs) const
+	{
+		return X() * rhs.X() + Y() * rhs.Y() + Z() * rhs.Z();
+	}
+
+
+	inline hullVector operator= (const Vec3 & rhs)
+	{
+		X() = rhs.X();
+		Y() = rhs.Y();
+		Z() = rhs.Z();
+		return *this;
+	}
+
+
 };
 
 class vhacdConvexHullFace
@@ -67,19 +135,16 @@ class vhacdConvexHullFace
 };
 
 //class vhacdConvexHull: public ndList<vhacdConvexHullFace>
-class vhacdConvexHull
+class vhacdConvexHull: public std::list<vhacdConvexHullFace>
 {
-	#ifdef	D_VHACD_OLD_CONVEXHULL_3D
 	class ndNormalMap;
-	#endif
-
 	public:
 	vhacdConvexHull(const vhacdConvexHull& source);
-	//vhacdConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
+	vhacdConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
 	//virtual ~vhacdConvexHull();
 	//
 	//int GetVertexCount() const;
-	//const hullVector* GetVertexPool() const;
+	const std::vector<hullVector>& GetVertexPool() const;
 	//const hullVector& GetVertex(int i) const;
 	//
 	//double GetDiagonal() const;
@@ -88,43 +153,48 @@ class vhacdConvexHull
 	//void CalculateVolumeAndSurfaceArea (double& volume, double& surcafeArea) const;
 	//
 	//protected:
+	private:
 	//vhacdConvexHull();
-	//void BuildHull (const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount);
-	//
+	void BuildHull (const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount);
+
+	int GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
+	int InitVertexArray(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
+	vhacdConvexHullAABBTreeNode* BuildTree (vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** const memoryPool, int& maxMemSize) const;
+
 	//virtual ndNode* AddFace (int i0, int i1, int i2);
 	//virtual void DeleteFace (ndNode* const node) ;
-	//virtual int InitVertexArray(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
-	//
+	
+	
 	//bool CheckFlatSurface(vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	//void CalculateConvexHull2d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	//void CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	//
 	//int SupportVertex (vhacdConvexHullAABBTreeNode** const tree, const vhacdConvexHullVertex* const points, const hullVector& dir, const bool removeEntry = true) const;
 	//double TetrahedrumVolume (const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
-	//
-	//int GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
-	//vhacdConvexHullAABBTreeNode* BuildTree (vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, ndInt8** const memoryPool, int& maxMemSize) const;
+
+	
+	
 	////static int ConvexCompareVertex(const vhacdConvexHullVertex* const A, const vhacdConvexHullVertex* const B, void* const context);
 	//bool Sanity() const;
 	//void Save (const char* const filename) const;
 	//
-	//hullVector m_aabbP0;
-	//hullVector m_aabbP1;
-	//int m_count;
-	//double m_diag;
-	//ndArray<hullVector> m_points;
+	hullVector m_aabbP0;
+	hullVector m_aabbP1;
+	int m_count;
+	double m_diag;
+	std::vector<hullVector> m_points;
 };
 
 //inline int vhacdConvexHull::GetVertexCount() const
 //{
 //	return m_count;
 //}
-//
-//inline const hullVector* vhacdConvexHull::GetVertexPool() const
-//{
-//	return &m_points[0];
-//}
-//
+
+inline const std::vector<hullVector>& vhacdConvexHull::GetVertexPool() const
+{
+	return m_points;
+}
+
 //inline const hullVector& vhacdConvexHull::GetVertex(int index) const
 //{
 //	return m_points[index];
