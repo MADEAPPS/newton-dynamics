@@ -138,7 +138,8 @@ ndFloat64 ndConvexHull3dFace::Evalue (const ndBigVector* const pointArray, const
 	const ndBigVector& p2 = pointArray[m_index[2]];
 
 	ndFloat64 matrix[3][3];
-	for (ndInt32 i = 0; i < 3; i ++) {
+	for (ndInt32 i = 0; i < 3; i ++) 
+	{
 		matrix[0][i] = p2[i] - p0[i];
 		matrix[1][i] = p1[i] - p0[i];
 		matrix[2][i] = point[i] - p0[i];
@@ -155,12 +156,14 @@ ndFloat64 ndConvexHull3dFace::Evalue (const ndBigVector* const pointArray, const
 	// ndFloat64 precision	= ndFloat64 (1.0f) / ndFloat64 (1<<30);
 	ndFloat64 precision	 = ndFloat64 (1.0f) / ndFloat64 (1<<24);
 	ndFloat64 errbound = error * precision;
-	if (fabs(det) > errbound) {
+	if (fabs(det) > errbound) 
+	{
 		return det;
 	}
 
 	ndGoogol exactMatrix[3][3];
-	for (ndInt32 i = 0; i < 3; i ++) {
+	for (ndInt32 i = 0; i < 3; i ++) 
+	{
 		exactMatrix[0][i] = ndGoogol(p2[i]) - ndGoogol(p0[i]);
 		exactMatrix[1][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
 		exactMatrix[2][i] = ndGoogol(point[i]) - ndGoogol(p0[i]);

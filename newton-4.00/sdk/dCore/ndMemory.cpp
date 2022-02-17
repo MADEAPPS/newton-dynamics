@@ -60,9 +60,12 @@ void* ndMemory::Malloc(size_t size)
 
 void ndMemory::Free(void* const ptr)
 {
-	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
-	m_memoryUsed.fetch_sub(ret->m_size);
-	m_freeMemory(ret->m_ptr);
+	if (ptr)
+	{
+		dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
+		m_memoryUsed.fetch_sub(ret->m_size);
+		m_freeMemory(ret->m_ptr);
+	}
 }
 
 ndInt32 ndMemory::GetSize(void* const ptr)

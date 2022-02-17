@@ -558,3 +558,17 @@ void ndDemoMesh::GetVertexArray(ndArray<ndVector>& points) const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void ndDemoMesh::GetIndexArray(ndArray<ndInt32>& indexList) const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_indexBuffer);
+	const GLuint* const data = (GLuint*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+	indexList.Resize(m_indexCount);
+	indexList.SetCount(m_indexCount);
+	for (ndInt32 i = 0; i < m_indexCount; i++)
+	{
+		indexList[i] = data[i];
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}

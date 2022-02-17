@@ -43,6 +43,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	void OptimizeForRender(const glPositionNormalUV* const points, ndInt32 pointCount,
 						   const ndInt32* const indices, ndInt32 indexCount);
 	void GetVertexArray(ndArray<ndVector>& points) const;
+	void GetIndexArray(ndArray<ndInt32>& indexList) const;
 
 	protected:
 	virtual ~ndDemoMesh();

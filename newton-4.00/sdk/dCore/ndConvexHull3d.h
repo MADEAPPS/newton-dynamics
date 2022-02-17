@@ -42,7 +42,10 @@ class ndConvexHull3dFace
 	
 	void SetMark(ndInt32 mark) {m_mark = mark;}
 	ndInt32 GetMark() const {return m_mark;}
-	ndList<ndConvexHull3dFace>::ndNode* GetTwin(ndInt32 index) const { return m_twin[index];}
+	ndList<ndConvexHull3dFace>::ndNode* GetTwin(ndInt32 index) const 
+	{ 
+		return m_twin[index];
+	}
 
 	private:
 	ndFloat64 Evalue (const ndBigVector* const pointArray, const ndBigVector& point) const;
