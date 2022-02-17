@@ -43,7 +43,7 @@ fbxDemoEntity::~fbxDemoEntity()
 	}
 }
 
-ndDemoEntity* fbxDemoEntity::CreateClone() const
+ndNodeBaseHierarchy* fbxDemoEntity::CreateClone() const
 {
 	return new fbxDemoEntity(*this);
 }

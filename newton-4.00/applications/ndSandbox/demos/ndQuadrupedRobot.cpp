@@ -80,7 +80,7 @@ class dQuadrupedRobot : public ndModel
 		,m_roll(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const entity = robotMesh->CreateClone();
+		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
 		scene->AddEntity(entity);
 		ndWorld* const world = scene->GetWorld();
 

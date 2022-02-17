@@ -14,6 +14,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
+#include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -27,10 +28,12 @@
 static ndBodyDynamic* AddRigidBody(
 	ndDemoEntityManager* const scene,
 	const ndMatrix& matrix, const ndShapeInstance& shape,
-	ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)
+	ndDemoEntity* const entity, ndFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+
+	// add the entity to the scene.
+	scene->AddEntity(entity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -49,7 +52,7 @@ static void AddToCompoundShape(const ndMatrix& mLocalMatrix, ndShapeInstance& pa
 	pCompoundShape->AddCollision(&childInstance);
 }
 
-void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
+static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 {
 	ndShapeInstance wall1(new ndShapeBox(2.0f, 2.0f, 0.1f));
 	ndShapeInstance wall2(new ndShapeBox(0.1f, 2.0f, 2.0f));
@@ -65,7 +68,7 @@ void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	ndMatrix mWall4Local = dGetIdentityMatrix();
 	mWall4Local.m_posit = ndVector(-1.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix mFloorLocal = dGetIdentityMatrix();
-	mFloorLocal = dYawMatrix(3.14f / 4.0f);//45 degree
+	//mFloorLocal = dYawMatrix(3.14f / 4.0f);//45 degree
 	mFloorLocal.m_posit = ndVector(0.0f, -1.0f, 0.0f, 1.0f);
 
 	auto pCompoundShape = parentInstance.GetShape()->GetAsShapeCompound();
@@ -77,6 +80,58 @@ void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	AddToCompoundShape(mFloorLocal, parentInstance, floor);
 	pCompoundShape->EndAddRemove();
 }
+
+static void AddEmptyBox(ndDemoEntityManager* const scene)
+{
+	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
+	CreateBoxCompoundShape(compoundShapeInstance);
+
+	ndDemoMesh* const compGeometry = new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+	ndDemoEntity* const compEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
+	compEntity->SetMesh(compGeometry, dGetIdentityMatrix());
+
+	ndMatrix mBodyMatrix = dGetIdentityMatrix();
+	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
+	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
+
+	compGeometry->Release();
+}
+
+static void AddBowls(ndDemoEntityManager* const scene)
+{
+	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh("bowl.fbx");
+
+	ndArray<ndVector> points;
+	ndDemoMesh* const mesh = (ndDemoMesh*)bowlEntity->GetMesh();
+	mesh->GetVertexArray(points);
+	ndShapeInstance hullShape(new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), 0.01f, &points[0].m_x));
+	hullShape.SetLocalMatrix(bowlEntity->GetMeshMatrix());
+
+	for (ndInt32 i = 0; i < 2; i++)
+	{
+		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
+		ndMatrix mOrigMatrix = dGetIdentityMatrix();
+		mOrigMatrix.m_posit.m_y += 4.0f;
+		AddRigidBody(scene, mOrigMatrix, hullShape, entity, 5.0f);
+	}
+
+	delete bowlEntity;
+}
+
+//static void AddSphere(ndDemoEntityManager* const scene)
+//{
+//	ndShapeInstance originShape(new ndShapeSphere(0.5f));
+//	ndDemoMesh* const origGeometry = new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+//
+//	ndDemoEntity* const origEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
+//	origEntity->SetMesh(origGeometry, dGetIdentityMatrix());
+//
+//	ndMatrix mOrigMatrix = dGetIdentityMatrix();
+//	mOrigMatrix.m_posit.m_y += 4.0f;
+//	AddRigidBody(scene, mOrigMatrix, originShape, origEntity, 5.0);
+//
+//	origGeometry->Release();
+//}
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
@@ -93,32 +148,14 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
-	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
-	CreateBoxCompoundShape(compoundShapeInstance);
-	compoundShapeInstance.SetScale(ndVector(2.0f, 1.0f, 1.0f, 0.0f));
-
-	ndDemoMeshIntance* const compGeometry = new ndDemoMeshIntance("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-	ndDemoInstanceEntity* const compEntity = new ndDemoInstanceEntity(compGeometry);
-	scene->AddEntity(compEntity);
-	ndMatrix mBodyMatrix = dGetIdentityMatrix();
-	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
-	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
-
-	ndShapeInstance originShape(new ndShapeSphere(0.5));
-	ndDemoMeshIntance* const origGeometry = new ndDemoMeshIntance("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-	ndDemoInstanceEntity* const origEntity = new ndDemoInstanceEntity(origGeometry);
-	scene->AddEntity(origEntity);
-	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-	mOrigMatrix.m_posit.m_y += 4.0f;
-	AddRigidBody(scene, mOrigMatrix, originShape, origEntity, 5.0);
+	AddEmptyBox(scene);
+	//AddSphere(scene);
+	AddBowls(scene);
 
 	ndVector origin(ndVector::m_zero);
-	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
-	origin.m_x -= 3.0f;
-	origin.m_y += 5.0f;
-
 	origin.m_x -= 15.0f;
+	origin.m_y += 5.0f;
 	origin.m_z += 15.0f;
-
+	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }

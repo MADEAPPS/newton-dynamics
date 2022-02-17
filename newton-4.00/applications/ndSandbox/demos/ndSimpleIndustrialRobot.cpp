@@ -75,7 +75,7 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_roll(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const rootEntity = robotMesh->CreateClone();
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
 		scene->AddEntity(rootEntity);
 		ndWorld* const world = scene->GetWorld();
 		

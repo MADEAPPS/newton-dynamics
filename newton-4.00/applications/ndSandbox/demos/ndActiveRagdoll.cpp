@@ -154,7 +154,7 @@ class ndActiveRagdollModel : public ndCharacter
 		,m_animBlendTree(nullptr)
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const entity = ragdollMesh->CreateClone();
+		ndDemoEntity* const entity = (ndDemoEntity*)ragdollMesh->CreateClone();
 		scene->AddEntity(entity);
 		ndWorld* const world = scene->GetWorld();
 		

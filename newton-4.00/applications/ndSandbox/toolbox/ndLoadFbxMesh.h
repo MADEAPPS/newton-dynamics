@@ -31,7 +31,7 @@ class fbxDemoEntity : public ndDemoEntity
 	}
 
 	void CleanIntermediate();
-	ndDemoEntity* CreateClone() const;
+	ndNodeBaseHierarchy* CreateClone() const;
 	void ApplyTransform(const ndMatrix& cordinateSystem);
 	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 
