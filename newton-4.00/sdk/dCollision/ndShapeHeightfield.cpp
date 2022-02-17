@@ -187,7 +187,7 @@ void ndShapeHeightfield::CalculateLocalObb()
 		y1 = dMax(y1, m_elevationMap[i]);
 	}
 
-	m_minBox = ndVector(ndFloat32(ndFloat32(0.0f)), ndFloat32 (y0) * m_verticalScale, ndFloat32(0.0f), ndFloat32(0.0f));
+	m_minBox = ndVector(ndFloat32(0.0f), ndFloat32 (y0) * m_verticalScale, ndFloat32(0.0f), ndFloat32(0.0f));
 	m_maxBox = ndVector(ndFloat32(m_width-1) * m_horizontalScale_x, ndFloat32(y1) * m_verticalScale, ndFloat32(m_height-1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 	m_boxSize = (m_maxBox - m_minBox) * ndVector::m_half;
@@ -288,6 +288,9 @@ void ndShapeHeightfield::CalculateMinExtend3d(const ndVector& p0, const ndVector
 	boxP1 = q1.Select((q1 * invScale).Floor() * scale + scale, m_yMask);
 	
 	boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
+	boxP1 = boxP1.Select(boxP1.GetMax(m_minBox), m_yMask);
+
+	boxP0 = boxP0.Select(boxP0.GetMin(m_maxBox), m_yMask);
 	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 
 	dAssert(boxP0.m_x <= boxP1.m_x);

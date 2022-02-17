@@ -303,6 +303,9 @@ class ndStackEntry
 		const ndVector p0(origin - size);
 		const ndVector p1(origin + size);
 
+		//const ndVector p0(ndVector::m_triplexMask & (ndVector(20000.0f) - size));
+		//const ndVector p1(ndVector::m_triplexMask & (ndVector(20000.0f) + size));
+
 		ndVector boxP0;
 		ndVector boxP1;
 		ndShapeHeightfield* const shape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
@@ -320,16 +323,6 @@ class ndStackEntry
 		const ndVector invScale(proceduralInstance->GetInvScale());
 		const ndVector size(invScale * data.m_localMatrixAbs1.RotateVector(compoundNode->m_size));
 		const ndVector origin(invScale * data.m_localMatrix1.TransformVector(compoundNode->m_origin));
-		//const ndVector p0(origin - size);
-		//const ndVector p1(origin + size);
-
-		//ndVector boxP0;
-		//ndVector boxP1;
-		//ndShapeStaticProceduralMesh* const shape = proceduralInstance->GetShape()->GetAsShapeStaticProceduralMesh();
-		//shape->GetLocalAabb(p0, p1, boxP0, boxP1);
-		//const ndVector boxSize((boxP1 - boxP0) * ndVector::m_half * scale);
-		//const ndVector boxOrigin((boxP1 + boxP0) * ndVector::m_half * scale);
-		//ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
 		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, origin, size);
 		return dist2;
 	}
