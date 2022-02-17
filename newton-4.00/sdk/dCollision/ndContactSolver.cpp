@@ -313,6 +313,13 @@ class ndStackEntry
 		const ndVector boxSize((boxP1 - boxP0) * ndVector::m_half * scale);
 		const ndVector boxOrigin((boxP1 + boxP0) * ndVector::m_half * scale);
 
+		if ((boxSize.m_x < 0) || (boxSize.m_y < 0) || (boxSize.m_z < 0))
+		{
+			dTrace(("p0 (%f %f %f)\n", p0.m_x, p0.m_y, p0.m_z));
+			dTrace(("p1 (%f %f %f)\n", p1.m_x, p1.m_y, p1.m_z));
+			shape->GetLocalAabb(p0, p1, boxP0, boxP1);
+		}
+
 		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
 		return dist2;
 	}
