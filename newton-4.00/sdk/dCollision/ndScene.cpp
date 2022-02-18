@@ -1744,7 +1744,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 
 	callback.m_contacts.SetCount(0);
 	callback.m_param = ndFloat32(1.2f);
-	while (stack) 
+	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
 	{
 		stack--;
 		ndFloat32 dist = stackDistance[stack];
@@ -1874,7 +1874,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const stackDistance, ndInt32 stack, const ndFastRay& ray) const
 {
 	bool state = false;
-	while (stack)
+	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
 	{
 		stack--;
 		ndFloat32 dist = stackDistance[stack];
@@ -1946,7 +1946,7 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, 
 void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const
 {
 	callback.m_bodyArray.SetCount(0);
-	while (stack)
+	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
 	{
 		stack--;
 		

@@ -139,8 +139,6 @@ static void AddBowls(ndDemoEntityManager* const scene)
 	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
 
 	VHACD::IVHACD::Parameters paramsVHACD;
-	//paramsVHACD.m_concavity = 0.00001;
-
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 
@@ -161,14 +159,13 @@ static void AddBowls(ndDemoEntityManager* const scene)
 			convexMeshPoints[j] = p;
 		}
 		ndShapeInstance hullShape(new ndShapeConvexHull(convexMeshPoints.GetCount(), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
-		//ndMatrix matrix(dGetIdentityMatrix());
-		//hullShape.SetLocalMatrix(matrix);
 		compoundShape->AddCollision(&hullShape);
 	}
 	compoundShape->EndAddRemove();
 	compoundShapeInstance.SetLocalMatrix(bowlEntity->GetMeshMatrix());
 	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-	for (ndInt32 i = 0; i < 4; i++)
+
+	for (ndInt32 i = 0; i < 2; i++)
 	{
 		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
 		mOrigMatrix.m_posit.m_y += 1.0f;
@@ -212,14 +209,14 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
-	AddEmptyBox(scene);
+	//AddEmptyBox(scene);
 	//AddSphere(scene);
 	AddBowls(scene);
 
 	ndVector origin(ndVector::m_zero);
-	origin.m_x -= 15.0f;
-	origin.m_y += 5.0f;
-	origin.m_z += 15.0f;
+	origin.m_x -= 5.0f;
+	origin.m_y += 1.0f;
+	origin.m_z += 5.0f;
 	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }

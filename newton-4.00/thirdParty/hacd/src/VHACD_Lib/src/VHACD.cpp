@@ -1059,7 +1059,7 @@ void VHACD::ComputeACD(const Parameters& params)
             double concavity = ComputeConcavity(volume, volumeCH, m_volumeCH0);
             double error = 1.01 * pset->ComputeMaxVolumeError() / m_volumeCH0;
 			// make the value smaller, later put it the parameters.
-			error *= 0.5f;
+			error *= params.m_concavityToVolumeWeigh;
 
             if (firstIteration) {
                 firstIteration = false;

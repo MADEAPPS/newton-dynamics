@@ -463,9 +463,10 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
     meshCH.ResizePoints(0);
     meshCH.ResizeTriangles(0);
 
-    for (int32_t v = 0; v < ch.GetVertexPool().size(); v++)
+	const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
+    for (int32_t v = 0; v < convexPoints.size(); v++)
 	{
-        meshCH.AddPoint(ch.GetVertexPool()[v]);
+        meshCH.AddPoint(convexPoints[v]);
     }
 
 	for (vhacdConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
@@ -1093,65 +1094,58 @@ void TetrahedronSet::ComputeBB()
 
 void TetrahedronSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
 {
-	_ASSERT(0);
-    //const size_t CLUSTER_SIZE = 65536;
-    //const size_t nTetrahedra = m_tetrahedra.Size();
-    //if (nTetrahedra == 0)
-    //    return;
-	//
-    //SArray<Vec3<double> > cpoints;
-	//
-    //Vec3<double>* points = new Vec3<double>[CLUSTER_SIZE];
-    //size_t p = 0;
-    //while (p < nTetrahedra) {
-    //    size_t q = 0;
-    //    size_t s = 0;
-    //    while (q < CLUSTER_SIZE && p < nTetrahedra) {
-    //        if (m_tetrahedra[p].m_data == PRIMITIVE_ON_SURFACE) {
-    //            ++s;
-    //            if (s == sampling) {
-    //                s = 0;
-    //                for (int32_t a = 0; a < 4; ++a) {
-    //                    points[q++] = m_tetrahedra[p].m_pts[a];
-    //                    for (int32_t xx = 0; xx < 3; ++xx) {
-    //                        assert(m_tetrahedra[p].m_pts[a][xx] + EPS >= m_minBB[xx]);
-    //                        assert(m_tetrahedra[p].m_pts[a][xx] <= m_maxBB[xx] + EPS);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        ++p;
-    //    }
-    //    btConvexHullComputer ch;
-    //    ch.compute((double*)points, 3 * sizeof(double), (int32_t)q, -1.0, -1.0);
-    //    for (int32_t v = 0; v < ch.vertices.size(); v++) {
-    //        cpoints.PushBack(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
-    //    }
-    //}
-    //delete[] points;
-	//
-    //points = cpoints.Data();
-    //btConvexHullComputer ch;
-    //ch.compute((double*)points, 3 * sizeof(double), (int32_t)cpoints.Size(), -1.0, -1.0);
-    //meshCH.ResizePoints(0);
-    //meshCH.ResizeTriangles(0);
-    //for (int32_t v = 0; v < ch.vertices.size(); v++) {
-    //    meshCH.AddPoint(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
-    //}
-    //const int32_t nt = ch.faces.size();
-    //for (int32_t t = 0; t < nt; ++t) {
-    //    const btConvexHullComputer::Edge* sourceEdge = &(ch.edges[ch.faces[t]]);
-    //    int32_t a = sourceEdge->getSourceVertex();
-    //    int32_t b = sourceEdge->getTargetVertex();
-    //    const btConvexHullComputer::Edge* edge = sourceEdge->getNextEdgeOfFace();
-    //    int32_t c = edge->getTargetVertex();
-    //    while (c != a) {
-    //        meshCH.AddTriangle(Vec3<int32_t>(a, b, c));
-    //        edge = edge->getNextEdgeOfFace();
-    //        b = c;
-    //        c = edge->getTargetVertex();
-    //    }
-    //}
+    const size_t CLUSTER_SIZE = 65536;
+    const size_t nTetrahedra = m_tetrahedra.Size();
+    if (nTetrahedra == 0)
+        return;
+	
+    SArray<Vec3<double> > cpoints;
+	
+    Vec3<double>* points = new Vec3<double>[CLUSTER_SIZE];
+    size_t p = 0;
+    while (p < nTetrahedra) {
+        size_t q = 0;
+        size_t s = 0;
+        while (q < CLUSTER_SIZE && p < nTetrahedra) {
+            if (m_tetrahedra[p].m_data == PRIMITIVE_ON_SURFACE) {
+                ++s;
+                if (s == sampling) {
+                    s = 0;
+                    for (int32_t a = 0; a < 4; ++a) {
+                        points[q++] = m_tetrahedra[p].m_pts[a];
+                        for (int32_t xx = 0; xx < 3; ++xx) {
+                            assert(m_tetrahedra[p].m_pts[a][xx] + EPS >= m_minBB[xx]);
+                            assert(m_tetrahedra[p].m_pts[a][xx] <= m_maxBB[xx] + EPS);
+                        }
+                    }
+                }
+            }
+            ++p;
+        }
+
+		vhacdConvexHull ch((double*)points, 3 * sizeof(double), int(q), 1.0e-5f);
+		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
+		for (int32_t v = 0; v < convexPoints.size(); v++)
+		{
+			cpoints.PushBack(convexPoints[v]);
+		}
+    }
+    delete[] points;
+	
+    points = cpoints.Data();
+	vhacdConvexHull ch((double*)points, 3 * sizeof(double), (int32_t)cpoints.Size(), 1.0e-5f);
+    meshCH.ResizePoints(0);
+    meshCH.ResizeTriangles(0);
+	const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
+    for (int32_t v = 0; v < convexPoints.size(); v++) {
+        meshCH.AddPoint(convexPoints[v]);
+    }
+
+	for (vhacdConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
+	{
+		vhacdConvexHullFace* const face = &node->GetInfo();
+		meshCH.AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
+	}
 }
 inline bool TetrahedronSet::Add(Tetrahedron& tetrahedron)
 {

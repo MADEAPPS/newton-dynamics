@@ -76,6 +76,7 @@ public:
         {
             m_resolution = 100000;
             m_concavity = 0.001;
+			m_concavityToVolumeWeigh = 0.5f;
             m_planeDownsampling = 4;
             m_convexhullDownsampling = 4;
             m_alpha = 0.05;
@@ -92,6 +93,7 @@ public:
 			m_projectHullVertices = true; // This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
         }
         double m_concavity;
+		double m_concavityToVolumeWeigh;
         double m_alpha;
         double m_beta;
         double m_minVolumePerCH;

@@ -243,24 +243,27 @@ class ndStackBvhStackEntry
 		ndInt32 treeNodeType,
 		const ndAabbPolygonSoup::ndNode* const treeNode)
 	{
-		ndVector bvhp0;
-		ndVector bvhp1;
-		bvhTreeCollision->GetNodeAabb(treeNode, bvhp0, bvhp1);
-		const ndVector bvhSize((bvhp1 - bvhp0) * ndVector::m_half);
-		const ndVector bvhOrigin((bvhp1 + bvhp0) * ndVector::m_half);
-	
-		ndInt32 j = stack;
-		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, bvhOrigin, bvhSize);
-		for (; j && (dist2 > stackPool[j - 1].m_dist2); j--)
+		if (stack < ((2 * D_COMPOUND_STACK_DEPTH) - 4))
 		{
-			stackPool[j] = stackPool[j - 1];
+			ndVector bvhp0;
+			ndVector bvhp1;
+			bvhTreeCollision->GetNodeAabb(treeNode, bvhp0, bvhp1);
+			const ndVector bvhSize((bvhp1 - bvhp0) * ndVector::m_half);
+			const ndVector bvhOrigin((bvhp1 + bvhp0) * ndVector::m_half);
+
+			ndInt32 j = stack;
+			ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, bvhOrigin, bvhSize);
+			for (; j && (dist2 > stackPool[j - 1].m_dist2); j--)
+			{
+				stackPool[j] = stackPool[j - 1];
+			}
+			stackPool[j].m_treeNodeIsLeaf = treeNodeType;
+			stackPool[j].m_compoundNode = compoundNode;
+			stackPool[j].m_collisionTreeNode = treeNode;
+			stackPool[j].m_dist2 = dist2;
+			stack++;
+			dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
 		}
-		stackPool[j].m_treeNodeIsLeaf = treeNodeType;
-		stackPool[j].m_compoundNode = compoundNode;
-		stackPool[j].m_collisionTreeNode = treeNode;
-		stackPool[j].m_dist2 = dist2;
-		stack++;
-		dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
 	}
 
 	const ndShapeCompound::ndNodeBase* m_compoundNode;
@@ -279,19 +282,23 @@ class ndStackEntry
 		const ndShapeCompound::ndNodeBase* const node0,
 		const ndShapeCompound::ndNodeBase* const node1)
 	{
-		dAssert(node0);
-		dAssert(node1);
-		ndInt32 j = stack;
-		ndFloat32 subDist2 = data.CalculateDistance2(node0->m_origin, node0->m_size, node1->m_origin, node1->m_size);
-		for (; j && (subDist2 > stackPool[j - 1].m_dist2); j--)
+		if (stack < ((2 * D_COMPOUND_STACK_DEPTH) - 4))
 		{
-			stackPool[j] = stackPool[j - 1];
+			dAssert(node0);
+			dAssert(node1);
+
+			ndInt32 j = stack;
+			ndFloat32 subDist2 = data.CalculateDistance2(node0->m_origin, node0->m_size, node1->m_origin, node1->m_size);
+			for (; j && (subDist2 > stackPool[j - 1].m_dist2); j--)
+			{
+				stackPool[j] = stackPool[j - 1];
+			}
+			stackPool[j].m_node0 = node0;
+			stackPool[j].m_node1 = node1;
+			stackPool[j].m_dist2 = subDist2;
+			stack++;
+			dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
 		}
-		stackPool[j].m_node0 = node0;
-		stackPool[j].m_node1 = node1;
-		stackPool[j].m_dist2 = subDist2;
-		stack++;
-		dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
 	}
 
 	ndFloat32 CalculateHeighfieldDist2(const ndContactSolver::ndBoxBoxDistance2& data, const ndShapeCompound::ndNodeBase* const compoundNode, ndShapeInstance* const heightfieldInstance)
@@ -2742,7 +2749,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 				}
 			}
 		}
-		else
+		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
 		{
 			dAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -2864,7 +2871,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				}
 			}
 		}
-		else
+		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
 		{
 			dAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -3527,7 +3534,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 				}
 			}
 		}
-		else
+		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
 		{
 			dAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -3572,7 +3579,6 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	m_separationDistance = ndSqrt(closestDist);
 	return contactCount;
 }
-
 
 ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 {
@@ -3652,7 +3658,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 				}
 			}
 		}
-		else
+		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
 		{
 			dAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -4020,7 +4026,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				}
 			}
 		}
-		else
+		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
 		{
 			dAssert(node->m_type == ndShapeCompound::m_node);
 			{
