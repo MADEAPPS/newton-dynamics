@@ -12,7 +12,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndTargaToOpenGl.h"
-#include "VHACD.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
@@ -100,83 +99,19 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 
 static void AddBowls(ndDemoEntityManager* const scene)
 {
-#if 0
 	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh("bowl.fbx");
+	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
 
-	ndArray<ndVector> points;
-	ndDemoMesh* const mesh = (ndDemoMesh*)bowlEntity->GetMesh();
-	mesh->GetVertexArray(points);
-	ndShapeInstance hullShape(new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), 0.01f, &points[0].m_x));
-	hullShape.SetLocalMatrix(bowlEntity->GetMeshMatrix());
-
-	for (ndInt32 i = 0; i < 2; i++)
-	{
-		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
-		ndMatrix mOrigMatrix = dGetIdentityMatrix();
-		mOrigMatrix.m_posit.m_y += 4.0f;
-		AddRigidBody(scene, mOrigMatrix, hullShape, entity, 5.0f);
-	}
-
-	delete bowlEntity;
-#else
-	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh("bowl.fbx");
-
-	ndArray<ndVector> points;
-	ndArray<ndInt32> indices;
-	ndDemoMesh* const mesh = (ndDemoMesh*)bowlEntity->GetMesh();
-	mesh->GetVertexArray(points);
-	mesh->GetIndexArray(indices);
-
-	ndArray<ndTriplex> meshPoints;
-	for (ndInt32 i = 0; i < points.GetCount(); i++)
-	{
-		ndTriplex p;
-		p.m_x = points[i].m_x;
-		p.m_y = points[i].m_y;
-		p.m_z = points[i].m_z;
-		meshPoints.PushBack(p);
-	}
-	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
-
-	VHACD::IVHACD::Parameters paramsVHACD;
-	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
-		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
-
-	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
-
-	ndShapeCompound* const compoundShape = compoundShapeInstance.GetShape()->GetAsShapeCompound();
-	compoundShape->BeginAddRemove();
-	ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
-	ndArray<ndVector> convexMeshPoints;
-	for (ndInt32 i = 0; i < hullCount; i++)
-	{
-		VHACD::IVHACD::ConvexHull ch;
-		interfaceVHACD->GetConvexHull(i, ch);
-		convexMeshPoints.SetCount(ch.m_nPoints);
-		for (ndInt32 j = 0; j < ndInt32 (ch.m_nPoints); j++)
-		{
-			ndVector p(ndFloat32 (ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
-			convexMeshPoints[j] = p;
-		}
-		ndShapeInstance hullShape(new ndShapeConvexHull(convexMeshPoints.GetCount(), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
-		compoundShape->AddCollision(&hullShape);
-	}
-	compoundShape->EndAddRemove();
-	compoundShapeInstance.SetLocalMatrix(bowlEntity->GetMeshMatrix());
 	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-
 	for (ndInt32 i = 0; i < 4; i++)
 	{
 		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
 		mOrigMatrix.m_posit.m_y += 1.0f;
-		AddRigidBody(scene, mOrigMatrix, compoundShapeInstance, entity, 5.0f);
+		AddRigidBody(scene, mOrigMatrix, *compoundShapeInstance, entity, 5.0f);
 	}
 
-	interfaceVHACD->Clean();
-	interfaceVHACD->Release();
-
+	delete compoundShapeInstance;
 	delete bowlEntity;
-#endif
 }
 
 static void AddSphere(ndDemoEntityManager* const scene)

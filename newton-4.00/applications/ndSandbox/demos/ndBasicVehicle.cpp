@@ -371,7 +371,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass)
 	{
 		ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
-		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren();
+		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromChildren();
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));

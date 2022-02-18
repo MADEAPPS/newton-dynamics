@@ -323,7 +323,7 @@ class dQuadrupedRobot : public ndModel
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 	{
-		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
+		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
 		dAssert(shape);
 		
 		// create the rigid body that will make this body

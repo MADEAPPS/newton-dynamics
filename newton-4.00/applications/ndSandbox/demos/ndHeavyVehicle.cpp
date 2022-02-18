@@ -289,7 +289,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
 
 		ndDemoEntity* const vehPart = parentEntity->Find(partName);
-		ndShapeInstance* const vehCollision = vehPart->CreateCollisionFromchildren();
+		ndShapeInstance* const vehCollision = vehPart->CreateCollisionFromChildren();
 
 		ndBodyDynamic* const vehBody = new ndBodyDynamic();
 		const ndMatrix matrix(vehPart->CalculateGlobalMatrix(nullptr));
@@ -308,7 +308,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass)
 	{
 		ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
-		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren();
+		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromChildren();
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));

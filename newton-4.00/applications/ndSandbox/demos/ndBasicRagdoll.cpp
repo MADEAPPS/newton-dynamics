@@ -218,7 +218,7 @@ class ndRagdollModel : public ndCharacter
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
-		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
+		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
 		dAssert(shape);
 
 		// create the rigid body that will make this body

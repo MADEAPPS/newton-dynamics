@@ -10,6 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "VHACD.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"
@@ -382,7 +383,57 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 }
 
-ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
+ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh() const
+{
+	ndArray<ndVector> points;
+	ndArray<ndInt32> indices;
+	ndDemoMesh* const mesh = (ndDemoMesh*)GetMesh();
+	mesh->GetVertexArray(points);
+	mesh->GetIndexArray(indices);
+
+	ndArray<ndTriplex> meshPoints;
+	for (ndInt32 i = 0; i < points.GetCount(); i++)
+	{
+		ndTriplex p;
+		p.m_x = points[i].m_x;
+		p.m_y = points[i].m_y;
+		p.m_z = points[i].m_z;
+		meshPoints.PushBack(p);
+	}
+	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
+
+	VHACD::IVHACD::Parameters paramsVHACD;
+	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
+		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+
+	ndShapeInstance* const compoundShapeInstance = new ndShapeInstance(new ndShapeCompound());
+
+	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
+	compoundShape->BeginAddRemove();
+	ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
+	ndArray<ndVector> convexMeshPoints;
+	for (ndInt32 i = 0; i < hullCount; i++)
+	{
+		VHACD::IVHACD::ConvexHull ch;
+		interfaceVHACD->GetConvexHull(i, ch);
+		convexMeshPoints.SetCount(ch.m_nPoints);
+		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); j++)
+		{
+			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
+			convexMeshPoints[j] = p;
+		}
+		ndShapeInstance hullShape(new ndShapeConvexHull(convexMeshPoints.GetCount(), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
+		compoundShape->AddCollision(&hullShape);
+	}
+	compoundShape->EndAddRemove();
+	compoundShapeInstance->SetLocalMatrix(GetMeshMatrix());
+
+	interfaceVHACD->Clean();
+	interfaceVHACD->Release();
+	return compoundShapeInstance;
+}
+
+ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 {
 	ndInt32 count = 1;
 	ndShapeInstance* shapeArray[128];
@@ -486,7 +537,6 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 	{
 		ndShapeInstance* const compoundInstance = new ndShapeInstance(new ndShapeCompound());
 		ndShapeCompound* const compound = compoundInstance->GetShape()->GetAsShapeCompound();
-		//compound->SetOwner(compoundInstance);
 
 		compound->BeginAddRemove ();
 		for (ndInt32 i = 1; i < count; i ++) 
