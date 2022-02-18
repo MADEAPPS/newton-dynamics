@@ -165,7 +165,7 @@ static void AddBowls(ndDemoEntityManager* const scene)
 	compoundShapeInstance.SetLocalMatrix(bowlEntity->GetMeshMatrix());
 	ndMatrix mOrigMatrix = dGetIdentityMatrix();
 
-	for (ndInt32 i = 0; i < 2; i++)
+	for (ndInt32 i = 0; i < 4; i++)
 	{
 		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
 		mOrigMatrix.m_posit.m_y += 1.0f;
@@ -179,20 +179,25 @@ static void AddBowls(ndDemoEntityManager* const scene)
 #endif
 }
 
-//static void AddSphere(ndDemoEntityManager* const scene)
-//{
-//	ndShapeInstance originShape(new ndShapeSphere(0.5f));
-//	ndDemoMesh* const origGeometry = new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-//
-//	ndDemoEntity* const origEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
-//	origEntity->SetMesh(origGeometry, dGetIdentityMatrix());
-//
-//	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-//	mOrigMatrix.m_posit.m_y += 4.0f;
-//	AddRigidBody(scene, mOrigMatrix, originShape, origEntity, 5.0);
-//
-//	origGeometry->Release();
-//}
+static void AddSphere(ndDemoEntityManager* const scene)
+{
+	ndShapeInstance originShape(new ndShapeSphere(0.25f));
+	ndDemoMesh* const origGeometry = new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+
+	ndDemoEntity* const origEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
+	origEntity->SetMesh(origGeometry, dGetIdentityMatrix());
+
+	ndMatrix mOrigMatrix = dGetIdentityMatrix();
+	mOrigMatrix.m_posit.m_x = 2.0f;
+	for (ndInt32 i = 0; i < 4; i++)
+	{
+		ndDemoEntity* const entity = (ndDemoEntity*)origEntity->CreateClone();
+		mOrigMatrix.m_posit.m_y += 1.0f;
+		AddRigidBody(scene, mOrigMatrix, originShape, entity, 1.0);
+	}
+	origGeometry->Release();
+	delete origEntity;
+}
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
@@ -209,8 +214,8 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
-	//AddEmptyBox(scene);
-	//AddSphere(scene);
+	AddEmptyBox(scene);
+	AddSphere(scene);
 	AddBowls(scene);
 
 	ndVector origin(ndVector::m_zero);
