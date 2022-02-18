@@ -71,9 +71,11 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 	D_CORE_API ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount = 0x7fffffff);
 	D_CORE_API virtual ~ndConvexHull3d();
 
-	ndInt32 GetVertexCount() const;
-	const ndBigVector* GetVertexPool() const;
-	const ndBigVector& GetVertex(ndInt32 i) const;
+	//ndInt32 GetVertexCount() const;
+	//const ndBigVector* GetVertexPool() const;
+	const ndArray<ndBigVector>& GetVertexPool() const;
+	//const ndBigVector& GetVertex(ndInt32 i) const;
+	//const ndArray<ndBigVector>& GetVertex(ndInt32 i) const;
 
 	ndFloat64 GetDiagonal() const;
 	void GetAABB (ndBigVector& boxP0, ndBigVector& boxP1) const;
@@ -103,25 +105,26 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 
 	ndBigVector m_aabbP0;
 	ndBigVector m_aabbP1;
-	ndInt32 m_count;
+	//ndInt32 m_count;
 	ndFloat64 m_diag;
 	ndArray<ndBigVector> m_points;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline ndInt32 ndConvexHull3d::GetVertexCount() const
+//inline ndInt32 ndConvexHull3d::GetVertexCount() const
+//{
+//	//return m_count;
+//	return m_points.GetCount();
+//}
+
+inline const ndArray<ndBigVector>& ndConvexHull3d::GetVertexPool() const
 {
-	return m_count;
+	return m_points;
 }
 
-inline const ndBigVector* ndConvexHull3d::GetVertexPool() const
-{
-	return &m_points[0];
-}
-
-inline const ndBigVector& ndConvexHull3d::GetVertex(ndInt32 index) const
-{
-	return m_points[index];
-}
+//inline const ndBigVector& ndConvexHull3d::GetVertex(ndInt32 index) const
+//{
+//	return m_points[index];
+//}
 
 inline ndFloat64 ndConvexHull3d::GetDiagonal() const
 {

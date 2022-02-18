@@ -20,16 +20,547 @@
 */
 
 #include "vhacdConvexHull.h"
-//#include "ndCoreStdafx.h"
-//#include "vhacdSort.h"
-//#include "ndTree.h"
-//#include "ndStack.h"
-//#include "ndGoogol.h"
-//#include "vhacdConvexHull.h"
-//#include "ndSmallDeterminant.h"
 
-
+#define VHACD_GOOGOL_SIZE	4
 #define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 8
+
+class vhacdGoogol
+{
+	public:
+	vhacdGoogol(void);
+	vhacdGoogol(double value);
+
+	operator double() const;
+	vhacdGoogol operator+ (const vhacdGoogol &A) const;
+	vhacdGoogol operator- (const vhacdGoogol &A) const;
+	vhacdGoogol operator* (const vhacdGoogol &A) const;
+	vhacdGoogol operator/ (const vhacdGoogol &A) const;
+
+	vhacdGoogol operator+= (const vhacdGoogol &A);
+	vhacdGoogol operator-= (const vhacdGoogol &A);
+
+	bool operator> (const vhacdGoogol &A) const;
+	bool operator>= (const vhacdGoogol &A) const;
+	bool operator< (const vhacdGoogol &A) const;
+	bool operator<= (const vhacdGoogol &A) const;
+	bool operator== (const vhacdGoogol &A) const;
+	bool operator!= (const vhacdGoogol &A) const;
+
+	vhacdGoogol Abs() const;
+	vhacdGoogol Sqrt() const;
+	vhacdGoogol InvSqrt() const;
+	vhacdGoogol Floor() const;
+
+	void Trace() const;
+	void ToString(char* const string) const;
+
+	private:
+	void InitFloatFloat(double value);
+	void NegateMantissa(uint64_t* const mantissa) const;
+	void CopySignedMantissa(uint64_t* const mantissa) const;
+	int NormalizeMantissa(uint64_t* const mantissa) const;
+	uint64_t CheckCarrier(uint64_t a, uint64_t b) const;
+	void ShiftRightMantissa(uint64_t* const mantissa, int bits) const;
+
+	int LeadingZeros(uint64_t a) const;
+	void ExtendeMultiply(uint64_t a, uint64_t b, uint64_t& high, uint64_t& low) const;
+	void ScaleMantissa(uint64_t* const out, uint64_t scale) const;
+
+	int m_sign;
+	int m_exponent;
+	uint64_t m_mantissa[VHACD_GOOGOL_SIZE];
+
+	public:
+	static vhacdGoogol m_zero;
+	static vhacdGoogol m_one;
+	static vhacdGoogol m_two;
+	static vhacdGoogol m_three;
+	static vhacdGoogol m_half;
+};
+
+vhacdGoogol vhacdGoogol::m_zero(0.0);
+vhacdGoogol vhacdGoogol::m_one(1.0);
+vhacdGoogol vhacdGoogol::m_two(2.0);
+vhacdGoogol vhacdGoogol::m_three(3.0);
+vhacdGoogol vhacdGoogol::m_half(0.5);
+
+vhacdGoogol::vhacdGoogol(void)
+	:m_sign(0)
+	, m_exponent(0)
+{
+	memset(m_mantissa, 0, sizeof(m_mantissa));
+}
+
+vhacdGoogol::vhacdGoogol(double value)
+	:m_sign(0)
+	, m_exponent(0)
+{
+	int exp;
+	double mantissa = fabs(frexp(value, &exp));
+
+	m_exponent = int(exp);
+	m_sign = (value >= 0) ? 0 : 1;
+
+	memset(m_mantissa, 0, sizeof(m_mantissa));
+	m_mantissa[0] = uint64_t(double(uint64_t(1) << 62) * mantissa);
+}
+
+void vhacdGoogol::CopySignedMantissa(uint64_t* const mantissa) const
+{
+	memcpy(mantissa, m_mantissa, sizeof(m_mantissa));
+	if (m_sign)
+	{
+		NegateMantissa(mantissa);
+	}
+}
+
+vhacdGoogol::operator double() const
+{
+	double mantissa = (double(1.0f) / double(uint64_t(1) << 62)) * double(m_mantissa[0]);
+	mantissa = ldexp(mantissa, m_exponent) * (m_sign ? double(-1.0f) : double(1.0f));
+	return mantissa;
+}
+
+vhacdGoogol vhacdGoogol::operator+ (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp;
+	if (m_mantissa[0] && A.m_mantissa[0])
+	{
+		uint64_t mantissa0[VHACD_GOOGOL_SIZE];
+		uint64_t mantissa1[VHACD_GOOGOL_SIZE];
+		uint64_t mantissa[VHACD_GOOGOL_SIZE];
+
+		CopySignedMantissa(mantissa0);
+		A.CopySignedMantissa(mantissa1);
+
+		int exponetDiff = m_exponent - A.m_exponent;
+		int exponent = m_exponent;
+		if (exponetDiff > 0)
+		{
+			ShiftRightMantissa(mantissa1, exponetDiff);
+		}
+		else if (exponetDiff < 0)
+		{
+			exponent = A.m_exponent;
+			ShiftRightMantissa(mantissa0, -exponetDiff);
+		}
+
+		uint64_t carrier = 0;
+		for (int i = VHACD_GOOGOL_SIZE - 1; i >= 0; i--)
+		{
+			uint64_t m0 = mantissa0[i];
+			uint64_t m1 = mantissa1[i];
+			mantissa[i] = m0 + m1 + carrier;
+			carrier = CheckCarrier(m0, m1) | CheckCarrier(m0 + m1, carrier);
+		}
+
+		int sign = 0;
+		if (int64_t(mantissa[0]) < 0)
+		{
+			sign = 1;
+			NegateMantissa(mantissa);
+		}
+
+		int bits = NormalizeMantissa(mantissa);
+		if (bits <= (-64 * VHACD_GOOGOL_SIZE))
+		{
+			tmp.m_sign = 0;
+			tmp.m_exponent = 0;
+		}
+		else
+		{
+			tmp.m_sign = sign;
+			tmp.m_exponent = int(exponent + bits);
+		}
+
+		memcpy(tmp.m_mantissa, mantissa, sizeof(m_mantissa));
+	}
+	else if (A.m_mantissa[0])
+	{
+		tmp = A;
+	}
+	else
+	{
+		tmp = *this;
+	}
+
+	return tmp;
+}
+
+vhacdGoogol vhacdGoogol::operator- (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(A);
+	tmp.m_sign = !tmp.m_sign;
+	return *this + tmp;
+}
+
+void vhacdGoogol::ScaleMantissa(uint64_t* const dst, uint64_t scale) const
+{
+	uint64_t carrier = 0;
+	for (int i = VHACD_GOOGOL_SIZE - 1; i >= 0; i--)
+	{
+		if (m_mantissa[i])
+		{
+			uint64_t low;
+			uint64_t high;
+			ExtendeMultiply(scale, m_mantissa[i], high, low);
+			uint64_t acc = low + carrier;
+			carrier = CheckCarrier(low, carrier);
+			carrier += high;
+			dst[i + 1] = acc;
+		}
+		else
+		{
+			dst[i + 1] = carrier;
+			carrier = 0;
+		}
+
+	}
+	dst[0] = carrier;
+}
+
+vhacdGoogol vhacdGoogol::operator* (const vhacdGoogol &A) const
+{
+	if (m_mantissa[0] && A.m_mantissa[0])
+	{
+		uint64_t mantissaAcc[VHACD_GOOGOL_SIZE * 2];
+		memset(mantissaAcc, 0, sizeof(mantissaAcc));
+		for (int i = VHACD_GOOGOL_SIZE - 1; i >= 0; i--)
+		{
+			uint64_t a = m_mantissa[i];
+			if (a)
+			{
+				uint64_t mantissaScale[2 * VHACD_GOOGOL_SIZE];
+				memset(mantissaScale, 0, sizeof(mantissaScale));
+				A.ScaleMantissa(&mantissaScale[i], a);
+
+				uint64_t carrier = 0;
+				for (int j = 0; j < 2 * VHACD_GOOGOL_SIZE; j++)
+				{
+					const int k = 2 * VHACD_GOOGOL_SIZE - 1 - j;
+					uint64_t m0 = mantissaAcc[k];
+					uint64_t m1 = mantissaScale[k];
+					mantissaAcc[k] = m0 + m1 + carrier;
+					carrier = CheckCarrier(m0, m1) | CheckCarrier(m0 + m1, carrier);
+				}
+			}
+		}
+
+		uint64_t carrier = 0;
+		//int bits = uint64_t(LeadingZeros (mantissaAcc[0]) - 2);
+		int bits = LeadingZeros(mantissaAcc[0]) - 2;
+		for (int i = 0; i < 2 * VHACD_GOOGOL_SIZE; i++)
+		{
+			const int k = 2 * VHACD_GOOGOL_SIZE - 1 - i;
+			uint64_t a = mantissaAcc[k];
+			mantissaAcc[k] = (a << uint64_t(bits)) | carrier;
+			carrier = a >> uint64_t(64 - bits);
+		}
+
+		int exp = m_exponent + A.m_exponent - (bits - 2);
+
+		vhacdGoogol tmp;
+		tmp.m_sign = m_sign ^ A.m_sign;
+		tmp.m_exponent = int(exp);
+		memcpy(tmp.m_mantissa, mantissaAcc, sizeof(m_mantissa));
+
+		return tmp;
+	}
+	return vhacdGoogol(0.0);
+}
+
+vhacdGoogol vhacdGoogol::operator/ (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(1.0 / A);
+	tmp = tmp * (m_two - A * tmp);
+	tmp = tmp * (m_two - A * tmp);
+	int test = 0;
+	int passes = 0;
+	do
+	{
+		passes++;
+		vhacdGoogol tmp0(tmp);
+		tmp = tmp * (m_two - A * tmp);
+		test = memcmp(&tmp0, &tmp, sizeof(vhacdGoogol));
+	} while (test && (passes < (2 * VHACD_GOOGOL_SIZE)));
+	return (*this) * tmp;
+}
+
+vhacdGoogol vhacdGoogol::Abs() const
+{
+	vhacdGoogol tmp(*this);
+	tmp.m_sign = 0;
+	return tmp;
+}
+
+vhacdGoogol vhacdGoogol::Floor() const
+{
+	if (m_exponent < 1)
+	{
+		return vhacdGoogol(0.0);
+	}
+	int bits = m_exponent + 2;
+	int start = 0;
+	while (bits >= 64)
+	{
+		bits -= 64;
+		start++;
+	}
+
+	vhacdGoogol tmp(*this);
+	for (int i = VHACD_GOOGOL_SIZE - 1; i > start; i--)
+	{
+		tmp.m_mantissa[i] = 0;
+	}
+	// some compilers do no like this and I do not know why is that
+	//uint64_t mask = (-1LL) << (64 - bits);
+	uint64_t mask(~0ULL);
+	mask <<= (64 - bits);
+	tmp.m_mantissa[start] &= mask;
+	return tmp;
+}
+
+vhacdGoogol vhacdGoogol::InvSqrt() const
+{
+	const vhacdGoogol& me = *this;
+	vhacdGoogol x(1.0f / sqrt(me));
+
+	int test = 0;
+	int passes = 0;
+	do
+	{
+		passes++;
+		vhacdGoogol tmp(x);
+		x = m_half * x * (m_three - me * x * x);
+		test = memcmp(&x, &tmp, sizeof(vhacdGoogol));
+	} while (test && (passes < (2 * VHACD_GOOGOL_SIZE)));
+	return x;
+}
+
+vhacdGoogol vhacdGoogol::Sqrt() const
+{
+	return *this * InvSqrt();
+}
+
+void vhacdGoogol::ToString(char* const string) const
+{
+	vhacdGoogol tmp(*this);
+	vhacdGoogol base(10.0);
+	while (double(tmp) > 1.0)
+	{
+		tmp = tmp / base;
+	}
+
+	int index = 0;
+	while (tmp.m_mantissa[0])
+	{
+		tmp = tmp * base;
+		vhacdGoogol digit(tmp.Floor());
+		tmp -= digit;
+		double val = digit;
+		string[index] = char(val) + '0';
+		index++;
+	}
+	string[index] = 0;
+}
+
+void vhacdGoogol::NegateMantissa(uint64_t* const mantissa) const
+{
+	uint64_t carrier = 1;
+	for (int i = VHACD_GOOGOL_SIZE - 1; i >= 0; i--)
+	{
+		uint64_t a = ~mantissa[i] + carrier;
+		if (a)
+		{
+			carrier = 0;
+		}
+		mantissa[i] = a;
+	}
+}
+
+void vhacdGoogol::ShiftRightMantissa(uint64_t* const mantissa, int bits) const
+{
+	uint64_t carrier = 0;
+	if (int64_t(mantissa[0]) < int64_t(0))
+	{
+		carrier = uint64_t(-1);
+	}
+
+	while (bits >= 64)
+	{
+		for (int i = VHACD_GOOGOL_SIZE - 2; i >= 0; i--)
+		{
+			mantissa[i + 1] = mantissa[i];
+		}
+		mantissa[0] = carrier;
+		bits -= 64;
+	}
+
+	if (bits > 0)
+	{
+		carrier <<= (64 - bits);
+		for (int i = 0; i < VHACD_GOOGOL_SIZE; i++)
+		{
+			uint64_t a = mantissa[i];
+			mantissa[i] = (a >> bits) | carrier;
+			carrier = a << (64 - bits);
+		}
+	}
+}
+
+int vhacdGoogol::LeadingZeros(uint64_t a) const
+{
+#define dgCOUNTBIT(mask,add)		\
+	{									\
+		uint64_t test = a & mask;	\
+		n += test ? 0 : add;			\
+		a = test ? test : (a & ~mask);	\
+	}
+
+	int n = 0;
+	dgCOUNTBIT(0xffffffff00000000LL, 32);
+	dgCOUNTBIT(0xffff0000ffff0000LL, 16);
+	dgCOUNTBIT(0xff00ff00ff00ff00LL, 8);
+	dgCOUNTBIT(0xf0f0f0f0f0f0f0f0LL, 4);
+	dgCOUNTBIT(0xccccccccccccccccLL, 2);
+	dgCOUNTBIT(0xaaaaaaaaaaaaaaaaLL, 1);
+
+	return n;
+}
+
+int vhacdGoogol::NormalizeMantissa(uint64_t* const mantissa) const
+{
+	int bits = 0;
+	if (int64_t(mantissa[0] * 2) < 0)
+	{
+		bits = 1;
+		ShiftRightMantissa(mantissa, 1);
+	}
+	else
+	{
+		while (!mantissa[0] && bits > (-64 * VHACD_GOOGOL_SIZE))
+		{
+			bits -= 64;
+			for (int i = 1; i < VHACD_GOOGOL_SIZE; i++) {
+				mantissa[i - 1] = mantissa[i];
+			}
+			mantissa[VHACD_GOOGOL_SIZE - 1] = 0;
+		}
+
+		if (bits > (-64 * VHACD_GOOGOL_SIZE))
+		{
+			int n = LeadingZeros(mantissa[0]) - 2;
+			if (n > 0) 
+			{
+				uint64_t carrier = 0;
+				for (int i = VHACD_GOOGOL_SIZE - 1; i >= 0; i--) 
+				{
+					uint64_t a = mantissa[i];
+					mantissa[i] = (a << n) | carrier;
+					carrier = a >> (64 - n);
+				}
+				bits -= n;
+			}
+			else if (n < 0)
+			{
+				// this is very rare but it does happens, whee the leading zeros of the mantissa is an exact multiple of 64
+				uint64_t carrier = 0;
+				int shift = -n;
+				for (int i = 0; i < VHACD_GOOGOL_SIZE; i++)
+				{
+					uint64_t a = mantissa[i];
+					mantissa[i] = (a >> shift) | carrier;
+					carrier = a << (64 - shift);
+				}
+				bits -= n;
+			}
+		}
+	}
+	return bits;
+}
+
+uint64_t vhacdGoogol::CheckCarrier(uint64_t a, uint64_t b) const
+{
+	return ((uint64_t(-1) - b) < a) ? uint64_t(1) : 0;
+}
+
+void vhacdGoogol::ExtendeMultiply(uint64_t a, uint64_t b, uint64_t& high, uint64_t& low) const
+{
+	uint64_t bLow = b & 0xffffffff;
+	uint64_t bHigh = b >> 32;
+	uint64_t aLow = a & 0xffffffff;
+	uint64_t aHigh = a >> 32;
+
+	uint64_t l = bLow * aLow;
+
+	uint64_t c1 = bHigh * aLow;
+	uint64_t c2 = bLow * aHigh;
+	uint64_t m = c1 + c2;
+	uint64_t carrier = CheckCarrier(c1, c2) << 32;
+
+	uint64_t h = bHigh * aHigh + carrier;
+
+	uint64_t ml = m << 32;
+	uint64_t ll = l + ml;
+	uint64_t mh = (m >> 32) + CheckCarrier(l, ml);
+	uint64_t hh = h + mh;
+
+	low = ll;
+	high = hh;
+}
+
+vhacdGoogol vhacdGoogol::operator+= (const vhacdGoogol &A)
+{
+	*this = *this + A;
+	return *this;
+}
+
+vhacdGoogol vhacdGoogol::operator-= (const vhacdGoogol &A)
+{
+	*this = *this - A;
+	return *this;
+}
+
+bool vhacdGoogol::operator> (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(*this - A);
+	return double(tmp) > 0.0;
+}
+
+bool vhacdGoogol::operator>= (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(*this - A);
+	return double(tmp) >= 0.0;
+}
+
+bool vhacdGoogol::operator< (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(*this - A);
+	return double(tmp) < 0.0;
+}
+
+bool vhacdGoogol::operator<= (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(*this - A);
+	return double(tmp) <= 0.0;
+}
+
+bool vhacdGoogol::operator== (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(*this - A);
+	return double(tmp) == 0.0;
+}
+
+bool vhacdGoogol::operator!= (const vhacdGoogol &A) const
+{
+	vhacdGoogol tmp(*this - A);
+	return double(tmp) != 0.0;
+}
+
+void vhacdGoogol::Trace() const
+{
+	//dTrace (("%f ", double (*this)));
+}
 
 inline int dExp2(int x)
 {
@@ -54,51 +585,6 @@ inline int dBitReversal(int v, int base)
 	return x;
 }
 
-class hullPlane : public hullVector
-{
-	public:
-	//hullPlane();
-	//hullPlane(const hullVector& point);
-	hullPlane(double x, double y, double z, double w)
-		:hullVector(x, y, z, 0.0)
-		,m_w(w)
-	{
-	}
-	//hullPlane(const hullVector &normal, double distance);
-	hullPlane(const hullVector &P0, const hullVector &P1, const hullVector &P2)
-		:hullVector((P1 - P0).CrossProduct(P2 - P0))
-	{
-		m_w = -DotProduct(P0);
-	}
-
-	hullPlane Scale(double s) const
-	{
-		return hullPlane(X() * s, Y() * s, Z() * s, m_w * s);
-	}
-
-	inline hullPlane operator= (const hullPlane &rhs)
-	{
-		X() = rhs.X();
-		Y() = rhs.Y();
-		Z() = rhs.Z();
-		m_w = rhs.m_w;
-		return *this;
-	}
-
-	inline hullVector operator*(const hullVector & rhs) const
-	{
-		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
-	}
-
-
-	//hullPlane Scale(double s) const;
-	//double Evalue(const double* const point) const;
-	//double Evalue(const hullVector &point) const;
-
-	double m_w;
-};
-
-
 template <class T>
 inline void vhacdSwap(T& A, T& B)
 {
@@ -106,7 +592,6 @@ inline void vhacdSwap(T& A, T& B)
 	A = B;
 	B = tmp;
 }
-
 
 template <class T, class dCompareKey>
 void vhacdSort(T* const array, int elements, void* const context = nullptr)
@@ -209,7 +694,86 @@ void vhacdSort(T* const array, int elements, void* const context = nullptr)
 	#endif
 }
 
-#if 0
+#define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))
+
+static double Determinant2x2(const double matrix[2][2], double* const error)
+{
+	double a00xa11 = matrix[0][0] * matrix[1][1];
+	double a01xa10 = matrix[0][1] * matrix[1][0];
+	*error = Absolute(a00xa11) + Absolute(a01xa10);
+	return a00xa11 - a01xa10;
+}
+
+static double Determinant3x3 (const double matrix[3][3], double* const error)
+{
+	double sign = double (-1.0f);
+	double det = double (0.0f);
+	double accError = double (0.0f); 
+	for (int i = 0; i < 3; i ++)  
+	{
+		double cofactor[2][2];
+		for (int j = 0; j < 2; j ++) 
+		{
+			int k0 = 0;
+			for (int k = 0; k < 3; k ++) 
+			{
+				if (k != i) 
+				{
+					cofactor[j][k0] = matrix[j][k];
+					k0 ++;
+				}
+			}
+		}
+
+		double parcialError;
+		double minorDet = Determinant2x2 (cofactor, &parcialError);
+		accError += parcialError * Absolute (matrix[2][i]);
+		det += sign * minorDet * matrix[2][i];
+		sign *= double (-1.0f);
+	}
+
+	*error = accError;
+	return det;
+}
+
+static vhacdGoogol Determinant2x2(const vhacdGoogol matrix[2][2])
+{
+	vhacdGoogol a00xa11(matrix[0][0] * matrix[1][1]);
+	vhacdGoogol a01xa10(matrix[0][1] * matrix[1][0]);
+	return a00xa11 - a01xa10;
+}
+
+
+static vhacdGoogol Determinant3x3(const vhacdGoogol matrix[3][3])
+{
+	vhacdGoogol negOne(double(-1.0f));
+	vhacdGoogol sign(double(-1.0f));
+	vhacdGoogol det = double(0.0f);
+	for (int i = 0; i < 3; i++)
+	{
+		vhacdGoogol cofactor[2][2];
+		for (int j = 0; j < 2; j++)
+		{
+			int k0 = 0;
+			for (int k = 0; k < 3; k++)
+			{
+				if (k != i)
+				{
+					cofactor[j][k0] = matrix[j][k];
+					k0++;
+				}
+			}
+		}
+
+		vhacdGoogol minorDet(Determinant2x2(cofactor));
+		det = det + sign * minorDet * matrix[2][i];
+		sign = sign * negOne;
+	}
+	return det;
+}
+
+
+
 vhacdConvexHullFace::vhacdConvexHullFace()
 {
 	m_mark = 0;
@@ -218,21 +782,33 @@ vhacdConvexHullFace::vhacdConvexHullFace()
 	m_twin[2] = nullptr;
 }
 
-double vhacdConvexHullFace::Evalue (const hullVector* const pointArray, const hullVector& point) const
+hullPlane vhacdConvexHullFace::GetPlaneEquation(const hullVector* const pointArray) const
+{
+	const hullVector& p0 = pointArray[m_index[0]];
+	const hullVector& p1 = pointArray[m_index[1]];
+	const hullVector& p2 = pointArray[m_index[2]];
+	hullPlane plane(p0, p1, p2);
+	//plane = plane.Scale(1.0f / sqrt(plane.DotProduct(plane & hullVector::m_triplexMask).GetScalar()));
+	plane = plane.Scale(1.0f / sqrt(plane.DotProduct(plane)));
+	return plane;
+}
+
+double vhacdConvexHullFace::Evalue(const hullVector* const pointArray, const hullVector& point) const
 {
 	const hullVector& p0 = pointArray[m_index[0]];
 	const hullVector& p1 = pointArray[m_index[1]];
 	const hullVector& p2 = pointArray[m_index[2]];
 
 	double matrix[3][3];
-	for (int i = 0; i < 3; i ++) {
+	for (int i = 0; i < 3; i++) 
+	{
 		matrix[0][i] = p2[i] - p0[i];
 		matrix[1][i] = p1[i] - p0[i];
 		matrix[2][i] = point[i] - p0[i];
 	}
 
 	double error;
-	double det = Determinant3x3 (matrix, &error);
+	double det = Determinant3x3(matrix, &error);
 
 	// the code use double, however the threshold for accuracy test is the machine precision of a float.
 	// by changing this to a smaller number, the code should run faster since many small test will be considered valid
@@ -240,32 +816,24 @@ double vhacdConvexHullFace::Evalue (const hullVector* const pointArray, const hu
 	// float64(1<<30) can be a good value
 
 	// double precision	= double (1.0f) / double (1<<30);
-	double precision	 = double (1.0f) / double (1<<24);
+	double precision = double(1.0f) / double(1 << 24);
 	double errbound = error * precision;
-	if (fabs(det) > errbound) {
+	if (fabs(det) > errbound) 
+	{
 		return det;
 	}
-
-	ndGoogol exactMatrix[3][3];
-	for (int i = 0; i < 3; i ++) {
-		exactMatrix[0][i] = ndGoogol(p2[i]) - ndGoogol(p0[i]);
-		exactMatrix[1][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
-		exactMatrix[2][i] = ndGoogol(point[i]) - ndGoogol(p0[i]);
+	
+	vhacdGoogol exactMatrix[3][3];
+	for (int i = 0; i < 3; i++) 
+	{
+		exactMatrix[0][i] = vhacdGoogol(p2[i]) - vhacdGoogol(p0[i]);
+		exactMatrix[1][i] = vhacdGoogol(p1[i]) - vhacdGoogol(p0[i]);
+		exactMatrix[2][i] = vhacdGoogol(point[i]) - vhacdGoogol(p0[i]);
 	}
 	return Determinant3x3(exactMatrix);
 }
 
-hullPlane vhacdConvexHullFace::GetPlaneEquation (const hullVector* const pointArray) const
-{
-	const hullVector& p0 = pointArray[m_index[0]];
-	const hullVector& p1 = pointArray[m_index[1]];
-	const hullVector& p2 = pointArray[m_index[2]];
-	hullPlane plane (p0, p1, p2);
-	plane = plane.Scale (1.0f / sqrt (plane.DotProduct(plane & hullVector::m_triplexMask).GetScalar()));
-	return plane;
-}
-
-
+#if 0
 vhacdConvexHull::vhacdConvexHull ()
 	:ndList<vhacdConvexHullFace>()
 	,m_aabbP0(hullVector (double (0.0f)))
@@ -316,16 +884,6 @@ vhacdConvexHull::~vhacdConvexHull(void)
 {
 }
 
-vhacdConvexHull::ndNode* vhacdConvexHull::AddFace (int i0, int i1, int i2)
-{
-	ndNode* const node = Append();
-	vhacdConvexHullFace& face = node->GetInfo();
-
-	face.m_index[0] = i0;
-	face.m_index[1] = i1;
-	face.m_index[2] = i2;
-	return node;
-}
 
 void vhacdConvexHull::DeleteFace (ndNode* const node)
 {
@@ -614,11 +1172,9 @@ class vhacdConvexHull::ndNormalMap
 
 
 vhacdConvexHull::vhacdConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
-	//:ndList<vhacdConvexHullFace>()
-	:list<vhacdConvexHullFace>()
+	:vhacdList<vhacdConvexHullFace>()
 	,m_aabbP0(0)
 	,m_aabbP1(0)
-	,m_count(0)
 	,m_diag()
 	,m_points()
 {
@@ -640,7 +1196,7 @@ void vhacdConvexHull::BuildHull(const double* const vertexCloud, int strideInByt
 	treePool.resize(treeCount + 256);
 	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], sizeof (vhacdConvexHull3dPointCluster) * int (treePool.size()));
 
-	if (m_count >= 4)
+	if (m_points.size() >= 4)
 	{
 		CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
 	}
@@ -945,7 +1501,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	count = GetUniquePoints(points, vertexCloud, strideInBytes, count, memoryPool, maxMemSize);
 	if (count < 4)
 	{
-		m_count = 0;
+		m_points.resize(0);
 		return count;
 	}
 	vhacdConvexHullAABBTreeNode* tree = BuildTree(nullptr, points, count, 0, (char**)&memoryPool, maxMemSize);
@@ -981,7 +1537,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	}
 	if (!validTetrahedrum)
 	{
-		m_count = 0;
+		m_points.resize(0);
 		_ASSERT(0);
 		return count;
 	}
@@ -1007,7 +1563,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	
 	if (!validTetrahedrum)
 	{
-		m_count = 0;
+		m_points.resize(0);
 		_ASSERT(0);
 		return count;
 	}
@@ -1063,12 +1619,12 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	if (!validTetrahedrum)
 	{
 		// the points do not form a convex hull
-		m_count = 0;
+		m_points.resize(0);
 		//_ASSERT (0);
 		return count;
 	}
 	
-	m_count = 4;
+	m_points.resize(4);
 	double volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
 	if (volume > double(0.0f))
 	{
@@ -1078,10 +1634,19 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	return count;
 }
 
+vhacdConvexHull::ndNode* vhacdConvexHull::AddFace(int i0, int i1, int i2)
+{
+	ndNode* const node = Append();
+	vhacdConvexHullFace& face = node->GetInfo();
+
+	face.m_index[0] = i0;
+	face.m_index[1] = i1;
+	face.m_index[2] = i2;
+	return node;
+}
 
 void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount)
 {
-#if 0
 	distTol = fabs(distTol) * m_diag;
 	ndNode* const f0Node = AddFace(0, 1, 2);
 	ndNode* const f1Node = AddFace(0, 2, 3);
@@ -1093,35 +1658,44 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 	vhacdConvexHullFace* const f2 = &f2Node->GetInfo();
 	vhacdConvexHullFace* const f3 = &f3Node->GetInfo();
 
-	f0->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
-	f0->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
-	f0->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
+	f0->m_twin[0] = f3Node;
+	f0->m_twin[1] = f2Node;
+	f0->m_twin[2] = f1Node;
 
-	f1->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
-	f1->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
-	f1->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
+	f1->m_twin[0] = f0Node;
+	f1->m_twin[1] = f2Node;
+	f1->m_twin[2] = f3Node;
 
-	f2->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
-	f2->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f3Node;
-	f2->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
+	f2->m_twin[0] = f0Node;
+	f2->m_twin[1] = f3Node;
+	f2->m_twin[2] = f1Node;
 
-	f3->m_twin[0] = (ndList<vhacdConvexHullFace>::ndNode*)f0Node;
-	f3->m_twin[1] = (ndList<vhacdConvexHullFace>::ndNode*)f1Node;
-	f3->m_twin[2] = (ndList<vhacdConvexHullFace>::ndNode*)f2Node;
-
-	ndList<ndNode*> boundaryFaces;
-
+	f3->m_twin[0] = f0Node;
+	f3->m_twin[1] = f1Node;
+	f3->m_twin[2] = f2Node;
+	
+	vhacdList<ndNode*> boundaryFaces;
 	boundaryFaces.Append(f0Node);
 	boundaryFaces.Append(f1Node);
 	boundaryFaces.Append(f2Node);
 	boundaryFaces.Append(f3Node);
+
+	m_points.resize(count);
+
 	count -= 4;
 	maxVertexCount -= 4;
 	int currentIndex = 4;
 
-	ndStack<ndNode*> stackPool(1024 + m_count);
-	ndStack<ndNode*> coneListPool(1024 + m_count);
-	ndStack<ndNode*> deleteListPool(1024 + m_count);
+	//ndStack<ndNode*> stackPool(1024 + m_count);
+	//ndStack<ndNode*> coneListPool(1024 + m_count);
+	//ndStack<ndNode*> deleteListPool(1024 + m_count);
+	std::vector<ndNode*> stackPool;
+	std::vector<ndNode*> coneListPool;
+	std::vector<ndNode*> deleteListPool;
+
+	stackPool.resize(1024 + count);
+	coneListPool.resize(1024 + count);
+	deleteListPool.resize(1024 + count);
 
 	ndNode** const stack = &stackPool[0];
 	ndNode** const coneList = &stackPool[0];
@@ -1143,14 +1717,8 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 		// yes that is correct, it does not makes a difference if you build a N point hull from 100 vertex
 		// or from 100000 vertex input array.
 
-#if 0
-		// using stack (faster)
-		dNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
-#else
 		// using a queue (some what slower by better hull when reduced vertex count is desired)
 		ndNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
-#endif
-
 		vhacdConvexHullFace* const face = &faceNode->GetInfo();
 		hullPlane planeEquation(face->GetPlaneEquation(&m_points[0]));
 
@@ -1160,9 +1728,8 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 
 		if ((dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f)))
 		{
-			_ASSERT(Sanity());
-
-			_ASSERT(faceNode);
+			//_ASSERT(Sanity());
+			//_ASSERT(faceNode);
 			stack[0] = faceNode;
 
 			int stackIndex = 1;
@@ -1173,38 +1740,38 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 				stackIndex--;
 				ndNode* const node1 = stack[stackIndex];
 				vhacdConvexHullFace* const face1 = &node1->GetInfo();
-
+			
 				if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > double(0.0f)))
 				{
-#ifdef _DEBUG
+					#ifdef _DEBUG
 					for (int i = 0; i < deletedCount; i++)
 					{
 						_ASSERT(deleteList[i] != node1);
 					}
-#endif
-
+					#endif
+			
 					deleteList[deletedCount] = node1;
 					deletedCount++;
-					_ASSERT(deletedCount < int(deleteListPool.GetElementsCount()));
+					_ASSERT(deletedCount < int(deleteListPool.size()));
 					face1->m_mark = 1;
 					for (int i = 0; i < 3; i++)
 					{
-						ndNode* const twinNode = (ndNode*)face1->m_twin[i];
+						ndNode* const twinNode = face1->m_twin[i];
 						_ASSERT(twinNode);
 						vhacdConvexHullFace* const twinFace = &twinNode->GetInfo();
 						if (!twinFace->m_mark)
 						{
 							stack[stackIndex] = twinNode;
 							stackIndex++;
-							_ASSERT(stackIndex < int(stackPool.GetElementsCount()));
+							_ASSERT(stackIndex < int(stackPool.size()));
 						}
 					}
 				}
 			}
-
+			
 			m_points[currentIndex] = points[index];
 			points[index].m_mark = 1;
-
+			
 			int newCount = 0;
 			for (int i = 0; i < deletedCount; i++)
 			{
@@ -1220,7 +1787,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 						int j1 = (j0 == 2) ? 0 : j0 + 1;
 						ndNode* const newNode = AddFace(currentIndex, face1->m_index[j0], face1->m_index[j1]);
 						boundaryFaces.Addtop(newNode);
-
+			
 						vhacdConvexHullFace* const newFace = &newNode->GetInfo();
 						newFace->m_twin[1] = twinNode;
 						for (int k = 0; k < 3; k++)
@@ -1232,17 +1799,18 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 						}
 						coneList[newCount] = newNode;
 						newCount++;
-						_ASSERT(newCount < int(coneListPool.GetElementsCount()));
+						_ASSERT(newCount < int(coneListPool.size()));
 					}
 				}
 			}
-
+			
 			for (int i = 0; i < newCount - 1; i++)
 			{
 				ndNode* const nodeA = coneList[i];
 				vhacdConvexHullFace* const faceA = &nodeA->GetInfo();
 				_ASSERT(faceA->m_mark == 0);
-				for (int j = i + 1; j < newCount; j++) {
+				for (int j = i + 1; j < newCount; j++) 
+				{
 					ndNode* const nodeB = coneList[j];
 					vhacdConvexHullFace* const faceB = &nodeB->GetInfo();
 					_ASSERT(faceB->m_mark == 0);
@@ -1253,7 +1821,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 						break;
 					}
 				}
-
+			
 				for (int j = i + 1; j < newCount; j++)
 				{
 					ndNode* const nodeB = coneList[j];
@@ -1267,12 +1835,12 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 					}
 				}
 			}
-
+			
 			for (int i = 0; i < deletedCount; i++)
 			{
 				ndNode* const node = deleteList[i];
 				boundaryFaces.Remove(node);
-				DeleteFace(node);
+				Remove(node);
 			}
 
 			maxVertexCount--;
@@ -1284,6 +1852,5 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 			boundaryFaces.Remove(faceNode);
 		}
 	}
-	m_count = currentIndex;
-#endif
+	m_points.resize(currentIndex);
 }

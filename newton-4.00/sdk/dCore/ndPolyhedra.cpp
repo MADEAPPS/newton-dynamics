@@ -2955,9 +2955,11 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 		}
 		
 		//ndVector* const dst = (ndVector*)&pool[0].m_x;
-		for (ndInt32 i = 0; i < convexHull.GetVertexCount(); i++) 
+		//ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
+		const ndArray<ndBigVector>& hullVertexArray = convexHull.GetVertexPool();
+		for (ndInt32 i = 0; i < hullVertexArray.GetCount(); i++)
 		{
-			pool[i] = convexHull.GetVertex(i);
+			pool[i] = hullVertexArray[i];
 		}
 
 		ndVector eigen;

@@ -171,7 +171,9 @@ ndFloat64 ndConvexHull3dFace::Evalue (const ndBigVector* const pointArray, const
 		exactMatrix[1][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
 		exactMatrix[2][i] = ndGoogol(point[i]) - ndGoogol(p0[i]);
 	}
-	return Determinant3x3(exactMatrix);
+
+	ndFloat64 ret = Determinant3x3(exactMatrix);
+	return ret;
 }
 
 ndBigPlane ndConvexHull3dFace::GetPlaneEquation (const ndBigVector* const pointArray) const
@@ -184,12 +186,11 @@ ndBigPlane ndConvexHull3dFace::GetPlaneEquation (const ndBigVector* const pointA
 	return plane;
 }
 
-
 ndConvexHull3d::ndConvexHull3d ()
 	:ndList<ndConvexHull3dFace>()
 	,m_aabbP0(ndBigVector (ndFloat64 (0.0f)))
 	,m_aabbP1(ndBigVector (ndFloat64 (0.0f)))
-	,m_count(0)
+	//,m_count(0)
 	,m_diag()
 	,m_points()
 {
@@ -199,13 +200,13 @@ ndConvexHull3d::ndConvexHull3d(const ndConvexHull3d& source)
 	:ndList<ndConvexHull3dFace>()
 	,m_aabbP0 (source.m_aabbP0)
 	,m_aabbP1 (source.m_aabbP1)
-	,m_count(source.m_count)
+	//,m_count(source.m_count)
 	,m_diag(source.m_diag)
-	,m_points(source.m_count)
+	,m_points(source.GetCount())
 {
-	m_points.SetCount(source.m_count);
-	m_points[m_count-1].m_w = ndFloat64 (0.0f);
-	for (ndInt32 i = 0; i < m_count; i ++) 
+	m_points.SetCount(source.GetCount());
+	m_points[source.GetCount()-1].m_w = ndFloat64 (0.0f);
+	for (ndInt32 i = 0; i < source.GetCount(); i ++)
 	{
 		m_points[i] = source.m_points[i];
 	}
@@ -234,7 +235,7 @@ ndConvexHull3d::ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strid
 	:ndList<ndConvexHull3dFace>()
 	,m_aabbP0(ndBigVector::m_zero)
 	,m_aabbP1(ndBigVector::m_zero)
-	,m_count(0)
+	//,m_count(0)
 	,m_diag()
 	,m_points()
 {
@@ -261,7 +262,7 @@ void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], treePool.GetSizeInBytes());
 
 #ifdef	D_OLD_CONVEXHULL_3D
-	if (m_count >= 4) 
+	if (m_points.GetCount() >= 4)
 	{
 		CalculateConvexHull3d (&treePool[0], &points[0], count, distTol, maxVertexCount);
 	}
@@ -478,7 +479,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, cons
 	count = GetUniquePoints(points, vertexCloud, strideInBytes, count, memoryPool, maxMemSize);
 	if (count < 4) 
 	{
-		m_count = 0;
+		m_points.SetCount(0);
 		return count;
 	}
 	ndConvexHull3dAABBTreeNode* tree = BuildTree (nullptr, points, count, 0, (ndInt8**) &memoryPool, maxMemSize);
@@ -518,7 +519,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, cons
 	}
 	if (!validTetrahedrum) 
 	{
-		m_count = 0;
+		m_points.SetCount(0);
 		dAssert (0);
 		return count;
 	}
@@ -547,7 +548,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, cons
 	dAssert(normal.m_w == ndFloat32(0.0f));
 	if (!validTetrahedrum) 
 	{
-		m_count = 0;
+		m_points.SetCount(0);
 		dAssert (0);
 		return count;
 	}
@@ -606,12 +607,13 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, cons
 	if (!validTetrahedrum) 
 	{
 		// the points do not form a convex hull
-		m_count = 0;
+		m_points.SetCount(0);
 		//dAssert (0);
 		return count;
 	}
 
-	m_count = 4;
+	//m_count = 4;
+	m_points.SetCount(4);
 	ndFloat64 volume = TetrahedrumVolume (m_points[0], m_points[1], m_points[2], m_points[3]);
 	if (volume > ndFloat64 (0.0f)) 
 	{
@@ -873,22 +875,23 @@ bool ndConvexHull3d::CheckFlatSurface(ndConvexHull3dAABBTreeNode* tree, ndConvex
 		}
 	}
 	points[index].m_mark = 1;
-	if (volume > ndFloat64(0.0f)) {
+	if (volume > ndFloat64(0.0f)) 
+	{
 		dSwap(m_points[2], m_points[3]);
 	}
 	dAssert(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < ndFloat64(0.0f));
-	m_count = 4;
+	//m_count = 4;
+	m_points.SetCount(4);
 	return false;
 }
 
-
 void ndConvexHull3d::CalculateConvexHull2d(ndConvexHull3dAABBTreeNode*, ndConvexHull3dVertex* const, ndInt32, ndFloat64, ndInt32)
 {
-
 }
 
 void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount)
 {
+	m_points.SetCount(count);
 	distTol = dAbs (distTol) * m_diag;
 	ndNode* const f0Node = AddFace (0, 1, 2);
 	ndNode* const f1Node = AddFace (0, 2, 3);
@@ -900,21 +903,21 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 	ndConvexHull3dFace* const f2 = &f2Node->GetInfo();
 	ndConvexHull3dFace* const f3 = &f3Node->GetInfo();
 
-	f0->m_twin[0] = (ndList<ndConvexHull3dFace>::ndNode*)f3Node;
-	f0->m_twin[1] = (ndList<ndConvexHull3dFace>::ndNode*)f2Node;
-	f0->m_twin[2] = (ndList<ndConvexHull3dFace>::ndNode*)f1Node;
+	f0->m_twin[0] = f3Node;
+	f0->m_twin[1] = f2Node;
+	f0->m_twin[2] = f1Node;
 
-	f1->m_twin[0] = (ndList<ndConvexHull3dFace>::ndNode*)f0Node;
-	f1->m_twin[1] = (ndList<ndConvexHull3dFace>::ndNode*)f2Node;
-	f1->m_twin[2] = (ndList<ndConvexHull3dFace>::ndNode*)f3Node;
+	f1->m_twin[0] = f0Node;
+	f1->m_twin[1] = f2Node;
+	f1->m_twin[2] = f3Node;
 
-	f2->m_twin[0] = (ndList<ndConvexHull3dFace>::ndNode*)f0Node;
-	f2->m_twin[1] = (ndList<ndConvexHull3dFace>::ndNode*)f3Node;
-	f2->m_twin[2] = (ndList<ndConvexHull3dFace>::ndNode*)f1Node;
+	f2->m_twin[0] = f0Node;
+	f2->m_twin[1] = f3Node;
+	f2->m_twin[2] = f1Node;
 
-	f3->m_twin[0] = (ndList<ndConvexHull3dFace>::ndNode*)f0Node;
-	f3->m_twin[1] = (ndList<ndConvexHull3dFace>::ndNode*)f1Node;
-	f3->m_twin[2] = (ndList<ndConvexHull3dFace>::ndNode*)f2Node;
+	f3->m_twin[0] = f0Node;
+	f3->m_twin[1] = f1Node;
+	f3->m_twin[2] = f2Node;
 
 	ndList<ndNode*> boundaryFaces;
 
@@ -925,10 +928,10 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 	count -= 4;
 	maxVertexCount -= 4;
 	ndInt32 currentIndex = 4;
-
-	ndStack<ndNode*> stackPool(1024 + m_count);
-	ndStack<ndNode*> coneListPool(1024 + m_count);
-	ndStack<ndNode*> deleteListPool(1024 + m_count);
+	
+	ndStack<ndNode*> stackPool(1024 + count);
+	ndStack<ndNode*> coneListPool(1024 + count);
+	ndStack<ndNode*> deleteListPool(1024 + count);
 
 	ndNode** const stack = &stackPool[0];
 	ndNode** const coneList = &stackPool[0];
@@ -996,7 +999,7 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 					face1->m_mark = 1;
 					for (ndInt32 i = 0; i < 3; i ++) 
 					{
-						ndNode* const twinNode = (ndNode*)face1->m_twin[i];
+						ndNode* const twinNode = face1->m_twin[i];
 						dAssert (twinNode);
 						ndConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 						if (!twinFace->m_mark) 
@@ -1049,7 +1052,8 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 				ndNode* const nodeA = coneList[i];
 				ndConvexHull3dFace* const faceA = &nodeA->GetInfo();
 				dAssert (faceA->m_mark == 0);
-				for (ndInt32 j = i + 1; j < newCount; j ++) {
+				for (ndInt32 j = i + 1; j < newCount; j ++) 
+				{
 					ndNode* const nodeB = coneList[j];
 					ndConvexHull3dFace* const faceB = &nodeB->GetInfo();
 					dAssert (faceB->m_mark == 0);
@@ -1091,9 +1095,9 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 			boundaryFaces.Remove (faceNode);
 		}
 	}
-	m_count = currentIndex;
+	//m_count = currentIndex;
+	m_points.SetCount(currentIndex);
 }
-
 
 void ndConvexHull3d::CalculateVolumeAndSurfaceArea (ndFloat64& volume, ndFloat64& surfaceArea) const
 {

@@ -276,7 +276,8 @@ ndGoogol ndGoogol::Floor () const
 	ndUnsigned64 mask (~0ULL);
 	mask <<= (64 - bits);
 	tmp.m_mantissa[start] &= mask;
-	if (m_sign) {
+	if (m_sign) 
+	{
 		dAssert (0);
 	}
 
@@ -417,10 +418,12 @@ ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 		if (bits > (-64 * ND_GOOGOL_SIZE)) 
 		{
 			ndInt32 n = LeadingZeros (mantissa[0]) - 2;
-			if (n > 0) {
+			if (n > 0) 
+			{
 				dAssert (n > 0);
 				ndUnsigned64 carrier = 0;
-				for (ndInt32 i = ND_GOOGOL_SIZE-1; i >= 0; i --) {
+				for (ndInt32 i = ND_GOOGOL_SIZE-1; i >= 0; i --) 
+				{
 					ndUnsigned64 a = mantissa[i];
 					mantissa[i] = (a << n) | carrier;
 					carrier = a >> (64 - n);

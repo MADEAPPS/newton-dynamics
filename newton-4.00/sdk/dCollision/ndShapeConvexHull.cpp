@@ -177,9 +177,10 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	for (bool success = false; !success; ) 
 	{
 		success = true;
-		const ndBigVector* const hullVertexArray = convexHull->GetVertexPool();
+		//const ndBigVector* const hullVertexArray = convexHull->GetVertexPool();
+		const ndArray<ndBigVector>& hullVertexArray = convexHull->GetVertexPool();
 
-		ndStack<ndInt8> mask(convexHull->GetVertexCount());
+		ndStack<ndInt8> mask(hullVertexArray.GetCount());
 		memset(&mask[0], 1, mask.GetSizeInBytes());
 		for (ndConvexHull3d::ndNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
 		{
@@ -220,7 +221,8 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		if (!success) 
 		{
 			ndInt32 count1 = 0;
-			ndInt32 vertexCount = convexHull->GetVertexCount();
+			//ndInt32 vertexCount = convexHull->GetVertexCount();
+			const ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
 			for (ndInt32 i = 0; i < vertexCount; i++) 
 			{
 				if (mask[i]) 
@@ -235,14 +237,16 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	}
 
 	dAssert(convexHull);
-	ndInt32 vertexCount = convexHull->GetVertexCount();
+	//ndInt32 vertexCount = convexHull->GetVertexCount();
+	ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
 	if (vertexCount < 4) 
 	{
 		delete convexHull;
 		return false;
 	}
 
-	const ndBigVector* const hullVertexArray = convexHull->GetVertexPool();
+	//const ndBigVector* const hullVertexArray = convexHull->GetVertexPool();
+	const ndArray<ndBigVector>& hullVertexArray = convexHull->GetVertexPool();
 	ndPolyhedra polyhedra;
 	polyhedra.BeginFace();
 	for (ndConvexHull3d::ndNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
@@ -254,7 +258,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 
 	if (vertexCount > 4) 
 	{
-		while (RemoveCoplanarEdge(polyhedra, hullVertexArray));
+		while (RemoveCoplanarEdge(polyhedra, &hullVertexArray[0]));
 	}
 
 	ndStack<ndInt32> vertexMap(vertexCount);

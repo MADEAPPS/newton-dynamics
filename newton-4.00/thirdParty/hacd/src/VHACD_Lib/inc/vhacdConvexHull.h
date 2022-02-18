@@ -22,19 +22,237 @@
 #ifndef __ND_CONVEXHULL_3D__
 #define __ND_CONVEXHULL_3D__
 
-#include <list>
 #include <vector>
 #include "vhacdVector.h"
-//#include "ndCoreStdafx.h"
-//#include "ndList.h"
-//#include "ndArray.h"
-//#include "ndPlane.h"
-//#include "ndVector.h"
-//#include "ndMatrix.h"
-//#include "ndQuaternion.h"
 
 class vhacdConvexHullVertex;
 class vhacdConvexHullAABBTreeNode;
+
+template<class T>
+class vhacdList
+{
+	public:
+	class ndNode
+	{
+		ndNode(ndNode* const prev, ndNode* const next)
+			:m_info()
+			,m_next(next)
+			,m_prev(prev)
+		{
+			if (m_prev)
+			{
+				m_prev->m_next = this;
+			}
+			if (m_next)
+			{
+				m_next->m_prev = this;
+			}
+		}
+
+		ndNode(const T &info, ndNode* const prev, ndNode* const next)
+			:m_info(info)
+			,m_next(next)
+			,m_prev(prev)
+		{
+			if (m_prev)
+			{
+				m_prev->m_next = this;
+			}
+			if (m_next)
+			{
+				m_next->m_prev = this;
+			}
+		}
+
+		~ndNode()
+		{
+		}
+
+		void Unlink()
+		{
+			if (m_prev)
+			{
+				m_prev->m_next = m_next;
+			}
+			if (m_next)
+			{
+				m_next->m_prev = m_prev;
+			}
+			m_prev = nullptr;
+			m_next = nullptr;
+		}
+
+		void AddLast(ndNode* const node)
+		{
+			m_next = node;
+			node->m_prev = this;
+		}
+
+		void AddFirst(ndNode* const node)
+		{
+			m_prev = node;
+			node->m_next = this;
+		}
+
+		public:
+		T& GetInfo()
+		{
+			return m_info;
+		}
+
+		ndNode *GetNext() const
+		{
+			return m_next;
+		}
+
+		ndNode *GetPrev() const
+		{
+			return m_prev;
+		}
+
+		private:
+		T m_info;
+		ndNode *m_next;
+		ndNode *m_prev;
+		friend class vhacdList<T>;
+	};
+
+	public:
+	vhacdList()
+		:m_first(nullptr)
+		,m_last(nullptr)
+		,m_count(0)
+	{
+	}
+
+	~vhacdList()
+	{
+		RemoveAll();
+	}
+
+	void RemoveAll()
+	{
+		for (ndNode *node = m_first; node; node = m_first)
+		{
+			m_count--;
+			m_first = node->GetNext();
+			node->Unlink();
+			delete node;
+		}
+		m_last = nullptr;
+		m_first = nullptr;
+	}
+
+	ndNode* Append()
+	{
+		m_count++;
+		if (m_first == nullptr)
+		{
+			m_first = new ndNode(nullptr, nullptr);
+			m_last = m_first;
+		}
+		else
+		{
+			m_last = new ndNode(m_last, nullptr);
+		}
+		return m_last;
+	}
+
+	ndNode* Append(const T &element)
+	{
+		m_count++;
+		if (m_first == nullptr)
+		{
+			m_first = new ndNode(element, nullptr, nullptr);
+			m_last = m_first;
+		}
+		else
+		{
+			m_last = new ndNode(element, m_last, nullptr);
+		}
+		return m_last;
+	}
+
+	ndNode* Addtop(const T &element)
+	{
+		m_count++;
+		if (m_last == nullptr)
+		{
+			m_last = new ndNode(element, nullptr, nullptr);
+			m_first = m_last;
+		}
+		else
+		{
+			m_first = new ndNode(element, nullptr, m_first);
+		}
+		return m_first;
+	}
+
+	int GetCount() const
+	{
+		return m_count;
+	}
+	
+	//operator int() const;
+	
+	ndNode* GetLast() const
+	{
+		return m_last;
+	}
+
+	ndNode* GetFirst() const
+	{
+		return m_first;
+	}
+		
+	void Remove(ndNode* const node)
+	{
+		Unlink(node);
+		delete node;
+	}
+
+	void Unlink(ndNode* const node)
+	{
+		m_count--;
+		if (node == m_first)
+		{
+			m_first = m_first->GetNext();
+		}
+		if (node == m_last)
+		{
+			m_last = m_last->GetPrev();
+		}
+		node->Unlink();
+	}
+
+	void Remove(const T &element)
+	{
+		ndNode *const node = Find(element);
+		if (node)
+		{
+			Remove(node);
+		}
+	}
+
+	ndNode* Find(const T &element) const
+	{
+		ndNode *node;
+		for (node = m_first; node; node = node->GetNext())
+		{
+			if (element == node->m_info)
+			{
+				break;
+			}
+		}
+		return node;
+	}
+
+	private:
+	ndNode* m_first;
+	ndNode* m_last;
+	int m_count;
+	friend class ndNode;
+};
 
 class hullVector : public VHACD::Vec3<double>
 {
@@ -112,104 +330,101 @@ class hullVector : public VHACD::Vec3<double>
 		Z() = rhs.Z();
 		return *this;
 	}
-
-
 };
+
+class hullPlane : public hullVector
+{
+	public:
+	hullPlane(double x, double y, double z, double w)
+		:hullVector(x, y, z, 0.0)
+		, m_w(w)
+	{
+	}
+
+	hullPlane(const hullVector &P0, const hullVector &P1, const hullVector &P2)
+		:hullVector((P1 - P0).CrossProduct(P2 - P0))
+	{
+		m_w = -DotProduct(P0);
+	}
+
+	hullPlane Scale(double s) const
+	{
+		return hullPlane(X() * s, Y() * s, Z() * s, m_w * s);
+	}
+
+	inline hullPlane operator= (const hullPlane &rhs)
+	{
+		X() = rhs.X();
+		Y() = rhs.Y();
+		Z() = rhs.Z();
+		m_w = rhs.m_w;
+		return *this;
+	}
+
+	inline hullVector operator*(const hullVector & rhs) const
+	{
+		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
+	}
+
+	double Evalue(const hullVector &point) const
+	{
+		return DotProduct(point) + m_w;
+	}
+
+	double m_w;
+};
+
+
+class vhacdConvexHullFace;
 
 class vhacdConvexHullFace
 {
 	public:
 	vhacdConvexHullFace();
+	double Evalue (const hullVector* const pointArray, const hullVector& point) const;
+	hullPlane GetPlaneEquation (const hullVector* const pointArray) const;
 	
-	//void SetMark(int mark) {m_mark = mark;}
-	//int GetMark() const {return m_mark;}
-	//ndList<vhacdConvexHullFace>::ndNode* GetTwin(int index) const { return m_twin[index];}
-	//
-	//private:
-	//double Evalue (const hullVector* const pointArray, const hullVector& point) const;
-	//ndBigPlane GetPlaneEquation (const hullVector* const pointArray) const;
-	//
-	//public:
-	//int m_index[3]; 
-	//private:
-	//int m_mark;
-	//ndList<vhacdConvexHullFace>::ndNode* m_twin[3];
-	//friend class vhacdConvexHull;
+	public:
+	int m_index[3]; 
+	private:
+	int m_mark;
+	vhacdList<vhacdConvexHullFace>::ndNode* m_twin[3];
+	
+	friend class vhacdConvexHull;
 };
 
-//class vhacdConvexHull: public ndList<vhacdConvexHullFace>
-class vhacdConvexHull: public std::list<vhacdConvexHullFace>
+class vhacdConvexHull: public vhacdList<vhacdConvexHullFace>
 {
 	class ndNormalMap;
 	public:
 	vhacdConvexHull(const vhacdConvexHull& source);
 	vhacdConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
-	//virtual ~vhacdConvexHull();
-	//
-	//int GetVertexCount() const;
+	//~vhacdConvexHull();
+		
 	const std::vector<hullVector>& GetVertexPool() const;
-	//const hullVector& GetVertex(int i) const;
-	//
-	//double GetDiagonal() const;
-	//void GetAABB (hullVector& boxP0, hullVector& boxP1) const;
-	//double RayCast (const hullVector& localP0, const hullVector& localP1) const;
-	//void CalculateVolumeAndSurfaceArea (double& volume, double& surcafeArea) const;
-	//
-	//protected:
+
 	private:
-	//vhacdConvexHull();
 	void BuildHull (const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount);
 
 	int GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
 	int InitVertexArray(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
 	vhacdConvexHullAABBTreeNode* BuildTree (vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** const memoryPool, int& maxMemSize) const;
 
-	//virtual ndNode* AddFace (int i0, int i1, int i2);
-	//virtual void DeleteFace (ndNode* const node) ;
+	ndNode* AddFace (int i0, int i1, int i2);
 	
-	
-	//bool CheckFlatSurface(vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
-	//void CalculateConvexHull2d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	void CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
 	
 	int SupportVertex (vhacdConvexHullAABBTreeNode** const tree, const vhacdConvexHullVertex* const points, const hullVector& dir, const bool removeEntry = true) const;
 	double TetrahedrumVolume (const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
-	
-	////static int ConvexCompareVertex(const vhacdConvexHullVertex* const A, const vhacdConvexHullVertex* const B, void* const context);
-	//bool Sanity() const;
-	//void Save (const char* const filename) const;
-	//
+
 	hullVector m_aabbP0;
 	hullVector m_aabbP1;
-	int m_count;
 	double m_diag;
 	std::vector<hullVector> m_points;
 };
-
-//inline int vhacdConvexHull::GetVertexCount() const
-//{
-//	return m_count;
-//}
 
 inline const std::vector<hullVector>& vhacdConvexHull::GetVertexPool() const
 {
 	return m_points;
 }
-
-//inline const hullVector& vhacdConvexHull::GetVertex(int index) const
-//{
-//	return m_points[index];
-//}
-//
-//inline double vhacdConvexHull::GetDiagonal() const
-//{
-//	return m_diag;
-//}
-//
-//inline void vhacdConvexHull::GetAABB (hullVector& boxP0, hullVector& boxP1) const
-//{
-//	boxP0 = m_aabbP0;
-//	boxP1 = m_aabbP1;
-//}
-
 #endif

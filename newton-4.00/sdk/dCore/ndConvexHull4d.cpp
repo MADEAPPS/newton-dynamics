@@ -230,7 +230,8 @@ ndFloat64 ndConvexHull4dTetraherum::Evalue (const ndConvexHull4dVector* const po
 	const ndBigVector &p3 = pointArray[m_faces[0].m_index[3]];
 
 	ndFloat64 matrix[4][4];
-	for (ndInt32 i = 0; i < 4; i ++) {
+	for (ndInt32 i = 0; i < 4; i ++) 
+	{
 		matrix[0][i] = p1[i] - p0[i];
 		matrix[1][i] = p2[i] - p0[i];
 		matrix[2][i] = p3[i] - p0[i];
@@ -241,12 +242,14 @@ ndFloat64 ndConvexHull4dTetraherum::Evalue (const ndConvexHull4dVector* const po
 	ndFloat64 det = Determinant4x4 (matrix, &error);
 	ndFloat64 precision  = ndFloat64 (1.0f) / ndFloat64 (1<<24);
 	ndFloat64 errbound = error * precision; 
-	if (fabs(det) > errbound) {
+	if (fabs(det) > errbound) 
+	{
 		return det;
 	}
 
 	ndGoogol exactMatrix[4][4];
-	for (ndInt32 i = 0; i < 4; i ++) {
+	for (ndInt32 i = 0; i < 4; i ++) 
+	{
 		exactMatrix[0][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
 		exactMatrix[1][i] = ndGoogol(p2[i]) - ndGoogol(p0[i]);
 		exactMatrix[2][i] = ndGoogol(p3[i]) - ndGoogol(p0[i]);
@@ -263,7 +266,8 @@ ndFloat64 ndConvexHull4dTetraherum::GetTetraVolume(const ndConvexHull4dVector* c
 	const ndBigVector &p3 = points[m_faces[0].m_index[3]];
 
 	ndFloat64 matrix[3][3];
-	for (ndInt32 i = 0; i < 3; i++) {
+	for (ndInt32 i = 0; i < 3; i++) 
+	{
 		matrix[0][i] = p2[i] - p0[i];
 		matrix[1][i] = p1[i] - p0[i];
 		matrix[2][i] = p3[i] - p0[i];
@@ -274,12 +278,14 @@ ndFloat64 ndConvexHull4dTetraherum::GetTetraVolume(const ndConvexHull4dVector* c
 
 	ndFloat64 precision = ndFloat64(1.0f) / ndFloat64(1 << 24);
 	ndFloat64 errbound = error * precision;
-	if (fabs(det) > errbound) {
+	if (fabs(det) > errbound) 
+	{
 		return det;
 	}
 
 	ndGoogol exactMatrix[3][3];
-	for (ndInt32 i = 0; i < 3; i++) {
+	for (ndInt32 i = 0; i < 3; i++) 
+	{
 		exactMatrix[0][i] = ndGoogol(p2[i]) - ndGoogol(p0[i]);
 		exactMatrix[1][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
 		exactMatrix[2][i] = ndGoogol(p3[i]) - ndGoogol(p0[i]);

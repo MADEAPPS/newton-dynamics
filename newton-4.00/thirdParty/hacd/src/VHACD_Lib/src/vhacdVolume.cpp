@@ -448,10 +448,8 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
             ++p;
         }
 
-        //btConvexHullComputer ch;
 		vhacdConvexHull ch((double*)points, 3 * sizeof(double), int(q), 1.0e-5f);
 		
-        //ch.compute((double*)points, 3 * sizeof(double), (int32_t)q, -1.0, -1.0);
 		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
         for (int32_t v = 0; v < convexPoints.size(); v++)
 		{
@@ -460,29 +458,21 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
     }
     delete[] points;
 	
-	_ASSERT(0);
-    //points = cpoints.Data();
-    //btConvexHullComputer ch;
-    //ch.compute((double*)points, 3 * sizeof(double), (int32_t)cpoints.Size(), -1.0, -1.0);
-    //meshCH.ResizePoints(0);
-    //meshCH.ResizeTriangles(0);
-    //for (int32_t v = 0; v < ch.vertices.size(); v++) {
-    //    meshCH.AddPoint(Vec3<double>(ch.vertices[v].getX(), ch.vertices[v].getY(), ch.vertices[v].getZ()));
-    //}
-    //const int32_t nt = ch.faces.size();
-    //for (int32_t t = 0; t < nt; ++t) {
-    //    const btConvexHullComputer::Edge* sourceEdge = &(ch.edges[ch.faces[t]]);
-    //    int32_t a = sourceEdge->getSourceVertex();
-    //    int32_t b = sourceEdge->getTargetVertex();
-    //    const btConvexHullComputer::Edge* edge = sourceEdge->getNextEdgeOfFace();
-    //    int32_t c = edge->getTargetVertex();
-    //    while (c != a) {
-    //        meshCH.AddTriangle(Vec3<int32_t>(a, b, c));
-    //        edge = edge->getNextEdgeOfFace();
-    //        b = c;
-    //        c = edge->getTargetVertex();
-    //    }
-    //}
+    points = cpoints.Data();
+	vhacdConvexHull ch((double*)points, 3 * sizeof(double), (int32_t)cpoints.Size(), 1.0e-5f);
+    meshCH.ResizePoints(0);
+    meshCH.ResizeTriangles(0);
+
+    for (int32_t v = 0; v < ch.GetVertexPool().size(); v++)
+	{
+        meshCH.AddPoint(ch.GetVertexPool()[v]);
+    }
+
+	for (vhacdConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
+	{
+		vhacdConvexHullFace* const face = &node->GetInfo();
+		meshCH.AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
+    }
 }
 
 void VoxelSet::GetPoints(const Voxel& voxel,

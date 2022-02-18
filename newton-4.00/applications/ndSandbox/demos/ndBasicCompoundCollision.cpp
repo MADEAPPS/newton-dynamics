@@ -145,6 +145,13 @@ static void AddBowls(ndDemoEntityManager* const scene)
 	bool res = interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 
+	ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
+	for (ndInt32 i = 0; i < hullCount; i++)
+	{
+		VHACD::IVHACD::ConvexHull ch;
+		interfaceVHACD->GetConvexHull(i, ch);
+		interfaceVHACD->GetConvexHull(i, ch);
+	}
 
 	//for (ndInt32 i = 0; i < 2; i++)
 	//{

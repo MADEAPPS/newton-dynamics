@@ -87,7 +87,7 @@ public:
             m_callback = 0;
             m_logger = 0;
             m_convexhullApproximation = true;
-            m_oclAcceleration = true;
+            m_oclAcceleration = false;
             m_maxConvexHulls = 1024;
 			m_projectHullVertices = true; // This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
         }
