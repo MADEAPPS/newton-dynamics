@@ -167,11 +167,11 @@ static void AddBowls(ndDemoEntityManager* const scene)
 	}
 	compoundShape->EndAddRemove();
 	compoundShapeInstance.SetLocalMatrix(bowlEntity->GetMeshMatrix());
-	for (ndInt32 i = 0; i < 1; i++)
+	ndMatrix mOrigMatrix = dGetIdentityMatrix();
+	for (ndInt32 i = 0; i < 4; i++)
 	{
 		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
-		ndMatrix mOrigMatrix = dGetIdentityMatrix();
-		mOrigMatrix.m_posit.m_y += 4.0f;
+		mOrigMatrix.m_posit.m_y += 1.0f;
 		AddRigidBody(scene, mOrigMatrix, compoundShapeInstance, entity, 5.0f);
 	}
 
