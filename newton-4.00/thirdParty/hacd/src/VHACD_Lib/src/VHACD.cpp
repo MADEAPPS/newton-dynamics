@@ -1058,6 +1058,8 @@ void VHACD::ComputeACD(const Parameters& params)
 
             double concavity = ComputeConcavity(volume, volumeCH, m_volumeCH0);
             double error = 1.01 * pset->ComputeMaxVolumeError() / m_volumeCH0;
+			// make the value smaller, later put it the parameters.
+			error *= 0.5f;
 
             if (firstIteration) {
                 firstIteration = false;
@@ -1073,7 +1075,7 @@ void VHACD::ComputeACD(const Parameters& params)
                     << std::endl;
                 params.m_logger->Log(msg.str().c_str());
             }
-
+			
             if (concavity > params.m_concavity && concavity > error) {
                 Vec3<double> preferredCuttingDirection;
                 double w = ComputePreferredCuttingDirection(pset, preferredCuttingDirection);
