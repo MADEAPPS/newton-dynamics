@@ -383,7 +383,7 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 }
 
-ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh() const
+ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 {
 	ndArray<ndVector> points;
 	ndArray<ndInt32> indices;
@@ -392,7 +392,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh() const
 	mesh->GetIndexArray(indices);
 
 	ndArray<ndTriplex> meshPoints;
-	for (ndInt32 i = 0; i < points.GetCount(); i++)
+	for (ndInt32 i = 0; i < points.GetCount(); ++i)
 	{
 		ndTriplex p;
 		p.m_x = points[i].m_x;
@@ -403,6 +403,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh() const
 	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
 
 	VHACD::IVHACD::Parameters paramsVHACD;
+	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0 : 0.5;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 
@@ -412,12 +413,12 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh() const
 	compoundShape->BeginAddRemove();
 	ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
 	ndArray<ndVector> convexMeshPoints;
-	for (ndInt32 i = 0; i < hullCount; i++)
+	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
 		VHACD::IVHACD::ConvexHull ch;
 		interfaceVHACD->GetConvexHull(i, ch);
 		convexMeshPoints.SetCount(ch.m_nPoints);
-		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); j++)
+		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
 		{
 			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
 			convexMeshPoints[j] = p;
@@ -435,8 +436,9 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh() const
 
 ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 {
-	ndInt32 count = 1;
-	ndShapeInstance* shapeArray[128];
+	ndFixSizeArray<ndShapeInstance*, 128> shapeArray;
+
+	ndArray<ndVector> points;
 	
 	shapeArray[0] = nullptr;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
@@ -447,13 +449,12 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	
 		if (strstr (name, "sphere")) 
 		{
-			ndArray<ndVector> points;
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 
 			ndVector minP(ndFloat32(1.0e10f));
 			ndVector maxP(ndFloat32(-1.0e10f));
-			for (ndInt32 i = 0; i < mesh->m_vertexCount; i++)
+			for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
 			{
 				minP = minP.GetMin(points[i]);
 				maxP = maxP.GetMax(points[i]);
@@ -463,46 +464,39 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 			const ndMatrix matrix(child->GetMeshMatrix() * alighMatrix * child->GetCurrentMatrix());
-			shapeArray[count] = new ndShapeInstance(new ndShapeSphere(size.m_x));
-			shapeArray[count]->SetLocalMatrix(matrix);
-			count++;
-			dAssert(count < ndInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
+			shapeArray.PushBack(new ndShapeInstance(new ndShapeSphere(size.m_x)));
+			shapeArray[shapeArray.GetCount()-1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr (name, "box")) 
 		{
-			ndArray<ndVector> points;
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 			
 			ndVector minP(ndFloat32(1.0e10f));
 			ndVector maxP(ndFloat32(-1.0e10f));
-			for (ndInt32 i = 0; i < mesh->m_vertexCount; i++)
+			for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
 			{
 				minP = minP.GetMin(points[i]);
 				maxP = maxP.GetMax(points[i]);
 			}
 			ndVector size(maxP - minP);
-			shapeArray[count] = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
+			shapeArray.PushBack(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
 
 			ndVector origin((maxP + minP).Scale (ndFloat32 (0.5f)));
 
 			ndMatrix matrix(child->GetMeshMatrix());
 			matrix.m_posit += origin;
 			matrix = matrix * child->GetCurrentMatrix();
-			
-			shapeArray[count]->SetLocalMatrix(matrix);
-			count++;
-			dAssert(count < ndInt32(sizeof(shapeArray) / sizeof(shapeArray[0])));
+			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr (name, "capsule")) 
 		{
-			ndArray<ndVector> points;
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 
 			ndVector minP(ndFloat32(1.0e10f));
 			ndVector maxP(ndFloat32(-1.0e10f));
-			for (ndInt32 i = 0; i < mesh->m_vertexCount; i++)
+			for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
 			{
 				minP = minP.GetMin(points[i]);
 				maxP = maxP.GetMax(points[i]);
@@ -515,40 +509,77 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 			const ndMatrix matrix (alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
 
-			shapeArray[count] = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
-			shapeArray[count]->SetLocalMatrix(matrix);
-			count++;
-			dAssert(count < ndInt32 (sizeof(shapeArray)/ sizeof (shapeArray[0])));
+			shapeArray.PushBack(new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high)));
+			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr(name, "convexhull")) 
 		{
-			ndArray<ndVector> points;
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
-			shapeArray[count] = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x));
+			shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x)));
 			const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
-			shapeArray[count]->SetLocalMatrix(matrix);
-			count++;
-			dAssert(count < ndInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
+			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
+		}
+		else if (strstr(name, "vhacd"))
+		{
+			ndArray<ndInt32> indices;
+			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			mesh->GetVertexArray(points);
+			mesh->GetIndexArray(indices);
+
+			ndArray<ndTriplex> meshPoints;
+			for (ndInt32 i = 0; i < points.GetCount(); ++i)
+			{
+				ndTriplex p;
+				p.m_x = points[i].m_x;
+				p.m_y = points[i].m_y;
+				p.m_z = points[i].m_z;
+				meshPoints.PushBack(p);
+			}
+			VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
+
+			VHACD::IVHACD::Parameters paramsVHACD;
+			paramsVHACD.m_concavityToVolumeWeigh = 1.0;
+			interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
+				(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+
+			ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
+			ndArray<ndVector> convexMeshPoints;
+			for (ndInt32 i = 0; i < hullCount; ++i)
+			{
+				VHACD::IVHACD::ConvexHull ch;
+				interfaceVHACD->GetConvexHull(i, ch);
+				convexMeshPoints.SetCount(ch.m_nPoints);
+				for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
+				{
+					ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
+					convexMeshPoints[j] = p;
+				}
+				shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(convexMeshPoints.GetCount(), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x)));
+				const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+				shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
+			}
+
+			interfaceVHACD->Clean();
+			interfaceVHACD->Release();
 		}
 	}
 	
-	if (count > 2) 
+	if (shapeArray.GetCount() > 2)
 	{
 		ndShapeInstance* const compoundInstance = new ndShapeInstance(new ndShapeCompound());
 		ndShapeCompound* const compound = compoundInstance->GetShape()->GetAsShapeCompound();
 
 		compound->BeginAddRemove ();
-		for (ndInt32 i = 1; i < count; i ++) 
+		for (ndInt32 i = 1; i < shapeArray.GetCount(); ++i)
 		{
 			compound->AddCollision(shapeArray[i]);
 			delete shapeArray[i];
 		}
 		compound->EndAddRemove ();
 		shapeArray[0] = compoundInstance;
-		count = 1;
 	} 
-	else if (count == 2) 
+	else if (shapeArray.GetCount() == 2)
 	{
 		shapeArray[0] = shapeArray[1];
 	}

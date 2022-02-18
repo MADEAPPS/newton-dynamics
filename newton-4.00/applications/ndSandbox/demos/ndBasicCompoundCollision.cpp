@@ -116,7 +116,7 @@ static void AddBowls(ndDemoEntityManager* const scene)
 
 static void AddSphere(ndDemoEntityManager* const scene)
 {
-	ndShapeInstance originShape(new ndShapeSphere(0.25f));
+	ndShapeInstance originShape(new ndShapeSphere(0.125f));
 	ndDemoMesh* const origGeometry = new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 
 	ndDemoEntity* const origEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
