@@ -406,7 +406,6 @@ void VoxelSet::ComputeBB()
 }
 void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
 {
-    //const size_t CLUSTER_SIZE = 65536;
     const size_t nVoxels = m_voxels.Size();
     if (nVoxels == 0)
         return;
@@ -451,7 +450,7 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
 
 		vhacdConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
 		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-        for (int32_t v = 0; v < convexPoints.size(); v++)
+		for (int32_t v = 0; v < int(convexPoints.size()); v++)
 		{
             cpoints.push_back(convexPoints[v]);
         }
@@ -461,7 +460,7 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
     meshCH.ResizeTriangles(0);
 
 	const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-    for (int32_t v = 0; v < convexPoints.size(); v++)
+	for (int32_t v = 0; v < int(convexPoints.size()); v++)
 	{
         meshCH.AddPoint(convexPoints[v]);
     }
@@ -1091,52 +1090,48 @@ void TetrahedronSet::ComputeBB()
 
 void TetrahedronSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
 {
-    const size_t CLUSTER_SIZE = 65536;
-    const size_t nTetrahedra = m_tetrahedra.Size();
-    if (nTetrahedra == 0)
-        return;
-	
-    SArray<Vec3<double> > cpoints;
-	
-    Vec3<double>* points = new Vec3<double>[CLUSTER_SIZE];
-    size_t p = 0;
-    while (p < nTetrahedra) {
-        size_t q = 0;
-        size_t s = 0;
-        while (q < CLUSTER_SIZE && p < nTetrahedra) {
-            if (m_tetrahedra[p].m_data == PRIMITIVE_ON_SURFACE) {
-                ++s;
-                if (s == sampling) {
-                    s = 0;
-                    for (int32_t a = 0; a < 4; ++a) {
-                        points[q++] = m_tetrahedra[p].m_pts[a];
-                        for (int32_t xx = 0; xx < 3; ++xx) {
-                            assert(m_tetrahedra[p].m_pts[a][xx] + EPS >= m_minBB[xx]);
-                            assert(m_tetrahedra[p].m_pts[a][xx] <= m_maxBB[xx] + EPS);
-                        }
-                    }
-                }
-            }
-            ++p;
-        }
+	const size_t nTetrahedra = m_tetrahedra.Size();
+	if (nTetrahedra == 0)
+		return;
 
-		vhacdConvexHull ch((double*)points, 3 * sizeof(double), int(q), 1.0e-5f);
-		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-		for (int32_t v = 0; v < convexPoints.size(); v++)
-		{
-			cpoints.PushBack(convexPoints[v]);
+	std::vector<Vec3<double>> points;
+	std::vector<Vec3<double>> cpoints;
+
+	size_t p = 0;
+	while (p < nTetrahedra) {
+		size_t s = 0;
+		while (p < nTetrahedra) {
+			if (m_tetrahedra[p].m_data == PRIMITIVE_ON_SURFACE) {
+				++s;
+				if (s == sampling) {
+					s = 0;
+					for (int32_t a = 0; a < 4; ++a) {
+						points.push_back(m_tetrahedra[p].m_pts[a]);
+						for (int32_t xx = 0; xx < 3; ++xx) {
+							assert(m_tetrahedra[p].m_pts[a][xx] + EPS >= m_minBB[xx]);
+							assert(m_tetrahedra[p].m_pts[a][xx] <= m_maxBB[xx] + EPS);
+						}
+					}
+				}
+			}
+			++p;
 		}
-    }
-    delete[] points;
-	
-    points = cpoints.Data();
-	vhacdConvexHull ch((double*)points, 3 * sizeof(double), (int32_t)cpoints.Size(), 1.0e-5f);
-    meshCH.ResizePoints(0);
-    meshCH.ResizeTriangles(0);
+
+		vhacdConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
+		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
+		for (int32_t v = 0; v < int(convexPoints.size()); v++)
+		{
+			cpoints.push_back(convexPoints[v]);
+		}
+	}
+
+	vhacdConvexHull ch(&cpoints[0][0], 3 * sizeof(double), int32_t(cpoints.size()), 1.0e-5f);
+	meshCH.ResizePoints(0);
+	meshCH.ResizeTriangles(0);
 	const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-    for (int32_t v = 0; v < convexPoints.size(); v++) {
-        meshCH.AddPoint(convexPoints[v]);
-    }
+	for (int32_t v = 0; v < int(convexPoints.size()); v++) {
+		meshCH.AddPoint(convexPoints[v]);
+	}
 
 	for (vhacdConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
 	{

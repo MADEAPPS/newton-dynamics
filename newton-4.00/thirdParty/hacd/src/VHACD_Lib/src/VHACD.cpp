@@ -779,6 +779,7 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
     timerComputeCost.Tic();
 #endif // DEBUG_TEMP
 
+#ifdef USE_GENERIC_CPP_11
 	class CommonData
 	{
 		public:
@@ -908,7 +909,6 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 		CommonData* m_commonData;
 	};
 
-#ifdef USE_NEWTON_THREADS
 	std::vector<BestClippingPlaneJob> jobs;
 	jobs.resize(nPlanes);
 

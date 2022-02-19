@@ -76,7 +76,7 @@ public:
         {
             m_resolution = 100000;
             m_concavity = 0.001;
-			m_concavityToVolumeWeigh = 0.5f;
+			m_concavityToVolumeWeigh = 1.0f;
             m_planeDownsampling = 4;
             m_convexhullDownsampling = 4;
             m_alpha = 0.05;

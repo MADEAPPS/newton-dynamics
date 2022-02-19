@@ -29,7 +29,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "vhacdRaycastMesh.h"
 #include <vector>
 
-#define USE_NEWTON_THREADS
+#define USE_GENERIC_CPP_11
 
 #define USE_THREAD 1
 #define OCL_MIN_NUM_PRIMITIVES 4096
@@ -369,7 +369,7 @@ private:
     size_t m_oclWorkGroupSize;
 #endif //CL_VERSION_1_1
 
-#ifdef USE_NEWTON_THREADS
+#ifdef USE_GENERIC_CPP_11
 	vhacdQueue m_parallelQueue;
 #endif
 };
