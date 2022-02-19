@@ -405,29 +405,6 @@ ndConvexHull3dAABBTreeNode* ndConvexHull3d::BuildTree (ndConvexHull3dAABBTreeNod
 ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const, ndInt32)
 {
 	const ndInt32 stride = ndInt32(strideInBytes / sizeof(ndFloat64));
-	//if (stride >= 4) 
-	//{
-	//	for (ndInt32 i = 0; i < count; i++) 
-	//	{
-	//		ndInt32 index = i * stride;
-	//		ndBigVector& vertex = points[i];
-	//		vertex = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], vertexCloud[index + 3]);
-	//		dAssert(dCheckVector(vertex));
-	//		points[i].m_mark = 0;
-	//	}
-	//} 
-	//else 
-	//{
-	//	for (ndInt32 i = 0; i < count; i++) 
-	//	{
-	//		ndInt32 index = i * stride;
-	//		ndBigVector& vertex = points[i];
-	//		vertex = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], ndFloat64(0.0f));
-	//		dAssert(dCheckVector(vertex));
-	//		points[i].m_mark = 0;
-	//	}
-	//}
-
 	for (ndInt32 i = 0; i < count; i++) 
 	{
 		ndInt32 index = i * stride;

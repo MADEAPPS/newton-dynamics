@@ -49,7 +49,7 @@ double vhacdConvexHullFace::Evalue(const hullVector* const pointArray, const hul
 	const hullVector& p2 = pointArray[m_index[2]];
 
 	double matrix[3][3];
-	for (int i = 0; i < 3; i++) 
+	for (int i = 0; i < 3; ++i) 
 	{
 		matrix[0][i] = p2[i] - p0[i];
 		matrix[1][i] = p1[i] - p0[i];
@@ -73,7 +73,7 @@ double vhacdConvexHullFace::Evalue(const hullVector* const pointArray, const hul
 	}
 	
 	vhacdGoogol exactMatrix[3][3];
-	for (int i = 0; i < 3; i++) 
+	for (int i = 0; i < 3; ++i) 
 	{
 		exactMatrix[0][i] = vhacdGoogol(p2[i]) - vhacdGoogol(p0[i]);
 		exactMatrix[1][i] = vhacdGoogol(p1[i]) - vhacdGoogol(p0[i]);
@@ -224,7 +224,7 @@ void vhacdConvexHull::BuildHull(const double* const vertexCloud, int strideInByt
 int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const, int)
 {
 	const int stride = int(strideInBytes / sizeof(double));
-	for (int i = 0; i < count; i++)
+	for (int i = 0; i < count; ++i)
 	{
 		int index = i * stride;
 		hullVector& vertex = points[i];
@@ -235,7 +235,7 @@ int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const 
 	class CompareVertex
 	{
 		public:
-		int Compare(const vhacdConvexHullVertex& elementA, const vhacdConvexHullVertex& elementB, void* const) const
+		int Compare(const vhacdConvexHullVertex& elementA, const vhacdConvexHullVertex& elementB) const
 		{
 			for (int i = 0; i < 3; i++)
 			{
@@ -255,11 +255,11 @@ int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const 
 
 	int indexCount = 0;
 	CompareVertex compareVetex;
-	for (int i = 1; i < count; i++)
+	for (int i = 1; i < count; ++i)
 	{
-		for (; i < count; i++)
+		for (; i < count; ++i)
 		{
-			if (compareVetex.Compare(points[indexCount], points[i], nullptr))
+			if (compareVetex.Compare(points[indexCount], points[i]))
 			{
 				indexCount++;
 				points[indexCount] = points[i];
@@ -287,7 +287,7 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 
 		_ASSERT(clump);
 		clump->m_count = count;
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < count; ++i)
 		{
 			clump->m_indices[i] = i + baseIndex;
 
@@ -305,7 +305,7 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 	{
 		hullVector median(0);
 		hullVector varian(0);
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < count; ++i)
 		{
 			const hullVector& p = points[i];
 			minP = minP.GetMin(p);
@@ -317,7 +317,7 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 		varian = varian.Scale(double(count)) - median * median;
 		int index = 0;
 		double maxVarian = double(-1.0e10f);
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; ++i)
 		{
 			if (varian[i] > maxVarian)
 			{
@@ -445,7 +445,7 @@ int vhacdConvexHull::SupportVertex(vhacdConvexHullAABBTreeNode** const treePoint
 			else
 			{
 				vhacdConvexHull3dPointCluster* const cluster = (vhacdConvexHull3dPointCluster*)me;
-				for (int i = 0; i < cluster->m_count; i++)
+				for (int i = 0; i < cluster->m_count; ++i)
 				{
 					const vhacdConvexHullVertex& p = points[cluster->m_indices[i]];
 					_ASSERT(p.X() >= cluster->m_box[0].X());
@@ -539,7 +539,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	
 	bool validTetrahedrum = false;
 	hullVector e1(0.0);
-	for (int i = 1; i < normalMap.m_count; i++)
+	for (int i = 1; i < normalMap.m_count; ++i)
 	{
 		int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
 		_ASSERT(index >= 0);
@@ -564,7 +564,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	validTetrahedrum = false;
 	hullVector e2(0.0);
 	hullVector normal(0.0);
-	for (int i = 2; i < normalMap.m_count; i++)
+	for (int i = 2; i < normalMap.m_count; ++i)
 	{
 		int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
 		_ASSERT(index >= 0);
@@ -617,7 +617,7 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	}
 	if (!validTetrahedrum)
 	{
-		for (int i = 3; i < normalMap.m_count; i++)
+		for (int i = 3; i < normalMap.m_count; ++i)
 		{
 			int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
 			_ASSERT(index >= 0);
@@ -639,7 +639,6 @@ int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const 
 	{
 		// the points do not form a convex hull
 		m_points.resize(0);
-		//_ASSERT (0);
 		return count;
 	}
 	
@@ -705,9 +704,6 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 	maxVertexCount -= 4;
 	int currentIndex = 4;
 
-	//ndStack<ndNode*> stackPool(1024 + m_count);
-	//ndStack<ndNode*> coneListPool(1024 + m_count);
-	//ndStack<ndNode*> deleteListPool(1024 + m_count);
 	std::vector<ndNode*> stackPool;
 	std::vector<ndNode*> coneListPool;
 	std::vector<ndNode*> deleteListPool;
@@ -763,7 +759,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 				if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > double(0.0f)))
 				{
 					#ifdef _DEBUG
-					for (int i = 0; i < deletedCount; i++)
+					for (int i = 0; i < deletedCount; ++i)
 					{
 						_ASSERT(deleteList[i] != node1);
 					}
@@ -773,7 +769,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 					deletedCount++;
 					_ASSERT(deletedCount < int(deleteListPool.size()));
 					face1->m_mark = 1;
-					for (int i = 0; i < 3; i++)
+					for (int i = 0; i < 3; ++i)
 					{
 						ndNode* const twinNode = face1->m_twin[i];
 						_ASSERT(twinNode);
@@ -792,7 +788,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 			points[index].m_mark = 1;
 			
 			int newCount = 0;
-			for (int i = 0; i < deletedCount; i++)
+			for (int i = 0; i < deletedCount; ++i)
 			{
 				ndNode* const node1 = deleteList[i];
 				vhacdConvexHullFace* const face1 = &node1->GetInfo();
@@ -823,7 +819,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 				}
 			}
 			
-			for (int i = 0; i < newCount - 1; i++)
+			for (int i = 0; i < newCount - 1; ++i)
 			{
 				ndNode* const nodeA = coneList[i];
 				vhacdConvexHullFace* const faceA = &nodeA->GetInfo();
@@ -855,7 +851,7 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 				}
 			}
 			
-			for (int i = 0; i < deletedCount; i++)
+			for (int i = 0; i < deletedCount; ++i)
 			{
 				ndNode* const node = deleteList[i];
 				boundaryFaces.Remove(node);

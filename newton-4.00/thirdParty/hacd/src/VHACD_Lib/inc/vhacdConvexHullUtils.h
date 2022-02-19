@@ -464,7 +464,7 @@ inline void vhacdSwap(T& A, T& B)
 }
 
 template <class T, class dCompareKey>
-void vhacdSort(T* const array, int elements, void* const context = nullptr)
+void vhacdSort(T* const array, int elements)
 {
 	const int batchSize = 8;
 	int stack[1024][2];
@@ -481,15 +481,15 @@ void vhacdSort(T* const array, int elements, void* const context = nullptr)
 		if ((hi - lo) > batchSize)
 		{
 			int mid = (lo + hi) >> 1;
-			if (comparator.Compare(array[lo], array[mid], context) > 0)
+			if (comparator.Compare(array[lo], array[mid]) > 0)
 			{
 				vhacdSwap(array[lo], array[mid]);
 			}
-			if (comparator.Compare(array[mid], array[hi], context) > 0)
+			if (comparator.Compare(array[mid], array[hi]) > 0)
 			{
 				vhacdSwap(array[mid], array[hi]);
 			}
-			if (comparator.Compare(array[lo], array[mid], context) > 0)
+			if (comparator.Compare(array[lo], array[mid]) > 0)
 			{
 				vhacdSwap(array[lo], array[mid]);
 			}
@@ -498,11 +498,11 @@ void vhacdSort(T* const array, int elements, void* const context = nullptr)
 			const T pivot(array[mid]);
 			do
 			{
-				while (comparator.Compare(array[i], pivot, context) < 0)
+				while (comparator.Compare(array[i], pivot) < 0)
 				{
 					i++;
 				}
-				while (comparator.Compare(array[j], pivot, context) > 0)
+				while (comparator.Compare(array[j], pivot) > 0)
 				{
 					j--;
 				}
@@ -538,7 +538,7 @@ void vhacdSort(T* const array, int elements, void* const context = nullptr)
 	}
 	for (int i = 1; i < stride; ++i)
 	{
-		if (comparator.Compare(array[0], array[i], context) > 0)
+		if (comparator.Compare(array[0], array[i]) > 0)
 		{
 			vhacdSwap(array[0], array[i]);
 		}
@@ -548,7 +548,7 @@ void vhacdSort(T* const array, int elements, void* const context = nullptr)
 	{
 		int j = i;
 		const T tmp(array[i]);
-		for (; comparator.Compare(array[j - 1], tmp, context) > 0; --j)
+		for (; comparator.Compare(array[j - 1], tmp) > 0; --j)
 		{
 			_ASSERT(j > 0);
 			array[j] = array[j - 1];

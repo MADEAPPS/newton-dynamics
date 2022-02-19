@@ -406,20 +406,20 @@ void VoxelSet::ComputeBB()
 }
 void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
 {
-    const size_t CLUSTER_SIZE = 65536;
+    //const size_t CLUSTER_SIZE = 65536;
     const size_t nVoxels = m_voxels.Size();
     if (nVoxels == 0)
         return;
 	
-    SArray<Vec3<double> > cpoints;
-	
-    Vec3<double>* points = new Vec3<double>[CLUSTER_SIZE];
+	std::vector<Vec3<double>> points;
+	std::vector<Vec3<double>> cpoints;
     size_t p = 0;
     size_t s = 0;
     short i, j, k;
     while (p < nVoxels) {
-        size_t q = 0;
-        while (q < CLUSTER_SIZE && p < nVoxels) {
+        //size_t q = 0;
+        //while (q < CLUSTER_SIZE && p < nVoxels) {
+		while (p < nVoxels) {
             if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) {
                 ++s;
                 if (s == sampling) {
@@ -435,31 +435,28 @@ void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
                     Vec3<double> p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
                     Vec3<double> p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
                     Vec3<double> p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
-                    points[q++] = p0 + m_minBB;
-                    points[q++] = p1 + m_minBB;
-                    points[q++] = p2 + m_minBB;
-                    points[q++] = p3 + m_minBB;
-                    points[q++] = p4 + m_minBB;
-                    points[q++] = p5 + m_minBB;
-                    points[q++] = p6 + m_minBB;
-                    points[q++] = p7 + m_minBB;
+
+     				points.push_back(p0 + m_minBB);
+					points.push_back(p1 + m_minBB);
+					points.push_back(p2 + m_minBB);
+					points.push_back(p3 + m_minBB);
+					points.push_back(p4 + m_minBB);
+					points.push_back(p5 + m_minBB);
+					points.push_back(p6 + m_minBB);
+					points.push_back(p7 + m_minBB);
                 }
             }
             ++p;
         }
 
-		vhacdConvexHull ch((double*)points, 3 * sizeof(double), int(q), 1.0e-5f);
-		
+		vhacdConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
 		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
         for (int32_t v = 0; v < convexPoints.size(); v++)
 		{
-            cpoints.PushBack(convexPoints[v]);
+            cpoints.push_back(convexPoints[v]);
         }
     }
-    delete[] points;
-	
-    points = cpoints.Data();
-	vhacdConvexHull ch((double*)points, 3 * sizeof(double), (int32_t)cpoints.Size(), 1.0e-5f);
+	vhacdConvexHull ch(&cpoints[0][0], 3 * sizeof(double), int32_t(cpoints.size()), 1.0e-5f);
     meshCH.ResizePoints(0);
     meshCH.ResizeTriangles(0);
 

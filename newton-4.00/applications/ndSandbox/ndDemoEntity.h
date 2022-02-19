@@ -92,7 +92,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	void RenderBone() const;
 
 	ndShapeInstance* CreateCollisionFromChildren() const;
-	ndShapeInstance* CreateCompoundFromMesh(bool lowDetail = true) const;
+	ndShapeInstance* CreateCompoundFromMesh(bool lowDetail = false) const;
 
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 

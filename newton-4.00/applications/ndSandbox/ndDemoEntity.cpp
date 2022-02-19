@@ -403,7 +403,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
 
 	VHACD::IVHACD::Parameters paramsVHACD;
-	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0 : 0.5;
+	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 
