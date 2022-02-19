@@ -693,8 +693,6 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
     bool oclAcceleration = (nPrimitives > OCL_MIN_NUM_PRIMITIVES && params.m_oclAcceleration && params.m_mode == 0) ? true : false;
     int32_t iBest = -1;
     int32_t nPlanes = static_cast<int32_t>(planes.Size());
-    bool cancel = false;
-    int32_t done = 0;
     double minTotal = MAX_DOUBLE;
     double minBalance = MAX_DOUBLE;
     double minSymmetry = MAX_DOUBLE;
@@ -781,166 +779,343 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
     timerComputeCost.Tic();
 #endif // DEBUG_TEMP
 
-#if USE_THREAD == 1 && _OPENMP
-#pragma omp parallel for
+	class CommonData
+	{
+		public:
+		CommonData(VHACD* me, const Parameters& params)
+			:m_me(me)
+			,m_params(params)
+		{
+			for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+			{
+				m_iBest[i] = -1;
+				m_minTotal[i] = MAX_DOUBLE;
+				m_minBalance[i] = MAX_DOUBLE;
+				m_minSymmetry[i] = MAX_DOUBLE;
+				m_minConcavity[i] = MAX_DOUBLE;
+			}
+		}
+
+		VHACD* m_me;
+		double m_w;
+		double m_beta;
+		double m_alpha;
+		const Parameters& m_params;
+		PrimitiveSet* m_onSurfacePSet;
+		const PrimitiveSet* m_inputPSet;
+		int32_t m_convexhullDownsampling;
+		Mesh chs[VHACD_WORKERS_THREADS][2];
+		SArray<Vec3<double>> chPts[VHACD_WORKERS_THREADS][2];
+
+		Vec3<double> m_preferredCuttingDirection;
+		PrimitiveSet** m_psets;
+
+		Plane m_bestPlane[VHACD_WORKERS_THREADS];
+		double m_minTotal[VHACD_WORKERS_THREADS];
+		double m_minBalance[VHACD_WORKERS_THREADS];
+		double m_minSymmetry[VHACD_WORKERS_THREADS];
+		double m_minConcavity[VHACD_WORKERS_THREADS];
+		int32_t m_iBest[VHACD_WORKERS_THREADS];
+		
+	};
+
+	class BestClippingPlaneJob : public vhacdJob
+	{
+		public:
+		BestClippingPlaneJob()
+			:vhacdJob()
+		{
+		}
+
+		void Execute(int threadId)
+		{
+			Mesh& leftCH = m_commonData->chs[threadId][0];
+			Mesh& rightCH = m_commonData->chs[threadId][1];
+			rightCH.ResizePoints(0);
+			leftCH.ResizePoints(0);
+			rightCH.ResizeTriangles(0);
+			leftCH.ResizeTriangles(0);
+			
+			// compute convex-hulls
+			#ifdef TEST_APPROX_CH
+			double volumeLeftCH1 = 0;
+			double volumeRightCH1 = 0;
+			#endif //TEST_APPROX_CH
+			if (m_commonData->m_params.m_convexhullApproximation)
+			{
+				SArray<Vec3<double> >& leftCHPts = m_commonData->chPts[threadId][0];
+				SArray<Vec3<double> >& rightCHPts = m_commonData->chPts[threadId][1];;
+				rightCHPts.Resize(0);
+				leftCHPts.Resize(0);
+				m_commonData->m_onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, m_commonData->m_convexhullDownsampling * 32);
+				m_commonData->m_inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
+				rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
+				leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
+				#ifdef TEST_APPROX_CH
+					Mesh leftCH1;
+					Mesh rightCH1;
+					VoxelSet right;
+					VoxelSet left;
+					m_commonData->m_onSurfacePSet->Clip(plane, &right, &left);
+					right.ComputeConvexHull(rightCH1, m_commonData->m_convexhullDownsampling);
+					left.ComputeConvexHull(leftCH1, m_commonData->m_convexhullDownsampling);
+			
+					volumeLeftCH1 = leftCH1.ComputeVolume();
+					volumeRightCH1 = rightCH1.ComputeVolume();
+				#endif //TEST_APPROX_CH
+			}
+			else 
+			{
+				PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
+				PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
+				m_commonData->m_onSurfacePSet->Clip(plane, right, left);
+				right->ComputeConvexHull(rightCH, m_commonData->m_convexhullDownsampling);
+				left->ComputeConvexHull(leftCH, m_commonData->m_convexhullDownsampling);
+			}
+
+			double volumeLeftCH = leftCH.ComputeVolume();
+			double volumeRightCH = rightCH.ComputeVolume();
+			
+			// compute clipped volumes
+			double volumeLeft = 0.0;
+			double volumeRight = 0.0;
+			
+			m_commonData->m_inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
+			
+			double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0);
+			double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0);
+			double concavity = (concavityLeft + concavityRight);
+			
+			// compute cost
+			double balance = m_commonData->m_alpha * fabs(volumeLeft - volumeRight) / m_commonData->m_me->m_volumeCH0;
+			double d = m_commonData->m_w * (m_commonData->m_preferredCuttingDirection[0] * plane.m_a + m_commonData->m_preferredCuttingDirection[1] * plane.m_b + m_commonData->m_preferredCuttingDirection[2] * plane.m_c);
+			double symmetry = m_commonData->m_beta * d;
+			double total = concavity + balance + symmetry;
+
+			if (total < m_commonData->m_minTotal[threadId] || (total == m_commonData->m_minTotal[threadId] && m_x < m_commonData->m_iBest[threadId]))
+			{
+				m_commonData->m_minConcavity[threadId] = concavity;
+				m_commonData->m_minBalance[threadId] = balance;
+				m_commonData->m_minSymmetry[threadId] = symmetry;
+				m_commonData->m_bestPlane[threadId] = plane;
+				m_commonData->m_minTotal[threadId] = total;
+				m_commonData->m_iBest[threadId] = m_x;
+			}
+		}
+
+		Plane plane;
+		int m_x;
+		CommonData* m_commonData;
+	};
+
+#ifdef USE_NEWTON_THREADS
+	std::vector<BestClippingPlaneJob> jobs;
+	jobs.resize(nPlanes);
+
+	CommonData data(this, params);
+	data.m_w = w;
+	data.m_beta = beta;
+	data.m_alpha = alpha;
+	data.m_psets = psets;
+	data.m_inputPSet = inputPSet;
+	data.m_onSurfacePSet = onSurfacePSet;
+	data.m_preferredCuttingDirection = preferredCuttingDirection;
+	data.m_convexhullDownsampling = convexhullDownsampling;
+	for (int32_t x = 0; x < nPlanes; ++x)
+	{
+		jobs[x].m_x = x;
+		jobs[x].plane = planes[x];
+		jobs[x].m_commonData = &data;
+		m_parallelQueue.PushTask(&jobs[x]);
+	}
+	m_parallelQueue.Sync();
+
+	minConcavity = data.m_minConcavity[0];
+	minBalance = data.m_minBalance[0];
+	minSymmetry = data.m_minSymmetry[0];
+	bestPlane = data.m_bestPlane[0];
+	minTotal = data.m_minTotal[0];
+	iBest = data.m_iBest[0];
+
+	for (int i = 1; i < VHACD_WORKERS_THREADS; i++)
+	{
+		if (minTotal < data.m_minTotal[i] || (minTotal == data.m_minTotal[i] && iBest < data.m_iBest[i]))
+		{
+			minConcavity = data.m_minConcavity[i];
+			minBalance = data.m_minBalance[i];
+			minSymmetry = data.m_minSymmetry[i];
+			bestPlane = data.m_bestPlane[i];
+			minTotal = data.m_minTotal[i];
+			iBest = data.m_iBest[i];
+		}
+	}
+
+#else
+
+	bool cancel = false;
+	int32_t done = 0;
+
+	#if USE_THREAD == 1 && _OPENMP
+	#pragma omp parallel for
+	#endif
+		for (int32_t x = 0; x < nPlanes; ++x) {
+			int32_t threadID = 0;
+	#if USE_THREAD == 1 && _OPENMP
+			threadID = omp_get_thread_num();
+	#pragma omp flush(cancel)
+	#endif
+			if (!cancel) {
+				//Update progress
+				if (GetCancel()) {
+					cancel = true;
+	#if USE_THREAD == 1 && _OPENMP
+	#pragma omp flush(cancel)
+	#endif
+				}
+				Plane plane = planes[x];
+
+				if (oclAcceleration) {
+	#ifdef CL_VERSION_1_1
+					const float fPlane[4] = { (float)plane.m_a, (float)plane.m_b, (float)plane.m_c, (float)plane.m_d };
+					cl_int error = clSetKernelArg(m_oclKernelComputePartialVolumes[threadID], 2, sizeof(float) * 4, fPlane);
+					if (error != CL_SUCCESS) {
+						if (params.m_logger) {
+							params.m_logger->Log("Couldn't kernel atguments \n");
+						}
+						SetCancel(true);
+					}
+
+					error = clEnqueueNDRangeKernel(m_oclQueue[threadID], m_oclKernelComputePartialVolumes[threadID],
+						1, NULL, &globalSize, &m_oclWorkGroupSize, 0, NULL, NULL);
+					if (error != CL_SUCCESS) {
+						if (params.m_logger) {
+							params.m_logger->Log("Couldn't run kernel \n");
+						}
+						SetCancel(true);
+					}
+					int32_t nValues = (int32_t)nWorkGroups;
+					while (nValues > 1) {
+						error = clSetKernelArg(m_oclKernelComputeSum[threadID], 1, sizeof(int32_t), &nValues);
+						if (error != CL_SUCCESS) {
+							if (params.m_logger) {
+								params.m_logger->Log("Couldn't kernel atguments \n");
+							}
+							SetCancel(true);
+						}
+						size_t nWorkGroups = (nValues + m_oclWorkGroupSize - 1) / m_oclWorkGroupSize;
+						size_t globalSize = nWorkGroups * m_oclWorkGroupSize;
+						error = clEnqueueNDRangeKernel(m_oclQueue[threadID], m_oclKernelComputeSum[threadID],
+							1, NULL, &globalSize, &m_oclWorkGroupSize, 0, NULL, NULL);
+						if (error != CL_SUCCESS) {
+							if (params.m_logger) {
+								params.m_logger->Log("Couldn't run kernel \n");
+							}
+							SetCancel(true);
+						}
+						nValues = (int32_t)nWorkGroups;
+					}
+	#endif // CL_VERSION_1_1
+				}
+
+				Mesh& leftCH = chs[threadID];
+				Mesh& rightCH = chs[threadID + m_ompNumProcessors];
+				rightCH.ResizePoints(0);
+				leftCH.ResizePoints(0);
+				rightCH.ResizeTriangles(0);
+				leftCH.ResizeTriangles(0);
+
+	// compute convex-hulls
+	#ifdef TEST_APPROX_CH
+				double volumeLeftCH1;
+				double volumeRightCH1;
+	#endif //TEST_APPROX_CH
+				if (params.m_convexhullApproximation) {
+					SArray<Vec3<double> >& leftCHPts = chPts[threadID];
+					SArray<Vec3<double> >& rightCHPts = chPts[threadID + m_ompNumProcessors];
+					rightCHPts.Resize(0);
+					leftCHPts.Resize(0);
+					onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
+					inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
+					rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
+					leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
+	#ifdef TEST_APPROX_CH
+					Mesh leftCH1;
+					Mesh rightCH1;
+					VoxelSet right;
+					VoxelSet left;
+					onSurfacePSet->Clip(plane, &right, &left);
+					right.ComputeConvexHull(rightCH1, convexhullDownsampling);
+					left.ComputeConvexHull(leftCH1, convexhullDownsampling);
+
+					volumeLeftCH1 = leftCH1.ComputeVolume();
+					volumeRightCH1 = rightCH1.ComputeVolume();
+	#endif //TEST_APPROX_CH
+				}
+				else {
+					PrimitiveSet* const right = psets[threadID];
+					PrimitiveSet* const left = psets[threadID + m_ompNumProcessors];
+					onSurfacePSet->Clip(plane, right, left);
+					right->ComputeConvexHull(rightCH, convexhullDownsampling);
+					left->ComputeConvexHull(leftCH, convexhullDownsampling);
+				}
+				double volumeLeftCH = leftCH.ComputeVolume();
+				double volumeRightCH = rightCH.ComputeVolume();
+
+				// compute clipped volumes
+				double volumeLeft = 0.0;
+				double volumeRight = 0.0;
+				if (oclAcceleration) {
+	#ifdef CL_VERSION_1_1
+					uint32_t volumes[4];
+					cl_int error = clEnqueueReadBuffer(m_oclQueue[threadID], partialVolumes[threadID], CL_TRUE,
+						0, sizeof(uint32_t) * 4, volumes, 0, NULL, NULL);
+					size_t nPrimitivesRight = volumes[0] + volumes[1] + volumes[2] + volumes[3];
+					size_t nPrimitivesLeft = nPrimitives - nPrimitivesRight;
+					volumeRight = nPrimitivesRight * unitVolume;
+					volumeLeft = nPrimitivesLeft * unitVolume;
+					if (error != CL_SUCCESS) {
+						if (params.m_logger) {
+							params.m_logger->Log("Couldn't read buffer \n");
+						}
+						SetCancel(true);
+					}
+	#endif // CL_VERSION_1_1
+				}
+				else {
+					inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
+				}
+				double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_volumeCH0);
+				double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_volumeCH0);
+				double concavity = (concavityLeft + concavityRight);
+
+				// compute cost
+				double balance = alpha * fabs(volumeLeft - volumeRight) / m_volumeCH0;
+				double d = w * (preferredCuttingDirection[0] * plane.m_a + preferredCuttingDirection[1] * plane.m_b + preferredCuttingDirection[2] * plane.m_c);
+				double symmetry = beta * d;
+				double total = concavity + balance + symmetry;
+
+	#if USE_THREAD == 1 && _OPENMP
+	#pragma omp critical
+	#endif
+				{
+					if (total < minTotal || (total == minTotal && x < iBest)) {
+						minConcavity = concavity;
+						minBalance = balance;
+						minSymmetry = symmetry;
+						bestPlane = plane;
+						minTotal = total;
+						iBest = x;
+					}
+					++done;
+					if (!(done & 127)) // reduce update frequency
+					{
+						double progress = done * (progress1 - progress0) / nPlanes + progress0;
+						Update(m_stageProgress, progress, params);
+					}
+				}
+			}
+		}
 #endif
-    for (int32_t x = 0; x < nPlanes; ++x) {
-        int32_t threadID = 0;
-#if USE_THREAD == 1 && _OPENMP
-        threadID = omp_get_thread_num();
-#pragma omp flush(cancel)
-#endif
-        if (!cancel) {
-            //Update progress
-            if (GetCancel()) {
-                cancel = true;
-#if USE_THREAD == 1 && _OPENMP
-#pragma omp flush(cancel)
-#endif
-            }
-            Plane plane = planes[x];
-
-            if (oclAcceleration) {
-#ifdef CL_VERSION_1_1
-                const float fPlane[4] = { (float)plane.m_a, (float)plane.m_b, (float)plane.m_c, (float)plane.m_d };
-                cl_int error = clSetKernelArg(m_oclKernelComputePartialVolumes[threadID], 2, sizeof(float) * 4, fPlane);
-                if (error != CL_SUCCESS) {
-                    if (params.m_logger) {
-                        params.m_logger->Log("Couldn't kernel atguments \n");
-                    }
-                    SetCancel(true);
-                }
-
-                error = clEnqueueNDRangeKernel(m_oclQueue[threadID], m_oclKernelComputePartialVolumes[threadID],
-                    1, NULL, &globalSize, &m_oclWorkGroupSize, 0, NULL, NULL);
-                if (error != CL_SUCCESS) {
-                    if (params.m_logger) {
-                        params.m_logger->Log("Couldn't run kernel \n");
-                    }
-                    SetCancel(true);
-                }
-                int32_t nValues = (int32_t)nWorkGroups;
-                while (nValues > 1) {
-                    error = clSetKernelArg(m_oclKernelComputeSum[threadID], 1, sizeof(int32_t), &nValues);
-                    if (error != CL_SUCCESS) {
-                        if (params.m_logger) {
-                            params.m_logger->Log("Couldn't kernel atguments \n");
-                        }
-                        SetCancel(true);
-                    }
-                    size_t nWorkGroups = (nValues + m_oclWorkGroupSize - 1) / m_oclWorkGroupSize;
-                    size_t globalSize = nWorkGroups * m_oclWorkGroupSize;
-                    error = clEnqueueNDRangeKernel(m_oclQueue[threadID], m_oclKernelComputeSum[threadID],
-                        1, NULL, &globalSize, &m_oclWorkGroupSize, 0, NULL, NULL);
-                    if (error != CL_SUCCESS) {
-                        if (params.m_logger) {
-                            params.m_logger->Log("Couldn't run kernel \n");
-                        }
-                        SetCancel(true);
-                    }
-                    nValues = (int32_t)nWorkGroups;
-                }
-#endif // CL_VERSION_1_1
-            }
-
-            Mesh& leftCH = chs[threadID];
-            Mesh& rightCH = chs[threadID + m_ompNumProcessors];
-            rightCH.ResizePoints(0);
-            leftCH.ResizePoints(0);
-            rightCH.ResizeTriangles(0);
-            leftCH.ResizeTriangles(0);
-
-// compute convex-hulls
-#ifdef TEST_APPROX_CH
-            double volumeLeftCH1;
-            double volumeRightCH1;
-#endif //TEST_APPROX_CH
-            if (params.m_convexhullApproximation) {
-                SArray<Vec3<double> >& leftCHPts = chPts[threadID];
-                SArray<Vec3<double> >& rightCHPts = chPts[threadID + m_ompNumProcessors];
-                rightCHPts.Resize(0);
-                leftCHPts.Resize(0);
-                onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
-                inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
-                rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
-                leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-#ifdef TEST_APPROX_CH
-                Mesh leftCH1;
-                Mesh rightCH1;
-                VoxelSet right;
-                VoxelSet left;
-                onSurfacePSet->Clip(plane, &right, &left);
-                right.ComputeConvexHull(rightCH1, convexhullDownsampling);
-                left.ComputeConvexHull(leftCH1, convexhullDownsampling);
-
-                volumeLeftCH1 = leftCH1.ComputeVolume();
-                volumeRightCH1 = rightCH1.ComputeVolume();
-#endif //TEST_APPROX_CH
-            }
-            else {
-                PrimitiveSet* const right = psets[threadID];
-                PrimitiveSet* const left = psets[threadID + m_ompNumProcessors];
-                onSurfacePSet->Clip(plane, right, left);
-                right->ComputeConvexHull(rightCH, convexhullDownsampling);
-                left->ComputeConvexHull(leftCH, convexhullDownsampling);
-            }
-            double volumeLeftCH = leftCH.ComputeVolume();
-            double volumeRightCH = rightCH.ComputeVolume();
-
-            // compute clipped volumes
-            double volumeLeft = 0.0;
-            double volumeRight = 0.0;
-            if (oclAcceleration) {
-#ifdef CL_VERSION_1_1
-                uint32_t volumes[4];
-                cl_int error = clEnqueueReadBuffer(m_oclQueue[threadID], partialVolumes[threadID], CL_TRUE,
-                    0, sizeof(uint32_t) * 4, volumes, 0, NULL, NULL);
-                size_t nPrimitivesRight = volumes[0] + volumes[1] + volumes[2] + volumes[3];
-                size_t nPrimitivesLeft = nPrimitives - nPrimitivesRight;
-                volumeRight = nPrimitivesRight * unitVolume;
-                volumeLeft = nPrimitivesLeft * unitVolume;
-                if (error != CL_SUCCESS) {
-                    if (params.m_logger) {
-                        params.m_logger->Log("Couldn't read buffer \n");
-                    }
-                    SetCancel(true);
-                }
-#endif // CL_VERSION_1_1
-            }
-            else {
-                inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
-            }
-            double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_volumeCH0);
-            double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_volumeCH0);
-            double concavity = (concavityLeft + concavityRight);
-
-            // compute cost
-            double balance = alpha * fabs(volumeLeft - volumeRight) / m_volumeCH0;
-            double d = w * (preferredCuttingDirection[0] * plane.m_a + preferredCuttingDirection[1] * plane.m_b + preferredCuttingDirection[2] * plane.m_c);
-            double symmetry = beta * d;
-            double total = concavity + balance + symmetry;
-
-#if USE_THREAD == 1 && _OPENMP
-#pragma omp critical
-#endif
-            {
-                if (total < minTotal || (total == minTotal && x < iBest)) {
-                    minConcavity = concavity;
-                    minBalance = balance;
-                    minSymmetry = symmetry;
-                    bestPlane = plane;
-                    minTotal = total;
-                    iBest = x;
-                }
-                ++done;
-                if (!(done & 127)) // reduce update frequency
-                {
-                    double progress = done * (progress1 - progress0) / nPlanes + progress0;
-                    Update(m_stageProgress, progress, params);
-                }
-            }
-        }
-    }
 
 #ifdef DEBUG_TEMP
     timerComputeCost.Toc();

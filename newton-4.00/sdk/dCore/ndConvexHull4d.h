@@ -67,17 +67,16 @@ class ndConvexHull4dTetraherum
 		ndFloat64 m_dist;
 	};
 
-	ndConvexHull4dTetraherum();
-	ndTetrahedrumPlane GetPlaneEquation (const ndConvexHull4dVector* const points) const;
-	ndFloat64 GetTetraVolume (const ndConvexHull4dVector* const pointArray) const;	
-	D_CORE_API ndBigVector CircumSphereCenter (const ndConvexHull4dVector* const pointArray) const;
-	ndFloat64 Evalue (const ndConvexHull4dVector* const pointArray, const ndBigVector& point) const;
-
-	ndInt32 GetMark() const { return m_mark; }
-	void SetMark(ndInt32 mark) { m_mark = mark; }
+	D_CORE_API ndConvexHull4dTetraherum();
+	D_CORE_API ndBigVector CircumSphereCenter(const ndConvexHull4dVector* const pointArray) const;
 
 	private:
 	void Init (const ndConvexHull4dVector* const points, ndInt32 v0, ndInt32 v1, ndInt32 v2, ndInt32 v3);
+	ndTetrahedrumPlane GetPlaneEquation(const ndConvexHull4dVector* const points) const;
+	ndFloat64 GetTetraVolume(const ndConvexHull4dVector* const pointArray) const;
+	ndFloat64 Evalue(const ndConvexHull4dVector* const pointArray, const ndBigVector& point) const;
+	ndInt32 GetMark() const { return m_mark; }
+	void SetMark(ndInt32 mark) { m_mark = mark; }
 
 	public:
 	ndTetrahedrumFace m_faces[4];

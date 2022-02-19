@@ -38,21 +38,18 @@ class ndConvexHull3dAABBTreeNode;
 class ndConvexHull3dFace
 {
 	public:
-	ndConvexHull3dFace();
-	
-	void SetMark(ndInt32 mark) {m_mark = mark;}
-	ndInt32 GetMark() const {return m_mark;}
-	ndList<ndConvexHull3dFace>::ndNode* GetTwin(ndInt32 index) const 
-	{ 
-		return m_twin[index];
-	}
+	D_CORE_API ndConvexHull3dFace();
 
 	private:
+	void SetMark(ndInt32 mark) { m_mark = mark; }
+	ndInt32 GetMark() const { return m_mark; }
+	ndList<ndConvexHull3dFace>::ndNode* GetTwin(ndInt32 index) const;
 	ndFloat64 Evalue (const ndBigVector* const pointArray, const ndBigVector& point) const;
 	ndBigPlane GetPlaneEquation (const ndBigVector* const pointArray) const;
 
 	public:
 	ndInt32 m_index[3]; 
+
 	private:
 	ndInt32 m_mark;
 	ndList<ndConvexHull3dFace>::ndNode* m_twin[3];
@@ -71,11 +68,7 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 	D_CORE_API ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount = 0x7fffffff);
 	D_CORE_API virtual ~ndConvexHull3d();
 
-	//ndInt32 GetVertexCount() const;
-	//const ndBigVector* GetVertexPool() const;
 	const ndArray<ndBigVector>& GetVertexPool() const;
-	//const ndBigVector& GetVertex(ndInt32 i) const;
-	//const ndArray<ndBigVector>& GetVertex(ndInt32 i) const;
 
 	ndFloat64 GetDiagonal() const;
 	void GetAABB (ndBigVector& boxP0, ndBigVector& boxP1) const;
@@ -99,38 +92,25 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 
 	ndInt32 GetUniquePoints(ndConvexHull3dVertex* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize);
 	ndConvexHull3dAABBTreeNode* BuildTree (ndConvexHull3dAABBTreeNode* const parent, ndConvexHull3dVertex* const points, ndInt32 count, ndInt32 baseIndex, ndInt8** const memoryPool, ndInt32& maxMemSize) const;
-	//static ndInt32 ConvexCompareVertex(const ndConvexHull3dVertex* const A, const ndConvexHull3dVertex* const B, void* const context);
+
 	bool Sanity() const;
 	void Save (const char* const filename) const;
 
 	ndBigVector m_aabbP0;
 	ndBigVector m_aabbP1;
-	//ndInt32 m_count;
 	ndFloat64 m_diag;
 	ndArray<ndBigVector> m_points;
 } D_GCC_NEWTON_ALIGN_32;
-
-//inline ndInt32 ndConvexHull3d::GetVertexCount() const
-//{
-//	//return m_count;
-//	return m_points.GetCount();
-//}
 
 inline const ndArray<ndBigVector>& ndConvexHull3d::GetVertexPool() const
 {
 	return m_points;
 }
 
-//inline const ndBigVector& ndConvexHull3d::GetVertex(ndInt32 index) const
-//{
-//	return m_points[index];
-//}
-
 inline ndFloat64 ndConvexHull3d::GetDiagonal() const
 {
 	return m_diag;
 }
-
 
 inline void ndConvexHull3d::GetAABB (ndBigVector& boxP0, ndBigVector& boxP1) const
 {

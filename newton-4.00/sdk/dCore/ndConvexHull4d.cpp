@@ -920,7 +920,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 		}
 	}
 
-    ndTree<ndNode*, ndInt32> perimeter;
+	ndTree<ndNode*, ndInt32> perimeter;
 	for (ndTempList::ndNode* deleteNode = deletedFaces.GetFirst(); deleteNode; deleteNode = deleteNode->GetNext()) 
 	{
 		ndNode* const deleteTetraNode = deleteNode->GetInfo();
@@ -1078,7 +1078,6 @@ void ndConvexHull4d::CalculateConvexHull (ndConvexHull4dAABBTreeNode* vertexTree
 	ndNode* const nodes0 = AddFace (0, 1, 2, 3);
 	ndNode* const nodes1 = AddFace (0, 1, 3, 2);
 
-	//ndList<ndNode*> boundaryFaces;
 	ndTempList boundaryFaces;
 	boundaryFaces.Append(nodes0);
 	boundaryFaces.Append(nodes1);

@@ -583,3 +583,121 @@ vhacdGoogol Determinant3x3(const vhacdGoogol matrix[3][3])
 	}
 	return det;
 }
+
+
+vhacdSemaphore::vhacdSemaphore()
+	:m_count(0)
+	,m_mutex()
+	,m_condition()
+	,m_terminate(false)
+{
+}
+
+vhacdSemaphore::~vhacdSemaphore()
+{
+}
+
+bool vhacdSemaphore::Wait()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	while (m_count == 0)
+	{
+		m_condition.wait(lock);
+	}
+
+	m_count--;
+	return m_terminate.load();
+}
+
+void vhacdSemaphore::Signal()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_count++;
+	m_condition.notify_one();
+}
+
+void vhacdSemaphore::Terminate()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_count++;
+	m_terminate.store(true);
+	m_condition.notify_one();
+}
+
+vhacdQueue::vhacdQueue()
+	:vhacdList<vhacdJob*>()
+	,m_mutex()
+	,m_jobs(0)
+{
+	for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+	{
+		m_threads[i].m_threadID = i;
+		m_threads[i].m_queue = this;
+	}
+}
+
+vhacdQueue::~vhacdQueue()
+{
+	for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+	{
+		m_threads[i].Terminate();
+		m_threads[i].join();
+	}
+}
+
+void vhacdQueue::PushTask(vhacdJob* const job)
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	Append(job);
+	m_jobs.fetch_add(1);
+	for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
+	{
+		m_threads[i].Signal();
+	}
+}
+
+vhacdJob* vhacdQueue::PopTask()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	vhacdJob* job = nullptr;
+	if (GetCount())
+	{
+		ndNode* const node = GetFirst();
+		job = node->GetInfo();
+		Remove(node);
+	}
+	return job;
+}
+
+void vhacdQueue::Sync()
+{
+	while (m_jobs)
+	{
+		std::this_thread::yield();
+	}
+}
+
+vhacdThread::vhacdThread()
+	:vhacdSemaphore()
+	,std::thread(&vhacdThread::ThreadFunctionCallback, this)
+	,m_queue(nullptr)
+{
+}
+
+vhacdThread::~vhacdThread()
+{
+}
+
+void vhacdThread::ThreadFunctionCallback()
+{
+	while (!Wait())
+	{
+		vhacdJob* const job = m_queue->PopTask();
+		if (job)
+		{
+			job->Execute(m_threadID);
+			m_queue->m_jobs.fetch_add(-1);
+		}
+	}
+}
+

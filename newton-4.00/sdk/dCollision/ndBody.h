@@ -64,7 +64,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	D_COLLISION_API virtual void SetCentreOfMass(const ndVector& com);
 
 	ndBodyNotify* GetNotifyCallback() const;
-
 	
 	ndVector GetOmega() const;
 	ndMatrix GetMatrix() const;

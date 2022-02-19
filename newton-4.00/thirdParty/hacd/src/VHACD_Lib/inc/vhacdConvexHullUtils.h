@@ -22,8 +22,14 @@
 #ifndef __ND_CONVEXHULL_3D_UTILS__
 #define __ND_CONVEXHULL_3D_UTILS__
 
+#include <mutex>
 #include <vector>
+#include <atomic>
+#include <thread>
+#include <condition_variable>
 #include "vhacdVector.h"
+
+#define VHACD_WORKERS_THREADS 4
 
 template<class T>
 class vhacdList
@@ -562,4 +568,60 @@ vhacdGoogol Determinant2x2(const vhacdGoogol matrix[2][2]);
 vhacdGoogol Determinant3x3(const vhacdGoogol matrix[3][3]);
 double Determinant2x2(const double matrix[2][2], double* const error);
 double Determinant3x3(const double matrix[3][3], double* const error);
+
+class vhacdJob
+{
+	public:
+	vhacdJob()
+	{
+	}
+
+	virtual ~vhacdJob()
+	{
+	}
+
+	virtual void Execute(int threadId) = 0;
+};
+
+class vhacdSemaphore
+{
+	public: 
+	vhacdSemaphore();
+	~vhacdSemaphore();
+	bool Wait();
+	void Signal();
+	void Terminate();
+
+	int m_count;
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
+	std::atomic<bool> m_terminate;
+};
+
+class vhacdQueue;
+class vhacdThread: public vhacdSemaphore, public std::thread
+{
+	public:
+	vhacdThread();
+	~vhacdThread();
+	void ThreadFunctionCallback();
+
+	int m_threadID;
+	vhacdQueue* m_queue;
+};
+
+class vhacdQueue : public vhacdList<vhacdJob*>
+{
+	public:
+	vhacdQueue();
+	~vhacdQueue();
+
+	void Sync();
+	vhacdJob* PopTask();
+	void PushTask(vhacdJob* const job);
+
+	std::mutex m_mutex;
+	std::atomic<int> m_jobs;
+	vhacdThread m_threads[VHACD_WORKERS_THREADS];
+};
 #endif

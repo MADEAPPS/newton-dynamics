@@ -27,7 +27,6 @@
 #include "ndConvexHull3d.h"
 #include "ndSmallDeterminant.h"
 
-
 #define DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE		8
 
 #ifdef	D_OLD_CONVEXHULL_3D
@@ -176,6 +175,11 @@ ndFloat64 ndConvexHull3dFace::Evalue (const ndBigVector* const pointArray, const
 	return ret;
 }
 
+ndConvexHull3d::ndList<ndConvexHull3dFace>::ndNode* ndConvexHull3dFace::GetTwin(ndInt32 index) const
+{
+	return m_twin[index];
+}
+
 ndBigPlane ndConvexHull3dFace::GetPlaneEquation (const ndBigVector* const pointArray) const
 {
 	const ndBigVector& p0 = pointArray[m_index[0]];
@@ -190,7 +194,6 @@ ndConvexHull3d::ndConvexHull3d ()
 	:ndList<ndConvexHull3dFace>()
 	,m_aabbP0(ndBigVector (ndFloat64 (0.0f)))
 	,m_aabbP1(ndBigVector (ndFloat64 (0.0f)))
-	//,m_count(0)
 	,m_diag()
 	,m_points()
 {
@@ -200,7 +203,6 @@ ndConvexHull3d::ndConvexHull3d(const ndConvexHull3d& source)
 	:ndList<ndConvexHull3dFace>()
 	,m_aabbP0 (source.m_aabbP0)
 	,m_aabbP1 (source.m_aabbP1)
-	//,m_count(source.m_count)
 	,m_diag(source.m_diag)
 	,m_points(source.GetCount())
 {
@@ -210,6 +212,7 @@ ndConvexHull3d::ndConvexHull3d(const ndConvexHull3d& source)
 	{
 		m_points[i] = source.m_points[i];
 	}
+
 	ndTree<ndNode*, ndNode*> map;
 	for(ndNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) 
 	{
@@ -235,7 +238,6 @@ ndConvexHull3d::ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strid
 	:ndList<ndConvexHull3dFace>()
 	,m_aabbP0(ndBigVector::m_zero)
 	,m_aabbP1(ndBigVector::m_zero)
-	//,m_count(0)
 	,m_diag()
 	,m_points()
 {
