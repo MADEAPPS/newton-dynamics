@@ -29,9 +29,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "vhacdRaycastMesh.h"
 #include <vector>
 
-#define USE_GENERIC_CPP_11
-
-#define OCL_MIN_NUM_PRIMITIVES 4096
 #define CH_APP_MIN_NUM_PRIMITIVES 64000
 namespace VHACD {
 class VHACD : public IVHACD {
@@ -335,9 +332,7 @@ private:
     PrimitiveSet* m_pset;
     Mutex m_cancelMutex;
     bool m_cancel;
-#ifdef USE_GENERIC_CPP_11
 	vhacdQueue m_parallelQueue;
-#endif
 };
 }
 #endif // VHACD_VHACD_H

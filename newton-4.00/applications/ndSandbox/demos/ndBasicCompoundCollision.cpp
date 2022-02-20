@@ -81,39 +81,6 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	pCompoundShape->EndAddRemove();
 }
 
-static void AddEmptyBox(ndDemoEntityManager* const scene)
-{
-	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
-	CreateBoxCompoundShape(compoundShapeInstance);
-
-	ndDemoMesh* const compGeometry = new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-	ndDemoEntity* const compEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
-	compEntity->SetMesh(compGeometry, dGetIdentityMatrix());
-
-	ndMatrix mBodyMatrix = dGetIdentityMatrix();
-	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
-	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
-
-	compGeometry->Release();
-}
-
-static void AddBowls(ndDemoEntityManager* const scene)
-{
-	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh("bowl.fbx");
-	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
-
-	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-	for (ndInt32 i = 0; i < 4; i++)
-	{
-		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
-		mOrigMatrix.m_posit.m_y += 1.0f;
-		AddRigidBody(scene, mOrigMatrix, *compoundShapeInstance, entity, 5.0f);
-	}
-
-	delete compoundShapeInstance;
-	delete bowlEntity;
-}
-
 static void AddSphere(ndDemoEntityManager* const scene)
 {
 	ndShapeInstance originShape(new ndShapeSphere(0.125f));
@@ -133,6 +100,38 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	origGeometry->Release();
 	delete origEntity;
 }
+static void AddEmptyBox(ndDemoEntityManager* const scene)
+{
+	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
+	CreateBoxCompoundShape(compoundShapeInstance);
+
+	ndDemoMesh* const compGeometry = new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+	ndDemoEntity* const compEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
+	compEntity->SetMesh(compGeometry, dGetIdentityMatrix());
+
+	ndMatrix mBodyMatrix = dGetIdentityMatrix();
+	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
+	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
+
+	compGeometry->Release();
+}
+
+static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName)
+{
+	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh(meshName);
+	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
+
+	ndMatrix mOrigMatrix = matrix;
+	for (ndInt32 i = 0; i < 4; i++)
+	{
+		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
+		mOrigMatrix.m_posit.m_z += 2.0f;
+		AddRigidBody(scene, mOrigMatrix, *compoundShapeInstance, entity, 5.0f);
+	}
+
+	delete compoundShapeInstance;
+	delete bowlEntity;
+}
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
@@ -149,14 +148,24 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
-	AddEmptyBox(scene);
+	ndMatrix location(dGetIdentityMatrix());
+
 	AddSphere(scene);
-	AddBowls(scene);
+	AddEmptyBox(scene);
+	
+	location.m_posit.m_y = 0.5f;
+	location.m_posit.m_z = -3.0f;
+	AddSimpleConcaveMesh(scene, location, "bowl.fbx");
+	
+	location.m_posit.m_x = 5.0f;
+	location.m_posit.m_z = -2.0f;
+	location.m_posit.m_y = 1.9f;
+	AddSimpleConcaveMesh(scene, location, "camel.fbx");
 
 	ndVector origin(ndVector::m_zero);
-	origin.m_x -= 5.0f;
-	origin.m_y += 1.0f;
-	origin.m_z += 5.0f;
+	origin.m_x -= 10.0f;
+	origin.m_y += 2.0f;
+	origin.m_z += 10.0f;
 	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }

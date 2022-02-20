@@ -43,75 +43,8 @@
 #pragma warning(disable:4267 4100 4244 4456)
 #endif
 
-#ifdef USE_SSE
-#include <immintrin.h>
+#define USE_CPP_11_THREADS
 
-const int32_t SIMD_WIDTH = 4;
-inline int32_t FindMinimumElement(const float* const d, float* const _, const int32_t n)
-{
-    // Min within vectors
-    __m128 min_i = _mm_set1_ps(-1.0f);
-    __m128 min_v = _mm_set1_ps(std::numeric_limits<float>::max());
-    for (int32_t i = 0; i <= n - SIMD_WIDTH; i += SIMD_WIDTH) {
-        const __m128 data = _mm_load_ps(&d[i]);
-        const __m128 pred = _mm_cmplt_ps(data, min_v);
-
-        min_i = _mm_blendv_ps(min_i, _mm_set1_ps(i), pred);
-        min_v = _mm_min_ps(data, min_v);
-    }
-
-    /* Min within vector */
-    const __m128 min1 = _mm_shuffle_ps(min_v, min_v, _MM_SHUFFLE(1, 0, 3, 2));
-    const __m128 min2 = _mm_min_ps(min_v, min1);
-    const __m128 min3 = _mm_shuffle_ps(min2, min2, _MM_SHUFFLE(0, 1, 0, 1));
-    const __m128 min4 = _mm_min_ps(min2, min3);
-    float min_d = _mm_cvtss_f32(min4);
-
-    // Min index
-    const int32_t min_idx = __builtin_ctz(_mm_movemask_ps(_mm_cmpeq_ps(min_v, min4)));
-    int32_t ret = min_i[min_idx] + min_idx;
-
-    // Trailing elements
-    for (int32_t i = (n & ~(SIMD_WIDTH - 1)); i < n; ++i) {
-        if (d[i] < min_d) {
-            min_d = d[i];
-            ret = i;
-        }
-    }
-
-    *m = min_d;
-    return ret;
-}
-
-inline int32_t FindMinimumElement(const float* const d, float* const m, const int32_t begin, const int32_t end)
-{
-    // Leading elements
-    int32_t min_i = -1;
-    float min_d = std::numeric_limits<float>::max();
-    const int32_t aligned = (begin & ~(SIMD_WIDTH - 1)) + ((begin & (SIMD_WIDTH - 1)) ? SIMD_WIDTH : 0);
-    for (int32_t i = begin; i < std::min(end, aligned); ++i) {
-        if (d[i] < min_d) {
-            min_d = d[i];
-            min_i = i;
-        }
-    }
-
-    // Middle and trailing elements
-    float r_m = std::numeric_limits<float>::max();
-    const int32_t n = end - aligned;
-    const int32_t r_i = (n > 0) ? FindMinimumElement(&d[aligned], &r_m, n) : 0;
-
-    // Pick the lowest
-    if (r_m < min_d) {
-        *m = r_m;
-        return r_i + aligned;
-    }
-    else {
-        *m = min_d;
-        return min_i;
-    }
-}
-#else
 inline int32_t FindMinimumElement(const float* const d, float* const m, const int32_t begin, const int32_t end)
 {
     int32_t idx = -1;
@@ -126,78 +59,6 @@ inline int32_t FindMinimumElement(const float* const d, float* const m, const in
     *m = min;
     return idx;
 }
-#endif
-
-//#define OCL_SOURCE_FROM_FILE
-#ifndef OCL_SOURCE_FROM_FILE
-const char* oclProgramSource = "\
-__kernel void ComputePartialVolumes(__global short4 * voxels,                    \
-                                    const    int      numVoxels,                 \
-                                    const    float4   plane,                     \
-                                    const    float4   minBB,                     \
-                                    const    float4   scale,                     \
-                                    __local  uint4 *  localPartialVolumes,       \
-                                    __global uint4 *  partialVolumes)            \
-{                                                                                \
-    int localId = get_local_id(0);                                               \
-    int groupSize = get_local_size(0);                                           \
-    int i0 = get_global_id(0) << 2;                                              \
-    float4 voxel;                                                                \
-    uint4  v;                                                                    \
-    voxel = convert_float4(voxels[i0]);                                          \
-    v.s0 = (dot(plane, mad(scale, voxel, minBB)) >= 0.0f) * (i0     < numVoxels);\
-    voxel = convert_float4(voxels[i0 + 1]);                                      \
-    v.s1 = (dot(plane, mad(scale, voxel, minBB)) >= 0.0f) * (i0 + 1 < numVoxels);\
-    voxel = convert_float4(voxels[i0 + 2]);                                      \
-    v.s2 = (dot(plane, mad(scale, voxel, minBB)) >= 0.0f) * (i0 + 2 < numVoxels);\
-    voxel = convert_float4(voxels[i0 + 3]);                                      \
-    v.s3 = (dot(plane, mad(scale, voxel, minBB)) >= 0.0f) * (i0 + 3 < numVoxels);\
-    localPartialVolumes[localId] = v;                                            \
-    barrier(CLK_LOCAL_MEM_FENCE);                                                \
-    for (int i = groupSize >> 1; i > 0; i >>= 1)                                 \
-    {                                                                            \
-        if (localId < i)                                                         \
-        {                                                                        \
-            localPartialVolumes[localId] += localPartialVolumes[localId + i];    \
-        }                                                                        \
-        barrier(CLK_LOCAL_MEM_FENCE);                                            \
-    }                                                                            \
-    if (localId == 0)                                                            \
-    {                                                                            \
-        partialVolumes[get_group_id(0)] = localPartialVolumes[0];                \
-    }                                                                            \
-}                                                                                \
-__kernel void ComputePartialSums(__global uint4 * data,                          \
-                                 const    int     dataSize,                      \
-                                 __local  uint4 * partialSums)                   \
-{                                                                                \
-    int globalId  = get_global_id(0);                                            \
-    int localId   = get_local_id(0);                                             \
-    int groupSize = get_local_size(0);                                           \
-    int i;                                                                       \
-    if (globalId < dataSize)                                                     \
-    {                                                                            \
-        partialSums[localId] = data[globalId];                                   \
-    }                                                                            \
-    else                                                                         \
-    {                                                                            \
-        partialSums[localId] = (0, 0, 0, 0);                                     \
-    }                                                                            \
-    barrier(CLK_LOCAL_MEM_FENCE);                                                \
-    for (i = groupSize >> 1; i > 0; i >>= 1)                                     \
-    {                                                                            \
-        if (localId < i)                                                         \
-        {                                                                        \
-            partialSums[localId] += partialSums[localId + i];                    \
-        }                                                                        \
-        barrier(CLK_LOCAL_MEM_FENCE);                                            \
-    }                                                                            \
-    if (localId == 0)                                                            \
-    {                                                                            \
-        data[get_group_id(0)] = partialSums[0];                                  \
-    }                                                                            \
-}";
-#endif //OCL_SOURCE_FROM_FILE
 
 namespace VHACD {
 IVHACD* CreateVHACD(void)
@@ -491,7 +352,6 @@ inline double ComputeConcavity(const double volume, const double volumeCH, const
     return fabs(volumeCH - volume) / volume0;
 }
 
-//#define DEBUG_TEMP
 void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double volume, const SArray<Plane>& planes,
     const Vec3<double>& preferredCuttingDirection, const double w, const double alpha, const double beta,
     const int32_t convexhullDownsampling, const double progress0, const double progress1, Plane& bestPlane,
@@ -501,7 +361,6 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
         return;
     }
     char msg[256];
-    //size_t nPrimitives = inputPSet->GetNPrimitives();
     int32_t iBest = -1;
     int32_t nPlanes = static_cast<int32_t>(planes.Size());
     double minTotal = MAX_DOUBLE;
@@ -525,7 +384,7 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
     timerComputeCost.Tic();
 #endif // DEBUG_TEMP
 
-#ifdef USE_GENERIC_CPP_11
+#ifdef USE_CPP_11_THREADS
 	class CommonData
 	{
 		public:
@@ -672,6 +531,12 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 	}
 #else
 
+	bool cancel = false;
+	int32_t done = 0;
+
+	SArray<Vec3<double> >* chPts = new SArray<Vec3<double> >[2];
+	Mesh* chs = new Mesh[2];
+
 	for (int32_t x = 0; x < nPlanes; ++x) {
 		int32_t threadID = 0;
 		if (!cancel) {
@@ -682,7 +547,7 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 			Plane plane = planes[x];
 
 			Mesh& leftCH = chs[threadID];
-			Mesh& rightCH = chs[threadID + m_ompNumProcessors];
+			Mesh& rightCH = chs[threadID + 1];
 			rightCH.ResizePoints(0);
 			leftCH.ResizePoints(0);
 			rightCH.ResizeTriangles(0);
@@ -695,29 +560,29 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 #endif //TEST_APPROX_CH
 			if (params.m_convexhullApproximation) {
 				SArray<Vec3<double> >& leftCHPts = chPts[threadID];
-				SArray<Vec3<double> >& rightCHPts = chPts[threadID + m_ompNumProcessors];
+				SArray<Vec3<double> >& rightCHPts = chPts[threadID + 1];
 				rightCHPts.Resize(0);
 				leftCHPts.Resize(0);
 				onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
 				inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
 				rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
 				leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-#ifdef TEST_APPROX_CH
-				Mesh leftCH1;
-				Mesh rightCH1;
-				VoxelSet right;
-				VoxelSet left;
-				onSurfacePSet->Clip(plane, &right, &left);
-				right.ComputeConvexHull(rightCH1, convexhullDownsampling);
-				left.ComputeConvexHull(leftCH1, convexhullDownsampling);
+				#ifdef TEST_APPROX_CH
+					Mesh leftCH1;
+					Mesh rightCH1;
+					VoxelSet right;
+					VoxelSet left;
+					onSurfacePSet->Clip(plane, &right, &left);
+					right.ComputeConvexHull(rightCH1, convexhullDownsampling);
+					left.ComputeConvexHull(leftCH1, convexhullDownsampling);
 
-				volumeLeftCH1 = leftCH1.ComputeVolume();
-				volumeRightCH1 = rightCH1.ComputeVolume();
-#endif //TEST_APPROX_CH
+					volumeLeftCH1 = leftCH1.ComputeVolume();
+					volumeRightCH1 = rightCH1.ComputeVolume();
+				#endif //TEST_APPROX_CH
 			}
 			else {
 				PrimitiveSet* const right = psets[threadID];
-				PrimitiveSet* const left = psets[threadID + m_ompNumProcessors];
+				PrimitiveSet* const left = psets[threadID + 1];
 				onSurfacePSet->Clip(plane, right, left);
 				right->ComputeConvexHull(rightCH, convexhullDownsampling);
 				left->ComputeConvexHull(leftCH, convexhullDownsampling);

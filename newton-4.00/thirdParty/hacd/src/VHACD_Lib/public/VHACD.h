@@ -144,6 +144,5 @@ protected:
     virtual ~IVHACD(void) {}
 };
 IVHACD* CreateVHACD(void);
-IVHACD* CreateVHACD_ASYNC(void);
 }
 #endif // VHACD_H
