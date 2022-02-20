@@ -57,19 +57,9 @@ public:
         ch.m_nTriangles = (uint32_t)mesh->GetNTriangles();
         ch.m_points = mesh->GetPoints();
         ch.m_triangles = (uint32_t *)mesh->GetTriangles();
-		ch.m_volume = mesh->ComputeVolume();
-		Vec3<double> &center = mesh->ComputeCenter();
-		ch.m_center[0] = center.X();
-		ch.m_center[1] = center.Y();
-		ch.m_center[2] = center.Z();
     }
     void Clean(void)
     {
-        if (mRaycastMesh)
-        {
-            mRaycastMesh->release();
-            mRaycastMesh = nullptr;
-        }
         delete m_volume;
         delete m_pset;
         size_t nCH = m_convexHulls.Size();
@@ -93,7 +83,6 @@ public:
         const uint32_t* const triangles,
         const uint32_t nTriangles,
         const Parameters& params);
-	virtual bool ComputeCenterOfMass(double centerOfMass[3]) const;
 
 private:
     void SetCancel(bool cancel)
@@ -126,11 +115,7 @@ private:
     }
     void Init()
     {
-		if (mRaycastMesh)
-		{
-			mRaycastMesh->release();
-			mRaycastMesh = nullptr;
-		}
+		m_raycastMesh = nullptr;
         memset(m_rot, 0, sizeof(double) * 9);
         m_dim = 64;
         m_volume = 0;
@@ -297,17 +282,18 @@ private:
         const Parameters& params)
     {
         Init();
-        if (params.m_projectHullVertices)
-        {
-            mRaycastMesh = RaycastMesh::createRaycastMesh(nPoints, points, nTriangles, (const uint32_t *)triangles);
-        }
-
         AlignMesh(points, 3, nPoints, (int32_t *)triangles, 3, nTriangles, params);
         VoxelizeMesh(points, 3, nPoints, (int32_t *)triangles, 3, nTriangles, params);
         ComputePrimitiveSet(params);
         ComputeACD(params);
         MergeConvexHulls(params);
-        SimplifyConvexHulls(params);
+		if (params.m_projectHullVertices)
+		{
+			m_raycastMesh = RaycastMesh::createRaycastMesh(nPoints, points, nTriangles, (const uint32_t *)triangles);
+			SimplifyConvexHulls(params);
+			m_raycastMesh->release();
+			m_raycastMesh = nullptr;
+		}
         if (GetCancel()) {
             Clean();
             return false;
@@ -316,7 +302,7 @@ private:
     }
 
 private:
-	RaycastMesh		*mRaycastMesh{ nullptr };
+	RaycastMesh* m_raycastMesh;
     SArray<Mesh*> m_convexHulls;
     std::string m_stage;
     std::string m_operation;

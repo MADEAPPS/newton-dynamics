@@ -30,58 +30,9 @@
 namespace VHACD {
 Mesh::Mesh()
 {
-    m_diag = 1.0;
 }
 Mesh::~Mesh()
 {
-}
-
-Vec3<double>& Mesh::ComputeCenter(void)
-{
-	const size_t nV = GetNPoints();
-	if (nV)
-	{
-		double center[3];
-		uint32_t pcount = uint32_t(GetNPoints());
-		const double *points = GetPoints();
-		uint32_t tcount = uint32_t(GetNTriangles());
-		const uint32_t *indices = (const uint32_t *)GetTriangles();
-		FLOAT_MATH::fm_computeCentroid(pcount, points, tcount, indices, center);
-		m_center.X() = center[0];
-		m_center.Y() = center[1];
-		m_center.Z() = center[2];
-		m_minBB = GetPoint(0);
-		m_maxBB = GetPoint(0);
-		for (size_t v = 1; v < nV; v++)
-		{
-			Vec3<double> p = GetPoint(v);
-			if (p.X() < m_minBB.X())
-			{
-				m_minBB.X() = p.X();
-			}
-			if (p.Y() < m_minBB.Y())
-			{
-				m_minBB.Y() = p.Y();
-			}
-			if (p.Z() < m_minBB.Z())
-			{
-				m_minBB.Z() = p.Z();
-			}
-			if (p.X() > m_maxBB.X())
-			{
-				m_maxBB.X() = p.X();
-			}
-			if (p.Y() > m_maxBB.Y())
-			{
-				m_maxBB.Y() = p.Y();
-			}
-			if (p.Z() > m_maxBB.Z())
-			{
-				m_maxBB.Z() = p.Z();
-			}
-		}
-	}
-	return m_center;
 }
 
 double Mesh::ComputeVolume() const
@@ -173,33 +124,6 @@ bool Mesh::IsInside(const Vec3<double>& pt) const
         }
     }
     return true;
-}
-double Mesh::ComputeDiagBB()
-{
-    const size_t nPoints = GetNPoints();
-    if (nPoints == 0)
-        return 0.0;
-    Vec3<double> minBB = m_points[0];
-    Vec3<double> maxBB = m_points[0];
-    double x, y, z;
-    for (size_t v = 1; v < nPoints; v++) {
-        x = m_points[v][0];
-        y = m_points[v][1];
-        z = m_points[v][2];
-        if (x < minBB[0])
-            minBB[0] = x;
-        else if (x > maxBB[0])
-            maxBB[0] = x;
-        if (y < minBB[1])
-            minBB[1] = y;
-        else if (y > maxBB[1])
-            maxBB[1] = y;
-        if (z < minBB[2])
-            minBB[2] = z;
-        else if (z > maxBB[2])
-            maxBB[2] = z;
-    }
-    return (m_diag = (maxBB - minBB).GetNorm());
 }
 
 #ifdef VHACD_DEBUG_MESH

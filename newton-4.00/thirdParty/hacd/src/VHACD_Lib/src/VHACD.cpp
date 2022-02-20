@@ -1091,7 +1091,7 @@ void VHACD::SimplifyConvexHull(Mesh* const ch, const size_t nvertices, const dou
         return;
     }
     ICHull icHull;
-    if (mRaycastMesh)
+    if (m_raycastMesh)
     {
         // We project these points onto the original source mesh to increase precision
         // The voxelization process drops floating point precision so returned data points are not exactly lying on the 
@@ -1134,7 +1134,7 @@ void VHACD::SimplifyConvexHull(Mesh* const ch, const size_t nvertices, const dou
             // By default the output point is equal to the input point
             outputPoint = inputPoint;
             double pointDistance;
-            if (mRaycastMesh->raycast(center.GetData(), dir.GetData(), inputPoint.GetData(), outputPoint.GetData(),&pointDistance) )
+            if (m_raycastMesh->raycast(center.GetData(), dir.GetData(), inputPoint.GetData(), outputPoint.GetData(),&pointDistance) )
             {
                 // If the nearest intersection point is too far away, we keep the original source data point.
                 // Not all points lie directly on the original mesh surface
@@ -1211,46 +1211,6 @@ void VHACD::SimplifyConvexHulls(const Parameters& params)
         msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
         params.m_logger->Log(msg.str().c_str());
     }
-}
-
-bool VHACD::ComputeCenterOfMass(double centerOfMass[3]) const
-{
-	bool ret = false;
-
-	centerOfMass[0] = 0;
-	centerOfMass[1] = 0;
-	centerOfMass[2] = 0;
-	// Get number of convex hulls in the result
-	uint32_t hullCount = GetNConvexHulls();
-	if (hullCount) // if we have results
-	{
-		ret = true;
-		double totalVolume = 0;
-		// Initialize the center of mass to zero
-		centerOfMass[0] = 0;
-		centerOfMass[1] = 0;
-		centerOfMass[2] = 0;
-		// Compute the total volume of all convex hulls
-		for (uint32_t i = 0; i < hullCount; i++)
-		{
-			ConvexHull ch;
-			GetConvexHull(i, ch);
-			totalVolume += ch.m_volume;
-		}
-		// compute the reciprocal of the total volume
-		double recipVolume = 1.0 / totalVolume;
-		// Add in the weighted by volume average of the center point of each convex hull
-		for (uint32_t i = 0; i < hullCount; i++)
-		{
-			ConvexHull ch;
-			GetConvexHull(i, ch);
-			double ratio = ch.m_volume*recipVolume;
-			centerOfMass[0] += ch.m_center[0] * ratio;
-			centerOfMass[1] += ch.m_center[1] * ratio;
-			centerOfMass[2] += ch.m_center[2] * ratio;
-		}
-	}
-	return ret;
 }
 
 } // end of VHACD namespace

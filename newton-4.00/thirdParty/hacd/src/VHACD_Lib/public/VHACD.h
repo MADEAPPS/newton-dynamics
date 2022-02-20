@@ -65,8 +65,6 @@ public:
         uint32_t* m_triangles;
         uint32_t m_nPoints;
         uint32_t m_nTriangles;
-		double		m_volume;
-		double		m_center[3];
     };
 
     class Parameters {
@@ -89,7 +87,9 @@ public:
             m_logger = 0;
             m_convexhullApproximation = true;
             m_maxConvexHulls = 1024;
-			m_projectHullVertices = true; // This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
+			// This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
+			//m_projectHullVertices = true; 
+			m_projectHullVertices = false;
         }
         double m_concavity;
 		double m_concavityToVolumeWeigh;
@@ -126,19 +126,6 @@ public:
     virtual void GetConvexHull(const uint32_t index, ConvexHull& ch) const = 0;
     virtual void Clean(void) = 0; // release internally allocated memory
     virtual void Release(void) = 0; // release IVHACD
-
-	// Will compute the center of mass of the convex hull decomposition results and return it
-	// in 'centerOfMass'.  Returns false if the center of mass could not be computed.
-	virtual bool ComputeCenterOfMass(double centerOfMass[3]) const = 0;
-
-	// In synchronous mode (non-multi-threaded) the state is always 'ready'
-	// In asynchronous mode, this returns true if the background thread is not still actively computing
-	// a new solution.  In an asynchronous config the 'IsReady' call will report any update or log
-	// messages in the caller's current thread.
-	virtual bool IsReady(void) const
-	{
-		return true;
-	}
 
 protected:
     virtual ~IVHACD(void) {}

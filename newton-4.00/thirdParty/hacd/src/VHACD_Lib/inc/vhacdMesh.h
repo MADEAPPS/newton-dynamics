@@ -82,9 +82,6 @@ public:
     const int32_t* const GetTriangles() const { return (int32_t*)m_triangles.Data(); } // ugly
     const Vec3<int32_t>* const GetTrianglesBuffer() const { return m_triangles.Data(); }
     Vec3<int32_t>* const GetTrianglesBuffer() { return m_triangles.Data(); }
-    const Vec3<double>& GetCenter() const { return m_center; }
-    const Vec3<double>& GetMinBB() const { return m_minBB; }
-    const Vec3<double>& GetMaxBB() const { return m_maxBB; }
     void ClearPoints() { m_points.Clear(); }
     void ClearTriangles() { m_triangles.Clear(); }
     void Clear()
@@ -95,7 +92,6 @@ public:
     void ResizePoints(size_t nPts) { m_points.Resize(nPts); }
     void ResizeTriangles(size_t nTri) { m_triangles.Resize(nTri); }
     void CopyPoints(SArray<Vec3<double> >& points) const { points = m_points; }
-    double GetDiagBB() const { return m_diag; }
     double ComputeVolume() const;
     void ComputeConvexHull(const double* const pts,
         const size_t nPts);
@@ -103,8 +99,6 @@ public:
         SArray<Vec3<double> >& positivePart,
         SArray<Vec3<double> >& negativePart) const;
     bool IsInside(const Vec3<double>& pt) const;
-    double ComputeDiagBB();
-	Vec3<double> &ComputeCenter(void);
 
 #ifdef VHACD_DEBUG_MESH
     bool LoadOFF(const std::string& fileName, bool invert);
@@ -121,10 +115,6 @@ public:
 private:
     SArray<Vec3<double> > m_points;
     SArray<Vec3<int32_t> > m_triangles;
-    Vec3<double> m_minBB;
-    Vec3<double> m_maxBB;
-    Vec3<double> m_center;
-    double m_diag;
 };
 }
 #endif

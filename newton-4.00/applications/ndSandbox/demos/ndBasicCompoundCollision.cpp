@@ -141,10 +141,10 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	// build a floor
 	//BuildPlayArena(scene);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 	//BuildCompoundScene(scene, dGetIdentityMatrix());
-	BuildGridPlane(scene, 120, 4.0f, 0.0f);
+	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
@@ -159,8 +159,14 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
-	location.m_posit.m_y = 1.9f;
+	location.m_posit.m_y = 1.7f;
 	AddSimpleConcaveMesh(scene, location, "camel.fbx");
+
+	location.m_posit.m_x = 10.0f;
+	location.m_posit.m_z = 5.0f;
+	location.m_posit.m_y = 2.0f;
+	AddSimpleConcaveMesh(scene, location, "dino.fbx");
+
 
 	ndVector origin(ndVector::m_zero);
 	origin.m_x -= 10.0f;
