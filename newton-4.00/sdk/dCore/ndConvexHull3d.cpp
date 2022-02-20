@@ -268,7 +268,18 @@ void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 
 	ndStack<ndConvexHull3dVertex> points (count);
 	ndStack<ndConvexHull3dPointCluster> treePool (treeCount + 256);
-	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], treePool.GetSizeInBytes());
+
+	const ndInt32 stride = ndInt32(strideInBytes / sizeof(ndFloat64));
+	for (ndInt32 i = 0; i < count; i++)
+	{
+		ndInt32 index = i * stride;
+		ndBigVector& vertex = points[i];
+		vertex = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], ndFloat64(0.0f));
+		dAssert(dCheckVector(vertex));
+		points[i].m_mark = 0;
+	}
+
+	count = InitVertexArray(&points[0], count, &treePool[0], treePool.GetSizeInBytes());
 
 #ifdef	D_OLD_CONVEXHULL_3D
 	if (m_points.GetCount() >= 4)
@@ -409,18 +420,8 @@ ndConvexHull3dAABBTreeNode* ndConvexHull3d::BuildTree (ndConvexHull3dAABBTreeNod
 	return tree;
 }
 
-ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const, ndInt32)
+ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, ndInt32 count)
 {
-	const ndInt32 stride = ndInt32(strideInBytes / sizeof(ndFloat64));
-	for (ndInt32 i = 0; i < count; i++) 
-	{
-		ndInt32 index = i * stride;
-		ndBigVector& vertex = points[i];
-		vertex = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], ndFloat64(0.0f));
-		dAssert(dCheckVector(vertex));
-		points[i].m_mark = 0;
-	}
-
 	class CompareVertex
 	{
 		public:
@@ -440,6 +441,7 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, cons
 			return 0;
 		}
 	};
+
 	ndSort<ndConvexHull3dVertex, CompareVertex>(points, count);
 
 	ndInt32 indexCount = 0;
@@ -460,15 +462,15 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, cons
 	return count;
 }
 
-ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize)
+ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize)
 {
-	count = GetUniquePoints(points, vertexCloud, strideInBytes, count, memoryPool, maxMemSize);
+	count = GetUniquePoints(points, count);
 	if (count < 4) 
 	{
 		m_points.SetCount(0);
 		return count;
 	}
-	ndConvexHull3dAABBTreeNode* tree = BuildTree (nullptr, points, count, 0, (ndInt8**) &memoryPool, maxMemSize);
+	ndConvexHull3dAABBTreeNode* tree = BuildTree (nullptr, &points[0], count, 0, (ndInt8**) &memoryPool, maxMemSize);
 
 	m_points.SetCount(count);
 	m_aabbP0 = tree->m_box[0];

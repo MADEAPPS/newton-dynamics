@@ -150,17 +150,17 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	ndMatrix location(dGetIdentityMatrix());
 
-	AddSphere(scene);
-	AddEmptyBox(scene);
-	
-	location.m_posit.m_y = 0.5f;
-	location.m_posit.m_z = -3.0f;
-	AddSimpleConcaveMesh(scene, location, "bowl.fbx");
-	
-	location.m_posit.m_x = 5.0f;
-	location.m_posit.m_z = -2.0f;
-	location.m_posit.m_y = 1.7f;
-	AddSimpleConcaveMesh(scene, location, "camel.fbx");
+	//AddSphere(scene);
+	//AddEmptyBox(scene);
+	//
+	//location.m_posit.m_y = 0.5f;
+	//location.m_posit.m_z = -3.0f;
+	//AddSimpleConcaveMesh(scene, location, "bowl.fbx");
+	//
+	//location.m_posit.m_x = 5.0f;
+	//location.m_posit.m_z = -2.0f;
+	//location.m_posit.m_y = 1.7f;
+	//AddSimpleConcaveMesh(scene, location, "camel.fbx");
 
 	location.m_posit.m_x = 10.0f;
 	location.m_posit.m_z = 5.0f;

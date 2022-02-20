@@ -81,16 +81,16 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 
 	virtual ndNode* AddFace (ndInt32 i0, ndInt32 i1, ndInt32 i2);
 	virtual void DeleteFace (ndNode* const node) ;
-	virtual ndInt32 InitVertexArray(ndConvexHull3dVertex* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize);
+	virtual ndInt32 InitVertexArray(ndConvexHull3dVertex* const points, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize);
 
 	bool CheckFlatSurface(ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 	void CalculateConvexHull2d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 	void CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
-	
+
 	ndInt32 SupportVertex (ndConvexHull3dAABBTreeNode** const tree, const ndConvexHull3dVertex* const points, const ndBigVector& dir, const bool removeEntry = true) const;
 	ndFloat64 TetrahedrumVolume (const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;
 
-	ndInt32 GetUniquePoints(ndConvexHull3dVertex* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize);
+	ndInt32 GetUniquePoints(ndConvexHull3dVertex* const points, ndInt32 count);
 	ndConvexHull3dAABBTreeNode* BuildTree (ndConvexHull3dAABBTreeNode* const parent, ndConvexHull3dVertex* const points, ndInt32 count, ndInt32 baseIndex, ndInt8** const memoryPool, ndInt32& maxMemSize) const;
 
 	bool Sanity() const;

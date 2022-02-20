@@ -57,15 +57,15 @@ class vhacdConvexHull: public vhacdList<vhacdConvexHullFace>
 	private:
 	void BuildHull (const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount);
 
-	int GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
-	int InitVertexArray(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize);
+	void GetUniquePoints(std::vector<vhacdConvexHullVertex>& points);
+	int InitVertexArray(std::vector<vhacdConvexHullVertex>& points, void* const memoryPool, int maxMemSize);
 	vhacdConvexHullAABBTreeNode* BuildTree (vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** const memoryPool, int& maxMemSize) const;
 
 	ndNode* AddFace (int i0, int i1, int i2);
 	
-	void CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount);
+	void CalculateConvexHull3d (vhacdConvexHullAABBTreeNode* vertexTree, std::vector<vhacdConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
 	
-	int SupportVertex (vhacdConvexHullAABBTreeNode** const tree, const vhacdConvexHullVertex* const points, const hullVector& dir, const bool removeEntry = true) const;
+	int SupportVertex (vhacdConvexHullAABBTreeNode** const tree, const std::vector<vhacdConvexHullVertex>& points, const hullVector& dir, const bool removeEntry = true) const;
 	double TetrahedrumVolume (const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
 
 	hullVector m_aabbP0;

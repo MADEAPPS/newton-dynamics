@@ -110,7 +110,6 @@ class vhacdConvexHull3dPointCluster : public vhacdConvexHullAABBTreeNode
 	int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 };
 
-
 class vhacdConvexHull::ndNormalMap
 {
 	public:
@@ -219,16 +218,7 @@ void vhacdConvexHull::BuildHull(const double* const vertexCloud, int strideInByt
 	std::vector<vhacdConvexHull3dPointCluster> treePool(treeCount + 256);
 	points.resize(count);
 	treePool.resize(treeCount + 256);
-	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], sizeof (vhacdConvexHull3dPointCluster) * int (treePool.size()));
 
-	if (m_points.size() >= 4)
-	{
-		CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
-	}
-}
-
-int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const, int)
-{
 	const int stride = int(strideInBytes / sizeof(double));
 	for (int i = 0; i < count; ++i)
 	{
@@ -237,7 +227,16 @@ int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const 
 		vertex = hullVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], double(0.0f));
 		points[i].m_mark = 0;
 	}
+	count = InitVertexArray(points, &treePool[0], sizeof (vhacdConvexHull3dPointCluster) * int (treePool.size()));
 
+	if (m_points.size() >= 4)
+	{
+		CalculateConvexHull3d(&treePool[0], points, count, distTol, maxVertexCount);
+	}
+}
+
+void vhacdConvexHull::GetUniquePoints(std::vector<vhacdConvexHullVertex>& points)
+{
 	class CompareVertex
 	{
 		public:
@@ -257,7 +256,9 @@ int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const 
 			return 0;
 		}
 	};
-	vhacdSort<vhacdConvexHullVertex, CompareVertex>(points, count);
+
+	int count = int(points.size());
+	vhacdSort<vhacdConvexHullVertex, CompareVertex>(&points[0], count);
 
 	int indexCount = 0;
 	CompareVertex compareVetex;
@@ -273,8 +274,7 @@ int vhacdConvexHull::GetUniquePoints(vhacdConvexHullVertex* const points, const 
 			}
 		}
 	}
-	count = indexCount + 1;
-	return count;
+	points.resize(indexCount + 1);
 }
 
 vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** memoryPool, int& maxMemSize) const
@@ -393,7 +393,7 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 	return tree;
 }
 
-int vhacdConvexHull::SupportVertex(vhacdConvexHullAABBTreeNode** const treePointer, const vhacdConvexHullVertex* const points, const hullVector& dirPlane, const bool removeEntry) const
+int vhacdConvexHull::SupportVertex(vhacdConvexHullAABBTreeNode** const treePointer, const std::vector<vhacdConvexHullVertex>& points, const hullVector& dirPlane, const bool removeEntry) const
 {
 #define DG_STACK_DEPTH_3D 64
 	double aabbProjection[DG_STACK_DEPTH_3D];
@@ -521,15 +521,16 @@ double vhacdConvexHull::TetrahedrumVolume(const hullVector& p0, const hullVector
 	return p3p0.DotProduct(p1p0.CrossProduct(p2p0));
 }
 
-int vhacdConvexHull::InitVertexArray(vhacdConvexHullVertex* const points, const double* const vertexCloud, int strideInBytes, int count, void* const memoryPool, int maxMemSize)
+int vhacdConvexHull::InitVertexArray(std::vector<vhacdConvexHullVertex>& points, void* const memoryPool, int maxMemSize)
 {
-	count = GetUniquePoints(points, vertexCloud, strideInBytes, count, memoryPool, maxMemSize);
+	GetUniquePoints(points);
+	int count = int (points.size());
 	if (count < 4)
 	{
 		m_points.resize(0);
-		return count;
+		return 0;
 	}
-	vhacdConvexHullAABBTreeNode* tree = BuildTree(nullptr, points, count, 0, (char**)&memoryPool, maxMemSize);
+	vhacdConvexHullAABBTreeNode* tree = BuildTree(nullptr, &points[0], count, 0, (char**)&memoryPool, maxMemSize);
 	
 	m_points.resize(count);
 	m_aabbP0 = tree->m_box[0];
@@ -669,7 +670,7 @@ vhacdConvexHull::ndNode* vhacdConvexHull::AddFace(int i0, int i1, int i2)
 	return node;
 }
 
-void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexTree, vhacdConvexHullVertex* const points, int count, double distTol, int maxVertexCount)
+void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexTree, std::vector<vhacdConvexHullVertex>& points, int count, double distTol, int maxVertexCount)
 {
 	distTol = fabs(distTol) * m_diag;
 	ndNode* const f0Node = AddFace(0, 1, 2);
