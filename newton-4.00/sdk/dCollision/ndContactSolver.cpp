@@ -253,7 +253,7 @@ class ndStackBvhStackEntry
 
 			ndInt32 j = stack;
 			ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, bvhOrigin, bvhSize);
-			for (; j && (dist2 > stackPool[j - 1].m_dist2); j--)
+			for (; j && (dist2 > stackPool[j - 1].m_dist2); --j)
 			{
 				stackPool[j] = stackPool[j - 1];
 			}
@@ -289,7 +289,7 @@ class ndStackEntry
 
 			ndInt32 j = stack;
 			ndFloat32 subDist2 = data.CalculateDistance2(node0->m_origin, node0->m_size, node1->m_origin, node1->m_size);
-			for (; j && (subDist2 > stackPool[j - 1].m_dist2); j--)
+			for (; j && (subDist2 > stackPool[j - 1].m_dist2); --j)
 			{
 				stackPool[j] = stackPool[j - 1];
 			}
@@ -542,7 +542,7 @@ ndBigVector ndContactSolver::ReduceTriangle(ndInt32& indexOut)
 		ndInt32 count = 3;
 		for (ndInt32 i = 2; i > 0; i--)
 		{
-			for (ndInt32 j = i - 1; j >= 0; j--)
+			for (ndInt32 j = i - 1; j >= 0; --j)
 			{
 				ndVector dist(m_hullDiff[i] - m_hullDiff[j]);
 				ndFloat32 mag2 = dist.DotProduct(dist).GetScalar();
@@ -1490,7 +1490,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	{
 		ndInt32 j = i;
 		ndVector tmp(array[i]);
-		for (; array[j - 1].m_x > tmp.m_x; j--) 
+		for (; array[j - 1].m_x > tmp.m_x; --j) 
 		{
 			dAssert(j > 0);
 			array[j] = array[j - 1];
@@ -1676,7 +1676,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 
 				dCluster cluster_i1(cluster);
 				cluster_i1.m_start = start + i0;
-				cluster_i1.m_count = start - i0;
+				cluster_i1.m_count = cluster.m_count - i0;
 				cluster_i1.m_sum -= xc;
 				cluster_i1.m_sum2 -= x2c;
 				spliteStack[stack] = cluster_i1;
@@ -1697,13 +1697,13 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	if (baseCount > maxCount)
 	{
 		ndInt32 maxIndex = 0;
-		ndFloat32 max_x = ndFloat32(1.0e20f);
+		ndFloat32 min_x = ndFloat32(1.0e20f);
 		for (ndInt32 i = 0; i < count; ++i)
 		{
-			if (array[i].m_x < max_x)
+			if (array[i].m_x < min_x)
 			{
 				maxIndex = i;
-				max_x = array[i].m_x;
+				min_x = array[i].m_x;
 			}
 		}
 		dSwap(array[0], array[maxIndex]);
@@ -1712,7 +1712,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 		{
 			ndInt32 j = i;
 			ndVector tmp(array[i]);
-			for (; array[j - 1].m_x > tmp.m_x; j--)
+			for (; array[j - 1].m_x > tmp.m_x; --j)
 			{
 				dAssert(j > 0);
 				array[j] = array[j - 1];
@@ -2787,7 +2787,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 				dAssert(left);
 				ndFloat32 subDist2 = data.CalculateDistance2(origin, size, left->m_origin, left->m_size);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -2803,7 +2803,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 				dAssert(right);
 				ndFloat32 subDist2 = data.CalculateDistance2(origin, size, right->m_origin, right->m_size);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -2909,7 +2909,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				dAssert(left);
 				ndFloat32 subDist2 = data.CalculateDistance2(left->m_origin, left->m_size, origin, size);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -2925,7 +2925,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				dAssert(right);
 				ndFloat32 subDist2 = data.CalculateDistance2(right->m_origin, right->m_size, origin, size);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -3572,7 +3572,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 				dAssert(left);
 				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, left, heightfieldInstance);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -3588,7 +3588,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 				dAssert(right);
 				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, right, heightfieldInstance);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -3696,7 +3696,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 				dAssert(left);
 				ndFloat32 subDist2 = callback.CalculateProceduralDist2(data, left, ProceduralInstance);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -3712,7 +3712,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 				dAssert(right);
 				ndFloat32 subDist2 = callback.CalculateProceduralDist2(data, right, ProceduralInstance);
 				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				for (; j && (subDist2 > stackDistance[j - 1]); --j)
 				{
 					stackPool[j] = stackPool[j - 1];
 					stackDistance[j] = stackDistance[j - 1];
@@ -4068,7 +4068,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				if (dist1 <= ndFloat32 (1.0f))
 				{
 					ndInt32 j = stack;
-					for (; j && (dist1 > impactTime[j - 1]); j--)
+					for (; j && (dist1 > impactTime[j - 1]); --j)
 					{
 						stackPool[j] = stackPool[j - 1];
 						impactTime[j] = impactTime[j - 1];
@@ -4089,7 +4089,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				if (dist1 <= ndFloat32(1.0f))
 				{
 					ndInt32 j = stack;
-					for (; j && (dist1 > impactTime[j - 1]); j--)
+					for (; j && (dist1 > impactTime[j - 1]); --j)
 					{
 						stackPool[j] = stackPool[j - 1];
 						impactTime[j] = impactTime[j - 1];

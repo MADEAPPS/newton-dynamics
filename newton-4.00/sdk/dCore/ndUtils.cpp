@@ -376,14 +376,12 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	
 				ndBigVector xc(ndBigVector::m_zero);
 				ndBigVector x2c(ndBigVector::m_zero);
-				//ndBigVector maxP(ndFloat64(-1.0e20f));
 				for (ndInt32 i = 0; i < i0; ++i)
 				{
 					ndInt32 j = remapIndex[i].m_vertexIndex;
 					const ndBigVector x(vertList[j * stride + 0], vertList[j * stride + 1], vertList[j * stride + 2], ndFloat64(0.0f));
 					xc += x;
 					x2c += x * x;
-					//maxP = maxP.GetMax(x);
 				}
 	
 				dSortCluster cluster_i1(cluster);

@@ -1910,14 +1910,12 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 		
 				ndBigVector xc(ndBigVector::m_zero);
 				ndBigVector x2c(ndBigVector::m_zero);
-				//ndBigVector maxP(ndFloat64(-1.0e20f));
 				for (ndInt32 i = 0; i < i0; ++i)
 				{
 					ndInt32 index = remapIndex[i].m_vertexIndex;
 					ndBigVector x(tmpFormat.m_vertex[index]);
 					xc += x;
 					x2c += x * x;
-					//maxP = maxP.GetMax(x);
 				}
 
 				dSortCluster cluster_i1(cluster);

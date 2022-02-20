@@ -59,7 +59,10 @@ class vhacdConvexHull: public vhacdList<vhacdConvexHullFace>
 
 	void GetUniquePoints(std::vector<vhacdConvexHullVertex>& points);
 	int InitVertexArray(std::vector<vhacdConvexHullVertex>& points, void* const memoryPool, int maxMemSize);
-	vhacdConvexHullAABBTreeNode* BuildTree (vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** const memoryPool, int& maxMemSize) const;
+	
+	vhacdConvexHullAABBTreeNode* BuildTreeNew(std::vector<vhacdConvexHullVertex>& points, char** const memoryPool, int& maxMemSize) const;
+	vhacdConvexHullAABBTreeNode* BuildTreeOld(std::vector<vhacdConvexHullVertex>& points, char** const memoryPool, int& maxMemSize);
+	vhacdConvexHullAABBTreeNode* BuildTreeRecurse(vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** const memoryPool, int& maxMemSize) const;
 
 	ndNode* AddFace (int i0, int i1, int i2);
 	

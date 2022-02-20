@@ -456,6 +456,12 @@ class vhacdGoogol
 };
 
 template <class T>
+inline T vhacdMax(T A, T B)
+{
+	return (A > B) ? A : B;
+}
+
+template <class T>
 inline void vhacdSwap(T& A, T& B)
 {
 	T tmp(A);

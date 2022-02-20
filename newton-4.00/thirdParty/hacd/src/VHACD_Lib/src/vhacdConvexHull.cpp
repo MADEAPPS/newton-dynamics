@@ -97,6 +97,21 @@ class vhacdConvexHullVertex : public hullVector
 class vhacdConvexHullAABBTreeNode
 {
 	public:
+	//vhacdConvexHullAABBTreeNode(vhacdConvexHullAABBTreeNode* const parent)
+	vhacdConvexHullAABBTreeNode()
+		:m_left(nullptr)
+		,m_right(nullptr)
+		,m_parent(nullptr)
+	{
+	}
+
+	vhacdConvexHullAABBTreeNode(vhacdConvexHullAABBTreeNode* const parent)
+		:m_left(nullptr)
+		,m_right(nullptr)
+		,m_parent(parent)
+	{
+	}
+
 	hullVector m_box[2];
 	vhacdConvexHullAABBTreeNode* m_left;
 	vhacdConvexHullAABBTreeNode* m_right;
@@ -106,6 +121,16 @@ class vhacdConvexHullAABBTreeNode
 class vhacdConvexHull3dPointCluster : public vhacdConvexHullAABBTreeNode
 {
 	public:
+	vhacdConvexHull3dPointCluster()
+		:vhacdConvexHullAABBTreeNode()
+	{
+	}
+
+	vhacdConvexHull3dPointCluster(vhacdConvexHullAABBTreeNode* const parent)
+		:vhacdConvexHullAABBTreeNode(parent)
+	{
+	}
+
 	int m_count;
 	int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 };
@@ -277,7 +302,7 @@ void vhacdConvexHull::GetUniquePoints(std::vector<vhacdConvexHullVertex>& points
 	points.resize(indexCount + 1);
 }
 
-vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** memoryPool, int& maxMemSize) const
+vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTreeRecurse(vhacdConvexHullAABBTreeNode* const parent, vhacdConvexHullVertex* const points, int count, int baseIndex, char** memoryPool, int& maxMemSize) const
 {
 	vhacdConvexHullAABBTreeNode* tree = nullptr;
 
@@ -286,7 +311,7 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 	hullVector maxP(-double(1.0e15f));
 	if (count <= VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE)
 	{
-		vhacdConvexHull3dPointCluster* const clump = new (*memoryPool) vhacdConvexHull3dPointCluster;
+		vhacdConvexHull3dPointCluster* const clump = new (*memoryPool) vhacdConvexHull3dPointCluster();
 		*memoryPool += sizeof(vhacdConvexHull3dPointCluster);
 		maxMemSize -= sizeof(vhacdConvexHull3dPointCluster);
 		_ASSERT(maxMemSize >= 0);
@@ -305,7 +330,6 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 		clump->m_left = nullptr;
 		clump->m_right = nullptr;
 		tree = clump;
-
 	}
 	else
 	{
@@ -374,7 +398,7 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 			i0 = count / 2;
 		}
 
-		tree = new (*memoryPool) vhacdConvexHullAABBTreeNode;
+		tree = new (*memoryPool) vhacdConvexHullAABBTreeNode();
 		*memoryPool += sizeof(vhacdConvexHullAABBTreeNode);
 		maxMemSize -= sizeof(vhacdConvexHullAABBTreeNode);
 		_ASSERT(maxMemSize >= 0);
@@ -382,8 +406,8 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 		_ASSERT(i0);
 		_ASSERT(count - i0);
 
-		tree->m_left = BuildTree(tree, points, i0, baseIndex, memoryPool, maxMemSize);
-		tree->m_right = BuildTree(tree, &points[i0], count - i0, i0 + baseIndex, memoryPool, maxMemSize);
+		tree->m_left = BuildTreeRecurse(tree, points, i0, baseIndex, memoryPool, maxMemSize);
+		tree->m_right = BuildTreeRecurse(tree, &points[i0], count - i0, i0 + baseIndex, memoryPool, maxMemSize);
 	}
 
 	_ASSERT(tree);
@@ -391,6 +415,405 @@ vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTree(vhacdConvexHullAABBTreeN
 	tree->m_box[0] = minP - hullVector(double(1.0e-3f));
 	tree->m_box[1] = maxP + hullVector(double(1.0e-3f));
 	return tree;
+}
+
+vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTreeOld(std::vector<vhacdConvexHullVertex>& points, char** const memoryPool, int& maxMemSize)
+{
+	GetUniquePoints(points);
+	int count = int(points.size());
+	if (count < 4)
+	{
+		return nullptr;
+	}
+	return BuildTreeRecurse(nullptr, &points[0], count, 0, memoryPool, maxMemSize);
+}
+
+vhacdConvexHullAABBTreeNode* vhacdConvexHull::BuildTreeNew(std::vector<vhacdConvexHullVertex>& points, char** const memoryPool, int& maxMemSize) const
+{
+	class dCluster
+	{
+		public:
+		hullVector m_sum;
+		hullVector m_sum2;
+		int m_start;
+		int m_count;
+	};
+
+	dCluster firstCluster;
+	firstCluster.m_start = 0;
+	firstCluster.m_count = int (points.size());
+	firstCluster.m_sum = hullVector(0);
+	firstCluster.m_sum2 = hullVector(0);
+
+	for (int i = 0; i < firstCluster.m_count; ++i)
+	{
+		const hullVector& p = points[i];
+		firstCluster.m_sum += p;
+		firstCluster.m_sum2 += p * p;
+	}
+
+	int baseCount = 0;
+	const int clusterSize = 16;
+
+	if (firstCluster.m_count > clusterSize)
+	{
+		dCluster spliteStack[128];
+		spliteStack[0] = firstCluster;
+		int stack = 1;
+
+		while (stack)
+		{
+			stack--;
+			dCluster cluster (spliteStack[stack]);
+
+			const hullVector origin(cluster.m_sum.Scale(1.0f / cluster.m_count));
+			const hullVector variance2(cluster.m_sum2.Scale(1.0f / cluster.m_count) - origin * origin);
+			double maxVariance2 = vhacdMax(vhacdMax(variance2.X(), variance2.Y()), variance2.Z());
+
+			if ((cluster.m_count <= clusterSize) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < 1.e-4f))
+			{
+				// no sure if this is beneficial, 
+				// the array is so small that seem too much overhead
+				//int maxIndex = 0;
+				//double min_x = 1.0e20f;
+				//for (int i = 0; i < cluster.m_count; ++i)
+				//{
+				//	if (points[cluster.m_start + i].X() < min_x)
+				//	{
+				//		maxIndex = i;
+				//		min_x = points[cluster.m_start + i].X();
+				//	}
+				//}
+				//vhacdSwap(points[cluster.m_start], points[cluster.m_start + maxIndex]);
+				//
+				//for (int i = 2; i < cluster.m_count; ++i)
+				//{
+				//	int j = i;
+				//	vhacdConvexHullVertex tmp(points[cluster.m_start + i]);
+				//	for (; points[cluster.m_start + j - 1].X() > tmp.X(); --j)
+				//	{
+				//		_ASSERT(j > 0);
+				//		points[cluster.m_start + j] = points[cluster.m_start + j - 1];
+				//	}
+				//	points[cluster.m_start + j] = tmp;
+				//}
+
+				int count = cluster.m_count;
+				for (int i = cluster.m_count - 1; i > 0; --i)
+				{
+					for (int j = i - 1; j >= 0; --j)
+					{
+						hullVector error(points[cluster.m_start + j] - points[cluster.m_start + i]);
+						double mag2 = error.DotProduct(error);
+						if (mag2 < 1.0e-6)
+						{
+							points[cluster.m_start + j] = points[cluster.m_start + i];
+							count--;
+							break;
+						}
+					}
+				}
+
+				_ASSERT(baseCount <= cluster.m_start);
+				for (int i = 0; i < count; ++i)
+				{
+					points[baseCount] = points[cluster.m_start + i];
+					baseCount++;
+				}
+			}
+			else
+			{
+				int firstSortAxis = 0;
+				if ((variance2.Y() >= variance2.X()) && (variance2.Y() >= variance2.Z()))
+				{
+					firstSortAxis = 1;
+				}
+				else if ((variance2.Z() >= variance2.X()) && (variance2.Z() >= variance2.Y()))
+				{
+					firstSortAxis = 2;
+				}
+				double axisVal = origin[firstSortAxis];
+
+				int i0 = 0;
+				int i1 = cluster.m_count - 1;
+
+				const int start = cluster.m_start;
+				while (i0 < i1)
+				{
+					while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < i1))
+					{
+						++i0;
+					};
+
+					while ((points[start + i1][firstSortAxis] > axisVal) && (i0 < i1))
+					{
+						--i1;
+					}
+
+					_ASSERT(i0 <= i1);
+					if (i0 < i1)
+					{
+						vhacdSwap(points[start + i0], points[start + i1]);
+						++i0;
+						--i1;
+					}
+				}
+
+				while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < cluster.m_count))
+				{
+					++i0;
+				};
+
+				#ifdef _DEBUG
+				for (int i = 0; i < i0; ++i)
+				{
+					_ASSERT(points[start + i][firstSortAxis] <= axisVal);
+				}
+
+				for (int i = i0; i < cluster.m_count; ++i)
+				{
+					_ASSERT(points[start + i][firstSortAxis] > axisVal);
+				}
+				#endif
+
+				hullVector xc(0);
+				hullVector x2c(0);
+				for (int i = 0; i < i0; ++i)
+				{
+					const hullVector& x = points[start + i];
+					xc += x;
+					x2c += x * x;
+				}
+
+				dCluster cluster_i1(cluster);
+				cluster_i1.m_start = start + i0;
+				cluster_i1.m_count = cluster.m_count - i0;
+				cluster_i1.m_sum -= xc;
+				cluster_i1.m_sum2 -= x2c;
+				spliteStack[stack] = cluster_i1;
+				_ASSERT(cluster_i1.m_count > 0);
+				stack++;
+
+				dCluster cluster_i0(cluster);
+				cluster_i0.m_start = start;
+				cluster_i0.m_count = i0;
+				cluster_i0.m_sum = xc;
+				cluster_i0.m_sum2 = x2c;
+				_ASSERT(cluster_i0.m_count > 0);
+				spliteStack[stack] = cluster_i0;
+				stack++;
+			}
+		}
+	}
+
+	points.resize(baseCount);
+	if (baseCount < 4)
+	{
+		return nullptr;
+	}
+
+	hullVector sum(0);
+	hullVector sum2(0);
+	hullVector minP(double(1.0e15f));
+	hullVector maxP(-double(1.0e15f));
+	class dTreeBox
+	{
+		public:
+		hullVector m_min;
+		hullVector m_max;
+		hullVector m_sum;
+		hullVector m_sum2;
+		vhacdConvexHullAABBTreeNode* m_parent;
+		vhacdConvexHullAABBTreeNode** m_child;
+		int m_start;
+		int m_count;
+	};
+
+	for (int i = 0; i < baseCount; ++i)
+	{
+		const hullVector& p = points[i];
+		sum += p;
+		sum2 += p * p;
+		minP = minP.GetMin(p);
+		maxP = maxP.GetMax(p);
+	}
+	
+	dTreeBox treeBoxStack[128];
+	treeBoxStack[0].m_start = 0;
+	treeBoxStack[0].m_count = baseCount;
+	treeBoxStack[0].m_sum = sum;
+	treeBoxStack[0].m_sum2 = sum2;
+	treeBoxStack[0].m_min = minP;
+	treeBoxStack[0].m_max = maxP;
+	treeBoxStack[0].m_child = nullptr;
+	treeBoxStack[0].m_parent = nullptr;
+
+	int stack = 1;
+	vhacdConvexHullAABBTreeNode* root = nullptr;
+	while (stack)
+	{
+		stack--;
+		dTreeBox box (treeBoxStack[stack]);
+		if (box.m_count <= VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE)
+		{
+			vhacdConvexHull3dPointCluster* const clump = new (*memoryPool) vhacdConvexHull3dPointCluster(box.m_parent);
+			*memoryPool += sizeof(vhacdConvexHull3dPointCluster);
+			maxMemSize -= sizeof(vhacdConvexHull3dPointCluster);
+			_ASSERT(maxMemSize >= 0);
+		
+			_ASSERT(clump);
+			clump->m_count = box.m_count;
+			for (int i = 0; i < box.m_count; ++i)
+			{
+				clump->m_indices[i] = i + box.m_start;
+			}
+			clump->m_box[0] = box.m_min;
+			clump->m_box[1] = box.m_max;
+
+			if (box.m_child)
+			{
+				*box.m_child = clump;
+			}
+
+			if (!root)
+			{
+				root = clump;
+			}
+		}
+		else
+		{
+			const hullVector origin(box.m_sum.Scale(1.0f / box.m_count));
+			const hullVector variance2(box.m_sum2.Scale(1.0f / box.m_count) - origin * origin);
+
+			int firstSortAxis = 0;
+			if ((variance2.Y() >= variance2.X()) && (variance2.Y() >= variance2.Z()))
+			{
+				firstSortAxis = 1;
+			}
+			else if ((variance2.Z() >= variance2.X()) && (variance2.Z() >= variance2.Y()))
+			{
+				firstSortAxis = 2;
+			}
+			double axisVal = origin[firstSortAxis];
+
+			int i0 = 0;
+			int i1 = box.m_count - 1;
+
+			const int start = box.m_start;
+			while (i0 < i1)
+			{
+				while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < i1))
+				{
+					++i0;
+				};
+
+				while ((points[start + i1][firstSortAxis] > axisVal) && (i0 < i1))
+				{
+					--i1;
+				}
+
+				_ASSERT(i0 <= i1);
+				if (i0 < i1)
+				{
+					vhacdSwap(points[start + i0], points[start + i1]);
+					++i0;
+					--i1;
+				}
+			}
+
+			while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < box.m_count))
+			{
+				++i0;
+			};
+
+			#ifdef _DEBUG
+			for (int i = 0; i < i0; ++i)
+			{
+				_ASSERT(points[start + i][firstSortAxis] <= axisVal);
+			}
+
+			for (int i = i0; i < box.m_count; ++i)
+			{
+				_ASSERT(points[start + i][firstSortAxis] > axisVal);
+			}
+			#endif
+
+			vhacdConvexHullAABBTreeNode* const node = new (*memoryPool) vhacdConvexHullAABBTreeNode(box.m_parent);
+			*memoryPool += sizeof(vhacdConvexHullAABBTreeNode);
+			maxMemSize -= sizeof(vhacdConvexHullAABBTreeNode);
+			_ASSERT(maxMemSize >= 0);
+
+			node->m_box[0] = box.m_min;
+			node->m_box[1] = box.m_max;
+			if (box.m_child)
+			{
+				*box.m_child = node;
+			}
+
+			if (!root)
+			{
+				root = node;
+			}
+
+			{
+				hullVector xc(0);
+				hullVector x2c(0);
+				hullVector p0(double(1.0e15f));
+				hullVector p1(-double(1.0e15f));
+				for (int i = i0; i < box.m_count; ++i)
+				{
+					const hullVector& p = points[start + i];
+					xc += p;
+					x2c += p * p;
+					p0 = p0.GetMin(p);
+					p1 = p1.GetMax(p);
+				}
+
+				dTreeBox cluster_i1(box);
+				cluster_i1.m_start = start + i0;
+				cluster_i1.m_count = box.m_count - i0;
+				cluster_i1.m_sum = xc;
+				cluster_i1.m_sum2 = x2c;
+				cluster_i1.m_min = p0;
+				cluster_i1.m_max = p1;
+				cluster_i1.m_parent = node;
+				cluster_i1.m_child = &node->m_right;
+				treeBoxStack[stack] = cluster_i1;
+				_ASSERT(cluster_i1.m_count > 0);
+				stack++;
+			}
+
+			{
+				hullVector xc(0);
+				hullVector x2c(0);
+				hullVector p0(double(1.0e15f));
+				hullVector p1(-double(1.0e15f));
+				for (int i = 0; i < i0; ++i)
+				{
+					const hullVector& p = points[start + i];
+					xc += p;
+					x2c += p * p;
+					p0 = p0.GetMin(p);
+					p1 = p1.GetMax(p);
+				}
+
+				dTreeBox cluster_i0(box);
+				cluster_i0.m_start = start;
+				cluster_i0.m_count = i0;
+				cluster_i0.m_min = p0;
+				cluster_i0.m_max = p1;
+				cluster_i0.m_sum = xc;
+				cluster_i0.m_sum2 = x2c;
+				cluster_i0.m_parent = node;
+				cluster_i0.m_child = &node->m_left;
+				_ASSERT(cluster_i0.m_count > 0);
+				treeBoxStack[stack] = cluster_i0;
+				stack++;
+			}
+		}
+	}
+	
+	return root;
 }
 
 int vhacdConvexHull::SupportVertex(vhacdConvexHullAABBTreeNode** const treePointer, const std::vector<vhacdConvexHullVertex>& points, const hullVector& dirPlane, const bool removeEntry) const
@@ -523,15 +946,18 @@ double vhacdConvexHull::TetrahedrumVolume(const hullVector& p0, const hullVector
 
 int vhacdConvexHull::InitVertexArray(std::vector<vhacdConvexHullVertex>& points, void* const memoryPool, int maxMemSize)
 {
-	GetUniquePoints(points);
+#if 1
+	vhacdConvexHullAABBTreeNode* tree = BuildTreeOld(points, (char**)&memoryPool, maxMemSize);
+#else
+	vhacdConvexHullAABBTreeNode* tree = BuildTreeNew(points, (char**)&memoryPool, maxMemSize);
+#endif
 	int count = int (points.size());
 	if (count < 4)
 	{
 		m_points.resize(0);
 		return 0;
 	}
-	vhacdConvexHullAABBTreeNode* tree = BuildTree(nullptr, &points[0], count, 0, (char**)&memoryPool, maxMemSize);
-	
+		
 	m_points.resize(count);
 	m_aabbP0 = tree->m_box[0];
 	m_aabbP1 = tree->m_box[1];
