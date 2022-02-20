@@ -31,7 +31,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 #define USE_GENERIC_CPP_11
 
-#define USE_THREAD 1
 #define OCL_MIN_NUM_PRIMITIVES 4096
 #define CH_APP_MIN_NUM_PRIMITIVES 64000
 namespace VHACD {
@@ -40,19 +39,6 @@ public:
     //! Constructor.
     VHACD()
     {
-#if USE_THREAD == 1 && _OPENMP
-        m_ompNumProcessors = 2 * omp_get_num_procs();
-        omp_set_num_threads(m_ompNumProcessors);
-#else //USE_THREAD == 1 && _OPENMP
-        m_ompNumProcessors = 1;
-#endif //USE_THREAD == 1 && _OPENMP
-#ifdef CL_VERSION_1_1
-        m_oclWorkGroupSize = 0;
-        m_oclDevice = 0;
-        m_oclQueue = 0;
-        m_oclKernelComputePartialVolumes = 0;
-        m_oclKernelComputeSum = 0;
-#endif //CL_VERSION_1_1
         Init();
     }
     //! Destructor.
@@ -110,10 +96,6 @@ public:
         const uint32_t* const triangles,
         const uint32_t nTriangles,
         const Parameters& params);
-    bool OCLInit(void* const oclDevice,
-        IUserLogger* const logger = 0);
-    bool OCLRelease(IUserLogger* const logger = 0);
-
 	virtual bool ComputeCenterOfMass(double centerOfMass[3]) const;
 
 private:
@@ -322,18 +304,13 @@ private:
         {
             mRaycastMesh = RaycastMesh::createRaycastMesh(nPoints, points, nTriangles, (const uint32_t *)triangles);
         }
-        if (params.m_oclAcceleration) {
-            // build kernels
-        }
+
         AlignMesh(points, 3, nPoints, (int32_t *)triangles, 3, nTriangles, params);
         VoxelizeMesh(points, 3, nPoints, (int32_t *)triangles, 3, nTriangles, params);
         ComputePrimitiveSet(params);
         ComputeACD(params);
         MergeConvexHulls(params);
         SimplifyConvexHulls(params);
-        if (params.m_oclAcceleration) {
-            // Release kernels
-        }
         if (GetCancel()) {
             Clean();
             return false;
@@ -358,17 +335,6 @@ private:
     PrimitiveSet* m_pset;
     Mutex m_cancelMutex;
     bool m_cancel;
-    int32_t m_ompNumProcessors;
-#ifdef CL_VERSION_1_1
-    cl_device_id* m_oclDevice;
-    cl_context m_oclContext;
-    cl_program m_oclProgram;
-    cl_command_queue* m_oclQueue;
-    cl_kernel* m_oclKernelComputePartialVolumes;
-    cl_kernel* m_oclKernelComputeSum;
-    size_t m_oclWorkGroupSize;
-#endif //CL_VERSION_1_1
-
 #ifdef USE_GENERIC_CPP_11
 	vhacdQueue m_parallelQueue;
 #endif

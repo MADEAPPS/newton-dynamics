@@ -215,17 +215,6 @@ public:
 		delete this;
 	}
 
-	virtual bool OCLInit(void* const oclDevice,
-		IVHACD::IUserLogger* const logger = 0) final
-	{
-		return mVHACD->OCLInit(oclDevice, logger);
-	}
-		
-	virtual bool OCLRelease(IVHACD::IUserLogger* const logger = 0) final
-	{
-		return mVHACD->OCLRelease(logger);
-	}
-
 	virtual void Update(const double overallProgress,
 		const double stageProgress,
 		const double operationProgress,

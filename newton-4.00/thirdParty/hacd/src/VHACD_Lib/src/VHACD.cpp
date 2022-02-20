@@ -23,11 +23,6 @@
 #include <limits>
 #include <sstream>
 #include "vhacdConvexHull.h"
-
-#if _OPENMP
-#include <omp.h>
-#endif // _OPENMP
-
 #include "../public/VHACD.h"
 #include "vhacdICHull.h"
 #include "vhacdMesh.h"
@@ -209,190 +204,7 @@ IVHACD* CreateVHACD(void)
 {
     return new VHACD();
 }
-bool VHACD::OCLInit(void* const oclDevice, IUserLogger* const logger)
-{
-#ifdef CL_VERSION_1_1
-    m_oclDevice = (cl_device_id*)oclDevice;
-    cl_int error;
-    m_oclContext = clCreateContext(NULL, 1, m_oclDevice, NULL, NULL, &error);
-    if (error != CL_SUCCESS) {
-        if (logger) {
-            logger->Log("Couldn't create context\n");
-        }
-        return false;
-    }
 
-#ifdef OCL_SOURCE_FROM_FILE
-    std::string cl_files = OPENCL_CL_FILES;
-// read kernal from file
-#ifdef _WIN32
-    std::replace(cl_files.begin(), cl_files.end(), '/', '\\');
-#endif // _WIN32
-
-    FILE* program_handle = fopen(cl_files.c_str(), "rb");
-    fseek(program_handle, 0, SEEK_END);
-    size_t program_size = ftell(program_handle);
-    rewind(program_handle);
-    char* program_buffer = new char[program_size + 1];
-    program_buffer[program_size] = '\0';
-    fread(program_buffer, sizeof(char), program_size, program_handle);
-    fclose(program_handle);
-    // create program
-    m_oclProgram = clCreateProgramWithSource(m_oclContext, 1, (const char**)&program_buffer, &program_size, &error);
-    delete[] program_buffer;
-#else
-    size_t program_size = strlen(oclProgramSource);
-    m_oclProgram = clCreateProgramWithSource(m_oclContext, 1, (const char**)&oclProgramSource, &program_size, &error);
-#endif
-    if (error != CL_SUCCESS) {
-        if (logger) {
-            logger->Log("Couldn't create program\n");
-        }
-        return false;
-    }
-
-    /* Build program */
-    error = clBuildProgram(m_oclProgram, 1, m_oclDevice, "-cl-denorms-are-zero", NULL, NULL);
-    if (error != CL_SUCCESS) {
-        size_t log_size;
-        /* Find Size of log and print to std output */
-        clGetProgramBuildInfo(m_oclProgram, *m_oclDevice, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
-        char* program_log = new char[log_size + 2];
-        program_log[log_size] = '\n';
-        program_log[log_size + 1] = '\0';
-        clGetProgramBuildInfo(m_oclProgram, *m_oclDevice, CL_PROGRAM_BUILD_LOG, log_size + 1, program_log, NULL);
-        if (logger) {
-            logger->Log("Couldn't build program\n");
-            logger->Log(program_log);
-        }
-        delete[] program_log;
-        return false;
-    }
-
-    delete[] m_oclQueue;
-    delete[] m_oclKernelComputePartialVolumes;
-    delete[] m_oclKernelComputeSum;
-    m_oclQueue = new cl_command_queue[m_ompNumProcessors];
-    m_oclKernelComputePartialVolumes = new cl_kernel[m_ompNumProcessors];
-    m_oclKernelComputeSum = new cl_kernel[m_ompNumProcessors];
-
-    const char nameKernelComputePartialVolumes[] = "ComputePartialVolumes";
-    const char nameKernelComputeSum[] = "ComputePartialSums";
-    for (int32_t k = 0; k < m_ompNumProcessors; ++k) {
-        m_oclKernelComputePartialVolumes[k] = clCreateKernel(m_oclProgram, nameKernelComputePartialVolumes, &error);
-        if (error != CL_SUCCESS) {
-            if (logger) {
-                logger->Log("Couldn't create kernel\n");
-            }
-            return false;
-        }
-        m_oclKernelComputeSum[k] = clCreateKernel(m_oclProgram, nameKernelComputeSum, &error);
-        if (error != CL_SUCCESS) {
-            if (logger) {
-                logger->Log("Couldn't create kernel\n");
-            }
-            return false;
-        }
-    }
-
-    error = clGetKernelWorkGroupInfo(m_oclKernelComputePartialVolumes[0],
-        *m_oclDevice,
-        CL_KERNEL_WORK_GROUP_SIZE,
-        sizeof(size_t),
-        &m_oclWorkGroupSize,
-        NULL);
-    size_t workGroupSize = 0;
-    error = clGetKernelWorkGroupInfo(m_oclKernelComputeSum[0],
-        *m_oclDevice,
-        CL_KERNEL_WORK_GROUP_SIZE,
-        sizeof(size_t),
-        &workGroupSize,
-        NULL);
-    if (error != CL_SUCCESS) {
-        if (logger) {
-            logger->Log("Couldn't query work group info\n");
-        }
-        return false;
-    }
-
-    if (workGroupSize < m_oclWorkGroupSize) {
-        m_oclWorkGroupSize = workGroupSize;
-    }
-
-    for (int32_t k = 0; k < m_ompNumProcessors; ++k) {
-        m_oclQueue[k] = clCreateCommandQueue(m_oclContext, *m_oclDevice, 0 /*CL_QUEUE_PROFILING_ENABLE*/, &error);
-        if (error != CL_SUCCESS) {
-            if (logger) {
-                logger->Log("Couldn't create queue\n");
-            }
-            return false;
-        }
-    }
-    return true;
-#else //CL_VERSION_1_1
-    return false;
-#endif //CL_VERSION_1_1
-}
-bool VHACD::OCLRelease(IUserLogger* const logger)
-{
-#ifdef CL_VERSION_1_1
-    cl_int error;
-    if (m_oclKernelComputePartialVolumes) {
-        for (int32_t k = 0; k < m_ompNumProcessors; ++k) {
-            error = clReleaseKernel(m_oclKernelComputePartialVolumes[k]);
-            if (error != CL_SUCCESS) {
-                if (logger) {
-                    logger->Log("Couldn't release kernal\n");
-                }
-                return false;
-            }
-        }
-        delete[] m_oclKernelComputePartialVolumes;
-    }
-    if (m_oclKernelComputeSum) {
-        for (int32_t k = 0; k < m_ompNumProcessors; ++k) {
-            error = clReleaseKernel(m_oclKernelComputeSum[k]);
-            if (error != CL_SUCCESS) {
-                if (logger) {
-                    logger->Log("Couldn't release kernal\n");
-                }
-                return false;
-            }
-        }
-        delete[] m_oclKernelComputeSum;
-    }
-    if (m_oclQueue) {
-        for (int32_t k = 0; k < m_ompNumProcessors; ++k) {
-            error = clReleaseCommandQueue(m_oclQueue[k]);
-            if (error != CL_SUCCESS) {
-                if (logger) {
-                    logger->Log("Couldn't release queue\n");
-                }
-                return false;
-            }
-        }
-        delete[] m_oclQueue;
-    }
-    error = clReleaseProgram(m_oclProgram);
-    if (error != CL_SUCCESS) {
-        if (logger) {
-            logger->Log("Couldn't release program\n");
-        }
-        return false;
-    }
-    error = clReleaseContext(m_oclContext);
-    if (error != CL_SUCCESS) {
-        if (logger) {
-            logger->Log("Couldn't release context\n");
-        }
-        return false;
-    }
-
-    return true;
-#else //CL_VERSION_1_1
-    return false;
-#endif //CL_VERSION_1_1
-}
 void VHACD::ComputePrimitiveSet(const Parameters& params)
 {
     if (GetCancel()) {
@@ -689,8 +501,7 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
         return;
     }
     char msg[256];
-    size_t nPrimitives = inputPSet->GetNPrimitives();
-    bool oclAcceleration = (nPrimitives > OCL_MIN_NUM_PRIMITIVES && params.m_oclAcceleration && params.m_mode == 0) ? true : false;
+    //size_t nPrimitives = inputPSet->GetNPrimitives();
     int32_t iBest = -1;
     int32_t nPlanes = static_cast<int32_t>(planes.Size());
     double minTotal = MAX_DOUBLE;
@@ -698,81 +509,16 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
     double minSymmetry = MAX_DOUBLE;
     minConcavity = MAX_DOUBLE;
 
-    SArray<Vec3<double> >* chPts = new SArray<Vec3<double> >[2 * m_ompNumProcessors];
-    Mesh* chs = new Mesh[2 * m_ompNumProcessors];
     PrimitiveSet* onSurfacePSet = inputPSet->Create();
     inputPSet->SelectOnSurface(onSurfacePSet);
 
     PrimitiveSet** psets = 0;
     if (!params.m_convexhullApproximation) {
-        psets = new PrimitiveSet*[2 * m_ompNumProcessors];
-        for (int32_t i = 0; i < 2 * m_ompNumProcessors; ++i) {
+        psets = new PrimitiveSet*[2];
+        for (int32_t i = 0; i < 2; ++i) {
             psets[i] = inputPSet->Create();
         }
     }
-
-#ifdef CL_VERSION_1_1
-    // allocate OpenCL data structures
-    cl_mem voxels;
-    cl_mem* partialVolumes = 0;
-    size_t globalSize = 0;
-    size_t nWorkGroups = 0;
-    double unitVolume = 0.0;
-    if (oclAcceleration) {
-        VoxelSet* vset = (VoxelSet*)inputPSet;
-        const Vec3<double> minBB = vset->GetMinBB();
-        const float fMinBB[4] = { (float)minBB[0], (float)minBB[1], (float)minBB[2], 1.0f };
-        const float fSclae[4] = { (float)vset->GetScale(), (float)vset->GetScale(), (float)vset->GetScale(), 0.0f };
-        const int32_t nVoxels = (int32_t)nPrimitives;
-        unitVolume = vset->GetUnitVolume();
-        nWorkGroups = (nPrimitives + 4 * m_oclWorkGroupSize - 1) / (4 * m_oclWorkGroupSize);
-        globalSize = nWorkGroups * m_oclWorkGroupSize;
-        cl_int error;
-        voxels = clCreateBuffer(m_oclContext,
-            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-            sizeof(Voxel) * nPrimitives,
-            vset->GetVoxels(),
-            &error);
-        if (error != CL_SUCCESS) {
-            if (params.m_logger) {
-                params.m_logger->Log("Couldn't create buffer\n");
-            }
-            SetCancel(true);
-        }
-
-        partialVolumes = new cl_mem[m_ompNumProcessors];
-        for (int32_t i = 0; i < m_ompNumProcessors; ++i) {
-            partialVolumes[i] = clCreateBuffer(m_oclContext,
-                CL_MEM_WRITE_ONLY,
-                sizeof(uint32_t) * 4 * nWorkGroups,
-                NULL,
-                &error);
-            if (error != CL_SUCCESS) {
-                if (params.m_logger) {
-                    params.m_logger->Log("Couldn't create buffer\n");
-                }
-                SetCancel(true);
-                break;
-            }
-            error = clSetKernelArg(m_oclKernelComputePartialVolumes[i], 0, sizeof(cl_mem), &voxels);
-            error |= clSetKernelArg(m_oclKernelComputePartialVolumes[i], 1, sizeof(uint32_t), &nVoxels);
-            error |= clSetKernelArg(m_oclKernelComputePartialVolumes[i], 3, sizeof(float) * 4, fMinBB);
-            error |= clSetKernelArg(m_oclKernelComputePartialVolumes[i], 4, sizeof(float) * 4, &fSclae);
-            error |= clSetKernelArg(m_oclKernelComputePartialVolumes[i], 5, sizeof(uint32_t) * 4 * m_oclWorkGroupSize, NULL);
-            error |= clSetKernelArg(m_oclKernelComputePartialVolumes[i], 6, sizeof(cl_mem), &(partialVolumes[i]));
-            error |= clSetKernelArg(m_oclKernelComputeSum[i], 0, sizeof(cl_mem), &(partialVolumes[i]));
-            error |= clSetKernelArg(m_oclKernelComputeSum[i], 2, sizeof(uint32_t) * 4 * m_oclWorkGroupSize, NULL);
-            if (error != CL_SUCCESS) {
-                if (params.m_logger) {
-                    params.m_logger->Log("Couldn't kernel arguments \n");
-                }
-                SetCancel(true);
-            }
-        }
-    }
-#else // CL_VERSION_1_1
-    oclAcceleration = false;
-#endif // CL_VERSION_1_1
 
 #ifdef DEBUG_TEMP
     Timer timerComputeCost;
@@ -926,166 +672,91 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 	}
 #else
 
-	#if USE_THREAD == 1 && _OPENMP
-	#pragma omp parallel for
-	#endif
-		for (int32_t x = 0; x < nPlanes; ++x) {
-			int32_t threadID = 0;
-	#if USE_THREAD == 1 && _OPENMP
-			threadID = omp_get_thread_num();
-	#pragma omp flush(cancel)
-	#endif
-			if (!cancel) {
-				//Update progress
-				if (GetCancel()) {
-					cancel = true;
-	#if USE_THREAD == 1 && _OPENMP
-	#pragma omp flush(cancel)
-	#endif
+	for (int32_t x = 0; x < nPlanes; ++x) {
+		int32_t threadID = 0;
+		if (!cancel) {
+			//Update progress
+			if (GetCancel()) {
+				cancel = true;
+			}
+			Plane plane = planes[x];
+
+			Mesh& leftCH = chs[threadID];
+			Mesh& rightCH = chs[threadID + m_ompNumProcessors];
+			rightCH.ResizePoints(0);
+			leftCH.ResizePoints(0);
+			rightCH.ResizeTriangles(0);
+			leftCH.ResizeTriangles(0);
+
+// compute convex-hulls
+#ifdef TEST_APPROX_CH
+			double volumeLeftCH1;
+			double volumeRightCH1;
+#endif //TEST_APPROX_CH
+			if (params.m_convexhullApproximation) {
+				SArray<Vec3<double> >& leftCHPts = chPts[threadID];
+				SArray<Vec3<double> >& rightCHPts = chPts[threadID + m_ompNumProcessors];
+				rightCHPts.Resize(0);
+				leftCHPts.Resize(0);
+				onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
+				inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
+				rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
+				leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
+#ifdef TEST_APPROX_CH
+				Mesh leftCH1;
+				Mesh rightCH1;
+				VoxelSet right;
+				VoxelSet left;
+				onSurfacePSet->Clip(plane, &right, &left);
+				right.ComputeConvexHull(rightCH1, convexhullDownsampling);
+				left.ComputeConvexHull(leftCH1, convexhullDownsampling);
+
+				volumeLeftCH1 = leftCH1.ComputeVolume();
+				volumeRightCH1 = rightCH1.ComputeVolume();
+#endif //TEST_APPROX_CH
+			}
+			else {
+				PrimitiveSet* const right = psets[threadID];
+				PrimitiveSet* const left = psets[threadID + m_ompNumProcessors];
+				onSurfacePSet->Clip(plane, right, left);
+				right->ComputeConvexHull(rightCH, convexhullDownsampling);
+				left->ComputeConvexHull(leftCH, convexhullDownsampling);
+			}
+			double volumeLeftCH = leftCH.ComputeVolume();
+			double volumeRightCH = rightCH.ComputeVolume();
+
+			// compute clipped volumes
+			double volumeLeft = 0.0;
+			double volumeRight = 0.0;
+			inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
+
+			double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_volumeCH0);
+			double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_volumeCH0);
+			double concavity = (concavityLeft + concavityRight);
+
+			// compute cost
+			double balance = alpha * fabs(volumeLeft - volumeRight) / m_volumeCH0;
+			double d = w * (preferredCuttingDirection[0] * plane.m_a + preferredCuttingDirection[1] * plane.m_b + preferredCuttingDirection[2] * plane.m_c);
+			double symmetry = beta * d;
+			double total = concavity + balance + symmetry;
+			{
+				if (total < minTotal || (total == minTotal && x < iBest)) {
+					minConcavity = concavity;
+					minBalance = balance;
+					minSymmetry = symmetry;
+					bestPlane = plane;
+					minTotal = total;
+					iBest = x;
 				}
-				Plane plane = planes[x];
-
-				if (oclAcceleration) {
-	#ifdef CL_VERSION_1_1
-					const float fPlane[4] = { (float)plane.m_a, (float)plane.m_b, (float)plane.m_c, (float)plane.m_d };
-					cl_int error = clSetKernelArg(m_oclKernelComputePartialVolumes[threadID], 2, sizeof(float) * 4, fPlane);
-					if (error != CL_SUCCESS) {
-						if (params.m_logger) {
-							params.m_logger->Log("Couldn't kernel atguments \n");
-						}
-						SetCancel(true);
-					}
-
-					error = clEnqueueNDRangeKernel(m_oclQueue[threadID], m_oclKernelComputePartialVolumes[threadID],
-						1, NULL, &globalSize, &m_oclWorkGroupSize, 0, NULL, NULL);
-					if (error != CL_SUCCESS) {
-						if (params.m_logger) {
-							params.m_logger->Log("Couldn't run kernel \n");
-						}
-						SetCancel(true);
-					}
-					int32_t nValues = (int32_t)nWorkGroups;
-					while (nValues > 1) {
-						error = clSetKernelArg(m_oclKernelComputeSum[threadID], 1, sizeof(int32_t), &nValues);
-						if (error != CL_SUCCESS) {
-							if (params.m_logger) {
-								params.m_logger->Log("Couldn't kernel atguments \n");
-							}
-							SetCancel(true);
-						}
-						size_t nWorkGroups = (nValues + m_oclWorkGroupSize - 1) / m_oclWorkGroupSize;
-						size_t globalSize = nWorkGroups * m_oclWorkGroupSize;
-						error = clEnqueueNDRangeKernel(m_oclQueue[threadID], m_oclKernelComputeSum[threadID],
-							1, NULL, &globalSize, &m_oclWorkGroupSize, 0, NULL, NULL);
-						if (error != CL_SUCCESS) {
-							if (params.m_logger) {
-								params.m_logger->Log("Couldn't run kernel \n");
-							}
-							SetCancel(true);
-						}
-						nValues = (int32_t)nWorkGroups;
-					}
-	#endif // CL_VERSION_1_1
-				}
-
-				Mesh& leftCH = chs[threadID];
-				Mesh& rightCH = chs[threadID + m_ompNumProcessors];
-				rightCH.ResizePoints(0);
-				leftCH.ResizePoints(0);
-				rightCH.ResizeTriangles(0);
-				leftCH.ResizeTriangles(0);
-
-	// compute convex-hulls
-	#ifdef TEST_APPROX_CH
-				double volumeLeftCH1;
-				double volumeRightCH1;
-	#endif //TEST_APPROX_CH
-				if (params.m_convexhullApproximation) {
-					SArray<Vec3<double> >& leftCHPts = chPts[threadID];
-					SArray<Vec3<double> >& rightCHPts = chPts[threadID + m_ompNumProcessors];
-					rightCHPts.Resize(0);
-					leftCHPts.Resize(0);
-					onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
-					inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
-					rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
-					leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-	#ifdef TEST_APPROX_CH
-					Mesh leftCH1;
-					Mesh rightCH1;
-					VoxelSet right;
-					VoxelSet left;
-					onSurfacePSet->Clip(plane, &right, &left);
-					right.ComputeConvexHull(rightCH1, convexhullDownsampling);
-					left.ComputeConvexHull(leftCH1, convexhullDownsampling);
-
-					volumeLeftCH1 = leftCH1.ComputeVolume();
-					volumeRightCH1 = rightCH1.ComputeVolume();
-	#endif //TEST_APPROX_CH
-				}
-				else {
-					PrimitiveSet* const right = psets[threadID];
-					PrimitiveSet* const left = psets[threadID + m_ompNumProcessors];
-					onSurfacePSet->Clip(plane, right, left);
-					right->ComputeConvexHull(rightCH, convexhullDownsampling);
-					left->ComputeConvexHull(leftCH, convexhullDownsampling);
-				}
-				double volumeLeftCH = leftCH.ComputeVolume();
-				double volumeRightCH = rightCH.ComputeVolume();
-
-				// compute clipped volumes
-				double volumeLeft = 0.0;
-				double volumeRight = 0.0;
-				if (oclAcceleration) {
-	#ifdef CL_VERSION_1_1
-					uint32_t volumes[4];
-					cl_int error = clEnqueueReadBuffer(m_oclQueue[threadID], partialVolumes[threadID], CL_TRUE,
-						0, sizeof(uint32_t) * 4, volumes, 0, NULL, NULL);
-					size_t nPrimitivesRight = volumes[0] + volumes[1] + volumes[2] + volumes[3];
-					size_t nPrimitivesLeft = nPrimitives - nPrimitivesRight;
-					volumeRight = nPrimitivesRight * unitVolume;
-					volumeLeft = nPrimitivesLeft * unitVolume;
-					if (error != CL_SUCCESS) {
-						if (params.m_logger) {
-							params.m_logger->Log("Couldn't read buffer \n");
-						}
-						SetCancel(true);
-					}
-	#endif // CL_VERSION_1_1
-				}
-				else {
-					inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
-				}
-				double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_volumeCH0);
-				double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_volumeCH0);
-				double concavity = (concavityLeft + concavityRight);
-
-				// compute cost
-				double balance = alpha * fabs(volumeLeft - volumeRight) / m_volumeCH0;
-				double d = w * (preferredCuttingDirection[0] * plane.m_a + preferredCuttingDirection[1] * plane.m_b + preferredCuttingDirection[2] * plane.m_c);
-				double symmetry = beta * d;
-				double total = concavity + balance + symmetry;
-
-	#if USE_THREAD == 1 && _OPENMP
-	#pragma omp critical
-	#endif
+				++done;
+				if (!(done & 127)) // reduce update frequency
 				{
-					if (total < minTotal || (total == minTotal && x < iBest)) {
-						minConcavity = concavity;
-						minBalance = balance;
-						minSymmetry = symmetry;
-						bestPlane = plane;
-						minTotal = total;
-						iBest = x;
-					}
-					++done;
-					if (!(done & 127)) // reduce update frequency
-					{
-						double progress = done * (progress1 - progress0) / nPlanes + progress0;
-						Update(m_stageProgress, progress, params);
-					}
+					double progress = done * (progress1 - progress0) / nPlanes + progress0;
+					Update(m_stageProgress, progress, params);
 				}
 			}
 		}
+	}
 #endif
 
 #ifdef DEBUG_TEMP
@@ -1093,25 +764,13 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
     printf_s("Cost[%i] = %f\n", nPlanes, timerComputeCost.GetElapsedTime());
 #endif // DEBUG_TEMP
 
-#ifdef CL_VERSION_1_1
-    if (oclAcceleration) {
-        clReleaseMemObject(voxels);
-        for (int32_t i = 0; i < m_ompNumProcessors; ++i) {
-            clReleaseMemObject(partialVolumes[i]);
-        }
-        delete[] partialVolumes;
-    }
-#endif // CL_VERSION_1_1
-
     if (psets) {
-        for (int32_t i = 0; i < 2 * m_ompNumProcessors; ++i) {
+        for (int32_t i = 0; i < 2; ++i) {
             delete psets[i];
         }
         delete[] psets;
     }
     delete onSurfacePSet;
-    delete[] chPts;
-    delete[] chs;
     if (params.m_logger) {
         sprintf(msg, "\n\t\t\t Best  %04i T=%2.6f C=%2.6f B=%2.6f S=%2.6f (%1.1f, %1.1f, %1.1f, %3.3f)\n\n", iBest, minTotal, minConcavity, minBalance, minSymmetry, bestPlane.m_a, bestPlane.m_b, bestPlane.m_c, bestPlane.m_d);
         params.m_logger->Log(msg);

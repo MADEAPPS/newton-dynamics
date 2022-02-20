@@ -88,7 +88,6 @@ public:
             m_callback = 0;
             m_logger = 0;
             m_convexhullApproximation = true;
-            m_oclAcceleration = false;
             m_maxConvexHulls = 1024;
 			m_projectHullVertices = true; // This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
         }
@@ -106,9 +105,8 @@ public:
         uint32_t m_pca;
         uint32_t m_mode;
         uint32_t m_convexhullApproximation;
-        uint32_t m_oclAcceleration;
-        uint32_t	m_maxConvexHulls;
-		bool	m_projectHullVertices;
+        uint32_t m_maxConvexHulls;
+		bool m_projectHullVertices;
     };
 
     virtual void Cancel() = 0;
@@ -128,10 +126,6 @@ public:
     virtual void GetConvexHull(const uint32_t index, ConvexHull& ch) const = 0;
     virtual void Clean(void) = 0; // release internally allocated memory
     virtual void Release(void) = 0; // release IVHACD
-    virtual bool OCLInit(void* const oclDevice,
-        IUserLogger* const logger = 0)
-        = 0;
-    virtual bool OCLRelease(IUserLogger* const logger = 0) = 0;
 
 	// Will compute the center of mass of the convex hull decomposition results and return it
 	// in 'centerOfMass'.  Returns false if the center of mass could not be computed.
