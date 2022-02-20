@@ -59,6 +59,12 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	m_vertex = nullptr;
 	m_simplex = nullptr;
 	Create(count, strideInBytes, vertexArray, tolerance);
+	dAssert(m_faceCount > 0);
+	//if (m_faceCount == 0)
+	//{
+	//	dAssert(m_faceCount > 0);
+	//	Create(count, strideInBytes, vertexArray, tolerance);
+	//}
 }
 
 ndShapeConvexHull::ndShapeConvexHull(const ndLoadSaveBase::ndLoadDescriptor& desc)

@@ -45,7 +45,7 @@ class ndConvexHull3dFace
 	ndInt32 GetMark() const { return m_mark; }
 	ndList<ndConvexHull3dFace>::ndNode* GetTwin(ndInt32 index) const;
 	ndFloat64 Evalue (const ndBigVector* const pointArray, const ndBigVector& point) const;
-	ndBigPlane GetPlaneEquation (const ndBigVector* const pointArray) const;
+	ndBigPlane GetPlaneEquation (const ndBigVector* const pointArray, bool& isvalid) const;
 
 	public:
 	ndInt32 m_index[3]; 

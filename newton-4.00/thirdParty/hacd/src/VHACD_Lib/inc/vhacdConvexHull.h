@@ -33,7 +33,7 @@ class vhacdConvexHullFace
 	public:
 	vhacdConvexHullFace();
 	double Evalue (const hullVector* const pointArray, const hullVector& point) const;
-	hullPlane GetPlaneEquation (const hullVector* const pointArray) const;
+	hullPlane GetPlaneEquation (const hullVector* const pointArray, bool& isValid) const;
 	
 	public:
 	int m_index[3]; 

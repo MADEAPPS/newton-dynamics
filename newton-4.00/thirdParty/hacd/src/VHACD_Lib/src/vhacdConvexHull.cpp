@@ -31,14 +31,20 @@ vhacdConvexHullFace::vhacdConvexHullFace()
 	m_twin[2] = nullptr;
 }
 
-hullPlane vhacdConvexHullFace::GetPlaneEquation(const hullVector* const pointArray) const
+hullPlane vhacdConvexHullFace::GetPlaneEquation(const hullVector* const pointArray, bool& isvalid) const
 {
 	const hullVector& p0 = pointArray[m_index[0]];
 	const hullVector& p1 = pointArray[m_index[1]];
 	const hullVector& p2 = pointArray[m_index[2]];
 	hullPlane plane(p0, p1, p2);
-	//plane = plane.Scale(1.0f / sqrt(plane.DotProduct(plane & hullVector::m_triplexMask).GetScalar()));
-	plane = plane.Scale(1.0f / sqrt(plane.DotProduct(plane)));
+
+	isvalid = false;
+	double mag2 = plane.DotProduct(plane);
+	if (mag2 > 1.0e-16f)
+	{
+		isvalid = true;
+		plane = plane.Scale(1.0f / sqrt(mag2));
+	}
 	return plane;
 }
 
@@ -733,18 +739,23 @@ void vhacdConvexHull::CalculateConvexHull3d(vhacdConvexHullAABBTreeNode* vertexT
 		// or from 100000 vertex input array.
 
 		// using a queue (some what slower by better hull when reduced vertex count is desired)
+		bool isvalid;
 		ndNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
 		vhacdConvexHullFace* const face = &faceNode->GetInfo();
-		hullPlane planeEquation(face->GetPlaneEquation(&m_points[0]));
+		hullPlane planeEquation(face->GetPlaneEquation(&m_points[0], isvalid));
 
-		int index = SupportVertex(&vertexTree, points, planeEquation);
-		const hullVector& p = points[index];
-		double dist = planeEquation.Evalue(p);
-
-		if ((dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f)))
+		int index = 0;
+		double dist = 0;
+		hullVector p;
+		if (isvalid)
 		{
-			//_ASSERT(Sanity());
-			//_ASSERT(faceNode);
+			index = SupportVertex(&vertexTree, points, planeEquation);
+			p = points[index];
+			dist = planeEquation.Evalue(p);
+		}
+
+		if (isvalid && (dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f)))
+		{
 			stack[0] = faceNode;
 
 			int stackIndex = 1;

@@ -180,13 +180,20 @@ ndConvexHull3d::ndList<ndConvexHull3dFace>::ndNode* ndConvexHull3dFace::GetTwin(
 	return m_twin[index];
 }
 
-ndBigPlane ndConvexHull3dFace::GetPlaneEquation (const ndBigVector* const pointArray) const
+ndBigPlane ndConvexHull3dFace::GetPlaneEquation (const ndBigVector* const pointArray, bool& isvalid) const
 {
 	const ndBigVector& p0 = pointArray[m_index[0]];
 	const ndBigVector& p1 = pointArray[m_index[1]];
 	const ndBigVector& p2 = pointArray[m_index[2]];
 	ndBigPlane plane (p0, p1, p2);
-	plane = plane.Scale (1.0f / sqrt (plane.DotProduct(plane & ndBigVector::m_triplexMask).GetScalar()));
+
+	isvalid = false;
+	double mag2 = plane.DotProduct(plane & ndBigVector::m_triplexMask).GetScalar();
+	if (mag2 > ndFloat32 (1.0e-16f))
+	{
+		isvalid = true;
+		plane = plane.Scale(ndFloat32 (1.0f) / sqrt(mag2));
+	}
 	return plane;
 }
 
@@ -940,14 +947,22 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 			ndNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
 		#endif
 
+		bool isvalid;
 		ndConvexHull3dFace* const face = &faceNode->GetInfo();
-		ndBigPlane planeEquation (face->GetPlaneEquation (&m_points[0]));
+		ndBigPlane planeEquation (face->GetPlaneEquation (&m_points[0], isvalid));
 
-		ndInt32 index = SupportVertex (&vertexTree, points, planeEquation);
-		const ndBigVector& p = points[index];
-		ndFloat64 dist = planeEquation.Evalue(p);
+		int index = 0;
+		double dist = 0;
+		ndBigVector p;
 
-		if ((dist >= distTol) && (face->Evalue(&m_points[0], p) > ndFloat64(0.0f))) 
+		if (isvalid)
+		{
+			index = SupportVertex(&vertexTree, points, planeEquation);
+			p = points[index];
+			dist = planeEquation.Evalue(p);
+		}
+
+		if (isvalid && (dist >= distTol) && (face->Evalue(&m_points[0], p) > ndFloat64(0.0f)))
 		{
 			dAssert (Sanity());
 

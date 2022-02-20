@@ -787,14 +787,6 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 			:m_me(me)
 			,m_params(params)
 		{
-			for (int i = 0; i < VHACD_WORKERS_THREADS; i++)
-			{
-				m_iBest[i] = -1;
-				m_minTotal[i] = MAX_DOUBLE;
-				m_minBalance[i] = MAX_DOUBLE;
-				m_minSymmetry[i] = MAX_DOUBLE;
-				m_minConcavity[i] = MAX_DOUBLE;
-			}
 		}
 
 		VHACD* m_me;
@@ -810,14 +802,6 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 
 		Vec3<double> m_preferredCuttingDirection;
 		PrimitiveSet** m_psets;
-
-		Plane m_bestPlane[VHACD_WORKERS_THREADS];
-		double m_minTotal[VHACD_WORKERS_THREADS];
-		double m_minBalance[VHACD_WORKERS_THREADS];
-		double m_minSymmetry[VHACD_WORKERS_THREADS];
-		double m_minConcavity[VHACD_WORKERS_THREADS];
-		int32_t m_iBest[VHACD_WORKERS_THREADS];
-		
 	};
 
 	class BestClippingPlaneJob : public vhacdJob
@@ -848,8 +832,8 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 				SArray<Vec3<double> >& rightCHPts = m_commonData->chPts[threadId][1];;
 				rightCHPts.Resize(0);
 				leftCHPts.Resize(0);
-				m_commonData->m_onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, m_commonData->m_convexhullDownsampling * 32);
-				m_commonData->m_inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
+				m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, m_commonData->m_convexhullDownsampling * 32);
+				m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
 				rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
 				leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
 				#ifdef TEST_APPROX_CH
@@ -869,7 +853,7 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 			{
 				PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
 				PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
-				m_commonData->m_onSurfacePSet->Clip(plane, right, left);
+				m_commonData->m_onSurfacePSet->Clip(m_plane, right, left);
 				right->ComputeConvexHull(rightCH, m_commonData->m_convexhullDownsampling);
 				left->ComputeConvexHull(leftCH, m_commonData->m_convexhullDownsampling);
 			}
@@ -881,31 +865,23 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 			double volumeLeft = 0.0;
 			double volumeRight = 0.0;
 			
-			m_commonData->m_inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
+			m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
 			
 			double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0);
 			double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0);
 			double concavity = (concavityLeft + concavityRight);
 			
 			// compute cost
-			double balance = m_commonData->m_alpha * fabs(volumeLeft - volumeRight) / m_commonData->m_me->m_volumeCH0;
-			double d = m_commonData->m_w * (m_commonData->m_preferredCuttingDirection[0] * plane.m_a + m_commonData->m_preferredCuttingDirection[1] * plane.m_b + m_commonData->m_preferredCuttingDirection[2] * plane.m_c);
-			double symmetry = m_commonData->m_beta * d;
-			double total = concavity + balance + symmetry;
-
-			if (total < m_commonData->m_minTotal[threadId] || (total == m_commonData->m_minTotal[threadId] && m_x < m_commonData->m_iBest[threadId]))
-			{
-				m_commonData->m_minConcavity[threadId] = concavity;
-				m_commonData->m_minBalance[threadId] = balance;
-				m_commonData->m_minSymmetry[threadId] = symmetry;
-				m_commonData->m_bestPlane[threadId] = plane;
-				m_commonData->m_minTotal[threadId] = total;
-				m_commonData->m_iBest[threadId] = m_x;
-			}
+			m_concavity = concavity;
+			m_balance = m_commonData->m_alpha * fabs(volumeLeft - volumeRight) / m_commonData->m_me->m_volumeCH0;
+			double d = m_commonData->m_w * (m_commonData->m_preferredCuttingDirection[0] * m_plane.m_a + m_commonData->m_preferredCuttingDirection[1] * m_plane.m_b + m_commonData->m_preferredCuttingDirection[2] * m_plane.m_c);
+			m_symmetry = m_commonData->m_beta * d;
 		}
 
-		Plane plane;
-		int m_x;
+		double m_concavity;
+		double m_balance;
+		double m_symmetry;
+		Plane m_plane;
 		CommonData* m_commonData;
 	};
 
@@ -921,39 +897,34 @@ void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double
 	data.m_onSurfacePSet = onSurfacePSet;
 	data.m_preferredCuttingDirection = preferredCuttingDirection;
 	data.m_convexhullDownsampling = convexhullDownsampling;
-	for (int32_t x = 0; x < nPlanes; ++x)
+	for (int32_t i = 0; i < nPlanes; ++i)
 	{
-		jobs[x].m_x = x;
-		jobs[x].plane = planes[x];
-		jobs[x].m_commonData = &data;
-		m_parallelQueue.PushTask(&jobs[x]);
+		jobs[i].m_plane = planes[i];
+		jobs[i].m_commonData = &data;
+		m_parallelQueue.PushTask(&jobs[i]);
 	}
 	m_parallelQueue.Sync();
 
-	minConcavity = data.m_minConcavity[0];
-	minBalance = data.m_minBalance[0];
-	minSymmetry = data.m_minSymmetry[0];
-	bestPlane = data.m_bestPlane[0];
-	minTotal = data.m_minTotal[0];
-	iBest = data.m_iBest[0];
-
-	for (int i = 1; i < VHACD_WORKERS_THREADS; i++)
+	iBest = 0;
+	minConcavity = jobs[0].m_concavity;
+	minBalance = jobs[0].m_balance;
+	minSymmetry = jobs[0].m_symmetry;
+	bestPlane = jobs[0].m_plane;
+	minTotal = jobs[0].m_concavity + jobs[0].m_balance + jobs[0].m_symmetry;
+	for (int32_t i = 1; i < nPlanes; ++i)
 	{
-		if (minTotal < data.m_minTotal[i] || (minTotal == data.m_minTotal[i] && iBest < data.m_iBest[i]))
+		double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
+		if (total < minTotal || (total < minTotal && i < iBest))
 		{
-			minConcavity = data.m_minConcavity[i];
-			minBalance = data.m_minBalance[i];
-			minSymmetry = data.m_minSymmetry[i];
-			bestPlane = data.m_bestPlane[i];
-			minTotal = data.m_minTotal[i];
-			iBest = data.m_iBest[i];
+			minConcavity = jobs[i].m_concavity;
+			minBalance = jobs[i].m_balance;
+			minSymmetry = jobs[i].m_symmetry;
+			bestPlane = jobs[i].m_plane;
+			minTotal = total;
+			iBest = i;
 		}
 	}
-
 #else
-
-	bool cancel = false;
-	int32_t done = 0;
 
 	#if USE_THREAD == 1 && _OPENMP
 	#pragma omp parallel for
