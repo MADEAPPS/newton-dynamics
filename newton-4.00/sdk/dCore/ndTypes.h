@@ -28,6 +28,8 @@
 	#endif
 #endif
 
+#define ND_NEWTON_VERSION	401
+
 #if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	#include <io.h>
 	#include <stdint.h>
