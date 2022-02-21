@@ -24,6 +24,7 @@ class ndJointIkHinge: public ndJointHinge
 	D_NEWTON_API ndJointIkHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointIkHinge();
 
+	protected:
 	D_NEWTON_API virtual bool IsIk() const;
 	D_NEWTON_API virtual void SetIkSolver();
 	D_NEWTON_API virtual void ResetIkSolver();
@@ -32,16 +33,11 @@ class ndJointIkHinge: public ndJointHinge
 
 	D_NEWTON_API void SetTorqueLimits(ndFloat32 minToque, ndFloat32 maxTorque);
 	D_NEWTON_API void GetTorqueLimits(ndFloat32& minToque, ndFloat32& maxTorque) const;
-	
-	protected:
+
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-	
-	ndFloat32 m_minTorque;
-	ndFloat32 m_maxTorque;
-	ndFloat32 m_motorAccel;
-	ndFloat32 m_savedMinToque;
-	ndFloat32 m_savedMaxTorque;
+
+	ndIkRowAccel m_axisAccel;
 };
 
 #endif 

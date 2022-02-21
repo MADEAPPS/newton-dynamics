@@ -17,11 +17,17 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointIkBallAndSocket)
 
 ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBallAndSocket(pinAndPivotFrame, child, parent)
+	,m_coneRow()
+	,m_twistRow()
+	,m_biConeRow()
 {
 }
 
 ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBallAndSocket(ndLoadSaveBase::ndLoadDescriptor(desc))
+	,m_coneRow()
+	,m_twistRow()
+	,m_biConeRow()
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -55,10 +61,39 @@ void ndJointIkBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 	//xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
 }
 
-
 void ndJointIkBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndJointBallAndSocket::DebugJoint(debugCallback);
+}
+
+bool ndJointIkBallAndSocket::IsIk() const
+{
+	return true;
+}
+
+void ndJointIkBallAndSocket::SetIkSolver()
+{
+	m_coneRow.Set();
+	m_twistRow.Set();
+	m_biConeRow.Set();
+}
+
+void ndJointIkBallAndSocket::ResetIkSolver()
+{
+	m_coneRow.Reset();
+	m_twistRow.Reset();
+	m_biConeRow.Reset();
+}
+
+void ndJointIkBallAndSocket::StopIkMotor(ndFloat32 timestep)
+{
+	dAssert(0);
+}
+
+bool ndJointIkBallAndSocket::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
+{
+	dAssert(0);
+	return 0;
 }
 
 void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
@@ -66,4 +101,8 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	m_coneLimits = false;
 	m_twistLimits = false;
 	ndJointBallAndSocket::JacobianDerivative(desc);
+
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
 }

@@ -24,9 +24,20 @@ class ndJointIkBallAndSocket: public ndJointBallAndSocket
 	D_NEWTON_API virtual ~ndJointIkBallAndSocket();
 
 	protected:
+	// inverse dynamics interface
+	D_COLLISION_API virtual bool IsIk() const;
+	D_COLLISION_API virtual void SetIkSolver();
+	D_COLLISION_API virtual void ResetIkSolver();
+	D_COLLISION_API virtual void StopIkMotor(ndFloat32 timestep);
+	D_COLLISION_API virtual bool SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1);
+
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+
+	ndIkRowAccel m_coneRow;
+	ndIkRowAccel m_twistRow;
+	ndIkRowAccel m_biConeRow;
 };
 
 #endif 
