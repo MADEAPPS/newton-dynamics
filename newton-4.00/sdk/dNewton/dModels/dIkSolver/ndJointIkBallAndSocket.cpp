@@ -121,7 +121,7 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 			//ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, ndFloat32 (0.0f));
 		SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
-		SetMotorAcceleration(desc, 0.5f);
+		SetMotorAcceleration(desc, 1.0f);
 		SetLowerFriction(desc, m_coneRow.m_minForce);
 		SetHighFriction(desc, m_coneRow.m_maxForce);
 			
@@ -131,6 +131,13 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 		//SetMotorAcceleration(desc, 0.5f);
 		SetLowerFriction(desc, m_biConeRow.m_minForce);
 		SetHighFriction(desc, m_biConeRow.m_maxForce);
+
+
+		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+		SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
+		//SetMotorAcceleration(desc, 0.5f);
+		SetLowerFriction(desc, m_twistRow.m_minForce);
+		SetHighFriction(desc, m_twistRow.m_maxForce);
 	}
 	else
 	{
@@ -150,12 +157,19 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 		//SetMotorAcceleration(desc, 0.5f);
 		SetLowerFriction(desc, m_biConeRow.m_minForce);
 		SetHighFriction(desc, m_biConeRow.m_maxForce);
+
+
+		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+		SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
+		//SetMotorAcceleration(desc, 0.1f);
+		SetLowerFriction(desc, m_twistRow.m_minForce);
+		SetHighFriction(desc, m_twistRow.m_maxForce);
 	}
 
-	AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
-	SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
-	//SetMotorAcceleration(desc, 0.5f);
-	SetLowerFriction(desc, m_twistRow.m_minForce);
-	SetHighFriction(desc, m_twistRow.m_maxForce);
+	//AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+	//SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
+	//SetMotorAcceleration(desc, 0.1f);
+	//SetLowerFriction(desc, m_twistRow.m_minForce);
+	//SetHighFriction(desc, m_twistRow.m_maxForce);
 
 }

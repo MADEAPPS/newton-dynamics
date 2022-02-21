@@ -459,6 +459,44 @@ return;
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 
+
+
+static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
+{
+	ndFloat32 mass = 1.0f;
+	ndFloat32 diameter = 1.0f;
+	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.125f, diameter * 0.125f, diameter * 1.0f));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_y = 1.0f;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+	world->AddBody(body);
+	scene->AddEntity(entity);
+
+	ndVector massMatrix(body->GetMassMatrix());
+	ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+	massMatrix.m_x = sphericalInertia;
+	massMatrix.m_y = sphericalInertia;
+	massMatrix.m_z = sphericalInertia;
+	body->SetMassMatrix(massMatrix);
+
+	matrix.m_posit -= matrix.m_front.Scale (0.5f);
+	ndJointIkBallAndSocket* const socket = new ndJointIkBallAndSocket(matrix, body, world->GetSentinelBody());
+	world->AddJoint(socket);
+	mesh->Release();
+}
+
 static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
 	dQuadrupedRobot* const me = (dQuadrupedRobot*)context;
@@ -475,13 +513,15 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
-	dQuadrupedRobot* const robot = new dQuadrupedRobot(scene, robotEntity, matrix);
-	scene->SetSelectedModel(robot);
-	world->AddModel(robot);
-	ndBodyDynamic* const root = robot->GetRoot();
-	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
-	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
+	//dQuadrupedRobot* const robot = new dQuadrupedRobot(scene, robotEntity, matrix);
+	//scene->SetSelectedModel(robot);
+	//world->AddModel(robot);
+	//ndBodyDynamic* const root = robot->GetRoot();
+	//world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
+
+	BuildBallSocket(scene, matrix.m_posit);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
