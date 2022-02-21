@@ -121,24 +121,41 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 			//ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, ndFloat32 (0.0f));
 		SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
+		SetMotorAcceleration(desc, 0.5f);
 		SetLowerFriction(desc, m_coneRow.m_minForce);
 		SetHighFriction(desc, m_coneRow.m_maxForce);
 			
 		//ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, ndFloat32(0.0f));
 		SetMotorAcceleration(desc, m_biConeRow.m_motorAccel);
+		//SetMotorAcceleration(desc, 0.5f);
 		SetLowerFriction(desc, m_biConeRow.m_minForce);
 		SetHighFriction(desc, m_biConeRow.m_maxForce);
-			
-		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
-		//SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
-		SetMotorAcceleration(desc, 0.5f);
-		SetLowerFriction(desc, m_twistRow.m_minForce);
-		SetHighFriction(desc, m_twistRow.m_maxForce);
 	}
 	else
 	{
-		dAssert(0);
-		//SubmitAngularAxis(matrix0, matrix1, desc);
+		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+		lateralDir = lateralDir.Normalize();
+		const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+
+		AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
+		SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
+		//SetMotorAcceleration(desc, 0.5f);
+		SetLowerFriction(desc, m_coneRow.m_minForce);
+		SetHighFriction(desc, m_coneRow.m_maxForce);
+
+		AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
+		SetMotorAcceleration(desc, m_biConeRow.m_motorAccel);
+		//SetMotorAcceleration(desc, 0.5f);
+		SetLowerFriction(desc, m_biConeRow.m_minForce);
+		SetHighFriction(desc, m_biConeRow.m_maxForce);
 	}
+
+	AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+	SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
+	//SetMotorAcceleration(desc, 0.5f);
+	SetLowerFriction(desc, m_twistRow.m_minForce);
+	SetHighFriction(desc, m_twistRow.m_maxForce);
+
 }
