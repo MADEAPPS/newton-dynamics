@@ -105,4 +105,40 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
+
+	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	if (cosAngleCos >= ndFloat32(0.998f))
+	{
+		// special case where the front axis are almost aligned
+		// solve by using Cartesian approximation
+		//SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		//ndFloat32 coneAngle = ndAcos(dClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)));
+		//if (coneAngle > m_maxConeAngle)
+		//ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		//if (dAbs (pitchAngle) < (ndFloat32 (2.0f) * ndDegreeToRad))
+		//{
+			// two rows to restrict rotation around around the parent coordinate system
+			//ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+		AddAngularRowJacobian(desc, matrix1.m_up, ndFloat32 (0.0f));
+		SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
+		SetLowerFriction(desc, m_coneRow.m_minForce);
+		SetHighFriction(desc, m_coneRow.m_maxForce);
+			
+		//ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		AddAngularRowJacobian(desc, matrix1.m_right, ndFloat32(0.0f));
+		SetMotorAcceleration(desc, m_biConeRow.m_motorAccel);
+		SetLowerFriction(desc, m_biConeRow.m_minForce);
+		SetHighFriction(desc, m_biConeRow.m_maxForce);
+			
+		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+		//SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
+		SetMotorAcceleration(desc, 0.5f);
+		SetLowerFriction(desc, m_twistRow.m_minForce);
+		SetHighFriction(desc, m_twistRow.m_maxForce);
+	}
+	else
+	{
+		dAssert(0);
+		//SubmitAngularAxis(matrix0, matrix1, desc);
+	}
 }
