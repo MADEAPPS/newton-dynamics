@@ -42,20 +42,16 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
 
 	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f},
-	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f},
-	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f},
-	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f},
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-
-	//{ "gripperLeft", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
-	//{ "gripperRight", dQuadrupedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
-	//{ "effector", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f, 1.0e5f },
+	//{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	//
+	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	//{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	//
+	//{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	//{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	//
+	//{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	//{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 };
 
 class dQuadrupedRobot : public ndModel
