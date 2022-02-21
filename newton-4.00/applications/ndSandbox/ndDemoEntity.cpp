@@ -400,9 +400,9 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 		p.m_z = points[i].m_z;
 		meshPoints.PushBack(p);
 	}
-	VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
+	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
 
-	VHACD::IVHACD::Parameters paramsVHACD;
+	nd::VHACD::IVHACD::Parameters paramsVHACD;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 		(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
@@ -415,7 +415,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 	ndArray<ndVector> convexMeshPoints;
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
-		VHACD::IVHACD::ConvexHull ch;
+		nd::VHACD::IVHACD::ConvexHull ch;
 		interfaceVHACD->GetConvexHull(i, ch);
 		convexMeshPoints.SetCount(ch.m_nPoints);
 		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
@@ -536,10 +536,10 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 				p.m_z = points[i].m_z;
 				meshPoints.PushBack(p);
 			}
-			VHACD::IVHACD* const interfaceVHACD = VHACD::CreateVHACD();
+			nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
 
-			VHACD::IVHACD::Parameters paramsVHACD;
-			paramsVHACD.m_concavityToVolumeWeigh = 1.0;
+			nd::VHACD::IVHACD::Parameters paramsVHACD;
+			//paramsVHACD.m_concavityToVolumeWeigh = 1.0;
 			interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 				(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 
@@ -547,7 +547,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndArray<ndVector> convexMeshPoints;
 			for (ndInt32 i = 0; i < hullCount; ++i)
 			{
-				VHACD::IVHACD::ConvexHull ch;
+				nd::VHACD::IVHACD::ConvexHull ch;
 				interfaceVHACD->GetConvexHull(i, ch);
 				convexMeshPoints.SetCount(ch.m_nPoints);
 				for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)

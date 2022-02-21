@@ -7,11 +7,13 @@
 #include "FloatMath.h"
 #include <vector>
 
-#define REAL float
-
-#include "FloatMath.inl"
-
-#undef REAL
-#define REAL double
-
+namespace nd
+{
+	namespace FLOAT_MATH
+	{
+		#define REAL float
+		#undef REAL
+		#define REAL double
+	}
+}
 #include "FloatMath.inl"
