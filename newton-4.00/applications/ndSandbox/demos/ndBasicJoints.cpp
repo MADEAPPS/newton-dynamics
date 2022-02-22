@@ -113,8 +113,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, array[i - 1], array[i - 0]);
 		joint->SetTwistFriction(regularizer, friction);
 		joint->SetConeFriction(regularizer, friction);
-		//joint->SetConeLimit(60.0f * ndDegreeToRad);
-		//joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+		joint->SetConeLimit(60.0f * ndDegreeToRad);
+		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 		world->AddJoint(joint);
 	}
 
@@ -124,7 +124,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(bodyMatrix0, array[count - 1], fixBody);
 	joint->SetTwistFriction(regularizer, friction);
 	joint->SetConeFriction(regularizer, friction);
-	//joint->SetConeLimit(60.0f * ndDegreeToRad);
+	joint->SetConeLimit(60.0f * ndDegreeToRad);
+	joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 	world->AddJoint(joint);
 
 	mesh->Release();
