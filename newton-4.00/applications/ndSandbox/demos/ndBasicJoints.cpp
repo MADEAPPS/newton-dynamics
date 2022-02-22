@@ -85,14 +85,23 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	const ndInt32 count = 3;
+	const ndInt32 count = 10;
 	ndBodyDynamic* array[count];
 	for (ndInt32 i = 0; i < count; i++)
 	{
 		matrix.m_posit.m_y += diameter;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndVector inertia(body->GetMassMatrix());
+		ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
+		inertia.m_x = maxI;
+		inertia.m_y = maxI;
+		inertia.m_z = maxI;
+		body->SetMassMatrix(inertia);
 		array[i] = body;
 	}
+
+	ndFloat32 friction = 10.0f;
+	ndFloat32 regularizer = 0.1f;
 
 	ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
 	for (ndInt32 i = 1; i < count; i++)
@@ -102,16 +111,21 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndMatrix pinMatrix(pinAlign * bodyMatrix0);
 		pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
 		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, array[i - 1], array[i - 0]);
-		joint->SetConeLimit(60.0f * ndDegreeToRad);
+		joint->SetTwistFriction(regularizer, friction);
+		joint->SetConeFriction(regularizer, friction);
+		//joint->SetConeLimit(60.0f * ndDegreeToRad);
+		//joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 		world->AddJoint(joint);
 	}
 
 	ndMatrix bodyMatrix0(pinAlign * array[count-1]->GetMatrix());
 	bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix0, array[count - 1], fixBody);
-	joint1->SetConeLimit(60.0f * ndDegreeToRad);
-	world->AddJoint(joint1);
+	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(bodyMatrix0, array[count - 1], fixBody);
+	joint->SetTwistFriction(regularizer, friction);
+	joint->SetConeFriction(regularizer, friction);
+	//joint->SetConeLimit(60.0f * ndDegreeToRad);
+	world->AddJoint(joint);
 
 	mesh->Release();
 }

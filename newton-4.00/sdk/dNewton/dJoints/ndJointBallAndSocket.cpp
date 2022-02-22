@@ -229,15 +229,8 @@ void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatri
 		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 	}
 
-	//if (m_options.m_option3) {
-	//	dFloat pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	//	SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);
-	//}
 	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	if ((pitchAngle < m_minTwistAngle) || (pitchAngle > m_maxTwistAngle))
-	{
-		SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
-	}
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
 void ndJointBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
@@ -305,10 +298,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMa
 
 	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	if ((pitchAngle < m_minTwistAngle) || (pitchAngle > m_maxTwistAngle))
-	{
-		SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
-	}
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
 void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
