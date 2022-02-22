@@ -47,7 +47,7 @@
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
-//#define DEFAULT_SCENE	11		// basic joints
+#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic rag doll
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
@@ -55,7 +55,7 @@
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-#define DEFAULT_SCENE	19		// quadruped robot
+//#define DEFAULT_SCENE	19		// quadruped robot
 //#define DEFAULT_SCENE	20		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture
 //#define DEFAULT_SCENE	21		// linked voronoi fracture
@@ -356,7 +356,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	//m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;

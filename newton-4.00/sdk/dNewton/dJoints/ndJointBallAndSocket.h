@@ -28,10 +28,10 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
 	D_NEWTON_API virtual ndFloat32 GetConeLimit() const;
-	D_NEWTON_API virtual void SetConeLimit(bool state, ndFloat32 maxConeAngle);
+	D_NEWTON_API virtual void SetConeLimit(ndFloat32 maxConeAngle);
 	D_NEWTON_API virtual void SetConeFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
 
-	D_NEWTON_API virtual void SetTwistLimits(bool state, ndFloat32 minAngle, ndFloat32 maxAngle);
+	D_NEWTON_API virtual void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
 	D_NEWTON_API virtual void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
 	D_NEWTON_API virtual void SetTwistFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
 
@@ -39,9 +39,10 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
-
+	
 	void SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitLinealRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
@@ -53,9 +54,6 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	ndFloat32 m_maxConeAngle;
 	ndFloat32 m_coneFriction;
 	ndFloat32 m_coneFrictionRegularizer;
-
-	bool m_coneLimits;
-	bool m_twistLimits;
 };
 
 #endif 

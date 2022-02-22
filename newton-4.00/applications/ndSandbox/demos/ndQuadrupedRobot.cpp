@@ -140,8 +140,8 @@ class dQuadrupedRobot : public ndModel
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndJointIkBallAndSocket* const socket = new ndJointIkBallAndSocket(pivotMatrix, childBody, parentBody);
-						socket->SetConeLimit(true, 120.0f * ndDegreeToRad);
-						socket->SetTwistLimits(true, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						socket->SetConeLimit(120.0f * ndDegreeToRad);
+						socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 						world->AddJoint(socket);
 						parentBody = childBody;
@@ -470,7 +470,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
-	matrix.m_posit.m_y = 1.0f;
+	matrix.m_posit.m_y = 1.2f;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -483,6 +483,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	body->SetMassMatrix(mass, shape);
 	world->AddBody(body);
 	scene->AddEntity(entity);
+
+	body->SetOmega(matrix.RotateVector(ndVector(0.4f, 1.5f, 0.0f, 0.0f)));
 
 	ndVector massMatrix(body->GetMassMatrix());
 	ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);

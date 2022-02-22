@@ -98,27 +98,21 @@ bool ndJointIkBallAndSocket::SetIkMotor(ndFloat32 timestep, const ndJacobian& fo
 
 void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	m_coneLimits = false;
-	m_twistLimits = false;
-	ndJointBallAndSocket::JacobianDerivative(desc);
-
+//ndJointBallAndSocket::JacobianDerivative(desc);
+//return;
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
+	SubmitLinealRows(matrix0, matrix1, desc);
+
+	ndVector omega(GetBody0()->GetMatrix().UnrotateVector(GetBody0()->GetOmega()));
+return;
 
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	if (cosAngleCos >= ndFloat32(0.998f))
+	if (cosAngleCos >= ndFloat32(0.999f))
 	{
 		// special case where the front axis are almost aligned
 		// solve by using Cartesian approximation
-		//SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-		//ndFloat32 coneAngle = ndAcos(dClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)));
-		//if (coneAngle > m_maxConeAngle)
-		//ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-		//if (dAbs (pitchAngle) < (ndFloat32 (2.0f) * ndDegreeToRad))
-		//{
-			// two rows to restrict rotation around around the parent coordinate system
-			//ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, ndFloat32 (0.0f));
 		SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
 		SetMotorAcceleration(desc, 1.0f);
@@ -135,35 +129,71 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 
 		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
 		SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
-		//SetMotorAcceleration(desc, 0.5f);
+		SetMotorAcceleration(desc, 0.5f);
 		SetLowerFriction(desc, m_twistRow.m_minForce);
 		SetHighFriction(desc, m_twistRow.m_maxForce);
 	}
 	else
 	{
-		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
-		lateralDir = lateralDir.Normalize();
-		const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		//matrix1 = dGetIdentityMatrix();
+		//ndVector xxxxxxxxx(30.0f * ndDegreeToRad, 45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad, 0.0f);
+		//matrix0 = dPitchMatrix(xxxxxxxxx.m_x) * dYawMatrix(xxxxxxxxx.m_y) * dRollMatrix(xxxxxxxxx.m_z) * matrix1;
+		//
+		//
+		//ndMatrix xxx(matrix0 * matrix1.Inverse());
+		//ndVector e0;
+		//ndVector e1;
+		//xxx.CalcPitchYawRoll(e0, e1);
+		//
+		//ndMatrix xxx1 = dPitchMatrix(e0.m_x);
+		//ndMatrix xxx2 = dYawMatrix(e0.m_y) * dRollMatrix(e0.m_z);
+		//ndMatrix Q = matrix1.Inverse() * xxx2 * matrix1;
+		//ndQuaternion zzzz(Q);
+		//ndVector xxxxxxx((zzzz & ndVector::m_triplexMask).Normalize());
+		//
+		//
+		//ndVector lateralDir__(matrix1[0].CrossProduct(matrix0[0]));
+		////dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+		//lateralDir__ = lateralDir__.Normalize();
+		//ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+		//ndMatrix coneRotation(ndQuaternion(lateralDir__, coneAngle), matrix1.m_posit);
+		//ndMatrix pitchMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
+		//
+		//
+		//ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		//dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+		//lateralDir = lateralDir.Normalize();
 
-		AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
-		SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
-		//SetMotorAcceleration(desc, 0.5f);
-		SetLowerFriction(desc, m_coneRow.m_minForce);
-		SetHighFriction(desc, m_coneRow.m_maxForce);
+		ndMatrix xxx(matrix0 * matrix1.Inverse());
+		ndVector e0;
+		ndVector e1;
+		xxx.CalcPitchYawRoll(e0, e1);
+		ndMatrix xxx1 = dPitchMatrix(e0.m_x);
+		ndMatrix xxx2 = dYawMatrix(e0.m_y) * dRollMatrix(e0.m_z);
+		ndMatrix Q = matrix1.Inverse() * xxx2 * matrix1;
 
-		AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
-		SetMotorAcceleration(desc, m_biConeRow.m_motorAccel);
-		//SetMotorAcceleration(desc, 0.5f);
-		SetLowerFriction(desc, m_biConeRow.m_minForce);
-		SetHighFriction(desc, m_biConeRow.m_maxForce);
+		//ndQuaternion lateralDir(Q);
+		ndVector lateralDir((ndQuaternion (Q) & ndVector::m_triplexMask).Normalize());
 
-
-		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
-		SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
-		//SetMotorAcceleration(desc, 0.1f);
-		SetLowerFriction(desc, m_twistRow.m_minForce);
-		SetHighFriction(desc, m_twistRow.m_maxForce);
+		//AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
+		//SetMotorAcceleration(desc, m_coneRow.m_motorAccel);
+		////SetMotorAcceleration(desc, 0.5f);
+		//SetLowerFriction(desc, m_coneRow.m_minForce);
+		//SetHighFriction(desc, m_coneRow.m_maxForce);
+		//
+		//const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		//AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
+		//SetMotorAcceleration(desc, m_biConeRow.m_motorAccel);
+		////SetMotorAcceleration(desc, 0.5f);
+		//SetLowerFriction(desc, m_biConeRow.m_minForce);
+		//SetHighFriction(desc, m_biConeRow.m_maxForce);
+		//
+		//
+		//AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+		//SetMotorAcceleration(desc, m_twistRow.m_motorAccel);
+		////SetMotorAcceleration(desc, 0.1f);
+		//SetLowerFriction(desc, m_twistRow.m_minForce);
+		//SetHighFriction(desc, m_twistRow.m_maxForce);
 	}
 
 	//AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));

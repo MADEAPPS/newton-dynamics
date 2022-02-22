@@ -75,44 +75,42 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 {
 	ndFloat32 mass = 1.0f;
 	ndFloat32 diameter = 0.5f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
+	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
+	ndPhysicsWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	matrix.m_posit.m_y += 1.0f;
-	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
-	matrix.m_posit.m_y += 1.0f;
-	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
+	const ndInt32 count = 3;
+	ndBodyDynamic* array[count];
+	for (ndInt32 i = 0; i < count; i++)
+	{
+		matrix.m_posit.m_y += diameter;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		array[i] = body;
+	}
 
-	ndMatrix bodyMatrix0(body0->GetMatrix());
-	ndMatrix bodyMatrix1(body1->GetMatrix());
-	ndMatrix pinMatrix(bodyMatrix0);
-	pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-	ndJointBallAndSocket* const joint0 = new ndJointBallAndSocket(pinMatrix, body0, body1);
-	world->AddJoint(joint0);
-	
-	matrix.m_posit.m_y += 1.0f;
-	ndBodyDynamic* const body2 = MakePrimitive(scene, matrix, shape, mesh, mass);
+	ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
+	for (ndInt32 i = 1; i < count; i++)
+	{
+		ndMatrix bodyMatrix0(array[i-1]->GetMatrix());
+		ndMatrix bodyMatrix1(array[i-0]->GetMatrix());
+		ndMatrix pinMatrix(pinAlign * bodyMatrix0);
+		pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
+		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, array[i - 1], array[i - 0]);
+		joint->SetConeLimit(60.0f * ndDegreeToRad);
+		world->AddJoint(joint);
+	}
 
-	bodyMatrix0 = body1->GetMatrix();
-	bodyMatrix1 = body2->GetMatrix();
-	pinMatrix = bodyMatrix0;
-	pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-	ndJointBallAndSocket* const joint2 = new ndJointBallAndSocket(pinMatrix, body1, body2);
-	world->AddJoint(joint2);
-
-	
-	bodyMatrix1.m_posit.m_y += 0.5f;
+	ndMatrix bodyMatrix0(pinAlign * array[count-1]->GetMatrix());
+	bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body2, fixBody);
+	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix0, array[count - 1], fixBody);
+	joint1->SetConeLimit(60.0f * ndDegreeToRad);
 	world->AddJoint(joint1);
 
 	mesh->Release();
@@ -433,11 +431,11 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
 	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
 	//BuildSlider(scene, ndVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
 	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
 	//BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
 	//BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
