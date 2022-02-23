@@ -343,10 +343,10 @@ namespace nd
 				for (int i = 0; i < count; ++i)
 				{
 					const hullVector& p = points[i];
-					minP = minP.GetMin(p);
-					maxP = maxP.GetMax(p);
 					median += p;
 					varian += p * p;
+					minP = minP.GetMin(p);
+					maxP = maxP.GetMax(p);
 				}
 
 				varian = varian.Scale(double(count)) - median * median;

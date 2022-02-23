@@ -555,10 +555,10 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 		for (ndInt32 i = 0; i < count; i ++) 
 		{
 			const ndBigVector& p = points[i];
-			minP = minP.GetMin(p);
-			maxP = maxP.GetMax(p);
 			median += p;
 			varian += p * p;
+			minP = minP.GetMin(p);
+			maxP = maxP.GetMax(p);
 		}
 
 		varian = varian.Scale (ndFloat32 (count)) - median * median;

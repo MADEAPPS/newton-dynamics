@@ -375,9 +375,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-		dAssert(0);
-		//hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
-		//scene->GetWorld()->AddJoint(hinge);
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		scene->GetWorld()->AddJoint(hinge);
 	}
 
 	{
@@ -392,9 +391,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-		dAssert(0);
-		//hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
-		//scene->GetWorld()->AddJoint(hinge);
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		scene->GetWorld()->AddJoint(hinge);
 	}
 
 	{
@@ -409,9 +407,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-		dAssert(0);
-		//hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
-		//scene->GetWorld()->AddJoint(hinge);
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		scene->GetWorld()->AddJoint(hinge);
 	}
 #endif
 	entity->CleanIntermediate();
