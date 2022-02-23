@@ -13,7 +13,7 @@
 #define __ND_JOINT_6DOF_IK_EFFECTOR_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointBallAndSocket.h"
+#include "ndJointSpherical.h"
 
 class ndJointIk6DofEffector: public ndJointBilateralConstraint
 {

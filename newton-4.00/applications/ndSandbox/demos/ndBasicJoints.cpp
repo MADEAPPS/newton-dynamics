@@ -117,7 +117,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndMatrix bodyMatrix1(array[i-0]->GetMatrix());
 		ndMatrix pinMatrix(pinAlign * bodyMatrix0);
 		pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, array[i - 1], array[i - 0]);
+		ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
 		joint->SetViscousFriction(regularizer, friction);
 		joint->SetConeLimit(60.0f * ndDegreeToRad);
 		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
@@ -127,7 +127,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndMatrix bodyMatrix0(pinAlign * array[count-1]->GetMatrix());
 	bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(bodyMatrix0, array[count - 1], fixBody);
+	ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
 	joint->SetViscousFriction(regularizer, friction);
 	joint->SetConeLimit(60.0f * ndDegreeToRad);
 	joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);

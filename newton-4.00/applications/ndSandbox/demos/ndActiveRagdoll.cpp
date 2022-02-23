@@ -375,7 +375,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-			ndJointPdBallAndSocket* const joint = (ndJointPdBallAndSocket*)jointNode->GetJoint();
+			ndJointSphericalPd* const joint = (ndJointSphericalPd*)jointNode->GetJoint();
 
 			dAssert(0);
 			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
@@ -390,7 +390,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-			ndJointBallAndSocket* const joint = (ndJointBallAndSocket*)jointNode->GetJoint();
+			ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
 
 			//dTrace (("do not forget to delete this debug\n"))
 			//joint->SetSolverModel(m_jointkinematicCloseLoop);

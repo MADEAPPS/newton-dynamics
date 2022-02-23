@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __ND_JOINT_BALL_AND_SOCKET_H__
-#define __ND_JOINT_BALL_AND_SOCKET_H__
+#ifndef __ND_JOINT_SPHERICAL_H__
+#define __ND_JOINT_SPHERICAL_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
@@ -19,13 +19,13 @@
 #define D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED ndFloat32 (0.1f) 
 #define D_BALL_AND_SOCKED_PENETRATION_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
 
-class ndJointBallAndSocket: public ndJointBilateralConstraint
+class ndJointSpherical: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointBallAndSocket);
-	D_NEWTON_API ndJointBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointBallAndSocket();
+	D_CLASS_REFLECTION(ndJointSpherical);
+	D_NEWTON_API ndJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointSpherical();
 
 	D_NEWTON_API virtual ndFloat32 GetConeLimit() const;
 	D_NEWTON_API virtual void SetConeLimit(ndFloat32 maxConeAngle);

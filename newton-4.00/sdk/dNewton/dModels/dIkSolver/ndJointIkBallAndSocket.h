@@ -13,9 +13,9 @@
 #define __ND_JOINT_IK_BALL_AND_SOCKET_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointBallAndSocket.h"
+#include "ndJointSpherical.h"
 
-class ndJointIkBallAndSocket: public ndJointBallAndSocket
+class ndJointIkBallAndSocket: public ndJointSpherical
 {
 	public:
 	D_CLASS_REFLECTION(ndJointIkBallAndSocket);

@@ -220,7 +220,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	body->SetOmega(omega);
 
 	matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
-	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, body, world->GetSentinelBody());
+	ndJointSpherical* const joint = new ndJointSpherical(matrix, body, world->GetSentinelBody());
 
 	world->AddBody(body);
 	world->AddJoint(joint);

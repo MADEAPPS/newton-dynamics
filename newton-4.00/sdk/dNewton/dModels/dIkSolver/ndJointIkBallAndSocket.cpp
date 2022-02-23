@@ -16,7 +16,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointIkBallAndSocket)
 
 ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBallAndSocket(pinAndPivotFrame, child, parent)
+	:ndJointSpherical(pinAndPivotFrame, child, parent)
 	,m_coneRow()
 	,m_twistRow()
 	,m_biConeRow()
@@ -24,7 +24,7 @@ ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndMatrix& pinAndPivotFrame,
 }
 
 ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBallAndSocket(ndLoadSaveBase::ndLoadDescriptor(desc))
+	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_coneRow()
 	,m_twistRow()
 	,m_biConeRow()
@@ -49,7 +49,7 @@ void ndJointIkBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBallAndSocket::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+	ndJointSpherical::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	dAssert(0);
 	//xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
@@ -63,7 +63,7 @@ void ndJointIkBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 
 void ndJointIkBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	ndJointBallAndSocket::DebugJoint(debugCallback);
+	ndJointSpherical::DebugJoint(debugCallback);
 }
 
 bool ndJointIkBallAndSocket::IsIk() const
@@ -98,7 +98,7 @@ bool ndJointIkBallAndSocket::SetIkMotor(ndFloat32 timestep, const ndJacobian& fo
 
 void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
-//ndJointBallAndSocket::JacobianDerivative(desc);
+//ndJointSpherical::JacobianDerivative(desc);
 //return;
 	ndMatrix matrix0;
 	ndMatrix matrix1;

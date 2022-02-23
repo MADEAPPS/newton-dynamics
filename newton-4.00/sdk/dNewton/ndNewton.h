@@ -64,9 +64,11 @@
 #include <ndContactNotify.h>
 #include <ndJointPdSlider.h>
 #include <ndCharacterNode.h>
+#include <ndJointSpherical.h>
 #include <ndDynamicsUpdate.h>
 #include <ndJointFollowPath.h>
 #include <ndBodyParticleSet.h>
+#include <ndJointSphericalPd.h>
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
@@ -74,12 +76,10 @@
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
 #include <ndJointHingeActuator.h>
-#include <ndJointBallAndSocket.h>
 #include <ndJointIk6DofEffector.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointIkBallAndSocket.h>
 #include <ndJointAttachmentPoint.h>
-#include <ndJointPdBallAndSocket.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>

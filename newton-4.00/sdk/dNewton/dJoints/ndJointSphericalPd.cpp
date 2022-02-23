@@ -11,16 +11,16 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointPdBallAndSocket.h"
+#include "ndJointSphericalPd.h"
 
 #define D_PD_MAX_ANGLE	ndFloat32 (120.0f * ndDegreeToRad)
 #define D_PD_PENETRATION_RECOVERY_ANGULAR_SPEED ndFloat32 (0.1f) 
 #define D_PD_PENETRATION_ANGULAR_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPdBallAndSocket)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSphericalPd)
 
-ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBallAndSocket(pinAndPivotFrame, child, parent)
+ndJointSphericalPd::ndJointSphericalPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	:ndJointSpherical(pinAndPivotFrame, child, parent)
 	//,m_pivotFrame(m_localMatrix1)
 	//,m_minTwistAngle(-ndFloat32(1.0e10f))
 	//,m_maxTwistAngle(ndFloat32(1.0e10f))
@@ -35,8 +35,8 @@ ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndMatrix& pinAndPivotFrame,
 	m_maxDof = 8;
 }
 
-ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndJointBallAndSocket(ndLoadSaveBase::ndLoadDescriptor(desc))
+ndJointSphericalPd::ndJointSphericalPd(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
 	//,m_pivotFrame(dGetIdentityMatrix())
 	//,m_minTwistAngle(-ndFloat32(1.0e10f))
 	//,m_maxTwistAngle(ndFloat32(1.0e10f))
@@ -65,11 +65,11 @@ ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescr
 	//m_coneAngleRegularizer = xmlGetFloat (xmlNode, "coneAngleRegularizer");
 }
 
-ndJointPdBallAndSocket::~ndJointPdBallAndSocket()
+ndJointSphericalPd::~ndJointSphericalPd()
 {
 }
 
-void ndJointPdBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointSphericalPd::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -89,62 +89,62 @@ void ndJointPdBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 	//xmlSaveParam(childNode, "coneAngleRegularizer", m_coneAngleRegularizer);
 }
 
-void ndJointPdBallAndSocket::GetConeSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+void ndJointSphericalPd::GetConeSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
 {
 	spring = m_coneAngleSpring;
 	damper = m_coneAngleDamper;
 	regularizer = m_coneAngleRegularizer;
 }
 
-void ndJointPdBallAndSocket::SetConeSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+void ndJointSphericalPd::SetConeSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
 	m_coneAngleSpring = dMax(spring, ndFloat32(0.0f));
 	m_coneAngleDamper = dMax(damper, ndFloat32(0.0f));
 	m_coneAngleRegularizer = dMax(regularizer, ndFloat32(0.0f));
 }
 
-void ndJointPdBallAndSocket::GetTwistSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+void ndJointSphericalPd::GetTwistSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
 {
 	spring = m_twistAngleSpring;
 	damper = m_twistAngleDamper;
 	regularizer = m_twistAngleRegularizer;
 }
 
-void ndJointPdBallAndSocket::SetTwistSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+void ndJointSphericalPd::SetTwistSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
 	m_twistAngleSpring = dMax(spring, ndFloat32(0.0f));
 	m_twistAngleDamper = dMax(damper, ndFloat32(0.0f));
 	m_twistAngleRegularizer = dMax(regularizer, ndFloat32(0.0f));
 }
 
-//void ndJointPdBallAndSocket::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
+//void ndJointSphericalPd::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
 //{
 //	m_minTwistAngle = -dAbs(minAngle);
 //	m_maxTwistAngle = dAbs(maxAngle);
 //}
 //
-//void ndJointPdBallAndSocket::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
+//void ndJointSphericalPd::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
 //{
 //	minAngle = m_minTwistAngle;
 //	maxAngle = m_maxTwistAngle;
 //}
 //
-//ndFloat32 ndJointPdBallAndSocket::GetMaxConeAngle() const
+//ndFloat32 ndJointSphericalPd::GetMaxConeAngle() const
 //{
 //	return m_maxConeAngle;
 //}
 //
-//void ndJointPdBallAndSocket::SetConeLimit(ndFloat32 maxConeAngle)
+//void ndJointSphericalPd::SetConeLimit(ndFloat32 maxConeAngle)
 //{
 //	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_PD_MAX_ANGLE * ndFloat32 (0.999f));
 //}
 //
-//ndVector ndJointPdBallAndSocket::GetTargetPosition() const
+//ndVector ndJointSphericalPd::GetTargetPosition() const
 //{
 //	return m_localMatrix1.m_posit;
 //}
 //
-//void ndJointPdBallAndSocket::SetTargetPosition(const ndVector& posit)
+//void ndJointSphericalPd::SetTargetPosition(const ndVector& posit)
 //{
 //	dAssert(posit.m_w == ndFloat32(1.0f));
 //	m_localMatrix1.m_posit = posit;
@@ -152,22 +152,22 @@ void ndJointPdBallAndSocket::SetTwistSpringDamper(ndFloat32 regularizer, ndFloat
 //
 //
 //
-//ndMatrix ndJointPdBallAndSocket::GetTargetMatrix() const
+//ndMatrix ndJointSphericalPd::GetTargetMatrix() const
 //{
 //	return m_localMatrix1;
 //}
 //
-//void ndJointPdBallAndSocket::SetTargetMatrix(const ndMatrix& matrix)
+//void ndJointSphericalPd::SetTargetMatrix(const ndMatrix& matrix)
 //{
 //	m_localMatrix1 = matrix;
 //}
 
-void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndJointSphericalPd::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	ndJointBallAndSocket::DebugJoint(debugCallback);
+	ndJointSpherical::DebugJoint(debugCallback);
 }
 
-//void ndJointPdBallAndSocket::SubmitTwistLimits(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+//void ndJointSphericalPd::SubmitTwistLimits(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 //{
 //	if((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 //	{ 
@@ -198,7 +198,7 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //	}
 //}
 
-//void ndJointPdBallAndSocket::SubmitPdRotation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+//void ndJointSphericalPd::SubmitPdRotation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 //{
 //	ndQuaternion q0(matrix0);
 //	ndQuaternion q1(matrix1);
@@ -244,13 +244,13 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //}
 
 //
-////void ndJointPdBallAndSocket::SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
-//void ndJointPdBallAndSocket::SubmitTwistAngleOnlyRows(const ndMatrix&, const ndMatrix&, ndConstraintDescritor&)
+////void ndJointSphericalPd::SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+//void ndJointSphericalPd::SubmitTwistAngleOnlyRows(const ndMatrix&, const ndMatrix&, ndConstraintDescritor&)
 //{
 //	dAssert(0);
 //}
 //
-//void ndJointPdBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+//void ndJointSphericalPd::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 //{
 //	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 //	if (cosAngleCos >= ndFloat32(0.998f))
@@ -300,7 +300,7 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //}
 
 //
-//void ndJointPdBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+//void ndJointSphericalPd::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 //{
 //	ndFloat32 twistAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 //	AddAngularRowJacobian(desc, matrix0.m_front, twistAngle);
@@ -337,7 +337,7 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //}
 
 
-void ndJointPdBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+void ndJointSphericalPd::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 	{
@@ -369,7 +369,7 @@ void ndJointPdBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 ang
 	}
 }
 
-void ndJointPdBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSphericalPd::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
@@ -396,7 +396,7 @@ void ndJointPdBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const nd
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointPdBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSphericalPd::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 	if (coneAngle > m_maxConeAngle)
@@ -417,7 +417,7 @@ void ndJointPdBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMat
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointPdBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointSphericalPd::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;

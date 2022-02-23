@@ -23,7 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-#include "ndJointBallAndSocket.h"
+#include "ndJointSpherical.h"
 #include "ndCharacterInverseDynamicNode.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterInverseDynamicNode)
@@ -31,7 +31,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterInverseDynamicNode)
 ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent)
 	:ndCharacterNode(parent)
 	,m_body(body)
-	,m_joint(new ndJointBallAndSocket(matrixInGlobalSpace, body, parent->GetBody()))
+	,m_joint(new ndJointSpherical(matrixInGlobalSpace, body, parent->GetBody()))
 {
 	m_localPose = m_body->GetMatrix() * parent->GetBody()->GetMatrix().Inverse();
 }

@@ -9,20 +9,19 @@
 * freely
 */
 
-#ifndef __ND_JOINT_PD_BALL_AND_SOCKET_H__
-#define __ND_JOINT_PD_BALL_AND_SOCKET_H__
+#ifndef __ND_JOINT_SPHERICAL_PD_H__
+#define __ND_JOINT_SPHERICAL_PD_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointBallAndSocket.h"
+#include "ndJointSpherical.h"
 
-//class ndJointPdBallAndSocket : public ndJointBilateralConstraint
-class ndJointPdBallAndSocket : public ndJointBallAndSocket
+class ndJointSphericalPd : public ndJointSpherical
 {
 	public:
-	D_CLASS_REFLECTION(ndJointPdBallAndSocket);
-	D_NEWTON_API ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointPdBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointPdBallAndSocket();
+	D_CLASS_REFLECTION(ndJointSphericalPd);
+	D_NEWTON_API ndJointSphericalPd(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndJointSphericalPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointSphericalPd();
 
 	//D_NEWTON_API void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
 	//D_NEWTON_API void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
@@ -71,21 +70,21 @@ class ndJointPdBallAndSocket : public ndJointBallAndSocket
 	ndFloat32 m_coneAngleRegularizer;
 };
 
-//inline ndMatrix ndJointPdBallAndSocket::GetTargetRotation() const
+//inline ndMatrix ndJointSphericalPd::GetTargetRotation() const
 //{
 //	ndMatrix tmp(m_localMatrix1);
 //	tmp.m_posit = m_pivotFrame.m_posit;
 //	return tmp;
 //}
 //
-//inline void ndJointPdBallAndSocket::SetTargetRotation(const ndMatrix& matrix)
+//inline void ndJointSphericalPd::SetTargetRotation(const ndMatrix& matrix)
 //{
 //	ndMatrix tmp(matrix);
 //	tmp.m_posit = m_localMatrix1.m_posit;
 //	m_localMatrix1 = tmp;
 //}
 //
-//inline const ndMatrix& ndJointPdBallAndSocket::GetReferenceMatrix() const
+//inline const ndMatrix& ndJointSphericalPd::GetReferenceMatrix() const
 //{
 //	return m_pivotFrame;
 //}

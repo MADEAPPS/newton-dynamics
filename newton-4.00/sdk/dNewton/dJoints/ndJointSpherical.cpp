@@ -11,11 +11,11 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointBallAndSocket.h"
+#include "ndJointSpherical.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBallAndSocket)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSpherical)
 
-ndJointBallAndSocket::ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_maxConeAngle(ndFloat32(1.0e10f))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
@@ -25,7 +25,7 @@ ndJointBallAndSocket::ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndB
 {
 }
 
-ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndJointSpherical::ndJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_maxConeAngle(ndFloat32(1.0e10f))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
@@ -42,11 +42,11 @@ ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::ndLoadDescripto
 	m_viscousFrictionRegularizer = xmlGetFloat(xmlNode, "viscousFrictionRegularizer");
 }
 
-ndJointBallAndSocket::~ndJointBallAndSocket()
+ndJointSpherical::~ndJointSpherical()
 {
 }
 
-void ndJointBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointSpherical::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -60,36 +60,36 @@ void ndJointBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) co
 	xmlSaveParam(childNode, "viscousFrictionRegularizer", m_viscousFrictionRegularizer);
 }
 
-void ndJointBallAndSocket::SetViscousFriction(ndFloat32 regularizer, ndFloat32 viscousFriction)
+void ndJointSpherical::SetViscousFriction(ndFloat32 regularizer, ndFloat32 viscousFriction)
 {
 	m_viscousFriction = dAbs(viscousFriction);
 	m_viscousFrictionRegularizer = dMax(dAbs(regularizer), ndFloat32(0.0f));
 }
 
-void ndJointBallAndSocket::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
+void ndJointSpherical::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
 {
 	m_minTwistAngle = dMin(minAngle, ndFloat32 (0.0f));
 	m_maxTwistAngle = dMax(maxAngle, ndFloat32(0.0f));
 }
 
-void ndJointBallAndSocket::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
+void ndJointSpherical::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
 {
 	minAngle = m_minTwistAngle;
 	maxAngle = m_maxTwistAngle;
 }
 
-ndFloat32 ndJointBallAndSocket::GetConeLimit() const
+ndFloat32 ndJointSpherical::GetConeLimit() const
 {
 	return m_maxConeAngle;
 }
 
-void ndJointBallAndSocket::SetConeLimit(ndFloat32 maxConeAngle)
+void ndJointSpherical::SetConeLimit(ndFloat32 maxConeAngle)
 {
 	//m_maxConeAngle = dMin (dAbs (maxConeAngle), D_BALL_AND_SOCKED_MAX_ANGLE * ndFloat32 (0.999f));
 	m_maxConeAngle = maxConeAngle;
 }
 
-void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;
@@ -177,7 +177,7 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	}
 }
 
-void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 	if (coneAngle > m_maxConeAngle)
@@ -194,7 +194,7 @@ void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatri
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad)) 
 	{
@@ -229,7 +229,7 @@ void ndJointBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle
 	}
 }
 
-void ndJointBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
@@ -262,7 +262,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMa
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))
@@ -314,14 +314,14 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, cons
 	}
 }
 
-void ndJointBallAndSocket::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 }
 
-void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;
