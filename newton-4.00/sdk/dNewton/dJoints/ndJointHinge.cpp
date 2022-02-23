@@ -54,6 +54,8 @@ ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
+	m_angle = xmlGetFloat(xmlNode, "angle");
+	m_omega = xmlGetFloat(xmlNode, "omega");
 	m_springK = xmlGetFloat(xmlNode, "springK");
 	m_damperC = xmlGetFloat(xmlNode, "damperC");
 	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
@@ -72,6 +74,8 @@ void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
+	xmlSaveParam(childNode, "angle", m_angle);
+	xmlSaveParam(childNode, "omega", m_omega);
 	xmlSaveParam(childNode, "springK", m_springK);
 	xmlSaveParam(childNode, "damperC", m_damperC);
 	xmlSaveParam(childNode, "minLimit", m_minLimit);

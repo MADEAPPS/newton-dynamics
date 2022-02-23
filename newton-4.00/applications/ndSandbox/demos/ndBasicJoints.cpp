@@ -30,6 +30,20 @@ class ndFollowSplinePath : public ndJointFollowPath
 	{
 	}
 
+	ndFollowSplinePath(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndJointFollowPath(ndLoadSaveBase::ndLoadDescriptor(desc))
+	{
+//		dAssert(0);
+	}
+
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+	{
+		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(childNode);
+		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+		ndJointFollowPath::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+	}
+
 	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
 	{
 		ndDemoEntity* const pathEntity = (ndDemoEntity*)GetBody1()->GetNotifyCallback()->GetUserData();
@@ -46,15 +60,8 @@ class ndFollowSplinePath : public ndJointFollowPath
 		positOut = matrix.TransformVector(point);
 		tangentOut = tangent;
 	}
-
-	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-	{
-		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(childNode);
-		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndJointFollowPath::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	}
 };
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndFollowSplinePath)
 
 static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoMesh* const mesh, ndFloat32 mass)
 {
@@ -467,7 +474,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
 	BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

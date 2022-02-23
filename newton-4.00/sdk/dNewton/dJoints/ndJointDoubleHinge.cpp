@@ -31,8 +31,12 @@ ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_angle1(ndFloat32(0.0f))
 	,m_omega1(ndFloat32(0.0f))
 {
-	dAssert(0);
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_angle0 = xmlGetFloat(xmlNode, "angle0");
+	m_angle1 = xmlGetFloat(xmlNode, "angle1");
+	m_omega0 = xmlGetFloat(xmlNode, "omega0");
+	m_omega1 = xmlGetFloat(xmlNode, "omega1");
 }
 
 ndJointDoubleHinge::~ndJointDoubleHinge()
@@ -46,9 +50,10 @@ void ndJointDoubleHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	dAssert(0);
-	// since this joint is not used that much
-	// for now double hinges do not have the hinge functionality
+	xmlSaveParam(childNode, "angle0", m_angle0);
+	xmlSaveParam(childNode, "angle1", m_angle1);
+	xmlSaveParam(childNode, "omega0", m_omega0);
+	xmlSaveParam(childNode, "omega1", m_omega1);
 }
 
 void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
