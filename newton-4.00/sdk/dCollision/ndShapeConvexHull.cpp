@@ -25,7 +25,8 @@
 #include "ndShapeConvexHull.h"
 
 //#define D_CONVEX_VERTEX_SPLITE_SIZE	48
-#define D_CONVEX_VERTEX_SPLITE_SIZE		32
+//#define D_CONVEX_VERTEX_SPLITE_SIZE	32
+#define D_CONVEX_VERTEX_SPLITE_SIZE		20
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeConvexHull)
 
 D_MSV_NEWTON_ALIGN_32
@@ -395,6 +396,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			ndInt32 boxIndex = stackBoxPool[stack];
 			ndConvexBox& box = boxTree[boxIndex];
 			if (box.m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE/2)
+			//if (box.m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE)
 			{
 				ndVector median(ndVector::m_zero);
 				ndVector varian(ndVector::m_zero);
@@ -583,26 +585,17 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 				box->m_soaVertexCount = soaCount;
 				startAcc += soaCount;
 			}
-
 		}
 	}
 	else 
 	{
 		m_soaVertexCount = ((m_vertexCount + 3) & -4) / 4;
-		//m_soaVertexCount = 2 * ((m_soaVertexCount + 1) / 2);
 		m_soa_x = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 		m_soa_y = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 		m_soa_z = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 		m_soa_index = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 
-		//ndVector array[D_CONVEX_VERTEX_SPLITE_SIZE];
 		ndFloat32* const indexptr = &m_soa_index[0].m_x;
-		//for (ndInt32 i = 0; i < m_soaVertexCount * 4; ++i)
-		//{
-		//	array[i] = m_vertex[0];
-		//	indexptr[i] = ndFloat32(0);
-		//}
-
 		for (ndInt32 i = 0; i < m_vertexCount; ++i)
 		{
 			array[i] = m_vertex[i];
@@ -896,7 +889,7 @@ inline ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir
 			}
 			else
 			{
-				for (ndInt32 j = 0; j < box.m_soaVertexCount; j++)
+				for (ndInt32 j = 0; j < box.m_soaVertexCount; ++j)
 				{
 					ndInt32 i = box.m_soaVertexStart + j;
 					ndVector dot(m_soa_x[i] * dirX + m_soa_y[i] * dirY + m_soa_z[i] * dirZ);
