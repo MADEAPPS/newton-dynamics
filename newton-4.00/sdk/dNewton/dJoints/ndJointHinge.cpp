@@ -254,6 +254,15 @@ void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& ma
 
 	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+
+	// save the current joint Omega
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	const ndFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	m_angle += deltaAngle;
+	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
@@ -262,28 +271,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	//
-	//// two rows to restrict rotation around around the parent coordinate system
-	//const ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	//AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-	//
-	//const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	//AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-
 	ApplyBaseRows(desc, matrix0, matrix1);
-
-	// save the current joint Omega
-	const ndVector omega0(m_body0->GetOmega());
-	const ndVector omega1(m_body1->GetOmega());
-	
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const ndFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
-	m_angle += deltaAngle;
-	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
-
 	if ((m_springK > ndFloat32 (0.0f)) || (m_damperC > ndFloat32 (0.0f)))
 	{
 		// spring damper with limits

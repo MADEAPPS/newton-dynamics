@@ -91,12 +91,12 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	{
 		matrix.m_posit.m_y += diameter;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndVector inertia(body->GetMassMatrix());
-		ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
-		inertia.m_x = maxI;
-		inertia.m_y = maxI;
-		inertia.m_z = maxI;
-		body->SetMassMatrix(inertia);
+		//ndVector inertia(body->GetMassMatrix());
+		//ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
+		//inertia.m_x = maxI;
+		//inertia.m_y = maxI;
+		//inertia.m_z = maxI;
+		//body->SetMassMatrix(inertia);
 		array[i] = body;
 	}
 
@@ -138,8 +138,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
 	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	matrix.m_posit.m_y += 5.0f;
-	//ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-
+	
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector posit(matrix.m_posit);
 	for (ndInt32 i = 0; i < 8; i++)
@@ -250,13 +249,12 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
-	ndVector massMatrix(body->GetMassMatrix());
-	ndFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
-	massMatrix.m_x = maxInertia;
-	massMatrix.m_y = maxInertia;
-	massMatrix.m_z = maxInertia;
+	//ndVector massMatrix(body->GetMassMatrix());
+	//ndFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
+	//massMatrix.m_x = maxInertia;
+	//massMatrix.m_y = maxInertia;
+	//massMatrix.m_z = maxInertia;
 	//body->SetMassMatrix(massMatrix);
-
 	body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
 
 	ndJointDoubleHinge* const joint = new ndJointDoubleHinge (matrix, body, fixBody);
@@ -381,7 +379,6 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	mesh->Release();
 
 	const ndInt32 count = 32;
-	//const ndInt32 count = 3;
 
 	ndBigVector point0;
 	ndVector positions[count + 1];
@@ -467,10 +464,10 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
 	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
 	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
-	//BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
+	BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
