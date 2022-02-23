@@ -31,9 +31,6 @@ ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndMatrix& pinAndPivotFrame,
 	,m_coneAngleSpring(ndFloat32(1000.0f))
 	,m_coneAngleDamper(ndFloat32(50.0f))
 	,m_coneAngleRegularizer(ndFloat32(5.0e-3f))
-	//,m_linearSpring(ndFloat32(0.0f))
-	//,m_linearDamper(ndFloat32(0.0f))
-	//,m_linearRegularizer(ndFloat32(0.0f))
 {
 	m_maxDof = 8;
 }
@@ -50,9 +47,6 @@ ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescr
 	//,m_coneAngleSpring(ndFloat32(1000.0f))
 	//,m_coneAngleDamper(ndFloat32(50.0f))
 	//,m_coneAngleRegularizer(ndFloat32(5.0e-3f))
-	//,m_linearSpring(ndFloat32(1000.0f))
-	//,m_linearDamper(ndFloat32(50.0f))
-	//,m_linearRegularizer(ndFloat32(5.0e-3f))
 {
 	dAssert(0);
 	m_maxDof = 8;
@@ -69,10 +63,6 @@ ndJointPdBallAndSocket::ndJointPdBallAndSocket(const ndLoadSaveBase::ndLoadDescr
 	//m_coneAngleSpring = xmlGetFloat (xmlNode, "coneAngleSpring");
 	//m_coneAngleDamper = xmlGetFloat (xmlNode, "coneAngleDamper");
 	//m_coneAngleRegularizer = xmlGetFloat (xmlNode, "coneAngleRegularizer");
-	//
-	//m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
-	//m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
-	//m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
 }
 
 ndJointPdBallAndSocket::~ndJointPdBallAndSocket()
@@ -97,10 +87,6 @@ void ndJointPdBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 	//xmlSaveParam(childNode, "coneAngleSpring", m_coneAngleSpring);
 	//xmlSaveParam(childNode, "coneAngleDamper", m_coneAngleDamper);
 	//xmlSaveParam(childNode, "coneAngleRegularizer", m_coneAngleRegularizer);
-	//
-	//xmlSaveParam(childNode, "linearSpring", m_linearSpring);
-	//xmlSaveParam(childNode, "linearDamper", m_linearDamper);
-	//xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
 void ndJointPdBallAndSocket::GetConeSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -164,19 +150,7 @@ void ndJointPdBallAndSocket::SetTwistSpringDamper(ndFloat32 regularizer, ndFloat
 //	m_localMatrix1.m_posit = posit;
 //}
 //
-//void ndJointPdBallAndSocket::GetLinearSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const
-//{
-//	spring = m_linearSpring;
-//	damper = m_linearDamper;
-//	regularizer = m_linearRegularizer;
-//}
 //
-//void ndJointPdBallAndSocket::SetLinearSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
-//{
-//	m_linearSpring = dMax(spring, ndFloat32(0.0f));
-//	m_linearDamper = dMax(damper, ndFloat32(0.0f));
-//	m_linearRegularizer = dMax(regularizer, ndFloat32(0.0f));
-//}
 //
 //ndMatrix ndJointPdBallAndSocket::GetTargetMatrix() const
 //{
@@ -269,27 +243,6 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //	}
 //}
 
-//void ndJointPdBallAndSocket::SubmitLinearLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
-//{
-//	if (m_linearRegularizer == ndFloat32(0.0f))
-//	{
-//		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-//		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-//		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-//	}
-//	else
-//	{
-//		// Cartesian motion
-//		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-//		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-//
-//		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-//		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-//
-//		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-//		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-//	}
-//}
 //
 ////void ndJointPdBallAndSocket::SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 //void ndJointPdBallAndSocket::SubmitTwistAngleOnlyRows(const ndMatrix&, const ndMatrix&, ndConstraintDescritor&)
@@ -345,62 +298,7 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //		}
 //	}
 //}
-//
-//void ndJointPdBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
-//{
-//	const ndVector dir0(matrix0.m_front);
-//	const ndVector dir1(matrix1.m_front);
-//	const ndVector lateralDir(dir1.CrossProduct(dir0).Normalize());
-//	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
-//	ndFloat32 cosAngleCos = dir1.DotProduct(dir0).GetScalar();
-//	ndFloat32 coneAngle = ndAcos(dClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)));
-//	const ndQuaternion rotation(lateralDir, coneAngle);
-//	const ndMatrix coneMatrix(rotation, ndVector::m_zero);
-//	const ndMatrix pitchMatrix = matrix1 * coneMatrix * matrix0.Inverse();
-//	ndFloat32 twistAngle = ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-//
-//	AddAngularRowJacobian(desc, dir0, twistAngle);
-//	SetMassSpringDamperAcceleration(desc, m_twistAngleRegularizer, m_twistAngleSpring, m_twistAngleDamper);
-//
-//	ndVector sideDir(lateralDir.CrossProduct(dir0));
-//	AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
-//	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
-//
-//	AddAngularRowJacobian(desc, lateralDir, -coneAngle);
-//	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
-//
-//	if (coneAngle > m_maxConeAngle)
-//	{
-//		dAssert(0);
-//	//	AddAngularRowJacobian(desc, lateralDir, 0.0f);
-//	//	const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-//	//	const ndFloat32 penetration = coneAngle - m_maxConeAngle;
-//	//	const ndFloat32 recoveringAceel = desc.m_invTimestep * D_PD_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PD_PENETRATION_ANGULAR_LIMIT), ndFloat32(1.0f));
-//	//	SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-//	//	SetHighFriction(desc, ndFloat32(0.0f));
-//	}
-//
-//	if (twistAngle < m_minTwistAngle)
-//	{
-//		dAssert(0);
-//		//AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
-//		//const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-//		//const ndFloat32 penetration = twistAngle - m_minTwistAngle;
-//		//const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_PD_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PD_PENETRATION_ANGULAR_LIMIT), ndFloat32(1.0f));
-//		//SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-//		//SetLowerFriction(desc, ndFloat32(0.0f));
-//	}
-//	else if (twistAngle >= m_maxTwistAngle)
-//	{
-//		dAssert(0);
-//		//AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
-//		//const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-//		//const ndFloat32 penetration = twistAngle - m_maxTwistAngle;
-//		//const ndFloat32 recoveringAceel = desc.m_invTimestep * D_PD_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PD_PENETRATION_ANGULAR_LIMIT), ndFloat32(1.0f));
-//		//SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-//		//SetHighFriction(desc, ndFloat32(0.0f));
-//	}
-//}
+
 //
 //void ndJointPdBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 //{
@@ -438,6 +336,87 @@ void ndJointPdBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback
 //	}
 //}
 
+
+void ndJointPdBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+{
+	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
+	{
+		dAssert(desc.m_rowsCount < 8);
+		AddAngularRowJacobian(desc, pin, -angle);
+		SetLowerFriction(desc, ndFloat32(-1.0e10f));
+		SetHighFriction(desc, ndFloat32(1.0e10f));
+	}
+	else
+	{
+		if (angle < m_minTwistAngle)
+		{
+			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_minTwistAngle;
+			const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetLowerFriction(desc, ndFloat32(0.0f));
+		}
+		else if (angle >= m_maxTwistAngle)
+		{
+			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_maxTwistAngle;
+			const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, ndFloat32(0.0f));
+		}
+	}
+}
+
+void ndJointPdBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+	lateralDir = lateralDir.Normalize();
+	const ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+	const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+	if (coneAngle > m_maxConeAngle)
+	{
+		AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
+		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const ndFloat32 penetration = coneAngle - m_maxConeAngle;
+		const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetHighFriction(desc, ndFloat32(0.0f));
+
+		AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
+		SetLowerFriction(desc, ndFloat32(-1.0e10f));
+		SetHighFriction(desc, ndFloat32(1.0e10f));
+	}
+
+	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+}
+
+void ndJointPdBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+	if (coneAngle > m_maxConeAngle)
+	{
+		// two rows to restrict rotation around around the parent coordinate system
+		ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+		SetLowerFriction(desc, ndFloat32(-1.0e10f));
+		SetHighFriction(desc, ndFloat32(1.0e10f));
+		
+		ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+		SetLowerFriction(desc, ndFloat32(-1.0e10f));
+		SetHighFriction(desc, ndFloat32(1.0e10f));
+	}
+
+	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+}
+
 void ndJointPdBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -446,28 +425,16 @@ void ndJointPdBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ApplyBaseRows(matrix0, matrix1, desc);
 	
-	//if (m_twistAngleRegularizer == ndFloat32(0.0f))
-	//{
-	//	// handle special case that this is a cone angle only joint (2dof)
-	//	SubmitConeAngleOnlyRows(matrix0, matrix1, desc);
-	//}
-	//else if (m_coneAngleRegularizer == ndFloat32(0.0f))
-	//{
-	//	// handle special case that this is a twist angle only joint (a hinge)
-	//	SubmitTwistAngleOnlyRows(matrix0, matrix1, desc);
-	//}
-	//else
-	//{
-	//	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	//	if (cosAngleCos >= ndFloat32(0.998f))
-	//	{
-	//		// special case where the front axis are almost aligned
-	//		// solve by using Cartesian approximation
-	//		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-	//	}
-	//	else
-	//	{
-	//		SubmitAngularAxis(matrix0, matrix1, desc);
-	//	}
-	//}
+
+	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	if (cosAngleCos >= ndFloat32(0.998f))
+	{
+		// special case where the front axis are almost aligned
+		// solve by using Cartesian approximation
+		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+	}
+	else
+	{
+		SubmitAngularAxis(matrix0, matrix1, desc);
+	}
 }

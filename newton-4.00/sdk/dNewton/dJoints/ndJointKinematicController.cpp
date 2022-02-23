@@ -204,12 +204,27 @@ ndJointKinematicController::ndJointKinematicController(const ndLoadSaveBase::ndL
 	m_angularFrictionCoefficient = xmlGetFloat(xmlNode, "angularFrictionCoefficient");
 	m_controlMode = ndControlModes(xmlGetInt(xmlNode, "controlMode"));
 	m_autoSleepState = xmlGetInt(xmlNode, "autoSleepState") ? true : false;
-
 }
 
 ndJointKinematicController::~ndJointKinematicController()
 {
 	m_body0->SetAutoSleep(m_autoSleepState);
+}
+
+void ndJointKinematicController::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "maxSpeed", m_maxSpeed);
+	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
+	xmlSaveParam(childNode, "maxLinearFriction", m_maxLinearFriction);
+	xmlSaveParam(childNode, "maxAngularFriction", m_maxAngularFriction);
+	xmlSaveParam(childNode, "angularFrictionCoefficient", m_angularFrictionCoefficient);
+	xmlSaveParam(childNode, "controlMode", ndInt32(m_controlMode));
+	xmlSaveParam(childNode, "autoSleepState", ndInt32(m_autoSleepState));
 }
 
 void ndJointKinematicController::Init(const ndMatrix& globalMatrix)
@@ -228,6 +243,75 @@ void ndJointKinematicController::Init(const ndMatrix& globalMatrix)
 	
 	// set as soft joint
 	SetSolverModel(m_jointkinematicAttachment);
+}
+
+void ndJointKinematicController::CheckSleep() const
+{
+	GetBody0()->SetSleepState(false);
+
+	//dAssert(0);
+	//ndMatrix matrix0;
+	//ndMatrix matrix1;
+	//CalculateGlobalMatrix(matrix0, matrix1);
+	//
+	//ndMatrix matrix(matrix1 * matrix0.Inverse());
+	//matrix.m_posit.m_w = 0.0f;
+	//if (matrix.m_posit.DotProduct3(matrix.m_posit) > ndFloat32(1.0e-6f)) 
+	//{
+	//	ndBodyKinematicSetSleepState(m_body0, 0);
+	//}
+	//else 
+	//{
+	//	switch (m_controlMode)
+	//	{
+	//		case m_full6dof:
+	//		case m_linearPlusAngularFriction:
+	//		{
+	//			ndFloat32 trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
+	//			if (trace < 0.9995f) 
+	//			{
+	//				ndBodyKinematicSetSleepState(m_body0, 0);
+	//			}
+	//			break;
+	//		}
+	//
+	//		case m_linearAndCone:
+	//		{
+	//			ndFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
+	//			if (cosAngle > 0.998f) 
+	//			{
+	//				ndBodyKinematicSetSleepState(m_body0, 0);
+	//			}
+	//			break;
+	//		}
+	//
+	//		case m_linearAndTwist:
+	//		{
+	//			ndFloat32 pitchAngle = 0.0f;
+	//			ndFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
+	//			if (cosAngle > 0.998f) 
+	//			{
+	//				pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+	//			}
+	//			else 
+	//			{
+	//				ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+	//				dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+	//				lateralDir = lateralDir.Normalize();
+	//				ndFloat32 coneAngle = dAcos(dClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
+	//				ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	//				ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	//				pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+	//			}
+	//
+	//			if (dAbs(pitchAngle) > (1.0 * ndDegreeToRad)) 
+	//			{
+	//				ndBodyKinematicSetSleepState(m_body0, 0);
+	//			}
+	//			break;
+	//		}
+	//	}
+	//}
 }
 
 void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
@@ -392,87 +476,3 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointKinematicController::CheckSleep() const
-{
-	GetBody0()->SetSleepState(false);
-
-	//dAssert(0);
-	//ndMatrix matrix0;
-	//ndMatrix matrix1;
-	//CalculateGlobalMatrix(matrix0, matrix1);
-	//
-	//ndMatrix matrix(matrix1 * matrix0.Inverse());
-	//matrix.m_posit.m_w = 0.0f;
-	//if (matrix.m_posit.DotProduct3(matrix.m_posit) > ndFloat32(1.0e-6f)) 
-	//{
-	//	ndBodyKinematicSetSleepState(m_body0, 0);
-	//}
-	//else 
-	//{
-	//	switch (m_controlMode)
-	//	{
-	//		case m_full6dof:
-	//		case m_linearPlusAngularFriction:
-	//		{
-	//			ndFloat32 trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
-	//			if (trace < 0.9995f) 
-	//			{
-	//				ndBodyKinematicSetSleepState(m_body0, 0);
-	//			}
-	//			break;
-	//		}
-	//
-	//		case m_linearAndCone:
-	//		{
-	//			ndFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
-	//			if (cosAngle > 0.998f) 
-	//			{
-	//				ndBodyKinematicSetSleepState(m_body0, 0);
-	//			}
-	//			break;
-	//		}
-	//
-	//		case m_linearAndTwist:
-	//		{
-	//			ndFloat32 pitchAngle = 0.0f;
-	//			ndFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
-	//			if (cosAngle > 0.998f) 
-	//			{
-	//				pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	//			}
-	//			else 
-	//			{
-	//				ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-	//				dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
-	//				lateralDir = lateralDir.Normalize();
-	//				ndFloat32 coneAngle = dAcos(dClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
-	//				ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	//				ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-	//				pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	//			}
-	//
-	//			if (dAbs(pitchAngle) > (1.0 * ndDegreeToRad)) 
-	//			{
-	//				ndBodyKinematicSetSleepState(m_body0, 0);
-	//			}
-	//			break;
-	//		}
-	//	}
-	//}
-}
-
-void ndJointKinematicController::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "maxSpeed", m_maxSpeed);
-	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
-	xmlSaveParam(childNode, "maxLinearFriction", m_maxLinearFriction);
-	xmlSaveParam(childNode, "maxAngularFriction", m_maxAngularFriction);
-	xmlSaveParam(childNode, "angularFrictionCoefficient", m_angularFrictionCoefficient);
-	xmlSaveParam(childNode, "controlMode", ndInt32(m_controlMode));
-	xmlSaveParam(childNode, "autoSleepState", ndInt32(m_autoSleepState));
-}

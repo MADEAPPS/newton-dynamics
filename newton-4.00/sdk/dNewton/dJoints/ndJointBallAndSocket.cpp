@@ -179,31 +179,6 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 
 void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	//if (m_options.m_option4) {
-	//	// two rows to restrict rotation around around the parent coordinate system
-	//	//dFloat coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct3(matrix0.m_front), dFloat(-1.0f), dFloat(1.0f)));
-	//	const dFloat angleError = GetMaxAngleError();
-	//	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	//	if (m_maxConeAngle <= angleError) {
-	//		NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
-	//		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	//		//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-	//		if (dAbs(angle0) > angleError) {
-	//			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
-	//			NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	//		}
-	//
-	//		dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	//		NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
-	//		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	//		//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-	//		if (dAbs(angle1) > angleError) {
-	//			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
-	//			NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	//		}
-	//	}
-	//}
-
 	ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 	if (coneAngle > m_maxConeAngle)
 	{

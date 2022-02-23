@@ -247,6 +247,7 @@ class ndRagdollModel : public ndCharacter
 		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 		joint->SetConeSpringDamper(0.005f, 0.0f, definition.m_friction);
+		joint->SetTwistSpringDamper(0.005f, 0.0f, definition.m_friction);
 
 		return jointNode;
 	}

@@ -34,10 +34,7 @@ class ndJointPdBallAndSocket : public ndJointBallAndSocket
 	D_NEWTON_API void SetConeSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 	D_NEWTON_API void GetConeSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
 	
-	
-	//D_NEWTON_API void GetLinearSpringDamperRegularizer(ndFloat32& spring, ndFloat32& damper, ndFloat32& regularizer) const;
-	//D_NEWTON_API void SetLinearSpringDamperRegularizer(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer = ndFloat32(5.0e-3f));
-	//
+
 	//D_NEWTON_API ndVector GetTargetPosition() const;
 	//D_NEWTON_API void SetTargetPosition(const ndVector& posit);
 	//
@@ -54,10 +51,10 @@ class ndJointPdBallAndSocket : public ndJointBallAndSocket
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-	//void SubmitLinearLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	//void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	//void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	//
+	void SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
+	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	
 	//void SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	//void SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
@@ -72,10 +69,6 @@ class ndJointPdBallAndSocket : public ndJointBallAndSocket
 	ndFloat32 m_coneAngleSpring;
 	ndFloat32 m_coneAngleDamper;
 	ndFloat32 m_coneAngleRegularizer;
-	
-	//ndFloat32 m_linearSpring;
-	//ndFloat32 m_linearDamper;
-	//ndFloat32 m_linearRegularizer;
 };
 
 //inline ndMatrix ndJointPdBallAndSocket::GetTargetRotation() const
