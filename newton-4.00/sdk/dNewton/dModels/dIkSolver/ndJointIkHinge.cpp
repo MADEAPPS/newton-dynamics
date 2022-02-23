@@ -137,17 +137,18 @@ void ndJointIkHinge::GetTorqueLimits(ndFloat32& minTorque, ndFloat32& maxTorque)
 
 void ndJointIkHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	m_hasLimits = false;
-	m_isSpringDamper = false;
-	m_friction = ndFloat32(0.0f);
-
-	ndJointHinge::JacobianDerivative(desc);
-	const ndVector pin(m_body0->GetMatrix().RotateVector(GetLocalMatrix0().m_front));
-
-	AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
-	SetMotorAcceleration(desc, m_axisAccel.m_motorAccel);
-	SetLowerFriction(desc, m_axisAccel.m_minForce);
-	SetHighFriction(desc, m_axisAccel.m_maxForce);
+	dAssert(0);
+	//m_hasLimits = false;
+	//m_isSpringDamper = false;
+	//m_friction = ndFloat32(0.0f);
+	//
+	//ndJointHinge::JacobianDerivative(desc);
+	//const ndVector pin(m_body0->GetMatrix().RotateVector(GetLocalMatrix0().m_front));
+	//
+	//AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
+	//SetMotorAcceleration(desc, m_axisAccel.m_motorAccel);
+	//SetLowerFriction(desc, m_axisAccel.m_minForce);
+	//SetHighFriction(desc, m_axisAccel.m_maxForce);
 }
 
 

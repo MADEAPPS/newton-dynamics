@@ -79,7 +79,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	//OptimizeForRender ();
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix, bool stretchMaping)
 	:ndDemoMeshInterface()
 	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -112,23 +112,19 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 			break;
 		}
 
-		//case SERIALIZE_ID_CONE:
-		//case SERIALIZE_ID_CAPSULE:
-		//case SERIALIZE_ID_CYLINDER:
-		//case SERIALIZE_ID_CHAMFERCYLINDER:
-		//{
-		//	//NewtonMeshApplySphericalMapping(mesh, LoadTexture(texture0));
-		//	NewtonMeshApplyCylindricalMapping(mesh, LoadTexture(texture0), LoadTexture(texture1), &aligmentUV[0][0]);
-		//	break;
-		//}
-
 		case ndShapeID::m_box:
 		{
 			ndInt32 tex0 = LoadTexture(texture0);
 			//ndInt32 tex1 = LoadTexture(texture1);
 			//ndInt32 tex2 = LoadTexture(texture2);
-			//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
-			mesh.UniformBoxMapping(tex0, aligmentUV);
+			if (stretchMaping)
+			{
+				mesh.BoxMapping(tex0, tex0, tex0, aligmentUV);
+			}
+			else
+			{
+				mesh.UniformBoxMapping(tex0, aligmentUV);
+			}
 			break;
 		}
 

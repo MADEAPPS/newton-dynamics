@@ -21,9 +21,10 @@ ndJointHingeActuator::ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndF
 	,m_motorSpeed(angularRate)
 	,m_maxTorque(D_LCP_MAX_VALUE)
 {
-	m_friction = ndFloat32 (0.0f);
-	SetAngularRate(angularRate);
-	EnableLimits(false, minAngle, maxAngle);
+	dAssert(0);
+	//m_friction = ndFloat32 (0.0f);
+	//SetAngularRate(angularRate);
+	//EnableLimits(false, minAngle, maxAngle);
 }
 
 ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -32,9 +33,8 @@ ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescripto
 	,m_motorSpeed(ndFloat32(0.0f))
 	,m_maxTorque(D_LCP_MAX_VALUE)
 {
-	m_friction = ndFloat32(0.0f);
+	dAssert(0);
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	
 	m_targetAngle = xmlGetFloat(xmlNode, "targetAngle");
 	m_motorSpeed = xmlGetFloat(xmlNode, "motorSpeed");
 	m_maxTorque = xmlGetFloat(xmlNode, "maxTorque");
@@ -113,54 +113,55 @@ void ndJointHingeActuator::SetMaxTorque(ndFloat32 torque)
 
 void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	m_hasLimits = false;
-	m_isSpringDamper = false;
-	m_friction = ndFloat32(0.0f);
-
-	ndJointHinge::JacobianDerivative(desc);
-
-	dAssert(m_motorSpeed >= 0.0f);
-	ndFloat32 step = m_motorSpeed * desc.m_timestep;
-
-	ndFloat32 currentSpeed = 0.0f;
-	if (m_angle < (m_targetAngle - step))
-	{
-		currentSpeed = m_motorSpeed;
-	}
-	else if (m_angle > (m_targetAngle + step))
-	{
-		currentSpeed = -m_motorSpeed;
-	}
-	else if (m_angle < m_targetAngle)
-	{
-		currentSpeed = ndFloat32 (0.3f) * (m_targetAngle - m_angle) * desc.m_invTimestep;
-		dAssert(dAbs(currentSpeed) < m_motorSpeed);
-	}
-	else if (m_angle > m_targetAngle)
-	{
-		currentSpeed = ndFloat32(0.3f) * (m_targetAngle - m_angle) * desc.m_invTimestep;
-		dAssert(dAbs(currentSpeed) < m_motorSpeed);
-	}
-
-	const ndVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
-	
-	AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
-	ndFloat32 accel = GetMotorZeroAcceleration(desc) + ndFloat32(0.3f) * currentSpeed * desc.m_invTimestep;
-	SetMotorAcceleration(desc, accel);
-	if (m_angle > GetMaxAngularLimit())
-	{
-		SetHighFriction(desc, m_maxTorque);
-	}
-	else if (m_angle < GetMinAngularLimit())
-	{
-		SetLowerFriction(desc, -m_maxTorque);
-	}
-	else 
-	{
-		SetHighFriction(desc, m_maxTorque);
-		SetLowerFriction(desc, -m_maxTorque);
-	}
-	dAssert(desc.m_rowsCount <= 6);
+	dAssert(0);
+	//m_hasLimits = false;
+	//m_isSpringDamper = false;
+	//m_friction = ndFloat32(0.0f);
+	//
+	//ndJointHinge::JacobianDerivative(desc);
+	//
+	//dAssert(m_motorSpeed >= 0.0f);
+	//ndFloat32 step = m_motorSpeed * desc.m_timestep;
+	//
+	//ndFloat32 currentSpeed = 0.0f;
+	//if (m_angle < (m_targetAngle - step))
+	//{
+	//	currentSpeed = m_motorSpeed;
+	//}
+	//else if (m_angle > (m_targetAngle + step))
+	//{
+	//	currentSpeed = -m_motorSpeed;
+	//}
+	//else if (m_angle < m_targetAngle)
+	//{
+	//	currentSpeed = ndFloat32 (0.3f) * (m_targetAngle - m_angle) * desc.m_invTimestep;
+	//	dAssert(dAbs(currentSpeed) < m_motorSpeed);
+	//}
+	//else if (m_angle > m_targetAngle)
+	//{
+	//	currentSpeed = ndFloat32(0.3f) * (m_targetAngle - m_angle) * desc.m_invTimestep;
+	//	dAssert(dAbs(currentSpeed) < m_motorSpeed);
+	//}
+	//
+	//const ndVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
+	//
+	//AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
+	//ndFloat32 accel = GetMotorZeroAcceleration(desc) + ndFloat32(0.3f) * currentSpeed * desc.m_invTimestep;
+	//SetMotorAcceleration(desc, accel);
+	//if (m_angle > GetMaxAngularLimit())
+	//{
+	//	SetHighFriction(desc, m_maxTorque);
+	//}
+	//else if (m_angle < GetMinAngularLimit())
+	//{
+	//	SetLowerFriction(desc, -m_maxTorque);
+	//}
+	//else 
+	//{
+	//	SetHighFriction(desc, m_maxTorque);
+	//	SetLowerFriction(desc, -m_maxTorque);
+	//}
+	//dAssert(desc.m_rowsCount <= 6);
 }
 
 

@@ -17,35 +17,29 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBallAndSocket)
 
 ndJointBallAndSocket::ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	,m_maxConeAngle(ndFloat32(1.0e10f))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
 	,m_maxTwistAngle(ndFloat32(1.0e10f))
-	,m_twistFriction(ndFloat32(0.0f))
-	,m_twistFrictionRegularizer(ndFloat32(0.0f))
-	,m_maxConeAngle(ndFloat32(1.0e10f))
-	,m_coneFriction(ndFloat32(0.0f))
-	,m_coneFrictionRegularizer(ndFloat32(0.0f))
+	,m_viscousFriction(ndFloat32(0.0f))
+	,m_viscousFrictionRegularizer(ndFloat32(0.0f))
 {
 }
 
 ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
+	,m_maxConeAngle(ndFloat32(1.0e10f))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
 	,m_maxTwistAngle(ndFloat32(1.0e10f))
-	,m_twistFriction(ndFloat32(0.0f))
-	,m_twistFrictionRegularizer(ndFloat32(0.0f))
-	,m_maxConeAngle(ndFloat32(1.0e10f))
-	,m_coneFriction(ndFloat32(0.0f))
-	,m_coneFrictionRegularizer(ndFloat32(0.0f))
+	,m_viscousFriction(ndFloat32(0.0f))
+	,m_viscousFrictionRegularizer(ndFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
 	m_maxConeAngle = xmlGetFloat(xmlNode, "maxConeAngle");
-	m_coneFriction = xmlGetFloat(xmlNode, "coneFriction");
 	m_minTwistAngle = xmlGetFloat(xmlNode, "minTwistAngle");
 	m_maxTwistAngle = xmlGetFloat(xmlNode, "maxTwistAngle");
-	m_twistFriction = xmlGetFloat(xmlNode, "twistFriction");
-	m_coneFrictionRegularizer = xmlGetFloat(xmlNode, "coneFrictionRegularizer");
-	m_twistFrictionRegularizer = xmlGetFloat(xmlNode, "twistFrictionRegularizer");
+	m_viscousFriction = xmlGetFloat(xmlNode, "viscousFriction");
+	m_viscousFrictionRegularizer = xmlGetFloat(xmlNode, "viscousFrictionRegularizer");
 }
 
 ndJointBallAndSocket::~ndJointBallAndSocket()
@@ -60,30 +54,22 @@ void ndJointBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) co
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	xmlSaveParam(childNode, "coneFriction", m_coneFriction);
 	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
 	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "twistFriction", m_twistFriction);
-	xmlSaveParam(childNode, "coneFrictionRegularizer", m_coneFrictionRegularizer);
-	xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
+	xmlSaveParam(childNode, "viscousFriction", m_viscousFriction);
+	xmlSaveParam(childNode, "viscousFrictionRegularizer", m_viscousFrictionRegularizer);
 }
 
-void ndJointBallAndSocket::SetConeFriction(ndFloat32 regularizer, ndFloat32 viscousFriction)
+void ndJointBallAndSocket::SetViscousFriction(ndFloat32 regularizer, ndFloat32 viscousFriction)
 {
-	m_coneFriction = dAbs(viscousFriction);
-	m_coneFrictionRegularizer = dMax(dAbs(regularizer), ndFloat32(0.0f));
+	m_viscousFriction = dAbs(viscousFriction);
+	m_viscousFrictionRegularizer = dMax(dAbs(regularizer), ndFloat32(0.0f));
 }
 
 void ndJointBallAndSocket::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
 {
 	m_minTwistAngle = dMin(minAngle, ndFloat32 (0.0f));
 	m_maxTwistAngle = dMax(maxAngle, ndFloat32(0.0f));
-}
-
-void ndJointBallAndSocket::SetTwistFriction(ndFloat32 regularizer, ndFloat32 viscousFriction)
-{
-	m_twistFriction = dAbs(viscousFriction);
-	m_twistFrictionRegularizer = dMax(dAbs(regularizer), ndFloat32(0.0f));
 }
 
 void ndJointBallAndSocket::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
@@ -260,10 +246,10 @@ void ndJointBallAndSocket::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, ndFloat32 (0.0f));
 		}
-		else if (m_twistFriction > ndFloat32(0.0f))
+		else if (m_viscousFriction > ndFloat32(0.0f))
 		{
 			AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
-			SetMassSpringDamperAcceleration(desc, m_twistFrictionRegularizer, ndFloat32 (0.0f), m_twistFriction);
+			SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32 (0.0f), m_viscousFriction);
 		}
 	}
 }
@@ -287,13 +273,13 @@ void ndJointBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMa
 		
 		AddAngularRowJacobian(desc, sideDir, ndFloat32 (0.0f));
 	}
-	else if (m_coneFriction > ndFloat32 (0.0f))
+	else if (m_viscousFriction > ndFloat32 (0.0f))
 	{
 		AddAngularRowJacobian(desc, lateralDir, ndFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, ndFloat32(0.0f), m_coneFriction);
+		SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
 
 		AddAngularRowJacobian(desc, sideDir, ndFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, ndFloat32(0.0f), m_coneFriction);
+		SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
 	}
 
 	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
@@ -342,13 +328,13 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, cons
 
 			AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
 		}
-		else if (m_coneFriction > ndFloat32(0.0f))
+		else if (m_viscousFriction > ndFloat32(0.0f))
 		{
 			AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
-			SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, ndFloat32(0.0f), m_coneFriction);
+			SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
 
 			AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
-			SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, ndFloat32(0.0f), m_coneFriction);
+			SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
 		}
 	}
 }

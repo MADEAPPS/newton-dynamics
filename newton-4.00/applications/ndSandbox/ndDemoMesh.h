@@ -26,7 +26,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name);
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix(), bool stretchMaping = true);
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
 	{ 

@@ -703,10 +703,10 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		// connect the part to the main body with a hinge
 		ndMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
-		hinge->EnableLimits(true, -15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
-
-		AddExtraBody(axleBody);
-		AddExtraJoint(hinge);
+		dAssert(0);
+		//hinge->EnableLimits(true, -15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
+		//AddExtraBody(axleBody);
+		//AddExtraJoint(hinge);
 		return axleBody;
 	}
 

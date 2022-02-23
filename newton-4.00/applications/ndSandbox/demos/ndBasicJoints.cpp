@@ -76,7 +76,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndFloat32 mass = 1.0f;
 	ndFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
@@ -111,8 +111,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndMatrix pinMatrix(pinAlign * bodyMatrix0);
 		pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
 		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, array[i - 1], array[i - 0]);
-		joint->SetTwistFriction(regularizer, friction);
-		joint->SetConeFriction(regularizer, friction);
+		joint->SetViscousFriction(regularizer, friction);
 		joint->SetConeLimit(60.0f * ndDegreeToRad);
 		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 		world->AddJoint(joint);
@@ -122,8 +121,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(bodyMatrix0, array[count - 1], fixBody);
-	joint->SetTwistFriction(regularizer, friction);
-	joint->SetConeFriction(regularizer, friction);
+	joint->SetViscousFriction(regularizer, friction);
 	joint->SetConeLimit(60.0f * ndDegreeToRad);
 	joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 	world->AddJoint(joint);
@@ -138,7 +136,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	matrix.m_posit.m_w = 1.0f;
 	
 	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
-	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	matrix.m_posit.m_y += 5.0f;
 	//ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
 
@@ -159,9 +157,9 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -170,18 +168,26 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	matrix.m_posit.m_y += 2.0f;
-
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-	
-	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
+	{
+		// spring damper slider with limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointSlider* const joint = new ndJointSlider(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
+		joint->SetLimits(-1.0f, 1.0f);
+		world->AddJoint(joint);
+	}
 
-	ndFloat32 regularizer = diameter > 0.5f ? 0.9f : 0.1f;
-	joint->SetAsSpringDamper(true, regularizer, 100.0f, 0.05f);
-	joint->EnableLimits(true, -1.0f, 1.0f);
-	joint->SetFriction(50.0f);
-	world->AddJoint(joint);
+	{
+		// viscuos damper slider with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointSlider* const joint = new ndJointSlider(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 0.0f, 10.0f);
+		joint->SetLimits(-1.0f, 1.0f);
+		world->AddJoint(joint);
+	}
 
 	mesh->Release();
 }
@@ -189,7 +195,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -200,16 +206,27 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	matrix.m_posit.m_y += 2.0f;
-
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+	{
+		// spring damper and limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
+		//joint->SetAsSpringDamper(0.1f, 500.0f, 5.0f);
+		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
+		joint->SetLimits(-3.0f, 3.0f);
+		world->AddJoint(joint);
+	}
 
-	ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
-	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
-	joint->SetFriction(2.0f);
-	joint->EnableLimits(true, -10.0f, 15.0f);
-	world->AddJoint(joint);
+	{
+		// viscuos friction and limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 0.0f, 1.0f);
+		joint->SetLimits(-10.0f, 15.0f);
+		world->AddJoint(joint);
+	}
 
 	mesh->Release();
 }
@@ -217,7 +234,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -245,7 +262,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndJointDoubleHinge* const joint = new ndJointDoubleHinge (matrix, body, fixBody);
 	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
 	//joint->SetFriction(2.0f);
-	//joint->EnableLimits(true, -10.0f, 15.0f);
+	//joint->SetLimits(true, -10.0f, 15.0f);
 	world->AddJoint(joint);
 
 	mesh->Release();
@@ -254,7 +271,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndShapeInstance shape(new ndShapeSphere(0.25f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 
 	ndMatrix matrix(dGetIdentityMatrix());
 
@@ -301,7 +318,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -324,7 +341,7 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 	world->AddJoint(new ndJointHinge(matrix, body1, fixBody));
 
 	ndVector pin(matrix.m_front);
-	world->AddJoint(new ndJointGear(5.0f, pin, body0, pin, body1));
+	world->AddJoint(new ndJointGear(4.0f, pin, body0, pin, body1));
 
 	mesh->Release();
 }
@@ -384,7 +401,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	ndFloat32 attachmentOffset = 0.8f;
 
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
-	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 	instanceMesh->Release();
@@ -447,11 +464,11 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, ndVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
-	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
-	//BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
+	BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
 	//BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	

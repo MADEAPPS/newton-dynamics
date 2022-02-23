@@ -127,10 +127,11 @@ class dQuadrupedRobot : public ndModel
 
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
-						hinge->EnableLimits(true, -60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						m_jointArray.PushBack(hinge);
-						world->AddJoint(hinge);
-						parentBody = childBody;
+						dAssert(0);
+						//hinge->EnableLimits(true, -60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						//m_jointArray.PushBack(hinge);
+						//world->AddJoint(hinge);
+						//parentBody = childBody;
 					}
 					else if (definition.m_type == dQuadrupedRobotDefinition::m_socket)
 					{

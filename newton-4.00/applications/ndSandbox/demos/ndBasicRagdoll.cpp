@@ -236,6 +236,7 @@ class ndRagdollModel : public ndCharacter
 
 	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentBone, const dJointDefinition& definition)
 	{
+		dAssert(0);
 		ndMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);

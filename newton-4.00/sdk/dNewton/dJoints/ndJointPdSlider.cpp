@@ -72,21 +72,19 @@ void ndJointPdSlider::SetTarget(ndFloat32 target)
 
 void ndJointPdSlider::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	m_hasLimits = false;
-	m_isSpringDamper = false;
-	m_friction = ndFloat32(0.0f);
-	ndJointSlider::JacobianDerivative(desc);
-	
-	ndMatrix matrix0;
-	ndMatrix matrix1;
-	
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const ndVector posit(matrix0.m_posit - matrix1.m_front.Scale(n_targetPosit));
-	AddLinearRowJacobian(desc, posit, matrix1.m_posit, matrix1.m_front);
-	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
-	SubmitConstraintLimits(desc, matrix0, matrix1);
+	dAssert(0);
+	//ndJointSlider::JacobianDerivative(desc);
+	//
+	//ndMatrix matrix0;
+	//ndMatrix matrix1;
+	//
+	//// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	//CalculateGlobalMatrix(matrix0, matrix1);
+	//
+	//const ndVector posit(matrix0.m_posit - matrix1.m_front.Scale(n_targetPosit));
+	//AddLinearRowJacobian(desc, posit, matrix1.m_posit, matrix1.m_front);
+	//SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+	//SubmitConstraintLimits(desc, matrix0, matrix1);
 }
 
 

@@ -27,7 +27,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false);
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
@@ -375,8 +375,9 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
-		scene->GetWorld()->AddJoint(hinge);
+		dAssert(0);
+		//hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
+		//scene->GetWorld()->AddJoint(hinge);
 	}
 
 	{
@@ -391,8 +392,9 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
-		scene->GetWorld()->AddJoint(hinge);
+		dAssert(0);
+		//hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
+		//scene->GetWorld()->AddJoint(hinge);
 	}
 
 	{
@@ -407,8 +409,9 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
-		scene->GetWorld()->AddJoint(hinge);
+		dAssert(0);
+		//hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
+		//scene->GetWorld()->AddJoint(hinge);
 	}
 #endif
 	entity->CleanIntermediate();

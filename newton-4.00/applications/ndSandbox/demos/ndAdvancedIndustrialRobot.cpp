@@ -124,10 +124,11 @@ class dAdvancedIndustrialRobot : public ndModel
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
-						hinge->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
-						m_jointArray.PushBack(hinge);
-						world->AddJoint(hinge);
-						parentBody = childBody;
+						dAssert(0);
+						//hinge->SetLimits(true, definition.m_minLimit, definition.m_maxLimit);
+						//m_jointArray.PushBack(hinge);
+						//world->AddJoint(hinge);
+						//parentBody = childBody;
 					}
 					else if (definition.m_type == dAdvancedRobotDefinition::m_slider)
 					{
@@ -136,8 +137,9 @@ class dAdvancedIndustrialRobot : public ndModel
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointPdSlider* const slider = new ndJointPdSlider(pivotMatrix, childBody, parentBody);
-						slider->EnableLimits(true, definition.m_minLimit, definition.m_maxLimit);
-						slider->SetAsSpringDamper(true, 0.01f, 2000.0f, 100.0f);
+						dAssert(0);
+						slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+						slider->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
 
 						if (!strstr(definition.m_boneName, "Left"))
 						{

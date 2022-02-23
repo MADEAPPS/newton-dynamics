@@ -28,16 +28,14 @@ class ndJointSlider: public ndJointBilateralConstraint
 
 	D_NEWTON_API virtual ndFloat32 GetSpeed() const;
 	D_NEWTON_API virtual ndFloat32 GetPosit() const;
-	D_NEWTON_API virtual ndFloat32 GetFriction() const;
-
-	D_NEWTON_API virtual void SetFriction(ndFloat32 friction);
-	D_NEWTON_API virtual void EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLimit);
-	D_NEWTON_API virtual void SetAsSpringDamper(bool state, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API virtual void SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit);
+	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	protected:
 	void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
+	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -47,11 +45,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 	ndFloat32 m_damperC;
 	ndFloat32 m_minLimit;
 	ndFloat32 m_maxLimit;
-	ndFloat32 m_friction;
 	ndFloat32 m_springDamperRegularizer;
-
-	bool m_hasLimits;
-	bool m_isSpringDamper;
 };
 
 #endif 
