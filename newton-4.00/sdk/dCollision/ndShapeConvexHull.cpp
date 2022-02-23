@@ -24,7 +24,8 @@
 #include "ndShapeInstance.h"
 #include "ndShapeConvexHull.h"
 
-#define D_CONVEX_VERTEX_SPLITE_SIZE	48
+//#define D_CONVEX_VERTEX_SPLITE_SIZE	48
+#define D_CONVEX_VERTEX_SPLITE_SIZE		32
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeConvexHull)
 
 D_MSV_NEWTON_ALIGN_32
@@ -121,7 +122,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 {
 	ndInt32 stride = strideInBytes / sizeof(ndFloat32);
 	ndStack<ndBigVector> buffer(2 * count);
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		buffer[i] = ndVector(vertexArray[i * stride + 0], vertexArray[i * stride + 1], vertexArray[i * stride + 2], ndFloat32(0.0f));
 	}
@@ -134,7 +135,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		//delete convexHull;
 		//
 		//ndStack<ndVector> tmp(3 * count);
-		//for (ndInt32 i = 0; i < count; i++) 
+		//for (ndInt32 i = 0; i < count; ++i) 
 		//{
 		//	tmp[i][0] = ndFloat32(buffer[i].m_x);
 		//	tmp[i][1] = ndFloat32(buffer[i].m_y);
@@ -147,7 +148,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		//
 		//ndInt32 index = 0;
 		//ndFloat32 size = ndFloat32(1.0e10f);
-		//for (ndInt32 i = 0; i < 3; i++) 
+		//for (ndInt32 i = 0; i < 3; ++i) 
 		//{
 		//	if (sphere.m_size[i] < size) 
 		//	{
@@ -158,7 +159,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		//ndVector normal(ndFloat32(0.0f));
 		//normal[index] = ndFloat32(1.0f);
 		//ndVector step = sphere.RotateVector(normal.Scale(ndFloat32(0.05f)));
-		//for (ndInt32 i = 0; i < count; i++) 
+		//for (ndInt32 i = 0; i < count; ++i) 
 		//{
 		//	ndVector p1(tmp[i] + step);
 		//	ndVector p2(tmp[i] - step);
@@ -229,7 +230,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			ndInt32 count1 = 0;
 			//ndInt32 vertexCount = convexHull->GetVertexCount();
 			const ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
-			for (ndInt32 i = 0; i < vertexCount; i++) 
+			for (ndInt32 i = 0; i < vertexCount; ++i) 
 			{
 				if (mask[i]) 
 				{
@@ -297,7 +298,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	m_simplex = (ndConvexSimplexEdge*)ndMemory::Malloc(ndInt32(m_edgeCount * sizeof(ndConvexSimplexEdge)));
 	m_vertexToEdgeMapping = (const ndConvexSimplexEdge**)ndMemory::Malloc(ndInt32(m_vertexCount * sizeof(ndConvexSimplexEdge*)));
 
-	for (ndInt32 i = 0; i < vertexCount; i++) 
+	for (ndInt32 i = 0; i < vertexCount; ++i) 
 	{
 		if (vertexMap[i] != -1) 
 		{
@@ -335,7 +336,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 
 	ndStack<ndConvexSimplexEdge*> faceArray(m_edgeCount);
 
-	for (ndInt32 i = 0; i < m_edgeCount; i++) 
+	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		ndConvexSimplexEdge* const face = &m_simplex[i];
 		if (!faceMarks[i]) 
@@ -355,6 +356,8 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	m_faceArray = (ndConvexSimplexEdge **)ndMemory::Malloc(ndInt32(m_faceCount * sizeof(ndConvexSimplexEdge *)));
 	memcpy(m_faceArray, &faceArray[0], m_faceCount * sizeof(ndConvexSimplexEdge *));
 
+	ndFixSizeArray<ndVector, D_CONVEX_VERTEX_SPLITE_SIZE> array;
+	array.SetCount(D_CONVEX_VERTEX_SPLITE_SIZE);
 	if (vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) 
 	{
 		// create a face structure for support vertex
@@ -364,7 +367,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		
 		ndVector boxP0(ndFloat32(1.0e15f));
 		ndVector boxP1(-ndFloat32(1.0e15f));
-		for (ndInt32 i = 0; i < vertexCount; i++) 
+		for (ndInt32 i = 0; i < vertexCount; ++i) 
 		{
 			const ndVector& p = m_vertex[i];
 			vertexNodeList[i] = sortTree.Insert(p, i);
@@ -395,7 +398,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			{
 				ndVector median(ndVector::m_zero);
 				ndVector varian(ndVector::m_zero);
-				for (ndInt32 i = 0; i < box.m_vertexCount; i++) 
+				for (ndInt32 i = 0; i < box.m_vertexCount; ++i) 
 				{
 					ndVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
 					boxP0 = boxP0.GetMin(p);
@@ -407,7 +410,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 				ndInt32 index = 0;
 				ndFloat64 maxVarian = ndFloat64(-1.0e10f);
 				varian = varian.Scale(ndFloat32(box.m_vertexCount)) - median * median;
-				for (ndInt32 i = 0; i < 3; i++) 
+				for (ndInt32 i = 0; i < 3; ++i) 
 				{
 					if (varian[i] > maxVarian) 
 					{
@@ -461,7 +464,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 					// insert right branch AABB
 					ndVector rightBoxP0(ndFloat32(1.0e15f));
 					ndVector rightBoxP1(-ndFloat32(1.0e15f));
-					for (ndInt32 i = i0; i < box.m_vertexCount; i++) 
+					for (ndInt32 i = i0; i < box.m_vertexCount; ++i) 
 					{
 						const ndVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
 						rightBoxP0 = rightBoxP0.GetMin(p);
@@ -486,7 +489,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 					// insert left branch AABB
 					ndVector leftBoxP0(ndFloat32(1.0e15f));
 					ndVector leftBoxP1(-ndFloat32(1.0e15f));
-					for (ndInt32 i = 0; i < i0; i++) 
+					for (ndInt32 i = 0; i < i0; ++i) 
 					{
 						const ndVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
 						leftBoxP0 = leftBoxP0.GetMin(p);
@@ -510,7 +513,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			}
 		}
 		
-		for (ndInt32 i = 0; i < m_vertexCount; i++) 
+		for (ndInt32 i = 0; i < m_vertexCount; ++i) 
 		{
 			m_vertex[i] = vertexNodeList[i]->GetInfo();
 			vertexNodeList[i]->GetInfo().m_w = ndFloat32(i);
@@ -520,7 +523,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		m_supportTree = (ndConvexBox*)ndMemory::Malloc(ndInt32(boxCount * sizeof(ndConvexBox)));
 		memcpy(m_supportTree, &boxTree[0], boxCount * sizeof(ndConvexBox));
 		
-		for (ndInt32 i = 0; i < m_edgeCount; i++) 
+		for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 		{
 			ndConvexSimplexEdge* const ptr = &m_simplex[i];
 			ndTree<ndVector, ndInt32>::ndNode* const node = sortTree.Find(ptr->m_vertex);
@@ -546,7 +549,6 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		m_soa_index = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 
 		ndInt32 startAcc = 0;
-		ndVector array[D_CONVEX_VERTEX_SPLITE_SIZE];
 		for (ndInt32 k = 0; k < boxCount; k++)
 		{
 			ndConvexBox* const box = &m_supportTree[k];
@@ -556,16 +558,16 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 				const ndInt32 soaCount = ((box->m_vertexCount + 3) & -4) / 4;
 
 				ndFloat32* const indexptr = &m_soa_index[startAcc].m_x;
-				for (ndInt32 i = 0; i < soaCount * 4; i++)
-				{
-					array[i] = m_vertex[box->m_vertexStart];
-					indexptr[i] = ndFloat32(box->m_vertexStart);
-				}
-
-				for (ndInt32 i = 0; i < box->m_vertexCount; i++)
+				for (ndInt32 i = 0; i < box->m_vertexCount; ++i)
 				{
 					array[i] = m_vertex[box->m_vertexStart + i];
 					indexptr[i] = ndFloat32(box->m_vertexStart + i);
+				}
+
+				for (ndInt32 i = box->m_vertexCount; i < soaCount * 4; ++i)
+				{
+					array[i] = m_vertex[box->m_vertexStart];
+					indexptr[i] = ndFloat32(box->m_vertexStart);
 				}
 
 				for (ndInt32 i = 0; i < box->m_vertexCount; i += 4)
@@ -587,23 +589,29 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	else 
 	{
 		m_soaVertexCount = ((m_vertexCount + 3) & -4) / 4;
-		m_soaVertexCount = 2 * ((m_soaVertexCount + 1) / 2);
+		//m_soaVertexCount = 2 * ((m_soaVertexCount + 1) / 2);
 		m_soa_x = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 		m_soa_y = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 		m_soa_z = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 		m_soa_index = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 
-		ndVector array[D_CONVEX_VERTEX_SPLITE_SIZE];
+		//ndVector array[D_CONVEX_VERTEX_SPLITE_SIZE];
 		ndFloat32* const indexptr = &m_soa_index[0].m_x;
-		for (ndInt32 i = 0; i < m_soaVertexCount * 4; i++)
-		{
-			array[i] = m_vertex[0];
-			indexptr[i] = ndFloat32(0);
-		}
+		//for (ndInt32 i = 0; i < m_soaVertexCount * 4; ++i)
+		//{
+		//	array[i] = m_vertex[0];
+		//	indexptr[i] = ndFloat32(0);
+		//}
 
-		for (ndInt32 i = 0; i < m_vertexCount; i++)
+		for (ndInt32 i = 0; i < m_vertexCount; ++i)
 		{
 			array[i] = m_vertex[i];
+			indexptr[i] = ndFloat32(i);
+		}
+
+		for (ndInt32 i = m_vertexCount; i < m_soaVertexCount * 4; ++i)
+		{
+			array[i] = m_vertex[0];
 			indexptr[i] = ndFloat32(i);
 		}
 
@@ -617,7 +625,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		}
 	}
 
-	for (ndInt32 i = 0; i < m_edgeCount; i++) 
+	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		ndConvexSimplexEdge* const edge = &m_simplex[i];
 		m_vertexToEdgeMapping[edge->m_vertex] = edge;
@@ -772,16 +780,14 @@ inline ndVector ndShapeConvexHull::SupportVertexBruteForce(const ndVector& dir, 
 	const ndVector dirX(dir.m_x);
 	const ndVector dirY(dir.m_y);
 	const ndVector dirZ(dir.m_z);
-	ndVector support(ndVector::m_negOne);
-	ndVector maxProj(ndFloat32(-1.0e20f));
-	for (ndInt32 i = 0; i < m_soaVertexCount; i += 2)
+	//ndVector support(ndVector::m_negOne);
+	//ndVector maxProj(ndFloat32(-1.0e20f));
+	ndVector support(m_soa_index[0]);
+	ndVector maxProj(m_soa_x[0] * dirX + m_soa_y[0] * dirY + m_soa_z[0] * dirZ);
+	for (ndInt32 i = 1; i < m_soaVertexCount; ++i)
 	{
 		ndVector dot(m_soa_x[i] * dirX + m_soa_y[i] * dirY + m_soa_z[i] * dirZ);
 		support = support.Select(m_soa_index[i], dot > maxProj);
-		maxProj = maxProj.GetMax(dot);
-
-		dot = m_soa_x[i + 1] * dirX + m_soa_y[i + 1] * dirY + m_soa_z[i + 1] * dirZ;
-		support = support.Select(m_soa_index[i + 1], dot > maxProj);
 		maxProj = maxProj.GetMax(dot);
 	}
 
@@ -950,7 +956,7 @@ void ndShapeConvexHull::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 	ndVector vertex[512];
 	ndShapeDebugNotify::ndEdgeType edgeType[512];
 	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
-	for (ndInt32 i = 0; i < m_faceCount; i++) 
+	for (ndInt32 i = 0; i < m_faceCount; ++i) 
 	{
 		ndConvexSimplexEdge* const face = m_faceArray[i];
 		ndConvexSimplexEdge* ptr = face;
