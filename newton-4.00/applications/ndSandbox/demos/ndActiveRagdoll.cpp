@@ -377,10 +377,11 @@ class ndActiveRagdollModel : public ndCharacter
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			ndJointPdBallAndSocket* const joint = (ndJointPdBallAndSocket*)jointNode->GetJoint();
 
+			dAssert(0);
 			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-			joint->SetConeAngleSpringDamperRegularizer(definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper, definition.m_coneSpringData.m_regularizer);
-			joint->SetTwistAngleSpringDamperRegularizer(definition.m_twistSpringData.m_spring, definition.m_twistSpringData.m_damper, definition.m_twistSpringData.m_regularizer);
+			joint->SetConeSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+			joint->SetTwistSpringDamper(definition.m_twistSpringData.m_regularizer, definition.m_twistSpringData.m_spring, definition.m_twistSpringData.m_damper);
 
 			return jointNode;
 		}

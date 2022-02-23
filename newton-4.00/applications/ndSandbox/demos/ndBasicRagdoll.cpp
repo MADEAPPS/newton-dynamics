@@ -236,7 +236,6 @@ class ndRagdollModel : public ndCharacter
 
 	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentBone, const dJointDefinition& definition)
 	{
-		dAssert(0);
 		ndMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
@@ -247,7 +246,7 @@ class ndRagdollModel : public ndCharacter
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		joint->SetConeAngleSpringDamperRegularizer(0.0f, definition.m_friction, 0.005f);
+		joint->SetConeSpringDamper(0.005f, 0.0f, definition.m_friction);
 
 		return jointNode;
 	}
@@ -283,13 +282,13 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	//scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
 
 	matrix.m_posit.m_z = 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	//scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
 
 	origin1.m_x += 20.0f;
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+//	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
 	ndQuaternion rot;

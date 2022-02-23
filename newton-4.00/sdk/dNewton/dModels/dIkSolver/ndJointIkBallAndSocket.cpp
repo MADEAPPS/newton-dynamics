@@ -103,7 +103,7 @@ void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitLinealRows(matrix0, matrix1, desc);
+	ApplyBaseRows(matrix0, matrix1, desc);
 
 	ndVector omega(GetBody0()->GetMatrix().UnrotateVector(GetBody0()->GetOmega()));
 return;

@@ -339,7 +339,7 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, cons
 	}
 }
 
-void ndJointBallAndSocket::SubmitLinealRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointBallAndSocket::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
@@ -351,8 +351,7 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-	SubmitLinealRows(matrix0, matrix1, desc);
+	ApplyBaseRows(matrix0, matrix1, desc);
 
 	ndFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
 	if (deltaTwist < (2.0f * ndDegreeToRad))
