@@ -181,10 +181,12 @@ void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 	{
-		dAssert(desc.m_rowsCount < 8);
 		AddAngularRowJacobian(desc, pin, -angle);
-		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
-		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		if (desc.m_rowsCount > 6)
+		{
+			SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+			SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		}
 	}
 	else
 	{
@@ -206,11 +208,11 @@ void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, ndFloat32(0.0f));
 		}
-		else if (m_viscousFriction > ndFloat32(0.0f))
-		{
-			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
-			SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
-		}
+		//else if (m_viscousFriction > ndFloat32(0.0f))
+		//{
+		//	AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+		//	SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
+		//}
 	}
 }
 
@@ -223,13 +225,13 @@ void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& m
 		// two rows to restrict rotation around around the parent coordinate system
 		ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
-		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		//SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		//SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 
 		ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
-		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		//SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		//SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 	}
 
 	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
@@ -243,7 +245,6 @@ void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 	lateralDir = lateralDir.Normalize();
 	const ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 	const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 	if (coneAngle > m_maxConeAngle)
 	{ 
 		AddAngularRowJacobian(desc, lateralDir, ndFloat32 (0.0f));
@@ -252,17 +253,18 @@ void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, ndFloat32(0.0f));
-		
-		AddAngularRowJacobian(desc, sideDir, ndFloat32 (0.0f));
-	}
-	else if (m_viscousFriction > ndFloat32 (0.0f))
-	{
-		AddAngularRowJacobian(desc, lateralDir, ndFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
 
-		AddAngularRowJacobian(desc, sideDir, ndFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
+		//const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		//AddAngularRowJacobian(desc, sideDir, ndFloat32 (0.0f));
 	}
+	//else if (m_viscousFriction > ndFloat32 (0.0f))
+	//{
+	//	AddAngularRowJacobian(desc, lateralDir, ndFloat32 (0.0f));
+	//	SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
+	//
+	//	AddAngularRowJacobian(desc, sideDir, ndFloat32 (0.0f));
+	//	SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
+	//}
 
 	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
