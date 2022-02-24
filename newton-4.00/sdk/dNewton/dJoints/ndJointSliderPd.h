@@ -9,19 +9,19 @@
 * freely
 */
 
-#ifndef __ND_JOINT_PD_SLIDER_H__
-#define __ND_JOINT_PD_SLIDER_H__
+#ifndef __ND_JOINT_SLIDER_PD_H__
+#define __ND_JOINT_SLIDER_PD_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointSlider.h"
 
-class ndJointPdSlider: public ndJointSlider
+class ndJointSliderPd: public ndJointSlider
 {
 	public:
-	D_CLASS_REFLECTION(ndJointPdSlider);
-	D_NEWTON_API ndJointPdSlider(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointPdSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointPdSlider();
+	D_CLASS_REFLECTION(ndJointSliderPd);
+	D_NEWTON_API ndJointSliderPd(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndJointSliderPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointSliderPd();
 
 	D_NEWTON_API ndFloat32 GetTarget() const;
 	D_NEWTON_API void SetTarget(ndFloat32 target);

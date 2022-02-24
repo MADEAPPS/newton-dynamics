@@ -62,7 +62,7 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
-#include <ndJointPdSlider.h>
+#include <ndJointSliderPd.h>
 #include <ndCharacterNode.h>
 #include <ndJointSpherical.h>
 #include <ndDynamicsUpdate.h>

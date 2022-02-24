@@ -441,8 +441,8 @@ return;
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointPdSlider* m_leftGripper;
-	ndJointPdSlider* m_rightGripper;
+	ndJointSliderPd* m_leftGripper;
+	ndJointSliderPd* m_rightGripper;
 	ndJointIk6DofEffector* m_effector;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;

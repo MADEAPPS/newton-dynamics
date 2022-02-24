@@ -11,17 +11,17 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointPdSlider.h"
+#include "ndJointSliderPd.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPdSlider)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSliderPd)
 
-ndJointPdSlider::ndJointPdSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointSliderPd::ndJointSliderPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSlider(pinAndPivotFrame, child, parent)
 	,n_targetPosit(ndFloat32 (0.0f))
 {
 }
 
-ndJointPdSlider::ndJointPdSlider(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndJointSliderPd::ndJointSliderPd(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSlider(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,n_targetPosit(ndFloat32(0.0f))
 {
@@ -38,11 +38,11 @@ ndJointPdSlider::ndJointPdSlider(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	//m_isSpringDamper = xmlGetInt(xmlNode, "isSpringDamper") ? true : false;
 }
 
-ndJointPdSlider::~ndJointPdSlider()
+ndJointSliderPd::~ndJointSliderPd()
 {
 }
 
-void ndJointPdSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointSliderPd::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -60,17 +60,17 @@ void ndJointPdSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	//xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
 }
 
-ndFloat32 ndJointPdSlider::GetTarget() const
+ndFloat32 ndJointSliderPd::GetTarget() const
 {
 	return n_targetPosit;
 }
 
-void ndJointPdSlider::SetTarget(ndFloat32 target)
+void ndJointSliderPd::SetTarget(ndFloat32 target)
 {
 	n_targetPosit = dClamp(target, m_minLimit, m_maxLimit);
 }
 
-void ndJointPdSlider::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointSliderPd::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dAssert(0);
 	//ndJointSlider::JacobianDerivative(desc);

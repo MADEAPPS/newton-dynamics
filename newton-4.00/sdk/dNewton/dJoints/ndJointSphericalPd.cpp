@@ -21,32 +21,16 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSphericalPd)
 
 ndJointSphericalPd::ndJointSphericalPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
-	//,m_pivotFrame(m_localMatrix1)
-	//,m_minTwistAngle(-ndFloat32(1.0e10f))
-	//,m_maxTwistAngle(ndFloat32(1.0e10f))
-	,m_twistAngleSpring(ndFloat32(1000.0f))
-	,m_twistAngleDamper(ndFloat32(50.0f))
-	,m_twistAngleRegularizer(ndFloat32(5.0e-3f))
-	//,m_maxConeAngle(ndFloat32(1.0e10f))
-	,m_coneAngleSpring(ndFloat32(1000.0f))
-	,m_coneAngleDamper(ndFloat32(50.0f))
-	,m_coneAngleRegularizer(ndFloat32(5.0e-3f))
+	,m_pivotFrame(m_localMatrix1)
+	,m_springConst(ndFloat32(0.0))
 {
 	m_maxDof = 8;
 }
 
 ndJointSphericalPd::ndJointSphericalPd(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
-	//,m_pivotFrame(dGetIdentityMatrix())
-	//,m_minTwistAngle(-ndFloat32(1.0e10f))
-	//,m_maxTwistAngle(ndFloat32(1.0e10f))
-	,m_twistAngleSpring(ndFloat32(1000.0f))
-	,m_twistAngleDamper(ndFloat32(50.0f))
-	,m_twistAngleRegularizer(ndFloat32(5.0e-3f))
-	//,m_maxConeAngle(ndFloat32(1.0e10f))
-	//,m_coneAngleSpring(ndFloat32(1000.0f))
-	//,m_coneAngleDamper(ndFloat32(50.0f))
-	//,m_coneAngleRegularizer(ndFloat32(5.0e-3f))
+	,m_pivotFrame(m_localMatrix1)
+	,m_springConst(ndFloat32(0.0))
 {
 	dAssert(0);
 	m_maxDof = 8;
@@ -89,78 +73,28 @@ void ndJointSphericalPd::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	//xmlSaveParam(childNode, "coneAngleRegularizer", m_coneAngleRegularizer);
 }
 
-void ndJointSphericalPd::GetConeSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+ndMatrix ndJointSphericalPd::GetTargetMatrix() const
 {
-	spring = m_coneAngleSpring;
-	damper = m_coneAngleDamper;
-	regularizer = m_coneAngleRegularizer;
+	return m_pivotFrame;
 }
 
-void ndJointSphericalPd::SetConeSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+void ndJointSphericalPd::SetTargetMatrix(const ndMatrix& matrix)
 {
-	m_coneAngleSpring = dMax(spring, ndFloat32(0.0f));
-	m_coneAngleDamper = dMax(damper, ndFloat32(0.0f));
-	m_coneAngleRegularizer = dMax(regularizer, ndFloat32(0.0f));
+	m_pivotFrame = matrix;
 }
 
-void ndJointSphericalPd::GetTwistSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+void ndJointSphericalPd::SetSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	spring = m_twistAngleSpring;
-	damper = m_twistAngleDamper;
-	regularizer = m_twistAngleRegularizer;
+	m_springConst = spring;
+	SetViscousFriction(regularizer, damper);
 }
 
-void ndJointSphericalPd::SetTwistSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+void ndJointSphericalPd::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
 {
-	m_twistAngleSpring = dMax(spring, ndFloat32(0.0f));
-	m_twistAngleDamper = dMax(damper, ndFloat32(0.0f));
-	m_twistAngleRegularizer = dMax(regularizer, ndFloat32(0.0f));
+	spring = m_springConst;
+	damper = m_viscousFriction;
+	regularizer = m_viscousFrictionRegularizer;
 }
-
-//void ndJointSphericalPd::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
-//{
-//	m_minTwistAngle = -dAbs(minAngle);
-//	m_maxTwistAngle = dAbs(maxAngle);
-//}
-//
-//void ndJointSphericalPd::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
-//{
-//	minAngle = m_minTwistAngle;
-//	maxAngle = m_maxTwistAngle;
-//}
-//
-//ndFloat32 ndJointSphericalPd::GetMaxConeAngle() const
-//{
-//	return m_maxConeAngle;
-//}
-//
-//void ndJointSphericalPd::SetConeLimit(ndFloat32 maxConeAngle)
-//{
-//	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_PD_MAX_ANGLE * ndFloat32 (0.999f));
-//}
-//
-//ndVector ndJointSphericalPd::GetTargetPosition() const
-//{
-//	return m_localMatrix1.m_posit;
-//}
-//
-//void ndJointSphericalPd::SetTargetPosition(const ndVector& posit)
-//{
-//	dAssert(posit.m_w == ndFloat32(1.0f));
-//	m_localMatrix1.m_posit = posit;
-//}
-//
-//
-//
-//ndMatrix ndJointSphericalPd::GetTargetMatrix() const
-//{
-//	return m_localMatrix1;
-//}
-//
-//void ndJointSphericalPd::SetTargetMatrix(const ndMatrix& matrix)
-//{
-//	m_localMatrix1 = matrix;
-//}
 
 void ndJointSphericalPd::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
@@ -424,7 +358,6 @@ void ndJointSphericalPd::JacobianDerivative(ndConstraintDescritor& desc)
 	
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ApplyBaseRows(matrix0, matrix1, desc);
-	
 
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))

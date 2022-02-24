@@ -23,27 +23,10 @@ class ndJointSphericalPd : public ndJointSpherical
 	D_NEWTON_API ndJointSphericalPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSphericalPd();
 
-	//D_NEWTON_API void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
-	//D_NEWTON_API void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
-	D_NEWTON_API void SetTwistSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
-	D_NEWTON_API void GetTwistSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
-	
-	//D_NEWTON_API ndFloat32 GetMaxConeAngle() const;
-	//D_NEWTON_API void SetConeLimit(ndFloat32 maxConeAngle);
-	D_NEWTON_API void SetConeSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
-	D_NEWTON_API void GetConeSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
-	
-
-	//D_NEWTON_API ndVector GetTargetPosition() const;
-	//D_NEWTON_API void SetTargetPosition(const ndVector& posit);
-	//
-	//D_NEWTON_API ndMatrix GetTargetMatrix() const;
-	//D_NEWTON_API void SetTargetMatrix(const ndMatrix& posit);
-	//
-	//const ndMatrix& GetReferenceMatrix() const;
-	//
-	//ndMatrix GetTargetRotation() const;
-	//void SetTargetRotation(const ndMatrix& rotation);
+	D_NEWTON_API ndMatrix GetTargetMatrix() const;
+	D_NEWTON_API void SetTargetMatrix(const ndMatrix& matrix);
+	D_NEWTON_API void SetSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API void GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -57,37 +40,10 @@ class ndJointSphericalPd : public ndJointSpherical
 	//void SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	//void SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
-	//ndMatrix m_pivotFrame;
-	//ndFloat32 m_minTwistAngle;
-	//ndFloat32 m_maxTwistAngle;
-	ndFloat32 m_twistAngleSpring;
-	ndFloat32 m_twistAngleDamper;
-	ndFloat32 m_twistAngleRegularizer;
-	
-	//ndFloat32 m_maxConeAngle;
-	ndFloat32 m_coneAngleSpring;
-	ndFloat32 m_coneAngleDamper;
-	ndFloat32 m_coneAngleRegularizer;
+	ndMatrix m_pivotFrame;
+	ndFloat32 m_springConst;
 };
 
-//inline ndMatrix ndJointSphericalPd::GetTargetRotation() const
-//{
-//	ndMatrix tmp(m_localMatrix1);
-//	tmp.m_posit = m_pivotFrame.m_posit;
-//	return tmp;
-//}
-//
-//inline void ndJointSphericalPd::SetTargetRotation(const ndMatrix& matrix)
-//{
-//	ndMatrix tmp(matrix);
-//	tmp.m_posit = m_localMatrix1.m_posit;
-//	m_localMatrix1 = tmp;
-//}
-//
-//inline const ndMatrix& ndJointSphericalPd::GetReferenceMatrix() const
-//{
-//	return m_pivotFrame;
-//}
 
 #endif 
 
