@@ -277,8 +277,8 @@ void ndJointSphericalPd::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, 
 	{
 		dAssert(desc.m_rowsCount < 8);
 		AddAngularRowJacobian(desc, pin, -angle);
-		SetLowerFriction(desc, ndFloat32(-1.0e10f));
-		SetHighFriction(desc, ndFloat32(1.0e10f));
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 	}
 	else
 	{
@@ -321,8 +321,8 @@ void ndJointSphericalPd::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 		SetHighFriction(desc, ndFloat32(0.0f));
 
 		AddAngularRowJacobian(desc, sideDir, ndFloat32(0.0f));
-		SetLowerFriction(desc, ndFloat32(-1.0e10f));
-		SetHighFriction(desc, ndFloat32(1.0e10f));
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 	}
 
 	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
@@ -338,13 +338,13 @@ void ndJointSphericalPd::SubmitAngularAxisCartesianApproximation(const ndMatrix&
 		// two rows to restrict rotation around around the parent coordinate system
 		ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-		SetLowerFriction(desc, ndFloat32(-1.0e10f));
-		SetHighFriction(desc, ndFloat32(1.0e10f));
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 		
 		ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-		SetLowerFriction(desc, ndFloat32(-1.0e10f));
-		SetHighFriction(desc, ndFloat32(1.0e10f));
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32 (0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 	}
 
 	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
@@ -353,6 +353,9 @@ void ndJointSphericalPd::SubmitAngularAxisCartesianApproximation(const ndMatrix&
 
 void ndJointSphericalPd::JacobianDerivative(ndConstraintDescritor& desc)
 {
+ndJointSpherical::JacobianDerivative(desc);
+return;
+
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	

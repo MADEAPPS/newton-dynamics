@@ -177,6 +177,43 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 }
 
+void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+{
+	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
+	{
+		dAssert(desc.m_rowsCount < 8);
+		AddAngularRowJacobian(desc, pin, -angle);
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+	}
+	else
+	{
+		if (angle < m_minTwistAngle)
+		{
+			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_minTwistAngle;
+			const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetLowerFriction(desc, ndFloat32(0.0f));
+		}
+		else if (angle >= m_maxTwistAngle)
+		{
+			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_maxTwistAngle;
+			const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, ndFloat32(0.0f));
+		}
+		else if (m_viscousFriction > ndFloat32(0.0f))
+		{
+			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+			SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32(0.0f), m_viscousFriction);
+		}
+	}
+}
+
 void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
@@ -185,48 +222,17 @@ void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& m
 		// two rows to restrict rotation around around the parent coordinate system
 		ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 
 		ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+		SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+		SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 	}
 
 	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
-}
-
-void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
-{
-	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad)) 
-	{
-		dAssert(desc.m_rowsCount < 6);
-		AddAngularRowJacobian(desc, pin, -angle);
-	}
-	else 
-	{
-		if (angle < m_minTwistAngle) 
-		{
-			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
-			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const ndFloat32 penetration = angle - m_minTwistAngle;
-			const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
-			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-			SetLowerFriction(desc, ndFloat32 (0.0f));
-		}
-		else if (angle >= m_maxTwistAngle) 
-		{
-			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
-			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const ndFloat32 penetration = angle - m_maxTwistAngle;
-			const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
-			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-			SetHighFriction(desc, ndFloat32 (0.0f));
-		}
-		else if (m_viscousFriction > ndFloat32(0.0f))
-		{
-			AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
-			SetMassSpringDamperAcceleration(desc, m_viscousFrictionRegularizer, ndFloat32 (0.0f), m_viscousFriction);
-		}
-	}
 }
 
 void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
@@ -321,12 +327,22 @@ void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& ma
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 }
 
+void ndJointSpherical::SubmitFriction(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+{
+m_viscousFriction = 0.0f;
+	if (m_viscousFriction)
+	{
+
+	}
+}
+
 void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ApplyBaseRows(matrix0, matrix1, desc);
+	SubmitFriction(matrix0, matrix1, desc);
 
 	ndFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
 	if (deltaTwist < (2.0f * ndDegreeToRad))
