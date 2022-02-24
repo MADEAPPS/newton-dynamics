@@ -310,6 +310,22 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
+
+#ifdef _DEBUG
+	const ndFloat32 maxLinear2 = m_maxLinearStep * m_maxLinearStep;
+	const ndFloat32 maxAngular2 = m_maxAngleStep * m_maxAngleStep;
+
+	const ndFloat32 linear2 = velocStep.m_linear.DotProduct(velocStep.m_linear).GetScalar() * timestep.m_x * timestep.m_x;
+	const ndFloat32 angular2 = velocStep.m_angular.DotProduct(velocStep.m_angular).GetScalar() * timestep.m_x * timestep.m_x;
+	if ((angular2 > maxAngular2) || (linear2 > maxLinear2))
+	{
+		dTrace(("warning IntegrateForceAndToque %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueId,
+			velocStep.m_angular.m_x, velocStep.m_angular.m_y, velocStep.m_angular.m_z,
+			velocStep.m_linear.m_x, velocStep.m_linear.m_y, velocStep.m_linear.m_z));
+		//dAssert(0);
+	}
+#endif
+
 	return velocStep;
 }
 

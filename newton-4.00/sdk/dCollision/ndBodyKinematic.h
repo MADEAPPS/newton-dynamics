@@ -107,7 +107,7 @@ class ndBodyKinematic : public ndBody
 
 	bool GetAutoSleep() const;
 	void SetAutoSleep(bool state);
-	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(ndFloat32 angleInRadian, ndFloat32 speedInMitersPerSeconds);
+	void SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32 angleInRadian, ndFloat32 stepInUnitPerSeconds);
 
 	virtual ndFloat32 GetLinearDamping() const;
 	virtual void SetLinearDamping(ndFloat32 linearDamp);
@@ -207,7 +207,7 @@ class ndBodyKinematic : public ndBody
 	ndList<ndBodyKinematic*>::ndNode* m_spetialUpdateNode;
 
 	ndFloat32 m_maxAngleStep;
-	ndFloat32 m_maxLinearSpeed;
+	ndFloat32 m_maxLinearStep;
 	ndFloat32 m_weigh;
 	ndInt32 m_rank;
 	ndInt32 m_index;
@@ -456,10 +456,10 @@ inline void ndBodyKinematic::SetSkeleton(ndSkeletonContainer* const skeleton)
 	m_skeletonContainer = skeleton;
 }
 
-inline void ndBodyKinematic::SetDebugMaxAngularIntegrationSteepAndLinearSpeed(ndFloat32 angleInRadian, ndFloat32 speedInMitersPerSeconds)
+inline void ndBodyKinematic::SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32 angleInRadian, ndFloat32 stepInUnitPerSeconds)
 {
+	m_maxLinearStep = dMax(dAbs(stepInUnitPerSeconds), ndFloat32(1.0f));
 	m_maxAngleStep = dMax(dAbs(angleInRadian), ndFloat32(90.0f) * ndDegreeToRad);
-	m_maxLinearSpeed = dMax(speedInMitersPerSeconds, ndFloat32 (100.0f));
 }
 
 inline void ndBodyKinematic::SetLinearDamping(ndFloat32)

@@ -84,7 +84,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_skeletonContainer(nullptr)
 	,m_spetialUpdateNode(nullptr)
 	,m_maxAngleStep(ndFloat32 (90.0f) * ndDegreeToRad)
-	,m_maxLinearSpeed(ndFloat32 (100.0f))
+	,m_maxLinearStep(ndFloat32 (10.0f))
 	,m_weigh(ndFloat32 (0.0f))
 	,m_rank(0)
 	,m_index(0)
@@ -134,7 +134,7 @@ ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	}
 
 	m_maxAngleStep = xmlGetFloat(xmlNode, "maxAngleStep");
-	m_maxLinearSpeed = xmlGetFloat(xmlNode, "maxLinearSpeed");
+	m_maxLinearStep = xmlGetFloat(xmlNode, "maxLinearStep");
 }
 
 ndBodyKinematic::~ndBodyKinematic()
@@ -142,6 +142,23 @@ ndBodyKinematic::~ndBodyKinematic()
 	dAssert(m_scene == nullptr);
 	dAssert(m_sceneNode == nullptr);
 	dAssert(m_spetialUpdateNode == nullptr);
+}
+
+void ndBodyKinematic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndBody::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "invMass", m_invMass.m_w);
+	ndVector invInertia(m_invMass & ndVector::m_triplexMask);
+	xmlSaveParam(childNode, "invPrincipalInertia", invInertia);
+
+	xmlSaveParam(childNode, "maxAngleStep", m_maxAngleStep);
+	xmlSaveParam(childNode, "maxLinearStep", m_maxLinearStep);
+
+	m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndBodyKinematic::SetSleepState(bool state)
@@ -423,10 +440,11 @@ void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)
 	const ndFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
 
 #ifdef _DEBUG
-	const ndFloat32 err2 = m_maxAngleStep * m_maxAngleStep;
-	const ndFloat32 step2 = omegaMag2 * timestep * timestep;
-	const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
-	if ((step2 > err2) || (speed2 > m_maxLinearSpeed))
+	const ndFloat32 angular2 = omegaMag2 * timestep * timestep;
+	const ndFloat32 linear2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
+	const ndFloat32 maxAngularStep2 = m_maxAngleStep * m_maxAngleStep;
+	const ndFloat32 maxLinearStep2 = m_maxLinearStep * m_maxLinearStep;
+	if ((angular2 > maxAngularStep2) || (linear2 > maxLinearStep2))
 	{
 		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueId,
 			m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
@@ -534,22 +552,5 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 		SetAccel(ndVector::m_zero);
 		SetAlpha(ndVector::m_zero);
 	}
-}
-
-void ndBodyKinematic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBody::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	
-	xmlSaveParam(childNode, "invMass", m_invMass.m_w);
-	ndVector invInertia(m_invMass & ndVector::m_triplexMask);
-	xmlSaveParam(childNode, "invPrincipalInertia", invInertia);
-
-	xmlSaveParam(childNode, "maxAngleStep", m_maxAngleStep);
-	xmlSaveParam(childNode, "maxLinearSpeed", m_maxLinearSpeed);
-
-	m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
