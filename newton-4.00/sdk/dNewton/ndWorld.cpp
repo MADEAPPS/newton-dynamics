@@ -480,6 +480,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	D_TRACKTIME();
 
 	// do the a pre-physics step
+	m_subStepIndex++;
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 	m_scene->InitBodyArray();
