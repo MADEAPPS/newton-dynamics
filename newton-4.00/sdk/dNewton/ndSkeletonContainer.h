@@ -113,21 +113,22 @@ class ndSkeletonContainer
 		}
 	};
 
-	void Init(ndBodyKinematic* const rootBody);
+	public:
+	D_NEWTON_API void ProjectVelocities();
 
+	private:
 	ndNode* GetRoot() const;
+
+	void CheckSleepState();
+	void Init(ndBodyKinematic* const rootBody);
 	ndNode* AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent);
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
+	void InitLoopMassMatrix();
 	void ClearCloseLoopJoints();
 	void AddCloseLoopJoint(ndConstraint* const joint);
 	void CalculateReactionForces(ndJacobian* const internalForces);
 	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
-
-	void CheckSleepState();
-
-	private:
-	void InitLoopMassMatrix();
 	void CalculateBufferSizeInBytes();
 	void ConditionMassMatrix() const;
 	void SortGraph(ndNode* const root, ndInt32& index);

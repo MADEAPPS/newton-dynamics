@@ -16,8 +16,8 @@
 #include "ndJointBilateralConstraint.h"
 
 #define D_BALL_AND_SOCKED_MAX_ANGLE	ndFloat32 (150.0f * ndDegreeToRad)
-#define D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED ndFloat32 (0.1f) 
-#define D_BALL_AND_SOCKED_PENETRATION_LIMIT ndFloat32 (10.0f * ndDegreeToRad) 
+#define D_MAX_SPHERICAL_RECOVERY_SPEED	ndFloat32 (1.0f)
+#define D_MAX_SPHERICAL_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
 class ndJointSpherical: public ndJointBilateralConstraint
 {
@@ -37,10 +37,11 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
-	
+
+	void SubmitFriction(ndConstraintDescritor& desc);
+	ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
 	void SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
 	void ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitFriction(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);

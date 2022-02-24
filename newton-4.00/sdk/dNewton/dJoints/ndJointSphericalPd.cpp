@@ -249,18 +249,20 @@ void ndJointSphericalPd::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, 
 		{
 			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
 			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const ndFloat32 penetration = angle - m_minTwistAngle;
-			const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
-			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			//const ndFloat32 penetration = angle - m_minTwistAngle;
+			//const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+			//SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetMotorAcceleration(desc, stopAccel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
 		}
 		else if (angle >= m_maxTwistAngle)
 		{
 			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
 			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const ndFloat32 penetration = angle - m_maxTwistAngle;
-			const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
-			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			//const ndFloat32 penetration = angle - m_maxTwistAngle;
+			//const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+			//SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetMotorAcceleration(desc, stopAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
 		}
 	}
@@ -277,9 +279,10 @@ void ndJointSphericalPd::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 	{
 		AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		const ndFloat32 penetration = coneAngle - m_maxConeAngle;
-		const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
-		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		//const ndFloat32 penetration = coneAngle - m_maxConeAngle;
+		//const ndFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), ndFloat32(1.0f));
+		//SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetMotorAcceleration(desc, stopAccel);
 		SetHighFriction(desc, ndFloat32(0.0f));
 
 		//const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));

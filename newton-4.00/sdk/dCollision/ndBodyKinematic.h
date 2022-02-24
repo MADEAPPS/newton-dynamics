@@ -107,6 +107,8 @@ class ndBodyKinematic : public ndBody
 
 	bool GetAutoSleep() const;
 	void SetAutoSleep(bool state);
+	ndFloat32 GetMaxLinearStep() const;
+	ndFloat32 GetMaxAngularStep() const;
 	void SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32 angleInRadian, ndFloat32 stepInUnitPerSeconds);
 
 	virtual ndFloat32 GetLinearDamping() const;
@@ -454,6 +456,16 @@ inline ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const
 inline void ndBodyKinematic::SetSkeleton(ndSkeletonContainer* const skeleton)
 {
 	m_skeletonContainer = skeleton;
+}
+
+inline ndFloat32 ndBodyKinematic::GetMaxLinearStep() const
+{
+	return m_maxLinearStep;
+}
+
+inline ndFloat32 ndBodyKinematic::GetMaxAngularStep() const
+{
+	return m_maxAngleStep;
 }
 
 inline void ndBodyKinematic::SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32 angleInRadian, ndFloat32 stepInUnitPerSeconds)

@@ -39,6 +39,8 @@
 	#include "ndDynamicsUpdateOpencl.h"
 #endif
 
+//int xxxxxxxxxxxxxxxxxxx;
+
 class ndSkeletonQueue : public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
 	public:
@@ -479,8 +481,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 {
 	D_TRACKTIME();
 
-	// do the a pre-physics step
-	m_subStepIndex++;
+	// do physics step
+//xxxxxxxxxxxxxxxxxxx = m_subStepIndex;
+
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 	m_scene->InitBodyArray();
@@ -505,6 +508,8 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	// second pass on models
 	ModelPostUpdate();
+
+	m_subStepIndex++;
 }
 
 void ndWorld::ParticleUpdate(ndFloat32 timestep)
