@@ -112,6 +112,7 @@ ndWorld::ndWorld()
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
+	,m_subStepIndex(0)
 	,m_transformsLock()
 	,m_inUpdate(false)
 	,m_collisionUpdate(true)
@@ -192,6 +193,8 @@ void ndWorld::CleanUp()
 		delete body;
 	}
 
+	m_frameIndex = 0;
+	m_subStepIndex = 0;
 	ndBody::m_uniqueIdCount = 1;
 	m_scene->Cleanup();
 }

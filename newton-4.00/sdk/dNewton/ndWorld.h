@@ -179,6 +179,7 @@ class ndWorld: public ndClassAlloc
 	ndSolverModes m_solverMode;
 	ndInt32 m_solverIterations;
 	ndUnsigned32 m_frameIndex;
+	ndUnsigned32 m_subStepIndex;
 	std::mutex m_transformsLock;
 	bool m_inUpdate;
 	bool m_collisionUpdate;
