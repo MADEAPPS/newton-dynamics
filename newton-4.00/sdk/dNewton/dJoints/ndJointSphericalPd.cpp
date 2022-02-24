@@ -332,8 +332,9 @@ void ndJointSphericalPd::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 
 void ndJointSphericalPd::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-	if (coneAngle > m_maxConeAngle)
+	//ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+	//if (coneAngle > m_maxConeAngle)
+	if (m_maxConeAngle < (ndFloat32(1.0f) * ndDegreeToRad))
 	{
 		// two rows to restrict rotation around around the parent coordinate system
 		ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
