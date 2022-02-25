@@ -15,30 +15,9 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointKinematicController)
 
+#define D_NOMINAL_TIMESTEP ndFloat32(1.0f / 60.0f)
+
 #if 0
-void ndJointKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
-{
-	dAssert (0);
-}
-
-void ndJointKinematicController::Serialize (NewtonSerializeCallback callback, void* const userData) const
-{
-	dAssert (0);
-}
-
-void ndJointKinematicController::ResetAutoSleep ()
-{
-	ndBodyKinematicSetAutoSleep(GetBody0(), 0);
-}
-
-dMatrix ndJointKinematicController::GetBodyMatrix () const
-{
-	dMatrix matrix0;
-	ndBodyKinematicGetMatrix(m_body0, &matrix0[0][0]);
-	return m_localMatrix0 * matrix0;
-}
-
-
 void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 threadIndex)
 {
 	dMatrix matrix0;
@@ -170,7 +149,6 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 th
 		}
 	}
 }
-
 #endif
 
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const ndVector& attachmentPointInGlobalSpace)
@@ -316,8 +294,7 @@ void ndJointKinematicController::CheckSleep() const
 
 void ndJointKinematicController::SetTargetMatrix(const ndMatrix& matrix)
 {
-	const ndFloat32 timestep = ndFloat32(1.0f / 60.0f);
-	const ndVector maxStep(ndVector(m_maxSpeed * timestep));
+	const ndVector maxStep(ndVector(m_maxSpeed * D_NOMINAL_TIMESTEP));
 	const ndVector minStep(maxStep * ndVector::m_negOne);
 	const ndVector step((maxStep.GetMin(matrix.m_posit - m_localMatrix1.m_posit)).GetMax(minStep));
 	const ndVector posit(m_localMatrix1.m_posit + (step & ndVector::m_triplexMask));
@@ -326,7 +303,6 @@ void ndJointKinematicController::SetTargetMatrix(const ndMatrix& matrix)
 	m_localMatrix1.m_posit = posit;
 	CheckSleep();
 }
-
 
 void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 {

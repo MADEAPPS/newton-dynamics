@@ -39,13 +39,14 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
+
 	void SubmitFriction(ndConstraintDescritor& desc);
-	
-	void SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
 	void ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngleLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+
+	bool SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	bool SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
+	bool SubmitAngleLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	bool SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
 	ndFloat32 m_maxConeAngle;
 	ndFloat32 m_minTwistAngle;

@@ -100,7 +100,6 @@ inline void ndJointKinematicController::SetAngularViscuosFrictionCoefficient(ndF
 	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(mass.m_x, dMax(mass.m_y, mass.m_z));
 }
 
-
 inline void ndJointKinematicController::SetTargetPosit(const ndVector& posit)
 {
 	ndMatrix matrix(m_localMatrix1);

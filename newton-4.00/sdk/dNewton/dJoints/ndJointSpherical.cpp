@@ -184,8 +184,9 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 }
 
-void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+bool ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 {
+	bool ret = false;
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 	{
 		AddAngularRowJacobian(desc, pin, -angle);
@@ -205,6 +206,7 @@ void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 			const ndFloat32 recoveringAccel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
+			ret = dAbs(stopAccel) > ndFloat32(1000.0f);
 		}
 		else if (angle >= m_maxTwistAngle)
 		{
@@ -214,11 +216,13 @@ void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
+			ret = dAbs(stopAccel) > ndFloat32(1000.0f);
 		}
 	}
+	return ret;
 }
 
-void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+bool ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	if (m_maxConeAngle < (ndFloat32 (1.0f) * ndDegreeToRad))
 	{
@@ -231,11 +235,12 @@ void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& m
 	}
 
 	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	return SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+bool ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
+	bool ret = false;
 	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 	lateralDir = lateralDir.Normalize();
@@ -251,6 +256,7 @@ void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
+			ret = dAbs(stopAccel) > ndFloat32(1000.0f);
 		}
 		else
 		{
@@ -265,7 +271,8 @@ void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 
 	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	bool ret1 = SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	return ret1 | ret;
 }
 
 void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
@@ -310,47 +317,46 @@ void ndJointSpherical::SubmitFriction(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointSpherical::SubmitAngleLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+bool ndJointSpherical::SubmitAngleLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
+	bool ret = false;
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))
 	{
 		// special case where the front axis are almost aligned
 		// solve by using Cartesian approximation
-		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		ret = SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
 	}
 	else
 	{
-		SubmitAngularAxis(matrix0, matrix1, desc);
+		ret = SubmitAngularAxis(matrix0, matrix1, desc);
 	}
+	return ret;
 }
 
 void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 {
-extern int xxxxxxxxxxxxxxxxxxx;
-if (xxxxxxxxxxxxxxxxxxx >= 1250)
-{
-	const ndBodyKinematic* const body0 = GetBody0();
-	const ndBodyKinematic* const body1 = GetBody1();
-	const ndVector omega0(body0->GetOmega());
-	const ndVector omega1(body1->GetOmega());
-	int xxxx0 = body0->GetId();
-	int xxxx1 = body1->GetId();
-	dTrace(("%d (%d %d): w0(%f %f %f) w1(%f %f %f)\n", xxxxxxxxxxxxxxxxxxx, xxxx0, xxxx1,
-		omega0.m_x, omega0.m_y, omega0.m_z, omega1.m_x, omega1.m_y, omega1.m_z));
-}
+//extern int xxxxxxxxxxxxxxxxxxx;
+//if (xxxxxxxxxxxxxxxxxxx >= 1250)
+//{
+//	const ndBodyKinematic* const body0 = GetBody0();
+//	const ndBodyKinematic* const body1 = GetBody1();
+//	const ndVector omega0(body0->GetOmega());
+//	const ndVector omega1(body1->GetOmega());
+//	int xxxx0 = body0->GetId();
+//	int xxxx1 = body1->GetId();
+//	dTrace(("%d (%d %d): w0(%f %f %f) w1(%f %f %f)\n", xxxxxxxxxxxxxxxxxxx, xxxx0, xxxx1,
+//		omega0.m_x, omega0.m_y, omega0.m_z, omega1.m_x, omega1.m_y, omega1.m_z));
+//}
 
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ApplyBaseRows(matrix0, matrix1, desc);
-	SubmitAngleLimits(matrix0, matrix1, desc);
-	if (desc.m_rowsCount < 6)
+	bool hitLimit = SubmitAngleLimits(matrix0, matrix1, desc);
+	if (!hitLimit)
 	{
-		SubmitFriction(desc);
-	}
-	else
-	{
+		dAssert(desc.m_rowsCount <= 6);
 		SubmitFriction(desc);
 	}
 }

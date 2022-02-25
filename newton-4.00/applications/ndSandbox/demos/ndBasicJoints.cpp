@@ -92,7 +92,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	const ndInt32 count = 4;
+	const ndInt32 count = 10;
 	ndBodyDynamic* array[count];
 	for (ndInt32 i = 0; i < count; i++)
 	{
