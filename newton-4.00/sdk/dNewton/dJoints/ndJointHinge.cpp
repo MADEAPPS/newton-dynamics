@@ -157,7 +157,6 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	}
 }
 
-
 void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
 {
 	// add spring damper row

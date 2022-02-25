@@ -518,24 +518,25 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 	void CreateEightWheelTurret(ndDemoEntityManager* const scene)
 	{
+		dAssert(0);
 		//turret servo controller actuator
-		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
-		ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
-		m_turretHinge = new ndJointHingePd(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
-		m_turrectAngle0 = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		AddExtraBody(turretBody);
-		AddExtraJoint(m_turretHinge);
-
-		//cannon servo controller actuator
-		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
-		ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		m_cannonHinge = new ndJointHingePd(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
-		AddExtraBody(canonBody);
-		AddExtraJoint(m_cannonHinge);
-
-		ndFloat32 y = cannonMatrix[1][1];
-		ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-		m_cannonAngle0 = -ndAtan2(y, x);
+		//ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
+		//ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
+		//m_turretHinge = new ndJointHingePd(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
+		//m_turrectAngle0 = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		//AddExtraBody(turretBody);
+		//AddExtraJoint(m_turretHinge);
+		//
+		////cannon servo controller actuator
+		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
+		//ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
+		//m_cannonHinge = new ndJointHingePd(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
+		//AddExtraBody(canonBody);
+		//AddExtraJoint(m_cannonHinge);
+		//
+		//ndFloat32 y = cannonMatrix[1][1];
+		//ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+		//m_cannonAngle0 = -ndAtan2(y, x);
 	}
 
 	void LinkTires(ndWorld* const world, const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1) const
@@ -558,70 +559,71 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		if (m_isPlayer)
 		{
-			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-			ndFixSizeArray<char, 32> buttons;
-			scene->GetJoystickButtons(buttons);
-
-			bool wakeUpVehicle = false;
-			if (buttons[2])
-			{
-				wakeUpVehicle = true;
-				m_turretAngle += 5.0e-3f;
-			}
-			else if (buttons[1])
-			{
-				wakeUpVehicle = true;
-				m_turretAngle -= 5.0e-3f;
-			}
-
-			if (buttons[0])
-			{
-				wakeUpVehicle = true;
-				m_cannonAngle += 1.0e-3f;
-				if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
-				{
-					m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
-				}
-			}
-			else if (buttons[3])
-			{
-				wakeUpVehicle = true;
-				m_cannonAngle -= 1.0e-3f;
-				if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
-				{
-					m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
-				}
-			}
-
-			// apply inputs to actuators joint
-			const ndMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-			ndFloat32 turretAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-			ndFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
-			ndFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-			if (dAbs(turretErrorAngle) > (0.25f * ndDegreeToRad))
-			{
-				turretTargetAngle += turretErrorAngle;
-			}
-			m_turretHinge->SetTargetAngle(turretTargetAngle);
-
-			const ndMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-			ndFloat32 y = cannonMatrix[1][1];
-			ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-			ndFloat32 cannonAngle = -ndAtan2(y, x);
-			ndFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
-
-			ndFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-			const ndFloat32 error = 0.125f * ndDegreeToRad;
-			if (dAbs(cannonErrorAngle) > error)
-			{
-				cannonTargetAngle += cannonErrorAngle;
-			}
-			m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-
-			if (wakeUpVehicle)
-			{
-				m_chassis->SetSleepState(false);
-			}
+			dAssert(0);
+			//ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			//ndFixSizeArray<char, 32> buttons;
+			//scene->GetJoystickButtons(buttons);
+			//
+			//bool wakeUpVehicle = false;
+			//if (buttons[2])
+			//{
+			//	wakeUpVehicle = true;
+			//	m_turretAngle += 5.0e-3f;
+			//}
+			//else if (buttons[1])
+			//{
+			//	wakeUpVehicle = true;
+			//	m_turretAngle -= 5.0e-3f;
+			//}
+			//
+			//if (buttons[0])
+			//{
+			//	wakeUpVehicle = true;
+			//	m_cannonAngle += 1.0e-3f;
+			//	if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
+			//	{
+			//		m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
+			//	}
+			//}
+			//else if (buttons[3])
+			//{
+			//	wakeUpVehicle = true;
+			//	m_cannonAngle -= 1.0e-3f;
+			//	if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
+			//	{
+			//		m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
+			//	}
+			//}
+			//
+			//// apply inputs to actuators joint
+			//const ndMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+			//ndFloat32 turretAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+			//ndFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
+			//ndFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+			//if (dAbs(turretErrorAngle) > (0.25f * ndDegreeToRad))
+			//{
+			//	turretTargetAngle += turretErrorAngle;
+			//}
+			//m_turretHinge->SetTargetAngle(turretTargetAngle);
+			//
+			//const ndMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+			//ndFloat32 y = cannonMatrix[1][1];
+			//ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+			//ndFloat32 cannonAngle = -ndAtan2(y, x);
+			//ndFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+			//
+			//ndFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+			//const ndFloat32 error = 0.125f * ndDegreeToRad;
+			//if (dAbs(cannonErrorAngle) > error)
+			//{
+			//	cannonTargetAngle += cannonErrorAngle;
+			//}
+			//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+			//
+			//if (wakeUpVehicle)
+			//{
+			//	m_chassis->SetSleepState(false);
+			//}
 		}
 	}
 
@@ -742,83 +744,85 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 	void CreateTractorBucket(ndDemoEntityManager* const scene)
 	{
-		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
-		ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
-		m_armHinge = new ndJointHingePd(turretMatrix, 1.5f, -10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad, frontBucketArmBody, m_chassis);
-		AddExtraBody(frontBucketArmBody);
-		AddExtraJoint(m_armHinge);
-		
-		m_armAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
-		AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
-
-		//cannon servo controller actuator
-		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
-		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
-		m_bucketHinge = new ndJointHingePd(frontBucketMatrix, 2.5f, -75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad, frontBucketBody, frontBucketArmBody);
-		AddExtraBody(frontBucketBody);
-		AddExtraJoint(m_bucketHinge);
-		
-		ndFloat32 y = frontBucketMatrix[1][1];
-		ndFloat32 x = ndSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
-		m_bucketAngle = -ndAtan2(y, x);
-		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody, "attachment_frontBucket001");
-		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody, "attachment_frontBucket002");
+		dAssert(0);
+		//ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
+		//ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
+		//m_armHinge = new ndJointHingePd(turretMatrix, 1.5f, -10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad, frontBucketArmBody, m_chassis);
+		//AddExtraBody(frontBucketArmBody);
+		//AddExtraJoint(m_armHinge);
+		//
+		//m_armAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		//AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
+		//AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
+		//
+		////cannon servo controller actuator
+		//ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
+		//ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
+		//m_bucketHinge = new ndJointHingePd(frontBucketMatrix, 2.5f, -75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad, frontBucketBody, frontBucketArmBody);
+		//AddExtraBody(frontBucketBody);
+		//AddExtraJoint(m_bucketHinge);
+		//
+		//ndFloat32 y = frontBucketMatrix[1][1];
+		//ndFloat32 x = ndSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
+		//m_bucketAngle = -ndAtan2(y, x);
+		//AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody, "attachment_frontBucket001");
+		//AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody, "attachment_frontBucket002");
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndBasicVehicle::ApplyInputs(world, timestep);
-		if (m_isPlayer)
-		{
-			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-			ndFixSizeArray<char, 32> buttons;
-
-			bool wakeUpVehicle = false;
-			scene->GetJoystickButtons(buttons);
-			if (buttons[0])
-			{
-				wakeUpVehicle = true;
-				m_armAngle = dMin(m_armAngle + 5.0e-3f, m_armHinge->GetMaxAngularLimit());
-				m_armHinge->SetTargetAngle(m_armAngle);
-			}
-			else if (buttons[3])
-			{
-				wakeUpVehicle = true;
-				m_armAngle = dMax(m_armAngle - 5.0e-3f, m_armHinge->GetMinAngularLimit());
-				m_armHinge->SetTargetAngle(m_armAngle);
-			}
-
-			if (buttons[1])
-			{
-				wakeUpVehicle = true;
-				m_bucketAngle = dMin(m_bucketAngle + 5.0e-3f, m_bucketHinge->GetMaxAngularLimit());
-				m_bucketHinge->SetTargetAngle(m_bucketAngle);
-			}
-			else if (buttons[2])
-			{
-				wakeUpVehicle = true;
-				m_bucketAngle = dMax(m_bucketAngle - 5.0e-3f, m_bucketHinge->GetMinAngularLimit());
-				m_bucketHinge->SetTargetAngle(m_bucketAngle);
-			}
-			const ndMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
-			ndFloat32 y = bucketMatrix[1][1];
-			ndFloat32 x = ndSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
-			ndFloat32 bucketAngle = -ndAtan2(y, x);
-			ndFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
-			ndFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
-			const ndFloat32 error = 0.125f * ndDegreeToRad;
-			if (dAbs(bucketErrorAngle) > error)
-			{
-				bucketTargetAngle += bucketErrorAngle;
-			}
-			m_bucketHinge->SetTargetAngle(bucketTargetAngle);
-
-			if (wakeUpVehicle)
-			{
-				m_chassis->SetSleepState(false);
-			}
-		}
+		dAssert(0);
+		//ndBasicVehicle::ApplyInputs(world, timestep);
+		//if (m_isPlayer)
+		//{
+		//	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+		//	ndFixSizeArray<char, 32> buttons;
+		//
+		//	bool wakeUpVehicle = false;
+		//	scene->GetJoystickButtons(buttons);
+		//	if (buttons[0])
+		//	{
+		//		wakeUpVehicle = true;
+		//		m_armAngle = dMin(m_armAngle + 5.0e-3f, m_armHinge->GetMaxAngularLimit());
+		//		m_armHinge->SetTargetAngle(m_armAngle);
+		//	}
+		//	else if (buttons[3])
+		//	{
+		//		wakeUpVehicle = true;
+		//		m_armAngle = dMax(m_armAngle - 5.0e-3f, m_armHinge->GetMinAngularLimit());
+		//		m_armHinge->SetTargetAngle(m_armAngle);
+		//	}
+		//
+		//	if (buttons[1])
+		//	{
+		//		wakeUpVehicle = true;
+		//		m_bucketAngle = dMin(m_bucketAngle + 5.0e-3f, m_bucketHinge->GetMaxAngularLimit());
+		//		m_bucketHinge->SetTargetAngle(m_bucketAngle);
+		//	}
+		//	else if (buttons[2])
+		//	{
+		//		wakeUpVehicle = true;
+		//		m_bucketAngle = dMax(m_bucketAngle - 5.0e-3f, m_bucketHinge->GetMinAngularLimit());
+		//		m_bucketHinge->SetTargetAngle(m_bucketAngle);
+		//	}
+		//	const ndMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
+		//	ndFloat32 y = bucketMatrix[1][1];
+		//	ndFloat32 x = ndSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
+		//	ndFloat32 bucketAngle = -ndAtan2(y, x);
+		//	ndFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
+		//	ndFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
+		//	const ndFloat32 error = 0.125f * ndDegreeToRad;
+		//	if (dAbs(bucketErrorAngle) > error)
+		//	{
+		//		bucketTargetAngle += bucketErrorAngle;
+		//	}
+		//	m_bucketHinge->SetTargetAngle(bucketTargetAngle);
+		//
+		//	if (wakeUpVehicle)
+		//	{
+		//		m_chassis->SetSleepState(false);
+		//	}
+		//}
 	}
 
 	ndJointHingePd* m_armHinge;

@@ -20,32 +20,18 @@ class ndJointHingePd: public ndJointHinge
 	public:
 	D_CLASS_REFLECTION(ndJointHingePd);
 	D_NEWTON_API ndJointHingePd(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	//D_NEWTON_API ndJointHingePd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointHingePd(const ndMatrix& pinAndPivotFrame, ndFloat32 angularRate, ndFloat32 minAngle, ndFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointHingePd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHingePd();
 
-	D_NEWTON_API virtual ndFloat32 GetTargetAngle() const;
-	D_NEWTON_API virtual void SetTargetAngle(ndFloat32 angle);
-
-	D_NEWTON_API virtual ndFloat32 GetMinAngularLimit() const;
-	D_NEWTON_API virtual ndFloat32 GetMaxAngularLimit() const;
-
-	D_NEWTON_API virtual void SetMinAngularLimit(ndFloat32 limit);
-	D_NEWTON_API virtual void SetMaxAngularLimit(ndFloat32 limit);
-	
-	D_NEWTON_API virtual ndFloat32 GetAngularRate() const;
-	D_NEWTON_API virtual void SetAngularRate(ndFloat32 rate);
-	
-    D_NEWTON_API virtual ndFloat32 GetMaxTorque() const;
-    D_NEWTON_API virtual void SetMaxTorque(ndFloat32 torque);
+	D_NEWTON_API virtual ndFloat32 GetTarget() const;
+	D_NEWTON_API virtual void SetTarget(ndFloat32 angle);
 	
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+	D_NEWTON_API void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
 	ndFloat32 m_targetAngle;
-	ndFloat32 m_motorSpeed;
-	ndFloat32 m_maxTorque;
 };
 
 #endif
