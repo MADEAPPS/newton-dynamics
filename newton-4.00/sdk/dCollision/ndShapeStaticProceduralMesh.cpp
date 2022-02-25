@@ -74,12 +74,6 @@ ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
 {
 }
 
-void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces)
-{
-	m_maxFaceCount = maxFaces;
-	m_maxVertexCount = maxVertex;
-}
-
 void ndShapeStaticProceduralMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
@@ -91,6 +85,12 @@ void ndShapeStaticProceduralMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& d
 	xmlSaveParam(childNode, "maxBox", m_maxBox);
 	xmlSaveParam(childNode, "maxFaceCount", m_maxFaceCount);
 	xmlSaveParam(childNode, "maxVertexCount", m_maxVertexCount);
+}
+
+void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces)
+{
+	m_maxFaceCount = maxFaces;
+	m_maxVertexCount = maxVertex;
 }
 
 ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const

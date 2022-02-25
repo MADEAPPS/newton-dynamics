@@ -342,6 +342,11 @@ void ndIkSolver::BuildMassMatrix()
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 }
 
+void ndIkSolver::ProjectVelocities(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+{
+
+}
+
 void ndIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
 	m_world = world;

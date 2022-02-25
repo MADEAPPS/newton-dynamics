@@ -370,33 +370,32 @@ ndConvexHull4d::~ndConvexHull4d(void)
 {
 }
 
-const ndConvexHull4d::ndNormalMap& ndConvexHull4d::GetNormaMap()
+void ndConvexHull4d::Save(const char* const filename) const
 {
-	static ndNormalMap normalMap;
-	return normalMap;
-}
-
-void ndConvexHull4d::Save (const char* const filename) const
-{
-	FILE* const file = fopen (filename, "wb");
+	FILE* const file = fopen(filename, "wb");
 	ndInt32 index = 0;
-//	fprintf (file, "final\n");
+	//	fprintf (file, "final\n");
 	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-		fprintf (file, "tetra %d\n", index);
-		index ++;
+		fprintf(file, "tetra %d\n", index);
+		index++;
 		const ndConvexHull4dTetraherum& face = nodePtr->GetInfo();
 		const ndBigVector& p0 = m_points[face.m_faces[0].m_index[0]];
 		const ndBigVector& p1 = m_points[face.m_faces[0].m_index[1]];
 		const ndBigVector& p2 = m_points[face.m_faces[0].m_index[2]];
 		const ndBigVector& p3 = m_points[face.m_faces[0].m_index[3]];
-		fprintf (file, "p0(%f %f %f %f)\n", p0[0], p0[1], p0[2], p0[3]);
-		fprintf (file, "p1(%f %f %f %f)\n", p1[0], p1[1], p1[2], p1[3]);
-		fprintf (file, "p2(%f %f %f %f)\n", p2[0], p2[1], p2[2], p2[3]);
-		fprintf (file, "p3(%f %f %f %f)\n", p3[0], p3[1], p3[2], p3[3]);
+		fprintf(file, "p0(%f %f %f %f)\n", p0[0], p0[1], p0[2], p0[3]);
+		fprintf(file, "p1(%f %f %f %f)\n", p1[0], p1[1], p1[2], p1[3]);
+		fprintf(file, "p2(%f %f %f %f)\n", p2[0], p2[1], p2[2], p2[3]);
+		fprintf(file, "p3(%f %f %f %f)\n", p3[0], p3[1], p3[2], p3[3]);
 	}
-	fprintf (file, "\n");
+	fprintf(file, "\n");
 
-	fclose (file);
+	fclose(file);
+}
+const ndConvexHull4d::ndNormalMap& ndConvexHull4d::GetNormaMap()
+{
+	static ndNormalMap normalMap;
+	return normalMap;
 }
 
 ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePointer, const ndConvexHull4dVector* const points, const ndBigVector& dir, const bool removeEntry) const

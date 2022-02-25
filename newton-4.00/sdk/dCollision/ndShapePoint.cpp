@@ -40,6 +40,11 @@ ndShapePoint::~ndShapePoint()
 {
 }
 
+void ndShapePoint::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
+{
+	dAssert(0);
+}
+
 void ndShapePoint::MassProperties()
 {
 	dAssert(0);
@@ -146,7 +151,3 @@ void ndShapePoint::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 	//}
 }
 
-void ndShapePoint::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-{
-	dAssert(0);
-}

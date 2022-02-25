@@ -124,7 +124,6 @@ class ndConvexHull3dPointCluster: public ndConvexHull3dAABBTreeNode
 	ndInt32 m_indices[DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 };
 
-
 ndConvexHull3dFace::ndConvexHull3dFace()
 {
 	m_mark = 0;
@@ -253,6 +252,28 @@ ndConvexHull3d::ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strid
 
 ndConvexHull3d::~ndConvexHull3d(void)
 {
+}
+
+void ndConvexHull3d::Save(const char* const filename) const
+{
+	FILE* const file = fopen(filename, "wb");
+	ndInt32 index = 0;
+	//	fprintf(file, "final\n");
+	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+		fprintf(file, "triangle %d\n", index);
+		index++;
+		const ndConvexHull3dFace& face = nodePtr->GetInfo();
+		const ndBigVector& p0 = m_points[face.m_index[0]];
+		const ndBigVector& p1 = m_points[face.m_index[1]];
+		const ndBigVector& p2 = m_points[face.m_index[2]];
+
+		fprintf(file, "p0(%f %f %f)\n", p0[0], p0[1], p0[2]);
+		fprintf(file, "p1(%f %f %f)\n", p1[0], p1[1], p1[2]);
+		fprintf(file, "p2(%f %f %f)\n", p2[0], p2[1], p2[2]);
+	}
+	fprintf(file, "\n");
+
+	fclose(file);
 }
 
 void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount)
@@ -1183,24 +1204,3 @@ ndFloat64 ndConvexHull3d::RayCast (const ndBigVector& localP0, const ndBigVector
 	return interset;
 }
 
-void ndConvexHull3d::Save (const char* const filename) const
-{
-	FILE* const file = fopen(filename, "wb");
-	ndInt32 index = 0;
-//	fprintf(file, "final\n");
-	for (ndNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-		fprintf(file, "triangle %d\n", index);
-		index++;
-		const ndConvexHull3dFace& face = nodePtr->GetInfo();
-		const ndBigVector& p0 = m_points[face.m_index[0]];
-		const ndBigVector& p1 = m_points[face.m_index[1]];
-		const ndBigVector& p2 = m_points[face.m_index[2]];
-
-		fprintf(file, "p0(%f %f %f)\n", p0[0], p0[1], p0[2]);
-		fprintf(file, "p1(%f %f %f)\n", p1[0], p1[1], p1[2]);
-		fprintf(file, "p2(%f %f %f)\n", p2[0], p2[1], p2[2]);
-	}
-	fprintf(file, "\n");
-
-	fclose(file);
-}

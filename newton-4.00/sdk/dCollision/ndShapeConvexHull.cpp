@@ -119,6 +119,16 @@ ndShapeConvexHull::~ndShapeConvexHull()
 	}
 }
 
+void ndShapeConvexHull::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "vextexArray3", m_vertexCount, m_vertex);
+}
+
 bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance)
 {
 	ndInt32 stride = strideInBytes / sizeof(ndFloat32);
@@ -1007,12 +1017,3 @@ void ndShapeConvexHull::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 	}
 }
 
-void ndShapeConvexHull::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "vextexArray3", m_vertexCount, m_vertex);
-}

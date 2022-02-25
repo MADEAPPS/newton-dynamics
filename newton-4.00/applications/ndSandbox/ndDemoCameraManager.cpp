@@ -18,7 +18,7 @@
 
 //#define D_ENABLE_CAMERA_REPLAY
 #ifdef D_ENABLE_CAMERA_REPLAY
-	#define D_RECORD_CAMERA
+	//#define D_RECORD_CAMERA
 #endif
 
 class ndDemoCameraPickBodyJoint: public ndJointKinematicController
@@ -89,7 +89,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 	ndFloat32 mouseX;
 	ndFloat32 mouseY;
 	scene->GetMousePosition (mouseX, mouseY);
-	
+
 	// slow down the Camera if we have a Body
 	ndFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 
@@ -130,7 +130,6 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 		ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 		ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
 
-		//if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) 
 		if (ImGui::IsMouseDown(0))
 		{
 			if (mouseSpeedX > 0.0f) 

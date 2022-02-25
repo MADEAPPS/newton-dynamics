@@ -37,7 +37,7 @@ ndShapeCone::ndShapeCone(ndFloat32 radius, ndFloat32 height)
 }
 
 ndShapeCone::ndShapeCone(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	: ndShapeConvex(m_cone)
+	:ndShapeConvex(m_cone)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	ndFloat32 radius = xmlGetFloat(xmlNode, "radius");
@@ -51,6 +51,17 @@ ndShapeCone::~ndShapeCone()
 	dAssert(m_shapeRefCount >= 0);
 	ndShapeConvex::m_vertex = nullptr;
 	ndShapeConvex::m_simplex = nullptr;
+}
+
+void ndShapeCone::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "radius", m_radius);
+	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
 }
 
 void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)
@@ -361,13 +372,3 @@ void ndShapeCone::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& 
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
-void ndShapeCone::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius", m_radius);
-	xmlSaveParam(childNode, "height", m_height * ndFloat32 (2.0f));
-}

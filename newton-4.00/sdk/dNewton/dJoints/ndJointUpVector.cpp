@@ -34,7 +34,15 @@ ndJointUpVector::~ndJointUpVector()
 {
 }
 
-// bu animating the orientation of the pin vector the application can change the orientation of the picked object
+void ndJointUpVector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+}
+
+// by animating the orientation of the pin vector the application can change the orientation of the picked object
 void ndJointUpVector::SetPinDir (const ndVector& pin)
 {
 	m_localMatrix1 = ndMatrix(pin);
@@ -79,11 +87,3 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointUpVector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-}

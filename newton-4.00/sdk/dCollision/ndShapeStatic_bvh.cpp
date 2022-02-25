@@ -111,6 +111,23 @@ ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
 {
 }
 
+void ndShapeStatic_bvh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeStaticMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	char fileName[1024];
+	sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
+	xmlSaveParam(childNode, "assetName", "string", fileName);
+
+	char filePathName[2 * 1024];
+	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
+	desc.m_assetIndex++;
+	Serialize(filePathName);
+}
+
 dIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const, ndInt32 indexCount, ndFloat32)
 {
 	ndMeshVertexListIndexList& data = (*(ndMeshVertexListIndexList*)context);
@@ -250,19 +267,3 @@ void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
-void ndShapeStatic_bvh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeStaticMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	char fileName[1024];
-	sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
-	xmlSaveParam(childNode, "assetName", "string", fileName);
-
-	char filePathName[2 * 1024];
-	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
-	desc.m_assetIndex++;
-	Serialize(filePathName);
-}

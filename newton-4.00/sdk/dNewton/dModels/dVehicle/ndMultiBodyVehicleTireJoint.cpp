@@ -38,6 +38,17 @@ ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 {
 }
 
+void ndMultiBodyVehicleTireJoint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointWheel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "lateralSlip", m_lateralSlip);
+	xmlSaveParam(childNode, "longitudinalSlip", m_longitudinalSlip);
+}
+
 ndFloat32 ndMultiBodyVehicleTireJoint::GetSideSlip() const
 {
 	return m_lateralSlip;
@@ -54,13 +65,3 @@ void ndMultiBodyVehicleTireJoint::JacobianDerivative(ndConstraintDescritor& desc
 	ndJointWheel::JacobianDerivative(desc);
 }
 
-void ndMultiBodyVehicleTireJoint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointWheel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "lateralSlip", m_lateralSlip);
-	xmlSaveParam(childNode, "longitudinalSlip", m_longitudinalSlip);
-}

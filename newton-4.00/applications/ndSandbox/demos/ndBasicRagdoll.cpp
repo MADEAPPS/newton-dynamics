@@ -96,24 +96,24 @@ static dJointDefinition jointsDefinition[] =
 {
 	{ "mixamorig:Hips", 1, 16, 0, {}, {}},
 	
-	{ "mixamorig:Spine", 2, 16, 5.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 5.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 5.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 5.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:RightUpLeg", 16, 31, 5.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 5.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	//{ "mixamorig:RightFoot", 16, 31, 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightFoot", 16, 31, 10.0f, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:LeftUpLeg", 16, 31, 5.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", 16, 31, 5.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	//{ "mixamorig:LeftFoot", 16, 31, 10.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:LeftFoot", 16, 31, 10.0f, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:RightArm", 16, 27, 5.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 5.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 	
-	{ "mixamorig:LeftArm", 16, 27, 5.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 5.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 };
 
 class ndRagdollModel : public ndModel
@@ -230,11 +230,25 @@ class ndRagdollModel : public ndModel
 		}
 		ndFloat32 density = mass / volume;
 
-		for (int i = 0; i < m_bodies.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); i++)
 		{
 			ndBodyDynamic* const body = m_bodies[i];
-			ndFloat32 scale = density * body->GetCollisionShape().GetVolume();
-			ndVector inertia(body->GetMassMatrix().Scale (scale));
+			ndFloat32 normalMass = density * body->GetCollisionShape().GetVolume();
+			body->SetMassMatrix(normalMass, body->GetCollisionShape());
+			ndVector inertia(body->GetMassMatrix());
+			ndFloat32 maxInertia = dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = dMin(dMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			if (minInertia < maxInertia * 0.5f)
+			{
+				minInertia = maxInertia * 0.5f;
+				for (ndInt32 j = 0; j < 3; j++)
+				{
+					if (inertia[j] < minInertia)
+					{
+						inertia[j] = minInertia;
+					}
+				}
+			}
 			body->SetMassMatrix(inertia);
 		}
 	}
@@ -257,41 +271,41 @@ class ndRagdollModel : public ndModel
 		return body;
 	}
 
-	ndJointSphericalPd* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBone, const dJointDefinition& definition)
+	ndJointSpherical* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBone, const dJointDefinition& definition)
 	{
 		ndMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
-		//ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentBone);
-		ndJointSphericalPd* const joint = new ndJointSphericalPd (pinAndPivotInGlobalSpace, childBody, parentBone);
+		ndJointSpherical* const joint = new ndJointSpherical (pinAndPivotInGlobalSpace, childBody, parentBone);
 		
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		joint->SetSpringDamper(0.1f, 0.0f, definition.m_friction);
+		joint->SetViscousFriction(0.1f, definition.m_friction);
 		return joint;
 	}
 
-	void Update(ndWorld* const, ndFloat32 timestep) 
+	//void Update(ndWorld* const world, ndFloat32 timestep) 
+	void Update(ndWorld* const, ndFloat32)
 	{
-		bool needProjection = false;
-		ndFloat32 invtimestep2 = 1.0f / (timestep * timestep);
-		for (ndInt32 i = 0; (i < m_bodies.GetCount()) && !needProjection; ++i)
-		{
-			ndBodyDynamic* const body = m_bodies[i];
-			const ndVector veloc(body->GetOmega());
-			const ndVector omega(body->GetVelocity());
-			ndFloat32 maxVeloc2 = body->GetMaxLinearStep() * body->GetMaxLinearStep() * invtimestep2;
-			ndFloat32 maxOmega2 = body->GetMaxAngularStep() * body->GetMaxAngularStep() * invtimestep2;
-			needProjection = needProjection || (omega.DotProduct(omega).GetScalar() > maxOmega2);
-			needProjection = needProjection || (veloc.DotProduct(veloc).GetScalar() > maxVeloc2);
-		}
-		if (needProjection)
-		{
-			ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-			skeleton->ProjectVelocities();
-		}
+		//bool needProjection = false;
+		//ndFloat32 invtimestep2 = 1.0f / (timestep * timestep);
+		//for (ndInt32 i = 0; (i < m_bodies.GetCount()) && !needProjection; ++i)
+		//{
+		//	ndBodyDynamic* const body = m_bodies[i];
+		//	const ndVector veloc(body->GetOmega());
+		//	const ndVector omega(body->GetVelocity());
+		//	ndFloat32 maxVeloc2 = body->GetMaxLinearStep() * body->GetMaxLinearStep() * invtimestep2;
+		//	ndFloat32 maxOmega2 = body->GetMaxAngularStep() * body->GetMaxAngularStep() * invtimestep2;
+		//	needProjection = needProjection || (omega.DotProduct(omega).GetScalar() > maxOmega2);
+		//	needProjection = needProjection || (veloc.DotProduct(veloc).GetScalar() > maxVeloc2);
+		//}
+		//if (needProjection)
+		//{
+		//	ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+		//	m_solver.ProjectVelocities(skeleton, world, timestep);
+		//}
 	}
 
 	//void PostUpdate(ndWorld* const world, ndFloat32)
@@ -304,8 +318,9 @@ class ndRagdollModel : public ndModel
 	{
 	}
 
+	//ndIkSolver m_solver;
 	ndArray<ndBodyDynamic*> m_bodies;
-	ndArray<ndJointSphericalPd*> m_joints;
+	ndArray<ndJointSpherical*> m_joints;
 };
 
 void ndBasicRagdoll (ndDemoEntityManager* const scene)
@@ -324,13 +339,13 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
 
 	matrix.m_posit.m_z = 2.0f;
-	//scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
 
 	origin1.m_x += 20.0f;
-//	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
 	ndQuaternion rot;

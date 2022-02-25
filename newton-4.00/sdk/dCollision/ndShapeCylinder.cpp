@@ -37,7 +37,7 @@ ndShapeCylinder::ndShapeCylinder(ndFloat32 radius0, ndFloat32 radius1, ndFloat32
 }
 
 ndShapeCylinder::ndShapeCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	: ndShapeConvex(m_cylinder)
+	:ndShapeConvex(m_cylinder)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	ndFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
@@ -52,6 +52,18 @@ ndShapeCylinder::~ndShapeCylinder()
 	dAssert(m_shapeRefCount >= 0);
 	ndShapeConvex::m_vertex = nullptr;
 	ndShapeConvex::m_simplex = nullptr;
+}
+
+void ndShapeCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "radius0", m_radius0);
+	xmlSaveParam(childNode, "radius1", m_radius1);
+	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
 }
 
 void ndShapeCylinder::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
@@ -429,14 +441,3 @@ void ndShapeCylinder::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
-void ndShapeCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius0", m_radius0);
-	xmlSaveParam(childNode, "radius1", m_radius1);
-	xmlSaveParam(childNode, "height", m_height * ndFloat32 (2.0f));
-}

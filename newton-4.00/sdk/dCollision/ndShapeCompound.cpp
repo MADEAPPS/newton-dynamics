@@ -46,55 +46,54 @@ ndShapeCompound::ndNodeBase::~ndNodeBase()
 	}
 }
 
-
 ndShapeCompound::ndNodeBase::ndNodeBase()
 	:ndClassAlloc()
-	, m_type(m_node)
-	, m_left(nullptr)
-	, m_right(nullptr)
-	, m_parent(nullptr)
-	, m_myNode(nullptr)
-	, m_shapeInstance(nullptr)
+	,m_type(m_node)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_myNode(nullptr)
+	,m_shapeInstance(nullptr)
 {
 }
 
 ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 	:ndClassAlloc()
-	, m_p0(copyFrom.m_p0)
-	, m_p1(copyFrom.m_p1)
-	, m_size(copyFrom.m_size)
-	, m_origin(copyFrom.m_origin)
-	, m_area(copyFrom.m_area)
-	, m_type(copyFrom.m_type)
-	, m_left(nullptr)
-	, m_right(nullptr)
-	, m_parent(nullptr)
-	, m_myNode(nullptr)
-	, m_shapeInstance(nullptr)
+	,m_p0(copyFrom.m_p0)
+	,m_p1(copyFrom.m_p1)
+	,m_size(copyFrom.m_size)
+	,m_origin(copyFrom.m_origin)
+	,m_area(copyFrom.m_area)
+	,m_type(copyFrom.m_type)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_myNode(nullptr)
+	,m_shapeInstance(nullptr)
 {
 	dAssert(!copyFrom.m_shapeInstance);
 }
 
 ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
 	:ndClassAlloc()
-	, m_type(m_leaf)
-	, m_left(nullptr)
-	, m_right(nullptr)
-	, m_parent(nullptr)
-	, m_myNode(nullptr)
-	, m_shapeInstance(new ndShapeInstance(*instance))
+	,m_type(m_leaf)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_myNode(nullptr)
+	,m_shapeInstance(new ndShapeInstance(*instance))
 {
 	CalculateAABB();
 }
 
 ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
 	:ndClassAlloc()
-	, m_type(m_node)
-	, m_left(left)
-	, m_right(right)
-	, m_parent(nullptr)
-	, m_myNode(nullptr)
-	, m_shapeInstance(nullptr)
+	,m_type(m_node)
+	,m_left(left)
+	,m_right(right)
+	,m_parent(nullptr)
+	,m_myNode(nullptr)
+	,m_shapeInstance(nullptr)
 {
 	m_left->m_parent = this;
 	m_right->m_parent = this;
@@ -388,18 +387,28 @@ ndShapeCompound::~ndShapeCompound()
 	}
 }
 
-/*
-void ndShapeCompound::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
+void ndShapeCompound::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
-	dAssert(0);
-	ndVector origin(matrix.TransformVector(m_boxOrigin));
-	ndVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	p0 = (origin - size) & ndVector::m_triplexMask;
-	p1 = (origin + size) & ndVector::m_triplexMask;
+	nd::TiXmlElement* const subShapedNode = new nd::TiXmlElement("ndCompoundsSubShaped");
+	childNode->LinkEndChild(subShapedNode);
+	ndLoadSaveBase::ndSaveDescriptor subShapeDesc(desc);
+	subShapeDesc.m_rootNode = subShapedNode;
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndNodeBase* const node = iter.GetNode()->GetInfo();
+		ndShapeInstance* const instance = node->GetShape();
+		subShapeDesc.m_shapeNodeHash = subShapeDesc.m_shapeMap->Find(instance->GetShape())->GetInfo();
+		instance->Save(subShapeDesc);
+	}
 }
 
-
+/*
 //ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
 ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, const ndInt32* const, ndInt32, ndInt32, const dPlane&, ndVector* const) const
 {
@@ -1232,23 +1241,3 @@ ndMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const ndMatrix& alignM
 	return inertia;
 }
 
-void ndShapeCompound::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	nd::TiXmlElement* const subShapedNode = new nd::TiXmlElement("ndCompoundsSubShaped");
-	childNode->LinkEndChild(subShapedNode);
-	ndLoadSaveBase::ndSaveDescriptor subShapeDesc(desc);
-	subShapeDesc.m_rootNode = subShapedNode;
-	ndTreeArray::Iterator iter(m_array);
-	for (iter.Begin(); iter; iter++)
-	{
-		ndNodeBase* const node = iter.GetNode()->GetInfo();
-		ndShapeInstance* const instance = node->GetShape();
-		subShapeDesc.m_shapeNodeHash = subShapeDesc.m_shapeMap->Find(instance->GetShape())->GetInfo();
-		instance->Save(subShapeDesc);
-	}
-}

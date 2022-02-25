@@ -87,6 +87,7 @@ void ndJointSphericalPd::SetSpringDamper(ndFloat32 regularizer, ndFloat32 spring
 {
 	m_springConst = spring;
 	SetViscousFriction(regularizer, damper);
+	m_maxDof = 8;
 }
 
 void ndJointSphericalPd::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const

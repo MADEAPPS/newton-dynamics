@@ -113,9 +113,6 @@ class ndSkeletonContainer
 		}
 	};
 
-	public:
-	D_NEWTON_API void ProjectVelocities();
-
 	private:
 	ndNode* GetRoot() const;
 

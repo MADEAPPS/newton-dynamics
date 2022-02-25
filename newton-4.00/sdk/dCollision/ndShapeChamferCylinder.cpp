@@ -57,6 +57,17 @@ ndShapeChamferCylinder::~ndShapeChamferCylinder()
 	ndShapeConvex::m_vertex = nullptr;
 }
 
+void ndShapeChamferCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "radius", m_radius);
+	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
+}
+
 void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 {
 	m_radius = dMax (dAbs (radius), D_MIN_CONVEX_SHAPE_SIZE);
@@ -153,18 +164,6 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 	ndShapeConvex::m_simplex = m_edgeArray;
 
 	SetVolumeAndCG ();
-}
-
-
-void ndShapeChamferCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius", m_radius);
-	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
 }
 
 ndShapeInfo ndShapeChamferCylinder::GetShapeInfo() const

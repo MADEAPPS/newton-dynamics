@@ -41,6 +41,16 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveB
 	m_limitedSlipOmega = xmlGetFloat(xmlNode, "limitedSlipOmega");
 }
 
+void ndMultiBodyVehicleDifferential::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "limitedSlipOmega", m_limitedSlipOmega);
+}
+
 void ndMultiBodyVehicleDifferential::AlignMatrix()
 {
 	ndMatrix matrix0;
@@ -99,12 +109,3 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 	}
 }
 
-void ndMultiBodyVehicleDifferential::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "limitedSlipOmega", m_limitedSlipOmega);
-}

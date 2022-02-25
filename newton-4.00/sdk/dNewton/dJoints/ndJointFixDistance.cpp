@@ -48,6 +48,16 @@ ndJointFixDistance::~ndJointFixDistance()
 {
 }
 
+void ndJointFixDistance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "distance", m_distance);
+}
+
 void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -100,15 +110,5 @@ void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 
 		SetMotorAcceleration(desc, a);
 	}
-}
-
-void ndJointFixDistance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "distance", m_distance);
 }
 

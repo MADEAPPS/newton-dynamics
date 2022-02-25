@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndJointFollowPath.h"
@@ -31,6 +30,14 @@ ndJointFollowPath::ndJointFollowPath(const ndLoadSaveBase::ndLoadDescriptor& des
 
 ndJointFollowPath::~ndJointFollowPath()
 {
+}
+
+void ndJointFollowPath::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
@@ -65,12 +72,5 @@ void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p00, p11, matrix1[2]);
 }
 
-void ndJointFollowPath::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-}
 
 

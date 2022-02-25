@@ -96,6 +96,21 @@ ndJointWheel::~ndJointWheel()
 {
 }
 
+void ndJointWheel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	m_info.Save(childNode);
+	xmlSaveParam(childNode, "baseFrame", m_baseFrame);
+	xmlSaveParam(childNode, "regularizer", m_regularizer);
+	xmlSaveParam(childNode, "normalizedBrake", m_normalizedBrake);
+	xmlSaveParam(childNode, "normalidedSteering", m_normalidedSteering);
+	xmlSaveParam(childNode, "normalizedHandBrake", m_normalizedHandBrake);
+}
+
 void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
 {
 	m_normalizedBrake = dClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
@@ -210,17 +225,3 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointWheel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	m_info.Save(childNode);
-	xmlSaveParam(childNode, "baseFrame", m_baseFrame);
-	xmlSaveParam(childNode, "regularizer", m_regularizer);
-	xmlSaveParam(childNode, "normalizedBrake", m_normalizedBrake);
-	xmlSaveParam(childNode, "normalidedSteering", m_normalidedSteering);
-	xmlSaveParam(childNode, "normalizedHandBrake", m_normalizedHandBrake);
-}

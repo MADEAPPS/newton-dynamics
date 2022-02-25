@@ -111,6 +111,26 @@ ndBody::~ndBody()
 	}
 }
 
+void ndBody::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+
+	if (m_notifyCallback)
+	{
+		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("bodyNotifyClass");
+		childNode->LinkEndChild(notifyNode);
+		m_notifyCallback->Save(ndLoadSaveBase::ndSaveDescriptor(desc, notifyNode));
+	}
+
+	xmlSaveParam(childNode, "matrix", m_matrix);
+	xmlSaveParam(childNode, "veloc", m_veloc);
+	xmlSaveParam(childNode, "omega", m_omega);
+	xmlSaveParam(childNode, "centreOfMass", m_localCentreOfMass);
+	xmlSaveParam(childNode, "autoSleep", m_autoSleep);
+}
+
 void ndBody::SetCentreOfMass(const ndVector& com)
 {
 	m_localCentreOfMass.m_x = com.m_x;
@@ -162,22 +182,3 @@ D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const
 	return rootNode->FirstChild(name);
 }
 
-void ndBody::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-
-	if (m_notifyCallback)
-	{
-		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("bodyNotifyClass");
-		childNode->LinkEndChild(notifyNode);
-		m_notifyCallback->Save(ndLoadSaveBase::ndSaveDescriptor(desc, notifyNode));
-	}
-
-	xmlSaveParam(childNode, "matrix", m_matrix);
-	xmlSaveParam(childNode, "veloc", m_veloc);
-	xmlSaveParam(childNode, "omega", m_omega);
-	xmlSaveParam(childNode, "centreOfMass", m_localCentreOfMass);
-	xmlSaveParam(childNode, "autoSleep", m_autoSleep);
-}

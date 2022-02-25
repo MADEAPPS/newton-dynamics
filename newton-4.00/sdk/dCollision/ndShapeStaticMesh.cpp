@@ -201,9 +201,16 @@ ndShapeStaticMesh::ndShapeStaticMesh(const ndLoadSaveBase::ndLoadDescriptor&)
 {
 }
 
-
 ndShapeStaticMesh::~ndShapeStaticMesh()
 {
+}
+
+void ndShapeStaticMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndShapeStaticMesh::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
@@ -267,10 +274,3 @@ ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const, co
 	//return count;
 }
 
-void ndShapeStaticMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-}

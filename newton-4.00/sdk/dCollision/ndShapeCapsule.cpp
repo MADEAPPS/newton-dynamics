@@ -46,6 +46,18 @@ ndShapeCapsule::ndShapeCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	Init(radius0, radius1, height);
 }
 
+void ndShapeCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "radius0", m_radius0);
+	xmlSaveParam(childNode, "radius1", m_radius0);
+	xmlSaveParam(childNode, "height", m_height * ndFloat32(2.0f));
+}
+
 void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 {
 	radio0 = dMax(dAbs(radio0), D_MIN_CONVEX_SHAPE_SIZE);
@@ -512,18 +524,3 @@ void ndShapeCapsule::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVecto
 	p1 = max_q0.GetMax(max_q1) & ndVector::m_triplexMask;
 }
 
-void ndShapeCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "radius0", m_radius0);
-	xmlSaveParam(childNode, "radius1", m_radius0);
-	xmlSaveParam(childNode, "height", m_height * ndFloat32 (2.0f));
-
-
-//__classLoader__.CreateClass(childNode);
-
-}

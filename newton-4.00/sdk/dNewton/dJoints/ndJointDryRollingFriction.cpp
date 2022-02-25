@@ -35,9 +35,19 @@ ndJointDryRollingFriction::ndJointDryRollingFriction(const ndLoadSaveBase::ndLoa
 	m_contactTrail = xmlGetFloat(xmlNode, "contactTrail");
 }
 
-
 ndJointDryRollingFriction::~ndJointDryRollingFriction()
 {
+}
+
+void ndJointDryRollingFriction::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "coefficient", m_coefficient);
+	xmlSaveParam(childNode, "contactTrail", m_contactTrail);
 }
 
 // rolling friction works as follow: the idealization of the contact of a spherical object 
@@ -98,15 +108,5 @@ void ndJointDryRollingFriction::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointDryRollingFriction::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "coefficient", m_coefficient);
-	xmlSaveParam(childNode, "contactTrail", m_contactTrail);
-}
 
 

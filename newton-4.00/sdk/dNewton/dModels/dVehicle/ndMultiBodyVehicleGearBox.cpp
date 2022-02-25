@@ -53,6 +53,17 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::ndLoa
 	m_driveTrainResistanceTorque = xmlGetFloat(xmlNode, "driveTrainResistanceTorque");
 }
 
+void ndMultiBodyVehicleGearBox::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointGear::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "clutchTorque", m_clutchTorque);
+	xmlSaveParam(childNode, "driveTrainResistanceTorque", m_driveTrainResistanceTorque);
+}
+
 void ndMultiBodyVehicleGearBox::SetIdleOmega(ndFloat32 rpm)
 {
 	m_idleOmega = dMax(rpm / dRadPerSecToRpm, ndFloat32(0.0f));
@@ -112,13 +123,3 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndMultiBodyVehicleGearBox::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointGear::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	
-	xmlSaveParam(childNode, "clutchTorque", m_clutchTorque);
-	xmlSaveParam(childNode, "driveTrainResistanceTorque", m_driveTrainResistanceTorque);
-}

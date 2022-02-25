@@ -39,6 +39,16 @@ ndJointPlane::~ndJointPlane()
 {
 }
 
+void ndJointPlane::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "enableControlRotation", m_enableControlRotation ? 1 : 0);
+}
+
 void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -76,12 +86,3 @@ void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointPlane::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "enableControlRotation", m_enableControlRotation ? 1 : 0);
-}

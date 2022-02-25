@@ -219,18 +219,18 @@ ndBodySphFluid::~ndBodySphFluid()
 	data.Clear();
 }
 
-ndBodySphFluid::ndWorkingData& ndBodySphFluid::WorkingData()
-{
-	static ndWorkingData workingBuffers;
-	return workingBuffers;
-}
-
 //void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
+}
+
+ndBodySphFluid::ndWorkingData& ndBodySphFluid::WorkingData()
+{
+	static ndWorkingData workingBuffers;
+	return workingBuffers;
 }
 
 void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)

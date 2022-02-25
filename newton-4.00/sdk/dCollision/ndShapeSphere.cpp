@@ -55,6 +55,16 @@ ndShapeSphere::~ndShapeSphere()
 	ndShapeConvex::m_vertex = nullptr;
 }
 
+void ndShapeSphere::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "radius", m_radius);
+}
+
 void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const ouput) const
 {
 	if (level) 
@@ -274,12 +284,3 @@ void ndShapeSphere::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	}
 }
 
-void ndShapeSphere::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	
-	xmlSaveParam(childNode, "radius", m_radius);
-}

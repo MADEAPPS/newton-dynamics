@@ -51,6 +51,16 @@ ndJointPulley::~ndJointPulley()
 {
 }
 
+void ndJointPulley::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "gearRatio", m_gearRatio);
+}
+
 void ndJointPulley::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -73,15 +83,5 @@ void ndJointPulley::JacobianDerivative(ndConstraintDescritor& desc)
 	const ndVector relVeloc(veloc0 * jacobian0.m_linear + veloc1 * jacobian1.m_linear);
 	const ndFloat32 w = relVeloc.AddHorizontal().GetScalar() * ndFloat32(0.5f);
 	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
-}
-
-void ndJointPulley::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "gearRatio", m_gearRatio);
 }
 

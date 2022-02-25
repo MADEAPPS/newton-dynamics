@@ -38,7 +38,6 @@ ndShape::ndShape(ndShapeID id)
 }
 
 ndShape::ndShape(const ndShape& source)
-	//:ndClassAlloc()
 	:ndContainersFreeListAlloc<ndShape>()
 	,m_inertia(source.m_inertia)
 	,m_crossInertia(source.m_crossInertia)
@@ -53,6 +52,19 @@ ndShape::ndShape(const ndShape& source)
 ndShape::~ndShape()
 {
 	dAssert(m_refCount.load() == 0);
+}
+
+void ndShape::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+
+	xmlSaveParam(childNode, "inertia", m_inertia);
+	xmlSaveParam(childNode, "crossInertia", m_crossInertia);
+	xmlSaveParam(childNode, "centerOfMass", m_centerOfMass);
+	xmlSaveParam(childNode, "boxSize", m_boxSize);
+	xmlSaveParam(childNode, "boxOrigin", m_boxOrigin);
 }
 
 void ndShape::MassProperties()
@@ -98,15 +110,3 @@ ndShapeInfo ndShape::GetShapeInfo() const
 	return info;
 }
 
-void ndShape::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-
-	xmlSaveParam(childNode, "inertia", m_inertia);
-	xmlSaveParam(childNode, "crossInertia", m_crossInertia);
-	xmlSaveParam(childNode, "centerOfMass", m_centerOfMass);
-	xmlSaveParam(childNode, "boxSize", m_boxSize);
-	xmlSaveParam(childNode, "boxOrigin", m_boxOrigin);
-}

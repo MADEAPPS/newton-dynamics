@@ -48,6 +48,18 @@ ndJointFix6dof::~ndJointFix6dof()
 {
 }
 
+void ndJointFix6dof::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "m_softness", m_softness);
+	xmlSaveParam(childNode, "m_softness", m_maxForce);
+	xmlSaveParam(childNode, "m_softness", m_maxTorque);
+}
+
 void ndJointFix6dof::SetAsSoftJoint(bool)
 {
 	dAssert(0);
@@ -142,14 +154,3 @@ void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatr
 	//dTrace(("%f %f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
 }
 
-void ndJointFix6dof::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "m_softness", m_softness);
-	xmlSaveParam(childNode, "m_softness", m_maxForce);
-	xmlSaveParam(childNode, "m_softness", m_maxTorque);
-}

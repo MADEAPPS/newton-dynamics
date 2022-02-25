@@ -21,7 +21,6 @@ ndJointGear::ndJointGear(ndFloat32 gearRatio,
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
 	,m_gearRatio(gearRatio)
 {
-
 	// calculate the two local matrix of the pivot point
 	ndMatrix dommyMatrix;
 
@@ -52,6 +51,16 @@ ndJointGear::~ndJointGear()
 {
 }
 
+void ndJointGear::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "gearRatio", m_gearRatio);
+}
+
 void ndJointGear::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -74,15 +83,5 @@ void ndJointGear::JacobianDerivative(ndConstraintDescritor& desc)
 	const ndVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 	const ndFloat32 w = relOmega.AddHorizontal().GetScalar() * ndFloat32(0.5f);
 	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
-}
-
-void ndJointGear::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "gearRatio", m_gearRatio);
 }
 

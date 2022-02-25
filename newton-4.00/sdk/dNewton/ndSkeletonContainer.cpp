@@ -398,11 +398,6 @@ void ndSkeletonContainer::Init(ndBodyKinematic* const rootBody)
 	}
 }
 
-void ndSkeletonContainer::ProjectVelocities()
-{
-
-}
-
 ndSkeletonContainer::ndNode* ndSkeletonContainer::AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent)
 {
 	ndNode* const node = &m_nodeList.Append()->GetInfo();
