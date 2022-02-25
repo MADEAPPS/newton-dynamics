@@ -15,8 +15,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_SLIDER_PENETRATION_LIMIT			ndFloat32 (0.2f) 
-#define D_SLIDER_PENETRATION_RECOVERY_SPEED ndFloat32 (0.1f) 
+#define D_MAX_SLIDER_RECOVERY_SPEED	ndFloat32 (0.5f)
+#define D_MAX_SLIDER_PENETRATION	ndFloat32 (0.05f)
 
 class ndJointSlider: public ndJointBilateralConstraint
 {
@@ -32,8 +32,9 @@ class ndJointSlider: public ndJointBilateralConstraint
 	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	protected:
-	void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	ndFloat32 PenetrationSpeed(ndFloat32 penetration) const;
+	bool SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
 	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

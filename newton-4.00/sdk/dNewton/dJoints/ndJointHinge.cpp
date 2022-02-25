@@ -102,7 +102,7 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 
 	// adding one extra dof, this makes the mass matrix ill conditioned, 
 	// but it could work with the direct solver
-	m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 0;
+	m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 6;
 }
 
 void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
@@ -237,7 +237,6 @@ bool ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndM
 			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
-
 	return ret;
 }
 

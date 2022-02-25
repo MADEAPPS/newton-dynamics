@@ -83,9 +83,6 @@ void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 	dAssert(maxLimit >= 0.0f);
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
-
-	// adding one extra dof, this makes the mass matrix ill conditioned, 
-	// but it could work with the direct solver
 	m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 0;
 }
 
@@ -96,8 +93,16 @@ void ndJointSlider::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, n
 	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
-void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
 {
+	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
+	ndFloat32 speed = D_MAX_SLIDER_RECOVERY_SPEED * param;
+	return speed;
+}
+
+bool ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+{
+	bool ret = false;
 	if ((m_minLimit == ndFloat32 (0.0f)) && (m_maxLimit == ndFloat32(0.0f)))
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
@@ -111,23 +116,26 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const nd
 			AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const ndFloat32 penetration = x - m_minLimit;
-			const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), ndFloat32(1.0f));
+			const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
+			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else if (x > m_maxLimit)
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
 			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const ndFloat32 penetration = x - m_maxLimit;
-			const ndFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), ndFloat32(1.0f));
+			const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, ndFloat32 (0.0f));
+			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
+	return ret;
 }
 
-void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// add spring damper row
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
@@ -171,15 +179,14 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
+	bool hitLimit = SubmitConstraintLimits(desc, matrix0, matrix1);
+	if (!hitLimit)
 	{
-		// spring damper with limits
-		SubmitConstraintLimitSpringDamper(desc, matrix0, matrix1);
-	}
-
-	if (m_maxDof == 7)
-	{
-		SubmitConstraintLimits(desc, matrix0, matrix1);
+		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
+		{
+			// spring damper with limits
+			SubmitSpringDamper(desc, matrix0, matrix1);
+		}
 	}
 }
 
