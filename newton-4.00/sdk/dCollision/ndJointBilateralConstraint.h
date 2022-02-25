@@ -27,7 +27,8 @@
 #include "ndConstraint.h"
 #include "ndBodyKinematic.h"
 
-#define DG_BILATERAL_CONTRAINT_DOF	8
+#define ND_BILATERAL_CONTRAINT_DOF	8
+#define ND_MAX_STOP_ACCEL			ndFloat32 (1000.0f)
 
 enum ndJointBilateralSolverModel
 {
@@ -124,10 +125,10 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector m_forceBody1;
 	ndVector m_torqueBody1;
 
-	ndVector m_r0[DG_BILATERAL_CONTRAINT_DOF];
-	ndVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
-	ndForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
-	ndFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
+	ndVector m_r0[ND_BILATERAL_CONTRAINT_DOF];
+	ndVector m_r1[ND_BILATERAL_CONTRAINT_DOF];
+	ndForceImpactPair m_jointForce[ND_BILATERAL_CONTRAINT_DOF];
+	ndFloat32 m_motorAcceleration[ND_BILATERAL_CONTRAINT_DOF];
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
 	ndJointList::ndNode* m_worldNode;

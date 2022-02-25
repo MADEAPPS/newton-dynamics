@@ -186,7 +186,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	}
 
 	{
-		// viscuos damper slider with limits
+		// viscous damper slider with limits
 		matrix.m_posit.m_y += 1.2f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 		ndJointSlider* const joint = new ndJointSlider(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
@@ -218,14 +218,13 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		matrix.m_posit.m_y += 2.0f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
-		//joint->SetAsSpringDamper(0.1f, 500.0f, 5.0f);
 		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
 		joint->SetLimits(-3.0f, 3.0f);
 		world->AddJoint(joint);
 	}
 
 	{
-		// viscuos friction and limits
+		// viscous friction and limits
 		matrix.m_posit.m_y += 1.2f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
@@ -467,8 +466,8 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
 	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
 	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);

@@ -215,7 +215,7 @@ void ndJointKinematicController::Init(const ndMatrix& globalMatrix)
 	SetControlMode(m_full6dof);
 	SetMaxLinearFriction(1.0f);
 	SetMaxAngularFriction(1.0f);
-	SetAngularViscuosFrictionCoefficient(1.0f);
+	SetAngularViscousFrictionCoefficient(1.0f);
 	SetMaxSpeed(30.0f);
 	SetMaxOmega(10.0f * 360.0f * ndDegreeToRad);
 	

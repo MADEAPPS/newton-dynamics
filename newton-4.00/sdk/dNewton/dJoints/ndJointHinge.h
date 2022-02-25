@@ -15,8 +15,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_HINGE_PENETRATION_RECOVERY_SPEED	ndFloat32 (0.1f) 
-#define D_HINGE_PENETRATION_LIMIT			ndFloat32 (10.0f * ndDegreeToRad) 
+#define D_MAX_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
+#define D_MAX_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
 class ndJointHinge: public ndJointBilateralConstraint
 {
@@ -35,11 +35,11 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit);
 	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
-	private:
-	void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	
 	protected:
+	ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
+	void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	bool SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;

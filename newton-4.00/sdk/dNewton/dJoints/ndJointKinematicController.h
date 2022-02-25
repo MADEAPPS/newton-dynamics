@@ -44,7 +44,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	void SetMaxOmega(ndFloat32 speedInRadiansPerSeconds);
 	void SetMaxLinearFriction(ndFloat32 force);
 	void SetMaxAngularFriction(ndFloat32 torque);
-	void SetAngularViscuosFrictionCoefficient(ndFloat32 coefficient);
+	void SetAngularViscousFrictionCoefficient(ndFloat32 coefficient);
 
 	ndMatrix GetTargetMatrix() const;
 	void SetTargetPosit(const ndVector& posit);
@@ -94,7 +94,7 @@ inline void ndJointKinematicController::SetMaxOmega(ndFloat32 speedInRadiansPerS
 	m_maxOmega = dAbs(speedInRadiansPerSeconds);
 }
 
-inline void ndJointKinematicController::SetAngularViscuosFrictionCoefficient(ndFloat32 coefficient)
+inline void ndJointKinematicController::SetAngularViscousFrictionCoefficient(ndFloat32 coefficient)
 {
 	ndVector mass (GetBody0()->GetMassMatrix());
 	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(mass.m_x, dMax(mass.m_y, mass.m_z));

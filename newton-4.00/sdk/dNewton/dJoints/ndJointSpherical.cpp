@@ -206,7 +206,7 @@ bool ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 			const ndFloat32 recoveringAccel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
-			ret = dAbs(stopAccel) > ndFloat32(1000.0f);
+			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else if (angle >= m_maxTwistAngle)
 		{
@@ -216,7 +216,7 @@ bool ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
-			ret = dAbs(stopAccel) > ndFloat32(1000.0f);
+			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
 	return ret;
@@ -256,7 +256,7 @@ bool ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
-			ret = dAbs(stopAccel) > ndFloat32(1000.0f);
+			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else
 		{
@@ -336,19 +336,6 @@ bool ndJointSpherical::SubmitAngleLimits(const ndMatrix& matrix0, const ndMatrix
 
 void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 {
-//extern int xxxxxxxxxxxxxxxxxxx;
-//if (xxxxxxxxxxxxxxxxxxx >= 1250)
-//{
-//	const ndBodyKinematic* const body0 = GetBody0();
-//	const ndBodyKinematic* const body1 = GetBody1();
-//	const ndVector omega0(body0->GetOmega());
-//	const ndVector omega1(body1->GetOmega());
-//	int xxxx0 = body0->GetId();
-//	int xxxx1 = body1->GetId();
-//	dTrace(("%d (%d %d): w0(%f %f %f) w1(%f %f %f)\n", xxxxxxxxxxxxxxxxxxx, xxxx0, xxxx1,
-//		omega0.m_x, omega0.m_y, omega0.m_z, omega1.m_x, omega1.m_y, omega1.m_z));
-//}
-
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -356,7 +343,6 @@ void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 	bool hitLimit = SubmitAngleLimits(matrix0, matrix1, desc);
 	if (!hitLimit)
 	{
-		dAssert(desc.m_rowsCount <= 6);
 		SubmitFriction(desc);
 	}
 }
