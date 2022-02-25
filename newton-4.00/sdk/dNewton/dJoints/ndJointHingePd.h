@@ -9,20 +9,20 @@
 * freely
 */
 
-#ifndef __ND_JOINT_HINGE_ACTUATOR_H__
-#define __ND_JOINT_HINGE_ACTUATOR_H__
+#ifndef __ND_JOINT_HINGE_PD_H__
+#define __ND_JOINT_HINGE_PD_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointHinge.h"
 
-class ndJointHingeActuator: public ndJointHinge
+class ndJointHingePd: public ndJointHinge
 {
 	public:
-	D_CLASS_REFLECTION(ndJointHingeActuator);
-	D_NEWTON_API ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	//D_NEWTON_API ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndFloat32 angularRate, ndFloat32 minAngle, ndFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointHingeActuator();
+	D_CLASS_REFLECTION(ndJointHingePd);
+	D_NEWTON_API ndJointHingePd(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	//D_NEWTON_API ndJointHingePd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointHingePd(const ndMatrix& pinAndPivotFrame, ndFloat32 angularRate, ndFloat32 minAngle, ndFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointHingePd();
 
 	D_NEWTON_API virtual ndFloat32 GetTargetAngle() const;
 	D_NEWTON_API virtual void SetTargetAngle(ndFloat32 angle);

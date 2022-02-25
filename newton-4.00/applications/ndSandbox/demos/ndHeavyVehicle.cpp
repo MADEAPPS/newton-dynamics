@@ -521,7 +521,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		//turret servo controller actuator
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
 		ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
-		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
+		m_turretHinge = new ndJointHingePd(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
 		m_turrectAngle0 = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
 		AddExtraBody(turretBody);
 		AddExtraJoint(m_turretHinge);
@@ -529,7 +529,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		//cannon servo controller actuator
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
 		ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
+		m_cannonHinge = new ndJointHingePd(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
 		AddExtraBody(canonBody);
 		AddExtraJoint(m_cannonHinge);
 
@@ -625,8 +625,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		}
 	}
 
-	ndJointHingeActuator* m_turretHinge;
-	ndJointHingeActuator* m_cannonHinge;
+	ndJointHingePd* m_turretHinge;
+	ndJointHingePd* m_cannonHinge;
 	ndFloat32 m_turretAngle;
 	ndFloat32 m_turrectAngle0;
 	ndFloat32 m_cannonAngle;
@@ -744,7 +744,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 	{
 		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
 		ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
-		m_armHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad, frontBucketArmBody, m_chassis);
+		m_armHinge = new ndJointHingePd(turretMatrix, 1.5f, -10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad, frontBucketArmBody, m_chassis);
 		AddExtraBody(frontBucketArmBody);
 		AddExtraJoint(m_armHinge);
 		
@@ -755,7 +755,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		//cannon servo controller actuator
 		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
 		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
-		m_bucketHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad, frontBucketBody, frontBucketArmBody);
+		m_bucketHinge = new ndJointHingePd(frontBucketMatrix, 2.5f, -75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad, frontBucketBody, frontBucketArmBody);
 		AddExtraBody(frontBucketBody);
 		AddExtraJoint(m_bucketHinge);
 		
@@ -821,8 +821,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		}
 	}
 
-	ndJointHingeActuator* m_armHinge;
-	ndJointHingeActuator* m_bucketHinge;
+	ndJointHingePd* m_armHinge;
+	ndJointHingePd* m_bucketHinge;
 	ndFloat32 m_armAngle;
 	ndFloat32 m_bucketAngle;
 };

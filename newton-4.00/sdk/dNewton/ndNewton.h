@@ -57,6 +57,7 @@
 #include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
+#include <ndJointHingePd.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
 #include <ndShapeInstance.h>
@@ -75,7 +76,6 @@
 #include <ndCharacterRootNode.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
-#include <ndJointHingeActuator.h>
 #include <ndJointIk6DofEffector.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointIkBallAndSocket.h>

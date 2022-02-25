@@ -11,11 +11,11 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointHingeActuator.h"
+#include "ndJointHingePd.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHingeActuator)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHingePd)
 
-ndJointHingeActuator::ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndFloat32 angularRate, ndFloat32 minAngle, ndFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointHingePd::ndJointHingePd(const ndMatrix& pinAndPivotFrame, ndFloat32 angularRate, ndFloat32 minAngle, ndFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle(ndFloat32(0.0f))
 	,m_motorSpeed(angularRate)
@@ -27,7 +27,7 @@ ndJointHingeActuator::ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndF
 	//EnableLimits(false, minAngle, maxAngle);
 }
 
-ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndJointHingePd::ndJointHingePd(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_targetAngle(ndFloat32 (0.0f))
 	,m_motorSpeed(ndFloat32(0.0f))
@@ -40,11 +40,11 @@ ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescripto
 	m_maxTorque = xmlGetFloat(xmlNode, "maxTorque");
 }
 
-ndJointHingeActuator::~ndJointHingeActuator()
+ndJointHingePd::~ndJointHingePd()
 {
 }
 
-void ndJointHingeActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointHingePd::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -56,42 +56,42 @@ void ndJointHingeActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) co
 	xmlSaveParam(childNode, "maxTorque", m_maxTorque);
 }
 
-ndFloat32 ndJointHingeActuator::GetMinAngularLimit() const
+ndFloat32 ndJointHingePd::GetMinAngularLimit() const
 {
 	return m_minLimit;
 }
 
-ndFloat32 ndJointHingeActuator::GetMaxAngularLimit() const
+ndFloat32 ndJointHingePd::GetMaxAngularLimit() const
 {
 	return m_maxLimit;
 }
 
-ndFloat32 ndJointHingeActuator::GetAngularRate() const
+ndFloat32 ndJointHingePd::GetAngularRate() const
 {
 	return m_motorSpeed;
 }
 
-void ndJointHingeActuator::SetMinAngularLimit(ndFloat32 limit)
+void ndJointHingePd::SetMinAngularLimit(ndFloat32 limit)
 {
 	m_minLimit = limit;
 }
 
-void ndJointHingeActuator::SetMaxAngularLimit(ndFloat32 limit)
+void ndJointHingePd::SetMaxAngularLimit(ndFloat32 limit)
 {
 	m_maxLimit = limit;
 }
 
-void ndJointHingeActuator::SetAngularRate(ndFloat32 rate)
+void ndJointHingePd::SetAngularRate(ndFloat32 rate)
 {
 	m_motorSpeed = rate;
 }
 
-ndFloat32 ndJointHingeActuator::GetTargetAngle() const
+ndFloat32 ndJointHingePd::GetTargetAngle() const
 {
 	return m_targetAngle;
 }
 
-void ndJointHingeActuator::SetTargetAngle(ndFloat32 angle)
+void ndJointHingePd::SetTargetAngle(ndFloat32 angle)
 {
 	angle = dClamp (angle, m_minLimit, m_maxLimit);
 	if (dAbs (angle - m_targetAngle) > ndFloat32 (1.0e-3f))
@@ -101,17 +101,17 @@ void ndJointHingeActuator::SetTargetAngle(ndFloat32 angle)
 	}
 }
 
-ndFloat32 ndJointHingeActuator::GetMaxTorque() const
+ndFloat32 ndJointHingePd::GetMaxTorque() const
 {
     return m_maxTorque;
 }
 
-void ndJointHingeActuator::SetMaxTorque(ndFloat32 torque)
+void ndJointHingePd::SetMaxTorque(ndFloat32 torque)
 {
     m_maxTorque = dAbs (torque);
 }
 
-void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointHingePd::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dAssert(0);
 	//m_hasLimits = false;
