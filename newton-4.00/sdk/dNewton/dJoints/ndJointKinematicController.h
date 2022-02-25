@@ -48,8 +48,9 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 
 	ndMatrix GetTargetMatrix() const;
 	void SetTargetPosit(const ndVector& posit);
-	void SetTargetMatrix(const ndMatrix& matrix);
 	void SetTargetRotation(const ndQuaternion& rotation);
+
+	D_NEWTON_API void SetTargetMatrix(const ndMatrix& matrix);
 
 	protected:
 	void Init(const ndMatrix& matrix);
@@ -99,30 +100,24 @@ inline void ndJointKinematicController::SetAngularViscuosFrictionCoefficient(ndF
 	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(mass.m_x, dMax(mass.m_y, mass.m_z));
 }
 
+
 inline void ndJointKinematicController::SetTargetPosit(const ndVector& posit)
 {
-	m_localMatrix1.m_posit = posit;
-	dAssert(m_localMatrix1.m_posit.m_w == ndFloat32(1.0f));
-	CheckSleep();
+	ndMatrix matrix(m_localMatrix1);
+	matrix.m_posit = posit;
+	SetTargetMatrix(matrix);
 }
 
-inline void ndJointKinematicController::SetTargetMatrix(const ndMatrix& matrix)
+inline void ndJointKinematicController::SetTargetRotation(const ndQuaternion& rotation)
 {
-	m_localMatrix1 = matrix;
-	CheckSleep();
+	ndMatrix matrix(rotation, m_localMatrix1.m_posit);
+	SetTargetMatrix(matrix);
 }
 
 inline ndMatrix ndJointKinematicController::GetTargetMatrix() const
 {
 	dAssert(0);
 	return m_localMatrix0;
-}
-
-inline void ndJointKinematicController::SetTargetRotation(const ndQuaternion& rotation)
-{
-	m_localMatrix1 = ndMatrix(rotation, m_localMatrix1.m_posit);
-	dAssert(m_localMatrix1.m_posit.m_w == ndFloat32(1.0f));
-	CheckSleep();
 }
 
 inline bool ndJointKinematicController::IsBilateral() const

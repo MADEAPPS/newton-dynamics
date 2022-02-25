@@ -314,6 +314,20 @@ void ndJointKinematicController::CheckSleep() const
 	//}
 }
 
+void ndJointKinematicController::SetTargetMatrix(const ndMatrix& matrix)
+{
+	const ndFloat32 timestep = ndFloat32(1.0f / 60.0f);
+	const ndVector maxStep(ndVector(m_maxSpeed * timestep));
+	const ndVector minStep(maxStep * ndVector::m_negOne);
+	const ndVector step((maxStep.GetMin(matrix.m_posit - m_localMatrix1.m_posit)).GetMax(minStep));
+	const ndVector posit(m_localMatrix1.m_posit + (step & ndVector::m_triplexMask));
+
+	m_localMatrix1 = matrix;
+	m_localMatrix1.m_posit = posit;
+	CheckSleep();
+}
+
+
 void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
