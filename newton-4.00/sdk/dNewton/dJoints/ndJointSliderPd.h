@@ -29,8 +29,9 @@ class ndJointSliderPd: public ndJointSlider
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+	void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
-	ndFloat32 n_targetPosit;
+	ndFloat32 m_targetPosit;
 };
 
 #endif 

@@ -195,6 +195,38 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		world->AddJoint(joint);
 	}
 
+	{
+		class ndJointSliderMotor : public ndJointSliderPd
+		{
+			public:
+			ndJointSliderMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+				:ndJointSliderPd(pinAndPivotFrame, child, parent)
+				,m_angle(0.0f)
+			{
+
+			}
+
+			void JacobianDerivative(ndConstraintDescritor& desc)
+			{
+				m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+				ndFloat32 dist = 0.9f * ndSin(m_angle);
+				SetTarget(dist);
+				ndJointSliderPd::JacobianDerivative(desc);
+			}
+
+			ndFloat32 m_angle;
+		};
+
+		// slider proportional derivative motor with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointSliderPd* const joint = new ndJointSliderMotor(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
+		joint->SetLimits(-1.0f, 1.0f);
+		world->AddJoint(joint);
+	}
+
+
 	mesh->Release();
 }
 
@@ -473,7 +505,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	//BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
 	//BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	////AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

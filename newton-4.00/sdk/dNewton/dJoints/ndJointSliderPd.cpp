@@ -17,25 +17,17 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSliderPd)
 
 ndJointSliderPd::ndJointSliderPd(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSlider(pinAndPivotFrame, child, parent)
-	,n_targetPosit(ndFloat32 (0.0f))
+	,m_targetPosit(ndFloat32 (0.0f))
 {
 }
 
 ndJointSliderPd::ndJointSliderPd(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSlider(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,n_targetPosit(ndFloat32(0.0f))
+	,m_targetPosit(ndFloat32(0.0f))
 {
-	dAssert(0);
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	//
-	//m_springK = xmlGetFloat(xmlNode, "springK");
-	//m_damperC = xmlGetFloat(xmlNode, "damperC");
-	//m_minLimit = xmlGetFloat(xmlNode, "minLimit");
-	//m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
-	//m_friction = xmlGetFloat(xmlNode, "friction");
-	//m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-	//m_hasLimits = xmlGetInt(xmlNode, "hasLimits") ? true : false;
-	//m_isSpringDamper = xmlGetInt(xmlNode, "isSpringDamper") ? true : false;
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	
+	m_targetPosit = xmlGetFloat(xmlNode, "targetPosit");
 }
 
 ndJointSliderPd::~ndJointSliderPd()
@@ -49,42 +41,43 @@ void ndJointSliderPd::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointSlider::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	dAssert(0);
-	//xmlSaveParam(childNode, "springK", m_springK);
-	//xmlSaveParam(childNode, "damperC", m_damperC);
-	//xmlSaveParam(childNode, "minLimit", m_minLimit);
-	//xmlSaveParam(childNode, "maxLimit", m_maxLimit);
-	//xmlSaveParam(childNode, "friction", m_friction);
-	//xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
-	//xmlSaveParam(childNode, "hasLimits", m_hasLimits ? 1 : 0);
-	//xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
+	xmlSaveParam(childNode, "targetPosit", m_targetPosit);
 }
 
 ndFloat32 ndJointSliderPd::GetTarget() const
 {
-	return n_targetPosit;
+	return m_targetPosit;
 }
 
 void ndJointSliderPd::SetTarget(ndFloat32 target)
 {
-	n_targetPosit = dClamp(target, m_minLimit, m_maxLimit);
+	m_targetPosit = target;
+}
+
+void ndJointSliderPd::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+{
+	const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_targetPosit));
+	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
 void ndJointSliderPd::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dAssert(0);
-	//ndJointSlider::JacobianDerivative(desc);
-	//
-	//ndMatrix matrix0;
-	//ndMatrix matrix1;
-	//
-	//// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	//CalculateGlobalMatrix(matrix0, matrix1);
-	//
-	//const ndVector posit(matrix0.m_posit - matrix1.m_front.Scale(n_targetPosit));
-	//AddLinearRowJacobian(desc, posit, matrix1.m_posit, matrix1.m_front);
-	//SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
-	//SubmitConstraintLimits(desc, matrix0, matrix1);
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	ApplyBaseRows(desc, matrix0, matrix1);
+	bool hitLimit = SubmitConstraintLimits(desc, matrix0, matrix1);
+	if (!hitLimit)
+	{
+		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
+		{
+			SubmitSpringDamper(desc, matrix0, matrix1);
+		}
+	}
 }
 
 
