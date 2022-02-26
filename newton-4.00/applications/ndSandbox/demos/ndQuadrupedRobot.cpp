@@ -418,8 +418,8 @@ class dQuadrupedRobot : public ndModel
 		targetMatrix.m_posit = newPosit;
 
 		m_effector->SetTargetMatrix(targetMatrix);
-		m_leftGripper->SetTarget(m_gripperPosit);
-		m_rightGripper->SetTarget(m_gripperPosit);
+		m_leftGripper->SetOffsetPosit(m_gripperPosit);
+		m_rightGripper->SetOffsetPosit(m_gripperPosit);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -441,8 +441,8 @@ return;
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointSliderPd* m_leftGripper;
-	ndJointSliderPd* m_rightGripper;
+	ndJointSlider* m_leftGripper;
+	ndJointSlider* m_rightGripper;
 	ndJointIk6DofEffector* m_effector;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;

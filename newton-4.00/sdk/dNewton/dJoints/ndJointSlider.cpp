@@ -23,6 +23,7 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* 
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_positOffset(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 {
 }
@@ -35,6 +36,7 @@ ndJointSlider::ndJointSlider(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_positOffset(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -45,6 +47,7 @@ ndJointSlider::ndJointSlider(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_damperC = xmlGetFloat(xmlNode, "damperC");
 	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
 	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
+	m_positOffset = xmlGetFloat(xmlNode, "positOffset");
 	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
 }
 
@@ -65,6 +68,7 @@ void ndJointSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "damperC", m_damperC);
 	xmlSaveParam(childNode, "minLimit", m_minLimit);
 	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(childNode, "positOffset", m_positOffset);
 	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
 }
 ndFloat32 ndJointSlider::GetSpeed() const
@@ -75,6 +79,16 @@ ndFloat32 ndJointSlider::GetSpeed() const
 ndFloat32 ndJointSlider::GetPosit() const
 {
 	return m_posit;
+}
+
+ndFloat32 ndJointSlider::GetOffsetPosit() const
+{
+	return m_positOffset;
+}
+
+void ndJointSlider::SetOffsetPosit(ndFloat32 offset)
+{
+	m_positOffset = offset;
 }
 
 void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
@@ -138,7 +152,8 @@ bool ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const nd
 void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// add spring damper row
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
+	const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_positOffset));
+	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 

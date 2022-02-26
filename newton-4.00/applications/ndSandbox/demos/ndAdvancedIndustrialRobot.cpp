@@ -136,7 +136,7 @@ class dAdvancedIndustrialRobot : public ndModel
 						m_bodyArray.PushBack(childBody);
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointSliderPd* const slider = new ndJointSliderPd(pivotMatrix, childBody, parentBody);
+						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
 						dAssert(0);
 						slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
 						slider->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
@@ -415,8 +415,8 @@ class dAdvancedIndustrialRobot : public ndModel
 		targetMatrix.m_posit = newPosit;
 
 		m_effector->SetTargetMatrix(targetMatrix);
-		m_leftGripper->SetTarget(m_gripperPosit);
-		m_rightGripper->SetTarget(m_gripperPosit);
+		m_leftGripper->SetOffsetPosit(m_gripperPosit);
+		m_rightGripper->SetOffsetPosit(m_gripperPosit);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -437,8 +437,8 @@ class dAdvancedIndustrialRobot : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointSliderPd* m_leftGripper;
-	ndJointSliderPd* m_rightGripper;
+	ndJointSlider* m_leftGripper;
+	ndJointSlider* m_rightGripper;
 	ndJointIk6DofEffector* m_effector;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;

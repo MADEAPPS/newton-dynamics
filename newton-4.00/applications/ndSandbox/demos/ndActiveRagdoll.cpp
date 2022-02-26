@@ -372,16 +372,18 @@ class ndActiveRagdollModel : public ndCharacter
 
 		if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
 		{
-			ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-
-			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-			ndJointSphericalPd* const joint = (ndJointSphericalPd*)jointNode->GetJoint();
-
 			dAssert(0);
-			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-			joint->SetSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
-			return jointNode;
+			return nullptr;
+			//ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+			//
+			//dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+			//ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
+			//
+			//dAssert(0);
+			//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+			//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+			//joint->SetSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+			//return jointNode;
 		}
 		else
 		{

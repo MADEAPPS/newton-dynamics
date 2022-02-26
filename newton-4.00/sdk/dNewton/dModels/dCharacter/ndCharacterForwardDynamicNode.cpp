@@ -23,7 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-#include "ndJointSphericalPd.h"
+#include "ndJointSpherical.h"
 #include "ndCharacterForwardDynamicNode.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
@@ -31,7 +31,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
 ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent)
 	:ndCharacterNode(parent)
 	,m_body(body)
-	,m_joint(new ndJointSphericalPd(matrixInGlobalSpace, body, parent->GetBody()))
+	,m_joint(new ndJointSpherical(matrixInGlobalSpace, body, parent->GetBody()))
 {
 	m_localPose = m_body->GetMatrix() * parent->GetBody()->GetMatrix().Inverse();
 }
@@ -50,7 +50,7 @@ ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const ndCharacterLo
 	const ndBody* const body = desc.m_bodyMap->Find(bodyHash)->GetInfo();
 	const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
 	m_body = (ndBodyDynamic*)body;
-	m_joint = (ndJointSphericalPd*)joint;
+	m_joint = (ndJointSpherical*)joint;
 }
 
 ndCharacterForwardDynamicNode::~ndCharacterForwardDynamicNode()

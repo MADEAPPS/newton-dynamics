@@ -27,22 +27,21 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHinge();
 
-	D_NEWTON_API virtual ndFloat32 GetAngle() const;
-	D_NEWTON_API virtual ndFloat32 GetOmega() const;
-	
+	D_NEWTON_API ndFloat32 GetAngle() const;
+	D_NEWTON_API ndFloat32 GetOmega() const;
 	D_NEWTON_API ndJacobianPair GetPinJacobian() const;
 
 	D_NEWTON_API void SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit);
 	D_NEWTON_API void GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit);
 
-	D_NEWTON_API virtual ndFloat32 GetOffsetAngle() const;
-	D_NEWTON_API virtual void SetOffsetAngle(ndFloat32 angle);
-	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API ndFloat32 GetOffsetAngle() const;
+	D_NEWTON_API void SetOffsetAngle(ndFloat32 angle);
+	D_NEWTON_API void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	protected:
-	ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
-	void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	bool SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
+	D_NEWTON_API void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API bool SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
