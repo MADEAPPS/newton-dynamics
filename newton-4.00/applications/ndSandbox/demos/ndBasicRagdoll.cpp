@@ -24,14 +24,6 @@
 class dJointDefinition
 {
 	public:
-	enum dCollsionMask
-	{
-		m_type0,
-		m_type1,
-		m_type2,
-		m_type3,
-	};
-
 	struct dJointLimit
 	{
 		ndFloat32 m_minTwistAngle;
@@ -47,8 +39,6 @@ class dJointDefinition
 	};
 
 	char m_boneName[32];
-	ndInt32 m_type;
-	ndInt32 m_typeMask;
 	ndFloat32 m_friction;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
@@ -56,46 +46,45 @@ class dJointDefinition
 
 static dJointDefinition mannequinDefinition[] =
 {
-	{ "Bip001 Pelvis", 1, 16, 0,{},{} },
+	{ "Bip001 Pelvis", 0,{},{} },
+	{ "Bip001 Spine1", 1.0f,{ -30.0f, 30.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 Head", 1.0f,{ -60.0f, 60.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 	
-	{ "Bip001 R Thigh", 16, 31, 1.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 90.0f, 0.0f } },
-	{ "Bip001 R Calf", 16, 31, 1.0f,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
-	{ "Bip001 R Foot", 16, 31, 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 R Thigh", 1.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 R Calf", 1.0f,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
+	{ "Bip001 R Foot", 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 	
-	{ "Bip001 L Thigh", 16, 31, 1.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 90.0f, 0.0f } },
-	{ "Bip001 L Calf", 16, 31, 1.0f,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
-	{ "Bip001 L Foot", 16, 31, 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 L Thigh", 1.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 L Calf", 1.0f,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
+	{ "Bip001 L Foot", 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
-	{ "Bip001 Head", 16, 31, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 90.0f, 0.0f } },
-	
-
-	{ "", 0, 0, 0,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
+	{ "", 0,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
 
 static dJointDefinition whiteManDefinition[] =
 {
-	{ "mixamorig:Hips", 1, 16, 0,{},{} },
+	{ "mixamorig:Hips", 0,{},{} },
+	
+	{ "mixamorig:Spine", 5.0f,{ -15.0f, 15.0f,  30.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine1", 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine2", 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Neck", 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+	
+	{ "mixamorig:RightUpLeg", 5.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightFoot", 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	
+	{ "mixamorig:LeftUpLeg", 5.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftLeg", 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:LeftFoot", 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	
+	{ "mixamorig:RightArm", 5.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightForeArm", 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 00.0f, 90.0f } },
+	
+	{ "mixamorig:LeftArm", 5.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftForeArm", 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
 
-	{ "mixamorig:Spine", 2, 16, 5.0f,{ -15.0f, 15.0f,  30.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:RightUpLeg", 16, 31, 5.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:RightFoot", 16, 31, 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:LeftUpLeg", 16, 31, 5.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:LeftFoot", 16, 31, 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:RightArm", 16, 27, 5.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 00.0f, 90.0f } },
-
-	{ "mixamorig:LeftArm", 16, 27, 5.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
-
-	{ "", 0, 0, 0,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
+	{ "", 0,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
 
 class ndRagdollEntityNotify : public ndDemoEntityNotify
