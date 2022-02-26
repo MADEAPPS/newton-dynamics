@@ -54,9 +54,10 @@ void ndJointHingePd::SetTarget(ndFloat32 angle)
 	m_targetAngle = angle;
 }
 
-void ndJointHingePd::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointHingePd::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix&)
 {
-	ndJointHinge::SubmitSpringDamper(desc, matrix0, matrix1);
+	AddAngularRowJacobian(desc, matrix0.m_front, m_targetAngle - m_angle);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
 void ndJointHingePd::JacobianDerivative(ndConstraintDescritor& desc)
