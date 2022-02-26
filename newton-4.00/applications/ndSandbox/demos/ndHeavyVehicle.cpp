@@ -627,8 +627,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		}
 	}
 
-	ndJointHingePd* m_turretHinge;
-	ndJointHingePd* m_cannonHinge;
+	ndJointHinge* m_turretHinge;
+	ndJointHinge* m_cannonHinge;
 	ndFloat32 m_turretAngle;
 	ndFloat32 m_turrectAngle0;
 	ndFloat32 m_cannonAngle;
@@ -825,8 +825,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		//}
 	}
 
-	ndJointHingePd* m_armHinge;
-	ndJointHingePd* m_bucketHinge;
+	ndJointHinge* m_armHinge;
+	ndJointHinge* m_bucketHinge;
 	ndFloat32 m_armAngle;
 	ndFloat32 m_bucketAngle;
 };

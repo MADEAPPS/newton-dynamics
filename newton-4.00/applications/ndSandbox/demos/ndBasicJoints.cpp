@@ -265,11 +265,11 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	}
 
 	{
-		class ndJointHingeMotor : public ndJointHingePd
+		class ndJointHingeOscilator : public ndJointHinge
 		{
 			public:
-			ndJointHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-				:ndJointHingePd(pinAndPivotFrame, child, parent)
+			ndJointHingeOscilator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+				:ndJointHinge(pinAndPivotFrame, child, parent)
 				,m_angle(0.0f)
 			{
 			}
@@ -278,8 +278,8 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 			{
 				m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
 				ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-				SetTarget(dist);
-				ndJointHingePd::JacobianDerivative(desc);
+				SetOffsetAngle(dist);
+				ndJointHinge::JacobianDerivative(desc);
 			}
 
 			ndFloat32 m_angle;
@@ -288,11 +288,38 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		// proportional derivative hinge motor with limits
 		matrix.m_posit.m_y += 1.2f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointHingePd* const joint = new ndJointHingeMotor(matrix, body, fixBody);
+		ndJointHinge* const joint = new ndJointHingeOscilator(matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
-		joint->SetLimits(-10.0f, 10.0f);
 		world->AddJoint(joint);
 	}
+
+	{
+		class ndJointHingeMotor : public ndJointHinge
+		{
+			public:
+			ndJointHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+				:ndJointHinge(pinAndPivotFrame, child, parent)
+				,m_speed(10.0f)
+			{
+			}
+
+			void JacobianDerivative(ndConstraintDescritor& desc)
+			{
+				ndFloat32 angle = GetAngle();
+				SetOffsetAngle(angle + m_speed * desc.m_timestep);
+				ndJointHinge::JacobianDerivative(desc);
+			}
+			ndFloat32 m_speed;
+		};
+
+		// proportional derivative hinge motor with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHingeMotor(matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
+		world->AddJoint(joint);
+	}
+
 
 	mesh->Release();
 }
@@ -560,13 +587,13 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
 	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
-	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
+	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;

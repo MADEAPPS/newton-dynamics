@@ -23,6 +23,7 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_offsetAngle(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 {
 }
@@ -35,6 +36,7 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& p
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_offsetAngle(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 {
 	ndMatrix tmp;
@@ -50,6 +52,7 @@ ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_damperC(ndFloat32(0.0f))
 	,m_minLimit(ndFloat32(-1.0e10f))
 	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_offsetAngle(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -60,6 +63,7 @@ ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_damperC = xmlGetFloat(xmlNode, "damperC");
 	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
 	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
+	m_offsetAngle = xmlGetFloat(xmlNode, "offsetAngle");
 	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
 }
 
@@ -80,6 +84,7 @@ void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "damperC", m_damperC);
 	xmlSaveParam(childNode, "minLimit", m_minLimit);
 	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(childNode, "offsetAngle", m_offsetAngle);
 	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
 }
 
@@ -109,6 +114,16 @@ void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
 {
 	minLimit = m_minLimit;
 	maxLimit = m_maxLimit;
+}
+
+ndFloat32 ndJointHinge::GetOffsetAngle() const
+{
+	return m_offsetAngle;
+}
+
+void ndJointHinge::SetOffsetAngle(ndFloat32 angle)
+{
+	m_offsetAngle = angle;
 }
 
 void ndJointHinge::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -160,7 +175,7 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
 {
 	// add spring damper row
-	AddAngularRowJacobian(desc, matrix0.m_front, -m_angle);
+	AddAngularRowJacobian(desc, matrix0.m_front, m_offsetAngle - m_angle);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 

@@ -57,7 +57,6 @@
 #include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
-#include <ndJointHingePd.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
 #include <ndShapeInstance.h>
