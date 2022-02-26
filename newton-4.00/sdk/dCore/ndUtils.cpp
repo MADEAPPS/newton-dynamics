@@ -28,6 +28,47 @@
 
 #define D_VERTEXLIST_INDEX_LIST_BASH (1024)
 
+// numerical recipe in c
+#define D_MAX_RAND		0x00ffffff
+#define D_RAND_MUL		1664525u
+#define D_ADD_ADD		1013904223u
+
+static ndUnsigned32 ___dRandSeed___ = 0;
+
+void dSetRandSeed(ndUnsigned32 seed)
+{
+	___dRandSeed___ = seed;
+}
+
+ndInt32 dRandInt()
+{
+	___dRandSeed___ = D_RAND_MUL * ___dRandSeed___ + D_ADD_ADD;
+	return ___dRandSeed___ & D_MAX_RAND;
+}
+
+/// return a random variable between 0.0 and 1.0
+ndFloat32 dRand()
+{
+	// numerical recipe in c
+	ndFloat32 r = ndFloat32(dRandInt()) * ((ndFloat32(1.0f) / D_MAX_RAND));
+	//dTrace(("%f\n", r));
+	return r;
+}
+
+/// return a pseudo Gaussian random with mean 0 and variance 0.5f
+ndFloat32 dGaussianRandom(ndFloat32 amp)
+{
+	// yes I know, this is not quite right but for now it will do for now.
+	const ndInt32 count = 4;
+	ndFloat32 r = ndFloat32(0.0f);
+	for (ndInt32 i = 0; i < count; i++)
+	{
+		r += ndFloat32(2.0f) * dRand() - ndFloat32(1.0f);
+	}
+	r *= (amp / count);
+	return r;
+}
+
 ndFloat64 dRoundToFloat(ndFloat64 val)
 {
 	ndInt32 exp;

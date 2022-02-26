@@ -15,28 +15,51 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDoubleHinge)
 
+ndJointDoubleHinge::ndAxisParam::ndAxisParam()
+	:m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_springK(ndFloat32(0.0f))
+	,m_damperC(ndFloat32(0.0f))
+	,m_minLimit(ndFloat32(-1.0e10f))
+	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_offsetAngle(ndFloat32(0.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
+{
+}
+
+void ndJointDoubleHinge::ndAxisParam::Load(const nd::TiXmlNode* const xmlNode)
+{
+	dAssert(0);
+	//m_angle0 = xmlGetFloat(xmlNode, "angle0");
+	//m_angle1 = xmlGetFloat(xmlNode, "angle1");
+	//m_omega0 = xmlGetFloat(xmlNode, "omega0");
+	//m_omega1 = xmlGetFloat(xmlNode, "omega1");
+}
+
+void ndJointDoubleHinge::ndAxisParam::Save(const nd::TiXmlNode* const xmlNode) const
+{
+	dAssert(0);
+	//xmlSaveParam(childNode, "angle0", m_angle0);
+	//xmlSaveParam(childNode, "angle1", m_angle1);
+	//xmlSaveParam(childNode, "omega0", m_omega0);
+	//xmlSaveParam(childNode, "omega1", m_omega1);
+}
+
 ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	,m_angle0(ndFloat32(0.0f))
-	,m_omega0(ndFloat32(0.0f))
-	,m_angle1(ndFloat32(0.0f))
-	,m_omega1(ndFloat32(0.0f))
+	,m_axis0()
+	,m_axis1()
 {
 }
 
 ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_angle0(ndFloat32(0.0f))
-	,m_omega0(ndFloat32(0.0f))
-	,m_angle1(ndFloat32(0.0f))
-	,m_omega1(ndFloat32(0.0f))
+	,m_axis0()
+	,m_axis1()
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_angle0 = xmlGetFloat(xmlNode, "angle0");
-	m_angle1 = xmlGetFloat(xmlNode, "angle1");
-	m_omega0 = xmlGetFloat(xmlNode, "omega0");
-	m_omega1 = xmlGetFloat(xmlNode, "omega1");
+	m_axis0.Load(xmlNode);
+	m_axis1.Load(xmlNode);
 }
 
 ndJointDoubleHinge::~ndJointDoubleHinge()
@@ -50,10 +73,8 @@ void ndJointDoubleHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "angle0", m_angle0);
-	xmlSaveParam(childNode, "angle1", m_angle1);
-	xmlSaveParam(childNode, "omega0", m_omega0);
-	xmlSaveParam(childNode, "omega1", m_omega1);
+	m_axis0.Save(childNode);
+	m_axis1.Save(childNode);
 }
 
 void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
@@ -80,13 +101,15 @@ void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatr
 	const ndVector omega1(m_body1->GetOmega());
 	
 	// calculate joint parameters, angles and omega
-	const ndFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);
-	m_angle0 += deltaAngle0;
-	m_omega0 = frontDir.DotProduct(omega0 - omega1).GetScalar();
+	//const ndFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);
+	const ndFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_axis0.m_angle);
+	m_axis0.m_angle += deltaAngle0;
+	m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
 	
-	const ndFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_angle1);
-	m_angle1 += deltaAngle1;
-	m_omega1 = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
+	//const ndFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_angle1);
+	const ndFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_axis1.m_angle);
+	m_axis1.m_angle += deltaAngle1;
+	m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 }
 
 void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
@@ -96,6 +119,17 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
+
+	//bool hitLimit = SubmitConstraintLimits(desc, matrix0, matrix1);
+	//if (!hitLimit)
+	//{
+	//	if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
+	//	{
+	//		// spring damper with limits
+	//		SubmitSpringDamper(desc, matrix0, matrix1);
+	//	}
+	//}
+
 
 	////// two rows to restrict rotation around around the parent coordinate system
 	////const ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);

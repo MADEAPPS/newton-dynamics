@@ -16,48 +16,6 @@
 
 #include "ndSandboxStdafx.h"
 
-// TODO: reference any additional headers you need in STDAFX.H
-// and not in this file
-
-static ndUnsigned32 ___dRandSeed___ = 0;
-
-void dSetRandSeed (ndUnsigned32 seed)
-{
-	___dRandSeed___	= seed; 
-}
-
-ndInt32 dRandInt()
-{
-	// numerical recipe in c
-	#define RAND_MUL 1664525u
-	#define RAND_ADD 1013904223u
-	___dRandSeed___ = RAND_MUL * ___dRandSeed___ + RAND_ADD;
-	return ___dRandSeed___ & dRAND_MAX;
-}
-
-
-/// return a random variable between 0.0 and 1.0
-ndFloat32 dRand()
-{
-	// numerical recipe in c
-	ndFloat32 r = ndFloat32(dRandInt()) * ((ndFloat32(1.0f) / dRAND_MAX));
-	//dTrace(("%f\n", r));
-	return r;
-}
-
-/// return a pseudo Gaussian random with mean 0 and variance 0.5f
-ndFloat32 dGaussianRandom (ndFloat32 amp)
-{
-	const ndInt32 count = 4;
-	ndFloat32 r = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < count; i++)
-	{
-		r += ndFloat32(2.0f) * dRand() - ndFloat32 (1.0f);
-	}
-	r *= (amp / count);
-	//dTrace(("%f\n", r));
-	return r;
-}
 
 // Windows user assets path
 void dGetWorkingFileName (const char* const name, char* const outPathName)

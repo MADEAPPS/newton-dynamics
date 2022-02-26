@@ -147,6 +147,11 @@ inline T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 /// Returns the time in micro seconds since application started 
 D_CORE_API ndUnsigned64 dGetTimeInMicroseconds();
 
+D_CORE_API ndFloat32 dRand();
+D_CORE_API ndInt32 dRandInt();
+D_CORE_API void dSetRandSeed(ndUnsigned32 seed);
+D_CORE_API ndFloat32 dGaussianRandom(ndFloat32 amp);
+
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
 /// \param ndFloat64 val: 64 bit float 
 /// \return a 64 bit double precision with a 32 bit mantissa

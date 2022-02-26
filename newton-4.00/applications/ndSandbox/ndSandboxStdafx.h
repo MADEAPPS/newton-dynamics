@@ -110,13 +110,6 @@
 	#endif
 #endif
 
-#define dRAND_MAX		0x00ffffff
-
-ndFloat32 dRand();
-ndInt32 dRandInt();
-void dSetRandSeed (ndUnsigned32 seed);
-ndFloat32 dGaussianRandom (ndFloat32 amp);
-
 inline ndInt32 dTwosPower (ndInt32 x)
 {
 	ndInt32 rval=1;

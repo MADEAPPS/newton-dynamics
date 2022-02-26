@@ -343,21 +343,11 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 
 	{
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-
-		//ndVector massMatrix(body->GetMassMatrix());
-		//ndFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
-		//massMatrix.m_x = maxInertia;
-		//massMatrix.m_y = maxInertia;
-		//massMatrix.m_z = maxInertia;
-		//body->SetMassMatrix(massMatrix);
-		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
-
-		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
-		//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
-		//joint->SetFriction(2.0f);
-		//joint->SetLimits(true, -10.0f, 15.0f);
-		world->AddJoint(joint);
+		//ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		//body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
+		//
+		//ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
+		//world->AddJoint(joint);
 	}
 
 	{
@@ -587,13 +577,13 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
-	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
+	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
