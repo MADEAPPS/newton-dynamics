@@ -314,22 +314,55 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	matrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
-	//ndVector massMatrix(body->GetMassMatrix());
-	//ndFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
-	//massMatrix.m_x = maxInertia;
-	//massMatrix.m_y = maxInertia;
-	//massMatrix.m_z = maxInertia;
-	//body->SetMassMatrix(massMatrix);
-	body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
+	{
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
-	ndJointDoubleHinge* const joint = new ndJointDoubleHinge (matrix, body, fixBody);
-	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
-	//joint->SetFriction(2.0f);
-	//joint->SetLimits(true, -10.0f, 15.0f);
-	world->AddJoint(joint);
+		//ndVector massMatrix(body->GetMassMatrix());
+		//ndFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
+		//massMatrix.m_x = maxInertia;
+		//massMatrix.m_y = maxInertia;
+		//massMatrix.m_z = maxInertia;
+		//body->SetMassMatrix(massMatrix);
+		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
 
+		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
+		//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
+		//joint->SetFriction(2.0f);
+		//joint->SetLimits(true, -10.0f, 15.0f);
+		world->AddJoint(joint);
+	}
+
+	{
+		class ndJointDoubleHingeMotor : public ndJointDoubleHingePd
+		{
+			public:
+				ndJointDoubleHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+				:ndJointDoubleHingePd(pinAndPivotFrame, child, parent)
+				,m_angle(0.0f)
+			{
+			}
+
+			void JacobianDerivative(ndConstraintDescritor& desc)
+			{
+				//m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+				//ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+				//SetTarget(dist);
+				ndJointDoubleHingePd::JacobianDerivative(desc);
+			}
+
+			ndFloat32 m_angle;
+		};
+
+		// proportional derivative hinge motor with limits
+		matrix.m_posit.m_z += 1.8f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body, fixBody);
+		//joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
+		//joint->SetLimits(-10.0f, 10.0f);
+		world->AddJoint(joint);
+	}
+	
 	mesh->Release();
 }
 

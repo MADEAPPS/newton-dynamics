@@ -76,6 +76,7 @@
 #include <ndCharacterRootNode.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
+#include <ndJointDoubleHingePd.h>
 #include <ndJointIk6DofEffector.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointIkBallAndSocket.h>
