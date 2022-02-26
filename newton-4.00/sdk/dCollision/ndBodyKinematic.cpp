@@ -446,10 +446,12 @@ void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)
 	const ndFloat32 maxLinearStep2 = m_maxLinearStep * m_maxLinearStep;
 	if ((angular2 > maxAngularStep2) || (linear2 > maxLinearStep2))
 	{
-		extern int xxxxxxxxxxxxxxxxxxx;
-		dTrace(("%d ", xxxxxxxxxxxxxxxxxxx));
-		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueId,
-			m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
+		//extern int xxxxxxxxxxxxxxxxxxx;
+		//dTrace(("%d ", xxxxxxxxxxxxxxxxxxx));
+		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", 
+			m_uniqueId,	
+			m_omega.m_x, m_omega.m_y, m_omega.m_z, 
+			m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
 		//dAssert(0);
 	}
 #endif

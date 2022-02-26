@@ -54,6 +54,50 @@ class dJointDefinition
 	dFrameMatrix m_frameBasics;
 };
 
+static dJointDefinition mannequinDefinition[] =
+{
+	{ "Bip001 Pelvis", 1, 16, 0,{},{} },
+	
+	{ "Bip001 R Thigh", 16, 31, 1.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 R Calf", 16, 31, 1.0f,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
+	{ "Bip001 R Foot", 16, 31, 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	
+	{ "Bip001 L Thigh", 16, 31, 1.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "Bip001 L Calf", 16, 31, 1.0f,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
+	{ "Bip001 L Foot", 16, 31, 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+
+	{ "Bip001 Head", 16, 31, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 90.0f, 0.0f } },
+	
+
+	{ "", 0, 0, 0,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
+};
+
+static dJointDefinition whiteManDefinition[] =
+{
+	{ "mixamorig:Hips", 1, 16, 0,{},{} },
+
+	{ "mixamorig:Spine", 2, 16, 5.0f,{ -15.0f, 15.0f,  30.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine1", 4, 16, 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine2", 8, 16, 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Neck", 16, 31, 5.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+
+	{ "mixamorig:RightUpLeg", 16, 31, 5.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightFoot", 16, 31, 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+
+	{ "mixamorig:LeftUpLeg", 16, 31, 5.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftLeg", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:LeftFoot", 16, 31, 5.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+
+	{ "mixamorig:RightArm", 16, 27, 5.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightForeArm", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 00.0f, 90.0f } },
+
+	{ "mixamorig:LeftArm", 16, 27, 5.0f,{ -45.0f, 45.0f, 80.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftForeArm", 16, 31, 5.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
+
+	{ "", 0, 0, 0,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
+};
+
 class ndRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
@@ -92,55 +136,32 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 	ndMatrix m_bindMatrix;
 };
 
-static dJointDefinition jointsDefinition[] =
-{
-	{ "mixamorig:Hips", 1, 16, 0, {}, {}},
-	
-	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	
-	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:RightFoot", 16, 31, 10.0f, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
-	
-	{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:LeftFoot", 16, 31, 10.0f, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
-	
-	{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-	
-	{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-};
 
 class ndRagdollModel : public ndModel
 {
 	public:
-	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location)
+	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location, dJointDefinition* const definition)
 		:ndModel()
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)ragdollMesh->CreateClone();
 		scene->AddEntity(entity);
 		ndWorld* const world = scene->GetWorld();
-		
+
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(definition[0].m_boneName);
+		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
+		entity->ResetMatrix(dGetIdentityMatrix());
+
 		// find the floor location 
-		ndMatrix matrix(location);
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y + 1.0f;
+		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
-		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 		m_bodies.PushBack(rootBody);
 
 		ndInt32 stack = 0;
-		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
-		
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		parentBones.SetCount(32);
@@ -160,15 +181,15 @@ class ndRagdollModel : public ndModel
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
-			for (ndInt32 i = 0; i < definitionCount; i++) 
+			for (ndInt32 i = 0; definition[i].m_boneName[0]; i++)
 			{
-				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
+				if (!strcmp(definition[i].m_boneName, name))
 				{
 					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
 					m_bodies.PushBack(childBody);
 		
 					// connect this body part to its parentBody with a ragdoll joint
-					m_joints.PushBack (ConnectBodyParts(childBody, parentBone, jointsDefinition[i]));
+					m_joints.PushBack (ConnectBodyParts(childBody, parentBone, definition[i]));
 					parentBone = childBody;
 					break;
 				}
@@ -238,9 +259,9 @@ class ndRagdollModel : public ndModel
 			ndVector inertia(body->GetMassMatrix());
 			ndFloat32 maxInertia = dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z);
 			ndFloat32 minInertia = dMin(dMin(inertia.m_x, inertia.m_y), inertia.m_z);
-			if (minInertia < maxInertia * 0.5f)
+			if (minInertia < maxInertia * 0.125f)
 			{
-				minInertia = maxInertia * 0.5f;
+				minInertia = maxInertia * 0.125f;
 				for (ndInt32 j = 0; j < 3; j++)
 				{
 					if (inertia[j] < minInertia)
@@ -282,7 +303,7 @@ class ndRagdollModel : public ndModel
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		joint->SetViscousFriction(0.1f, definition.m_friction);
+		joint->SetViscousFriction(0.2f, definition.m_friction);
 		return joint;
 	}
 
@@ -316,39 +337,92 @@ class ndRagdollModel : public ndModel
 	//void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
 	void PostTransformUpdate(ndWorld* const, ndFloat32)
 	{
+		ndInt32 sleepCount = 0;
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+		{
+			ndBodyDynamic* const body = m_bodies[i];
+			sleepCount += body->GetSleepState() ? 1 : 0;
+		}
+		if ((sleepCount > 0) && (sleepCount < m_bodies.GetCount()))
+		{
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				ndBodyDynamic* const body = m_bodies[i];
+				if (body->GetSleepState() == true) 
+				{
+					ndBodyNotify* const notify = body->GetNotifyCallback();
+					dAssert(notify);
+					notify->OnTransform(0, body->GetMatrix());
+				}
+			}
+		}
 	}
 
-	//ndIkSolver m_solver;
 	ndArray<ndBodyDynamic*> m_bodies;
 	ndArray<ndJointSpherical*> m_joints;
 };
+
+void BuildWhiteMan(ndDemoEntityManager* const scene, const ndVector& origin)
+{
+	ndMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	matrix.m_posit.m_y = 0.5f;
+
+	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
+
+	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix, whiteManDefinition);
+	scene->GetWorld()->AddModel(ragdoll);
+
+	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_z -= 2.0f;
+	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix, whiteManDefinition));
+
+	matrix.m_posit.m_z = 2.0f;
+	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix, whiteManDefinition));
+
+	delete ragdollMesh;
+}
+
+void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
+{
+	ndMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	matrix.m_posit.m_y = 0.5f;
+	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("mannequin.fbx");
+
+	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition);
+	scene->GetWorld()->AddModel(ragdoll);
+
+	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_z -= 2.0f;
+	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition));
+
+	matrix.m_posit.m_z = 2.0f;
+	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition));
+
+	delete ragdollMesh;
+}
 
 void ndBasicRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
+	ndVector origin(0.0f, 0.0f, 0.0f, 0.0f);
+	origin.m_x += 20.0f;
+	AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
-	ndMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.5f;
-	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix);
-	scene->SetSelectedModel(ragdoll);
-	scene->GetWorld()->AddModel(ragdoll);
+	origin.m_x -= 20.0f;
+	BuildMannequin(scene, origin); 
 
-	matrix.m_posit.m_x += 2.0f;
-	matrix.m_posit.m_z -= 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	origin.m_x -= 2.0f;
+	BuildWhiteMan(scene, origin);
 
-	matrix.m_posit.m_z = 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
-
-	origin1.m_x += 20.0f;
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
-
-	delete ragdollMesh;
 	ndQuaternion rot;
-	ndVector origin(-5.0f, 1.0f, 0.0f, 0.0f);
+	origin.m_x -= 3.0f;
+	origin.m_y = 2.0f;
 	scene->SetCameraMatrix(rot, origin);
 }

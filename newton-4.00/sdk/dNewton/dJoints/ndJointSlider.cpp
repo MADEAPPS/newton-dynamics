@@ -114,9 +114,9 @@ ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
 	return speed;
 }
 
-bool ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	bool ret = false;
+	ndInt8 ret = false;
 	if ((m_minLimit == ndFloat32 (0.0f)) && (m_maxLimit == ndFloat32(0.0f)))
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
@@ -194,7 +194,7 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	bool hitLimit = SubmitConstraintLimits(desc, matrix0, matrix1);
+	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
 	if (!hitLimit)
 	{
 		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))

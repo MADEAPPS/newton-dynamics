@@ -220,9 +220,9 @@ ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-bool ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	bool ret = false;
+	ndInt8 ret = 0;
 	if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
 	{
 		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
@@ -261,7 +261,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	bool hitLimit = SubmitConstraintLimits(desc, matrix0, matrix1);
+	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
 	if (!hitLimit)
 	{
 		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))

@@ -39,7 +39,7 @@
 	#include "ndDynamicsUpdateOpencl.h"
 #endif
 
-int xxxxxxxxxxxxxxxxxxx;
+//ndInt32 xxxxxxxxxxxxxxxxxxx;
 
 class ndSkeletonQueue : public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
@@ -482,7 +482,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	D_TRACKTIME();
 
 	// do physics step
-xxxxxxxxxxxxxxxxxxx = m_subStepIndex;
+	//xxxxxxxxxxxxxxxxxxx = m_subStepIndex;
 
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);

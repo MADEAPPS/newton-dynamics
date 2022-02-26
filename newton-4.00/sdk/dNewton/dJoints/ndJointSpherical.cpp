@@ -184,9 +184,9 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 }
 
-bool ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+ndInt8 ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 {
-	bool ret = false;
+	ndInt8 ret = false;
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 	{
 		AddAngularRowJacobian(desc, pin, -angle);
@@ -222,7 +222,7 @@ bool ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, nd
 	return ret;
 }
 
-bool ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+ndInt8 ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	if (m_maxConeAngle < (ndFloat32 (1.0f) * ndDegreeToRad))
 	{
@@ -238,9 +238,9 @@ bool ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& m
 	return SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-bool ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	bool ret = false;
+	ndInt8 ret = false;
 	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 	lateralDir = lateralDir.Normalize();
@@ -271,7 +271,7 @@ bool ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 
 	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	bool ret1 = SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	ndInt8 ret1 = SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 	return ret1 | ret;
 }
 
@@ -317,9 +317,9 @@ void ndJointSpherical::SubmitFriction(ndConstraintDescritor& desc)
 	}
 }
 
-bool ndJointSpherical::SubmitAngleLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+ndInt8 ndJointSpherical::SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	bool ret = false;
+	ndInt8 ret = false;
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))
 	{
@@ -340,7 +340,7 @@ void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ApplyBaseRows(matrix0, matrix1, desc);
-	bool hitLimit = SubmitAngleLimits(matrix0, matrix1, desc);
+	ndInt8 hitLimit = SubmitLimits(matrix0, matrix1, desc);
 	if (!hitLimit)
 	{
 		SubmitFriction(desc);
