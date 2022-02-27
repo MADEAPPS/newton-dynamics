@@ -98,8 +98,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 				:ndJointSpherical(pinAndPivotFrame, child, parent)
 				,m_rollAngle(0.0f)
 				,m_pitchAngle(0.0f)
-				,m_rollOmega(10.0f)
-				,m_pitchOmega(0.0f)
+				,m_rollOmega(5.0f)
+				,m_pitchOmega(6.0f)
 			{
 				ndFloat32 friction = 10.0f;
 				ndFloat32 spring = 1500.0f;
@@ -109,14 +109,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 			void JacobianDerivative(ndConstraintDescritor& desc)
 			{
-				//m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
-				//ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-				//SetOffsetAngle0(dist);
-				//
-				//ndFloat32 angle = GetAngle1();
-				//SetOffsetAngle1(angle + m_speed * desc.m_timestep);
-
-				m_rollAngle = ndFmod(m_rollAngle + 5.0f * desc.m_timestep, 2.0f * ndPi);
+				m_rollAngle = ndFmod(m_rollAngle + m_rollOmega * desc.m_timestep, 2.0f * ndPi);
+				m_pitchAngle = ndFmod(m_pitchAngle + m_pitchOmega * desc.m_timestep, 2.0f * ndPi);
 
 				const ndMatrix rotaion(dPitchMatrix(m_pitchAngle) * dRollMatrix(m_rollAngle));
 				SetOffsetRotation(rotaion);
