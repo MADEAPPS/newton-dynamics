@@ -343,11 +343,11 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 
 	{
-		//ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		//body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
-		//
-		//ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
-		//world->AddJoint(joint);
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
+		
+		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
+		world->AddJoint(joint);
 	}
 
 	{
@@ -357,26 +357,32 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 				ndJointDoubleHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 				:ndJointDoubleHinge(pinAndPivotFrame, child, parent)
 				,m_angle(0.0f)
+				,m_speed(10.0f)
 			{
 			}
 
 			void JacobianDerivative(ndConstraintDescritor& desc)
 			{
-				//m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
-				//ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-				//SetTarget(dist);
+				m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+				ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+				SetOffsetAngle0(dist);
+
+				ndFloat32 angle = GetAngle1();
+				SetOffsetAngle1(angle + m_speed * desc.m_timestep);
+
 				ndJointDoubleHinge::JacobianDerivative(desc);
 			}
 
 			ndFloat32 m_angle;
+			ndFloat32 m_speed;
 		};
 
 		// proportional derivative hinge motor with limits
 		matrix.m_posit.m_z += 1.8f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body, fixBody);
-		//joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
-		//joint->SetLimits(-10.0f, 10.0f);
+		joint->SetAsSpringDamper0(0.1f, 1500.0f, 10.0f);
+		joint->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
 		world->AddJoint(joint);
 	}
 	
