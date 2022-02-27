@@ -17,7 +17,7 @@
 
 #define D_MAX_SPHERICAL_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_SPHERICAL_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
-#define D_BALL_AND_SOCKED_MAX_ANGLE		(ndFloat32 (150.0f) * ndDegreeToRad)
+#define D_MAX_SPHERICAL_CONE_ANGLE		(ndFloat32 (150.0f) * ndDegreeToRad)
 
 class ndJointSpherical: public ndJointBilateralConstraint
 {
@@ -27,11 +27,13 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSpherical();
 
-	D_NEWTON_API virtual ndFloat32 GetConeLimit() const;
-	D_NEWTON_API virtual void SetConeLimit(ndFloat32 maxConeAngle);
-	D_NEWTON_API virtual void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
-	D_NEWTON_API virtual void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
-	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API ndFloat32 GetConeLimit() const;
+	D_NEWTON_API ndMatrix GetOffsetRotation() const;
+	D_NEWTON_API void SetConeLimit(ndFloat32 maxConeAngle);
+	D_NEWTON_API void SetOffsetRotation(const ndMatrix& rotation);
+	D_NEWTON_API void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
+	D_NEWTON_API void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
+	D_NEWTON_API void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 	D_NEWTON_API void GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
 
 	protected:

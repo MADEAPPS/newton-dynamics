@@ -91,23 +91,54 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	matrix.m_posit.m_w = 1.0f;
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	{
+		class ndJointSphericalMotor : public ndJointSpherical
+		{
+			public:
+			ndJointSphericalMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+				:ndJointSpherical(pinAndPivotFrame, child, parent)
+				,m_rollAngle(0.0f)
+				,m_pitchAngle(0.0f)
+				,m_rollOmega(10.0f)
+				,m_pitchOmega(0.0f)
+			{
+				ndFloat32 friction = 10.0f;
+				ndFloat32 spring = 1500.0f;
+				ndFloat32 regularizer = 0.01f;
+				SetAsSpringDamper(regularizer, spring, friction);
+			}
+
+			void JacobianDerivative(ndConstraintDescritor& desc)
+			{
+				//m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+				//ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+				//SetOffsetAngle0(dist);
+				//
+				//ndFloat32 angle = GetAngle1();
+				//SetOffsetAngle1(angle + m_speed * desc.m_timestep);
+
+				m_rollAngle = ndFmod(m_rollAngle + 5.0f * desc.m_timestep, 2.0f * ndPi);
+
+				const ndMatrix rotaion(dPitchMatrix(m_pitchAngle) * dRollMatrix(m_rollAngle));
+				SetOffsetRotation(rotaion);
+				ndJointSpherical::JacobianDerivative(desc);
+			}
+
+			ndFloat32 m_rollAngle;
+			ndFloat32 m_pitchAngle;
+			ndFloat32 m_rollOmega;
+			ndFloat32 m_pitchOmega;
+		};
+
+
 		// add a spherical motor.
 		matrix.m_posit.m_y = floor.m_y;
 		matrix.m_posit.m_y += diameter;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		
-		ndFloat32 friction = 10.0f;
-		ndFloat32 spring = 1500.0f;
-		ndFloat32 regularizer = 0.01f;
-		
 		ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
 		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
 		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, body, fixBody);
-		joint->SetAsSpringDamper(regularizer, spring, friction);
-		//joint->SetConeLimit(60.0f * ndDegreeToRad);
-		//joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+		ndJointSpherical* const joint = new ndJointSphericalMotor(bodyMatrix0, body, fixBody);
 		world->AddJoint(joint);
 	}
 

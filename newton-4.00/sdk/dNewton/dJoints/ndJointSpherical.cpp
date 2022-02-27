@@ -78,6 +78,16 @@ ndFloat32 ndJointSpherical::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
+ndMatrix ndJointSpherical::GetOffsetRotation() const
+{
+	return m_rotation;
+}
+
+void ndJointSpherical::SetOffsetRotation(const ndMatrix& rotation)
+{
+	m_rotation = rotation;
+}
+
 void ndJointSpherical::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
 	m_springK = dAbs(spring);
@@ -111,7 +121,8 @@ ndFloat32 ndJointSpherical::GetConeLimit() const
 
 void ndJointSpherical::SetConeLimit(ndFloat32 maxConeAngle)
 {
-	m_maxConeAngle = dClamp (maxConeAngle, ndFloat32 (0.0f), D_BALL_AND_SOCKED_MAX_ANGLE);
+	//m_maxConeAngle = dClamp (maxConeAngle, ndFloat32 (0.0f), D_BALL_AND_SOCKED_MAX_ANGLE);
+	m_maxConeAngle = dClamp(maxConeAngle, ndFloat32(0.0f), ndFloat32(1.0e10f));
 }
 
 void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -179,7 +190,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 	
 	// show cone angle limits
-	if ((m_maxConeAngle > ndFloat32 (0.0f)) && (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE)) 
+	if ((m_maxConeAngle > ndFloat32 (0.0f)) && (m_maxConeAngle < D_MAX_SPHERICAL_CONE_ANGLE))
 	{
 		ndVector color(ndFloat32(0.3f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 		ndVector point(radius * ndCos(m_maxConeAngle), radius * ndSin(m_maxConeAngle), ndFloat32 (0.0f), ndFloat32(0.0f));
@@ -260,42 +271,46 @@ ndInt8 ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix&
 ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndInt8 ret = false;
-	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
-	lateralDir = lateralDir.Normalize();
-	const ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-	const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	if (coneAngle > m_maxConeAngle)
-	{ 
-		if (m_maxConeAngle > (ndFloat32(1.0f) * ndDegreeToRad))
+	if (m_maxConeAngle < D_MAX_SPHERICAL_CONE_ANGLE)
+	{
+		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+		lateralDir = lateralDir.Normalize();
+		const ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+		const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+		if (coneAngle > m_maxConeAngle)
 		{
-			AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
-			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const ndFloat32 penetration = coneAngle - m_maxConeAngle;
-			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
-			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
-			SetHighFriction(desc, ndFloat32(0.0f));
-			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
-		}
-		else
-		{
-			// two rows to restrict rotation around around the parent coordinate system
-			ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-			AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-			SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
-			SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+			if (m_maxConeAngle > (ndFloat32(1.0f) * ndDegreeToRad))
+			{
+				AddAngularRowJacobian(desc, lateralDir, ndFloat32(0.0f));
+				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+				const ndFloat32 penetration = coneAngle - m_maxConeAngle;
+				const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
+				SetMotorAcceleration(desc, stopAccel - recoveringAccel);
+				SetHighFriction(desc, ndFloat32(0.0f));
+				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+			}
+			else
+			{
+				// two rows to restrict rotation around around the parent coordinate system
+				ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+				AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+				SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+				SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
 
-			ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-			AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-			SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
-			SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+				ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+				AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+				SetLowerFriction(desc, -D_LCP_MAX_VALUE * ndFloat32(0.1f));
+				SetHighFriction(desc, D_LCP_MAX_VALUE * ndFloat32(0.1f));
+			}
 		}
+
+		const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+		ndInt8 ret1 = SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+		ret = ret1 | ret;
 	}
-
-	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-	const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	ndInt8 ret1 = SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
-	return ret1 | ret;
+	return ret;
 }
 
 void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
