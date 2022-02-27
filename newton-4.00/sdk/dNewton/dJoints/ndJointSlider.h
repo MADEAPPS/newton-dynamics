@@ -35,9 +35,9 @@ class ndJointSlider: public ndJointBilateralConstraint
 	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	protected:
-	ndFloat32 PenetrationSpeed(ndFloat32 penetration) const;
-	ndInt8 SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API ndFloat32 PenetrationSpeed(ndFloat32 penetration) const;
+	D_NEWTON_API ndInt8 SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
 	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

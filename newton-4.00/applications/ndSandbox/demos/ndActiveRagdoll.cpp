@@ -398,7 +398,7 @@ class ndActiveRagdollModel : public ndCharacter
 			dAssert(0);
 			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-			joint->SetViscousFriction(ndFloat32(0.0f), ndFloat32(0.0f));
+			joint->SetAsSpringDamper(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 			return jointNode;
 		}
 	}

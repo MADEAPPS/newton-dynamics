@@ -136,7 +136,8 @@ ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, ndFloat32 invdt
 	ndQuaternion q0 (*this);
 	if (q0.DotProduct (q1).GetScalar() < ndFloat32 (0.0f)) 
 	{
-		q0 = q0.Scale(ndFloat32 (-1.0f));
+		//q0 = q0.Scale(ndFloat32 (-1.0f));
+		q0 = q0 * ndVector::m_negOne;
 	}
 	ndQuaternion dq (q0.Inverse() * q1);
 	ndVector omegaDir (dq.m_x, dq.m_y, dq.m_z, ndFloat32 (0.0f));

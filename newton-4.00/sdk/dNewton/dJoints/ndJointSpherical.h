@@ -31,28 +31,29 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	D_NEWTON_API virtual void SetConeLimit(ndFloat32 maxConeAngle);
 	D_NEWTON_API virtual void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
 	D_NEWTON_API virtual void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
-	D_NEWTON_API virtual void SetViscousFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
+	D_NEWTON_API virtual void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API void GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-	ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
+	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
+	D_NEWTON_API void ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitSpringDamper(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API ndInt8 SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API ndInt8 SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
+	D_NEWTON_API ndInt8 SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API ndInt8 SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
-	void SubmitFriction(ndConstraintDescritor& desc);
-	void ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-
-	ndInt8 SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	ndInt8 SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
-	ndInt8 SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	ndInt8 SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	
+	ndMatrix m_rotation;
+	ndFloat32 m_springK;
+	ndFloat32 m_damperC;
 	ndFloat32 m_maxConeAngle;
 	ndFloat32 m_minTwistAngle;
 	ndFloat32 m_maxTwistAngle;
-	ndFloat32 m_viscousFriction;
-	ndFloat32 m_viscousFrictionRegularizer;
+	ndFloat32 m_springDamperRegularizer;
 };
 
 #endif 

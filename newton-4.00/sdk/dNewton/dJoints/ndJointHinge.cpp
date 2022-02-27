@@ -133,6 +133,13 @@ void ndJointHinge::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, nd
 	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
+void ndJointHinge::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+{
+	spring = m_springK;
+	damper = m_damperC;
+	regularizer = m_springDamperRegularizer;
+}
+
 void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndMatrix matrix0;

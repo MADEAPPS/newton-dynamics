@@ -35,6 +35,7 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit);
 	D_NEWTON_API void GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit);
 	D_NEWTON_API void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API void GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
 
 	protected:
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;

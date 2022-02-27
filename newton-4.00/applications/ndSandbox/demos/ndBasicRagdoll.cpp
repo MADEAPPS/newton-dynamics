@@ -292,7 +292,7 @@ class ndRagdollModel : public ndModel
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		joint->SetViscousFriction(0.2f, definition.m_friction);
+		joint->SetAsSpringDamper(0.2f, ndFloat32 (0.0f), definition.m_friction);
 		return joint;
 	}
 

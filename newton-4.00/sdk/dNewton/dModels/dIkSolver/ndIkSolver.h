@@ -37,9 +37,7 @@ class ndIkSolver: public ndClassAlloc
 	D_NEWTON_API void SetMaxIterations(ndInt32 iterCount);
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
 	D_NEWTON_API void AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
-
 	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
-	D_NEWTON_API void ProjectVelocities(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
 
 	D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
 	D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
