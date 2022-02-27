@@ -27,24 +27,28 @@ ndJointDoubleHinge::ndAxisParam::ndAxisParam()
 {
 }
 
-//void ndJointDoubleHinge::ndAxisParam::Load(const nd::TiXmlNode* const xmlNode)
-void ndJointDoubleHinge::ndAxisParam::Load(const nd::TiXmlNode* const)
+void ndJointDoubleHinge::ndAxisParam::Load(const nd::TiXmlElement* const xmlNode)
 {
-	dAssert(0);
-	//m_angle0 = xmlGetFloat(xmlNode, "angle0");
-	//m_angle1 = xmlGetFloat(xmlNode, "angle1");
-	//m_omega0 = xmlGetFloat(xmlNode, "omega0");
-	//m_omega1 = xmlGetFloat(xmlNode, "omega1");
+	m_angle = xmlGetFloat(xmlNode, "angle");
+	m_omega = xmlGetFloat(xmlNode, "omega");
+	m_springK = xmlGetFloat(xmlNode, "springK");
+	m_damperC = xmlGetFloat(xmlNode, "damperC");
+	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
+	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
+	m_offsetAngle = xmlGetFloat(xmlNode, "offsetAngle");
+	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
 }
 
-//void ndJointDoubleHinge::ndAxisParam::Save(const nd::TiXmlNode* const xmlNode) const
-void ndJointDoubleHinge::ndAxisParam::Save(const nd::TiXmlNode* const) const
+void ndJointDoubleHinge::ndAxisParam::Save(nd::TiXmlElement* const xmlNode) const
 {
-	dAssert(0);
-	//xmlSaveParam(childNode, "angle0", m_angle0);
-	//xmlSaveParam(childNode, "angle1", m_angle1);
-	//xmlSaveParam(childNode, "omega0", m_omega0);
-	//xmlSaveParam(childNode, "omega1", m_omega1);
+	xmlSaveParam(xmlNode, "angle", m_angle);
+	xmlSaveParam(xmlNode, "omega", m_omega);
+	xmlSaveParam(xmlNode, "springK", m_springK);
+	xmlSaveParam(xmlNode, "damperC", m_damperC);
+	xmlSaveParam(xmlNode, "minLimit", m_minLimit);
+	xmlSaveParam(xmlNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(xmlNode, "offsetAngle", m_offsetAngle);
+	xmlSaveParam(xmlNode, "springDamperRegularizer", m_springDamperRegularizer);
 }
 
 ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
@@ -61,8 +65,12 @@ ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& d
 {
 	dAssert(m_maxDof == 8);
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	m_axis0.Load(xmlNode);
-	m_axis1.Load(xmlNode);
+
+	const nd::TiXmlNode* const axis0 = xmlFind(xmlNode, "axis0");
+	m_axis0.Load((nd::TiXmlElement*)axis0);
+
+	const nd::TiXmlNode* const axis1 = xmlFind(xmlNode, "axis1");
+	m_axis1.Load((nd::TiXmlElement*)axis1);
 }
 
 ndJointDoubleHinge::~ndJointDoubleHinge()
@@ -76,8 +84,14 @@ void ndJointDoubleHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	m_axis0.Save(childNode);
-	m_axis1.Save(childNode);
+	nd::TiXmlElement* const axis0 = new nd::TiXmlElement("axis0");
+	childNode->LinkEndChild(axis0);
+	m_axis0.Save(axis0);
+
+	nd::TiXmlElement* const axis1 = new nd::TiXmlElement("axis1");
+	childNode->LinkEndChild(axis1);
+	m_axis0.Save(axis1);
+
 }
 
 ndFloat32 ndJointDoubleHinge::GetAngle0() const
@@ -204,7 +218,8 @@ ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+//ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor&, const ndMatrix&, const ndMatrix&)
 {
 	ndInt8 ret = 0;
 	//if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
@@ -238,13 +253,13 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMat
 	return ret;
 }
 
-void ndJointDoubleHinge::SubmitSpringDamper0(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointDoubleHinge::SubmitSpringDamper0(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix&)
 {
 	AddAngularRowJacobian(desc, matrix0.m_front, m_axis0.m_offsetAngle - m_axis0.m_angle);
 	SetMassSpringDamperAcceleration(desc, m_axis0.m_springDamperRegularizer, m_axis0.m_springK, m_axis0.m_damperC);
 }
 
-void ndJointDoubleHinge::SubmitSpringDamper1(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointDoubleHinge::SubmitSpringDamper1(ndConstraintDescritor& desc, const ndMatrix&, const ndMatrix& matrix1)
 {
 	AddAngularRowJacobian(desc, matrix1.m_up, m_axis1.m_offsetAngle - m_axis1.m_angle);
 	SetMassSpringDamperAcceleration(desc, m_axis1.m_springDamperRegularizer, m_axis1.m_springK, m_axis1.m_damperC);

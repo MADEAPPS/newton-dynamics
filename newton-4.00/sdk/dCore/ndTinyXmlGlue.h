@@ -45,5 +45,7 @@ D_CORE_API ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char
 D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array);
 
+D_CORE_API const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* const name);
+
 #endif
 

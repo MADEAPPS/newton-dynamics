@@ -257,3 +257,16 @@ const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const 
 	dAssert(element);
 	return element->Attribute("string");
 }
+
+const nd::TiXmlNode* xmlFind(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	//for (const nd::TiXmlElement* node = (nd::TiXmlElement*) rootNode->FirstChild(name); node; node = (nd::TiXmlElement*) node->NextSibling())
+	//{
+	//	const char* const text = node->GetText();
+	//	if (!strcmp(text, name))
+	//	{
+	//		return node;
+	//	}
+	//}
+	return rootNode->FirstChild(name);
+}

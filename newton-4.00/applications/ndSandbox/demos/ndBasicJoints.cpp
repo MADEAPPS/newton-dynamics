@@ -377,7 +377,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 			ndFloat32 m_speed;
 		};
 
-		// proportional derivative hinge motor with limits
+		// proportional derivative double hinge motor
 		matrix.m_posit.m_z += 1.8f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body, fixBody);
