@@ -63,6 +63,7 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndCharacterNode.h>
+#include <ndIk6DofEffector.h>
 #include <ndJointSpherical.h>
 #include <ndDynamicsUpdate.h>
 #include <ndJointFollowPath.h>
@@ -73,7 +74,6 @@
 #include <ndCharacterRootNode.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
-#include <ndJointIk6DofEffector.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointIkBallAndSocket.h>
 #include <ndJointAttachmentPoint.h>

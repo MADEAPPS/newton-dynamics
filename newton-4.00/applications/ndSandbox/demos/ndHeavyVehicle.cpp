@@ -518,22 +518,23 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 	void CreateEightWheelTurret(ndDemoEntityManager* const scene)
 	{
-		dAssert(0);
 		//turret servo controller actuator
-		//ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
-		//ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
-		//m_turretHinge = new ndJointHingePd(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
+		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
+		const ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
+		////m_turretHinge = new ndJointHingePd(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
+		m_turretHinge = new ndJointHinge(turretMatrix, turretBody, m_chassis);
 		//m_turrectAngle0 = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		//AddExtraBody(turretBody);
-		//AddExtraJoint(m_turretHinge);
-		//
+		AddExtraBody(turretBody);
+		AddExtraJoint(m_turretHinge);
+		
 		////cannon servo controller actuator
-		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
-		//ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		//m_cannonHinge = new ndJointHingePd(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
-		//AddExtraBody(canonBody);
-		//AddExtraJoint(m_cannonHinge);
-		//
+		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
+		ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
+		////m_cannonHinge = new ndJointHingePd(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
+		m_cannonHinge = new ndJointHinge(cannonMatrix, canonBody, turretBody);
+		AddExtraBody(canonBody);
+		AddExtraJoint(m_cannonHinge);
+
 		//ndFloat32 y = cannonMatrix[1][1];
 		//ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 		//m_cannonAngle0 = -ndAtan2(y, x);
@@ -559,11 +560,10 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		if (m_isPlayer)
 		{
-			dAssert(0);
-			//ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-			//ndFixSizeArray<char, 32> buttons;
-			//scene->GetJoystickButtons(buttons);
-			//
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			ndFixSizeArray<char, 32> buttons;
+			scene->GetJoystickButtons(buttons);
+			
 			//bool wakeUpVehicle = false;
 			//if (buttons[2])
 			//{
@@ -920,19 +920,20 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndTractorVehicle(scene, tractorDesc, matrix);
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndLav25Vehicle(scene, lav25Desc, matrix);
-	ndHeavyMultiBodyVehicle* const vehicle = new ndBigRigVehicle(scene, bigRigDesc, matrix);
-	scene->GetWorld()->AddModel(vehicle);
-	vehicle->SetAsPlayer(scene);
-	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
+	//ndHeavyMultiBodyVehicle* const vehicle0 = new ndBigRigVehicle(scene, bigRigDesc, matrix);
+	//scene->GetWorld()->AddModel(vehicle0);
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	scene->GetWorld()->AddModel(new ndLav25Vehicle(scene, lav25Desc, matrix));
+	ndHeavyMultiBodyVehicle* const vehicle1 = new ndLav25Vehicle(scene, lav25Desc, matrix);
+	scene->GetWorld()->AddModel(vehicle1);
 	
 	matrix.m_posit.m_z -= 12.0f;
-	scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
+	//ndHeavyMultiBodyVehicle* const vehicle2 = new ndTractorVehicle(scene, tractorDesc, matrix);
+	//scene->GetWorld()->AddModel(vehicle2);
+
+	vehicle1->SetAsPlayer(scene);
+	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle1);
 	
 	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;

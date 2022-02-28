@@ -9,19 +9,19 @@
 * freely
 */
 
-#ifndef __ND_JOINT_6DOF_IK_EFFECTOR_H__
-#define __ND_JOINT_6DOF_IK_EFFECTOR_H__
+#ifndef __ND_IK_6DOF_EFFECTOR_H__
+#define __ND_IK_6DOF_EFFECTOR_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointSpherical.h"
+#include "ndJointBilateralConstraint.h"
 
-class ndJointIk6DofEffector: public ndJointBilateralConstraint
+class ndIk6DofEffector: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointIk6DofEffector);
-	D_NEWTON_API ndJointIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointIk6DofEffector();
+	D_CLASS_REFLECTION(ndIk6DofEffector);
+	D_NEWTON_API ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndIk6DofEffector();
 
 	D_NEWTON_API ndMatrix GetReferenceMatrix() const;
 	D_NEWTON_API void SetTargetMatrix(const ndMatrix& localMatrix);

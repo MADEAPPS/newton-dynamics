@@ -155,7 +155,7 @@ class dAdvancedIndustrialRobot : public ndModel
 						//ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						ndMatrix pivotMatrix(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
 						pivotMatrix.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-						m_effector = new ndJointIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
+						m_effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
 						m_effector->SetMode(true, true);
 
 						m_baseRotation = m_effector->GetReferenceMatrix();
@@ -242,7 +242,7 @@ class dAdvancedIndustrialRobot : public ndModel
 			dAssert(body1 == m_rootBody);
 
 			const ndMatrix pivotMatrix(body0->GetMatrix());
-			m_effector = new ndJointIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+			m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
 			m_effector->SetMode(true, true);
 
 			ndFloat32 regularizer;
@@ -437,7 +437,7 @@ class dAdvancedIndustrialRobot : public ndModel
 	ndBodyDynamic* m_rootBody;
 	ndJointSlider* m_leftGripper;
 	ndJointSlider* m_rightGripper;
-	ndJointIk6DofEffector* m_effector;
+	ndIk6DofEffector* m_effector;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;

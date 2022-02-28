@@ -27,9 +27,9 @@
 
 class ndWorld;
 class ndCharacterNode;
+class ndIk6DofEffector;
 class ndCharacterRootNode;
 class ndCharacterSkeleton;
-class ndJointIk6DofEffector;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
@@ -49,7 +49,7 @@ class ndCharacter: public ndModel
 		public:
 		ndMatrix m_bindMatrix;
 		ndCharacterNode* m_controlNode;
-		ndJointIk6DofEffector* m_effector;
+		ndIk6DofEffector* m_effector;
 	};
 
 	D_CLASS_REFLECTION(ndCharacter);
