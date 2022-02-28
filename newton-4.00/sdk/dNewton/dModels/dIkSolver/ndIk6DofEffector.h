@@ -32,6 +32,8 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void EnableAxisX(bool state);
 	D_NEWTON_API void EnableAxisY(bool state);
 	D_NEWTON_API void EnableAxisZ(bool state);
+	D_NEWTON_API void EnableRotation(bool state);
+	D_NEWTON_API void EnableStrictRotation(bool state);
 
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);
@@ -48,22 +50,28 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API void SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
 	ndMatrix m_targetFrame;
-	//ndFloat32 m_angle;
-	//ndFloat32 m_minAngle;
-	//ndFloat32 m_maxAngle;
-	//ndFloat32 m_angularSpring;
-	//ndFloat32 m_angularDamper;
-	//ndFloat32 m_angularRegularizer;
+
+	ndFloat32 m_angularSpring;
+	ndFloat32 m_angularDamper;
+	ndFloat32 m_angularRegularizer;
 	
 	ndFloat32 m_linearSpring;
 	ndFloat32 m_linearDamper;
 	ndFloat32 m_linearRegularizer;
-	//bool m_linearMode;
-	//bool m_angularMode;
-	ndInt8 m_linearAxis;
+	union
+	{
+		ndInt8 m_controlDofFlags;
+		struct
+		{
+			ndInt8 m_axisX					: 1;
+			ndInt8 m_axisY					: 1;
+			ndInt8 m_axisZ					: 1;
+			ndInt8 fixAxisRotation			: 1;
+			ndInt8 m_shortestPathRotation	: 1;
+		};
+	};
 };
 
 

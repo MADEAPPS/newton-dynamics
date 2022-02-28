@@ -426,10 +426,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 	ndLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
 		,m_effector(nullptr)
-		,m_turretAngle(0.0f)
-		,m_turrectAngle0(0.0f)
 		,m_cannonHigh(0.0f)
-		,m_cannonAngle0(0.0f)
+		,m_turretAngle(0.0f)
 	{
 		VehicleAssembly(scene);
 	}
@@ -540,6 +538,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		m_effector = new ndIk6DofEffector(effectorMatrix, canonBody, m_chassis);
 		m_effector->EnableAxisY(false);
 		m_effector->EnableAxisZ(false);
+		m_effector->EnableStrictRotation(false);
 		AddExtraJoint(m_effector);
 	}
 
@@ -591,36 +590,11 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			}
 			
 			m_cannonHigh = dClamp(m_cannonHigh, -ndFloat32(0.1f), ndFloat32(0.3f));
-			m_turretAngle = dClamp(m_turretAngle, -ndFloat32(-2.0f) * ndPi, ndFloat32(-2.0f) * ndPi);
-			
-			//// apply inputs to actuators joint
-			//const ndMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-			//ndFloat32 turretAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-			//ndFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
-			//ndFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-			//if (dAbs(turretErrorAngle) > (0.25f * ndDegreeToRad))
-			//{
-			//	turretTargetAngle += turretErrorAngle;
-			//}
-			//m_turretHinge->SetTargetAngle(turretTargetAngle);
-			//
-			//const ndMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-			//ndFloat32 y = cannonMatrix[1][1];
-			//ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-			//ndFloat32 cannonAngle = -ndAtan2(y, x);
-			//ndFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonHigh, m_cannonAngle0), -cannonAngle);
-			//
-			//ndFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-			//const ndFloat32 error = 0.125f * ndDegreeToRad;
-			//if (dAbs(cannonErrorAngle) > error)
-			//{
-			//	cannonTargetAngle += cannonErrorAngle;
-			//}
-			//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+			m_turretAngle = dClamp(m_turretAngle, -ndFloat32(2.0f) * ndPi, ndFloat32(2.0f) * ndPi);
 			
 			if (wakeUpVehicle)
 			{
-				ndMatrix effectorMatrix (m_effector->GetOffsetMatrix());
+				ndMatrix effectorMatrix (dPitchMatrix(m_turretAngle));
 				effectorMatrix.m_posit.m_x = m_cannonHigh;
 				m_effector->SetOffsetMatrix(effectorMatrix);
 
@@ -630,10 +604,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 	}
 
 	ndIk6DofEffector* m_effector;
-	ndFloat32 m_turretAngle;
-	ndFloat32 m_turrectAngle0;
 	ndFloat32 m_cannonHigh;
-	ndFloat32 m_cannonAngle0;
+	ndFloat32 m_turretAngle;
 };
 
 class ndTractorVehicle : public ndHeavyMultiBodyVehicle

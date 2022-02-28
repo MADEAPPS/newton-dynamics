@@ -350,9 +350,6 @@ void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatri
 			ndFloat32 dirMag = ndSqrt(dirMag2);
 			ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 
-			ndQuaternion xxxx1(ndQuaternion(basis[0], angle));
-			ndMatrix xxxx(matrix0 * ndMatrix (xxxx1, ndVector::m_zero));
-
 			AddAngularRowJacobian(desc, basis[0], angle);
 			SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 			AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
