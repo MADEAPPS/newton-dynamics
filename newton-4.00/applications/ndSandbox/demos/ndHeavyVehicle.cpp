@@ -425,11 +425,10 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 	public:
 	ndLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
-		,m_turretHinge(nullptr)
-		,m_cannonHinge(nullptr)
+		,m_effector(nullptr)
 		,m_turretAngle(0.0f)
 		,m_turrectAngle0(0.0f)
-		,m_cannonAngle(0.0f)
+		,m_cannonHigh(0.0f)
 		,m_cannonAngle0(0.0f)
 	{
 		VehicleAssembly(scene);
@@ -518,26 +517,30 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 	void CreateEightWheelTurret(ndDemoEntityManager* const scene)
 	{
-		//turret servo controller actuator
+		//turret body
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
 		const ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
-		////m_turretHinge = new ndJointHingePd(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
-		m_turretHinge = new ndJointHinge(turretMatrix, turretBody, m_chassis);
-		//m_turrectAngle0 = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		ndJointHinge* const turretHinge = new ndJointHinge(turretMatrix, turretBody, m_chassis);
 		AddExtraBody(turretBody);
-		AddExtraJoint(m_turretHinge);
+		AddExtraJoint(turretHinge);
 		
-		////cannon servo controller actuator
+		//cannon body
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
 		ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		////m_cannonHinge = new ndJointHingePd(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
-		m_cannonHinge = new ndJointHinge(cannonMatrix, canonBody, turretBody);
+		ndJointHinge* const cannonHinge = new ndJointHinge(cannonMatrix, canonBody, turretBody);
 		AddExtraBody(canonBody);
-		AddExtraJoint(m_cannonHinge);
+		AddExtraJoint(cannonHinge);
 
-		//ndFloat32 y = cannonMatrix[1][1];
-		//ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-		//m_cannonAngle0 = -ndAtan2(y, x);
+		// link the effector for controlling the turret
+		ndDemoEntity* const turretEntity = (ndDemoEntity*)turretBody->GetNotifyCallback()->GetUserData();
+		ndDemoEntity* const effectorEntity = turretEntity->Find("effector");
+		ndMatrix effectorMatrix(m_localFrame * effectorEntity->CalculateGlobalMatrix(nullptr));
+		effectorMatrix.m_posit = turretBody->GetMatrix().m_posit;
+		
+		m_effector = new ndIk6DofEffector(effectorMatrix, canonBody, m_chassis);
+		m_effector->EnableAxisY(false);
+		m_effector->EnableAxisZ(false);
+		AddExtraJoint(m_effector);
 	}
 
 	void LinkTires(ndWorld* const world, const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1) const
@@ -564,37 +567,32 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			ndFixSizeArray<char, 32> buttons;
 			scene->GetJoystickButtons(buttons);
 			
-			//bool wakeUpVehicle = false;
-			//if (buttons[2])
-			//{
-			//	wakeUpVehicle = true;
-			//	m_turretAngle += 5.0e-3f;
-			//}
-			//else if (buttons[1])
-			//{
-			//	wakeUpVehicle = true;
-			//	m_turretAngle -= 5.0e-3f;
-			//}
-			//
-			//if (buttons[0])
-			//{
-			//	wakeUpVehicle = true;
-			//	m_cannonAngle += 1.0e-3f;
-			//	if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
-			//	{
-			//		m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
-			//	}
-			//}
-			//else if (buttons[3])
-			//{
-			//	wakeUpVehicle = true;
-			//	m_cannonAngle -= 1.0e-3f;
-			//	if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
-			//	{
-			//		m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
-			//	}
-			//}
-			//
+			bool wakeUpVehicle = false;
+			if (buttons[2])
+			{
+				wakeUpVehicle = true;
+				m_turretAngle += 5.0e-3f;
+			}
+			else if (buttons[1])
+			{
+				wakeUpVehicle = true;
+				m_turretAngle -= 5.0e-3f;
+			}
+			
+			if (buttons[0])
+			{
+				wakeUpVehicle = true;
+				m_cannonHigh -= 2.0e-3f;
+			}
+			else if (buttons[3])
+			{
+				wakeUpVehicle = true;
+				m_cannonHigh += 2.0e-3f;
+			}
+			
+			m_cannonHigh = dClamp(m_cannonHigh, -ndFloat32(0.1f), ndFloat32(0.3f));
+			m_turretAngle = dClamp(m_turretAngle, -ndFloat32(-2.0f) * ndPi, ndFloat32(-2.0f) * ndPi);
+			
 			//// apply inputs to actuators joint
 			//const ndMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
 			//ndFloat32 turretAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
@@ -610,7 +608,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			//ndFloat32 y = cannonMatrix[1][1];
 			//ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 			//ndFloat32 cannonAngle = -ndAtan2(y, x);
-			//ndFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+			//ndFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonHigh, m_cannonAngle0), -cannonAngle);
 			//
 			//ndFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
 			//const ndFloat32 error = 0.125f * ndDegreeToRad;
@@ -619,19 +617,22 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			//	cannonTargetAngle += cannonErrorAngle;
 			//}
 			//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-			//
-			//if (wakeUpVehicle)
-			//{
-			//	m_chassis->SetSleepState(false);
-			//}
+			
+			if (wakeUpVehicle)
+			{
+				ndMatrix effectorMatrix (m_effector->GetOffsetMatrix());
+				effectorMatrix.m_posit.m_x = m_cannonHigh;
+				m_effector->SetOffsetMatrix(effectorMatrix);
+
+				m_chassis->SetSleepState(false);
+			}
 		}
 	}
 
-	ndJointHinge* m_turretHinge;
-	ndJointHinge* m_cannonHinge;
+	ndIk6DofEffector* m_effector;
 	ndFloat32 m_turretAngle;
 	ndFloat32 m_turrectAngle0;
-	ndFloat32 m_cannonAngle;
+	ndFloat32 m_cannonHigh;
 	ndFloat32 m_cannonAngle0;
 };
 

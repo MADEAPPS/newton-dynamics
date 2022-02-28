@@ -121,13 +121,13 @@ class dQuadrupedRobot : public ndModel
 					//dTrace(("name: %s\n", name));
 					if (definition.m_type == dQuadrupedRobotDefinition::m_hinge)
 					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						MakeLegSphericalInretia(childBody);
-						m_bodyArray.PushBack(childBody);
-
-						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
 						dAssert(0);
+						//ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+						//MakeLegSphericalInretia(childBody);
+						//m_bodyArray.PushBack(childBody);
+						//
+						//const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+						//ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
 						//hinge->EnableLimits(true, -60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						//m_jointArray.PushBack(hinge);
 						//world->AddJoint(hinge);
@@ -149,21 +149,22 @@ class dQuadrupedRobot : public ndModel
 					}
 					else
 					{
-						ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
-						m_effector->SetMode(true, true);
-
-						m_baseRotation = m_effector->GetReferenceMatrix();
-
-						ndFloat32 regularizer;
-						ndFloat32 springConst;
-						ndFloat32 damperConst;
-
-						m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
-						m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
-
-						m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
-						m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+						dAssert(0);
+						//ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						//m_effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
+						//m_effector->SetMode(true, true);
+						//
+						//m_baseRotation = m_effector->GetReferenceMatrix();
+						//
+						//ndFloat32 regularizer;
+						//ndFloat32 springConst;
+						//ndFloat32 damperConst;
+						//
+						//m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
+						//m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+						//
+						//m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
+						//m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
 					}
 					break;
 				}
@@ -229,26 +230,27 @@ class dQuadrupedRobot : public ndModel
 		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
 		if (xmlGetInt(endEffectorNode, "hasEffector"))
 		{
-			ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
-			ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
-
-			ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
-			ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
-			dAssert(body1 == m_rootBody);
-
-			const ndMatrix pivotMatrix(body0->GetMatrix());
-			m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
-			m_effector->SetMode(true, true);
-
-			ndFloat32 regularizer;
-			ndFloat32 springConst;
-			ndFloat32 damperConst;
-
-			m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
-			m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
-
-			m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
-			m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+			dAssert(0);
+			//ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
+			//ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
+			//
+			//ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
+			//ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
+			//dAssert(body1 == m_rootBody);
+			//
+			//const ndMatrix pivotMatrix(body0->GetMatrix());
+			//m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+			//m_effector->SetMode(true, true);
+			//
+			//ndFloat32 regularizer;
+			//ndFloat32 springConst;
+			//ndFloat32 damperConst;
+			//
+			//m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
+			//m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+			//
+			//m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
+			//m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
 		}
 	}
 
@@ -395,31 +397,32 @@ class dQuadrupedRobot : public ndModel
 
 	void PlaceEffector()
 	{
-		// apply target position collected by control panel
-		const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
-		ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
-
-		// get the reference matrix in local space 
-		// (this is because the robot has a build rotation in the model) 
-		ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
-
-		// add the local frame displacement)
-		localPosit.m_x += m_x;
-		localPosit.m_y += m_y;
-		localPosit = aximuthMatrix.RotateVector(localPosit);
-
-		// take new position back to target space
-		const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
-
-		targetMatrix = 
-			dRollMatrix(90.0f * ndDegreeToRad) *
-			dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) * 
-			dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
-		targetMatrix.m_posit = newPosit;
-
-		m_effector->SetTargetMatrix(targetMatrix);
-		m_leftGripper->SetOffsetPosit(m_gripperPosit);
-		m_rightGripper->SetOffsetPosit(m_gripperPosit);
+		dAssert(0);
+		//// apply target position collected by control panel
+		//const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
+		//ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
+		//
+		//// get the reference matrix in local space 
+		//// (this is because the robot has a build rotation in the model) 
+		//ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
+		//
+		//// add the local frame displacement)
+		//localPosit.m_x += m_x;
+		//localPosit.m_y += m_y;
+		//localPosit = aximuthMatrix.RotateVector(localPosit);
+		//
+		//// take new position back to target space
+		//const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
+		//
+		//targetMatrix = 
+		//	dRollMatrix(90.0f * ndDegreeToRad) *
+		//	dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) * 
+		//	dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
+		//targetMatrix.m_posit = newPosit;
+		//
+		//m_effector->SetTargetMatrix(targetMatrix);
+		//m_leftGripper->SetOffsetPosit(m_gripperPosit);
+		//m_rightGripper->SetOffsetPosit(m_gripperPosit);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
