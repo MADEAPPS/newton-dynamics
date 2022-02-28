@@ -93,27 +93,27 @@ void ndIk6DofEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndIk6DofEffector::EnableAxisX(bool state)
 {
-	m_axisX = ((state ? 1 : 0) << 0);
+	m_axisX = state ? 1 : 0;
 }
 
 void ndIk6DofEffector::EnableAxisY(bool state)
 {
-	m_axisY = ((state ? 1 : 0) << 0);
+	m_axisY = state ? 1 : 0;
 }
 
 void ndIk6DofEffector::EnableAxisZ(bool state)
 {
-	m_axisZ = ((state ? 1 : 0) << 0);
+	m_axisZ = state ? 1 : 0;
 }
 
-void ndIk6DofEffector::EnableRotation(bool state)
+void ndIk6DofEffector::EnableShortPathRotation(bool state)
 {
-	m_shortestPathRotation = ((state ? 1 : 0) << 0);
+	m_shortestPathRotation = state ? 1 : 0;
 }
 
-void ndIk6DofEffector::EnableStrictRotation(bool state)
+void ndIk6DofEffector::EnableFixAxisRotation(bool state)
 {
-	fixAxisRotation = ((state ? 1 : 0) << 0);
+	fixAxisRotation = state ? 1 : 0;
 }
 
 ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
@@ -229,7 +229,7 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 	}
 	else if (fixAxisRotation)
 	{
-		dAssert(0);
+//		dAssert(0);
 	}
 }
 
@@ -239,5 +239,5 @@ void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearAxis(matrix0, matrix1, desc);
-	//SubmitAngularAxis(matrix0, matrix1, desc);
+	SubmitAngularAxis(matrix0, matrix1, desc);
 }

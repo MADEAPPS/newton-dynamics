@@ -33,7 +33,8 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void EnableAxisY(bool state);
 	D_NEWTON_API void EnableAxisZ(bool state);
 	D_NEWTON_API void EnableRotation(bool state);
-	D_NEWTON_API void EnableStrictRotation(bool state);
+	D_NEWTON_API void EnableFixAxisRotation(bool state);
+	D_NEWTON_API void EnableShortPathRotation(bool state);
 
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);

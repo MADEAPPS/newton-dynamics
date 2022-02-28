@@ -536,9 +536,11 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		effectorMatrix.m_posit = turretBody->GetMatrix().m_posit;
 		
 		m_effector = new ndIk6DofEffector(effectorMatrix, canonBody, m_chassis);
+		m_effector->EnableAxisX(true);
 		m_effector->EnableAxisY(false);
 		m_effector->EnableAxisZ(false);
-		m_effector->EnableStrictRotation(false);
+		m_effector->EnableFixAxisRotation(true);
+		m_effector->EnableShortPathRotation(false);
 		AddExtraJoint(m_effector);
 	}
 
