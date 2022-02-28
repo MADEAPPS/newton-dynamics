@@ -21,19 +21,78 @@
 #include "ndDemoSplinePathMesh.h"
 #include "ndDemoInstanceEntity.h"
 
-class ndFollowSplinePath : public ndJointFollowPath
+class SplinePathBody : public ndBodyDynamic
+{
+public:
+	D_CLASS_REFLECTION(SplinePathBody);
+	SplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
+		:ndBodyDynamic()
+	{
+		// create a Bezier Spline path for AI car to drive
+		ndShapeInstance box(new ndShapeBox(1.0f, 1.0f, 1.0f));
+
+		ndPhysicsWorld* const world = scene->GetWorld();
+		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+		SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		SetMatrix(matrix);
+		SetCollisionShape(box);
+		world->AddBody(this);
+		scene->AddEntity(entity);
+
+		// create a Bezier Spline path for AI car to drive
+		CreateSplinePath();
+	}
+
+	SplinePathBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndBodyDynamic(ndLoadSaveBase::ndLoadDescriptor(desc))
+	{
+		CreateSplinePath();
+	}
+
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+	{
+		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(childNode);
+		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+		ndBodyDynamic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+	}
+
+	void CreateSplinePath()
+	{
+		//ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)GetNotifyCallback()->GetUserData();
+		ndFloat64 knots[] = { 0.0f, 1.0f / 5.0f, 2.0f / 5.0f, 3.0f / 5.0f, 4.0f / 5.0f, 1.0f };
+
+		ndBigVector control[] =
+		{
+			ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
+			ndBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f),
+			ndBigVector(175.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
+			ndBigVector(200.0f - 100.0f, 70.0f, 250.0f - 250.0f, 1.0f),
+			ndBigVector(215.0f - 100.0f, 20.0f, 250.0f - 250.0f, 1.0f),
+			ndBigVector(150.0f - 100.0f, 50.0f, 350.0f - 250.0f, 1.0f),
+			ndBigVector(50.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
+			ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
+		};
+
+		m_spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
+	}
+
+	ndBezierSpline m_spline;
+};
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(SplinePathBody)
+
+class ndJointFollowSplinePath : public ndJointFollowPath
 {
 	public:
-	D_CLASS_REFLECTION(ndFollowSplinePath);
-	ndFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
+	D_CLASS_REFLECTION(ndJointFollowSplinePath);
+	ndJointFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
 	}
 
-	ndFollowSplinePath(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	ndJointFollowSplinePath(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndJointFollowPath(ndLoadSaveBase::ndLoadDescriptor(desc))
 	{
-//		dAssert(0);
 	}
 
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -46,11 +105,10 @@ class ndFollowSplinePath : public ndJointFollowPath
 
 	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
 	{
-		ndDemoEntity* const pathEntity = (ndDemoEntity*)GetBody1()->GetNotifyCallback()->GetUserData();
-		ndDemoSplinePathMesh* const mesh = (ndDemoSplinePathMesh*)pathEntity->GetMesh();
-		const ndBezierSpline& spline = mesh->m_curve;
+		const SplinePathBody* const splineBody = (SplinePathBody*)GetBody1();
+		const ndBezierSpline& spline = splineBody->m_spline;
 		
-		ndMatrix matrix(GetBody1()->GetMatrix());
+		ndMatrix matrix(splineBody->GetMatrix());
 		
 		ndVector p(matrix.UntransformVector(location));
 		ndBigVector point;
@@ -61,7 +119,7 @@ class ndFollowSplinePath : public ndJointFollowPath
 		tangentOut = tangent;
 	}
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndFollowSplinePath)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFollowSplinePath)
 
 static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoMesh* const mesh, ndFloat32 mass)
 {
@@ -136,7 +194,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		world->AddJoint(joint);
 	}
 
-	if (0)
+	if (1)
 	{
 		const ndInt32 count = 6;
 		// add flexible chain with spring damper.
@@ -178,7 +236,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		world->AddJoint(joint);
 	}
 
-	if (0)
+	if (1)
 	{
 		// add a chain with viscous friction.
 		const ndInt32 count = 6;
@@ -564,37 +622,19 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 
-	// create a Bezier Spline path for AI car to drive
-	ndShapeInstance box(new ndShapeBox(1.0f, 1.0f, 1.0f));
-	ndBodyDynamic* const pathBody = MakePrimitive(scene, matrix, box, nullptr, 0.0f);
+	SplinePathBody* const pathBody = new SplinePathBody(scene, matrix);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 
-	ndBezierSpline spline;
-	ndFloat64 knots[] = { 0.0f, 1.0f / 5.0f, 2.0f / 5.0f, 3.0f / 5.0f, 4.0f / 5.0f, 1.0f };
-
-	ndBigVector control[] =
-	{
-		ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
-		ndBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f),
-		ndBigVector(175.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
-		ndBigVector(200.0f - 100.0f, 70.0f, 250.0f - 250.0f, 1.0f),
-		ndBigVector(215.0f - 100.0f, 20.0f, 250.0f - 250.0f, 1.0f),
-		ndBigVector(150.0f - 100.0f, 50.0f, 350.0f - 250.0f, 1.0f),
-		ndBigVector(50.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
-		ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
-	};
-
-	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
-
-	ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
+	ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500);
 	rollerCosterPath->SetMesh(mesh, dGetIdentityMatrix());
 
 	mesh->SetVisible(true);
-	//mesh->SetRenderResolution(500);
 	mesh->Release();
 
-	const ndInt32 count = 32;
 
+	ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)rollerCosterPath->GetMesh();
+	const ndBezierSpline& spline = splineMesh->m_curve;
+	const ndInt32 count = 32;
 	ndBigVector point0;
 	ndVector positions[count + 1];
 	ndFloat64 knot = spline.FindClosestKnot(point0, ndBigVector(ndVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
@@ -649,7 +689,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 		
 		bodies[i] = body;
 		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
-		world->AddJoint(new ndFollowSplinePath(matrix, body, pathBody));
+		world->AddJoint(new ndJointFollowSplinePath(matrix, body, pathBody));
 		
 		ndVector veloc(dir.Scale(20.0f));
 		body->SetVelocity(veloc);
@@ -676,13 +716,13 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
-	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
+	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
+	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
