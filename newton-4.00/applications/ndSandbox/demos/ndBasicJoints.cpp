@@ -23,7 +23,7 @@
 
 class SplinePathBody : public ndBodyDynamic
 {
-public:
+	public:
 	D_CLASS_REFLECTION(SplinePathBody);
 	SplinePathBody(ndDemoEntityManager* const scene, ndMatrix& matrix)
 		:ndBodyDynamic()

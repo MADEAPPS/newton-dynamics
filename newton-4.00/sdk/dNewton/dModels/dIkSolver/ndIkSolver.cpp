@@ -445,7 +445,7 @@ void ndIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world
 						constraintParam.m_invTimestep = m_invTimestep;
 						joint->JacobianDerivative(constraintParam);
 						const ndInt32 dof = constraintParam.m_rowsCount;
-						dAssert(dof == joint->m_rowCount);
+						//dAssert(dof == joint->m_rowCount);
 						const ndInt32 baseIndex = joint->m_rowStart;
 						for (ndInt32 i = 0; i < dof; ++i)
 						{
