@@ -382,16 +382,16 @@ class dSimpleIndustrialRobot : public ndModel
 		if (m_effector)
 		{
 			// apply target position collected by control panel
-			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
-			ndMatrix targetMatrix(dGetIdentityMatrix());
+			ndMatrix targetMatrix (
+				dRollMatrix(90.0f * ndDegreeToRad) *
+				dPitchMatrix(m_pitch * ndDegreeToRad) * 
+				dYawMatrix(m_yaw * ndDegreeToRad) * 
+				dRollMatrix(m_roll * ndDegreeToRad) *
+				dRollMatrix(-90.0f * ndDegreeToRad));
 			
 			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
+			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-
-			//targetMatrix =
-			//	dRollMatrix(90.0f * ndDegreeToRad) *
-			//	dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) *
-			//	dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
 			
 			m_effector->SetOffsetMatrix(targetMatrix);
 			m_leftGripper->SetOffsetPosit(m_gripperPosit);
@@ -414,7 +414,6 @@ class dSimpleIndustrialRobot : public ndModel
 	ndFloat32 m_yaw;
 	ndFloat32 m_roll;
 };
-
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dSimpleIndustrialRobot);
 
 static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
