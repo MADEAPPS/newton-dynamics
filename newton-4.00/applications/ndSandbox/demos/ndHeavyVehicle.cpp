@@ -704,100 +704,95 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
 		matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
 
-		ndJointAttachmentPoint* const attachementJoint = new ndJointAttachmentPoint(matrix0, body1, attachmentBody);
-		attachementJoint->SetDimnetionX(false);
+		ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, body1, attachmentBody);
+		attachementJoint->EnableAxisX(false);
+		attachementJoint->EnableAxisY(true);
+		attachementJoint->EnableAxisZ(true);
+		attachementJoint->EnableFixAxisRotation(false);
+		attachementJoint->EnableShortPathRotation(false);
 		AddExtraJoint(attachementJoint);
-
-		// For now let these part collide and make sure the shape to no intersect.
-		// a further optimization is to make these part non collidable,
-		// but them the parts will not collide with anything.
-		// a better way is to to add collision flags and filter collision 
-		// with the vehicle parts, but this is outside the scope of the demo.
-		//body0->GetCollisionShape().SetCollisionMode(false);
-		//body1->GetCollisionShape().SetCollisionMode(false);
 	}
 
 	void CreateTractorBucket(ndDemoEntityManager* const scene)
 	{
-		dAssert(0);
-		//ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
-		//ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
-		//m_armHinge = new ndJointHingePd(turretMatrix, 1.5f, -10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad, frontBucketArmBody, m_chassis);
-		//AddExtraBody(frontBucketArmBody);
-		//AddExtraJoint(m_armHinge);
-		//
-		//m_armAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		//AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
-		//AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
-		//
-		////cannon servo controller actuator
-		//ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
-		//ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
-		//m_bucketHinge = new ndJointHingePd(frontBucketMatrix, 2.5f, -75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad, frontBucketBody, frontBucketArmBody);
-		//AddExtraBody(frontBucketBody);
-		//AddExtraJoint(m_bucketHinge);
-		//
-		//ndFloat32 y = frontBucketMatrix[1][1];
-		//ndFloat32 x = ndSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
-		//m_bucketAngle = -ndAtan2(y, x);
-		//AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody, "attachment_frontBucket001");
-		//AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody, "attachment_frontBucket002");
+		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
+		ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
+		m_armHinge = new ndJointHinge(turretMatrix, frontBucketArmBody, m_chassis);
+		m_armHinge->SetLimits(-10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad);
+		AddExtraBody(frontBucketArmBody);
+		AddExtraJoint(m_armHinge);
+		AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
+		AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
+		m_armAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		
+		//cannon servo controller actuator
+		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
+		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
+		m_bucketHinge = new ndJointHinge(frontBucketMatrix, frontBucketBody, frontBucketArmBody);
+		m_bucketHinge->SetLimits(-75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+		AddExtraBody(frontBucketBody);
+		AddExtraJoint(m_bucketHinge);
+		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody, "attachment_frontBucket001");
+		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody, "attachment_frontBucket002");
+
+		ndFloat32 y = frontBucketMatrix[1][1];
+		ndFloat32 x = ndSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
+		m_bucketAngle = -ndAtan2(y, x);
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		dAssert(0);
-		//ndBasicVehicle::ApplyInputs(world, timestep);
-		//if (m_isPlayer)
-		//{
-		//	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-		//	ndFixSizeArray<char, 32> buttons;
-		//
-		//	bool wakeUpVehicle = false;
-		//	scene->GetJoystickButtons(buttons);
-		//	if (buttons[0])
-		//	{
-		//		wakeUpVehicle = true;
-		//		m_armAngle = dMin(m_armAngle + 5.0e-3f, m_armHinge->GetMaxAngularLimit());
-		//		m_armHinge->SetTargetAngle(m_armAngle);
-		//	}
-		//	else if (buttons[3])
-		//	{
-		//		wakeUpVehicle = true;
-		//		m_armAngle = dMax(m_armAngle - 5.0e-3f, m_armHinge->GetMinAngularLimit());
-		//		m_armHinge->SetTargetAngle(m_armAngle);
-		//	}
-		//
-		//	if (buttons[1])
-		//	{
-		//		wakeUpVehicle = true;
-		//		m_bucketAngle = dMin(m_bucketAngle + 5.0e-3f, m_bucketHinge->GetMaxAngularLimit());
-		//		m_bucketHinge->SetTargetAngle(m_bucketAngle);
-		//	}
-		//	else if (buttons[2])
-		//	{
-		//		wakeUpVehicle = true;
-		//		m_bucketAngle = dMax(m_bucketAngle - 5.0e-3f, m_bucketHinge->GetMinAngularLimit());
-		//		m_bucketHinge->SetTargetAngle(m_bucketAngle);
-		//	}
-		//	const ndMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
-		//	ndFloat32 y = bucketMatrix[1][1];
-		//	ndFloat32 x = ndSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
-		//	ndFloat32 bucketAngle = -ndAtan2(y, x);
-		//	ndFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
-		//	ndFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
-		//	const ndFloat32 error = 0.125f * ndDegreeToRad;
-		//	if (dAbs(bucketErrorAngle) > error)
-		//	{
-		//		bucketTargetAngle += bucketErrorAngle;
-		//	}
-		//	m_bucketHinge->SetTargetAngle(bucketTargetAngle);
-		//
-		//	if (wakeUpVehicle)
-		//	{
-		//		m_chassis->SetSleepState(false);
-		//	}
-		//}
+		ndBasicVehicle::ApplyInputs(world, timestep);
+		if (m_isPlayer)
+		{
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			ndFixSizeArray<char, 32> buttons;
+		
+			bool wakeUpVehicle = false;
+			scene->GetJoystickButtons(buttons);
+			if (buttons[0])
+			{
+				wakeUpVehicle = true;
+				//m_armAngle = dMin(m_armAngle + 5.0e-3f, m_armHinge->GetMaxAngularLimit());
+				//m_armHinge->SetTargetAngle(m_armAngle);
+			}
+			else if (buttons[3])
+			{
+				wakeUpVehicle = true;
+				//m_armAngle = dMax(m_armAngle - 5.0e-3f, m_armHinge->GetMinAngularLimit());
+				//m_armHinge->SetTargetAngle(m_armAngle);
+			}
+		
+			if (buttons[1])
+			{
+				wakeUpVehicle = true;
+				//m_bucketAngle = dMin(m_bucketAngle + 5.0e-3f, m_bucketHinge->GetMaxAngularLimit());
+				//m_bucketHinge->SetTargetAngle(m_bucketAngle);
+			}
+			else if (buttons[2])
+			{
+				wakeUpVehicle = true;
+				//m_bucketAngle = dMax(m_bucketAngle - 5.0e-3f, m_bucketHinge->GetMinAngularLimit());
+				//m_bucketHinge->SetTargetAngle(m_bucketAngle);
+			}
+			//const ndMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
+			//ndFloat32 y = bucketMatrix[1][1];
+			//ndFloat32 x = ndSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
+			//ndFloat32 bucketAngle = -ndAtan2(y, x);
+			//ndFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
+			//ndFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
+			//const ndFloat32 error = 0.125f * ndDegreeToRad;
+			//if (dAbs(bucketErrorAngle) > error)
+			//{
+			//	bucketTargetAngle += bucketErrorAngle;
+			//}
+			//m_bucketHinge->SetTargetAngle(bucketTargetAngle);
+		
+			if (wakeUpVehicle)
+			{
+				m_chassis->SetSleepState(false);
+			}
+		}
 	}
 
 	ndJointHinge* m_armHinge;
@@ -900,15 +895,15 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	ndHeavyMultiBodyVehicle* const vehicle1 = new ndLav25Vehicle(scene, lav25Desc, matrix);
-	scene->GetWorld()->AddModel(vehicle1);
+	//ndHeavyMultiBodyVehicle* const vehicle1 = new ndLav25Vehicle(scene, lav25Desc, matrix);
+	//scene->GetWorld()->AddModel(vehicle1);
 	
 	matrix.m_posit.m_z -= 12.0f;
-	//ndHeavyMultiBodyVehicle* const vehicle2 = new ndTractorVehicle(scene, tractorDesc, matrix);
-	//scene->GetWorld()->AddModel(vehicle2);
+	ndHeavyMultiBodyVehicle* const vehicle2 = new ndTractorVehicle(scene, tractorDesc, matrix);
+	scene->GetWorld()->AddModel(vehicle2);
 
-	vehicle1->SetAsPlayer(scene);
-	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle1);
+	vehicle2->SetAsPlayer(scene);
+	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle2);
 	
 	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;
