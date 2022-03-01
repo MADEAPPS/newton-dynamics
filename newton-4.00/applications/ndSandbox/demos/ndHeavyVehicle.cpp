@@ -718,6 +718,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
 		ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
 		m_armHinge = new ndJointHinge(turretMatrix, frontBucketArmBody, m_chassis);
+		m_armHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
 		m_armHinge->SetLimits(-10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad);
 		AddExtraBody(frontBucketArmBody);
 		AddExtraJoint(m_armHinge);
@@ -729,6 +730,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
 		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
 		m_bucketHinge = new ndJointHinge(frontBucketMatrix, frontBucketBody, frontBucketArmBody);
+		m_bucketHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
 		m_bucketHinge->SetLimits(-75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 		AddExtraBody(frontBucketBody);
 		AddExtraJoint(m_bucketHinge);
