@@ -154,7 +154,7 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	ndVector arch[subdiv + 1];
 
 	ndFloat32 deltaTwist = m_maxLimit - m_minLimit;
-	if ((deltaTwist > ndFloat32(1.0e-3f)) && (deltaTwist < ndFloat32(2.0f) * ndPi))
+	if ((deltaTwist > ndFloat32(1.0e-3f)) && (deltaTwist <= ndFloat32(2.0f) * ndPi))
 	{
 		ndMatrix pitchMatrix(matrix1);
 		pitchMatrix.m_posit = matrix1.m_posit;

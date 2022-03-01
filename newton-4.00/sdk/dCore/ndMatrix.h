@@ -193,15 +193,6 @@ inline ndVector ndMatrix::UnrotateVector (const ndVector &v) const
 
 inline ndVector ndMatrix::TransformVector (const ndVector &v) const
 {
-	//ndVector xxx0 (m_front * v.BroadcastX() + m_up * v.BroadcastY() +
-	//	m_right * v.BroadcastZ() + m_posit * v.BroadcastW());
-	//ndVector xxx1 (RotateVector(v) + m_posit);
-	//
-	//ndVector error(xxx0 - xxx1);
-	//dAssert(dAbs(error.DotProduct(error).GetScalar()) < 1.0e-4f);
-	//return m_front * v.BroadcastX() + m_up * v.BroadcastY() +
-	//	   m_right * v.BroadcastZ() + m_posit * v.BroadcastW();
-
 	return RotateVector(v) + m_posit;
 }
 
@@ -213,11 +204,6 @@ inline ndVector ndMatrix::TransformVector1x4(const ndVector &v) const
 
 inline ndVector ndMatrix::UntransformVector (const ndVector &v) const
 {
-	//return ndVector(
-	//	(m_front * v).AddHorizontal().GetScalar(), 
-	//	(m_up * v).AddHorizontal().GetScalar(), 
-	//	(m_right * v).AddHorizontal().GetScalar(), 
-	//	(m_posit * v).AddHorizontal().GetScalar());
 	return UnrotateVector(v - m_posit) | ndVector::m_wOne;
 }
 

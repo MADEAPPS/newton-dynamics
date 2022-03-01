@@ -31,6 +31,22 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKine
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
+ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivotChild, const ndMatrix& globalPinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	:ndJointBilateralConstraint(6, child, parent, globalPinAndPivotChild, globalPinAndPivotParent)
+	,m_targetFrame(dGetIdentityMatrix())
+	,m_angularSpring(ndFloat32(1000.0f))
+	,m_angularDamper(ndFloat32(50.0f))
+	,m_angularRegularizer(ndFloat32(5.0e-3f))
+	,m_linearSpring(ndFloat32(1000.0f))
+	,m_linearDamper(ndFloat32(50.0f))
+	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_controlDofOptions(0xff)
+{
+	m_fixAxisRotation = 0;
+	m_shortestPathRotation = 1;
+	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
 ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_targetFrame(dGetIdentityMatrix())
@@ -132,7 +148,7 @@ void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 sp
 {
 	m_linearSpring = dAbs(spring);
 	m_linearDamper = dAbs(damper);
-	m_linearRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_linearRegularizer = dClamp(regularizer, ndFloat32(1.0e-4f), ndFloat32(0.99f));
 }
 
 void ndIk6DofEffector::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -146,7 +162,7 @@ void ndIk6DofEffector::SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 s
 {
 	m_angularSpring = dAbs(spring);
 	m_angularDamper = dAbs(damper);
-	m_angularRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_angularRegularizer = dClamp(regularizer, ndFloat32(1.0e-4f), ndFloat32(0.99f));
 }
 
 void ndIk6DofEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const

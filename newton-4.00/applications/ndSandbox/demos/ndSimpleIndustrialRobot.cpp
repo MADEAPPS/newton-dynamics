@@ -65,6 +65,7 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_leftGripper(nullptr)
 		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
+		,m_effectorOffset(ndVector::m_zero)
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
@@ -134,7 +135,7 @@ class dSimpleIndustrialRobot : public ndModel
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
 						slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-						slider->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
+						slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
 
 						if (!strstr(definition.m_boneName, "Left"))
 						{
@@ -149,12 +150,16 @@ class dSimpleIndustrialRobot : public ndModel
 					}
 					else
 					{
-						ndMatrix pivotMatrix(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-						pivotMatrix.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-						m_effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
-						m_effector->SetLinearSpringDamper(0.01f, 2500.0f, 100.0f);
-						m_effector->SetAngularSpringDamper(0.01f, 2500.0f, 100.0f);
+						const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						m_effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
+						m_effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
+						m_effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
 						world->AddJoint(m_effector);
+						m_effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
+						ndMatrix offset(dGetIdentityMatrix());
+						offset.m_posit = m_effectorOffset;
+						m_effector->SetOffsetMatrix(offset);
 					}
 					break;
 				}
@@ -296,16 +301,6 @@ class dSimpleIndustrialRobot : public ndModel
 			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
 			xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
 		}
-
-		//m_x;
-		//m_y;
-		//m_azimuth;
-		//m_pitch;
-		//m_yaw;
-		//m_roll;
-		//m_pitch0;
-		//m_yaw0;
-		//m_roll0;
 	}
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -388,28 +383,15 @@ class dSimpleIndustrialRobot : public ndModel
 		{
 			// apply target position collected by control panel
 			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
-			//ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
 			ndMatrix targetMatrix(dGetIdentityMatrix());
 			
-			targetMatrix.m_posit.m_y = m_y;
+			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
+			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 
-			// get the reference matrix in local space 
-			// (this is because the robot has a build rotation in the model) 
-			//ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
-			
-			//// add the local frame displacement)
-			//localPosit.m_x += m_x;
-			//localPosit.m_y += m_y;
-			//localPosit = aximuthMatrix.RotateVector(localPosit);
-			//
-			//// take new position back to target space
-			//const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
-			//
 			//targetMatrix =
 			//	dRollMatrix(90.0f * ndDegreeToRad) *
 			//	dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) *
 			//	dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
-			//targetMatrix.m_posit = newPosit;
 			
 			m_effector->SetOffsetMatrix(targetMatrix);
 			m_leftGripper->SetOffsetPosit(m_gripperPosit);
@@ -423,7 +405,7 @@ class dSimpleIndustrialRobot : public ndModel
 	ndIk6DofEffector* m_effector;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
-
+	ndVector m_effectorOffset;
 	ndFloat32 m_x;
 	ndFloat32 m_y;
 	ndFloat32 m_azimuth;

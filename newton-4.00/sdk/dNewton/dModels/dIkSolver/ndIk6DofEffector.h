@@ -21,6 +21,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_CLASS_REFLECTION(ndIk6DofEffector);
 	D_NEWTON_API ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndIk6DofEffector(const ndMatrix& globalPinAndPivotChild, const ndMatrix& globalPinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIk6DofEffector();
 
 	D_NEWTON_API void EnableAxisX(bool state);
