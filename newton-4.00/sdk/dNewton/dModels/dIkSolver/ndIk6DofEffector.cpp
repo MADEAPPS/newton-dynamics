@@ -24,8 +24,10 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKine
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_controlDofFlags (0x0f)
+	,m_controlDofOptions(0xff)
 {
+	m_fixAxisRotation = 0;
+	m_shortestPathRotation = 1;
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
@@ -38,7 +40,7 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_controlDofFlags(0x0f)
+	,m_controlDofOptions(0xff)
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -113,7 +115,7 @@ void ndIk6DofEffector::EnableShortPathRotation(bool state)
 
 void ndIk6DofEffector::EnableFixAxisRotation(bool state)
 {
-	fixAxisRotation = state ? 1 : 0;
+	m_fixAxisRotation = state ? 1 : 0;
 }
 
 ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
@@ -126,55 +128,41 @@ void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 	m_targetFrame = matrix;
 }
 
+void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+{
+	m_linearSpring = dAbs(spring);
+	m_linearDamper = dAbs(damper);
+	m_linearRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+}
+
+void ndIk6DofEffector::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+{
+	spring = m_linearSpring;
+	damper = m_linearDamper;
+	regularizer = m_linearRegularizer;
+}
+
+void ndIk6DofEffector::SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+{
+	m_angularSpring = dAbs(spring);
+	m_angularDamper = dAbs(damper);
+	m_angularRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+}
+
+void ndIk6DofEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+{
+	spring = m_angularSpring;
+	damper = m_angularDamper;
+	regularizer = m_angularRegularizer;
+}
+
 void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	//ndMatrix localRotationBody1(m_localRotationBody1);
-	//localRotationBody1.m_posit = m_targetPosit + m_pivot;
-	//localRotationBody1.m_posit.m_w = ndFloat32(1.0f);
-
-	//ndMatrix localMatrix1(m_coronalFrame);
-	//localMatrix1.m_posit += (m_targetPosit & ndVector::m_triplexMask);
-	//const ndMatrix matrix1 (localMatrix1 * m_body1->GetMatrix());
-
-	//const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
 	const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
-	
-	//const ndMatrix twistMatrix(dPitchMatrix(0.0f));
-	//const ndMatrix matrix0(twistMatrix * m_localRotationBody0 * m_body0->GetMatrix());
-	//const ndMatrix matrix1(m_coneRotation * localRotationBody1 * m_body1->GetMatrix());
+	const ndMatrix matrix1(m_targetFrame * m_localMatrix1 * m_body1->GetMatrix());
 	
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
-
-	//debugCallback.DrawLine(matrix1.m_posit, matrix1.m_posit - matrix1.m_front.Scale(m_maxDist), ndVector(1.0f, 1.0f, 0.0f, 1.0f));
-	//debugCallback.DrawLine(matrix0.m_posit, matrix0.m_posit - matrix0.m_front.Scale(m_maxDist), ndVector(1.0f, 1.0f, 0.0f, 1.0f));
-	
-	//const dInt32 subdiv = 8;
-	//const ndFloat32 radius = debugCallback.m_debugScale;
-	//ndVector arch[subdiv + 1];
-	//
-	//// show twist angle limits
-	//ndFloat32 deltaTwist = m_maxAngle - m_minAngle;
-	//if ((deltaTwist > ndFloat32(1.0e-3f)) && (deltaTwist < ndFloat32(2.0f) * dPi))
-	//{
-	//	ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(1.0f));
-	//	ndFloat32 angleStep = dMin(m_maxAngle - m_minAngle, ndFloat32(2.0f * dPi)) / subdiv;
-	//	ndFloat32 angle0 = m_minAngle;
-	//
-	//	ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-	//	for (dInt32 i = 0; i <= subdiv; i++)
-	//	{
-	//		arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
-	//		debugCallback.DrawLine(matrix1.m_posit, arch[i], color);
-	//		angle0 += angleStep;
-	//	}
-	//	
-	//	for (dInt32 i = 0; i < subdiv; i++)
-	//	{
-	//		debugCallback.DrawLine(arch[i], arch[i + 1], color);
-	//	}
-	//}
 }
 
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
@@ -182,7 +170,7 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 	for (ndInt32 i = 0; i < 3; i++)
 	{
-		if (m_controlDofFlags & (1 << i))
+		if (m_controlDofOptions & (1 << i))
 		{
 			const ndVector pin = matrix1[i];
 			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
@@ -214,7 +202,7 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		}
 		else
 		{
-			ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
+			const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
 			AddAngularRowJacobian(desc, matrix11[0], pitchAngle);
 			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 			
@@ -227,7 +215,7 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 		}
 	}
-	else if (fixAxisRotation)
+	else if (m_fixAxisRotation)
 	{
 		const ndMatrix matrix11(m_targetFrame * matrix1);
 		const ndVector& pin = matrix11.m_front;

@@ -23,26 +23,19 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIk6DofEffector();
 
-	//D_NEWTON_API ndMatrix GetReferenceMatrix() const;
-	//D_NEWTON_API void SetTargetMatrix(const ndMatrix& localMatrix);
-	//D_NEWTON_API bool IsLinearMode() const;
-	//D_NEWTON_API bool IsAngularMode() const;
-	//D_NEWTON_API void SetMode(bool linear, bool angular);
-
 	D_NEWTON_API void EnableAxisX(bool state);
 	D_NEWTON_API void EnableAxisY(bool state);
 	D_NEWTON_API void EnableAxisZ(bool state);
-	D_NEWTON_API void EnableRotation(bool state);
 	D_NEWTON_API void EnableFixAxisRotation(bool state);
 	D_NEWTON_API void EnableShortPathRotation(bool state);
 
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);
 	
-	//D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
-	//D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
-	//D_NEWTON_API void SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
-	//D_NEWTON_API void GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
+	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
+	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
+	D_NEWTON_API void SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
+	D_NEWTON_API void GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -63,14 +56,14 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	ndFloat32 m_linearRegularizer;
 	union
 	{
-		ndInt8 m_controlDofFlags;
+		ndUnsigned8 m_controlDofOptions;
 		struct
 		{
-			ndInt8 m_axisX					: 1;
-			ndInt8 m_axisY					: 1;
-			ndInt8 m_axisZ					: 1;
-			ndInt8 fixAxisRotation			: 1;
-			ndInt8 m_shortestPathRotation	: 1;
+			ndUnsigned8 m_axisX					: 1;
+			ndUnsigned8 m_axisY					: 1;
+			ndUnsigned8 m_axisZ					: 1;
+			ndUnsigned8 m_fixAxisRotation		: 1;
+			ndUnsigned8 m_shortestPathRotation	: 1;
 		};
 	};
 };
