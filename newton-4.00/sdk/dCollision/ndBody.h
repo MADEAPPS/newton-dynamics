@@ -76,12 +76,13 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	D_COLLISION_API virtual void SetOmega(const ndVector& veloc);
 	D_COLLISION_API virtual void SetVelocity(const ndVector& veloc);
 	D_COLLISION_API virtual void SetMatrix(const ndMatrix& matrix);
-	
+		
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
 	D_COLLISION_API ndVector GetVelocityAtPoint(const ndVector& point) const;
 
-	void SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom);
+	D_COLLISION_API void SetOmegaNoSleep(const ndVector& veloc);
+	D_COLLISION_API void SetVelocityNoSleep(const ndVector& veloc);
+	D_COLLISION_API void SetMatrixNoSleep(const ndMatrix& matrix);
 
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
@@ -89,6 +90,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual void AttachContact(ndContact* const) {}
 	virtual void DetachContact(ndContact* const) {}
 	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }
+	void SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom);
 
 	ndMatrix m_matrix;
 	ndVector m_veloc;

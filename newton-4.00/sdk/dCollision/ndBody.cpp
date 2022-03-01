@@ -154,27 +154,42 @@ void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 	}
 }
 
-void ndBody::SetOmega(const ndVector& omega)
+void ndBody::SetOmegaNoSleep(const ndVector& omega)
 {
 	m_omega = omega;
+}
+
+void ndBody::SetOmega(const ndVector& omega)
+{
 	m_equilibrium = 0;
+	SetOmegaNoSleep(omega);
+}
+
+void ndBody::SetVelocityNoSleep(const ndVector& veloc)
+{
+	m_veloc = veloc;
 }
 
 void ndBody::SetVelocity(const ndVector& veloc)
 {
-	m_veloc = veloc;
 	m_equilibrium = 0;
+	SetVelocityNoSleep(veloc);
+}
+
+void ndBody::SetMatrixNoSleep(const ndMatrix& matrix)
+{
+	m_matrix = matrix;
+	dAssert(m_matrix.TestOrthogonal(ndFloat32(1.0e-4f)));
+
+	m_rotation = ndQuaternion(m_matrix);
+	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
 void ndBody::SetMatrix(const ndMatrix& matrix)
 {
 	m_equilibrium = 0;
 	m_transformIsDirty = 1;
-	m_matrix = matrix;
-	dAssert(m_matrix.TestOrthogonal(ndFloat32(1.0e-4f)));
-
-	m_rotation = ndQuaternion(m_matrix);
-	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
+	SetMatrixNoSleep(matrix);
 }
 
 D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const rootNode, const char* const name)

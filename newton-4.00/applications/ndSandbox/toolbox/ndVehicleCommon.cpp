@@ -496,6 +496,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 			ndFloat32 desiredOmega = dMax (m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
 			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
 			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
+			m_chassis->SetSleepState(false);
 		}
 		else
 		{

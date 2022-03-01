@@ -75,8 +75,8 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 
 	//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
 
-	m_body0->SetMatrix(matrix1);
-	m_body0->SetVelocity(m_body1->GetVelocity());
+	m_body0->SetMatrixNoSleep(matrix1);
+	m_body0->SetVelocityNoSleep(m_body1->GetVelocity());
 
 	const ndVector omega0(m_body0->GetOmega());
 	const ndVector omega1(m_body1->GetOmega());
@@ -85,10 +85,7 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	const ndVector wy(matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()));
 	const ndVector wz(matrix1.m_right.Scale (matrix1.m_right.DotProduct(omega1).GetScalar()));
 	const ndVector omega(wx + wy + wz);
-
-	//ndVector error(omega1 - omega);
-	//dTrace(("(%f %f %f)\n", error.m_x, error.m_y, error.m_z));
-	m_body0->SetOmega(omega);
+	m_body0->SetOmegaNoSleep(omega);
 }
 
 void ndMultiBodyVehicleMotor::SetFrictionLose(ndFloat32 newtonMeters)

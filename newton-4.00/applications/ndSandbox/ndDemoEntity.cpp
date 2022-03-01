@@ -440,7 +440,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 
 	ndArray<ndVector> points;
 	
-	shapeArray[0] = nullptr;
+	shapeArray.PushBack(nullptr);
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
 	{
 		ndString tmpName(child->GetName());

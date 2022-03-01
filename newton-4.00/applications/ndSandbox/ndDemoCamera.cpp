@@ -223,8 +223,6 @@ dAssert (0);
 	return ndVector::m_zero;
 }
 
-
-
 void ndDemoCamera::SetMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
 	ndMatrix matrix (rotation, position);

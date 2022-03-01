@@ -59,8 +59,8 @@ void ndMultiBodyVehicleDifferential::AlignMatrix()
 
 	//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
 
-	m_body0->SetMatrix(matrix1);
-	m_body0->SetVelocity(m_body1->GetVelocity());
+	m_body0->SetMatrixNoSleep(matrix1);
+	m_body0->SetVelocityNoSleep(m_body1->GetVelocity());
 
 	ndVector omega0(m_body0->GetOmega());
 	ndVector omega1(m_body1->GetOmega());
@@ -69,7 +69,7 @@ void ndMultiBodyVehicleDifferential::AlignMatrix()
 		matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar()) +
 		matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
 
-	m_body0->SetOmega(omega);
+	m_body0->SetOmegaNoSleep(omega);
 }
 
 void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& desc)
