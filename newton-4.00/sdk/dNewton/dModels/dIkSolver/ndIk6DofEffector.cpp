@@ -202,7 +202,6 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		if (dirMag2 > ndFloat32(ndFloat32(1.0e-7f)))
 		{
 			const ndVector dir(pin.Normalize());
-			dTrace(("%f %f %f\n", dir.m_x, dir.m_y, dir.m_z));
 			const ndMatrix basis(dir);
 			ndFloat32 dirMag = ndSqrt(dirMag2);
 			ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
@@ -229,7 +228,12 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 	}
 	else if (fixAxisRotation)
 	{
-//		dAssert(0);
+		const ndMatrix matrix11(m_targetFrame * matrix1);
+		const ndVector& pin = matrix11.m_front;
+
+		ndFloat32 angle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
+		AddAngularRowJacobian(desc, pin, angle);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 	}
 }
 
