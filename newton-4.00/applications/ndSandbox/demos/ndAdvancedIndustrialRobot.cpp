@@ -37,21 +37,20 @@ class dAdvancedRobotDefinition
 	ndFloat32 m_mass;
 	ndFloat32 m_minLimit;
 	ndFloat32 m_maxLimit;
-	ndFloat32 m_maxTorque;
 };
 
 static dAdvancedRobotDefinition jointsDefinition[] =
 {
-	{ "base", dAdvancedRobotDefinition::m_root, 100.0f, 0.0f, 0.0f, 1.0e5f},
-	{ "base_rotator", dAdvancedRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f, 1.0e5f },
-	{ "arm_0", dAdvancedRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_1", dAdvancedRobotDefinition::m_hinge , 5.0f, - 5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_2", dAdvancedRobotDefinition::m_hinge , 5.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_3", dAdvancedRobotDefinition::m_hinge , 3.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
-	{ "arm_4", dAdvancedRobotDefinition::m_hinge , 2.0f, -360.0f * ndDegreeToRad, 360.0f * ndDegreeToRad, 1.0e5f },
-	{ "gripperLeft", dAdvancedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
-	{ "gripperRight", dAdvancedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f, 1.0e5f },
-	{ "effector", dAdvancedRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f, 1.0e5f },
+	{ "base", dAdvancedRobotDefinition::m_root, 100.0f, 0.0f, 0.0f},
+	{ "base_rotator", dAdvancedRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
+	{ "arm_0", dAdvancedRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad},
+	{ "arm_1", dAdvancedRobotDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
+	{ "arm_2", dAdvancedRobotDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
+	{ "arm_3", dAdvancedRobotDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
+	{ "arm_4", dAdvancedRobotDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
+	{ "gripperLeft", dAdvancedRobotDefinition::m_slider  , 1.0f, -0.2f, 0.03f},
+	{ "gripperRight", dAdvancedRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f},
+	{ "effector", dAdvancedRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f},
 };
 
 class dAdvancedIndustrialRobot : public ndModel
@@ -66,7 +65,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
-		,m_baseRotation(dGetIdentityMatrix())
+		,m_effectorOffset(ndVector::m_wOne)
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
@@ -152,23 +151,19 @@ class dAdvancedIndustrialRobot : public ndModel
 					}
 					else
 					{
-						dAssert(0);
-						//ndMatrix pivotMatrix(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-						//pivotMatrix.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-						//m_effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
-						//m_effector->SetMode(true, true);
-						//
-						//m_baseRotation = m_effector->GetReferenceMatrix();
-						//
-						//ndFloat32 regularizer;
-						//ndFloat32 springConst;
-						//ndFloat32 damperConst;
-						//
-						//m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
-						//m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
-						//
-						//m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
-						//m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+						const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						m_effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
+						m_effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
+						m_effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
+						m_effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
+						ndMatrix offset(dGetIdentityMatrix());
+						offset.m_posit = m_effectorOffset;
+						m_effector->SetOffsetMatrix(offset);
+
+						//the effector is not part of the rig, 
+						//instead the Inverse dynamics solver use it to calculate
+						//the joints accelerations.
 					}
 					break;
 				}
@@ -190,7 +185,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
 		,m_invDynamicsSolver()
-		,m_baseRotation(dGetIdentityMatrix())
+		,m_effectorOffset(ndVector::m_wOne)
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
@@ -374,7 +369,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
 		ImGui::Text("gripper");
-		change = change | ImGui::SliderFloat("##gripperPosit", &m_gripperPosit, -0.2f, 0.03f);
+		change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
 
 		ImGui::Text("pitch");
 		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
@@ -391,32 +386,21 @@ class dAdvancedIndustrialRobot : public ndModel
 
 	void PlaceEffector()
 	{
-		dAssert(0);
-		//// apply target position collected by control panel
-		//const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
-		//ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
-		//
-		//// get the reference matrix in local space 
-		//// (this is because the robot has a build rotation in the model) 
-		//ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
-		//
-		//// add the local frame displacement)
-		//localPosit.m_x += m_x;
-		//localPosit.m_y += m_y;
-		//localPosit = aximuthMatrix.RotateVector(localPosit);
-		//
-		//// take new position back to target space
-		//const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
-		//
-		//targetMatrix = 
-		//	dRollMatrix(90.0f * ndDegreeToRad) *
-		//	dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) * 
-		//	dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
-		//targetMatrix.m_posit = newPosit;
-		//
-		//m_effector->SetTargetMatrix(targetMatrix);
-		//m_leftGripper->SetOffsetPosit(m_gripperPosit);
-		//m_rightGripper->SetOffsetPosit(m_gripperPosit);
+		// apply target position collected by control panel
+		ndMatrix targetMatrix(
+			dRollMatrix(90.0f * ndDegreeToRad) *
+			dPitchMatrix(m_pitch * ndDegreeToRad) *
+			dYawMatrix(m_yaw * ndDegreeToRad) *
+			dRollMatrix(m_roll * ndDegreeToRad) *
+			dRollMatrix(-90.0f * ndDegreeToRad));
+
+		ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
+		const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
+		targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+		m_effector->SetOffsetMatrix(targetMatrix);
+
+		m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+		m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -444,7 +428,7 @@ class dAdvancedIndustrialRobot : public ndModel
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 
-	ndMatrix m_baseRotation;
+	ndVector m_effectorOffset;
 	ndFloat32 m_x;
 	ndFloat32 m_y;
 	ndFloat32 m_azimuth;

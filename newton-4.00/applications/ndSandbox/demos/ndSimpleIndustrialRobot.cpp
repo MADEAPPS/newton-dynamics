@@ -44,7 +44,7 @@ static dSimpleRobotDefinition jointsDefinition[] =
 	{ "base", dSimpleRobotDefinition::m_root, 100.0f, 0.0f, 0.0f},
 	{ "base_rotator", dSimpleRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
 	{ "arm_0", dSimpleRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad},
-	{ "arm_1", dSimpleRobotDefinition::m_hinge , 5.0f, -5.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
+	{ "arm_1", dSimpleRobotDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
 	{ "arm_2", dSimpleRobotDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
 	{ "arm_3", dSimpleRobotDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
 	{ "arm_4", dSimpleRobotDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
@@ -64,7 +64,7 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_leftGripper(nullptr)
 		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
-		,m_effectorOffset(ndVector::m_zero)
+		,m_effectorOffset(ndVector::m_wOne)
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
@@ -154,11 +154,13 @@ class dSimpleIndustrialRobot : public ndModel
 						m_effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
 						m_effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
 						m_effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
-						world->AddJoint(m_effector);
 						m_effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
 						ndMatrix offset(dGetIdentityMatrix());
 						offset.m_posit = m_effectorOffset;
 						m_effector->SetOffsetMatrix(offset);
+
+						// the effector is part of the rig
+						world->AddJoint(m_effector);
 					}
 					break;
 				}
@@ -179,6 +181,7 @@ class dSimpleIndustrialRobot : public ndModel
 		,m_leftGripper(nullptr)
 		,m_rightGripper(nullptr)
 		,m_effector(nullptr)
+		,m_effectorOffset(ndVector::m_wOne)
 		,m_x(0.0f)
 		,m_y(0.0f)
 		,m_azimuth(0.0f)
@@ -360,7 +363,6 @@ class dSimpleIndustrialRobot : public ndModel
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
 		ImGui::Text("gripper");
-		//change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.03f);
 		change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
 
 		ImGui::Text("pitch");
