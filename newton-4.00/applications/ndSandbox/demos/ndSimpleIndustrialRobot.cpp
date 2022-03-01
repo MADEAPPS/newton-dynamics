@@ -361,7 +361,8 @@ class dSimpleIndustrialRobot : public ndModel
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 
 		ImGui::Text("gripper");
-		change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.03f);
+		//change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.03f);
+		change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
 
 		ImGui::Text("pitch");
 		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
@@ -394,8 +395,8 @@ class dSimpleIndustrialRobot : public ndModel
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 			
 			m_effector->SetOffsetMatrix(targetMatrix);
-			m_leftGripper->SetOffsetPosit(m_gripperPosit);
-			m_rightGripper->SetOffsetPosit(m_gripperPosit);
+			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 		}
 	}
 
