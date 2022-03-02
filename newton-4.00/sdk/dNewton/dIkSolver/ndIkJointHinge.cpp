@@ -11,23 +11,23 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointIkHinge.h"
+#include "ndIkJointHinge.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointIkHinge)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointHinge)
 
-ndJointIkHinge::ndJointIkHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,m_axisAccel()
 {
 }
 
-ndJointIkHinge::ndJointIkHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotInChild, pinAndPivotInParent, child, parent)
 	,m_axisAccel()
 {
 }
 
-ndJointIkHinge::ndJointIkHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndIkJointHinge::ndIkJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_axisAccel()
 {
@@ -46,11 +46,11 @@ ndJointIkHinge::ndJointIkHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	//m_isSpringDamper = xmlGetInt(xmlNode, "isSpringDamper") ? true : false;
 }
 
-ndJointIkHinge::~ndJointIkHinge()
+ndIkJointHinge::~ndIkJointHinge()
 {
 }
 
-void ndJointIkHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndIkJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -70,28 +70,28 @@ void ndJointIkHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	//xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
 }
 
-bool ndJointIkHinge::IsIk() const
+bool ndIkJointHinge::IsIk() const
 {
 	return true;
 }
 
-void ndJointIkHinge::SetIkSolver()
+void ndIkJointHinge::SetIkSolver()
 {
 	m_axisAccel.Set();
 }
 
-void ndJointIkHinge::ResetIkSolver()
+void ndIkJointHinge::ResetIkSolver()
 {
 	m_axisAccel.Reset();
 }
 
-void ndJointIkHinge::StopIkMotor(ndFloat32 timestep)
+void ndIkJointHinge::StopIkMotor(ndFloat32 timestep)
 {
 	//m_motorAccel = -GetOmega() / timestep;
 	m_axisAccel.m_motorAccel = -GetOmega() / timestep;
 }
 
-bool ndJointIkHinge::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
+bool ndIkJointHinge::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
 {
 	const ndBodyKinematic* const body0 = GetBody0();
 	const ndBodyKinematic* const body1 = GetBody1();
@@ -121,17 +121,17 @@ bool ndJointIkHinge::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0
 	return ret;
 }
 
-void ndJointIkHinge::SetTorqueLimits(ndFloat32 minTorque, ndFloat32 maxTorque)
+void ndIkJointHinge::SetTorqueLimits(ndFloat32 minTorque, ndFloat32 maxTorque)
 {
 	m_axisAccel.SetForceLimit(minTorque, maxTorque);
 }
 
-void ndJointIkHinge::GetTorqueLimits(ndFloat32& minTorque, ndFloat32& maxTorque) const
+void ndIkJointHinge::GetTorqueLimits(ndFloat32& minTorque, ndFloat32& maxTorque) const
 {
 	m_axisAccel.GetForceLimit(minTorque, maxTorque);
 }
 
-void ndJointIkHinge::JacobianDerivative(ndConstraintDescritor& desc)
+void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;

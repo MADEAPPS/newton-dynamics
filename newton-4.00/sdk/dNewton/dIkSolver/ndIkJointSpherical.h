@@ -9,19 +9,19 @@
 * freely
 */
 
-#ifndef __ND_JOINT_IK_BALL_AND_SOCKET_H__
-#define __ND_JOINT_IK_BALL_AND_SOCKET_H__
+#ifndef __ND_IK_JOINT_SPHERICAL_H__
+#define __ND_IK_JOINT_SPHERICAL_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointSpherical.h"
 
-class ndJointIkBallAndSocket: public ndJointSpherical
+class ndIkJointSpherical: public ndJointSpherical
 {
 	public:
-	D_CLASS_REFLECTION(ndJointIkBallAndSocket);
-	D_NEWTON_API ndJointIkBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointIkBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointIkBallAndSocket();
+	D_CLASS_REFLECTION(ndIkJointSpherical);
+	D_NEWTON_API ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndIkJointSpherical();
 
 	protected:
 	// inverse dynamics interface

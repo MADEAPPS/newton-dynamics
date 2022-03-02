@@ -9,20 +9,20 @@
 * freely
 */
 
-#ifndef __ND_JOINT_IK_HINGE_H__
-#define __ND_JOINT_IK_HINGE_H__
+#ifndef __ND_IK_JOINT_HINGE_H__
+#define __ND_IK_JOINT_HINGE_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointHinge.h"
 
-class ndJointIkHinge: public ndJointHinge
+class ndIkJointHinge: public ndJointHinge
 {
 	public:
-	D_CLASS_REFLECTION(ndJointIkHinge);
-	D_NEWTON_API ndJointIkHinge(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointIkHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointIkHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointIkHinge();
+	D_CLASS_REFLECTION(ndIkJointHinge);
+	D_NEWTON_API ndIkJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndIkJointHinge();
 
 	protected:
 	D_NEWTON_API virtual bool IsIk() const;

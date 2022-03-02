@@ -35,9 +35,9 @@ else()
 	include_directories(dCollision/)
 	include_directories(dNewton/dJoints/)
 	include_directories(dNewton/dModels/)
+	include_directories(dNewton/dIkSolver)
 	include_directories(dNewton/dParticles/)
 	include_directories(dNewton/dModels/dVehicle)
-	include_directories(dNewton/dModels/dIkSolver)
 	include_directories(dNewton/dModels/dCharacter)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
@@ -67,9 +67,9 @@ else()
 		dCollision/*.h 
 		dNewton/dJoints/*.h 
 		dNewton/dModels/*.h 
+		dNewton/dIkSolver/*.h
 		dNewton/dParticles/*.h 
 		dNewton/dModels/dVehicle/*.h
-		dNewton/dModels/dIkSolver/*.h
 		dNewton/dModels/dCharacter/*.h)
 
 	file(GLOB CPP_SOURCE 
@@ -85,12 +85,12 @@ else()
 		dNewton/dModels/*.cpp
 		dNewton/dJoints/*.h 
 		dNewton/dJoints/*.cpp
+		dNewton/dIkSolver/*.h
+		dNewton/dIkSolver/*.cpp
 		dNewton/dParticles/*.h
 		dNewton/dParticles/*.cpp
 		dNewton/dModels/dVehicle/*.h 
 		dNewton/dModels/dVehicle/*.cpp
-		dNewton/dModels/dIkSolver/*.h
-		dNewton/dModels/dIkSolver/*.cpp
 		dNewton/dModels/dCharacter/*.h
 		dNewton/dModels/dCharacter/*.cpp)
 

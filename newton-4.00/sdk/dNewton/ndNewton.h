@@ -51,7 +51,7 @@
 #include <ndJointPulley.h>
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
-#include <ndJointIkHinge.h>
+#include <ndIkJointHinge.h>
 #include <ndBodySphFluid.h>
 #include <ndContactArray.h>
 #include <ndJointFix6dof.h>
@@ -68,6 +68,7 @@
 #include <ndDynamicsUpdate.h>
 #include <ndJointFollowPath.h>
 #include <ndBodyParticleSet.h>
+#include <ndIkJointSpherical.h>
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
@@ -75,7 +76,6 @@
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
 #include <ndBodyParticleSetList.h>
-#include <ndJointIkBallAndSocket.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>

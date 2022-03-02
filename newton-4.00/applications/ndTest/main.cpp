@@ -165,7 +165,7 @@ int main(int, const char*)
 	ndBodyDynamic* bodyFloor = BuildFloorBox(world);
 	ndBodyDynamic* bodySphere = BuildSphere(world, 1.0f, origin + ndVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f);
 
-	ndJointBallAndSocket joint(bodySphere->GetMatrix(), bodySphere, bodyFloor);
+	ndJointSpherical joint(bodySphere->GetMatrix(), bodySphere, bodyFloor);
 
 	ndFloat32 totalTime = 0;
 	for (ndInt32 i = 0; i < 10000; i++)

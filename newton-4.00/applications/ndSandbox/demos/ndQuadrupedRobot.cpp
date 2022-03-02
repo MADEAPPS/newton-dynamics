@@ -140,7 +140,7 @@ class dQuadrupedRobot : public ndModel
 						m_bodyArray.PushBack(childBody);
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						ndJointIkBallAndSocket* const socket = new ndJointIkBallAndSocket(pivotMatrix, childBody, parentBody);
+						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
 						socket->SetConeLimit(120.0f * ndDegreeToRad);
 						socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
@@ -498,7 +498,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	body->SetMassMatrix(massMatrix);
 
 	matrix.m_posit -= matrix.m_front.Scale (0.5f);
-	ndJointIkBallAndSocket* const socket = new ndJointIkBallAndSocket(matrix, body, world->GetSentinelBody());
+	ndIkJointSpherical* const socket = new ndIkJointSpherical(matrix, body, world->GetSentinelBody());
 	world->AddJoint(socket);
 	mesh->Release();
 }

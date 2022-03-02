@@ -120,9 +120,10 @@ class dAdvancedIndustrialRobot : public ndModel
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
-
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
+
+						// here we use a ik joint instead of a regula one.
+						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 						hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
 						world->AddJoint(hinge);

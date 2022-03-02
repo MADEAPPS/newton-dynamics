@@ -11,11 +11,11 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointIkBallAndSocket.h"
+#include "ndIkJointSpherical.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointIkBallAndSocket)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointSpherical)
 
-ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndIkJointSpherical::ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
 	,m_coneRow()
 	,m_twistRow()
@@ -23,7 +23,7 @@ ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndMatrix& pinAndPivotFrame,
 {
 }
 
-ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndIkJointSpherical::ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_coneRow()
 	,m_twistRow()
@@ -40,11 +40,11 @@ ndJointIkBallAndSocket::ndJointIkBallAndSocket(const ndLoadSaveBase::ndLoadDescr
 	//m_twistFrictionRegularizer = xmlGetFloat(xmlNode, "twistFrictionRegularizer");
 }
 
-ndJointIkBallAndSocket::~ndJointIkBallAndSocket()
+ndIkJointSpherical::~ndIkJointSpherical()
 {
 }
 
-void ndJointIkBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndIkJointSpherical::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -61,42 +61,42 @@ void ndJointIkBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 	//xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
 }
 
-void ndJointIkBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndIkJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndJointSpherical::DebugJoint(debugCallback);
 }
 
-bool ndJointIkBallAndSocket::IsIk() const
+bool ndIkJointSpherical::IsIk() const
 {
 	return true;
 }
 
-void ndJointIkBallAndSocket::SetIkSolver()
+void ndIkJointSpherical::SetIkSolver()
 {
 	m_coneRow.Set();
 	m_twistRow.Set();
 	m_biConeRow.Set();
 }
 
-void ndJointIkBallAndSocket::ResetIkSolver()
+void ndIkJointSpherical::ResetIkSolver()
 {
 	m_coneRow.Reset();
 	m_twistRow.Reset();
 	m_biConeRow.Reset();
 }
 
-void ndJointIkBallAndSocket::StopIkMotor(ndFloat32 timestep)
+void ndIkJointSpherical::StopIkMotor(ndFloat32 timestep)
 {
 	dAssert(0);
 }
 
-bool ndJointIkBallAndSocket::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
+bool ndIkJointSpherical::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
 {
 	dAssert(0);
 	return 0;
 }
 
-void ndJointIkBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
+void ndIkJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 {
 //ndJointSpherical::JacobianDerivative(desc);
 //return;
