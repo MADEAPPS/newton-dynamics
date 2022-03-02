@@ -45,17 +45,17 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f},
 	
-	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	//{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	//{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f },
-	//
-	//{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	//{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	//{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f },
-	//
-	//{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	//{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	//{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -492,10 +492,10 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	ndBodyDynamic* const root = robot0->GetRoot();
-	world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
-	matrix.m_posit.m_x -= 1.5f;
+	matrix.m_posit.m_x -= 4.5f;
 	matrix.m_posit.m_y += 1.5f;
 	matrix.m_posit.m_z += 0.5f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
