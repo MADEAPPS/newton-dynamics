@@ -431,7 +431,7 @@ class dQuadrupedRobot : public ndModel
 		{
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
 			{ 
-				if (i == 0)
+				if (i == 1)
 				PlaceEffector(i, timestep);
 				m_invDynamicsSolver.AddEffector(skeleton, m_effectors[i]);
 			}
