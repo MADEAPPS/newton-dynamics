@@ -45,17 +45,17 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f},
 	
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f },
-	
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f },
-	
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	//{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	//{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	//
+	//{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	//{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	//{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	//
+	//{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	//{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	//{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -393,34 +393,27 @@ class dQuadrupedRobot : public ndModel
 		}
 	}
 
-	void PlaceEffector()
+	void PlaceEffector(ndInt32 index, ndFloat32 timestep)
 	{
-		dAssert(0);
-		//// apply target position collected by control panel
-		//const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
-		//ndMatrix targetMatrix(m_effector->GetReferenceMatrix());
-		//
-		//// get the reference matrix in local space 
-		//// (this is because the robot has a build rotation in the model) 
-		//ndVector localPosit(targetMatrix.UnrotateVector(targetMatrix.m_posit));
-		//
-		//// add the local frame displacement)
-		//localPosit.m_x += m_x;
-		//localPosit.m_y += m_y;
-		//localPosit = aximuthMatrix.RotateVector(localPosit);
-		//
-		//// take new position back to target space
-		//const ndVector newPosit(targetMatrix.RotateVector(localPosit) + ndVector::m_wOne);
-		//
-		//targetMatrix = 
+		ndIk6DofEffector* const effector = m_effectors[index];
+
+		//ndMatrix targetMatrix(
 		//	dRollMatrix(90.0f * ndDegreeToRad) *
-		//	dPitchMatrix(m_pitch * ndDegreeToRad) * dYawMatrix(m_yaw * ndDegreeToRad) * dRollMatrix(m_roll * ndDegreeToRad) * 
-		//	dRollMatrix(-90.0f * ndDegreeToRad) * m_baseRotation;
-		//targetMatrix.m_posit = newPosit;
-		//
-		//m_effector->SetTargetMatrix(targetMatrix);
-		//m_leftGripper->SetOffsetPosit(m_gripperPosit);
-		//m_rightGripper->SetOffsetPosit(m_gripperPosit);
+		//	dPitchMatrix(m_pitch * ndDegreeToRad) *
+		//	dYawMatrix(m_yaw * ndDegreeToRad) *
+		//	dRollMatrix(m_roll * ndDegreeToRad) *
+		//	dRollMatrix(-90.0f * ndDegreeToRad));
+
+		ndMatrix targetMatrix(dGetIdentityMatrix());
+
+		static float xxxx;
+		xxxx += 1.0f * timestep;
+
+		ndVector localPosit(m_effectorsOffset[index]);
+		localPosit.m_x += 0.25f * ndSin(xxxx);
+		targetMatrix.m_posit = localPosit;
+		
+		effector->SetOffsetMatrix(targetMatrix);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -430,12 +423,15 @@ class dQuadrupedRobot : public ndModel
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		dAssert(skeleton);
 
+		m_rootBody->SetSleepState(false);
+
 		m_invDynamicsSolver.SetMaxIterations(4);
 		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
 			{ 
-				//PlaceEffector();
+				if (i == 0)
+				PlaceEffector(i, timestep);
 				m_invDynamicsSolver.AddEffector(skeleton, m_effectors[i]);
 			}
 			m_invDynamicsSolver.Solve(skeleton, world, timestep);
@@ -494,13 +490,13 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	//ndBodyDynamic* const root = robot0->GetRoot();
-	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
-	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
+	ndBodyDynamic* const root = robot0->GetRoot();
+	world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
-	matrix.m_posit.m_x -= 4.0f;
-	matrix.m_posit.m_y += 1.0f;
-	matrix.m_posit.m_z += 0.0f;
+	matrix.m_posit.m_x -= 1.5f;
+	matrix.m_posit.m_y += 1.5f;
+	matrix.m_posit.m_z += 0.5f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
