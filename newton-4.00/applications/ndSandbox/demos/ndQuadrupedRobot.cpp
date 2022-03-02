@@ -65,6 +65,7 @@ class dQuadrupedRobot : public ndModel
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
+		,m_referenceFrame(dGetIdentityMatrix())
 		,m_rootBody(nullptr)
 		,m_effectors()
 		,m_invDynamicsSolver()
@@ -87,6 +88,7 @@ class dQuadrupedRobot : public ndModel
 		// add the root body
 		m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
 		m_bodyArray.PushBack(m_rootBody);
+		m_referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix(rootEntity);
 
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
@@ -143,19 +145,23 @@ class dQuadrupedRobot : public ndModel
 					}
 					else
 					{
-						//dAssert(0);
-						const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						char refName[256];
+						sprintf(refName, "%sreference", name);
+						dAssert(rootEntity->Find(refName));
+						const ndMatrix ikReferenceFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
 						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						//ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
-						ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
+						ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, ikReferenceFrame, parentBody, m_rootBody);
 						effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
 						effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
-						//effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
-						//ndMatrix offset(dGetIdentityMatrix());
-						//offset.m_posit = m_effectorOffset;
-						//effector->SetOffsetMatrix(offset);
-
+						ndVector effectorOffset (ikReferenceFrame.UntransformVector(pivotMatrix.m_posit));
+						ndMatrix offset(dGetIdentityMatrix());
+						offset.m_posit = effectorOffset;
+						effector->SetOffsetMatrix(offset);
+						
 						m_effectors.PushBack(effector);
+						m_effectorsOffset.PushBack(effectorOffset);
+						const ndMatrix referenceFrame(m_referenceFrame * m_rootBody->GetMatrix());
+						m_effectorsPivot.PushBack(referenceFrame.UntransformVector(ikReferenceFrame.m_posit));
 					}
 					break;
 				}
@@ -334,10 +340,15 @@ class dQuadrupedRobot : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
+		const ndMatrix rootMatrix(m_referenceFrame * m_rootBody->GetMatrix());
+		context.DrawFrame(rootMatrix);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
 			ndJointBilateralConstraint* const joint = m_effectors[i];
 			joint->DebugJoint(context);
+			ndMatrix reference(rootMatrix);
+			reference.m_posit += rootMatrix.RotateVector(m_effectorsPivot[i]);
+			context.DrawFrame(reference);
 		}
 	}
 
@@ -431,8 +442,11 @@ class dQuadrupedRobot : public ndModel
 		}
 	}
 
+	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndIk6DofEffector*, 4> m_effectors;
+	ndFixSizeArray<ndVector, 4> m_effectorsPivot;
+	ndFixSizeArray<ndVector, 4> m_effectorsOffset;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
@@ -480,7 +494,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	ndBodyDynamic* const root = robot0->GetRoot();
+	//ndBodyDynamic* const root = robot0->GetRoot();
 	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
