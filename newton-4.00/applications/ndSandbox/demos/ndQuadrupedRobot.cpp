@@ -43,7 +43,7 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 
 	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f},
 	//{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	//
+	
 	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f},
 	//{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 	//
@@ -121,22 +121,22 @@ class dQuadrupedRobot : public ndModel
 					//dTrace(("name: %s\n", name));
 					if (definition.m_type == dQuadrupedRobotDefinition::m_hinge)
 					{
-						dAssert(0);
-						//ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						//MakeLegSphericalInretia(childBody);
-						//m_bodyArray.PushBack(childBody);
-						//
-						//const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						//ndJointIkHinge* const hinge = new ndJointIkHinge(pivotMatrix, childBody, parentBody);
-						//hinge->EnableLimits(true, -60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						//m_jointArray.PushBack(hinge);
-						//world->AddJoint(hinge);
-						//parentBody = childBody;
+
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+						MakeLegSphericalInertia(childBody);
+						m_bodyArray.PushBack(childBody);
+						
+						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
+						hinge->SetLimits(-60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						m_jointArray.PushBack(hinge);
+						world->AddJoint(hinge);
+						parentBody = childBody;
 					}
 					else if (definition.m_type == dQuadrupedRobotDefinition::m_socket)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						MakeLegSphericalInretia(childBody);
+						MakeLegSphericalInertia(childBody);
 						m_bodyArray.PushBack(childBody);
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
@@ -262,14 +262,14 @@ class dQuadrupedRobot : public ndModel
 		}
 	}
 
-	void MakeLegSphericalInretia(ndBodyDynamic* const body)
+	void MakeLegSphericalInertia(ndBodyDynamic* const body)
 	{
-		ndVector massMatrix(body->GetMassMatrix());
-		ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
-		massMatrix.m_x = sphericalInertia;
-		massMatrix.m_y = sphericalInertia;
-		massMatrix.m_z = sphericalInertia;
-		body->SetMassMatrix(massMatrix);
+		//ndVector massMatrix(body->GetMassMatrix());
+		//ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+		//massMatrix.m_x = sphericalInertia;
+		//massMatrix.m_y = sphericalInertia;
+		//massMatrix.m_z = sphericalInertia;
+		//body->SetMassMatrix(massMatrix);
 	}
 
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -464,44 +464,43 @@ return;
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 
 
-
-static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
-{
-	ndFloat32 mass = 1.0f;
-	ndFloat32 diameter = 1.0f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.125f, diameter * 0.125f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
-	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_y = 1.2f;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
-	world->AddBody(body);
-	scene->AddEntity(entity);
-
-	body->SetOmega(matrix.RotateVector(ndVector(0.4f, 1.5f, 0.0f, 0.0f)));
-
-	ndVector massMatrix(body->GetMassMatrix());
-	ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
-	massMatrix.m_x = sphericalInertia;
-	massMatrix.m_y = sphericalInertia;
-	massMatrix.m_z = sphericalInertia;
-	body->SetMassMatrix(massMatrix);
-
-	matrix.m_posit -= matrix.m_front.Scale (0.5f);
-	ndIkJointSpherical* const socket = new ndIkJointSpherical(matrix, body, world->GetSentinelBody());
-	world->AddJoint(socket);
-	mesh->Release();
-}
+//static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
+//{
+//	ndFloat32 mass = 1.0f;
+//	ndFloat32 diameter = 1.0f;
+//	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.125f, diameter * 0.125f, diameter * 1.0f));
+//	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+//
+//	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
+//	matrix.m_posit = origin;
+//	matrix.m_posit.m_y = 2.0f;
+//	matrix.m_posit.m_w = 1.0f;
+//
+//	ndPhysicsWorld* const world = scene->GetWorld();
+//	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+//	entity->SetMesh(mesh, dGetIdentityMatrix());
+//	ndBodyDynamic* const body = new ndBodyDynamic();
+//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+//	body->SetMatrix(matrix);
+//	body->SetCollisionShape(shape);
+//	body->SetMassMatrix(mass, shape);
+//	world->AddBody(body);
+//	scene->AddEntity(entity);
+//
+//	body->SetOmega(matrix.RotateVector(ndVector(0.4f, 1.5f, 0.0f, 0.0f)));
+//
+//	ndVector massMatrix(body->GetMassMatrix());
+//	ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
+//	massMatrix.m_x = sphericalInertia;
+//	massMatrix.m_y = sphericalInertia;
+//	massMatrix.m_z = sphericalInertia;
+//	body->SetMassMatrix(massMatrix);
+//
+//	matrix.m_posit -= matrix.m_front.Scale (0.5f);
+//	ndIkJointSpherical* const socket = new ndIkJointSpherical(matrix, body, world->GetSentinelBody());
+//	world->AddJoint(socket);
+//	mesh->Release();
+//}
 
 static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
@@ -520,18 +519,15 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
 
-	//dQuadrupedRobot* const robot = new dQuadrupedRobot(scene, robotEntity, matrix);
-	//scene->SetSelectedModel(robot);
-	//world->AddModel(robot);
-	//ndBodyDynamic* const root = robot->GetRoot();
-	//world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
-	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
-
-	BuildBallSocket(scene, matrix.m_posit);
+	dQuadrupedRobot* const robot0 = new dQuadrupedRobot(scene, robotEntity, matrix);
+	scene->SetSelectedModel(robot0);
+	world->AddModel(robot0);
+	//BuildBallSocket(scene, matrix.m_posit);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new dQuadrupedRobot(scene, robotEntity, matrix));
+	//dQuadrupedRobot* const robot1 = new dQuadrupedRobot(scene, robotEntity, matrix);
+	//world->AddModel(robot1);
 
 	delete robotEntity;
 
@@ -545,6 +541,10 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//posit.m_z += 0.2f;
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
+
+	ndBodyDynamic* const root = robot0->GetRoot();
+	world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.0f;
