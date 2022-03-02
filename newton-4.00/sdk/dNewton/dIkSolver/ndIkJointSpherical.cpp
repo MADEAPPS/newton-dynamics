@@ -17,17 +17,13 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointSpherical)
 
 ndIkJointSpherical::ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
-	,m_coneRow()
-	,m_twistRow()
-	,m_biConeRow()
+	,m_rotationAxis(dGetIdentityMatrix())
 {
 }
 
 ndIkJointSpherical::ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_coneRow()
-	,m_twistRow()
-	,m_biConeRow()
+	,m_rotationAxis(dGetIdentityMatrix())
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -73,16 +69,18 @@ bool ndIkJointSpherical::IsIk() const
 
 void ndIkJointSpherical::SetIkSolver()
 {
-	m_coneRow.Set();
-	m_twistRow.Set();
-	m_biConeRow.Set();
+	for (ndInt32 i = 0; i < 3; i++)
+	{
+		m_axisAccel[i].Set();
+	}
 }
 
 void ndIkJointSpherical::ResetIkSolver()
 {
-	m_coneRow.Reset();
-	m_twistRow.Reset();
-	m_biConeRow.Reset();
+	for (ndInt32 i = 0; i < 3; i++)
+	{
+		m_axisAccel[i].Reset();
+	}
 }
 
 void ndIkJointSpherical::StopIkMotor(ndFloat32 timestep)
@@ -104,7 +102,11 @@ void ndIkJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 	ApplyBaseRows(matrix0, matrix1, desc);
 	SubmitLimits(matrix0, matrix1, desc);
 
-	//SetMotorAcceleration(desc, m_axisAccel.m_motorAccel);
-	//SetLowerFriction(desc, m_axisAccel.m_minForce);
-	//SetHighFriction(desc, m_axisAccel.m_maxForce);
+	for (ndInt32 i = 0; i < 3; i++)
+	{
+		AddAngularRowJacobian(desc, m_rotationAxis[i], ndFloat32(0.0f));
+		SetMotorAcceleration(desc, m_axisAccel[i].m_motorAccel);
+		SetLowerFriction(desc, m_axisAccel[i].m_minForce);
+		SetHighFriction(desc, m_axisAccel[i].m_maxForce);
+	}
 }

@@ -54,8 +54,8 @@
 //#define DEFAULT_SCENE	15		// heavy vehicle
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
-#define DEFAULT_SCENE	18		// advanced industrial robot
-//#define DEFAULT_SCENE	19		// quadruped robot
+//#define DEFAULT_SCENE	18		// advanced industrial robot
+#define DEFAULT_SCENE	19		// quadruped robot
 //#define DEFAULT_SCENE	20		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture
 //#define DEFAULT_SCENE	21		// linked voronoi fracture
@@ -372,7 +372,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
-	//m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	

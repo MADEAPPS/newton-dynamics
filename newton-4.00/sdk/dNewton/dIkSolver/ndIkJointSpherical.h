@@ -35,9 +35,8 @@ class ndIkJointSpherical: public ndJointSpherical
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-	ndIkRowAccel m_coneRow;
-	ndIkRowAccel m_twistRow;
-	ndIkRowAccel m_biConeRow;
+	ndMatrix m_rotationAxis;
+	ndIkRowAccel m_axisAccel[3];
 };
 
 #endif 

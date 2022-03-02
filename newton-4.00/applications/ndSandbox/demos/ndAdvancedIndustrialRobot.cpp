@@ -360,7 +360,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		scene->Print(color, "Control panel");
 
 		bool change = false;
-		ImGui::Text("solver sub steps");
+		//ImGui::Text("ik solver passes");
 
 		ImGui::Text("position x");
 		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);

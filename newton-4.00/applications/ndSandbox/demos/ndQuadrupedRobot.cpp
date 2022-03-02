@@ -28,7 +28,7 @@ class dQuadrupedRobotDefinition
 	{
 		m_root,
 		m_hinge,
-		m_socket,
+		m_spherical,
 		m_effector
 	};
 
@@ -41,16 +41,17 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 {
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
 
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_socket, 4.0f},
-	//{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f},
 	
-	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
 	//{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 	//
-	//{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	//{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
 	//{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 	//
-	//{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_socket, 4.0f},
+	//{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
 	//{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 };
 
@@ -62,18 +63,8 @@ class dQuadrupedRobot : public ndModel
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
 		,m_rootBody(nullptr)
-		,m_leftGripper(nullptr)
-		,m_rightGripper(nullptr)
-		,m_effector(nullptr)
+		,m_effectors()
 		,m_invDynamicsSolver()
-		,m_baseRotation(dGetIdentityMatrix())
-		,m_x(0.0f)
-		,m_y(0.0f)
-		,m_azimuth(0.0f)
-		,m_gripperPosit(0.0f)
-		,m_pitch(0.0f)
-		,m_yaw(0.0f)
-		,m_roll(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -133,7 +124,7 @@ class dQuadrupedRobot : public ndModel
 						world->AddJoint(hinge);
 						parentBody = childBody;
 					}
-					else if (definition.m_type == dQuadrupedRobotDefinition::m_socket)
+					else if (definition.m_type == dQuadrupedRobotDefinition::m_spherical)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						MakeLegSphericalInertia(childBody);
@@ -149,22 +140,19 @@ class dQuadrupedRobot : public ndModel
 					}
 					else
 					{
-						dAssert(0);
-						//ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						//m_effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
-						//m_effector->SetMode(true, true);
-						//
-						//m_baseRotation = m_effector->GetReferenceMatrix();
-						//
-						//ndFloat32 regularizer;
-						//ndFloat32 springConst;
-						//ndFloat32 damperConst;
-						//
-						//m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
-						//m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
-						//
-						//m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
-						//m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+						//dAssert(0);
+						const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
+						//ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
+						ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, parentBody, m_rootBody);
+						effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
+						effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
+						//effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
+						//ndMatrix offset(dGetIdentityMatrix());
+						//offset.m_posit = m_effectorOffset;
+						//effector->SetOffsetMatrix(offset);
+
+						m_effectors.PushBack(effector);
 					}
 					break;
 				}
@@ -182,18 +170,8 @@ class dQuadrupedRobot : public ndModel
 	dQuadrupedRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
-		,m_leftGripper(nullptr)
-		,m_rightGripper(nullptr)
-		,m_effector(nullptr)
+		,m_effectors()
 		,m_invDynamicsSolver()
-		,m_baseRotation(dGetIdentityMatrix())
-		,m_x(0.0f)
-		,m_y(0.0f)
-		,m_azimuth(0.0f)
-		,m_gripperPosit(0.0f)
-		,m_pitch(0.0f)
-		,m_yaw(0.0f)
-		,m_roll(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -256,13 +234,17 @@ class dQuadrupedRobot : public ndModel
 
 	~dQuadrupedRobot()
 	{
-		if (m_effector && !m_effector->IsInWorld())
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
-			delete m_effector;
+			if (!m_effectors[i]->IsInWorld())
+			{
+				delete m_effectors[i];
+			}
 		}
 	}
 
-	void MakeLegSphericalInertia(ndBodyDynamic* const body)
+	//void MakeLegSphericalInertia(ndBodyDynamic* const body)
+	void MakeLegSphericalInertia(ndBodyDynamic* const)
 	{
 		//ndVector massMatrix(body->GetMassMatrix());
 		//ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
@@ -310,14 +292,15 @@ class dQuadrupedRobot : public ndModel
 		nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
 		modelRootNode->LinkEndChild(endEffectorNode);
 
-		xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
-		if (m_effector)
-		{
-			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
-			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
-			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
-			xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
-		}
+		dAssert(0);
+		//xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
+		//if (m_effector)
+		//{
+		//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
+		//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
+		//	xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
+		//	xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+		//}
 	}
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -346,12 +329,14 @@ class dQuadrupedRobot : public ndModel
 		return m_rootBody;
 	}
 
-	void Debug(ndConstraintDebugCallback& context) const
+	//void Debug(ndConstraintDebugCallback& context) const
+	void Debug(ndConstraintDebugCallback&) const
 	{
-		if (m_effector)
-		{
-			((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
-		}
+		dAssert(0);
+		//if (m_effector)
+		//{
+		//	((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
+		//}
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -370,24 +355,24 @@ class dQuadrupedRobot : public ndModel
 		scene->Print(color, "Control panel");
 
 		bool change = false;
-		ImGui::Text("solver sub steps");
+		//ImGui::Text("ik solver passes");
 
-		ImGui::Text("position x");
-		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
-		ImGui::Text("position y");
-		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
-		ImGui::Text("azimuth");
-		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
-
-		ImGui::Text("gripper");
-		change = change | ImGui::SliderFloat("##gripperPosit", &m_gripperPosit, -0.2f, 0.03f);
-
-		ImGui::Text("pitch");
-		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
-		ImGui::Text("yaw");
-		change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
-		ImGui::Text("roll");
-		change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
+		//ImGui::Text("position x");
+		//change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
+		//ImGui::Text("position y");
+		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
+		//ImGui::Text("azimuth");
+		//change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
+		//
+		//ImGui::Text("gripper");
+		//change = change | ImGui::SliderFloat("##gripperPosit", &m_gripperPosit, -0.2f, 0.03f);
+		//
+		//ImGui::Text("pitch");
+		//change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
+		//ImGui::Text("yaw");
+		//change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
+		//ImGui::Text("roll");
+		//change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
 
 		if (change)
 		{
@@ -429,36 +414,26 @@ class dQuadrupedRobot : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-return;
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		dAssert(skeleton);
 
 		m_invDynamicsSolver.SetMaxIterations(4);
-
-		if (m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
+		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
-			PlaceEffector();
-			m_invDynamicsSolver.AddEffector(skeleton, m_effector);
-			m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			//for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
+			//{ 
+			//	//PlaceEffector();
+			//	m_invDynamicsSolver.AddEffector(skeleton, m_effectors[i]);
+			//}
+			//m_invDynamicsSolver.Solve(skeleton, world, timestep);
 		}
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndJointSlider* m_leftGripper;
-	ndJointSlider* m_rightGripper;
-	ndIk6DofEffector* m_effector;
+	ndFixSizeArray<ndIk6DofEffector*, 4> m_effectors;
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
-
-	ndMatrix m_baseRotation;
-	ndFloat32 m_x;
-	ndFloat32 m_y;
-	ndFloat32 m_azimuth;
-	ndFloat32 m_gripperPosit;
-	ndFloat32 m_pitch;
-	ndFloat32 m_yaw;
-	ndFloat32 m_roll;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
