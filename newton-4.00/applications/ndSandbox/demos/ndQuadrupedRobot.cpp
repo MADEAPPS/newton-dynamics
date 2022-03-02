@@ -151,8 +151,9 @@ class dQuadrupedRobot : public ndModel
 						const ndMatrix ikReferenceFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
 						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, ikReferenceFrame, parentBody, m_rootBody);
-						effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
-						effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
+						ndFloat32 regularizer = 1.0e-4f;
+						effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
 						ndVector effectorOffset (ikReferenceFrame.UntransformVector(pivotMatrix.m_posit));
 						ndMatrix offset(dGetIdentityMatrix());
 						offset.m_posit = effectorOffset;
@@ -407,7 +408,7 @@ class dQuadrupedRobot : public ndModel
 		ndMatrix targetMatrix(dGetIdentityMatrix());
 
 		static float xxxx;
-		xxxx += 1.0f * timestep;
+		xxxx += 5.0f * timestep;
 
 		ndVector localPosit(m_effectorsOffset[index]);
 		localPosit.m_x += 0.25f * ndSin(xxxx);

@@ -181,19 +181,6 @@ void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	debugCallback.DrawFrame(matrix1);
 }
 
-void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
-{
-	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
-	for (ndInt32 i = 0; i < 3; i++)
-	{
-		if (m_controlDofOptions & (1 << i))
-		{
-			const ndVector pin = matrix1[i];
-			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
-			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-		}
-	}
-}
 
 void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
@@ -206,8 +193,7 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		const ndFloat32 tol = ndFloat32(1.0e-3f);
 		if (dirMag2 > (tol * tol))
 		{
-			const ndVector dir(pin.Normalize());
-			const ndMatrix basis(dir);
+			const ndMatrix basis(pin);
 			const ndFloat32 dirMag = ndSqrt(dirMag2);
 			const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 
@@ -239,6 +225,20 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		const ndFloat32 angle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
 		AddAngularRowJacobian(desc, pin, angle);
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+	}
+}
+
+void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+	for (ndInt32 i = 0; i < 3; i++)
+	{
+		if (m_controlDofOptions & (1 << i))
+		{
+			const ndVector pin = matrix1[i];
+			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+		}
 	}
 }
 

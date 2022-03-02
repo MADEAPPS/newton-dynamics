@@ -64,20 +64,21 @@ void ndIkJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 
 void ndIkJointSpherical::SubmitAccel(const ndMatrix&, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	const ndVector relAplha(m_accel1.m_angular - m_accel0.m_angular);
-	ndFloat32 alpha(relAplha.DotProduct(relAplha).GetScalar());
-	if (alpha > ndFloat32(1.0e-5f))
+	//const ndVector relAplha(m_accel1.m_angular - m_accel0.m_angular);
+	//ndFloat32 alpha(relAplha.DotProduct(relAplha).GetScalar());
+	//if (alpha > ndFloat32(1.0e-5f))
+	//if (0)
+	//{
+	//	const ndMatrix basis(relAplha);
+	//	ndFloat32 accel = (basis[0] * m_accel0.m_angular - basis[0] * m_accel1.m_angular).AddHorizontal().GetScalar();
+	//	AddAngularRowJacobian(desc, basis[0], ndFloat32(0.0f));
+	//	SetMotorAcceleration(desc, accel);
+	//	AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
+	//	AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
+	//}
+	//else
 	{
-		const ndVector pin(relAplha.Normalize());
-		const ndMatrix basis(pin.Normalize());
-		ndFloat32 accel = (basis[0] * m_accel0.m_angular - basis[0] * m_accel1.m_angular).AddHorizontal().GetScalar();
-		AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
-		SetMotorAcceleration(desc, accel);
-		AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
-		AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
-	}
-	else
-	{
+		// if we have the alpha, there is not need to find a shortest path, any set of axis will do 
 		for (ndInt32 i = 0; i < 3; ++i)
 		{
 			ndFloat32 accel = (matrix1[i] * m_accel0.m_angular - matrix1[i] * m_accel1.m_angular).AddHorizontal().GetScalar();
