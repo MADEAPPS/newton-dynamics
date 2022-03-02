@@ -17,13 +17,13 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointSpherical)
 
 ndIkJointSpherical::ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
-	,m_rotationAxis(dGetIdentityMatrix())
+	,ndIkInterface()
 {
 }
 
 ndIkJointSpherical::ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_rotationAxis(dGetIdentityMatrix())
+	,ndIkInterface()
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -62,36 +62,29 @@ void ndIkJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 	ndJointSpherical::DebugJoint(debugCallback);
 }
 
-bool ndIkJointSpherical::IsIk() const
+void ndIkJointSpherical::SubmitAccel(const ndMatrix&, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	return true;
-}
-
-void ndIkJointSpherical::SetIkSolver()
-{
-	for (ndInt32 i = 0; i < 3; i++)
+	const ndVector relAplha(m_accel1.m_angular - m_accel0.m_angular);
+	ndFloat32 alpha(relAplha.DotProduct(relAplha).GetScalar());
+	if (alpha > ndFloat32(1.0e-5f))
 	{
-		m_axisAccel[i].Set();
+		const ndVector pin(relAplha.Normalize());
+		const ndMatrix basis(pin.Normalize());
+		ndFloat32 accel = (basis[0] * m_accel0.m_angular - basis[0] * m_accel1.m_angular).AddHorizontal().GetScalar();
+		AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
+		SetMotorAcceleration(desc, accel);
+		AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
+		AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
 	}
-}
-
-void ndIkJointSpherical::ResetIkSolver()
-{
-	for (ndInt32 i = 0; i < 3; i++)
+	else
 	{
-		m_axisAccel[i].Reset();
+		for (ndInt32 i = 0; i < 3; ++i)
+		{
+			ndFloat32 accel = (matrix1[i] * m_accel0.m_angular - matrix1[i] * m_accel1.m_angular).AddHorizontal().GetScalar();
+			AddAngularRowJacobian(desc, matrix1[i], ndFloat32(0.0f));
+			SetMotorAcceleration(desc, accel);
+		}
 	}
-}
-
-void ndIkJointSpherical::StopIkMotor(ndFloat32 timestep)
-{
-	dAssert(0);
-}
-
-bool ndIkJointSpherical::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
-{
-	dAssert(0);
-	return 0;
 }
 
 void ndIkJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
@@ -102,11 +95,8 @@ void ndIkJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 	ApplyBaseRows(matrix0, matrix1, desc);
 	SubmitLimits(matrix0, matrix1, desc);
 
-	for (ndInt32 i = 0; i < 3; i++)
+	if (!m_ikMode)
 	{
-		AddAngularRowJacobian(desc, m_rotationAxis[i], ndFloat32(0.0f));
-		SetMotorAcceleration(desc, m_axisAccel[i].m_motorAccel);
-		SetLowerFriction(desc, m_axisAccel[i].m_minForce);
-		SetHighFriction(desc, m_axisAccel[i].m_maxForce);
+		SubmitAccel(matrix0, matrix1, desc);
 	}
 }

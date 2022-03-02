@@ -45,14 +45,17 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
 	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f},
 	
-	//{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	//{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	//
-	//{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	//{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	//
-	//{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	//{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f },
+	
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
+	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -329,14 +332,13 @@ class dQuadrupedRobot : public ndModel
 		return m_rootBody;
 	}
 
-	//void Debug(ndConstraintDebugCallback& context) const
-	void Debug(ndConstraintDebugCallback&) const
+	void Debug(ndConstraintDebugCallback& context) const
 	{
-		dAssert(0);
-		//if (m_effector)
-		//{
-		//	((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
-		//}
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
+		{
+			ndJointBilateralConstraint* const joint = m_effectors[i];
+			joint->DebugJoint(context);
+		}
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -420,12 +422,12 @@ class dQuadrupedRobot : public ndModel
 		m_invDynamicsSolver.SetMaxIterations(4);
 		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
-			//for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
-			//{ 
-			//	//PlaceEffector();
-			//	m_invDynamicsSolver.AddEffector(skeleton, m_effectors[i]);
-			//}
-			//m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
+			{ 
+				//PlaceEffector();
+				m_invDynamicsSolver.AddEffector(skeleton, m_effectors[i]);
+			}
+			m_invDynamicsSolver.Solve(skeleton, world, timestep);
 		}
 	}
 
@@ -438,44 +440,6 @@ class dQuadrupedRobot : public ndModel
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 
-
-//static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
-//{
-//	ndFloat32 mass = 1.0f;
-//	ndFloat32 diameter = 1.0f;
-//	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.125f, diameter * 0.125f, diameter * 1.0f));
-//	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-//
-//	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
-//	matrix.m_posit = origin;
-//	matrix.m_posit.m_y = 2.0f;
-//	matrix.m_posit.m_w = 1.0f;
-//
-//	ndPhysicsWorld* const world = scene->GetWorld();
-//	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-//	entity->SetMesh(mesh, dGetIdentityMatrix());
-//	ndBodyDynamic* const body = new ndBodyDynamic();
-//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-//	body->SetMatrix(matrix);
-//	body->SetCollisionShape(shape);
-//	body->SetMassMatrix(mass, shape);
-//	world->AddBody(body);
-//	scene->AddEntity(entity);
-//
-//	body->SetOmega(matrix.RotateVector(ndVector(0.4f, 1.5f, 0.0f, 0.0f)));
-//
-//	ndVector massMatrix(body->GetMassMatrix());
-//	ndFloat32 sphericalInertia = 0.5f * dMax(dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z);
-//	massMatrix.m_x = sphericalInertia;
-//	massMatrix.m_y = sphericalInertia;
-//	massMatrix.m_z = sphericalInertia;
-//	body->SetMassMatrix(massMatrix);
-//
-//	matrix.m_posit -= matrix.m_front.Scale (0.5f);
-//	ndIkJointSpherical* const socket = new ndIkJointSpherical(matrix, body, world->GetSentinelBody());
-//	world->AddJoint(socket);
-//	mesh->Release();
-//}
 
 static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
@@ -497,7 +461,6 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	dQuadrupedRobot* const robot0 = new dQuadrupedRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot0);
 	world->AddModel(robot0);
-	//BuildBallSocket(scene, matrix.m_posit);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
@@ -518,7 +481,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	ndBodyDynamic* const root = robot0->GetRoot();
-	world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 4.0f;

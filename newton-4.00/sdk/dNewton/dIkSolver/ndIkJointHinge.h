@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointHinge.h"
 
-class ndIkJointHinge: public ndJointHinge
+class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointHinge);
@@ -25,19 +25,10 @@ class ndIkJointHinge: public ndJointHinge
 	D_NEWTON_API virtual ~ndIkJointHinge();
 
 	protected:
-	D_NEWTON_API virtual bool IsIk() const;
-	D_NEWTON_API virtual void SetIkSolver();
-	D_NEWTON_API virtual void ResetIkSolver();
-	D_NEWTON_API virtual void StopIkMotor(ndFloat32 timestep);
-	D_NEWTON_API virtual bool SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1);
-
-	D_NEWTON_API void SetTorqueLimits(ndFloat32 minToque, ndFloat32 maxTorque);
-	D_NEWTON_API void GetTorqueLimits(ndFloat32& minToque, ndFloat32& maxTorque) const;
+	D_ADD_IK_INTERFACE();
 
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
-	ndIkRowAccel m_axisAccel;
 };
 
 #endif 

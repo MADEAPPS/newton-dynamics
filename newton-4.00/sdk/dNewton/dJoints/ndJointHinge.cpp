@@ -186,17 +186,6 @@ void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatri
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
-ndJacobianPair ndJointHinge::GetPinJacobian() const
-{
-	ndMatrix matrix (GetLocalMatrix0() * GetBody0()->GetMatrix());
-	ndJacobianPair pair;
-	pair.m_jacobianM0.m_linear = ndVector::m_zero;
-	pair.m_jacobianM1.m_linear = ndVector::m_zero;
-	pair.m_jacobianM0.m_angular = matrix.m_front;
-	pair.m_jacobianM1.m_angular = matrix.m_front * ndVector::m_negOne;
-	return pair;
-}
-
 void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);

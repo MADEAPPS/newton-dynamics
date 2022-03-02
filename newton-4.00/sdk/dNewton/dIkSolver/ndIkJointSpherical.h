@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSpherical.h"
 
-class ndIkJointSpherical: public ndJointSpherical
+class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
 	D_CLASS_REFLECTION(ndIkJointSpherical);
@@ -25,18 +25,11 @@ class ndIkJointSpherical: public ndJointSpherical
 
 	protected:
 	// inverse dynamics interface
-	D_COLLISION_API virtual bool IsIk() const;
-	D_COLLISION_API virtual void SetIkSolver();
-	D_COLLISION_API virtual void ResetIkSolver();
-	D_COLLISION_API virtual void StopIkMotor(ndFloat32 timestep);
-	D_COLLISION_API virtual bool SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1);
-
+	D_ADD_IK_INTERFACE();
+	D_COLLISION_API void SubmitAccel(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
-
-	ndMatrix m_rotationAxis;
-	ndIkRowAccel m_axisAccel[3];
 };
 
 #endif 

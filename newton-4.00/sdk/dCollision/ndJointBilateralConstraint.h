@@ -39,24 +39,32 @@ enum ndJointBilateralSolverModel
 	m_jointModesCount
 };
 
+#define D_ADD_IK_INTERFACE()																\
+	virtual void SetIkMode(bool mode)														\
+	{																						\
+		m_ikMode = mode;																	\
+	}																						\
+	virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel)	\
+	{																						\
+		m_accel0 = body0Accel;																\
+		m_accel1 = body1Accel;																\
+	}
+
+
 D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
-	class ndIkRowAccel
+	class ndIkInterface
 	{
 		public:
-		ndIkRowAccel();
-		void Set();
-		void Reset();
-		void SetForceLimit(ndFloat32 min, ndFloat32 max);
-		void GetForceLimit(ndFloat32& min, ndFloat32& max) const;
+		ndIkInterface()
+			:m_ikMode(false)
+		{}
 
-		ndFloat32 m_minForce;
-		ndFloat32 m_maxForce;
-		ndFloat32 m_motorAccel;
-		ndFloat32 m_savedMinForce;
-		ndFloat32 m_savedMaxForce;
+		ndJacobian m_accel0;
+		ndJacobian m_accel1;
+		bool m_ikMode;
 	};
 
 	D_CLASS_REFLECTION(ndJointBilateralConstraint);
@@ -95,11 +103,8 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector GetTorqueBody1() const;
 
 	// inverse dynamics interface
-	D_COLLISION_API virtual bool IsIk() const;
-	D_COLLISION_API virtual void SetIkSolver();
-	D_COLLISION_API virtual void ResetIkSolver();
-	D_COLLISION_API virtual void StopIkMotor(ndFloat32 timestep);
-	D_COLLISION_API virtual bool SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1);
+	D_COLLISION_API virtual void SetIkMode(bool mode);
+	D_COLLISION_API virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel);
 
 	bool IsInWorld() const;
 	bool IsBilateral() const;
@@ -343,44 +348,6 @@ inline bool ndJointBilateralConstraint::IsSkeleton() const
 inline void ndJointBilateralConstraint::ReplaceSentinel(ndBodyKinematic* const sentinel)
 {
 	m_body1 = sentinel;
-}
-
-inline ndJointBilateralConstraint::ndIkRowAccel::ndIkRowAccel()
-	:m_minForce(ndFloat32(-1.0e10f))
-	,m_maxForce(ndFloat32(1.0e10f))
-	,m_motorAccel(ndFloat32(0.0f))
-	,m_savedMinForce(ndFloat32(0.0f))
-	,m_savedMaxForce(ndFloat32(0.0f))
-{
-}
-
-inline void ndJointBilateralConstraint::ndIkRowAccel::SetForceLimit(ndFloat32 min, ndFloat32 max)
-{
-	dAssert(min <= ndFloat32(0.0f));
-	dAssert(max >= ndFloat32(0.0f));
-	m_minForce = min;
-	m_maxForce = max;
-}
-
-inline void ndJointBilateralConstraint::ndIkRowAccel::GetForceLimit(ndFloat32& min, ndFloat32& max) const
-{
-	min = m_minForce;
-	max = m_maxForce;
-}
-
-inline void ndJointBilateralConstraint::ndIkRowAccel::Set()
-{
-	m_savedMinForce = m_minForce;
-	m_savedMaxForce = m_maxForce;
-	m_minForce = ndFloat32(0.0f);
-	m_maxForce = ndFloat32(0.0f);
-	m_motorAccel = ndFloat32(0.0f);
-	SetForceLimit(ndFloat32(0.0f), ndFloat32(0.0f));
-}
-
-inline void ndJointBilateralConstraint::ndIkRowAccel::Reset()
-{
-	SetForceLimit(m_savedMinForce, m_savedMaxForce);
 }
 
 #endif

@@ -166,26 +166,12 @@ void ndJointBilateralConstraint::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 	xmlSaveParam(childNode, "solverModel", ndInt32(m_solverModel));
 }
 
-bool ndJointBilateralConstraint::IsIk() const
-{
-	return false;
-}
-
-void ndJointBilateralConstraint::SetIkSolver()
+void ndJointBilateralConstraint::SetIkMode(bool)
 {
 }
 
-void ndJointBilateralConstraint::ResetIkSolver()
+void ndJointBilateralConstraint::SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel)
 {
-}
-
-void ndJointBilateralConstraint::StopIkMotor(ndFloat32)
-{
-}
-
-bool ndJointBilateralConstraint::SetIkMotor(ndFloat32, const ndJacobian&, const ndJacobian&)
-{
-	return true;
 }
 
 void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCallback) const

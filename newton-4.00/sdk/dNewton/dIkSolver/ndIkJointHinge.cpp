@@ -17,19 +17,19 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointHinge)
 
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
-	,m_axisAccel()
+	,ndIkInterface()
 {
 }
 
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotInChild, pinAndPivotInParent, child, parent)
-	,m_axisAccel()
+	,ndIkInterface()
 {
 }
 
 ndIkJointHinge::ndIkJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_axisAccel()
+
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -70,67 +70,6 @@ void ndIkJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	//xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
 }
 
-bool ndIkJointHinge::IsIk() const
-{
-	return true;
-}
-
-void ndIkJointHinge::SetIkSolver()
-{
-	m_axisAccel.Set();
-}
-
-void ndIkJointHinge::ResetIkSolver()
-{
-	m_axisAccel.Reset();
-}
-
-void ndIkJointHinge::StopIkMotor(ndFloat32 timestep)
-{
-	//m_motorAccel = -GetOmega() / timestep;
-	m_axisAccel.m_motorAccel = -GetOmega() / timestep;
-}
-
-bool ndIkJointHinge::SetIkMotor(ndFloat32 timestep, const ndJacobian& forceBody0, const ndJacobian& forceBody1)
-{
-	const ndBodyKinematic* const body0 = GetBody0();
-	const ndBodyKinematic* const body1 = GetBody1();
-
-	const ndMatrix& invInertia0 = body0->GetInvInertiaMatrix();
-	const ndMatrix& invInertia1 = body1->GetInvInertiaMatrix();
-
-	const ndVector alpha0(invInertia0.RotateVector(forceBody0.m_angular));
-	const ndVector alpha1(invInertia1.RotateVector(forceBody1.m_angular));
-
-	ndFloat32 minLimit;
-	ndFloat32 maxLimit;
-	GetLimits(minLimit, maxLimit);
-	ndJacobianPair jacobian(GetPinJacobian());
-	ndFloat32 accel = (jacobian.m_jacobianM0.m_angular * alpha0 + jacobian.m_jacobianM1.m_angular * alpha1).AddHorizontal().GetScalar();
-	ndFloat32 angle = GetAngle() + GetOmega() * timestep + accel * timestep * timestep;
-
-	bool ret = true;
-	if ((angle < minLimit) || (angle > maxLimit))
-	{
-		ret = false;
-		accel = -GetOmega() / timestep;
-		m_axisAccel.Reset();
-	}
-	m_axisAccel.m_motorAccel = accel;
-
-	return ret;
-}
-
-void ndIkJointHinge::SetTorqueLimits(ndFloat32 minTorque, ndFloat32 maxTorque)
-{
-	m_axisAccel.SetForceLimit(minTorque, maxTorque);
-}
-
-void ndIkJointHinge::GetTorqueLimits(ndFloat32& minTorque, ndFloat32& maxTorque) const
-{
-	m_axisAccel.GetForceLimit(minTorque, maxTorque);
-}
-
 void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -140,11 +79,15 @@ void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	ApplyBaseRows(desc, matrix0, matrix1);
 	SubmitLimits(desc, matrix0, matrix1);
 
-	const ndVector pin(matrix0.m_front);
-	AddAngularRowJacobian(desc, pin, ndFloat32 (0.0f));
-	SetMotorAcceleration(desc, m_axisAccel.m_motorAccel);
-	SetLowerFriction(desc, m_axisAccel.m_minForce);
-	SetHighFriction(desc, m_axisAccel.m_maxForce);
+	if (!m_ikMode)
+	{
+		const ndVector pin(matrix0.m_front);
+		ndFloat32 accel = (pin * m_accel0.m_angular - pin * m_accel1.m_angular).AddHorizontal().GetScalar();
+		AddAngularRowJacobian(desc, pin, 0.0f);
+		SetMotorAcceleration(desc, accel);
+		//SetLowerFriction(desc, m_axisAccel.m_minForce);
+		//SetHighFriction(desc, m_axisAccel.m_maxForce);
+	}
 }
 
 
