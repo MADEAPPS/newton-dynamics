@@ -67,8 +67,11 @@ class dQuadrupedRobot : public ndModel
 		:ndModel()
 		,m_referenceFrame(dGetIdentityMatrix())
 		,m_rootBody(nullptr)
+		,m_effectorsOffset()
 		,m_effectors()
 		,m_invDynamicsSolver()
+		,m_bodyArray()
+		,m_jointArray()
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -155,11 +158,10 @@ class dQuadrupedRobot : public ndModel
 						ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
 						
 						m_effectors.PushBack(effector);
-						m_effectorsPivot.PushBack(effector->GetLocalMatrix1().m_posit);
 						m_effectorsOffset.PushBack(effector->GetOffsetMatrix().m_posit);
 
 						ndFloat32 regularizer = 1.0e-4f;
-						effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+						effector->EnableRotationAxis(ndIk6DofEffector::m_swivelAngle);
 						effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
 					}
@@ -347,9 +349,6 @@ class dQuadrupedRobot : public ndModel
 		{
 			ndJointBilateralConstraint* const joint = m_effectors[i];
 			joint->DebugJoint(context);
-			ndMatrix reference(rootMatrix);
-			reference.m_posit += rootMatrix.RotateVector(m_effectorsPivot[i]);
-			context.DrawFrame(reference);
 		}
 	}
 
@@ -442,9 +441,9 @@ class dQuadrupedRobot : public ndModel
 
 	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
-	ndFixSizeArray<ndIk6DofEffector*, 4> m_effectors;
-	ndFixSizeArray<ndVector, 4> m_effectorsPivot;
 	ndFixSizeArray<ndVector, 4> m_effectorsOffset;
+	ndFixSizeArray<ndIk6DofEffector*, 4> m_effectors;
+
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;

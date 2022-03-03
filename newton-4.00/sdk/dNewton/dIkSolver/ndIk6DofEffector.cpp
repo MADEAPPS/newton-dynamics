@@ -24,6 +24,7 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_swivelAngleValue(ndFloat32(0.0f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
@@ -39,6 +40,8 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_swivelAngleValue(ndFloat32(0.0f))
+	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
 	dAssert(0);
@@ -117,6 +120,16 @@ ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
 	return m_targetFrame;
 }
 
+ndFloat32 ndIk6DofEffector::GetSwivelAngle() const
+{
+	return m_swivelAngleValue;
+}
+
+void ndIk6DofEffector::SetSwivelAngle(const ndFloat32& angle)
+{
+	m_swivelAngleValue = angle;
+}
+
 void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 {
 	m_targetFrame = matrix;
@@ -161,6 +174,39 @@ void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	debugCallback.DrawFrame(targetFrame);
 }
 
+void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	const ndQuaternion rotation(matrix0.Inverse() * matrix1);
+	const ndVector pin(rotation & ndVector::m_triplexMask);
+	const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
+	const ndFloat32 tol = ndFloat32(1.0e-3f);
+	if (dirMag2 > (tol * tol))
+	{
+		const ndMatrix basis(pin);
+		const ndFloat32 dirMag = ndSqrt(dirMag2);
+		const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
+
+		AddAngularRowJacobian(desc, basis[0], angle);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
+		AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
+	}
+	else
+	{
+		const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+
+		const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
+		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+
+		const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
+		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+	}
+}
+
 void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	switch (m_rotationType)
@@ -175,43 +221,16 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 			break;
 		}
-		case m_swivelPlane:
+		case m_swivelAngle:
 		{
-			dAssert(0);
+			const ndMatrix matrix11(m_targetFrame * matrix1);
+			SubmitShortestPathAxis(matrix0, matrix11, desc);
 			break;
 		}
 		case m_shortestPath:
 		{
 			const ndMatrix matrix11(m_targetFrame * matrix1);
-			const ndQuaternion rotation(matrix0.Inverse() * matrix11);
-			const ndVector pin(rotation & ndVector::m_triplexMask);
-			const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
-			const ndFloat32 tol = ndFloat32(1.0e-3f);
-			if (dirMag2 > (tol * tol))
-			{
-				const ndMatrix basis(pin);
-				const ndFloat32 dirMag = ndSqrt(dirMag2);
-				const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
-
-				AddAngularRowJacobian(desc, basis[0], angle);
-				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-				AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
-				AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
-			}
-			else
-			{
-				const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
-				AddAngularRowJacobian(desc, matrix11[0], pitchAngle);
-				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-
-				const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[1]);
-				AddAngularRowJacobian(desc, matrix11[1], yawAngle);
-				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-
-				const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[2]);
-				AddAngularRowJacobian(desc, matrix11[2], rollAngle);
-				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-			}
+			SubmitShortestPathAxis(matrix0, matrix11, desc);
 			break;
 		}
 	}
@@ -238,5 +257,5 @@ void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearAxis(matrix0, matrix1, desc);
-	//SubmitAngularAxis(matrix0, matrix1, desc);
+	SubmitAngularAxis(matrix0, matrix1, desc);
 }

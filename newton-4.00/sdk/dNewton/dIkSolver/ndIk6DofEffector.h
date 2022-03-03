@@ -22,7 +22,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	{
 		m_disabled,
 		m_fixAxis,
-		m_swivelPlane,
+		m_swivelAngle,
 		m_shortestPath,
 	};
 
@@ -38,6 +38,9 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);
+
+	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
+	D_NEWTON_API void SetSwivelAngle(const ndFloat32& angle);
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
@@ -51,6 +54,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API void SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
 	ndMatrix m_targetFrame;
 	ndFloat32 m_angularSpring;
@@ -60,15 +64,17 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	ndFloat32 m_linearSpring;
 	ndFloat32 m_linearDamper;
 	ndFloat32 m_linearRegularizer;
+
+	ndFloat32 m_swivelAngleValue;
 	ndRotationType m_rotationType;
 	union
 	{
 		ndUnsigned8 m_controlDofOptions;
 		struct
 		{
-			ndUnsigned8 m_axisX				: 1;
-			ndUnsigned8 m_axisY				: 1;
-			ndUnsigned8 m_axisZ				: 1;
+			ndUnsigned8 m_axisX	: 1;
+			ndUnsigned8 m_axisY	: 1;
+			ndUnsigned8 m_axisZ	: 1;
 		};
 	};
 };
