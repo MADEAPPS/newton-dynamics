@@ -409,7 +409,7 @@ class dQuadrupedRobot : public ndModel
 
 		static float xxxx;
 		xxxx += 5.0f * timestep;
-		//xxxx = 0.9;
+		xxxx = 0.6f;
 
 		ndVector localPosit(m_effectorsOffset[index]);
 		localPosit.m_x += 0.25f * ndSin(xxxx);
