@@ -148,22 +148,20 @@ class dQuadrupedRobot : public ndModel
 						char refName[256];
 						sprintf(refName, "%sreference", name);
 						dAssert(rootEntity->Find(refName));
-						const ndMatrix ikReferenceFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
-						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						ndIk6DofEffector* const effector = new ndIk6DofEffector(pivotMatrix, ikReferenceFrame, parentBody, m_rootBody);
+
+						ndBodyDynamic* const childBody = parentBody;
+						const ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
+						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
+						ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
+						
+						m_effectors.PushBack(effector);
+						m_effectorsPivot.PushBack(effector->GetLocalMatrix1().m_posit);
+						m_effectorsOffset.PushBack(effector->GetOffsetMatrix().m_posit);
+
 						ndFloat32 regularizer = 1.0e-4f;
 						effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
-						ndVector effectorOffset (ikReferenceFrame.UntransformVector(pivotMatrix.m_posit));
-						ndMatrix offset(dGetIdentityMatrix());
-						offset.m_posit = effectorOffset;
-						effector->SetOffsetMatrix(offset);
-						
-						m_effectors.PushBack(effector);
-						m_effectorsOffset.PushBack(effectorOffset);
-						const ndMatrix referenceFrame(m_referenceFrame * m_rootBody->GetMatrix());
-						m_effectorsPivot.PushBack(referenceFrame.UntransformVector(ikReferenceFrame.m_posit));
 					}
 					break;
 				}

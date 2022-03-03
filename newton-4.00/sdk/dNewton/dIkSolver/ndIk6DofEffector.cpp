@@ -15,24 +15,9 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIk6DofEffector)
 
-ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, globalPinAndPivot)
-	,m_targetFrame(dGetIdentityMatrix())
-	,m_angularSpring(ndFloat32(1000.0f))
-	,m_angularDamper(ndFloat32(50.0f))
-	,m_angularRegularizer(ndFloat32(5.0e-3f))
-	,m_linearSpring(ndFloat32(1000.0f))
-	,m_linearDamper(ndFloat32(50.0f))
-	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_rotationType(m_disabled)
-	,m_controlDofOptions(0xff)
-{
-	SetSolverModel(m_jointkinematicCloseLoop);
-}
-
-ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivotChild, const ndMatrix& globalPinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, globalPinAndPivotChild, globalPinAndPivotParent)
-	,m_targetFrame(dGetIdentityMatrix())
+ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
+	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
 	,m_angularRegularizer(ndFloat32(5.0e-3f))
@@ -168,12 +153,13 @@ void ndIk6DofEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32&
 void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	const ndMatrix matrix1(m_targetFrame * m_localMatrix1 * m_body1->GetMatrix());
+	const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
+	const ndMatrix targetFrame(m_targetFrame * matrix1);
 	
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
+	debugCallback.DrawFrame(targetFrame);
 }
-
 
 void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {

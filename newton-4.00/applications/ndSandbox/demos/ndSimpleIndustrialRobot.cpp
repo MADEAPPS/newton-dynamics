@@ -149,16 +149,18 @@ class dSimpleIndustrialRobot : public ndModel
 					}
 					else
 					{
-						const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
+						ndBodyDynamic* const childBody = parentBody;
+
+						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
+						m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
+
+						m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
+
+						ndFloat32 relaxation = 0.001f;
 						m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-						m_effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
-						m_effector->SetAngularSpringDamper(0.0001f, 1500.0f, 100.0f);
-						m_effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
-						ndMatrix offset(dGetIdentityMatrix());
-						offset.m_posit = m_effectorOffset;
-						m_effector->SetOffsetMatrix(offset);
+						m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
+						m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
 
 						// the effector is part of the rig
 						world->AddJoint(m_effector);

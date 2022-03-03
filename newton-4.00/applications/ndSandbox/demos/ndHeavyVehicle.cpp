@@ -535,7 +535,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		ndMatrix effectorMatrix(m_localFrame * effectorEntity->CalculateGlobalMatrix(nullptr));
 		effectorMatrix.m_posit = turretBody->GetMatrix().m_posit;
 		
-		m_effector = new ndIk6DofEffector(effectorMatrix, canonBody, m_chassis);
+		m_effector = new ndIk6DofEffector(effectorMatrix, effectorMatrix, canonBody, m_chassis);
 		m_effector->EnableAxisX(true);
 		m_effector->EnableAxisY(false);
 		m_effector->EnableAxisZ(false);
@@ -703,7 +703,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
 		matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
 
-		ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, body1, attachmentBody);
+		ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, body1, attachmentBody);
 		attachementJoint->EnableAxisX(false);
 		attachementJoint->EnableAxisY(true);
 		attachementJoint->EnableAxisZ(true);
@@ -717,7 +717,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndMatrix armMatrix(m_localFrame * armBody->GetMatrix());
 		m_armHinge = new ndJointHinge(armMatrix, armBody, m_chassis);
 		m_armHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
-		//m_armHinge->SetLimits(-10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad);
+
 		AddExtraBody(armBody);
 		AddExtraJoint(m_armHinge);
 		AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", armBody, "attach0_left");
@@ -728,7 +728,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
 		m_bucketHinge = new ndJointHinge(frontBucketMatrix, frontBucketBody, armBody);
 		m_bucketHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
-		//m_bucketHinge->SetLimits(-75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+
 		AddExtraBody(frontBucketBody);
 		AddExtraJoint(m_bucketHinge);
 		AddHydraulic(scene, armBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody, "attachment_frontBucket001");
