@@ -155,6 +155,7 @@ class dAdvancedIndustrialRobot : public ndModel
 						const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
 						const ndMatrix pivotMatrix(childEntity->CalculateGlobalMatrix());
 						m_effector = new ndIk6DofEffector(pivotMatrix, referenceFrame, parentBody, m_rootBody);
+						m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						m_effector->SetLinearSpringDamper(0.0001f, 1500.0f, 200.0f);
 						m_effector->SetAngularSpringDamper(0.001f, 1500.0f, 100.0f);
 						m_effectorOffset = referenceFrame.UntransformVector(pivotMatrix.m_posit);
@@ -240,8 +241,7 @@ class dAdvancedIndustrialRobot : public ndModel
 			//
 			//const ndMatrix pivotMatrix(body0->GetMatrix());
 			//m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
-			//m_effector->SetMode(true, true);
-			//
+			//m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 			//ndFloat32 regularizer;
 			//ndFloat32 springConst;
 			//ndFloat32 damperConst;

@@ -539,8 +539,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		m_effector->EnableAxisX(true);
 		m_effector->EnableAxisY(false);
 		m_effector->EnableAxisZ(false);
-		m_effector->EnableFixAxisRotation(true);
-		m_effector->EnableShortPathRotation(false);
+		m_effector->EnableRotationAxis(ndIk6DofEffector::m_fixAxis);
 		AddExtraJoint(m_effector);
 	}
 
@@ -708,8 +707,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		attachementJoint->EnableAxisX(false);
 		attachementJoint->EnableAxisY(true);
 		attachementJoint->EnableAxisZ(true);
-		attachementJoint->EnableFixAxisRotation(false);
-		attachementJoint->EnableShortPathRotation(false);
+		attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
 		AddExtraJoint(attachementJoint);
 	}
 

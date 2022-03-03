@@ -24,10 +24,9 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivot, ndBodyKine
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
-	m_fixAxisRotation = 0;
-	m_shortestPathRotation = 1;
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
@@ -40,10 +39,9 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& globalPinAndPivotChild, const
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
-	m_fixAxisRotation = 0;
-	m_shortestPathRotation = 1;
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
@@ -124,14 +122,9 @@ void ndIk6DofEffector::EnableAxisZ(bool state)
 	m_axisZ = state ? 1 : 0;
 }
 
-void ndIk6DofEffector::EnableShortPathRotation(bool state)
+void ndIk6DofEffector::EnableRotationAxis(ndRotationType type)
 {
-	m_shortestPathRotation = state ? 1 : 0;
-}
-
-void ndIk6DofEffector::EnableFixAxisRotation(bool state)
-{
-	m_fixAxisRotation = state ? 1 : 0;
+	m_rotationType = type;
 }
 
 ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
@@ -184,53 +177,64 @@ void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 
 void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	if (m_shortestPathRotation)
+	switch (m_rotationType)
 	{
-		const ndMatrix matrix11(m_targetFrame * matrix1);
-		const ndQuaternion rotation(matrix0.Inverse() * matrix11);
-		const ndVector pin(rotation & ndVector::m_triplexMask);
-		const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
-		const ndFloat32 tol = ndFloat32(1.0e-3f);
-		if (dirMag2 > (tol * tol))
+		case m_fixAxis:
 		{
-			const ndMatrix basis(pin);
-			const ndFloat32 dirMag = ndSqrt(dirMag2);
-			const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
+			const ndMatrix matrix11(m_targetFrame * matrix1);
+			const ndVector& pin = matrix11.m_front;
 
-			AddAngularRowJacobian(desc, basis[0], angle);
+			const ndFloat32 angle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
+			AddAngularRowJacobian(desc, pin, angle);
 			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-			AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
-			AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
+			break;
 		}
-		else
+		case m_swivelPlane:
 		{
-			const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
-			AddAngularRowJacobian(desc, matrix11[0], pitchAngle);
-			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-			
-			const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[1]);
-			AddAngularRowJacobian(desc, matrix11[1], yawAngle);
-			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-			
-			const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[2]);
-			AddAngularRowJacobian(desc, matrix11[2], rollAngle);
-			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+			dAssert(0);
+			break;
 		}
-	}
-	else if (m_fixAxisRotation)
-	{
-		const ndMatrix matrix11(m_targetFrame * matrix1);
-		const ndVector& pin = matrix11.m_front;
+		case m_shortestPath:
+		{
+			const ndMatrix matrix11(m_targetFrame * matrix1);
+			const ndQuaternion rotation(matrix0.Inverse() * matrix11);
+			const ndVector pin(rotation & ndVector::m_triplexMask);
+			const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
+			const ndFloat32 tol = ndFloat32(1.0e-3f);
+			if (dirMag2 > (tol * tol))
+			{
+				const ndMatrix basis(pin);
+				const ndFloat32 dirMag = ndSqrt(dirMag2);
+				const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 
-		const ndFloat32 angle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
-		AddAngularRowJacobian(desc, pin, angle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+				AddAngularRowJacobian(desc, basis[0], angle);
+				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+				AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
+				AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
+			}
+			else
+			{
+				const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
+				AddAngularRowJacobian(desc, matrix11[0], pitchAngle);
+				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+
+				const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[1]);
+				AddAngularRowJacobian(desc, matrix11[1], yawAngle);
+				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+
+				const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[2]);
+				AddAngularRowJacobian(desc, matrix11[2], rollAngle);
+				SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+			}
+			break;
+		}
 	}
 }
 
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+dTrace(("%f %f\n", matrix0.m_posit.m_y, posit1.m_y));
 	for (ndInt32 i = 0; i < 3; i++)
 	{
 		if (m_controlDofOptions & (1 << i))
