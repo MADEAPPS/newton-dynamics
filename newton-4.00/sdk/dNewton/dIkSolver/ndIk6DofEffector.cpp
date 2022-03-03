@@ -120,19 +120,22 @@ ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
 	return m_targetFrame;
 }
 
-ndFloat32 ndIk6DofEffector::GetSwivelAngle() const
-{
-	return m_swivelAngleValue;
-}
-
-void ndIk6DofEffector::SetSwivelAngle(const ndFloat32& angle)
-{
-	m_swivelAngleValue = angle;
-}
-
 void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 {
 	m_targetFrame = matrix;
+}
+
+void ndIk6DofEffector::GetPositionAndSwivelAngle(ndVector& posit, ndFloat32& angle) const
+{
+	angle = m_swivelAngleValue;
+	posit = m_targetFrame.m_posit;
+}
+
+void ndIk6DofEffector::SetPositionAndSwivelAngle(const ndVector& posit, ndFloat32 angle)
+{
+	m_swivelAngleValue = angle;
+	m_targetFrame.m_posit = posit;
+	m_targetFrame.m_posit.m_w = ndFloat32(1.0f);
 }
 
 void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -209,6 +212,15 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 
 void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
+
+	//const ndMatrix matrix0__(m_localMatrix0 * m_body0->GetMatrix());
+	//const ndMatrix matrix1__(m_localMatrix1 * m_body1->GetMatrix());
+	//const ndMatrix targetFrame__(m_targetFrame * matrix1);
+	//if (matrix0__[1].DotProduct(targetFrame__[1]).GetScalar() > 0.999f)
+	//{
+	//	const ndMatrix matrix1___(m_localMatrix1 * m_body1->GetMatrix());
+	//}
+
 	switch (m_rotationType)
 	{
 		case m_fixAxis:
@@ -223,8 +235,22 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		}
 		case m_swivelAngle:
 		{
-			const ndMatrix matrix11(m_targetFrame * matrix1);
-			SubmitShortestPathAxis(matrix0, matrix11, desc);
+			const ndMatrix matrix(m_targetFrame * matrix1);
+
+			ndVector xxxx(matrix1.UntransformVector(matrix0.m_posit));
+			dTrace(("p0(%f %f %f) p1(%f %f %f)\n", 
+				xxxx.m_x, xxxx.m_y, xxxx.m_z,
+				m_targetFrame.m_posit.m_x, m_targetFrame.m_posit.m_y, m_targetFrame.m_posit.m_z));
+			ndVector xxxx1((m_targetFrame.m_posit & ndVector::m_triplexMask).Normalize());
+
+			ndVector  xxxxxxxxx(m_targetFrame.m_posit);
+			m_targetFrame = matrix0 * matrix1.Inverse();
+			m_targetFrame.m_posit = xxxxxxxxx;
+			
+			//SubmitShortestPathAxis(matrix0, matrix, desc);
+			const ndMatrix matrix_____(m_targetFrame * matrix1);
+
+			SubmitShortestPathAxis(matrix0, matrix_____, desc);
 			break;
 		}
 		case m_shortestPath:
@@ -239,7 +265,6 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
-dTrace(("%f %f\n", matrix0.m_posit.m_y, posit1.m_y));
 	for (ndInt32 i = 0; i < 3; i++)
 	{
 		if (m_controlDofOptions & (1 << i))

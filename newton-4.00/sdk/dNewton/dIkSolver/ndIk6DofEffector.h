@@ -39,8 +39,8 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndMatrix GetOffsetMatrix() const;
 	D_NEWTON_API void SetOffsetMatrix(const ndMatrix& matrix);
 
-	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
-	D_NEWTON_API void SetSwivelAngle(const ndFloat32& angle);
+	D_NEWTON_API void GetPositionAndSwivelAngle(ndVector& posit, ndFloat32& angle) const;
+	D_NEWTON_API void SetPositionAndSwivelAngle(const ndVector& posit, ndFloat32 angle);
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
