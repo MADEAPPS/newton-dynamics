@@ -233,30 +233,28 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 			break;
 		}
+
 		case m_swivelAngle:
 		{
-			const ndMatrix matrix(m_targetFrame * matrix1);
-
-			ndVector xxxx(matrix1.UntransformVector(matrix0.m_posit));
-			dTrace(("p0(%f %f %f) p1(%f %f %f)\n", 
-				xxxx.m_x, xxxx.m_y, xxxx.m_z,
-				m_targetFrame.m_posit.m_x, m_targetFrame.m_posit.m_y, m_targetFrame.m_posit.m_z));
-			ndVector xxxx1((m_targetFrame.m_posit & ndVector::m_triplexMask).Normalize());
-
-			ndVector  xxxxxxxxx(m_targetFrame.m_posit);
+			const ndVector saveTargetPost(m_targetFrame.m_posit);
+#if 1
 			m_targetFrame = matrix0 * matrix1.Inverse();
-			m_targetFrame.m_posit = xxxxxxxxx;
-			
-			//SubmitShortestPathAxis(matrix0, matrix, desc);
-			const ndMatrix matrix_____(m_targetFrame * matrix1);
-
-			SubmitShortestPathAxis(matrix0, matrix_____, desc);
+			const ndMatrix matrix(m_targetFrame * matrix1);
+			SubmitShortestPathAxis(matrix0, matrix, desc);
+			//SubmitShortestPathAxis(matrix0, matrix0, desc);
+#else
+			m_targetFrame = matrix0 * matrix1.Inverse() * dPitchMatrix(m_swivelAngleValue);
+			const ndMatrix matrix (m_targetFrame * matrix1);
+			SubmitShortestPathAxis(matrix0, matrix, desc);
+#endif
+			m_targetFrame.m_posit = saveTargetPost;
 			break;
 		}
+
 		case m_shortestPath:
 		{
-			const ndMatrix matrix11(m_targetFrame * matrix1);
-			SubmitShortestPathAxis(matrix0, matrix11, desc);
+			const ndMatrix matrix(m_targetFrame * matrix1);
+			SubmitShortestPathAxis(matrix0, matrix, desc);
 			break;
 		}
 	}

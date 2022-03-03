@@ -408,16 +408,16 @@ class dQuadrupedRobot : public ndModel
 
 		static float xxxx;
 		xxxx -= 5.0f * timestep;
-		//xxxx = 0.6f;
+
 
 		ndVector localPosit(m_effectorsOffset[index]);
-		//localPosit.m_x -= 0.1f;
-		localPosit.m_x += 0.25f * ndCos(xxxx);
-		localPosit.m_y += 0.5f * ndSin(xxxx);
-		//targetMatrix.m_posit = localPosit;
-		//effector->SetOffsetMatrix(targetMatrix);
+		localPosit.m_x -= 0.1f;
+		localPosit.m_x += 0.125f * ndCos(xxxx);
+		localPosit.m_y += 0.30f * ndSin(xxxx);
+		//ndFloat32 angle = 30 * ndDegreeToRad * ndSin(xxxx * 0.1f);
+		ndFloat32 angle = -10.0f * ndDegreeToRad;
 
-		effector->SetPositionAndSwivelAngle(localPosit, 0.0f);
+		effector->SetPositionAndSwivelAngle(localPosit, angle);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
