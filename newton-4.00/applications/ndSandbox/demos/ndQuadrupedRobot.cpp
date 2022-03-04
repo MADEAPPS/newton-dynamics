@@ -433,8 +433,8 @@ class dQuadrupedRobot : public ndModel
 
 
 		ndVector localPosit(m_effectorsOffset[index]);
-		//localPosit.m_x -= 0.1f;
-		//localPosit.m_x += 0.125f * ndCos(xxxx);
+		localPosit.m_x -= 0.1f;
+		localPosit.m_x += 0.20f * ndCos(xxxx);
 		localPosit.m_y += 0.30f * ndSin(xxxx);
 		//localPosit.m_z += 0.1f * ndSin(xxxx);
 		localPosit.m_z += 0.2f;
