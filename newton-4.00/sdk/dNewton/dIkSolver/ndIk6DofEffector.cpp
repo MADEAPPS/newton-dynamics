@@ -24,7 +24,7 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_swivelAngleValue(ndFloat32(0.0f))
+	//,m_swivelAngleValue(ndFloat32(0.0f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
@@ -40,7 +40,7 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	,m_swivelAngleValue(ndFloat32(0.0f))
+	//,m_swivelAngleValue(ndFloat32(0.0f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
@@ -125,18 +125,18 @@ void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 	m_targetFrame = matrix;
 }
 
-void ndIk6DofEffector::GetPositionAndSwivelAngle(ndVector& posit, ndFloat32& angle) const
-{
-	angle = m_swivelAngleValue;
-	posit = m_targetFrame.m_posit;
-}
-
-void ndIk6DofEffector::SetPositionAndSwivelAngle(const ndVector& posit, ndFloat32 angle)
-{
-	m_swivelAngleValue = angle;
-	m_targetFrame.m_posit = posit;
-	m_targetFrame.m_posit.m_w = ndFloat32(1.0f);
-}
+//void ndIk6DofEffector::GetPositionAndSwivelAngle(ndVector& posit, ndFloat32& angle) const
+//{
+//	angle = m_swivelAngleValue;
+//	posit = m_targetFrame.m_posit;
+//}
+//
+//void ndIk6DofEffector::SetPositionAndSwivelAngle(const ndVector& posit, ndFloat32 angle)
+//{
+//	m_swivelAngleValue = angle;
+//	m_targetFrame.m_posit = posit;
+//	m_targetFrame.m_posit.m_w = ndFloat32(1.0f);
+//}
 
 void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
@@ -196,17 +196,26 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 	}
 	else
 	{
-		const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		//const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		//AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
+		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		//
+		//const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
+		//AddAngularRowJacobian(desc, matrix1[1], yawAngle);
+		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		//
+		//const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
+		//AddAngularRowJacobian(desc, matrix1[2], rollAngle);
+		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 
-		const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
-		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		AddAngularRowJacobian(desc, matrix1[0], ndFloat32 (0.0f));
+		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
 
-		const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
-		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		AddAngularRowJacobian(desc, matrix1[1], ndFloat32(0.0f));
+		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
+
+		AddAngularRowJacobian(desc, matrix1[2], ndFloat32(0.0f));
+		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
 	}
 }
 
@@ -234,28 +243,49 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			break;
 		}
 
-		case m_swivelAngle:
-		{
-			const ndVector saveTargetPost(m_targetFrame.m_posit);
-#if 0
-			m_targetFrame = matrix0 * matrix1.Inverse();
-			const ndMatrix matrix(m_targetFrame * matrix1);
-			SubmitShortestPathAxis(matrix0, matrix, desc);
-			//SubmitShortestPathAxis(matrix0, matrix0, desc);
-#else
-			ndVector euler0;
-			ndVector euler1;
-			matrix0.CalcPitchYawRoll(euler0, euler1);
-			//m_targetFrame = matrix0 * matrix1.Inverse() * dPitchMatrix(m_swivelAngleValue);
-			//const ndMatrix matrix(dPitchMatrix(euler0.m_x) * dYawMatrix(euler0.m_y) * dRollMatrix(euler0.m_z));
-			ndFloat32 xxx = 90.0f * ndDegreeToRad + m_swivelAngleValue;
-			const ndMatrix matrix(dPitchMatrix(xxx) * dYawMatrix(euler0.m_y) * dRollMatrix(euler0.m_z));
-			m_targetFrame = matrix * matrix1.Inverse();
-			SubmitShortestPathAxis(matrix0, matrix, desc);
-#endif
-			m_targetFrame.m_posit = saveTargetPost;
-			break;
-		}
+		//case m_swivelAngle:
+		//{
+		//	const ndVector saveTargetPost(m_targetFrame.m_posit);
+		//	#if 0
+		//	m_targetFrame = matrix0 * matrix1.Inverse();
+		//	const ndMatrix matrix(m_targetFrame * matrix1);
+		//	SubmitShortestPathAxis(matrix0, matrix, desc);
+		//	//SubmitShortestPathAxis(matrix0, matrix0, desc);
+		//	#else
+		//	const ndVector dir(ndVector::m_triplexMask & (matrix0.m_posit - matrix1.m_posit));
+		//	const ndQuaternion rot(dir.Normalize(), m_swivelAngleValue);
+		//	const ndMatrix matrix(matrix1 * ndMatrix(rot, ndVector::m_wOne));
+		//	m_targetFrame = matrix * matrix1.Inverse();
+		//	SubmitShortestPathAxis(matrix0, matrix, desc);
+		//
+		//	//const ndVector front(matrix1.UnrotateVector(matrix0.m_front));
+		//	//ndFloat32 rollAngle = ndAtan2(front.m_y, front.m_x);
+		//	//ndFloat32 yawAngle = ndAsin (dClamp (-front.m_z, ndFloat32 (-1.0f), ndFloat32(1.0f)));
+		//	//
+		//	//m_targetFrame = dYawMatrix(yawAngle) * dRollMatrix(rollAngle);
+		//	//const ndMatrix matrix(m_targetFrame * matrix1);
+		//	//SubmitShortestPathAxis(matrix0, matrix, desc);
+		//
+		//	//const ndVector front(matrix1.UnrotateVector(xxxxx.m_front));
+		//	//ndFloat32 rollAngle = ndAtan2(front.m_y, front.m_x);
+		//	//ndFloat32 yawAngle = ndAsin (dClamp (-front.m_z, ndFloat32 (-1.0f), ndFloat32(1.0f)));
+		//	//
+		//	//m_targetFrame = dYawMatrix(yawAngle) * dRollMatrix(rollAngle);
+		//	//const ndMatrix matrix(m_targetFrame * matrix1);
+		//	//SubmitShortestPathAxis(xxxxx, matrix, desc);
+		//
+		//
+		//	//ndVector euler0;
+		//	//ndVector euler1;
+		//	//matrix0.CalcPitchYawRoll(euler0, euler1);
+		//	//ndFloat32 xxx = 90.0f * ndDegreeToRad + m_swivelAngleValue;
+		//	//const ndMatrix matrix(dPitchMatrix(xxx) * dYawMatrix(euler0.m_y) * dRollMatrix(euler0.m_z));
+		//	//m_targetFrame = matrix * matrix1.Inverse();
+		//	//SubmitShortestPathAxis(matrix0, matrix, desc);
+		//	#endif
+		//	m_targetFrame.m_posit = saveTargetPost;
+		//	break;
+		//}
 
 		case m_shortestPath:
 		{

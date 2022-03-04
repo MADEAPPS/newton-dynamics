@@ -152,16 +152,39 @@ class dQuadrupedRobot : public ndModel
 						sprintf(refName, "%sreference", name);
 						dAssert(rootEntity->Find(refName));
 
-						ndBodyDynamic* const childBody = parentBody;
-						const ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
+						//ndBodyDynamic* const childBody = parentBody;
 						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
+						const ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
+
+						ndShapeInstance sphere(new ndShapeSphere(0.05f));
+						sphere.SetCollisionMode(false);
+
+						ndBodyDynamic* const childBody = new ndBodyDynamic();
+						childBody->SetMatrix(effectorFrame);
+						childBody->SetCollisionShape(sphere);
+						childBody->SetMassMatrix(1.0f / parentBody->GetInvMass(), sphere);
+						childBody->SetNotifyCallback(new ndDemoEntityNotify(scene, nullptr, parentBody));
+
+						ndMatrix bootFrame;
+						bootFrame.m_front = pivotFrame.m_up;
+						bootFrame.m_up = pivotFrame.m_right;
+						bootFrame.m_right = bootFrame.m_front.CrossProduct(bootFrame.m_up);
+						bootFrame.m_posit = effectorFrame.m_posit;
+
+						ndJointDoubleHinge* const bootJoint = new ndJointDoubleHinge(bootFrame, childBody, parentBody);
+						bootJoint->SetLimits0(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						bootJoint->SetLimits1(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						// add body to the world
+						scene->GetWorld()->AddBody(childBody);
+						scene->GetWorld()->AddJoint(bootJoint);
+
 						ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
-						
 						m_effectors.PushBack(effector);
 						m_effectorsOffset.PushBack(effector->GetOffsetMatrix().m_posit);
 
 						ndFloat32 regularizer = 1.0e-4f;
-						effector->EnableRotationAxis(ndIk6DofEffector::m_swivelAngle);
+						//effector->EnableRotationAxis(ndIk6DofEffector::m_swivelAngle);
+						effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
 					}
@@ -314,7 +337,7 @@ class dQuadrupedRobot : public ndModel
 		//	xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
 		//}
 	}
-	
+
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 	{
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
@@ -411,15 +434,17 @@ class dQuadrupedRobot : public ndModel
 
 
 		ndVector localPosit(m_effectorsOffset[index]);
-		localPosit.m_x -= 0.1f;
+		//localPosit.m_x -= 0.1f;
 		//localPosit.m_x += 0.125f * ndCos(xxxx);
-		//localPosit.m_y += 0.30f * ndSin(xxxx);
+		localPosit.m_y += 0.30f * ndSin(xxxx * 0.1f);
 		//localPosit.m_z += 0.1f * ndSin(xxxx);
 		localPosit.m_z += 0.2f;
-		ndFloat32 angle = 60.0f * ndDegreeToRad * ndSin(xxxx * 1.0f);
-		//ndFloat32 angle = -15.0f * ndDegreeToRad;
+		ndFloat32 angle = 30.0f * ndDegreeToRad * ndSin(xxxx * 1.0f);
 
-		effector->SetPositionAndSwivelAngle(localPosit, angle);
+		//localPosit.m_y += 0.30f;
+		//ndFloat32 angle = -20.0f * ndDegreeToRad;
+
+		//effector->SetPositionAndSwivelAngle(localPosit, angle);
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)

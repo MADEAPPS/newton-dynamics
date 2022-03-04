@@ -176,6 +176,80 @@ void ndJointDoubleHinge::SetAsSpringDamper1(ndFloat32 regularizer, ndFloat32 spr
 	m_axis1.m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
+void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	debugCallback.DrawFrame(matrix0);
+	debugCallback.DrawFrame(matrix1);
+
+	const int subdiv = 12;
+	ndVector arch[subdiv + 1];
+	const ndFloat32 radius = debugCallback.m_debugScale;
+
+	if ((m_axis0.m_maxLimit > ndFloat32(1.0e-3f)) || (m_axis0.m_minLimit < -ndFloat32(1.0e-3f)))
+	{
+		// show pitch angle limits
+		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
+
+		ndFloat32 minAngle = m_axis0.m_minLimit;
+		ndFloat32 maxAngle = m_axis0.m_maxLimit;
+		if ((maxAngle - minAngle) >= ndPi * ndFloat32(2.0f))
+		{
+			minAngle = 0.0f;
+			maxAngle = ndPi * ndFloat32(2.0f);
+		}
+
+		ndFloat32 angleStep = (maxAngle - minAngle) / subdiv;
+		ndFloat32 angle0 = minAngle;
+
+		ndVector color(ndVector(0.5f, 0.0f, 0.0f, 0.0f));
+		for (ndInt32 i = 0; i <= subdiv; i++)
+		{
+			arch[i] = matrix0.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			debugCallback.DrawLine(matrix1.m_posit, arch[i], color);
+			angle0 += angleStep;
+		}
+
+		for (ndInt32 i = 0; i < subdiv; i++)
+		{
+			debugCallback.DrawLine(arch[i], arch[i + 1], color);
+		}
+	}
+
+	if ((m_axis1.m_maxLimit > ndFloat32(1.0e-3f)) || (m_axis1.m_minLimit < -ndFloat32(1.0e-3f)))
+	{
+		// show yaw angle limits
+		ndVector point(ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	
+		ndFloat32 minAngle = m_axis1.m_minLimit;
+		ndFloat32 maxAngle = m_axis1.m_maxLimit;
+		if ((maxAngle - minAngle) >= ndPi * ndFloat32(2.0f))
+		{
+			minAngle = 0.0f;
+			maxAngle = ndPi * ndFloat32(2.0f);
+		}
+	
+		ndFloat32 angleStep = (maxAngle - minAngle) / subdiv;
+		ndFloat32 angle0 = minAngle;
+	
+		ndVector color(ndVector(0.0f, 0.5f, 0.0f, 0.0f));
+		for (ndInt32 i = 0; i <= subdiv; i++) 
+		{
+			arch[i] = matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point));
+			debugCallback.DrawLine(matrix1.m_posit, arch[i], color);
+			angle0 += angleStep;
+		}
+	
+		for (ndInt32 i = 0; i < subdiv; i++)
+		{
+			debugCallback.DrawLine(arch[i], arch[i + 1], color);
+		}
+	}
+}
+
 void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
