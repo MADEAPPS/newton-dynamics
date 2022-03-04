@@ -95,9 +95,9 @@ class dQuadrupedRobot : public ndModel
 			////localPosit.m_z += 0.1f * ndSin(xxxx);
 			//localPosit.m_z += 0.2f;
 
-			localPosit.m_x -= 0.1f;
-			localPosit.m_x += 0.20f * ndCos(xxxx + m_walkPhaseAngle);
-			localPosit.m_y += 0.30f * ndSin(xxxx + m_walkPhaseAngle);
+			//localPosit.m_x -= 0.1f;
+			localPosit.m_x += 0.1f * ndCos(xxxx + m_walkPhaseAngle);
+			//localPosit.m_y += 0.30f * ndSin(xxxx + m_walkPhaseAngle);
 			//localPosit.m_z += 0.1f * ndSin(xxxx);
 			//localPosit.m_z += 0.2f;
 			targetMatrix.m_posit = localPosit;
