@@ -412,10 +412,12 @@ class dQuadrupedRobot : public ndModel
 
 		ndVector localPosit(m_effectorsOffset[index]);
 		localPosit.m_x -= 0.1f;
-		localPosit.m_x += 0.125f * ndCos(xxxx);
-		localPosit.m_y += 0.30f * ndSin(xxxx);
-		//ndFloat32 angle = 30 * ndDegreeToRad * ndSin(xxxx * 0.1f);
-		ndFloat32 angle = -10.0f * ndDegreeToRad;
+		//localPosit.m_x += 0.125f * ndCos(xxxx);
+		//localPosit.m_y += 0.30f * ndSin(xxxx);
+		//localPosit.m_z += 0.1f * ndSin(xxxx);
+		localPosit.m_z += 0.2f;
+		ndFloat32 angle = 30.0f * ndDegreeToRad * ndSin(xxxx * 0.5f);
+		//ndFloat32 angle = -15.0f * ndDegreeToRad;
 
 		effector->SetPositionAndSwivelAngle(localPosit, angle);
 	}

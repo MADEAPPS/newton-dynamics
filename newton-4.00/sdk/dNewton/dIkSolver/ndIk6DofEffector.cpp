@@ -237,14 +237,20 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		case m_swivelAngle:
 		{
 			const ndVector saveTargetPost(m_targetFrame.m_posit);
-#if 1
+#if 0
 			m_targetFrame = matrix0 * matrix1.Inverse();
 			const ndMatrix matrix(m_targetFrame * matrix1);
 			SubmitShortestPathAxis(matrix0, matrix, desc);
 			//SubmitShortestPathAxis(matrix0, matrix0, desc);
 #else
-			m_targetFrame = matrix0 * matrix1.Inverse() * dPitchMatrix(m_swivelAngleValue);
-			const ndMatrix matrix (m_targetFrame * matrix1);
+			ndVector euler0;
+			ndVector euler1;
+			matrix0.CalcPitchYawRoll(euler0, euler1);
+			//m_targetFrame = matrix0 * matrix1.Inverse() * dPitchMatrix(m_swivelAngleValue);
+			//const ndMatrix matrix(dPitchMatrix(euler0.m_x) * dYawMatrix(euler0.m_y) * dRollMatrix(euler0.m_z));
+			ndFloat32 xxx = 90.0f * ndDegreeToRad + m_swivelAngleValue;
+			const ndMatrix matrix(dPitchMatrix(xxx) * dYawMatrix(euler0.m_y) * dRollMatrix(euler0.m_z));
+			m_targetFrame = matrix * matrix1.Inverse();
 			SubmitShortestPathAxis(matrix0, matrix, desc);
 #endif
 			m_targetFrame.m_posit = saveTargetPost;
