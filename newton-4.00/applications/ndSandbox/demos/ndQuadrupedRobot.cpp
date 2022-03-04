@@ -152,7 +152,6 @@ class dQuadrupedRobot : public ndModel
 						sprintf(refName, "%sreference", name);
 						dAssert(rootEntity->Find(refName));
 
-						//ndBodyDynamic* const childBody = parentBody;
 						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
 						const ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
 
@@ -171,7 +170,7 @@ class dQuadrupedRobot : public ndModel
 						bootFrame.m_right = bootFrame.m_front.CrossProduct(bootFrame.m_up);
 						bootFrame.m_posit = effectorFrame.m_posit;
 
-						ndJointDoubleHinge* const bootJoint = new ndJointDoubleHinge(bootFrame, childBody, parentBody);
+						ndJointDoubleHinge* const bootJoint = new ndIkJointDoubleHinge(bootFrame, childBody, parentBody);
 						bootJoint->SetLimits0(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						bootJoint->SetLimits1(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						// add body to the world

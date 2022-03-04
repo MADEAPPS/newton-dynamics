@@ -75,6 +75,7 @@
 #include <ndCharacterRootNode.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
+#include <ndIkJointDoubleHinge.h>
 #include <ndBodyParticleSetList.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
