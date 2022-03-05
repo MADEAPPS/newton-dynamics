@@ -42,21 +42,21 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 {
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
 
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f },
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f },
+	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f },
+
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f },
+	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f },
+	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.25f },
+
 	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 4.0f},
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f},
+	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.5f},
 	
 	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
 	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.25f },
-	
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
-	
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.50f },
+	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -99,7 +99,7 @@ class dQuadrupedRobot : public ndModel
 
 		void PlaceEffector(ndFloat32 timestep)
 		{
-			if (m_walkPhaseAngle != 64) return;
+			if (m_walkPhaseAngle != 0) return;
 
 			ndMatrix targetMatrix(dGetIdentityMatrix());
 
