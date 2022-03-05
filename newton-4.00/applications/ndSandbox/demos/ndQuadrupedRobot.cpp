@@ -49,7 +49,7 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 3.0f },
 	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.0f },
 	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.5f },
-
+	
 	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 3.0f },
 	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.0f },
 	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
@@ -69,7 +69,7 @@ class dQuadrupedRobot : public ndModel
 	class dQuadrupedLeg : public ndIk6DofEffector
 	{
 		public:
-		dQuadrupedLeg(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent, ndFloat32 phaseAngle)
+		dQuadrupedLeg(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent, ndFloat32 phaseAngle, ndFloat32 swayAmp)
 			:ndIk6DofEffector(pinAndPivotChild, pinAndPivotParent, child, parent)
 			,m_walkPhaseAngle(phaseAngle)
 			,m_footOnGround(0)
@@ -82,7 +82,7 @@ class dQuadrupedRobot : public ndModel
 			m_offset = GetOffsetMatrix().m_posit;
 
 			// generate very crude animation. 
-			GenerateSimpleWalkCycle();
+			GenerateSimpleWalkCycle(swayAmp);
 		}
 
 		void DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -91,7 +91,7 @@ class dQuadrupedRobot : public ndModel
 			ndIk6DofEffector::DebugJoint(debugCallback);
 		}
 
-		void GenerateSimpleWalkCycle()
+		void GenerateSimpleWalkCycle(ndFloat32 swayAmp)
 		{
 			// clear pose vector
 			for (ndInt32 i = 0; i < (D_SAMPLES_COUNT + 1); i++)
@@ -100,12 +100,14 @@ class dQuadrupedRobot : public ndModel
 			}
 
 			const ndInt32 splitParam = D_SAMPLES_COUNT / 2 + 1;
+
 			// vertical leg motion
 			ndFloat32 amplitud = 0.1f;
 			ndFloat32 period = ndPi / (D_SAMPLES_COUNT - splitParam - 2);
-			for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT - 1; i++)
+			for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT; i++)
 			{
-				m_walkCurve[i].m_x = -amplitud * ndSin(period * (i - splitParam));
+				ndFloat32 j = ndFloat32(i - splitParam - 1);
+				m_walkCurve[i].m_x = -amplitud * ndSin(period * j);
 			}
 
 			// horizontal motion
@@ -122,6 +124,19 @@ class dQuadrupedRobot : public ndModel
 				m_walkCurve[i].m_y = -stride  * (0.5f - j / (D_SAMPLES_COUNT - splitParam));
 			}
 			m_walkCurve[D_SAMPLES_COUNT].m_y = m_walkCurve[0].m_y;
+
+			// sideway motion
+			//ndFloat32 sideAmp = -0.15f;
+			for (ndInt32 i = 0; i < splitParam; i++)
+			{
+				m_walkCurve[i].m_z = swayAmp;
+			}
+			for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT; i++)
+			{
+				ndFloat32 j = ndFloat32(i - splitParam - 1);
+				m_walkCurve[i].m_z = swayAmp * (1.0f - ndSin(period * j));
+			}
+			m_walkCurve[D_SAMPLES_COUNT].m_z = m_walkCurve[0].m_z;
 		}
 
 		void GeneratePose(ndFloat32 parameter)
@@ -132,6 +147,7 @@ class dQuadrupedRobot : public ndModel
 			ndInt32 index = ndInt32 ((parameter + m_walkPhaseAngle) * D_SAMPLES_COUNT) % D_SAMPLES_COUNT;
 			localPosit.m_x += m_walkCurve[index].m_x;
 			localPosit.m_y += m_walkCurve[index].m_y;
+			localPosit.m_z += m_walkCurve[index].m_z;
 
 			m_footOnGround = (index < D_SAMPLES_COUNT / 2 + 1);
 			
@@ -258,7 +274,10 @@ class dQuadrupedRobot : public ndModel
 						scene->GetWorld()->AddBody(childBody);
 						scene->GetWorld()->AddJoint(bootJoint);
 
-						dQuadrupedLeg* const effector = new dQuadrupedLeg(effectorFrame, pivotFrame, childBody, m_rootBody, definition.m_walkPhase);
+						ndVector legSide(m_rootBody->GetMatrix().UntransformVector(pivotFrame.m_posit));
+						ndFloat32 swayAmp(0.8f * legSide.m_y);
+
+						dQuadrupedLeg* const effector = new dQuadrupedLeg(effectorFrame, pivotFrame, childBody, m_rootBody, definition.m_walkPhase, swayAmp);
 						m_effectors.PushBack(effector);
 					}
 					break;
@@ -526,8 +545,8 @@ class dQuadrupedRobot : public ndModel
 		m_invDynamicsSolver.SetMaxIterations(4);
 		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
-			//ndFloat32 walkSpeed = 1.0f;
-			ndFloat32 walkSpeed = 0.05f;
+			ndFloat32 walkSpeed = 1.0f;
+			//ndFloat32 walkSpeed = 0.05f;
 			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
 //if (m_walkParam >= 0.5)
 //m_walkParam = 0.5;
