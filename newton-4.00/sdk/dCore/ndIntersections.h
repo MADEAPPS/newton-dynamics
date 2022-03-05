@@ -47,11 +47,12 @@ typedef ndFloat32 (*dRayIntersectCallback) (void* const context,
 D_CORE_API ndBigVector dPointToRayDistance (const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1); 
 D_CORE_API ndBigVector dPointToTriangleDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
 D_CORE_API ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
+D_CORE_API void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndVector& ray_q0, const ndVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out);
 
 D_CORE_API bool dRayBoxClip (ndVector& ray_p0, ndVector& ray_p1, const ndVector& boxP0, const ndVector& boxP1); 
 D_CORE_API ndFloat32 dRayCastBox (const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut);
 D_CORE_API ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius);
-//D_CORE_API void dRayToRayDistance(const ndVector& ray_p0, const ndVector& ray_p1, const ndVector& ray_q0, const ndVector& ray_q1, ndVector& p0Out, ndVector& p1Out);
+
 
 inline ndInt32 dOverlapTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {

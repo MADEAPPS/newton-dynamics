@@ -458,8 +458,19 @@ class dQuadrupedRobot : public ndModel
 		if (supportPolygon.GetCount() >= 3)
 		{
 
-		}
+		} 
+		else if (supportPolygon.GetCount() == 2)
+		{
+			ndBigVector p0(rootMatrix.m_posit);
+			p0.m_y -= 1.0f;
+			ndBigVector p0Out;
+			ndBigVector p1Out;
+			dRayToRayDistance(supportPolygon[0], supportPolygon[1], rootMatrix.m_posit, p0, p0Out, p1Out);
 
+			ndVector t0(p0Out);
+			ndVector t1(p1Out);
+			context.DrawLine(t0, t1, ndVector (0.0f, 0.0f, 1.0f, 0.0f));
+		}
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)

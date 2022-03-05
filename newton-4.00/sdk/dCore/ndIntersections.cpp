@@ -193,6 +193,105 @@ ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVe
 	return p0;
 }
 
+void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndVector& ray_q0, const ndVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out)
+{
+	ndFloat64 sN;
+	ndFloat64 tN;
+	
+	ndBigVector u(ray_p1 - ray_p0);
+	ndBigVector v(ray_q1 - ray_q0);
+	ndBigVector w(ray_p0 - ray_q0);
+	dAssert(u.m_w == ndFloat64(0.0f));
+	dAssert(v.m_w == ndFloat64(0.0f));
+	dAssert(w.m_w == ndFloat64(0.0f));
+	
+	ndFloat64 a = u.DotProduct(u).GetScalar();
+	ndFloat64 b = u.DotProduct(v).GetScalar();
+	ndFloat64 c = v.DotProduct(v).GetScalar();
+	ndFloat64 d = u.DotProduct(w).GetScalar();
+	ndFloat64 e = v.DotProduct(w).GetScalar();
+	ndFloat64 D = a*c - b*b;
+	ndFloat64 sD = D;
+	ndFloat64 tD = D;
+	
+	// compute the line parameters of the two closest points
+	if (D < ndFloat64(1.0e-8f)) 
+	{
+		sN = ndFloat64(0.0f);
+		sD = ndFloat64(1.0f);
+		tN = e;
+		tD = c;
+	}
+	else 
+	{
+		// get the closest points on the infinite lines
+		sN = (b*e - c*d);
+		tN = (a*e - b*d);
+		if (sN < ndFloat64(0.0f)) 
+		{
+			// sc < 0 => the s=0 edge is visible
+			sN = ndFloat64(0.0f);
+			tN = e;
+			tD = c;
+		}
+		else if (sN > sD) 
+		{
+			// sc > 1 => the s=1 edge is visible
+			sN = sD;
+			tN = e + b;
+			tD = c;
+		}
+	}
+	
+	if (tN < ndFloat64(0.0f)) 
+	{
+		// tc < 0 => the t=0 edge is visible
+		tN = ndFloat64(0.0f);
+		// recompute sc for this edge
+		if (-d < ndFloat64(0.0f)) 
+		{
+			sN = ndFloat64(0.0f);
+		}
+		else if (-d > a) 
+		{
+			sN = sD;
+		}
+		else 
+		{
+			sN = -d;
+			sD = a;
+		}
+	}
+	else if (tN > tD) 
+	{
+		// tc > 1 => the t=1 edge is visible
+		tN = tD;
+		// recompute sc for this edge
+		if ((-d + b) < ndFloat64(0.0f)) 
+		{
+			sN = ndFloat64(0.0f);
+		}
+		else if ((-d + b) > a) 
+		{
+			sN = sD;
+		}
+		else 
+		{
+			sN = (-d + b);
+			sD = a;
+		}
+	}
+	
+	// finally do the division to get sc and tc
+	ndFloat64 sc = (dAbs(sN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : sN / sD);
+	ndFloat64 tc = (dAbs(tN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : tN / tD);
+	
+	dAssert(u.m_w == ndFloat64(0.0f));
+	dAssert(v.m_w == ndFloat64(0.0f));
+	p0Out = ray_p0 + u.Scale(sc);
+	p1Out = ray_q0 + v.Scale(tc);
+}
+
 ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius)
 {
 	ndVector p0Origin (p0 - origin);
