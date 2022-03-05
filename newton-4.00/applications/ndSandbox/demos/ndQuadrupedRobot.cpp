@@ -42,21 +42,21 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 {
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
 
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 4.0f },
-	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f },
-	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f },
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 3.0f },
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.0f },
+	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f },
+	
+	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 3.0f },
+	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.0f },
+	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.5f },
 
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f },
-	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f },
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 3.0f },
+	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.0f },
+	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
+	
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 3.0f },
+	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.0f },
 	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.25f },
-	
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f },
-	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f },
-	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.50f },
-	
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f },
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f },
-	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -71,7 +71,7 @@ class dQuadrupedRobot : public ndModel
 		public:
 		dQuadrupedLeg(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent, ndFloat32 phaseAngle)
 			:ndIk6DofEffector(pinAndPivotChild, pinAndPivotParent, child, parent)
-			,m_walkPhaseAngle(ndInt32 (phaseAngle * D_SAMPLES_COUNT))
+			,m_walkPhaseAngle(phaseAngle)
 		{
 			ndFloat32 regularizer = 1.0e-4f;
 			EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
@@ -80,63 +80,58 @@ class dQuadrupedRobot : public ndModel
 			
 			m_offset = GetOffsetMatrix().m_posit;
 
-			m_timeParam = 0.0f;
-
 			// generate very crude animation. 
-			// vertical leg motion
+			GenerateSimpleWalkCycle();
+		}
+
+		void GenerateSimpleWalkCycle()
+		{
+			// clear pose vector
 			for (ndInt32 i = 0; i < (D_SAMPLES_COUNT + 1); i++)
 			{
 				m_walkCurve[i] = ndVector::m_zero;
 			}
 
-			ndFloat32 amp = 0.2f;
-			const ndInt32 splitParam = D_SAMPLES_COUNT * 3 / 4 + 1;
-
+			const ndInt32 splitParam = D_SAMPLES_COUNT / 2 + 1;
+			// vertical leg motion
+			ndFloat32 amplitud = 0.1f;
 			ndFloat32 period = ndPi / (D_SAMPLES_COUNT - splitParam - 2);
 			for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT - 1; i++)
 			{
-				m_walkCurve[i].m_x = -amp * ndSin(period * (i - splitParam));
+				m_walkCurve[i].m_x = -amplitud * ndSin(period * (i - splitParam));
 			}
 
 			// horizontal motion
-			ndFloat32 stride = 0.6f;
-			const ndInt32 splitParamY = D_SAMPLES_COUNT * 3 / 4;
-			for (ndInt32 i = 0; i < splitParamY; i++)
+			ndFloat32 stride = 0.4f;
+			for (ndInt32 i = 0; i < splitParam; i++)
 			{
 				ndFloat32 j = ndFloat32(i);
 				m_walkCurve[i].m_y = stride  * (0.5f - j / splitParam);
 			}
 
-			for (ndInt32 i = splitParamY; i < D_SAMPLES_COUNT; i++)
+			for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT; i++)
 			{
-				ndFloat32 j = ndFloat32(i - splitParamY);
-				m_walkCurve[i].m_y = -stride  * (0.5f - j / (D_SAMPLES_COUNT - splitParamY));
+				ndFloat32 j = ndFloat32(i - splitParam);
+				m_walkCurve[i].m_y = -stride  * (0.5f - j / (D_SAMPLES_COUNT - splitParam));
 			}
 			m_walkCurve[D_SAMPLES_COUNT].m_y = m_walkCurve[0].m_y;
 		}
 
-		void PlaceEffector(ndFloat32 timestep)
+		void GeneratePose(ndFloat32 parameter)
 		{
-			//if ((m_walkPhaseAngle == 96) || (m_walkPhaseAngle == 64)) return;
-
+			ndVector localPosit(m_offset);
 			ndMatrix targetMatrix(dGetIdentityMatrix());
 
-			ndVector localPosit(m_offset);
-
-			ndFloat32 frequency = 40.0f;
-			m_timeParam = dMod(m_timeParam + frequency * timestep, ndFloat32 (D_SAMPLES_COUNT));
-			ndInt32 index = ndInt32(m_timeParam) + m_walkPhaseAngle;
-			localPosit.m_x += m_walkCurve[index % D_SAMPLES_COUNT].m_x;
-			localPosit.m_y += m_walkCurve[index % D_SAMPLES_COUNT].m_y;
+			ndInt32 index = ndInt32 ((parameter + m_walkPhaseAngle) * D_SAMPLES_COUNT) % D_SAMPLES_COUNT;
+			localPosit.m_x += m_walkCurve[index].m_x;
+			localPosit.m_y += m_walkCurve[index].m_y;
 			
 			targetMatrix.m_posit = localPosit;
 			SetOffsetMatrix(targetMatrix);
 		}
 
 		ndVector m_offset;
-		ndInt32 m_walkPhaseAngle;
-
-		ndFloat32 m_timeParam;
+		ndFloat32 m_walkPhaseAngle;
 		ndVector m_walkCurve[D_SAMPLES_COUNT + 1];
 	};
 
@@ -148,6 +143,7 @@ class dQuadrupedRobot : public ndModel
 		,m_invDynamicsSolver()
 		,m_bodyArray()
 		,m_jointArray()
+		,m_walkParam(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -272,6 +268,7 @@ class dQuadrupedRobot : public ndModel
 		,m_rootBody(nullptr)
 		,m_effectors()
 		,m_invDynamicsSolver()
+		,m_walkParam(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -421,8 +418,10 @@ class dQuadrupedRobot : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		const ndMatrix rootMatrix(m_referenceFrame * m_rootBody->GetMatrix());
+		ndMatrix rootMatrix(m_rootBody->GetMatrix());
+		rootMatrix.m_posit = rootMatrix.TransformVector(m_rootBody->GetCentreOfMass());
 		context.DrawFrame(rootMatrix);
+
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
 			ndJointBilateralConstraint* const joint = m_effectors[i];
@@ -483,10 +482,12 @@ class dQuadrupedRobot : public ndModel
 		m_invDynamicsSolver.SetMaxIterations(4);
 		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
+			ndFloat32 walkSpeed = 1.0f;
+			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
 			{ 
 				dQuadrupedLeg* const effector = m_effectors[i];
-				effector->PlaceEffector(timestep);
+				effector->GeneratePose(m_walkParam);
 				m_invDynamicsSolver.AddEffector(skeleton, effector);
 			}
 			m_invDynamicsSolver.Solve(skeleton, world, timestep);
@@ -496,16 +497,16 @@ class dQuadrupedRobot : public ndModel
 	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<dQuadrupedLeg*, 4> m_effectors;
-
 	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
+	ndFloat32 m_walkParam;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 
 
-static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
+void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
 	dQuadrupedRobot* const me = (dQuadrupedRobot*)context;
 	me->ApplyControls(scene);
@@ -545,7 +546,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	ndBodyDynamic* const root = robot0->GetRoot();
-	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 4.5f;
