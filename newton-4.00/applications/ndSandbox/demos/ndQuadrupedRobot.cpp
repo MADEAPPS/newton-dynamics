@@ -62,6 +62,8 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 class dQuadrupedRobot : public ndModel
 {
 	public:
+	#define D_SAMPLES_COUNT 128
+
 	D_CLASS_REFLECTION(dQuadrupedRobot);
 
 	class dQuadrupedLeg : public ndIk6DofEffector
@@ -69,7 +71,8 @@ class dQuadrupedRobot : public ndModel
 		public:
 		dQuadrupedLeg(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent, ndFloat32 phaseAngle)
 			:ndIk6DofEffector(pinAndPivotChild, pinAndPivotParent, child, parent)
-			,m_walkPhaseAngle(phaseAngle * 2.0f * ndPi)
+			//,m_walkPhaseAngle(phaseAngle * 2.0f * ndPi)
+			,m_walkPhaseAngle(ndInt32 (phaseAngle * D_SAMPLES_COUNT))
 		{
 			ndFloat32 regularizer = 1.0e-4f;
 			EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
@@ -79,37 +82,43 @@ class dQuadrupedRobot : public ndModel
 			m_offset = GetOffsetMatrix().m_posit;
 
 			xxxx = 0.0f;
+			const ndInt32 splite = D_SAMPLES_COUNT * 2 / 3;
+			for (ndInt32 i = 0; i < splite; i++)
+			{
+				m_walkCurve[i].m_x = 0.0f;
+			}
+
+			ndFloat32 amp = 0.2f;
+			ndFloat32 period = ndPi / (D_SAMPLES_COUNT - splite);
+			for (ndInt32 i = splite; i < D_SAMPLES_COUNT + 1; i++)
+			{
+				m_walkCurve[i].m_x = -amp * ndSin(period * (i - splite));
+			}
+			m_walkCurve[D_SAMPLES_COUNT].m_x = m_walkCurve[splite].m_x;
 		}
 
 		void PlaceEffector(ndFloat32 timestep)
 		{
-			ndMatrix targetMatrix(dGetIdentityMatrix());
-			
-			
-			xxxx -= 0.5f * timestep;
-			
-			ndVector localPosit(m_offset);
-			//localPosit.m_x -= 0.1f;
-			//localPosit.m_x += 0.20f * ndCos(xxxx);
-			//localPosit.m_y += 0.30f * ndSin(xxxx);
-			////localPosit.m_z += 0.1f * ndSin(xxxx);
-			//localPosit.m_z += 0.2f;
+			if (m_walkPhaseAngle != 64) return;
 
-			//localPosit.m_x -= 0.1f;
-			localPosit.m_x += 0.1f * ndCos(xxxx + m_walkPhaseAngle);
-			//localPosit.m_y += 0.30f * ndSin(xxxx + m_walkPhaseAngle);
-			//localPosit.m_z += 0.1f * ndSin(xxxx);
-			//localPosit.m_z += 0.2f;
-			targetMatrix.m_posit = localPosit;
+			ndMatrix targetMatrix(dGetIdentityMatrix());
+
+			ndVector localPosit(m_offset);
+
+			ndFloat32 frequency = 30.0f;
+			xxxx = dMod(xxxx + frequency * timestep, ndFloat32 (D_SAMPLES_COUNT));
+			ndFloat32 h = m_walkCurve[(ndInt32(xxxx) + m_walkPhaseAngle) % D_SAMPLES_COUNT].m_x;
+			localPosit.m_x += h;
 			
 			targetMatrix.m_posit = localPosit;
 			SetOffsetMatrix(targetMatrix);
 		}
 
 		ndVector m_offset;
-		ndFloat32 m_walkPhaseAngle;
+		ndInt32 m_walkPhaseAngle;
 
 		ndFloat32 xxxx;
+		ndVector m_walkCurve[D_SAMPLES_COUNT + 1];
 	};
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
