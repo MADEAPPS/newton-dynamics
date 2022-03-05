@@ -432,13 +432,13 @@ class dAdvancedIndustrialRobot : public ndModel
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 
 	ndVector m_effectorOffset;
-	ndFloat32 m_x;
-	ndFloat32 m_y;
-	ndFloat32 m_azimuth;
-	ndFloat32 m_gripperPosit;
-	ndFloat32 m_pitch;
-	ndFloat32 m_yaw;
-	ndFloat32 m_roll;
+	ndReal m_x;
+	ndReal m_y;
+	ndReal m_azimuth;
+	ndReal m_gripperPosit;
+	ndReal m_pitch;
+	ndReal m_yaw;
+	ndReal m_roll;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAdvancedIndustrialRobot);

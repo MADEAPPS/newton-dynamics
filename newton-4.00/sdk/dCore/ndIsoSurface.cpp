@@ -57,7 +57,7 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 
 	ndInt32 GenerateLowResIndexList(const ndIsoSurface* const me, 
 		ndInt32* const indexList, ndInt32 strideInFloats, 
-		ndFloat32* const posit, ndFloat32* const normals);
+		ndReal* const posit, ndReal* const normals);
 
 	private:
 	class ndGridHash
@@ -3077,7 +3077,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIsoSurface(ndCalculateIsoVal
 ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	const ndIsoSurface* const me, 
 	ndInt32* const indexList, ndInt32 strideInFloats, 
-	ndFloat32* const posit, ndFloat32* const normals)
+	ndReal* const posit, ndReal* const normals)
 {
 	D_TRACKTIME();
 	#define D_LOW_RES_BITS	   1
@@ -3275,9 +3275,9 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	{
 		ndInt32 j = strideInFloats * i;
 		m_triangles[i] = ndVector::m_zero;
-		posit[j + 0] = m_trianglesScratchBuffer[i].m_x;
-		posit[j + 1] = m_trianglesScratchBuffer[i].m_y;
-		posit[j + 2] = m_trianglesScratchBuffer[i].m_z;
+		posit[j + 0] = ndReal(m_trianglesScratchBuffer[i].m_x);
+		posit[j + 1] = ndReal(m_trianglesScratchBuffer[i].m_y);
+		posit[j + 2] = ndReal(m_trianglesScratchBuffer[i].m_z);
 	}
 
 	// calculate normals
@@ -3304,9 +3304,9 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	{
 		ndVector normal(m_triangles[i] * m_triangles[i].InvMagSqrt());
 		ndInt32 j = strideInFloats * i;
-		normals[j + 0] = normal.m_x;
-		normals[j + 1] = normal.m_y;
-		normals[j + 2] = normal.m_z;
+		normals[j + 0] = ndReal (normal.m_x);
+		normals[j + 1] = ndReal (normal.m_y);
+		normals[j + 2] = ndReal (normal.m_z);
 	}
 
 	return vertexCount;
@@ -3415,7 +3415,7 @@ void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 g
 	m_volumeSizeZ = implementation.m_volumeSizeZ;
 }
 
-ndInt32 ndIsoSurface::GenerateListIndexList(ndInt32* const indexList, ndInt32 strideInFloats, ndFloat32* const posit, ndFloat32* const normals) const
+ndInt32 ndIsoSurface::GenerateListIndexList(ndInt32* const indexList, ndInt32 strideInFloats, ndReal* const posit, ndReal* const normals) const
 {
 	ndInt32 vertexCount = 0;
 	ndImplementation& implementation = GetImplementation();

@@ -53,7 +53,7 @@ class ndIsoSurface: public ndClassAlloc
 	const ndArray<ndVector>& GetPoints() const;
 
 	D_CORE_API void GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize, ndCalculateIsoValue* const computeIsoValue = nullptr);
-	D_CORE_API ndInt32 GenerateListIndexList(ndInt32 * const indexList, ndInt32 strideInFloat32, ndFloat32* const posit, ndFloat32* const normals) const;
+	D_CORE_API ndInt32 GenerateListIndexList(ndInt32 * const indexList, ndInt32 strideInFloat32, ndReal* const posit, ndReal* const normals) const;
 
 	private:
 	ndImplementation& GetImplementation() const;

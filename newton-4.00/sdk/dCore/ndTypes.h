@@ -204,6 +204,7 @@
 	#define D_CORE_API 
 #endif
 
+typedef float ndReal;
 typedef int8_t ndInt8;
 typedef uint8_t ndUnsigned8;
 typedef int16_t ndInt16;

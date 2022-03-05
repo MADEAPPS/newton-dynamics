@@ -72,6 +72,7 @@ class dQuadrupedRobot : public ndModel
 		dQuadrupedLeg(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, ndBodyKinematic* const child, ndBodyKinematic* const parent, ndFloat32 phaseAngle)
 			:ndIk6DofEffector(pinAndPivotChild, pinAndPivotParent, child, parent)
 			,m_walkPhaseAngle(phaseAngle)
+			,m_footOnGround(0)
 		{
 			ndFloat32 regularizer = 1.0e-4f;
 			EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
@@ -82,6 +83,12 @@ class dQuadrupedRobot : public ndModel
 
 			// generate very crude animation. 
 			GenerateSimpleWalkCycle();
+		}
+
+		void DebugJoint(ndConstraintDebugCallback& debugCallback) const
+		{
+			// TODO: maybe draw the trajectory here
+			ndIk6DofEffector::DebugJoint(debugCallback);
 		}
 
 		void GenerateSimpleWalkCycle()
@@ -125,6 +132,8 @@ class dQuadrupedRobot : public ndModel
 			ndInt32 index = ndInt32 ((parameter + m_walkPhaseAngle) * D_SAMPLES_COUNT) % D_SAMPLES_COUNT;
 			localPosit.m_x += m_walkCurve[index].m_x;
 			localPosit.m_y += m_walkCurve[index].m_y;
+
+			m_footOnGround = (index < D_SAMPLES_COUNT / 2 + 1);
 			
 			targetMatrix.m_posit = localPosit;
 			SetOffsetMatrix(targetMatrix);
@@ -133,6 +142,8 @@ class dQuadrupedRobot : public ndModel
 		ndVector m_offset;
 		ndFloat32 m_walkPhaseAngle;
 		ndVector m_walkCurve[D_SAMPLES_COUNT + 1];
+
+		ndInt32 m_footOnGround;
 	};
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
@@ -422,11 +433,33 @@ class dQuadrupedRobot : public ndModel
 		rootMatrix.m_posit = rootMatrix.TransformVector(m_rootBody->GetCentreOfMass());
 		context.DrawFrame(rootMatrix);
 
+		ndFixSizeArray<ndVector , 4> supportPolygon;
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
-			ndJointBilateralConstraint* const joint = m_effectors[i];
+			dQuadrupedLeg* const joint = m_effectors[i];
 			joint->DebugJoint(context);
+			if (joint->m_footOnGround)
+			{
+				ndVector point(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
+				supportPolygon.PushBack(point);
+			}
 		}
+
+		// Draw support polygon
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		ndInt32 i0 = supportPolygon.GetCount() - 1;
+		for (ndInt32 i = 0; i < supportPolygon.GetCount(); i++)
+		{
+			context.DrawLine(supportPolygon[i], supportPolygon[i0], color);
+			i0 = i;
+		}
+
+		// Draw center of mass projection
+		if (supportPolygon.GetCount() >= 3)
+		{
+
+		}
+
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -482,8 +515,12 @@ class dQuadrupedRobot : public ndModel
 		m_invDynamicsSolver.SetMaxIterations(4);
 		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
-			ndFloat32 walkSpeed = 1.0f;
+			//ndFloat32 walkSpeed = 1.0f;
+			ndFloat32 walkSpeed = 0.05f;
 			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
+//if (m_walkParam >= 0.5)
+//m_walkParam = 0.5;
+
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); i ++)
 			{ 
 				dQuadrupedLeg* const effector = m_effectors[i];
