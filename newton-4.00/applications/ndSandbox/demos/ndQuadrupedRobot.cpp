@@ -42,21 +42,21 @@ static dQuadrupedRobotDefinition jointsDefinition[] =
 {
 	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
 
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f },
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f },
-	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
+	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 4.0f },
+	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f },
+	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f },
 
+	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f },
+	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f },
+	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.25f },
+	
 	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 4.0f },
 	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.5f },
 	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.50f },
-
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f},
 	
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 4.0f},
-	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.5f},
-	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.25f },
+	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 4.0f },
+	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.5f },
+	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
 };
 
 class dQuadrupedRobot : public ndModel
@@ -80,35 +80,54 @@ class dQuadrupedRobot : public ndModel
 			
 			m_offset = GetOffsetMatrix().m_posit;
 
-			xxxx = 0.0f;
+			m_timeParam = 0.0f;
+
+			// generate very crude animation. 
+			// vertical leg motion
 			for (ndInt32 i = 0; i < (D_SAMPLES_COUNT + 1); i++)
 			{
-				m_walkCurve[i].m_x = 0.0f;
+				m_walkCurve[i] = ndVector::m_zero;
 			}
 
 			ndFloat32 amp = 0.2f;
-			const ndInt32 splite = D_SAMPLES_COUNT * 3 / 4 + 1;
+			const ndInt32 splitParam = D_SAMPLES_COUNT * 3 / 4 + 1;
 
-			ndFloat32 period = ndPi / (D_SAMPLES_COUNT - splite - 2);
-			for (ndInt32 i = splite; i < D_SAMPLES_COUNT - 1; i++)
+			ndFloat32 period = ndPi / (D_SAMPLES_COUNT - splitParam - 2);
+			for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT - 1; i++)
 			{
-				m_walkCurve[i].m_x = -amp * ndSin(period * (i - splite));
+				m_walkCurve[i].m_x = -amp * ndSin(period * (i - splitParam));
 			}
+
+			// horizontal motion
+			ndFloat32 stride = 0.6f;
+			const ndInt32 splitParamY = D_SAMPLES_COUNT * 3 / 4;
+			for (ndInt32 i = 0; i < splitParamY; i++)
+			{
+				ndFloat32 j = ndFloat32(i);
+				m_walkCurve[i].m_y = stride  * (0.5f - j / splitParam);
+			}
+
+			for (ndInt32 i = splitParamY; i < D_SAMPLES_COUNT; i++)
+			{
+				ndFloat32 j = ndFloat32(i - splitParamY);
+				m_walkCurve[i].m_y = -stride  * (0.5f - j / (D_SAMPLES_COUNT - splitParamY));
+			}
+			m_walkCurve[D_SAMPLES_COUNT].m_y = m_walkCurve[0].m_y;
 		}
 
 		void PlaceEffector(ndFloat32 timestep)
 		{
-			if ((m_walkPhaseAngle == 96) || (m_walkPhaseAngle == 64)) return;
-
+			//if ((m_walkPhaseAngle == 96) || (m_walkPhaseAngle == 64)) return;
 
 			ndMatrix targetMatrix(dGetIdentityMatrix());
 
 			ndVector localPosit(m_offset);
 
 			ndFloat32 frequency = 40.0f;
-			xxxx = dMod(xxxx + frequency * timestep, ndFloat32 (D_SAMPLES_COUNT));
-			ndFloat32 h = m_walkCurve[(ndInt32(xxxx) + m_walkPhaseAngle) % D_SAMPLES_COUNT].m_x;
-			localPosit.m_x += h;
+			m_timeParam = dMod(m_timeParam + frequency * timestep, ndFloat32 (D_SAMPLES_COUNT));
+			ndInt32 index = ndInt32(m_timeParam) + m_walkPhaseAngle;
+			localPosit.m_x += m_walkCurve[index % D_SAMPLES_COUNT].m_x;
+			localPosit.m_y += m_walkCurve[index % D_SAMPLES_COUNT].m_y;
 			
 			targetMatrix.m_posit = localPosit;
 			SetOffsetMatrix(targetMatrix);
@@ -117,7 +136,7 @@ class dQuadrupedRobot : public ndModel
 		ndVector m_offset;
 		ndInt32 m_walkPhaseAngle;
 
-		ndFloat32 xxxx;
+		ndFloat32 m_timeParam;
 		ndVector m_walkCurve[D_SAMPLES_COUNT + 1];
 	};
 
