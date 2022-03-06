@@ -177,6 +177,21 @@ class dQuadrupedRobot : public ndModel
 		ndFixSizeArray<ndFloat32,4> m_phase;
 	};
 
+	class dQuadrupedBalanceController: public ndAnimationBlendTreeNode, public ndIkSolver
+	{
+		public: 
+		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input)
+			:ndAnimationBlendTreeNode(input)
+			,ndIkSolver()
+		{
+		}
+
+		void Evaluate(ndAnimationPose& output)
+		{
+			ndAnimationBlendTreeNode::Evaluate(output);
+		}
+	};
+
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
 		,m_referenceFrame(dGetIdentityMatrix())
@@ -184,7 +199,6 @@ class dQuadrupedRobot : public ndModel
 		,m_walkCycle(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_effectors()
-		,m_invDynamicsSolver()
 		,m_bodyArray()
 		,m_jointArray()
 		,m_walkParam(0.0f)
@@ -326,7 +340,6 @@ class dQuadrupedRobot : public ndModel
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effectors()
-		,m_invDynamicsSolver()
 		,m_walkParam(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
@@ -454,7 +467,7 @@ class dQuadrupedRobot : public ndModel
 			m_output.PushBack(keyFrame);
 		}
 
-		m_animBlendTree = m_walkCycle;
+		m_animBlendTree = new dQuadrupedBalanceController (m_walkCycle);
 	}
 
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -602,13 +615,13 @@ class dQuadrupedRobot : public ndModel
 
 		m_rootBody->SetSleepState(false);
 
-		m_invDynamicsSolver.SetMaxIterations(4);
-		if (!m_invDynamicsSolver.IsSleeping(skeleton))
+		if (!m_animBlendTree->IsSleeping(skeleton))
 		{
 			ndFloat32 walkSpeed = 1.0f;
 			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
 
 			m_walkCycle->SetParam(m_walkParam);
+			
 			m_animBlendTree->Evaluate(m_output);
 			dQuadrupedWalkSequence* const sequence = (dQuadrupedWalkSequence*)m_walkCycle->GetSequence();
 
@@ -620,21 +633,20 @@ class dQuadrupedRobot : public ndModel
 				m_effectors[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
 
 				effector->SetOffsetMatrix(matrix);
-				m_invDynamicsSolver.AddEffector(skeleton, effector);
+				m_animBlendTree->AddEffector(skeleton, effector);
 			}
 
-			m_invDynamicsSolver.Solve(skeleton, world, timestep);
+			m_animBlendTree->Solve(skeleton, world, timestep);
 		}
 	}
 
 	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
 	ndAnimationSequencePlayer* m_walkCycle;
-	ndAnimationBlendTreeNode* m_animBlendTree;
+	dQuadrupedBalanceController* m_animBlendTree;
 	
 	ndAnimationPose m_output;
 	ndFixSizeArray<dEffectorInfo, 4> m_effectors;
-	ndIkSolver m_invDynamicsSolver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 	ndFloat32 m_walkParam;

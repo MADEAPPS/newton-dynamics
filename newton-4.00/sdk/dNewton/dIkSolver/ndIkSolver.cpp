@@ -41,7 +41,6 @@ ndIkSolver::ndIkSolver()
 	,m_invTimestep(ndFloat32(0.0f))
 	,m_maxAccel(ndFloat32(1.0e3f))
 	,m_maxAlpha(ndFloat32(1.0e3f))
-	,m_maxIterations(4)
 {
 }
 
@@ -55,10 +54,10 @@ void ndIkSolver::SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha)
 	m_maxAccel = dAbs(maxAccel);
 }
 
-void ndIkSolver::SetMaxIterations(ndInt32 iterCount)
-{
-	m_maxIterations = dClamp(iterCount, 1, 16);
-}
+//void ndIkSolver::SetMaxIterations(ndInt32 iterCount)
+//{
+//	m_maxIterations = dClamp(iterCount, 1, 16);
+//}
 
 void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 {
