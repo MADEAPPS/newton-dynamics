@@ -260,6 +260,7 @@ class dQuadrupedRobot : public ndModel
 						childBody->SetCollisionShape(sphere);
 						childBody->SetMassMatrix(1.0f / parentBody->GetInvMass(), sphere);
 						childBody->SetNotifyCallback(new ndDemoEntityNotify(scene, nullptr, parentBody));
+						m_bodyArray.PushBack(childBody);
 
 						ndMatrix bootFrame;
 						bootFrame.m_front = pivotFrame.m_up;
@@ -448,10 +449,6 @@ class dQuadrupedRobot : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		ndMatrix rootMatrix(m_rootBody->GetMatrix());
-		rootMatrix.m_posit = rootMatrix.TransformVector(m_rootBody->GetCentreOfMass());
-		context.DrawFrame(rootMatrix);
-
 		ndFixSizeArray<ndVector , 4> supportPolygon;
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
@@ -473,6 +470,22 @@ class dQuadrupedRobot : public ndModel
 			i0 = i;
 		}
 
+		ndFloat32 toltalMass = 0.0f;
+		ndVector com(ndVector::m_zero);
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
+		{
+			ndBodyDynamic* const body = m_bodyArray[i];
+			ndFloat32 mass = body->GetMassMatrix().m_w;
+			ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+			com += comMass.Scale (mass);
+			toltalMass += mass;
+		}
+		com = com.Scale(1.0f / toltalMass);
+		com.m_w = 1.0f;
+		ndMatrix rootMatrix(m_rootBody->GetMatrix());
+		rootMatrix.m_posit = com;;
+		context.DrawFrame(rootMatrix);
+
 		// Draw center of mass projection
 		if (supportPolygon.GetCount() >= 3)
 		{
@@ -488,7 +501,7 @@ class dQuadrupedRobot : public ndModel
 
 			ndVector t0(p0Out);
 			ndVector t1(p1Out);
-			context.DrawLine(t0, t1, ndVector (0.0f, 0.0f, 1.0f, 0.0f));
+			context.DrawLine(t0, t1, ndVector (1.0f, 0.5f, 1.0f, 0.0f));
 		}
 	}
 
@@ -613,7 +626,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	ndBodyDynamic* const root = robot0->GetRoot();
-	world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 4.5f;
