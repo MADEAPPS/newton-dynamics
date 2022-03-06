@@ -39,12 +39,20 @@ ndIkSolver::ndIkSolver()
 	,m_skeleton(nullptr)
 	,m_timestep(ndFloat32(0.0f))
 	,m_invTimestep(ndFloat32(0.0f))
+	,m_maxAccel(ndFloat32(1.0e3f))
+	,m_maxAlpha(ndFloat32(1.0e3f))
 	,m_maxIterations(4)
 {
 }
 
 ndIkSolver::~ndIkSolver()
 {
+}
+
+void ndIkSolver::SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha)
+{
+	m_maxAlpha = dAbs(maxAlpha);
+	m_maxAccel = dAbs(maxAccel);
 }
 
 void ndIkSolver::SetMaxIterations(ndInt32 iterCount)
@@ -379,8 +387,23 @@ void ndIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world
 		const ndVector invMass(body->GetInvMass());
 		const ndMatrix& invInertia = body->GetInvInertiaMatrix();
 
-		accelerations[i].m_linear = invMass * (body->m_accel + m_internalForces[index].m_linear);
-		accelerations[i].m_angular = invInertia.RotateVector (body->m_alpha + m_internalForces[index].m_angular);
+		ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
+		ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
+
+		ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();
+		if (maxAccel2 > (m_maxAccel * m_maxAccel))
+		{
+			accel = accel.Normalize().Scale(m_maxAccel);
+		}
+
+		ndFloat32 maxAlpha2 = alpha.DotProduct(alpha).GetScalar();
+		if (maxAlpha2 > (m_maxAlpha * m_maxAlpha))
+		{
+			alpha = alpha.Normalize().Scale(m_maxAlpha);
+		}
+
+		accelerations[i].m_linear = accel;
+		accelerations[i].m_angular = alpha;
 	}
 
 	//bool accelerationsAreValid = false;

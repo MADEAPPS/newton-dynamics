@@ -35,6 +35,7 @@ class ndIkSolver: public ndClassAlloc
 	D_NEWTON_API ~ndIkSolver();
 
 	D_NEWTON_API void SetMaxIterations(ndInt32 iterCount);
+	D_NEWTON_API void SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha);
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
 	D_NEWTON_API void AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
 	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
@@ -57,6 +58,8 @@ class ndIkSolver: public ndClassAlloc
 	ndSkeletonContainer* m_skeleton;
 	ndFloat32 m_timestep;
 	ndFloat32 m_invTimestep;
+	ndFloat32 m_maxAccel;
+	ndFloat32 m_maxAlpha;
 	ndInt32 m_maxIterations;
 
 	friend class ndSkeletonContainer;
