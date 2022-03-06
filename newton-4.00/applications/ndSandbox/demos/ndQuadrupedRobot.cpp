@@ -126,7 +126,6 @@ class dQuadrupedRobot : public ndModel
 			m_walkCurve[D_SAMPLES_COUNT].m_y = m_walkCurve[0].m_y;
 
 			// sideway motion
-			//ndFloat32 sideAmp = -0.15f;
 			for (ndInt32 i = 0; i < splitParam; i++)
 			{
 				m_walkCurve[i].m_z = swayAmp;
@@ -489,7 +488,18 @@ class dQuadrupedRobot : public ndModel
 		// Draw center of mass projection
 		if (supportPolygon.GetCount() >= 3)
 		{
+			ndBigVector p0(rootMatrix.m_posit);
+			p0.m_y -= 1.0f;
+			ndBigVector p0Out;
+			ndBigVector p1Out;
 
+			ndBigVector poly[16];
+			for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
+			{
+				poly[i] = supportPolygon[i];
+			}
+
+			dRayToPolygonDistance(rootMatrix.m_posit, p0, poly, supportPolygon.GetCount(), p0Out, p1Out);
 		} 
 		else if (supportPolygon.GetCount() == 2)
 		{
@@ -497,7 +507,7 @@ class dQuadrupedRobot : public ndModel
 			p0.m_y -= 1.0f;
 			ndBigVector p0Out;
 			ndBigVector p1Out;
-			dRayToRayDistance(supportPolygon[0], supportPolygon[1], rootMatrix.m_posit, p0, p0Out, p1Out);
+			dRayToRayDistance(rootMatrix.m_posit, p0, supportPolygon[0], supportPolygon[1], p0Out, p1Out);
 
 			ndVector t0(p0Out);
 			ndVector t1(p1Out);
@@ -559,7 +569,7 @@ class dQuadrupedRobot : public ndModel
 		if (!m_invDynamicsSolver.IsSleeping(skeleton))
 		{
 			ndFloat32 walkSpeed = 1.0f;
-			//ndFloat32 walkSpeed = 0.05f;
+			//ndFloat32 walkSpeed = 0.02f;
 			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
 //if (m_walkParam >= 0.5)
 //m_walkParam = 0.5;

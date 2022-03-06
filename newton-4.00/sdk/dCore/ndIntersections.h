@@ -44,10 +44,12 @@ typedef ndFloat32 (*dRayIntersectCallback) (void* const context,
 										   const ndFloat32* const polygon, ndInt32 strideInBytes,
 										   const ndInt32* const indexArray, ndInt32 indexCount);
 
-D_CORE_API ndBigVector dPointToRayDistance (const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1); 
-D_CORE_API ndBigVector dPointToTriangleDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
-D_CORE_API ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
-D_CORE_API void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndVector& ray_q0, const ndVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out);
+D_CORE_API ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1);
+D_CORE_API ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
+D_CORE_API ndBigVector dPointToTetrahedrumDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
+
+D_CORE_API void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector& ray_q0, const ndBigVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out);
+D_CORE_API void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector* const points, ndInt32 vertexCount, ndBigVector& p0Out, ndBigVector& p1Out);
 
 D_CORE_API bool dRayBoxClip (ndVector& ray_p0, ndVector& ray_p1, const ndVector& boxP0, const ndVector& boxP1); 
 D_CORE_API ndFloat32 dRayCastBox (const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut);
