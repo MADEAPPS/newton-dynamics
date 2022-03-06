@@ -23,13 +23,13 @@ class ndAnimationKeyFramesTrack
 			:ndArray<OBJECT>()
 		{
 		}
-		ndInt32 GetIndex(ndFloat32 time) const;
+		ndInt32 GetIndex(ndFloat32 param) const;
 
 		private:
-		ndInt32 GetIndexDebug(ndFloat32 time) const;
+		ndInt32 GetIndexDebug(ndFloat32 param) const;
 
 		public:
-		ndArray<ndFloat32> m_time;
+		ndArray<ndFloat32> m_param;
 	};
 
 	ndAnimationKeyFramesTrack()
@@ -52,8 +52,8 @@ class ndAnimationKeyFramesTrack
 		m_name = name; 
 	}
 
-	void InterpolatePosition(ndFloat32 time, ndFloat32 length, ndVector &positOut) const;
-	void InterpolateRotation(ndFloat32 time, ndFloat32 length, ndQuaternion& rotationOut) const;
+	void InterpolatePosition(ndFloat32 param, ndVector &positOut) const;
+	void InterpolateRotation(ndFloat32 param, ndQuaternion& rotationOut) const;
 
 	ndString m_name;
 	dKeyFramesArray<ndVector> m_position;

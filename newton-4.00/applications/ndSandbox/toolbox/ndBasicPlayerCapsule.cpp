@@ -45,22 +45,22 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
 	{
 		ndDemoEntityNotify::OnTransform(thread, matrix);
+		//ndWorld* const word = m_manager->GetWorld();
+		//ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
-		ndWorld* const word = m_manager->GetWorld();
-		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
-
-		ndFloat32 timestep = word->GetScene()->GetTimestep();
+		dAssert(0);
+		//ndFloat32 timestep = word->GetScene()->GetTimestep();
 		//timestep *= 0.25f;
 		//timestep = 1.0f/(30.0f * 4.0f);
 		//timestep *= 0.05f;
-		player->m_animBlendTree->Evaluate(player->m_output, timestep);
-
-		for (int i = 0; i < player->m_output.GetCount(); i++)
-		{
-			const ndAnimKeyframe& keyFrame = player->m_output[i];
-			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
-			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
-		}
+		//player->m_animBlendTree->Evaluate(player->m_output, timestep);
+		//
+		//for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
+		//{
+		//	const ndAnimKeyframe& keyFrame = player->m_output[i];
+		//	ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
+		//	entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+		//}
 	}
 };
 
@@ -77,7 +77,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//matrix.m_posit.m_y = floor.m_y + 1.0f;
 	matrix.m_posit.m_y = floor.m_y;
 	
 	ndDemoEntity* const entity = (ndDemoEntity*)modelEntity->CreateClone();
@@ -126,8 +125,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree = idleMoveBlend;
 
 	// evaluate twice that interpolation is reset
-	m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
-	m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
+	dAssert(0);
+	//m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
+	//m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)

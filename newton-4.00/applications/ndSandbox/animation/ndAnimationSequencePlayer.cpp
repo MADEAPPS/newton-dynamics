@@ -17,7 +17,7 @@
 ndAnimationSequencePlayer::ndAnimationSequencePlayer(ndAnimationSequence* const sequence)
 	:ndAnimationBlendTreeNode(nullptr)
 	,m_sequence(sequence)
-	,m_time(ndFloat32 (0.0f))
+	,m_param(ndFloat32 (0.0f))
 {
 }
 
@@ -25,15 +25,24 @@ ndAnimationSequencePlayer::~ndAnimationSequencePlayer()
 {
 }
 
-void ndAnimationSequencePlayer::SetFrame(ndFloat32 absoluteTime)
+ndFloat32 ndAnimationSequencePlayer::GetParam() const
 {
-	m_time = dMod(absoluteTime, m_sequence->m_period);
+	return m_param;
 }
 
-void ndAnimationSequencePlayer::Evaluate(ndAnimationPose& output, ndFloat32 timestep)
+void ndAnimationSequencePlayer::SetParam(ndFloat32 param)
 {
-	AdvanceFrame(timestep);
-	m_sequence->CalculatePose(output, m_time);
+	m_param = dMod(param, ndFloat32 (1.0f));
+}
+
+ndAnimationSequence* ndAnimationSequencePlayer::GetSequence()
+{
+	return m_sequence;
+}
+
+void ndAnimationSequencePlayer::Evaluate(ndAnimationPose& output)
+{
+	m_sequence->CalculatePose(output, m_param);
 }
 
 

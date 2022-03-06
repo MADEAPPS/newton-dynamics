@@ -405,21 +405,22 @@ class ndActiveRagdollModel : public ndCharacter
 
 	void Update(ndWorld* const world, ndFloat32 timestep) 
 	{
-		//m_animBlendTree->Evaluate(m_output, timestep);
-		m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
-		//m_animBlendTree->Evaluate(m_output, 0.0f);
-		for (ndInt32 i = 0; i < m_output.GetCount(); i++)
-		{
-			const ndAnimKeyframe& keyFrame = m_output[i];
-			ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
-			if (skelNode)
-			{
-				skelNode->SetLocalPose(ndMatrix(keyFrame.m_rotation, keyFrame.m_posit));
-			}
-		}
-		SetPose();
-
-		ndCharacter::Update(world, timestep);
+		dAssert(0);
+		////m_animBlendTree->Evaluate(m_output, timestep);
+		//m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
+		////m_animBlendTree->Evaluate(m_output, 0.0f);
+		//for (ndInt32 i = 0; i < m_output.GetCount(); i++)
+		//{
+		//	const ndAnimKeyframe& keyFrame = m_output[i];
+		//	ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
+		//	if (skelNode)
+		//	{
+		//		skelNode->SetLocalPose(ndMatrix(keyFrame.m_rotation, keyFrame.m_posit));
+		//	}
+		//}
+		//SetPose();
+		//
+		//ndCharacter::Update(world, timestep);
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)

@@ -125,19 +125,6 @@ void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 	m_targetFrame = matrix;
 }
 
-//void ndIk6DofEffector::GetPositionAndSwivelAngle(ndVector& posit, ndFloat32& angle) const
-//{
-//	angle = m_swivelAngleValue;
-//	posit = m_targetFrame.m_posit;
-//}
-//
-//void ndIk6DofEffector::SetPositionAndSwivelAngle(const ndVector& posit, ndFloat32 angle)
-//{
-//	m_swivelAngleValue = angle;
-//	m_targetFrame.m_posit = posit;
-//	m_targetFrame.m_posit.m_w = ndFloat32(1.0f);
-//}
-
 void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
 	m_linearSpring = dAbs(spring);
@@ -299,7 +286,7 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
-	for (ndInt32 i = 0; i < 3; i++)
+	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		if (m_controlDofOptions & (1 << i))
 		{
