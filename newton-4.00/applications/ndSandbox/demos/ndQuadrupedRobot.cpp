@@ -762,7 +762,8 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 		const ndVector com(origin + veloc.Scale(m_timestep));
 		const ndVector target(ProjectCenterOfMass(polygon, com));
 
-		const ndVector step((com - target).Scale (0.01f));
+		ndFloat32 correctionFactor = 0.05f;
+		const ndVector step((com - target).Scale (correctionFactor));
 		
 		for (ndInt32 i = 0; i < output.GetCount(); ++i)
 		{
@@ -799,7 +800,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
+	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
 
 	dQuadrupedRobot* const robot0 = new dQuadrupedRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot0);
@@ -826,7 +827,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
 
-	matrix.m_posit.m_x -= 4.5f;
+	matrix.m_posit.m_x -= 2.5f;
 	matrix.m_posit.m_y += 1.5f;
 	matrix.m_posit.m_z += 0.5f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
