@@ -188,6 +188,7 @@ class dQuadrupedRobot : public ndModel
 		}
 
 		ndVector CalculateCenterOfMass() const;
+		ndVector PredictCenterOfMassVelocity() const;
 		void Evaluate(ndAnimationPose& output);
 
 		ndWorld* m_world;
@@ -653,6 +654,23 @@ ndVector dQuadrupedRobot::dQuadrupedBalanceController::CalculateCenterOfMass() c
 	return com;
 }
 
+ndVector dQuadrupedRobot::dQuadrupedBalanceController::PredictCenterOfMassVelocity() const
+{
+	ndFloat32 toltalMass = 0.0f;
+	ndVector momentum(ndVector::m_zero);
+	for (ndInt32 i = 0; i < m_model->m_bodyArray.GetCount(); ++i)
+	{
+		ndBodyDynamic* const body = m_model->m_bodyArray[i];
+		ndFloat32 mass = body->GetMassMatrix().m_w;
+		const ndVector invMass(body->GetInvMass());
+		ndVector veloc(body->GetVelocity() + body->GetAccel().Scale (body->GetInvMass() * m_timestep));
+		momentum += veloc.Scale(mass);
+		toltalMass += mass;
+	}
+	momentum = momentum.Scale(1.0f / toltalMass);
+	return momentum;
+}
+
 void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& output)
 {
 	// get the animation pose
@@ -676,7 +694,7 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 	// and with that the final pose will be adjusted to keep the balance
 	// for now just assume the pose is valid and return. 
 	const ndVector com(CalculateCenterOfMass());
-
+	const ndVector veloc(PredictCenterOfMassVelocity());
 }
 
 void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
