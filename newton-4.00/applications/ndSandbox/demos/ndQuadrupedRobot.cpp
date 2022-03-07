@@ -673,7 +673,7 @@ ndVector dQuadrupedRobot::dQuadrupedBalanceController::ProjectCenterOfMass(const
 	{
 		dRayToRayDistance(com, p1, supportPolygon[0], supportPolygon[1], p0Out, p1Out);
 	}
-	p1Out.m_y -= (p0Out.m_y - com.m_y);
+	p1Out.m_y = com.m_y;
 	return p1Out;
 }
 
@@ -742,7 +742,7 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 		const ndVector veloc(PredictCenterOfMassVelocity() & ndVector::m_triplexMask);
 		const ndVector com(origin + veloc.Scale(m_timestep));
 		const ndVector target(ProjectCenterOfMass(polygon, com));
-		const ndVector step(target - com);
+		const ndVector step(com - target);
 		const ndVector step1(target - com);
 	}
 }
