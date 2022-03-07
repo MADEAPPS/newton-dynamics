@@ -122,6 +122,7 @@ class dQuadrupedRobot : public ndModel
 
 			// sideway motion
 			ndFloat32 swayAmp = info.m_swayAmp;
+swayAmp = 0.0f;
 			for (ndInt32 i = 0; i < splitParam; ++i)
 			{
 				walkCurve[i].m_z = swayAmp;
@@ -183,8 +184,15 @@ class dQuadrupedRobot : public ndModel
 		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input, dQuadrupedRobot* const model)
 			:ndAnimationBlendTreeNode(input)
 			,ndIkSolver()
+			,m_world(nullptr)
 			,m_model(model)
+			,m_timestep(ndFloat32 (0.0f))
 		{
+			m_centerOfMassCorrection.SetCount(4);
+			for (ndInt32 i = 0; i < m_centerOfMassCorrection.GetCount(); ++i)
+			{
+				m_centerOfMassCorrection[i] = ndVector::m_zero;
+			}
 		}
 
 		ndVector CalculateCenterOfMass() const;
@@ -197,6 +205,7 @@ class dQuadrupedRobot : public ndModel
 		ndWorld* m_world;
 		dQuadrupedRobot* m_model;
 		ndFloat32 m_timestep;
+		ndFixSizeArray<ndVector, 4> m_centerOfMassCorrection;
 	};
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
@@ -611,8 +620,8 @@ class dQuadrupedRobot : public ndModel
 			ndFloat32 walkSpeed = 1.0f;
 			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
 
-			m_walkParam = 0.5;
-			// advance walk animation (for now, later this will be controll by game play logic)
+	m_walkParam = 0.8f;
+			// advance walk animation (for now, later this will be control by game play logic)
 			m_walkCycle->SetParam(m_walkParam);
 			dQuadrupedWalkSequence* const sequence = (dQuadrupedWalkSequence*)m_walkCycle->GetSequence();
 			for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
@@ -719,16 +728,26 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 	// calculate thee accelerations needed for this pose
 	ndSkeletonContainer* const skeleton = m_model->GetRoot()->GetSkeleton();
 	dAssert(skeleton);
+
+	const ndJointBilateralConstraint* joints[4];
 	for (ndInt32 i = 0; i < output.GetCount(); ++i)
 	{
 		const ndAnimKeyframe& keyFrame = output[i];
-		const ndMatrix matrix(keyFrame.m_rotation, keyFrame.m_posit);
-		ndIk6DofEffector* const effector = m_model->m_effectors[i].m_effector;
-
+		const dEffectorInfo& info = m_model->m_effectors[i];
+		ndMatrix matrix(keyFrame.m_rotation, keyFrame.m_posit);
+		ndIk6DofEffector* const effector = info.m_effector;
+		dAssert(effector == output[i].m_userData);
+		if (info.m_footOnGround)
+		{
+			matrix.m_posit += m_centerOfMassCorrection[i];
+		}
 		effector->SetOffsetMatrix(matrix);
-		AddEffector(skeleton, effector);
+		joints[i] = effector;
+		//AddEffector(skeleton, effector);
 	}
-	Solve(skeleton, m_world, m_timestep);
+
+	SolverBegin(skeleton, joints, 4, m_world, m_timestep);
+	Solve();
 
 	// here we will integrate the model to get the center of mass velocity 
 	// and with that the final pose will be adjusted to keep the balance
@@ -742,9 +761,27 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 		const ndVector veloc(PredictCenterOfMassVelocity() & ndVector::m_triplexMask);
 		const ndVector com(origin + veloc.Scale(m_timestep));
 		const ndVector target(ProjectCenterOfMass(polygon, com));
-		const ndVector step(com - target);
-		const ndVector step1(target - com);
+
+		const ndVector step((com - target).Scale (0.01f));
+		
+		for (ndInt32 i = 0; i < output.GetCount(); ++i)
+		{
+			const dEffectorInfo& info = m_model->m_effectors[i];
+			if (info.m_footOnGround)
+			{
+				ndIk6DofEffector* const effector = info.m_effector;
+				ndVector localStep(effector->GetBody0()->GetMatrix().UnrotateVector(effector->GetLocalMatrix0().UnrotateVector(step)));
+				m_centerOfMassCorrection[i] += localStep & ndVector::m_triplexMask;
+				//ndMatrix matrix(effector->GetOffsetMatrix());
+				//matrix.m_posit += localStep & ndVector::m_triplexMask;
+				//effector->SetOffsetMatrix(matrix);
+			}
+		}
+
+		//Solve();
 	}
+
+	SolverEnd();
 }
 
 void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)

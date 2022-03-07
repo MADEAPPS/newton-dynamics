@@ -31,6 +31,7 @@
 ndIkSolver::ndIkSolver()
 	:ndClassAlloc()
 	,m_sentinelBody()
+	,m_bodiesIndex(32)
 	,m_bodies(32)
 	,m_internalForces(32)
 	,m_leftHandSide(128)
@@ -202,11 +203,6 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	}
 }
 
-void ndIkSolver::AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint)
-{
-	skeleton->AddCloseLoopJoint(joint);
-}
-
 bool ndIkSolver::IsSleeping(ndSkeletonContainer* const skeleton) const
 {
 	return skeleton->m_isResting ? true : false;
@@ -307,11 +303,12 @@ void ndIkSolver::BuildMassMatrix()
 		}
 	}
 	
+	m_bodiesIndex.SetCount(m_bodies.GetCount());
 	m_internalForces.SetCount(m_bodies.GetCount());
 	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body = m_bodies[i];
-		body->m_rank = body->m_index;
+		m_bodiesIndex[i] = body->m_index;
 		body->m_index = i;
 	
 		body->UpdateInvInertiaMatrix();
@@ -348,179 +345,96 @@ void ndIkSolver::BuildMassMatrix()
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 }
 
-void ndIkSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
+void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, const ndJointBilateralConstraint** joints, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep)
 {
 	m_world = world;
 	m_skeleton = skeleton;
 	m_timestep = timestep;
 	m_invTimestep = ndFloat32(1.0f) / timestep;
 
+	for (ndInt32 i = jointCount - 1; i >= 0; --i)
+	{
+		m_skeleton->AddCloseLoopJoint((ndConstraint*)joints[i]);
+	}
+	
 	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndJointBilateralConstraint* const joint = node->m_joint;
-		//joint->SetIkSolver();
 		joint->SetIkMode(true);
 	}
 	BuildMassMatrix();
+}
 
-	m_skeleton->SolveImmediate(*this);
-
-	//ndFixSizeArray<bool, 256> mask;
-	//ndFixSizeArray<ndFloat32, 256> accelerations;
-	ndFixSizeArray<ndJacobian, 256> accelerations;
-	//mask.SetCount(m_skeleton->m_nodeList.GetCount());
-	accelerations.SetCount(m_skeleton->m_nodeList.GetCount());
-	//for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-	//{
-	//	mask[i] = true;
-	//}
-
-	accelerations[0].m_linear = ndVector::m_zero;
-	accelerations[0].m_angular = ndVector::m_zero;
-	for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
+void ndIkSolver::SolverEnd()
+{
+	if (m_skeleton)
 	{
-		ndBodyKinematic* const body = m_bodies[i];
-		const ndInt32 index = body->m_index;
-
-		const ndVector invMass(body->GetInvMass());
-		const ndMatrix& invInertia = body->GetInvInertiaMatrix();
-
-		ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
-		ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
-
-		ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();
-		if (maxAccel2 > (m_maxAccel * m_maxAccel))
+		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
 		{
-			accel = accel.Normalize().Scale(m_maxAccel);
+			ndBodyKinematic* const body = m_bodies[i];
+			body->m_index = m_bodiesIndex[i];
+			body->m_rank = 0;
 		}
 
-		ndFloat32 maxAlpha2 = alpha.DotProduct(alpha).GetScalar();
-		if (maxAlpha2 > (m_maxAlpha * m_maxAlpha))
+		m_skeleton->ClearCloseLoopJoints();
+	}
+}
+
+void ndIkSolver::Solve()
+{
+	if (m_skeleton)
+	{
+		m_skeleton->SolveImmediate(*this);
+
+		ndFixSizeArray<ndJacobian, 256> accelerations;
+		accelerations.SetCount(m_skeleton->m_nodeList.GetCount());
+
+		accelerations[0].m_linear = ndVector::m_zero;
+		accelerations[0].m_angular = ndVector::m_zero;
+		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
 		{
-			alpha = alpha.Normalize().Scale(m_maxAlpha);
+			ndBodyKinematic* const body = m_bodies[i];
+			const ndInt32 index = body->m_index;
+
+			const ndVector invMass(body->GetInvMass());
+			const ndMatrix& invInertia = body->GetInvInertiaMatrix();
+
+			ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
+			ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
+
+			ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();
+			if (maxAccel2 > (m_maxAccel * m_maxAccel))
+			{
+				accel = accel.Normalize().Scale(m_maxAccel);
+			}
+
+			ndFloat32 maxAlpha2 = alpha.DotProduct(alpha).GetScalar();
+			if (maxAlpha2 > (m_maxAlpha * m_maxAlpha))
+			{
+				alpha = alpha.Normalize().Scale(m_maxAlpha);
+			}
+
+			accelerations[i].m_linear = accel;
+			accelerations[i].m_angular = alpha;
 		}
 
-		accelerations[i].m_linear = accel;
-		accelerations[i].m_angular = alpha;
-	}
+		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
+		{
+			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndJointBilateralConstraint* const joint = node->m_joint;
+			const ndInt32 index0 = (joint->GetBody0()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody0()->m_index : 0;
+			const ndInt32 index1 = (joint->GetBody1()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody1()->m_index : 0;
+			joint->SetIkSetAccel(accelerations[index0], accelerations[index1]);
+			joint->SetIkMode(false);
+		}
 
-	//bool accelerationsAreValid = false;
-	//ndInt32 maxPasses = m_maxIterations;
-	//const ndVector zero(ndVector::m_zero);
-	//while (!accelerationsAreValid && maxPasses)
-	//{
-	//	maxPasses--;
-	//	accelerationsAreValid = true;
-	//	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-	//	{
-	//		if (mask[i])
-	//		{
-	//			ndJacobian forceBody0;
-	//			ndJacobian forceBody1;
-	//			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-	//			ndJointBilateralConstraint* const joint = node->m_joint;
-	//
-	//			const ndInt32 index0 = (joint->GetBody0()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody0()->m_index : 0;
-	//			const ndInt32 index1 = (joint->GetBody1()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody1()->m_index : 0;
-	//			ndBodyKinematic* const body0 = m_bodies[index0];
-	//			ndBodyKinematic* const body1 = m_bodies[index1];
-	//
-	//			forceBody0.m_linear = body0->m_accel + m_internalForces[index0].m_linear;
-	//			forceBody0.m_angular = body0->m_alpha + m_internalForces[index0].m_angular;
-	//			forceBody1.m_linear = body1->m_accel + m_internalForces[index1].m_linear;
-	//			forceBody1.m_angular = body1->m_alpha + m_internalForces[index1].m_angular;
-	//
-	//			dAssert(0);
-	//			//mask[i] = joint->SetIkMotor(timestep, forceBody0, forceBody1, &m_leftHandSide[joint->m_rowStart]);
-	//			//accelerationsAreValid = accelerationsAreValid & mask[i];
-	//		}
-	//	}
-	//
-	//	if (!accelerationsAreValid)
-	//	{
-	//		if (!maxPasses)
-	//		{
-	//			for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-	//			{
-	//				if (mask[i])
-	//				{
-	//					ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-	//					ndJointBilateralConstraint* const joint = node->m_joint;
-	//					dAssert(0);
-	//					//joint->StopIkMotor(timestep);
-	//				}
-	//			}
-	//			break;
-	//		}
-	//		else
-	//		{
-	//			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-	//			{
-	//				ndBodyKinematic* const body = m_bodies[i];
-	//				body->m_accel = zero;
-	//				body->m_alpha = zero;
-	//			}
-	//
-	//			for (ndInt32 j = m_skeleton->m_nodeList.GetCount() - 2; j >= 0; --j)
-	//			{
-	//				if (!mask[j])
-	//				{
-	//					ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[j];
-	//					ndJointBilateralConstraint* const joint = node->m_joint;
-	//
-	//					ndConstraintDescritor constraintParam;
-	//					dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
-	//					for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
-	//					{
-	//						constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
-	//						constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
-	//						constraintParam.m_forceBounds[i].m_jointForce = nullptr;
-	//						constraintParam.m_forceBounds[i].m_normalIndex = D_INDEPENDENT_ROW;
-	//					}
-	//					joint->m_rowCount = joint->GetRowsCount();
-	//
-	//					constraintParam.m_rowsCount = 0;
-	//					constraintParam.m_timestep = m_timestep;
-	//					constraintParam.m_invTimestep = m_invTimestep;
-	//					joint->JacobianDerivative(constraintParam);
-	//					const ndInt32 dof = constraintParam.m_rowsCount;
-	//					//dAssert(dof == joint->m_rowCount);
-	//					const ndInt32 baseIndex = joint->m_rowStart;
-	//					for (ndInt32 i = 0; i < dof; ++i)
-	//					{
-	//						ndRightHandSide* const rhs = &m_rightHandSide[baseIndex + i];
-	//						rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
-	//						rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
-	//						rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
-	//					}
-	//				}
-	//			}
-	//			m_skeleton->SolveImmediate(*this);
-	//		}
-	//	}
-	//}
-	
-	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-	{
-		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-		ndJointBilateralConstraint* const joint = node->m_joint;
-		const ndInt32 index0 = (joint->GetBody0()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody0()->m_index : 0;
-		const ndInt32 index1 = (joint->GetBody1()->GetInvMass() > ndFloat32(0.0f)) ? joint->GetBody1()->m_index : 0;
-		joint->SetIkSetAccel(accelerations[index0], accelerations[index1]);
-		joint->SetIkMode(false);
+		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
+		{
+			ndBodyKinematic* const body = m_bodies[i];
+			const ndInt32 index = body->m_index;
+			body->m_accel += m_internalForces[index].m_linear;
+			body->m_alpha += m_internalForces[index].m_angular;
+		}
 	}
-
-	for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
-	{
-		ndBodyKinematic* const body = m_bodies[i];
-		const ndInt32 index = body->m_index;
-		body->m_accel += m_internalForces[index].m_linear;
-		body->m_alpha += m_internalForces[index].m_angular;
-	
-		body->m_index = body->m_rank;
-		body->m_rank = 0;
-	}
-	
-	m_skeleton->ClearCloseLoopJoints();
 }

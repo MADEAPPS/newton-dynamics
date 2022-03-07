@@ -22,7 +22,6 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	{
 		m_disabled,
 		m_fixAxis,
-		//m_swivelAngle,
 		m_shortestPath,
 	};
 
@@ -62,7 +61,6 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	ndFloat32 m_linearDamper;
 	ndFloat32 m_linearRegularizer;
 
-	//ndFloat32 m_swivelAngleValue;
 	ndRotationType m_rotationType;
 	union
 	{

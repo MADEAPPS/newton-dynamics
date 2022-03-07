@@ -36,8 +36,10 @@ class ndIkSolver: public ndClassAlloc
 
 	D_NEWTON_API void SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha);
 	D_NEWTON_API bool IsSleeping(ndSkeletonContainer* const skeleton) const;
-	D_NEWTON_API void AddEffector(ndSkeletonContainer* const skeleton, ndConstraint* const joint);
-	D_NEWTON_API void Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep);
+
+	D_NEWTON_API void SolverBegin(ndSkeletonContainer* const skeleton, const ndJointBilateralConstraint** joint, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API void Solve();
+	D_NEWTON_API void SolverEnd();
 
 	D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
 	D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
@@ -49,6 +51,7 @@ class ndIkSolver: public ndClassAlloc
 
 	private:
 	ndBodyKinematic m_sentinelBody;
+	ndArray<ndInt32> m_bodiesIndex;
 	ndArray<ndBodyKinematic*> m_bodies;
 	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
