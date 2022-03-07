@@ -29,6 +29,10 @@
 #include <condition_variable>
 #include "vhacdVector.h"
 
+#ifndef _ASSERT
+	#define _ASSERT(x)
+#endif
+
 namespace nd
 {
 	namespace VHACD 
