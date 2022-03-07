@@ -13,7 +13,7 @@
 #define __PHYSICS_UTIL__
 
 //#define DEMO_GRAVITY  ndFloat32(-10.0f)
-#define DEMO_GRAVITY  ndFloat32(-0.0f)
+#define DEMO_GRAVITY  ndFloat32(-0.2f)
 
 class ndDemoEntityManager;
 
