@@ -19,18 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-//#ifndef memset
-//inline void memset(void* const src, char val, int size)
-//{
-//	char* const ptr = (char*)src;
-//	for (int i = 0; i < size; i++)
-//	{
-//		ptr[i] = val;
-//	}
-//}
-//#endif
-
 #include <string.h>
 #include "vhacdConvexHullUtils.h"
 
