@@ -189,6 +189,9 @@ class dQuadrupedRobot : public ndModel
 
 		ndVector CalculateCenterOfMass() const;
 		ndVector PredictCenterOfMassVelocity() const;
+		void GetSupportPolygon(ndFixSizeArray<ndVector, 16>& polygon) const;
+		ndVector ProjectCenterOfMass(const ndFixSizeArray<ndVector, 16>& polygon, const ndVector& com) const;
+
 		void Evaluate(ndAnimationPose& output);
 
 		ndWorld* m_world;
@@ -637,6 +640,43 @@ class dQuadrupedRobot : public ndModel
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 
+void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeArray<ndVector, 16>& supportPolygon) const
+{
+	supportPolygon.SetCount(0);
+	for (ndInt32 i = 0; i < m_model->m_effectors.GetCount(); ++i)
+	{
+		ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
+		if (m_model->m_effectors[i].m_footOnGround)
+		{
+			ndVector point(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
+			supportPolygon.PushBack(point);
+		}
+	}
+}
+
+ndVector dQuadrupedRobot::dQuadrupedBalanceController::ProjectCenterOfMass(const ndFixSizeArray<ndVector, 16>& supportPolygon, const ndVector& com) const
+{
+	ndBigVector p0Out;
+	ndBigVector p1Out;
+	ndBigVector p1(com);
+	p1.m_y -= 1.0f;
+	if (supportPolygon.GetCount() >= 3)
+	{
+		ndBigVector poly[16];
+		for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
+		{
+			poly[i] = supportPolygon[i];
+		}
+		dRayToPolygonDistance(com, p1, poly, supportPolygon.GetCount(), p0Out, p1Out);
+	}
+	else if (supportPolygon.GetCount() == 2)
+	{
+		dRayToRayDistance(com, p1, supportPolygon[0], supportPolygon[1], p0Out, p1Out);
+	}
+	p1Out.m_y -= (p0Out.m_y - com.m_y);
+	return p1Out;
+}
+
 ndVector dQuadrupedRobot::dQuadrupedBalanceController::CalculateCenterOfMass() const
 {
 	ndFloat32 toltalMass = 0.0f;
@@ -667,8 +707,8 @@ ndVector dQuadrupedRobot::dQuadrupedBalanceController::PredictCenterOfMassVeloci
 		momentum += veloc.Scale(mass);
 		toltalMass += mass;
 	}
-	momentum = momentum.Scale(1.0f / toltalMass);
-	return momentum;
+	ndVector veloc (momentum.Scale(1.0f / toltalMass));
+	return veloc;
 }
 
 void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& output)
@@ -693,8 +733,18 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 	// here we will integrate the model to get the center of mass velocity 
 	// and with that the final pose will be adjusted to keep the balance
 	// for now just assume the pose is valid and return. 
-	const ndVector com(CalculateCenterOfMass());
-	const ndVector veloc(PredictCenterOfMassVelocity());
+
+	ndFixSizeArray<ndVector, 16> polygon;
+	GetSupportPolygon(polygon);
+	if (polygon.GetCount())
+	{
+		const ndVector origin(CalculateCenterOfMass());
+		const ndVector veloc(PredictCenterOfMassVelocity() & ndVector::m_triplexMask);
+		const ndVector com(origin + veloc.Scale(m_timestep));
+		const ndVector target(ProjectCenterOfMass(polygon, com));
+		const ndVector step(target - com);
+		const ndVector step1(target - com);
+	}
 }
 
 void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
