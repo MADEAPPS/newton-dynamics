@@ -120,6 +120,11 @@ ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
 	return m_targetFrame;
 }
 
+ndMatrix ndIk6DofEffector::CalculateTargetGlobal() const
+{
+	return m_targetFrame * GetLocalMatrix1() * GetBody1()->GetMatrix();
+}
+
 void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 {
 	m_targetFrame = matrix;

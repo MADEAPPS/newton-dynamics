@@ -184,15 +184,16 @@ swayAmp = 0.0f;
 		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input, dQuadrupedRobot* const model)
 			:ndAnimationBlendTreeNode(input)
 			,ndIkSolver()
+			,m_centerOfMassCorrection(ndVector::m_zero)
 			,m_world(nullptr)
 			,m_model(model)
 			,m_timestep(ndFloat32 (0.0f))
 		{
-			m_centerOfMassCorrection.SetCount(4);
-			for (ndInt32 i = 0; i < m_centerOfMassCorrection.GetCount(); ++i)
-			{
-				m_centerOfMassCorrection[i] = ndVector::m_zero;
-			}
+			//m_centerOfMassCorrection.SetCount(4);
+			//for (ndInt32 i = 0; i < m_centerOfMassCorrection.GetCount(); ++i)
+			//{
+			//	m_centerOfMassCorrection[i] = ndVector::m_zero;
+			//}
 		}
 
 		ndVector CalculateCenterOfMass() const;
@@ -202,10 +203,11 @@ swayAmp = 0.0f;
 
 		void Evaluate(ndAnimationPose& output);
 
+		//ndFixSizeArray<ndVector, 4> m_centerOfMassCorrection;
+		ndVector m_centerOfMassCorrection;
 		ndWorld* m_world;
 		dQuadrupedRobot* m_model;
 		ndFloat32 m_timestep;
-		ndFixSizeArray<ndVector, 4> m_centerOfMassCorrection;
 	};
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
@@ -521,8 +523,8 @@ swayAmp = 0.0f;
 			joint->DebugJoint(context);
 			if (m_effectors[i].m_footOnGround)
 			{
-				ndVector point(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
-				supportPolygon.PushBack(point);
+				ndMatrix matrix(m_effectors[i].m_effector->CalculateTargetGlobal());
+				supportPolygon.PushBack(matrix.m_posit);
 			}
 		}
 
@@ -654,11 +656,10 @@ void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeAr
 	supportPolygon.SetCount(0);
 	for (ndInt32 i = 0; i < m_model->m_effectors.GetCount(); ++i)
 	{
-		ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
 		if (m_model->m_effectors[i].m_footOnGround)
 		{
-			ndVector point(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
-			supportPolygon.PushBack(point);
+			ndMatrix matrix(m_model->m_effectors[i].m_effector->CalculateTargetGlobal());
+			supportPolygon.PushBack(matrix.m_posit);
 		}
 	}
 }
@@ -736,14 +737,14 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 		const dEffectorInfo& info = m_model->m_effectors[i];
 		ndMatrix matrix(keyFrame.m_rotation, keyFrame.m_posit);
 		ndIk6DofEffector* const effector = info.m_effector;
+		joints[i] = effector;
 		dAssert(effector == output[i].m_userData);
+
 		if (info.m_footOnGround)
 		{
-			matrix.m_posit += m_centerOfMassCorrection[i];
+			//matrix.m_posit += m_centerOfMassCorrection[i];
 		}
 		effector->SetOffsetMatrix(matrix);
-		joints[i] = effector;
-		//AddEffector(skeleton, effector);
 	}
 
 	SolverBegin(skeleton, joints, 4, m_world, m_timestep);
@@ -770,12 +771,14 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 			const dEffectorInfo& info = m_model->m_effectors[i];
 			if (info.m_footOnGround)
 			{
-				ndIk6DofEffector* const effector = info.m_effector;
-				ndVector localStep(effector->GetBody0()->GetMatrix().UnrotateVector(effector->GetLocalMatrix0().UnrotateVector(step)));
-				m_centerOfMassCorrection[i] += localStep & ndVector::m_triplexMask;
-				//ndMatrix matrix(effector->GetOffsetMatrix());
-				//matrix.m_posit += localStep & ndVector::m_triplexMask;
-				//effector->SetOffsetMatrix(matrix);
+				//ndIk6DofEffector* const effector = info.m_effector;
+				////ndVector localStep(effector->GetBody0()->GetMatrix().UnrotateVector(effector->GetLocalMatrix0().UnrotateVector(step)));
+				//const ndMatrix matrix(effector->CalculateTargetGlobal());
+				//ndVector localStep(matrix.UnrotateVector(step));
+				//m_centerOfMassCorrection[i] += localStep & ndVector::m_triplexMask;
+				////ndMatrix matrix(effector->GetOffsetMatrix());
+				////matrix.m_posit += localStep & ndVector::m_triplexMask;
+				////effector->SetOffsetMatrix(matrix);
 			}
 		}
 

@@ -17,13 +17,13 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointSpherical)
 
 ndIkJointSpherical::ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointSpherical(pinAndPivotFrame, child, parent)
-	,ndIkInterface()
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 }
 
 ndIkJointSpherical::ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,ndIkInterface()
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

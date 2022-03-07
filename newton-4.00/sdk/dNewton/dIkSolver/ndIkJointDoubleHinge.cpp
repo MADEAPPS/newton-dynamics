@@ -17,7 +17,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointDoubleHinge)
 
 ndIkJointDoubleHinge::ndIkJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointDoubleHinge(pinAndPivotFrame, child, parent)
-	,ndIkInterface()
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 }
 
@@ -29,7 +29,7 @@ ndIkJointDoubleHinge::ndIkJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndB
 
 ndIkJointDoubleHinge::ndIkJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointDoubleHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
-
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

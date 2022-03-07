@@ -17,19 +17,19 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkJointHinge)
 
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
-	,ndIkInterface()
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 }
 
 ndIkJointHinge::ndIkJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotInChild, pinAndPivotInParent, child, parent)
-	,ndIkInterface()
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 }
 
 ndIkJointHinge::ndIkJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
-
+	,ndJointBilateralConstraint::ndIkInterface()
 {
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
