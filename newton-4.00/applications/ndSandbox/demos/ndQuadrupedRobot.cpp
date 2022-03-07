@@ -180,16 +180,18 @@ class dQuadrupedRobot : public ndModel
 	class dQuadrupedBalanceController: public ndAnimationBlendTreeNode, public ndIkSolver
 	{
 		public: 
-		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input)
+		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input, dQuadrupedRobot* const model)
 			:ndAnimationBlendTreeNode(input)
 			,ndIkSolver()
+			,m_model(model)
 		{
 		}
 
-		void Evaluate(ndAnimationPose& output)
-		{
-			ndAnimationBlendTreeNode::Evaluate(output);
-		}
+		void Evaluate(ndAnimationPose& output);
+
+		ndWorld* m_world;
+		dQuadrupedRobot* m_model;
+		ndFloat32 m_timestep;
 	};
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
@@ -197,7 +199,7 @@ class dQuadrupedRobot : public ndModel
 		,m_referenceFrame(dGetIdentityMatrix())
 		,m_rootBody(nullptr)
 		,m_walkCycle(nullptr)
-		,m_animBlendTree(nullptr)
+		,m_balanceController(nullptr)
 		,m_effectors()
 		,m_bodyArray()
 		,m_jointArray()
@@ -215,7 +217,7 @@ class dQuadrupedRobot : public ndModel
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 0.75f;
+		matrix.m_posit.m_y += 0.705f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
@@ -383,9 +385,9 @@ class dQuadrupedRobot : public ndModel
 
 	~dQuadrupedRobot()
 	{
-		if (m_animBlendTree)
+		if (m_balanceController)
 		{
-			delete m_animBlendTree;
+			delete m_balanceController;
 		}
 
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
@@ -467,7 +469,7 @@ class dQuadrupedRobot : public ndModel
 			m_output.PushBack(keyFrame);
 		}
 
-		m_animBlendTree = new dQuadrupedBalanceController (m_walkCycle);
+		m_balanceController = new dQuadrupedBalanceController (m_walkCycle, this);
 	}
 
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -536,33 +538,28 @@ class dQuadrupedRobot : public ndModel
 		context.DrawFrame(rootMatrix);
 
 		// Draw center of mass projection
+		ndBigVector p0Out;
+		ndBigVector p1Out;
+		ndBigVector p0(rootMatrix.m_posit);
+
+		p0.m_y -= 1.0f;
 		if (supportPolygon.GetCount() >= 3)
 		{
-			ndBigVector p0(rootMatrix.m_posit);
-			p0.m_y -= 1.0f;
-			ndBigVector p0Out;
-			ndBigVector p1Out;
-
 			ndBigVector poly[16];
 			for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
 			{
 				poly[i] = supportPolygon[i];
 			}
-
 			dRayToPolygonDistance(rootMatrix.m_posit, p0, poly, supportPolygon.GetCount(), p0Out, p1Out);
 		} 
 		else if (supportPolygon.GetCount() == 2)
 		{
-			ndBigVector p0(rootMatrix.m_posit);
-			p0.m_y -= 1.0f;
-			ndBigVector p0Out;
-			ndBigVector p1Out;
 			dRayToRayDistance(rootMatrix.m_posit, p0, supportPolygon[0], supportPolygon[1], p0Out, p1Out);
-
-			ndVector t0(p0Out);
-			ndVector t1(p1Out);
-			context.DrawLine(t0, t1, ndVector (1.0f, 0.5f, 1.0f, 0.0f));
 		}
+		ndVector t0(p0Out);
+		ndVector t1(p1Out);
+		context.DrawPoint(t0, ndVector(1.0f, 0.0f, 0.0f, 0.0f));
+		context.DrawPoint(t1, ndVector(0.0f, 0.0f, 1.0f, 0.0f));
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -615,35 +612,30 @@ class dQuadrupedRobot : public ndModel
 
 		m_rootBody->SetSleepState(false);
 
-		if (!m_animBlendTree->IsSleeping(skeleton))
+		if (!m_balanceController->IsSleeping(skeleton))
 		{
 			ndFloat32 walkSpeed = 1.0f;
 			m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
 
+			m_walkParam = 0.5;
+			// advance walk animation (for now, later this will be controll by game play logic)
 			m_walkCycle->SetParam(m_walkParam);
-			
-			m_animBlendTree->Evaluate(m_output);
 			dQuadrupedWalkSequence* const sequence = (dQuadrupedWalkSequence*)m_walkCycle->GetSequence();
-
 			for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
 			{
-				const ndAnimKeyframe& keyFrame = m_output[i];
-				const ndMatrix matrix(keyFrame.m_rotation, keyFrame.m_posit);
-				ndIk6DofEffector* const effector = m_effectors[i].m_effector;
 				m_effectors[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
-
-				effector->SetOffsetMatrix(matrix);
-				m_animBlendTree->AddEffector(skeleton, effector);
 			}
-
-			m_animBlendTree->Solve(skeleton, world, timestep);
+			
+			m_balanceController->m_world = world;
+			m_balanceController->m_timestep = timestep;
+			m_balanceController->Evaluate(m_output);
 		}
 	}
 
 	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
 	ndAnimationSequencePlayer* m_walkCycle;
-	dQuadrupedBalanceController* m_animBlendTree;
+	dQuadrupedBalanceController* m_balanceController;
 	
 	ndAnimationPose m_output;
 	ndFixSizeArray<dEffectorInfo, 4> m_effectors;
@@ -653,6 +645,30 @@ class dQuadrupedRobot : public ndModel
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
+
+void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& output)
+{
+	// get the animation pose
+	ndAnimationBlendTreeNode::Evaluate(output);
+
+	// calculate thee accelerations needed for this pose
+	ndSkeletonContainer* const skeleton = m_model->GetRoot()->GetSkeleton();
+	dAssert(skeleton);
+	for (ndInt32 i = 0; i < output.GetCount(); ++i)
+	{
+		const ndAnimKeyframe& keyFrame = output[i];
+		const ndMatrix matrix(keyFrame.m_rotation, keyFrame.m_posit);
+		ndIk6DofEffector* const effector = m_model->m_effectors[i].m_effector;
+
+		effector->SetOffsetMatrix(matrix);
+		AddEffector(skeleton, effector);
+	}
+	Solve(skeleton, m_world, m_timestep);
+
+	// here we will integrate the model to get the center of mass velocity 
+	// and with that the final pose will be adjusted to keep the balance
+	// for now just assume the pose is valid and return. 
+}
 
 
 void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)

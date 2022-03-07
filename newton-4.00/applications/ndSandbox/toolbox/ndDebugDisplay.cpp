@@ -602,56 +602,69 @@ void RenderParticles(ndDemoEntityManager* const scene)
 }
 #endif
 
+class ndJoindDebug : public ndConstraintDebugCallback
+{
+	public:
+	ndJoindDebug(ndDemoEntityManager* const scene)
+	{
+		ndDemoCamera* const camera = scene->GetCamera();
+		const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		m_shader = scene->GetShaderCache().m_wireFrame;
+
+		glUseProgram(m_shader);
+
+		m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+		m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(glVector3), m_line);
+	}
+
+	~ndJoindDebug()
+	{
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glUseProgram(0);
+	}
+
+	void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness)
+	{
+		m_line[0].m_x = GLfloat(point.m_x);
+		m_line[0].m_y = GLfloat(point.m_y);
+		m_line[0].m_z = GLfloat(point.m_z);
+		glVector4 c(color);
+
+		glPointSize(GLfloat(thickness));
+		glUniform4fv(m_shadeColorLocation, 1, &c[0]);
+		glDrawArrays(GL_POINTS, 0, 1);
+		glPointSize(1);
+	}
+
+	void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
+	{
+		m_line[0].m_x = GLfloat(p0.m_x);
+		m_line[0].m_y = GLfloat(p0.m_y);
+		m_line[0].m_z = GLfloat(p0.m_z);
+		m_line[1].m_x = GLfloat(p1.m_x);
+		m_line[1].m_y = GLfloat(p1.m_y);
+		m_line[1].m_z = GLfloat(p1.m_z);
+		glVector4 c(color);
+
+		glLineWidth(GLfloat(thickness));
+		glUniform4fv(m_shadeColorLocation, 1, &c[0]);
+		glDrawArrays(GL_LINES, 0, 2);
+		glLineWidth(1);
+	}
+
+	GLuint m_shader;
+	ndInt32 m_shadeColorLocation;
+	ndInt32 m_projectionViewModelMatrixLocation;
+
+	glVector3 m_line[2];
+};
+
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {
-	class ndJoindDebug : public ndConstraintDebugCallback
-	{
-		public:
-		ndJoindDebug(ndDemoEntityManager* const scene)
-		{
-			ndDemoCamera* const camera = scene->GetCamera();
-			const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-			m_shader = scene->GetShaderCache().m_wireFrame;
-
-			glUseProgram(m_shader);
-
-			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
-			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
-			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
-
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(3, GL_FLOAT, sizeof(glVector3), m_line);
-		}
-
-		~ndJoindDebug()
-		{
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glUseProgram(0);
-		}
-
-		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
-		{
-			m_line[0].m_x = GLfloat(p0.m_x);
-			m_line[0].m_y = GLfloat(p0.m_y);
-			m_line[0].m_z = GLfloat(p0.m_z);
-			m_line[1].m_x = GLfloat(p1.m_x);
-			m_line[1].m_y = GLfloat(p1.m_y);
-			m_line[1].m_z = GLfloat(p1.m_z);
-			glVector4 c(color);
-			
-			glLineWidth(GLfloat(thickness));
-			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
-			glDrawArrays(GL_LINES, 0, 2);
-			glLineWidth(1);
-		}
-
-		GLuint m_shader;
-		ndInt32 m_shadeColorLocation;
-		ndInt32 m_projectionViewModelMatrixLocation;
-
-		glVector3 m_line[2];
-	};
-
 	ndJoindDebug debugJoint(scene);
 	debugJoint.SetScale(0.2f);
 	ndWorld* const workd = scene->GetWorld();
@@ -665,54 +678,6 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 
 void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 {
-	class ndJoindDebug : public ndConstraintDebugCallback
-	{
-		public:
-		ndJoindDebug(ndDemoEntityManager* const scene)
-		{
-			ndDemoCamera* const camera = scene->GetCamera();
-			const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-			m_shader = scene->GetShaderCache().m_wireFrame;
-
-			glUseProgram(m_shader);
-
-			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
-			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
-			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
-
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(3, GL_FLOAT, sizeof(glVector3), m_line);
-		}
-
-		~ndJoindDebug()
-		{
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glUseProgram(0);
-		}
-		
-		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
-		{
-			m_line[0].m_x = GLfloat(p0.m_x);
-			m_line[0].m_y = GLfloat(p0.m_y);
-			m_line[0].m_z = GLfloat(p0.m_z);
-			m_line[1].m_x = GLfloat(p1.m_x);
-			m_line[1].m_y = GLfloat(p1.m_y);
-			m_line[1].m_z = GLfloat(p1.m_z);
-			glVector4 c(color);
-
-			glLineWidth(GLfloat(thickness));
-			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
-			glDrawArrays(GL_LINES, 0, 2);
-			glLineWidth(1);
-		}
-
-		GLuint m_shader;
-		ndInt32 m_shadeColorLocation;
-		ndInt32 m_projectionViewModelMatrixLocation;
-
-		glVector3 m_line[2];
-	};
-
 	ndJoindDebug debugJoint(scene);
 	debugJoint.SetScale(0.2f);
 	ndWorld* const workd = scene->GetWorld();

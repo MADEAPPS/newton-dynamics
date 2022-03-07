@@ -51,7 +51,8 @@ class ndConstraintDebugCallback: public ndClassAlloc
 	{
 	}
 
-	virtual void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness = ndFloat32 (1.0f)) = 0;
+	virtual void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness = ndFloat32 (8.0f)) = 0;
+	virtual void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness = ndFloat32(1.0f)) = 0;
 
 	virtual void SetScale(ndFloat32 scale)
 	{
