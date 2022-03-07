@@ -187,6 +187,7 @@ class dQuadrupedRobot : public ndModel
 		{
 		}
 
+		ndVector CalculateCenterOfMass() const;
 		void Evaluate(ndAnimationPose& output);
 
 		ndWorld* m_world;
@@ -521,18 +522,7 @@ class dQuadrupedRobot : public ndModel
 			i0 = i;
 		}
 
-		ndFloat32 toltalMass = 0.0f;
-		ndVector com(ndVector::m_zero);
-		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-		{
-			ndBodyDynamic* const body = m_bodyArray[i];
-			ndFloat32 mass = body->GetMassMatrix().m_w;
-			ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-			com += comMass.Scale (mass);
-			toltalMass += mass;
-		}
-		com = com.Scale(1.0f / toltalMass);
-		com.m_w = 1.0f;
+		const ndVector com(m_balanceController->CalculateCenterOfMass());
 		ndMatrix rootMatrix(m_rootBody->GetMatrix());
 		rootMatrix.m_posit = com;;
 		context.DrawFrame(rootMatrix);
@@ -646,6 +636,23 @@ class dQuadrupedRobot : public ndModel
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 
+ndVector dQuadrupedRobot::dQuadrupedBalanceController::CalculateCenterOfMass() const
+{
+	ndFloat32 toltalMass = 0.0f;
+	ndVector com(ndVector::m_zero);
+	for (ndInt32 i = 0; i < m_model->m_bodyArray.GetCount(); ++i)
+	{
+		ndBodyDynamic* const body = m_model->m_bodyArray[i];
+		ndFloat32 mass = body->GetMassMatrix().m_w;
+		ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+		com += comMass.Scale(mass);
+		toltalMass += mass;
+	}
+	com = com.Scale(1.0f / toltalMass);
+	com.m_w = 1.0f;
+	return com;
+}
+
 void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& output)
 {
 	// get the animation pose
@@ -668,8 +675,9 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 	// here we will integrate the model to get the center of mass velocity 
 	// and with that the final pose will be adjusted to keep the balance
 	// for now just assume the pose is valid and return. 
-}
+	const ndVector com(CalculateCenterOfMass());
 
+}
 
 void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 {
