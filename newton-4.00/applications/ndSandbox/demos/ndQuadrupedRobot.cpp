@@ -329,7 +329,8 @@ swayAmp = 0.0f;
 
 						dEffectorInfo info;
 						info.m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
-						ndFloat32 regularizer = 1.0e-4f;
+						//ndFloat32 regularizer = 1.0e-4f;
+						ndFloat32 regularizer = 1.0e-1f;
 						info.m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						info.m_effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
 						info.m_effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
@@ -520,7 +521,7 @@ swayAmp = 0.0f;
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndJointBilateralConstraint* const joint = m_effectors[i].m_effector;
-			joint->DebugJoint(context);
+			//joint->DebugJoint(context);
 			if (m_effectors[i].m_footOnGround)
 			{
 				ndMatrix matrix(m_effectors[i].m_effector->CalculateTargetGlobal());
@@ -770,7 +771,9 @@ xxxxx++;
 			ndMatrix pivotMatrix(effector->GetLocalMatrix1() * effector->GetBody1()->GetMatrix());
 			const ndMatrix effectorMatrix(matrix * pivotMatrix);
 			pivotMatrix.m_posit -= step;
-			matrix = effectorMatrix * pivotMatrix.Inverse();
+			//matrix = effectorMatrix * pivotMatrix.Inverse();
+			matrix = poseMatrix;
+			matrix.m_posit = (effectorMatrix * pivotMatrix.Inverse()).m_posit;
 			effector->SetOffsetMatrix(matrix);
 			m_centerOfMassCorrection[i] = matrix.m_posit - poseMatrix.m_posit;
 		}
