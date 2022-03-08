@@ -524,8 +524,9 @@ swayAmp = 0.0f;
 			//joint->DebugJoint(context);
 			if (m_effectors[i].m_footOnGround)
 			{
-				ndMatrix matrix(m_effectors[i].m_effector->CalculateTargetGlobal());
-				supportPolygon.PushBack(matrix.m_posit);
+				const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
+				//ndMatrix matrix(m_effectors[i].m_effector->CalculateTargetGlobal());
+				supportPolygon.PushBack(posit);
 			}
 		}
 
@@ -659,8 +660,10 @@ void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeAr
 	{
 		if (m_model->m_effectors[i].m_footOnGround)
 		{
-			ndMatrix matrix(m_model->m_effectors[i].m_effector->CalculateTargetGlobal());
-			supportPolygon.PushBack(matrix.m_posit);
+			ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
+			//ndMatrix matrix(m_model->m_effectors[i].m_effector->CalculateTargetGlobal());
+			const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
+			supportPolygon.PushBack(posit);
 		}
 	}
 }

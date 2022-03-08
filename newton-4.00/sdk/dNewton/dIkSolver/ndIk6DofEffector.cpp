@@ -24,7 +24,6 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	//,m_swivelAngleValue(ndFloat32(0.0f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
@@ -40,7 +39,6 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
-	//,m_swivelAngleValue(ndFloat32(0.0f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
@@ -120,10 +118,10 @@ ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
 	return m_targetFrame;
 }
 
-ndMatrix ndIk6DofEffector::CalculateTargetGlobal() const
-{
-	return m_targetFrame * GetLocalMatrix1() * GetBody1()->GetMatrix();
-}
+//ndMatrix ndIk6DofEffector::CalculateTargetGlobal() const
+//{
+//	return m_targetFrame * GetLocalMatrix1() * GetBody1()->GetMatrix();
+//}
 
 void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 {
@@ -270,7 +268,6 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 		//	//ndVector euler0;
 		//	//ndVector euler1;
 		//	//matrix0.CalcPitchYawRoll(euler0, euler1);
-		//	//ndFloat32 xxx = 90.0f * ndDegreeToRad + m_swivelAngleValue;
 		//	//const ndMatrix matrix(dPitchMatrix(xxx) * dYawMatrix(euler0.m_y) * dRollMatrix(euler0.m_z));
 		//	//m_targetFrame = matrix * matrix1.Inverse();
 		//	//SubmitShortestPathAxis(matrix0, matrix, desc);
