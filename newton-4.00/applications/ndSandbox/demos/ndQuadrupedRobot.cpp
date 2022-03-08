@@ -69,9 +69,25 @@ class dQuadrupedRobot : public ndModel
 
 	D_CLASS_REFLECTION(dQuadrupedRobot);
 
+	class dHipJoint : public ndIkJointSpherical
+	{
+		public:
+		dHipJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndIkJointSpherical(pinAndPivotFrame, child, parent)
+		{
+
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			ndIkJointSpherical::JacobianDerivative(desc);
+		}
+	};
+
 	class dEffectorInfo
 	{
 		public:
+		dHipJoint* m_hipSocket;
 		ndIk6DofEffector* m_effector;
 		ndFloat32 m_walkPhase;
 		ndFloat32 m_swayAmp;
@@ -178,21 +194,6 @@ swayAmp = 0.0f;
 		ndFixSizeArray<ndFloat32,4> m_phase;
 	};
 
-	class dHipJoint : public ndIkJointSpherical
-	{
-		public:
-		dHipJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndIkJointSpherical(pinAndPivotFrame, child, parent)
-		{
-
-		}
-
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			ndIkJointSpherical::JacobianDerivative(desc);
-		}
-	};
-
 	class dQuadrupedBalanceController: public ndAnimationBlendTreeNode, public ndIkSolver
 	{
 		public: 
@@ -267,6 +268,8 @@ swayAmp = 0.0f;
 			stack++;
 		}
 
+		dHipJoint* socket = nullptr;
+
 		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		while (stack) 
 		{
@@ -300,7 +303,7 @@ swayAmp = 0.0f;
 						m_bodyArray.PushBack(childBody);
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						ndIkJointSpherical* const socket = new dHipJoint(pivotMatrix, childBody, parentBody);
+						socket = new dHipJoint(pivotMatrix, childBody, parentBody);
 						socket->SetConeLimit(120.0f * ndDegreeToRad);
 						socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
@@ -343,6 +346,7 @@ swayAmp = 0.0f;
 						ndFloat32 swayAmp(0.8f * legSide.m_y);
 
 						dEffectorInfo info;
+						info.m_hipSocket = socket;
 						info.m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
 						//ndFloat32 regularizer = 1.0e-4f;
 						ndFloat32 regularizer = 1.0e-1f;
@@ -543,6 +547,10 @@ swayAmp = 0.0f;
 				supportPolygon.PushBack(posit);
 			}
 		}
+
+		ndVector xxx0(m_effectors[0].m_hipSocket->GetBody0()->GetMatrix().TransformVector(m_effectors[0].m_hipSocket->GetLocalMatrix0().m_posit));
+		ndVector xxx1(m_effectors[1].m_hipSocket->GetBody0()->GetMatrix().TransformVector(m_effectors[1].m_hipSocket->GetLocalMatrix0().m_posit));
+		context.DrawLine(xxx0, xxx1, ndVector (0.0f, 0.0f, 0.0f, 0.0f));
 
 		// Draw support polygon
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
