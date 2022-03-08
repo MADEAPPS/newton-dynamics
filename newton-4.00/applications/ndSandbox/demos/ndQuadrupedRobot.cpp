@@ -232,7 +232,7 @@ swayAmp = 0.0f;
 		,m_rootBody(nullptr)
 		,m_walkCycle(nullptr)
 		,m_balanceController(nullptr)
-		,m_effectors()
+		,m_limbs()
 		,m_bodyArray()
 		,m_jointArray()
 		,m_walkParam(0.0f)
@@ -357,7 +357,7 @@ swayAmp = 0.0f;
 						info.m_footOnGround = 0;
 						info.m_swayAmp = swayAmp;
 						info.m_walkPhase = definition.m_walkPhase;
-						m_effectors.PushBack(info);
+						m_limbs.PushBack(info);
 					}
 					break;
 				}
@@ -377,7 +377,7 @@ swayAmp = 0.0f;
 	dQuadrupedRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
-		,m_effectors()
+		,m_limbs()
 		,m_walkParam(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
@@ -426,9 +426,9 @@ swayAmp = 0.0f;
 			delete m_balanceController;
 		}
 
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
 		{
-			ndIk6DofEffector* const effector = m_effectors[i].m_effector;
+			ndIk6DofEffector* const effector = m_limbs[i].m_effector;
 			if (!effector->IsInWorld())
 			{
 				delete effector;
@@ -489,19 +489,19 @@ swayAmp = 0.0f;
 	{
 		// create a procedural walk cycle
 		dQuadrupedWalkSequence* const walk = new dQuadrupedWalkSequence();
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
 		{
-			walk->AddTrack(m_effectors[i]);
+			walk->AddTrack(m_limbs[i]);
 		}
 
 		// build the pose tree blender, for now just the walk
 		m_walkCycle = new ndAnimationSequencePlayer(walk);
 
 		// bind animation tree to key frame pose
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
 		{
 			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = m_effectors[i].m_effector;
+			keyFrame.m_userData = m_limbs[i].m_effector;
 			m_output.PushBack(keyFrame);
 		}
 
@@ -537,20 +537,26 @@ swayAmp = 0.0f;
 	void Debug(ndConstraintDebugCallback& context) const
 	{
 		ndFixSizeArray<ndVector , 4> supportPolygon;
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+
+		ndFixSizeArray<ndJointBilateralConstraint*, 4> sockets;
+		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
 		{
-			ndJointBilateralConstraint* const joint = m_effectors[i].m_effector;
+			ndJointBilateralConstraint* const joint = m_limbs[i].m_effector;
 			//joint->DebugJoint(context);
-			if (m_effectors[i].m_footOnGround)
+			if (m_limbs[i].m_footOnGround)
 			{
 				const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
 				supportPolygon.PushBack(posit);
+				sockets.PushBack(m_limbs[i].m_hipSocket);
 			}
 		}
 
-		ndVector xxx0(m_effectors[0].m_hipSocket->GetBody0()->GetMatrix().TransformVector(m_effectors[0].m_hipSocket->GetLocalMatrix0().m_posit));
-		ndVector xxx1(m_effectors[1].m_hipSocket->GetBody0()->GetMatrix().TransformVector(m_effectors[1].m_hipSocket->GetLocalMatrix0().m_posit));
-		context.DrawLine(xxx0, xxx1, ndVector (0.0f, 0.0f, 0.0f, 0.0f));
+		if (sockets.GetCount() == 2)
+		{
+			ndVector p0(sockets[0]->GetBody0()->GetMatrix().TransformVector(sockets[0]->GetLocalMatrix0().m_posit));
+			ndVector p1(sockets[1]->GetBody0()->GetMatrix().TransformVector(sockets[1]->GetLocalMatrix0().m_posit));
+			context.DrawLine(p0, p1, ndVector(1.0f, 1.0f, 0.7f, 0.0f), 2);
+		}
 
 		// Draw support polygon
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
@@ -652,7 +658,7 @@ swayAmp = 0.0f;
 			dQuadrupedWalkSequence* const sequence = (dQuadrupedWalkSequence*)m_walkCycle->GetSequence();
 			for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
 			{
-				m_effectors[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
+				m_limbs[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
 			}
 			
 			m_balanceController->m_world = world;
@@ -667,7 +673,7 @@ swayAmp = 0.0f;
 	dQuadrupedBalanceController* m_balanceController;
 	
 	ndAnimationPose m_output;
-	ndFixSizeArray<dEffectorInfo, 4> m_effectors;
+	ndFixSizeArray<dEffectorInfo, 4> m_limbs;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 	ndFloat32 m_walkParam;
@@ -678,11 +684,11 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
 void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeArray<ndVector, 16>& supportPolygon) const
 {
 	supportPolygon.SetCount(0);
-	for (ndInt32 i = 0; i < m_model->m_effectors.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_model->m_limbs.GetCount(); ++i)
 	{
-		if (m_model->m_effectors[i].m_footOnGround)
+		if (m_model->m_limbs[i].m_footOnGround)
 		{
-			ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
+			ndJointBilateralConstraint* const joint = m_model->m_limbs[i].m_effector;
 			const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
 			supportPolygon.PushBack(posit);
 		}
@@ -780,7 +786,7 @@ xxxxx++;
 	for (ndInt32 i = 0; i < output.GetCount(); ++i)
 	{
 		const ndAnimKeyframe& keyFrame = output[i];
-		const dEffectorInfo& info = m_model->m_effectors[i];
+		const dEffectorInfo& info = m_model->m_limbs[i];
 
 		ndMatrix poseMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		ndMatrix matrix(poseMatrix);
