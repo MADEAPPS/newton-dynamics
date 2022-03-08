@@ -178,6 +178,21 @@ swayAmp = 0.0f;
 		ndFixSizeArray<ndFloat32,4> m_phase;
 	};
 
+	class dHipJoint : public ndIkJointSpherical
+	{
+		public:
+		dHipJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndIkJointSpherical(pinAndPivotFrame, child, parent)
+		{
+
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			ndIkJointSpherical::JacobianDerivative(desc);
+		}
+	};
+
 	class dQuadrupedBalanceController: public ndAnimationBlendTreeNode, public ndIkSolver
 	{
 		public: 
@@ -285,7 +300,7 @@ swayAmp = 0.0f;
 						m_bodyArray.PushBack(childBody);
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
+						ndIkJointSpherical* const socket = new dHipJoint(pivotMatrix, childBody, parentBody);
 						socket->SetConeLimit(120.0f * ndDegreeToRad);
 						socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
@@ -525,7 +540,6 @@ swayAmp = 0.0f;
 			if (m_effectors[i].m_footOnGround)
 			{
 				const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
-				//ndMatrix matrix(m_effectors[i].m_effector->CalculateTargetGlobal());
 				supportPolygon.PushBack(posit);
 			}
 		}
@@ -661,7 +675,6 @@ void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeAr
 		if (m_model->m_effectors[i].m_footOnGround)
 		{
 			ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
-			//ndMatrix matrix(m_model->m_effectors[i].m_effector->CalculateTargetGlobal());
 			const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
 			supportPolygon.PushBack(posit);
 		}
@@ -774,7 +787,6 @@ xxxxx++;
 			ndMatrix pivotMatrix(effector->GetLocalMatrix1() * effector->GetBody1()->GetMatrix());
 			const ndMatrix effectorMatrix(matrix * pivotMatrix);
 			pivotMatrix.m_posit -= step;
-			//matrix = effectorMatrix * pivotMatrix.Inverse();
 			matrix = poseMatrix;
 			matrix.m_posit = (effectorMatrix * pivotMatrix.Inverse()).m_posit;
 			effector->SetOffsetMatrix(matrix);
