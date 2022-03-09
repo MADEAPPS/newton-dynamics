@@ -102,10 +102,6 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndVector GetForceBody1() const;
 	ndVector GetTorqueBody1() const;
 
-	// inverse dynamics interface
-	D_COLLISION_API virtual void SetIkMode(bool mode);
-	D_COLLISION_API virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel);
-
 	bool IsInWorld() const;
 	bool IsBilateral() const;
 	bool IsCollidable() const;
@@ -123,6 +119,10 @@ class ndJointBilateralConstraint : public ndConstraint
 	bool IsSkeleton() const;
 
 	protected:
+	// inverse dynamics interface
+	D_COLLISION_API virtual void SetIkMode(bool mode);
+	D_COLLISION_API virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel);
+
 	ndMatrix m_localMatrix0;
 	ndMatrix m_localMatrix1;
 	ndVector m_forceBody0;

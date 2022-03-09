@@ -45,6 +45,7 @@
 #include <ndCharacter.h>
 #include <ndConstraint.h>
 #include <ndJointHinge.h>
+#include <ndJointPlane.h>
 #include <ndBodyNotify.h>
 #include <ndJointWheel.h>
 #include <ndJointSlider.h>

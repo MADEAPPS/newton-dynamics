@@ -364,6 +364,9 @@ class dInvertedPendulum : public ndModel
 		ndFloat32 radius = 0.125f * size;
 		ndFloat32 lenght = 2.0f * size;
 
+
+
+
 		ndBodyKinematic* const box = AddBox(scene, matrix, mass, size, size, size);
 		ndBodyKinematic* const leg = AddCapsule(scene, matrix, 0.1f * mass, radius, radius, 2.0f * size);
 
@@ -371,8 +374,13 @@ class dInvertedPendulum : public ndModel
 		legMatrix.m_posit.m_y -= lenght * 0.5f;
 		leg->SetMatrix(legMatrix);
 
-		ndIkJointSpherical* const socket = new ndIkJointSpherical(matrix, leg, box);
+		ndMatrix attachment(legMatrix);
+		attachment.m_posit = matrix.m_posit;
+		ndIkJointSpherical* const socket = new ndIkJointSpherical(attachment, leg, box);
+		socket->SetIkMode(true);
 		world->AddJoint(socket);
+
+		//world->AddJoint(new ndJointPlane(matrix.m_posit, matrix.m_front, box, world->GetSentinelBody()));
 	}
 
 	dInvertedPendulum(const ndLoadSaveBase::ndLoadDescriptor& desc)

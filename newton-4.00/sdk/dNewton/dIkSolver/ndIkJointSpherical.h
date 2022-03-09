@@ -23,9 +23,10 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 	D_NEWTON_API ndIkJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointSpherical();
 
-	protected:
 	// inverse dynamics interface
 	D_ADD_IK_INTERFACE();
+
+	protected:
 	D_COLLISION_API void SubmitAccel(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;

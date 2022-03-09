@@ -24,9 +24,10 @@ class ndIkJointDoubleHinge: public ndJointDoubleHinge, public ndJointBilateralCo
 	//D_NEWTON_API ndIkJointDoubleHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndIkJointDoubleHinge();
 
-	protected:
+	// inverse dynamics interface
 	D_ADD_IK_INTERFACE();
 
+	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 };
