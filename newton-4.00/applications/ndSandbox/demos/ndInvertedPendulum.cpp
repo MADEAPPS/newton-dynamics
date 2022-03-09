@@ -365,18 +365,34 @@ class dInvertedPendulum : public ndModel
 		ndFloat32 lenght = 2.0f * size;
 		
 		ndBodyKinematic* const box = AddBox(scene, matrix, mass, size, size, size);
-		ndBodyKinematic* const leg = AddCapsule(scene, matrix, mass / 20.0f, radius, radius, 2.0f * size);
+		//ndBodyKinematic* const leg = AddCapsule(scene, matrix, mass / 20.0f, radius, radius, 2.0f * size);
+		ndBodyKinematic* const sph = AddSphere(scene, matrix, mass / 30.0f, radius);
 
-		ndMatrix legMatrix(dRollMatrix(90.0f * ndDegreeToRad) * box->GetMatrix());
-		legMatrix.m_posit.m_y -= lenght * 0.5f;
-		leg->SetMatrix(legMatrix);
+		//ndMatrix legMatrix(dRollMatrix(90.0f * ndDegreeToRad) * box->GetMatrix());
+		//legMatrix.m_posit.m_y -= lenght * 0.5f;
+		//leg->SetMatrix(legMatrix);
 
-		ndMatrix attachment(legMatrix);
-		attachment.m_posit = matrix.m_posit;
-		ndIkJointSpherical* const socket = new ndIkJointSpherical(attachment, leg, box);
-		//socket->SetIkMode(false);
-		world->AddJoint(socket);
+		ndMatrix sphMatrix(box->GetMatrix());
+		sphMatrix.m_posit.m_y -= lenght;
+		sph->SetMatrix(sphMatrix);
+		//sph->GetCollisionShape().SetCollisionMode(false);
+		//ndIkJointSpherical* const feetJoint = new ndIkJointSpherical(sphMatrix, sph, leg);
+		//world->AddJoint(feetJoint);
 
+		//ndMatrix legSocketMatrix(legMatrix);
+		//legSocketMatrix.m_posit = matrix.m_posit;
+		//ndIkJointSpherical* const socketJoint = new ndIkJointSpherical(legSocketMatrix, leg, box);
+		//world->AddJoint(socketJoint);
+
+		ndIk6DofEffector* effector = new ndIk6DofEffector(sphMatrix, matrix, sph, box);
+		ndFloat32 regularizer = 1.0e-1f;
+		effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+		effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
+		effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
+		world->AddJoint(effector);
+
+		//feetJoint->SetIkMode(false);
+		//socketJoint->SetIkMode(false);
 		//world->AddJoint(new ndJointPlane(matrix.m_posit, matrix.m_front, box, world->GetSentinelBody()));
 	}
 
