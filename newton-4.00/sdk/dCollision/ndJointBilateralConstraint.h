@@ -59,7 +59,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	{
 		public:
 		ndIkInterface()
-			:m_ikMode(false)
+			:m_ikMode(true)
 		{}
 
 		ndJacobian m_accel0;
