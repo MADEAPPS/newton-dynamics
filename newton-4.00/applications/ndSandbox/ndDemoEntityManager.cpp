@@ -55,11 +55,12 @@
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-#define DEFAULT_SCENE	19		// quadruped robot
-//#define DEFAULT_SCENE	20		// simple voronoi fracture
+#define DEFAULT_SCENE	19		// inverted pendulum
+//#define DEFAULT_SCENE	20		// quadruped robot
+//#define DEFAULT_SCENE	21		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture
-//#define DEFAULT_SCENE	21		// linked voronoi fracture
-//#define DEFAULT_SCENE	22		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	22		// linked voronoi fracture
+//#define DEFAULT_SCENE	23		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -72,6 +73,7 @@ void ndActiveRagdoll(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedRobot(ndDemoEntityManager* const scene);
+void ndInvertedPendulum(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -109,6 +111,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
+	{ "simple inverted pendulum", ndInvertedPendulum },
 	{ "quadruped robot", ndQuadrupedRobot},
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
@@ -374,9 +377,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
-	//m_collisionDisplayMode = 1;
+	m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();

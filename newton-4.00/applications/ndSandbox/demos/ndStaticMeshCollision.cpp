@@ -60,13 +60,25 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	location.m_posit.m_z += 4.0f;
 	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 
-	AddBox(scene, ndVector(10.0f, 1.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, ndVector(10.0f, 1.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, ndVector(10.0f, 2.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddConvexHull(scene, ndVector(8.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.6f, 1.0f, 15);
-	AddConvexHull(scene, ndVector(7.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
-	AddConvexHull(scene, ndVector(6.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.5f, 1.2f, 6);
-	AddCapsulesStacks(scene, ndVector(45.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(dGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+		}
+	};
+
+	AddBox(scene, PlaceMatrix(10.0f, 1.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(10.0f, 1.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(10.0f, 2.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddConvexHull(scene, PlaceMatrix(8.0f, 1.0f, -3.0f), 10.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, PlaceMatrix(7.0f, 1.0f, -3.0f), 10.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, PlaceMatrix(6.0f, 1.0f, -3.0f), 10.0f, 0.5f, 1.2f, 6);
+	AddCapsulesStacks(scene, PlaceMatrix(45.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 
 	delete man;
 	ndQuaternion rot;

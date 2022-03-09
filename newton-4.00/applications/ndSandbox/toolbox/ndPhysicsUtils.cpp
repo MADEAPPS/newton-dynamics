@@ -66,14 +66,25 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const ndVector& origin, con
 	return nullptr;
 }
 
+void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndInt32 count)
+{
+	ndMatrix matrix(location);
+	for (ndInt32 i = 0; i < count; i++)
+	{
+		for (ndInt32 j = 0; j < count; j++)
+		{
+			//ndVector posit(origin + ndVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f));
+			matrix.m_posit = location.m_posit + ndVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f);
+			AddBox(scene, matrix, mass, 4.0f, 0.25f, 3.0f);
+		}
+	}
+}
+
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& shape,
-	ndFloat32 mass, const ndVector& origin, const ndFloat32 high, ndInt32 count)
+	ndFloat32 mass, const ndMatrix& location, const ndFloat32 high, ndInt32 count)
 {
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
+	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -95,44 +106,34 @@ static void AddShape(ndDemoEntityManager* const scene,
 	}
 }
 
-void AddPlanks(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndInt32 count)
-{
-	for (ndInt32 i = 0; i < count; i++)
-	{
-		for (ndInt32 j = 0; j < count; j++)
-		{
-			ndVector posit(origin + ndVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f));
-			AddBox(scene, posit, mass, 4.0f, 0.25f, 3.0f);
-		}
-	}
-}
-
-void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
+void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
 	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
+	
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
-
+	
 	ndFloat32 spacing = 2.0f;
+
+	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
 	for (ndInt32 i = 0; i < rows_x; i++)
 	{
 		for (ndInt32 j = 0; j < rows_z; j++)
 		{
-			ndVector location((j - rows_x / 2) * spacing, 0.0f, (i - rows_z / 2) * spacing, 0.0f);
-			AddShape(scene, rootEntity, shape, mass, location + origin, high, columHigh);
+			matrix.m_posit = location.m_posit + ndVector ((j - rows_x / 2) * spacing, 0.0f, (i - rows_z / 2) * spacing, 0.0f);
+			AddShape(scene, rootEntity, shape, mass, matrix, high, columHigh);
 		}
 	}
-
+	
 	instanceMesh->Release();
 }
 
-ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& origin, ndFloat32 mass)
+ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndMatrix matrix(origin);
+	ndMatrix matrix(location);
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 500.0f, 0.0f, 0.0f), 1000.0f));
 	matrix.m_posit.m_y = dMax (floor.m_y + 1.0f, matrix.m_posit.m_y);
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
@@ -153,40 +154,28 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 	return body;
 }
 
-ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez)
+ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
 	ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
-	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass);
 	return body;
 }
 
-ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 radius)
+ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
 	ndShapeInstance shape(new ndShapeSphere(radius));
-	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass);
 	return body;
 }
 
-ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high)
+ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass);
 	return body;
 }
 
-ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments)
+ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments)
 {
 	ndInt32 count = 0;
 	ndVector points[1024 * 8];
@@ -202,11 +191,7 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndVector&
 		dAssert(count < ndInt32 (sizeof(points) / sizeof(points[0])));
 	}
 
-	ndMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
 	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof(ndVector), 0.0f, &points[0].m_x));
-	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass);
 	return body;
 }

@@ -474,16 +474,16 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 
 	delete robotEntity;
 
-	ndVector posit(matrix.m_posit);
-	posit.m_x += 1.5f;
-	posit.m_z += 1.5f;
-	AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
-	AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
+	ndMatrix location(matrix);
+	location.m_posit.m_x += 1.5f;
+	location.m_posit.m_z += 1.5f;
+	AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f);
 
-	posit.m_x += 0.6f;
-	posit.m_z += 0.2f;
-	AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
-	AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
+	location.m_posit.m_x += 0.6f;
+	location.m_posit.m_z += 0.2f;
+	AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f);
+	AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;

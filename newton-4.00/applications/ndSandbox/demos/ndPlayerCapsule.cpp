@@ -50,10 +50,23 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	location.m_posit.m_z += 2.0f;
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 
-	//AddCapsulesStacks(scene, ndVector (32.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	AddBox(scene, ndVector(10.0f, 0.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, ndVector(10.0f, 0.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, ndVector(10.0f, 1.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(dGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+		}
+	};
+
+	//AddCapsulesStacks___(scene, PlaceMatrix(32.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	AddBox(scene, PlaceMatrix(10.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(10.0f, 0.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
 
 	delete entity;
 	ndQuaternion rot;

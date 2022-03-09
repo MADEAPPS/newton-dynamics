@@ -400,18 +400,18 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	ndVector origin(0.0f, 0.0f, 0.0f, 0.0f);
-	origin.m_x += 20.0f;
+	ndMatrix origin(dGetIdentityMatrix());
+	origin.m_posit.m_x += 20.0f;
 	AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
-	origin.m_x -= 20.0f;
-	BuildMannequin(scene, origin); 
+	origin.m_posit.m_x -= 20.0f;
+	BuildMannequin(scene, origin.m_posit); 
 
-	origin.m_x -= 2.0f;
-	BuildWhiteMan(scene, origin);
+	origin.m_posit.m_x -= 2.0f;
+	BuildWhiteMan(scene, origin.m_posit);
 
 	ndQuaternion rot;
-	origin.m_x -= 3.0f;
-	origin.m_y = 2.0f;
-	scene->SetCameraMatrix(rot, origin);
+	origin.m_posit.m_x -= 3.0f;
+	origin.m_posit.m_y = 2.0f;
+	scene->SetCameraMatrix(rot, origin.m_posit);
 }

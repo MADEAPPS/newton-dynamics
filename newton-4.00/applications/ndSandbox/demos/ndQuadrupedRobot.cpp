@@ -69,25 +69,25 @@ class dQuadrupedRobot : public ndModel
 
 	D_CLASS_REFLECTION(dQuadrupedRobot);
 
-	class dHipJoint : public ndIkJointSpherical
-	{
-		public:
-		dHipJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndIkJointSpherical(pinAndPivotFrame, child, parent)
-		{
-
-		}
-
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			ndIkJointSpherical::JacobianDerivative(desc);
-		}
-	};
+	//class dHipJoint : public ndIkJointSpherical
+	//{
+	//	public:
+	//	dHipJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	//		:ndIkJointSpherical(pinAndPivotFrame, child, parent)
+	//	{
+	//
+	//	}
+	//
+	//	void JacobianDerivative(ndConstraintDescritor& desc)
+	//	{
+	//		ndIkJointSpherical::JacobianDerivative(desc);
+	//	}
+	//};
 
 	class dEffectorInfo
 	{
 		public:
-		dHipJoint* m_hipSocket;
+		//dHipJoint* m_hipSocket;
 		ndIk6DofEffector* m_effector;
 		ndFloat32 m_walkPhase;
 		ndFloat32 m_swayAmp;
@@ -200,16 +200,15 @@ swayAmp = 0.0f;
 		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input, dQuadrupedRobot* const model)
 			:ndAnimationBlendTreeNode(input)
 			,ndIkSolver()
-			//,m_centerOfMassCorrection(ndVector::m_zero)
 			,m_world(nullptr)
 			,m_model(model)
 			,m_timestep(ndFloat32 (0.0f))
 		{
-			m_centerOfMassCorrection.SetCount(4);
-			for (ndInt32 i = 0; i < m_centerOfMassCorrection.GetCount(); ++i)
-			{
-				m_centerOfMassCorrection[i] = ndVector::m_zero;
-			}
+			//m_centerOfMassCorrection.SetCount(4);
+			//for (ndInt32 i = 0; i < m_centerOfMassCorrection.GetCount(); ++i)
+			//{
+			//	m_centerOfMassCorrection[i] = ndVector::m_zero;
+			//}
 		}
 
 		ndVector CalculateCenterOfMass() const;
@@ -219,8 +218,7 @@ swayAmp = 0.0f;
 
 		void Evaluate(ndAnimationPose& output);
 
-		ndFixSizeArray<ndVector, 4> m_centerOfMassCorrection;
-		//ndVector m_centerOfMassCorrection;
+		//ndFixSizeArray<ndVector, 4> m_centerOfMassCorrection;
 		ndWorld* m_world;
 		dQuadrupedRobot* m_model;
 		ndFloat32 m_timestep;
@@ -249,7 +247,7 @@ swayAmp = 0.0f;
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 0.705f;
+		matrix.m_posit.m_y += 0.71f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
@@ -268,8 +266,7 @@ swayAmp = 0.0f;
 			stack++;
 		}
 
-		dHipJoint* socket = nullptr;
-
+		//dHipJoint* socket = nullptr;
 		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		while (stack) 
 		{
@@ -286,7 +283,6 @@ swayAmp = 0.0f;
 					//dTrace(("name: %s\n", name));
 					if (definition.m_type == dQuadrupedRobotDefinition::m_hinge)
 					{
-
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						m_bodyArray.PushBack(childBody);
 						
@@ -303,7 +299,7 @@ swayAmp = 0.0f;
 						m_bodyArray.PushBack(childBody);
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						socket = new dHipJoint(pivotMatrix, childBody, parentBody);
+						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
 						socket->SetConeLimit(120.0f * ndDegreeToRad);
 						socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
@@ -346,7 +342,7 @@ swayAmp = 0.0f;
 						ndFloat32 swayAmp(0.8f * legSide.m_y);
 
 						dEffectorInfo info;
-						info.m_hipSocket = socket;
+						//info.m_hipSocket = socket;
 						info.m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
 						//ndFloat32 regularizer = 1.0e-4f;
 						ndFloat32 regularizer = 1.0e-1f;
@@ -537,8 +533,8 @@ swayAmp = 0.0f;
 	void Debug(ndConstraintDebugCallback& context) const
 	{
 		ndFixSizeArray<ndVector , 4> supportPolygon;
+		//ndFixSizeArray<ndJointBilateralConstraint*, 4> sockets;
 
-		ndFixSizeArray<ndJointBilateralConstraint*, 4> sockets;
 		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
 		{
 			ndJointBilateralConstraint* const joint = m_limbs[i].m_effector;
@@ -547,16 +543,16 @@ swayAmp = 0.0f;
 			{
 				const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
 				supportPolygon.PushBack(posit);
-				sockets.PushBack(m_limbs[i].m_hipSocket);
+				//sockets.PushBack(m_limbs[i].m_hipSocket);
 			}
 		}
 
-		if (sockets.GetCount() == 2)
-		{
-			ndVector p0(sockets[0]->GetBody0()->GetMatrix().TransformVector(sockets[0]->GetLocalMatrix0().m_posit));
-			ndVector p1(sockets[1]->GetBody0()->GetMatrix().TransformVector(sockets[1]->GetLocalMatrix0().m_posit));
-			context.DrawLine(p0, p1, ndVector(1.0f, 1.0f, 0.7f, 0.0f), 2);
-		}
+		//if (sockets.GetCount() == 2)
+		//{
+		//	ndVector p0(sockets[0]->GetBody0()->GetMatrix().TransformVector(sockets[0]->GetLocalMatrix0().m_posit));
+		//	ndVector p1(sockets[1]->GetBody0()->GetMatrix().TransformVector(sockets[1]->GetLocalMatrix0().m_posit));
+		//	context.DrawLine(p0, p1, ndVector(1.0f, 1.0f, 0.7f, 0.0f), 2);
+		//}
 
 		// Draw support polygon
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
@@ -790,22 +786,22 @@ xxxxx++;
 
 		ndMatrix poseMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		ndMatrix matrix(poseMatrix);
-		matrix.m_posit += m_centerOfMassCorrection[i];
+		//matrix.m_posit += m_centerOfMassCorrection[i];
 
 		ndIk6DofEffector* const effector = info.m_effector;
 		joints[i] = effector;
 		dAssert(effector == output[i].m_userData);
 		
-		if (info.m_footOnGround)
-		{
-			ndMatrix pivotMatrix(effector->GetLocalMatrix1() * effector->GetBody1()->GetMatrix());
-			const ndMatrix effectorMatrix(matrix * pivotMatrix);
-			pivotMatrix.m_posit -= step;
-			matrix = poseMatrix;
-			matrix.m_posit = (effectorMatrix * pivotMatrix.Inverse()).m_posit;
-			effector->SetOffsetMatrix(matrix);
-			m_centerOfMassCorrection[i] = matrix.m_posit - poseMatrix.m_posit;
-		}
+		//if (info.m_footOnGround)
+		//{
+			//ndMatrix pivotMatrix(effector->GetLocalMatrix1() * effector->GetBody1()->GetMatrix());
+			//const ndMatrix effectorMatrix(matrix * pivotMatrix);
+			//pivotMatrix.m_posit -= step;
+			//matrix = poseMatrix;
+			//matrix.m_posit = (effectorMatrix * pivotMatrix.Inverse()).m_posit;
+			//effector->SetOffsetMatrix(matrix);
+			//m_centerOfMassCorrection[i] = matrix.m_posit - poseMatrix.m_posit;
+		//}
 		effector->SetOffsetMatrix(matrix);
 	}
 

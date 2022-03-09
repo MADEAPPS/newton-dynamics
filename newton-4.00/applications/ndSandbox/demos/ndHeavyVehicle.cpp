@@ -891,7 +891,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;
-	AddPlanks(scene, matrix.m_posit, 300.0f, 5);
+	AddPlanks(scene, matrix, 300.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
