@@ -40,7 +40,7 @@ class dInvertedPendulum : public ndModel
 		ndPhysicsWorld* const world = scene->GetWorld();
 		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		ndMatrix matrix(location);
-		matrix.m_posit.m_y += floor.m_y + 2.0f;
+		matrix.m_posit.m_y += floor.m_y + 1.05f;
 		
 		ndFloat32 mass = 1.0f;
 		ndFloat32 size = 0.5f;
