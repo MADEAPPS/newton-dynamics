@@ -757,7 +757,7 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 	ndSkeletonContainer* const skeleton = m_model->GetRoot()->GetSkeleton();
 	dAssert(skeleton);
 
-	const ndJointBilateralConstraint* joints[4];
+	ndJointBilateralConstraint* joints[4];
 
 	// here we will integrate the model to get the center of mass velocity 
 	// and with that the final pose will be adjusted to keep the balance

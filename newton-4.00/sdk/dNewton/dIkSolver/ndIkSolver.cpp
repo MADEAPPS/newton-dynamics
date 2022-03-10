@@ -345,7 +345,7 @@ void ndIkSolver::BuildMassMatrix()
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 }
 
-void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, const ndJointBilateralConstraint** joints, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep)
+void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joints, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep)
 {
 	m_world = world;
 	m_skeleton = skeleton;

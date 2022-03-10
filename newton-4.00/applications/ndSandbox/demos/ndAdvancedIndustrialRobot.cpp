@@ -417,7 +417,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		if (m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
 		{
 			PlaceEffector();
-			const ndJointBilateralConstraint* joint = m_effector;
+			ndJointBilateralConstraint* joint = m_effector;
 			m_invDynamicsSolver.SolverBegin(skeleton, &joint, 1, world, timestep);
 			m_invDynamicsSolver.Solve();
 			m_invDynamicsSolver.SolverEnd();
