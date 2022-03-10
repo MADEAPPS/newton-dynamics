@@ -62,6 +62,10 @@ class dInvertedPendulum : public ndModel
 
 		ndMatrix sphMatrix(box->GetMatrix());
 		sphMatrix.m_posit.m_y -= lenght;
+
+		// try offsetting the effector.
+		sphMatrix.m_posit.m_z -= 0.01f;
+
 		sph->SetMatrix(sphMatrix);
 		//sph->GetCollisionShape().SetCollisionMode(false);
 		//ndIkJointSpherical* const feetJoint = new ndIkJointSpherical(sphMatrix, sph, leg);
