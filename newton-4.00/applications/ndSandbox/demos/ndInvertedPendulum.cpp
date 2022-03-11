@@ -174,14 +174,11 @@ class dInvertedPendulum : public ndModel
 			comVeloc += body->GetVelocity().Scale(mass);
 			toltalMass += mass;
 		}
-		com = com.Scale(1.0f / toltalMass);
-		comVeloc = comVeloc.Scale(1.0f / toltalMass);
-		com.m_w = 1.0f;
-		comVeloc.m_w = 1.0f;
+		com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
+		comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
 	}
 
-	//void UpdateFK(ndWorld* const world, ndFloat32 timestep)
-	void UpdateFK(ndWorld* const world, ndFloat32)
+	void UpdateFK(ndWorld* const world, ndFloat32 timestep)
 	{
 		// step 1: see if we have a support contacts
 		ndBodyKinematic::ndContactMap::Iterator it(m_contactSensor->GetContactMap());
@@ -230,19 +227,38 @@ class dInvertedPendulum : public ndModel
 		rayCaster caster(this);
 		const ndShapeInstance& shape = m_contactSensor->GetCollisionShape();
 		ndMatrix matrix(m_bodies[0]->GetMatrix());
-		matrix.m_posit = com;
+		matrix.m_posit = com | ndVector::m_wOne;
 		bool hit = world->ConvexCast(caster, shape, matrix, matrix.m_posit - ndVector(0.0f, 1.0f, 0.0f, 0.0f));
 		if (!hit)
 		{
 			return;
 		}
 		
-		ndSkeletonContainer* const skel = m_bodies[0]->GetSkeleton();
-
 		// step 5: her we have a com support point, the com, com velocity
 		// need calculate translation distance from current contact to the com support contact
-		dTrace(("have support\n"));
+		//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
+		
+static int xxx;
+xxx++;
 
+		ndJointBilateralConstraint* joint = m_effector;
+		ndMatrix matrix0;
+		ndMatrix matrix1;
+		joint->CalculateGlobalMatrix(matrix0, matrix1);
+		ndVector step(comVeloc.Scale(timestep));
+
+
+		matrix1.m_posit.m_x -= step.m_x * 200.0f;
+		matrix1.m_posit.m_z -= step.m_z * 200.0f;
+		ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
+if (xxx >= 50)
+xxx *= 1;
+
+		m_effector->SetOffsetMatrix(targetMatrix);
+
+		//m_solver.SolverBegin(skeleton, &joint, 1, world, timestep);
+		//m_solver.Solve();
+		//m_solver.SolverEnd();
 	}
 
 	ndIkSolver m_solver;
