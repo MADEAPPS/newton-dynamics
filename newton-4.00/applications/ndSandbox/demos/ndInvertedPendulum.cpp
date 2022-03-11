@@ -247,9 +247,9 @@ xxx++;
 		joint->CalculateGlobalMatrix(matrix0, matrix1);
 		ndVector step(comVeloc.Scale(timestep));
 
-
-		matrix1.m_posit.m_x -= step.m_x * 200.0f;
-		matrix1.m_posit.m_z -= step.m_z * 200.0f;
+		float applifyEffect = 100.0f;
+		matrix1.m_posit.m_x -= step.m_x * applifyEffect;
+		matrix1.m_posit.m_z -= step.m_z * applifyEffect;
 		ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
 if (xxx >= 50)
 xxx *= 1;
