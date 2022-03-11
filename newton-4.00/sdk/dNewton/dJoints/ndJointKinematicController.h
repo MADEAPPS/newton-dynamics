@@ -9,13 +9,8 @@
 * freely
 */
 
-// ndJointKinematicController.h: interface for the ndJointKinematicController class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef __ND_JOINT_KINEMATIC_CONTROLLER_H__
 #define __ND_JOINT_KINEMATIC_CONTROLLER_H__
-
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

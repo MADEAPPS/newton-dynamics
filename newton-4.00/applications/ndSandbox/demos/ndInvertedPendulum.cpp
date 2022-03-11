@@ -67,6 +67,8 @@ class dInvertedPendulum : public ndModel
 		sphMatrix.m_posit.m_z -= 0.05f;
 
 		sph->SetMatrix(sphMatrix);
+		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
+		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
 		//sph->GetCollisionShape().SetCollisionMode(false);
 		//ndIkJointSpherical* const feetJoint = new ndIkJointSpherical(sphMatrix, sph, leg);
 		//world->AddJoint(feetJoint);
@@ -251,8 +253,9 @@ xxx++;
 		matrix1.m_posit.m_x -= step.m_x * applifyEffect;
 		matrix1.m_posit.m_y -= step.m_y * 50.0f;
 		matrix1.m_posit.m_z -= step.m_z * applifyEffect;
+		ndMatrix targetMatrix0(m_effector->GetOffsetMatrix());
 		ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
-if (xxx >= 50)
+if (xxx >= 17)
 xxx *= 1;
 
 		m_effector->SetOffsetMatrix(targetMatrix);
