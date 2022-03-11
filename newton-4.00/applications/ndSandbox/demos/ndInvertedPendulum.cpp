@@ -64,7 +64,7 @@ class dInvertedPendulum : public ndModel
 		sphMatrix.m_posit.m_y -= lenght;
 
 		// try offsetting the effector.
-		sphMatrix.m_posit.m_z -= 0.01f;
+		sphMatrix.m_posit.m_z -= 0.05f;
 
 		sph->SetMatrix(sphMatrix);
 		//sph->GetCollisionShape().SetCollisionMode(false);
@@ -81,6 +81,7 @@ class dInvertedPendulum : public ndModel
 		m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 		m_effector->SetLinearSpringDamper(regularizer, 1500.0f, 100.0f);
 		m_effector->SetAngularSpringDamper(regularizer, 1500.0f, 100.0f);
+		m_effector->SetSolverModel(ndJointBilateralSolverModel::m_jointkinematicOpenLoop);
 
 		//feetJoint->SetIkMode(false);
 		//socketJoint->SetIkMode(false);
@@ -235,6 +236,8 @@ class dInvertedPendulum : public ndModel
 		{
 			return;
 		}
+		
+		ndSkeletonContainer* const skel = m_bodies[0]->GetSkeleton();
 
 		// step 5: her we have a com support point, the com, com velocity
 		// need calculate translation distance from current contact to the com support contact
@@ -244,7 +247,6 @@ class dInvertedPendulum : public ndModel
 
 	ndIkSolver m_solver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodies;
-	//ndBodyDynamic* m_rootBody;
 	ndBodyDynamic* m_contactSensor;
 	ndIk6DofEffector* m_effector;
 };
