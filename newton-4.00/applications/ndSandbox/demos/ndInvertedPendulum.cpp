@@ -249,6 +249,7 @@ xxx++;
 
 		float applifyEffect = 100.0f;
 		matrix1.m_posit.m_x -= step.m_x * applifyEffect;
+		matrix1.m_posit.m_y -= step.m_y * 50.0f;
 		matrix1.m_posit.m_z -= step.m_z * applifyEffect;
 		ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
 if (xxx >= 50)
