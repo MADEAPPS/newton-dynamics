@@ -1450,28 +1450,6 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	}
 }
 
-void ndSkeletonContainer::CalculateReactionForces(ndJacobian* const internalForces)
-{
-	D_TRACKTIME();
-	if (!m_isResting)
-	{
-		const ndInt32 nodeCount = m_nodeList.GetCount();
-		ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
-		ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);
-
-		CalculateJointAccel(internalForces, accel);
-		CalculateForce(force, accel);
-		if (m_auxiliaryRowCount)
-		{
-			SolveAuxiliary(internalForces, accel, force);
-		}
-		else
-		{
-			UpdateForces(internalForces, force);
-		}
-	}
-}
-
 void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const
 {
 	const ndSpatialVector zero(ndSpatialVector::m_zero);
@@ -1689,6 +1667,7 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndBodyKinematic** const bodyAr
 
 void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 {
+	D_TRACKTIME();
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
 	ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);
@@ -1705,3 +1684,33 @@ void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 	}
 }
 
+void ndSkeletonContainer::CalculateReactionForces(ndJacobian* const internalForces)
+{
+#if _DEBUG
+	extern ndInt32 xxxxxxxxxxxxxxxxxxx;
+	if (xxxxxxxxxxxxxxxxxxx >= 499)
+	{
+		xxxxxxxxxxxxxxxxxxx *= 1;
+	}
+#endif
+
+
+	if (!m_isResting)
+	{
+		D_TRACKTIME();
+		const ndInt32 nodeCount = m_nodeList.GetCount();
+		ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
+		ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);
+
+		CalculateJointAccel(internalForces, accel);
+		CalculateForce(force, accel);
+		if (m_auxiliaryRowCount)
+		{
+			SolveAuxiliary(internalForces, accel, force);
+		}
+		else
+		{
+			UpdateForces(internalForces, force);
+		}
+	}
+}

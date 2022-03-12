@@ -585,8 +585,6 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		// a better way is to sort, bu that takes about 1 ms,
 		// we interleaving bashes and has the randomizing 
 		// effect that balance the work load on the thread.
-		//const ndStartEnd startEnd(gridScans.GetCount() - 1, threadIndex, threadCount);
-		//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 
 		const ndInt32 scansCount = gridScans.GetCount() - 1;
 		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
