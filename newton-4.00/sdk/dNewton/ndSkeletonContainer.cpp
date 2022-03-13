@@ -1686,15 +1686,6 @@ void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 
 void ndSkeletonContainer::CalculateReactionForces(ndJacobian* const internalForces)
 {
-#if _DEBUG
-	extern ndInt32 xxxxxxxxxxxxxxxxxxx;
-	if (xxxxxxxxxxxxxxxxxxx >= 499)
-	{
-		xxxxxxxxxxxxxxxxxxx *= 1;
-	}
-#endif
-
-
 	if (!m_isResting)
 	{
 		D_TRACKTIME();

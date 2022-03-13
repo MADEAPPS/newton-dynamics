@@ -319,8 +319,6 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	const ndFloat32 angular2 = velocStep.m_angular.DotProduct(velocStep.m_angular).GetScalar() * timestep.m_x * timestep.m_x;
 	if ((angular2 > maxAngular2) || (linear2 > maxLinear2))
 	{
-		//extern int xxxxxxxxxxxxxxxxxxx;
-		//dTrace(("%d ", xxxxxxxxxxxxxxxxxxx));
 		dTrace(("warning IntegrateForceAndToque %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", 
 			m_uniqueId,
 			velocStep.m_angular.m_x, velocStep.m_angular.m_y, velocStep.m_angular.m_z,

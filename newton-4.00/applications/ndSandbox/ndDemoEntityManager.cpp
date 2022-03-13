@@ -362,7 +362,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
-	//m_autoSleepMode = false;
+	m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndOpenclSolver1;
 	//m_solverMode = ndWorld::ndOpenclSolver2;
 	m_solverMode = ndWorld::ndSimdSoaSolver;
