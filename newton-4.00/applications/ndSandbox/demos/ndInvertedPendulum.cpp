@@ -250,11 +250,9 @@ xxx++;
 //if (xxx >= 17)
 if (xxx == 200)
 {
-xxx *= 1;
-m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
+m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
 //CalculateCenterOfMass(com, comVeloc);
 }
-
 
 		ndMatrix matrix0;
 		ndMatrix matrix1;
