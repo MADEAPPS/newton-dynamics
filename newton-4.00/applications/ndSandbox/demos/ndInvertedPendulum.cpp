@@ -33,9 +33,11 @@ class dInvertedPendulum : public ndModel
 
 	dInvertedPendulum(ndDemoEntityManager* const scene, const ndMatrix& location)
 		:ndModel()
+		,m_gravityDir(0.0f, -1.0f, 0.0f, 0.0f)
+		,m_solver()
+		,m_bodies()
 		,m_effector(nullptr)
 		,m_contactSensor(nullptr)
-		,m_solver()
 	{
 		ndPhysicsWorld* const world = scene->GetWorld();
 		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -64,7 +66,7 @@ class dInvertedPendulum : public ndModel
 		sphMatrix.m_posit.m_y -= lenght;
 
 		// try offsetting the effector.
-		sphMatrix.m_posit.m_z -= 0.05f;
+		//sphMatrix.m_posit.m_z -= 0.05f;
 
 		sph->SetMatrix(sphMatrix);
 		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
@@ -244,20 +246,44 @@ static int xxx;
 xxx++;
 
 		ndJointBilateralConstraint* joint = m_effector;
+
+//if (xxx >= 17)
+if (xxx == 200)
+{
+xxx *= 1;
+m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
+//CalculateCenterOfMass(com, comVeloc);
+}
+
+
 		ndMatrix matrix0;
 		ndMatrix matrix1;
 		joint->CalculateGlobalMatrix(matrix0, matrix1);
-		ndVector step(comVeloc.Scale(timestep));
+		//const ndVector effectorVeloc(joint->GetBody0()->GetVelocityAtPoint(matrix0.m_posit));
+		//const ndVector relVeloc(comVeloc - effectorVeloc);
+		////const ndVector step(comVeloc.Scale(timestep));
+		//const ndVector step(relVeloc.Scale(timestep));
 
-		float applifyEffect = 100.0f;
-		matrix1.m_posit.m_x -= step.m_x * applifyEffect;
-		matrix1.m_posit.m_y -= step.m_y * 50.0f;
-		matrix1.m_posit.m_z -= step.m_z * applifyEffect;
-		ndMatrix targetMatrix0(m_effector->GetOffsetMatrix());
-		ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
-if (xxx >= 17)
-xxx *= 1;
+		//float applifyEffect = 50.0f;
+		//matrix1.m_posit.m_x -= step.m_x * applifyEffect;
+		//matrix1.m_posit.m_y -= step.m_y * 20.0f;
+		//matrix1.m_posit.m_z -= step.m_z * applifyEffect;
+		//ndMatrix targetMatrix0(m_effector->GetOffsetMatrix());
+		//ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
 
+		//float applifyEffect = 100.0f;
+		//float applifyEffect = 0.0f;
+		//matrix1.m_posit.m_x -= step.m_x * applifyEffect;
+		//matrix1.m_posit.m_y -= step.m_y * 50.0f;
+		//matrix1.m_posit.m_z -= step.m_z * applifyEffect;
+		//ndMatrix targetMatrix0(m_effector->GetOffsetMatrix());
+		//ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
+		//m_effector->SetOffsetMatrix(targetMatrix);
+
+
+		ndVector localGravity(matrix1.UnrotateVector(m_gravityDir));
+		ndMatrix targetMatrix(m_effector->GetOffsetMatrix());
+		targetMatrix.m_posit = localGravity.Scale(1.0f) | ndVector::m_wOne;
 		m_effector->SetOffsetMatrix(targetMatrix);
 
 		//m_solver.SolverBegin(skeleton, &joint, 1, world, timestep);
@@ -265,6 +291,7 @@ xxx *= 1;
 		//m_solver.SolverEnd();
 	}
 
+	ndVector m_gravityDir;
 	ndIkSolver m_solver;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodies;
 	ndBodyDynamic* m_contactSensor;

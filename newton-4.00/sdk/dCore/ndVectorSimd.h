@@ -251,8 +251,8 @@ class ndVector
 	// return 4d cross product
 	inline ndVector CrossProduct (const ndVector& A, const ndVector& B) const
 	{
-		ndFloat32 cofactor[3][3];
 		ndFloat32 array[4][4];
+		ndFloat32 cofactor[3][3];
 
 		const ndVector& me = *this;
 		for (ndInt32 i = 0; i < 4; i ++) 
