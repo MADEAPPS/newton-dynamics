@@ -288,7 +288,10 @@ m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
 
 		ndVector localGravity(matrix1.UnrotateVector(m_gravityDir));
 		ndMatrix targetMatrix(m_effector->GetOffsetMatrix());
-		//ndMatrix targetMatrix(dGetIdentityMatrix() * matrix1.Inverse());
+
+		// specify foot orientation. 
+		targetMatrix = dGetIdentityMatrix() * matrix1.Inverse();
+
 		targetMatrix.m_posit = localGravity.Scale(1.0f) | ndVector::m_wOne;
 if (xxx > 200)
 {
