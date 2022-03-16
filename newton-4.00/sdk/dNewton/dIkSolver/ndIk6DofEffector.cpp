@@ -286,5 +286,5 @@ void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearAxis(matrix0, matrix1, desc);
-	//SubmitAngularAxis(matrix0, matrix1, desc);
+	SubmitAngularAxis(matrix0, matrix1, desc);
 }
