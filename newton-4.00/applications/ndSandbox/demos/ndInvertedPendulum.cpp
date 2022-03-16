@@ -133,6 +133,7 @@ class dInvertedPendulum : public ndModel
 		ndVector com(CalculateCenterOfMass());
 		rootMatrix.m_posit = com;
 		//context.DrawFrame(rootMatrix);
+		context.DrawPoint(com, ndVector(1.0f, 0.0f, 0.0f, 0.0f), 12.0f);
 
 		ndVector p1(com + m_gravityDir.Scale (1.0f));
 		context.DrawLine(com, p1, ndVector(0.0f, 1.0f, 1.0f, 0.0f));
