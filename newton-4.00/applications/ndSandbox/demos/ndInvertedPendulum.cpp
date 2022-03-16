@@ -43,6 +43,7 @@ class dInvertedPendulum : public ndModel
 		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		ndMatrix matrix(location);
 		matrix.m_posit.m_y += floor.m_y + 1.05f;
+		//matrix.m_posit.m_y += floor.m_y + 1.1f;
 		
 		ndFloat32 mass = 1.0f;
 		ndFloat32 size = 0.5f;
@@ -66,7 +67,7 @@ class dInvertedPendulum : public ndModel
 		sphMatrix.m_posit.m_y -= lenght;
 
 		// try offsetting the effector.
-		//sphMatrix.m_posit.m_z -= 0.05f;
+		sphMatrix.m_posit.m_z -= (size * 0.5f) * 0.0f;
 
 		sph->SetMatrix(sphMatrix);
 		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
@@ -128,8 +129,13 @@ class dInvertedPendulum : public ndModel
 		ndJointBilateralConstraint* const joint = m_effector;
 		joint->DebugJoint(context);
 		ndMatrix rootMatrix(dGetIdentityMatrix());
-		rootMatrix.m_posit = CalculateCenterOfMass();
-		context.DrawFrame(rootMatrix);
+
+		ndVector com(CalculateCenterOfMass());
+		rootMatrix.m_posit = com;
+		//context.DrawFrame(rootMatrix);
+
+		ndVector p1(com + m_gravityDir.Scale (1.0f));
+		context.DrawLine(com, p1, ndVector(0.0f, 1.0f, 1.0f, 0.0f));
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -176,7 +182,7 @@ class dInvertedPendulum : public ndModel
 		}
 		com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
 		//comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
-		return com & ndVector::m_wOne;
+		return com | ndVector::m_wOne;
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -274,7 +280,6 @@ xxx++;
 if (xxx == 200)
 {
 m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
-//CalculateCenterOfMass(com, comVeloc);
 }
 
 		ndMatrix matrix0;

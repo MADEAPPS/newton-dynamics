@@ -231,6 +231,18 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
+#if 0
+	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+	for (ndInt32 i = 0; i < 3; ++i)
+	{
+		if (m_controlDofOptions & (1 << i))
+		{
+			const ndVector pin = matrix1[i];
+			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+		}
+	}
+#else
 	ndMatrix xxxxxxx(dGetIdentityMatrix());
 
 	const ndVector posit0(matrix0.m_posit);
@@ -265,6 +277,7 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 		}
 	}
+#endif
 }
 
 void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
@@ -273,5 +286,5 @@ void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearAxis(matrix0, matrix1, desc);
-	SubmitAngularAxis(matrix0, matrix1, desc);
+	//SubmitAngularAxis(matrix0, matrix1, desc);
 }
