@@ -118,11 +118,6 @@ ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
 	return m_targetFrame;
 }
 
-//ndMatrix ndIk6DofEffector::CalculateTargetGlobal() const
-//{
-//	return m_targetFrame * GetLocalMatrix1() * GetBody1()->GetMatrix();
-//}
-
 void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 {
 	m_targetFrame = matrix;
@@ -165,6 +160,7 @@ void ndIk6DofEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
 	debugCallback.DrawFrame(targetFrame);
+	debugCallback.DrawPoint(targetFrame.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
 void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
@@ -235,13 +231,37 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+	ndMatrix xxxxxxx(dGetIdentityMatrix());
+
+	const ndVector posit0(matrix0.m_posit);
+	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+
+	const ndBodyKinematic* const body0 = GetBody0();
+	const ndBodyKinematic* const body1 = GetBody1();
+
+	const ndVector omega0(body0->GetOmega());
+	const ndVector omega1(body1->GetOmega());
+	const ndVector veloc0 (body0->GetVelocity());
+	const ndVector veloc1 (body1->GetVelocity());
+
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		if (m_controlDofOptions & (1 << i))
 		{
-			const ndVector pin = matrix1[i];
-			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
+			//const ndVector pin = matrix1[i];
+			const ndVector pin = xxxxxxx[i];
+			AddLinearRowJacobian(desc, posit0, posit1, pin);
+			//AddLinearRowJacobian(desc, posit0, posit0, pin);
+
+			const ndInt32 index = desc.m_rowsCount - 1;
+			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
+			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
+			const ndFloat32 relPosit = -(jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
+			const ndFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+
+			const ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
+			desc.m_diagonalRegularizer[index] = m_linearRegularizer;
+			SetMotorAcceleration(desc, accel);
 			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 		}
 	}

@@ -80,7 +80,9 @@ class dInvertedPendulum : public ndModel
 		//ndIkJointSpherical* const socketJoint = new ndIkJointSpherical(legSocketMatrix, leg, box);
 		//world->AddJoint(socketJoint);
 
-		m_effector = new ndIk6DofEffector(sphMatrix, matrix, sph, box);
+		ndMatrix sphMatrixPivot(box->GetMatrix());
+		sphMatrixPivot.m_posit.m_z = sphMatrix.m_posit.m_z;
+		m_effector = new ndIk6DofEffector(sphMatrix, sphMatrixPivot, sph, box);
 		ndFloat32 regularizer = 1.0e-2f;
 		m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 		m_effector->SetLinearSpringDamper(regularizer, 1500.0f, 100.0f);
@@ -125,6 +127,9 @@ class dInvertedPendulum : public ndModel
 	{
 		ndJointBilateralConstraint* const joint = m_effector;
 		joint->DebugJoint(context);
+		ndMatrix rootMatrix(dGetIdentityMatrix());
+		rootMatrix.m_posit = CalculateCenterOfMass();
+		context.DrawFrame(rootMatrix);
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -135,6 +140,43 @@ class dInvertedPendulum : public ndModel
 	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::PostTransformUpdate(world, timestep);
+	}
+
+	//void CalculateCenterOfMass(ndVector& com, ndVector& comVeloc) const
+	//{
+	//	ndFloat32 toltalMass = 0.0f;
+	//	com = ndVector::m_zero;
+	//	comVeloc = ndVector::m_zero;
+	//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	//	{
+	//		ndBodyDynamic* const body = m_bodies[i];
+	//		ndFloat32 mass = body->GetMassMatrix().m_w;
+	//		ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+	//		com += comMass.Scale(mass);
+	//		comVeloc += body->GetVelocity().Scale(mass);
+	//		toltalMass += mass;
+	//	}
+	//	com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
+	//	comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
+	//}
+
+	ndVector CalculateCenterOfMass() const
+	{
+		ndFloat32 toltalMass = 0.0f;
+		ndVector com (ndVector::m_zero);
+		//comVeloc = ndVector::m_zero;
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+		{
+			ndBodyDynamic* const body = m_bodies[i];
+			ndFloat32 mass = body->GetMassMatrix().m_w;
+			ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+			com += comMass.Scale(mass);
+			//comVeloc += body->GetVelocity().Scale(mass);
+			toltalMass += mass;
+		}
+		com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
+		//comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
+		return com & ndVector::m_wOne;
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
@@ -164,25 +206,8 @@ class dInvertedPendulum : public ndModel
 		//m_solver.SolverEnd();
 	}
 
-	void CalculateCenterOfMass(ndVector& com, ndVector& comVeloc) const
-	{
-		ndFloat32 toltalMass = 0.0f;
-		com = ndVector::m_zero;
-		comVeloc = ndVector::m_zero;
-		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		{
-			ndBodyDynamic* const body = m_bodies[i];
-			ndFloat32 mass = body->GetMassMatrix().m_w;
-			ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-			com += comMass.Scale(mass);
-			comVeloc += body->GetVelocity().Scale(mass);
-			toltalMass += mass;
-		}
-		com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
-		comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
-	}
-
-	void UpdateFK(ndWorld* const world, ndFloat32 timestep)
+	//void UpdateFK(ndWorld* const world, ndFloat32 timestep)
+	void UpdateFK(ndWorld* const, ndFloat32)
 	{
 		// step 1: see if we have a support contacts
 		ndBodyKinematic::ndContactMap::Iterator it(m_contactSensor->GetContactMap());
@@ -200,43 +225,41 @@ class dInvertedPendulum : public ndModel
 		}
 
 		// step 3: have support contacts, find the projection of the com over the ground
-		ndVector com;
-		ndVector comVeloc;
-		CalculateCenterOfMass(com, comVeloc);
+		//const ndVector com(CalculateCenterOfMass());
 
-		// step 4: with the com find the projection to the ground
-		class rayCaster : public ndConvexCastNotify
-		{
-			public:
-			rayCaster(dInvertedPendulum* const owner)
-				:m_owner(owner)
-			{
-			}
-
-			ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
-			{
-				for (ndInt32 i = 0; i < m_owner->m_bodies.GetCount(); ++i)
-				{
-					if (body == m_owner->m_bodies[i])
-					{
-						return 0;
-					}
-				}
-				return 1;
-			}
-
-			dInvertedPendulum* m_owner;
-		};
-
-		rayCaster caster(this);
-		const ndShapeInstance& shape = m_contactSensor->GetCollisionShape();
-		ndMatrix matrix(m_bodies[0]->GetMatrix());
-		matrix.m_posit = com | ndVector::m_wOne;
-		bool hit = world->ConvexCast(caster, shape, matrix, matrix.m_posit - ndVector(0.0f, 1.0f, 0.0f, 0.0f));
-		if (!hit)
-		{
-			return;
-		}
+		//// step 4: with the com find the projection to the ground
+		//class rayCaster : public ndConvexCastNotify
+		//{
+		//	public:
+		//	rayCaster(dInvertedPendulum* const owner)
+		//		:m_owner(owner)
+		//	{
+		//	}
+		//
+		//	ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+		//	{
+		//		for (ndInt32 i = 0; i < m_owner->m_bodies.GetCount(); ++i)
+		//		{
+		//			if (body == m_owner->m_bodies[i])
+		//			{
+		//				return 0;
+		//			}
+		//		}
+		//		return 1;
+		//	}
+		//
+		//	dInvertedPendulum* m_owner;
+		//};
+		//
+		//rayCaster caster(this);
+		//const ndShapeInstance& shape = m_contactSensor->GetCollisionShape();
+		//ndMatrix matrix(m_bodies[0]->GetMatrix());
+		//matrix.m_posit = com | ndVector::m_wOne;
+		//bool hit = world->ConvexCast(caster, shape, matrix, matrix.m_posit - ndVector(0.0f, 1.0f, 0.0f, 0.0f));
+		//if (!hit)
+		//{
+		//	return;
+		//}
 		
 		// step 5: her we have a com support point, the com, com velocity
 		// need calculate translation distance from current contact to the com support contact
@@ -250,38 +273,23 @@ xxx++;
 //if (xxx >= 17)
 if (xxx == 200)
 {
-m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
+m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
 //CalculateCenterOfMass(com, comVeloc);
 }
 
 		ndMatrix matrix0;
 		ndMatrix matrix1;
 		joint->CalculateGlobalMatrix(matrix0, matrix1);
-		//const ndVector effectorVeloc(joint->GetBody0()->GetVelocityAtPoint(matrix0.m_posit));
-		//const ndVector relVeloc(comVeloc - effectorVeloc);
-		////const ndVector step(comVeloc.Scale(timestep));
-		//const ndVector step(relVeloc.Scale(timestep));
-
-		//float applifyEffect = 50.0f;
-		//matrix1.m_posit.m_x -= step.m_x * applifyEffect;
-		//matrix1.m_posit.m_y -= step.m_y * 20.0f;
-		//matrix1.m_posit.m_z -= step.m_z * applifyEffect;
-		//ndMatrix targetMatrix0(m_effector->GetOffsetMatrix());
-		//ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
-
-		//float applifyEffect = 100.0f;
-		//float applifyEffect = 0.0f;
-		//matrix1.m_posit.m_x -= step.m_x * applifyEffect;
-		//matrix1.m_posit.m_y -= step.m_y * 50.0f;
-		//matrix1.m_posit.m_z -= step.m_z * applifyEffect;
-		//ndMatrix targetMatrix0(m_effector->GetOffsetMatrix());
-		//ndMatrix targetMatrix(matrix0 * matrix1.Inverse());
-		//m_effector->SetOffsetMatrix(targetMatrix);
-
 
 		ndVector localGravity(matrix1.UnrotateVector(m_gravityDir));
 		ndMatrix targetMatrix(m_effector->GetOffsetMatrix());
+		//ndMatrix targetMatrix(dGetIdentityMatrix() * matrix1.Inverse());
 		targetMatrix.m_posit = localGravity.Scale(1.0f) | ndVector::m_wOne;
+if (xxx > 200)
+{
+	xxx *= 1;
+}
+
 		m_effector->SetOffsetMatrix(targetMatrix);
 
 		//m_solver.SolverBegin(skeleton, &joint, 1, world, timestep);
