@@ -239,7 +239,7 @@ xxxx++;
 if (xxxx > 200)
 xxxx *= 1;
 
-#if 1
+#if 0
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
@@ -272,9 +272,10 @@ xxxx *= 1;
 			const ndInt32 index = desc.m_rowsCount - 1;
 			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
-			const ndFloat32 relPosit = -(jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
-			const ndFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-			const ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
+			const ndFloat32 relPosit = (jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
+			const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+			//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
+			const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, relPosit, m_linearDamper, relVeloc);
 
 			desc.m_diagonalRegularizer[index] = m_linearRegularizer;
 			SetMotorAcceleration(desc, accel);
