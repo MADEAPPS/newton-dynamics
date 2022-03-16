@@ -54,6 +54,9 @@ class dInvertedPendulum : public ndModel
 		//ndBodyKinematic* const leg = AddCapsule(scene, matrix, mass / 20.0f, radius, radius, 2.0f * size);
 		ndBodyKinematic* const sph = AddSphere(scene, matrix, mass / 30.0f, radius);
 
+// hack to show equilbrium can be dynamics.
+		box->SetAngularDamping(ndVector(1.0f, 1.0f, 1.0f, 0.0f));
+
 		// add a dummy object to force to make a skeleton
 		//ndBodyKinematic* const dummySphere = AddSphere(scene, matrix, mass / 30.0f, radius);
 		//dummySphere->SetMatrix(matrix);

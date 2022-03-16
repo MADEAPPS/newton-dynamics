@@ -231,22 +231,26 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-#if 0
+	//const ndMatrix& axisDir = matrix1;
+	const ndMatrix axisDir(dGetIdentityMatrix());
+
+static int xxxx;
+xxxx++;
+if (xxxx > 200)
+xxxx *= 1;
+
+#if 1
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		if (m_controlDofOptions & (1 << i))
 		{
-			const ndVector pin = matrix1[i];
+			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
 			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 		}
 	}
 #else
-	ndMatrix xxxxxxx(dGetIdentityMatrix());
-
-float FAKE_PID_factor = 10.0f;
-
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 
@@ -262,28 +266,18 @@ float FAKE_PID_factor = 10.0f;
 	{
 		if (m_controlDofOptions & (1 << i))
 		{
-			//const ndVector pin = matrix1[i];
-			const ndVector pin = xxxxxxx[i];
+			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, posit0, posit1, pin);
-			//AddLinearRowJacobian(desc, posit0, posit0, pin);
 
 			const ndInt32 index = desc.m_rowsCount - 1;
 			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 			const ndFloat32 relPosit = -(jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
 			const ndFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-
-			//const ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit * 10.0f, m_linearDamper, relVeloc);
-			const ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit * FAKE_PID_factor, m_linearDamper, relVeloc);
-
-//if (relPosit * xxxxx > 4.0f)
-//xxxxx *= 1;
-//if (i == 2)
-//dTrace(("%f\n", relPosit * xxxxx));
+			const ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
 
 			desc.m_diagonalRegularizer[index] = m_linearRegularizer;
 			SetMotorAcceleration(desc, accel);
-			//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 		}
 	}
 #endif
