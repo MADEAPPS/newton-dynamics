@@ -283,7 +283,7 @@ xxx++;
 //if (xxx >= 17)
 if (xxx == 200)
 {
-m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
+m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.5f, 0.0f));
 }
 
 		ndMatrix matrix0;

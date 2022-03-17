@@ -344,7 +344,7 @@ void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatri
 		const ndQuaternion rotation(matrix0.Inverse() * matrix11);
 		const ndVector pin(rotation & ndVector::m_triplexMask);
 		const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
-		const ndFloat32 tol = ndFloat32(1.0e-3f);
+		const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
 		if (dirMag2 > (tol * tol))
 		{
 			const ndMatrix basis(pin);

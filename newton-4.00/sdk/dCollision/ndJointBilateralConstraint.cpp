@@ -225,11 +225,10 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	const ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 
 	const ndFloat32 relPosit = desc.m_penetration[index];
-	const ndFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+	const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+	const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, spring, -relPosit, damper, relVeloc);
 
 	const ndFloat32 r = dClamp(regularizer, ndFloat32(1.e-8f), ndFloat32(0.9f));
-	const ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, spring, relPosit, damper, relVeloc);
-	
 	desc.m_diagonalRegularizer[index] = r;
 	SetMotorAcceleration(desc, accel);
 }
