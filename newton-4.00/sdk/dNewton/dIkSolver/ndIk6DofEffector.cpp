@@ -244,13 +244,8 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	//const ndMatrix& axisDir = matrix1;
-	const ndMatrix axisDir(dGetIdentityMatrix());
-
-static int xxxx;
-xxxx++;
-if (xxxx > 200)
-xxxx *= 1;
+	const ndMatrix& axisDir = matrix1;
+	//const ndMatrix axisDir(dGetIdentityMatrix());
 
 #if 0
 	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
@@ -281,16 +276,19 @@ xxxx *= 1;
 		{
 			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, posit0, posit1, pin);
+			//AddLinearRowJacobian(desc, posit0, posit0, pin);
 
 			const ndInt32 index = desc.m_rowsCount - 1;
 			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 			const ndFloat32 relPosit = (jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
 			const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-			const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, relPosit, m_linearDamper * 0.01f, relVeloc);
-			//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
-
-			desc.m_diagonalRegularizer[index] = m_linearRegularizer;
+			//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, relPosit, m_linearDamper * 0.01f, relVeloc);
+			//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, relPosit, m_linearDamper * 0.01f, relVeloc) + desc.m_velocityAccel[index];
+			const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
+			
+			//const ndFloat32 accel = GetMotorZeroAcceleration(desc) - 1.0f * relPosit * desc.m_invTimestep * desc.m_invTimestep;
+			//desc.m_diagonalRegularizer[index] = m_linearRegularizer;
 			SetMotorAcceleration(desc, accel);
 		}
 	}
