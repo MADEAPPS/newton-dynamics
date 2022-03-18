@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set (projectName "ndSolverCuda")
 message (${projectName})
+project(cmake_and_cuda LANGUAGES CXX CUDA)
 
 include_directories(../.././)
 include_directories(../../dCore/)
@@ -28,7 +29,7 @@ include_directories(../../dNewton/dModels/dCharacter)
 
 add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
 include_directories(./)
-include_directories(CL/)
+include_directories(cuda/)
 
 file(GLOB CPP_SOURCE *.c *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
