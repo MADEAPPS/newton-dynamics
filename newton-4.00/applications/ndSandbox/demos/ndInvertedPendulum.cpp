@@ -38,70 +38,66 @@ class dInvertedPendulum : public ndModel
 		,m_bodies()
 		,m_effector(nullptr)
 		,m_contactSensor(nullptr)
+		,m_efectorLength(1.0f)
 	{
+		ndFloat32 mass = 1.0f;
+		ndFloat32 sizex = 0.5f;
+		ndFloat32 sizey = 1.0f;
+		ndFloat32 sizez = 0.5f;
+		ndFloat32 radius = 0.125f * sizex;
+		
 		ndPhysicsWorld* const world = scene->GetWorld();
 		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		ndMatrix matrix(location);
-		matrix.m_posit.m_y += floor.m_y + 1.05f;
-		//matrix.m_posit.m_y += floor.m_y + 1.1f;
+		ndMatrix boxMatrix(location);
+		boxMatrix.m_posit.m_y = floor.m_y;
+		ndBodyKinematic* const box = AddBox(scene, location, mass, sizex, sizey, sizez);
+
+		ndShapeInfo sizeInfo (box->GetCollisionShape().GetShape()->GetShapeInfo());
+		boxMatrix.m_posit.m_y += sizeInfo.m_box.m_y * 0.5f + radius + m_efectorLength;
+		box->SetMatrix(boxMatrix);
+		box->GetNotifyCallback()->OnTransform(0, boxMatrix);
+		box->GetNotifyCallback()->OnTransform(0, boxMatrix);
 		
-		ndFloat32 mass = 1.0f;
-		ndFloat32 size = 0.5f;
-		ndFloat32 radius = 0.125f * size;
-		ndFloat32 lenght = 2.0f * size;
-		
-		ndBodyKinematic* const box = AddBox(scene, matrix, mass, size, size, size);
 		//ndBodyKinematic* const leg = AddCapsule(scene, matrix, mass / 20.0f, radius, radius, 2.0f * size);
-		ndBodyKinematic* const sph = AddSphere(scene, matrix, mass / 30.0f, radius);
-
-// hack to show equilibrium can be dynamics.
-box->SetAngularDamping(ndVector(1.0f, 1.0f, 1.0f, 0.0f));
-
-		// add a dummy object to force to make a skeleton
-		//ndBodyKinematic* const dummySphere = AddSphere(scene, matrix, mass / 30.0f, radius);
-		//dummySphere->SetMatrix(matrix);
-		//world->AddJoint(new ndJointFix6dof(matrix, dummySphere, box));
-
-		//ndMatrix legMatrix(dRollMatrix(90.0f * ndDegreeToRad) * box->GetMatrix());
-		//legMatrix.m_posit.m_y -= lenght * 0.5f;
-		//leg->SetMatrix(legMatrix);
-
+		ndBodyKinematic* const sph = AddSphere(scene, location, mass / 20.0f, radius);
 		ndMatrix sphMatrix(box->GetMatrix());
-		sphMatrix.m_posit.m_y -= lenght;
-
-		// try offsetting the effector.
-		sphMatrix.m_posit.m_z -= (size * 0.5f) * 0.0f;
-
+		sphMatrix.m_posit.m_y -= sizeInfo.m_box.m_y * 0.5f + m_efectorLength;
+		//// try offsetting the effector.
+		//sphMatrix.m_posit.m_z -= (size * 0.5f) * 0.0f;
 		sph->SetMatrix(sphMatrix);
 		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
 		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
-		//sph->GetCollisionShape().SetCollisionMode(false);
-		//ndIkJointSpherical* const feetJoint = new ndIkJointSpherical(sphMatrix, sph, leg);
-		//world->AddJoint(feetJoint);
 
-		//ndMatrix legSocketMatrix(legMatrix);
-		//legSocketMatrix.m_posit = matrix.m_posit;
-		//ndIkJointSpherical* const socketJoint = new ndIkJointSpherical(legSocketMatrix, leg, box);
-		//world->AddJoint(socketJoint);
+// hack to show equilibrium can be dynamics.
+//box->SetAngularDamping(ndVector(1.0f, 1.0f, 1.0f, 0.0f));
 
-		ndMatrix sphMatrixPivot(box->GetMatrix());
-		sphMatrixPivot.m_posit.m_z = sphMatrix.m_posit.m_z;
-		m_effector = new ndIk6DofEffector(sphMatrix, sphMatrixPivot, sph, box);
+		////sph->GetCollisionShape().SetCollisionMode(false);
+		////ndIkJointSpherical* const feetJoint = new ndIkJointSpherical(sphMatrix, sph, leg);
+		////world->AddJoint(feetJoint);
+		
+		////ndMatrix legSocketMatrix(legMatrix);
+		////legSocketMatrix.m_posit = matrix.m_posit;
+		////ndIkJointSpherical* const socketJoint = new ndIkJointSpherical(legSocketMatrix, leg, box);
+		////world->AddJoint(socketJoint);
+		
+		ndMatrix boxPivot(box->GetMatrix());
+		boxPivot.m_posit.m_y -= sizeInfo.m_box.m_y * 0.5f;
+		boxPivot.m_posit.m_z = sphMatrix.m_posit.m_z;
+		m_effector = new ndIk6DofEffector(sphMatrix, boxPivot, sph, box);
 		ndFloat32 regularizer = 1.0e-2f;
 		m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 		m_effector->SetLinearSpringDamper(regularizer, 1500.0f, 100.0f);
 		m_effector->SetAngularSpringDamper(regularizer, 1500.0f, 100.0f);
 		m_effector->SetSolverModel(ndJointBilateralSolverModel::m_jointkinematicOpenLoop);
-
+		
 		//feetJoint->SetIkMode(false);
 		//socketJoint->SetIkMode(false);
 		//world->AddJoint(new ndJointPlane(matrix.m_posit, matrix.m_front, box, world->GetSentinelBody()));
-
+		
 		m_bodies.PushBack(box->GetAsBodyDynamic());
 		m_bodies.PushBack(sph->GetAsBodyDynamic());
-		//m_rootBody = box->GetAsBodyDynamic();
 		m_contactSensor = sph->GetAsBodyDynamic();
-
+		
 		#ifdef D_USE_FORWARD_DYNAMICS
 			world->AddJoint(m_effector);
 		#endif
@@ -314,6 +310,7 @@ if (xxx > 200)
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodies;
 	ndBodyDynamic* m_contactSensor;
 	ndIk6DofEffector* m_effector;
+	ndFloat32 m_efectorLength;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dInvertedPendulum);
 
@@ -321,6 +318,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
+	//BuildFlatPlane(scene, true);
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	ndWorld* const world = scene->GetWorld();

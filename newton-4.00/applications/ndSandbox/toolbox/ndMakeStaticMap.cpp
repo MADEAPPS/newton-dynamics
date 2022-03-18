@@ -18,7 +18,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoSplinePathMesh.h"
 
-ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location)
+ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -29,6 +29,8 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	uvMatrix[2][2] *= 0.025f;
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false);
 
+	ndMatrix location(matrix);
+	location.m_posit.m_y -= 0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 

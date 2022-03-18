@@ -181,8 +181,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
 	public:
-
-
 	ndMatrix m_offsetMatrix;
 	ndVector m_scale;
 	ndShapeMaterial m_shapeMaterial;
