@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
-set (projectName "ndSolverAvx2")
+set (projectName "ndSolverCuda")
 message (${projectName})
 
 include_directories(../.././)
@@ -26,39 +26,39 @@ include_directories(../../dNewton/dParticles/)
 include_directories(../../dNewton/dModels/dVehicle)
 include_directories(../../dNewton/dModels/dCharacter)
 
+add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
+include_directories(./)
+include_directories(CL/)
+
 file(GLOB CPP_SOURCE *.c *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 if(MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /arch:AVX2")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
+	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /arch:AVX2")
+	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
+	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
 
 if(MINGW)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mavx2 -mfma  ")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma ")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma")
+	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mavx2 -mfma  ")
+	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma ")
+	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma")
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
 
 if(UNIX)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
+	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 
 	add_library(${projectName} SHARED ${CPP_SOURCE})
+	target_link_libraries (${projectName} OpenCL)
 endif()
 
-if(MSVC OR MINGW)
-	target_link_options(${projectName} PUBLIC "/DEBUG") 
-endif()
-
-install(TARGETS ${projectName}
+install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib
 		ARCHIVE DESTINATION lib
 		RUNTIME DESTINATION bin)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
-

@@ -8,7 +8,7 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 3.4.0)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 set (projectName "ndSolverOpenCL")
 message (${projectName})
@@ -21,6 +21,8 @@ include_directories(../../dProfiler/)
 include_directories(../../dCollision/)
 include_directories(../../dNewton/dJoints/)
 include_directories(../../dNewton/dModels/)
+include_directories(../../dNewton/dIkSolver)
+include_directories(../../dNewton/dParticles/)
 include_directories(../../dNewton/dModels/dVehicle)
 include_directories(../../dNewton/dModels/dCharacter)
 

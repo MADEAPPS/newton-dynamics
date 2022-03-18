@@ -51,6 +51,7 @@ class ndWorld: public ndClassAlloc
 		ndStandardSolver,
 		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
+		ndCudaSolver,
 		ndOpenclSolver1,
 		ndOpenclSolver2,
 	};
@@ -190,6 +191,7 @@ class ndWorld: public ndClassAlloc
 	friend class ndWorldDefaultScene;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateCuda;
 	friend class ndDynamicsUpdateOpencl;
 } D_GCC_NEWTON_ALIGN_32;
 

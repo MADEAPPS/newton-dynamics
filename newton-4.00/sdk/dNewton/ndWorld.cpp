@@ -39,6 +39,10 @@
 	#include "ndDynamicsUpdateOpencl.h"
 #endif
 
+#ifdef _D_NEWTON_CUDA
+	#include "ndDynamicsUpdateCuda.h"
+#endif
+
 #if _DEBUG
 ndInt32 xxxxxxxxxxxxxxxxxxx;
 #endif
@@ -231,6 +235,13 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndOpenclSolver2:
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateOpencl(this, 1);
+				break;
+			#endif
+
+			#ifdef _D_NEWTON_CUDA
+			case ndCudaSolver:
+				m_solverMode = solverMode;
+				m_solver = new ndDynamicsUpdateCuda(this, 0);
 				break;
 			#endif
 

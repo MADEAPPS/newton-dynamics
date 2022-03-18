@@ -8,7 +8,7 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 3.4.0)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 if (NEWTON_USE_DEFAULT_NEW_AND_DELETE)
 	add_definitions(-DD_USE_DEFAULT_NEW_AND_DELETE)
@@ -45,6 +45,19 @@ else()
 		include_directories(dExtensions/dAvx2)
 	endif()
 
+	if (NEWTON_ENABLE_CUDA_SOLVER)
+		add_definitions(-D_D_NEWTON_CUDA)
+		include_directories(dExtensions/dCuda)
+
+		#if(NEWTON_BUILD_SHARED_LIBS)
+		#	if (PTR_SIZE EQUAL 8)
+		#		link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
+		#	else()
+		#		link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x86/OpenCL.lib")
+		#	endif()
+		#endif()
+	endif(NEWTON_ENABLE_CUDA_SOLVER)
+
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
 		add_definitions(-D_D_NEWTON_OPENCL)
 		include_directories(dExtensions/dOpencl)
@@ -56,7 +69,6 @@ else()
 				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x86/OpenCL.lib")
 			endif()
 		endif()
-
 	endif(NEWTON_ENABLE_OPENCL_SOLVER)
 
 	# source and header files
@@ -107,6 +119,10 @@ else()
 
 		if(NEWTON_ENABLE_AVX2_SOLVER)
 			target_link_libraries (${projectName} ndSolverAvx2)
+		endif()
+
+		if (NEWTON_ENABLE_CUDA_SOLVER)
+			target_link_libraries (${projectName} ndSolverCuda)
 		endif()
 
 		if (NEWTON_ENABLE_OPENCL_SOLVER)

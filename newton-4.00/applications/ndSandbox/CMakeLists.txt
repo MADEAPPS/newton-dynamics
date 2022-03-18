@@ -8,7 +8,7 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 3.4.0)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 set (projectName "ndSandbox")
 message (${projectName})
@@ -66,7 +66,19 @@ if(MSVC OR MINGW)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
 			target_link_libraries (${projectName} ndSolverAvx2)
 		endif()
-	endif()
+	endif(NEWTON_ENABLE_AVX2_SOLVER)
+
+	if (NEWTON_ENABLE_CUDA_SOLVER)
+		if (NOT NEWTON_BUILD_SHARED_LIBS)
+			target_link_libraries (${projectName} ndSolverCuda)
+			#if (PTR_SIZE EQUAL 8)
+			#	message (${CMAKE_CURRENT_SOURCE_DIR})
+			#	target_link_libraries (${projectName} "${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
+			#else()
+			#	target_link_libraries (${projectName} "${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
+			#endif()
+		endif()
+	endif(NEWTON_ENABLE_CUDA_SOLVER)
 
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
@@ -78,7 +90,7 @@ if(MSVC OR MINGW)
 				target_link_libraries (${projectName} "${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
 			endif()
 		endif()
-	endif()
+	endif(NEWTON_ENABLE_OPENCL_SOLVER)
 
 	if (PTR_SIZE EQUAL 8)
 		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/lib/OpenAL_32.lib)
@@ -110,11 +122,15 @@ if(UNIX)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		target_link_libraries (${projectName} ndSolverAvx2)
-	endif()
+	endif(NEWTON_ENABLE_AVX2_SOLVER)
 
+	if (NEWTON_ENABLE_CUDA_SOLVER)
+		target_link_libraries (${projectName} ndSolverCuda)
+	endif(NEWTON_ENABLE_CUDA_SOLVER)
+	
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
-		target_link_libraries (${projectName} OpenCL ndSolverOpenCL)
-	endif()
+		target_link_libraries (${projectName} ndSolverOpenCL OpenCL)
+	endif(NEWTON_ENABLE_OPENCL_SOLVER)
     
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")

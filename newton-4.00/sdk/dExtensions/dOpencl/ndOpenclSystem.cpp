@@ -19,15 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
-#include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-#include "ndBodyDynamic.h"
-#include "ndSkeletonList.h"
-#include "ndOpenclSystem.h"
 #include "ndDynamicsUpdateOpencl.h"
-#include "ndJointBilateralConstraint.h"
-
+#include "ndOpenclSystem.h"
 
 const char* ndOpenclSystem::m_kernelSource = R""""(
 
@@ -95,7 +88,7 @@ struct dMatrix3x3 dQuatToMatrix (float4 q)
 	struct dMatrix3x3 matrix;
 
 	//const dQuaternion quat0(quat);
-	//const dQuaternion quat1(quat0.Scale (dFloat32(2.0f)));
+	//const dQuaternion quat1(quat0.Scale (ndFloat32(2.0f)));
 	float4 quat0 = q;
 	float4 quat1 = q * ((float4)(2.0f));
 	
@@ -167,7 +160,7 @@ float4 dMatrixByGaussianElimination(struct dMatrix3x3 matrix, float4 v)
 			//dVector scale(tmp[j][i] / tmp[i][i]);
 			//tmp[j] -= tmp[i] * scale;
 			//ret[j] -= ret[i] * scale.GetScalar();
-			//tmp[j][i] = dFloat32(0.0f);
+			//tmp[j][i] = ndFloat32(0.0f);
 
 			float4 scale = (float4) (tmp.m_data[j][i] / tmp.m_data[i][i]);
 			tmp.m_data[j] = tmp.m_data[j] - tmp.m_data[i] * scale;
@@ -204,9 +197,9 @@ float8 dIntegrateForceAndToque(
 	float4 dw = localOmega * timestep;
 
 	//const dMatrix jacobianMatrix(
-	//	dVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, dFloat32(0.0f)),
-	//	dVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, dFloat32(0.0f)),
-	//	dVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, dFloat32(0.0f)),
+	//	dVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, ndFloat32(0.0f)),
+	//	dVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, ndFloat32(0.0f)),
+	//	dVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, ndFloat32(0.0f)),
 	//	dVector::m_wOne);
 	struct dMatrix3x3 jacobianMatrix;
 	jacobianMatrix.m_front = (float4)(mass.x, (mass.z - mass.y) * dw.z, (mass.z - mass.y) * dw.y, 0.0f);
@@ -282,7 +275,7 @@ __kernel void IntegrateBodiesVelocity(
 	}	
 
 	//ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
-	//const dInt32 index = body->m_index;
+	//const ndInt32 index = body->m_index;
 	//const ndJacobian& forceAndTorque = internalForces[index];
 
 	int index = indexPtr[globalIndex];
@@ -315,7 +308,7 @@ __kernel void IntegrateBodiesVelocity(
 	//	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
 	//	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
 	//	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-	//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+	//	const ndInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 	//	body->m_resting &= equilibrium;
 	//}
 }
@@ -369,11 +362,11 @@ void ndOpenclBodyBuffer::Cleanup()
 	m_transform.Cleanup();
 }
 
-void ndOpenclBodyBuffer::Resize(cl_context context, const dArray<dInt32>& bodyArray)
+void ndOpenclBodyBuffer::Resize(cl_context context, const ndArray<ndInt32>& bodyArray)
 {
 	if (m_transform.GetCapacity() < bodyArray.GetCount())
 	{
-		dInt32 size = dMax(m_transform.GetCapacity(), D_OPENCL_BUFFER_SIZE);
+		ndInt32 size = dMax(m_transform.GetCapacity(), D_OPENCL_BUFFER_SIZE);
 		while (size < bodyArray.GetCount())
 		{
 			size *= 2;
@@ -384,9 +377,9 @@ void ndOpenclBodyBuffer::Resize(cl_context context, const dArray<dInt32>& bodyAr
 	}
 }
 
-void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<dInt32>& bodyArray)
+void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const ndArray<ndInt32>& bodyArray)
 {
-	const dInt32 items = bodyArray.GetCount();
+	const ndInt32 items = bodyArray.GetCount();
 	m_veloc.SetCount(items);
 	m_accel.SetCount(items);
 	m_transform.SetCount(items);
@@ -395,7 +388,7 @@ void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<d
 	//ndJacobian* const accel = (ndJacobian*)&m_accel[0];
 	//ndJacobian* const transform = (ndJacobian*)&m_transform[0];
 
-	for (dInt32 i = 0; i < items; i++)
+	for (ndInt32 i = 0; i < items; i++)
 	{
 		dAssert(0);
 		//ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
@@ -436,7 +429,7 @@ dVector ndOpenclBodyBuffer::NormalizeQuat(const dVector& r)
 	return r * dVector(invMag);
 }
 
-void ndOpenclBodyBuffer::DebudKernel(dFloat32 timestepIn, const dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclBodyBuffer::DebudKernel(ndFloat32 timestepIn, const ndArray<ndBodyKinematic*>& bodyArray)
 {
 	dVector* const omegaBuffer = (dVector*)&m_omega[0];
 	dVector* const velocBuffer = (dVector*)&m_veloc[0];
@@ -445,8 +438,8 @@ void ndOpenclBodyBuffer::DebudKernel(dFloat32 timestepIn, const dArray<ndBodyKin
 	dVector* const centerOfMassBuffer = (dVector*)&m_posit[0];
 	dQuaternion* const rotationBuffer = (dQuaternion*)&m_rotation[0];
 
-	const dInt32 items = bodyArray.GetCount();
-	for (dInt32 globalIndex = 0; globalIndex < items; globalIndex++)
+	const ndInt32 items = bodyArray.GetCount();
+	for (ndInt32 globalIndex = 0; globalIndex < items; globalIndex++)
 	{
 		dVector timestep(timestepIn);
 		dVector invTimestep(1.0f / timestepIn);
@@ -483,7 +476,7 @@ void ndOpenclBodyBuffer::DebudKernel(dFloat32 timestepIn, const dArray<ndBodyKin
 }
 #endif
 
-void ndOpenclBodyBuffer::SetKernelParameters(cl_kernel kernel, dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclBodyBuffer::SetKernelParameters(cl_kernel kernel, ndFloat32 timestep, const ndArray<ndBodyKinematic*>& bodyArray)
 {
 	cl_int err = CL_SUCCESS;
 
@@ -538,7 +531,7 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 	size_t computeUnits;
 	err = clGetDeviceInfo(m_device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(size_t), &computeUnits, &stringLength);
 	dAssert(err == CL_SUCCESS);
-	m_computeUnits = dInt32(computeUnits);
+	m_computeUnits = ndInt32(computeUnits);
 
 	// create command queue
 	cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
@@ -581,7 +574,7 @@ ndOpenclSystem::~ndOpenclSystem()
 	dAssert(err == CL_SUCCESS);
 }
 
-ndOpenclSystem* ndOpenclSystem::Singleton(dInt32 driveNumber)
+ndOpenclSystem* ndOpenclSystem::Singleton(ndInt32 driveNumber)
 {
 	cl_uint numPlatforms = 0;
 	cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
@@ -598,7 +591,7 @@ ndOpenclSystem* ndOpenclSystem::Singleton(dInt32 driveNumber)
 		return nullptr;
 	}
 
-	dInt32 driveIndex = 0;
+	ndInt32 driveIndex = 0;
 	cl_platform_id bestPlatform = 0;
 	for (cl_uint i = 0; i < numPlatforms; i++)
 	{
@@ -665,12 +658,12 @@ void ndOpenclSystem::SetKernel(const char* const name, ndKernel& kerner)
 	dAssert(err == CL_SUCCESS);
 }
 
-void ndOpenclSystem::Resize(const dArray<dInt32>& bodyArray)
+void ndOpenclSystem::Resize(const ndArray<ndInt32>& bodyArray)
 {
 	m_bodyArray.Resize(m_context, bodyArray);
 }
 
-void ndOpenclSystem::CopyToGpu(const dArray<dInt32>& bodyArray)
+void ndOpenclSystem::CopyToGpu(const ndArray<ndInt32>& bodyArray)
 {
 	m_bodyArray.CopyToGpu(m_commandQueue, bodyArray);
 }
@@ -682,7 +675,7 @@ void ndOpenclSystem::Finish()
 	dAssert(err == CL_SUCCESS);
 }
 
-void ndOpenclSystem::ExecuteIntegrateBodyPosition(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclSystem::ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndArray<ndBodyKinematic*>& bodyArray)
 {
 	// let the driver decide the local work group size.
 	//size_t local = bodyArray.GetCount();

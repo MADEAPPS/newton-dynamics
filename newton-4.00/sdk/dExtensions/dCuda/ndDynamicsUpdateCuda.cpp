@@ -19,52 +19,56 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDynamicsUpdateOpencl.h"
+
+#include "ndDynamicsUpdateCuda.h"
 #include "ndWorld.h"
 #include "ndModel.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
-#include "ndOpenclSystem.h"
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
-ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world, ndInt32 driverNumber)
+//ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32 driverNumber)
+ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32)
 	:ndDynamicsUpdate(world)
-	,m_opencl(nullptr)
+	//,m_opencl(nullptr)
 {
 	//m_opencl = ndOpenclSystem::Singleton(driverNumber);
 }
 
-ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
+ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
 {
-	if (m_opencl)
-	{
-		delete m_opencl;
-	}
+	//if (m_opencl)
+	//{
+	//	delete m_opencl;
+	//}
 }
 
-const char* ndDynamicsUpdateOpencl::GetStringId() const
+const char* ndDynamicsUpdateCuda::GetStringId() const
 {
-	return m_opencl ? m_opencl->m_platformName : "no opencl support";
+	//return m_opencl ? m_opencl->m_platformName : "no opencl support";
+	//dAssert(0);
+	return "no cuda support";
 }
 
-void ndDynamicsUpdateOpencl::BuildIsland()
+void ndDynamicsUpdateCuda::BuildIsland()
 {
-	ndScene* const scene = m_world->GetScene();
-	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	dAssert(bodyArray.GetCount() >= 1);
-	if (bodyArray.GetCount() - 1)
-	{
-		D_TRACKTIME();
-		SortJoints();
-		SortIslands();
-	}
+	dAssert(0);
+	//ndScene* const scene = m_world->GetScene();
+	//const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	//dAssert(bodyArray.GetCount() >= 1);
+	//if (bodyArray.GetCount() - 1)
+	//{
+	//	D_TRACKTIME();
+	//	SortJoints();
+	//	SortIslands();
+	//}
 }
 
-void ndDynamicsUpdateOpencl::SortJoints()
+void ndDynamicsUpdateCuda::SortJoints()
 {
 	D_TRACKTIME();
 
@@ -145,7 +149,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	//SortBodyJointScan();
 }
 
-void ndDynamicsUpdateOpencl::SortIslands()
+void ndDynamicsUpdateCuda::SortIslands()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -266,7 +270,7 @@ void ndDynamicsUpdateOpencl::SortIslands()
 	//}
 }
 
-void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
+void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 {
 	dAssert(0);
 	//class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
@@ -310,7 +314,7 @@ void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 	//}
 }
 
-void ndDynamicsUpdateOpencl::InitWeights()
+void ndDynamicsUpdateCuda::InitWeights()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -374,7 +378,7 @@ void ndDynamicsUpdateOpencl::InitWeights()
 	//m_solverPasses = m_world->GetSolverIterations() + 2 * ndInt32(extraPasses) / conectivity + 1;
 }
 
-void ndDynamicsUpdateOpencl::InitBodyArray()
+void ndDynamicsUpdateCuda::InitBodyArray()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -424,7 +428,7 @@ void ndDynamicsUpdateOpencl::InitBodyArray()
 }
 
 //void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const joint)
-void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
+void ndDynamicsUpdateCuda::GetJacobianDerivatives(ndConstraint* const)
 {
 	dAssert(0);
 	//ndConstraintDescritor constraintParam;
@@ -525,7 +529,7 @@ void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 	//}
 }
 
-void ndDynamicsUpdateOpencl::InitJacobianMatrix()
+void ndDynamicsUpdateCuda::InitJacobianMatrix()
 {
 	dAssert(0);
 	//class ndInitJacobianMatrix : public ndScene::ndBaseJob
@@ -742,7 +746,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 	//}
 }
 
-void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
+void ndDynamicsUpdateCuda::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -784,7 +788,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
 	//m_firstPassCoef = ndFloat32(1.0f);
 }
 
-void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
+void ndDynamicsUpdateCuda::IntegrateBodiesVelocity()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -849,7 +853,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 	//scene->SubmitJobs<ndIntegrateBodiesVelocity>();
 }
 
-void ndDynamicsUpdateOpencl::UpdateForceFeedback()
+void ndDynamicsUpdateCuda::UpdateForceFeedback()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -916,7 +920,7 @@ void ndDynamicsUpdateOpencl::UpdateForceFeedback()
 	//scene->SubmitJobs<ndUpdateForceFeedback>();
 }
 
-void ndDynamicsUpdateOpencl::IntegrateBodies()
+void ndDynamicsUpdateCuda::IntegrateBodies()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -980,7 +984,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 	//#endif
 }
 
-void ndDynamicsUpdateOpencl::DetermineSleepStates()
+void ndDynamicsUpdateCuda::DetermineSleepStates()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -1237,7 +1241,7 @@ void ndDynamicsUpdateOpencl::DetermineSleepStates()
 	//scene->SubmitJobs<ndDetermineSleepStates>();
 }
 
-void ndDynamicsUpdateOpencl::InitSkeletons()
+void ndDynamicsUpdateCuda::InitSkeletons()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -1277,7 +1281,7 @@ void ndDynamicsUpdateOpencl::InitSkeletons()
 	//scene->SubmitJobs<ndInitSkeletons>();
 }
 
-void ndDynamicsUpdateOpencl::UpdateSkeletons()
+void ndDynamicsUpdateCuda::UpdateSkeletons()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -1318,7 +1322,7 @@ void ndDynamicsUpdateOpencl::UpdateSkeletons()
 	//scene->SubmitJobs<ndUpdateSkeletons>();
 }
 
-void ndDynamicsUpdateOpencl::CalculateJointsForce()
+void ndDynamicsUpdateCuda::CalculateJointsForce()
 {
 	D_TRACKTIME();
 	dAssert(0);
@@ -1512,37 +1516,36 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 	//}
 }
 
-void ndDynamicsUpdateOpencl::CalculateForces()
+void ndDynamicsUpdateCuda::CalculateForces()
 {
 	D_TRACKTIME();
-	dAssert(0);
-	//if (m_world->GetScene()->GetActiveContactArray().GetCount())
-	//{
-	//	m_firstPassCoef = ndFloat32(0.0f);
-	//	if (m_world->m_skeletonList.GetCount())
-	//	{
-	//		InitSkeletons();
-	//	}
-	//
-	//	for (ndInt32 step = 0; step < 4; step++)
-	//	{
-	//		CalculateJointsAcceleration();
-	//		CalculateJointsForce();
-	//		if (m_world->m_skeletonList.GetCount())
-	//		{
-	//			UpdateSkeletons();
-	//		}
-	//		IntegrateBodiesVelocity();
-	//	}
-	//	UpdateForceFeedback();
-	//}
+	if (m_world->GetScene()->GetActiveContactArray().GetCount())
+	{
+		m_firstPassCoef = ndFloat32(0.0f);
+		if (m_world->m_skeletonList.GetCount())
+		{
+			InitSkeletons();
+		}
+
+		for (ndInt32 step = 0; step < 4; step++)
+		{
+			CalculateJointsAcceleration();
+			CalculateJointsForce();
+			if (m_world->m_skeletonList.GetCount())
+			{
+				UpdateSkeletons();
+			}
+			IntegrateBodiesVelocity();
+		}
+		UpdateForceFeedback();
+	}
 }
 
-void ndDynamicsUpdateOpencl::FinishGpuUpdate()
+void ndDynamicsUpdateCuda::FinishGpuUpdate()
 {
 	D_TRACKTIME();
-	m_opencl->Finish();
 	dAssert(0);
+	//m_opencl->Finish();
 	//ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder____();
 	//ndJacobian* const accel = (ndJacobian*)&m_opencl->m_bodyArray.m_accel[0];
 	//ndJacobian* const transform = (ndJacobian*)&m_opencl->m_bodyArray.m_transform[0];
@@ -1567,9 +1570,10 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 	//}
 }
 
-void ndDynamicsUpdateOpencl::Update()
+void ndDynamicsUpdateCuda::Update()
 {
 	D_TRACKTIME();
+	//dAssert(0);
 	//if (m_opencl)
 	////if (0)
 	//{

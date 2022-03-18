@@ -19,19 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_WORLD_DYNAMICS_UPDATE_OPENCL_H__
-#define __D_WORLD_DYNAMICS_UPDATE_OPENCL_H__
+#ifndef __D_WORLD_DYNAMICS_UPDATE_CUDA_H__
+#define __D_WORLD_DYNAMICS_UPDATE_CUDA_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-class ndOpenclSystem;
+//class ndOpenclSystem;
 
-class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
+class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 {
 	public:
-	ndDynamicsUpdateOpencl(ndWorld* const world, ndInt32 driverNumber);
-	virtual ~ndDynamicsUpdateOpencl();
+	ndDynamicsUpdateCuda(ndWorld* const world, ndInt32 driverNumber);
+	virtual ~ndDynamicsUpdateCuda();
 
 	virtual const char* GetStringId() const;
 
@@ -59,7 +59,7 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	ndOpenclSystem* m_opencl;
+	//ndOpenclSystem* m_opencl;
 };
 
 

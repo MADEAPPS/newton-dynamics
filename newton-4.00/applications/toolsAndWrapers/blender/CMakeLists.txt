@@ -8,7 +8,7 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 3.4.0)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 option("NEWTON_BUILD_TEST" "generate test project" "OFF")
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")

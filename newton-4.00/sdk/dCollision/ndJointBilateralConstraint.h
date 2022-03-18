@@ -155,6 +155,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateCuda;
 	friend class ndDynamicsUpdateOpencl;
 };
 
