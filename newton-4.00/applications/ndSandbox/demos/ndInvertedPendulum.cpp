@@ -48,10 +48,11 @@ class dInvertedPendulum : public ndModel
 		
 		ndPhysicsWorld* const world = scene->GetWorld();
 		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		ndMatrix boxMatrix(location);
-		boxMatrix.m_posit.m_y = floor.m_y;
 		ndBodyKinematic* const box = AddBox(scene, location, mass, sizex, sizey, sizez);
 
+		ndMatrix boxMatrix(location);
+		boxMatrix.m_posit.m_y = floor.m_y;
+		boxMatrix.m_posit.m_y += 0.5f;
 		ndShapeInfo sizeInfo (box->GetCollisionShape().GetShape()->GetShapeInfo());
 		boxMatrix.m_posit.m_y += sizeInfo.m_box.m_y * 0.5f + radius + m_efectorLength;
 		box->SetMatrix(boxMatrix);
@@ -62,8 +63,8 @@ class dInvertedPendulum : public ndModel
 		ndBodyKinematic* const sph = AddSphere(scene, location, mass / 20.0f, radius);
 		ndMatrix sphMatrix(box->GetMatrix());
 		sphMatrix.m_posit.m_y -= sizeInfo.m_box.m_y * 0.5f + m_efectorLength;
-		//// try offsetting the effector.
-		//sphMatrix.m_posit.m_z -= (size * 0.5f) * 0.0f;
+		// try offsetting the effector.
+		sphMatrix.m_posit.m_z -= (sizez * 0.5f) * 1.0f;
 		sph->SetMatrix(sphMatrix);
 		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
 		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
@@ -134,7 +135,7 @@ class dInvertedPendulum : public ndModel
 		//context.DrawFrame(rootMatrix);
 		context.DrawPoint(com, ndVector(1.0f, 0.0f, 0.0f, 0.0f), 12.0f);
 
-		ndVector p1(com + m_gravityDir.Scale (1.0f));
+		ndVector p1(com + m_gravityDir.Scale (m_efectorLength * 2.0f));
 		context.DrawLine(com, p1, ndVector(0.0f, 1.0f, 1.0f, 0.0f));
 	}
 
@@ -227,7 +228,7 @@ class dInvertedPendulum : public ndModel
 		// step 2: we apply correction only if there is a support contact
 		if (!hasSupport)
 		{
-			return;
+//			return;
 		}
 
 		// step 3: have support contacts, find the projection of the com over the ground
@@ -279,8 +280,10 @@ xxx++;
 //if (xxx >= 17)
 if (xxx == 200)
 {
-m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
+//m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
+return;
 }
+return;
 
 		ndMatrix matrix0;
 		ndMatrix matrix1;
@@ -292,7 +295,7 @@ m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
 		// specify foot orientation. 
 		targetMatrix = dGetIdentityMatrix() * matrix1.Inverse();
 
-		targetMatrix.m_posit = localGravity.Scale(1.0f) | ndVector::m_wOne;
+		targetMatrix.m_posit = localGravity.Scale(m_efectorLength) | ndVector::m_wOne;
 if (xxx > 200)
 {
 	xxx *= 1;
