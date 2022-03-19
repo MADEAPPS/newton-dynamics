@@ -27,23 +27,35 @@
 //#define D_USE_GPU_DEVICE
 //#define D_OPENCL_BUFFER_SIZE	1024
 
-#if 0
+
 template<class T>
-class ndCudaBuffer: public ndArray<T>
+class ndDeviceBuffer
 {
 	public:
-	ndCudaBuffer(cl_mem_flags flags);
-	~ndCudaBuffer();
+	ndDeviceBuffer();
+	~ndDeviceBuffer();
 
-	void Cleanup();
-	void SyncSize(cl_context context, ndInt32 size);
-	void ReadData(cl_command_queue commandQueue);
-	void WriteData(cl_command_queue commandQueue);
+	ndInt32 GetCount() const;
+	void SetCount(ndInt32 count);
 
-	cl_mem m_gpuBuffer;
-	cl_mem_flags m_flags;
+	void Clear();
+	void Resize(ndInt32 count);
+	ndInt32 GetCapacity() const;
+
+	T& operator[] (ndInt32 i);
+	const T& operator[] (ndInt32 i) const;
+
+	//void Cleanup();
+	//void SyncSize(cl_context context, ndInt32 size);
+	//void ReadData(cl_command_queue commandQueue);
+	//void WriteData(cl_command_queue commandQueue);
+
+	T* m_array;
+	ndInt32 m_size;
+	ndInt32 m_capacity;
 };
 
+#if 0
 class ndCudaBodyBuffer
 {
 	public:
@@ -72,12 +84,12 @@ class ndCudaBodyBuffer
 	void DebudKernel(ndFloat32 timestepIn, const ndArray<ndBodyKinematic*>& bodyArray);
 #endif
 
-	ndCudaBuffer<ndCudaJacobian> m_transform;
-	ndCudaBuffer<ndCudaJacobian> m_veloc;
-	ndCudaBuffer<ndCudaJacobian> m_accel;
+	ndDeviceBuffer<ndCudaJacobian> m_transform;
+	ndDeviceBuffer<ndCudaJacobian> m_veloc;
+	ndDeviceBuffer<ndCudaJacobian> m_accel;
 };
 
-class ndCudaSystem: public ndClassAlloc
+class ndCudaContext: public ndClassAlloc
 {
 	public:
 	class ndKernel
@@ -93,8 +105,8 @@ class ndCudaSystem: public ndClassAlloc
 		size_t m_workWroupSize;
 	};
 
-	ndCudaSystem(cl_context context, cl_platform_id);
-	~ndCudaSystem();
+	ndCudaContext(cl_context context, cl_platform_id);
+	~ndCudaContext();
 
 	void Finish();
 	cl_program CompileProgram();
@@ -103,7 +115,7 @@ class ndCudaSystem: public ndClassAlloc
 	void SetKernel(const char* const name, ndKernel& kerner);
 	void ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndArray<ndBodyKinematic*>& bodyArray);
 
-	static ndCudaSystem* Singleton(ndInt32 driveNumber);
+	static ndCudaContext* CreateContext(ndInt32 driveNumber);
 
 	ndCudaBodyBuffer m_bodyArray;
 	char m_platformName[128];
@@ -121,35 +133,10 @@ class ndCudaSystem: public ndClassAlloc
 	ndInt32 m_computeUnits;
 };
 
-template<class T>
-ndCudaBuffer<T>::ndCudaBuffer(cl_mem_flags flags)
-	:ndArray<T>()
-	,m_gpuBuffer(nullptr)
-	,m_flags(flags)
-{
-}
+
 
 template<class T>
-ndCudaBuffer<T>::~ndCudaBuffer()
-{
-	dAssert(!m_gpuBuffer);
-}
-
-template<class T>
-void ndCudaBuffer<T>::Cleanup()
-{
-	if (m_gpuBuffer)
-	{
-		cl_int err = CL_SUCCESS;
-		err = clReleaseMemObject(m_gpuBuffer);
-		dAssert(err == CL_SUCCESS);
-		ndArray<T>::Resize(0);
-	}
-	m_gpuBuffer = nullptr;
-}
-
-template<class T>
-void ndCudaBuffer<T>::SyncSize(cl_context context, ndInt32 size)
+void ndDeviceBuffer<T>::SyncSize(cl_context context, ndInt32 size)
 {
 	cl_int err = CL_SUCCESS;
 
@@ -175,7 +162,7 @@ void ndCudaBuffer<T>::SyncSize(cl_context context, ndInt32 size)
 }
 
 template<class T>
-void ndCudaBuffer<T>::ReadData(cl_command_queue commandQueue)
+void ndDeviceBuffer<T>::ReadData(cl_command_queue commandQueue)
 {
 	cl_int err = CL_SUCCESS;
 	void* const destination = &(*this)[0];
@@ -187,7 +174,7 @@ void ndCudaBuffer<T>::ReadData(cl_command_queue commandQueue)
 }
 
 template<class T>
-void ndCudaBuffer<T>::WriteData(cl_command_queue commandQueue)
+void ndDeviceBuffer<T>::WriteData(cl_command_queue commandQueue)
 {
 	const void* const source = &(*this)[0];
 
@@ -200,13 +187,128 @@ void ndCudaBuffer<T>::WriteData(cl_command_queue commandQueue)
 }
 #endif
 
-
-class ndCudaSystem : public ndClassAlloc
+class ndCudaContext : public ndClassAlloc
 {
 	public: 
-	ndCudaSystem();
-	~ndCudaSystem();
-	static ndCudaSystem* Singleton();
+	ndCudaContext();
+	~ndCudaContext();
+	static ndCudaContext* CreateContext();
 
 	struct cudaDeviceProp m_prop;
+	ndDeviceBuffer<ndInt32> A;
+	ndDeviceBuffer<ndInt32> B;
+	ndDeviceBuffer<ndInt32> C;
 };
+
+template<class T>
+ndDeviceBuffer<T>::ndDeviceBuffer()
+	:m_array(nullptr)
+	,m_size(0)
+	,m_capacity(0)
+{
+}
+
+template<class T>
+ndDeviceBuffer<T>::~ndDeviceBuffer()
+{
+	if (m_array)
+	{
+		cudaError_t cudaStatus;
+		cudaStatus = cudaFree(m_array);
+		dAssert(cudaStatus == cudaSuccess);
+	}
+}
+
+template<class T>
+const T& ndDeviceBuffer<T>::operator[] (ndInt32 i) const
+{
+	dAssert(i >= 0);
+	dAssert(i < m_size);
+	return m_array[i];
+}
+
+template<class T>
+T& ndDeviceBuffer<T>::operator[] (ndInt32 i)
+{
+	dAssert(i >= 0);
+	dAssert(i < m_size);
+	return m_array[i];
+}
+
+template<class T>
+ndInt32 ndDeviceBuffer<T>::GetCount() const
+{
+	return m_size;
+}
+
+template<class T>
+void ndDeviceBuffer<T>::SetCount(ndInt32 count)
+{
+	while (count > m_capacity)
+	{
+		Resize(m_capacity * 2);
+	}
+	m_size = count;
+}
+
+template<class T>
+ndInt32 ndDeviceBuffer<T>::GetCapacity() const
+{
+	return m_capacity;
+}
+
+template<class T>
+void ndDeviceBuffer<T>::Clear()
+{
+	m_size = 0;
+}
+
+template<class T>
+void ndDeviceBuffer<T>::Resize(ndInt32 newSize)
+{
+	cudaError_t cudaStatus;
+	if (newSize > m_capacity || (m_capacity == 0))
+	{
+		T* newArray;
+		newSize = dMax(newSize, 16);
+		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
+		dAssert(cudaStatus == cudaSuccess);
+		if (m_array)
+		{
+			cudaStatus = cudaMemcpy(newArray, m_array, m_size * sizeof(T), cudaMemcpyDeviceToDevice);
+			dAssert(cudaStatus == cudaSuccess);
+			cudaStatus = cudaFree(m_array);
+			dAssert(cudaStatus == cudaSuccess);
+		}
+		m_array = newArray;
+		m_capacity = newSize;
+	}
+	else if (newSize < m_capacity)
+	{
+		newSize = dMax(newSize, 16);
+		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
+		if (m_array)
+		{
+			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
+			cudaStatus = cudaFree(m_array);
+			dAssert(cudaStatus == cudaSuccess);
+		}
+
+		m_capacity = newSize;
+		m_array = newArray;
+	}
+}
+
+
+//template<class T>
+//void ndDeviceBuffer<T>::Cleanup()
+//{
+//	if (m_gpuBuffer)
+//	{
+//		cl_int err = CL_SUCCESS;
+//		err = clReleaseMemObject(m_gpuBuffer);
+//		dAssert(err == CL_SUCCESS);
+//		ndArray<T>::Resize(0);
+//	}
+//	m_gpuBuffer = nullptr;
+//}

@@ -19,10 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndCudaSystem.h"
+#include "ndCudaContext.h"
 
 #if 0
-const char* ndCudaSystem::m_kernelSource = R""""(
+const char* ndCudaContext::m_kernelSource = R""""(
 
 //union dJacobian
 //{
@@ -497,7 +497,7 @@ void ndOpenclBodyBuffer::SetKernelParameters(cl_kernel kernel, ndFloat32 timeste
 	dAssert(err == CL_SUCCESS);
 }
 
-ndCudaSystem::ndCudaSystem(cl_context context, cl_platform_id)
+ndCudaContext::ndCudaContext(cl_context context, cl_platform_id)
 	:m_context(context)
 	,m_bodyArray()
 	,m_integrateBodiesPosition()
@@ -545,7 +545,7 @@ ndCudaSystem::ndCudaSystem(cl_context context, cl_platform_id)
 	SetKernel("IntegrateUnconstrainedBodies", m_integrateUnconstrainedBodies);
 }
 
-ndCudaSystem::~ndCudaSystem()
+ndCudaContext::~ndCudaContext()
 {
 	cl_int err = CL_SUCCESS;
 
@@ -574,7 +574,7 @@ ndCudaSystem::~ndCudaSystem()
 	dAssert(err == CL_SUCCESS);
 }
 
-ndCudaSystem* ndCudaSystem::Singleton(ndInt32 driveNumber)
+ndCudaContext* ndCudaContext::CreateContext(ndInt32 driveNumber)
 {
 	cl_uint numPlatforms = 0;
 	cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
@@ -621,10 +621,10 @@ ndCudaSystem* ndCudaSystem::Singleton(ndInt32 driveNumber)
 		return nullptr;
 	}
 
-	return new ndCudaSystem(context, bestPlatform);
+	return new ndCudaContext(context, bestPlatform);
 }
 
-cl_program ndCudaSystem::CompileProgram()
+cl_program ndCudaContext::CompileProgram()
 {
 	cl_int err = CL_SUCCESS;
 	const char* source[1];
@@ -647,7 +647,7 @@ cl_program ndCudaSystem::CompileProgram()
 	return program;
 }
 
-void ndCudaSystem::SetKernel(const char* const name, ndKernel& kerner)
+void ndCudaContext::SetKernel(const char* const name, ndKernel& kerner)
 {
 	cl_int err = CL_SUCCESS;
 
@@ -658,24 +658,24 @@ void ndCudaSystem::SetKernel(const char* const name, ndKernel& kerner)
 	dAssert(err == CL_SUCCESS);
 }
 
-void ndCudaSystem::Resize(const ndArray<ndInt32>& bodyArray)
+void ndCudaContext::Resize(const ndArray<ndInt32>& bodyArray)
 {
 	m_bodyArray.Resize(m_context, bodyArray);
 }
 
-void ndCudaSystem::CopyToGpu(const ndArray<ndInt32>& bodyArray)
+void ndCudaContext::CopyToGpu(const ndArray<ndInt32>& bodyArray)
 {
 	m_bodyArray.CopyToGpu(m_commandQueue, bodyArray);
 }
 
-void ndCudaSystem::Finish()
+void ndCudaContext::Finish()
 {
 	cl_int err = CL_SUCCESS;
 	err = clFinish(m_commandQueue);
 	dAssert(err == CL_SUCCESS);
 }
 
-void ndCudaSystem::ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndArray<ndBodyKinematic*>& bodyArray)
+void ndCudaContext::ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndArray<ndBodyKinematic*>& bodyArray)
 {
 	// let the driver decide the local work group size.
 	//size_t local = bodyArray.GetCount();
@@ -697,7 +697,7 @@ void ndCudaSystem::ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndArra
 }
 #endif
 
-ndCudaSystem::ndCudaSystem()
+ndCudaContext::ndCudaContext()
 	:ndClassAlloc()
 {
 	cudaError_t cudaStatus;
@@ -705,12 +705,12 @@ ndCudaSystem::ndCudaSystem()
 	dAssert(cudaStatus == cudaSuccess);
 }
 
-ndCudaSystem::~ndCudaSystem()
+ndCudaContext::~ndCudaContext()
 {
 
 }
 
-ndCudaSystem* ndCudaSystem::Singleton()
+ndCudaContext* ndCudaContext::CreateContext()
 {
 	//cl_uint numPlatforms = 0;
 	//cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
@@ -763,5 +763,5 @@ ndCudaSystem* ndCudaSystem::Singleton()
 		return nullptr;
 	}
 
-	return new ndCudaSystem();
+	return new ndCudaContext();
 }

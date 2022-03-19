@@ -31,7 +31,8 @@
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
-ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world, ndInt32 driverNumber)
+//ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world, ndInt32 driverNumber)
+ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world, ndInt32)
 	:ndDynamicsUpdate(world)
 	,m_opencl(nullptr)
 {

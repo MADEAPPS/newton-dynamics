@@ -37,7 +37,7 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
-//#define DEFAULT_SCENE	1		// gpu basic rigidbody
+#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
@@ -55,7 +55,7 @@
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-#define DEFAULT_SCENE	19		// inverted pendulum
+//#define DEFAULT_SCENE	19		// inverted pendulum
 //#define DEFAULT_SCENE	20		// quadruped robot
 //#define DEFAULT_SCENE	21		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture
@@ -359,10 +359,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	m_hideVisualMeshes = true;
+	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
-	m_autoSleepMode = false;
+	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndOpenclSolver1;
 	//m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
@@ -377,10 +377,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_showModelsDebugInfo = true;
+	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();

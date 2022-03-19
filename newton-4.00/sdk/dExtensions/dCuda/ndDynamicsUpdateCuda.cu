@@ -22,7 +22,7 @@
 #include "ndDynamicsUpdateCuda.h"
 #include "ndWorld.h"
 #include "ndModel.h"
-#include "ndCudaSystem.h"
+#include "ndCudaContext.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
@@ -31,44 +31,26 @@
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
-
 ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32)
 	:ndDynamicsUpdate(world)
-	,m_cuda(nullptr)
-	//:m_velocTol(ndFloat32(1.0e-8f))
-	//,m_islands(D_DEFAULT_BUFFER_SIZE)
-	//,m_jointForcesIndex(D_DEFAULT_BUFFER_SIZE)
-	//,m_internalForces(D_DEFAULT_BUFFER_SIZE)
-	//,m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
-	//,m_rightHandSide(D_DEFAULT_BUFFER_SIZE)
-	//,m_tempInternalForces(D_DEFAULT_BUFFER_SIZE)
-	//,m_bodyIslandOrder(D_DEFAULT_BUFFER_SIZE)
-	//,m_jointBodyPairIndexBuffer(D_DEFAULT_BUFFER_SIZE)
-	//,m_world(world)
-	//,m_timestep(ndFloat32(0.0f))
-	//,m_invTimestep(ndFloat32(0.0f))
-	//,m_firstPassCoef(ndFloat32(0.0f))
-	//,m_invStepRK(ndFloat32(0.0f))
-	//,m_timestepRK(ndFloat32(0.0f))
-	//,m_invTimestepRK(ndFloat32(0.0f))
-	//,m_solverPasses(0)
-	//,m_activeJointCount(0)
-	//,m_unConstrainedBodyCount(0)
+	,m_context(ndCudaContext::CreateContext())
 {
-	m_cuda = ndCudaSystem::Singleton();
+	m_context->A.SetCount(100);
+	m_context->B.SetCount(100);
+	m_context->C.SetCount(100);
 }
 
 ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
 {
-	if (m_cuda)
+	if (m_context)
 	{
-		delete m_cuda;
+		delete m_context;
 	}
 }
 
 const char* ndDynamicsUpdateCuda::GetStringId() const
 {
-	return m_cuda ? &m_cuda->m_prop.name[0] : "no cuda support";
+	return m_context ? &m_context->m_prop.name[0] : "no cuda support";
 }
 
 //void ndDynamicsUpdateCuda::Clear()
@@ -88,7 +70,7 @@ const char* ndDynamicsUpdateCuda::GetStringId() const
 //	D_TRACKTIME();
 //	class ndEvaluateKey
 //	{
-//	public:
+//		public:
 //		ndEvaluateKey(void* const context)
 //		{
 //			ndInt32 digit = *((ndInt32*)context);
@@ -1744,18 +1726,55 @@ void ndDynamicsUpdateCuda::CalculateForces()
 
 void ndDynamicsUpdateCuda::Update()
 {
-	D_TRACKTIME();
-	m_timestep = m_world->GetScene()->GetTimestep();
-
-	BuildIsland();
-	if (GetIslands().GetCount())
+	if (m_context)
 	{
-		IntegrateUnconstrainedBodies();
-		InitWeights();
-		InitBodyArray();
-		InitJacobianMatrix();
-		CalculateForces();
-		IntegrateBodies();
-		DetermineSleepStates();
+		DeviceUpdate();
 	}
+	else
+	{
+		ndDynamicsUpdate::Update();
+	}
+}
+
+template <typename T, typename Predicate>
+__global__ void addKernel(T* c, const T *a, const T *b, Predicate op)
+{
+	int i = threadIdx.x;
+	c[i] = op (a[i], b[i]);
+}
+
+void ndDynamicsUpdateCuda::TestCudaKernel()
+{
+	auto addValue = [] __device__ (int a, int b)
+	{
+		return a + b;
+	};
+
+	ndInt32* A = &m_context->A[0];
+	ndInt32* B = &m_context->B[0];
+	ndInt32* C = &m_context->C[0];
+	ndInt32 size = m_context->A.GetCount();
+	addKernel <<<1, size >>> (A, B, C, addValue);
+}
+
+void ndDynamicsUpdateCuda::DeviceUpdate()
+{
+	D_TRACKTIME();
+	//ndDynamicsUpdate::Update();
+
+
+	TestCudaKernel();
+	//m_timestep = m_world->GetScene()->GetTimestep();
+	//
+	//BuildIsland();
+	//if (GetIslands().GetCount())
+	//{
+	//	IntegrateUnconstrainedBodies();
+	//	InitWeights();
+	//	InitBodyArray();
+	//	InitJacobianMatrix();
+	//	CalculateForces();
+	//	IntegrateBodies();
+	//	DetermineSleepStates();
+	//}
 }

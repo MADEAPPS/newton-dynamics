@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-class ndCudaSystem;
+class ndCudaContext;
 
 class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 {
@@ -56,10 +56,14 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	void CalculateJointsAcceleration();
 	void IntegrateUnconstrainedBodies();
 
+	void DeviceUpdate();
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	ndCudaSystem* m_cuda;
+	public:
+	void TestCudaKernel();
+
+	ndCudaContext* m_context;
 };
 
 

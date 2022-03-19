@@ -36,33 +36,28 @@ include_directories(cuda/)
 
 file(GLOB CPP_SOURCE 
 	*.h
+	*.cu
 	*.cpp 
 	cuda/*.h
 	cuda/*.cu)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-#set_property(TARGET ${projectName} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
-#set_property(TARGET ${projectName} PROPERTY CUDA_ARCHITECTURES 35 50 72)
+
+Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")
+message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
+message ("cuda release options ${CMAKE_CUDA_FLAGS_DEBUG}")
 
 if(MSVC)
-	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /arch:AVX2")
-	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
-	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
 
 if(MINGW)
-	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mavx2 -mfma  ")
-	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma ")
-	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma")
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
 
 if(UNIX)
-	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
-	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
-	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
-
 	add_library(${projectName} SHARED ${CPP_SOURCE})
 endif()
 
