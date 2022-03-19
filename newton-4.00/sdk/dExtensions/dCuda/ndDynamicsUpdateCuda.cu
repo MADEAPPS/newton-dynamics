@@ -38,6 +38,16 @@ ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32)
 	m_context->A.SetCount(100);
 	m_context->B.SetCount(100);
 	m_context->C.SetCount(100);
+
+	ndArray<ndInt32> xxxx;
+	for (ndInt32 i = 0; i < 100; i++)
+	{
+		xxxx.PushBack(i);
+	}
+
+	m_context->A.ReadData(&xxxx[0], 100);
+	m_context->B.ReadData(&xxxx[0], 100);
+	m_context->C.ReadData(&xxxx[0], 100);
 }
 
 ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
@@ -1754,14 +1764,19 @@ void ndDynamicsUpdateCuda::TestCudaKernel()
 	ndInt32* B = &m_context->B[0];
 	ndInt32* C = &m_context->C[0];
 	ndInt32 size = m_context->A.GetCount();
+
 	addKernel <<<1, size >>> (A, B, C, addValue);
+
+	ndFixSizeArray<ndInt32, 100> xxxxx;
+	m_context->A.WriteData(&xxxxx[0], 100);
+	m_context->B.WriteData(&xxxxx[0], 100);
+	m_context->C.WriteData(&xxxxx[0], 100);
 }
 
 void ndDynamicsUpdateCuda::DeviceUpdate()
 {
 	D_TRACKTIME();
 	//ndDynamicsUpdate::Update();
-
 
 	TestCudaKernel();
 	//m_timestep = m_world->GetScene()->GetTimestep();

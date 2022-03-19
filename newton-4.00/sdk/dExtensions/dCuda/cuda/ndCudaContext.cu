@@ -703,6 +703,9 @@ ndCudaContext::ndCudaContext()
 	cudaError_t cudaStatus;
 	cudaStatus = cudaGetDeviceProperties(&m_prop, 0);
 	dAssert(cudaStatus == cudaSuccess);
+
+	cudaStatus = cudaSetDevice(0);
+	dAssert(cudaStatus == cudaSuccess);
 }
 
 ndCudaContext::~ndCudaContext()

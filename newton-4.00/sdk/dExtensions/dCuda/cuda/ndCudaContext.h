@@ -45,10 +45,8 @@ class ndDeviceBuffer
 	T& operator[] (ndInt32 i);
 	const T& operator[] (ndInt32 i) const;
 
-	//void Cleanup();
-	//void SyncSize(cl_context context, ndInt32 size);
-	//void ReadData(cl_command_queue commandQueue);
-	//void WriteData(cl_command_queue commandQueue);
+	void ReadData(const T* const src, ndInt32 elements);
+	void WriteData(T* const dst, ndInt32 elements) const;
 
 	T* m_array;
 	ndInt32 m_size;
@@ -213,9 +211,7 @@ ndDeviceBuffer<T>::~ndDeviceBuffer()
 {
 	if (m_array)
 	{
-		cudaError_t cudaStatus;
-		cudaStatus = cudaFree(m_array);
-		dAssert(cudaStatus == cudaSuccess);
+		cudaFree(m_array);
 	}
 }
 
@@ -299,16 +295,17 @@ void ndDeviceBuffer<T>::Resize(ndInt32 newSize)
 	}
 }
 
+template<class T>
+void ndDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements)
+{
+	dAssert(elements <= m_size);
+	cudaMemcpy(m_array, src, sizeof (T) * elements, cudaMemcpyHostToDevice);
+}
 
-//template<class T>
-//void ndDeviceBuffer<T>::Cleanup()
-//{
-//	if (m_gpuBuffer)
-//	{
-//		cl_int err = CL_SUCCESS;
-//		err = clReleaseMemObject(m_gpuBuffer);
-//		dAssert(err == CL_SUCCESS);
-//		ndArray<T>::Resize(0);
-//	}
-//	m_gpuBuffer = nullptr;
-//}
+template<class T>
+void ndDeviceBuffer<T>::WriteData(T* const dst, ndInt32 elements) const
+{
+	dAssert(elements <= m_size);
+	cudaMemcpy(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost);
+}
+
