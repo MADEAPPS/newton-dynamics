@@ -37,6 +37,9 @@ ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32)
 	//,m_opencl(nullptr)
 {
 	//m_opencl = ndOpenclSystem::Singleton(driverNumber);
+
+	extern int test_main();
+	test_main();
 }
 
 ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
