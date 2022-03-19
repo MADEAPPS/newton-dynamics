@@ -1,4 +1,4 @@
-﻿
+﻿#include <cuda.h>
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -21,6 +21,14 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size)
     int *dev_b = 0;
     int *dev_c = 0;
     cudaError_t cudaStatus;
+
+	int count;
+	cudaStatus = cudaGetDeviceCount(&count);
+
+	struct cudaDeviceProp prop;
+	cudaStatus = cudaGetDeviceProperties(&prop, 0);
+
+	
 
     // Choose which GPU to run on, change this on a multi-GPU system.
     cudaStatus = cudaSetDevice(0);

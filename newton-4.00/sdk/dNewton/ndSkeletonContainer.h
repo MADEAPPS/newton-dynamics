@@ -177,6 +177,7 @@ class ndSkeletonContainer
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateCuda;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const

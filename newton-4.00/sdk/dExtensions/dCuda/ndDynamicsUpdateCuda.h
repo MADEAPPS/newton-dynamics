@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-//class ndOpenclSystem;
+class ndCudaSystem;
 
 class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 {
@@ -59,7 +59,7 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	//ndOpenclSystem* m_opencl;
+	ndCudaSystem* m_cuda;
 };
 
 
