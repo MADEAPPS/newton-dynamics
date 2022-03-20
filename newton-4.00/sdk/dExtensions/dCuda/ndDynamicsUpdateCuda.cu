@@ -29,7 +29,10 @@
 #include <ndDynamicsUpdateSoa.h>
 #include <ndJointBilateralConstraint.h>
 
-#include "ndCudaUtils.h"
+#include "cuQuat.h"
+#include "cuVector3.h"
+#include "cuVector4.h"
+#include "cuMatrix3x3.h"
 #include "ndCudaContext.h"
 #include "ndCudaKernels.h"
 #include "ndDynamicsUpdateCuda.h"
@@ -675,6 +678,10 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 
 	auto IntegrateUnconstrainedBodies = [] __device__(ndBodyProxi& body)
 	{
+		cuVector3 xxx(1.0, 2.0, 3.0);
+		cuVector3 xxx1(xxx + xxx);
+		//matrix3x3 matrix = dQuatToMatrix(body.m_rotation);
+		cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
 	};
 
 	if (GetUnconstrainedBodyCount())
@@ -1793,7 +1800,7 @@ void ndDynamicsUpdateCuda::LoadBodyData()
 	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
-		gpuBodyBuffer.m_dataView[i].m_rotation = VectorToFloat4(body->GetRotation());
+		gpuBodyBuffer.m_dataView[i].m_rotation = cuQuat(body->GetRotation());
 	}
 
 	gpuBodyBuffer.ReadData(&gpuBodyBuffer[0], gpuBodyBuffer.GetCount());

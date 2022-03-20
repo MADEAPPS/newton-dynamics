@@ -19,45 +19,58 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_BODY_BUFFER_H__
-#define __ND_BODY_BUFFER_H__
+#ifndef __ND_CUVECTOR4_H__
+#define __ND_CUVECTOR4_H__
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <ndNewtonStdafx.h>
-
-#include "cuQuat.h"
 #include "cuVector3.h"
-#include "cuVector4.h"
-#include "cuMatrix3x3.h"
-#include "cuDeviceBuffer.h"
 
-class ndBodyProxi
+class cuVector4: public cuVector3
 {
 	public:
-	//float4 m_rotation;
-	cuQuat m_rotation;
+	inline __device__ cuVector4()
+	{
+	}
+
+	inline __device__ cuVector4(float x)
+		:cuVector3(x)
+		,m_w(x)
+	{
+	}
+
+	inline __device__ cuVector4(float x, float y, float z, float w)
+		:cuVector3(x, y, z)
+		,m_w(w)
+	{
+	}
+
+	inline __device__ cuVector4(const cuVector4& src)
+		:cuVector3(src)
+		,m_w(src.m_w)
+	{
+	}
+
+	inline cuVector4(const ndVector& src)
+		:cuVector3(src)
+		,m_w(src.m_w)
+	{
+	}
+
+	inline ndVector ToNdVector(const cuVector4& src) const
+	{
+		return ndVector(src.m_x, src.m_y, src.m_z, src.m_w);
+	}
+	
+	inline cuVector4 __device__ operator+ (const cuVector4& A) const
+	{
+		return cuVector4(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
+	}
+
+	inline cuVector4 __device__ operator* (const cuVector4& A) const
+	{
+		return cuVector4(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
+	}
+
+	float m_w;
 };
 
-class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxi>
-{
-	public:
-	ndBodyBuffer();
-	~ndBodyBuffer();
-
-	//cuDeviceBuffer<ndCudaJacobian> m_transform;
-	//cuDeviceBuffer<ndCudaJacobian> m_veloc;
-	//cuDeviceBuffer<ndCudaJacobian> m_accel;
-	ndArray<ndBodyProxi> m_dataView;
-};
-
-
-inline ndBodyBuffer::ndBodyBuffer()
-	:cuDeviceBuffer<ndBodyProxi>()
-{
-}
-
-inline ndBodyBuffer::~ndBodyBuffer()
-{
-}
 #endif

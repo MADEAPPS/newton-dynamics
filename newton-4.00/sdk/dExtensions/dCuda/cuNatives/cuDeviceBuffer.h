@@ -25,14 +25,13 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
-//#include <device_launch_parameters.h>
 
 template<class T>
-class ndDeviceBuffer
+class cuDeviceBuffer
 {
 	public:
-	ndDeviceBuffer();
-	~ndDeviceBuffer();
+	cuDeviceBuffer();
+	~cuDeviceBuffer();
 
 	ndInt32 GetCount() const;
 	void SetCount(ndInt32 count);
@@ -54,7 +53,7 @@ class ndDeviceBuffer
 
 
 template<class T>
-ndDeviceBuffer<T>::ndDeviceBuffer()
+cuDeviceBuffer<T>::cuDeviceBuffer()
 	:m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -62,7 +61,7 @@ ndDeviceBuffer<T>::ndDeviceBuffer()
 }
 
 template<class T>
-ndDeviceBuffer<T>::~ndDeviceBuffer()
+cuDeviceBuffer<T>::~cuDeviceBuffer()
 {
 	if (m_array)
 	{
@@ -71,7 +70,7 @@ ndDeviceBuffer<T>::~ndDeviceBuffer()
 }
 
 template<class T>
-const T& ndDeviceBuffer<T>::operator[] (ndInt32 i) const
+const T& cuDeviceBuffer<T>::operator[] (ndInt32 i) const
 {
 	dAssert(i >= 0);
 	dAssert(i < m_size);
@@ -79,7 +78,7 @@ const T& ndDeviceBuffer<T>::operator[] (ndInt32 i) const
 }
 
 template<class T>
-T& ndDeviceBuffer<T>::operator[] (ndInt32 i)
+T& cuDeviceBuffer<T>::operator[] (ndInt32 i)
 {
 	dAssert(i >= 0);
 	dAssert(i < m_size);
@@ -87,13 +86,13 @@ T& ndDeviceBuffer<T>::operator[] (ndInt32 i)
 }
 
 template<class T>
-ndInt32 ndDeviceBuffer<T>::GetCount() const
+ndInt32 cuDeviceBuffer<T>::GetCount() const
 {
 	return m_size;
 }
 
 template<class T>
-void ndDeviceBuffer<T>::SetCount(ndInt32 count)
+void cuDeviceBuffer<T>::SetCount(ndInt32 count)
 {
 	while (count > m_capacity)
 	{
@@ -103,19 +102,19 @@ void ndDeviceBuffer<T>::SetCount(ndInt32 count)
 }
 
 template<class T>
-ndInt32 ndDeviceBuffer<T>::GetCapacity() const
+ndInt32 cuDeviceBuffer<T>::GetCapacity() const
 {
 	return m_capacity;
 }
 
 template<class T>
-void ndDeviceBuffer<T>::Clear()
+void cuDeviceBuffer<T>::Clear()
 {
 	m_size = 0;
 }
 
 template<class T>
-void ndDeviceBuffer<T>::Resize(ndInt32 newSize)
+void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 {
 	cudaError_t cudaStatus;
 	if (newSize > m_capacity || (m_capacity == 0))
@@ -151,14 +150,14 @@ void ndDeviceBuffer<T>::Resize(ndInt32 newSize)
 }
 
 template<class T>
-void ndDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements)
+void cuDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements)
 {
 	dAssert(elements <= m_size);
 	cudaMemcpy(m_array, src, sizeof (T) * elements, cudaMemcpyHostToDevice);
 }
 
 template<class T>
-void ndDeviceBuffer<T>::WriteData(T* const dst, ndInt32 elements) const
+void cuDeviceBuffer<T>::WriteData(T* const dst, ndInt32 elements) const
 {
 	dAssert(elements <= m_size);
 	cudaMemcpy(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost);
