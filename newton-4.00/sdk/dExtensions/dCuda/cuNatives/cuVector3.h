@@ -62,10 +62,46 @@ class cuVector3
 	{
 	}
 
-	
+	inline float __device__ GetElement (int i) const
+	{
+		return (&m_x)[i];
+	}
+
+	inline void __device__ SetElement(int i, float val)
+	{
+		(&m_x)[i] = val;
+	}
+
+	inline float __device__ AddHorizontal() const
+	{
+		return m_x + m_y + m_z;
+	}
+
+	inline cuVector3 __device__ Scale (float s) const
+	{
+		return cuVector3(m_x * s, m_y * s , m_z * s);
+	}
+
+	inline cuVector3 __device__ CrossProduct(const cuVector3& B) const
+	{
+		return cuVector3(m_y * B.m_z - m_z * B.m_y,
+						 m_z * B.m_x - m_x * B.m_z,
+						 m_x * B.m_y - m_y * B.m_x);
+	}
+
 	inline cuVector3 __device__ operator+ (const cuVector3& A) const
 	{
 		return cuVector3(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z);
+	}
+
+	inline cuVector3 __device__ operator- (const cuVector3& A) const
+	{
+		return cuVector3(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z);
+	}
+
+	inline cuVector3 __device__ operator* (const cuVector3& A) const
+	{
+		return cuVector3(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z);
 	}
 
 	float m_x;

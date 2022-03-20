@@ -202,8 +202,8 @@ class ndVector
 	inline ndVector CrossProduct (const ndVector& B) const
 	{
 		return ndVector (m_y * B.m_z - m_z * B.m_y,
-			m_z * B.m_x - m_x * B.m_z,
-			m_x * B.m_y - m_y * B.m_x, m_w);
+						 m_z * B.m_x - m_x * B.m_z,
+						 m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
 	inline ndVector CrossProduct (const ndVector& A, const ndVector& B) const

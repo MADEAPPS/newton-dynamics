@@ -230,7 +230,6 @@ class ndBodyKinematic : public ndBody
 } D_GCC_NEWTON_ALIGN_32;
 
 
-//class ndBodySentinel : public ndBodyDynamic
 class ndBodySentinel : public ndBodyKinematic
 {
 	ndBodySentinel* GetAsBodySentinel() { return this; }

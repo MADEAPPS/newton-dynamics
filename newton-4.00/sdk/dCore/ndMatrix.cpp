@@ -275,7 +275,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 
 		for (ndInt32 j = i + 1; j < 4; j++) 
 		{
-			ndVector scale(tmp[j][i] / tmp[i][i]);
+			const ndVector scale(tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
 			ret[j] -= ret[i] * scale.GetScalar();
 			tmp[j][i] = ndFloat32(0.0f);
@@ -284,7 +284,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 
 	for (ndInt32 i = 3; i >= 0; i--) 
 	{
-		ndVector pivot(tmp[i] * ret);
+		const ndVector pivot(tmp[i] * ret);
 		ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
 	}
 

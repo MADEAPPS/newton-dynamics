@@ -518,11 +518,10 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 		
 		// and solving for alpha we get the angular acceleration at t + dt
 		// calculate gradient at a full time step
-		ndVector gradientStep(localTorque.Scale(timestep));
+		//const ndVector gradient(localTorque.Scale(timestep));
 		
 		// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 		const ndVector dw(localOmega.Scale(ndFloat32(0.5f) * timestep));
-		//ndVector dw(localOmega.Scale(ndFloat32(1.0f) * timestep));
 		
 		// calculates Jacobian matrix (
 		//		dWx / dwx, dWx / dwy, dWx / dwz
@@ -538,8 +537,7 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 			ndVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, ndFloat32(0.0f)),
 			ndVector::m_wOne);
 		
-		gradientStep = jacobianMatrix.SolveByGaussianElimination(gradientStep);
-		
+		const ndVector gradientStep (jacobianMatrix.SolveByGaussianElimination(localTorque.Scale(timestep)));
 		localOmega += gradientStep;
 		
 		const ndVector alpha(m_matrix.RotateVector(localTorque * m_invMass));

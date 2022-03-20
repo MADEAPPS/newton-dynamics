@@ -35,8 +35,99 @@
 class ndBodyProxi
 {
 	public:
-	//float4 m_rotation;
+
+	inline cuMatrix3x3 __device__ CalculateInvInertiaMatrix(const cuMatrix3x3& matrix) const
+	{
+		const cuVector3 invIxx(m_invIntertia.GetElement(0));
+		const cuVector3 invIyy(m_invIntertia.GetElement(1));
+		const cuVector3 invIzz(m_invIntertia.GetElement(2));
+		return cuMatrix3x3(
+			matrix.m_front.Scale(matrix.m_front.GetElement(0)) * invIxx +
+			matrix.m_up.Scale(matrix.m_up.GetElement(0))	* invIyy +
+			matrix.m_right.Scale(matrix.m_right.GetElement(0)) * invIzz,
+
+			matrix.m_front.Scale(matrix.m_front.GetElement(1)) * invIxx +
+			matrix.m_up.Scale(matrix.m_up.GetElement(1))	* invIyy +
+			matrix.m_right.Scale(matrix.m_right.GetElement(1)) * invIzz,
+
+			matrix.m_front.Scale(matrix.m_front.GetElement(2)) * invIxx +
+			matrix.m_up.Scale(matrix.m_up.GetElement(2))	* invIyy +
+			matrix.m_right.Scale(matrix.m_right.GetElement(2)) * invIzz);
+	}
+
+	inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix, float timestep)
+	{
+		const cuVector3 omegaDamp(m_dampCoef);
+		const cuVector3 omega(matrix.UnrotateVector(m_omega) * omegaDamp);
+		m_omega = matrix.RotateVector(omega);
+		m_veloc = m_veloc.Scale(m_dampCoef.m_w);
+	}
+
+	inline void __device__ IntegrateExternalForce(const cuMatrix3x3& matrix, float timestep)
+	{
+		//if (!m_equilibrium && (m_invMass.m_w > ndFloat32(0.0f)))
+		{
+			//const ndVector accel(GetForce().Scale(m_invMass.m_w));
+			//const ndVector torque(GetTorque());
+			const cuVector3 accel(0.0);
+			const cuVector3 torque(0.0);
+			
+			cuVector3 localOmega(matrix.UnrotateVector(m_omega));
+			const cuVector3 localAngularMomentum(localOmega * m_mass);
+			const cuVector3 angularMomentum(matrix.RotateVector(localAngularMomentum));
+			const cuVector3 gyroTorque(m_omega.CrossProduct(angularMomentum));
+			const cuVector3 localTorque(matrix.UnrotateVector(torque - gyroTorque));
+			
+			// and solving for alpha we get the angular acceleration at t + dt
+			// calculate gradient at a full time step
+			//cuVector3 gradientStep(localTorque.Scale(timestep));
+			
+			// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
+			const cuVector3 dw(localOmega.Scale(0.5f * timestep));
+			
+			const cuMatrix3x3 jacobianMatrix(
+				cuVector3(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y),
+				cuVector3((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x),
+				cuVector3((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z));
+	
+			const cuVector3 gradientStep (jacobianMatrix.SolveByGaussianElimination(localTorque.Scale(timestep)));
+			
+			localOmega = localOmega + gradientStep;
+			
+			const cuVector3 alpha(matrix.RotateVector(localTorque * m_invIntertia));
+			
+			//SetAccel(accel);
+			//SetAlpha(alpha);
+			m_veloc = m_veloc + accel.Scale(timestep);
+			m_omega = matrix.RotateVector(localOmega);
+		}
+		//else
+		//{
+		//	SetAccel(ndVector::m_zero);
+		//	SetAlpha(ndVector::m_zero);
+		//}
+	}
+
+
+	void LoadData(ndBodyKinematic* const body)
+	{
+		m_mass = body->GetMassMatrix();
+		m_rotation = cuQuat(body->GetRotation());
+		m_posit = body->GetGlobalGetCentreOfMass();
+		m_invIntertia = body->GetInvInertia();
+		m_dampCoef = body->GetAngularDamping();
+		m_dampCoef.m_w = body->GetLinearDamping();
+		m_veloc = body->GetVelocity();
+		m_omega = body->GetOmega();
+	}
+
+	cuVector4 m_mass;
 	cuQuat m_rotation;
+	cuVector4 m_dampCoef;
+	cuVector4 m_invIntertia;
+	cuVector3 m_posit;
+	cuVector3 m_veloc;
+	cuVector3 m_omega;
 };
 
 class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxi>

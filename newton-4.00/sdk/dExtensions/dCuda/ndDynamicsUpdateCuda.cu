@@ -678,10 +678,11 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 
 	auto IntegrateUnconstrainedBodies = [] __device__(ndBodyProxi& body)
 	{
-		cuVector3 xxx(1.0, 2.0, 3.0);
-		cuVector3 xxx1(xxx + xxx);
-		//matrix3x3 matrix = dQuatToMatrix(body.m_rotation);
-		cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
+		float timestep = 1.0 / 128.0f;
+		const cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
+		//cuMatrix3x3 invInertia(body.CalculateInvInertiaMatrix(matrix));
+		body.AddDampingAcceleration(matrix, timestep);
+		body.IntegrateExternalForce(matrix, timestep);
 	};
 
 	if (GetUnconstrainedBodyCount())
@@ -1800,7 +1801,7 @@ void ndDynamicsUpdateCuda::LoadBodyData()
 	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
-		gpuBodyBuffer.m_dataView[i].m_rotation = cuQuat(body->GetRotation());
+		gpuBodyBuffer.m_dataView[i].LoadData(body);
 	}
 
 	gpuBodyBuffer.ReadData(&gpuBodyBuffer[0], gpuBodyBuffer.GetCount());
