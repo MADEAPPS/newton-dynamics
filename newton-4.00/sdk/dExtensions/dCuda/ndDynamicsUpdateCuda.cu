@@ -19,35 +19,38 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDynamicsUpdateCuda.h"
-#include "ndWorld.h"
-#include "ndModel.h"
+#include <ndWorld.h>
+#include <ndModel.h>
+#include <ndWorldScene.h>
+#include <ndBodyDynamic.h>
+#include <ndSkeletonList.h>
+#include <ndDynamicsUpdate.h>
+#include <ndBodyParticleSet.h>
+#include <ndDynamicsUpdateSoa.h>
+#include <ndJointBilateralConstraint.h>
+
+#include "ndCudaUtils.h"
 #include "ndCudaContext.h"
-#include "ndWorldScene.h"
-#include "ndBodyDynamic.h"
-#include "ndSkeletonList.h"
-#include "ndDynamicsUpdate.h"
-#include "ndBodyParticleSet.h"
-#include "ndDynamicsUpdateSoa.h"
-#include "ndJointBilateralConstraint.h"
+#include "ndCudaKernels.h"
+#include "ndDynamicsUpdateCuda.h"
 
 ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32)
 	:ndDynamicsUpdate(world)
 	,m_context(ndCudaContext::CreateContext())
 {
-	m_context->A.SetCount(100);
-	m_context->B.SetCount(100);
-	m_context->C.SetCount(100);
-
-	ndArray<ndInt32> xxxx;
-	for (ndInt32 i = 0; i < 100; i++)
-	{
-		xxxx.PushBack(i);
-	}
-
-	m_context->A.ReadData(&xxxx[0], 100);
-	m_context->B.ReadData(&xxxx[0], 100);
-	m_context->C.ReadData(&xxxx[0], 100);
+	//m_context->A.SetCount(100);
+	//m_context->B.SetCount(100);
+	//m_context->C.SetCount(100);
+	//
+	//ndArray<ndInt32> xxxx;
+	//for (ndInt32 i = 0; i < 100; i++)
+	//{
+	//	xxxx.PushBack(i);
+	//}
+	//
+	//m_context->A.ReadData(&xxxx[0], 100);
+	//m_context->B.ReadData(&xxxx[0], 100);
+	//m_context->C.ReadData(&xxxx[0], 100);
 }
 
 ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
@@ -651,29 +654,39 @@ void ndDynamicsUpdateCuda::BuildIsland()
 void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 {
 	ndScene* const scene = m_world->GetScene();
-	auto IntegrateUnconstrainedBodies = ndMakeObject::ndFunction([this, &scene](ndInt32 threadIndex, ndInt32 threadCount)
+	auto IntegrateUnconstrainedBodies___ = ndMakeObject::ndFunction([this, &scene](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
+
+		const ndFloat32 timestep = scene->GetTimestep();
+		const ndInt32 base = bodyArray.GetCount() - GetUnconstrainedBodyCount();
+
+		const ndStartEnd startEnd(GetUnconstrainedBodyCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			D_TRACKTIME();
-			ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
+			ndBodyKinematic* const body = bodyArray[base + i];
+			dAssert(body);
+			body->UpdateInvInertiaMatrix();
+			body->AddDampingAcceleration(timestep);
+			body->IntegrateExternalForce(timestep);
+		}
+	});
 
-			const ndFloat32 timestep = scene->GetTimestep();
-			const ndInt32 base = bodyArray.GetCount() - GetUnconstrainedBodyCount();
-
-			const ndStartEnd startEnd(GetUnconstrainedBodyCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyKinematic* const body = bodyArray[base + i];
-				dAssert(body);
-				body->UpdateInvInertiaMatrix();
-				body->AddDampingAcceleration(timestep);
-				body->IntegrateExternalForce(timestep);
-			}
-		});
+	auto IntegrateUnconstrainedBodies = [] __device__(ndBodyProxi& body)
+	{
+	};
 
 	if (GetUnconstrainedBodyCount())
 	{
 		D_TRACKTIME();
-		scene->ParallelExecute(IntegrateUnconstrainedBodies);
+		ndInt32 threadsPerBlock = 256;
+		ndInt32 threads = m_context->m_bodyBuffer.GetCount();
+		ndInt32 blocks = (threads - 1) / threadsPerBlock + 1;
+		ndBodyProxi* bodies = &m_context->m_bodyBuffer[0];
+		
+		//scene->ParallelExecute(IntegrateUnconstrainedBodies);
+		CudaKernel <<<blocks, threadsPerBlock>>> (IntegrateUnconstrainedBodies, bodies, threads);
 	}
 }
 
@@ -693,32 +706,32 @@ void ndDynamicsUpdateCuda::InitWeights()
 	ndInt32 extraPassesArray[D_MAX_THREADS_COUNT];
 
 	auto InitWeights = ndMakeObject::ndFunction([this, &bodyArray, &extraPassesArray](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			const ndArray<ndInt32>& jointForceIndexBuffer = GetJointForceIndexBuffer();
-			const ndArray<ndJointBodyPairIndex>& jointBodyPairIndex = GetJointBodyPairIndexBuffer();
+	{
+		D_TRACKTIME();
+		const ndArray<ndInt32>& jointForceIndexBuffer = GetJointForceIndexBuffer();
+		const ndArray<ndJointBodyPairIndex>& jointBodyPairIndex = GetJointBodyPairIndexBuffer();
 
-			ndInt32 maxExtraPasses = 1;
-			const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 1, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		ndInt32 maxExtraPasses = 1;
+		const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			const ndInt32 index = jointForceIndexBuffer[i];
+			const ndJointBodyPairIndex& scan = jointBodyPairIndex[index];
+			ndBodyKinematic* const body = bodyArray[scan.m_body];
+			dAssert(body->m_index == scan.m_body);
+			dAssert(body->m_bodyIsConstrained <= 1);
+			const ndInt32 count = jointForceIndexBuffer[i + 1] - index - 1;
+			const ndInt32 mask = -ndInt32(body->m_bodyIsConstrained & ~body->m_isStatic);
+			const ndInt32 weigh = 1 + (mask & count);
+			dAssert(weigh >= 0);
+			if (weigh)
 			{
-				const ndInt32 index = jointForceIndexBuffer[i];
-				const ndJointBodyPairIndex& scan = jointBodyPairIndex[index];
-				ndBodyKinematic* const body = bodyArray[scan.m_body];
-				dAssert(body->m_index == scan.m_body);
-				dAssert(body->m_bodyIsConstrained <= 1);
-				const ndInt32 count = jointForceIndexBuffer[i + 1] - index - 1;
-				const ndInt32 mask = -ndInt32(body->m_bodyIsConstrained & ~body->m_isStatic);
-				const ndInt32 weigh = 1 + (mask & count);
-				dAssert(weigh >= 0);
-				if (weigh)
-				{
-					body->m_weigh = ndFloat32(weigh);
-				}
-				maxExtraPasses = dMax(weigh, maxExtraPasses);
+				body->m_weigh = ndFloat32(weigh);
 			}
-			extraPassesArray[threadIndex] = maxExtraPasses;
-		});
+			maxExtraPasses = dMax(weigh, maxExtraPasses);
+		}
+		extraPassesArray[threadIndex] = maxExtraPasses;
+	});
 	scene->ParallelExecute(InitWeights);
 
 	ndInt32 extraPasses = 0;
@@ -1746,31 +1759,44 @@ void ndDynamicsUpdateCuda::Update()
 	}
 }
 
-template <typename T, typename Predicate>
-__global__ void addKernel(T* c, const T *a, const T *b, Predicate op)
-{
-	int i = threadIdx.x;
-	c[i] = op (a[i], b[i]);
-}
+//void ndDynamicsUpdateCuda::TestCudaKernel()
+//{
+//	auto addValue = [] __device__ (int a, int b)
+//	{
+//		return a + b;
+//	};
+//
+//	ndInt32* A = &m_context->A[0];
+//	ndInt32* B = &m_context->B[0];
+//	ndInt32* C = &m_context->C[0];
+//	ndInt32 size = m_context->A.GetCount();
+//
+//	CudaHelloWorld <<<1, size >>> (A, B, C, addValue);
+//
+//	ndFixSizeArray<ndInt32, 100> xxxxx;
+//	m_context->A.WriteData(&xxxxx[0], 100);
+//	m_context->B.WriteData(&xxxxx[0], 100);
+//	m_context->C.WriteData(&xxxxx[0], 100);
+//}
 
-void ndDynamicsUpdateCuda::TestCudaKernel()
+void ndDynamicsUpdateCuda::LoadBodyData()
 {
-	auto addValue = [] __device__ (int a, int b)
+	ndScene* const scene = m_world->GetScene();
+	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	const ndInt32 bodyCount = bodyArray.GetCount();
+
+	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+
+	gpuBodyBuffer.SetCount(bodyCount);
+	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
+
+	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
-		return a + b;
-	};
+		ndBodyKinematic* const body = bodyArray[i];
+		gpuBodyBuffer.m_dataView[i].m_rotation = VectorToFloat4(body->GetRotation());
+	}
 
-	ndInt32* A = &m_context->A[0];
-	ndInt32* B = &m_context->B[0];
-	ndInt32* C = &m_context->C[0];
-	ndInt32 size = m_context->A.GetCount();
-
-	addKernel <<<1, size >>> (A, B, C, addValue);
-
-	ndFixSizeArray<ndInt32, 100> xxxxx;
-	m_context->A.WriteData(&xxxxx[0], 100);
-	m_context->B.WriteData(&xxxxx[0], 100);
-	m_context->C.WriteData(&xxxxx[0], 100);
+	gpuBodyBuffer.ReadData(&gpuBodyBuffer[0], gpuBodyBuffer.GetCount());
 }
 
 void ndDynamicsUpdateCuda::DeviceUpdate()
@@ -1778,18 +1804,19 @@ void ndDynamicsUpdateCuda::DeviceUpdate()
 	D_TRACKTIME();
 	//ndDynamicsUpdate::Update();
 
-	TestCudaKernel();
-	//m_timestep = m_world->GetScene()->GetTimestep();
-	//
-	//BuildIsland();
-	//if (GetIslands().GetCount())
-	//{
-	//	IntegrateUnconstrainedBodies();
+	//TestCudaKernel();
+	LoadBodyData();
+	m_timestep = m_world->GetScene()->GetTimestep();
+	
+	BuildIsland();
+	if (GetIslands().GetCount())
+	{
+		IntegrateUnconstrainedBodies();
 	//	InitWeights();
 	//	InitBodyArray();
 	//	InitJacobianMatrix();
 	//	CalculateForces();
 	//	IntegrateBodies();
 	//	DetermineSleepStates();
-	//}
+	}
 }

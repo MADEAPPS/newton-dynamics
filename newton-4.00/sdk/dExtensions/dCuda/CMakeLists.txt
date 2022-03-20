@@ -34,14 +34,8 @@ include_directories(../../dNewton/dModels/dCharacter)
 include_directories(./)
 include_directories(cuda/)
 
-file(GLOB CPP_SOURCE 
-	*.h
-	*.cu
-	*.cpp 
-	cuda/*.h
-	cuda/*.cu)
+file(GLOB CPP_SOURCE *.h *.cu *.cpp)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
-
 
 Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --extended-lambda")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")

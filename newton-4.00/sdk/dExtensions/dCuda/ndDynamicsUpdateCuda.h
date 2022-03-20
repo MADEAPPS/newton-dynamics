@@ -22,8 +22,8 @@
 #ifndef __D_WORLD_DYNAMICS_UPDATE_CUDA_H__
 #define __D_WORLD_DYNAMICS_UPDATE_CUDA_H__
 
-#include "ndNewtonStdafx.h"
-#include "ndDynamicsUpdate.h"
+#include <ndNewtonStdafx.h>
+#include <ndDynamicsUpdate.h>
 
 class ndCudaContext;
 
@@ -38,7 +38,7 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	protected:
 	virtual void Update();
 
-	private:
+	public:
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
@@ -60,11 +60,14 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	public:
-	void TestCudaKernel();
+	void LoadBodyData();
+
+	
+	//void TestCudaKernel();
 
 	ndCudaContext* m_context;
 };
+
 
 
 #endif
