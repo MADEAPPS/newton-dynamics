@@ -64,6 +64,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API ndFloat32 GetLinearDamping() const;
 	D_NEWTON_API void SetLinearDamping(ndFloat32 linearDamp);
 
+	D_NEWTON_API ndVector GetCachedDamping() const;
 	D_NEWTON_API ndVector GetAngularDamping() const;
 	D_NEWTON_API void SetAngularDamping(const ndVector& angularDamp);
 
@@ -106,6 +107,11 @@ inline void ndBodyDynamic::SaveExternalForces()
 {
 	m_savedExternalForce = m_externalForce;
 	m_savedExternalTorque = m_externalTorque;
+}
+
+inline ndVector ndBodyDynamic::GetCachedDamping() const
+{
+	return m_cachedDampCoef;
 }
 
 #endif 

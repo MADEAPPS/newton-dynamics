@@ -51,22 +51,22 @@ class cuMatrix3x3
 		return cuVector3((m_front * v).AddHorizontal(), (m_up * v).AddHorizontal(), (m_right * v).AddHorizontal());
 	}
 
-	inline cuVector3 __device__ RotateVector(const cuVector3 &v) const
+	inline cuVector3 __device__ RotateVector(const cuVector3& v) const
 	{
-		return m_front.Scale(v.m_x)  + m_up.Scale(v.m_y) + m_right.Scale(v.m_z);
+		return m_front.Scale(v.m_x) + m_up.Scale(v.m_y) + m_right.Scale(v.m_z);
 	}
 
 	inline cuVector3 __device__ SolveByGaussianElimination(const cuVector3 &v) const
 	{
 		cuMatrix3x3 tmp(*this);
 		cuVector3 ret(v);
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; ++i)
 		{
 			float pivot = cuAbs(tmp.m_data[i].GetElement(i));
 			if (pivot < float(0.01f))
 			{
 				int permute = i;
-				for (int j = i + 1; j < 3; j++)
+				for (int j = i + 1; j < 3; ++j)
 				{
 					float pivot1 = cuAbs(tmp.m_data[j].GetElement(i));
 					if (pivot1 > pivot)
@@ -90,7 +90,7 @@ class cuMatrix3x3
 				}
 			}
 
-			for (int j = i + 1; j < 3; j++)
+			for (int j = i + 1; j < 3; ++j)
 			{
 				const cuVector3 scale(tmp.m_data[j].GetElement(i) / tmp.m_data[i].GetElement(i));
 				tmp.m_data[j] = tmp.m_data[j] - tmp.m_data[i] * scale;
@@ -100,7 +100,7 @@ class cuMatrix3x3
 			}
 		}
 
-		for (int i = 2; i >= 0; i--)
+		for (int i = 2; i >= 0; --i)
 		{
 			const cuVector3 pivot(tmp.m_data[i] * ret);
 			//ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];

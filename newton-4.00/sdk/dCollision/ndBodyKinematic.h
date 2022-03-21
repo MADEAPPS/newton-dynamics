@@ -114,6 +114,7 @@ class ndBodyKinematic : public ndBody
 	virtual ndFloat32 GetLinearDamping() const;
 	virtual void SetLinearDamping(ndFloat32 linearDamp);
 
+	virtual ndVector GetCachedDamping() const;
 	virtual ndVector GetAngularDamping() const;
 	virtual void SetAngularDamping(const ndVector& angularDamp);
 
@@ -490,6 +491,11 @@ inline void ndBodyKinematic::SetAngularDamping(const ndVector&)
 inline ndVector ndBodyKinematic::GetAngularDamping() const
 {
 	return ndVector::m_zero;
+}
+
+inline ndVector ndBodyKinematic::GetCachedDamping() const
+{
+	return ndVector::m_one;
 }
 
 inline void ndBodyKinematic::UpdateInvInertiaMatrix()

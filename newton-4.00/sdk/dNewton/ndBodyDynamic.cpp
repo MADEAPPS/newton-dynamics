@@ -35,7 +35,7 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_savedExternalForce(ndVector::m_zero)
 	,m_savedExternalTorque(ndVector::m_zero)
 	,m_dampCoef(ndVector::m_zero)
-	,m_cachedDampCoef(ndVector::m_zero)
+	,m_cachedDampCoef(ndVector::m_one)
 	,m_cachedTimeStep(ndFloat32 (0.0f))
 {
 	m_isDynamics = 1;
@@ -50,7 +50,7 @@ ndBodyDynamic::ndBodyDynamic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_savedExternalForce(ndVector::m_zero)
 	,m_savedExternalTorque(ndVector::m_zero)
 	,m_dampCoef(ndVector::m_zero)
-	,m_cachedDampCoef(ndVector::m_zero)
+	,m_cachedDampCoef(ndVector::m_one)
 	,m_cachedTimeStep(ndFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -244,10 +244,9 @@ ndFloat32 ndBodyDynamic::GetLinearDamping() const
 ndVector ndBodyDynamic::GetAngularDamping() const
 {
 	return ndVector(m_dampCoef.m_x / D_MAX_SPEED_ATT,
-				   m_dampCoef.m_y / D_MAX_SPEED_ATT,
-				   m_dampCoef.m_z / D_MAX_SPEED_ATT, ndFloat32(0.0f));
+				    m_dampCoef.m_y / D_MAX_SPEED_ATT,
+				    m_dampCoef.m_z / D_MAX_SPEED_ATT, ndFloat32(0.0f));
 }
-
 
 void ndBodyDynamic::SetAngularDamping(const ndVector& angularDamp)
 {

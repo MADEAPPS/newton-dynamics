@@ -80,8 +80,6 @@ class ndBodyProxi
 			
 			// and solving for alpha we get the angular acceleration at t + dt
 			// calculate gradient at a full time step
-			//cuVector3 gradientStep(localTorque.Scale(timestep));
-			
 			// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 			const cuVector3 dw(localOmega.Scale(0.5f * timestep));
 			
@@ -89,11 +87,9 @@ class ndBodyProxi
 				cuVector3(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y),
 				cuVector3((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x),
 				cuVector3((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z));
-	
+			
 			const cuVector3 gradientStep (jacobianMatrix.SolveByGaussianElimination(localTorque.Scale(timestep)));
-			
 			localOmega = localOmega + gradientStep;
-			
 			const cuVector3 alpha(matrix.RotateVector(localTorque * m_invIntertia));
 			
 			//SetAccel(accel);
@@ -108,17 +104,20 @@ class ndBodyProxi
 		//}
 	}
 
-
 	void LoadData(ndBodyKinematic* const body)
 	{
 		m_mass = body->GetMassMatrix();
 		m_rotation = cuQuat(body->GetRotation());
 		m_posit = body->GetGlobalGetCentreOfMass();
 		m_invIntertia = body->GetInvInertia();
-		m_dampCoef = body->GetAngularDamping();
-		m_dampCoef.m_w = body->GetLinearDamping();
+		m_dampCoef = body->GetCachedDamping();
 		m_veloc = body->GetVelocity();
 		m_omega = body->GetOmega();
+	}
+
+	void CopyData(ndBodyKinematic* const body)
+	{
+
 	}
 
 	cuVector4 m_mass;
@@ -135,10 +134,6 @@ class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxi>
 	public:
 	ndBodyBuffer();
 	~ndBodyBuffer();
-
-	//cuDeviceBuffer<ndCudaJacobian> m_transform;
-	//cuDeviceBuffer<ndCudaJacobian> m_veloc;
-	//cuDeviceBuffer<ndCudaJacobian> m_accel;
 	ndArray<ndBodyProxi> m_dataView;
 };
 

@@ -35,12 +35,12 @@ __global__ void CudaHelloWorld(T* c, const T *a, const T *b, Predicate op)
 }
 
 template <typename T, typename Predicate>
-__global__ void CudaKernel(Predicate function, T* param, int size)
+__global__ void CudaKernel(Predicate function, T* param, float timestep, int size)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	if (index < size)
 	{
-		function(param[index]);
+		function(param[index], timestep);
 	}
 }
 

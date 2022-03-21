@@ -61,6 +61,7 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	void LoadBodyData();
+	void WriteBodyData();
 
 	
 	//void TestCudaKernel();

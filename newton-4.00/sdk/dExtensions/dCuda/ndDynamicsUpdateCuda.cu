@@ -657,7 +657,7 @@ void ndDynamicsUpdateCuda::BuildIsland()
 void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 {
 	ndScene* const scene = m_world->GetScene();
-	auto IntegrateUnconstrainedBodies___ = ndMakeObject::ndFunction([this, &scene](ndInt32 threadIndex, ndInt32 threadCount)
+	auto IntegrateUnconstrainedBodiesCPU = ndMakeObject::ndFunction([this, &scene](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
@@ -676,9 +676,8 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 		}
 	});
 
-	auto IntegrateUnconstrainedBodies = [] __device__(ndBodyProxi& body)
+	auto IntegrateUnconstrainedBodies = [] __device__(ndBodyProxi& body, float timestep)
 	{
-		float timestep = 1.0 / 128.0f;
 		const cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
 		//cuMatrix3x3 invInertia(body.CalculateInvInertiaMatrix(matrix));
 		body.AddDampingAcceleration(matrix, timestep);
@@ -689,12 +688,14 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 	{
 		D_TRACKTIME();
 		ndInt32 threadsPerBlock = 256;
+
 		ndInt32 threads = m_context->m_bodyBuffer.GetCount();
-		ndInt32 blocks = (threads - 1) / threadsPerBlock + 1;
+		ndInt32 blocks = (threads + threadsPerBlock - 1) / threadsPerBlock;
 		ndBodyProxi* bodies = &m_context->m_bodyBuffer[0];
-		
-		//scene->ParallelExecute(IntegrateUnconstrainedBodies);
-		CudaKernel <<<blocks, threadsPerBlock>>> (IntegrateUnconstrainedBodies, bodies, threads);
+		const ndFloat32 timestep = scene->GetTimestep();
+
+		scene->ParallelExecute(IntegrateUnconstrainedBodiesCPU);
+		CudaKernel <<<blocks, threadsPerBlock>>> (IntegrateUnconstrainedBodies, bodies, timestep, threads);
 	}
 }
 
@@ -1118,46 +1119,46 @@ void ndDynamicsUpdateCuda::IntegrateBodiesVelocity()
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	auto IntegrateBodiesVelocity = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
+		const ndArray<ndJacobian>& internalForces = GetInternalForces();
+
+		const ndVector timestep4(GetTimestepRK());
+		const ndVector speedFreeze2(m_world->m_freezeSpeed2 * ndFloat32(0.1f));
+
+		const ndStartEnd startEnd(bodyArray.GetCount() - GetUnconstrainedBodyCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			D_TRACKTIME();
-			ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
-			const ndArray<ndJacobian>& internalForces = GetInternalForces();
+			ndBodyKinematic* const body = bodyArray[i];
 
-			const ndVector timestep4(GetTimestepRK());
-			const ndVector speedFreeze2(m_world->m_freezeSpeed2 * ndFloat32(0.1f));
+			dAssert(body);
+			dAssert(body->GetAsBodyDynamic());
+			dAssert(body->m_bodyIsConstrained);
+			const ndInt32 index = body->m_index;
+			const ndJacobian& forceAndTorque = internalForces[index];
+			const ndVector force(body->GetForce() + forceAndTorque.m_linear);
+			const ndVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
+			const ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 
-			const ndStartEnd startEnd(bodyArray.GetCount() - GetUnconstrainedBodyCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			if (!body->m_equilibrium0)
 			{
-				ndBodyKinematic* const body = bodyArray[i];
-
-				dAssert(body);
-				dAssert(body->GetAsBodyDynamic());
-				dAssert(body->m_bodyIsConstrained);
-				const ndInt32 index = body->m_index;
-				const ndJacobian& forceAndTorque = internalForces[index];
-				const ndVector force(body->GetForce() + forceAndTorque.m_linear);
-				const ndVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
-				const ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
-
-				if (!body->m_equilibrium0)
-				{
-					body->m_veloc += velocStep.m_linear;
-					body->m_omega += velocStep.m_angular;
-					body->IntegrateGyroSubstep(timestep4);
-				}
-				else
-				{
-					const ndVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-					const ndVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-					const ndVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & ndVector::m_negOne);
-					const ndInt8 equilibrium = test.GetSignMask() ? 0 : 1;
-					body->m_equilibrium0 = equilibrium;
-				}
-				dAssert(body->m_veloc.m_w == ndFloat32(0.0f));
-				dAssert(body->m_omega.m_w == ndFloat32(0.0f));
+				body->m_veloc += velocStep.m_linear;
+				body->m_omega += velocStep.m_angular;
+				body->IntegrateGyroSubstep(timestep4);
 			}
-		});
+			else
+			{
+				const ndVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+				const ndVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+				const ndVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & ndVector::m_negOne);
+				const ndInt8 equilibrium = test.GetSignMask() ? 0 : 1;
+				body->m_equilibrium0 = equilibrium;
+			}
+			dAssert(body->m_veloc.m_w == ndFloat32(0.0f));
+			dAssert(body->m_omega.m_w == ndFloat32(0.0f));
+		}
+	});
 	scene->ParallelExecute(IntegrateBodiesVelocity);
 }
 
@@ -1767,26 +1768,6 @@ void ndDynamicsUpdateCuda::Update()
 	}
 }
 
-//void ndDynamicsUpdateCuda::TestCudaKernel()
-//{
-//	auto addValue = [] __device__ (int a, int b)
-//	{
-//		return a + b;
-//	};
-//
-//	ndInt32* A = &m_context->A[0];
-//	ndInt32* B = &m_context->B[0];
-//	ndInt32* C = &m_context->C[0];
-//	ndInt32 size = m_context->A.GetCount();
-//
-//	CudaHelloWorld <<<1, size >>> (A, B, C, addValue);
-//
-//	ndFixSizeArray<ndInt32, 100> xxxxx;
-//	m_context->A.WriteData(&xxxxx[0], 100);
-//	m_context->B.WriteData(&xxxxx[0], 100);
-//	m_context->C.WriteData(&xxxxx[0], 100);
-//}
-
 void ndDynamicsUpdateCuda::LoadBodyData()
 {
 	ndScene* const scene = m_world->GetScene();
@@ -1794,6 +1775,7 @@ void ndDynamicsUpdateCuda::LoadBodyData()
 	const ndInt32 bodyCount = bodyArray.GetCount();
 
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+	ndArray<ndBodyProxi>& data = gpuBodyBuffer.m_dataView;
 
 	gpuBodyBuffer.SetCount(bodyCount);
 	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
@@ -1801,18 +1783,34 @@ void ndDynamicsUpdateCuda::LoadBodyData()
 	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
-		gpuBodyBuffer.m_dataView[i].LoadData(body);
+		ndBodyProxi& proxi = data[i];
+		proxi.LoadData(body);
 	}
+	gpuBodyBuffer.ReadData(&data[0], bodyCount);
+}
 
-	gpuBodyBuffer.ReadData(&gpuBodyBuffer[0], gpuBodyBuffer.GetCount());
+void ndDynamicsUpdateCuda::WriteBodyData()
+{
+	ndScene* const scene = m_world->GetScene();
+	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	const ndInt32 bodyCount = bodyArray.GetCount();
+
+	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+	ndArray<ndBodyProxi>& data = gpuBodyBuffer.m_dataView;
+	gpuBodyBuffer.WriteData(&data[0], bodyCount);
+
+	for (ndInt32 i = 0; i < bodyCount; i++)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		ndBodyProxi& proxi = data[i];
+ 		proxi.CopyData(body);
+	}
 }
 
 void ndDynamicsUpdateCuda::DeviceUpdate()
 {
 	D_TRACKTIME();
-	//ndDynamicsUpdate::Update();
 
-	//TestCudaKernel();
 	LoadBodyData();
 	m_timestep = m_world->GetScene()->GetTimestep();
 	
@@ -1824,7 +1822,9 @@ void ndDynamicsUpdateCuda::DeviceUpdate()
 	//	InitBodyArray();
 	//	InitJacobianMatrix();
 	//	CalculateForces();
-	//	IntegrateBodies();
+		IntegrateBodies();
 	//	DetermineSleepStates();
 	}
+
+	WriteBodyData();
 }

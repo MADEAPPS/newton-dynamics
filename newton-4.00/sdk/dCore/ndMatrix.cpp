@@ -403,98 +403,6 @@ void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, n
 	transformMatrix.m_posit = m_posit;
 }
 
-#if 0
-dVector dMatrix::EigenVectors()
-{
-	dMatrix& mat = *this;
-	dMatrix eigenVectors(dGetIdentityMatrix());
-
-	dVector d(mat[0][0], mat[1][1], mat[2][2], dFloat32(0.0f));
-	dVector b(d);
-	for (dInt32 i = 0; i < 50; i++) {
-		dFloat32 sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[1][2];
-		if (sm < dFloat32(1.0e-12f)) {
-			// check the eigenvalue vectors	
-			//dVector tmp(eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
-			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dFloat32(0.0f)) {
-			//	eigenVectors.m_right = eigenVectors.m_right * dVector::m_negOne;
-			//}
-			dAssert (eigenVectors[0].DotProduct(eigenVectors[1].CrossProduct(eigenVectors[2])).GetScalar() > dFloat32 (0.0f));
-			break;
-		}
-
-		dFloat32 thresh = dFloat32(0.0f);
-		if (i < 3) {
-			thresh = (dFloat32)(0.2f / 9.0f) * sm;
-		}
-
-		dVector z(dVector::m_zero);
-		for (dInt32 ip = 0; ip < 2; ip++) {
-			for (dInt32 iq = ip + 1; iq < 3; iq++) {
-				dFloat32 g = dFloat32(100.0f) * dAbs(mat[ip][iq]);
-				if ((i > 3) && ((dAbs(d[ip]) + g) == dAbs(d[ip])) && ((dAbs(d[iq]) + g) == dAbs(d[iq]))) {
-					mat[ip][iq] = dFloat32(0.0f);
-				} else if (dAbs(mat[ip][iq]) > thresh) {
-
-					dFloat32 t;
-					dFloat32 h = d[iq] - d[ip];
-					if (dAbs(h) + g == dAbs(h)) {
-						t = mat[ip][iq] / h;
-					} else {
-						dFloat32 theta = dFloat32(0.5f) * h / mat[ip][iq];
-						t = dFloat32(1.0f) / (dAbs(theta) + dSqrt(dFloat32(1.0f) + theta * theta));
-						if (theta < dFloat32(0.0f)) {
-							t = -t;
-						}
-					}
-					dFloat32 c = dRsqrt(dFloat32(1.0f) + t * t);
-					dFloat32 s = t * c;
-					dFloat32 tau = s / (dFloat32(1.0f) + c);
-					h = t * mat[ip][iq];
-					z[ip] -= h;
-					z[iq] += h;
-					d[ip] -= h;
-					d[iq] += h;
-					mat[ip][iq] = dFloat32(0.0f);
-
-					for (dInt32 j = 0; j <= ip - 1; j++) {
-						dFloat32 g0 = mat[j][ip];
-						dFloat32 h0 = mat[j][iq];
-						mat[j][ip] = g0 - s * (h0 + g0 * tau);
-						mat[j][iq] = h0 + s * (g0 - h0 * tau);
-					}
-					for (dInt32 j = ip + 1; j <= iq - 1; j++) {
-						dFloat32 g0 = mat[ip][j];
-						dFloat32 h0 = mat[j][iq];
-						mat[ip][j] = g0 - s * (h0 + g0 * tau);
-						mat[j][iq] = h0 + s * (g0 - h0 * tau);
-					}
-					for (dInt32 j = iq + 1; j < 3; j++) {
-						dFloat32 g0 = mat[ip][j];
-						dFloat32 h0 = mat[iq][j];
-						mat[ip][j] = g0 - s * (h0 + g0 * tau);
-						mat[iq][j] = h0 + s * (g0 - h0 * tau);
-					}
-
-					dVector sv(s);
-					dVector tauv(tau);
-					dVector gv(eigenVectors[ip]);
-					dVector hv(eigenVectors[iq]);
-					eigenVectors[ip] -= sv * (hv + gv * tauv);
-					eigenVectors[iq] += sv * (gv - hv * tauv);
-				}
-			}
-		}
-
-		b += z;
-		d = b;
-	}
-
-	*this = eigenVectors;
-	return d;
-}
-
-#else
 ndVector ndMatrix::EigenVectors ()
 {
 	ndMatrix matrix (*this);
@@ -639,5 +547,5 @@ ndVector ndMatrix::EigenVectors ()
 	*this = eigenVectors;
 	return d;
 }
-#endif
+
 

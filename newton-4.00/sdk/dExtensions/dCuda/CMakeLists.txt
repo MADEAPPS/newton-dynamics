@@ -40,6 +40,9 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --extended-lambda")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")
 Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")
+
+#Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -ptx")
+
 message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
 message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")
 

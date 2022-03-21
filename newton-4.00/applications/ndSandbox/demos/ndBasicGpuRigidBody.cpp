@@ -131,7 +131,7 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 
 	//ndInt32 count = 30;
-	ndInt32 count = 5;
+	ndInt32 count = 1;
 	AddBox(scene, ndVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, count);
 
 	ndQuaternion rot;
