@@ -30,8 +30,7 @@
 #include <ndJointBilateralConstraint.h>
 
 #include "cuQuat.h"
-#include "cuVector3.h"
-#include "cuVector4.h"
+#include "cuVector.h"
 #include "cuMatrix3x3.h"
 
 #include "ndCudaContext.h"

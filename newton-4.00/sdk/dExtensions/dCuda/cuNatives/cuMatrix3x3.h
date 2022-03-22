@@ -22,7 +22,7 @@
 #ifndef __ND_CUMATRIX3x3_H__
 #define __ND_CUMATRIX3x3_H__
 
-#include "cuVector3.h"
+#include "cuVector.h"
 #include "cuIntrisics.h"
 
 class cuMatrix3x3
@@ -39,27 +39,27 @@ class cuMatrix3x3
 	{
 	}
 
-	inline __device__ cuMatrix3x3(const cuVector3& front, const cuVector3& up, const cuVector3& right)
+	inline __device__ cuMatrix3x3(const cuVector& front, const cuVector& up, const cuVector& right)
 		:m_front(front)
 		,m_up(up)
 		,m_right(right)
 	{
 	}
 
-	inline cuVector3 __device__ UnrotateVector(const cuVector3 &v) const
+	inline cuVector __device__ UnrotateVector(const cuVector &v) const
 	{
-		return cuVector3((m_front * v).AddHorizontal(), (m_up * v).AddHorizontal(), (m_right * v).AddHorizontal());
+		return cuVector((m_front * v).AddHorizontal(), (m_up * v).AddHorizontal(), (m_right * v).AddHorizontal(), 0.0f);
 	}
 
-	inline cuVector3 __device__ RotateVector(const cuVector3& v) const
+	inline cuVector __device__ RotateVector(const cuVector& v) const
 	{
-		return m_front.Scale(v.m_x)  + m_up.Scale(v.m_y) + m_right.Scale(v.m_z);
+		return m_front.Scale(v.x)  + m_up.Scale(v.y) + m_right.Scale(v.z);
 	}
 
-	inline cuVector3 __device__ SolveByGaussianElimination(const cuVector3 &v) const
+	inline cuVector __device__ SolveByGaussianElimination(const cuVector &v) const
 	{
 		cuMatrix3x3 tmp(*this);
-		cuVector3 ret(v);
+		cuVector ret(v);
 		for (int i = 0; i < 3; ++i)
 		{
 			float pivot = cuAbs(tmp.m_data[i].GetElement(i));
@@ -84,7 +84,7 @@ class cuMatrix3x3
 					ret.SetElement(permute, a0);
 
 					cuSwap(tmp.m_data[i], tmp.m_data[permute]);
-					//cuVector3 b (tmp.GetElement(i));
+					//cuVector b (tmp.GetElement(i));
 					//tmp.SetElement(i, tmp.GetElement(permute));
 					//tmp.SetElement(permute, a0);
 				}
@@ -92,17 +92,17 @@ class cuMatrix3x3
 
 			for (int j = i + 1; j < 3; ++j)
 			{
-				const cuVector3 scale(tmp.m_data[j].GetElement(i) / tmp.m_data[i].GetElement(i));
+				const cuVector scale(tmp.m_data[j].GetElement(i) / tmp.m_data[i].GetElement(i));
 				tmp.m_data[j] = tmp.m_data[j] - tmp.m_data[i] * scale;
 				//ret[j] -= ret[i] * scale.GetScalar();
-				ret.SetElement(j, ret.GetElement(j) - ret.GetElement(i) * scale.m_x);
+				ret.SetElement(j, ret.GetElement(j) - ret.GetElement(i) * scale.x);
 				tmp.m_data[j].SetElement(i, 0.0f);
 			}
 		}
 
 		for (int i = 2; i >= 0; --i)
 		{
-			const cuVector3 pivot(tmp.m_data[i] * ret);
+			const cuVector pivot(tmp.m_data[i] * ret);
 			//ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
 			ret.SetElement(i, (ret.GetElement(i) - pivot.AddHorizontal() + tmp.m_data[i].GetElement(i) * ret.GetElement(i)) / tmp.m_data[i].GetElement(i));
 		}
@@ -114,11 +114,11 @@ class cuMatrix3x3
 	{
 		struct
 		{
-			cuVector3 m_front;
-			cuVector3 m_up;
-			cuVector3 m_right;
+			cuVector m_front;
+			cuVector m_up;
+			cuVector m_right;
 		};
-		cuVector3 m_data[3];
+		cuVector m_data[3];
 	};
 };
 

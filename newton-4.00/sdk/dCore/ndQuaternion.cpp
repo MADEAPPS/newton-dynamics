@@ -111,7 +111,7 @@ ndQuaternion ndQuaternion::operator* (const ndQuaternion &q) const
 	const ndVector x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
 	const ndVector y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
 	const ndVector z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
-	const ndVector w(q);
+	const ndVector w( q);
 	return x * ndVector(m_x) + y * ndVector(m_y) + z * ndVector(m_z) + w * ndVector(m_w);
 }
 
