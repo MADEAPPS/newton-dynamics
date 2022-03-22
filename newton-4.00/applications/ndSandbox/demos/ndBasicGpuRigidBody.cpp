@@ -115,7 +115,6 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 			{
 				ndVector posit(step * (i - count/2), step * (j - count / 2), step * (k - count / 2), 0.0f);
 				ndQuaternion rotation(dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f) + 0.1f);
-				//matrix.m_posit = origin + posit;
 				ndMatrix location(rotation, origin + posit);
 				AddShape(scene, location, rootEntity, shape, 10.0f, density);
 			}
@@ -130,8 +129,8 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 
-	//ndInt32 count = 30;
-	ndInt32 count = 1;
+	ndInt32 count = 30;
+	//ndInt32 count = 1;
 	AddBox(scene, ndVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, count);
 
 	ndQuaternion rot;

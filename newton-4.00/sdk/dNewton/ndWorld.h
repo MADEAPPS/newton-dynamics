@@ -186,9 +186,9 @@ class ndWorld: public ndClassAlloc
 	bool m_collisionUpdate;
 
 	friend class ndScene;
+	friend class ndWorldScene;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
-	friend class ndWorldDefaultScene;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateCuda;

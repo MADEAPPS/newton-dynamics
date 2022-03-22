@@ -47,11 +47,11 @@ endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-include_directories(./)
-include_directories(../dCore/)
-include_directories(../dTinyxml/)
-include_directories(../dProfiler/)
-include_directories(../dCollision/)
+include_directories(.)
+include_directories(../dCore)
+include_directories(../dTinyxml)
+include_directories(../dProfiler)
+include_directories(../dCollision)
 
 include_directories(dJoints/)
 include_directories(dModels/)

@@ -89,6 +89,11 @@ class cuVector3
 						 m_x * B.m_y - m_y * B.m_x);
 	}
 
+	inline float __device__ DotProduct(const cuVector3& B) const
+	{
+		return (*this * B).AddHorizontal();
+	}
+
 	inline cuVector3 __device__ operator+ (const cuVector3& A) const
 	{
 		return cuVector3(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z);

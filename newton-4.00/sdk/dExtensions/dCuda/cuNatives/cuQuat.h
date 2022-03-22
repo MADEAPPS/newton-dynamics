@@ -48,18 +48,29 @@ class cuQuat: public cuVector4
 	{
 	}
 
+	inline __device__ cuQuat(const cuVector3& unitAxis, float angle)
+		:cuVector4()
+	{
+		angle = angle * float(0.5f);
+		m_w = cos(angle);
+		float sinAng = sin(angle);
+
+		m_x = unitAxis.m_x * sinAng;
+		m_y = unitAxis.m_y * sinAng;
+		m_z = unitAxis.m_z * sinAng;
+	}
+
 	inline cuQuat(const ndVector& src)
-		: cuVector4(src)
+		:cuVector4(src)
 	{
 	}
 
-	//inline cuMatrix3x3 __device__ operator+ (const cuQuat& q) const
 	inline cuMatrix3x3 __device__ GetMatrix3x3 () const
 	{
 		//const dQuaternion quat0(quat);
-		//const dQuaternion quat1(quat0.Scale (ndFloat32(2.0f)));
-		const cuQuat& quat0 = *this;
-		const cuQuat quat1 (quat0 * cuVector4(2.0));
+		//const dQuaternion quat1(quat0.Scale (float(2.0f)));
+		const cuQuat quat0 = *this;
+		const cuQuat quat1 (quat0.Scale (2.0));
 		
 		float x2 = quat0.m_x * quat1.m_x;
 		float y2 = quat0.m_y * quat1.m_y;
@@ -75,21 +86,22 @@ class cuQuat: public cuVector4
 		const cuVector3 front(1.0f - y2 - z2, xy + zw, xz - yw);
 		const cuVector3 up   (xy - zw, 1.0f - x2 - z2, yz + xw);
 		const cuVector3 right(xz + yw, yz - xw, 1.0f - x2 - y2);
-		return cuMatrix3x3(right, up, front);
+		return cuMatrix3x3(front, up, right);
 	}
-	
-	//inline ndVector(const cuQuat& src) const
-	//{
-	//	return ndVector(src.m_x, src.m_y, src.m_z, src.m_w);
-	//}
-	//
-	//
-	//inline cuQuat __device__ operator+ (const cuQuat& A) const
-	//{
-	//	return cuQuat(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
-	//}
-	//
-	//float m_w;
+
+	inline cuQuat __device__ Normalize() const
+	{
+		return cuVector4::Normalize();
+	}
+
+	inline cuQuat __device__ operator* (const cuQuat &q) const
+	{
+		const cuVector4 x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
+		const cuVector4 y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
+		const cuVector4 z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
+		const cuVector4 w(q);
+		return x * cuVector4(m_x) + y * cuVector4(m_y) + z * cuVector4(m_z) + w * cuVector4(m_w);
+	}
 };
 
 #endif

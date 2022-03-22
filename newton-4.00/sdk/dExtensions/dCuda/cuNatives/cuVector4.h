@@ -70,6 +70,27 @@ class cuVector4: public cuVector3
 		return cuVector4(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 	}
 
+	inline cuVector4 __device__ Scale(float s) const
+	{
+		return cuVector4(m_x * s, m_y * s, m_z * s, m_w * s);
+	}
+
+	inline float __device__ AddHorizontal() const
+	{
+		return m_x + m_y + m_z + m_w;
+	}
+
+	inline float __device__ DotProduct(const cuVector4& B) const
+	{
+		return (*this * B).AddHorizontal();
+	}
+
+	inline cuVector4 __device__ Normalize() const
+	{
+		float den = 1.0f / sqrt(DotProduct(*this));
+		return cuVector4(m_x * den, m_y * den, m_z * den, m_w * den);
+	}
+
 	float m_w;
 };
 

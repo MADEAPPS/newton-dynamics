@@ -154,11 +154,11 @@ class ndScene : public ndThreadPool
 	protected:
 	D_COLLISION_API ndScene();
 	
-	D_COLLISION_API void InitBodyArray();
-	D_COLLISION_API void UpdateSpecial();
-	D_COLLISION_API void UpdateTransform();
-	D_COLLISION_API void CalculateContacts();
-	D_COLLISION_API void FindCollidingPairs();
+	D_COLLISION_API virtual void InitBodyArray();
+	D_COLLISION_API virtual void UpdateSpecial();
+	D_COLLISION_API virtual void UpdateTransform();
+	D_COLLISION_API virtual void CalculateContacts();
+	D_COLLISION_API virtual void FindCollidingPairs();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
 

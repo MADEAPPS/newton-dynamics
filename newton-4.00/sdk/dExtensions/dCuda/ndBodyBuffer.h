@@ -32,10 +32,9 @@
 #include "cuMatrix3x3.h"
 #include "cuDeviceBuffer.h"
 
-class ndBodyProxi
+class ndBodyProxy
 {
 	public:
-
 	inline cuMatrix3x3 __device__ CalculateInvInertiaMatrix(const cuMatrix3x3& matrix) const
 	{
 		const cuVector3 invIxx(m_invIntertia.GetElement(0));
@@ -55,17 +54,17 @@ class ndBodyProxi
 			matrix.m_right.Scale(matrix.m_right.GetElement(2)) * invIzz);
 	}
 
-	inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix, float timestep)
+	//inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix, float timestep)
+	inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix, float)
 	{
-		const cuVector3 omegaDamp(m_dampCoef);
-		const cuVector3 omega(matrix.UnrotateVector(m_omega) * omegaDamp);
+		const cuVector3 omega(matrix.UnrotateVector(m_omega) * m_dampCoef);
 		m_omega = matrix.RotateVector(omega);
 		m_veloc = m_veloc.Scale(m_dampCoef.m_w);
 	}
 
 	inline void __device__ IntegrateExternalForce(const cuMatrix3x3& matrix, float timestep)
 	{
-		//if (!m_equilibrium && (m_invMass.m_w > ndFloat32(0.0f)))
+		//if (!m_equilibrium && (m_invMass.m_w > float(0.0f)))
 		{
 			//const ndVector accel(GetForce().Scale(m_invMass.m_w));
 			//const ndVector torque(GetTorque());
@@ -87,7 +86,7 @@ class ndBodyProxi
 				cuVector3(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y),
 				cuVector3((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x),
 				cuVector3((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z));
-			
+	
 			const cuVector3 gradientStep (jacobianMatrix.SolveByGaussianElimination(localTorque.Scale(timestep)));
 			localOmega = localOmega + gradientStep;
 			const cuVector3 alpha(matrix.RotateVector(localTorque * m_invIntertia));
@@ -104,7 +103,30 @@ class ndBodyProxi
 		//}
 	}
 
-	void LoadData(ndBodyKinematic* const body)
+	inline void __device__ IntegrateVelocity(float timestep)
+	{
+		m_posit = m_posit + m_veloc.Scale(timestep);
+		float omegaMag2 = m_omega.DotProduct(m_omega);
+		
+		float tol = (float(0.0125f) * 3.141592f / 180.0f);
+		float tol2 = tol * tol;
+		if (omegaMag2 > tol2)
+		{
+			// this is correct
+		//	//float invOmegaMag = ndRsqrt(omegaMag2);
+			float invOmegaMag = 1.0f / sqrt(omegaMag2);
+			const float omegaAngle = invOmegaMag * omegaMag2 * timestep;
+			const cuVector3 omegaAxis(m_omega.Scale(invOmegaMag));
+			const cuQuat rotationStep(omegaAxis, omegaAngle);
+			const cuQuat rotation(m_rotation * rotationStep);
+			m_rotation = rotation.Normalize();
+
+			//m_matrix = ndMatrix(m_rotation, m_matrix.m_posit);
+		}
+		////m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
+	}
+
+	void BodyToProxy(ndBodyKinematic* const body)
 	{
 		m_mass = body->GetMassMatrix();
 		m_rotation = cuQuat(body->GetRotation());
@@ -115,9 +137,16 @@ class ndBodyProxi
 		m_omega = body->GetOmega();
 	}
 
-	void CopyData(ndBodyKinematic* const body)
+	void ProxyToBody(ndBodyKinematic* const body) const
 	{
+		const ndVector veloc(m_veloc.m_x, m_veloc.m_y, m_veloc.m_z, ndFloat32(0.0f));
+		const ndVector omega(m_omega.m_x, m_omega.m_y, m_omega.m_z, ndFloat32(0.0f));
+		const ndVector position(m_posit.m_x, m_posit.m_y, m_posit.m_z, ndFloat32(1.0f));
+		const ndQuaternion rotation(ndVector(m_rotation.m_x, m_rotation.m_y, m_rotation.m_z, m_rotation.m_w));
 
+		body->SetOmegaNoSleep(omega);
+		body->SetVelocityNoSleep(veloc);
+		body->SetMatrixAndCentreOfMass(rotation, position);
 	}
 
 	cuVector4 m_mass;
@@ -129,17 +158,17 @@ class ndBodyProxi
 	cuVector3 m_omega;
 };
 
-class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxi>
+class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxy>
 {
 	public:
 	ndBodyBuffer();
 	~ndBodyBuffer();
-	ndArray<ndBodyProxi> m_dataView;
+	ndArray<ndBodyProxy> m_dataView;
 };
 
 
 inline ndBodyBuffer::ndBodyBuffer()
-	:cuDeviceBuffer<ndBodyProxi>()
+	:cuDeviceBuffer<ndBodyProxy>()
 {
 }
 

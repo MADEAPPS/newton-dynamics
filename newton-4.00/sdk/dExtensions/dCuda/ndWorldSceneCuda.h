@@ -19,21 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_KERNELS_H__
-#define __ND_CUDA_KERNELS_H__
-
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
+#include <ndDynamicsUpdate.h>
 
-template <typename T, typename Predicate>
-__global__ void CudaKernel(Predicate function, T* param, float timestep, int size)
+class ndCudaContext;
+
+class ndWorldSceneCuda : public ndWorldScene
 {
-	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < size)
-	{
-		function(param[index], timestep);
-	}
-}
+	public:
+	ndWorldSceneCuda(ndWorld* const world);
+	virtual ~ndWorldSceneCuda();
 
-#endif
+	virtual void InitBodyArray();
+	virtual void CalculateContacts();
+	virtual void FindCollidingPairs();
+};

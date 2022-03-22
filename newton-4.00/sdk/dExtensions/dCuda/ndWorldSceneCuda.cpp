@@ -19,21 +19,49 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_KERNELS_H__
-#define __ND_CUDA_KERNELS_H__
+//#include "ndCoreStdafx.h"
+//#include "ndNewtonStdafx.h"
+//#include "ndWorldSceneCuda.h"
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <ndNewtonStdafx.h>
+#include <ndWorld.h>
+#include <ndModel.h>
+#include <ndWorldScene.h>
+#include <ndBodyDynamic.h>
+#include <ndSkeletonList.h>
+#include <ndDynamicsUpdate.h>
+#include <ndBodyParticleSet.h>
+#include <ndDynamicsUpdateSoa.h>
+#include <ndJointBilateralConstraint.h>
 
-template <typename T, typename Predicate>
-__global__ void CudaKernel(Predicate function, T* param, float timestep, int size)
+#include "cuQuat.h"
+#include "cuVector3.h"
+#include "cuVector4.h"
+#include "cuMatrix3x3.h"
+
+#include "ndCudaContext.h"
+#include "ndCudaKernels.h"
+#include "ndWorldSceneCuda.h"
+
+ndWorldSceneCuda::ndWorldSceneCuda(ndWorld* const world)
+	:ndWorldScene(world)
 {
-	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < size)
-	{
-		function(param[index], timestep);
-	}
 }
 
-#endif
+ndWorldSceneCuda::~ndWorldSceneCuda()
+{
+}
+
+void ndWorldSceneCuda::CalculateContacts()
+{
+	ndWorldScene::CalculateContacts();
+}
+
+void ndWorldSceneCuda::FindCollidingPairs()
+{
+	ndWorldScene::FindCollidingPairs();
+}
+
+void ndWorldSceneCuda::InitBodyArray()
+{
+	ndWorldScene::InitBodyArray();
+}

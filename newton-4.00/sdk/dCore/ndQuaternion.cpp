@@ -111,23 +111,7 @@ ndQuaternion ndQuaternion::operator* (const ndQuaternion &q) const
 	const ndVector x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
 	const ndVector y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
 	const ndVector z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
-	//const ndVector w( q.m_x,  q.m_y,  q.m_z,  q.m_w);
 	const ndVector w(q);
-
-//#ifdef _DEBUG
-//	ndQuaternion xxx0(x * ndVector(m_x) + y * ndVector(m_y) + z * ndVector(m_z) + w * ndVector(m_w));
-//	ndQuaternion xxx1(
-//		q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z,
-//		q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z,
-//		q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
-//		q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
-//
-//	ndFloat32 mag0 = xxx0.DotProduct(xxx0).GetScalar();
-//	ndFloat32 mag1 = xxx1.DotProduct(xxx1).GetScalar();
-//	ndFloat32 error = mag0 - mag1;
-//	dAssert(dAbs(error) < ndFloat32(1.0e-5f));
-//#endif
-
 	return x * ndVector(m_x) + y * ndVector(m_y) + z * ndVector(m_z) + w * ndVector(m_w);
 }
 

@@ -19,21 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_KERNELS_H__
-#define __ND_CUDA_KERNELS_H__
+#include "ndCoreStdafx.h"
+#include "ndNewtonStdafx.h"
+#include "ndWorldScene.h"
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <ndNewtonStdafx.h>
-
-template <typename T, typename Predicate>
-__global__ void CudaKernel(Predicate function, T* param, float timestep, int size)
+ndWorldScene::ndWorldScene(ndWorld* const world)
+	:ndScene()
+	,m_world(world)
 {
-	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < size)
-	{
-		function(param[index], timestep);
-	}
 }
 
-#endif
+ndWorldScene::~ndWorldScene()
+{
+}
+
+void ndWorldScene::ThreadFunction()
+{
+	m_world->ThreadFunction();
+}

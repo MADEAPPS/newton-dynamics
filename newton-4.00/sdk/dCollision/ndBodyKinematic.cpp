@@ -436,7 +436,6 @@ void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)
 	dAssert(m_omega.m_w == ndFloat32(0.0f));
 	m_globalCentreOfMass += m_veloc.Scale(timestep);
 
-	//const ndFloat32 omegaMag2 = dMax(m_omega.DotProduct(m_omega).GetScalar(), tol2);
 	const ndFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
 
 #ifdef _DEBUG

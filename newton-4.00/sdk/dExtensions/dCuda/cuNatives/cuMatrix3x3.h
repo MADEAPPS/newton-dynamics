@@ -53,7 +53,7 @@ class cuMatrix3x3
 
 	inline cuVector3 __device__ RotateVector(const cuVector3& v) const
 	{
-		return m_front.Scale(v.m_x) + m_up.Scale(v.m_y) + m_right.Scale(v.m_z);
+		return m_front.Scale(v.m_x)  + m_up.Scale(v.m_y) + m_right.Scale(v.m_z);
 	}
 
 	inline cuVector3 __device__ SolveByGaussianElimination(const cuVector3 &v) const

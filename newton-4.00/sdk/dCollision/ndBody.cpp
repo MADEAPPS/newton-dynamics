@@ -185,6 +185,14 @@ void ndBody::SetMatrixNoSleep(const ndMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
+void ndBody::SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom)
+{
+	m_rotation = rotation;
+	m_globalCentreOfMass = globalcom;
+	m_matrix = ndMatrix(rotation, m_matrix.m_posit);
+	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
+}
+
 void ndBody::SetMatrix(const ndMatrix& matrix)
 {
 	m_equilibrium = 0;

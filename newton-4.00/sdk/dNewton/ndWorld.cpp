@@ -40,6 +40,7 @@
 #endif
 
 #ifdef _D_NEWTON_CUDA
+	#include "ndWorldSceneCuda.h"
 	#include "ndDynamicsUpdateCuda.h"
 #endif
 
@@ -127,8 +128,8 @@ ndWorld::ndWorld()
 {
 	// start the engine thread;
 	ndBody::m_uniqueIdCount = 0;
-	m_scene = new ndWorldDefaultScene(this);
 	m_solver = new ndDynamicsUpdate(this);
+	m_scene = new ndWorldScene(this);
 
 	ndInt32 steps = 1;
 	ndFloat32 freezeAccel2 = m_freezeAccel2;
@@ -240,7 +241,9 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 
 			#ifdef _D_NEWTON_CUDA
 			case ndCudaSolver:
+				delete m_scene;
 				m_solverMode = solverMode;
+				m_scene = new ndWorldSceneCuda(this);
 				m_solver = new ndDynamicsUpdateCuda(this, 0);
 				break;
 			#endif
