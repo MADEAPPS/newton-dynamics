@@ -871,7 +871,7 @@ void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 	m_scene->BodiesInAabb(callback);
 }
 
-#if 1
+#if 0
 void ndWorld::SelectSolver(ndSolverModes solverMode)
 {
 	if (solverMode != m_solverMode)

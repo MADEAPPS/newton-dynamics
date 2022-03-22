@@ -224,7 +224,7 @@ ndScene::ndScene(const ndScene& src)
 	,m_specialUpdateList()
 	,m_backgroundThread()
 	,m_lock()
-	,m_rootNode(src.m_rootNode)
+	,m_rootNode(nullptr)
 	,m_sentinelBody(src.m_sentinelBody)
 	,m_contactNotifyCallback(src.m_contactNotifyCallback)
 	,m_treeEntropy(ndFloat32(0.0f))
@@ -254,6 +254,14 @@ ndScene::ndScene(const ndScene& src)
 		ndBodyKinematic* const body = node->GetInfo();
 		ndBodyList::ndNode* const newNode = m_bodyList.Append(body);
 		body->SetSceneNodes(this, newNode);
+
+		ndSceneBodyNode* const sceneNode = body->GetSceneBodyNode();
+		if (sceneNode)
+		{
+			stealData->RemoveNode(sceneNode);
+			ndSceneBodyNode* const newSceneNode = new ndSceneBodyNode(body);
+			AddNode(newSceneNode);
+		}
 	}
 	stealData->m_bodyList.RemoveAll();
 	BalanceScene();
