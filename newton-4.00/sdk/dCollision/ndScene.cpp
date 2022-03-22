@@ -207,7 +207,6 @@ ndScene::ndScene()
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_forceBalanceSceneCounter(0)
 	,m_bodyListChanged(0)
-	,m_currentThreadsMem(0)
 	,m_forceBalanceScene(0)
 {
 	m_sentinelBody = new ndBodySentinel;
@@ -1160,57 +1159,6 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 
 bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
 {
-	//bool mass0 = (body0->m_invMass.m_w != ndFloat32(0.0f));
-	//bool mass1 = (body1->m_invMass.m_w != ndFloat32(0.0f));
-	//bool isDynamic0 = body0->IsRTTIType(ntBodyKinematic::m_dynamicBodyRTTI) != 0;
-	//bool isDynamic1 = body1->IsRTTIType(ntBodyKinematic::m_dynamicBodyRTTI) != 0;
-	//bool isKinematic0 = body0->IsRTTIType(ntBodyKinematic::m_kinematicBodyRTTI) != 0;
-	//bool isKinematic1 = body1->IsRTTIType(ntBodyKinematic::m_kinematicBodyRTTI) != 0;
-	//
-	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionnullptr_RTTI));
-	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionnullptr_RTTI));
-	//
-	//bool tier1 = true;
-	//bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
-	//bool tier3 = (agreggate0 != agreggate1) || !agreggate0 || (agreggate0 && agreggate0->GetSelfCollision());
-	//bool tier4 = isDynamic0 & mass0;
-	//bool tier5 = isDynamic1 & mass1;
-	//bool tier6 = isKinematic0 & mass1;
-	//bool tier7 = isKinematic1 & mass0;
-	//bool ret = tier1 & tier2  & tier3 & (tier4 | tier5 | tier6 | tier7);
-	//
-	//if (ret) 
-	//{
-	//	const dgCollisionInstance* const instance0 = body0->GetCollision();
-	//	const dgCollisionInstance* const instance1 = body1->GetCollision();
-	//
-	//	if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
-	//		ndVector velRelative(body1->GetVelocity() - body0->GetVelocity());
-	//		if (velRelative.DotProduct(velRelative).GetScalar() > ndFloat32(0.25f)) {
-	//			ndVector box0_p0;
-	//			ndVector box0_p1;
-	//			ndVector box1_p0;
-	//			ndVector box1_p1;
-	//
-	//			instance0->CalculateAabb(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
-	//			instance1->CalculateAabb(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
-	//
-	//			ndVector boxp0(box0_p0 - box1_p1);
-	//			ndVector boxp1(box0_p1 - box1_p0);
-	//			ndFastRay ray(ndVector::m_zero, velRelative.Scale(timestep * ndFloat32(4.0f)));
-	//			ndFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
-	//			ret = (distance < ndFloat32(1.0f));
-	//		}
-	//		else {
-	//			ret = dgOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? 1 : 0;
-	//		}
-	//	}
-	//	else {
-	//		ret = dgOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? 1 : 0;
-	//	}
-	//}
-	//return ret;
-
 	bool test = body0->GetCollisionShape().GetCollisionMode() & body1->GetCollisionShape().GetCollisionMode();
 	return test && dOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? true : false;
 }
@@ -1276,75 +1224,51 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
-	if (m_bodyListChanged || (m_currentThreadsMem != GetThreadCount()))
+	if (m_bodyListChanged)
 	{
+		ndInt32 index = 0;
+		ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		view.SetCount(m_bodyList.GetCount());
+		for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+		{
+			ndBodyKinematic* const body = node->GetInfo();
+			view[index] = node->GetInfo();
+			++index;
+
+			dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+			bool inScene = true;
+			if (!body->GetSceneBodyNode())
+			{
+				inScene = AddBody(body);
+			}
+			dAssert(inScene && body->m_sceneNode);
+		}
 		m_bodyListChanged = 0;
-		const ndInt32 threadCount = GetThreadCount();
-		if (m_bodyList.GetCount() < (2 * threadCount))
-		{
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				m_bodyListRuns[i].m_count = 0;
-				m_bodyListRuns[i].m_start = 0;
-				m_bodyListRuns[i].m_begin = nullptr;
-			}
-			m_bodyListRuns[0].m_count = m_bodyList.GetCount();
-			m_bodyListRuns[0].m_begin = m_bodyList.GetFirst();
-		}
-		else
-		{
-			ndInt32 start = 0;
-			ndInt32 count = m_bodyList.GetCount() / threadCount;
-			ndBodyList::ndNode* node = m_bodyList.GetFirst();
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				m_bodyListRuns[i].m_start = start;
-				m_bodyListRuns[i].m_count = count;
-				start += count;
-				m_bodyListRuns[i].m_begin = node;
-				for (ndInt32 j = 0; j < count; ++j)
-				{
-					node = node->GetNext();
-				}
-			}
-			m_bodyListRuns[threadCount - 1].m_count = m_bodyList.GetCount() - m_bodyListRuns[threadCount - 1].m_start;
-		}
-		m_currentThreadsMem = ndInt8(GetThreadCount());
 	}
 
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 
-	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32)
+	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
 		ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
-		const ndBodyListRun& run = m_bodyListRuns[threadIndex];
-
+		
 		ndInt32* const scan = &scans[threadIndex][0];
 		scan[0] = 0;
 		scan[1] = 0;
-
+		
 		const ndFloat32 timestep = m_timestep;
-		ndBodyList::ndNode* node = run.m_begin;
-		for (ndInt32 i = 0; i < run.m_count; ++i)
+		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			ndBodyKinematic* const body = node->GetInfo();
-			node = node->GetNext();
-			dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-			bool inScene = true;
-			if (!body->GetSceneBodyNode())
-			{
-				ndScopeSpinLock lock(m_lock);
-				inScene = AddBody(body);
-			}
-			dAssert(inScene && body->m_sceneNode);
-
+			ndBodyKinematic* const body = view[i];
 			body->ApplyExternalForces(threadIndex, timestep);
-			const ndInt32 index = i + run.m_start;
-			body->PrepareStep(index);
-			activeBodyArray[index] = body;
 
+			body->PrepareStep(i);
+			activeBodyArray[i] = body;
+		
 			const ndInt32 key = body->m_equilibrium;
 			scan[key] ++;
 			if (!body->m_equilibrium || body->m_transformIsDirty)
@@ -1373,18 +1297,19 @@ void ndScene::InitBodyArray()
 
 	if (movingBodyCount)
 	{
-		auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32)
+		auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME();
 			const ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
 			ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 
-			const ndBodyListRun& run = m_bodyListRuns[threadIndex];
+			const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
 			ndInt32* const scan = &scans[threadIndex][0];
-
-			for (ndInt32 i = 0; i < run.m_count; ++i)
+			
+			const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = activeBodyArray[i + run.m_start];
+				ndBodyKinematic* const body = activeBodyArray[i];
 				const ndInt32 key = body->m_equilibrium;
 				const ndInt32 index = scan[key];
 				sceneBodyArray[index] = body;

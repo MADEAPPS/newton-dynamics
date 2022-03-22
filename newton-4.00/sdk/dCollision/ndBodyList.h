@@ -31,8 +31,11 @@ class ndBodyList: public ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBo
 	public:
 	ndBodyList()
 		:ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBodyKinematic*>>()
+		,m_view(1024)
 	{
 	}
+
+	ndArray<ndBodyKinematic*> m_view;
 };
 
 

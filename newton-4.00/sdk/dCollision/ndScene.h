@@ -180,7 +180,6 @@ class ndScene : public ndThreadPool
 	ndList<ndBodyKinematic*> m_specialUpdateList;
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndSpinLock m_lock;
-	ndBodyListRun m_bodyListRuns[D_MAX_THREADS_COUNT];
 	ndSceneNode* m_rootNode;
 	ndBodyKinematic* m_sentinelBody;
 	ndContactNotify* m_contactNotifyCallback;
@@ -190,7 +189,6 @@ class ndScene : public ndThreadPool
 	ndUnsigned32 m_lru;
 	ndUnsigned32 m_forceBalanceSceneCounter;
 	ndUnsigned8 m_bodyListChanged;
-	ndUnsigned8 m_currentThreadsMem;
 	ndUnsigned8 m_forceBalanceScene;
 
 	static ndVector m_velocTol;

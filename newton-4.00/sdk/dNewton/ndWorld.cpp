@@ -244,7 +244,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 				delete m_scene;
 				m_solverMode = solverMode;
 				m_scene = new ndWorldSceneCuda(this);
-				m_solver = new ndDynamicsUpdateCuda(this, 0);
+				m_solver = new ndDynamicsUpdateCuda(this);
 				break;
 			#endif
 

@@ -31,6 +31,10 @@ ndCudaContext::ndCudaContext()
 
 	cudaStatus = cudaSetDevice(0);
 	dAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
 }
 
 ndCudaContext::~ndCudaContext()

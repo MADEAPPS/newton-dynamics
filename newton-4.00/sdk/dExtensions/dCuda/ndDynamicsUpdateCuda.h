@@ -30,7 +30,7 @@ class ndCudaContext;
 class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 {
 	public:
-	ndDynamicsUpdateCuda(ndWorld* const world, ndInt32 driverNumber);
+	ndDynamicsUpdateCuda(ndWorld* const world);
 	virtual ~ndDynamicsUpdateCuda();
 
 	virtual const char* GetStringId() const;

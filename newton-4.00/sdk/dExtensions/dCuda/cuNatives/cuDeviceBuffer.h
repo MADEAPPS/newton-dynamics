@@ -116,7 +116,7 @@ void cuDeviceBuffer<T>::Clear()
 template<class T>
 void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 {
-	cudaError_t cudaStatus;
+	cudaError_t cudaStatus = cudaSuccess;
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
 		T* newArray;
@@ -135,8 +135,10 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	}
 	else if (newSize < m_capacity)
 	{
+		T* newArray;
 		newSize = dMax(newSize, 16);
-		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
+		//T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
+		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{
 			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
@@ -146,6 +148,10 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 
 		m_capacity = newSize;
 		m_array = newArray;
+	}
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
 	}
 }
 

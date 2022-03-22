@@ -40,7 +40,7 @@
 
 #define D_THREADS_PER_BLOCK		256
 
-ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world, ndInt32)
+ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_context(ndCudaContext::CreateContext())
 {

@@ -53,15 +53,18 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 
 void ndWorldSceneCuda::CalculateContacts()
 {
-	ndWorldScene::CalculateContacts();
+	//ndWorldScene::CalculateContacts();
 }
 
 void ndWorldSceneCuda::FindCollidingPairs()
 {
-	ndWorldScene::FindCollidingPairs();
+	//ndWorldScene::FindCollidingPairs();
 }
 
 void ndWorldSceneCuda::InitBodyArray()
 {
+	static int xxx;
+	//if (xxx < 10)
 	ndWorldScene::InitBodyArray();
+	xxx++;
 }
