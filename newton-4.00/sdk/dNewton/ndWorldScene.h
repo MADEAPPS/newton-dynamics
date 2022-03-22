@@ -26,6 +26,7 @@ class ndWorldScene : public ndScene
 {
 	public:
 	D_NEWTON_API ndWorldScene(ndWorld* const world);
+	D_NEWTON_API ndWorldScene(const ndWorldScene& src);
 	D_NEWTON_API virtual ~ndWorldScene();
 
 	protected:

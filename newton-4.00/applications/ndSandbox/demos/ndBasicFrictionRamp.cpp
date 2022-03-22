@@ -133,8 +133,6 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	texMatrix.m_posit.m_y = -0.5f;
 	const char* const boxTexName = "wood_0.tga";
 	ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
-
-	//ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
 	for (ndInt32 i = 0; i < 10; i++)
 	{
 		ndBodyDynamic* const boxBody = AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);

@@ -153,6 +153,7 @@ class ndScene : public ndThreadPool
 
 	protected:
 	D_COLLISION_API ndScene();
+	D_COLLISION_API ndScene(const ndScene& src);
 	
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();

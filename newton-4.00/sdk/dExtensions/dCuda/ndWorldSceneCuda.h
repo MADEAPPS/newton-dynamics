@@ -27,7 +27,7 @@ class ndCudaContext;
 class ndWorldSceneCuda : public ndWorldScene
 {
 	public:
-	ndWorldSceneCuda(ndWorld* const world);
+	ndWorldSceneCuda(const ndWorldScene& src);
 	virtual ~ndWorldSceneCuda();
 
 	virtual void InitBodyArray();

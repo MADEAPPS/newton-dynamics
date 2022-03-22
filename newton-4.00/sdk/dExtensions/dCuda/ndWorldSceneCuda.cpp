@@ -42,8 +42,8 @@
 #include "ndCudaKernels.h"
 #include "ndWorldSceneCuda.h"
 
-ndWorldSceneCuda::ndWorldSceneCuda(ndWorld* const world)
-	:ndWorldScene(world)
+ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
+	:ndWorldScene(src)
 {
 }
 

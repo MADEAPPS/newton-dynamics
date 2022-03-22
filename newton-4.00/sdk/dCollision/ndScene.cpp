@@ -206,18 +206,67 @@ ndScene::ndScene()
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_forceBalanceSceneCounter(0)
-	,m_bodyListChanged(0)
+	,m_bodyListChanged(1)
 	,m_forceBalanceScene(0)
 {
 	m_sentinelBody = new ndBodySentinel;
 	m_contactNotifyCallback->m_scene = this;
 }
 
+ndScene::ndScene(const ndScene& src)
+	:ndThreadPool("newtonWorker")
+	,m_bodyList()
+	,m_contactArray()
+	,m_scratchBuffer(1024)
+	,m_sceneBodyArray(1024)
+	,m_activeBodyArray(1024)
+	,m_activeConstraintArray(1024)
+	,m_specialUpdateList()
+	,m_backgroundThread()
+	,m_lock()
+	,m_rootNode(src.m_rootNode)
+	,m_sentinelBody(src.m_sentinelBody)
+	,m_contactNotifyCallback(src.m_contactNotifyCallback)
+	,m_treeEntropy(ndFloat32(0.0f))
+	,m_fitness()
+	,m_timestep(ndFloat32(0.0f))
+	,m_lru(D_CONTACT_DELAY_FRAMES)
+	,m_forceBalanceSceneCounter(0)
+	,m_bodyListChanged(1)
+	,m_forceBalanceScene(0)
+{
+	ndScene* const stealData = (ndScene*)&src;
+	stealData->m_sentinelBody = nullptr;
+	stealData->m_contactNotifyCallback = nullptr;
+	m_contactNotifyCallback->m_scene = this;
+
+	stealData->m_contactArray.DeleteAllContacts();
+
+	for (ndList<ndBodyKinematic*>::ndNode* node = stealData->m_specialUpdateList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyKinematic* const body = node->GetInfo();
+		body->m_spetialUpdateNode = m_specialUpdateList.Append(body);
+	}
+	stealData->m_specialUpdateList.RemoveAll();
+
+	for (ndBodyList::ndNode* node = stealData->m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyKinematic* const body = node->GetInfo();
+		ndBodyList::ndNode* const newNode = m_bodyList.Append(body);
+		body->SetSceneNodes(this, newNode);
+	}
+	stealData->m_bodyList.RemoveAll();
+	BalanceScene();
+}
+
 ndScene::~ndScene()
 {
 	Cleanup();
 	Finish();
-	delete m_contactNotifyCallback;
+	if (m_contactNotifyCallback)
+	{
+		delete m_contactNotifyCallback;
+	}
 	ndFreeListAlloc::Flush();
 }
 
@@ -1278,8 +1327,27 @@ void ndScene::InitBodyArray()
 		}
 	});
 
-	ParallelExecute(BuildBodyArray);
+	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
+		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 
+		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		ndInt32* const scan = &scans[threadIndex][0];
+
+		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = activeBodyArray[i];
+			const ndInt32 key = body->m_equilibrium;
+			const ndInt32 index = scan[key];
+			sceneBodyArray[index] = body;
+			scan[key] ++;
+		}
+	});
+
+	ParallelExecute(BuildBodyArray);
 	ndInt32 sum = 0;
 	ndInt32 threadCount = GetThreadCount();
 	for (ndInt32 j = 0; j < 2; j++)
@@ -1294,30 +1362,11 @@ void ndScene::InitBodyArray()
 
 	ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
 	m_sceneBodyArray.SetCount(m_bodyList.GetCount());
-
 	if (movingBodyCount)
 	{
-		auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			const ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
-			ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
-
-			const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
-			ndInt32* const scan = &scans[threadIndex][0];
-			
-			const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyKinematic* const body = activeBodyArray[i];
-				const ndInt32 key = body->m_equilibrium;
-				const ndInt32 index = scan[key];
-				sceneBodyArray[index] = body;
-				scan[key] ++;
-			}
-		});
 		ParallelExecute(CompactMovingBodies);
 	}
+
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
 	ndBodyKinematic* const sentinelBody = m_sentinelBody;

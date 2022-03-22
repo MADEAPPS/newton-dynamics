@@ -29,6 +29,12 @@ ndWorldScene::ndWorldScene(ndWorld* const world)
 {
 }
 
+ndWorldScene::ndWorldScene(const ndWorldScene& src)
+	:ndScene(src)
+	,m_world(src.m_world)
+{
+}
+
 ndWorldScene::~ndWorldScene()
 {
 }
