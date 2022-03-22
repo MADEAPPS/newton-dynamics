@@ -212,17 +212,20 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 {
 	if (solverMode != m_solverMode)
 	{
+		delete m_scene;
 		delete m_solver;
 		switch (solverMode)
 		{
 			case ndSimdSoaSolver:
 				m_solverMode = solverMode;
+				m_scene = new ndWorldScene(this);
 				m_solver = new ndDynamicsUpdateSoa(this);
 				break;
 
 			#ifdef _D_USE_AVX2_SOLVER
 			case ndSimdAvx2Solver:
 				m_solverMode = solverMode;
+				m_scene = new ndWorldScene(this);
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
 			#endif
@@ -230,6 +233,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			#ifdef _D_NEWTON_OPENCL
 			case ndOpenclSolver1:
 				m_solverMode = solverMode;
+				m_scene = new ndWorldScene(this);
 				m_solver = new ndDynamicsUpdateOpencl(this, 0);
 				break;
 
@@ -241,7 +245,6 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 
 			#ifdef _D_NEWTON_CUDA
 			case ndCudaSolver:
-				delete m_scene;
 				m_solverMode = solverMode;
 				m_scene = new ndWorldSceneCuda(this);
 				m_solver = new ndDynamicsUpdateCuda(this);
@@ -251,6 +254,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndStandardSolver:
 			default:
 				m_solverMode = ndStandardSolver;
+				m_scene = new ndWorldScene(this);
 				m_solver = new ndDynamicsUpdate(this);
 				break;
 		}

@@ -30,6 +30,7 @@
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 #include "ndUtils.h"
+#include "ndVector.h"
 #include "ndClassAlloc.h"
 
 template<class T>
@@ -54,6 +55,9 @@ class ndArray: public ndClassAlloc
 
 	void Swap(ndArray& other);
 	void PushBack(const T& element);
+
+	private: 
+	void CopyData(T* const dst, const T* const src, ndInt32 elements);
 
 	protected:
 	T* m_array;
@@ -144,11 +148,17 @@ ndInt32 ndArray<T>::GetCount() const
 template<class T>
 void ndArray<T>::SetCount(ndInt32 count)
 {
-	m_size = count;
-	while (m_size > m_capacity)
+	//m_size = count;
+	//while (m_size > m_capacity)
+	//{
+	//	Resize(m_capacity * 2);
+	//}
+
+	while (count > m_capacity)
 	{
 		Resize(m_capacity * 2);
 	}
+	m_size = count;
 }
 
 template<class T>
@@ -164,7 +174,28 @@ void ndArray<T>::Clear()
 }
 
 template<class T>
-void ndArray<T>::Resize(ndInt32 size)
+void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elements)
+{
+	//memcpy(dstPtr, srcPtr, elements * sizeof(T));
+	const ndInt32 sizeInBytes = elements * sizeof(T);
+	const ndInt32 size16 = sizeInBytes / sizeof(ndVector);
+
+	ndVector* const dst = (ndVector*)dstPtr;
+	const ndVector* const src = (ndVector*)srcPtr;
+	for (ndInt32 i = 0; i < size16; ++i)
+	{
+		dst[i] = src[i];
+	}
+	char* const dstBytes = (char*)dst;
+	const char* const srcBytes = (char*)src;
+	for (ndInt32 i = size16 * sizeof(ndVector); i < sizeInBytes; ++i)
+	{
+		dstBytes[i] = srcBytes[i];
+	}
+}
+
+template<class T>
+void ndArray<T>::Resize(ndInt32 newSize)
 {
 	// note: I know some tolls will detect a warning here
 	// because it is copy object from one array
@@ -174,36 +205,32 @@ void ndArray<T>::Resize(ndInt32 size)
 	// if an application needs to use an array with
 	// for general purpose classes, 
 	// please use standart lib std::vector
-	if (size > m_capacity || (m_capacity == 0))
+	if (newSize > m_capacity || (m_capacity == 0))
 	{
-		size = dMax(size, 16);
-		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * size));
+		newSize = dMax(newSize, 16);
+		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		if (m_array) 
 		{
-			for (ndInt32 i = 0; i < m_capacity; i++)
-			{
-				memcpy(&newArray[i], &m_array[i], sizeof(T));
-			}
+			//memcpy(newArray, m_array, m_size * sizeof(T));
+			CopyData(newArray, m_array, m_size);
 			ndMemory::Free(m_array);
 		}
 		m_array = newArray;
-		m_capacity = size;
+		m_capacity = newSize;
 	}
-	else if (size < m_capacity) 
+	else if (newSize < m_capacity)
 	{
-		size = dMax(size, 16);
-		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * size));
+		newSize = dMax(newSize, 16);
+		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		if (m_array) 
 		{
-			for (ndInt32 i = 0; i < size; i++) 
-			{
-				memcpy(&newArray[i], &m_array[i], sizeof(T));
-			}
+			//memcpy(newArray, m_array, newSize * sizeof(T));
+			CopyData(newArray, m_array, newSize);
 			ndMemory::Free(m_array);
 		}
-		m_size = size;
-		m_capacity = size;
+		//m_size = newSize;
 		m_array = newArray;
+		m_capacity = newSize;
 	}
 }
 
