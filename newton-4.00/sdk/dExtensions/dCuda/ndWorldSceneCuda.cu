@@ -81,6 +81,7 @@ void ndWorldSceneCuda::LoadBodyData()
 
 	gpuBodyBuffer.SetCount(bodyCount);
 	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
+	m_context->m_transformBuffer.SetCount(bodyCount);
 
 	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
@@ -91,7 +92,7 @@ void ndWorldSceneCuda::LoadBodyData()
 	gpuBodyBuffer.ReadData(&data[0], bodyCount);
 }
 
-void ndWorldSceneCuda::WriteBodyData()
+void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
@@ -114,7 +115,7 @@ void ndWorldSceneCuda::WriteBodyData()
 void ndWorldSceneCuda::UpdateTransform()
 {
 	D_TRACKTIME();
-	WriteBodyData();
+	GetBodyTransforms();
 	ndScene::UpdateTransform();
 }
 

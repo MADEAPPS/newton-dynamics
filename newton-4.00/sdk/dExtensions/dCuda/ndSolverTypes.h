@@ -19,31 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef __ND_CU_VECTOR_H__
+#define __ND_CU_VECTOR_H__
+
+#include <cuda.h>
+#include <vector_types.h>
+#include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
-#include <ndDynamicsUpdate.h>
 
-class ndCudaContext;
 
-class ndWorldSceneCuda : public ndWorldScene
+class ndSpatialVector
 {
 	public:
-	ndWorldSceneCuda(const ndWorldScene& src);
-	virtual ~ndWorldSceneCuda();
-
-	private:
-	virtual void InitBodyArray();
-	virtual void CalculateContacts();
-	virtual void FindCollidingPairs();
-
-	virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
-
-	virtual void UpdateTransform();
-
-	void LoadBodyData();
-
-	void GetBodyTransforms();
-
-	ndCudaContext* m_context;
-	friend class ndDynamicsUpdateCuda;
+	cuVector m_linear;
+	cuVector m_angular;
 };
+
+#endif

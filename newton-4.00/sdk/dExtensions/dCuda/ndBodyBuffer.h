@@ -111,9 +111,6 @@ class ndBodyProxy
 		if (omegaMag2 > tol2)
 		{
 			// this is correct
-			//float invOmegaMag = 1.0f / sqrt(omegaMag2);
-			//const float omegaAngle = invOmegaMag * omegaMag2 * timestep;
-			//const cuVector omegaAxis(m_omega.Scale(invOmegaMag));
 			const float omegaAngle = ndSqrt(omegaMag2);
 			const cuVector omegaAxis(m_omega.Scale(ndFloat32(1.0f) / omegaAngle));
 			const cuQuat rotationStep(omegaAxis, omegaAngle * timestep);

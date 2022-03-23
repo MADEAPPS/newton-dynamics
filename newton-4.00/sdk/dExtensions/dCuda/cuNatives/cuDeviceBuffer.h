@@ -26,6 +26,8 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 
+#define D_GRANULARITY (1024 * 4)
+
 template<class T>
 class cuDeviceBuffer
 {
@@ -120,7 +122,7 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
 		T* newArray;
-		newSize = dMax(newSize, 16);
+		newSize = dMax(newSize, D_GRANULARITY);
 		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
 		dAssert(cudaStatus == cudaSuccess);
 		if (m_array)
@@ -136,7 +138,7 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	else if (newSize < m_capacity)
 	{
 		T* newArray;
-		newSize = dMax(newSize, 16);
+		newSize = dMax(newSize, D_GRANULARITY);
 		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{

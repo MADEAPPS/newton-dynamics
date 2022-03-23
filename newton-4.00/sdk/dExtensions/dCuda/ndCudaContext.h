@@ -38,6 +38,7 @@ class ndCudaContext : public ndClassAlloc
 
 	struct cudaDeviceProp m_prop;
 	ndBodyBuffer m_bodyBuffer;
+	cuDeviceBuffer<ndSpatialVector> m_transformBuffer;
 };
 
 #endif
