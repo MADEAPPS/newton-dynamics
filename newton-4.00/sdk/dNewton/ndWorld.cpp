@@ -385,6 +385,19 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 	return 0;
 }
 
+void ndWorld::UpdateTransformsLock()
+{
+	D_TRACKTIME();
+	m_transformsLock.lock();
+}
+
+void ndWorld::UpdateTransformsUnlock()
+{
+	D_TRACKTIME();
+	m_transformsLock.unlock();
+}
+
+
 void ndWorld::ThreadFunction()
 {
 	ndUnsigned64 timeAcc = dGetTimeInMicroseconds();

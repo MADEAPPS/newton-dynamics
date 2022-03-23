@@ -69,9 +69,6 @@ class ndWorld: public ndClassAlloc
 
 	virtual void OnPostUpdate(ndFloat32 timestep);
 
-	void UpdateTransformsLock();
-	void UpdateTransformsUnlock();
-
 	ndInt32 GetThreadCount() const;
 	void SetThreadCount(ndInt32 count);
 
@@ -91,6 +88,9 @@ class ndWorld: public ndClassAlloc
 
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
+
+	D_NEWTON_API void UpdateTransformsLock();
+	D_NEWTON_API void UpdateTransformsUnlock();
 	
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
@@ -332,16 +332,6 @@ inline void ndWorld::Update(ndFloat32 timestep)
 inline ndWorld::ndSolverModes ndWorld::GetSelectedSolver() const
 {
 	return m_solverMode;
-}
-
-inline void ndWorld::UpdateTransformsLock()
-{
-	m_transformsLock.lock();
-}
-
-inline void ndWorld::UpdateTransformsUnlock()
-{
-	m_transformsLock.unlock();
 }
 
 inline ndInt32 ndWorld::GetEngineVersion() const
