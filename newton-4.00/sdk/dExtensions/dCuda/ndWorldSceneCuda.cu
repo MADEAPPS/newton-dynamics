@@ -93,6 +93,7 @@ void ndWorldSceneCuda::LoadBodyData()
 
 void ndWorldSceneCuda::WriteBodyData()
 {
+	D_TRACKTIME();
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	const ndInt32 bodyCount = bodyArray.GetCount();
 
@@ -112,6 +113,7 @@ void ndWorldSceneCuda::WriteBodyData()
 
 void ndWorldSceneCuda::UpdateTransform()
 {
+	D_TRACKTIME();
 	WriteBodyData();
 	ndScene::UpdateTransform();
 }
