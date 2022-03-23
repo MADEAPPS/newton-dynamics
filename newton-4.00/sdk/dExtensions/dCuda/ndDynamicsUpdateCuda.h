@@ -60,7 +60,6 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	void LoadBodyData();
 	void WriteBodyData();
 
 	ndCudaContext* m_context;

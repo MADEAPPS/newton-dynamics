@@ -222,6 +222,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndIkSolver;
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;
+	friend class ndWorldSceneCuda;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;

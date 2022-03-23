@@ -1298,7 +1298,7 @@ void ndScene::InitBodyArray()
 			{
 				inScene = AddBody(body);
 			}
-			dAssert(inScene && body->m_sceneNode);
+			dAssert(inScene && body->GetSceneBodyNode());
 		}
 		m_bodyListChanged = 0;
 	}

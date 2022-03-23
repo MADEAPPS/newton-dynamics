@@ -71,10 +71,35 @@ void ndWorldSceneCuda::FindCollidingPairs()
 	//ndWorldScene::FindCollidingPairs();
 }
 
+void ndWorldSceneCuda::LoadBodyData()
+{
+	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	const ndInt32 bodyCount = bodyArray.GetCount();
+
+	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
+
+	gpuBodyBuffer.SetCount(bodyCount);
+	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
+
+	for (ndInt32 i = 0; i < bodyCount; i++)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		ndBodyProxy& proxi = data[i];
+		proxi.BodyToProxy(body);
+	}
+	gpuBodyBuffer.ReadData(&data[0], bodyCount);
+}
+
+
 void ndWorldSceneCuda::InitBodyArray()
 {
-	static int xxx;
-	//if (xxx < 10)
+	bool bodyListChanged = m_bodyListChanged;
 	ndWorldScene::InitBodyArray();
-	xxx++;
+
+	if (bodyListChanged)
+	{
+		//ndWorldScene::InitBodyArray();
+		LoadBodyData();
+	}
 }

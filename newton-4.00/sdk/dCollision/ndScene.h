@@ -111,7 +111,10 @@ class ndScene : public ndThreadPool
 
 	D_COLLISION_API void SendBackgroundTask(ndBackgroundTask* const job);
 
-	private:
+	protected:
+	D_COLLISION_API ndScene();
+	D_COLLISION_API ndScene(const ndScene& src);
+
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 	ndFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
 
@@ -150,10 +153,6 @@ class ndScene : public ndThreadPool
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
-
-	protected:
-	D_COLLISION_API ndScene();
-	D_COLLISION_API ndScene(const ndScene& src);
 	
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();
@@ -162,14 +161,6 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void FindCollidingPairs();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
-
-	class ndBodyListRun
-	{
-		public:
-		ndBodyList::ndNode* m_begin;
-		ndInt32 m_count;
-		ndInt32 m_start;
-	};
 	
 	ndBodyList m_bodyList;
 	ndContactArray m_contactArray;
