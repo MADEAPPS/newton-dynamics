@@ -19,10 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-//#include "ndCoreStdafx.h"
-//#include "ndNewtonStdafx.h"
-//#include "ndWorldSceneCuda.h"
-
 #include <ndWorld.h>
 #include <ndModel.h>
 #include <ndWorldScene.h>
@@ -43,11 +39,26 @@
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
+	,m_context(ndCudaContext::CreateContext())
 {
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
 {
+	if (m_context)
+	{
+		delete m_context;
+	}
+}
+
+void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
+{
+	dAssert(0);
+}
+
+void ndWorldSceneCuda::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
+{
+	dAssert(0);
 }
 
 void ndWorldSceneCuda::CalculateContacts()

@@ -63,9 +63,6 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	void LoadBodyData();
 	void WriteBodyData();
 
-	
-	//void TestCudaKernel();
-
 	ndCudaContext* m_context;
 };
 

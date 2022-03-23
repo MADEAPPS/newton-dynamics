@@ -871,115 +871,85 @@ void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 	m_scene->BodiesInAabb(callback);
 }
 
-#if 0
 void ndWorld::SelectSolver(ndSolverModes solverMode)
 {
 	if (solverMode != m_solverMode)
 	{
-		//delete m_scene;
 		delete m_solver;
 		switch (solverMode)
 		{
 			case ndSimdSoaSolver:
+			{
 				m_solverMode = solverMode;
-				m_scene = new ndWorldScene(this);
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solver = new ndDynamicsUpdateSoa(this);
 				break;
+			}
 
 			#ifdef _D_USE_AVX2_SOLVER
 			case ndSimdAvx2Solver:
+			{
 				m_solverMode = solverMode;
-				//m_scene = new ndWorldScene(this);
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
+			}
 			#endif
 
 			#ifdef _D_NEWTON_OPENCL
 			case ndOpenclSolver1:
+			{
 				m_solverMode = solverMode;
-				//m_scene = new ndWorldScene(this);
+				newScene = new ndWorldScene(this);
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solver = new ndDynamicsUpdateOpencl(this, 0);
 				break;
+			}
 
 			case ndOpenclSolver2:
+			{
 				m_solverMode = solverMode;
-				//m_scene = new ndWorldScene(this);
+				newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solver = new ndDynamicsUpdateOpencl(this, 1);
 				break;
+			}
 			#endif
 
 			#ifdef _D_NEWTON_CUDA
 			case ndCudaSolver:
+			{
 				m_solverMode = solverMode;
-				//m_scene = new ndWorldSceneCuda(this);
+				ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solver = new ndDynamicsUpdateCuda(this);
 				break;
+			}
 			#endif
 
 			case ndStandardSolver:
 			default:
+			{
 				m_solverMode = ndStandardSolver;
-				//m_scene = new ndWorldScene(this);
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solver = new ndDynamicsUpdate(this);
 				break;
+			}
 		}
 	}
 }
-
-#else
-
-void ndWorld::SelectSolver(ndSolverModes solverMode)
-{
-	if (solverMode != m_solverMode)
-	{
-		ndWorldScene* newScene = nullptr;
-		ndDynamicsUpdate* newSolver = nullptr;
-		switch (solverMode)
-		{
-			case ndSimdSoaSolver:
-				newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-				newSolver = new ndDynamicsUpdateSoa(this);
-				break;
-
-			#ifdef _D_USE_AVX2_SOLVER
-			case ndSimdAvx2Solver:
-				newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-				newSolver = new ndDynamicsUpdateAvx2(this);
-				break;
-			#endif
-
-			#ifdef _D_NEWTON_OPENCL
-			case ndOpenclSolver1:
-				newScene = new ndWorldScene(this);
-				newSolver = new ndDynamicsUpdateOpencl(this, 0);
-				break;
-
-			case ndOpenclSolver2:
-				newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-				m_solver = new ndDynamicsUpdateOpencl(this, 1);
-				break;
-			#endif
-
-			#ifdef _D_NEWTON_CUDA
-			case ndCudaSolver:
-				newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
-				newSolver = new ndDynamicsUpdateCuda(this);
-				break;
-			#endif
-
-			case ndStandardSolver:
-			default:
-				solverMode = ndStandardSolver;
-				newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-				newSolver = new ndDynamicsUpdate(this);
-				break;
-		}
-		
-		delete m_scene;
-		delete m_solver;
-		m_scene = newScene;
-		m_solver = newSolver;
-		m_solverMode = solverMode;
-	}
-}
-#endif

@@ -43,56 +43,6 @@ ndCudaContext::~ndCudaContext()
 
 ndCudaContext* ndCudaContext::CreateContext()
 {
-	//cl_uint numPlatforms = 0;
-	//cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
-	//if ((err != CL_SUCCESS) || (numPlatforms == 0))
-	//{
-	//	return nullptr;
-	//}
-	//
-	//dAssert(numPlatforms < 16);
-	//cl_platform_id platforms[16];
-	//err = clGetPlatformIDs(numPlatforms, &platforms[0], nullptr);
-	//if (err != CL_SUCCESS)
-	//{
-	//	return nullptr;
-	//}
-	//
-	//ndInt32 driveIndex = 0;
-	//cl_platform_id bestPlatform = 0;
-	//for (cl_uint i = 0; i < numPlatforms; i++)
-	//{
-	//	cl_uint numDevices = 0;
-	//	err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices);
-	//	if (!((err != CL_SUCCESS) || (numDevices == 0)))
-	//	{
-	//		bestPlatform = platforms[i];
-	//		if (driveIndex == driveNumber)
-	//		{
-	//			break;
-	//		}
-	//		driveIndex++;
-	//	}
-	//}
-	//
-	//if (bestPlatform == nullptr)
-	//{
-	//	return nullptr;
-	//}
-	//
-	//cl_context_properties contextProperties[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)bestPlatform, 0 };
-	//
-	//cl_context context = clCreateContextFromType(contextProperties, CL_DEVICE_TYPE_GPU, nullptr, nullptr, &err);
-	//if ((CL_SUCCESS != err) || (context == nullptr))
-	//{
-	//	return nullptr;
-	//}
-
 	cudaError_t cudaStatus = cudaSetDevice(0);
-	if (cudaStatus != cudaSuccess)
-	{
-		return nullptr;
-	}
-
-	return new ndCudaContext();
+	return (cudaStatus == cudaSuccess) ? new ndCudaContext() : nullptr;
 }

@@ -35,35 +35,19 @@
 
 #include "ndCudaContext.h"
 #include "ndCudaKernels.h"
+#include "ndWorldSceneCuda.h"
 #include "ndDynamicsUpdateCuda.h"
 
 #define D_THREADS_PER_BLOCK		256
 
 ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
 	:ndDynamicsUpdate(world)
-	,m_context(ndCudaContext::CreateContext())
+	,m_context(((ndWorldSceneCuda*)world->GetScene())->m_context)
 {
-	//m_context->A.SetCount(100);
-	//m_context->B.SetCount(100);
-	//m_context->C.SetCount(100);
-	//
-	//ndArray<ndInt32> xxxx;
-	//for (ndInt32 i = 0; i < 100; i++)
-	//{
-	//	xxxx.PushBack(i);
-	//}
-	//
-	//m_context->A.ReadData(&xxxx[0], 100);
-	//m_context->B.ReadData(&xxxx[0], 100);
-	//m_context->C.ReadData(&xxxx[0], 100);
 }
 
 ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
 {
-	if (m_context)
-	{
-		delete m_context;
-	}
 }
 
 const char* ndDynamicsUpdateCuda::GetStringId() const
