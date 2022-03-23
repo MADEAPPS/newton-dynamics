@@ -38,7 +38,10 @@ class ndWorldSceneCuda : public ndWorldScene
 	virtual void FindCollidingPairs(ndBodyKinematic* const body);
 	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 
+	virtual void UpdateTransform();
+
 	void LoadBodyData();
+	void WriteBodyData();
 
 	ndCudaContext* m_context;
 	friend class ndDynamicsUpdateCuda;

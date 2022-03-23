@@ -1389,7 +1389,7 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_isJointFence1 = 1;
 	sentinelBody->m_bodyIsConstrained = 0;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
-	GetActiveBodyArray().PushBack(sentinelBody);
+	m_activeBodyArray.PushBack(sentinelBody);
 }
 
 void ndScene::CalculateContacts()

@@ -1765,23 +1765,23 @@ void ndDynamicsUpdateCuda::Update()
 	}
 }
 
-void ndDynamicsUpdateCuda::WriteBodyData()
-{
-	ndScene* const scene = m_world->GetScene();
-	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	const ndInt32 bodyCount = bodyArray.GetCount();
-
-	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
-	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
-	gpuBodyBuffer.WriteData(&data[0], bodyCount);
-
-	for (ndInt32 i = 0; i < bodyCount; i++)
-	{
-		ndBodyKinematic* const body = bodyArray[i];
-		ndBodyProxy& proxi = data[i];
- 		proxi.ProxyToBody(body);
-	}
-}
+//void ndDynamicsUpdateCuda::WriteBodyData()
+//{
+//	ndScene* const scene = m_world->GetScene();
+//	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+//	const ndInt32 bodyCount = bodyArray.GetCount();
+//
+//	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+//	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
+//	gpuBodyBuffer.WriteData(&data[0], bodyCount);
+//
+//	for (ndInt32 i = 0; i < bodyCount; i++)
+//	{
+//		ndBodyKinematic* const body = bodyArray[i];
+//		ndBodyProxy& proxi = data[i];
+// 		proxi.ProxyToBody(body);
+//	}
+//}
 
 void ndDynamicsUpdateCuda::DeviceUpdate()
 {
@@ -1800,6 +1800,4 @@ void ndDynamicsUpdateCuda::DeviceUpdate()
 		IntegrateBodies();
 	//	DetermineSleepStates();
 	}
-
-	WriteBodyData();
 }

@@ -91,15 +91,39 @@ void ndWorldSceneCuda::LoadBodyData()
 	gpuBodyBuffer.ReadData(&data[0], bodyCount);
 }
 
+void ndWorldSceneCuda::WriteBodyData()
+{
+	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	const ndInt32 bodyCount = bodyArray.GetCount();
+
+	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
+	gpuBodyBuffer.WriteData(&data[0], bodyCount);
+
+	for (ndInt32 i = 0; i < bodyCount; i++)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		body->m_transformIsDirty = true;
+
+		ndBodyProxy& proxi = data[i];
+		proxi.ProxyToBody(body);
+	}
+}
+
+void ndWorldSceneCuda::UpdateTransform()
+{
+	WriteBodyData();
+	ndScene::UpdateTransform();
+}
 
 void ndWorldSceneCuda::InitBodyArray()
 {
 	bool bodyListChanged = m_bodyListChanged;
-	ndWorldScene::InitBodyArray();
+	//ndWorldScene::InitBodyArray();
 
 	if (bodyListChanged)
 	{
-		//ndWorldScene::InitBodyArray();
+		ndWorldScene::InitBodyArray();
 		LoadBodyData();
 	}
 }
