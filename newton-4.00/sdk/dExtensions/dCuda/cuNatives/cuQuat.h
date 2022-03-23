@@ -51,9 +51,15 @@ class cuQuat: public cuVector
 	inline __device__ cuQuat(const cuVector& unitAxis, float angle)
 		:cuVector()
 	{
-		angle = angle * float(0.5f);
+		angle = angle * 0.5f;
 		w = cos(angle);
-		float sinAng = sin(angle);
+		const float sinAng = sin(angle);
+
+		// this does not works.
+		//float sinAng;
+		////float cosAng;
+		////sincos(angle * 0.5f, &sinAng, &w);
+		//__sincosf(angle * 0.5f, &sinAng, &w);
 
 		x = unitAxis.x * sinAng;
 		y = unitAxis.y * sinAng;
@@ -67,21 +73,19 @@ class cuQuat: public cuVector
 
 	inline cuMatrix3x3 __device__ GetMatrix3x3 () const
 	{
-		//const dQuaternion quat0(quat);
-		//const dQuaternion quat1(quat0.Scale (float(2.0f)));
-		const cuQuat quat0 = *this;
-		const cuQuat quat1 (quat0.Scale (2.0));
+		//const cuQuat quat0 = *this;
+		const cuQuat quat1 (Scale (2.0));
 		
-		float x2 = quat0.x * quat1.x;
-		float y2 = quat0.y * quat1.y;
-		float z2 = quat0.z * quat1.z;
+		const float x2 = x * quat1.x;
+		const float y2 = y * quat1.y;
+		const float z2 = z * quat1.z;
 
-		float xy = quat0.x * quat1.y;
-		float xz = quat0.x * quat1.z;
-		float xw = quat0.x * quat1.w;
-		float yz = quat0.y * quat1.z;
-		float yw = quat0.y * quat1.w;
-		float zw = quat0.z * quat1.w;
+		const float xy = x * quat1.y;
+		const float xz = x * quat1.z;
+		const float xw = x * quat1.w;
+		const float yz = y * quat1.z;
+		const float yw = y * quat1.w;
+		const float zw = z * quat1.w;
 
 		const cuVector front(1.0f - y2 - z2, xy + zw, xz - yw, 0.0f);
 		const cuVector up   (xy - zw, 1.0f - x2 - z2, yz + xw, 0.0f);

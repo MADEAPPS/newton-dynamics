@@ -684,7 +684,7 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 	{
 		const cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
 		//cuMatrix3x3 invInertia(body.CalculateInvInertiaMatrix(matrix));
-		body.AddDampingAcceleration(matrix, timestep);
+		body.AddDampingAcceleration(matrix);
 		body.IntegrateExternalForce(matrix, timestep);
 	};
 

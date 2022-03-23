@@ -53,8 +53,7 @@ class ndBodyProxy
 			matrix.m_right.Scale(matrix.m_right.GetElement(2)) * invIzz);
 	}
 
-	//inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix, float timestep)
-	inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix, float)
+	inline void __device__ AddDampingAcceleration(const cuMatrix3x3& matrix)
 	{
 		const cuVector omega(matrix.UnrotateVector(m_omega) * m_dampCoef);
 		m_omega = matrix.RotateVector(omega);
@@ -105,18 +104,19 @@ class ndBodyProxy
 	inline void __device__ IntegrateVelocity(float timestep)
 	{
 		m_posit = m_posit + m_veloc.Scale(timestep);
-		float omegaMag2 = m_omega.DotProduct(m_omega);
+		const float omegaMag2 = m_omega.DotProduct(m_omega);
 		
-		float tol = (float(0.0125f) * 3.141592f / 180.0f);
-		float tol2 = tol * tol;
+		const float tol = (float(0.0125f) * 3.141592f / 180.0f);
+		const float tol2 = tol * tol;
 		if (omegaMag2 > tol2)
 		{
 			// this is correct
-		//	//float invOmegaMag = ndRsqrt(omegaMag2);
-			float invOmegaMag = 1.0f / sqrt(omegaMag2);
-			const float omegaAngle = invOmegaMag * omegaMag2 * timestep;
-			const cuVector omegaAxis(m_omega.Scale(invOmegaMag));
-			const cuQuat rotationStep(omegaAxis, omegaAngle);
+			//float invOmegaMag = 1.0f / sqrt(omegaMag2);
+			//const float omegaAngle = invOmegaMag * omegaMag2 * timestep;
+			//const cuVector omegaAxis(m_omega.Scale(invOmegaMag));
+			const float omegaAngle = ndSqrt(omegaMag2);
+			const cuVector omegaAxis(m_omega.Scale(ndFloat32(1.0f) / omegaAngle));
+			const cuQuat rotationStep(omegaAxis, omegaAngle * timestep);
 			const cuQuat rotation(m_rotation * rotationStep);
 			m_rotation = rotation.Normalize();
 
@@ -148,13 +148,15 @@ class ndBodyProxy
 		body->SetMatrixAndCentreOfMass(rotation, position);
 	}
 
-	cuVector m_mass;
 	cuQuat m_rotation;
-	cuVector m_dampCoef;
-	cuVector m_invIntertia;
 	cuVector m_posit;
 	cuVector m_veloc;
 	cuVector m_omega;
+
+	// constant Data
+	cuVector m_mass;
+	cuVector m_dampCoef;
+	cuVector m_invIntertia;
 };
 
 class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxy>
@@ -165,7 +167,6 @@ class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxy>
 	ndArray<ndBodyProxy> m_dataView;
 };
 
-
 inline ndBodyBuffer::ndBodyBuffer()
 	:cuDeviceBuffer<ndBodyProxy>()
 {
@@ -174,4 +175,5 @@ inline ndBodyBuffer::ndBodyBuffer()
 inline ndBodyBuffer::~ndBodyBuffer()
 {
 }
+
 #endif

@@ -47,30 +47,31 @@ ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 	const ndQuaternion quat0(quat);
 	const ndQuaternion quat1(quat0.Scale (ndFloat32(2.0f)));
 
-	ndFloat32 x2 = quat0.m_x * quat1.m_x;
-	ndFloat32 y2 = quat0.m_y * quat1.m_y;
-	ndFloat32 z2 = quat0.m_z * quat1.m_z;
+	const ndFloat32 x2 = quat0.m_x * quat1.m_x;
+	const ndFloat32 y2 = quat0.m_y * quat1.m_y;
+	const ndFloat32 z2 = quat0.m_z * quat1.m_z;
 
 #ifdef _DEBUG
 	ndFloat32 w2 = quat0.m_w * quat1.m_w;
 	dAssert (dAbs (w2 + x2 + y2 + z2 - ndFloat32(2.0f)) <ndFloat32 (1.0e-3f));
 #endif
 
-	ndFloat32 xy = quat0.m_x * quat1.m_y;
-	ndFloat32 xz = quat0.m_x * quat1.m_z;
-	ndFloat32 xw = quat0.m_x * quat1.m_w;
-	ndFloat32 yz = quat0.m_y * quat1.m_z;
-	ndFloat32 yw = quat0.m_y * quat1.m_w;
-	ndFloat32 zw = quat0.m_z * quat1.m_w;
+	const ndFloat32 xy = quat0.m_x * quat1.m_y;
+	const ndFloat32 xz = quat0.m_x * quat1.m_z;
+	const ndFloat32 xw = quat0.m_x * quat1.m_w;
+	const ndFloat32 yz = quat0.m_y * quat1.m_z;
+	const ndFloat32 yw = quat0.m_y * quat1.m_w;
+	const ndFloat32 zw = quat0.m_z * quat1.m_w;
 
 	m_front = ndVector (ndFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, ndFloat32(0.0f));
 	m_up    = ndVector (xy - zw, ndFloat32(1.0f) - x2 - z2, yz + xw, ndFloat32(0.0f));
 	m_right = ndVector (xz + yw, yz - xw, ndFloat32(1.0f) - x2 - y2, ndFloat32(0.0f));
 
-	m_posit.m_x = position.m_x;
-	m_posit.m_y = position.m_y;
-	m_posit.m_z = position.m_z;
-	m_posit.m_w = ndFloat32(1.0f);
+	m_posit = position;
+	//m_posit.m_x = position.m_x;
+	//m_posit.m_y = position.m_y;
+	//m_posit.m_z = position.m_z;
+	//m_posit.m_w = ndFloat32(1.0f);
 }
 
 ndMatrix::ndMatrix (const ndMatrix& transformMatrix, const ndVector& scale, const ndMatrix& stretchAxis)

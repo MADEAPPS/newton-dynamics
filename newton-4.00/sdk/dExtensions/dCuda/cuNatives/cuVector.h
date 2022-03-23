@@ -25,6 +25,7 @@
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
+
 #include <ndNewtonStdafx.h>
 #include <device_launch_parameters.h>
 

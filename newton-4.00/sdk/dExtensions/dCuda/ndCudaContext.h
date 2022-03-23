@@ -37,10 +37,6 @@ class ndCudaContext : public ndClassAlloc
 	static ndCudaContext* CreateContext();
 
 	struct cudaDeviceProp m_prop;
-	//ndDeviceBuffer<ndInt32> A;
-	//ndDeviceBuffer<ndInt32> B;
-	//ndDeviceBuffer<ndInt32> C;
-
 	ndBodyBuffer m_bodyBuffer;
 };
 

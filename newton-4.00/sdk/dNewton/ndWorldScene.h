@@ -32,5 +32,12 @@ class ndWorldScene : public ndScene
 	protected:
 	virtual void ThreadFunction();
 
+	virtual ndWorld* GetWorld() const;
+
 	ndWorld* m_world;
 };
+
+inline ndWorld* ndWorldScene::GetWorld() const
+{
+	return m_world;
+}
