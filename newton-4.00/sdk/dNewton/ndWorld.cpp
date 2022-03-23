@@ -388,15 +388,14 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 void ndWorld::UpdateTransformsLock()
 {
 	D_TRACKTIME();
-	m_transformsLock.lock();
+	//m_transformsLock.lock();
 }
 
 void ndWorld::UpdateTransformsUnlock()
 {
 	D_TRACKTIME();
-	m_transformsLock.unlock();
+	//m_transformsLock.unlock();
 }
-
 
 void ndWorld::ThreadFunction()
 {
