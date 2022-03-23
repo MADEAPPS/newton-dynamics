@@ -78,15 +78,10 @@ class cuMatrix3x3
 
 				if (permute != i)
 				{
-					//dSwap(ret[i], ret[permute]);
 					float a0 = ret.GetElement(i);
 					ret.SetElement(i, ret.GetElement(permute));
 					ret.SetElement(permute, a0);
-
 					cuSwap(tmp.m_data[i], tmp.m_data[permute]);
-					//cuVector b (tmp.GetElement(i));
-					//tmp.SetElement(i, tmp.GetElement(permute));
-					//tmp.SetElement(permute, a0);
 				}
 			}
 
@@ -94,7 +89,6 @@ class cuMatrix3x3
 			{
 				const cuVector scale(tmp.m_data[j].GetElement(i) / tmp.m_data[i].GetElement(i));
 				tmp.m_data[j] = tmp.m_data[j] - tmp.m_data[i] * scale;
-				//ret[j] -= ret[i] * scale.GetScalar();
 				ret.SetElement(j, ret.GetElement(j) - ret.GetElement(i) * scale.x);
 				tmp.m_data[j].SetElement(i, 0.0f);
 			}
@@ -103,7 +97,6 @@ class cuMatrix3x3
 		for (int i = 2; i >= 0; --i)
 		{
 			const cuVector pivot(tmp.m_data[i] * ret);
-			//ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
 			ret.SetElement(i, (ret.GetElement(i) - pivot.AddHorizontal() + tmp.m_data[i].GetElement(i) * ret.GetElement(i)) / tmp.m_data[i].GetElement(i));
 		}
 

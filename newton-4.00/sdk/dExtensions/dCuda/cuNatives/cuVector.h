@@ -25,9 +25,7 @@
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
-
 #include <ndNewtonStdafx.h>
-#include <device_launch_parameters.h>
 
 class cuVector: public float4
 {
@@ -68,6 +66,11 @@ class cuVector: public float4
 		w = src.m_w;
 	}
 
+	inline ndVector ToNdVector(const cuVector& src) const
+	{
+		return ndVector(src.x, src.y, src.z, src.w);
+	}
+
 	inline float __device__ GetElement(int i) const
 	{
 		return (&this->x)[i];
@@ -76,11 +79,6 @@ class cuVector: public float4
 	inline void __device__ SetElement(int i, float val)
 	{
 		(&this->x)[i] = val;
-	}
-
-	inline ndVector ToNdVector(const cuVector& src) const
-	{
-		return ndVector(src.x, src.y, src.z, src.w);
 	}
 	
 	inline cuVector __device__ operator+ (const cuVector& A) const
@@ -120,8 +118,6 @@ class cuVector: public float4
 						x * B.y - y * B.x,
 						w);
 	}
-
-
 
 	inline cuVector __device__ Normalize() const
 	{

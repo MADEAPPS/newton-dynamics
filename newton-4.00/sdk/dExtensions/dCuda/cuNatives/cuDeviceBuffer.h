@@ -137,7 +137,6 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	{
 		T* newArray;
 		newSize = dMax(newSize, 16);
-		//T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{
