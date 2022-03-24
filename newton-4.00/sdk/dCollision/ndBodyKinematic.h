@@ -33,7 +33,7 @@ class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-#define D_USE_ISLAND_WIP
+//#define D_USE_ISLAND_WIP
 
 #define D_SMALL_ISLAND_COUNT		32
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)

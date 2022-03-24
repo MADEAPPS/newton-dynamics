@@ -672,7 +672,6 @@ void ndDynamicsUpdate::SortIslands()
 		scan[key] += (body->m_bodyIsConstrained ? 1 : -1);
 	}
 	m_unConstrainedBodyCount = bodyCount - scan[0];
-
 #endif
 }
 
@@ -760,17 +759,21 @@ void ndDynamicsUpdate::InitWeights()
 		}
 		extraPassesArray[threadIndex] = maxExtraPasses;
 	});
-	scene->ParallelExecute(InitWeights);
 
-	ndInt32 extraPasses = 0;
-	const ndInt32 threadCount = scene->GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; ++i)
+	if (scene->GetActiveContactArray().GetCount())
 	{
-		extraPasses = dMax(extraPasses, extraPassesArray[i]);
-	}
+		scene->ParallelExecute(InitWeights);
 
-	const ndInt32 conectivity = 7;
-	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
+		ndInt32 extraPasses = 0;
+		const ndInt32 threadCount = scene->GetThreadCount();
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			extraPasses = dMax(extraPasses, extraPassesArray[i]);
+		}
+
+		const ndInt32 conectivity = 7;
+		m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
+	}
 }
 
 void ndDynamicsUpdate::InitBodyArray()
@@ -1785,18 +1788,13 @@ void ndDynamicsUpdate::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-#ifdef D_USE_ISLAND_WIP
-	if (GetIslands().GetCount())
-#endif
-	{
-		IntegrateUnconstrainedBodies();
-		InitWeights();
-		InitBodyArray();
-		InitJacobianMatrix();
-		CalculateForces();
-		IntegrateBodies();
-		#ifdef D_USE_ISLAND_WIP
-		DetermineSleepStates();
-		#endif
-	}
+	IntegrateUnconstrainedBodies();
+	InitWeights();
+	InitBodyArray();
+	InitJacobianMatrix();
+	CalculateForces();
+	IntegrateBodies();
+	#ifdef D_USE_ISLAND_WIP
+	DetermineSleepStates();
+	#endif
 }

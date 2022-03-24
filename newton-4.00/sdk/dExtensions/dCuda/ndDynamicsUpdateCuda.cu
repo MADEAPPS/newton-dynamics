@@ -503,9 +503,10 @@ void ndDynamicsUpdateCuda::SortJoints()
 void ndDynamicsUpdateCuda::SortIslands()
 {
 	D_TRACKTIME();
+#ifdef D_USE_ISLAND_WIP
 	class ndIslandKey
 	{
-	public:
+		public:
 		ndIslandKey(void* const) {}
 		ndUnsigned32 GetKey(const ndBodyIndexPair& pair) const
 		{
@@ -517,7 +518,7 @@ void ndDynamicsUpdateCuda::SortIslands()
 
 	class ndEvaluateKey
 	{
-	public:
+		public:
 		ndEvaluateKey(void* const context)
 		{
 			ndInt32 digitLocation = *((ndInt32*)context);
@@ -626,6 +627,36 @@ void ndDynamicsUpdateCuda::SortIslands()
 		}
 	}
 	m_unConstrainedBodyCount = unConstrainedCount;
+#else
+	ndScene* const scene = m_world->GetScene();
+	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	ndArray<ndBodyKinematic*>& activeBodyArray = GetBodyIslandOrder();
+	GetInternalForces().SetCount(bodyArray.GetCount());
+	ndBodyKinematic** const buffer0 = (ndBodyKinematic**)&GetInternalForces()[0];
+
+	ndInt32 bodyCount = 0;
+	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		buffer0[bodyCount] = body;
+		bodyCount += (!(body->m_equilibrium0 & body->m_islandSleep));
+	}
+
+	activeBodyArray.SetCount(bodyCount);
+	ndInt32 scan[2];
+	scan[0] = 0;
+	scan[1] = bodyCount - 1;
+	for (ndInt32 i = 0; i < bodyCount; ++i)
+	{
+		ndBodyKinematic* const body = buffer0[i];
+		dAssert((body->m_bodyIsConstrained == 0) || (body->m_bodyIsConstrained == 1));
+		const ndInt32 key = 1 - body->m_bodyIsConstrained;
+		const ndInt32 index = scan[1 - body->m_bodyIsConstrained];
+		activeBodyArray[index] = body;
+		scan[key] += (body->m_bodyIsConstrained ? 1 : -1);
+	}
+	m_unConstrainedBodyCount = bodyCount - scan[0];
+#endif
 }
 
 void ndDynamicsUpdateCuda::BuildIsland()
@@ -727,17 +758,21 @@ void ndDynamicsUpdateCuda::InitWeights()
 		}
 		extraPassesArray[threadIndex] = maxExtraPasses;
 	});
-	scene->ParallelExecute(InitWeights);
 
-	ndInt32 extraPasses = 0;
-	const ndInt32 threadCount = scene->GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; ++i)
+	if (scene->GetActiveContactArray().GetCount())
 	{
-		extraPasses = dMax(extraPasses, extraPassesArray[i]);
-	}
+		scene->ParallelExecute(InitWeights);
 
-	const ndInt32 conectivity = 7;
-	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
+		ndInt32 extraPasses = 0;
+		const ndInt32 threadCount = scene->GetThreadCount();
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			extraPasses = dMax(extraPasses, extraPassesArray[i]);
+		}
+
+		const ndInt32 conectivity = 7;
+		m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
+	}
 }
 
 void ndDynamicsUpdateCuda::InitBodyArray()
@@ -1227,6 +1262,9 @@ void ndDynamicsUpdateCuda::IntegrateBodies()
 				body->m_accel = invTime * (body->m_veloc - body->m_accel);
 				body->m_alpha = invTime * (body->m_omega - body->m_alpha);
 				body->IntegrateVelocity(timestep);
+				#ifndef D_USE_ISLAND_WIP
+				body->EvaluateSleepState(m_world);
+				#endif
 			}
 		}
 	});
@@ -1772,14 +1810,13 @@ void ndDynamicsUpdateCuda::DeviceUpdate()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	//BuildIsland();
-	//if (GetIslands().GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-	//	InitWeights();
-	//	InitBodyArray();
-	//	InitJacobianMatrix();
-	//	CalculateForces();
-		IntegrateBodies();
-	//	DetermineSleepStates();
-	}
+	IntegrateUnconstrainedBodies();
+	//InitWeights();
+	//InitBodyArray();
+	//InitJacobianMatrix();
+	//CalculateForces();
+	IntegrateBodies();
+#ifdef D_USE_ISLAND_WIP
+	//DetermineSleepStates();
+#endif
 }

@@ -150,121 +150,6 @@ void ndDynamicsUpdateOpencl::SortIslands()
 {
 	D_TRACKTIME();
 	dAssert(0);
-	//ndScene* const scene = m_world->GetScene();
-	//const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	//GetInternalForces().SetCount(bodyArray.GetCount());
-	//
-	//ndInt32 bodyCount = 0;
-	//const ndInt32 totalBodyCount = bodyArray.GetCount() - 1;
-	//ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	//for (ndInt32 i = 0; i < totalBodyCount; i++)
-	//{
-	//	ndBodyKinematic* const body = bodyArray[i];
-	//	if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
-	//	{
-	//		buffer0[bodyCount].m_body = body;
-	//		if (body->m_invMass.m_w > ndFloat32(0.0f))
-	//		{
-	//			ndBodyKinematic* root = body->m_islandParent;
-	//			while (root != root->m_islandParent)
-	//			{
-	//				root = root->m_islandParent;
-	//			}
-	//
-	//			buffer0[bodyCount].m_root = root;
-	//			if (root->m_rank != -1)
-	//			{
-	//				root->m_rank = -1;
-	//			}
-	//		}
-	//		else
-	//		{
-	//			buffer0[bodyCount].m_root = body;
-	//			body->m_rank = -1;
-	//		}
-	//		bodyCount++;
-	//	}
-	//}
-	//
-	//ndArray<ndIsland>& islands = GetIsland____();
-	////ndArray<ndInt32>& islandOrder = GetBodyIslandOrder____();
-	//ndArray<ndInt32>& islandOrder = GetBodyIslandOrder_______();
-	//
-	//islands.SetCount(0);
-	//islandOrder.SetCount(bodyCount);
-	//
-	//m_unConstrainedBodyCount____ = 0;
-	//if (bodyCount)
-	//{
-	//	// sort using counting sort o(n)
-	//	ndInt32 scans[2];
-	//	scans[0] = 0;
-	//	scans[1] = 0;
-	//	for (ndInt32 i = 0; i < bodyCount; i++)
-	//	{
-	//		ndInt32 j = 1 - buffer0[i].m_root->m_bodyIsConstrained;
-	//		scans[j] ++;
-	//	}
-	//	scans[1] = scans[0];
-	//	scans[0] = 0;
-	//	ndBodyIndexPair* const buffer2 = buffer0 + bodyCount;
-	//	for (ndInt32 i = 0; i < bodyCount; i++)
-	//	{
-	//		const ndInt32 key = 1 - buffer0[i].m_root->m_bodyIsConstrained;
-	//		const ndInt32 j = scans[key];
-	//		buffer2[j] = buffer0[i];
-	//		scans[key] = j + 1;
-	//	}
-	//
-	//	const ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
-	//	for (ndInt32 i = 0; i < bodyCount; i++)
-	//	{
-	//		dAssert(bodyArray[buffer1[i].m_body->m_index] == buffer1[i].m_body);
-	//		dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
-	//
-	//		islandOrder[i] = buffer1[i].m_body->m_index;
-	//		if (buffer1[i].m_root->m_rank == -1)
-	//		{
-	//			buffer1[i].m_root->m_rank = 0;
-	//			ndIsland island(buffer1[i].m_root);
-	//			islands.PushBack(island);
-	//		}
-	//		buffer1[i].m_root->m_rank += 1;
-	//	}
-	//
-	//	ndInt32 start = 0;
-	//	ndInt32 islandMaxKeySize = 0;
-	//	ndInt32 unConstrainedCount = 0;
-	//	for (ndInt32 i = 0; i < islands.GetCount(); i++)
-	//	{
-	//		ndIsland& island = islands[i];
-	//		island.m_start = start;
-	//		island.m_count = island.m_root->m_rank;
-	//		islandMaxKeySize = dMax(islandMaxKeySize, island.m_count);
-	//		start += island.m_count;
-	//		unConstrainedCount += island.m_root->m_bodyIsConstrained ? 0 : 1;
-	//	}
-	//
-	//	m_unConstrainedBodyCount____ = unConstrainedCount;
-	//
-	//	class EvaluateKey
-	//	{
-	//		public:
-	//		dUnsigned32 GetKey(const ndIsland& island) const
-	//		{
-	//			dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
-	//			const dUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
-	//			dAssert(key < maxVal);
-	//			return maxVal - key;
-	//		}
-	//	};
-	//
-	//	scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&islands[0], (ndIsland*)GetTempBuffer(), islands.GetCount(), 0);
-	//	if (islandMaxKeySize >= 256)
-	//	{
-	//		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&islands[0], (ndIsland*)GetTempBuffer(), islands.GetCount(), 1);
-	//	}
-	//}
 }
 
 void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
@@ -920,65 +805,6 @@ void ndDynamicsUpdateOpencl::UpdateForceFeedback()
 void ndDynamicsUpdateOpencl::IntegrateBodies()
 {
 	D_TRACKTIME();
-	dAssert(0);
-	//class ndIntegrateBodies : public ndScene::ndBaseJob
-	//{
-	//	public:
-	//	virtual void Execute()
-	//	{
-	//		D_TRACKTIME();
-	//		ndWorld* const world = m_owner->GetWorld();
-	//		ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-	//		const ndArray<ndInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-	//		ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
-	//
-	//		const ndFloat32 timestep = m_timestep;
-	//		const dVector invTime(me->m_invTimestep);
-	//
-	//		const ndInt32 threadIndex = GetThreadId();
-	//		const ndInt32 threadCount = m_owner->GetThreadCount();
-	//		const ndInt32 bodyCount = bodyIslandOrder.GetCount();
-	//		const ndInt32 stride = bodyCount / threadCount;
-	//		const ndInt32 start = threadIndex * stride;
-	//		const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-	//
-	//		for (ndInt32 i = 0; i < blockSize; i++)
-	//		{
-	//			ndInt32 index = bodyIslandOrder[start + i];
-	//			ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
-	//
-	//			// the initial velocity and angular velocity were stored in m_accel and dynBody->m_alpha for memory saving
-	//			if (body)
-	//			{
-	//				if (!body->m_equilibrium)
-	//				{
-	//					body->m_accel = invTime * (body->m_veloc - body->m_accel);
-	//					body->m_alpha = invTime * (body->m_omega - body->m_alpha);
-	//					body->IntegrateVelocity(timestep);
-	//				}
-	//			}
-	//			else
-	//			{
-	//				ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
-	//				dAssert(kinBody);
-	//				if (!kinBody->m_equilibrium)
-	//				{
-	//					kinBody->IntegrateVelocity(timestep);
-	//				}
-	//			}
-	//		}
-	//	}
-	//};
-
-	//#ifdef D_USE_GPU_DEVICE___
-	//	dAssert(0);
-	//	m_opencl->Resize(GetBodyIslandOrder____());
-	//	m_opencl->CopyToGpu(GetBodyIslandOrder____());
-	//	m_opencl->ExecuteIntegrateBodyPosition(m_timestep, GetBodyIslandOrder____());
-	//#else
-	//	ndScene* const scene = m_world->GetScene();
-	//	scene->SubmitJobs<ndIntegrateBodies>();
-	//#endif
 }
 
 void ndDynamicsUpdateOpencl::DetermineSleepStates()
@@ -1577,18 +1403,14 @@ void ndDynamicsUpdateOpencl::Update()
 	//	m_timestep = m_world->GetScene()->GetTimestep();
 	//
 	//	BuildIsland();
-	//	ndInt32 count = GetActiveBodies().GetCount();
-	//	if (count)
-	//	{
-	//		IntegrateUnconstrainedBodies();
-	//		InitWeights();
-	//		InitBodyArray();
-	//		InitJacobianMatrix();
-	//		CalculateForces();
-	//		IntegrateBodies();
-	//		//FinishGpuUpdate();
-	//		DetermineSleepStates();
-	//	}
+	//	IntegrateUnconstrainedBodies();
+	//	InitWeights();
+	//	InitBodyArray();
+	//	InitJacobianMatrix();
+	//	CalculateForces();
+	//	IntegrateBodies();
+	//	//FinishGpuUpdate();
+	//	DetermineSleepStates();
 	//}
 	//else
 	//{
