@@ -517,7 +517,8 @@ void ndDynamicsUpdateSoa::SortIslands()
 		unConstrainedCount += islands.GetCount();
 	
 		ndInt32 context = 0;
-		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
+		scene->GetScratchBuffer().SetCount(islands.GetCount() * sizeof(ndIsland));
+		ndIsland* const islandTempBuffer = (ndIsland*)&scene->GetScratchBuffer()[0];
 		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{

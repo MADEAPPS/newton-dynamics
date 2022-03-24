@@ -88,6 +88,8 @@ class ndScene : public ndThreadPool
 
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
+	
+	ndArray<ndUnsigned8>& GetScratchBuffer();
 
 	ndFloat32 GetTimestep() const;
 	void SetTimestep(ndFloat32 timestep);
@@ -165,7 +167,7 @@ class ndScene : public ndThreadPool
 	ndBodyList m_bodyList;
 	ndContactArray m_contactArray;
 
-	ndArray<void*> m_scratchBuffer;
+	ndArray<ndUnsigned8> m_scratchBuffer;
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
 	ndArray<ndBodyKinematic*> m_activeBodyArray;
 	ndArray<ndConstraint*> m_activeConstraintArray;
@@ -208,6 +210,11 @@ inline ndInt32 ndScene::GetThreadCount() const
 {
 	const ndThreadPool& pool = *this;
 	return pool.GetThreadCount();
+}
+
+inline ndArray<ndUnsigned8>& ndScene::GetScratchBuffer()
+{
+	return m_scratchBuffer;
 }
 
 inline const ndBodyList& ndScene::GetBodyList() const

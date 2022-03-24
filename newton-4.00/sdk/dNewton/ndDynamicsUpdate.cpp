@@ -125,7 +125,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	});
 	scene->ParallelExecute(CountJointBodyPairs);
 
-	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)GetTempBuffer();
+	scene->GetScratchBuffer().SetCount(bodyJointPairs.GetCount() * sizeof (ndJointBodyPairIndex));
+	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)&scene->GetScratchBuffer()[0];
 
 	ndInt32 digit = 0;
 	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), &digit);
@@ -183,9 +184,8 @@ void ndDynamicsUpdate::BuildDisjointSets()
 	ndScene* const scene = m_world->GetScene();
 
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
-	ndConstraint** const tempJointBuffer = (ndConstraint**)GetTempBuffer();
-	//dAssert(m_activeJointCount <= jointArray.GetCount());
-	//jointArray.SetCount(m_activeJointCount);
+	scene->GetScratchBuffer().SetCount(jointArray.GetCount() * sizeof (ndConstraint*));
+	ndConstraint** const tempJointBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 	
 	for (ndInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 	{
@@ -355,7 +355,9 @@ void ndDynamicsUpdate::SortJointsScan()
 	{
 		D_TRACKTIME();
 		ndInt32* const hist = &histogram[threadIndex][0];
-		ndConstraint** const dstBuffer = (ndConstraint**)GetTempBuffer();
+		ndScene* const scene = m_world->GetScene();
+		dAssert(scene->GetScratchBuffer().GetCount() >= jointArray.GetCount() * sizeof(ndConstraint*));
+		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
 		hist[0] = 0;
 		hist[1] = 0;
@@ -376,7 +378,9 @@ void ndDynamicsUpdate::SortJointsScan()
 	{
 		D_TRACKTIME();
 		ndInt32* const hist = &histogram[threadIndex][0];
-		ndConstraint** const dstBuffer = (ndConstraint**)GetTempBuffer();
+		ndScene* const scene = m_world->GetScene();
+		dAssert(scene->GetScratchBuffer().GetCount() >= jointArray.GetCount() * sizeof (ndConstraint*));
+		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
 		const ndStartEnd startEnd(jointArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -390,6 +394,9 @@ void ndDynamicsUpdate::SortJointsScan()
 			hist[key] = entry + 1;
 		}
 	});
+
+	scene->GetScratchBuffer().SetCount((jointArray.GetCount() + 32) * sizeof (ndConstraint*));
+	ndConstraint** const tempJointBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
 	scene->ParallelExecute(MarkFence0);
 	scene->ParallelExecute(MarkFence1);
@@ -426,7 +433,6 @@ void ndDynamicsUpdate::SortJointsScan()
 	}
 
 	scene->ParallelExecute(Sort0);
-	ndConstraint** const tempJointBuffer = (ndConstraint**)GetTempBuffer();
 
 #ifdef _DEBUG
 	for (ndInt32 i = 0; i < (jointArray.GetCount() - 1); ++i)
@@ -617,7 +623,8 @@ void ndDynamicsUpdate::SortIslands()
 		unConstrainedCount += islands.GetCount();
 
 		ndInt32 context = 0;
-		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
+		scene->GetScratchBuffer().SetCount(islands.GetCount() * sizeof(ndIsland));
+		ndIsland* const islandTempBuffer = (ndIsland*)&scene->GetScratchBuffer()[0];
 		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{

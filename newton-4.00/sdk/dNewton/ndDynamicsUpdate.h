@@ -84,7 +84,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 	ndDynamicsUpdate(ndWorld* const world);
 	virtual ~ndDynamicsUpdate();
 
-	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
 	ndInt32 GetUnconstrainedBodyCount() const;
 	void ClearBuffer(void* const buffer, ndInt32 sizeInByte) const;
@@ -167,11 +166,6 @@ inline ndFloat32 ndDynamicsUpdate::GetTimestepRK() const
 inline ndArray<ndDynamicsUpdate::ndIsland>& ndDynamicsUpdate::GetIslands()
 {
 	return m_islands;
-}
-
-inline void* ndDynamicsUpdate::GetTempBuffer() const
-{
-	return (void*)&m_leftHandSide[0];
 }
 
 inline ndArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()

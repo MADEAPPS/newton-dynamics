@@ -191,7 +191,7 @@ ndScene::ndScene()
 	:ndThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactArray()
-	,m_scratchBuffer(1024)
+	,m_scratchBuffer(1024 * sizeof (void*))
 	,m_sceneBodyArray(1024)
 	,m_activeBodyArray(1024)
 	,m_activeConstraintArray(1024)
@@ -217,7 +217,7 @@ ndScene::ndScene(const ndScene& src)
 	:ndThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactArray()
-	,m_scratchBuffer(1024)
+	,m_scratchBuffer(1024 * sizeof(void*))
 	,m_sceneBodyArray(1024)
 	,m_activeBodyArray(1024)
 	,m_activeConstraintArray(1024)
@@ -675,8 +675,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		{
 			if (fitness.GetFirst()) 
 			{
-				m_scratchBuffer.SetCount(fitness.GetCount() * 2 + 16);
-				//ndSceneNode** const leafArray = dAlloca(ndSceneNode*, fitness.GetCount() * 2 + 16);
+				m_scratchBuffer.SetCount((fitness.GetCount() * 2 + 16) * sizeof (ndSceneNode*));
 				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 
 				ndInt32 leafNodesCount = 0;
@@ -1401,7 +1400,7 @@ void ndScene::CalculateContacts()
 	m_activeConstraintArray.SetCount(0);
 	if (m_contactArray.GetCount())
 	{
-		m_scratchBuffer.SetCount(m_contactArray.GetCount());
+		m_scratchBuffer.SetCount(m_contactArray.GetCount() * sizeof (ndContact*));
 		m_activeConstraintArray.SetCount(m_contactArray.GetCount());
 
 		auto CalculateNewContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
@@ -1984,10 +1983,10 @@ void ndScene::Cleanup()
 
 	ndFreeListAlloc::Flush();
 	m_contactArray.Resize(1024);
-	m_scratchBuffer.Resize(1024);
 	m_sceneBodyArray.Resize(1024);
 	m_activeBodyArray.Resize(1024);
 	m_activeConstraintArray.Resize(1024);
+	m_scratchBuffer.Resize(1024 * sizeof(void*));
 
 	m_contactArray.SetCount(0);
 	m_scratchBuffer.SetCount(0);
