@@ -24,10 +24,6 @@
 
 #include "ndNewtonStdafx.h"
 
-#define D_SMALL_ISLAND_COUNT		32
-#define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
-#define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * ndFloat32 (0.5f))
-
 #define D_MAX_BODY_RADIX_BIT		9
 
 #define D_USE_EARLY_OUT_JOINT
@@ -46,8 +42,6 @@
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
 class ndWorld;
-
-//#define D_USE_ISLAND_WIP
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc

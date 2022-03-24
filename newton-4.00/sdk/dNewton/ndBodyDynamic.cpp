@@ -335,11 +335,6 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 	const ndFloat32 tol = (ndFloat32(0.0125f) * ndDegreeToRad);
 	if (omegaMag2 > (tol * tol))
 	{
-		// calculate new matrix
-		//const ndFloat32 invOmegaMag = ndRsqrt(omegaMag2);
-		//const ndVector omegaAxis(m_omega.Scale(invOmegaMag));
-		//ndFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
-
 		const ndFloat32 omegaAngle = ndSqrt(omegaMag2);
 		const ndVector omegaAxis(m_omega.Scale(ndFloat32(1.0f) / omegaAngle));
 		const ndQuaternion rotationStep(omegaAxis, omegaAngle * timestep.GetScalar());
@@ -358,5 +353,56 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 	{
 		m_gyroAlpha = ndVector::m_zero;
 		m_gyroTorque = ndVector::m_zero;
+	}
+}
+
+void ndBodyDynamic::EvaluateSleepState(const ndWorld* const world)
+{
+	dAssert(m_accel.m_w == ndFloat32(0.0f));
+	dAssert(m_alpha.m_w == ndFloat32(0.0f));
+	dAssert(m_veloc.m_w == ndFloat32(0.0f));
+	dAssert(m_omega.m_w == ndFloat32(0.0f));
+
+	int count = 1000;
+
+	const ndFloat32 speedFreeze = world->m_freezeSpeed2;
+	const ndFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? ndFloat32(0.01f) : ndFloat32(1.0f));
+	const ndFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
+	const ndFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * ndFloat32(0.0625f);
+	const ndVector velocDragVect(D_FREEZZING_VELOCITY_DRAG);
+
+	ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
+	m_accel = m_accel & accelTest;
+	m_alpha = m_alpha & accelTest;
+
+	ndUnsigned8 equilibrium = m_isStatic | m_autoSleep;
+	dAssert(equilibrium == ((m_invMass.m_w == ndFloat32(0.0f)) ? 1 : m_autoSleep));
+	const ndVector isMovingMask(m_veloc + m_omega + m_accel + m_alpha);
+	const ndVector mask(isMovingMask.TestZero());
+	const ndInt32 test = mask.GetSignMask() & 7;
+	if (test != 7)
+	{
+		const ndFloat32 accel2 = m_accel.DotProduct(m_accel).GetScalar();
+		const ndFloat32 alpha2 = m_alpha.DotProduct(m_alpha).GetScalar();
+		const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar();
+		const ndFloat32 omega2 = m_omega.DotProduct(m_omega).GetScalar();
+		ndUnsigned32 equilibriumTest = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+
+		if (equilibriumTest)
+		{
+			const ndVector velocTol(ndFloat32(1.0e-8f));
+
+			const ndVector veloc(m_veloc * velocDragVect);
+			const ndVector omega(m_omega * velocDragVect);
+			const ndVector velocMask(veloc.DotProduct(veloc) > velocTol);
+			const ndVector omegaMask(omega.DotProduct(omega) > velocTol);
+			m_veloc = velocMask & veloc;
+			m_omega = omegaMask & omega;
+		}
+		equilibrium &= equilibriumTest;
+	}
+	if (m_equilibrium != equilibrium)
+	{
+		m_equilibrium = equilibrium;
 	}
 }

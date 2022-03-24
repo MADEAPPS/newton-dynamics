@@ -517,6 +517,7 @@ void ndDynamicsUpdate::SortJoints()
 void ndDynamicsUpdate::SortIslands()
 {
 	D_TRACKTIME();
+#ifdef D_USE_ISLAND_WIP
 	class ndIslandKey
 	{
 		public:
@@ -640,6 +641,39 @@ void ndDynamicsUpdate::SortIslands()
 		}
 	}
 	m_unConstrainedBodyCount = unConstrainedCount;
+
+#else
+
+	ndScene* const scene = m_world->GetScene();
+	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	ndArray<ndBodyKinematic*>& activeBodyArray = GetBodyIslandOrder();
+	GetInternalForces().SetCount(bodyArray.GetCount());
+	ndBodyKinematic** const buffer0 = (ndBodyKinematic**)&GetInternalForces()[0];
+
+	ndInt32 bodyCount = 0;
+	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		buffer0[bodyCount] = body;
+		bodyCount += (!(body->m_equilibrium0 & body->m_islandSleep));
+	}
+
+	activeBodyArray.SetCount(bodyCount);
+	ndInt32 scan[2];
+	scan[0] = 0;
+	scan[1] = bodyCount - 1;
+	for (ndInt32 i = 0; i < bodyCount; ++i)
+	{
+		ndBodyKinematic* const body = buffer0[i];
+		dAssert((body->m_bodyIsConstrained == 0) || (body->m_bodyIsConstrained == 1));
+		const ndInt32 key = 1 - body->m_bodyIsConstrained;
+		const ndInt32 index = scan[1 - body->m_bodyIsConstrained];
+		activeBodyArray[index] = body;
+		scan[key] += (body->m_bodyIsConstrained ? 1 : -1);
+	}
+	m_unConstrainedBodyCount = bodyCount - scan[0];
+
+#endif
 }
 
 void ndDynamicsUpdate::BuildIsland()
@@ -1226,6 +1260,9 @@ void ndDynamicsUpdate::IntegrateBodies()
 				body->m_accel = invTime * (body->m_veloc - body->m_accel);
 				body->m_alpha = invTime * (body->m_omega - body->m_alpha);
 				body->IntegrateVelocity(timestep);
+				#ifndef D_USE_ISLAND_WIP
+				body->EvaluateSleepState(m_world);
+				#endif
 			}
 		}
 	});
@@ -1370,7 +1407,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 						body->m_alpha = ndVector::m_zero;
 						body->m_veloc = ndVector::m_zero;
 						body->m_omega = ndVector::m_zero;
-						body->m_equilibrium = body->m_isStatic | body->m_autoSleep;
+						//body->m_equilibrium = body->m_isStatic | body->m_autoSleep;
 					}
 					else
 					{
@@ -1378,8 +1415,9 @@ void ndDynamicsUpdate::DetermineSleepStates()
 						dAssert(kinBody);
 						kinBody->m_veloc = ndVector::m_zero;
 						kinBody->m_omega = ndVector::m_zero;
-						kinBody->m_equilibrium = kinBody->m_isStatic | kinBody->m_autoSleep;
+						//kinBody->m_equilibrium = kinBody->m_isStatic | kinBody->m_autoSleep;
 					}
+					body->m_equilibrium = body->m_isStatic | body->m_autoSleep;
 				}
 			}
 			else if ((count > 1) || bodyIslands[0]->m_bodyIsConstrained)
@@ -1403,7 +1441,6 @@ void ndDynamicsUpdate::DetermineSleepStates()
 				}
 				else
 				{
-					#ifdef D_USE_ISLAND_WIP
 					if (count < D_SMALL_ISLAND_COUNT)
 					{
 						// delay small islandArray for about 10 seconds
@@ -1449,7 +1486,6 @@ void ndDynamicsUpdate::DetermineSleepStates()
 							}
 						}
 					}
-					#endif	
 				}
 			}
 		};
@@ -1749,7 +1785,9 @@ void ndDynamicsUpdate::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
+#ifdef D_USE_ISLAND_WIP
 	if (GetIslands().GetCount())
+#endif
 	{
 		IntegrateUnconstrainedBodies();
 		InitWeights();
@@ -1757,6 +1795,8 @@ void ndDynamicsUpdate::Update()
 		InitJacobianMatrix();
 		CalculateForces();
 		IntegrateBodies();
+		#ifdef D_USE_ISLAND_WIP
 		DetermineSleepStates();
+		#endif
 	}
 }

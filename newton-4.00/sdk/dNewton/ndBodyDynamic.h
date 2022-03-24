@@ -73,6 +73,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	
 	private:
 	void SaveExternalForces();
+	D_NEWTON_API virtual void EvaluateSleepState(const ndWorld* const world);
 	D_NEWTON_API virtual void IntegrateGyroSubstep(const ndVector& timestep);
 	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 

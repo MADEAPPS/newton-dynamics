@@ -556,3 +556,7 @@ void ndBodyKinematic::IntegrateExternalForce(ndFloat32 timestep)
 	}
 }
 
+void ndBodyKinematic::EvaluateSleepState(const ndWorld* const)
+{
+	dAssert(0);
+}

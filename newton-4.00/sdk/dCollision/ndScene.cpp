@@ -264,7 +264,9 @@ ndScene::ndScene(const ndScene& src)
 		}
 	}
 	stealData->m_bodyList.RemoveAll();
+
 	BalanceScene();
+	SetThreadCount(src.GetThreadCount());
 }
 
 ndScene::~ndScene()
