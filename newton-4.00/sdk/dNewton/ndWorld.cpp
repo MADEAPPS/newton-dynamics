@@ -918,7 +918,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndOpenclSolver1:
 			{
 				m_solverMode = solverMode;
-				newScene = new ndWorldScene(this);
+				ndWorldScene* const newScene = new ndWorldScene(this);
 				delete m_scene;
 				m_scene = newScene;
 
@@ -929,7 +929,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndOpenclSolver2:
 			{
 				m_solverMode = solverMode;
-				newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
 				delete m_scene;
 				m_scene = newScene;
 

@@ -47,6 +47,8 @@
 
 class ndWorld;
 
+//#define D_USE_ISLAND_WIP
+
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc
 {

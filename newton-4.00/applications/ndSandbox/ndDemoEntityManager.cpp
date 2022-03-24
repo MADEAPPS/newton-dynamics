@@ -37,11 +37,11 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
-#define DEFAULT_SCENE	1		// gpu basic rigidbody
+//#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
+#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// basic player
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -366,9 +366,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = ndWorld::ndOpenclSolver1;
 	//m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	m_solverMode = ndWorld::ndCudaSolver;
+	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
-	//m_solverMode = ndWorld::ndStandardSolver;
+	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
@@ -380,7 +380,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
@@ -860,7 +860,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Text("solver sub steps");
 			ImGui::SliderInt("##solv", &m_solverSubSteps, 2, 8);
 			ImGui::Text("iterative solver passes");
-			ImGui::SliderInt("##intera", &m_solverPasses, 4, 64);
+			ImGui::SliderInt("##intera", &m_solverPasses, 4, 32);
 			ImGui::Text("worker threads");
 			ImGui::SliderInt("##worker", &m_workerThreads, 1, D_MAX_THREADS_COUNT);
 			ImGui::Separator();

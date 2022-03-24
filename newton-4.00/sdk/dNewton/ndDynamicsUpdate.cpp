@@ -736,7 +736,7 @@ void ndDynamicsUpdate::InitWeights()
 	}
 
 	const ndInt32 conectivity = 7;
-	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 1;
+	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
 }
 
 void ndDynamicsUpdate::InitBodyArray()
@@ -1237,6 +1237,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	ndFloat32 timestep = scene->GetTimestep();
+
 	auto DetermineSleepStates = ndMakeObject::ndFunction([this, timestep](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
@@ -1402,6 +1403,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 				}
 				else
 				{
+					#ifdef D_USE_ISLAND_WIP
 					if (count < D_SMALL_ISLAND_COUNT)
 					{
 						// delay small islandArray for about 10 seconds
@@ -1412,9 +1414,9 @@ void ndDynamicsUpdate::DetermineSleepStates()
 							body->m_equilibrium = 0;
 						}
 					}
-					ndInt32 timeScaleSleepCount = ndInt32(ndFloat32(60.0f) * sleepCounter * timestep);
 
 					ndInt32 sleepIndex = D_SLEEP_ENTRIES;
+					ndInt32 timeScaleSleepCount = ndInt32(ndFloat32(60.0f) * sleepCounter * timestep);
 					for (ndInt32 i = 1; i < D_SLEEP_ENTRIES; ++i)
 					{
 						if (world->m_sleepTable[i].m_steps > timeScaleSleepCount)
@@ -1423,8 +1425,8 @@ void ndDynamicsUpdate::DetermineSleepStates()
 							break;
 						}
 					}
-					sleepIndex--;
 
+					sleepIndex--;
 					bool state1 =
 						(maxAccel < world->m_sleepTable[sleepIndex].m_maxAccel) &&
 						(maxAlpha < world->m_sleepTable[sleepIndex].m_maxAlpha) &&
@@ -1447,6 +1449,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 							}
 						}
 					}
+					#endif	
 				}
 			}
 		};
@@ -1514,9 +1517,8 @@ void ndDynamicsUpdate::UpdateSkeletons()
 void ndDynamicsUpdate::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	ndScene* const scene = m_world->GetScene();
 	const ndInt32 passes = m_solverPasses;
-	const ndInt32 threadsCount = scene->GetThreadCount();
+	ndScene* const scene = m_world->GetScene();
 
 	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();

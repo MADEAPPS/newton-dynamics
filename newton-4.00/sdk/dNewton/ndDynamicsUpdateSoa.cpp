@@ -630,7 +630,7 @@ void ndDynamicsUpdateSoa::InitWeights()
 	}
 
 	const ndInt32 conectivity = 7;
-	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 1;
+	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
 }
 
 void ndDynamicsUpdateSoa::IntegrateBodies()
@@ -1493,9 +1493,8 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 void ndDynamicsUpdateSoa::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	ndScene* const scene = m_world->GetScene();
 	const ndInt32 passes = m_solverPasses;
-	const ndInt32 threadsCount = scene->GetThreadCount();
+	ndScene* const scene = m_world->GetScene();
 
 	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
