@@ -95,27 +95,32 @@ void ndWorldSceneCuda::LoadBodyData()
 void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
-	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-	const ndInt32 bodyCount = bodyArray.GetCount();
-
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
-	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
-	gpuBodyBuffer.WriteData(&data[0], bodyCount);
-
-	for (ndInt32 i = 0; i < bodyCount; i++)
-	{
-		ndBodyKinematic* const body = bodyArray[i];
-		body->m_transformIsDirty = true;
-
-		ndBodyProxy& proxi = data[i];
-		proxi.ProxyToBody(body);
-	}
+	ndBodyProxy* const data = &m_context->m_bodyBuffer.m_dataView[0];
+	gpuBodyBuffer.WriteData(data, GetActiveBodyArray().GetCount());
 }
 
 void ndWorldSceneCuda::UpdateTransform()
 {
 	D_TRACKTIME();
 	GetBodyTransforms();
+
+	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndBodyProxy* const data = &m_context->m_bodyBuffer.m_dataView[0];
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			body->m_transformIsDirty = true;
+			const ndBodyProxy& proxi = data[i];
+			proxi.ProxyToBody(body);
+		}
+	});
+	ParallelExecute(SetTransform);
+
 	ndScene::UpdateTransform();
 }
 

@@ -228,6 +228,7 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 
 void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 {
+	D_TRACKTIME();
 	const ndFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
 
 	ndInt32 maxSteps = MAX_PHYSICS_STEPS;

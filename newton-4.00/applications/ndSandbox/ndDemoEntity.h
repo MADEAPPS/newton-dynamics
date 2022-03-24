@@ -107,6 +107,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	ndDemoMeshInterface* m_mesh;
 	UserData* m_userData;
 	ndList <ndDemoEntity*>::ndNode* m_rootNode;
+	ndSpinLock m_lock;
 	bool m_isVisible;
 
 	friend class ndDemoEntityNotify;

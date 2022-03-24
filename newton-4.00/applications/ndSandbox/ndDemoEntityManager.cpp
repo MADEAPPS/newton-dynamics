@@ -1462,11 +1462,11 @@ void ndDemoEntityManager::DrawDebugShapes()
 
 void ndDemoEntityManager::RenderScene()
 {
+	D_TRACKTIME();
 	ndFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
-
-	D_TRACKTIME();
+	
 	// Get the interpolated location of each body in the scene
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
 

@@ -104,6 +104,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
+	,m_lock()
 	,m_isVisible(true)
 {
 	if (parent) 
@@ -178,6 +179,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
+	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
 {
 	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : nullptr;
@@ -290,6 +292,7 @@ ndMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix (const ndDemoEntity* co
 
 void ndDemoEntity::SetMatrix(const ndQuaternion& rotation, const ndVector& position)
 {
+	ndScopeSpinLock lock(m_lock);
 	m_curPosition = m_nextPosition;
 	m_curRotation = m_nextRotation;
 
@@ -316,29 +319,32 @@ void ndDemoEntity::SetNextMatrix (const ndQuaternion& rotation, const ndVector& 
 	}
 }
 
-void ndDemoEntity::ResetMatrix(const ndMatrix& matrix)
-{
-	ndQuaternion rot (matrix);
-	SetMatrix(rot, matrix.m_posit);
-	SetMatrix(rot, matrix.m_posit);
-	InterpolateMatrix (ndFloat32 (0.0f));
-}
-
 void ndDemoEntity::InterpolateMatrix(ndFloat32 param)
 {
-	ndVector p0(m_curPosition);
-	ndVector p1(m_nextPosition);
-	ndQuaternion r0(m_curRotation);
-	ndQuaternion r1(m_nextRotation);
+	{
+		ndScopeSpinLock lock(m_lock);
+		ndVector p0(m_curPosition);
+		ndVector p1(m_nextPosition);
+		ndQuaternion r0(m_curRotation);
+		ndQuaternion r1(m_nextRotation);
 
-	ndVector posit(p0 + (p1 - p0).Scale(param));
-	ndQuaternion rotation(r0.Slerp(r1, param));
-	m_matrix = ndMatrix(rotation, posit);
+		ndVector posit(p0 + (p1 - p0).Scale(param));
+		ndQuaternion rotation(r0.Slerp(r1, param));
+		m_matrix = ndMatrix(rotation, posit);
+	}
 
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
 	{
 		child->InterpolateMatrix(param);
 	}
+}
+
+void ndDemoEntity::ResetMatrix(const ndMatrix& matrix)
+{
+	ndQuaternion rot(matrix);
+	SetMatrix(rot, matrix.m_posit);
+	SetMatrix(rot, matrix.m_posit);
+	InterpolateMatrix(ndFloat32(0.0f));
 }
 
 const ndMatrix& ndDemoEntity::GetRenderMatrix () const

@@ -223,8 +223,9 @@ void ndDemoCameraManager::RenderPickedTarget () const
 void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, ndFloat32 param)
 {
 	// interpolate the location of all entities in the world
-	ndWorld* const world = scene->GetWorld();
-	world->UpdateTransformsLock();
+	//ndWorld* const world = scene->GetWorld();
+	//world->UpdateTransformsLock();
+	D_TRACKTIME();
 
 	for (ndDemoEntityManager::ndNode* node = scene->GetFirst(); node; node = node->GetNext()) 
 	{
@@ -235,7 +236,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	// interpolate the Camera matrix;
 	m_camera->InterpolateMatrix (param);
 
-	world->UpdateTransformsUnlock();
+	//world->UpdateTransformsUnlock();
 }
 
 void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const ndVector& p0, const ndVector& p1, ndFloat32) 

@@ -675,7 +675,9 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		{
 			if (fitness.GetFirst()) 
 			{
-				ndSceneNode** const leafArray = dAlloca(ndSceneNode*, fitness.GetCount() * 2 + 16);
+				m_scratchBuffer.SetCount(fitness.GetCount() * 2 + 16);
+				//ndSceneNode** const leafArray = dAlloca(ndSceneNode*, fitness.GetCount() * 2 + 16);
+				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 
 				ndInt32 leafNodesCount = 0;
 				for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
