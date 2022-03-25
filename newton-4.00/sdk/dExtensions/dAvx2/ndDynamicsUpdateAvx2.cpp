@@ -681,6 +681,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 	});
 	scene->ParallelExecute(DetermineSleepStates);
 #else
+
 	auto CalculateSleepState = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
@@ -696,28 +697,30 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 		{
 			const ndInt32 index = bodyIndex[i];
 			ndBodyKinematic* const body = bodyArray[jointBodyPairIndexBuffer[index].m_body];
-			ndUnsigned8 equilibrium = body->m_isJointFence0;
-			if (equilibrium & body->m_autoSleep)
+			dAssert(body->m_isStatic <= 1);
+			dAssert(body->m_index == jointBodyPairIndexBuffer[index].m_body);
+			const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
+			const ndInt32 count = mask & (bodyIndex[i + 1] - index);
+			if (count)
 			{
-				dAssert(body->m_isStatic <= 1);
-				dAssert(body->m_index == jointBodyPairIndexBuffer[index].m_body);
-				const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
-				const ndInt32 count = mask & (bodyIndex[i + 1] - index);
-
-				for (ndInt32 j = 0; j < count; ++j)
+				ndUnsigned8 equilibrium = body->m_isJointFence0;
+				if (equilibrium & body->m_autoSleep)
 				{
-					const ndJointBodyPairIndex& scan = jointBodyPairIndexBuffer[index + j];
-					ndConstraint* const joint = jointArray[scan.m_joint >> 1];
-					ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
-					dAssert(body1 != body);
-					equilibrium = equilibrium & body1->m_isJointFence0;
+					for (ndInt32 j = 0; j < count; ++j)
+					{
+						const ndJointBodyPairIndex& scan = jointBodyPairIndexBuffer[index + j];
+						ndConstraint* const joint = jointArray[scan.m_joint >> 1];
+						ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
+						dAssert(body1 != body);
+						equilibrium = equilibrium & body1->m_isJointFence0;
+					}
 				}
-			}
-			body->m_equilibrium = equilibrium & body->m_autoSleep;
-			if (body->m_equilibrium)
-			{
-				body->m_veloc = zero;
-				body->m_omega = zero;
+				body->m_equilibrium = equilibrium & body->m_autoSleep;
+				if (body->m_equilibrium)
+				{
+					body->m_veloc = zero;
+					body->m_omega = zero;
+				}
 			}
 		}
 	});

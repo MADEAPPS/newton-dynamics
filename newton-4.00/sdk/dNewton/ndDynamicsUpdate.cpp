@@ -1572,28 +1572,30 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		{
 			const ndInt32 index = bodyIndex[i];
 			ndBodyKinematic* const body = bodyArray[jointBodyPairIndexBuffer[index].m_body];
-			ndUnsigned8 equilibrium = body->m_isJointFence0;
-			if (equilibrium & body->m_autoSleep)
+			dAssert(body->m_isStatic <= 1);
+			dAssert(body->m_index == jointBodyPairIndexBuffer[index].m_body);
+			const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
+			const ndInt32 count = mask & (bodyIndex[i + 1] - index);
+			if (count)
 			{
-				dAssert(body->m_isStatic <= 1);
-				dAssert(body->m_index == jointBodyPairIndexBuffer[index].m_body);
-				const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
-				const ndInt32 count = mask & (bodyIndex[i + 1] - index);
-
-				for (ndInt32 j = 0; j < count; ++j)
+				ndUnsigned8 equilibrium = body->m_isJointFence0;
+				if (equilibrium & body->m_autoSleep)
 				{
-					const ndJointBodyPairIndex& scan = jointBodyPairIndexBuffer[index + j];
-					ndConstraint* const joint = jointArray[scan.m_joint >> 1];
-					ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
-					dAssert(body1 != body);
-					equilibrium = equilibrium & body1->m_isJointFence0;
+					for (ndInt32 j = 0; j < count; ++j)
+					{
+						const ndJointBodyPairIndex& scan = jointBodyPairIndexBuffer[index + j];
+						ndConstraint* const joint = jointArray[scan.m_joint >> 1];
+						ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
+						dAssert(body1 != body);
+						equilibrium = equilibrium & body1->m_isJointFence0;
+					}
 				}
-			}
-			body->m_equilibrium = equilibrium & body->m_autoSleep;
-			if (body->m_equilibrium)
-			{
-				body->m_veloc = zero;
-				body->m_omega = zero;
+				body->m_equilibrium = equilibrium & body->m_autoSleep;
+				if (body->m_equilibrium)
+				{
+					body->m_veloc = zero;
+					body->m_omega = zero;
+				}
 			}
 		}
 	});
@@ -1605,8 +1607,9 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	}
 #endif
 
+#if 0
 	static int xxxx;
-	//dTrace(("frame %d\n", xxxx));
+	dTrace(("frame %d\n", xxxx));
 	xxxx++;
 	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	for (ndInt32 i = 0; i < bodyArray.GetCount(); i++)
@@ -1614,10 +1617,11 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		ndBodyKinematic* const body = bodyArray[i];
 		if (body->m_equilibrium)
 		{
-			//dTrace(("%d\n", body->m_uniqueId));
+			dTrace(("%d\n", body->m_uniqueId));
 		}
 	}
-	//dTrace(("\n"));
+	dTrace(("\n"));
+#endif
 }
 
 void ndDynamicsUpdate::InitSkeletons()
