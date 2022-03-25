@@ -24,9 +24,9 @@
 
 #include "ndNewtonStdafx.h"
 
-#define D_MAX_SPEED_ATT	ndFloat32(0.02f)
-//#define D_FREEZE_ACCEL	ndFloat32(0.1f)
+#define D_MAX_SPEED_ATT		ndFloat32(0.02f)
 #define D_FREEZE_ACCEL		ndFloat32(1.0f)
+//#define D_FREEZE_ACCEL	ndFloat32(0.5f)
 #define D_FREEZE_SPEED		ndFloat32(0.032f)
 
 #define D_FREEZE_ACCEL2		(D_FREEZE_ACCEL * D_FREEZE_ACCEL)
@@ -73,9 +73,9 @@ class ndBodyDynamic: public ndBodyKinematic
 	
 	private:
 	void SaveExternalForces();
-	D_NEWTON_API virtual void EvaluateSleepState(const ndWorld* const world);
 	D_NEWTON_API virtual void IntegrateGyroSubstep(const ndVector& timestep);
 	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
+	D_NEWTON_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 
 	ndVector m_externalForce;
 	ndVector m_externalTorque;

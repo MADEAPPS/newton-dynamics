@@ -110,9 +110,9 @@ ndWorld::ndWorld()
 	,m_activeSkeletons(256)
 	,m_timestep(ndFloat32 (0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
-	,m_freezeAlpha2(D_FREEZE_ACCEL2)
+	//,m_freezeAlpha2(D_FREEZE_ACCEL2)
 	,m_freezeSpeed2(D_FREEZE_SPEED2)
-	,m_freezeOmega2(D_FREEZE_SPEED2)
+	//,m_freezeOmega2(D_FREEZE_SPEED2)
 	,m_averageUpdateTime(ndFloat32(0.0f))
 	,m_averageTimestepAcc(ndFloat32(0.0f))
 	,m_averageFramesCount(ndFloat32(0.0f))
@@ -133,31 +133,31 @@ ndWorld::ndWorld()
 
 	ndInt32 steps = 1;
 	ndFloat32 freezeAccel2 = m_freezeAccel2;
-	ndFloat32 freezeAlpha2 = m_freezeAlpha2;
+	//ndFloat32 freezeAlpha2 = m_freezeAlpha2;
 	ndFloat32 freezeSpeed2 = m_freezeSpeed2;
-	ndFloat32 freezeOmega2 = m_freezeOmega2;
+	//ndFloat32 freezeOmega2 = m_freezeOmega2;
 	for (ndInt32 i = 0; i < D_SLEEP_ENTRIES; i++) 
 	{
 		m_sleepTable[i].m_maxAccel = freezeAccel2;
-		m_sleepTable[i].m_maxAlpha = freezeAlpha2;
+		//m_sleepTable[i].m_maxAlpha = freezeAlpha2;
 		m_sleepTable[i].m_maxVeloc = freezeSpeed2;
-		m_sleepTable[i].m_maxOmega = freezeOmega2;
+		//m_sleepTable[i].m_maxOmega = freezeOmega2;
 		m_sleepTable[i].m_steps = steps;
 		steps += 7;
 		freezeAccel2 *= ndFloat32(1.5f);
-		freezeAlpha2 *= ndFloat32(1.5f);
+		//freezeAlpha2 *= ndFloat32(1.5f);
 		freezeSpeed2 *= ndFloat32(1.5f);
-		freezeOmega2 *= ndFloat32(1.5f);
+		//freezeOmega2 *= ndFloat32(1.5f);
 	}
 
 	m_sleepTable[0].m_maxAccel *= ndFloat32(0.009f);
-	m_sleepTable[0].m_maxAlpha *= ndFloat32(0.009f);
+	//m_sleepTable[0].m_maxAlpha *= ndFloat32(0.009f);
 
 	steps += 300;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel *= ndFloat32(100.0f);
-	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAlpha *= ndFloat32(100.0f);
+	//m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAlpha *= ndFloat32(100.0f);
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc = 0.25f;
-	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
+	//m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
 }
 

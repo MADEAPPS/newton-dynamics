@@ -135,9 +135,9 @@ class ndWorld: public ndClassAlloc
 	{
 		public:
 		ndFloat32 m_maxAccel;
-		ndFloat32 m_maxAlpha;
+		//ndFloat32 m_maxAlpha;
 		ndFloat32 m_maxVeloc;
-		ndFloat32 m_maxOmega;
+		//ndFloat32 m_maxOmega;
 		ndInt32 m_steps;
 	};
 
@@ -166,9 +166,9 @@ class ndWorld: public ndClassAlloc
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;
-	ndFloat32 m_freezeAlpha2;
+	//ndFloat32 m_freezeAlpha2;
 	ndFloat32 m_freezeSpeed2;
-	ndFloat32 m_freezeOmega2;
+	//ndFloat32 m_freezeOmega2;
 	ndFloat32 m_averageUpdateTime;
 	ndFloat32 m_averageTimestepAcc;
 	ndFloat32 m_averageFramesCount;

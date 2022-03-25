@@ -33,7 +33,7 @@ class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-//#define D_USE_ISLAND_WIP
+#define D_USE_ISLAND_WIP
 
 #define D_SMALL_ISLAND_COUNT		32
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
@@ -196,7 +196,7 @@ class ndBodyKinematic : public ndBody
 	void SetSceneBodyNode(ndSceneBodyNode* const node);
 	virtual void AddDampingAcceleration(ndFloat32 timestep);
 	
-	D_COLLISION_API virtual void EvaluateSleepState(const ndWorld* const world);
+	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 	
 	ndMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
@@ -225,6 +225,8 @@ class ndBodyKinematic : public ndBody
 	//#ifdef D_USE_ISLAND_WIP
 	ndInt32 m_sleepingCounter;
 	//#endif
+
+	static ndVector m_velocTol;
 
 	friend class ndWorld;
 	friend class ndScene;

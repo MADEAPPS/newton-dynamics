@@ -209,9 +209,9 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 			{
 				const bool state =
 					(maxAccel > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||
-					(maxAlpha > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAlpha) ||
+					(maxAlpha > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||
 					(maxSpeed > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc) ||
-					(maxOmega > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega);
+					(maxOmega > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc);
 
 				if (state)
 				{
@@ -251,9 +251,9 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 
 					bool state1 =
 						(maxAccel < world->m_sleepTable[sleepIndex].m_maxAccel) &&
-						(maxAlpha < world->m_sleepTable[sleepIndex].m_maxAlpha) &&
+						(maxAlpha < world->m_sleepTable[sleepIndex].m_maxAccel) &&
 						(maxSpeed < world->m_sleepTable[sleepIndex].m_maxVeloc) &&
-						(maxOmega < world->m_sleepTable[sleepIndex].m_maxOmega);
+						(maxOmega < world->m_sleepTable[sleepIndex].m_maxVeloc);
 					if (state1)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -678,8 +678,13 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 	auto IntegrateBodies = ndMakeObject::ndFunction([this, timestep, invTime](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
+		const ndWorld* const world = m_world;
 		const ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+
+		const ndFloat32 speedFreeze2 = world->m_freezeSpeed2;
+		const ndFloat32 accelFreeze2 = world->m_freezeAccel2;
+
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
@@ -689,7 +694,7 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 				body->m_alpha = invTime * (body->m_omega - body->m_alpha);
 				body->IntegrateVelocity(timestep);
 				#ifndef D_USE_ISLAND_WIP
-				body->EvaluateSleepState(m_world);
+				body->EvaluateSleepState(speedFreeze2, accelFreeze2);
 				#endif
 			}
 		}
