@@ -648,30 +648,77 @@ void ndDynamicsUpdate::SortIslands()
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	ndArray<ndBodyKinematic*>& activeBodyArray = GetBodyIslandOrder();
 	GetInternalForces().SetCount(bodyArray.GetCount());
-	ndBodyKinematic** const buffer0 = (ndBodyKinematic**)&GetInternalForces()[0];
+	activeBodyArray.SetCount(bodyArray.GetCount());
 
-	ndInt32 bodyCount = 0;
-	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+	ndInt32 histogram[D_MAX_THREADS_COUNT][3];
+	auto Scan0 = ndMakeObject::ndFunction([this, &bodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		ndBodyKinematic* const body = bodyArray[i];
-		buffer0[bodyCount] = body;
-		bodyCount += (!(body->m_equilibrium0 & body->m_islandSleep));
-	}
+		D_TRACKTIME();
+		ndInt32* const hist = &histogram[threadIndex][0];
+		hist[0] = 0;
+		hist[1] = 0;
+		hist[2] = 0;
 
-	activeBodyArray.SetCount(bodyCount);
-	ndInt32 scan[2];
+		ndInt32 map[4];
+		map[0] = 0;
+		map[1] = 1;
+		map[2] = 2;
+		map[3] = 2;
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			ndInt32 key = map[(body->m_equilibrium0 & body->m_islandSleep) * 2 + 1 - body->m_bodyIsConstrained];
+			dAssert(key < 3);
+			hist[key] = hist[key] + 1;
+		}
+	});
+
+	auto Sort0 = ndMakeObject::ndFunction([this, &bodyArray, &activeBodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndInt32* const hist = &histogram[threadIndex][0];
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+
+		ndInt32 map[4];
+		map[0] = 0;
+		map[1] = 1;
+		map[2] = 2;
+		map[3] = 2;
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			ndInt32 key = map[(body->m_equilibrium0 & body->m_islandSleep) * 2 + 1 - body->m_bodyIsConstrained];
+			dAssert(key < 3);
+			const ndInt32 entry = hist[key];
+			activeBodyArray[entry] = body;
+			hist[key] = entry + 1;
+		}
+	});
+
+	scene->ParallelExecute(Scan0);
+
+	ndInt32 scan[3];
 	scan[0] = 0;
-	scan[1] = bodyCount - 1;
-	for (ndInt32 i = 0; i < bodyCount; ++i)
+	scan[1] = 0;
+	scan[2] = 0;
+	const ndInt32 threadCount = scene->GetThreadCount();
+
+	ndInt32 sum = 0;
+	for (ndInt32 i = 0; i < 3; ++i)
 	{
-		ndBodyKinematic* const body = buffer0[i];
-		dAssert((body->m_bodyIsConstrained == 0) || (body->m_bodyIsConstrained == 1));
-		const ndInt32 key = 1 - body->m_bodyIsConstrained;
-		const ndInt32 index = scan[1 - body->m_bodyIsConstrained];
-		activeBodyArray[index] = body;
-		scan[key] += (body->m_bodyIsConstrained ? 1 : -1);
+		for (ndInt32 j = 0; j < threadCount; ++j)
+		{
+			ndInt32 partialSum = histogram[j][i];
+			histogram[j][i] = sum;
+			sum += partialSum;
+		}
+		scan[i] = sum;
 	}
-	m_unConstrainedBodyCount = bodyCount - scan[0];
+
+	scene->ParallelExecute(Sort0);
+	activeBodyArray.SetCount(scan[1]);
+	m_unConstrainedBodyCount = scan[1] - scan[0];
 #endif
 }
 
@@ -1269,7 +1316,11 @@ void ndDynamicsUpdate::IntegrateBodies()
 				body->m_alpha = invTime * (body->m_omega - body->m_alpha);
 				body->IntegrateVelocity(timestep);
 				#ifndef D_USE_ISLAND_WIP
-				body->EvaluateSleepState(speedFreeze2, accelFreeze2);
+				body->m_equilibrium0 = 0;
+				if (!body->m_equilibrium)
+				{
+					body->EvaluateSleepState(speedFreeze2, accelFreeze2);
+				}
 				#endif
 			}
 		}
@@ -1280,6 +1331,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 void ndDynamicsUpdate::DetermineSleepStates()
 {
 	D_TRACKTIME();
+#ifdef D_USE_ISLAND_WIP
 	ndScene* const scene = m_world->GetScene();
 	ndFloat32 timestep = scene->GetTimestep();
 
@@ -1507,6 +1559,9 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		}
 	});
 	scene->ParallelExecute(DetermineSleepStates);
+#else
+	dAssert(0);
+#endif
 }
 
 void ndDynamicsUpdate::InitSkeletons()
@@ -1799,7 +1854,5 @@ void ndDynamicsUpdate::Update()
 	InitJacobianMatrix();
 	CalculateForces();
 	IntegrateBodies();
-	#ifdef D_USE_ISLAND_WIP
 	DetermineSleepStates();
-	#endif
 }

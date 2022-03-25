@@ -418,8 +418,5 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		}
 		equilibrium &= equilibriumTest;
 	}
-	if (m_equilibrium != equilibrium)
-	{
-		m_equilibrium = equilibrium;
-	}
+	m_equilibrium0 = equilibrium;
 }
