@@ -358,22 +358,24 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 
 void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2)
 {
-	dAssert(m_accel.m_w == ndFloat32(0.0f));
-	dAssert(m_alpha.m_w == ndFloat32(0.0f));
-	dAssert(m_veloc.m_w == ndFloat32(0.0f));
-	dAssert(m_omega.m_w == ndFloat32(0.0f));
-
-	ndInt32 count = 0;
-	if (m_bodyIsConstrained)
+	m_isJointFence0 = 1;
+	if (m_isStatic)
 	{
-		if (m_jointList.GetCount() > 1)
+		m_equilibrium = 1;
+	}
+	else
+	{
+		dAssert(m_accel.m_w == ndFloat32(0.0f));
+		dAssert(m_alpha.m_w == ndFloat32(0.0f));
+		dAssert(m_veloc.m_w == ndFloat32(0.0f));
+		dAssert(m_omega.m_w == ndFloat32(0.0f));
+
+		ndInt32 count = 0;
+		if (m_bodyIsConstrained)
 		{
-			count = 1000;
-		}
-		else
-		{
+			count = m_jointList.GetCount() > 1 ? 1000 : 1;
 			ndContactMap::Iterator it(m_contactList);
-			for (it.Begin(); it && (count < 2); it ++)
+			for (it.Begin(); it && (count < 2); it++)
 			{
 				ndContact* const contact = it.GetNode()->GetInfo();
 				count += contact->IsActive() ? 1 : 0;
@@ -383,40 +385,44 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 				count = 1000;
 			}
 		}
-	}
-	const ndFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-	const ndFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * ndFloat32(0.0625f);
+		const ndFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
+		const ndFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * ndFloat32(0.0625f);
 
-	ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
-	m_accel = m_accel & accelTest;
-	m_alpha = m_alpha & accelTest;
+		ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
+		m_accel = m_accel & accelTest;
+		m_alpha = m_alpha & accelTest;
 
-	ndUnsigned8 equilibrium = m_isStatic | m_autoSleep;
-	dAssert(equilibrium == ((m_invMass.m_w == ndFloat32(0.0f)) ? 1 : m_autoSleep));
-	const ndVector isMovingMask(m_veloc + m_omega + m_accel + m_alpha);
-	const ndVector mask(isMovingMask.TestZero());
-	const ndInt32 test = mask.GetSignMask() & 7;
-	if (test != 7)
-	{
-		const ndFloat32 accelFreeze2 = freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? ndFloat32(0.01f) : ndFloat32(1.0f));
-		const ndFloat32 accel2 = m_accel.DotProduct(m_accel).GetScalar();
-		const ndFloat32 alpha2 = m_alpha.DotProduct(m_alpha).GetScalar();
-		const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar();
-		const ndFloat32 omega2 = m_omega.DotProduct(m_omega).GetScalar();
-		ndUnsigned32 equilibriumTest = (accel2 < accelFreeze2) && (alpha2 < accelFreeze2) && (speed2 < freezeSpeed2) && (omega2 < freezeSpeed2);
-
-		if (equilibriumTest)
+		ndUnsigned8 equilibrium = m_isStatic | m_autoSleep;
+		dAssert(equilibrium == ((m_invMass.m_w == ndFloat32(0.0f)) ? 1 : m_autoSleep));
+		const ndVector isMovingMask(m_veloc + m_omega + m_accel + m_alpha);
+		const ndVector mask(isMovingMask.TestZero());
+		const ndInt32 test = mask.GetSignMask() & 7;
+		if (test != 7)
 		{
-			const ndFloat32 velocityDragCoeff = (count <= D_SMALL_ISLAND_COUNT) ? D_FREEZZING_VELOCITY_DRAG : ndFloat32(0.9999f);
-			const ndVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, ndFloat32(0.0f));
-			const ndVector veloc(m_veloc * velocDragVect);
-			const ndVector omega(m_omega * velocDragVect);
-			const ndVector velocMask(veloc.DotProduct(veloc) > m_velocTol);
-			const ndVector omegaMask(omega.DotProduct(omega) > m_velocTol);
-			m_veloc = velocMask & veloc;
-			m_omega = omegaMask & omega;
+			const ndFloat32 accelFreeze2 = freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? ndFloat32(0.01f) : ndFloat32(1.0f));
+			const ndFloat32 accel2 = m_accel.DotProduct(m_accel).GetScalar();
+			const ndFloat32 alpha2 = m_alpha.DotProduct(m_alpha).GetScalar();
+			const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar();
+			const ndFloat32 omega2 = m_omega.DotProduct(m_omega).GetScalar();
+			ndUnsigned32 equilibriumTest = (accel2 < accelFreeze2) && (alpha2 < accelFreeze2) && (speed2 < freezeSpeed2) && (omega2 < freezeSpeed2);
+
+			if (equilibriumTest)
+			{
+				const ndFloat32 velocityDragCoeff = (count <= D_SMALL_ISLAND_COUNT) ? D_FREEZZING_VELOCITY_DRAG : ndFloat32(0.9999f);
+				const ndVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, ndFloat32(0.0f));
+				const ndVector veloc(m_veloc * velocDragVect);
+				const ndVector omega(m_omega * velocDragVect);
+				const ndVector velocMask(veloc.DotProduct(veloc) > m_velocTol);
+				const ndVector omegaMask(omega.DotProduct(omega) > m_velocTol);
+				m_veloc = velocMask & veloc;
+				m_omega = omegaMask & omega;
+			}
+			equilibrium &= equilibriumTest;
 		}
-		equilibrium &= equilibriumTest;
+		m_isJointFence0 = equilibrium;
+		if (equilibrium & ~m_bodyIsConstrained)
+		{
+			m_equilibrium = equilibrium;
+		}
 	}
-	m_equilibrium0 = equilibrium;
 }

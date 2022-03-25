@@ -266,12 +266,12 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	//ndInt32 pyramidHigh = 60;
 	//ndInt32 pyramidHigh = 18;
+	//ndInt32 pyramidHigh = 30;
 	ndInt32 pyramidHigh = 30;
-	//ndInt32 pyramidHigh = 20;
-	for (ndInt32 i = 0; i < 4; i++)
-	//for (ndInt32 i = 0; i < 1; i++)
+	//for (ndInt32 i = 0; i < 4; i++)
+	for (ndInt32 i = 0; i < 1; i++)
 	{
-		//BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+		BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;
 	}
 	
@@ -281,7 +281,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//BuildSphereColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin.m_z += 6.0f;
-	BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 18);
 	
 	origin.m_z += 6.0f;
 	//BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 20);

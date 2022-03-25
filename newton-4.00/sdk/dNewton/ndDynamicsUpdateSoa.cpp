@@ -286,7 +286,46 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 	});
 	scene->ParallelExecute(DetermineSleepStates);
 #else
-	dAssert(0);
+	auto CalculateSleepState = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndScene* const scene = m_world->GetScene();
+		const ndArray<ndInt32>& bodyIndex = GetJointForceIndexBuffer();
+		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
+		ndConstraint** const jointArray = &scene->GetActiveContactArray()[0];
+		ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+
+		const ndStartEnd startEnd(bodyIndex.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			const ndInt32 index = bodyIndex[i];
+			ndBodyKinematic* const body = bodyArray[jointBodyPairIndexBuffer[index].m_body];
+			ndUnsigned8 equilibrium = body->m_isJointFence0;
+			if (equilibrium & body->m_autoSleep)
+			{
+				dAssert(body->m_isStatic <= 1);
+				dAssert(body->m_index == jointBodyPairIndexBuffer[index].m_body);
+				const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
+				const ndInt32 count = mask & (bodyIndex[i + 1] - index);
+
+				for (ndInt32 j = 0; j < count; ++j)
+				{
+					const ndJointBodyPairIndex& scan = jointBodyPairIndexBuffer[index + j];
+					ndConstraint* const joint = jointArray[scan.m_joint >> 1];
+					ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
+					dAssert(body1 != body);
+					equilibrium = equilibrium & body1->m_isJointFence0;
+				}
+			}
+			body->m_equilibrium = equilibrium & body->m_autoSleep;
+		}
+	});
+
+	ndScene* const scene = m_world->GetScene();
+	if (scene->GetActiveContactArray().GetCount())
+	{
+		scene->ParallelExecute(CalculateSleepState);
+	}
 #endif
 }
 
@@ -744,14 +783,10 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 				body->m_accel = invTime * (body->m_veloc - body->m_accel);
 				body->m_alpha = invTime * (body->m_omega - body->m_alpha);
 				body->IntegrateVelocity(timestep);
-				#ifndef D_USE_ISLAND_WIP
-				body->m_equilibrium0 = 0;
-				if (!body->m_equilibrium)
-				{
-					body->EvaluateSleepState(speedFreeze2, accelFreeze2);
-				}
-				#endif
 			}
+			#ifndef D_USE_ISLAND_WIP
+			body->EvaluateSleepState(speedFreeze2, accelFreeze2);
+			#endif
 		}
 	});
 	scene->ParallelExecute(IntegrateBodies);
