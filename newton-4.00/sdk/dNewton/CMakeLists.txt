@@ -25,20 +25,20 @@ file(GLOB CPP_SOURCE
 	dModels/*.cpp
 	dJoints/*.h
 	dJoints/*.cpp
+	dIkSolver/*.h	
+	dIkSolver/*.cpp
 	dParticles/*.h
 	dParticles/*.cpp
 	dModels/dVehicle*.h	
 	dModels/dVehicle/*.cpp
-	dModels/dIkSolver/*.h	
-	dModels/dIkSolver/*.cpp
 	dModels/dCharacter/*.h
 	dModels/dCharacter/*.cpp)
 
 file(GLOB HEADERS *.h dJoints/*.h)
 file(GLOB HEADERS *.h dModels/*.h)
+file(GLOB HEADERS *.h dIkSolver/*.h)
 file(GLOB HEADERS *.h dParticles/*.h)
 file(GLOB HEADERS *.h dModels/dVehicle/*.h)
-file(GLOB HEADERS *.h dModels/dIkSolver/*.h)
 file(GLOB HEADERS *.h dModels/dCharacter/*.h)
 
 if(NEWTON_ENABLE_AVX2_SOLVER)
@@ -55,11 +55,10 @@ include_directories(../dCollision)
 
 include_directories(dJoints/)
 include_directories(dModels/)
+include_directories(dIkSolver/)
 include_directories(dParticles/)
 include_directories(dModels/dVehicle/)
-include_directories(dModels/dIkSolver/)
 include_directories(dModels/dCharacter/)
-
 if(NEWTON_ENABLE_AVX2_SOLVER)
 	include_directories(../dExtensions/dAvx2)
 endif()

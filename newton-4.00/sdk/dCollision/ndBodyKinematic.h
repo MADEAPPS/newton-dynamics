@@ -33,7 +33,7 @@ class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-#define D_USE_ISLAND_WIP
+//#define D_USE_ISLAND_WIP
 
 #define D_SMALL_ISLAND_COUNT		32
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
@@ -222,11 +222,10 @@ class ndBodyKinematic : public ndBody
 	ndFloat32 m_weigh;
 	ndInt32 m_rank;
 	ndInt32 m_index;
-	//#ifdef D_USE_ISLAND_WIP
+	#ifdef D_USE_ISLAND_WIP
 	ndInt32 m_sleepingCounter;
-	//#endif
-
-	static ndVector m_velocTol;
+	#endif
+	D_COLLISION_API static ndVector m_velocTol;
 
 	friend class ndWorld;
 	friend class ndScene;

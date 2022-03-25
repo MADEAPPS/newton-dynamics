@@ -90,8 +90,10 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_weigh(ndFloat32 (0.0f))
 	,m_rank(0)
 	,m_index(0)
-	,m_sleepingCounter(0)
 {
+	#ifdef D_USE_ISLAND_WIP
+	m_sleepingCounter = 0;
+	#endif
 	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
 	SetMassMatrix(ndVector::m_zero);
@@ -120,8 +122,10 @@ ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_weigh(ndFloat32(0.0f))
 	,m_rank(0)
 	,m_index(0)
-	,m_sleepingCounter(0)
 {
+	#ifdef D_USE_ISLAND_WIP
+	m_sleepingCounter = 0;
+	#endif
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
 	ndShapeInstance instance(xmlNode->FirstChild("ndShapeInstance"), *desc.m_shapeMap);
