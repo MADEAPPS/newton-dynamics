@@ -155,7 +155,11 @@ class ndScene : public ndThreadPool
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
+
+	// claed from world updatee
+	D_COLLISION_API virtual void UpdateBodyList();
 	
+	// call form substeps update
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();
 	D_COLLISION_API virtual void UpdateTransform();

@@ -1281,7 +1281,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 	}
 }
 
-void ndScene::InitBodyArray()
+void ndScene::UpdateBodyList()
 {
 	D_TRACKTIME();
 	if (m_bodyListChanged)
@@ -1305,7 +1305,11 @@ void ndScene::InitBodyArray()
 		}
 		m_bodyListChanged = 0;
 	}
+}
 
+void ndScene::InitBodyArray()
+{
+	D_TRACKTIME();
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 

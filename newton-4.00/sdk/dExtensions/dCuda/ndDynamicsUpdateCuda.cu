@@ -1574,6 +1574,7 @@ void ndDynamicsUpdateCuda::DetermineSleepStates()
 		ndConstraint** const jointArray = &scene->GetActiveContactArray()[0];
 		ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
+		const ndVector zero(ndVector::m_zero);
 		const ndStartEnd startEnd(bodyIndex.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -1597,6 +1598,11 @@ void ndDynamicsUpdateCuda::DetermineSleepStates()
 				}
 			}
 			body->m_equilibrium = equilibrium & body->m_autoSleep;
+			if (body->m_equilibrium)
+			{
+				body->m_veloc = zero;
+				body->m_omega = zero;
+			}
 		}
 	});
 

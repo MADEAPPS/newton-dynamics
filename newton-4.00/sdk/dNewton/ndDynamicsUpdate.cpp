@@ -1566,6 +1566,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		ndConstraint** const jointArray = &scene->GetActiveContactArray()[0];
 		ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
+		const ndVector zero(ndVector::m_zero);
 		const ndStartEnd startEnd(bodyIndex.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -1589,6 +1590,11 @@ void ndDynamicsUpdate::DetermineSleepStates()
 				}
 			}
 			body->m_equilibrium = equilibrium & body->m_autoSleep;
+			if (body->m_equilibrium)
+			{
+				body->m_veloc = zero;
+				body->m_omega = zero;
+			}
 		}
 	});
 
@@ -1598,6 +1604,20 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		scene->ParallelExecute(CalculateSleepState);
 	}
 #endif
+
+	static int xxxx;
+	//dTrace(("frame %d\n", xxxx));
+	xxxx++;
+	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	for (ndInt32 i = 0; i < bodyArray.GetCount(); i++)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		if (body->m_equilibrium)
+		{
+			//dTrace(("%d\n", body->m_uniqueId));
+		}
+	}
+	//dTrace(("\n"));
 }
 
 void ndDynamicsUpdate::InitSkeletons()
