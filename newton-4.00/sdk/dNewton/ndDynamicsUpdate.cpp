@@ -447,7 +447,9 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	dAssert(m_activeJointCount <= jointArray.GetCount());
 	jointArray.SetCount(m_activeJointCount);
+#ifdef D_USE_ISLAND_WIP
 	BuildDisjointSets();
+#endif
 
 	m_activeJointCount = movingJointCount;
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
