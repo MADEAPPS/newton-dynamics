@@ -30,9 +30,9 @@
 template <class T, class dCompareKey>
 void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 {
-	D_TRACKTIME();
+	//D_TRACKTIME();
 	const ndInt32 batchSize = 8;
-	ndInt32 stack[1024][2];
+	ndInt32 stack[128][2];
 
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
@@ -133,8 +133,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
 void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, void* const context = nullptr)
 {
-	D_TRACKTIME();
-
+	//D_TRACKTIME();
 	dAssert(keyBitSize > 0);
 	ndInt32 scans[1 << keyBitSize];
 	ndEvaluateKey evaluator(context);

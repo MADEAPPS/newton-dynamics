@@ -1569,8 +1569,10 @@ void ndScene::FindCollidingPairs()
 	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		//const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
@@ -1581,8 +1583,10 @@ void ndScene::FindCollidingPairs()
 	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		//const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
@@ -1590,7 +1594,7 @@ void ndScene::FindCollidingPairs()
 		}
 	});
 
-	bool fullScan = (3 * m_sceneBodyArray.GetCount()) > m_activeBodyArray.GetCount();
+	bool fullScan = (2 * m_sceneBodyArray.GetCount()) > m_activeBodyArray.GetCount();
 	// uncomment line below to test full versus partial scan
 	//fullScan = true;
 	if (fullScan)
