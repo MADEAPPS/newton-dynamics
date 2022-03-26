@@ -33,8 +33,6 @@ class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-//#define D_USE_ISLAND_WIP
-
 #define D_SMALL_ISLAND_COUNT		32
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * ndFloat32 (0.5f))
@@ -222,9 +220,6 @@ class ndBodyKinematic : public ndBody
 	ndFloat32 m_weigh;
 	ndInt32 m_rank;
 	ndInt32 m_index;
-	#ifdef D_USE_ISLAND_WIP
-	ndInt32 m_sleepingCounter;
-	#endif
 	D_COLLISION_API static ndVector m_velocTol;
 
 	friend class ndWorld;
@@ -411,7 +406,6 @@ inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 	m_weigh = ndFloat32(0.0f);
 	m_isStatic = (m_invMass.m_w == ndFloat32(0.0f));
 	m_equilibrium = m_isStatic | m_equilibrium;
-	m_islandSleep = m_equilibrium;
 	m_equilibrium0 = m_equilibrium;
 }
 

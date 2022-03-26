@@ -252,6 +252,7 @@ ndScene::ndScene(const ndScene& src)
 	for (ndBodyList::ndNode* node = stealData->m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
+		body->m_sceneForceUpdate = 1;
 		ndBodyList::ndNode* const newNode = m_bodyList.Append(body);
 		body->SetSceneNodes(this, newNode);
 
@@ -1407,7 +1408,6 @@ void ndScene::InitBodyArray()
 
 	sentinelBody->m_isStatic = 1;
 	sentinelBody->m_autoSleep = 1;
-	sentinelBody->m_islandSleep = 1;
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_equilibrium0 = 1;
 	sentinelBody->m_isJointFence0 = 1;

@@ -120,7 +120,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void Clear();
 	virtual void Update();
 	void SortJointsScan();
-	void BuildDisjointSets();
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
