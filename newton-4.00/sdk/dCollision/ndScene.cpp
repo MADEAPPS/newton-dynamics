@@ -835,36 +835,45 @@ void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const 
 
 void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
 {
-	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
-	body->UpdateCollisionMatrix();
-		
-	dAssert(!bodyNode->GetLeft());
-	dAssert(!bodyNode->GetRight());
-	dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-
-	const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
-	if (!test) 
+	if (!body->m_equilibrium | body->m_sceneForceUpdate)
 	{
-		bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
-		if (!m_rootNode->GetAsSceneBodyNode()) 
+		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+		body->UpdateCollisionMatrix();
+
+		dAssert(!bodyNode->GetLeft());
+		dAssert(!bodyNode->GetRight());
+		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+		if (!test)
 		{
-			const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-			dAssert(root == nullptr);
-			for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent) 
+			bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
+			if (!m_rootNode->GetAsSceneBodyNode())
 			{
-				ndScopeSpinLock lock(parent->m_lock);
-				ndVector minBox;
-				ndVector maxBox;
-				ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-				if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
+				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				dAssert(root == nullptr);
+				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
 				{
-					break;
+					ndScopeSpinLock lock(parent->m_lock);
+					ndVector minBox;
+					ndVector maxBox;
+					ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					{
+						break;
+					}
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
+					parent->m_surfaceArea = area;
 				}
-				parent->m_minBox = minBox;
-				parent->m_maxBox = maxBox;
-				parent->m_surfaceArea = area;
 			}
 		}
+		body->m_sceneEquilibrium = !body->m_sceneForceUpdate & (test != 0);
+		body->m_sceneForceUpdate = 0;
+	}
+	else
+	{
+		body->m_sceneEquilibrium = 1;
 	}
 }
 
@@ -1157,17 +1166,22 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 	m_contactNotifyCallback->OnContactCallback(contact, m_timestep);
 }
 
-void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
+//void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
+void ndScene::SubmitPairs(ndSceneBodyNode* const leafNode, ndSceneNode* const node)
 {
 	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
-	const ndVector boxP0(body0 ? body0->m_minAabb : leafNode->m_minBox);
-	const ndVector boxP1(body0 ? body0->m_maxAabb : leafNode->m_maxBox);
-	const bool test0 = body0 ? (body0->m_invMass.m_w != ndFloat32(0.0f)) : true;
-
-	ndInt32 stack = 1;
+	//const ndVector boxP0(body0 ? body0->m_minAabb : leafNode->m_minBox);
+	//const ndVector boxP1(body0 ? body0->m_maxAabb : leafNode->m_maxBox);
+	const ndVector boxP0(leafNode->m_minBox);
+	const ndVector boxP1(leafNode->m_maxBox);
+	//const bool test0 = body0 ? (body0->m_invMass.m_w != ndFloat32(0.0f)) : true;
+	dAssert(body0);
+	const bool test0 = (body0->m_invMass.m_w != ndFloat32(0.0f)) & body0->GetCollisionShape().GetCollisionMode();
+	
 	ndSceneNode* pool[D_SCENE_MAX_STACK_DEPTH];
 	pool[0] = node;
 
+	ndInt32 stack = 1;
 	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 16)))
 	{
 		stack--;
@@ -1178,14 +1192,19 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 			{
 				dAssert(!rootNode->GetRight());
 				dAssert(!rootNode->GetLeft());
-				ndBodyKinematic* const body1 = rootNode->GetBody() ? rootNode->GetBody() : nullptr;
-				if (body0) 
+				
+				//ndBodyKinematic* const body1 = rootNode->GetBody() ? rootNode->GetBody() : nullptr;
+				ndBodyKinematic* const body1 = rootNode->GetBody();
+				dAssert(body1);
+				//if (body0) 
 				{
-					if (body1) 
+					//if (body1) 
 					{
-						if (test0 || (body1->m_invMass.m_w != ndFloat32(0.0f)))
+						//if (test0 | (body1->m_invMass.m_w != ndFloat32(0.0f)))
 						{
-							const bool test = TestOverlaping(body0, body1);
+							//const bool test = TestOverlaping(body0, body1);
+							const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
+							bool test = test0 | test1;
 							if (test)
 							{
 								AddPair(body0, body1);
@@ -1217,11 +1236,11 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 	}
 }
 
-bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
-{
-	bool test = body0->GetCollisionShape().GetCollisionMode() & body1->GetCollisionShape().GetCollisionMode();
-	return test && dOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? true : false;
-}
+//bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
+//{
+//	bool test = body0->GetCollisionShape().GetCollisionMode() & body1->GetCollisionShape().GetCollisionMode();
+//	return test && dOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? true : false;
+//}
 
 ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
@@ -1332,13 +1351,11 @@ void ndScene::InitBodyArray()
 
 			body->PrepareStep(i);
 			activeBodyArray[i] = body;
-		
-			const ndInt32 key = body->m_equilibrium;
+			UpdateAabb(threadIndex, body);
+
+			//const ndInt32 key = body->m_equilibrium;
+			const ndInt32 key = body->m_sceneEquilibrium;
 			scan[key] ++;
-			if (!body->m_equilibrium || body->m_transformIsDirty)
-			{
-				UpdateAabb(threadIndex, body);
-			}
 		}
 	});
 
@@ -1355,7 +1372,8 @@ void ndScene::InitBodyArray()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = activeBodyArray[i];
-			const ndInt32 key = body->m_equilibrium;
+			//const ndInt32 key = body->m_equilibrium;
+			const ndInt32 key = body->m_sceneEquilibrium;
 			const ndInt32 index = scan[key];
 			sceneBodyArray[index] = body;
 			scan[key] ++;
@@ -1394,7 +1412,8 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_equilibrium0 = 1;
 	sentinelBody->m_isJointFence0 = 1;
 	sentinelBody->m_isJointFence1 = 1;
-	sentinelBody->m_bodyIsConstrained = 0;
+	sentinelBody->m_isConstrained = 0;
+	sentinelBody->m_sceneEquilibrium = 1;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
 	m_activeBodyArray.PushBack(sentinelBody);
 }
@@ -1569,8 +1588,6 @@ void ndScene::FindCollidingPairs()
 	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		//const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1583,8 +1600,6 @@ void ndScene::FindCollidingPairs()
 	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		//const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)

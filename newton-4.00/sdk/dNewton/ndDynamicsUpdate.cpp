@@ -315,11 +315,11 @@ void ndDynamicsUpdate::SortJointsScan()
 				dAssert((body1->m_invMass.m_w == ndFloat32(0.0f)) == body1->m_isStatic);
 			}
 
-			body0->m_bodyIsConstrained = 1;
+			body0->m_isConstrained = 1;
 			body0->m_equilibrium0 = body0->m_equilibrium0 & equilibrium;
 			if (!body1->m_isStatic)
 			{
-				body1->m_bodyIsConstrained = 1;
+				body1->m_isConstrained = 1;
 				body1->m_equilibrium0 = body1->m_equilibrium0 & equilibrium;
 			}
 		}
@@ -527,7 +527,7 @@ void ndDynamicsUpdate::SortIslands()
 		ndUnsigned32 GetKey(const ndBodyIndexPair& pair) const
 		{
 			const ndBodyKinematic* const body = pair.m_root;
-			const ndInt32 key = 1 - body->m_bodyIsConstrained;
+			const ndInt32 key = 1 - body->m_isConstrained;
 			return key;
 		}
 	};
@@ -543,7 +543,7 @@ void ndDynamicsUpdate::SortIslands()
 
 		ndUnsigned32 GetKey(const ndIsland& island) const
 		{
-			ndUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
+			ndUnsigned32 key = island.m_count * 2 + island.m_root->m_isConstrained;
 			const ndUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
 			dAssert(key < maxVal);
 			const ndUnsigned32 lowKey = (maxVal - key) >> m_shift;
@@ -600,7 +600,7 @@ void ndDynamicsUpdate::SortIslands()
 		ndCountingSort<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
-			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
+			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_isConstrained >= buffer1[i + 1].m_root->m_isConstrained));
 
 			activeBodyArray[i] = buffer1[i].m_body;
 			if (buffer1[i].m_root->m_rank == -1)
@@ -621,7 +621,7 @@ void ndDynamicsUpdate::SortIslands()
 			island.m_count = island.m_root->m_rank;
 			islandMaxKeySize = dMax(islandMaxKeySize, island.m_count);
 			start += island.m_count;
-			unConstrainedCount -= island.m_root->m_bodyIsConstrained;
+			unConstrainedCount -= island.m_root->m_isConstrained;
 		}
 		unConstrainedCount += islands.GetCount();
 
@@ -670,7 +670,7 @@ void ndDynamicsUpdate::SortIslands()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
-			ndInt32 key = map[(body->m_equilibrium0 & body->m_islandSleep) * 2 + 1 - body->m_bodyIsConstrained];
+			ndInt32 key = map[(body->m_equilibrium0 & body->m_islandSleep) * 2 + 1 - body->m_isConstrained];
 			dAssert(key < 3);
 			hist[key] = hist[key] + 1;
 		}
@@ -690,7 +690,7 @@ void ndDynamicsUpdate::SortIslands()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
-			ndInt32 key = map[(body->m_equilibrium0 & body->m_islandSleep) * 2 + 1 - body->m_bodyIsConstrained];
+			ndInt32 key = map[(body->m_equilibrium0 & body->m_islandSleep) * 2 + 1 - body->m_isConstrained];
 			dAssert(key < 3);
 			const ndInt32 entry = hist[key];
 			activeBodyArray[entry] = body;
@@ -795,9 +795,9 @@ void ndDynamicsUpdate::InitWeights()
 			const ndJointBodyPairIndex& scan = jointBodyPairIndex[index];
 			ndBodyKinematic* const body = bodyArray[scan.m_body];
 			dAssert(body->m_index == scan.m_body);
-			dAssert(body->m_bodyIsConstrained <= 1);
+			dAssert(body->m_isConstrained <= 1);
 			const ndInt32 count = jointForceIndexBuffer[i + 1] - index - 1;
-			const ndInt32 mask = -ndInt32(body->m_bodyIsConstrained & ~body->m_isStatic);
+			const ndInt32 mask = -ndInt32(body->m_isConstrained & ~body->m_isStatic);
 			const ndInt32 weigh = 1 + (mask & count);
 			dAssert(weigh >= 0);
 			if (weigh)
@@ -841,7 +841,7 @@ void ndDynamicsUpdate::InitBodyArray()
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			dAssert(body);
-			dAssert(body->m_bodyIsConstrained | body->m_isStatic);
+			dAssert(body->m_isConstrained | body->m_isStatic);
 
 			body->UpdateInvInertiaMatrix();
 			body->AddDampingAcceleration(timestep);
@@ -1205,7 +1205,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 
 			dAssert(body);
 			dAssert(body->GetAsBodyDynamic());
-			dAssert(body->m_bodyIsConstrained);
+			dAssert(body->m_isConstrained);
 			const ndInt32 index = body->m_index;
 			const ndJacobian& forceAndTorque = internalForces[index];
 			const ndVector force(body->GetForce() + forceAndTorque.m_linear);
@@ -1478,7 +1478,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 					body->m_equilibrium = body->m_isStatic | body->m_autoSleep;
 				}
 			}
-			else if ((count > 1) || bodyIslands[0]->m_bodyIsConstrained)
+			else if ((count > 1) || bodyIslands[0]->m_isConstrained)
 			{
 				const bool state =
 					(maxAccel > world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||

@@ -47,7 +47,9 @@ ndBody::ndBody()
 	,m_equilibrium0(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
-	,m_bodyIsConstrained(0)
+	,m_isConstrained(0)
+	,m_sceneForceUpdate(1)
+	,m_sceneEquilibrium(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -73,7 +75,9 @@ ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_equilibrium0(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
-	,m_bodyIsConstrained(0)
+	,m_isConstrained(0)
+	,m_sceneForceUpdate(1)
+	,m_sceneEquilibrium(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -197,6 +201,7 @@ void ndBody::SetMatrix(const ndMatrix& matrix)
 {
 	m_equilibrium = 0;
 	m_transformIsDirty = 1;
+	m_sceneForceUpdate = 1;
 	SetMatrixNoSleep(matrix);
 }
 

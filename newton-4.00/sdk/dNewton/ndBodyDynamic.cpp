@@ -371,7 +371,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		dAssert(m_omega.m_w == ndFloat32(0.0f));
 
 		ndInt32 count = 0;
-		if (m_bodyIsConstrained)
+		if (m_isConstrained)
 		{
 			count = m_jointList.GetCount() > 1 ? 1000 : 1;
 			ndContactMap::Iterator it(m_contactList);
@@ -420,7 +420,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 			equilibrium &= equilibriumTest;
 		}
 		m_isJointFence0 = equilibrium;
-		if (equilibrium & ~m_bodyIsConstrained)
+		if (equilibrium & ~m_isConstrained)
 		{
 			m_equilibrium = equilibrium;
 		}

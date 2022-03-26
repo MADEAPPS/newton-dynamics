@@ -73,7 +73,8 @@ void ndWorldSceneCuda::FindCollidingPairs()
 
 void ndWorldSceneCuda::LoadBodyData()
 {
-	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	ndArray<ndBodyKinematic*>& bodyArray = m_bodyList.m_view;
 	const ndInt32 bodyCount = bodyArray.GetCount();
 
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
@@ -96,8 +97,8 @@ void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
-	ndBodyProxy* const data = &m_context->m_bodyBuffer.m_dataView[0];
-	gpuBodyBuffer.WriteData(data, GetActiveBodyArray().GetCount());
+	ndArray<ndBodyProxy>& view = gpuBodyBuffer.m_dataView;
+	gpuBodyBuffer.WriteData(&view[0], view.GetCount());
 }
 
 void ndWorldSceneCuda::UpdateTransform()
@@ -124,14 +125,19 @@ void ndWorldSceneCuda::UpdateTransform()
 	ndScene::UpdateTransform();
 }
 
-void ndWorldSceneCuda::InitBodyArray()
+void ndWorldSceneCuda::UpdateBodyList()
 {
 	bool bodyListChanged = m_bodyListChanged;
-	//ndWorldScene::InitBodyArray();
-
+	ndWorldScene::UpdateBodyList();
 	if (bodyListChanged)
 	{
+		// hack to test cuda kernel
 		ndWorldScene::InitBodyArray();
 		LoadBodyData();
 	}
+}
+
+void ndWorldSceneCuda::InitBodyArray()
+{
+	//ndWorldScene::InitBodyArray();
 }

@@ -32,6 +32,7 @@ class ndWorldSceneCuda : public ndWorldScene
 
 	private:
 	virtual void InitBodyArray();
+	virtual void UpdateBodyList();
 	virtual void CalculateContacts();
 	virtual void FindCollidingPairs();
 

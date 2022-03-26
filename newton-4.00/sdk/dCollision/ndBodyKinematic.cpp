@@ -568,7 +568,7 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 	else
 	{
 		ndInt32 count = 0;
-		if (m_bodyIsConstrained)
+		if (m_isConstrained)
 		{
 			count = m_jointList.GetCount() > 1 ? 1000 : 1;
 			ndContactMap::Iterator it(m_contactList);
@@ -608,7 +608,7 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 			equilibrium &= equilibriumTest;
 		}
 		m_isJointFence0 = equilibrium;
-		if (equilibrium & ~m_bodyIsConstrained)
+		if (equilibrium & ~m_isConstrained)
 		{
 			m_equilibrium = equilibrium;
 		}

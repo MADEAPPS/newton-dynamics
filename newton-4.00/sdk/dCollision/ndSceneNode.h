@@ -40,6 +40,11 @@ class ndSceneNode: public ndClassAlloc
 		,m_surfaceArea(ndFloat32(1.0e20f))
 		,m_lock()
 	{
+#ifdef _DEBUG
+		static ndInt32 nodeId = 0;
+		m_nodeId = nodeId;
+		nodeId++;
+#endif
 	}
 
 	virtual ~ndSceneNode()
@@ -73,6 +78,9 @@ class ndSceneNode: public ndClassAlloc
 	ndSceneNode* m_parent;
 	ndFloat32 m_surfaceArea;
 	ndSpinLock m_lock;
+#ifdef _DEBUG
+	ndInt32 m_nodeId;
+#endif
 
 	static ndVector m_aabbQuantization;
 	static ndVector m_aabbInvQuantization;

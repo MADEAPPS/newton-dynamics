@@ -406,8 +406,8 @@ inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 	m_index = index;
 	m_isJointFence0 = 1;
 	m_isJointFence1 = 1;
+	m_isConstrained = 0;
 	m_islandParent = this;
-	m_bodyIsConstrained = 0;
 	m_weigh = ndFloat32(0.0f);
 	m_isStatic = (m_invMass.m_w == ndFloat32(0.0f));
 	m_equilibrium = m_isStatic | m_equilibrium;
