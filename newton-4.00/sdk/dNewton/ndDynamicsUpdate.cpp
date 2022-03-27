@@ -828,29 +828,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			ndVector forceAcc1(zero);
 			ndVector torqueAcc1(zero);
 
-			#ifdef D_PROGRESSIVE_SLEEP_EXPERIMENT
-			const ndVector progressiveSleepWeigh(ndFloat32(0.01f));
-			if (body0->m_isJointFence1 & !body0->m_isStatic)
-			{
-				for (ndInt32 i = 0; i < count; ++i)
-				{
-					ndLeftHandSide* const row = &m_leftHandSide[index + i];
-					row->m_Jt.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * progressiveSleepWeigh;
-					row->m_Jt.m_jacobianM0.m_angular = row->m_Jt.m_jacobianM0.m_linear * progressiveSleepWeigh;
-				}
-			}
-
-			if (body1->m_isJointFence1 & !body1->m_isStatic)
-			{
-				for (ndInt32 i = 0; i < count; ++i)
-				{
-					ndLeftHandSide* const row = &m_leftHandSide[index + i];
-					row->m_Jt.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * progressiveSleepWeigh;
-					row->m_Jt.m_jacobianM1.m_angular = row->m_Jt.m_jacobianM1.m_linear * progressiveSleepWeigh;
-				}
-			}
-			#endif
-
 			const ndVector weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const ndVector weigh1(body1->m_weigh * joint->m_preconditioner1);
 

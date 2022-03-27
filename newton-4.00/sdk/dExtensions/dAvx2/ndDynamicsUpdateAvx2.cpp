@@ -1042,27 +1042,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			ndAvxFloat forceAcc0(ndAvxFloat::m_zero);
 			ndAvxFloat forceAcc1(ndAvxFloat::m_zero);
 
-			#ifdef D_PROGRESSIVE_SLEEP_EXPERIMENT
-			const ndAvxFloat progressiveSleepWeigh(ndFloat32(0.01f));
-			if (body0->m_isJointFence1 & !body0->m_isStatic)
-			{
-				for (ndInt32 i = 0; i < count; ++i)
-				{
-					ndAvxFloat& row = (ndAvxFloat&)m_leftHandSide[index + i].m_Jt.m_jacobianM0;
-					row = progressiveSleepWeigh * row;
-				}
-			}
-
-			if (body1->m_isJointFence1 & !body1->m_isStatic)
-			{
-				for (ndInt32 i = 0; i < count; ++i)
-				{
-					ndAvxFloat& row = (ndAvxFloat&)m_leftHandSide[index + i].m_Jt.m_jacobianM1;
-					row = progressiveSleepWeigh * row;
-				}
-			}
-			#endif
-
 			const ndAvxFloat weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const ndAvxFloat weigh1(body1->m_weigh * joint->m_preconditioner1);
 

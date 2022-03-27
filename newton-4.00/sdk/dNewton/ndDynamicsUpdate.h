@@ -27,7 +27,6 @@
 #define D_MAX_BODY_RADIX_BIT		9
 
 #define D_USE_EARLY_OUT_JOINT
-#define D_PROGRESSIVE_SLEEP_EXPERIMENT
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.

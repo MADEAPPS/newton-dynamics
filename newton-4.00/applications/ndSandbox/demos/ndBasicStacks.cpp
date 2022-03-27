@@ -278,14 +278,14 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildSphereColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin.m_z += 6.0f;
-	BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 18);
+	BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z += 6.0f;
 	BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
 
 	origin.m_x -= 6.0f;
 	origin.m_z -= 6.0f;
-	BuildCapsuleStack(scene, 10.0f, origin, ndVector(0.25f, 0.25f, 2.0f, 0.0f), 18);
+	BuildCapsuleStack(scene, 10.0f, origin, ndVector(0.25f, 0.25f, 2.0f, 0.0f), 20);
 
 	ndQuaternion rot(dYawMatrix (45.0f * ndDegreeToRad));
 	origin = ndVector::m_zero;
