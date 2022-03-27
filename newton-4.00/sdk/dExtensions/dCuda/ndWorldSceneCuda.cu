@@ -138,11 +138,12 @@ void ndWorldSceneCuda::UpdateTransform()
 			body->SetMatrixAndCentreOfMass(rotation, position);
 
 			body->m_transformIsDirty = true;
+			UpdateTransformNotify(threadIndex, body);
 		}
 	});
 	ParallelExecute(SetTransform);
 	
-	ndScene::UpdateTransform();
+	//ndScene::UpdateTransform();
 }
 
 void ndWorldSceneCuda::UpdateBodyList()
