@@ -88,7 +88,7 @@ class ndScene : public ndThreadPool
 
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
-	
+
 	ndArray<ndUnsigned8>& GetScratchBuffer();
 
 	ndFloat32 GetTimestep() const;
@@ -174,7 +174,6 @@ class ndScene : public ndThreadPool
 
 	ndArray<ndUnsigned8> m_scratchBuffer;
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
-	ndArray<ndBodyKinematic*> m_activeBodyArray;
 	ndArray<ndConstraint*> m_activeConstraintArray;
 	ndList<ndBodyKinematic*> m_specialUpdateList;
 	ndThreadBackgroundWorker m_backgroundThread;
@@ -232,6 +231,11 @@ inline ndArray<ndConstraint*>& ndScene::GetActiveContactArray()
 	return m_activeConstraintArray;
 }
 
+inline const ndContactArray& ndScene::GetContactArray() const
+{
+	return m_contactArray;
+}
+
 inline const ndArray<ndConstraint*>& ndScene::GetActiveContactArray() const
 {
 	return m_activeConstraintArray;
@@ -239,17 +243,12 @@ inline const ndArray<ndConstraint*>& ndScene::GetActiveContactArray() const
 
 inline ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
 {
-	return m_activeBodyArray;
+	return m_bodyList.m_view;
 }
 
 inline const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
 {
-	return m_activeBodyArray;
-}
-
-inline const ndContactArray& ndScene::GetContactArray() const
-{
-	return m_contactArray;
+	return m_bodyList.m_view;
 }
 
 inline ndFloat32 ndScene::GetTimestep() const

@@ -74,16 +74,15 @@ void ndWorldSceneCuda::FindCollidingPairs()
 void ndWorldSceneCuda::LoadBodyData()
 {
 	//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-	ndArray<ndBodyKinematic*>& bodyArray = m_bodyList.m_view;
+	ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	const ndInt32 bodyCount = bodyArray.GetCount();
-
+	
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
 	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
-
+	
 	gpuBodyBuffer.SetCount(bodyCount);
 	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
-	m_context->m_transformBuffer.SetCount(bodyCount);
-
+	
 	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
@@ -96,9 +95,27 @@ void ndWorldSceneCuda::LoadBodyData()
 void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
-	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
-	ndArray<ndBodyProxy>& view = gpuBodyBuffer.m_dataView;
-	gpuBodyBuffer.WriteData(&view[0], view.GetCount());
+
+	auto GetTransform = [] __device__(const ndBodyProxy& body, cuSpatialVector& transform)
+	{
+		transform.m_linear = body.m_posit;
+		transform.m_angular = body.m_rotation;
+	};
+
+	if (m_context->m_bodyBuffer.GetCount())
+	{
+		ndArray<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu;
+		cuDeviceBuffer<cuSpatialVector>& gpuBuffer = m_context->m_transformBufferGpu;
+
+		ndInt32 threads = m_context->m_bodyBuffer.GetCount();
+		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		ndBodyProxy* bodies = &m_context->m_bodyBuffer[0];
+
+		gpuBuffer.SetCount(threads);
+		cpuBuffer.SetCount(threads);
+		CudaKernel2 << <blocks, D_THREADS_PER_BLOCK >> > (GetTransform, bodies, &gpuBuffer[0], threads);
+		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount());
+	}
 }
 
 void ndWorldSceneCuda::UpdateTransform()
@@ -109,19 +126,22 @@ void ndWorldSceneCuda::UpdateTransform()
 	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndBodyProxy* const data = &m_context->m_bodyBuffer.m_dataView[0];
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const cuSpatialVector* const data = &m_context->m_transformBufferCpu[0];
 		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
+			const cuSpatialVector& transform = data[i];
+			const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
+			const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
+			body->SetMatrixAndCentreOfMass(rotation, position);
+
 			body->m_transformIsDirty = true;
-			const ndBodyProxy& proxi = data[i];
-			proxi.ProxyToBody(body);
 		}
 	});
 	ParallelExecute(SetTransform);
-
+	
 	ndScene::UpdateTransform();
 }
 
@@ -131,8 +151,6 @@ void ndWorldSceneCuda::UpdateBodyList()
 	ndWorldScene::UpdateBodyList();
 	if (bodyListChanged)
 	{
-		// hack to test cuda kernel
-		ndWorldScene::InitBodyArray();
 		LoadBodyData();
 	}
 }
@@ -140,4 +158,12 @@ void ndWorldSceneCuda::UpdateBodyList()
 void ndWorldSceneCuda::InitBodyArray()
 {
 	//ndWorldScene::InitBodyArray();
+
+	//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	// hack to update transform for now.
+	//for (ndInt32 i = 0; i < bodyArray.GetCount()-1; ++i)
+	//{
+	//	ndBodyKinematic* const body = bodyArray[i];
+	//	body->m_transformIsDirty = true;
+	//}
 }

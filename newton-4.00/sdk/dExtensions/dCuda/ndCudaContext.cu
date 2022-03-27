@@ -24,6 +24,8 @@
 ndCudaContext::ndCudaContext()
 	:ndClassAlloc()
 	,m_bodyBuffer()
+	,m_transformBufferCpu(D_GRANULARITY)
+	,m_transformBufferGpu()
 {
 	cudaError_t cudaStatus;
 	cudaStatus = cudaGetDeviceProperties(&m_prop, 0);

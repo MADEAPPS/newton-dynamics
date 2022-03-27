@@ -36,4 +36,14 @@ __global__ void CudaKernel(Predicate function, T* param, float timestep, int siz
 	}
 }
 
+template <typename T0, typename T1, typename Predicate>
+__global__ void CudaKernel2(Predicate function, T0* buffer0, T1* buffer1, int size)
+{
+	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	if (index < size)
+	{
+		function(buffer0[index], buffer1[index]);
+	}
+}
+
 #endif

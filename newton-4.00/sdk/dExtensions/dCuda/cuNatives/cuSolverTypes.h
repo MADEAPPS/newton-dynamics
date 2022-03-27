@@ -19,16 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CU_VECTOR_H__
-#define __ND_CU_VECTOR_H__
+#ifndef __CU_SOLVER_TYPES_H__
+#define __CU_SOLVER_TYPES_H__
 
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 
+#include "cuVector.h"
 
-class ndSpatialVector
+class cuSpatialVector
 {
 	public:
 	cuVector m_linear;

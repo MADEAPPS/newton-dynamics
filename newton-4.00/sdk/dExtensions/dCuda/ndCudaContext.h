@@ -28,6 +28,7 @@
 #include <device_launch_parameters.h>
 
 #include "ndBodyBuffer.h"
+#include "cuSolverTypes.h"
 
 class ndCudaContext : public ndClassAlloc
 {
@@ -38,7 +39,9 @@ class ndCudaContext : public ndClassAlloc
 
 	struct cudaDeviceProp m_prop;
 	ndBodyBuffer m_bodyBuffer;
-	cuDeviceBuffer<ndSpatialVector> m_transformBuffer;
+
+	ndArray<cuSpatialVector> m_transformBufferCpu;
+	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu;
 };
 
 #endif

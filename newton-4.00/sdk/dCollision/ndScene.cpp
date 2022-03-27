@@ -193,7 +193,6 @@ ndScene::ndScene()
 	,m_contactArray()
 	,m_scratchBuffer(1024 * sizeof (void*))
 	,m_sceneBodyArray(1024)
-	,m_activeBodyArray(1024)
 	,m_activeConstraintArray(1024)
 	,m_specialUpdateList()
 	,m_backgroundThread()
@@ -219,7 +218,6 @@ ndScene::ndScene(const ndScene& src)
 	,m_contactArray()
 	,m_scratchBuffer(1024 * sizeof(void*))
 	,m_sceneBodyArray(1024)
-	,m_activeBodyArray(1024)
 	,m_activeConstraintArray(1024)
 	,m_specialUpdateList()
 	,m_backgroundThread()
@@ -1307,7 +1305,7 @@ void ndScene::UpdateBodyList()
 	if (m_bodyListChanged)
 	{
 		ndInt32 index = 0;
-		ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 		view.SetCount(m_bodyList.GetCount());
 		for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 		{
@@ -1324,6 +1322,7 @@ void ndScene::UpdateBodyList()
 			dAssert(inScene && body->GetSceneBodyNode());
 		}
 		m_bodyListChanged = 0;
+		view.PushBack(m_sentinelBody);
 	}
 }
 
@@ -1331,30 +1330,25 @@ void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
-	m_activeBodyArray.SetCount(m_bodyList.GetCount());
-
 	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
-		ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 		
 		ndInt32* const scan = &scans[threadIndex][0];
 		scan[0] = 0;
 		scan[1] = 0;
 		
 		const ndFloat32 timestep = m_timestep;
-		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = view[i];
 			body->ApplyExternalForces(threadIndex, timestep);
 
 			body->PrepareStep(i);
-			activeBodyArray[i] = body;
 			UpdateAabb(threadIndex, body);
 
-			//const ndInt32 key = body->m_equilibrium;
 			const ndInt32 key = body->m_sceneEquilibrium;
 			scan[key] ++;
 		}
@@ -1363,7 +1357,7 @@ void ndScene::InitBodyArray()
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
+		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
 		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 
 		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
@@ -1373,7 +1367,6 @@ void ndScene::InitBodyArray()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = activeBodyArray[i];
-			//const ndInt32 key = body->m_equilibrium;
 			const ndInt32 key = body->m_sceneEquilibrium;
 			const ndInt32 index = scan[key];
 			sceneBodyArray[index] = body;
@@ -1404,7 +1397,7 @@ void ndScene::InitBodyArray()
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
 	ndBodyKinematic* const sentinelBody = m_sentinelBody;
-	sentinelBody->PrepareStep(GetActiveBodyArray().GetCount());
+	sentinelBody->PrepareStep(GetActiveBodyArray().GetCount() - 1);
 
 	sentinelBody->m_isStatic = 1;
 	sentinelBody->m_autoSleep = 1;
@@ -1415,7 +1408,6 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_isConstrained = 0;
 	sentinelBody->m_sceneEquilibrium = 1;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
-	m_activeBodyArray.PushBack(sentinelBody);
 }
 
 void ndScene::CalculateContacts()
@@ -1609,7 +1601,7 @@ void ndScene::FindCollidingPairs()
 		}
 	});
 
-	bool fullScan = (2 * m_sceneBodyArray.GetCount()) > m_activeBodyArray.GetCount();
+	bool fullScan = (2 * m_sceneBodyArray.GetCount()) > GetActiveBodyArray().GetCount();
 	// uncomment line below to test full versus partial scan
 	//fullScan = true;
 	if (fullScan)
@@ -2009,14 +2001,12 @@ void ndScene::Cleanup()
 	ndFreeListAlloc::Flush();
 	m_contactArray.Resize(1024);
 	m_sceneBodyArray.Resize(1024);
-	m_activeBodyArray.Resize(1024);
 	m_activeConstraintArray.Resize(1024);
 	m_scratchBuffer.Resize(1024 * sizeof(void*));
 
 	m_contactArray.SetCount(0);
 	m_scratchBuffer.SetCount(0);
 	m_sceneBodyArray.SetCount(0);
-	m_activeBodyArray.SetCount(0);
 	m_activeConstraintArray.SetCount(0);
 }
 

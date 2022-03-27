@@ -38,8 +38,6 @@
 #include "ndWorldSceneCuda.h"
 #include "ndDynamicsUpdateCuda.h"
 
-#define D_THREADS_PER_BLOCK		256
-
 ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_context(((ndWorldSceneCuda*)world->GetScene())->m_context)

@@ -135,14 +135,15 @@ class ndBodyProxy
 
 	void ProxyToBody(ndBodyKinematic* const body) const
 	{
-		const ndVector veloc(m_veloc.x, m_veloc.y, m_veloc.z, ndFloat32(0.0f));
-		const ndVector omega(m_omega.x, m_omega.y, m_omega.z, ndFloat32(0.0f));
-		const ndVector position(m_posit.x, m_posit.y, m_posit.z, ndFloat32(1.0f));
-		const ndQuaternion rotation(ndVector(m_rotation.x, m_rotation.y, m_rotation.z, m_rotation.w));
-
-		body->SetOmegaNoSleep(omega);
-		body->SetVelocityNoSleep(veloc);
-		body->SetMatrixAndCentreOfMass(rotation, position);
+		dAssert(0);
+		//const ndVector veloc(m_veloc.x, m_veloc.y, m_veloc.z, ndFloat32(0.0f));
+		//const ndVector omega(m_omega.x, m_omega.y, m_omega.z, ndFloat32(0.0f));
+		//const ndVector position(m_posit.x, m_posit.y, m_posit.z, ndFloat32(1.0f));
+		//const ndQuaternion rotation(ndVector(m_rotation.x, m_rotation.y, m_rotation.z, m_rotation.w));
+		//
+		//body->SetOmegaNoSleep(omega);
+		//body->SetVelocityNoSleep(veloc);
+		//body->SetMatrixAndCentreOfMass(rotation, position);
 	}
 
 	cuQuat m_rotation;
@@ -166,6 +167,7 @@ class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxy>
 
 inline ndBodyBuffer::ndBodyBuffer()
 	:cuDeviceBuffer<ndBodyProxy>()
+	,m_dataView(D_GRANULARITY)
 {
 }
 

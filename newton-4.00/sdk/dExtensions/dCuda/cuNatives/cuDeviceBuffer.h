@@ -26,7 +26,8 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 
-#define D_GRANULARITY (1024 * 4)
+#define D_GRANULARITY			(1024 * 32)
+#define D_THREADS_PER_BLOCK		256
 
 template<class T>
 class cuDeviceBuffer
@@ -53,13 +54,14 @@ class cuDeviceBuffer
 	ndInt32 m_capacity;
 };
 
-
 template<class T>
 cuDeviceBuffer<T>::cuDeviceBuffer()
 	:m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
 {
+	SetCount(D_GRANULARITY);
+	SetCount(0);
 }
 
 template<class T>

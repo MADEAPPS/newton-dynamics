@@ -30,7 +30,7 @@ class ndWorldSceneCuda : public ndWorldScene
 	ndWorldSceneCuda(const ndWorldScene& src);
 	virtual ~ndWorldSceneCuda();
 
-	private:
+	//private:
 	virtual void InitBodyArray();
 	virtual void UpdateBodyList();
 	virtual void CalculateContacts();
