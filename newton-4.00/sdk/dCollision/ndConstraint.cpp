@@ -29,8 +29,10 @@
 
 ndConstraint::ndConstraint()
 	:ndContainersFreeListAlloc<ndConstraint>()
+#ifdef D_JOINT_PRECONDITIONER					
 	,m_preconditioner0(ndFloat32 (1.0f))
 	,m_preconditioner1(ndFloat32(1.0f))
+#endif
 	,m_rowCount(0)
 	,m_rowStart(0)
 	,m_active(1)

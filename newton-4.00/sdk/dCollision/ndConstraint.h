@@ -24,11 +24,17 @@
 
 #include "ndCollisionStdafx.h"
 
-#define D_MAX_BOUND				D_LCP_MAX_VALUE
-#define D_MIN_BOUND				(-D_LCP_MAX_VALUE)
-#define D_INDEPENDENT_ROW		-1 
-#define D_CONSTRAINT_MAX_ROWS	(3 * 16)
-#define MIN_JOINT_PIN_LENGTH	ndFloat32 (50.0f)
+#define D_MAX_BOUND					D_LCP_MAX_VALUE
+#define D_MIN_BOUND					(-D_LCP_MAX_VALUE)
+#define D_INDEPENDENT_ROW			-1 
+#define D_CONSTRAINT_MAX_ROWS		(3 * 16)
+
+//#define D_JOINT_PRECONDITIONER
+
+#ifdef D_JOINT_PRECONDITIONER
+#define D_DIAGONAL_PRECONDITIONER	ndFloat32 (25.0f)
+#endif
+
 
 class ndBody;
 class ndContact;
@@ -250,8 +256,10 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	void InitPointParam(dgPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
+#ifdef D_JOINT_PRECONDITIONER
 	ndFloat32 m_preconditioner0;
 	ndFloat32 m_preconditioner1;
+#endif
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;
 	ndUnsigned8 m_active;

@@ -803,6 +803,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const ndVector invMass0(body0->m_invMass[3]);
 			const ndVector invMass1(body1->m_invMass[3]);
 
+			#ifdef D_JOINT_PRECONDITIONER
 			joint->m_preconditioner0 = ndFloat32(1.0f);
 			joint->m_preconditioner1 = ndFloat32(1.0f);
 
@@ -821,6 +822,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 					joint->m_preconditioner1 = mass1 / (mass0 * D_DIAGONAL_PRECONDITIONER);
 				}
 			}
+			#endif
 
 			const ndVector zero(ndVector::m_zero);
 			ndVector forceAcc0(zero);
@@ -828,11 +830,16 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			ndVector forceAcc1(zero);
 			ndVector torqueAcc1(zero);
 
+			#ifdef D_JOINT_PRECONDITIONER
 			const ndVector weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const ndVector weigh1(body1->m_weigh * joint->m_preconditioner1);
 
 			const ndFloat32 preconditioner0 = joint->m_preconditioner0;
 			const ndFloat32 preconditioner1 = joint->m_preconditioner1;
+			#else
+			const ndVector weigh0(body0->m_weigh);
+			const ndVector weigh1(body1->m_weigh);
+			#endif
 
 			const bool isBilateral = joint->IsBilateral();
 			for (ndInt32 i = 0; i < count; ++i)
@@ -873,12 +880,20 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
 
-				ndVector f0(rhs->m_force * preconditioner0);
-				ndVector f1(rhs->m_force * preconditioner1);
+				#ifdef D_JOINT_PRECONDITIONER
+				const ndVector f0(rhs->m_force * preconditioner0);
+				const ndVector f1(rhs->m_force * preconditioner1);
 				forceAcc0 = forceAcc0 + JtM0.m_linear * f0;
 				torqueAcc0 = torqueAcc0 + JtM0.m_angular * f0;
 				forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
 				torqueAcc1 = torqueAcc1 + JtM1.m_angular * f1;
+				#else
+				const ndVector f(rhs->m_force);
+				forceAcc0 = forceAcc0 + JtM0.m_linear * f;
+				torqueAcc0 = torqueAcc0 + JtM0.m_angular * f;
+				forceAcc1 = forceAcc1 + JtM1.m_linear * f;
+				torqueAcc1 = torqueAcc1 + JtM1.m_angular * f;
+				#endif
 			}
 
 			const ndInt32 index0 = jointIndex * 2 + 0;
@@ -1254,6 +1269,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
 			if (!resting)
 			{
+				#ifdef D_JOINT_PRECONDITIONER
 				ndVector preconditioner0(joint->m_preconditioner0);
 				ndVector preconditioner1(joint->m_preconditioner1);
 
@@ -1264,6 +1280,16 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 				preconditioner0 = preconditioner0.Scale(body0->m_weigh);
 				preconditioner1 = preconditioner1.Scale(body1->m_weigh);
+
+				#else	
+				const ndVector preconditioner0(body0->m_weigh);
+				const ndVector preconditioner1(body1->m_weigh);
+
+				ndVector forceM0(m_internalForces[m0].m_linear);
+				ndVector torqueM0(m_internalForces[m0].m_angular);
+				ndVector forceM1(m_internalForces[m1].m_linear);
+				ndVector torqueM1(m_internalForces[m1].m_angular);
+				#endif
 
 				for (ndInt32 j = 0; j < rowsCount; ++j)
 				{
@@ -1295,7 +1321,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					const ndVector deltaForce(f - force);
 					const ndVector deltaForce0(deltaForce * preconditioner0);
 					const ndVector deltaForce1(deltaForce * preconditioner1);
-
 					forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, deltaForce0);
 					torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, deltaForce0);
 					forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, deltaForce1);

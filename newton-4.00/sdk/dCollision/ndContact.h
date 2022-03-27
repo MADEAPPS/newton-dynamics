@@ -33,7 +33,6 @@ class ndShapeInstance;
 #define D_MAX_CONTATCS					128
 #define D_CONSTRAINT_MAX_ROWS			(3 * 16)
 #define D_RESTING_CONTACT_PENETRATION	(D_PENETRATION_TOL + ndFloat32 (1.0f / 1024.0f))
-#define D_DIAGONAL_PRECONDITIONER		ndFloat32 (25.0f)
 
 D_MSV_NEWTON_ALIGN_32
 class ndContactPoint

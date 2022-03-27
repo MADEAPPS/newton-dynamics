@@ -264,7 +264,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	ndVector origin(ndVector::m_zero);
 
-	//ndInt32 pyramidHigh = 1;
+	//ndInt32 pyramidHigh = 20;
 	ndInt32 pyramidHigh = 30;
 	//ndInt32 pyramidHigh = 60;
 	for (ndInt32 i = 0; i < 4; i++)

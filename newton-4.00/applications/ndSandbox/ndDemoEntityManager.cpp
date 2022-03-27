@@ -366,8 +366,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = ndWorld::ndOpenclSolver1;
 	//m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	m_solverMode = ndWorld::ndCudaSolver;
-	//m_solverMode = ndWorld::ndSimdAvx2Solver;
+	//m_solverMode = ndWorld::ndCudaSolver;
+	m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 4;
@@ -380,7 +380,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
