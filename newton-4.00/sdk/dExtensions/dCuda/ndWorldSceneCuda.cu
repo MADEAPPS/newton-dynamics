@@ -41,6 +41,7 @@ ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
 	,m_context(ndCudaContext::CreateContext())
 {
+	m_bodyListChanged = 1;
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
@@ -49,6 +50,11 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 	{
 		delete m_context;
 	}
+}
+
+bool ndWorldSceneCuda::SupportGPU() const
+{
+	return true;
 }
 
 void ndWorldSceneCuda::Sync()

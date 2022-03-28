@@ -40,6 +40,10 @@ ndBodyKinematic::ndContactMap::ndContactMap()
 {
 }
 
+ndBodyKinematic::ndContactMap::~ndContactMap()
+{
+}
+
 ndContact* ndBodyKinematic::ndContactMap::FindContact(const ndBody* const body0, const ndBody* const body1) const
 {
 	ndContactkey key(body0->GetId(), body1->GetId());
@@ -49,24 +53,20 @@ ndContact* ndBodyKinematic::ndContactMap::FindContact(const ndBody* const body0,
 
 void ndBodyKinematic::ndContactMap::AttachContact(ndContact* const contact)
 {
-	//dAssert(SanityCheck());
 	ndBody* const body0 = contact->GetBody0();
 	ndBody* const body1 = contact->GetBody1();
 	ndContactkey key(body0->GetId(), body1->GetId());
 	dAssert(!Find(key));
 	Insert(contact, key);
-	//dAssert(SanityCheck());
 }
 
 void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 {
-	//dAssert(SanityCheck());
 	ndBody* const body0 = contact->GetBody0();
 	ndBody* const body1 = contact->GetBody1();
 	ndContactkey key(body0->GetId(), body1->GetId());
 	dAssert(Find(key));
 	Remove(key);
-	//dAssert(SanityCheck());
 }
 
 ndBodyKinematic::ndBodyKinematic()
@@ -86,7 +86,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_scene(nullptr)
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
-	,m_sceneBodyBodyNode(nullptr)
+	,m_sceneBodyNode(nullptr)
 	,m_skeletonContainer(nullptr)
 	,m_spetialUpdateNode(nullptr)
 	,m_maxAngleStep(ndFloat32 (45.0f) * ndDegreeToRad)
@@ -117,7 +117,7 @@ ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_scene(nullptr)
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
-	,m_sceneBodyBodyNode(nullptr)
+	,m_sceneBodyNode(nullptr)
 	,m_skeletonContainer(nullptr)
 	,m_spetialUpdateNode(nullptr)
 	,m_weigh(ndFloat32(0.0f))

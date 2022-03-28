@@ -25,6 +25,24 @@
 #include "ndContactArray.h"
 #include "ndBodyKinematic.h"
 
+ndContactArray::ndContactArray()
+	:ndArray<ndContact*>(1024)
+	,m_lock()
+{
+}
+
+ndContactArray::ndContactArray(const ndContactArray& src)
+	:ndArray<ndContact*>()
+	,m_lock()
+{
+	ndContactArray& steal = (ndContactArray&)src;
+	Swap(steal);
+}
+
+ndContactArray::~ndContactArray()
+{
+}
+
 ndContact* ndContactArray::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
 	ndContact* const contact = new ndContact;

@@ -79,10 +79,11 @@ class ndBodyKinematic : public ndBody
 	class ndContactMap: public ndTree<ndContact*, ndContactkey, ndContainersFreeListAlloc<ndContact*>>
 	{
 		public:
-		ndContactMap();
 		D_COLLISION_API ndContact* FindContact(const ndBody* const body0, const ndBody* const body1) const;
 
 		private:
+		ndContactMap();
+		~ndContactMap();
 		void AttachContact(ndContact* const contact);
 		void DetachContact(ndContact* const contact);
 		friend class ndBodyKinematic;
@@ -210,7 +211,7 @@ class ndBodyKinematic : public ndBody
 	ndScene* m_scene;
 	ndBodyKinematic* m_islandParent;
 	ndBodyList::ndNode* m_sceneNode;
-	ndSceneBodyNode* m_sceneBodyBodyNode;
+	ndSceneBodyNode* m_sceneBodyNode;
 	ndSkeletonContainer* m_skeletonContainer;
 	ndList<ndBodyKinematic*>::ndNode* m_spetialUpdateNode;
 
@@ -338,12 +339,12 @@ inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyList::ndN
 
 inline ndSceneBodyNode* ndBodyKinematic::GetSceneBodyNode() const
 {
-	return m_sceneBodyBodyNode;
+	return m_sceneBodyNode;
 }
 
 inline void ndBodyKinematic::SetSceneBodyNode(ndSceneBodyNode* const node)
 {
-	m_sceneBodyBodyNode = node;
+	m_sceneBodyNode = node;
 }
 
 inline ndVector ndBodyKinematic::GetForce() const

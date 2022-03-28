@@ -64,6 +64,8 @@ class ndScene : public ndThreadPool
 	{
 		public:
 		ndFitnessList();
+		ndFitnessList(const ndFitnessList& src);
+
 		ndFloat64 TotalCost() const;
 
 		void AddNode(ndSceneTreeNode* const node);
@@ -77,6 +79,7 @@ class ndScene : public ndThreadPool
 	public:
 	D_COLLISION_API virtual ~ndScene();
 	D_COLLISION_API virtual void Sync();
+	D_COLLISION_API virtual bool SupportGPU() const;
 
 	ndInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;

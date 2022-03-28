@@ -160,6 +160,22 @@ ndScene::ndFitnessList::ndFitnessList()
 {
 }
 
+ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
+	:ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>()
+	,m_currentCost(src.m_currentCost)
+	,m_currentNode(src.m_currentNode)
+	,m_index(src.m_index)
+{
+	ndFitnessList* const stealData = (ndFitnessList*)&src;
+	ndNode* nextNode;
+	for (ndNode* node = stealData->GetFirst(); node; node = node = nextNode)
+	{
+		nextNode = node->GetNext();
+		stealData->Unlink(node);
+		Append(node);
+	}
+}
+
 void ndScene::ndFitnessList::AddNode(ndSceneTreeNode* const node)
 {
 	node->m_fitnessNode = Append(node);
@@ -214,59 +230,58 @@ ndScene::ndScene()
 
 ndScene::ndScene(const ndScene& src)
 	:ndThreadPool("newtonWorker")
-	,m_bodyList()
-	,m_contactArray()
-	,m_scratchBuffer(1024 * sizeof(void*))
-	,m_sceneBodyArray(1024)
-	,m_activeConstraintArray(1024)
+	,m_bodyList(src.m_bodyList)
+	,m_contactArray(src.m_contactArray)
+	,m_scratchBuffer()
+	,m_sceneBodyArray()
+	,m_activeConstraintArray()
 	,m_specialUpdateList()
 	,m_backgroundThread()
 	,m_lock()
 	,m_rootNode(nullptr)
-	,m_sentinelBody(src.m_sentinelBody)
-	,m_contactNotifyCallback(src.m_contactNotifyCallback)
+	,m_sentinelBody(nullptr)
+	,m_contactNotifyCallback(nullptr)
 	,m_treeEntropy(ndFloat32(0.0f))
-	,m_fitness()
+	,m_fitness(src.m_fitness)
 	,m_timestep(ndFloat32(0.0f))
-	,m_lru(D_CONTACT_DELAY_FRAMES)
-	,m_forceBalanceSceneCounter(0)
-	,m_bodyListChanged(1)
-	,m_forceBalanceScene(0)
+	,m_lru(src.m_lru)
+	,m_forceBalanceSceneCounter(src.m_forceBalanceSceneCounter)
+	,m_bodyListChanged(src.m_bodyListChanged)
+	,m_forceBalanceScene(src.m_forceBalanceScene)
 {
 	ndScene* const stealData = (ndScene*)&src;
-	stealData->m_sentinelBody = nullptr;
-	stealData->m_contactNotifyCallback = nullptr;
+
+	SetThreadCount(src.GetThreadCount());
+	m_backgroundThread.SetThreadCount(m_backgroundThread.GetThreadCount());
+
+	m_scratchBuffer.Swap(stealData->m_scratchBuffer);
+	m_sceneBodyArray.Swap(stealData->m_sceneBodyArray);
+	m_activeConstraintArray.Swap(stealData->m_activeConstraintArray);
+
+	dSwap(m_rootNode, stealData->m_rootNode);
+	dSwap(m_sentinelBody, stealData->m_sentinelBody);
+	dSwap(m_contactNotifyCallback, stealData->m_contactNotifyCallback);
 	m_contactNotifyCallback->m_scene = this;
 
-	stealData->m_contactArray.DeleteAllContacts();
-
-	for (ndList<ndBodyKinematic*>::ndNode* node = stealData->m_specialUpdateList.GetFirst(); node; node = node->GetNext())
+	ndList<ndBodyKinematic*>::ndNode* nextNode;
+	for (ndList<ndBodyKinematic*>::ndNode* node = stealData->m_specialUpdateList.GetFirst(); node; node = nextNode)
 	{
-		ndBodyKinematic* const body = node->GetInfo();
-		dAssert(body->GetContactMap().GetCount() == 0);
-		body->m_spetialUpdateNode = m_specialUpdateList.Append(body);
+		nextNode = node->GetNext();
+		stealData->m_specialUpdateList.Unlink(node);
+		m_specialUpdateList.Append(node);
 	}
-	stealData->m_specialUpdateList.RemoveAll();
 
-	for (ndBodyList::ndNode* node = stealData->m_bodyList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
 		body->m_sceneForceUpdate = 1;
-		ndBodyList::ndNode* const newNode = m_bodyList.Append(body);
-		body->SetSceneNodes(this, newNode);
-
 		ndSceneBodyNode* const sceneNode = body->GetSceneBodyNode();
 		if (sceneNode)
 		{
-			stealData->RemoveNode(sceneNode);
-			ndSceneBodyNode* const newSceneNode = new ndSceneBodyNode(body);
-			AddNode(newSceneNode);
+			body->SetSceneNodes(this, node);
 		}
+		dAssert (body->GetContactMap().SanityCheck());
 	}
-	stealData->m_bodyList.RemoveAll();
-
-	BalanceScene();
-	SetThreadCount(src.GetThreadCount());
 }
 
 ndScene::~ndScene()
@@ -278,6 +293,11 @@ ndScene::~ndScene()
 		delete m_contactNotifyCallback;
 	}
 	ndFreeListAlloc::Flush();
+}
+
+bool ndScene::SupportGPU() const
+{
+	return false;
 }
 
 void ndScene::Sync()
@@ -1692,8 +1712,8 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 			}
 			else
 			{
-				const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
-				const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
+				const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->GetSceneBodyNode();
+				const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->GetSceneBodyNode();
 				if (dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) 
 				{
 					contact->m_sceneLru = m_lru;
@@ -1722,8 +1742,8 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 
 	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
 	{
-		const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
-		const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
+		const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->GetSceneBodyNode();
+		const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->GetSceneBodyNode();
 		if (!dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
 		{
 			contact->m_isDead = 1;

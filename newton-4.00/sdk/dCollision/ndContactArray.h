@@ -28,15 +28,9 @@
 class ndContactArray : public ndArray<ndContact*>
 {
 	public:
-	ndContactArray()
-		:ndArray<ndContact*>(1024)
-		,m_lock()
-	{
-	}
-
-	~ndContactArray()
-	{
-	}
+	ndContactArray();
+	ndContactArray(const ndContactArray& src);
+	~ndContactArray();
 
 	void DeleteAllContacts();
 	void DeleteContact(ndContact* const contact);
