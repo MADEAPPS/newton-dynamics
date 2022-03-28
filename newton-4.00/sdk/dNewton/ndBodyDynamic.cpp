@@ -369,24 +369,23 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		dAssert(m_alpha.m_w == ndFloat32(0.0f));
 		dAssert(m_veloc.m_w == ndFloat32(0.0f));
 		dAssert(m_omega.m_w == ndFloat32(0.0f));
+		
+		ndInt32 count = ndInt32(m_weigh);
+		dAssert((!m_isConstrained && !m_weigh) || (m_isConstrained && m_weigh));
 
-		ndInt32 count = 0;
-		if (m_isConstrained)
+		#ifdef _DEBUG
+		ndInt32 checkConnection = m_jointList.GetCount();
+		ndContactMap::Iterator it(m_contactList);
+		for (it.Begin(); it; it++)
 		{
-			count = m_jointList.GetCount() > 1 ? 1000 : 1;
-			ndContactMap::Iterator it(m_contactList);
-			for (it.Begin(); it && (count < 2); it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				count += contact->IsActive() ? 1 : 0;
-			}
-			if (count > 1)
-			{
-				count = 1000;
-			}
+			ndContact* const contact = it.GetNode()->GetInfo();
+			checkConnection += contact->IsActive() ? 1 : 0;
 		}
+		dAssert(count == checkConnection);
+		#endif
+
 		const ndFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-		const ndFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * ndFloat32(0.0625f);
+		const ndFloat32 maxAccNorm2 = (count > 1) ? acc2 : acc2 * ndFloat32(0.0625f);
 
 		ndVector accelTest((m_accel.DotProduct(m_accel) > maxAccNorm2) | (m_alpha.DotProduct(m_alpha) > maxAccNorm2));
 		m_accel = m_accel & accelTest;
@@ -399,7 +398,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		const ndInt32 test = mask.GetSignMask() & 7;
 		if (test != 7)
 		{
-			const ndFloat32 accelFreeze2 = freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? ndFloat32(0.01f) : ndFloat32(1.0f));
+			const ndFloat32 accelFreeze2 = freezeAccel2 * ((count <= 1) ? ndFloat32(0.01f) : ndFloat32(1.0f));
 			const ndFloat32 accel2 = m_accel.DotProduct(m_accel).GetScalar();
 			const ndFloat32 alpha2 = m_alpha.DotProduct(m_alpha).GetScalar();
 			const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar();
@@ -408,7 +407,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 
 			if (equilibriumTest)
 			{
-				const ndFloat32 velocityDragCoeff = (count <= D_SMALL_ISLAND_COUNT) ? D_FREEZZING_VELOCITY_DRAG : ndFloat32(0.9999f);
+				const ndFloat32 velocityDragCoeff = (count <= 1) ? D_FREEZZING_VELOCITY_DRAG : ndFloat32(0.9999f);
 				const ndVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, ndFloat32(0.0f));
 				const ndVector veloc(m_veloc * velocDragVect);
 				const ndVector omega(m_omega * velocDragVect);

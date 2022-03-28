@@ -243,6 +243,7 @@ ndScene::ndScene(const ndScene& src)
 	for (ndList<ndBodyKinematic*>::ndNode* node = stealData->m_specialUpdateList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
+		dAssert(body->GetContactMap().GetCount() == 0);
 		body->m_spetialUpdateNode = m_specialUpdateList.Append(body);
 	}
 	stealData->m_specialUpdateList.RemoveAll();

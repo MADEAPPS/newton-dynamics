@@ -33,7 +33,6 @@ class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-#define D_SMALL_ISLAND_COUNT		32
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * ndFloat32 (0.5f))
 

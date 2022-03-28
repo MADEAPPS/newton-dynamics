@@ -49,20 +49,24 @@ ndContact* ndBodyKinematic::ndContactMap::FindContact(const ndBody* const body0,
 
 void ndBodyKinematic::ndContactMap::AttachContact(ndContact* const contact)
 {
+	//dAssert(SanityCheck());
 	ndBody* const body0 = contact->GetBody0();
 	ndBody* const body1 = contact->GetBody1();
 	ndContactkey key(body0->GetId(), body1->GetId());
 	dAssert(!Find(key));
 	Insert(contact, key);
+	//dAssert(SanityCheck());
 }
 
 void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 {
+	//dAssert(SanityCheck());
 	ndBody* const body0 = contact->GetBody0();
 	ndBody* const body1 = contact->GetBody1();
 	ndContactkey key(body0->GetId(), body1->GetId());
 	dAssert(Find(key));
 	Remove(key);
+	//dAssert(SanityCheck());
 }
 
 ndBodyKinematic::ndBodyKinematic()
@@ -562,20 +566,7 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 	else
 	{
 		ndInt32 count = 0;
-		if (m_isConstrained)
-		{
-			count = m_jointList.GetCount() > 1 ? 1000 : 1;
-			ndContactMap::Iterator it(m_contactList);
-			for (it.Begin(); it && (count < 2); it++)
-			{
-				ndContact* const contact = it.GetNode()->GetInfo();
-				count += contact->IsActive() ? 1 : 0;
-			}
-			if (count > 1)
-			{
-				count = 1000;
-			}
-		}
+		dAssert(!m_isConstrained);
 
 		ndUnsigned8 equilibrium = (m_invMass.m_w == ndFloat32(0.0f)) ? 1 : (m_autoSleep & ~m_equilibriumOverride);
 		const ndVector isMovingMask(m_veloc + m_omega);
@@ -589,7 +580,7 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 
 			if (equilibriumTest)
 			{
-				const ndFloat32 velocityDragCoeff = (count <= D_SMALL_ISLAND_COUNT) ? D_FREEZZING_VELOCITY_DRAG : ndFloat32(0.9999f);
+				const ndFloat32 velocityDragCoeff = (count <= 1) ? D_FREEZZING_VELOCITY_DRAG : ndFloat32(0.9999f);
 				const ndVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, ndFloat32(0.0f));
 				const ndVector veloc(m_veloc * velocDragVect);
 				const ndVector omega(m_omega * velocDragVect);
