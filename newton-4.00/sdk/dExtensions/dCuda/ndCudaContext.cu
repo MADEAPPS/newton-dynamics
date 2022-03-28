@@ -24,7 +24,8 @@
 ndCudaContext::ndCudaContext()
 	:ndClassAlloc()
 	,m_bodyBuffer()
-	,m_transformBufferCpu(D_GRANULARITY)
+	,m_transformBufferCpu0()
+	,m_transformBufferCpu1()
 	,m_transformBufferGpu()
 {
 	cudaError_t cudaStatus;
@@ -33,6 +34,14 @@ ndCudaContext::ndCudaContext()
 
 	cudaStatus = cudaSetDevice(0);
 	dAssert(cudaStatus == cudaSuccess);
+
+	// create tow strem for double buffer updates
+	cudaStatus = cudaStreamCreate(&m_stream0);
+	dAssert(cudaStatus == cudaSuccess);
+
+	//cudaStatus = cudaStreamCreate(&m_stream1);
+	//dAssert(cudaStatus == cudaSuccess);
+
 	if (cudaStatus != cudaSuccess)
 	{
 		dAssert(0);
@@ -41,10 +50,30 @@ ndCudaContext::ndCudaContext()
 
 ndCudaContext::~ndCudaContext()
 {
+	cudaError_t cudaStatus;
+	cudaStatus = cudaStreamDestroy(m_stream0);
+	dAssert(cudaStatus == cudaSuccess);
+
+	//cudaStatus = cudaStreamDestroy(m_stream1);
+	//dAssert(cudaStatus == cudaSuccess);
+
+	cudaStatus = cudaDeviceReset();
+	dAssert(cudaStatus == cudaSuccess);
+
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
 }
 
 ndCudaContext* ndCudaContext::CreateContext()
 {
 	cudaError_t cudaStatus = cudaSetDevice(0);
 	return (cudaStatus == cudaSuccess) ? new ndCudaContext() : nullptr;
+}
+
+void ndCudaContext::SwapBuffers()
+{
+	//dSwap(m_stream0, m_stream1);
+	m_transformBufferCpu0.Swap(m_transformBufferCpu1);
 }

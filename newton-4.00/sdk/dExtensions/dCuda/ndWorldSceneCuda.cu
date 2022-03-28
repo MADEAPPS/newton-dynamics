@@ -51,6 +51,17 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 	}
 }
 
+void ndWorldSceneCuda::Sync()
+{
+	ndScene::Sync();
+
+	//syncronize all streams before starting a new frame.
+	//this is pretty horrendous function, need to find a beter method
+	//cudaDeviceSynchronize();
+	//cudaStreamSynchronize(m_context->m_stream0);
+	m_context->SwapBuffers();
+}
+
 void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
 {
 	dAssert(0);
@@ -73,21 +84,30 @@ void ndWorldSceneCuda::FindCollidingPairs()
 
 void ndWorldSceneCuda::LoadBodyData()
 {
-	//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	const ndInt32 bodyCount = bodyArray.GetCount();
 	
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
+	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+
 	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
 	
 	gpuBodyBuffer.SetCount(bodyCount);
 	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
+	transformBufferCpu0.SetCount(bodyCount);
+	transformBufferCpu1.SetCount(bodyCount);
 	
 	for (ndInt32 i = 0; i < bodyCount; i++)
 	{
+		cuSpatialVector transform;
 		ndBodyKinematic* const body = bodyArray[i];
 		ndBodyProxy& proxi = data[i];
 		proxi.BodyToProxy(body);
+		transform.m_angular = cuQuat(body->GetRotation());
+		transform.m_linear = body->GetGlobalGetCentreOfMass();
+		transformBufferCpu0[i] = transform;
+		transformBufferCpu1[i] = transform;
 	}
 	gpuBodyBuffer.ReadData(&data[0], bodyCount);
 }
@@ -104,7 +124,7 @@ void ndWorldSceneCuda::GetBodyTransforms()
 
 	if (m_context->m_bodyBuffer.GetCount())
 	{
-		ndArray<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu;
+		cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
 		cuDeviceBuffer<cuSpatialVector>& gpuBuffer = m_context->m_transformBufferGpu;
 
 		ndInt32 threads = m_context->m_bodyBuffer.GetCount();
@@ -113,8 +133,9 @@ void ndWorldSceneCuda::GetBodyTransforms()
 
 		gpuBuffer.SetCount(threads);
 		cpuBuffer.SetCount(threads);
-		CudaKernel2 << <blocks, D_THREADS_PER_BLOCK >> > (GetTransform, bodies, &gpuBuffer[0], threads);
-		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount());
+		cudaStream_t stream = m_context->m_stream0;
+		CudaKernel2 <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (GetTransform, bodies, &gpuBuffer[0], threads);
+		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount(), stream);
 	}
 }
 
@@ -127,7 +148,7 @@ void ndWorldSceneCuda::UpdateTransform()
 	{
 		D_TRACKTIME();
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const cuSpatialVector* const data = &m_context->m_transformBufferCpu[0];
+		const cuSpatialVector* const data = &m_context->m_transformBufferCpu1[0];
 		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -153,6 +174,7 @@ void ndWorldSceneCuda::UpdateBodyList()
 	if (bodyListChanged)
 	{
 		LoadBodyData();
+		cudaDeviceSynchronize();
 	}
 }
 

@@ -27,8 +27,10 @@
 #include <ndNewtonStdafx.h>
 #include <device_launch_parameters.h>
 
+#include "cuHostBuffer.h"
 #include "ndBodyBuffer.h"
 #include "cuSolverTypes.h"
+#include "cuDeviceBuffer.h"
 
 class ndCudaContext : public ndClassAlloc
 {
@@ -37,10 +39,15 @@ class ndCudaContext : public ndClassAlloc
 	~ndCudaContext();
 	static ndCudaContext* CreateContext();
 
+	void SwapBuffers();
+
 	struct cudaDeviceProp m_prop;
 	ndBodyBuffer m_bodyBuffer;
 
-	ndArray<cuSpatialVector> m_transformBufferCpu;
+	cudaStream_t m_stream0;
+	//cudaStream_t m_stream1;
+	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;
+	cuHostBuffer<cuSpatialVector> m_transformBufferCpu1;
 	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu;
 };
 

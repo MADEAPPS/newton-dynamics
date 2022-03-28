@@ -279,6 +279,11 @@ ndScene::~ndScene()
 	ndFreeListAlloc::Flush();
 }
 
+void ndScene::Sync()
+{
+	ndThreadPool::Sync();
+}
+
 void ndScene::CollisionOnlyUpdate()
 {
 	D_TRACKTIME();

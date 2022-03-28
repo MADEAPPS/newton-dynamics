@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEVICE_BUFFER_H__
-#define __ND_DEVICE_BUFFER_H__
+#ifndef __ND_HOST_BUFFER_H__
+#define __ND_HOST_BUFFER_H__
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -28,11 +28,11 @@
 #include "cuIntrisics.h"
 
 template<class T>
-class cuDeviceBuffer
+class cuHostBuffer
 {
 	public:
-	cuDeviceBuffer();
-	~cuDeviceBuffer();
+	cuHostBuffer();
+	~cuHostBuffer();
 
 	ndInt32 GetCount() const;
 	void SetCount(ndInt32 count);
@@ -43,6 +43,8 @@ class cuDeviceBuffer
 
 	T& operator[] (ndInt32 i);
 	const T& operator[] (ndInt32 i) const;
+
+	void Swap(cuHostBuffer& buffer);
 
 	void ReadData(const T* const src, ndInt32 elements);
 	void WriteData(T* const dst, ndInt32 elements) const;
@@ -56,7 +58,7 @@ class cuDeviceBuffer
 };
 
 template<class T>
-cuDeviceBuffer<T>::cuDeviceBuffer()
+cuHostBuffer<T>::cuHostBuffer()
 	:m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -66,16 +68,16 @@ cuDeviceBuffer<T>::cuDeviceBuffer()
 }
 
 template<class T>
-cuDeviceBuffer<T>::~cuDeviceBuffer()
+cuHostBuffer<T>::~cuHostBuffer()
 {
 	if (m_array)
 	{
-		cudaFree(m_array);
+		cudaFreeHost(m_array);
 	}
 }
 
 template<class T>
-const T& cuDeviceBuffer<T>::operator[] (ndInt32 i) const
+const T& cuHostBuffer<T>::operator[] (ndInt32 i) const
 {
 	dAssert(i >= 0);
 	dAssert(i < m_size);
@@ -83,7 +85,7 @@ const T& cuDeviceBuffer<T>::operator[] (ndInt32 i) const
 }
 
 template<class T>
-T& cuDeviceBuffer<T>::operator[] (ndInt32 i)
+T& cuHostBuffer<T>::operator[] (ndInt32 i)
 {
 	dAssert(i >= 0);
 	dAssert(i < m_size);
@@ -91,13 +93,13 @@ T& cuDeviceBuffer<T>::operator[] (ndInt32 i)
 }
 
 template<class T>
-ndInt32 cuDeviceBuffer<T>::GetCount() const
+ndInt32 cuHostBuffer<T>::GetCount() const
 {
 	return m_size;
 }
 
 template<class T>
-void cuDeviceBuffer<T>::SetCount(ndInt32 count)
+void cuHostBuffer<T>::SetCount(ndInt32 count)
 {
 	while (count > m_capacity)
 	{
@@ -107,32 +109,40 @@ void cuDeviceBuffer<T>::SetCount(ndInt32 count)
 }
 
 template<class T>
-ndInt32 cuDeviceBuffer<T>::GetCapacity() const
+ndInt32 cuHostBuffer<T>::GetCapacity() const
 {
 	return m_capacity;
 }
 
 template<class T>
-void cuDeviceBuffer<T>::Clear()
+void cuHostBuffer<T>::Clear()
 {
 	m_size = 0;
 }
 
 template<class T>
-void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
+void cuHostBuffer<T>::Swap(cuHostBuffer& buffer)
+{
+	dSwap(m_size, buffer.m_size);
+	dSwap(m_array, buffer.m_array);
+	dSwap(m_capacity, buffer.m_capacity);
+}
+
+template<class T>
+void cuHostBuffer<T>::Resize(ndInt32 newSize)
 {
 	cudaError_t cudaStatus = cudaSuccess;
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
 		T* newArray;
 		newSize = dMax(newSize, D_GRANULARITY);
-		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
+		cudaError_t cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		dAssert(cudaStatus == cudaSuccess);
 		if (m_array)
 		{
 			cudaStatus = cudaMemcpy(newArray, m_array, m_size * sizeof(T), cudaMemcpyDeviceToDevice);
 			dAssert(cudaStatus == cudaSuccess);
-			cudaStatus = cudaFree(m_array);
+			cudaStatus = cudaFreeHost(m_array);
 			dAssert(cudaStatus == cudaSuccess);
 		}
 		m_array = newArray;
@@ -142,11 +152,11 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	{
 		T* newArray;
 		newSize = dMax(newSize, D_GRANULARITY);
-		cudaError_t cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
+		cudaError_t cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{
 			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
-			cudaStatus = cudaFree(m_array);
+			cudaStatus = cudaFreeHost(m_array);
 			dAssert(cudaStatus == cudaSuccess);
 		}
 
@@ -160,21 +170,21 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 }
 
 template<class T>
-void cuDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements)
+void cuHostBuffer<T>::ReadData(const T* const src, ndInt32 elements)
 {
 	dAssert(elements <= m_size);
 	cudaMemcpy(m_array, src, sizeof (T) * elements, cudaMemcpyHostToDevice);
 }
 
 template<class T>
-void cuDeviceBuffer<T>::WriteData(T* const dst, ndInt32 elements) const
+void cuHostBuffer<T>::WriteData(T* const dst, ndInt32 elements) const
 {
 	dAssert(elements <= m_size);
 	cudaMemcpy(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost);
 }
 
 template<class T>
-void cuDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements, cudaStream_t stream)
+void cuHostBuffer<T>::ReadData(const T* const src, ndInt32 elements, cudaStream_t stream)
 {
 	dAssert(elements <= m_size);
 	cudaError_t cudaStatus = cudaMemcpyAsync(m_array, src, sizeof(T) * elements, cudaMemcpyHostToDevice, stream);
@@ -186,7 +196,7 @@ void cuDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements, cudaStrea
 }
 
 template<class T>
-void cuDeviceBuffer<T>::WriteData(T* const dst, ndInt32 elements, cudaStream_t stream) const
+void cuHostBuffer<T>::WriteData(T* const dst, ndInt32 elements, cudaStream_t stream) const
 {
 	dAssert(elements <= m_size);
 	cudaError_t cudaStatus = cudaMemcpyAsync(dst, m_array, sizeof(T) * elements, cudaMemcpyDeviceToHost, stream);

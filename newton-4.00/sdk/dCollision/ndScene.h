@@ -76,8 +76,7 @@ class ndScene : public ndThreadPool
 
 	public:
 	D_COLLISION_API virtual ~ndScene();
-
-	void Sync();
+	D_COLLISION_API virtual void Sync();
 
 	ndInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
@@ -199,11 +198,6 @@ class ndScene : public ndThreadPool
 	friend class ndConvexCastNotify;
 	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_ALIGN_32 ;
-
-inline void ndScene::Sync()
-{
-	ndThreadPool::Sync();
-}
 
 inline ndWorld* ndScene::GetWorld() const
 {

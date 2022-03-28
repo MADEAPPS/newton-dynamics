@@ -577,8 +577,8 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 		ndBodyProxy* bodies = &m_context->m_bodyBuffer[0];
 		const ndFloat32 timestep = scene->GetTimestep();
 
-		//scene->ParallelExecute(IntegrateUnconstrainedBodiesCPU);
-		CudaKernel <<<blocks, D_THREADS_PER_BLOCK >>> (IntegrateUnconstrainedBodies, bodies, timestep, threads);
+		cudaStream_t stream = m_context->m_stream0;
+		CudaKernel <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (IntegrateUnconstrainedBodies, bodies, timestep, threads);
 	}
 }
 
@@ -1142,8 +1142,8 @@ void ndDynamicsUpdateCuda::IntegrateBodies()
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		ndBodyProxy* bodies = &m_context->m_bodyBuffer[0];
 
-		//scene->ParallelExecute(IntegrateBodiesCPU);
-		CudaKernel << <blocks, D_THREADS_PER_BLOCK >> > (IntegrateBodies, bodies, timestep, threads);
+		cudaStream_t stream = m_context->m_stream0;
+		CudaKernel <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (IntegrateBodies, bodies, timestep, threads);
 	}
 }
 
