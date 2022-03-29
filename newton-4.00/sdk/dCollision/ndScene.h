@@ -79,7 +79,6 @@ class ndScene : public ndThreadPool
 	public:
 	D_COLLISION_API virtual ~ndScene();
 	D_COLLISION_API virtual void Sync();
-	D_COLLISION_API virtual bool SupportGPU() const;
 
 	ndInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
@@ -162,7 +161,7 @@ class ndScene : public ndThreadPool
 	// claed from world updatee
 	D_COLLISION_API virtual void UpdateBodyList();
 	
-	// call form substeps update
+	// call from substeps update
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();
 	D_COLLISION_API virtual void UpdateTransform();

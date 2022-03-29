@@ -31,7 +31,6 @@ class ndWorldSceneCuda : public ndWorldScene
 	virtual ~ndWorldSceneCuda();
 
 	virtual void Sync();
-	virtual bool SupportGPU() const;
 	virtual void InitBodyArray();
 	virtual void UpdateBodyList();
 	virtual void CalculateContacts();

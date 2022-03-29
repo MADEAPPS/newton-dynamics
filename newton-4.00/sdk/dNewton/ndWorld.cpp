@@ -899,12 +899,10 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 		{
 			case ndSimdSoaSolver:
 			{
-				if (m_scene->SupportGPU())
-				{
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-				}
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateSoa(this);
 				break;
@@ -913,12 +911,10 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			#ifdef _D_USE_AVX2_SOLVER
 			case ndSimdAvx2Solver:
 			{
-				if (m_scene->SupportGPU())
-				{
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-				}
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
@@ -928,12 +924,10 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			#ifdef _D_NEWTON_OPENCL
 			case ndOpenclSolver1:
 			{
-				if (!m_scene->SupportGPU())
-				{
-					ndWorldScene* const newScene = new ndWorldScene(this);
-					delete m_scene;
-					m_scene = newScene;
-				}
+				ndWorldScene* const newScene = new ndWorldScene(this);
+				delete m_scene;
+				m_scene = newScene;
+
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateOpencl(this, 0);
 				break;
@@ -941,12 +935,9 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 
 			case ndOpenclSolver2:
 			{
-				if (!m_scene->SupportGPU())
-				{
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-				}
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
 
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateOpencl(this, 1);
@@ -957,12 +948,9 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			#ifdef _D_NEWTON_CUDA
 			case ndCudaSolver:
 			{
-				if (!m_scene->SupportGPU())
-				{
-					ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-				}
+				ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
 
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateCuda(this);
@@ -973,12 +961,9 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndStandardSolver:
 			default:
 			{
-				if (m_scene->SupportGPU())
-				{
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-				}
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
 
 				m_solverMode = ndStandardSolver;
 				m_solver = new ndDynamicsUpdate(this);

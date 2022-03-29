@@ -52,11 +52,6 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 	}
 }
 
-bool ndWorldSceneCuda::SupportGPU() const
-{
-	return true;
-}
-
 void ndWorldSceneCuda::Sync()
 {
 	ndScene::Sync();

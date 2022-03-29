@@ -295,11 +295,6 @@ ndScene::~ndScene()
 	ndFreeListAlloc::Flush();
 }
 
-bool ndScene::SupportGPU() const
-{
-	return false;
-}
-
 void ndScene::Sync()
 {
 	ndThreadPool::Sync();

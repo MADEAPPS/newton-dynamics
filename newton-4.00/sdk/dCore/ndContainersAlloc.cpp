@@ -36,9 +36,9 @@ class dFreeListEntry
 class dFreeListHeader
 {
 	public:
-	dFreeListEntry* m_headPointer;
 	ndInt32 m_count;
 	ndInt32 m_schunkSize;
+	dFreeListEntry* m_headPointer;
 };
 
 class dFreeListDictionary: public ndFixSizeArray<dFreeListHeader, D_FREELIST_DICTIONARY_SIZE>
@@ -108,7 +108,7 @@ class dFreeListDictionary: public ndFixSizeArray<dFreeListHeader, D_FREELIST_DIC
 	{
 		ndScopeSpinLock lock(m_lock);
 		dFreeListDictionary& me = *this;
-		for (ndInt32 i = 0; i < GetCount(); i++)
+		for (ndInt32 i = 0; i < GetCount(); ++i)
 		{
 			dFreeListHeader* const header = &me[i];
 			Flush(header);
@@ -142,7 +142,7 @@ class dFreeListDictionary: public ndFixSizeArray<dFreeListHeader, D_FREELIST_DIC
 			}
 		}
 
-		for (ndInt32 i = i0; i <= i1; i++)
+		for (ndInt32 i = i0; i <= i1; ++i)
 		{
 			if (me[i].m_schunkSize == size)
 			{
@@ -151,7 +151,7 @@ class dFreeListDictionary: public ndFixSizeArray<dFreeListHeader, D_FREELIST_DIC
 		}
 
 		#ifdef _DEBUG
-			for (ndInt32 i = 0; i < GetCount(); i++)
+			for (ndInt32 i = 0; i < GetCount(); ++i)
 			{
 				dAssert(me[i].m_schunkSize != size);
 			}
@@ -162,13 +162,13 @@ class dFreeListDictionary: public ndFixSizeArray<dFreeListHeader, D_FREELIST_DIC
 		header.m_schunkSize = size;
 		header.m_headPointer = nullptr;
 		PushBack(header);
-		ndInt32 index = 0;
-		for (ndInt32 i = GetCount() - 2; i >= 0; i--)
+		ndInt32 index = GetCount() - 1;
+		for (ndInt32 i = GetCount() - 2; i >= 0; --i)
 		{
 			if (size < me[i].m_schunkSize)
 			{
 				me[i + 1] = me[i];
-				me[i] = header;
+				me[i + 0] = header;
 				index = i;
 			}
 			else
