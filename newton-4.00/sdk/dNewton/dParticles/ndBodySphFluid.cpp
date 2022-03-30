@@ -25,9 +25,10 @@
 #include "ndBodySphFluid.h"
 
 #define D_USE_SPH_SMALL_HASH
+#define D_SPH_BUFFER_GRANULARITY	4096	
 
 #ifdef D_USE_SPH_SMALL_HASH
-	#define D_SPH_HASH_BITS	7
+	#define D_SPH_HASH_BITS			7
 #else
 	#define D_SPH_HASH_BITS	10
 #endif
@@ -64,7 +65,6 @@ class ndBodySphFluid::ndGridHash
 		m_y = hash.m_iy;
 		m_z = hash.m_iz;
 
-		m_cellIsPadd = 1;
 		m_cellType = ndAdjacentGrid;
 		m_particleIndex = particleIndex;
 	}
@@ -76,9 +76,8 @@ class ndBodySphFluid::ndGridHash
 		{
 			ndUnsigned64 m_y : D_SPH_HASH_BITS * 2;
 			ndUnsigned64 m_z : D_SPH_HASH_BITS * 2;
-			ndUnsigned64 m_particleIndex : 20;
-			ndUnsigned64 m_cellType : 1;
-			ndUnsigned64 m_cellIsPadd : 1;
+			ndUnsigned64 m_particleIndex	: 20;
+			ndUnsigned64 m_cellType			: 1;
 		};
 		struct
 		{
@@ -108,7 +107,6 @@ class ndBodySphFluid::ndGridHash
 	};
 	ndInt32 m_particleIndex;
 	ndInt8 m_cellType;
-	ndInt8 m_cellIsPadd;
 #endif
 };
 
@@ -130,40 +128,40 @@ class ndBodySphFluid::ndWorkingData
 
 	public:
 	ndWorkingData()
-		:m_accel(256)
-		,m_locks(256)
-		,m_pairCount(256)
-		,m_gridScans(256)
-		,m_density(256)
-		,m_invDensity(256)
-		,m_pairs(256)
-		,m_hashGridMap(256)
-		,m_hashGridMapScratchBuffer(256)
-		,m_kernelDistance(256)
+		:m_accel(D_SPH_BUFFER_GRANULARITY)
+		,m_locks(D_SPH_BUFFER_GRANULARITY)
+		,m_pairCount(D_SPH_BUFFER_GRANULARITY)
+		,m_gridScans(D_SPH_BUFFER_GRANULARITY)
+		,m_density(D_SPH_BUFFER_GRANULARITY)
+		,m_invDensity(D_SPH_BUFFER_GRANULARITY)
+		,m_pairs(D_SPH_BUFFER_GRANULARITY)
+		,m_hashGridMap(D_SPH_BUFFER_GRANULARITY)
+		,m_hashGridMapScratchBuffer(D_SPH_BUFFER_GRANULARITY)
+		,m_kernelDistance(D_SPH_BUFFER_GRANULARITY)
 		,m_worlToGridOrigin(ndFloat32 (1.0f))
 		,m_worlToGridScale(ndFloat32(1.0f))
 	{
 		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 		{
-			m_partialsGridScans[i].Resize(256);
+			m_partialsGridScans[i].Resize(D_SPH_BUFFER_GRANULARITY);
 		}
 	}
 
 	void Clear()
 	{
-		m_accel.Resize(256);
-		m_locks.Resize(256);
-		m_pairs.Resize(256);
-		m_density.Resize(256);
-		m_pairCount.Resize(256);
-		m_gridScans.Resize(256);
-		m_invDensity.Resize(256);
-		m_hashGridMap.Resize(256);
-		m_kernelDistance.Resize(256);
-		m_hashGridMapScratchBuffer.Resize(256);
+		m_accel.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_locks.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_pairs.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_density.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_pairCount.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_gridScans.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_invDensity.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_hashGridMap.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_kernelDistance.Resize(D_SPH_BUFFER_GRANULARITY);
+		m_hashGridMapScratchBuffer.Resize(D_SPH_BUFFER_GRANULARITY);
 		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 		{
-			m_partialsGridScans[i].Resize(256);
+			m_partialsGridScans[i].Resize(D_SPH_BUFFER_GRANULARITY);
 		}
 	}
 
@@ -803,7 +801,6 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 
 void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 {
-	//#define D_USE_PARALLEL_CLASSIFY
 	D_TRACKTIME();
 	class ndGridNeighborInfo
 	{
@@ -866,26 +863,50 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	
 	ndGridNeighborInfo neiborghood;
 	ndWorkingData& data = WorkingData();
-	ndInt32 scans[D_MAX_THREADS_COUNT][2];
 
-	auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		const ndVector origin(m_box0);
 		const ndFloat32 gridSize = GetSphGridSize();
-		ndGridHash* const dst = &data.m_hashGridMapScratchBuffer[0];
+		const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
+		const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
+		const ndVector* const posit = &m_posit[0];
+		ndInt32* const scans = &data.m_gridScans[0];
+
+		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			const ndVector r(posit[i] - origin);
+			const ndVector p(r * invGridSize);
+			const ndGridHash hashKey(p, i);
+
+			const ndVector p0((r - box) * invGridSize);
+			const ndVector p1((r + box) * invGridSize);
+			ndGridHash box0Hash(p0, i);
+			const ndGridHash box1Hash(p1, i);
+			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+
+			dAssert(codeHash.m_y <= 1);
+			dAssert(codeHash.m_z <= 1);
+			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
+			scans[i] = neiborghood.m_counter[code];
+		}
+	});
+
+	auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndVector origin(m_box0);
+		const ndFloat32 gridSize = GetSphGridSize();
+		ndGridHash* const dst = &data.m_hashGridMap[0];
+		const ndInt32* const scans = &data.m_gridScans[0];
 		
 		// the 0.99 factor is to make sure the box 
 		// fits in not more than two adjacent grids.
 		const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
 		const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 		const ndVector* const posit = &m_posit[0];
-
-		#ifdef D_USE_PARALLEL_CLASSIFY
-		ndInt32* const scan = &scans[threadIndex][0];
-		scan[0] = 0;
-		scan[1] = 0;
-		#endif
 
 		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -904,82 +925,36 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			dAssert(codeHash.m_z <= 1);
 			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 
-			#ifdef D_USE_PARALLEL_CLASSIFY
-			scan[0] += neiborghood.m_counter[code];
-			scan[1] += (4 - neiborghood.m_counter[code]);
-			#endif
-
-			const ndInt8* const padding = &neiborghood.m_isPadd[code][0];
+			const ndInt32 base = scans[i];
+			const ndInt32 count = scans[i + 1] - base;
 			const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
-			for (ndInt32 j = 0; j < 4; j++)
+			for (ndInt32 j = 0; j < count; ++ j)
 			{
 				ndGridHash quadrand(box0Hash);
-				quadrand.m_cellIsPadd = padding[j];
 				quadrand.m_gridHash += neigborgh[j].m_gridHash;
 				quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
-				dAssert(quadrand.m_cellIsPadd <= 1);
 				dAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
-				dst[i * 4 + j] = quadrand;
+				dst[base + j] = quadrand;
 			}
 		}
 	});
-
-	auto CompactGrids = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		ndArray<ndGridHash>& dst = data.m_hashGridMap;
-		const ndGridHash* const src = &data.m_hashGridMapScratchBuffer[0];
-		ndInt32* const scan = &scans[threadIndex][0];
-
-		const ndStartEnd startEnd(dst.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			const ndGridHash grid(src[i]);
-			const ndInt32 key = grid.m_cellIsPadd;
-			const ndInt32 index = scan[key];
-			dst[index] = grid;
-			scan[key] = index + 1;
-		}
-	});
-
 	dAssert(sizeof(ndGridHash) <= 16);
+
+	data.m_gridScans.SetCount(m_posit.GetCount() + 1);
+	data.m_gridScans[m_posit.GetCount()] = 0;
+	threadPool->ParallelExecute(CountGrids);
+
+	ndInt32 gridCount = 0;
+	for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); i++)
+	{
+		ndInt32 count = data.m_gridScans[i];
+		data.m_gridScans[i] = gridCount;
+		gridCount += count;
+	}
 	
-	data.m_hashGridMap.SetCount(m_posit.GetCount() * 4);
-	data.m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 4);
-	threadPool->ParallelExecute(CreateGrids);
-
-	#ifdef D_USE_PARALLEL_CLASSIFY
-		ndInt32 sum = 0;
-		const ndInt32 threadCount = threadPool->GetThreadCount();
-		for (ndInt32 i = 0; i < 2; ++i)
-		{
-			for (ndInt32 j = 0; j < threadCount; ++j)
-			{
-				ndInt32 partialSum = scans[j][i];
-				scans[j][i] = sum;
-				sum += partialSum;
-			}
-		}
-
-		// there is a bug here. need to debug it
-		ndInt32 gridCount = scans[0][1] - scans[0][0];
-		threadPool->ParallelExecute(CompactGrids);
-
-	#else
-
-		ndInt32 gridCount = 0;
-		{
-			D_TRACKTIME();
-			// this seems to be very cache friendly and beating radix sort hand down.
-			for (ndInt32 i = 0; i < data.m_hashGridMapScratchBuffer.GetCount(); ++i)
-			{
-				const ndGridHash cell(data.m_hashGridMapScratchBuffer[i]);
-				data.m_hashGridMap[gridCount] = cell;
-				gridCount += (1 - ndInt32(cell.m_cellIsPadd));
-			}
-		}
-	#endif
 	data.m_hashGridMap.SetCount(gridCount);
+	threadPool->ParallelExecute(CreateGrids);
+	data.m_hashGridMapScratchBuffer.SetCount(gridCount);
 }
 
 void ndBodySphFluid::Execute(ndThreadPool* const threadPool)

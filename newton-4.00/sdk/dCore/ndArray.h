@@ -211,7 +211,6 @@ void ndArray<T>::Resize(ndInt32 newSize)
 		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		if (m_array) 
 		{
-			//memcpy(newArray, m_array, m_size * sizeof(T));
 			CopyData(newArray, m_array, m_size);
 			ndMemory::Free(m_array);
 		}
@@ -224,11 +223,10 @@ void ndArray<T>::Resize(ndInt32 newSize)
 		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		if (m_array) 
 		{
-			//memcpy(newArray, m_array, newSize * sizeof(T));
 			CopyData(newArray, m_array, newSize);
 			ndMemory::Free(m_array);
 		}
-		//m_size = newSize;
+		m_size = newSize;
 		m_array = newArray;
 		m_capacity = newSize;
 	}

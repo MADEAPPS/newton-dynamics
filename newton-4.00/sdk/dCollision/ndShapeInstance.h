@@ -222,7 +222,6 @@ inline ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) cons
 	scale[0][0] = m_scale.m_x;
 	scale[1][1] = m_scale.m_y;
 	scale[2][2] = m_scale.m_z;
-	//ndMatrix scaledMatrix(m_localMatrix * matrix);
 	return m_aligmentMatrix * scale * m_localMatrix * matrix;
 }
 
