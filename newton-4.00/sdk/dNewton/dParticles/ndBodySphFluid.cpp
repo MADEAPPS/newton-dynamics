@@ -24,14 +24,8 @@
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
-#define D_USE_SPH_SMALL_HASH
+#define D_SPH_HASH_BITS				10
 #define D_SPH_BUFFER_GRANULARITY	4096	
-
-#ifdef D_USE_SPH_SMALL_HASH
-	#define D_SPH_HASH_BITS			7
-#else
-	#define D_SPH_HASH_BITS	10
-#endif
 
 class ndBodySphFluid::ndGridHash
 {
@@ -69,45 +63,24 @@ class ndBodySphFluid::ndGridHash
 		m_particleIndex = particleIndex;
 	}
 
-#ifdef D_USE_SPH_SMALL_HASH
 	union
 	{
 		struct
 		{
-			ndUnsigned64 m_y : D_SPH_HASH_BITS * 2;
-			ndUnsigned64 m_z : D_SPH_HASH_BITS * 2;
-			ndUnsigned64 m_particleIndex	: 20;
+			ndUnsigned64 m_y				: D_SPH_HASH_BITS * 2;
+			ndUnsigned64 m_z				: D_SPH_HASH_BITS * 2;
+			ndUnsigned64 m_particleIndex	: 23;
 			ndUnsigned64 m_cellType			: 1;
 		};
 		struct
 		{
-			ndUnsigned64 m_yLow : D_SPH_HASH_BITS;
-			ndUnsigned64 m_yHigh : D_SPH_HASH_BITS;
-			ndUnsigned64 m_zLow : D_SPH_HASH_BITS;
-			ndUnsigned64 m_zHigh : D_SPH_HASH_BITS;
+			ndUnsigned64 m_yLow				: D_SPH_HASH_BITS;
+			ndUnsigned64 m_yHigh			: D_SPH_HASH_BITS;
+			ndUnsigned64 m_zLow				: D_SPH_HASH_BITS;
+			ndUnsigned64 m_zHigh			: D_SPH_HASH_BITS;
 		};
-		ndUnsigned64 m_gridHash : D_SPH_HASH_BITS * 2 * 2;
+		ndUnsigned64 m_gridHash				: D_SPH_HASH_BITS * 2 * 2;
 	};
-#else
-	union
-	{
-		struct
-		{
-			ndUnsigned64 m_y : D_SPH_HASH_BITS * 2;
-			ndUnsigned64 m_z : D_SPH_HASH_BITS * 2;
-		};
-		struct
-		{
-			ndUnsigned64 m_yLow : D_SPH_HASH_BITS;
-			ndUnsigned64 m_yHigh : D_SPH_HASH_BITS;
-			ndUnsigned64 m_zLow : D_SPH_HASH_BITS;
-			ndUnsigned64 m_zHigh : D_SPH_HASH_BITS;
-		};
-		ndUnsigned64 m_gridHash;
-	};
-	ndInt32 m_particleIndex;
-	ndInt8 m_cellType;
-#endif
 };
 
 class ndBodySphFluid::ndParticlePair
@@ -863,7 +836,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	
 	ndGridNeighborInfo neiborghood;
 	ndWorkingData& data = WorkingData();
-
+	
 	auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
@@ -943,7 +916,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	data.m_gridScans[m_posit.GetCount()] = 0;
 	threadPool->ParallelExecute(CountGrids);
-
+	
 	ndInt32 gridCount = 0;
 	for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); i++)
 	{
@@ -960,6 +933,8 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
+	dAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
+
 	CaculateAabb(threadPool);
 	CreateGrids(threadPool);
 	SortGrids(threadPool);
