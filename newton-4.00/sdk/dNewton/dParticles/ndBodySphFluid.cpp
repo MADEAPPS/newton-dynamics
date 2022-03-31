@@ -24,7 +24,7 @@
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
-#define D_SPH_HASH_BITS				10
+#define D_SPH_HASH_BITS				8
 #define D_SPH_BUFFER_GRANULARITY	4096	
 
 class ndBodySphFluid::ndGridHash
