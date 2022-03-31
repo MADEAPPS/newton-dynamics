@@ -68,6 +68,11 @@ void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
 	dAssert(0);
 }
 
+void ndWorldSceneCuda::FindCollidingPairs()
+{
+	//ndWorldScene::FindCollidingPairs();
+}
+
 void ndWorldSceneCuda::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 {
 	dAssert(0);
@@ -76,11 +81,6 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32 threadIndex, ndContact* const c
 void ndWorldSceneCuda::CalculateContacts()
 {
 	//ndWorldScene::CalculateContacts();
-}
-
-void ndWorldSceneCuda::FindCollidingPairs()
-{
-	//ndWorldScene::FindCollidingPairs();
 }
 
 void ndWorldSceneCuda::LoadBodyData()
@@ -181,13 +181,86 @@ void ndWorldSceneCuda::UpdateBodyList()
 
 void ndWorldSceneCuda::InitBodyArray()
 {
-	//ndWorldScene::InitBodyArray();
+//	ndWorldScene::InitBodyArray();
 
-	//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-	// hack to update transform for now.
-	//for (ndInt32 i = 0; i < bodyArray.GetCount()-1; ++i)
+	// this has to be recreated in gpu
+	//ndInt32 scans[D_MAX_THREADS_COUNT][2];
+	//auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	//{
-	//	ndBodyKinematic* const body = bodyArray[i];
-	//	body->m_transformIsDirty = true;
+	//	D_TRACKTIME();
+	//	const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+	//
+	//	ndInt32* const scan = &scans[threadIndex][0];
+	//	scan[0] = 0;
+	//	scan[1] = 0;
+	//
+	//	const ndFloat32 timestep = m_timestep;
+	//	const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		ndBodyKinematic* const body = view[i];
+	//		body->ApplyExternalForces(threadIndex, timestep);
+	//
+	//		body->PrepareStep(i);
+	//		UpdateAabb(threadIndex, body);
+	//
+	//		const ndInt32 key = body->m_sceneEquilibrium;
+	//		scan[key] ++;
+	//	}
+	//});
+	
+	//auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME();
+	//	const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
+	//	ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
+	//
+	//	const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+	//	ndInt32* const scan = &scans[threadIndex][0];
+	//
+	//	const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		ndBodyKinematic* const body = activeBodyArray[i];
+	//		const ndInt32 key = body->m_sceneEquilibrium;
+	//		const ndInt32 index = scan[key];
+	//		sceneBodyArray[index] = body;
+	//		scan[key] ++;
+	//	}
+	//});
+	
+	//ParallelExecute(BuildBodyArray);
+	//ndInt32 sum = 0;
+	//ndInt32 threadCount = GetThreadCount();
+	//for (ndInt32 j = 0; j < 2; j++)
+	//{
+	//	for (ndInt32 i = 0; i < threadCount; ++i)
+	//	{
+	//		const ndInt32 count = scans[i][j];
+	//		scans[i][j] = sum;
+	//		sum += count;
+	//	}
 	//}
+	//
+	//ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
+	//m_sceneBodyArray.SetCount(m_bodyList.GetCount());
+	//if (movingBodyCount)
+	//{
+	//	ParallelExecute(CompactMovingBodies);
+	//}
+	//
+	//m_sceneBodyArray.SetCount(movingBodyCount);
+	//
+	//ndBodyKinematic* const sentinelBody = m_sentinelBody;
+	//sentinelBody->PrepareStep(GetActiveBodyArray().GetCount() - 1);
+	//
+	//sentinelBody->m_isStatic = 1;
+	//sentinelBody->m_autoSleep = 1;
+	//sentinelBody->m_equilibrium = 1;
+	//sentinelBody->m_equilibrium0 = 1;
+	//sentinelBody->m_isJointFence0 = 1;
+	//sentinelBody->m_isJointFence1 = 1;
+	//sentinelBody->m_isConstrained = 0;
+	//sentinelBody->m_sceneEquilibrium = 1;
+	//sentinelBody->m_weigh = ndFloat32(0.0f);
 }
