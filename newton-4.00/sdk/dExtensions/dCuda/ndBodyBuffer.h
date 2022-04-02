@@ -122,24 +122,6 @@ class ndBodyProxy
 		////m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	}
 
-	void BodyToProxy(ndBodyKinematic* const body)
-	{
-		// Get thansform and velocity
-		m_mass = body->GetMassMatrix();
-		m_rotation = cuQuat(body->GetRotation());
-		m_posit = body->GetGlobalGetCentreOfMass();
-		m_invIntertia = body->GetInvInertia();
-		m_dampCoef = body->GetCachedDamping();
-		m_veloc = body->GetVelocity();
-		m_omega = body->GetOmega();
-
-		// Get scene manager data
-		const ndShapeInstance& collision = body->GetCollisionShape();
-		const ndShape* const shape = collision.GetShape();
-		m_obbSize = shape->GetObbSize();
-		m_obbOrigin = shape->GetObbOrigin();
-	}
-
 	void ProxyToBody(ndBodyKinematic* const body) const
 	{
 		dAssert(0);
@@ -158,16 +140,16 @@ class ndBodyProxy
 	cuVector m_veloc;
 	cuVector m_omega;
 
+	// scene Management data
+	cuVector m_minAabb;
+	cuVector m_maxAabb;
+
 	// constant Data
 	cuVector m_mass;
 	cuVector m_dampCoef;
 	cuVector m_invIntertia;
 	cuVector m_obbSize;
 	cuVector m_obbOrigin;
-
-	// scene Management data
-	cuVector m_minAabb;
-	cuVector m_maxAabb;
 };
 
 class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxy>

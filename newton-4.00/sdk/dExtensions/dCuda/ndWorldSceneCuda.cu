@@ -85,31 +85,64 @@ void ndWorldSceneCuda::CalculateContacts()
 
 void ndWorldSceneCuda::LoadBodyData()
 {
-	ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-	const ndInt32 bodyCount = bodyArray.GetCount();
-	
+	auto UploadBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndVector minBox(ndFloat32(1.0e15f));
+		const ndVector maxBox(ndFloat32(-1.0e15f));
+
+		ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+		ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
+
+		cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
+		cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+
+		ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			cuSpatialVector transform;
+			ndBodyKinematic* const body = bodyArray[i];
+			ndBodyProxy& proxi = data[i];
+
+			// Get thansform and velocity
+			proxi.m_mass = body->GetMassMatrix();
+			proxi.m_rotation = cuQuat(body->GetRotation());
+			proxi.m_posit = body->GetGlobalGetCentreOfMass();
+			proxi.m_invIntertia = body->GetInvInertia();
+			proxi.m_dampCoef = body->GetCachedDamping();
+			proxi.m_veloc = body->GetVelocity();
+			proxi.m_omega = body->GetOmega();
+
+			// Get scene manager data
+			const ndShapeInstance& collision = body->GetCollisionShape();
+			const ndShape* const shape = collision.GetShape();
+			proxi.m_obbSize = shape->GetObbSize();
+			proxi.m_obbOrigin = shape->GetObbOrigin();
+			proxi.m_minAabb = minBox;
+			proxi.m_maxAabb = maxBox;
+
+			transform.m_angular = cuQuat(body->GetRotation());
+			transform.m_linear = body->GetGlobalGetCentreOfMass();
+			transformBufferCpu0[i] = transform;
+			transformBufferCpu1[i] = transform;
+		}
+	});
+
 	ndBodyBuffer& gpuBodyBuffer = m_context->m_bodyBuffer;
+	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
+	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 
-	ndArray<ndBodyProxy>& data = gpuBodyBuffer.m_dataView;
+	const ndInt32 bodyCount = bodyArray.GetCount();
 	
 	gpuBodyBuffer.SetCount(bodyCount);
-	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
 	transformBufferCpu0.SetCount(bodyCount);
 	transformBufferCpu1.SetCount(bodyCount);
-	
-	for (ndInt32 i = 0; i < bodyCount; i++)
-	{
-		cuSpatialVector transform;
-		ndBodyKinematic* const body = bodyArray[i];
-		ndBodyProxy& proxi = data[i];
-		proxi.BodyToProxy(body);
-		transform.m_angular = cuQuat(body->GetRotation());
-		transform.m_linear = body->GetGlobalGetCentreOfMass();
-		transformBufferCpu0[i] = transform;
-		transformBufferCpu1[i] = transform;
-	}
+	gpuBodyBuffer.m_dataView.SetCount(bodyCount);
+
+	ParallelExecute(UploadBodies);
 	gpuBodyBuffer.ReadData(&data[0], bodyCount);
 }
 
