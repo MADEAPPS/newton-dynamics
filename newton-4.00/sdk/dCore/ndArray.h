@@ -148,12 +148,6 @@ ndInt32 ndArray<T>::GetCount() const
 template<class T>
 void ndArray<T>::SetCount(ndInt32 count)
 {
-	//m_size = count;
-	//while (m_size > m_capacity)
-	//{
-	//	Resize(m_capacity * 2);
-	//}
-
 	while (count > m_capacity)
 	{
 		Resize(m_capacity * 2);

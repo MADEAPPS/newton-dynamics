@@ -190,6 +190,7 @@ void ndBody::SetMatrixNoSleep(const ndMatrix& matrix)
 void ndBody::SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom)
 {
 	m_rotation = rotation;
+	dAssert(m_rotation.DotProduct(m_rotation).GetScalar() > ndFloat32(0.9999f));
 	m_globalCentreOfMass = globalcom;
 	m_matrix = ndMatrix(rotation, m_matrix.m_posit);
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);

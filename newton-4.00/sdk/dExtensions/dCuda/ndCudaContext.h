@@ -42,13 +42,14 @@ class ndCudaContext : public ndClassAlloc
 	void SwapBuffers();
 
 	struct cudaDeviceProp m_prop;
-	ndBodyBuffer m_bodyBuffer;
-
-	cudaStream_t m_stream0;
-	//cudaStream_t m_stream1;
+	ndArray<cuBodyProxy> m_bodyBufferCpu;
+	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu1;
 	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu;
+
+	cudaStream_t m_stream0;
+	//cudaStream_t m_stream1;
 };
 
 #endif

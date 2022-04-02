@@ -31,7 +31,7 @@
 #include "cuMatrix3x3.h"
 #include "cuDeviceBuffer.h"
 
-class ndBodyProxy
+class cuBodyProxy
 {
 	public:
 	inline cuMatrix3x3 __device__ CalculateInvInertiaMatrix(const cuMatrix3x3& matrix) const
@@ -152,22 +152,5 @@ class ndBodyProxy
 	cuVector m_obbOrigin;
 };
 
-class ndBodyBuffer: public cuDeviceBuffer<ndBodyProxy>
-{
-	public:
-	ndBodyBuffer();
-	~ndBodyBuffer();
-	ndArray<ndBodyProxy> m_dataView;
-};
-
-inline ndBodyBuffer::ndBodyBuffer()
-	:cuDeviceBuffer<ndBodyProxy>()
-	,m_dataView(D_GRANULARITY)
-{
-}
-
-inline ndBodyBuffer::~ndBodyBuffer()
-{
-}
 
 #endif

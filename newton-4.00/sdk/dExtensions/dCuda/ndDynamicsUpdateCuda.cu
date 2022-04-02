@@ -35,9 +35,30 @@
 #include "cuMatrix3x3.h"
 
 #include "ndCudaContext.h"
-#include "ndCudaKernels.h"
 #include "ndWorldSceneCuda.h"
 #include "ndDynamicsUpdateCuda.h"
+
+
+template <typename Predicate>
+__global__ void CudaIntegrateUnconstrainedBodies(Predicate function, cuBodyProxy* bodyArray, float timestep, int size)
+{
+	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	if (index < size)
+	{
+		function(bodyArray[index], timestep);
+	}
+}
+
+template <typename Predicate>
+__global__ void CudaIntegrateBodies(Predicate function, cuBodyProxy* bodyArray, float timestep, int size)
+{
+	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	if (index < size)
+	{
+		function(bodyArray[index], timestep);
+	}
+}
+
 
 ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
 	:ndDynamicsUpdate(world)
@@ -560,7 +581,7 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 		}
 	});
 
-	auto IntegrateUnconstrainedBodies = [] __device__(ndBodyProxy& body, float timestep)
+	auto IntegrateUnconstrainedBodies = [] __device__(cuBodyProxy& body, float timestep)
 	{
 		const cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
 		//cuMatrix3x3 invInertia(body.CalculateInvInertiaMatrix(matrix));
@@ -569,16 +590,16 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 	};
 
 	//if (GetUnconstrainedBodyCount())
-	if (m_context->m_bodyBuffer.GetCount())
+	if (m_context->m_bodyBufferGpu.GetCount())
 	{
 		D_TRACKTIME();
-		ndInt32 threads = m_context->m_bodyBuffer.GetCount();
+		ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		ndBodyProxy* bodies = &m_context->m_bodyBuffer[0];
+		cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 		const ndFloat32 timestep = scene->GetTimestep();
 
 		cudaStream_t stream = m_context->m_stream0;
-		CudaKernel <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (IntegrateUnconstrainedBodies, bodies, timestep, threads);
+		CudaIntegrateUnconstrainedBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (IntegrateUnconstrainedBodies, bodiesGpu, timestep, threads);
 	}
 }
 
@@ -1130,20 +1151,20 @@ void ndDynamicsUpdateCuda::IntegrateBodies()
 		}
 	});
 
-	auto IntegrateBodies = [] __device__(ndBodyProxy& body, float timestep)
+	auto IntegrateBodies = [] __device__(cuBodyProxy& body, float timestep)
 	{
 		//const cuMatrix3x3 matrix(body.m_rotation.GetMatrix3x3());
 		body.IntegrateVelocity(timestep);
 	};
 
-	if (m_context->m_bodyBuffer.GetCount())
+	if (m_context->m_bodyBufferGpu.GetCount())
 	{
-		ndInt32 threads = m_context->m_bodyBuffer.GetCount();
+		ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		ndBodyProxy* bodies = &m_context->m_bodyBuffer[0];
+		cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 
 		cudaStream_t stream = m_context->m_stream0;
-		CudaKernel <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (IntegrateBodies, bodies, timestep, threads);
+		CudaIntegrateBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (IntegrateBodies, bodiesGpu, timestep, threads);
 	}
 }
 
