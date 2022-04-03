@@ -141,6 +141,8 @@ class cuBodyProxy
 	cuVector m_omega;
 
 	// scene Management data
+	cuQuat m_globalSphapeRotation;
+	cuVector m_globalSphapePosition;
 	cuVector m_minAabb;
 	cuVector m_maxAabb;
 
@@ -150,6 +152,10 @@ class cuBodyProxy
 	cuVector m_invIntertia;
 	cuVector m_obbSize;
 	cuVector m_obbOrigin;
+	cuVector m_scale;
+	cuVector m_localPosition;
+	cuQuat m_localRotation;
+	cuQuat m_alignRotation;
 };
 
 

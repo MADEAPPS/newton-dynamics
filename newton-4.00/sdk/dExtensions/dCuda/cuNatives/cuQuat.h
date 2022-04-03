@@ -54,13 +54,6 @@ class cuQuat: public cuVector
 		angle = angle * 0.5f;
 		w = cos(angle);
 		const float sinAng = sin(angle);
-
-		// this does not works.
-		//float sinAng;
-		////float cosAng;
-		////sincos(angle * 0.5f, &sinAng, &w);
-		//__sincosf(angle * 0.5f, &sinAng, &w);
-
 		x = unitAxis.x * sinAng;
 		y = unitAxis.y * sinAng;
 		z = unitAxis.z * sinAng;

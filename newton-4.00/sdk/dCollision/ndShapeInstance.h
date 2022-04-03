@@ -148,6 +148,8 @@ class ndShapeInstance: public ndClassAlloc
 	
 	const ndVector& GetScale() const;
 	const ndVector& GetInvScale() const;
+	const ndMatrix& GetAlignmentMatrix() const;
+
 	D_COLLISION_API void SetScale(const ndVector& scale);
 	D_COLLISION_API void SetGlobalScale(const ndVector& scale);
 	D_COLLISION_API void SetGlobalScale(const ndMatrix& scaleMatrix);
@@ -163,7 +165,7 @@ class ndShapeInstance: public ndClassAlloc
 
 	ndMatrix m_globalMatrix;
 	ndMatrix m_localMatrix;
-	ndMatrix m_aligmentMatrix;
+	ndMatrix m_alignmentMatrix;
 	ndVector m_scale;
 	ndVector m_invScale;
 	ndVector m_maxScale;
@@ -191,6 +193,11 @@ inline const ndShape* ndShapeInstance::GetShape() const
 	return m_shape; 
 }
 
+inline const ndMatrix& ndShapeInstance::GetAlignmentMatrix() const
+{
+	return m_alignmentMatrix;
+}
+
 inline const ndMatrix& ndShapeInstance::GetLocalMatrix() const
 {
 	return m_localMatrix;
@@ -199,11 +206,6 @@ inline const ndMatrix& ndShapeInstance::GetLocalMatrix() const
 inline void ndShapeInstance::SetLocalMatrix(const ndMatrix& matrix)
 {
 	m_localMatrix = matrix;
-}
-
-inline ndInt32 ndShapeInstance::GetConvexVertexCount() const
-{
-	return m_shape->GetConvexVertexCount();
 }
 
 inline const ndMatrix& ndShapeInstance::GetGlobalMatrix() const
@@ -222,7 +224,12 @@ inline ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) cons
 	scale[0][0] = m_scale.m_x;
 	scale[1][1] = m_scale.m_y;
 	scale[2][2] = m_scale.m_z;
-	return m_aligmentMatrix * scale * m_localMatrix * matrix;
+	return m_alignmentMatrix * scale * m_localMatrix * matrix;
+}
+
+inline ndInt32 ndShapeInstance::GetConvexVertexCount() const
+{
+	return m_shape->GetConvexVertexCount();
 }
 
 inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
@@ -250,8 +257,8 @@ inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 		case m_global:
 		default:
 		{
-			const ndVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertex(dir1, nullptr));
+			const ndVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+			return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertex(dir1, nullptr));
 		}
 	}
 }
@@ -307,8 +314,8 @@ inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector
 	case m_global:
 	default:
 	{
-		dVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-		return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point * m_invScale), dir1));
+		dVector dir1(m_alignmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+		return m_scale * m_alignmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_alignmentMatrix.UntransformVector(point * m_invScale), dir1));
 	}
 #endif
 	}

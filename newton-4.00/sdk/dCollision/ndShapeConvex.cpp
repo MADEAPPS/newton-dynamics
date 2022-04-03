@@ -986,14 +986,14 @@ ndVector ndShapeConvex::CalculateVolumeIntegral(const ndMatrix& globalMatrix, co
 			localPlane = localPlane * (scale | ndVector::m_wOne);
 			ndFloat32 mag2 = localPlane.DotProduct(localPlane & ndVector::m_triplexMask).GetScalar();
 			localPlane = localPlane.Scale(ndRsqrt(mag2));
-			localPlane = parentScale.m_aligmentMatrix.UntransformPlane(localPlane);
+			localPlane = parentScale.GetAlignmentMatrix().UntransformPlane(localPlane);
 		}
 	}
 
 	ndVector cg(CalculateVolumeIntegral(localPlane));
 
 	ndFloat32 volume = cg.m_w * scale.m_x * scale.m_y * scale.m_z;
-	cg = parentScale.m_aligmentMatrix.RotateVector(cg);
+	cg = parentScale.GetAlignmentMatrix().RotateVector(cg);
 	cg = cg * scale;
 	cg = globalMatrix.TransformVector(cg);
 	cg.m_w = volume;

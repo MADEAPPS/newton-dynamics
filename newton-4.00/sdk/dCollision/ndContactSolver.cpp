@@ -3120,8 +3120,8 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	ndInt32 maxReduceLimit = maxContacts - 16;
 
 	const ndVector& polygonInstanceScale = polySoupInstance.GetScale();
-	const ndMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
-	const ndMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
+	const ndMatrix& polySoupGlobalMatrix = polySoupInstance.GetGlobalMatrix();
+	const ndMatrix& polySoupGlobalAligmentMatrix = polySoupInstance.GetAlignmentMatrix();
 
 	ndMatrix polySoupScaledMatrix(
 		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
@@ -4144,8 +4144,8 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 	ndInt32 maxReduceLimit = maxContacts - 16;
 
 	const ndVector& polygonInstanceScale = polySoupInstance.GetScale();
-	const ndMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
-	const ndMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
+	const ndMatrix& polySoupGlobalMatrix = polySoupInstance.GetGlobalMatrix();
+	const ndMatrix& polySoupGlobalAligmentMatrix = polySoupInstance.GetAlignmentMatrix();
 
 	ndMatrix polySoupScaledMatrix(
 		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,

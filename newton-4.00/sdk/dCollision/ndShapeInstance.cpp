@@ -34,7 +34,7 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	:ndClassAlloc()
 	,m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix(dGetIdentityMatrix())
-	,m_aligmentMatrix(dGetIdentityMatrix())
+	,m_alignmentMatrix(dGetIdentityMatrix())
 	,m_scale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_invScale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_maxScale(ndVector::m_one & ndVector::m_triplexMask)
@@ -60,7 +60,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	:ndClassAlloc()
 	,m_globalMatrix(instance.m_globalMatrix)
 	,m_localMatrix(instance.m_localMatrix)
-	,m_aligmentMatrix(instance.m_aligmentMatrix)
+	,m_alignmentMatrix(instance.m_alignmentMatrix)
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
 	,m_maxScale(instance.m_maxScale)
@@ -86,7 +86,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 	:ndClassAlloc()
 	,m_globalMatrix(instance.m_globalMatrix)
 	,m_localMatrix(instance.m_localMatrix)
-	,m_aligmentMatrix(instance.m_aligmentMatrix)
+	,m_alignmentMatrix(instance.m_alignmentMatrix)
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
 	,m_maxScale(instance.m_maxScale)
@@ -105,7 +105,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	:ndClassAlloc()
 	,m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix(dGetIdentityMatrix())
-	,m_aligmentMatrix(dGetIdentityMatrix())
+	,m_alignmentMatrix(dGetIdentityMatrix())
 	,m_scale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_invScale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_maxScale(ndVector::m_one & ndVector::m_triplexMask)
@@ -122,7 +122,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	m_shape = cacheInstance.GetShape()->AddRef();
 	
 	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");
-	m_aligmentMatrix = xmlGetMatrix(xmlNode, "aligmentMatrix");
+	m_alignmentMatrix = xmlGetMatrix(xmlNode, "alignmentMatrix");
 	m_skinMargin = xmlGetFloat(xmlNode, "skinMargin");
 	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
@@ -154,7 +154,7 @@ void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 	xmlSaveParam(paramNode, "shapeHashId", desc.m_shapeNodeHash);
 	xmlSaveParam(paramNode, "localMatrix", m_localMatrix);
-	xmlSaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
+	xmlSaveParam(paramNode, "alignmentMatrix", m_alignmentMatrix);
 	xmlSaveParam(paramNode, "scale", m_scale);
 
 	xmlSaveParam(paramNode, "skinMargin", m_skinMargin);
@@ -173,7 +173,7 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 {
 	m_globalMatrix = instance.m_globalMatrix;
 	m_localMatrix = instance.m_localMatrix;
-	m_aligmentMatrix = instance.m_aligmentMatrix;
+	m_alignmentMatrix = instance.m_alignmentMatrix;
 	m_scale = instance.m_scale;
 	m_invScale = instance.m_invScale;
 	m_maxScale = instance.m_maxScale;
@@ -217,78 +217,8 @@ ndMatrix ndShapeInstance::CalculateInertia() const
 	}
 	else 
 	{
-		return m_shape->CalculateInertiaAndCenterOfMass(m_aligmentMatrix, m_scale, m_localMatrix);
+		return m_shape->CalculateInertiaAndCenterOfMass(m_alignmentMatrix, m_scale, m_localMatrix);
 	}
-}
-
-void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
-{
-#if 0
-	m_shape->CalculateAabb(matrix, p0, p1);
-	switch (m_scaleType)
-	{
-		case m_unit:
-		{
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-	
-		case m_uniform:
-		case m_nonUniform:
-		{
-			ndMatrix matrix1(matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			matrix1 = matrix.Inverse() * matrix1;
-	
-			ndVector size0(ndVector::m_half * (p1 - p0));
-			ndVector origin(matrix1.TransformVector( ndVector::m_half * (p0 + p1)));
-			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
-	
-			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-			break;
-		}
-	
-		case m_global:
-		default:
-		{
-			ndMatrix matrix1(matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			matrix1 = matrix.Inverse() * m_aligmentMatrix * matrix1;
-	
-			ndVector size0(ndVector::m_half * (p1 - p0));
-			ndVector origin(matrix1.TransformVector(ndVector::m_half * (p0 + p1)));
-			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
-	
-			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-	
-			break;
-		}
-	}
-
-#else
-	ndMatrix scaleMatrix;
-	scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
-	scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
-	scaleMatrix[2] = matrix[2].Scale(m_scale.m_z);
-	scaleMatrix[3] = matrix[3];
-	scaleMatrix = m_aligmentMatrix * scaleMatrix;
-
-	const ndVector size0(m_shape->GetObbSize());
-	const ndVector origin(scaleMatrix.TransformVector(m_shape->GetObbOrigin()));
-	const ndVector size(scaleMatrix.m_front.Abs().Scale(size0.m_x) + scaleMatrix.m_up.Abs().Scale(size0.m_y) + scaleMatrix.m_right.Abs().Scale(size0.m_z));
-
-	p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-	p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-#endif
-	dAssert(p0.m_w == ndFloat32(0.0f));
-	dAssert(p1.m_w == ndFloat32(0.0f));
 }
 
 void ndShapeInstance::CalculateObb(ndVector& origin, ndVector& size) const
@@ -315,7 +245,7 @@ void ndShapeInstance::CalculateObb(ndVector& origin, ndVector& size) const
 		{
 			ndVector p0;
 			ndVector p1;
-			m_shape->CalculateAabb(m_aligmentMatrix, p0, p1);
+			m_shape->CalculateAabb(m_alignmentMatrix, p0, p1);
 			size = (ndVector::m_half * (p1 - p0) * m_scale + m_padding) & ndVector::m_triplexMask;
 			origin = (ndVector::m_half * (p1 + p0) * m_scale) & ndVector::m_triplexMask;;
 			break;
@@ -377,13 +307,13 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			case m_global:
 			default:
 			{
-				ndVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
-				ndVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
+				ndVector p0(m_alignmentMatrix.UntransformVector(localP0 * m_invScale));
+				ndVector p1(m_alignmentMatrix.UntransformVector(localP1 * m_invScale));
 				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
 				if (t < ndFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
-					ndVector normal(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
+					ndVector normal(m_alignmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
 					contactOut.m_shapeInstance1 = this;
@@ -432,13 +362,13 @@ ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, cons
 		case m_global:
 		default:
 		{
-			ndVector point1(m_aligmentMatrix.UntransformVector(m_invScale * point));
-			//ndVector normal1(m_aligmentMatrix.UntransformVector(m_scale * normal));
-			ndVector normal1(m_aligmentMatrix.UnrotateVector(m_scale * normal));
+			ndVector point1(m_alignmentMatrix.UntransformVector(m_invScale * point));
+			//ndVector normal1(m_alignmentMatrix.UntransformVector(m_scale * normal));
+			ndVector normal1(m_alignmentMatrix.UnrotateVector(m_scale * normal));
 			normal1 = normal1.Normalize();
 			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
 			for (ndInt32 i = 0; i < count; i++) {
-				contactsOut[i] = m_scale * m_aligmentMatrix.TransformVector(contactsOut[i]);
+				contactsOut[i] = m_scale * m_alignmentMatrix.TransformVector(contactsOut[i]);
 			}
 		}
 	}
@@ -491,7 +421,7 @@ void ndShapeInstance::SetGlobalScale(const ndMatrix& scaleMatrix)
 	const ndMatrix matrix(scaleMatrix * m_localMatrix);
 
 	ndVector scale;
-	matrix.PolarDecomposition(m_localMatrix, scale, m_aligmentMatrix);
+	matrix.PolarDecomposition(m_localMatrix, scale, m_alignmentMatrix);
 	bool uniform = (dAbs(scale[0] - scale[1]) < ndFloat32(1.0e-4f)) && (dAbs(scale[0] - scale[2]) < ndFloat32(1.0e-4f));
 	if (uniform) 
 	{
@@ -499,7 +429,7 @@ void ndShapeInstance::SetGlobalScale(const ndMatrix& scaleMatrix)
 	}
 	else
 	{
-		bool isIdentity = m_aligmentMatrix.TestIdentity();
+		bool isIdentity = m_alignmentMatrix.TestIdentity();
 		m_scaleType = isIdentity ? m_nonUniform : m_global;
 		m_scale = scale;
 		m_invScale = ndVector(ndFloat32(1.0f) / m_scale[0], ndFloat32(1.0f) / m_scale[1], ndFloat32(1.0f) / m_scale[2], ndFloat32(0.0f));
@@ -562,4 +492,74 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 	m_point0.m_w = ndFloat32(1.0f);
 	m_point1.m_w = ndFloat32(1.0f);
 	return ret;
+}
+
+void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
+{
+#if 0
+	m_shape->CalculateAabb(matrix, p0, p1);
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			p0 -= m_padding;
+			p1 += m_padding;
+			break;
+		}
+
+		case m_uniform:
+		case m_nonUniform:
+		{
+			ndMatrix matrix1(matrix);
+			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
+			matrix1 = matrix.Inverse() * matrix1;
+
+			ndVector size0(ndVector::m_half * (p1 - p0));
+			ndVector origin(matrix1.TransformVector(ndVector::m_half * (p0 + p1)));
+			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
+
+			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
+			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
+			break;
+		}
+
+		case m_global:
+		default:
+		{
+			ndMatrix matrix1(matrix);
+			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
+			matrix1 = matrix.Inverse() * m_alignmentMatrix * matrix1;
+
+			ndVector size0(ndVector::m_half * (p1 - p0));
+			ndVector origin(matrix1.TransformVector(ndVector::m_half * (p0 + p1)));
+			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
+
+			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
+			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
+
+			break;
+		}
+	}
+
+#else
+	ndMatrix scaleMatrix;
+	scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
+	scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
+	scaleMatrix[2] = matrix[2].Scale(m_scale.m_z);
+	scaleMatrix[3] = matrix[3];
+	scaleMatrix = m_alignmentMatrix * scaleMatrix;
+
+	const ndVector size0(m_shape->GetObbSize());
+	const ndVector origin(scaleMatrix.TransformVector(m_shape->GetObbOrigin()));
+	const ndVector size(scaleMatrix.m_front.Abs().Scale(size0.m_x) + scaleMatrix.m_up.Abs().Scale(size0.m_y) + scaleMatrix.m_right.Abs().Scale(size0.m_z));
+
+	p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
+	p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
+#endif
+	dAssert(p0.m_w == ndFloat32(0.0f));
+	dAssert(p1.m_w == ndFloat32(0.0f));
 }

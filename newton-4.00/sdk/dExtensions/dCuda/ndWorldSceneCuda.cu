@@ -136,10 +136,15 @@ void ndWorldSceneCuda::LoadBodyData()
 			// Get scene manager data
 			const ndShapeInstance& collision = body->GetCollisionShape();
 			const ndShape* const shape = collision.GetShape();
-			proxi.m_obbSize = shape->GetObbSize();
-			proxi.m_obbOrigin = shape->GetObbOrigin();
+
 			proxi.m_minAabb = minBox;
 			proxi.m_maxAabb = maxBox;
+			proxi.m_obbSize = shape->GetObbSize();
+			proxi.m_obbOrigin = shape->GetObbOrigin();
+			proxi.m_scale = collision.GetScale();
+			proxi.m_localPosition = collision.GetLocalMatrix().m_posit;
+			proxi.m_localRotation = cuQuat(ndQuaternion(collision.GetLocalMatrix()));
+			proxi.m_alignRotation = cuQuat(ndQuaternion(collision.GetAlignmentMatrix()));
 
 			transform.m_angular = cuQuat(body->GetRotation());
 			transform.m_linear = body->GetGlobalGetCentreOfMass();
