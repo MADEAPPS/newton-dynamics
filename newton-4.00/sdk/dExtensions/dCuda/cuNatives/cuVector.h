@@ -26,6 +26,7 @@
 #include <vector_types.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
+#include "cuIntrisics.h"
 
 class cuVector: public float4
 {
@@ -94,6 +95,11 @@ class cuVector: public float4
 	inline cuVector __device__ operator* (const cuVector& A) const
 	{
 		return cuVector(x * A.x, y * A.y, z * A.z, w * A.w);
+	}
+
+	inline cuVector __device__ Abs() const
+	{
+		return cuVector(cuAbs(x), cuAbs(y), cuAbs(z), w);
 	}
 
 	inline cuVector __device__ Scale(float s) const

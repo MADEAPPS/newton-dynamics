@@ -46,6 +46,11 @@ class cuMatrix3x3
 	{
 	}
 
+	inline cuMatrix3x3 __device__ operator* (const cuMatrix3x3& A) const
+	{
+		return cuMatrix3x3(A.RotateVector(m_front), A.RotateVector(m_up), A.RotateVector(m_right));
+	}
+
 	inline cuVector __device__ UnrotateVector(const cuVector &v) const
 	{
 		return cuVector((m_front * v).AddHorizontal(), (m_up * v).AddHorizontal(), (m_right * v).AddHorizontal(), 0.0f);
@@ -53,7 +58,7 @@ class cuMatrix3x3
 
 	inline cuVector __device__ RotateVector(const cuVector& v) const
 	{
-		return m_front.Scale(v.x)  + m_up.Scale(v.y) + m_right.Scale(v.z);
+		return m_front.Scale(v.x) + m_up.Scale(v.y) + m_right.Scale(v.z);
 	}
 
 	inline cuVector __device__ SolveByGaussianElimination(const cuVector &v) const

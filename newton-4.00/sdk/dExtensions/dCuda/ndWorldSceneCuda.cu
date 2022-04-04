@@ -325,8 +325,34 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto UpdateAABB = [] __device__(cuBodyProxy& body)
 	{
-		body.m_minAabb = body.m_posit;
-		//transform.m_angular = body.m_rotation;
+		// calculate shape global Matrix
+		body.m_globalSphapeRotation = body.m_localRotation * body.m_rotation;
+		cuMatrix3x3 matrix(body.m_globalSphapeRotation.GetMatrix3x3());
+		body.m_globalSphapePosition = matrix.RotateVector(body.m_localPosition) + body.m_posit;
+
+		// calculate world aabb
+		//ndMatrix scaleMatrix;
+		//scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
+		//scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
+		//scaleMatrix[2] = matrix[2].Scale(m_scale.m_z);
+		//scaleMatrix[3] = matrix[3];
+		//scaleMatrix = m_alignmentMatrix * scaleMatrix;
+		matrix.m_front = matrix.m_front.Scale(body.m_scale.x);
+		matrix.m_up    = matrix.m_up.Scale(body.m_scale.y);
+		matrix.m_right = matrix.m_right.Scale(body.m_scale.z);
+		matrix = body.m_alignRotation.GetMatrix3x3() * matrix;
+
+		//const ndVector size0(m_shape->GetObbSize());
+		//const ndVector size(scaleMatrix.m_front.Abs().Scale(size0.m_x) + scaleMatrix.m_up.Abs().Scale(size0.m_y) + scaleMatrix.m_right.Abs().Scale(size0.m_z));
+		//const ndVector origin(scaleMatrix.TransformVector(m_shape->GetObbOrigin()));
+		const cuVector origin(matrix.RotateVector(body.m_obbOrigin) + body.m_globalSphapePosition);
+		const cuVector size(matrix.m_front.Abs().Scale(body.m_obbSize.x) + matrix.m_up.Abs().Scale(body.m_obbSize.y) + matrix.m_right.Abs().Scale(body.m_obbSize.z));
+
+		//p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
+		//p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
+		const cuVector padding(1.0f / 16.0f);
+		body.m_minAabb = origin - size - padding;
+		body.m_maxAabb = origin + size + padding;
 	};
 	
 	cudaStream_t stream = m_context->m_stream0;
