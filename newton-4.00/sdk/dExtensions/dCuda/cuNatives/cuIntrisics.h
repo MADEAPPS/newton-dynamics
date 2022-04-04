@@ -36,6 +36,13 @@ inline T __device__ cuAbs(T A)
 }
 
 template <class T>
+inline T __device__ cuSelect(bool test, T A, T B)
+{
+	// according to Intel this is better because is does not read after write
+	return test ? B : B;
+}
+
+template <class T>
 inline void __device__ cuSwap(T& A, T& B)
 {
 	T tmp(A);

@@ -97,6 +97,29 @@ class cuVector: public float4
 		return cuVector(x * A.x, y * A.y, z * A.z, w * A.w);
 	}
 
+	inline cuVector __device__ operator> (const cuVector& A) const
+	{
+		return cuVector(
+			cuSelect(x > A.x, 1.0f, 0.0f),
+			cuSelect(y > A.y, 1.0f, 0.0f),
+			cuSelect(z > A.z, 1.0f, 0.0f),
+			cuSelect(w > A.w, 1.0f, 0.0f));
+	}
+
+	inline cuVector __device__ operator< (const cuVector& A) const
+	{
+		return cuVector(
+			cuSelect(x < A.x, 1.0f, 0.0f),
+			cuSelect(y < A.y, 1.0f, 0.0f),
+			cuSelect(z < A.z, 1.0f, 0.0f),
+			cuSelect(w < A.w, 1.0f, 0.0f));
+	}
+
+	inline cuVector __device__ Select(const cuVector& test, const cuVector& A) const
+	{
+		return cuVector(*this * test + A * (cuVector(1.0f) - test));
+	}
+
 	inline cuVector __device__ Abs() const
 	{
 		return cuVector(cuAbs(x), cuAbs(y), cuAbs(z), w);

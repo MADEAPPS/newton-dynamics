@@ -36,14 +36,26 @@
 #include "ndCudaContext.h"
 #include "ndWorldSceneCuda.h"
 
+template <typename Predicate, typename Predicate1>
+__global__ void CudaAddBodyPadding(Predicate SetSentinelPosit, Predicate1 PaddBodies, cuBodyProxy* bodyArray, int sentinelIndex)
+{
+	if (blockIdx.x == sentinelIndex)
+	{
+		SetSentinelPosit(bodyArray[blockIdx.x - 1], bodyArray[blockIdx.x]);
+	}
+	__syncthreads();
+	
+	if (blockIdx.x > sentinelIndex)
+	{
+		PaddBodies(bodyArray[sentinelIndex], bodyArray[blockIdx.x]);
+	}
+}
+
 template <typename Predicate>
 __global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuBodyProxy* bodyArray, int size)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < size)
-	{
-		UpdateBodyScene(bodyArray[index]);
-	}
+	UpdateBodyScene(bodyArray[index]);
 }
 
 template <typename Predicate>
@@ -111,8 +123,6 @@ void ndWorldSceneCuda::LoadBodyData()
 		const ndVector maxBox(ndFloat32(-1.0e15f));
 
 		ndArray<cuBodyProxy>& data = m_context->m_bodyBufferCpu;
-		//cuDeviceBuffer<cuBodyProxy>& gpuBodyBuffer = m_context->m_bodyBufferGpu;
-
 		cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 		cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 
@@ -160,16 +170,17 @@ void ndWorldSceneCuda::LoadBodyData()
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 
-	const ndInt32 bodyCount = bodyArray.GetCount();
+	const ndInt32 cpuBodyCount = bodyArray.GetCount();
+	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
 	
-	bodyBufferCpu.SetCount(bodyCount);
-	bodyBufferGpu.SetCount(bodyCount);
-	transformBufferGpu.SetCount(bodyCount);
-	transformBufferCpu0.SetCount(bodyCount);
-	transformBufferCpu1.SetCount(bodyCount);
+	bodyBufferCpu.SetCount(cpuBodyCount);
+	bodyBufferGpu.SetCount(gpuBodyCount);
+	transformBufferGpu.SetCount(cpuBodyCount);
+	transformBufferCpu0.SetCount(cpuBodyCount);
+	transformBufferCpu1.SetCount(cpuBodyCount);
 
 	ParallelExecute(UploadBodies);
-	bodyBufferGpu.ReadData(&bodyBufferCpu[0], bodyCount);
+	bodyBufferGpu.ReadData(&bodyBufferCpu[0], cpuBodyCount);
 }
 
 void ndWorldSceneCuda::GetBodyTransforms()
@@ -323,6 +334,24 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
+	auto InitSentinelPadding = [] __device__(const cuBodyProxy& body, cuBodyProxy& sentinel)
+	{
+		sentinel.m_posit = body.m_posit;
+		sentinel.m_rotation = body.m_rotation;
+	};
+
+	auto PaddBodyArray = [] __device__(const cuBodyProxy& src, cuBodyProxy& dst)
+	{
+		dst.m_rotation = src.m_rotation;
+		dst.m_posit = src.m_posit;
+		dst.m_obbSize = src.m_obbSize;
+		dst.m_obbOrigin = src.m_obbOrigin;
+		dst.m_scale = src.m_scale;
+		dst.m_localPosition = src.m_localPosition;
+		dst.m_localRotation = src.m_localRotation;
+		dst.m_alignRotation = src.m_alignRotation;
+	};
+
 	auto UpdateAABB = [] __device__(cuBodyProxy& body)
 	{
 		// calculate shape global Matrix
@@ -358,6 +387,10 @@ void ndWorldSceneCuda::InitBodyArray()
 	cudaStream_t stream = m_context->m_stream0;
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 	ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	dAssert(blocks * D_THREADS_PER_BLOCK == threads);
 	cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
-	CudaInitBodyArray << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAABB, bodiesGpu, threads);
+	ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
+
+	CudaAddBodyPadding <<<1, D_THREADS_PER_BLOCK, 0, stream >>> (InitSentinelPadding, PaddBodyArray, bodiesGpu, sentinelIndex);
+	CudaInitBodyArray <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (UpdateAABB, bodiesGpu, threads);
 }
