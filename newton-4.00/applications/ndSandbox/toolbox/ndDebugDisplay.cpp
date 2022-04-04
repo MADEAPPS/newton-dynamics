@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 
 #define D_USE_GEOMETRY_SHADERS 
+#define D_TEST_CALCULATE_CONTACTS
 
 #ifndef D_USE_GEOMETRY_SHADERS 
 static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, ndFloat32 x, ndFloat32 y, ndFloat32 w)
@@ -226,6 +227,22 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 					pointBuffer.SetCount(0);
 				}
 			}
+
+			// test User contact calculation.
+			#ifdef D_TEST_CALCULATE_CONTACTS
+			ndContactSolver solver;
+			ndContactNotify notification;
+			ndFixSizeArray<ndContactPoint, 16> contactOut;
+			ndBodyKinematic* bodyA = contact->GetBody0();
+			ndBodyKinematic* bodyB = contact->GetBody1();
+			const ndShapeInstance& shapeA = bodyA->GetCollisionShape();
+			const ndShapeInstance& shapeB = bodyB->GetCollisionShape();
+
+			solver.CalculateContacts(
+				&shapeA, bodyA->GetMatrix(), bodyA->GetVelocity(),
+				&shapeB, bodyB->GetMatrix(), bodyB->GetVelocity(),
+				contactOut, &notification);
+			#endif
 		}
 	}
 	glDrawArrays(GL_POINTS, 0, pointBuffer.GetCount());

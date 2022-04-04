@@ -45,19 +45,6 @@ void ndApplicationMaterial::OnContactCallback(const ndContact* const, ndFloat32)
 	{
 		//PlaySoundTest(joint);
 	}
-
-#if 0
-	ndContactSolver solver;
-	ndFixSizeArray<ndContactPoint, 16> contactOut;
-	ndBodyKinematic* bodyA = contactJoint->GetBody0();
-	ndBodyKinematic* bodyB = contactJoint->GetBody1();
-	const ndShapeInstance& shapeA = bodyA->GetCollisionShape();
-	const ndShapeInstance& shapeB = bodyB->GetCollisionShape();
-	solver.CalculateContacts(
-		&shapeA, bodyA->GetMatrix(), bodyA->GetVelocity(),
-		&shapeB, bodyB->GetMatrix(), bodyB->GetVelocity(),
-		contactOut);
-#endif
 }
 
 ndMaterialGraph::ndMaterialGraph()

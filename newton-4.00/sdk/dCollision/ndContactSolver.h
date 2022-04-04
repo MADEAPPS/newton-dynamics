@@ -67,7 +67,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	D_COLLISION_API void CalculateContacts(
 		const ndShapeInstance* const shapeA, const ndMatrix& matrixA, const ndVector& velocA,
 		const ndShapeInstance* const shapeB, const ndMatrix& matrixB, const ndVector& velocB,
-		ndFixSizeArray<ndContactPoint, 16>& contactOut);
+		ndFixSizeArray<ndContactPoint, 16>& contactOut, ndContactNotify* const notification);
 
 	private:
 	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, ndFloat32 timestep, ndInt32 threadId);

@@ -3192,7 +3192,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	}
 
 	m_contactBuffer = contactOut;
-	dAssert(closestDist < ndFloat32(1000.0f));
+	dAssert(!count || (closestDist < ndFloat32(1000.0f)));
 	m_separationDistance = closestDist;
 	m_instance1.m_shape = polySoupInstance.m_shape;
 	m_instance1 = polySoupInstance;
@@ -4297,7 +4297,7 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 void ndContactSolver::CalculateContacts(
 	const ndShapeInstance* const instanceA, const ndMatrix& matrixA, const ndVector& velocA,
 	const ndShapeInstance* const instanceB, const ndMatrix& matrixB, const ndVector& velocB,
-	ndFixSizeArray<ndContactPoint, 16>& contactOut)
+	ndFixSizeArray<ndContactPoint, 16>& contactOut, ndContactNotify* const notification)
 {
 	ndContact contact;
 	ndBodyKinematic bodyA;
@@ -4335,7 +4335,7 @@ void ndContactSolver::CalculateContacts(
 	m_separatingVector = ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 	m_contact = &contact;
 	m_freeFace = nullptr;
-	m_notification = nullptr;
+	m_notification = notification;
 	m_contactBuffer = contactBuffer;
 	m_timestep = ndFloat32 (1.0f);
 	m_skinMargin = ndFloat32(0.0f);

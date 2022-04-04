@@ -161,12 +161,11 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;
 	AddSimpleConcaveMesh(scene, location, "camel.fbx");
-
+	
 	location.m_posit.m_x = 10.0f;
 	location.m_posit.m_z = 5.0f;
 	location.m_posit.m_y = 2.0f;
 	AddSimpleConcaveMesh(scene, location, "dino.fbx");
-
 
 	ndVector origin(ndVector::m_zero);
 	origin.m_x -= 10.0f;
