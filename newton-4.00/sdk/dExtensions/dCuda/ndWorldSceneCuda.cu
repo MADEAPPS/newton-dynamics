@@ -357,6 +357,7 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto UpdateAABB = [] __device__(cuBodyProxy& body)
 	{
+		__shared__  cuVector aabb[D_THREADS_PER_BLOCK][2];
 		// calculate shape global Matrix
 		body.m_globalSphapeRotation = body.m_localRotation * body.m_rotation;
 		cuMatrix3x3 matrix(body.m_globalSphapeRotation.GetMatrix3x3());
@@ -383,8 +384,32 @@ void ndWorldSceneCuda::InitBodyArray()
 		//p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
 		//p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
 		const cuVector padding(1.0f / 16.0f);
-		body.m_minAabb = origin - size - padding;
-		body.m_maxAabb = origin + size + padding;
+		const cuVector minBox(origin - size - padding);
+		const cuVector maxBox(origin + size + padding);
+
+		body.m_minAabb = minBox;
+		body.m_maxAabb = maxBox;
+
+		// calculate bondin box for this tyhread block
+		aabb[blockIdx.x][0] = minBox;
+		aabb[blockIdx.x][1] = maxBox;
+		__syncthreads();
+
+		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
+		{
+			if (blockIdx.x < i)
+			{
+				aabb[blockIdx.x][0] = aabb[blockIdx.x][0].Min(aabb[blockIdx.x + i][0]);
+				aabb[blockIdx.x][1] = aabb[blockIdx.x][1].Max(aabb[blockIdx.x + i][1]);
+			}
+			__syncthreads();
+		}
+
+		if (blockIdx.x == 0)
+		{
+			body.m_xxx0 = aabb[0][0];
+			body.m_xxx1 = aabb[0][1];
+		}
 
 		//int x0 = __float2int_rd(body.m_minAabb.x * D_CUDA_SCENE_INV_GRID_SIZE);
 		//int y0 = __float2int_rd(body.m_minAabb.y * D_CUDA_SCENE_INV_GRID_SIZE);

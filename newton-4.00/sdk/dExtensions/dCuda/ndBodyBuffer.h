@@ -156,6 +156,9 @@ class cuBodyProxy
 	cuVector m_localPosition;
 	cuQuat m_localRotation;
 	cuQuat m_alignRotation;
+
+	cuVector m_xxx0;
+	cuVector m_xxx1;
 };
 
 
