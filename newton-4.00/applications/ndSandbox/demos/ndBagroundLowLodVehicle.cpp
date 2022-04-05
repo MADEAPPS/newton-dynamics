@@ -287,9 +287,9 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 
 	//ndBodyKinematic* const mapBody = BuildPlayArena(scene);
 	//ndBodyKinematic* const mapBody = BuildFlatPlane(scene, true);
-	ndBodyKinematic* const mapBody = BuildGridPlane(scene, 400, 4.0f, 0.0f);
+	//ndBodyKinematic* const mapBody = BuildGridPlane(scene, 400, 4.0f, 0.0f);
 	//ndBodyKinematic* const mapBody = BuildCompoundScene(scene, heighfieldLocation);
-	//ndBodyKinematic* const mapBody = BuildHeightFieldTerrain(scene, heighfieldLocation);
+	ndBodyKinematic* const mapBody = BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//ndBodyKinematic* const mapBody = BuildProceduralMap(scene, 200, 2.0f, 0.0f);
 	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "track.fbx", false);

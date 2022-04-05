@@ -173,7 +173,7 @@ struct ndHeighfieldInfo
 	ndFloat32 m_verticalScale;
 	ndFloat32 m_horizonalScale_x;
 	ndFloat32 m_horizonalScale_z;
-	ndInt16* m_elevation;
+	ndReal* m_elevation;
 	ndInt8* m_atributes;
 };
 

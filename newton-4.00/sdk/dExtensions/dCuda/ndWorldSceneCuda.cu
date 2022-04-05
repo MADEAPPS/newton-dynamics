@@ -36,6 +36,9 @@
 #include "ndCudaContext.h"
 #include "ndWorldSceneCuda.h"
 
+#define D_CUDA_SCENE_GRID_SIZE		8.0f
+#define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
+
 template <typename Predicate, typename Predicate1>
 __global__ void CudaAddBodyPadding(Predicate SetSentinelPosit, Predicate1 PaddBodies, cuBodyProxy* bodyArray, int sentinelIndex)
 {
@@ -382,6 +385,13 @@ void ndWorldSceneCuda::InitBodyArray()
 		const cuVector padding(1.0f / 16.0f);
 		body.m_minAabb = origin - size - padding;
 		body.m_maxAabb = origin + size + padding;
+
+		//int x0 = __float2int_rd(body.m_minAabb.x * D_CUDA_SCENE_INV_GRID_SIZE);
+		//int y0 = __float2int_rd(body.m_minAabb.y * D_CUDA_SCENE_INV_GRID_SIZE);
+		//int z0 = __float2int_rd(body.m_minAabb.z * D_CUDA_SCENE_INV_GRID_SIZE);
+		//int x1 = __float2int_rd(body.m_maxAabb.x * D_CUDA_SCENE_INV_GRID_SIZE);
+		//int y1 = __float2int_rd(body.m_maxAabb.y * D_CUDA_SCENE_INV_GRID_SIZE);
+		//int z1 = __float2int_rd(body.m_maxAabb.z * D_CUDA_SCENE_INV_GRID_SIZE);
 	};
 	
 	cudaStream_t stream = m_context->m_stream0;

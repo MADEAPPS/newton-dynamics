@@ -179,19 +179,21 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	scene->AddEntity(entity);
 
 	// create the height field collision and rigid body
-	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
+	ndShapeInstance heighfieldInstance(
+		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
 		ndShapeHeightfield::m_invertedDiagonals,
-		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
+		D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<ndInt16>& hightMap = shape->GetElevationMap();
+	ndArray<ndReal>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
-		ndFloat32 high = heightfield[i].m_y * 100.0f;
-		dAssert(high <  ndFloat32(1 << 15));
-		dAssert(high > -ndFloat32(1 << 15));
-		hightMap[i] = ndInt16(high);
+		//ndFloat32 high = heightfield[i].m_y * 100.0f;
+		ndFloat32 high = heightfield[i].m_y;
+		//dAssert(high <  ndFloat32(1 << 15));
+		//dAssert(high > -ndFloat32(1 << 15));
+		hightMap[i] = ndReal(high);
 	}
 	shape->UpdateElevationMapAabb();
 
@@ -217,18 +219,18 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 
 	ndShapeInstance heighfieldInstance(
 		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
-		ndShapeHeightfield::m_invertedDiagonals, 1.0f / 100.0f, 
+		ndShapeHeightfield::m_invertedDiagonals, 
 		D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<ndInt16>& hightMap = shape->GetElevationMap();
+	ndArray<ndReal>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
-		ndFloat32 high = heightfield[i].m_y * 100.0f;
-		dAssert(high <  ndFloat32(1 << 15));
-		dAssert(high > -ndFloat32(1 << 15));
-		hightMap[i] = ndInt16(high);
+		ndFloat32 high = heightfield[i].m_y;
+		//dAssert(high <  ndFloat32(1 << 15));
+		//dAssert(high > -ndFloat32(1 << 15));
+		hightMap[i] = ndReal(high);
 	}
 	shape->UpdateElevationMapAabb();
 

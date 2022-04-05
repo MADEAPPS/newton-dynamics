@@ -37,12 +37,12 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	D_CLASS_REFLECTION(ndShapeHeightfield);
 	D_COLLISION_API ndShapeHeightfield(
 		ndInt32 width, ndInt32 height, ndGridConstruction contructionMode,
-		ndFloat32 verticalScale, ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z);
+		ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z);
 	D_COLLISION_API ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
 
-	ndArray<ndInt16>& GetElevationMap();
-	const ndArray<ndInt16>& GetElevationMap() const;
+	ndArray<ndReal>& GetElevationMap();
+	const ndArray<ndReal>& GetElevationMap() const;
 
 	D_COLLISION_API void UpdateElevationMapAabb();
 	D_COLLISION_API void GetLocalAabb(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
@@ -79,8 +79,8 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	ndVector m_minBox;
 	ndVector m_maxBox;
 	ndArray<ndInt8> m_atributeMap;
-	ndArray<ndInt16> m_elevationMap;
-	ndFloat32 m_verticalScale;
+	ndArray<ndReal> m_elevationMap;
+	//ndFloat32 m_verticalScale;
 	ndFloat32 m_horizontalScale_x;
 	ndFloat32 m_horizontalScale_z;
 	ndFloat32 m_horizontalScaleInv_x;
@@ -99,12 +99,12 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	friend class ndContactSolver;
 };
 
-inline ndArray<ndInt16>& ndShapeHeightfield::GetElevationMap()
+inline ndArray<ndReal>& ndShapeHeightfield::GetElevationMap()
 {
 	return m_elevationMap;
 }
 
-inline const ndArray<ndInt16>& ndShapeHeightfield::GetElevationMap() const
+inline const ndArray<ndReal>& ndShapeHeightfield::GetElevationMap() const
 {
 	return m_elevationMap;
 }

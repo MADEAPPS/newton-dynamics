@@ -52,13 +52,13 @@ ndInt32 ndShapeHeightfield::m_verticalEdgeMap[][7] =
 
 ndShapeHeightfield::ndShapeHeightfield(
 	ndInt32 width, ndInt32 height, ndGridConstruction constructionMode,
-	ndFloat32 verticalScale, ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z)
+	ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z)
 	:ndShapeStaticMesh(m_heightField)
 	,m_minBox(ndVector::m_zero)
 	,m_maxBox(ndVector::m_zero)
 	,m_atributeMap(width * height)
 	,m_elevationMap(width * height)
-	,m_verticalScale(verticalScale)
+	//,m_verticalScale(verticalScale)
 	,m_horizontalScale_x(horizontalScale_x)
 	,m_horizontalScale_z(horizontalScale_z)
 	,m_horizontalScaleInv_x(ndFloat32(1.0f) / horizontalScale_x)
@@ -74,7 +74,7 @@ ndShapeHeightfield::ndShapeHeightfield(
 	m_elevationMap.SetCount(width * height);
 
 	memset(&m_atributeMap[0], 0, sizeof(ndInt8) * m_atributeMap.GetCount());
-	memset(&m_elevationMap[0], 0, sizeof(ndInt16) * m_elevationMap.GetCount());
+	memset(&m_elevationMap[0], 0, sizeof(ndReal) * m_elevationMap.GetCount());
 
 	CalculateLocalObb();
 }
@@ -85,7 +85,7 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_maxBox(ndVector::m_zero)
 	,m_atributeMap(0)
 	,m_elevationMap(0)
-	,m_verticalScale(ndFloat32 (0.0f))
+	//,m_verticalScale(ndFloat32 (0.0f))
 	,m_horizontalScale_x(ndFloat32(0.0f))
 	,m_horizontalScale_z(ndFloat32(0.0f))
 	,m_horizontalScaleInv_x(ndFloat32(0.0f))
@@ -100,7 +100,7 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 
 	m_minBox = xmlGetVector3(xmlNode, "minBox");
 	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
-	m_verticalScale = xmlGetFloat(xmlNode, "verticalScale");
+	//m_verticalScale = xmlGetFloat(xmlNode, "verticalScale");
 	m_horizontalScale_x = xmlGetFloat(xmlNode, "horizontalScale_x");
 	m_horizontalScale_z = xmlGetFloat(xmlNode, "horizontalScale_z");
 	m_width = xmlGetInt(xmlNode, "width");
@@ -118,7 +118,7 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 		ndInt64 readBytes;
 		m_elevationMap.SetCount(m_width * m_height);
 		m_atributeMap.SetCount(m_width * m_height);
-		readBytes = fread(&m_elevationMap[0], sizeof(ndInt16), m_elevationMap.GetCount(), file);
+		readBytes = fread(&m_elevationMap[0], sizeof(ndReal), m_elevationMap.GetCount(), file);
 		readBytes = fread(&m_atributeMap[0], sizeof(ndInt8), m_atributeMap.GetCount(), file);
 		fclose(file);
 	}
@@ -141,7 +141,7 @@ void ndShapeHeightfield::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	xmlSaveParam(childNode, "assetName", "string", fileName);
 	xmlSaveParam(childNode, "minBox", m_minBox);
 	xmlSaveParam(childNode, "maxBox", m_maxBox);
-	xmlSaveParam(childNode, "verticalScale", m_verticalScale);
+	//xmlSaveParam(childNode, "verticalScale", m_verticalScale);
 	xmlSaveParam(childNode, "horizontalScale_x", m_horizontalScale_x);
 	xmlSaveParam(childNode, "horizontalScale_z", m_horizontalScale_z);
 	xmlSaveParam(childNode, "width", m_width);
@@ -155,7 +155,7 @@ void ndShapeHeightfield::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	FILE* const file = fopen(filePathName, "wb");
 	if (file) 
 	{
-		fwrite(&m_elevationMap[0], sizeof(ndInt16), m_elevationMap.GetCount(), file);
+		fwrite(&m_elevationMap[0], sizeof(ndReal), m_elevationMap.GetCount(), file);
 		fwrite(&m_atributeMap[0], sizeof(ndInt8), m_atributeMap.GetCount(), file);
 		fclose(file);
 	}
@@ -168,10 +168,10 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 	info.m_heightfield.m_width = m_width;
 	info.m_heightfield.m_height = m_height;
 	info.m_heightfield.m_gridsDiagonals = m_diagonalMode;
-	info.m_heightfield.m_verticalScale = m_verticalScale;
+	//info.m_heightfield.m_verticalScale = m_verticalScale;
 	info.m_heightfield.m_horizonalScale_x = m_horizontalScale_x;
 	info.m_heightfield.m_horizonalScale_z = m_horizontalScale_z;
-	info.m_heightfield.m_elevation = (ndInt16*)&m_elevationMap[0];
+	info.m_heightfield.m_elevation = (ndReal*)&m_elevationMap[0];
 	info.m_heightfield.m_atributes = (ndInt8*)&m_atributeMap[0];
 
 	return info;
@@ -179,16 +179,16 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 
 void ndShapeHeightfield::CalculateLocalObb()
 {
-	ndInt16 y0 = ndInt16(0x7fff);
-	ndInt16 y1 = ndInt16 (-0x7fff);
+	ndReal y0 = ndReal (1.0e10f);
+	ndReal y1 = -ndReal(1.0e10f);
 	for (ndInt32 i = m_elevationMap.GetCount()-1; i >= 0; i--)
 	{
 		y0 = dMin(y0, m_elevationMap[i]);
 		y1 = dMax(y1, m_elevationMap[i]);
 	}
 
-	m_minBox = ndVector(ndFloat32(0.0f), ndFloat32 (y0) * m_verticalScale, ndFloat32(0.0f), ndFloat32(0.0f));
-	m_maxBox = ndVector(ndFloat32(m_width-1) * m_horizontalScale_x, ndFloat32(y1) * m_verticalScale, ndFloat32(m_height-1) * m_horizontalScale_z, ndFloat32(0.0f));
+	m_minBox = ndVector(ndFloat32(0.0f), ndFloat32 (y0), ndFloat32(0.0f), ndFloat32(0.0f));
+	m_maxBox = ndVector(ndFloat32(m_width-1) * m_horizontalScale_x, ndFloat32(y1), ndFloat32(m_height-1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 	m_boxSize = (m_maxBox - m_minBox) * ndVector::m_half;
 	m_boxOrigin = (m_maxBox + m_minBox) * ndVector::m_half;
@@ -221,16 +221,16 @@ void ndShapeHeightfield::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& 
 	ndInt32 base = 0;
 	for (ndInt32 z = 0; z < m_height - 1; z++) 
 	{
-		const ndVector p0 ((0 + 0) * m_horizontalScale_x, m_verticalScale * ndFloat32(m_elevationMap[base + 0]),               (z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-		const ndVector p1 ((0 + 0) * m_horizontalScale_x, m_verticalScale * ndFloat32(m_elevationMap[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+		const ndVector p0 ((0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0]),               (z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+		const ndVector p1 ((0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 		points[0 * 2 + 0] = matrix.TransformVector(p0);
 		points[1 * 2 + 0] = matrix.TransformVector(p1);
 
 		for (ndInt32 x = 0; x < m_width - 1; x++) 
 		{
-			const ndVector p2 ((x + 1) * m_horizontalScale_x, m_verticalScale * ndFloat32(m_elevationMap[base + x + 1]),			(z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-			const ndVector p3 ((x + 1) * m_horizontalScale_x, m_verticalScale * ndFloat32(m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+			const ndVector p2 ((x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + 1]),			(z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+			const ndVector p3 ((x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 			points[0 * 2 + 1] = matrix.TransformVector(p2);
 			points[1 * 2 + 1] = matrix.TransformVector(p3);
@@ -340,11 +340,10 @@ ndFloat32 ndShapeHeightfield::RayCastCell(const ndFastRay& ray, ndInt32 xIndex0,
 
 	ndInt32 base = zIndex0 * m_width + xIndex0;
 
-	//const ndFloat32* const elevation = (ndFloat32*)m_elevationMap;
-	points[0 * 2 + 0] = ndVector((xIndex0 + 0) * m_horizontalScale_x, m_verticalScale * ndFloat32 (m_elevationMap[base + 0]),			  (zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-	points[0 * 2 + 1] = ndVector((xIndex0 + 1) * m_horizontalScale_x, m_verticalScale * ndFloat32 (m_elevationMap[base + 1]),			  (zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-	points[1 * 2 + 1] = ndVector((xIndex0 + 1) * m_horizontalScale_x, m_verticalScale * ndFloat32 (m_elevationMap[base + m_width + 1]), (zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
-	points[1 * 2 + 0] = ndVector((xIndex0 + 0) * m_horizontalScale_x, m_verticalScale * ndFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[0 * 2 + 0] = ndVector((xIndex0 + 0) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + 0]),			  (zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[0 * 2 + 1] = ndVector((xIndex0 + 1) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + 1]),			  (zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[1 * 2 + 1] = ndVector((xIndex0 + 1) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + m_width + 1]), (zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[1 * 2 + 0] = ndVector((xIndex0 + 0) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 	ndFloat32 t = ndFloat32(1.2f);
 	if (m_diagonalMode == m_normalDiagonals)
@@ -527,30 +526,31 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 
 void ndShapeHeightfield::CalculateMinAndMaxElevation(ndInt32 x0, ndInt32 x1, ndInt32 z0, ndInt32 z1, ndFloat32& minHeight, ndFloat32& maxHeight) const
 {
-	ndInt16 minVal = 0x7fff;
-	ndInt16 maxVal = -0x7fff;
+	//ndInt16 minVal = 0x7fff;
+	//ndInt16 maxVal = -0x7fff;
+	ndReal minVal = ndReal(1.0e10f);
+	ndReal maxVal = -ndReal(1.0e10f);
+
 	ndInt32 base = z0 * m_width;
 	for (ndInt32 z = z0; z <= z1; z++) 
 	{
 		for (ndInt32 x = x0; x <= x1; x++) 
 		{
-			ndInt16 high = m_elevationMap[base + x];
+			ndReal high = m_elevationMap[base + x];
 			minVal = dMin(high, minVal);
 			maxVal = dMax(high, maxVal);
 		}
 		base += m_width;
 	}
 
-	minHeight = minVal * m_verticalScale;
-	maxHeight = maxVal * m_verticalScale;
+	minHeight = minVal;
+	maxHeight = maxVal;
 }
 
 void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
 	ndVector boxP0;
 	ndVector boxP1;
-
-	//dgWorld* const world = data->m_objBody->GetWorld();
 
 	// the user data is the pointer to the collision geometry
 	CalculateMinExtend3d(data->GetOrigin(), data->GetTarget(), boxP0, boxP1);
@@ -609,7 +609,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			ndFloat32 zVal = m_horizontalScale_z * z;
 			for (ndInt32 x = x0; x <= x1; x++) 
 			{
-				vertex[vertexIndex] = ndVector(m_horizontalScale_x * x, m_verticalScale * ndFloat32(m_elevationMap[base + x]), zVal, ndFloat32(0.0f));
+				vertex[vertexIndex] = ndVector(m_horizontalScale_x * x, ndFloat32(m_elevationMap[base + x]), zVal, ndFloat32(0.0f));
 				vertexIndex++;
 				dAssert(vertexIndex <= vertex.GetCount());
 			}

@@ -24,6 +24,7 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
+//#include <device_functions.h>
 
 #define D_GRANULARITY			(1024 * 32)
 #define D_THREADS_PER_BLOCK		256
