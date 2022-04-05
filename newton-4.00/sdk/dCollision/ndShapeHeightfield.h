@@ -80,7 +80,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	ndVector m_maxBox;
 	ndArray<ndInt8> m_atributeMap;
 	ndArray<ndReal> m_elevationMap;
-	//ndFloat32 m_verticalScale;
 	ndFloat32 m_horizontalScale_x;
 	ndFloat32 m_horizontalScale_z;
 	ndFloat32 m_horizontalScaleInv_x;

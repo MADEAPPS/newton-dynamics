@@ -58,7 +58,6 @@ ndShapeHeightfield::ndShapeHeightfield(
 	,m_maxBox(ndVector::m_zero)
 	,m_atributeMap(width * height)
 	,m_elevationMap(width * height)
-	//,m_verticalScale(verticalScale)
 	,m_horizontalScale_x(horizontalScale_x)
 	,m_horizontalScale_z(horizontalScale_z)
 	,m_horizontalScaleInv_x(ndFloat32(1.0f) / horizontalScale_x)
@@ -85,7 +84,6 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_maxBox(ndVector::m_zero)
 	,m_atributeMap(0)
 	,m_elevationMap(0)
-	//,m_verticalScale(ndFloat32 (0.0f))
 	,m_horizontalScale_x(ndFloat32(0.0f))
 	,m_horizontalScale_z(ndFloat32(0.0f))
 	,m_horizontalScaleInv_x(ndFloat32(0.0f))
@@ -100,7 +98,6 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 
 	m_minBox = xmlGetVector3(xmlNode, "minBox");
 	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
-	//m_verticalScale = xmlGetFloat(xmlNode, "verticalScale");
 	m_horizontalScale_x = xmlGetFloat(xmlNode, "horizontalScale_x");
 	m_horizontalScale_z = xmlGetFloat(xmlNode, "horizontalScale_z");
 	m_width = xmlGetInt(xmlNode, "width");
@@ -141,7 +138,6 @@ void ndShapeHeightfield::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	xmlSaveParam(childNode, "assetName", "string", fileName);
 	xmlSaveParam(childNode, "minBox", m_minBox);
 	xmlSaveParam(childNode, "maxBox", m_maxBox);
-	//xmlSaveParam(childNode, "verticalScale", m_verticalScale);
 	xmlSaveParam(childNode, "horizontalScale_x", m_horizontalScale_x);
 	xmlSaveParam(childNode, "horizontalScale_z", m_horizontalScale_z);
 	xmlSaveParam(childNode, "width", m_width);
@@ -168,7 +164,6 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 	info.m_heightfield.m_width = m_width;
 	info.m_heightfield.m_height = m_height;
 	info.m_heightfield.m_gridsDiagonals = m_diagonalMode;
-	//info.m_heightfield.m_verticalScale = m_verticalScale;
 	info.m_heightfield.m_horizonalScale_x = m_horizontalScale_x;
 	info.m_heightfield.m_horizonalScale_z = m_horizontalScale_z;
 	info.m_heightfield.m_elevation = (ndReal*)&m_elevationMap[0];
@@ -181,7 +176,7 @@ void ndShapeHeightfield::CalculateLocalObb()
 {
 	ndReal y0 = ndReal (1.0e10f);
 	ndReal y1 = -ndReal(1.0e10f);
-	for (ndInt32 i = m_elevationMap.GetCount()-1; i >= 0; i--)
+	for (ndInt32 i = m_elevationMap.GetCount()-1; i >= 0; --i)
 	{
 		y0 = dMin(y0, m_elevationMap[i]);
 		y1 = dMax(y1, m_elevationMap[i]);
@@ -219,7 +214,7 @@ void ndShapeHeightfield::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& 
 	const ndInt32 i3 = indirectIndex[3];
 
 	ndInt32 base = 0;
-	for (ndInt32 z = 0; z < m_height - 1; z++) 
+	for (ndInt32 z = 0; z < m_height - 1; ++z)
 	{
 		const ndVector p0 ((0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0]),               (z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
 		const ndVector p1 ((0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
@@ -227,7 +222,7 @@ void ndShapeHeightfield::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& 
 		points[0 * 2 + 0] = matrix.TransformVector(p0);
 		points[1 * 2 + 0] = matrix.TransformVector(p1);
 
-		for (ndInt32 x = 0; x < m_width - 1; x++) 
+		for (ndInt32 x = 0; x < m_width - 1; ++x) 
 		{
 			const ndVector p2 ((x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + 1]),			(z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
 			const ndVector p3 ((x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
@@ -526,15 +521,13 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 
 void ndShapeHeightfield::CalculateMinAndMaxElevation(ndInt32 x0, ndInt32 x1, ndInt32 z0, ndInt32 z1, ndFloat32& minHeight, ndFloat32& maxHeight) const
 {
-	//ndInt16 minVal = 0x7fff;
-	//ndInt16 maxVal = -0x7fff;
 	ndReal minVal = ndReal(1.0e10f);
 	ndReal maxVal = -ndReal(1.0e10f);
 
 	ndInt32 base = z0 * m_width;
-	for (ndInt32 z = z0; z <= z1; z++) 
+	for (ndInt32 z = z0; z <= z1; ++z) 
 	{
-		for (ndInt32 x = x0; x <= x1; x++) 
+		for (ndInt32 x = x0; x <= x1; ++x) 
 		{
 			ndReal high = m_elevationMap[base + x];
 			minVal = dMin(high, minVal);
@@ -604,10 +597,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	
 		ndInt32 vertexIndex = 0;
 		ndInt32 base = z0 * m_width;
-		for (ndInt32 z = z0; z <= z1; z++) 
+		for (ndInt32 z = z0; z <= z1; ++z) 
 		{
 			ndFloat32 zVal = m_horizontalScale_z * z;
-			for (ndInt32 x = x0; x <= x1; x++) 
+			for (ndInt32 x = x0; x <= x1; ++x) 
 			{
 				vertex[vertexIndex] = ndVector(m_horizontalScale_x * x, ndFloat32(m_elevationMap[base + x]), zVal, ndFloat32(0.0f));
 				vertexIndex++;
@@ -626,10 +619,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 faceSize = ndInt32(dMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 
 		const ndInt32* const indirectIndex = GetIndexList();
-		for (ndInt32 z = z0; (z < z1) && (faceCount < D_MAX_COLLIDING_FACES); z++) 
+		for (ndInt32 z = z0; (z < z1) && (faceCount < D_MAX_COLLIDING_FACES); ++z) 
 		{
 			ndInt32 zStep = z * m_width;
-			for (ndInt32 x = x0; (x < x1) && (faceCount < D_MAX_COLLIDING_FACES); x++) 
+			for (ndInt32 x = x0; (x < x1) && (faceCount < D_MAX_COLLIDING_FACES); ++x) 
 			{
 				ndInt32 vIndex[4];
 				vIndex[0] = vertexIndex;
@@ -700,12 +693,12 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		
 		const int maxIndex = index;
 		ndInt32 stepBase = (x1 - x0) * (2 * 9);
-		for (ndInt32 z = z0; z < z1; z++) 
+		for (ndInt32 z = z0; z < z1; ++z) 
 		{
 			//const ndInt32 diagBase = m_width * z;
 			const ndInt32 triangleIndexBase = (z - z0) * stepBase;
 			const ndInt32* const horizontalEdgeMap = &m_horizontalEdgeMap[m_diagonalMode == m_normalDiagonals ? 0 : 1][0];
-			for (ndInt32 x = x0; x < (x1 - 1); x++) 
+			for (ndInt32 x = x0; x < (x1 - 1); ++x) 
 			{
 				ndInt32 index1 = (x - x0) * (2 * 9) + triangleIndexBase;
 				if (index1 < maxIndex) 
@@ -735,10 +728,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		}
 	
 		const ndInt32* const verticalEdgeMap = &m_verticalEdgeMap[m_diagonalMode == m_normalDiagonals ? 0 : 1][0];
-		for (ndInt32 x = x0; x < x1; x++) 
+		for (ndInt32 x = x0; x < x1; ++x) 
 		{
 			const ndInt32 triangleIndexBase = (x - x0) * (2 * 9);
-			for (ndInt32 z = z0; z < (z1 - 1); z++) 
+			for (ndInt32 z = z0; z < (z1 - 1); ++z) 
 			{
 				ndInt32 index1 = (z - z0) * stepBase + triangleIndexBase;
 				if (index1 < maxIndex) 
@@ -778,7 +771,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		if (data->m_doContinueCollisionTest) 
 		{
 			ndFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
-			for (ndInt32 i = 0; i < faceCount; i++) 
+			for (ndInt32 i = 0; i < faceCount; ++i)
 			{
 				const ndInt32* const indexArray = &indices[faceIndexCount1];
 				const ndVector& faceNormal = vertex[indexArray[4]];
@@ -796,7 +789,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		}
 		else 
 		{
-			for (ndInt32 i = 0; i < faceCount; i++) 
+			for (ndInt32 i = 0; i < faceCount; ++i) 
 			{
 				const ndInt32* const indexArray = &indices[faceIndexCount1];
 				const ndVector& faceNormal = vertex[indexArray[4]];
