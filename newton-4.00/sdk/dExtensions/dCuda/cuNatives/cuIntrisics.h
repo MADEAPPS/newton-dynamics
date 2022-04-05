@@ -24,7 +24,6 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-//#include <device_functions.h>
 
 #define D_GRANULARITY			(1024 * 32)
 #define D_THREADS_PER_BLOCK		256
@@ -32,15 +31,31 @@
 template <class T>
 inline T __device__ cuAbs(T A)
 {
-	// according to Intel this is better because is does not read after write
-	return (A >= T(0)) ? A : -A;
+	return fabsf(A);
+}
+
+template <class T>
+inline T __device__ cuFloor(T A)
+{
+	return floorf(A);
+}
+
+template <class T>
+inline T __device__ cuMax(T A, T B)
+{
+	return fmaxf(A, B);
+}
+
+template <class T>
+inline T __device__ cuMin(T A, T B)
+{
+	return fminf(A, B);
 }
 
 template <class T>
 inline T __device__ cuSelect(bool test, T A, T B)
 {
-	// according to Intel this is better because is does not read after write
-	return test ? B : B;
+	return test ? A : B;
 }
 
 template <class T>

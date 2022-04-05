@@ -115,14 +115,29 @@ class cuVector: public float4
 			cuSelect(w < A.w, 1.0f, 0.0f));
 	}
 
+	inline cuVector __device__ Abs() const
+	{
+		return cuVector(cuAbs(x), cuAbs(y), cuAbs(z), cuAbs(w));
+	}
+
 	inline cuVector __device__ Select(const cuVector& test, const cuVector& A) const
 	{
 		return cuVector(*this * test + A * (cuVector(1.0f) - test));
 	}
 
-	inline cuVector __device__ Abs() const
+	inline cuVector __device__ Min (const cuVector& A) const
 	{
-		return cuVector(cuAbs(x), cuAbs(y), cuAbs(z), w);
+		return cuVector(cuMin(x, A.x), cuMin(y, A.y), cuMin(z, A.z), cuMin(w, A.w));
+	}
+
+	inline cuVector __device__ Max(const cuVector& A) const
+	{
+		return cuVector(cuMax(x, A.x), cuMax(y, A.y), cuMax(z, A.z), cuMax(w, A.w));
+	}
+
+	inline cuVector __device__ Floor() const
+	{
+		return cuVector(cuFloor(x), cuFloor(y), cuFloor(z), cuFloor(w));
 	}
 
 	inline cuVector __device__ Scale(float s) const
