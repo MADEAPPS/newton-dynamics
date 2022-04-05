@@ -28,6 +28,8 @@ ndCudaContext::ndCudaContext()
 	,m_transformBufferCpu0()
 	,m_transformBufferCpu1()
 	,m_transformBufferGpu()
+	,m_boundingBoxGpu()
+	,m_scan()
 	,m_stream0(0)
 {
 	cudaError_t cudaStatus;

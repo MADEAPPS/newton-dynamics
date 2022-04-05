@@ -36,4 +36,12 @@ class cuSpatialVector
 	cuVector m_angular;
 };
 
+class cuBoundingBox
+{
+	public:
+	cuVector m_min;
+	cuVector m_max;
+};
+
+
 #endif
