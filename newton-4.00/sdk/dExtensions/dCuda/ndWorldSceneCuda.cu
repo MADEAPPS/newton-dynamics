@@ -46,9 +46,9 @@ __global__ void CudaAddBodyPadding(Predicate PaddLastBlock, cuBodyProxy* bodyArr
 }
 
 template <typename Predicate>
-__global__ void CudaMergeAabb(Predicate ReducedAabb, cuBoundingBox* bBox, ndInt32 count)
+__global__ void CudaMergeAabb(Predicate ReducedAabb, ndGpuInfo* const info, cuBoundingBox* bBox, ndInt32 count)
 {
-	ReducedAabb(bBox, count);
+	ReducedAabb(info, bBox, count);
 }
 
 template <typename Predicate>
@@ -341,7 +341,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
-	auto ReducedAabb = [] __device__(cuBoundingBox * bBoxOut, int index)
+	auto ReducedAabb = [] __device__(ndGpuInfo* const info, cuBoundingBox* bBoxOut, int index)
 	{
 		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
 
@@ -367,8 +367,12 @@ void ndWorldSceneCuda::InitBodyArray()
 
 		if (threadIdx.x == 0)
 		{
-			bBoxOut[0].m_min = (aabb[0].m_min.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE);
-			bBoxOut[0].m_max = (aabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE);
+			cuVector minBox((aabb[0].m_min.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE));
+			cuVector maxBox((aabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE));
+			minBox.w = 0.0f;
+			maxBox.w = 0.0f;
+			info->m_worldBox.m_min = minBox;
+			info->m_worldBox.m_max = maxBox;
 		}
 	};
 
@@ -460,6 +464,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
+	ndGpuInfo* const info = m_context->m_sceneInfo;
 	cudaStream_t stream = m_context->m_stream0;
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
@@ -473,5 +478,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
 	CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
 	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu, scan, threads);
-	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, bBoxGpu, blocksCount);
+	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, info, bBoxGpu, blocksCount);
 }

@@ -69,6 +69,9 @@ ndCudaContext::ndCudaContext()
 	//cudaStatus = cudaStreamCreate(&m_stream1);
 	//dAssert(cudaStatus == cudaSuccess);
 
+	cudaStatus = cudaMalloc((void**)&m_sceneInfo, sizeof(m_sceneInfo));
+	dAssert(cudaStatus == cudaSuccess);
+
 	if (cudaStatus != cudaSuccess)
 	{
 		dAssert(0);
@@ -78,6 +81,9 @@ ndCudaContext::ndCudaContext()
 ndCudaContext::~ndCudaContext()
 {
 	cudaError_t cudaStatus;
+	cudaStatus = cudaFree(m_sceneInfo);
+	dAssert(cudaStatus == cudaSuccess);
+
 	cudaStatus = cudaStreamDestroy(m_stream0);
 	dAssert(cudaStatus == cudaSuccess);
 

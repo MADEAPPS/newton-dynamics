@@ -42,6 +42,12 @@ class ndCudaDevice
 	struct cudaDeviceProp m_prop;
 };
 
+class ndGpuInfo
+{
+	public:
+	cuBoundingBox m_worldBox;
+};
+
 class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 {
 	public: 
@@ -51,6 +57,7 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 
 	void SwapBuffers();
 	
+	ndGpuInfo* m_sceneInfo;
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
 	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;
