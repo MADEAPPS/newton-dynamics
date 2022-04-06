@@ -21,8 +21,36 @@
 
 #include "ndCudaContext.h"
 
+ndCudaDevice::ndCudaDevice()
+{
+	cudaError_t cudaStatus;
+	cudaStatus = cudaGetDeviceProperties(&m_prop, 0);
+	dAssert(cudaStatus == cudaSuccess);
+
+	cudaStatus = cudaSetDevice(0);
+	dAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
+	m_valid = (cudaStatus == cudaSuccess);
+}
+
+ndCudaDevice::~ndCudaDevice()
+{
+	cudaError_t cudaStatus;
+	cudaStatus = cudaDeviceReset();
+	dAssert(cudaStatus == cudaSuccess);
+
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
+}
+
 ndCudaContext::ndCudaContext()
 	:ndClassAlloc()
+	,ndCudaDevice()
 	,m_bodyBufferCpu(D_GRANULARITY)
 	,m_bodyBufferGpu()
 	,m_transformBufferCpu0()
@@ -33,13 +61,8 @@ ndCudaContext::ndCudaContext()
 	,m_stream0(0)
 {
 	cudaError_t cudaStatus;
-	cudaStatus = cudaGetDeviceProperties(&m_prop, 0);
-	dAssert(cudaStatus == cudaSuccess);
 
-	cudaStatus = cudaSetDevice(0);
-	dAssert(cudaStatus == cudaSuccess);
-
-	// create tow strem for double buffer updates
+	// create two streams for double buffer updates
 	cudaStatus = cudaStreamCreate(&m_stream0);
 	dAssert(cudaStatus == cudaSuccess);
 
@@ -60,9 +83,6 @@ ndCudaContext::~ndCudaContext()
 
 	//cudaStatus = cudaStreamDestroy(m_stream1);
 	//dAssert(cudaStatus == cudaSuccess);
-
-	cudaStatus = cudaDeviceReset();
-	dAssert(cudaStatus == cudaSuccess);
 
 	if (cudaStatus != cudaSuccess)
 	{

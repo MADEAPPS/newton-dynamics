@@ -130,7 +130,8 @@ void ndWorldSceneCuda::LoadBodyData()
 		cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 
 		ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		//const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			cuSpatialVector transform;
@@ -363,7 +364,7 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto UpdateAABB = [] __device__(cuBodyProxy& body, cuBoundingBox* bBox, int* scan)
 	{
-		__shared__  cuVector aabb[D_THREADS_PER_BLOCK][2];
+		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
 		// calculate shape global Matrix
 		body.m_globalSphapeRotation = body.m_localRotation * body.m_rotation;
 		cuMatrix3x3 matrix(body.m_globalSphapeRotation.GetMatrix3x3());
@@ -405,24 +406,24 @@ void ndWorldSceneCuda::InitBodyArray()
 		// save aabb and calculate bonding box for this thread block
 		body.m_minAabb = minBox;
 		body.m_maxAabb = maxBox;
-		aabb[threadIdx.x][0] = minBox;
-		aabb[threadIdx.x][1] = maxBox;
+		aabb[threadIdx.x].m_min = minBox;
+		aabb[threadIdx.x].m_max = maxBox;
 		__syncthreads();
 
 		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
 		{
 			if (threadIdx.x < i)
 			{
-				aabb[threadIdx.x][0] = aabb[threadIdx.x][0].Min(aabb[threadIdx.x + i][0]);
-				aabb[threadIdx.x][1] = aabb[threadIdx.x][1].Max(aabb[threadIdx.x + i][1]);
+				aabb[threadIdx.x].m_min = aabb[threadIdx.x].m_min.Min(aabb[threadIdx.x + i].m_min);
+				aabb[threadIdx.x].m_max = aabb[threadIdx.x].m_max.Max(aabb[threadIdx.x + i].m_max);
 			}
 			__syncthreads();
 		}
 
 		if (threadIdx.x == 0)
 		{
-			bBox[blockDim.x].m_min = aabb[0][0];
-			bBox[blockDim.x].m_max = aabb[0][1];
+			bBox[blockIdx.x].m_min = aabb[0].m_min;
+			bBox[blockIdx.x].m_max = aabb[0].m_max;
 		}
 	};
 	
@@ -434,8 +435,10 @@ void ndWorldSceneCuda::InitBodyArray()
 	int* const scan = &m_context->m_scan[0];
 	cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 	cuBoundingBox* const bBoxGpu = &m_context->m_boundingBoxGpu[0];
-	ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
 
-	CudaAddBodyPadding <<<1, D_THREADS_PER_BLOCK, 0, stream >>> (InitSentinelPadding, PaddBodyArray, bodiesGpu, sentinelIndex);
+	ndInt32 sentinelBlock = (blocks - 1) * D_THREADS_PER_BLOCK;
+	ndInt32 sentinelIndex = (m_context->m_bodyBufferCpu.GetCount() - 1) - sentinelBlock;
+
+	CudaAddBodyPadding <<<1, D_THREADS_PER_BLOCK, 0, stream >>> (InitSentinelPadding, PaddBodyArray, &bodiesGpu[sentinelBlock], sentinelIndex);
 	CudaInitBodyArray <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (UpdateAABB, bodiesGpu, bBoxGpu, scan, threads);
 }

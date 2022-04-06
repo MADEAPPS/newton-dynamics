@@ -72,7 +72,13 @@ cuHostBuffer<T>::~cuHostBuffer()
 {
 	if (m_array)
 	{
-		cudaFreeHost(m_array);
+		cudaError_t cudaStatus = cudaSuccess;
+		cudaStatus = cudaFreeHost(m_array);
+		dAssert(cudaStatus == cudaSuccess);
+		if (cudaStatus != cudaSuccess)
+		{
+			dAssert(0);
+		}
 	}
 }
 

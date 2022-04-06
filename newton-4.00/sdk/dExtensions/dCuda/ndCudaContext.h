@@ -32,7 +32,17 @@
 #include "cuSolverTypes.h"
 #include "cuDeviceBuffer.h"
 
-class ndCudaContext : public ndClassAlloc
+class ndCudaDevice
+{
+	public:
+	ndCudaDevice();
+	~ndCudaDevice();
+
+	ndInt32 m_valid;
+	struct cudaDeviceProp m_prop;
+};
+
+class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 {
 	public: 
 	ndCudaContext();
@@ -40,8 +50,7 @@ class ndCudaContext : public ndClassAlloc
 	static ndCudaContext* CreateContext();
 
 	void SwapBuffers();
-
-	struct cudaDeviceProp m_prop;
+	
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
 	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;

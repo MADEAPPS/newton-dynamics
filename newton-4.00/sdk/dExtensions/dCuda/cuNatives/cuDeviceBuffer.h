@@ -70,7 +70,13 @@ cuDeviceBuffer<T>::~cuDeviceBuffer()
 {
 	if (m_array)
 	{
-		cudaFree(m_array);
+		cudaError_t cudaStatus = cudaSuccess;
+		cudaStatus = cudaFree(m_array);
+		dAssert(cudaStatus == cudaSuccess);
+		if (cudaStatus != cudaSuccess)
+		{
+			dAssert(0);
+		}
 	}
 }
 
