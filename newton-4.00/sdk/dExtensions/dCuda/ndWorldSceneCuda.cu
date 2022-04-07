@@ -74,11 +74,16 @@ __global__ void CudaCountAabb(Predicate CountAabb, ndGpuInfo* const info, cuBody
 }
 
 template <typename Predicate>
-__global__ void CudaPrefixScanSum(Predicate PrefixScan, int* scan)
+__global__ void CudaPrefixScanSum0(Predicate PrefixScan, int* scan)
 {
 	PrefixScan(scan);
 }
 
+template <typename Predicate>
+__global__ void CudaPrefixScanSum1(Predicate PrefixScan, int* scan, int size)
+{
+	PrefixScan(scan, size);
+}
 
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
@@ -501,7 +506,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		scan[index] = count;
 	};
 
-	auto PrefixScanSum = [] __device__(int* scan)
+	auto PrefixScanSum0 = [] __device__(int* scan)
 	{
 		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
 
@@ -522,6 +527,19 @@ void ndWorldSceneCuda::InitBodyArray()
 		scan[index] = cacheBuffer[threadId];
 	};
 
+	auto PrefixScanSum1 = [] __device__(int* scan, int size)
+	{
+		int threadId = threadIdx.x;
+		const int blocks = size / D_THREADS_PER_BLOCK;
+		for (int i = 1; i < blocks; i ++)
+		{
+			int sum = scan[i * D_THREADS_PER_BLOCK - 1];
+			__syncthreads();
+			scan[i * D_THREADS_PER_BLOCK + threadId] += sum;
+			__syncthreads();
+		}
+	};
+
 
 	ndGpuInfo* const info = m_context->m_sceneInfo;
 	cudaStream_t stream = m_context->m_stream0;
@@ -540,5 +558,6 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, info, bBoxGpu, blocksCount);
 
 	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
-	CudaPrefixScanSum << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum, scan);
+	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scan);
+	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, scan, threads);
 }
