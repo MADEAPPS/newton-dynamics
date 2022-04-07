@@ -57,47 +57,6 @@ class ndTask
 	friend class ndThreadPool;
 };
 
-class ndThreadPoolJob_old
-{
-	public:
-	ndThreadPoolJob_old() 
-	{
-	}
-
-	virtual ~ndThreadPoolJob_old() 
-	{
-	}
-
-	ndInt32 GetThreadId() const 
-	{ 
-		return m_threadIndex; 
-	}
-
-	ndInt32 GetThreadCount() const
-	{
-		return m_threadCount;
-	}
-
-	ndThreadPool* GetThreadPool() const
-	{
-		return m_threadPool;
-	}
-
-	void* GetContext() const
-	{
-		return m_context;
-	}
-
-	virtual void Execute() = 0;
-
-	private:
-	void* m_context;
-	ndThreadPool* m_threadPool;
-	ndInt32 m_threadCount;
-	ndInt32 m_threadIndex;
-	friend class ndThreadPool;
-};
-
 class ndThreadPool: public ndSyncMutex, public ndThread
 {
 	class ndWorker: public ndThread

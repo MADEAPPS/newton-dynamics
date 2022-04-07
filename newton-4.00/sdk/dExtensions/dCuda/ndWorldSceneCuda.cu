@@ -48,14 +48,19 @@ __global__ void CudaAddBodyPadding(Predicate PaddLastBlock, cuBodyProxy* bodyArr
 template <typename Predicate>
 __global__ void CudaMergeAabb(Predicate ReducedAabb, ndGpuInfo* const info, cuBoundingBox* bBox, ndInt32 count)
 {
-	ReducedAabb(info, bBox, count);
+	ReducedAabb(*info, bBox, count);
 }
 
 template <typename Predicate>
-__global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuBodyProxy* bodyArray, cuBoundingBox* bBox, int* scan, int size)
+__global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuBodyProxy* bodyArray, cuBoundingBox* bBox)
 {
-	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	UpdateBodyScene(bodyArray[index], bBox, scan);
+	UpdateBodyScene(bodyArray, bBox);
+}
+
+template <typename Predicate>
+__global__ void CudaCountAabb(Predicate CountAabb, ndGpuInfo* const info, cuBodyProxy* bodyArray, int* scan)
+{
+	CountAabb(*info, bodyArray, scan);
 }
 
 template <typename Predicate>
@@ -341,7 +346,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
-	auto ReducedAabb = [] __device__(ndGpuInfo* const info, cuBoundingBox* bBoxOut, int index)
+	auto ReducedAabb = [] __device__(ndGpuInfo& info, cuBoundingBox* bBoxOut, int index)
 	{
 		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
 
@@ -371,8 +376,8 @@ void ndWorldSceneCuda::InitBodyArray()
 			cuVector maxBox((aabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE));
 			minBox.w = 0.0f;
 			maxBox.w = 0.0f;
-			info->m_worldBox.m_min = minBox;
-			info->m_worldBox.m_max = maxBox;
+			info.m_worldBox.m_min = minBox;
+			info.m_worldBox.m_max = maxBox;
 		}
 	};
 
@@ -399,9 +404,13 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto UpdateAabb = [] __device__(cuBodyProxy& body, cuBoundingBox* bBox, int* scan)
+	auto UpdateAabb = [] __device__(cuBodyProxy* bodyArray, cuBoundingBox* bBox)
 	{
 		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
+
+		int index = threadIdx.x + blockDim.x * blockIdx.x;
+		cuBodyProxy& body = bodyArray[index];
+
 		// calculate shape global Matrix
 		body.m_globalSphapeRotation = body.m_localRotation * body.m_rotation;
 		cuMatrix3x3 matrix(body.m_globalSphapeRotation.GetMatrix3x3());
@@ -431,15 +440,6 @@ void ndWorldSceneCuda::InitBodyArray()
 		const cuVector minBox(origin - size - padding);
 		const cuVector maxBox(origin + size + padding);
 
-		int x0 = __float2int_rd(minBox.x * D_CUDA_SCENE_INV_GRID_SIZE);
-		int y0 = __float2int_rd(minBox.y * D_CUDA_SCENE_INV_GRID_SIZE);
-		int z0 = __float2int_rd(minBox.z * D_CUDA_SCENE_INV_GRID_SIZE);
-		int x1 = __float2int_rd(maxBox.x * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int y1 = __float2int_rd(maxBox.y * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int z1 = __float2int_rd(maxBox.z * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
-		scan[threadIdx.x + blockDim.x * blockIdx.x] = count;
-
 		// save aabb and calculate bonding box for this thread block
 		body.m_minAabb = minBox;
 		body.m_maxAabb = maxBox;
@@ -464,6 +464,34 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
+	auto CountAabb = [] __device__(const ndGpuInfo& info, const cuBodyProxy* bodyArray, int* scan)
+	{
+		__shared__  cuBoundingBox cacheAabb;
+		if (threadIdx.x == 0)
+		{
+			cacheAabb.m_min = info.m_worldBox.m_min;
+			cacheAabb.m_max = info.m_worldBox.m_max;
+		}
+		__syncthreads();
+
+		const cuVector minBox(cacheAabb.m_min);
+		//const cuVector maxBox(cacheAabb.m_max);
+
+		int index = threadIdx.x + blockDim.x * blockIdx.x;
+		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
+		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
+
+		int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+		int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+		int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+		int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
+		scan[index] = count;
+	};
+
+
 	ndGpuInfo* const info = m_context->m_sceneInfo;
 	cudaStream_t stream = m_context->m_stream0;
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
@@ -477,6 +505,8 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
 	CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
-	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu, scan, threads);
+	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu);
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, info, bBoxGpu, blocksCount);
+
+	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
 }
