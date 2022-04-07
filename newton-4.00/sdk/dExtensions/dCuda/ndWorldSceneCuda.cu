@@ -58,12 +58,6 @@ __global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuBodyProxy* bodyAr
 }
 
 template <typename Predicate>
-__global__ void CudaCountAabb(Predicate CountAabb, ndGpuInfo* const info, cuBodyProxy* bodyArray, int* scan)
-{
-	CountAabb(*info, bodyArray, scan);
-}
-
-template <typename Predicate>
 __global__ void CudaGetBodyTransforms(Predicate GetTransform, const cuBodyProxy* const srcBuffer, cuSpatialVector* const dstBuffer, int size)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
@@ -72,6 +66,20 @@ __global__ void CudaGetBodyTransforms(Predicate GetTransform, const cuBodyProxy*
 		GetTransform(srcBuffer[index], dstBuffer[index]);
 	}
 }
+
+template <typename Predicate>
+__global__ void CudaCountAabb(Predicate CountAabb, ndGpuInfo* const info, cuBodyProxy* bodyArray, int* scan)
+{
+	CountAabb(*info, bodyArray, scan);
+}
+
+template <typename Predicate>
+__global__ void CudaPrefixScanSum(Predicate PrefixScan, int* scan)
+{
+	PrefixScan(scan);
+}
+
+
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
@@ -440,24 +448,26 @@ void ndWorldSceneCuda::InitBodyArray()
 		const cuVector minBox(origin - size - padding);
 		const cuVector maxBox(origin + size + padding);
 
+
+		int threadId = threadIdx.x;
 		// save aabb and calculate bonding box for this thread block
 		body.m_minAabb = minBox;
 		body.m_maxAabb = maxBox;
-		aabb[threadIdx.x].m_min = minBox;
-		aabb[threadIdx.x].m_max = maxBox;
+		aabb[threadId].m_min = minBox;
+		aabb[threadId].m_max = maxBox;
 		__syncthreads();
 
 		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
 		{
-			if (threadIdx.x < i)
+			if (threadId < i)
 			{
-				aabb[threadIdx.x].m_min = aabb[threadIdx.x].m_min.Min(aabb[threadIdx.x + i].m_min);
-				aabb[threadIdx.x].m_max = aabb[threadIdx.x].m_max.Max(aabb[threadIdx.x + i].m_max);
+				aabb[threadId].m_min = aabb[threadIdx.x].m_min.Min(aabb[threadId + i].m_min);
+				aabb[threadId].m_max = aabb[threadIdx.x].m_max.Max(aabb[threadId + i].m_max);
 			}
 			__syncthreads();
 		}
 
-		if (threadIdx.x == 0)
+		if (threadId == 0)
 		{
 			bBox[blockIdx.x].m_min = aabb[0].m_min;
 			bBox[blockIdx.x].m_max = aabb[0].m_max;
@@ -491,6 +501,27 @@ void ndWorldSceneCuda::InitBodyArray()
 		scan[index] = count;
 	};
 
+	auto PrefixScanSum = [] __device__(int* scan)
+	{
+		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
+
+		int index = threadIdx.x + blockDim.x * blockIdx.x;
+
+		cacheBuffer[threadIdx.x] = 0;
+		int threadId = threadIdx.x + D_THREADS_PER_BLOCK;
+		cacheBuffer[threadId] = scan[index];
+		__syncthreads();
+		
+		for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
+		{
+			int sum = cacheBuffer[threadId] + cacheBuffer[threadId - i];
+			__syncthreads();
+			cacheBuffer[threadId] = sum;
+			__syncthreads();
+		}
+		scan[index] = cacheBuffer[threadId];
+	};
+
 
 	ndGpuInfo* const info = m_context->m_sceneInfo;
 	cudaStream_t stream = m_context->m_stream0;
@@ -509,4 +540,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, info, bBoxGpu, blocksCount);
 
 	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
+	CudaPrefixScanSum << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum, scan);
 }
