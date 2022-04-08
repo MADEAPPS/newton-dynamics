@@ -80,9 +80,9 @@ __global__ void CudaPrefixScanSum0(Predicate PrefixScan, int* scan)
 }
 
 template <typename Predicate>
-__global__ void CudaPrefixScanSum1(Predicate PrefixScan, int* scan, int size)
+__global__ void CudaPrefixScanSum1(Predicate PrefixScan, ndGpuInfo* const info, int* scan, int size, int sentinelIndex)
 {
-	PrefixScan(scan, size);
+	PrefixScan(*info, scan, size, sentinelIndex);
 }
 
 
@@ -527,7 +527,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		scan[index] = cacheBuffer[threadId];
 	};
 
-	auto PrefixScanSum1 = [] __device__(int* scan, int size)
+	auto PrefixScanSum1 = [] __device__(ndGpuInfo& info, int* scan, int size, int sentinelIndex)
 	{
 		int threadId = threadIdx.x;
 		const int blocks = size / D_THREADS_PER_BLOCK;
@@ -537,6 +537,11 @@ void ndWorldSceneCuda::InitBodyArray()
 			__syncthreads();
 			scan[i * D_THREADS_PER_BLOCK + threadId] += sum;
 			__syncthreads();
+		}
+
+		if (threadId == 0)
+		{
+			info.m_cellBodyCount = scan[sentinelIndex + 1] - scan[0];
 		}
 	};
 
@@ -559,5 +564,5 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
 	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scan);
-	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, scan, threads);
+	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, info, scan, threads, sentinelIndex);
 }

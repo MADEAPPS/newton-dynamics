@@ -29,6 +29,21 @@
 
 #include "cuVector.h"
 
+class cuAabbGridHash
+{
+	union
+	{
+		int4 m_key;
+		struct
+		{
+			int m_id;
+			int m_x;
+			int m_y;
+			int m_z;
+		};
+	};
+};
+
 class cuSpatialVector
 {
 	public:

@@ -51,16 +51,19 @@ ndCudaDevice::~ndCudaDevice()
 ndCudaContext::ndCudaContext()
 	:ndClassAlloc()
 	,ndCudaDevice()
+	,m_scan()
 	,m_bodyBufferCpu(D_GRANULARITY)
+	,m_gridHash()
 	,m_bodyBufferGpu()
+	,m_boundingBoxGpu()
 	,m_transformBufferCpu0()
 	,m_transformBufferCpu1()
 	,m_transformBufferGpu()
-	,m_boundingBoxGpu()
-	,m_scan()
 	,m_stream0(0)
 {
 	cudaError_t cudaStatus;
+
+	m_gridHash.SetCount(D_GRANULARITY * 4);
 
 	// create two streams for double buffer updates
 	cudaStatus = cudaStreamCreate(&m_stream0);
