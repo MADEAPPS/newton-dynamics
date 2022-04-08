@@ -35,6 +35,7 @@ class cuAabbGridHash
 	union
 	{
 		int4 m_key;
+		char m_bytes[4 * 3];
 		struct
 		{
 			int m_x;

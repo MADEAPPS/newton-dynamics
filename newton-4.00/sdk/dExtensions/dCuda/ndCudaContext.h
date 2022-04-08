@@ -60,6 +60,7 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 	
 	ndGpuInfo* m_sceneInfo;
 	cuDeviceBuffer<int> m_scan;
+	cuDeviceBuffer<int> m_histogram;
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
 	cuDeviceBuffer<cuAabbGridHash> m_gridHash;
 	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
