@@ -29,6 +29,21 @@
 
 #include "cuVector.h"
 
+class cuSpatialVector
+{
+	public:
+	cuVector m_linear;
+	cuVector m_angular;
+};
+
+class cuBoundingBox
+{
+	public:
+	cuVector m_min;
+	cuVector m_max;
+};
+
+
 class cuAabbGridHash
 {
 	public:
@@ -46,18 +61,50 @@ class cuAabbGridHash
 	};
 };
 
-class cuSpatialVector
+template <typename Predicate>
+__global__ void CudaHistogram(Predicate EvaluateKey, const cuAabbGridHash* array, int* histogram, int size, int digit)
 {
-	public:
-	cuVector m_linear;
-	cuVector m_angular;
-};
+	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
+	cacheBuffer[threadIdx.x] = 0;
+	__syncthreads();
+	int threadIndex = threadIdx.x;
+	int index = threadIndex + blockDim.x * blockIdx.x;
+	if (index < size)
+	{
+		int key = EvaluateKey(array[index], digit);
+		atomicAdd(&cacheBuffer[key], 1);
+	}
+	__syncthreads();
 
-class cuBoundingBox
+	histogram[index] = cacheBuffer[threadIndex];
+}
+
+//template<class T>
+class CudaCountingSort
 {
 	public:
-	cuVector m_min;
-	cuVector m_max;
+	CudaCountingSort(int* histogram, int size, cudaStream_t stream)
+		:m_histogram(histogram)
+		, m_stream(stream)
+		, m_size(size)
+		, m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
+	{
+	}
+
+	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit)
+	{
+		auto EvaluateKey = [] __device__(const cuAabbGridHash & dataElement, int digit)
+		{
+			return dataElement.m_bytes[digit];
+		};
+
+		CudaHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, m_histogram, m_size, digit);
+	}
+
+	int* m_histogram;
+	cudaStream_t m_stream;
+	int m_size;
+	int m_blocks;
 };
 
 

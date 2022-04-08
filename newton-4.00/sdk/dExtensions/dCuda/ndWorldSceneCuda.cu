@@ -40,128 +40,6 @@
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
 
-//template <class T, class cuEvaluateKey>
-//void CudaCountingSort(T* const array, T* const scratchBuffer, int size)
-//{
-//	//D_TRACKTIME();
-//	//ndEvaluateKey evaluator(context);
-//	//const ndInt32 threadCount = threadPool.GetThreadCount();
-//	//ndInt32* const scans = dAlloca(ndInt32, threadCount * (1 << keyBitSize));
-//	//
-//	//auto ndCountKeys = ndMakeObject::ndFunction([&array, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-//	//{
-//	//	D_TRACKTIME();
-//	//	ndInt32* const scan = &scans[threadIndex * (1 << keyBitSize)];
-//	//
-//	//	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-//	//	{
-//	//		scan[i] = 0;
-//	//	}
-//	//
-//	//	ndStartEnd startEnd(size, threadIndex, threadCount);
-//	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-//	//	{
-//	//		const T& entry = array[i];
-//	//		const ndInt32 key = evaluator.GetKey(entry);
-//	//		dAssert(key >= 0);
-//	//		dAssert(key < (1 << keyBitSize));
-//	//		scan[key] ++;
-//	//	}
-//	//});
-//	//
-//	//auto ndSortArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-//	//{
-//	//	D_TRACKTIME();
-//	//	ndInt32* const scan = &scans[threadIndex * (1 << keyBitSize)];
-//	//
-//	//	ndStartEnd startEnd(size, threadIndex, threadCount);
-//	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-//	//	{
-//	//		const T& entry = array[i];
-//	//		const ndInt32 key = evaluator.GetKey(entry);
-//	//		dAssert(key >= 0);
-//	//		dAssert(key < (1 << keyBitSize));
-//	//		const ndInt32 index = scan[key];
-//	//		scratchBuffer[index] = entry;
-//	//		scan[key] = index + 1;
-//	//	}
-//	//});
-//	//
-//	//threadPool.ParallelExecute(ndCountKeys);
-//	//
-//	//ndInt32 bits = keyBitSize;
-//	//if (bits < 11)
-//	//{
-//	//	ndInt32 sum = 0;
-//	//	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-//	//	{
-//	//		for (ndInt32 j = 0; j < threadCount; ++j)
-//	//		{
-//	//			ndInt32 k = j * (1 << keyBitSize) + i;
-//	//			ndInt32 partialSum = scans[k];
-//	//			scans[k] = sum;
-//	//			sum += partialSum;
-//	//		}
-//	//	}
-//	//}
-//	//else
-//	//{
-//	//	dAssert(0);
-//	//}
-//	//
-//	//threadPool.ParallelExecute(ndSortArray);
-
-
-template <class T, typename Predicate>
-__global__ void CudaHistogram(Predicate EvaluateKey, const T* array, int* histogram, int size, int digit)
-{
-	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
-	cacheBuffer[threadIdx.x] = 0;
-	__syncthreads();
-	int threadIndex = threadIdx.x;
-	int index = threadIndex + blockDim.x * blockIdx.x;
-	if (index < size)
-	{
-		int4 xxxx = array[index].m_key;
-		int key = EvaluateKey(array[index], digit);
-		atomicAdd(&cacheBuffer[key], 1);
-	}
-	__syncthreads();
-
-	histogram[index] = cacheBuffer[threadIndex];
-}
-
-template<class T>
-class CudaCountingSort
-{
-	public:
-	CudaCountingSort(int* histogram, int size, cudaStream_t stream)
-		:m_histogram(histogram)
-		,m_stream(stream)
-		,m_size(size)
-		,m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
-	{
-	}
-
-	void Sort(const T* const src, T* const dst, int digit)
-	{
-		auto EvaluateKey = [] __device__(const T& dataElement, int digit) 
-		{ 
-			return dataElement.m_bytes[digit];
-		};
-
-		//CudaHistogram << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, info, bodiesGpu, scan, hashArray);
-		CudaHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, m_histogram, m_size, digit);
-	}
-
-	int* m_histogram;
-	cudaStream_t m_stream;
-	int m_size;
-	int m_blocks;
-};
-
-
-
 template <typename Predicate>
 __global__ void CudaAddBodyPadding(Predicate PaddLastBlock, cuBodyProxy* bodyArray, int blocksCount, int sentinelIndex)
 {
@@ -748,6 +626,12 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, info, scan, threads, sentinelIndex);
 	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, info, bodiesGpu, scan, hashArray);
 
-	CudaCountingSort<cuAabbGridHash> sortHash(histogram, threads, stream);
-	sortHash.Sort(hashArray, hashArray, 9);
+	CudaCountingSort sortHash(histogram, threads, stream);
+	for (int i = 2; i >= 0; --i)
+	{
+		sortHash.Sort(hashArray, hashArray, i * 4 + 1);
+		// swapt pointers
+		sortHash.Sort(hashArray, hashArray, i * 4 + 0);
+		// swapt pointers
+	}
 }
