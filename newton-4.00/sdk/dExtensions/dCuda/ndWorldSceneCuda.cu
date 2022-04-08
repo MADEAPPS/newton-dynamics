@@ -85,6 +85,12 @@ __global__ void CudaPrefixScanSum1(Predicate PrefixScan, ndGpuInfo* const info, 
 	PrefixScan(*info, scan, size, sentinelIndex);
 }
 
+template <typename Predicate>
+__global__ void CudaGenerateGridHash(Predicate GenerateHash, ndGpuInfo* const info, cuBodyProxy* bodyArray, int* scan, cuAabbGridHash* hashArray)
+{
+	GenerateHash(*info, bodyArray, scan, hashArray);
+}
+
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
@@ -194,12 +200,12 @@ void ndWorldSceneCuda::LoadBodyData()
 	const ndInt32 cpuBodyCount = bodyArray.GetCount();
 	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
 	
+	scan.SetCount(gpuBodyCount + 1);
 	bodyBufferCpu.SetCount(cpuBodyCount);
 	bodyBufferGpu.SetCount(gpuBodyCount);
 	transformBufferGpu.SetCount(cpuBodyCount);
 	transformBufferCpu0.SetCount(cpuBodyCount);
 	transformBufferCpu1.SetCount(cpuBodyCount);
-	scan.SetCount(gpuBodyCount);
 	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
 
 	ParallelExecute(UploadBodies);
@@ -503,7 +509,56 @@ void ndWorldSceneCuda::InitBodyArray()
 		int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 		int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 		int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
-		scan[index] = count;
+		scan[index + 1] = count;
+		if (index == 0)
+		{
+			scan[0] = 0;
+		}
+	};
+
+	auto GenerateHash = [] __device__(const ndGpuInfo & info, const cuBodyProxy* bodyArray, const int* scan, cuAabbGridHash* hashArray)
+	{
+		__shared__  cuBoundingBox cacheAabb;
+		if (threadIdx.x == 0)
+		{
+			cacheAabb.m_min = info.m_worldBox.m_min;
+			cacheAabb.m_max = info.m_worldBox.m_max;
+		}
+		__syncthreads();
+
+		const cuVector minBox(cacheAabb.m_min);
+		int index = threadIdx.x + blockDim.x * blockIdx.x;
+		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
+		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
+
+		int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+		int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+		int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+		int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		//int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
+
+		int start = scan[index];
+		//int count = scan[index + 1] - start;
+
+		cuAabbGridHash hash;
+		hash.m_id = index;
+		for (int z = z0; z < z1; z++)
+		{
+			hash.m_z = z;
+			for (int y = y0; y < y1; y++)
+			{
+				hash.m_y = y;
+				for (int x = x0; x < x1; x++)
+				{
+					hash.m_x = x;
+					int4 val = hash.m_key;
+					hashArray[start].m_key = val;
+					start++;
+				}
+			}
+		}
 	};
 
 	auto PrefixScanSum0 = [] __device__(int* scan)
@@ -541,7 +596,7 @@ void ndWorldSceneCuda::InitBodyArray()
 
 		if (threadId == 0)
 		{
-			info.m_cellBodyCount = scan[sentinelIndex + 1] - scan[0];
+			info.m_cellBodyCount = scan[sentinelIndex + 1];
 		}
 	};
 
@@ -554,6 +609,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	dAssert(blocksCount * D_THREADS_PER_BLOCK == threads);
 
 	int* const scan = &m_context->m_scan[0];
+	cuAabbGridHash* const hashArray = &m_context->m_gridHash[0];
 	cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 	cuBoundingBox* const bBoxGpu = &m_context->m_boundingBoxGpu[0];
 
@@ -565,4 +621,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
 	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scan);
 	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, info, scan, threads, sentinelIndex);
+	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, info, bodiesGpu, scan, hashArray);
 }
