@@ -39,7 +39,6 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
-
 template <typename Predicate>
 __global__ void CudaAddBodyPadding(Predicate PaddLastBlock, cuBodyProxy* bodyArray, int blocksCount, int sentinelIndex)
 {

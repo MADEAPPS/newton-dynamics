@@ -2953,7 +2953,6 @@ void ndIsoSurface::ndImplementation::RemoveDuplicates(const ndArray<ndVector>& p
 	const ndVector origin(m_boxP0);
 	const ndVector invGridSize(m_invGridSize);
 
-	//const ndVector rounding(ndVector::m_half);
 	const ndVector rounding(ndVector::m_zero);
 	ndUpperDigit upperDigits;
 	const ndGridHashSteps steps;
@@ -3217,37 +3216,37 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 		m_triangles[i].m_w = ndFloat32(i);
 	}
 
-	ndInt32 xDimSize = me->m_volumeSizeX * D_LOW_RES_FRACTION;
+	const ndInt32 xDimSize = me->m_volumeSizeX * D_LOW_RES_FRACTION;
 	ndCountingSort<ndVector, ndKey_lowX, 8>(m_triangles, m_trianglesScratchBuffer);
 	if (xDimSize >= 256)
 	{
 		ndCountingSort<ndVector, ndKey_midleX, 8>(m_triangles, m_trianglesScratchBuffer);
-		if (xDimSize >= 256 * 256)
-		{
-			ndCountingSort<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer);
-		}
+	}
+	if (xDimSize >= 256 * 256)
+	{
+		ndCountingSort<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer);
 	} 
 	
-	ndInt32 yDimSize = me->m_volumeSizeY * D_LOW_RES_FRACTION;
+	const ndInt32 yDimSize = me->m_volumeSizeY * D_LOW_RES_FRACTION;
 	ndCountingSort<ndVector, ndKey_lowY, 8>(m_triangles, m_trianglesScratchBuffer);
 	if (yDimSize >= 256)
 	{
 		ndCountingSort<ndVector, ndKey_midleY, 8>(m_triangles, m_trianglesScratchBuffer);
-		if (yDimSize >= 256 * 256)
-		{
-			ndCountingSort<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer);
-		}
+	}
+	if (yDimSize >= 256 * 256)
+	{
+		ndCountingSort<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer);
 	}
 	
-	ndInt32 zDimSize = me->m_volumeSizeZ * D_LOW_RES_FRACTION;
+	const ndInt32 zDimSize = me->m_volumeSizeZ * D_LOW_RES_FRACTION;
 	ndCountingSort<ndVector, ndKey_lowZ, 8>(m_triangles, m_trianglesScratchBuffer);
 	if (zDimSize >= 256)
 	{
 		ndCountingSort<ndVector, ndKey_midleZ, 8>(m_triangles, m_trianglesScratchBuffer);
-		if (yDimSize >= 256 * 256)
-		{
-			ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer);
-		}
+	}
+	if (zDimSize >= 256 * 256)
+	{
+		ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer);
 	}
 	
 	const ndInt32 count = m_triangles.GetCount();

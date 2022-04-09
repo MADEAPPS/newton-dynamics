@@ -78,21 +78,31 @@ void ndDynamicsUpdate::Clear()
 void ndDynamicsUpdate::SortBodyJointScan()
 {
 	D_TRACKTIME();
-	class ndEvaluateKey
+	class ndEvaluateKey0
 	{
 		public:
-		ndEvaluateKey(void* const context)
+		ndEvaluateKey0(void* const)
 		{
-			ndInt32 digit = *((ndInt32*)context);
-			m_shift = digit * D_MAX_BODY_RADIX_BIT;
 		}
 
 		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
-			ndUnsigned32 key = entry.m_body >> m_shift;
-			return key & ((1<< D_MAX_BODY_RADIX_BIT)-1);
+			return entry.m_body & ((1 << D_MAX_BODY_RADIX_BIT) - 1);
 		}
-		ndUnsigned32 m_shift;
+	};
+
+	class ndEvaluateKey1
+	{
+		public:
+		ndEvaluateKey1(void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
+		{
+			ndUnsigned32 key = entry.m_body >> D_MAX_BODY_RADIX_BIT;
+			return key & ((1 << D_MAX_BODY_RADIX_BIT) - 1);
+		}
 	};
 
 	ndScene* const scene = m_world->GetScene();
@@ -128,11 +138,17 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	scene->GetScratchBuffer().SetCount(bodyJointPairs.GetCount() * sizeof (ndJointBodyPairIndex));
 	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)&scene->GetScratchBuffer()[0];
 
-	ndInt32 digit = 0;
-	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), &digit);
+	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey0, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount());
+	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey1, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount());
 
-	digit = 1;
-	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount(), &digit);
+#ifdef _DEBUG
+	for (int i = 1; i < bodyJointPairs.GetCount(); i++)
+	{
+		ndUnsigned32 key0 = bodyJointPairs[i - 1].m_body;
+		ndUnsigned32 key1 = bodyJointPairs[i + 0].m_body;
+		dAssert(key0 <= key1);
+	}
+#endif
 
 	bodyJointPairs.SetCount(bodyJointPairs.GetCount() + 1);
 	bodyJointPairs[bodyJointPairs.GetCount() - 1] = bodyJointPairs[bodyJointPairs.GetCount() - 2];

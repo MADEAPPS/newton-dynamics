@@ -146,7 +146,9 @@ class ndBodySphFluid::ndWorkingData
 
 	ndInt32 WorldToGrid(ndFloat32 x) const
 	{
-		return ndInt32 ((x - m_worlToGridOrigin) * m_worlToGridScale);
+		ndInt32 val = ndInt32((x - m_worlToGridOrigin) * m_worlToGridScale);
+		dAssert(val >= 0);
+		return val;
 	}
 
 	ndArray<ndVector> m_accel;
@@ -273,17 +275,32 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 	};
 
 	ndWorkingData& data = WorkingData();
+	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
 
 	ndCountingSort<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
-	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
 	if (keySize >= 256)
 	{
 		ndCountingSort<ndGridHash, ndKey_middle, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
-		if (keySize >= (256 * 256))
-		{
-			ndCountingSort<ndGridHash, ndKey_high, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
-		}
 	}
+	if (keySize >= (256 * 256))
+	{
+		ndCountingSort<ndGridHash, ndKey_high, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+	}
+
+#ifdef _DEBUG
+	const ndArray<ndVector>& point = GetPositions();
+	for (int i = 1; i < data.m_hashGridMap.GetCount(); i ++)
+	{
+		ndGridHash cell0(data.m_hashGridMap[i - 1]);
+		ndGridHash cell1(data.m_hashGridMap[i + 0]);
+		const ndVector p0(point[cell0.m_particleIndex]);
+		const ndVector p1(point[cell1.m_particleIndex]);
+		ndUnsigned32 key0 = data.WorldToGrid(p0.m_x);
+		ndUnsigned32 key1 = data.WorldToGrid(p1.m_x);
+		dAssert(key0 <= key1);
+		//dAssert(p0.m_x <= p1.m_x);
+	}
+#endif
 }
 
 void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
@@ -330,8 +347,8 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	};
 
 	ndWorkingData& data = WorkingData();
+	const ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
 
-	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
 	ndCountingSort<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	if (boxSize.m_iy > (1 << D_SPH_HASH_BITS))
 	{
@@ -343,6 +360,17 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	{
 		ndCountingSort<ndGridHash, ndKey_zhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	}
+
+#ifdef _DEBUG
+	for (int i = 1; i < data.m_hashGridMap.GetCount(); i++)
+	{
+		ndGridHash cell0(data.m_hashGridMap[i - 1]);
+		ndGridHash cell1(data.m_hashGridMap[i + 0]);
+		ndUnsigned64 key0 = (cell0.m_z << (D_SPH_HASH_BITS * 2)) + cell0.m_y;
+		ndUnsigned64 key1 = (cell1.m_z << (D_SPH_HASH_BITS * 2)) + cell1.m_y;
+		dAssert(key0 <= key1);
+	}
+#endif
 }
 
 void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
