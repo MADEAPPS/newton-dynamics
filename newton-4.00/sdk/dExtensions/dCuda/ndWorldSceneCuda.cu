@@ -627,11 +627,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, info, bodiesGpu, scan, hashArray);
 
 	CudaCountingSort sortHash(histogram, threads, stream);
-	for (int i = 2; i >= 0; --i)
-	{
-		sortHash.Sort(hashArray, hashArray, i * 4 + 1);
-		// swapt pointers
-		sortHash.Sort(hashArray, hashArray, i * 4 + 0);
-		// swapt pointers
-	}
+	sortHash.Sort(hashArray, hashArray);
 }

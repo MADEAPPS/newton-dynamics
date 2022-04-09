@@ -91,6 +91,18 @@ class CudaCountingSort
 	{
 	}
 
+
+	void Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst)
+	{
+		for (int i = 2; i >= 0; --i)
+		{
+			Sort(src, dst, i * 4 + 1);
+			Sort(dst, src, i * 4 + 0);
+		}
+	}
+
+	// Cuda does not let provate of protected lamdda to be passes as argumnet of kerners.
+	public:
 	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit)
 	{
 		auto EvaluateKey = [] __device__(const cuAabbGridHash & dataElement, int digit)
