@@ -61,22 +61,39 @@ class cuAabbGridHash
 };
 
 template <typename Predicate>
-__global__ void CudaSortHistogram(Predicate EvaluateKey, const cuAabbGridHash* array, int* histogram, int size, int digit)
+__global__ void CudaSortHistogram(Predicate EvaluateKey, const cuAabbGridHash* src, int* histogram, int size, int digit)
 {
 	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
 
-	cacheBuffer[threadIdx.x] = 0;
-	__syncthreads();
 	int threadIndex = threadIdx.x;
+	cacheBuffer[threadIndex] = 0;
+	__syncthreads();
 	int index = threadIndex + blockDim.x * blockIdx.x;
 	if (index < size)
 	{
-		int key = EvaluateKey(array[index], digit);
+		int key = EvaluateKey(src[index], digit);
 		atomicAdd(&cacheBuffer[key], 1);
 	}
 	__syncthreads();
-
 	histogram[index] = cacheBuffer[threadIndex];
+}
+
+template <typename Predicate>
+__global__ void CudaSortItems(Predicate EvaluateKey, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
+{
+	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
+
+	int threadIndex = threadIdx.x;
+	int index = threadIndex + blockDim.x * blockIdx.x;
+
+	cacheBuffer[threadIndex] = histogram[index];
+	__syncthreads();
+	if (index < size)
+	{
+		int key = EvaluateKey(src[index], digit);
+		int dstIndex = atomicAdd(&cacheBuffer[key], 1);
+		dst[dstIndex] = src[index];
+	}
 }
 
 template <typename Predicate>
@@ -161,6 +178,7 @@ class CudaCountingSort
 
 		CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, m_histogram, m_size, digit);
 		CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, m_histogram, m_size);
+		CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, dst, m_histogram, m_size, digit);
 	}
 
 	int* m_histogram;

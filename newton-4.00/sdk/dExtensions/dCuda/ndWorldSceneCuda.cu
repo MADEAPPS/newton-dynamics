@@ -80,9 +80,9 @@ __global__ void CudaPrefixScanSum0(Predicate PrefixScan, int* scan)
 }
 
 template <typename Predicate>
-__global__ void CudaPrefixScanSum1(Predicate PrefixScan, ndGpuInfo* const info, int* scan, int size, int sentinelIndex)
+__global__ void CudaPrefixScanSum1(Predicate PrefixScan, ndGpuInfo* const info, int* scan, int size, int sentinelIndex, int gridCapacity)
 {
-	PrefixScan(*info, scan, size, sentinelIndex);
+	PrefixScan(*info, scan, size, sentinelIndex, gridCapacity);
 }
 
 template <typename Predicate>
@@ -504,13 +504,13 @@ void ndWorldSceneCuda::InitBodyArray()
 		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
 		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
 
-		int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
-		int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
-		int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
-		int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
+		const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
 		scan[index + 1] = count;
 		if (index == 0)
 		{
@@ -528,24 +528,23 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 		__syncthreads();
 
+		const int index = threadIdx.x + blockDim.x * blockIdx.x;
+
 		const cuVector minBox(cacheAabb.m_min);
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
 		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
 		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
 
-		int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
-		int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
-		int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
-		int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		//int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
-
-		int start = scan[index];
-		//int count = scan[index + 1] - start;
+		const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 
 		cuAabbGridHash hash;
 		hash.m_id = index;
+		int start = scan[index];
+
 		for (int z = z0; z < z1; z++)
 		{
 			hash.m_z = z;
@@ -584,7 +583,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		scan[index] = cacheBuffer[threadId];
 	};
 
-	auto PrefixScanSum1 = [] __device__(ndGpuInfo& info, int* scan, int size, int sentinelIndex)
+	auto PrefixScanSum1 = [] __device__(ndGpuInfo& info, int* scan, int size, int sentinelIndex, int gridCapacity)
 	{
 		int threadId = threadIdx.x;
 		const int blocks = size / D_THREADS_PER_BLOCK;
@@ -599,6 +598,16 @@ void ndWorldSceneCuda::InitBodyArray()
 		if (threadId == 0)
 		{
 			info.m_cellBodyCount = scan[sentinelIndex + 1];
+		}
+		__syncthreads();
+		if (info.m_cellBodyCount > gridCapacity)
+		{
+			int capacity = gridCapacity - 1024;
+			for (int i = 0; i < blocks; i++)
+			{
+				int val = scan[i * D_THREADS_PER_BLOCK + threadId];
+				scan[i * D_THREADS_PER_BLOCK + threadId] = min(val, capacity);
+			}
 		}
 	};
 
@@ -619,12 +628,10 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
 	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu);
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, info, bBoxGpu, blocksCount);
-
 	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
 	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scan);
-	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, info, scan, threads, sentinelIndex);
+	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, info, scan, threads, sentinelIndex, m_context->m_gridHash.GetCount());
 	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, info, bodiesGpu, scan, hashArray);
-
 	CudaCountingSort sortHash(histogram, threads, stream);
 	sortHash.Sort(hashArray, hashArray);
 }
