@@ -45,6 +45,12 @@ class ndCudaDevice
 class ndGpuInfo
 {
 	public:
+	ndGpuInfo()
+		:m_worldBox()
+		, m_cellBodyCount(0)
+	{
+	}
+
 	cuBoundingBox m_worldBox;
 	int m_cellBodyCount;
 };
@@ -58,11 +64,14 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 
 	void SwapBuffers();
 	
-	ndGpuInfo* m_sceneInfo;
+	ndGpuInfo* m_sceneInfoGpu;
+	ndGpuInfo* m_sceneInfoCpu0;
+	ndGpuInfo* m_sceneInfoCpu1;
 	cuDeviceBuffer<int> m_scan;
 	cuDeviceBuffer<int> m_histogram;
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
 	cuDeviceBuffer<cuAabbGridHash> m_gridHash;
+	cuDeviceBuffer<cuAabbGridHash> m_gridHashTmp;
 	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox> m_boundingBoxGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;

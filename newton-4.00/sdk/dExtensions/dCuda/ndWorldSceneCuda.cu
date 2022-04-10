@@ -244,8 +244,20 @@ void ndWorldSceneCuda::GetBodyTransforms()
 void ndWorldSceneCuda::UpdateTransform()
 {
 	D_TRACKTIME();
-	GetBodyTransforms();
 
+	// get the scene info from the update	
+	ndGpuInfo* const gpuInfo = m_context->m_sceneInfoGpu;
+	ndGpuInfo* const cpuInfo = m_context->m_sceneInfoCpu0;
+
+	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndGpuInfo), cudaMemcpyDeviceToHost, m_context->m_stream0);
+	dAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
+
+
+	GetBodyTransforms();
 	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
@@ -611,27 +623,36 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	ndGpuInfo* const info = m_context->m_sceneInfo;
+	if (m_context->m_gridHash.GetCapacity() < m_context->m_sceneInfoCpu1->m_cellBodyCount)
+	{
+		cudaDeviceSynchronize();
+		m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_cellBodyCount);
+		m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_cellBodyCount);
+		cudaDeviceSynchronize();
+	}
+
+	ndGpuInfo* const infoGpu = m_context->m_sceneInfoGpu;
 	cudaStream_t stream = m_context->m_stream0;
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	dAssert(blocksCount < D_THREADS_PER_BLOCK);
+	//dAssert(blocksCount < D_THREADS_PER_BLOCK);
 	dAssert(blocksCount * D_THREADS_PER_BLOCK == threads);
 
-	int* const scan = &m_context->m_scan[0];
-	int* const histogram = &m_context->m_histogram[0];
-	cuAabbGridHash* const hashArray = &m_context->m_gridHash[0];
+	int* const scanGpu = &m_context->m_scan[0];
+	int* const histogramGpu = &m_context->m_histogram[0];
+	cuAabbGridHash* const hashArrayGpu = &m_context->m_gridHash[0];
+	cuAabbGridHash* const hashArrayTmpGpu = &m_context->m_gridHashTmp[0];
 	cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 	cuBoundingBox* const bBoxGpu = &m_context->m_boundingBoxGpu[0];
 
 	ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
 	CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
 	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu);
-	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, info, bBoxGpu, blocksCount);
-	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, info, bodiesGpu, scan);
-	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scan);
-	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, info, scan, threads, sentinelIndex, m_context->m_gridHash.GetCount());
-	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, info, bodiesGpu, scan, hashArray);
-	CudaCountingSort sortHash(histogram, threads, stream);
-	sortHash.Sort(hashArray, hashArray);
+	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, infoGpu, bBoxGpu, blocksCount);
+	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, infoGpu, bodiesGpu, scanGpu);
+	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scanGpu);
+	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, infoGpu, scanGpu, threads, sentinelIndex, m_context->m_gridHash.GetCount());
+	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, infoGpu, bodiesGpu, scanGpu, hashArrayGpu);
+	CudaCountingSort sortHash(histogramGpu, threads, stream);
+	sortHash.Sort(hashArrayGpu, hashArrayTmpGpu);
 }
