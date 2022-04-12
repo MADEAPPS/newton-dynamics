@@ -47,14 +47,14 @@ class ndGpuInfo
 	public:
 	ndGpuInfo()
 		:m_worldBox()
-		,m_cellBodyCount(0)
+		,m_gridHashCount(0)
 		,m_sentinelIndex(0)
 	{
 	}
 
 	cuBoundingBox m_worldBox;
 	int4 m_hasUpperByteHash;
-	int m_cellBodyCount;
+	int m_gridHashCount;
 	int m_sentinelIndex;
 };
 

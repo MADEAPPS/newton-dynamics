@@ -615,11 +615,11 @@ void ndWorldSceneCuda::InitBodyArray()
 		if (threadId == 0)
 		{
 			info.m_sentinelIndex = sentinelIndex;
-			info.m_cellBodyCount = scan[sentinelIndex + 1];
+			info.m_gridHashCount = scan[sentinelIndex + 1];
 		}
-
 		__syncthreads();
-		if (info.m_cellBodyCount > gridCapacity)
+
+		if (info.m_gridHashCount > gridCapacity)
 		{
 			int capacity = gridCapacity - 1024;
 			for (int i = 0; i < blocks; i++)
@@ -630,11 +630,11 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	if (m_context->m_gridHash.GetCapacity() < m_context->m_sceneInfoCpu1->m_cellBodyCount)
+	if (m_context->m_gridHash.GetCount() < m_context->m_sceneInfoCpu1->m_gridHashCount)
 	{
 		cudaDeviceSynchronize();
-		m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_cellBodyCount);
-		m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_cellBodyCount);
+		m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
+		m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
 		cudaDeviceSynchronize();
 	}
 
@@ -642,7 +642,6 @@ void ndWorldSceneCuda::InitBodyArray()
 	cudaStream_t stream = m_context->m_stream0;
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	//dAssert(blocksCount < D_THREADS_PER_BLOCK);
 	dAssert(blocksCount * D_THREADS_PER_BLOCK == threads);
 
 	int* const scanGpu = &m_context->m_scan[0];

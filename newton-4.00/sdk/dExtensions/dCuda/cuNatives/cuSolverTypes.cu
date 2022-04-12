@@ -53,7 +53,9 @@ __global__ void CudaSortHistogram(Predicate EvaluateKey, const ndGpuInfo& info, 
 template <typename Predicate>
 __global__ void CudaSortItems(Predicate EvaluateKey, const ndGpuInfo& info, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
 {
-	__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
+	__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
+	__shared__  int cacheBufferAdress[D_THREADS_PER_BLOCK];
+	__shared__  int cacheKey[D_THREADS_PER_BLOCK];
 	__shared__  cuAabbGridHash hashCash[D_THREADS_PER_BLOCK];
 
 	int threadIndex = threadIdx.x;
@@ -63,23 +65,26 @@ __global__ void CudaSortItems(Predicate EvaluateKey, const ndGpuInfo& info, cons
 	bool test = !(digit & 1) | hasUpperByteHash;
 	if (test)
 	{
-		cacheBuffer[threadIndex] = histogram[index];
-		hashCash[threadIndex] = src[index];
+		const cuAabbGridHash& entry = src[index];
+
+		hashCash[threadIndex] = entry;
+		cacheBufferCount[threadIndex] = histogram[index];
+		cacheKey[threadIndex] = EvaluateKey(entry, digit);
 		__syncthreads();
 
 		if ((index < size) && (threadIndex == 0))
 		{
 			for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
 			{
-				int key = EvaluateKey(hashCash[i], digit);
-				int dstIndex = cacheBuffer[key];
-				//dst[dstIndex] = hashCash[i];
-				cacheBuffer[D_THREADS_PER_BLOCK + i] = dstIndex;
-				cacheBuffer[key] = dstIndex + 1;
+				//int key = EvaluateKey(hashCash[i], digit);
+				const int key = cacheKey[i];
+				const int dstIndex = cacheBufferCount[key];
+				cacheBufferAdress[i] = dstIndex;
+				cacheBufferCount[key] = dstIndex + 1;
 			}
 		}
 		__syncthreads();
-		int dstIndex = cacheBuffer[D_THREADS_PER_BLOCK + threadIndex];
+		int dstIndex = cacheBufferAdress[threadIndex];
 		dst[dstIndex] = hashCash[threadIndex];
 	}
 	else
