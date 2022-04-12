@@ -409,6 +409,11 @@ void ndWorldSceneCuda::InitBodyArray()
 			cuVector maxBox((aabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE));
 			minBox.w = 0.0f;
 			maxBox.w = 0.0f;
+			const cuVector sizeBox((maxBox - minBox).Scale(D_CUDA_SCENE_INV_GRID_SIZE));
+			info.m_hasUpperByteHash.x = (sizeBox.x >= 256);
+			info.m_hasUpperByteHash.y = (sizeBox.y >= 256);
+			info.m_hasUpperByteHash.z = (sizeBox.z >= 256);
+
 			info.m_worldBox.m_min = minBox;
 			info.m_worldBox.m_max = maxBox;
 		}
@@ -655,6 +660,6 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scanGpu);
 	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, infoGpu, scanGpu, threads, sentinelIndex, m_context->m_gridHash.GetCount());
 	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, infoGpu, bodiesGpu, scanGpu, hashArrayGpu);
-	CudaCountingSort sortHash(histogramGpu, threads, stream);
+	CudaCountingSort sortHash(infoGpu, histogramGpu, threads, stream);
 	sortHash.Sort(hashArrayGpu, hashArrayTmpGpu);
 }

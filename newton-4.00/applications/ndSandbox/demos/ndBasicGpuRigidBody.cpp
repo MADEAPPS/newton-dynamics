@@ -134,7 +134,7 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	//ndInt32 count = 32;
 	//ndInt32 count = 7;
 	//ndInt32 count = 1;
-	AddBox(scene, ndVector(0.0f, 1.0f, -3.0f, 1.0f), 1.0f, count);
+	AddBox(scene, ndVector(0.0f, 0.5f, -3.0f, 1.0f), 1.0f, count);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f - 5.0f * count, 15.0f, 0.0f, 0.0f);

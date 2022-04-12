@@ -24,62 +24,84 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 #include "cuSolverTypes.h"
+#include "ndCudaContext.h"
 
 template <typename Predicate>
-__global__ void CudaSortHistogram(Predicate EvaluateKey, const cuAabbGridHash* src, int* histogram, int size, int digit)
+__global__ void CudaSortHistogram(Predicate EvaluateKey, const ndGpuInfo& info, const cuAabbGridHash* src, int* histogram, int size, int digit)
 {
 	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
 
-	int threadIndex = threadIdx.x;
-	cacheBuffer[threadIndex] = 0;
-	__syncthreads();
-	int index = threadIndex + blockDim.x * blockIdx.x;
-
-	if (index < size)
+	bool hasUpperByteHash = (&info.m_hasUpperByteHash.x)[digit / 4] ? true : false;
+	bool test = !(digit & 1) | hasUpperByteHash;
+	if (test)
 	{
-		int key = EvaluateKey(src[index], digit);
-		atomicAdd(&cacheBuffer[key], 1);
+		int threadIndex = threadIdx.x;
+		int index = threadIndex + blockDim.x * blockIdx.x;
+
+		cacheBuffer[threadIndex] = 0;
+		__syncthreads();
+		if (index < size)
+		{
+			int key = EvaluateKey(src[index], digit);
+			atomicAdd(&cacheBuffer[key], 1);
+		}
+		__syncthreads();
+		histogram[index] = cacheBuffer[threadIndex];
 	}
-	__syncthreads();
-	histogram[index] = cacheBuffer[threadIndex];
 }
 
 template <typename Predicate>
-__global__ void CudaSortItems(Predicate EvaluateKey, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
+__global__ void CudaSortItems(Predicate EvaluateKey, const ndGpuInfo& info, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
 {
 	__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
 	__shared__  cuAabbGridHash hashCash[D_THREADS_PER_BLOCK];
 
 	int threadIndex = threadIdx.x;
 	int index = threadIndex + blockDim.x * blockIdx.x;
-	cacheBuffer[threadIndex] = histogram[index];
-	hashCash[threadIndex] = src[index];
-	__syncthreads();
 
-	if ((index < size) && (threadIndex == 0))
+	bool hasUpperByteHash = (&info.m_hasUpperByteHash.x)[digit / 4] ? true : false;
+	bool test = !(digit & 1) | hasUpperByteHash;
+	if (test)
 	{
-		for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
+		cacheBuffer[threadIndex] = histogram[index];
+		hashCash[threadIndex] = src[index];
+		__syncthreads();
+
+		if ((index < size) && (threadIndex == 0))
 		{
-			int key = EvaluateKey(hashCash[i], digit);
-			int dstIndex = cacheBuffer[key];
-			//dst[dstIndex] = hashCash[i];
-			cacheBuffer[D_THREADS_PER_BLOCK + i] = dstIndex;
-			cacheBuffer[key] = dstIndex + 1;
+			for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
+			{
+				int key = EvaluateKey(hashCash[i], digit);
+				int dstIndex = cacheBuffer[key];
+				//dst[dstIndex] = hashCash[i];
+				cacheBuffer[D_THREADS_PER_BLOCK + i] = dstIndex;
+				cacheBuffer[key] = dstIndex + 1;
+			}
 		}
+		__syncthreads();
+		int dstIndex = cacheBuffer[D_THREADS_PER_BLOCK + threadIndex];
+		dst[dstIndex] = hashCash[threadIndex];
 	}
-	__syncthreads();
-	int dstIndex = cacheBuffer[D_THREADS_PER_BLOCK + threadIndex];
-	dst[dstIndex] = hashCash[threadIndex];
+	else
+	{
+		dst[index] = src[index];
+	}
 }
 
 template <typename Predicate>
-__global__ void CudaSortPrefixScans(Predicate PrefixScan, int* histogram, int size)
+__global__ void CudaSortPrefixScans(Predicate PrefixScan, const ndGpuInfo& info, int* histogram, int size, int digit)
 {
-	PrefixScan(histogram, size);
+	bool hasUpperByteHash = (&info.m_hasUpperByteHash.x)[digit / 4] ? true : false;
+	bool test = !(digit & 1) | hasUpperByteHash;
+	if (test)
+	{
+		PrefixScan(histogram, size);
+	}
 }
 
-CudaCountingSort::CudaCountingSort(int* histogram, int size, cudaStream_t stream)
-	:m_histogram(histogram)
+CudaCountingSort::CudaCountingSort(ndGpuInfo* info, int* histogram, int size, cudaStream_t stream)
+	:m_info(info)
+	,m_histogram(histogram)
 	,m_stream(stream)
 	,m_size(size)
 	,m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
@@ -132,9 +154,9 @@ void CudaCountingSort::Sort(const cuAabbGridHash* const src, cuAabbGridHash* con
 		}
 	};
 
-	CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, m_histogram, m_size, digit);
-	CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, m_histogram, m_size);
-	CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, dst, m_histogram, m_size, digit);
+	CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, m_histogram, m_size, digit);
+	CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, *m_info, m_histogram, m_size, digit);
+	CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, dst, m_histogram, m_size, digit);
 }
 
 bool CudaCountingSort::SanityCheck(const cuAabbGridHash* const src)
@@ -149,15 +171,13 @@ bool CudaCountingSort::SanityCheck(const cuAabbGridHash* const src)
 	{
 		cuAabbGridHash key0(data[i - 1]);
 		cuAabbGridHash key1(data[i - 0]);
-		dAssert(key0.m_z <= key1.m_z);
-		if (key1.m_z == key0.m_z)
-		{
-			dAssert(key0.m_y <= key1.m_y);
-			if (key1.m_y == key0.m_y)
-			{
-				dAssert(key0.m_x <= key1.m_x);
-			}
-		}
+		bool zTest0 = key0.m_z < key1.m_z;
+		bool zTest1 = key0.m_z == key1.m_z;
+		bool yTest0 = key0.m_y < key1.m_y;
+		bool yTest1 = key0.m_y == key1.m_y;
+		bool xTest = key0.m_x <= key1.m_x;
+		bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
+		dAssert(test);
 	}
 	return true;
 }
@@ -169,5 +189,6 @@ void CudaCountingSort::Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst
 		Sort(src, dst, i * 4 + 0);
 		Sort(dst, src, i * 4 + 1);
 	}
+
 	//dAssert(SanityCheck(src));
 }

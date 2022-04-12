@@ -53,6 +53,7 @@ class ndGpuInfo
 	}
 
 	cuBoundingBox m_worldBox;
+	int4 m_hasUpperByteHash;
 	int m_cellBodyCount;
 	int m_sentinelIndex;
 };

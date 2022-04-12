@@ -29,6 +29,7 @@
 
 #include "cuVector.h"
 
+class ndGpuInfo;
 class cuSpatialVector
 {
 	public:
@@ -63,7 +64,7 @@ class cuAabbGridHash
 class CudaCountingSort
 {
 	public:
-	CudaCountingSort(int* histogram, int size, cudaStream_t stream);
+	CudaCountingSort(ndGpuInfo* info, int* histogram, int size, cudaStream_t stream);
 	void Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst);
 
 	// thi sis provate dat but Cuda does not let private of protected lamddas 
@@ -73,6 +74,7 @@ class CudaCountingSort
 
 	bool SanityCheck(const cuAabbGridHash* const src);
 
+	ndGpuInfo* m_info;
 	int* m_histogram;
 	cudaStream_t m_stream;
 	int m_size;
