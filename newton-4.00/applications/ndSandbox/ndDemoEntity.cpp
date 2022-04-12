@@ -109,7 +109,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 {
 	if (parent) 
 	{
-		Attach (parent, true);
+		Attach(parent);
 	}
 }
 

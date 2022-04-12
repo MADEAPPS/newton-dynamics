@@ -47,12 +47,14 @@ class ndGpuInfo
 	public:
 	ndGpuInfo()
 		:m_worldBox()
-		, m_cellBodyCount(0)
+		,m_cellBodyCount(0)
+		,m_sentinelIndex(0)
 	{
 	}
 
 	cuBoundingBox m_worldBox;
 	int m_cellBodyCount;
+	int m_sentinelIndex;
 };
 
 class ndCudaContext : public ndClassAlloc, public ndCudaDevice

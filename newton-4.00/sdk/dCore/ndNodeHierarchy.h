@@ -25,7 +25,7 @@ class ndNodeBaseHierarchy: public ndClassAlloc
 	D_CORE_API ndNodeBaseHierarchy* GetSibling () const;
 
 	D_CORE_API void Detach ();
-	D_CORE_API void Attach (ndNodeBaseHierarchy* const parent, bool addFirst = false);
+	D_CORE_API void Attach(ndNodeBaseHierarchy* const parent);
 	
 	D_CORE_API ndNodeBaseHierarchy* GetRoot () const;
 	D_CORE_API ndNodeBaseHierarchy* GetFirst() const;
@@ -64,7 +64,7 @@ class ndNodeHierarchy: public ndNodeBaseHierarchy
 	public:
 	ndNodeHierarchy ();
 	ndNodeHierarchy (const char* const name);
-	void Attach (T* const parent, bool addFirst = false);
+	void Attach(T* const parent);
 	void Detach ();
 	T* GetChild () const;
 	T* GetParent () const;
@@ -163,7 +163,6 @@ ndNodeHierarchy<T>::~ndNodeHierarchy ()
 {
 }
 
-
 //template<class T>
 //dNodeBaseHierarchy* ndNodeHierarchy<T>::CreateClone () const
 //{
@@ -171,9 +170,9 @@ ndNodeHierarchy<T>::~ndNodeHierarchy ()
 //}
 
 template<class T>
-void ndNodeHierarchy<T>::Attach (T* const parent, bool addFirst)
+void ndNodeHierarchy<T>::Attach(T* const parent)
 {
-	ndNodeBaseHierarchy::Attach(parent, addFirst);
+	ndNodeBaseHierarchy::Attach(parent);
 }
 
 template<class T>

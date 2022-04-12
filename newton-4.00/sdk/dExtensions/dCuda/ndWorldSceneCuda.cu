@@ -530,7 +530,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto GenerateHash = [] __device__(const ndGpuInfo & info, const cuBodyProxy* bodyArray, const int* scan, cuAabbGridHash* hashArray)
+	auto GenerateHash = [] __device__(const ndGpuInfo& info, const cuBodyProxy* bodyArray, const int* scan, cuAabbGridHash* hashArray)
 	{
 		__shared__  cuBoundingBox cacheAabb;
 		if (threadIdx.x == 0)
@@ -554,7 +554,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 
 		cuAabbGridHash hash;
-		hash.m_id = index;
+		hash.m_id = min (index, info.m_sentinelIndex);
 		int start = scan[index];
 
 		for (int z = z0; z < z1; z++)
@@ -609,8 +609,10 @@ void ndWorldSceneCuda::InitBodyArray()
 
 		if (threadId == 0)
 		{
+			info.m_sentinelIndex = sentinelIndex;
 			info.m_cellBodyCount = scan[sentinelIndex + 1];
 		}
+
 		__syncthreads();
 		if (info.m_cellBodyCount > gridCapacity)
 		{

@@ -60,132 +60,23 @@ class cuAabbGridHash
 	};
 };
 
-template <typename Predicate>
-__global__ void CudaSortHistogram(Predicate EvaluateKey, const cuAabbGridHash* src, int* histogram, int size, int digit)
-{
-	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
-
-	int threadIndex = threadIdx.x;
-	cacheBuffer[threadIndex] = 0;
-	__syncthreads();
-	int index = threadIndex + blockDim.x * blockIdx.x;
-	if (index < size)
-	{
-		int key = EvaluateKey(src[index], digit);
-		atomicAdd(&cacheBuffer[key], 1);
-	}
-	__syncthreads();
-	histogram[index] = cacheBuffer[threadIndex];
-}
-
-template <typename Predicate>
-__global__ void CudaSortItems(Predicate EvaluateKey, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
-{
-	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
-
-	int threadIndex = threadIdx.x;
-	int index = threadIndex + blockDim.x * blockIdx.x;
-
-	cacheBuffer[threadIndex] = histogram[index];
-	__syncthreads();
-	if (index < size)
-	{
-		int key = EvaluateKey(src[index], digit);
-		int dstIndex = atomicAdd(&cacheBuffer[key], 1);
-		dst[dstIndex] = src[index];
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaSortPrefixScans(Predicate PrefixScan, int* scan, int size)
-{
-	PrefixScan(scan, size);
-}
-
 class CudaCountingSort
 {
 	public:
-	CudaCountingSort(int* histogram, int size, cudaStream_t stream)
-		:m_histogram(histogram)
-		,m_stream(stream)
-		,m_size(size)
-		,m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
-	{
-	}
+	CudaCountingSort(int* histogram, int size, cudaStream_t stream);
+	void Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst);
 
-	void Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			Sort(dst, src, i * 4 + 0);
-			Sort(src, dst, i * 4 + 1);
-		}
-	}
-
-	// Cuda does not let provate of protected lamdda to be passes as argumnet of kerners.
+	// thi sis provate dat but Cuda does not let private of protected lamddas 
+	// to be passes as argumnet of kerners.
 	public:
-	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit)
-	{
-		auto EvaluateKey = [] __device__(const cuAabbGridHash & dataElement, int digit)
-		{
-			return dataElement.m_bytes[digit];
-		};
+	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit);
 
-		auto PrefixScanSum = [] __device__(int* scan, int size)
-		{
-			__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK + 1];
-			//__shared__  int xxxx[D_THREADS_PER_BLOCK];
-			//__shared__  int xxxx1[D_THREADS_PER_BLOCK];
-
-			int threadId = threadIdx.x;
-			int threadId1 = threadId + D_THREADS_PER_BLOCK;
-
-			//xxxx[threadId] = scan[threadId];
-			int sum = 0;
-			cacheBuffer[threadId] = 0;
-			if (threadId == 0)
-			{
-				cacheBuffer[threadId1] = 0;
-			}
-			const int blocks = size / D_THREADS_PER_BLOCK;
-			for (int i = 0; i < blocks; i++)
-			{
-				sum = scan[i * D_THREADS_PER_BLOCK + threadId];
-			}
-			//xxxx[threadId] = sum;
-			cacheBuffer[threadId1 + 1] = sum;
-			__syncthreads();
-			
-			for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-			{
-				int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
-				__syncthreads();
-				cacheBuffer[threadId1] = sum;
-				__syncthreads();
-			}
-			sum = cacheBuffer[threadId1];
-			//xxxx1[threadId] = sum;
-
-			for (int i = 0; i < blocks; i++)
-			{
-				int partialSum = scan[i * D_THREADS_PER_BLOCK + threadId];
-				//__syncthreads();
-				scan[i * D_THREADS_PER_BLOCK + threadId] = sum;
-				//xxxx1[threadId] = sum;
-				sum += partialSum;
-			}
-		};
-
-		CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, m_histogram, m_size, digit);
-		CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, m_histogram, m_size);
-		CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, src, dst, m_histogram, m_size, digit);
-	}
+	bool SanityCheck(const cuAabbGridHash* const src);
 
 	int* m_histogram;
 	cudaStream_t m_stream;
 	int m_size;
 	int m_blocks;
 };
-
 
 #endif

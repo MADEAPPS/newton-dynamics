@@ -32,22 +32,13 @@ ndNodeBaseHierarchy::~ndNodeBaseHierarchy ()
 	}
 }
 
-void ndNodeBaseHierarchy::Attach (ndNodeBaseHierarchy* const parentArg, bool addFirst)
+void ndNodeBaseHierarchy::Attach(ndNodeBaseHierarchy* const parent)
 {
-	m_parent = parentArg;
+	m_parent = parent;
 	if (m_parent->m_child) 
 	{
-		if (addFirst) 
-		{
-			m_sibling = m_parent->m_child;
-			m_parent->m_child = this;
-		} 
-		else 
-		{
-			ndNodeBaseHierarchy* obj = m_parent->m_child;
-			for (; obj->m_sibling; obj = obj->m_sibling);
-			obj->m_sibling = this;
-		}
+		m_sibling = m_parent->m_child;
+		m_parent->m_child = this;
 	} 
 	else 
 	{
