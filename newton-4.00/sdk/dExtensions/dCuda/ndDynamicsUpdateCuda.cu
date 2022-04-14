@@ -33,29 +33,31 @@
 #include "cuQuat.h"
 #include "cuVector.h"
 #include "cuMatrix3x3.h"
-
+#include "cuSolverTypes.h"
 #include "ndCudaContext.h"
 #include "ndWorldSceneCuda.h"
 #include "ndDynamicsUpdateCuda.h"
 
 
 template <typename Predicate>
-__global__ void CudaIntegrateUnconstrainedBodies(Predicate function, cuBodyProxy* bodyArray, float timestep, int size)
+__global__ void CudaIntegrateUnconstrainedBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < size)
+	if (info.m_frameIsValid & (index < info.m_bodyArray.m_size))
 	{
-		function(bodyArray[index], timestep);
+		cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+		IntegrateVelocity(bodyArray[index], timestep);
 	}
 }
 
 template <typename Predicate>
-__global__ void CudaIntegrateBodies(Predicate function, cuBodyProxy* bodyArray, float timestep, int size)
+__global__ void CudaIntegrateBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < size)
+	if (info.m_frameIsValid & (index < info.m_bodyArray.m_size))
 	{
-		function(bodyArray[index], timestep);
+		cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+		IntegrateVelocity(bodyArray[index], timestep);
 	}
 }
 
@@ -593,13 +595,13 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 	if (m_context->m_bodyBufferGpu.GetCount())
 	{
 		D_TRACKTIME();
+		cudaStream_t stream = m_context->m_stream0;
 		ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 		const ndFloat32 timestep = scene->GetTimestep();
-
-		cudaStream_t stream = m_context->m_stream0;
-		CudaIntegrateUnconstrainedBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (IntegrateUnconstrainedBodies, bodiesGpu, timestep, threads);
+		cuSceneInfo& sceneInfo = *m_context->m_sceneInfoGpu;
+		
+		CudaIntegrateUnconstrainedBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (IntegrateUnconstrainedBodies, sceneInfo, timestep);
 	}
 }
 
@@ -1159,12 +1161,12 @@ void ndDynamicsUpdateCuda::IntegrateBodies()
 
 	if (m_context->m_bodyBufferGpu.GetCount())
 	{
+		cudaStream_t stream = m_context->m_stream0;
 		ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
-
-		cudaStream_t stream = m_context->m_stream0;
-		CudaIntegrateBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (IntegrateBodies, bodiesGpu, timestep, threads);
+		cuSceneInfo& sceneInfo = *m_context->m_sceneInfoGpu;
+		
+		CudaIntegrateBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (IntegrateBodies, sceneInfo, timestep);
 	}
 }
 

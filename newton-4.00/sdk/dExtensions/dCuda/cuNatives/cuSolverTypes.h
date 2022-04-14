@@ -27,6 +27,9 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 #include "cuVector.h"
+#include "cuDeviceBuffer.h"
+
+class cuBodyProxy;
 
 class cuSpatialVector
 {
@@ -42,21 +45,52 @@ class cuBoundingBox
 	cuVector m_max;
 };
 
+template <class T>
+class cuBuffer
+{
+	public:
+	cuBuffer()
+		:m_array(nullptr)
+		,m_size(0)
+		,m_capacity(0)
+	{
+	}
+
+	cuBuffer(const cuDeviceBuffer<T>& src)
+		:m_array((T*)&src[0])
+		,m_size(src.GetCount())
+		,m_capacity(src.GetCapacity())
+	{
+	}
+
+	T* m_array;
+	int m_size;
+	int m_capacity;
+};
+
 class cuSceneInfo
 {
 	public:
 	cuSceneInfo()
 		:m_worldBox()
+		,m_bodyArray()
 		,m_gridHashCount(0)
 		,m_sentinelIndex(0)
+		,m_frameIsValid(1)
 		,m_debugCounter(0)
 	{
+		m_hasUpperByteHash.x = 0;
+		m_hasUpperByteHash.y = 0;
+		m_hasUpperByteHash.z = 0;
+		m_hasUpperByteHash.w = 0;
 	}
 
 	cuBoundingBox m_worldBox;
+	cuBuffer<cuBodyProxy> m_bodyArray;
 	int4 m_hasUpperByteHash;
 	int m_gridHashCount;
 	int m_sentinelIndex;
+	int m_frameIsValid;
 	int m_debugCounter;
 };
 

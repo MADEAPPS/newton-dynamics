@@ -88,9 +88,9 @@ ndCudaContext::ndCudaContext()
 	*m_sceneInfoCpu0 = cuSceneInfo();
 	*m_sceneInfoCpu1 = cuSceneInfo();
 
-	m_histogram.SetCount(D_GRANULARITY * 4);
-	m_gridHash.SetCount(D_GRANULARITY * 4);
-	m_gridHashTmp.SetCount(D_GRANULARITY * 4);
+	//m_histogram.SetCount(D_GRANULARITY * 4);
+	//m_gridHash.SetCount(D_GRANULARITY * 4);
+	//m_gridHashTmp.SetCount(D_GRANULARITY * 4);
 }
 
 ndCudaContext::~ndCudaContext()

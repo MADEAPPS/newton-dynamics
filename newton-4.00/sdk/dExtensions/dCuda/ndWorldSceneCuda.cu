@@ -146,7 +146,7 @@ void ndWorldSceneCuda::CalculateContacts()
 
 void ndWorldSceneCuda::LoadBodyData()
 {
-	auto UploadBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		const ndVector minBox(ndFloat32(1.0e15f));
@@ -157,7 +157,6 @@ void ndWorldSceneCuda::LoadBodyData()
 		cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 
 		ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		//const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -194,34 +193,55 @@ void ndWorldSceneCuda::LoadBodyData()
 		}
 	});
 
-	cuDeviceBuffer<int>& scan = m_context->m_scan;
-	cuDeviceBuffer<int>& histogram = m_context->m_histogram;
-	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
+	cudaDeviceSynchronize();
+
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-	cuDeviceBuffer<cuAabbGridHash>& hashArray = m_context->m_gridHash;
-	cuDeviceBuffer<cuAabbGridHash>& hashArray1 = m_context->m_gridHashTmp;
+	const ndInt32 cpuBodyCount = bodyArray.GetCount();
+	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+
+	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
+	bodyBufferCpu.SetCount(cpuBodyCount);
+
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
-	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu = m_context->m_transformBufferGpu;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+	bodyBufferGpu.SetCount(cpuBodyCount);
+	transformBufferGpu.SetCount(cpuBodyCount);
+	transformBufferCpu0.SetCount(cpuBodyCount);
+	transformBufferCpu1.SetCount(cpuBodyCount);
 
-	const ndInt32 cpuBodyCount = bodyArray.GetCount();
-	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+	cuSceneInfo info;
+	info.m_bodyArray = cuBuffer<cuBodyProxy>(bodyBufferGpu);
 	
-	scan.SetCount(gpuBodyCount + 1);
-	histogram.SetCount(gpuBodyCount + 1);
-	bodyBufferCpu.SetCount(cpuBodyCount);
-	bodyBufferGpu.SetCount(gpuBodyCount);
-	hashArray.SetCount(gpuBodyCount);
-	hashArray1.SetCount(gpuBodyCount);
-	transformBufferGpu.SetCount(gpuBodyCount);
-	transformBufferCpu0.SetCount(gpuBodyCount);
-	transformBufferCpu1.SetCount(gpuBodyCount);
-	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
+	
+	//cuDeviceBuffer<int>& scan = m_context->m_scan;
+	//cuDeviceBuffer<int>& histogram = m_context->m_histogram;
+	//cuDeviceBuffer<cuAabbGridHash>& hashArray = m_context->m_gridHash;
+	//cuDeviceBuffer<cuAabbGridHash>& hashArray1 = m_context->m_gridHashTmp;
+	//cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
 
-	ParallelExecute(UploadBodies);
+	//scan.SetCount(gpuBodyCount + 1);
+	//histogram.SetCount(gpuBodyCount + 1);
+	//bodyBufferGpu.SetCount(gpuBodyCount);
+	//hashArray.SetCount(gpuBodyCount);
+	//hashArray1.SetCount(gpuBodyCount);
+	//boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
+
+	cudaError_t cudaStatus;
+	ParallelExecute(CopyBodies);
+
+	cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, &info, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
+	dAssert(cudaStatus == cudaSuccess);
+
 	bodyBufferGpu.ReadData(&bodyBufferCpu[0], cpuBodyCount);
+
+	cudaDeviceSynchronize();
+
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
 }
 
 void ndWorldSceneCuda::GetBodyTransforms()
@@ -299,7 +319,6 @@ void ndWorldSceneCuda::UpdateBodyList()
 	if (bodyListChanged)
 	{
 		LoadBodyData();
-		cudaDeviceSynchronize();
 	}
 }
 
@@ -652,14 +671,14 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	if (m_context->m_gridHash.GetCount() < m_context->m_sceneInfoCpu1->m_gridHashCount)
-	{
-		cudaDeviceSynchronize();
-		m_context->m_histogram.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
-		m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
-		m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
-		cudaDeviceSynchronize();
-	}
+	//if (m_context->m_gridHash.GetCount() < m_context->m_sceneInfoCpu1->m_gridHashCount)
+	//{
+	//	cudaDeviceSynchronize();
+	//	m_context->m_histogram.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
+	//	m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
+	//	m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
+	//	cudaDeviceSynchronize();
+	//}
 
 	//cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
 	//cudaStream_t stream = m_context->m_stream0;
