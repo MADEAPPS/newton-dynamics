@@ -46,9 +46,9 @@ __global__ void CudaAddBodyPadding(Predicate PaddLastBlock, cuBodyProxy* bodyArr
 }
 
 template <typename Predicate>
-__global__ void CudaMergeAabb(Predicate ReducedAabb, ndGpuInfo* const info, cuBoundingBox* bBox, ndInt32 count)
+__global__ void CudaMergeAabb(Predicate ReducedAabb, cuSceneInfo& info, cuBoundingBox* bBox, ndInt32 count)
 {
-	ReducedAabb(*info, bBox, count);
+	ReducedAabb(info, bBox, count);
 }
 
 template <typename Predicate>
@@ -68,9 +68,9 @@ __global__ void CudaGetBodyTransforms(Predicate GetTransform, const cuBodyProxy*
 }
 
 template <typename Predicate>
-__global__ void CudaCountAabb(Predicate CountAabb, ndGpuInfo* const info, cuBodyProxy* bodyArray, int* scan)
+__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info, cuBodyProxy* bodyArray, int* scan)
 {
-	CountAabb(*info, bodyArray, scan);
+	CountAabb(info, bodyArray, scan);
 }
 
 template <typename Predicate>
@@ -80,15 +80,21 @@ __global__ void CudaPrefixScanSum0(Predicate PrefixScan, int* scan)
 }
 
 template <typename Predicate>
-__global__ void CudaPrefixScanSum1(Predicate PrefixScan, ndGpuInfo* const info, int* scan, int size, int sentinelIndex, int gridCapacity)
+__global__ void CudaPrefixScanSum1(Predicate PrefixScan, cuSceneInfo& info, int* scan, int size, int sentinelIndex, int gridCapacity)
 {
-	PrefixScan(*info, scan, size, sentinelIndex, gridCapacity);
+	PrefixScan(info, scan, size, sentinelIndex, gridCapacity);
 }
 
 template <typename Predicate>
-__global__ void CudaGenerateGridHash(Predicate GenerateHash, ndGpuInfo* const info, cuBodyProxy* bodyArray, int* scan, cuAabbGridHash* hashArray)
+__global__ void CudaGenerateGridHash(Predicate GenerateHash, cuSceneInfo& info, cuBodyProxy* bodyArray, int* scan, cuAabbGridHash* hashArray)
 {
-	GenerateHash(*info, bodyArray, scan, hashArray);
+	GenerateHash(info, bodyArray, scan, hashArray);
+}
+
+template <typename Predicate>
+__global__ void CudaEndGridHash(Predicate EndGridHash, cuSceneInfo& info, cuAabbGridHash* hashArray)
+{
+	EndGridHash(info, hashArray);
 }
 
 
@@ -192,6 +198,8 @@ void ndWorldSceneCuda::LoadBodyData()
 	cuDeviceBuffer<int>& histogram = m_context->m_histogram;
 	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	cuDeviceBuffer<cuAabbGridHash>& hashArray = m_context->m_gridHash;
+	cuDeviceBuffer<cuAabbGridHash>& hashArray1 = m_context->m_gridHashTmp;
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu = m_context->m_transformBufferGpu;
@@ -205,9 +213,11 @@ void ndWorldSceneCuda::LoadBodyData()
 	histogram.SetCount(gpuBodyCount + 1);
 	bodyBufferCpu.SetCount(cpuBodyCount);
 	bodyBufferGpu.SetCount(gpuBodyCount);
-	transformBufferGpu.SetCount(cpuBodyCount);
-	transformBufferCpu0.SetCount(cpuBodyCount);
-	transformBufferCpu1.SetCount(cpuBodyCount);
+	hashArray.SetCount(gpuBodyCount);
+	hashArray1.SetCount(gpuBodyCount);
+	transformBufferGpu.SetCount(gpuBodyCount);
+	transformBufferCpu0.SetCount(gpuBodyCount);
+	transformBufferCpu1.SetCount(gpuBodyCount);
 	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
 
 	ParallelExecute(UploadBodies);
@@ -246,10 +256,10 @@ void ndWorldSceneCuda::UpdateTransform()
 	D_TRACKTIME();
 
 	// get the scene info from the update	
-	ndGpuInfo* const gpuInfo = m_context->m_sceneInfoGpu;
-	ndGpuInfo* const cpuInfo = m_context->m_sceneInfoCpu0;
+	cuSceneInfo* const gpuInfo = m_context->m_sceneInfoGpu;
+	cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu0;
 
-	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndGpuInfo), cudaMemcpyDeviceToHost, m_context->m_stream0);
+	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost, m_context->m_stream0);
 	dAssert(cudaStatus == cudaSuccess);
 	if (cudaStatus != cudaSuccess)
 	{
@@ -379,7 +389,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
-	auto ReducedAabb = [] __device__(ndGpuInfo& info, cuBoundingBox* bBoxOut, int index)
+	auto ReducedAabb = [] __device__(cuSceneInfo& info, cuBoundingBox* bBoxOut, int index)
 	{
 		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
 
@@ -504,7 +514,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto CountAabb = [] __device__(const ndGpuInfo& info, const cuBodyProxy* bodyArray, int* scan)
+	auto CountAabb = [] __device__(const cuSceneInfo& info, const cuBodyProxy* bodyArray, int* scan)
 	{
 		__shared__  cuBoundingBox cacheAabb;
 		if (threadIdx.x == 0)
@@ -535,50 +545,6 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto GenerateHash = [] __device__(const ndGpuInfo& info, const cuBodyProxy* bodyArray, const int* scan, cuAabbGridHash* hashArray)
-	{
-		__shared__  cuBoundingBox cacheAabb;
-		if (threadIdx.x == 0)
-		{
-			cacheAabb.m_min = info.m_worldBox.m_min;
-			cacheAabb.m_max = info.m_worldBox.m_max;
-		}
-		__syncthreads();
-
-		const int index = threadIdx.x + blockDim.x * blockIdx.x;
-
-		const cuVector minBox(cacheAabb.m_min);
-		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
-		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
-
-		const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-
-		cuAabbGridHash hash;
-		hash.m_id = min (index, info.m_sentinelIndex);
-		int start = scan[index];
-
-		for (int z = z0; z < z1; z++)
-		{
-			hash.m_z = z;
-			for (int y = y0; y < y1; y++)
-			{
-				hash.m_y = y;
-				for (int x = x0; x < x1; x++)
-				{
-					hash.m_x = x;
-					int4 val = hash.m_key;
-					hashArray[start].m_key = val;
-					start++;
-				}
-			}
-		}
-	};
-
 	auto PrefixScanSum0 = [] __device__(int* scan)
 	{
 		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
@@ -600,7 +566,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		scan[index] = cacheBuffer[threadId];
 	};
 
-	auto PrefixScanSum1 = [] __device__(ndGpuInfo& info, int* scan, int size, int sentinelIndex, int gridCapacity)
+	auto PrefixScanSum1 = [] __device__(cuSceneInfo& info, int* scan, int size, int sentinelIndex, int gridCapacity)
 	{
 		int threadId = threadIdx.x;
 		const int blocks = size / D_THREADS_PER_BLOCK;
@@ -630,35 +596,93 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
+	auto EndGridHash = [] __device__(cuSceneInfo& info, cuAabbGridHash* hashArray)
+	{
+		cuAabbGridHash hash;
+		int index = info.m_gridHashCount;
+		hash = hashArray[index - 1];
+		hash.m_id = -1;
+		hash.m_z = hash.m_z + 1;
+		hashArray[index] = hash;
+		info.m_gridHashCount = index + 1;
+		info.m_debugCounter = info.m_debugCounter + 1;
+	};
+
+	auto GenerateHash = [] __device__(const cuSceneInfo & info, const cuBodyProxy * bodyArray, const int* scan, cuAabbGridHash * hashArray)
+	{
+		__shared__  cuBoundingBox cacheAabb;
+
+		const int threadId = threadIdx.x;
+		const int index = threadId + blockDim.x * blockIdx.x;
+		if (threadId == 0)
+		{
+			cacheAabb.m_min = info.m_worldBox.m_min;
+			cacheAabb.m_max = info.m_worldBox.m_max;
+		}
+		__syncthreads();
+
+		const cuVector minBox(cacheAabb.m_min);
+		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
+		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
+
+		const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+		const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+
+		cuAabbGridHash hash;
+		hash.m_id = min(index, info.m_sentinelIndex);
+		int start = scan[index];
+
+		for (int z = z0; z < z1; z++)
+		{
+			hash.m_z = z;
+			for (int y = y0; y < y1; y++)
+			{
+				hash.m_y = y;
+				for (int x = x0; x < x1; x++)
+				{
+					hash.m_x = x;
+					hashArray[start] = hash;
+					start++;
+				}
+			}
+		}
+	};
+
 	if (m_context->m_gridHash.GetCount() < m_context->m_sceneInfoCpu1->m_gridHashCount)
 	{
 		cudaDeviceSynchronize();
+		m_context->m_histogram.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
 		m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
 		m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
 		cudaDeviceSynchronize();
 	}
 
-	ndGpuInfo* const infoGpu = m_context->m_sceneInfoGpu;
-	cudaStream_t stream = m_context->m_stream0;
-	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
-	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	dAssert(blocksCount * D_THREADS_PER_BLOCK == threads);
-
-	int* const scanGpu = &m_context->m_scan[0];
-	int* const histogramGpu = &m_context->m_histogram[0];
-	cuAabbGridHash* const hashArrayGpu = &m_context->m_gridHash[0];
-	cuAabbGridHash* const hashArrayTmpGpu = &m_context->m_gridHashTmp[0];
-	cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
-	cuBoundingBox* const bBoxGpu = &m_context->m_boundingBoxGpu[0];
-
-	ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
-	CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
-	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu);
-	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, infoGpu, bBoxGpu, blocksCount);
-	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, infoGpu, bodiesGpu, scanGpu);
-	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scanGpu);
-	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, infoGpu, scanGpu, threads, sentinelIndex, m_context->m_gridHash.GetCount());
-	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, infoGpu, bodiesGpu, scanGpu, hashArrayGpu);
-	CudaCountingSort sortHash(infoGpu, histogramGpu, threads, stream);
-	sortHash.Sort(hashArrayGpu, hashArrayTmpGpu);
+	//cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
+	//cudaStream_t stream = m_context->m_stream0;
+	//ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
+	//ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//dAssert(blocksCount * D_THREADS_PER_BLOCK == threads);
+	//
+	//int* const scanGpu = &m_context->m_scan[0];
+	//int* const histogramGpu = &m_context->m_histogram[0];
+	//cuAabbGridHash* const hashArrayGpu = &m_context->m_gridHash[0];
+	//cuAabbGridHash* const hashArrayTmpGpu = &m_context->m_gridHashTmp[0];
+	//cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
+	//cuBoundingBox* const bBoxGpu = &m_context->m_boundingBoxGpu[0];
+	//
+	//ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
+	//CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
+	//CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu);
+	//CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu, bBoxGpu, blocksCount);
+	//CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu, bodiesGpu, scanGpu);
+	//CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scanGpu);
+	//CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu, scanGpu, threads, sentinelIndex, m_context->m_gridHash.GetCount());
+	//CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, *infoGpu, bodiesGpu, scanGpu, hashArrayGpu);
+	////CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu, hashArrayGpu);
+	//CudaCountingSort sortHash(infoGpu, histogramGpu, threads, stream);
+	//sortHash.Sort(hashArrayGpu, hashArrayTmpGpu);
 }

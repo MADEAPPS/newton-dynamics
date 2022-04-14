@@ -27,6 +27,7 @@
 #include <ndNewtonStdafx.h>
 #include <device_launch_parameters.h>
 
+#include "cuSort.h"
 #include "cuHostBuffer.h"
 #include "ndBodyBuffer.h"
 #include "cuSolverTypes.h"
@@ -42,22 +43,6 @@ class ndCudaDevice
 	struct cudaDeviceProp m_prop;
 };
 
-class ndGpuInfo
-{
-	public:
-	ndGpuInfo()
-		:m_worldBox()
-		,m_gridHashCount(0)
-		,m_sentinelIndex(0)
-	{
-	}
-
-	cuBoundingBox m_worldBox;
-	int4 m_hasUpperByteHash;
-	int m_gridHashCount;
-	int m_sentinelIndex;
-};
-
 class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 {
 	public: 
@@ -67,9 +52,9 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 
 	void SwapBuffers();
 	
-	ndGpuInfo* m_sceneInfoGpu;
-	ndGpuInfo* m_sceneInfoCpu0;
-	ndGpuInfo* m_sceneInfoCpu1;
+	cuSceneInfo* m_sceneInfoGpu;
+	cuSceneInfo* m_sceneInfoCpu0;
+	cuSceneInfo* m_sceneInfoCpu1;
 	cuDeviceBuffer<int> m_scan;
 	cuDeviceBuffer<int> m_histogram;
 	ndArray<cuBodyProxy> m_bodyBufferCpu;

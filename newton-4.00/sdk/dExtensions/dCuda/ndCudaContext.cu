@@ -67,24 +67,17 @@ ndCudaContext::ndCudaContext()
 	,m_stream0(0)
 {
 	cudaError_t cudaStatus;
-
-	m_gridHash.SetCount(D_GRANULARITY * 4);
-	m_gridHashTmp.SetCount(D_GRANULARITY * 4);
-
 	// create two streams for double buffer updates
 	cudaStatus = cudaStreamCreate(&m_stream0);
 	dAssert(cudaStatus == cudaSuccess);
 
-	//cudaStatus = cudaStreamCreate(&m_stream1);
-	//dAssert(cudaStatus == cudaSuccess);
-
-	cudaStatus = cudaMalloc((void**)&m_sceneInfoGpu, sizeof(ndGpuInfo));
+	cudaStatus = cudaMalloc((void**)&m_sceneInfoGpu, sizeof(cuSceneInfo));
 	dAssert(cudaStatus == cudaSuccess);
 
-	cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu0, sizeof(ndGpuInfo));
+	cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu0, sizeof(cuSceneInfo));
 	dAssert(cudaStatus == cudaSuccess);
 
-	cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu1, sizeof(ndGpuInfo));
+	cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu1, sizeof(cuSceneInfo));
 	dAssert(cudaStatus == cudaSuccess);
 
 	if (cudaStatus != cudaSuccess)
@@ -92,8 +85,12 @@ ndCudaContext::ndCudaContext()
 		dAssert(0);
 	}
 
-	*m_sceneInfoCpu0 = ndGpuInfo();
-	*m_sceneInfoCpu1 = ndGpuInfo();
+	*m_sceneInfoCpu0 = cuSceneInfo();
+	*m_sceneInfoCpu1 = cuSceneInfo();
+
+	m_histogram.SetCount(D_GRANULARITY * 4);
+	m_gridHash.SetCount(D_GRANULARITY * 4);
+	m_gridHashTmp.SetCount(D_GRANULARITY * 4);
 }
 
 ndCudaContext::~ndCudaContext()
@@ -124,7 +121,8 @@ ndCudaContext::~ndCudaContext()
 ndCudaContext* ndCudaContext::CreateContext()
 {
 	cudaError_t cudaStatus = cudaSetDevice(0);
-	return (cudaStatus == cudaSuccess) ? new ndCudaContext() : nullptr;
+	ndCudaContext* const context = (cudaStatus == cudaSuccess) ? new ndCudaContext() : nullptr;
+	return context;
 }
 
 void ndCudaContext::SwapBuffers()

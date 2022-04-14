@@ -19,45 +19,52 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __CU_SOLVER_TYPES_H__
-#define __CU_SOLVER_TYPES_H__
+#ifndef __CU_SORT_H__
+#define __CU_SORT_H__
 
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
-#include "cuVector.h"
 
-class cuSpatialVector
+class cuSceneInfo;
+
+class cuAabbGridHash
 {
 	public:
-	cuVector m_linear;
-	cuVector m_angular;
-};
-
-class cuBoundingBox
-{
-	public:
-	cuVector m_min;
-	cuVector m_max;
-};
-
-class cuSceneInfo
-{
-	public:
-	cuSceneInfo()
-		:m_worldBox()
-		,m_gridHashCount(0)
-		,m_sentinelIndex(0)
-		,m_debugCounter(0)
+	union
 	{
-	}
+		int4 m_key;
+		char m_bytes[4 * 3];
+		struct
+		{
+			int m_x;
+			int m_y;
+			int m_z;
+			int m_id;
+		};
+	};
+};
 
-	cuBoundingBox m_worldBox;
-	int4 m_hasUpperByteHash;
-	int m_gridHashCount;
-	int m_sentinelIndex;
-	int m_debugCounter;
+
+class CudaCountingSort
+{
+	public:
+	CudaCountingSort(cuSceneInfo* info, int* histogram, int size, cudaStream_t stream);
+	void Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst);
+
+	// this should be private but Cuda does not let private of protected lamddas 
+	// to be passed as arguments to kerners.
+	public:
+	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit);
+
+	bool SanityCheck(const cuAabbGridHash* const src);
+
+	cuSceneInfo* m_info;
+	int* m_histogram;
+	cudaStream_t m_stream;
+	int m_size;
+	int m_blocks;
 };
 
 #endif
