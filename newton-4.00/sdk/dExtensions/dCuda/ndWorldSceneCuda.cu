@@ -746,14 +746,12 @@ void ndWorldSceneCuda::InitBodyArray()
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
 	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
-	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
-	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
-	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
-	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
-	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
-	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
-	
-	CudaCountingSort sortHash(infoGpu, stream);
-	sortHash.Sort();
+	//CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
+	//CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
+	//CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
+	//CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
+	//CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
+	//CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
+	//CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
+	//CudaSortGridHash (m_context);
 }

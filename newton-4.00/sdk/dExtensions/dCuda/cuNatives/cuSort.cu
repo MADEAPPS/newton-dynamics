@@ -108,103 +108,109 @@ __global__ void CudaSortPrefixScans(Predicate PrefixScan, const cuSceneInfo& inf
 	}
 }
 
-CudaCountingSort::CudaCountingSort(cuSceneInfo* info, cudaStream_t stream)
-	:m_info(info)
-	,m_stream(stream)
-{
-}
+//CudaCountingSort::CudaCountingSort(ndCudaContext* context)
+//	:m_context(context)
+//{
+//}
+//
+//bool CudaCountingSort::SanityCheck(const cuAabbGridHash* const src)
+//{
+//	//cuSceneInfo info;
+//	//cudaError_t cudaStatus;
+//	//ndArray<cuAabbGridHash> data;
+//	//
+//	//cudaDeviceSynchronize();
+//	//cudaStatus = cudaMemcpy(&info, m_info, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
+//	//dAssert(cudaStatus == cudaSuccess);
+//	//
+//	//data.SetCount(m_size);
+//	//cudaStatus = cudaMemcpy(&data[0], src, m_size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
+//	//dAssert(cudaStatus == cudaSuccess);
+//	//
+//	//for (int i = 1; i < m_size; i++)
+//	//{
+//	//	cuAabbGridHash key0(data[i - 1]);
+//	//	cuAabbGridHash key1(data[i - 0]);
+//	//	bool zTest0 = key0.m_z < key1.m_z;
+//	//	bool zTest1 = key0.m_z == key1.m_z;
+//	//	bool yTest0 = key0.m_y < key1.m_y;
+//	//	bool yTest1 = key0.m_y == key1.m_y;
+//	//	bool xTest = key0.m_x <= key1.m_x;
+//	//	bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
+//	//	dAssert(test);
+//	//}
+//	return true;
+//}
 
-bool CudaCountingSort::SanityCheck(const cuAabbGridHash* const src)
+//static void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit)
+static void SortGridHash(ndCudaContext* context, int digit)
 {
-	//cuSceneInfo info;
-	//cudaError_t cudaStatus;
-	//ndArray<cuAabbGridHash> data;
-	//
-	//cudaDeviceSynchronize();
-	//cudaStatus = cudaMemcpy(&info, m_info, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	//dAssert(cudaStatus == cudaSuccess);
-	//
-	//data.SetCount(m_size);
-	//cudaStatus = cudaMemcpy(&data[0], src, m_size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
-	//dAssert(cudaStatus == cudaSuccess);
-	//
-	//for (int i = 1; i < m_size; i++)
+	//auto EvaluateKey = [] __device__(const cuAabbGridHash & dataElement, int digit)
 	//{
-	//	cuAabbGridHash key0(data[i - 1]);
-	//	cuAabbGridHash key1(data[i - 0]);
-	//	bool zTest0 = key0.m_z < key1.m_z;
-	//	bool zTest1 = key0.m_z == key1.m_z;
-	//	bool yTest0 = key0.m_y < key1.m_y;
-	//	bool yTest1 = key0.m_y == key1.m_y;
-	//	bool xTest = key0.m_x <= key1.m_x;
-	//	bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
-	//	dAssert(test);
-	//}
-	return true;
-}
+	//	return dataElement.m_bytes[digit];
+	//};
+	//
+	//auto PrefixScanSum = [] __device__(int* histogram, int size)
+	//{
+	//	__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK + 1];
+	//
+	//	int threadId = threadIdx.x;
+	//	int threadId1 = threadId + D_THREADS_PER_BLOCK;
+	//
+	//	int sum = 0;
+	//	cacheBuffer[threadId] = 0;
+	//	if (threadId == 0)
+	//	{
+	//		cacheBuffer[threadId1] = 0;
+	//	}
+	//	const int blocks = size / D_THREADS_PER_BLOCK;
+	//	for (int i = 0; i < blocks; i++)
+	//	{
+	//		sum += histogram[i * D_THREADS_PER_BLOCK + threadId];
+	//	}
+	//	cacheBuffer[threadId1 + 1] = sum;
+	//	__syncthreads();
+	//
+	//	for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
+	//	{
+	//		int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
+	//		__syncthreads();
+	//		cacheBuffer[threadId1] = sum;
+	//		__syncthreads();
+	//	}
+	//	sum = cacheBuffer[threadId1];
+	//
+	//	for (int i = 0; i < blocks; i++)
+	//	{
+	//		int j = i * D_THREADS_PER_BLOCK + threadId;
+	//		int partialSum = histogram[j];
+	//		histogram[j] = sum;
+	//		sum += partialSum;
+	//	}
+	//};
 
-void CudaCountingSort::Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit)
-{
-	auto EvaluateKey = [] __device__(const cuAabbGridHash & dataElement, int digit)
-	{
-		return dataElement.m_bytes[digit];
-	};
 
-	auto PrefixScanSum = [] __device__(int* histogram, int size)
-	{
-		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK + 1];
-
-		int threadId = threadIdx.x;
-		int threadId1 = threadId + D_THREADS_PER_BLOCK;
-
-		int sum = 0;
-		cacheBuffer[threadId] = 0;
-		if (threadId == 0)
-		{
-			cacheBuffer[threadId1] = 0;
-		}
-		const int blocks = size / D_THREADS_PER_BLOCK;
-		for (int i = 0; i < blocks; i++)
-		{
-			sum += histogram[i * D_THREADS_PER_BLOCK + threadId];
-		}
-		cacheBuffer[threadId1 + 1] = sum;
-		__syncthreads();
-
-		for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-		{
-			int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
-			__syncthreads();
-			cacheBuffer[threadId1] = sum;
-			__syncthreads();
-		}
-		sum = cacheBuffer[threadId1];
-
-		for (int i = 0; i < blocks; i++)
-		{
-			int j = i * D_THREADS_PER_BLOCK + threadId;
-			int partialSum = histogram[j];
-			histogram[j] = sum;
-			sum += partialSum;
-		}
-	};
-
-	//m_size(size)
-	//m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
-	//ndInt32 hashBlocksCount = (infoGpu->m_scan.m_size + 8 * D_THREADS_PER_BLOCK) / D_THREADS_PER_BLOCK; 
+	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
+	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu1;
+	ndInt32 blocks = (sceneInfo->m_scan.m_size + 8 * D_THREADS_PER_BLOCK) / D_THREADS_PER_BLOCK;
 	 
 	//CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, m_histogram, m_size, digit);
 	//CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, *m_info, m_histogram, m_size, digit);
 	//CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, dst, m_histogram, m_size, digit);
 }
 
-void CudaCountingSort::Sort()
+//void CudaCountingSort::Sort()
+void CudaSortGridHash(ndCudaContext* context)
 {
-	//cuAabbGridHash* const src, cuAabbGridHash* const dst
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	Sort(src, dst, i * 4 + 0);
-	//	Sort(dst, src, i * 4 + 1);
-	//}
+	//cuAabbGridHash* const src = m_info->m_hashArray.m_array;
+	//cuAabbGridHash* const dst = m_info->m_hashArrayScrath.m_array;
+	dAssert(context->m_gridHash.GetCount() == context->m_gridHashTmp.GetCount());
+	dAssert(context->m_histogram.GetCount() == context->m_gridHashTmp.GetCount());
+
+	for (int i = 0; i < 3; i++)
+	{
+		SortGridHash(context, i * 4 + 0);
+		SortGridHash(context, i * 4 + 1);
+	}
 	//dAssert(SanityCheck(src));
 }

@@ -67,7 +67,6 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu;
 
 	cudaStream_t m_stream0;
-	//cudaStream_t m_stream1;
 };
 
 #endif

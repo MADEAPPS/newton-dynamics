@@ -27,7 +27,7 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 
-class cuSceneInfo;
+class ndCudaContext;
 
 class cuAabbGridHash
 {
@@ -47,21 +47,21 @@ class cuAabbGridHash
 };
 
 
-class CudaCountingSort
-{
-	public:
-	CudaCountingSort(cuSceneInfo* info, cudaStream_t stream);
-	void Sort();
-
-	// this should be private but Cuda does not let private of protected lamddas 
-	// to be passed as arguments to kerners.
-	public:
-	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit);
-
-	bool SanityCheck(const cuAabbGridHash* const src);
-
-	cuSceneInfo* m_info;
-	cudaStream_t m_stream;
-};
+void CudaSortGridHash(ndCudaContext* context);
+//class CudaCountingSort
+//{
+//	public:
+//	CudaCountingSort(ndCudaContext* m_context);
+//	void Sort();
+//
+//	// this should be private but Cuda does not let private of protected lamddas 
+//	// to be passed as arguments to kerners.
+//	public:
+//	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit);
+//
+//	bool SanityCheck(const cuAabbGridHash* const src);
+//
+//	ndCudaContext* m_context;
+//};
 
 #endif
