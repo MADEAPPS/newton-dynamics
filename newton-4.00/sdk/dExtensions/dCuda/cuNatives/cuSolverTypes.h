@@ -73,9 +73,11 @@ class cuSceneInfo
 	public:
 	cuSceneInfo()
 		:m_worldBox()
+		,m_scan()
+		,m_histogram()
 		,m_bodyArray()
+		,m_bodyAabbArray()
 		,m_gridHashCount(0)
-		,m_sentinelIndex(0)
 		,m_frameIsValid(1)
 		,m_debugCounter(0)
 	{
@@ -86,10 +88,12 @@ class cuSceneInfo
 	}
 
 	cuBoundingBox m_worldBox;
+	cuBuffer<int> m_scan;
+	cuBuffer<int> m_histogram;
 	cuBuffer<cuBodyProxy> m_bodyArray;
+	cuBuffer<cuBoundingBox> m_bodyAabbArray;
 	int4 m_hasUpperByteHash;
 	int m_gridHashCount;
-	int m_sentinelIndex;
 	int m_frameIsValid;
 	int m_debugCounter;
 };

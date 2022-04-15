@@ -40,21 +40,50 @@
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
 template <typename Predicate>
-__global__ void CudaAddBodyPadding(Predicate PaddLastBlock, cuBodyProxy* bodyArray, int blocksCount, int sentinelIndex)
+__global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuSceneInfo& info)
 {
-	PaddLastBlock(bodyArray, blocksCount, sentinelIndex);
+	if (info.m_frameIsValid)
+	{
+		UpdateBodyScene(info);
+	}
 }
 
 template <typename Predicate>
-__global__ void CudaMergeAabb(Predicate ReducedAabb, cuSceneInfo& info, cuBoundingBox* bBox, ndInt32 count)
+__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
 {
-	ReducedAabb(info, bBox, count);
+	if (info.m_frameIsValid)
+	{
+		CountAabb(info);
+	}
 }
 
 template <typename Predicate>
-__global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuBodyProxy* bodyArray, cuBoundingBox* bBox)
+__global__ void CudaPrefixScanSum0(Predicate PrefixScan, cuSceneInfo& info)
 {
-	UpdateBodyScene(bodyArray, bBox);
+	if (info.m_frameIsValid)
+	{
+		PrefixScan(info);
+	}
+}
+
+template <typename Predicate>
+__global__ void CudaPrefixScanSum1(Predicate PrefixScan, cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		PrefixScan(info);
+	}
+}
+
+
+
+template <typename Predicate>
+__global__ void CudaMergeAabb(Predicate ReducedAabb, cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		ReducedAabb(info);
+	}
 }
 
 template <typename Predicate>
@@ -67,23 +96,6 @@ __global__ void CudaGetBodyTransforms(Predicate GetTransform, const cuBodyProxy*
 	}
 }
 
-template <typename Predicate>
-__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info, cuBodyProxy* bodyArray, int* scan)
-{
-	CountAabb(info, bodyArray, scan);
-}
-
-template <typename Predicate>
-__global__ void CudaPrefixScanSum0(Predicate PrefixScan, int* scan)
-{
-	PrefixScan(scan);
-}
-
-template <typename Predicate>
-__global__ void CudaPrefixScanSum1(Predicate PrefixScan, cuSceneInfo& info, int* scan, int size, int sentinelIndex, int gridCapacity)
-{
-	PrefixScan(info, scan, size, sentinelIndex, gridCapacity);
-}
 
 template <typename Predicate>
 __global__ void CudaGenerateGridHash(Predicate GenerateHash, cuSceneInfo& info, cuBodyProxy* bodyArray, int* scan, cuAabbGridHash* hashArray)
@@ -197,23 +209,32 @@ void ndWorldSceneCuda::LoadBodyData()
 
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	const ndInt32 cpuBodyCount = bodyArray.GetCount();
-	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+	const ndInt32 gpuBodyCount = (D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1)) / D_THREADS_PER_BLOCK);
 
 	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
 	bodyBufferCpu.SetCount(cpuBodyCount);
 
+	cuDeviceBuffer<int>& scanGpu = m_context->m_scan;
+	cuDeviceBuffer<int>& histogramGpu = m_context->m_histogram;
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
+	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu = m_context->m_transformBufferGpu;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+
+	scanGpu.SetCount(cpuBodyCount);
+	histogramGpu.SetCount(cpuBodyCount);
 	bodyBufferGpu.SetCount(cpuBodyCount);
 	transformBufferGpu.SetCount(cpuBodyCount);
 	transformBufferCpu0.SetCount(cpuBodyCount);
 	transformBufferCpu1.SetCount(cpuBodyCount);
+	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
 
 	cuSceneInfo info;
+	info.m_scan = cuBuffer<int>(scanGpu);
+	info.m_histogram = cuBuffer<int>(histogramGpu);
 	info.m_bodyArray = cuBuffer<cuBodyProxy>(bodyBufferGpu);
-	
+	info.m_bodyAabbArray = cuBuffer<cuBoundingBox>(boundingBoxGpu);
 	
 	//cuDeviceBuffer<int>& scan = m_context->m_scan;
 	//cuDeviceBuffer<int>& histogram = m_context->m_histogram;
@@ -320,6 +341,28 @@ void ndWorldSceneCuda::UpdateBodyList()
 	{
 		LoadBodyData();
 	}
+	
+	cuSceneInfo* const sceneInfo = m_context->m_sceneInfoCpu1;
+	if (!sceneInfo->m_frameIsValid)
+	{
+		cudaDeviceSynchronize();
+		sceneInfo->m_frameIsValid = 1;
+		cuDeviceBuffer<int>& histogram = m_context->m_histogram;
+		if (sceneInfo->m_histogram.m_size > histogram.GetCapacity())
+		{
+			histogram.SetCount(sceneInfo->m_histogram.m_size + 1);
+			sceneInfo->m_histogram = cuBuffer<int>(histogram);
+		}
+
+		cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
+		dAssert(cudaStatus == cudaSuccess);
+
+		if (cudaStatus != cudaSuccess)
+		{
+			dAssert(0);
+		}
+		cudaDeviceSynchronize();
+	}
 }
 
 void ndWorldSceneCuda::InitBodyArray()
@@ -408,212 +451,28 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
-	auto ReducedAabb = [] __device__(cuSceneInfo& info, cuBoundingBox* bBoxOut, int index)
-	{
-		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
-
-		aabb[threadIdx.x].m_min = bBoxOut[threadIdx.x].m_min;
-		aabb[threadIdx.x].m_max = bBoxOut[threadIdx.x].m_max;
-		__syncthreads();
-
-		if (threadIdx.x >= index)
-		{
-			aabb[threadIdx.x] = aabb[index - 1];
-		}
-		__syncthreads();
-
-		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
-		{
-			if (threadIdx.x < i)
-			{
-				aabb[threadIdx.x].m_min = aabb[threadIdx.x].m_min.Min(aabb[threadIdx.x + i].m_min);
-				aabb[threadIdx.x].m_max = aabb[threadIdx.x].m_max.Max(aabb[threadIdx.x + i].m_max);
-			}
-			__syncthreads();
-		}
-
-		if (threadIdx.x == 0)
-		{
-			cuVector minBox((aabb[0].m_min.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE));
-			cuVector maxBox((aabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE));
-			minBox.w = 0.0f;
-			maxBox.w = 0.0f;
-			const cuVector sizeBox((maxBox - minBox).Scale(D_CUDA_SCENE_INV_GRID_SIZE));
-			info.m_hasUpperByteHash.x = (sizeBox.x >= 256);
-			info.m_hasUpperByteHash.y = (sizeBox.y >= 256);
-			info.m_hasUpperByteHash.z = (sizeBox.z >= 256);
-
-			info.m_worldBox.m_min = minBox;
-			info.m_worldBox.m_max = maxBox;
-		}
-	};
-
-	auto PaddLastBodyBlock = [] __device__(cuBodyProxy* bodyArray, int blocksCount, int sentinelIndex)
-	{
-		int index = (blocksCount - 1) * blockDim.x + threadIdx.x;
-		if (index == sentinelIndex)
-		{
-			bodyArray[sentinelIndex].m_posit = bodyArray[sentinelIndex - 1].m_posit;
-			bodyArray[sentinelIndex].m_rotation = bodyArray[sentinelIndex - 1].m_rotation;
-		}
-		__syncthreads();
-
-		if (index > sentinelIndex)
-		{
-			bodyArray[index].m_rotation = bodyArray[sentinelIndex].m_rotation;
-			bodyArray[index].m_posit = bodyArray[sentinelIndex].m_posit;
-			bodyArray[index].m_obbSize = bodyArray[sentinelIndex].m_obbSize;
-			bodyArray[index].m_obbOrigin = bodyArray[sentinelIndex].m_obbOrigin;
-			bodyArray[index].m_scale = bodyArray[sentinelIndex].m_scale;
-			bodyArray[index].m_localPosition = bodyArray[sentinelIndex].m_localPosition;
-			bodyArray[index].m_localRotation = bodyArray[sentinelIndex].m_localRotation;
-			bodyArray[index].m_alignRotation = bodyArray[sentinelIndex].m_alignRotation;
-		}
-	};
-
-	auto UpdateAabb = [] __device__(cuBodyProxy* bodyArray, cuBoundingBox* bBox)
-	{
-		__shared__  cuBoundingBox aabb[D_THREADS_PER_BLOCK];
-
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
-		cuBodyProxy& body = bodyArray[index];
-
-		// calculate shape global Matrix
-		body.m_globalSphapeRotation = body.m_localRotation * body.m_rotation;
-		cuMatrix3x3 matrix(body.m_globalSphapeRotation.GetMatrix3x3());
-		body.m_globalSphapePosition = matrix.RotateVector(body.m_localPosition) + body.m_posit;
-
-		// calculate world aabb
-		//ndMatrix scaleMatrix;
-		//scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
-		//scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
-		//scaleMatrix[2] = matrix[2].Scale(m_scale.m_z);
-		//scaleMatrix[3] = matrix[3];
-		//scaleMatrix = m_alignmentMatrix * scaleMatrix;
-		matrix.m_front = matrix.m_front.Scale(body.m_scale.x);
-		matrix.m_up    = matrix.m_up.Scale(body.m_scale.y);
-		matrix.m_right = matrix.m_right.Scale(body.m_scale.z);
-		matrix = body.m_alignRotation.GetMatrix3x3() * matrix;
-
-		//const ndVector size0(m_shape->GetObbSize());
-		//const ndVector size(scaleMatrix.m_front.Abs().Scale(size0.m_x) + scaleMatrix.m_up.Abs().Scale(size0.m_y) + scaleMatrix.m_right.Abs().Scale(size0.m_z));
-		//const ndVector origin(scaleMatrix.TransformVector(m_shape->GetObbOrigin()));
-		const cuVector origin(matrix.RotateVector(body.m_obbOrigin) + body.m_globalSphapePosition);
-		const cuVector size(matrix.m_front.Abs().Scale(body.m_obbSize.x) + matrix.m_up.Abs().Scale(body.m_obbSize.y) + matrix.m_right.Abs().Scale(body.m_obbSize.z));
-
-		//p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-		//p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-		const cuVector padding(1.0f / 16.0f);
-		const cuVector minBox(origin - size - padding);
-		const cuVector maxBox(origin + size + padding);
-
-
-		int threadId = threadIdx.x;
-		// save aabb and calculate bonding box for this thread block
-		body.m_minAabb = minBox;
-		body.m_maxAabb = maxBox;
-		aabb[threadId].m_min = minBox;
-		aabb[threadId].m_max = maxBox;
-		__syncthreads();
-
-		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
-		{
-			if (threadId < i)
-			{
-				aabb[threadId].m_min = aabb[threadIdx.x].m_min.Min(aabb[threadId + i].m_min);
-				aabb[threadId].m_max = aabb[threadIdx.x].m_max.Max(aabb[threadId + i].m_max);
-			}
-			__syncthreads();
-		}
-
-		if (threadId == 0)
-		{
-			bBox[blockIdx.x].m_min = aabb[0].m_min;
-			bBox[blockIdx.x].m_max = aabb[0].m_max;
-		}
-	};
-
-	auto CountAabb = [] __device__(const cuSceneInfo& info, const cuBodyProxy* bodyArray, int* scan)
-	{
-		__shared__  cuBoundingBox cacheAabb;
-		if (threadIdx.x == 0)
-		{
-			cacheAabb.m_min = info.m_worldBox.m_min;
-			cacheAabb.m_max = info.m_worldBox.m_max;
-		}
-		__syncthreads();
-
-		const cuVector minBox(cacheAabb.m_min);
-		//const cuVector maxBox(cacheAabb.m_max);
-
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
-		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
-		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
-
-		const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
-		scan[index + 1] = count;
-		if (index == 0)
-		{
-			scan[0] = 0;
-		}
-	};
-
-	auto PrefixScanSum0 = [] __device__(int* scan)
-	{
-		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
-
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
-
-		cacheBuffer[threadIdx.x] = 0;
-		int threadId = threadIdx.x + D_THREADS_PER_BLOCK;
-		cacheBuffer[threadId] = scan[index];
-		__syncthreads();
-		
-		for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-		{
-			int sum = cacheBuffer[threadId] + cacheBuffer[threadId - i];
-			__syncthreads();
-			cacheBuffer[threadId] = sum;
-			__syncthreads();
-		}
-		scan[index] = cacheBuffer[threadId];
-	};
-
-	auto PrefixScanSum1 = [] __device__(cuSceneInfo& info, int* scan, int size, int sentinelIndex, int gridCapacity)
-	{
-		int threadId = threadIdx.x;
-		const int blocks = size / D_THREADS_PER_BLOCK;
-		for (int i = 1; i < blocks; i ++)
-		{
-			int sum = scan[i * D_THREADS_PER_BLOCK - 1];
-			__syncthreads();
-			scan[i * D_THREADS_PER_BLOCK + threadId] += sum;
-			__syncthreads();
-		}
-
-		if (threadId == 0)
-		{
-			info.m_sentinelIndex = sentinelIndex;
-			info.m_gridHashCount = scan[sentinelIndex + 1];
-		}
-		__syncthreads();
-
-		if (info.m_gridHashCount > gridCapacity)
-		{
-			int capacity = gridCapacity - 1024;
-			for (int i = 0; i < blocks; i++)
-			{
-				int val = scan[i * D_THREADS_PER_BLOCK + threadId];
-				scan[i * D_THREADS_PER_BLOCK + threadId] = min(val, capacity);
-			}
-		}
-	};
+	//auto PaddLastBodyBlock = [] __device__(cuBodyProxy* bodyArray, int blocksCount, int sentinelIndex)
+	//{
+	//	int index = (blocksCount - 1) * blockDim.x + threadIdx.x;
+	//	if (index == sentinelIndex)
+	//	{
+	//		bodyArray[sentinelIndex].m_posit = bodyArray[sentinelIndex - 1].m_posit;
+	//		bodyArray[sentinelIndex].m_rotation = bodyArray[sentinelIndex - 1].m_rotation;
+	//	}
+	//	__syncthreads();
+	//
+	//	if (index > sentinelIndex)
+	//	{
+	//		bodyArray[index].m_rotation = bodyArray[sentinelIndex].m_rotation;
+	//		bodyArray[index].m_posit = bodyArray[sentinelIndex].m_posit;
+	//		bodyArray[index].m_obbSize = bodyArray[sentinelIndex].m_obbSize;
+	//		bodyArray[index].m_obbOrigin = bodyArray[sentinelIndex].m_obbOrigin;
+	//		bodyArray[index].m_scale = bodyArray[sentinelIndex].m_scale;
+	//		bodyArray[index].m_localPosition = bodyArray[sentinelIndex].m_localPosition;
+	//		bodyArray[index].m_localRotation = bodyArray[sentinelIndex].m_localRotation;
+	//		bodyArray[index].m_alignRotation = bodyArray[sentinelIndex].m_alignRotation;
+	//	}
+	//};
 
 	auto EndGridHash = [] __device__(cuSceneInfo& info, cuAabbGridHash* hashArray)
 	{
@@ -629,77 +488,292 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto GenerateHash = [] __device__(const cuSceneInfo & info, const cuBodyProxy * bodyArray, const int* scan, cuAabbGridHash * hashArray)
 	{
-		__shared__  cuBoundingBox cacheAabb;
+		//__shared__  cuBoundingBox cacheAabb;
+		//
+		//const int threadId = threadIdx.x;
+		//const int index = threadId + blockDim.x * blockIdx.x;
+		//if (threadId == 0)
+		//{
+		//	cacheAabb.m_min = info.m_worldBox.m_min;
+		//	cacheAabb.m_max = info.m_worldBox.m_max;
+		//}
+		//__syncthreads();
+		//
+		//const cuVector minBox(cacheAabb.m_min);
+		//const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
+		//const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
+		//
+		//const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+		//const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+		//const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+		//const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		//const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		//const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+		//
+		//cuAabbGridHash hash;
+		//hash.m_id = min(index, info.m_sentinelIndex);
+		//int start = scan[index];
+		//
+		//for (int z = z0; z < z1; z++)
+		//{
+		//	hash.m_z = z;
+		//	for (int y = y0; y < y1; y++)
+		//	{
+		//		hash.m_y = y;
+		//		for (int x = x0; x < x1; x++)
+		//		{
+		//			hash.m_x = x;
+		//			hashArray[start] = hash;
+		//			start++;
+		//		}
+		//	}
+		//}
+	};
 
-		const int threadId = threadIdx.x;
-		const int index = threadId + blockDim.x * blockIdx.x;
-		if (threadId == 0)
+	auto CalcuateBodyAabb = [] __device__(cuSceneInfo& info)
+	{
+		__shared__  cuBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
+
+		int threadId = threadIdx.x;
+		int index = threadId + blockDim.x * blockIdx.x;
+		const int bodyCount = info.m_bodyArray.m_size - 1;
+		if (index < bodyCount)
 		{
-			cacheAabb.m_min = info.m_worldBox.m_min;
-			cacheAabb.m_max = info.m_worldBox.m_max;
+			cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+			cuBodyProxy& body = bodyArray[index];
+
+			// calculate shape global Matrix
+			body.m_globalSphapeRotation = body.m_localRotation * body.m_rotation;
+			cuMatrix3x3 matrix(body.m_globalSphapeRotation.GetMatrix3x3());
+			body.m_globalSphapePosition = matrix.RotateVector(body.m_localPosition) + body.m_posit;
+
+			matrix.m_front = matrix.m_front.Scale(body.m_scale.x);
+			matrix.m_up = matrix.m_up.Scale(body.m_scale.y);
+			matrix.m_right = matrix.m_right.Scale(body.m_scale.z);
+			matrix = body.m_alignRotation.GetMatrix3x3() * matrix;
+
+			const cuVector origin(matrix.RotateVector(body.m_obbOrigin) + body.m_globalSphapePosition);
+			const cuVector size(matrix.m_front.Abs().Scale(body.m_obbSize.x) + matrix.m_up.Abs().Scale(body.m_obbSize.y) + matrix.m_right.Abs().Scale(body.m_obbSize.z));
+
+			const cuVector padding(1.0f / 16.0f);
+			const cuVector minBox(origin - size - padding);
+			const cuVector maxBox(origin + size + padding);
+
+			// save aabb and calculate bonding box for this thread block
+			body.m_minAabb = minBox;
+			body.m_maxAabb = maxBox;
+			cacheAabb[threadId].m_min = minBox;
+			cacheAabb[threadId].m_max = maxBox;
+		}
+
+		const int lastBlock = bodyCount / D_THREADS_PER_BLOCK;
+		if (lastBlock == blockIdx.x)
+		{
+			__syncthreads();
+			const int lastId = bodyCount - D_THREADS_PER_BLOCK * lastBlock;
+			const cuBoundingBox box(cacheAabb[0]);
+			if (threadId >= lastId)
+			{
+				cacheAabb[threadId] = box;
+			}
 		}
 		__syncthreads();
 
-		const cuVector minBox(cacheAabb.m_min);
-		const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
-		const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
-
-		const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
-		const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-
-		cuAabbGridHash hash;
-		hash.m_id = min(index, info.m_sentinelIndex);
-		int start = scan[index];
-
-		for (int z = z0; z < z1; z++)
+		cuBoundingBox* bBox = info.m_bodyAabbArray.m_array;
+		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
 		{
-			hash.m_z = z;
-			for (int y = y0; y < y1; y++)
+			if (threadId < i)
 			{
-				hash.m_y = y;
-				for (int x = x0; x < x1; x++)
-				{
-					hash.m_x = x;
-					hashArray[start] = hash;
-					start++;
-				}
+				cacheAabb[threadId].m_min = cacheAabb[threadId].m_min.Min(cacheAabb[threadId + i].m_min);
+				cacheAabb[threadId].m_max = cacheAabb[threadId].m_max.Max(cacheAabb[threadId + i].m_max);
+			}
+			__syncthreads();
+		}
+		
+		if (threadId == 0)
+		{
+			bBox[blockIdx.x].m_min = cacheAabb[0].m_min;
+			bBox[blockIdx.x].m_max = cacheAabb[0].m_max;
+		}
+	};
+
+	auto ReducedAabb = [] __device__(cuSceneInfo& info)
+	{
+		__shared__  cuBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
+
+		cuBoundingBox* bBoxOut = info.m_bodyAabbArray.m_array;
+
+		int index = threadIdx.x;
+		const int boxCount = info.m_bodyAabbArray.m_size;
+		if (index < boxCount)
+		{
+			cacheAabb[index] = bBoxOut[index];
+		}
+		__syncthreads();
+
+		if (index >= boxCount)
+		{
+			cacheAabb[index] = cacheAabb[0];
+		}
+		__syncthreads();
+
+		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
+		{
+			if (index < i)
+			{
+				cacheAabb[index].m_min = cacheAabb[index].m_min.Min(cacheAabb[index + i].m_min);
+				cacheAabb[index].m_max = cacheAabb[index].m_max.Max(cacheAabb[index + i].m_max);
+			}
+			__syncthreads();
+		}
+
+		if (threadIdx.x == 0)
+		{
+			cuVector minBox((cacheAabb[0].m_min.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE));
+			cuVector maxBox((cacheAabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE));
+			minBox.w = 0.0f;
+			maxBox.w = 0.0f;
+			const cuVector sizeBox((maxBox - minBox).Scale(D_CUDA_SCENE_INV_GRID_SIZE));
+			info.m_hasUpperByteHash.x = (sizeBox.x >= 256);
+			info.m_hasUpperByteHash.y = (sizeBox.y >= 256);
+			info.m_hasUpperByteHash.z = (sizeBox.z >= 256);
+
+			info.m_worldBox.m_min = minBox;
+			info.m_worldBox.m_max = maxBox;
+		}
+	};
+
+	auto CountAabb = [] __device__(const cuSceneInfo& info)
+	{
+		int index = threadIdx.x + blockDim.x * blockIdx.x;
+		const int bodyCount = info.m_bodyArray.m_size - 1;
+		if (index < bodyCount)
+		{
+			int* scan = info.m_scan.m_array;
+			cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+
+			const cuVector minBox(info.m_worldBox.m_min);
+			const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
+			const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
+
+			const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+			const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+			const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+			const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+			const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+			const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+			const int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
+			scan[index + 1] = count;
+			if (index == 0)
+			{
+				scan[0] = 0;
 			}
 		}
 	};
 
-	//if (m_context->m_gridHash.GetCount() < m_context->m_sceneInfoCpu1->m_gridHashCount)
-	//{
-	//	cudaDeviceSynchronize();
-	//	m_context->m_histogram.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
-	//	m_context->m_gridHash.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
-	//	m_context->m_gridHashTmp.SetCount(m_context->m_sceneInfoCpu1->m_gridHashCount);
-	//	cudaDeviceSynchronize();
-	//}
+	auto PrefixScanSum0 = [] __device__(cuSceneInfo& info)
+	{
+		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
 
-	//cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
-	//cudaStream_t stream = m_context->m_stream0;
-	//ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
-	//ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	//dAssert(blocksCount * D_THREADS_PER_BLOCK == threads);
-	//
+		int threadId = threadIdx.x;
+		int threadId1 = threadId + D_THREADS_PER_BLOCK;
+		int index = threadId + blockDim.x * blockIdx.x;
+		const int bodyCount = info.m_bodyArray.m_size;
+		
+		int* scan = info.m_scan.m_array;
+		cacheBuffer[threadId] = 0;
+		cacheBuffer[threadId1] = 0;
+		__syncthreads();
+
+		if (index < bodyCount)
+		{
+			cacheBuffer[threadId1] = scan[index];
+		}
+		__syncthreads();
+		
+		for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
+		{
+			int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
+			__syncthreads();
+			cacheBuffer[threadId1] = sum;
+			__syncthreads();
+		}
+		if (index < bodyCount)
+		{
+			scan[index] = cacheBuffer[threadId1];
+		}
+	};
+
+	auto PrefixScanSum1 = [] __device__(cuSceneInfo& info)
+	{
+		//, int* scan, int size, int sentinelIndex, int gridCapacity
+		//__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
+
+		int threadId = threadIdx.x;
+		const int bodyCount = info.m_bodyArray.m_size;
+		int* scan = info.m_scan.m_array;
+
+		if ((bodyCount >= D_THREADS_PER_BLOCK) && (bodyCount < D_THREADS_PER_BLOCK * 2))
+		{
+			int val = scan[D_THREADS_PER_BLOCK - 1];
+			int j = D_THREADS_PER_BLOCK + threadId;
+			if (j < bodyCount)
+			{
+				scan[j] = scan[j] + val;
+			}
+			__syncthreads();
+		}
+		else
+		{
+			const int blocks = (bodyCount - 1) / D_THREADS_PER_BLOCK;
+			for (int i = 1; i < blocks; i++)
+			{
+				int sum = scan[i * D_THREADS_PER_BLOCK - 1];
+				__syncthreads();
+				scan[i * D_THREADS_PER_BLOCK + threadId] += sum;
+				__syncthreads();
+			}
+			int val = scan[blocks * D_THREADS_PER_BLOCK - 1];
+			int j = blocks * D_THREADS_PER_BLOCK + threadId;
+			if (j < bodyCount)
+			{
+				scan[j] = scan[j] + val;
+			}
+			__syncthreads();
+		}
+		
+		if (threadId == 0)
+		{
+			int val = scan[bodyCount - 1];
+			info.m_histogram.m_size = val;
+			if (val > info.m_histogram.m_capacity)
+			{
+				info.m_frameIsValid = 0;
+			}
+		}
+	};
+
+
+	cudaStream_t stream = m_context->m_stream0;
+	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
+	
+	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
+	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	
 	//int* const scanGpu = &m_context->m_scan[0];
 	//int* const histogramGpu = &m_context->m_histogram[0];
 	//cuAabbGridHash* const hashArrayGpu = &m_context->m_gridHash[0];
 	//cuAabbGridHash* const hashArrayTmpGpu = &m_context->m_gridHashTmp[0];
 	//cuBodyProxy* const bodiesGpu = &m_context->m_bodyBufferGpu[0];
 	//cuBoundingBox* const bBoxGpu = &m_context->m_boundingBoxGpu[0];
-	//
+
 	//ndInt32 sentinelIndex = m_context->m_bodyBufferCpu.GetCount() - 1;
-	//CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, bodiesGpu, blocksCount, sentinelIndex);
-	//CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (UpdateAabb, bodiesGpu, bBoxGpu);
-	//CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu, bBoxGpu, blocksCount);
-	//CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu, bodiesGpu, scanGpu);
-	//CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, scanGpu);
-	//CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu, scanGpu, threads, sentinelIndex, m_context->m_gridHash.GetCount());
+	//CudaAddBodyPadding << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PaddLastBodyBlock, *infoGpu);
+	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
+	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
+	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
+	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
+	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
 	//CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHash, *infoGpu, bodiesGpu, scanGpu, hashArrayGpu);
 	////CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu, hashArrayGpu);
 	//CudaCountingSort sortHash(infoGpu, histogramGpu, threads, stream);
