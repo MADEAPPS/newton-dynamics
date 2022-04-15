@@ -28,40 +28,40 @@
 class cuMatrix3x3
 {
 	public:
-	inline __device__ cuMatrix3x3()
+	inline __device__ __host__ cuMatrix3x3()
 	{
 	}
 
-	inline __device__ cuMatrix3x3(const cuMatrix3x3& src)
+	inline __device__ __host__ cuMatrix3x3(const cuMatrix3x3& src)
 		:m_front(src.m_front)
 		,m_up(src.m_up)
 		,m_right(src.m_right)
 	{
 	}
 
-	inline __device__ cuMatrix3x3(const cuVector& front, const cuVector& up, const cuVector& right)
+	inline __device__ __host__ cuMatrix3x3(const cuVector& front, const cuVector& up, const cuVector& right)
 		:m_front(front)
 		,m_up(up)
 		,m_right(right)
 	{
 	}
 
-	inline cuMatrix3x3 __device__ operator* (const cuMatrix3x3& A) const
+	inline cuMatrix3x3 __device__ __host__ operator* (const cuMatrix3x3& A) const
 	{
 		return cuMatrix3x3(A.RotateVector(m_front), A.RotateVector(m_up), A.RotateVector(m_right));
 	}
 
-	inline cuVector __device__ UnrotateVector(const cuVector &v) const
+	inline cuVector __device__ __host__ UnrotateVector(const cuVector &v) const
 	{
 		return cuVector((m_front * v).AddHorizontal(), (m_up * v).AddHorizontal(), (m_right * v).AddHorizontal(), 0.0f);
 	}
 
-	inline cuVector __device__ RotateVector(const cuVector& v) const
+	inline cuVector __device__ __host__ RotateVector(const cuVector& v) const
 	{
 		return m_front.Scale(v.x) + m_up.Scale(v.y) + m_right.Scale(v.z);
 	}
 
-	inline cuVector __device__ SolveByGaussianElimination(const cuVector &v) const
+	inline cuVector __device__ __host__ SolveByGaussianElimination(const cuVector &v) const
 	{
 		cuMatrix3x3 tmp(*this);
 		cuVector ret(v);

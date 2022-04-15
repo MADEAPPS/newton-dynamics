@@ -29,37 +29,37 @@
 #define D_THREADS_PER_BLOCK		256
 
 template <class T>
-inline T __device__ cuAbs(T A)
+inline T __device__ __host__ cuAbs(T A)
 {
 	return fabsf(A);
 }
 
 template <class T>
-inline T __device__ cuFloor(T A)
+inline T __device__ __host__ cuFloor(T A)
 {
 	return floorf(A);
 }
 
 template <class T>
-inline T __device__ cuMax(T A, T B)
+inline T __device__ __host__ cuMax(T A, T B)
 {
 	return fmaxf(A, B);
 }
 
 template <class T>
-inline T __device__ cuMin(T A, T B)
+inline T __device__ __host__ cuMin(T A, T B)
 {
 	return fminf(A, B);
 }
 
 template <class T>
-inline T __device__ cuSelect(bool test, T A, T B)
+inline T __device__ __host__ cuSelect(bool test, T A, T B)
 {
 	return test ? A : B;
 }
 
 template <class T>
-inline void __device__ cuSwap(T& A, T& B)
+inline void __device__ __host__ cuSwap(T& A, T& B)
 {
 	T tmp(A);
 	A = B;

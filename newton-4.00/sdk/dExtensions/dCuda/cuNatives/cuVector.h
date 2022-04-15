@@ -31,11 +31,11 @@
 class cuVector: public float4
 {
 	public:
-	inline __device__ cuVector()
+	inline __device__ __host__ cuVector()
 	{
 	}
 
-	inline __device__ cuVector(float val)
+	inline __device__ __host__ cuVector(float val)
 	{
 		x = val;
 		y = val;
@@ -43,7 +43,7 @@ class cuVector: public float4
 		w = val;
 	}
 
-	inline __device__ cuVector(float val_x, float val_y, float val_z, float val_w)
+	inline __device__ __host__ cuVector(float val_x, float val_y, float val_z, float val_w)
 	{
 		x = val_x;
 		y = val_y;
@@ -51,7 +51,7 @@ class cuVector: public float4
 		w = val_w;
 	}
 
-	inline __device__ cuVector(const cuVector& src)
+	inline __device__ __host__ cuVector(const cuVector& src)
 	{
 		x = src.x;
 		y = src.y;
@@ -72,32 +72,32 @@ class cuVector: public float4
 		return ndVector(src.x, src.y, src.z, src.w);
 	}
 
-	inline float __device__ GetElement(int i) const
+	inline float __device__ __host__ GetElement(int i) const
 	{
 		return (&this->x)[i];
 	}
 
-	inline void __device__ SetElement(int i, float val)
+	inline void __device__ __host__ SetElement(int i, float val)
 	{
 		(&this->x)[i] = val;
 	}
 	
-	inline cuVector __device__ operator+ (const cuVector& A) const
+	inline cuVector __device__ __host__ operator+ (const cuVector& A) const
 	{
 		return cuVector(x + A.x, y + A.y, z + A.z, w + A.w);
 	}
 
-	inline cuVector __device__ operator- (const cuVector& A) const
+	inline cuVector __device__ __host__ operator- (const cuVector& A) const
 	{
 		return cuVector(x - A.x, y - A.y, z - A.z, w - A.w);
 	}
 
-	inline cuVector __device__ operator* (const cuVector& A) const
+	inline cuVector __device__ __host__ operator* (const cuVector& A) const
 	{
 		return cuVector(x * A.x, y * A.y, z * A.z, w * A.w);
 	}
 
-	inline cuVector __device__ operator> (const cuVector& A) const
+	inline cuVector __device__ __host__ operator> (const cuVector& A) const
 	{
 		return cuVector(
 			cuSelect(x > A.x, 1.0f, 0.0f),
@@ -106,7 +106,7 @@ class cuVector: public float4
 			cuSelect(w > A.w, 1.0f, 0.0f));
 	}
 
-	inline cuVector __device__ operator< (const cuVector& A) const
+	inline cuVector __device__ __host__ operator< (const cuVector& A) const
 	{
 		return cuVector(
 			cuSelect(x < A.x, 1.0f, 0.0f),
@@ -115,47 +115,47 @@ class cuVector: public float4
 			cuSelect(w < A.w, 1.0f, 0.0f));
 	}
 
-	inline cuVector __device__ Abs() const
+	inline cuVector __device__ __host__ Abs() const
 	{
 		return cuVector(cuAbs(x), cuAbs(y), cuAbs(z), cuAbs(w));
 	}
 
-	inline cuVector __device__ Select(const cuVector& test, const cuVector& A) const
+	inline cuVector __device__ __host__ Select(const cuVector& test, const cuVector& A) const
 	{
 		return cuVector(*this * test + A * (cuVector(1.0f) - test));
 	}
 
-	inline cuVector __device__ Min (const cuVector& A) const
+	inline cuVector __device__ __host__ Min (const cuVector& A) const
 	{
 		return cuVector(cuMin(x, A.x), cuMin(y, A.y), cuMin(z, A.z), cuMin(w, A.w));
 	}
 
-	inline cuVector __device__ Max(const cuVector& A) const
+	inline cuVector __device__ __host__ Max(const cuVector& A) const
 	{
 		return cuVector(cuMax(x, A.x), cuMax(y, A.y), cuMax(z, A.z), cuMax(w, A.w));
 	}
 
-	inline cuVector __device__ Floor() const
+	inline cuVector __device__ __host__ Floor() const
 	{
 		return cuVector(cuFloor(x), cuFloor(y), cuFloor(z), cuFloor(w));
 	}
 
-	inline cuVector __device__ Scale(float s) const
+	inline cuVector __device__ __host__ Scale(float s) const
 	{
 		return cuVector(x * s, y * s, z * s, w * s);
 	}
 
-	inline float __device__ AddHorizontal() const
+	inline float __device__ __host__ AddHorizontal() const
 	{
 		return x + y + z + w;
 	}
 
-	inline float __device__ DotProduct(const cuVector& B) const
+	inline float __device__ __host__ DotProduct(const cuVector& B) const
 	{
 		return (*this * B).AddHorizontal();
 	}
 
-	inline cuVector __device__ CrossProduct(const cuVector& B) const
+	inline cuVector __device__ __host__ CrossProduct(const cuVector& B) const
 	{
 		return cuVector(y * B.z - z * B.y,
 						z * B.x - x * B.z,
@@ -163,7 +163,7 @@ class cuVector: public float4
 						w);
 	}
 
-	inline cuVector __device__ Normalize() const
+	inline cuVector __device__ __host__ Normalize() const
 	{
 		float den = 1.0f / sqrt(DotProduct(*this));
 		return cuVector(x * den, y * den, z * den, w * den);

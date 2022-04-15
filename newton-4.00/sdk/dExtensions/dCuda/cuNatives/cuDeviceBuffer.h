@@ -168,6 +168,13 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 template<class T>
 void cuDeviceBuffer<T>::ReadData(const T* const src, ndInt32 elements)
 {
+	T* const src1 = (T*)src;
+	src1[0].m_omega.x = 0.0f;
+	src1[0].m_omega.y = 10.0f;
+	src1[0].m_omega.z = 0.0f;
+	src1[0].m_rotation = cuQuat();
+
+
 	dAssert(elements <= m_size);
 	cudaMemcpy(m_array, src, sizeof (T) * elements, cudaMemcpyHostToDevice);
 

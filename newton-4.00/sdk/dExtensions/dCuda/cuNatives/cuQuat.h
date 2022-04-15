@@ -28,27 +28,27 @@
 class cuQuat: public cuVector
 {
 	public:
-	inline __device__ cuQuat()
+	inline __device__ __host__ cuQuat()
 		:cuVector(0.0f, 0.0f, 0.0f, 1.0f)
 	{
 	}
 
-	inline __device__ cuQuat(float x, float y, float z, float w)
+	inline __device__ __host__ cuQuat(float x, float y, float z, float w)
 		:cuVector(x, y, z, w)
 	{
 	}
 
-	inline __device__ cuQuat(const cuQuat& src)
+	inline __device__ __host__ cuQuat(const cuQuat& src)
 		:cuVector(src)
 	{
 	}
 
-	inline __device__ cuQuat(const cuVector& src)
+	inline __device__ __host__ cuQuat(const cuVector& src)
 		:cuVector(src)
 	{
 	}
 
-	inline __device__ cuQuat(const cuVector& unitAxis, float angle)
+	inline __device__ __host__ cuQuat(const cuVector& unitAxis, float angle)
 		:cuVector()
 	{
 		angle = angle * 0.5f;
@@ -64,7 +64,7 @@ class cuQuat: public cuVector
 	{
 	}
 
-	inline cuMatrix3x3 __device__ GetMatrix3x3 () const
+	inline cuMatrix3x3 __device__ __host__ GetMatrix3x3 () const
 	{
 		//const cuQuat quat0 = *this;
 		const cuQuat quat1 (Scale (2.0));
@@ -86,12 +86,12 @@ class cuQuat: public cuVector
 		return cuMatrix3x3(front, up, right);
 	}
 
-	inline cuQuat __device__ Normalize() const
+	inline cuQuat __device__ __host__ Normalize() const
 	{
 		return cuVector::Normalize();
 	}
 
-	inline cuQuat __device__ operator* (const cuQuat &q) const
+	inline cuQuat __device__ __host__ operator* (const cuQuat &q) const
 	{
 		const cuVector x_( q.w,  q.z, -q.y, -q.x);
 		const cuVector y_(-q.z,  q.w,  q.x, -q.y);
