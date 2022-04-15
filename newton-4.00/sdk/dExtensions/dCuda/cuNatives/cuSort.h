@@ -50,8 +50,8 @@ class cuAabbGridHash
 class CudaCountingSort
 {
 	public:
-	CudaCountingSort(cuSceneInfo* info, int* histogram, int size, cudaStream_t stream);
-	void Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst);
+	CudaCountingSort(cuSceneInfo* info, cudaStream_t stream);
+	void Sort();
 
 	// this should be private but Cuda does not let private of protected lamddas 
 	// to be passed as arguments to kerners.
@@ -61,10 +61,7 @@ class CudaCountingSort
 	bool SanityCheck(const cuAabbGridHash* const src);
 
 	cuSceneInfo* m_info;
-	int* m_histogram;
 	cudaStream_t m_stream;
-	int m_size;
-	int m_blocks;
 };
 
 #endif

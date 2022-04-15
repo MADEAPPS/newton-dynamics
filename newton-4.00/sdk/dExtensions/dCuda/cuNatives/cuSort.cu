@@ -108,41 +108,38 @@ __global__ void CudaSortPrefixScans(Predicate PrefixScan, const cuSceneInfo& inf
 	}
 }
 
-CudaCountingSort::CudaCountingSort(cuSceneInfo* info, int* histogram, int size, cudaStream_t stream)
+CudaCountingSort::CudaCountingSort(cuSceneInfo* info, cudaStream_t stream)
 	:m_info(info)
-	,m_histogram(histogram)
 	,m_stream(stream)
-	,m_size(size)
-	,m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
 {
 }
 
 bool CudaCountingSort::SanityCheck(const cuAabbGridHash* const src)
 {
-	cudaError_t cudaStatus;
-	cuSceneInfo info;
-	ndArray<cuAabbGridHash> data;
-
-	cudaDeviceSynchronize();
-	cudaStatus = cudaMemcpy(&info, m_info, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	dAssert(cudaStatus == cudaSuccess);
-	
-	data.SetCount(m_size);
-	cudaStatus = cudaMemcpy(&data[0], src, m_size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
-	dAssert(cudaStatus == cudaSuccess);
-
-	for (int i = 1; i < m_size; i++)
-	{
-		cuAabbGridHash key0(data[i - 1]);
-		cuAabbGridHash key1(data[i - 0]);
-		bool zTest0 = key0.m_z < key1.m_z;
-		bool zTest1 = key0.m_z == key1.m_z;
-		bool yTest0 = key0.m_y < key1.m_y;
-		bool yTest1 = key0.m_y == key1.m_y;
-		bool xTest = key0.m_x <= key1.m_x;
-		bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
-		dAssert(test);
-	}
+	//cuSceneInfo info;
+	//cudaError_t cudaStatus;
+	//ndArray<cuAabbGridHash> data;
+	//
+	//cudaDeviceSynchronize();
+	//cudaStatus = cudaMemcpy(&info, m_info, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
+	//dAssert(cudaStatus == cudaSuccess);
+	//
+	//data.SetCount(m_size);
+	//cudaStatus = cudaMemcpy(&data[0], src, m_size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
+	//dAssert(cudaStatus == cudaSuccess);
+	//
+	//for (int i = 1; i < m_size; i++)
+	//{
+	//	cuAabbGridHash key0(data[i - 1]);
+	//	cuAabbGridHash key1(data[i - 0]);
+	//	bool zTest0 = key0.m_z < key1.m_z;
+	//	bool zTest1 = key0.m_z == key1.m_z;
+	//	bool yTest0 = key0.m_y < key1.m_y;
+	//	bool yTest1 = key0.m_y == key1.m_y;
+	//	bool xTest = key0.m_x <= key1.m_x;
+	//	bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
+	//	dAssert(test);
+	//}
 	return true;
 }
 
@@ -192,17 +189,22 @@ void CudaCountingSort::Sort(const cuAabbGridHash* const src, cuAabbGridHash* con
 		}
 	};
 
-	CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, m_histogram, m_size, digit);
-	CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, *m_info, m_histogram, m_size, digit);
-	CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, dst, m_histogram, m_size, digit);
+	//m_size(size)
+	//m_blocks((m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK)
+	//ndInt32 hashBlocksCount = (infoGpu->m_scan.m_size + 8 * D_THREADS_PER_BLOCK) / D_THREADS_PER_BLOCK; 
+	 
+	//CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, m_histogram, m_size, digit);
+	//CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, *m_info, m_histogram, m_size, digit);
+	//CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, dst, m_histogram, m_size, digit);
 }
 
-void CudaCountingSort::Sort(cuAabbGridHash* const src, cuAabbGridHash* const dst)
+void CudaCountingSort::Sort()
 {
-	for (int i = 0; i < 3; i++)
-	{
-		Sort(src, dst, i * 4 + 0);
-		Sort(dst, src, i * 4 + 1);
-	}
-	dAssert(SanityCheck(src));
+	//cuAabbGridHash* const src, cuAabbGridHash* const dst
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	Sort(src, dst, i * 4 + 0);
+	//	Sort(dst, src, i * 4 + 1);
+	//}
+	//dAssert(SanityCheck(src));
 }

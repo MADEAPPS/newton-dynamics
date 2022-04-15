@@ -80,7 +80,6 @@ class cuSceneInfo
 		,m_hashArray()
 		,m_bodyAabbArray()
 		,m_hashArrayScrath()
-		,m_gridHashCount(0)
 		,m_frameIsValid(1)
 		,m_debugCounter(0)
 	{
@@ -97,8 +96,9 @@ class cuSceneInfo
 	cuBuffer<cuAabbGridHash> m_hashArray;
 	cuBuffer<cuBoundingBox> m_bodyAabbArray;
 	cuBuffer<cuAabbGridHash> m_hashArrayScrath;
+	cuBuffer<cuSpatialVector> m_transformBuffer;
+	
 	int4 m_hasUpperByteHash;
-	int m_gridHashCount;
 	int m_frameIsValid;
 	int m_debugCounter;
 };
