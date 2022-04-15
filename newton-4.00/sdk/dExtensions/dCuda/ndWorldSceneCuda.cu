@@ -291,7 +291,7 @@ void ndWorldSceneCuda::GetBodyTransforms()
 	ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
 	CudaGetBodyTransforms << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (GetTransform, *infoGpu);
-	gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount(), stream);
+	gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
 }
 
 void ndWorldSceneCuda::UpdateTransform()

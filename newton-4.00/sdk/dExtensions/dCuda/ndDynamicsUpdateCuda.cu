@@ -43,7 +43,7 @@ template <typename Predicate>
 __global__ void CudaIntegrateUnconstrainedBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (info.m_frameIsValid & (index < info.m_bodyArray.m_size))
+	if (info.m_frameIsValid & (index < (info.m_bodyArray.m_size - 1)))
 	{
 		cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
 		IntegrateVelocity(bodyArray[index], timestep);
@@ -54,7 +54,7 @@ template <typename Predicate>
 __global__ void CudaIntegrateBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (info.m_frameIsValid & (index < info.m_bodyArray.m_size))
+	if (info.m_frameIsValid & (index < (info.m_bodyArray.m_size - 1)))
 	{
 		cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
 		IntegrateVelocity(bodyArray[index], timestep);
