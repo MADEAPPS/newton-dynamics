@@ -93,6 +93,11 @@ class cuBodyProxy
 			//SetAlpha(alpha);
 			m_veloc = m_veloc + accel.Scale(timestep);
 			m_omega = matrix.RotateVector(localOmega);
+
+			printf("IntegrateExternalForce: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
+				m_omega.x, m_omega.y, m_omega.z,
+				m_rotation.x, m_rotation.y, m_rotation.z, m_rotation.w);
+
 		}
 		//else
 		//{
@@ -116,10 +121,10 @@ class cuBodyProxy
 			const cuQuat rotationStep(omegaAxis, omegaAngle * timestep);
 			const cuQuat rotation(m_rotation * rotationStep);
 			m_rotation = rotation.Normalize();
-
-			//m_matrix = ndMatrix(m_rotation, m_matrix.m_posit);
 		}
-		////m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
+		printf("IntegrateVelocity: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
+			m_omega.x, m_omega.y, m_omega.z,
+			m_rotation.x, m_rotation.y, m_rotation.z, m_rotation.w);
 	}
 
 	void ProxyToBody(ndBodyKinematic* const body) const

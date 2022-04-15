@@ -273,6 +273,10 @@ void ndWorldSceneCuda::GetBodyTransforms()
 			cuBodyProxy* src = info.m_bodyArray.m_array;
 			cuSpatialVector* dst = info.m_transformBuffer.m_array;
 
+			printf("GetTransform: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
+				src[index].m_omega.x, src[index].m_omega.y, src[index].m_omega.z, 
+				src[index].m_rotation.x, src[index].m_rotation.y, src[index].m_rotation.z, src[index].m_rotation.w);
+
 			dst[index].m_linear = src[index].m_posit;
 			dst[index].m_angular = src[index].m_rotation;
 		}
@@ -323,9 +327,7 @@ void ndWorldSceneCuda::UpdateTransform()
 
 			body->m_transformIsDirty = true;
 			UpdateTransformNotify(threadIndex, body);
-			dTrace(("omega(%f %f %f) rot(%f %f %f %f)\n", 
-				body->m_omega[0], body->m_omega[1], body->m_omega[2],
-				rotation[0], rotation[1], rotation[2], rotation[3]));
+			//printf ("GetTransform: w(%f %f %f) r(%f %f %f %f)\n", body->m_omega[0], body->m_omega[1], body->m_omega[2],	rotation[0], rotation[1], rotation[2], rotation[3]);
 		}
 	});
 	ParallelExecute(SetTransform);
