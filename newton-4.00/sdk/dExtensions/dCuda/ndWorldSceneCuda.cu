@@ -323,6 +323,9 @@ void ndWorldSceneCuda::UpdateTransform()
 
 			body->m_transformIsDirty = true;
 			UpdateTransformNotify(threadIndex, body);
+			dTrace(("omega(%f %f %f) rot(%f %f %f %f)\n", 
+				body->m_omega[0], body->m_omega[1], body->m_omega[2],
+				rotation[0], rotation[1], rotation[2], rotation[3]));
 		}
 	});
 	ParallelExecute(SetTransform);
@@ -345,14 +348,14 @@ void ndWorldSceneCuda::UpdateBodyList()
 	{
 		cudaDeviceSynchronize();
 		sceneInfo->m_frameIsValid = 1;
-		cuDeviceBuffer<int>& histogram = m_context->m_histogram;
-		if (sceneInfo->m_histogram.m_size > histogram.GetCapacity())
+		cuDeviceBuffer<cuAabbGridHash>& gridHash = m_context->m_gridHash;
+		if (sceneInfo->m_hashArray.m_size > gridHash.GetCapacity())
 		{
-			histogram.SetCount(sceneInfo->m_histogram.m_size + 1);
-			m_context->m_gridHash.SetCount(sceneInfo->m_histogram.m_size + 1);
-			m_context->m_gridHashTmp.SetCount(sceneInfo->m_histogram.m_size + 1);
+			m_context->m_gridHash.SetCount(sceneInfo->m_hashArray.m_size + 1);
+			m_context->m_gridHashTmp.SetCount(sceneInfo->m_hashArray.m_size + 1);
+			m_context->m_histogram.SetCount(sceneInfo->m_hashArray.m_size + D_THREADS_PER_BLOCK + 1);
 			
-			sceneInfo->m_histogram = cuBuffer<int>(histogram);
+			sceneInfo->m_histogram = cuBuffer<int>(m_context->m_histogram);
 			sceneInfo->m_hashArray = cuBuffer<cuAabbGridHash>(m_context->m_gridHash);
 			sceneInfo->m_hashArrayScrath = cuBuffer<cuAabbGridHash>(m_context->m_gridHashTmp);
 		}

@@ -61,7 +61,6 @@ __global__ void CudaIntegrateBodies(Predicate IntegrateVelocity, cuSceneInfo& in
 	}
 }
 
-
 ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_context(((ndWorldSceneCuda*)world->GetScene())->m_context)

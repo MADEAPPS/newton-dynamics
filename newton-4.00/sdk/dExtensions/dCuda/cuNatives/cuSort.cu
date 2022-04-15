@@ -26,87 +26,102 @@
 #include "cuSort.h"
 #include "ndCudaContext.h"
 
-inline bool __device__ HasUpperDigit(const cuSceneInfo& info, int digit)
+inline bool __device__ IsThisDigitValid(const cuSceneInfo& info, int digit)
 {
+	bool isEven = (digit & 1) ? false : true;
 	bool hasUpperByteHash = (&info.m_hasUpperByteHash.x)[digit / 4] ? true : false;
-	bool test = !(digit & 1) | hasUpperByteHash;
+	bool test = isEven | hasUpperByteHash;
 	return test;
 }
 
-template <typename Predicate>
-__global__ void CudaSortHistogram(Predicate EvaluateKey, const cuSceneInfo& info, const cuAabbGridHash* src, int* histogram, int size, int digit)
+inline unsigned __device__ EvaluateKey(const cuAabbGridHash& dataElement, int digit)
+{
+	return dataElement.m_bytes[digit];
+};
+
+__global__ void CudaSortHistogram(const cuSceneInfo& info, int digit)
 {
 	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
 
-	bool test = HasUpperDigit(info, digit);
-	if (test)
+	//, const cuAabbGridHash* src, int* histogram, int size,
+
+	if (info.m_frameIsValid)
 	{
-		int threadIndex = threadIdx.x;
-		int index = threadIndex + blockDim.x * blockIdx.x;
-
-		cacheBuffer[threadIndex] = 0;
-		__syncthreads();
-		if (index < size)
-		{
-			int key = EvaluateKey(src[index], digit);
-			atomicAdd(&cacheBuffer[key], 1);
-		}
-		__syncthreads();
-		histogram[index] = cacheBuffer[threadIndex];
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaSortItems(Predicate EvaluateKey, const cuSceneInfo& info, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
-{
-	__shared__  int cacheKey[D_THREADS_PER_BLOCK];
-	__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
-	__shared__  int cacheBufferAdress[D_THREADS_PER_BLOCK];
-
-	int threadIndex = threadIdx.x;
-	int index = threadIndex + blockDim.x * blockIdx.x;
-
-	cacheKey[threadIndex] = 0;
-	if (index < size)
-	{
-		bool test = HasUpperDigit(info, digit);
+		bool test = IsThisDigitValid(info, digit);
 		if (test)
 		{
-			const cuAabbGridHash entry = src[index];
-			cacheBufferCount[threadIndex] = histogram[index];
-			cacheKey[threadIndex] = EvaluateKey(entry, digit);
-			__syncthreads();
+			int threadIndex = threadIdx.x;
+			cacheBuffer[threadIndex] = 0;
 
-			if (threadIndex == 0)
+			int index = threadIndex + blockDim.x * blockIdx.x;
+
+			int* histogram = info.m_histogram.m_array;
+			const cuAabbGridHash* src = (digit & 1) ? info.m_hashArray.m_array : info.m_hashArrayScrath.m_array;
+		
+			__syncthreads();
+			int gridCount = info.m_hashArray.m_size - 1;
+			if (index < gridCount)
 			{
-				for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
-				{
-					const int key = cacheKey[i];
-					const int dstIndex = cacheBufferCount[key];
-					cacheBufferAdress[i] = dstIndex;
-					cacheBufferCount[key] = dstIndex + 1;
-				}
+				unsigned key = EvaluateKey(src[index], digit);
+				atomicAdd(&cacheBuffer[key], 1);
 			}
 			__syncthreads();
-			int dstIndex = cacheBufferAdress[threadIndex];
-			dst[dstIndex] = entry;
-		}
-		else
-		{
-			dst[index] = src[index];
+			histogram[index] = cacheBuffer[threadIndex];
 		}
 	}
 }
 
-template <typename Predicate>
-__global__ void CudaSortPrefixScans(Predicate PrefixScan, const cuSceneInfo& info, int* histogram, int size, int digit)
-{
-	bool test = HasUpperDigit(info, digit);
-	if (test)
-	{
-		PrefixScan(histogram, size);
-	}
-}
+//template <typename Predicate>
+//__global__ void CudaSortItems(Predicate EvaluateKey, const cuSceneInfo& info, const cuAabbGridHash* src, cuAabbGridHash* dst, int* histogram, int size, int digit)
+//{
+//	__shared__  int cacheKey[D_THREADS_PER_BLOCK];
+//	__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
+//	__shared__  int cacheBufferAdress[D_THREADS_PER_BLOCK];
+//
+//	int threadIndex = threadIdx.x;
+//	int index = threadIndex + blockDim.x * blockIdx.x;
+//
+//	cacheKey[threadIndex] = 0;
+//	if (index < size)
+//	{
+//		bool test = IsThisDigitValid(info, digit);
+//		if (test)
+//		{
+//			const cuAabbGridHash entry = src[index];
+//			cacheBufferCount[threadIndex] = histogram[index];
+//			cacheKey[threadIndex] = EvaluateKey(entry, digit);
+//			__syncthreads();
+//
+//			if (threadIndex == 0)
+//			{
+//				for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
+//				{
+//					const int key = cacheKey[i];
+//					const int dstIndex = cacheBufferCount[key];
+//					cacheBufferAdress[i] = dstIndex;
+//					cacheBufferCount[key] = dstIndex + 1;
+//				}
+//			}
+//			__syncthreads();
+//			int dstIndex = cacheBufferAdress[threadIndex];
+//			dst[dstIndex] = entry;
+//		}
+//		else
+//		{
+//			dst[index] = src[index];
+//		}
+//	}
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaSortPrefixScans(Predicate PrefixScan, const cuSceneInfo& info, int* histogram, int size, int digit)
+//{
+//	bool test = IsThisDigitValid(info, digit);
+//	if (test)
+//	{
+//		PrefixScan(histogram, size);
+//	}
+//}
 
 //CudaCountingSort::CudaCountingSort(ndCudaContext* context)
 //	:m_context(context)
@@ -190,13 +205,14 @@ static void SortGridHash(ndCudaContext* context, int digit)
 	//};
 
 
+	cudaStream_t stream = context->m_stream0;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu1;
 	ndInt32 blocks = (sceneInfo->m_scan.m_size + 8 * D_THREADS_PER_BLOCK) / D_THREADS_PER_BLOCK;
 	 
-	//CudaSortHistogram << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, m_histogram, m_size, digit);
-	//CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, m_stream >> > (PrefixScanSum, *m_info, m_histogram, m_size, digit);
-	//CudaSortItems << <m_blocks, D_THREADS_PER_BLOCK, 0, m_stream >> > (EvaluateKey, *m_info, src, dst, m_histogram, m_size, digit);
+	CudaSortHistogram << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+	//CudaSortPrefixScans << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum, *infoGpu, m_histogram, m_size, digit);
+	//CudaSortItems << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (EvaluateKey, *infoGpu, src, dst, m_histogram, m_size, digit);
 }
 
 //void CudaCountingSort::Sort()
