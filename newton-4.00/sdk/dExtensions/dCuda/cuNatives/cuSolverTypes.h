@@ -30,6 +30,7 @@
 #include "cuDeviceBuffer.h"
 
 class cuBodyProxy;
+class cuAabbGridHash;
 
 class cuSpatialVector
 {
@@ -76,7 +77,9 @@ class cuSceneInfo
 		,m_scan()
 		,m_histogram()
 		,m_bodyArray()
+		,m_hashArray()
 		,m_bodyAabbArray()
+		,m_hashArrayScrath()
 		,m_gridHashCount(0)
 		,m_frameIsValid(1)
 		,m_debugCounter(0)
@@ -91,7 +94,9 @@ class cuSceneInfo
 	cuBuffer<int> m_scan;
 	cuBuffer<int> m_histogram;
 	cuBuffer<cuBodyProxy> m_bodyArray;
+	cuBuffer<cuAabbGridHash> m_hashArray;
 	cuBuffer<cuBoundingBox> m_bodyAabbArray;
+	cuBuffer<cuAabbGridHash> m_hashArrayScrath;
 	int4 m_hasUpperByteHash;
 	int m_gridHashCount;
 	int m_frameIsValid;
