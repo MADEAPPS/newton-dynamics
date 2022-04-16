@@ -47,21 +47,6 @@ class cuAabbGridHash
 };
 
 
-void CudaSortGridHash(ndCudaContext* context);
-//class CudaCountingSort
-//{
-//	public:
-//	CudaCountingSort(ndCudaContext* m_context);
-//	void Sort();
-//
-//	// this should be private but Cuda does not let private of protected lamddas 
-//	// to be passed as arguments to kerners.
-//	public:
-//	void Sort(const cuAabbGridHash* const src, cuAabbGridHash* const dst, int digit);
-//
-//	bool SanityCheck(const cuAabbGridHash* const src);
-//
-//	ndCudaContext* m_context;
-//};
+void CudaSortGridHash(ndCudaContext* const context);
 
 #endif

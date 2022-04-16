@@ -273,7 +273,7 @@ void ndWorldSceneCuda::GetBodyTransforms()
 			cuBodyProxy* src = info.m_bodyArray.m_array;
 			cuSpatialVector* dst = info.m_transformBuffer.m_array;
 
-			printf("GetTransform: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
+			printf("GetTransform GPU: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
 				src[index].m_omega.x, src[index].m_omega.y, src[index].m_omega.z, 
 				src[index].m_rotation.x, src[index].m_rotation.y, src[index].m_rotation.z, src[index].m_rotation.w);
 
@@ -309,7 +309,6 @@ void ndWorldSceneCuda::UpdateTransform()
 		dAssert(0);
 	}
 
-
 	GetBodyTransforms();
 	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -327,7 +326,9 @@ void ndWorldSceneCuda::UpdateTransform()
 
 			body->m_transformIsDirty = true;
 			UpdateTransformNotify(threadIndex, body);
-			//printf ("GetTransform: w(%f %f %f) r(%f %f %f %f)\n", body->m_omega[0], body->m_omega[1], body->m_omega[2],	rotation[0], rotation[1], rotation[2], rotation[3]);
+			printf ("GetTransform cpu %d : w(%f %f %f) r(%f %f %f %f)\n", i, 
+				body->m_omega[0], body->m_omega[1], body->m_omega[2],	
+				rotation[0], rotation[1], rotation[2], rotation[3]);
 		}
 	});
 	ParallelExecute(SetTransform);
