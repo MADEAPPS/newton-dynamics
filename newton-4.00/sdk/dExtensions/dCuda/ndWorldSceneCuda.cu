@@ -273,9 +273,9 @@ void ndWorldSceneCuda::GetBodyTransforms()
 			cuBodyProxy* src = info.m_bodyArray.m_array;
 			cuSpatialVector* dst = info.m_transformBuffer.m_array;
 
-			printf("GetTransform GPU: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
-				src[index].m_omega.x, src[index].m_omega.y, src[index].m_omega.z, 
-				src[index].m_rotation.x, src[index].m_rotation.y, src[index].m_rotation.z, src[index].m_rotation.w);
+			//printf("GetTransform GPU: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
+			//	src[index].m_omega.x, src[index].m_omega.y, src[index].m_omega.z, 
+			//	src[index].m_rotation.x, src[index].m_rotation.y, src[index].m_rotation.z, src[index].m_rotation.w);
 
 			dst[index].m_linear = src[index].m_posit;
 			dst[index].m_angular = src[index].m_rotation;
@@ -320,13 +320,20 @@ void ndWorldSceneCuda::UpdateTransform()
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			const cuSpatialVector& transform = data[i];
+
 			const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
 			const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
 			body->SetMatrixAndCentreOfMass(rotation, position);
 
 			body->m_transformIsDirty = true;
+
+			printf("SetTransform buffer %d : w(%f %f %f) r(%f %f %f %f)\n", i,
+				transform.m_linear.x, transform.m_linear.y, transform.m_linear.z,
+				transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w);
+
 			UpdateTransformNotify(threadIndex, body);
-			printf ("GetTransform cpu %d : w(%f %f %f) r(%f %f %f %f)\n", i, 
+
+			printf ("SetTransform body %d : w(%f %f %f) r(%f %f %f %f)\n", i, 
 				body->m_omega[0], body->m_omega[1], body->m_omega[2],	
 				rotation[0], rotation[1], rotation[2], rotation[3]);
 		}
