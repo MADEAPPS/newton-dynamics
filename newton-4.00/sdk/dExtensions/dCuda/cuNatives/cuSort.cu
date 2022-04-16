@@ -26,6 +26,19 @@
 #include "cuSort.h"
 #include "ndCudaContext.h"
 
+
+//__global__ void cuTest0(const cuSceneInfo& info, int digit)
+//{
+//
+//}
+//
+//__global__ void cuTest1(const cuSceneInfo& info, int digit, cudaStream_t stream)
+//{
+//	cuTest0 << <1, 1, 0, stream >> > (info, digit);
+//}
+
+
+
 inline bool __device__ cuIsThisGridHashDigitValid(const cuSceneInfo& info, int digit)
 {
 	bool isEven = (digit & 1) ? false : true;
@@ -169,33 +182,36 @@ __global__ void cuSortGridHashItems(const cuSceneInfo& info, int digit)
 	}
 }
 
-static bool GridHashSanityCheck(ndCudaContext* context)
+static bool GridHashSanityCheck(ndCudaContext* const context)
 {
-//	const cuAabbGridHash* const src
-//	//cuSceneInfo info;
-//	//cudaError_t cudaStatus;
-//	//ndArray<cuAabbGridHash> data;
-//	//
-//	//cudaDeviceSynchronize();
-//	//cudaStatus = cudaMemcpy(&info, m_info, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-//	//dAssert(cudaStatus == cudaSuccess);
-//	//
-//	//data.SetCount(m_size);
-//	//cudaStatus = cudaMemcpy(&data[0], src, m_size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
-//	//dAssert(cudaStatus == cudaSuccess);
-//	//
-//	//for (int i = 1; i < m_size; i++)
-//	//{
-//	//	cuAabbGridHash key0(data[i - 1]);
-//	//	cuAabbGridHash key1(data[i - 0]);
-//	//	bool zTest0 = key0.m_z < key1.m_z;
-//	//	bool zTest1 = key0.m_z == key1.m_z;
-//	//	bool yTest0 = key0.m_y < key1.m_y;
-//	//	bool yTest1 = key0.m_y == key1.m_y;
-//	//	bool xTest = key0.m_x <= key1.m_x;
-//	//	bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
-//	//	dAssert(test);
-//	//}
+	cuSceneInfo info;
+	cudaError_t cudaStatus;
+	cudaDeviceSynchronize();
+	cudaStatus = cudaMemcpy(&info, context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
+	dAssert(cudaStatus == cudaSuccess);
+
+	if (info.m_frameIsValid)
+	{
+		ndArray<cuAabbGridHash> data;
+		int size = info.m_hashArray.m_size;
+		data.SetCount(size);
+		cudaStatus = cudaMemcpy(&data[0], info.m_hashArray.m_array, size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
+		dAssert(cudaStatus == cudaSuccess);
+
+		for (int i = 1; i < size; i++)
+		{
+			cuAabbGridHash key0(data[i - 1]);
+			cuAabbGridHash key1(data[i - 0]);
+			bool zTest0 = key0.m_z < key1.m_z;
+			bool zTest1 = key0.m_z == key1.m_z;
+			bool yTest0 = key0.m_y < key1.m_y;
+			bool yTest1 = key0.m_y == key1.m_y;
+			bool xTest = key0.m_x <= key1.m_x;
+			//bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
+			bool test = xTest;
+			dAssert(test);
+		}
+	}
 	return true;
 }
 
@@ -203,12 +219,14 @@ static void SortGridHash(ndCudaContext* context, int digit)
 {
 	cudaStream_t stream = context->m_stream0;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
-	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu1;
-	ndInt32 blocks = (sceneInfo->m_scan.m_size + 8 * D_THREADS_PER_BLOCK) / D_THREADS_PER_BLOCK;
-	 
-	cuCountGridHashKeys << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-	cuGridHashPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-	cuSortGridHashItems << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
+	ndInt32 blocks = (sceneInfo->m_histogram.m_size + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	if (blocks)
+	{
+		cuCountGridHashKeys << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+		cuGridHashPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+		cuSortGridHashItems << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+	}
 }
 
 void CudaSortGridHash(ndCudaContext* const context)
@@ -216,7 +234,7 @@ void CudaSortGridHash(ndCudaContext* const context)
 	dAssert(context->m_gridHash.GetCount() == context->m_gridHashTmp.GetCount());
 	dAssert(context->m_histogram.GetCount() == context->m_gridHashTmp.GetCount());
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		SortGridHash(context, i * 4 + 0);
 		SortGridHash(context, i * 4 + 1);

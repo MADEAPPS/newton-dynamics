@@ -80,7 +80,7 @@ class cuSceneInfo
 		,m_hashArray()
 		,m_bodyAabbArray()
 		,m_hashArrayScrath()
-		,m_frameIsValid(1)
+		,m_frameIsValid(0)
 		,m_debugCounter(0)
 	{
 		m_hasUpperByteHash.x = 0;

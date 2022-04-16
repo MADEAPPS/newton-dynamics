@@ -42,46 +42,31 @@
 template <typename Predicate>
 __global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuSceneInfo& info)
 {
-	if (info.m_frameIsValid)
-	{
-		UpdateBodyScene(info);
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		CountAabb(info);
-	}
+	UpdateBodyScene(info);
 }
 
 template <typename Predicate>
 __global__ void CudaMergeAabb(Predicate ReducedAabb, cuSceneInfo& info)
 {
-	if (info.m_frameIsValid)
-	{
-		ReducedAabb(info);
-	}
+	ReducedAabb(info);
+}
+
+template <typename Predicate>
+__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
+{
+	CountAabb(info);
 }
 
 template <typename Predicate>
 __global__ void CudaPrefixScanSum0(Predicate PrefixScan, cuSceneInfo& info)
 {
-	if (info.m_frameIsValid)
-	{
-		PrefixScan(info);
-	}
+	PrefixScan(info);
 }
 
 template <typename Predicate>
 __global__ void CudaPrefixScanSum1(Predicate PrefixScan, cuSceneInfo& info)
 {
-	if (info.m_frameIsValid)
-	{
-		PrefixScan(info);
-	}
+	PrefixScan(info);
 }
 
 template <typename Predicate>
@@ -130,12 +115,6 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 void ndWorldSceneCuda::Sync()
 {
 	ndScene::Sync();
-
-	//syncronize all streams before starting a new frame.
-	//this is pretty horrendous function, need to find a beter method
-	//cudaDeviceSynchronize();
-	//cudaStreamSynchronize(m_context->m_stream0);
-	m_context->SwapBuffers();
 }
 
 void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
@@ -248,6 +227,7 @@ void ndWorldSceneCuda::LoadBodyData()
 	cudaError_t cudaStatus;
 	ParallelExecute(CopyBodies);
 
+	*m_context->m_sceneInfoCpu = info;
 	cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, &info, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
 	dAssert(cudaStatus == cudaSuccess);
 
@@ -273,10 +253,6 @@ void ndWorldSceneCuda::GetBodyTransforms()
 			cuBodyProxy* src = info.m_bodyArray.m_array;
 			cuSpatialVector* dst = info.m_transformBuffer.m_array;
 
-			//printf("GetTransform GPU: id(%d) w(%f %f %f) r(%f %f %f %f)\n", threadIdx.x,
-			//	src[index].m_omega.x, src[index].m_omega.y, src[index].m_omega.z, 
-			//	src[index].m_rotation.x, src[index].m_rotation.y, src[index].m_rotation.z, src[index].m_rotation.w);
-
 			dst[index].m_linear = src[index].m_posit;
 			dst[index].m_angular = src[index].m_rotation;
 		}
@@ -292,6 +268,10 @@ void ndWorldSceneCuda::GetBodyTransforms()
 
 	CudaGetBodyTransforms << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (GetTransform, *infoGpu);
 	gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
+
+	// I probably need to seet an even to swap teh buffer but for now let us just do a swap here.
+	//printf("SwapBuffers\n");
+	m_context->SwapBuffers();
 }
 
 void ndWorldSceneCuda::UpdateTransform()
@@ -300,7 +280,7 @@ void ndWorldSceneCuda::UpdateTransform()
 
 	// get the scene info from the update	
 	cuSceneInfo* const gpuInfo = m_context->m_sceneInfoGpu;
-	cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu0;
+	cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu;
 
 	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost, m_context->m_stream0);
 	dAssert(cudaStatus == cudaSuccess);
@@ -320,27 +300,24 @@ void ndWorldSceneCuda::UpdateTransform()
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			const cuSpatialVector& transform = data[i];
-
 			const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
 			const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
 			body->SetMatrixAndCentreOfMass(rotation, position);
 
 			body->m_transformIsDirty = true;
 
-			printf("SetTransform buffer %d : w(%f %f %f) r(%f %f %f %f)\n", i,
-				transform.m_linear.x, transform.m_linear.y, transform.m_linear.z,
-				transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w);
+			//printf("SetTransform buffer %d : w(%f %f %f) r(%f %f %f %f)\n", i,
+			//	transform.m_linear.x, transform.m_linear.y, transform.m_linear.z,
+			//	transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w);
 
 			UpdateTransformNotify(threadIndex, body);
 
-			printf ("SetTransform body %d : w(%f %f %f) r(%f %f %f %f)\n", i, 
-				body->m_omega[0], body->m_omega[1], body->m_omega[2],	
-				rotation[0], rotation[1], rotation[2], rotation[3]);
+			//printf ("SetTransform body %d : w(%f %f %f) r(%f %f %f %f)\n", i, 
+			//	body->m_omega[0], body->m_omega[1], body->m_omega[2],	
+			//	rotation[0], rotation[1], rotation[2], rotation[3]);
 		}
 	});
 	ParallelExecute(SetTransform);
-	
-	//ndScene::UpdateTransform();
 }
 
 void ndWorldSceneCuda::UpdateBodyList()
@@ -353,7 +330,7 @@ void ndWorldSceneCuda::UpdateBodyList()
 		LoadBodyData();
 	}
 	
-	cuSceneInfo* const sceneInfo = m_context->m_sceneInfoCpu1;
+	cuSceneInfo* const sceneInfo = m_context->m_sceneInfoCpu;
 	if (!sceneInfo->m_frameIsValid)
 	{
 		cudaDeviceSynchronize();
@@ -682,7 +659,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			info.m_histogram.m_size = newSize;
 			info.m_hashArray.m_size = newSize;
 			info.m_hashArrayScrath.m_size = newSize;
-			if (newSize > info.m_histogram.m_capacity)
+			if (newSize >= info.m_histogram.m_capacity)
 			{
 				info.m_frameIsValid = 0;
 			}
@@ -747,7 +724,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		info.m_hashArray.m_size = index + 1;
 		info.m_hashArrayScrath.m_size = index + 1;
 		info.m_debugCounter = info.m_debugCounter + 1;
-		if (info.m_hashArray.m_size > info.m_hashArray.m_capacity)
+		if ((index + 1) >= info.m_hashArray.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}

@@ -53,8 +53,7 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 	void SwapBuffers();
 	
 	cuSceneInfo* m_sceneInfoGpu;
-	cuSceneInfo* m_sceneInfoCpu0;
-	cuSceneInfo* m_sceneInfoCpu1;
+	cuSceneInfo* m_sceneInfoCpu;
 	cuDeviceBuffer<int> m_scan;
 	cuDeviceBuffer<int> m_histogram;
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
