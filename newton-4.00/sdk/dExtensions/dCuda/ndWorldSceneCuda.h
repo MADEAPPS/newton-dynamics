@@ -32,6 +32,7 @@ class ndWorldSceneCuda : public ndWorldScene
 
 	virtual void Begin();
 	virtual void End();
+	virtual bool IsValid() const;
 
 	virtual void InitBodyArray();
 	virtual void UpdateBodyList();

@@ -950,9 +950,18 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 				ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
 				delete m_scene;
 				m_scene = newScene;
-
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateCuda(this);
+				if (!newScene->IsValid())
+				{
+					delete m_solver;
+					ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = defaultScene;
+
+					m_solverMode = ndStandardSolver;
+					m_solver = new ndDynamicsUpdate(this);
+				}
 				break;
 			}
 			#endif

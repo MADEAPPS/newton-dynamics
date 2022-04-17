@@ -78,7 +78,6 @@ class ndScene : public ndThreadPool
 
 	public:
 	D_COLLISION_API virtual ~ndScene();
-	D_COLLISION_API virtual void Sync();
 
 	ndInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
@@ -102,6 +101,8 @@ class ndScene : public ndThreadPool
 
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
+	D_COLLISION_API virtual void Sync();
+	D_COLLISION_API virtual bool IsValid() const;
 
 	D_COLLISION_API virtual void Cleanup();
 	D_COLLISION_API void Update(ndFloat32 timestep);
@@ -201,6 +202,11 @@ class ndScene : public ndThreadPool
 	friend class ndConvexCastNotify;
 	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+inline bool ndScene::IsValid() const
+{
+	return true;
+}
 
 inline ndWorld* ndScene::GetWorld() const
 {

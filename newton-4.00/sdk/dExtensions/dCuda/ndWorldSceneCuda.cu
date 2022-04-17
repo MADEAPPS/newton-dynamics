@@ -119,6 +119,11 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 	}
 }
 
+bool ndWorldSceneCuda::IsValid() const
+{
+	return m_context ? true : false;
+}
+
 void ndWorldSceneCuda::Begin()
 {
 	ndWorldScene::Begin();
