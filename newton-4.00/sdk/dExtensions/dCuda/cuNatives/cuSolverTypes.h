@@ -80,8 +80,10 @@ class cuSceneInfo
 		,m_hashArray()
 		,m_bodyAabbArray()
 		,m_hashArrayScrath()
+		,m_transformBuffer0()
+		,m_transformBuffer1()
 		,m_frameIsValid(0)
-		,m_debugCounter(0)
+		,m_frameCount(0)
 	{
 		m_hasUpperByteHash.x = 0;
 		m_hasUpperByteHash.y = 0;
@@ -96,11 +98,12 @@ class cuSceneInfo
 	cuBuffer<cuAabbGridHash> m_hashArray;
 	cuBuffer<cuBoundingBox> m_bodyAabbArray;
 	cuBuffer<cuAabbGridHash> m_hashArrayScrath;
-	cuBuffer<cuSpatialVector> m_transformBuffer;
+	cuBuffer<cuSpatialVector> m_transformBuffer0;
+	cuBuffer<cuSpatialVector> m_transformBuffer1;
 	
 	int4 m_hasUpperByteHash;
 	int m_frameIsValid;
-	int m_debugCounter;
+	int m_frameCount;
 };
 
 #endif

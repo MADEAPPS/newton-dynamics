@@ -62,12 +62,17 @@ ndCudaContext::ndCudaContext()
 	,m_boundingBoxGpu()
 	,m_transformBufferCpu0()
 	,m_transformBufferCpu1()
-	,m_transformBufferGpu()
-	,m_stream0(0)
+	,m_transformBufferGpu0()
+	,m_transformBufferGpu1()
+	,m_solverMemCpyStream(0)
+	,m_solverComputeStream(0)
+	,m_frameCounter(0)
 {
 	cudaError_t cudaStatus;
-	// create two streams for double buffer updates
-	cudaStatus = cudaStreamCreate(&m_stream0);
+	cudaStatus = cudaStreamCreate(&m_solverMemCpyStream);
+	dAssert(cudaStatus == cudaSuccess);
+
+	cudaStatus = cudaStreamCreate(&m_solverComputeStream);
 	dAssert(cudaStatus == cudaSuccess);
 
 	cudaStatus = cudaMalloc((void**)&m_sceneInfoGpu, sizeof(cuSceneInfo));
@@ -94,11 +99,11 @@ ndCudaContext::~ndCudaContext()
 	cudaStatus = cudaFree(m_sceneInfoGpu);
 	dAssert(cudaStatus == cudaSuccess);
 
-	cudaStatus = cudaStreamDestroy(m_stream0);
+	cudaStatus = cudaStreamDestroy(m_solverComputeStream);
 	dAssert(cudaStatus == cudaSuccess);
 
-	//cudaStatus = cudaStreamDestroy(m_stream1);
-	//dAssert(cudaStatus == cudaSuccess);
+	cudaStatus = cudaStreamDestroy(m_solverMemCpyStream);
+	dAssert(cudaStatus == cudaSuccess);
 
 	if (cudaStatus != cudaSuccess)
 	{

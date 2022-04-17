@@ -594,7 +594,7 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 	if (m_context->m_bodyBufferGpu.GetCount())
 	{
 		D_TRACKTIME();
-		cudaStream_t stream = m_context->m_stream0;
+		cudaStream_t stream = m_context->m_solverComputeStream;
 		ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		const ndFloat32 timestep = scene->GetTimestep();
@@ -1160,7 +1160,7 @@ void ndDynamicsUpdateCuda::IntegrateBodies()
 
 	if (m_context->m_bodyBufferGpu.GetCount())
 	{
-		cudaStream_t stream = m_context->m_stream0;
+		cudaStream_t stream = m_context->m_solverComputeStream;
 		ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
 		ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		cuSceneInfo& sceneInfo = *m_context->m_sceneInfoGpu;

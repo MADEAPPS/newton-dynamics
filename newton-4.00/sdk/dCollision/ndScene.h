@@ -100,6 +100,9 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
+	D_COLLISION_API virtual void Begin();
+	D_COLLISION_API virtual void End();
+
 	D_COLLISION_API virtual void Cleanup();
 	D_COLLISION_API void Update(ndFloat32 timestep);
 
@@ -150,8 +153,6 @@ class ndScene : public ndThreadPool
 
 	void UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root);
 	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	//bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
-	//void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 	void SubmitPairs(ndSceneBodyNode* const bodyNode, ndSceneNode* const node);
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;

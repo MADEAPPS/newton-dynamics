@@ -63,9 +63,12 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 	cuDeviceBuffer<cuBoundingBox> m_boundingBoxGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu1;
-	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu;
+	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu0;
+	cuDeviceBuffer<cuSpatialVector> m_transformBufferGpu1;
 
-	cudaStream_t m_stream0;
+	cudaStream_t m_solverMemCpyStream;
+	cudaStream_t m_solverComputeStream;
+	ndInt32 m_frameCounter;
 };
 
 #endif

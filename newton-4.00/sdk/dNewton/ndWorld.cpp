@@ -417,7 +417,6 @@ void ndWorld::ThreadFunction()
 
 		m_scene->SetTimestep(m_timestep);
 		m_scene->BalanceScene();
-		//m_scene->UpdateBodyList();
 
 		ndInt32 const steps = m_subSteps;
 		ndFloat32 timestep = m_timestep / steps;

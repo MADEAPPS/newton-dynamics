@@ -88,11 +88,21 @@ __global__ void CudaEndGridHash(Predicate EndGridHash, cuSceneInfo& info)
 }
 
 template <typename Predicate>
-__global__ void CudaGetBodyTransforms(Predicate GetTransform, cuSceneInfo& info)
+__global__ void CudaGetBodyTransforms(Predicate GetTransform, cuSceneInfo& info, int frameCount)
 {
-	GetTransform(info);
+	GetTransform(info, frameCount);
 }
 
+template <typename Predicate>
+__global__ void CudaInitTransforms(Predicate InitTransforms, cuSceneInfo& info)
+{
+	InitTransforms(info);
+}
+
+__global__ void CudaEndFrame(cuSceneInfo& info, int frameCount)
+{
+	info.m_frameCount = frameCount;
+}
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
@@ -109,9 +119,39 @@ ndWorldSceneCuda::~ndWorldSceneCuda()
 	}
 }
 
-void ndWorldSceneCuda::Sync()
+void ndWorldSceneCuda::Begin()
 {
-	ndScene::Sync();
+	ndWorldScene::Begin();
+	cudaDeviceSynchronize();
+
+	cudaStream_t stream = m_context->m_solverMemCpyStream;
+	const ndInt32 frameCounter = m_context->m_frameCounter;
+
+	// get the scene info from the update	
+	cuSceneInfo* const gpuInfo = m_context->m_sceneInfoGpu;
+	cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu;
+	
+	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost, stream);
+	dAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
+
+	CudaEndFrame << < 1, 1, 0, m_context->m_solverComputeStream >> > (*gpuInfo, frameCounter);
+	if (frameCounter)
+	{
+		cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
+		cuDeviceBuffer<cuSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_context->m_transformBufferGpu1 : m_context->m_transformBufferGpu0;
+		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
+	}
+}
+
+void ndWorldSceneCuda::End()
+{
+	m_context->m_frameCounter = m_context->m_frameCounter + 1;
+	m_context->SwapBuffers();
+	ndWorldScene::End();
 }
 
 void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
@@ -183,10 +223,28 @@ void ndWorldSceneCuda::LoadBodyData()
 		}
 	});
 
+	auto InitTransforms = [] __device__(const cuSceneInfo & info)
+	{
+		int index = threadIdx.x + blockDim.x * blockIdx.x;
+		if (index < info.m_bodyArray.m_size)
+		{
+			cuBodyProxy* src = info.m_bodyArray.m_array;
+			cuSpatialVector* dst0 = info.m_transformBuffer0.m_array;
+			cuSpatialVector* dst1 = info.m_transformBuffer1.m_array;
+
+			dst0[index].m_linear = src[index].m_posit;
+			dst0[index].m_angular = src[index].m_rotation;
+			dst1[index].m_linear = src[index].m_posit;
+			dst1[index].m_angular = src[index].m_rotation;
+		}
+	};
+
 	cudaDeviceSynchronize();
 
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+
 	const ndInt32 cpuBodyCount = bodyArray.GetCount();
+	const ndInt32 blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	const ndInt32 gpuBodyCount = (D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1)) / D_THREADS_PER_BLOCK);
 
 	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
@@ -198,16 +256,18 @@ void ndWorldSceneCuda::LoadBodyData()
 	cuDeviceBuffer<cuAabbGridHash>& hashArrayGpu1 = m_context->m_gridHashTmp;
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
-	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu = m_context->m_transformBufferGpu;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu0 = m_context->m_transformBufferGpu0;
+	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu1 = m_context->m_transformBufferGpu1;
 
 	scanGpu.SetCount(cpuBodyCount);
 	histogramGpu.SetCount(cpuBodyCount);
 	hashArrayGpu0.SetCount(cpuBodyCount);
 	hashArrayGpu1.SetCount(cpuBodyCount);
 	bodyBufferGpu.SetCount(cpuBodyCount);
-	transformBufferGpu.SetCount(cpuBodyCount);
+	transformBufferGpu0.SetCount(cpuBodyCount);
+	transformBufferGpu1.SetCount(cpuBodyCount);
 	transformBufferCpu0.SetCount(cpuBodyCount);
 	transformBufferCpu1.SetCount(cpuBodyCount);
 	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
@@ -219,7 +279,8 @@ void ndWorldSceneCuda::LoadBodyData()
 	info.m_hashArray = cuBuffer<cuAabbGridHash>(hashArrayGpu0);
 	info.m_bodyAabbArray = cuBuffer<cuBoundingBox>(boundingBoxGpu);
 	info.m_hashArrayScrath = cuBuffer<cuAabbGridHash>(hashArrayGpu1);
-	info.m_transformBuffer = cuBuffer<cuSpatialVector>(transformBufferGpu);
+	info.m_transformBuffer0 = cuBuffer<cuSpatialVector>(transformBufferGpu0);
+	info.m_transformBuffer1 = cuBuffer<cuSpatialVector>(transformBufferGpu1);
 
 	cudaError_t cudaStatus;
 	ParallelExecute(CopyBodies);
@@ -229,6 +290,7 @@ void ndWorldSceneCuda::LoadBodyData()
 	dAssert(cudaStatus == cudaSuccess);
 
 	bodyBufferGpu.ReadData(&bodyBufferCpu[0], cpuBodyCount);
+	CudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (InitTransforms, *m_context->m_sceneInfoCpu);
 
 	cudaDeviceSynchronize();
 
@@ -242,49 +304,34 @@ void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
 
-	auto GetTransform = [] __device__(const cuSceneInfo& info)
+	auto GetTransform = [] __device__(const cuSceneInfo& info, int frameCount)
 	{
 		int index = threadIdx.x + blockDim.x * blockIdx.x;
 		if (index < (info.m_bodyArray.m_size - 1))
 		{
 			cuBodyProxy* src = info.m_bodyArray.m_array;
-			cuSpatialVector* dst = info.m_transformBuffer.m_array;
+			cuSpatialVector* dst = (frameCount & 1) ? info.m_transformBuffer0.m_array : info.m_transformBuffer1.m_array;
 
 			dst[index].m_linear = src[index].m_posit;
 			dst[index].m_angular = src[index].m_rotation;
 		}
 	};
 
-	cudaStream_t stream = m_context->m_stream0;
+	cudaStream_t stream = m_context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
-	cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
-	cuDeviceBuffer<cuSpatialVector>& gpuBuffer = m_context->m_transformBufferGpu;
-		
+	
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
 	ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	CudaGetBodyTransforms << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (GetTransform, *infoGpu, m_context->m_frameCounter);
 
-	CudaGetBodyTransforms << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (GetTransform, *infoGpu);
-	gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
-
-	// I probably need to seet an even to swap teh buffer but for now let us just do a swap here.
-	//printf("SwapBuffers\n");
-	m_context->SwapBuffers();
+	//cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
+	//cuDeviceBuffer<cuSpatialVector>& gpuBuffer = m_context->m_transformBufferGpu0;
+	//gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
 }
 
 void ndWorldSceneCuda::UpdateTransform()
 {
 	D_TRACKTIME();
-
-	// get the scene info from the update	
-	cuSceneInfo* const gpuInfo = m_context->m_sceneInfoGpu;
-	cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu;
-
-	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost, m_context->m_stream0);
-	dAssert(cudaStatus == cudaSuccess);
-	if (cudaStatus != cudaSuccess)
-	{
-		dAssert(0);
-	}
 
 	GetBodyTransforms();
 	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
@@ -711,14 +758,13 @@ void ndWorldSceneCuda::InitBodyArray()
 		info.m_histogram.m_size = index + 1;
 		info.m_hashArray.m_size = index + 1;
 		info.m_hashArrayScrath.m_size = index + 1;
-		info.m_debugCounter = info.m_debugCounter + 1;
 		if ((index + 1) >= info.m_hashArray.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}
 	};
 
-	cudaStream_t stream = m_context->m_stream0;
+	cudaStream_t stream = m_context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
 	
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;

@@ -318,6 +318,17 @@ void ndScene::ThreadFunction()
 	CollisionOnlyUpdate();
 }
 
+void ndScene::Begin()
+{
+	ndThreadPool::Begin();
+}
+
+void ndScene::End()
+{
+	ndThreadPool::End();
+}
+
+
 void ndScene::Update(ndFloat32 timestep)
 {
 	// wait until previous update complete.
