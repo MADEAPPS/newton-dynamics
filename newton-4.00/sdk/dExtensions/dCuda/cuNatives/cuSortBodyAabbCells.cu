@@ -23,8 +23,9 @@
 #include <vector_types.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
-#include "cuSort.h"
+
 #include "ndCudaContext.h"
+#include "cuSortBodyAabbCells.h"
 
 
 //__global__ void cuTest0(const cuSceneInfo& info, int digit)
@@ -46,12 +47,12 @@ inline bool __device__ cuIsThisGridHashDigitValid(const cuSceneInfo& info, int d
 	return test;
 }
 
-inline unsigned __device__ cuSortEvaluateGridHashKey(const cuAabbGridHash& dataElement, int digit)
+inline unsigned __device__ cuSortEvaluateGridHashKey(const cuBodyAabbCell& dataElement, int digit)
 {
 	return dataElement.m_bytes[digit];
 };
 
-__global__ void cuSortGridHashPrefixScan(const cuSceneInfo& info, int digit)
+__global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int digit)
 {
 	__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK + 1];
 
@@ -116,10 +117,10 @@ __global__ void cuCountGridHashKeys(const cuSceneInfo& info, int digit)
 				int index = threadIndex + blockDim.x * blockIdx.x;
 
 				int* histogram = info.m_histogram.m_array;
-				const cuAabbGridHash* src = (digit & 1) ? info.m_hashArrayScrath.m_array : info.m_hashArray.m_array;
+				const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
 
 				__syncthreads();
-				int gridCount = info.m_hashArray.m_size - 1;
+				int gridCount = info.m_bodyAabbCell.m_size - 1;
 				if (index < gridCount)
 				{
 					unsigned key = cuSortEvaluateGridHashKey(src[index], digit);
@@ -132,7 +133,7 @@ __global__ void cuCountGridHashKeys(const cuSceneInfo& info, int digit)
 	}
 }
 
-__global__ void cuSortGridHashItems(const cuSceneInfo& info, int digit)
+__global__ void cuCountingSortBodyCellsItems(const cuSceneInfo& info, int digit)
 {
 	__shared__  int cacheKey[D_THREADS_PER_BLOCK];
 	__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
@@ -142,7 +143,7 @@ __global__ void cuSortGridHashItems(const cuSceneInfo& info, int digit)
 	{
 		int threadIndex = threadIdx.x;
 		int index = threadIndex + blockDim.x * blockIdx.x;
-		const int gridCount = info.m_hashArray.m_size - 1;
+		const int gridCount = info.m_bodyAabbCell.m_size - 1;
 		bool test = cuIsThisGridHashDigitValid(info, digit);
 		if (test)
 		{
@@ -150,13 +151,13 @@ __global__ void cuSortGridHashItems(const cuSceneInfo& info, int digit)
 			if (blocks < blockIdx.x)
 			{
 				int* histogram = info.m_histogram.m_array;
-				cuAabbGridHash* dst = (digit & 1) ? info.m_hashArray.m_array : info.m_hashArrayScrath.m_array;
-				const cuAabbGridHash* src = (digit & 1) ? info.m_hashArrayScrath.m_array : info.m_hashArray.m_array;
+				cuBodyAabbCell* dst = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
+				const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
 
 				cacheKey[threadIndex] = 0;
 				if (index < gridCount)
 				{
-					const cuAabbGridHash entry = src[index];
+					const cuBodyAabbCell entry = src[index];
 					cacheBufferCount[threadIndex] = histogram[index];
 					cacheKey[threadIndex] = cuSortEvaluateGridHashKey(entry, digit);
 					__syncthreads();
@@ -181,15 +182,15 @@ __global__ void cuSortGridHashItems(const cuSceneInfo& info, int digit)
 		{
 			if (index < gridCount)
 			{
-				cuAabbGridHash* dst = info.m_hashArray.m_array;
-				const cuAabbGridHash* src = info.m_hashArrayScrath.m_array;
+				cuBodyAabbCell* dst = info.m_bodyAabbCell.m_array;
+				const cuBodyAabbCell* src = info.m_bodyAabbCellScrath.m_array;
 				dst[index] = src[index];
 			}
 		}
 	}
 }
 
-static bool SortGridHashSanityCheck(ndCudaContext* const context)
+static bool CountingSortBodyCellsSanityCheck(ndCudaContext* const context)
 {
 	cuSceneInfo info;
 	cudaError_t cudaStatus;
@@ -199,16 +200,16 @@ static bool SortGridHashSanityCheck(ndCudaContext* const context)
 
 	if (info.m_frameIsValid)
 	{
-		static ndArray<cuAabbGridHash> data;
-		int size = info.m_hashArray.m_size;
+		static ndArray<cuBodyAabbCell> data;
+		int size = info.m_bodyAabbCell.m_size;
 		data.SetCount(size);
-		cudaStatus = cudaMemcpy(&data[0], info.m_hashArray.m_array, size * sizeof(cuAabbGridHash), cudaMemcpyDeviceToHost);
+		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
 		dAssert(cudaStatus == cudaSuccess);
 
 		for (int i = 1; i < size; i++)
 		{
-			const cuAabbGridHash key0(data[i - 1]);
-			const cuAabbGridHash key1(data[i - 0]);
+			const cuBodyAabbCell key0(data[i - 1]);
+			const cuBodyAabbCell key1(data[i - 0]);
 			const bool zTest0 = key0.m_z < key1.m_z;
 			const bool zTest1 = key0.m_z == key1.m_z;
 			const bool yTest0 = key0.m_y < key1.m_y;
@@ -222,7 +223,7 @@ static bool SortGridHashSanityCheck(ndCudaContext* const context)
 	return true;
 }
 
-static void SortGridHash(ndCudaContext* context, int digit)
+static void CountingSortBodyCells(ndCudaContext* context, int digit)
 {
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
 	ndInt32 blocks = (sceneInfo->m_histogram.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
@@ -231,20 +232,20 @@ static void SortGridHash(ndCudaContext* context, int digit)
 		cudaStream_t stream = context->m_solverComputeStream;
 		cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
 		cuCountGridHashKeys << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-		cuSortGridHashPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-		cuSortGridHashItems << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+		cuCountingSortBodyCellsPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+		cuCountingSortBodyCellsItems << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
 	}
 }
 
-void CudaSortGridHash(ndCudaContext* const context)
+void CudaSortBodyAabbCells(ndCudaContext* const context)
 {
-	dAssert(context->m_gridHash.GetCount() <= context->m_histogram.GetCount());
-	dAssert(context->m_gridHash.GetCount() == context->m_gridHashTmp.GetCount());
+	dAssert(context->m_bodyAabbCell.GetCount() <= context->m_histogram.GetCount());
+	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellTmp.GetCount());
 	
 	for (int i = 0; i < 3; i++)
 	{
-		SortGridHash(context, i * 4 + 0);
-		SortGridHash(context, i * 4 + 1);
+		CountingSortBodyCells(context, i * 4 + 0);
+		CountingSortBodyCells(context, i * 4 + 1);
 	}
-	//dAssert(SortGridHashSanityCheck(context));
+	dAssert(CountingSortBodyCellsSanityCheck(context));
 }

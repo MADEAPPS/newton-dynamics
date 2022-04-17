@@ -19,7 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include <ndWorld.h>
+#include <ndModel.h>
+#include <ndWorldScene.h>
+#include <ndBodyDynamic.h>
+#include <ndSkeletonList.h>
+#include <ndDynamicsUpdate.h>
+#include <ndBodyParticleSet.h>
+#include <ndDynamicsUpdateSoa.h>
+#include <ndJointBilateralConstraint.h>
+
 #include "ndCudaContext.h"
+#include "cuSortBodyAabbCells.h"
 
 ndCudaDevice::ndCudaDevice()
 {
@@ -56,9 +67,9 @@ ndCudaContext::ndCudaContext()
 	,m_scan()
 	,m_histogram()
 	,m_bodyBufferCpu(D_GRANULARITY)
-	,m_gridHash()
-	,m_gridHashTmp()
 	,m_bodyBufferGpu()
+	,m_bodyAabbCell()
+	,m_bodyAabbCellTmp()
 	,m_boundingBoxGpu()
 	,m_transformBufferCpu0()
 	,m_transformBufferCpu1()

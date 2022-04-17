@@ -35,6 +35,7 @@
 
 #include "ndCudaContext.h"
 #include "ndWorldSceneCuda.h"
+#include "cuSortBodyAabbCells.h"
 
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
@@ -257,10 +258,10 @@ void ndWorldSceneCuda::LoadBodyData()
 
 	cuDeviceBuffer<int>& scanGpu = m_context->m_scan;
 	cuDeviceBuffer<int>& histogramGpu = m_context->m_histogram;
-	cuDeviceBuffer<cuAabbGridHash>& hashArrayGpu0 = m_context->m_gridHash;
-	cuDeviceBuffer<cuAabbGridHash>& hashArrayGpu1 = m_context->m_gridHashTmp;
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
+	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu0 = m_context->m_bodyAabbCell;
+	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu1 = m_context->m_bodyAabbCellTmp;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu0 = m_context->m_transformBufferGpu0;
@@ -268,9 +269,9 @@ void ndWorldSceneCuda::LoadBodyData()
 
 	scanGpu.SetCount(cpuBodyCount);
 	histogramGpu.SetCount(cpuBodyCount);
-	hashArrayGpu0.SetCount(cpuBodyCount);
-	hashArrayGpu1.SetCount(cpuBodyCount);
 	bodyBufferGpu.SetCount(cpuBodyCount);
+	bodyAabbCellGpu0.SetCount(cpuBodyCount);
+	bodyAabbCellGpu1.SetCount(cpuBodyCount);
 	transformBufferGpu0.SetCount(cpuBodyCount);
 	transformBufferGpu1.SetCount(cpuBodyCount);
 	transformBufferCpu0.SetCount(cpuBodyCount);
@@ -281,9 +282,9 @@ void ndWorldSceneCuda::LoadBodyData()
 	info.m_scan = cuBuffer<int>(scanGpu);
 	info.m_histogram = cuBuffer<int>(histogramGpu);
 	info.m_bodyArray = cuBuffer<cuBodyProxy>(bodyBufferGpu);
-	info.m_hashArray = cuBuffer<cuAabbGridHash>(hashArrayGpu0);
 	info.m_bodyAabbArray = cuBuffer<cuBoundingBox>(boundingBoxGpu);
-	info.m_hashArrayScrath = cuBuffer<cuAabbGridHash>(hashArrayGpu1);
+	info.m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu0);
+	info.m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu1);
 	info.m_transformBuffer0 = cuBuffer<cuSpatialVector>(transformBufferGpu0);
 	info.m_transformBuffer1 = cuBuffer<cuSpatialVector>(transformBufferGpu1);
 
@@ -375,16 +376,16 @@ void ndWorldSceneCuda::UpdateBodyList()
 	{
 		cudaDeviceSynchronize();
 		sceneInfo->m_frameIsValid = 1;
-		cuDeviceBuffer<cuAabbGridHash>& gridHash = m_context->m_gridHash;
-		if (sceneInfo->m_hashArray.m_size > gridHash.GetCapacity())
+		cuDeviceBuffer<cuBodyAabbCell>& gridHash = m_context->m_bodyAabbCell;
+		if (sceneInfo->m_bodyAabbCell.m_size > gridHash.GetCapacity())
 		{
-			m_context->m_gridHash.SetCount(sceneInfo->m_hashArray.m_size + 1);
-			m_context->m_gridHashTmp.SetCount(sceneInfo->m_hashArray.m_size + 1);
-			m_context->m_histogram.SetCount(sceneInfo->m_hashArray.m_size + D_THREADS_PER_BLOCK);
+			m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size + 1);
+			m_context->m_bodyAabbCellTmp.SetCount(sceneInfo->m_bodyAabbCell.m_size + 1);
+			m_context->m_histogram.SetCount(sceneInfo->m_bodyAabbCell.m_size + D_THREADS_PER_BLOCK);
 			
 			sceneInfo->m_histogram = cuBuffer<int>(m_context->m_histogram);
-			sceneInfo->m_hashArray = cuBuffer<cuAabbGridHash>(m_context->m_gridHash);
-			sceneInfo->m_hashArrayScrath = cuBuffer<cuAabbGridHash>(m_context->m_gridHashTmp);
+			sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
+			sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellTmp);
 		}
 
 		cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
@@ -697,9 +698,9 @@ void ndWorldSceneCuda::InitBodyArray()
 		{
 			int newSize = scan[bodyCount - 1];
 			info.m_histogram.m_size = newSize;
-			info.m_hashArray.m_size = newSize;
-			info.m_hashArrayScrath.m_size = newSize;
-			if (newSize >= info.m_hashArray.m_capacity)
+			info.m_bodyAabbCell.m_size = newSize;
+			info.m_bodyAabbCellScrath.m_size = newSize;
+			if (newSize >= info.m_bodyAabbCell.m_capacity)
 			{
 				info.m_frameIsValid = 0;
 			}
@@ -715,7 +716,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		{
 			int* scan = info.m_scan.m_array;
 			cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
-			cuAabbGridHash* hashArray = info.m_hashArray.m_array;
+			cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
 
 			const cuVector minBox(info.m_worldBox.m_min);
 			const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
@@ -728,7 +729,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 			const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 
-			cuAabbGridHash hash;
+			cuBodyAabbCell hash;
 			hash.m_id = index;
 			int start = scan[index];
 			
@@ -751,19 +752,19 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto EndGridHash = [] __device__(cuSceneInfo& info)
 	{
-		cuAabbGridHash* hashArray = info.m_hashArray.m_array;
-		int index = info.m_hashArray.m_size;
+		cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
+		int index = info.m_bodyAabbCell.m_size;
 
-		cuAabbGridHash hash;
+		cuBodyAabbCell hash;
 		hash = hashArray[index - 1];
 		hash.m_id = -1;
 		hash.m_z = hash.m_z + 1;
 
 		hashArray[index] = hash;
 		info.m_histogram.m_size = index + 1;
-		info.m_hashArray.m_size = index + 1;
-		info.m_hashArrayScrath.m_size = index + 1;
-		if ((index + 1) >= info.m_hashArray.m_capacity)
+		info.m_bodyAabbCell.m_size = index + 1;
+		info.m_bodyAabbCellScrath.m_size = index + 1;
+		if ((index + 1) >= info.m_bodyAabbCell.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}
@@ -782,5 +783,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
 	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
-	CudaSortGridHash (m_context);
+	CudaSortBodyAabbCells(m_context);
 }

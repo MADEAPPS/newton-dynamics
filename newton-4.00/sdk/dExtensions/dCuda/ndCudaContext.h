@@ -27,7 +27,6 @@
 #include <ndNewtonStdafx.h>
 #include <device_launch_parameters.h>
 
-#include "cuSort.h"
 #include "cuHostBuffer.h"
 #include "ndBodyBuffer.h"
 #include "cuSolverTypes.h"
@@ -57,9 +56,9 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 	cuDeviceBuffer<int> m_scan;
 	cuDeviceBuffer<int> m_histogram;
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
-	cuDeviceBuffer<cuAabbGridHash> m_gridHash;
-	cuDeviceBuffer<cuAabbGridHash> m_gridHashTmp;
 	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
+	cuDeviceBuffer<cuBodyAabbCell> m_bodyAabbCell;
+	cuDeviceBuffer<cuBodyAabbCell> m_bodyAabbCellTmp;
 	cuDeviceBuffer<cuBoundingBox> m_boundingBoxGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu1;

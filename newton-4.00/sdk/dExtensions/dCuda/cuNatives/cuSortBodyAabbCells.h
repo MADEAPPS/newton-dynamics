@@ -29,7 +29,7 @@
 
 class ndCudaContext;
 
-class cuAabbGridHash
+class cuBodyAabbCell
 {
 	public:
 	union
@@ -46,7 +46,6 @@ class cuAabbGridHash
 	};
 };
 
-
-void CudaSortGridHash(ndCudaContext* const context);
+void CudaSortBodyAabbCells(ndCudaContext* const context);
 
 #endif
