@@ -90,10 +90,7 @@ __global__ void CudaEndGridHash(Predicate EndGridHash, cuSceneInfo& info)
 template <typename Predicate>
 __global__ void CudaGetBodyTransforms(Predicate GetTransform, cuSceneInfo& info)
 {
-	if (info.m_frameIsValid)
-	{
-		GetTransform(info);
-	}
+	GetTransform(info);
 }
 
 
@@ -305,16 +302,7 @@ void ndWorldSceneCuda::UpdateTransform()
 			body->SetMatrixAndCentreOfMass(rotation, position);
 
 			body->m_transformIsDirty = true;
-
-			//printf("SetTransform buffer %d : w(%f %f %f) r(%f %f %f %f)\n", i,
-			//	transform.m_linear.x, transform.m_linear.y, transform.m_linear.z,
-			//	transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w);
-
 			UpdateTransformNotify(threadIndex, body);
-
-			//printf ("SetTransform body %d : w(%f %f %f) r(%f %f %f %f)\n", i, 
-			//	body->m_omega[0], body->m_omega[1], body->m_omega[2],	
-			//	rotation[0], rotation[1], rotation[2], rotation[3]);
 		}
 	});
 	ParallelExecute(SetTransform);
@@ -340,7 +328,7 @@ void ndWorldSceneCuda::UpdateBodyList()
 		{
 			m_context->m_gridHash.SetCount(sceneInfo->m_hashArray.m_size + 1);
 			m_context->m_gridHashTmp.SetCount(sceneInfo->m_hashArray.m_size + 1);
-			m_context->m_histogram.SetCount(sceneInfo->m_hashArray.m_size + D_THREADS_PER_BLOCK + 1);
+			m_context->m_histogram.SetCount(sceneInfo->m_hashArray.m_size + D_THREADS_PER_BLOCK);
 			
 			sceneInfo->m_histogram = cuBuffer<int>(m_context->m_histogram);
 			sceneInfo->m_hashArray = cuBuffer<cuAabbGridHash>(m_context->m_gridHash);
@@ -659,7 +647,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			info.m_histogram.m_size = newSize;
 			info.m_hashArray.m_size = newSize;
 			info.m_hashArrayScrath.m_size = newSize;
-			if (newSize >= info.m_histogram.m_capacity)
+			if (newSize >= info.m_hashArray.m_capacity)
 			{
 				info.m_frameIsValid = 0;
 			}
@@ -736,12 +724,12 @@ void ndWorldSceneCuda::InitBodyArray()
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
 	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
-	//CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
-	//CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
-	//CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-	//CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
-	//CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
-	//CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
-	//CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
-	//CudaSortGridHash (m_context);
+	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
+	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
+	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
+	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
+	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
+	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
+	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
+	CudaSortGridHash (m_context);
 }
