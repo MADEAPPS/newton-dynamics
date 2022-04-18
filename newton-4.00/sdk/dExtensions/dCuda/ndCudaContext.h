@@ -32,6 +32,9 @@
 #include "cuSolverTypes.h"
 #include "cuDeviceBuffer.h"
 
+#define D_COUNT_SORT_SUPER_BLOCK	32
+#define D_THREADS_PER_BLOCK		256
+
 class ndCudaDevice
 {
 	public:
