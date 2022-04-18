@@ -376,14 +376,24 @@ void ndWorldSceneCuda::UpdateBodyList()
 	{
 		cudaDeviceSynchronize();
 		sceneInfo->m_frameIsValid = 1;
-		cuDeviceBuffer<cuBodyAabbCell>& gridHash = m_context->m_bodyAabbCell;
-		if (sceneInfo->m_bodyAabbCell.m_size > gridHash.GetCapacity())
+		cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCell = m_context->m_bodyAabbCell;
+
+		ndInt32 cellCount = sceneInfo->m_histogram.m_size - 1;
+		ndInt32 blocksCount = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		ndInt32 superBlocks = (blocksCount + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
+		ndInt32 histogramSize = superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
+		histogramSize += superBlocks * D_THREADS_PER_BLOCK;
+		//histogramSize += D_THREADS_PER_BLOCK + 1;
+		if (histogramSize > m_context->m_histogram.GetCapacity())
+		{
+			m_context->m_histogram.SetCount(histogramSize);
+			sceneInfo->m_histogram = cuBuffer<int>(m_context->m_histogram);
+		}
+
+		if (sceneInfo->m_bodyAabbCell.m_size > bodyAabbCell.GetCapacity())
 		{
 			m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size + 1);
 			m_context->m_bodyAabbCellTmp.SetCount(sceneInfo->m_bodyAabbCell.m_size + 1);
-			m_context->m_histogram.SetCount(sceneInfo->m_bodyAabbCell.m_size + D_THREADS_PER_BLOCK);
-			
-			sceneInfo->m_histogram = cuBuffer<int>(m_context->m_histogram);
 			sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
 			sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellTmp);
 		}
