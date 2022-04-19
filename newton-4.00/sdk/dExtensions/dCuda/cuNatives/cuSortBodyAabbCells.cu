@@ -27,7 +27,7 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
-//#define D_USE_PARALLEL_PREFIX_SCAN
+#define D_USE_PARALLEL_PREFIX_SCAN
 
 //__global__ void cuTest0(const cuSceneInfo& info, int digit)
 //{
@@ -187,7 +187,7 @@ __global__ void cuCountingSortAddSuperBlock(const cuSceneInfo& info, int digit)
 				{
 					sum += histogram[offsetIn + i * D_THREADS_PER_BLOCK];
 				}
-				const int offset = threadId + superBlocks * superBlockSize;
+				const int offset = threadId + superBlocks * superBlockSize + blockIdx.x * D_THREADS_PER_BLOCK;
 				histogram[offset] = sum;
 			}
 		}
@@ -218,6 +218,7 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
 			const int superBlockOffset = threadId + superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
+
 			for (int i = 0; i < superBlocks; i++)
 			{
 				sum += histogram[superBlockOffset + i * D_THREADS_PER_BLOCK];
@@ -232,6 +233,27 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 				cacheBuffer[threadId1] = sum;
 				__syncthreads();
 			}
+
+			//if (threadId == 0)
+			//{
+			//	printf("scan: ");
+			//	for (int i = 0; i < 16; i++)
+			//	{
+			//		printf("%d ", cacheBuffer[D_THREADS_PER_BLOCK + i]);
+			//	}
+			//	printf("\n");
+			//
+			//	printf("blocks %d:\n", blocks);
+			//	for (int i = 0; i < blocks; i++)
+			//	{
+			//		printf("block %d: ", i);
+			//		for (int j = 0; j < 16; j++)
+			//		{
+			//			printf("%d ", histogram[i * D_THREADS_PER_BLOCK + j]);
+			//		}
+			//		printf("\n");
+			//	}
+			//}
 
 			sum = cacheBuffer[threadId1];
 			for (int i = 0; i < blocks; i++)
@@ -285,6 +307,28 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 			}
 
 			sum = cacheBuffer[threadId1];
+
+			//if (threadId == 0)
+			//{
+			//	printf("scan: ");
+			//	for (int i = 0; i < 16; i++)
+			//	{
+			//		printf("%d ", cacheBuffer[D_THREADS_PER_BLOCK + i]);
+			//	}
+			//	printf("\n");
+			//
+			//	printf("blocks %d:\n", blocks);
+			//	for (int i = 0; i < blocks; i++)
+			//	{
+			//		printf("block %d: ", i);
+			//		for (int j = 0; j < 16; j++)
+			//		{
+			//			printf("%d ", histogram[i * D_THREADS_PER_BLOCK + j]);
+			//		}
+			//		printf("\n");
+			//	}
+			//}
+
 			for (int i = 0; i < blocks; i++)
 			{
 				int j = i * D_THREADS_PER_BLOCK + threadId;
@@ -369,5 +413,5 @@ void CudaSortBodyAabbCells(ndCudaContext* const context)
 		CountingSortBodyCells(context, i * 4 + 1);
 	}
 
-	dAssert(CountingSortBodyCellsSanityCheck(context));
+	//dAssert(CountingSortBodyCellsSanityCheck(context));
 }
