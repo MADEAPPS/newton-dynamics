@@ -549,6 +549,7 @@ void ndDynamicsUpdateCuda::SortIslands()
 
 void ndDynamicsUpdateCuda::BuildIsland()
 {
+	m_unConstrainedBodyCount = 0;
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	dAssert(bodyArray.GetCount() >= 1);
