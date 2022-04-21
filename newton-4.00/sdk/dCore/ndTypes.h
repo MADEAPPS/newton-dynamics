@@ -123,11 +123,15 @@
     #endif
 #endif
 
-//#define DG_PROFILE_PHYSICS
-
-// uncomment out D_PROFILER to enable profiler frame capture profiler traces
+// uncomment out D_FORCE_PROFILE_PHYSICS to enable profiler frame capture profiler traces
 // alternatively the end application can use a command line option to enable this define
-//#define D_PROFILER
+//#define D_FORCE_PROFILE_PHYSICS
+
+#ifdef D_FORCE_PROFILE_PHYSICS
+	#ifndef D_PROFILER
+		#define D_PROFILER
+	#endif
+#endif
 
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
@@ -143,13 +147,11 @@
 // define D_USE_THREAD_EMULATION on the command line for 
 // platform that do not support hardware multi threading or 
 // if the and application want to control threading at the application level 
-//#define D_USE_THREAD_EMULATION
+//#define D_USE_FORCE_THREAD_EMULATION
 
-#if (defined(WIN32) || defined(_WIN32))
-	#if _MSC_VER < 1700
-		#ifndef D_USE_THREAD_EMULATION
-			#define D_USE_THREAD_EMULATION
-		#endif
+#ifdef D_USE_FORCE_THREAD_EMULATION
+	#ifndef D_USE_THREAD_EMULATION
+		#define D_USE_THREAD_EMULATION
 	#endif
 #endif
 

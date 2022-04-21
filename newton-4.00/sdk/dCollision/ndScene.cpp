@@ -1395,7 +1395,8 @@ void ndScene::InitBodyArray()
 		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
 		ndInt32* const scan = &scans[threadIndex][0];
 
-		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+		//const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = activeBodyArray[i];
@@ -1633,9 +1634,8 @@ void ndScene::FindCollidingPairs()
 		}
 	});
 
-	bool fullScan = (2 * m_sceneBodyArray.GetCount()) > GetActiveBodyArray().GetCount();
-	// uncomment line below to test full versus partial scan
-	//fullScan = true;
+	const ndArray<ndBodyKinematic*>& activeBodies = GetActiveBodyArray();
+	bool fullScan = (2 * m_sceneBodyArray.GetCount()) > activeBodies.GetCount();
 	if (fullScan)
 	{
 		ParallelExecute(FindPairs);
