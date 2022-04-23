@@ -28,7 +28,7 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
-#define D_USE_PARALLEL_PREFIX_SCAN
+//#define D_USE_PARALLEL_PREFIX_SCAN
 
 #define D_USE_PARALLEL_PREFIX_LOCAL_SIZE	(1024*4)
 
@@ -419,22 +419,16 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 
 __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int digit)
 {
-	__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK + 1];
+	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK + 1];
 
 	if (info.m_frameIsValid)
 	{
 		bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
 		if (test)
 		{
-			int threadId = threadIdx.x;
-			int threadId1 = threadId + D_THREADS_PER_BLOCK;
-
-			int sum = 0;
+			const int threadId = threadIdx.x;
 			cacheBuffer[threadId] = 0;
-			if (threadId == 0)
-			{
-				cacheBuffer[threadId1] = 0;
-			}
+			cacheBuffer[threadId + D_THREADS_PER_BLOCK / 2 + 1] = 0;
 
 			int* histogram = info.m_histogram.m_array;
 			const int cellCount = info.m_bodyAabbCell.m_size - 1;
@@ -442,6 +436,8 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
 			const int superBlockOffset = threadId + superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
 
+			int sum = 0;
+			const int threadId1 = threadId + D_THREADS_PER_BLOCK / 2;
 			for (int i = 0; i < superBlocks; i++)
 			{
 				sum += histogram[superBlockOffset + i * D_THREADS_PER_BLOCK];
@@ -451,9 +447,9 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 
 			for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
 			{
-				int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
+				const int prefitSum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
 				__syncthreads();
-				cacheBuffer[threadId1] = sum;
+				cacheBuffer[threadId1] = prefitSum;
 				__syncthreads();
 			}
 
