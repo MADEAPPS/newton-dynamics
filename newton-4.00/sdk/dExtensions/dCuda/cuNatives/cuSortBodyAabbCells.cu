@@ -28,7 +28,7 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
-//#define D_USE_PARALLEL_PREFIX_SCAN
+#define D_USE_PARALLEL_PREFIX_SCAN
 
 //__global__ void cuTest0(const cuSceneInfo& info, int digit)
 //{
