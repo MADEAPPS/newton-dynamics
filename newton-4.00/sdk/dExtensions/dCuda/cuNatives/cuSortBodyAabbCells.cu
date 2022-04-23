@@ -30,6 +30,8 @@
 
 #define D_USE_PARALLEL_PREFIX_SCAN
 
+#define D_USE_PARALLEL_PREFIX_LOCAL_SIZE	(1024*4)
+
 //__global__ void cuTest0(const cuSceneInfo& info, int digit)
 //{
 //
@@ -171,10 +173,10 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 
 #else
 
-			__shared__  int cacheKeyPrefix[2 * D_THREADS_PER_BLOCK + 1];
 			__shared__  int cacheSortedKey[D_THREADS_PER_BLOCK];
 			__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
 			__shared__  int cacheBufferAdress[2 * D_THREADS_PER_BLOCK];
+			__shared__  int cacheKeyPrefix[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK + 1];
 
 			if (blockIdx.x < blocks)
 			{
@@ -183,9 +185,8 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
 
 				cacheKeyPrefix[threadId] = 0;
-				cacheKeyPrefix[D_THREADS_PER_BLOCK] = 0;
+				cacheKeyPrefix[threadId + D_THREADS_PER_BLOCK/2 + 1] = 0;
 				cacheBufferCount[threadId] = histogram[index];
-				cacheKeyPrefix[threadId + D_THREADS_PER_BLOCK + 1] = 0;
 				cacheSortedKey[threadId] = (D_THREADS_PER_BLOCK << D_THREADS_PER_BLOCK_BITS) | threadId;
 
 				cuBodyAabbCell entry;
@@ -193,7 +194,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				{
 					entry = src[index];
 					const int key = cuCountingSortEvaluateGridCellKey(entry, digit);
-					atomicAdd(&cacheKeyPrefix[key + D_THREADS_PER_BLOCK + 1], 1);
+					atomicAdd(&cacheKeyPrefix[key + D_THREADS_PER_BLOCK/2 + 1], 1);
 					cacheSortedKey[threadId] = (key << D_THREADS_PER_BLOCK_BITS) | threadId;
 				}
 				__syncthreads();
@@ -217,7 +218,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 					}
 				}
 
-				const int threadId1 = threadId + D_THREADS_PER_BLOCK;
+				const int threadId1 = threadId + D_THREADS_PER_BLOCK/2;
 				for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
 				{
 					int sum = cacheKeyPrefix[threadId1] + cacheKeyPrefix[threadId1 - i];
@@ -227,7 +228,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				}
 
 				const int itemCount = cuMin(int(cellCount - blockIdx.x * D_THREADS_PER_BLOCK), D_THREADS_PER_BLOCK);
-				for (int i = D_THREADS_PER_BLOCK; cacheKeyPrefix[i] < itemCount; i++)
+				for (int i = D_THREADS_PER_BLOCK/2; cacheKeyPrefix[i] < itemCount; i++)
 				{
 					const int start = cacheKeyPrefix[i];
 					const int count = cacheKeyPrefix[i + 1] - start;
