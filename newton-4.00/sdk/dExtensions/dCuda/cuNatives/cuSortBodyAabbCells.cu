@@ -28,9 +28,11 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
-#define D_USE_PARALLEL_PREFIX_SCAN
+//#define D_USE_PARALLEL_PREFIX_SCAN
 
-#define D_PARALLEL_PREFIX_LOCAL_SIZE	(1024*4)
+#define D_PARALLEL_PREFIX_LOCAL_SIZE	(1024)
+#define D_PARALLEL_PREFIX_BUFFER_SIZE	(D_PARALLEL_PREFIX_LOCAL_SIZE * 4)
+
 
 //__global__ void cuTest0(const cuSceneInfo& info, int digit)
 //{
@@ -357,8 +359,8 @@ __global__ void cuCountingSortBodyCellsCalculatePrefix(const cuSceneInfo& info, 
 
 __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int digit)
 {
-	__shared__  int accumulator[D_PARALLEL_PREFIX_LOCAL_SIZE];
-	__shared__  int cacheBuffer[D_PARALLEL_PREFIX_LOCAL_SIZE / 2 + D_PARALLEL_PREFIX_LOCAL_SIZE + D_THREADS_PER_BLOCK];
+	__shared__  int accumulator[D_PARALLEL_PREFIX_BUFFER_SIZE];
+	__shared__  int cacheBuffer[D_PARALLEL_PREFIX_BUFFER_SIZE / 2 + D_PARALLEL_PREFIX_BUFFER_SIZE + D_THREADS_PER_BLOCK];
 	if (info.m_frameIsValid)
 	{
 		bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
@@ -368,110 +370,68 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 			const int threadId = threadIdx.x;
 			const int cellCount = info.m_bodyAabbCell.m_size - 1;
 			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
-#if 1
-			const int power = 32 - __clz(blocks);
-			const int powerBase = 1 << power;
-			int* histogram = info.m_histogram.m_array;
-
-			const int bufferSize = 2 * (powerBase + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK + 1;
-			for (int i = 0; i < bufferSize; i++)
+			
+			cacheBuffer[threadId] = 0;
+			const int cacheIntSize = D_PARALLEL_PREFIX_LOCAL_SIZE * ((sizeof(cacheBuffer) / sizeof(int)) / D_PARALLEL_PREFIX_LOCAL_SIZE);
+			const int cacheIntFrac = sizeof(cacheBuffer) / sizeof(int) - cacheIntSize;
+			for (int i = 0; i < cacheIntSize; i += D_PARALLEL_PREFIX_LOCAL_SIZE)
 			{
-				cacheBuffer[i * D_THREADS_PER_BLOCK + threadId] = 0;
+				cacheBuffer[i + threadId + cacheIntFrac] = 0;
 			}
 			__syncthreads();
 
-			if (threadId < blocks)
-			{
-				cacheBuffer[powerBase + threadId + 1] = histogram[threadId * D_THREADS_PER_BLOCK + blockID];
-			}
+			int* histogram = info.m_histogram.m_array;
+			const int intBlocks = blocks / D_PARALLEL_PREFIX_LOCAL_SIZE;
+			const int fractBlocks = blocks - intBlocks * D_PARALLEL_PREFIX_LOCAL_SIZE;
+			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
+
+			int histogramStart = blockID;
+			int bufferStart = D_PARALLEL_PREFIX_BUFFER_SIZE / 2;
 			if (threadId == 0)
 			{
-				cacheBuffer[powerBase] = histogram[superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK + blockID];
+				cacheBuffer[bufferStart] = histogram[superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK + blockID];
 			}
-
+			for (int i = 0; i < intBlocks; i++)
+			{
+				cacheBuffer[bufferStart + 1 + threadId] = histogram[threadId * D_THREADS_PER_BLOCK + histogramStart];
+				bufferStart += D_PARALLEL_PREFIX_LOCAL_SIZE;
+				histogramStart += D_THREADS_PER_BLOCK * D_THREADS_PER_BLOCK;
+			}
+			if (threadId < fractBlocks)
+			{
+				cacheBuffer[bufferStart + 1 + threadId] = histogram[threadId * D_THREADS_PER_BLOCK + histogramStart];
+			}
 			__syncthreads();
+
+			const int power = 32 - __clz(blocks);
+			const int powerBase = 1 << power;
+			bufferStart = D_PARALLEL_PREFIX_BUFFER_SIZE / 2;
 			for (int i = 1; i < powerBase; i = i << 1)
 			{
-				int sum = 0;
-				if (threadId < powerBase)
+				for (int j = 0; j < powerBase; j += D_PARALLEL_PREFIX_LOCAL_SIZE)
 				{
-					sum = cacheBuffer[powerBase + threadId] + cacheBuffer[powerBase - i + threadId];
+					accumulator[threadId + j] = cacheBuffer[bufferStart + threadId] + cacheBuffer[bufferStart - i + threadId + j];
 				}
 				__syncthreads();
-				if (threadId < powerBase)
+				for (int j = 0; j < powerBase; j += D_PARALLEL_PREFIX_LOCAL_SIZE)
 				{
-					cacheBuffer[powerBase + threadId] = sum;
+					cacheBuffer[bufferStart + threadId + j] = accumulator[threadId + j];
 				}
 				__syncthreads();
 			}
-			if (threadId < blocks)
+
+			histogramStart = blockID;
+			bufferStart = D_PARALLEL_PREFIX_BUFFER_SIZE / 2;
+			for (int i = 0; i < intBlocks; i++)
 			{
-				histogram[threadId * D_THREADS_PER_BLOCK + blockID] = cacheBuffer[powerBase + threadId];
+				histogram[threadId * D_THREADS_PER_BLOCK + histogramStart] = cacheBuffer[bufferStart + threadId];
+				bufferStart += D_PARALLEL_PREFIX_LOCAL_SIZE;
+				histogramStart += D_THREADS_PER_BLOCK * D_THREADS_PER_BLOCK;
 			}
-#else
-			if (blockID < blocks)
+			if (threadId < fractBlocks)
 			{
-				for (int i = 0; i < sizeof(cacheBuffer) / sizeof(int); i += D_THREADS_PER_BLOCK)
-				{
-					cacheBuffer[i + threadId] = 0;
-				}
-				__syncthreads();
-
-				int* histogram = info.m_histogram.m_array;
-				const int intBlocks = blocks / D_THREADS_PER_BLOCK;
-				const int fractBlocks = blocks - intBlocks * D_THREADS_PER_BLOCK;
-				const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
-
-				int histogramStart = blockID;
-				int bufferStart = D_PARALLEL_PREFIX_LOCAL_SIZE / 2;
-				if (threadId == 0)
-				{
-					cacheBuffer[bufferStart] = histogram[superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK + blockID];
-				}
-				for (int i = 0; i < intBlocks; i++)
-				{
-					cacheBuffer[bufferStart + 1 + threadId] = histogram[threadId * D_THREADS_PER_BLOCK + histogramStart];
-					bufferStart += D_THREADS_PER_BLOCK;
-					histogramStart += D_THREADS_PER_BLOCK * D_THREADS_PER_BLOCK;
-				}
-				if (threadId < fractBlocks)
-				{
-					cacheBuffer[bufferStart + 1 + threadId] = histogram[threadId * D_THREADS_PER_BLOCK + histogramStart];
-				}
-				__syncthreads();
-
-				const int power = 32 - __clz(blocks);
-				const int powerBase = 1 << power;
-				bufferStart = D_PARALLEL_PREFIX_LOCAL_SIZE / 2;
-				for (int i = 1; i < powerBase; i = i << 1)
-				{
-					for (int j = 0; j < powerBase; j += D_THREADS_PER_BLOCK)
-					{
-						accumulator[threadId + j] = cacheBuffer[bufferStart + threadId] + cacheBuffer[bufferStart - i + threadId + j];
-					}
-					__syncthreads();
-					for (int j = 0; j < powerBase; j += D_THREADS_PER_BLOCK)
-					{
-						cacheBuffer[bufferStart + threadId + j] = accumulator[threadId + j];
-					}
-					__syncthreads();
-				}
-
-				histogramStart = blockID;
-				bufferStart = D_PARALLEL_PREFIX_LOCAL_SIZE / 2;
-				for (int i = 0; i < intBlocks; i++)
-				{
-					histogram[threadId * D_THREADS_PER_BLOCK + histogramStart] = cacheBuffer[bufferStart + threadId];
-					bufferStart += D_THREADS_PER_BLOCK;
-					histogramStart += D_THREADS_PER_BLOCK * D_THREADS_PER_BLOCK;
-				}
-				if (threadId < fractBlocks)
-				{
-					histogram[threadId * D_THREADS_PER_BLOCK + histogramStart] = cacheBuffer[bufferStart + threadId];
-				}
+				histogram[threadId * D_THREADS_PER_BLOCK + histogramStart] = cacheBuffer[bufferStart + threadId];
 			}
-#endif
 		}
 	}
 }
@@ -578,7 +538,7 @@ static void CountingSortBodyCells(ndCudaContext* context, int digit)
 		cuCountingSortAddSuperBlock << <superBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
 		#ifdef D_USE_PARALLEL_PREFIX_SCAN
 			cuCountingSortBodyCellsCalculatePrefix << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-			cuCountingSortBodyCellsPrefixScan << <D_THREADS_PER_BLOCK, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
+			cuCountingSortBodyCellsPrefixScan << <D_THREADS_PER_BLOCK, D_PARALLEL_PREFIX_LOCAL_SIZE, 0, stream >> > (*infoGpu, digit);
 		#else
 			cuCountingSortBodyCellsPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
 		#endif
