@@ -32,7 +32,6 @@
 #include "cuSolverTypes.h"
 #include "cuDeviceBuffer.h"
 
-#define D_COUNT_SORT_SUPER_BLOCK	32
 #define D_THREADS_PER_BLOCK_BITS	8
 #define D_THREADS_PER_BLOCK		(1<<D_THREADS_PER_BLOCK_BITS)
 

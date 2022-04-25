@@ -46,6 +46,7 @@ class cuBodyAabbCell
 	};
 };
 
-void CudaSortBodyAabbCells(ndCudaContext* const context);
+void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
+void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context);
 
 #endif

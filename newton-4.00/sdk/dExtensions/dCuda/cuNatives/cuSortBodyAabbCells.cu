@@ -28,6 +28,7 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
+#define D_COUNT_SORT_SUPER_BLOCK		32
 #define D_PARALLEL_PREFIX_LOCAL_SIZE	(1024)
 #define D_PARALLEL_PREFIX_BUFFER_SIZE	(D_PARALLEL_PREFIX_LOCAL_SIZE * 4)
 
@@ -358,7 +359,6 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int d
 	}
 }
 
-
 static bool CountingSortBodyCellsSanityCheck(ndCudaContext* const context)
 {
 	cuSceneInfo info;
@@ -413,7 +413,33 @@ static void CountingSortBodyCells(ndCudaContext* context, int digit)
 	}
 }
 
-void CudaSortBodyAabbCells(ndCudaContext* const context)
+void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context)
+{
+	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
+	cuBuffer<cuBodyAabbCell>& gpuBuffer = sceneInfo->m_bodyAabbCell;
+
+	ndInt32 cellCount = gpuBuffer.m_size;
+	ndInt32 blocksCount = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	ndInt32 superBlocks = (blocksCount + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
+	ndInt32 histogramSize = superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
+	histogramSize += superBlocks * D_THREADS_PER_BLOCK;
+
+	if (histogramSize > context->m_histogram.GetCapacity())
+	{
+		context->m_histogram.SetCount(histogramSize);
+		sceneInfo->m_histogram = cuBuffer<int>(context->m_histogram);
+	}
+
+	if (cellCount > context->m_bodyAabbCell.GetCapacity())
+	{
+		context->m_bodyAabbCell.SetCount(cellCount);
+		context->m_bodyAabbCellTmp.SetCount(cellCount);
+		sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCell);
+		sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCellTmp);
+	}
+}
+
+void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 {
 	//BitonicSort();
 
