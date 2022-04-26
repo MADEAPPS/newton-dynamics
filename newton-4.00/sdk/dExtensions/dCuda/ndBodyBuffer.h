@@ -119,7 +119,8 @@ class cuBodyProxy
 		}
 	}
 
-	void ProxyToBody(ndBodyKinematic* const body) const
+	//void ProxyToBody(ndBodyKinematic* const body) const
+	void ProxyToBody(ndBodyKinematic* const) const
 	{
 		dAssert(0);
 		//const ndVector veloc(m_veloc.x, m_veloc.y, m_veloc.z, ndFloat32(0.0f));

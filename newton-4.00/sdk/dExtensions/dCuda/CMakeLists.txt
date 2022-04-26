@@ -37,9 +37,9 @@ include_directories(cuNatives/)
 file(GLOB CPP_SOURCE *.h *.cu *.cpp cuNatives/*.h cuNatives/*.cu  cuNatives/*.cpp)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --extended-lambda")
-Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} --extended-lambda")
-Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4201 -wd4324 -Zi -Ob0 -Od /RTC1\" --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_RELEASE "-Xcompiler=\"-MD -W4 -wd4201 -wd4324 -Zi -O2 -Ob2\" -DNDEBUG --extended-lambda") 
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-Xcompiler=\"-MD -W4 -wd4201 -wd4324 -Zi -O2 -Ob1\" -DNDEBUG --extended-lambda")
 
 #Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -lineinfo")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -lineinfo")

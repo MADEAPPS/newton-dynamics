@@ -142,7 +142,7 @@ void cuHostBuffer<T>::Resize(ndInt32 newSize)
 	{
 		T* newArray;
 		newSize = dMax(newSize, D_GRANULARITY);
-		cudaError_t cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
+		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		dAssert(cudaStatus == cudaSuccess);
 		if (m_array)
 		{
@@ -158,7 +158,7 @@ void cuHostBuffer<T>::Resize(ndInt32 newSize)
 	{
 		T* newArray;
 		newSize = dMax(newSize, D_GRANULARITY);
-		cudaError_t cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
+		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{
 			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
