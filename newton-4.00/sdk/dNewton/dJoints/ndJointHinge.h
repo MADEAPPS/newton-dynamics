@@ -31,6 +31,8 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 GetOmega() const;
 	D_NEWTON_API ndFloat32 GetOffsetAngle() const;
 	D_NEWTON_API void SetOffsetAngle(ndFloat32 angle);
+	D_NEWTON_API bool GetLimitState() const;
+	D_NEWTON_API void SetLimitState(bool state);
 	D_NEWTON_API void SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit);
 	D_NEWTON_API void GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit);
 	D_NEWTON_API void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
@@ -54,6 +56,7 @@ class ndJointHinge: public ndJointBilateralConstraint
 	ndFloat32 m_maxLimit;
 	ndFloat32 m_offsetAngle;
 	ndFloat32 m_springDamperRegularizer;
+	ndInt8 m_limitState;
 };
 
 #endif 
