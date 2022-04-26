@@ -112,7 +112,8 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 
 	// adding one extra dof, this makes the mass matrix ill conditioned, 
 	// but it could work with the direct solver
-	m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 6;
+	//m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 6;
+	//m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 6;
 }
 
 bool ndJointHinge::GetLimitState() const
@@ -122,6 +123,7 @@ bool ndJointHinge::GetLimitState() const
 
 void ndJointHinge::SetLimitState(bool state)
 {
+	m_maxDof = state ? 7 : 6;
 	m_limitState = state ? 1 : 0;
 }
 
@@ -239,6 +241,7 @@ ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& m
 		if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
 		{
 			AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
+			ret = 1;
 		}
 		else
 		{

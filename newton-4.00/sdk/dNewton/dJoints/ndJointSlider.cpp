@@ -120,9 +120,9 @@ bool ndJointSlider::GetLimitState() const
 
 void ndJointSlider::SetLimitState(bool state)
 {
+	m_maxDof = state ? 7 : 6;
 	m_limitState = state ? 1 : 0;
 }
-
 
 void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
@@ -130,7 +130,7 @@ void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 	dAssert(maxLimit >= 0.0f);
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
-	m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 0;
+	//m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 0;
 }
 
 void ndJointSlider::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -155,6 +155,7 @@ ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& 
 		if ((m_minLimit == ndFloat32(0.0f)) && (m_maxLimit == ndFloat32(0.0f)))
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
+			ret = 1;
 		}
 		else
 		{
