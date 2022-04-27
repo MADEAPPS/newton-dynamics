@@ -103,19 +103,6 @@ ndFloat32 ndJointHinge::GetOmega() const
 	return m_omega;
 }
 
-void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
-{
-	dAssert(minLimit <= 0.0f);
-	dAssert(maxLimit >= 0.0f);
-	m_minLimit = minLimit;
-	m_maxLimit = maxLimit;
-
-	// adding one extra dof, this makes the mass matrix ill conditioned, 
-	// but it could work with the direct solver
-	//m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 6;
-	//m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 6;
-}
-
 bool ndJointHinge::GetLimitState() const
 {
 	return m_limitState ? true : false;
@@ -125,6 +112,30 @@ void ndJointHinge::SetLimitState(bool state)
 {
 	m_maxDof = state ? 7 : 6;
 	m_limitState = state ? 1 : 0;
+
+	if (m_limitState)
+	{
+		SetLimits(m_minLimit, m_maxLimit);
+	}
+}
+
+void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
+{
+	dAssert(minLimit <= 0.0f);
+	dAssert(maxLimit >= 0.0f);
+	m_minLimit = minLimit;
+	m_maxLimit = maxLimit;
+
+	if (m_angle > m_maxLimit)
+	{
+		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_maxLimit);
+		m_angle = m_maxLimit + deltaAngle;
+	} 
+	else if (m_angle < m_minLimit)
+	{
+		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_minLimit);
+		m_angle = m_minLimit + deltaAngle;
+	}
 }
 
 void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
