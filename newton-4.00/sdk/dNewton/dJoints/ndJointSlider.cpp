@@ -13,6 +13,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSlider.h"
 
+#define D_MAX_SLIDER_RECOVERY_SPEED	ndFloat32 (0.5f)
+#define D_MAX_SLIDER_PENETRATION	ndFloat32 (0.05f)
+
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSlider)
 
 ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)

@@ -9,20 +9,20 @@
 * freely
 */
 
-#ifndef __ND_JOINT_HINGE_H__
-#define __ND_JOINT_HINGE_H__
+#ifndef __ND_JOINT_CYLINDER_H__
+#define __ND_JOINT_CYLINDER_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-class ndJointHinge: public ndJointBilateralConstraint
+class ndJointCylinder: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointHinge);
-	D_NEWTON_API ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_NEWTON_API ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointHinge();
+	D_CLASS_REFLECTION(ndJointCylinder);
+	D_NEWTON_API ndJointCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_NEWTON_API ndJointCylinder(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointCylinder(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointCylinder();
 
 	D_NEWTON_API ndFloat32 GetAngle() const;
 	D_NEWTON_API ndFloat32 GetOmega() const;

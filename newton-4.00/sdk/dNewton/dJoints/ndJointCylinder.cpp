@@ -11,14 +11,14 @@
 
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointHinge.h"
+#include "ndJointCylinder.h"
 
 #define D_MAX_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHinge)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointCylinder)
 
-ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointCylinder::ndJointCylinder(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
@@ -32,7 +32,7 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 {
 }
 
-ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointCylinder::ndJointCylinder(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotInChild)
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
@@ -49,7 +49,7 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& p
 	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
 }
 
-ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
+ndJointCylinder::ndJointCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
@@ -74,11 +74,11 @@ ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_limitState = ndInt8 (xmlGetInt(xmlNode, "limitState"));
 }
 
-ndJointHinge::~ndJointHinge()
+ndJointCylinder::~ndJointCylinder()
 {
 }
 
-void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndJointCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -96,22 +96,22 @@ void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "limitState", m_limitState);
 }
 
-ndFloat32 ndJointHinge::GetAngle() const
+ndFloat32 ndJointCylinder::GetAngle() const
 {
 	return m_angle;
 }
 
-ndFloat32 ndJointHinge::GetOmega() const
+ndFloat32 ndJointCylinder::GetOmega() const
 {
 	return m_omega;
 }
 
-bool ndJointHinge::GetLimitState() const
+bool ndJointCylinder::GetLimitState() const
 {
 	return m_limitState ? true : false;
 }
 
-void ndJointHinge::SetLimitState(bool state)
+void ndJointCylinder::SetLimitState(bool state)
 {
 	m_maxDof = state ? 7 : 6;
 	m_limitState = state ? 1 : 0;
@@ -122,7 +122,7 @@ void ndJointHinge::SetLimitState(bool state)
 	}
 }
 
-void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
+void ndJointCylinder::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
 	dAssert(minLimit <= 0.0f);
 	dAssert(maxLimit >= 0.0f);
@@ -141,37 +141,37 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 	}
 }
 
-void ndJointHinge::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
+void ndJointCylinder::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
 {
 	minLimit = m_minLimit;
 	maxLimit = m_maxLimit;
 }
 
-ndFloat32 ndJointHinge::GetOffsetAngle() const
+ndFloat32 ndJointCylinder::GetOffsetAngle() const
 {
 	return m_offsetAngle;
 }
 
-void ndJointHinge::SetOffsetAngle(ndFloat32 angle)
+void ndJointCylinder::SetOffsetAngle(ndFloat32 angle)
 {
 	m_offsetAngle = angle;
 }
 
-void ndJointHinge::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+void ndJointCylinder::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
 	m_springK = dAbs(spring);
 	m_damperC = dAbs(damper);
 	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
-void ndJointHinge::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+void ndJointCylinder::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
 {
 	spring = m_springK;
 	damper = m_damperC;
 	regularizer = m_springDamperRegularizer;
 }
 
-void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndJointCylinder::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;
@@ -210,14 +210,14 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	}
 }
 
-void ndJointHinge::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
+void ndJointCylinder::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
 {
 	// add spring damper row
 	AddAngularRowJacobian(desc, matrix0.m_front, m_offsetAngle - m_angle);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
-void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointCylinder::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
@@ -240,14 +240,14 @@ void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& ma
 	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
-ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
+ndFloat32 ndJointCylinder::PenetrationOmega(ndFloat32 penetration) const
 {
 	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
 	ndFloat32 omega = D_MAX_HINGE_RECOVERY_SPEED * param;
 	return omega;
 }
 
-ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+ndInt8 ndJointCylinder::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	ndInt8 ret = 0;
 	if (m_limitState)
@@ -285,7 +285,7 @@ ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& m
 	return ret;
 }
 
-void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
 	ndMatrix matrix1;

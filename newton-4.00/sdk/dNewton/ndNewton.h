@@ -63,6 +63,7 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
+#include <ndJointCylinder.h>
 #include <ndCharacterNode.h>
 #include <ndIk6DofEffector.h>
 #include <ndJointSpherical.h>
