@@ -313,30 +313,52 @@ void ndJointCylinder::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	}
 }
 
-void ndJointCylinder::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
+void ndJointCylinder::SubmitSpringDamperAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
 {
 	// add spring damper row
 	AddAngularRowJacobian(desc, matrix0.m_front, m_offsetAngle - m_angle);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizerAngle, m_springKAngle, m_damperCAngle);
 }
 
+void ndJointCylinder::SubmitSpringDamperPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+{
+	// add spring damper row
+	const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_offsetPosit));
+	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizerPosit, m_springKPosit, m_damperCPosit);
+}
+
 void ndJointCylinder::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
+	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
 
-	// two rows to restrict rotation around around the parent coordinate system
-	const ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+	const ndVector& pin = matrix1[0];
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
+	const ndVector prel(p0 - p1);
+	const ndVector vrel(veloc0 - veloc1);
 
-	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
+	m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
+	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
+	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
+	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
+
+	const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	AddAngularRowJacobian(desc, matrix1.m_front, angle0);
+
+	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	AddAngularRowJacobian(desc, matrix1.m_up, angle1);
+
+	const ndFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	AddAngularRowJacobian(desc, matrix1.m_right, angle2);
+	
 	// save the current joint Omega
 	const ndVector omega0(m_body0->GetOmega());
 	const ndVector omega1(m_body1->GetOmega());
-
+	
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	const ndFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
 	m_angle += deltaAngle;
@@ -350,7 +372,7 @@ ndFloat32 ndJointCylinder::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-ndInt8 ndJointCylinder::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+ndInt8 ndJointCylinder::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	ndInt8 ret = 0;
 	if (m_limitStateAngle)
@@ -388,6 +410,52 @@ ndInt8 ndJointCylinder::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix
 	return ret;
 }
 
+ndFloat32 ndJointCylinder::PenetrationSpeed(ndFloat32 penetration) const
+{
+	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
+	ndFloat32 speed = D_MAX_SLIDER_RECOVERY_SPEED * param;
+	return speed;
+}
+
+ndInt8 ndJointCylinder::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+{
+	ndInt8 ret = false;
+	if (m_limitStatePosit)
+	{
+		if ((m_minLimitPosit == ndFloat32(0.0f)) && (m_maxLimitPosit == ndFloat32(0.0f)))
+		{
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
+			ret = 1;
+		}
+		else
+		{
+			ndFloat32 x = m_posit + m_speed * desc.m_timestep;
+			if (x < m_minLimitPosit)
+			{
+				ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimitPosit));
+				AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+				const ndFloat32 penetration = x - m_minLimitPosit;
+				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
+				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+				SetLowerFriction(desc, ndFloat32(0.0f));
+				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+			}
+			else if (x > m_maxLimitPosit)
+			{
+				AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
+				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+				const ndFloat32 penetration = x - m_maxLimitPosit;
+				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
+				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+				SetHighFriction(desc, ndFloat32(0.0f));
+				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+			}
+		}
+	}
+	return ret;
+}
+
 void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -395,13 +463,23 @@ void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
-	if (!hitLimit)
+	ndInt8 hitLimitAngle = SubmitLimitsAngle(desc, matrix0, matrix1);
+	if (!hitLimitAngle)
 	{
 		if ((m_springKAngle > ndFloat32(0.0f)) || (m_damperCAngle > ndFloat32(0.0f)))
 		{
 			// spring damper with limits
-			SubmitSpringDamper(desc, matrix0, matrix1);
+			SubmitSpringDamperAngle(desc, matrix0, matrix1);
+		}
+	}
+
+	ndInt8 hitLimitPosit = SubmitLimitsPosit(desc, matrix0, matrix1);
+	if (!hitLimitPosit)
+	{
+		if ((m_springKPosit > ndFloat32(0.0f)) || (m_damperCPosit > ndFloat32(0.0f)))
+		{
+			// spring damper with limits
+			SubmitSpringDamperPosit(desc, matrix0, matrix1);
 		}
 	}
 }
