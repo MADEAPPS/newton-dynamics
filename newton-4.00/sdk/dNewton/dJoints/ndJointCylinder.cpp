@@ -13,36 +13,57 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointCylinder.h"
 
+#define D_MAX_SLIDER_RECOVERY_SPEED	ndFloat32 (0.5f)
+#define D_MAX_SLIDER_PENETRATION	ndFloat32 (0.05f)
+
 #define D_MAX_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointCylinder)
 
 ndJointCylinder::ndJointCylinder(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
-	,m_springK(ndFloat32(0.0f))
-	,m_damperC(ndFloat32(0.0f))
-	,m_minLimit(ndFloat32(-1.0e10f))
-	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_springKAngle(ndFloat32(0.0f))
+	,m_damperCAngle(ndFloat32(0.0f))
+	,m_minLimitAngle(ndFloat32(-1.0e10f))
+	,m_maxLimitAngle(ndFloat32(1.0e10f))
 	,m_offsetAngle(ndFloat32(0.0f))
-	,m_springDamperRegularizer(ndFloat32(0.1f))
-	,m_limitState(0)
+	,m_springDamperRegularizerAngle(ndFloat32(0.1f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springKPosit(ndFloat32(0.0f))
+	,m_damperCPosit(ndFloat32(0.0f))
+	,m_minLimitPosit(ndFloat32(-1.0e10f))
+	,m_maxLimitPosit(ndFloat32(1.0e10f))
+	,m_offsetPosit(ndFloat32(0.0f))
+	,m_springDamperRegularizerPosit(ndFloat32(0.1f))
+	,m_limitStatePosit(0)
+	,m_limitStateAngle(0)
 {
 }
 
 ndJointCylinder::ndJointCylinder(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotInChild)
+	:ndJointBilateralConstraint(8, child, parent, pinAndPivotInChild)
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
-	,m_springK(ndFloat32(0.0f))
-	,m_damperC(ndFloat32(0.0f))
-	,m_minLimit(ndFloat32(-1.0e10f))
-	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_springKAngle(ndFloat32(0.0f))
+	,m_damperCAngle(ndFloat32(0.0f))
+	,m_minLimitAngle(ndFloat32(-1.0e10f))
+	,m_maxLimitAngle(ndFloat32(1.0e10f))
 	,m_offsetAngle(ndFloat32(0.0f))
-	,m_springDamperRegularizer(ndFloat32(0.1f))
-	,m_limitState(0)
+	,m_springDamperRegularizerAngle(ndFloat32(0.1f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springKPosit(ndFloat32(0.0f))
+	,m_damperCPosit(ndFloat32(0.0f))
+	,m_minLimitPosit(ndFloat32(-1.0e10f))
+	,m_maxLimitPosit(ndFloat32(1.0e10f))
+	,m_offsetPosit(ndFloat32(0.0f))
+	,m_springDamperRegularizerPosit(ndFloat32(0.1f))
+	,m_limitStatePosit(0)
+	,m_limitStateAngle(0)
 {
 	ndMatrix tmp;
 	CalculateLocalMatrix(pinAndPivotInChild, m_localMatrix0, tmp);
@@ -53,25 +74,45 @@ ndJointCylinder::ndJointCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
-	,m_springK(ndFloat32(0.0f))
-	,m_damperC(ndFloat32(0.0f))
-	,m_minLimit(ndFloat32(-1.0e10f))
-	,m_maxLimit(ndFloat32(1.0e10f))
+	,m_springKAngle(ndFloat32(0.0f))
+	,m_damperCAngle(ndFloat32(0.0f))
+	,m_minLimitAngle(ndFloat32(-1.0e10f))
+	,m_maxLimitAngle(ndFloat32(1.0e10f))
 	,m_offsetAngle(ndFloat32(0.0f))
-	,m_springDamperRegularizer(ndFloat32(0.1f))
-	,m_limitState(0)
+	,m_springDamperRegularizerAngle(ndFloat32(0.1f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springKPosit(ndFloat32(0.0f))
+	,m_damperCPosit(ndFloat32(0.0f))
+	,m_minLimitPosit(ndFloat32(-1.0e10f))
+	,m_maxLimitPosit(ndFloat32(1.0e10f))
+	,m_offsetPosit(ndFloat32(0.0f))
+	,m_springDamperRegularizerPosit(ndFloat32(0.1f))
+	,m_limitStatePosit(0)
+	,m_limitStateAngle(0)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
 	m_angle = xmlGetFloat(xmlNode, "angle");
 	m_omega = xmlGetFloat(xmlNode, "omega");
-	m_springK = xmlGetFloat(xmlNode, "springK");
-	m_damperC = xmlGetFloat(xmlNode, "damperC");
-	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
-	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
+	m_springKAngle = xmlGetFloat(xmlNode, "springKAngle");
+	m_damperCAngle = xmlGetFloat(xmlNode, "damperCAngle");
+	m_minLimitAngle = xmlGetFloat(xmlNode, "minLimitAngle");
+	m_maxLimitAngle = xmlGetFloat(xmlNode, "maxLimitAngle");
 	m_offsetAngle = xmlGetFloat(xmlNode, "offsetAngle");
-	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
-	m_limitState = ndInt8 (xmlGetInt(xmlNode, "limitState"));
+	m_springDamperRegularizerAngle = xmlGetFloat(xmlNode, "springDamperRegularizerAngle");
+
+	m_posit = xmlGetFloat(xmlNode, "posit");
+	m_speed = xmlGetFloat(xmlNode, "speed");
+	m_springKPosit = xmlGetFloat(xmlNode, "springKPosit");
+	m_damperCPosit = xmlGetFloat(xmlNode, "damperCPosit");
+	m_minLimitPosit = xmlGetFloat(xmlNode, "minLimitPosit");
+	m_maxLimitPosit = xmlGetFloat(xmlNode, "maxLimitPosit");
+	m_offsetPosit = xmlGetFloat(xmlNode, "offsetPosit");
+	m_springDamperRegularizerPosit = xmlGetFloat(xmlNode, "springDamperRegularizerPosit");
+
+	m_limitStatePosit = ndInt8(xmlGetInt(xmlNode, "limitStatePosit"));
+	m_limitStateAngle = ndInt8 (xmlGetInt(xmlNode, "limitStateAngle"));
 }
 
 ndJointCylinder::~ndJointCylinder()
@@ -87,13 +128,24 @@ void ndJointCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 	xmlSaveParam(childNode, "angle", m_angle);
 	xmlSaveParam(childNode, "omega", m_omega);
-	xmlSaveParam(childNode, "springK", m_springK);
-	xmlSaveParam(childNode, "damperC", m_damperC);
-	xmlSaveParam(childNode, "minLimit", m_minLimit);
-	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(childNode, "springKAngle", m_springKAngle);
+	xmlSaveParam(childNode, "damperCAngle", m_damperCAngle);
+	xmlSaveParam(childNode, "minLimitAngle", m_minLimitAngle);
+	xmlSaveParam(childNode, "maxLimitAngle", m_maxLimitAngle);
 	xmlSaveParam(childNode, "offsetAngle", m_offsetAngle);
-	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
-	xmlSaveParam(childNode, "limitState", m_limitState);
+	xmlSaveParam(childNode, "springDamperRegularizerAngle", m_springDamperRegularizerAngle);
+
+	xmlSaveParam(childNode, "posit", m_posit);
+	xmlSaveParam(childNode, "speed", m_speed);
+	xmlSaveParam(childNode, "springKPosit", m_springKPosit);
+	xmlSaveParam(childNode, "damperCPosit", m_damperCPosit);
+	xmlSaveParam(childNode, "minLimitPosit", m_minLimitPosit);
+	xmlSaveParam(childNode, "maxLimitPosit", m_maxLimitPosit);
+	xmlSaveParam(childNode, "offsetPosit", m_offsetPosit);
+	xmlSaveParam(childNode, "springDamperRegularizerPosit", m_springDamperRegularizerPosit);
+
+	xmlSaveParam(childNode, "limitStatePosit", m_limitStatePosit);
+	xmlSaveParam(childNode, "limitStateAngle", m_limitStateAngle);
 }
 
 ndFloat32 ndJointCylinder::GetAngle() const
@@ -106,45 +158,43 @@ ndFloat32 ndJointCylinder::GetOmega() const
 	return m_omega;
 }
 
-bool ndJointCylinder::GetLimitState() const
+bool ndJointCylinder::GetLimitStateAngle() const
 {
-	return m_limitState ? true : false;
+	return m_limitStateAngle ? true : false;
 }
 
-void ndJointCylinder::SetLimitState(bool state)
+void ndJointCylinder::SetLimitStateAngle(bool state)
 {
-	m_maxDof = state ? 7 : 6;
-	m_limitState = state ? 1 : 0;
-
-	if (m_limitState)
+	m_limitStateAngle = state ? 1 : 0;
+	if (m_limitStateAngle)
 	{
-		SetLimits(m_minLimit, m_maxLimit);
+		SetLimitsAngle(m_minLimitAngle, m_maxLimitAngle);
 	}
 }
 
-void ndJointCylinder::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
+void ndJointCylinder::SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
 	dAssert(minLimit <= 0.0f);
 	dAssert(maxLimit >= 0.0f);
-	m_minLimit = minLimit;
-	m_maxLimit = maxLimit;
+	m_minLimitAngle = minLimit;
+	m_maxLimitAngle = maxLimit;
 
-	if (m_angle > m_maxLimit)
+	if (m_angle > m_maxLimitAngle)
 	{
-		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_maxLimit);
-		m_angle = m_maxLimit + deltaAngle;
+		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_maxLimitAngle);
+		m_angle = m_maxLimitAngle + deltaAngle;
 	} 
-	else if (m_angle < m_minLimit)
+	else if (m_angle < m_minLimitAngle)
 	{
-		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_minLimit);
-		m_angle = m_minLimit + deltaAngle;
+		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_minLimitAngle);
+		m_angle = m_minLimitAngle + deltaAngle;
 	}
 }
 
-void ndJointCylinder::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit)
+void ndJointCylinder::GetLimitsAngle(ndFloat32& minLimit, ndFloat32& maxLimit) const
 {
-	minLimit = m_minLimit;
-	maxLimit = m_maxLimit;
+	minLimit = m_minLimitAngle;
+	maxLimit = m_maxLimitAngle;
 }
 
 ndFloat32 ndJointCylinder::GetOffsetAngle() const
@@ -157,18 +207,71 @@ void ndJointCylinder::SetOffsetAngle(ndFloat32 angle)
 	m_offsetAngle = angle;
 }
 
-void ndJointCylinder::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+void ndJointCylinder::SetAsSpringDamperAngle(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_springK = dAbs(spring);
-	m_damperC = dAbs(damper);
-	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springKAngle = dAbs(spring);
+	m_damperCAngle = dAbs(damper);
+	m_springDamperRegularizerAngle = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
-void ndJointCylinder::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+void ndJointCylinder::GetSpringDamperAngle(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
 {
-	spring = m_springK;
-	damper = m_damperC;
-	regularizer = m_springDamperRegularizer;
+	spring = m_springKAngle;
+	damper = m_damperCAngle;
+	regularizer = m_springDamperRegularizerAngle;
+}
+
+ndFloat32 ndJointCylinder::GetPosit() const
+{
+	return m_posit;
+}
+
+ndFloat32 ndJointCylinder::GetOffsetPosit() const
+{
+	return m_offsetPosit;
+}
+
+void ndJointCylinder::SetOffsetPosit(ndFloat32 offset)
+{
+	m_offsetPosit = offset;
+}
+
+bool ndJointCylinder::GetLimitStatePosit() const
+{
+	return m_limitStatePosit ? true : false;
+}
+
+void ndJointCylinder::SetLimitStatePosit(bool state)
+{
+	m_limitStatePosit = state ? 1 : 0;
+}
+
+void ndJointCylinder::SetLimitsPosit(ndFloat32 minLimit, ndFloat32 maxLimit)
+{
+	dAssert(minLimit <= 0.0f);
+	dAssert(maxLimit >= 0.0f);
+	m_minLimitPosit = minLimit;
+	m_maxLimitPosit = maxLimit;
+}
+
+void ndJointCylinder::GetLimitsPosit(ndFloat32& minLimit, ndFloat32& maxLimit) const
+{
+	minLimit = m_minLimitPosit;
+	maxLimit = m_maxLimitPosit;
+}
+
+void ndJointCylinder::SetAsSpringDamperPosit(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
+{
+	m_springKPosit = dAbs(spring);
+	m_damperCPosit = dAbs(damper);
+	m_springDamperRegularizerPosit = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+}
+
+void ndJointCylinder::GetSpringDamperPosit(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+{
+	spring = m_springKPosit;
+	damper = m_damperCPosit;
+	regularizer = m_springDamperRegularizerPosit;
 }
 
 void ndJointCylinder::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -184,7 +287,7 @@ void ndJointCylinder::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	const ndFloat32 radius = debugCallback.m_debugScale;
 	ndVector arch[subdiv + 1];
 
-	ndFloat32 deltaTwist = m_maxLimit - m_minLimit;
+	ndFloat32 deltaTwist = m_maxLimitAngle - m_minLimitAngle;
 	if ((deltaTwist > ndFloat32(1.0e-3f)) && (deltaTwist <= ndFloat32(2.0f) * ndPi))
 	{
 		ndMatrix pitchMatrix(matrix1);
@@ -193,7 +296,7 @@ void ndJointCylinder::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
 
 		ndFloat32 angleStep = dMin(deltaTwist, ndFloat32(2.0f * ndPi)) / subdiv;
-		ndFloat32 angle0 = m_minLimit;
+		ndFloat32 angle0 = m_minLimitAngle;
 
 		ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 		for (ndInt32 i = 0; i <= subdiv; i++)
@@ -214,7 +317,7 @@ void ndJointCylinder::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMa
 {
 	// add spring damper row
 	AddAngularRowJacobian(desc, matrix0.m_front, m_offsetAngle - m_angle);
-	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizerAngle, m_springKAngle, m_damperCAngle);
 }
 
 void ndJointCylinder::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
@@ -250,9 +353,9 @@ ndFloat32 ndJointCylinder::PenetrationOmega(ndFloat32 penetration) const
 ndInt8 ndJointCylinder::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	ndInt8 ret = 0;
-	if (m_limitState)
+	if (m_limitStateAngle)
 	{
-		if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
+		if ((m_minLimitAngle > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimitAngle < (ndFloat32(1.0f) * ndDegreeToRad)))
 		{
 			AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
 			ret = 1;
@@ -260,21 +363,21 @@ ndInt8 ndJointCylinder::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix
 		else
 		{
 			const ndFloat32 angle = m_angle + m_omega * desc.m_timestep;
-			if (angle < m_minLimit)
+			if (angle < m_minLimitAngle)
 			{
 				AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
 				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-				const ndFloat32 penetration = angle - m_minLimit;
+				const ndFloat32 penetration = angle - m_minLimitAngle;
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
 				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
-			else if (angle > m_maxLimit)
+			else if (angle > m_maxLimitAngle)
 			{
 				AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
 				const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-				const ndFloat32 penetration = angle - m_maxLimit;
+				const ndFloat32 penetration = angle - m_maxLimitAngle;
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
@@ -295,7 +398,7 @@ void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
 	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
 	if (!hitLimit)
 	{
-		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
+		if ((m_springKAngle > ndFloat32(0.0f)) || (m_damperCAngle > ndFloat32(0.0f)))
 		{
 			// spring damper with limits
 			SubmitSpringDamper(desc, matrix0, matrix1);

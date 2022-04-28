@@ -133,7 +133,12 @@ void ndJointSlider::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 	dAssert(maxLimit >= 0.0f);
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
-	//m_maxDof = ((maxLimit - minLimit) < ndFloat32(1.0e9f)) ? 7 : 0;
+}
+
+void ndJointSlider::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit) const
+{
+	minLimit = m_minLimit;
+	maxLimit = m_maxLimit;
 }
 
 void ndJointSlider::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -141,6 +146,13 @@ void ndJointSlider::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, n
 	m_springK = dAbs(spring);
 	m_damperC = dAbs(damper);
 	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+}
+
+void ndJointSlider::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
+{
+	spring = m_springK;
+	damper = m_damperC;
+	regularizer = m_springDamperRegularizer;
 }
 
 ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const

@@ -28,12 +28,22 @@ class ndJointCylinder: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 GetOmega() const;
 	D_NEWTON_API ndFloat32 GetOffsetAngle() const;
 	D_NEWTON_API void SetOffsetAngle(ndFloat32 angle);
-	D_NEWTON_API bool GetLimitState() const;
-	D_NEWTON_API void SetLimitState(bool state);
-	D_NEWTON_API void SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit);
-	D_NEWTON_API void GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit);
-	D_NEWTON_API void SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
-	D_NEWTON_API void GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
+	D_NEWTON_API bool GetLimitStateAngle() const;
+	D_NEWTON_API void SetLimitStateAngle(bool state);
+	D_NEWTON_API void SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit);
+	D_NEWTON_API void GetLimitsAngle(ndFloat32& minLimit, ndFloat32& maxLimit) const;
+	D_NEWTON_API void SetAsSpringDamperAngle(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API void GetSpringDamperAngle(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
+
+	D_NEWTON_API ndFloat32 GetPosit() const;
+	D_NEWTON_API ndFloat32 GetOffsetPosit() const;
+	D_NEWTON_API void SetOffsetPosit(ndFloat32 offset);
+	D_NEWTON_API bool GetLimitStatePosit() const;
+	D_NEWTON_API void SetLimitStatePosit(bool state);
+	D_NEWTON_API void SetLimitsPosit(ndFloat32 minLimit, ndFloat32 maxLimit);
+	D_NEWTON_API void GetLimitsPosit(ndFloat32& minLimit, ndFloat32& maxLimit) const;
+	D_NEWTON_API void SetAsSpringDamperPosit(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
+	D_NEWTON_API void GetSpringDamperPosit(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
 
 	protected:
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
@@ -47,13 +57,24 @@ class ndJointCylinder: public ndJointBilateralConstraint
 
 	ndFloat32 m_angle;
 	ndFloat32 m_omega;
-	ndFloat32 m_springK;
-	ndFloat32 m_damperC;
-	ndFloat32 m_minLimit;
-	ndFloat32 m_maxLimit;
+	ndFloat32 m_springKAngle;
+	ndFloat32 m_damperCAngle;
+	ndFloat32 m_minLimitAngle;
+	ndFloat32 m_maxLimitAngle;
 	ndFloat32 m_offsetAngle;
-	ndFloat32 m_springDamperRegularizer;
-	ndInt8 m_limitState;
+	ndFloat32 m_springDamperRegularizerAngle;
+
+	ndFloat32 m_posit;
+	ndFloat32 m_speed;
+	ndFloat32 m_springKPosit;
+	ndFloat32 m_damperCPosit;
+	ndFloat32 m_minLimitPosit;
+	ndFloat32 m_maxLimitPosit;
+	ndFloat32 m_offsetPosit;
+	ndFloat32 m_springDamperRegularizerPosit;
+
+	ndInt8 m_limitStatePosit;
+	ndInt8 m_limitStateAngle;
 };
 
 #endif 
