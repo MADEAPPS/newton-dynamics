@@ -315,11 +315,11 @@ void ndDynamicsUpdate::SortJointsScan()
 		movingJoints[threadIndex] = activeJointCount;
 	});
 
-	auto Scan0 = ndMakeObject::ndFunction([this, &jointArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Scan0 = ndMakeObject::ndFunction([this, &jointArray, &histogram, scene](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		ndInt32* const hist = &histogram[threadIndex][0];
-		ndScene* const scene = m_world->GetScene();
+		//ndScene* const scene = m_world->GetScene();
 		dAssert(scene->GetScratchBuffer().GetCount() >= jointArray.GetCount() * sizeof(ndConstraint*));
 		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
@@ -338,11 +338,10 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	});
 
-	auto Sort0 = ndMakeObject::ndFunction([this, &jointArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Sort0 = ndMakeObject::ndFunction([this, &jointArray, &histogram, scene](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		ndInt32* const hist = &histogram[threadIndex][0];
-		ndScene* const scene = m_world->GetScene();
 		dAssert(scene->GetScratchBuffer().GetCount() >= jointArray.GetCount() * sizeof (ndConstraint*));
 		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
