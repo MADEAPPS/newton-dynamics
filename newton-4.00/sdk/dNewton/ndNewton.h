@@ -48,6 +48,7 @@
 #include <ndJointPlane.h>
 #include <ndBodyNotify.h>
 #include <ndJointWheel.h>
+#include <ndJointRoller.h>
 #include <ndJointSlider.h>
 #include <ndJointPulley.h>
 #include <ndShapeConvex.h>
