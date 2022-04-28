@@ -4308,7 +4308,11 @@ void ndContactSolver::CalculateContacts(
 	ndShape* const shapeB = (ndShape*)(instanceB->GetShape());
 
 	m_instance0.SetShape(shapeA);
+	m_instance0.SetGlobalMatrix(matrixA);      // Setting the global matrix before setting the collision shape of the body
+
 	m_instance1.SetShape(shapeB);
+	m_instance1.SetGlobalMatrix(matrixB);      // Setting the global matrix before setting the collision shape of the body
+
 	bodyA.SetCollisionShape(m_instance0);
 	bodyB.SetCollisionShape(m_instance1);
 
@@ -4327,9 +4331,6 @@ void ndContactSolver::CalculateContacts(
 	}
 	contact.SetBodies(&bodyA, &bodyB);
 
-	m_instance0.SetGlobalMatrix(bodyA.GetMatrix());
-	m_instance1.SetGlobalMatrix(bodyB.GetMatrix());
-
 	m_closestPoint0 = ndVector::m_zero;
 	m_closestPoint1 = ndVector::m_zero;
 	m_separatingVector = ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -4337,7 +4338,7 @@ void ndContactSolver::CalculateContacts(
 	m_freeFace = nullptr;
 	m_notification = notification;
 	m_contactBuffer = contactBuffer;
-	m_timestep = ndFloat32 (1.0f);
+	m_timestep = ndFloat32(1.0f);
 	m_skinMargin = ndFloat32(0.0f);
 	m_separationDistance = ndFloat32(1.0e10f);
 	m_maxCount = D_MAX_CONTATCS;
@@ -4345,7 +4346,7 @@ void ndContactSolver::CalculateContacts(
 	m_pruneContacts = 1;
 	m_intersectionTestOnly = 0;
 
-	const ndInt32 count = dMin (CalculateContactsDiscrete(), contactOut.GetCapacity());
+	const ndInt32 count = dMin(CalculateContactsDiscrete(), contactOut.GetCapacity());
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndContactPoint& contactPoint = contactBuffer[i];
