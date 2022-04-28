@@ -346,8 +346,8 @@ void ndJointCylinder::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix&
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
-	const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-	AddAngularRowJacobian(desc, matrix1.m_front, angle0);
+	//const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	//AddAngularRowJacobian(desc, matrix1.m_front, angle0);
 
 	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle1);

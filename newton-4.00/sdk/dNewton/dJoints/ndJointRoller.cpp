@@ -323,8 +323,8 @@ void ndJointRoller::SubmitSpringDamperAngle(ndConstraintDescritor& desc, const n
 void ndJointRoller::SubmitSpringDamperPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// add spring damper row
-	const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_offsetPosit));
-	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+	const ndVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_offsetPosit));
+	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizerPosit, m_springKPosit, m_damperCPosit);
 }
 
@@ -339,15 +339,15 @@ void ndJointRoller::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& m
 	const ndVector prel(p0 - p1);
 	const ndVector vrel(veloc0 - veloc1);
 
-	m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
-	m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
+	m_speed = vrel.DotProduct(matrix1.m_up).GetScalar();
+	m_posit = prel.DotProduct(matrix1.m_up).GetScalar();
 	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
-	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
+	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[0]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
-	const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-	AddAngularRowJacobian(desc, matrix1.m_front, angle0);
+	//const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	//AddAngularRowJacobian(desc, matrix1.m_front, angle0);
 
 	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle1);
