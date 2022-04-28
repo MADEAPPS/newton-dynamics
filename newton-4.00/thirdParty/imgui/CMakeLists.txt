@@ -13,10 +13,24 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set (projectName "imgui")
 message (${projectName})
 
+include_directories(.)
+include_directories(backends)
+include_directories(../glfw/include)
+
+#add_definitions(-DIMGUI_DISABLE_OBSOLETE_KEYIO)
 
 # low level core
-file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
+file(GLOB CPP_SOURCE 
+	*.h 
+	*.cpp 
+	backends/imgui_impl_glfw.h
+	backends/imgui_impl_glfw.cpp
+	backends/imgui_impl_opengl3.h
+	backends/imgui_impl_opengl3.cpp
+)
+
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
 

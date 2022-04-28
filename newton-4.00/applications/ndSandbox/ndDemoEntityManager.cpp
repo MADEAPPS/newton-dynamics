@@ -267,25 +267,56 @@ ndDemoEntityManager::ndDemoEntityManager ()
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
-
 	glfwInit();
 
+	// Decide GL+GLSL versions
+	#if defined(IMGUI_IMPL_OPENGL_ES2)
+	// GL ES 2.0 + GLSL 100
+	const char* glsl_version = "#version 100";
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+	#elif defined(__APPLE__)
+	// GL 3.2 + GLSL 150
+	const char* glsl_version = "#version 150";
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+	#else
+	// GL 3.0 + GLSL 130
+	const char* glsl_version = "#version 130";
 	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+	#endif
 
-#if defined (_DEBUG)
+	#if defined (_DEBUG)
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#endif
+	#endif
 
-	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
+	m_hasJoytick = glfwJoystickPresent(0) ? true : false;
 
+	// Create window with graphics context
 	char version[256];
 	sprintf(version, "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
-	m_mainFrame = glfwCreateWindow(1280, 720, version, nullptr, nullptr);
+	//GLFWwindow* window = glfwCreateWindow(1280, 720, version, NULL, NULL);
+	m_mainFrame = glfwCreateWindow(1280, 720, version, NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
+	glfwSwapInterval(0); // Enable vsync
+
+	 // Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
 	ndInt32 monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
-	if (monitorsCount > 1) 
+	if (monitorsCount > 1)
 	{
 		ndInt32 window_x;
 		ndInt32 window_y;
@@ -297,21 +328,38 @@ ndDemoEntityManager::ndDemoEntityManager ()
 		glfwSetWindowPos(m_mainFrame, monitor_x + window_x, monitor_y + 64);
 	}
 
+	// Setup Dear ImGui style
+	//ImGui::StyleColorsDark();
+	ImGui::StyleColorsLight();
+	//ImGui::StyleColorsClassic();
+
+	// Setup Platform/Renderer back ends
+	ImGui_ImplGlfw_InitForOpenGL(m_mainFrame, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
 	// attach myself to the main frame
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
-#if defined (_DEBUG)
+	#if defined (_DEBUG)
 	glDebugMessageCallback((GLDEBUGPROC)OpenMessageCallback, m_mainFrame);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-#endif
+	#endif
+
+	// Load Fonts
+	LoadFont();
+
+	glfwSetKeyCallback(m_mainFrame, KeyCallback);
+	glfwSetCharCallback(m_mainFrame, CharCallback);
+	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
+	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
+	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
 
 	// Setup ImGui binding
-	ImGuiIO& io = ImGui::GetIO();
 	io.UserData = this;
 
 	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
-	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                     
+	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
 	io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
 	io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
 	io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
@@ -331,30 +379,18 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
 	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-	// Alternatively you can set this to nullptr and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-	io.RenderDrawListsFn = RenderDrawListsCallback;
-	//	io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
-	//	io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
-
-#ifdef _MSC_VER 
+	#ifdef _MSC_VER 
 	io.ImeWindowHandle = glfwGetWin32Window(m_mainFrame);
-#else 
-	dTrace (("no sure what to set this to for non windews systems\n"))
-//	dAssert (0);
-#endif
-
-	glfwSwapInterval(0);
-	glfwSetKeyCallback(m_mainFrame, KeyCallback);
-	glfwSetCharCallback(m_mainFrame, CharCallback);
-	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
-	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
-	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
-
-	LoadFont();
+	#endif
 
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
 	m_mousePressed[2] = false;
+	
+	// Alternatively you can set this to nullptr and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
+	//io.RenderDrawListsFn = RenderDrawListsCallback;
+	//io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
+	//io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
 
 	// initialized the physics world for the new scene
 	//m_showUI = false;
@@ -388,13 +424,13 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	m_shaderCache.CreateAllEffects();
 
-#ifdef ENABLE_REPLAY
-	#ifdef REPLAY_RECORD
-		m_replayLogFile = fopen("replayLog.bin", "wb");
-	#else 
-		m_replayLogFile = fopen("replayLog.bin", "rb");
+	#ifdef ENABLE_REPLAY
+		#ifdef REPLAY_RECORD
+			m_replayLogFile = fopen("replayLog.bin", "wb");
+		#else 
+			m_replayLogFile = fopen("replayLog.bin", "rb");
+		#endif
 	#endif
-#endif
 
 	Test0__();
 	//Test1__();
@@ -425,7 +461,13 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	glDeleteTextures(1, &font_texture);
 	ImGui::GetIO().Fonts->TexID = 0;
 
-	ImGui::Shutdown();
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	glfwDestroyWindow(m_mainFrame);
 	glfwTerminate();
 }
 
@@ -1090,7 +1132,13 @@ void ndDemoEntityManager::ToggleProfiler()
 
 void ndDemoEntityManager::BeginFrame()
 {
+	// Poll and handle events (inputs, window resize, etc.)
+	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+	// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+	// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+	// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 	glfwPollEvents();
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Setup display size (every frame to accommodate for window resizing)
@@ -1101,7 +1149,17 @@ void ndDemoEntityManager::BeginFrame()
 	io.DisplaySize = ImVec2((float)w, (float)h);
 	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
-	// Start the frame
+	//int display_w, display_h;
+	//glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
+	glViewport(0, 0, display_w, display_h);
+
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Start the Dear ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
 
@@ -1175,7 +1233,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "solver:         %s", m_world->GetSolverString());
 			ImGui::Text(text, "");
 
-			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
+			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0));
 			ImGui::End();
 		}
 	}
@@ -1613,15 +1671,66 @@ void ndDemoEntityManager::RenderScene()
 void ndDemoEntityManager::Run()
 {
     // Main loop
-    while (!glfwWindowShouldClose(m_mainFrame))
-    {
-		m_suspendPhysicsUpdate = false;
-		BeginFrame();
+	bool show_demo_window = true;
+	bool show_another_window = false;
 
+	// Main loop
+	while (!glfwWindowShouldClose(m_mainFrame))
+	{
 		D_TRACKTIME();
+		m_suspendPhysicsUpdate = false;
 
+		BeginFrame();
 		RenderStats();
+
+#if 0
+		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+		if (show_demo_window)
+		{
+			ImGui::ShowDemoWindow(&show_demo_window);
+		}
+
+		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+		if (0)
+		{
+			static float f = 0.0f;
+			static int counter = 0;
+		
+			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+		
+			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+			ImGui::Checkbox("Another Window", &show_another_window);
+		
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+		
+			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+				counter++;
+			ImGui::SameLine();
+			ImGui::Text("counter = %d", counter);
+		
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+
+		// 3. Show another simple window.
+		if (show_another_window)
+		{
+			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+			ImGui::Text("Hello from another window!");
+			if (ImGui::Button("Close Me"))
+				show_another_window = false;
+			ImGui::End();
+		}
+#endif
+
+		// Rendering
 		ImGui::Render();
+		RenderDrawListsCallback(ImGui::GetDrawData());
+
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(m_mainFrame);
-    }
+	}
 }
