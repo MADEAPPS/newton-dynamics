@@ -77,8 +77,8 @@ class cuSceneInfo
 		,m_scan()
 		,m_histogram()
 		,m_bodyArray()
-		,m_bodyAabbCell()
 		,m_bodyAabbArray()
+		,m_bodyAabbCell()
 		,m_bodyAabbCellScrath()
 		,m_transformBuffer0()
 		,m_transformBuffer1()
@@ -95,15 +95,15 @@ class cuSceneInfo
 	cuBuffer<int> m_scan;
 	cuBuffer<int> m_histogram;
 	cuBuffer<cuBodyProxy> m_bodyArray;
-	cuBuffer<cuBodyAabbCell> m_bodyAabbCell;
 	cuBuffer<cuBoundingBox> m_bodyAabbArray;
+	cuBuffer<cuBodyAabbCell> m_bodyAabbCell;
 	cuBuffer<cuBodyAabbCell> m_bodyAabbCellScrath;
 	cuBuffer<cuSpatialVector> m_transformBuffer0;
 	cuBuffer<cuSpatialVector> m_transformBuffer1;
 	
 	int4 m_hasUpperByteHash;
-	int m_frameIsValid;
-	int m_frameCount;
+	unsigned m_frameIsValid;
+	unsigned m_frameCount;
 };
 
 #endif

@@ -28,9 +28,8 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
-#define D_COUNT_SORT_SUPER_BLOCK		32
-#define D_PARALLEL_PREFIX_LOCAL_SIZE	(1024)
-#define D_PARALLEL_PREFIX_BUFFER_SIZE	(D_PARALLEL_PREFIX_LOCAL_SIZE * 4)
+#define D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE	256
+#define D_AABB_GRID_CELL_SORT_BLOCK_SIZE	(1<<D_AABB_GRID_CELL_BITS)
 
 
 //__global__ void cuTest0(const cuSceneInfo& info, int digit)
@@ -55,12 +54,12 @@
 //	arr[2] = (0 << D_THREADS_PER_BLOCK_BITS) + 2;
 //	arr[3] = (1 << D_THREADS_PER_BLOCK_BITS) + 3;
 //
-//	int xxxx = 0;
+//	int zzzz = 0;
 //	for (int k = 2; k <= D_THREADS_PER_BLOCK; k *= 2)
 //	{
 //		for (int j = k / 2; j > 0; j /= 2)
 //		{
-//			xxxx++;
+//			zzzz++;
 //			for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
 //			{
 //				const int l = i ^ j;
@@ -80,282 +79,226 @@
 //	arr[D_THREADS_PER_BLOCK - 1] = 0;
 //}
 
-inline bool __device__ cuCountingSortIsThisGridCellDigitValid(const cuSceneInfo& info, int digit)
+inline unsigned __device__ cuCountingSortEvaluateGridCellKey(const cuBodyAabbCell& cell, int digit)
 {
-	bool isEven = (digit & 1) ? false : true;
-	bool hasUpperByteHash = (&info.m_hasUpperByteHash.x)[digit / 4] ? true : false;
-	bool test = isEven | hasUpperByteHash;
-	return test;
-}
-
-inline unsigned __device__ cuCountingSortEvaluateGridCellKey(const cuBodyAabbCell& dataElement, int digit)
-{
-	return dataElement.m_bytes[digit];
+	unsigned key = cell.m_key;
+	unsigned mask = (1 << D_AABB_GRID_CELL_BITS) - 1;
+	unsigned value = mask & (key >> (digit * D_AABB_GRID_CELL_BITS));
+	return value;
 };
 
 __global__ void cuCountingSortCountGridCells(const cuSceneInfo& info, int digit)
 {
-	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK];
+	__shared__  int cacheBuffer[D_AABB_GRID_CELL_SORT_BLOCK_SIZE];
 	if (info.m_frameIsValid)
 	{
-		bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
-		if (test)
+		const int blockId = blockIdx.x;
+		const int cellCount = info.m_bodyAabbCell.m_size - 1;
+		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+		if (blockId < blocks)
 		{
-			const int cellCount = info.m_bodyAabbCell.m_size - 1;
-			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-			if (blockIdx.x < blocks)
+			const int threadId = threadIdx.x;
+
+			cacheBuffer[threadId] = 0;
+			const int index = threadId + D_AABB_GRID_CELL_SORT_BLOCK_SIZE * blockId;
+
+			int* histogram = info.m_histogram.m_array;
+			const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
+
+			__syncthreads();
+			if (index < cellCount)
 			{
-				int threadId = threadIdx.x;
-				cacheBuffer[threadId] = 0;
-
-				int index = threadId + blockDim.x * blockIdx.x;
-
-				int* histogram = info.m_histogram.m_array;
-				const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
-
-				__syncthreads();
-				if (index < cellCount)
-				{
-					unsigned key = cuCountingSortEvaluateGridCellKey(src[index], digit);
-					atomicAdd(&cacheBuffer[key], 1);
-				}
-				__syncthreads();
-				histogram[index] = cacheBuffer[threadId];
+				unsigned key = cuCountingSortEvaluateGridCellKey(src[index], digit);
+				atomicAdd(&cacheBuffer[key], 1);
 			}
+			__syncthreads();
+
+			int dstBase = blockId * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+			histogram[dstBase + threadId] = cacheBuffer[threadId];
 		}
 	}
 }
 
 __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digit)
 {
+	__shared__  long long cachedCells[D_AABB_GRID_CELL_SORT_BLOCK_SIZE];
+	__shared__  unsigned cacheSortedKey[D_AABB_GRID_CELL_SORT_BLOCK_SIZE];
+	__shared__  int cacheBufferAdress[D_AABB_GRID_CELL_SORT_BLOCK_SIZE];
+	__shared__  int cacheKeyPrefix[D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2 + D_AABB_GRID_CELL_SORT_BLOCK_SIZE + 1];
+	
+	if (info.m_frameIsValid)
+	{
+		const int blockId = blockIdx.x;
+		const int cellCount = info.m_bodyAabbCell.m_size - 1;
+		
+		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+		if (blockId < blocks)
+		{
+			const int threadId = threadIdx.x;
+			const int* histogram = info.m_histogram.m_array;
+	
+			const int index = threadId + blockDim.x * blockId;
+			const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
+			cuBodyAabbCell* dst = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
+
+			const int srcOffset = blockId * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+
+			cacheBufferAdress[threadId] = histogram[(blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE) + srcOffset + threadId];
+
+			cacheSortedKey[threadId] = ((1<< D_AABB_GRID_CELL_BITS) << 16) | threadId;
+			if (index < cellCount)
+			{
+				cuBodyAabbCell cell;
+				long long value = src[index].m_cpyValue;
+				cell.m_cpyValue = value;
+				cachedCells[threadId] = value;
+				unsigned key = cuCountingSortEvaluateGridCellKey(cell, digit);
+				cacheSortedKey[threadId] = (key << 16) | threadId;
+			}
+			__syncthreads();
+
+			cacheKeyPrefix[threadId] = 0;
+			const int prefixBase = D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2;
+			cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[srcOffset + threadId];
+
+			for (int k = 2; k <= D_AABB_GRID_CELL_SORT_BLOCK_SIZE; k *= 2)
+			{
+				for (int j = k / 2; j > 0; j /= 2)
+				{
+					const int threadId1 = threadId ^ j;
+					if (threadId1 > threadId)
+					{
+						const int a = cacheSortedKey[threadId];
+						const int b = cacheSortedKey[threadId1];
+						const int mask0 = (-(threadId & k)) >> 31;
+						const int mask1 = (-(a > b)) >> 31;
+						const int mask = mask0 ^ mask1;
+						cacheSortedKey[threadId] = b & mask | a & ~mask;
+						cacheSortedKey[threadId1] = a & mask | b & ~mask;
+					}
+					__syncthreads();
+				}
+			}
+
+			for (int i = 1; i < D_AABB_GRID_CELL_SORT_BLOCK_SIZE; i = i << 1)
+			{
+				const int sum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
+				__syncthreads();
+				cacheKeyPrefix[prefixBase + threadId] = sum;
+				__syncthreads();
+			}
+
+			if (index < cellCount)
+			{
+				const unsigned keyValue = cacheSortedKey[threadId];
+				const unsigned key = keyValue >> 16;
+				const unsigned dstOffset = threadId + cacheBufferAdress[key] - cacheKeyPrefix[prefixBase + key];
+				dst[dstOffset].m_cpyValue = cachedCells[keyValue & 0xffff];
+			}
+		}
+	}
+}
+
+__global__ void cuCountingSortAddSubPrefix(const cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const int blockId = blockIdx.x;
+		const int threadId = threadIdx.x;
+		const int cellCount = info.m_bodyAabbCell.m_size - 1;
+		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+		
+		int* histogram = info.m_histogram.m_array;
+		
+		int sum = 0;
+		int start = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+		for (int i = 0; i < blocks; i++)
+		{
+			sum += histogram[start + threadId];
+			start += D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+		}
+		const int dstIndex = 2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+		histogram[dstIndex + threadId] = sum;
+	}
+}
+
+__global__ void cuCountingSortCaculatePrefixOffset(const cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const int blockId = blockIdx.x;
+		const int cellCount = info.m_bodyAabbCell.m_size - 1;
+		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+
+		const int threadId = threadIdx.x;
+		int* histogram = info.m_histogram.m_array;
+
+		int src = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+		int dst = blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + src;
+		int sum = histogram[2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + src + threadId];
+
+		for (int i = 0; i < blocks; i++)
+		{
+			histogram[dst + threadId] = sum;
+			sum += histogram[src + threadId];
+			dst += D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+			src += D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+		}
+	}
+}
+
+__global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info)
+{
+	__shared__  int cacheBuffer[D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2 + D_AABB_GRID_CELL_SORT_BLOCK_SIZE + 1];
+
 	if (info.m_frameIsValid)
 	{
 		const int threadId = threadIdx.x;
-		const int index = threadId + blockDim.x * blockIdx.x;
+
+		cacheBuffer[threadId] = 0;
+		cacheBuffer[D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2 + 1] = 0;
+
+		int* histogram = info.m_histogram.m_array;
 		const int cellCount = info.m_bodyAabbCell.m_size - 1;
-		const bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
-		if (test)
+		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+		const int histogramBase = 2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+
+		const int cacheStart = D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2;
+		cacheBuffer[cacheStart + threadId + 1] = histogram[histogramBase + threadId];
+		__syncthreads();
+		
+		for (int i = 1; i < D_AABB_GRID_CELL_SORT_BLOCK_SIZE; i = i << 1)
 		{
-			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-#if 0
-			__shared__  int cacheKey[D_THREADS_PER_BLOCK];
-			__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
-			__shared__  int cacheBufferAdress[D_THREADS_PER_BLOCK];
-			if (blockIdx.x < blocks)
-			{
-				int* histogram = info.m_histogram.m_array;
-				cuBodyAabbCell* dst = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
-				const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
-			
-				cacheKey[threadId] = 0;
-				cacheBufferCount[threadId] = histogram[index];
-				if (index < cellCount)
-				{
-					const cuBodyAabbCell entry = src[index];
-					cacheKey[threadId] = cuCountingSortEvaluateGridCellKey(entry, digit);
-					__syncthreads();
-			
-					if (threadId == 0)
-					{
-						for (int i = 0; i < D_THREADS_PER_BLOCK; i++)
-						{
-							const int key = cacheKey[i];
-							const int dstIndex = cacheBufferCount[key];
-							cacheBufferAdress[i] = dstIndex;
-							cacheBufferCount[key] = dstIndex + 1;
-						}
-					}
-					__syncthreads();
-					int dstIndex = cacheBufferAdress[threadId];
-					dst[dstIndex] = entry;
-				}
-			}
-
-#else
-			__shared__  int cacheSortedKey[D_THREADS_PER_BLOCK];
-			__shared__  int cacheBufferCount[D_THREADS_PER_BLOCK];
-			__shared__  int cacheBufferAdress[2 * D_THREADS_PER_BLOCK];
-			__shared__  int cacheKeyPrefix[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK + 1];
-
-			if (blockIdx.x < blocks)
-			{
-				int* histogram = info.m_histogram.m_array;
-				cuBodyAabbCell* dst = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
-				const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
-
-				cacheKeyPrefix[threadId] = 0;
-				cacheKeyPrefix[threadId + D_THREADS_PER_BLOCK/2 + 1] = 0;
-				cacheBufferCount[threadId] = histogram[index];
-				cacheSortedKey[threadId] = (D_THREADS_PER_BLOCK << D_THREADS_PER_BLOCK_BITS) | threadId;
-
-				cuBodyAabbCell entry;
-				if (index < cellCount)
-				{
-					entry = src[index];
-					const int key = cuCountingSortEvaluateGridCellKey(entry, digit);
-					atomicAdd(&cacheKeyPrefix[key + D_THREADS_PER_BLOCK/2 + 1], 1);
-					cacheSortedKey[threadId] = (key << D_THREADS_PER_BLOCK_BITS) | threadId;
-				}
-				__syncthreads();
-
-				for (int k = 2; k <= D_THREADS_PER_BLOCK; k *= 2)
-				{
-					for (int j = k / 2; j > 0; j /= 2)
-					{
-						const int threadId1 = threadId ^ j;
-						if (threadId1 > threadId)
-						{
-							const int a = cacheSortedKey[threadId];
-							const int b = cacheSortedKey[threadId1];
-							const int mask0 = (-(threadId & k)) >> 31;
-							const int mask1 = (-(a > b)) >> 31;
-							const int mask = mask0 ^ mask1;
-							cacheSortedKey[threadId] = b & mask | a & ~mask;
-							cacheSortedKey[threadId1] = a & mask | b & ~mask;
-						}
-						__syncthreads();
-					}
-				}
-
-				const int threadId1 = threadId + D_THREADS_PER_BLOCK/2;
-				for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-				{
-					int sum = cacheKeyPrefix[threadId1] + cacheKeyPrefix[threadId1 - i];
-					__syncthreads();
-					cacheKeyPrefix[threadId1] = sum;
-					__syncthreads();
-				}
-
-				const int itemCount = cuMin(int(cellCount - blockIdx.x * D_THREADS_PER_BLOCK), D_THREADS_PER_BLOCK);
-				for (int i = D_THREADS_PER_BLOCK/2; cacheKeyPrefix[i] < itemCount; i++)
-				{
-					const int start = cacheKeyPrefix[i];
-					const int count = cacheKeyPrefix[i + 1] - start;
-					if (threadId < count)
-					{
-						const int key = cacheSortedKey[start] >> D_THREADS_PER_BLOCK_BITS;
-						const int dstIndex = cacheSortedKey[start + threadId] & (D_THREADS_PER_BLOCK - 1);
-						const int base = cacheBufferCount[key];
-						cacheBufferAdress[dstIndex] = base + threadId;
-					}
-				}
-				__syncthreads();
-
-				if (index < cellCount)
-				{
-					int dstIndex = cacheBufferAdress[threadId];
-					dst[dstIndex] = entry;
-				}
-			}
-#endif
-		}
-		else
-		{
-			if (index < cellCount)
-			{
-				cuBodyAabbCell* dst = info.m_bodyAabbCell.m_array;
-				const cuBodyAabbCell* src = info.m_bodyAabbCellScrath.m_array;
-				dst[index] = src[index];
-			}
-		}
-	}
-}
-
-__global__ void cuCountingSortClearLastSuperBlock(const cuSceneInfo& info, int digit)
-{
-	if (info.m_frameIsValid)
-	{
-		bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
-		if (test)
-		{
-			const int cellCount = info.m_bodyAabbCell.m_size - 1;
-			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
-
-			const int offset = threadIdx.x + (superBlocks - 1) * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
-			int* histogram = info.m_histogram.m_array;
-			for (int i = 0; i < D_COUNT_SORT_SUPER_BLOCK; i++)
-			{
-				histogram[offset + i * D_THREADS_PER_BLOCK] = 0;
-			}
-		}
-	}
-}
-
-__global__ void cuCountingSortAddSuperBlock(const cuSceneInfo& info, int digit)
-{
-	if (info.m_frameIsValid)
-	{
-		bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
-		if (test)
-		{
-			const int cellCount = info.m_bodyAabbCell.m_size - 1;
-			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
-			if (blockIdx.x < superBlocks)
-			{
-				const int threadId = threadIdx.x;
-				const int superBlockSize = D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
-				const int offsetIn = threadId + blockIdx.x * superBlockSize;
-				int* histogram = info.m_histogram.m_array;
-
-				int sum = 0;
-				for (int i = 0; i < D_COUNT_SORT_SUPER_BLOCK; i++)
-				{
-					sum += histogram[offsetIn + i * D_THREADS_PER_BLOCK];
-				}
-				const int offset = threadId + superBlocks * superBlockSize + blockIdx.x * D_THREADS_PER_BLOCK;
-				histogram[offset] = sum;
-			}
-		}
-	}
-}
-
-__global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, int digit)
-{
-	__shared__  int cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK + 1];
-
-	if (info.m_frameIsValid)
-	{
-		bool test = cuCountingSortIsThisGridCellDigitValid(info, digit);
-		if (test)
-		{
-			const int threadId = threadIdx.x;
-			cacheBuffer[threadId] = 0;
-			cacheBuffer[threadId + D_THREADS_PER_BLOCK / 2 + 1] = 0;
-
-			int* histogram = info.m_histogram.m_array;
-			const int cellCount = info.m_bodyAabbCell.m_size - 1;
-			const int blocks = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-			const int superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
-			const int superBlockOffset = threadId + superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
-
-			int sum = 0;
-			const int threadId1 = threadId + D_THREADS_PER_BLOCK / 2;
-			for (int i = 0; i < superBlocks; i++)
-			{
-				sum += histogram[superBlockOffset + i * D_THREADS_PER_BLOCK];
-			}
-			cacheBuffer[threadId1 + 1] = sum;
+			const int sum = cacheBuffer[cacheStart + threadId] + cacheBuffer[cacheStart - i + threadId];
 			__syncthreads();
-
-			for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-			{
-				const int prefixSum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
-				__syncthreads();
-				cacheBuffer[threadId1] = prefixSum;
-				__syncthreads();
-			}
-
-			sum = cacheBuffer[threadId1];
-			for (int i = 0; i < blocks; i++)
-			{
-				int j = i * D_THREADS_PER_BLOCK + threadId;
-				int partialSum = histogram[j];
-				histogram[j] = sum;
-				sum += partialSum;
-			}
+			cacheBuffer[cacheStart + threadId] = sum;
+			__syncthreads();
 		}
+		histogram[histogramBase + threadId] = cacheBuffer[cacheStart + threadId];
+	}
+}
+
+void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context)
+{
+	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
+	cuBuffer<cuBodyAabbCell>& gpuBuffer = sceneInfo->m_bodyAabbCell;
+
+	ndInt32 cellCount = gpuBuffer.m_size;
+	ndInt32 blocksCount = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+
+	ndInt32 histogramSize = (2 * blocksCount + 1) * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+	if (histogramSize > context->m_histogram.GetCapacity())
+	{
+		context->m_histogram.SetCount(histogramSize);
+		sceneInfo->m_histogram = cuBuffer<int>(context->m_histogram);
+	}
+	
+	if (cellCount > context->m_bodyAabbCell.GetCapacity())
+	{
+		context->m_bodyAabbCell.SetCount(cellCount);
+		context->m_bodyAabbCellTmp.SetCount(cellCount);
+		sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCell);
+		sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCellTmp);
 	}
 }
 
@@ -372,10 +315,12 @@ static bool CountingSortBodyCellsSanityCheck(ndCudaContext* const context)
 		static ndArray<cuBodyAabbCell> data;
 		int size = info.m_bodyAabbCell.m_size - 1;
 		data.SetCount(size);
-		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-		//cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCellScrath.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCellScrath.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
 		dAssert(cudaStatus == cudaSuccess);
 
+		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+		dAssert(cudaStatus == cudaSuccess);
+	
 		for (int i = 1; i < size; i++)
 		{
 			cuBodyAabbCell key0(data[i - 1]);
@@ -398,45 +343,19 @@ static bool CountingSortBodyCellsSanityCheck(ndCudaContext* const context)
 static void CountingSortBodyCells(ndCudaContext* context, int digit)
 {
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
-	ndInt32 blocks = (sceneInfo->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	if (blocks)
-	{
-		cudaStream_t stream = context->m_solverComputeStream;
-		cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
-		ndInt32 superBlocks = (blocks + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
+	ndInt32 blocks = (sceneInfo->m_bodyAabbCell.m_capacity + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
+	dAssert(blocks > 0);
 
-		cuCountingSortClearLastSuperBlock << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-		cuCountingSortCountGridCells << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-		cuCountingSortAddSuperBlock << <superBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-		cuCountingSortBodyCellsPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-		cuCountingSortShuffleGridCells << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, digit);
-	}
-}
+	cudaStream_t stream = context->m_solverComputeStream;
+	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
 
-void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context)
-{
-	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
-	cuBuffer<cuBodyAabbCell>& gpuBuffer = sceneInfo->m_bodyAabbCell;
+	ndInt32 radixBlock = D_AABB_GRID_CELL_SORT_BLOCK_SIZE / D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
 
-	ndInt32 cellCount = gpuBuffer.m_size;
-	ndInt32 blocksCount = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	ndInt32 superBlocks = (blocksCount + D_COUNT_SORT_SUPER_BLOCK - 1) / D_COUNT_SORT_SUPER_BLOCK;
-	ndInt32 histogramSize = superBlocks * D_COUNT_SORT_SUPER_BLOCK * D_THREADS_PER_BLOCK;
-	histogramSize += superBlocks * D_THREADS_PER_BLOCK;
-
-	if (histogramSize > context->m_histogram.GetCapacity())
-	{
-		context->m_histogram.SetCount(histogramSize);
-		sceneInfo->m_histogram = cuBuffer<int>(context->m_histogram);
-	}
-
-	if (cellCount > context->m_bodyAabbCell.GetCapacity())
-	{
-		context->m_bodyAabbCell.SetCount(cellCount);
-		context->m_bodyAabbCellTmp.SetCount(cellCount);
-		sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCell);
-		sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCellTmp);
-	}
+	cuCountingSortCountGridCells << <blocks, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu, digit);
+	cuCountingSortAddSubPrefix << <radixBlock, D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
+	cuCountingSortBodyCellsPrefixScan << <1, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
+	cuCountingSortCaculatePrefixOffset << <radixBlock, D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
+	cuCountingSortShuffleGridCells << <blocks, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu, digit);
 }
 
 void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
@@ -445,12 +364,10 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 
 	dAssert(context->m_bodyAabbCell.GetCount() <= context->m_histogram.GetCount());
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellTmp.GetCount());
-
-	for (int i = 0; i < 3; i++)
-	{
-		CountingSortBodyCells(context, i * 4 + 0);
-		CountingSortBodyCells(context, i * 4 + 1);
-	}
+	
+	CountingSortBodyCells(context, 0);
+	CountingSortBodyCells(context, 1);
+	CountingSortBodyCells(context, 2);
 
 	dAssert(CountingSortBodyCellsSanityCheck(context));
 }

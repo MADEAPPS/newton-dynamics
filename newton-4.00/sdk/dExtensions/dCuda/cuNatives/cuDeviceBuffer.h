@@ -132,11 +132,12 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	{
 		T* newArray;
 		newSize = dMax(newSize, D_GRANULARITY);
-		cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
+		const ndInt32 itemSizeInBytes = sizeof(T);
+		cudaStatus = cudaMalloc((void**)&newArray, newSize * itemSizeInBytes);
 		dAssert(cudaStatus == cudaSuccess);
 		if (m_array)
 		{
-			cudaStatus = cudaMemcpy(newArray, m_array, m_size * sizeof(T), cudaMemcpyDeviceToDevice);
+			cudaStatus = cudaMemcpy(newArray, m_array, m_size * itemSizeInBytes, cudaMemcpyDeviceToDevice);
 			dAssert(cudaStatus == cudaSuccess);
 			cudaStatus = cudaFree(m_array);
 			dAssert(cudaStatus == cudaSuccess);
@@ -147,11 +148,12 @@ void cuDeviceBuffer<T>::Resize(ndInt32 newSize)
 	else if (newSize < m_capacity)
 	{
 		T* newArray;
+		const ndInt32 itemSizeInBytes = sizeof(T);
 		newSize = dMax(newSize, D_GRANULARITY);
-		cudaStatus = cudaMalloc((void**)&newArray, newSize * sizeof(T));
+		cudaStatus = cudaMalloc((void**)&newArray, newSize * itemSizeInBytes);
 		if (m_array)
 		{
-			cudaStatus = cudaMemcpy(newArray, m_array, newSize * sizeof(T), cudaMemcpyDeviceToDevice);
+			cudaStatus = cudaMemcpy(newArray, m_array, newSize * itemSizeInBytes, cudaMemcpyDeviceToDevice);
 			cudaStatus = cudaFree(m_array);
 			dAssert(cudaStatus == cudaSuccess);
 		}

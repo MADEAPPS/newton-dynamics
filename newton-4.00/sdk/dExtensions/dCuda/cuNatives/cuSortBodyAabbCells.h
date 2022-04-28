@@ -29,20 +29,29 @@
 
 class ndCudaContext;
 
+// do not change this
+#define D_AABB_GRID_CELL_BITS			10
+
 class cuBodyAabbCell
 {
 	public:
 	union
 	{
-		int4 m_key;
-		char m_bytes[4 * 3];
 		struct
 		{
-			int m_x;
-			int m_y;
-			int m_z;
-			int m_id;
+			union
+			{
+				struct
+				{
+					unsigned m_x : D_AABB_GRID_CELL_BITS;
+					unsigned m_y : D_AABB_GRID_CELL_BITS;
+					unsigned m_z : D_AABB_GRID_CELL_BITS;
+				};
+				unsigned m_key;
+			};
+			unsigned m_id;
 		};
+		long long m_cpyValue;
 	};
 };
 

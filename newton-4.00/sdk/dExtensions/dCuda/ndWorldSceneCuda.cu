@@ -160,7 +160,8 @@ void ndWorldSceneCuda::End()
 	ndWorldScene::End();
 }
 
-void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
+//void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
+void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const)
 {
 	dAssert(0);
 }
@@ -170,7 +171,8 @@ void ndWorldSceneCuda::FindCollidingPairs()
 	//ndWorldScene::FindCollidingPairs();
 }
 
-void ndWorldSceneCuda::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
+//void ndWorldSceneCuda::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
+void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 {
 	dAssert(0);
 }
@@ -690,10 +692,6 @@ void ndWorldSceneCuda::InitBodyArray()
 			info.m_histogram.m_size = newSize;
 			info.m_bodyAabbCell.m_size = newSize;
 			info.m_bodyAabbCellScrath.m_size = newSize;
-			if (newSize >= info.m_bodyAabbCell.m_capacity)
-			{
-				info.m_frameIsValid = 0;
-			}
 		}
 	};
 
@@ -706,7 +704,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		{
 			int* scan = info.m_scan.m_array;
 			cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
-			cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
+			cuBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
 
 			const cuVector minBox(info.m_worldBox.m_min);
 			const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
@@ -721,6 +719,7 @@ void ndWorldSceneCuda::InitBodyArray()
 
 			cuBodyAabbCell hash;
 			hash.m_id = index;
+			hash.m_key = 0;
 			int start = scan[index];
 			
 			for (int z = z0; z < z1; z++)
@@ -742,12 +741,12 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto EndGridHash = [] __device__(cuSceneInfo& info)
 	{
-		cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
-		int index = info.m_bodyAabbCell.m_size;
+		cuBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
+		int index = info.m_bodyAabbCellScrath.m_size;
 
 		cuBodyAabbCell hash;
 		hash = hashArray[index - 1];
-		hash.m_id = -1;
+		hash.m_id = unsigned (-1);
 		hash.m_z = hash.m_z + 1;
 
 		hashArray[index] = hash;
@@ -755,6 +754,10 @@ void ndWorldSceneCuda::InitBodyArray()
 		info.m_bodyAabbCell.m_size = index + 1;
 		info.m_bodyAabbCellScrath.m_size = index + 1;
 		if ((index + 1) >= info.m_bodyAabbCell.m_capacity)
+		{
+			info.m_frameIsValid = 0;
+		}
+		if ((2 * index + 2048) >= info.m_histogram.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}
