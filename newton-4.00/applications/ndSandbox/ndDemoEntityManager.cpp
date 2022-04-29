@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
-//#define DEFAULT_SCENE	3		// basic compound shapes
+#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
@@ -47,7 +47,7 @@
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
-#define DEFAULT_SCENE	11		// basic joints
+//#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic rag doll
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
@@ -332,6 +332,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//ImGui::StyleColorsDark();
 	ImGui::StyleColorsLight();
 	//ImGui::StyleColorsClassic();
+	ImGuiStyle* const style = &ImGui::GetStyle();
+	style->Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.5f);
 
 	// Setup Platform/Renderer back ends
 	ImGui_ImplGlfw_InitForOpenGL(m_mainFrame, true);
@@ -1719,7 +1721,7 @@ void ndDemoEntityManager::Run()
 		BeginFrame();
 		RenderStats();
 
-		TestImGui();
+		//TestImGui();
 
 		// Rendering
 		ImGui::Render();

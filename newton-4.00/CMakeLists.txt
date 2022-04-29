@@ -165,11 +165,5 @@ if(NEWTON_BUILD_PROFILER)
 endif()
 
 add_subdirectory(sdk)
+add_subdirectory(thirdParty)
 add_subdirectory(applications)
-
-if (NEWTON_BUILD_SANDBOX_DEMOS)
-	add_subdirectory(thirdParty)
-endif()
-
-
-

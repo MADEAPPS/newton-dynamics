@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-#add_subdirectory(tinyxml)
+add_subdirectory(hacd/src/VHACD_Lib)
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	if (MSVC OR MINGW)
@@ -21,7 +21,6 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
 	#add_subdirectory(openAL)
 	add_subdirectory(glatter)
 	add_subdirectory(openFBX/src)
-	add_subdirectory(hacd/src/VHACD_Lib)
 endif()
 
 

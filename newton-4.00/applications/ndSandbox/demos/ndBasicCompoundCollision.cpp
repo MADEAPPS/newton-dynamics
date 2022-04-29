@@ -116,13 +116,13 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	compGeometry->Release();
 }
 
-static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName)
+static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
 {
 	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh(meshName);
 	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
 
 	ndMatrix mOrigMatrix = matrix;
-	for (ndInt32 i = 0; i < 4; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
 		mOrigMatrix.m_posit.m_z += 2.0f;
@@ -150,17 +150,17 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	ndMatrix location(dGetIdentityMatrix());
 
-	AddSphere(scene);
-	AddEmptyBox(scene);
+	//AddSphere(scene);
+	//AddEmptyBox(scene);
 	
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
-	AddSimpleConcaveMesh(scene, location, "bowl.fbx");
+	//AddSimpleConcaveMesh(scene, location, "bowl.fbx");
 	
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;
-	AddSimpleConcaveMesh(scene, location, "camel.fbx");
+	//AddSimpleConcaveMesh(scene, location, "camel.fbx");
 	
 	location.m_posit.m_x = 10.0f;
 	location.m_posit.m_z = 5.0f;
