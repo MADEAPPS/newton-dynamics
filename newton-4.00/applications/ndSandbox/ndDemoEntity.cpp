@@ -11,6 +11,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "VHACD.h"
+#include "ndHacd.h"
+#include "include/VHACD.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"
@@ -406,12 +408,21 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 		p.m_z = points[i].m_z;
 		meshPoints.PushBack(p);
 	}
-	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
 
+#define USE_OLD_HACD
+#ifdef USE_OLD_HACD
+	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
 	nd::VHACD::IVHACD::Parameters paramsVHACD;
 	paramsVHACD.m_resolution = 400000;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+#else
+	ndNew::VHACD::IVHACD* const interfaceVHACD = ndCreateVHACD();
+	ndNew::VHACD::IVHACD::Parameters paramsVHACD;
+	paramsVHACD.m_resolution = 400000;
+	//paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
+	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+#endif
 
 	ndShapeInstance* const compoundShapeInstance = new ndShapeInstance(new ndShapeCompound());
 
@@ -421,7 +432,11 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 	ndArray<ndVector> convexMeshPoints;
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
+#ifdef USE_OLD_HACD
 		nd::VHACD::IVHACD::ConvexHull ch;
+#else
+		ndNew::VHACD::IVHACD::ConvexHull ch;
+#endif
 		interfaceVHACD->GetConvexHull(i, ch);
 		convexMeshPoints.SetCount(ch.m_nPoints);
 		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
@@ -546,6 +561,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 
 			nd::VHACD::IVHACD::Parameters paramsVHACD;
 			//paramsVHACD.m_concavityToVolumeWeigh = 1.0;
+			paramsVHACD.m_concavityToVolumeWeigh = 0.5f;
 			interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
 				(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 

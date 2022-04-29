@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "vhacd")
+set (projectName "vhacdNew")
 message (${projectName})
 
 if (MSVC)
@@ -20,10 +20,10 @@ if (MSVC)
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi /GS- /W4 /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
 endif()
 
-include_directories(inc/)
-include_directories(public/)
+#include_directories(inc/)
+#include_directories(public/)
 
-file(GLOB CPP_SOURCE src/*.cpp public/*.h inc/*.h)
+file(GLOB CPP_SOURCE *.cpp *.h include/*.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})

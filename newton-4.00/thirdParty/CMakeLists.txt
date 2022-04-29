@@ -10,7 +10,8 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-add_subdirectory(hacd/src/VHACD_Lib)
+add_subdirectory(hacdNew)
+add_subdirectory(hacdOld/src/VHACD_Lib)
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	if (MSVC OR MINGW)
