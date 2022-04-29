@@ -403,7 +403,8 @@ class ndActiveRagdollModel : public ndCharacter
 		}
 	}
 
-	void Update(ndWorld* const world, ndFloat32 timestep) 
+	//void Update(ndWorld* const world, ndFloat32 timestep) 
+	void Update(ndWorld* const, ndFloat32)
 	{
 		dAssert(0);
 		////m_animBlendTree->Evaluate(m_output, timestep);

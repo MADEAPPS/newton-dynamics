@@ -220,6 +220,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void LoadDemo(ndInt32 menu);
 
 	void DrawDebugShapes();
+
+	void TestImGui();
 	
 	GLFWwindow* m_mainFrame;
 	ndInt32	m_defaultFont;
