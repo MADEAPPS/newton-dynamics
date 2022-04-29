@@ -202,8 +202,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	
 	void ShowMainMenuBar();
 	void ToggleProfiler();
-
-	static void RenderDrawListsCallback(ImDrawData* const draw_data);
+	void RenderScene(ImDrawData* const draw_data);
 
 	static void CharCallback(GLFWwindow* window, ndUnsigned32 ch);
 	static void KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods);

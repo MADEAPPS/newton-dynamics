@@ -1333,10 +1333,7 @@ ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 }
 
 
-// This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
-// If text or lines are blurry when integrating ImGui in your engine:
-// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
-void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
+void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
 {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	ImGuiIO& io = ImGui::GetIO();
@@ -1726,7 +1723,7 @@ void ndDemoEntityManager::Run()
 
 		// Rendering
 		ImGui::Render();
-		RenderDrawListsCallback(ImGui::GetDrawData());
+		RenderScene(ImGui::GetDrawData());
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(m_mainFrame);
