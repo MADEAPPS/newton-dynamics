@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "vhacdOld")
+set (projectName "vhacd")
 message (${projectName})
 
 if (MSVC)

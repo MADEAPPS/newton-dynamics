@@ -11,8 +11,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "VHACD.h"
-#include "ndHacd.h"
-#include "include/VHACD.h"
+//#include "ndHacd.h"
+//#include "include/VHACD.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"
@@ -413,7 +413,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 #ifdef USE_OLD_HACD
 	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
 	nd::VHACD::IVHACD::Parameters paramsVHACD;
-	paramsVHACD.m_resolution = 400000;
+	//paramsVHACD.m_resolution = 400000;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 #else
