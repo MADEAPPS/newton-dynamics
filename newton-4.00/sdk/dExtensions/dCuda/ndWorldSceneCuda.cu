@@ -672,13 +672,13 @@ void ndWorldSceneCuda::InitBodyArray()
 			const int blocks = (bodyCount - 1) / D_THREADS_PER_BLOCK;
 			for (int i = 1; i < blocks; i++)
 			{
-				int sum = scan[i * D_THREADS_PER_BLOCK - 1];
+				const int sum = scan[i * D_THREADS_PER_BLOCK - 1];
 				__syncthreads();
 				scan[i * D_THREADS_PER_BLOCK + threadId] += sum;
 				__syncthreads();
 			}
-			int val = scan[blocks * D_THREADS_PER_BLOCK - 1];
-			int j = blocks * D_THREADS_PER_BLOCK + threadId;
+			const int val = scan[blocks * D_THREADS_PER_BLOCK - 1];
+			const int j = blocks * D_THREADS_PER_BLOCK + threadId;
 			if (j < bodyCount)
 			{
 				scan[j] = scan[j] + val;
@@ -777,4 +777,6 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
 	CudaBodyAabbCellSortBuffer(m_context);
+
+	CudaBodyCalculatePairsCount(m_context);
 }

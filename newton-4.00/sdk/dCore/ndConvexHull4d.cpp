@@ -774,13 +774,16 @@ void ndConvexHull4d::DeleteFace (ndNode* const node)
 
 bool ndConvexHull4d::Sanity() const
 {
-	for (ndNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (ndNode* node = GetFirst(); node; node = node->GetNext()) 
+	{
 		ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
 
-		for (ndInt32 i = 0; i < 4; i ++) {
+		for (ndInt32 i = 0; i < 4; i ++) 
+		{
 			ndConvexHull4dTetraherum::ndTetrahedrumFace* const face = &tetra->m_faces[i];
 			ndNode* const twinNode = face->m_twin;
-			if (!twinNode) {
+			if (!twinNode) 
+			{
 				return false;
 			}
 		}
@@ -854,20 +857,25 @@ void ndConvexHull4d::LinkSibling (ndNode* node0, ndNode* node1)	const
 {
 	ndConvexHull4dTetraherum* const tetra0 = &node0->GetInfo();
 	ndConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
-	for (ndInt32 i = 0; i < 4; i ++) {
+	for (ndInt32 i = 0; i < 4; i ++) 
+	{
 		ndConvexHull4dTetraherum::ndTetrahedrumFace* const face0 = &tetra0->m_faces[i];
-		if (!face0->m_twin) {
+		if (!face0->m_twin) 
+		{
 			ndInt32 i0 = face0->m_index[0];
 			ndInt32 i1 = face0->m_index[1];
 			ndInt32 i2 = face0->m_index[2];
-			for (ndInt32 j = 0; j < 4; j ++) {
+			for (ndInt32 j = 0; j < 4; j ++) 
+			{
 				ndConvexHull4dTetraherum::ndTetrahedrumFace* const face1 = &tetra1->m_faces[j];
-				if (!face1->m_twin) {
+				if (!face1->m_twin) 
+				{
 					ndInt32 j2 = face1->m_index[0];
 					ndInt32 j1 = face1->m_index[1];
 					ndInt32 j0 = face1->m_index[2];
 
-					if (((i0 == j0) && (i1 == j1) && (i2 == j2)) || ((i1 == j0) && (i2 == j1) && (i0 == j2)) || ((i2 == j0) && (i0 == j1) && (i1 == j2))) {
+					if (((i0 == j0) && (i1 == j1) && (i2 == j2)) || ((i1 == j0) && (i2 == j1) && (i0 == j2)) || ((i2 == j0) && (i0 == j1) && (i1 == j2))) 
+					{
 						face0->m_twin = node1;
 						face1->m_twin = node0;
 						return;
@@ -992,21 +1000,27 @@ ndConvexHull4d::ndNode* ndConvexHull4d::FindFacingNode(const ndBigVector& vertex
 	heap.Push(bestNode, dist);
 	ndInt32 maxCount = heap.GetMaxCount() - 1;
 	ndInt32 releafCount = maxCount >> 3;
-	while (heap.GetCount()) {
+	while (heap.GetCount()) 
+	{
 		ndNode* const node1 = heap[0];
-		ndFloat64 dist1 = heap.Value();
-		if (dist1 > ndFloat64 (1.0e-5f)) {
+		ndFloat64 dist1 = heap.Value().m_key;
+		if (dist1 > ndFloat64 (1.0e-5f)) 
+		{
 			return node1;
 		}
 		heap.Pop();
 		ndConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
-		for (ndInt32 i = 0; i < 4; i ++) {
+		for (ndInt32 i = 0; i < 4; i ++) 
+		{
 			ndNode* neigborghNode = tetra1->m_faces[i].m_twin;
 			ndConvexHull4dTetraherum* const neighborgh = &neigborghNode->GetInfo();
-			if (neighborgh->GetMark() != mark) {
+			if (neighborgh->GetMark() != mark) 
+			{
 				neighborgh->SetMark(mark);
-				if (heap.GetCount() >= maxCount) {
-					for (ndInt32 j = 0; j < releafCount; j ++) {
+				if (heap.GetCount() >= maxCount) 
+				{
+					for (ndInt32 j = 0; j < releafCount; j ++) 
+					{
 						heap.Remove(heap.GetCount() - 1);
 					}
 				}
@@ -1016,10 +1030,12 @@ ndConvexHull4d::ndNode* ndConvexHull4d::FindFacingNode(const ndBigVector& vertex
 		}
 	}
 
-	for (ndNode* node1 = GetFirst(); node1; node1 = node1->GetNext()) {
+	for (ndNode* node1 = GetFirst(); node1; node1 = node1->GetNext()) 
+	{
 		ndConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
 		ndFloat64 dist1 = tetra1->Evalue(hullVertexArray, vertex);
-		if (dist1 > ndFloat64(0.0f)) {
+		if (dist1 > ndFloat64(0.0f)) 
+		{
 			return node1;
 		}
 	}
@@ -1032,7 +1048,8 @@ ndInt32 ndConvexHull4d::AddVertex (const ndBigVector& vertex)
 	ndSetPrecisionDouble precision;
 	ndInt32 index = -1;
 	ndNode* const faceNode = FindFacingNode(vertex);
-	if (faceNode) {
+	if (faceNode) 
+	{
 		index = m_count;
 		m_points[index] = vertex;
 		m_points[index].m_index = index;

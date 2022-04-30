@@ -320,7 +320,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		D_TRACKTIME();
 		ndInt32* const hist = &histogram[threadIndex][0];
 		//ndScene* const scene = m_world->GetScene();
-		dAssert(scene->GetScratchBuffer().GetCount() >= jointArray.GetCount() * sizeof(ndConstraint*));
+		dAssert(scene->GetScratchBuffer().GetCount() >= ndInt32 (jointArray.GetCount() * sizeof(ndConstraint*)));
 		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
 		hist[0] = 0;
@@ -342,7 +342,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	{
 		D_TRACKTIME();
 		ndInt32* const hist = &histogram[threadIndex][0];
-		dAssert(scene->GetScratchBuffer().GetCount() >= jointArray.GetCount() * sizeof (ndConstraint*));
+		dAssert(scene->GetScratchBuffer().GetCount() >= ndInt32 (jointArray.GetCount() * sizeof (ndConstraint*)));
 		ndConstraint** const dstBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
 		const ndStartEnd startEnd(jointArray.GetCount(), threadIndex, threadCount);

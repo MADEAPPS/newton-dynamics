@@ -369,5 +369,5 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	CountingSortBodyCells(context, 1);
 	CountingSortBodyCells(context, 2);
 
-	dAssert(CountingSortBodyCellsSanityCheck(context));
+	//dAssert(CountingSortBodyCellsSanityCheck(context));
 }
