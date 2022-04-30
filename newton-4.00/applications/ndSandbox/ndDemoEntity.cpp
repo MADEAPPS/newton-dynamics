@@ -10,9 +10,6 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "VHACD.h"
-//#include "ndHacd.h"
-//#include "include/VHACD.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"

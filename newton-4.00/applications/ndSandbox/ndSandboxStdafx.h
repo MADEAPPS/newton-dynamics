@@ -47,9 +47,6 @@
 	#include <glatter.h>
 	#include <GL/glu.h>
 	#include <GL/gl.h>
-	#include <imgui.h>
-	#include <imgui_impl_glfw.h>
-	#include <imgui_impl_opengl3.h>
 	#include <GLFW/glfw3.h>
 	#include <GLFW/glfw3native.h>
 
@@ -67,7 +64,6 @@
 	#include <glatter.h>
 	#include <GL/glu.h>
 	#include <GL/gl.h>
-	#include <imgui.h>
 	#include <GLFW/glfw3.h>
 
 	// audio library support
@@ -89,6 +85,14 @@
 
 // some third party libraries includes here
 #include <ofbx.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
+#include "VHACD.h"
+//#include "ndHacd.h"
+//#include "include/VHACD.h"
+
 
 // SDK includes
 #include <ndNewton.h>
