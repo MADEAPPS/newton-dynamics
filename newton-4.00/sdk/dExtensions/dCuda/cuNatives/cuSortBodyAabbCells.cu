@@ -32,9 +32,8 @@
 #define D_AABB_GRID_CELL_SORT_BLOCK_SIZE	(1<<D_AABB_GRID_CELL_BITS)
 
 
-//__global__ void cuTest0(const cuSceneInfo& info, int digit)
+//static __global__ void cuTest0(const cuSceneInfo& info, int digit)
 //{
-//
 //}
 //
 //__global__ void cuTest1(const cuSceneInfo& info, int digit, cudaStream_t stream)

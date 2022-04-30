@@ -449,7 +449,7 @@ ndInt32 ndShapeConvex::RectifyConvexSlice(ndInt32 count, const ndVector& normal,
 			ptr = ptr->m_next;
 		} while (ptr != hullPoint);
 
-		while (sortHeap.GetCount() && (sortHeap.Value().m_key * ndFloat32(32.0f) < totalArea)) 
+		while (sortHeap.GetCount() && (sortHeap.Value() * ndFloat32(32.0f) < totalArea)) 
 		{
 			ndConvexFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask) 

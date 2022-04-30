@@ -778,5 +778,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
 	CudaBodyAabbCellSortBuffer(m_context);
 
-	CudaBodyCalculatePairsCount(m_context);
+	//CudaBodyCalculatePairsCount(m_context);
 }

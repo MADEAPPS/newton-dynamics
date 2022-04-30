@@ -34,6 +34,448 @@
 
 //#define ND_HEAP_DEBUG_CHECK
 
+#if 0
+template <class dItem, class dKey>
+class ndHeap : public ndClassAlloc
+{
+protected:
+	struct RECORD
+	{
+		dKey m_key;
+		dItem m_obj;
+
+		RECORD(dKey key, const dItem& obj)
+			:m_key(key), m_obj(obj)
+		{
+		}
+	};
+
+	ndHeap(ndInt32 maxElements);
+	ndHeap(const void* const buffer, ndInt32 sizeInBytes);
+	~ndHeap();
+
+public:
+	void Flush();
+	dKey MaxValue() const;
+	dKey Value(ndInt32 i = 0) const;
+	ndInt32 GetCount() const;
+	ndInt32 GetMaxCount() const;
+	const dItem& operator[] (ndInt32 i) const;
+	ndInt32 Find(dItem& obj);
+	ndInt32 Find(dKey key);
+
+	RECORD* m_pool;
+	ndInt32 m_curCount;
+	ndInt32 m_maxCount;
+	bool m_bufferIsOwnned;
+};
+
+
+template <class dItem, class dKey>
+class ndDownHeap : public ndHeap<dItem, dKey>
+{
+public:
+	ndDownHeap(ndInt32 maxElements);
+	ndDownHeap(const void* const buffer, ndInt32 sizeInBytes);
+
+	void Pop();
+	void Push(dItem& obj, dKey key);
+	void Sort();
+	void Remove(ndInt32 Index);
+	bool SanityCheck();
+};
+
+template <class dItem, class dKey>
+class ndUpHeap : public ndHeap<dItem, dKey>
+{
+public:
+	ndUpHeap(ndInt32 maxElements);
+	ndUpHeap(const void* const buffer, ndInt32 sizeInBytes);
+
+	void Pop();
+	void Push(dItem& obj, dKey key);
+	void Sort();
+	void Remove(ndInt32 Index);
+	bool SanityCheck();
+};
+
+template <class dItem, class dKey>
+ndHeap<dItem, dKey>::ndHeap(ndInt32 maxElements)
+	:ndClassAlloc()
+	, m_pool((RECORD*)ndMemory::Malloc(maxElements * sizeof(RECORD)))
+	, m_curCount(0)
+	, m_maxCount(maxElements)
+	, m_bufferIsOwnned(true)
+{
+	Flush();
+}
+
+template <class dItem, class dKey>
+ndHeap<dItem, dKey>::ndHeap(const void* const buffer, ndInt32 sizeInBytes)
+	:ndClassAlloc()
+	, m_pool((RECORD*)buffer)
+	, m_curCount(0)
+	, m_maxCount(ndInt32(sizeInBytes / sizeof(RECORD)))
+	, m_bufferIsOwnned(false)
+{
+	Flush();
+}
+
+template <class dItem, class dKey>
+ndHeap<dItem, dKey>::~ndHeap()
+{
+	if (m_bufferIsOwnned)
+	{
+		ndMemory::Free(m_pool);
+	}
+}
+
+template <class dItem, class dKey>
+dKey ndHeap<dItem, dKey>::Value(ndInt32 i) const
+{
+	return m_pool[i].m_key;
+}
+
+template <class dItem, class dKey>
+ndInt32 ndHeap<dItem, dKey>::GetCount() const
+{
+	return m_curCount;
+}
+
+template <class dItem, class dKey>
+void ndHeap<dItem, dKey>::Flush()
+{
+	m_curCount = 0;
+
+#ifdef _DEBUG
+	//	ndHeap<dItem,dKey>::m_pool[ndHeap<dItem,dKey>::m_curCount].m_key = dKey (0);
+#endif
+}
+
+template <class dItem, class dKey>
+dKey ndHeap<dItem, dKey>::MaxValue() const
+{
+	return m_pool[0].m_key;
+}
+
+template <class dItem, class dKey>
+ndInt32 ndHeap<dItem, dKey>::GetMaxCount() const
+{
+	return m_maxCount;
+}
+
+template <class dItem, class dKey>
+ndInt32 ndHeap<dItem, dKey>::Find(dItem& obj)
+{
+	// For now let perform a linear search
+	// this is efficient if the size of the heap is small
+	// ex: m_curCount < 32
+	// this will be change to a binary search in the heap should the 
+	// the size of the heap get larger than 32
+	//	dAssert (m_curCount <= 32);
+	for (ndInt32 i = 0; i < m_curCount; i++)
+	{
+		if (m_pool[i].obj == obj)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+template <class dItem, class dKey>
+ndInt32 ndHeap<dItem, dKey>::Find(dKey key)
+{
+	// ex: m_curCount < 32
+	// this will be change to a binary search in the heap shoud the 
+	// the size of the heap get larger than 32
+	dAssert(m_curCount <= 32);
+	for (ndInt32 i = 0; i < m_curCount; i++)
+	{
+		if (m_pool[i].m_key == key)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+template <class dItem, class dKey>
+const dItem& ndHeap<dItem, dKey>::operator[] (ndInt32 i) const
+{
+	dAssert(i <= m_curCount);
+	return m_pool[i].m_obj;
+}
+
+// **************************************************************************
+//
+// down Heap
+//
+// **************************************************************************
+template <class dItem, class dKey>
+ndDownHeap<dItem, dKey>::ndDownHeap(ndInt32 maxElements)
+	:ndHeap<dItem, dKey>(maxElements)
+{
+}
+
+template <class dItem, class dKey>
+ndDownHeap<dItem, dKey>::ndDownHeap(const void* const buffer, ndInt32 sizeInBytes)
+	: ndHeap<dItem, dKey>(buffer, sizeInBytes)
+{
+}
+
+template <class dItem, class dKey>
+void ndDownHeap<dItem, dKey>::Push(dItem& obj, dKey key)
+{
+	ndHeap<dItem, dKey>::m_curCount++;
+
+	ndInt32 i = ndHeap<dItem, dKey>::m_curCount;
+	for (ndInt32 j = 0; i; i = j)
+	{
+		j = i >> 1;
+		if (!j || (ndHeap<dItem, dKey>::m_pool[j - 1].m_key > key))
+		{
+			break;
+		}
+		ndHeap<dItem, dKey>::m_pool[i - 1] = ndHeap<dItem, dKey>::m_pool[j - 1];
+	}
+	dAssert(i);
+	ndHeap<dItem, dKey>::m_pool[i - 1].m_key = key;
+	ndHeap<dItem, dKey>::m_pool[i - 1].m_obj = obj;
+
+	dAssert(SanityCheck());
+}
+
+template <class dItem, class dKey>
+void ndDownHeap<dItem, dKey>::Pop()
+{
+	//ndDownHeap<dItem, dKey>::Remove(0);
+	Remove(0);
+}
+
+template <class dItem, class dKey>
+void ndDownHeap<dItem, dKey>::Remove(ndInt32 index)
+{
+	ndHeap<dItem, dKey>::m_curCount--;
+	ndHeap<dItem, dKey>::m_pool[index] = ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount];
+	while (index && ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1].m_key < ndHeap<dItem, dKey>::m_pool[index].m_key)
+	{
+		dSwap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
+		index = (index - 1) >> 1;
+	}
+
+	while ((2 * index + 1) < ndHeap<dItem, dKey>::m_curCount)
+	{
+		ndInt32 i0 = 2 * index + 1;
+		ndInt32 i1 = 2 * index + 2;
+		if (i1 < ndHeap<dItem, dKey>::m_curCount)
+		{
+			i0 = (ndHeap<dItem, dKey>::m_pool[i0].m_key > ndHeap<dItem, dKey>::m_pool[i1].m_key) ? i0 : i1;
+			if (ndHeap<dItem, dKey>::m_pool[i0].m_key <= ndHeap<dItem, dKey>::m_pool[index].m_key)
+			{
+				break;
+			}
+			dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+			index = i0;
+		}
+		else
+		{
+			if (ndHeap<dItem, dKey>::m_pool[i0].m_key > ndHeap<dItem, dKey>::m_pool[index].m_key)
+			{
+				dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+			}
+			index = i0;
+		}
+	}
+	dAssert(SanityCheck());
+}
+
+template <class dItem, class dKey>
+void ndDownHeap<dItem, dKey>::Sort()
+{
+	ndInt32 count = ndHeap<dItem, dKey>::m_curCount;
+	for (ndInt32 i = 1; i < count; i++)
+	{
+		dKey key(ndHeap<dItem, dKey>::m_pool[0].m_key);
+		dItem obj(ndHeap<dItem, dKey>::m_pool[0].m_obj);
+
+		Pop();
+
+		ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount].m_key = key;
+		ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount].m_obj = obj;
+	}
+
+	ndHeap<dItem, dKey>::m_curCount = count;
+	for (ndInt32 i = 0; i < count / 2; i++)
+	{
+		dKey key(ndHeap<dItem, dKey>::m_pool[i].m_key);
+		dItem obj(ndHeap<dItem, dKey>::m_pool[i].m_obj);
+
+		ndHeap<dItem, dKey>::m_pool[i].m_key = ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key;
+		ndHeap<dItem, dKey>::m_pool[i].m_obj = ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj;
+
+		ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key = key;
+		ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj = obj;
+	}
+	dAssert(SanityCheck());
+}
+
+template <class dItem, class dKey>
+bool ndDownHeap<dItem, dKey>::SanityCheck()
+{
+#ifdef ND_HEAP_DEBUG_CHECK
+	for (ndInt32 i = 0; i < m_curCount; i++)
+	{
+		ndInt32 i1 = 2 * i + 1;
+		ndInt32 i2 = 2 * i + 2;
+		if ((i1 < m_curCount) && (ndHeap<dItem, dKey>::m_pool[i].m_key < ndHeap<dItem, dKey>::m_pool[i1].m_key))
+		{
+			return false;
+		}
+		if ((i2 < m_curCount) && (ndHeap<dItem, dKey>::m_pool[i].m_key < ndHeap<dItem, dKey>::m_pool[i2].m_key))
+		{
+			return false;
+		}
+	}
+#endif
+	return true;
+}
+
+// **************************************************************************
+//
+// down Heap
+//
+// **************************************************************************
+template <class dItem, class dKey>
+ndUpHeap<dItem, dKey>::ndUpHeap(ndInt32 maxElements)
+//	:ndHeapBase<dItem, dKey> (maxElements, allocator)
+	:ndHeap<dItem, dKey>(maxElements)
+{
+}
+
+template <class dItem, class dKey>
+ndUpHeap<dItem, dKey>::ndUpHeap(const void* const buffer, ndInt32 sizeInBytes)
+	: ndHeap<dItem, dKey>(buffer, sizeInBytes)
+{
+}
+
+template <class dItem, class dKey>
+bool ndUpHeap<dItem, dKey>::SanityCheck()
+{
+#ifdef ND_HEAP_DEBUG_CHECK
+	for (ndInt32 i = 0; i < m_curCount; i++)
+	{
+		ndInt32 i1 = 2 * i + 1;
+		ndInt32 i2 = 2 * i + 2;
+		if ((i1 < m_curCount) && (ndHeap<dItem, dKey>::m_pool[i].m_key > ndHeap<dItem, dKey>::m_pool[i1].m_key))
+		{
+			return false;
+		}
+		if ((i2 < m_curCount) && (ndHeap<dItem, dKey>::m_pool[i].m_key > ndHeap<dItem, dKey>::m_pool[i2].m_key))
+		{
+			return false;
+		}
+	}
+#endif
+	return true;
+}
+
+template <class dItem, class dKey>
+void ndUpHeap<dItem, dKey>::Push(dItem& obj, dKey key)
+{
+	ndHeap<dItem, dKey>::m_curCount++;
+
+	ndInt32 i = ndHeap<dItem, dKey>::m_curCount;
+	for (ndInt32 j = 0; i; i = j)
+	{
+		j = i >> 1;
+		if (!j || (ndHeap<dItem, dKey>::m_pool[j - 1].m_key < key))
+		{
+			break;
+		}
+		ndHeap<dItem, dKey>::m_pool[i - 1] = ndHeap<dItem, dKey>::m_pool[j - 1];
+	}
+	dAssert(i);
+	ndHeap<dItem, dKey>::m_pool[i - 1].m_key = key;
+	ndHeap<dItem, dKey>::m_pool[i - 1].m_obj = obj;
+	dAssert(SanityCheck());
+}
+
+template <class dItem, class dKey>
+void ndUpHeap<dItem, dKey>::Pop()
+{
+	Remove(0);
+}
+
+template <class dItem, class dKey>
+void ndUpHeap<dItem, dKey>::Sort()
+{
+	ndInt32 count = ndHeap<dItem, dKey>::m_curCount;
+	for (ndInt32 i = 1; i < count; i++)
+	{
+		dKey key(ndHeap<dItem, dKey>::m_pool[0].m_key);
+		dItem obj(ndHeap<dItem, dKey>::m_pool[0].m_obj);
+
+		Pop();
+
+		ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount].m_key = key;
+		ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount].m_obj = obj;
+	}
+
+	ndHeap<dItem, dKey>::m_curCount = count;
+	for (ndInt32 i = 0; i < count / 2; i++)
+	{
+		dKey key(ndHeap<dItem, dKey>::m_pool[i].m_key);
+		dItem obj(ndHeap<dItem, dKey>::m_pool[i].m_obj);
+
+		ndHeap<dItem, dKey>::m_pool[i].m_key = ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key;
+		ndHeap<dItem, dKey>::m_pool[i].m_obj = ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj;
+
+		ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key = key;
+		ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj = obj;
+	}
+	dAssert(SanityCheck());
+}
+
+template <class dItem, class dKey>
+void ndUpHeap<dItem, dKey>::Remove(ndInt32 index)
+{
+	ndHeap<dItem, dKey>::m_curCount--;
+	ndHeap<dItem, dKey>::m_pool[index] = ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount];
+	while (index && ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1].m_key > ndHeap<dItem, dKey>::m_pool[index].m_key)
+	{
+		dSwap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
+		index = (index - 1) >> 1;
+	}
+
+	while ((2 * index + 1) < ndHeap<dItem, dKey>::m_curCount)
+	{
+		ndInt32 i0 = 2 * index + 1;
+		ndInt32 i1 = 2 * index + 2;
+		if (i1 < ndHeap<dItem, dKey>::m_curCount)
+		{
+			i0 = (ndHeap<dItem, dKey>::m_pool[i0].m_key < ndHeap<dItem, dKey>::m_pool[i1].m_key) ? i0 : i1;
+			if (ndHeap<dItem, dKey>::m_pool[i0].m_key >= ndHeap<dItem, dKey>::m_pool[index].m_key)
+			{
+				break;
+			}
+			dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+			index = i0;
+		}
+		else
+		{
+			if (ndHeap<dItem, dKey>::m_pool[i0].m_key < ndHeap<dItem, dKey>::m_pool[index].m_key)
+			{
+				dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+			}
+			index = i0;
+		}
+	}
+	dAssert(SanityCheck());
+}
+
+#else
+
 template <class dItem, class dKey>
 class ndHeap : public ndClassAlloc
 {
@@ -116,8 +558,13 @@ class ndDownHeap : public ndHeap<dItem, ndDownHeapCompare<dKey>>
 		:ndHeap<dItem, ndDownHeapCompare<dKey>>(buffer, sizeInBytes)
 	{
 	}
-};
 
+	dKey Value(ndInt32 i = 0) const
+	{
+		const ndDownHeapCompare<dKey> key(ndHeap<dItem, ndDownHeapCompare<dKey>>::Value(i));
+		return key.m_key;
+	}
+};
 
 template <class dKey>
 class ndUpHeapCompare
@@ -158,6 +605,12 @@ class ndUpHeap : public ndHeap<dItem, ndUpHeapCompare<dKey>>
 	ndUpHeap(const void * const buffer, ndInt32 sizeInBytes)
 		:ndHeap<dItem, ndUpHeapCompare<dKey>>(buffer, sizeInBytes)
 	{
+	}
+
+	dKey Value(ndInt32 i = 0) const
+	{
+		const ndUpHeapCompare<dKey> key(ndHeap<dItem, ndUpHeapCompare<dKey>>::Value(i));
+		return key.m_key;
 	}
 };
 
@@ -363,4 +816,5 @@ void ndHeap<dItem, dKey>::Remove(ndInt32 index)
 	dAssert(SanityCheck());
 }
 
+#endif
 #endif

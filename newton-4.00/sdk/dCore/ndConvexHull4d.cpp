@@ -1003,7 +1003,7 @@ ndConvexHull4d::ndNode* ndConvexHull4d::FindFacingNode(const ndBigVector& vertex
 	while (heap.GetCount()) 
 	{
 		ndNode* const node1 = heap[0];
-		ndFloat64 dist1 = heap.Value().m_key;
+		ndFloat64 dist1 = heap.Value();
 		if (dist1 > ndFloat64 (1.0e-5f)) 
 		{
 			return node1;

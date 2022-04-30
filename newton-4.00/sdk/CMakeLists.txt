@@ -55,8 +55,12 @@ else()
 
 		if(NEWTON_BUILD_SHARED_LIBS)
 			if (PTR_SIZE EQUAL 8)
+				# this does not fucking works, unless yo umak ethe p[ropject a cuda solution.]
+				#link_libraries ("$ENV{CUDA_PATH_V11_6}/lib/x64/cudadevrt.lib")
 				link_libraries ("$ENV{CUDA_PATH_V11_6}/lib/x64/cudart_static.lib")
 			else()
+				# this does not fucking works, unless yo umak ethe p[ropject a cuda solution.]
+				#link_libraries ("$ENV{CUDA_PATH_V11_6}/lib/Win32/cudadevrt.lib")
 				link_libraries ("$ENV{CUDA_PATH_V11_6}/lib/Win32/cudart_static.lib")
 			endif()
 		endif()

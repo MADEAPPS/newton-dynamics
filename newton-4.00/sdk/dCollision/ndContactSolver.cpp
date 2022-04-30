@@ -1396,7 +1396,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 			ptr = ptr->m_next;
 		} while (ptr != hullPoint);
 
-		while (sortHeap.GetCount() && (sortHeap.Value().m_key * ndFloat32(16.0f) < totalArea))
+		while (sortHeap.GetCount() && (sortHeap.Value() * ndFloat32(16.0f) < totalArea))
 		{
 			ndConvexFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask)
