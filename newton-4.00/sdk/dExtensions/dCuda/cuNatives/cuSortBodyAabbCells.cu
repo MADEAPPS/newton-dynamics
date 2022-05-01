@@ -148,8 +148,8 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 			if (index < cellCount)
 			{
 				cuBodyAabbCell cell;
-				long long value = src[index].m_cpyValue;
-				cell.m_cpyValue = value;
+				long long value = src[index].m_value;
+				cell.m_value = value;
 				cachedCells[threadId] = value;
 				unsigned key = cuCountingSortEvaluateGridCellKey(cell, digit);
 				cacheSortedKey[threadId] = (key << 16) | threadId;
@@ -192,7 +192,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				const unsigned keyValue = cacheSortedKey[threadId];
 				const unsigned key = keyValue >> 16;
 				const unsigned dstOffset = threadId + cacheBufferAdress[key] - cacheKeyPrefix[prefixBase + key];
-				dst[dstOffset].m_cpyValue = cachedCells[keyValue & 0xffff];
+				dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
 			}
 		}
 	}
@@ -301,44 +301,6 @@ void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context)
 	}
 }
 
-static bool CountingSortBodyCellsSanityCheck(ndCudaContext* const context)
-{
-	cuSceneInfo info;
-	cudaError_t cudaStatus;
-	cudaDeviceSynchronize();
-	cudaStatus = cudaMemcpy(&info, context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	dAssert(cudaStatus == cudaSuccess);
-
-	if (info.m_frameIsValid)
-	{
-		static ndArray<cuBodyAabbCell> data;
-		int size = info.m_bodyAabbCell.m_size - 1;
-		data.SetCount(size);
-		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCellScrath.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-		dAssert(cudaStatus == cudaSuccess);
-
-		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, size * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-		dAssert(cudaStatus == cudaSuccess);
-	
-		for (int i = 1; i < size; i++)
-		{
-			cuBodyAabbCell key0(data[i - 1]);
-			cuBodyAabbCell key1(data[i - 0]);
-			bool zTest0 = key0.m_z < key1.m_z;
-			bool zTest1 = key0.m_z == key1.m_z;
-			bool yTest0 = key0.m_y < key1.m_y;
-			bool yTest1 = key0.m_y == key1.m_y;
-			bool xTest = key0.m_x <= key1.m_x;
-			bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
-			//test = xTest;
-			//test = key0.m_y <= key1.m_y;
-			//test = yTest0 | (yTest1 & xTest);
-			dAssert(test);
-		}
-	}
-	return true;
-}
-
 static void CountingSortBodyCells(ndCudaContext* context, int digit)
 {
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
@@ -367,6 +329,4 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	CountingSortBodyCells(context, 0);
 	CountingSortBodyCells(context, 1);
 	CountingSortBodyCells(context, 2);
-
-	//dAssert(CountingSortBodyCellsSanityCheck(context));
 }

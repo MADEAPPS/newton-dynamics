@@ -51,7 +51,7 @@ class cuBodyAabbCell
 			};
 			unsigned m_id;
 		};
-		long long m_cpyValue;
+		long long m_value;
 	};
 };
 

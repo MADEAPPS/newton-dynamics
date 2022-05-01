@@ -40,6 +40,11 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
+__global__ void CudaEndFrame(cuSceneInfo& info, int frameCount)
+{
+	info.m_frameCount = frameCount;
+}
+
 template <typename Predicate>
 __global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuSceneInfo& info)
 {
@@ -100,9 +105,13 @@ __global__ void CudaInitTransforms(Predicate InitTransforms, cuSceneInfo& info)
 	InitTransforms(info);
 }
 
-__global__ void CudaEndFrame(cuSceneInfo& info, int frameCount)
+template <typename Predicate>
+__global__ void CudaBodyCalculatePairsCount(Predicate CalculatePairsCount, cuSceneInfo& info)
 {
-	info.m_frameCount = frameCount;
+	if (info.m_frameIsValid)
+	{
+		CalculatePairsCount(info);
+	}
 }
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
@@ -390,6 +399,61 @@ void ndWorldSceneCuda::UpdateBodyList()
 		cudaDeviceSynchronize();
 	}
 }
+
+
+
+bool ndWorldSceneCuda::SanityCheck() const
+{
+	cuSceneInfo info;
+	cudaError_t cudaStatus;
+
+	cudaDeviceSynchronize();
+	cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
+	dAssert(cudaStatus == cudaSuccess);
+
+	if (info.m_frameIsValid)
+	{
+		static ndArray<cuBodyAabbCell> data;
+		data.SetCount(info.m_bodyAabbCell.m_size - 1);
+		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, data.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+		dAssert(cudaStatus == cudaSuccess);
+
+		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, data.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+		dAssert(cudaStatus == cudaSuccess);
+
+		for (int i = 1; i < data.GetCount(); i++)
+		{
+			cuBodyAabbCell key0(data[i - 1]);
+			cuBodyAabbCell key1(data[i - 0]);
+			bool zTest0 = key0.m_z < key1.m_z;
+			bool zTest1 = key0.m_z == key1.m_z;
+			bool yTest0 = key0.m_y < key1.m_y;
+			bool yTest1 = key0.m_y == key1.m_y;
+			bool xTest = key0.m_x <= key1.m_x;
+			bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
+			//test = xTest;
+			//test = key0.m_y <= key1.m_y;
+			//test = yTest0 | (yTest1 & xTest);
+			dAssert(test);
+		}
+
+		static ndArray<int> scan;
+		scan.SetCount(info.m_bodyAabbCell.m_size - 1);
+
+		cudaStatus = cudaMemcpy(&scan[0], info.m_scan.m_array, scan.GetCount() * sizeof(int), cudaMemcpyDeviceToHost);
+		dAssert(cudaStatus == cudaSuccess);
+		//for (int i = 0; i < data.GetCount(); i++)
+		//{
+		//	if (data[i].m_id != 0)
+		//	{
+		//		data[i].m_id = 1;
+		//	}
+		//}
+
+	}
+	return true;
+}
+
 
 void ndWorldSceneCuda::InitBodyArray()
 {
@@ -763,20 +827,60 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
+	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
+	{
+		const int blockId = blockIdx.x;
+		const int cellCount = info.m_bodyAabbCell.m_size - 1;
+		const int blocks = (cellCount + blockDim.x - 1) / blockDim.x;
+		if (blockId < blocks)
+		{
+			const int threadId = threadIdx.x;
+			int index = threadId + blockDim.x * blockIdx.x;
+			if (index < cellCount)
+			{
+				int* scan = info.m_scan.m_array;
+				const cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
+
+				unsigned count = 0;
+				const cuBodyAabbCell& cell = hashArray[index];
+
+				//__shared__  long long xxxxxxxx[D_THREADS_PER_BLOCK];
+				//xxxxxxxx[threadId] = cell.m_value;
+				//if (index == 636)
+				//{
+				//	printf("%d %d\n", hashArray[index].m_key, hashArray[index + 1].m_key);
+				//}
+
+				for (int i = index + 1; cell.m_key == hashArray[i].m_key; i++)
+				{
+					count++;
+				}
+
+				__syncthreads();
+				scan[index] = count;
+			}
+		}
+	};
+
+
 	cudaStream_t stream = m_context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
 	
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
-	ndInt32 blocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	ndInt32 bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
-	CudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
+	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
-	CudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-	CudaPrefixScanSum0 << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
+	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
+	CudaPrefixScanSum0 << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
 	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
-	CudaGenerateGridHash << <blocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
+	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
 	CudaBodyAabbCellSortBuffer(m_context);
 
-	//CudaBodyCalculatePairsCount(m_context);
+	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	dAssert(cellsBlocksCount > 0);
+	CudaBodyCalculatePairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculatePairsCount, *infoGpu);
+
+	//dAssert (SanityCheck());
 }
