@@ -64,13 +64,7 @@ __global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
 }
 
 template <typename Predicate>
-__global__ void CudaPrefixScanSum0(Predicate PrefixScan, cuSceneInfo& info)
-{
-	PrefixScan(info);
-}
-
-template <typename Predicate>
-__global__ void CudaPrefixScanSum1(Predicate PrefixScan, cuSceneInfo& info)
+__global__ void CudaBodyPrefixScan(Predicate PrefixScan, cuSceneInfo& info)
 {
 	PrefixScan(info);
 }
@@ -267,8 +261,8 @@ void ndWorldSceneCuda::LoadBodyData()
 	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
 	bodyBufferCpu.SetCount(cpuBodyCount);
 
-	cuDeviceBuffer<int>& scanGpu = m_context->m_scan;
-	cuDeviceBuffer<int>& histogramGpu = m_context->m_histogram;
+	//cuDeviceBuffer<int>& scanGpu = m_context->m_scan;
+	cuDeviceBuffer<unsigned>& histogramGpu = m_context->m_histogram;
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
 	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu0 = m_context->m_bodyAabbCell;
@@ -278,7 +272,6 @@ void ndWorldSceneCuda::LoadBodyData()
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu0 = m_context->m_transformBufferGpu0;
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu1 = m_context->m_transformBufferGpu1;
 
-	scanGpu.SetCount(cpuBodyCount);
 	histogramGpu.SetCount(cpuBodyCount);
 	bodyBufferGpu.SetCount(cpuBodyCount);
 	bodyAabbCellGpu0.SetCount(cpuBodyCount);
@@ -290,8 +283,7 @@ void ndWorldSceneCuda::LoadBodyData()
 	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
 
 	cuSceneInfo info;
-	info.m_scan = cuBuffer<int>(scanGpu);
-	info.m_histogram = cuBuffer<int>(histogramGpu);
+	info.m_histogram = cuBuffer<unsigned>(histogramGpu);
 	info.m_bodyArray = cuBuffer<cuBodyProxy>(bodyBufferGpu);
 	info.m_bodyAabbArray = cuBuffer<cuBoundingBox>(boundingBoxGpu);
 	info.m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu0);
@@ -437,10 +429,10 @@ bool ndWorldSceneCuda::SanityCheck() const
 			dAssert(test);
 		}
 
-		static ndArray<int> scan;
-		scan.SetCount(info.m_bodyAabbCell.m_size - 1);
+		static ndArray<unsigned> scan;
+		scan.SetCount(info.m_bodyArray.m_size);
 
-		cudaStatus = cudaMemcpy(&scan[0], info.m_scan.m_array, scan.GetCount() * sizeof(int), cudaMemcpyDeviceToHost);
+		cudaStatus = cudaMemcpy(&scan[0], info.m_histogram.m_array, scan.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
 		dAssert(cudaStatus == cudaSuccess);
 		//for (int i = 0; i < data.GetCount(); i++)
 		//{
@@ -450,6 +442,10 @@ bool ndWorldSceneCuda::SanityCheck() const
 		//	}
 		//}
 
+	}
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
 	}
 	return true;
 }
@@ -656,103 +652,99 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto CountAabb = [] __device__(const cuSceneInfo& info)
 	{
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
+		__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
+
+		const int blockId = blockIdx.x;
 		const int bodyCount = info.m_bodyArray.m_size - 1;
-		if (index < bodyCount)
+		const int blocks = (bodyCount + blockDim.x - 1) / blockDim.x;
+		if (blockId < blocks)
 		{
-			int* scan = info.m_scan.m_array;
-			cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+			const int threadId = threadIdx.x;
+			const int threadId1 = D_THREADS_PER_BLOCK / 2 + threadId;
+			const int index = threadId + blockDim.x * blockId;
 
-			const cuVector minBox(info.m_worldBox.m_min);
-			const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
-			const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
-
-			const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
-			const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
-			const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
-			const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-			const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-			const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
-			const int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
-			scan[index + 1] = count;
-			if (index == 0)
+			cacheBuffer[threadId] = 0;
+			cacheBuffer[threadId1] = 0;
+			if (index < bodyCount)
 			{
-				scan[0] = 0;
+				cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+
+				const cuVector minBox(info.m_worldBox.m_min);
+				const cuVector bodyBoxMin(bodyArray[index].m_minAabb);
+				const cuVector bodyBoxMax(bodyArray[index].m_maxAabb);
+
+				const int x0 = __float2int_rd((bodyBoxMin.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE);
+				const int y0 = __float2int_rd((bodyBoxMin.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE);
+				const int z0 = __float2int_rd((bodyBoxMin.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE);
+				const int x1 = __float2int_rd((bodyBoxMax.x - minBox.x) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+				const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+				const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
+				const int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
+				cacheBuffer[threadId1] = count;
+			}
+
+			__syncthreads();
+			for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
+			{
+				int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
+				__syncthreads();
+				cacheBuffer[threadId1] = sum;
+				__syncthreads();
+			}
+
+			if (index < bodyCount)
+			{
+				unsigned* scan = info.m_histogram.m_array;
+				const unsigned offset = (bodyCount + 1 + 1024 - 1) & (-1024);
+				scan[offset + index] = cacheBuffer[threadId1];
 			}
 		}
 	};
 
-	auto PrefixScanSum0 = [] __device__(cuSceneInfo& info)
-	{
-		__shared__  int cacheBuffer[2 * D_THREADS_PER_BLOCK];
-
-		int threadId = threadIdx.x;
-		int threadId1 = threadId + D_THREADS_PER_BLOCK;
-		int index = threadId + blockDim.x * blockIdx.x;
-		const int bodyCount = info.m_bodyArray.m_size;
-		
-		int* scan = info.m_scan.m_array;
-		cacheBuffer[threadId] = 0;
-		cacheBuffer[threadId1] = 0;
-		__syncthreads();
-
-		if (index < bodyCount)
-		{
-			cacheBuffer[threadId1] = scan[index];
-		}
-		__syncthreads();
-		
-		for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-		{
-			int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
-			__syncthreads();
-			cacheBuffer[threadId1] = sum;
-			__syncthreads();
-		}
-		if (index < bodyCount)
-		{
-			scan[index] = cacheBuffer[threadId1];
-		}
-	};
-
-	auto PrefixScanSum1 = [] __device__(cuSceneInfo& info)
+	auto BodyPrefixScan = [] __device__(cuSceneInfo& info)
 	{
 		int threadId = threadIdx.x;
-		const int bodyCount = info.m_bodyArray.m_size;
-		int* scan = info.m_scan.m_array;
+		const int bodyCount = info.m_bodyArray.m_size - 1;
+		const int blocks = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		const unsigned fraction = bodyCount - (blocks - 1) * D_THREADS_PER_BLOCK;
+		const unsigned srcOffset = (bodyCount + 1 + 1024 - 1) & (-1024);
 
-		if ((bodyCount >= D_THREADS_PER_BLOCK) && (bodyCount < D_THREADS_PER_BLOCK * 2))
+		unsigned* scan = info.m_histogram.m_array;
+		unsigned offset = D_THREADS_PER_BLOCK;
+		if (blocks >= 2)
 		{
-			int val = scan[D_THREADS_PER_BLOCK - 1];
-			int j = D_THREADS_PER_BLOCK + threadId;
-			if (j < bodyCount)
+			scan[threadId + 1] = scan[srcOffset + threadId];
+			__syncthreads();
+
+			for (int i = 1; i < (blocks - 1); i++)
 			{
-				scan[j] = scan[j] + val;
+				const int sum = scan[offset];
+				scan[offset + threadId + 1] = scan[srcOffset + offset + threadId] + sum;
+				offset += D_THREADS_PER_BLOCK;
+				__syncthreads();
+			}
+		
+			int sum = 0;
+			if (threadId < fraction)
+			{
+				sum = scan[offset];
 			}
 			__syncthreads();
+			if (threadId < fraction)
+			{
+				//scan[offset + threadId] += sum;
+				scan[offset + threadId + 1] = scan[srcOffset + offset + threadId] + sum;
+			}
 		}
 		else
-		{
-			const int blocks = (bodyCount - 1) / D_THREADS_PER_BLOCK;
-			for (int i = 1; i < blocks; i++)
-			{
-				const int sum = scan[i * D_THREADS_PER_BLOCK - 1];
-				__syncthreads();
-				scan[i * D_THREADS_PER_BLOCK + threadId] += sum;
-				__syncthreads();
-			}
-			const int val = scan[blocks * D_THREADS_PER_BLOCK - 1];
-			const int j = blocks * D_THREADS_PER_BLOCK + threadId;
-			if (j < bodyCount)
-			{
-				scan[j] = scan[j] + val;
-			}
-			__syncthreads();
+		{ 
+			scan[threadId + 1] = scan[srcOffset + threadId];
 		}
 		
 		if (threadId == 0)
 		{
-			int newSize = scan[bodyCount - 1];
+			scan[0] = 0;
+			int newSize = scan[bodyCount];
 			info.m_histogram.m_size = newSize;
 			info.m_bodyAabbCell.m_size = newSize;
 			info.m_bodyAabbCellScrath.m_size = newSize;
@@ -766,8 +758,8 @@ void ndWorldSceneCuda::InitBodyArray()
 		const int bodyCount = info.m_bodyArray.m_size - 1;
 		if (index < bodyCount)
 		{
-			int* scan = info.m_scan.m_array;
-			cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
+			const unsigned* scan = info.m_histogram.m_array;
+			const cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
 			cuBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
 
 			const cuVector minBox(info.m_worldBox.m_min);
@@ -784,7 +776,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			cuBodyAabbCell hash;
 			hash.m_id = index;
 			hash.m_key = 0;
-			int start = scan[index];
+			unsigned start = scan[index];
 			
 			for (int z = z0; z < z1; z++)
 			{
@@ -829,35 +821,50 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
 	{
+		__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
+
 		const int blockId = blockIdx.x;
 		const int cellCount = info.m_bodyAabbCell.m_size - 1;
 		const int blocks = (cellCount + blockDim.x - 1) / blockDim.x;
 		if (blockId < blocks)
 		{
 			const int threadId = threadIdx.x;
+			const int threadId1 = D_THREADS_PER_BLOCK / 2 + threadId;
 			int index = threadId + blockDim.x * blockIdx.x;
+
+			cacheBuffer[threadId] = 0;
+			cacheBuffer[threadId1] = 0;
 			if (index < cellCount)
 			{
-				int* scan = info.m_scan.m_array;
+				unsigned* scan = info.m_histogram.m_array;
 				const cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
 
 				unsigned count = 0;
 				const cuBodyAabbCell& cell = hashArray[index];
 
-				//__shared__  long long xxxxxxxx[D_THREADS_PER_BLOCK];
-				//xxxxxxxx[threadId] = cell.m_value;
-				//if (index == 636)
-				//{
-				//	printf("%d %d\n", hashArray[index].m_key, hashArray[index + 1].m_key);
-				//}
-
 				for (int i = index + 1; cell.m_key == hashArray[i].m_key; i++)
 				{
 					count++;
 				}
+				cacheBuffer[threadId1] = count;
+			}
 
+			__syncthreads();
+			for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
+			{
+				int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
 				__syncthreads();
-				scan[index] = count;
+				cacheBuffer[threadId1] = sum;
+				__syncthreads();
+			}
+
+			//__syncthreads();
+			//scan[index] = count;
+			if (index < cellCount)
+			{
+				unsigned* scan = info.m_histogram.m_array;
+				const unsigned offset = (cellCount + 1 + 1024 - 1) & (-1024);
+				scan[offset + index] = cacheBuffer[threadId1];
 			}
 		}
 	};
@@ -872,8 +879,8 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
 	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-	CudaPrefixScanSum0 << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum0, *infoGpu);
-	CudaPrefixScanSum1 << <1, D_THREADS_PER_BLOCK, 0, stream >> > (PrefixScanSum1, *infoGpu);
+	CudaBodyPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (BodyPrefixScan, *infoGpu);
+//dAssert(SanityCheck());
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
 	CudaBodyAabbCellSortBuffer(m_context);
@@ -882,5 +889,5 @@ void ndWorldSceneCuda::InitBodyArray()
 	dAssert(cellsBlocksCount > 0);
 	CudaBodyCalculatePairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculatePairsCount, *infoGpu);
 
-	//dAssert (SanityCheck());
+	dAssert (SanityCheck());
 }

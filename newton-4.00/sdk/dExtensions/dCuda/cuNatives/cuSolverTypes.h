@@ -74,7 +74,6 @@ class cuSceneInfo
 	public:
 	cuSceneInfo()
 		:m_worldBox()
-		,m_scan()
 		,m_histogram()
 		,m_bodyArray()
 		,m_bodyAabbArray()
@@ -92,8 +91,7 @@ class cuSceneInfo
 	}
 
 	cuBoundingBox m_worldBox;
-	cuBuffer<int> m_scan;
-	cuBuffer<int> m_histogram;
+	cuBuffer<unsigned> m_histogram;
 	cuBuffer<cuBodyProxy> m_bodyArray;
 	cuBuffer<cuBoundingBox> m_bodyAabbArray;
 	cuBuffer<cuBodyAabbCell> m_bodyAabbCell;

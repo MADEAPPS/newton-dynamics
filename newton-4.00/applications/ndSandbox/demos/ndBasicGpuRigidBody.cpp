@@ -127,7 +127,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	//BuildFloorBox(scene, dGetIdentityMatrix());
 
 	//ndInt32 count = 50;
 	//ndInt32 count = 40;
@@ -139,6 +139,7 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	//ndInt32 count = 6;
 	//ndInt32 count = 5;
 	//ndInt32 count = 4;
+	//ndInt32 count = 2;
 	//ndInt32 count = 1;
 	AddBox(scene, ndVector(0.0f, 0.5f, -3.0f, 1.0f), 1.0f, count);
 

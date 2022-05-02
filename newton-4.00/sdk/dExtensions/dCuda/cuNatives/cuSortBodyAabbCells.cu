@@ -101,7 +101,7 @@ __global__ void cuCountingSortCountGridCells(const cuSceneInfo& info, int digit)
 			cacheBuffer[threadId] = 0;
 			const int index = threadId + D_AABB_GRID_CELL_SORT_BLOCK_SIZE * blockId;
 
-			int* histogram = info.m_histogram.m_array;
+			unsigned* histogram = info.m_histogram.m_array;
 			const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
 
 			__syncthreads();
@@ -134,7 +134,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 		if (blockId < blocks)
 		{
 			const int threadId = threadIdx.x;
-			const int* histogram = info.m_histogram.m_array;
+			const unsigned* histogram = info.m_histogram.m_array;
 	
 			const int index = threadId + blockDim.x * blockId;
 			const cuBodyAabbCell* src = (digit & 1) ? info.m_bodyAabbCell.m_array : info.m_bodyAabbCellScrath.m_array;
@@ -207,7 +207,7 @@ __global__ void cuCountingSortAddSubPrefix(const cuSceneInfo& info)
 		const int cellCount = info.m_bodyAabbCell.m_size - 1;
 		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
 		
-		int* histogram = info.m_histogram.m_array;
+		unsigned* histogram = info.m_histogram.m_array;
 		
 		int sum = 0;
 		int start = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
@@ -230,7 +230,7 @@ __global__ void cuCountingSortCaculatePrefixOffset(const cuSceneInfo& info)
 		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
 
 		const int threadId = threadIdx.x;
-		int* histogram = info.m_histogram.m_array;
+		unsigned* histogram = info.m_histogram.m_array;
 
 		int src = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
 		int dst = blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + src;
@@ -257,7 +257,7 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info)
 		cacheBuffer[threadId] = 0;
 		cacheBuffer[D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2 + 1] = 0;
 
-		int* histogram = info.m_histogram.m_array;
+		unsigned* histogram = info.m_histogram.m_array;
 		const int cellCount = info.m_bodyAabbCell.m_size - 1;
 		const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
 		const int histogramBase = 2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
@@ -289,7 +289,7 @@ void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context)
 	if (histogramSize > context->m_histogram.GetCapacity())
 	{
 		context->m_histogram.SetCount(histogramSize);
-		sceneInfo->m_histogram = cuBuffer<int>(context->m_histogram);
+		sceneInfo->m_histogram = cuBuffer<unsigned>(context->m_histogram);
 	}
 	
 	if (cellCount > context->m_bodyAabbCell.GetCapacity())
