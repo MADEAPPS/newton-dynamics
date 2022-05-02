@@ -261,7 +261,6 @@ void ndWorldSceneCuda::LoadBodyData()
 	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
 	bodyBufferCpu.SetCount(cpuBodyCount);
 
-	//cuDeviceBuffer<int>& scanGpu = m_context->m_scan;
 	cuDeviceBuffer<unsigned>& histogramGpu = m_context->m_histogram;
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
