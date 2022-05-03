@@ -65,8 +65,8 @@ class cuBuffer
 	}
 
 	T* m_array;
-	int m_size;
-	int m_capacity;
+	unsigned m_size;
+	unsigned m_capacity;
 };
 
 class cuSceneInfo
