@@ -718,7 +718,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			cuBodyAabbCell hash;
 			hash.m_id = index;
 			hash.m_key = 0;
-			unsigned start = index ? 0 : histogram[index - 1];
+			unsigned start = index ? histogram[index - 1] : 0;
 			
 			for (int z = z0; z < z1; z++)
 			{
