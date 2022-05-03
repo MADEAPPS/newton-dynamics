@@ -385,7 +385,6 @@ void ndWorldSceneCuda::UpdateBodyList()
 	}
 }
 
-
 bool ndWorldSceneCuda::SanityCheck() const
 {
 	cuSceneInfo info;
@@ -421,20 +420,17 @@ bool ndWorldSceneCuda::SanityCheck() const
 			//dAssert(test);
 		}
 
-		static ndArray<unsigned> scan;
-		scan.SetCount(info.m_bodyArray.m_size);
+		static ndArray<unsigned> histogram;
+		histogram.SetCount(info.m_bodyArray.m_size);
 
-		cudaStatus = cudaMemcpy(&scan[0], info.m_histogram.m_array, scan.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
+		cudaStatus = cudaMemcpy(&histogram[0], info.m_histogram.m_array, histogram.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
 		dAssert(cudaStatus == cudaSuccess);
-		//for (int i = 0; i < data.GetCount(); i++)
-		//{
-		//	if (data[i].m_id != 0)
-		//	{
-		//		data[i].m_id = 1;
-		//	}
-		//}
-
+		for (int i = 1; i < histogram.GetCount(); i++)
+		{
+			dAssert(histogram[i - 1] <= histogram[i]);
+		}
 	}
+
 	if (cudaStatus != cudaSuccess)
 	{
 		dAssert(0);
@@ -740,22 +736,24 @@ void ndWorldSceneCuda::InitBodyArray()
 	auto EndGridHash = [] __device__(cuSceneInfo& info)
 	{
 		cuBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
-		int index = info.m_bodyAabbCellScrath.m_size;
+		const int index = info.m_bodyAabbCellScrath.m_size;
 
 		cuBodyAabbCell hash;
 		hash = hashArray[index - 1];
 		hash.m_id = unsigned (-1);
 		hash.m_z = hash.m_z + 1;
-
 		hashArray[index] = hash;
-		info.m_histogram.m_size = index + 1;
+
+		//info.m_histogram.m_size = index + 1;
 		info.m_bodyAabbCell.m_size = index + 1;
 		info.m_bodyAabbCellScrath.m_size = index + 1;
 		if ((index + 1) >= info.m_bodyAabbCell.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}
-		if ((2 * index + 2048) >= info.m_histogram.m_capacity)
+
+		const int histogrameSize = D_PREFIX_SCAN_ALIGN * ((index + D_PREFIX_SCAN_ALIGN) / D_PREFIX_SCAN_ALIGN) + D_PREFIX_SCAN_ALIGN;
+		if (histogrameSize >= info.m_histogram.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}
@@ -819,9 +817,9 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
 	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
 	CudaPrefixScan(m_context);
-dAssert(SanityCheck());
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
-//	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
+	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
+dAssert(SanityCheck());
 //	CudaBodyAabbCellSortBuffer(m_context);
 //
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
