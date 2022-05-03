@@ -696,7 +696,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	auto GenerateHashGrids = [] __device__(const cuSceneInfo & info)
 	{
 		const int threadId = threadIdx.x;
-		int index = threadId + blockDim.x * blockIdx.x;
+		const int index = threadId + blockDim.x * blockIdx.x;
 		const int bodyCount = info.m_bodyArray.m_size - 1;
 		if (index < bodyCount)
 		{
