@@ -27,7 +27,7 @@
 #include <string>
 #include "vhacdConvexHull.h"
 
-namespace nd
+namespace nd_
 {
 	namespace VHACD 
 	{

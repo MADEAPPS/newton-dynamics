@@ -28,8 +28,8 @@
 // link errors due to a duplicate implementation. This is the same pattern used by
 // ImGui and StbLib and other popular open source libraries.
 
-#    define VHACD_VERSION_MAJOR_New 4
-#    define VHACD_VERSION_MINOR_New 0
+#    define VHACD_VERSION_MAJOR 4
+#    define VHACD_VERSION_MINOR 0
 
 // Changes for version 4.0
 //
@@ -110,32 +110,6 @@
 
 #include <stdint.h>
 #include <functional>
-#include <assert.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <float.h>
-#include <limits.h>
-
-#include <chrono>
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <mutex>
-#include <atomic>
-#include <thread>
-#include <algorithm>
-#include <condition_variable>
-#include <unordered_set>
-#include <unordered_map>
-#include <future>
-#include <memory>
-#include <array>
-#include <deque>
-
-
-namespace ndNew
-{
 
 namespace VHACD
 {
@@ -250,7 +224,7 @@ public:
         uint32_t            m_maxConvexHulls{64};           // The maximum number of convex hulls to produce
         uint32_t            m_resolution{400000};           // The voxel resolution to use
         double              m_minimumVolumePercentErrorAllowed{1}; // if the voxels are within 1% of the volume of the hull, we consider this a close enough approximation
-        uint32_t            m_maxRecursionDepth{12};        // The maximum recursion depth
+        uint32_t            m_maxRecursionDepth{14};        // The maximum recursion depth
         bool                m_shrinkWrap{true};             // Whether or not to shrinkwrap the voxel positions to the source mesh on output
         FillMode            m_fillMode{ FillMode::FLOOD_FILL }; // How to fill the interior of the voxelized mesh
         uint32_t            m_maxNumVerticesPerCH{64};      // The maximum number of vertices allowed in any output convex hull
@@ -359,6 +333,28 @@ IVHACD* CreateVHACD_ASYNC(void);    // Create an asynchronous (non-blocking) imp
 
 
 #if ENABLE_VHACD_IMPLEMENTATION
+#include <assert.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <float.h>
+#include <limits.h>
+
+#include <chrono>
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <algorithm>
+#include <condition_variable>
+#include <unordered_set>
+#include <unordered_map>
+#include <future>
+#include <memory>
+#include <array>
+#include <deque>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -9034,7 +9030,7 @@ public:
             }
         }
         // Our parent's new surface voxels become our new surface voxels so long as they intersect our region
-        for (auto &i:parent.mSurfaceVoxels)
+        for (auto &i:parent.mNewSurfaceVoxels)
         {
             uint32_t x,y,z;
             i.getVoxel(x,y,z);
@@ -9183,7 +9179,7 @@ public:
         size_t voxelCount = mInteriorVoxels.size() + mNewSurfaceVoxels.size() + mSurfaceVoxels.size();
         mVoxelVolume = singleVoxelVolume * double(voxelCount);
         double diff = fabs(mHullVolume-mVoxelVolume);
-        mVolumeError = (diff*100)/mHullVolume;
+        mVolumeError = (diff*100)/mVoxelVolume;
     }
 
     // Returns true if this convex hull should be considered done
@@ -9416,7 +9412,7 @@ public:
         if ( dx >= dy && dx >= dz )
         {
             ret = SplitAxis::X_AXIS_NEGATIVE;
-            location = (mX2-mX1)/2+mX1;
+            location = (mX2+1+mX1)/2;
             uint32_t edgeLoc;
             if ( mParams.m_findBestPlane && findConcavityX(edgeLoc) )
             {
@@ -9426,7 +9422,7 @@ public:
         else if ( dy >= dx && dy >= dz )
         {
             ret = SplitAxis::Y_AXIS_NEGATIVE;
-            location = (mY2-mY1)/2+mY1;
+            location = (mY2 + 1 + mY1) / 2;
             uint32_t edgeLoc;
             if ( mParams.m_findBestPlane &&  findConcavityY(edgeLoc) )
             {
@@ -9436,7 +9432,7 @@ public:
         else
         {
             ret = SplitAxis::Z_AXIS_NEGATIVE;
-            location = (mZ2-mZ1)/2+mZ1;
+            location = (mZ2 + 1 + mZ1) / 2;
             uint32_t edgeLoc;
             if ( mParams.m_findBestPlane &&  findConcavityZ(edgeLoc) )
             {
@@ -11512,7 +11508,5 @@ IVHACD* CreateVHACD_ASYNC(void)
 #endif
 
 #endif
-
-}
 
 #endif // VHACD_H

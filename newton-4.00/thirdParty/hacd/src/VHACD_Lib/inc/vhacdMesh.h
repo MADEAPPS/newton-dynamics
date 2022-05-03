@@ -18,7 +18,7 @@
 #include "vhacdSArray.h"
 #include "vhacdVector.h"
 
-namespace nd
+namespace nd_
 {
 	#define VHACD_DEBUG_MESH
 

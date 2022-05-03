@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _ND_VHACD_VECTOR_INL
 #define _ND_VHACD_VECTOR_INL
-namespace nd
+namespace nd_
 {
 	namespace VHACD
 	{

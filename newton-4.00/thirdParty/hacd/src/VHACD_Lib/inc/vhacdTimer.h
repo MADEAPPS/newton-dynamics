@@ -29,7 +29,7 @@
 #include <time.h>
 #endif
 
-namespace nd
+namespace nd_
 {
 	namespace VHACD 
 	{

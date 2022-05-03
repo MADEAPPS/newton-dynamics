@@ -14,9 +14,9 @@
 #include "ndHacd.h"
 #include "include/VHACD.h"
 
-ndNew::VHACD::IVHACD* ndCreateVHACD()
+VHACD::IVHACD* ndCreateVHACD()
 {
-	return ndNew::VHACD::CreateVHACD();
+	return VHACD::CreateVHACD();
 }
 
 

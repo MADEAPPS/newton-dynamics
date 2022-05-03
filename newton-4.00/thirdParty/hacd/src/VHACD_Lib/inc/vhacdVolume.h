@@ -19,7 +19,7 @@
 #include "vhacdVector.h"
 #include <assert.h>
 
-namespace nd
+namespace nd_
 {
 	namespace VHACD {
 

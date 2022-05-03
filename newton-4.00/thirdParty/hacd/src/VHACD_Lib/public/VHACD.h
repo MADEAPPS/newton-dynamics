@@ -16,8 +16,8 @@
 #ifndef ND_VHACD_H
 #define ND_VHACD_H
 
-#define VHACD_VERSION_MAJOR 2
-#define VHACD_VERSION_MINOR 3
+#define ND_VHACD_VERSION_MAJOR 2
+#define ND_VHACD_VERSION_MINOR 3
 
 // Changes for version 2.3
 //
@@ -39,7 +39,7 @@
 // and begin a new one.  To cancel a currently running approximation just call 'Cancel'.
 #include <stdint.h>
 
-namespace nd
+namespace nd_
 {
 	namespace VHACD 
 	{

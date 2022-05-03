@@ -14,6 +14,8 @@
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"
 
+#define USE_OLD_HACD
+
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 gravity)
@@ -406,18 +408,16 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 		meshPoints.PushBack(p);
 	}
 
-#define USE_OLD_HACD
 #ifdef USE_OLD_HACD
-	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
-	nd::VHACD::IVHACD::Parameters paramsVHACD;
+	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
+	nd_::VHACD::IVHACD::Parameters paramsVHACD;
 	//paramsVHACD.m_resolution = 400000;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 #else
-	ndNew::VHACD::IVHACD* const interfaceVHACD = ndCreateVHACD();
-	ndNew::VHACD::IVHACD::Parameters paramsVHACD;
-	//paramsVHACD.m_resolution = 400000;
-	//paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
+	lowDetail = 0;
+	VHACD::IVHACD* const interfaceVHACD = ndCreateVHACD();
+	VHACD::IVHACD::Parameters paramsVHACD;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 #endif
 
@@ -430,9 +430,9 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
 #ifdef USE_OLD_HACD
-		nd::VHACD::IVHACD::ConvexHull ch;
+		nd_::VHACD::IVHACD::ConvexHull ch;
 #else
-		ndNew::VHACD::IVHACD::ConvexHull ch;
+		VHACD::IVHACD::ConvexHull ch;
 #endif
 		interfaceVHACD->GetConvexHull(i, ch);
 		convexMeshPoints.SetCount(ch.m_nPoints);
@@ -554,9 +554,9 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 				p.m_z = points[i].m_z;
 				meshPoints.PushBack(p);
 			}
-			nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
+			nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
 
-			nd::VHACD::IVHACD::Parameters paramsVHACD;
+			nd_::VHACD::IVHACD::Parameters paramsVHACD;
 			//paramsVHACD.m_concavityToVolumeWeigh = 1.0;
 			paramsVHACD.m_concavityToVolumeWeigh = 0.5f;
 			interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
@@ -566,7 +566,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndArray<ndVector> convexMeshPoints;
 			for (ndInt32 i = 0; i < hullCount; ++i)
 			{
-				nd::VHACD::IVHACD::ConvexHull ch;
+				nd_::VHACD::IVHACD::ConvexHull ch;
 				interfaceVHACD->GetConvexHull(i, ch);
 				convexMeshPoints.SetCount(ch.m_nPoints);
 				for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)

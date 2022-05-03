@@ -15,7 +15,7 @@
 #include "vhacdICHull.h"
 #include <limits>
 
-namespace nd
+namespace nd_
 {
 	namespace VHACD 
 	{

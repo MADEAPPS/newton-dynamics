@@ -4,7 +4,7 @@
 #include <float.h>
 #include <stdint.h>
 
-namespace nd
+namespace nd_
 {
 	namespace FLOAT_MATH
 	{

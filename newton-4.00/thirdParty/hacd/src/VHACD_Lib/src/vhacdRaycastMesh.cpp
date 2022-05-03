@@ -2,7 +2,7 @@
 #include <math.h>
 #include <assert.h>
 
-namespace nd
+namespace nd_
 {
 	namespace RAYCAST_MESH
 	{

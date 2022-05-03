@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-namespace nd
+namespace nd_
 {
 	#define SARRAY_DEFAULT_MIN_SIZE 16
 

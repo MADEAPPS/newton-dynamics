@@ -7,7 +7,7 @@
 // a quaternion is a 'float *' to 4 floats representing a quaternion x,y,z,w
 //
 
-namespace nd
+namespace nd_
 {
 	namespace FLOAT_MATH
 	{

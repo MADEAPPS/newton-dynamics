@@ -2,7 +2,7 @@
 #define ND_RAYCAST_MESH_H
 
 #include <stdint.h>
-namespace nd
+namespace nd_
 {
 	namespace VHACD
 	{

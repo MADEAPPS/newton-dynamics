@@ -18,7 +18,7 @@
 #include <iostream>
 #include <math.h>
 
-namespace nd 
+namespace nd_ 
 {
 	namespace VHACD 
 	{

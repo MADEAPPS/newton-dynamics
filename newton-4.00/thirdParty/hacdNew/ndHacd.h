@@ -12,15 +12,12 @@
 #ifndef _D_VHACD_H_
 #define _D_VHACD_H_
 
-namespace ndNew
+namespace VHACD
 {
-	namespace VHACD
-	{
-		class IVHACD;
-	};
+	class IVHACD;
 };
 
-ndNew::VHACD::IVHACD* ndCreateVHACD();
+VHACD::IVHACD* ndCreateVHACD();
 
 #endif 
 

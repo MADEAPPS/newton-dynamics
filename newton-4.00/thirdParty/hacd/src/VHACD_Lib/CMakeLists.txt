@@ -23,7 +23,7 @@ endif()
 include_directories(inc/)
 include_directories(public/)
 
-file(GLOB CPP_SOURCE src/*.cpp public/*.h inc/*.h)
+file(GLOB CPP_SOURCE src/*.cpp src/*.inl  inc/*.inl inc/*.h public/*.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})

@@ -18,7 +18,7 @@
 #include "vhacdManifoldMesh.h"
 #include "vhacdVector.h"
 
-namespace nd
+namespace nd_
 {
 	namespace VHACD 
 	{
