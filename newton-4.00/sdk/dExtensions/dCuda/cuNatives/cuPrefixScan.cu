@@ -31,7 +31,7 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 	if (info.m_frameIsValid)
 	{
 		int threadId = threadIdx.x;
-		const unsigned itemsCount = info.m_histogram.m_size - 1;
+		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
 		unsigned* histogram = info.m_histogram.m_array;
@@ -52,7 +52,7 @@ __global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
 	if (info.m_frameIsValid)
 	{
 		int threadId = threadIdx.x;
-		const unsigned itemsCount = info.m_histogram.m_size - 1;
+		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
 		unsigned* histogram = info.m_histogram.m_array;
@@ -73,7 +73,7 @@ __global__ void cuPaddBuffer(cuSceneInfo& info)
 	if (info.m_frameIsValid)
 	{
 		int threadId = threadIdx.x;
-		const unsigned itemsCount = info.m_histogram.m_size - 1;
+		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		const unsigned lastBlock = D_PREFIX_SCAN_PASSES * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
 
@@ -84,17 +84,15 @@ __global__ void cuPaddBuffer(cuSceneInfo& info)
 		{
 			histogram[offset + threadId] = 0;
 			offset += D_THREADS_PER_BLOCK;
-			__syncthreads();
 		}
 	}
 }
 
 void CudaPrefixScan(ndCudaContext* const context)
 {
-	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
 	cudaStream_t stream = context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
-#if 1
+#if 0
 	cuLinearNaivePrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 #else
 	cuPaddBuffer << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);

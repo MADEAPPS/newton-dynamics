@@ -30,8 +30,9 @@
 #include "cuIntrisics.h"
 #include "ndCudaContext.h"
 
-#define D_PREFIX_SCAN_PASSES	4
-#define D_PREFIX_SCAN_ALIGN		((1<<D_PREFIX_SCAN_PASSES) * D_THREADS_PER_BLOCK)
+#define D_PREFIX_SCAN_PASSES_BITS	4
+#define D_PREFIX_SCAN_PASSES		(1<<D_PREFIX_SCAN_PASSES_BITS)
+#define D_PREFIX_SCAN_ALIGN			(D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK)
 
 void CudaPrefixScan(ndCudaContext* const context);
 
