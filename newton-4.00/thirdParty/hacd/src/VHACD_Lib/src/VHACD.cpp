@@ -382,245 +382,150 @@ namespace nd_
 		timerComputeCost.Tic();
 	#endif // DEBUG_TEMP
 
-	#ifdef USE_CPP_11_THREADS
-		class CommonData
+	class CommonData
+	{
+		public:
+		CommonData(VHACD* me, const Parameters& params)
+			:m_me(me)
+			,m_params(params)
 		{
-			public:
-			CommonData(VHACD* me, const Parameters& params)
-				:m_me(me)
-				,m_params(params)
-			{
-			}
+		}
 
-			VHACD* m_me;
-			double m_w;
-			double m_beta;
-			double m_alpha;
-			const Parameters& m_params;
-			PrimitiveSet* m_onSurfacePSet;
-			const PrimitiveSet* m_inputPSet;
-			int32_t m_convexhullDownsampling;
-			Mesh chs[VHACD_WORKERS_THREADS][2];
-			SArray<Vec3<double>> chPts[VHACD_WORKERS_THREADS][2];
+		VHACD* m_me;
+		double m_w;
+		double m_beta;
+		double m_alpha;
+		const Parameters& m_params;
+		PrimitiveSet* m_onSurfacePSet;
+		const PrimitiveSet* m_inputPSet;
+		int32_t m_convexhullDownsampling;
+		Mesh chs[VHACD_WORKERS_THREADS][2];
+		SArray<Vec3<double>> chPts[VHACD_WORKERS_THREADS][2];
 
-			Vec3<double> m_preferredCuttingDirection;
-			PrimitiveSet** m_psets;
-		};
+		Vec3<double> m_preferredCuttingDirection;
+		PrimitiveSet** m_psets;
+	};
 
-		class BestClippingPlaneJob : public Job
+	class BestClippingPlaneJob : public Job
+	{
+		public:
+		BestClippingPlaneJob()
+			:Job()
 		{
-			public:
-			BestClippingPlaneJob()
-				:Job()
-			{
-			}
+		}
 
-			void Execute(int threadId)
-			{
-				Mesh& leftCH = m_commonData->chs[threadId][0];
-				Mesh& rightCH = m_commonData->chs[threadId][1];
-				rightCH.ResizePoints(0);
-				leftCH.ResizePoints(0);
-				rightCH.ResizeTriangles(0);
-				leftCH.ResizeTriangles(0);
+		void Execute(int threadId)
+		{
+			Mesh& leftCH = m_commonData->chs[threadId][0];
+			Mesh& rightCH = m_commonData->chs[threadId][1];
+			rightCH.ResizePoints(0);
+			leftCH.ResizePoints(0);
+			rightCH.ResizeTriangles(0);
+			leftCH.ResizeTriangles(0);
 			
-				// compute convex-hulls
+			// compute convex-hulls
+			#ifdef TEST_APPROX_CH
+			double volumeLeftCH1 = 0;
+			double volumeRightCH1 = 0;
+			#endif //TEST_APPROX_CH
+			if (m_commonData->m_params.m_convexhullApproximation)
+			{
+				SArray<Vec3<double> >& leftCHPts = m_commonData->chPts[threadId][0];
+				SArray<Vec3<double> >& rightCHPts = m_commonData->chPts[threadId][1];;
+				rightCHPts.Resize(0);
+				leftCHPts.Resize(0);
+				m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, m_commonData->m_convexhullDownsampling * 32);
+				m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
+				rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
+				leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
 				#ifdef TEST_APPROX_CH
-				double volumeLeftCH1 = 0;
-				double volumeRightCH1 = 0;
+					Mesh leftCH1;
+					Mesh rightCH1;
+					VoxelSet right;
+					VoxelSet left;
+					m_commonData->m_onSurfacePSet->Clip(plane, &right, &left);
+					right.ComputeConvexHull(rightCH1, m_commonData->m_convexhullDownsampling);
+					left.ComputeConvexHull(leftCH1, m_commonData->m_convexhullDownsampling);
+			
+					volumeLeftCH1 = leftCH1.ComputeVolume();
+					volumeRightCH1 = rightCH1.ComputeVolume();
 				#endif //TEST_APPROX_CH
-				if (m_commonData->m_params.m_convexhullApproximation)
-				{
-					SArray<Vec3<double> >& leftCHPts = m_commonData->chPts[threadId][0];
-					SArray<Vec3<double> >& rightCHPts = m_commonData->chPts[threadId][1];;
-					rightCHPts.Resize(0);
-					leftCHPts.Resize(0);
-					m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, m_commonData->m_convexhullDownsampling * 32);
-					m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
-					rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
-					leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-					#ifdef TEST_APPROX_CH
-						Mesh leftCH1;
-						Mesh rightCH1;
-						VoxelSet right;
-						VoxelSet left;
-						m_commonData->m_onSurfacePSet->Clip(plane, &right, &left);
-						right.ComputeConvexHull(rightCH1, m_commonData->m_convexhullDownsampling);
-						left.ComputeConvexHull(leftCH1, m_commonData->m_convexhullDownsampling);
-			
-						volumeLeftCH1 = leftCH1.ComputeVolume();
-						volumeRightCH1 = rightCH1.ComputeVolume();
-					#endif //TEST_APPROX_CH
-				}
-				else 
-				{
-					PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
-					PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
-					m_commonData->m_onSurfacePSet->Clip(m_plane, right, left);
-					right->ComputeConvexHull(rightCH, m_commonData->m_convexhullDownsampling);
-					left->ComputeConvexHull(leftCH, m_commonData->m_convexhullDownsampling);
-				}
-
-				double volumeLeftCH = leftCH.ComputeVolume();
-				double volumeRightCH = rightCH.ComputeVolume();
-			
-				// compute clipped volumes
-				double volumeLeft = 0.0;
-				double volumeRight = 0.0;
-			
-				m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
-			
-				double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0);
-				double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0);
-				double concavity = (concavityLeft + concavityRight);
-			
-				// compute cost
-				m_concavity = concavity;
-				m_balance = m_commonData->m_alpha * fabs(volumeLeft - volumeRight) / m_commonData->m_me->m_volumeCH0;
-				double d = m_commonData->m_w * (m_commonData->m_preferredCuttingDirection[0] * m_plane.m_a + m_commonData->m_preferredCuttingDirection[1] * m_plane.m_b + m_commonData->m_preferredCuttingDirection[2] * m_plane.m_c);
-				m_symmetry = m_commonData->m_beta * d;
 			}
-
-			double m_concavity;
-			double m_balance;
-			double m_symmetry;
-			Plane m_plane;
-			CommonData* m_commonData;
-		};
-
-		std::vector<BestClippingPlaneJob> jobs;
-		jobs.resize(nPlanes);
-
-		CommonData data(this, params);
-		data.m_w = w;
-		data.m_beta = beta;
-		data.m_alpha = alpha;
-		data.m_psets = psets;
-		data.m_inputPSet = inputPSet;
-		data.m_onSurfacePSet = onSurfacePSet;
-		data.m_preferredCuttingDirection = preferredCuttingDirection;
-		data.m_convexhullDownsampling = convexhullDownsampling;
-		for (int32_t i = 0; i < nPlanes; ++i)
-		{
-			jobs[i].m_plane = planes[i];
-			jobs[i].m_commonData = &data;
-			m_parallelQueue.PushTask(&jobs[i]);
-		}
-		m_parallelQueue.Sync();
-
-		iBest = 0;
-		minConcavity = jobs[0].m_concavity;
-		minBalance = jobs[0].m_balance;
-		minSymmetry = jobs[0].m_symmetry;
-		bestPlane = jobs[0].m_plane;
-		minTotal = jobs[0].m_concavity + jobs[0].m_balance + jobs[0].m_symmetry;
-		for (int32_t i = 1; i < nPlanes; ++i)
-		{
-			double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
-			if (total < minTotal || (total < minTotal && i < iBest))
+			else 
 			{
-				minConcavity = jobs[i].m_concavity;
-				minBalance = jobs[i].m_balance;
-				minSymmetry = jobs[i].m_symmetry;
-				bestPlane = jobs[i].m_plane;
-				minTotal = total;
-				iBest = i;
+				PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
+				PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
+				m_commonData->m_onSurfacePSet->Clip(m_plane, right, left);
+				right->ComputeConvexHull(rightCH, m_commonData->m_convexhullDownsampling);
+				left->ComputeConvexHull(leftCH, m_commonData->m_convexhullDownsampling);
 			}
+
+			double volumeLeftCH = leftCH.ComputeVolume();
+			double volumeRightCH = rightCH.ComputeVolume();
+			
+			// compute clipped volumes
+			double volumeLeft = 0.0;
+			double volumeRight = 0.0;
+			
+			m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
+			
+			double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0);
+			double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0);
+			double concavity = (concavityLeft + concavityRight);
+			
+			// compute cost
+			m_concavity = concavity;
+			m_balance = m_commonData->m_alpha * fabs(volumeLeft - volumeRight) / m_commonData->m_me->m_volumeCH0;
+			double d = m_commonData->m_w * (m_commonData->m_preferredCuttingDirection[0] * m_plane.m_a + m_commonData->m_preferredCuttingDirection[1] * m_plane.m_b + m_commonData->m_preferredCuttingDirection[2] * m_plane.m_c);
+			m_symmetry = m_commonData->m_beta * d;
 		}
-	#else
 
-		bool cancel = false;
-		int32_t done = 0;
+		double m_concavity;
+		double m_balance;
+		double m_symmetry;
+		Plane m_plane;
+		CommonData* m_commonData;
+	};
 
-		SArray<Vec3<double> >* chPts = new SArray<Vec3<double> >[2];
-		Mesh* chs = new Mesh[2];
+	std::vector<BestClippingPlaneJob> jobs;
+	jobs.resize(nPlanes);
 
-		for (int32_t x = 0; x < nPlanes; ++x) {
-			int32_t threadID = 0;
-			if (!cancel) {
-				//Update progress
-				if (GetCancel()) {
-					cancel = true;
-				}
-				Plane plane = planes[x];
+	CommonData data(this, params);
+	data.m_w = w;
+	data.m_beta = beta;
+	data.m_alpha = alpha;
+	data.m_psets = psets;
+	data.m_inputPSet = inputPSet;
+	data.m_onSurfacePSet = onSurfacePSet;
+	data.m_preferredCuttingDirection = preferredCuttingDirection;
+	data.m_convexhullDownsampling = convexhullDownsampling;
+	for (int32_t i = 0; i < nPlanes; ++i)
+	{
+		jobs[i].m_plane = planes[i];
+		jobs[i].m_commonData = &data;
+		m_parallelQueue.PushTask(&jobs[i]);
+	}
+	m_parallelQueue.Sync();
 
-				Mesh& leftCH = chs[threadID];
-				Mesh& rightCH = chs[threadID + 1];
-				rightCH.ResizePoints(0);
-				leftCH.ResizePoints(0);
-				rightCH.ResizeTriangles(0);
-				leftCH.ResizeTriangles(0);
-
-	// compute convex-hulls
-	#ifdef TEST_APPROX_CH
-				double volumeLeftCH1;
-				double volumeRightCH1;
-	#endif //TEST_APPROX_CH
-				if (params.m_convexhullApproximation) {
-					SArray<Vec3<double> >& leftCHPts = chPts[threadID];
-					SArray<Vec3<double> >& rightCHPts = chPts[threadID + 1];
-					rightCHPts.Resize(0);
-					leftCHPts.Resize(0);
-					onSurfacePSet->Intersect(plane, &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
-					inputPSet->GetConvexHull().Clip(plane, rightCHPts, leftCHPts);
-					rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
-					leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-					#ifdef TEST_APPROX_CH
-						Mesh leftCH1;
-						Mesh rightCH1;
-						VoxelSet right;
-						VoxelSet left;
-						onSurfacePSet->Clip(plane, &right, &left);
-						right.ComputeConvexHull(rightCH1, convexhullDownsampling);
-						left.ComputeConvexHull(leftCH1, convexhullDownsampling);
-
-						volumeLeftCH1 = leftCH1.ComputeVolume();
-						volumeRightCH1 = rightCH1.ComputeVolume();
-					#endif //TEST_APPROX_CH
-				}
-				else {
-					PrimitiveSet* const right = psets[threadID];
-					PrimitiveSet* const left = psets[threadID + 1];
-					onSurfacePSet->Clip(plane, right, left);
-					right->ComputeConvexHull(rightCH, convexhullDownsampling);
-					left->ComputeConvexHull(leftCH, convexhullDownsampling);
-				}
-				double volumeLeftCH = leftCH.ComputeVolume();
-				double volumeRightCH = rightCH.ComputeVolume();
-
-				// compute clipped volumes
-				double volumeLeft = 0.0;
-				double volumeRight = 0.0;
-				inputPSet->ComputeClippedVolumes(plane, volumeRight, volumeLeft);
-
-				double concavityLeft = ComputeConcavity(volumeLeft, volumeLeftCH, m_volumeCH0);
-				double concavityRight = ComputeConcavity(volumeRight, volumeRightCH, m_volumeCH0);
-				double concavity = (concavityLeft + concavityRight);
-
-				// compute cost
-				double balance = alpha * fabs(volumeLeft - volumeRight) / m_volumeCH0;
-				double d = w * (preferredCuttingDirection[0] * plane.m_a + preferredCuttingDirection[1] * plane.m_b + preferredCuttingDirection[2] * plane.m_c);
-				double symmetry = beta * d;
-				double total = concavity + balance + symmetry;
-				{
-					if (total < minTotal || (total == minTotal && x < iBest)) {
-						minConcavity = concavity;
-						minBalance = balance;
-						minSymmetry = symmetry;
-						bestPlane = plane;
-						minTotal = total;
-						iBest = x;
-					}
-					++done;
-					if (!(done & 127)) // reduce update frequency
-					{
-						double progress = done * (progress1 - progress0) / nPlanes + progress0;
-						Update(m_stageProgress, progress, params);
-					}
-				}
-			}
+	iBest = 0;
+	minConcavity = jobs[0].m_concavity;
+	minBalance = jobs[0].m_balance;
+	minSymmetry = jobs[0].m_symmetry;
+	bestPlane = jobs[0].m_plane;
+	minTotal = jobs[0].m_concavity + jobs[0].m_balance + jobs[0].m_symmetry;
+	for (int32_t i = 1; i < nPlanes; ++i)
+	{
+		double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
+		if (total < minTotal || (total < minTotal && i < iBest))
+		{
+			minConcavity = jobs[i].m_concavity;
+			minBalance = jobs[i].m_balance;
+			minSymmetry = jobs[i].m_symmetry;
+			bestPlane = jobs[i].m_plane;
+			minTotal = total;
+			iBest = i;
 		}
-	#endif
+	}
 
 	#ifdef DEBUG_TEMP
 		timerComputeCost.Toc();
