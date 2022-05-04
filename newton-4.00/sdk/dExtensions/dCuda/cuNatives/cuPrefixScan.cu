@@ -26,7 +26,7 @@
 
 #include "cuPrefixScan.h"
 
-__global__ void cuPrefixScan(cuSceneInfo& info)
+__global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
@@ -44,14 +44,27 @@ __global__ void cuPrefixScan(cuSceneInfo& info)
 			offset += D_THREADS_PER_BLOCK;
 			__syncthreads();
 		}
+	}
+}
 
-		//if (threadId == 0)
-		//{
-		//	int newSize = histogram[bodyCount];
-		//	info.m_histogram.m_size = srcOffset;
-		//	info.m_bodyAabbCell.m_size = newSize;
-		//	info.m_bodyAabbCellScrath.m_size = newSize;
-		//}
+__global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		int threadId = threadIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size - 1;
+		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+
+		unsigned* histogram = info.m_histogram.m_array;
+		unsigned offset = D_THREADS_PER_BLOCK;
+
+		for (int i = 1; i < blocks; i++)
+		{
+			const unsigned sum = histogram[offset - 1];
+			histogram[offset + threadId] += sum;
+			offset += D_THREADS_PER_BLOCK;
+			__syncthreads();
+		}
 	}
 }
 
@@ -60,6 +73,5 @@ void CudaPrefixScan(ndCudaContext* const context)
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
 	cudaStream_t stream = context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
-
-	cuPrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
+	cuLinearNaivePrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 }

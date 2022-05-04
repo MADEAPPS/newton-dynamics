@@ -596,28 +596,35 @@ void ndWorldSceneCuda::InitBodyArray()
 	{
 		__shared__  cuBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
-		cuBoundingBox* bBoxOut = info.m_bodyAabbArray.m_array;
+		const cuBoundingBox* bBoxOut = info.m_bodyAabbArray.m_array;
 
-		int index = threadIdx.x;
+		const int threadId = threadIdx.x;
 		const int boxCount = info.m_bodyAabbArray.m_size;
-		if (index < boxCount)
+		const int aabbBlocks = boxCount / D_THREADS_PER_BLOCK;
+		const int boxLastRow = boxCount - aabbBlocks * D_THREADS_PER_BLOCK;
+
+		cacheAabb[threadId] = bBoxOut[0];
+		if (threadId < boxLastRow)
 		{
-			cacheAabb[index] = bBoxOut[index];
+			cacheAabb[threadId] = bBoxOut[aabbBlocks * D_THREADS_PER_BLOCK + threadId];
 		}
 		__syncthreads();
 
-		if (index >= boxCount)
+		unsigned base = 0;
+		for (int i = 0; i < aabbBlocks; i++)
 		{
-			cacheAabb[index] = cacheAabb[0];
+			cacheAabb[threadId].m_min = cacheAabb[threadId].m_min.Min(cacheAabb[base + threadId].m_min);
+			cacheAabb[threadId].m_max = cacheAabb[threadId].m_max.Min(cacheAabb[base + threadId].m_max);
+			base += D_THREADS_PER_BLOCK;
 		}
-		__syncthreads();
 
+		__syncthreads();
 		for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
 		{
-			if (index < i)
+			if (threadId < i)
 			{
-				cacheAabb[index].m_min = cacheAabb[index].m_min.Min(cacheAabb[index + i].m_min);
-				cacheAabb[index].m_max = cacheAabb[index].m_max.Max(cacheAabb[index + i].m_max);
+				cacheAabb[threadId].m_min = cacheAabb[threadId].m_min.Min(cacheAabb[threadId + i].m_min);
+				cacheAabb[threadId].m_max = cacheAabb[threadId].m_max.Max(cacheAabb[threadId + i].m_max);
 			}
 			__syncthreads();
 		}
@@ -628,11 +635,6 @@ void ndWorldSceneCuda::InitBodyArray()
 			cuVector maxBox((cacheAabb[0].m_max.Scale(D_CUDA_SCENE_INV_GRID_SIZE).Floor()).Scale(D_CUDA_SCENE_GRID_SIZE) + cuVector(D_CUDA_SCENE_GRID_SIZE));
 			minBox.w = 0.0f;
 			maxBox.w = 0.0f;
-			const cuVector sizeBox((maxBox - minBox).Scale(D_CUDA_SCENE_INV_GRID_SIZE));
-			info.m_hasUpperByteHash.x = (sizeBox.x >= 256);
-			info.m_hasUpperByteHash.y = (sizeBox.y >= 256);
-			info.m_hasUpperByteHash.z = (sizeBox.z >= 256);
-
 			info.m_worldBox.m_min = minBox;
 			info.m_worldBox.m_max = maxBox;
 		}

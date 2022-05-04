@@ -84,10 +84,6 @@ class cuSceneInfo
 		,m_frameIsValid(0)
 		,m_frameCount(0)
 	{
-		m_hasUpperByteHash.x = 0;
-		m_hasUpperByteHash.y = 0;
-		m_hasUpperByteHash.z = 0;
-		m_hasUpperByteHash.w = 0;
 	}
 
 	cuBoundingBox m_worldBox;
@@ -99,7 +95,6 @@ class cuSceneInfo
 	cuBuffer<cuSpatialVector> m_transformBuffer0;
 	cuBuffer<cuSpatialVector> m_transformBuffer1;
 	
-	int4 m_hasUpperByteHash;
 	unsigned m_frameIsValid;
 	unsigned m_frameCount;
 };
