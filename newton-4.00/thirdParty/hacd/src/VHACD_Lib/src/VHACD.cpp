@@ -423,11 +423,6 @@ namespace nd_
 			rightCH.ResizeTriangles(0);
 			leftCH.ResizeTriangles(0);
 			
-			// compute convex-hulls
-			#ifdef TEST_APPROX_CH
-			double volumeLeftCH1 = 0;
-			double volumeRightCH1 = 0;
-			#endif //TEST_APPROX_CH
 			if (m_commonData->m_params.m_convexhullApproximation)
 			{
 				SArray<Vec3<double> >& leftCHPts = m_commonData->chPts[threadId][0];
@@ -438,18 +433,6 @@ namespace nd_
 				m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
 				rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
 				leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-				#ifdef TEST_APPROX_CH
-					Mesh leftCH1;
-					Mesh rightCH1;
-					VoxelSet right;
-					VoxelSet left;
-					m_commonData->m_onSurfacePSet->Clip(plane, &right, &left);
-					right.ComputeConvexHull(rightCH1, m_commonData->m_convexhullDownsampling);
-					left.ComputeConvexHull(leftCH1, m_commonData->m_convexhullDownsampling);
-			
-					volumeLeftCH1 = leftCH1.ComputeVolume();
-					volumeRightCH1 = rightCH1.ComputeVolume();
-				#endif //TEST_APPROX_CH
 			}
 			else 
 			{
