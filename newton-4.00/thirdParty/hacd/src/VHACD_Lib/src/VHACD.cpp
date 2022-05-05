@@ -838,6 +838,11 @@ namespace nd_
 
 	void VHACD::MergeConvexHulls(const Parameters& params)
 	{
+		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
+		{
+			return;
+		}
+
 		if (GetCancel()) {
 			return;
 		}
@@ -875,6 +880,25 @@ namespace nd_
 					costMatrix[idx++] = ComputeConcavity(volume1 + m_convexHulls[p2]->ComputeVolume(), combinedCH.ComputeVolume(), m_volumeCH0);
 				}
 			}
+
+			//struct ConvexPair
+			//{
+			//	int m_p0;
+			//	int m_p1;
+			//	float m_cost;
+			//};
+			//SArray<ConvexPair> convexPairArray;
+			//convexPairArray.Resize(((nConvexHulls * nConvexHulls) - nConvexHulls) >> 1);
+			//int pairsCount = 0;
+			//for (int i = 1; i < nConvexHulls; ++i)
+			//{
+			//	for (int j = 0; j < i; ++j)
+			//	{
+			//		convexPairArray[pairsCount].m_p0 = i;
+			//		convexPairArray[pairsCount].m_p1 = j;
+			//		pairsCount++;
+			//	}
+			//}
 
 			// Until we cant merge below the maximum cost
 			size_t costSize = m_convexHulls.Size();
