@@ -841,7 +841,7 @@ namespace nd_
 	{
 		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
 		{
-//			return;
+			return;
 		}
 
 		if (GetCancel()) {
@@ -881,30 +881,23 @@ namespace nd_
 			int m_p1;
 		};
 
-
 		struct ConvexPair: public ConvexKey
 		{
 			ConvexPair()
 			{
 			}
-
+		
 			ConvexPair(int i0, int i1)
 				:ConvexKey(i0, i1)
 			{
 			}
-
+		
 			float m_cost;
 		};
 
-		//struct ConvexHullData
-		//{
-		//	int m_id;
-		//	Mesh* m_hull;
-		//};
-
 		std::set<ConvexKey> hullGraph;
 		SArray<ConvexPair> convexPairArray;
-		ndDownHeap<std::set<ConvexKey>::iterator, ConvexKey> priority(int (8 * m_convexHulls.Size() * m_convexHulls.Size()));
+		ndUpHeap<ConvexKey, float> priority(int (8 * m_convexHulls.Size() * m_convexHulls.Size()));
 
 		int pairsCount = 0;
 		convexPairArray.Resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
@@ -917,13 +910,32 @@ namespace nd_
 				convexPairArray[pairsCount].m_p0 = i;
 				convexPairArray[pairsCount].m_p1 = j;
 				pairsCount++;
-
-				//std::set<ConvexKey>::iterator it = hullGraph.find(key);
-				//priority.Push()
 			}
 		}
 
-#endif
+		size_t nConvexHulls = m_convexHulls.Size();
+		if (nConvexHulls > 1 && !m_cancel)
+		{
+			Mesh combinedCH;
+			SArray<Vec3<double> > pts;
+			for (int i = 0; i < pairsCount; i++)
+			{
+				ConvexPair& pair = convexPairArray[i];
+				const float volume0 = m_convexHulls[pair.m_p0]->ComputeVolume();
+				const float volume1 = m_convexHulls[pair.m_p1]->ComputeVolume();
+				ComputeConvexHull(m_convexHulls[pair.m_p0], m_convexHulls[pair.m_p1], pts, &combinedCH);
+				pair.m_cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+			}
+
+			for (int i = 0; i < pairsCount; i++)
+			{
+				ConvexPair& pair = convexPairArray[i];
+				priority.Push(pair, pair.m_cost);
+			}
+
+			int xxxx = 0;
+		}
+#else
 
 		// Get the current number of convex hulls
 		size_t nConvexHulls = m_convexHulls.Size();
@@ -1035,6 +1047,9 @@ namespace nd_
 				costMatrix.Resize(erase_idx);
 			}
 		}
+
+#endif
+
 		m_overallProgress = 99.0;
 		Update(100.0, 100.0, params);
 		m_timer.Toc();
