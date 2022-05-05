@@ -21,6 +21,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <set>
 #include <sstream>
 #include "vhacdConvexHull.h"
 #include "../public/VHACD.h"
@@ -840,7 +841,7 @@ namespace nd_
 	{
 		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
 		{
-			return;
+//			return;
 		}
 
 		if (GetCancel()) {
@@ -855,6 +856,74 @@ namespace nd_
 			msg << "+ " << m_stage << std::endl;
 			params.m_logger->Log(msg.str().c_str());
 		}
+
+#if 0
+		struct ConvexKey
+		{
+			ConvexKey()
+			{
+			}
+
+			ConvexKey(int i0, int i1)
+				:m_p0(min(i0, i1))
+				,m_p1(max(i0, i1))
+			{
+			}
+
+			bool operator< (const ConvexKey& key) const
+			{
+				int key0 = (m_p1 << 16) + m_p0;
+				int key1 = (key.m_p1 << 16) + key.m_p0;
+				return key0 < key1;
+			}
+
+			int m_p0;
+			int m_p1;
+		};
+
+
+		struct ConvexPair: public ConvexKey
+		{
+			ConvexPair()
+			{
+			}
+
+			ConvexPair(int i0, int i1)
+				:ConvexKey(i0, i1)
+			{
+			}
+
+			float m_cost;
+		};
+
+		//struct ConvexHullData
+		//{
+		//	int m_id;
+		//	Mesh* m_hull;
+		//};
+
+		std::set<ConvexKey> hullGraph;
+		SArray<ConvexPair> convexPairArray;
+		ndDownHeap<std::set<ConvexKey>::iterator, ConvexKey> priority(int (8 * m_convexHulls.Size() * m_convexHulls.Size()));
+
+		int pairsCount = 0;
+		convexPairArray.Resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
+		for (int i = 1; i < m_convexHulls.Size(); ++i)
+		{
+			for (int j = 0; j < i; ++j)
+			{
+				ConvexKey key(i, j);
+				hullGraph.insert(key);
+				convexPairArray[pairsCount].m_p0 = i;
+				convexPairArray[pairsCount].m_p1 = j;
+				pairsCount++;
+
+				//std::set<ConvexKey>::iterator it = hullGraph.find(key);
+				//priority.Push()
+			}
+		}
+
+#endif
 
 		// Get the current number of convex hulls
 		size_t nConvexHulls = m_convexHulls.Size();
@@ -880,25 +949,6 @@ namespace nd_
 					costMatrix[idx++] = ComputeConcavity(volume1 + m_convexHulls[p2]->ComputeVolume(), combinedCH.ComputeVolume(), m_volumeCH0);
 				}
 			}
-
-			//struct ConvexPair
-			//{
-			//	int m_p0;
-			//	int m_p1;
-			//	float m_cost;
-			//};
-			//SArray<ConvexPair> convexPairArray;
-			//convexPairArray.Resize(((nConvexHulls * nConvexHulls) - nConvexHulls) >> 1);
-			//int pairsCount = 0;
-			//for (int i = 1; i < nConvexHulls; ++i)
-			//{
-			//	for (int j = 0; j < i; ++j)
-			//	{
-			//		convexPairArray[pairsCount].m_p0 = i;
-			//		convexPairArray[pairsCount].m_p1 = j;
-			//		pairsCount++;
-			//	}
-			//}
 
 			// Until we cant merge below the maximum cost
 			size_t costSize = m_convexHulls.Size();
@@ -994,6 +1044,8 @@ namespace nd_
 			params.m_logger->Log(msg.str().c_str());
 		}
 	}
+
+
 	void VHACD::SimplifyConvexHull(Mesh* const ch, const size_t nvertices, const double minVolume)
 	{
 		if (nvertices <= 4) {

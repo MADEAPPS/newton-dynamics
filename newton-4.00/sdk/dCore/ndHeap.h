@@ -24,8 +24,8 @@
 *  Visual C++ 6.0 created by: Julio Jerez
 *
 ****************************************************************************/
-#ifndef __NDHeapBase__
-#define __NDHeapBase__
+#ifndef __D_HEAP_H__
+#define __D_HEAP_H__
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
@@ -77,53 +77,6 @@ class ndHeap : public ndClassAlloc
 	bool m_bufferIsOwnned;
 };
 
-template <class dKey>
-class ndUpHeapCompare
-{
-	public:
-	ndUpHeapCompare(dKey key)
-		:m_key(key)
-	{
-	}
-
-	bool operator> (const ndUpHeapCompare<dKey>& key) const
-	{
-		return m_key < key.m_key;
-	}
-
-	bool operator< (const ndUpHeapCompare<dKey>& key) const
-	{
-		return m_key > key.m_key;
-	}
-
-	bool operator<= (const ndUpHeapCompare<dKey>& key) const
-	{
-		return m_key >= key.m_key;
-	}
-
-	dKey m_key;
-};
-
-template <class dItem, class dKey>
-class ndUpHeap : public ndHeap<dItem, ndUpHeapCompare<dKey>>
-{
-	public:
-	ndUpHeap(ndInt32 maxElements)
-		:ndHeap<dItem, ndUpHeapCompare<dKey>>(maxElements)
-	{
-	}
-
-	ndUpHeap(const void * const buffer, ndInt32 sizeInBytes)
-		:ndHeap<dItem, ndUpHeapCompare<dKey>>(buffer, sizeInBytes)
-	{
-	}
-
-	dKey Value(ndInt32 i = 0) const
-	{
-		const ndUpHeapCompare<dKey> key(ndHeap<dItem, ndUpHeapCompare<dKey>>::Value(i));
-		return key.m_key;
-	}
-};
 
 
 // *************************
@@ -405,6 +358,55 @@ class ndDownHeap : public ndHeap<dItem, ndDownHeapCompare<dKey>>
 	dKey Value(ndInt32 i = 0) const
 	{
 		const ndDownHeapCompare<dKey> key(ndHeap<dItem, ndDownHeapCompare<dKey>>::Value(i));
+		return key.m_key;
+	}
+};
+
+
+template <class dKey>
+class ndUpHeapCompare
+{
+	public:
+	ndUpHeapCompare(dKey key)
+		:m_key(key)
+	{
+	}
+
+	bool operator> (const ndUpHeapCompare<dKey>& key) const
+	{
+		return m_key < key.m_key;
+	}
+
+	bool operator< (const ndUpHeapCompare<dKey>& key) const
+	{
+		return m_key > key.m_key;
+	}
+
+	bool operator<= (const ndUpHeapCompare<dKey>& key) const
+	{
+		return m_key >= key.m_key;
+	}
+
+	dKey m_key;
+};
+
+template <class dItem, class dKey>
+class ndUpHeap : public ndHeap<dItem, ndUpHeapCompare<dKey>>
+{
+	public:
+	ndUpHeap(ndInt32 maxElements)
+		:ndHeap<dItem, ndUpHeapCompare<dKey>>(maxElements)
+	{
+	}
+
+	ndUpHeap(const void* const buffer, ndInt32 sizeInBytes)
+		:ndHeap<dItem, ndUpHeapCompare<dKey>>(buffer, sizeInBytes)
+	{
+	}
+
+	dKey Value(ndInt32 i = 0) const
+	{
+		const ndUpHeapCompare<dKey> key(ndHeap<dItem, ndUpHeapCompare<dKey>>::Value(i));
 		return key.m_key;
 	}
 };

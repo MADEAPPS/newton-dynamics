@@ -70,6 +70,367 @@ namespace nd_
 			return x;
 		}
 
+		template <class dItem, class dKey>
+		class ndHeap
+		{
+			public:
+			ndHeap(int maxElements);
+			ndHeap(const void* const buffer, int sizeInBytes);
+			~ndHeap();
+
+			void Flush();
+			dKey MaxValue() const;
+			dKey Value(int i = 0) const;
+			int GetCount() const;
+			int GetMaxCount() const;
+			const dItem& operator[] (int i) const;
+			int Find(dItem& obj);
+			int Find(dKey key);
+
+			void Pop();
+			void Sort();
+			void Remove(int Index);
+			void Push(dItem& obj, dKey key);
+
+			protected:
+			struct dRecord
+			{
+				dRecord()
+				{
+				}
+
+				dRecord(dKey key, const dItem& obj)
+					:m_key(key)
+					,m_obj(obj)
+				{
+				}
+
+				dKey m_key;
+				dItem m_obj;
+			};
+
+			dRecord* m_pool;
+			int m_curCount;
+			int m_maxCount;
+			bool m_bufferIsOwnned;
+		};
+
+
+		// *************************
+		//
+		// implementation
+		//
+		// *************************
+
+		template <class dItem, class dKey>
+		ndHeap<dItem, dKey>::ndHeap(int maxElements)
+			:m_pool(new dRecord[maxElements])
+			,m_curCount(0)
+			,m_maxCount(maxElements)
+			,m_bufferIsOwnned(true)
+		{
+			Flush();
+		}
+
+		template <class dItem, class dKey>
+		ndHeap<dItem, dKey>::ndHeap(const void* const buffer, int sizeInBytes)
+			:m_pool((dRecord*)buffer)
+			,m_curCount(0)
+			,m_maxCount(int(sizeInBytes / sizeof(dRecord)))
+			,m_bufferIsOwnned(false)
+		{
+			Flush();
+		}
+
+		template <class dItem, class dKey>
+		ndHeap<dItem, dKey>::~ndHeap()
+		{
+			if (m_bufferIsOwnned)
+			{
+				//ndMemory::Free(m_pool);
+				delete[] m_pool;
+			}
+		}
+
+		template <class dItem, class dKey>
+		dKey ndHeap<dItem, dKey>::Value(int i) const
+		{
+			return m_pool[i].m_key;
+		}
+
+		template <class dItem, class dKey>
+		int ndHeap<dItem, dKey>::GetCount() const
+		{
+			return m_curCount;
+		}
+
+		template <class dItem, class dKey>
+		void ndHeap<dItem, dKey>::Flush()
+		{
+			m_curCount = 0;
+		}
+
+		template <class dItem, class dKey>
+		dKey ndHeap<dItem, dKey>::MaxValue() const
+		{
+			return m_pool[0].m_key;
+		}
+
+		template <class dItem, class dKey>
+		int ndHeap<dItem, dKey>::GetMaxCount() const
+		{
+			return m_maxCount;
+		}
+
+		template <class dItem, class dKey>
+		int ndHeap<dItem, dKey>::Find(dItem& obj)
+		{
+			// For now let perform a linear search
+			// this is efficient if the size of the heap is small
+			// ex: m_curCount < 32
+			// this will be change to a binary search in the heap should the 
+			// the size of the heap get larger than 32
+			//	dAssert (m_curCount <= 32);
+			for (int i = 0; i < m_curCount; i++)
+			{
+				if (m_pool[i].obj == obj)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		template <class dItem, class dKey>
+		int ndHeap<dItem, dKey>::Find(dKey key)
+		{
+			// ex: m_curCount < 32
+			// this will be change to a binary search in the heap should the 
+			// the size of the heap get larger than 32
+			dAssert(m_curCount <= 32);
+			for (int i = 0; i < m_curCount; i++)
+			{
+				if (m_pool[i].m_key == key)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		template <class dItem, class dKey>
+		const dItem& ndHeap<dItem, dKey>::operator[] (int i) const
+		{
+			dAssert(i <= m_curCount);
+			return m_pool[i].m_obj;
+		}
+
+		template <class dItem, class dKey>
+		void ndHeap<dItem, dKey>::Push(dItem& obj, dKey key)
+		{
+			ndHeap<dItem, dKey>::m_curCount++;
+
+			int i = ndHeap<dItem, dKey>::m_curCount;
+			for (int j = 0; i; i = j)
+			{
+				j = i >> 1;
+				if (!j || (ndHeap<dItem, dKey>::m_pool[j - 1].m_key > key))
+				{
+					break;
+				}
+				ndHeap<dItem, dKey>::m_pool[i - 1] = ndHeap<dItem, dKey>::m_pool[j - 1];
+			}
+			dAssert(i);
+			ndHeap<dItem, dKey>::m_pool[i - 1].m_key = key;
+			ndHeap<dItem, dKey>::m_pool[i - 1].m_obj = obj;
+
+			dAssert(SanityCheck());
+		}
+
+		template <class dItem, class dKey>
+		void ndHeap<dItem, dKey>::Pop()
+		{
+			Remove(0);
+		}
+
+		template <class dItem, class dKey>
+		void ndHeap<dItem, dKey>::Remove(int index)
+		{
+			ndHeap<dItem, dKey>::m_curCount--;
+			ndHeap<dItem, dKey>::m_pool[index] = ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount];
+			while (index && ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1].m_key < ndHeap<dItem, dKey>::m_pool[index].m_key)
+			{
+				dSwap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
+				index = (index - 1) >> 1;
+			}
+
+			while ((2 * index + 1) < ndHeap<dItem, dKey>::m_curCount)
+			{
+				int i0 = 2 * index + 1;
+				int i1 = 2 * index + 2;
+				if (i1 < ndHeap<dItem, dKey>::m_curCount)
+				{
+					i0 = (ndHeap<dItem, dKey>::m_pool[i0].m_key > ndHeap<dItem, dKey>::m_pool[i1].m_key) ? i0 : i1;
+					if (ndHeap<dItem, dKey>::m_pool[i0].m_key <= ndHeap<dItem, dKey>::m_pool[index].m_key)
+					{
+						break;
+					}
+					dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+					index = i0;
+				}
+				else
+				{
+					if (ndHeap<dItem, dKey>::m_pool[i0].m_key > ndHeap<dItem, dKey>::m_pool[index].m_key)
+					{
+						dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+					}
+					index = i0;
+				}
+			}
+			dAssert(SanityCheck());
+		}
+
+		template <class dItem, class dKey>
+		void ndHeap<dItem, dKey>::Sort()
+		{
+			int count = ndHeap<dItem, dKey>::m_curCount;
+			for (int i = 1; i < count; i++)
+			{
+				dKey key(ndHeap<dItem, dKey>::m_pool[0].m_key);
+				dItem obj(ndHeap<dItem, dKey>::m_pool[0].m_obj);
+
+				Pop();
+
+				ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount].m_key = key;
+				ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount].m_obj = obj;
+			}
+
+			ndHeap<dItem, dKey>::m_curCount = count;
+			for (int i = 0; i < count / 2; i++)
+			{
+				dKey key(ndHeap<dItem, dKey>::m_pool[i].m_key);
+				dItem obj(ndHeap<dItem, dKey>::m_pool[i].m_obj);
+
+				ndHeap<dItem, dKey>::m_pool[i].m_key = ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key;
+				ndHeap<dItem, dKey>::m_pool[i].m_obj = ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj;
+
+				ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key = key;
+				ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj = obj;
+			}
+			dAssert(SanityCheck());
+		}
+
+		// *****************************************
+		//
+		//  two typical instances of heaps, up and down.
+		//
+		// *****************************************
+		template <class dKey>
+		class ndDownHeapCompare
+		{
+			public:
+			ndDownHeapCompare()
+			{
+			}
+
+			ndDownHeapCompare(dKey key)
+				:m_key(key)
+			{
+			}
+
+			bool operator> (const ndDownHeapCompare<dKey>& key) const
+			{
+				return m_key > key.m_key;
+			}
+
+			bool operator< (const ndDownHeapCompare<dKey>& key) const
+			{
+				return m_key < key.m_key;
+			}
+
+			bool operator<= (const ndDownHeapCompare<dKey>& key) const
+			{
+				return m_key <= key.m_key;
+			}
+
+			dKey m_key;
+		};
+
+		template <class dItem, class dKey>
+		class ndDownHeap : public ndHeap<dItem, ndDownHeapCompare<dKey>>
+		{
+			public:
+			ndDownHeap(int maxElements)
+				:ndHeap<dItem, ndDownHeapCompare<dKey>>(maxElements)
+			{
+			}
+
+			ndDownHeap(const void* const buffer, int sizeInBytes)
+				:ndHeap<dItem, ndDownHeapCompare<dKey>>(buffer, sizeInBytes)
+			{
+			}
+
+			dKey Value(int i = 0) const
+			{
+				const ndDownHeapCompare<dKey> key(ndHeap<dItem, ndDownHeapCompare<dKey>>::Value(i));
+				return key.m_key;
+			}
+		};
+
+
+		template <class dKey>
+		class ndUpHeapCompare
+		{
+			public:
+			ndUpHeapCompare()
+			{
+			}
+
+			ndUpHeapCompare(dKey key)
+				:m_key(key)
+			{
+			}
+
+			bool operator> (const ndUpHeapCompare<dKey>& key) const
+			{
+				return m_key < key.m_key;
+			}
+
+			bool operator< (const ndUpHeapCompare<dKey>& key) const
+			{
+				return m_key > key.m_key;
+			}
+
+			bool operator<= (const ndUpHeapCompare<dKey>& key) const
+			{
+				return m_key >= key.m_key;
+			}
+
+			dKey m_key;
+		};
+
+		template <class dItem, class dKey>
+		class ndUpHeap : public ndHeap<dItem, ndUpHeapCompare<dKey>>
+		{
+			public:
+			ndUpHeap(int maxElements)
+				:ndHeap<dItem, ndUpHeapCompare<dKey>>(maxElements)
+			{
+			}
+
+			ndUpHeap(const void* const buffer, int sizeInBytes)
+				:ndHeap<dItem, ndUpHeapCompare<dKey>>(buffer, sizeInBytes)
+			{
+			}
+
+			dKey Value(int i = 0) const
+			{
+				const ndUpHeapCompare<dKey> key(ndHeap<dItem, ndUpHeapCompare<dKey>>::Value(i));
+				return key.m_key;
+			}
+		};
+
+
 		template<class T>
 		class List
 		{
