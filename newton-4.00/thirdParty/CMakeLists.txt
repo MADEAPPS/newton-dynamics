@@ -10,7 +10,10 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-add_subdirectory(hacdNew)
+if(NEWTON_TEST_NEW_V_HACD)
+	add_subdirectory(hacdNew)
+endif(NEWTON_TEST_NEW_V_HACD)
+
 add_subdirectory(openFBX/src)
 add_subdirectory(hacd/src/VHACD_Lib)
 

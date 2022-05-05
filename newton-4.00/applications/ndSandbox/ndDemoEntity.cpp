@@ -14,7 +14,7 @@
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"
 
-#define USE_OLD_HACD
+//#define USE_OLD_HACD
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 
@@ -408,16 +408,16 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 		meshPoints.PushBack(p);
 	}
 
-#ifdef USE_OLD_HACD
+#ifdef _D_USE_NEW_HACD
+	lowDetail = 0;
+	VHACD::IVHACD* const interfaceVHACD = ndCreateVHACD();
+	VHACD::IVHACD::Parameters paramsVHACD;
+	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+#else
 	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
 	nd_::VHACD::IVHACD::Parameters paramsVHACD;
 	//paramsVHACD.m_resolution = 400000;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
-	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
-#else
-	lowDetail = 0;
-	VHACD::IVHACD* const interfaceVHACD = ndCreateVHACD();
-	VHACD::IVHACD::Parameters paramsVHACD;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 #endif
 
@@ -429,10 +429,11 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 	ndArray<ndVector> convexMeshPoints;
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
-#ifdef USE_OLD_HACD
-		nd_::VHACD::IVHACD::ConvexHull ch;
-#else
+#ifdef _D_USE_NEW_HACD
 		VHACD::IVHACD::ConvexHull ch;
+		
+#else
+		nd_::VHACD::IVHACD::ConvexHull ch;
 #endif
 		interfaceVHACD->GetConvexHull(i, ch);
 		convexMeshPoints.SetCount(ch.m_nPoints);
