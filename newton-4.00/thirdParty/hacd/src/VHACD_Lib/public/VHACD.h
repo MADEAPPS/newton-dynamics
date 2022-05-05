@@ -76,7 +76,7 @@ namespace nd_
 				Parameters(void) { Init(); }
 				void Init(void)
 				{
-					m_resolution = 100000;
+					m_resolution = 400000;
 					m_concavity = 0.001;
 					m_concavityToVolumeWeigh = 1.0f;
 					m_planeDownsampling = 4;

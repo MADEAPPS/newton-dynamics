@@ -14,7 +14,6 @@
 #include "ndDemoEntity.h"
 #include "ndAnimationPose.h"
 
-//#define USE_OLD_HACD
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 
@@ -416,7 +415,6 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 #else
 	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
 	nd_::VHACD::IVHACD::Parameters paramsVHACD;
-	//paramsVHACD.m_resolution = 400000;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 #endif
