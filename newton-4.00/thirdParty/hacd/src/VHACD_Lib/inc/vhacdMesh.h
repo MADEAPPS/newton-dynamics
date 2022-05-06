@@ -115,6 +115,8 @@ namespace nd_
 			//! Destructor.
 			~Mesh(void);
 
+			Mesh(const Mesh& src);
+
 			private:
 			SArray<Vec3<double> > m_points;
 			SArray<Vec3<int32_t> > m_triangles;

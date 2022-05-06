@@ -858,6 +858,12 @@ namespace nd_
 		}
 
 #if 0
+		struct ConvexProxy
+		{
+			Mesh* m_hull;
+			int m_id;
+		};
+
 		struct ConvexKey
 		{
 			ConvexKey()
@@ -865,8 +871,8 @@ namespace nd_
 			}
 
 			ConvexKey(int i0, int i1)
-				:m_p0(min(i0, i1))
-				,m_p1(max(i0, i1))
+				:m_p0(Min(i0, i1))
+				,m_p1(Max(i0, i1))
 			{
 			}
 
@@ -895,8 +901,10 @@ namespace nd_
 			float m_cost;
 		};
 
+		
 		std::set<ConvexKey> hullGraph;
 		std::vector<ConvexPair> convexPairArray;
+		std::vector<ConvexProxy> convexProxyArray;
 		ndUpHeap<ConvexKey, float> priority(int(8 * m_convexHulls.Size() * m_convexHulls.Size()));
 
 		class MergeConvexJob : public Job
@@ -921,7 +929,6 @@ namespace nd_
 				}
 			}
 
-
 			ConvexPair* m_pairs;
 			Mesh** m_convexHulls;
 			double m_volumeCH0;
@@ -932,14 +939,21 @@ namespace nd_
 
 		int pairsCount = 0;
 		convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
-		for (int i = 1; i < m_convexHulls.Size(); ++i)
+
+		for (int i = 0; i < m_convexHulls.Size(); ++i)
+		{
+			convexProxyArray.push_back(ConvexProxy());
+			convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[0]);
+			convexProxyArray[i].m_id = i;
+		}
+
+		for (int i = 1; i < convexProxyArray.size(); ++i)
 		{
 			for (int j = 0; j < i; ++j)
 			{
 				ConvexKey key(i, j);
 				hullGraph.insert(key);
-				convexPairArray[pairsCount].m_p0 = i;
-				convexPairArray[pairsCount].m_p1 = j;
+				convexPairArray[pairsCount] = ConvexPair(i, j);
 				pairsCount++;
 			}
 		}
@@ -969,27 +983,43 @@ namespace nd_
 				priority.Push(pair, pair.m_cost);
 			}
 
+			SArray<Vec3<double> > pts;
 			while ((nConvexHulls > params.m_maxConvexHulls) && priority.GetCount())
 			{
 				ConvexKey key(priority[0]);
-				if (hullGraph.find(key) != hullGraph.end())
+				std::set<ConvexKey>::iterator it = hullGraph.find(key);
+				if (it != hullGraph.end())
 				{
-					hullGraph.erase(key);
-					for (int i = key.m_p1 + 1; i < m_convexHulls.Size(); i++)
+					hullGraph.erase(it);
+					for (int i = 0; i < convexProxyArray.size(); i++)
 					{
-						ConvexKey key1(key.m_p0, i);
-						hullGraph.erase(key1);
+						if (convexProxyArray[i].m_hull)
+						{
+							ConvexKey key0(key.m_p0, i);
+							hullGraph.erase(key0);
+
+							ConvexKey key1(key.m_p1, i);
+							hullGraph.erase(key1);
+						}
 					}
 
-					for (int i = 0; i < key.m_p0; i++)
-					{
-						ConvexKey key1(i, key.m_p1);
-						hullGraph.erase(key1);
-					}
+					Mesh* const newHull = new Mesh();
+					int index = int(convexProxyArray.size());
+					ComputeConvexHull(convexProxyArray[key.m_p0].m_hull, convexProxyArray[key.m_p1].m_hull, pts, newHull);
+					convexProxyArray.push_back(ConvexProxy());
+					convexProxyArray[index].m_hull = newHull;
+					convexProxyArray[index].m_id = index;
+					delete convexProxyArray[key.m_p0].m_hull;
+					delete convexProxyArray[key.m_p1].m_hull;
+					convexProxyArray[key.m_p0].m_hull = nullptr;
+					convexProxyArray[key.m_p1].m_hull = nullptr;
+
+					nConvexHulls--;
 				}
 				priority.Pop();
 			}
 
+			int xxxxx = 1;
 			
 		}
 #else

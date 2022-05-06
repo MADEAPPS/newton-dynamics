@@ -38,6 +38,20 @@ namespace nd_
 		{
 		}
 
+		Mesh::Mesh(const Mesh& src)
+		{
+			size_t nV = src.m_points.Size();
+			size_t nT = src.m_triangles.Size();
+			for (size_t v = 0; v < nV; v++) 
+			{
+				m_points.PushBack(src.m_points[v]);
+			}
+			for (size_t f = 0; f < nT; f++) 
+			{
+				m_triangles.PushBack(m_triangles[f]);
+			}
+		}
+
 		double Mesh::ComputeVolume() const
 		{
 			const size_t nV = GetNPoints();
