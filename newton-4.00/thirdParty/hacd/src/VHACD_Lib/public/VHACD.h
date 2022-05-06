@@ -78,6 +78,7 @@ namespace nd_
 				{
 					m_resolution = 400000;
 					m_concavity = 0.001;
+					m_minMergeToleranace = 0.5e-3f;
 					m_concavityToVolumeWeigh = 1.0f;
 					m_planeDownsampling = 4;
 					m_convexhullDownsampling = 4;
@@ -90,7 +91,8 @@ namespace nd_
 					m_callback = 0;
 					m_logger = 0;
 					m_convexhullApproximation = true;
-					m_maxConvexHulls = 1024;
+					//m_maxConvexHulls = 1024;
+					m_maxConvexHulls = 128;
 					// This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
 					//m_projectHullVertices = true; 
 					m_projectHullVertices = false;
@@ -100,6 +102,7 @@ namespace nd_
 				double m_alpha;
 				double m_beta;
 				double m_minVolumePerCH;
+				double m_minMergeToleranace;
 				IUserCallback* m_callback;
 				IUserLogger* m_logger;
 				uint32_t m_resolution;

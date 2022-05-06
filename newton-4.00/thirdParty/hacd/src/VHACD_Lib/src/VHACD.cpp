@@ -839,11 +839,6 @@ namespace nd_
 
 	void VHACD::MergeConvexHulls(const Parameters& params)
 	{
-		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
-		{
-//			return;
-		}
-
 		if (GetCancel()) {
 			return;
 		}
@@ -857,7 +852,7 @@ namespace nd_
 			params.m_logger->Log(msg.str().c_str());
 		}
 
-#if 0
+#if 1
 		struct ConvexProxy
 		{
 			Mesh* m_hull;
@@ -900,7 +895,6 @@ namespace nd_
 		
 			float m_cost;
 		};
-
 		
 		std::set<ConvexKey> hullGraph;
 		std::vector<ConvexPair> convexPairArray;
@@ -943,7 +937,7 @@ namespace nd_
 		for (int i = 0; i < m_convexHulls.Size(); ++i)
 		{
 			convexProxyArray.push_back(ConvexProxy());
-			convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[0]);
+			convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[i]);
 			convexProxyArray[i].m_id = i;
 		}
 
@@ -980,11 +974,15 @@ namespace nd_
 			for (int i = 0; i < pairsCount; i++)
 			{
 				ConvexPair& pair = convexPairArray[i];
-				priority.Push(pair, pair.m_cost);
+				if (pair.m_cost < (2.0f * params.m_minMergeToleranace))
+				{
+					priority.Push(pair, pair.m_cost);
+				}
 			}
 
+			Mesh combinedCH;
 			SArray<Vec3<double> > pts;
-			while ((nConvexHulls > params.m_maxConvexHulls) && priority.GetCount())
+			while (((nConvexHulls > params.m_maxConvexHulls) || (priority.Value() <= params.m_minMergeToleranace)) && priority.GetCount())
 			{
 				ConvexKey key(priority[0]);
 				std::set<ConvexKey>::iterator it = hullGraph.find(key);
@@ -1014,15 +1012,44 @@ namespace nd_
 					convexProxyArray[key.m_p0].m_hull = nullptr;
 					convexProxyArray[key.m_p1].m_hull = nullptr;
 
+					const float volume0 = newHull->ComputeVolume();
+					for (int i = 0; i < convexProxyArray.size() - 1; i++)
+					{
+						if (convexProxyArray[i].m_hull)
+						{
+							ConvexPair pair(i, index);
+							const float volume1 = convexProxyArray[i].m_hull->ComputeVolume();
+							ComputeConvexHull(newHull, convexProxyArray[i].m_hull, pts, &combinedCH);
+							float cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+							priority.Push(pair, cost);
+						}
+					}
+
 					nConvexHulls--;
 				}
 				priority.Pop();
 			}
+	
+			for (int i = int (m_convexHulls.Size()-1); i >= 0; --i)
+			{
+				delete m_convexHulls[i];
+				m_convexHulls.PopBack();
+			}
 
-			int xxxxx = 1;
-			
+			for (int i = 0; i < convexProxyArray.size(); i++)
+			{
+				if (convexProxyArray[i].m_hull)
+				{
+					m_convexHulls.PushBack(convexProxyArray[i].m_hull);
+				}
+			}
 		}
 #else
+
+		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
+		{
+			//			return;
+		}
 
 		// Get the current number of convex hulls
 		size_t nConvexHulls = m_convexHulls.Size();

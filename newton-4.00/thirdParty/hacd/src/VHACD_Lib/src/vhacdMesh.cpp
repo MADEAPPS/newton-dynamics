@@ -48,7 +48,7 @@ namespace nd_
 			}
 			for (size_t f = 0; f < nT; f++) 
 			{
-				m_triangles.PushBack(m_triangles[f]);
+				m_triangles.PushBack(src.m_triangles[f]);
 			}
 		}
 
