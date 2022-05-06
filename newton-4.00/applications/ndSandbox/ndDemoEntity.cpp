@@ -415,7 +415,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 #else
 	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
 	nd_::VHACD::IVHACD::Parameters paramsVHACD;
-	//paramsVHACD.m_maxConvexHulls = 24;
+	paramsVHACD.m_maxConvexHulls = 24;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
 #endif
@@ -430,7 +430,6 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 	{
 #ifdef _D_USE_NEW_HACD
 		VHACD::IVHACD::ConvexHull ch;
-		
 #else
 		nd_::VHACD::IVHACD::ConvexHull ch;
 #endif

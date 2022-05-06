@@ -70,6 +70,27 @@ namespace nd_
 			return x;
 		}
 
+		template <class T>
+		inline T Min(T A, T B)
+		{
+			return (A < B) ? A : B;
+		}
+
+		template <class T>
+		inline T Max(T A, T B)
+		{
+			return (A > B) ? A : B;
+		}
+
+		template <class T>
+		inline void Swap(T& A, T& B)
+		{
+			T tmp(A);
+			A = B;
+			B = tmp;
+		}
+
+
 		template <class dItem, class dKey>
 		class ndHeap
 		{
@@ -254,7 +275,7 @@ namespace nd_
 			ndHeap<dItem, dKey>::m_pool[index] = ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount];
 			while (index && ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1].m_key < ndHeap<dItem, dKey>::m_pool[index].m_key)
 			{
-				dSwap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
+				Swap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
 				index = (index - 1) >> 1;
 			}
 
@@ -269,14 +290,14 @@ namespace nd_
 					{
 						break;
 					}
-					dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+					Swap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
 					index = i0;
 				}
 				else
 				{
 					if (ndHeap<dItem, dKey>::m_pool[i0].m_key > ndHeap<dItem, dKey>::m_pool[index].m_key)
 					{
-						dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+						Swap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
 					}
 					index = i0;
 				}
@@ -822,20 +843,6 @@ namespace nd_
 			static Googol m_three;
 			static Googol m_half;
 		};
-
-		template <class T>
-		inline T Max(T A, T B)
-		{
-			return (A > B) ? A : B;
-		}
-
-		template <class T>
-		inline void Swap(T& A, T& B)
-		{
-			T tmp(A);
-			A = B;
-			B = tmp;
-		}
 
 		template <class T, class dCompareKey>
 		void Sort(T* const array, int elements)

@@ -841,7 +841,7 @@ namespace nd_
 	{
 		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
 		{
-			return;
+//			return;
 		}
 
 		if (GetCancel()) {
@@ -896,11 +896,42 @@ namespace nd_
 		};
 
 		std::set<ConvexKey> hullGraph;
-		SArray<ConvexPair> convexPairArray;
-		ndUpHeap<ConvexKey, float> priority(int (8 * m_convexHulls.Size() * m_convexHulls.Size()));
+		std::vector<ConvexPair> convexPairArray;
+		ndUpHeap<ConvexKey, float> priority(int(8 * m_convexHulls.Size() * m_convexHulls.Size()));
+
+		class MergeConvexJob : public Job
+		{
+			public:
+				MergeConvexJob()
+				:Job()
+			{
+			}
+
+			void Execute(int)
+			{
+				Mesh combinedCH;
+				SArray<Vec3<double> > pts;
+				for (int i = 0; i < m_pairsCount; i++)
+				{
+					ConvexPair& pair = m_pairs[i];
+					const float volume0 = m_convexHulls[pair.m_p0]->ComputeVolume();
+					const float volume1 = m_convexHulls[pair.m_p1]->ComputeVolume();
+					ComputeConvexHull(m_convexHulls[pair.m_p0], m_convexHulls[pair.m_p1], pts, &combinedCH);
+					pair.m_cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+				}
+			}
+
+
+			ConvexPair* m_pairs;
+			Mesh** m_convexHulls;
+			double m_volumeCH0;
+			int m_pairsCount;
+		};
+
+		MergeConvexJob jobBashes[VHACD_WORKERS_THREADS * 4 + 1];
 
 		int pairsCount = 0;
-		convexPairArray.Resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
+		convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
 		for (int i = 1; i < m_convexHulls.Size(); ++i)
 		{
 			for (int j = 0; j < i; ++j)
@@ -916,16 +947,21 @@ namespace nd_
 		size_t nConvexHulls = m_convexHulls.Size();
 		if (nConvexHulls > 1 && !m_cancel)
 		{
-			Mesh combinedCH;
-			SArray<Vec3<double> > pts;
-			for (int i = 0; i < pairsCount; i++)
+			int bashSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
+			for (int32_t j = 0; j <= VHACD_WORKERS_THREADS * 4; j ++)
 			{
-				ConvexPair& pair = convexPairArray[i];
-				const float volume0 = m_convexHulls[pair.m_p0]->ComputeVolume();
-				const float volume1 = m_convexHulls[pair.m_p1]->ComputeVolume();
-				ComputeConvexHull(m_convexHulls[pair.m_p0], m_convexHulls[pair.m_p1], pts, &combinedCH);
-				pair.m_cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+				int i = j * bashSize;
+				int count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
+				if (count > 0)
+				{
+					jobBashes[j].m_pairs = &convexPairArray[i];
+					jobBashes[j].m_pairsCount = count;
+					jobBashes[j].m_volumeCH0 = m_volumeCH0;
+					jobBashes[j].m_convexHulls = &m_convexHulls[0];
+					m_parallelQueue.PushTask(&jobBashes[j]);
+				}
 			}
+			m_parallelQueue.Sync();
 
 			for (int i = 0; i < pairsCount; i++)
 			{
@@ -933,7 +969,28 @@ namespace nd_
 				priority.Push(pair, pair.m_cost);
 			}
 
-			int xxxx = 0;
+			while ((nConvexHulls > params.m_maxConvexHulls) && priority.GetCount())
+			{
+				ConvexKey key(priority[0]);
+				if (hullGraph.find(key) != hullGraph.end())
+				{
+					hullGraph.erase(key);
+					for (int i = key.m_p1 + 1; i < m_convexHulls.Size(); i++)
+					{
+						ConvexKey key1(key.m_p0, i);
+						hullGraph.erase(key1);
+					}
+
+					for (int i = 0; i < key.m_p0; i++)
+					{
+						ConvexKey key1(i, key.m_p1);
+						hullGraph.erase(key1);
+					}
+				}
+				priority.Pop();
+			}
+
+			
 		}
 #else
 
