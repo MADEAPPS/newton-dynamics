@@ -72,7 +72,7 @@ __global__ void cuPaddBuffer(cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
-		int threadId = threadIdx.x;
+		const int threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		const unsigned lastBlock = D_PREFIX_SCAN_PASSES * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
@@ -88,6 +88,29 @@ __global__ void cuPaddBuffer(cuSceneInfo& info)
 	}
 }
 
+__global__ void cuPrefixScanAddBlocks(cuSceneInfo& info, int bit)
+{
+	if (info.m_frameIsValid)
+	{
+		const int blockId = blockIdx.x;
+		const int threadId = threadIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		const unsigned superBlockCount = (D_PREFIX_SCAN_PASSES / 2) * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
+		if (blockId < superBlockCount)
+		{
+			unsigned* histogram = info.m_histogram.m_array;
+			const int stride = 1 << bit;
+			const int mask = 2 * stride;
+			const int blockBase = D_THREADS_PER_BLOCK * blockId / mask;
+			const int blockFrac = D_THREADS_PER_BLOCK * (blockId & (mask-1));
+			const int halfStrideBlock = D_THREADS_PER_BLOCK * stride;
+			const unsigned value = histogram[blockBase + halfStrideBlock - 1];
+			histogram[blockBase + halfStrideBlock + blockFrac + threadId] += value;
+		}
+	}
+}
+
 void CudaPrefixScan(ndCudaContext* const context)
 {
 	cudaStream_t stream = context->m_solverComputeStream;
@@ -96,6 +119,14 @@ void CudaPrefixScan(ndCudaContext* const context)
 	cuLinearNaivePrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 #else
 	cuPaddBuffer << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
+
+	const ndInt32 threads = context->m_histogram.GetCount();
+	const ndInt32 bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	const ndInt32 histogramBlocks = D_PREFIX_SCAN_PASSES * ((bodyBlocksCount + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
+	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
+	{
+		cuPrefixScanAddBlocks << <histogramBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, i);
+	}
 #endif
 
 }
