@@ -30,7 +30,7 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
-		int threadId = threadIdx.x;
+		const int threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
@@ -51,24 +51,36 @@ __global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
-		int threadId = threadIdx.x;
+		const int threadId = threadIdx.x;
+		const int blockId = blockIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		const unsigned superBlocks = (blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES;
 
 		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = D_THREADS_PER_BLOCK;
+		unsigned offset = D_PREFIX_SCAN_ALIGN;
+		const unsigned dstOffset = blockId * D_THREADS_PER_BLOCK;
 
-		for (int i = 1; i < blocks; i++)
-		{
-			const unsigned sum = histogram[offset - 1];
-			histogram[offset + threadId] += sum;
-			offset += D_THREADS_PER_BLOCK;
-			__syncthreads();
-		}
+		//for (int i = 1; i < superBlocks; i++)
+		//{
+		//	const unsigned sum = histogram[offset - 1];
+		//	histogram[offset + dstOffset + threadId] += sum;
+		//	offset += D_PREFIX_SCAN_ALIGN;
+		//	__syncthreads();
+		//}
+		//
+		//for (int i = 1; i < superBlocks; i++)
+		//{
+		//	const unsigned sum = histogram[offset - 1];
+		//	histogram[offset + dstOffset + threadId] += sum;
+		//	offset += D_PREFIX_SCAN_ALIGN;
+		//	__syncthreads();
+		//}
+
 	}
 }
 
-__global__ void cuPaddBuffer(cuSceneInfo& info)
+__global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
@@ -88,7 +100,7 @@ __global__ void cuPaddBuffer(cuSceneInfo& info)
 	}
 }
 
-__global__ void cuPrefixScanAddBlocks(cuSceneInfo& info, int bit)
+__global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 {
 	if (info.m_frameIsValid)
 	{
@@ -118,15 +130,16 @@ void CudaPrefixScan(ndCudaContext* const context)
 #if 0
 	cuLinearNaivePrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 #else
-	cuPaddBuffer << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
+	cuHillisSteelePaddBuffer << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 
 	const ndInt32 threads = context->m_histogram.GetCount();
 	const ndInt32 bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	const ndInt32 histogramBlocks = D_PREFIX_SCAN_PASSES * ((bodyBlocksCount + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
 	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
 	{
-		cuPrefixScanAddBlocks << <histogramBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, i);
+		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, i);
 	}
+	cuHillisSteelePrefixScan << <D_PREFIX_SCAN_PASSES, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 #endif
 
 }
