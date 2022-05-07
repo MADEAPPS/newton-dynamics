@@ -99,8 +99,8 @@ void glatter_check_error_GL(const char* file, int line)
 {
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        printf("GLATTER: in '%s'(%d):\n", file, line);
-        printf("GLATTER: OpenGL call produced %s error.\n", enum_to_string_GL(err));
+        GLATTER_PRINTF("GLATTER: in '%s'(%d):\n", file, line);
+        GLATTER_PRINTF("GLATTER: OpenGL call produced %s error.\n", enum_to_string_GL(err));
     }
 }
 
@@ -131,7 +131,7 @@ int x_error_handler(Display *dsp, XErrorEvent *error)
 {
     char error_string[128];
     XGetErrorText(dsp, error->error_code, error_string, 128);
-    printf("X Error: %s\n", error_string);
+    GLATTER_PRINTF("X Error: %s\n", error_string);
     return 0;
 }
 #endif //!defined(GLATTER_DO_NOT_INSTALL_X_ERROR_HANDLER)
@@ -189,7 +189,7 @@ void glatter_check_error_WGL(const char* file, int line)
         FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
         eid, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, NULL);
 
-    printf("GLATTER: WGL call produced the following error in %s(%d):\n%s\t", file, line, buffer);
+    GLATTER_PRINTF("GLATTER: WGL call produced the following error in %s(%d):\n%s\t", file, line, buffer);
 
     LocalFree(buffer);
 }
@@ -219,7 +219,7 @@ void glatter_check_error_EGL(const char* file, int line)
 {
     EGLint err = eglGetError();
     if (err != EGL_SUCCESS) {
-        printf("GLATTER: EGL call produced %s error in %s(%d)\n",
+        GLATTER_PRINTF("GLATTER: EGL call produced %s error in %s(%d)\n",
             enum_to_string_EGL(err), file, line);
     }
 }
@@ -276,12 +276,13 @@ void glatter_pre_callback(const char* file, int line)
 {
     static int initialized = 0;
 #if defined(_WIN32)
-    //static __declspec(thread) DWORD thread_id;
-	#if (defined (__MINGW32__) || defined (__MINGW64__))
-		static __thread DWORD thread_id;
-	#else
-		static __declspec(thread) DWORD thread_id;
-	#endif
+
+#if defined(__MINGW32__)
+    static __thread DWORD thread_id;
+#else
+    static __declspec(thread) DWORD thread_id;
+#endif
+
     if (!initialized) {
         thread_id = GetCurrentThreadId();
         initialized = 1;
@@ -296,7 +297,7 @@ void glatter_pre_callback(const char* file, int line)
     pthread_t current_thread = pthread_self();
 #endif
     if (current_thread != thread_id) {
-        printf("GLATTER: Calling OpenGL from a different thread, in %s(%d)\n", file, line);
+        GLATTER_PRINTF("GLATTER: Calling OpenGL from a different thread, in %s(%d)\n", file, line);
     }
 }
 
@@ -317,11 +318,7 @@ Printable get_prs(size_t sz, void* obj)
         sz = 16;
 
     for (size_t i=0; i<sz; i++) {
-		#ifdef GLATTER_WGL
-			_snprintf(&ret.data[i*3], sizeof(ret)-3*i-1," %02x", (unsigned char) *(((char*)obj)+i) );
-		#else 
-			snprintf(&ret.data[i*3], sizeof(ret)-3*i-1," %02x", (unsigned char) *(((char*)obj)+i) );
-		#endif
+        snprintf(&ret.data[i*3], sizeof(ret)-3*i-1," %02x", (unsigned char) *(((char*)obj)+i) );
     }
     
     ret.data[0     ] = '[';
@@ -395,11 +392,11 @@ typedef struct glatter_es_record_struct
 
     #define GLATTER_DBLOCK(file, line, name, printf_fmt, ...) \
         glatter_pre_callback(file, line);\
-        printf("GLATTER: in '%s'(%d):\n", file, line);\
-        printf("GLATTER: " #name printf_fmt "\n",##__VA_ARGS__);
+        GLATTER_PRINTF("GLATTER: in '%s'(%d):\n", file, line);\
+        GLATTER_PRINTF("GLATTER: " #name printf_fmt "\n",##__VA_ARGS__);
 
     #define GLATTER_RBLOCK(...)\
-        printf("GLATTER: returned " __VA_ARGS__);
+        GLATTER_PRINTF("GLATTER: returned " __VA_ARGS__);
 
 #else
 

@@ -1,5 +1,5 @@
-#ifndef __GLATTER_PLATFORM_HEADERS_H__
-#define __GLATTER_PLATFORM_HEADERS_H__
+#ifndef GLATTER_PLATFORM_HEADERS_H_DEFINED
+#define GLATTER_PLATFORM_HEADERS_H_DEFINED
 
 // When introducing a new platform, this file needs to be modified.
 
@@ -17,14 +17,20 @@
     defined(GLATTER_EGL_GLES_3_0) 	+\
     defined(GLATTER_EGL_GLES_3_1) 	+\
     defined(GLATTER_EGL_GLES_3_2)   > 1
-    
+
     #error Multiple platforms defined.
-    
+
 #endif
 
 
 #if defined(_WIN32)
-    #include <windows.h>
+    #ifndef NOMINMAX
+    #define NOMINMAX
+    #endif
+    #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+    #endif
+    #include <Windows.h>
 #elif defined (__linux__)
     #include <pthread.h>
     #include <dlfcn.h>
@@ -42,7 +48,7 @@
     #if defined(GLATTER_GLU)
         #include "headers/windows_gl_basic/GLU.h"
     #endif
-    
+
     #if defined(GLATTER_GLX) || defined(GLATTER_EGL)
         #error One of the wrappers defined are not relevant to the selected platform. Please review your glatter_config.h.
     #endif
@@ -114,11 +120,11 @@
         #include "headers/khronos_gles2/gl2ext.h"
 
     #endif
-    
+
     #if defined(GLATTER_GLX) || defined(GLATTER_WGL)
         #error One of the wrappers defined are not relevant to the selected platform. Please review your glatter_config.h.
     #endif
-    
+
 #endif
 
 

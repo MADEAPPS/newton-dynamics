@@ -23,8 +23,8 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __GLATTER_H__
-#define __GLATTER_H__
+#ifndef GLATTER_H_DEFINED
+#define GLATTER_H_DEFINED
 
 #include "glatter_config.h"
 #include "glatter_platform_headers.h"
@@ -35,6 +35,7 @@ extern "C" {
 
 #elif defined (GLATTER_HEADER_ONLY)
 
+    // this can be modified in glatter_config.h
     #error GLATTER_HEADER_ONLY can only be used in C++
 
 #endif //__cplusplus

@@ -28,6 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 typedef union glatter_extension_support_status_union_GLX
 {
     int inexed_extensions[67];
@@ -101,6 +106,11 @@ typedef union glatter_extension_support_status_union_GLX
         int has_GLX_SUN_get_transparent_index;
     };
 } glatter_extension_support_status_GLX_t;
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 
 #define glatter_GLX_3DFX_multisample glatter_get_extension_support_GLX().has_GLX_3DFX_multisample

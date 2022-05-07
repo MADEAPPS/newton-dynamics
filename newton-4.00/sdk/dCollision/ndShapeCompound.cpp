@@ -468,6 +468,17 @@ ndShapeInfo ndShapeCompound::GetShapeInfo() const
 	return info;
 }
 
+//void DebugShape(ndShapeCompound* const shapeInstance)
+//{
+//	const ndShapeCompound::ndTreeArray& shapeList = shapeInstance->GetTree();
+//	ndShapeCompound::ndTreeArray::Iterator iter(shapeList);
+//	for (iter.Begin(); iter; iter++)
+//	{
+//		ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
+//		/// do what you wnat here
+//	}
+//}
+
 void ndShapeCompound::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	ndTreeArray::Iterator iter(m_array);

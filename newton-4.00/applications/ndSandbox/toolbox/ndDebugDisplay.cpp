@@ -9,9 +9,6 @@
 * freely
 */
 
-// dGeometry.cpp: implementation of the dGeometry class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"

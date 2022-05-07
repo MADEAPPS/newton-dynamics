@@ -28,6 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 typedef union glatter_extension_support_status_union_GL
 {
     int inexed_extensions[591];
@@ -625,6 +630,11 @@ typedef union glatter_extension_support_status_union_GL
         int has_GL_WIN_specular_fog;
     };
 } glatter_extension_support_status_GL_t;
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 
 #define glatter_GL_3DFX_multisample glatter_get_extension_support_GL().has_GL_3DFX_multisample

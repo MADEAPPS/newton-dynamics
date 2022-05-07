@@ -28,6 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 typedef union glatter_extension_support_status_union_EGL
 {
     int inexed_extensions[125];
@@ -159,6 +164,11 @@ typedef union glatter_extension_support_status_union_EGL
         int has_EGL_TIZEN_image_native_surface;
     };
 } glatter_extension_support_status_EGL_t;
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 
 #define glatter_EGL_ANDROID_blob_cache glatter_get_extension_support_EGL().has_EGL_ANDROID_blob_cache

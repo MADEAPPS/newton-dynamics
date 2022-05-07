@@ -27,6 +27,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#endif
+
 GLATTER_INLINE_OR_NOT
 const char* enum_to_string_EGL(GLenum e)
 {
@@ -937,4 +942,7 @@ const char* enum_to_string_EGL(GLenum e)
     return "<UNKNOWN ENUM>";
 }
 
+#ifdef _MSC_VER
+#pragma warning(pop) 
+#endif
 

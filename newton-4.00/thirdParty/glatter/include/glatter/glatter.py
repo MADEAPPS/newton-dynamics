@@ -858,6 +858,11 @@ def get_enum_to_string(family):
     if family not in enum_to_string:
         return
     rv = '''
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#endif
+
 GLATTER_INLINE_OR_NOT
 const char* enum_to_string_''' + family  + '''(GLenum e)
 {
@@ -914,7 +919,11 @@ const char* enum_to_string_''' + family  + '''(GLenum e)
     }
     return "<UNKNOWN ENUM>";
 }
-\n'''
+
+#ifdef _MSC_VER
+#pragma warning(pop) 
+#endif
+'''
     return rv
 
 
@@ -926,6 +935,11 @@ def get_ext_support_decl(v):
 
     rv = '''
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 typedef union glatter_extension_support_status_union_''' + v + '''
 {
     int inexed_extensions[''' + str(len(ext_names_sorted[v])) + '''];
@@ -933,6 +947,11 @@ typedef union glatter_extension_support_status_union_''' + v + '''
 ''' + '\n'.join(['        int has_'+ x + ';' for x in ext_names_sorted[v]]) + '''
     };
 } glatter_extension_support_status_''' + v + '''_t;
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 
 ''' + '\n'.join([('#define glatter_' + x + ' glatter_get_extension_support_'+ v +'().has_' + x) for x in ext_names_sorted[v]]) + '''
@@ -960,10 +979,18 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
     static glatter_extension_support_status_''' + v + '''_t ess;
 
     typedef glatter_es_record_t rt;
+#ifdef __cplusplus
+    static const rt zrt = {0, 0};
+#else
+#define zrt {0, 0}
+#endif
 ''' + '\n'.join(['    static rt e' +   '{: <4x}'.format(x)  + '[] = {{' + '}, {'.join(
         str([y, ext_hash_to_full_hash[v][x][y]]).translate({ord(c): None for c in '[]'}) \
-            for y in ext_hash_to_full_hash[v][x]) + '}, 0};' for x in ext_hash_to_full_hash[v]]) + '''
+            for y in ext_hash_to_full_hash[v][x]) + '}, zrt};' for x in ext_hash_to_full_hash[v]]) + '''
 
+#ifndef __cplusplus
+#undef zrt
+#endif
 
     static glatter_es_record_t* es_dispatch[GLATTER_LOOKUP_SIZE] = {
         ''' + hts[:-1] + '''

@@ -349,7 +349,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
  * Create an RGB, double-buffered window.
  * Return the window and context handles.
  */
-static void make_window(LPCWSTR name, int x, int y, int width, int height) {
+static void make_window(LPCSTR name, int x, int y, int width, int height) {
     GLuint PixelFormat;
     WNDCLASS wc;
     DWORD dwExStyle, dwStyle;
@@ -480,7 +480,7 @@ main(int argc, char *argv[])
     }
 
 
-    make_window(L"wglgears", 0, 0, 300, 300);
+    make_window("wglgears", 0, 0, 300, 300);
     reshape(300, 300);
 
     wglSwapIntervalEXT(0);

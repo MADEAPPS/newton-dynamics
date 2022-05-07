@@ -28,6 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 typedef union glatter_extension_support_status_union_WGL
 {
     int inexed_extensions[55];
@@ -89,6 +94,11 @@ typedef union glatter_extension_support_status_union_WGL
         int has_WGL_OML_sync_control;
     };
 } glatter_extension_support_status_WGL_t;
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 
 #define glatter_WGL_3DFX_multisample glatter_get_extension_support_WGL().has_WGL_3DFX_multisample
