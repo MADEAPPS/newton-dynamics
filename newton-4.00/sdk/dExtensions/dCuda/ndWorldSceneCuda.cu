@@ -421,7 +421,7 @@ bool ndWorldSceneCuda::SanityCheck() const
 		}
 
 		static ndArray<unsigned> histogram;
-		histogram.SetCount(info.m_bodyArray.m_size);
+		histogram.SetCount(info.m_histogram.m_size);
 
 		cudaStatus = cudaMemcpy(&histogram[0], info.m_histogram.m_array, histogram.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
 		dAssert(cudaStatus == cudaSuccess);
