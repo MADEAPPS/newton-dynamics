@@ -34,6 +34,20 @@ class ndSkeletonContainer
 	~ndSkeletonContainer();
 
 	protected:
+	class ndOrdinal
+	{
+		public:
+		ndOrdinal()
+		{
+			for (ndInt32 i = 0; i < sizeof(m_sourceJacobianIndex); ++i)
+			{
+				m_sourceJacobianIndex[i] = ndInt8(i);
+			}
+		}
+		
+		ndInt8 m_sourceJacobianIndex[12];
+	};
+
 	class ndNodePair
 	{
 		public:
@@ -93,15 +107,10 @@ class ndSkeletonContainer
 		ndNode* m_parent;
 		ndNode* m_child;
 		ndNode* m_sibling;
-		union
-		{
-			ndInt64 m_ordinals;
-			ndInt8 m_sourceJacobianIndex[8];
-		};
 		ndInt32 m_index;
-		ndInt16 m_dof;
-		ndInt16 m_swapJacobianBodiesIndex;
-		static ndInt64 m_ordinalInit;
+		ndOrdinal m_ordinal;
+		ndInt8 m_dof;
+		ndInt8 m_swapJacobianBodiesIndex;
 	};
 
 	class ndNodeList : public ndList<ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >

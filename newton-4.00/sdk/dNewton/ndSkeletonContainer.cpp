@@ -30,7 +30,7 @@
 
 #define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * ndFloat32 (0.25f))
 
-ndInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x0706050403020100ll;
+//ndInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x0706050403020100ll;
 
 ndSkeletonContainer::ndNode::ndNode()
 	:m_body(nullptr)
@@ -38,8 +38,8 @@ ndSkeletonContainer::ndNode::ndNode()
 	,m_parent(nullptr)
 	,m_child(nullptr)
 	,m_sibling(nullptr)
-	,m_ordinals(0)
 	,m_index(0)
+	,m_ordinal()
 	,m_dof(0)
 	,m_swapJacobianBodiesIndex(0)
 {
@@ -105,7 +105,8 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 	{
 		for (ndInt32 i = 0; i < m_dof; ++i) 
 		{
-			const ndInt32 k = m_sourceJacobianIndex[i];
+			//const ndInt32 k = m_sourceJacobianIndex[i];
+			const ndInt32 k = m_ordinal.m_sourceJacobianIndex[i];
 			const ndRightHandSide* const rhs = &rightHandSide[start + k];
 			const ndLeftHandSide* const row = &leftHandSide[start + k];
 			jointMass[i] = zero;
@@ -124,7 +125,7 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 	{
 		for (ndInt32 i = 0; i < m_dof; ++i) 
 		{
-			const ndInt32 k = m_sourceJacobianIndex[i];
+			const ndInt32 k = m_ordinal.m_sourceJacobianIndex[i];
 			const ndRightHandSide* const rhs = &rightHandSide[start + k];
 			const ndLeftHandSide* const row = &leftHandSide[start + k];
 			jointMass[i] = zero;
@@ -231,7 +232,8 @@ ndInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftH
 	CalculateInertiaMatrix(bodyMassArray);
 
 	ndInt32 boundedDof = 0;
-	m_ordinals = m_ordinalInit;
+	//m_ordinals = m_ordinalInit;
+	m_ordinal = ndOrdinal();
 
 	if (m_joint) 
 	{
@@ -241,7 +243,7 @@ ndInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftH
 		const ndInt32 first = m_joint->m_rowStart;
 		for (ndInt32 i = 0; i < count; ++i) 
 		{
-			ndInt32 k = m_sourceJacobianIndex[i];
+			ndInt32 k = m_ordinal.m_sourceJacobianIndex[i];
 			const ndRightHandSide* const rhs = &rightHandSide[k + first];
 			if ((rhs->m_lowerBoundFrictionCoefficent <= ndFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= ndFloat32(D_MAX_SKELETON_LCP_VALUE))) 
 			{
@@ -249,7 +251,7 @@ ndInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftH
 			}
 			else 
 			{
-				dSwap(m_sourceJacobianIndex[i], m_sourceJacobianIndex[count - 1]);
+				dSwap(m_ordinal.m_sourceJacobianIndex[i], m_ordinal.m_sourceJacobianIndex[count - 1]);
 				i--;
 				count--;
 			}
@@ -875,7 +877,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		const ndInt32 first = joint->m_rowStart;
 		for (ndInt32 j = 0; j < primaryDof; ++j)  
 		{
-			const ndInt32 index = node->m_sourceJacobianIndex[j];
+			const ndInt32 index = node->m_ordinal.m_sourceJacobianIndex[j];
 			m_pairs[primaryIndex].m_m0 = m0;
 			m_pairs[primaryIndex].m_m1 = m1;
 			m_pairs[primaryIndex].m_joint = joint;
@@ -887,7 +889,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		const ndInt32 auxiliaryDof = joint->m_rowCount - primaryDof;
 		for (ndInt32 j = 0; j < auxiliaryDof; ++j)  
 		{
-			const ndInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
+			const ndInt32 index = node->m_ordinal.m_sourceJacobianIndex[primaryDof + j];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + index];
 
 			m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
@@ -1058,7 +1060,7 @@ inline void ndSkeletonContainer::CalculateJointAccel(const ndJacobian* const int
 
 		for (ndInt32 j = 0; j < dof; ++j)  
 		{
-			const ndInt32 k = node->m_sourceJacobianIndex[j];
+			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
 			ndVector diag(
@@ -1100,7 +1102,7 @@ inline void ndSkeletonContainer::UpdateForces(ndJacobian* const internalForces, 
 		const ndInt32 count = node->m_dof;
 		for (ndInt32 j = 0; j < count; ++j)  
 		{
-			const ndInt32 k = node->m_sourceJacobianIndex[j];
+			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 
 			ndVector jointForce = ndFloat32(f[j]);
@@ -1483,7 +1485,7 @@ void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const i
 
 		for (ndInt32 j = 0; j < dof; ++j)
 		{
-			const ndInt32 k = node->m_sourceJacobianIndex[j];
+			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			//const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
 			//ndVector diag(
@@ -1528,7 +1530,7 @@ inline void ndSkeletonContainer::UpdateForcesImmediate(ndBodyKinematic** const b
 		const ndInt32 count = node->m_dof;
 		for (ndInt32 j = 0; j < count; ++j)
 		{
-			const ndInt32 k = node->m_sourceJacobianIndex[j];
+			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 
 			ndVector jointForce = ndFloat32(f[j]);
