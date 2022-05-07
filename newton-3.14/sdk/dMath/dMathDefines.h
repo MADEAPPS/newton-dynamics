@@ -19,7 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <malloc.h>
+#ifdef _MSC_VER
+  #include <malloc.h>
+#endif
 
 #ifdef _MSC_VER
 	#include <windows.h>
