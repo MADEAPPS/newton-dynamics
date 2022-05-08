@@ -157,10 +157,13 @@ class dSimpleIndustrialRobot : public ndModel
 
 						m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 
-						ndFloat32 relaxation = 0.001f;
+						ndFloat32 relaxation = 0.005f;
 						m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
 						m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
+
+						m_effector->SetMaxForce(4000.0f);
+						m_effector->SetMaxTorque(1000.0f);
 
 						// the effector is part of the rig
 						world->AddJoint(m_effector);
@@ -362,7 +365,8 @@ class dSimpleIndustrialRobot : public ndModel
 		ImGui::Text("position x");
 		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
 		ImGui::Text("position y");
-		change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
+		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
+		change = change | ImGui::SliderFloat("##y", &m_y, -2.5f, 2.0f);
 		ImGui::Text("azimuth");
 		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
 

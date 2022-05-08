@@ -20,9 +20,11 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
+	,m_angularMaxTorque(D_LCP_MAX_VALUE)
 	,m_angularRegularizer(ndFloat32(5.0e-3f))
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
+	,m_linearMaxForce(D_LCP_MAX_VALUE)
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
@@ -35,9 +37,11 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_targetFrame(dGetIdentityMatrix())
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
+	,m_angularMaxTorque(D_LCP_MAX_VALUE)
 	,m_angularRegularizer(ndFloat32(5.0e-3f))
 	,m_linearSpring(ndFloat32(1000.0f))
 	,m_linearDamper(ndFloat32(50.0f))
+	,m_linearMaxForce(D_LCP_MAX_VALUE)
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
@@ -53,11 +57,13 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	//m_maxAngle = xmlGetFloat (xmlNode, "maxAngle");
 	//m_angularSpring = xmlGetFloat (xmlNode, "angularSpring");
 	//m_angularDamper = xmlGetFloat (xmlNode, "angularDamper");
+	//m_angularMaxTorque = xmlGetFloat (xmlNode, "angularMaxTorque");
 	//m_angularRegularizer = xmlGetFloat (xmlNode, "angularRegularizer");
 	//
 	//m_maxDist = xmlGetFloat(xmlNode, "maxDist");
 	//m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
 	//m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
+	//m_linearMaxForce = xmlGetFloat (xmlNode, "linearMaxForce");
 	//m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
 	//
 	//m_targetPosit.m_w = ndFloat32(1.0f);
@@ -85,11 +91,13 @@ void ndIk6DofEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	//xmlSaveParam(childNode, "maxAngle", m_maxAngle);
 	//xmlSaveParam(childNode, "angularSpring", m_angularSpring);
 	//xmlSaveParam(childNode, "angularDamper", m_angularDamper);
+	//xmlSaveParam(childNode, "angularMaxTorque", m_angularMaxTorque);
 	//xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
 	//
 	//xmlSaveParam(childNode, "maxDist", m_maxDist);
 	//xmlSaveParam(childNode, "linearSpring", m_linearSpring);
 	//xmlSaveParam(childNode, "linearDamper", m_linearDamper);
+	//xmlSaveParam(childNode, "linearMaxForce", m_linearMaxForce);
 	//xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
@@ -121,6 +129,26 @@ ndMatrix ndIk6DofEffector::GetOffsetMatrix() const
 void ndIk6DofEffector::SetOffsetMatrix(const ndMatrix& matrix)
 {
 	m_targetFrame = matrix;
+}
+
+ndFloat32 ndIk6DofEffector::GetMaxForce() const
+{
+	return m_linearMaxForce;
+}
+
+void ndIk6DofEffector::SetMaxForce(ndFloat32 force)
+{
+	m_linearMaxForce = dAbs(force);
+}
+
+ndFloat32 ndIk6DofEffector::GetMaxTorque() const
+{
+	return m_angularMaxTorque;
+}
+
+void ndIk6DofEffector::SetMaxTorque(ndFloat32 torque)
+{
+	m_angularMaxTorque = dAbs(torque);
 }
 
 void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -178,43 +206,47 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 
 		const ndMatrix basis(pin);
 		const ndFloat32 dirMag = ndSqrt(dirMag2);
-		const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
+		//const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
+		const ndFloat32 angle = ndAtan2(dirMag, rotation.m_w);
 		AddAngularRowJacobian(desc, basis[0], angle);
+#if 0
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+#else
 		const ndInt32 index = desc.m_rowsCount - 1;
 		const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 		const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 		const ndFloat32 relOmega = (jacobian0.m_angular * omega0 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-		//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, -angle, m_linearDamper * 0.01f, relOmega);
 		const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, -angle, m_linearDamper, relOmega);
 		desc.m_diagonalRegularizer[index] = m_linearRegularizer;
 		SetMotorAcceleration(desc, accel);
-		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+#endif
+		SetLowerFriction(desc, -m_angularMaxTorque);
+		SetHighFriction(desc, m_angularMaxTorque);
 
 		AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
+		SetLowerFriction(desc, -m_angularMaxTorque);
+		SetHighFriction(desc, m_angularMaxTorque);
+
 		AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
+		SetLowerFriction(desc, -m_angularMaxTorque);
+		SetHighFriction(desc, m_angularMaxTorque);
 	}
 	else
 	{
-		//const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-		//AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
-		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-		//
-		//const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
-		//AddAngularRowJacobian(desc, matrix1[1], yawAngle);
-		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-		//
-		//const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
-		//AddAngularRowJacobian(desc, matrix1[2], rollAngle);
-		//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-
 		AddAngularRowJacobian(desc, matrix1[0], ndFloat32 (0.0f));
 		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
+		SetLowerFriction(desc, -m_angularMaxTorque);
+		SetHighFriction(desc, m_angularMaxTorque);
 
 		AddAngularRowJacobian(desc, matrix1[1], ndFloat32(0.0f));
 		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
+		SetLowerFriction(desc, -m_angularMaxTorque);
+		SetHighFriction(desc, m_angularMaxTorque);
 
 		AddAngularRowJacobian(desc, matrix1[2], ndFloat32(0.0f));
 		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
+		SetLowerFriction(desc, -m_angularMaxTorque);
+		SetHighFriction(desc, m_angularMaxTorque);
 	}
 }
 
@@ -245,22 +277,22 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const ndMatrix& axisDir = matrix1;
-	//const ndMatrix axisDir(dGetIdentityMatrix());
-
-#if 0
-	ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+	const ndVector posit0(matrix0.m_posit);
+	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
+	
+#if 1
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		if (m_controlDofOptions & (1 << i))
 		{
 			const ndVector pin = axisDir[i];
-			AddLinearRowJacobian(desc, matrix0.m_posit, posit1, pin);
-			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+			AddLinearRowJacobian(desc, posit0, posit1, pin);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper*2.0f);
+			SetLowerFriction(desc, -m_linearMaxForce);
+			SetHighFriction(desc, m_linearMaxForce);
 		}
 	}
 #else
-	const ndVector posit0(matrix0.m_posit);
-	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 
 	const ndBodyKinematic* const body0 = GetBody0();
 	const ndBodyKinematic* const body1 = GetBody1();
@@ -276,20 +308,15 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 		{
 			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, posit0, posit1, pin);
-			//AddLinearRowJacobian(desc, posit0, posit0, pin);
-
 			const ndInt32 index = desc.m_rowsCount - 1;
 			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 			const ndFloat32 relPosit = (jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
 			const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-			//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, relPosit, m_linearDamper * 0.01f, relVeloc);
-			//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring * 10.0f, relPosit, m_linearDamper * 0.01f, relVeloc) + desc.m_velocityAccel[index];
 			const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
-			
-			//const ndFloat32 accel = GetMotorZeroAcceleration(desc) - 1.0f * relPosit * desc.m_invTimestep * desc.m_invTimestep;
-			//desc.m_diagonalRegularizer[index] = m_linearRegularizer;
 			SetMotorAcceleration(desc, accel);
+			SetLowerFriction(desc, -m_linearMaxForce);
+			SetHighFriction(desc, m_linearMaxForce);
 		}
 	}
 #endif

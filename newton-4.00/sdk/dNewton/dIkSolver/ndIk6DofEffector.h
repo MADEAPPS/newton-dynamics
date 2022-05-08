@@ -41,8 +41,15 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	
 	D_NEWTON_API void SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
+	
 	D_NEWTON_API void SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
+
+	D_NEWTON_API ndFloat32 GetMaxForce() const;
+	D_NEWTON_API void SetMaxForce(ndFloat32 force);
+	
+	D_NEWTON_API ndFloat32 GetMaxTorque() const;
+	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -56,10 +63,12 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	ndMatrix m_targetFrame;
 	ndFloat32 m_angularSpring;
 	ndFloat32 m_angularDamper;
+	ndFloat32 m_angularMaxTorque;
 	ndFloat32 m_angularRegularizer;
 	
 	ndFloat32 m_linearSpring;
 	ndFloat32 m_linearDamper;
+	ndFloat32 m_linearMaxForce;
 	ndFloat32 m_linearRegularizer;
 
 	ndRotationType m_rotationType;

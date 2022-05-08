@@ -27,7 +27,7 @@
 #include "ndConstraint.h"
 #include "ndBodyKinematic.h"
 
-#define ND_BILATERAL_CONTRAINT_DOF	8
+#define ND_BILATERAL_CONTRAINT_DOF	12
 #define ND_MAX_STOP_ACCEL			ndFloat32 (1000.0f)
 
 enum ndJointBilateralSolverModel
