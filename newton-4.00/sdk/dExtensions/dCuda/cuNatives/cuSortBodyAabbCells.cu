@@ -326,6 +326,6 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellTmp.GetCount());
 	
 	CountingSortBodyCells(context, 0);
-	CountingSortBodyCells(context, 1);
-	CountingSortBodyCells(context, 2);
+	//CountingSortBodyCells(context, 1);
+	//CountingSortBodyCells(context, 2);
 }

@@ -440,7 +440,7 @@ bool ndWorldSceneCuda::SanityCheckSortCells() const
 			bool yTest1 = key0.m_y == key1.m_y;
 			bool xTest = key0.m_x <= key1.m_x;
 			bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
-			//test = xTest;
+			test = xTest;
 			//test = key0.m_y <= key1.m_y;
 			//test = yTest0 | (yTest1 & xTest);
 			dAssert(test);
@@ -753,25 +753,27 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto EndGridHash = [] __device__(cuSceneInfo& info)
 	{
+		const unsigned* histogram = info.m_histogram.m_array;
 		cuBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
-		const int index = info.m_bodyAabbCellScrath.m_size;
+		//const int index = info.m_bodyAabbCellScrath.m_size;
+		const unsigned index = info.m_bodyArray.m_size;
+		const unsigned size = histogram[index];
 
 		cuBodyAabbCell hash;
-		hash = hashArray[index - 1];
+		hash = hashArray[size - 1];
 		hash.m_id = unsigned (-1);
 		hash.m_z = hash.m_z + 1;
-		hashArray[index] = hash;
+		hashArray[size] = hash;
 
-		//info.m_histogram.m_size = index + 1;
-		info.m_bodyAabbCell.m_size = index + 1;
-		info.m_bodyAabbCellScrath.m_size = index + 1;
-		if ((index + 1) >= info.m_bodyAabbCell.m_capacity)
+		info.m_bodyAabbCell.m_size = size + 1;
+		info.m_bodyAabbCellScrath.m_size = size + 1;
+		if ((size + 1) >= info.m_bodyAabbCell.m_capacity)
 		{
 			info.m_frameIsValid = 0;
 		}
 
 		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK;
-		const int histogrameSize = prefixScanSuperBlockAlign * ((index + prefixScanSuperBlockAlign) / prefixScanSuperBlockAlign) + prefixScanSuperBlockAlign;
+		const int histogrameSize = prefixScanSuperBlockAlign * ((size + prefixScanSuperBlockAlign) / prefixScanSuperBlockAlign) + prefixScanSuperBlockAlign;
 		if (histogrameSize >= info.m_histogram.m_capacity)
 		{
 			info.m_frameIsValid = 0;
