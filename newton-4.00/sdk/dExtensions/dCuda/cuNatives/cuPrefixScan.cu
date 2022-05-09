@@ -50,9 +50,9 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 {
 	const unsigned itemsCount = info.m_histogram.m_size;
-	const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockDim.x;
-	const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
-	if ((alignedItemsCount + D_PREFIX_SCAN_ALIGN) > info.m_histogram.m_capacity)
+	const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
+	const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
+	if ((alignedItemsCount + prefixScanSuperBlockAlign) > info.m_histogram.m_capacity)
 	{
 		if (threadIdx.x == 0)
 		{
@@ -83,8 +83,8 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 	{
 		const unsigned blockId = blockIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockDim.x;
-		const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
 		const unsigned blocks = ((alignedItemsCount + blockDim.x - 1) / blockDim.x);
 		if (blockId < blocks)
 		{
@@ -122,28 +122,26 @@ __global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
 		const unsigned blockId = blockIdx.x;
 		const unsigned threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockDim.x;
-		const unsigned superBlockCount = (itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN;
+		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned superBlockCount = (itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
 
 		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = blockId * blockDim.x + D_PREFIX_SCAN_ALIGN;
-		const unsigned superBlockOffset = superBlockCount * D_PREFIX_SCAN_ALIGN;
+		unsigned offset = blockId * blockDim.x + prefixScanSuperBlockAlign;
+		const unsigned superBlockOffset = superBlockCount * prefixScanSuperBlockAlign;
 
 		unsigned value = histogram[superBlockOffset];
 		for (int i = 1; i < superBlockCount; i++)
 		{
 			histogram[offset + threadId] += value;
 			value += histogram[superBlockOffset + i];
-			offset += D_PREFIX_SCAN_ALIGN;
+			offset += prefixScanSuperBlockAlign;
 		}
 	}
 }
 
 
-//void CudaPrefixScan(ndCudaContext* const context, int blockSize)
-void CudaPrefixScan(ndCudaContext* const context)
+void CudaPrefixScan(ndCudaContext* const context, int blockSize)
 {
-	int blockSize = D_THREADS_PER_BLOCK;
 	cudaStream_t stream = context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
 #if 0
@@ -152,8 +150,8 @@ void CudaPrefixScan(ndCudaContext* const context)
 	cuHillisSteelePaddBuffer << <1, blockSize, 0, stream >> > (*infoGpu);
 
 	const ndInt32 threads = context->m_histogram.GetCount();
-	const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockSize;
-	const ndInt32 superBlocks = (threads + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN;
+	const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockSize;
+	const ndInt32 superBlocks = (threads + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
 	const ndInt32 histogramBlocks = D_PREFIX_SCAN_PASSES * superBlocks;
 
 #if 0
@@ -165,7 +163,7 @@ void CudaPrefixScan(ndCudaContext* const context)
 			for (unsigned threadId = 0; threadId < 1; threadId++)
 			{
 				const unsigned itemsCount = context->m_histogram.GetCount();
-				const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+				const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
 				const unsigned blocks = ((alignedItemsCount + blockSize - 1) / blockSize);
 				if (blockID < blocks)
 				{
@@ -180,7 +178,7 @@ void CudaPrefixScan(ndCudaContext* const context)
 					{
 						if (threadId == (blockSize - 1))
 						{
-							const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+							const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
 							unsigned dstBlock = blockID / D_PREFIX_SCAN_PASSES_BITS;
 						}
 					}

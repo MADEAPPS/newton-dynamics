@@ -32,9 +32,8 @@
 
 #define D_PREFIX_SCAN_PASSES_BITS	4
 #define D_PREFIX_SCAN_PASSES		(1<<D_PREFIX_SCAN_PASSES_BITS)
-#define D_PREFIX_SCAN_ALIGN____		(D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK)
 
-void CudaPrefixScan(ndCudaContext* const context);
+void CudaPrefixScan(ndCudaContext* const context, int blockSize);
 
 
 #endif

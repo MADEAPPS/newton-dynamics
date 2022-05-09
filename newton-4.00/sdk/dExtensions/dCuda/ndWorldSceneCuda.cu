@@ -770,7 +770,8 @@ void ndWorldSceneCuda::InitBodyArray()
 			info.m_frameIsValid = 0;
 		}
 
-		const int histogrameSize = D_PREFIX_SCAN_ALIGN____ * ((index + D_PREFIX_SCAN_ALIGN____) / D_PREFIX_SCAN_ALIGN____) + D_PREFIX_SCAN_ALIGN____;
+		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK;
+		const int histogrameSize = prefixScanSuperBlockAlign * ((index + prefixScanSuperBlockAlign) / prefixScanSuperBlockAlign) + prefixScanSuperBlockAlign;
 		if (histogrameSize >= info.m_histogram.m_capacity)
 		{
 			info.m_frameIsValid = 0;
@@ -818,7 +819,8 @@ void ndWorldSceneCuda::InitBodyArray()
 			if (index < cellCount)
 			{
 				unsigned* scan = info.m_histogram.m_array;
-				const unsigned offset = (cellCount + D_PREFIX_SCAN_ALIGN____) & (-D_PREFIX_SCAN_ALIGN____);
+				const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK;
+				const unsigned offset = (cellCount + prefixScanSuperBlockAlign) & (-prefixScanSuperBlockAlign);
 				scan[offset + index] = cacheBuffer[threadId1];
 			}
 		}
@@ -834,7 +836,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
 	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-	CudaPrefixScan(m_context);
+	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
 dAssert(SanityCheckPrefix());
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
