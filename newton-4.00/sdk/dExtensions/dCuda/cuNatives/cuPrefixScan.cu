@@ -47,55 +47,31 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 	}
 }
 
-__global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		const int threadId = threadIdx.x;
-		const int blockId = blockIdx.x;
-		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		const unsigned superBlocks = (blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES;
-
-		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = D_PREFIX_SCAN_ALIGN;
-		const unsigned dstOffset = blockId * D_THREADS_PER_BLOCK;
-
-		//for (int i = 1; i < superBlocks; i++)
-		//{
-		//	const unsigned sum = histogram[offset - 1];
-		//	histogram[offset + dstOffset + threadId] += sum;
-		//	offset += D_PREFIX_SCAN_ALIGN;
-		//	__syncthreads();
-		//}
-		//
-		//for (int i = 1; i < superBlocks; i++)
-		//{
-		//	const unsigned sum = histogram[offset - 1];
-		//	histogram[offset + dstOffset + threadId] += sum;
-		//	offset += D_PREFIX_SCAN_ALIGN;
-		//	__syncthreads();
-		//}
-
-	}
-}
-
 __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 {
+	const unsigned itemsCount = info.m_histogram.m_size;
+	const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+	if ((alignedItemsCount + D_PREFIX_SCAN_ALIGN) > info.m_histogram.m_capacity)
+	{
+		if (threadIdx.x == 0)
+		{
+			#ifdef _DEBUG
+			printf("function: cuHillisSteelePaddBuffer: buffer overflow\n");
+			#endif
+			info.m_frameIsValid = 1;
+		}
+		__syncthreads();
+	}
+
 	if (info.m_frameIsValid)
 	{
-		const int threadId = threadIdx.x;
-		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		const unsigned lastBlock = D_PREFIX_SCAN_PASSES * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
+		const unsigned threadId = threadIdx.x;
+		const unsigned blockStart = D_THREADS_PER_BLOCK * ((itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
 
 		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = blocks * D_THREADS_PER_BLOCK;
-
-		for (int i = blocks; i < lastBlock; i++)
+		for (unsigned offset = blockStart; offset < alignedItemsCount; offset += D_THREADS_PER_BLOCK)
 		{
 			histogram[offset + threadId] = 0;
-			offset += D_THREADS_PER_BLOCK;
 		}
 	}
 }
@@ -104,24 +80,62 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 {
 	if (info.m_frameIsValid)
 	{
-		const int blockId = blockIdx.x;
-		const int threadId = threadIdx.x;
+		const unsigned blockId = blockIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		const unsigned superBlockCount = (D_PREFIX_SCAN_PASSES / 2) * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
-		if (blockId < superBlockCount)
+		const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+		const unsigned blocks = ((alignedItemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+		if (blockId < blocks)
 		{
-			unsigned* histogram = info.m_histogram.m_array;
-			const int stride = 1 << bit;
-			const int mask = 2 * stride;
-			const int blockBase = D_THREADS_PER_BLOCK * blockId / mask;
-			const int blockFrac = D_THREADS_PER_BLOCK * (blockId & (mask-1));
-			const int halfStrideBlock = D_THREADS_PER_BLOCK * stride;
-			const unsigned value = histogram[blockBase + halfStrideBlock - 1];
-			histogram[blockBase + halfStrideBlock + blockFrac + threadId] += value;
+			const unsigned power = 1 << (bit + 1);
+			const unsigned blockFrac = blockId & (power - 1);
+			if (blockFrac >= (power >> 1))
+			{
+				const unsigned threadId = threadIdx.x;
+				const unsigned dstIndex = D_THREADS_PER_BLOCK * blockId;
+				const unsigned srcIndex = D_THREADS_PER_BLOCK * (blockId - blockFrac + (power >> 1)) - 1;
+
+				unsigned* histogram = info.m_histogram.m_array;
+				const unsigned value = histogram[srcIndex];
+				histogram[dstIndex + threadId] += value;
+
+				if ((power == D_PREFIX_SCAN_PASSES) && (blockFrac == (power - 1)))
+				{
+					__syncthreads();
+					if (threadId == (D_THREADS_PER_BLOCK - 1))
+					{
+						unsigned dstBlock = blockId / D_PREFIX_SCAN_PASSES;
+						const unsigned sum = histogram[blockId * D_THREADS_PER_BLOCK + threadId];
+						histogram[alignedItemsCount + dstBlock] = sum;
+					}
+				}
+			}
 		}
 	}
 }
+
+__global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const unsigned blockId = blockIdx.x;
+		const unsigned threadId = threadIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned superBlockCount = (itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN;
+
+		unsigned* histogram = info.m_histogram.m_array;
+		unsigned offset = blockId * D_THREADS_PER_BLOCK + D_PREFIX_SCAN_ALIGN;
+		const unsigned superBlockOffset = superBlockCount * D_PREFIX_SCAN_ALIGN;
+
+		unsigned value = histogram[superBlockOffset];
+		for (int i = 1; i < superBlockCount; i++)
+		{
+			histogram[offset + threadId] += value;
+			value += histogram[superBlockOffset + i];
+			offset += D_PREFIX_SCAN_ALIGN;
+		}
+	}
+}
+
 
 void CudaPrefixScan(ndCudaContext* const context)
 {
@@ -133,8 +147,43 @@ void CudaPrefixScan(ndCudaContext* const context)
 	cuHillisSteelePaddBuffer << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 
 	const ndInt32 threads = context->m_histogram.GetCount();
-	const ndInt32 bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	const ndInt32 histogramBlocks = D_PREFIX_SCAN_PASSES * ((bodyBlocksCount + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES);
+	const ndInt32 superBlocks = (threads + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN;
+	const ndInt32 histogramBlocks = D_PREFIX_SCAN_PASSES * superBlocks;
+
+#if 0
+	for (ndInt32 pass = 1; pass < (D_PREFIX_SCAN_PASSES_BITS + 1); pass++)
+	{
+		for (unsigned blockID = 0; blockID < 100; blockID++)
+		{
+			//for (unsigned threadId = 0; threadId < D_THREADS_PER_BLOCK; threadId++)
+			for (unsigned threadId = 0; threadId < 1; threadId++)
+			{
+				const unsigned itemsCount = context->m_histogram.GetCount();
+				const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+				const unsigned blocks = ((alignedItemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+				if (blockID < blocks)
+				{
+					const unsigned power = 1 << pass;
+					const unsigned blockFrac = blockID & (power - 1);
+					if (blockFrac >= (power >> 1))
+					{
+						const unsigned srcIndex = blockID - blockFrac + (power >> 1);
+					}
+
+					if ((pass == D_PREFIX_SCAN_PASSES_BITS) && (blockFrac == (power - 1)))
+					{
+						if (threadId == (D_THREADS_PER_BLOCK - 1))
+						{
+							const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
+							unsigned dstBlock = blockID / D_PREFIX_SCAN_PASSES_BITS;
+						}
+					}
+				}
+			}
+		}
+	}
+#endif
+
 	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
 	{
 		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, i);

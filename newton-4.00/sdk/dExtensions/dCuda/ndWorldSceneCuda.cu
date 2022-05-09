@@ -417,7 +417,7 @@ bool ndWorldSceneCuda::SanityCheck() const
 			//test = xTest;
 			//test = key0.m_y <= key1.m_y;
 			//test = yTest0 | (yTest1 & xTest);
-			//dAssert(test);
+			dAssert(test);
 		}
 
 		static ndArray<unsigned> histogram;
@@ -427,7 +427,7 @@ bool ndWorldSceneCuda::SanityCheck() const
 		dAssert(cudaStatus == cudaSuccess);
 		for (int i = 1; i < histogram.GetCount(); i++)
 		{
-			dAssert(histogram[i - 1] <= histogram[i]);
+			//dAssert(histogram[i - 1] <= histogram[i]);
 		}
 	}
 
@@ -821,9 +821,9 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaPrefixScan(m_context);
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
-dAssert(SanityCheck());
-//	CudaBodyAabbCellSortBuffer(m_context);
-//
+	CudaBodyAabbCellSortBuffer(m_context);
+
+	dAssert(SanityCheck());
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 //	dAssert(cellsBlocksCount > 0);
 //	CudaBodyCalculatePairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculatePairsCount, *infoGpu);

@@ -28,9 +28,7 @@
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
 
-#define D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE	256
 #define D_AABB_GRID_CELL_SORT_BLOCK_SIZE	(1<<D_AABB_GRID_CELL_BITS)
-
 
 //static __global__ void cuTest0(const cuSceneInfo& info, int digit)
 //{
@@ -210,13 +208,13 @@ __global__ void cuCountingSortAddSubPrefix(const cuSceneInfo& info)
 		unsigned* histogram = info.m_histogram.m_array;
 		
 		int sum = 0;
-		int start = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+		int start = blockId * D_THREADS_PER_BLOCK;
 		for (int i = 0; i < blocks; i++)
 		{
 			sum += histogram[start + threadId];
 			start += D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
 		}
-		const int dstIndex = 2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+		const int dstIndex = 2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + blockId * D_THREADS_PER_BLOCK;
 		histogram[dstIndex + threadId] = sum;
 	}
 }
@@ -232,7 +230,7 @@ __global__ void cuCountingSortCaculatePrefixOffset(const cuSceneInfo& info)
 		const int threadId = threadIdx.x;
 		unsigned* histogram = info.m_histogram.m_array;
 
-		int src = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+		int src = blockId * D_THREADS_PER_BLOCK;
 		int dst = blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + src;
 		int sum = histogram[2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE + src + threadId];
 
@@ -310,12 +308,12 @@ static void CountingSortBodyCells(ndCudaContext* context, int digit)
 	cudaStream_t stream = context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
 
-	ndInt32 radixBlock = D_AABB_GRID_CELL_SORT_BLOCK_SIZE / D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
+	ndInt32 radixBlock = D_AABB_GRID_CELL_SORT_BLOCK_SIZE / D_THREADS_PER_BLOCK;
 
 	cuCountingSortCountGridCells << <blocks, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu, digit);
-	cuCountingSortAddSubPrefix << <radixBlock, D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
+	cuCountingSortAddSubPrefix << <radixBlock, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 	cuCountingSortBodyCellsPrefixScan << <1, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
-	cuCountingSortCaculatePrefixOffset << <radixBlock, D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
+	cuCountingSortCaculatePrefixOffset << <radixBlock, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
 	cuCountingSortShuffleGridCells << <blocks, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu, digit);
 }
 
