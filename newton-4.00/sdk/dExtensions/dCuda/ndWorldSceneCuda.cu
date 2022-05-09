@@ -770,7 +770,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			info.m_frameIsValid = 0;
 		}
 
-		const int histogrameSize = D_PREFIX_SCAN_ALIGN * ((index + D_PREFIX_SCAN_ALIGN) / D_PREFIX_SCAN_ALIGN) + D_PREFIX_SCAN_ALIGN;
+		const int histogrameSize = D_PREFIX_SCAN_ALIGN____ * ((index + D_PREFIX_SCAN_ALIGN____) / D_PREFIX_SCAN_ALIGN____) + D_PREFIX_SCAN_ALIGN____;
 		if (histogrameSize >= info.m_histogram.m_capacity)
 		{
 			info.m_frameIsValid = 0;
@@ -818,7 +818,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			if (index < cellCount)
 			{
 				unsigned* scan = info.m_histogram.m_array;
-				const unsigned offset = (cellCount + D_PREFIX_SCAN_ALIGN) & (-D_PREFIX_SCAN_ALIGN);
+				const unsigned offset = (cellCount + D_PREFIX_SCAN_ALIGN____) & (-D_PREFIX_SCAN_ALIGN____);
 				scan[offset + index] = cacheBuffer[threadId1];
 			}
 		}

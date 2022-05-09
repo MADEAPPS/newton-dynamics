@@ -32,16 +32,16 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 	{
 		const int threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned blocks = (itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		const unsigned blocks = (itemsCount + blockDim.x - 1) / blockDim.x;
 
 		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = D_THREADS_PER_BLOCK;
+		unsigned offset = blockDim.x;
 
 		for (int i = 1; i < blocks; i++)
 		{
 			const unsigned sum = histogram[offset - 1];
 			histogram[offset + threadId] += sum;
-			offset += D_THREADS_PER_BLOCK;
+			offset += blockDim.x;
 			__syncthreads();
 		}
 	}
@@ -50,6 +50,7 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 {
 	const unsigned itemsCount = info.m_histogram.m_size;
+	const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockDim.x;
 	const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
 	if ((alignedItemsCount + D_PREFIX_SCAN_ALIGN) > info.m_histogram.m_capacity)
 	{
@@ -66,10 +67,10 @@ __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 	if (info.m_frameIsValid)
 	{
 		const unsigned threadId = threadIdx.x;
-		const unsigned blockStart = D_THREADS_PER_BLOCK * ((itemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+		const unsigned blockStart = blockDim.x * ((itemsCount + blockDim.x - 1) / blockDim.x);
 
 		unsigned* histogram = info.m_histogram.m_array;
-		for (unsigned offset = blockStart; offset < alignedItemsCount; offset += D_THREADS_PER_BLOCK)
+		for (unsigned offset = blockStart; offset < alignedItemsCount; offset += blockDim.x)
 		{
 			histogram[offset + threadId] = 0;
 		}
@@ -82,8 +83,9 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 	{
 		const unsigned blockId = blockIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockDim.x;
 		const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
-		const unsigned blocks = ((alignedItemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+		const unsigned blocks = ((alignedItemsCount + blockDim.x - 1) / blockDim.x);
 		if (blockId < blocks)
 		{
 			const unsigned power = 1 << (bit + 1);
@@ -91,8 +93,8 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 			if (blockFrac >= (power >> 1))
 			{
 				const unsigned threadId = threadIdx.x;
-				const unsigned dstIndex = D_THREADS_PER_BLOCK * blockId;
-				const unsigned srcIndex = D_THREADS_PER_BLOCK * (blockId - blockFrac + (power >> 1)) - 1;
+				const unsigned dstIndex = blockDim.x * blockId;
+				const unsigned srcIndex = blockDim.x * (blockId - blockFrac + (power >> 1)) - 1;
 
 				unsigned* histogram = info.m_histogram.m_array;
 				const unsigned value = histogram[srcIndex];
@@ -101,10 +103,10 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 				if ((power == D_PREFIX_SCAN_PASSES) && (blockFrac == (power - 1)))
 				{
 					__syncthreads();
-					if (threadId == (D_THREADS_PER_BLOCK - 1))
+					if (threadId == (blockDim.x - 1))
 					{
 						unsigned dstBlock = blockId / D_PREFIX_SCAN_PASSES;
-						const unsigned sum = histogram[blockId * D_THREADS_PER_BLOCK + threadId];
+						const unsigned sum = histogram[blockId * blockDim.x + threadId];
 						histogram[alignedItemsCount + dstBlock] = sum;
 					}
 				}
@@ -120,10 +122,11 @@ __global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
 		const unsigned blockId = blockIdx.x;
 		const unsigned threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockDim.x;
 		const unsigned superBlockCount = (itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN;
 
 		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = blockId * D_THREADS_PER_BLOCK + D_PREFIX_SCAN_ALIGN;
+		unsigned offset = blockId * blockDim.x + D_PREFIX_SCAN_ALIGN;
 		const unsigned superBlockOffset = superBlockCount * D_PREFIX_SCAN_ALIGN;
 
 		unsigned value = histogram[superBlockOffset];
@@ -137,16 +140,19 @@ __global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
 }
 
 
+//void CudaPrefixScan(ndCudaContext* const context, int blockSize)
 void CudaPrefixScan(ndCudaContext* const context)
 {
+	int blockSize = D_THREADS_PER_BLOCK;
 	cudaStream_t stream = context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = context->m_sceneInfoGpu;
 #if 0
-	cuLinearNaivePrefixScan << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
+	cuLinearNaivePrefixScan << <1, blockSize, 0, stream >> > (*infoGpu);
 #else
-	cuHillisSteelePaddBuffer << <1, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
+	cuHillisSteelePaddBuffer << <1, blockSize, 0, stream >> > (*infoGpu);
 
 	const ndInt32 threads = context->m_histogram.GetCount();
+	const unsigned D_PREFIX_SCAN_ALIGN = D_PREFIX_SCAN_PASSES * blockSize;
 	const ndInt32 superBlocks = (threads + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN;
 	const ndInt32 histogramBlocks = D_PREFIX_SCAN_PASSES * superBlocks;
 
@@ -155,12 +161,12 @@ void CudaPrefixScan(ndCudaContext* const context)
 	{
 		for (unsigned blockID = 0; blockID < 100; blockID++)
 		{
-			//for (unsigned threadId = 0; threadId < D_THREADS_PER_BLOCK; threadId++)
+			//for (unsigned threadId = 0; threadId < blockSize; threadId++)
 			for (unsigned threadId = 0; threadId < 1; threadId++)
 			{
 				const unsigned itemsCount = context->m_histogram.GetCount();
 				const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
-				const unsigned blocks = ((alignedItemsCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+				const unsigned blocks = ((alignedItemsCount + blockSize - 1) / blockSize);
 				if (blockID < blocks)
 				{
 					const unsigned power = 1 << pass;
@@ -172,7 +178,7 @@ void CudaPrefixScan(ndCudaContext* const context)
 
 					if ((pass == D_PREFIX_SCAN_PASSES_BITS) && (blockFrac == (power - 1)))
 					{
-						if (threadId == (D_THREADS_PER_BLOCK - 1))
+						if (threadId == (blockSize - 1))
 						{
 							const unsigned alignedItemsCount = D_PREFIX_SCAN_ALIGN * ((itemsCount + D_PREFIX_SCAN_ALIGN - 1) / D_PREFIX_SCAN_ALIGN);
 							unsigned dstBlock = blockID / D_PREFIX_SCAN_PASSES_BITS;
@@ -186,9 +192,9 @@ void CudaPrefixScan(ndCudaContext* const context)
 
 	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
 	{
-		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu, i);
+		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, blockSize, 0, stream >> > (*infoGpu, i);
 	}
-	cuHillisSteelePrefixScan << <D_PREFIX_SCAN_PASSES, D_THREADS_PER_BLOCK, 0, stream >> > (*infoGpu);
+	cuHillisSteelePrefixScan << <D_PREFIX_SCAN_PASSES, blockSize, 0, stream >> > (*infoGpu);
 #endif
 
 }
