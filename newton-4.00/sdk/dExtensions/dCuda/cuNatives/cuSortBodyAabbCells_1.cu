@@ -279,30 +279,6 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info)
 	}
 }
 
-void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context)
-{
-	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
-	cuBuffer<cuBodyAabbCell>& gpuBuffer = sceneInfo->m_bodyAabbCell;
-
-	ndInt32 cellCount = gpuBuffer.m_size;
-	ndInt32 blocksCount = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
-
-	ndInt32 histogramSize = (2 * blocksCount + 1) * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
-	if (histogramSize > context->m_histogram.GetCapacity())
-	{
-		context->m_histogram.SetCount(histogramSize);
-		sceneInfo->m_histogram = cuBuffer<unsigned>(context->m_histogram);
-	}
-	
-	if (cellCount > context->m_bodyAabbCell.GetCapacity())
-	{
-		context->m_bodyAabbCell.SetCount(cellCount);
-		context->m_bodyAabbCellTmp.SetCount(cellCount);
-		sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCell);
-		sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(context->m_bodyAabbCellTmp);
-	}
-}
-
 static void CountingSortBodyCells(ndCudaContext* context, int digit)
 {
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
@@ -329,6 +305,6 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellTmp.GetCount());
 	
 	CountingSortBodyCells(context, 0);
-	CountingSortBodyCells(context, 1);
-	CountingSortBodyCells(context, 2);
+	//CountingSortBodyCells(context, 1);
+	//CountingSortBodyCells(context, 2);
 }

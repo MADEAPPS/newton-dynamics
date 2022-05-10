@@ -56,7 +56,8 @@ class cuBodyAabbCell
 };
 
 void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
-void CudaBodyAabbCellResizeBuffers(ndCudaContext* const context);
+void CudaBodyAabbCellSortBufferOld(ndCudaContext* const context);
+
 
 
 #endif

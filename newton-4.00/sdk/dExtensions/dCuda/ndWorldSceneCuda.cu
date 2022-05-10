@@ -376,7 +376,20 @@ void ndWorldSceneCuda::UpdateBodyList()
 		cudaDeviceSynchronize();
 		sceneInfo->m_frameIsValid = 1;
 
-		CudaBodyAabbCellResizeBuffers(m_context);
+		//CudaBodyAabbCellResizeBuffers(m_context);
+		if (sceneInfo->m_histogram.m_size > sceneInfo->m_histogram.m_capacity)
+		{
+			m_context->m_histogram.SetCount(sceneInfo->m_histogram.m_size);
+			sceneInfo->m_histogram = cuBuffer<unsigned>(m_context->m_histogram);
+		}
+
+		if (sceneInfo->m_bodyAabbCell.m_size > sceneInfo->m_bodyAabbCell.m_capacity)
+		{
+			m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size);
+			m_context->m_bodyAabbCellTmp.SetCount(sceneInfo->m_bodyAabbCell.m_size);
+			sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
+			sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellTmp);
+		}
 
 		cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
 		dAssert(cudaStatus == cudaSuccess);
@@ -705,9 +718,13 @@ void ndWorldSceneCuda::InitBodyArray()
 			if (newCapacity >= info.m_histogram.m_capacity)
 			{
 				#ifdef _DEBUG
-				printf("function: CountAabb: histogram buffer overflow\n");
+				if (index == 0)
+				{
+					printf("function: CountAabb: histogram buffer overflow\n");
+				}
 				#endif
 				info.m_frameIsValid = 1;
+				info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
 			}
 			else
 			{
@@ -782,14 +799,30 @@ void ndWorldSceneCuda::InitBodyArray()
 		info.m_bodyAabbCellScrath.m_size = size + 1;
 		if ((size + 1) >= info.m_bodyAabbCell.m_capacity)
 		{
+			#ifdef _DEBUG
+			if (index == 0)
+			{
+				printf("function: EndGridHash: bodyAabbCell buffer overflow\n");
+			}
+			#endif
+
 			info.m_frameIsValid = 0;
+			info.m_bodyAabbCell.m_size = info.m_bodyAabbCell.m_capacity + 1;
 		}
 
 		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK;
 		const int histogrameSize = prefixScanSuperBlockAlign * ((size + prefixScanSuperBlockAlign) / prefixScanSuperBlockAlign) + prefixScanSuperBlockAlign;
 		if (histogrameSize >= info.m_histogram.m_capacity)
 		{
+			#ifdef _DEBUG
+			if (index == 0)
+			{
+				printf("function: EndGridHash: histogram buffer overflow\n");
+			}
+			#endif
+
 			info.m_frameIsValid = 0;
+			info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
 		}
 	};
 
@@ -853,10 +886,10 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
 	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
 dAssert(SanityCheckPrefix());
-//	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 
-//	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
-//	CudaBodyAabbCellSortBuffer(m_context);
+	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
+	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
+//	CudaBodyAabbCellSortBufferOld(m_context);
 //dAssert(SanityCheckSortCells());
 
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
