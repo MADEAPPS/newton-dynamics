@@ -704,6 +704,9 @@ void ndWorldSceneCuda::InitBodyArray()
 			const unsigned newCapacity = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES) + D_THREADS_PER_BLOCK;
 			if (newCapacity >= info.m_histogram.m_capacity)
 			{
+				#ifdef _DEBUG
+				printf("function: CountAabb: histogram buffer overflow\n");
+				#endif
 				info.m_frameIsValid = 1;
 			}
 			else
@@ -712,7 +715,7 @@ void ndWorldSceneCuda::InitBodyArray()
 				histogram[index] = cacheBuffer[threadId1];
 				if (index == 0)
 				{
-					info.m_histogram.m_size = newCapacity;
+					info.m_histogram.m_size = blocks * D_THREADS_PER_BLOCK;
 				}
 			}
 		}
@@ -848,8 +851,8 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
 	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
 	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-//	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
-//dAssert(SanityCheckPrefix());
+	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
+dAssert(SanityCheckPrefix());
 //	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 
 //	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);

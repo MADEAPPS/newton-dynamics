@@ -49,25 +49,14 @@ __global__ void cuLinearNaivePrefixScan(cuSceneInfo& info)
 
 __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 {
-	const unsigned itemsCount = info.m_histogram.m_size;
-	const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
-	const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
-	if ((alignedItemsCount + prefixScanSuperBlockAlign) > info.m_histogram.m_capacity)
-	{
-		if (threadIdx.x == 0)
-		{
-			#ifdef _DEBUG
-			printf("function: cuHillisSteelePaddBuffer: buffer overflow\n");
-			#endif
-			info.m_frameIsValid = 1;
-		}
-		__syncthreads();
-	}
-
 	if (info.m_frameIsValid)
 	{
+		const unsigned itemsCount = info.m_histogram.m_size;
 		const unsigned threadId = threadIdx.x;
+
+		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
 		const unsigned blockStart = blockDim.x * ((itemsCount + blockDim.x - 1) / blockDim.x);
+		const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
 
 		unsigned* histogram = info.m_histogram.m_array;
 		for (unsigned offset = blockStart; offset < alignedItemsCount; offset += blockDim.x)
@@ -147,7 +136,6 @@ void CudaPrefixScan(ndCudaContext* const context, int blockSize)
 #if 0
 	cuLinearNaivePrefixScan << <1, blockSize, 0, stream >> > (*infoGpu);
 #else
-	cuHillisSteelePaddBuffer << <1, blockSize, 0, stream >> > (*infoGpu);
 
 	const ndInt32 threads = context->m_histogram.GetCount();
 	const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockSize;
@@ -188,6 +176,7 @@ void CudaPrefixScan(ndCudaContext* const context, int blockSize)
 	}
 #endif
 
+	cuHillisSteelePaddBuffer << <1, blockSize, 0, stream >> > (*infoGpu);
 	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
 	{
 		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, blockSize, 0, stream >> > (*infoGpu, i);
