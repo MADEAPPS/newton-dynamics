@@ -51,17 +51,20 @@ __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
-		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned blockId = blockIdx.x;
 		const unsigned threadId = threadIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size;
 
 		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
 		const unsigned blockStart = blockDim.x * ((itemsCount + blockDim.x - 1) / blockDim.x);
 		const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
 
+		const unsigned blockOffset = blockId * blockDim.x;
 		unsigned* histogram = info.m_histogram.m_array;
-		for (unsigned offset = blockStart; offset < alignedItemsCount; offset += blockDim.x)
+		
+		if (blockStart >= blockStart)
 		{
-			histogram[offset + threadId] = 0;
+			histogram[blockOffset + threadId] = 0;
 		}
 	}
 }
@@ -176,7 +179,7 @@ void CudaPrefixScan(ndCudaContext* const context, int blockSize)
 	}
 #endif
 
-	cuHillisSteelePaddBuffer << <1, blockSize, 0, stream >> > (*infoGpu);
+	cuHillisSteelePaddBuffer << <D_PREFIX_SCAN_PASSES, blockSize, 0, stream >> > (*infoGpu);
 	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
 	{
 		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, blockSize, 0, stream >> > (*infoGpu, i);
