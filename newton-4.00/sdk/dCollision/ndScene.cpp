@@ -912,27 +912,30 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& tim
 {
 	dAssert(contact && (contact->GetAsContact()));
 
-	ndBodyKinematic* const body0 = contact->GetBody0();
-	ndBodyKinematic* const body1 = contact->GetBody1();
-
-	ndVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
-	positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
-	contact->m_positAcc += positStep;
-	
-	ndVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
-	ndVector positSign(ndVector::m_negOne & (positError2 < m_linearContactError2));
-	if (positSign.GetSignMask())
+	if (contact->m_maxDOF)
 	{
-		ndVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
-		rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
-		contact->m_rotationAcc = contact->m_rotationAcc * ndQuaternion(rotationStep.m_x, rotationStep.m_y, rotationStep.m_z, ndFloat32(1.0f));
-	
-		ndVector angle(contact->m_rotationAcc & ndVector::m_triplexMask);
-		ndVector rotatError2(angle.DotProduct(angle));
-		ndVector rotationSign(ndVector::m_negOne & (rotatError2 < m_linearContactError2));
-		if (rotationSign.GetSignMask())
+		ndBodyKinematic* const body0 = contact->GetBody0();
+		ndBodyKinematic* const body1 = contact->GetBody1();
+
+		ndVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
+		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
+		contact->m_positAcc += positStep;
+
+		ndVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
+		ndVector positSign(ndVector::m_negOne & (positError2 < m_linearContactError2));
+		if (positSign.GetSignMask())
 		{
-			return true;
+			ndVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
+			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
+			contact->m_rotationAcc = contact->m_rotationAcc * ndQuaternion(rotationStep.m_x, rotationStep.m_y, rotationStep.m_z, ndFloat32(1.0f));
+
+			ndVector angle(contact->m_rotationAcc & ndVector::m_triplexMask);
+			ndVector rotatError2(angle.DotProduct(angle));
+			ndVector rotationSign(ndVector::m_negOne & (rotatError2 < m_linearContactError2));
+			if (rotationSign.GetSignMask())
+			{
+				return true;
+			}
 		}
 	}
 	return false;
@@ -1197,7 +1200,6 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 	m_contactNotifyCallback->OnContactCallback(contact, m_timestep);
 }
 
-//void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 void ndScene::SubmitPairs(ndSceneBodyNode* const leafNode, ndSceneNode* const node)
 {
 	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
