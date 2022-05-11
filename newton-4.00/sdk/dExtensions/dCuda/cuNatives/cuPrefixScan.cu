@@ -54,15 +54,12 @@ __global__ void cuHillisSteelePaddBuffer(cuSceneInfo& info)
 		const unsigned blockId = blockIdx.x;
 		const unsigned threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-
-		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
 		const unsigned blockStart = blockDim.x * ((itemsCount + blockDim.x - 1) / blockDim.x);
-		const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
 
 		const unsigned blockOffset = blockId * blockDim.x;
 		unsigned* histogram = info.m_histogram.m_array;
 		
-		if (blockStart >= blockStart)
+		if (blockOffset >= blockStart)
 		{
 			histogram[blockOffset + threadId] = 0;
 		}

@@ -75,22 +75,12 @@ __global__ void CudaValidateGridBuffer(Predicate validateBuffer, cuSceneInfo& in
 	}
 }
 
-
 template <typename Predicate>
 __global__ void CudaGenerateGridHash(Predicate GenerateHash, cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
 		GenerateHash(info);
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaEndGridHash(Predicate EndGridHash, cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		EndGridHash(info);
 	}
 }
 
@@ -451,15 +441,21 @@ bool ndWorldSceneCuda::SanityCheckSortCells() const
 
 	if (info.m_frameIsValid)
 	{
-		static ndArray<cuBodyAabbCell> data;
-		data.SetCount(info.m_bodyAabbCell.m_size - 1);
-		cudaStatus = cudaMemcpy(&data[0], info.m_bodyAabbCell.m_array, data.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+		static ndArray<cuBodyAabbCell> bodyAabbCell;
+		static ndArray<cuBodyAabbCell> bodyAabbCellScrath;
+		bodyAabbCell.SetCount(info.m_bodyAabbCell.m_size);
+		bodyAabbCellScrath.SetCount(info.m_bodyAabbCell.m_size);
+
+		cudaStatus = cudaMemcpy(&bodyAabbCellScrath[0], info.m_bodyAabbCellScrath.m_array, bodyAabbCellScrath.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
 		dAssert(cudaStatus == cudaSuccess);
 
-		for (int i = 1; i < data.GetCount(); i++)
+		cudaStatus = cudaMemcpy(&bodyAabbCell[0], info.m_bodyAabbCell.m_array, bodyAabbCell.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+		dAssert(cudaStatus == cudaSuccess);
+
+		for (int i = 1; i < bodyAabbCell.GetCount(); i++)
 		{
-			cuBodyAabbCell key0(data[i - 1]);
-			cuBodyAabbCell key1(data[i - 0]);
+			cuBodyAabbCell key0(bodyAabbCell[i - 1]);
+			cuBodyAabbCell key1(bodyAabbCell[i - 0]);
 			bool zTest0 = key0.m_z < key1.m_z;
 			bool zTest1 = key0.m_z == key1.m_z;
 			bool yTest0 = key0.m_y < key1.m_y;
@@ -748,22 +744,6 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto ValidateGridArray = [] __device__(cuSceneInfo & info)
-	{
-		const unsigned lastIndex = info.m_bodyArray.m_size - 1;
-		const unsigned* histogram = info.m_histogram.m_array;
-		const unsigned cellCount = histogram[lastIndex];
-		if ((cellCount + D_THREADS_PER_BLOCK) > info.m_bodyAabbCellScrath.m_capacity)
-		{
-			#ifdef _DEBUG
-				printf("function: ValidateGridArray: histogram buffer overflow\n");
-			#endif
-			info.m_frameIsValid = 0;
-			info.m_bodyAabbCell.m_size = cellCount + D_THREADS_PER_BLOCK;
-			info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
-		}
-	};
-
 	auto GenerateHashGrids = [] __device__(const cuSceneInfo & info)
 	{
 		const int threadId = threadIdx.x;
@@ -808,47 +788,41 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto EndGridHash = [] __device__(cuSceneInfo& info)
+	auto ValidateGridArray = [] __device__(cuSceneInfo & info)
 	{
+		const unsigned lastIndex = info.m_bodyArray.m_size - 2;
 		const unsigned* histogram = info.m_histogram.m_array;
-		cuBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
-		const unsigned index = info.m_bodyArray.m_size;
-		const unsigned size = histogram[index];
-
-		cuBodyAabbCell hash;
-		hash = hashArray[size - 1];
-		hash.m_id = unsigned (-1);
-		hash.m_z = hash.m_z + 1;
-		hashArray[size] = hash;
-
-		info.m_bodyAabbCell.m_size = size + 1;
-		info.m_bodyAabbCellScrath.m_size = size + 1;
-		if ((size + 1) >= info.m_bodyAabbCell.m_capacity)
+		const unsigned cellCount = histogram[lastIndex];
+		if ((cellCount + D_THREADS_PER_BLOCK) > info.m_bodyAabbCellScrath.m_capacity)
 		{
-			if (index == 0)
-			{
-				#ifdef _DEBUG
-				printf("function: EndGridHash: bodyAabbCell buffer overflow\n");
-				#endif
-				info.m_frameIsValid = 0;
-				info.m_bodyAabbCell.m_size = info.m_bodyAabbCell.m_capacity + 1;
-			}
+			#ifdef _DEBUG
+			printf("function: ValidateGridArray: histogram buffer overflow\n");
+			#endif
+			info.m_frameIsValid = 0;
+			info.m_bodyAabbCell.m_size = cellCount + D_THREADS_PER_BLOCK;
+			info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
 		}
-
-		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK;
-		const int histogrameSize = prefixScanSuperBlockAlign * ((size + prefixScanSuperBlockAlign) / prefixScanSuperBlockAlign) + prefixScanSuperBlockAlign;
-		if (histogrameSize >= info.m_histogram.m_capacity)
+		else
 		{
-			if (index == 0)
-			{
-				#ifdef _DEBUG
-				printf("function: EndGridHash: histogram buffer overflow\n");
-				#endif
-				info.m_frameIsValid = 0;
-				info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
-			}
+			cuBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
+			cuBodyAabbCell* hashArrayScrath = info.m_bodyAabbCellScrath.m_array;
+
+			cuBodyAabbCell hash;
+			hash.m_value = 0;
+			hash.m_id = unsigned(-1);
+			hash.m_x = unsigned(-1);
+			hash.m_y = unsigned(-1);
+			hash.m_z = unsigned(-1);
+
+			const long long value = hash.m_value;
+			hashArray[cellCount].m_value = value;
+			hashArrayScrath[cellCount].m_value = value;
+
+			info.m_bodyAabbCell.m_size = cellCount + 1;
+			info.m_bodyAabbCellScrath.m_size = cellCount + 1;
 		}
 	};
+
 
 	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
 	{
@@ -913,9 +887,9 @@ dAssert(SanityCheckPrefix());
 
 	CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
-	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
-//	CudaBodyAabbCellSortBufferOld(m_context);
-//dAssert(SanityCheckSortCells());
+
+	CudaBodyAabbCellSortBufferOld(m_context);
+dAssert(SanityCheckSortCells());
 
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 //	dAssert(cellsBlocksCount > 0);
