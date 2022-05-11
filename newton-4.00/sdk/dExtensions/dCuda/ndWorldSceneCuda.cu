@@ -67,6 +67,16 @@ __global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
 }
 
 template <typename Predicate>
+__global__ void CudaValidateGridBuffer(Predicate validateBuffer, cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		validateBuffer(info);
+	}
+}
+
+
+template <typename Predicate>
 __global__ void CudaGenerateGridHash(Predicate GenerateHash, cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
@@ -262,7 +272,7 @@ void ndWorldSceneCuda::LoadBodyData()
 	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
 	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
 	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu0 = m_context->m_bodyAabbCell;
-	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu1 = m_context->m_bodyAabbCellTmp;
+	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu1 = m_context->m_bodyAabbCellScrath;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
 	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu0 = m_context->m_transformBufferGpu0;
@@ -386,9 +396,9 @@ void ndWorldSceneCuda::UpdateBodyList()
 		if (sceneInfo->m_bodyAabbCell.m_size > sceneInfo->m_bodyAabbCell.m_capacity)
 		{
 			m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size);
-			m_context->m_bodyAabbCellTmp.SetCount(sceneInfo->m_bodyAabbCell.m_size);
+			m_context->m_bodyAabbCellScrath.SetCount(sceneInfo->m_bodyAabbCell.m_size);
 			sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
-			sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellTmp);
+			sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellScrath);
 		}
 
 		cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
@@ -631,7 +641,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		const cuBoundingBox* bBoxOut = info.m_bodyAabbArray.m_array;
 
 		const unsigned threadId = threadIdx.x;
-		const unsigned boxCount = info.m_bodyAabbArray.m_size;
+		const unsigned boxCount = info.m_bodyAabbArray.m_size - 1;
 		const unsigned aabbBlocks = boxCount / D_THREADS_PER_BLOCK;
 		const unsigned boxLastRow = boxCount - aabbBlocks * D_THREADS_PER_BLOCK;
 
@@ -717,12 +727,12 @@ void ndWorldSceneCuda::InitBodyArray()
 			const unsigned newCapacity = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK * ((blocks + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES) + D_THREADS_PER_BLOCK;
 			if (newCapacity >= info.m_histogram.m_capacity)
 			{
-				#ifdef _DEBUG
 				if (index == 0)
 				{
+					#ifdef _DEBUG
 					printf("function: CountAabb: histogram buffer overflow\n");
+					#endif
 				}
-				#endif
 				info.m_frameIsValid = 1;
 				info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
 			}
@@ -735,6 +745,22 @@ void ndWorldSceneCuda::InitBodyArray()
 					info.m_histogram.m_size = blocks * D_THREADS_PER_BLOCK;
 				}
 			}
+		}
+	};
+
+	auto ValidateGridArray = [] __device__(cuSceneInfo & info)
+	{
+		const unsigned lastIndex = info.m_bodyArray.m_size - 1;
+		const unsigned* histogram = info.m_histogram.m_array;
+		const unsigned cellCount = histogram[lastIndex];
+		if ((cellCount + D_THREADS_PER_BLOCK) > info.m_bodyAabbCellScrath.m_capacity)
+		{
+			#ifdef _DEBUG
+				printf("function: ValidateGridArray: histogram buffer overflow\n");
+			#endif
+			info.m_frameIsValid = 0;
+			info.m_bodyAabbCell.m_size = cellCount + D_THREADS_PER_BLOCK;
+			info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
 		}
 	};
 
@@ -799,30 +825,28 @@ void ndWorldSceneCuda::InitBodyArray()
 		info.m_bodyAabbCellScrath.m_size = size + 1;
 		if ((size + 1) >= info.m_bodyAabbCell.m_capacity)
 		{
-			#ifdef _DEBUG
 			if (index == 0)
 			{
+				#ifdef _DEBUG
 				printf("function: EndGridHash: bodyAabbCell buffer overflow\n");
+				#endif
+				info.m_frameIsValid = 0;
+				info.m_bodyAabbCell.m_size = info.m_bodyAabbCell.m_capacity + 1;
 			}
-			#endif
-
-			info.m_frameIsValid = 0;
-			info.m_bodyAabbCell.m_size = info.m_bodyAabbCell.m_capacity + 1;
 		}
 
 		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK;
 		const int histogrameSize = prefixScanSuperBlockAlign * ((size + prefixScanSuperBlockAlign) / prefixScanSuperBlockAlign) + prefixScanSuperBlockAlign;
 		if (histogrameSize >= info.m_histogram.m_capacity)
 		{
-			#ifdef _DEBUG
 			if (index == 0)
 			{
+				#ifdef _DEBUG
 				printf("function: EndGridHash: histogram buffer overflow\n");
+				#endif
+				info.m_frameIsValid = 0;
+				info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
 			}
-			#endif
-
-			info.m_frameIsValid = 0;
-			info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
 		}
 	};
 
@@ -887,6 +911,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
 dAssert(SanityCheckPrefix());
 
+	CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaEndGridHash << <1, 1, 0, stream >> > (EndGridHash, *infoGpu);
 //	CudaBodyAabbCellSortBufferOld(m_context);

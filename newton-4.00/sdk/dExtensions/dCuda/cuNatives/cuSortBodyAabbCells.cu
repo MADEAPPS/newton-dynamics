@@ -323,7 +323,7 @@ void CudaBodyAabbCellSortBufferOld(ndCudaContext* const context)
 	//BitonicSort();
 
 	dAssert(context->m_bodyAabbCell.GetCount() <= context->m_histogram.GetCount());
-	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellTmp.GetCount());
+	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellScrath.GetCount());
 	
 	CountingSortBodyCellsOld(context, 0);
 	//CountingSortBodyCellsOld(context, 1);

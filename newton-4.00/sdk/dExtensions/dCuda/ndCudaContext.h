@@ -60,7 +60,7 @@ class ndCudaContext : public ndClassAlloc, public ndCudaDevice
 	ndArray<cuBodyProxy> m_bodyBufferCpu;
 	cuDeviceBuffer<cuBodyProxy> m_bodyBufferGpu;
 	cuDeviceBuffer<cuBodyAabbCell> m_bodyAabbCell;
-	cuDeviceBuffer<cuBodyAabbCell> m_bodyAabbCellTmp;
+	cuDeviceBuffer<cuBodyAabbCell> m_bodyAabbCellScrath;
 	cuDeviceBuffer<cuBoundingBox> m_boundingBoxGpu;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu0;
 	cuHostBuffer<cuSpatialVector> m_transformBufferCpu1;
