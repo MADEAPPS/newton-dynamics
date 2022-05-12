@@ -821,8 +821,20 @@ void ndWorldSceneCuda::InitBodyArray()
 			info.m_bodyAabbCell.m_size = cellCount + 1;
 			info.m_bodyAabbCellScrath.m_size = cellCount + 1;
 		}
-	};
 
+		// check new histogram size.
+		const unsigned histogramGridBlockSize = (1 << D_AABB_GRID_CELL_BITS);
+		const unsigned histogramSuperGridBlockSize = histogramGridBlockSize * D_PREFIX_SCAN_PASSES;
+		const unsigned newCapacity = 2 * histogramGridBlockSize + histogramSuperGridBlockSize * ((cellCount + histogramSuperGridBlockSize - 1) / histogramSuperGridBlockSize);
+		if (newCapacity >= info.m_histogram.m_capacity)
+		{
+			#ifdef _DEBUG
+			printf("function: ValidateGridArray: histogram buffer overflow\n");
+			#endif
+			info.m_frameIsValid = 1;
+		}
+		info.m_histogram.m_size = newCapacity;
+	};
 
 	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
 	{
