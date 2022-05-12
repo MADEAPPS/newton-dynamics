@@ -900,8 +900,8 @@ dAssert(SanityCheckPrefix());
 	CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 
-	CudaBodyAabbCellSortBufferOld(m_context);
-dAssert(SanityCheckSortCells());
+	CudaBodyAabbCellSortBuffer(m_context);
+//dAssert(SanityCheckSortCells());
 
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 //	dAssert(cellsBlocksCount > 0);
