@@ -298,6 +298,7 @@ void ndDemoEntity::SetMatrix(const ndQuaternion& rotation, const ndVector& posit
 
 	m_nextPosition = position;
 	m_nextRotation = rotation;
+	dAssert(position.m_w == ndFloat32(1.0f));
 
 	ndFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
@@ -311,6 +312,7 @@ void ndDemoEntity::SetNextMatrix (const ndQuaternion& rotation, const ndVector& 
 	// read the data in a critical section to prevent race condition from other thread  
 	m_nextPosition = position;
 	m_nextRotation = rotation;
+	dAssert(position.m_w == ndFloat32(1.0f));
 
 	ndFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 

@@ -145,6 +145,6 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	AddBox(scene, ndVector(0.0f, 0.5f, -3.0f, 1.0f), 1.0f, count);
 
 	ndQuaternion rot;
-	ndVector origin(-15.0f - 5.0f * count, 10.0f, 0.0f, 0.0f);
+	ndVector origin(-15.0f - 5.0f * count, 10.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

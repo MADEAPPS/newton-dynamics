@@ -71,6 +71,6 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	delete man;
 	ndQuaternion rot;
-	ndVector origin(-5.0f, 4.0f, 0.0f, 0.0f);
+	ndVector origin(-5.0f, 4.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

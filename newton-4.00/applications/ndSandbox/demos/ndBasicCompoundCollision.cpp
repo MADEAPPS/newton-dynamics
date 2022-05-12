@@ -172,6 +172,7 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	origin.m_x -= 10.0f;
 	origin.m_y += 2.0f;
 	origin.m_z += 10.0f;
+	origin.m_w = 1.0f;
 	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }

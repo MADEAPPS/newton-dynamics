@@ -780,6 +780,6 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
-	ndVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

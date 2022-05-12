@@ -463,7 +463,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
 
 	ndMatrix matrix(dGetIdentityMatrix());

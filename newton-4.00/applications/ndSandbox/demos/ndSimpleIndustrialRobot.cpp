@@ -440,10 +440,8 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
 
-	
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
-/*
 	dSimpleIndustrialRobot* const robot = new dSimpleIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
@@ -455,18 +453,16 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
 	//scene->GetWorld()->AddModel(new dSimpleIndustrialRobot(scene, robotEntity, matrix));
-*/
+	//ndMatrix location(matrix);
+	//location = dRollMatrix(-65 * ndDegreeToRad) * location;
+	//location.m_posit.m_x += 1.5f;
+	//location.m_posit.m_y += 1.5f;
+	//location.m_posit.m_z += 1.5f;
+	//AddBox(scene, location, 5.0f, 0.5f, 3.0f, 4.0f);
+	//location.m_posit.m_z += 1.5f;
+	//AddBox(scene, location, 5.0f, 0.5f, 3.0f, 4.0f);
 
-	ndMatrix location(matrix);
-	location = dRollMatrix(-65 * ndDegreeToRad) * location;
-	location.m_posit.m_x += 1.5f;
-	location.m_posit.m_y += 1.5f;
-	location.m_posit.m_z += 1.5f;
-	AddBox(scene, location, 5.0f, 0.5f, 3.0f, 4.0f);
-	location.m_posit.m_z += 1.5f;
-	AddBox(scene, location, 5.0f, 0.5f, 3.0f, 4.0f);
-
-	//delete robotEntity;
+	delete robotEntity;
 
 	matrix.m_posit.m_x -= 6.0f;
 	matrix.m_posit.m_y += 2.0f;
