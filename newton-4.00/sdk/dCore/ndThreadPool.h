@@ -118,18 +118,21 @@ class ndFunction<Type>
 	{
 	}
 
-	template<typename... Args> typename
+	//template<typename... Args> typename
 	//std::result_of<Type(Args...)>::type operator()(Args... args)
-	void operator()(Args... args)
-	{
-		m_object.operator()(args...);
-	}
-
-	template<typename... Args> typename
+	//{
+	//	m_object.operator()(args...);
+	//}
+	//
+	//template<typename... Args> typename
 	//std::result_of<const Type(Args...)>::type operator()(Args... args) const
-	void operator()(Args... args) const
+	//{
+	//	m_object.operator()(args...);
+	//}
+
+	void operator()(ndInt32 threadIndex, ndInt32 threadCount) const
 	{
-		m_object.operator()(args...);
+		m_object.operator()(threadIndex, threadCount);
 	}
 
 	private:
