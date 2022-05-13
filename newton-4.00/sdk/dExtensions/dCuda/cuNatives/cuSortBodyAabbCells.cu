@@ -204,15 +204,16 @@ __global__ void cuCountingSortAddSubPrefix(const cuSceneInfo& info)
 		const unsigned threadId = threadIdx.x;
 		const unsigned cellCount = info.m_bodyAabbCell.m_size - 1;
 
+		unsigned* histogram = info.m_histogram.m_array;
 		if (blockId >= D_PREFIX_SCAN_PASSES)
 		{
-
+			histogram[threadId] = 0;
 		}
 		else
 		{
 			//const unsigned blocks = 1 + (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
 			//
-			//unsigned* histogram = info.m_histogram.m_array;
+			//
 			//
 			//unsigned sum = 0;
 			//unsigned start = blockId * D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE;
