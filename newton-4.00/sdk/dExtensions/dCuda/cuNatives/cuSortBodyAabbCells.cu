@@ -185,32 +185,25 @@ __global__ void cuCountingSortHillisSteelePrefixScanAddBlocks(cuSceneInfo& info,
 
 __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info)
 {
-	//__shared__  int cacheBuffer[D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2 + D_AABB_GRID_CELL_SORT_BLOCK_SIZE + 1];
-	//
 	if (info.m_frameIsValid)
 	{
-	//	const unsigned threadId = threadIdx.x;
-		unsigned* histogram = info.m_histogram.m_array;
+		const unsigned blockId = blockIdx.x;
+		const unsigned threadId = threadIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned superBlockCount = (itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
 
-		__syncthreads();
-	//	const unsigned cellCount = info.m_bodyAabbCell.m_size - 1;
-	//	const unsigned blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
-	//	const unsigned histogramBase = 2 * blocks * D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
-	//
-	//	const unsigned cacheStart = D_AABB_GRID_CELL_SORT_BLOCK_SIZE / 2;
-	//
-	//	cacheBuffer[threadId] = 0;
-	//	cacheBuffer[cacheStart + threadId + 1] = histogram[histogramBase + threadId];
-	//
-	//	__syncthreads();
-	//	for (int i = 1; i < D_AABB_GRID_CELL_SORT_BLOCK_SIZE; i = i << 1)
-	//	{
-	//		const unsigned sum = cacheBuffer[cacheStart + threadId] + cacheBuffer[cacheStart - i + threadId];
-	//		__syncthreads();
-	//		cacheBuffer[cacheStart + threadId] = sum;
-	//		__syncthreads();
-	//	}
-	//	histogram[histogramBase + threadId] = cacheBuffer[cacheStart + threadId];
+		unsigned* histogram = info.m_histogram.m_array;
+		unsigned offset = blockId * blockDim.x + prefixScanSuperBlockAlign;
+		const unsigned superBlockOffset = superBlockCount * prefixScanSuperBlockAlign;
+
+		//unsigned value = histogram[superBlockOffset];
+		//for (int i = 1; i < superBlockCount; i++)
+		//{
+		//	histogram[offset + threadId] += value;
+		//	value += histogram[superBlockOffset + i];
+		//	offset += prefixScanSuperBlockAlign;
+		//}
 	}
 }
 
