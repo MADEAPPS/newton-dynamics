@@ -205,6 +205,6 @@ void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 	AddCylinderEffect(fractureManager, matrix);
 
 	ndQuaternion rot;
-	ndVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	ndVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

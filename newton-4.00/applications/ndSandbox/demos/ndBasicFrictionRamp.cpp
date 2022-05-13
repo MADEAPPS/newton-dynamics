@@ -166,6 +166,6 @@ void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 
 	ndMatrix camMatrix(dRollMatrix(10.0f * ndDegreeToRad) *  dYawMatrix(20.0f * ndDegreeToRad));
 	ndQuaternion rot(camMatrix);
-	ndVector origin(-40.0f, 10.0f, 15.0f, 0.0f);
+	ndVector origin(-40.0f, 10.0f, 15.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
