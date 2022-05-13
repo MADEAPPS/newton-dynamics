@@ -832,8 +832,14 @@ void ndWorldSceneCuda::InitBodyArray()
 			printf("function: ValidateGridArray: histogram buffer overflow\n");
 			#endif
 			info.m_frameIsValid = 1;
+			info.m_histogram.m_size = newCapacity;
 		}
-		info.m_histogram.m_size = newCapacity;
+		else
+		{
+			const unsigned blocks = ((cellCount + histogramGridBlockSize - 1) / histogramGridBlockSize);
+			info.m_histogram.m_size = (blocks + 1) * histogramGridBlockSize;
+		}
+		
 	};
 
 	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
