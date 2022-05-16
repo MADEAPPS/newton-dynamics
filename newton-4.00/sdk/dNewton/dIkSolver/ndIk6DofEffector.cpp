@@ -216,8 +216,10 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 		const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 		const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 		const ndFloat32 relOmega = (jacobian0.m_angular * omega0 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-		const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, -angle, m_linearDamper, relOmega);
-		desc.m_diagonalRegularizer[index] = m_linearRegularizer;
+		//const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, -angle, m_linearDamper, relOmega);
+		//desc.m_diagonalRegularizer[index] = m_linearRegularizer;
+		const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_angularSpring, -angle, m_angularDamper, relOmega);
+		desc.m_diagonalRegularizer[index] = m_angularRegularizer;
 		SetMotorAcceleration(desc, accel);
 #endif
 		SetLowerFriction(desc, -m_angularMaxTorque);
