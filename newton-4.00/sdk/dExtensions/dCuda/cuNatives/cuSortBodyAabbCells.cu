@@ -122,17 +122,8 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 	//__shared__  int cacheBufferAdress[D_AABB_GRID_CELL_SORT_BLOCK_SIZE];
 	__shared__  int cacheKeyPrefix[(1 << D_AABB_GRID_CELL_BITS) / 2 + (1 << D_AABB_GRID_CELL_BITS) + 1];
 
-
-	//__shared__  unsigned cacheBuffer[1 << D_AABB_GRID_CELL_BITS];
-	
 	if (info.m_frameIsValid)
 	{
-		//const int blockId = blockIdx.x;
-		//const int cellCount = info.m_bodyAabbCell.m_size - 1;
-		
-		//	const int blocks = (cellCount + D_AABB_GRID_CELL_SORT_BLOCK_SIZE - 1) / D_AABB_GRID_CELL_SORT_BLOCK_SIZE;
-		//	if (blockId < blocks)
-		
 		const unsigned blockId = blockIdx.x;
 		const unsigned cellCount = info.m_bodyAabbCell.m_size - 1;
 		const unsigned blocks = (cellCount + blockDim.x - 1) / blockDim.x;
