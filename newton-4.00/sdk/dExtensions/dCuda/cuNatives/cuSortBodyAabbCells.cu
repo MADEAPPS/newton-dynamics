@@ -42,15 +42,14 @@
 
 //void BitonicSort(int* arr, int D_THREADS_PER_BLOCK)
 //{
-//	for (int i = 0; i < D_THREADS_PER_BLOCK * 4; i++)
-//	{
-//		arr[i] = (D_THREADS_PER_BLOCK << D_THREADS_PER_BLOCK_BITS) + i;
-//	}
-//
-//	arr[0] = (0 << D_THREADS_PER_BLOCK_BITS) + 0;
-//	arr[1] = (1 << D_THREADS_PER_BLOCK_BITS) + 1;
-//	arr[2] = (0 << D_THREADS_PER_BLOCK_BITS) + 2;
-//	arr[3] = (1 << D_THREADS_PER_BLOCK_BITS) + 3;
+//	//for (int i = 0; i < D_THREADS_PER_BLOCK * 4; i++)
+//	//{
+//	//	arr[i] = (D_THREADS_PER_BLOCK << D_THREADS_PER_BLOCK_BITS) + i;
+//	//}
+//	//arr[0] = (0 << D_THREADS_PER_BLOCK_BITS) + 0;
+//	//arr[1] = (1 << D_THREADS_PER_BLOCK_BITS) + 1;
+//	//arr[2] = (0 << D_THREADS_PER_BLOCK_BITS) + 2;
+//	//arr[3] = (1 << D_THREADS_PER_BLOCK_BITS) + 3;
 //
 //	int zzzz = 0;
 //	for (int k = 2; k <= D_THREADS_PER_BLOCK; k *= 2)
@@ -74,7 +73,7 @@
 //			}
 //		}
 //	}
-//	arr[D_THREADS_PER_BLOCK - 1] = 0;
+//	zzzz *= 1;
 //}
 
 inline unsigned __device__ cuCountingSortEvaluateGridCellKey(const cuBodyAabbCell& cell, int digit)
@@ -154,40 +153,42 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 			const int prefixBase = (1 << D_AABB_GRID_CELL_BITS) / 2;
 			cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[srcOffset + threadId];
 						
+			const int threadId0 = threadId;
 			for (int k = 2; k <= (1 << D_AABB_GRID_CELL_BITS); k *= 2)
 			{
 				for (int j = k / 2; j > 0; j /= 2)
 				{
-					const int threadId1 = threadId ^ j;
-					if (threadId1 > threadId)
+					const int threadId1 = threadId0 ^ j;
+					if (threadId1 > threadId0)
 					{
-						const int a = cacheSortedKey[threadId];
+						const int a = cacheSortedKey[threadId0];
 						const int b = cacheSortedKey[threadId1];
-						const int mask0 = (-(threadId & k)) >> 31;
+						const int mask0 = (-(threadId0 & k)) >> 31;
 						const int mask1 = (-(a > b)) >> 31;
 						const int mask = mask0 ^ mask1;
-						cacheSortedKey[threadId] = b & mask | a & ~mask;
+						cacheSortedKey[threadId0] = b & mask | a & ~mask;
 						cacheSortedKey[threadId1] = a & mask | b & ~mask;
 					}
 					__syncthreads();
 				}
 			}
+
 			
-			//for (int i = 1; i < D_AABB_GRID_CELL_SORT_BLOCK_SIZE; i = i << 1)
-			//{
-			//	const int sum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
-			//	__syncthreads();
-			//	cacheKeyPrefix[prefixBase + threadId] = sum;
-			//	__syncthreads();
-			//}
-			//
-			//if (index < cellCount)
-			//{
+			for (int i = 1; i < (1 << D_AABB_GRID_CELL_BITS); i = i << 1)
+			{
+				const int sum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
+				__syncthreads();
+				cacheKeyPrefix[prefixBase + threadId] = sum;
+				__syncthreads();
+			}
+			
+			if (index < cellCount)
+			{
 			//	const unsigned keyValue = cacheSortedKey[threadId];
 			//	const unsigned key = keyValue >> 16;
 			//	const unsigned dstOffset = threadId + cacheBufferAdress[key] - cacheKeyPrefix[prefixBase + key];
 			//	dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
-			//}
+			}
 		}
 	}
 }
