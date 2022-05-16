@@ -353,14 +353,17 @@ static void CountingSortBodyCells(ndCudaContext* context, int digit)
 
 	cuCountingSortCountGridCells << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu, digit);
 
+#if 1
 	cuCountingSortHillisSteelePaddBuffer << <D_PREFIX_SCAN_PASSES + 1, histogramGridBlockSize, 0, stream >> > (*infoGpu);
 	for (ndInt32 i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
 	{
 		cuCountingSortHillisSteelePrefixScanAddBlocks << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu, i);
 	}
 	cuCountingSortHillisSteelePrefixScanAddBlocksFinal << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu);
-
 	cuCountingSortBodyCellsPrefixScan << <D_PREFIX_SCAN_PASSES, histogramGridBlockSize, 0, stream >> > (*infoGpu);
+#else
+
+#endif
 
 	//cuCountingSortCaculatePrefixOffset << <radixBlock, D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE, 0, stream >> > (*infoGpu);
 	//cuCountingSortShuffleGridCells << <blocks, D_AABB_GRID_CELL_SORT_BLOCK_SIZE, 0, stream >> > (*infoGpu, digit);
