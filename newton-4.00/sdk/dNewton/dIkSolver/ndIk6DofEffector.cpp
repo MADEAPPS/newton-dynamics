@@ -208,6 +208,7 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 		const ndFloat32 dirMag = ndSqrt(dirMag2);
 		//const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 		const ndFloat32 angle = ndAtan2(dirMag, rotation.m_w);
+		dTrace(("angle_error(%f) rotation(%f %f %f %f)\n", angle * ndRadToDegree, rotation.m_x, rotation.m_y, rotation.m_z, rotation.m_w));
 		AddAngularRowJacobian(desc, basis[0], angle);
 #if 0
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
