@@ -88,13 +88,40 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 				unsigned* histogram = info.m_histogram.m_array;
 				const unsigned value = histogram[srcIndex];
 				histogram[dstIndex + threadId] += value;
+			}
+		}
+	}
+}
 
-				if ((power == D_PREFIX_SCAN_PASSES) && (blockFrac == (power - 1)))
+__global__ void cuHillisSteelePrefixScanAddBlocksFinal(cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const unsigned blockId = blockIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
+		const unsigned blocks = ((alignedItemsCount + blockDim.x - 1) / blockDim.x);
+		if (blockId < blocks)
+		{
+			const unsigned power = 1 << D_PREFIX_SCAN_PASSES_BITS;
+			const unsigned blockFrac = blockId & (power - 1);
+			if (blockFrac >= (power >> 1))
+			{
+				const unsigned threadId = threadIdx.x;
+				const unsigned dstIndex = blockDim.x * blockId;
+				const unsigned srcIndex = blockDim.x * (blockId - blockFrac + (power >> 1)) - 1;
+
+				unsigned* histogram = info.m_histogram.m_array;
+				const unsigned value = histogram[srcIndex];
+				histogram[dstIndex + threadId] += value;
+
+				if (blockFrac == (power - 1))
 				{
 					__syncthreads();
 					if (threadId == (blockDim.x - 1))
 					{
-						unsigned dstBlock = blockId / D_PREFIX_SCAN_PASSES;
+						const unsigned dstBlock = blockId / D_PREFIX_SCAN_PASSES;
 						const unsigned sum = histogram[blockId * blockDim.x + threadId];
 						histogram[alignedItemsCount + dstBlock] = sum;
 					}
@@ -103,6 +130,7 @@ __global__ void cuHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 		}
 	}
 }
+
 
 __global__ void cuHillisSteelePrefixScan(cuSceneInfo& info)
 {
@@ -177,10 +205,12 @@ void CudaPrefixScan(ndCudaContext* const context, int blockSize)
 #endif
 
 	cuHillisSteelePaddBuffer << <D_PREFIX_SCAN_PASSES, blockSize, 0, stream >> > (*infoGpu);
-	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
+	for (ndInt32 i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
 	{
 		cuHillisSteelePrefixScanAddBlocks << <histogramBlocks, blockSize, 0, stream >> > (*infoGpu, i);
 	}
+	cuHillisSteelePrefixScanAddBlocksFinal << <histogramBlocks, blockSize, 0, stream >> > (*infoGpu);
+
 	cuHillisSteelePrefixScan << <D_PREFIX_SCAN_PASSES, blockSize, 0, stream >> > (*infoGpu);
 #endif
 

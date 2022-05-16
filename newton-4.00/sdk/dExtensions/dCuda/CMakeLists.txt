@@ -16,7 +16,7 @@ message (${projectName})
 set(CMAKE_CUDA_STANDARD 14)
 CMAKE_POLICY(SET CMP0104 OLD)
 project(cmake_and_cuda LANGUAGES CXX CUDA)
-SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH_V11_6}/bin/nvcc.exe.exe)
+SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe.exe)
 
 include_directories(../../.)
 include_directories(../../dCore)

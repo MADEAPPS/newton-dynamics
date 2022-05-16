@@ -150,9 +150,9 @@ __global__ void cuCountingSortHillisSteelePrefixScanAddBlocks(cuSceneInfo& info,
 	{
 		const unsigned blockId = blockIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
-		const unsigned alignedItemsCount = prefixScanSuperBlockAlign * ((itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign);
-		const unsigned blocks = ((alignedItemsCount + blockDim.x - 1) / blockDim.x);
+		const unsigned superBlockSize = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned alignedSuperBlockBase = superBlockSize * ((itemsCount + superBlockSize - 1) / superBlockSize);
+		const unsigned blocks = ((alignedSuperBlockBase + blockDim.x - 1) / blockDim.x);
 		if (blockId < blocks)
 		{
 			const unsigned power = 1 << (bit + 1);
@@ -161,23 +161,44 @@ __global__ void cuCountingSortHillisSteelePrefixScanAddBlocks(cuSceneInfo& info,
 			{
 				const unsigned threadId = threadIdx.x;
 				const unsigned dstIndex = blockDim.x * blockId;
-				//const unsigned srcIndex = blockDim.x * (blockId - blockFrac + (power >> 1)) - 1;
+				const unsigned srcIndex = blockDim.x * (blockId - blockFrac + (power >> 1) - 1);
+
+				unsigned* histogram = info.m_histogram.m_array;
+				const unsigned value = histogram[srcIndex + threadId];
+				histogram[dstIndex + threadId] += value;
+			}
+		}
+	}
+}
+
+__global__ void cuCountingSortHillisSteelePrefixScanAddBlocksFinal(cuSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const unsigned blockId = blockIdx.x;
+		const unsigned itemsCount = info.m_histogram.m_size;
+		const unsigned superBlockSize = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned alignedSuperBlockBase = superBlockSize * ((itemsCount + superBlockSize - 1) / superBlockSize);
+		const unsigned blocks = ((alignedSuperBlockBase + blockDim.x - 1) / blockDim.x);
+		if (blockId < blocks)
+		{
+			const unsigned power = 1 << D_PREFIX_SCAN_PASSES_BITS;
+			const unsigned blockFrac = blockId & (power - 1);
+			if (blockFrac >= (power >> 1))
+			{
+				const unsigned threadId = threadIdx.x;
+				const unsigned dstIndex = blockDim.x * blockId;
 				const unsigned srcIndex = blockDim.x * (blockId - blockFrac + (power >> 1) - 1);
 
 				unsigned* histogram = info.m_histogram.m_array;
 				const unsigned value = histogram[srcIndex + threadId];
 				histogram[dstIndex + threadId] += value;
 
-				//if ((power == D_PREFIX_SCAN_PASSES) && (blockFrac == (power - 1)))
-				//{
-				//	__syncthreads();
-				//	if (threadId == (blockDim.x - 1))
-				//	{
-				//		unsigned dstBlock = blockId / D_PREFIX_SCAN_PASSES;
-				//		const unsigned sum = histogram[blockId * blockDim.x + threadId];
-				//		histogram[alignedItemsCount + dstBlock] = sum;
-				//	}
-				//}
+				if (blockFrac == (power - 1))
+				{
+					const unsigned blockSumBase = alignedSuperBlockBase + blockDim.x * (blockId/D_PREFIX_SCAN_PASSES);
+					histogram[blockSumBase + threadId] = value;
+				}
 			}
 		}
 	}
@@ -190,20 +211,28 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info)
 		const unsigned blockId = blockIdx.x;
 		const unsigned threadId = threadIdx.x;
 		const unsigned itemsCount = info.m_histogram.m_size;
-		const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockDim.x;
-		const unsigned superBlockCount = (itemsCount + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
-
+		const unsigned superBlockSize = D_PREFIX_SCAN_PASSES * blockDim.x;
+		const unsigned superBlockCount = (itemsCount + superBlockSize - 1) / superBlockSize;
+		const unsigned alignedSuperBlockBase = superBlockSize * superBlockCount;
+		
+		unsigned offset = blockId * blockDim.x + superBlockSize;
 		unsigned* histogram = info.m_histogram.m_array;
-		unsigned offset = blockId * blockDim.x + prefixScanSuperBlockAlign;
-		const unsigned superBlockOffset = superBlockCount * prefixScanSuperBlockAlign;
+		//__shared__  unsigned superBlockOffset_;
+		//__shared__  unsigned prefixScanSuperBlockAlign_;
+		//superBlockOffset_ = superBlockOffset;
+		//prefixScanSuperBlockAlign_ = prefixScanSuperBlockAlign;
+		//__syncthreads();
 
-		//unsigned value = histogram[superBlockOffset];
-		//for (int i = 1; i < superBlockCount; i++)
-		//{
-		//	histogram[offset + threadId] += value;
-		//	value += histogram[superBlockOffset + i];
-		//	offset += prefixScanSuperBlockAlign;
-		//}
+		unsigned value = 0;
+		unsigned blockSumBase = alignedSuperBlockBase;
+		for (int i = 1; i < superBlockCount; i++)
+		{
+			value += histogram[blockSumBase + threadId];
+			blockSumBase += blockDim.x;
+
+			histogram[offset + threadId] += value;
+			offset += superBlockSize;
+		}
 	}
 }
 
@@ -325,10 +354,12 @@ static void CountingSortBodyCells(ndCudaContext* context, int digit)
 	cuCountingSortCountGridCells << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu, digit);
 
 	cuCountingSortHillisSteelePaddBuffer << <D_PREFIX_SCAN_PASSES + 1, histogramGridBlockSize, 0, stream >> > (*infoGpu);
-	for (ndInt32 i = 0; i < D_PREFIX_SCAN_PASSES_BITS; i++)
+	for (ndInt32 i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
 	{
 		cuCountingSortHillisSteelePrefixScanAddBlocks << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu, i);
 	}
+	cuCountingSortHillisSteelePrefixScanAddBlocksFinal << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu);
+
 	cuCountingSortBodyCellsPrefixScan << <D_PREFIX_SCAN_PASSES, histogramGridBlockSize, 0, stream >> > (*infoGpu);
 
 	//cuCountingSortCaculatePrefixOffset << <radixBlock, D_AABB_GRID_CELL_DIGIT_BLOCK_SIZE, 0, stream >> > (*infoGpu);

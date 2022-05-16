@@ -655,7 +655,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 		const ndFloat32* const invDensity = &data.m_invDensity[0];
 
 		const ndFloat32 h = GetSphGridSize();
-		const ndFloat32 u = m_viscosity;
+		//const ndFloat32 u = m_viscosity;
 		const ndVector kernelConst(m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
 
 		const ndFloat32 viscosity = m_viscosity;

@@ -254,7 +254,7 @@ static ndInt32 SortVertices(
 		const ndInt32 ii = remapIndex[i].m_mask;
 		if (ii == -1)
 		{
-			const ndInt32 i0 = remapIndex[i].m_ordinal;
+			//const ndInt32 i0 = remapIndex[i].m_ordinal;
 			const ndInt32 iii = remapIndex[i].m_vertexIndex;
 			const ndFloat64 swept = vertexList[iii * stride + firstSortAxis] + sweptWindow;;
 			for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
@@ -262,7 +262,7 @@ static ndInt32 SortVertices(
 				const ndInt32 jj = remapIndex[j].m_mask;
 				if (jj == -1)
 				{
-					const ndInt32 j0 = remapIndex[j].m_ordinal;
+					//const ndInt32 j0 = remapIndex[j].m_ordinal;
 					const ndInt32 jjj = remapIndex[j].m_vertexIndex;
 					ndFloat64 val = vertexList[jjj * stride + firstSortAxis];
 					if (val >= swept)

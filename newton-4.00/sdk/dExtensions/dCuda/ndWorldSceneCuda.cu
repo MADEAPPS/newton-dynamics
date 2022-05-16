@@ -824,8 +824,12 @@ void ndWorldSceneCuda::InitBodyArray()
 
 		// check new histogram size.
 		const unsigned histogramGridBlockSize = (1 << D_AABB_GRID_CELL_BITS);
-		const unsigned histogramSuperGridBlockSize = histogramGridBlockSize * D_PREFIX_SCAN_PASSES;
-		const unsigned newCapacity = 2 * histogramGridBlockSize + histogramSuperGridBlockSize * ((cellCount + histogramSuperGridBlockSize - 1) / histogramSuperGridBlockSize);
+		const unsigned blocksCount = 1 + ((cellCount + histogramGridBlockSize - 1) / histogramGridBlockSize);
+		const unsigned superBlocksCount = (blocksCount + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES;
+		//const unsigned blocks = ((cellCount + histogramSuperGridBlockSize - 1) / histogramSuperGridBlockSize);
+		//const unsigned histogramSuperGridBlockSize = histogramGridBlockSize * D_PREFIX_SCAN_PASSES;
+		//const unsigned newCapacity = 2 * histogramGridBlockSize + histogramSuperGridBlockSize * ((cellCount + histogramSuperGridBlockSize - 1) / histogramSuperGridBlockSize);
+		const unsigned newCapacity = (superBlocksCount * D_PREFIX_SCAN_PASSES + superBlocksCount) * histogramGridBlockSize;
 		if (newCapacity >= info.m_histogram.m_capacity)
 		{
 			#ifdef _DEBUG
@@ -836,10 +840,8 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 		else
 		{
-			const unsigned blocks = ((cellCount + histogramGridBlockSize - 1) / histogramGridBlockSize);
-			info.m_histogram.m_size = (blocks + 1) * histogramGridBlockSize;
+			info.m_histogram.m_size = blocksCount * histogramGridBlockSize;
 		}
-		
 	};
 
 	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
