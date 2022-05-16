@@ -236,6 +236,9 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 	}
 	else
 	{
+
+		dTrace(("xxxxsmall angle_error\n"));
+
 		AddAngularRowJacobian(desc, matrix1[0], ndFloat32 (0.0f));
 		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
 		SetLowerFriction(desc, -m_angularMaxTorque);
