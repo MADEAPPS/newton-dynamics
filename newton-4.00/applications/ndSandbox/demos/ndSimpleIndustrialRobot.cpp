@@ -162,8 +162,8 @@ class dSimpleIndustrialRobot : public ndModel
 						m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
 						m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
 
-						m_effector->SetMaxForce(4000.0f);
-						m_effector->SetMaxTorque(1000.0f);
+						m_effector->SetMaxForce(8000.0f);
+						m_effector->SetMaxTorque(8000.0f);
 
 						// the effector is part of the rig
 						world->AddJoint(m_effector);
