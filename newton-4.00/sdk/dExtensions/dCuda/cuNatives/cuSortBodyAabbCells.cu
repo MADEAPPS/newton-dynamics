@@ -184,8 +184,14 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				const unsigned srcOffset = blockId * (1 << D_AABB_GRID_CELL_BITS);
 				const unsigned keyValue = cacheSortedKey[threadId];
 				const unsigned key = keyValue >> 16;
-				const unsigned dstOffset = threadId + cacheKeyPrefix[prefixBase + key] + histogram[srcOffset + threadId];
-				dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
+				const unsigned threadIdBase = cacheKeyPrefix[prefixBase + key];
+				const unsigned dstOffset = threadId - threadIdBase;
+				//const unsigned dstOffset = threadId - threadIdBase + histogram[srcOffset + threadId];
+				//dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
+
+__shared__  unsigned xxxx[1 << D_AABB_GRID_CELL_BITS];
+xxxx[threadId] = dstOffset;
+__syncthreads();
 			}
 		}
 	}
@@ -204,12 +210,8 @@ __global__ void cuCountingSortBodyCellsPrefixScan(const cuSceneInfo& info, unsig
 		
 		unsigned offset = blockId * blockDim.x;
 		unsigned* histogram = info.m_histogram.m_array;
-		////__shared__  unsigned superBlockOffset_;
-		////__shared__  unsigned prefixScanSuperBlockAlign_;
-		////superBlockOffset_ = superBlockOffset;
-		////prefixScanSuperBlockAlign_ = prefixScanSuperBlockAlign;
-		////__syncthreads();
 
+// this is stil wrong 
 		unsigned sum = 0;
 		histogram[offset + threadId] = 0;
 		for (int i = 1; i < blockCount; i++)
