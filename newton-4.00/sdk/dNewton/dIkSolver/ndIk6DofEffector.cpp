@@ -209,7 +209,7 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 		//const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 		const ndFloat32 angle = ndAtan2(dirMag, rotation.m_w);
 		AddAngularRowJacobian(desc, basis[0], angle);
-#if 0
+#if 1
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 #else
 		const ndInt32 index = desc.m_rowsCount - 1;
@@ -233,23 +233,6 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 	}
 	else
 	{
-#if 0
-		AddAngularRowJacobian(desc, matrix1[1], ndFloat32 (0.0f));
-		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
-		SetLowerFriction(desc, -m_angularMaxTorque);
-		SetHighFriction(desc, m_angularMaxTorque);
-
-		AddAngularRowJacobian(desc, matrix1[2], ndFloat32(0.0f));
-		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
-		SetLowerFriction(desc, -m_angularMaxTorque);
-		SetHighFriction(desc, m_angularMaxTorque);
-
-		AddAngularRowJacobian(desc, matrix1[0], ndFloat32(0.0f));
-		SetMotorAcceleration(desc, GetMotorZeroAcceleration(desc));
-		SetLowerFriction(desc, -m_angularMaxTorque);
-		SetHighFriction(desc, m_angularMaxTorque);
-
-#else
 		ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
@@ -267,7 +250,6 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 		SetLowerFriction(desc, -m_angularMaxTorque);
 		SetHighFriction(desc, m_angularMaxTorque);
-#endif
 	}
 }
 

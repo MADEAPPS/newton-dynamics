@@ -252,7 +252,6 @@ __global__ void cuCountingSortHillisSteelePaddBuffer(const cuSceneInfo& info)
 	}
 }
 
-
 __global__ void cuCountingSortHillisSteelePrefixScanAddBlocks(cuSceneInfo& info, int bit)
 {
 	if (info.m_frameIsValid)
