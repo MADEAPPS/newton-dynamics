@@ -118,7 +118,6 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 {
 	__shared__  long long cachedCells[1 << D_AABB_GRID_CELL_BITS];
 	__shared__  unsigned cacheSortedKey[1 << D_AABB_GRID_CELL_BITS];
-	//__shared__  int cacheBufferAdress[D_AABB_GRID_CELL_SORT_BLOCK_SIZE];
 	__shared__  int cacheKeyPrefix[(1 << D_AABB_GRID_CELL_BITS) / 2 + (1 << D_AABB_GRID_CELL_BITS) + 1];
 
 	if (info.m_frameIsValid)
@@ -134,8 +133,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 			cuBodyAabbCell* dst = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
 
 			const unsigned index = threadId + blockDim.x * blockId;
-			const int srcOffset = blockId * (1 << D_AABB_GRID_CELL_BITS);
-			//cacheBufferAdress[threadId] = histogram[blocks * (1 << D_AABB_GRID_CELL_BITS) + srcOffset + threadId];
+			const int lastRoadOffset = (blocks - 1) * (1 << D_AABB_GRID_CELL_BITS);
 			
 			cacheSortedKey[threadId] = ((1<< D_AABB_GRID_CELL_BITS) << 16) | threadId;
 			if (index < cellCount)
@@ -151,7 +149,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 
 			cacheKeyPrefix[threadId] = 0;
 			const int prefixBase = (1 << D_AABB_GRID_CELL_BITS) / 2;
-			cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[srcOffset + threadId];
+			cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
 						
 			const int threadId0 = threadId;
 			for (int k = 2; k <= (1 << D_AABB_GRID_CELL_BITS); k *= 2)
@@ -173,7 +171,6 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				}
 			}
 
-			
 			for (int i = 1; i < (1 << D_AABB_GRID_CELL_BITS); i = i << 1)
 			{
 				const int sum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
@@ -184,10 +181,11 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 			
 			if (index < cellCount)
 			{
-			//	const unsigned keyValue = cacheSortedKey[threadId];
-			//	const unsigned key = keyValue >> 16;
-			//	const unsigned dstOffset = threadId + cacheBufferAdress[key] - cacheKeyPrefix[prefixBase + key];
-			//	dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
+				const unsigned srcOffset = blockId * (1 << D_AABB_GRID_CELL_BITS);
+				const unsigned keyValue = cacheSortedKey[threadId];
+				const unsigned key = keyValue >> 16;
+				const unsigned dstOffset = threadId + cacheKeyPrefix[prefixBase + key] + histogram[srcOffset + threadId];
+				dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
 			}
 		}
 	}

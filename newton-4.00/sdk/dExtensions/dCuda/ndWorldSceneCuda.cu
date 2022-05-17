@@ -456,15 +456,18 @@ bool ndWorldSceneCuda::SanityCheckSortCells() const
 		{
 			cuBodyAabbCell key0(bodyAabbCell[i - 1]);
 			cuBodyAabbCell key1(bodyAabbCell[i - 0]);
-			bool zTest0 = key0.m_z < key1.m_z;
-			bool zTest1 = key0.m_z == key1.m_z;
-			bool yTest0 = key0.m_y < key1.m_y;
-			bool yTest1 = key0.m_y == key1.m_y;
-			bool xTest = key0.m_x <= key1.m_x;
-			bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
-			test = xTest;
+			//bool zTest0 = key0.m_z < key1.m_z;
+			//bool zTest1 = key0.m_z == key1.m_z;
+			//bool yTest0 = key0.m_y < key1.m_y;
+			//bool yTest1 = key0.m_y == key1.m_y;
+			//bool xTest = key0.m_x <= key1.m_x;
+			//bool test = zTest0 | (zTest1 & (yTest0 | (yTest1 & xTest)));
+			//test = xTest;
 			//test = key0.m_y <= key1.m_y;
 			//test = yTest0 | (yTest1 & xTest);
+			ndUnsigned32 value0 = key0.m_key;
+			ndUnsigned32 value1 = key1.m_key;
+			bool test = value0 <= value1;
 			dAssert(test);
 		}
 	}
@@ -905,7 +908,7 @@ dAssert(SanityCheckPrefix());
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 
 	CudaBodyAabbCellSortBuffer(m_context);
-//dAssert(SanityCheckSortCells());
+dAssert(SanityCheckSortCells());
 
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 //	dAssert(cellsBlocksCount > 0);
