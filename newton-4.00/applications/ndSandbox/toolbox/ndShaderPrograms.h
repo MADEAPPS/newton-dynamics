@@ -23,8 +23,9 @@ class ndShaderPrograms
 	ndShaderPrograms();
 	~ndShaderPrograms();
 
+	void Cleanup();
 	bool CreateAllEffects();
-
+	
 	private:
 	void LoadShaderCode (const char* const name, char* const buffer);
 	GLuint CreateShaderEffect (const char* const vertexShader, const char* const pixelShader, const char* const geometryShader = nullptr);

@@ -458,6 +458,7 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	glDeleteTextures(1, &font_texture);
 	ImGui::GetIO().Fonts->TexID = 0;
 
+	m_shaderCache.Cleanup();
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();

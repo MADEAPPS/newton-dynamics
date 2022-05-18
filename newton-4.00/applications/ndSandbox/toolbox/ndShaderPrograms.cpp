@@ -19,12 +19,15 @@ ndShaderPrograms::ndShaderPrograms(void)
 
 ndShaderPrograms::~ndShaderPrograms(void)
 {
+}
+
+void ndShaderPrograms::Cleanup()
+{
 	for (ndInt32 i = 0; i < sizeof(m_shaders) / sizeof(m_shaders[0]); i++)
 	{
 		if (m_shaders[i])
 		{
-			//glDeleteShader(m_skyBox);
-			glDeleteShader(m_shaders[i]);
+			glDeleteProgram(m_shaders[i]);
 			m_shaders[i] = 0;
 		}
 	}
