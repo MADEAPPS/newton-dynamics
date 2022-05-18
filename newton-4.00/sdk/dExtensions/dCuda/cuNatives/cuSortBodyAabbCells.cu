@@ -119,7 +119,9 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 {
 	__shared__  long long cachedCells[1 << D_AABB_GRID_CELL_BITS];
 	__shared__  unsigned cacheSortedKey[1 << D_AABB_GRID_CELL_BITS];
-	__shared__  int cacheKeyPrefix[(1 << D_AABB_GRID_CELL_BITS) / 2 + (1 << D_AABB_GRID_CELL_BITS) + 1];
+	__shared__  unsigned cacheBaseOffset[1 << D_AABB_GRID_CELL_BITS];
+	__shared__  unsigned cacheKeyPrefix[(1 << D_AABB_GRID_CELL_BITS) / 2 + (1 << D_AABB_GRID_CELL_BITS) + 1];
+	__shared__  unsigned cacheItemCount[(1 << D_AABB_GRID_CELL_BITS) / 2 + (1 << D_AABB_GRID_CELL_BITS) + 1];
 
 	if (info.m_frameIsValid)
 	{
@@ -134,23 +136,29 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 			cuBodyAabbCell* dst = (digit & 1) ? info.m_bodyAabbCellScrath.m_array : info.m_bodyAabbCell.m_array;
 
 			const unsigned index = threadId + blockDim.x * blockId;
-			const int lastRoadOffset = blocks * (1 << D_AABB_GRID_CELL_BITS);
+			const unsigned lastRoadOffset = blocks * (1 << D_AABB_GRID_CELL_BITS);
 			
 			cacheSortedKey[threadId] = ((1<< D_AABB_GRID_CELL_BITS) << 16) | threadId;
 			if (index < cellCount)
 			{
 				cuBodyAabbCell cell;
-				long long value = src[index].m_value;
+				const long long value = src[index].m_value;
 				cell.m_value = value;
 				cachedCells[threadId] = value;
-				unsigned key = cuCountingSortEvaluateGridCellKey(cell, digit);
+				const unsigned key = cuCountingSortEvaluateGridCellKey(cell, digit);
 				cacheSortedKey[threadId] = (key << 16) | threadId;
 			}
 			__syncthreads();
 
 			cacheKeyPrefix[threadId] = 0;
+			cacheItemCount[threadId] = 0;
+
 			const unsigned prefixBase = (1 << D_AABB_GRID_CELL_BITS) / 2;
+			const unsigned srcOffset = blockId * (1 << D_AABB_GRID_CELL_BITS);
+			//const unsigned cacheBaseOffset____ = histogram[srcOffset + threadId];
+			cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
 			cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
+			cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + (1 << D_AABB_GRID_CELL_BITS) + threadId] - cacheBaseOffset[threadId];
 						
 			const int threadId0 = threadId;
 			for (int k = 2; k <= (1 << D_AABB_GRID_CELL_BITS); k *= 2)
@@ -174,27 +182,35 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 
 			for (int i = 1; i < (1 << D_AABB_GRID_CELL_BITS); i = i << 1)
 			{
-				const int sum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
+				const unsigned prefixSum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
+				const unsigned countSum = cacheItemCount[prefixBase + threadId] + cacheItemCount[prefixBase - i + threadId];
 				__syncthreads();
-				cacheKeyPrefix[prefixBase + threadId] = sum;
+				cacheKeyPrefix[prefixBase + threadId] = prefixSum;
+				cacheItemCount[prefixBase + threadId] = countSum;
 				__syncthreads();
 			}
 			
 			if (index < cellCount)
 			{
-				const unsigned srcOffset = blockId * (1 << D_AABB_GRID_CELL_BITS);
 				const unsigned keyValue = cacheSortedKey[threadId];
 				const unsigned key = keyValue >> 16;
-				const unsigned threadIdBase = cacheKeyPrefix[prefixBase + key];
-				//const unsigned dstOffset = threadId + threadIdBase;
-				//const unsigned dstOffset = threadId + threadIdBase + histogram[srcOffset + threadId];
-				const unsigned dstOffset = threadId + threadIdBase + histogram[srcOffset + key];
-				dst[dstOffset].m_value = cachedCells[keyValue & 0xffff];
+				const unsigned threadIdBase = cacheItemCount[prefixBase + key];
 
-//__shared__  unsigned xxxx[1 << D_AABB_GRID_CELL_BITS];
-//xxxx[threadId] = dstOffset;
-//__syncthreads();
-//__syncthreads();
+				const unsigned dstOffset0 = threadId - threadIdBase;
+				const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
+				dst[dstOffset0 + dstOffset1].m_value = cachedCells[keyValue & 0xffff];
+
+//if (blockId == 1)
+//{
+//	__shared__  unsigned xxxx0[1 << D_AABB_GRID_CELL_BITS];
+//	//__shared__  unsigned xxxx1[1 << D_AABB_GRID_CELL_BITS];
+//	__shared__  unsigned xxxx2[1 << D_AABB_GRID_CELL_BITS];
+//	xxxx0[threadId] = cacheKeyPrefix[prefixBase + key];
+//	//xxxx1[threadId] = cacheBaseOffset;
+//	xxxx2[threadId] = dstOffset1;
+//	__syncthreads();
+//	__syncthreads();
+//}
 			}
 		}
 	}
@@ -410,6 +426,6 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellScrath.GetCount());
 	
 	CountingSortBodyCells(context, 0);
-	//CountingSortBodyCells(context, 1);
-	//CountingSortBodyCells(context, 2);
+	CountingSortBodyCells(context, 1);
+	CountingSortBodyCells(context, 2);
 }

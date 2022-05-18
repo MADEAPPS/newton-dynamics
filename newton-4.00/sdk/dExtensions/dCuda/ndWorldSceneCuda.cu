@@ -458,9 +458,8 @@ bool ndWorldSceneCuda::SanityCheckSortCells() const
 			cuBodyAabbCell key1(bodyAabbCell[i - 0]);
 			ndUnsigned32 value0 = key0.m_key;
 			ndUnsigned32 value1 = key1.m_key;
-
-			value0 = key0.m_x;
-			value1 = key1.m_x;
+			//value0 = key0.m_x;
+			//value1 = key1.m_x;
 			bool test = (value0 <= value1);
 			dAssert(test);
 		}
