@@ -23,7 +23,9 @@ ndShaderPrograms::~ndShaderPrograms(void)
 	{
 		if (m_shaders[i])
 		{
-			glDeleteShader(m_skyBox);
+			//glDeleteShader(m_skyBox);
+			glDeleteShader(m_shaders[i]);
+			m_shaders[i] = 0;
 		}
 	}
 }
