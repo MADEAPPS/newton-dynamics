@@ -47,8 +47,9 @@ ndCudaDevice::ndCudaDevice()
 	m_valid = (cudaStatus == cudaSuccess);
 
 	dTrace(("gpu: %s\n", m_prop.name));
-	dTrace(("wavefront: %d\n", m_prop.warpSize));
+	dTrace(("warp size: %d\n", m_prop.warpSize));
 	dTrace(("muliprocesors: %d\n", m_prop.multiProcessorCount));
+	dTrace(("compute capability: %d.%d\n", m_prop.major, m_prop.minor));
 	dTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
 	dTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
 }
