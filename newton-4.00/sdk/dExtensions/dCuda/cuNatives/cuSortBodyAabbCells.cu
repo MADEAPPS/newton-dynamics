@@ -425,7 +425,7 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	dAssert(context->m_bodyAabbCell.GetCount() <= context->m_histogram.GetCount());
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellScrath.GetCount());
 	
-	CountingSortBodyCells(context, 0);
-	CountingSortBodyCells(context, 1);
+	//CountingSortBodyCells(context, 0);
+	//CountingSortBodyCells(context, 1);
 	CountingSortBodyCells(context, 2);
 }
