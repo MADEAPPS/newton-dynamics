@@ -60,4 +60,11 @@ void CudaBodyAabbCellSortBufferOld(ndCudaContext* const context);
 
 
 
+
+//template <typename Function>
+//void xxxxxxxxx(const Function& xxx)
+//{
+//	xxx();
+//}
+
 #endif
