@@ -169,7 +169,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 						const int a = cacheSortedKey[threadId0];
 						const int b = cacheSortedKey[threadId1];
 						const int mask0 = (-(threadId0 & k)) >> 31;
-						const int mask1 = (-(a > b)) >> 31;
+						const int mask1 = -(a > b);
 						const int mask = mask0 ^ mask1;
 						cacheSortedKey[threadId0] = (b & mask) | (a & ~mask);
 						cacheSortedKey[threadId1] = (a & mask) | (b & ~mask);
@@ -411,7 +411,7 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	dAssert(context->m_bodyAabbCell.GetCount() <= context->m_histogram.GetCount());
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellScrath.GetCount());
 	
-	//CountingSortBodyCells(context, 0);
-	//CountingSortBodyCells(context, 1);
+	CountingSortBodyCells(context, 0);
+	CountingSortBodyCells(context, 1);
 	CountingSortBodyCells(context, 2);
 }
