@@ -78,9 +78,9 @@
 
 inline unsigned __device__ cuCountingSortEvaluateGridCellKey(const cuBodyAabbCell& cell, int digit)
 {
-	unsigned key = cell.m_key;
-	unsigned mask = (1 << D_AABB_GRID_CELL_BITS) - 1;
-	unsigned value = mask & (key >> (digit * D_AABB_GRID_CELL_BITS));
+	const unsigned key = cell.m_key;
+	const unsigned mask = (1 << D_AABB_GRID_CELL_BITS) - 1;
+	const unsigned value = mask & (key >> (digit * D_AABB_GRID_CELL_BITS));
 	return value;
 };
 
@@ -107,8 +107,7 @@ __global__ void cuCountingSortCountGridCells(const cuSceneInfo& info, int digit)
 				atomicAdd(&cacheBuffer[key], 1);
 			}
 			__syncthreads();
-			
-			//const unsigned dstBase = blockDim.x * blockId + blockDim.x;
+
 			const unsigned dstBase = blockDim.x * blockId;
 			histogram[dstBase + threadId] = cacheBuffer[threadId];
 		}
@@ -155,7 +154,6 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 
 			const unsigned prefixBase = (1 << D_AABB_GRID_CELL_BITS) / 2;
 			const unsigned srcOffset = blockId * (1 << D_AABB_GRID_CELL_BITS);
-			//const unsigned cacheBaseOffset____ = histogram[srcOffset + threadId];
 			cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
 			cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
 			cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + (1 << D_AABB_GRID_CELL_BITS) + threadId] - cacheBaseOffset[threadId];
@@ -173,8 +171,8 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 						const int mask0 = (-(threadId0 & k)) >> 31;
 						const int mask1 = (-(a > b)) >> 31;
 						const int mask = mask0 ^ mask1;
-						cacheSortedKey[threadId0] = b & mask | a & ~mask;
-						cacheSortedKey[threadId1] = a & mask | b & ~mask;
+						cacheSortedKey[threadId0] = (b & mask) | (a & ~mask);
+						cacheSortedKey[threadId1] = (a & mask) | (b & ~mask);
 					}
 					__syncthreads();
 				}
@@ -199,18 +197,6 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				const unsigned dstOffset0 = threadId - threadIdBase;
 				const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
 				dst[dstOffset0 + dstOffset1].m_value = cachedCells[keyValue & 0xffff];
-
-//if (blockId == 1)
-//{
-//	__shared__  unsigned xxxx0[1 << D_AABB_GRID_CELL_BITS];
-//	//__shared__  unsigned xxxx1[1 << D_AABB_GRID_CELL_BITS];
-//	__shared__  unsigned xxxx2[1 << D_AABB_GRID_CELL_BITS];
-//	xxxx0[threadId] = cacheKeyPrefix[prefixBase + key];
-//	//xxxx1[threadId] = cacheBaseOffset;
-//	xxxx2[threadId] = dstOffset1;
-//	__syncthreads();
-//	__syncthreads();
-//}
 			}
 		}
 	}
