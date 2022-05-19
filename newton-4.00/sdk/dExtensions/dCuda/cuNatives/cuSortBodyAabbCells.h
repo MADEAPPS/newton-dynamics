@@ -56,15 +56,14 @@ class cuBodyAabbCell
 };
 
 void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
-void CudaBodyAabbCellSortBufferOld(ndCudaContext* const context);
 
 
+template <typename Predicate>
+__global__ void XXXXXXX(Predicate GetKey)
+{
+	unsigned val = 0;
+	val = GetKey(val);
+}
 
-
-//template <typename Function>
-//void xxxxxxxxx(const Function& xxx)
-//{
-//	xxx();
-//}
 
 #endif

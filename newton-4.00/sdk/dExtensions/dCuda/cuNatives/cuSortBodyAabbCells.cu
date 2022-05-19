@@ -416,18 +416,4 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	CountingSortBodyCells(context, 0);
 	CountingSortBodyCells(context, 1);
 	CountingSortBodyCells(context, 2);
-
-	
-	////auto CountJointBodyPairs = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
-	//auto XXX = ndMakeObject::ndFunction([]()
-	//{
-	//
-	//});
-	//
-	////auto square = []()
-	////{
-	////	//return i * i;
-	////};
-	//
-	//xxxxxxxxx<>(XXX);
 }

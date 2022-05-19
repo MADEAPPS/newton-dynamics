@@ -894,6 +894,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	};
 
 
+
 	cudaStream_t stream = m_context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
 	
@@ -916,4 +917,11 @@ dAssert(SanityCheckSortCells());
 	dAssert(cellsBlocksCount > 0);
 	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
 //dAssert(SanityCheckPrefix());
+
+
+	//auto GetKey____ = [] __device__(const unsigned& item)
+	//{
+	//	return 0;
+	//};
+	//XXXXXXX << <1, 1, 0, stream >> > (GetKey____);
 }
