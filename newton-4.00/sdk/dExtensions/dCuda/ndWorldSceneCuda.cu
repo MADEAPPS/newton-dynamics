@@ -605,11 +605,11 @@ void ndWorldSceneCuda::InitBodyArray()
 			cacheAabb[threadId].m_max = maxBox;
 		}
 
-		const int lastBlock = bodyCount / D_THREADS_PER_BLOCK;
+		const unsigned lastBlock = bodyCount / D_THREADS_PER_BLOCK;
 		if (lastBlock == blockIdx.x)
 		{
 			__syncthreads();
-			const int lastId = bodyCount - D_THREADS_PER_BLOCK * lastBlock;
+			const unsigned lastId = bodyCount - D_THREADS_PER_BLOCK * lastBlock;
 			const cuBoundingBox box(cacheAabb[0]);
 			if (threadId >= lastId)
 			{
@@ -752,9 +752,9 @@ void ndWorldSceneCuda::InitBodyArray()
 
 	auto GenerateHashGrids = [] __device__(const cuSceneInfo & info)
 	{
-		const int threadId = threadIdx.x;
-		const int index = threadId + blockDim.x * blockIdx.x;
-		const int bodyCount = info.m_bodyArray.m_size - 1;
+		const unsigned threadId = threadIdx.x;
+		const unsigned index = threadId + blockDim.x * blockIdx.x;
+		const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 		if (index < bodyCount)
 		{
 			const unsigned* histogram = info.m_histogram.m_array;
@@ -850,13 +850,13 @@ void ndWorldSceneCuda::InitBodyArray()
 	{
 		__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
 
-		const int blockId = blockIdx.x;
-		const int cellCount = info.m_bodyAabbCell.m_size - 1;
-		const int blocks = (cellCount + blockDim.x - 1) / blockDim.x;
+		const unsigned blockId = blockIdx.x;
+		const unsigned cellCount = info.m_bodyAabbCell.m_size - 1;
+		const unsigned blocks = (cellCount + blockDim.x - 1) / blockDim.x;
 		if (blockId < blocks)
 		{
-			const int threadId = threadIdx.x;
-			const int threadId1 = D_THREADS_PER_BLOCK / 2 + threadId;
+			const unsigned threadId = threadIdx.x;
+			const unsigned threadId1 = D_THREADS_PER_BLOCK / 2 + threadId;
 			int index = threadId + blockDim.x * blockIdx.x;
 
 			cacheBuffer[threadId] = 0;
@@ -913,8 +913,8 @@ dAssert(SanityCheckPrefix());
 	CudaBodyAabbCellSortBuffer(m_context);
 dAssert(SanityCheckSortCells());
 
-//	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-//	dAssert(cellsBlocksCount > 0);
-//	CudaBodyCalculatePairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculatePairsCount, *infoGpu);
-//dAssert(SanityCheck());
+	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	dAssert(cellsBlocksCount > 0);
+	CudaBodyCalculatePairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculatePairsCount, *infoGpu);
+//dAssert(SanityCheckPrefix());
 }
