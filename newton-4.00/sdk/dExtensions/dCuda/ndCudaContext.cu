@@ -138,9 +138,10 @@ ndCudaContext* ndCudaContext::CreateContext()
 	cudaDeviceProp prop;
 	ndCudaContext* context = nullptr;
 	cudaError_t cudaStatus = cudaGetDeviceProperties(&prop, 0);
-	int campbility = prop.major * 10 + prop.minor;
+	int campbility = prop.major * 100 + prop.minor;
 	// go as far back as 5.2 Maxwell GeForce GTX 960 or better.
-	if ((cudaStatus == cudaSuccess) && (campbility >= 52))
+	//if ((cudaStatus == cudaSuccess) && (campbility >= 600))
+	if ((cudaStatus == cudaSuccess) && (campbility >= 700))
 	{
 		cudaStatus = cudaSetDevice(0);
 		context = (cudaStatus == cudaSuccess) ? new ndCudaContext() : nullptr;
