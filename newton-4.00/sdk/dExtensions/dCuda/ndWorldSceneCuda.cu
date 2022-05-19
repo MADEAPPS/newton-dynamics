@@ -46,15 +46,15 @@ __global__ void CudaEndFrame(cuSceneInfo& info, int frameCount)
 }
 
 template <typename Predicate>
-__global__ void CudaInitBodyArray(Predicate UpdateBodyScene, cuSceneInfo& info)
+__global__ void CudaInitBodyArray(Predicate InitBodyArray, cuSceneInfo& info)
 {
-	UpdateBodyScene(info);
+	InitBodyArray(info);
 }
 
 template <typename Predicate>
-__global__ void CudaMergeAabb(Predicate ReducedAabb, cuSceneInfo& info)
+__global__ void CudaMergeAabb(Predicate MergeAabb, cuSceneInfo& info)
 {
-	ReducedAabb(info);
+	MergeAabb(info);
 }
 
 template <typename Predicate>
@@ -97,11 +97,11 @@ __global__ void CudaInitTransforms(Predicate InitTransforms, cuSceneInfo& info)
 }
 
 template <typename Predicate>
-__global__ void CudaBodyCalculatePairsCount(Predicate CalculatePairsCount, cuSceneInfo& info)
+__global__ void CudaCalculateBodyPairsCount(Predicate CalculateBodyPairsCount, cuSceneInfo& info)
 {
 	if (info.m_frameIsValid)
 	{
-		CalculatePairsCount(info);
+		CalculateBodyPairsCount(info);
 	}
 }
 
@@ -569,7 +569,7 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
-	auto CalcuateBodyAabb = [] __device__(cuSceneInfo& info)
+	auto InitBodyArray = [] __device__(cuSceneInfo& info)
 	{
 		__shared__  cuBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
@@ -636,7 +636,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto ReducedAabb = [] __device__(cuSceneInfo& info)
+	auto MergeAabb = [] __device__(cuSceneInfo& info)
 	{
 		__shared__  cuBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
@@ -846,7 +846,7 @@ void ndWorldSceneCuda::InitBodyArray()
 		}
 	};
 
-	auto CalculatePairsCount = [] __device__(cuSceneInfo & info)
+	auto CalculateBodyPairsCount = [] __device__(cuSceneInfo & info)
 	{
 		__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
 
@@ -901,8 +901,8 @@ void ndWorldSceneCuda::InitBodyArray()
 	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
 	ndInt32 bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
-	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalcuateBodyAabb, *infoGpu);
-	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (ReducedAabb, *infoGpu);
+	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (InitBodyArray, *infoGpu);
+	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (MergeAabb, *infoGpu);
 	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
 	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
 dAssert(SanityCheckPrefix());
@@ -915,6 +915,6 @@ dAssert(SanityCheckSortCells());
 
 	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	dAssert(cellsBlocksCount > 0);
-	CudaBodyCalculatePairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculatePairsCount, *infoGpu);
+	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
 //dAssert(SanityCheckPrefix());
 }
