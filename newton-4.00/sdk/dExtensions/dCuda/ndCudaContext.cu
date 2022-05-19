@@ -50,11 +50,13 @@ ndCudaDevice::ndCudaDevice()
 	dTrace(("compute capability: %d.%d\n", m_prop.major, m_prop.minor));
 
 	dTrace(("warp size: %d\n", m_prop.warpSize));
-	dTrace(("muliprocessors: %d\n", m_prop.multiProcessorCount));
+	dTrace(("multiprocessors: %d\n", m_prop.multiProcessorCount));
 	dTrace(("threads per blocks %d\n", m_prop.maxThreadsPerBlock));
-	dTrace(("blocks per muliprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
+	dTrace(("blocks per multiprocessors %d\n", m_prop.maxBlocksPerMultiProcessor));
 	dTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
 	dTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
+
+	m_blocksPerKernelCall = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
 }
 
 ndCudaDevice::~ndCudaDevice()

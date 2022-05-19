@@ -26,7 +26,7 @@
 #include <vector_types.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
-#include "cuIntrisics.h"
+#include "cuIntrinsics.h"
 
 class cuVector: public float4
 {

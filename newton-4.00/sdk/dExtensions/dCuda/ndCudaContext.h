@@ -41,8 +41,9 @@ class ndCudaDevice
 	ndCudaDevice();
 	~ndCudaDevice();
 
-	ndInt32 m_valid;
 	struct cudaDeviceProp m_prop;
+	ndUnsigned32 m_valid;
+	ndUnsigned32 m_blocksPerKernelCall;
 };
 
 class ndCudaContext : public ndClassAlloc, public ndCudaDevice

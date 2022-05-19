@@ -25,7 +25,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
-#include "cuIntrisics.h"
+#include "cuIntrinsics.h"
 
 template<class T>
 class cuHostBuffer

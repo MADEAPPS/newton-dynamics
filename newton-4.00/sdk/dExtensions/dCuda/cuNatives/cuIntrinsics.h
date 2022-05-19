@@ -19,13 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_INTRISICS_H__
-#define __ND_INTRISICS_H__
+#ifndef __ND_INTRINSICS_H__
+#define __ND_INTRINSICS_H__
 
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define D_GRANULARITY	(1024 * 512)
+#define D_GRANULARITY	(1024 * 256)
 
 template <class T>
 inline T __device__ __host__ cuAbs(T A)

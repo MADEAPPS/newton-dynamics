@@ -23,7 +23,7 @@
 #define __ND_CUMATRIX3x3_H__
 
 #include "cuVector.h"
-#include "cuIntrisics.h"
+#include "cuIntrinsics.h"
 
 class cuMatrix3x3
 {

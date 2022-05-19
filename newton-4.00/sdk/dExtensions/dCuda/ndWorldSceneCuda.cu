@@ -376,7 +376,6 @@ void ndWorldSceneCuda::UpdateBodyList()
 		cudaDeviceSynchronize();
 		sceneInfo->m_frameIsValid = 1;
 
-		//CudaBodyAabbCellResizeBuffers(m_context);
 		if (sceneInfo->m_histogram.m_size > sceneInfo->m_histogram.m_capacity)
 		{
 			m_context->m_histogram.SetCount(sceneInfo->m_histogram.m_size);

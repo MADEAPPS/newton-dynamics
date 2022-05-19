@@ -27,7 +27,7 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 
-#include "cuIntrisics.h"
+#include "cuIntrinsics.h"
 #include "ndCudaContext.h"
 
 #define D_PREFIX_SCAN_PASSES_BITS	4

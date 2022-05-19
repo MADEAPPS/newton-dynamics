@@ -24,7 +24,7 @@
 #include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
 
-#include "cuIntrisics.h"
+#include "cuIntrinsics.h"
 #include "cuPrefixScan.h"
 #include "ndCudaContext.h"
 #include "cuSortBodyAabbCells.h"
@@ -376,7 +376,7 @@ __global__ void cuCountingSortCaculatePrefixOffset(const cuSceneInfo& info)
 #endif
 
 
-static void CountingSortBodyCells(ndCudaContext* context, int digit)
+static void CountingSortBodyCells(ndCudaContext* const context, int digit)
 {
 	cuSceneInfo* const sceneInfo = context->m_sceneInfoCpu;
 	cudaStream_t stream = context->m_solverComputeStream;
@@ -384,6 +384,8 @@ static void CountingSortBodyCells(ndCudaContext* context, int digit)
 
 	const unsigned histogramGridBlockSize = (1 << D_AABB_GRID_CELL_BITS);
 	const unsigned blocks = (sceneInfo->m_bodyAabbCell.m_capacity + histogramGridBlockSize - 1) / histogramGridBlockSize;
+
+	dAssert(blocks <= context->m_blocksPerKernelCall);
 
 	cuCountingSortCountGridCells << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu, digit);
 
