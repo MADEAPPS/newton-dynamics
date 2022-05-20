@@ -49,7 +49,9 @@ else()
 		add_definitions(-D_D_NEWTON_CUDA)
 		include_directories(dExtensions/dCuda)
 
-		# none of this shit works		
+		# none of this shit works
+		#CMAKE_POLICY(SET CMP0104 NEW)
+		#SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe.exe)
 		#set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 		#set_properties(TARGET ${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 		#set_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)

@@ -385,7 +385,7 @@ static void CountingSortBodyCells(ndCudaContext* const context, int digit)
 	const unsigned histogramGridBlockSize = (1 << D_AABB_GRID_CELL_BITS);
 	const unsigned blocks = (sceneInfo->m_bodyAabbCell.m_capacity + histogramGridBlockSize - 1) / histogramGridBlockSize;
 
-	dAssert(blocks <= context->m_blocksPerKernelCall);
+	//dAssert(blocks <= context->m_blocksPerKernelCall);
 
 	cuCountingSortCountGridCells << <blocks, histogramGridBlockSize, 0, stream >> > (*infoGpu, digit);
 

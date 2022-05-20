@@ -734,7 +734,7 @@ void ndWorldSceneCuda::InitBodyArray()
 					printf("function: CountAabb: histogram buffer overflow\n");
 					#endif
 				}
-				info.m_frameIsValid = 1;
+				info.m_frameIsValid = 0;
 				info.m_histogram.m_size = info.m_histogram.m_capacity + 1;
 			}
 			else
@@ -836,7 +836,7 @@ void ndWorldSceneCuda::InitBodyArray()
 			#ifdef _DEBUG
 			printf("function: ValidateGridArray: histogram buffer overflow\n");
 			#endif
-			info.m_frameIsValid = 1;
+			info.m_frameIsValid = 0;
 			info.m_histogram.m_size = newCapacity;
 		}
 		else
@@ -909,9 +909,9 @@ dAssert(SanityCheckPrefix());
 	CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 
-//	CudaBodyAabbCellSortBuffer(m_context);
-////dAssert(SanityCheckSortCells());
-//
+	CudaBodyAabbCellSortBuffer(m_context);
+dAssert(SanityCheckSortCells());
+
 //	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 //	dAssert(cellsBlocksCount > 0);
 //	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
