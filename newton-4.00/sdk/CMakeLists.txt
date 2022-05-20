@@ -50,6 +50,7 @@ else()
 		include_directories(dExtensions/dCuda)
 
 		# none of this shit works
+		#PROJECT(GPUProcessing LANGUAGES CUDA CXX)
 		#set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 		#set_properties(TARGET ${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 		#set_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
@@ -148,7 +149,6 @@ else()
     
 	if (MSVC)
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-		#if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 			set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundCoreStdafx.h")
 			set_source_files_properties(dCore/ndCoreStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcndCoreStdafx.h")
 		endif()

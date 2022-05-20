@@ -10,13 +10,13 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndSolverCuda")
+set (projectName "ndSolverCuda_1")
 message (${projectName})
 
 set(CMAKE_CUDA_STANDARD 14)
 CMAKE_POLICY(SET CMP0104 OLD)
 project(cmake_and_cuda LANGUAGES CXX CUDA)
-SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe.exe)
+set(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe)
 
 include_directories(../../.)
 include_directories(../../dCore)
@@ -46,9 +46,9 @@ Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -lineinfo")
 #Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -lineinfo")
 
 # this does not fucking works, unless yo umak ethe p[ropject a cuda solution.]
-#Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -rdc=true")
-#Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -rdc=true")
-#Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -rdc=true")
+Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -rdc=true")
+Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -rdc=true")
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} -rdc=true")
 
 Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} --device-debug")
 Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELWITHDEBINFO} --device-debug")
@@ -61,17 +61,7 @@ message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
 message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")
 message ("cuda release with debug options ${CMAKE_CUDA_FLAGS_RELWITHDEBINFO}")
 
-if(MSVC)
-	add_library(${projectName} STATIC ${CPP_SOURCE})
-endif()
-
-if(MINGW)
-	add_library(${projectName} STATIC ${CPP_SOURCE})
-endif()
-
-if(UNIX)
-	add_library(${projectName} SHARED ${CPP_SOURCE})
-endif()
+add_library(${projectName} SHARED ${CPP_SOURCE})
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib
