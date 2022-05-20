@@ -76,12 +76,17 @@
 //	zzzz *= 1;
 //}
 
-inline unsigned __device__ cuCountingSortEvaluateGridCellKey(const cuBodyAabbCell& cell, int digit)
+//inline unsigned __device__ cuCountingSortEvaluateGridCellKey(const cuBodyAabbCell& cell, int digit)
+inline unsigned __device__ cuCountingSortEvaluateGridCellKey(unsigned key, int digit)
 {
-	const unsigned key = cell.m_key;
+	//const unsigned key = cell.m_key;
 	const unsigned mask = (1 << D_AABB_GRID_CELL_BITS) - 1;
 	const unsigned value = mask & (key >> (digit * D_AABB_GRID_CELL_BITS));
 	return value;
+	//const unsigned x = cell.m_x;
+	//const unsigned y = cell.m_y;
+	//const unsigned z = cell.m_z;
+	//return digit ? ((digit == 1) ? y : z) : cell.m_x;
 };
 
 __global__ void cuCountingSortCountGridCells(const cuSceneInfo& info, int digit)
@@ -103,18 +108,8 @@ __global__ void cuCountingSortCountGridCells(const cuSceneInfo& info, int digit)
 			const unsigned index = threadId + blockDim.x * blockId;
 			if (index < cellCount)
 			{
-				const unsigned key = cuCountingSortEvaluateGridCellKey(src[index], digit);
+				const unsigned key = cuCountingSortEvaluateGridCellKey(src[index].m_key, digit);
 				atomicAdd(&cacheBuffer[key], 1);
-				//if (blockId == 0)
-				//{
-				//	//blockDim.x* blockId
-				//	const unsigned index1 = blockDim.x * blockId;
-				//	for (int i = 0; i < blockDim.x; i++)
-				//	{
-				//		const unsigned key = cuCountingSortEvaluateGridCellKey(src[index1 + i], digit);
-				//		cacheBuffer[key] += 1;
-				//	}
-				//}
 			}
 			__syncthreads();
 
@@ -154,7 +149,7 @@ __global__ void cuCountingSortShuffleGridCells(const cuSceneInfo& info, int digi
 				const long long value = src[index].m_value;
 				cell.m_value = value;
 				cachedCells[threadId] = value;
-				const unsigned key = cuCountingSortEvaluateGridCellKey(cell, digit);
+				const unsigned key = cuCountingSortEvaluateGridCellKey(cell.m_key, digit);
 				cacheSortedKey[threadId] = (key << 16) | threadId;
 			}
 			__syncthreads();
@@ -423,7 +418,7 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context)
 	dAssert(context->m_bodyAabbCell.GetCount() <= context->m_histogram.GetCount());
 	dAssert(context->m_bodyAabbCell.GetCount() == context->m_bodyAabbCellScrath.GetCount());
 	
-	CountingSortBodyCells(context, 0);
-	CountingSortBodyCells(context, 1);
+	//CountingSortBodyCells(context, 0);
+	//CountingSortBodyCells(context, 1);
 	CountingSortBodyCells(context, 2);
 }

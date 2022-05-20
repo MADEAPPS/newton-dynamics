@@ -462,8 +462,8 @@ bool ndWorldSceneCuda::SanityCheckSortCells() const
 			ndUnsigned32 value1 = key1.m_key;
 			//value0 = key0.m_x + key0.m_y * 1024;
 			//value1 = key1.m_x + key1.m_y * 1024;
-			//value0 = key0.m_z;
-			//value1 = key1.m_z;
+			value0 = key0.m_z;
+			value1 = key1.m_z;
 
 			bool test = (value0 <= value1);
 			dAssert(test);
