@@ -894,7 +894,6 @@ void ndWorldSceneCuda::InitBodyArray()
 	};
 
 
-
 	cudaStream_t stream = m_context->m_solverComputeStream;
 	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
 	
@@ -910,18 +909,18 @@ dAssert(SanityCheckPrefix());
 	CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
 	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 
-	CudaBodyAabbCellSortBuffer(m_context);
-dAssert(SanityCheckSortCells());
-
-	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	dAssert(cellsBlocksCount > 0);
-	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
-//dAssert(SanityCheckPrefix());
-
-
-	//auto GetKey____ = [] __device__(const unsigned& item)
-	//{
-	//	return 0;
-	//};
-	//XXXXXXX << <1, 1, 0, stream >> > (GetKey____);
+//	CudaBodyAabbCellSortBuffer(m_context);
+////dAssert(SanityCheckSortCells());
+//
+//	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+//	dAssert(cellsBlocksCount > 0);
+//	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
+////dAssert(SanityCheckPrefix());
+//
+//
+//	//auto GetKey____ = [] __device__(const unsigned& item)
+//	//{
+//	//	return 0;
+//	//};
+//	//XXXXXXX << <1, 1, 0, stream >> > (GetKey____);
 }

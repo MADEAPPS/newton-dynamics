@@ -49,9 +49,10 @@ else()
 		add_definitions(-D_D_NEWTON_CUDA)
 		include_directories(dExtensions/dCuda)
 
-		#CMAKE_POLICY(SET CMP0104 NEW)
-		#SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe.exe)
+		# none of this shit works		
 		#set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+		#set_properties(TARGET ${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+		#set_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 
 		if(NEWTON_BUILD_SHARED_LIBS)
 			if (PTR_SIZE EQUAL 8)
