@@ -105,6 +105,16 @@ __global__ void cuCountingSortCountGridCells(const cuSceneInfo& info, int digit)
 			{
 				const unsigned key = cuCountingSortEvaluateGridCellKey(src[index], digit);
 				atomicAdd(&cacheBuffer[key], 1);
+				//if (blockId == 0)
+				//{
+				//	//blockDim.x* blockId
+				//	const unsigned index1 = blockDim.x * blockId;
+				//	for (int i = 0; i < blockDim.x; i++)
+				//	{
+				//		const unsigned key = cuCountingSortEvaluateGridCellKey(src[index1 + i], digit);
+				//		cacheBuffer[key] += 1;
+				//	}
+				//}
 			}
 			__syncthreads();
 
