@@ -61,11 +61,17 @@ message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
 message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")
 message ("cuda release with debug options ${CMAKE_CUDA_FLAGS_RELWITHDEBINFO}")
 
+add_definitions(-D_D_CUDA_EXPORT_DLL)
+
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-install(TARGETS ${projectName} 
-		LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib
-		RUNTIME DESTINATION bin)
-
 install(FILES ${HEADERS} DESTINATION include/${projectName})
+install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
+install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
+
+if (NEWTON_BUILD_SANDBOX_DEMOS)
+	add_custom_command(
+		TARGET ${projectName} POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/../../applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+endif ()

@@ -48,6 +48,7 @@ else()
 	if (NEWTON_ENABLE_CUDA_SOLVER)
 		add_definitions(-D_D_NEWTON_CUDA)
 		include_directories(dExtensions/dCuda)
+		include_directories(dExtensions/dCuda_1)
 
 		# none of this shit works
 		#PROJECT(GPUProcessing LANGUAGES CUDA CXX)
@@ -132,7 +133,7 @@ else()
 		endif()
 
 		if (NEWTON_ENABLE_CUDA_SOLVER)
-			target_link_libraries (${projectName} ndSolverCuda)
+			target_link_libraries (${projectName} ndSolverCuda ndSolverCuda_1)
 		endif()
 
 		if (NEWTON_ENABLE_OPENCL_SOLVER)
