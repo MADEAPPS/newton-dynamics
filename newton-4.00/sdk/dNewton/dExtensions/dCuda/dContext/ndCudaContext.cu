@@ -57,3 +57,28 @@ const char* ndCudaContext::GetStringId() const
 {
 	return IsValid() ? &m_device->m_prop.name[0] : "no cuda support";
 }
+
+ndCudaSpatialVector* ndCudaContext::GetTransformBuffer0()
+{
+	return m_implement->GetTransformBuffer0();
+}
+
+ndCudaSpatialVector* ndCudaContext::GetTransformBuffer1()
+{
+	return m_implement->GetTransformBuffer1();
+}
+
+void ndCudaContext::Begin()
+{
+	m_implement->Begin();
+}
+
+void ndCudaContext::ResizeBuffers(int size)
+{
+	m_implement->ResizeBuffers(size);
+}
+
+void ndCudaContext::LoadBodyData(int size)
+{
+	m_implement->LoadBodyData(size);
+}

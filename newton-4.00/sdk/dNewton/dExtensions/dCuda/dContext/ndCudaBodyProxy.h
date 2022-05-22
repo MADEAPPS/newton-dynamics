@@ -109,7 +109,7 @@ class ndCudaBodyProxy
 		if (omegaMag2 > tol2)
 		{
 			// this is correct
-			const float omegaAngle = sqrt(omegaMag2);
+			const float omegaAngle = sqrtf(omegaMag2);
 			const ndCudaVector omegaAxis(m_omega.Scale(float(1.0f) / omegaAngle));
 			const ndCudaQuat rotationStep(omegaAxis, omegaAngle * timestep);
 			const ndCudaQuat rotation(m_rotation * rotationStep);

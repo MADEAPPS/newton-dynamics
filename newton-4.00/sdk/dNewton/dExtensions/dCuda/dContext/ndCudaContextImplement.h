@@ -39,8 +39,8 @@
 
 
 class ndCudaDevice;
-//#define D_THREADS_PER_BLOCK_BITS	8
-//#define D_THREADS_PER_BLOCK		(1<<D_THREADS_PER_BLOCK_BITS)
+#define D_THREADS_PER_BLOCK_BITS	8
+#define D_THREADS_PER_BLOCK			(1<<D_THREADS_PER_BLOCK_BITS)
 
 class ndCudaContextImplement
 {
@@ -48,15 +48,21 @@ class ndCudaContextImplement
 	ndCudaContextImplement();
 	~ndCudaContextImplement();
 
+	void Begin();
+	void LoadBodyData(int size);
+	void ResizeBuffers(int size);
+
+	ndCudaSpatialVector* GetTransformBuffer0();
+	ndCudaSpatialVector* GetTransformBuffer1();
+
 	//void SwapBuffers();
 	ndCudaSceneInfo* m_sceneInfoGpu;
 	ndCudaSceneInfo* m_sceneInfoCpu;
 	ndCudaDeviceBuffer<unsigned> m_histogram;
-	//ndArray<cuBodyProxy> m_bodyBufferCpu;
 	ndCudaDeviceBuffer<ndCudaBodyProxy> m_bodyBufferGpu;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScrath;
-	ndCudaDeviceBuffer<cuBoundingBox> m_boundingBoxGpu;
+	ndCudaDeviceBuffer<ndCudaBoundingBox> m_boundingBoxGpu;
 	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu0;
 	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu1;
 	ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBufferGpu0;

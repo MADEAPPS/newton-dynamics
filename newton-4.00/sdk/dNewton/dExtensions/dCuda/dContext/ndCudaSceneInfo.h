@@ -26,10 +26,10 @@
 #include <vector_types.h>
 #include <cuda_runtime.h>
 #include "ndCudaVector.h"
-//#include "cuDeviceBuffer.h"
+#include "ndCudaDeviceBuffer.h"
 
-//class cuBodyProxy;
-//class cuBodyAabbCell;
+class ndCudaBodyProxy;
+class ndCudaBodyAabbCell;
 
 class ndCudaSpatialVector
 {
@@ -38,61 +38,61 @@ class ndCudaSpatialVector
 	ndCudaVector m_angular;
 };
 
-class cuBoundingBox
+class ndCudaBoundingBox
 {
 	public:
 	ndCudaVector m_min;
 	ndCudaVector m_max;
 };
 
-//template <class T>
-//class cuBuffer
-//{
-//	public:
-//	cuBuffer()
-//		:m_array(nullptr)
-//		,m_size(0)
-//		,m_capacity(0)
-//	{
-//	}
-//
-//	cuBuffer(const cuDeviceBuffer<T>& src)
-//		:m_array((T*)&src[0])
-//		,m_size(src.GetCount())
-//		,m_capacity(src.GetCapacity())
-//	{
-//	}
-//
-//	T* m_array;
-//	unsigned m_size;
-//	unsigned m_capacity;
-//};
+template <class T>
+class ndCudaBuffer
+{
+	public:
+	ndCudaBuffer()
+		:m_array(nullptr)
+		,m_size(0)
+		,m_capacity(0)
+	{
+	}
+
+	ndCudaBuffer(const ndCudaDeviceBuffer<T>& src)
+		:m_array((T*)&src[0])
+		,m_size(src.GetCount())
+		,m_capacity(src.GetCapacity())
+	{
+	}
+
+	T* m_array;
+	unsigned m_size;
+	unsigned m_capacity;
+};
 
 class ndCudaSceneInfo
 {
 	public:
 	ndCudaSceneInfo()
-		//:m_worldBox()
-		//,m_histogram()
-		//,m_bodyArray()
-		//,m_bodyAabbArray()
-		//,m_bodyAabbCell()
-		//,m_bodyAabbCellScrath()
-		//,m_transformBuffer0()
-		//,m_transformBuffer1()
-		//,m_frameIsValid(0)
-		//,m_frameCount(0)
+		:m_worldBox()
+		,m_histogram()
+		,m_bodyArray()
+		,m_bodyAabbArray()
+		,m_bodyAabbCell()
+		,m_bodyAabbCellScrath()
+		,m_transformBuffer0()
+		,m_transformBuffer1()
+		,m_frameIsValid(0)
+		,m_frameCount(0)
 	{
 	}
 
-	//cuBoundingBox m_worldBox;
-	//cuBuffer<unsigned> m_histogram;
-	//cuBuffer<cuBodyProxy> m_bodyArray;
-	//cuBuffer<cuBoundingBox> m_bodyAabbArray;
-	//cuBuffer<cuBodyAabbCell> m_bodyAabbCell;
-	//cuBuffer<cuBodyAabbCell> m_bodyAabbCellScrath;
-	//cuBuffer<ndCudaSpatialVector> m_transformBuffer0;
-	//cuBuffer<ndCudaSpatialVector> m_transformBuffer1;
+	ndCudaBoundingBox m_worldBox;
+	ndCudaBuffer<unsigned> m_histogram;
+	ndCudaBuffer<ndCudaBodyProxy> m_bodyArray;
+	ndCudaBuffer<ndCudaBoundingBox> m_bodyAabbArray;
+	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
+	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScrath;
+	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
+	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
 	
 	unsigned m_frameIsValid;
 	unsigned m_frameCount;

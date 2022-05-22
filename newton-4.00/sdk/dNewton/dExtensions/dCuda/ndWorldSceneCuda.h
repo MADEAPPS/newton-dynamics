@@ -21,10 +21,8 @@
 
 #include <ndNewtonStdafx.h>
 #include <ndCudaContext.h>
+#include <ndCudaBodyProxy.h>
 #include <ndDynamicsUpdate.h>
-
-
-//class ndCudaContext;
 
 class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 {
@@ -53,6 +51,7 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 
 	ndCudaContext* GetContext();
 
-	//ndCudaContext* m_context;
+	ndArray<ndCudaBodyProxy> m_bodyBufferCpu;
+
 	friend class ndDynamicsUpdateCuda;
 };

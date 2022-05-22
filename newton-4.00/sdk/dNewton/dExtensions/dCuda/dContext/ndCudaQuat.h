@@ -52,8 +52,8 @@ class ndCudaQuat: public ndCudaVector
 		:ndCudaVector()
 	{
 		angle = angle * 0.5f;
-		w = cos(angle);
-		const float sinAng = sin(angle);
+		w = cosf(angle);
+		const float sinAng = sinf(angle);
 		x = unitAxis.x * sinAng;
 		y = unitAxis.y * sinAng;
 		z = unitAxis.z * sinAng;

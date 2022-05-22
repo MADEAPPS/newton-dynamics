@@ -164,7 +164,7 @@ class ndCudaVector: public float4
 
 	inline ndCudaVector __device__ __host__ Normalize() const
 	{
-		float den = 1.0f / sqrt(DotProduct(*this));
+		float den = 1.0f / sqrtf(DotProduct(*this));
 		return ndCudaVector(x * den, y * den, z * den, w * den);
 	}
 };

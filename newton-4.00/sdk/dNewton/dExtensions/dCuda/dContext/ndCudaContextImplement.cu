@@ -19,29 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-//#include <ndWorld.h>
-//#include <ndModel.h>
-//#include <ndWorldScene.h>
-//#include <ndBodyDynamic.h>
-//#include <ndSkeletonList.h>
-//#include <ndDynamicsUpdate.h>
-//#include <ndBodyParticleSet.h>
-//#include <ndDynamicsUpdateSoa.h>
-//#include <ndJointBilateralConstraint.h>
-//
-//#include "ndCudaContext.h"
-//#include "cuSortBodyAabbCells.h"
-
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
 #include "ndCudaContext.h"
 #include "ndCudaContextImplement.h"
 
+
+__global__ void CudaEndFrame(ndCudaSceneInfo& info, int frameCount)
+{
+	info.m_frameCount = frameCount;
+}
+
 ndCudaContextImplement::ndCudaContextImplement()
 	:m_sceneInfoGpu(nullptr)
 	,m_sceneInfoCpu(nullptr)
 	,m_histogram()
-	//,m_bodyBufferCpu(D_GRANULARITY)
 	,m_bodyBufferGpu()
 	,m_bodyAabbCell()
 	,m_bodyAabbCellScrath()
@@ -103,3 +95,110 @@ void ndCudaContextImplement::SwapBuffers()
 	//m_transformBufferCpu0.Swap(m_transformBufferCpu1);
 }
 */
+
+void ndCudaContextImplement::Begin()
+{
+	cudaDeviceSynchronize();
+
+	const ndInt32 frameCounter = m_frameCounter;
+
+	// get the scene info from the update	
+	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
+	ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
+
+	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndCudaSceneInfo), cudaMemcpyDeviceToHost, m_solverMemCpyStream);
+	dAssert(cudaStatus == cudaSuccess);
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
+
+	CudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, frameCounter);
+	if (frameCounter)
+	{
+		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu0;
+		ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBufferGpu1 : m_transformBufferGpu0;
+		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
+	}
+}
+
+ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer0()
+{
+	return &m_transformBufferCpu0[0];
+}
+
+ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer1()
+{
+	return &m_transformBufferCpu1[0];
+}
+
+void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
+{
+	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+	
+	ndCudaDeviceBuffer<unsigned>& histogramGpu = m_histogram;
+	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBufferGpu = m_bodyBufferGpu;
+	ndCudaDeviceBuffer<ndCudaBoundingBox>& boundingBoxGpu = m_boundingBoxGpu;
+	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu0 = m_bodyAabbCell;
+	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu1 = m_bodyAabbCellScrath;
+	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu0 = m_transformBufferCpu0;
+	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu1 = m_transformBufferCpu1;
+	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu0 = m_transformBufferGpu0;
+	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu1 = m_transformBufferGpu1;
+	
+	histogramGpu.SetCount(cpuBodyCount);
+	bodyBufferGpu.SetCount(cpuBodyCount);
+	bodyAabbCellGpu0.SetCount(cpuBodyCount);
+	bodyAabbCellGpu1.SetCount(cpuBodyCount);
+	transformBufferGpu0.SetCount(cpuBodyCount);
+	transformBufferGpu1.SetCount(cpuBodyCount);
+	transformBufferCpu0.SetCount(cpuBodyCount);
+	transformBufferCpu1.SetCount(cpuBodyCount);
+	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
+}
+
+void ndCudaContextImplement::LoadBodyData(int cpuBodyCount)
+{
+	//auto InitTransforms = [] __device__(const cuSceneInfo & info)
+	//{
+	//	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	//	if (index < info.m_bodyArray.m_size)
+	//	{
+	//		cuBodyProxy* src = info.m_bodyArray.m_array;
+	//		cuSpatialVector* dst0 = info.m_transformBuffer0.m_array;
+	//		cuSpatialVector* dst1 = info.m_transformBuffer1.m_array;
+	//
+	//		dst0[index].m_linear = src[index].m_posit;
+	//		dst0[index].m_angular = src[index].m_rotation;
+	//		dst1[index].m_linear = src[index].m_posit;
+	//		dst1[index].m_angular = src[index].m_rotation;
+	//	}
+	//};
+	
+	cudaDeviceSynchronize();
+		
+	ndCudaSceneInfo info;
+	info.m_histogram = ndCudaBuffer<unsigned>(m_histogram);
+	info.m_bodyArray = ndCudaBuffer<ndCudaBodyProxy>(m_bodyBufferGpu);
+	info.m_bodyAabbArray = ndCudaBuffer<ndCudaBoundingBox>(m_boundingBoxGpu);
+	info.m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
+	info.m_bodyAabbCellScrath = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScrath);
+	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
+	info.m_transformBuffer1 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
+	
+	*m_sceneInfoCpu = info;
+	cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, &info, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
+	dAssert(cudaStatus == cudaSuccess);
+
+	const ndInt32 blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+	
+	//bodyBufferGpu.ReadData(&bodyBufferCpu[0], cpuBodyCount);
+	//CudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (InitTransforms, *m_context->m_sceneInfoCpu);
+	
+	cudaDeviceSynchronize();
+	if (cudaStatus != cudaSuccess)
+	{
+		dAssert(0);
+	}
+}
