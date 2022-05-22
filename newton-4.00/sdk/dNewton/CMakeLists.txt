@@ -13,10 +13,6 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set (projectName "ndNewton")
 message (${projectName})
 
-if(NEWTON_USE_PLUGIN_DLL)
-	add_definitions(-DDG_USE_PLUGINS)
-endif()
-
 #source and header files
 file(GLOB CPP_SOURCE 
 	*.h 
@@ -45,8 +41,6 @@ if(NEWTON_ENABLE_AVX2_SOLVER)
 	add_definitions(-D_D_USE_AVX2_SOLVER)
 endif()
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
-
 include_directories(.)
 include_directories(../dCore)
 include_directories(../dTinyxml)
@@ -59,8 +53,23 @@ include_directories(dIkSolver/)
 include_directories(dParticles/)
 include_directories(dModels/dVehicle/)
 include_directories(dModels/dCharacter/)
+
+add_subdirectory(dExtensions)
+
 if(NEWTON_ENABLE_AVX2_SOLVER)
-	include_directories(../dExtensions/dAvx2)
+	include_directories(dExtensions/dAvx2)
+endif()
+
+if (NEWTON_ENABLE_CUDA_SOLVER)
+	add_definitions(-D_D_NEWTON_CUDA)
+	include_directories(dExtensions/dCuda)
+	include_directories(dExtensions/dCuda/dContext)
+	
+	file(GLOB CPP_SOURCE 
+		${CPP_SOURCE} 
+		dExtensions/dCuda/*.h
+		dExtensions/dCuda/*.cpp
+		dExtensions/dCuda/dContext/*.h) 
 endif()
 
 if (NEWTON_ENABLE_OPENCL_SOLVER)
@@ -78,15 +87,15 @@ if (NEWTON_ENABLE_OPENCL_SOLVER)
 	endif()
 endif()
 
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
+
 if(NEWTON_BUILD_SHARED_LIBS)
 	add_definitions(-D_D_NEWTON_EXPORT_DLL)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
 
-
 	if(MSVC OR MINGW)
 		target_link_options(${projectName} PUBLIC "/DEBUG") 
 	endif()
-
 else()
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
@@ -114,10 +123,16 @@ if (MSVC)
 endif(MSVC)
 
 target_link_libraries(${projectName} ndTinyxml ndCore ndCollision)
+
 if(NEWTON_ENABLE_AVX2_SOLVER)
 	target_link_libraries(${projectName} ndSolverAvx2)
 endif()
 
+if (NEWTON_ENABLE_CUDA_SOLVER)
+	if(NEWTON_BUILD_SHARED_LIBS)
+		target_link_libraries (${projectName} ndSolverCuda)
+	endif()
+endif()
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib

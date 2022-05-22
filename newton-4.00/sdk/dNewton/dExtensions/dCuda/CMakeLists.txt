@@ -10,31 +10,22 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndSolverCuda_1")
+set (projectName "ndSolverCuda")
 message (${projectName})
 
 set(CMAKE_CUDA_STANDARD 14)
 CMAKE_POLICY(SET CMP0104 OLD)
-project(cmake_and_cuda LANGUAGES CXX CUDA)
+project(${projectName} LANGUAGES CXX CUDA)
 set(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe)
 
-include_directories(../../.)
-include_directories(../../dCore)
-include_directories(../../dNewton)
-include_directories(../../dTinyxml)
-include_directories(../../dProfiler)
-include_directories(../../dCollision)
-include_directories(../../dNewton/dJoints)
-include_directories(../../dNewton/dModels)
-include_directories(../../dNewton/dIkSolver)
-include_directories(../../dNewton/dParticles)
-include_directories(../../dNewton/dModels/dVehicle)
-include_directories(../../dNewton/dModels/dCharacter)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CUDA_STANDARD 14)
 
 include_directories(./)
-include_directories(cuNatives/)
+include_directories(dCudaDriver/)
 
-file(GLOB CPP_SOURCE *.h *.cu *.cpp cuNatives/*.h cuNatives/*.cu  cuNatives/*.cpp)
+file(GLOB CPP_SOURCE dContext/*.h dContext/*.cu dContext/*.cpp)
+
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4201 -wd4324 -Zi -Ob0 -Od /RTC1\" --extended-lambda")
@@ -62,8 +53,8 @@ message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")
 message ("cuda release with debug options ${CMAKE_CUDA_FLAGS_RELWITHDEBINFO}")
 
 add_definitions(-D_D_CUDA_EXPORT_DLL)
-
 add_library(${projectName} SHARED ${CPP_SOURCE})
+set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
 install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
@@ -73,5 +64,12 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_custom_command(
 		TARGET ${projectName} POST_BUILD
 		COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/../../../applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+		ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/../../../../applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+endif ()
+
+if (NEWTON_BUILD_TEST)
+	add_custom_command(
+		TARGET ${projectName} POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/../../../../applications/ndTest/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
 endif ()

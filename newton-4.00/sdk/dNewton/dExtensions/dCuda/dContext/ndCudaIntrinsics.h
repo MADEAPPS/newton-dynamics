@@ -19,40 +19,50 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
+#ifndef __ND_CUDA_INTRINSICS_H__
+#define __ND_CUDA_INTRINSICS_H__
 
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
 
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
-	#endif
+#define D_GRANULARITY	(1024 * 256)
+
+template <class T>
+inline T __device__ __host__ cuAbs(T A)
+{
+	return fabsf(A);
+}
+
+template <class T>
+inline T __device__ __host__ cuFloor(T A)
+{
+	return floorf(A);
+}
+
+template <class T>
+inline T __device__ __host__ cuMax(T A, T B)
+{
+	return fmaxf(A, B);
+}
+
+template <class T>
+inline T __device__ __host__ cuMin(T A, T B)
+{
+	return fminf(A, B);
+}
+
+template <class T>
+inline T __device__ __host__ cuSelect(bool test, T A, T B)
+{
+	return test ? A : B;
+}
+
+template <class T>
+inline void __device__ __host__ cuSwap(T& A, T& B)
+{
+	T tmp(A);
+	A = B;
+	B = tmp;
+}
+
 #endif
-
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
-#else
-	#define dTrace(x);
-#endif
-
-
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
-	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
-	}
-
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
-#endif
-
-	
-#endif
-

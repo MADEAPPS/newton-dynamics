@@ -18,8 +18,6 @@ if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
-add_subdirectory(dExtensions)
-
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
@@ -40,47 +38,7 @@ else()
 	include_directories(dNewton/dModels/dVehicle)
 	include_directories(dNewton/dModels/dCharacter)
 
-	if(NEWTON_ENABLE_AVX2_SOLVER)
-		add_definitions(-D_D_USE_AVX2_SOLVER)
-		include_directories(dExtensions/dAvx2)
-	endif()
-
-	if (NEWTON_ENABLE_CUDA_SOLVER)
-		add_definitions(-D_D_NEWTON_CUDA)
-		include_directories(dExtensions/dCuda)
-		include_directories(dExtensions/dCuda_1)
-
-		# none of this shit works
-		#PROJECT(GPUProcessing LANGUAGES CUDA CXX)
-		#set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-		#set_properties(TARGET ${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-		#set_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)
-
-		if(NEWTON_BUILD_SHARED_LIBS)
-			if (PTR_SIZE EQUAL 8)
-				# this does not fucking works, unless yo umak ethe p[ropject a cuda solution.]
-				#link_libraries ("$ENV{CUDA_PATH}/lib/x64/cudadevrt.lib")
-				link_libraries ("$ENV{CUDA_PATH}/lib/x64/cudart_static.lib")
-			else()
-				# this does not fucking works, unless yo umak ethe p[ropject a cuda solution.]
-				#link_libraries ("$ENV{CUDA_PATH}/lib/Win32/cudadevrt.lib")
-				link_libraries ("$ENV{CUDA_PATH}/lib/Win32/cudart_static.lib")
-			endif()
-		endif()
-	endif(NEWTON_ENABLE_CUDA_SOLVER)
-
-	if (NEWTON_ENABLE_OPENCL_SOLVER)
-		add_definitions(-D_D_NEWTON_OPENCL)
-		include_directories(dExtensions/dOpencl)
-
-		if(NEWTON_BUILD_SHARED_LIBS)
-			if (PTR_SIZE EQUAL 8)
-				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
-			else()
-				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x86/OpenCL.lib")
-			endif()
-		endif()
-	endif(NEWTON_ENABLE_OPENCL_SOLVER)
+	add_subdirectory(dNewton/dExtensions)
 
 	# source and header files
 	file(GLOB HEADERS 
@@ -117,6 +75,36 @@ else()
 		dNewton/dModels/dCharacter/*.h
 		dNewton/dModels/dCharacter/*.cpp)
 
+	if(NEWTON_ENABLE_AVX2_SOLVER)
+		add_definitions(-D_D_USE_AVX2_SOLVER)
+		include_directories(dNewton/dExtensions/dAvx2)
+	endif()
+
+	if (NEWTON_ENABLE_CUDA_SOLVER)
+		add_definitions(-D_D_NEWTON_CUDA)
+		include_directories(dNewton/dExtensions/dCuda)
+		include_directories(dNewton/dExtensions/dCuda/dContext)
+
+		file(GLOB CPP_SOURCE 
+			${CPP_SOURCE} 
+			dNewton/dExtensions/dCuda/*.h
+			dNewton/dExtensions/dCuda/*.cpp
+			dNewton/dExtensions/dCuda/dContext/*.h) 
+	endif()
+
+	if (NEWTON_ENABLE_OPENCL_SOLVER)
+		add_definitions(-D_D_NEWTON_OPENCL)
+		include_directories(dNewton/dExtensions/dOpencl)
+
+		if(NEWTON_BUILD_SHARED_LIBS)
+			if (PTR_SIZE EQUAL 8)
+				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dNewton/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
+			else()
+				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dNewton/dExtensions/dOpencl/CL/lib/x86/OpenCL.lib")
+			endif()
+		endif()
+	endif(NEWTON_ENABLE_OPENCL_SOLVER)
+
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 	add_definitions(-D_D_SINGLE_LIBRARY)
@@ -133,7 +121,7 @@ else()
 		endif()
 
 		if (NEWTON_ENABLE_CUDA_SOLVER)
-			target_link_libraries (${projectName} ndSolverCuda ndSolverCuda_1)
+			target_link_libraries (${projectName} ndSolverCuda)
 		endif()
 
 		if (NEWTON_ENABLE_OPENCL_SOLVER)

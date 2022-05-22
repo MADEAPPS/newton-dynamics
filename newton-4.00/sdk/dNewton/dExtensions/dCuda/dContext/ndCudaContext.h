@@ -19,40 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
+#ifndef __ND_CUDA_CONTEXT_H__
+#define __ND_CUDA_CONTEXT_H__
 
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
+#include "ndCudaStdafx.h"
 
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
-	#endif
+class ndCudaDevice;
+class ndCudaContextImplement;
+
+class ndCudaContext
+{
+	public: 
+	D_CUDA_API ndCudaContext();
+	D_CUDA_API ~ndCudaContext();
+
+	D_CUDA_API bool IsValid() const;
+	D_CUDA_API const char* GetStringId() const;
+
+	ndCudaDevice* m_device;
+	ndCudaContextImplement* m_implement;
+};
+
 #endif
-
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
-#else
-	#define dTrace(x);
-#endif
-
-
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
-	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
-	}
-
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
-#endif
-
-	
-#endif
-

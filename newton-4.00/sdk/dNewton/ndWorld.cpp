@@ -40,6 +40,7 @@
 #endif
 
 #ifdef _D_NEWTON_CUDA
+	#include "ndCudaUtils.h"
 	#include "ndWorldSceneCuda.h"
 	#include "ndDynamicsUpdateCuda.h"
 #endif
@@ -947,6 +948,10 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			#ifdef _D_NEWTON_CUDA
 			case ndCudaSolver:
 			{
+				ndMemFreeCallback freeMemory;
+				ndMemAllocCallback allocMemory;
+				ndMemory::GetMemoryAllocators(allocMemory,freeMemory);
+				CudaSetMemoryAllocators(allocMemory, freeMemory);
 				ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
 				delete m_scene;
 				m_scene = newScene;

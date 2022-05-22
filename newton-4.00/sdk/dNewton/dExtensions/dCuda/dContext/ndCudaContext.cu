@@ -19,40 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
+#include "ndCudaStdafx.h"
+#include "ndCudaUtils.h"
+#include "ndCudaContext.h"
+#include "ndCudaContextImplement.h"
 
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
-
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
-	#endif
-#endif
-
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
-#else
-	#define dTrace(x);
-#endif
-
-
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
+ndCudaContext::ndCudaContext()
+	:m_device(new ndCudaDevice)
+	,m_implement(nullptr)
+{
+	int campbility = m_device->m_prop.major * 100 + m_device->m_prop.minor;
+	// go as far back as 5.2 Maxwell GeForce GTX 960 or better.
+	if (campbility >= 600)
+	//if ((cudaStatus == cudaSuccess) && (campbility >= 700))
 	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
+		cudaError_t cudaStatus = cudaSetDevice(0);
+		m_implement = (cudaStatus == cudaSuccess) ? new ndCudaContextImplement() : nullptr;
+	}
+}
+
+ndCudaContext::~ndCudaContext()
+{
+	if (m_implement)
+	{
+		delete m_implement;
 	}
 
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
-#endif
+	delete m_device;
+}
 
-	
-#endif
+bool ndCudaContext::IsValid() const 
+{
+	return m_implement ? true : false;
+}
 
+const char* ndCudaContext::GetStringId() const
+{
+	return IsValid() ? &m_device->m_prop.name[0] : "no cuda support";
+}

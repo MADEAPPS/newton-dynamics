@@ -19,145 +19,150 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <ndWorld.h>
-#include <ndModel.h>
-#include <ndWorldScene.h>
-#include <ndBodyDynamic.h>
-#include <ndSkeletonList.h>
-#include <ndDynamicsUpdate.h>
-#include <ndBodyParticleSet.h>
-#include <ndDynamicsUpdateSoa.h>
-#include <ndJointBilateralConstraint.h>
-
-#include "cuQuat.h"
-#include "cuVector.h"
-#include "cuMatrix3x3.h"
-#include "cuPrefixScan.h"
+#include "ndCoreStdafx.h"
+#include "ndNewtonStdafx.h"
+#include "ndWorld.h"
+#include "ndModel.h"
+#include "ndWorldScene.h"
+#include "ndBodyDynamic.h"
 #include "ndCudaContext.h"
+#include "ndSkeletonList.h"
 #include "ndWorldSceneCuda.h"
-#include "cuSortBodyAabbCells.h"
+#include "ndDynamicsUpdate.h"
+#include "ndBodyParticleSet.h"
+#include "ndJointBilateralConstraint.h"
 
-#define D_CUDA_SCENE_GRID_SIZE		8.0f
-#define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
+//#include "cuQuat.h"
+//#include "cuVector.h"
+//#include "cuMatrix3x3.h"
+//#include "cuPrefixScan.h"
 
-__global__ void CudaEndFrame(cuSceneInfo& info, int frameCount)
-{
-	info.m_frameCount = frameCount;
-}
+//#include "cuSortBodyAabbCells.h"
 
-template <typename Predicate>
-__global__ void CudaInitBodyArray(Predicate InitBodyArray, cuSceneInfo& info)
-{
-	InitBodyArray(info);
-}
+//#define D_CUDA_SCENE_GRID_SIZE		8.0f
+//#define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
-template <typename Predicate>
-__global__ void CudaMergeAabb(Predicate MergeAabb, cuSceneInfo& info)
-{
-	MergeAabb(info);
-}
-
-template <typename Predicate>
-__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		CountAabb(info);
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaValidateGridBuffer(Predicate validateBuffer, cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		validateBuffer(info);
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaGenerateGridHash(Predicate GenerateHash, cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		GenerateHash(info);
-	}
-}
-
-template <typename Predicate>
-__global__ void CudaGetBodyTransforms(Predicate GetTransform, cuSceneInfo& info, int frameCount)
-{
-	GetTransform(info, frameCount);
-}
-
-template <typename Predicate>
-__global__ void CudaInitTransforms(Predicate InitTransforms, cuSceneInfo& info)
-{
-	InitTransforms(info);
-}
-
-template <typename Predicate>
-__global__ void CudaCalculateBodyPairsCount(Predicate CalculateBodyPairsCount, cuSceneInfo& info)
-{
-	if (info.m_frameIsValid)
-	{
-		CalculateBodyPairsCount(info);
-	}
-}
+//__global__ void CudaEndFrame(cuSceneInfo& info, int frameCount)
+//{
+//	info.m_frameCount = frameCount;
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaInitBodyArray(Predicate InitBodyArray, cuSceneInfo& info)
+//{
+//	InitBodyArray(info);
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaMergeAabb(Predicate MergeAabb, cuSceneInfo& info)
+//{
+//	MergeAabb(info);
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaCountAabb(Predicate CountAabb, cuSceneInfo& info)
+//{
+//	if (info.m_frameIsValid)
+//	{
+//		CountAabb(info);
+//	}
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaValidateGridBuffer(Predicate validateBuffer, cuSceneInfo& info)
+//{
+//	if (info.m_frameIsValid)
+//	{
+//		validateBuffer(info);
+//	}
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaGenerateGridHash(Predicate GenerateHash, cuSceneInfo& info)
+//{
+//	if (info.m_frameIsValid)
+//	{
+//		GenerateHash(info);
+//	}
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaGetBodyTransforms(Predicate GetTransform, cuSceneInfo& info, int frameCount)
+//{
+//	GetTransform(info, frameCount);
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaInitTransforms(Predicate InitTransforms, cuSceneInfo& info)
+//{
+//	InitTransforms(info);
+//}
+//
+//template <typename Predicate>
+//__global__ void CudaCalculateBodyPairsCount(Predicate CalculateBodyPairsCount, cuSceneInfo& info)
+//{
+//	if (info.m_frameIsValid)
+//	{
+//		CalculateBodyPairsCount(info);
+//	}
+//}
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
-	,m_context(ndCudaContext::CreateContext())
+	,ndCudaContext()
 {
 	m_bodyListChanged = 1;
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
 {
-	if (m_context)
-	{
-		delete m_context;
-	}
+}
+
+ndCudaContext* ndWorldSceneCuda::GetContext()
+{
+	return this;
 }
 
 bool ndWorldSceneCuda::IsValid() const
 {
-	return m_context ? true : false;
+	return ndCudaContext::IsValid();
 }
 
 void ndWorldSceneCuda::Begin()
 {
-	ndWorldScene::Begin();
-	cudaDeviceSynchronize();
-
-	cudaStream_t stream = m_context->m_solverMemCpyStream;
-	const ndInt32 frameCounter = m_context->m_frameCounter;
-
-	// get the scene info from the update	
-	cuSceneInfo* const gpuInfo = m_context->m_sceneInfoGpu;
-	cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu;
-	
-	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost, stream);
-	dAssert(cudaStatus == cudaSuccess);
-	if (cudaStatus != cudaSuccess)
-	{
-		dAssert(0);
-	}
-
-	CudaEndFrame << < 1, 1, 0, m_context->m_solverComputeStream >> > (*gpuInfo, frameCounter);
-	if (frameCounter)
-	{
-		cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
-		cuDeviceBuffer<cuSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_context->m_transformBufferGpu1 : m_context->m_transformBufferGpu0;
-		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
-	}
+	dAssert(0);
+	//ndWorldScene::Begin();
+	//cudaDeviceSynchronize();
+	//
+	//cudaStream_t stream = m_context->m_solverMemCpyStream;
+	//const ndInt32 frameCounter = m_context->m_frameCounter;
+	//
+	//// get the scene info from the update	
+	//cuSceneInfo* const gpuInfo = m_context->m_sceneInfoGpu;
+	//cuSceneInfo* const cpuInfo = m_context->m_sceneInfoCpu;
+	//
+	//cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost, stream);
+	//dAssert(cudaStatus == cudaSuccess);
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	dAssert(0);
+	//}
+	//
+	//CudaEndFrame << < 1, 1, 0, m_context->m_solverComputeStream >> > (*gpuInfo, frameCounter);
+	//if (frameCounter)
+	//{
+	//	cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
+	//	cuDeviceBuffer<cuSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_context->m_transformBufferGpu1 : m_context->m_transformBufferGpu0;
+	//	gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
+	//}
 }
 
 void ndWorldSceneCuda::End()
 {
-	m_context->m_frameCounter = m_context->m_frameCounter + 1;
-	m_context->SwapBuffers();
-	ndWorldScene::End();
+	dAssert(0);
+	//m_context->m_frameCounter = m_context->m_frameCounter + 1;
+	//m_context->SwapBuffers();
+	//ndWorldScene::End();
 }
 
 //void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
@@ -184,303 +189,307 @@ void ndWorldSceneCuda::CalculateContacts()
 
 void ndWorldSceneCuda::LoadBodyData()
 {
-	auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndVector minBox(ndFloat32(1.0e15f));
-		const ndVector maxBox(ndFloat32(-1.0e15f));
-
-		ndArray<cuBodyProxy>& data = m_context->m_bodyBufferCpu;
-		cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
-		cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
-
-		ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			cuSpatialVector transform;
-			ndBodyKinematic* const body = bodyArray[i];
-			cuBodyProxy& proxi = data[i];
-
-			// Get thansform and velocity
-			proxi.m_mass = body->GetMassMatrix();
-			proxi.m_rotation = cuQuat(body->GetRotation());
-			proxi.m_posit = body->GetGlobalGetCentreOfMass();
-			proxi.m_invIntertia = body->GetInvInertia();
-			proxi.m_dampCoef = body->GetCachedDamping();
-			proxi.m_veloc = body->GetVelocity();
-			proxi.m_omega = body->GetOmega();
-
-			// Get scene manager data
-			const ndShapeInstance& collision = body->GetCollisionShape();
-			const ndShape* const shape = collision.GetShape();
-
-			proxi.m_minAabb = minBox;
-			proxi.m_maxAabb = maxBox;
-			proxi.m_obbSize = shape->GetObbSize();
-			proxi.m_obbOrigin = shape->GetObbOrigin();
-			proxi.m_scale = collision.GetScale();
-			proxi.m_localPosition = collision.GetLocalMatrix().m_posit;
-			proxi.m_localRotation = cuQuat(ndQuaternion(collision.GetLocalMatrix()));
-			proxi.m_alignRotation = cuQuat(ndQuaternion(collision.GetAlignmentMatrix()));
-
-			transform.m_angular = cuQuat(body->GetRotation());
-			transform.m_linear = body->GetGlobalGetCentreOfMass();
-			transformBufferCpu0[i] = transform;
-			transformBufferCpu1[i] = transform;
-		}
-	});
-
-	auto InitTransforms = [] __device__(const cuSceneInfo & info)
-	{
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
-		if (index < info.m_bodyArray.m_size)
-		{
-			cuBodyProxy* src = info.m_bodyArray.m_array;
-			cuSpatialVector* dst0 = info.m_transformBuffer0.m_array;
-			cuSpatialVector* dst1 = info.m_transformBuffer1.m_array;
-
-			dst0[index].m_linear = src[index].m_posit;
-			dst0[index].m_angular = src[index].m_rotation;
-			dst1[index].m_linear = src[index].m_posit;
-			dst1[index].m_angular = src[index].m_rotation;
-		}
-	};
-
-	cudaDeviceSynchronize();
-
-	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-
-	const ndInt32 cpuBodyCount = bodyArray.GetCount();
-	const ndInt32 blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	const ndInt32 gpuBodyCount = (D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1)) / D_THREADS_PER_BLOCK);
-
-	ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
-	bodyBufferCpu.SetCount(cpuBodyCount);
-
-	cuDeviceBuffer<unsigned>& histogramGpu = m_context->m_histogram;
-	cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
-	cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
-	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu0 = m_context->m_bodyAabbCell;
-	cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu1 = m_context->m_bodyAabbCellScrath;
-	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
-	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
-	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu0 = m_context->m_transformBufferGpu0;
-	cuDeviceBuffer<cuSpatialVector>& transformBufferGpu1 = m_context->m_transformBufferGpu1;
-
-	histogramGpu.SetCount(cpuBodyCount);
-	bodyBufferGpu.SetCount(cpuBodyCount);
-	bodyAabbCellGpu0.SetCount(cpuBodyCount);
-	bodyAabbCellGpu1.SetCount(cpuBodyCount);
-	transformBufferGpu0.SetCount(cpuBodyCount);
-	transformBufferGpu1.SetCount(cpuBodyCount);
-	transformBufferCpu0.SetCount(cpuBodyCount);
-	transformBufferCpu1.SetCount(cpuBodyCount);
-	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
-
-	cuSceneInfo info;
-	info.m_histogram = cuBuffer<unsigned>(histogramGpu);
-	info.m_bodyArray = cuBuffer<cuBodyProxy>(bodyBufferGpu);
-	info.m_bodyAabbArray = cuBuffer<cuBoundingBox>(boundingBoxGpu);
-	info.m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu0);
-	info.m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu1);
-	info.m_transformBuffer0 = cuBuffer<cuSpatialVector>(transformBufferGpu0);
-	info.m_transformBuffer1 = cuBuffer<cuSpatialVector>(transformBufferGpu1);
-
-	cudaError_t cudaStatus;
-	ParallelExecute(CopyBodies);
-
-	*m_context->m_sceneInfoCpu = info;
-	cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, &info, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
-	dAssert(cudaStatus == cudaSuccess);
-
-	bodyBufferGpu.ReadData(&bodyBufferCpu[0], cpuBodyCount);
-	CudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (InitTransforms, *m_context->m_sceneInfoCpu);
-
-	cudaDeviceSynchronize();
-
-	if (cudaStatus != cudaSuccess)
-	{
-		dAssert(0);
-	}
+	dAssert(0);
+	//auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME();
+	//	const ndVector minBox(ndFloat32(1.0e15f));
+	//	const ndVector maxBox(ndFloat32(-1.0e15f));
+	//
+	//	ndArray<cuBodyProxy>& data = m_context->m_bodyBufferCpu;
+	//	cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
+	//	cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+	//
+	//	ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	//	const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		cuSpatialVector transform;
+	//		ndBodyKinematic* const body = bodyArray[i];
+	//		cuBodyProxy& proxi = data[i];
+	//
+	//		// Get thansform and velocity
+	//		proxi.m_mass = body->GetMassMatrix();
+	//		proxi.m_rotation = cuQuat(body->GetRotation());
+	//		proxi.m_posit = body->GetGlobalGetCentreOfMass();
+	//		proxi.m_invIntertia = body->GetInvInertia();
+	//		proxi.m_dampCoef = body->GetCachedDamping();
+	//		proxi.m_veloc = body->GetVelocity();
+	//		proxi.m_omega = body->GetOmega();
+	//
+	//		// Get scene manager data
+	//		const ndShapeInstance& collision = body->GetCollisionShape();
+	//		const ndShape* const shape = collision.GetShape();
+	//
+	//		proxi.m_minAabb = minBox;
+	//		proxi.m_maxAabb = maxBox;
+	//		proxi.m_obbSize = shape->GetObbSize();
+	//		proxi.m_obbOrigin = shape->GetObbOrigin();
+	//		proxi.m_scale = collision.GetScale();
+	//		proxi.m_localPosition = collision.GetLocalMatrix().m_posit;
+	//		proxi.m_localRotation = cuQuat(ndQuaternion(collision.GetLocalMatrix()));
+	//		proxi.m_alignRotation = cuQuat(ndQuaternion(collision.GetAlignmentMatrix()));
+	//
+	//		transform.m_angular = cuQuat(body->GetRotation());
+	//		transform.m_linear = body->GetGlobalGetCentreOfMass();
+	//		transformBufferCpu0[i] = transform;
+	//		transformBufferCpu1[i] = transform;
+	//	}
+	//});
+	//
+	//auto InitTransforms = [] __device__(const cuSceneInfo & info)
+	//{
+	//	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	//	if (index < info.m_bodyArray.m_size)
+	//	{
+	//		cuBodyProxy* src = info.m_bodyArray.m_array;
+	//		cuSpatialVector* dst0 = info.m_transformBuffer0.m_array;
+	//		cuSpatialVector* dst1 = info.m_transformBuffer1.m_array;
+	//
+	//		dst0[index].m_linear = src[index].m_posit;
+	//		dst0[index].m_angular = src[index].m_rotation;
+	//		dst1[index].m_linear = src[index].m_posit;
+	//		dst1[index].m_angular = src[index].m_rotation;
+	//	}
+	//};
+	//
+	//cudaDeviceSynchronize();
+	//
+	//const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	//
+	//const ndInt32 cpuBodyCount = bodyArray.GetCount();
+	//const ndInt32 blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//const ndInt32 gpuBodyCount = (D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1)) / D_THREADS_PER_BLOCK);
+	//
+	//ndArray<cuBodyProxy>& bodyBufferCpu = m_context->m_bodyBufferCpu;
+	//bodyBufferCpu.SetCount(cpuBodyCount);
+	//
+	//cuDeviceBuffer<unsigned>& histogramGpu = m_context->m_histogram;
+	//cuDeviceBuffer<cuBodyProxy>& bodyBufferGpu = m_context->m_bodyBufferGpu;
+	//cuDeviceBuffer<cuBoundingBox>& boundingBoxGpu = m_context->m_boundingBoxGpu;
+	//cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu0 = m_context->m_bodyAabbCell;
+	//cuDeviceBuffer<cuBodyAabbCell>& bodyAabbCellGpu1 = m_context->m_bodyAabbCellScrath;
+	//cuHostBuffer<cuSpatialVector>& transformBufferCpu0 = m_context->m_transformBufferCpu0;
+	//cuHostBuffer<cuSpatialVector>& transformBufferCpu1 = m_context->m_transformBufferCpu1;
+	//cuDeviceBuffer<cuSpatialVector>& transformBufferGpu0 = m_context->m_transformBufferGpu0;
+	//cuDeviceBuffer<cuSpatialVector>& transformBufferGpu1 = m_context->m_transformBufferGpu1;
+	//
+	//histogramGpu.SetCount(cpuBodyCount);
+	//bodyBufferGpu.SetCount(cpuBodyCount);
+	//bodyAabbCellGpu0.SetCount(cpuBodyCount);
+	//bodyAabbCellGpu1.SetCount(cpuBodyCount);
+	//transformBufferGpu0.SetCount(cpuBodyCount);
+	//transformBufferGpu1.SetCount(cpuBodyCount);
+	//transformBufferCpu0.SetCount(cpuBodyCount);
+	//transformBufferCpu1.SetCount(cpuBodyCount);
+	//boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
+	//
+	//cuSceneInfo info;
+	//info.m_histogram = cuBuffer<unsigned>(histogramGpu);
+	//info.m_bodyArray = cuBuffer<cuBodyProxy>(bodyBufferGpu);
+	//info.m_bodyAabbArray = cuBuffer<cuBoundingBox>(boundingBoxGpu);
+	//info.m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu0);
+	//info.m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(bodyAabbCellGpu1);
+	//info.m_transformBuffer0 = cuBuffer<cuSpatialVector>(transformBufferGpu0);
+	//info.m_transformBuffer1 = cuBuffer<cuSpatialVector>(transformBufferGpu1);
+	//
+	//cudaError_t cudaStatus;
+	//ParallelExecute(CopyBodies);
+	//
+	//*m_context->m_sceneInfoCpu = info;
+	//cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, &info, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
+	//dAssert(cudaStatus == cudaSuccess);
+	//
+	//bodyBufferGpu.ReadData(&bodyBufferCpu[0], cpuBodyCount);
+	//CudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (InitTransforms, *m_context->m_sceneInfoCpu);
+	//
+	//cudaDeviceSynchronize();
+	//
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	dAssert(0);
+	//}
 }
 
 void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
-
-	auto GetTransform = [] __device__(const cuSceneInfo& info, int frameCount)
-	{
-		int index = threadIdx.x + blockDim.x * blockIdx.x;
-		if (index < (info.m_bodyArray.m_size - 1))
-		{
-			cuBodyProxy* src = info.m_bodyArray.m_array;
-			cuSpatialVector* dst = (frameCount & 1) ? info.m_transformBuffer0.m_array : info.m_transformBuffer1.m_array;
-
-			dst[index].m_linear = src[index].m_posit;
-			dst[index].m_angular = src[index].m_rotation;
-		}
-	};
-
-	cudaStream_t stream = m_context->m_solverComputeStream;
-	cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
-	
-	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
-	ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	CudaGetBodyTransforms << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (GetTransform, *infoGpu, m_context->m_frameCounter);
-
-	//cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
-	//cuDeviceBuffer<cuSpatialVector>& gpuBuffer = m_context->m_transformBufferGpu0;
-	//gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
+	dAssert(0);
+	//auto GetTransform = [] __device__(const cuSceneInfo& info, int frameCount)
+	//{
+	//	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	//	if (index < (info.m_bodyArray.m_size - 1))
+	//	{
+	//		cuBodyProxy* src = info.m_bodyArray.m_array;
+	//		cuSpatialVector* dst = (frameCount & 1) ? info.m_transformBuffer0.m_array : info.m_transformBuffer1.m_array;
+	//
+	//		dst[index].m_linear = src[index].m_posit;
+	//		dst[index].m_angular = src[index].m_rotation;
+	//	}
+	//};
+	//
+	//cudaStream_t stream = m_context->m_solverComputeStream;
+	//cuSceneInfo* const infoGpu = m_context->m_sceneInfoGpu;
+	//
+	//ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
+	//ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//CudaGetBodyTransforms << <blocks, D_THREADS_PER_BLOCK, 0, stream >> > (GetTransform, *infoGpu, m_context->m_frameCounter);
+	//
+	////cuHostBuffer<cuSpatialVector>& cpuBuffer = m_context->m_transformBufferCpu0;
+	////cuDeviceBuffer<cuSpatialVector>& gpuBuffer = m_context->m_transformBufferGpu0;
+	////gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, stream);
 }
 
 void ndWorldSceneCuda::UpdateTransform()
 {
 	D_TRACKTIME();
+	dAssert(0);
 
-	GetBodyTransforms();
-	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const cuSpatialVector* const data = &m_context->m_transformBufferCpu1[0];
-		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			const cuSpatialVector& transform = data[i];
-			const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
-			const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
-			body->SetMatrixAndCentreOfMass(rotation, position);
-
-			body->m_transformIsDirty = true;
-			UpdateTransformNotify(threadIndex, body);
-		}
-	});
-	ParallelExecute(SetTransform);
+	//GetBodyTransforms();
+	//auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	D_TRACKTIME();
+	//	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	//	const cuSpatialVector* const data = &m_context->m_transformBufferCpu1[0];
+	//	const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		ndBodyKinematic* const body = bodyArray[i];
+	//		const cuSpatialVector& transform = data[i];
+	//		const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
+	//		const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
+	//		body->SetMatrixAndCentreOfMass(rotation, position);
+	//
+	//		body->m_transformIsDirty = true;
+	//		UpdateTransformNotify(threadIndex, body);
+	//	}
+	//});
+	//ParallelExecute(SetTransform);
 }
 
 void ndWorldSceneCuda::UpdateBodyList()
 {
 	D_TRACKTIME();
-	bool bodyListChanged = m_bodyListChanged;
-	ndWorldScene::UpdateBodyList();
-	if (bodyListChanged)
-	{
-		LoadBodyData();
-	}
-	
-	cuSceneInfo* const sceneInfo = m_context->m_sceneInfoCpu;
-	if (!sceneInfo->m_frameIsValid)
-	{
-		cudaDeviceSynchronize();
-		sceneInfo->m_frameIsValid = 1;
-
-		if (sceneInfo->m_histogram.m_size > sceneInfo->m_histogram.m_capacity)
-		{
-			m_context->m_histogram.SetCount(sceneInfo->m_histogram.m_size);
-			sceneInfo->m_histogram = cuBuffer<unsigned>(m_context->m_histogram);
-		}
-
-		if (sceneInfo->m_bodyAabbCell.m_size > sceneInfo->m_bodyAabbCell.m_capacity)
-		{
-			m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size);
-			m_context->m_bodyAabbCellScrath.SetCount(sceneInfo->m_bodyAabbCell.m_size);
-			sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
-			sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellScrath);
-		}
-
-		cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
-		dAssert(cudaStatus == cudaSuccess);
-		if (cudaStatus != cudaSuccess)
-		{
-			dAssert(0);
-		}
-		cudaDeviceSynchronize();
-	}
+	dAssert(0);
+	//bool bodyListChanged = m_bodyListChanged;
+	//ndWorldScene::UpdateBodyList();
+	//if (bodyListChanged)
+	//{
+	//	LoadBodyData();
+	//}
+	//
+	//cuSceneInfo* const sceneInfo = m_context->m_sceneInfoCpu;
+	//if (!sceneInfo->m_frameIsValid)
+	//{
+	//	cudaDeviceSynchronize();
+	//	sceneInfo->m_frameIsValid = 1;
+	//
+	//	if (sceneInfo->m_histogram.m_size > sceneInfo->m_histogram.m_capacity)
+	//	{
+	//		m_context->m_histogram.SetCount(sceneInfo->m_histogram.m_size);
+	//		sceneInfo->m_histogram = cuBuffer<unsigned>(m_context->m_histogram);
+	//	}
+	//
+	//	if (sceneInfo->m_bodyAabbCell.m_size > sceneInfo->m_bodyAabbCell.m_capacity)
+	//	{
+	//		m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size);
+	//		m_context->m_bodyAabbCellScrath.SetCount(sceneInfo->m_bodyAabbCell.m_size);
+	//		sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
+	//		sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellScrath);
+	//	}
+	//
+	//	cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
+	//	dAssert(cudaStatus == cudaSuccess);
+	//	if (cudaStatus != cudaSuccess)
+	//	{
+	//		dAssert(0);
+	//	}
+	//	cudaDeviceSynchronize();
+	//}
 }
 
 bool ndWorldSceneCuda::SanityCheckPrefix() const
 {
-	cuSceneInfo info;
-	cudaError_t cudaStatus;
-
-	cudaDeviceSynchronize();
-	cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	dAssert(cudaStatus == cudaSuccess);
-
-	if (info.m_frameIsValid)
-	{
-		static ndArray<unsigned> histogram;
-		histogram.SetCount(info.m_histogram.m_size);
-
-		cudaStatus = cudaMemcpy(&histogram[0], info.m_histogram.m_array, histogram.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
-		dAssert(cudaStatus == cudaSuccess);
-		for (int i = 1; i < histogram.GetCount(); i++)
-		{
-			dAssert(histogram[i - 1] <= histogram[i]);
-		}
-	}
-
-	if (cudaStatus != cudaSuccess)
-	{
-		dAssert(0);
-	}
+	dAssert(0);
+	//cuSceneInfo info;
+	//cudaError_t cudaStatus;
+	//
+	//cudaDeviceSynchronize();
+	//cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
+	//dAssert(cudaStatus == cudaSuccess);
+	//
+	//if (info.m_frameIsValid)
+	//{
+	//	static ndArray<unsigned> histogram;
+	//	histogram.SetCount(info.m_histogram.m_size);
+	//
+	//	cudaStatus = cudaMemcpy(&histogram[0], info.m_histogram.m_array, histogram.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
+	//	dAssert(cudaStatus == cudaSuccess);
+	//	for (int i = 1; i < histogram.GetCount(); i++)
+	//	{
+	//		dAssert(histogram[i - 1] <= histogram[i]);
+	//	}
+	//}
+	//
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	dAssert(0);
+	//}
 	return true;
 }
 
 bool ndWorldSceneCuda::SanityCheckSortCells() const
 {
-	cuSceneInfo info;
-	cudaError_t cudaStatus;
-
-	cudaDeviceSynchronize();
-	cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	dAssert(cudaStatus == cudaSuccess);
-
-	if (info.m_frameIsValid)
-	{
-		static ndArray<cuBodyAabbCell> bodyAabbCell;
-		static ndArray<cuBodyAabbCell> bodyAabbCellScrath;
-		bodyAabbCell.SetCount(info.m_bodyAabbCell.m_size);
-		bodyAabbCellScrath.SetCount(info.m_bodyAabbCell.m_size);
-
-		cudaStatus = cudaMemcpy(&bodyAabbCellScrath[0], info.m_bodyAabbCellScrath.m_array, bodyAabbCellScrath.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-		dAssert(cudaStatus == cudaSuccess);
-
-		cudaStatus = cudaMemcpy(&bodyAabbCell[0], info.m_bodyAabbCell.m_array, bodyAabbCell.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-		dAssert(cudaStatus == cudaSuccess);
-
-		for (int i = 1; i < bodyAabbCell.GetCount(); i++)
-		{
-			cuBodyAabbCell key0(bodyAabbCell[i - 1]);
-			cuBodyAabbCell key1(bodyAabbCell[i - 0]);
-			//cuBodyAabbCell key0(bodyAabbCellScrath[i - 1]);
-			//cuBodyAabbCell key1(bodyAabbCellScrath[i - 0]);
-
-			ndUnsigned32 value0 = key0.m_key;
-			ndUnsigned32 value1 = key1.m_key;
-			//value0 = key0.m_x + key0.m_y * 1024;
-			//value1 = key1.m_x + key1.m_y * 1024;
-			value0 = key0.m_z;
-			value1 = key1.m_z;
-
-			bool test = (value0 <= value1);
-			dAssert(test);
-			if (!test)
-			{
-				break;
-			}
-		}
-	}
-
-	if (cudaStatus != cudaSuccess)
-	{
-		dAssert(0);
-	}
+	dAssert(0);
+	//cuSceneInfo info;
+	//cudaError_t cudaStatus;
+	//
+	//cudaDeviceSynchronize();
+	//cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
+	//dAssert(cudaStatus == cudaSuccess);
+	//
+	//if (info.m_frameIsValid)
+	//{
+	//	static ndArray<cuBodyAabbCell> bodyAabbCell;
+	//	static ndArray<cuBodyAabbCell> bodyAabbCellScrath;
+	//	bodyAabbCell.SetCount(info.m_bodyAabbCell.m_size);
+	//	bodyAabbCellScrath.SetCount(info.m_bodyAabbCell.m_size);
+	//
+	//	cudaStatus = cudaMemcpy(&bodyAabbCellScrath[0], info.m_bodyAabbCellScrath.m_array, bodyAabbCellScrath.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+	//	dAssert(cudaStatus == cudaSuccess);
+	//
+	//	cudaStatus = cudaMemcpy(&bodyAabbCell[0], info.m_bodyAabbCell.m_array, bodyAabbCell.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
+	//	dAssert(cudaStatus == cudaSuccess);
+	//
+	//	for (int i = 1; i < bodyAabbCell.GetCount(); i++)
+	//	{
+	//		cuBodyAabbCell key0(bodyAabbCell[i - 1]);
+	//		cuBodyAabbCell key1(bodyAabbCell[i - 0]);
+	//		//cuBodyAabbCell key0(bodyAabbCellScrath[i - 1]);
+	//		//cuBodyAabbCell key1(bodyAabbCellScrath[i - 0]);
+	//
+	//		ndUnsigned32 value0 = key0.m_key;
+	//		ndUnsigned32 value1 = key1.m_key;
+	//		//value0 = key0.m_x + key0.m_y * 1024;
+	//		//value1 = key1.m_x + key1.m_y * 1024;
+	//		//value0 = key0.m_z;
+	//		//value1 = key1.m_z;
+	//
+	//		bool test = (value0 <= value1);
+	//		dAssert(test);
+	//		if (!test)
+	//		{
+	//			break;
+	//		}
+	//	}
+	//}
+	//
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	dAssert(0);
+	//}
 	return true;
 }
-
 
 void ndWorldSceneCuda::InitBodyArray()
 {
@@ -568,6 +577,8 @@ void ndWorldSceneCuda::InitBodyArray()
 	//sentinelBody->m_sceneEquilibrium = 1;
 	//sentinelBody->m_weigh = ndFloat32(0.0f);
 
+	dAssert(0);
+#if 0
 	auto InitBodyArray = [] __device__(cuSceneInfo& info)
 	{
 		__shared__  cuBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
@@ -923,4 +934,5 @@ dAssert(SanityCheckSortCells());
 //	//	return 0;
 //	//};
 //	//XXXXXXX << <1, 1, 0, stream >> > (GetKey____);
+#endif
 }

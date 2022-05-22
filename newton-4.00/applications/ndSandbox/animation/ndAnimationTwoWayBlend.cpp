@@ -29,7 +29,8 @@ ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 	delete m_node1;
 }
 
-void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output)
+//void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output)
+void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose&)
 {
 	dAssert(0);
 	//if (m_param < 0.001f) 

@@ -63,6 +63,7 @@ class ndMemory
 	/// is ok to install the memory allocator on the main of the 
 	/// application or just before start using the engine.
 	D_CORE_API static void SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
+	D_CORE_API static void GetMemoryAllocators(ndMemAllocCallback& alloc, ndMemFreeCallback& free);
 
 	private:
 	static ndAtomic<ndUnsigned64> m_memoryUsed;

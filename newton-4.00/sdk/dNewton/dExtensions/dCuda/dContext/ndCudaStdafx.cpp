@@ -19,40 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
+#include "ndCudaStdafx.h"
 
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
-
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
-	#endif
-#endif
-
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
-#else
-	#define dTrace(x);
-#endif
-
-
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
+#if (defined(WIN32) || defined(_WIN32))
+	BOOL APIENTRY DllMain(HMODULE, DWORD  ul_reason_for_call, LPVOID )
 	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
+		switch (ul_reason_for_call)
+		{
+			case DLL_PROCESS_ATTACH:
+			case DLL_THREAD_ATTACH:
+			{
+				#if defined(_DEBUG) && defined(_MSC_VER)
+					// Track all memory leaks at the operating system level.
+					// make sure no Newton tool or utility leaves leaks behind.
+					unsigned flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
+					flags = flags | _CRTDBG_REPORT_FLAG;
+					flags = flags | _CRTDBG_CHECK_EVERY_1024_DF;
+					_CrtSetDbgFlag(flags);
+					//_CrtSetBreakAlloc(3342281);
+				#endif
+			}
+
+			case DLL_THREAD_DETACH:
+			case DLL_PROCESS_DETACH:
+				break;
+		}
+		return TRUE;
 	}
-
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
 #endif
 
-	
-#endif
 

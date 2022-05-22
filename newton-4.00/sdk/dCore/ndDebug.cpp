@@ -23,7 +23,7 @@
 #include "ndCoreStdafx.h"
 #include "ndDebug.h"
 
-#ifdef DG_TRACE
+#ifdef D_TRACE
 void ndExpandTraceMessage(const char* const fmt, ...)
 {
 	va_list v_args;

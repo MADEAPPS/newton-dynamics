@@ -19,40 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
+#ifndef __ND_CUDA_UTILS_H__
+#define __ND_CUDA_UTILS_H__
 
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
-
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
+#include "ndCudaStdafx.h"
+#ifdef D_DISABLE_ASSERT
+	#define dAssert(x)
+#else 
+	#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+		#define dAssert(x) _ASSERTE(x)
+	#else
+		#ifdef _DEBUG
+			#define dAssert(x) assert(x)
+		#else 
+			#define dAssert(x)
+		#endif
 	#endif
 #endif
 
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
+
+#ifdef _MSC_VER 
+	#ifdef _DEBUG 
+		#define CUDA_TRACE
+	#endif
+#endif
+
+#ifdef CUDA_TRACE
+	void cudaExpandTraceMessage(const char* const fmt, ...);
+	#define cuTrace(x) cudaExpandTraceMessage x;
 #else
-	#define dTrace(x);
+	#define cuTrace(x);
 #endif
 
+typedef void* (*ndMemAllocCallback) (size_t size);
+typedef void (*ndMemFreeCallback) (void* const ptr);
 
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
-	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
-	}
+D_CUDA_API void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
 #endif
-
-	
-#endif
-

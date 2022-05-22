@@ -84,3 +84,9 @@ void ndMemory::SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback f
 	m_allocMemory = alloc;
 	m_freeMemory = free;
 }
+
+void ndMemory::GetMemoryAllocators(ndMemAllocCallback& alloc, ndMemFreeCallback& free)
+{
+	alloc = m_allocMemory;
+	free = m_freeMemory;
+}

@@ -19,40 +19,31 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
+#ifndef __ND_CUDA_STDAFX_H__
+#define __ND_CUDA_STDAFX_H__
 
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
+#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+	#include <io.h>
+	#include <stdio.h>
+	#include <stdint.h>
+	#include <direct.h>
+	#include <malloc.h>
+	#include <stdarg.h>
+	#include <process.h>
 
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
-	#endif
-#endif
-
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
+	#pragma warning (push, 3)
+	#include <windows.h>
+	#include <crtdbg.h>
+	#pragma warning (pop)
 #else
-	#define dTrace(x);
+	#include <sys/stat.h>
 #endif
 
-
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
-	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
-	}
-
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
+#ifdef _D_CUDA_EXPORT_DLL
+	#define D_CUDA_API __declspec(dllexport)
 #else
-	#define TRACE_FUNCTION(name)
+	#define D_CUDA_API __declspec(dllimport)
 #endif
 
-	
-#endif
+#endif 
 

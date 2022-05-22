@@ -25,7 +25,6 @@
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
-#include <ndNewtonStdafx.h>
 #include "cuVector.h"
 #include "cuDeviceBuffer.h"
 
@@ -69,10 +68,10 @@ class cuBuffer
 	unsigned m_capacity;
 };
 
-class cuSceneInfo
+class ndCudaSceneInfo
 {
 	public:
-	cuSceneInfo()
+	ndCudaSceneInfo()
 		:m_worldBox()
 		,m_histogram()
 		,m_bodyArray()

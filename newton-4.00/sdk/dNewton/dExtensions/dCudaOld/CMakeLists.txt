@@ -10,13 +10,13 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndSolverCuda")
+set (projectName "ndSolverCudaOld")
 message (${projectName})
 
 set(CMAKE_CUDA_STANDARD 14)
 CMAKE_POLICY(SET CMP0104 OLD)
 project(cmake_and_cuda LANGUAGES CXX CUDA)
-SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe.exe)
+SET(CMAKE_CUDA_COMPILER $ENV{CUDA_PATH}/bin/nvcc.exe)
 
 include_directories(../../.)
 include_directories(../../dCore)

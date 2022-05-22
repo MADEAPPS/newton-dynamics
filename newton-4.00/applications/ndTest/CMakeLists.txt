@@ -52,6 +52,13 @@ if(NEWTON_ENABLE_AVX2_SOLVER)
 	endif()
 endif(NEWTON_ENABLE_AVX2_SOLVER)
 
+if (NEWTON_ENABLE_CUDA_SOLVER)
+	if (NOT NEWTON_BUILD_SHARED_LIBS)
+		target_link_libraries (${projectName} ndSolverCuda)
+	endif()
+endif(NEWTON_ENABLE_CUDA_SOLVER)
+
+
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()

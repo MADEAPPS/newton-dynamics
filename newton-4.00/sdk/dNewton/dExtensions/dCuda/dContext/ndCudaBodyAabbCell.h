@@ -19,30 +19,50 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_STDAFX_H__
-#define __ND_CUDA_STDAFX_H__
+#ifndef __CU_SORT_H__
+#define __CU_SORT_H__
 
-#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
-	#include <io.h>
-	#include <stdint.h>
-	#include <direct.h>
-	#include <malloc.h>
-	#include <stdarg.h>
-	#include <process.h>
+#include <cuda.h>
+#include <vector_types.h>
+#include <cuda_runtime.h>
+#include <ndNewtonStdafx.h>
 
-	#pragma warning (push, 3)
-	#include <windows.h>
-	#include <crtdbg.h>
-	#pragma warning (pop)
-#else
-	#include <sys/stat.h>
+class ndCudaContext;
+
+// do not change this
+#define D_AABB_GRID_CELL_BITS			10
+
+class ndCudaBodyAabbCell
+{
+	public:
+	union
+	{
+		struct
+		{
+			union
+			{
+				struct
+				{
+					unsigned m_x : D_AABB_GRID_CELL_BITS;
+					unsigned m_y : D_AABB_GRID_CELL_BITS;
+					unsigned m_z : D_AABB_GRID_CELL_BITS;
+				};
+				unsigned m_key;
+			};
+			unsigned m_id;
+		};
+		long long m_value;
+	};
+};
+
+//void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
+//
+//template <typename Predicate>
+//__global__ void XXXXXXX(Predicate GetKey)
+//{
+//	unsigned val = 0;
+//	val = GetKey(val);
+//}
+
+
 #endif
-
-#ifdef _D_CUDA_EXPORT_DLL
-	#define D_CUDA_API __declspec(dllexport)
-#else
-	#define D_CUDA_API __declspec(dllimport)
-#endif
-
-#endif 
-

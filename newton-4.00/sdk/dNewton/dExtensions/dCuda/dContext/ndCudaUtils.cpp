@@ -21,49 +21,43 @@
 
 
 #include "ndCudaStdafx.h"
+#include "ndCudaUtils.h"
 
-void *operator new (size_t size)
+static ndMemAllocCallback g_alloc = malloc;
+static ndMemFreeCallback g_free = free;
+
+void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free)
 {
-	//return ndMemory::Malloc(size);
-	//_ASSERT(0);
-	return nullptr;
+	g_alloc = alloc;
+	g_free = free;
+}
+
+void* operator new (size_t size)
+{
+	return g_alloc(size);
 }
 
 void operator delete (void* ptr)
 {
-	//ndMemory::Free(ptr);
+	g_free(ptr);
 }
 
-D_CUDA_API void XXXXXXXXXXXXXXXXXXXXXXXX()
+#ifdef CUDA_TRACE
+void cudaExpandTraceMessage(const char* const fmt, ...)
 {
+	va_list v_args;
+	char text[4096];
 
+	text[0] = 0;
+	va_start(v_args, fmt);
+	vsprintf(text, fmt, v_args);
+	va_end(v_args);
+
+	#if (defined(WIN32) || defined(_WIN32))
+		OutputDebugStringA(text);
+	#else 
+		printf("%s\n", text);
+	#endif
 }
 
-#if (defined(WIN32) || defined(_WIN32))
-	BOOL APIENTRY DllMain(HMODULE, DWORD  ul_reason_for_call, LPVOID )
-	{
-		switch (ul_reason_for_call)
-		{
-			case DLL_PROCESS_ATTACH:
-			case DLL_THREAD_ATTACH:
-			{
-				#if defined(_DEBUG) && defined(_MSC_VER)
-					// Track all memory leaks at the operating system level.
-					// make sure no Newton tool or utility leaves leaks behind.
-					unsigned flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
-					flags = flags | _CRTDBG_REPORT_FLAG;
-					flags = flags | _CRTDBG_CHECK_EVERY_1024_DF;
-					_CrtSetDbgFlag(flags);
-					//_CrtSetBreakAlloc(3342281);
-				#endif
-			}
-
-			case DLL_THREAD_DETACH:
-			case DLL_PROCESS_DETACH:
-				break;
-		}
-		return TRUE;
-	}
 #endif
-
-

@@ -19,40 +19,40 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_DEBUG_H__
-#define __ND_DEBUG_H__
-
-#include "ndCoreStdafx.h"
-#include "ndTypes.h"
-
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define D_TRACE
-	#endif
-#endif
-
-#ifdef D_TRACE
-	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
-#else
-	#define dTrace(x);
-#endif
+#include <ndNewtonStdafx.h>
+#include <ndCudaContext.h>
+#include <ndDynamicsUpdate.h>
 
 
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
-	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
-	}
+//class ndCudaContext;
 
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
-#endif
+class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
+{
+	public:
+	ndWorldSceneCuda(const ndWorldScene& src);
+	virtual ~ndWorldSceneCuda();
 
-	
-#endif
+	virtual void Begin();
+	virtual void End();
+	virtual bool IsValid() const;
 
+	virtual void InitBodyArray();
+	virtual void UpdateBodyList();
+	virtual void CalculateContacts();
+	virtual void FindCollidingPairs();
+
+	virtual void FindCollidingPairs(ndBodyKinematic* const body);
+	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+
+	virtual void UpdateTransform();
+	void LoadBodyData();
+	void GetBodyTransforms();
+
+	bool SanityCheckPrefix() const;
+	bool SanityCheckSortCells() const;
+
+	ndCudaContext* GetContext();
+
+	//ndCudaContext* m_context;
+	friend class ndDynamicsUpdateCuda;
+};
