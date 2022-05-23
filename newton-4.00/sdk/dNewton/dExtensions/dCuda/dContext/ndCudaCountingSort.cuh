@@ -64,15 +64,15 @@ void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
 */
 
 template <typename Buffer, typename SortKeyPredicate>
-__global__ void XXXXX(const Buffer* src, const Buffer* dst, unsigned size, SortKeyPredicate sortKey)
+__global__ void XXXXX(const Buffer* src, const Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey)
 {
 
 }
 
 template <typename Buffer, typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey)
 {
-	XXXXX << <1, 1, 0 >> > (src, dst, size, sortKey);
+	XXXXX << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey);
 }
 
 
