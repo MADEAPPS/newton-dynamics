@@ -720,7 +720,6 @@ void ndCudaContextImplement::InitBodyArray()
 	};
 #endif
 
-	//cudaStream_t stream = m_context->m_solverComputeStream;
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
 
 #if 0
@@ -729,7 +728,7 @@ void ndCudaContextImplement::InitBodyArray()
 	//CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (InitBodyArray, *infoGpu);
 	//CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (MergeAabb, *infoGpu);
 	//CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
-	CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
+	//CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
 	dAssert(SanityCheckPrefix());
 
 	CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
