@@ -55,6 +55,12 @@ __global__ void ndCudaCountingSortCountItems(const Buffer* src, unsigned* histog
 	histogram[dstBase + threadId] = cacheBuffer[threadId];
 }
 
+inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned items, unsigned keySize, unsigned blockSize)
+{
+	unsigned blocks = (items + blockSize - 1) / blockSize;
+	return keySize * (blocks + 2);
+}
+
 template <typename Buffer, typename SortKeyPredicate>
 __global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
 {

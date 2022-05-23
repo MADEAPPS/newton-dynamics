@@ -286,7 +286,6 @@ __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 	}
 };
 
-
 __global__ void ndCudaScene(ndCudaSceneInfo& info)
 {
 	unsigned bodyCount = info.m_bodyArray.m_size - 1;
@@ -337,6 +336,11 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	const unsigned histogramGridBlockSize = (1 << D_AABB_GRID_CELL_BITS);
 	const unsigned blocksCount = (cellCount + histogramGridBlockSize - 1) / histogramGridBlockSize;
 	const unsigned newCapacity = (blocksCount + 2) * histogramGridBlockSize;
+	const unsigned newCapacity1 = ndCudaCountingSortCalculateScanPrefixSize(cellCount, 1 << D_AABB_GRID_CELL_BITS, D_THREADS_PER_BLOCK);
+
+	__shared__  unsigned xxxxxxx[2];
+	xxxxxxx[0] = newCapacity;
+	xxxxxxx[1] = newCapacity1;
 	if (newCapacity >= info.m_histogram.m_capacity)
 	{
 		#ifdef _DEBUG
