@@ -137,6 +137,21 @@ __global__ void ndCudaHillisSteeleAddSupeBlocksInternal(ndCudaSceneInfo& info)
 	}
 }
 
+__global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
+{
+	const unsigned index = blockIdx.x * blockDim.x + blockIdx.x;
+	const unsigned* histogram = info.m_histogram.m_array;
+	if (index > 1)
+	{
+		unsigned item0 = histogram[index - 1];
+		unsigned item1 = histogram[index - 0];
+		if (item0 > item1)
+		{
+			info.m_frameIsValid = 0;
+		}
+	}
+}
+
 __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info, unsigned blockSize)
 {
 	const unsigned threads = info.m_histogram.m_size;
@@ -153,7 +168,13 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info, unsigned blo
 	ndCudaHillisSteeleAddSupeBlocksInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
 
 	#ifdef _DEBUG
-		// isseu debug code, here for sanity check.
+		// issue debug code, here for sanity check.
+		unsigned sanityBlocks = threads / blockSize;
+		ndCudaHillisSteeleSanityCheck << <sanityBlocks, blockSize, 0 >> > (info);
+		if (info.m_frameIsValid == 0)
+		{
+			printf("function: ndCudaHillisSteelePrefixScan failed\n");
+		}
 	#endif
 }
 
