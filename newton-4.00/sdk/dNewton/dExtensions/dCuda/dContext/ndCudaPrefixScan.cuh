@@ -151,6 +151,10 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info, unsigned blo
 	}
 	ndCudaHillisSteelePrefixScanAddBlocksFinalInternal << <histogramBlocks, blockSize, 0 >> > (info);
 	ndCudaHillisSteeleAddSupeBlocksInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
+
+	#ifdef _DEBUG
+		// isseu debug code, here for sanity check.
+	#endif
 }
 
 #endif
