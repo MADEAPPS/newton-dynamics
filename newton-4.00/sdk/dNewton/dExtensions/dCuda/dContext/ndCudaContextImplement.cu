@@ -23,6 +23,7 @@
 #include "ndCudaUtils.h"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
+#include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
@@ -648,6 +649,11 @@ void ndCudaContextImplement::InitBodyArray()
 	};
 #endif
 
+	auto SortKey = [] __device__(const unsigned& item)
+	{
+		return 0;
+	};
+
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
 
 #if 0
@@ -676,4 +682,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
+	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey);
 }
