@@ -568,7 +568,7 @@ void ndDynamicsUpdateCuda::BuildIsland()
 
 void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 {
-	dAssert(0);
+	//dAssert(0);
 	//ndScene* const scene = m_world->GetScene();
 	//auto IntegrateUnconstrainedBodiesCPU = ndMakeObject::ndFunction([this, &scene](ndInt32 threadIndex, ndInt32 threadCount)
 	//{
@@ -1132,7 +1132,7 @@ void ndDynamicsUpdateCuda::UpdateForceFeedback()
 void ndDynamicsUpdateCuda::IntegrateBodies()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	//dAssert(0);
 	//ndScene* const scene = m_world->GetScene();
 	//const ndVector invTime(m_invTimestep);
 	//const ndFloat32 timestep = scene->GetTimestep();

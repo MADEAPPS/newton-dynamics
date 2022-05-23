@@ -49,13 +49,14 @@ class ndCudaContextImplement
 	~ndCudaContextImplement();
 
 	void Begin();
-	void LoadBodyData(int size);
 	void ResizeBuffers(int size);
+	void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 
+	void SwapBuffers();
+	void InitBodyArray();
 	ndCudaSpatialVector* GetTransformBuffer0();
 	ndCudaSpatialVector* GetTransformBuffer1();
-
-	//void SwapBuffers();
+	
 	ndCudaSceneInfo* m_sceneInfoGpu;
 	ndCudaSceneInfo* m_sceneInfoCpu;
 	ndCudaDeviceBuffer<unsigned> m_histogram;

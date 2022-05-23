@@ -25,6 +25,7 @@
 #include "ndCudaStdafx.h"
 
 class ndCudaDevice;
+class ndCudaBodyProxy;
 class ndCudaSpatialVector;
 class ndCudaContextImplement;
 
@@ -38,8 +39,11 @@ class ndCudaContext
 	D_CUDA_API const char* GetStringId() const;
 
 	D_CUDA_API void Begin();
-	D_CUDA_API void LoadBodyData(int size);
 	D_CUDA_API void ResizeBuffers(int size);
+	D_CUDA_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
+
+	D_CUDA_API void InitBodyArray();
+	D_CUDA_API void SwapBuffers();
 
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer0();
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer1();
