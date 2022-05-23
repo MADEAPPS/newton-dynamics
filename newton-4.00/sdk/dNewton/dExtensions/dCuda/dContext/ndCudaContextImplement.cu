@@ -351,6 +351,18 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	ndCudaGenerateHashGrids << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 }
 
+template <typename SortKeyPredicate>
+__global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sortKey_x, SortKeyPredicate sortKey_y, SortKeyPredicate sortKey_z)
+{
+	const unsigned size = info.m_bodyAabbCell.m_size - 1;
+	ndCudaBodyAabbCell* dst = info.m_bodyAabbCell.m_array;
+	ndCudaBodyAabbCell* src = info.m_bodyAabbCellScrath.m_array;
+	ndCudaCountingSort << <1, 1, 0 >> > (src, dst, size, sortKey_x);
+	ndCudaCountingSort << <1, 1, 0 >> > (dst, src, size, sortKey_y);
+	ndCudaCountingSort << <1, 1, 0 >> > (src, dst, size, sortKey_z);
+}
+
+
 ndCudaContextImplement::ndCudaContextImplement()
 	:m_sceneInfoGpu(nullptr)
 	,m_sceneInfoCpu(nullptr)
@@ -682,5 +694,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey);
+	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey, SortKey, SortKey);
 }

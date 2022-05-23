@@ -63,18 +63,16 @@ class cuBodyAabbCell
 void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
 */
 
-template <typename SortKeyPredicate>
-__global__ void XXXXX(const ndCudaSceneInfo& info, SortKeyPredicate sortKey)
+template <typename Buffer, typename SortKeyPredicate>
+__global__ void XXXXX(const Buffer* src, const Buffer* dst, unsigned size, SortKeyPredicate sortKey)
 {
 
 }
 
-template <typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(const ndCudaSceneInfo& info, SortKeyPredicate sortKey)
+template <typename Buffer, typename SortKeyPredicate>
+__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned size, SortKeyPredicate sortKey)
 {
-	//unsigned val = 0;
-	//val = GetKey(val);
-	XXXXX << <1, 1, 0 >> > (info, sortKey);
+	XXXXX << <1, 1, 0 >> > (src, dst, size, sortKey);
 }
 
 
