@@ -24,7 +24,7 @@ set(CMAKE_CUDA_STANDARD 14)
 include_directories(./)
 include_directories(dCudaDriver/)
 
-file(GLOB CPP_SOURCE dContext/*.h dContext/*.cu dContext/*.cpp)
+file(GLOB CPP_SOURCE dContext/*.h dContext/*.cpp dContext/*.cuh dContext/*.cu)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 

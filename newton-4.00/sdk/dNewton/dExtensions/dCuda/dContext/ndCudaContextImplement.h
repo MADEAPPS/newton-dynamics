@@ -25,12 +25,6 @@
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
 #include "ndCudaDevice.h"
-
-//#include <cuda.h>
-//#include <cuda_runtime.h>
-//#include <ndNewtonStdafx.h>
-//#include <device_launch_parameters.h>
-
 #include "ndCudaSceneInfo.h"
 #include "ndCudaBodyProxy.h"
 #include "ndCudaHostBuffer.h"
@@ -38,9 +32,10 @@
 #include "ndCudaBodyAabbCell.h"
 
 
-class ndCudaDevice;
 #define D_THREADS_PER_BLOCK_BITS	8
 #define D_THREADS_PER_BLOCK			(1<<D_THREADS_PER_BLOCK_BITS)
+
+class ndCudaDevice;
 
 class ndCudaContextImplement
 {
@@ -54,6 +49,7 @@ class ndCudaContextImplement
 
 	void SwapBuffers();
 	void InitBodyArray();
+	void ValidateContextBuffers();
 	ndCudaSpatialVector* GetTransformBuffer0();
 	ndCudaSpatialVector* GetTransformBuffer1();
 	

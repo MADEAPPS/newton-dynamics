@@ -88,6 +88,11 @@ void ndCudaContext::LoadBodyData(const ndCudaBodyProxy* const src, int size)
 	m_implement->LoadBodyData(src, size);
 }
 
+void ndCudaContext::ValidateContextBuffers()
+{
+	m_implement->ValidateContextBuffers();
+}
+
 void ndCudaContext::InitBodyArray()
 {
 	m_implement->InitBodyArray();

@@ -230,34 +230,7 @@ void ndWorldSceneCuda::UpdateBodyList()
 		LoadBodyData();
 	}
 	
-	//cuSceneInfo* const sceneInfo = m_context->m_sceneInfoCpu;
-	//if (!sceneInfo->m_frameIsValid)
-	//{
-	//	cudaDeviceSynchronize();
-	//	sceneInfo->m_frameIsValid = 1;
-	//
-	//	if (sceneInfo->m_histogram.m_size > sceneInfo->m_histogram.m_capacity)
-	//	{
-	//		m_context->m_histogram.SetCount(sceneInfo->m_histogram.m_size);
-	//		sceneInfo->m_histogram = cuBuffer<unsigned>(m_context->m_histogram);
-	//	}
-	//
-	//	if (sceneInfo->m_bodyAabbCell.m_size > sceneInfo->m_bodyAabbCell.m_capacity)
-	//	{
-	//		m_context->m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size);
-	//		m_context->m_bodyAabbCellScrath.SetCount(sceneInfo->m_bodyAabbCell.m_size);
-	//		sceneInfo->m_bodyAabbCell = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCell);
-	//		sceneInfo->m_bodyAabbCellScrath = cuBuffer<cuBodyAabbCell>(m_context->m_bodyAabbCellScrath);
-	//	}
-	//
-	//	cudaError_t cudaStatus = cudaMemcpy(m_context->m_sceneInfoGpu, sceneInfo, sizeof(cuSceneInfo), cudaMemcpyHostToDevice);
-	//	dAssert(cudaStatus == cudaSuccess);
-	//	if (cudaStatus != cudaSuccess)
-	//	{
-	//		dAssert(0);
-	//	}
-	//	cudaDeviceSynchronize();
-	//}
+	ValidateContextBuffers();
 }
 
 bool ndWorldSceneCuda::SanityCheckPrefix() const

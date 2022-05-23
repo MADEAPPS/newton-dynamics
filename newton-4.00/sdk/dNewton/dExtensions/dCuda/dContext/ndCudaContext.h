@@ -44,6 +44,7 @@ class ndCudaContext
 
 	D_CUDA_API void InitBodyArray();
 	D_CUDA_API void SwapBuffers();
+	D_CUDA_API void ValidateContextBuffers();
 
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer0();
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer1();
