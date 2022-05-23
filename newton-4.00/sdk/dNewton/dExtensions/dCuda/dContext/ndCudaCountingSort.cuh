@@ -30,49 +30,36 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-
-/*
-class ndCudaContext;
-
-// do not change this
-#define D_AABB_GRID_CELL_BITS			10
-
-class cuBodyAabbCell
-{
-	public:
-	union
-	{
-		struct
-		{
-			union
-			{
-				struct
-				{
-					unsigned m_x : D_AABB_GRID_CELL_BITS;
-					unsigned m_y : D_AABB_GRID_CELL_BITS;
-					unsigned m_z : D_AABB_GRID_CELL_BITS;
-				};
-				unsigned m_key;
-			};
-			unsigned m_id;
-		};
-		long long m_value;
-	};
-};
-
-void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
-*/
+#define D_COUNTING_SORT_MAX_BLOCK_SIZE  256
+#define D_COUNTING_SORT_MAX_KEY_SIZE	1024
 
 template <typename Buffer, typename SortKeyPredicate>
-__global__ void XXXXX(const Buffer* src, const Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSortCountItems(const Buffer* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
 {
+	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_MAX_KEY_SIZE];
 
+	const unsigned blockId = blockIdx.x;
+	const unsigned threadId = threadIdx.x;
+	
+	// this is wroung;
+	cacheBuffer[threadId] = 0;
+	const unsigned index = threadId + blockDim.x * blockId;
+	if (index < size)
+	{
+		const unsigned key = sortKey(src[index].m_key);
+		atomicAdd(&cacheBuffer[key], 1);
+	}
+	__syncthreads();
+	
+	const unsigned dstBase = blockDim.x * blockId;
+	histogram[dstBase + threadId] = cacheBuffer[threadId];
 }
 
 template <typename Buffer, typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
 {
-	XXXXX << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey);
+	unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
+	ndCudaCountingSortCountItems << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, prefixScanBuffer, size, sortKey);
 }
 
 

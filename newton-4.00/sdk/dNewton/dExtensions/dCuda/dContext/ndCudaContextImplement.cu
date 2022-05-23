@@ -357,12 +357,13 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sort
 	if (info.m_frameIsValid)
 	{
 		const unsigned size = info.m_bodyAabbCell.m_size - 1;
+		const unsigned keySize = 1 << D_AABB_GRID_CELL_BITS;
 		unsigned* prefixScanBuffer = info.m_histogram.m_array;
 		ndCudaBodyAabbCell* dst = info.m_bodyAabbCell.m_array;
 		ndCudaBodyAabbCell* src = info.m_bodyAabbCellScrath.m_array;
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_x);
-		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_y);
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_z);
+		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_x, keySize);
+		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_y, keySize);
+		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_z, keySize);
 	}
 }
 
