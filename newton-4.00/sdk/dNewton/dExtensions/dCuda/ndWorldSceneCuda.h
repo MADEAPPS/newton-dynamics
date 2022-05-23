@@ -46,7 +46,6 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 	void LoadBodyData();
 	void GetBodyTransforms();
 
-	bool SanityCheckPrefix() const;
 	bool SanityCheckSortCells() const;
 
 	ndCudaContext* GetContext();

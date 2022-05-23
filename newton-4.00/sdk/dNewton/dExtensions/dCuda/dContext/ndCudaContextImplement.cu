@@ -28,13 +28,12 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
-
-__global__ void CudaEndFrame(ndCudaSceneInfo& info, int frameCount)
+__global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 {
 	info.m_frameCount = frameCount;
 }
 
-__global__ void CudaInitTransforms(ndCudaSceneInfo& info)
+__global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	if (index < info.m_bodyArray.m_size)
@@ -50,7 +49,7 @@ __global__ void CudaInitTransforms(ndCudaSceneInfo& info)
 	}
 }
 
-__global__ void CudaInitBodyArray(ndCudaSceneInfo& info)
+__global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 {
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
@@ -123,7 +122,7 @@ __global__ void CudaInitBodyArray(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void CudaMergeAabb(ndCudaSceneInfo& info)
+__global__ void ndCudaMergeAabb(ndCudaSceneInfo& info)
 {
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
@@ -176,7 +175,7 @@ __global__ void CudaMergeAabb(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void CudaCountAabb(ndCudaSceneInfo& info)
+__global__ void ndCudaCountAabb(ndCudaSceneInfo& info)
 {
 	__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
 
@@ -242,7 +241,7 @@ __global__ void CudaCountAabb(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void GenerateHashGrids(const ndCudaSceneInfo& info)
+__global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 {
 	const unsigned threadId = threadIdx.x;
 	const unsigned index = threadId + blockDim.x * blockIdx.x;
@@ -293,9 +292,9 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	unsigned bodyBlocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
 	//printf("ndCudaScene %d\n", bodyBlocksCount);
-	CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
-	CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
-	CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+	ndCudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
+	ndCudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 	if (info.m_frameIsValid == 0)
 	{
 		return;
@@ -348,7 +347,7 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	info.m_histogram.m_size = blocksCount * histogramGridBlockSize;
 
 	//printf("ndCudaScene %d  %d\n", info.m_histogram.m_size, info.m_histogram.m_capacity);
-	GenerateHashGrids << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+	ndCudaGenerateHashGrids << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 }
 
 ndCudaContextImplement::ndCudaContextImplement()
@@ -413,14 +412,15 @@ ndCudaContextImplement::~ndCudaContextImplement()
 void ndCudaContextImplement::SwapBuffers()
 {
 	m_frameCounter = m_frameCounter + 1;
+
+	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
+	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
 	m_transformBufferCpu0.Swap(m_transformBufferCpu1);
 }
 
 void ndCudaContextImplement::Begin()
 {
 	cudaDeviceSynchronize();
-
-	const ndInt32 frameCounter = m_frameCounter;
 
 	// get the scene info from the update	
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
@@ -433,7 +433,8 @@ void ndCudaContextImplement::Begin()
 		dAssert(0);
 	}
 
-	CudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, frameCounter);
+	const int frameCounter = m_frameCounter;
+	//ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, frameCounter);
 	if (frameCounter)
 	{
 		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu0;
@@ -454,7 +455,7 @@ ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer1()
 
 void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 {
-	const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+	const int gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
 	
 	ndCudaDeviceBuffer<unsigned>& histogramGpu = m_histogram;
 	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBufferGpu = m_bodyBufferGpu;
@@ -494,11 +495,11 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, &info, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
 	dAssert(cudaStatus == cudaSuccess);
 
-	const ndInt32 blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	//const ndInt32 gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
+	const int blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//const int gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
 	
 	m_bodyBufferGpu.ReadData(src, cpuBodyCount);
-	CudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (*m_sceneInfoCpu);
+	ndCudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (*m_sceneInfoCpu);
 	
 	cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess)
@@ -541,39 +542,39 @@ void ndCudaContextImplement::ValidateContextBuffers()
 
 void ndCudaContextImplement::InitBodyArray()
 {
-	//auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	//auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](int threadIndex, int threadCount)
 	//{
 	//	const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
 	//	ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 	//
 	//	const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
-	//	ndInt32* const scan = &scans[threadIndex][0];
+	//	int* const scan = &scans[threadIndex][0];
 	//
 	//	const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	for (int i = startEnd.m_start; i < startEnd.m_end; ++i)
 	//	{
 	//		ndBodyKinematic* const body = activeBodyArray[i];
-	//		const ndInt32 key = body->m_sceneEquilibrium;
-	//		const ndInt32 index = scan[key];
+	//		const int key = body->m_sceneEquilibrium;
+	//		const int index = scan[key];
 	//		sceneBodyArray[index] = body;
 	//		scan[key] ++;
 	//	}
 	//});
 
 	//ParallelExecute(BuildBodyArray);
-	//ndInt32 sum = 0;
-	//ndInt32 threadCount = GetThreadCount();
-	//for (ndInt32 j = 0; j < 2; j++)
+	//int sum = 0;
+	//int threadCount = GetThreadCount();
+	//for (int j = 0; j < 2; j++)
 	//{
-	//	for (ndInt32 i = 0; i < threadCount; ++i)
+	//	for (int i = 0; i < threadCount; ++i)
 	//	{
-	//		const ndInt32 count = scans[i][j];
+	//		const int count = scans[i][j];
 	//		scans[i][j] = sum;
 	//		sum += count;
 	//	}
 	//}
 	//
-	//ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
+	//int movingBodyCount = scans[0][1] - scans[0][0];
 	//m_sceneBodyArray.SetCount(m_bodyList.GetCount());
 	//if (movingBodyCount)
 	//{
@@ -650,21 +651,18 @@ void ndCudaContextImplement::InitBodyArray()
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
 
 #if 0
-	//ndInt32 threads = m_context->m_bodyBufferGpu.GetCount() - 1;
-	//ndInt32 bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//int threads = m_context->m_bodyBufferGpu.GetCount() - 1;
+	//int bodyBlocksCount = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	//CudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (InitBodyArray, *infoGpu);
 	//CudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0, stream >> > (MergeAabb, *infoGpu);
 	//CudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CountAabb, *infoGpu);
 	//CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
-	dAssert(SanityCheckPrefix());
 	//CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
-
-	CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
-
+	//CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
 	CudaBodyAabbCellSortBuffer(m_context);
 	dAssert(SanityCheckSortCells());
 
-	//	ndInt32 cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//	int cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	//	dAssert(cellsBlocksCount > 0);
 	//	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
 	////dAssert(SanityCheckPrefix());

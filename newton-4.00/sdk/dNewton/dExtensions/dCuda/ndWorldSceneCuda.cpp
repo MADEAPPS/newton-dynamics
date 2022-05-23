@@ -233,36 +233,6 @@ void ndWorldSceneCuda::UpdateBodyList()
 	ValidateContextBuffers();
 }
 
-bool ndWorldSceneCuda::SanityCheckPrefix() const
-{
-	dAssert(0);
-	//cuSceneInfo info;
-	//cudaError_t cudaStatus;
-	//
-	//cudaDeviceSynchronize();
-	//cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	//dAssert(cudaStatus == cudaSuccess);
-	//
-	//if (info.m_frameIsValid)
-	//{
-	//	static ndArray<unsigned> histogram;
-	//	histogram.SetCount(info.m_histogram.m_size);
-	//
-	//	cudaStatus = cudaMemcpy(&histogram[0], info.m_histogram.m_array, histogram.GetCount() * sizeof(unsigned), cudaMemcpyDeviceToHost);
-	//	dAssert(cudaStatus == cudaSuccess);
-	//	for (int i = 1; i < histogram.GetCount(); i++)
-	//	{
-	//		dAssert(histogram[i - 1] <= histogram[i]);
-	//	}
-	//}
-	//
-	//if (cudaStatus != cudaSuccess)
-	//{
-	//	dAssert(0);
-	//}
-	return true;
-}
-
 bool ndWorldSceneCuda::SanityCheckSortCells() const
 {
 	dAssert(0);
