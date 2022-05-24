@@ -33,7 +33,7 @@ __global__ void ndCudaBeginFrame(ndCudaSceneInfo& info)
 {
 	long long coreTicks = clock64();
 	info.m_timeSlice = coreTicks;
-	printf("t0 = %lld    ", coreTicks);
+	//printf("t0 = %lld    ", coreTicks);
 }
 
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
@@ -41,9 +41,12 @@ __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 	long long coreTicks = clock64();
 
 	info.m_frameCount = frameCount;
-	printf("t1 = %lld   diff= %lld\n", coreTicks, coreTicks - info.m_timeSlice);
+	long long diff = (coreTicks >= info.m_timeSlice) ? (coreTicks - info.m_timeSlice) : (info.m_timeSlice - coreTicks);
+	//printf("t1 = %lld   diff= %lld\n", coreTicks, coreTicks - info.m_timeSlice);
+	//printf("t1 = %lld   diff= %lld\n", coreTicks, x);
 
-	info.m_timeSlice = coreTicks - info.m_timeSlice;
+	//info.m_timeSlice = coreTicks - info.m_timeSlice;
+	info.m_timeSlice = diff;
 }
 
 __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
