@@ -121,7 +121,7 @@ class ndCudaSceneInfo
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
 	
-	long long int m_timeSlice;
+	long long m_timeSlice;
 	unsigned m_frameIsValid;
 	unsigned m_frameCount;
 };

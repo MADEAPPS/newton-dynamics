@@ -117,7 +117,7 @@ ndWorld::ndWorld()
 	,m_averageFramesCount(ndFloat32(0.0f))
 	,m_lastExecutionTime(ndFloat32(0.0f))
 	,m_extensionAverageUpdateTime(ndFloat32(0.0f))
-	,m_extensionaverageTimestepAcc(ndFloat32(0.0f))
+	,m_extensionAverageTimestepAcc(ndFloat32(0.0f))
 	,m_subSteps(1)
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
@@ -454,6 +454,7 @@ void ndWorld::CalculateAverageUpdateTime()
 {
 	m_averageFramesCount += ndFloat32 (1.0f);
 	m_averageTimestepAcc += m_lastExecutionTime;
+	m_extensionAverageTimestepAcc += ndFloat32(m_scene->GetGPUTime());
 
 	dAssert(m_averageTimestepAcc >= ndFloat32(0.0f));
 	const ndFloat32 movingAverageFrames = ndFloat32 (16);
@@ -461,6 +462,10 @@ void ndWorld::CalculateAverageUpdateTime()
 	{
 		m_averageUpdateTime = m_averageTimestepAcc/m_averageFramesCount;
 		m_averageTimestepAcc = ndFloat32 (0.0f);
+
+		m_extensionAverageUpdateTime = m_extensionAverageTimestepAcc / m_averageFramesCount;
+		m_extensionAverageTimestepAcc = 0.0f;
+
 		m_averageFramesCount -= movingAverageFrames;
 	}
 }

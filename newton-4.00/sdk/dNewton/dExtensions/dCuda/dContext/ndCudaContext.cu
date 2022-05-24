@@ -58,6 +58,11 @@ const char* ndCudaContext::GetStringId() const
 	return IsValid() ? &m_device->m_prop.name[0] : "no cuda support";
 }
 
+double ndCudaContext::GetGPUTime() const
+{
+	return IsValid() ? m_device->m_frequency * m_implement->GetGpuClocks() : 0;
+}
+
 void ndCudaContext::SwapBuffers()
 {
 	m_implement->SwapBuffers();

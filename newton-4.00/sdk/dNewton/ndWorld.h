@@ -138,9 +138,7 @@ class ndWorld: public ndClassAlloc
 	{
 		public:
 		ndFloat32 m_maxAccel;
-		//ndFloat32 m_maxAlpha;
 		ndFloat32 m_maxVeloc;
-		//ndFloat32 m_maxOmega;
 		ndInt32 m_steps;
 	};
 
@@ -175,7 +173,7 @@ class ndWorld: public ndClassAlloc
 	ndFloat32 m_averageFramesCount;
 	ndFloat32 m_lastExecutionTime;
 	ndFloat32 m_extensionAverageUpdateTime;
-	ndFloat32 m_extensionaverageTimestepAcc;
+	ndFloat32 m_extensionAverageTimestepAcc;
 
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 

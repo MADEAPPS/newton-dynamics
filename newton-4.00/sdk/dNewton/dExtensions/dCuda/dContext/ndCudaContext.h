@@ -49,6 +49,8 @@ class ndCudaContext
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer0();
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer1();
 
+	D_CUDA_API double GetGPUTime() const;
+
 	ndCudaDevice* m_device;
 	ndCudaContextImplement* m_implement;
 };

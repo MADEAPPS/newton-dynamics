@@ -47,6 +47,7 @@ ndCudaDevice::ndCudaDevice()
 	cuTrace(("memory bus with: %d bits\n", m_prop.memoryBusWidth));
 	cuTrace(("memory: (mbytes) %d\n", m_prop.totalGlobalMem / (1024 * 1024)));
 	
+	m_frequency = 1.0f / m_prop.clockRate;
 	m_blocksPerKernelCall = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
 }
 

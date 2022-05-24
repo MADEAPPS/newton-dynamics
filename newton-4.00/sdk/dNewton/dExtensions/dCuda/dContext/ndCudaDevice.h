@@ -35,6 +35,7 @@ class ndCudaDevice
 	~ndCudaDevice();
 
 	struct cudaDeviceProp m_prop;
+	double m_frequency;
 	unsigned m_valid;
 	unsigned m_blocksPerKernelCall;
 };

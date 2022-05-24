@@ -50,6 +50,8 @@ class ndCudaContextImplement
 	void ValidateContextBuffers();
 	ndCudaSpatialVector* GetTransformBuffer0();
 	ndCudaSpatialVector* GetTransformBuffer1();
+
+	long long GetGpuClocks() const;
 	
 	ndCudaSceneInfo* m_sceneInfoGpu;
 	ndCudaSceneInfo* m_sceneInfoCpu;

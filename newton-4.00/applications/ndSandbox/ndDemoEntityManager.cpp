@@ -1200,7 +1200,7 @@ void ndDemoEntityManager::RenderStats()
 
 			if (m_world->IsGPU())
 			{
-				sprintf(text, "gpu     time:  %6.3f ms", m_world->GetExtensionAverageUpdateTime() * 1.0e3f);
+				sprintf(text, "gpu     time:  %6.3f ms", m_world->GetExtensionAverageUpdateTime() * 1.0e-3f);
 				ImGui::Text(text, "");
 			}
 

@@ -56,7 +56,12 @@ bool ndWorldSceneCuda::IsValid() const
 
 bool ndWorldSceneCuda::IsGPU() const
 {
-	return true;
+	return ndCudaContext::IsValid();
+}
+
+double ndWorldSceneCuda::GetGPUTime() const
+{
+	return ndCudaContext::GetGPUTime();
 }
 
 void ndWorldSceneCuda::Begin()
