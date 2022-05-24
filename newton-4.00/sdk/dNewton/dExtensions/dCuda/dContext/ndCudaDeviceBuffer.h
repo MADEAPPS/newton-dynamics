@@ -130,7 +130,7 @@ void ndCudaDeviceBuffer<T>::Resize(int newSize)
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
 		T* newArray;
-		newSize = dMax(newSize, D_GRANULARITY);
+		newSize = std::max(newSize, D_GRANULARITY);
 		const int itemSizeInBytes = sizeof(T);
 		cudaStatus = cudaMalloc((void**)&newArray, newSize * itemSizeInBytes);
 		dAssert(cudaStatus == cudaSuccess);
@@ -148,7 +148,7 @@ void ndCudaDeviceBuffer<T>::Resize(int newSize)
 	{
 		T* newArray;
 		const int itemSizeInBytes = sizeof(T);
-		newSize = dMax(newSize, D_GRANULARITY);
+		newSize = std::max(newSize, D_GRANULARITY);
 		cudaStatus = cudaMalloc((void**)&newArray, newSize * itemSizeInBytes);
 		if (m_array)
 		{

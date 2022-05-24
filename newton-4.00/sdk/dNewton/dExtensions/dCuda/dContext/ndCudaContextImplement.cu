@@ -355,13 +355,16 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sort
 	if (info.m_frameIsValid)
 	{
 		const unsigned size = info.m_bodyAabbCell.m_size - 1;
-		unsigned* prefixScanBuffer = info.m_histogram.m_array;
+		unsigned* histogram = info.m_histogram.m_array;
+
+		printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
+
 		ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
 		ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_x, D_THREADS_PER_BLOCK);
-		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_y, D_THREADS_PER_BLOCK);
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_z, D_THREADS_PER_BLOCK);
-		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_w, D_THREADS_PER_BLOCK);
+		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
+		//ndCudaCountingSort << <1, 1, 0 >> > (dst, src, histogram, size, sortKey_y, D_THREADS_PER_BLOCK);
+		//ndCudaCountingSort << <1, 1, 0 >> > (src, dst, histogram, size, sortKey_z, D_THREADS_PER_BLOCK);
+		//ndCudaCountingSort << <1, 1, 0 >> > (dst, src, histogram, size, sortKey_w, D_THREADS_PER_BLOCK);
 	}
 }
 

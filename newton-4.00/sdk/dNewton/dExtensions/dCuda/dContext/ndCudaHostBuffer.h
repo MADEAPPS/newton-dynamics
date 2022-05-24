@@ -128,9 +128,9 @@ void ndCudaHostBuffer<T>::Clear()
 template<class T>
 void ndCudaHostBuffer<T>::Swap(ndCudaHostBuffer& buffer)
 {
-	dSwap(m_size, buffer.m_size);
-	dSwap(m_array, buffer.m_array);
-	dSwap(m_capacity, buffer.m_capacity);
+	cuSwap(m_size, buffer.m_size);
+	cuSwap(m_array, buffer.m_array);
+	cuSwap(m_capacity, buffer.m_capacity);
 }
 
 template<class T>
@@ -140,7 +140,7 @@ void ndCudaHostBuffer<T>::Resize(int newSize)
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
 		T* newArray;
-		newSize = dMax(newSize, D_GRANULARITY);
+		newSize = std::max(newSize, D_GRANULARITY);
 		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		dAssert(cudaStatus == cudaSuccess);
 		if (m_array)
@@ -156,7 +156,7 @@ void ndCudaHostBuffer<T>::Resize(int newSize)
 	else if (newSize < m_capacity)
 	{
 		T* newArray;
-		newSize = dMax(newSize, D_GRANULARITY);
+		newSize = std::max(newSize, D_GRANULARITY);
 		cudaStatus = cudaMallocHost((void**)&newArray, newSize * sizeof(T));
 		if (m_array)
 		{

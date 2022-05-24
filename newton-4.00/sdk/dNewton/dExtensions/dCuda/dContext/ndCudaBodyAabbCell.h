@@ -25,7 +25,6 @@
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
-#include <ndNewtonStdafx.h>
 
 class ndCudaContext;
 
@@ -54,15 +53,5 @@ class ndCudaBodyAabbCell
 		long long m_value;
 	};
 };
-
-//void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
-//
-//template <typename Predicate>
-//__global__ void XXXXXXX(Predicate GetKey)
-//{
-//	unsigned val = 0;
-//	val = GetKey(val);
-//}
-
 
 #endif

@@ -28,9 +28,10 @@ file(GLOB CPP_SOURCE dContext/*.h dContext/*.cpp dContext/*.cuh dContext/*.cu)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4201 -wd4324 -Zi -Ob0 -Od /RTC1\" --extended-lambda")
-Set(CMAKE_CUDA_FLAGS_RELEASE "-Xcompiler=\"-MD -W4 -wd4201 -wd4324 -Zi -O2 -Ob2\" -DNDEBUG --extended-lambda") 
-Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-Xcompiler=\"-MD -W4 -wd4201 -wd4324 -Zi -O2 -Ob1\" -DNDEBUG --extended-lambda")
+
+Set(CMAKE_CUDA_FLAGS_DEBUG "-Xcompiler=\"-MDd -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -Ob0 -Od /RTC1\" --extended-lambda")
+Set(CMAKE_CUDA_FLAGS_RELEASE "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob2\" -DNDEBUG --extended-lambda") 
+Set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-Xcompiler=\"-MD -W4 -wd4100 -wd4201 -wd4324 -wd4505 -Zi -O2 -Ob1\" -DNDEBUG --extended-lambda")
 
 #Set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -lineinfo")
 Set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -lineinfo")

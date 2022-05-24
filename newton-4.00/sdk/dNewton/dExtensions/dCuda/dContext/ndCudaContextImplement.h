@@ -67,7 +67,7 @@ class ndCudaContextImplement
 	
 	cudaStream_t m_solverMemCpyStream;
 	cudaStream_t m_solverComputeStream;
-	ndInt32 m_frameCounter;
+	unsigned m_frameCounter;
 };
 
 #endif

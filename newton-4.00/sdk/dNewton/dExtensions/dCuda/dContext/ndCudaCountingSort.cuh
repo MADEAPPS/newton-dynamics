@@ -41,6 +41,7 @@ __global__ void ndCudaCountingSortCountItemsInternal(const Buffer* src, unsigned
 	const unsigned threadId = threadIdx.x;
 	
 	cacheBuffer[threadId] = 0;
+	__syncthreads();
 	const unsigned index = threadId + blockDim.x * blockId;
 	if (index < size)
 	{
@@ -53,6 +54,25 @@ __global__ void ndCudaCountingSortCountItemsInternal(const Buffer* src, unsigned
 	histogram[dstBase + threadId] = cacheBuffer[threadId];
 }
 
+__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
+{
+	unsigned sum = 0;
+	unsigned offset = 0;
+
+	//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
+
+	const unsigned threadId = threadIdx.x;
+	for (int i = 0; i < blockCount; i++)
+	{
+		const unsigned count = histogram[offset + threadId];
+		histogram[offset + threadId] = sum;
+		sum += count;
+		offset += blockDim.x;
+	}
+	histogram[offset + threadId] = sum;
+}
+
+
 inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned items, unsigned keySize)
 {
 	unsigned blocks = (items + D_COUNTING_SORT_MAX_BLOCK_SIZE - 1) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
@@ -60,10 +80,13 @@ inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned it
 }
 
 template <typename Buffer, typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
+__global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
 {
-	unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
-	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, prefixScanBuffer, size, sortKey);
+	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
+
+	printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
+	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey);
+	ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
 }
 
 
