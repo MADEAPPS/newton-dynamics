@@ -361,13 +361,12 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sort
 
 		ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
 		ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
-		//ndCudaCountingSort << <1, 1, 0 >> > (dst, src, histogram, size, sortKey_y, D_THREADS_PER_BLOCK);
-		//ndCudaCountingSort << <1, 1, 0 >> > (src, dst, histogram, size, sortKey_z, D_THREADS_PER_BLOCK);
-		//ndCudaCountingSort << <1, 1, 0 >> > (dst, src, histogram, size, sortKey_w, D_THREADS_PER_BLOCK);
+		ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
+		//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_y, D_THREADS_PER_BLOCK);
+		//ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_z, D_THREADS_PER_BLOCK);
+		//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_w, D_THREADS_PER_BLOCK);
 	}
 }
-
 
 ndCudaContextImplement::ndCudaContextImplement()
 	:m_sceneInfoGpu(nullptr)
@@ -667,9 +666,11 @@ void ndCudaContextImplement::InitBodyArray()
 	};
 #endif
 
-	auto SortKey = [] __device__(const unsigned& item)
+	//auto SortKey = [] __device__(const unsigned& item)
+	auto SortKey = [] __device__(const ndCudaBodyAabbCell& item)
 	{
-		return 0;
+		const unsigned key = item.m_key;
+		return key & 0xff;
 	};
 
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;

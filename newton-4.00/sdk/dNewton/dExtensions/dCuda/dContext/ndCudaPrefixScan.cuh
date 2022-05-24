@@ -173,7 +173,7 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info, unsigned blo
 		ndCudaHillisSteeleSanityCheck << <sanityBlocks, blockSize, 0 >> > (info);
 		if (info.m_frameIsValid == 0)
 		{
-			printf("function: ndCudaHillisSteelePrefixScan failed\n");
+			printf("function: %s failed\n", __FUNCTION__);
 		}
 	#endif
 }
