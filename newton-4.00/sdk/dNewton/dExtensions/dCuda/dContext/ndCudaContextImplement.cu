@@ -32,6 +32,7 @@
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 {
 	info.m_frameCount = frameCount;
+	info.m_timeSlice = clock64() - info.m_timeSlice;
 }
 
 __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
@@ -57,6 +58,8 @@ __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 	const unsigned threadId = threadIdx.x;
 	const unsigned index = threadId + blockDim.x * blockIdx.x;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
+
+	info.m_timeSlice = clock64();
 
 	//if (index == 0)
 	//{

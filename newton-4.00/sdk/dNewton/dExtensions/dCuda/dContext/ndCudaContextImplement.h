@@ -29,8 +29,6 @@
 #include "ndCudaBodyProxy.h"
 #include "ndCudaHostBuffer.h"
 #include "ndCudaDeviceBuffer.h"
-#include "ndCudaBodyAabbCell.h"
-
 
 #define D_THREADS_PER_BLOCK_BITS	8
 #define D_THREADS_PER_BLOCK			(1<<D_THREADS_PER_BLOCK_BITS)

@@ -45,6 +45,32 @@ class ndCudaBoundingBox
 	ndCudaVector m_max;
 };
 
+#define D_AABB_GRID_CELL_BITS			10
+
+class ndCudaBodyAabbCell
+{
+	public:
+	union
+	{
+		struct
+		{
+			union
+			{
+				struct
+				{
+					unsigned m_x : D_AABB_GRID_CELL_BITS;
+					unsigned m_y : D_AABB_GRID_CELL_BITS;
+					unsigned m_z : D_AABB_GRID_CELL_BITS;
+				};
+				unsigned m_key;
+			};
+			unsigned m_id;
+		};
+		long long m_value;
+	};
+};
+
+
 template <class T>
 class ndCudaBuffer
 {
@@ -80,6 +106,7 @@ class ndCudaSceneInfo
 		,m_bodyAabbCellScrath()
 		,m_transformBuffer0()
 		,m_transformBuffer1()
+		,m_timeSlice(0)
 		,m_frameIsValid(0)
 		,m_frameCount(0)
 	{
@@ -94,6 +121,7 @@ class ndCudaSceneInfo
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
 	
+	long long int m_timeSlice;
 	unsigned m_frameIsValid;
 	unsigned m_frameCount;
 };
