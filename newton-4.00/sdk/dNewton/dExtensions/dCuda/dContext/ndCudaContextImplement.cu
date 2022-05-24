@@ -251,7 +251,7 @@ __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 	{
 		const unsigned* histogram = info.m_histogram.m_array;
 		const ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
-		ndCudaBodyAabbCell* hashArray = info.m_bodyAabbCellScrath.m_array;
+		ndCudaBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
 
 		const ndCudaVector minBox(info.m_worldBox.m_min);
 		const ndCudaVector bodyBoxMin(bodyArray[index].m_minAabb);
@@ -333,14 +333,7 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	info.m_bodyAabbCellScrath.m_size = cellCount + 1;
 
 	// check new histogram size.
-	const unsigned histogramGridBlockSize = (1 << D_AABB_GRID_CELL_BITS);
-	const unsigned blocksCount = (cellCount + histogramGridBlockSize - 1) / histogramGridBlockSize;
-	const unsigned newCapacity = (blocksCount + 2) * histogramGridBlockSize;
-	const unsigned newCapacity1 = ndCudaCountingSortCalculateScanPrefixSize(cellCount, 1 << D_AABB_GRID_CELL_BITS, D_THREADS_PER_BLOCK);
-
-	__shared__  unsigned xxxxxxx[2];
-	xxxxxxx[0] = newCapacity;
-	xxxxxxx[1] = newCapacity1;
+	const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(cellCount, D_THREADS_PER_BLOCK);
 	if (newCapacity >= info.m_histogram.m_capacity)
 	{
 		#ifdef _DEBUG
@@ -349,25 +342,26 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 		info.m_frameIsValid = 0;
 		info.m_histogram.m_size = newCapacity;
 	}
-	info.m_histogram.m_size = blocksCount * histogramGridBlockSize;
+	//const unsigned blocksCount = (cellCount + D_COUNTING_SORT_MAX_BLOCK_SIZE - 1) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
+	info.m_histogram.m_size = bodyBlocksCount * D_THREADS_PER_BLOCK;
 
 	//printf("ndCudaScene %d  %d\n", info.m_histogram.m_size, info.m_histogram.m_capacity);
 	ndCudaGenerateHashGrids << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 }
 
 template <typename SortKeyPredicate>
-__global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sortKey_x, SortKeyPredicate sortKey_y, SortKeyPredicate sortKey_z)
+__global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sortKey_x, SortKeyPredicate sortKey_y, SortKeyPredicate sortKey_z, SortKeyPredicate sortKey_w)
 {
 	if (info.m_frameIsValid)
 	{
 		const unsigned size = info.m_bodyAabbCell.m_size - 1;
-		const unsigned keySize = 1 << D_AABB_GRID_CELL_BITS;
 		unsigned* prefixScanBuffer = info.m_histogram.m_array;
-		ndCudaBodyAabbCell* dst = info.m_bodyAabbCell.m_array;
-		ndCudaBodyAabbCell* src = info.m_bodyAabbCellScrath.m_array;
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_x, keySize);
-		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_y, keySize);
-		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_z, keySize);
+		ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
+		ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
+		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_x, D_THREADS_PER_BLOCK);
+		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_y, D_THREADS_PER_BLOCK);
+		ndCudaCountingSort << <1, 1, 0 >> > (src, dst, prefixScanBuffer, size, sortKey_z, D_THREADS_PER_BLOCK);
+		ndCudaCountingSort << <1, 1, 0 >> > (dst, src, prefixScanBuffer, size, sortKey_w, D_THREADS_PER_BLOCK);
 	}
 }
 
@@ -703,5 +697,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey, SortKey, SortKey);
+	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey, SortKey, SortKey, SortKey);
 }

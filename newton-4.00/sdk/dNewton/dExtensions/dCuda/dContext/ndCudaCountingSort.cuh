@@ -30,18 +30,16 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-#define D_COUNTING_SORT_MAX_BLOCK_SIZE  256
-#define D_COUNTING_SORT_MAX_KEY_SIZE	1024
+#define D_COUNTING_SORT_MAX_BLOCK_SIZE  1024
 
 template <typename Buffer, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountItems(const Buffer* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSortCountItemsInternal(const Buffer* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
 {
-	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_MAX_KEY_SIZE];
+	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_MAX_BLOCK_SIZE];
 
 	const unsigned blockId = blockIdx.x;
 	const unsigned threadId = threadIdx.x;
 	
-	// this is wroung;
 	cacheBuffer[threadId] = 0;
 	const unsigned index = threadId + blockDim.x * blockId;
 	if (index < size)
@@ -55,9 +53,9 @@ __global__ void ndCudaCountingSortCountItems(const Buffer* src, unsigned* histog
 	histogram[dstBase + threadId] = cacheBuffer[threadId];
 }
 
-inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned items, unsigned keySize, unsigned blockSize)
+inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned items, unsigned keySize)
 {
-	unsigned blocks = (items + blockSize - 1) / blockSize;
+	unsigned blocks = (items + D_COUNTING_SORT_MAX_BLOCK_SIZE - 1) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
 	return keySize * (blocks + 2);
 }
 
@@ -65,7 +63,7 @@ template <typename Buffer, typename SortKeyPredicate>
 __global__ void ndCudaCountingSort(const Buffer* src, Buffer* dst, unsigned* prefixScanBuffer, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
 {
 	unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
-	ndCudaCountingSortCountItems << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, prefixScanBuffer, size, sortKey);
+	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, prefixScanBuffer, size, sortKey);
 }
 
 
