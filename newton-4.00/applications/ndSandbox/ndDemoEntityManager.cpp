@@ -1198,6 +1198,12 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
+			if (m_world->IsGPU())
+			{
+				sprintf(text, "gpu     time:  %6.3f ms", m_world->GetExtensionAverageUpdateTime() * 1.0e3f);
+				ImGui::Text(text, "");
+			}
+
 			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
 

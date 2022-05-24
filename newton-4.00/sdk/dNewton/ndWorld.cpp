@@ -111,13 +111,13 @@ ndWorld::ndWorld()
 	,m_activeSkeletons(256)
 	,m_timestep(ndFloat32 (0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
-	//,m_freezeAlpha2(D_FREEZE_ACCEL2)
 	,m_freezeSpeed2(D_FREEZE_SPEED2)
-	//,m_freezeOmega2(D_FREEZE_SPEED2)
 	,m_averageUpdateTime(ndFloat32(0.0f))
 	,m_averageTimestepAcc(ndFloat32(0.0f))
 	,m_averageFramesCount(ndFloat32(0.0f))
 	,m_lastExecutionTime(ndFloat32(0.0f))
+	,m_extensionAverageUpdateTime(ndFloat32(0.0f))
+	,m_extensionaverageTimestepAcc(ndFloat32(0.0f))
 	,m_subSteps(1)
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
@@ -212,6 +212,11 @@ void ndWorld::CleanUp()
 const char* ndWorld::GetSolverString() const
 {
 	return m_solver->GetStringId();
+}
+
+bool ndWorld::IsGPU() const
+{
+	return m_scene->IsGPU();
 }
 
 void ndWorld::ClearCache()

@@ -32,6 +32,7 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 
 	virtual void Begin();
 	virtual void End();
+	virtual bool IsGPU() const;
 	virtual bool IsValid() const;
 
 	virtual void InitBodyArray();

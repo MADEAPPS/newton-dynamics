@@ -102,6 +102,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
 	D_COLLISION_API virtual void Sync();
+	D_COLLISION_API virtual bool IsGPU() const;
 	D_COLLISION_API virtual bool IsValid() const;
 
 	D_COLLISION_API virtual void Cleanup();
@@ -206,6 +207,11 @@ class ndScene : public ndThreadPool
 inline bool ndScene::IsValid() const
 {
 	return true;
+}
+
+inline bool ndScene::IsGPU() const
+{
+	return false;
 }
 
 inline ndWorld* ndScene::GetWorld() const

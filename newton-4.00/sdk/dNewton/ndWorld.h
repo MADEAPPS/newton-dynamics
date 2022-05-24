@@ -77,6 +77,8 @@ class ndWorld: public ndClassAlloc
 
 	ndSolverModes GetSelectedSolver() const;
 	D_NEWTON_API void SelectSolver(ndSolverModes solverMode);
+
+	D_NEWTON_API bool IsGPU() const;
 	D_NEWTON_API const char* GetSolverString() const;
 
 	D_NEWTON_API virtual bool AddBody(ndBody* const body);
@@ -109,6 +111,7 @@ class ndWorld: public ndClassAlloc
 	ndFloat32 GetUpdateTime() const;
 	ndUnsigned32 GetFrameIndex() const;
 	ndFloat32 GetAverageUpdateTime() const;
+	ndFloat32 GetExtensionAverageUpdateTime() const;
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
@@ -166,13 +169,13 @@ class ndWorld: public ndClassAlloc
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;
-	//ndFloat32 m_freezeAlpha2;
 	ndFloat32 m_freezeSpeed2;
-	//ndFloat32 m_freezeOmega2;
 	ndFloat32 m_averageUpdateTime;
 	ndFloat32 m_averageTimestepAcc;
 	ndFloat32 m_averageFramesCount;
 	ndFloat32 m_lastExecutionTime;
+	ndFloat32 m_extensionAverageUpdateTime;
+	ndFloat32 m_extensionaverageTimestepAcc;
 
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
@@ -290,6 +293,11 @@ inline ndFloat32 ndWorld::GetUpdateTime() const
 inline ndFloat32 ndWorld::GetAverageUpdateTime() const
 {
 	return m_averageUpdateTime;
+}
+
+inline ndFloat32 ndWorld::GetExtensionAverageUpdateTime() const
+{
+	return m_extensionAverageUpdateTime;
 }
 
 inline ndUnsigned32 ndWorld::GetFrameIndex() const
