@@ -51,7 +51,7 @@ class ndCudaContextImplement
 	ndCudaSpatialVector* GetTransformBuffer0();
 	ndCudaSpatialVector* GetTransformBuffer1();
 
-	long long GetGpuClocks() const;
+	float GetTimeInMilisecunds() const;
 	
 	ndCudaSceneInfo* m_sceneInfoGpu;
 	ndCudaSceneInfo* m_sceneInfoCpu;
@@ -67,6 +67,9 @@ class ndCudaContextImplement
 	
 	cudaStream_t m_solverMemCpyStream;
 	cudaStream_t m_solverComputeStream;
+	cudaEvent_t m_startTime;
+	cudaEvent_t m_stopTime;
+	float m_timeInMilisecunds;
 	unsigned m_frameCounter;
 };
 

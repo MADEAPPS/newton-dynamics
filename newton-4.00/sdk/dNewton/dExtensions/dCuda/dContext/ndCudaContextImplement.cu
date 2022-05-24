@@ -29,24 +29,9 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
-__global__ void ndCudaBeginFrame(ndCudaSceneInfo& info)
-{
-	long long coreTicks = clock64();
-	info.m_timeSlice = coreTicks;
-	//printf("t0 = %lld    ", coreTicks);
-}
-
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 {
-	long long coreTicks = clock64();
-
 	info.m_frameCount = frameCount;
-	long long diff = (coreTicks >= info.m_timeSlice) ? (coreTicks - info.m_timeSlice) : (info.m_timeSlice - coreTicks);
-	//printf("t1 = %lld   diff= %lld\n", coreTicks, coreTicks - info.m_timeSlice);
-	//printf("t1 = %lld   diff= %lld\n", coreTicks, x);
-
-	//info.m_timeSlice = coreTicks - info.m_timeSlice;
-	info.m_timeSlice = diff;
 }
 
 __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
@@ -372,7 +357,7 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sort
 		const unsigned size = info.m_bodyAabbCell.m_size - 1;
 		unsigned* histogram = info.m_histogram.m_array;
 
-		printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
+		//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
 
 		ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
 		ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
@@ -397,6 +382,7 @@ ndCudaContextImplement::ndCudaContextImplement()
 	,m_transformBufferGpu1()
 	,m_solverMemCpyStream(0)
 	,m_solverComputeStream(0)
+	,m_timeInMilisecunds(0.0f)
 	,m_frameCounter(0)
 {
 	cudaError_t cudaStatus;
@@ -416,6 +402,9 @@ ndCudaContextImplement::ndCudaContextImplement()
 	{
 		dAssert(0);
 	}
+
+	cudaEventCreate(&m_startTime);
+	cudaEventCreate(&m_stopTime);
 	
 	*m_sceneInfoCpu = ndCudaSceneInfo();
 }
@@ -423,6 +412,9 @@ ndCudaContextImplement::ndCudaContextImplement()
 ndCudaContextImplement::~ndCudaContextImplement()
 {
 	cudaError_t cudaStatus;
+
+	cudaEventDestroy(m_stopTime);
+	cudaEventDestroy(m_startTime);
 	
 	cudaStatus = cudaFreeHost(m_sceneInfoCpu);
 	dAssert(cudaStatus == cudaSuccess);
@@ -442,9 +434,9 @@ ndCudaContextImplement::~ndCudaContextImplement()
 	}
 }
 
-long long ndCudaContextImplement::GetGpuClocks() const
+float ndCudaContextImplement::GetTimeInMilisecunds() const
 {
-	return m_sceneInfoCpu->m_timeSlice;
+	return m_timeInMilisecunds;
 }
 
 void ndCudaContextImplement::SwapBuffers()
@@ -453,11 +445,15 @@ void ndCudaContextImplement::SwapBuffers()
 
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
+	cudaEventRecord(m_stopTime);
+
 	m_transformBufferCpu0.Swap(m_transformBufferCpu1);
 }
 
 void ndCudaContextImplement::Begin()
 {
+	cudaEventSynchronize(m_stopTime);
+	cudaEventElapsedTime(&m_timeInMilisecunds, m_startTime, m_stopTime);
 	cudaDeviceSynchronize();
 
 	// get the scene info from the update	
@@ -480,7 +476,7 @@ void ndCudaContextImplement::Begin()
 		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
 	}
 
-	ndCudaBeginFrame << <1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
+	cudaEventRecord(m_startTime);
 }
 
 ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer0()
@@ -723,5 +719,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey, SortKey, SortKey, SortKey);
+	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey, SortKey, SortKey, SortKey);
 }

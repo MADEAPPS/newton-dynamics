@@ -60,7 +60,7 @@ const char* ndCudaContext::GetStringId() const
 
 double ndCudaContext::GetGPUTime() const
 {
-	return IsValid() ? m_device->m_frequency * m_implement->GetGpuClocks() : 0;
+	return IsValid() ? m_implement->GetTimeInMilisecunds() : 0.0;
 }
 
 void ndCudaContext::SwapBuffers()
