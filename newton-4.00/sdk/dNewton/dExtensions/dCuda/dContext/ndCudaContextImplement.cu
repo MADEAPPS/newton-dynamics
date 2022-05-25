@@ -191,10 +191,11 @@ __global__ void ndCudaCountAabb(ndCudaSceneInfo& info)
 
 		cacheBuffer[threadId] = 0;
 		cacheBuffer[threadId1] = 0;
+		__syncthreads();
+
+		ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
 		if (index < bodyCount)
 		{
-			ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
-
 			const ndCudaVector minBox(info.m_worldBox.m_min);
 			const ndCudaVector bodyBoxMin(bodyArray[index].m_minAabb);
 			const ndCudaVector bodyBoxMax(bodyArray[index].m_maxAabb);
@@ -294,9 +295,12 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	//printf("ndCudaScene %d\n", bodyBlocksCount);
 	ndCudaInitBodyArray << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
+
+	printf("function: CudaCountAabb\n");
 	ndCudaCountAabb << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 	if (info.m_frameIsValid == 0)
 	{
+		printf("function: %s failed\n", __FUNCTION__);
 		return;
 	}
 
@@ -346,11 +350,12 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	info.m_histogram.m_size = bodyBlocksCount * D_THREADS_PER_BLOCK;
 
 	//printf("ndCudaScene %d  %d\n", info.m_histogram.m_size, info.m_histogram.m_capacity);
+	//printf("function: ndCudaGenerateHashGrids\n\n");
 	ndCudaGenerateHashGrids << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 }
 
-template <typename SortKeyPredicate>
-__global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sortKey_x, SortKeyPredicate sortKey_y, SortKeyPredicate sortKey_z, SortKeyPredicate sortKey_w)
+template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
+__global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
 {
 	if (info.m_frameIsValid)
 	{
@@ -359,8 +364,11 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate sort
 
 		//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
 
-		ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
-		ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
+		//ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
+		//ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
+		long long* src = &info.m_bodyAabbCell.m_array->m_value;
+		long long* dst = &info.m_bodyAabbCellScrath.m_array->m_value;
+
 		ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
 		//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_y, D_THREADS_PER_BLOCK);
 		//ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_z, D_THREADS_PER_BLOCK);
@@ -468,7 +476,6 @@ void ndCudaContextImplement::Begin()
 	}
 
 	const int frameCounter = m_frameCounter;
-	//ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, frameCounter);
 	if (frameCounter)
 	{
 		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu0;
@@ -684,11 +691,36 @@ void ndCudaContextImplement::InitBodyArray()
 	};
 #endif
 
-	//auto SortKey = [] __device__(const unsigned& item)
-	auto SortKey = [] __device__(const ndCudaBodyAabbCell& item)
+	auto SortKey_x = [] __device__(long long value)
 	{
+		ndCudaBodyAabbCell item;
+		item.m_value = value;
 		const unsigned key = item.m_key;
 		return key & 0xff;
+	};
+
+	auto SortKey_y = [] __device__(long long value)
+	{
+		ndCudaBodyAabbCell item;
+		item.m_value = value;
+		const unsigned key = item.m_key;
+		return (key>>8) & 0xff;
+	};
+
+	auto SortKey_z = [] __device__(long long value)
+	{
+		ndCudaBodyAabbCell item;
+		item.m_value = value;
+		const unsigned key = item.m_key;
+		return (key >> 16) & 0xff;
+	};
+
+	auto SortKey_w = [] __device__(long long value)
+	{
+		ndCudaBodyAabbCell item;
+		item.m_value = value;
+		const unsigned key = item.m_key;
+		return (key >> 24) & 0xff;
 	};
 
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
@@ -719,5 +751,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey, SortKey, SortKey, SortKey);
+	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
 }

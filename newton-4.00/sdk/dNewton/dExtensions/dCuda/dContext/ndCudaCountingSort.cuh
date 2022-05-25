@@ -72,7 +72,7 @@ __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsi
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountShuffleGridIetemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
 {
 	__shared__  BufferItem cachedCells[D_COUNTING_SORT_MAX_BLOCK_SIZE];
 	__shared__  unsigned cacheSortedKey[D_COUNTING_SORT_MAX_BLOCK_SIZE];
@@ -149,11 +149,19 @@ __global__ void ndCudaCountingSortCountShuffleGridIetemsInternal(const BufferIte
 	}
 }
 
-
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountSanityCheckInternal(const BufferItem* src, BufferItem* dst, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSortCountSanityCheckInternal(ndCudaSceneInfo& info, const BufferItem* dst, unsigned size, SortKeyPredicate sortKey)
 {
-
+	const unsigned index = blockIdx.x * blockDim.x + blockIdx.x;
+	if (index > 1)
+	{
+		const unsigned key0 = sortKey(dst[index - 1]);
+		const unsigned key1 = sortKey(dst[index - 0]);
+		if (key0 > key1)
+		{
+			info.m_frameIsValid = 0;
+		}
+	}
 }
 
 
@@ -171,12 +179,12 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src,
 	//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
 	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey);
 	ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
-	ndCudaCountingSortCountShuffleGridIetemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
+	ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
 
 	#ifdef _DEBUG
 		// issue debug code, here for sanity check.
 		//unsigned sanityBlocks = threads / blockSize;
-		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, size, sortKey);
+		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (info, dst, size, sortKey);
 		if (info.m_frameIsValid == 0)
 		{
 			printf("function: %s failed\n", __FUNCTION__);
