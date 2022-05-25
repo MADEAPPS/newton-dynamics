@@ -143,8 +143,8 @@ __global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
 	const unsigned* histogram = info.m_histogram.m_array;
 	if (index > 1)
 	{
-		unsigned item0 = histogram[index - 1];
-		unsigned item1 = histogram[index - 0];
+		unsigned item0 = histogram[index - 0];
+		unsigned item1 = histogram[index - 1];
 		if (item0 > item1)
 		{
 			info.m_frameIsValid = 0;
@@ -159,23 +159,31 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info, unsigned blo
 	const unsigned superBlocks = (threads + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
 	const unsigned histogramBlocks = D_PREFIX_SCAN_PASSES * superBlocks;
 
-	ndCudaHillisSteelePaddBufferInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
-	for (int i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
-	{
-		ndCudaHillisSteelePrefixScanAddBlocksInternal << <histogramBlocks, blockSize, 0 >> > (info, i);
-	}
-	ndCudaHillisSteelePrefixScanAddBlocksFinalInternal << <histogramBlocks, blockSize, 0 >> > (info);
-	ndCudaHillisSteeleAddSupeBlocksInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
-
-	#ifdef _DEBUG
-		// issue debug code, here for sanity check.
-		unsigned sanityBlocks = threads / blockSize;
-		ndCudaHillisSteeleSanityCheck << <sanityBlocks, blockSize, 0 >> > (info);
-		if (info.m_frameIsValid == 0)
-		{
-			printf("function: %s failed\n", __FUNCTION__);
-		}
-	#endif
+	printf("xxxxxxxx this is shit\n");
+	//ndCudaHillisSteelePaddBufferInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
+	//for (int i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
+	//{
+	//	ndCudaHillisSteelePrefixScanAddBlocksInternal << <histogramBlocks, blockSize, 0 >> > (info, i);
+	//}
+	//ndCudaHillisSteelePrefixScanAddBlocksFinalInternal << <histogramBlocks, blockSize, 0 >> > (info);
+	//ndCudaHillisSteeleAddSupeBlocksInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
+	//
+	////printf("function: %s_2: ", __FUNCTION__);
+	////for (int i = 0; i < 16; i++)
+	////{
+	////	printf("%d ", info.m_histogram.m_array[i]);
+	////}
+	////printf("\n");
+	//
+	//#ifdef _DEBUG
+	//	// issue debug code, here for sanity check.
+	//	unsigned sanityBlocks = threads / blockSize;
+	//	ndCudaHillisSteeleSanityCheck << <sanityBlocks, blockSize, 0 >> > (info);
+	//	if (info.m_frameIsValid == 0)
+	//	{
+	//		printf("function: %s failed\n", __FUNCTION__);
+	//	}
+	//#endif
 }
 
 #endif
