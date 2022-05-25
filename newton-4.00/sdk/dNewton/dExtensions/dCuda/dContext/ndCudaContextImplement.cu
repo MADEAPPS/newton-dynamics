@@ -168,19 +168,13 @@ __global__ void ndCudaMergeAabb(ndCudaSceneInfo& info)
 
 __global__ void ndCudaCountAabb(ndCudaSceneInfo& info)
 {
-	__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
-
 	const unsigned blockId = blockIdx.x;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	const unsigned threadId = threadIdx.x;
-	const unsigned threadId1 = D_THREADS_PER_BLOCK / 2 + threadId;
 	const unsigned index = threadId + blockDim.x * blockId;
 
-	cacheBuffer[threadId] = 0;
-	cacheBuffer[threadId1] = 0;
-	__syncthreads();
-
-	ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
+	unsigned* histogram = info.m_histogram.m_array;
+	const ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
 	if (index < bodyCount)
 	{
 		const ndCudaVector minBox(info.m_worldBox.m_min);
@@ -194,20 +188,8 @@ __global__ void ndCudaCountAabb(ndCudaSceneInfo& info)
 		const int y1 = __float2int_rd((bodyBoxMax.y - minBox.y) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 		const int z1 = __float2int_rd((bodyBoxMax.z - minBox.z) * D_CUDA_SCENE_INV_GRID_SIZE) + 1;
 		const int count = (z1 - z0) * (y1 - y0) * (x1 - x0);
-		cacheBuffer[threadId1] = count;
+		histogram[index] = count;
 	}
-	__syncthreads();
-
-	for (int i = 1; i < D_THREADS_PER_BLOCK; i = i << 1)
-	{
-		int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
-		__syncthreads();
-		cacheBuffer[threadId1] = sum;
-		__syncthreads();
-	}
-
-	unsigned* histogram = info.m_histogram.m_array;
-	histogram[index] = cacheBuffer[threadId1];
 };
 
 __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
@@ -220,7 +202,6 @@ __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 		const unsigned* histogram = info.m_histogram.m_array;
 		const ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
 		ndCudaBodyAabbCell* hashArray = info.m_bodyAabbCell.m_array;
-		//long long* hashArray = &info.m_bodyAabbCell.m_array->m_value;
 
 		const ndCudaVector minBox(info.m_worldBox.m_min);
 		const ndCudaVector bodyBoxMin(bodyArray[index].m_minAabb);
@@ -247,7 +228,6 @@ __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 				for (int x = x0; x < x1; x++)
 				{
 					hash.m_x = x;
-					//hashArray[start] = hash;
 					hashArray[start].m_value = hash.m_value;
 					start++;
 				}
@@ -260,55 +240,45 @@ inline void __device__ cuInitBodyArray(ndCudaSceneInfo& info)
 {
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	
-	//printf("ndCudaScene %d\n", bodyBlocksCount);
 	ndCudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 }
 
 inline bool __device__ cuCountAabb(ndCudaSceneInfo& info)
 {
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
-	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-
-	const unsigned newCapacity = D_PREFIX_SCAN_PASSES * D_THREADS_PER_BLOCK * ((blocksCount + D_PREFIX_SCAN_PASSES - 1) / D_PREFIX_SCAN_PASSES) + D_THREADS_PER_BLOCK;
-	if (newCapacity > info.m_histogram.m_capacity)
+	if (bodyCount > info.m_histogram.m_capacity)
 	{
-		#ifdef _DEBUG
-		printf("function: %s failed\n", __FUNCTION__);
-		#endif
-		info.m_histogram.m_size = newCapacity + 1;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		info.m_histogram.m_size = bodyCount + 1;
 		return false;
 	}
 
-	info.m_histogram.m_size = blocksCount * D_THREADS_PER_BLOCK;
+	info.m_histogram.m_size = bodyCount;
+	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	ndCudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 	return true;
 }
 
-inline bool __device__ cuGenerateHashGrids(ndCudaSceneInfo& info)
+inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 {
-	const unsigned* histogram = info.m_histogram.m_array;
+	//const unsigned* histogram = info.m_histogram.m_array;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
-	const unsigned cellCount = histogram[bodyCount - 1];
+	const unsigned cellCount = info.m_histogram.m_array[bodyCount - 1];
 	if ((cellCount + D_THREADS_PER_BLOCK) > info.m_bodyAabbCell.m_capacity)
 	{
-		#ifdef _DEBUG
-		printf("function: %s failed\n", __FUNCTION__);
-		#endif
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		info.m_bodyAabbCell.m_size = cellCount + D_THREADS_PER_BLOCK;
 		info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
 		return false;
 	}
 	
 	// check new histogram size.
-	const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(cellCount, D_THREADS_PER_BLOCK);
-	if (newCapacity > info.m_histogram.m_capacity)
-	{
-		#ifdef _DEBUG
-		printf("function: %s %d failed\n", __FUNCTION__, __LINE__);
-		#endif
-		info.m_histogram.m_size = newCapacity + 1;
-	}
+	//const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(cellCount, D_THREADS_PER_BLOCK);
+	//if (newCapacity > info.m_histogram.m_capacity)
+	//{
+	//	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+	//	info.m_histogram.m_size = newCapacity + 1;
+	//}
 
 	ndCudaBodyAabbCell cell;
 	ndCudaBodyAabbCell* cellArray = info.m_bodyAabbCell.m_array;
@@ -326,21 +296,20 @@ inline bool __device__ cuGenerateHashGrids(ndCudaSceneInfo& info)
 
 	info.m_bodyAabbCell.m_size = cellCount + 1;
 	info.m_bodyAabbCellScrath.m_size = cellCount + 1;
-	info.m_histogram.m_size = blocksCount * D_THREADS_PER_BLOCK;
-
-	//printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
-	//printf("function: %s: ", __FUNCTION__);
-	//for (int i = 0; i < 16; i++)
-	//{
-	//	printf("%d ", histogram[i]);
-	//}
-	//printf("\n");
+	//info.m_histogram.m_size = blocksCount * D_THREADS_PER_BLOCK;
 	
 	ndCudaGenerateHashGrids << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
-	
+
+	printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
+	printf("function: %s: ", __FUNCTION__);
+	for (int i = 0; i < info.m_histogram.m_size; i++)
+	{
+		printf("%d ", info.m_histogram.m_array[i]);
+	}
+	printf("\n");
 	printf("function: %s\n: ", __FUNCTION__);
 	printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
 	{
 		printf("x(%d) y(%d) z(%d) id(%d)\n", cellArray[i].m_x, cellArray[i].m_y, cellArray[i].m_z, cellArray[i].m_id);
 	}
@@ -354,22 +323,30 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 	cuInitBodyArray(info);
 	if (!info.m_frameIsValid)
 	{
-		printf("function: %s failed\n", __FUNCTION__);
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		return;
 	}
+
 	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
 	if (!cuCountAabb(info))
 	{
-		printf("function: %s failed\n", __FUNCTION__);
 		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		return;
 	}
-	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info, D_THREADS_PER_BLOCK);
-	
-	if (!cuGenerateHashGrids(info))
+
+	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
+	if (!info.m_frameIsValid)
 	{
-		printf("function: %s failed\n", __FUNCTION__);
 		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
+	}
+	
+	if (!cuGenerateGridCells(info))
+	{
+		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		return;
 	}
 	

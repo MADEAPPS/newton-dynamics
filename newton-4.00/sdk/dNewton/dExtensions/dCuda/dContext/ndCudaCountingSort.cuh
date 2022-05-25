@@ -187,7 +187,7 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src,
 		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (info, dst, size, sortKey);
 		if (info.m_frameIsValid == 0)
 		{
-			printf("function: %s failed\n", __FUNCTION__);
+			printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		}
 	#endif
 }
