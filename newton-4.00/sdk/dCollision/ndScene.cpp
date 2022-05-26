@@ -1202,18 +1202,16 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 
 void ndScene::SubmitPairs(ndSceneBodyNode* const leafNode, ndSceneNode* const node)
 {
+	ndSceneNode* pool[D_SCENE_MAX_STACK_DEPTH];
+
 	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
-	//const ndVector boxP0(body0 ? body0->m_minAabb : leafNode->m_minBox);
-	//const ndVector boxP1(body0 ? body0->m_maxAabb : leafNode->m_maxBox);
+	dAssert(body0);
+
 	const ndVector boxP0(leafNode->m_minBox);
 	const ndVector boxP1(leafNode->m_maxBox);
-	//const bool test0 = body0 ? (body0->m_invMass.m_w != ndFloat32(0.0f)) : true;
-	dAssert(body0);
 	const bool test0 = (body0->m_invMass.m_w != ndFloat32(0.0f)) & body0->GetCollisionShape().GetCollisionMode();
-	
-	ndSceneNode* pool[D_SCENE_MAX_STACK_DEPTH];
-	pool[0] = node;
 
+	pool[0] = node;
 	ndInt32 stack = 1;
 	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 16)))
 	{
@@ -1226,24 +1224,13 @@ void ndScene::SubmitPairs(ndSceneBodyNode* const leafNode, ndSceneNode* const no
 				dAssert(!rootNode->GetRight());
 				dAssert(!rootNode->GetLeft());
 				
-				//ndBodyKinematic* const body1 = rootNode->GetBody() ? rootNode->GetBody() : nullptr;
 				ndBodyKinematic* const body1 = rootNode->GetBody();
 				dAssert(body1);
-				//if (body0) 
+				const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
+				const bool test = test0 | test1;
+				if (test)
 				{
-					//if (body1) 
-					{
-						//if (test0 | (body1->m_invMass.m_w != ndFloat32(0.0f)))
-						{
-							//const bool test = TestOverlaping(body0, body1);
-							const bool test1 = (body1->m_invMass.m_w != ndFloat32(0.0f)) & body1->GetCollisionShape().GetCollisionMode();
-							bool test = test0 | test1;
-							if (test)
-							{
-								AddPair(body0, body1);
-							}
-						}
-					}
+					AddPair(body0, body1);
 				}
 			}
 			else 
@@ -1268,12 +1255,6 @@ void ndScene::SubmitPairs(ndSceneBodyNode* const leafNode, ndSceneNode* const no
 		m_forceBalanceScene = 1;
 	}
 }
-
-//bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
-//{
-//	bool test = body0->GetCollisionShape().GetCollisionMode() & body1->GetCollisionShape().GetCollisionMode();
-//	return test && dOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? true : false;
-//}
 
 ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
@@ -1397,7 +1378,6 @@ void ndScene::InitBodyArray()
 		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
 		ndInt32* const scan = &scans[threadIndex][0];
 
-		//const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
 		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
