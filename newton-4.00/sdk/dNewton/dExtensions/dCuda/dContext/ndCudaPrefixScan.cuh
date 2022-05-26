@@ -219,12 +219,11 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info)
 	//printf("\n");
 	
 	#ifdef _DEBUG
-		// issue debug code, here for sanity check.
-		ndCudaHillisSteeleSanityCheck << <blocks, D_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
-		if (info.m_frameIsValid == 0)
-		{
-			printf("skipping frame %d  function %s\n", info.m_frameCount, __FUNCTION__);
-		}
+	ndCudaHillisSteeleSanityCheck << <blocks, D_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
+	if (info.m_frameIsValid == 0)
+	{
+		printf("skipping frame %d  function %s\n", info.m_frameCount, __FUNCTION__);
+	}
 	#endif
 }
 

@@ -37,7 +37,6 @@ __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsig
 	unsigned sum = 0;
 	unsigned offset = 0;
 
-	//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
 	const unsigned threadId = threadIdx.x;
 	for (int i = 0; i < blockCount; i++)
 	{
@@ -86,8 +85,6 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 	
 	const unsigned index = threadId + blockDim.x * blockId;
 	const unsigned lastRoadOffset = blocks * D_COUNTING_SORT_MAX_BLOCK_SIZE;
-	
-	//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
 
 	cacheSortedKey[threadId] = (D_COUNTING_SORT_MAX_BLOCK_SIZE << 16) | threadId;
 	if (index < size)
@@ -155,8 +152,8 @@ __global__ void ndCudaCountingSortCountSanityCheckInternal(ndCudaSceneInfo& info
 	const unsigned index = blockIdx.x * blockDim.x + blockIdx.x;
 	if (index > 1)
 	{
-		const unsigned key0 = sortKey(dst[index - 1]);
-		const unsigned key1 = sortKey(dst[index - 0]);
+		const unsigned key0 = sortKey(dst[index - 0]);
+		const unsigned key1 = sortKey(dst[index - 1]);
 		if (key0 > key1)
 		{
 			info.m_frameIsValid = 0;
@@ -172,23 +169,46 @@ inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned it
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
+__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize, char* text)
 {
 	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
-
-	//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
 	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey);
-	ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
-	ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
+	//ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
+	//ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
+	
+	printf("%s\n", text);
+	printf("size: %d  blocks: %d\n", size, blocks);
+	printf("histogram: ");
+	for (int i = 0; i < 16; i++)
+	{
+		printf("%d ", histogram[i]);
+	}
+	printf("\n");
 
+	printf("histogram: ");
+	for (int i = 0; i < 16; i++)
+	{
+		printf("%d ", histogram[i + keySize]);
+	}
+	printf("\n");
+
+	//printf("function: %s\n", __FUNCTION__);
+	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
+	//{
+	//	ndCudaBodyAabbCell cell;
+	//	//cell.m_value = dst[i];
+	//	cell.m_value = src[i];
+	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cell.m_x, cell.m_y, cell.m_z, cell.m_id);
+	//}
+	printf("\n");
+
+	
 	#ifdef _DEBUG
-		// issue debug code, here for sanity check.
-		//unsigned sanityBlocks = threads / blockSize;
-		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (info, dst, size, sortKey);
-		if (info.m_frameIsValid == 0)
-		{
-			printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-		}
+	//ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (info, dst, size, sortKey);
+	//if (info.m_frameIsValid == 0)
+	//{
+	//	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+	//}
 	#endif
 }
 

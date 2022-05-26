@@ -261,7 +261,6 @@ inline bool __device__ cuCountAabb(ndCudaSceneInfo& info)
 
 inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 {
-	//const unsigned* histogram = info.m_histogram.m_array;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	const unsigned cellCount = info.m_histogram.m_array[bodyCount - 1];
 	if ((cellCount + D_THREADS_PER_BLOCK) > info.m_bodyAabbCell.m_capacity)
@@ -271,14 +270,6 @@ inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 		info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
 		return false;
 	}
-	
-	// check new histogram size.
-	//const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(cellCount, D_THREADS_PER_BLOCK);
-	//if (newCapacity > info.m_histogram.m_capacity)
-	//{
-	//	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-	//	info.m_histogram.m_size = newCapacity + 1;
-	//}
 
 	ndCudaBodyAabbCell cell;
 	ndCudaBodyAabbCell* cellArray = info.m_bodyAabbCell.m_array;
@@ -296,24 +287,22 @@ inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 
 	info.m_bodyAabbCell.m_size = cellCount + 1;
 	info.m_bodyAabbCellScrath.m_size = cellCount + 1;
-	//info.m_histogram.m_size = blocksCount * D_THREADS_PER_BLOCK;
-	
 	ndCudaGenerateHashGrids << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 
-	printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
-	printf("function: %s: ", __FUNCTION__);
-	for (int i = 0; i < info.m_histogram.m_size; i++)
-	{
-		printf("%d ", info.m_histogram.m_array[i]);
-	}
-	printf("\n");
-	printf("function: %s\n: ", __FUNCTION__);
-	printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
-	for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
-	{
-		printf("x(%d) y(%d) z(%d) id(%d)\n", cellArray[i].m_x, cellArray[i].m_y, cellArray[i].m_z, cellArray[i].m_id);
-	}
-	printf("\n");
+	//printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
+	//printf("function: %s: ", __FUNCTION__);
+	//for (int i = 0; i < info.m_histogram.m_size; i++)
+	//{
+	//	printf("%d ", info.m_histogram.m_array[i]);
+	//}
+	//printf("\n");
+	//printf("function: %s\n: ", __FUNCTION__);
+	//printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
+	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
+	//{
+	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cellArray[i].m_x, cellArray[i].m_y, cellArray[i].m_z, cellArray[i].m_id);
+	//}
+	//printf("\n");
 
 	return true;
 }
@@ -349,36 +338,57 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		return;
 	}
-	
-	//printf("function: %s: ", __FUNCTION__);
-	//for (int i = 0; i < 16; i++)
-	//{
-	//	//	printf("x(%d) y(%d) z(%d) id(%d)\n", hashArray[i].m_x, hashArray[i].m_y, hashArray[i].m_z, hashArray[i].m_id);
-	//	printf("%d ", info.m_histogram.m_array[i]);
-	//}
-	//printf("\n");
 }
 
 template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
 __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
 {
-	if (info.m_frameIsValid)
+	if (!info.m_frameIsValid)
 	{
-		const unsigned size = info.m_bodyAabbCell.m_size - 1;
-		unsigned* histogram = info.m_histogram.m_array;
-
-		//printf("%d %d %d %d\n", histogram[0], histogram[1], histogram[2], histogram[3]);
-
-		//ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
-		//ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
-		long long* src = &info.m_bodyAabbCell.m_array->m_value;
-		long long* dst = &info.m_bodyAabbCellScrath.m_array->m_value;
-
-		ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
-		//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_y, D_THREADS_PER_BLOCK);
-		//ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_z, D_THREADS_PER_BLOCK);
-		//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_w, D_THREADS_PER_BLOCK);
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
 	}
+	
+	unsigned* histogram = info.m_histogram.m_array;
+	const unsigned size = info.m_bodyAabbCell.m_size - 1;
+
+	const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(size, D_THREADS_PER_BLOCK);
+	if (newCapacity > info.m_histogram.m_capacity)
+	{
+		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		info.m_histogram.m_size = newCapacity;
+		return;
+	}
+
+	//printf("function: %s\n: ", __FUNCTION__);
+	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
+	//{
+	//	const ndCudaBodyAabbCell* cellArray = info.m_bodyAabbCell.m_array;
+	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cellArray[i].m_x, cellArray[i].m_y, cellArray[i].m_z, cellArray[i].m_id);
+	//}
+	//printf("\n");
+	//return;
+
+	//ndCudaBodyAabbCell* src = info.m_bodyAabbCell.m_array;
+	//ndCudaBodyAabbCell* dst = info.m_bodyAabbCellScrath.m_array;
+	long long* src = &info.m_bodyAabbCell.m_array->m_value;
+	long long* dst = &info.m_bodyAabbCellScrath.m_array->m_value;
+
+	ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK, "aaaa");
+	//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_y, D_THREADS_PER_BLOCK);
+	//ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_z, D_THREADS_PER_BLOCK);
+	//ndCudaCountingSort << <1, 1, 0 >> > (info, dst, src, histogram, size, sortKey_w, D_THREADS_PER_BLOCK);
+
+	//printf("function: %s\n", __FUNCTION__);
+	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
+	//{
+	//	ndCudaBodyAabbCell cell;
+	//	//cell.m_value = dst[i];
+	//	cell.m_value = src[i];
+	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cell.m_x, cell.m_y, cell.m_z, cell.m_id);
+	//}
+	//printf("\n");
 }
 
 ndCudaContextImplement::ndCudaContextImplement()
@@ -754,5 +764,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
+	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
 }
