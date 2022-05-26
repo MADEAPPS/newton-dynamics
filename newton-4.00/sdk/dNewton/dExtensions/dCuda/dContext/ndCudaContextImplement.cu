@@ -406,7 +406,7 @@ __global__ void ndCudaScene_Debug(ndCudaSceneInfo& info, SortKeyPredicate_x sort
 	unsigned* histogram = info.m_histogram.m_array;
 	long long* src = &info.m_bodyAabbCell.m_array->m_value;
 	long long* dst = &info.m_bodyAabbCellScrath.m_array->m_value;
-	ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK, "aaaa");
+	ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
 
 	printf("valid:%d frame:%d  size:%d\n", info.m_frameIsValid, info.m_frameCount, info.m_bodyAabbCell.m_size);
 }

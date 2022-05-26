@@ -32,7 +32,7 @@
 
 #define D_COUNTING_SORT_MAX_BLOCK_SIZE  1024
 
-__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
+__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount, unsigned prefixKeySize)
 {
 	unsigned sum = 0;
 	unsigned offset = 0;
@@ -43,13 +43,13 @@ __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsig
 		const unsigned count = histogram[offset + threadId];
 		histogram[offset + threadId] = sum;
 		sum += count;
-		offset += blockDim.x;
+		offset += prefixKeySize;
 	}
 	histogram[offset + threadId] = sum;
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, unsigned prefixKeySize)
 {
 	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_MAX_BLOCK_SIZE];
 
@@ -66,12 +66,12 @@ __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsi
 	}
 	__syncthreads();
 	
-	const unsigned dstBase = blockDim.x * blockId;
+	const unsigned dstBase = prefixKeySize * blockId;
 	histogram[dstBase + threadId] = cacheBuffer[threadId];
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey)
+__global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, unsigned prefixKeySize)
 {
 	__shared__  BufferItem cachedCells[D_COUNTING_SORT_MAX_BLOCK_SIZE];
 	__shared__  unsigned cacheSortedKey[D_COUNTING_SORT_MAX_BLOCK_SIZE];
@@ -169,10 +169,10 @@ inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned it
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize, char* text)
+__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
 {
 	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
-	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey);
+	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey, keySize);
 	//ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
 	//ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
 	
