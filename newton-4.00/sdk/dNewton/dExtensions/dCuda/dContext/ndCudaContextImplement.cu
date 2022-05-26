@@ -50,14 +50,13 @@ __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
 	}
 }
 
-__global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
+__global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 {
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
 	const unsigned threadId = threadIdx.x;
 	const unsigned index = threadId + blockDim.x * blockIdx.x;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
-
 	if (index < bodyCount)
 	{
 		ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
@@ -117,6 +116,15 @@ __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 		bBox[blockIdx.x].m_max = cacheAabb[0].m_max;
 	}
 };
+
+__global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
+//inline void __device__ cuInitBodyArray(ndCudaSceneInfo& info)
+{
+	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
+	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	ndCudaInitBodyArrayInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+}
+
 
 __global__ void ndCudaMergeAabb(ndCudaSceneInfo& info)
 {
@@ -236,12 +244,6 @@ __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 	}
 };
 
-inline void __device__ cuInitBodyArray(ndCudaSceneInfo& info)
-{
-	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
-	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	ndCudaInitBodyArray << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
-}
 
 inline bool __device__ cuCountAabb(ndCudaSceneInfo& info)
 {
@@ -307,40 +309,40 @@ inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 	return true;
 }
 
-__global__ void ndCudaScene(ndCudaSceneInfo& info)
-{
-	cuInitBodyArray(info);
-	if (!info.m_frameIsValid)
-	{
-		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-		return;
-	}
-
-	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
-	if (!cuCountAabb(info))
-	{
-		info.m_frameIsValid = 0;
-		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-		return;
-	}
-
-	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
-	if (!info.m_frameIsValid)
-	{
-		info.m_frameIsValid = 0;
-		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-		return;
-	}
-	
-	if (!cuGenerateGridCells(info))
-	{
-		info.m_frameIsValid = 0;
-		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-		return;
-	}
-
-	printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
-}
+//__global__ void ndCudaScene(ndCudaSceneInfo& info)
+//{
+//	cuInitBodyArray(info);
+//	if (!info.m_frameIsValid)
+//	{
+//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+//		return;
+//	}
+//
+//	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
+//	if (!cuCountAabb(info))
+//	{
+//		info.m_frameIsValid = 0;
+//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+//		return;
+//	}
+//
+//	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
+//	if (!info.m_frameIsValid)
+//	{
+//		info.m_frameIsValid = 0;
+//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+//		return;
+//	}
+//	
+//	if (!cuGenerateGridCells(info))
+//	{
+//		info.m_frameIsValid = 0;
+//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+//		return;
+//	}
+//
+//	printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
+//}
 
 template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
 __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
@@ -397,7 +399,7 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x so
 template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
 __global__ void ndCudaScene_Debug(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
 {
-	cuInitBodyArray(info);
+	//cuInitBodyArray(info);
 	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
 	cuCountAabb(info);
 	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
@@ -778,5 +780,7 @@ void ndCudaContextImplement::InitBodyArray()
 
 	//ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
+
+	ndCudaInitBodyArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	ndCudaScene_Debug << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
 }
