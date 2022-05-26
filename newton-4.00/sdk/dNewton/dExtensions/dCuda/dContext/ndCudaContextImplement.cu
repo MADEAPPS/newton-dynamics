@@ -393,6 +393,25 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x so
 	//printf("\n");
 }
 
+
+template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
+__global__ void ndCudaScene_Debug(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
+{
+	cuInitBodyArray(info);
+	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
+	cuCountAabb(info);
+	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
+	cuGenerateGridCells(info);
+	unsigned size = info.m_bodyAabbCell.m_size - 1;
+	unsigned* histogram = info.m_histogram.m_array;
+	long long* src = &info.m_bodyAabbCell.m_array->m_value;
+	long long* dst = &info.m_bodyAabbCellScrath.m_array->m_value;
+	ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK, "aaaa");
+
+	printf("valid:%d frame:%d  size:%d\n", info.m_frameIsValid, info.m_frameCount, info.m_bodyAabbCell.m_size);
+}
+
+
 ndCudaContextImplement::ndCudaContextImplement()
 	:m_sceneInfoGpu(nullptr)
 	,m_sceneInfoCpu(nullptr)
@@ -749,22 +768,15 @@ void ndCudaContextImplement::InitBodyArray()
 	//CudaPrefixScan(m_context, D_THREADS_PER_BLOCK);
 	//CudaValidateGridBuffer << <1, 1, 0, stream >> > (ValidateGridArray, *infoGpu);
 	//CudaGenerateGridHash << <bodyBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (GenerateHashGrids, *infoGpu);
-	CudaBodyAabbCellSortBuffer(m_context);
-	dAssert(SanityCheckSortCells());
-
-	//	int cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	//	dAssert(cellsBlocksCount > 0);
-	//	CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
-	////dAssert(SanityCheckPrefix());
-	//
-	//
-	//	//auto GetKey____ = [] __device__(const unsigned& item)
-	//	//{
-	//	//	return 0;
-	//	//};
-	//	//XXXXXXX << <1, 1, 0, stream >> > (GetKey____);
+	//CudaBodyAabbCellSortBuffer(m_context);
+	//dAssert(SanityCheckSortCells());
+	//int cellsBlocksCount = (m_context->m_bodyAabbCell.m_capacity + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	//dAssert(cellsBlocksCount > 0);
+	//CudaCalculateBodyPairsCount << <cellsBlocksCount, D_THREADS_PER_BLOCK, 0, stream >> > (CalculateBodyPairsCount, *infoGpu);
+	//dAssert(SanityCheckPrefix());
 #endif
 
-	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
+	//ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
+	ndCudaScene_Debug << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
 }
