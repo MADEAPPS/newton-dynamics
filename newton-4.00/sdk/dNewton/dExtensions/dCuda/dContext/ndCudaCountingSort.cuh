@@ -176,21 +176,21 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src,
 	//ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
 	//ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
 	
-	printf("%s\n", text);
-	printf("size: %d  blocks: %d\n", size, blocks);
-	printf("histogram: ");
-	for (int i = 0; i < 16; i++)
-	{
-		printf("%d ", histogram[i]);
-	}
-	printf("\n");
-
-	printf("histogram: ");
-	for (int i = 0; i < 16; i++)
-	{
-		printf("%d ", histogram[i + keySize]);
-	}
-	printf("\n");
+	//printf("%s\n", text);
+	//printf("size: %d  blocks: %d\n", size, blocks);
+	//printf("histogram: ");
+	//for (int i = 0; i < 16; i++)
+	//{
+	//	printf("%d ", histogram[i]);
+	//}
+	//printf("\n");
+	//
+	//printf("histogram: ");
+	//for (int i = 0; i < 16; i++)
+	//{
+	//	printf("%d ", histogram[i + keySize]);
+	//}
+	//printf("\n");
 
 	//printf("function: %s\n", __FUNCTION__);
 	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
@@ -200,7 +200,7 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src,
 	//	cell.m_value = src[i];
 	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cell.m_x, cell.m_y, cell.m_z, cell.m_id);
 	//}
-	printf("\n");
+	//printf("\n");
 
 	
 	#ifdef _DEBUG

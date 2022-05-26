@@ -338,6 +338,8 @@ __global__ void ndCudaScene(ndCudaSceneInfo& info)
 		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		return;
 	}
+
+	printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
 }
 
 template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
@@ -764,5 +766,5 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 	ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
+	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
 }
