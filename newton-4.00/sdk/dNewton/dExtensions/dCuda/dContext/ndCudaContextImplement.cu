@@ -759,15 +759,10 @@ void ndCudaContextImplement::InitBodyArray()
 	//dAssert(SanityCheckPrefix());
 #endif
 
-	//ndCudaScene << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
-
+	long long dommyType = 0;
 	ndCudaInitBodyArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	ndCudaHillisSteelePrefixScan << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	ndCudaGenerateGrids << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-
-	//__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate GetInfo, GetKeyPredicate GetKey)
-	long long dommyType = 0;
 	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x, 256);
 
 }

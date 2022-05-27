@@ -32,10 +32,11 @@
 
 #define D_COUNTING_SORT_MAX_BLOCK_SIZE  1024
 
-__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount, unsigned prefixKeySize)
+__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
 {
 	unsigned sum = 0;
 	unsigned offset = 0;
+	const unsigned keySize = blockDim.x;
 
 	const unsigned threadId = threadIdx.x;
 	for (int i = 0; i < blockCount; i++)
@@ -43,7 +44,7 @@ __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsig
 		const unsigned count = histogram[offset + threadId];
 		histogram[offset + threadId] = sum;
 		sum += count;
-		offset += prefixKeySize;
+		offset += keySize;
 	}
 	histogram[offset + threadId] = sum;
 }
@@ -168,9 +169,9 @@ inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned it
 }
 
 
-template <typename BufferItem, 
-	typename PredicateGetSrcBuffer, typename PredicateGetDstBuffer, typename PredicateGetItemsCount, typename PredicateGetSortKey>
-__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem, 
+template <typename BufferItem, typename PredicateGetSrcBuffer, typename PredicateGetDstBuffer, typename PredicateGetItemsCount, typename PredicateGetSortKey>
+__global__ void ndCudaCountingSort(
+	ndCudaSceneInfo& info, BufferItem, 
 	PredicateGetSrcBuffer GetSrcBuffer, PredicateGetDstBuffer GetDstBuffer, PredicateGetItemsCount GetItemsCount,
 	PredicateGetSortKey GetSortKey, unsigned keySize)
 {
@@ -187,24 +188,16 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem,
 	unsigned* histogram = info.m_histogram.m_array;
 	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
 	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, GetSortKey, keySize);
-	ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks, keySize);
+	ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
 	ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, GetSortKey, keySize);
-	
-	//printf("%s\n", text);
-	//printf("size: %d  blocks: %d\n", size, blocks);
-	//printf("histogram: ");
-	//for (int i = 0; i < 16; i++)
+
+	#ifdef _DEBUG
+	//ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (info, dst, size, sortKey);
+	//if (info.m_frameIsValid == 0)
 	//{
-	//	printf("%d ", histogram[i]);
+	//	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 	//}
-	//printf("\n");
-	//
-	//printf("histogram: ");
-	//for (int i = 0; i < 16; i++)
-	//{
-	//	printf("%d ", histogram[i + keySize]);
-	//}
-	//printf("\n");
+	#endif
 
 	printf("unsorted: %s\n", __FUNCTION__);
 	for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
@@ -226,14 +219,6 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem,
 	printf("\n");
 	printf("\n");
 
-	
-	#ifdef _DEBUG
-	//ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (info, dst, size, sortKey);
-	//if (info.m_frameIsValid == 0)
-	//{
-	//	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-	//}
-	#endif
 }
 
 #endif
