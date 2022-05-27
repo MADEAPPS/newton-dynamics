@@ -168,11 +168,37 @@ inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned it
 	return keySize * (blocks + 2);
 }
 
-template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
+template <typename BufferItem>
+struct CudaCountingSortInfo
 {
-	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
-	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey, keySize);
+	BufferItem* m_dst;
+	const BufferItem* m_src;
+	unsigned* m_histogram;
+	unsigned m_itemsCount;
+	unsigned m_keySize;
+
+	static __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate<BufferItem> GetInfo)
+	{
+
+	}
+};
+
+//template <typename BufferItem, typename SortKeyPredicate>
+//__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
+template <typename GetInfoPredicate<typename BufferItem>>
+__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate<BufferItem> GetInfo)
+{
+	if (!info.m_frameIsValid)
+	{
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
+	}
+
+	CudaCountingSortInfo<BufferItem> sortInfo;
+	GetInfo(info, sortInfo);
+
+	//const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
+	//ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey, keySize);
 	//ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
 	//ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
 	

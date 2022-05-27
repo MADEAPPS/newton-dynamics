@@ -184,6 +184,13 @@ __global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
 
 __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info)
 {
+	if (!info.m_frameIsValid)
+	{
+		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
+	}
+
 	const unsigned threads = info.m_histogram.m_size;
 	//const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockSize;
 	//const unsigned superBlocks = (threads + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;

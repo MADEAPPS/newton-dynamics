@@ -117,16 +117,7 @@ __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
-//inline void __device__ cuInitBodyArray(ndCudaSceneInfo& info)
-{
-	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
-	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	ndCudaInitBodyArrayInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
-}
-
-
-__global__ void ndCudaMergeAabb(ndCudaSceneInfo& info)
+__global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 {
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
@@ -174,7 +165,7 @@ __global__ void ndCudaMergeAabb(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void ndCudaCountAabb(ndCudaSceneInfo& info)
+__global__ void ndCudaCountAabbInternal(ndCudaSceneInfo& info)
 {
 	const unsigned blockId = blockIdx.x;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
@@ -200,7 +191,7 @@ __global__ void ndCudaCountAabb(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
+__global__ void ndCudaGenerateGridsInternal(const ndCudaSceneInfo& info)
 {
 	const unsigned threadId = threadIdx.x;
 	const unsigned index = threadId + blockDim.x * blockIdx.x;
@@ -244,39 +235,53 @@ __global__ void ndCudaGenerateHashGrids(const ndCudaSceneInfo& info)
 	}
 };
 
-
-inline bool __device__ cuCountAabb(ndCudaSceneInfo& info)
+__global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 {
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
-	if (bodyCount > info.m_histogram.m_capacity)
+	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+	ndCudaInitBodyArrayInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+	if (!info.m_frameIsValid)
 	{
 		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
+	}
+
+	ndCudaMergeAabbInternal << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
+	if (bodyCount > info.m_histogram.m_capacity)
+	{
+		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		info.m_histogram.m_size = bodyCount + 1;
-		return false;
+		return;
 	}
 
 	info.m_histogram.m_size = bodyCount;
-	const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	ndCudaCountAabb << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
-	return true;
+	ndCudaCountAabbInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 }
 
-inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
+__global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info)
 {
+	if (!info.m_frameIsValid)
+	{
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
+	}
+
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	const unsigned cellCount = info.m_histogram.m_array[bodyCount - 1];
 	if ((cellCount + D_THREADS_PER_BLOCK) > info.m_bodyAabbCell.m_capacity)
 	{
-		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		info.m_frameIsValid = 0;
 		info.m_bodyAabbCell.m_size = cellCount + D_THREADS_PER_BLOCK;
 		info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
-		return false;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		return;
 	}
 
 	ndCudaBodyAabbCell cell;
 	ndCudaBodyAabbCell* cellArray = info.m_bodyAabbCell.m_array;
 	ndCudaBodyAabbCell* cellArrayScrath = info.m_bodyAabbCellScrath.m_array;
-	
+
 	cell.m_value = 0;
 	cell.m_x = unsigned(-1);
 	cell.m_y = unsigned(-1);
@@ -284,12 +289,12 @@ inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 	cell.m_id = unsigned(-1);
 	cellArray[cellCount].m_value = cell.m_value;
 	cellArrayScrath[cellCount].m_value = cell.m_value;
-	
+
 	const unsigned blocksCount = (cellCount + D_COUNTING_SORT_MAX_BLOCK_SIZE - 1) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
 
 	info.m_bodyAabbCell.m_size = cellCount + 1;
 	info.m_bodyAabbCellScrath.m_size = cellCount + 1;
-	ndCudaGenerateHashGrids << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+	ndCudaGenerateGridsInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 
 	//printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
 	//printf("function: %s: ", __FUNCTION__);
@@ -306,44 +311,20 @@ inline bool __device__ cuGenerateGridCells(ndCudaSceneInfo& info)
 	//}
 	//printf("\n");
 
-	return true;
+	//unsigned* histogram = info.m_histogram.m_array;
+	//const unsigned size = info.m_bodyAabbCell.m_size - 1;
+	const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(info.m_bodyAabbCell.m_size - 1, D_THREADS_PER_BLOCK);
+	if (newCapacity > info.m_histogram.m_capacity)
+	{
+		info.m_frameIsValid = 0;
+		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+		info.m_histogram.m_size = newCapacity;
+	}
+
+	printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
 }
 
-//__global__ void ndCudaScene(ndCudaSceneInfo& info)
-//{
-//	cuInitBodyArray(info);
-//	if (!info.m_frameIsValid)
-//	{
-//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-//		return;
-//	}
-//
-//	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
-//	if (!cuCountAabb(info))
-//	{
-//		info.m_frameIsValid = 0;
-//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-//		return;
-//	}
-//
-//	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
-//	if (!info.m_frameIsValid)
-//	{
-//		info.m_frameIsValid = 0;
-//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-//		return;
-//	}
-//	
-//	if (!cuGenerateGridCells(info))
-//	{
-//		info.m_frameIsValid = 0;
-//		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
-//		return;
-//	}
-//
-//	printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
-//}
-
+/*
 template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
 __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
 {
@@ -352,7 +333,7 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x so
 		printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 		return;
 	}
-	
+
 	unsigned* histogram = info.m_histogram.m_array;
 	const unsigned size = info.m_bodyAabbCell.m_size - 1;
 
@@ -394,25 +375,7 @@ __global__ void ndCudaSortGridArray(ndCudaSceneInfo& info, SortKeyPredicate_x so
 	//}
 	//printf("\n");
 }
-
-
-template <typename SortKeyPredicate_x, typename SortKeyPredicate_y, typename SortKeyPredicate_z, typename SortKeyPredicate_w>
-__global__ void ndCudaScene_Debug(ndCudaSceneInfo& info, SortKeyPredicate_x sortKey_x, SortKeyPredicate_y sortKey_y, SortKeyPredicate_z sortKey_z, SortKeyPredicate_w sortKey_w)
-{
-	//cuInitBodyArray(info);
-	ndCudaMergeAabb << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
-	cuCountAabb(info);
-	ndCudaHillisSteelePrefixScan << <1, 1, 0 >> > (info);
-	cuGenerateGridCells(info);
-	unsigned size = info.m_bodyAabbCell.m_size - 1;
-	unsigned* histogram = info.m_histogram.m_array;
-	long long* src = &info.m_bodyAabbCell.m_array->m_value;
-	long long* dst = &info.m_bodyAabbCellScrath.m_array->m_value;
-	ndCudaCountingSort << <1, 1, 0 >> > (info, src, dst, histogram, size, sortKey_x, D_THREADS_PER_BLOCK);
-
-	printf("valid:%d frame:%d  size:%d\n", info.m_frameIsValid, info.m_frameCount, info.m_bodyAabbCell.m_size);
-}
-
+*/
 
 ndCudaContextImplement::ndCudaContextImplement()
 	:m_sceneInfoGpu(nullptr)
@@ -727,6 +690,11 @@ void ndCudaContextImplement::InitBodyArray()
 	};
 #endif
 
+
+	auto SortGetInfo_x = [] __device__(const ndCudaSceneInfo &info, CudaCountingSortInfo<long long>& data)
+	{
+	};
+
 	auto SortKey_x = [] __device__(long long value)
 	{
 		ndCudaBodyAabbCell item;
@@ -735,29 +703,30 @@ void ndCudaContextImplement::InitBodyArray()
 		return key & 0xff;
 	};
 
-	auto SortKey_y = [] __device__(long long value)
-	{
-		ndCudaBodyAabbCell item;
-		item.m_value = value;
-		const unsigned key = item.m_key;
-		return (key>>8) & 0xff;
-	};
+	//auto SortKey_y = [] __device__(long long value)
+	//{
+	//	ndCudaBodyAabbCell item;
+	//	item.m_value = value;
+	//	const unsigned key = item.m_key;
+	//	return (key>>8) & 0xff;
+	//};
+	//
+	//auto SortKey_z = [] __device__(long long value)
+	//{
+	//	ndCudaBodyAabbCell item;
+	//	item.m_value = value;
+	//	const unsigned key = item.m_key;
+	//	return (key >> 16) & 0xff;
+	//};
+	//
+	//auto SortKey_w = [] __device__(long long value)
+	//{
+	//	ndCudaBodyAabbCell item;
+	//	item.m_value = value;
+	//	const unsigned key = item.m_key;
+	//	return (key >> 24) & 0xff;
+	//};
 
-	auto SortKey_z = [] __device__(long long value)
-	{
-		ndCudaBodyAabbCell item;
-		item.m_value = value;
-		const unsigned key = item.m_key;
-		return (key >> 16) & 0xff;
-	};
-
-	auto SortKey_w = [] __device__(long long value)
-	{
-		ndCudaBodyAabbCell item;
-		item.m_value = value;
-		const unsigned key = item.m_key;
-		return (key >> 24) & 0xff;
-	};
 
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
 
@@ -782,5 +751,9 @@ void ndCudaContextImplement::InitBodyArray()
 	//ndCudaSortGridArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
 
 	ndCudaInitBodyArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	ndCudaScene_Debug << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortKey_x, SortKey_y, SortKey_z, SortKey_w);
+	ndCudaHillisSteelePrefixScan << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
+	ndCudaGenerateGrids << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
+
+	//__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate GetInfo, GetKeyPredicate GetKey)
+	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortGetInfo_x);
 }
