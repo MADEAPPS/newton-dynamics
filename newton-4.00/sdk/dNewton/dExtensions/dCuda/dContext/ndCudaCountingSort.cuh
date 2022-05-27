@@ -71,7 +71,7 @@ __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsi
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, unsigned prefixKeySize)
+__global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate GetSortKey, unsigned prefixKeySize)
 {
 	__shared__  BufferItem cachedCells[D_COUNTING_SORT_MAX_BLOCK_SIZE];
 	__shared__  unsigned cacheSortedKey[D_COUNTING_SORT_MAX_BLOCK_SIZE];
@@ -84,13 +84,11 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 	const unsigned blocks = (size + blockDim.x - 1) / blockDim.x;
 	
 	const unsigned index = threadId + blockDim.x * blockId;
-	const unsigned lastRoadOffset = blocks * D_COUNTING_SORT_MAX_BLOCK_SIZE;
-
 	cacheSortedKey[threadId] = (D_COUNTING_SORT_MAX_BLOCK_SIZE << 16) | threadId;
 	if (index < size)
 	{
 		cachedCells[threadId] = src[index];
-		const unsigned key = sortKey(src[index]);
+		const unsigned key = GetSortKey(src[index]);
 		cacheSortedKey[threadId] = (key << 16) | threadId;
 	}
 	
@@ -98,8 +96,9 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 	cacheItemCount[threadId] = 0;
 	__syncthreads();
 
+	const unsigned srcOffset = blockId * prefixKeySize;
+	const unsigned lastRoadOffset = blocks * prefixKeySize;
 	const unsigned prefixBase = D_COUNTING_SORT_MAX_BLOCK_SIZE / 2;
-	const unsigned srcOffset = blockId * D_COUNTING_SORT_MAX_BLOCK_SIZE;
 	cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
 	cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
 	cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + D_COUNTING_SORT_MAX_BLOCK_SIZE + threadId] - cacheBaseOffset[threadId];
@@ -173,7 +172,7 @@ template <typename BufferItem,
 	typename PredicateGetSrcBuffer, typename PredicateGetDstBuffer, typename PredicateGetItemsCount, typename PredicateGetSortKey>
 __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem, 
 	PredicateGetSrcBuffer GetSrcBuffer, PredicateGetDstBuffer GetDstBuffer, PredicateGetItemsCount GetItemsCount,
-	PredicateGetSortKey getSortKey)
+	PredicateGetSortKey GetSortKey, unsigned keySize)
 {
 	if (!info.m_frameIsValid)
 	{
@@ -185,11 +184,11 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem,
 	BufferItem* dst = GetDstBuffer(info);
 	const BufferItem* src = GetSrcBuffer(info);
 
-	unsigned* histograma = info.m_histogram.m_array;
+	unsigned* histogram = info.m_histogram.m_array;
 	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
-	//ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey, keySize);
-	//ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
-	//ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);
+	ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, GetSortKey, keySize);
+	ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks, keySize);
+	ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, GetSortKey, keySize);
 	
 	//printf("%s\n", text);
 	//printf("size: %d  blocks: %d\n", size, blocks);
@@ -207,15 +206,25 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem,
 	//}
 	//printf("\n");
 
-	//printf("function: %s\n", __FUNCTION__);
-	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
-	//{
-	//	ndCudaBodyAabbCell cell;
-	//	//cell.m_value = dst[i];
-	//	cell.m_value = src[i];
-	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cell.m_x, cell.m_y, cell.m_z, cell.m_id);
-	//}
-	//printf("\n");
+	printf("unsorted: %s\n", __FUNCTION__);
+	for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
+	{
+		ndCudaBodyAabbCell cell;
+		cell.m_value = src[i];
+		const unsigned key = GetSortKey(src[i]);
+		printf("x(%d) y(%d) z(%d) id(%d)  key(%d)\n", cell.m_x, cell.m_y, cell.m_z, cell.m_id, key);
+	}
+	printf("\n");
+
+	printf("sorted: %s\n", __FUNCTION__);
+	for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
+	{
+		ndCudaBodyAabbCell cell;
+		cell.m_value = dst[i];
+		printf("x(%d) y(%d) z(%d) id(%d)\n", cell.m_x, cell.m_y, cell.m_z, cell.m_id);
+	}
+	printf("\n");
+	printf("\n");
 
 	
 	#ifdef _DEBUG

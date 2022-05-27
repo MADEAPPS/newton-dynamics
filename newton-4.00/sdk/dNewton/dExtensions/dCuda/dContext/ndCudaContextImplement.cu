@@ -768,6 +768,6 @@ void ndCudaContextImplement::InitBodyArray()
 
 	//__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate GetInfo, GetKeyPredicate GetKey)
 	long long dommyType = 0;
-	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x);
+	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x, 256);
 
 }
