@@ -106,8 +106,8 @@ class ndCudaSceneInfo
 		,m_bodyAabbCellScrath()
 		,m_transformBuffer0()
 		,m_transformBuffer1()
-		,m_frameIsValid(0)
 		,m_frameCount(0)
+		,m_frameIsValid(0)
 	{
 	}
 
@@ -120,8 +120,16 @@ class ndCudaSceneInfo
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
 	
-	unsigned m_frameIsValid;
 	unsigned m_frameCount;
+	unsigned m_frameIsValid;
 };
+
+
+inline void __device__ cuInvalidateFrame(ndCudaSceneInfo& info, const char* functionName, unsigned lineNumber)
+{
+	info.m_frameIsValid = 0;
+	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, functionName, lineNumber);
+}
+
 
 #endif
