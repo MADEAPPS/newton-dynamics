@@ -168,25 +168,12 @@ inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned it
 	return keySize * (blocks + 2);
 }
 
-template <typename BufferItem>
-struct CudaCountingSortInfo
-{
-	BufferItem* m_dst;
-	const BufferItem* m_src;
-	unsigned* m_histogram;
-	unsigned m_itemsCount;
-	unsigned m_keySize;
 
-	static __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate<BufferItem> GetInfo)
-	{
-
-	}
-};
-
-//template <typename BufferItem, typename SortKeyPredicate>
-//__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, const unsigned keySize)
-template <typename GetInfoPredicate<typename BufferItem>>
-__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate<BufferItem> GetInfo)
+template <typename BufferItem, 
+	typename PredicateGetSrcBuffer, typename PredicateGetDstBuffer, typename PredicateGetItemsCount, typename PredicateGetSortKey>
+__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, BufferItem, 
+	PredicateGetSrcBuffer GetSrcBuffer, PredicateGetDstBuffer GetDstBuffer, PredicateGetItemsCount GetItemsCount,
+	PredicateGetSortKey getSortKey)
 {
 	if (!info.m_frameIsValid)
 	{
@@ -194,10 +181,12 @@ __global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate<Buffe
 		return;
 	}
 
-	CudaCountingSortInfo<BufferItem> sortInfo;
-	GetInfo(info, sortInfo);
+	unsigned size = GetItemsCount(info);
+	BufferItem* dst = GetDstBuffer(info);
+	const BufferItem* src = GetSrcBuffer(info);
 
-	//const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
+	unsigned* histograma = info.m_histogram.m_array;
+	const unsigned blocks = (size + D_COUNTING_SORT_MAX_BLOCK_SIZE -1 ) / D_COUNTING_SORT_MAX_BLOCK_SIZE;
 	//ndCudaCountingSortCountItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, histogram, size, sortKey, keySize);
 	//ndCudaCountingCellsPrefixScanInternal << <1, keySize, 0 >> > (histogram, blocks);
 	//ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_MAX_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, sortKey);

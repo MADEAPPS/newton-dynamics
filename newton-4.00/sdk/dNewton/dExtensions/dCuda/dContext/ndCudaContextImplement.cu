@@ -691,11 +691,23 @@ void ndCudaContextImplement::InitBodyArray()
 #endif
 
 
-	auto SortGetInfo_x = [] __device__(const ndCudaSceneInfo &info, CudaCountingSortInfo<long long>& data)
+	auto GetItemsCount = [] __device__(const ndCudaSceneInfo & info)
 	{
+		return info.m_bodyAabbCell.m_size - 1;
 	};
 
-	auto SortKey_x = [] __device__(long long value)
+	auto GetSrcBuffer = [] __device__(const ndCudaSceneInfo &info)
+	{
+		return &info.m_bodyAabbCell.m_array[0].m_value;
+	};
+
+	auto GetDstBuffer = [] __device__(const ndCudaSceneInfo & info)
+	{
+		return &info.m_bodyAabbCellScrath.m_array[0].m_value;
+	};
+
+
+	auto GetSortKey_x = [] __device__(long long value)
 	{
 		ndCudaBodyAabbCell item;
 		item.m_value = value;
@@ -755,5 +767,7 @@ void ndCudaContextImplement::InitBodyArray()
 	ndCudaGenerateGrids << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 
 	//__global__ void ndCudaCountingSort(ndCudaSceneInfo& info, GetInfoPredicate GetInfo, GetKeyPredicate GetKey)
-	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, SortGetInfo_x);
+	long long dommyType = 0;
+	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x);
+
 }
