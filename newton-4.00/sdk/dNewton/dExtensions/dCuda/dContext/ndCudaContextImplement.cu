@@ -296,23 +296,6 @@ __global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info)
 	info.m_bodyAabbCellScrath.m_size = cellCount + 1;
 	ndCudaGenerateGridsInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 
-	//printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
-	//printf("function: %s: ", __FUNCTION__);
-	//for (int i = 0; i < info.m_histogram.m_size; i++)
-	//{
-	//	printf("%d ", info.m_histogram.m_array[i]);
-	//}
-	//printf("\n");
-	//printf("function: %s\n: ", __FUNCTION__);
-	//printf("bodyCount(%d)  cellCount(%d) blocksCount(%d)\n", bodyCount, cellCount, blocksCount);
-	//for (int i = 0; i < info.m_bodyAabbCell.m_size; i++)
-	//{
-	//	printf("x(%d) y(%d) z(%d) id(%d)\n", cellArray[i].m_x, cellArray[i].m_y, cellArray[i].m_z, cellArray[i].m_id);
-	//}
-	//printf("\n");
-
-	//unsigned* histogram = info.m_histogram.m_array;
-	//const unsigned size = info.m_bodyAabbCell.m_size - 1;
 	const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(info.m_bodyAabbCell.m_size - 1, D_THREADS_PER_BLOCK);
 	if (newCapacity > info.m_histogram.m_capacity)
 	{
@@ -321,7 +304,7 @@ __global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info)
 		info.m_histogram.m_size = newCapacity;
 	}
 
-	printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
+	//printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
 }
 
 /*
@@ -763,6 +746,6 @@ void ndCudaContextImplement::InitBodyArray()
 	ndCudaInitBodyArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	ndCudaHillisSteelePrefixScan << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	ndCudaGenerateGrids << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x, 256);
+	//ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x, 256);
 
 }
