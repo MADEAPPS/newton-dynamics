@@ -183,7 +183,7 @@ __global__ void ndCudaHillisSteeleAddSupeBlocksInternal(ndCudaSceneInfo& info)
 
 __global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
 {
-	const unsigned index = blockIdx.x * blockDim.x + blockIdx.x;
+	const unsigned index = threadIdx.x + blockIdx.x * blockDim.x;
 	const unsigned* histogram = info.m_histogram.m_array;
 	if ((index > 1) && (index < info.m_histogram.m_size))
 	{

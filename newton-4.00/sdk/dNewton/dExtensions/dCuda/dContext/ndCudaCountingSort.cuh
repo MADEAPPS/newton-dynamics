@@ -30,9 +30,9 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-//#define D_COUNTING_SORT_BLOCK_SIZE		(1<<9)
-#define D_COUNTING_SORT_BLOCK_SIZE		(1<<3)
-#define D_COUNTING_INTERNAL_BUFFER_SIZE	(1<<10)
+//#define D_COUNTING_SORT_BLOCK_SIZE			(1<<3)
+#define D_COUNTING_SORT_BLOCK_SIZE				(1<<10)
+#define D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE	(1<<8)
 
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
 {
@@ -54,13 +54,17 @@ __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsig
 template <typename BufferItem, typename SortKeyPredicate>
 __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, unsigned prefixKeySize)
 {
-	__shared__  unsigned cacheBuffer[D_COUNTING_INTERNAL_BUFFER_SIZE];
+	__shared__  unsigned cacheBuffer[D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE];
 
 	const unsigned blockId = blockIdx.x;
 	const unsigned threadId = threadIdx.x;
 	
-	cacheBuffer[threadId] = 0;
+	if (threadId < prefixKeySize)
+	{
+		cacheBuffer[threadId] = 0;
+	}
 	__syncthreads();
+
 	const unsigned index = threadId + blockDim.x * blockId;
 	if (index < size)
 	{
@@ -69,8 +73,11 @@ __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsi
 	}
 	__syncthreads();
 	
-	const unsigned dstBase = prefixKeySize * blockId;
-	histogram[dstBase + threadId] = cacheBuffer[threadId];
+	if (threadId < prefixKeySize)
+	{
+		const unsigned dstBase = prefixKeySize * blockId;
+		histogram[dstBase + threadId] = cacheBuffer[threadId];
+	}
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
@@ -78,9 +85,12 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 {
 	__shared__  BufferItem cachedCells[D_COUNTING_SORT_BLOCK_SIZE];
 	__shared__  unsigned cacheSortedKey[D_COUNTING_SORT_BLOCK_SIZE];
-	__shared__  unsigned cacheBaseOffset[D_COUNTING_INTERNAL_BUFFER_SIZE];
-	__shared__  unsigned cacheKeyPrefix[D_COUNTING_INTERNAL_BUFFER_SIZE / 2 + D_COUNTING_INTERNAL_BUFFER_SIZE + 1];
-	__shared__  unsigned cacheItemCount[D_COUNTING_INTERNAL_BUFFER_SIZE / 2 + D_COUNTING_INTERNAL_BUFFER_SIZE + 1];
+	//__shared__  unsigned cacheBaseOffset[D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE];
+	//__shared__  unsigned cacheKeyPrefix[D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE / 2 + D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE + 1 + D_COUNTING_SORT_BLOCK_SIZE];
+	//__shared__  unsigned cacheItemCount[D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE / 2 + D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE + 1 + D_COUNTING_SORT_BLOCK_SIZE];
+	__shared__  unsigned cacheBaseOffset[D_COUNTING_SORT_BLOCK_SIZE];
+	__shared__  unsigned cacheKeyPrefix[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
+	__shared__  unsigned cacheItemCount[D_COUNTING_SORT_BLOCK_SIZE / 2 + D_COUNTING_SORT_BLOCK_SIZE + 1];
 
 	const unsigned blockId = blockIdx.x;
 	const unsigned threadId = threadIdx.x;
@@ -94,17 +104,24 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 		const unsigned key = GetSortKey(src[index]);
 		cacheSortedKey[threadId] = (key << 16) | threadId;
 	}
-	
-	cacheKeyPrefix[threadId] = 0;
-	cacheItemCount[threadId] = 0;
-	__syncthreads();
 
 	const unsigned srcOffset = blockId * prefixKeySize;
 	const unsigned lastRoadOffset = blocks * prefixKeySize;
-	const unsigned prefixBase = D_COUNTING_INTERNAL_BUFFER_SIZE / 2;
-	cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
-	cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
-	cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + prefixKeySize + threadId] - cacheBaseOffset[threadId];
+	const unsigned prefixBase = D_COUNTING_SORT_BLOCK_SIZE / 2;
+
+	if (threadId < prefixKeySize)
+	{
+		cacheKeyPrefix[threadId] = 0;
+		cacheItemCount[threadId] = 0;
+		cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
+	}
+	__syncthreads();
+
+	if (threadId < prefixKeySize)
+	{
+		cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
+		cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + prefixKeySize + threadId] - cacheBaseOffset[threadId];
+	}
 	
 	const int threadId0 = threadId;
 	for (int k = 2; k <= D_COUNTING_SORT_BLOCK_SIZE; k *= 2)
@@ -135,20 +152,17 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 		cacheItemCount[prefixBase + threadId] = countSum;
 		__syncthreads();
 	}
-
-
-
-	const unsigned keyValue = cacheSortedKey[threadId];
-	const unsigned key = keyValue >> 16;
-	const unsigned threadIdBase = cacheItemCount[prefixBase + key];
-
-	const unsigned dstOffset0 = threadId - threadIdBase;
-	const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
-	if ((dstOffset0 + dstOffset1) > size)
-	{
-		printf("size(%d) block(%d) thread(%d)dstOffset0(%d) dstOffset1(%d)\n", size, threadId, threadId, dstOffset0, dstOffset1);
-	}
-
+	
+	//const unsigned keyValue = cacheSortedKey[threadId];
+	//const unsigned key = keyValue >> 16;
+	//const unsigned threadIdBase = cacheItemCount[prefixBase + key];
+	//const unsigned dstOffset0 = threadId - threadIdBase;
+	//const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
+	//if ((dstOffset0 + dstOffset1)> size)
+	//{
+	//	printf("size(%d) dstOffset0(%d) dstOffset1(%d)\n", size, dstOffset0, dstOffset1);
+	//}
+	
 	if (index < size)
 	{
 		const unsigned keyValue = cacheSortedKey[threadId];
@@ -157,21 +171,17 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 	
 		const unsigned dstOffset0 = threadId - threadIdBase;
 		const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
-		//if ((dstOffset0 + dstOffset1)> size)
-		//{
-		//	printf("size(%d) dstOffset0(%d) dstOffset1(%d)\n", size, dstOffset0, dstOffset1);
-		//}
-			
-//		dst[dstOffset0 + dstOffset1] = cachedCells[keyValue & 0xffff];
+		dst[dstOffset0 + dstOffset1] = cachedCells[keyValue & 0xffff];
 	}
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
 __global__ void ndCudaCountingSortCountSanityCheckInternal(ndCudaSceneInfo& info, const BufferItem* dst, unsigned size, SortKeyPredicate GetSortKey)
 {
-	const unsigned index = blockIdx.x * blockDim.x + blockIdx.x;
-	if (index > 1)
+	const unsigned index = threadIdx.x + blockIdx.x * blockDim.x;
+	if ((index > 1) && (index < size))
 	{
+		printf("esto es un mierda\n");
 		const unsigned key0 = GetSortKey(dst[index - 0]);
 		const unsigned key1 = GetSortKey(dst[index - 1]);
 		if (info.m_frameIsValid && (key0 > key1))
@@ -206,7 +216,8 @@ __global__ void ndCudaCountingSort(
 		ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, GetSortKey, keySize);
 
 		#ifdef _DEBUG
-		//ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (info, dst, size, GetSortKey);
+		dst[0] = 0xffffffffffffffff;
+		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (info, dst, size, GetSortKey);
 		#endif
 	}
 }
