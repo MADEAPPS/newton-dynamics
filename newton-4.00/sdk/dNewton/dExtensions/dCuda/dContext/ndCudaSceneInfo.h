@@ -127,6 +127,7 @@ class ndCudaSceneInfo
 
 inline void __device__ cuInvalidateFrame(ndCudaSceneInfo& info, const char* functionName, unsigned lineNumber)
 {
+	cudaDeviceSynchronize();
 	info.m_frameIsValid = 0;
 	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, functionName, lineNumber);
 }

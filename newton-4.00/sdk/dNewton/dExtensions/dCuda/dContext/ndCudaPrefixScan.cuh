@@ -30,15 +30,15 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-#define D_PREFIX_SCAN_BLOCK_SIZE	1024
+#define D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE	1024
 
 __global__ void ndCudaHillisSteeleInternal(ndCudaSceneInfo& info)
 {
-	__shared__  unsigned cacheBuffer[D_PREFIX_SCAN_BLOCK_SIZE / 2 + D_PREFIX_SCAN_BLOCK_SIZE];
+	__shared__  unsigned cacheBuffer[D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE / 2 + D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE + 1];
 
 	const unsigned blockId = blockIdx.x;
 	const unsigned threadId0 = threadIdx.x;
-	const unsigned threadId1 = D_PREFIX_SCAN_BLOCK_SIZE / 2 + threadId0;
+	const unsigned threadId1 = D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE / 2 + threadId0;
 	cacheBuffer[threadId0] = 0;
 	cacheBuffer[threadId1] = 0;
 	__syncthreads();
@@ -51,7 +51,7 @@ __global__ void ndCudaHillisSteeleInternal(ndCudaSceneInfo& info)
 	}
 	__syncthreads();
 
-	for (int i = 1; i < D_PREFIX_SCAN_BLOCK_SIZE; i = i << 1)
+	for (int i = 1; i < D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE; i = i << 1)
 	{
 		int sum = cacheBuffer[threadId1] + cacheBuffer[threadId1 - i];
 		__syncthreads();
@@ -69,15 +69,15 @@ __global__ void ndCudaHillisSteeleAddBlocksInternal(ndCudaSceneInfo& info)
 {
 	const unsigned threadId = threadIdx.x;
 	const unsigned itemsCount = info.m_histogram.m_size;
-	const unsigned superBlockCount = (itemsCount + D_PREFIX_SCAN_BLOCK_SIZE - 1) / D_PREFIX_SCAN_BLOCK_SIZE;
+	const unsigned superBlockCount = (itemsCount + D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE - 1) / D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
 	
 	unsigned* histogram = info.m_histogram.m_array;
-	unsigned offset = D_PREFIX_SCAN_BLOCK_SIZE;
+	unsigned offset = D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
 	for (int i = 1; i < superBlockCount; i++)
 	{
 		const unsigned value = histogram[offset - 1];
 		histogram[offset + threadId] += value;
-		offset += D_PREFIX_SCAN_BLOCK_SIZE;
+		offset += D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
 		__syncthreads();
 	}
 }
@@ -179,16 +179,52 @@ __global__ void ndCudaHillisSteeleAddSupeBlocksInternal(ndCudaSceneInfo& info)
 		offset += prefixScanSuperBlockAlign;
 	}
 }
+
+__global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const unsigned threads = info.m_histogram.m_size;
+		//const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockSize;
+		//const unsigned superBlocks = (threads + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
+		//const unsigned histogramBlocks = D_PREFIX_SCAN_PASSES * superBlocks;
+		const unsigned blocks = (threads + D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE - 1) / D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
+		if (blocks * D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE > info.m_histogram.m_capacity)
+		{
+			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
+			info.m_histogram.m_size = blocks * D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
+			return;
+		}
+
+		ndCudaHillisSteeleInternal << <blocks, D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
+		//ndCudaHillisSteelePaddBufferInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
+		//for (int i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
+		//{
+		//	ndCudaHillisSteelePrefixScanAddBlocksInternal << <histogramBlocks, blockSize, 0 >> > (info, i);
+		//}
+		//ndCudaHillisSteelePrefixScanAddBlocksFinalInternal << <histogramBlocks, blockSize, 0 >> > (info);
+		//ndCudaHillisSteeleAddSupeBlocksInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
+
+		if (blocks > 1)
+		{
+			ndCudaHillisSteeleInternal << <1, D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
+		}
+
+#ifdef _DEBUG
+		ndCudaHillisSteeleSanityCheck << <blocks, D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
+#endif
+	}
+}
 */
 
 __global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
 {
 	const unsigned index = threadIdx.x + blockIdx.x * blockDim.x;
 	const unsigned* histogram = info.m_histogram.m_array;
-	if ((index > 1) && (index < info.m_histogram.m_size))
+	if ((index >= 1) && (index < info.m_histogram.m_size))
 	{
-		unsigned item0 = histogram[index - 0];
-		unsigned item1 = histogram[index - 1];
+		unsigned item0 = histogram[index - 1];
+		unsigned item1 = histogram[index - 0];
 		if (info.m_frameIsValid && (item0 > item1))
 		{
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
@@ -201,33 +237,22 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info)
 	if (info.m_frameIsValid)
 	{
 		const unsigned threads = info.m_histogram.m_size;
-		//const unsigned prefixScanSuperBlockAlign = D_PREFIX_SCAN_PASSES * blockSize;
-		//const unsigned superBlocks = (threads + prefixScanSuperBlockAlign - 1) / prefixScanSuperBlockAlign;
-		//const unsigned histogramBlocks = D_PREFIX_SCAN_PASSES * superBlocks;
-		const unsigned blocks = (threads + D_PREFIX_SCAN_BLOCK_SIZE - 1) / D_PREFIX_SCAN_BLOCK_SIZE;
-		if (blocks * D_PREFIX_SCAN_BLOCK_SIZE > info.m_histogram.m_capacity)
+		const unsigned blocks = (threads + D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE - 1) / D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
+		if (blocks * D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE > info.m_histogram.m_capacity)
 		{
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
-			info.m_histogram.m_size = blocks * D_PREFIX_SCAN_BLOCK_SIZE;
+			info.m_histogram.m_size = blocks * D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE;
 			return;
 		}
 
-		ndCudaHillisSteeleInternal << <blocks, D_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
-		//ndCudaHillisSteelePaddBufferInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
-		//for (int i = 0; i < (D_PREFIX_SCAN_PASSES_BITS - 1); i++)
-		//{
-		//	ndCudaHillisSteelePrefixScanAddBlocksInternal << <histogramBlocks, blockSize, 0 >> > (info, i);
-		//}
-		//ndCudaHillisSteelePrefixScanAddBlocksFinalInternal << <histogramBlocks, blockSize, 0 >> > (info);
-		//ndCudaHillisSteeleAddSupeBlocksInternal << <D_PREFIX_SCAN_PASSES, blockSize, 0 >> > (info);
-
+		ndCudaHillisSteeleInternal << <blocks, D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
 		if (blocks > 1)
 		{
-			ndCudaHillisSteeleInternal << <1, D_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
+			ndCudaHillisSteeleInternal << <1, D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
 		}
 
 		#ifdef _DEBUG
-		ndCudaHillisSteeleSanityCheck << <blocks, D_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
+		ndCudaHillisSteeleSanityCheck << <blocks, D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE, 0 >> > (info);
 		#endif
 	}
 }

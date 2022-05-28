@@ -179,11 +179,11 @@ template <typename BufferItem, typename SortKeyPredicate>
 __global__ void ndCudaCountingSortCountSanityCheckInternal(ndCudaSceneInfo& info, const BufferItem* dst, unsigned size, SortKeyPredicate GetSortKey)
 {
 	const unsigned index = threadIdx.x + blockIdx.x * blockDim.x;
-	if ((index > 1) && (index < size))
+	if ((index >= 1) && (index < size))
 	{
-		printf("esto es un mierda\n");
-		const unsigned key0 = GetSortKey(dst[index - 0]);
-		const unsigned key1 = GetSortKey(dst[index - 1]);
+		const unsigned key0 = GetSortKey(dst[index - 1]);
+		const unsigned key1 = GetSortKey(dst[index - 0]);
+		//printf("%llx id:%d (%llx %llx) (%x %x)\n", dst, threadIdx.x, dst[index - 1], dst[index - 0], key0, key1);
 		if (info.m_frameIsValid && (key0 > key1))
 		{
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
@@ -216,8 +216,8 @@ __global__ void ndCudaCountingSort(
 		ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, GetSortKey, keySize);
 
 		#ifdef _DEBUG
-		dst[0] = 0xffffffffffffffff;
 		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (info, dst, size, GetSortKey);
+		printf("\n");
 		#endif
 	}
 }

@@ -162,6 +162,8 @@ __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 		maxBox.w = 0.0f;
 		info.m_worldBox.m_min = minBox;
 		info.m_worldBox.m_max = maxBox;
+
+		const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	}
 };
 
@@ -287,7 +289,6 @@ __global__ void ndCudaCalculateBodyPairsCountInternal(ndCudaSceneInfo& info)
 
 __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 {
-	//printf("frame %d  %d\n", info.m_frameCount, info.m_frameIsValid);
 	if (info.m_frameIsValid)
 	{
 		const unsigned bodyCount = info.m_bodyArray.m_size - 1;
@@ -295,14 +296,13 @@ __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 		ndCudaInitBodyArrayInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 		ndCudaMergeAabbInternal << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
 
+		//cudaDeviceSynchronize();
+		info.m_histogram.m_size = bodyCount;
 		if (bodyCount > info.m_histogram.m_capacity)
 		{
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
-			info.m_histogram.m_size = bodyCount + 1;
 			return;
 		}
-
-		info.m_histogram.m_size = bodyCount;
 		ndCudaCountAabbInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 	}
 }
@@ -340,15 +340,12 @@ __global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info)
 		info.m_bodyAabbCellScrath.m_size = cellCount + 1;
 		ndCudaGenerateGridsInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 
-		const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(info.m_bodyAabbCell.m_size - 1, D_THREADS_PER_BLOCK);
+		const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(cellCount + 2, D_THREADS_PER_BLOCK);
 		if (newCapacity > info.m_histogram.m_capacity)
 		{
-			
-			printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
+			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
 			info.m_histogram.m_size = newCapacity;
 		}
-
-		//printf("frame %d  size %d\n", info.m_frameCount, info.m_bodyAabbCell.m_size);
 	}
 }
 
@@ -580,7 +577,7 @@ void ndCudaContextImplement::ValidateContextBuffers()
 			sceneInfo->m_frameIsValid = 1;
 		}
 
-		//dAssert(sceneInfo->m_frameIsValid);
+		dAssert(sceneInfo->m_frameIsValid);
 		cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, sceneInfo, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
 		dAssert(cudaStatus == cudaSuccess);
 		if (cudaStatus != cudaSuccess)
@@ -700,8 +697,8 @@ void ndCudaContextImplement::InitBodyArray()
 
 	ndCudaInitBodyArray << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 	ndCudaHillisSteelePrefixScan << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	//ndCudaGenerateGrids << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
-	//ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x, 256);
+	ndCudaGenerateGrids << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
+	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_x, 256);
 	//ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetDstBuffer, GetSrcBuffer, GetItemsCount, GetSortKey_y, 256);
 	//ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_z, 256);
 	//ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetDstBuffer, GetSrcBuffer, GetItemsCount, GetSortKey_w, 256);
