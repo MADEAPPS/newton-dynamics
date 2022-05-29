@@ -30,9 +30,8 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-//#define D_COUNTING_SORT_BLOCK_SIZE			(1<<3)
-#define D_COUNTING_SORT_BLOCK_SIZE				(1<<10)
-//#define D_COUNTING_INTERNAL_SCAN_BUFFER_SIZE	(1<<8)
+
+#define D_COUNTING_SORT_BLOCK_SIZE		(1<<10)
 
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
 {
@@ -115,8 +114,7 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 	}
 	
 	const int threadId0 = threadId;
-	//for (int k = 2; k <= D_COUNTING_SORT_BLOCK_SIZE; k *= 2)
-	for (int k = 2; k <= prefixKeySize; k *= 2)
+	for (int k = 2; k <= blockDim.x; k *= 2)
 	{
 		for (int j = k / 2; j > 0; j /= 2)
 		{
@@ -135,7 +133,6 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 		}
 	}
 	
-	//for (int i = 1; i < D_COUNTING_SORT_BLOCK_SIZE; i = i << 1)
 	for (int i = 1; i < prefixKeySize; i = i << 1)
 	{
 		const unsigned prefixSum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
@@ -145,16 +142,6 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 		cacheItemCount[prefixBase + threadId] = countSum;
 		__syncthreads();
 	}
-	
-	//const unsigned keyValue = cacheSortedKey[threadId];
-	//const unsigned key = keyValue >> 16;
-	//const unsigned threadIdBase = cacheItemCount[prefixBase + key];
-	//const unsigned dstOffset0 = threadId - threadIdBase;
-	//const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
-	//if ((dstOffset0 + dstOffset1)> size)
-	//{
-	//	printf("size(%d) dstOffset0(%d) dstOffset1(%d)\n", size, dstOffset0, dstOffset1);
-	//}
 	
 	if (index < size)
 	{
@@ -209,25 +196,25 @@ __global__ void ndCudaCountingSort(
 		ndCudaCountingSortCountShuffleItemsInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (src, dst, histogram, size, GetSortKey, keySize);
 
 		#ifdef _DEBUG
-		cudaDeviceSynchronize();
-		printf("unsorted: %s count(%d)\n", __FUNCTION__, size);
-		for (int i = 0; i < size; i++)
-		{
-			ndCudaBodyAabbCell cell;
-			cell.m_value = src[i];
-			printf("thread(%d) x(%d) y(%d) z(%d) id(%d)  %llx\n", i, cell.m_x, cell.m_y, cell.m_z, cell.m_id, cell.m_value);
-		}
-		printf("\n");
-		
-		printf("sorted: %s count(%d)\n", __FUNCTION__, size);
-		for (int i = 0; i < size; i++)
-		{
-			ndCudaBodyAabbCell cell;
-			cell.m_value = dst[i];
-			printf("thread(%d) x(%d) y(%d) z(%d) id(%d)  %llx\n", i, cell.m_x, cell.m_y, cell.m_z, cell.m_id, cell.m_value);
-		}
-		printf("\n");
-		printf("\n");
+		//cudaDeviceSynchronize();
+		//printf("unsorted: %s count(%d)\n", __FUNCTION__, size);
+		//for (int i = 0; i < size; i++)
+		//{
+		//	ndCudaBodyAabbCell cell;
+		//	cell.m_value = src[i];
+		//	printf("thread(%d) x(%d) y(%d) z(%d) id(%d)  %llx\n", i, cell.m_x, cell.m_y, cell.m_z, cell.m_id, cell.m_value);
+		//}
+		//printf("\n");
+		//
+		//printf("sorted: %s count(%d)\n", __FUNCTION__, size);
+		//for (int i = 0; i < size; i++)
+		//{
+		//	ndCudaBodyAabbCell cell;
+		//	cell.m_value = dst[i];
+		//	printf("thread(%d) x(%d) y(%d) z(%d) id(%d)  %llx\n", i, cell.m_x, cell.m_y, cell.m_z, cell.m_id, cell.m_value);
+		//}
+		//printf("\n");
+		//printf("\n");
 
 		ndCudaCountingSortCountSanityCheckInternal << <blocks, D_COUNTING_SORT_BLOCK_SIZE, 0 >> > (info, dst, size, GetSortKey);
 		#endif
