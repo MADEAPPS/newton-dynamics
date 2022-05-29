@@ -34,7 +34,7 @@ ndCudaContext::ndCudaContext()
 	//if ((cudaStatus == cudaSuccess) && (campbility >= 700))
 	{
 		cudaError_t cudaStatus = cudaSetDevice(0);
-		m_implement = (cudaStatus == cudaSuccess) ? new ndCudaContextImplement() : nullptr;
+		m_implement = (cudaStatus == cudaSuccess) ? new ndCudaContextImplement(m_device) : nullptr;
 	}
 }
 
@@ -63,11 +63,6 @@ double ndCudaContext::GetGPUTime() const
 	return IsValid() ? m_implement->GetTimeInMilisecunds() : 0.0;
 }
 
-void ndCudaContext::SwapBuffers()
-{
-	m_implement->SwapBuffers();
-}
-
 ndCudaSpatialVector* ndCudaContext::GetTransformBuffer0()
 {
 	return m_implement->GetTransformBuffer0();
@@ -82,6 +77,12 @@ void ndCudaContext::Begin()
 {
 	m_implement->Begin();
 }
+
+void ndCudaContext::End()
+{
+	m_implement->End();
+}
+
 
 void ndCudaContext::ResizeBuffers(int size)
 {

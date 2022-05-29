@@ -106,6 +106,8 @@ class ndCudaSceneInfo
 		,m_bodyAabbCellScrath()
 		,m_transformBuffer0()
 		,m_transformBuffer1()
+		,m_ticks(0)
+		,m_deltaTicks(0)
 		,m_frameCount(0)
 		,m_frameIsValid(0)
 	{
@@ -120,6 +122,8 @@ class ndCudaSceneInfo
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
 	
+	long long m_ticks;
+	long long m_deltaTicks;
 	unsigned m_frameCount;
 	unsigned m_frameIsValid;
 };

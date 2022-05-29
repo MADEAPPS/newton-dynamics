@@ -39,11 +39,12 @@ class ndCudaContext
 	D_CUDA_API const char* GetStringId() const;
 
 	D_CUDA_API void Begin();
+	D_CUDA_API void End();
+
 	D_CUDA_API void ResizeBuffers(int size);
 	D_CUDA_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 
 	D_CUDA_API void InitBodyArray();
-	D_CUDA_API void SwapBuffers();
 	D_CUDA_API void ValidateContextBuffers();
 
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer0();

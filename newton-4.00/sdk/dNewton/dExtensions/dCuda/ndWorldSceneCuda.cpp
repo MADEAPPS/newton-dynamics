@@ -72,7 +72,7 @@ void ndWorldSceneCuda::Begin()
 
 void ndWorldSceneCuda::End()
 {
-	ndCudaContext::SwapBuffers();
+	ndCudaContext::End();
 	ndWorldScene::End();
 }
 

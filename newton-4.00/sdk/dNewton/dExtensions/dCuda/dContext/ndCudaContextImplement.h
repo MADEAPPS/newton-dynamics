@@ -38,10 +38,11 @@ class ndCudaDevice;
 class ndCudaContextImplement
 {
 	public: 
-	ndCudaContextImplement();
+	ndCudaContextImplement(const ndCudaDevice* const device);
 	~ndCudaContextImplement();
 
 	void Begin();
+	void End();
 	void ResizeBuffers(int size);
 	void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 
@@ -53,6 +54,7 @@ class ndCudaContextImplement
 
 	float GetTimeInMilisecunds() const;
 	
+	const ndCudaDevice* m_device;
 	ndCudaSceneInfo* m_sceneInfoGpu;
 	ndCudaSceneInfo* m_sceneInfoCpu;
 	ndCudaDeviceBuffer<unsigned> m_histogram;
@@ -67,9 +69,7 @@ class ndCudaContextImplement
 	
 	cudaStream_t m_solverMemCpyStream;
 	cudaStream_t m_solverComputeStream;
-	cudaEvent_t m_startTime;
-	cudaEvent_t m_stopTime;
-	float m_timeInMilisecunds;
+	double m_timeInMilisecunds;
 	unsigned m_frameCounter;
 };
 

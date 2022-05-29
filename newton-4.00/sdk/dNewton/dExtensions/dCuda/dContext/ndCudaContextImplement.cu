@@ -21,6 +21,7 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
+#include "ndCudaDevice.h"
 #include "ndCudaContext.h"
 #include "ndCudaPrefixScan.cuh"
 #include "ndCudaCountingSort.cuh"
@@ -29,9 +30,30 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
+__global__ void ndCudaBeginFrameInternal(ndCudaSceneInfo& info)
+{
+	long long t0 = clock64();
+	info.m_ticks = t0;
+}
+
+__global__ void ndCudaEndFrameInternal(ndCudaSceneInfo& info)
+{
+	
+	long long t0 = info.m_ticks;
+	long long t1 = clock64();
+	info.m_deltaTicks = t1 - t0;
+	//printf("t1=%lld  t1=%lld ticks=%lld\n", t1, t0, info.m_deltaTicks);
+}
+
+__global__ void ndCudaBeginFrame(ndCudaSceneInfo& info)
+{
+	ndCudaBeginFrameInternal << <1, 1, 0 >> > (info);
+}
+
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 {
 	info.m_frameCount = frameCount;
+	ndCudaEndFrameInternal << <1, 1, 0 >> > (info);
 }
 
 __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
@@ -375,8 +397,9 @@ __global__ void ndCudaCalculateBodyPairsCount(ndCudaSceneInfo& info)
 };
 
 
-ndCudaContextImplement::ndCudaContextImplement()
-	:m_sceneInfoGpu(nullptr)
+ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
+	:m_device(device)
+	,m_sceneInfoGpu(nullptr)
 	,m_sceneInfoCpu(nullptr)
 	,m_histogram()
 	,m_bodyBufferGpu()
@@ -410,19 +433,12 @@ ndCudaContextImplement::ndCudaContextImplement()
 		dAssert(0);
 	}
 
-	cudaEventCreate(&m_startTime);
-	cudaEventCreate(&m_stopTime);
-	
 	*m_sceneInfoCpu = ndCudaSceneInfo();
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
 {
 	cudaError_t cudaStatus;
-
-	cudaEventDestroy(m_stopTime);
-	cudaEventDestroy(m_startTime);
-	
 	cudaStatus = cudaFreeHost(m_sceneInfoCpu);
 	dAssert(cudaStatus == cudaSuccess);
 	
@@ -443,25 +459,17 @@ ndCudaContextImplement::~ndCudaContextImplement()
 
 float ndCudaContextImplement::GetTimeInMilisecunds() const
 {
-	return m_timeInMilisecunds;
+	return float (m_timeInMilisecunds);
 }
 
 void ndCudaContextImplement::SwapBuffers()
 {
-	m_frameCounter = m_frameCounter + 1;
-
-	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
-	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
-	//cudaEventRecord(m_stopTime);
-
 	m_transformBufferCpu0.Swap(m_transformBufferCpu1);
 }
 
 void ndCudaContextImplement::Begin()
 {
 	cudaDeviceSynchronize();
-	//cudaEventSynchronize(m_stopTime);
-	//cudaEventElapsedTime(&m_timeInMilisecunds, m_startTime, m_stopTime);
 
 	// get the scene info from the update	
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
@@ -482,7 +490,17 @@ void ndCudaContextImplement::Begin()
 		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
 	}
 
-	//cudaEventRecord(m_startTime);
+	//m_timeInMilisecunds = (cpuInfo->m_deltaTicks / m_device->m_frequency) * 1.0e3f;
+	
+	ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
+}
+
+void ndCudaContextImplement::End()
+{
+	SwapBuffers();
+	m_frameCounter = m_frameCounter + 1;
+	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
+	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
 }
 
 ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer0()
