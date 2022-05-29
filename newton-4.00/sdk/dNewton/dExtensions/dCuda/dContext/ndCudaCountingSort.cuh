@@ -185,6 +185,7 @@ __global__ void ndCudaCountingSort(
 {
 	if (info.m_frameIsValid)
 	{
+		//printf("%s %d\n", __FUNCTION__, info.m_frameCount);
 		unsigned size = GetItemsCount(info);
 		BufferItem* dst = GetDstBuffer(info);
 		const BufferItem* src = GetSrcBuffer(info);

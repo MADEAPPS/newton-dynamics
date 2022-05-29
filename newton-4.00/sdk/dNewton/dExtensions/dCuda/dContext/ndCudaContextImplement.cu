@@ -162,8 +162,6 @@ __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 		maxBox.w = 0.0f;
 		info.m_worldBox.m_min = minBox;
 		info.m_worldBox.m_max = maxBox;
-
-		const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	}
 };
 
@@ -372,7 +370,6 @@ __global__ void ndCudaCalculateBodyPairsCount(ndCudaSceneInfo& info)
 		//printf("\n");
 		//
 		//printf("\n");
-
 		//printf("%s %d\n", __FUNCTION__, info.m_frameCount);
 	}
 };

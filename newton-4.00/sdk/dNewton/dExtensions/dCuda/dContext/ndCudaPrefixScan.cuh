@@ -43,7 +43,7 @@ __global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
 		unsigned item1 = histogram[index - 0];
 		if (info.m_frameIsValid && (item0 > item1))
 		{
-			printf("block(%d) id:%d (%d %d)\n", threadIdx.x, item0, item1);
+			//printf("block(%d) id:%d (%d %d)\n", blockIdx.x, threadIdx.x, item0, item1);
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
 		}
 	}
