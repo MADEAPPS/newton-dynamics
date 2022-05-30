@@ -409,11 +409,10 @@ ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 	,m_bodyBufferGpu()
 	,m_bodyAabbCell()
 	,m_bodyAabbCellScrath()
-	,m_boundingBoxGpu()
-	,m_transformBufferCpu0()
-	,m_transformBufferCpu1()
 	,m_transformBufferGpu0()
 	,m_transformBufferGpu1()
+	,m_transformBufferCpu0()
+	,m_transformBufferCpu1()
 	,m_solverMemCpyStream(0)
 	,m_solverComputeStream(0)
 	,m_timeInSeconds(0.0f)
@@ -521,11 +520,8 @@ ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer1()
 
 void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 {
-	const int gpuBodyCount = D_THREADS_PER_BLOCK * ((cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK);
-	
 	ndCudaDeviceBuffer<unsigned>& histogramGpu = m_histogram;
 	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBufferGpu = m_bodyBufferGpu;
-	ndCudaDeviceBuffer<ndCudaBoundingBox>& boundingBoxGpu = m_boundingBoxGpu;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu0 = m_bodyAabbCell;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu1 = m_bodyAabbCellScrath;
 	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu0 = m_transformBufferCpu0;
@@ -541,7 +537,6 @@ void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 	transformBufferGpu1.SetCount(cpuBodyCount);
 	transformBufferCpu0.SetCount(cpuBodyCount);
 	transformBufferCpu1.SetCount(cpuBodyCount);
-	boundingBoxGpu.SetCount(gpuBodyCount / D_THREADS_PER_BLOCK);
 }
 
 void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int cpuBodyCount)
@@ -551,7 +546,6 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	ndCudaSceneInfo info;
 	info.m_histogram = ndCudaBuffer<unsigned>(m_histogram);
 	info.m_bodyArray = ndCudaBuffer<ndCudaBodyProxy>(m_bodyBufferGpu);
-	//info.m_bodyAabbArray = ndCudaBuffer<ndCudaBoundingBox>(m_boundingBoxGpu);
 	info.m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
 	info.m_bodyAabbCellScrath = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScrath);
 	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);

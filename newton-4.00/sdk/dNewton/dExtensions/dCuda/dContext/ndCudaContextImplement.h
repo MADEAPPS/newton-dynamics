@@ -61,15 +61,19 @@ class ndCudaContextImplement
 	const ndCudaDevice* m_device;
 	ndCudaSceneInfo* m_sceneInfoGpu;
 	ndCudaSceneInfo* m_sceneInfoCpu;
+
+	// gpu buffers
 	ndCudaDeviceBuffer<unsigned> m_histogram;
 	ndCudaDeviceBuffer<ndCudaBodyProxy> m_bodyBufferGpu;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScrath;
-	ndCudaDeviceBuffer<ndCudaBoundingBox> m_boundingBoxGpu;
-	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu0;
-	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu1;
 	ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBufferGpu0;
 	ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBufferGpu1;
+
+	// host buffers
+	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu0;
+	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu1;
+
 	
 	cudaStream_t m_solverMemCpyStream;
 	cudaStream_t m_solverComputeStream;
