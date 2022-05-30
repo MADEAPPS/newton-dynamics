@@ -100,7 +100,6 @@ void ndWorldSceneCuda::CalculateContacts()
 
 void ndWorldSceneCuda::LoadBodyData()
 {
-
 	auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
@@ -108,8 +107,7 @@ void ndWorldSceneCuda::LoadBodyData()
 		const ndCudaVector maxBox(ndFloat32(-1.0e15f));
 		
 		ndArray<ndCudaBodyProxy>& data = m_bodyBufferCpu;
-		ndCudaSpatialVector* const transformBufferCpu0 = GetTransformBuffer0();
-		ndCudaSpatialVector* const transformBufferCpu1 = GetTransformBuffer1();
+		ndCudaSpatialVector* const transformBufferCpu = GetTransformBuffer();
 		
 		ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
@@ -158,8 +156,7 @@ void ndWorldSceneCuda::LoadBodyData()
 		
 			transform.m_linear = proxi.m_posit;
 			transform.m_angular = proxi.m_rotation;
-			transformBufferCpu0[i] = transform;
-			transformBufferCpu1[i] = transform;
+			transformBufferCpu[i] = transform;
 		}
 	});
 
@@ -211,7 +208,7 @@ void ndWorldSceneCuda::UpdateTransform()
 	{
 		D_TRACKTIME();
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndCudaSpatialVector* const data = GetTransformBuffer1();
+		const ndCudaSpatialVector* const data = GetTransformBuffer();
 		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{

@@ -49,8 +49,7 @@ class ndCudaContext
 	D_CUDA_API void UpdateTransform();
 	D_CUDA_API void ValidateContextBuffers();
 
-	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer0();
-	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer1();
+	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer();
 	
 	D_CUDA_API void IntegrateBodies(float timestep);
 	D_CUDA_API void IntegrateUnconstrainedBodies(float timestep);

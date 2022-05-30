@@ -52,8 +52,7 @@ class ndCudaContextImplement
 	void InitBodyArray();
 	void UpdateTransform();
 	void ValidateContextBuffers();
-	ndCudaSpatialVector* GetTransformBuffer0();
-	ndCudaSpatialVector* GetTransformBuffer1();
+	ndCudaSpatialVector* GetTransformBuffer();
 
 	void IntegrateBodies(float timestep);
 	void IntegrateUnconstrainedBodies(float timestep);
@@ -71,9 +70,7 @@ class ndCudaContextImplement
 	ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBufferGpu1;
 
 	// host buffers
-	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu0;
-	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu1;
-
+	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu;
 	
 	cudaStream_t m_solverMemCpyStream;
 	cudaStream_t m_solverComputeStream;

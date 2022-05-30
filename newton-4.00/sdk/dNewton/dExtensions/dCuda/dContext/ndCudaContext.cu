@@ -63,14 +63,9 @@ double ndCudaContext::GetGPUTime() const
 	return IsValid() ? m_implement->GetTimeInSeconds() : 0.0;
 }
 
-ndCudaSpatialVector* ndCudaContext::GetTransformBuffer0()
+ndCudaSpatialVector* ndCudaContext::GetTransformBuffer()
 {
-	return m_implement->GetTransformBuffer0();
-}
-
-ndCudaSpatialVector* ndCudaContext::GetTransformBuffer1()
-{
-	return m_implement->GetTransformBuffer1();
+	return m_implement->GetTransformBuffer();
 }
 
 void ndCudaContext::Begin()

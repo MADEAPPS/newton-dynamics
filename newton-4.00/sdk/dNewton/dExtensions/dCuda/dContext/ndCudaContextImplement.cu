@@ -30,7 +30,7 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
-static ndCudaBoundingBox __device__ g_boundingBoxBuffer[1024 * 1024];
+static ndCudaBoundingBox __device__ g_boundingBoxBuffer[1024 * 1024 / D_THREADS_PER_BLOCK];
 
 
 __global__ void ndCudaBeginFrameInternal(ndCudaSceneInfo& info)
@@ -436,8 +436,7 @@ ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 	,m_bodyAabbCellScrath()
 	,m_transformBufferGpu0()
 	,m_transformBufferGpu1()
-	,m_transformBufferCpu0()
-	,m_transformBufferCpu1()
+	,m_transformBufferCpu()
 	,m_solverMemCpyStream(0)
 	,m_solverComputeStream(0)
 	,m_timeInSeconds(0.0f)
@@ -492,7 +491,7 @@ float ndCudaContextImplement::GetTimeInSeconds() const
 
 void ndCudaContextImplement::SwapBuffers()
 {
-	m_transformBufferCpu0.Swap(m_transformBufferCpu1);
+	//m_transformBufferCpu0.Swap(m_transformBufferCpu1);
 }
 
 void ndCudaContextImplement::Begin()
@@ -514,7 +513,7 @@ void ndCudaContextImplement::Begin()
 	const int frameCounter = m_frameCounter;
 	if (frameCounter)
 	{
-		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu0;
+		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu;
 		ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBufferGpu1 : m_transformBufferGpu0;
 		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
 	}
@@ -533,14 +532,9 @@ void ndCudaContextImplement::End()
 	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
 }
 
-ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer0()
+ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer()
 {
-	return &m_transformBufferCpu0[0];
-}
-
-ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer1()
-{
-	return &m_transformBufferCpu1[0];
+	return &m_transformBufferCpu[0];
 }
 
 void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
@@ -549,8 +543,7 @@ void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBufferGpu = m_bodyBufferGpu;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu0 = m_bodyAabbCell;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu1 = m_bodyAabbCellScrath;
-	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu0 = m_transformBufferCpu0;
-	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu1 = m_transformBufferCpu1;
+	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu = m_transformBufferCpu;
 	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu0 = m_transformBufferGpu0;
 	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu1 = m_transformBufferGpu1;
 	
@@ -560,8 +553,7 @@ void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 	bodyAabbCellGpu1.SetCount(cpuBodyCount);
 	transformBufferGpu0.SetCount(cpuBodyCount);
 	transformBufferGpu1.SetCount(cpuBodyCount);
-	transformBufferCpu0.SetCount(cpuBodyCount);
-	transformBufferCpu1.SetCount(cpuBodyCount);
+	transformBufferCpu.SetCount(cpuBodyCount);
 }
 
 void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int cpuBodyCount)
