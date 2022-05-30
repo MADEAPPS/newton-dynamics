@@ -216,14 +216,14 @@ void ndWorldSceneCuda::UpdateTransform()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			dTrace(("buffer are not swapping\n"));
-			//ndBodyKinematic* const body = bodyArray[i];
-			//const ndCudaSpatialVector& transform = data[i];
-			//const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
-			//const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
-			//body->SetMatrixAndCentreOfMass(rotation, position);
-			//
-			//body->m_transformIsDirty = true;
-			//UpdateTransformNotify(threadIndex, body);
+			ndBodyKinematic* const body = bodyArray[i];
+			const ndCudaSpatialVector& transform = data[i];
+			const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
+			const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
+			body->SetMatrixAndCentreOfMass(rotation, position);
+			
+			body->m_transformIsDirty = true;
+			UpdateTransformNotify(threadIndex, body);
 		}
 	});
 	ParallelExecute(SetTransform);

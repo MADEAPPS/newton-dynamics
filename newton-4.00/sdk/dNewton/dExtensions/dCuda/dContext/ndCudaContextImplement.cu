@@ -401,6 +401,31 @@ __global__ void ndCudaCalculateBodyPairsCount(ndCudaSceneInfo& info)
 };
 
 
+__global__ void ndCudaGetBodyTransformsInternal (const ndCudaSceneInfo & info)
+{
+	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	if (index < (info.m_bodyArray.m_size - 1))
+	{
+		const ndCudaBodyProxy* src = info.m_bodyArray.m_array;
+		ndCudaSpatialVector* dst = (info.m_frameCount & 1) ? info.m_transformBuffer0.m_array : info.m_transformBuffer1.m_array;
+
+		dst[index].m_linear = src[index].m_posit;
+		dst[index].m_angular = src[index].m_rotation;
+	}
+};
+
+
+__global__ void ndCudaGetBodyTransforms(ndCudaSceneInfo& info)
+{
+	if (info.m_frameIsValid)
+	{
+		const unsigned threads = info.m_bodyArray.m_size - 1;
+		const unsigned blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		ndCudaGetBodyTransformsInternal << <blocks, D_THREADS_PER_BLOCK, 0 >> > (info);
+	}
+}
+
+
 ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 	:m_device(device)
 	,m_sceneInfoGpu(nullptr)
@@ -549,7 +574,7 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	info.m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
 	info.m_bodyAabbCellScrath = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScrath);
 	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
-	info.m_transformBuffer1 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
+	info.m_transformBuffer1 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu1);
 	
 	*m_sceneInfoCpu = info;
 	cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, &info, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
@@ -607,7 +632,8 @@ void ndCudaContextImplement::ValidateContextBuffers()
 
 void ndCudaContextImplement::UpdateTransform()
 {
-
+	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
+	ndCudaGetBodyTransforms << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
 }
 
 void ndCudaContextImplement::InitBodyArray()
