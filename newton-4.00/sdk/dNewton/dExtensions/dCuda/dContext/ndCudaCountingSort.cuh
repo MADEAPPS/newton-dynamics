@@ -33,21 +33,13 @@
 
 #define D_COUNTING_SORT_BLOCK_SIZE		(1<<10)
 
-inline __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
-{
-	unsigned sum = 0;
-	unsigned offset = 0;
-	const unsigned keySize = blockDim.x;
+__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount);
 
-	const unsigned threadId = threadIdx.x;
-	for (int i = 0; i < blockCount; i++)
-	{
-		const unsigned count = histogram[offset + threadId];
-		histogram[offset + threadId] = sum;
-		sum += count;
-		offset += keySize;
-	}
-	histogram[offset + threadId] = sum;
+
+inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned items, unsigned keySize)
+{
+	unsigned blocks = (items + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
+	return keySize * (blocks + 2);
 }
 
 template <typename BufferItem, typename SortKeyPredicate>
@@ -169,12 +161,6 @@ __global__ void ndCudaCountingSortCountSanityCheckInternal(ndCudaSceneInfo& info
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
 		}
 	}
-}
-
-inline unsigned __device__ ndCudaCountingSortCalculateScanPrefixSize(unsigned items, unsigned keySize)
-{
-	unsigned blocks = (items + D_COUNTING_SORT_BLOCK_SIZE - 1) / D_COUNTING_SORT_BLOCK_SIZE;
-	return keySize * (blocks + 2);
 }
 
 template <typename BufferItem, typename PredicateGetSrcBuffer, typename PredicateGetDstBuffer, typename PredicateGetItemsCount, typename PredicateGetSortKey>
