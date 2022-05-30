@@ -91,9 +91,6 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 
-	D_NEWTON_API void UpdateTransformsLock();
-	D_NEWTON_API void UpdateTransformsUnlock();
-	
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndModelList& GetModelList() const;
@@ -182,7 +179,6 @@ class ndWorld: public ndClassAlloc
 	ndInt32 m_solverIterations;
 	ndUnsigned32 m_frameIndex;
 	ndUnsigned32 m_subStepIndex;
-	std::mutex m_transformsLock;
 	bool m_inUpdate;
 	bool m_collisionUpdate;
 

@@ -123,7 +123,6 @@ ndWorld::ndWorld()
 	,m_solverIterations(4)
 	,m_frameIndex(0)
 	,m_subStepIndex(0)
-	,m_transformsLock()
 	,m_inUpdate(false)
 	,m_collisionUpdate(true)
 {
@@ -391,18 +390,6 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 	return 0;
 }
 
-void ndWorld::UpdateTransformsLock()
-{
-	D_TRACKTIME();
-	//m_transformsLock.lock();
-}
-
-void ndWorld::UpdateTransformsUnlock()
-{
-	D_TRACKTIME();
-	//m_transformsLock.unlock();
-}
-
 void ndWorld::ThreadFunction()
 {
 	ndUnsigned64 timeAcc = dGetTimeInMicroseconds();
@@ -435,12 +422,11 @@ void ndWorld::ThreadFunction()
 		m_scene->SetTimestep(m_timestep);
 		
 		ParticleUpdate(m_timestep);
-		UpdateTransformsLock();
+		
 		UpdateTransforms();
 		PostModelTransform();
 		m_inUpdate = false;
 		PostUpdate(m_timestep);
-		UpdateTransformsUnlock();
 
 		m_scene->End();
 	}

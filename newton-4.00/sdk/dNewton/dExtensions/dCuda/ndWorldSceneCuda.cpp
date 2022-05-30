@@ -206,28 +206,27 @@ void ndWorldSceneCuda::GetBodyTransforms()
 void ndWorldSceneCuda::UpdateTransform()
 {
 	D_TRACKTIME();
-	//dAssert(0);
-
-	//GetBodyTransforms();
-	//auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	//{
-	//	D_TRACKTIME();
-	//	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-	//	const cuSpatialVector* const data = &m_context->m_transformBufferCpu1[0];
-	//	const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
-	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//	{
-	//		ndBodyKinematic* const body = bodyArray[i];
-	//		const cuSpatialVector& transform = data[i];
-	//		const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
-	//		const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
-	//		body->SetMatrixAndCentreOfMass(rotation, position);
-	//
-	//		body->m_transformIsDirty = true;
-	//		UpdateTransformNotify(threadIndex, body);
-	//	}
-	//});
-	//ParallelExecute(SetTransform);
+	ndCudaContext::UpdateTransform();
+	auto SetTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndCudaSpatialVector* const data = GetTransformBuffer1();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			dTrace(("buffer are not swapping\n"));
+			//ndBodyKinematic* const body = bodyArray[i];
+			//const ndCudaSpatialVector& transform = data[i];
+			//const ndVector position(transform.m_linear.x, transform.m_linear.y, transform.m_linear.z, ndFloat32(1.0f));
+			//const ndQuaternion rotation(ndVector(transform.m_angular.x, transform.m_angular.y, transform.m_angular.z, transform.m_angular.w));
+			//body->SetMatrixAndCentreOfMass(rotation, position);
+			//
+			//body->m_transformIsDirty = true;
+			//UpdateTransformNotify(threadIndex, body);
+		}
+	});
+	ParallelExecute(SetTransform);
 }
 
 void ndWorldSceneCuda::UpdateBodyList()

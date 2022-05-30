@@ -222,9 +222,6 @@ void ndDemoCameraManager::RenderPickedTarget () const
 
 void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, ndFloat32 param)
 {
-	// interpolate the location of all entities in the world
-	//ndWorld* const world = scene->GetWorld();
-	//world->UpdateTransformsLock();
 	D_TRACKTIME();
 
 	for (ndDemoEntityManager::ndNode* node = scene->GetFirst(); node; node = node->GetNext()) 

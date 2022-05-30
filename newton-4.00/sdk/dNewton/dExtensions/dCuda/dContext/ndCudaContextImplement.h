@@ -50,6 +50,7 @@ class ndCudaContextImplement
 
 	void SwapBuffers();
 	void InitBodyArray();
+	void UpdateTransform();
 	void ValidateContextBuffers();
 	ndCudaSpatialVector* GetTransformBuffer0();
 	ndCudaSpatialVector* GetTransformBuffer1();

@@ -113,3 +113,8 @@ void ndCudaContext::IntegrateUnconstrainedBodies(float timestep)
 {
 	m_implement->IntegrateUnconstrainedBodies(timestep);
 }
+
+void ndCudaContext::UpdateTransform()
+{
+	m_implement->UpdateTransform();
+}

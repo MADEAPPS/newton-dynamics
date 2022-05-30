@@ -609,6 +609,11 @@ void ndCudaContextImplement::ValidateContextBuffers()
 	}
 }
 
+void ndCudaContextImplement::UpdateTransform()
+{
+
+}
+
 void ndCudaContextImplement::InitBodyArray()
 {
 	//auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](int threadIndex, int threadCount)
@@ -678,7 +683,6 @@ void ndCudaContextImplement::InitBodyArray()
 	{
 		return &info.m_bodyAabbCellScrath.m_array[0].m_value;
 	};
-
 
 	auto GetSortKey_x = [] __device__(long long value)
 	{
