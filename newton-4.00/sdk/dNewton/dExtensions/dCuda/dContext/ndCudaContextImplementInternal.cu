@@ -306,22 +306,6 @@ __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 	ndCudaEndFrameInternal << <1, 1, 0 >> > (info);
 }
 
-__global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
-{
-	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (index < info.m_bodyArray.m_size)
-	{
-		const ndCudaBodyProxy* src = info.m_bodyArray.m_array;
-		ndCudaSpatialVector* dst0 = info.m_transformBuffer0.m_array;
-		ndCudaSpatialVector* dst1 = info.m_transformBuffer1.m_array;
-
-		dst0[index].m_linear = src[index].m_posit;
-		dst0[index].m_angular = src[index].m_rotation;
-		dst1[index].m_linear = src[index].m_posit;
-		dst1[index].m_angular = src[index].m_rotation;
-	}
-}
-
 __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 {
 	if (info.m_frameIsValid)
@@ -425,4 +409,25 @@ __global__ void ndCudaGetBodyTransforms(ndCudaSceneInfo& info)
 		const unsigned blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		ndCudaGetBodyTransformsInternal << <blocks, D_THREADS_PER_BLOCK, 0 >> > (info);
 	}
+}
+
+
+__global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
+{
+	int index = threadIdx.x + blockDim.x * blockIdx.x;
+	if (index < info.m_bodyArray.m_size)
+	{
+		const ndCudaBodyProxy* src = info.m_bodyArray.m_array;
+		ndCudaSpatialVector* dst0 = info.m_transformBuffer0.m_array;
+		ndCudaSpatialVector* dst1 = info.m_transformBuffer1.m_array;
+
+		dst0[index].m_linear = src[index].m_posit;
+		dst0[index].m_angular = src[index].m_rotation;
+		dst1[index].m_linear = src[index].m_posit;
+		dst1[index].m_angular = src[index].m_rotation;
+	}
+}
+
+__global__ void ndCudaGenerateSceneGraph(ndCudaSceneInfo& info)
+{
 }

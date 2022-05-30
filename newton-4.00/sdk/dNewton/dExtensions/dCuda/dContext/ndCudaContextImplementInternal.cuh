@@ -49,8 +49,10 @@ __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info);
 __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info);
 __global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info);
 __global__ void ndCudaGetBodyTransforms(ndCudaSceneInfo& info);
+__global__ void ndCudaGenerateSceneGraph(ndCudaSceneInfo& info);
 __global__ void ndCudaCalculateBodyPairsCount(ndCudaSceneInfo& info);
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount);
+
 
 
 #endif

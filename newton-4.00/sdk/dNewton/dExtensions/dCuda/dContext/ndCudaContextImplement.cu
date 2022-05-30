@@ -176,7 +176,8 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 
 	const int blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	m_bodyBufferGpu.ReadData(src, cpuBodyCount);
-	ndCudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, 0 >> > (*m_sceneInfoCpu);
+	ndCudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, m_solverComputeStream >> > (*m_sceneInfoCpu);
+	ndCudaGenerateSceneGraph << <1, 1, 0, m_solverComputeStream >> > (*m_sceneInfoCpu);
 	
 	cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess)
