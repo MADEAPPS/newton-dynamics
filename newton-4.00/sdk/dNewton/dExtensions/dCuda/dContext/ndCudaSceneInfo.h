@@ -45,7 +45,7 @@ class ndCudaBoundingBox
 	ndCudaVector m_max;
 };
 
-#define D_AABB_GRID_CELL_BITS			10
+#define D_AABB_GRID_CELL_BITS	10
 
 class ndCudaBodyAabbCell
 {
@@ -101,7 +101,6 @@ class ndCudaSceneInfo
 		:m_worldBox()
 		,m_histogram()
 		,m_bodyArray()
-		,m_bodyAabbArray()
 		,m_bodyAabbCell()
 		,m_bodyAabbCellScrath()
 		,m_transformBuffer0()
@@ -116,7 +115,6 @@ class ndCudaSceneInfo
 	ndCudaBoundingBox m_worldBox;
 	ndCudaBuffer<unsigned> m_histogram;
 	ndCudaBuffer<ndCudaBodyProxy> m_bodyArray;
-	ndCudaBuffer<ndCudaBoundingBox> m_bodyAabbArray;
 	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
 	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScrath;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;

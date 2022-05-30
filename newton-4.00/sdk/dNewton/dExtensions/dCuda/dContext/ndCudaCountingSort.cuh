@@ -33,7 +33,7 @@
 
 #define D_COUNTING_SORT_BLOCK_SIZE		(1<<10)
 
-__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
+inline __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
 {
 	unsigned sum = 0;
 	unsigned offset = 0;

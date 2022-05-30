@@ -30,6 +30,9 @@
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
+static ndCudaBoundingBox __device__ g_boundingBoxBuffer[1024 * 1024];
+
+
 __global__ void ndCudaBeginFrameInternal(ndCudaSceneInfo& info)
 {
 	long long t0 = clock64();
@@ -121,7 +124,6 @@ __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 	}
 	__syncthreads();
 
-	ndCudaBoundingBox* bBox = info.m_bodyAabbArray.m_array;
 	for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
 	{
 		if (threadId < i)
@@ -134,26 +136,23 @@ __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 
 	if (threadId == 0)
 	{
-		bBox[blockIdx.x].m_min = cacheAabb[0].m_min;
-		bBox[blockIdx.x].m_max = cacheAabb[0].m_max;
+		g_boundingBoxBuffer[blockIdx.x].m_min = cacheAabb[0].m_min;
+		g_boundingBoxBuffer[blockIdx.x].m_max = cacheAabb[0].m_max;
 	}
 };
 
 __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 {
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
-
-	const ndCudaBoundingBox* bBoxOut = info.m_bodyAabbArray.m_array;
-
 	const unsigned threadId = threadIdx.x;
-	const unsigned boxCount = info.m_bodyAabbArray.m_size - 1;
+	const unsigned boxCount = ((info.m_bodyArray.m_size - 1) + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	const unsigned aabbBlocks = boxCount / D_THREADS_PER_BLOCK;
 	const unsigned boxLastRow = boxCount - aabbBlocks * D_THREADS_PER_BLOCK;
 
-	cacheAabb[threadId] = bBoxOut[0];
+	cacheAabb[threadId] = g_boundingBoxBuffer[0];
 	if (threadId < boxLastRow)
 	{
-		cacheAabb[threadId] = bBoxOut[aabbBlocks * D_THREADS_PER_BLOCK + threadId];
+		cacheAabb[threadId] = g_boundingBoxBuffer[aabbBlocks * D_THREADS_PER_BLOCK + threadId];
 	}
 	__syncthreads();
 
@@ -164,8 +163,8 @@ __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 		cacheAabb[threadId].m_max = cacheAabb[threadId].m_max.Min(cacheAabb[base + threadId].m_max);
 		base += D_THREADS_PER_BLOCK;
 	}
-
 	__syncthreads();
+
 	for (int i = D_THREADS_PER_BLOCK / 2; i; i = i >> 1)
 	{
 		if (threadId < i)
@@ -306,7 +305,6 @@ __global__ void ndCudaCalculateBodyPairsCountInternal(ndCudaSceneInfo& info)
 	//}
 };
 
-
 __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 {
 	if (info.m_frameIsValid)
@@ -314,6 +312,12 @@ __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
 		const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 		const unsigned blocksCount = (bodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 		ndCudaInitBodyArrayInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
+		#ifdef _DEBUG
+		if (blocksCount > D_THREADS_PER_BLOCK * 16)
+		{
+			printf("function: %sn too many block to ruun in one block\n", __FUNCTION__);
+		}
+		#endif
 		ndCudaMergeAabbInternal << <1, D_THREADS_PER_BLOCK, 0 >> > (info);
 
 		//cudaDeviceSynchronize();
@@ -545,7 +549,7 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	ndCudaSceneInfo info;
 	info.m_histogram = ndCudaBuffer<unsigned>(m_histogram);
 	info.m_bodyArray = ndCudaBuffer<ndCudaBodyProxy>(m_bodyBufferGpu);
-	info.m_bodyAabbArray = ndCudaBuffer<ndCudaBoundingBox>(m_boundingBoxGpu);
+	//info.m_bodyAabbArray = ndCudaBuffer<ndCudaBoundingBox>(m_boundingBoxGpu);
 	info.m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
 	info.m_bodyAabbCellScrath = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScrath);
 	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
@@ -707,7 +711,6 @@ void ndCudaContextImplement::InitBodyArray()
 		const unsigned key = item.m_key;
 		return (key >> 24) & 0xff;
 	};
-
 
 	long long dommyType = 0;
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;

@@ -43,6 +43,8 @@ class ndCudaContextImplement
 
 	void Begin();
 	void End();
+	float GetTimeInMilisecunds() const;
+
 	void ResizeBuffers(int size);
 	void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 
@@ -52,7 +54,8 @@ class ndCudaContextImplement
 	ndCudaSpatialVector* GetTransformBuffer0();
 	ndCudaSpatialVector* GetTransformBuffer1();
 
-	float GetTimeInMilisecunds() const;
+	void IntegrateBodies(float timestep);
+	void IntegrateUnconstrainedBodies(float timestep);
 	
 	const ndCudaDevice* m_device;
 	ndCudaSceneInfo* m_sceneInfoGpu;

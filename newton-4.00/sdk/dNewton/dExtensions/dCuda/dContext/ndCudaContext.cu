@@ -103,3 +103,13 @@ void ndCudaContext::InitBodyArray()
 {
 	m_implement->InitBodyArray();
 }
+
+void ndCudaContext::IntegrateBodies(float timestep)
+{
+	m_implement->IntegrateBodies(timestep);
+}
+
+void ndCudaContext::IntegrateUnconstrainedBodies(float timestep)
+{
+	m_implement->IntegrateUnconstrainedBodies(timestep);
+}

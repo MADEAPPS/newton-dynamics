@@ -42,17 +42,6 @@
 
 #if 0
 template <typename Predicate>
-__global__ void CudaIntegrateUnconstrainedBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
-{
-	int index = threadIdx.x + blockDim.x * blockIdx.x;
-	if (info.m_frameIsValid & (index < (info.m_bodyArray.m_size - 1)))
-	{
-		cuBodyProxy* bodyArray = info.m_bodyArray.m_array;
-		IntegrateVelocity(bodyArray[index], timestep);
-	}
-}
-
-template <typename Predicate>
 __global__ void CudaIntegrateBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
@@ -566,6 +555,7 @@ void ndDynamicsUpdateCuda::BuildIsland()
 	}
 }
 
+
 void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 {
 	//dAssert(0);
@@ -596,19 +586,8 @@ void ndDynamicsUpdateCuda::IntegrateUnconstrainedBodies()
 	//	body.AddDampingAcceleration(matrix);
 	//	body.IntegrateExternalForce(matrix, timestep);
 	//};
-	//
-	////if (GetUnconstrainedBodyCount())
-	//if (m_context->m_bodyBufferGpu.GetCount())
-	//{
-	//	D_TRACKTIME();
-	//	cudaStream_t stream = m_context->m_solverComputeStream;
-	//	ndInt32 threads = m_context->m_bodyBufferGpu.GetCount();
-	//	ndInt32 blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	//	const ndFloat32 timestep = scene->GetTimestep();
-	//	cuSceneInfo& sceneInfo = *m_context->m_sceneInfoGpu;
-	//	
-	//	CudaIntegrateUnconstrainedBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream >>> (IntegrateUnconstrainedBodies, sceneInfo, timestep);
-	//}
+
+	m_context->IntegrateUnconstrainedBodies(m_timestep);
 }
 
 void ndDynamicsUpdateCuda::InitWeights()
@@ -1175,6 +1154,8 @@ void ndDynamicsUpdateCuda::IntegrateBodies()
 	//	
 	//	CudaIntegrateBodies <<<blocks, D_THREADS_PER_BLOCK, 0, stream>>> (IntegrateBodies, sceneInfo, timestep);
 	//}
+
+	m_context->IntegrateBodies(m_timestep);
 }
 
 void ndDynamicsUpdateCuda::DetermineSleepStates()
@@ -1533,7 +1514,6 @@ void ndDynamicsUpdateCuda::Update()
 void ndDynamicsUpdateCuda::DeviceUpdate()
 {
 	D_TRACKTIME();
-
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	//BuildIsland();

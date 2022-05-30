@@ -40,6 +40,7 @@ class ndCudaContext
 
 	D_CUDA_API void Begin();
 	D_CUDA_API void End();
+	D_CUDA_API double GetGPUTime() const;
 
 	D_CUDA_API void ResizeBuffers(int size);
 	D_CUDA_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
@@ -49,8 +50,9 @@ class ndCudaContext
 
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer0();
 	D_CUDA_API ndCudaSpatialVector* GetTransformBuffer1();
-
-	D_CUDA_API double GetGPUTime() const;
+	
+	D_CUDA_API void IntegrateBodies(float timestep);
+	D_CUDA_API void IntegrateUnconstrainedBodies(float timestep);
 
 	ndCudaDevice* m_device;
 	ndCudaContextImplement* m_implement;
