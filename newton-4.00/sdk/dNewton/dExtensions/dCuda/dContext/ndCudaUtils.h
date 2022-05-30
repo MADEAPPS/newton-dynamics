@@ -54,6 +54,8 @@
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
 
+long long CudaGetTimeInMicroseconds();
 D_CUDA_API void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
+
 
 #endif

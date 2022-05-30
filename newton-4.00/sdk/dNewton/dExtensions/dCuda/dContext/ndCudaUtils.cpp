@@ -22,6 +22,7 @@
 
 #include "ndCudaStdafx.h"
 #include "ndCudaUtils.h"
+#include <chrono>
 
 static ndMemAllocCallback g_alloc = malloc;
 static ndMemFreeCallback g_free = free;
@@ -41,6 +42,15 @@ void operator delete (void* ptr)
 {
 	g_free(ptr);
 }
+
+long long CudaGetTimeInMicroseconds()
+{
+	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
+	long long  timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
+	return timeStamp;
+}
+
 
 #ifdef CUDA_TRACE
 void cudaExpandTraceMessage(const char* const fmt, ...)

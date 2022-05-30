@@ -61,7 +61,7 @@ __global__ void CudaIntegrateBodiesInternal(ndCudaSceneInfo& info, float timeste
 	{
 		ndCudaBodyProxy& body = bodyArray[index];
 		body.IntegrateVelocity(timestep);
-		printf("%f %f %f %f\n", body.m_rotation.x, body.m_rotation.y, body.m_rotation.z, body.m_rotation.w);
+		//printf("%f %f %f %f\n", body.m_rotation.x, body.m_rotation.y, body.m_rotation.z, body.m_rotation.w);
 	}
 };
 

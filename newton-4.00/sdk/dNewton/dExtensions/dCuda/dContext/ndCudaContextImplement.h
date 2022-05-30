@@ -43,7 +43,7 @@ class ndCudaContextImplement
 
 	void Begin();
 	void End();
-	float GetTimeInMilisecunds() const;
+	float GetTimeInSeconds() const;
 
 	void ResizeBuffers(int size);
 	void LoadBodyData(const ndCudaBodyProxy* const src, int size);
@@ -73,7 +73,7 @@ class ndCudaContextImplement
 	
 	cudaStream_t m_solverMemCpyStream;
 	cudaStream_t m_solverComputeStream;
-	double m_timeInMilisecunds;
+	double m_timeInSeconds;
 	unsigned m_frameCounter;
 };
 
