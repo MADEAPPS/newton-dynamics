@@ -58,7 +58,6 @@ if (NEWTON_ENABLE_CUDA_SOLVER)
 	endif()
 endif(NEWTON_ENABLE_CUDA_SOLVER)
 
-
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()

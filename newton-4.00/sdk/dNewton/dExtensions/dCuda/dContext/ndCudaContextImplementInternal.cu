@@ -342,14 +342,14 @@ __global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info)
 		{
 			cuInvalidateFrame(info, __FUNCTION__, __LINE__);
 			info.m_bodyAabbCell.m_size = cellCount + D_THREADS_PER_BLOCK;
-			info.m_bodyAabbCellScrath.m_size = cellCount + D_THREADS_PER_BLOCK;
+			info.m_bodyAabbCellScratch.m_size = cellCount + D_THREADS_PER_BLOCK;
 			printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, __FUNCTION__, __LINE__);
 			return;
 		}
 
 		ndCudaBodyAabbCell cell;
 		ndCudaBodyAabbCell* cellArray = info.m_bodyAabbCell.m_array;
-		ndCudaBodyAabbCell* cellArrayScrath = info.m_bodyAabbCellScrath.m_array;
+		ndCudaBodyAabbCell* cellArrayScratch = info.m_bodyAabbCellScratch.m_array;
 
 		cell.m_value = 0;
 		cell.m_x = unsigned(-1);
@@ -357,12 +357,12 @@ __global__ void ndCudaGenerateGrids(ndCudaSceneInfo& info)
 		cell.m_z = unsigned(-1);
 		cell.m_id = unsigned(-1);
 		cellArray[cellCount].m_value = cell.m_value;
-		cellArrayScrath[cellCount].m_value = cell.m_value;
+		cellArrayScratch[cellCount].m_value = cell.m_value;
 
 		const unsigned blocksCount = (cellCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 
 		info.m_bodyAabbCell.m_size = cellCount + 1;
-		info.m_bodyAabbCellScrath.m_size = cellCount + 1;
+		info.m_bodyAabbCellScratch.m_size = cellCount + 1;
 		ndCudaGenerateGridsInternal << <blocksCount, D_THREADS_PER_BLOCK, 0 >> > (info);
 
 		const unsigned newCapacity = ndCudaCountingSortCalculateScanPrefixSize(cellCount + 2, D_THREADS_PER_BLOCK);

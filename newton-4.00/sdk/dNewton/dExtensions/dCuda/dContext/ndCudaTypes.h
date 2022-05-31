@@ -19,15 +19,29 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_SCENE_NODE_H__
-#define __ND_CUDA_SCENE_NODE_H__
+#ifndef __ND_CUDA_TYPES_H__
+#define __ND_CUDA_TYPES_H__
 
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
+
 #include "ndCudaVector.h"
-#include "ndCudaSceneInfo.h"
-//#include "ndCudaDeviceBuffer.h"
+#include "ndCudaDeviceBuffer.h"
+
+class ndCudaBoundingBox
+{
+	public:
+	ndCudaVector m_min;
+	ndCudaVector m_max;
+};
+
+class ndCudaSpatialVector
+{
+	public:
+	ndCudaVector m_linear;
+	ndCudaVector m_angular;
+};
 
 class ndCudaSceneNode
 {
@@ -37,5 +51,54 @@ class ndCudaSceneNode
 	int m_bodyIndex;
 };
 
+
+// maybe to be removed
+#define D_AABB_GRID_CELL_BITS	10
+class ndCudaBodyAabbCell
+{
+	public:
+	union
+	{
+		struct
+		{
+			union
+			{
+				struct
+				{
+					unsigned m_x : D_AABB_GRID_CELL_BITS;
+					unsigned m_y : D_AABB_GRID_CELL_BITS;
+					unsigned m_z : D_AABB_GRID_CELL_BITS;
+				};
+				unsigned m_key;
+			};
+			unsigned m_id;
+		};
+		long long m_value;
+	};
+};
+
+
+template <class T>
+class ndCudaBuffer
+{
+	public:
+	ndCudaBuffer()
+		:m_array(nullptr)
+		,m_size(0)
+		,m_capacity(0)
+	{
+	}
+
+	ndCudaBuffer(const ndCudaDeviceBuffer<T>& src)
+		:m_array((T*)&src[0])
+		,m_size(src.GetCount())
+		,m_capacity(src.GetCapacity())
+	{
+	}
+
+	T* m_array;
+	unsigned m_size;
+	unsigned m_capacity;
+};
 
 #endif

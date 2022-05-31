@@ -35,7 +35,7 @@ ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 	,m_histogram()
 	,m_bodyBufferGpu()
 	,m_bodyAabbCell()
-	,m_bodyAabbCellScrath()
+	,m_bodyAabbCellScratch()
 	,m_transformBufferGpu0()
 	,m_transformBufferGpu1()
 	,m_transformBufferCpu()
@@ -144,7 +144,7 @@ void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 	ndCudaDeviceBuffer<unsigned>& histogramGpu = m_histogram;
 	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBufferGpu = m_bodyBufferGpu;
 	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu0 = m_bodyAabbCell;
-	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu1 = m_bodyAabbCellScrath;
+	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu1 = m_bodyAabbCellScratch;
 	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu = m_transformBufferCpu;
 	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu0 = m_transformBufferGpu0;
 	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu1 = m_transformBufferGpu1;
@@ -166,7 +166,7 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	info.m_histogram = ndCudaBuffer<unsigned>(m_histogram);
 	info.m_bodyArray = ndCudaBuffer<ndCudaBodyProxy>(m_bodyBufferGpu);
 	info.m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
-	info.m_bodyAabbCellScrath = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScrath);
+	info.m_bodyAabbCellScratch = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScratch);
 	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
 	info.m_transformBuffer1 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu1);
 	
@@ -204,9 +204,9 @@ void ndCudaContextImplement::ValidateContextBuffers()
 		{
 			sceneInfo->m_frameIsValid = 1;
 			m_bodyAabbCell.SetCount(sceneInfo->m_bodyAabbCell.m_size);
-			m_bodyAabbCellScrath.SetCount(sceneInfo->m_bodyAabbCell.m_size);
+			m_bodyAabbCellScratch.SetCount(sceneInfo->m_bodyAabbCell.m_size);
 			sceneInfo->m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
-			sceneInfo->m_bodyAabbCellScrath = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScrath);
+			sceneInfo->m_bodyAabbCellScratch = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScratch);
 		}
 
 		if (!sceneInfo->m_frameCount)
@@ -298,7 +298,7 @@ void ndCudaContextImplement::InitBodyArray()
 
 	auto GetDstBuffer = [] __device__(const ndCudaSceneInfo & info)
 	{
-		return &info.m_bodyAabbCellScrath.m_array[0].m_value;
+		return &info.m_bodyAabbCellScratch.m_array[0].m_value;
 	};
 
 	auto GetSortKey_x = [] __device__(long long value)

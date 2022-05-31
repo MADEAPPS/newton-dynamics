@@ -25,74 +25,7 @@
 #include <cuda.h>
 #include <vector_types.h>
 #include <cuda_runtime.h>
-#include "ndCudaVector.h"
-#include "ndCudaDeviceBuffer.h"
-
-class ndCudaBodyProxy;
-class ndCudaBodyAabbCell;
-
-class ndCudaSpatialVector
-{
-	public:
-	ndCudaVector m_linear;
-	ndCudaVector m_angular;
-};
-
-class ndCudaBoundingBox
-{
-	public:
-	ndCudaVector m_min;
-	ndCudaVector m_max;
-};
-
-#define D_AABB_GRID_CELL_BITS	10
-
-class ndCudaBodyAabbCell
-{
-	public:
-	union
-	{
-		struct
-		{
-			union
-			{
-				struct
-				{
-					unsigned m_x : D_AABB_GRID_CELL_BITS;
-					unsigned m_y : D_AABB_GRID_CELL_BITS;
-					unsigned m_z : D_AABB_GRID_CELL_BITS;
-				};
-				unsigned m_key;
-			};
-			unsigned m_id;
-		};
-		long long m_value;
-	};
-};
-
-
-template <class T>
-class ndCudaBuffer
-{
-	public:
-	ndCudaBuffer()
-		:m_array(nullptr)
-		,m_size(0)
-		,m_capacity(0)
-	{
-	}
-
-	ndCudaBuffer(const ndCudaDeviceBuffer<T>& src)
-		:m_array((T*)&src[0])
-		,m_size(src.GetCount())
-		,m_capacity(src.GetCapacity())
-	{
-	}
-
-	T* m_array;
-	unsigned m_size;
-	unsigned m_capacity;
-};
+#include "ndCudaTypes.h"
 
 class ndCudaSceneInfo
 {
@@ -101,8 +34,9 @@ class ndCudaSceneInfo
 		:m_worldBox()
 		,m_histogram()
 		,m_bodyArray()
+		,m_sceneGraph()
 		,m_bodyAabbCell()
-		,m_bodyAabbCellScrath()
+		,m_bodyAabbCellScratch()
 		,m_transformBuffer0()
 		,m_transformBuffer1()
 		,m_ticks(0)
@@ -115,10 +49,12 @@ class ndCudaSceneInfo
 	ndCudaBoundingBox m_worldBox;
 	ndCudaBuffer<unsigned> m_histogram;
 	ndCudaBuffer<ndCudaBodyProxy> m_bodyArray;
+	ndCudaBuffer<ndCudaSceneNode> m_sceneGraph;
 	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
-	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScrath;
+	ndCudaBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScratch;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
+	
 	
 	long long m_ticks;
 	long long m_deltaTicks;
@@ -129,7 +65,7 @@ class ndCudaSceneInfo
 
 inline void __device__ cuInvalidateFrame(ndCudaSceneInfo& info, const char* functionName, unsigned lineNumber)
 {
-	cudaDeviceSynchronize();
+	//cudaDeviceSynchronize();
 	info.m_frameIsValid = 0;
 	printf("skipping frame %d  function %s  line %d\n", info.m_frameCount, functionName, lineNumber);
 }
