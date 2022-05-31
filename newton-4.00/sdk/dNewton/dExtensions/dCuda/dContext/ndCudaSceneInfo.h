@@ -55,7 +55,6 @@ class ndCudaSceneInfo
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer0;
 	ndCudaBuffer<ndCudaSpatialVector> m_transformBuffer1;
 	
-	
 	long long m_ticks;
 	long long m_deltaTicks;
 	unsigned m_frameCount;

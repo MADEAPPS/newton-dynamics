@@ -33,11 +33,12 @@ ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 	,m_sceneInfoGpu(nullptr)
 	,m_sceneInfoCpu(nullptr)
 	,m_histogram()
-	,m_bodyBufferGpu()
+	,m_bodyBuffer()
+	,m_sceneGraph()
 	,m_bodyAabbCell()
 	,m_bodyAabbCellScratch()
-	,m_transformBufferGpu0()
-	,m_transformBufferGpu1()
+	,m_transformBuffer0()
+	,m_transformBuffer1()
 	,m_transformBufferCpu()
 	,m_solverMemCpyStream(0)
 	,m_solverComputeStream(0)
@@ -116,7 +117,7 @@ void ndCudaContextImplement::Begin()
 	if (frameCounter)
 	{
 		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu;
-		ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBufferGpu1 : m_transformBufferGpu0;
+		ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBuffer1 : m_transformBuffer0;
 		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
 	}
 
@@ -141,20 +142,23 @@ ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer()
 
 void ndCudaContextImplement::ResizeBuffers(int cpuBodyCount)
 {
-	ndCudaDeviceBuffer<unsigned>& histogramGpu = m_histogram;
-	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBufferGpu = m_bodyBufferGpu;
-	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu0 = m_bodyAabbCell;
-	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCellGpu1 = m_bodyAabbCellScratch;
-	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu = m_transformBufferCpu;
-	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu0 = m_transformBufferGpu0;
-	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBufferGpu1 = m_transformBufferGpu1;
+	ndCudaDeviceBuffer<unsigned>& histogram = m_histogram;
+	ndCudaDeviceBuffer<ndCudaBodyProxy>& bodyBuffer = m_bodyBuffer;
+	ndCudaDeviceBuffer<ndCudaSceneNode>& sceneGraph = m_sceneGraph;
+	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCell0 = m_bodyAabbCell;
+	ndCudaDeviceBuffer<ndCudaBodyAabbCell>& bodyAabbCell1 = m_bodyAabbCellScratch;
+	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBuffer0 = m_transformBuffer0;
+	ndCudaDeviceBuffer<ndCudaSpatialVector>& transformBuffer1 = m_transformBuffer1;
 	
-	histogramGpu.SetCount(cpuBodyCount);
-	bodyBufferGpu.SetCount(cpuBodyCount);
-	bodyAabbCellGpu0.SetCount(cpuBodyCount);
-	bodyAabbCellGpu1.SetCount(cpuBodyCount);
-	transformBufferGpu0.SetCount(cpuBodyCount);
-	transformBufferGpu1.SetCount(cpuBodyCount);
+	histogram.SetCount(cpuBodyCount);
+	bodyBuffer.SetCount(cpuBodyCount);
+	sceneGraph.SetCount(cpuBodyCount * 2);
+	bodyAabbCell0.SetCount(cpuBodyCount);
+	bodyAabbCell1.SetCount(cpuBodyCount);
+	transformBuffer0.SetCount(cpuBodyCount);
+	transformBuffer1.SetCount(cpuBodyCount);
+
+	ndCudaHostBuffer<ndCudaSpatialVector>& transformBufferCpu = m_transformBufferCpu;
 	transformBufferCpu.SetCount(cpuBodyCount);
 }
 
@@ -164,18 +168,19 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 		
 	ndCudaSceneInfo info;
 	info.m_histogram = ndCudaBuffer<unsigned>(m_histogram);
-	info.m_bodyArray = ndCudaBuffer<ndCudaBodyProxy>(m_bodyBufferGpu);
+	info.m_bodyArray = ndCudaBuffer<ndCudaBodyProxy>(m_bodyBuffer);
+	info.m_sceneGraph = ndCudaBuffer<ndCudaSceneNode>(m_sceneGraph);
 	info.m_bodyAabbCell = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCell);
 	info.m_bodyAabbCellScratch = ndCudaBuffer<ndCudaBodyAabbCell>(m_bodyAabbCellScratch);
-	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu0);
-	info.m_transformBuffer1 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBufferGpu1);
+	info.m_transformBuffer0 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBuffer0);
+	info.m_transformBuffer1 = ndCudaBuffer<ndCudaSpatialVector>(m_transformBuffer1);
 	
 	*m_sceneInfoCpu = info;
 	cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, &info, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
 	dAssert(cudaStatus == cudaSuccess);
 
 	const int blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-	m_bodyBufferGpu.ReadData(src, cpuBodyCount);
+	m_bodyBuffer.ReadData(src, cpuBodyCount);
 	ndCudaInitTransforms << <blocksCount, D_THREADS_PER_BLOCK, 0, m_solverComputeStream >> > (*m_sceneInfoCpu);
 	ndCudaGenerateSceneGraph << <1, 1, 0, m_solverComputeStream >> > (*m_sceneInfoCpu);
 	
