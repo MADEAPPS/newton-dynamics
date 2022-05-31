@@ -93,6 +93,11 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 	dAssert(0);
 }
 
+void ndWorldSceneCuda::BalanceScene()
+{
+
+}
+
 void ndWorldSceneCuda::CalculateContacts()
 {
 	//ndWorldScene::CalculateContacts();

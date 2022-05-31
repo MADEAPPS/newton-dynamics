@@ -36,6 +36,7 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 	virtual bool IsValid() const;
 	virtual double GetGPUTime() const;
 
+	virtual void BalanceScene();
 	virtual void InitBodyArray();
 	virtual void UpdateBodyList();
 	virtual void CalculateContacts();
