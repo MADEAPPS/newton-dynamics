@@ -27,7 +27,7 @@
 #include <cuda_runtime.h>
 #include "ndCudaSceneInfo.h"
 
-#define D_CUDA_PROFILE_KERNELS
+//#define D_CUDA_PROFILE_KERNELS
 
 class ndCudaProfileTime
 {
@@ -57,7 +57,7 @@ class ndCudaProfileTime
 #ifdef D_CUDA_PROFILE_KERNELS
 #define ND_CUDA_PROFILE ndCudaProfileTime __timer__(info);
 #else
-#define ND_CUDA_PROFILE()
+#define ND_CUDA_PROFILE ;
 #endif
 
 #endif
