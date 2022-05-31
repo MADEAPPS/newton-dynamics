@@ -35,13 +35,19 @@ class ndCudaProfileTime
 	inline __device__ ndCudaProfileTime(ndCudaSceneInfo& info)
 		:m_info(&info)
 	{
-		m_savedTime = clock64();
+		if ((blockIdx.x == 0) && (threadIdx.x == 0))
+		{
+			m_savedTime = clock64();
+		}
 	}
 
 	inline __device__ ~ndCudaProfileTime()
 	{
-		long long deltaTime = clock64() - m_savedTime;
-		m_info->m_deltaTicks += deltaTime;
+		if ((blockIdx.x == 0) && (threadIdx.x == 0))
+		{
+			long long deltaTime = clock64() - m_savedTime;
+			m_info->m_deltaTicks += deltaTime;
+		}
 	}
 
 	ndCudaSceneInfo* m_info;
