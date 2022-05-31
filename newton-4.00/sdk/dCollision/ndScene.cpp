@@ -715,8 +715,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
 				{
 					ndSceneNode* const node = nodePtr->GetInfo();
-					ndSceneNode* const leftNode = node->GetLeft();
 
+					ndSceneNode* const leftNode = node->GetLeft();
 					ndBodyKinematic* const leftBody = leftNode->GetBody();
 					if (leftBody) 
 					{
