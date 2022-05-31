@@ -27,6 +27,7 @@
 #include <cuda_runtime.h>
 #include "ndCudaTypes.h"
 
+
 class ndCudaSceneInfo
 {
 	public:

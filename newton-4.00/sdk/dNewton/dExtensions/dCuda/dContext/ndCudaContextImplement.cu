@@ -99,9 +99,9 @@ void ndCudaContextImplement::SwapBuffers()
 
 void ndCudaContextImplement::Begin()
 {
-	long long t0 = CudaGetTimeInMicroseconds();
+	//long long t0 = CudaGetTimeInMicroseconds();
 	cudaDeviceSynchronize();
-	long long t1 = CudaGetTimeInMicroseconds();
+	//long long t1 = CudaGetTimeInMicroseconds();
 	// get the scene info from the update	
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
@@ -121,9 +121,7 @@ void ndCudaContextImplement::Begin()
 		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
 	}
 
-	//m_timeInSeconds = (cpuInfo->m_deltaTicks / m_device->m_frequency);
-	m_timeInSeconds = (t1 - t0) * 1.0e-6f;
-
+	m_timeInSeconds = (cpuInfo->m_deltaTicks / m_device->m_frequency);
 	ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
 }
 

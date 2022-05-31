@@ -23,6 +23,7 @@
 #include "ndCudaUtils.h"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
+#include "ndCudaProfileTime.h"
 #include "ndCudaPrefixScan.cuh"
 #include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
@@ -36,21 +37,21 @@ static ndCudaBoundingBox __device__ g_boundingBoxBuffer[1024 * 1024 / D_THREADS_
 
 __global__ void ndCudaBeginFrameInternal(ndCudaSceneInfo& info)
 {
-	long long t0 = clock64();
-	info.m_ticks = t0;
+	info.m_ticks = 0;
+	ND_CUDA_PROFILE;
 }
 
 __global__ void ndCudaEndFrameInternal(ndCudaSceneInfo& info)
 {
-	
-	long long t0 = info.m_ticks;
-	long long t1 = clock64();
-	info.m_deltaTicks = t1 - t0;
-	//printf("t1=%lld  t1=%lld ticks=%lld\n", t1, t0, info.m_deltaTicks);
+	//long long t0 = info.m_ticks;
+	//long long t1 = clock64();
+	//info.m_deltaTicks = t1 - t0;
+	info.m_deltaTicks = info.m_ticks;
 }
 
 __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 {
+	ND_CUDA_PROFILE;
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 
 	const unsigned threadId = threadIdx.x;
@@ -117,6 +118,7 @@ __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 
 __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 {
+	ND_CUDA_PROFILE;
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
 	const unsigned threadId = threadIdx.x;
 	const unsigned boxCount = ((info.m_bodyArray.m_size - 1) + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
@@ -160,8 +162,9 @@ __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info)
 	}
 };
 
-__global__ void ndCudaGenerateGridsInternal(const ndCudaSceneInfo& info)
+__global__ void ndCudaGenerateGridsInternal(ndCudaSceneInfo& info)
 {
+	ND_CUDA_PROFILE;
 	const unsigned threadId = threadIdx.x;
 	const unsigned index = threadId + blockDim.x * blockIdx.x;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
@@ -206,6 +209,7 @@ __global__ void ndCudaGenerateGridsInternal(const ndCudaSceneInfo& info)
 
 __global__ void ndCudaCountAabbInternal(ndCudaSceneInfo& info)
 {
+	ND_CUDA_PROFILE;
 	const unsigned blockId = blockIdx.x;
 	const unsigned bodyCount = info.m_bodyArray.m_size - 1;
 	const unsigned threadId = threadIdx.x;
@@ -233,6 +237,7 @@ __global__ void ndCudaCountAabbInternal(ndCudaSceneInfo& info)
 //auto CalculateBodyPairsCount = [] __device__(cuSceneInfo & info)
 __global__ void ndCudaCalculateBodyPairsCountInternal(ndCudaSceneInfo& info)
 {
+	ND_CUDA_PROFILE;
 	//__shared__  unsigned cacheBuffer[D_THREADS_PER_BLOCK / 2 + D_THREADS_PER_BLOCK];
 	//
 	//const unsigned blockId = blockIdx.x;
@@ -280,8 +285,9 @@ __global__ void ndCudaCalculateBodyPairsCountInternal(ndCudaSceneInfo& info)
 };
 
 
-__global__ void ndCudaGetBodyTransformsInternal (const ndCudaSceneInfo & info)
+__global__ void ndCudaGetBodyTransformsInternal (ndCudaSceneInfo & info)
 {
+	ND_CUDA_PROFILE;
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	if (index < (info.m_bodyArray.m_size - 1))
 	{
@@ -292,7 +298,6 @@ __global__ void ndCudaGetBodyTransformsInternal (const ndCudaSceneInfo & info)
 		dst[index].m_angular = src[index].m_rotation;
 	}
 };
-
 
 
 __global__ void ndCudaBeginFrame(ndCudaSceneInfo& info)

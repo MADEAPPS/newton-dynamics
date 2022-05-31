@@ -23,6 +23,7 @@
 #include "ndCudaUtils.h"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
+#include "ndCudaProfileTime.h"
 #include "ndCudaPrefixScan.cuh"
 #include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
@@ -30,6 +31,7 @@
 
 __global__ void CudaIntegrateUnconstrainedBodiesInternal(ndCudaSceneInfo& info, float timestep)
 {
+	ND_CUDA_PROFILE;
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	const unsigned maxCount = info.m_bodyArray.m_size - 1;
 	ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
@@ -42,18 +44,9 @@ __global__ void CudaIntegrateUnconstrainedBodiesInternal(ndCudaSceneInfo& info, 
 	}
 }
 
-__global__ void CudaIntegrateUnconstrainedBodies(ndCudaSceneInfo& info, float timestep)
-{
-	const unsigned threads = info.m_bodyArray.m_size - 1;
-	if (info.m_frameIsValid && threads)
-	{
-		const unsigned blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
-		CudaIntegrateUnconstrainedBodiesInternal << <blocks, D_THREADS_PER_BLOCK, 0 >> > (info, timestep);
-	}
-}
-
 __global__ void CudaIntegrateBodiesInternal(ndCudaSceneInfo& info, float timestep)
 {
+	ND_CUDA_PROFILE;
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	const unsigned maxCount = info.m_bodyArray.m_size - 1;
 	ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
@@ -64,6 +57,17 @@ __global__ void CudaIntegrateBodiesInternal(ndCudaSceneInfo& info, float timeste
 		//printf("%f %f %f %f\n", body.m_rotation.x, body.m_rotation.y, body.m_rotation.z, body.m_rotation.w);
 	}
 };
+
+__global__ void CudaIntegrateUnconstrainedBodies(ndCudaSceneInfo& info, float timestep)
+{
+	const unsigned threads = info.m_bodyArray.m_size - 1;
+	if (info.m_frameIsValid && threads)
+	{
+		const unsigned blocks = (threads + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
+		CudaIntegrateUnconstrainedBodiesInternal << <blocks, D_THREADS_PER_BLOCK, 0 >> > (info, timestep);
+	}
+}
+
 
 __global__ void CudaIntegrateBodies(ndCudaSceneInfo& info, float timestep)
 {
