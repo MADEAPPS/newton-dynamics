@@ -35,6 +35,8 @@
 #include "ndJointBilateralConstraint.h"
 #include "ndShapeStaticProceduralMesh.h"
 
+//#define D_NEW_SCENE
+
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			ndFloat32 (0.2f)
 #define D_CONTACT_TRANSLATION_ERROR	ndFloat32 (1.0e-3f)
@@ -687,6 +689,83 @@ ndFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const roo
 	return fitness.m_currentCost;
 }
 
+#ifdef D_NEW_SCENE
+
+ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode)
+{
+	dAssert(firstBox >= 0);
+	dAssert(lastBox >= 0);
+
+	if (lastBox == firstBox)
+	{
+		return leafArray[firstBox];
+	}
+	else
+	{
+		ndSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
+
+		ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
+		parent->m_parent = nullptr;
+		*nextNode = (*nextNode)->GetNext();
+
+		parent->SetAabb(info.m_p0, info.m_p1);
+
+		parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
+		parent->m_left->m_parent = parent;
+
+		parent->m_right = BuildTopDown(leafArray, firstBox + info.m_axis, lastBox, nextNode);
+		parent->m_right->m_parent = parent;
+		return parent;
+	}
+}
+
+ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode)
+{
+	if (lastBox == firstBox)
+	{
+		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
+	}
+
+	ndInt32 midPoint = -1;
+	const ndFloat32 scale = ndFloat32(1.0f / 64.0f);
+	const ndSceneNode* const node0 = leafArray[firstBox];
+	const ndInt32 count = lastBox - firstBox;
+	ndFloat32 area0 = scale * node0->m_surfaceArea;
+	for (ndInt32 i = 1; i <= count; ++i)
+	{
+		const ndSceneNode* const node1 = leafArray[firstBox + i];
+		ndFloat32 area1 = node1->m_surfaceArea;
+		if (area0 > area1)
+		{
+			midPoint = i - 1;
+			break;
+		}
+	}
+
+	if (midPoint == -1)
+	{
+		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
+	}
+	else
+	{
+		ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
+
+		parent->m_parent = nullptr;
+		*nextNode = (*nextNode)->GetNext();
+
+		parent->m_right = BuildTopDown(leafArray, firstBox, firstBox + midPoint, nextNode);
+		parent->m_right->m_parent = parent;
+
+		parent->m_left = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
+		parent->m_left->m_parent = parent;
+
+		ndVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
+		ndVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
+		parent->SetAabb(minP, maxP);
+
+		return parent;
+	}
+}
 void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root)
 {
 	if (*root) 
@@ -710,6 +789,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 			{
 				m_scratchBuffer.SetCount((fitness.GetCount() * 2 + 16) * sizeof (ndSceneNode*));
 				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
+				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
 				ndInt32 leafNodesCount = 0;
 				for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
@@ -721,8 +801,9 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 					if (leftBody) 
 					{
 						node->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
-						leafArray[leafNodesCount] = leftNode;
+						leafArrayUnsorted[leafNodesCount] = leftNode;
 						leafNodesCount++;
+						dAssert(leafNodesCount <= m_bodyList.GetCount());
 					}
 
 					ndSceneNode* const rightNode = node->GetRight();
@@ -730,31 +811,38 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 					if (rightBody) 
 					{
 						rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
-						leafArray[leafNodesCount] = rightNode;
+						leafArrayUnsorted[leafNodesCount] = rightNode;
 						leafNodesCount++;
+						dAssert(leafNodesCount <= m_bodyList.GetCount());
 					}
 				}
 				
 				ndFitnessList::ndNode* nodePtr = fitness.GetFirst();
-				class CompareNodes
+
+				class ndEvaluateKey
 				{
 					public:
-					ndInt32 Compare(const ndSceneNode* const elementA, const ndSceneNode* const elementB, void* const) const
+					ndEvaluateKey(void* const)
 					{
-						ndFloat32 areaA = elementA->m_surfaceArea;
-						ndFloat32 areaB = elementB->m_surfaceArea;
-						if (areaA < areaB)
-						{
-							return 1;
-						}
-						if (areaA > areaB)
-						{
-							return -1;
-						}
-						return 0;
+						m_factor = ndFloat32(1.0f) / ndLog(36.0f);
 					}
+
+					ndUnsigned32 GetKey(const ndSceneNode* const element) const
+					{
+						ndFloat32 areaA = element->m_surfaceArea;
+						ndFloat32 compressedValue = m_factor * ndLog(areaA);
+						dAssert(compressedValue <= 255);
+						ndInt32 key = ndUnsigned32 (ndFloor (compressedValue));
+						key = 255 - dClamp(key, 0, 255);
+						return key;
+					}
+
+					ndFloat32 m_factor;
 				};
-				ndSort<ndSceneNode*, CompareNodes>(leafArray, leafNodesCount);
+
+				//leafArrayUnsorted[2]->m_surfaceArea = 1000.0f;
+				
+				ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount);
 				
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
 				dAssert(!(*root)->m_parent);
@@ -769,22 +857,18 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 	}
 }
 
-void ndScene::BalanceScene()
-{
-	D_TRACKTIME();
-	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
-}
+#else
 
 ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode)
 {
 	dAssert(firstBox >= 0);
 	dAssert(lastBox >= 0);
 
-	if (lastBox == firstBox) 
+	if (lastBox == firstBox)
 	{
 		return leafArray[firstBox];
 	}
-	else 
+	else
 	{
 		ndSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
 
@@ -805,7 +889,7 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 
 ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode)
 {
-	if (lastBox == firstBox) 
+	if (lastBox == firstBox)
 	{
 		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
 	}
@@ -815,22 +899,22 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 fir
 	const ndSceneNode* const node0 = leafArray[firstBox];
 	const ndInt32 count = lastBox - firstBox;
 	ndFloat32 area0 = scale * node0->m_surfaceArea;
-	for (ndInt32 i = 1; i <= count; ++i) 
+	for (ndInt32 i = 1; i <= count; ++i)
 	{
 		const ndSceneNode* const node1 = leafArray[firstBox + i];
 		ndFloat32 area1 = node1->m_surfaceArea;
-		if (area0 > area1) 
+		if (area0 > area1)
 		{
 			midPoint = i - 1;
 			break;
 		}
 	}
 
-	if (midPoint == -1) 
+	if (midPoint == -1)
 	{
 		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
 	}
-	else 
+	else
 	{
 		ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
 
@@ -849,6 +933,97 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 fir
 
 		return parent;
 	}
+}
+
+void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root)
+{
+	if (*root)
+	{
+		D_TRACKTIME();
+
+		m_forceBalanceSceneCounter++;
+		if (m_forceBalanceSceneCounter > 256)
+		{
+			m_forceBalanceScene = 1;
+		}
+
+		ndSceneNode* const parent = (*root)->m_parent;
+
+		(*root)->m_parent = nullptr;
+		ndFloat64 entropy = ReduceEntropy(fitness, root);
+
+		if (m_forceBalanceScene || (entropy > (oldEntropy * ndFloat32(1.5f))) || (entropy < (oldEntropy * ndFloat32(0.75f))))
+		{
+			if (fitness.GetFirst())
+			{
+				m_scratchBuffer.SetCount((fitness.GetCount() * 2 + 16) * sizeof(ndSceneNode*));
+				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
+
+				ndInt32 leafNodesCount = 0;
+				for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext())
+				{
+					ndSceneNode* const node = nodePtr->GetInfo();
+
+					ndSceneNode* const leftNode = node->GetLeft();
+					ndBodyKinematic* const leftBody = leftNode->GetBody();
+					if (leftBody)
+					{
+						node->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
+						leafArray[leafNodesCount] = leftNode;
+						leafNodesCount++;
+						dAssert(leafNodesCount <= m_bodyList.GetCount());
+					}
+
+					ndSceneNode* const rightNode = node->GetRight();
+					ndBodyKinematic* const rightBody = rightNode->GetBody();
+					if (rightBody)
+					{
+						rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
+						leafArray[leafNodesCount] = rightNode;
+						leafNodesCount++;
+						dAssert(leafNodesCount <= m_bodyList.GetCount());
+					}
+				}
+
+				ndFitnessList::ndNode* nodePtr = fitness.GetFirst();
+				class CompareNodes
+				{
+					public:
+					ndInt32 Compare(const ndSceneNode* const elementA, const ndSceneNode* const elementB, void* const) const
+					{
+						ndFloat32 areaA = elementA->m_surfaceArea;
+						ndFloat32 areaB = elementB->m_surfaceArea;
+						if (areaA < areaB)
+						{
+							return 1;
+						}
+						if (areaA > areaB)
+						{
+							return -1;
+						}
+						return 0;
+					}
+				};
+				ndSort<ndSceneNode*, CompareNodes>(leafArray, leafNodesCount);
+
+				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
+				dAssert(!(*root)->m_parent);
+				entropy = fitness.TotalCost();
+				fitness.m_currentCost = entropy;
+			}
+			oldEntropy = entropy;
+			m_forceBalanceScene = 0;
+			m_forceBalanceSceneCounter = 0;
+		}
+		(*root)->m_parent = parent;
+	}
+}
+#endif
+
+void ndScene::BalanceScene()
+{
+	D_TRACKTIME();
+	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
 void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body)
