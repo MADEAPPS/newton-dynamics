@@ -563,9 +563,37 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 	mesh->Release();
 }
 
+//static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+//{
+//	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+//	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+//
+//	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
+//	matrix.m_posit = origin;
+//	matrix.m_posit.m_w = 1.0f;
+//
+//	ndPhysicsWorld* const world = scene->GetWorld();
+//
+//	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+//	matrix.m_posit.m_y = floor.m_y;
+//
+//	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+//	{
+//		// spring damper slider with limits
+//		matrix.m_posit.m_y += 2.0f;
+//		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+//		ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
+//		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
+//		joint->SetLimitsPosit(-1.0f, 1.0f);
+//		world->AddJoint(joint);
+//	}
+//
+//	mesh->Release();
+//}
+
 static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
-	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.1f/*0.25f*/));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
@@ -582,10 +610,12 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 		// spring damper slider with limits
 		matrix.m_posit.m_y += 2.0f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
-		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
-		joint->SetLimitsPosit(-1.0f, 1.0f);
-		world->AddJoint(joint);
+		body->SetAngularDamping(ndVector(ndFloat32(0.5f)));
+
+		//ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
+		//joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
+		//joint->SetLimitsPosit(-1.0f, 1.0f);
+		//world->AddJoint(joint);
 	}
 
 	mesh->Release();
@@ -773,8 +803,8 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	//BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
-	//BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
-	//
+	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
+	
 	//BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
 	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
