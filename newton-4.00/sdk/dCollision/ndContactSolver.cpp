@@ -2593,7 +2593,7 @@ dTrace(("%d y0=%f y1=%f ", xxxx, m_closestPoint0.m_y, m_closestPoint1.m_y));
 		for (ndInt32 i = count - 1; i >= 0; i--)
 		{
 			contactOut[i].m_point += offset;
-			dTrace(("c(%f %f %f) depth=%f  ", contactOut[i].m_point.m_x, contactOut[i].m_point.m_y, contactOut[i].m_point.m_z, contactOut[i].m_penetration));
+			dTrace(("c=%f depth=%f  ", contactOut[i].m_point.m_y, contactOut[i].m_penetration));
 		}
 	}
 dTrace(("\n"));
