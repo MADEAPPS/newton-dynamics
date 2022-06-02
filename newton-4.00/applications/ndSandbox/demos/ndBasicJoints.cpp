@@ -593,7 +593,7 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 
 static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
-	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.1f/*0.25f*/));
+	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.2f/*0.25f*/));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
@@ -811,5 +811,9 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
+
+origin.m_z += 12.0f;
+origin.m_x += 14.0f;
+origin.m_y -= 4.0f;
 	scene->SetCameraMatrix(rot, origin);
 }
