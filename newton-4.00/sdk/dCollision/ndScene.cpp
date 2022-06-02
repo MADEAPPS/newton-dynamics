@@ -831,8 +831,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						ndFloat32 compressedValue = m_factor * ndLog(areaA);
 						dAssert(compressedValue <= 255);
 						ndInt32 key = ndUnsigned32 (ndFloor (compressedValue));
-						//key = 255 - dClamp(key, 0, 255);
-						key = dClamp(key, 0, 255);
+						key = 255 - dClamp(key, 0, 255);
 						return key;
 					}
 
@@ -843,7 +842,36 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				ndUnsigned32 prefixScan[(1 << 8) + 1];
 				ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount, prefixScan, nullptr);
 				
-				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
+				class ndItemRun
+				{
+					public:
+					ndUnsigned32 m_start;
+					ndUnsigned32 m_count;
+				};
+
+				ndInt32 pairsCount = 0;
+				ndItemRun pairs[(1 << 8)];
+				for (ndInt32 i = 0; i < (1 << 8); ++i)
+				{
+					ndUnsigned32 count = prefixScan[i + 1] - prefixScan[i];
+					if (count)
+					{
+						pairs[pairsCount].m_count = count;
+						pairs[pairsCount].m_start = prefixScan[i];
+						pairsCount++;
+					}
+				}
+
+				dAssert(pairsCount);
+				if (pairsCount == 1)
+				{
+					*root = BuildTopDown(leafArray, 0, 0, &nodePtr);
+				}
+				else
+				{
+					*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
+				}
+				
 				dAssert(!(*root)->m_parent);
 				entropy = fitness.TotalCost();
 				fitness.m_currentCost = entropy;

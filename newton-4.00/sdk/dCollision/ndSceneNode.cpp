@@ -24,7 +24,6 @@
 #include "ndBodyKinematic.h"
 #include "ndSceneNode.h"
 
-//#define D_AABB_QUANTIZATION		ndFloat32 (8.0f)
 #define D_AABB_QUANTIZATION		ndFloat32 (4.0f)
 #define D_AABB_INV_QUANTIZATION	(ndFloat32 (1.0f) / D_AABB_QUANTIZATION)
 
