@@ -2868,22 +2868,22 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 		}
 	};
 
-	ndCountingSort<ndGridHash, ndKey_xlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_xlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer, nullptr, nullptr);
 	if (m_upperDigitsIsValid.m_x)
 	{
-		ndCountingSort<ndGridHash, ndKey_xhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_xhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer, nullptr, nullptr);
 	}
 
-	ndCountingSort<ndGridHash, ndKey_ylow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_ylow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer, nullptr, nullptr);
 	if (m_upperDigitsIsValid.m_y)
 	{
-		ndCountingSort<ndGridHash, ndKey_yhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_yhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer, nullptr, nullptr);
 	}
 
-	ndCountingSort<ndGridHash, ndKey_zlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_zlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer, nullptr, nullptr);
 	if (m_upperDigitsIsValid.m_z)
 	{
-		ndCountingSort<ndGridHash, ndKey_zhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_zhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer, nullptr, nullptr);
 	}
 }
 
@@ -2970,22 +2970,22 @@ void ndIsoSurface::ndImplementation::RemoveDuplicates(const ndArray<ndVector>& p
 	}
 	m_upperDigitsIsValid = upperDigits;
 
-	ndCountingSort<ndGridHash, ndKey_xlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+	ndCountingSort<ndGridHash, ndKey_xlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap, nullptr, nullptr);
 	if (m_upperDigitsIsValid.m_x)
 	{
-		ndCountingSort<ndGridHash, ndKey_xhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+		ndCountingSort<ndGridHash, ndKey_xhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap, nullptr, nullptr);
 	}
 
-	ndCountingSort<ndGridHash, ndKey_ylow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+	ndCountingSort<ndGridHash, ndKey_ylow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap, nullptr, nullptr);
 	if (m_upperDigitsIsValid.m_y)
 	{
-		ndCountingSort<ndGridHash, ndKey_yhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+		ndCountingSort<ndGridHash, ndKey_yhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap, nullptr, nullptr);
 	}
 
-	ndCountingSort<ndGridHash, ndKey_zlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+	ndCountingSort<ndGridHash, ndKey_zlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap, nullptr, nullptr);
 	if (m_upperDigitsIsValid.m_z)
 	{
-		ndCountingSort<ndGridHash, ndKey_zhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+		ndCountingSort<ndGridHash, ndKey_zhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap, nullptr, nullptr);
 	}
 
 	ndInt32 gridCount = 0;
@@ -3217,36 +3217,36 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	}
 
 	const ndInt32 xDimSize = me->m_volumeSizeX * D_LOW_RES_FRACTION;
-	ndCountingSort<ndVector, ndKey_lowX, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowX, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	if (xDimSize >= 256)
 	{
-		ndCountingSort<ndVector, ndKey_midleX, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_midleX, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	}
 	if (xDimSize >= 256 * 256)
 	{
-		ndCountingSort<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	} 
 	
 	const ndInt32 yDimSize = me->m_volumeSizeY * D_LOW_RES_FRACTION;
-	ndCountingSort<ndVector, ndKey_lowY, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowY, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	if (yDimSize >= 256)
 	{
-		ndCountingSort<ndVector, ndKey_midleY, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_midleY, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	}
 	if (yDimSize >= 256 * 256)
 	{
-		ndCountingSort<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	}
 	
 	const ndInt32 zDimSize = me->m_volumeSizeZ * D_LOW_RES_FRACTION;
-	ndCountingSort<ndVector, ndKey_lowZ, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowZ, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	if (zDimSize >= 256)
 	{
-		ndCountingSort<ndVector, ndKey_midleZ, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_midleZ, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	}
 	if (zDimSize >= 256 * 256)
 	{
-		ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer, nullptr, nullptr);
 	}
 	
 	const ndInt32 count = m_triangles.GetCount();

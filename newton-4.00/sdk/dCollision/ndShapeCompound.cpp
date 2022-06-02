@@ -1010,7 +1010,7 @@ void ndShapeCompound::EndAddRemove()
 						return 0;
 					}
 				};
-				ndSort<ndNodeBase*, CompareNodes>(leafArray, leafNodesCount);
+				ndSort<ndNodeBase*, CompareNodes>(leafArray, leafNodesCount, nullptr);
 
 				ndInt32 rootIndex = 0;
 				m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, nodeArray, rootIndex);

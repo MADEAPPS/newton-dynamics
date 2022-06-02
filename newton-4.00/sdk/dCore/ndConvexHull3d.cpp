@@ -463,7 +463,7 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, ndIn
 		}
 	};
 
-	ndSort<ndConvexHull3dVertex, CompareVertex>(points, count);
+	ndSort<ndConvexHull3dVertex, CompareVertex>(points, count, nullptr);
 
 	ndInt32 indexCount = 0;
 	CompareVertex compareVetex;

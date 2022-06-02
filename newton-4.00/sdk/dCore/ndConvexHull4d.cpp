@@ -664,7 +664,7 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 			return 0;
 		}
 	};
-	ndSort<ndConvexHull4dVector, CompareVertex>(points, count);
+	ndSort<ndConvexHull4dVector, CompareVertex>(points, count, nullptr);
 
 	ndInt32 indexCount = 0;
 	CompareVertex compareVetex;

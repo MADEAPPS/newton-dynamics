@@ -76,7 +76,7 @@ ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 			return 0;
 		}
 	};
-	ndSort<ndVector, CompareVertex>(vertexCloud2d, count);
+	ndSort<ndVector, CompareVertex>(vertexCloud2d, count, nullptr);
 
 	// Build lower hull
 	ndInt32 k = 0;

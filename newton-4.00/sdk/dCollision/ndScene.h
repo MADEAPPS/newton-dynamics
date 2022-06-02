@@ -39,6 +39,8 @@ class ndConvexCastNotify;
 class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
 
+//#define D_NEW_SCENE
+
 D_MSV_NEWTON_ALIGN_32
 class ndSceneTreeNotiFy : public ndClassAlloc
 {

@@ -28,7 +28,7 @@
 #include "ndThreadPool.h"
 
 template <class T, class dCompareKey>
-void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
+void ndSort(T* const array, ndInt32 elements, void* const context)
 {
 	//D_TRACKTIME();
 	const ndInt32 batchSize = 8;
@@ -131,7 +131,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, void* const context = nullptr)
+void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context)
 {
 	//D_TRACKTIME();
 	dAssert(keyBitSize > 0);
@@ -158,6 +158,14 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, void* 
 		sum += partialSum;
 	}
 
+	if (prefixScanOut)
+	{ 
+		for (ndInt32 i = 0; i < ((1 << keyBitSize) + 1); ++i)
+		{
+			prefixScanOut[i] = scans[i];
+		}
+	}
+
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const T& entry = array[i];
@@ -179,17 +187,17 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, void* 
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBuffer, ndInt32 size, void* const context = nullptr)
+void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut,  void* const context)
 {
 	D_TRACKTIME();
 	ndEvaluateKey evaluator(context);
 	const ndInt32 threadCount = threadPool.GetThreadCount();
-	ndInt32* const scans = dAlloca(ndInt32, threadCount * (1 << keyBitSize) + 1);
+	ndUnsigned32* const scans = dAlloca(ndUnsigned32, threadCount * ((1 << keyBitSize) + 1));
 
 	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		ndInt32* const scan = &scans[threadIndex * (1 << keyBitSize)];
+		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
 
 		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 		{
@@ -210,7 +218,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 	auto ndSortArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		ndInt32* const scan = &scans[threadIndex * (1 << keyBitSize)];
+		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
 
 		ndStartEnd startEnd(size, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -247,6 +255,16 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		dAssert(0);
 	}
 
+	if (prefixScanOut)
+	{
+		const ndUnsigned32* const srcPrefix = &scans[(threadCount- 1) * (1 << keyBitSize)];
+		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
+		{
+			prefixScanOut[i] = srcPrefix[i];
+		}
+		prefixScanOut[1 << keyBitSize] = size;
+	}
+
 	threadPool.ParallelExecute(ndSortArray);
 
 //#ifdef _DEBUG
@@ -261,18 +279,18 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
+void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* const prefixScanOut, void* const context)
 {
 	scratchBuffer.SetCount(array.GetCount());
-	ndCountingSort<T, ndEvaluateKey, keyBitSize>(threadPool, &array[0], &scratchBuffer[0], array.GetCount(), context);
+	ndCountingSort<T, ndEvaluateKey, keyBitSize>(threadPool, &array[0], &scratchBuffer[0], array.GetCount(), prefixScanOut, context);
 	array.Swap(scratchBuffer);
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
+void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* const prefixScanOut, void* const context)
 {
 	scratchBuffer.SetCount(array.GetCount());
-	ndCountingSort<T, ndEvaluateKey, keyBitSize>(&array[0], &scratchBuffer[0], array.GetCount(), context);
+	ndCountingSort<T, ndEvaluateKey, keyBitSize>(&array[0], &scratchBuffer[0], array.GetCount(), prefixScanOut, context);
 	array.Swap(scratchBuffer);
 }
 

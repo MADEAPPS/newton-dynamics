@@ -156,7 +156,7 @@ void ndDelaunayTetrahedralization::SortVertexArray ()
 			return 0;
 		}
 	};
-	ndSort<ndConvexHull4dVector, CompareVertex>(points, m_count);
+	ndSort<ndConvexHull4dVector, CompareVertex>(points, m_count, nullptr);
 }
 
 void ndDelaunayTetrahedralization::RemoveUpperHull ()

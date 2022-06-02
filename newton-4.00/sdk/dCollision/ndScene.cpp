@@ -35,8 +35,6 @@
 #include "ndJointBilateralConstraint.h"
 #include "ndShapeStaticProceduralMesh.h"
 
-//#define D_NEW_SCENE
-
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			ndFloat32 (0.2f)
 #define D_CONTACT_TRANSLATION_ERROR	ndFloat32 (1.0e-3f)
@@ -833,7 +831,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						ndFloat32 compressedValue = m_factor * ndLog(areaA);
 						dAssert(compressedValue <= 255);
 						ndInt32 key = ndUnsigned32 (ndFloor (compressedValue));
-						key = 255 - dClamp(key, 0, 255);
+						//key = 255 - dClamp(key, 0, 255);
+						key = dClamp(key, 0, 255);
 						return key;
 					}
 
@@ -841,8 +840,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				};
 
 				//leafArrayUnsorted[2]->m_surfaceArea = 1000.0f;
-				
-				ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount);
+				ndUnsigned32 prefixScan[(1 << 8) + 1];
+				ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount, prefixScan, nullptr);
 				
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
 				dAssert(!(*root)->m_parent);
@@ -1004,7 +1003,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						return 0;
 					}
 				};
-				ndSort<ndSceneNode*, CompareNodes>(leafArray, leafNodesCount);
+				ndSort<ndSceneNode*, CompareNodes>(leafArray, leafNodesCount, nullptr);
 
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
 				dAssert(!(*root)->m_parent);
