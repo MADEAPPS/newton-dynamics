@@ -820,9 +820,11 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				class ndEvaluateKey
 				{
 					public:
+					#define D_AABB_AREA_FACTOR	ndFloat32 (5.0f)
+
 					ndEvaluateKey(void* const)
 					{
-						m_factor = ndFloat32(1.0f) / ndLog(36.0f);
+						m_factor = ndFloat32(1.0f) / ndLog(D_AABB_AREA_FACTOR * D_AABB_AREA_FACTOR);
 					}
 
 					ndUnsigned32 GetKey(const ndSceneNode* const element) const
@@ -874,10 +876,12 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 					for (ndInt32 i = 0; i < (pairsCount-1); ++i)
 					{
 						ndSceneTreeNode* const node = nodePtr->GetInfo();
-						node->m_parent = parentNode;
-						parentNode = node;
 						nodePtr = nodePtr->GetNext();
 
+						node->m_parent = parentNode;
+						parentNode = node;
+
+						//if (i) ? nodes[i - 1]->m_left = ;
 						parentNode->m_right = BuildTopDown(leafArray, pairs[i].m_start, pairs[i].m_start + pairs[i].m_count - 1, &nodePtr);
 						parentNode->m_right->m_parent = parentNode;
 
@@ -886,6 +890,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						//ndVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
 						//ndVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
 						//parent->SetAabb(minP, maxP);
+
+						nodes[i] = node;
 					}
 
 					*root = nodes[0];
