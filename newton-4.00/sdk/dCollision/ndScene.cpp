@@ -850,7 +850,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				};
 
 				ndInt32 pairsCount = 0;
-				ndItemRun pairs[(1 << 8)];
+				ndItemRun pairs[1 << 8];
 				for (ndInt32 i = 0; i < (1 << 8); ++i)
 				{
 					ndUnsigned32 count = prefixScan[i + 1] - prefixScan[i];
@@ -869,7 +869,26 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				}
 				else
 				{
-					*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
+					ndSceneNode* nodes[1 << 8];
+					ndSceneTreeNode* parentNode = nullptr;
+					for (ndInt32 i = 0; i < (pairsCount-1); ++i)
+					{
+						ndSceneTreeNode* const node = nodePtr->GetInfo();
+						node->m_parent = parentNode;
+						parentNode = node;
+						nodePtr = nodePtr->GetNext();
+
+						parentNode->m_right = BuildTopDown(leafArray, pairs[i].m_start, pairs[i].m_start + pairs[i].m_count - 1, &nodePtr);
+						parentNode->m_right->m_parent = parentNode;
+
+						//parent->m_left = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
+						//parent->m_left->m_parent = parent;
+						//ndVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
+						//ndVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
+						//parent->SetAabb(minP, maxP);
+					}
+
+					*root = nodes[0];
 				}
 				
 				dAssert(!(*root)->m_parent);
