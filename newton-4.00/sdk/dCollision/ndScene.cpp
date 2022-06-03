@@ -700,22 +700,15 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 		return leafArray[firstBox];
 	}
 
-	ndInt32 boxCount = lastBox - firstBox + 1;
-	ndSceneNode** const boxArray = &leafArray[firstBox];
+lastBox = firstBox + 2;
 
-	if (boxCount == 2)
+	class ndBlockSegment
 	{
-		dAssert(0);
-		//m_axis = 1;
-		//for (ndInt32 i = 0; i < boxCount; ++i)
-		//{
-		//	ndSceneNode* const node = boxArray[i];
-		//	dAssert(node->GetAsSceneBodyNode());
-		//	minP = minP.GetMin(node->m_minBox);
-		//	maxP = maxP.GetMax(node->m_maxBox);
-		//}
-		return nullptr;
-	}
+		public:
+		ndSceneTreeNode* m_node;
+		ndInt32 m_start;
+		ndInt32 m_count;
+	};
 
 	class ndBoxStats
 	{
@@ -727,121 +720,194 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 	};
 
 	ndBoxStats boxStats[D_MAX_THREADS_COUNT];
-	
-	auto CalculateBoxStats = ndMakeObject::ndFunction([this, boxArray, boxCount, &boxStats](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
 
-		ndVector median(ndVector::m_zero);
-		ndVector varian(ndVector::m_zero);
-		ndVector minP(ndFloat32(1.0e15f));
-		ndVector maxP(ndFloat32(-1.0e15f));
+	ndInt32 stack = 1;
+	ndBlockSegment stackPool[64];
 
-		const ndStartEnd startEnd(boxCount, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndSceneNode* const node = boxArray[i];
-			dAssert(node->GetAsSceneBodyNode());
-			minP = minP.GetMin(node->m_minBox);
-			maxP = maxP.GetMax(node->m_maxBox);
-			ndVector p(ndVector::m_half * (node->m_minBox + node->m_maxBox));
-			median += p;
-			varian += p * p;
-		}
-		boxStats[threadIndex].m_median = median;
-		boxStats[threadIndex].m_varian = varian;
-		boxStats[threadIndex].m_minP = minP;
-		boxStats[threadIndex].m_maxP = maxP;
-	});
-
-	ParallelExecute(CalculateBoxStats);
-
-	ndVector minP(boxStats[0].m_minP);
-	ndVector maxP(boxStats[0].m_maxP);
-	ndVector median(boxStats[0].m_median);
-	ndVector varian(boxStats[0].m_varian);
-
-	const ndInt32 threadCount = GetThreadCount();
-	for (ndInt32 i = 1; i < threadCount; ++i)
-	{
-		minP = minP.GetMin(boxStats[i].m_minP);
-		maxP = maxP.GetMin(boxStats[i].m_maxP);
-		median += boxStats[i].m_median;
-		varian += boxStats[i].m_varian;
-	}
-
-	varian = varian.Scale(ndFloat32(boxCount)) - median * median;
-	
-	ndInt32 index = 0;
-	ndFloat32 maxVarian = ndFloat32(-1.0e15f);
-	for (ndInt32 i = 0; i < 3; ++i)
-	{
-		if (varian[i] > maxVarian)
-		{
-			index = i;
-			maxVarian = varian[i];
-		}
-	}
-	
-	ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
-	ndFloat32 test = center[index];
-	
-	ndInt32 i0 = 0;
-	ndInt32 i1 = boxCount - 1;
-	do
-	{
-		for (; i0 <= i1; i0++)
-		{
-			ndSceneNode* const node = boxArray[i0];
-			ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
-			if (val > test)
-			{
-				break;
-			}
-		}
-	
-		for (; i1 >= i0; i1--)
-		{
-			ndSceneNode* const node = boxArray[i1];
-			ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
-			if (val < test)
-			{
-				break;
-			}
-		}
-	
-		if (i0 < i1)
-		{
-			dSwap(boxArray[i0], boxArray[i1]);
-			i0++;
-			i1--;
-		}
-	
-	} while (i0 <= i1);
-	
-	if (i0 > 0)
-	{
-		i0--;
-	}
-	if ((i0 + 1) >= boxCount)
-	{
-		i0 = boxCount - 2;
-	}
-	ndInt32 spliteEntry = i0 + 1;
-
-
-	ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
-	parent->m_parent = nullptr;
+	ndSceneTreeNode* const root = (*nextNode)->GetInfo();
+	root->m_left = nullptr;
+	root->m_right = nullptr;
+	root->m_parent = nullptr;
 	*nextNode = (*nextNode)->GetNext();
 	
-	parent->SetAabb(minP, maxP);
-	
-	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + spliteEntry - 1, nextNode);
-	parent->m_left->m_parent = parent;
-	
-	parent->m_right = BuildTopDown(leafArray, firstBox + spliteEntry, lastBox, nextNode);
-	parent->m_right->m_parent = parent;
-	return parent;
+	stackPool[0].m_node = root;
+	stackPool[0].m_start = firstBox;
+	stackPool[0].m_count = lastBox - firstBox + 1;
+
+	while (stack)
+	{
+		stack--;
+		ndBlockSegment block = stackPool[stack];
+
+		//if (block.m_count == 1)
+		//{
+		//	dAssert(0);
+		//}
+		//else if (block.m_count == 2)
+		if (block.m_count == 2)
+		{
+			ndSceneTreeNode* const node = block.m_node;
+			dAssert(node->m_left == nullptr);
+			dAssert(node->m_right == nullptr);
+
+			node->m_left = leafArray[block.m_start];
+			node->m_left->m_parent = node;
+
+			node->m_right = leafArray[block.m_start + 1];
+			node->m_right->m_parent = node;
+
+			const ndVector minP(node->m_left->m_minBox.GetMin(node->m_right->m_minBox));
+			const ndVector maxP(node->m_left->m_maxBox.GetMax(node->m_right->m_maxBox));
+			node->SetAabb(minP, maxP);
+		}
+		else
+		{
+			ndInt32 boxCount = block.m_count;
+			ndSceneNode** const boxArray = &leafArray[block.m_start];
+
+			auto CalculateBoxStats = ndMakeObject::ndFunction([this, boxArray, boxCount, &boxStats](ndInt32 threadIndex, ndInt32 threadCount)
+			{
+				D_TRACKTIME();
+
+				ndVector median(ndVector::m_zero);
+				ndVector varian(ndVector::m_zero);
+				ndVector minP(ndFloat32(1.0e15f));
+				ndVector maxP(ndFloat32(-1.0e15f));
+
+				const ndStartEnd startEnd(boxCount, threadIndex, threadCount);
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					ndSceneNode* const node = boxArray[i];
+					dAssert(node->GetAsSceneBodyNode());
+					minP = minP.GetMin(node->m_minBox);
+					maxP = maxP.GetMax(node->m_maxBox);
+					ndVector p(ndVector::m_half * (node->m_minBox + node->m_maxBox));
+					median += p;
+					varian += p * p;
+				}
+				boxStats[threadIndex].m_median = median;
+				boxStats[threadIndex].m_varian = varian;
+				boxStats[threadIndex].m_minP = minP;
+				boxStats[threadIndex].m_maxP = maxP;
+			});
+			ParallelExecute(CalculateBoxStats);
+
+			ndVector minP(boxStats[0].m_minP);
+			ndVector maxP(boxStats[0].m_maxP);
+			ndVector median(boxStats[0].m_median);
+			ndVector varian(boxStats[0].m_varian);
+
+			const ndInt32 threadCount = GetThreadCount();
+			for (ndInt32 i = 1; i < threadCount; ++i)
+			{
+				minP = minP.GetMin(boxStats[i].m_minP);
+				maxP = maxP.GetMin(boxStats[i].m_maxP);
+				median += boxStats[i].m_median;
+				varian += boxStats[i].m_varian;
+			}
+
+			block.m_node->SetAabb(minP, maxP);
+
+
+			varian = varian.Scale(ndFloat32(boxCount)) - median * median;
+
+			ndInt32 index = 0;
+			ndFloat32 maxVarian = ndFloat32(-1.0e15f);
+			for (ndInt32 i = 0; i < 3; ++i)
+			{
+				if (varian[i] > maxVarian)
+				{
+					index = i;
+					maxVarian = varian[i];
+				}
+			}
+
+			ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
+			ndFloat32 test = center[index];
+
+			ndInt32 i0 = 0;
+			ndInt32 i1 = boxCount - 1;
+			do
+			{
+				for (; i0 <= i1; i0++)
+				{
+					ndSceneNode* const node = boxArray[i0];
+					ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
+					if (val > test)
+					{
+						break;
+					}
+				}
+
+				for (; i1 >= i0; i1--)
+				{
+					ndSceneNode* const node = boxArray[i1];
+					ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
+					if (val < test)
+					{
+						break;
+					}
+				}
+
+				if (i0 < i1)
+				{
+					dSwap(boxArray[i0], boxArray[i1]);
+					i0++;
+					i1--;
+				}
+
+			} while (i0 <= i1);
+
+			if (i0 > 0)
+			{
+				i0--;
+			}
+			if ((i0 + 1) >= boxCount)
+			{
+				i0 = boxCount - 2;
+			}
+			ndInt32 spliteEntry = i0 + 1;
+
+			dAssert(spliteEntry > 0);
+			dAssert(spliteEntry < block.m_count - 1);
+
+			//ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
+			//*nextNode = (*nextNode)->GetNext();
+
+			ndInt32 leftCount = spliteEntry;
+			if (leftCount == 1)
+			{
+				dAssert(0);
+			}
+			else
+			{
+				dAssert(0);
+			}
+
+			ndInt32 rightCount = boxCount - spliteEntry;
+			if (rightCount == 1)
+			{
+				dAssert(0);
+			}
+			else
+			{
+				dAssert(0);
+			}
+
+			//parent->m_parent = block.m_node;
+			//parent->SetAabb(minP, maxP);
+			//
+			//stackPool[0].m_node = nullptr;
+			//stackPool[0].m_start = firstBox;
+			//stackPool[0].m_count = lastBox - firstBox + 1;
+			//parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + spliteEntry - 1, nextNode);
+			//parent->m_left->m_parent = parent;
+			//
+			//parent->m_right = BuildTopDown(leafArray, firstBox + spliteEntry, lastBox, nextNode);
+			//parent->m_right->m_parent = parent;
+		}
+	}
+	return root;
 }
 
 void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root)
@@ -957,7 +1023,9 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						nodePtr = nodePtr->GetNext();
 						parentNode->m_left = nullptr;
 						parentNode->m_parent = nullptr;
-						parentNode->m_right = BuildTopDown(leafArray, pairs[i].m_start, pairs[i].m_start + pairs[i].m_count - 1, &nodePtr);
+
+						const ndItemRun& pair = pairs[i];
+						parentNode->m_right = BuildTopDown(leafArray, pair.m_start, pair.m_start + pair.m_count - 1, &nodePtr);
 						parentNode->m_right->m_parent = parentNode;
 						nodes[i] = parentNode;
 					}
