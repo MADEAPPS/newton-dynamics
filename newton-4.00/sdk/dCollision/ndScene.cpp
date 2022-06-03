@@ -717,53 +717,6 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 	}
 }
 
-ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode)
-{
-	if (lastBox == firstBox)
-	{
-		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
-	}
-
-	ndInt32 midPoint = -1;
-	const ndFloat32 scale = ndFloat32(1.0f / 64.0f);
-	const ndSceneNode* const node0 = leafArray[firstBox];
-	const ndInt32 count = lastBox - firstBox;
-	ndFloat32 area0 = scale * node0->m_surfaceArea;
-	for (ndInt32 i = 1; i <= count; ++i)
-	{
-		const ndSceneNode* const node1 = leafArray[firstBox + i];
-		ndFloat32 area1 = node1->m_surfaceArea;
-		if (area0 > area1)
-		{
-			midPoint = i - 1;
-			break;
-		}
-	}
-
-	if (midPoint == -1)
-	{
-		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
-	}
-	else
-	{
-		ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
-
-		parent->m_parent = nullptr;
-		*nextNode = (*nextNode)->GetNext();
-
-		parent->m_right = BuildTopDown(leafArray, firstBox, firstBox + midPoint, nextNode);
-		parent->m_right->m_parent = parent;
-
-		parent->m_left = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
-		parent->m_left->m_parent = parent;
-
-		ndVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
-		ndVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
-		parent->SetAabb(minP, maxP);
-
-		return parent;
-	}
-}
 void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root)
 {
 	if (*root) 
@@ -840,7 +793,6 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 					ndFloat32 m_factor;
 				};
 
-				//leafArrayUnsorted[2]->m_surfaceArea = 1000.0f;
 				ndUnsigned32 prefixScan[(1 << 8) + 1];
 				ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount, prefixScan, nullptr);
 				
@@ -871,27 +823,35 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				}
 				else
 				{
-					ndSceneNode* nodes[1 << 8];
-					ndSceneTreeNode* parentNode = nullptr;
+					ndSceneTreeNode* nodes[1 << 8];
 					for (ndInt32 i = 0; i < (pairsCount-1); ++i)
 					{
-						ndSceneTreeNode* const node = nodePtr->GetInfo();
+						ndSceneTreeNode* parentNode = nodePtr->GetInfo();
 						nodePtr = nodePtr->GetNext();
-
-						node->m_parent = parentNode;
-						parentNode = node;
-
-						//if (i) ? nodes[i - 1]->m_left = ;
+						parentNode->m_left = nullptr;
+						parentNode->m_parent = nullptr;
 						parentNode->m_right = BuildTopDown(leafArray, pairs[i].m_start, pairs[i].m_start + pairs[i].m_count - 1, &nodePtr);
 						parentNode->m_right->m_parent = parentNode;
+						nodes[i] = parentNode;
+					}
 
-						//parent->m_left = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
-						//parent->m_left->m_parent = parent;
-						//ndVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
-						//ndVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
-						//parent->SetAabb(minP, maxP);
+					ndSceneTreeNode* const lastNode = nodes[pairsCount - 2];
+					lastNode->m_left = BuildTopDown(leafArray, pairs[pairsCount - 1].m_start, pairs[pairsCount - 1].m_start + pairs[pairsCount - 1].m_count - 1, &nodePtr);
+					lastNode->m_left->m_parent = nodes[pairsCount - 2];
+					const ndVector minP(lastNode->m_left->m_minBox.GetMin(lastNode->m_right->m_minBox));
+					const ndVector maxP(lastNode->m_left->m_maxBox.GetMax(lastNode->m_right->m_maxBox));
+					lastNode->SetAabb(minP, maxP);
 
-						nodes[i] = node;
+					for (ndInt32 i = pairsCount - 2; i; --i)
+					{
+						ndSceneTreeNode* const childNode = nodes[i];
+						ndSceneTreeNode* const parentNode = nodes[i - 1];
+						
+						childNode->m_parent = parentNode;
+						parentNode->m_left = childNode;
+						const ndVector minBox(parentNode->m_left->m_minBox.GetMin(parentNode->m_right->m_minBox));
+						const ndVector maxBox(parentNode->m_left->m_maxBox.GetMax(parentNode->m_right->m_maxBox));
+						parentNode->SetAabb(minBox, maxBox);
 					}
 
 					*root = nodes[0];

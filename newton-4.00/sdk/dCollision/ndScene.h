@@ -147,7 +147,9 @@ class ndScene : public ndThreadPool
 	ndFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+#ifndef D_NEW_SCENE
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+#endif
 
 	D_COLLISION_API void CollisionOnlyUpdate();
 	const ndContactArray& GetContactArray() const;
