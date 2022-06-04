@@ -739,11 +739,6 @@ lastBox = firstBox + 2;
 		stack--;
 		ndBlockSegment block = stackPool[stack];
 
-		//if (block.m_count == 1)
-		//{
-		//	dAssert(0);
-		//}
-		//else if (block.m_count == 2)
 		if (block.m_count == 2)
 		{
 			ndSceneTreeNode* const node = block.m_node;
@@ -866,45 +861,40 @@ lastBox = firstBox + 2;
 			{
 				i0 = boxCount - 2;
 			}
-			ndInt32 spliteEntry = i0 + 1;
 
-			dAssert(spliteEntry > 0);
-			dAssert(spliteEntry < block.m_count - 1);
-
-			//ndSceneTreeNode* const parent = (*nextNode)->GetInfo();
-			//*nextNode = (*nextNode)->GetNext();
-
-			ndInt32 leftCount = spliteEntry;
+			ndInt32 leftCount = i0 + 1;
 			if (leftCount == 1)
 			{
-				dAssert(0);
+				block.m_node->m_left = leafArray[block.m_start];
+				block.m_node->m_left->m_parent = block.m_node;
 			}
 			else
 			{
-				dAssert(0);
+				ndSceneTreeNode* const node = (*nextNode)->GetInfo();
+				*nextNode = (*nextNode)->GetNext();
+
+				node->m_left = nullptr;
+				node->m_right = nullptr;
+				node->m_parent = block.m_node;
+				block.m_node->m_left = node;
+
+				stackPool[stack].m_node = node;
+				stackPool[stack].m_start = block.m_start;
+				stackPool[stack].m_count = leftCount;
+				stack++;
+				dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
 			}
 
-			ndInt32 rightCount = boxCount - spliteEntry;
+			ndInt32 rightCount = boxCount - leftCount;
 			if (rightCount == 1)
 			{
-				dAssert(0);
+				block.m_node->m_right = leafArray[block.m_start + leftCount];
+				block.m_node->m_right->m_parent = block.m_node;
 			}
 			else
 			{
 				dAssert(0);
 			}
-
-			//parent->m_parent = block.m_node;
-			//parent->SetAabb(minP, maxP);
-			//
-			//stackPool[0].m_node = nullptr;
-			//stackPool[0].m_start = firstBox;
-			//stackPool[0].m_count = lastBox - firstBox + 1;
-			//parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + spliteEntry - 1, nextNode);
-			//parent->m_left->m_parent = parent;
-			//
-			//parent->m_right = BuildTopDown(leafArray, firstBox + spliteEntry, lastBox, nextNode);
-			//parent->m_right->m_parent = parent;
 		}
 	}
 	return root;
