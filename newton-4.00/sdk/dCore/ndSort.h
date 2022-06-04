@@ -135,7 +135,7 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsi
 {
 	//D_TRACKTIME();
 	dAssert(keyBitSize > 0);
-	ndInt32 scans[(1 << keyBitSize) + 1];
+	ndUnsigned32 scans[(1 << keyBitSize) + 1];
 	ndEvaluateKey evaluator(context);
 	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{

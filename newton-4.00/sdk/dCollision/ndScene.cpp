@@ -581,127 +581,8 @@ ndFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const roo
 
 #ifdef D_NEW_SCENE
 
-
-D_MSV_NEWTON_ALIGN_32
-class ndScene::ndSpliteInfo
-{
-public:
-	ndSpliteInfo(ndSceneNode** const boxArray, ndInt32 boxCount)
-	{
-		ndVector minP(ndFloat32(1.0e15f));
-		ndVector maxP(-ndFloat32(1.0e15f));
-
-		if (boxCount == 2)
-		{
-			m_axis = 1;
-			for (ndInt32 i = 0; i < boxCount; ++i)
-			{
-				ndSceneNode* const node = boxArray[i];
-				dAssert(node->GetAsSceneBodyNode());
-				minP = minP.GetMin(node->m_minBox);
-				maxP = maxP.GetMax(node->m_maxBox);
-			}
-		}
-		else
-		{
-			ndVector median(ndVector::m_zero);
-			ndVector varian(ndVector::m_zero);
-			for (ndInt32 i = 0; i < boxCount; ++i)
-			{
-				ndSceneNode* const node = boxArray[i];
-				dAssert(node->GetAsSceneBodyNode());
-				minP = minP.GetMin(node->m_minBox);
-				maxP = maxP.GetMax(node->m_maxBox);
-				ndVector p(ndVector::m_half * (node->m_minBox + node->m_maxBox));
-				median += p;
-				varian += p * p;
-			}
-
-			varian = varian.Scale(ndFloat32(boxCount)) - median * median;
-
-			ndInt32 index = 0;
-			ndFloat32 maxVarian = ndFloat32(-1.0e15f);
-			for (ndInt32 i = 0; i < 3; ++i)
-			{
-				if (varian[i] > maxVarian)
-				{
-					index = i;
-					maxVarian = varian[i];
-				}
-			}
-
-			ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
-
-			ndFloat32 test = center[index];
-
-			ndInt32 i0 = 0;
-			ndInt32 i1 = boxCount - 1;
-			do
-			{
-				for (; i0 <= i1; i0++)
-				{
-					ndSceneNode* const node = boxArray[i0];
-					ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
-					if (val > test)
-					{
-						break;
-					}
-				}
-
-				for (; i1 >= i0; i1--)
-				{
-					ndSceneNode* const node = boxArray[i1];
-					ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
-					if (val < test)
-					{
-						break;
-					}
-				}
-
-				if (i0 < i1)
-				{
-					dSwap(boxArray[i0], boxArray[i1]);
-					i0++;
-					i1--;
-				}
-
-			} while (i0 <= i1);
-
-			if (i0 > 0)
-			{
-				i0--;
-			}
-			if ((i0 + 1) >= boxCount)
-			{
-				i0 = boxCount - 2;
-			}
-			m_axis = i0 + 1;
-		}
-
-		dAssert(maxP.m_x - minP.m_x >= ndFloat32(0.0f));
-		dAssert(maxP.m_y - minP.m_y >= ndFloat32(0.0f));
-		dAssert(maxP.m_z - minP.m_z >= ndFloat32(0.0f));
-		m_p0 = minP;
-		m_p1 = maxP;
-	}
-
-	ndVector m_p0;
-	ndVector m_p1;
-	ndInt32 m_axis;
-} D_GCC_NEWTON_ALIGN_32;
-
 ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode)
 {
-	dAssert(firstBox >= 0);
-	dAssert(lastBox >= 0);
-
-	if (lastBox == firstBox)
-	{
-		return leafArray[firstBox];
-	}
-
-lastBox = firstBox + 2;
-
 	class ndBlockSegment
 	{
 		public:
@@ -719,11 +600,19 @@ lastBox = firstBox + 2;
 		ndVector m_maxP;
 	};
 
-	ndBoxStats boxStats[D_MAX_THREADS_COUNT];
-
 	ndInt32 stack = 1;
-	ndBlockSegment stackPool[64];
+	ndBoxStats boxStats[D_MAX_THREADS_COUNT];
+	ndBlockSegment stackPool[D_SCENE_MAX_STACK_DEPTH];
 
+	dAssert(firstBox >= 0);
+	dAssert(lastBox >= 0);
+
+	if (lastBox == firstBox)
+	{
+		return leafArray[firstBox];
+	}
+
+	D_TRACKTIME();
 	ndSceneTreeNode* const root = (*nextNode)->GetInfo();
 	root->m_left = nullptr;
 	root->m_right = nullptr;
@@ -733,6 +622,9 @@ lastBox = firstBox + 2;
 	stackPool[0].m_node = root;
 	stackPool[0].m_start = firstBox;
 	stackPool[0].m_count = lastBox - firstBox + 1;
+
+	m_sceneBodyArray.SetCount(stackPool[0].m_count);
+	ndSceneNode** const tmpBuffer = (ndSceneNode**) &m_sceneBodyArray[0];
 
 	while (stack)
 	{
@@ -760,7 +652,7 @@ lastBox = firstBox + 2;
 			ndInt32 boxCount = block.m_count;
 			ndSceneNode** const boxArray = &leafArray[block.m_start];
 
-			auto CalculateBoxStats = ndMakeObject::ndFunction([this, boxArray, boxCount, &boxStats](ndInt32 threadIndex, ndInt32 threadCount)
+			auto CalculateBoxStats = ndMakeObject::ndFunction([this, boxArray, boxCount, tmpBuffer, &boxStats](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				D_TRACKTIME();
 
@@ -773,6 +665,8 @@ lastBox = firstBox + 2;
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndSceneNode* const node = boxArray[i];
+					tmpBuffer[i] = node;
+
 					dAssert(node->GetAsSceneBodyNode());
 					minP = minP.GetMin(node->m_minBox);
 					maxP = maxP.GetMax(node->m_maxBox);
@@ -800,10 +694,7 @@ lastBox = firstBox + 2;
 				median += boxStats[i].m_median;
 				varian += boxStats[i].m_varian;
 			}
-
 			block.m_node->SetAabb(minP, maxP);
-
-
 			varian = varian.Scale(ndFloat32(boxCount)) - median * median;
 
 			ndInt32 index = 0;
@@ -817,52 +708,47 @@ lastBox = firstBox + 2;
 				}
 			}
 
+			class ndSpliteTest
+			{
+				public:
+				ndSpliteTest(const ndFloat32 dist, ndInt32 index)
+					:m_dist(dist)
+					,m_index(index)
+				{
+				}
+				
+				ndFloat32 m_dist;
+				ndInt32 m_index;
+			};
 			ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
 			ndFloat32 test = center[index];
 
-			ndInt32 i0 = 0;
-			ndInt32 i1 = boxCount - 1;
-			do
+			class ndEvaluateKey
 			{
-				for (; i0 <= i1; i0++)
+				public:
+				ndEvaluateKey(void* const context)
 				{
-					ndSceneNode* const node = boxArray[i0];
-					ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
-					if (val > test)
-					{
-						break;
-					}
+					ndSpliteTest* const test = (ndSpliteTest*)context;
+					m_dist = test->m_dist;
+					m_index = test->m_index;
 				}
 
-				for (; i1 >= i0; i1--)
+				ndUnsigned32 GetKey(const ndSceneNode* const node) const
 				{
-					ndSceneNode* const node = boxArray[i1];
-					ndFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * ndFloat32(0.5f);
-					if (val < test)
-					{
-						break;
-					}
+					const ndFloat32 val = (node->m_minBox[m_index] + node->m_maxBox[m_index]) * ndFloat32(0.5f);
+					const ndUnsigned32 key = (val > m_dist) ? 1 : 0;
+					return key;
 				}
 
-				if (i0 < i1)
-				{
-					dSwap(boxArray[i0], boxArray[i1]);
-					i0++;
-					i1--;
-				}
+				ndFloat32 m_dist;
+				ndInt32 m_index;
+			};
 
-			} while (i0 <= i1);
+			ndUnsigned32 prefixScan[32];
+			ndSpliteTest context(test, index);
+			ndCountingSort<ndSceneNode*, ndEvaluateKey, 1>(*this, tmpBuffer, boxArray, boxCount, prefixScan, &context);
 
-			if (i0 > 0)
-			{
-				i0--;
-			}
-			if ((i0 + 1) >= boxCount)
-			{
-				i0 = boxCount - 2;
-			}
-
-			ndInt32 leftCount = i0 + 1;
+			const ndInt32 leftCount = prefixScan[1] - prefixScan[0];
 			if (leftCount == 1)
 			{
 				block.m_node->m_left = leafArray[block.m_start];
@@ -879,13 +765,14 @@ lastBox = firstBox + 2;
 				block.m_node->m_left = node;
 
 				stackPool[stack].m_node = node;
-				stackPool[stack].m_start = block.m_start;
 				stackPool[stack].m_count = leftCount;
+				stackPool[stack].m_start = block.m_start;
 				stack++;
 				dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
 			}
 
-			ndInt32 rightCount = boxCount - leftCount;
+			//ndInt32 rightCount = boxCount - leftCount;
+			const ndInt32 rightCount = prefixScan[2] - prefixScan[1];
 			if (rightCount == 1)
 			{
 				block.m_node->m_right = leafArray[block.m_start + leftCount];
@@ -893,7 +780,19 @@ lastBox = firstBox + 2;
 			}
 			else
 			{
-				dAssert(0);
+				ndSceneTreeNode* const node = (*nextNode)->GetInfo();
+				*nextNode = (*nextNode)->GetNext();
+
+				node->m_left = nullptr;
+				node->m_right = nullptr;
+				node->m_parent = block.m_node;
+				block.m_node->m_right = node;
+
+				stackPool[stack].m_node = node;
+				stackPool[stack].m_count = rightCount;
+				stackPool[stack].m_start = block.m_start + leftCount;
+				stack++;
+				dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
 			}
 		}
 	}
