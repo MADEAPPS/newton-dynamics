@@ -257,10 +257,9 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 
 	if (prefixScanOut)
 	{
-		const ndUnsigned32* const srcPrefix = &scans[(threadCount- 1) * (1 << keyBitSize)];
 		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 		{
-			prefixScanOut[i] = srcPrefix[i];
+			prefixScanOut[i] = scans[i];
 		}
 		prefixScanOut[1 << keyBitSize] = size;
 	}

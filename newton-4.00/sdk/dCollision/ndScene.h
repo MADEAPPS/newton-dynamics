@@ -155,7 +155,6 @@ class ndScene : public ndThreadPool
 	const ndContactArray& GetContactArray() const;
 
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
-	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
 	void UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root);

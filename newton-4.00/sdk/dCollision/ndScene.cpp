@@ -868,7 +868,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						ndFloat32 compressedValue = m_factor * ndLog(areaA);
 						dAssert(compressedValue <= 255);
 						ndInt32 key = ndUnsigned32 (ndFloor (compressedValue));
-						key = 255 - dClamp(key, 0, 255);
+						//key = 255 - dClamp(key, 0, 255);
+						key = dClamp(key, 0, 255);
 						return key;
 					}
 
@@ -1661,36 +1662,6 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 	return nullptr;
 }
 
-ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
-{
-	if (body1->GetInvMass() != ndFloat32(0.0f))
-	{
-		ndContact* const contact = body1->FindContact(body0);
-		dAssert(!contact || (body0->FindContact(body1) == contact));
-		return contact;
-	}
-
-	dAssert(body0->GetInvMass() != ndFloat32(0.0f));
-	ndContact* const contact = body0->FindContact(body1);
-	dAssert(!contact || (body1->FindContact(body0) == contact));
-	return contact;
-}
-
-void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
-{
-	ndContact* const contact = FindContactJoint(body0, body1);
-	if (!contact) 
-	{
-		const ndJointBilateralConstraint* const bilateral = FindBilateralJoint(body0, body1);
-
-		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
-		if (isCollidable) 
-		{
-			ndContact* const newContact = m_contactArray.CreateContact(body0, body1);
-			newContact->m_material = m_contactNotifyCallback->GetMaterial(newContact, body0->GetCollisionShape(), body1->GetCollisionShape());
-		}
-	}
-}
 
 void ndScene::UpdateBodyList()
 {
@@ -1801,113 +1772,6 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_isConstrained = 0;
 	sentinelBody->m_sceneEquilibrium = 1;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
-}
-
-void ndScene::CalculateContacts()
-{
-	D_TRACKTIME();
-	ndInt32 digitScan[D_MAX_THREADS_COUNT][4];
-	m_activeConstraintArray.SetCount(0);
-	if (m_contactArray.GetCount())
-	{
-		m_scratchBuffer.SetCount(m_contactArray.GetCount() * sizeof (ndContact*));
-		m_activeConstraintArray.SetCount(m_contactArray.GetCount());
-
-		auto CalculateNewContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			ndContactArray& activeContacts = m_contactArray;
-			ndContact** const dstContacts = (ndContact**)&m_scratchBuffer[0];
-			ndInt32* const scan = &digitScan[threadIndex][0];
-
-			ndInt32 keyLookUp[4];
-			scan[0] = 0;
-			scan[1] = 0;
-			scan[2] = 0;
-			scan[3] = 0;
-			keyLookUp[0] = 0;
-			keyLookUp[1] = 1;
-			keyLookUp[2] = 2;
-			keyLookUp[3] = 2;
-
-			const ndStartEnd startEnd(activeContacts.GetCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContact* const contact = activeContacts[i]->GetAsContact();
-				dAssert(contact);
-				if (!contact->m_isDead)
-				{
-					CalculateContacts(threadIndex, contact);
-				}
-				dstContacts[i] = contact;
-				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
-				const ndInt32 key = keyLookUp[entry];
-				scan[key] ++;
-			}
-		});
-
-		ParallelExecute(CalculateNewContacts);
-
-		ndInt32 sum = 0;
-		ndInt32 threadCount = GetThreadCount();
-		for (ndInt32 j = 0; j < 4; j++)
-		{
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				const ndInt32 count = digitScan[i][j];
-				digitScan[i][j] = sum;
-				sum += count;
-			}
-		}
-
-		ndInt32 activeJoints = digitScan[0][1] - digitScan[0][0];
-		ndInt32 inactiveJoints = digitScan[0][2] - digitScan[0][1];
-		ndInt32 deadContacts = digitScan[0][3] - digitScan[0][2];
-
-		auto CompactContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			ndContactArray& dstContacts = m_contactArray;
-			ndContact** const srcContacts = (ndContact**)&m_scratchBuffer[0];
-			ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
-
-			ndInt32 keyLookUp[4];
-			keyLookUp[0] = 0;
-			keyLookUp[1] = 1;
-			keyLookUp[2] = 2;
-			keyLookUp[3] = 2;
-			ndInt32* const scan = &digitScan[threadIndex][0];
-
-			const ndStartEnd startEnd(dstContacts.GetCount(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContact* const contact = srcContacts[i]->GetAsContact();
-				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
-				const ndInt32 key = keyLookUp[entry];
-				const ndInt32 index = scan[key];
-				dstContacts[index] = contact;
-				activeConstraintArray[index] = contact;
-				scan[key]++;
-			}
-		});
-		ParallelExecute(CompactContacts);
-
-		if (deadContacts)
-		{
-			D_TRACKTIME();
-			// this could be parallelized, monitor it to see if is worth doing it.
-			const ndInt32 start = activeJoints + inactiveJoints;
-			for (ndInt32 i = 0; i < deadContacts; ++i)
-			{
-				ndContact* const contact = m_contactArray[start + i];
-				m_contactArray.DeleteContact(contact);
-				delete contact;
-			}
-		}
-
-		m_activeConstraintArray.SetCount(activeJoints);
-		m_contactArray.SetCount(activeJoints + inactiveJoints);
-	}
 }
 
 void ndScene::FindCollidingPairs(ndBodyKinematic* const body)
@@ -2561,4 +2425,132 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 void ndScene::SendBackgroundTask(ndBackgroundTask* const job)
 {
 	m_backgroundThread.SendTask(job);
+}
+
+void ndScene::CalculateContacts()
+{
+	D_TRACKTIME();
+	ndInt32 digitScan[D_MAX_THREADS_COUNT][4];
+
+	auto CalculateNewContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndContactArray& activeContacts = m_contactArray;
+		ndContact** const dstContacts = (ndContact**)&m_scratchBuffer[0];
+		ndInt32* const scan = &digitScan[threadIndex][0];
+
+		ndInt32 keyLookUp[4];
+		scan[0] = 0;
+		scan[1] = 0;
+		scan[2] = 0;
+		scan[3] = 0;
+		keyLookUp[0] = 0;
+		keyLookUp[1] = 1;
+		keyLookUp[2] = 2;
+		keyLookUp[3] = 2;
+
+		const ndStartEnd startEnd(activeContacts.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndContact* const contact = activeContacts[i]->GetAsContact();
+			dAssert(contact);
+			if (!contact->m_isDead)
+			{
+				CalculateContacts(threadIndex, contact);
+			}
+			dstContacts[i] = contact;
+			const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
+			const ndInt32 key = keyLookUp[entry];
+			scan[key] ++;
+		}
+	});
+
+	auto CompactContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndContactArray& dstContacts = m_contactArray;
+		ndContact** const srcContacts = (ndContact**)&m_scratchBuffer[0];
+		ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
+
+		ndInt32 keyLookUp[4];
+		keyLookUp[0] = 0;
+		keyLookUp[1] = 1;
+		keyLookUp[2] = 2;
+		keyLookUp[3] = 2;
+		ndInt32* const scan = &digitScan[threadIndex][0];
+
+		const ndStartEnd startEnd(dstContacts.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndContact* const contact = srcContacts[i]->GetAsContact();
+			const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
+			const ndInt32 key = keyLookUp[entry];
+			const ndInt32 index = scan[key];
+			dstContacts[index] = contact;
+			activeConstraintArray[index] = contact;
+			scan[key]++;
+		}
+	});
+
+	m_activeConstraintArray.SetCount(0);
+	if (m_contactArray.GetCount())
+	{
+		m_scratchBuffer.SetCount(m_contactArray.GetCount() * sizeof(ndContact*));
+		m_activeConstraintArray.SetCount(m_contactArray.GetCount());
+
+		ParallelExecute(CalculateNewContacts);
+
+		ndInt32 sum = 0;
+		ndInt32 threadCount = GetThreadCount();
+		for (ndInt32 j = 0; j < 4; j++)
+		{
+			for (ndInt32 i = 0; i < threadCount; ++i)
+			{
+				const ndInt32 count = digitScan[i][j];
+				digitScan[i][j] = sum;
+				sum += count;
+			}
+		}
+
+		ndInt32 activeJoints = digitScan[0][1] - digitScan[0][0];
+		ndInt32 inactiveJoints = digitScan[0][2] - digitScan[0][1];
+		ndInt32 deadContacts = digitScan[0][3] - digitScan[0][2];
+
+		ParallelExecute(CompactContacts);
+
+		if (deadContacts)
+		{
+			D_TRACKTIME();
+			// this could be parallelized, monitor it to see if is worth doing it.
+			const ndInt32 start = activeJoints + inactiveJoints;
+			for (ndInt32 i = 0; i < deadContacts; ++i)
+			{
+				ndContact* const contact = m_contactArray[start + i];
+				m_contactArray.DeleteContact(contact);
+				delete contact;
+			}
+		}
+
+		m_activeConstraintArray.SetCount(activeJoints);
+		m_contactArray.SetCount(activeJoints + inactiveJoints);
+	}
+}
+
+void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+{
+	ndContact* const contact = (body0->GetInvMass() != ndFloat32(0.0f)) ? body0->FindContact(body1) : body1->FindContact(body0);;
+	dAssert(!contact || (contact->m_body1->FindContact(contact->m_body0) == contact));
+
+	if (!contact)
+	{
+		const ndJointBilateralConstraint* const bilateral = FindBilateralJoint(body0, body1);
+
+		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+		if (isCollidable)
+		{
+			ndContact* const newContact = m_contactArray.CreateContact(body0, body1);
+			dAssert(newContact->m_body0->GetInvMass() != ndFloat32(0.0f));
+			newContact->m_material = m_contactNotifyCallback->GetMaterial(newContact, body0->GetCollisionShape(), body1->GetCollisionShape());
+		}
+	}
 }
