@@ -690,10 +690,11 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 			for (ndInt32 i = 1; i < threadCount; ++i)
 			{
 				minP = minP.GetMin(boxStats[i].m_minP);
-				maxP = maxP.GetMin(boxStats[i].m_maxP);
+				maxP = maxP.GetMax(boxStats[i].m_maxP);
 				median += boxStats[i].m_median;
 				varian += boxStats[i].m_varian;
 			}
+
 			block.m_node->SetAabb(minP, maxP);
 			varian = varian.Scale(ndFloat32(boxCount)) - median * median;
 
@@ -868,8 +869,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						ndFloat32 compressedValue = m_factor * ndLog(areaA);
 						dAssert(compressedValue <= 255);
 						ndInt32 key = ndUnsigned32 (ndFloor (compressedValue));
-						//key = 255 - dClamp(key, 0, 255);
-						key = dClamp(key, 0, 255);
+						key = 255 - dClamp(key, 0, 255);
 						return key;
 					}
 
