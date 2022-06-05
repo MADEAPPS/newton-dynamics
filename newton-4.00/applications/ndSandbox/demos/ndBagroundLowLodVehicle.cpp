@@ -95,7 +95,7 @@ class BackGroundVehicleController : public ndModel
 			m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
 			ndFloat32 dSpeedDifference = m_dDesiredSpeed - m_dCurrentSpeed;
 			ndFloat32 dForce = _UpdatePIDForDriveForces(dSpeedDifference, timestep);
-			dForce = dClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
+			dForce = ndClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
 			ndVector vForce(ndFloat32(0.0), ndFloat32(0.0), dForce, ndFloat32(0.0));
 			ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
 			ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
@@ -119,7 +119,7 @@ class BackGroundVehicleController : public ndModel
 		m_dIntegral = m_dIntegral + m_dIntegralGain * dError * dTimestep;
 
 		// Make sure our integral remains inside reasonable bounds relative to the maximum force we are supposed to use
-		m_dIntegral = dClamp(m_dIntegral, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
+		m_dIntegral = ndClamp(m_dIntegral, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
 
 		// Reset integral so that we don't overshoot stopping, and don't move slightly when our speed should be zero.
 		if (abs(m_dDesiredSpeed) < 0.01 && abs(m_dCurrentSpeed) < 0.01)
@@ -160,7 +160,7 @@ class BackGroundVehicleController : public ndModel
 
 		ndFloat32 dAngularSpeed = vUp.DotProduct(m_pAiBody->GetOmega()).GetScalar();            // Component of the angular velocity about the up vector
 		ndFloat32 dAngularSpeedDifference = dDesiredAngularSpeed - dAngularSpeed;
-		dAngularSpeedDifference = dClamp(dAngularSpeedDifference, ndFloat32(-0.3), ndFloat32(0.3));
+		dAngularSpeedDifference = ndClamp(dAngularSpeedDifference, ndFloat32(-0.3), ndFloat32(0.3));
 		dAngularSpeedDifference = dAngularSpeedDifference / ndFloat32(0.3);               // Normalise to between -1 and 1;
 		ndFloat32 dTorque = dAngularSpeedDifference * dMaxTorque;
 		ndVector vYAxisMoment = ndVector(ndFloat32(0.0), dTorque, ndFloat32(0.0), ndFloat32(0.0));                        // Vehicle space torque

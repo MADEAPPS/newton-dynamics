@@ -198,7 +198,7 @@ void ndBasicPlayerCapsule::ApplyInputs(ndFloat32 timestep)
 ndFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector& normal, ndInt32, const ndBodyKinematic* const) const
 {
 	//return ndFloat32(2.0f);
-	if (dAbs(normal.m_y) < 0.8f)
+	if (ndAbs(normal.m_y) < 0.8f)
 	{
 		return 0.4f;
 	}
@@ -226,9 +226,9 @@ void ndBasicPlayerCapsule::SetCamera()
 
 		ndFloat32 angle0 = camera->GetYawAngle();
 		ndFloat32 angle1 = GetHeadingAngle();
-		ndFloat32 error = AnglesAdd(angle1, -angle0);
+		ndFloat32 error = ndAnglesAdd(angle1, -angle0);
 
-		if ((dAbs (error) > 1.0e-3f) ||
+		if ((ndAbs (error) > 1.0e-3f) ||
 			m_scene->GetKeyState(' ') ||
 			m_scene->GetKeyState('A') ||
 			m_scene->GetKeyState('D') ||

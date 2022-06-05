@@ -143,9 +143,9 @@ void ndJointSlider::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit) const
 
 void ndJointSlider::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_springK = dAbs(spring);
-	m_damperC = dAbs(damper);
-	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springK = ndAbs(spring);
+	m_damperC = ndAbs(damper);
+	m_springDamperRegularizer = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 void ndJointSlider::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -157,7 +157,7 @@ void ndJointSlider::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, n
 
 ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
 {
-	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
+	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
 	ndFloat32 speed = D_MAX_SLIDER_RECOVERY_SPEED * param;
 	return speed;
 }
@@ -184,7 +184,7 @@ ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& 
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (x > m_maxLimit)
 			{
@@ -194,7 +194,7 @@ ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& 
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}

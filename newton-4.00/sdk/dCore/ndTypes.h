@@ -345,7 +345,7 @@ inline void operator delete[](void* ptr)	\
 
 		T exchange(T val)
 		{
-			dSwap(val, m_val);
+			ndSwap(val, m_val);
 			return val;
 		}
 

@@ -36,7 +36,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
 
-	const ndVector omega(dGaussianRandom(2.0f), dGaussianRandom(4.0f), dGaussianRandom(3.0f), 0.0f);
+	const ndVector omega(ndGaussianRandom(2.0f), ndGaussianRandom(4.0f), ndGaussianRandom(3.0f), 0.0f);
 	body->SetOmega(omega);
 
 	ndBodyNotify* const notification = body->GetNotifyCallback();
@@ -114,7 +114,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 			for (ndInt32 i = 0; i < count; i++)
 			{
 				ndVector posit(step * (i - count/2), step * j, step * (k - count / 2), 0.0f);
-				ndQuaternion rotation(dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f) + 0.1f);
+				ndQuaternion rotation(ndGaussianRandom(1.0f), ndGaussianRandom(1.0f), ndGaussianRandom(1.0f), ndGaussianRandom(1.0f) + 0.1f);
 				ndMatrix location(rotation, origin + posit);
 				AddShape(scene, location, rootEntity, shape, 10.0f, density);
 			}

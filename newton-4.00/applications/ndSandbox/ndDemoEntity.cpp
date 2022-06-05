@@ -522,7 +522,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			}
 			ndVector size(ndVector::m_half * (maxP - minP));
 			ndVector origin(ndVector::m_half * (maxP + minP));
-			ndFloat32 high = 2.0f * dMax (size.m_y - size.m_x, ndFloat32 (0.05f));
+			ndFloat32 high = 2.0f * ndMax (size.m_y - size.m_x, ndFloat32 (0.05f));
 			ndMatrix alighMatrix(dRollMatrix(90.0f * ndDegreeToRad));
 			alighMatrix.m_posit = origin;
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);

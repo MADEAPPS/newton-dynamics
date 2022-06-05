@@ -60,16 +60,16 @@ void ndShapeCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 {
-	radio0 = dMax(dAbs(radio0), D_MIN_CONVEX_SHAPE_SIZE);
-	radio1 = dMax(dAbs(radio1), D_MIN_CONVEX_SHAPE_SIZE);
-	height = dMax(dAbs(height), D_MIN_CONVEX_SHAPE_SIZE);
+	radio0 = ndMax(ndAbs(radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	radio1 = ndMax(ndAbs(radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	height = ndMax(ndAbs(height), D_MIN_CONVEX_SHAPE_SIZE);
 
 	m_transform = ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f));
 	if (radio0 > radio1) 
 	{
 		m_transform.m_x = ndFloat32(-1.0f);
 		m_transform.m_y = ndFloat32(-1.0f);
-		dSwap(radio0, radio1);
+		ndSwap(radio0, radio1);
 	}
 
 	m_radius0 = radio0;
@@ -115,7 +115,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	{
 		x0 += step;
 		ndFloat32 x = x0 + m_height;
-		ndFloat32 arg = dMax(m_radius0 * m_radius0 - x * x, ndFloat32(1.0e-3f));
+		ndFloat32 arg = ndMax(m_radius0 * m_radius0 - x * x, ndFloat32(1.0e-3f));
 		ndFloat32 r0 = ndSqrt(arg);
 
 		ndFloat32 angle = ndFloat32(0.0f);
@@ -136,7 +136,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	for (ndInt32 j = 0; j < dx1; j++) 
 	{
 		ndFloat32 x = x1 - m_height;
-		ndFloat32 arg = dMax(m_radius1 * m_radius1 - x * x, ndFloat32(1.0e-3f));
+		ndFloat32 arg = ndMax(m_radius1 * m_radius1 - x * x, ndFloat32(1.0e-3f));
 		ndFloat32 r1 = ndSqrt(arg);
 		ndFloat32 angle = ndFloat32(0.0f);
 		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
@@ -229,7 +229,7 @@ ndShapeInfo ndShapeCapsule::GetShapeInfo() const
 
 	if (m_transform.m_x < ndFloat32(0.0f)) 
 	{
-		dSwap(info.m_capsule.m_radio0, info.m_capsule.m_radio1);
+		ndSwap(info.m_capsule.m_radio0, info.m_capsule.m_radio1);
 	}
 	return info;
 }
@@ -238,9 +238,9 @@ void ndShapeCapsule::TesselateTriangle(ndInt32 level, const ndVector& p0, const 
 {
 	if (level) 
 	{
-		dAssert(dAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndVector p01(p0 + p1);
 		ndVector p12(p1 + p2);
 		ndVector p20(p2 + p0);
@@ -249,9 +249,9 @@ void ndShapeCapsule::TesselateTriangle(ndInt32 level, const ndVector& p0, const 
 		p12 = p12.Scale(ndRsqrt(p12.DotProduct(p12).GetScalar()));
 		p20 = p20.Scale(ndRsqrt(p20.DotProduct(p20).GetScalar()));
 
-		dAssert(dAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
 		TesselateTriangle(level - 1, p0, p01, p20, count, ouput);
 		TesselateTriangle(level - 1, p1, p12, p01, count, ouput);
@@ -384,7 +384,7 @@ ndVector ndShapeCapsule::SupportVertex(const ndVector& direction, ndInt32* const
 {
 	ndVector dir(direction * m_transform);
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndVector p0(dir.Scale(m_radius0));
 	ndVector p1(dir.Scale(m_radius1));
@@ -403,7 +403,7 @@ ndVector ndShapeCapsule::SupportVertexSpecial(const ndVector& direction, ndFloat
 {
 	ndVector dir(direction * m_transform);
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndVector p0(ndVector::m_zero);
 	ndVector p1(dir.Scale(m_radius1 - m_radius0));

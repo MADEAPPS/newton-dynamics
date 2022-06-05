@@ -50,7 +50,7 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 	contactSolver.m_contactBuffer = &contactBuffer[0];
 
 	m_param = ndFloat32(1.2f);
-	const ndInt32 count = dMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
+	const ndInt32 count = ndMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
 	if (count)
 	{
 		for (ndInt32 i = 0; i < count; i++)

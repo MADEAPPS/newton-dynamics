@@ -2401,8 +2401,8 @@ ndFloat64 ndPolyhedra::EdgePenalty (const ndBigVector* const pool, ndEdge* const
 				ndFloat64 mag0 = e0.DotProduct(e0).GetScalar();
 				ndFloat64 mag1 = e1.DotProduct(e1).GetScalar();
 				ndFloat64 mag2 = e2.DotProduct(e2).GetScalar();
-				ndFloat64 maxMag = dMax(dMax (mag0, mag1), mag2);
-				ndFloat64 minMag = dMin(dMin (mag0, mag1), mag2);
+				ndFloat64 maxMag = ndMax(ndMax (mag0, mag1), mag2);
+				ndFloat64 minMag = ndMin(ndMin (mag0, mag1), mag2);
 				ndFloat64 ratio = minMag / maxMag;
 
 				if (ratio < aspect) 
@@ -2448,7 +2448,7 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 
 	const ndFloat64 maxCost = ndFloat32 (1.0e-3f);
 	ndFloat64 tol2 = tol * tol;
-	ndFloat64 distTol = dMax (tol2, ndFloat64 (1.0e-12f));
+	ndFloat64 distTol = ndMax (tol2, ndFloat64 (1.0e-12f));
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) 
 	{
@@ -3166,7 +3166,7 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 			var += p * p;
 			cov += p * q;
 		}
-		dSwap(cov.m_y, cov.m_z);
+		ndSwap(cov.m_y, cov.m_z);
 
 		ndFloat64 k = ndFloat64(1.0) / vertexCount;
 		var = var.Scale(k);

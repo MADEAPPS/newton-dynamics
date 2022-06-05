@@ -80,7 +80,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 
 	ndStack<ndInt32>indexListBuffer(builder.m_vertex.GetCount());
 	ndInt32* const indexList = &indexListBuffer[0];
-	dVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
+	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 	
 	ndMeshEffect::dMeshVertexFormat vertexFormat;
 	

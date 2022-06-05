@@ -178,8 +178,8 @@ void ndShapeHeightfield::CalculateLocalObb()
 	ndReal y1 = -ndReal(1.0e10f);
 	for (ndInt32 i = m_elevationMap.GetCount()-1; i >= 0; --i)
 	{
-		y0 = dMin(y0, m_elevationMap[i]);
-		y1 = dMax(y1, m_elevationMap[i]);
+		y0 = ndMin(y0, m_elevationMap[i]);
+		y1 = ndMax(y1, m_elevationMap[i]);
 	}
 
 	m_minBox = ndVector(ndFloat32(0.0f), ndFloat32 (y0), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -530,8 +530,8 @@ void ndShapeHeightfield::CalculateMinAndMaxElevation(ndInt32 x0, ndInt32 x1, ndI
 		for (ndInt32 x = x0; x <= x1; ++x) 
 		{
 			ndReal high = m_elevationMap[base + x];
-			minVal = dMin(high, minVal);
-			maxVal = dMax(high, maxVal);
+			minVal = ndMin(high, minVal);
+			maxVal = ndMax(high, maxVal);
 		}
 		base += m_width;
 	}
@@ -616,7 +616,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 step = x1 - x0 + 1;
 		ndInt32* const indices = data->m_globalFaceVertexIndex;
 		ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
-		ndInt32 faceSize = ndInt32(dMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
+		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 
 		const ndInt32* const indirectIndex = GetIndexList();
 		for (ndInt32 z = z0; (z < z1) && (faceCount < D_MAX_COLLIDING_FACES); ++z) 

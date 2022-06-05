@@ -179,8 +179,8 @@ void ndBezierSpline::BasicsFunctions (ndFloat64 u, ndInt32 span, ndFloat64* cons
 {
 	BasicFunctionsOut[0] = ndFloat32 (1.0f);
 
-	ndFloat64* const left = dAlloca(ndFloat64, m_knotsCount + 32);
-	ndFloat64* const right = dAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const left = ndAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const right = ndAlloca(ndFloat64, m_knotsCount + 32);
 
 	for (ndInt32 j = 1; j <= m_degree; j ++) 
 	{
@@ -200,10 +200,10 @@ void ndBezierSpline::BasicsFunctions (ndFloat64 u, ndInt32 span, ndFloat64* cons
 
 void ndBezierSpline::BasicsFunctionsDerivatives (ndFloat64 u, ndInt32 span, ndFloat64* const derivativesOut) const
 {
-	ndFloat64* const a = dAlloca(ndFloat64, m_knotsCount + 32);
-	ndFloat64* const ndu = dAlloca(ndFloat64, m_knotsCount + 32);
-	ndFloat64* const left = dAlloca(ndFloat64, m_knotsCount + 32);
-	ndFloat64* const right = dAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const a = ndAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const ndu = ndAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const left = ndAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const right = ndAlloca(ndFloat64, m_knotsCount + 32);
 
 	const ndInt32 width = m_degree + 1;
 	ndu[0] = ndFloat32 (1.0f);
@@ -274,7 +274,7 @@ void ndBezierSpline::BasicsFunctionsDerivatives (ndFloat64 u, ndInt32 span, ndFl
 				d += a[width * s2 + k] * ndu[width * r + pk];
 			}
 			derivativesOut[width * k + r] = d;
-			dSwap(s1, s2);
+			ndSwap(s1, s2);
 		}
 	}
 
@@ -292,7 +292,7 @@ void ndBezierSpline::BasicsFunctionsDerivatives (ndFloat64 u, ndInt32 span, ndFl
 ndBigVector ndBezierSpline::CurvePoint (ndFloat64 u, ndInt32 span) const
 {
 	ndBigVector point (ndFloat32 (0.0f));
-	ndFloat64* const basicFunctions = dAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const basicFunctions = ndAlloca(ndFloat64, m_knotsCount + 32);
 	BasicsFunctions (u, span, basicFunctions);
 	for (ndInt32 i = 0; i <= m_degree; i ++) 
 	{
@@ -304,17 +304,17 @@ ndBigVector ndBezierSpline::CurvePoint (ndFloat64 u, ndInt32 span) const
 
 ndBigVector ndBezierSpline::CurvePoint (ndFloat64 u) const
 {
-	u = dClamp (u, ndFloat64 (ndFloat32 (0.0f)), ndFloat64 (ndFloat32 (1.0f)));
+	u = ndClamp (u, ndFloat64 (ndFloat32 (0.0f)), ndFloat64 (ndFloat32 (1.0f)));
 	ndInt32 span = GetSpan(u);
 	return CurvePoint (u, span);
 }
 
 ndBigVector ndBezierSpline::CurveDerivative (ndFloat64 u, ndInt32 index) const
 {
-	u = dClamp (u, ndFloat64 (ndFloat32 (0.0f)), ndFloat64 (ndFloat32 (1.0f)));
+	u = ndClamp (u, ndFloat64 (ndFloat32 (0.0f)), ndFloat64 (ndFloat32 (1.0f)));
 	dAssert (index <= m_degree);
 	
-	ndFloat64* const basicsFuncDerivatives = dAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const basicsFuncDerivatives = ndAlloca(ndFloat64, m_knotsCount + 32);
 	ndInt32 span = GetSpan(u);
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
 
@@ -329,8 +329,8 @@ ndBigVector ndBezierSpline::CurveDerivative (ndFloat64 u, ndInt32 index) const
 
 ndInt32 ndBezierSpline::CurveAllDerivatives (ndFloat64 u, ndBigVector* const derivatives) const
 {
-	u = dMod (u, ndFloat64(ndFloat32 (1.0f)));
-	ndFloat64* const basicsFuncDerivatives = dAlloca(ndFloat64, m_knotsCount + 32);
+	u = ndMod (u, ndFloat64(ndFloat32 (1.0f)));
+	ndFloat64* const basicsFuncDerivatives = ndAlloca(ndFloat64, m_knotsCount + 32);
 	ndInt32 span = GetSpan(u);
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
 
@@ -359,7 +359,7 @@ void ndBezierSpline::CreateCubicKnotVector(ndInt32 count, const ndBigVector* con
 {
 	dAssert (count >= 2);
 
-	ndFloat64* const u = dAlloca(ndFloat64, m_knotsCount + 32);
+	ndFloat64* const u = ndAlloca(ndFloat64, m_knotsCount + 32);
 #if 0
 	u[0] = dFloat32 (0.0f);
 	dFloat64 d = dFloat32(0.0f);
@@ -441,7 +441,7 @@ void ndBezierSpline::CreateCubicControlPoints(ndInt32 count, const ndBigVector* 
 	} 
 	else 
 	{
-		ndFloat64* const dd = dAlloca(ndFloat64, m_knotsCount + 32);
+		ndFloat64* const dd = ndAlloca(ndFloat64, m_knotsCount + 32);
 		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
 		ndFloat64 den = abc[1];
 		m_controlPoints[2]  = (points[1] - m_controlPoints[1].Scale (abc[0])).Scale (ndFloat32 (1.0f) / den);
@@ -529,7 +529,7 @@ void ndBezierSpline::InsertKnot (ndFloat64 u)
 	ndInt32 multiplicity = 0;
 	for (ndInt32 i = 0; i < m_degree; i ++) 
 	{
-		multiplicity += (dAbs (m_knotVector[k + i + 1] - u) < ndFloat64 (1.0e-5f)) ? 1 : 0;
+		multiplicity += (ndAbs (m_knotVector[k + i + 1] - u) < ndFloat64 (1.0e-5f)) ? 1 : 0;
 	}
 	if (multiplicity == m_degree) 
 	{
@@ -582,7 +582,7 @@ bool ndBezierSpline::RemoveKnot (ndFloat64 u, ndFloat64 tol)
 {
 	ndInt32 r = GetSpan(u) + 1;
 	dAssert (m_knotVector[r - 1] < u);
-	if (dAbs (m_knotVector[r] - u) > 1.0e-5f) 
+	if (ndAbs (m_knotVector[r] - u) > 1.0e-5f) 
 	{
 		return false;
 	}
@@ -689,7 +689,7 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 	ndFloat64 bestU = ndFloat32 (0.0f);
 	ndFloat64 distance2 = ndFloat32 (1.0e10f);
 	ndBigVector closestControlPoint(m_controlPoints[0]);
-	subdivitionSteps = dMax(subdivitionSteps, 1);
+	subdivitionSteps = ndMax(subdivitionSteps, 1);
 	ndFloat64 scale = ndFloat32 (1.0f) / subdivitionSteps;
 	for (ndInt32 span = m_degree; span < (m_knotsCount - m_degree - 1); span++) 
 	{
@@ -737,7 +737,7 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 		dAssert(derivatives[2].m_w == ndFloat32 (0.0f));
 		ndFloat64 num = derivatives[1].DotProduct(dist).GetScalar();
 		ndFloat64 den = derivatives[2].DotProduct(dist).GetScalar() + derivatives[1].DotProduct(derivatives[1]).GetScalar();
-		ndFloat64 u1 = dClamp(u0 - num / den, ndFloat64(0.0), ndFloat64(1.0));
+		ndFloat64 u1 = ndClamp(u0 - num / den, ndFloat64(0.0), ndFloat64(1.0));
 		if (u1 < m_knotVector[startSpan]) 
 		{
 			startSpan--;
@@ -753,7 +753,7 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 		dAssert(startSpan <= (m_knotsCount - m_degree - 1));
 		closestControlPoint = CurvePoint(u1, startSpan);
 
-		stop |= (dAbs(u1 - u0) < ndFloat64(1.0e-10)) || (num * num < ((dist.DotProduct(dist).GetScalar()) * (derivatives[1].DotProduct(derivatives[1]).GetScalar()) * ndFloat64(1.0e-10)));
+		stop |= (ndAbs(u1 - u0) < ndFloat64(1.0e-10)) || (num * num < ((dist.DotProduct(dist).GetScalar()) * (derivatives[1].DotProduct(derivatives[1]).GetScalar()) * ndFloat64(1.0e-10)));
 		u0 = u1;
 	}
 

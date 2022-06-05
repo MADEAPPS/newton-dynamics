@@ -113,17 +113,17 @@ void ndJointWheel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
 {
-	m_normalizedBrake = dClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
+	m_normalizedBrake = ndClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
 }
 
 void ndJointWheel::SetHandBrake(ndFloat32 normalizedBrake)
 {
-	m_normalizedHandBrake = dClamp(normalizedBrake, ndFloat32(0.0f), ndFloat32(1.0f));
+	m_normalizedHandBrake = ndClamp(normalizedBrake, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
 void ndJointWheel::SetSteering(ndFloat32 normalidedSteering)
 {
-	m_normalidedSteering = dClamp(normalidedSteering, ndFloat32(-1.0f), ndFloat32(1.0f));
+	m_normalidedSteering = ndClamp(normalidedSteering, ndFloat32(-1.0f), ndFloat32(1.0f));
 }
 
 void ndJointWheel::UpdateTireSteeringAngleMatrix()
@@ -134,7 +134,7 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-	const ndFloat32 distance = dClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
+	const ndFloat32 distance = ndClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
 
 	const ndFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
 	ndMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
@@ -185,7 +185,7 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
-	const ndFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
+	const ndFloat32 brakeFrictionTorque = ndMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
 	if (brakeFrictionTorque > ndFloat32(0.0f))
 	{
 		const ndFloat32 brakesToChassisInfluence = ndFloat32 (0.125f);

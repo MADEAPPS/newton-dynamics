@@ -183,7 +183,7 @@ template <typename Function>
 void ndThreadPool::ParallelExecute(const Function& ndFunction)
 {
 	const ndInt32 threadCount = GetThreadCount();
-	ndTaskImplement<Function>* const jobsArray = dAlloca(ndTaskImplement<Function>, threadCount);
+	ndTaskImplement<Function>* const jobsArray = ndAlloca(ndTaskImplement<Function>, threadCount);
 	
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{

@@ -120,7 +120,7 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& c
 
 ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar)
 {
-	fov = dClamp (fov, ndFloat32 (0.0f), ndPi);
+	fov = ndClamp (fov, ndFloat32 (0.0f), ndPi);
 	//y = ZNear * (ndFloat32)ndTan((fov * cPIdiv180) * 0.5f);
 	ndFloat32 y = ZNear * ndTan(fov * 0.5f);
 	ndFloat32 x = y * Aspect;

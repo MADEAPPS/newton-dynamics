@@ -308,7 +308,7 @@ void ndPolygonSoupBuilder::PackArray()
 {
 	ndStack<ndInt32> indexMapPool (m_vertexPoints.GetCount());
 	ndInt32* const indexMap = &indexMapPool[0];
-	ndInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-6f));
+	ndInt32 vertexCount = ndVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-6f));
 
 	ndInt32 k = 0;
 	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
@@ -337,7 +337,7 @@ void ndPolygonSoupBuilder::Finalize()
 		ndStack<ndInt32> indexMapPool(m_vertexIndex.GetCount());
 
 		ndInt32* const indexMap = &indexMapPool[0];
-		ndInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-4f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-4f));
 		dAssert(vertexCount <= m_vertexPoints.GetCount());
 		m_vertexPoints.SetCount(vertexCount);
 
@@ -583,7 +583,7 @@ void ndPolygonSoupBuilder::End(bool optimize)
 
 		m_normalIndex.Resize(faceCount);;
 		m_normalIndex.SetCount(faceCount);
-		ndInt32 normalCount = dVertexListToIndexList(&m_normalPoints[0].m_x, sizeof(ndBigVector), 3, faceCount, &m_normalIndex[0], ndFloat32(1.0e-6f));
+		ndInt32 normalCount = ndVertexListToIndexList(&m_normalPoints[0].m_x, sizeof(ndBigVector), 3, faceCount, &m_normalIndex[0], ndFloat32(1.0e-6f));
 		dAssert(normalCount <= m_normalPoints.GetCount());
 		m_normalPoints.SetCount(normalCount);
 	}
@@ -720,7 +720,7 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 
 					if (side) 
 					{
-						dSwap (array[faceStart + i], array[faceStart + lastFace - 1]);
+						ndSwap (array[faceStart + i], array[faceStart + lastFace - 1]);
 						lastFace --;
 						i --;
 					} 

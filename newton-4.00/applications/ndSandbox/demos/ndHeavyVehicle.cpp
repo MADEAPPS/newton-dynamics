@@ -399,7 +399,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
 					ndFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
-					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
+					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
 
 					// draw the current gear
 					m_vehicleUI->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
@@ -590,8 +590,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 				m_cannonHigh += 2.0e-3f;
 			}
 			
-			m_cannonHigh = dClamp(m_cannonHigh, -ndFloat32(0.1f), ndFloat32(0.5f));
-			m_turretAngle = dClamp(m_turretAngle, -ndFloat32(2.0f) * ndPi, ndFloat32(2.0f) * ndPi);
+			m_cannonHigh = ndClamp(m_cannonHigh, -ndFloat32(0.1f), ndFloat32(0.5f));
+			m_turretAngle = ndClamp(m_turretAngle, -ndFloat32(2.0f) * ndPi, ndFloat32(2.0f) * ndPi);
 			
 			if (wakeUpVehicle)
 			{
@@ -767,8 +767,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 				m_bucketAngle = m_bucketAngle - timestep * 0.5f;
 			}
 
-			m_armAngle = dClamp(m_armAngle, ndFloat32 (-10.0f) * ndDegreeToRad, ndFloat32 (45.0f) * ndDegreeToRad);
-			m_bucketAngle = dClamp(m_bucketAngle, ndFloat32(-75.0f) * ndDegreeToRad, ndFloat32(80.0f) * ndDegreeToRad);
+			m_armAngle = ndClamp(m_armAngle, ndFloat32 (-10.0f) * ndDegreeToRad, ndFloat32 (45.0f) * ndDegreeToRad);
+			m_bucketAngle = ndClamp(m_bucketAngle, ndFloat32(-75.0f) * ndDegreeToRad, ndFloat32(80.0f) * ndDegreeToRad);
 	
 			if (wakeUpVehicle)
 			{

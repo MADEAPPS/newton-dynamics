@@ -54,7 +54,7 @@ inline ndFloat32 ndMultiBodyVehicleDifferential::GetSlipOmega() const
 
 inline void ndMultiBodyVehicleDifferential::SetSlipOmega(ndFloat32 omega)
 {
-	m_limitedSlipOmega = dMax(D_MINIMUM_SLIP_OMEGA, dAbs(omega));
+	m_limitedSlipOmega = ndMax(D_MINIMUM_SLIP_OMEGA, ndAbs(omega));
 }
 
 #endif

@@ -462,7 +462,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
 					ndFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
-					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
+					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
 
 					// draw the current gear
 					m_vehicleUI->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);

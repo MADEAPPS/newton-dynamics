@@ -447,7 +447,7 @@ void ndContactSolver::TranslateSimplex(const ndVector& step)
 void ndContactSolver::SupportVertex(const ndVector& dir0, ndInt32 vertexIndex)
 {
 	dAssert(dir0.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir0.DotProduct(dir0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir0.DotProduct(dir0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	ndVector dir1 (dir0.Scale(ndFloat32 (-1.0f)));
 	
 	const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
@@ -508,7 +508,7 @@ ndBigVector ndContactSolver::ReduceTriangle(ndInt32& indexOut)
 
 	const ndFloat64 det = a00 * a11 - a01 * a01;
 	dAssert(det >= ndFloat32(0.0f));
-	if (dAbs(det) > ndFloat32(1.0e-16f)) 
+	if (ndAbs(det) > ndFloat32(1.0e-16f)) 
 	{
 		const ndFloat64 b0 = -e10.DotProduct(p0).GetScalar();
 		const ndFloat64 b1 = -e20.DotProduct(p0).GetScalar();
@@ -776,7 +776,7 @@ void ndContactSolver::CalculateContactFromFeacture(ndInt32 featureType)
 			const ndFloat64 det = a00 * a11 - a01 * a01;
 			//dAssert(det >= ndFloat32(0.0f));
 			// check against machine precision 
-			if (dAbs(det) > ndFloat32(1.0e-16f))
+			if (ndAbs(det) > ndFloat32(1.0e-16f))
 			{
 				const ndFloat64 b0 = -e10.DotProduct(p0).GetScalar();
 				const ndFloat64 b1 = -e20.DotProduct(p0).GetScalar();
@@ -898,7 +898,7 @@ void ndContactSolver::CalculateContactFromFeacture(ndInt32 featureType)
 	m_closestPoint0 = ndVector::m_half * (s + d);
 	m_closestPoint1 = ndVector::m_half * (s - d);
 	dAssert(m_separatingVector.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(m_separatingVector.DotProduct(m_separatingVector).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+	dAssert(ndAbs(m_separatingVector.DotProduct(m_separatingVector).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 }
 
 ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVector& point1, const ndVector& normal)
@@ -1007,7 +1007,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 				p10 = p10.Scale(ndRsqrt(p10.DotProduct(p10).GetScalar() + ndFloat32(1.0e-8f)));
 				q10 = q10.Scale(ndRsqrt(q10.DotProduct(q10).GetScalar() + ndFloat32(1.0e-8f)));
 				ndFloat32 dot = q10.DotProduct(p10).GetScalar();
-				if (dAbs(dot) > ndFloat32(0.998f)) 
+				if (ndAbs(dot) > ndFloat32(0.998f)) 
 				{
 					// segment are collinear, the contact points is the overlapping segment
 					ndFloat32 pl0 = p0.DotProduct(p10).GetScalar();
@@ -1016,13 +1016,13 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 					ndFloat32 ql1 = q1.DotProduct(p10).GetScalar();
 					if (pl0 > pl1) 
 					{
-						dSwap(pl0, pl1);
-						dSwap(p0, p1);
+						ndSwap(pl0, pl1);
+						ndSwap(p0, p1);
 						p10 = p10.Scale(ndFloat32(-1.0f));
 					}
 					if (ql0 > ql1) 
 					{
-						dSwap(ql0, ql1);
+						ndSwap(ql0, ql1);
 					}
 					if (!((ql0 > pl1) && (ql1 < pl0))) 
 					{
@@ -1090,7 +1090,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 					ndVector dp(ptr[1] - ptr[0]);
 					dAssert(dp.m_w == ndFloat32(0.0f));
 					ndFloat32 den = plane.DotProduct(dp).GetScalar();
-					if (dAbs(den) < ndFloat32 (1.0e-10f)) 
+					if (ndAbs(den) < ndFloat32 (1.0e-10f)) 
 					{
 						den = ndFloat32(1.0e-10f);
 					}
@@ -1105,7 +1105,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 				ndVector dp(ptr[1] - ptr[0]);
 				dAssert(dp.m_w == ndFloat32(0.0f));
 				ndFloat32 den = plane.DotProduct(dp).GetScalar();
-				if (dAbs(den) < ndFloat32(1.0e-10f))
+				if (ndAbs(den) < ndFloat32(1.0e-10f))
 				{
 					den = ndFloat32(1.0e-10f);
 				}
@@ -1223,7 +1223,7 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 						ndVector dp(p1 - p0);
 						dAssert(dp.m_w == 0.0f);
 						ndFloat32 den = plane.DotProduct(dp).GetScalar();
-						if (dAbs(den) < ndFloat32(1.0e-24f)) 
+						if (ndAbs(den) < ndFloat32(1.0e-24f)) 
 						{
 							den = (den >= ndFloat32(0.0f)) ? ndFloat32(1.0e-24f) : ndFloat32(-1.0e-24f);
 						}
@@ -1251,7 +1251,7 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 					ndVector dp(p1 - p0);
 					dAssert(dp.m_w == 0.0f);
 					ndFloat32 den = plane.DotProduct(dp).GetScalar();
-					if (dAbs(den) < ndFloat32(1.0e-24f)) 
+					if (ndAbs(den) < ndFloat32(1.0e-24f)) 
 					{
 						den = (den >= ndFloat32(0.0f)) ? ndFloat32(1.0e-24f) : ndFloat32(-1.0e-24f);
 					}
@@ -1602,7 +1602,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 
 			const ndVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
 			const ndVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
-			ndFloat32 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
+			ndFloat32 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			if ((cluster.m_count <= clusterSize) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(1.e-4f)))
 			{
@@ -1642,7 +1642,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 					dAssert(i0 <= i1);
 					if (i0 < i1)
 					{
-						dSwap(array[start + i0], array[start + i1]);
+						ndSwap(array[start + i0], array[start + i1]);
 						++i0;
 						--i1;
 					}
@@ -1706,7 +1706,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 				min_x = array[i].m_x;
 			}
 		}
-		dSwap(array[0], array[maxIndex]);
+		ndSwap(array[0], array[maxIndex]);
 
 		for (ndInt32 i = 2; i < count; ++i)
 		{
@@ -1808,7 +1808,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
-		if (dAbs(covariance[i][i]) < (1.0e-6f)) 
+		if (ndAbs(covariance[i][i]) < (1.0e-6f)) 
 		{
 			for (ndInt32 j = 0; j < 3; ++j) 
 			{
@@ -1822,18 +1822,18 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	covariance.m_posit = origin;
 	if (eigen[1] < eigen[2]) 
 	{
-		dSwap(eigen[1], eigen[2]);
-		dSwap(covariance[1], covariance[2]);
+		ndSwap(eigen[1], eigen[2]);
+		ndSwap(covariance[1], covariance[2]);
 	}
 	if (eigen[0] < eigen[1]) 
 	{
-		dSwap(eigen[0], eigen[1]);
-		dSwap(covariance[0], covariance[1]);
+		ndSwap(eigen[0], eigen[1]);
+		ndSwap(covariance[0], covariance[1]);
 	}
 	if (eigen[1] < eigen[2]) 
 	{
-		dSwap(eigen[1], eigen[2]);
-		dSwap(covariance[1], covariance[2]);
+		ndSwap(eigen[1], eigen[2]);
+		ndSwap(covariance[1], covariance[2]);
 	}
 
 	const ndFloat32 eigenValueError = ndFloat32(1.0e-4f);
@@ -1986,9 +1986,9 @@ ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& loca
 		{
 			ndVector q(v + point);
 			ndFloat32 den = normal.DotProduct(p0p1).GetScalar();
-			if (dAbs(den) < ndFloat32(1.0e-12f)) 
+			if (ndAbs(den) < ndFloat32(1.0e-12f)) 
 			{
-				den = dSign(den) * ndFloat32(1.0e-12f);
+				den = ndSign(den) * ndFloat32(1.0e-12f);
 			}
 			dAssert(normal.m_w == ndFloat32(0.0f));
 			ndFloat32 t1 = normal.DotProduct(localP0 - q).GetScalar() / den;
@@ -2152,7 +2152,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 			}
 			matrix = rotation * matrix;
 		}
-		if (dAbs(maxArea) < ndFloat32(1e-15f)) 
+		if (ndAbs(maxArea) < ndFloat32(1e-15f)) 
 		{
 			return -1;
 		}
@@ -2172,12 +2172,12 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 		normal = normal.Scale(ndRsqrt(mag2));
 		SupportVertex(normal, 3);
 		volume = normal.DotProduct(m_hullDiff[3] - m_hullDiff[0]).GetScalar();
-		if (dAbs(volume) < ndFloat32(1.0e-10f)) 
+		if (ndAbs(volume) < ndFloat32(1.0e-10f)) 
 		{
 			normal = normal.Scale(ndFloat32(-1.0f));
 			SupportVertex(normal, 3);
 			volume = -normal.DotProduct(m_hullDiff[3] - m_hullDiff[0]).GetScalar();
-			if (dAbs(volume) < ndFloat32(1.0e-10f)) 
+			if (ndAbs(volume) < ndFloat32(1.0e-10f)) 
 			{
 				volume = ndFloat32(0.0f);
 			}
@@ -2197,11 +2197,11 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 	dAssert(count == 4);
 	if (volume > ndFloat32(0.0f)) 
 	{
-		dSwap(m_hullSum[1], m_hullSum[0]);
-		dSwap(m_hullDiff[1], m_hullDiff[0]);
+		ndSwap(m_hullSum[1], m_hullSum[0]);
+		ndSwap(m_hullDiff[1], m_hullDiff[0]);
 	}
 
-	if (dAbs(volume) < ndFloat32(1e-15f)) 
+	if (ndAbs(volume) < ndFloat32(1e-15f)) 
 	{
 		// this volume is unrealizable, let us build  a different tetrahedron using the method of core 200
 		ndVector e1;
@@ -2248,7 +2248,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 			e3 = m_hullDiff[3] - m_hullDiff[0];
 			dAssert(normal.m_w == ndFloat32(0.0f));
 			error2 = normal.DotProduct(e3).GetScalar();
-			if (dAbs(error2) > D_CALCULATE_SEPARATING_PLANE_ERROR) 
+			if (ndAbs(error2) > D_CALCULATE_SEPARATING_PLANE_ERROR) 
 			{
 				break;
 			}
@@ -2261,8 +2261,8 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 
 		if (error2 > ndFloat32(0.0f)) 
 		{
-			dSwap(m_hullSum[1], m_hullSum[2]);
-			dSwap(m_hullDiff[1], m_hullDiff[2]);
+			ndSwap(m_hullSum[1], m_hullSum[2]);
+			ndSwap(m_hullDiff[1], m_hullDiff[2]);
 		}
 
 		#ifdef _DEBUG
@@ -2331,7 +2331,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 			SupportVertex(faceNode->m_plane & ndVector::m_triplexMask, m_vertexIndex);
 			const ndVector& p = m_hullDiff[m_vertexIndex];
 			ndFloat32 dist = faceNode->m_plane.Evalue(p);
-			ndFloat32 distTolerance = dMax(dAbs(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
+			ndFloat32 distTolerance = ndMax(ndAbs(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
 
 			if (dist < distTolerance) 
 			{
@@ -2638,7 +2638,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 			}
 		}
 
-		count = dMin(m_maxCount, count);
+		count = ndMin(m_maxCount, count);
 		ndContactPoint* const contactOut = m_contactBuffer;
 
 		ndBodyKinematic* const body0 = m_contact->GetBody0();
@@ -2745,7 +2745,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = dMin (closestDist, dist2);
+			closestDist = ndMin (closestDist, dist2);
 			break;
 		}
 
@@ -2769,8 +2769,8 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
-					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = dMin(closestDist, dist * dist);
+					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = ndMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -2868,7 +2868,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = dMin(closestDist, dist2);
+			closestDist = ndMin(closestDist, dist2);
 			break;
 		}
 		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
@@ -2891,8 +2891,8 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
-					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = dMin(closestDist, dist * dist);
+					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = ndMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -2990,7 +2990,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 		ndFloat32 dist2 = stackPool[stack].m_dist2;
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = dMin(closestDist, dist2);
+			closestDist = ndMin(closestDist, dist2);
 			break;
 		}
 
@@ -3019,8 +3019,8 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
-					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = dMin(closestDist, dist * dist);
+					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = ndMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3172,7 +3172,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 		m_vertexIndex = 0;
 		m_contactBuffer = &contactOut[count];
 		ndInt32 count1 = polygon.CalculateContactToConvexHullDescrete(&polySoupInstance, *this);
-		closestDist = dMin(closestDist, m_separationDistance);
+		closestDist = ndMin(closestDist, m_separationDistance);
 
 		if (count1 > 0)
 		{
@@ -3356,7 +3356,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 		ndFloat32 dist2 = stackPool[stack].m_dist2;
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = dMin(closestDist, dist2);
+			closestDist = ndMin(closestDist, dist2);
 			break;
 		}
 
@@ -3383,8 +3383,8 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexToSaticStaticBvhContactsNodeDescrete(collisionTreeNode);
-					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = dMin(closestDist, dist * dist);
+					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = ndMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3529,7 +3529,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = dMin(closestDist, dist2);
+			closestDist = ndMin(closestDist, dist2);
 			break;
 		}
 
@@ -3553,9 +3553,9 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
-					//closestDist = dMin(closestDist, contactSolver.m_separationDistance);
-					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = dMin(closestDist, dist * dist);
+					//closestDist = ndMin(closestDist, contactSolver.m_separationDistance);
+					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = ndMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3654,7 +3654,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = dMin(closestDist, dist2);
+			closestDist = ndMin(closestDist, dist2);
 			break;
 		}
 
@@ -3678,8 +3678,8 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
-					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = dMin(closestDist, dist * dist);
+					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = ndMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3913,7 +3913,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 			m_timestep = tacc;
 			closestPoint1 = m_closestPoint1 + step;
 			m_separatingVector = m_separatingVector * ndVector::m_negOne;
-			ndFloat32 penetration = dMax(num * ndFloat32(-1.0f) + D_PENETRATION_TOL, ndFloat32(0.0f));
+			ndFloat32 penetration = ndMax(num * ndFloat32(-1.0f) + D_PENETRATION_TOL, ndFloat32(0.0f));
 			if (m_contactBuffer && !m_intersectionTestOnly)
 			{
 				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
@@ -3921,7 +3921,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector);
 					if (count)
 					{
-						count = dMin(m_maxCount, count);
+						count = ndMin(m_maxCount, count);
 						ndContactPoint* const contactOut = m_contactBuffer;
 
 						for (int i = 0; i < count; ++i)
@@ -4353,7 +4353,7 @@ void ndContactSolver::CalculateContacts(
 	m_pruneContacts = 1;
 	m_intersectionTestOnly = 0;
 
-	const ndInt32 count = dMin(CalculateContactsDiscrete(), contactOut.GetCapacity());
+	const ndInt32 count = ndMin(CalculateContactsDiscrete(), contactOut.GetCapacity());
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndContactPoint& contactPoint = contactBuffer[i];

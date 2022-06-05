@@ -181,12 +181,12 @@ void ndJointRoller::SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit)
 
 	if (m_angle > m_maxLimitAngle)
 	{
-		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_maxLimitAngle);
+		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimitAngle);
 		m_angle = m_maxLimitAngle + deltaAngle;
 	} 
 	else if (m_angle < m_minLimitAngle)
 	{
-		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_minLimitAngle);
+		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimitAngle);
 		m_angle = m_minLimitAngle + deltaAngle;
 	}
 }
@@ -209,9 +209,9 @@ void ndJointRoller::SetOffsetAngle(ndFloat32 angle)
 
 void ndJointRoller::SetAsSpringDamperAngle(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_springKAngle = dAbs(spring);
-	m_damperCAngle = dAbs(damper);
-	m_springDamperRegularizerAngle = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springKAngle = ndAbs(spring);
+	m_damperCAngle = ndAbs(damper);
+	m_springDamperRegularizerAngle = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 void ndJointRoller::GetSpringDamperAngle(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -262,9 +262,9 @@ void ndJointRoller::GetLimitsPosit(ndFloat32& minLimit, ndFloat32& maxLimit) con
 
 void ndJointRoller::SetAsSpringDamperPosit(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_springKPosit = dAbs(spring);
-	m_damperCPosit = dAbs(damper);
-	m_springDamperRegularizerPosit = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springKPosit = ndAbs(spring);
+	m_damperCPosit = ndAbs(damper);
+	m_springDamperRegularizerPosit = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 void ndJointRoller::GetSpringDamperPosit(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -295,7 +295,7 @@ void ndJointRoller::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 
 		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
 
-		ndFloat32 angleStep = dMin(deltaTwist, ndFloat32(2.0f * ndPi)) / subdiv;
+		ndFloat32 angleStep = ndMin(deltaTwist, ndFloat32(2.0f * ndPi)) / subdiv;
 		ndFloat32 angle0 = m_minLimitAngle;
 
 		ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -360,14 +360,14 @@ void ndJointRoller::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& m
 	const ndVector omega1(m_body1->GetOmega());
 	
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const ndFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
 	m_angle += deltaAngle;
 	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 ndFloat32 ndJointRoller::PenetrationOmega(ndFloat32 penetration) const
 {
-	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
+	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
 	ndFloat32 omega = D_MAX_HINGE_RECOVERY_SPEED * param;
 	return omega;
 }
@@ -393,7 +393,7 @@ ndInt8 ndJointRoller::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMat
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (angle > m_maxLimitAngle)
 			{
@@ -403,7 +403,7 @@ ndInt8 ndJointRoller::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMat
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}
@@ -412,7 +412,7 @@ ndInt8 ndJointRoller::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMat
 
 ndFloat32 ndJointRoller::PenetrationSpeed(ndFloat32 penetration) const
 {
-	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
+	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_SLIDER_PENETRATION) / D_MAX_SLIDER_PENETRATION;
 	ndFloat32 speed = D_MAX_SLIDER_RECOVERY_SPEED * param;
 	return speed;
 }
@@ -439,7 +439,7 @@ ndInt8 ndJointRoller::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMat
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (x > m_maxLimitPosit)
 			{
@@ -449,7 +449,7 @@ ndInt8 ndJointRoller::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMat
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}

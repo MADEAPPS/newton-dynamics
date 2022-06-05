@@ -218,7 +218,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 				const ndArray<ndInt32>& indexList = m_fluidBody->m_indexList;
 				const ndArray<glPositionNormalUV>& points = m_fluidBody->m_points;
 				m_isoSurfaceMesh1->UpdateBuffers(points, indexList);
-				dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+				ndSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
 			}
 		}
 
@@ -284,9 +284,9 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 				p.m_y = spacing * int(p.m_y / spacing);
 				p.m_z = spacing * int(p.m_z / spacing);
 
-				p.m_x += dGaussianRandom(spacing * 0.01f);
-				p.m_y += dGaussianRandom(spacing * 0.01f);
-				p.m_z += dGaussianRandom(spacing * 0.01f);
+				p.m_x += ndGaussianRandom(spacing * 0.01f);
+				p.m_y += ndGaussianRandom(spacing * 0.01f);
+				p.m_z += ndGaussianRandom(spacing * 0.01f);
 				posit.PushBack(p);
 				veloc.PushBack(v);
 			}

@@ -231,7 +231,7 @@ void ndBodyDynamic::ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const im
 
 void ndBodyDynamic::SetLinearDamping(ndFloat32 linearDamp)
 {
-	linearDamp = dClamp(linearDamp, ndFloat32(0.0f), ndFloat32(1.0f));
+	linearDamp = ndClamp(linearDamp, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_w = D_MAX_SPEED_ATT * linearDamp;
 	m_cachedTimeStep = ndFloat32(0.0f);
 }
@@ -250,13 +250,13 @@ ndVector ndBodyDynamic::GetAngularDamping() const
 
 void ndBodyDynamic::SetAngularDamping(const ndVector& angularDamp)
 {
-	ndFloat32 tmp = dClamp(angularDamp.m_x, ndFloat32(0.0f), ndFloat32(1.0f));
+	ndFloat32 tmp = ndClamp(angularDamp.m_x, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_x = D_MAX_SPEED_ATT * tmp;
 
-	tmp = dClamp(angularDamp.m_y, ndFloat32(0.0f), ndFloat32(1.0f));
+	tmp = ndClamp(angularDamp.m_y, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_y = D_MAX_SPEED_ATT * tmp;
 
-	tmp = dClamp(angularDamp.m_z, ndFloat32(0.0f), ndFloat32(1.0f));
+	tmp = ndClamp(angularDamp.m_z, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_z = D_MAX_SPEED_ATT * tmp;
 
 	m_cachedTimeStep = ndFloat32(0.0f);
@@ -264,7 +264,7 @@ void ndBodyDynamic::SetAngularDamping(const ndVector& angularDamp)
 
 void ndBodyDynamic::AddDampingAcceleration(ndFloat32 timestep)
 {
-	if (dAbs(m_cachedTimeStep - timestep) > ndFloat32(1.0e-6f)) 
+	if (ndAbs(m_cachedTimeStep - timestep) > ndFloat32(1.0e-6f)) 
 	{
 		m_cachedTimeStep = timestep;
 		// assume a nominal 60 frame seconds time step.

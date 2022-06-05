@@ -143,8 +143,8 @@ inline void ndBodyPlayerCapsule::SetHeadingAngle(ndFloat32 angle)
 { 
 	//m_headingAngle = dClamp(angle, ndFloat32(-dPi), ndFloat32(dPi)); 
 	const ndFloat32 interpolation = ndFloat32(0.3f);
-	ndFloat32 deltaAngle = AnglesAdd(angle, -m_headingAngle) * interpolation;
-	ndFloat32 headingAngle = AnglesAdd(m_headingAngle, deltaAngle);
+	ndFloat32 deltaAngle = ndAnglesAdd(angle, -m_headingAngle) * interpolation;
+	ndFloat32 headingAngle = ndAnglesAdd(m_headingAngle, deltaAngle);
 	//dTrace(("%f %f %f\n", angle * dRadToDegree, m_headingAngle * dRadToDegree, headingAngle * dRadToDegree));
 	m_headingAngle = headingAngle;
 }

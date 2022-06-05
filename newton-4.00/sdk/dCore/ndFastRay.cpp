@@ -155,8 +155,8 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 	}
 	
 	// finally do the division to get sc and tc
-	ndFloat32 sc = (dAbs(sN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : sN / sD);
-	ndFloat32 tc = (dAbs(tN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : tN / tD);
+	ndFloat32 sc = (ndAbs(sN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : sN / sD);
+	ndFloat32 tc = (ndAbs(tN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : tN / tD);
 	
 	dAssert(u.m_w == ndFloat32(0.0f));
 	dAssert(v.m_w == ndFloat32(0.0f));

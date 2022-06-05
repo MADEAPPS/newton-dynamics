@@ -249,7 +249,7 @@ void ndHeap<dItem, dKey>::Remove(ndInt32 index)
 	ndHeap<dItem, dKey>::m_pool[index] = ndHeap<dItem, dKey>::m_pool[ndHeap<dItem, dKey>::m_curCount];
 	while (index && ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1].m_key < ndHeap<dItem, dKey>::m_pool[index].m_key)
 	{
-		dSwap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
+		ndSwap(ndHeap<dItem, dKey>::m_pool[(index - 1) >> 1], ndHeap<dItem, dKey>::m_pool[index]);
 		index = (index - 1) >> 1;
 	}
 
@@ -264,14 +264,14 @@ void ndHeap<dItem, dKey>::Remove(ndInt32 index)
 			{
 				break;
 			}
-			dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+			ndSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
 			index = i0;
 		}
 		else
 		{
 			if (ndHeap<dItem, dKey>::m_pool[i0].m_key > ndHeap<dItem, dKey>::m_pool[index].m_key)
 			{
-				dSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
+				ndSwap(ndHeap<dItem, dKey>::m_pool[i0], ndHeap<dItem, dKey>::m_pool[index]);
 			}
 			index = i0;
 		}

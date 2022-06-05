@@ -276,13 +276,13 @@ void ndJointKinematicController::CheckSleep() const
 	//				ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	//				dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 	//				lateralDir = lateralDir.Normalize();
-	//				ndFloat32 coneAngle = dAcos(dClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
+	//				ndFloat32 coneAngle = dAcos(ndClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
 	//				ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 	//				ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	//				pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	//			}
 	//
-	//			if (dAbs(pitchAngle) > (1.0 * ndDegreeToRad)) 
+	//			if (ndAbs(pitchAngle) > (1.0 * ndDegreeToRad)) 
 	//			{
 	//				ndBodyKinematicSetSleepState(m_body0, 0);
 	//			}
@@ -337,14 +337,14 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		const ndFloat32 dist = pointPosit.AddHorizontal().GetScalar();
 		const ndFloat32 speed = pointVeloc.AddHorizontal().GetScalar();
 	
-		ndFloat32 v = m_maxSpeed * dSign(dist);
+		ndFloat32 v = m_maxSpeed * ndSign(dist);
 		if ((dist < maxDistance) && (dist > -maxDistance)) 
 		{
 			v = damp * dist * invTimestep;
 		}
-		dAssert(dAbs(v) <= m_maxSpeed);
+		dAssert(ndAbs(v) <= m_maxSpeed);
 	
-		const ndFloat32 relAccel = dClamp ((v + speed) * invTimestep, ndFloat32 (-400.0f), ndFloat32 (400.0f));
+		const ndFloat32 relAccel = ndClamp ((v + speed) * invTimestep, ndFloat32 (-400.0f), ndFloat32 (400.0f));
 
 		SetMotorAcceleration(desc, -relAccel);
 		SetLowerFriction(desc, -m_maxLinearFriction);
@@ -365,7 +365,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 				
 				const ndVector pointOmega(omega0 * jacobianPair.m_jacobianM0.m_angular + omega1 * jacobianPair.m_jacobianM1.m_angular);
 				const ndFloat32 relSpeed = pointOmega.AddHorizontal().GetScalar();
-				const ndFloat32 relAccel = dClamp (relSpeed * invTimestep, ndFloat32 (-3000.0f), ndFloat32(3000.0f));
+				const ndFloat32 relAccel = ndClamp (relSpeed * invTimestep, ndFloat32 (-3000.0f), ndFloat32(3000.0f));
 				SetMotorAcceleration(desc, -relAccel);
 				SetLowerFriction(desc, -angularFriction);
 				SetHighFriction(desc, angularFriction);
@@ -387,12 +387,12 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//				ndVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		//				ndFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
 		//
-		//				ndFloat32 w = m_maxOmega * dSign(coneAngle);
+		//				ndFloat32 w = m_maxOmega * ndSign(coneAngle);
 		//				if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
 		//					w = damp * coneAngle * invTimestep;
 		//				}
 		//
-		//				dAssert(dAbs(w) <= m_maxOmega);
+		//				dAssert(ndAbs(w) <= m_maxOmega);
 		//				ndFloat32 relAlpha = (w + relOmega) * invTimestep;
 		//
 		//				NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
@@ -408,7 +408,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 		//		dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 		//		lateralDir = lateralDir.Normalize();
-		//		ndFloat32 coneAngle = dAcos(dClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
+		//		ndFloat32 coneAngle = dAcos(ndClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
 		//		ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 		//
 		//		if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
@@ -418,7 +418,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//			ndVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		//			ndFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
 		//
-		//			ndFloat32 w = m_maxOmega * dSign(coneAngle);
+		//			ndFloat32 w = m_maxOmega * ndSign(coneAngle);
 		//			if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
 		//				w = damp * coneAngle * invTimestep;
 		//			}
@@ -451,11 +451,11 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//		ndVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		//		ndFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
 		//
-		//		ndFloat32 w = m_maxOmega * dSign(pitchAngle);
+		//		ndFloat32 w = m_maxOmega * ndSign(pitchAngle);
 		//		if ((pitchAngle < maxAngle) && (pitchAngle > -maxAngle)) {
 		//			w = damp * pitchAngle * invTimestep;
 		//		}
-		//		dAssert(dAbs(w) <= m_maxOmega);
+		//		dAssert(ndAbs(w) <= m_maxOmega);
 		//		ndFloat32 relAlpha = (w + relOmega) * invTimestep;
 		//
 		//		NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);

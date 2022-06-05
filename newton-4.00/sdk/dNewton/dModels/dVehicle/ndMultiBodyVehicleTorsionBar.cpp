@@ -71,9 +71,9 @@ void ndMultiBodyVehicleTorsionBar::Save(const ndLoadSaveBase::ndSaveDescriptor& 
 
 void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(ndFloat32 springK, ndFloat32 damperC, ndFloat32 springDamperRegularizer)
 {
-	m_springK = dAbs(springK);
-	m_damperC = dAbs(damperC);
-	m_springDamperRegularizer = dClamp (springDamperRegularizer, ndFloat32 (0.001), ndFloat32(0.99f));
+	m_springK = ndAbs(springK);
+	m_damperC = ndAbs(damperC);
+	m_springDamperRegularizer = ndClamp (springDamperRegularizer, ndFloat32 (0.001), ndFloat32(0.99f));
 }
 
 void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyKinematic* const leftTire, const ndBodyKinematic* const rightTire)

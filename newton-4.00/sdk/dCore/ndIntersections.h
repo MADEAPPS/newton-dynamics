@@ -84,7 +84,7 @@ inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, cons
 
 	// estimate the maximum effect of the angular velocity and enlarge that box by that value (use 45 degrees as max angle not 90)
 	dAssert (omega.m_w == ndFloat32 (0.0f));
-	ndFloat32 maxAngle = dMin (ndSqrt (omega.DotProduct(omega).GetScalar() * timestep * timestep), ndFloat32 (45.0f * ndDegreeToRad));
+	ndFloat32 maxAngle = ndMin (ndSqrt (omega.DotProduct(omega).GetScalar() * timestep * timestep), ndFloat32 (45.0f * ndDegreeToRad));
 
 	ndFloat32 angularTravel = (maxRadius - minRadius) * maxAngle;
 	ndVector angularStep (angularTravel, angularTravel, angularTravel, ndFloat32 (0.0f));

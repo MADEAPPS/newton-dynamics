@@ -32,7 +32,7 @@ ndFloat32 ndAnimationSequencePlayer::GetParam() const
 
 void ndAnimationSequencePlayer::SetParam(ndFloat32 param)
 {
-	m_param = dMod(param, ndFloat32 (1.0f));
+	m_param = ndMod(param, ndFloat32 (1.0f));
 }
 
 ndAnimationSequence* ndAnimationSequencePlayer::GetSequence()

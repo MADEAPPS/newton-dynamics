@@ -70,8 +70,8 @@ void ndShapeChamferCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) 
 
 void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 {
-	m_radius = dMax (dAbs (radius), D_MIN_CONVEX_SHAPE_SIZE);
-	m_height = dMax (dAbs (height * ndFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius = ndMax (ndAbs (radius), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = ndMax (ndAbs (height * ndFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	ndFloat32 sliceAngle = ndFloat32 (0.0f);
 	ndFloat32 sliceStep = ndPi  / DG_CHAMFERCYLINDER_SLICES; 
@@ -262,12 +262,12 @@ ndVector ndShapeChamferCylinder::SupportVertexSpecialProjectPoint(const ndVector
 ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndFloat32 x = dir.GetScalar();
-	if (dAbs(x) > ndFloat32(0.9999f)) 
+	if (ndAbs(x) > ndFloat32(0.9999f)) 
 	{
-		return ndVector(dSign(x) * m_height, m_radius, ndFloat32(0.0f), ndFloat32(0.0f));
+		return ndVector(ndSign(x) * m_height, m_radius, ndFloat32(0.0f), ndFloat32(0.0f));
 	}
 
 	ndVector sideDir(m_yzMask & dir);
@@ -278,10 +278,10 @@ ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir, ndInt32* con
 ndVector ndShapeChamferCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndFloat32 x = dir.GetScalar();
-	if (dAbs(x) > ndFloat32(0.99995f)) 
+	if (ndAbs(x) > ndFloat32(0.99995f)) 
 	{
 		return ndVector(ndFloat32(0.0f), m_radius, ndFloat32(0.0f), ndFloat32(0.0f));
 	}
@@ -333,7 +333,7 @@ ndFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const ndVec
 
 	//ndVector dir(dq * dq.InvMagSqrt());
 	ndVector dir(dq.Normalize());
-	if (dAbs(dir.m_x) > 0.9999f) 
+	if (ndAbs(dir.m_x) > 0.9999f) 
 	{
 		//return ndShapeConvex::RayCast(localP0, localP1, maxT, contactOut, body, nullptr, nullptr);
 		return ndShapeConvex::RayCast(callback, localP0, localP1, maxT, body, contactOut);
@@ -399,7 +399,7 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 	if (normal.m_x < -inclination) 
 	{
 		ndMatrix matrix(normal);
-		ndFloat32 x = ndSqrt(dMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
+		ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
 		count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
 		//count = RectifyConvexSlice(n, normal, contactsOut);
@@ -407,7 +407,7 @@ ndInt32 ndShapeChamferCylinder::CalculatePlaneIntersection(const ndVector& norma
 	else if (normal.m_x > inclination) 
 	{
 		ndMatrix matrix(normal);
-		ndFloat32 x = ndSqrt(dMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
+		ndFloat32 x = ndSqrt(ndMax(m_height * m_height - origin.m_x * origin.m_x, ndFloat32(0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
 		count = BuildCylinderCapPoly(m_radius + x, matrix, contactsOut);
 		//count = RectifyConvexSlice(n, normal, contactsOut);

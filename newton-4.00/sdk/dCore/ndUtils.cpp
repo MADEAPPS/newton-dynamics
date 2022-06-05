@@ -35,41 +35,41 @@
 
 static ndUnsigned32 ___dRandSeed___ = 0;
 
-void dSetRandSeed(ndUnsigned32 seed)
+void ndSetRandSeed(ndUnsigned32 seed)
 {
 	___dRandSeed___ = seed;
 }
 
-ndInt32 dRandInt()
+ndInt32 ndRandInt()
 {
 	___dRandSeed___ = D_RAND_MUL * ___dRandSeed___ + D_ADD_ADD;
 	return ___dRandSeed___ & D_MAX_RAND;
 }
 
 /// return a random variable between 0.0 and 1.0
-ndFloat32 dRand()
+ndFloat32 ndRand()
 {
 	// numerical recipe in c
-	ndFloat32 r = ndFloat32(dRandInt()) * ((ndFloat32(1.0f) / D_MAX_RAND));
+	ndFloat32 r = ndFloat32(ndRandInt()) * ((ndFloat32(1.0f) / D_MAX_RAND));
 	//dTrace(("%f\n", r));
 	return r;
 }
 
 /// return a pseudo Gaussian random with mean 0 and variance 0.5f
-ndFloat32 dGaussianRandom(ndFloat32 amp)
+ndFloat32 ndGaussianRandom(ndFloat32 amp)
 {
 	// yes I know, this is not quite right but for now it will do for now.
 	const ndInt32 count = 4;
 	ndFloat32 r = ndFloat32(0.0f);
 	for (ndInt32 i = 0; i < count; i++)
 	{
-		r += ndFloat32(2.0f) * dRand() - ndFloat32(1.0f);
+		r += ndFloat32(2.0f) * ndRand() - ndFloat32(1.0f);
 	}
 	r *= (amp / count);
 	return r;
 }
 
-ndFloat64 dRoundToFloat(ndFloat64 val)
+ndFloat64 ndRoundToFloat(ndFloat64 val)
 {
 	ndInt32 exp;
 	ndFloat64 mantissa = frexp(val, &exp);
@@ -82,7 +82,7 @@ ndFloat64 dRoundToFloat(ndFloat64 val)
 	return val1;
 }
 
-ndUnsigned64 dGetTimeInMicroseconds()
+ndUnsigned64 ndGetTimeInMicroseconds()
 {
 	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
@@ -110,7 +110,7 @@ void ndSpinLock::Delay(ndInt32& exp)
 			acc++;
 		}
 	#endif
-	exp = dMin(exp * 2, 64);
+	exp = ndMin(exp * 2, 64);
 }
 #endif
 
@@ -244,8 +244,8 @@ static ndInt32 SortVertices(
 	};
 	ndSort<dSortKey, dCompareKey>(remapIndex, cluster.m_count, &sortContext);
 
-	const ndFloat64 minDist = dMin(dMin(variance.m_x, variance.m_y), variance.m_z);
-	const ndFloat64 tolerance = dMax(dMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
+	const ndFloat64 minDist = ndMin(ndMin(variance.m_x, variance.m_y), variance.m_z);
+	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 	
 	ndInt32 newCount = 0;
@@ -347,7 +347,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 
 			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
-			ndFloat64 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
+			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			dSortKey* const remapIndex = &indirectList[cluster.m_start];
 			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
@@ -388,7 +388,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 					dAssert(i0 <= i1);
 					if (i0 < i1)
 					{
-						dSwap(remapIndex[i0], remapIndex[i1]);
+						ndSwap(remapIndex[i0], remapIndex[i1]);
 						++i0;
 						--i1;
 					}
@@ -450,7 +450,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	return baseCount;
 }
 
-ndInt32 dVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
+ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
 {
 	ndSetPrecisionDouble precision;
 

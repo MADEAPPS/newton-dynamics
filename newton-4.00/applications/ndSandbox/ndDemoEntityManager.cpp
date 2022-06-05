@@ -587,7 +587,7 @@ ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axis
 	if (m_hasJoytick) 
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-		axisCount = dMin (axisCount, axisValues.GetCapacity());
+		axisCount = ndMin (axisCount, axisValues.GetCapacity());
 		for (ndInt32 i = 0; i < axisCount; i ++) 
 		{
 			axisValues[i] = axis[i];
@@ -621,7 +621,7 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 	if (m_hasJoytick) 
 	{
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-		buttonsCount = dMin (buttonsCount, axisbuttons.GetCapacity());
+		buttonsCount = ndMin (buttonsCount, axisbuttons.GetCapacity());
 		for (ndInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];
@@ -646,7 +646,7 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 void ndDemoEntityManager::ResetTimer()
 {
 	dResetTimer();
-	m_microsecunds = dGetTimeInMicroseconds ();
+	m_microsecunds = ndGetTimeInMicroseconds ();
 }
 
 void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
@@ -1332,7 +1332,7 @@ void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)
 
 ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
-	ndUnsigned64 timeStep = dGetTimeInMicroseconds () - m_microsecunds;		
+	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
 	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {

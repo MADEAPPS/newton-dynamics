@@ -116,7 +116,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		ndFloat32 t = -num / den;
 		contactOut.m_point = localP0 + segment.Scale(t);
 		contactOut.m_normal = m_planeEquation;
-		return dClamp (t, ndFloat32 (0.0f), ndFloat32 (1.2f));
+		return ndClamp (t, ndFloat32 (0.0f), ndFloat32 (1.2f));
 	}
 
 	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const
@@ -174,7 +174,7 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 		for (ndInt32 ix = 0; ix <= grids; ix++)
 		{
 			ndFloat32 x0 = origin.m_x + ix * gridSize;
-			points.PushBack(ndVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
+			points.PushBack(ndVector(x0, ndGaussianRandom(perturbation), z0, 1.0f));
 		}
 	}
 

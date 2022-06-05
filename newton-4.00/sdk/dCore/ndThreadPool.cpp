@@ -83,9 +83,9 @@ ndThreadPool::~ndThreadPool()
 void ndThreadPool::SetThreadCount(ndInt32 count)
 {
 #ifdef	D_USE_THREAD_EMULATION
-	m_count = dClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
+	m_count = ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 #else
-	count = dClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
+	count = ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 	if (count != m_count)
 	{
 		if (m_workers)

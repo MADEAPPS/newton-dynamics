@@ -61,6 +61,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndScene : public ndThreadPool
 {
 	protected:
+#ifdef D_NEW_SCENE
+	class ndContactPairs;
+#endif
 	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
 	{
 		public:

@@ -48,15 +48,15 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 			ndInt32 mid = (lo + hi) >> 1;
 			if (comparator.Compare(array[lo], array[mid], context) > 0)
 			{
-				dSwap(array[lo], array[mid]);
+				ndSwap(array[lo], array[mid]);
 			}
 			if (comparator.Compare(array[mid], array[hi], context) > 0)
 			{
-				dSwap(array[mid], array[hi]);
+				ndSwap(array[mid], array[hi]);
 			}
 			if (comparator.Compare(array[lo], array[mid], context) > 0)
 			{
-				dSwap(array[lo], array[mid]);
+				ndSwap(array[lo], array[mid]);
 			}
 			ndInt32 i = lo + 1;
 			ndInt32 j = hi - 1;
@@ -74,7 +74,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 
 				if (i <= j)
 				{
-					dSwap(array[i], array[j]);
+					ndSwap(array[i], array[j]);
 					i++;
 					j--;
 				}
@@ -105,7 +105,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 	{
 		if (comparator.Compare(array[0], array[i], context) > 0)
 		{
-			dSwap(array[0], array[i]);
+			ndSwap(array[0], array[i]);
 		}
 	}
 
@@ -192,7 +192,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 	D_TRACKTIME();
 	ndEvaluateKey evaluator(context);
 	const ndInt32 threadCount = threadPool.GetThreadCount();
-	ndUnsigned32* const scans = dAlloca(ndUnsigned32, threadCount * ((1 << keyBitSize) + 1));
+	ndUnsigned32* const scans = ndAlloca(ndUnsigned32, threadCount * ((1 << keyBitSize) + 1));
 
 	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{

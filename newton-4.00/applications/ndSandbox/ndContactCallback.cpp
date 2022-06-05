@@ -96,7 +96,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 		const ndVector veloc(pointVeloc1 - pointVeloc0);
 
 		const ndFloat32 verticalSpeed = contactPoint.m_normal.DotProduct(veloc).GetScalar();
-		const ndFloat32 nornalSpeed = dAbs(verticalSpeed);
+		const ndFloat32 nornalSpeed = ndAbs(verticalSpeed);
 		if (nornalSpeed > maxNornalSpeed)
 		{
 			maxNornalSpeed = nornalSpeed;
@@ -114,7 +114,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 
 	const ndShapeInstance& instance0 = body0->GetCollisionShape();
 	const ndShapeInstance& instance1 = body1->GetCollisionShape();
-	const ndFloat32 speedThreshold = dMax(instance0.GetMaterial().m_userParam[0].m_floatData, instance1.GetMaterial().m_userParam[0].m_floatData);
+	const ndFloat32 speedThreshold = ndMax(instance0.GetMaterial().m_userParam[0].m_floatData, instance1.GetMaterial().m_userParam[0].m_floatData);
 	if (maxNornalSpeed > speedThreshold)
 	{
 		// play impact sound here;

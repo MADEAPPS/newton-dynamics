@@ -487,7 +487,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 						dAssert(i0 <= i1);
 						if (i0 < i1)
 						{
-							dSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
+							ndSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
 							++i0;
 							--i1;
 						}

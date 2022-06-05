@@ -377,9 +377,9 @@ ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, cons
 
 void ndShapeInstance::SetScale(const ndVector& scale)
 {
-	ndFloat32 scaleX = dAbs(scale.m_x);
-	ndFloat32 scaleY = dAbs(scale.m_y);
-	ndFloat32 scaleZ = dAbs(scale.m_z);
+	ndFloat32 scaleX = ndAbs(scale.m_x);
+	ndFloat32 scaleY = ndAbs(scale.m_y);
+	ndFloat32 scaleZ = ndAbs(scale.m_z);
 	dAssert(scaleX > ndFloat32(0.0f));
 	dAssert(scaleY > ndFloat32(0.0f));
 	dAssert(scaleZ > ndFloat32(0.0f));
@@ -390,9 +390,9 @@ void ndShapeInstance::SetScale(const ndVector& scale)
 		ndShapeCompound* const compound = ((ndShape*)m_shape)->GetAsShapeCompound();
 		compound->ApplyScale(scale);
 	}
-	else if ((dAbs(scaleX - scaleY) < ndFloat32(1.0e-4f)) && (dAbs(scaleX - scaleZ) < ndFloat32(1.0e-4f))) 
+	else if ((ndAbs(scaleX - scaleY) < ndFloat32(1.0e-4f)) && (ndAbs(scaleX - scaleZ) < ndFloat32(1.0e-4f))) 
 	{
-		if ((dAbs(scaleX - ndFloat32(1.0f)) < ndFloat32(1.0e-4f))) 
+		if ((ndAbs(scaleX - ndFloat32(1.0f)) < ndFloat32(1.0e-4f))) 
 		{
 			m_scaleType = m_unit;
 			m_scale = ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f));
@@ -410,7 +410,7 @@ void ndShapeInstance::SetScale(const ndVector& scale)
 	else 
 	{
 		m_scaleType = m_nonUniform;
-		m_maxScale = dMax(dMax(scaleX, scaleY), scaleZ);
+		m_maxScale = ndMax(ndMax(scaleX, scaleY), scaleZ);
 		m_scale = ndVector(scaleX, scaleY, scaleZ, ndFloat32(0.0f));
 		m_invScale = ndVector(ndFloat32(1.0f) / scaleX, ndFloat32(1.0f) / scaleY, ndFloat32(1.0f) / scaleZ, ndFloat32(0.0f));
 	}
@@ -422,7 +422,7 @@ void ndShapeInstance::SetGlobalScale(const ndMatrix& scaleMatrix)
 
 	ndVector scale;
 	matrix.PolarDecomposition(m_localMatrix, scale, m_alignmentMatrix);
-	bool uniform = (dAbs(scale[0] - scale[1]) < ndFloat32(1.0e-4f)) && (dAbs(scale[0] - scale[2]) < ndFloat32(1.0e-4f));
+	bool uniform = (ndAbs(scale[0] - scale[1]) < ndFloat32(1.0e-4f)) && (ndAbs(scale[0] - scale[2]) < ndFloat32(1.0e-4f));
 	if (uniform) 
 	{
 		SetScale(scale);

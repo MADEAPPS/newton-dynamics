@@ -2662,7 +2662,7 @@ void ndIsoSurface::ndImplementation::CalculateAabb(const ndArray<ndVector>& poin
 
 ndVector ndIsoSurface::ndImplementation::InterpolateLowResVertex(const ndVector& p0, const ndVector& p1) const
 {
-	dAssert(dAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
+	dAssert(ndAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
 	const ndVector p1p0(p1 - p0);
 	return ndVector(p0 + p1p0 * ndVector::m_half);
 }
@@ -2678,7 +2678,7 @@ ndVector ndIsoSurface::ndImplementation::InterpolateHighResVertex(ndFloat32, con
 	//return p;
 
 	//dAssert(isolevel == ndFloat32(0.5f));
-	dAssert(dAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
+	dAssert(ndAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
 	const ndVector p1p0(p1 - p0);
 	return ndVector(p0 + p1p0 * ndVector::m_half);
 }
@@ -2964,9 +2964,9 @@ void ndIsoSurface::ndImplementation::RemoveDuplicates(const ndArray<ndVector>& p
 		const ndGridHash hashKey(p);
 		m_hashGridMapScratchBuffer[i] = hashKey;
 
-		upperDigits.m_x = dMax(upperDigits.m_x, ndInt32(hashKey.m_xHigh));
-		upperDigits.m_y = dMax(upperDigits.m_y, ndInt32(hashKey.m_yHigh));
-		upperDigits.m_z = dMax(upperDigits.m_z, ndInt32(hashKey.m_zHigh));
+		upperDigits.m_x = ndMax(upperDigits.m_x, ndInt32(hashKey.m_xHigh));
+		upperDigits.m_y = ndMax(upperDigits.m_y, ndInt32(hashKey.m_yHigh));
+		upperDigits.m_z = ndMax(upperDigits.m_z, ndInt32(hashKey.m_zHigh));
 	}
 	m_upperDigitsIsValid = upperDigits;
 

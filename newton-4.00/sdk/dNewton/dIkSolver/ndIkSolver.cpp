@@ -51,8 +51,8 @@ ndIkSolver::~ndIkSolver()
 
 void ndIkSolver::SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha)
 {
-	m_maxAlpha = dAbs(maxAlpha);
-	m_maxAccel = dAbs(maxAccel);
+	m_maxAlpha = ndAbs(maxAlpha);
+	m_maxAccel = ndAbs(maxAccel);
 }
 
 //void ndIkSolver::SetMaxIterations(ndInt32 iterCount)
@@ -146,7 +146,7 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = ndFloat32(0.0f);
-		rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
+		rhs->m_diagonalRegularizer = ndMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
 
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];

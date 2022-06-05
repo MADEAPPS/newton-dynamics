@@ -84,7 +84,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	{
 		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
 		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-		ndInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
 
 		m_shader = shaderCache.m_flatShaded;
 		m_indexCount = m_triangles.GetCount();
@@ -225,7 +225,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	{
 		ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
 		m_lines.SetCount(drawShapes.m_lines.GetCount());
-		ndInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
 
 		m_indexCount = m_lines.GetCount();
 		ndTree<ndUnsigned64, ndUnsigned64> filter;
@@ -242,8 +242,8 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 			} key;
 			ndInt32 i0 = m_lines[i - 1];
 			ndInt32 i1 = m_lines[i - 0];
-			key.m_low = dMin(i0, i1);
-			key.m_high = dMax(i0, i1);
+			key.m_low = ndMin(i0, i1);
+			key.m_high = ndMax(i0, i1);
 			if (filter.Find(key.m_key))
 			{
 				m_lines[i - 1] = m_lines[m_indexCount - 2];

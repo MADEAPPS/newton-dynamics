@@ -310,7 +310,7 @@ class ndVector
 
 	ndFloat32 GetMax () const
 	{
-		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
+		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
 	}
 
 	ndVector GetMax (const ndVector& data) const
@@ -746,7 +746,7 @@ class ndBigVector
 
 	ndFloat64 GetMax () const
 	{
-		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
+		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
 	}
 
 	ndBigVector GetMax (const ndBigVector& data) const

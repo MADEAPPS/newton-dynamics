@@ -101,8 +101,8 @@ ndMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode(dgMeshBVHNode* const left, 
 	m_left->m_parent = this;
 	m_right->m_parent = this;
 
-	//	dVector p0 (dMin (left->m_p0.m_x, right->m_p0.m_x), dMin (left->m_p0.m_y, right->m_p0.m_y), dMin (left->m_p0.m_z, right->m_p0.m_z), dFloat32 (0.0f));
-	//	dVector p1 (dMax (left->m_p1.m_x, right->m_p1.m_x), dMax (left->m_p1.m_y, right->m_p1.m_y), dMax (left->m_p1.m_z, right->m_p1.m_z), dFloat32 (0.0f));
+	//	dVector p0 (ndMin (left->m_p0.m_x, right->m_p0.m_x), ndMin (left->m_p0.m_y, right->m_p0.m_y), ndMin (left->m_p0.m_z, right->m_p0.m_z), dFloat32 (0.0f));
+	//	dVector p1 (ndMax (left->m_p1.m_x, right->m_p1.m_x), ndMax (left->m_p1.m_y, right->m_p1.m_y), ndMax (left->m_p1.m_z, right->m_p1.m_z), dFloat32 (0.0f));
 	dVector p0(left->m_p0.GetMin(right->m_p0));
 	dVector p1(left->m_p1.GetMax(right->m_p1));
 	SetBox(p0, p1);
@@ -1710,8 +1710,8 @@ void ndMeshEffect::dPointFormat::CompressData(
 	};
 	ndSort<dSortKey, CompareKey>(remapIndex, cluster.m_count, &sortContext);
 
-	const ndFloat64 minDist = dMin(dMin(variance.m_x, variance.m_y), variance.m_z);
-	const ndFloat64 tolerance = dMax(dMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
+	const ndFloat64 minDist = ndMin(ndMin(variance.m_x, variance.m_y), variance.m_z);
+	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 
 	const ndInt32 base = output.m_vertex.GetCount();
@@ -1831,7 +1831,7 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 
-			ndFloat64 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
+			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				tmpFormat.CompressData(*this, indexList, remapIndex, cluster, tol);
@@ -1877,7 +1877,7 @@ void ndMeshEffect::dPointFormat::CompactVertexData(ndInt32* const indexList, ndF
 					dAssert(i0 <= i1);
 					if (i0 < i1)
 					{
-						dSwap(remapIndex[i0], remapIndex[i1]);
+						ndSwap(remapIndex[i0], remapIndex[i1]);
 						++i0;
 						--i1;
 					}
@@ -1974,8 +1974,8 @@ void ndMeshEffect::dAttibutFormat::CompressData(
 	};
 	ndSort<dSortKey, CompareKey>(remapIndex, cluster.m_count, &sortContext);
 
-	const ndFloat64 minDist = dMin(dMin(variance.m_x, variance.m_y), variance.m_z);
-	const ndFloat64 tolerance = dMax(dMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
+	const ndFloat64 minDist = ndMin(ndMin(variance.m_x, variance.m_y), variance.m_z);
+	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 
 	const ndInt32 base = output.m_pointChannel.GetCount();
@@ -2190,7 +2190,7 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 
 			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
-			ndFloat64 maxVariance2 = dMax(dMax(variance2.m_x, variance2.m_y), variance2.m_z);
+			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof (spliteStack) / sizeof (spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
@@ -2237,7 +2237,7 @@ void ndMeshEffect::dAttibutFormat::CompactVertexData(const dPointFormat& points,
 					dAssert(i0 <= i1);
 					if (i0 < i1)
 					{
-						dSwap(remapIndex[i0], remapIndex[i1]);
+						ndSwap(remapIndex[i0], remapIndex[i1]);
 						++i0;
 						--i1;
 					}
@@ -2830,7 +2830,7 @@ void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 		ndInt32 count = format->m_faceIndexCount[j];
 		for (ndInt32 i = 0; i < count; ++i)
 		{
-			vertexCount = dMax(vertexCount, format->m_vertex.m_indexList[maxAttribCount + i] + 1);
+			vertexCount = ndMax(vertexCount, format->m_vertex.m_indexList[maxAttribCount + i] + 1);
 		}
 		maxAttribCount += count;
 	}
@@ -3980,7 +3980,7 @@ void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 				if (source->m_attrib.m_materialChannel.GetCount()) 
 				{
 					ndInt32 matIndex = source->m_attrib.m_materialChannel[aIndex];
-					maxMatIndex = dMax(matIndex, maxMatIndex);
+					maxMatIndex = ndMax(matIndex, maxMatIndex);
 					AddMaterial(matIndex);
 				}
 
@@ -4131,7 +4131,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 
 	ndStack<ndInt32>indexListBuffer(builder.m_vertex.GetCount());
 	ndInt32* const indexList = &indexListBuffer[0];
-	dVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
+	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 
 	ndMeshEffect::dMeshVertexFormat vertexFormat;
 	vertexFormat.m_faceCount = builder.m_faceIndexCount.GetCount();
@@ -4180,13 +4180,13 @@ void ndMeshEffect::CalculateAABB(ndBigVector& minBox, ndBigVector& maxBox) const
 		ndEdge* const edge = &(*iter);
 		const ndBigVector& p(points[edge->m_incidentVertex]);
 
-		minP.m_x = dMin(p.m_x, minP.m_x);
-		minP.m_y = dMin(p.m_y, minP.m_y);
-		minP.m_z = dMin(p.m_z, minP.m_z);
+		minP.m_x = ndMin(p.m_x, minP.m_x);
+		minP.m_y = ndMin(p.m_y, minP.m_y);
+		minP.m_z = ndMin(p.m_z, minP.m_z);
 
-		maxP.m_x = dMax(p.m_x, maxP.m_x);
-		maxP.m_y = dMax(p.m_y, maxP.m_y);
-		maxP.m_z = dMax(p.m_z, maxP.m_z);
+		maxP.m_x = ndMax(p.m_x, maxP.m_x);
+		maxP.m_y = ndMax(p.m_y, maxP.m_y);
+		maxP.m_z = ndMax(p.m_z, maxP.m_z);
 	}
 
 	minBox = minP;

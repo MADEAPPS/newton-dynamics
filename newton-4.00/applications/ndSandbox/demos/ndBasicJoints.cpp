@@ -302,7 +302,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
 		world->AddJoint(joint);
 		posit.m_y += diameter * 1.5f;
-		matrix.m_posit = posit + ndVector(dGaussianRandom(0.01f), 0.0f, dGaussianRandom(0.01f), 0.0f);
+		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.01f), 0.0f, ndGaussianRandom(0.01f), 0.0f);
 	}
 
 	mesh2->Release();

@@ -331,8 +331,8 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			e20 = e20.Scale (ndFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
 			e12 = e20.Scale (ndFloat64 (1.0) / sqrt (e12.DotProduct(e12).GetScalar()));
 
-			m_triangleAngles[i * 3 + 0] = acos (dClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
-			m_triangleAngles[i * 3 + 1] = acos (dClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 0] = acos (ndClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 1] = acos (ndClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
 			m_triangleAngles[i * 3 + 2] = dgABF_PI - m_triangleAngles[i * 3 + 0] - m_triangleAngles[i * 3 + 1];
 		}
 	}
@@ -1074,7 +1074,7 @@ dAssert (0);
 			dAssert(e10.m_w == ndFloat32(0.0f));
 			dAssert(e20.m_w == ndFloat32(0.0f));
 
-			m_beta[i] = acos (dClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
+			m_beta[i] = acos (ndClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
 			dAssert (m_beta[i] > ndFloat64 (0.0f));
 		}
 
@@ -1400,7 +1400,7 @@ dAssert (0);
 		m_progressNum ++;
 		if (m_progressReportCallback) {
 			if ((m_progressNum & 127) == 127) {
-				m_continueExecution = m_progressReportCallback (dMin (ndFloat32 (m_progressNum) / m_progressDen, ndFloat32 (1.0f)), m_progressReportUserData);
+				m_continueExecution = m_progressReportCallback (ndMin (ndFloat32 (m_progressNum) / m_progressDen, ndFloat32 (1.0f)), m_progressReportUserData);
 			}
 		}
 	}
@@ -1512,12 +1512,12 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 	for (ndInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
 		buffer[i] = uvAligment.RotateVector (m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
-		pMin.m_x = dMin (pMin.m_x, tmp.m_x);
-		pMax.m_x = dMax (pMax.m_x, tmp.m_x);
-		pMin.m_y = dMin (pMin.m_y, tmp.m_y);
-		pMax.m_y = dMax (pMax.m_y, tmp.m_y);
-		pMin.m_z = dMin (pMin.m_z, tmp.m_z);
-		pMax.m_z = dMax (pMax.m_z, tmp.m_z);
+		pMin.m_x = ndMin (pMin.m_x, tmp.m_x);
+		pMax.m_x = ndMax (pMax.m_x, tmp.m_x);
+		pMin.m_y = ndMin (pMin.m_y, tmp.m_y);
+		pMax.m_y = ndMax (pMax.m_y, tmp.m_y);
+		pMin.m_z = ndMin (pMin.m_z, tmp.m_z);
+		pMax.m_z = ndMax (pMax.m_z, tmp.m_z);
 	}
 
 	ndStack<ndBigVector>cylinder (m_points.m_vertex.m_count);
@@ -1588,7 +1588,7 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 				e1 = e2;
 			}
 			normal = normal.Normalize();
-			if (dAbs(normal.m_x) > ndFloat32 (0.99f)) {
+			if (ndAbs(normal.m_x) > ndFloat32 (0.99f)) {
 				ndEdge* ptr = edge;
 				do {
 					dAttibutFormat::dgUV uv;
@@ -1623,7 +1623,7 @@ void ndMeshEffect::AngleBaseFlatteningMapping (ndInt32 material, dgReportProgres
 	tmp.CalculateAABB(minBox, maxBox);
 
 	ndBigVector size (maxBox - minBox);
-	ndFloat32 scale = ndFloat32 (1.0 / dMax (size.m_x, size.m_y, size.m_z));
+	ndFloat32 scale = ndFloat32 (1.0 / ndMax (size.m_x, size.m_y, size.m_z));
 
 	ndMatrix matrix (dGetIdentityMatrix());
 	matrix[0][0] = scale;
@@ -1743,19 +1743,19 @@ void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const nd
 	{
 		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
-		pMin.m_x = dMin(pMin.m_x, tmp.m_x);
-		pMax.m_x = dMax(pMax.m_x, tmp.m_x);
-		pMin.m_y = dMin(pMin.m_y, tmp.m_y);
-		pMax.m_y = dMax(pMax.m_y, tmp.m_y);
-		pMin.m_z = dMin(pMin.m_z, tmp.m_z);
-		pMax.m_z = dMax(pMax.m_z, tmp.m_z);
+		pMin.m_x = ndMin(pMin.m_x, tmp.m_x);
+		pMax.m_x = ndMax(pMax.m_x, tmp.m_x);
+		pMin.m_y = ndMin(pMin.m_y, tmp.m_y);
+		pMax.m_y = ndMax(pMax.m_y, tmp.m_y);
+		pMin.m_z = ndMin(pMin.m_z, tmp.m_z);
+		pMax.m_z = ndMax(pMax.m_z, tmp.m_z);
 	}
 	ndInt32 materialArray[3];
 
 	ndBigVector dist(pMax);
-	dist[0] = dMax(ndFloat64(1.0e-3f), dist[0]);
-	dist[1] = dMax(ndFloat64(1.0e-3f), dist[1]);
-	dist[2] = dMax(ndFloat64(1.0e-3f), dist[2]);
+	dist[0] = ndMax(ndFloat64(1.0e-3f), dist[0]);
+	dist[1] = ndMax(ndFloat64(1.0e-3f), dist[1]);
+	dist[2] = ndMax(ndFloat64(1.0e-3f), dist[2]);
 	ndBigVector scale(ndFloat64(0.5f) / dist[0], ndFloat64(0.5f) / dist[1], ndFloat64(0.5f) / dist[2], ndFloat64(0.0f));
 
 	UnpackAttibuteData();
@@ -1804,7 +1804,7 @@ void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const nd
 			ndInt32 v = (u + 1) % 3;
 			if (index == 1) 
 			{
-				dSwap(u, v);
+				ndSwap(u, v);
 			}
 			ndEdge* ptr = edge;
 			do 
@@ -1857,9 +1857,9 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 			{
 				ndBigVector n(FaceNormal(edge, &m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
 				ndVector normal(rotationMatrix.RotateVector(ndVector(n.Normalize())));
-				normal.m_x = dAbs(normal.m_x);
-				normal.m_y = dAbs(normal.m_y);
-				normal.m_z = dAbs(normal.m_z);
+				normal.m_x = ndAbs(normal.m_x);
+				normal.m_y = ndAbs(normal.m_y);
+				normal.m_z = ndAbs(normal.m_z);
 				if ((normal.m_z >= (normal.m_x - ndFloat32(1.0e-4f))) && (normal.m_z >= (normal.m_y - ndFloat32(1.0e-4f)))) 
 				{
 					ndEdge* ptr = edge;
@@ -1893,10 +1893,10 @@ void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMat
 		ndBigVector geoPoint(m_points.m_vertex[i] - origin);
 		dAssert(geoPoint.m_w == ndFloat32(0.0f));
 		ndVector point(textureMatrix.RotateVector(geoPoint.Normalize()));
-		point.m_x = dClamp(point.m_x, ndFloat32(-1.0f + 1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
+		point.m_x = ndClamp(point.m_x, ndFloat32(-1.0f + 1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 
-		ndFloat64 v = dClamp(ndAsin(point.m_x) / ndPi + ndFloat64(0.5f), ndFloat64(0.0f), ndFloat64(1.0f));
-		ndFloat64 u = dClamp(ndAtan2(point.m_y, point.m_z) / (ndFloat32(2.0f) * ndPi) + ndFloat64(0.5f), ndFloat64(0.0f), ndFloat64(1.0f));
+		ndFloat64 v = ndClamp(ndAsin(point.m_x) / ndPi + ndFloat64(0.5f), ndFloat64(0.0f), ndFloat64(1.0f));
+		ndFloat64 u = ndClamp(ndAtan2(point.m_y, point.m_z) / (ndFloat32(2.0f) * ndPi) + ndFloat64(0.5f), ndFloat64(0.0f), ndFloat64(1.0f));
 		sphere[i].m_x = u;
 		sphere[i].m_y = v;
 	}

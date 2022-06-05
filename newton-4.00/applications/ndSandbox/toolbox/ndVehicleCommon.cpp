@@ -79,7 +79,7 @@ ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetRedLineRadPerSec() const
 ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetTorque(ndFloat32 omegaInRadPerSeconds) const
 {
 	const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
-	omegaInRadPerSeconds = dClamp(omegaInRadPerSeconds, ndFloat32(0.0f), m_torqueCurve[maxIndex - 1].m_radPerSeconds);
+	omegaInRadPerSeconds = ndClamp(omegaInRadPerSeconds, ndFloat32(0.0f), m_torqueCurve[maxIndex - 1].m_radPerSeconds);
 
 	for (ndInt32 i = 1; i < maxIndex; i++)
 	{
@@ -355,7 +355,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 		}
 
 		ndFloat32 steerAngle = ndFloat32(scene->GetKeyState('A')) - ndFloat32(scene->GetKeyState('D'));
-		if (dAbs(steerAngle) == 0.0f)
+		if (ndAbs(steerAngle) == 0.0f)
 		{
 			steerAngle = - axis[0] * axis[0] * axis[0];
 		}
@@ -493,7 +493,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 		if (m_startEngine)
 		{
 			ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
-			ndFloat32 desiredOmega = dMax (m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
+			ndFloat32 desiredOmega = ndMax (m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
 			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
 			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
 			m_chassis->SetSleepState(false);

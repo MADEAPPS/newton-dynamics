@@ -376,8 +376,8 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 	}
 	else 
 	{
-		ndFloat32 invMassA = dMin(jointA->GetBody0()->GetInvMass(), jointA->GetBody1()->GetInvMass());
-		ndFloat32 invMassB = dMin(jointB->GetBody0()->GetInvMass(), jointB->GetBody1()->GetInvMass());
+		ndFloat32 invMassA = ndMin(jointA->GetBody0()->GetInvMass(), jointA->GetBody1()->GetInvMass());
+		ndFloat32 invMassB = ndMin(jointB->GetBody0()->GetInvMass(), jointB->GetBody1()->GetInvMass());
 		if (invMassA < invMassB) 
 		{
 			return -1;
@@ -392,7 +392,7 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 
 void ndWorld::ThreadFunction()
 {
-	ndUnsigned64 timeAcc = dGetTimeInMicroseconds();
+	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
 	const bool collisionUpdate = m_collisionUpdate;
 	m_inUpdate = true;
 
@@ -432,7 +432,7 @@ void ndWorld::ThreadFunction()
 	}
 	
 	m_frameIndex++;
-	m_lastExecutionTime = (dGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
+	m_lastExecutionTime = (ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();
 }
 
@@ -631,7 +631,7 @@ void ndWorld::UpdateSkeletons()
 					{
 						if (root0->m_rank > root1->m_rank)
 						{
-							dSwap(root0, root1);
+							ndSwap(root0, root1);
 						}
 						root0->m_islandParent = root1;
 						if (root0->m_rank == root1->m_rank)
@@ -657,7 +657,7 @@ void ndWorld::UpdateSkeletons()
 
 		// find all root nodes for all independent joint arrangements
 		ndInt32 inslandCount = 0;
-		solverUpdate.m_leftHandSide.SetCount(dMax(bodyArray.GetCount() + 256, 1024));
+		solverUpdate.m_leftHandSide.SetCount(ndMax(bodyArray.GetCount() + 256, 1024));
 		ndIslandMember* const islands = (ndIslandMember*)&solverUpdate.m_leftHandSide[0];
 		for (ndInt32 i = 0; i < bodyArray.GetCount(); i++)
 		{

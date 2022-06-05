@@ -134,11 +134,11 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 		{
 			if (mouseSpeedX > 0.0f) 
 			{
-				m_yaw = AnglesAdd(m_yaw, m_yawRate);
+				m_yaw = ndAnglesAdd(m_yaw, m_yawRate);
 			} 
 			else if (mouseSpeedX < 0.0f)
 			{
-				m_yaw = AnglesAdd(m_yaw, -m_yawRate);
+				m_yaw = ndAnglesAdd(m_yaw, -m_yawRate);
 			}
 
 			if (mouseSpeedY > 0.0f)
@@ -149,7 +149,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 			{
 				m_pitch -= m_pitchRate;
 			}
-			m_pitch = dClamp(m_pitch, ndFloat32 (-80.0f * ndDegreeToRad), ndFloat32 (80.0f * ndDegreeToRad));
+			m_pitch = ndClamp(m_pitch, ndFloat32 (-80.0f * ndDegreeToRad), ndFloat32 (80.0f * ndDegreeToRad));
 		}
 	}
 
@@ -269,8 +269,8 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 					//change this to make the grabbing stronger or weaker
 					//const ndFloat32 angularFritionAccel = 10.0f;
 					const ndFloat32 angularFritionAccel = 10.0f;
-					const ndFloat32 linearFrictionAccel = 40.0f * dMax(dAbs(DEMO_GRAVITY), ndFloat32(10.0f));
-					const ndFloat32 inertia = dMax(mass.m_z, dMax(mass.m_x, mass.m_y));
+					const ndFloat32 linearFrictionAccel = 40.0f * ndMax(ndAbs(DEMO_GRAVITY), ndFloat32(10.0f));
+					const ndFloat32 inertia = ndMax(mass.m_z, ndMax(mass.m_x, mass.m_y));
 
 					m_pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
 					scene->GetWorld()->AddJoint(m_pickJoint);

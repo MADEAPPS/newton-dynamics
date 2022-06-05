@@ -930,8 +930,8 @@ ndInt32 ndTree<OBJECT, KEY, allocator>::CompareKeys (const KEY &key0, const KEY 
 template<class OBJECT, class KEY, class allocator>
 void ndTree<OBJECT, KEY, allocator>::SwapInfo (ndTree<OBJECT, KEY, allocator>& tree)
 {
-	dSwap (m_head, tree.m_head);
-	dSwap (m_count, tree.m_count);
+	ndSwap (m_head, tree.m_head);
+	ndSwap (m_count, tree.m_count);
 }
 
 //template<class OBJECT, class KEY, class allocator> ndInt32 ndTree<OBJECT, KEY, allocator>::m_size = 0;

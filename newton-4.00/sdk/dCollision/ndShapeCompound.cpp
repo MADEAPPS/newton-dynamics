@@ -210,7 +210,7 @@ class ndShapeCompound::ndSpliteInfo
 
 				if (i0 < i1)
 				{
-					dSwap(boxArray[i0], boxArray[i1]);
+					ndSwap(boxArray[i0], boxArray[i1]);
 					i0++;
 					i1--;
 				}
@@ -943,7 +943,7 @@ void ndShapeCompound::EndAddRemove()
 
 		ndInt32 stack = 1;
 		ndInt32 nodeCount = 0;
-		ndNodeBase** nodeArray = dAlloca(ndNodeBase*, m_array.GetCount() + 10);
+		ndNodeBase** nodeArray = ndAlloca(ndNodeBase*, m_array.GetCount() + 10);
 		ndNodeBase* stackBuffer[D_COMPOUND_STACK_DEPTH];
 
 		stackBuffer[0] = m_root;
@@ -974,7 +974,7 @@ void ndShapeCompound::EndAddRemove()
 			if ((cost > m_treeEntropy * ndFloat32(2.0f)) || (cost < m_treeEntropy * ndFloat32(0.5f))) 
 			{
 				ndInt32 leafNodesCount = 0;
-				ndNodeBase** leafArray = dAlloca(ndNodeBase*, nodeCount + 12);
+				ndNodeBase** leafArray = ndAlloca(ndNodeBase*, nodeCount + 12);
 				for (ndInt32 i = 0; i < nodeCount; i++)
 				{ 
 					ndNodeBase* const node = nodeArray[i];
@@ -1031,7 +1031,7 @@ void ndShapeCompound::EndAddRemove()
 		}
 		
 		dAssert(m_root->m_size.m_w == ndFloat32(0.0f));
-		m_boxMinRadius = dMin(dMin(m_root->m_size.m_x, m_root->m_size.m_y), m_root->m_size.m_z);
+		m_boxMinRadius = ndMin(ndMin(m_root->m_size.m_x, m_root->m_size.m_y), m_root->m_size.m_z);
 		m_boxMaxRadius = ndSqrt(m_root->m_size.DotProduct(m_root->m_size).GetScalar());
 		
 		m_boxSize = m_root->m_size;

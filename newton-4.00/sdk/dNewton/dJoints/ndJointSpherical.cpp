@@ -73,7 +73,7 @@ void ndJointSpherical::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 ndFloat32 ndJointSpherical::PenetrationOmega(ndFloat32 penetration) const
 {
-	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_SPHERICAL_PENETRATION) / D_MAX_SPHERICAL_PENETRATION;
+	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_SPHERICAL_PENETRATION) / D_MAX_SPHERICAL_PENETRATION;
 	ndFloat32 omega = D_MAX_SPHERICAL_RECOVERY_SPEED * param;
 	return omega;
 }
@@ -90,9 +90,9 @@ void ndJointSpherical::SetOffsetRotation(const ndMatrix& rotation)
 
 void ndJointSpherical::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_springK = dAbs(spring);
-	m_damperC = dAbs(damper);
-	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springK = ndAbs(spring);
+	m_damperC = ndAbs(damper);
+	m_springDamperRegularizer = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 void ndJointSpherical::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -104,8 +104,8 @@ void ndJointSpherical::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring
 
 void ndJointSpherical::SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle)
 {
-	m_minTwistAngle = dMin(minAngle, ndFloat32 (0.0f));
-	m_maxTwistAngle = dMax(maxAngle, ndFloat32(0.0f));
+	m_minTwistAngle = ndMin(minAngle, ndFloat32 (0.0f));
+	m_maxTwistAngle = ndMax(maxAngle, ndFloat32(0.0f));
 }
 
 void ndJointSpherical::GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const
@@ -121,8 +121,8 @@ ndFloat32 ndJointSpherical::GetConeLimit() const
 
 void ndJointSpherical::SetConeLimit(ndFloat32 maxConeAngle)
 {
-	//m_maxConeAngle = dClamp (maxConeAngle, ndFloat32 (0.0f), D_BALL_AND_SOCKED_MAX_ANGLE);
-	m_maxConeAngle = dClamp(maxConeAngle, ndFloat32(0.0f), ndFloat32(1.0e10f));
+	//m_maxConeAngle = ndClamp (maxConeAngle, ndFloat32 (0.0f), D_BALL_AND_SOCKED_MAX_ANGLE);
+	m_maxConeAngle = ndClamp(maxConeAngle, ndFloat32(0.0f), ndFloat32(1.0e10f));
 }
 
 void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -146,7 +146,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 		if (mag2 > ndFloat32 (1.0e-4f)) 
 		{
 			lateralDir = lateralDir.Scale(ndFloat32 (1.0f) / ndSqrt(mag2));
-			coneRotation = ndMatrix(ndQuaternion(lateralDir, ndAcos(dClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)))), matrix1.m_posit);
+			coneRotation = ndMatrix(ndQuaternion(lateralDir, ndAcos(ndClamp(cosAngleCos, ndFloat32(-1.0f), ndFloat32(1.0f)))), matrix1.m_posit);
 		}
 		else 
 		{
@@ -172,7 +172,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	
 		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
 	
-		ndFloat32 angleStep = dMin(m_maxTwistAngle - m_minTwistAngle, ndFloat32(2.0f * ndPi)) / subdiv;
+		ndFloat32 angleStep = ndMin(m_maxTwistAngle - m_minTwistAngle, ndFloat32(2.0f * ndPi)) / subdiv;
 		ndFloat32 angle0 = m_minTwistAngle;
 	
 		ndVector color(ndFloat32 (0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -232,7 +232,7 @@ ndInt8 ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, 
 			const ndFloat32 recoveringAccel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
-			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+			ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else if (angle >= m_maxTwistAngle)
 		{
@@ -242,7 +242,7 @@ ndInt8 ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, 
 			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
-			ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+			ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
 	return ret;
@@ -276,7 +276,7 @@ ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 		lateralDir = lateralDir.Normalize();
-		const ndFloat32 coneAngle = ndAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+		const ndFloat32 coneAngle = ndAcos(ndClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 		const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 		if (coneAngle > m_maxConeAngle)
 		{
@@ -288,7 +288,7 @@ ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 				const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else
 			{

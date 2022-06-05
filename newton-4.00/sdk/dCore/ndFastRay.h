@@ -86,7 +86,7 @@ inline ndRay ndFastRay::PointDistance(const ndVector& point) const
 {
 	//dBigVector dp(ray_p1 - ray_p0);
 	//dAssert(dp.m_w == ndFloat32(0.0f));
-	ndFloat32 t = dClamp(m_diff.DotProduct(point - m_p0).GetScalar() / m_diff.DotProduct(m_diff).GetScalar(), ndFloat32(0.0f), ndFloat32(1.0f));
+	ndFloat32 t = ndClamp(m_diff.DotProduct(point - m_p0).GetScalar() / m_diff.DotProduct(m_diff).GetScalar(), ndFloat32(0.0f), ndFloat32(1.0f));
 	return ndRay (m_p0 + m_diff.Scale(t), point);
 }
 
@@ -131,7 +131,7 @@ inline ndInt32 ndFastRay::BoxTest(const ndVector& minBox, const ndVector& maxBox
 
 			if (t1 > t2)
 			{
-				dSwap(t1, t2);
+				ndSwap(t1, t2);
 			}
 			if (t1 > tmin)
 			{

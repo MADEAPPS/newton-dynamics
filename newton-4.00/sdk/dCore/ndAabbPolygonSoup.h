@@ -180,7 +180,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 				ndVector minBox1 (q0 - obb.m_size);
 				ndVector maxBox1 (q1 + obb.m_size);
 				ndFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);
-				dist = (dist1  > ndFloat32 (1.0f)) ? dist1 : dMax (dist1, dist);
+				dist = (dist1  > ndFloat32 (1.0f)) ? dist1 : ndMax (dist1, dist);
 			}
 			return dist;
 		}

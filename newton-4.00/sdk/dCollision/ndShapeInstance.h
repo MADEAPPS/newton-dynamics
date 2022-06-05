@@ -236,7 +236,7 @@ inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -267,7 +267,7 @@ inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndI
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -288,7 +288,7 @@ inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
 		case m_unit:

@@ -182,7 +182,7 @@ class ndTemplateVector: public ndClassAlloc
 
 	T GetMax () const
 	{
-		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
+		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
 	}
 
 	ndTemplateVector<T> GetMax(const ndTemplateVector<T>& data) const

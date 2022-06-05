@@ -17,7 +17,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDryRollingFriction)
 
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndFloat32 coefficient)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
-	,m_coefficient(dClamp (coefficient, ndFloat32(0.0f), ndFloat32 (1.0f)))
+	,m_coefficient(ndClamp (coefficient, ndFloat32(0.0f), ndFloat32 (1.0f)))
 	,m_contactTrail(ndFloat32 (0.1f))
 {
 	ndMatrix matrix(body0->GetMatrix());
@@ -75,7 +75,7 @@ void ndJointDryRollingFriction::JacobianDerivative(ndConstraintDescritor& desc)
 			{
 				const ndForceImpactPair& normalForce = node->GetInfo().m_normal_Force;
 				ndFloat32 force = normalForce.GetInitialGuess();
-				maxForce = dMax(force, maxForce);
+				maxForce = ndMax(force, maxForce);
 			}
 		}
 	}

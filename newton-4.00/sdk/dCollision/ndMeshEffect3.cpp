@@ -1032,7 +1032,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 	ndFloat64 CalculateConcavity (dgHACDConveHull& hull, ndMeshEffect& mesh, dgHACDCluster& clusterA, dgHACDCluster& clusterB)
 	{
-		return dMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
+		return ndMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
 	}
 
 
@@ -1321,7 +1321,7 @@ ndMeshEffect* ndMeshEffect::CreateConvexApproximation(ndFloat32 maxConcavity, nd
 	if (maxVertexPerHull < 4) {
 		maxVertexPerHull = 4;
 	}
-	backFaceDistanceFactor = dClamp(backFaceDistanceFactor, ndFloat32 (1.0e-6f), ndFloat32 (1.0f));
+	backFaceDistanceFactor = ndClamp(backFaceDistanceFactor, ndFloat32 (1.0e-6f), ndFloat32 (1.0f));
 
 	ndMeshEffect* partition = nullptr;
 

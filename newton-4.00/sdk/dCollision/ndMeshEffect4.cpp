@@ -1116,7 +1116,7 @@ class dgHACDClusterGraph
 
 	ndFloat64 CalculateConcavitySingleThread (dgHACDConveHull& hull, ndMeshEffect& mesh, dgHACDCluster& clusterA, dgHACDCluster& clusterB)
 	{
-		return dMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
+		return ndMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
 	}
 
 
@@ -1227,7 +1227,7 @@ class dgHACDClusterGraph
 		}
 		m_parallerConcavityCalculator.SynchronizationBarrier();
 		
-		concavity = dMax(concavity, data.GetConcavity());
+		concavity = ndMax(concavity, data.GetConcavity());
 		//ndFloat64 xxx = CalculateConcavitySingleThread (hull, mesh, clusterA, clusterB);
 		//dAssert (fabs(concavity - xxx) < ndFloat64 (1.0e-5f));
 		return concavity;

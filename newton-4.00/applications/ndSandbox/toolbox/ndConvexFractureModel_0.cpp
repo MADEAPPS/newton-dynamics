@@ -35,7 +35,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 			if (project > ndFloat32(0.9999f)) 
 			{
 				ndFloat32 dist = m_plane.m_w - plane.m_plane.m_w;
-				if (dAbs(dist) < ndFloat32(1.0e-4f)) 
+				if (ndAbs(dist) < ndFloat32(1.0e-4f)) 
 				{
 					ndInt32 pointCount = 0;
 					for (ndInt32 i = 0; i < m_count; i++)
@@ -368,13 +368,13 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	ndInt32 bodyCount = 0;
 	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
 	{
-		bodyCount = dMax(bodyCount, debrisEnt->m_enumerator + 1);
+		bodyCount = ndMax(bodyCount, debrisEnt->m_enumerator + 1);
 		dAssert(debrisEnt->m_drebriBody);
 		//dAssert(debrisEnt->m_enumerator < bodyCount);
 	}
 
 	//ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
-	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
+	ndBodyDynamic** const bodyArray = ndAlloca(ndBodyDynamic*, bodyCount);
 	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
 	
 	ndInt32 debrisID = ndApplicationMaterial::m_dedris;

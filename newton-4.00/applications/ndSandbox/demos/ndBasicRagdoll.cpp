@@ -246,8 +246,8 @@ class ndRagdollModel : public ndModel
 			ndFloat32 normalMass = density * body->GetCollisionShape().GetVolume();
 			body->SetMassMatrix(normalMass, body->GetCollisionShape());
 			ndVector inertia(body->GetMassMatrix());
-			ndFloat32 maxInertia = dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z);
-			ndFloat32 minInertia = dMin(dMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
 			if (minInertia < maxInertia * 0.125f)
 			{
 				minInertia = maxInertia * 0.125f;

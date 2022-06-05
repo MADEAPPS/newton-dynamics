@@ -150,9 +150,9 @@ ndScene::ndScene(const ndScene& src)
 	m_sceneBodyArray.Swap(stealData->m_sceneBodyArray);
 	m_activeConstraintArray.Swap(stealData->m_activeConstraintArray);
 
-	dSwap(m_rootNode, stealData->m_rootNode);
-	dSwap(m_sentinelBody, stealData->m_sentinelBody);
-	dSwap(m_contactNotifyCallback, stealData->m_contactNotifyCallback);
+	ndSwap(m_rootNode, stealData->m_rootNode);
+	ndSwap(m_sentinelBody, stealData->m_sentinelBody);
+	ndSwap(m_contactNotifyCallback, stealData->m_contactNotifyCallback);
 	m_contactNotifyCallback->m_scene = this;
 
 	ndList<ndBodyKinematic*>::ndNode* nextNode;
@@ -867,7 +867,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 						ndFloat32 compressedValue = m_factor * ndLog(areaA);
 						dAssert(compressedValue <= 255);
 						ndInt32 key = ndUnsigned32 (ndFloor (compressedValue));
-						key = 255 - dClamp(key, 0, 255);
+						key = 255 - ndClamp(key, 0, 255);
 						return key;
 					}
 
@@ -1160,7 +1160,7 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 	if (diff <= ndFloat32(1.0e-2f)) 
 	{
 		staticMotion = 1;
-		if (dAbs(controlNormal.m_z) > ndFloat32(0.577f)) 
+		if (ndAbs(controlNormal.m_z) > ndFloat32(0.577f)) 
 		{
 			tangDir = ndVector(-controlNormal.m_y, controlNormal.m_z, ndFloat32(0.0f), ndFloat32(0.0f));
 		}
@@ -1173,7 +1173,7 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 		dAssert(controlDir0.DotProduct(controlDir0).GetScalar() > ndFloat32(1.0e-8f));
 		controlDir0 = controlDir0.Normalize();
 		controlDir1 = controlNormal.CrossProduct(controlDir0);
-		dAssert(dAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+		dAssert(ndAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	}
 	
 	ndFloat32 maxImpulse = ndFloat32(-1.0f);
@@ -1238,7 +1238,7 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 			}
 			else 
 			{
-				if (dAbs(contactPoint->m_normal.m_z) > ndFloat32(0.577f))
+				if (ndAbs(contactPoint->m_normal.m_z) > ndFloat32(0.577f))
 				{
 					tangDir = ndVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, ndFloat32(0.0f), ndFloat32(0.0f));
 				}
@@ -1251,7 +1251,7 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 				dAssert(contactPoint->m_dir0.DotProduct(contactPoint->m_dir0).GetScalar() > ndFloat32(1.0e-8f));
 				contactPoint->m_dir0 = contactPoint->m_dir0.Normalize();
 				contactPoint->m_dir1 = contactPoint->m_normal.CrossProduct(contactPoint->m_dir0);
-				dAssert(dAbs(contactPoint->m_normal.DotProduct(contactPoint->m_dir0.CrossProduct(contactPoint->m_dir1)).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+				dAssert(ndAbs(contactPoint->m_normal.DotProduct(contactPoint->m_dir0.CrossProduct(contactPoint->m_dir1)).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 			}
 		}
 		else 
@@ -1262,9 +1262,9 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 	
 			dAssert(contactPoint->m_normal.m_w == ndFloat32(0.0f));
 			ndFloat32 impulse = relReloc.DotProduct(contactPoint->m_normal).GetScalar();
-			if (dAbs(impulse) > maxImpulse) 
+			if (ndAbs(impulse) > maxImpulse) 
 			{
-				maxImpulse = dAbs(impulse);
+				maxImpulse = ndAbs(impulse);
 			}
 	
 			ndVector tangentDir(relReloc - contactPoint->m_normal.Scale(impulse));
@@ -1277,7 +1277,7 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 			}
 			else 
 			{
-				if (dAbs(contactPoint->m_normal.m_z) > ndFloat32(0.577f)) 
+				if (ndAbs(contactPoint->m_normal.m_z) > ndFloat32(0.577f)) 
 				{
 					tangentDir = ndVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, ndFloat32(0.0f), ndFloat32(0.0f));
 				}
@@ -1291,7 +1291,7 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 				contactPoint->m_dir0 = contactPoint->m_dir0.Normalize();
 			}
 			contactPoint->m_dir1 = contactPoint->m_normal.CrossProduct(contactPoint->m_dir0);
-			dAssert(dAbs(contactPoint->m_normal.DotProduct(contactPoint->m_dir0.CrossProduct(contactPoint->m_dir1)).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+			dAssert(ndAbs(contactPoint->m_normal.DotProduct(contactPoint->m_dir0.CrossProduct(contactPoint->m_dir1)).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 		}
 		dAssert(contactPoint->m_dir0.m_w == ndFloat32(0.0f));
 		dAssert(contactPoint->m_dir0.m_w == ndFloat32(0.0f));
@@ -1753,7 +1753,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody))
 					{
 						// found new contacts, see how the are managed
-						if (dAbs(savedNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
+						if (ndAbs(savedNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
 						{
 							// merge contact
 							for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
@@ -2285,6 +2285,21 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 }
 
 #else
+
+class ndContactPairs
+{
+	public:
+	ndContactPairs(ndUnsigned32 body0, ndUnsigned32 body1)
+		:m_contact(nullptr)
+		,m_Body0(ndMin(body0, body1))
+		,m_Body1(ndMax(body0, body1))
+	{
+	}
+
+	ndContact* m_contact;
+	ndUnsigned32 m_Body0;
+	ndUnsigned32 m_Body1;
+};
 
 void ndScene::CalculateContacts()
 {

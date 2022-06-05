@@ -65,9 +65,9 @@ class ndConvexHull3d::ndNormalMap
 	{
 		if (level) 
 		{
-			dAssert(dAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-			dAssert(dAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-			dAssert(dAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 			ndVector p01(p0 + p1);
 			ndVector p12(p1 + p2);
 			ndVector p20(p2 + p0);
@@ -76,9 +76,9 @@ class ndConvexHull3d::ndNormalMap
 			p12 = p12.Scale(ndRsqrt(p12.DotProduct(p12).GetScalar()));
 			p20 = p20.Scale(ndRsqrt(p20.DotProduct(p20).GetScalar()));
 
-			dAssert(dAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-			dAssert(dAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-			dAssert(dAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
 			TessellateTriangle(level - 1, p0, p01, p20, count);
 			TessellateTriangle(level - 1, p1, p12, p01, count);
@@ -90,7 +90,7 @@ class ndConvexHull3d::ndNormalMap
 			ndBigPlane n(p0, p1, p2);
 			n = n.Scale(ndFloat64(1.0f) / sqrt(n.DotProduct(n).GetScalar()));
 			n.m_w = ndFloat64(0.0f);
-			ndInt32 index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
+			ndInt32 index = ndBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
 			m_normal[index] = n;
 			count++;
 			dAssert(count <= ndInt32 (sizeof(m_normal) / sizeof(m_normal[0])));
@@ -407,7 +407,7 @@ ndConvexHull3dAABBTreeNode* ndConvexHull3d::BuildTree (ndConvexHull3dAABBTreeNod
 
 			if (i0 < i1)
 			{
-				dSwap(points[i0], points[i1]);
+				ndSwap(points[i0], points[i1]);
 				i0++;
 				i1--;
 			}
@@ -626,7 +626,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 	ndFloat64 volume = TetrahedrumVolume (m_points[0], m_points[1], m_points[2], m_points[3]);
 	if (volume > ndFloat64 (0.0f)) 
 	{
-		dSwap(m_points[2], m_points[3]);
+		ndSwap(m_points[2], m_points[3]);
 	}
 	dAssert (TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < ndFloat64(0.0f));
 
@@ -874,19 +874,19 @@ bool ndConvexHull3d::CheckFlatSurface(ndConvexHull3dAABBTreeNode* tree, ndConvex
 	m_points[3] = points[index];
 
 	ndFloat64 volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
-	if (dAbs(volume) < ndFloat32(1.0e-9f)) {
+	if (ndAbs(volume) < ndFloat32(1.0e-9f)) {
 		normal = normal.Scale(ndFloat32(-1.0f));
 		index = SupportVertex(&tree, points, normal);
 		m_points[3] = points[index];
 		volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
-		if (dAbs(volume) < ndFloat32(1.0e-9f)) {
+		if (ndAbs(volume) < ndFloat32(1.0e-9f)) {
 			return true;
 		}
 	}
 	points[index].m_mark = 1;
 	if (volume > ndFloat64(0.0f)) 
 	{
-		dSwap(m_points[2], m_points[3]);
+		ndSwap(m_points[2], m_points[3]);
 	}
 	dAssert(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < ndFloat64(0.0f));
 	//m_count = 4;
@@ -901,7 +901,7 @@ void ndConvexHull3d::CalculateConvexHull2d(ndConvexHull3dAABBTreeNode*, ndConvex
 void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount)
 {
 	m_points.SetCount(count);
-	distTol = dAbs (distTol) * m_diag;
+	distTol = ndAbs (distTol) * m_diag;
 	ndNode* const f0Node = AddFace (0, 1, 2);
 	ndNode* const f1Node = AddFace (0, 2, 3);
 	ndNode* const f2Node = AddFace (2, 1, 3);
@@ -1190,7 +1190,7 @@ ndFloat64 ndConvexHull3d::RayCast (const ndBigVector& localP0, const ndBigVector
 			}
 		} else {
 			dAssert (D >= ndFloat64 (0.0f));
-			tL = dMin (tL, t);
+			tL = ndMin (tL, t);
 			if (tL < tE) {
 				return ndFloat64 (1.2f);
 			}

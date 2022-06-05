@@ -108,10 +108,10 @@ void ndShapeStaticProceduralMesh::CalculateLocalObb()
 
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
-	ndVector* const vertexBuffer = dAlloca(ndVector, m_maxVertexCount);
-	ndInt32* const faceBuffer = dAlloca(ndInt32, m_maxFaceCount);
-	ndInt32* const materialBuffer = dAlloca(ndInt32, m_maxFaceCount);
-	ndInt32* const indexBuffer = dAlloca(ndInt32, m_maxFaceCount * 4);
+	ndVector* const vertexBuffer = ndAlloca(ndVector, m_maxVertexCount);
+	ndInt32* const faceBuffer = ndAlloca(ndInt32, m_maxFaceCount);
+	ndInt32* const materialBuffer = ndAlloca(ndInt32, m_maxFaceCount);
+	ndInt32* const indexBuffer = ndAlloca(ndInt32, m_maxFaceCount * 4);
 
 	dTempArray<ndInt32> faceList(m_maxFaceCount, faceBuffer);
 	dTempArray<ndInt32> indexList(m_maxFaceCount * 4, indexBuffer);
@@ -200,7 +200,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		if (edgeNode->GetInfo() != -1)
 		{
 			ndEdge edge(iter.GetKey());
-			dSwap(edge.m_i0, edge.m_i1);
+			ndSwap(edge.m_i0, edge.m_i1);
 			ndEdgeMap::ndNode* const twinNode = edgeMap.Find(edge);
 			if (twinNode)
 			{
@@ -210,7 +210,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 				{
 					ndInt32 i0 = edgeNode->GetInfo();
 					ndInt32 i1 = twinNode->GetInfo();
-					dSwap(indices[i0], indices[i1]);
+					ndSwap(indices[i0], indices[i1]);
 				}
 				twinNode->GetInfo() = -1;
 			}

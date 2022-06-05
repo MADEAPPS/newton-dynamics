@@ -86,7 +86,7 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 	const ndVector omega1(m_body1->GetOmega());
 
 	ndFloat32 slipOmega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
-	if (dAbs(slipOmega) > m_limitedSlipOmega) 
+	if (ndAbs(slipOmega) > m_limitedSlipOmega) 
 	{
 		AddAngularRowJacobian(desc, matrix1.m_up, ndFloat32 (0.0f));
 		ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;

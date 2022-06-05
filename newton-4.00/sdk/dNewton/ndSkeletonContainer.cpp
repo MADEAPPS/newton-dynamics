@@ -155,7 +155,7 @@ inline void ndSkeletonContainer::ndNode::CalculateBodyDiagonal(ndNode* const chi
 		const ndSpatialVector& jacobian = jacobianMatrix[i];
 		for (ndInt32 j = 0; j < dof; ++j)  
 		{
-			dAssert(dAreEqual(childDiagonal[i][j], childDiagonal[j][i], ndFloat64(1.0e-5f)));
+			dAssert(ndAreEqual(childDiagonal[i][j], childDiagonal[j][i], ndFloat64(1.0e-5f)));
 			ndFloat64 val = childDiagonal[i][j];
 			copy[j] = copy[j] + jacobian.Scale(val);
 		}
@@ -251,7 +251,7 @@ ndInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftH
 			}
 			else 
 			{
-				dSwap(m_ordinal.m_sourceJacobianIndex[i], m_ordinal.m_sourceJacobianIndex[count - 1]);
+				ndSwap(m_ordinal.m_sourceJacobianIndex[i], m_ordinal.m_sourceJacobianIndex[count - 1]);
 				i--;
 				count--;
 			}
@@ -735,7 +735,7 @@ void ndSkeletonContainer::ConditionMassMatrix() const
 {
 	D_TRACKTIME();
 	const ndInt32 nodeCount = m_nodeList.GetCount();
-	ndForcePair* const forcePair = dAlloca(ndForcePair, nodeCount);
+	ndForcePair* const forcePair = ndAlloca(ndForcePair, nodeCount);
 	const ndSpatialVector zero(ndSpatialVector::m_zero);
 
 	const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -756,7 +756,7 @@ void ndSkeletonContainer::ConditionMassMatrix() const
 			{
 				const ndFloat32 value = matrixRow10[entry0];
 				a[k] = value;
-				startjoint = (value == 0.0f) ? startjoint : dMin(startjoint, index);
+				startjoint = (value == 0.0f) ? startjoint : ndMin(startjoint, index);
 				entry0++;
 			}
 		}
@@ -789,7 +789,7 @@ void ndSkeletonContainer::RebuildMassMatrix(const ndFloat32* const diagDamp) con
 {
 	D_TRACKTIME();
 	const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
-	ndInt16* const indexList = dAlloca(ndInt16, primaryCount);
+	ndInt16* const indexList = ndAlloca(ndInt16, primaryCount);
 	for (ndInt32 i = 0; i < m_auxiliaryRowCount; ++i) 
 	{
 		const ndFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
@@ -815,7 +815,7 @@ void ndSkeletonContainer::RebuildMassMatrix(const ndFloat32* const diagDamp) con
 			m_massMatrix11[j * m_auxiliaryRowCount + i] = offDiagonal;
 		}
 
-		matrixRow11[i] = dMax(matrixRow11[i], diagDamp[i]);
+		matrixRow11[i] = ndMax(matrixRow11[i], diagDamp[i]);
 	}
 }
 
@@ -825,7 +825,7 @@ void ndSkeletonContainer::FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat3
 	// save the matrix 
 	ndInt32 srcLine = 0;
 	ndInt32 dstLine = 0;
-	ndFloat32* const backupMatrix = dAlloca(ndFloat32, size * stride);
+	ndFloat32* const backupMatrix = ndAlloca(ndFloat32, size * stride);
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(ndFloat32));
@@ -861,7 +861,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	m_massMatrix10 = (ndFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 	
-	ndInt32* const boundRow = dAlloca(ndInt32, m_auxiliaryRowCount);
+	ndInt32* const boundRow = ndAlloca(ndInt32, m_auxiliaryRowCount);
 
 	m_blockSize = 0;
 	ndInt32 primaryIndex = 0;
@@ -954,7 +954,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		m_matrixRowsIndex[primaryCount + j] = tmpMatrixRowsIndex;
 	}
 
-	ndFloat32* const diagDamp = dAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const diagDamp = ndAlloca(ndFloat32, m_auxiliaryRowCount);
 	memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(ndFloat32));
 	memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(ndFloat32));
 
@@ -966,7 +966,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	{
 		FactorizeMatrix(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 		const ndInt32 boundedSize = m_auxiliaryRowCount - m_blockSize;
-		ndFloat32* const acc = dAlloca(ndFloat32, m_auxiliaryRowCount);
+		ndFloat32* const acc = ndAlloca(ndFloat32, m_auxiliaryRowCount);
 		ndInt32 rowStart = 0;
 
 		for (ndInt32 i = 0; i < m_blockSize; ++i) 
@@ -1129,8 +1129,8 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 	const ndFloat32 tol2 = ndFloat32(0.25f);
 	const ndInt32 maxIterCount = 64;
 
-	ndFloat32* const invDiag1 = dAlloca(ndFloat32, size);
-	ndFloat32* const residual = dAlloca(ndFloat32, size);
+	ndFloat32* const invDiag1 = ndAlloca(ndFloat32, size);
+	ndFloat32* const residual = ndAlloca(ndFloat32, size);
 
 	ndInt32 base = 0;
 	for (ndInt32 i = 0; i < size; i++)
@@ -1143,7 +1143,7 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 
 		const ndFloat32 l = low[i] * coefficient - x0[i];
 		const ndFloat32 h = high[i] * coefficient - x0[i];
-		x[i] = dClamp(ndFloat32(0.0f), l, h);
+		x[i] = ndClamp(ndFloat32(0.0f), l, h);
 		invDiag1[i] = ndFloat32(1.0f) / matrix[base + i];
 		base += stride;
 	}
@@ -1194,13 +1194,13 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 			}
 			const ndFloat32 dx = f - x[i];
 #else
-			const ndFloat32 f = dClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
+			const ndFloat32 f = ndClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
 			const ndFloat32 dx = f - x[i];
 			const ndFloat32 dr = dx * row[i];
 			tolerance += dr * dr;
 #endif
 			x[i] = f;
-			if (dAbs(dx) > ndFloat32(1.0e-6f))
+			if (ndAbs(dx) > ndFloat32(1.0e-6f))
 			{
 				for (ndInt32 j = 0; j < size; ++j) 
 				{
@@ -1220,9 +1220,9 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 	const ndFloat32 tol2 = ndFloat32(0.25f);
 	const ndInt32 maxIterCount = 64;
 
-	ndFloat32* const invDiag1 = dAlloca(ndFloat32, size);
-	ndFloat32* const residual = dAlloca(ndFloat32, size);
-	ndInt32* const tempNormalIndex = dAlloca(ndInt32, size);
+	ndFloat32* const invDiag1 = ndAlloca(ndFloat32, size);
+	ndFloat32* const residual = ndAlloca(ndFloat32, size);
+	ndInt32* const tempNormalIndex = ndAlloca(ndInt32, size);
 
 	ndInt32 base = 0;
 	for (ndInt32 i = 0; i < size; i++)
@@ -1236,7 +1236,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 
 		const ndFloat32 l = low[i] * coefficient - x0[i];
 		const ndFloat32 h = high[i] * coefficient - x0[i];
-		x[i] = dClamp(ndFloat32(0.0f), l, h);
+		x[i] = ndClamp(ndFloat32(0.0f), l, h);
 		invDiag1[i] = ndFloat32(1.0f) / matrix[base + i];
 		base += stride;
 	}
@@ -1267,13 +1267,13 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 			const ndFloat32 h = high[i] * coefficient - x0[i];
 
 			const ndFloat32* const row = &matrix[base];
-			const ndFloat32 f = dClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
+			const ndFloat32 f = ndClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
 			const ndFloat32 dx = f - x[i];
 			const ndFloat32 dr = dx * row[i];
 			tolerance += dr * dr;
 
 			x[i] = f;
-			if (dAbs(dx) > ndFloat32(1.0e-6f))
+			if (ndAbs(dx) > ndFloat32(1.0e-6f))
 			{
 				for (ndInt32 j = 0; j < size; ++j) 
 				{
@@ -1324,12 +1324,12 @@ void ndSkeletonContainer::SolveBlockLcp(ndInt32 size, ndInt32 blockSize, const n
 
 void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
 {
-	ndFloat32* const f = dAlloca(ndFloat32, m_rowCount);
-	ndFloat32* const b = dAlloca(ndFloat32, m_auxiliaryRowCount);
-	ndFloat32* const low = dAlloca(ndFloat32, m_auxiliaryRowCount);
-	ndFloat32* const high = dAlloca(ndFloat32, m_auxiliaryRowCount);
-	ndFloat32* const u = dAlloca(ndFloat32, m_auxiliaryRowCount + 1);
-	ndFloat32* const u0 = dAlloca(ndFloat32, m_auxiliaryRowCount + 1);
+	ndFloat32* const f = ndAlloca(ndFloat32, m_rowCount);
+	ndFloat32* const b = ndAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const low = ndAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const high = ndAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const u = ndAlloca(ndFloat32, m_auxiliaryRowCount + 1);
+	ndFloat32* const u0 = ndAlloca(ndFloat32, m_auxiliaryRowCount + 1);
 
 	ndInt32 primaryIndex = 0;
 	const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -1418,8 +1418,8 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	m_rightHandSide = rightHandSide;
 
 	const ndInt32 nodeCount = m_nodeList.GetCount();
-	ndSpatialMatrix* const bodyMassArray = dAlloca(ndSpatialMatrix, nodeCount);
-	ndSpatialMatrix* const jointMassArray = dAlloca(ndSpatialMatrix, nodeCount);
+	ndSpatialMatrix* const bodyMassArray = ndAlloca(ndSpatialMatrix, nodeCount);
+	ndSpatialMatrix* const jointMassArray = ndAlloca(ndSpatialMatrix, nodeCount);
 	if (m_nodesOrder)
 	{
 		for (ndInt32 i = 0; i < nodeCount - 1; i++)
@@ -1559,12 +1559,12 @@ inline void ndSkeletonContainer::UpdateForcesImmediate(ndBodyKinematic** const b
 
 void ndSkeletonContainer::SolveAuxiliaryImmediate(ndBodyKinematic** const bodyArray, ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
 {
-	ndFloat32* const f = dAlloca(ndFloat32, m_rowCount);
-	ndFloat32* const b = dAlloca(ndFloat32, m_auxiliaryRowCount);
-	ndFloat32* const low = dAlloca(ndFloat32, m_auxiliaryRowCount);
-	ndFloat32* const high = dAlloca(ndFloat32, m_auxiliaryRowCount);
-	ndFloat32* const u = dAlloca(ndFloat32, m_auxiliaryRowCount + 1);
-	ndFloat32* const u0 = dAlloca(ndFloat32, m_auxiliaryRowCount + 1);
+	ndFloat32* const f = ndAlloca(ndFloat32, m_rowCount);
+	ndFloat32* const b = ndAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const low = ndAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const high = ndAlloca(ndFloat32, m_auxiliaryRowCount);
+	ndFloat32* const u = ndAlloca(ndFloat32, m_auxiliaryRowCount + 1);
+	ndFloat32* const u0 = ndAlloca(ndFloat32, m_auxiliaryRowCount + 1);
 
 	ndInt32 primaryIndex = 0;
 	const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -1671,8 +1671,8 @@ void ndSkeletonContainer::SolveImmediate(ndIkSolver& solverInfo)
 {
 	D_TRACKTIME();
 	const ndInt32 nodeCount = m_nodeList.GetCount();
-	ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
-	ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);
+	ndForcePair* const force = ndAlloca(ndForcePair, nodeCount);
+	ndForcePair* const accel = ndAlloca(ndForcePair, nodeCount);
 
 	CalculateJointAccelImmediate(&solverInfo.m_internalForces[0], accel);
 	CalculateForce(force, accel);
@@ -1692,8 +1692,8 @@ void ndSkeletonContainer::CalculateReactionForces(ndJacobian* const internalForc
 	{
 		D_TRACKTIME();
 		const ndInt32 nodeCount = m_nodeList.GetCount();
-		ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
-		ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);
+		ndForcePair* const force = ndAlloca(ndForcePair, nodeCount);
+		ndForcePair* const accel = ndAlloca(ndForcePair, nodeCount);
 
 		CalculateJointAccel(internalForces, accel);
 		CalculateForce(force, accel);

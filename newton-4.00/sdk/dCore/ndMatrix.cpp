@@ -53,7 +53,7 @@ ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 
 #ifdef _DEBUG
 	ndFloat32 w2 = quat0.m_w * quat1.m_w;
-	dAssert (dAbs (w2 + x2 + y2 + z2 - ndFloat32(2.0f)) <ndFloat32 (1.0e-3f));
+	dAssert (ndAbs (w2 + x2 + y2 + z2 - ndFloat32(2.0f)) <ndFloat32 (1.0e-3f));
 #endif
 
 	const ndFloat32 xy = quat0.m_x * quat1.m_y;
@@ -172,9 +172,9 @@ void ndMatrix::TransformBBox (const ndVector& p0local, const ndVector& p1local, 
 	const ndMatrix& matrix = *this;
 	ndVector size ((p1local - p0local) * ndVector::m_half);
 	ndVector center (TransformVector ((p1local + p0local) * ndVector::m_half));
-	ndVector extends (size.m_x * dAbs(matrix[0][0]) + size.m_y * dAbs(matrix[1][0]) + size.m_z * dAbs(matrix[2][0]),  
-					 size.m_x * dAbs(matrix[0][1]) + size.m_y * dAbs(matrix[1][1]) + size.m_z * dAbs(matrix[2][1]),  
-	                 size.m_x * dAbs(matrix[0][2]) + size.m_y * dAbs(matrix[1][2]) + size.m_z * dAbs(matrix[2][2]), ndFloat32 (0.0f));  
+	ndVector extends (size.m_x * ndAbs(matrix[0][0]) + size.m_y * ndAbs(matrix[1][0]) + size.m_z * ndAbs(matrix[2][0]),  
+					 size.m_x * ndAbs(matrix[0][1]) + size.m_y * ndAbs(matrix[1][1]) + size.m_z * ndAbs(matrix[2][1]),  
+	                 size.m_x * ndAbs(matrix[0][2]) + size.m_y * ndAbs(matrix[1][2]) + size.m_z * ndAbs(matrix[2][2]), ndFloat32 (0.0f));  
 
 	p0 = center - extends;
 	p1 = center + extends;
@@ -186,13 +186,13 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	ndMatrix inv (dGetIdentityMatrix());
 	for (ndInt32 i = 0; i < 4; i++) 
 	{
-		ndFloat32 pivot = dAbs(tmp[i][i]);
+		ndFloat32 pivot = ndAbs(tmp[i][i]);
 		if (pivot < ndFloat32(0.1f)) 
 		{
 			ndInt32 permute = i;
 			for (ndInt32 j = i + 1; j < 4; j++) 
 			{
-				ndFloat32 pivot1 = dAbs(tmp[j][i]);
+				ndFloat32 pivot1 = ndAbs(tmp[j][i]);
 				if (pivot1 > pivot) 
 				{
 					permute = j;
@@ -203,8 +203,8 @@ ndMatrix ndMatrix::Inverse4x4 () const
 			{
 				dAssert(pivot > ndFloat32(0.0f));
 				dAssert((pivot > ndFloat32(1.0e-6f)) || (dConditionNumber(4, 4, (ndFloat32*)&(*this)[0][0]) < ndFloat32(1.0e5f)));
-				dSwap(inv[i], inv[permute]);
-				dSwap(tmp[i], tmp[permute]);
+				ndSwap(inv[i], inv[permute]);
+				ndSwap(tmp[i], tmp[permute]);
 			}
 		}
 
@@ -234,11 +234,11 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	for (ndInt32 i = 0; i < 4; i++) 
 	{
 		ndFloat32 error = tmp[i][i] - ndFloat32(1.0f);
-		dAssert(dAbs(error) < ndFloat32(1.0e-3f));
+		dAssert(ndAbs(error) < ndFloat32(1.0e-3f));
 		for (ndInt32 j = i + 1; j < 4; j++) 
 		{
-			dAssert(dAbs(tmp[i][j]) < ndFloat32(1.0e-3f));
-			dAssert(dAbs(tmp[j][i]) < ndFloat32(1.0e-3f));
+			dAssert(ndAbs(tmp[i][j]) < ndFloat32(1.0e-3f));
+			dAssert(ndAbs(tmp[j][i]) < ndFloat32(1.0e-3f));
 		}
 	}
 #endif
@@ -252,13 +252,13 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 	ndVector ret(v);
 	for (ndInt32 i = 0; i < 4; i++) 
 	{
-		ndFloat32 pivot = dAbs(tmp[i][i]);
+		ndFloat32 pivot = ndAbs(tmp[i][i]);
 		if (pivot < ndFloat32(0.01f)) 
 		{
 			ndInt32 permute = i;
 			for (ndInt32 j = i + 1; j < 4; j++) 
 			{
-				ndFloat32 pivot1 = dAbs(tmp[j][i]);
+				ndFloat32 pivot1 = ndAbs(tmp[j][i]);
 				if (pivot1 > pivot) 
 				{
 					permute = j;
@@ -269,8 +269,8 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 			if (permute != i) 
 			{
 				dAssert(pivot > ndFloat32(1.0e-6f));
-				dSwap(ret[i], ret[permute]);
-				dSwap(tmp[i], tmp[permute]);
+				ndSwap(ret[i], ret[permute]);
+				ndSwap(tmp[i], tmp[permute]);
 			}
 		}
 
@@ -296,7 +296,7 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 {
 	const ndMatrix& matrix = *this;
 	dAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
-	dAssert (dAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-4f));
+	dAssert (ndAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-4f));
 
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > ndFloat32 (0.99995f)) 
@@ -365,9 +365,9 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 	{
 		for (ndInt32 j = 0; j < 3; j ++) 
 		{
-			ndFloat32 error = dAbs (m0[i][j] - matrix[i][j]);
+			ndFloat32 error = ndAbs (m0[i][j] - matrix[i][j]);
 			dAssert (error < 5.0e-2f);
-			error = dAbs (m1[i][j] - matrix[i][j]);
+			error = ndAbs (m1[i][j] - matrix[i][j]);
 			dAssert (error < 5.0e-2f);
 		}
 	}
@@ -380,7 +380,7 @@ void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, n
 	// where S = sqrt (transpose (L) * L)
 
 	const ndMatrix& me = *this;
-	ndFloat32 sign = dSign (me[2].DotProduct(me[0].CrossProduct(me[1])).GetScalar());
+	ndFloat32 sign = ndSign (me[2].DotProduct(me[0].CrossProduct(me[1])).GetScalar());
 	stretchAxis = me * Transpose();
 	scale = stretchAxis.EigenVectors();
 
@@ -460,23 +460,23 @@ ndVector ndMatrix::EigenVectors ()
 		{
 			for (ndInt32 k = j + 1; k < 3; k ++) 
 			{
-				ndFloat32 g = ndFloat32 (100.0f) * dAbs(matrix[j][k]);
-				if ((i > 3) && ((dAbs(d[j]) + g) == dAbs(d[j])) && ((dAbs(d[k]) + g) == dAbs(d[k]))) 
+				ndFloat32 g = ndFloat32 (100.0f) * ndAbs(matrix[j][k]);
+				if ((i > 3) && ((ndAbs(d[j]) + g) == ndAbs(d[j])) && ((ndAbs(d[k]) + g) == ndAbs(d[k]))) 
 				{
 					matrix[j][k] = ndFloat32 (0.0f);
 				} 
-				else if (dAbs(matrix[j][k]) > thresh) 
+				else if (ndAbs(matrix[j][k]) > thresh) 
 				{
 					ndFloat32 t;
 					ndFloat32 h = d[k] - d[j];
-					if (dAbs(h) + g == dAbs(h)) 
+					if (ndAbs(h) + g == ndAbs(h)) 
 					{
 						t = matrix[j][k] / h;
 					} 
 					else 
 					{
 						ndFloat32 theta = ndFloat32 (0.5f) * h / matrix[j][k];
-						t = ndFloat32(1.0f) / (dAbs(theta) + ndSqrt(ndFloat32(1.0f) + theta * theta));
+						t = ndFloat32(1.0f) / (ndAbs(theta) + ndSqrt(ndFloat32(1.0f) + theta * theta));
 						if (theta < ndFloat32 (0.0f)) 
 						{
 							t = -t;
@@ -540,7 +540,7 @@ ndVector ndMatrix::EigenVectors ()
 		{
 			for (ndInt32 k = 0; k < 3; k++) 
 			{
-				dAssert(dAreEqual(originalMatrix[j][k], tempMatrix[j][k], ndFloat32(1.0e-3f)));
+				dAssert(ndAreEqual(originalMatrix[j][k], tempMatrix[j][k], ndFloat32(1.0e-3f)));
 			}
 		}
 	#endif

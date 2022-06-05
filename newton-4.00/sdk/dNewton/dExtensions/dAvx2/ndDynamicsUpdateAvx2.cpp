@@ -842,7 +842,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 			{
 				body->m_weigh = ndFloat32(weigh);
 			}
-			maxExtraPasses = dMax(weigh, maxExtraPasses);
+			maxExtraPasses = ndMax(weigh, maxExtraPasses);
 		}
 		extraPassesArray[threadIndex] = maxExtraPasses;
 	});
@@ -856,7 +856,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 		const ndInt32 threadCount = scene->GetThreadCount();
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
-			extraPasses = dMax(extraPasses, extraPassesArray[i]);
+			extraPasses = ndMax(extraPasses, extraPassesArray[i]);
 		}
 
 		const ndInt32 conectivity = 7;
@@ -977,7 +977,7 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = ndFloat32(0.0f);
-		rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
+		rhs->m_diagonalRegularizer = ndMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
 
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];
@@ -1078,7 +1078,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				dAssert(rhs->m_jointFeebackForce);
 				const ndFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
 
-				rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
+				rhs->m_force = isBilateral ? ndClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = ndFloat32(0.0f);
 
 				const ndAvxFloat& JtM0 = (ndAvxFloat&)row->m_Jt.m_jacobianM0;
@@ -2121,7 +2121,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					{
 						const ndSoaMatrixElement* const row = &massMatrix[j];
 						rightHandSide[j + rowStartBase].m_force = row->m_force[i];
-						rightHandSide[j + rowStartBase].m_maxImpact = dMax(dAbs(row->m_force[i]), rightHandSide[j + rowStartBase].m_maxImpact);
+						rightHandSide[j + rowStartBase].m_maxImpact = ndMax(ndAbs(row->m_force[i]), rightHandSide[j + rowStartBase].m_maxImpact);
 					}
 
 					const ndInt32 index0 = (block + i) * 2 + 0;

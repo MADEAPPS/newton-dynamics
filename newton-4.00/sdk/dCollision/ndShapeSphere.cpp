@@ -69,9 +69,9 @@ void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const n
 {
 	if (level) 
 	{
-		dAssert(dAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndVector p01(p0 + p1);
 		ndVector p12(p1 + p2);
 		ndVector p20(p2 + p0);
@@ -80,9 +80,9 @@ void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const n
 		p12 = p12.Normalize();
 		p20 = p20.Normalize();
 
-		dAssert(dAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
 		TesselateTriangle(level - 1, p0, p01, p20, count, ouput);
 		TesselateTriangle(level - 1, p1, p12, p01, count, ouput);
@@ -99,7 +99,7 @@ void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const n
 
 void ndShapeSphere::Init(ndFloat32 radius)
 {
-	m_radius = dMax(dAbs(radius), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius = ndMax(ndAbs(radius), D_MIN_CONVEX_SHAPE_SIZE);
 	
 	m_edgeCount = D_SPHERE_EDGE_COUNT;
 	m_vertexCount = D_SPHERE_VERTEX_COUNT;
@@ -127,7 +127,7 @@ void ndShapeSphere::Init(ndFloat32 radius)
 		TesselateTriangle(index, p5, p3, p1, count, tmpVectex);
 		TesselateTriangle(index, p5, p0, p3, count, tmpVectex);
 
-		ndInt32 vertexCount = dVertexListToIndexList(&tmpVectex[0].m_x, sizeof(ndVector), 3, count, indexList, 0.001f);
+		ndInt32 vertexCount = ndVertexListToIndexList(&tmpVectex[0].m_x, sizeof(ndVector), 3, count, indexList, 0.001f);
 
 		dAssert(vertexCount == D_SPHERE_VERTEX_COUNT);
 		for (ndInt32 i = 0; i < vertexCount; i++) 
@@ -215,7 +215,7 @@ ndVector ndShapeSphere::SupportVertexSpecial(const ndVector&, ndFloat32, ndInt32
 ndVector ndShapeSphere::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	dAssert(dir.m_w == 0.0f);
 	return dir.Scale(m_radius);
 }

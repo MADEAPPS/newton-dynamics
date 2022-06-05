@@ -35,13 +35,13 @@ T dSQRH(const T num, const T den)
 template <class T>
 T dPythag(const T a, const T b)
 {
-	T absa(dAbs(a));
-	T absb(dAbs(b));
+	T absa(ndAbs(a));
+	T absb(ndAbs(b));
 	return (absa > absb) ? (absa * dSQRH(absb, absa)) : ((absb == T(0.0f) ? T(0.0f) : (absb * dSQRH(absa, absb))));
 }
 
 template <class T>
-T dSign(const T a, const T b)
+T ndSign(const T a, const T b)
 {
 	return (b >= T(0.0f)) ? (a >= T(0.0f) ? a : -a) : (a >= T(0.0f) ? -a : a);
 }

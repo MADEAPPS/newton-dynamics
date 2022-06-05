@@ -75,7 +75,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	ndInt32* const indices = dAlloca(ndInt32, indexCount);
+	ndInt32* const indices = ndAlloca(ndInt32, indexCount);
 
 	ndInt32 segmentStart = 0;
 	ndInt32 materialCount = 0;

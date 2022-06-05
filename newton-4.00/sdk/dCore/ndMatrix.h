@@ -140,7 +140,7 @@ inline ndMatrix::ndMatrix (const ndVector& front)
 	:m_front((front & ndVector::m_triplexMask).Normalize())
 	,m_posit(ndVector::m_wOne)
 {
-	if (dAbs(m_front.m_z) > ndFloat32 (0.577f)) 
+	if (ndAbs(m_front.m_z) > ndFloat32 (0.577f)) 
 	{
 		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_z, ndFloat32(0.0f), ndFloat32(0.0f)));
 	}
@@ -280,10 +280,10 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 			    (m_up[3] == ndFloat32(0.0f)) &&
 				(m_right[3] == ndFloat32(0.0f)) &&
 				(m_posit[3] == ndFloat32(1.0f)) &&
-				(dAbs(a - ndFloat32(1.0f)) < tol) &&
-				(dAbs(b - ndFloat32(1.0f)) < tol) &&
-				(dAbs(c - ndFloat32(1.0f)) < tol) &&
-				(dAbs(d - ndFloat32(1.0f)) < tol);
+				(ndAbs(a - ndFloat32(1.0f)) < tol) &&
+				(ndAbs(b - ndFloat32(1.0f)) < tol) &&
+				(ndAbs(c - ndFloat32(1.0f)) < tol) &&
+				(ndAbs(d - ndFloat32(1.0f)) < tol);
 	if (!ret)
 	{
 		dAssert (0);
@@ -294,9 +294,9 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 inline bool ndMatrix::TestSymetric3x3() const
 {
 	const ndMatrix& me = *this;
-	return (dAbs (me[0][1] - me[1][0]) < ndFloat32 (1.0e-5f)) && 
-		   (dAbs (me[0][2] - me[2][0]) < ndFloat32 (1.0e-5f)) &&
-		   (dAbs (me[1][2] - me[2][1]) < ndFloat32 (1.0e-5f)) &&
+	return (ndAbs (me[0][1] - me[1][0]) < ndFloat32 (1.0e-5f)) && 
+		   (ndAbs (me[0][2] - me[2][0]) < ndFloat32 (1.0e-5f)) &&
+		   (ndAbs (me[1][2] - me[2][1]) < ndFloat32 (1.0e-5f)) &&
 		   (me[0][3] == ndFloat32 (0.0f)) &&
 		   (me[1][3] == ndFloat32 (0.0f)) &&
 		   (me[2][3] == ndFloat32 (0.0f)) &&

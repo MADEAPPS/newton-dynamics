@@ -90,23 +90,23 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 
 void ndMultiBodyVehicleMotor::SetFrictionLose(ndFloat32 newtonMeters)
 {
-	m_internalFriction = dAbs(newtonMeters);
+	m_internalFriction = ndAbs(newtonMeters);
 }
 
 void ndMultiBodyVehicleMotor::SetMaxRpm(ndFloat32 redLineRpm)
 {
-	m_maxOmega = dMax(redLineRpm / dRadPerSecToRpm, ndFloat32 (0.0f));
+	m_maxOmega = ndMax(redLineRpm / dRadPerSecToRpm, ndFloat32 (0.0f));
 }
 
 void ndMultiBodyVehicleMotor::SetOmegaAccel(ndFloat32 rpmStep)
 {
-	m_omegaStep = dAbs(rpmStep / dRadPerSecToRpm);
+	m_omegaStep = ndAbs(rpmStep / dRadPerSecToRpm);
 }
 
 void ndMultiBodyVehicleMotor::SetTorqueAndRpm(ndFloat32 newtonMeters, ndFloat32 rpm)
 {
-	m_engineTorque = dMax(newtonMeters, ndFloat32(0.0f));
-	m_targetOmega = dClamp(rpm / dRadPerSecToRpm, ndFloat32(0.0f), m_maxOmega);
+	m_engineTorque = ndMax(newtonMeters, ndFloat32(0.0f));
+	m_targetOmega = ndClamp(rpm / dRadPerSecToRpm, ndFloat32(0.0f), m_maxOmega);
 }
 
 ndFloat32 ndMultiBodyVehicleMotor::GetRpm() const
@@ -129,7 +129,7 @@ ndFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& 
 	}
 
 	m_omega = currentOmega;
-	ndFloat32 omegaStep = dClamp(m_targetOmega - m_omega, -m_omegaStep, m_omegaStep);
+	ndFloat32 omegaStep = ndClamp(m_targetOmega - m_omega, -m_omegaStep, m_omegaStep);
 	ndFloat32 accel = omegaStep * desc.m_invTimestep;
 	return accel;
 }
@@ -151,7 +151,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	AddAngularRowJacobian(desc, matrix0.m_front * ndVector::m_negOne, ndFloat32(0.0f));
 
 	const ndFloat32 accel = CalculateAcceleration(desc);
-	const ndFloat32 torque = dMax(m_engineTorque, m_internalFriction);
+	const ndFloat32 torque = ndMax(m_engineTorque, m_internalFriction);
 	SetMotorAcceleration(desc, accel);
 	SetHighFriction(desc, torque);
 	SetLowerFriction(desc, -torque);
@@ -160,7 +160,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	// add torque coupling to chassis.
 	const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
 	dAssert(gearBox);
-	if (gearBox && dAbs(gearBox->GetRatio()) > ndFloat32(0.0f))
+	if (gearBox && ndAbs(gearBox->GetRatio()) > ndFloat32(0.0f))
 	{
 		ndJacobian& chassisJacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 		chassisJacobian.m_angular = ndVector::m_zero;

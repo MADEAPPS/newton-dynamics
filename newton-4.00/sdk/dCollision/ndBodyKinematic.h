@@ -43,8 +43,8 @@ class ndBodyKinematic : public ndBody
 	{
 		public:
 		ndContactkey(ndUnsigned32 tag0, ndUnsigned32 tag1)
-			:m_tagLow(dMin(tag0, tag1))
-			,m_tagHigh(dMax(tag0, tag1))
+			:m_tagLow(ndMin(tag0, tag1))
+			,m_tagHigh(ndMax(tag0, tag1))
 		{
 			dAssert(m_tagLow < m_tagHigh);
 		}
@@ -477,8 +477,8 @@ inline ndFloat32 ndBodyKinematic::GetMaxAngularStep() const
 
 inline void ndBodyKinematic::SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32 angleInRadian, ndFloat32 stepInUnitPerSeconds)
 {
-	m_maxLinearStep = dMax(dAbs(stepInUnitPerSeconds), ndFloat32(1.0f));
-	m_maxAngleStep = dMax(dAbs(angleInRadian), ndFloat32(90.0f) * ndDegreeToRad);
+	m_maxLinearStep = ndMax(ndAbs(stepInUnitPerSeconds), ndFloat32(1.0f));
+	m_maxAngleStep = ndMax(ndAbs(angleInRadian), ndFloat32(90.0f) * ndDegreeToRad);
 }
 
 inline void ndBodyKinematic::SetLinearDamping(ndFloat32)

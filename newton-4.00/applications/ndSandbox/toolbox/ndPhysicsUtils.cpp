@@ -24,7 +24,7 @@
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 {
 	ndVector p0(origin);
-	ndVector p1(origin - ndVector(0.0f, dAbs(dist), 0.0f, 0.0f));
+	ndVector p1(origin - ndVector(0.0f, ndAbs(dist), 0.0f, 0.0f));
 
 	ndRayCastClosestHitCallback rayCaster;
 	if (world.RayCast(rayCaster, p0, p1))
@@ -135,7 +135,7 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 
 	ndMatrix matrix(location);
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 500.0f, 0.0f, 0.0f), 1000.0f));
-	matrix.m_posit.m_y = dMax (floor.m_y + 1.0f, matrix.m_posit.m_y);
+	matrix.m_posit.m_y = ndMax (floor.m_y + 1.0f, matrix.m_posit.m_y);
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndBodyDynamic* const body = new ndBodyDynamic();

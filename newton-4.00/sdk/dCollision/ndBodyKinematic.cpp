@@ -257,7 +257,7 @@ void ndBodyKinematic::DetachJoint(ndJointList::ndNode* const node)
 
 void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 {
-	mass = dAbs(mass);
+	mass = ndAbs(mass);
 
 	ndShape* const shape = m_shapeInstance.GetShape();
 	//if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
@@ -276,13 +276,13 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 	}
 	else
 	{
-		ndFloat32 Ixx = dAbs(inertia[0][0]);
-		ndFloat32 Iyy = dAbs(inertia[1][1]);
-		ndFloat32 Izz = dAbs(inertia[2][2]);
+		ndFloat32 Ixx = ndAbs(inertia[0][0]);
+		ndFloat32 Iyy = ndAbs(inertia[1][1]);
+		ndFloat32 Izz = ndAbs(inertia[2][2]);
 
-		ndFloat32 Ixx1 = dClamp(Ixx, ndFloat32(0.0001f) * mass, ndFloat32(10000.0f) * mass);
-		ndFloat32 Iyy1 = dClamp(Iyy, ndFloat32(0.0001f) * mass, ndFloat32(10000.0f) * mass);
-		ndFloat32 Izz1 = dClamp(Izz, ndFloat32(0.0001f) * mass, ndFloat32(10000.0f) * mass);
+		ndFloat32 Ixx1 = ndClamp(Ixx, ndFloat32(0.0001f) * mass, ndFloat32(10000.0f) * mass);
+		ndFloat32 Iyy1 = ndClamp(Iyy, ndFloat32(0.0001f) * mass, ndFloat32(10000.0f) * mass);
+		ndFloat32 Izz1 = ndClamp(Izz, ndFloat32(0.0001f) * mass, ndFloat32(10000.0f) * mass);
 
 		dAssert(Ixx1 > ndFloat32(0.0f));
 		dAssert(Iyy1 > ndFloat32(0.0f));
@@ -320,7 +320,7 @@ void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const ndFastRay& ray, ndFloat32 maxT) const
 {
 	ndVector l0(ray.m_p0);
-	ndVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, ndFloat32(1.0f))));
+	ndVector l1(ray.m_p0 + ray.m_diff.Scale(ndMin(maxT, ndFloat32(1.0f))));
 
 	bool state = false;
 	if (dRayBoxClip(l0, l1, m_minAabb, m_maxAabb))

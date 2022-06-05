@@ -201,7 +201,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	// please use standart lib std::vector
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
-		newSize = dMax(newSize, 16);
+		newSize = ndMax(newSize, 16);
 		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -213,7 +213,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	}
 	else if (newSize < m_capacity)
 	{
-		newSize = dMax(newSize, 16);
+		newSize = ndMax(newSize, 16);
 		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
 		if (m_array) 
 		{
@@ -229,9 +229,9 @@ void ndArray<T>::Resize(ndInt32 newSize)
 template<class T>
 void ndArray<T>::Swap(ndArray& other)
 {
-	dSwap(m_array, other.m_array);
-	dSwap(m_size, other.m_size);
-	dSwap(m_capacity, other.m_capacity);
+	ndSwap(m_array, other.m_array);
+	ndSwap(m_size, other.m_size);
+	ndSwap(m_capacity, other.m_capacity);
 }
 
 #endif

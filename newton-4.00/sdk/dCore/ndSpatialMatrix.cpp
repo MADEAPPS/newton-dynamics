@@ -37,13 +37,13 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 
 	for (ndInt32 i = 0; i < rows; i++) 
 	{
-		ndFloat64 pivot = dAbs(tmp[i][i]);
+		ndFloat64 pivot = ndAbs(tmp[i][i]);
 		if (pivot < ndFloat64(0.01f)) 
 		{
 			ndInt32 permute = i;
 			for (ndInt32 j = i + 1; j < rows; j++) 
 			{
-				ndFloat64 pivot1 = dAbs(tmp[j][i]);
+				ndFloat64 pivot1 = ndAbs(tmp[j][i]);
 				if (pivot1 > pivot) {
 					permute = j;
 					pivot = pivot1;
@@ -66,8 +66,8 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 			{
 				for (ndInt32 j = 0; j < rows; j++) 
 				{
-					dSwap(tmp[i][j], tmp[permute][j]);
-					dSwap(tmp[i][j], tmp[permute][j]);
+					ndSwap(tmp[i][j], tmp[permute][j]);
+					ndSwap(tmp[i][j], tmp[permute][j]);
 				}
 			}
 		}
@@ -118,12 +118,12 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 	for (ndInt32 i = 0; i < rows; i++) 
 	{
 		ndSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
-		dAssert(dAbs(v[i] - ndFloat64(1.0f)) < ndFloat64(1.0e-6f));
+		dAssert(ndAbs(v[i] - ndFloat64(1.0f)) < ndFloat64(1.0e-6f));
 		for (ndInt32 j = 0; j < rows; j++) 
 		{
 			if (j != i) 
 			{
-				dAssert(dAbs(v[j]) < ndFloat64(1.0e-6f));
+				dAssert(ndAbs(v[j]) < ndFloat64(1.0e-6f));
 			}
 		}
 	}

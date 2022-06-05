@@ -180,10 +180,10 @@ T ndConjugateGradient<T, ndMatrixOperator>::Solve(ndInt32 size, T tolerance, T* 
 	} 
 	else 
 	{
-		T* const r0 = dAlloca(T, size);
-		T* const z0 = dAlloca(T, size);
-		T* const p0 = dAlloca(T, size);
-		T* const q0 = dAlloca(T, size);
+		T* const r0 = ndAlloca(T, size);
+		T* const z0 = ndAlloca(T, size);
+		T* const p0 = ndAlloca(T, size);
+		T* const q0 = ndAlloca(T, size);
 		SetBuffers(r0, z0, p0, q0);
 		T error = SolveInternal(size, tolerance, x, b, matrix, preconditionerBuffer);
 		SetBuffers(nullptr, nullptr, nullptr, nullptr);

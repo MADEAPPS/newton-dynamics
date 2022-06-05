@@ -75,11 +75,11 @@ ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 	ndMatrix unitMatrix (tmp * matrix.Inverse());
 	for (ndInt32 i = 0; i < 4; i ++) 
 	{
-		ndFloat32 err = dAbs (unitMatrix[i][i] - ndFloat32(1.0f));
+		ndFloat32 err = ndAbs (unitMatrix[i][i] - ndFloat32(1.0f));
 		dAssert (err < ndFloat32 (1.0e-2f));
 	}
 
-	ndFloat32 err = dAbs (DotProduct(*this).GetScalar() - ndFloat32(1.0f));
+	ndFloat32 err = ndAbs (DotProduct(*this).GetScalar() - ndFloat32(1.0f));
 	dAssert (err < ndFloat32(ndEpsilon * 100.0f));
 #endif
 }
@@ -91,8 +91,8 @@ ndQuaternion::ndQuaternion (const ndVector &unitAxis, ndFloat32 angle)
 	ndFloat32 sinAng = ndSin (angle);
 
 #ifdef _DEBUG
-	if (dAbs (angle) > ndFloat32(ndEpsilon / 10.0f)) {
-		dAssert (dAbs (ndFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < ndFloat32(ndEpsilon * 10.0f));
+	if (ndAbs (angle) > ndFloat32(ndEpsilon / 10.0f)) {
+		dAssert (ndAbs (ndFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < ndFloat32(ndEpsilon * 10.0f));
 	} 
 #endif
 	m_x = unitAxis.m_x * sinAng;
@@ -186,7 +186,7 @@ ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, ndFloat32 t) const
 	}
 
 	dot = q0.DotProduct (q0).GetScalar();
-	if (dAbs (dot - ndFloat32(1.0f)) > ndEpsilon) 
+	if (ndAbs (dot - ndFloat32(1.0f)) > ndEpsilon) 
 	{
 		dot = ndRsqrt (dot);
 		q0 = q0.Scale(dot);

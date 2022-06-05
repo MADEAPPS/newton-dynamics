@@ -206,7 +206,7 @@ ndString::ndString (const char* const data, ndInt32 maxSize)
 {
 	if (data) 
 	{
-		m_size = dMin (CalculateSize (data), maxSize);
+		m_size = ndMin (CalculateSize (data), maxSize);
 		m_capacity = m_size + 1; 
 		m_string = AllocMem (m_size + 1);
 		CopyData (m_string, data, m_size + 1);
@@ -349,7 +349,7 @@ void ndString::operator+= (const char* const src)
 	ndInt32 size = CalculateSize (src);
 	if ((m_size + size + 1) > m_capacity) 
 	{
-		ndInt32 newCapacity = dMax (m_capacity - 1, 1);
+		ndInt32 newCapacity = ndMax (m_capacity - 1, 1);
 		while (newCapacity < (m_size + size)) 
 		{
 			newCapacity *= 2;
@@ -530,7 +530,7 @@ ndInt32 ndString::Find (const char* const subString, ndInt32 subStringLength, nd
 	ndInt32 location = -1;
 	if (m_size) 
 	{
-		const ndInt32 str2Size = dMin (subStringLength, lenght);
+		const ndInt32 str2Size = ndMin (subStringLength, lenght);
 		if (str2Size == 1) 
 		{
 			char ch = subString[0];
@@ -584,7 +584,7 @@ ndInt32 ndString::Find (const char* const subString, ndInt32 subStringLength, nd
 				{
 					return j;
 				}
-				j += dMax(i - frequency[ndInt32 (ptr1[i])], 1);
+				j += ndMax(i - frequency[ndInt32 (ptr1[i])], 1);
 			}
 		}
 	}

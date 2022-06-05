@@ -28,9 +28,9 @@
 #include "ndMemory.h"
 
 // assume this function returns memory aligned to 16 bytes
-#define dAlloca(type, count) (type*) alloca (sizeof (type) * (count))
+#define ndAlloca(type, count) (type*) alloca (sizeof (type) * (count))
 
-inline ndInt32 dExp2 (ndInt32 x)
+inline ndInt32 ndExp2 (ndInt32 x)
 {
 	ndInt32 exp;
 	for (exp = -1; x; x >>= 1) 
@@ -40,10 +40,10 @@ inline ndInt32 dExp2 (ndInt32 x)
 	return exp;
 }
 
-inline ndInt32 dBitReversal(ndInt32 v, ndInt32 base)
+inline ndInt32 ndBitReversal(ndInt32 v, ndInt32 base)
 {
 	ndInt32 x = 0;
-	ndInt32 power = dExp2 (base) - 1;
+	ndInt32 power = ndExp2 (base) - 1;
 	do 
 	{
 		x += (v & 1) << power;
@@ -55,31 +55,31 @@ inline ndInt32 dBitReversal(ndInt32 v, ndInt32 base)
 }
 
 template <class T>
-T dMod(T val, T mod)
+inline T ndMod(T val, T mod)
 {
 	return T(fmod(T(val), T(mod)));
 }
 
 template <class T> 
-inline T dMin(T A, T B)
+inline T ndMin(T A, T B)
 {
 	return (A < B) ? A : B; 
 }
 
 template <class T> 
-inline T dMax(T A, T B)
+inline T ndMax(T A, T B)
 {
 	return (A > B) ? A : B; 
 }
 
 template <class T>
-inline T dClamp(T val, T min, T max)
+inline T ndClamp(T val, T min, T max)
 {
-	return dMax (min, dMin (max, val));
+	return ndMax (min, ndMin (max, val));
 }
 
 template <class T> 
-inline void dSwap(T& A, T& B)
+inline void ndSwap(T& A, T& B)
 {
 	T tmp (A);
 	A = B;
@@ -87,23 +87,23 @@ inline void dSwap(T& A, T& B)
 }	
 
 template <class T>
-inline T dAbs(T A)
+inline T ndAbs(T A)
 {
 	// according to Intel this is better because is does not read after write
 	return (A >= T(0)) ? A : -A;
 }
 
 template <class T>
-inline T dSign(T A)
+inline T ndSign(T A)
 {
 	return (A >= T(0)) ? T(1) : T(-1);
 }
 
 template <class T> 
-inline bool dAreEqual(T A, T B, T tol)
+inline bool ndAreEqual(T A, T B, T tol)
 {
 	// deal with too small and de normal values.
-	if ((dAbs(A) < tol) && (dAbs(B) < tol)) 
+	if ((ndAbs(A) < tol) && (ndAbs(B) < tol)) 
 	{
 		return true;
 	}
@@ -113,7 +113,7 @@ inline bool dAreEqual(T A, T B, T tol)
 	
 	ndInt32 exp1;
 	ndFloat64 mantissa1 = frexp(ndFloat64(B), &exp1);
-	if (dAbs(exp0 - exp1) > 1)
+	if (ndAbs(exp0 - exp1) > 1)
 	{
 		return false;
 	}
@@ -128,11 +128,11 @@ inline bool dAreEqual(T A, T B, T tol)
 			mantissa1 *= ndFloat32(2.0f);
 		}
 	}
-	return dAbs(mantissa0 - mantissa1) < tol;
+	return ndAbs(mantissa0 - mantissa1) < tol;
 }
 
 template <class T>
-inline T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
+inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 {
 	T s1 = T(ndSin(angleInRadiand1));
 	T c1 = T(ndCos(angleInRadiand1));
@@ -145,22 +145,22 @@ inline T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 }
 
 /// Returns the time in micro seconds since application started 
-D_CORE_API ndUnsigned64 dGetTimeInMicroseconds();
+D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 
-D_CORE_API ndFloat32 dRand();
-D_CORE_API ndInt32 dRandInt();
-D_CORE_API void dSetRandSeed(ndUnsigned32 seed);
-D_CORE_API ndFloat32 dGaussianRandom(ndFloat32 amp);
+D_CORE_API ndFloat32 ndRand();
+D_CORE_API ndInt32 ndRandInt();
+D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
+D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 amp);
 
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
 /// \param ndFloat64 val: 64 bit float 
 /// \return a 64 bit double precision with a 32 bit mantissa
-D_CORE_API ndFloat64 dRoundToFloat(ndFloat64 val);
+D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 
-D_CORE_API ndInt32 dVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
+D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
 template <class T>
-ndInt32 dVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, T tolerance = ndEpsilon)
+ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, T tolerance = ndEpsilon)
 {
 	ndInt32 stride = ndInt32(strideInBytes / sizeof(T));
 	ndStack<ndFloat64> pool(vertexCount * stride);
@@ -176,7 +176,7 @@ ndInt32 dVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndInt
 		}
 	}
 
-	ndInt32 count = dVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
+	ndInt32 count = ndVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
 	for (ndInt32 i = 0; i < count; i++)
 	{
 		const ndFloat64* const src = &data[i * stride];

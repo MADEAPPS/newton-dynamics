@@ -146,7 +146,7 @@ class ndForceImpactPair
 		ndFloat32 value = ndFloat32(ndFloat32(0.0f));
 		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
-			ndFloat32 mag = dAbs(m_initialGuess[i]);
+			ndFloat32 mag = ndAbs(m_initialGuess[i]);
 			if (mag < smallest) 
 			{
 				smallest = mag;

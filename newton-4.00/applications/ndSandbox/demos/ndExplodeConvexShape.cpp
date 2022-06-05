@@ -54,14 +54,14 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 
 	const ndInt32 count = 20;
 
-	dSetRandSeed(0);
+	ndSetRandSeed(0);
 	const ndVector scale(0.2f);
 	const ndVector invScale(size * scale.Reciproc());
 	for (ndInt32 i = 0; i < count; i++)
 	{
-		ndFloat32 x = dRand();
-		ndFloat32 y = dRand();
-		ndFloat32 z = dRand();
+		ndFloat32 x = ndRand();
+		ndFloat32 y = ndRand();
+		ndFloat32 z = ndRand();
 		ndVector randPoint(x, y, z, ndFloat32(0.0f));
 		randPoint *= invScale;
 		randPoint = pMin + scale * randPoint.Floor();

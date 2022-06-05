@@ -81,9 +81,9 @@ D_COLLISION_API void ndShapeBox::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 
 void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 {
-	m_size[0].m_x = dMax(dAbs(size_x) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
-	m_size[0].m_y = dMax(dAbs(size_y) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
-	m_size[0].m_z = dMax(dAbs(size_z) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_x = ndMax(ndAbs(size_x) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_y = ndMax(ndAbs(size_y) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_z = ndMax(ndAbs(size_z) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 	m_size[0].m_w = ndFloat32(0.0f);
 
 	m_size[1].m_x = -m_size[0].m_x;
@@ -203,7 +203,7 @@ ndVector ndShapeBox::SupportVertex(const ndVector& dir0, ndInt32* const vertexIn
 	ndVector mask0(dir0.Abs() > m_flushZero);
 	ndVector dir(dir0 & mask0);
 
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	dAssert(dir.m_w == ndFloat32(0.0f));
 	ndVector mask(dir < ndVector::m_zero);
 	if (vertexIndex) 
@@ -220,7 +220,7 @@ ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32, ndInt
 	ndVector mask0(dir0.Abs() > m_flushZero);
 	ndVector dir(dir0 & mask0);
 	
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	dAssert(dir.m_w == ndFloat32(0.0f));
 	ndVector mask(dir < ndVector::m_zero);
 	if (vertexIndex) 
@@ -239,7 +239,7 @@ ndVector ndShapeBox::SupportVertexSpecialProjectPoint(const ndVector& point, con
 {
 	ndVector mask0(dir0.Abs() > m_flushZero);
 	ndVector dir(dir0 & mask0);
-	dAssert(dAbs((dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f))) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs((dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f))) < ndFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
@@ -254,7 +254,7 @@ ndFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const ndVector& localP0, const n
 	for (ndInt32 i = 0; i < 3; i++) 
 	{
 		ndFloat32 dp = localP1[i] - localP0[i];
-		if (dAbs(dp) < ndFloat32(1.0e-8f)) 
+		if (ndAbs(dp) < ndFloat32(1.0e-8f)) 
 		{
 			if (localP0[i] <= m_size[1][i] || localP0[i] >= m_size[0][i]) 
 			{
@@ -271,7 +271,7 @@ ndFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const ndVector& localP0, const n
 			if (t1 > t2) 
 			{
 				sign = 1;
-				dSwap(t1, t2);
+				ndSwap(t1, t2);
 			}
 			if (t1 > tmin) 
 			{

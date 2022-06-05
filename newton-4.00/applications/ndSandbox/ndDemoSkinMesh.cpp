@@ -102,7 +102,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		for (ndInt32 i = 0; i < cluster->m_vertexIndex.GetCount(); i++) 
 		{
 			ndInt32 vertexIndex = cluster->m_vertexIndex[i];
-			vCount = dMax(vertexIndex + 1, vCount);
+			vCount = ndMax(vertexIndex + 1, vCount);
 			ndFloat32 vertexWeight = cluster->m_vertexWeigh[i];
 			if (vertexWeight >= weight[vertexIndex][3]) 
 			{
@@ -113,8 +113,8 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 				{
 					if (weight[vertexIndex][j] < weight[vertexIndex][j + 1]) 
 					{
-						dSwap(weight[vertexIndex][j], weight[vertexIndex][j + 1]);
-						dSwap(skinBone[vertexIndex].m_boneIndex[j], skinBone[vertexIndex].m_boneIndex[j + 1]);
+						ndSwap(weight[vertexIndex][j], weight[vertexIndex][j + 1]);
+						ndSwap(skinBone[vertexIndex].m_boneIndex[j], skinBone[vertexIndex].m_boneIndex[j + 1]);
 					}
 				}
 			}
@@ -138,7 +138,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		{
 			if (skinBone[i].m_boneIndex[j] != -1) 
 			{
-				weightcount = dMax(weightcount, j + 1);
+				weightcount = ndMax(weightcount, j + 1);
 			}
 			else 
 			{
@@ -351,9 +351,9 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 
 void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
-	ndMatrix* const bindMatrix = dAlloca(ndMatrix, m_nodeCount);
+	ndMatrix* const bindMatrix = ndAlloca(ndMatrix, m_nodeCount);
 	ndInt32 count = CalculateMatrixPalette(bindMatrix);
-	glMatrix* const glMatrixPallete = dAlloca(glMatrix, count);
+	glMatrix* const glMatrixPallete = ndAlloca(glMatrix, count);
 	for (ndInt32 i = 0; i < count; i++)
 	{
 		glMatrixPallete[i] = bindMatrix[i];

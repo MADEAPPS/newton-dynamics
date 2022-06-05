@@ -100,7 +100,7 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 ma
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale(height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
 	
-	height = dMax(height - 2.0f * radius / m_weistScale, ndFloat32(0.1f));
+	height = ndMax(height - 2.0f * radius / m_weistScale, ndFloat32(0.1f));
 	ndShapeInstance instance(new ndShapeCapsule(radius / m_weistScale, radius / m_weistScale, height));
 	instance.SetLocalMatrix(shapeMatrix);
 	instance.SetScale(ndVector (ndFloat32 (1.0f), m_weistScale, m_weistScale, ndFloat32 (0.0f)));
@@ -113,7 +113,7 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 ma
 	m_localFrame = shapeMatrix;
 	m_localFrame.m_posit = ndVector::m_wOne;
 	m_contactPatch = radius / m_weistScale;
-	m_stepHeight = dMax(stepHeight, m_contactPatch * ndFloat32(2.0f));
+	m_stepHeight = ndMax(stepHeight, m_contactPatch * ndFloat32(2.0f));
 }
 
 ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -204,7 +204,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 			{
 				ndVector point(contactSolver.m_contactBuffer[i].m_point);
 				ndVector normal(contactSolver.m_contactBuffer[i].m_normal);
-				ndFloat32 speed = dMin((contactSolver.m_contactBuffer[i].m_penetration + D_MAX_COLLISION_PENETRATION), ndFloat32(0.25f)) * invTimeStep;
+				ndFloat32 speed = ndMin((contactSolver.m_contactBuffer[i].m_penetration + D_MAX_COLLISION_PENETRATION), ndFloat32(0.25f)) * invTimeStep;
 				impulseSolver.AddLinearRow(normal, point - com, speed, 0.0f, 1.0e12f);
 			}
 
@@ -223,7 +223,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		ndFloat32 scaleSpeedFactor = 1.5f;
 		ndFloat32 forwardSpeed = m_forwardSpeed * scaleSpeedFactor;
 		ndFloat32 lateralSpeed = m_lateralSpeed * scaleSpeedFactor;
-		ndFloat32 maxSpeed = dMax(dAbs(forwardSpeed), dAbs(lateralSpeed));
+		ndFloat32 maxSpeed = ndMax(ndAbs(forwardSpeed), ndAbs(lateralSpeed));
 		ndFloat32 stepFriction = 1.0f + m_mass * maxSpeed;
 		
 		SetVelocity(savedVeloc);
@@ -296,7 +296,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 					ndFloat32 relSpeed = normal.DotProduct(veloc).GetScalar();
 					if (relSpeed < ndFloat32(-1.0e-2f)) 
 					{
-						maxHigh = dMax(point.m_x, maxHigh);
+						maxHigh = ndMax(point.m_x, maxHigh);
 					}
 				}
 			}
@@ -447,7 +447,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 			ndVector normal(contact->m_normal);
 			ndInt32 index = impulseSolver.AddContactRow(contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
 	
-			ndFloat32 impulse = invTimestep * dClamp(contact->m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, ndFloat32(0.0f), ndFloat32(0.5f));
+			ndFloat32 impulse = invTimestep * ndClamp(contact->m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, ndFloat32(0.0f), ndFloat32(0.5f));
 			impulseSolver.m_rhs[index] = impulse;
 		}
 
@@ -461,7 +461,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 		contactSolver.CalculateContacts();
 		for (ndInt32 i = 0; i < contactSolver.m_contactCount; i++) 
 		{
-			penetration = dMax(contactSolver.m_contactBuffer[i].m_penetration, penetration);
+			penetration = ndMax(contactSolver.m_contactBuffer[i].m_penetration, penetration);
 		}
 	}
 	
@@ -479,7 +479,7 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 	ndFloat32 maxPenetration = 0.0f;
 	for (ndInt32 i = 0; i < contactSolver.m_contactCount; i++) 
 	{
-		maxPenetration = dMax(contactSolver.m_contactBuffer[i].m_penetration, maxPenetration);
+		maxPenetration = ndMax(contactSolver.m_contactBuffer[i].m_penetration, maxPenetration);
 	}
 
 	ndMatrix matrix(GetMatrix());
@@ -564,7 +564,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			ndBodyKinematic* body1 = srcContact->GetBody1();
 			if (body1 == m_player)
 			{
-				dSwap(body0, body1);
+				ndSwap(body0, body1);
 			}
 			ndContact contact;
 			contact.SetBodies(body0, body1);

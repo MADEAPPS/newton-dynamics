@@ -216,7 +216,7 @@ inline ndInt32 ndWorld::GetSubSteps() const
 
 inline void ndWorld::SetSubSteps(ndInt32 subSteps)
 {
-	m_subSteps = dClamp(subSteps, 1, 16);
+	m_subSteps = ndClamp(subSteps, 1, 16);
 }
 
 inline ndScene* ndWorld::GetScene() const
@@ -231,7 +231,7 @@ inline ndInt32 ndWorld::GetSolverIterations() const
 
 inline void ndWorld::SetSolverIterations(ndInt32 iterations)
 {
-	m_solverIterations = ndUnsigned32(dMax(4, iterations));
+	m_solverIterations = ndUnsigned32(ndMax(4, iterations));
 }
 
 inline ndContactNotify* ndWorld::GetContactNotify() const

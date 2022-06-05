@@ -68,9 +68,9 @@ void ndShapeCylinder::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndShapeCylinder::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 {
-	m_radius0 = dMax(dAbs(radio0), D_MIN_CONVEX_SHAPE_SIZE);
-	m_radius1 = dMax(dAbs(radio1), D_MIN_CONVEX_SHAPE_SIZE);
-	m_height = dMax(dAbs(height) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius0 = ndMax(ndAbs(radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius1 = ndMax(ndAbs(radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = ndMax(ndAbs(height) * ndFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 
 	ndFloat32 angle = ndFloat32(0.0f);
 	const ndInt32 offset0 = 0;
@@ -215,14 +215,14 @@ void ndShapeCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 ndVector ndShapeCylinder::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
 ndVector ndShapeCylinder::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	if (dir.m_x < ndFloat32(-0.9999f)) 
 	{
@@ -259,7 +259,7 @@ ndVector ndShapeCylinder::SupportVertex(const ndVector& dir, ndInt32* const) con
 ndVector ndShapeCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	const ndFloat32 thickness = D_PENETRATION_TOL + skinMargin;
 	if (dir.m_x < ndFloat32(-0.9999f)) 
@@ -317,7 +317,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 			ndFloat32 cosAng = normal.m_y * magInv;
 			ndFloat32 sinAng = normal.m_z * magInv;
 
-			dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 			ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 			ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 
@@ -365,7 +365,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 			ndFloat32 cosAng = normal.m_y * magInv;
 			ndFloat32 sinAng = normal.m_z * magInv;
 
-			dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 			ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 			ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 
@@ -404,7 +404,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 		ndFloat32 cosAng = normal.m_y * magInv;
 		ndFloat32 sinAng = normal.m_z * magInv;
 
-		dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 		ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 		ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 

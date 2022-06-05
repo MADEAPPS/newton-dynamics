@@ -92,7 +92,7 @@ ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray
 {
 	ndBigVector dp (ray_p1 - ray_p0);
 	dAssert (dp.m_w == ndFloat32 (0.0f));
-	ndFloat64 t = dClamp (dp.DotProduct(point - ray_p0).GetScalar() / dp.DotProduct(dp).GetScalar(), ndFloat64(0.0f), ndFloat64 (1.0f));
+	ndFloat64 t = ndClamp (dp.DotProduct(point - ray_p0).GetScalar() / dp.DotProduct(dp).GetScalar(), ndFloat64(0.0f), ndFloat64 (1.0f));
 	return ray_p0 + dp.Scale (t);
 }
 
@@ -106,7 +106,7 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 
 	const ndFloat64 det = a00 * a11 - a01 * a01;
 	dAssert(det >= ndFloat32(0.0f));
-	if (dAbs(det) > ndFloat32(1.0e-24f)) 
+	if (ndAbs(det) > ndFloat32(1.0e-24f)) 
 	{
 		ndBigVector p0Point (point - p0);
 		const ndFloat64 b0 = e10.DotProduct(p0Point).GetScalar();
@@ -283,8 +283,8 @@ void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, con
 	}
 	
 	// finally do the division to get sc and tc
-	ndFloat64 sc = (dAbs(sN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : sN / sD);
-	ndFloat64 tc = (dAbs(tN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : tN / tD);
+	ndFloat64 sc = (ndAbs(sN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : sN / sD);
+	ndFloat64 tc = (ndAbs(tN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : tN / tD);
 	
 	dAssert(u.m_w == ndFloat64(0.0f));
 	dAssert(v.m_w == ndFloat64(0.0f));
@@ -305,7 +305,7 @@ void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1,
 
 	normal = normal & ndBigVector::m_triplexMask;
 	ndBigVector segment(ray_p1 - ray_p0);
-	ndFloat64 param = dClamp(-normal.DotProduct(ray_p0 - points[0]).GetScalar() / (normal.DotProduct(segment).GetScalar()), ndFloat64(0.0f), ndFloat64(1.0f));
+	ndFloat64 param = ndClamp(-normal.DotProduct(ray_p0 - points[0]).GetScalar() / (normal.DotProduct(segment).GetScalar()), ndFloat64(0.0f), ndFloat64(1.0f));
 	p0Out = ray_p0 + segment.Scale(param);
 
 	ndFloat64 distance2 = ndFloat32(1.0e10f);
@@ -342,7 +342,7 @@ ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector
 			ndFloat32 t1 = (-b - desc) * den;
 			if ((t0 >= ndFloat32 (0.0f)) && (t1 >= ndFloat32 (0.0f))) 
 			{
-				t0 =  dMin(t0, t1);
+				t0 =  ndMin(t0, t1);
 				if (t0 <= ndFloat32 (1.0f)) 
 				{
 					return t0;
@@ -381,7 +381,7 @@ ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector
 			ndFloat64 t1 = (-b - desc) * den;
 			if ((t0 >= ndFloat32(0.0f)) && (t1 >= ndFloat32(0.0f)))
 			{
-				t0 = dMin(t0, t1);
+				t0 = ndMin(t0, t1);
 				if (t0 <= ndFloat32(1.0f))
 				{
 					return ndFloat32(t0);
@@ -416,7 +416,7 @@ ndFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& bo
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		ndFloat32 dp = p1[i] - p0[i];
-		if (dAbs(dp) < ndFloat32(1.0e-8f))
+		if (ndAbs(dp) < ndFloat32(1.0e-8f))
 		{
 			if (p0[i] <= boxP0[i] || p0[i] >= boxP1[i])
 			{
@@ -433,7 +433,7 @@ ndFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& bo
 			if (t1 > t2)
 			{
 				sign = 1;
-				dSwap(t1, t2);
+				ndSwap(t1, t2);
 			}
 			if (t1 > tmin)
 			{

@@ -40,13 +40,13 @@ ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 			ndFloat32 area = Cross(vertexCloud2d[0], vertexCloud2d[1], vertexCloud2d[2]);
 			if (area < ndFloat32(0.0f)) 
 			{
-				dSwap(vertexCloud2d[1], vertexCloud2d[2]);
+				ndSwap(vertexCloud2d[1], vertexCloud2d[2]);
 			}
 		}
 		return count;
 	}
 
-	ndVector* const hull = dAlloca(ndVector, 2 * count);
+	ndVector* const hull = ndAlloca(ndVector, 2 * count);
 
 	// Sort points lexicographically
 	class CompareVertex

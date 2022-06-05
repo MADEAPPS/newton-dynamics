@@ -131,12 +131,12 @@ void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 
 	if (m_angle > m_maxLimit)
 	{
-		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_maxLimit);
+		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_maxLimit);
 		m_angle = m_maxLimit + deltaAngle;
 	} 
 	else if (m_angle < m_minLimit)
 	{
-		const ndFloat32 deltaAngle = AnglesAdd(m_angle, -m_minLimit);
+		const ndFloat32 deltaAngle = ndAnglesAdd(m_angle, -m_minLimit);
 		m_angle = m_minLimit + deltaAngle;
 	}
 }
@@ -159,9 +159,9 @@ void ndJointHinge::SetOffsetAngle(ndFloat32 angle)
 
 void ndJointHinge::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_springK = dAbs(spring);
-	m_damperC = dAbs(damper);
-	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_springK = ndAbs(spring);
+	m_damperC = ndAbs(damper);
+	m_springDamperRegularizer = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 void ndJointHinge::GetSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -192,7 +192,7 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 
 		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
 
-		ndFloat32 angleStep = dMin(deltaTwist, ndFloat32(2.0f * ndPi)) / subdiv;
+		ndFloat32 angleStep = ndMin(deltaTwist, ndFloat32(2.0f * ndPi)) / subdiv;
 		ndFloat32 angle0 = m_minLimit;
 
 		ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -235,14 +235,14 @@ void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& ma
 	const ndVector omega1(m_body1->GetOmega());
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const ndFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
 	m_angle += deltaAngle;
 	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
 {
-	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
+	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
 	ndFloat32 omega = D_MAX_HINGE_RECOVERY_SPEED * param;
 	return omega;
 }
@@ -268,7 +268,7 @@ ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& m
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (angle > m_maxLimit)
 			{
@@ -278,7 +278,7 @@ ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& m
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}

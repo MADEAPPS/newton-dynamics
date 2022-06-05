@@ -36,9 +36,9 @@ ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* cons
 	ndInt32 stride = ndInt32 (strideInByte / sizeof (ndFloat64));
 	for (ndInt32 i = 0; i < count; i ++) 
 	{
-		ndFloat64 x = dRoundToFloat (vertexCloud[i * stride + 0]);
-		ndFloat64 y = dRoundToFloat (vertexCloud[i * stride + 1]);
-		ndFloat64 z = dRoundToFloat (vertexCloud[i * stride + 2]);
+		ndFloat64 x = ndRoundToFloat (vertexCloud[i * stride + 0]);
+		ndFloat64 y = ndRoundToFloat (vertexCloud[i * stride + 1]);
+		ndFloat64 z = ndRoundToFloat (vertexCloud[i * stride + 2]);
 		points[i] = ndBigVector (x, y, z, x * x + y * y + z * z);
 	}
 
@@ -51,12 +51,12 @@ ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* cons
 		ndFloat64 maxW = ndFloat64 (-1.0e20f);
 		for (ndInt32 i = 0; i < count; i++) 
 		{
-			ndFloat64 x = dRoundToFloat(vertexCloud[i * stride + 0]);
-			ndFloat64 y = dRoundToFloat(vertexCloud[i * stride + 1]);
-			ndFloat64 z = dRoundToFloat(vertexCloud[i * stride + 2]);
+			ndFloat64 x = ndRoundToFloat(vertexCloud[i * stride + 0]);
+			ndFloat64 y = ndRoundToFloat(vertexCloud[i * stride + 1]);
+			ndFloat64 z = ndRoundToFloat(vertexCloud[i * stride + 2]);
 			points[i] = ndBigVector(x, y, z, x * x + y * y + z * z);
 			origin += points[i];
-			maxW = dMax (points[i].m_w, maxW);
+			maxW = ndMax (points[i].m_w, maxW);
 		}
 		origin = origin.Scale (ndFloat64 (1.0f) / count);
 		points[count + 0] = origin;

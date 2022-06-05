@@ -115,7 +115,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
 {
-	char* const buffer = dAlloca(char, count * 4 * 12);
+	char* const buffer = ndAlloca(char, count * 4 * 12);
 
 	char* ptr = buffer;
 	for (ndInt32 i = 0; i < count; i++)

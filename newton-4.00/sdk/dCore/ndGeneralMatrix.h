@@ -125,7 +125,7 @@ template<class T>
 bool dCholeskyFactorization(ndInt32 size, ndInt32 stride, T* const psdMatrix)
 {
 	bool state = true;
-	T* const invDiagonal = dAlloca(T, size);
+	T* const invDiagonal = ndAlloca(T, size);
 	for (ndInt32 i = 0; (i < size) && state; i++) 
 	{
 		state = state && dCholeskyFactorizationAddRow(size, stride, i, psdMatrix, invDiagonal);
@@ -136,7 +136,7 @@ bool dCholeskyFactorization(ndInt32 size, ndInt32 stride, T* const psdMatrix)
 template<class T>
 bool dTestPSDmatrix(ndInt32 size, ndInt32 stride, T* const matrix)
 {
-	T* const copy = dAlloca(T, size * size);
+	T* const copy = ndAlloca(T, size * size);
 	ndInt32 row = 0;
 	for (ndInt32 i = 0; i < size; i++) 
 	{
@@ -150,7 +150,7 @@ template<class T>
 void dCholeskyApplyRegularizer (ndInt32 size, ndInt32 stride, T* const psdMatrix, T* const regularizer)
 {
 	bool isPsdMatrix = false;
-	ndFloat32* const lowerTriangule = dAlloca(ndFloat32, stride * stride);
+	ndFloat32* const lowerTriangule = ndAlloca(ndFloat32, stride * stride);
 	do 
 	{
 		memcpy(lowerTriangule, psdMatrix, sizeof(ndFloat32) * stride * stride);
@@ -206,10 +206,10 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 	{
 		const T* const rowI = &matrix[i * size];
 		ndInt32 m = i;
-		T maxVal (dAbs(rowI[i]));
+		T maxVal (ndAbs(rowI[i]));
 		for (ndInt32 j = i + 1; j < size - 1; j++) 
 		{
-			T val (dAbs(matrix[size * j + i]));
+			T val (ndAbs(matrix[size * j + i]));
 			if (val > maxVal) 
 			{
 				m = j;
@@ -228,9 +228,9 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 			T* const rowJ = &matrix[i * size];
 			for (ndInt32 j = 0; j < size; j++) 
 			{
-				dSwap(rowK[j], rowJ[j]);
+				ndSwap(rowK[j], rowJ[j]);
 			}
-			dSwap(b[i], b[m]);
+			ndSwap(b[i], b[m]);
 		}
 
 		T den = T(1.0f) / rowI[i];
@@ -263,8 +263,8 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 template <class T>
 void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symmetricMatrix, T* const eigenValues)
 {
-	T* const offDiag = dAlloca(T, size);
-	T* const matrix = dAlloca(T, size * stride);
+	T* const offDiag = ndAlloca(T, size);
+	T* const matrix = ndAlloca(T, size * stride);
 
 	memcpy(matrix, symmetricMatrix, sizeof(T) * size * stride);
 	for (ndInt32 i = size - 1; i > 0; i--) 
@@ -277,7 +277,7 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 			T scale(0.0f);
 			for (ndInt32 k = 0; k < i; k++) 
 			{
-				scale += dAbs(rowI[k]);
+				scale += ndAbs(rowI[k]);
 			}
 
 			if (scale == T(0.0f)) 
@@ -353,8 +353,8 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 		{
 			for (j = i; j < size - 1; j++) 
 			{
-  				T dd(dAbs(eigenValues[j]) + dAbs(eigenValues[j + 1]));
-				if (dAbs(offDiag[j]) <= (T(1.e-6f) * dd)) 
+  				T dd(ndAbs(eigenValues[j]) + ndAbs(eigenValues[j + 1]));
+				if (ndAbs(offDiag[j]) <= (T(1.e-6f) * dd)) 
 				{
 					break;
 				}
@@ -371,7 +371,7 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 
 				T g((eigenValues[i + 1] - eigenValues[i]) / (T(2.0f) * offDiag[i]));
 				T r(dPythag(g, T(1.0f)));
-				g = eigenValues[j] - eigenValues[i] + offDiag[i] / (g + dSign(r, g));
+				g = eigenValues[j] - eigenValues[i] + offDiag[i] / (g + ndSign(r, g));
 				T s(1.0f);
 				T c(1.0f);
 				T p(0.0f);
@@ -413,17 +413,17 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 template <class T>
 T dConditionNumber(const ndInt32 size, const ndInt32 stride, const T* const choleskyMatrix)
 {
-	T* const eigenValues = dAlloca(T, size);
+	T* const eigenValues = ndAlloca(T, size);
 	dEigenValues(size, stride, choleskyMatrix, eigenValues);
 
 	T minVal = T(1.0e20f);
 	T maxVal = T(-1.0e20f);
 	for (ndInt32 i = 0; i < size; i++) 
 	{
-		minVal = dMin(minVal, eigenValues[i]);
-		maxVal = dMax(maxVal, eigenValues[i]);
+		minVal = ndMin(minVal, eigenValues[i]);
+		maxVal = ndMax(maxVal, eigenValues[i]);
 	}
-	T condition = T(dAbs(maxVal) / dAbs(minVal));
+	T condition = T(ndAbs(maxVal) / ndAbs(minVal));
 	return condition;
 }
 
@@ -448,12 +448,12 @@ template <class T>
 void dGaussSeidelLcpSor(const ndInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, ndInt32 maxIterCount, ndInt16* const clipped, T sor)
 {
 	const T* const me = matrix;
-	T* const invDiag1 = dAlloca(T, size);
+	T* const invDiag1 = ndAlloca(T, size);
 
 	ndInt32 stride = 0;
 	for (ndInt32 i = 0; i < size; i++) 
 	{
-		x[i] = dClamp(T(0.0f), low[i], high[i]);
+		x[i] = ndClamp(T(0.0f), low[i], high[i]);
 		invDiag1[i] = T(1.0f) / me[stride + i];
 		stride += size;
 	}
@@ -500,9 +500,9 @@ template <class T>
 void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const matrix, T* const x, const T* const b, const ndInt32* const normalIndex, const T* const low, const T* const high, T tol2, ndInt32 maxIterCount, T sor)
 {
 	const T* const me = matrix;
-	T* const invDiag1 = dAlloca(T, size);
-	T* const u = dAlloca(T, size + 1);
-	ndInt32* const index = dAlloca(ndInt32, size);
+	T* const invDiag1 = ndAlloca(T, size);
+	T* const u = ndAlloca(T, size + 1);
+	ndInt32* const index = ndAlloca(ndInt32, size);
 
 	u[size] = T(1.0f);
 	ndInt32 rowStart = 0;
@@ -517,14 +517,14 @@ void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const
 		const T val = u[index[j]];
 		const T l = low[j] * val;
 		const T h = high[j] * val;
-		u[j] = dClamp(u[j], l, h);
+		u[j] = ndClamp(u[j], l, h);
 		invDiag1[j] = T(1.0f) / me[rowStart + j];
 		rowStart += stride;
 	}
 
 	T tolerance(tol2 * 2.0f);
 	const T* const invDiag = invDiag1;
-	const ndInt32 maxCount = dMax(8, size);
+	const ndInt32 maxCount = ndMax(8, size);
 	for (ndInt32 i = 0; (i < maxCount) && (tolerance > tol2); i++) 
 	{
 		ndInt32 base = 0;
@@ -617,7 +617,7 @@ void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const
 template <class T>
 void dGaussSeidelLCP(const ndInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T sor = T(1.2f))
 {
-	ndInt16* const clipped = dAlloca(ndInt16, size);
+	ndInt16* const clipped = ndAlloca(ndInt16, size);
 	dGaussSeidelLcpSor(size, matrix, x, b, low, high, T(1.0e-3f), size * size, clipped, sor);
 }
 
@@ -632,22 +632,22 @@ void dPermuteRows(ndInt32 size, ndInt32 i, ndInt32 j, T* const matrix, T* const 
 		T* const invB = &choleskyMatrix[size * j];
 		for (ndInt32 k = 0; k < size; k++) 
 		{
-			dSwap(A[k], B[k]);
-			dSwap(invA[k], invB[k]);
+			ndSwap(A[k], B[k]);
+			ndSwap(invA[k], invB[k]);
 		}
 
 		ndInt32 stride = 0;
 		for (ndInt32 k = 0; k < size; k++) 
 		{
-			dSwap(matrix[stride + i], matrix[stride + j]);
+			ndSwap(matrix[stride + i], matrix[stride + j]);
 			stride += size;
 		}
 
-		dSwap(x[i], x[j]);
-		dSwap(r[i], r[j]);
-		dSwap(low[i], low[j]);
-		dSwap(high[i], high[j]);
-		dSwap(permute[i], permute[j]);
+		ndSwap(x[i], x[j]);
+		ndSwap(r[i], r[j]);
+		ndSwap(low[i], low[j]);
+		ndSwap(high[i], high[j]);
+		ndSwap(permute[i], permute[j]);
 	}
 }
 
@@ -693,7 +693,7 @@ void dHouseholderReflection(ndInt32 size, ndInt32 row, ndInt32 colum, T* const c
 			}
 			if (mag2 > T(1.0e-14f)) 
 			{
-				reflection[i] = rowI[i] + dSign(rowI[i]) * T(sqrt(mag2 + rowI[i] * rowI[i]));
+				reflection[i] = rowI[i] + ndSign(rowI[i]) * T(sqrt(mag2 + rowI[i] * rowI[i]));
 
 				const T vMag2(mag2 + reflection[i] * reflection[i]);
 				const T den = T(2.0f) / vMag2;
@@ -731,7 +731,7 @@ void dHouseholderReflection(ndInt32 size, ndInt32 row, ndInt32 colum, T* const c
 
 		for (ndInt32 i = row; i < size; i++) 
 		{
-			choleskyMatrix[size * i + i] = dMax(choleskyMatrix[size * i + i], T(1.0e-6f));
+			choleskyMatrix[size * i + i] = ndMax(choleskyMatrix[size * i + i], T(1.0e-6f));
 		}
 	}
 }
@@ -790,20 +790,20 @@ void dCholeskyUpdate(ndInt32 size, ndInt32 row, ndInt32 colum, T* const cholesky
 template <class T>
 void dSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x, T* const b, T* const low, T* const high)
 {
-	T* const x0 = dAlloca(T, size);
-	T* const r0 = dAlloca(T, size);
-	T* const tmp0 = dAlloca(T, size);
-	T* const tmp1 = dAlloca(T, size);
-	T* const delta_r = dAlloca(T, size);
-	T* const delta_x = dAlloca(T, size);
-	T* const lowerTriangularMatrix = dAlloca(T, size * size);
-	ndInt16* const permute = dAlloca(ndInt16, size);
+	T* const x0 = ndAlloca(T, size);
+	T* const r0 = ndAlloca(T, size);
+	T* const tmp0 = ndAlloca(T, size);
+	T* const tmp1 = ndAlloca(T, size);
+	T* const delta_r = ndAlloca(T, size);
+	T* const delta_x = ndAlloca(T, size);
+	T* const lowerTriangularMatrix = ndAlloca(T, size * size);
+	ndInt16* const permute = ndAlloca(ndInt16, size);
 
 	for (ndInt32 i = 0; i < size; i++) 
 	{
 		permute[i] = ndInt16(i);
 		x0[i] = T(0.0f);
-		x[i] = dMax (b[i] * b[i], T (1.0f));
+		x[i] = ndMax (b[i] * b[i], T (1.0f));
 	}
 
 	for (ndInt32 n = size - 1, i = size - 1; i >= 0; i--) 
@@ -917,17 +917,17 @@ void dSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x, 
 			T clamp_x(0.0f);
 			ndInt32 swapIndex = -1;
 
-			if (dAbs(r0[index]) > T(1.0e-12f)) 
+			if (ndAbs(r0[index]) > T(1.0e-12f)) 
 			{
 				dCalculateDelta_x(size, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
 				dCalculateDelta_r(size, index, symmetricMatrixPSD, delta_x, delta_r);
 
 				dAssert(delta_r[index] != T(0.0f));
-				dAssert(dAbs(delta_x[index]) == T(1.0f));
+				dAssert(ndAbs(delta_x[index]) == T(1.0f));
 				delta_r[index] = (delta_r[index] == T(0.0f)) ? T(1.0e-12f) : delta_r[index];
 
 				T scale = -r0[index] / delta_r[index];
-				dAssert(dAbs(scale) >= T(0.0f));
+				dAssert(ndAbs(scale) >= T(0.0f));
 
 				for (ndInt32 i = 0; i <= index; i++) 
 				{
@@ -945,18 +945,18 @@ void dSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x, 
 						scale = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				dAssert(dAbs(scale) >= T(0.0f));
+				dAssert(ndAbs(scale) >= T(0.0f));
 
 				for (ndInt32 i = clampedIndex; (i < size) && (scale > T(1.0e-12f)); i++) 
 				{
 					T r1 = r0[i] + scale * delta_r[i];
 					if ((r1 * r0[i]) < T(0.0f)) 
 					{
-						dAssert(dAbs(delta_r[i]) > T(0.0f));
+						dAssert(ndAbs(delta_r[i]) > T(0.0f));
 						T s1 = -r0[i] / delta_r[i];
-						dAssert(dAbs(s1) >= T(0.0f));
-						dAssert(dAbs(s1) <= dAbs(scale));
-						if (dAbs(s1) < dAbs(scale)) 
+						dAssert(ndAbs(s1) >= T(0.0f));
+						dAssert(ndAbs(s1) <= ndAbs(scale));
+						if (ndAbs(s1) < ndAbs(scale)) 
 						{
 							scale = s1;
 							swapIndex = i;
@@ -964,7 +964,7 @@ void dSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x, 
 					}
 				}
 
-				if (dAbs(scale) > T(1.0e-12f)) 
+				if (ndAbs(scale) > T(1.0e-12f)) 
 				{
 					for (ndInt32 i = 0; i < size; i++) 
 					{
@@ -1063,7 +1063,7 @@ void dSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x, 
 template <class T>
 bool dSolveDantzigLCP(ndInt32 size, T* const symetricMatrix, T* const x, T* const b, T* const low, T* const high)
 {
-	T* const choleskyMatrix = dAlloca(T, size * size);
+	T* const choleskyMatrix = ndAlloca(T, size * size);
 	dCheckAligment(choleskyMatrix);
 
 	memcpy (choleskyMatrix, symetricMatrix, sizeof (T) * size * size);
@@ -1099,7 +1099,7 @@ bool dSolveDantzigLCP(ndInt32 size, T* const symetricMatrix, T* const x, T* cons
 template <class T>
 bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* const x, T* const b, T* const low, T* const high)
 {
-	ndInt16* const permute = dAlloca(ndInt16, size);
+	ndInt16* const permute = ndAlloca(ndInt16, size);
 
 	for (ndInt32 i = 0; i < size; i++) 
 	{
@@ -1123,20 +1123,20 @@ bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* co
 				T* const B = &symmetricMatrixPSD [size * j];
 				for (ndInt32 k = 0; k < size; k++) 
 				{
-					dSwap(A[k], B[k]);
+					ndSwap(A[k], B[k]);
 				}
 
 				ndInt32 stride = 0;
 				for (ndInt32 k = 0; k < size; k++) 
 				{
-					dSwap(symmetricMatrixPSD [stride + i], symmetricMatrixPSD [stride + j]);
+					ndSwap(symmetricMatrixPSD [stride + i], symmetricMatrixPSD [stride + j]);
 					stride += size;
 				}
-				dSwap(x[i], x[j]);
-				dSwap(b[i], b[j]);
-				dSwap(low[i], low[j]);
-				dSwap(high[i], high[j]);
-				dSwap(permute[i], permute[j]);
+				ndSwap(x[i], x[j]);
+				ndSwap(b[i], b[j]);
+				ndSwap(low[i], low[j]);
+				ndSwap(high[i], high[j]);
+				ndSwap(permute[i], permute[j]);
 			}
 
 			i--;
@@ -1156,12 +1156,12 @@ bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* co
 		}
 
 		const ndInt32 boundedSize = size - unboundedSize;
-		T* const l = dAlloca(T, boundedSize);
-		T* const h = dAlloca(T, boundedSize);
-		T* const c = dAlloca(T, boundedSize);
-		T* const u = dAlloca(T, boundedSize);
-		T* const a11 = dAlloca(T, boundedSize * boundedSize);
-		T* const a10 = dAlloca(T, boundedSize * unboundedSize);
+		T* const l = ndAlloca(T, boundedSize);
+		T* const h = ndAlloca(T, boundedSize);
+		T* const c = ndAlloca(T, boundedSize);
+		T* const u = ndAlloca(T, boundedSize);
+		T* const a11 = ndAlloca(T, boundedSize * boundedSize);
+		T* const a10 = ndAlloca(T, boundedSize * unboundedSize);
 
 		for (ndInt32 i = 0; i < boundedSize; i++) 
 		{
@@ -1230,9 +1230,9 @@ template <class T>
 void dSolveDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD, T* const x, T* const b, T* const low, T* const high)
 {
 	T tol2 = T(0.25f * 0.25f);
-	ndInt32 passes = dClamp(size, 12, 20);
-	T* const r = dAlloca(T, size);
-	ndInt16* const clipped = dAlloca(ndInt16, size);
+	ndInt32 passes = ndClamp(size, 12, 20);
+	T* const r = ndAlloca(T, size);
+	ndInt16* const clipped = ndAlloca(ndInt16, size);
 
 	// find an approximation to the solution
 	dGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, passes, clipped, T(1.3f));
@@ -1255,7 +1255,7 @@ void dSolveDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD, T* const x, T* 
 		if ((clippeCount < 16) && ((clippeCount < 32) && (err2 < T(16.0f)))) 
 		{
 			// small lcp can be solved with direct method
-			T* const x0 = dAlloca(T, size);
+			T* const x0 = ndAlloca(T, size);
 			for (ndInt32 i = 0; i < size; i++) 
 			{
 				low[i] -= x[i];

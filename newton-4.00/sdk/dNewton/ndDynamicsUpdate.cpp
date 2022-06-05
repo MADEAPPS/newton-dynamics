@@ -638,7 +638,7 @@ void ndDynamicsUpdate::InitWeights()
 			{
 				body->m_weigh = ndFloat32(weigh);
 			}
-			maxExtraPasses = dMax(weigh, maxExtraPasses);
+			maxExtraPasses = ndMax(weigh, maxExtraPasses);
 		}
 		extraPassesArray[threadIndex] = maxExtraPasses;
 	});
@@ -651,7 +651,7 @@ void ndDynamicsUpdate::InitWeights()
 		const ndInt32 threadCount = scene->GetThreadCount();
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
-			extraPasses = dMax(extraPasses, extraPassesArray[i]);
+			extraPasses = ndMax(extraPasses, extraPassesArray[i]);
 		}
 
 		const ndInt32 conectivity = 7;
@@ -773,7 +773,7 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = ndFloat32(0.0f);
-		rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
+		rhs->m_diagonalRegularizer = ndMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
 
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];
@@ -881,7 +881,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				dAssert(rhs->m_jointFeebackForce);
 				const ndFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
 
-				rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
+				rhs->m_force = isBilateral ? ndClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = ndFloat32(0.0f);
 
 				const ndJacobian& JtM0 = row->m_Jt.m_jacobianM0;
@@ -1412,7 +1412,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, f);
 				forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, f);
 				torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
-				rhs->m_maxImpact = dMax(dAbs(f.GetScalar()), rhs->m_maxImpact);
+				rhs->m_maxImpact = ndMax(ndAbs(f.GetScalar()), rhs->m_maxImpact);
 			}
 
 			const ndInt32 index0 = jointIndex * 2 + 0;

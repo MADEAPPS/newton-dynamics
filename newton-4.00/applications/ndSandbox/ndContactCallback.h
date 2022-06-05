@@ -52,8 +52,8 @@ class ndMaterailKey
 	}
 
 	ndMaterailKey(ndUnsigned64 low, ndUnsigned64 high)
-		:m_lowKey(ndUnsigned32(dMin(low, high)))
-		, m_highKey(ndUnsigned32(dMax(low, high)))
+		:m_lowKey(ndUnsigned32(ndMin(low, high)))
+		, m_highKey(ndUnsigned32(ndMax(low, high)))
 	{
 	}
 

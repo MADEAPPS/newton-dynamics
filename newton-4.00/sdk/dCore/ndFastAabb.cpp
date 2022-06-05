@@ -105,7 +105,7 @@ ndFloat32 ndFastAabb::PolygonBoxRayDistance(const ndVector& faceNormal, ndInt32 
 		ndVector veloc(faceMatrix.RotateVector(ray.m_diff) & ndVector::m_triplexMask);
 		ndFastRay localRay(ndVector(ndFloat32(0.0f)), veloc);
 		ndFloat32 dist1 = localRay.BoxIntersect(minBox, maxBox);
-		dist0 = dMax(dist1, dist0);
+		dist0 = ndMax(dist1, dist0);
 	}
 	return dist0;
 }
@@ -131,7 +131,7 @@ ndFloat32 ndFastAabb::PolygonBoxDistance(const ndVector& faceNormal, ndInt32 ind
 		dist2 = dist2.GetMin(dist2.ShiftTripleRight());
 		dist2 = dist2.GetMin(dist2.ShiftTripleRight());
 		ndFloat32 dist1 = dist2.GetScalar();
-		dist0 = (dist1 > ndFloat32(0.0f)) ? dMax(dist0, dist1) : ndFloat32(0.0f);
+		dist0 = (dist1 > ndFloat32(0.0f)) ? ndMax(dist0, dist1) : ndFloat32(0.0f);
 		if (dist0 <= ndFloat32(0.0f))
 		{
 			// some how clang crashes in relese and release with debug, 

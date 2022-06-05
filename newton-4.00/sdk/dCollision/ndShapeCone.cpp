@@ -66,8 +66,8 @@ void ndShapeCone::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)
 {
-	m_radius = dMax(dAbs(radius), D_MIN_CONVEX_SHAPE_SIZE);
-	m_height = dMax(dAbs(height * ndFloat32(0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius = ndMax(ndAbs(radius), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = ndMax(ndAbs(height * ndFloat32(0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	ndFloat32 angle = ndFloat32(0.0f);
 	for (ndInt32 i = 0; i < D_CONE_SEGMENTS; i++) 
@@ -194,14 +194,14 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 ndVector ndShapeCone::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
 ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	if (dir.m_x < ndFloat32(-0.9999f)) 
 	{
@@ -236,7 +236,7 @@ ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
 ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	if (dir.m_x < ndFloat32(-0.9999f)) 
 	{
@@ -295,7 +295,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 			ndFloat32 cosAng = normal.m_y * magInv;
 			ndFloat32 sinAng = normal.m_z * magInv;
 
-			dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+			dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 			ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 			ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 
@@ -334,7 +334,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 		ndFloat32 cosAng = normal.m_y * magInv;
 		ndFloat32 sinAng = normal.m_z * magInv;
 
-		dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 		ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 		ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 

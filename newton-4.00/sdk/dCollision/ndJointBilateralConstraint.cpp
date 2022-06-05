@@ -46,7 +46,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 	if (m_body0->GetInvMass() == ndFloat32(0.0f)) 
 	{
-		dSwap(m_body0, m_body1);
+		ndSwap(m_body0, m_body1);
 	}
 	dAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
 
@@ -83,7 +83,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 	if (m_body0->GetInvMass() == ndFloat32(0.0f))
 	{
-		dSwap(m_body0, m_body1);
+		ndSwap(m_body0, m_body1);
 	}
 	dAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
 
@@ -228,7 +228,7 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, spring, -relPosit, damper, relVeloc);
 
-	const ndFloat32 r = dClamp(regularizer, ndFloat32(1.e-8f), ndFloat32(0.9f));
+	const ndFloat32 r = ndClamp(regularizer, ndFloat32(1.e-8f), ndFloat32(0.9f));
 	desc.m_diagonalRegularizer[index] = r;
 	SetMotorAcceleration(desc, accel);
 }

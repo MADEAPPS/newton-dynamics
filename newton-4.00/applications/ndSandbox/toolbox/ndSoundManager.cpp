@@ -101,7 +101,7 @@ void ndSoundChannel::Stop()
 
 void ndSoundChannel::SetVolume(ndFloat32 volume)
 {
-	if (dAbs(volume - m_volume) > ndFloat32(1.0e-3f))
+	if (ndAbs(volume - m_volume) > ndFloat32(1.0e-3f))
 	{
 		m_volume = volume;
 		alSourcef(m_source, AL_GAIN, ALfloat(m_volume));
@@ -140,7 +140,7 @@ void ndSoundChannel::ApplyAttenuation(const ndVector& listenerPosit)
 	}
 
 	gain *= m_volume;
-	if (dAbs(gain - m_gain) > ndFloat32(1.0e-3f))
+	if (ndAbs(gain - m_gain) > ndFloat32(1.0e-3f))
 	{
 		m_gain = gain;
 		alSourcef(m_source, AL_GAIN, ALfloat(m_gain));
@@ -155,7 +155,7 @@ ndFloat32 ndSoundChannel::GetPitch() const
 
 void ndSoundChannel::SetPitch(ndFloat32 pitch)
 {
-	if (dAbs(pitch - m_pitch) > ndFloat32(1.0e-3f))
+	if (ndAbs(pitch - m_pitch) > ndFloat32(1.0e-3f))
 	{
 		m_pitch = pitch;
 		alSourcef(m_source, AL_PITCH, ALfloat(m_pitch));

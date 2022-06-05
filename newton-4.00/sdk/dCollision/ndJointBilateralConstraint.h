@@ -168,7 +168,7 @@ inline void ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverMod
 {
 	dAssert(model < m_jointModesCount);
 	dAssert(model >= m_jointIterativeSoft);
-	m_solverModel = dClamp(model, m_jointIterativeSoft, m_jointModesCount);
+	m_solverModel = ndClamp(model, m_jointIterativeSoft, m_jointModesCount);
 }
 
 inline ndUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
@@ -226,7 +226,7 @@ inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& 
 	const ndInt32 index = desc.m_rowsCount - 1;
 	dAssert(index >= 0);
 	dAssert(index < ndInt32 (m_maxDof));
-	desc.m_forceBounds[index].m_low = dClamp(friction, ndFloat32(D_MIN_BOUND), ndFloat32(-0.001f));
+	desc.m_forceBounds[index].m_low = ndClamp(friction, ndFloat32(D_MIN_BOUND), ndFloat32(-0.001f));
 	dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
 
 	#ifdef _DEBUG
@@ -248,7 +248,7 @@ inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& d
 	dAssert(index >= 0);
 	dAssert(index < ndInt32(m_maxDof));
 	
-	desc.m_forceBounds[index].m_upper = dClamp(friction, ndFloat32(0.001f), ndFloat32(D_MAX_BOUND));
+	desc.m_forceBounds[index].m_upper = ndClamp(friction, ndFloat32(0.001f), ndFloat32(D_MAX_BOUND));
 	dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
 
 	#ifdef _DEBUG
@@ -328,7 +328,7 @@ inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescr
 	const ndInt32 index = desc.m_rowsCount - 1;
 	dAssert(index >= 0);
 	dAssert(index < ndInt32(m_maxDof));
-	desc.m_diagonalRegularizer[index] = dClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
+	desc.m_diagonalRegularizer[index] = ndClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
 inline bool ndJointBilateralConstraint::IsInWorld() const

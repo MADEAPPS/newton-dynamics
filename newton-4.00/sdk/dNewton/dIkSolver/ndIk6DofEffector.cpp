@@ -138,7 +138,7 @@ ndFloat32 ndIk6DofEffector::GetMaxForce() const
 
 void ndIk6DofEffector::SetMaxForce(ndFloat32 force)
 {
-	m_linearMaxForce = dAbs(force);
+	m_linearMaxForce = ndAbs(force);
 }
 
 ndFloat32 ndIk6DofEffector::GetMaxTorque() const
@@ -148,14 +148,14 @@ ndFloat32 ndIk6DofEffector::GetMaxTorque() const
 
 void ndIk6DofEffector::SetMaxTorque(ndFloat32 torque)
 {
-	m_angularMaxTorque = dAbs(torque);
+	m_angularMaxTorque = ndAbs(torque);
 }
 
 void ndIk6DofEffector::SetLinearSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_linearSpring = dAbs(spring);
-	m_linearDamper = dAbs(damper);
-	m_linearRegularizer = dClamp(regularizer, ndFloat32(1.0e-4f), ndFloat32(0.99f));
+	m_linearSpring = ndAbs(spring);
+	m_linearDamper = ndAbs(damper);
+	m_linearRegularizer = ndClamp(regularizer, ndFloat32(1.0e-4f), ndFloat32(0.99f));
 }
 
 void ndIk6DofEffector::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const
@@ -167,9 +167,9 @@ void ndIk6DofEffector::GetLinearSpringDamper(ndFloat32& regularizer, ndFloat32& 
 
 void ndIk6DofEffector::SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_angularSpring = dAbs(spring);
-	m_angularDamper = dAbs(damper);
-	m_angularRegularizer = dClamp(regularizer, ndFloat32(1.0e-4f), ndFloat32(0.99f));
+	m_angularSpring = ndAbs(spring);
+	m_angularDamper = ndAbs(damper);
+	m_angularRegularizer = ndClamp(regularizer, ndFloat32(1.0e-4f), ndFloat32(0.99f));
 }
 
 void ndIk6DofEffector::GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const

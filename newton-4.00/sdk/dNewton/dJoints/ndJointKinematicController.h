@@ -71,28 +71,28 @@ inline void ndJointKinematicController::SetControlMode(ndControlModes mode)
 
 inline void ndJointKinematicController::SetMaxSpeed(ndFloat32 speedInMetersPerSeconds)
 {
-	m_maxSpeed = dAbs(speedInMetersPerSeconds);
+	m_maxSpeed = ndAbs(speedInMetersPerSeconds);
 }
 
 inline void ndJointKinematicController::SetMaxLinearFriction(ndFloat32 frictionForce)
 {
-	m_maxLinearFriction = dAbs(frictionForce);
+	m_maxLinearFriction = ndAbs(frictionForce);
 }
 
 inline void ndJointKinematicController::SetMaxAngularFriction(ndFloat32 frictionTorque)
 {
-	m_maxAngularFriction = dAbs(frictionTorque);
+	m_maxAngularFriction = ndAbs(frictionTorque);
 }
 
 inline void ndJointKinematicController::SetMaxOmega(ndFloat32 speedInRadiansPerSeconds)
 {
-	m_maxOmega = dAbs(speedInRadiansPerSeconds);
+	m_maxOmega = ndAbs(speedInRadiansPerSeconds);
 }
 
 inline void ndJointKinematicController::SetAngularViscousFrictionCoefficient(ndFloat32 coefficient)
 {
 	ndVector mass (GetBody0()->GetMassMatrix());
-	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(mass.m_x, dMax(mass.m_y, mass.m_z));
+	m_angularFrictionCoefficient = ndAbs(coefficient) * ndMax(mass.m_x, ndMax(mass.m_y, mass.m_z));
 }
 
 inline void ndJointKinematicController::SetTargetPosit(const ndVector& posit)

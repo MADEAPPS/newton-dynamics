@@ -55,9 +55,9 @@ void ndPolygonMeshDesc::SortFaceArray()
 
 					if (i <= j)
 					{
-						dSwap(m_hitDistance[i], m_hitDistance[j]);
-						dSwap(m_faceIndexStart[i], m_faceIndexStart[j]);
-						dSwap(m_faceIndexCount[i], m_faceIndexCount[j]);
+						ndSwap(m_hitDistance[i], m_hitDistance[j]);
+						ndSwap(m_faceIndexStart[i], m_faceIndexStart[j]);
+						ndSwap(m_faceIndexCount[i], m_faceIndexCount[j]);
 						i++;
 						j--;
 					}
@@ -88,9 +88,9 @@ void ndPolygonMeshDesc::SortFaceArray()
 	{
 		if (m_hitDistance[i] < m_hitDistance[0])
 		{
-			dSwap(m_hitDistance[i], m_hitDistance[0]);
-			dSwap(m_faceIndexStart[i], m_faceIndexStart[0]);
-			dSwap(m_faceIndexCount[i], m_faceIndexCount[0]);
+			ndSwap(m_hitDistance[i], m_hitDistance[0]);
+			ndSwap(m_faceIndexStart[i], m_faceIndexStart[0]);
+			ndSwap(m_faceIndexCount[i], m_faceIndexCount[0]);
 		}
 	}
 

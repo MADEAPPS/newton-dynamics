@@ -130,9 +130,9 @@ void ndJointDoubleHinge::SetOffsetAngle0(ndFloat32 angle)
 
 void ndJointDoubleHinge::SetAsSpringDamper0(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_axis0.m_springK = dAbs(spring);
-	m_axis0.m_damperC = dAbs(damper);
-	m_axis0.m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_axis0.m_springK = ndAbs(spring);
+	m_axis0.m_damperC = ndAbs(damper);
+	m_axis0.m_springDamperRegularizer = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 ndFloat32 ndJointDoubleHinge::GetAngle1() const
@@ -171,9 +171,9 @@ void ndJointDoubleHinge::SetOffsetAngle1(ndFloat32 angle)
 
 void ndJointDoubleHinge::SetAsSpringDamper1(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
-	m_axis1.m_springK = dAbs(spring);
-	m_axis1.m_damperC = dAbs(damper);
-	m_axis1.m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
+	m_axis1.m_springK = ndAbs(spring);
+	m_axis1.m_damperC = ndAbs(damper);
+	m_axis1.m_springDamperRegularizer = ndClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 }
 
 void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -274,20 +274,20 @@ void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatr
 	const ndVector omega1(m_body1->GetOmega());
 	
 	// calculate joint parameters, angles and omega
-	//const ndFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);
-	const ndFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_axis0.m_angle);
+	//const ndFloat32 deltaAngle0 = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);
+	const ndFloat32 deltaAngle0 = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_axis0.m_angle);
 	m_axis0.m_angle += deltaAngle0;
 	m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
 	
-	//const ndFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_angle1);
-	const ndFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_axis1.m_angle);
+	//const ndFloat32 deltaAngle1 = ndAnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_angle1);
+	const ndFloat32 deltaAngle1 = ndAnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_axis1.m_angle);
 	m_axis1.m_angle += deltaAngle1;
 	m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 }
 
 ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
 {
-	ndFloat32 param = dClamp(penetration, ndFloat32(0.0f), D_MAX_DOUBLE_HINGE_PENETRATION) / D_MAX_DOUBLE_HINGE_PENETRATION;
+	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_DOUBLE_HINGE_PENETRATION) / D_MAX_DOUBLE_HINGE_PENETRATION;
 	ndFloat32 omega = D_MAX_DOUBLE_HINGE_RECOVERY_SPEED * param;
 	return omega;
 }
@@ -311,7 +311,7 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor&, const ndMatrix&,
 	//		const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 	//		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 	//		SetLowerFriction(desc, ndFloat32(0.0f));
-	//		ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+	//		ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 	//	}
 	//	else if (angle > m_maxLimit)
 	//	{
@@ -321,7 +321,7 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor&, const ndMatrix&,
 	//		const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 	//		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 	//		SetHighFriction(desc, ndFloat32(0.0f));
-	//		ret = dAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+	//		ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 	//	}
 	//}
 	return ret;

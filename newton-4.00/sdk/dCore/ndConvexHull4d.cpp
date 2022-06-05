@@ -67,7 +67,7 @@ ndConvexHull4d::ndNormalMap::ndNormalMap()
 			ndFloat64 z = cosBeta * tmp[i].m_z;
 			ndFloat64 y = cosBeta * tmp[i].m_y;
 			ndFloat64 x = cosBeta * tmp[i].m_x;
-			ndInt32 index = dBitReversal(count, sizeof (m_normal) / sizeof (m_normal[0]));
+			ndInt32 index = ndBitReversal(count, sizeof (m_normal) / sizeof (m_normal[0]));
 			dAssert (index < ndInt32 (sizeof (m_normal) / sizeof (m_normal[0])));
 			m_normal[index] = ndBigVector (x, y, z, w);
 			count ++;
@@ -82,9 +82,9 @@ void ndConvexHull4d::ndNormalMap::TessellateTriangle(ndInt32 level, const ndVect
 	dAssert(p2.m_w == ndFloat32(0.0f));
 	if (level) 
 	{
-		dAssert(dAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndVector p01(p0 + p1);
 		ndVector p12(p1 + p2);
 		ndVector p20(p2 + p0);
@@ -99,9 +99,9 @@ void ndConvexHull4d::ndNormalMap::TessellateTriangle(ndInt32 level, const ndVect
 		p12 = p12.Normalize();
 		p20 = p20.Normalize();
 
-		dAssert(dAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(dAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		dAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
 		TessellateTriangle(level - 1, p0, p01, p20, buffer, count);
 		TessellateTriangle(level - 1, p1, p12, p01, buffer, count);
@@ -113,7 +113,7 @@ void ndConvexHull4d::ndNormalMap::TessellateTriangle(ndInt32 level, const ndVect
 		ndBigPlane n(p0, p1, p2);
 		n = n.Scale(ndFloat64(1.0f) / sqrt(n.DotProduct(n).GetScalar()));
 		n.m_w = ndFloat64(0.0f);
-		ndInt32 index = dBitReversal(count, 128);
+		ndInt32 index = ndBitReversal(count, 128);
 		buffer[index] = n;
 		dAssert(count < 128);
 		count++;
@@ -600,7 +600,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 
 			if (i0 < i1)
 			{
-				dSwap(points[i0], points[i1]);
+				ndSwap(points[i0], points[i1]);
 				i0++; 
 				i1--;
 			}

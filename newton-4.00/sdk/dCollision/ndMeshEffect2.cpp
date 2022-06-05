@@ -1123,8 +1123,8 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 		y = floor(y * quantizeFactor) * invQuantizeFactor;
 		z = floor(z * quantizeFactor) * invQuantizeFactor;
 		ndBigVector p(x, y, z, ndFloat64(0.0f));
-		pMin = ndBigVector(dMin(x, pMin.m_x), dMin(y, pMin.m_y), dMin(z, pMin.m_z), ndFloat64(0.0f));
-		pMax = ndBigVector(dMax(x, pMax.m_x), dMax(y, pMax.m_y), dMax(z, pMax.m_z), ndFloat64(0.0f));
+		pMin = ndBigVector(ndMin(x, pMin.m_x), ndMin(y, pMin.m_y), ndMin(z, pMin.m_z), ndFloat64(0.0f));
+		pMax = ndBigVector(ndMax(x, pMax.m_x), ndMax(y, pMax.m_y), ndMax(z, pMax.m_z), ndFloat64(0.0f));
 		pool[count] = p;
 		count++;
 	}
@@ -1148,11 +1148,11 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 	count += 8;
 	
 	ndStack<ndInt32> indexList(count);
-	count = dVertexListToIndexList(&pool[0].m_x, sizeof(ndBigVector), 3, count, &indexList[0], ndFloat64(5.0e-2f));
+	count = ndVertexListToIndexList(&pool[0].m_x, sizeof(ndBigVector), 3, count, &indexList[0], ndFloat64(5.0e-2f));
 	dAssert(count >= 8);
 	
-	//ndFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
-	ndFloat64 maxSize = dMax(dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y), pMax.m_z - pMin.m_z);
+	//ndFloat64 maxSize = ndMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
+	ndFloat64 maxSize = ndMax(ndMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y), pMax.m_z - pMin.m_z);
 	pMin -= ndBigVector(maxSize, maxSize, maxSize, ndFloat64(0.0f));
 	pMax += ndBigVector(maxSize, maxSize, maxSize, ndFloat64(0.0f));
 
@@ -1223,7 +1223,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 				dAssert(count1 < ndInt32(sizeof(pointArray) / sizeof(pointArray[0])));
 			}
 	
-			count1 = dVertexListToIndexList(&pointArray[0].m_x, sizeof(ndBigVector), 3, count1, &indexArray[0], ndFloat64(1.0e-3f));
+			count1 = ndVertexListToIndexList(&pointArray[0].m_x, sizeof(ndBigVector), 3, count1, &indexArray[0], ndFloat64(1.0e-3f));
 			if (count1 >= 4) 
 			{
 				ndMeshEffect convexMesh(&pointArray[0].m_x, count1, sizeof(ndBigVector), ndFloat64(0.0f));

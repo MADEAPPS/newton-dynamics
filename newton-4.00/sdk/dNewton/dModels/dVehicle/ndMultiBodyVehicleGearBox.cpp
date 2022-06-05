@@ -66,22 +66,22 @@ void ndMultiBodyVehicleGearBox::Save(const ndLoadSaveBase::ndSaveDescriptor& des
 
 void ndMultiBodyVehicleGearBox::SetIdleOmega(ndFloat32 rpm)
 {
-	m_idleOmega = dMax(rpm / dRadPerSecToRpm, ndFloat32(0.0f));
+	m_idleOmega = ndMax(rpm / dRadPerSecToRpm, ndFloat32(0.0f));
 }
 
 void ndMultiBodyVehicleGearBox::SetClutchTorque(ndFloat32 torqueInNewtonMeters)
 {
-	m_clutchTorque = dAbs(torqueInNewtonMeters);
+	m_clutchTorque = ndAbs(torqueInNewtonMeters);
 }
 
 void ndMultiBodyVehicleGearBox::SetInternalLosesTorque(ndFloat32 torqueInNewtonMeters)
 {
-	m_driveTrainResistanceTorque = dAbs(torqueInNewtonMeters);
+	m_driveTrainResistanceTorque = ndAbs(torqueInNewtonMeters);
 }
 
 void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	if (dAbs(m_gearRatio) > ndFloat32(1.0e-2f))
+	if (ndAbs(m_gearRatio) > ndFloat32(1.0e-2f))
 	{
 		ndMatrix matrix0;
 		ndMatrix matrix1;
@@ -105,7 +105,7 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		
 		ndFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
 		ndFloat32 w1 = omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega;
-		w1 = (gearRatio > ndFloat32(0.0f)) ? dMin(w1, ndFloat32(0.0f)) : dMax(w1, ndFloat32(0.0f));
+		w1 = (gearRatio > ndFloat32(0.0f)) ? ndMin(w1, ndFloat32(0.0f)) : ndMax(w1, ndFloat32(0.0f));
 		
 		const ndFloat32 w = (w0 + w1) * ndFloat32(0.5f);
 		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
