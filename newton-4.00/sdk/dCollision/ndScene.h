@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_NEW_SCENE
+//#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
@@ -62,7 +62,20 @@ class ndScene : public ndThreadPool
 {
 	protected:
 #ifdef D_NEW_SCENE
-	class ndContactPairs;
+	class ndContactPairs
+	{
+		public:
+		ndContactPairs(ndUnsigned32 body0, ndUnsigned32 body1, ndContact* const contact = nullptr)
+			:m_contact(contact)
+			,m_Body0(ndMin(body0, body1))
+			,m_Body1(ndMax(body0, body1))
+		{
+		}
+
+		ndContact* m_contact;
+		ndUnsigned32 m_Body0;
+		ndUnsigned32 m_Body1;
+	};
 #endif
 	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
 	{
@@ -131,15 +144,19 @@ class ndScene : public ndThreadPool
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 	ndFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
 
-	D_COLLISION_API virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	D_COLLISION_API virtual void FindCollidingPairsForward(ndBodyKinematic* const body);
-	D_COLLISION_API virtual void FindCollidingPairsBackward(ndBodyKinematic* const body);
+	//D_COLLISION_API virtual void FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId);
+	//D_COLLISION_API virtual void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
+	//D_COLLISION_API virtual void FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 threadId);
+
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
 
-	D_COLLISION_API virtual void UpdateAabb(ndInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	const ndContactArray& GetContactArray() const;
+	void FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId);
+	void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
+	void FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 threadId);
+	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId);
+	void SubmitPairs(ndSceneBodyNode* const bodyNode, ndSceneNode* const node, ndInt32 threadId);
 
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
@@ -150,16 +167,10 @@ class ndScene : public ndThreadPool
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
 
-	D_COLLISION_API void CollisionOnlyUpdate();
-	const ndContactArray& GetContactArray() const;
-
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
 	void UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root);
-	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	void SubmitPairs(ndSceneBodyNode* const bodyNode, ndSceneNode* const node);
-
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
@@ -168,14 +179,19 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void UpdateBodyList();
 	
 	// call from substeps update
+	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();
 	D_COLLISION_API virtual void UpdateTransform();
 	D_COLLISION_API virtual void CalculateContacts();
 	D_COLLISION_API virtual void FindCollidingPairs();
-	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
-	
+
+	D_COLLISION_API virtual void CollisionOnlyUpdate();
+	D_COLLISION_API virtual void UpdateAabb(ndInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
+
 	ndBodyList m_bodyList;
 	ndContactArray m_contactArray;
 
@@ -184,6 +200,10 @@ class ndScene : public ndThreadPool
 	ndArray<ndConstraint*> m_activeConstraintArray;
 	ndList<ndBodyKinematic*> m_specialUpdateList;
 	ndThreadBackgroundWorker m_backgroundThread;
+#ifdef D_NEW_SCENE
+	ndArray<ndContactPairs> m_particalNewPairs[D_MAX_THREADS_COUNT];
+#endif
+
 	ndSpinLock m_lock;
 	ndSceneNode* m_rootNode;
 	ndBodyKinematic* m_sentinelBody;
