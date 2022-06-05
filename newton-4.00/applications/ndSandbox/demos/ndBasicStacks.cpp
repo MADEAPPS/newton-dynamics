@@ -288,13 +288,13 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_z -= 6.0f;
 	BuildCapsuleStack(scene, 10.0f, origin, ndVector(0.25f, 0.25f, 2.0f, 0.0f), 20);
 
-	ndQuaternion rot(dYawMatrix (45.0f * ndDegreeToRad));
-	origin = ndVector::m_zero;
+	origin = ndVector::m_wOne;
 	origin.m_x -= 3.0f;
 	origin.m_y += 5.0f;
 
 	origin.m_x -= 15.0f;
 	origin.m_z += 15.0f;
 
+	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }
