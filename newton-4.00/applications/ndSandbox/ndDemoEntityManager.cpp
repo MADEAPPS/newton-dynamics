@@ -36,8 +36,8 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// basic rigidbody
-//#define DEFAULT_SCENE	1		// gpu basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
