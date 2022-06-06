@@ -721,45 +721,54 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 				}
 			}
 
-			class ndSpliteTest
-			{
-				public:
-				ndSpliteTest(const ndFloat32 dist, ndInt32 index)
-					:m_dist(dist)
-					,m_index(index)
-				{
-				}
-				
-				ndFloat32 m_dist;
-				ndInt32 m_index;
-			};
-			ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
-			ndFloat32 test = center[index];
-
-			class ndEvaluateKey
-			{
-				public:
-				ndEvaluateKey(void* const context)
-				{
-					ndSpliteTest* const test = (ndSpliteTest*)context;
-					m_dist = test->m_dist;
-					m_index = test->m_index;
-				}
-
-				ndUnsigned32 GetKey(const ndSceneNode* const node) const
-				{
-					const ndFloat32 val = (node->m_minBox[m_index] + node->m_maxBox[m_index]) * ndFloat32(0.5f);
-					const ndUnsigned32 key = (val > m_dist) ? 1 : 0;
-					return key;
-				}
-
-				ndFloat32 m_dist;
-				ndInt32 m_index;
-			};
-
 			ndUnsigned32 prefixScan[32];
-			ndSpliteTest context(test, index);
-			ndCountingSort<ndSceneNode*, ndEvaluateKey, 1>(*this, tmpBuffer, boxArray, boxCount, prefixScan, &context);
+			if (maxVarian > ndFloat32(1.0e-3f))
+			{
+				class ndSpliteTest
+				{
+					public:
+					ndSpliteTest(const ndFloat32 dist, ndInt32 index)
+						:m_dist(dist)
+						, m_index(index)
+					{
+					}
+
+					ndFloat32 m_dist;
+					ndInt32 m_index;
+				};
+				ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
+				ndFloat32 test = center[index];
+
+				class ndEvaluateKey
+				{
+					public:
+					ndEvaluateKey(void* const context)
+					{
+						ndSpliteTest* const test = (ndSpliteTest*)context;
+						m_dist = test->m_dist;
+						m_index = test->m_index;
+					}
+
+					ndUnsigned32 GetKey(const ndSceneNode* const node) const
+					{
+						const ndFloat32 val = (node->m_minBox[m_index] + node->m_maxBox[m_index]) * ndFloat32(0.5f);
+						const ndUnsigned32 key = (val > m_dist) ? 1 : 0;
+						return key;
+					}
+
+					ndFloat32 m_dist;
+					ndInt32 m_index;
+				};
+				
+				ndSpliteTest context(test, index);
+				ndCountingSort<ndSceneNode*, ndEvaluateKey, 1>(*this, tmpBuffer, boxArray, boxCount, prefixScan, &context);
+			}
+			else
+			{
+				prefixScan[0] = 0;
+				prefixScan[1] = boxCount / 2;
+				prefixScan[2] = boxCount;
+			}
 
 			const ndInt32 leftCount = prefixScan[1] - prefixScan[0];
 			if (leftCount == 1)
@@ -784,7 +793,6 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 				dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
 			}
 
-			//ndInt32 rightCount = boxCount - leftCount;
 			const ndInt32 rightCount = prefixScan[2] - prefixScan[1];
 			if (rightCount == 1)
 			{
@@ -2307,6 +2315,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 
 #else
 
+#if 0
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId)
 {
 	ndArray<ndContactPairs>& particalPairs = m_particalNewPairs[threadId];
@@ -2612,5 +2621,57 @@ void ndScene::CalculateContacts()
 		ParallelExecute(CopyActiveContact);
 	}
 }
+
+#else
+
+void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId)
+{
+	const ndBodyKinematic::ndContactMap& contactMap0 = body0->GetContactMap();
+	const ndBodyKinematic::ndContactMap& contactMap1 = body1->GetContactMap();
+
+	ndContact* const contact = (contactMap0.GetCount() <= contactMap1.GetCount()) ? contactMap0.FindContact(body0, body1) : contactMap1.FindContact(body1, body0);
+	//dAssert(!contact || (contact->m_body1->FindContact(contact->m_body0) == contact));
+	if (!contact)
+	{
+		const ndJointBilateralConstraint* const bilateral = FindBilateralJoint(body0, body1);
+		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+		if (isCollidable)
+		{
+			ndArray<ndContactPairs>& particalPairs = m_particalNewPairs[threadId];
+			ndContactPairs pair(body0->m_index, body1->m_index);
+			particalPairs.PushBack(pair);
+		}
+	}
+}
+
+void ndScene::CalculateContacts()
+{
+	D_TRACKTIME();
+	ndInt32 newContactCount = 0;
+	const ndInt32 threadCount = GetThreadCount();
+	for (ndInt32 i = 0; i < threadCount; ++i)
+	{
+		newContactCount += m_particalNewPairs[i].GetCount();
+	}
+
+	//ndInt32 contactCount = m_contactArray.GetCount();
+	//m_contactArray.SetCount((2 * (contactCount + newContactCount) + 16) * sizeof(ndContactPairs));
+	//
+	//auto CopyPartialCounts = ndMakeObject::ndFunction([this, contactCount](ndInt32 threadIndex, ndInt32 threadCount
+	//{
+	//	D_TRACKTIME();
+	//	const ndArray<ndContactPairs>& newPairs = m_particalNewPairs[threadIndex];
+	//
+	//	const ndUnsigned32 start = scanCounts[threadIndex];
+	//	dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
+	//	for (ndInt32 i = 0; i < newPairs.GetCount(); ++i)
+	//	{
+	//		srcPtr[start + i] = newPairs[i];
+	//	}
+	//});
+
+}
+
+#endif
 
 #endif
