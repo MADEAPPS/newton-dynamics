@@ -2499,7 +2499,7 @@ void ndScene::CalculateContacts()
 	dstPtr[contactCount] = ndContactPairs(0x7fffffff, 0x7fffffff);
 
 	ndUnsigned32 prefixScan[8];
-	memset(prefixScan, 0, sizeof(prefixScan));
+	//memset(prefixScan, 0, sizeof(prefixScan));
 
 	ndCountingSort<ndContactPairs, ndJointBody0_x, 8>(*this, srcPtr, dstPtr, contactCount, nullptr, nullptr);
 	ndSwap(srcPtr, dstPtr);
