@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-//#define D_NEW_SCENE
+#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
@@ -67,14 +67,14 @@ class ndScene : public ndThreadPool
 		public:
 		ndContactPairs(ndUnsigned32 body0, ndUnsigned32 body1, ndContact* const contact = nullptr)
 			:m_contact(contact)
-			,m_Body0(ndMin(body0, body1))
-			,m_Body1(ndMax(body0, body1))
+			,m_body0(ndMin(body0, body1))
+			,m_body1(ndMax(body0, body1))
 		{
 		}
 
+		ndUnsigned32 m_body0;
+		ndUnsigned32 m_body1;
 		ndContact* m_contact;
-		ndUnsigned32 m_Body0;
-		ndUnsigned32 m_Body1;
 	};
 #endif
 	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
