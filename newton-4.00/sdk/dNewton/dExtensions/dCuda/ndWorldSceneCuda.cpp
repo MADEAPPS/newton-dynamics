@@ -76,33 +76,6 @@ void ndWorldSceneCuda::End()
 	ndWorldScene::End();
 }
 
-//void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const body)
-void ndWorldSceneCuda::FindCollidingPairs(ndBodyKinematic* const)
-{
-	dAssert(0);
-}
-
-void ndWorldSceneCuda::FindCollidingPairs()
-{
-	//ndWorldScene::FindCollidingPairs();
-}
-
-//void ndWorldSceneCuda::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
-void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
-{
-	dAssert(0);
-}
-
-void ndWorldSceneCuda::BalanceScene()
-{
-
-}
-
-void ndWorldSceneCuda::CalculateContacts()
-{
-	//ndWorldScene::CalculateContacts();
-}
-
 void ndWorldSceneCuda::LoadBodyData()
 {
 	auto CopyBodies = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
@@ -243,61 +216,26 @@ void ndWorldSceneCuda::UpdateBodyList()
 	ValidateContextBuffers();
 }
 
-bool ndWorldSceneCuda::SanityCheckSortCells() const
-{
-	dAssert(0);
-	//cuSceneInfo info;
-	//cudaError_t cudaStatus;
-	//
-	//cudaDeviceSynchronize();
-	//cudaStatus = cudaMemcpy(&info, m_context->m_sceneInfoGpu, sizeof(cuSceneInfo), cudaMemcpyDeviceToHost);
-	//dAssert(cudaStatus == cudaSuccess);
-	//
-	//if (info.m_frameIsValid)
-	//{
-	//	static ndArray<cuBodyAabbCell> bodyAabbCell;
-	//	static ndArray<cuBodyAabbCell> bodyAabbCellScrath;
-	//	bodyAabbCell.SetCount(info.m_bodyAabbCell.m_size);
-	//	bodyAabbCellScrath.SetCount(info.m_bodyAabbCell.m_size);
-	//
-	//	cudaStatus = cudaMemcpy(&bodyAabbCellScrath[0], info.m_bodyAabbCellScrath.m_array, bodyAabbCellScrath.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-	//	dAssert(cudaStatus == cudaSuccess);
-	//
-	//	cudaStatus = cudaMemcpy(&bodyAabbCell[0], info.m_bodyAabbCell.m_array, bodyAabbCell.GetCount() * sizeof(cuBodyAabbCell), cudaMemcpyDeviceToHost);
-	//	dAssert(cudaStatus == cudaSuccess);
-	//
-	//	for (int i = 1; i < bodyAabbCell.GetCount(); i++)
-	//	{
-	//		cuBodyAabbCell key0(bodyAabbCell[i - 1]);
-	//		cuBodyAabbCell key1(bodyAabbCell[i - 0]);
-	//		//cuBodyAabbCell key0(bodyAabbCellScrath[i - 1]);
-	//		//cuBodyAabbCell key1(bodyAabbCellScrath[i - 0]);
-	//
-	//		ndUnsigned32 value0 = key0.m_key;
-	//		ndUnsigned32 value1 = key1.m_key;
-	//		//value0 = key0.m_x + key0.m_y * 1024;
-	//		//value1 = key1.m_x + key1.m_y * 1024;
-	//		//value0 = key0.m_z;
-	//		//value1 = key1.m_z;
-	//
-	//		bool test = (value0 <= value1);
-	//		dAssert(test);
-	//		if (!test)
-	//		{
-	//			break;
-	//		}
-	//	}
-	//}
-	//
-	//if (cudaStatus != cudaSuccess)
-	//{
-	//	dAssert(0);
-	//}
-	return true;
-}
-
 void ndWorldSceneCuda::InitBodyArray()
 {
 	D_TRACKTIME();
 	ndCudaContext::InitBodyArray();
+}
+
+void ndWorldSceneCuda::FindCollidingPairs()
+{
+	D_TRACKTIME();
+	ndWorldScene::FindCollidingPairs();
+}
+
+void ndWorldSceneCuda::BalanceScene()
+{
+	D_TRACKTIME();
+	ndWorldScene::BalanceScene();
+}
+
+void ndWorldSceneCuda::CalculateContacts()
+{
+	D_TRACKTIME();
+	ndWorldScene::CalculateContacts();
 }

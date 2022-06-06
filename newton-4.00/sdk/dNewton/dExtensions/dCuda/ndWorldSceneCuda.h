@@ -42,14 +42,12 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 	virtual void CalculateContacts();
 	virtual void FindCollidingPairs();
 
-	virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	//virtual void FindCollidingPairs(ndBodyKinematic* const body);
+	//virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 
 	virtual void UpdateTransform();
 	void LoadBodyData();
 	void GetBodyTransforms();
-
-	bool SanityCheckSortCells() const;
 
 	ndCudaContext* GetContext();
 
