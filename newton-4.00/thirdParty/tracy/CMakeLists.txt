@@ -16,11 +16,6 @@ target_link_libraries(
         ${CMAKE_DL_LIBS}
 )
 
-# Public dependency on some libraries required when using Mingw
-if(WIN32 AND ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-    target_link_libraries(TracyClient PUBLIC ws2_32 dbghelp)
-endif()
-
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
     find_library(EXECINFO_LIBRARY NAMES execinfo REQUIRED)
     target_link_libraries(TracyClient PUBLIC ${EXECINFO_LIBRARY})
@@ -49,16 +44,15 @@ set_option(TRACY_ONLY_IPV4 "Tracy will only accept connections on IPv4 addresses
 set_option(TRACY_NO_CODE_TRANSFER "Disable collection of source code" OFF)
 set_option(TRACY_NO_CONTEXT_SWITCH "Disable capture of context switches" OFF)
 set_option(TRACY_NO_EXIT "Client executable does not exit until all profile data is sent to server" OFF)
+set_option(TRACY_NO_FRAME_IMAGE "Disable capture of frame images" OFF)
 set_option(TRACY_NO_SAMPLING "Disable call stack sampling" OFF)
 set_option(TRACY_NO_VERIFY "Disable zone validation for C API" OFF)
 set_option(TRACY_NO_VSYNC_CAPTURE "Disable capture of hardware Vsync events" OFF)
 set_option(TRACY_NO_FRAME_IMAGE  "Disable the frame image support and its thread" OFF)
-set_option(TRACY_NO_SYSTEM_TRACING  "Disable systrace sampling" OFF)
+set_option(TRACY_NO_SYS_TRACE  "Disable systrace sampling" OFF)
 set_option(TRACY_DELAYED_INIT "Enable delayed initialization of the library (init on first call)" OFF)
 set_option(TRACY_MANUAL_LIFETIME "Enable the manual lifetime management of the profile" OFF)
 set_option(TRACY_FIBERS "Enable fibers support" OFF)
-set_option(TRACY_NO_CRASH_HANDLER "Disable crash handling" OFF)
-set_option(TRACY_TIMER_FALLBACK "Use lower resolution timers" OFF)
 
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(TracyClient PRIVATE TRACY_EXPORTS)
@@ -127,6 +121,6 @@ install(FILES ${client_includes}
 install(FILES ${common_includes}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/common)
 install(EXPORT TracyConfig
-        NAMESPACE Tracy::
+		NAMESPACE Tracy::
         FILE TracyConfig.cmake
         DESTINATION share/Tracy)

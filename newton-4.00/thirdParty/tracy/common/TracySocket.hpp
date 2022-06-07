@@ -2,7 +2,6 @@
 #define __TRACYSOCKET_HPP__
 
 #include <atomic>
-#include <stddef.h>
 #include <stdint.h>
 
 #include "TracyForceInline.hpp"

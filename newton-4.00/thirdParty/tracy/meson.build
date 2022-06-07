@@ -60,7 +60,7 @@ if get_option('tracy_no_frame_image')
   add_project_arguments('-DTRACY_NO_FRAME_IMAGE', language : 'cpp')
 endif
 
-if get_option('tracy_no_system_tracing')
+if get_option('tracy_no_sys_trace')
   add_project_arguments('-DTRACY_NO_SYSTEM_TRACING', language : 'cpp')
 endif
 
@@ -76,17 +76,9 @@ if get_option('tracy_fibers')
   add_project_arguments('-DTRACY_FIBERS', language : 'cpp')
 endif
 
-if get_option('tracy_timer_fallback')
-  add_project_arguments('-DTRACY_TIMER_FALLBACK', language : 'cpp')
-endif
-
 tracy_shared_libs = get_option('tracy_shared_libs')
 if tracy_shared_libs
   add_project_arguments('-DTRACY_EXPORTS', language : 'cpp')
-endif
-
-if get_option('tracy_no_crash_handler')
-  add_project_arguments('-DTRACY_NO_CRASH_HANDLER', language : 'cpp')
 endif
 
 threads_dep = dependency('threads')
@@ -149,23 +141,17 @@ tracy_src = [
 
 tracy_public_include_dirs = include_directories('.')
 
-compiler = meson.get_compiler('cpp')
-override_options = []
-if compiler.get_id() != 'msvc'
-  override_options += 'cpp_std=c++11'
-endif
-
 if tracy_shared_libs
   tracy = shared_library('tracy', tracy_src, tracy_header_files,
     dependencies        : [ threads_dep ],
     include_directories : tracy_public_include_dirs,
-    override_options    : override_options,
+    override_options    : [ 'cpp_std=c++11' ],
     install             : true)
 else
   tracy = static_library('tracy', tracy_src, tracy_header_files,
     dependencies        : [ threads_dep ],
     include_directories : tracy_public_include_dirs,
-    override_options    : override_options,
+    override_options    : [ 'cpp_std=c++11' ],
     install             : true)
 endif
 

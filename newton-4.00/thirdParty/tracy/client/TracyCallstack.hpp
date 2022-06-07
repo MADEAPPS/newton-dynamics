@@ -13,10 +13,6 @@
 
 #ifdef TRACY_HAS_CALLSTACK
 
-#ifdef TRACY_DEBUGINFOD
-#  include <elfutils/debuginfod.h>
-#endif
-
 #include <assert.h>
 #include <stdint.h>
 
@@ -55,13 +51,7 @@ CallstackSymbolData DecodeCodeAddress( uint64_t ptr );
 const char* DecodeCallstackPtrFast( uint64_t ptr );
 CallstackEntryData DecodeCallstackPtr( uint64_t ptr );
 void InitCallstack();
-void EndCallstack();
 const char* GetKernelModulePath( uint64_t addr );
-
-#ifdef TRACY_DEBUGINFOD
-const uint8_t* GetBuildIdForImage( const char* image, size_t& size );
-debuginfod_client* GetDebuginfodClient();
-#endif
 
 #if TRACY_HAS_CALLSTACK == 1
 

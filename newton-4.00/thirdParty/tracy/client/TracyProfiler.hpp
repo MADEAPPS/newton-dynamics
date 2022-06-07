@@ -30,10 +30,6 @@
 #  define TRACY_HW_TIMER
 #endif
 
-#ifdef __linux__
-#  include <signal.h>
-#endif
-
 #if defined TRACY_TIMER_FALLBACK || !defined TRACY_HW_TIMER
 #  include <chrono>
 #endif
@@ -224,9 +220,7 @@ public:
 #  endif
 #endif
 
-#if !defined TRACY_TIMER_FALLBACK
-        return 0;  // unreachable branch
-#endif
+        return 0;  // unreacheble branch
     }
 
     tracy_force_inline uint32_t GetNextZoneId()
@@ -929,7 +923,6 @@ private:
 
     ParameterCallback m_paramCallback;
 
-    char* m_queryImage;
     char* m_queryData;
     char* m_queryDataPtr;
 

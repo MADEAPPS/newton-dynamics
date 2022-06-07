@@ -265,7 +265,7 @@ void WINAPI EventRecordCallbackVsync( PEVENT_RECORD record )
 
 static void SetupVsync()
 {
-#if _WIN32_WINNT >= _WIN32_WINNT_WINBLUE && !defined(__MINGW32__)
+#if _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
     const auto psz = sizeof( EVENT_TRACE_PROPERTIES ) + MAX_PATH;
     s_propVsync = (EVENT_TRACE_PROPERTIES*)tracy_malloc( psz );
     memset( s_propVsync, 0, sizeof( EVENT_TRACE_PROPERTIES ) );
@@ -772,13 +772,11 @@ bool SysTraceStart( int64_t& samplingPeriod )
     return false;
 #endif
 
+    int paranoidLevel = 2;
     const auto paranoidLevelStr = ReadFile( "/proc/sys/kernel/perf_event_paranoid" );
     if( !paranoidLevelStr ) return false;
-#ifdef TRACY_VERBOSE
-    int paranoidLevel = 2;
     paranoidLevel = atoi( paranoidLevelStr );
     TracyDebug( "perf_event_paranoid: %i\n", paranoidLevel );
-#endif
 
     int switchId = -1, wakeupId = -1;
     const auto switchIdStr = ReadFile( "/sys/kernel/debug/tracing/events/sched/sched_switch/id" );
@@ -859,11 +857,7 @@ bool SysTraceStart( int64_t& samplingPeriod )
             pe.exclude_kernel = 1;
             ProbePreciseIp( pe, currentPid );
             fd = perf_event_open( &pe, currentPid, i, -1, PERF_FLAG_FD_CLOEXEC );
-            if( fd == -1 )
-            {
-                TracyDebug( "  Failed to setup!\n");
-                break;
-            }
+            if( fd == -1 ) break;
             TracyDebug( "  No access to kernel samples\n" );
         }
         new( s_ring+s_numBuffers ) RingBuffer( 64*1024, fd, EventCallstack );
