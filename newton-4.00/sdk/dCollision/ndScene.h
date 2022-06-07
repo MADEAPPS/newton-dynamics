@@ -28,7 +28,6 @@
 #include "ndContactArray.h"
 
 #define D_NEW_SCENE
-
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 

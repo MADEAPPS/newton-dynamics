@@ -125,6 +125,7 @@ static inline void LuaRemove( char* script )
 #else
 
 #include <assert.h>
+#include <limits>
 
 #include "common/TracyColor.hpp"
 #include "common/TracyAlign.hpp"
@@ -136,7 +137,7 @@ namespace tracy
 {
 
 #ifdef TRACY_ON_DEMAND
-LuaZoneState& GetLuaZoneState();
+TRACY_API LuaZoneState& GetLuaZoneState();
 #endif
 
 namespace detail
@@ -150,9 +151,9 @@ static tracy_force_inline void SendLuaCallstack( lua_State* L, uint32_t depth )
     const char* func[64];
     uint32_t fsz[64];
     uint32_t ssz[64];
-    uint32_t spaceNeeded = 4;     // cnt
 
-    uint32_t cnt;
+    uint8_t cnt;
+    uint16_t spaceNeeded = sizeof( cnt );
     for( cnt=0; cnt<depth; cnt++ )
     {
         if( lua_getstack( L, cnt+1, dbg+cnt ) == 0 ) break;
@@ -162,32 +163,29 @@ static tracy_force_inline void SendLuaCallstack( lua_State* L, uint32_t depth )
         ssz[cnt] = uint32_t( strlen( dbg[cnt].source ) );
         spaceNeeded += fsz[cnt] + ssz[cnt];
     }
-    spaceNeeded += cnt * ( 4 + 4 + 4 );     // source line, function string length, source string length
+    spaceNeeded += cnt * ( 4 + 2 + 2 );     // source line, function string length, source string length
 
-    auto ptr = (char*)tracy_malloc( spaceNeeded + 4 );
+    auto ptr = (char*)tracy_malloc( spaceNeeded + 2 );
     auto dst = ptr;
-    memcpy( dst, &spaceNeeded, 4 ); dst += 4;
-    memcpy( dst, &cnt, 4 ); dst += 4;
-    for( uint32_t i=0; i<cnt; i++ )
+    memcpy( dst, &spaceNeeded, 2 ); dst += 2;
+    memcpy( dst, &cnt, 1 ); dst++;
+    for( uint8_t i=0; i<cnt; i++ )
     {
         const uint32_t line = dbg[i].currentline;
         memcpy( dst, &line, 4 ); dst += 4;
-        memcpy( dst, fsz+i, 4 ); dst += 4;
+        assert( fsz[i] <= std::numeric_limits<uint16_t>::max() );
+        memcpy( dst, fsz+i, 2 ); dst += 2;
         memcpy( dst, func[i], fsz[i] ); dst += fsz[i];
-        memcpy( dst, ssz+i, 4 ); dst += 4;
+        assert( ssz[i] <= std::numeric_limits<uint16_t>::max() );
+        memcpy( dst, ssz+i, 2 ); dst += 2;
         memcpy( dst, dbg[i].source, ssz[i] ), dst += ssz[i];
     }
-    assert( dst - ptr == spaceNeeded + 4 );
+    assert( dst - ptr == spaceNeeded + 2 );
 
-    Magic magic;
-    auto token = GetToken();
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::CallstackAlloc );
-    MemWrite( &item->callstackAlloc.ptr, (uint64_t)ptr );
-    MemWrite( &item->callstackAlloc.nativePtr, (uint64_t)Callstack( depth ) );
-    MemWrite( &item->callstackAlloc.thread, GetThreadHandle() );
-    tail.store( magic + 1, std::memory_order_release );
+    TracyQueuePrepare( QueueType::CallstackAlloc );
+    MemWrite( &item->callstackAllocFat.ptr, (uint64_t)ptr );
+    MemWrite( &item->callstackAllocFat.nativePtr, (uint64_t)Callstack( depth ) );
+    TracyQueueCommit( callstackAllocFatThread );
 }
 
 static inline int LuaZoneBeginS( lua_State* L )
@@ -199,55 +197,22 @@ static inline int LuaZoneBeginS( lua_State* L )
     if( !GetLuaZoneState().active ) return 0;
 #endif
 
-    const uint32_t color = Color::DeepSkyBlue3;
-
-    lua_Debug dbg;
-    lua_getstack( L, 1, &dbg );
-    lua_getinfo( L, "Snl", &dbg );
-
-    const uint32_t line = dbg.currentline;
-    const auto func = dbg.name ? dbg.name : dbg.short_src;
-    const auto fsz = strlen( func );
-    const auto ssz = strlen( dbg.source );
-
-    // Data layout:
-    //  4b  payload size
-    //  4b  color
-    //  4b  source line
-    //  fsz function name
-    //  1b  null terminator
-    //  ssz source file name
-    //  1b  null terminator
-    const uint32_t sz = uint32_t( 4 + 4 + 4 + fsz + 1 + ssz + 1 );
-    auto ptr = (char*)tracy_malloc( sz );
-    memcpy( ptr, &sz, 4 );
-    memcpy( ptr + 4, &color, 4 );
-    memcpy( ptr + 8, &line, 4 );
-    memcpy( ptr + 12, func, fsz+1 );
-    memcpy( ptr + 12 + fsz + 1, dbg.source, ssz + 1 );
-
-    Magic magic;
-    auto token = GetToken();
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneBeginAllocSrcLocCallstack );
-#ifdef TRACY_RDTSCP_OPT
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( item->zoneBegin.cpu ) );
-#else
-    uint32_t cpu;
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( cpu ) );
-    MemWrite( &item->zoneBegin.cpu, cpu );
-#endif
-    MemWrite( &item->zoneBegin.thread, GetThreadHandle() );
-    MemWrite( &item->zoneBegin.srcloc, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
-
 #ifdef TRACY_CALLSTACK
     const uint32_t depth = TRACY_CALLSTACK;
 #else
     const auto depth = uint32_t( lua_tointeger( L, 1 ) );
 #endif
     SendLuaCallstack( L, depth );
+
+    lua_Debug dbg;
+    lua_getstack( L, 1, &dbg );
+    lua_getinfo( L, "Snl", &dbg );
+    const auto srcloc = Profiler::AllocSourceLocation( dbg.currentline, dbg.source, dbg.name ? dbg.name : dbg.short_src );
+
+    TracyQueuePrepare( QueueType::ZoneBeginAllocSrcLocCallstack );
+    MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
+    MemWrite( &item->zoneBegin.srcloc, srcloc );
+    TracyQueueCommit( zoneBeginThread );
 
     return 0;
 }
@@ -261,59 +226,24 @@ static inline int LuaZoneBeginNS( lua_State* L )
     if( !GetLuaZoneState().active ) return 0;
 #endif
 
-    const uint32_t color = Color::DeepSkyBlue3;
-
-    lua_Debug dbg;
-    lua_getstack( L, 1, &dbg );
-    lua_getinfo( L, "Snl", &dbg );
-
-    const uint32_t line = dbg.currentline;
-    const auto func = dbg.name ? dbg.name : dbg.short_src;
-    size_t nsz;
-    const auto name = lua_tolstring( L, 1, &nsz );
-    const auto fsz = strlen( func );
-    const auto ssz = strlen( dbg.source );
-
-    // Data layout:
-    //  4b  payload size
-    //  4b  color
-    //  4b  source line
-    //  fsz function name
-    //  1b  null terminator
-    //  ssz source file name
-    //  1b  null terminator
-    //  nsz zone name
-    const uint32_t sz = uint32_t( 4 + 4 + 4 + fsz + 1 + ssz + 1 + nsz );
-    auto ptr = (char*)tracy_malloc( sz );
-    memcpy( ptr, &sz, 4 );
-    memcpy( ptr + 4, &color, 4 );
-    memcpy( ptr + 8, &line, 4 );
-    memcpy( ptr + 12, func, fsz+1 );
-    memcpy( ptr + 12 + fsz + 1, dbg.source, ssz + 1 );
-    memcpy( ptr + 12 + fsz + 1 + ssz + 1, name, nsz );
-
-    Magic magic;
-    auto token = GetToken();
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneBeginAllocSrcLocCallstack );
-#ifdef TRACY_RDTSCP_OPT
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( item->zoneBegin.cpu ) );
-#else
-    uint32_t cpu;
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( cpu ) );
-    MemWrite( &item->zoneBegin.cpu, cpu );
-#endif
-    MemWrite( &item->zoneBegin.thread, GetThreadHandle() );
-    MemWrite( &item->zoneBegin.srcloc, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
-
 #ifdef TRACY_CALLSTACK
     const uint32_t depth = TRACY_CALLSTACK;
 #else
     const auto depth = uint32_t( lua_tointeger( L, 2 ) );
 #endif
     SendLuaCallstack( L, depth );
+
+    lua_Debug dbg;
+    lua_getstack( L, 1, &dbg );
+    lua_getinfo( L, "Snl", &dbg );
+    size_t nsz;
+    const auto name = lua_tolstring( L, 1, &nsz );
+    const auto srcloc = Profiler::AllocSourceLocation( dbg.currentline, dbg.source, dbg.name ? dbg.name : dbg.short_src, name, nsz );
+
+    TracyQueuePrepare( QueueType::ZoneBeginAllocSrcLocCallstack );
+    MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
+    MemWrite( &item->zoneBegin.srcloc, srcloc );
+    TracyQueueCommit( zoneBeginThread );
 
     return 0;
 }
@@ -331,48 +261,15 @@ static inline int LuaZoneBegin( lua_State* L )
     if( !GetLuaZoneState().active ) return 0;
 #endif
 
-    const uint32_t color = Color::DeepSkyBlue3;
-
     lua_Debug dbg;
     lua_getstack( L, 1, &dbg );
     lua_getinfo( L, "Snl", &dbg );
+    const auto srcloc = Profiler::AllocSourceLocation( dbg.currentline, dbg.source, dbg.name ? dbg.name : dbg.short_src );
 
-    const uint32_t line = dbg.currentline;
-    const auto func = dbg.name ? dbg.name : dbg.short_src;
-    const auto fsz = strlen( func );
-    const auto ssz = strlen( dbg.source );
-
-    // Data layout:
-    //  4b  payload size
-    //  4b  color
-    //  4b  source line
-    //  fsz function name
-    //  1b  null terminator
-    //  ssz source file name
-    //  1b  null terminator
-    const uint32_t sz = uint32_t( 4 + 4 + 4 + fsz + 1 + ssz + 1 );
-    auto ptr = (char*)tracy_malloc( sz );
-    memcpy( ptr, &sz, 4 );
-    memcpy( ptr + 4, &color, 4 );
-    memcpy( ptr + 8, &line, 4 );
-    memcpy( ptr + 12, func, fsz+1 );
-    memcpy( ptr + 12 + fsz + 1, dbg.source, ssz + 1 );
-
-    Magic magic;
-    auto token = GetToken();
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneBeginAllocSrcLoc );
-#ifdef TRACY_RDTSCP_OPT
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( item->zoneBegin.cpu ) );
-#else
-    uint32_t cpu;
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( cpu ) );
-    MemWrite( &item->zoneBegin.cpu, cpu );
-#endif
-    MemWrite( &item->zoneBegin.thread, GetThreadHandle() );
-    MemWrite( &item->zoneBegin.srcloc, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
+    TracyQueuePrepare( QueueType::ZoneBeginAllocSrcLoc );
+    MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
+    MemWrite( &item->zoneBegin.srcloc, srcloc );
+    TracyQueueCommit( zoneBeginThread );
     return 0;
 #endif
 }
@@ -389,52 +286,17 @@ static inline int LuaZoneBeginN( lua_State* L )
     if( !GetLuaZoneState().active ) return 0;
 #endif
 
-    const uint32_t color = Color::DeepSkyBlue3;
-
     lua_Debug dbg;
     lua_getstack( L, 1, &dbg );
     lua_getinfo( L, "Snl", &dbg );
-
-    const uint32_t line = dbg.currentline;
-    const auto func = dbg.name ? dbg.name : dbg.short_src;
     size_t nsz;
     const auto name = lua_tolstring( L, 1, &nsz );
-    const auto fsz = strlen( func );
-    const auto ssz = strlen( dbg.source );
+    const auto srcloc = Profiler::AllocSourceLocation( dbg.currentline, dbg.source, dbg.name ? dbg.name : dbg.short_src, name, nsz );
 
-    // Data layout:
-    //  4b  payload size
-    //  4b  color
-    //  4b  source line
-    //  fsz function name
-    //  1b  null terminator
-    //  ssz source file name
-    //  1b  null terminator
-    //  nsz zone name
-    const uint32_t sz = uint32_t( 4 + 4 + 4 + fsz + 1 + ssz + 1 + nsz );
-    auto ptr = (char*)tracy_malloc( sz );
-    memcpy( ptr, &sz, 4 );
-    memcpy( ptr + 4, &color, 4 );
-    memcpy( ptr + 8, &line, 4 );
-    memcpy( ptr + 12, func, fsz+1 );
-    memcpy( ptr + 12 + fsz + 1, dbg.source, ssz + 1 );
-    memcpy( ptr + 12 + fsz + 1 + ssz + 1, name, nsz );
-
-    Magic magic;
-    auto token = GetToken();
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneBeginAllocSrcLoc );
-#ifdef TRACY_RDTSCP_OPT
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( item->zoneBegin.cpu ) );
-#else
-    uint32_t cpu;
-    MemWrite( &item->zoneBegin.time, Profiler::GetTime( cpu ) );
-    MemWrite( &item->zoneBegin.cpu, cpu );
-#endif
-    MemWrite( &item->zoneBegin.thread, GetThreadHandle() );
-    MemWrite( &item->zoneBegin.srcloc, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
+    TracyQueuePrepare( QueueType::ZoneBeginAllocSrcLoc );
+    MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
+    MemWrite( &item->zoneBegin.srcloc, srcloc );
+    TracyQueueCommit( zoneBeginThread );
     return 0;
 #endif
 }
@@ -452,20 +314,9 @@ static inline int LuaZoneEnd( lua_State* L )
     }
 #endif
 
-    Magic magic;
-    auto token = GetToken();
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneEnd );
-#ifdef TRACY_RDTSCP_OPT
-    MemWrite( &item->zoneEnd.time, Profiler::GetTime( item->zoneEnd.cpu ) );
-#else
-    uint32_t cpu;
-    MemWrite( &item->zoneEnd.time, Profiler::GetTime( cpu ) );
-    MemWrite( &item->zoneEnd.cpu, cpu );
-#endif
-    MemWrite( &item->zoneEnd.thread, GetThreadHandle() );
-    tail.store( magic + 1, std::memory_order_release );
+    TracyQueuePrepare( QueueType::ZoneEnd );
+    MemWrite( &item->zoneEnd.time, Profiler::GetTime() );
+    TracyQueueCommit( zoneEndThread );
     return 0;
 }
 
@@ -482,18 +333,15 @@ static inline int LuaZoneText( lua_State* L )
 
     auto txt = lua_tostring( L, 1 );
     const auto size = strlen( txt );
+    assert( size < std::numeric_limits<uint16_t>::max() );
 
-    Magic magic;
-    auto token = GetToken();
-    auto ptr = (char*)tracy_malloc( size+1 );
+    auto ptr = (char*)tracy_malloc( size );
     memcpy( ptr, txt, size );
-    ptr[size] = '\0';
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneText );
-    MemWrite( &item->zoneText.thread, GetThreadHandle() );
-    MemWrite( &item->zoneText.text, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
+
+    TracyQueuePrepare( QueueType::ZoneText );
+    MemWrite( &item->zoneTextFat.text, (uint64_t)ptr );
+    MemWrite( &item->zoneTextFat.size, (uint16_t)size );
+    TracyQueueCommit( zoneTextFatThread );
     return 0;
 }
 
@@ -510,18 +358,15 @@ static inline int LuaZoneName( lua_State* L )
 
     auto txt = lua_tostring( L, 1 );
     const auto size = strlen( txt );
+    assert( size < std::numeric_limits<uint16_t>::max() );
 
-    Magic magic;
-    auto token = GetToken();
-    auto ptr = (char*)tracy_malloc( size+1 );
+    auto ptr = (char*)tracy_malloc( size );
     memcpy( ptr, txt, size );
-    ptr[size] = '\0';
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::ZoneName );
-    MemWrite( &item->zoneText.thread, GetThreadHandle() );
-    MemWrite( &item->zoneText.text, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
+
+    TracyQueuePrepare( QueueType::ZoneName );
+    MemWrite( &item->zoneTextFat.text, (uint64_t)ptr );
+    MemWrite( &item->zoneTextFat.size, (uint16_t)size );
+    TracyQueueCommit( zoneTextFatThread );
     return 0;
 }
 
@@ -533,19 +378,16 @@ static inline int LuaMessage( lua_State* L )
 
     auto txt = lua_tostring( L, 1 );
     const auto size = strlen( txt );
+    assert( size < std::numeric_limits<uint16_t>::max() );
 
-    Magic magic;
-    auto token = GetToken();
-    auto ptr = (char*)tracy_malloc( size+1 );
+    auto ptr = (char*)tracy_malloc( size );
     memcpy( ptr, txt, size );
-    ptr[size] = '\0';
-    auto& tail = token->get_tail_index();
-    auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
-    MemWrite( &item->hdr.type, QueueType::Message );
-    MemWrite( &item->message.time, Profiler::GetTime() );
-    MemWrite( &item->message.thread, GetThreadHandle() );
-    MemWrite( &item->message.text, (uint64_t)ptr );
-    tail.store( magic + 1, std::memory_order_release );
+
+    TracyQueuePrepare( QueueType::Message );
+    MemWrite( &item->messageFat.time, Profiler::GetTime() );
+    MemWrite( &item->messageFat.text, (uint64_t)ptr );
+    MemWrite( &item->messageFat.size, (uint16_t)size );
+    TracyQueueCommit( messageFatThread );
     return 0;
 }
 
