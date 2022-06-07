@@ -27,6 +27,7 @@
 
 ndThread::ndThread()
 	:ndClassAlloc()
+	,ndThreadName()
 	,ndSemaphore()
 #ifndef D_USE_THREAD_EMULATION
 	,ndAtomic<bool>(true)

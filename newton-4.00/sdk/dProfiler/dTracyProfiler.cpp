@@ -23,12 +23,12 @@
 
 	static bool profileOn = false;
 
-	void dProfilerEnableProlingLow(int mode)
+	void dProfilerEnableProlingLow()
 	{
-		profileOn = mode ? true : false;
+		profileOn = !profileOn;
 	}
 	
-	long long dProfilerStartTraceLow(const dProfilerSourceLocation* const srcloc)
+	void dProfilerStartTraceLow(const dProfilerSourceLocation* const srcloc)
 	{
 		if (profileOn) 
 		{
@@ -36,16 +36,10 @@
 			MemWrite(&item->zoneBegin.time, Profiler::GetTime());
 			MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
 			TracyQueueCommit(zoneBeginThread);
-			return 0;
-		} 
-		else 
-		{
-			return 0;
 		}
 	}
 
-	//void dProfilerEndTraceLow(long long threadId)
-	void dProfilerEndTraceLow(long long)
+	void dProfilerEndTraceLow()
 	{
 		if (profileOn) 
 		{
@@ -57,8 +51,6 @@
 
 	void dProfilerSetTrackNameLow(const char* const trackName)
 	{
-		//std::thread::native_handle_type handle = (std::thread::native_handle_type) GetThreadHandle();
-		//SetThreadName(handle, trackName);
 		tracy::SetThreadName(trackName);
 	}
 

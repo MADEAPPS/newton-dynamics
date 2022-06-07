@@ -1101,7 +1101,6 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndI
 	ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
 	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
 	{
-		//manager->ToggleProfiler();
 		manager->m_profilerMode = true;
 	}
 
@@ -1124,8 +1123,7 @@ void ndDemoEntityManager::ToggleProfiler()
 		dAssert(m_world);
 		dTrace(("profiler Enable\n"));
 		m_world->Sync();
-		//m_profilerMode = !m_profilerMode;
-		dProfilerEnableProling(m_profilerMode);
+		dProfilerEnableProling();
 	#endif
 }
 

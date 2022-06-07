@@ -26,8 +26,19 @@
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
 
+class ndThreadName
+{
+	public:
+	ndThreadName()
+	{
+		strcpy(m_name, "newtonWorker");
+	}
+	char m_name[32];
+};
+
 class ndThread
 	:public ndClassAlloc
+	,public ndThreadName
 	,public ndSemaphore
 #ifndef D_USE_THREAD_EMULATION
 	,public ndAtomic<bool>
@@ -51,9 +62,6 @@ class ndThread
 
 	private:
 	void ThreadFunctionCallback();
-
-	protected:
-	char m_name[32];
 };
 
 #endif

@@ -2587,6 +2587,7 @@ void ndScene::CalculateContacts()
 		{
 			auto CopyActiveContact = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 			{
+				D_TRACKTIME();
 				const ndArray<ndContact*>& constraintArray = m_contactArray;
 				ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
 				const ndUnsigned32 activeJointCount = activeConstraintArray.GetCount();
