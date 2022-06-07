@@ -104,6 +104,7 @@ ndScene::ndScene()
 	,m_activeConstraintArray(1024)
 	,m_specialUpdateList()
 	,m_backgroundThread()
+	,m_newPairs(1024)
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
@@ -1634,20 +1635,23 @@ void ndScene::FindCollidingPairs()
 		scanCounts[threadCount] = sum;
 		m_newPairs.SetCount(sum);
 
-		auto CopyPartialCounts = ndMakeObject::ndFunction([this, &scanCounts](ndInt32 threadIndex, ndInt32)
+		if (sum)
 		{
-			D_TRACKTIME();
-			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
-
-			const ndUnsigned32 count = m_newPairs.GetCount();
-			const ndUnsigned32 start = scanCounts[threadIndex];
-			dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
-			for (ndUnsigned32 i = 0; i < count; ++i)
+			auto CopyPartialCounts = ndMakeObject::ndFunction([this, &scanCounts](ndInt32 threadIndex, ndInt32)
 			{
-				m_newPairs[start + i] = newPairs[i];
-			}
-		});
-		ParallelExecute(CopyPartialCounts);
+				D_TRACKTIME();
+				const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
+
+				const ndUnsigned32 count = newPairs.GetCount();
+				const ndUnsigned32 start = scanCounts[threadIndex];
+				dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
+				for (ndUnsigned32 i = 0; i < count; ++i)
+				{
+					m_newPairs[start + i] = newPairs[i];
+				}
+			});
+			ParallelExecute(CopyPartialCounts);
+		}
 
 		#endif	
 	}
