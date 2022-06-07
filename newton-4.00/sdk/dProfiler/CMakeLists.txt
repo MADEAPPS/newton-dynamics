@@ -14,6 +14,7 @@ set (projectName "dProfiler")
 message (${projectName})
 
 add_definitions(-DTRACY_ENABLE)
+add_definitions(-DTRACY_ONLY_LOCALHOST)
 
 # low level core
 file(GLOB HEADERS *.h)
