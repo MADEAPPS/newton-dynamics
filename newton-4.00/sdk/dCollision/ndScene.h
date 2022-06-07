@@ -65,16 +65,14 @@ class ndScene : public ndThreadPool
 	class ndContactPairs
 	{
 		public:
-		ndContactPairs(ndUnsigned32 body0, ndUnsigned32 body1, ndContact* const contact = nullptr)
-			:m_contact(contact)
-			,m_body0(ndMin(body0, body1))
+		ndContactPairs(ndUnsigned32 body0, ndUnsigned32 body1)
+			:m_body0(ndMin(body0, body1))
 			,m_body1(ndMax(body0, body1))
 		{
 		}
 
 		ndUnsigned32 m_body0;
 		ndUnsigned32 m_body1;
-		ndContact* m_contact;
 	};
 #endif
 	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
