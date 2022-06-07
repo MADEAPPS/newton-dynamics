@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-//#define D_NEW_SCENE
+#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
@@ -199,7 +199,8 @@ class ndScene : public ndThreadPool
 	ndList<ndBodyKinematic*> m_specialUpdateList;
 	ndThreadBackgroundWorker m_backgroundThread;
 #ifdef D_NEW_SCENE
-	ndArray<ndContactPairs> m_particalNewPairs[D_MAX_THREADS_COUNT];
+	ndArray<ndContactPairs> m_newPairs;
+	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
 #endif
 
 	ndSpinLock m_lock;

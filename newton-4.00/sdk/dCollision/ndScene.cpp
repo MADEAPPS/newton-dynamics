@@ -122,7 +122,7 @@ ndScene::ndScene()
 	#ifdef D_NEW_SCENE
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 	{
-		m_particalNewPairs[i].Resize(256);
+		m_partialNewPairs[i].Resize(256);
 	}
 	#endif	
 }
@@ -136,6 +136,7 @@ ndScene::ndScene(const ndScene& src)
 	,m_activeConstraintArray()
 	,m_specialUpdateList()
 	,m_backgroundThread()
+	,m_newPairs(1024)
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
@@ -185,7 +186,7 @@ ndScene::ndScene(const ndScene& src)
 	#ifdef D_NEW_SCENE
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 	{
-		m_particalNewPairs[i].Resize(256);
+		m_partialNewPairs[i].Resize(256);
 	}
 	#endif	
 }
@@ -1611,17 +1612,43 @@ void ndScene::FindCollidingPairs()
 	#ifdef D_NEW_SCENE
 	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
 	{
-		m_particalNewPairs[i].SetCount(0);
+		m_partialNewPairs[i].SetCount(0);
 	}
 	#endif	
 
+	const ndInt32 threadCount = GetThreadCount();
 	const ndArray<ndBodyKinematic*>& activeBodies = GetActiveBodyArray();
-	bool fullScan = (2 * m_sceneBodyArray.GetCount()) > activeBodies.GetCount();
+	const bool fullScan = (2 * m_sceneBodyArray.GetCount()) > activeBodies.GetCount();
 	if (fullScan)
 	{
 		ParallelExecute(FindPairs);
 		#ifdef D_NEW_SCENE
-			dAssert(0);
+		ndUnsigned32 sum = 0;
+		ndUnsigned32 scanCounts[D_MAX_THREADS_COUNT + 1];
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
+			scanCounts[i] = sum;
+			sum += newPairs.GetCount();
+		}
+		scanCounts[threadCount] = sum;
+		m_newPairs.SetCount(sum);
+
+		auto CopyPartialCounts = ndMakeObject::ndFunction([this, &scanCounts](ndInt32 threadIndex, ndInt32)
+		{
+			D_TRACKTIME();
+			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
+
+			const ndUnsigned32 count = m_newPairs.GetCount();
+			const ndUnsigned32 start = scanCounts[threadIndex];
+			dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
+			for (ndUnsigned32 i = 0; i < count; ++i)
+			{
+				m_newPairs[start + i] = newPairs[i];
+			}
+		});
+		ParallelExecute(CopyPartialCounts);
+
 		#endif	
 	}
 	else
@@ -1630,7 +1657,80 @@ void ndScene::FindCollidingPairs()
 		ParallelExecute(FindPairsBackward);
 
 		#ifdef D_NEW_SCENE
-		dAssert(0);
+		ndUnsigned32 sum = 0;
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			sum += m_partialNewPairs[i].GetCount();
+		}
+		m_newPairs.SetCount(sum);
+
+		sum = 0;
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
+			const ndUnsigned32 count = newPairs.GetCount();
+			for (ndUnsigned32 j = 0; j < count; ++j)
+			{
+				m_newPairs[sum + j] = newPairs[j];
+			}
+			sum += count;
+		}
+
+		if (sum)
+		{
+			class CompareKey
+			{
+				public:
+				int Compare(const ndContactPairs& a, const ndContactPairs& b, void*) const
+				{
+					union Key
+					{
+						ndUnsigned64 m_key;
+						struct 
+						{
+							ndUnsigned32 m_low;
+							ndUnsigned32 m_high;
+						};
+					};
+
+					Key keyA;
+					Key keyB;
+					keyA.m_low = a.m_body0;
+					keyA.m_high = a.m_body1;
+					keyB.m_low = b.m_body0;
+					keyB.m_high = b.m_body1;
+
+					if (keyA.m_key < keyB.m_key)
+					{
+						return -1;
+					}
+					else if (keyA.m_key > keyB.m_key)
+					{
+						return 1;
+					}
+					return 0;
+				}
+			};
+			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], sum, nullptr);
+
+			CompareKey comparator;
+			for (ndInt32 i = sum - 2; i >= 0; i--)
+			{
+				if (comparator.Compare(m_newPairs[i], m_newPairs[i + 1], nullptr) == 0)
+				{
+					sum --;
+					m_newPairs[i] = m_newPairs[sum];
+				}
+			}
+			m_newPairs.SetCount(sum);
+
+			#ifdef _DEBUG
+			for (ndInt32 i = 1; i < m_newPairs.GetCount(); ++i)
+			{
+				dAssert(comparator.Compare(m_newPairs[i], m_newPairs[i - 1], nullptr));
+			}
+			#endif	
+		}
 		#endif	
 	}
 }
@@ -2322,315 +2422,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 
 #else
 
-#if 0
-void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId)
-{
-	ndArray<ndContactPairs>& particalPairs = m_particalNewPairs[threadId];
-	ndContactPairs pair(body0->m_index, body1->m_index);
-	particalPairs.PushBack(pair);
-}
-
-void ndScene::CalculateContacts()
-{
-	D_TRACKTIME();
-	enum ndPairGroup
-	{
-		m_existingJoint,
-		m_newJoint,
-		m_deadJoint,
-		m_duplicateJoint,
-	};
-
-	class ndJointBody0_x
-	{
-		public:
-		ndJointBody0_x(void* const)
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndContactPairs& pair) const
-		{
-			const ndUnsigned32 key = pair.m_body0 & 0xff;
-			return key;
-		}
-	};
-
-	class ndJointBody0_y
-	{
-		public:
-		ndJointBody0_y(void* const)
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndContactPairs& pair) const
-		{
-			const ndUnsigned32 key = (pair.m_body0 >> 8) & 0xff;
-			return key;
-		}
-	};
-
-	class ndJointBody1_x
-	{
-		public:
-		ndJointBody1_x(void* const)
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndContactPairs& pair) const
-		{
-			const ndUnsigned32 key = pair.m_body1 & 0xff;
-			return key;
-		}
-	};
-
-	class ndJointBody1_y
-	{
-		public:
-		ndJointBody1_y(void* const)
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndContactPairs& pair) const
-		{
-			const ndUnsigned32 key = (pair.m_body1 >> 8) & 0xff;
-			return key;
-		}
-	};
-
-	class ndJointClassify
-	{
-		public:
-		ndJointClassify(void* const scene)
-			:m_scene((ndScene*)scene)
-			,m_bodyArray(&m_scene->GetActiveBodyArray()[0])
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndContactPairs& pair) const
-		{
-			const ndContactPairs* const ptr = &pair;
-
-			if ((pair.m_body0 == ptr[1].m_body0) && (pair.m_body1 == ptr[1].m_body1))
-			{
-				dAssert(!pair.m_contact);
-				return m_duplicateJoint;
-			}
-			else if (!pair.m_contact)
-			{
-				ndBodyKinematic* const body0 = m_bodyArray[pair.m_body0];
-				ndBodyKinematic* const body1 = m_bodyArray[pair.m_body1];
-				dAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
-				dAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
-				const ndJointBilateralConstraint* const bilateral = m_scene->FindBilateralJoint(body0, body1);
-				const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
-				return isCollidable ? m_newJoint : m_duplicateJoint;
-			}
-
-			return pair.m_contact->m_isDead ? m_deadJoint : m_existingJoint;
-		}
-
-		ndScene* m_scene;
-		ndBodyKinematic** m_bodyArray;
-	};
-
-	class ndJointActive
-	{
-		public:
-		ndJointActive(void* const scene)
-			:m_scene((ndScene*)scene)
-			,m_bodyArray(&m_scene->GetActiveBodyArray()[0])
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndContactPairs& pair) const
-		{
-			const bool inactive = !pair.m_contact->IsActive() | !pair.m_contact->m_maxDOF;
-			return inactive ? 1 : 0;
-		}
-
-		ndScene* m_scene;
-		ndBodyKinematic** m_bodyArray;
-	};
-
-	ndInt32 newContactCount = 0;
-	const ndInt32 threadCount = GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		newContactCount += m_particalNewPairs[i].GetCount();
-	}
-
-	ndInt32 contactCount = m_contactArray.GetCount();
-	m_scratchBuffer.SetCount((2 * (contactCount + newContactCount) + 16) * sizeof(ndContactPairs));
-
-	ndContactPairs* srcPtr = (ndContactPairs*)&m_scratchBuffer[0];
-	ndContactPairs* dstPtr = &srcPtr[contactCount + newContactCount + 8];
-	
-	ndUnsigned32 scanCounts[D_MAX_THREADS_COUNT + 1];
-
-	auto CopyPartialCounts = ndMakeObject::ndFunction([this, srcPtr, &scanCounts](ndInt32 threadIndex, ndInt32)
-	{
-		D_TRACKTIME();
-		const ndArray<ndContactPairs>& newPairs = m_particalNewPairs[threadIndex];
-
-		const ndUnsigned32 start = scanCounts[threadIndex];
-		dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32 (newPairs.GetCount()));
-		for (ndInt32 i = 0; i < newPairs.GetCount(); ++i)
-		{
-			srcPtr[start + i] = newPairs[i];
-		}
-	});
-
-	ndUnsigned32 sum = 0;
-	auto CopyContactArray = ndMakeObject::ndFunction([this, srcPtr, &sum](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		ndContact** const contactArray = &m_contactArray[0];
-		const ndUnsigned32 count = m_contactArray.GetCount();
-		const ndUnsigned32 start = sum;
-		const ndStartEnd startEnd(count, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndContact* const contact = contactArray[i];
-			ndInt32 i0 = contact->m_body0->m_index;
-			ndInt32 i1 = contact->m_body1->m_index;
-			srcPtr[start + i] = ndContactPairs(i0, i1, contact);
-		}
-	});
-
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		const ndArray<ndContactPairs>& newPairs = m_particalNewPairs[i];
-		scanCounts[i] = sum;
-		sum += newPairs.GetCount();
-	}
-	scanCounts[threadCount] = sum;
-	ParallelExecute(CopyPartialCounts);
-	if (contactCount)
-	{
-		ParallelExecute(CopyContactArray);
-	}
-
-	contactCount += sum;
-	srcPtr[contactCount] = ndContactPairs(0x7fffffff, 0x7fffffff);
-	dstPtr[contactCount] = ndContactPairs(0x7fffffff, 0x7fffffff);
-
-	ndUnsigned32 prefixScan[8];
-	//memset(prefixScan, 0, sizeof(prefixScan));
-
-	ndCountingSort<ndContactPairs, ndJointBody0_x, 8>(*this, srcPtr, dstPtr, contactCount, nullptr, nullptr);
-	ndSwap(srcPtr, dstPtr);
-
-	ndCountingSort<ndContactPairs, ndJointBody0_y, 8>(*this, srcPtr, dstPtr, contactCount, nullptr, nullptr);
-	ndSwap(srcPtr, dstPtr);
-
-	ndCountingSort<ndContactPairs, ndJointBody1_x, 8>(*this, srcPtr, dstPtr, contactCount, nullptr, nullptr);
-	ndSwap(srcPtr, dstPtr);
-
-	ndCountingSort<ndContactPairs, ndJointBody1_y, 8>(*this, srcPtr, dstPtr, contactCount, nullptr, nullptr);
-	ndSwap(srcPtr, dstPtr);
-
-	ndCountingSort<ndContactPairs, ndJointClassify, 2>(*this, srcPtr, dstPtr, contactCount, prefixScan, this);
-	ndSwap(srcPtr, dstPtr);
-
-	if (prefixScan[m_deadJoint + 1] > prefixScan[m_deadJoint])
-	{	
-		// delete dead joints;
-		auto DeleteContactArray = ndMakeObject::ndFunction([this, srcPtr, &prefixScan](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			const ndUnsigned32 start = prefixScan[m_deadJoint];
-			const ndUnsigned32 count = prefixScan[m_deadJoint + 1] - start;
-
-			const ndStartEnd startEnd(count, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContactPairs& pair = srcPtr[start + i];
-				dAssert(pair.m_contact);
-				dAssert(pair.m_contact->m_isDead);
-				if (pair.m_contact->m_isAttached)
-				{
-					pair.m_contact->DetachFromBodies();
-				}
-				pair.m_contact->m_isDead = 1;
-				delete pair.m_contact;
-			}
-		});
-		ParallelExecute(DeleteContactArray);
-	}
-
-	if (prefixScan[m_newJoint + 1] > prefixScan[m_newJoint])
-	{
-		// create new joints;
-		auto CreateContact = ndMakeObject::ndFunction([this, srcPtr, &prefixScan](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
-
-			const ndUnsigned32 start = prefixScan[m_newJoint];
-			const ndUnsigned32 count = prefixScan[m_newJoint + 1] - start;
-
-			const ndStartEnd startEnd(count, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContactPairs& pair = srcPtr[start + i];
-				ndBodyKinematic* const body0 = bodyArray[pair.m_body0];
-				ndBodyKinematic* const body1 = bodyArray[pair.m_body1];
-				dAssert(!pair.m_contact);
-				dAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
-				dAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
-
-				pair.m_contact = new ndContact;
-				pair.m_contact->SetBodies(body0, body1);
-				pair.m_contact->AttachToBodies();
-
-				dAssert(pair.m_contact->m_body0->GetInvMass() != ndFloat32(0.0f));
-				pair.m_contact->m_material = m_contactNotifyCallback->GetMaterial(pair.m_contact, body0->GetCollisionShape(), body1->GetCollisionShape());
-			}
-		});
-		ParallelExecute(CreateContact);
-	}
-
-	if (prefixScan[m_newJoint + 1])
-	{
-		// calculate joint contacts;
-		m_contactArray.SetCount(prefixScan[m_newJoint + 1]);
-		auto CalculateContactPoints = ndMakeObject::ndFunction([this, srcPtr, &prefixScan](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME();
-			const ndUnsigned32 jointCount = prefixScan[m_newJoint + 1];
-
-			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContactPairs& pair = srcPtr[i];
-				dAssert(pair.m_contact);
-				CalculateContacts(threadIndex, pair.m_contact);
-				m_contactArray[i] = pair.m_contact;
-			}
-		});
-		ParallelExecute(CalculateContactPoints);
-
-		ndCountingSort<ndContactPairs, ndJointActive, 1>(*this, srcPtr, dstPtr, m_contactArray.GetCount(), prefixScan, this);
-		ndSwap(srcPtr, dstPtr);
-
-		m_activeConstraintArray.SetCount(prefixScan[1]);
-		auto CopyActiveContact = ndMakeObject::ndFunction([this, srcPtr, &prefixScan](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			const ndUnsigned32 activeJointCount = prefixScan[1];
-			ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
-			const ndStartEnd startEnd(activeJointCount, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContactPairs& pair = srcPtr[i];
-				activeConstraintArray[i] = pair.m_contact;
-			}
-		});
-		ParallelExecute(CopyActiveContact);
-	}
-}
-
-#else
-
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId)
 {
 	const ndBodyKinematic::ndContactMap& contactMap0 = body0->GetContactMap();
@@ -2644,16 +2435,8 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable)
 		{
-			ndArray<ndContactPairs>& particalPairs = m_particalNewPairs[threadId];
+			ndArray<ndContactPairs>& particalPairs = m_partialNewPairs[threadId];
 			ndContactPairs pair(body0->m_index, body1->m_index);
-
-int xxx0 = body0->m_uniqueId;
-int xxx1 = body1->m_uniqueId;
-if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
-{
-	dAssert(0);
-}
-
 			particalPairs.PushBack(pair);
 		}
 	}
@@ -2662,51 +2445,25 @@ if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
 void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
-	ndInt32 newContactCount = 0;
-	const ndInt32 threadCount = GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		newContactCount += m_particalNewPairs[i].GetCount();
-	}
-
 	ndInt32 contactCount = m_contactArray.GetCount();
-	m_scratchBuffer.SetCount((contactCount + newContactCount + 16) * sizeof(ndContact*));
+	m_scratchBuffer.SetCount((contactCount + m_newPairs.GetCount() + 16) * sizeof(ndContact*));
 
 	ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
-
-	ndUnsigned32 sum = 0;
-	ndUnsigned32 scanCounts[D_MAX_THREADS_COUNT + 1];
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		const ndArray<ndContactPairs>& newPairs = m_particalNewPairs[i];
-		scanCounts[i] = sum;
-		sum += newPairs.GetCount();
-	}
-	scanCounts[threadCount] = sum;
 	
-	auto CopyPartialCounts = ndMakeObject::ndFunction([this, tmpJointsArray, &scanCounts](ndInt32 threadIndex, ndInt32)
+	auto CreateNewContacts = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndContactPairs>& newPairs = m_particalNewPairs[threadIndex];
+		const ndArray<ndContactPairs>& newPairs = m_newPairs;
 		ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
 
 		const ndUnsigned32 count = newPairs.GetCount();
-		const ndUnsigned32 start = scanCounts[threadIndex];
-		dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
-		for (ndUnsigned32 i = 0; i < count; ++i)
+		const ndStartEnd startEnd(count, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const ndContactPairs& pair = newPairs[i];
 
 			ndBodyKinematic* const body0 = bodyArray[pair.m_body0];
 			ndBodyKinematic* const body1 = bodyArray[pair.m_body1];
-
-int xxx0 = body0->m_uniqueId;
-int xxx1 = body1->m_uniqueId;
-if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
-{
-	dAssert(0);
-}
-
 			dAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
 			dAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
 	
@@ -2716,16 +2473,16 @@ if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
 	
 			dAssert(contact->m_body0->GetInvMass() != ndFloat32(0.0f));
 			contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
-			tmpJointsArray[start + i] = contact;
+			tmpJointsArray[i] = contact;
 		}
 	});
 	
-	auto CopyContactArray = ndMakeObject::ndFunction([this, tmpJointsArray, &sum](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CopyContactArray = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		ndContact** const contactArray = &m_contactArray[0];
 
-		const ndUnsigned32 start = sum;
+		const ndUnsigned32 start = m_newPairs.GetCount();
 		const ndUnsigned32 count = m_contactArray.GetCount();
 		
 		const ndStartEnd startEnd(count, threadIndex, threadCount);
@@ -2736,13 +2493,13 @@ if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
 		}
 	});
 	
-	ParallelExecute(CopyPartialCounts);
+	ParallelExecute(CreateNewContacts);
 	if (contactCount)
 	{
 		ParallelExecute(CopyContactArray);
 	}
 
-	m_contactArray.SetCount(contactCount + sum);
+	m_contactArray.SetCount(contactCount + m_newPairs.GetCount());
 	if (m_contactArray.GetCount())
 	{
 		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray, &contactCount](ndInt32 threadIndex, ndInt32 threadCount)
@@ -2807,14 +2564,6 @@ if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndContact* const contact = contactArray[start + i];
-
-					int xxx0 = contact->m_body0->m_uniqueId;
-					int xxx1 = contact->m_body1->m_uniqueId;
-					if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
-					{
-						dAssert(0);
-					}
-
 					dAssert(contact->m_isDead);
 					if (contact->m_isAttached)
 					{
@@ -2848,7 +2597,5 @@ if (((xxx0 == 29) && (xxx1 == 10)) || ((xxx0 == 10) && (xxx1 == 29)))
 		}
 	}
 }
-
-#endif
 
 #endif
