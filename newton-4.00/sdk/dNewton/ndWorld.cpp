@@ -981,7 +981,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 		}
 
 		#ifdef _DEBUG
-		for (ndBodyList::ndNode* node = m_scene->m_bodyList.GetFirst(); node; node = node->GetNext())
+		for (ndBodyList::ndNode* node = m_scene->GetBodyList().GetFirst(); node; node = node->GetNext())
 		{
 			ndBodyKinematic* const body = node->GetInfo();
 			dAssert(body->GetContactMap().SanityCheck());

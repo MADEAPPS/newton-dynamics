@@ -117,14 +117,15 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API void SendBackgroundTask(ndBackgroundTask* const job);
 
 	ndInt32 GetThreadCount() const;
+
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
 
-	ndArray<ndConstraint*>& GetActiveContactArray();
-	const ndArray<ndConstraint*>& GetActiveContactArray() const;
-
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
+
+	ndArray<ndConstraint*>& GetActiveContactArray();
+	const ndArray<ndConstraint*>& GetActiveContactArray() const;
 
 	ndArray<ndUnsigned8>& GetScratchBuffer();
 

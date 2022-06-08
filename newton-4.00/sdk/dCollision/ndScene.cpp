@@ -1438,89 +1438,6 @@ void ndScene::UpdateBodyList()
 	}
 }
 
-void ndScene::InitBodyArray()
-{
-	D_TRACKTIME();
-	ndInt32 scans[D_MAX_THREADS_COUNT][2];
-	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-		
-		ndInt32* const scan = &scans[threadIndex][0];
-		scan[0] = 0;
-		scan[1] = 0;
-		
-		const ndFloat32 timestep = m_timestep;
-		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = view[i];
-			body->ApplyExternalForces(threadIndex, timestep);
-
-			body->PrepareStep(i);
-			UpdateAabb(threadIndex, body);
-
-			const ndInt32 key = body->m_sceneEquilibrium;
-			scan[key] ++;
-		}
-	});
-
-	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
-		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
-
-		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
-		ndInt32* const scan = &scans[threadIndex][0];
-
-		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = activeBodyArray[i];
-			const ndInt32 key = body->m_sceneEquilibrium;
-			const ndInt32 index = scan[key];
-			sceneBodyArray[index] = body;
-			scan[key] ++;
-		}
-	});
-
-	ParallelExecute(BuildBodyArray);
-	ndInt32 sum = 0;
-	ndInt32 threadCount = GetThreadCount();
-	for (ndInt32 j = 0; j < 2; ++j)
-	{
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			const ndInt32 count = scans[i][j];
-			scans[i][j] = sum;
-			sum += count;
-		}
-	}
-
-	ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
-	m_sceneBodyArray.SetCount(m_bodyList.GetCount());
-	if (movingBodyCount)
-	{
-		ParallelExecute(CompactMovingBodies);
-	}
-
-	m_sceneBodyArray.SetCount(movingBodyCount);
-
-	ndBodyKinematic* const sentinelBody = m_sentinelBody;
-	sentinelBody->PrepareStep(GetActiveBodyArray().GetCount() - 1);
-
-	sentinelBody->m_isStatic = 1;
-	sentinelBody->m_autoSleep = 1;
-	sentinelBody->m_equilibrium = 1;
-	sentinelBody->m_equilibrium0 = 1;
-	sentinelBody->m_isJointFence0 = 1;
-	sentinelBody->m_isJointFence1 = 1;
-	sentinelBody->m_isConstrained = 0;
-	sentinelBody->m_sceneEquilibrium = 1;
-	sentinelBody->m_weigh = ndFloat32(0.0f);
-}
 
 void ndScene::FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId)
 {
@@ -1563,168 +1480,6 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 th
 		if (sibling != ptr)
 		{
 			SubmitPairs(bodyNode, sibling, threadId);
-		}
-	}
-}
-
-void ndScene::FindCollidingPairs()
-{
-	D_TRACKTIME();
-	auto FindPairs = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
-		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			FindCollidingPairs(body, threadIndex);
-		}
-	});
-
-	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			FindCollidingPairsForward(body, threadIndex);
-		}
-	});
-
-	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
-		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			FindCollidingPairsBackward(body, threadIndex);
-		}
-	});
-
-	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
-	{
-		m_partialNewPairs[i].SetCount(0);
-	}
-
-	const ndInt32 threadCount = GetThreadCount();
-	const ndArray<ndBodyKinematic*>& activeBodies = GetActiveBodyArray();
-	const bool fullScan = (2 * m_sceneBodyArray.GetCount()) > activeBodies.GetCount();
-	if (fullScan)
-	{
-		ParallelExecute(FindPairs);
-
-		ndUnsigned32 sum = 0;
-		ndUnsigned32 scanCounts[D_MAX_THREADS_COUNT + 1];
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
-			scanCounts[i] = sum;
-			sum += newPairs.GetCount();
-		}
-		scanCounts[threadCount] = sum;
-		m_newPairs.SetCount(sum);
-
-		if (sum)
-		{
-			auto CopyPartialCounts = ndMakeObject::ndFunction([this, &scanCounts](ndInt32 threadIndex, ndInt32)
-			{
-				D_TRACKTIME();
-				const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
-
-				const ndUnsigned32 count = newPairs.GetCount();
-				const ndUnsigned32 start = scanCounts[threadIndex];
-				dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
-				for (ndUnsigned32 i = 0; i < count; ++i)
-				{
-					m_newPairs[start + i] = newPairs[i];
-				}
-			});
-			ParallelExecute(CopyPartialCounts);
-		}
-	}
-	else
-	{
-		ParallelExecute(FindPairsForward);
-		ParallelExecute(FindPairsBackward);
-
-		ndUnsigned32 sum = 0;
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			sum += m_partialNewPairs[i].GetCount();
-		}
-		m_newPairs.SetCount(sum);
-
-		sum = 0;
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
-			const ndUnsigned32 count = newPairs.GetCount();
-			for (ndUnsigned32 j = 0; j < count; ++j)
-			{
-				m_newPairs[sum + j] = newPairs[j];
-			}
-			sum += count;
-		}
-
-		if (sum)
-		{
-			class CompareKey
-			{
-				public:
-				int Compare(const ndContactPairs& a, const ndContactPairs& b, void*) const
-				{
-					union Key
-					{
-						ndUnsigned64 m_key;
-						struct 
-						{
-							ndUnsigned32 m_low;
-							ndUnsigned32 m_high;
-						};
-					};
-
-					Key keyA;
-					Key keyB;
-					keyA.m_low = a.m_body0;
-					keyA.m_high = a.m_body1;
-					keyB.m_low = b.m_body0;
-					keyB.m_high = b.m_body1;
-
-					if (keyA.m_key < keyB.m_key)
-					{
-						return -1;
-					}
-					else if (keyA.m_key > keyB.m_key)
-					{
-						return 1;
-					}
-					return 0;
-				}
-			};
-			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], sum, nullptr);
-
-			CompareKey comparator;
-			for (ndInt32 i = sum - 2; i >= 0; i--)
-			{
-				if (comparator.Compare(m_newPairs[i], m_newPairs[i + 1], nullptr) == 0)
-				{
-					sum --;
-					m_newPairs[i] = m_newPairs[sum];
-				}
-			}
-			m_newPairs.SetCount(sum);
-
-			#ifdef _DEBUG
-			for (ndInt32 i = 1; i < m_newPairs.GetCount(); ++i)
-			{
-				dAssert(comparator.Compare(m_newPairs[i], m_newPairs[i - 1], nullptr));
-			}
-			#endif	
 		}
 	}
 }
@@ -2461,4 +2216,251 @@ void ndScene::CalculateContacts()
 			ParallelExecute(CopyActiveContact);
 		}
 	}
+}
+
+void ndScene::FindCollidingPairs()
+{
+	D_TRACKTIME();
+	auto FindPairs = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			FindCollidingPairs(body, threadIndex);
+		}
+	});
+
+	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			FindCollidingPairsForward(body, threadIndex);
+		}
+	});
+
+	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
+		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			FindCollidingPairsBackward(body, threadIndex);
+		}
+	});
+
+	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
+	{
+		m_partialNewPairs[i].SetCount(0);
+	}
+
+	const ndInt32 threadCount = GetThreadCount();
+	const ndArray<ndBodyKinematic*>& activeBodies = GetActiveBodyArray();
+	const bool fullScan = (2 * m_sceneBodyArray.GetCount()) > activeBodies.GetCount();
+	if (fullScan)
+	{
+		ParallelExecute(FindPairs);
+
+		ndUnsigned32 sum = 0;
+		ndUnsigned32 scanCounts[D_MAX_THREADS_COUNT + 1];
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
+			scanCounts[i] = sum;
+			sum += newPairs.GetCount();
+		}
+		scanCounts[threadCount] = sum;
+		m_newPairs.SetCount(sum);
+
+		if (sum)
+		{
+			auto CopyPartialCounts = ndMakeObject::ndFunction([this, &scanCounts](ndInt32 threadIndex, ndInt32)
+			{
+				D_TRACKTIME();
+				const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
+
+				const ndUnsigned32 count = newPairs.GetCount();
+				const ndUnsigned32 start = scanCounts[threadIndex];
+				dAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
+				for (ndUnsigned32 i = 0; i < count; ++i)
+				{
+					m_newPairs[start + i] = newPairs[i];
+				}
+			});
+			ParallelExecute(CopyPartialCounts);
+		}
+	}
+	else
+	{
+		ParallelExecute(FindPairsForward);
+		ParallelExecute(FindPairsBackward);
+
+		ndUnsigned32 sum = 0;
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			sum += m_partialNewPairs[i].GetCount();
+		}
+		m_newPairs.SetCount(sum);
+
+		sum = 0;
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
+			const ndUnsigned32 count = newPairs.GetCount();
+			for (ndUnsigned32 j = 0; j < count; ++j)
+			{
+				m_newPairs[sum + j] = newPairs[j];
+			}
+			sum += count;
+		}
+
+		if (sum)
+		{
+			class CompareKey
+			{
+			public:
+				int Compare(const ndContactPairs& a, const ndContactPairs& b, void*) const
+				{
+					union Key
+					{
+						ndUnsigned64 m_key;
+						struct
+						{
+							ndUnsigned32 m_low;
+							ndUnsigned32 m_high;
+						};
+					};
+
+					Key keyA;
+					Key keyB;
+					keyA.m_low = a.m_body0;
+					keyA.m_high = a.m_body1;
+					keyB.m_low = b.m_body0;
+					keyB.m_high = b.m_body1;
+
+					if (keyA.m_key < keyB.m_key)
+					{
+						return -1;
+					}
+					else if (keyA.m_key > keyB.m_key)
+					{
+						return 1;
+					}
+					return 0;
+				}
+			};
+			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], sum, nullptr);
+
+			CompareKey comparator;
+			for (ndInt32 i = sum - 2; i >= 0; i--)
+			{
+				if (comparator.Compare(m_newPairs[i], m_newPairs[i + 1], nullptr) == 0)
+				{
+					sum--;
+					m_newPairs[i] = m_newPairs[sum];
+				}
+			}
+			m_newPairs.SetCount(sum);
+
+			#ifdef _DEBUG
+			for (ndInt32 i = 1; i < m_newPairs.GetCount(); ++i)
+			{
+				dAssert(comparator.Compare(m_newPairs[i], m_newPairs[i - 1], nullptr));
+			}
+			#endif	
+		}
+	}
+}
+
+void ndScene::InitBodyArray()
+{
+	D_TRACKTIME();
+	ndInt32 scans[D_MAX_THREADS_COUNT][2];
+	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+
+		ndInt32* const scan = &scans[threadIndex][0];
+		scan[0] = 0;
+		scan[1] = 0;
+
+		const ndFloat32 timestep = m_timestep;
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = view[i];
+			body->ApplyExternalForces(threadIndex, timestep);
+
+			body->PrepareStep(i);
+			UpdateAabb(threadIndex, body);
+
+			const ndInt32 key = body->m_sceneEquilibrium;
+			scan[key] ++;
+		}
+	});
+
+	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
+		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
+		
+		//const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		ndInt32* const scan = &scans[threadIndex][0];
+
+		//const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		const ndStartEnd startEnd(activeBodyArray.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = activeBodyArray[i];
+			const ndInt32 key = body->m_sceneEquilibrium;
+			const ndInt32 index = scan[key];
+			sceneBodyArray[index] = body;
+			scan[key] ++;
+		}
+	});
+
+	ParallelExecute(BuildBodyArray);
+	ndInt32 sum = 0;
+	ndInt32 threadCount = GetThreadCount();
+	for (ndInt32 j = 0; j < 2; ++j)
+	{
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			const ndInt32 count = scans[i][j];
+			scans[i][j] = sum;
+			sum += count;
+		}
+	}
+
+	ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
+	m_sceneBodyArray.SetCount(m_bodyList.GetCount());
+	if (movingBodyCount)
+	{
+		ParallelExecute(CompactMovingBodies);
+	}
+
+	m_sceneBodyArray.SetCount(movingBodyCount);
+
+	ndBodyKinematic* const sentinelBody = m_sentinelBody;
+	sentinelBody->PrepareStep(GetActiveBodyArray().GetCount() - 1);
+
+	sentinelBody->m_isStatic = 1;
+	sentinelBody->m_autoSleep = 1;
+	sentinelBody->m_equilibrium = 1;
+	sentinelBody->m_equilibrium0 = 1;
+	sentinelBody->m_isJointFence0 = 1;
+	sentinelBody->m_isJointFence1 = 1;
+	sentinelBody->m_isConstrained = 0;
+	sentinelBody->m_sceneEquilibrium = 1;
+	sentinelBody->m_weigh = ndFloat32(0.0f);
 }
