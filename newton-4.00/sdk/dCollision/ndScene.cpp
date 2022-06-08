@@ -1410,35 +1410,6 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 	return nullptr;
 }
 
-
-void ndScene::UpdateBodyList()
-{
-	D_TRACKTIME();
-	if (m_bodyListChanged)
-	{
-		ndInt32 index = 0;
-		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-		view.SetCount(m_bodyList.GetCount());
-		for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
-		{
-			ndBodyKinematic* const body = node->GetInfo();
-			view[index] = node->GetInfo();
-			++index;
-
-			dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-			bool inScene = true;
-			if (!body->GetSceneBodyNode())
-			{
-				inScene = AddBody(body);
-			}
-			dAssert(inScene && body->GetSceneBodyNode());
-		}
-		m_bodyListChanged = 0;
-		view.PushBack(m_sentinelBody);
-	}
-}
-
-
 void ndScene::FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId)
 {
 	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
@@ -2377,6 +2348,33 @@ void ndScene::FindCollidingPairs()
 			}
 			#endif	
 		}
+	}
+}
+
+void ndScene::UpdateBodyList()
+{
+	if (m_bodyListChanged)
+	{
+		D_TRACKTIME();
+		ndInt32 index = 0;
+		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+		view.SetCount(m_bodyList.GetCount());
+		for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+		{
+			ndBodyKinematic* const body = node->GetInfo();
+			view[index] = node->GetInfo();
+			++index;
+
+			dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+			bool inScene = true;
+			if (!body->GetSceneBodyNode())
+			{
+				inScene = AddBody(body);
+			}
+			dAssert(inScene && body->GetSceneBodyNode());
+		}
+		m_bodyListChanged = 0;
+		view.PushBack(m_sentinelBody);
 	}
 }
 

@@ -38,6 +38,7 @@ ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	,ndCudaContext()
 {
 	m_bodyListChanged = 1;
+	UpdateBodyList();
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
@@ -203,30 +204,6 @@ void ndWorldSceneCuda::UpdateTransform()
 	ParallelExecute(SetTransform);
 }
 
-void ndWorldSceneCuda::UpdateBodyList()
-{
-	D_TRACKTIME();
-	bool bodyListChanged = m_bodyListChanged;
-	ndWorldScene::UpdateBodyList();
-	if (bodyListChanged)
-	{
-		LoadBodyData();
-	}
-	
-	ValidateContextBuffers();
-}
-
-void ndWorldSceneCuda::InitBodyArray()
-{
-	D_TRACKTIME();
-	ndCudaContext::InitBodyArray();
-}
-
-void ndWorldSceneCuda::FindCollidingPairs()
-{
-	D_TRACKTIME();
-	ndWorldScene::FindCollidingPairs();
-}
 
 void ndWorldSceneCuda::BalanceScene()
 {
@@ -238,4 +215,29 @@ void ndWorldSceneCuda::CalculateContacts()
 {
 	D_TRACKTIME();
 	ndWorldScene::CalculateContacts();
+}
+
+
+void ndWorldSceneCuda::UpdateBodyList()
+{
+	bool bodyListChanged = m_bodyListChanged;
+	ndWorldScene::UpdateBodyList();
+	if (bodyListChanged)
+	{
+		LoadBodyData();
+	}
+
+	ValidateContextBuffers();
+}
+
+void ndWorldSceneCuda::FindCollidingPairs()
+{
+	D_TRACKTIME();
+	ndWorldScene::FindCollidingPairs();
+}
+
+void ndWorldSceneCuda::InitBodyArray()
+{
+	ndWorldScene::InitBodyArray();
+	ndCudaContext::InitBodyArray();
 }

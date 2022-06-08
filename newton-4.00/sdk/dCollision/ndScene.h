@@ -167,16 +167,15 @@ class ndScene : public ndThreadPool
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
-	// claed from world updatee
-	D_COLLISION_API virtual void UpdateBodyList();
-	
 	// call from substeps update
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();
+	D_COLLISION_API virtual void UpdateBodyList();
 	D_COLLISION_API virtual void UpdateTransform();
 	D_COLLISION_API virtual void CalculateContacts();
 	D_COLLISION_API virtual void FindCollidingPairs();
+	
 	D_COLLISION_API virtual void ThreadFunction();
 
 	D_COLLISION_API virtual void CollisionOnlyUpdate();

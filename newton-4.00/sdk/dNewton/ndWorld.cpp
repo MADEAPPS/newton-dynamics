@@ -136,7 +136,7 @@ ndWorld::ndWorld()
 	//ndFloat32 freezeAlpha2 = m_freezeAlpha2;
 	ndFloat32 freezeSpeed2 = m_freezeSpeed2;
 	//ndFloat32 freezeOmega2 = m_freezeOmega2;
-	for (ndInt32 i = 0; i < D_SLEEP_ENTRIES; i++) 
+	for (ndInt32 i = 0; i < D_SLEEP_ENTRIES; ++i) 
 	{
 		m_sleepTable[i].m_maxAccel = freezeAccel2;
 		//m_sleepTable[i].m_maxAlpha = freezeAlpha2;
@@ -413,9 +413,8 @@ void ndWorld::ThreadFunction()
 
 		ndInt32 const steps = m_subSteps;
 		ndFloat32 timestep = m_timestep / steps;
-		for (ndInt32 i = 0; i < steps; i++)
+		for (ndInt32 i = 0; i < steps; ++i)
 		{
-			m_scene->UpdateBodyList();
 			SubStepUpdate(timestep);
 		}
 
@@ -467,6 +466,8 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
+
+	m_scene->UpdateBodyList();
 	m_scene->InitBodyArray();
 
 	// update the collision system
@@ -512,7 +513,7 @@ void ndWorld::ModelUpdate()
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		ndModelList& modelList = m_modelList;
 		ndModelList::ndNode* node = modelList.GetFirst();
-		for (ndInt32 i = 0; i < threadIndex; i++)
+		for (ndInt32 i = 0; i < threadIndex; ++i)
 		{
 			node = node ? node->GetNext() : nullptr;
 		}
@@ -522,7 +523,7 @@ void ndWorld::ModelUpdate()
 			ndModel* const model = node->GetInfo();
 			model->Update(this, timestep);
 
-			for (ndInt32 i = 0; i < threadCount; i++)
+			for (ndInt32 i = 0; i < threadCount; ++i)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
@@ -540,7 +541,7 @@ void ndWorld::ModelPostUpdate()
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		ndModelList& modelList = m_modelList;
 		ndModelList::ndNode* node = modelList.GetFirst();
-		for (ndInt32 i = 0; i < threadIndex; i++)
+		for (ndInt32 i = 0; i < threadIndex; ++i)
 		{
 			node = node ? node->GetNext() : nullptr;
 		}
@@ -550,7 +551,7 @@ void ndWorld::ModelPostUpdate()
 			ndModel* const model = node->GetInfo();
 			model->PostUpdate(this, timestep);
 
-			for (ndInt32 i = 0; i < threadCount; i++)
+			for (ndInt32 i = 0; i < threadCount; ++i)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
@@ -568,7 +569,7 @@ void ndWorld::PostModelTransform()
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		ndModelList& modelList = m_modelList;
 		ndModelList::ndNode* node = modelList.GetFirst();
-		for (ndInt32 i = 0; i < threadIndex; i++)
+		for (ndInt32 i = 0; i < threadIndex; ++i)
 		{
 			node = node ? node->GetNext() : nullptr;
 		}
@@ -578,7 +579,7 @@ void ndWorld::PostModelTransform()
 			ndModel* const model = node->GetInfo();
 			model->PostTransformUpdate(this, timestep);
 
-			for (ndInt32 i = 0; i < threadCount; i++)
+			for (ndInt32 i = 0; i < threadCount; ++i)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
@@ -659,7 +660,7 @@ void ndWorld::UpdateSkeletons()
 		ndInt32 inslandCount = 0;
 		solverUpdate.m_leftHandSide.SetCount(ndMax(bodyArray.GetCount() + 256, 1024));
 		ndIslandMember* const islands = (ndIslandMember*)&solverUpdate.m_leftHandSide[0];
-		for (ndInt32 i = 0; i < bodyArray.GetCount(); i++)
+		for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			if (body->GetInvMass() > ndFloat32(0.0f))
@@ -684,7 +685,7 @@ void ndWorld::UpdateSkeletons()
 		}
 
 		// build the root node
-		for (ndInt32 i = 0; i < inslandCount; i++)
+		for (ndInt32 i = 0; i < inslandCount; ++i)
 		{
 			ndSkeletonQueue queuePool;
 			ndInt32 stack = 1;
