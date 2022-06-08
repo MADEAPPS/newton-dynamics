@@ -104,7 +104,9 @@ ndScene::ndScene()
 	,m_activeConstraintArray(1024)
 	,m_specialUpdateList()
 	,m_backgroundThread()
+#ifdef D_NEW_SCENE
 	,m_newPairs(1024)
+#endif
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
@@ -137,7 +139,9 @@ ndScene::ndScene(const ndScene& src)
 	,m_activeConstraintArray()
 	,m_specialUpdateList()
 	,m_backgroundThread()
+#ifdef D_NEW_SCENE
 	,m_newPairs(1024)
+#endif
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_sentinelBody(nullptr)
@@ -1617,7 +1621,6 @@ void ndScene::FindCollidingPairs()
 	}
 	#endif	
 
-	const ndInt32 threadCount = GetThreadCount();
 	const ndArray<ndBodyKinematic*>& activeBodies = GetActiveBodyArray();
 	const bool fullScan = (2 * m_sceneBodyArray.GetCount()) > activeBodies.GetCount();
 	if (fullScan)
@@ -1625,6 +1628,7 @@ void ndScene::FindCollidingPairs()
 		ParallelExecute(FindPairs);
 		#ifdef D_NEW_SCENE
 		ndUnsigned32 sum = 0;
+		const ndInt32 threadCount = GetThreadCount();
 		ndUnsigned32 scanCounts[D_MAX_THREADS_COUNT + 1];
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{

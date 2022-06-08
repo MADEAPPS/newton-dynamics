@@ -27,7 +27,8 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_NEW_SCENE
+//#define D_NEW_SCENE
+
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 
@@ -140,10 +141,6 @@ class ndScene : public ndThreadPool
 
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 	ndFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
-
-	//D_COLLISION_API virtual void FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId);
-	//D_COLLISION_API virtual void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
-	//D_COLLISION_API virtual void FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 threadId);
 
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
