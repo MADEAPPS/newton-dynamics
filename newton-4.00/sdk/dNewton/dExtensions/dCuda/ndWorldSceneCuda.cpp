@@ -207,16 +207,13 @@ void ndWorldSceneCuda::UpdateTransform()
 
 void ndWorldSceneCuda::BalanceScene()
 {
-	D_TRACKTIME();
 	ndWorldScene::BalanceScene();
 }
 
 void ndWorldSceneCuda::CalculateContacts()
 {
-	D_TRACKTIME();
-	ndWorldScene::CalculateContacts();
+	//ndWorldScene::CalculateContacts();
 }
-
 
 void ndWorldSceneCuda::UpdateBodyList()
 {
@@ -232,7 +229,6 @@ void ndWorldSceneCuda::UpdateBodyList()
 
 void ndWorldSceneCuda::FindCollidingPairs()
 {
-	D_TRACKTIME();
 	ndWorldScene::FindCollidingPairs();
 }
 
