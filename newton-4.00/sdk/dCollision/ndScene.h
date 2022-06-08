@@ -61,7 +61,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndScene : public ndThreadPool
 {
 	protected:
-#ifdef D_NEW_SCENE
 	class ndContactPairs
 	{
 		public:
@@ -74,7 +73,7 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_body0;
 		ndUnsigned32 m_body1;
 	};
-#endif
+
 	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
 	{
 		public:
@@ -93,24 +92,6 @@ class ndScene : public ndThreadPool
 
 	public:
 	D_COLLISION_API virtual ~ndScene();
-
-	ndInt32 GetThreadCount() const;
-	virtual ndWorld* GetWorld() const;
-	const ndBodyList& GetBodyList() const;
-
-	ndArray<ndConstraint*>& GetActiveContactArray();
-	const ndArray<ndConstraint*>& GetActiveContactArray() const;
-
-	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
-	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
-
-	ndArray<ndUnsigned8>& GetScratchBuffer();
-
-	ndFloat32 GetTimestep() const;
-	void SetTimestep(ndFloat32 timestep);
-
-	ndBodyKinematic* GetSentinelBody() const;
-
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
@@ -134,6 +115,22 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	D_COLLISION_API void SendBackgroundTask(ndBackgroundTask* const job);
+
+	ndInt32 GetThreadCount() const;
+	virtual ndWorld* GetWorld() const;
+	const ndBodyList& GetBodyList() const;
+
+	ndArray<ndConstraint*>& GetActiveContactArray();
+	const ndArray<ndConstraint*>& GetActiveContactArray() const;
+
+	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
+	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
+
+	ndArray<ndUnsigned8>& GetScratchBuffer();
+
+	ndFloat32 GetTimestep() const;
+	void SetTimestep(ndFloat32 timestep);
+	ndBodyKinematic* GetSentinelBody() const;
 
 	protected:
 	D_COLLISION_API ndScene();
@@ -194,10 +191,8 @@ class ndScene : public ndThreadPool
 	ndArray<ndConstraint*> m_activeConstraintArray;
 	ndList<ndBodyKinematic*> m_specialUpdateList;
 	ndThreadBackgroundWorker m_backgroundThread;
-#ifdef D_NEW_SCENE
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
-#endif
 
 	ndSpinLock m_lock;
 	ndSceneNode* m_rootNode;
