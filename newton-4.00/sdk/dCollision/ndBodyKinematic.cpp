@@ -371,7 +371,7 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 	ndScene* const scene = GetScene();
 	if (scene)
 	{
-		scene->UpdateAabb(0, this);
+		scene->UpdateAabb(this);
 	}
 }
 

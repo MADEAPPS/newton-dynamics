@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-//#define D_NEW_SCENE
+#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
@@ -179,7 +179,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void ThreadFunction();
 
 	D_COLLISION_API virtual void CollisionOnlyUpdate();
-	D_COLLISION_API virtual void UpdateAabb(ndInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateAabb(ndBodyKinematic* const body);
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 

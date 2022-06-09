@@ -991,8 +991,57 @@ void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const 
 	}
 }
 
-#if 1
-void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
+#ifdef D_NEW_SCENE
+
+void ndScene::UpdateAabb(ndBodyKinematic* const body)
+{
+	D_TRACKTIME();
+	ndUnsigned8 sceneEquilibrium = 1;
+	ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
+	if (!body->m_equilibrium | sceneForceUpdate)
+	{
+		D_TRACKTIME();
+		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+		dAssert(!bodyNode->GetLeft());
+		dAssert(!bodyNode->GetRight());
+		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+		body->UpdateCollisionMatrix();
+		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+		if (!test)
+		{
+			bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
+			if (!m_rootNode->GetAsSceneBodyNode())
+			{
+				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				dAssert(root == nullptr);
+				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
+				{
+					ndVector minBox;
+					ndVector maxBox;
+
+					ndScopeSpinLock lock(parent->m_lock);
+					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					{
+						break;
+					}
+					ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
+					parent->m_surfaceArea = area;
+				}
+			}
+		}
+		sceneEquilibrium = !sceneForceUpdate & (test != 0);
+	}
+
+	body->m_sceneForceUpdate = 0;
+	body->m_sceneEquilibrium = sceneEquilibrium;
+}
+
+#else
+
+void ndScene::UpdateAabb(ndBodyKinematic* const body)
 {
 	if (!body->m_equilibrium | body->m_sceneForceUpdate)
 	{
@@ -1036,52 +1085,6 @@ void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
 	}
 }
 
-#else
-
-void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
-{
-	D_TRACKTIME();
-	ndUnsigned8 sceneEquilibrium = 1;
-	if (!body->m_equilibrium | body->m_sceneForceUpdate)
-	{
-		D_TRACKTIME();
-		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
-		body->UpdateCollisionMatrix();
-
-		dAssert(!bodyNode->GetLeft());
-		dAssert(!bodyNode->GetRight());
-		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-
-		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
-		if (!test)
-		{
-			bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
-			if (!m_rootNode->GetAsSceneBodyNode())
-			{
-				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-				dAssert(root == nullptr);
-				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
-				{
-					ndScopeSpinLock lock(parent->m_lock);
-					ndVector minBox;
-					ndVector maxBox;
-					ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
-					{
-						break;
-					}
-					parent->m_minBox = minBox;
-					parent->m_maxBox = maxBox;
-					parent->m_surfaceArea = area;
-				}
-			}
-		}
-		sceneEquilibrium = (test != 0);
-	}
-	dAssert(sceneEquilibrium);
-	body->m_sceneForceUpdate = 0;
-	body->m_sceneEquilibrium = sceneEquilibrium;
-}
 #endif
 
 bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& timestep) const
@@ -2442,17 +2445,19 @@ void ndScene::InitBodyArray()
 
 		const ndFloat32 timestep = m_timestep;
 		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = view[i];
 			body->ApplyExternalForces(threadIndex, timestep);
 
 			body->PrepareStep(i);
-			UpdateAabb(threadIndex, body);
-
+			UpdateAabb(body);
 			const ndInt32 key = body->m_sceneEquilibrium;
 			scan[key] ++;
 		}
+
+		//dTrace(("%d %d\n", startEnd.m_end, scan[1]));
 	});
 
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)

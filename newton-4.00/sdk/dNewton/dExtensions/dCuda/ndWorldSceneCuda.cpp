@@ -38,7 +38,6 @@ ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	,ndCudaContext()
 {
 	m_bodyListChanged = 1;
-	UpdateBodyList();
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
@@ -207,6 +206,10 @@ void ndWorldSceneCuda::UpdateTransform()
 
 void ndWorldSceneCuda::BalanceScene()
 {
+	if (m_bodyListChanged)
+	{
+		UpdateBodyList();
+	}
 	ndWorldScene::BalanceScene();
 }
 
