@@ -991,6 +991,7 @@ void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const 
 	}
 }
 
+#if 1
 void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
 {
 	if (!body->m_equilibrium | body->m_sceneForceUpdate)
@@ -1034,6 +1035,54 @@ void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
 		body->m_sceneEquilibrium = 1;
 	}
 }
+
+#else
+
+void ndScene::UpdateAabb(ndInt32, ndBodyKinematic* const body)
+{
+	D_TRACKTIME();
+	ndUnsigned8 sceneEquilibrium = 1;
+	if (!body->m_equilibrium | body->m_sceneForceUpdate)
+	{
+		D_TRACKTIME();
+		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+		body->UpdateCollisionMatrix();
+
+		dAssert(!bodyNode->GetLeft());
+		dAssert(!bodyNode->GetRight());
+		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+		if (!test)
+		{
+			bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
+			if (!m_rootNode->GetAsSceneBodyNode())
+			{
+				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				dAssert(root == nullptr);
+				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
+				{
+					ndScopeSpinLock lock(parent->m_lock);
+					ndVector minBox;
+					ndVector maxBox;
+					ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					{
+						break;
+					}
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
+					parent->m_surfaceArea = area;
+				}
+			}
+		}
+		sceneEquilibrium = (test != 0);
+	}
+	dAssert(sceneEquilibrium);
+	body->m_sceneForceUpdate = 0;
+	body->m_sceneEquilibrium = sceneEquilibrium;
+}
+#endif
 
 bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& timestep) const
 {
@@ -2411,11 +2460,8 @@ void ndScene::InitBodyArray()
 		D_TRACKTIME();
 		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
-		
-		//const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
-		ndInt32* const scan = &scans[threadIndex][0];
 
-		//const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		ndInt32* const scan = &scans[threadIndex][0];
 		const ndStartEnd startEnd(activeBodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
