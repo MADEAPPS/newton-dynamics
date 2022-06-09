@@ -419,7 +419,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 
 ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
-	ndFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
+	
 	ndBigVector control[] =
 	{
 		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
@@ -430,28 +430,25 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
 	};
 
-	ndBezierSpline spline;
-	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
-
-	// recreate the spline from sample points at equally spaced distance 
-	//ndPhysicsWorld* const world = scene->GetWorld();
-
 	ndMatrix matrix(dGetIdentityMatrix());
-	ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
-	splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
-	ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
-	scene->AddEntity(splineEntity);
-	splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
-	splineMesh->SetVisible(true);
-	splineMesh->Release();
+	{
+		// build using control points
+		ndBezierSpline spline;
+		ndFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
+		spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
+
+		// recreate the spline from sample points at equally spaced distance 
+		ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
+		splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
+		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
+		scene->AddEntity(splineEntity);
+		splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
+		splineMesh->SetVisible(true);
+		splineMesh->Release();
+	}
 
 	{
-		// try different degrees
-		//ndBigVector points[4];
-		//points[0] = ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f);
-		//points[1] = ndBigVector(-36.0f, 1.0f, 4.0f, 1.0f);
-		//points[2] = ndBigVector(4.0f, 1.0f, 15.0f, 1.0f);
-		//points[3] = ndBigVector(44.0f, 1.0f, 4.0f, 1.0f);
+		// fix a spline to the points array
 		ndInt32 size = sizeof(control) / sizeof(control[0]);
 
 		ndBigVector derivP0(control[1] - control[size-1]);
@@ -478,7 +475,6 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		splineMesh1->SetVisible(true);
 		splineMesh1->Release();
 	}
-
 
 	return BuildStaticMesh(scene, meshName, optimized);
 }
