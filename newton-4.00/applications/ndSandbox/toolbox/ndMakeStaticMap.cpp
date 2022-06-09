@@ -461,6 +461,8 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		//spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
 		spline1.GlobalCubicInterpolation(size, control, derivP0, derivP0);
 
+		ndBigVector xxxx (spline1.CurveDerivative(0.25f));
+
 		//ndFloat64 u = (knots[1] + knots[2]) * 0.5f;
 		//spline.InsertKnot(u);
 		//spline.InsertKnot(u);
