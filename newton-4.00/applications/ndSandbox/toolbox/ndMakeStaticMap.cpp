@@ -418,7 +418,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 }
 
 
-void GetPointAndTangentAtLocation(const ndBezierSpline& aspline, const ndMatrix amatrix, const ndVector& location, ndVector& positOut, ndVector& tangentOut)
+static void GetPointAndTangentAtLocation(const ndBezierSpline& aspline, const ndMatrix amatrix, const ndVector& location, ndVector& positOut, ndVector& tangentOut)
 {
 	const ndBezierSpline& spline = aspline;
 
