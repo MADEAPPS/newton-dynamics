@@ -417,17 +417,34 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	return body;
 }
 
+
+void GetPointAndTangentAtLocation(const ndBezierSpline& aspline, const ndMatrix amatrix, const ndVector& location, ndVector& positOut, ndVector& tangentOut)
+{
+	const ndBezierSpline& spline = aspline;
+
+	ndMatrix matrix(amatrix);
+
+	ndVector p(matrix.UntransformVector(location));
+	ndBigVector point;
+	ndFloat64 knot = spline.FindClosestKnot(point, p, 4);
+	ndBigVector tangent(spline.CurveDerivative(knot));
+	tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
+	positOut = matrix.TransformVector(point);
+	tangentOut = tangent;
+}
+
+
 ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
 	
 	ndBigVector control[] =
 	{
 		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
-		ndBigVector(-36.0f, 1.0f,   4.0f, 1.0f),
-		ndBigVector(  4.0f, 1.0f,  15.0f, 1.0f),
-		ndBigVector( 44.0f, 1.0f,   4.0f, 1.0f),
+		ndBigVector(-36.0f, 2.0f,   4.0f, 1.0f),
+		ndBigVector(  4.0f, 3.0f,  15.0f, 1.0f),
+		ndBigVector( 44.0f, 2.0f,   4.0f, 1.0f),
 		ndBigVector(  4.0f, 1.0f, -22.0f, 1.0f),
-		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
+		ndBigVector(-16.0f, 0.0f, -10.0f, 1.0f),
 	};
 
 	ndMatrix matrix(dGetIdentityMatrix());
@@ -459,6 +476,17 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		spline.GlobalCubicInterpolation(size, control, derivP0, derivP0);
 
 		ndBigVector xxxx (spline.CurveDerivative(0.25f));
+
+		ndVector xxxx1;
+		ndVector xxxx2;
+		for (int i = 0; i < size; i++)
+		{
+			GetPointAndTangentAtLocation(spline, matrix, control[i], xxxx1, xxxx2);
+
+			printf("px: %.3f py: %.3f pz: %.3f \n", xxxx1.m_x, xxxx1.m_y, xxxx1.m_z);
+			printf("tx: %.3f ty: %.3f tz: %.3f \n", xxxx2.m_x, xxxx2.m_y, xxxx2.m_z);
+		}
+
 
 		//ndFloat64 u = (knots[1] + knots[2]) * 0.5f;
 		//spline.InsertKnot(u);
