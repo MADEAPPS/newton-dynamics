@@ -737,7 +737,13 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 		dAssert(derivatives[2].m_w == ndFloat32 (0.0f));
 		ndFloat64 num = derivatives[1].DotProduct(dist).GetScalar();
 		ndFloat64 den = derivatives[2].DotProduct(dist).GetScalar() + derivatives[1].DotProduct(derivatives[1]).GetScalar();
-		ndFloat64 u1 = ndClamp(u0 - num / den, ndFloat64(0.0), ndFloat64(1.0 - 1.0e-12));
+		//ndFloat64 u1 = ndClamp(u0 - num / den, ndFloat64(0.0), ndFloat64(1.0 - 1.0e-12));
+		ndFloat64 u1 = u0;
+		if (ndAbs(den) > ndFloat64(1.0e-12))
+		{
+			u1 -= num / den;
+		}
+		u1 = ndClamp(u1, ndFloat64(0.0), ndFloat64(1.0 - 1.0e-12));
 		if (u1 < m_knotVector[startSpan]) 
 		{
 			startSpan--;

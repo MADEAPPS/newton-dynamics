@@ -428,7 +428,7 @@ static void GetPointAndTangentAtLocation(const ndBezierSpline& aspline, const nd
 	ndBigVector point;
 	ndFloat64 knot = spline.FindClosestKnot(point, p, 4);
 	ndBigVector tangent(spline.CurveDerivative(knot));
-	tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
+	tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar() + ndFloat64 (1.0e-16f)));
 	positOut = matrix.TransformVector(point);
 	tangentOut = tangent;
 }
@@ -468,14 +468,15 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		// fix a spline to the points array
 		ndInt32 size = sizeof(control) / sizeof(control[0]);
 
-		ndBigVector derivP0(control[1] - control[size-1]);
+		//ndBigVector derivP0(control[1] - control[size-1]);
+		 ndBigVector derivP0(0.0);
 		//ndBigVector derivP1(control[0] - control[size - 2]);
 
 		ndBezierSpline spline;
 		//spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
 		spline.GlobalCubicInterpolation(size, control, derivP0, derivP0);
 
-		ndBigVector xxxx (spline.CurveDerivative(0.25f));
+		//ndBigVector xxxx (spline.CurveDerivative(0.25f));
 
 		ndVector xxxx1;
 		ndVector xxxx2;
