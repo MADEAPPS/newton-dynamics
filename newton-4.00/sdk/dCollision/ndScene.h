@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_NEW_SCENE
+//#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
@@ -158,6 +158,7 @@ class ndScene : public ndThreadPool
 	ndFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+	ndSceneNode* BuildBottomUp(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
 
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
