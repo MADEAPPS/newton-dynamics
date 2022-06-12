@@ -137,6 +137,17 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene();
 	D_COLLISION_API ndScene(const ndScene& src);
 
+#ifdef D_NEW_SCENE
+	class ndBottomUpCell
+	{
+		public:
+		const ndSceneNode* m_node;
+		ndInt32 m_x;
+		ndInt32 m_y;
+		ndInt32 m_z;
+	};
+#endif
+
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 	ndFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
 
@@ -194,6 +205,11 @@ class ndScene : public ndThreadPool
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
+
+#ifdef	D_NEW_SCENE
+	ndArray<ndBottomUpCell> m_cellBuffer0;
+	ndArray<ndBottomUpCell> m_cellBuffer1;
+#endif
 
 	ndSpinLock m_lock;
 	ndSceneNode* m_rootNode;
