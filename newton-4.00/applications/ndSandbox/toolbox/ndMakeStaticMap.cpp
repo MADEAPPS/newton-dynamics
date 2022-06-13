@@ -497,16 +497,14 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		spline.GlobalCubicInterpolation(size, control, derivP0, derivP0);
 
 		//ndBigVector xxxx (spline.CurveDerivative(0.25f));
-
-		ndVector xxxx1;
-		ndVector xxxx2;
+		//ndVector xxxx1;
+		//ndVector xxxx2;
 		for (int i = 0; i < size; i++)
 		{
 			//GetPointAndTangentAtLocation(spline, matrix, control[i], xxxx1, xxxx2);
-			ndMatrix matrix (GetMatrixAtLocation(spline, control[i]));
-
-			printf("px: %.3f py: %.3f pz: %.3f \n", xxxx1.m_x, xxxx1.m_y, xxxx1.m_z);
-			printf("tx: %.3f ty: %.3f tz: %.3f \n", xxxx2.m_x, xxxx2.m_y, xxxx2.m_z);
+			ndMatrix matrix1 (GetMatrixAtLocation(spline, control[i]));
+			printf("px: %.3f py: %.3f pz: %.3f \n", matrix1.m_posit.m_x, matrix1.m_posit.m_y, matrix1.m_posit.m_z);
+			//printf("tx: %.3f ty: %.3f tz: %.3f \n", xxxx2.m_x, xxxx2.m_y, xxxx2.m_z);
 		}
 
 
