@@ -1656,17 +1656,16 @@ void ndScene::UpdateAabb(ndBodyKinematic* const body)
 				dAssert(root == nullptr);
 				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
 				{
-					dTrace(("this is a Big Mistake\n"));
-					dAssert(0);
 					ndVector minBox;
 					ndVector maxBox;
 
 					ndScopeSpinLock lock(parent->m_lock);
+					ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
 					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
 					{
 						break;
 					}
-					ndFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					
 					parent->m_minBox = minBox;
 					parent->m_maxBox = maxBox;
 					parent->m_surfaceArea = area;
