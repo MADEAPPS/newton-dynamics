@@ -216,7 +216,8 @@ class ndScene : public ndThreadPool
 #ifdef	D_NEW_SCENE
 	ndArray<ndBottomUpCell> m_cellBuffer0;
 	ndArray<ndBottomUpCell> m_cellBuffer1;
-	ndArray<ndCellScanPrefix> m_cellCounts;
+	ndArray<ndCellScanPrefix> m_cellCounts0;
+	ndArray<ndCellScanPrefix> m_cellCounts1;
 #endif
 
 	ndSpinLock m_lock;

@@ -952,6 +952,19 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 		}
 	};
 
+	class ndSortCellCount
+	{
+		public:
+		ndSortCellCount(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndCellScanPrefix& cell) const
+		{
+			return cell.m_cellTest;
+		}
+	};
+
 	//ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 	ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
@@ -1022,13 +1035,14 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 		sentinelCell.m_z = ndUnsigned32(-1);
 		sentinelCell.m_node = nullptr;
 
-		m_cellCounts.SetCount(m_cellBuffer0.GetCount());
+		m_cellCounts0.SetCount(m_cellBuffer0.GetCount());
+		m_cellCounts1.SetCount(m_cellBuffer1.GetCount() + 1);
 		m_cellBuffer0.PushBack(sentinelCell);
 
 		auto MarkCellBounds = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME();
-			ndCellScanPrefix* const dst = &m_cellCounts[0];
+			ndCellScanPrefix* const dst = &m_cellCounts0[0];
 			const ndStartEnd startEnd(m_cellBuffer0.GetCount() - 1, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -1040,6 +1054,8 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 			}
 		});
 		ParallelExecute(MarkCellBounds);
+
+		ndCountingSort<ndCellScanPrefix, ndSortCellCount, 1>(*this, &m_cellCounts0[0], &m_cellCounts1[0], m_cellCounts0.GetCount(), prefixScan, nullptr);
 
 		sentinelCell.m_x = ndUnsigned32(-1);
 	}
