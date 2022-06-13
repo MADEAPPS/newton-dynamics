@@ -141,10 +141,11 @@ class ndScene : public ndThreadPool
 	class ndBottomUpCell
 	{
 		public:
-		ndInt32 m_x;
-		ndInt32 m_y;
-		ndInt32 m_z;
-		ndInt32 m_padd;
+		ndUnsigned32 m_location : 30;
+		ndUnsigned32 m_cellTest : 1;
+		ndUnsigned32 m_x;
+		ndUnsigned32 m_y;
+		ndUnsigned32 m_z;
 		const ndSceneNode* m_node;
 	};
 #endif
@@ -210,6 +211,8 @@ class ndScene : public ndThreadPool
 #ifdef	D_NEW_SCENE
 	ndArray<ndBottomUpCell> m_cellBuffer0;
 	ndArray<ndBottomUpCell> m_cellBuffer1;
+
+	//ndArray<ndUnsigned32> m_cellCounts;
 #endif
 
 	ndSpinLock m_lock;

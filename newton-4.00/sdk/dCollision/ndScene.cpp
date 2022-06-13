@@ -1015,6 +1015,30 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 		{
 			dAssert(0);
 		}
+
+		ndBottomUpCell sentinelCell;
+		sentinelCell.m_x = ndUnsigned32(-1);
+		sentinelCell.m_y = ndUnsigned32(-1);
+		sentinelCell.m_z = ndUnsigned32(-1);
+		sentinelCell.m_node = nullptr;
+		m_cellBuffer0.PushBack(sentinelCell);
+
+		auto MarkCellBounds = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+		{
+			D_TRACKTIME();
+			const ndStartEnd startEnd(m_cellBuffer0.GetCount() - 1, threadIndex, threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndBottomUpCell& cell0 = m_cellBuffer0[i];
+				const ndBottomUpCell& cell1 = m_cellBuffer0[i + 1];
+				ndUnsigned8 test = (cell0.m_x == cell1.m_x) & (cell0.m_y == cell1.m_y) & (cell0.m_z == cell1.m_z) & (cell1.m_node != nullptr);
+				cell0.m_cellTest = test;
+				cell0.m_location = i;
+			}
+		});
+		ParallelExecute(MarkCellBounds);
+
+		sentinelCell.m_x = ndUnsigned32(-1);
 	}
 
 
