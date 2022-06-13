@@ -884,7 +884,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 			const BoxInfo* const info = (BoxInfo*)boxInfo;
 			m_size = info->m_size;
 			m_origin = info->m_origin;
-			m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32 (1.0f)/ m_size.m_x);
+			m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
 		}
 
 		ndUnsigned32 GetKey(const ndSceneNode* const node) const
@@ -913,50 +913,109 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 		ndVector m_origin;
 	};
 
+	class ndSortCell_xlow
+	{
+		public:
+		ndSortCell_xlow(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return cell.m_x & 0xff;
+		}
+	};
+
+	class ndSortCell_ylow
+	{
+		public:
+		ndSortCell_ylow(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return cell.m_y & 0xff;
+		}
+	};
+
+	class ndSortCell_zlow
+	{
+		public:
+		ndSortCell_zlow(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return cell.m_z & 0xff;
+		}
+	};
+
 	//ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 	ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
 	BoxInfo info;
 	info.m_origin = minP;
-	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize * ndFloat32(2.0f));
-	//info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize * ndFloat32(4.0f));
+	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
 
 	ndUnsigned32 prefixScan[4];
-	
-	ndCountingSort<ndSceneNode*, ndGridClassifier, 2>(*this, leafArrayUnsorted, leafArray, boxCount, prefixScan, &info);
-
-	m_cellBuffer0.SetCount(prefixScan[m_insideCell + 1]);
-	m_cellBuffer1.SetCount(prefixScan[m_insideCell + 1]);
-
-	ndGridClassifier gridClassifier(&info);
-	auto MakeGrids = ndMakeObject::ndFunction([this, leafArray, &gridClassifier](ndInt32 threadIndex, ndInt32 threadCount)
+	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
+	for (int xxxx = 1; xxxx <= 10; xxxx++)
 	{
-		D_TRACKTIME();
+		info.m_size = info.m_size.Scale (ndFloat32 (2.0f));
+		ndCountingSort<ndSceneNode*, ndGridClassifier, 2>(*this, leafArrayUnsorted, leafArray, boxCount, prefixScan, &info);
+		m_cellBuffer0.SetCount(prefixScan[m_insideCell + 1]);
+		m_cellBuffer1.SetCount(prefixScan[m_insideCell + 1]);
 
-		const ndVector origin(gridClassifier.m_origin);
-		const ndVector invSize (gridClassifier.m_invSize);
-		const ndStartEnd startEnd(m_cellBuffer0.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		ndGridClassifier gridClassifier(&info);
+		auto MakeGrids = ndMakeObject::ndFunction([this, leafArray, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			const ndSceneNode* const node = leafArray[i];
-			const ndVector dist(node->m_minBox - origin);
-			const ndVector posit(invSize * dist);
-			const ndVector intPosit(posit.GetInt());
-			m_cellBuffer0[i].m_x = intPosit.m_ix;
-			m_cellBuffer0[i].m_y = intPosit.m_iy;
-			m_cellBuffer0[i].m_z = intPosit.m_iz;
-			m_cellBuffer0[i].m_node = node;
+			D_TRACKTIME();
+			const ndVector origin(gridClassifier.m_origin);
+			const ndVector invSize(gridClassifier.m_invSize);
+			const ndStartEnd startEnd(m_cellBuffer0.GetCount(), threadIndex, threadCount);
+			ndInt32 max_x = 0;
+			ndInt32 max_y = 0;
+			ndInt32 max_z = 0;
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				const ndSceneNode* const node = leafArray[i];
+				const ndVector dist(node->m_minBox - origin);
+				const ndVector posit(invSize * dist);
+				const ndVector intPosit(posit.GetInt());
+				m_cellBuffer0[i].m_x = intPosit.m_ix;
+				m_cellBuffer0[i].m_y = intPosit.m_iy;
+				m_cellBuffer0[i].m_z = intPosit.m_iz;
+				max_x = ndMax(intPosit.m_ix, max_x);
+				max_y = ndMax(intPosit.m_iy, max_y);
+				max_z = ndMax(intPosit.m_iz, max_z);
+				m_cellBuffer0[i].m_node = node;
+			}
+			maxGrids[threadIndex][0] = max_x;
+			maxGrids[threadIndex][1] = max_y;
+			maxGrids[threadIndex][2] = max_z;
+		});
+		ParallelExecute(MakeGrids);
+
+		ndCountingSort<ndBottomUpCell, ndSortCell_xlow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+		if (maxGrids[0][0] > 256)
+		{
+			dAssert(0);
 		}
-	});
-	ParallelExecute(MakeGrids);
 
-	
+		ndCountingSort<ndBottomUpCell, ndSortCell_ylow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+		if (maxGrids[0][0] > 256)
+		{
+			dAssert(0);
+		}
 
-	//for (ndInt32 i = 0; i < 10; i++)
-	//{
-	//	info.m_size = info.m_size.Scale(2.0f);
-	//	ndCountingSort<ndSceneNode*, ndGridClassifier, 2>(*this, leafArrayUnsorted, leafArray, boxCount, prefixScan, &info);
-	//}
+		ndCountingSort<ndBottomUpCell, ndSortCell_zlow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+		if (maxGrids[0][0] > 256)
+		{
+			dAssert(0);
+		}
+	}
 
 
 	return nullptr;

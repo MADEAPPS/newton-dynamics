@@ -141,10 +141,11 @@ class ndScene : public ndThreadPool
 	class ndBottomUpCell
 	{
 		public:
-		const ndSceneNode* m_node;
 		ndInt32 m_x;
 		ndInt32 m_y;
 		ndInt32 m_z;
+		ndInt32 m_padd;
+		const ndSceneNode* m_node;
 	};
 #endif
 
