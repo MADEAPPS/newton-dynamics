@@ -1656,6 +1656,8 @@ void ndScene::UpdateAabb(ndBodyKinematic* const body)
 				dAssert(root == nullptr);
 				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
 				{
+					dTrace(("this is a Big Mistake\n"));
+					dAssert(0);
 					ndVector minBox;
 					ndVector maxBox;
 
