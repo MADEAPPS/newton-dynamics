@@ -352,7 +352,7 @@ ndInt32 ndBezierSpline::CurveAllDerivatives (ndFloat64 u, ndBigVector* const der
 void ndBezierSpline::GlobalCubicInterpolation (ndInt32 count, const ndBigVector* const points, const ndBigVector& firstTangent, const ndBigVector& lastTangent)
 {
 	CreateCubicKnotVector (count, points);
-	CreateCubicControlPoints (count, points, firstTangent & ndBigVector::m_triplexMask, lastTangent & ndBigVector::m_triplexMask);
+	CreateCubicControlPoints (count, points, firstTangent, lastTangent);
 }
 
 void ndBezierSpline::CreateCubicKnotVector(ndInt32 count, const ndBigVector* const points)
@@ -419,9 +419,13 @@ void ndBezierSpline::CreateCubicKnotVector(ndInt32 count, const ndBigVector* con
 	}
 }
 
-void ndBezierSpline::CreateCubicControlPoints(ndInt32 count, const ndBigVector* const points, const ndBigVector& firstTangent, const ndBigVector& lastTangent)
+void ndBezierSpline::CreateCubicControlPoints(ndInt32 count, const ndBigVector* const points, const ndBigVector& firstTangentIn, const ndBigVector& lastTangentIn)
 {
 	ndFloat64 abc[4];
+
+	const ndBigVector lastTangent(lastTangentIn & ndBigVector::m_triplexMask);
+	const ndBigVector firstTangent(firstTangentIn & ndBigVector::m_triplexMask);
+
 	if ((m_knotsCount - 2 * (m_degree - 1)) != m_controlPointsCount) 
 	{
 		m_controlPointsCount = m_knotsCount - 2 * (m_degree - 1);
