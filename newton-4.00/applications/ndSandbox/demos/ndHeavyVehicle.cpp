@@ -860,7 +860,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//BuildStaticMesh(scene, "track.fbx", true);
 	BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
-	//BuildSplineTrack(scene, "playerarena.fbx", true);
+	BuildSplineTrack(scene, "playerarena.fbx", true);
 	//sceneLocation.m_posit.m_x = -200.0f;
 	//sceneLocation.m_posit.m_z = -200.0f;
 	//BuildHeightFieldTerrain(scene, sceneLocation);

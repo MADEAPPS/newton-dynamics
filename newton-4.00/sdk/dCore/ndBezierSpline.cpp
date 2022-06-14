@@ -352,7 +352,7 @@ ndInt32 ndBezierSpline::CurveAllDerivatives (ndFloat64 u, ndBigVector* const der
 void ndBezierSpline::GlobalCubicInterpolation (ndInt32 count, const ndBigVector* const points, const ndBigVector& firstTangent, const ndBigVector& lastTangent)
 {
 	CreateCubicKnotVector (count, points);
-	CreateCubicControlPoints (count, points, firstTangent, lastTangent);
+	CreateCubicControlPoints (count, points, firstTangent & ndBigVector::m_triplexMask, lastTangent & ndBigVector::m_triplexMask);
 }
 
 void ndBezierSpline::CreateCubicKnotVector(ndInt32 count, const ndBigVector* const points)
