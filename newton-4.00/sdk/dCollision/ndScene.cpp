@@ -3051,19 +3051,17 @@ void ndScene::InitBodyArray()
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 		ndInt32* const scan = &scans[threadIndex][0];
 
-#if 0
-		const ndStartEnd startEnd(activeBodyArray.GetCount(), threadIndex, threadCount);
-#else
-		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		//const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		//const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		//const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
 		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-#endif
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			ndBodyKinematic* const body = activeBodyArray[i];
+			ndBodyKinematic* const body = view[i];
 			const ndInt32 key = body->m_sceneEquilibrium;
 			const ndInt32 index = scan[key];
 			sceneBodyArray[index] = body;
