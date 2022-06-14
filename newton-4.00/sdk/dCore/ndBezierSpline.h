@@ -57,6 +57,9 @@ class ndBezierSpline : public ndClassAlloc
 	D_CORE_API ndFloat64 GetKnot(ndInt32 i) const;
 	D_CORE_API ndFloat64 FindClosestKnot (ndBigVector& closestPointOnCurve, const ndBigVector& point, ndInt32 subdivitionSteps = 2) const;
 
+	D_CORE_API void Trace() const;
+
+
 	private:
 	void Clear();
 	ndInt32 GetSpan(ndFloat64 u) const;

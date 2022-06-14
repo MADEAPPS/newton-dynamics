@@ -493,8 +493,9 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		//ndBigVector derivP1(control[0] - control[size - 2]);
 
 		ndBezierSpline spline;
-		//spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
 		spline.GlobalCubicInterpolation(size, control, derivP0, derivP0);
+
+		spline.Trace();
 
 		//ndBigVector xxxx (spline.CurveDerivative(0.25f));
 		//ndVector xxxx1;
