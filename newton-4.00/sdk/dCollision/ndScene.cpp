@@ -1634,18 +1634,17 @@ void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const 
 
 void ndScene::UpdateAabb(ndBodyKinematic* const body)
 {
-	D_TRACKTIME();
 	ndUnsigned8 sceneEquilibrium = 1;
 	ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
 	if (!body->m_equilibrium | sceneForceUpdate)
 	{
-		D_TRACKTIME();
 		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+		body->UpdateCollisionMatrix();
+
 		dAssert(!bodyNode->GetLeft());
 		dAssert(!bodyNode->GetRight());
 		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
-		body->UpdateCollisionMatrix();
 		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 		if (!test)
 		{
@@ -2941,7 +2940,7 @@ void ndScene::FindCollidingPairs()
 		{
 			class CompareKey
 			{
-			public:
+				public:
 				int Compare(const ndContactPairs& a, const ndContactPairs& b, void*) const
 				{
 					union Key
@@ -3048,8 +3047,6 @@ void ndScene::InitBodyArray()
 			const ndInt32 key = body->m_sceneEquilibrium;
 			scan[key] ++;
 		}
-
-		//dTrace(("%d %d\n", startEnd.m_end, scan[1]));
 	});
 
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
