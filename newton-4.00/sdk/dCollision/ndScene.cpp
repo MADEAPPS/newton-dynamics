@@ -1639,12 +1639,11 @@ void ndScene::UpdateAabb(ndBodyKinematic* const body)
 	if (!body->m_equilibrium | sceneForceUpdate)
 	{
 		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
-		body->UpdateCollisionMatrix();
-
 		dAssert(!bodyNode->GetLeft());
 		dAssert(!bodyNode->GetRight());
 		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
+		body->UpdateCollisionMatrix();
 		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 		if (!test)
 		{
@@ -3052,11 +3051,16 @@ void ndScene::InitBodyArray()
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
-
+		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 		ndInt32* const scan = &scans[threadIndex][0];
+
+#if 0
 		const ndStartEnd startEnd(activeBodyArray.GetCount(), threadIndex, threadCount);
+#else
+		const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+#endif
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = activeBodyArray[i];
