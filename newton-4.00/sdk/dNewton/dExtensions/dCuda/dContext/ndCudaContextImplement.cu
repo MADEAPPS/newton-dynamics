@@ -97,7 +97,7 @@ void ndCudaContextImplement::Begin()
 	float milliseconds = 0;
 	cudaEventSynchronize(m_device->m_endEvent);
 
-#ifdef D_MEASURE_FRAME_TIME
+#ifdef D_CUDA_PROFILE_FRAME_TIME
 	cudaEventElapsedTime(&milliseconds, m_device->m_startEvent, m_device->m_endEvent);
 #endif
 	m_timeInSeconds = milliseconds * 1.0e3f;
@@ -122,7 +122,7 @@ void ndCudaContextImplement::Begin()
 		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
 	}
 
-#ifdef D_MEASURE_FRAME_TIME
+#ifdef D_CUDA_PROFILE_FRAME_TIME
 	cudaEventRecord(m_device->m_startEvent);
 #endif
 	ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
@@ -133,7 +133,7 @@ void ndCudaContextImplement::End()
 	m_frameCounter = m_frameCounter + 1;
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
-#ifdef D_MEASURE_FRAME_TIME
+#ifdef D_CUDA_PROFILE_FRAME_TIME
 	cudaEventRecord(m_device->m_endEvent);
 #endif
 }
