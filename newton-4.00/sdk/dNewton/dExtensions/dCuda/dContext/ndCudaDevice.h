@@ -28,6 +28,8 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
+#define D_MEASURE_FRAME_TIME
+
 class ndCudaDevice
 {
 	public:
