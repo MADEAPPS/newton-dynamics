@@ -72,6 +72,7 @@ void ndBezierSpline::Trace() const
 		dTrace(("%f %f %f\n", m_controlPoints[i].m_x, m_controlPoints[i].m_y, m_controlPoints[i].m_z));
 	}
 }
+
 ndBezierSpline& ndBezierSpline::operator = (const ndBezierSpline &copy)
 {
 	Clear();

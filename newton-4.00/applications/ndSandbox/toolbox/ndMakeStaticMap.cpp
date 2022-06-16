@@ -483,19 +483,19 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 
 	ndMatrix matrix(dGetIdentityMatrix());
 	{
-		// build using control points
-		ndBezierSpline spline;
-		ndFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
-		spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
-
-		// recreate the spline from sample points at equally spaced distance 
-		ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
-		splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
-		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
-		scene->AddEntity(splineEntity);
-		splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
-		splineMesh->SetVisible(true);
-		splineMesh->Release();
+		//// build using control points
+		//ndBezierSpline spline;
+		//ndFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
+		//spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
+		//
+		//// recreate the spline from sample points at equally spaced distance 
+		//ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
+		//splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
+		//ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
+		//scene->AddEntity(splineEntity);
+		//splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
+		//splineMesh->SetVisible(true);
+		//splineMesh->Release();
 	}
 
 	{
