@@ -49,11 +49,24 @@ ndCudaDevice::ndCudaDevice()
 	
 	m_frequency = m_prop.clockRate * 1000;
 	m_blocksPerKernelCall = m_prop.maxBlocksPerMultiProcessor * m_prop.multiProcessorCount;
+
+	cudaStatus = cudaEventCreate(&m_startEvent);
+	dAssert(cudaStatus == cudaSuccess);
+
+	cudaStatus = cudaEventCreate(&m_endEvent);
+	dAssert(cudaStatus == cudaSuccess);
 }
 
 ndCudaDevice::~ndCudaDevice()
 {
 	cudaError_t cudaStatus;
+
+	cudaStatus = cudaEventDestroy(m_endEvent);
+	dAssert(cudaStatus == cudaSuccess);
+
+	cudaStatus = cudaEventDestroy(m_startEvent);
+	dAssert(cudaStatus == cudaSuccess);
+
 	cudaStatus = cudaDeviceReset();
 	dAssert(cudaStatus == cudaSuccess);
 	

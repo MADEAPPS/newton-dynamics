@@ -38,6 +38,9 @@ class ndCudaDevice
 	double m_frequency;
 	unsigned m_valid;
 	unsigned m_blocksPerKernelCall;
+
+	CUevent m_startEvent;
+	CUevent m_endEvent;
 };
 
 #endif

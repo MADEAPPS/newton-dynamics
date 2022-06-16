@@ -94,8 +94,13 @@ float ndCudaContextImplement::GetTimeInSeconds() const
 
 void ndCudaContextImplement::Begin()
 {
-	cudaDeviceSynchronize();
+	float milliseconds = 0;
+	cudaEventSynchronize(m_device->m_endEvent);
 
+	cudaEventElapsedTime(&milliseconds, m_device->m_startEvent, m_device->m_endEvent);
+	m_timeInSeconds = milliseconds * 1.0e3f;
+
+	cudaDeviceSynchronize();
 	// get the scene info from the update	
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
@@ -116,6 +121,8 @@ void ndCudaContextImplement::Begin()
 	}
 
 	//m_timeInSeconds = (cpuInfo->m_deltaTicks / m_device->m_frequency);
+
+	cudaEventRecord(m_device->m_startEvent);
 	ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
 }
 
@@ -124,6 +131,8 @@ void ndCudaContextImplement::End()
 	m_frameCounter = m_frameCounter + 1;
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
+
+	cudaEventRecord(m_device->m_endEvent);
 }
 
 ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer()
