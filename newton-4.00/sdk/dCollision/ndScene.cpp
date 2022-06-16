@@ -904,8 +904,11 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 			dAssert(x1 >= 0);
 			dAssert(y1 >= 0);
 			dAssert(z1 >= 0);
-			bool test = (x0 == x1) & (y0 == y1) & (z0 == z1);
-			return test ? m_insideCell : m_outsideCell;
+			const ndUnsigned32 test_x = (x0 == x1);
+			const ndUnsigned32 test_y = (y0 == y1);
+			const ndUnsigned32 test_z = (z0 == z1);
+			const bool test = test_x & test_y & test_z;
+			return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
 		}
 
 		ndVector m_size;
@@ -1029,26 +1032,25 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 			dAssert(0);
 		}
 
-		ndBottomUpCell sentinelCell;
-		sentinelCell.m_x = ndUnsigned32(-1);
-		sentinelCell.m_y = ndUnsigned32(-1);
-		sentinelCell.m_z = ndUnsigned32(-1);
-		sentinelCell.m_node = nullptr;
-
 		m_cellCounts0.SetCount(m_cellBuffer0.GetCount());
-		m_cellCounts1.SetCount(m_cellBuffer1.GetCount() + 1);
-		m_cellBuffer0.PushBack(sentinelCell);
-
+		m_cellCounts1.SetCount(m_cellBuffer1.GetCount());
 		auto MarkCellBounds = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME();
 			ndCellScanPrefix* const dst = &m_cellCounts0[0];
 			const ndStartEnd startEnd(m_cellBuffer0.GetCount() - 1, threadIndex, threadCount);
+
+			ndBottomUpCell sentinelCell;
+			sentinelCell.m_x = ndUnsigned32(-1);
+			sentinelCell.m_y = ndUnsigned32(-1);
+			sentinelCell.m_z = ndUnsigned32(-1);
+			sentinelCell.m_node = nullptr;
+
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				const ndBottomUpCell& cell0 = m_cellBuffer0[i];
-				const ndBottomUpCell& cell1 = m_cellBuffer0[i + 1];
-				ndUnsigned8 test = (cell0.m_x == cell1.m_x) & (cell0.m_y == cell1.m_y) & (cell0.m_z == cell1.m_z) & (cell1.m_node != nullptr);
+				const ndBottomUpCell cell0 (m_cellBuffer0[i]);
+				const ndBottomUpCell cell1 (i ? m_cellBuffer0[i - 1] : sentinelCell);
+				const ndUnsigned8 test = (cell0.m_x == cell1.m_x) & (cell0.m_y == cell1.m_y) & (cell0.m_z == cell1.m_z) & (cell1.m_node != nullptr);
 				dst[i].m_cellTest = test;
 				dst[i].m_location = i;
 			}
@@ -1057,7 +1059,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 
 		ndCountingSort<ndCellScanPrefix, ndSortCellCount, 1>(*this, &m_cellCounts0[0], &m_cellCounts1[0], m_cellCounts0.GetCount(), prefixScan, nullptr);
 
-		sentinelCell.m_x = ndUnsigned32(-1);
+		m_cellBuffer0.SetCount(10);
 	}
 
 
