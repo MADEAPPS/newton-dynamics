@@ -23,7 +23,6 @@
 #include "ndCudaUtils.h"
 #include "ndCudaDevice.h"
 #include "ndCudaContext.h"
-#include "ndCudaProfileTime.h"
 #include "ndCudaPrefixScan.cuh"
 #include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
@@ -31,7 +30,6 @@
 
 __global__ void CudaIntegrateUnconstrainedBodiesInternal(ndCudaSceneInfo& info, float timestep)
 {
-	ND_CUDA_PROFILE;
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	const unsigned maxCount = info.m_bodyArray.m_size - 1;
 	ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
@@ -46,7 +44,6 @@ __global__ void CudaIntegrateUnconstrainedBodiesInternal(ndCudaSceneInfo& info, 
 
 __global__ void CudaIntegrateBodiesInternal(ndCudaSceneInfo& info, float timestep)
 {
-	ND_CUDA_PROFILE;
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
 	const unsigned maxCount = info.m_bodyArray.m_size - 1;
 	ndCudaBodyProxy* bodyArray = info.m_bodyArray.m_array;
