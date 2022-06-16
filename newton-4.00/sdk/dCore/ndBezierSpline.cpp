@@ -52,6 +52,26 @@ void ndBezierSpline::Clear()
 	m_controlPointsCount = 0;
 }
 
+void ndBezierSpline::Trace() const
+{
+	const ndInt32 knotsCount = m_knotsCount - m_degree * 2;
+	dTrace(("dregree %d\n", m_degree));
+	dTrace(("knotsCount %d\n", knotsCount));
+	dTrace(("controlPointsCount %d\n", m_controlPointsCount));
+
+	dTrace(("knots: "));
+	for (ndInt32 i = 0; i < knotsCount; ++i)
+	{
+		dTrace(("%f ", m_knotVector[i + m_degree]));
+	}
+
+	dTrace(("\n"));
+	dTrace(("controlPoints:\n"));
+	for (ndInt32 i = 0; i < m_controlPointsCount; ++i)
+	{
+		dTrace(("%f %f %f\n", m_controlPoints[i].m_x, m_controlPoints[i].m_y, m_controlPoints[i].m_z));
+	}
+}
 ndBezierSpline& ndBezierSpline::operator = (const ndBezierSpline &copy)
 {
 	Clear();
@@ -319,12 +339,12 @@ ndBigVector ndBezierSpline::CurveDerivative (ndFloat64 u, ndInt32 index) const
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
 
 	const ndInt32 with = m_degree + 1;
-	ndBigVector point (ndFloat32 (0.0f));
+	ndBigVector point (ndBigVector::m_zero);
 	for (ndInt32 i = 0; i <= m_degree; ++i) 
 	{
 		point += m_controlPoints[span - m_degree + i].Scale (basicsFuncDerivatives[with * index + i]);
 	}
-	return point;
+	return point & ndBigVector::m_triplexMask;
 }
 
 ndInt32 ndBezierSpline::CurveAllDerivatives (ndFloat64 u, ndBigVector* const derivatives) const
@@ -741,7 +761,6 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 		dAssert(derivatives[2].m_w == ndFloat32 (0.0f));
 		ndFloat64 num = derivatives[1].DotProduct(dist).GetScalar();
 		ndFloat64 den = derivatives[2].DotProduct(dist).GetScalar() + derivatives[1].DotProduct(derivatives[1]).GetScalar();
-		//ndFloat64 u1 = ndClamp(u0 - num / den, ndFloat64(0.0), ndFloat64(1.0 - 1.0e-12));
 		ndFloat64 u1 = u0;
 		if (ndAbs(den) > ndFloat64(1.0e-12))
 		{
@@ -771,23 +790,3 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 	return u0;
 }
 
-void ndBezierSpline::Trace() const
-{
-	const ndInt32 knotsCount = m_knotsCount - m_degree * 2;
-	dTrace(("dregree %d\n", m_degree));
-	dTrace(("knotsCount %d\n", knotsCount));
-	dTrace(("controlPointsCount %d\n", m_controlPointsCount));
-	
-	dTrace(("knots: "));
-	for (ndInt32 i = 0; i < knotsCount; ++i)
-	{
-		dTrace(("%f ", m_knotVector[i + m_degree]));
-	}
-
-	dTrace(("\n"));
-	dTrace(("controlPoints:\n"));
-	for (ndInt32 i = 0; i < m_controlPointsCount; ++i)
-	{
-		dTrace(("%f %f %f\n", m_controlPoints[i].m_x, m_controlPoints[i].m_y, m_controlPoints[i].m_z));
-	}
-}

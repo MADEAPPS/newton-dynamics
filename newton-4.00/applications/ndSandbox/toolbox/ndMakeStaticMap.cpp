@@ -442,6 +442,20 @@ static ndMatrix GetMatrixAtLocation(const ndBezierSpline& spline, const ndVector
 	ndBigVector closestPointOnCurve;
 	ndFloat64 u = spline.FindClosestKnot(closestPointOnCurve, location);
 	ndBigVector tangent(spline.CurveDerivative(u));
+	ndFloat64 mang2 = tangent.DotProduct(tangent).GetScalar();
+	if (mang2 < ndFloat32(1.0e-8f))
+	{
+		// do a back prodedure to get the tangent
+		ndFloat64 u1 = ndFmod(u + 1.0e-3, 1.0);
+		//ndFloat64 u0 = ndFmod(u - 1.0e-3, 1.0);
+		//if (u0 < 0)
+		//{
+		//	u0 += 1.0;
+		//}
+		ndBigVector p0(spline.CurvePoint(u));
+		ndBigVector p1(spline.CurvePoint(u1));
+		tangent = p1 - p0;
+	}
 	ndVector xdir(tangent.Normalize());
 
 	ndMatrix matrix;
@@ -464,7 +478,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		ndBigVector(  4.0f, 3.0f,  15.0f, 1.0f),
 		ndBigVector( 44.0f, 2.0f,   4.0f, 1.0f),
 		ndBigVector(  4.0f, 1.0f, -22.0f, 1.0f),
-		ndBigVector(-16.0f, 0.0f, -10.0f, 1.0f),
+		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
 	};
 
 	ndMatrix matrix(dGetIdentityMatrix());
@@ -488,8 +502,8 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		// fix a spline to the points array
 		ndInt32 size = sizeof(control) / sizeof(control[0]);
 
-		ndBigVector derivP0(control[1] - control[size-1]);
-		// ndBigVector derivP0(0.0);
+		//ndBigVector derivP0(control[1] - control[size-1]);
+		ndBigVector derivP0(0.0);
 		//ndBigVector derivP1(control[0] - control[size - 2]);
 
 		ndBezierSpline spline;
