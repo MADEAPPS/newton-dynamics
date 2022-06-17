@@ -1067,7 +1067,19 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 			m_cellCounts0[0].m_location = 0;
 			ndCountingSort<ndCellScanPrefix, ndSortCellCount, 1>(*this, &m_cellCounts0[0], &m_cellCounts1[0], m_cellCounts0.GetCount(), prefixScan, nullptr);
 
-			m_cellBuffer0.SetCount(10);
+			ndUnsigned32 sum = 0;
+			const ndUnsigned32 bashCount = prefixScan[1] - 1;
+			for (ndUnsigned32 i = 0; i < bashCount; i++)
+			{
+				const ndUnsigned32 count = m_cellCounts1[i + 1].m_location - m_cellCounts1[i].m_location - 1;
+				m_cellCounts0[i].m_location = sum;
+				sum += count;
+			}
+			m_cellCounts0[bashCount].m_location = sum; 
+
+			m_cellCounts0[bashCount].m_location = sum;
+
+			
 		}
 	}
 

@@ -27,7 +27,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	
 	ndMatrix origin1(dGetIdentityMatrix());
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 1, 2);
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 3, 3, 3);
 
 	ndQuaternion rot;
 	ndVector origin(-60.0f, 5.0f, 0.0f, 1.0f);
