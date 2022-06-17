@@ -28,6 +28,18 @@ class ndBodyKinematic;
 class ndSceneBodyNode;
 class ndSceneTreeNode;
 
+//#define D_NEW_SCENE
+
+#ifdef D_NEW_SCENE
+class ndBottomUpCell
+{
+	public:
+	ndUnsigned32 m_x;
+	ndUnsigned32 m_y;
+	ndUnsigned32 m_z;
+};
+#endif
+
 D_MSV_NEWTON_ALIGN_32
 class ndSceneNode: public ndClassAlloc
 {
@@ -39,6 +51,9 @@ class ndSceneNode: public ndClassAlloc
 		,m_parent(parent)
 		,m_surfaceArea(ndFloat32(1.0e20f))
 		,m_lock()
+#ifdef D_NEW_SCENE
+		,m_cell()
+#endif
 	{
 #ifdef _DEBUG
 		static ndInt32 nodeId = 0;
@@ -78,6 +93,9 @@ class ndSceneNode: public ndClassAlloc
 	ndSceneNode* m_parent;
 	ndFloat32 m_surfaceArea;
 	ndSpinLock m_lock;
+#ifdef D_NEW_SCENE
+	ndBottomUpCell m_cell;
+#endif
 #ifdef _DEBUG
 	ndInt32 m_nodeId;
 #endif

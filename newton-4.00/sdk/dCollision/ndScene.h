@@ -27,8 +27,6 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-//#define D_NEW_SCENE
-
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 
@@ -138,14 +136,14 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene(const ndScene& src);
 
 #ifdef D_NEW_SCENE
-	class ndBottomUpCell
-	{
-		public:
-		ndUnsigned32 m_x;
-		ndUnsigned32 m_y;
-		ndUnsigned32 m_z;
-		const ndSceneNode* m_node;
-	};
+	//class ndBottomUpCell
+	//{
+	//	public:
+	//	ndUnsigned32 m_x;
+	//	ndUnsigned32 m_y;
+	//	ndUnsigned32 m_z;
+	//	const ndSceneNode* m_node;
+	//};
 
 	class ndCellScanPrefix
 	{
@@ -176,7 +174,8 @@ class ndScene : public ndThreadPool
 	ndFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
-	ndSceneNode* BuildBottomUp(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+	//ndSceneNode* BuildBottomUp(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+	ndSceneNode* BuildBottomUp(ndFitnessList& fitness);
 
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
@@ -214,8 +213,8 @@ class ndScene : public ndThreadPool
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
 
 #ifdef	D_NEW_SCENE
-	ndArray<ndBottomUpCell> m_cellBuffer0;
-	ndArray<ndBottomUpCell> m_cellBuffer1;
+	//ndArray<ndBottomUpCell> m_cellBuffer0;
+	//ndArray<ndBottomUpCell> m_cellBuffer1;
 	ndArray<ndCellScanPrefix> m_cellCounts0;
 	ndArray<ndCellScanPrefix> m_cellCounts1;
 #endif
