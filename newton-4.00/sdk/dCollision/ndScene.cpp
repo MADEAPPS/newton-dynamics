@@ -1093,22 +1093,21 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 
 ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 {
-	const ndUnsigned32 baseCount = m_bodyList.GetCount() + 4;
-	m_scratchBuffer.SetCount(4 * baseCount * sizeof(ndSceneNode*));
-
+	const ndUnsigned32 baseCount = m_bodyList.GetCount();
+	m_scratchBuffer.SetCount((baseCount + 4) * sizeof(ndSceneNode*));
+	
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
-	ndSceneNode** dstArray = &srcArray[2 * baseCount];
-
+	//ndSceneNode** tmpArray = &srcArray[2 * baseCount];
+	
 	ndUnsigned32 leafNodesCount = 0;
 	ndUnsigned32 parentNodesCount = 0;
 	for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext())
 	{
 		ndSceneNode* const node = nodePtr->GetInfo();
 		srcArray[baseCount + parentNodesCount] = node;
-		dstArray[baseCount + parentNodesCount] = node;
 		parentNodesCount++;
 		dAssert(parentNodesCount < baseCount);
-
+	
 		ndSceneNode* const leftNode = node->GetLeft();
 		ndBodyKinematic* const leftBody = leftNode->GetBody();
 		if (leftBody)
@@ -1118,7 +1117,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			leafNodesCount++;
 			dAssert(leafNodesCount <= baseCount);
 		}
-
+	
 		ndSceneNode* const rightNode = node->GetRight();
 		ndBodyKinematic* const rightBody = rightNode->GetBody();
 		if (rightBody)
@@ -1129,8 +1128,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			dAssert(leafNodesCount <= baseCount);
 		}
 	}
-
-
+	
 	ndVector boxes[D_MAX_THREADS_COUNT][2];
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
 	auto CalculateBoxSize = ndMakeObject::ndFunction([this, srcArray, leafNodesCount, &boxSizes, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
@@ -1139,13 +1137,13 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		ndVector minP(ndFloat32(1.0e15f));
 		ndVector maxP(ndFloat32(-1.0e15f));
 		ndFloat32 minSize = ndFloat32(1.0e15f);
-
+	
 		const ndStartEnd startEnd(leafNodesCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const ndSceneNode* const node = srcArray[i];
 			dAssert(((ndSceneNode*)node)->GetAsSceneBodyNode());
-
+	
 			minP = minP.GetMin(node->m_minBox);
 			maxP = maxP.GetMax(node->m_maxBox);
 			const ndVector size(node->m_maxBox - node->m_minBox);
@@ -1157,7 +1155,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		boxSizes[threadIndex] = minSize;
 	});
 	ParallelExecute(CalculateBoxSize);
-
+	
 	ndVector minP(ndFloat32(1.0e15f));
 	ndVector maxP(ndFloat32(-1.0e15f));
 	ndFloat32 minBoxSize = ndFloat32(1.0e15f);
@@ -1168,111 +1166,171 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		maxP = maxP.GetMax(boxes[i][1]);
 		minBoxSize = ndMin(minBoxSize, boxSizes[i]);
 	}
-
+	
 	class BoxInfo
 	{
 		public:
 		ndVector m_size;
 		ndVector m_origin;
 	};
-
+	
 	enum
 	{
 		m_insideCell = 0,
 		m_outsideCell,
 	};
-
-	class ndGridClassifier
-	{
-		public:
-		ndGridClassifier(void* const boxInfo)
-		{
-			const BoxInfo* const info = (BoxInfo*)boxInfo;
-			m_size = info->m_size;
-			m_origin = info->m_origin;
-			m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
-		}
-
-		ndUnsigned32 GetKey(const ndSceneNode* const node) const
-		{
-			const ndVector minPosit((m_invSize * (node->m_minBox - m_origin)).GetInt());
-			const ndVector maxPosit((m_invSize * (node->m_maxBox - m_origin)).GetInt());
-			const ndInt32 x0 = minPosit.m_ix;
-			const ndInt32 y0 = minPosit.m_iy;
-			const ndInt32 z0 = minPosit.m_iz;
-			const ndInt32 x1 = maxPosit.m_ix;
-			const ndInt32 y1 = maxPosit.m_iy;
-			const ndInt32 z1 = maxPosit.m_iz;
-
-			dAssert(x0 >= 0);
-			dAssert(y0 >= 0);
-			dAssert(z0 >= 0);
-			dAssert(x1 >= 0);
-			dAssert(y1 >= 0);
-			dAssert(z1 >= 0);
-			const ndUnsigned32 test_x = (x0 == x1);
-			const ndUnsigned32 test_y = (y0 == y1);
-			const ndUnsigned32 test_z = (z0 == z1);
-			const bool test = test_x & test_y & test_z;
-			return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
-		}
-
-		ndVector m_size;
-		ndVector m_invSize;
-		ndVector m_origin;
-	};
-
-
+	
+	//class ndGridClassifier
+	//{
+	//	public:
+	//	ndGridClassifier(void* const boxInfo)
+	//	{
+	//		const BoxInfo* const info = (BoxInfo*)boxInfo;
+	//		m_size = info->m_size;
+	//		m_origin = info->m_origin;
+	//		m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
+	//	}
+	//
+	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
+	//	{
+	//		const ndVector minPosit((m_invSize * (node->m_minBox - m_origin)).GetInt());
+	//		const ndVector maxPosit((m_invSize * (node->m_maxBox - m_origin)).GetInt());
+	//		const ndInt32 x0 = minPosit.m_ix;
+	//		const ndInt32 y0 = minPosit.m_iy;
+	//		const ndInt32 z0 = minPosit.m_iz;
+	//		const ndInt32 x1 = maxPosit.m_ix;
+	//		const ndInt32 y1 = maxPosit.m_iy;
+	//		const ndInt32 z1 = maxPosit.m_iz;
+	//
+	//		dAssert(x0 >= 0);
+	//		dAssert(y0 >= 0);
+	//		dAssert(z0 >= 0);
+	//		dAssert(x1 >= 0);
+	//		dAssert(y1 >= 0);
+	//		dAssert(z1 >= 0);
+	//		const ndUnsigned32 test_x = (x0 == x1);
+	//		const ndUnsigned32 test_y = (y0 == y1);
+	//		const ndUnsigned32 test_z = (z0 == z1);
+	//		const bool test = test_x & test_y & test_z;
+	//		return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
+	//	}
+	//
+	//	ndVector m_size;
+	//	ndVector m_invSize;
+	//	ndVector m_origin;
+	//};
+	//
+	//class ndSortCell_xlow
+	//{
+	//	public:
+	//	ndSortCell_xlow(const void* const)
+	//	{
+	//	}
+	//
+	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
+	//	{
+	//		return node->m_cell.m_x & 0xff;
+	//	}
+	//};
+	//
+	//class ndSortCell_ylow
+	//{
+	//	public:
+	//	ndSortCell_ylow(const void* const)
+	//	{
+	//	}
+	//
+	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
+	//	{
+	//		return node->m_cell.m_y & 0xff;
+	//	}
+	//};
+	//
+	//class ndSortCell_zlow
+	//{
+	//	public:
+	//	ndSortCell_zlow(const void* const)
+	//	{
+	//	}
+	//
+	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
+	//	{
+	//		return node->m_cell.m_z & 0xff;
+	//	}
+	//};
+	
 	BoxInfo info;
 	info.m_origin = minP;
 	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
-
-	ndUnsigned32 prefixScan[4];
-	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
+	
+	//ndUnsigned32 prefixScan[4];
+	//ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 	for (int xxxx = 1; xxxx <= 10; xxxx++)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
-		ndCountingSort<ndSceneNode*, ndGridClassifier, 2>(*this, srcArray, dstArray, leafNodesCount, prefixScan, &info);
-		ndSwap(srcArray, dstArray);
-
-		ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1];
-		if (insideCellsCount)
-		{
-			ndGridClassifier gridClassifier(&info);
-			ndUnsigned32 nodesCount = leafNodesCount;
-			ndSceneNode** nodeArray = srcArray;
-			auto MakeGrids = ndMakeObject::ndFunction([this, nodeArray, nodesCount, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
-			{
-				D_TRACKTIME();
-				const ndVector origin(gridClassifier.m_origin);
-				const ndVector invSize(gridClassifier.m_invSize);
-				const ndStartEnd startEnd(nodesCount, threadIndex, threadCount);
-				ndInt32 max_x = 0;
-				ndInt32 max_y = 0;
-				ndInt32 max_z = 0;
-				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-				{
-					ndSceneNode* const node = nodeArray[i];
-					const ndVector dist(node->m_minBox - origin);
-					const ndVector posit(invSize * dist);
-					const ndVector intPosit(posit.GetInt());
-					node->m_cell.m_x = intPosit.m_ix;
-					node->m_cell.m_y = intPosit.m_iy;
-					node->m_cell.m_z = intPosit.m_iz;
-					max_x = ndMax(intPosit.m_ix, max_x);
-					max_y = ndMax(intPosit.m_iy, max_y);
-					max_z = ndMax(intPosit.m_iz, max_z);
-					//m_cellBuffer0[i].m_node = node;
-				}
-				maxGrids[threadIndex][0] = max_x;
-				maxGrids[threadIndex][1] = max_y;
-				maxGrids[threadIndex][2] = max_z;
-			});
-			ParallelExecute(MakeGrids);
-
-		}
+	//	ndCountingSort<ndSceneNode*, ndGridClassifier, 2>(*this, tmpArray, srcArray, leafNodesCount, prefixScan, &info);
+	//
+	//	ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1];
+	//	if (insideCellsCount)
+	//	{
+	//		ndGridClassifier gridClassifier(&info);
+	//		ndUnsigned32 nodesCount = leafNodesCount;
+	//		ndSceneNode** nodeArray = srcArray;
+	//		auto MakeGrids = ndMakeObject::ndFunction([this, nodeArray,  nodesCount, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
+	//		{
+	//			D_TRACKTIME();
+	//			const ndVector origin(gridClassifier.m_origin);
+	//			const ndVector invSize(gridClassifier.m_invSize);
+	//			const ndStartEnd startEnd(nodesCount, threadIndex, threadCount);
+	//			ndInt32 max_x = 0;
+	//			ndInt32 max_y = 0;
+	//			ndInt32 max_z = 0;
+	//			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//			{
+	//				ndSceneNode* const node = nodeArray[i];
+	//				const ndVector dist(node->m_minBox - origin);
+	//				const ndVector posit(invSize * dist);
+	//				const ndVector intPosit(posit.GetInt());
+	//				node->m_cell.m_x = intPosit.m_ix;
+	//				node->m_cell.m_y = intPosit.m_iy;
+	//				node->m_cell.m_z = intPosit.m_iz;
+	//				max_x = ndMax(intPosit.m_ix, max_x);
+	//				max_y = ndMax(intPosit.m_iy, max_y);
+	//				max_z = ndMax(intPosit.m_iz, max_z);
+	//			}
+	//			maxGrids[threadIndex][0] = max_x;
+	//			maxGrids[threadIndex][1] = max_y;
+	//			maxGrids[threadIndex][2] = max_z;
+	//		});
+	//		ParallelExecute(MakeGrids);
+	//
+	//
+	//		ndSceneNode** ptr0 = srcArray;
+	//		ndSceneNode** ptr1 = tmpArray;
+	//		ndCountingSort<ndSceneNode*, ndSortCell_xlow, 8>(*this, ptr0, ptr1, leafNodesCount, nullptr, nullptr);
+	//		ndSwap(ptr0, ptr1);
+	//		if (maxGrids[0][0] > 256)
+	//		{
+	//			dAssert(0);
+	//		}
+	//		
+	//		ndCountingSort<ndSceneNode*, ndSortCell_ylow, 8>(*this, ptr0, ptr1, leafNodesCount, nullptr, nullptr);
+	//		ndSwap(ptr0, ptr1);
+	//		if (maxGrids[0][0] > 256)
+	//		{
+	//			dAssert(0);
+	//		}
+	//		
+	//		ndCountingSort<ndSceneNode*, ndSortCell_zlow, 8>(*this, ptr0, ptr1, leafNodesCount, nullptr, nullptr);
+	//		ndSwap(ptr0, ptr1);
+	//		if (maxGrids[0][0] > 256)
+	//		{
+	//			dAssert(0);
+	//		}
+	//	}
 	}
 
+	dAssert(0);
 	return nullptr;
 }
 #endif

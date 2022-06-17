@@ -39,6 +39,8 @@ class ndConvexCastNotify;
 class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
 
+//#define D_NEW_SCENE
+
 D_MSV_NEWTON_ALIGN_32
 class ndSceneTreeNotiFy : public ndClassAlloc
 {
@@ -136,14 +138,14 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene(const ndScene& src);
 
 #ifdef D_NEW_SCENE
-	//class ndBottomUpCell
-	//{
-	//	public:
-	//	ndUnsigned32 m_x;
-	//	ndUnsigned32 m_y;
-	//	ndUnsigned32 m_z;
-	//	const ndSceneNode* m_node;
-	//};
+	class ndBottomUpCell
+	{
+		public:
+		ndUnsigned32 m_x;
+		ndUnsigned32 m_y;
+		ndUnsigned32 m_z;
+		const ndSceneNode* m_node;
+	};
 
 	class ndCellScanPrefix
 	{
@@ -213,8 +215,8 @@ class ndScene : public ndThreadPool
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
 
 #ifdef	D_NEW_SCENE
-	//ndArray<ndBottomUpCell> m_cellBuffer0;
-	//ndArray<ndBottomUpCell> m_cellBuffer1;
+	ndArray<ndBottomUpCell> m_cellBuffer0;
+	ndArray<ndBottomUpCell> m_cellBuffer1;
 	ndArray<ndCellScanPrefix> m_cellCounts0;
 	ndArray<ndCellScanPrefix> m_cellCounts1;
 #endif
