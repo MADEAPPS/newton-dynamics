@@ -1094,10 +1094,10 @@ ndSceneNode* ndScene::BuildBottomUp(ndSceneNode** const leafArray, ndInt32 first
 ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 {
 	const ndUnsigned32 baseCount = m_bodyList.GetCount();
-	m_scratchBuffer.SetCount((baseCount + 4) * sizeof(ndSceneNode*));
+	m_scratchBuffer.SetCount(4 * (baseCount + 4) * sizeof(ndSceneNode*));
 	
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
-	//ndSceneNode** tmpArray = &srcArray[2 * baseCount];
+	ndSceneNode** tmpArray = &srcArray[4 * (baseCount + 4)];
 	
 	ndUnsigned32 leafNodesCount = 0;
 	ndUnsigned32 parentNodesCount = 0;
@@ -1180,154 +1180,210 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		m_outsideCell,
 	};
 	
-	//class ndGridClassifier
-	//{
-	//	public:
-	//	ndGridClassifier(void* const boxInfo)
-	//	{
-	//		const BoxInfo* const info = (BoxInfo*)boxInfo;
-	//		m_size = info->m_size;
-	//		m_origin = info->m_origin;
-	//		m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
-	//	}
-	//
-	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
-	//	{
-	//		const ndVector minPosit((m_invSize * (node->m_minBox - m_origin)).GetInt());
-	//		const ndVector maxPosit((m_invSize * (node->m_maxBox - m_origin)).GetInt());
-	//		const ndInt32 x0 = minPosit.m_ix;
-	//		const ndInt32 y0 = minPosit.m_iy;
-	//		const ndInt32 z0 = minPosit.m_iz;
-	//		const ndInt32 x1 = maxPosit.m_ix;
-	//		const ndInt32 y1 = maxPosit.m_iy;
-	//		const ndInt32 z1 = maxPosit.m_iz;
-	//
-	//		dAssert(x0 >= 0);
-	//		dAssert(y0 >= 0);
-	//		dAssert(z0 >= 0);
-	//		dAssert(x1 >= 0);
-	//		dAssert(y1 >= 0);
-	//		dAssert(z1 >= 0);
-	//		const ndUnsigned32 test_x = (x0 == x1);
-	//		const ndUnsigned32 test_y = (y0 == y1);
-	//		const ndUnsigned32 test_z = (z0 == z1);
-	//		const bool test = test_x & test_y & test_z;
-	//		return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
-	//	}
-	//
-	//	ndVector m_size;
-	//	ndVector m_invSize;
-	//	ndVector m_origin;
-	//};
-	//
-	//class ndSortCell_xlow
-	//{
-	//	public:
-	//	ndSortCell_xlow(const void* const)
-	//	{
-	//	}
-	//
-	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
-	//	{
-	//		return node->m_cell.m_x & 0xff;
-	//	}
-	//};
-	//
-	//class ndSortCell_ylow
-	//{
-	//	public:
-	//	ndSortCell_ylow(const void* const)
-	//	{
-	//	}
-	//
-	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
-	//	{
-	//		return node->m_cell.m_y & 0xff;
-	//	}
-	//};
-	//
-	//class ndSortCell_zlow
-	//{
-	//	public:
-	//	ndSortCell_zlow(const void* const)
-	//	{
-	//	}
-	//
-	//	ndUnsigned32 GetKey(const ndSceneNode* const node) const
-	//	{
-	//		return node->m_cell.m_z & 0xff;
-	//	}
-	//};
+	class ndGridClassifier
+	{
+		public:
+		ndGridClassifier(void* const boxInfo)
+		{
+			const BoxInfo* const info = (BoxInfo*)boxInfo;
+			m_size = info->m_size;
+			m_origin = info->m_origin;
+			m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
+		}
+	
+		ndUnsigned32 GetKey(const ndSceneNode* const node) const
+		{
+			const ndVector minPosit((m_invSize * (node->m_minBox - m_origin)).GetInt());
+			const ndVector maxPosit((m_invSize * (node->m_maxBox - m_origin)).GetInt());
+			const ndInt32 x0 = minPosit.m_ix;
+			const ndInt32 y0 = minPosit.m_iy;
+			const ndInt32 z0 = minPosit.m_iz;
+			const ndInt32 x1 = maxPosit.m_ix;
+			const ndInt32 y1 = maxPosit.m_iy;
+			const ndInt32 z1 = maxPosit.m_iz;
+	
+			dAssert(x0 >= 0);
+			dAssert(y0 >= 0);
+			dAssert(z0 >= 0);
+			dAssert(x1 >= 0);
+			dAssert(y1 >= 0);
+			dAssert(z1 >= 0);
+			const ndUnsigned32 test_x = (x0 == x1);
+			const ndUnsigned32 test_y = (y0 == y1);
+			const ndUnsigned32 test_z = (z0 == z1);
+			const bool test = test_x & test_y & test_z;
+			return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
+		}
+	
+		ndVector m_size;
+		ndVector m_invSize;
+		ndVector m_origin;
+	};
+
+	class ndSortCell_xlow
+	{
+		public:
+		ndSortCell_xlow(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return cell.m_x & 0xff;
+		}
+	};
+
+	class ndSortCell_ylow
+	{
+		public:
+		ndSortCell_ylow(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return cell.m_y & 0xff;
+		}
+	};
+
+	class ndSortCell_zlow
+	{
+		public:
+		ndSortCell_zlow(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return cell.m_z & 0xff;
+		}
+	};
+
+	class ndSortCellCount
+	{
+		public:
+		ndSortCellCount(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndCellScanPrefix& cell) const
+		{
+			return cell.m_cellTest;
+		}
+	};
+
 	
 	BoxInfo info;
 	info.m_origin = minP;
 	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
 	
-	//ndUnsigned32 prefixScan[4];
-	//ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
+	ndUnsigned32 prefixScan[4];
+	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 	for (int xxxx = 1; xxxx <= 10; xxxx++)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
-	//	ndCountingSort<ndSceneNode*, ndGridClassifier, 2>(*this, tmpArray, srcArray, leafNodesCount, prefixScan, &info);
-	//
-	//	ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1];
-	//	if (insideCellsCount)
-	//	{
-	//		ndGridClassifier gridClassifier(&info);
-	//		ndUnsigned32 nodesCount = leafNodesCount;
-	//		ndSceneNode** nodeArray = srcArray;
-	//		auto MakeGrids = ndMakeObject::ndFunction([this, nodeArray,  nodesCount, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
-	//		{
-	//			D_TRACKTIME();
-	//			const ndVector origin(gridClassifier.m_origin);
-	//			const ndVector invSize(gridClassifier.m_invSize);
-	//			const ndStartEnd startEnd(nodesCount, threadIndex, threadCount);
-	//			ndInt32 max_x = 0;
-	//			ndInt32 max_y = 0;
-	//			ndInt32 max_z = 0;
-	//			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//			{
-	//				ndSceneNode* const node = nodeArray[i];
-	//				const ndVector dist(node->m_minBox - origin);
-	//				const ndVector posit(invSize * dist);
-	//				const ndVector intPosit(posit.GetInt());
-	//				node->m_cell.m_x = intPosit.m_ix;
-	//				node->m_cell.m_y = intPosit.m_iy;
-	//				node->m_cell.m_z = intPosit.m_iz;
-	//				max_x = ndMax(intPosit.m_ix, max_x);
-	//				max_y = ndMax(intPosit.m_iy, max_y);
-	//				max_z = ndMax(intPosit.m_iz, max_z);
-	//			}
-	//			maxGrids[threadIndex][0] = max_x;
-	//			maxGrids[threadIndex][1] = max_y;
-	//			maxGrids[threadIndex][2] = max_z;
-	//		});
-	//		ParallelExecute(MakeGrids);
-	//
-	//
-	//		ndSceneNode** ptr0 = srcArray;
-	//		ndSceneNode** ptr1 = tmpArray;
-	//		ndCountingSort<ndSceneNode*, ndSortCell_xlow, 8>(*this, ptr0, ptr1, leafNodesCount, nullptr, nullptr);
-	//		ndSwap(ptr0, ptr1);
-	//		if (maxGrids[0][0] > 256)
-	//		{
-	//			dAssert(0);
-	//		}
-	//		
-	//		ndCountingSort<ndSceneNode*, ndSortCell_ylow, 8>(*this, ptr0, ptr1, leafNodesCount, nullptr, nullptr);
-	//		ndSwap(ptr0, ptr1);
-	//		if (maxGrids[0][0] > 256)
-	//		{
-	//			dAssert(0);
-	//		}
-	//		
-	//		ndCountingSort<ndSceneNode*, ndSortCell_zlow, 8>(*this, ptr0, ptr1, leafNodesCount, nullptr, nullptr);
-	//		ndSwap(ptr0, ptr1);
-	//		if (maxGrids[0][0] > 256)
-	//		{
-	//			dAssert(0);
-	//		}
-	//	}
+		ndCountingSortInPlace<ndSceneNode*, ndGridClassifier, 2>(*this, srcArray, tmpArray, leafNodesCount, prefixScan, &info);
+	
+		ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1];
+		if (insideCellsCount)
+		{
+			ndGridClassifier gridClassifier(&info);
+			ndUnsigned32 nodesCount = leafNodesCount;
+			ndSceneNode** nodeArray = srcArray;
+
+			m_cellBuffer0.SetCount(insideCellsCount);
+			m_cellBuffer1.SetCount(insideCellsCount);
+			auto MakeGrids = ndMakeObject::ndFunction([this, nodeArray, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
+			{
+				D_TRACKTIME();
+				const ndVector origin(gridClassifier.m_origin);
+				const ndVector invSize(gridClassifier.m_invSize);
+
+				const ndStartEnd startEnd(m_cellBuffer0.GetCount(), threadIndex, threadCount);
+				ndInt32 max_x = 0;
+				ndInt32 max_y = 0;
+				ndInt32 max_z = 0;
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					ndSceneNode* const node = nodeArray[i];
+					const ndVector dist(node->m_minBox - origin);
+					const ndVector posit(invSize * dist);
+					const ndVector intPosit(posit.GetInt());
+					m_cellBuffer0[i].m_x = intPosit.m_ix;
+					m_cellBuffer0[i].m_y = intPosit.m_iy;
+					m_cellBuffer0[i].m_z = intPosit.m_iz;
+					max_x = ndMax(intPosit.m_ix, max_x);
+					max_y = ndMax(intPosit.m_iy, max_y);
+					max_z = ndMax(intPosit.m_iz, max_z);
+				}
+				maxGrids[threadIndex][0] = max_x;
+				maxGrids[threadIndex][1] = max_y;
+				maxGrids[threadIndex][2] = max_z;
+			});
+			ParallelExecute(MakeGrids);
+
+			ndCountingSort<ndBottomUpCell, ndSortCell_xlow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+			if (maxGrids[0][0] > 256)
+			{
+				dAssert(0);
+			}
+			
+			ndCountingSort<ndBottomUpCell, ndSortCell_ylow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+			if (maxGrids[0][0] > 256)
+			{
+				dAssert(0);
+			}
+			
+			ndCountingSort<ndBottomUpCell, ndSortCell_zlow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+			if (maxGrids[0][0] > 256)
+			{
+				dAssert(0);
+			}
+
+			ndBottomUpCell sentinelCell;
+			sentinelCell.m_x = ndUnsigned32(-1);
+			sentinelCell.m_y = ndUnsigned32(-1);
+			sentinelCell.m_z = ndUnsigned32(-1);
+			sentinelCell.m_node = nullptr;
+			
+			m_cellBuffer0.PushBack(sentinelCell);
+			m_cellBuffer1.PushBack(sentinelCell);
+			m_cellCounts0.SetCount(m_cellBuffer0.GetCount());
+			m_cellCounts1.SetCount(m_cellBuffer1.GetCount());
+			auto MarkCellBounds = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+			{
+				D_TRACKTIME();
+				ndCellScanPrefix* const dst = &m_cellCounts0[0];
+				const ndStartEnd startEnd(m_cellBuffer0.GetCount() - 1, threadIndex, threadCount);
+			
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					const ndBottomUpCell& cell0 = m_cellBuffer0[i + 1];
+					const ndBottomUpCell& cell1 = m_cellBuffer0[i];
+					const ndUnsigned8 test = (cell0.m_x == cell1.m_x) & (cell0.m_y == cell1.m_y) & (cell0.m_z == cell1.m_z) & (cell1.m_node != nullptr);
+					dst[i + 1].m_cellTest = test;
+					dst[i + 1].m_location = i + 1;
+				}
+			});
+			ParallelExecute(MarkCellBounds);
+
+			m_cellCounts0[0].m_cellTest = 0;
+			m_cellCounts0[0].m_location = 0;
+			ndCountingSort<ndCellScanPrefix, ndSortCellCount, 1>(*this, m_cellCounts0, m_cellCounts1, prefixScan, nullptr);
+			
+			//ndUnsigned32 sum = 0;
+			//const ndUnsigned32 bashCount = prefixScan[1] - 1;
+			//for (ndUnsigned32 i = 0; i < bashCount; i++)
+			//{
+			//	const ndUnsigned32 count = m_cellCounts1[i + 1].m_location - m_cellCounts1[i].m_location - 1;
+			//	m_cellCounts0[i].m_location = sum;
+			//	sum += count;
+			//}
+			//m_cellCounts0[bashCount].m_location = sum; 
+			//
+			//m_cellCounts0[bashCount].m_location = sum;
+
+		}
 	}
 
 	dAssert(0);
