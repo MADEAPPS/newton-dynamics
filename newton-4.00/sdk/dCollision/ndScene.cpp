@@ -911,7 +911,8 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	
 	enum
 	{
-		m_insideCell = 0,
+		m_linkedCell,
+		m_insideCell,
 		m_outsideCell,
 	};
 	
@@ -924,6 +925,11 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			m_size = info->m_size;
 			m_origin = info->m_origin;
 			m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
+
+			m_code[0] = m_outsideCell;
+			m_code[1] = m_insideCell;
+			m_code[2] = m_linkedCell;
+			m_code[3] = m_linkedCell;
 		}
 	
 		ndUnsigned32 GetKey(const ndSceneNode* const node) const
@@ -946,13 +952,16 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			const ndUnsigned32 test_x = (x0 == x1);
 			const ndUnsigned32 test_y = (y0 == y1);
 			const ndUnsigned32 test_z = (z0 == z1);
-			const bool test = test_x & test_y & test_z;
-			return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
+			const ndUnsigned32 test = test_x & test_y & test_z;
+			const ndUnsigned32 codeIndex = node->m_bhvLinked * 2 + test;
+			//return test ? ndUnsigned32(m_insideCell) : ndUnsigned32(m_outsideCell);
+			return m_code[codeIndex];
 		}
 	
 		ndVector m_size;
 		ndVector m_invSize;
 		ndVector m_origin;
+		ndUnsigned32 m_code[4];
 	};
 
 	class ndSortCell_xlow
@@ -1016,21 +1025,22 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	
 	ndUnsigned32 prefixScan[4];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
+
 	for (int xxxx = 1; xxxx <= 10; xxxx++)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
 		ndCountingSortInPlace<ndSceneNode*, ndGridClassifier, 2>(*this, srcArray, tmpArray, leafNodesCount, prefixScan, &info);
-	
-		ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1];
+
+		ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1] - prefixScan[m_insideCell];
 		if (insideCellsCount)
 		{
 			ndGridClassifier gridClassifier(&info);
-			ndUnsigned32 nodesCount = leafNodesCount;
-			ndSceneNode** nodeArray = srcArray;
-
 			m_cellBuffer0.SetCount(insideCellsCount);
 			m_cellBuffer1.SetCount(insideCellsCount);
-			auto MakeGrids = ndMakeObject::ndFunction([this, nodeArray, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
+			const ndUnsigned32 linkedNodes = prefixScan[m_linkedCell + 1] - prefixScan[m_linkedCell];
+			srcArray += linkedNodes;
+			leafNodesCount -= linkedNodes;
+			auto MakeGrids = ndMakeObject::ndFunction([this, srcArray, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				D_TRACKTIME();
 				const ndVector origin(gridClassifier.m_origin);
@@ -1042,7 +1052,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 				ndInt32 max_z = 0;
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
-					ndSceneNode* const node = nodeArray[i];
+					ndSceneNode* const node = srcArray[i];
 					const ndVector dist(node->m_minBox - origin);
 					const ndVector posit(invSize * dist);
 					const ndVector intPosit(posit.GetInt());
@@ -1119,7 +1129,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			}
 			m_cellCounts1[bashCount].m_location = sum; 
 
-			auto SmallBhvNodes = ndMakeObject::ndFunction([this, parentsArray](ndInt32 threadIndex, ndInt32 threadCount)
+			auto SmallBhvNodes = ndMakeObject::ndFunction([this, parentsArray, bashCount](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				D_TRACKTIME();
 				const ndCellScanPrefix* const srcCellNodes = &m_cellCounts0[0];
@@ -1127,36 +1137,39 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 				const ndBottomUpCell* const nodesCells = &m_cellBuffer0[0];
 				dAssert(m_cellCounts0.GetCount() == m_cellCounts1.GetCount());
 
-				const ndStartEnd startEnd(m_cellCounts0.GetCount() - 1, threadIndex, threadCount);
+				auto MakeTowNodeThree = [srcCellNodes, newParentsDest, nodesCells, parentsArray](int index)
+				{
+					const ndUnsigned32 childIndex = srcCellNodes[index].m_location;
+					const ndUnsigned32 parentIndex = newParentsDest[index].m_location;
+
+					ndSceneNode* const node0 = nodesCells[childIndex + 0].m_node;
+					ndSceneNode* const node1 = nodesCells[childIndex + 1].m_node;
+					ndSceneTreeNode* const root = parentsArray[parentIndex]->GetAsSceneTreeNode();
+					dAssert(root);
+
+					node0->m_bhvLinked = 1;
+					node1->m_bhvLinked = 1;
+
+					root->m_left = node0;
+					root->m_right = node1;
+					node0->m_parent = root;
+					node1->m_parent = root;
+					root->m_parent = nullptr;
+
+					root->m_minBox = node0->m_minBox.GetMin(node1->m_minBox);
+					root->m_maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
+					const ndVector size(root->m_maxBox - root->m_minBox);
+					root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
+				};
+
+				const ndStartEnd startEnd(bashCount, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					const ndUnsigned32 nodesCount = newParentsDest[i + 1].m_location - newParentsDest[i].m_location;
 
 					if (nodesCount == 1)
 					{
-						const ndUnsigned32 index = srcCellNodes[i].m_location;
-						const ndUnsigned32 parentIndex = newParentsDest[i].m_location;
-
-						ndSceneNode* const node0 = nodesCells[index + 0].m_node;
-						ndSceneNode* const node1 = nodesCells[index + 1].m_node;
-						ndSceneTreeNode* const root = parentsArray[parentIndex]->GetAsSceneTreeNode();
-						dAssert(root);
-
-						node0->m_bhvLinked = 1;
-						node1->m_bhvLinked = 1;
-
-						root->m_left = node0;
-						root->m_right = node1;
-						node0->m_parent = root;
-						node1->m_parent = root;
-						root->m_parent = nullptr;
-
-						//root->SetAabb(node0->m_minBox, node1->m_maxBox);
-						root->m_minBox = node0->m_minBox.GetMin(node1->m_minBox);
-						root->m_maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
-						const ndVector size(root->m_maxBox - root->m_minBox);
-						root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
-
+						MakeTowNodeThree(i);
 					}
 					else if (nodesCount == 2)
 					{
@@ -1174,11 +1187,12 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 						dAssert(!node->m_bhvLinked);
 					}
 					#endif			
-
 				}
 			});
 			ParallelExecute(SmallBhvNodes);
 
+			parentsArray += sum;
+			leafNodesCount += sum;
 		}
 	}
 
