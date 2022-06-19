@@ -27,6 +27,8 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
+//#define D_NEW_SCENE
+
 #define D_SCENE_MAX_STACK_DEPTH		256
 #define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 
@@ -38,8 +40,6 @@ class ndContactNotify;
 class ndConvexCastNotify;
 class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
-
-//#define D_NEW_SCENE
 
 D_MSV_NEWTON_ALIGN_32
 class ndSceneTreeNotiFy : public ndClassAlloc
@@ -144,7 +144,7 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_x;
 		ndUnsigned32 m_y;
 		ndUnsigned32 m_z;
-		const ndSceneNode* m_node;
+		ndSceneNode* m_node;
 	};
 
 	class ndCellScanPrefix

@@ -39,6 +39,7 @@ class ndSceneNode: public ndClassAlloc
 		,m_parent(parent)
 		,m_surfaceArea(ndFloat32(1.0e20f))
 		,m_lock()
+		,m_bhvLinked(0)
 	{
 #ifdef _DEBUG
 		static ndInt32 nodeId = 0;
@@ -78,6 +79,7 @@ class ndSceneNode: public ndClassAlloc
 	ndSceneNode* m_parent;
 	ndFloat32 m_surfaceArea;
 	ndSpinLock m_lock;
+	ndUnsigned8 m_bhvLinked;
 #ifdef _DEBUG
 	ndInt32 m_nodeId;
 #endif
