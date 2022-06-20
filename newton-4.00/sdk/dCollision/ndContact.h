@@ -95,7 +95,6 @@ class ndContact: public ndConstraint
 	D_COLLISION_API void DetachFromBodies();
 
 	ndContact* GetAsContact() { return this; }
-	ndFloat32 GetPruningTolerance() const;
 
 	const ndMaterial* GetMaterial() const;
 
@@ -129,7 +128,6 @@ class ndContact: public ndConstraint
 	ndMaterial* m_material;
 	ndFloat32 m_timeOfImpact;
 	ndFloat32 m_separationDistance;
-	ndFloat32 m_contactPruningTolereance;
 	ndUnsigned32 m_maxDOF;
 	ndUnsigned32 m_sceneLru;
 	ndUnsigned32 m_isDead : 1;
@@ -152,11 +150,6 @@ class ndContact: public ndConstraint
 inline const ndMaterial* ndContact::GetMaterial() const
 {
 	return m_material;
-}
-
-inline ndFloat32 ndContact::GetPruningTolerance() const
-{
-	return m_contactPruningTolereance;
 }
 
 inline ndUnsigned32 ndContact::GetRowsCount() const
