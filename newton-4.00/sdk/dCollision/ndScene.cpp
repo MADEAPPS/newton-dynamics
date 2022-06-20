@@ -996,39 +996,45 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 					if (maxVarian > ndFloat32(1.0e-3f))
 					{
-						ndFloat32 midPoint = median[index] / ndFloat32(block.m_count);
-
-						ndInt32 index0 = block.m_start;
-						ndInt32 index1 = block.m_start + block.m_count - 1;
-
-						auto CompareKey = [index, midPoint](const ndSceneNode* const node)
+						class ndCompareContext
 						{
-							const ndVector p(ndVector::m_half * (node->m_minBox + node->m_maxBox));
-							ndUnsigned32 key = p[index] < midPoint;
-							return key;
+							public:
+							ndFloat32 m_midPoint;
+							ndUnsigned32 m_index;
 						};
 
-						ndBottomUpCell* const sortNodesCells = &m_cellBuffer0[0];
-						while (index1 > index0)
+						class ndCompareKey
 						{
-							while ((index0 < index1) && !CompareKey(sortNodesCells[index0].m_node))
+							public:
+							ndCompareKey(const void* const context)
 							{
-								index0++;
+								const ndCompareContext* const info = (ndCompareContext*)context;
+
+								m_index = info->m_index;
+								m_midPoint = info->m_midPoint;
 							}
 
-							while ((index0 < index1) && CompareKey(sortNodesCells[index1].m_node))
+							ndUnsigned32 GetKey(const ndBottomUpCell& cell)
 							{
-								index1--;
+								const ndSceneNode* const node = cell.m_node;
+								const ndVector p(ndVector::m_half * (node->m_minBox + node->m_maxBox));
+								ndUnsigned32 key = p[m_index] >= m_midPoint;
+								return key;
 							}
 
-							if (index0 < index1)
-							{
-								ndSwap(sortNodesCells[index0], sortNodesCells[index1]);
-							}
+							ndFloat32 m_midPoint;
+							ndUnsigned32 m_index;
+						};
 
-							dAssert(index0 <= index1);
-						}
-						dAssert(index0 <= index1);
+						ndCompareContext info;
+						ndUnsigned32 scan[8];
+						ndBottomUpCell tmpBuffer[256];
+
+						info.m_index = index;
+						info.m_midPoint = median[index] / ndFloat32(block.m_count);
+						ndCountingSortInPlace<ndBottomUpCell, ndCompareKey, 2>(&m_cellBuffer0[block.m_start], tmpBuffer, block.m_count, scan, &info);
+						ndInt32 index0 = block.m_start + scan[1];
+
 						dAssert(index0 > block.m_start);
 						dAssert(index0 < (block.m_start + block.m_count));
 
@@ -1040,8 +1046,8 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						}
 						else if (count0 == 2)
 						{
-							ndSceneNode* const node0 = sortNodesCells[block.m_start + 0].m_node;
-							ndSceneNode* const node1 = sortNodesCells[block.m_start + 1].m_node;
+							ndSceneNode* const node0 = m_cellBuffer0[block.m_start + 0].m_node;
+							ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
 							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
 							dAssert(root);
 							dAssert(!root->m_left);
@@ -1052,9 +1058,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						}
 						else if (count0 == 3)
 						{
-							ndSceneNode* const node0 = sortNodesCells[block.m_start + 0].m_node;
-							ndSceneNode* const node1 = sortNodesCells[block.m_start + 1].m_node;
-							ndSceneNode* const node2 = sortNodesCells[block.m_start + 2].m_node;
+							ndSceneNode* const node0 = m_cellBuffer0[block.m_start + 0].m_node;
+							ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
+							ndSceneNode* const node2 = m_cellBuffer0[block.m_start + 2].m_node;
 
 							ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
 							rootNodeIndex++;
@@ -1094,8 +1100,8 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						}
 						else if (count1 == 2)
 						{
-							ndSceneNode* const node0 = sortNodesCells[index0 + 0].m_node;
-							ndSceneNode* const node1 = sortNodesCells[index0 + 1].m_node;
+							ndSceneNode* const node0 = m_cellBuffer0[index0 + 0].m_node;
+							ndSceneNode* const node1 = m_cellBuffer0[index0 + 1].m_node;
 							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
 							rootNodeIndex++;
 
@@ -1107,9 +1113,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						}
 						else if (count1 == 3)
 						{
-							ndSceneNode* const node0 = sortNodesCells[index0 + 0].m_node;
-							ndSceneNode* const node1 = sortNodesCells[index0 + 1].m_node;
-							ndSceneNode* const node2 = sortNodesCells[index0 + 2].m_node;
+							ndSceneNode* const node0 = m_cellBuffer0[index0 + 0].m_node;
+							ndSceneNode* const node1 = m_cellBuffer0[index0 + 1].m_node;
+							ndSceneNode* const node2 = m_cellBuffer0[index0 + 2].m_node;
 
 							ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
 							rootNodeIndex++;
@@ -1366,7 +1372,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ndUnsigned32 prefixScan[4];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
-	for (int xxxx = 1; xxxx <= 10; xxxx++)
+	for (ndInt32 xxxx = 1; xxxx <= 10; ++xxxx)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
 		ndCountingSortInPlace<ndSceneNode*, ndGridClassifier, 2>(*this, srcArray, tmpArray, leafNodesCount, prefixScan, &info);
