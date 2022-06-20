@@ -1030,7 +1030,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						}
 						dAssert(index0 <= index1);
 						dAssert(index0 > block.m_start);
-						dAssert(index0 < (block.m_start + block.m_count - 1));
+						dAssert(index0 < (block.m_start + block.m_count));
 
 						ndUnsigned32 count0 = index0 - block.m_start;
 						dAssert(count0);
