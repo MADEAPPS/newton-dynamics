@@ -830,7 +830,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 		const ndBottomUpCell* const nodesCells = &m_cellBuffer0[0];
 		dAssert(m_cellCounts0.GetCount() == m_cellCounts1.GetCount());
 
-		auto MakeTwoNodeThree = [](ndSceneTreeNode* const root, ndSceneNode* const left, ndSceneNode* const right)
+		auto MakeTwoNodesTree = [](ndSceneTreeNode* const root, ndSceneNode* const left, ndSceneNode* const right)
 		{
 			left->m_bhvLinked = 1;
 			right->m_bhvLinked = 1;
@@ -844,6 +844,67 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 			root->m_minBox = left->m_minBox.GetMin(right->m_minBox);
 			root->m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
+			const ndVector size(root->m_maxBox - root->m_minBox);
+			root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
+		};
+
+		auto MakeThreeNodesTree = [](ndSceneTreeNode* const root, ndSceneTreeNode* const subRoot, ndSceneNode* const node0, ndSceneNode* const node1, ndSceneNode* const node2)
+		{
+			class ndNodeOrder
+			{
+				public:
+				ndVector m_p0;
+				ndVector m_p1;
+				ndSceneNode* m_node0;
+				ndSceneNode* m_node1;
+				ndSceneNode* m_node2;
+				ndFloat32 m_area;
+			};
+			
+			ndNodeOrder order[3];
+			
+			order[0].m_node0 = node0;
+			order[0].m_node1 = node1;
+			order[0].m_node2 = node2;
+			
+			order[1].m_node0 = node1;
+			order[1].m_node1 = node2;
+			order[1].m_node2 = node0;
+			
+			order[2].m_node0 = node2;
+			order[2].m_node1 = node0;
+			order[2].m_node2 = node1;
+			
+			for (ndInt32 i = 0; i < 3; ++i)
+			{
+				order[i].m_p0 = order[i].m_node0->m_minBox.GetMin(order[i].m_node1->m_minBox);
+				order[i].m_p1 = order[i].m_node0->m_maxBox.GetMax(order[i].m_node1->m_maxBox);
+				const ndVector size(order[i].m_p1 - order[i].m_p0);
+				order[i].m_area = size.DotProduct(size.ShiftTripleRight()).GetScalar();
+			}
+
+			root->m_bhvLinked = 1;
+			node0->m_bhvLinked = 1;
+			node1->m_bhvLinked = 1;
+			node2->m_bhvLinked = 1;
+			subRoot->m_bhvLinked = 1;
+
+			subRoot->m_parent = root;
+			subRoot->m_left = order[0].m_node0;
+			subRoot->m_right = order[0].m_node1;
+			subRoot->m_minBox = order[0].m_p0;
+			subRoot->m_maxBox = order[0].m_p1;
+			subRoot->m_surfaceArea = order[0].m_area;
+			subRoot->m_left->m_parent = subRoot;
+			subRoot->m_right->m_parent = subRoot;
+
+			root->m_parent = nullptr;
+			root->m_right = subRoot;
+			root->m_left = order[0].m_node2;
+			root->m_left->m_parent = root;
+
+			root->m_minBox = root->m_left->m_minBox.GetMin(root->m_right->m_minBox);
+			root->m_maxBox = root->m_left->m_maxBox.GetMax(root->m_right->m_maxBox);
 			const ndVector size(root->m_maxBox - root->m_minBox);
 			root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 		};
@@ -862,7 +923,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				ndSceneTreeNode* const root = parentsArray[parentIndex]->GetAsSceneTreeNode();
 				dAssert(root);
 				dAssert(!root->m_bhvLinked);
-				MakeTwoNodeThree(root, node0, node1);
+				MakeTwoNodesTree(root, node0, node1);
 			}
 			else if (nodesCount == 2)
 			{
@@ -872,7 +933,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			{
 				class ndBlockSegment
 				{
-				public:
+					public:
 					ndInt32 m_start;
 					ndInt32 m_count;
 					ndInt32 m_rootNodeIndex;
@@ -984,14 +1045,28 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
 							dAssert(root);
 							dAssert(!root->m_left);
-							MakeTwoNodeThree(parent, node0, node1);
+							MakeTwoNodesTree(parent, node0, node1);
 							parent->m_parent = root;
 							root->m_left = parent;
 							rootNodeIndex++;
 						}
 						else if (count0 == 3)
 						{
-							dAssert(0);
+							ndSceneNode* const node0 = sortNodesCells[block.m_start + 0].m_node;
+							ndSceneNode* const node1 = sortNodesCells[block.m_start + 1].m_node;
+							ndSceneNode* const node2 = sortNodesCells[block.m_start + 2].m_node;
+
+							ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+							rootNodeIndex++;
+
+							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+							rootNodeIndex++;
+
+							dAssert(root);
+							dAssert(!root->m_left);
+							MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
+							grandParent->m_parent = root;
+							root->m_left = grandParent;
 						}
 						else
 						{
@@ -1026,7 +1101,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 							dAssert(root);
 							dAssert(!root->m_right);
-							MakeTwoNodeThree(parent, node0, node1);
+							MakeTwoNodesTree(parent, node0, node1);
 							parent->m_parent = root;
 							root->m_right = parent;
 						}
@@ -1044,51 +1119,26 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 							dAssert(root);
 							dAssert(!root->m_right);
-
-							parent->m_parent = grandParent;
-							grandParent->m_right = parent;
-
+							MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
 							grandParent->m_parent = root;
 							root->m_right = grandParent;
-
-							class ndNodeOrder
-							{
-								public:
-								ndVector m_p0;
-								ndVector m_p1;
-								ndSceneNode* m_node0;
-								ndSceneNode* m_node1;
-								ndSceneNode* m_node2;
-								ndFloat32 m_area;
-							};
-
-							ndNodeOrder order[3];
-
-							order[0].m_node0 = node0;
-							order[0].m_node1 = node1;
-							order[0].m_node2 = node2;
-
-							order[1].m_node0 = node1;
-							order[1].m_node1 = node2;
-							order[1].m_node2 = node0;
-
-							order[2].m_node0 = node2;
-							order[2].m_node1 = node0;
-							order[2].m_node2 = node1;
-
-							for (ndInt32 j = 0; j < 3; ++j)
-							{
-								order[j].m_p0 = order[j].m_node0->m_minBox.GetMin(order[j].m_node1->m_minBox);
-								order[j].m_p1 = order[j].m_node0->m_maxBox.GetMax(order[j].m_node1->m_maxBox);
-								const ndVector dimSize(order[j].m_p1 - order[j].m_p0);
-								order[j].m_area = dimSize.DotProduct(dimSize.ShiftTripleRight()).GetScalar();
-							}
-
-							dAssert(0);
 						}
 						else
 						{
-							dAssert(0);
+							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+							parent->m_bhvLinked = 1;
+							parent->m_parent = root;
+							parent->m_left = nullptr;
+							parent->m_right = nullptr;
+							root->m_right = parent;
+
+							stackPool[stack].m_rootNodeIndex = rootNodeIndex;
+							stackPool[stack].m_start = index0;
+							stackPool[stack].m_count = count1;
+
+							stack++;
+							rootNodeIndex++;
+							dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
 						}
 					}
 					else
