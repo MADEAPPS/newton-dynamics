@@ -913,11 +913,12 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 					ndSceneTreeNode* const root = parentsArray[block.m_rootNodeIndex]->GetAsSceneTreeNode();
 					root->m_minBox = minP;
 					root->m_maxBox = maxP;
-					const ndVector size(maxP - minP);
 					root->m_bhvLinked = 1;
 					root->m_left = nullptr;
 					root->m_right = nullptr;
 					root->m_parent = nullptr;
+
+					const ndVector size(maxP - minP);
 					root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 
 					ndInt32 index = 0;
@@ -1049,6 +1050,39 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 							grandParent->m_parent = root;
 							root->m_right = grandParent;
+
+							class ndNodeOrder
+							{
+								public:
+								ndVector m_p0;
+								ndVector m_p1;
+								ndSceneNode* m_node0;
+								ndSceneNode* m_node1;
+								ndSceneNode* m_node2;
+								ndFloat32 m_area;
+							};
+
+							ndNodeOrder order[3];
+
+							order[0].m_node0 = node0;
+							order[0].m_node1 = node1;
+							order[0].m_node2 = node2;
+
+							order[1].m_node0 = node1;
+							order[1].m_node1 = node2;
+							order[1].m_node2 = node0;
+
+							order[2].m_node0 = node2;
+							order[2].m_node1 = node0;
+							order[2].m_node2 = node1;
+
+							for (ndInt32 j = 0; j < 3; ++j)
+							{
+								order[j].m_p0 = order[j].m_node0->m_minBox.GetMin(order[j].m_node1->m_minBox);
+								order[j].m_p1 = order[j].m_node0->m_maxBox.GetMax(order[j].m_node1->m_maxBox);
+								const ndVector dimSize(order[j].m_p1 - order[j].m_p0);
+								order[j].m_area = dimSize.DotProduct(dimSize.ShiftTripleRight()).GetScalar();
+							}
 
 							dAssert(0);
 						}
