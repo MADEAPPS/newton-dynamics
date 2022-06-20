@@ -927,7 +927,19 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			}
 			else if (nodesCount == 2)
 			{
-				dAssert(0);
+				const ndUnsigned32 childIndex = srcCellNodes[i].m_location;
+				const ndUnsigned32 parentIndex = newParentsDest[i].m_location;
+
+				ndSceneNode* const node0 = nodesCells[childIndex + 0].m_node;
+				ndSceneNode* const node1 = nodesCells[childIndex + 1].m_node;
+				ndSceneNode* const node2 = nodesCells[childIndex + 2].m_node;
+
+				ndSceneTreeNode* const root = parentsArray[parentIndex + 0]->GetAsSceneTreeNode();
+				ndSceneTreeNode* const subParent = parentsArray[parentIndex + 1]->GetAsSceneTreeNode();
+
+				dAssert(root);
+				dAssert(!root->m_bhvLinked);
+				MakeThreeNodesTree(root, subParent, node0, node1, node2);
 			}
 			else if (nodesCount > 2)
 			{
@@ -1042,7 +1054,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						dAssert(count0);
 						if (count0 == 1)
 						{
-							dAssert(0);
+							ndSceneNode* const node = m_cellBuffer0[block.m_start].m_node;
+							node->m_bhvLinked = 0;
+							node->m_parent = nullptr;
 						}
 						else if (count0 == 2)
 						{
