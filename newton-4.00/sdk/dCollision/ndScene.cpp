@@ -1123,7 +1123,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						dAssert(count1);
 						if (count1 == 1)
 						{
-							ndSceneNode* const node = m_cellBuffer0[block.m_start].m_node;
+							ndSceneNode* const node = m_cellBuffer0[index0].m_node;
 							node->m_bhvLinked = 1;
 							node->m_parent = root;
 							root->m_right = node;
@@ -1408,7 +1408,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
-int xxxxx = 0;
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
@@ -1514,7 +1513,6 @@ int xxxxx = 0;
 
 			BuildSmallBvh(parentsArray, bashCount);
 
-			xxxxx += sum;
 			parentsArray += sum;
 			leafNodesCount += sum;
 		}
