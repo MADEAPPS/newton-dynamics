@@ -834,6 +834,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 		{
 			left->m_bhvLinked = 1;
 			right->m_bhvLinked = 1;
+			root->m_bhvLinked = 1;
 
 			root->m_left = left;
 			root->m_right = right;
@@ -924,6 +925,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				dAssert(root);
 				dAssert(!root->m_bhvLinked);
 				MakeTwoNodesTree(root, node0, node1);
+				root->m_bhvLinked = 0;
 			}
 			else if (nodesCount == 2)
 			{
@@ -940,6 +942,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				dAssert(root);
 				dAssert(!root->m_bhvLinked);
 				MakeThreeNodesTree(root, subParent, node0, node1, node2);
+				root->m_bhvLinked = 0;
 			}
 			else if (nodesCount > 2)
 			{
@@ -1055,8 +1058,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						if (count0 == 1)
 						{
 							ndSceneNode* const node = m_cellBuffer0[block.m_start].m_node;
-							node->m_bhvLinked = 0;
-							node->m_parent = nullptr;
+							node->m_bhvLinked = 1;
+							node->m_parent = root;
+							root->m_left = node;
 						}
 						else if (count0 == 2)
 						{
@@ -1110,7 +1114,10 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						dAssert(count1);
 						if (count1 == 1)
 						{
-							dAssert(0);
+							ndSceneNode* const node = m_cellBuffer0[block.m_start].m_node;
+							node->m_bhvLinked = 1;
+							node->m_parent = root;
+							root->m_right = node;
 						}
 						else if (count1 == 2)
 						{
@@ -1166,7 +1173,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						dAssert(0);
 					}
 				}
-
 				rootNode->m_bhvLinked = 0;
 			}
 			#ifdef _DEBUG
@@ -1190,6 +1196,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
 	ndSceneNode** tmpArray = &srcArray[4 * (baseCount + 4)];
 
+ndSceneNode** xxxxxxxx = srcArray;
 	ndSceneNode** parentsArray = &srcArray[baseCount];
 	
 	ndUnsigned32 leafNodesCount = 0;
@@ -1201,6 +1208,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		parentNodesCount++;
 
 		node->m_bhvLinked = 0;
+		node->m_parent = nullptr;
 		dAssert(parentNodesCount < baseCount);
 	
 		ndSceneNode* const leftNode = node->GetLeft();
@@ -1208,6 +1216,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		if (leftBody)
 		{
 			leftNode->m_bhvLinked = 0;
+			leftNode->m_parent = nullptr;
 			leftNode->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
 			srcArray[leafNodesCount] = leftNode;
 			leafNodesCount++;
@@ -1219,6 +1228,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		if (rightNode->GetBody())
 		{
 			rightNode->m_bhvLinked = 0;
+			rightNode->m_parent = nullptr;
 			rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
 			srcArray[leafNodesCount] = rightNode;
 			leafNodesCount++;
@@ -1383,7 +1393,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 
 //info.m_size = info.m_size.Scale(ndFloat32(2.0f));
 	
-	ndUnsigned32 prefixScan[4];
+	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
 	for (ndInt32 xxxx = 1; xxxx <= 10; ++xxxx)
