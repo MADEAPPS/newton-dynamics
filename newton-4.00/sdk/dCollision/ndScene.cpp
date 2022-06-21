@@ -1209,6 +1209,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 
 		node->m_bhvLinked = 0;
 		node->m_parent = nullptr;
+		node->m_surfaceArea = ndFloat32(0.0f);
 		dAssert(parentNodesCount < baseCount);
 	
 		ndSceneNode* const leftNode = node->GetLeft();
@@ -1217,6 +1218,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		{
 			leftNode->m_bhvLinked = 0;
 			leftNode->m_parent = nullptr;
+			leftNode->m_surfaceArea = ndFloat32(0.0f);
 			leftNode->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
 			srcArray[leafNodesCount] = leftNode;
 			leafNodesCount++;
@@ -1229,6 +1231,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		{
 			rightNode->m_bhvLinked = 0;
 			rightNode->m_parent = nullptr;
+			rightNode->m_surfaceArea = ndFloat32(0.0f);
 			rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
 			srcArray[leafNodesCount] = rightNode;
 			leafNodesCount++;
@@ -1396,7 +1399,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
-	//for (ndInt32 xxxx = 1; xxxx <= 10; ++xxxx)
+int xxxxx = 0;
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
@@ -1502,6 +1505,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 
 			BuildSmallBvh(parentsArray, bashCount);
 
+			xxxxx += sum;
 			parentsArray += sum;
 			leafNodesCount += sum;
 		}
@@ -1528,20 +1532,16 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		(*root)->m_parent = nullptr;
 		ndFloat64 entropy = ReduceEntropy(fitness, root);
 
-		#ifdef D_NEW_SCENE
-		ndFloat64 entropy1 = 0;
-		if (fitness.GetFirst())
-		{
-			ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
-			*root = bottomUpRoot;
-			entropy1 = fitness.TotalCost();
-		}
-		#endif 
-
 		if (m_forceBalanceScene || (entropy > (oldEntropy * ndFloat32(1.5f))) || (entropy < (oldEntropy * ndFloat32(0.75f))))
 		{
 			if (fitness.GetFirst())
 			{
+				#ifdef D_NEW_SCENE
+				ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
+				*root = bottomUpRoot;
+				ndFloat64 entropy1 = fitness.TotalCost();
+				#endif 
+
 				m_scratchBuffer.SetCount((fitness.GetCount() * 2 + 16) * sizeof(ndSceneNode*));
 				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
