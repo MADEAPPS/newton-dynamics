@@ -727,7 +727,7 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstB
 					public:
 					ndSpliteTest(const ndFloat32 dist, ndInt32 index)
 						:m_dist(dist)
-						, m_index(index)
+						,m_index(index)
 					{
 					}
 
@@ -1195,9 +1195,9 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
 	ndSceneNode** tmpArray = &srcArray[4 * (baseCount + 4)];
-
-ndSceneNode** xxxxxxxx = srcArray;
 	ndSceneNode** parentsArray = &srcArray[baseCount];
+
+//ndSceneNode** xxxxxxxx = srcArray;
 	
 	ndUnsigned32 leafNodesCount = 0;
 	ndUnsigned32 parentNodesCount = 0;
@@ -1396,7 +1396,8 @@ ndSceneNode** xxxxxxxx = srcArray;
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
-	for (ndInt32 xxxx = 1; xxxx <= 10; ++xxxx)
+	//for (ndInt32 xxxx = 1; xxxx <= 10; ++xxxx)
+	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
 		ndCountingSortInPlace<ndSceneNode*, ndGridClassifier, 2>(*this, srcArray, tmpArray, leafNodesCount, prefixScan, &info);
@@ -1506,8 +1507,7 @@ ndSceneNode** xxxxxxxx = srcArray;
 		}
 	}
 
-	dAssert(0);
-	return nullptr;
+	return srcArray[0];
 }
 #endif
 
@@ -1529,9 +1529,12 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		ndFloat64 entropy = ReduceEntropy(fitness, root);
 
 		#ifdef D_NEW_SCENE
+		ndFloat64 entropy1 = 0;
 		if (fitness.GetFirst())
 		{
 			ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
+			*root = bottomUpRoot;
+			entropy1 = fitness.TotalCost();
 		}
 		#endif 
 
