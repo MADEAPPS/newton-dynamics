@@ -884,6 +884,15 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				order[i].m_area = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 			}
 
+			if (order[2].m_area < order[1].m_area)
+			{
+				ndSwap(order[1], order[2]);
+			}
+			if (order[1].m_area < order[0].m_area)
+			{
+				ndSwap(order[1], order[0]);
+			}
+
 			root->m_bhvLinked = 1;
 			node0->m_bhvLinked = 1;
 			node1->m_bhvLinked = 1;
