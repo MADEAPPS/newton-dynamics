@@ -87,7 +87,6 @@ class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 	ndUnsigned8 m_listIsDirty;
 };
 
-
 class ndBodyList: public ndListView<ndBodyKinematic>
 {
 	public:
