@@ -952,6 +952,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				};
 
 				ndBlockSegment stackPool[8];
+				//ndBlockSegment stackPool[16];
 
 				ndUnsigned32 stack = 1;
 				ndUnsigned32 rootNodeIndex = newParentsDest[i].m_location;
@@ -1041,6 +1042,8 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						ndCompareContext info;
 						ndUnsigned32 scan[8];
 						ndBottomUpCell tmpBuffer[256];
+						//ndBottomUpCell tmpBuffer[2048];
+						dAssert(block.m_count < sizeof(tmpBuffer) / sizeof(tmpBuffer[1]));
 
 						info.m_index = index;
 						info.m_midPoint = median[index] / ndFloat32(block.m_count);
@@ -1051,6 +1054,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						dAssert(index0 < (block.m_start + block.m_count));
 
 						ndUnsigned32 count0 = index0 - block.m_start;
+
 						dAssert(count0);
 						if (count0 == 1)
 						{
@@ -1194,7 +1198,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
 	ndSceneNode** tmpArray = &srcArray[4 * (baseCount + 4)];
 	ndSceneNode** parentsArray = &srcArray[baseCount];
-//ndSceneNode** xxxxxxxx = srcArray;
 
 	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray, baseCount](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -1240,8 +1243,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ParallelExecute(CopySceneNode);
 
 	ndUnsigned32 leafNodesCount = baseCount;
-	//ndUnsigned32 parentNodesCount = fitness.m_view.GetCount();
-	dAssert(fitness.m_view.GetCount() < baseCount);
+	dAssert(ndUnsigned32(fitness.m_view.GetCount()) < baseCount);
 	
 	ndVector boxes[D_MAX_THREADS_COUNT][2];
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
@@ -1403,6 +1405,9 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
+static int xxxx0;
+static int xxxx1;
+
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
@@ -1506,8 +1511,10 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			}
 			m_cellCounts1[bashCount].m_location = sum; 
 
-			BuildSmallBvh(parentsArray, bashCount);
+			xxxx0++;
+			xxxx1 += sum;
 
+			BuildSmallBvh(parentsArray, bashCount);
 			parentsArray += sum;
 			leafNodesCount += sum;
 		}
@@ -1524,8 +1531,12 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		UpdateBodyList();
 		fitness.UpdateView();
 		m_forceBalanceSceneCounter++;
-		//if (m_forceBalanceSceneCounter > 256)
+		
+#ifdef D_NEW_SCENE
 		if (m_forceBalanceSceneCounter > 2)
+#else
+		if (m_forceBalanceSceneCounter > 256)
+#endif
 		{
 			m_forceBalanceScene = 1;
 		}
