@@ -30,7 +30,7 @@
 template <class T, class dCompareKey>
 void ndSort(T* const array, ndInt32 elements, void* const context)
 {
-	//D_TRACKTIME();
+	D_TRACKTIME();
 	const ndInt32 batchSize = 8;
 	ndInt32 stack[128][2];
 
@@ -133,7 +133,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
 void ndCountingSortInPlace(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context)
 {
-	//D_TRACKTIME();
+	D_TRACKTIME();
 	dAssert(keyBitSize > 0);
 	ndUnsigned32 scans[(1 << keyBitSize) + 1];
 	ndEvaluateKey evaluator(context);
@@ -279,11 +279,10 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 #endif
 }
 
-
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
 void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context)
 {
-	//D_TRACKTIME();
+	D_TRACKTIME();
 	dAssert(keyBitSize > 0);
 	ndUnsigned32 scans[(1 << keyBitSize) + 1];
 	ndEvaluateKey evaluator(context);
@@ -442,6 +441,5 @@ void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* 
 	ndCountingSort<T, ndEvaluateKey, keyBitSize>(&array[0], &scratchBuffer[0], array.GetCount(), prefixScanOut, context);
 	array.Swap(scratchBuffer);
 }
-
 
 #endif
