@@ -114,7 +114,6 @@ ndScene::ndScene()
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_forceBalanceSceneCounter(0)
-	,m_bodyListChanged(1)
 	,m_forceBalanceScene(0)
 {
 	m_sentinelBody = new ndBodySentinel;
@@ -145,7 +144,6 @@ ndScene::ndScene(const ndScene& src)
 	,m_timestep(ndFloat32(0.0f))
 	,m_lru(src.m_lru)
 	,m_forceBalanceSceneCounter(src.m_forceBalanceSceneCounter)
-	,m_bodyListChanged(src.m_bodyListChanged)
 	,m_forceBalanceScene(src.m_forceBalanceScene)
 {
 	ndScene* const stealData = (ndScene*)&src;
@@ -285,8 +283,7 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 {
 	if ((body->m_scene == nullptr) && (body->m_sceneNode == nullptr))
 	{
-		m_bodyListChanged = 1;
-		ndBodyList::ndNode* const node = m_bodyList.Append(body);
+		ndBodyList::ndNode* const node = m_bodyList.AddItem(body);
 		body->SetSceneNodes(this, node);
 		m_contactNotifyCallback->OnBodyAdded(body);
 
@@ -321,14 +318,13 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 
 	if (body->m_scene && body->m_sceneNode)
 	{
-		m_bodyListChanged = 1;
 		if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
 		{
 			m_specialUpdateList.Remove(body->m_spetialUpdateNode);
 			body->m_spetialUpdateNode = nullptr;
 		}
 
-		m_bodyList.Remove(body->m_sceneNode);
+		m_bodyList.RemoveItem(body->m_sceneNode);
 		body->SetSceneNodes(nullptr, nullptr);
 		m_contactNotifyCallback->OnBodyRemoved(body);
 		return true;
@@ -2536,7 +2532,6 @@ void ndScene::Cleanup()
 	Sync();
 	m_backgroundThread.Terminate();
 
-	m_bodyListChanged = 1;
 	while (m_bodyList.GetFirst())
 	{
 		ndBodyKinematic* const body = m_bodyList.GetFirst()->GetInfo();
@@ -3065,18 +3060,13 @@ void ndScene::FindCollidingPairs()
 
 void ndScene::UpdateBodyList()
 {
-	if (m_bodyListChanged)
+	if (m_bodyList.UpdateView())
 	{
 		D_TRACKTIME();
-		ndInt32 index = 0;
 		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-		view.SetCount(m_bodyList.GetCount());
-		for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+		for (ndInt32 i = 0; i < view.GetCount(); ++i)
 		{
-			ndBodyKinematic* const body = node->GetInfo();
-			view[index] = node->GetInfo();
-			++index;
-
+			ndBodyKinematic* const body = view[i];
 			dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 			bool inScene = true;
 			if (!body->GetSceneBodyNode())
@@ -3085,7 +3075,6 @@ void ndScene::UpdateBodyList()
 			}
 			dAssert(inScene && body->GetSceneBodyNode());
 		}
-		m_bodyListChanged = 0;
 		view.PushBack(m_sentinelBody);
 	}
 }

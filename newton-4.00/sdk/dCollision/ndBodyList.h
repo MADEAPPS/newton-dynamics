@@ -26,22 +26,25 @@
 
 class ndBodyKinematic;
 
-class ndBodyList: public ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBodyKinematic*>>
+template<class T >
+class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 {
 	public:
-	ndBodyList()
-		:ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBodyKinematic*>>()
+	ndListView()
+		:ndList<T*, ndContainersFreeListAlloc<T*>>()
 		,m_view(1024)
+		,m_listIsDirty(1)
 	{
 	}
 
-	ndBodyList(const ndBodyList& src)
-		:ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBodyKinematic*>>()
+	ndListView(const ndListView& src)
+		:ndList<T*, ndContainersFreeListAlloc<T*>>()
 		,m_view()
+		,m_listIsDirty(1)
 	{
-		ndBodyList* const stealData = (ndBodyList*)&src;
+		ndListView* const stealData = (ndListView*)&src;
 		ndNode* nextNode;
-		for (ndNode* node = stealData->GetFirst(); node; node = node = nextNode)
+		for (ndNode* node = stealData->GetFirst(); node; node = nextNode)
 		{
 			nextNode = node->GetNext();
 			stealData->Unlink(node);
@@ -50,7 +53,53 @@ class ndBodyList: public ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBo
 		m_view.Swap(stealData->m_view);
 	}
 
-	ndArray<ndBodyKinematic*> m_view;
+	ndNode* AddItem(T* const item)
+	{
+		m_listIsDirty = 1;
+		return Append(item);
+	}
+
+	void RemoveItem(ndNode* const node)
+	{
+		m_listIsDirty = 1;
+		Remove(node);
+	}
+
+	bool UpdateView()
+	{
+		bool ret = false;
+		if (m_listIsDirty)
+		{
+			ret = true;
+			m_listIsDirty = 0;
+			m_view.SetCount(GetCount());
+			ndInt32 index = 0;
+			for (ndNode* node = GetFirst(); node; node = node->GetNext())
+			{
+				m_view[index] = node->GetInfo();
+				index++;
+			}
+		}
+		return ret;
+	}
+
+	ndArray<T*> m_view;
+	ndUnsigned8 m_listIsDirty;
+};
+
+
+class ndBodyList: public ndListView<ndBodyKinematic>
+{
+	public:
+	ndBodyList()
+		:ndListView<ndBodyKinematic>()
+	{
+	}
+
+	ndBodyList(const ndBodyList& src)
+		:ndListView<ndBodyKinematic>(src)
+	{
+	}
 };
 
 
