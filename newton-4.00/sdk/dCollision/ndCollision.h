@@ -33,7 +33,7 @@
 #include <ndScene.h>
 #include <ndShape.h>
 #include <ndContact.h>
-#include <ndBodyList.h>
+#include <ndListView.h>
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
 #include <ndShapeCone.h>

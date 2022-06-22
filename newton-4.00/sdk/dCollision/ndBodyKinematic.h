@@ -24,7 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
-#include "ndBodyList.h"
+#include "ndListView.h"
 #include "ndJointList.h"
 #include "ndConstraint.h"
 

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_BODY_LIST_H__
-#define __ND_BODY_LIST_H__
+#ifndef __ND_LIST_VIEW_H__
+#define __ND_LIST_VIEW_H__
 
 #include "ndCollisionStdafx.h"
 
@@ -70,6 +70,7 @@ class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 		bool ret = false;
 		if (m_listIsDirty)
 		{
+			D_TRACKTIME();
 			ret = true;
 			m_listIsDirty = 0;
 			m_view.SetCount(GetCount());

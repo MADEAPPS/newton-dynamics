@@ -45,32 +45,22 @@ ndVector ndScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANG
 ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
 ndScene::ndFitnessList::ndFitnessList()
-	:ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>()
+	:ndListView<ndSceneTreeNode>()
 	,m_currentCost(ndFloat32(0.0f))
 	,m_currentNode(nullptr)
-	,m_index(0)
 {
 }
 
 ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
-	:ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>()
+	:ndListView<ndSceneTreeNode>(src)
 	,m_currentCost(src.m_currentCost)
 	,m_currentNode(src.m_currentNode)
-	,m_index(src.m_index)
 {
-	ndFitnessList* const stealData = (ndFitnessList*)&src;
-	ndNode* nextNode;
-	for (ndNode* node = stealData->GetFirst(); node; node = node = nextNode)
-	{
-		nextNode = node->GetNext();
-		stealData->Unlink(node);
-		Append(node);
-	}
 }
 
 void ndScene::ndFitnessList::AddNode(ndSceneTreeNode* const node)
 {
-	node->m_fitnessNode = Append(node);
+	node->m_fitnessNode = AddItem(node);
 }
 
 void ndScene::ndFitnessList::RemoveNode(ndSceneTreeNode* const node)
@@ -80,7 +70,7 @@ void ndScene::ndFitnessList::RemoveNode(ndSceneTreeNode* const node)
 	{
 		m_currentNode = node->m_fitnessNode->GetNext();
 	}
-	Remove(node->m_fitnessNode);
+	RemoveItem(node->m_fitnessNode);
 	node->m_fitnessNode = nullptr;
 }
 
@@ -88,8 +78,10 @@ ndFloat64 ndScene::ndFitnessList::TotalCost() const
 {
 	D_TRACKTIME();
 	ndFloat64 cost = ndFloat32(0.0f);
-	for (ndNode* node = GetFirst(); node; node = node->GetNext()) {
-		ndSceneNode* const box = node->GetInfo();
+	dAssert(m_view.GetCount() == GetCount());
+	for (ndInt32 i = 0; i < m_view.GetCount(); ++i)
+	{
+		ndSceneNode* const box = m_view[i];
 		cost += box->m_surfaceArea;
 	}
 	return cost;
@@ -1195,54 +1187,61 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 {
+	D_TRACKTIME();
 	const ndUnsigned32 baseCount = m_bodyList.GetCount();
 	m_scratchBuffer.SetCount(4 * (baseCount + 4) * sizeof(ndSceneNode*));
 	
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
 	ndSceneNode** tmpArray = &srcArray[4 * (baseCount + 4)];
 	ndSceneNode** parentsArray = &srcArray[baseCount];
-
 //ndSceneNode** xxxxxxxx = srcArray;
-	
-	ndUnsigned32 leafNodesCount = 0;
-	ndUnsigned32 parentNodesCount = 0;
-	for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext())
-	{
-		ndSceneNode* const node = nodePtr->GetInfo();
-		parentsArray[parentNodesCount] = node;
-		parentNodesCount++;
 
-		node->m_bhvLinked = 0;
-		node->m_parent = nullptr;
-		node->m_surfaceArea = ndFloat32(0.0f);
-		dAssert(parentNodesCount < baseCount);
-	
-		ndSceneNode* const leftNode = node->GetLeft();
-		const ndBodyKinematic* const leftBody = leftNode->GetBody();
-		if (leftBody)
+	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray, baseCount](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
+		dAssert(baseCount == ndUnsigned32(activeBodyArray.GetCount() - 1));
+
+		const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			leftNode->m_bhvLinked = 0;
-			leftNode->m_parent = nullptr;
-			leftNode->m_surfaceArea = ndFloat32(0.0f);
-			leftNode->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
-			srcArray[leafNodesCount] = leftNode;
-			leafNodesCount++;
-			dAssert(leafNodesCount <= baseCount);
+			const ndBodyKinematic* const body = activeBodyArray[i];
+			ndSceneNode* const node = activeBodyArray[i]->GetSceneBodyNode();
+			dAssert(node);
+
+			node->m_bhvLinked = 0;
+			node->m_parent = nullptr;
+			node->m_surfaceArea = ndFloat32(0.0f);
+			node->SetAabb(body->m_minAabb, body->m_maxAabb);
+			srcArray[i] = node;
 		}
-	
-		ndSceneNode* const rightNode = node->GetRight();
-		const ndBodyKinematic* const rightBody = rightNode->GetBody();
-		if (rightNode->GetBody())
+	});
+
+	auto CopySceneNode = ndMakeObject::ndFunction([this, &fitness, parentsArray](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndSceneTreeNode*>& view = fitness.m_view;
+		dAssert(view.GetCount() == fitness.GetCount());
+
+		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			rightNode->m_bhvLinked = 0;
-			rightNode->m_parent = nullptr;
-			rightNode->m_surfaceArea = ndFloat32(0.0f);
-			rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
-			srcArray[leafNodesCount] = rightNode;
-			leafNodesCount++;
-			dAssert(leafNodesCount <= baseCount);
+			ndSceneNode* const node = view[i];
+			parentsArray[i] = node;
+			node->m_bhvLinked = 0;
+			node->m_parent = nullptr;
+			node->m_surfaceArea = ndFloat32(0.0f);
 		}
-	}
+	});
+
+	UpdateBodyList();
+	fitness.UpdateView();
+	ParallelExecute(CopyBodyNodes);
+	ParallelExecute(CopySceneNode);
+
+	ndUnsigned32 leafNodesCount = baseCount;
+	//ndUnsigned32 parentNodesCount = fitness.m_view.GetCount();
+	dAssert(fitness.m_view.GetCount() < baseCount);
 	
 	ndVector boxes[D_MAX_THREADS_COUNT][2];
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
@@ -1522,10 +1521,11 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 {
 	if (*root)
 	{
-		D_TRACKTIME();
-
+		UpdateBodyList();
+		fitness.UpdateView();
 		m_forceBalanceSceneCounter++;
-		if (m_forceBalanceSceneCounter > 256)
+		//if (m_forceBalanceSceneCounter > 256)
+		if (m_forceBalanceSceneCounter > 2)
 		{
 			m_forceBalanceScene = 1;
 		}
@@ -1545,14 +1545,18 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				ndFloat64 entropy1 = fitness.TotalCost();
 				#endif 
 
+				D_TRACKTIME();
+
 				m_scratchBuffer.SetCount((fitness.GetCount() * 2 + 16) * sizeof(ndSceneNode*));
 				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
 				ndUnsigned32 leafNodesCount = 0;
-				for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext())
+				const ndArray<ndSceneTreeNode*>& view = fitness.m_view;
+				dAssert(view.GetCount() == fitness.GetCount());
+				for (ndInt32 i = 0; i < view.GetCount(); ++i)
 				{
-					ndSceneNode* const node = nodePtr->GetInfo();
+					ndSceneNode* const node = view[i];
 
 					ndSceneNode* const leftNode = node->GetLeft();
 					ndBodyKinematic* const leftBody = leftNode->GetBody();

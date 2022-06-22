@@ -23,7 +23,7 @@
 #define __ND_SCENE_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndBodyList.h"
+#include "ndListView.h"
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
@@ -73,7 +73,7 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_body1;
 	};
 
-	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
+	class ndFitnessList : public ndListView<ndSceneTreeNode>
 	{
 		public:
 		ndFitnessList();
@@ -86,7 +86,6 @@ class ndScene : public ndThreadPool
 		
 		ndFloat64 m_currentCost;
 		ndNode* m_currentNode;
-		ndInt32 m_index;
 	};
 
 	public:
