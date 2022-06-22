@@ -1329,9 +1329,12 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			dAssert(x1 >= 0);
 			dAssert(y1 >= 0);
 			dAssert(z1 >= 0);
-			const ndUnsigned32 test_x = (x0 == x1);
-			const ndUnsigned32 test_y = (y0 == y1);
-			const ndUnsigned32 test_z = (z0 == z1);
+			//const ndUnsigned32 test_x = (x0 == x1);
+			//const ndUnsigned32 test_y = (y0 == y1);
+			//const ndUnsigned32 test_z = (z0 == z1);
+			const ndUnsigned32 test_x = (((x1 - x0)) >> 1) == 0;
+			const ndUnsigned32 test_y = (((y1 - y0)) >> 1) == 0;
+			const ndUnsigned32 test_z = (((z1 - z0)) >> 1) == 0;
 			const ndUnsigned32 test = test_x & test_y & test_z;
 			const ndUnsigned32 codeIndex = node->m_bhvLinked * 2 + test;
 			return m_code[codeIndex];
@@ -1399,8 +1402,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	BoxInfo info;
 	info.m_origin = minP;
 	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
-
-//info.m_size = info.m_size.Scale(ndFloat32(2.0f));
 	
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
@@ -1410,9 +1411,8 @@ static int xxxx1;
 
 	while (leafNodesCount > 1)
 	{
-		info.m_size = info.m_size.Scale(ndFloat32(2.0f));
+		info.m_size = info.m_size * ndVector::m_two;
 		ndCountingSortInPlace<ndSceneNode*, ndGridClassifier, 2>(*this, srcArray, tmpArray, leafNodesCount, prefixScan, &info);
-
 		ndUnsigned32 insideCellsCount = prefixScan[m_insideCell + 1] - prefixScan[m_insideCell];
 		if (insideCellsCount)
 		{
@@ -1518,6 +1518,7 @@ static int xxxx1;
 			parentsArray += sum;
 			leafNodesCount += sum;
 		}
+		
 	}
 
 	return srcArray[0];
