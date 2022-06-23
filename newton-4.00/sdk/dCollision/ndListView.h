@@ -103,14 +103,14 @@ template<class T>
 typename ndListView<T>::ndNode* ndListView<T>::AddItem(T* const item)
 {
 	m_listIsDirty = 1;
-	return Append(item);
+	return ndListView<T>::Append(item);
 }
 
 template<class T>
 void ndListView<T>::RemoveItem(typename ndListView<T>::ndNode* const node)
 {
 	m_listIsDirty = 1;
-	Remove(node);
+	ndListView<T>::Remove(node);
 }
 
 template<class T>
