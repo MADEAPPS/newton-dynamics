@@ -130,7 +130,7 @@ bool ndListView<T>::UpdateView()
 		m_listIsDirty = 0;
 		m_view.SetCount(ndListView<T>::GetCount());
 		ndInt32 index = 0;
-		for (typename ndListView<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
+		for (typename ndListView<T>::ndNode* node = ndListView<T>::GetFirst(); node; node = node->GetNext())
 		{
 			m_view[index] = node->GetInfo();
 			index++;
