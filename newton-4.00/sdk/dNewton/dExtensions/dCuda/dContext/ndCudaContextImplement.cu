@@ -100,7 +100,7 @@ void ndCudaContextImplement::Begin()
 #ifdef D_CUDA_PROFILE_FRAME_TIME
 	cudaEventElapsedTime(&milliseconds, m_device->m_startEvent, m_device->m_endEvent);
 #endif
-	m_timeInSeconds = milliseconds * 1.0e3f;
+	m_timeInSeconds = milliseconds * 1.0e-3f;
 
 	cudaDeviceSynchronize();
 	// get the scene info from the update	
