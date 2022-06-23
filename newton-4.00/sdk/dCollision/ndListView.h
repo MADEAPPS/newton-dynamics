@@ -78,11 +78,11 @@ ndListView<T>::ndListView(const ndListView& src)
 {
 	typename ndListView<T>::ndNode* nextNode;
 	ndListView* const stealData = (ndListView*)&src;
-	for (ndListView<T>::ndNode* node = stealData->GetFirst(); node; node = nextNode)
+	for (typename ndListView<T>::ndNode* node = stealData->GetFirst(); node; node = nextNode)
 	{
 		nextNode = node->GetNext();
 		stealData->Unlink(node);
-		Append(node);
+		ndListView<T>::Append(node);
 	}
 	m_view.Swap(stealData->m_view);
 }
@@ -130,7 +130,7 @@ bool ndListView<T>::UpdateView()
 		m_listIsDirty = 0;
 		m_view.SetCount(ndListView<T>::GetCount());
 		ndInt32 index = 0;
-		for (ndListView<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
+		for (typename ndListView<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
 		{
 			m_view[index] = node->GetInfo();
 			index++;
