@@ -32,8 +32,8 @@ class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 	public:
 	ndListView();
 	ndListView(const ndListView& src);
-	void RemoveItem(ndNode* const node);
 	ndList<T*, ndContainersFreeListAlloc<T*>>::ndNode* AddItem(T* const item);
+	void RemoveItem(ndList<T*, ndContainersFreeListAlloc<T*>>::ndNode* const node);
 
 	bool UpdateView();
 	const bool IsListDirty() const;
