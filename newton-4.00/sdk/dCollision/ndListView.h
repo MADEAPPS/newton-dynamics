@@ -33,8 +33,8 @@ class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 	ndListView();
 	ndListView(const ndListView& src);
 
-	typename ndListView::ndNode* AddItem(T* const item);
-	void RemoveItem(typename ndListView::ndNode* const node);
+	typename ndListView<T>::ndNode* AddItem(T* const item);
+	void RemoveItem(typename ndListView<T>::ndNode* const node);
 
 	bool UpdateView();
 	const bool IsListDirty() const;
@@ -76,7 +76,7 @@ ndListView<T>::ndListView(const ndListView& src)
 	,m_view()
 	,m_listIsDirty(1)
 {
-	ndListView<T>::ndNode* nextNode;
+	typename ndListView<T>::ndNode* nextNode;
 	ndListView* const stealData = (ndListView*)&src;
 	for (ndListView<T>::ndNode* node = stealData->GetFirst(); node; node = nextNode)
 	{
@@ -107,7 +107,7 @@ typename ndListView<T>::ndNode* ndListView<T>::AddItem(T* const item)
 }
 
 template<class T>
-void ndListView<T>::RemoveItem(typename ndListView::ndNode* const node)
+void ndListView<T>::RemoveItem(typename ndListView<T>::ndNode* const node)
 {
 	m_listIsDirty = 1;
 	Remove(node);
@@ -128,7 +128,7 @@ bool ndListView<T>::UpdateView()
 		D_TRACKTIME();
 		ret = true;
 		m_listIsDirty = 0;
-		m_view.SetCount(GetCount());
+		m_view.SetCount(ndListView<T>::GetCount());
 		ndInt32 index = 0;
 		for (ndListView<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
 		{
