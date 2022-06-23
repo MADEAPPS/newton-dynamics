@@ -987,9 +987,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 					root->m_minBox = minP;
 					root->m_maxBox = maxP;
 					root->m_bhvLinked = 1;
-					root->m_left = nullptr;
-					root->m_right = nullptr;
-					root->m_parent = nullptr;
+					//root->m_left = nullptr;
+					//root->m_right = nullptr;
+					//root->m_parent = nullptr;
 
 					const ndVector size(maxP - minP);
 					root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
@@ -1067,7 +1067,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 							ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
 							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
 							dAssert(root);
-							dAssert(!root->m_left);
 							MakeTwoNodesTree(parent, node0, node1);
 							parent->m_parent = root;
 							root->m_left = parent;
@@ -1126,7 +1125,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 							rootNodeIndex++;
 
 							dAssert(root);
-							dAssert(!root->m_right);
 							MakeTwoNodesTree(parent, node0, node1);
 							parent->m_parent = root;
 							root->m_right = parent;
@@ -1144,7 +1142,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 							rootNodeIndex++;
 
 							dAssert(root);
-							dAssert(!root->m_right);
 							MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
 							grandParent->m_parent = root;
 							root->m_right = grandParent;
@@ -1669,8 +1666,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				entropy = fitness.TotalCost();
 				fitness.m_currentCost = entropy;
 
-				dTrace(("TopDown\n"));
-				dAssert((*root)->SanityCheck(0));
+				//dTrace(("TopDown\n"));
+				//dAssert((*root)->SanityCheck(0));
 			}
 
 			#ifdef D_NEW_SCENE
@@ -1680,8 +1677,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
 				*root = bottomUpRoot;
 
-				dTrace(("bottomDown\n"));
-				dAssert ((*root)->SanityCheck(0));
+				//dTrace(("bottomDown\n"));
+				//dAssert ((*root)->SanityCheck(0));
 
 				ndFloat64 entropy1 = fitness.TotalCost();
 				//dTrace (("topDown:%f  bottomUp:%f\n", ndFloat32 (entropy), ndFloat32(entropy1)));
