@@ -1327,9 +1327,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			dAssert(x1 >= 0);
 			dAssert(y1 >= 0);
 			dAssert(z1 >= 0);
-			//const ndUnsigned32 test_x = (x0 == x1);
-			//const ndUnsigned32 test_y = (y0 == y1);
-			//const ndUnsigned32 test_z = (z0 == z1);
 			const ndUnsigned32 test_x = (((x1 - x0)) >> 1) == 0;
 			const ndUnsigned32 test_y = (((y1 - y0)) >> 1) == 0;
 			const ndUnsigned32 test_z = (((z1 - z0)) >> 1) == 0;
@@ -1403,9 +1400,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
-
-static int xxxx0;
-static int xxxx1;
 
 	while (leafNodesCount > 1)
 	{
@@ -1508,9 +1502,6 @@ static int xxxx1;
 				sum += count;
 			}
 			m_cellCounts1[bashCount].m_location = sum; 
-
-			xxxx0++;
-			xxxx1 += sum;
 
 			BuildSmallBvh(parentsArray, bashCount);
 			parentsArray += sum;
