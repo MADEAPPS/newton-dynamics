@@ -78,7 +78,7 @@ ndListView<T>::ndListView(const ndListView& src)
 {
 	ndListView<T>::ndNode* nextNode;
 	ndListView* const stealData = (ndListView*)&src;
-	for (ndNode* node = stealData->GetFirst(); node; node = nextNode)
+	for (ndListView<T>::ndNode* node = stealData->GetFirst(); node; node = nextNode)
 	{
 		nextNode = node->GetNext();
 		stealData->Unlink(node);
