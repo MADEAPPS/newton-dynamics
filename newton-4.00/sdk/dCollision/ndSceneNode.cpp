@@ -34,6 +34,12 @@ ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 	:ndSceneNode(nullptr)
 	,m_body(body)
 {
+#ifdef _DEBUG
+	static ndInt32 nodeId = 0;
+	m_nodeId = nodeId;
+	nodeId++;
+#endif
+
 	SetAabb(body->m_minAabb, body->m_maxAabb);
 	m_body->SetSceneBodyNode(this);
 }
@@ -49,6 +55,12 @@ ndSceneTreeNode::ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const 
 	,m_right(myNode)
 	,m_fitnessNode(nullptr)
 {
+#ifdef _DEBUG
+	static ndInt32 nodeId = 1000000;
+	m_nodeId = nodeId;
+	nodeId++;
+#endif
+
 	if (m_parent) 
 	{
 		ndSceneTreeNode* const myParent = (ndSceneTreeNode*)m_parent;

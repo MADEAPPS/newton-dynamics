@@ -42,9 +42,7 @@ class ndSceneNode: public ndClassAlloc
 		,m_bhvLinked(0)
 	{
 #ifdef _DEBUG
-		static ndInt32 nodeId = 0;
-		m_nodeId = nodeId;
-		nodeId++;
+		m_nodeId = 0;
 #endif
 	}
 
