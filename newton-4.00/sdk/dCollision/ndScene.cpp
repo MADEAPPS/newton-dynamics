@@ -1194,7 +1194,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	m_scratchBuffer.SetCount(4 * (baseCount + 4) * sizeof(ndSceneNode*));
 	
 	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
-	ndSceneNode** tmpArray = &srcArray[4 * (baseCount + 4)];
+	ndSceneNode** tmpArray = &srcArray[2 * (baseCount + 4)];
 	ndSceneNode** parentsArray = &srcArray[baseCount];
 
 	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray, baseCount](ndInt32 threadIndex, ndInt32 threadCount)
@@ -1221,7 +1221,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	auto CopySceneNode = ndMakeObject::ndFunction([this, &fitness, parentsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndSceneTreeNode*>& view = fitness.m_view;
+		const ndArray<ndSceneTreeNode*>& view = fitness.GetView();
 		dAssert(view.GetCount() == fitness.GetCount());
 
 		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
@@ -1241,7 +1241,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 	ParallelExecute(CopySceneNode);
 
 	ndUnsigned32 leafNodesCount = baseCount;
-	dAssert(ndUnsigned32(fitness.m_view.GetCount()) < baseCount);
+	dAssert(ndUnsigned32(fitness.GetView().GetCount()) < baseCount);
 	
 	ndVector boxes[D_MAX_THREADS_COUNT][2];
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
@@ -1533,7 +1533,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 #ifdef D_NEW_SCENE
 		if (m_forceBalanceSceneCounter > 2)
 #else
-		if (m_forceBalanceSceneCounter > 256)
+		//if (m_forceBalanceSceneCounter > 256)
+		if (m_forceBalanceSceneCounter > 2)
 #endif
 		{
 			m_forceBalanceScene = 1;
@@ -1548,14 +1549,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		{
 			if (fitness.GetFirst())
 			{
-				#ifdef D_NEW_SCENE
-				ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
-				*root = bottomUpRoot;
-				ndFloat64 entropy1 = fitness.TotalCost();
-				#endif 
-
 				D_TRACKTIME();
-
 				m_scratchBuffer.SetCount((fitness.GetCount() * 2 + 16) * sizeof(ndSceneNode*));
 				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
 				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
@@ -1684,6 +1678,18 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				entropy = fitness.TotalCost();
 				fitness.m_currentCost = entropy;
 			}
+
+			#ifdef D_NEW_SCENE
+			if (fitness.GetFirst())
+			{
+				D_TRACKTIME();
+				ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
+				*root = bottomUpRoot;
+				ndFloat64 entropy1 = fitness.TotalCost();
+				//dTrace (("topDown:%f  bottomUp:%f\n", ndFloat32 (entropy), ndFloat32(entropy1)));
+			}
+			#endif 
+
 			oldEntropy = entropy;
 			m_forceBalanceScene = 0;
 			m_forceBalanceSceneCounter = 0;
