@@ -26,64 +26,22 @@
 
 class ndBodyKinematic;
 
-template<class T >
+template<class T>
 class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 {
 	public:
-	ndListView()
-		:ndList<T*, ndContainersFreeListAlloc<T*>>()
-		,m_view(1024)
-		,m_listIsDirty(1)
-	{
-	}
+	ndListView();
+	ndListView(const ndListView& src);
+	ndNode* AddItem(T* const item);
+	void RemoveItem(ndNode* const node);
 
-	ndListView(const ndListView& src)
-		:ndList<T*, ndContainersFreeListAlloc<T*>>()
-		,m_view()
-		,m_listIsDirty(1)
-	{
-		ndListView* const stealData = (ndListView*)&src;
-		ndNode* nextNode;
-		for (ndNode* node = stealData->GetFirst(); node; node = nextNode)
-		{
-			nextNode = node->GetNext();
-			stealData->Unlink(node);
-			Append(node);
-		}
-		m_view.Swap(stealData->m_view);
-	}
+	bool UpdateView();
+	const bool IsListDirty() const;
 
-	ndNode* AddItem(T* const item)
-	{
-		m_listIsDirty = 1;
-		return Append(item);
-	}
+	ndArray<T*>& GetView();
+	const ndArray<T*>& GetView() const;
 
-	void RemoveItem(ndNode* const node)
-	{
-		m_listIsDirty = 1;
-		Remove(node);
-	}
-
-	bool UpdateView()
-	{
-		bool ret = false;
-		if (m_listIsDirty)
-		{
-			D_TRACKTIME();
-			ret = true;
-			m_listIsDirty = 0;
-			m_view.SetCount(GetCount());
-			ndInt32 index = 0;
-			for (ndNode* node = GetFirst(); node; node = node->GetNext())
-			{
-				m_view[index] = node->GetInfo();
-				index++;
-			}
-		}
-		return ret;
-	}
-
+	protected:
 	ndArray<T*> m_view;
 	ndUnsigned8 m_listIsDirty;
 };
@@ -102,5 +60,83 @@ class ndBodyList: public ndListView<ndBodyKinematic>
 	}
 };
 
+
+template<class T>
+ndListView<T>::ndListView()
+	:ndList<T*, ndContainersFreeListAlloc<T*>>()
+	,m_view(1024)
+	,m_listIsDirty(1)
+{
+}
+
+template<class T>
+ndListView<T>::ndListView(const ndListView& src)
+	:ndList<T*, ndContainersFreeListAlloc<T*>>()
+	,m_view()
+	,m_listIsDirty(1)
+{
+	ndNode* nextNode;
+	ndListView* const stealData = (ndListView*)&src;
+	for (ndNode* node = stealData->GetFirst(); node; node = nextNode)
+	{
+		nextNode = node->GetNext();
+		stealData->Unlink(node);
+		Append(node);
+	}
+	m_view.Swap(stealData->m_view);
+}
+
+template<class T>
+ndArray<T*>& ndListView<T>::GetView()
+{
+	return m_view;
+}
+
+template<class T>
+const ndArray<T*>& ndListView<T>::GetView() const
+{
+	return m_view;
+}
+
+
+template<class T>
+typename ndListView<T>::ndNode* ndListView<T>::AddItem(T* const item)
+{
+	m_listIsDirty = 1;
+	return Append(item);
+}
+
+template<class T>
+void ndListView<T>::RemoveItem(ndNode* const node)
+{
+	m_listIsDirty = 1;
+	Remove(node);
+}
+
+template<class T>
+const bool ndListView<T>::IsListDirty() const
+{
+	return m_listIsDirty ? true : false;
+}
+
+template<class T>
+bool ndListView<T>::UpdateView()
+{
+	bool ret = false;
+	if (m_listIsDirty)
+	{
+		D_TRACKTIME();
+		ret = true;
+		m_listIsDirty = 0;
+		m_view.SetCount(GetCount());
+		ndInt32 index = 0;
+		for (ndNode* node = GetFirst(); node; node = node->GetNext())
+		{
+			m_view[index] = node->GetInfo();
+			index++;
+		}
+	}
+	return ret;
+}
 
 #endif

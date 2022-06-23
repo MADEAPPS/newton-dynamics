@@ -1564,7 +1564,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
 				ndUnsigned32 leafNodesCount = 0;
-				const ndArray<ndSceneTreeNode*>& view = fitness.m_view;
+				const ndArray<ndSceneTreeNode*>& view = fitness.GetView();
 				dAssert(view.GetCount() == fitness.GetCount());
 				for (ndInt32 i = 0; i < view.GetCount(); ++i)
 				{

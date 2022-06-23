@@ -37,8 +37,6 @@ ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
 	,ndCudaContext()
 {
-	dAssert(0);
-	//m_bodyListChanged = 1;
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
@@ -207,12 +205,7 @@ void ndWorldSceneCuda::UpdateTransform()
 
 void ndWorldSceneCuda::BalanceScene()
 {
-	dAssert(0);
-	//if (m_bodyListChanged)
-	//{
-	//	UpdateBodyList();
-	//}
-	//ndWorldScene::BalanceScene();
+	ndWorldScene::BalanceScene();
 }
 
 void ndWorldSceneCuda::CalculateContacts()
@@ -222,15 +215,15 @@ void ndWorldSceneCuda::CalculateContacts()
 
 void ndWorldSceneCuda::UpdateBodyList()
 {
-	dAssert(0);
-	//bool bodyListChanged = m_bodyListChanged;
-	//ndWorldScene::UpdateBodyList();
-	//if (bodyListChanged)
-	//{
-	//	LoadBodyData();
-	//}
-	//
-	//ValidateContextBuffers();
+	bool bodyListChanged = m_bodyList.IsListDirty();
+
+	ndWorldScene::UpdateBodyList();
+	if (bodyListChanged)
+	{
+		LoadBodyData();
+	}
+	
+	ValidateContextBuffers();
 }
 
 void ndWorldSceneCuda::FindCollidingPairs()
