@@ -952,7 +952,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				};
 
 				ndBlockSegment stackPool[8];
-				//ndBlockSegment stackPool[16];
 
 				ndUnsigned32 stack = 1;
 				ndUnsigned32 rootNodeIndex = newParentsDest[i].m_location;
@@ -1042,7 +1041,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						ndCompareContext info;
 						ndUnsigned32 scan[8];
 						ndBottomUpCell tmpBuffer[256];
-						//ndBottomUpCell tmpBuffer[2048];
 						dAssert(block.m_count < sizeof(tmpBuffer) / sizeof(tmpBuffer[1]));
 
 						info.m_index = index;
@@ -1518,7 +1516,6 @@ static int xxxx1;
 			parentsArray += sum;
 			leafNodesCount += sum;
 		}
-		
 	}
 
 	return srcArray[0];
@@ -1564,7 +1561,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
 				ndUnsigned32 leafNodesCount = 0;
-				const ndArray<ndSceneTreeNode*>& view = fitness.m_view;
+				const ndArray<ndSceneTreeNode*>& view = fitness.GetView();
 				dAssert(view.GetCount() == fitness.GetCount());
 				for (ndInt32 i = 0; i < view.GetCount(); ++i)
 				{

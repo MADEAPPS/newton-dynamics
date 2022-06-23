@@ -295,12 +295,12 @@ inline const ndArray<ndConstraint*>& ndScene::GetActiveContactArray() const
 
 inline ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
 {
-	return m_bodyList.m_view;
+	return m_bodyList.GetView();
 }
 
 inline const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
 {
-	return m_bodyList.m_view;
+	return m_bodyList.GetView();
 }
 
 inline ndFloat32 ndScene::GetTimestep() const
