@@ -32,45 +32,21 @@ D_MSV_NEWTON_ALIGN_32
 class ndSceneNode: public ndClassAlloc
 {
 	public:
-	ndSceneNode(ndSceneNode* const parent)
-		:ndClassAlloc()
-		,m_minBox(ndFloat32(-1.0e15f))
-		,m_maxBox(ndFloat32( 1.0e15f))
-		,m_parent(parent)
-		,m_surfaceArea(ndFloat32(1.0e20f))
-		,m_lock()
-		,m_bhvLinked(0)
-	{
-#ifdef _DEBUG
-		m_nodeId = 0;
-#endif
-	}
-
-	virtual ~ndSceneNode()
-	{
-	}
+	ndSceneNode(ndSceneNode* const parent);
+	virtual ~ndSceneNode();
 
 	void GetAabb(ndVector& minBox, ndVector& maxBox) const;
 	void SetAabb(const ndVector& minBox, const ndVector& maxBox);
 
-	virtual ndSceneNode* GetAsSceneNode() { return this; }
-	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return nullptr; }
-	virtual ndSceneTreeNode* GetAsSceneTreeNode() { return nullptr; }
+	virtual ndSceneNode* GetAsSceneNode();
+	virtual ndSceneBodyNode* GetAsSceneBodyNode();
+	virtual ndSceneTreeNode* GetAsSceneTreeNode();
+	
+	virtual ndSceneNode* GetLeft() const;
+	virtual ndSceneNode* GetRight() const;
+	virtual ndBodyKinematic* GetBody() const;
 
-	virtual ndBodyKinematic* GetBody() const
-	{
-		return nullptr;
-	}
-
-	virtual ndSceneNode* GetLeft() const
-	{
-		return nullptr;
-	}
-
-	virtual ndSceneNode* GetRight() const
-	{
-		return nullptr;
-	}
+	virtual bool SanityCheck(ndUnsigned32 level) const;
 
 	ndVector m_minBox;
 	ndVector m_maxBox;
@@ -121,11 +97,60 @@ class ndSceneTreeNode: public ndSceneNode
 		return m_right;
 	}
 
+	bool SanityCheck(ndUnsigned32 level) const;
+
 	ndSceneNode* m_left;
 	ndSceneNode* m_right;
 	ndList<ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>::ndNode* m_fitnessNode;
 } D_GCC_NEWTON_ALIGN_32;
 
+inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
+	:ndClassAlloc()
+	,m_minBox(ndFloat32(-1.0e15f))
+	,m_maxBox(ndFloat32(1.0e15f))
+	,m_parent(parent)
+	,m_surfaceArea(ndFloat32(1.0e20f))
+	,m_lock()
+	,m_bhvLinked(0)
+{
+#ifdef _DEBUG
+	m_nodeId = 0;
+#endif
+}
+
+inline ndSceneNode::~ndSceneNode()
+{
+}
+
+inline ndSceneNode* ndSceneNode::GetAsSceneNode()
+{ 
+	return this; 
+}
+
+inline ndSceneBodyNode* ndSceneNode::GetAsSceneBodyNode()
+{ 
+	return nullptr; 
+}
+
+inline ndSceneTreeNode* ndSceneNode::GetAsSceneTreeNode()
+{ 
+	return nullptr; 
+}
+
+inline ndBodyKinematic* ndSceneNode::GetBody() const
+{
+	return nullptr;
+}
+
+inline ndSceneNode* ndSceneNode::GetLeft() const
+{
+	return nullptr;
+}
+
+inline ndSceneNode* ndSceneNode::GetRight() const
+{
+	return nullptr;
+}
 
 inline void ndSceneNode::GetAabb(ndVector& minBox, ndVector& maxBox) const
 {
@@ -151,4 +176,22 @@ inline void ndSceneNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 	const ndVector size(m_maxBox - m_minBox);
 	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
+
+inline bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
+{
+#ifdef _DEBUG
+	char margin[256];
+	for (ndUnsigned32 i = 0; i < level; ++i)
+	{
+		margin[i * 2] = ' ';
+		margin[i * 2 + 1] = ' ';
+	}
+	margin[level * 2] = 0;
+	dTrace(("%s %d\n", margin, m_nodeId));
+#endif
+
+	dAssert(!m_parent || dBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
+	return true;
+}
+
 #endif

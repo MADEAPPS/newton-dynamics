@@ -1677,6 +1677,9 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				dAssert(!(*root)->m_parent);
 				entropy = fitness.TotalCost();
 				fitness.m_currentCost = entropy;
+
+				dTrace(("TopDown\n"));
+				dAssert((*root)->SanityCheck(0));
 			}
 
 			#ifdef D_NEW_SCENE
@@ -1685,6 +1688,10 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				D_TRACKTIME();
 				ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
 				*root = bottomUpRoot;
+
+				dTrace(("bottomDown\n"));
+				dAssert ((*root)->SanityCheck(0));
+
 				ndFloat64 entropy1 = fitness.TotalCost();
 				//dTrace (("topDown:%f  bottomUp:%f\n", ndFloat32 (entropy), ndFloat32(entropy1)));
 			}

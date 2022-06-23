@@ -99,3 +99,13 @@ ndSceneTreeNode::~ndSceneTreeNode()
 	}
 }
 
+bool ndSceneTreeNode::SanityCheck(ndUnsigned32 level) const
+{
+	dAssert(m_left->m_parent == this);
+	dAssert(m_right->m_parent == this);
+
+	ndSceneNode::SanityCheck(level);
+	m_left->SanityCheck(level + 1);
+	m_right->SanityCheck(level + 1);
+	return true;
+}
