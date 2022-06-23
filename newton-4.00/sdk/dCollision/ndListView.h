@@ -76,7 +76,7 @@ ndListView<T>::ndListView(const ndListView& src)
 	,m_view()
 	,m_listIsDirty(1)
 {
-	ndNode* nextNode;
+	ndListView<T>::ndNode* nextNode;
 	ndListView* const stealData = (ndListView*)&src;
 	for (ndNode* node = stealData->GetFirst(); node; node = nextNode)
 	{
@@ -130,7 +130,7 @@ bool ndListView<T>::UpdateView()
 		m_listIsDirty = 0;
 		m_view.SetCount(GetCount());
 		ndInt32 index = 0;
-		for (ndNode* node = GetFirst(); node; node = node->GetNext())
+		for (ndListView<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
 		{
 			m_view[index] = node->GetInfo();
 			index++;
