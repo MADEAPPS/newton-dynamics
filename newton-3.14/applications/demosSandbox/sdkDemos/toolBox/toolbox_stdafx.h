@@ -178,6 +178,7 @@ typedef long long unsigned64;
 #include <dMultiBodyVehicleTire.h>
 #include <dMultiBodyVehicleEngine.h>
 #include <dMultiBodyVehicleDifferential.h>
+#include <dPlayerControllerContactSolver.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

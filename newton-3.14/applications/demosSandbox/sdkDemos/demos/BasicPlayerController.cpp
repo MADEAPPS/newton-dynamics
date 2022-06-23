@@ -47,6 +47,21 @@ class dBasicPlayerController: public dPlayerController
 		SetImpulse(totalImpulse);
 	}
 
+	void UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver)
+	{
+		dPlayerController::UpdatePlayerStatus(contactSolver);
+		for (int i = 0; i < contactSolver.m_contactCount; i++) {
+			NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
+			const NewtonBody* const hitBody = contact.m_hitBody;
+			DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(hitBody);
+			const dString& name = player->GetName();
+			if (name == "player")
+			{
+				dTrace(("hit a player\n"));
+			}
+		}
+	}
+
 	dFloat ContactFrictionCallback(const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
 		if (normal.m_y < 0.9f) {
@@ -236,6 +251,7 @@ class dBasicPlayerControllerManager: public dVehicleManager
 		// make standing and crouch meshes
 		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
 		scene->Append(playerEntity);
+		playerEntity->SetNameID("player");
 		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
 
 		// set the user data
@@ -408,9 +424,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_x += 4.0f;
 	location.m_posit.m_z += 1.0f;
 	location.m_posit.m_y += 5.0f;
-	//playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	location.m_posit.m_z += 3.0f;
-	//playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
 	// show player special effects
 	if (0)

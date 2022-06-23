@@ -61,7 +61,7 @@ class dPlayerController: public dVehicle
 		m_deepPenetration,
 	};
 
-	void UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver);
+	
 	void ResolveStep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
 	void ResolveCollision(dPlayerControllerContactSolver& contactSolver, dFloat timestep);
 	dFloat PredictTimestep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
@@ -77,6 +77,7 @@ class dPlayerController: public dVehicle
 	{
 	}
 
+	DVEHICLE_API virtual void UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver);
 	DVEHICLE_API virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	DVEHICLE_API void PreUpdate(dFloat timestep);
