@@ -32,8 +32,9 @@ class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 	public:
 	ndListView();
 	ndListView(const ndListView& src);
-	ndList<T*, ndContainersFreeListAlloc<T*>>::ndNode* AddItem(T* const item);
-	void RemoveItem(ndList<T*, ndContainersFreeListAlloc<T*>>::ndNode* const node);
+
+	typename ndListView::ndNode* AddItem(T* const item);
+	void RemoveItem(typename ndListView::ndNode* const node);
 
 	bool UpdateView();
 	const bool IsListDirty() const;
@@ -98,7 +99,6 @@ const ndArray<T*>& ndListView<T>::GetView() const
 	return m_view;
 }
 
-
 template<class T>
 typename ndListView<T>::ndNode* ndListView<T>::AddItem(T* const item)
 {
@@ -107,7 +107,7 @@ typename ndListView<T>::ndNode* ndListView<T>::AddItem(T* const item)
 }
 
 template<class T>
-void ndListView<T>::RemoveItem(ndNode* const node)
+void ndListView<T>::RemoveItem(typename ndListView::ndNode* const node)
 {
 	m_listIsDirty = 1;
 	Remove(node);
