@@ -106,7 +106,6 @@ ndScene::ndScene()
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_forceBalanceSceneCounter(0)
-	,m_forceBalanceScene(0)
 {
 	m_sentinelBody = new ndBodySentinel;
 	m_contactNotifyCallback->m_scene = this;
@@ -135,8 +134,7 @@ ndScene::ndScene(const ndScene& src)
 	,m_fitness(src.m_fitness)
 	,m_timestep(ndFloat32(0.0f))
 	,m_lru(src.m_lru)
-	,m_forceBalanceSceneCounter(src.m_forceBalanceSceneCounter)
-	,m_forceBalanceScene(src.m_forceBalanceScene)
+	,m_forceBalanceSceneCounter(0)
 {
 	ndScene* const stealData = (ndScene*)&src;
 
@@ -1503,170 +1501,150 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 }
 #endif
 
-//void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root)
 void ndScene::UpdateFitness()
 {
-	//m_fitness, m_treeEntropy, & m_rootNode
 	if (m_rootNode && m_fitness.GetCount())
 	{
 		D_TRACKTIME();
 		UpdateBodyList();
 		m_fitness.UpdateView();
-		m_forceBalanceSceneCounter++;
-		
-		//if (m_forceBalanceSceneCounter > 256)
-		if (m_forceBalanceSceneCounter > 1)
-		{
-			m_forceBalanceScene = 1;
-		}
 
-		//ndSceneNode* const parent = m_rootNode->m_parent;
 		dAssert(!m_rootNode->m_parent);
-		//m_rootNode->m_parent = nullptr;
-
 		ndFloat64 oldEntropy = m_treeEntropy;
 		ndFloat64 entropy = ReduceEntropy(m_fitness, &m_rootNode);
-		if (m_forceBalanceScene || (entropy > (oldEntropy * ndFloat32(1.5f))) || (entropy < (oldEntropy * ndFloat32(0.75f))))
+		if (!m_forceBalanceSceneCounter || (entropy > (oldEntropy * ndFloat32(1.5f))) || (entropy < (oldEntropy * ndFloat32(0.75f))))
 		{
-			//if (m_fitness.GetFirst())
-			//{
-				m_scratchBuffer.SetCount((m_fitness.GetCount() * 2 + 16) * sizeof(ndSceneNode*));
-				ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
-				ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
+			m_scratchBuffer.SetCount((m_fitness.GetCount() * 2 + 16) * sizeof(ndSceneNode*));
+			ndSceneNode** const leafArray = (ndSceneNode**)&m_scratchBuffer[0];
+			ndSceneNode** const leafArrayUnsorted = &leafArray[m_bodyList.GetCount() + 1];
 
-				ndUnsigned32 leafNodesCount = 0;
-				const ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
-				dAssert(view.GetCount() == m_fitness.GetCount());
-				for (ndInt32 i = 0; i < view.GetCount(); ++i)
+			ndUnsigned32 leafNodesCount = 0;
+			const ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
+			dAssert(view.GetCount() == m_fitness.GetCount());
+			for (ndInt32 i = 0; i < view.GetCount(); ++i)
+			{
+				ndSceneNode* const node = view[i];
+
+				ndSceneNode* const leftNode = node->GetLeft();
+				ndBodyKinematic* const leftBody = leftNode->GetBody();
+				if (leftBody)
 				{
-					ndSceneNode* const node = view[i];
-
-					ndSceneNode* const leftNode = node->GetLeft();
-					ndBodyKinematic* const leftBody = leftNode->GetBody();
-					if (leftBody)
-					{
-						node->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
-						leafArrayUnsorted[leafNodesCount] = leftNode;
-						leafNodesCount++;
-						dAssert(leafNodesCount <= ndUnsigned32(m_bodyList.GetCount()));
-					}
-
-					ndSceneNode* const rightNode = node->GetRight();
-					ndBodyKinematic* const rightBody = rightNode->GetBody();
-					if (rightBody)
-					{
-						rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
-						leafArrayUnsorted[leafNodesCount] = rightNode;
-						leafNodesCount++;
-						dAssert(leafNodesCount <= ndUnsigned32(m_bodyList.GetCount()));
-					}
+					node->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
+					leafArrayUnsorted[leafNodesCount] = leftNode;
+					leafNodesCount++;
+					dAssert(leafNodesCount <= ndUnsigned32(m_bodyList.GetCount()));
 				}
 
-				class ndEvaluateKey
+				ndSceneNode* const rightNode = node->GetRight();
+				ndBodyKinematic* const rightBody = rightNode->GetBody();
+				if (rightBody)
 				{
-					public:
-					#define D_AABB_AREA_FACTOR	ndFloat32 (5.0f)
+					rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
+					leafArrayUnsorted[leafNodesCount] = rightNode;
+					leafNodesCount++;
+					dAssert(leafNodesCount <= ndUnsigned32(m_bodyList.GetCount()));
+				}
+			}
 
-					ndEvaluateKey(void* const)
-					{
-						m_factor = ndFloat32(1.0f) / ndLog(D_AABB_AREA_FACTOR * D_AABB_AREA_FACTOR);
-					}
+			class ndEvaluateKey
+			{
+				public:
+				#define D_AABB_AREA_FACTOR	ndFloat32 (5.0f)
 
-					ndUnsigned32 GetKey(const ndSceneNode* const element) const
-					{
-						ndFloat32 areaA = element->m_surfaceArea;
-						ndFloat32 compressedValue = m_factor * ndLog(areaA);
-						dAssert(compressedValue <= 255);
-						ndInt32 key = ndUnsigned32(ndFloor(compressedValue));
-						key = 255 - ndClamp(key, 0, 255);
-						return key;
-					}
-
-					ndFloat32 m_factor;
-				};
-
-				ndUnsigned32 prefixScan[(1 << 8) + 1];
-				ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount, prefixScan, nullptr);
-
-				class ndItemRun
+				ndEvaluateKey(void* const)
 				{
-					public:
-					ndUnsigned32 m_start;
-					ndUnsigned32 m_count;
-				};
-
-				ndInt32 pairsCount = 0;
-				ndItemRun pairs[1 << 8];
-				for (ndInt32 i = 0; i < (1 << 8); ++i)
-				{
-					ndUnsigned32 count = prefixScan[i + 1] - prefixScan[i];
-					if (count)
-					{
-						pairs[pairsCount].m_count = count;
-						pairs[pairsCount].m_start = prefixScan[i];
-						pairsCount++;
-					}
+					m_factor = ndFloat32(1.0f) / ndLog(D_AABB_AREA_FACTOR * D_AABB_AREA_FACTOR);
 				}
 
-				dAssert(pairsCount);
-
-				ndFitnessList::ndNode* nodePtr = m_fitness.GetFirst();
-				if (pairsCount == 1)
+				ndUnsigned32 GetKey(const ndSceneNode* const element) const
 				{
-					dAssert(pairs[0].m_count == leafNodesCount);
-					m_rootNode = BuildTopDown(leafArray, 0, leafNodesCount-1, &nodePtr);
-				}
-				else
-				{
-					ndSceneTreeNode* nodes[1 << 8];
-					for (ndInt32 i = 0; i < (pairsCount - 1); ++i)
-					{
-						ndSceneTreeNode* parentNode = nodePtr->GetInfo();
-						nodePtr = nodePtr->GetNext();
-						parentNode->m_left = nullptr;
-						parentNode->m_parent = nullptr;
-
-						const ndItemRun& pair = pairs[i];
-						parentNode->m_right = BuildTopDown(leafArray, pair.m_start, pair.m_start + pair.m_count - 1, &nodePtr);
-						parentNode->m_right->m_parent = parentNode;
-						nodes[i] = parentNode;
-					}
-
-					ndSceneTreeNode* const lastNode = nodes[pairsCount - 2];
-					lastNode->m_left = BuildTopDown(leafArray, pairs[pairsCount - 1].m_start, pairs[pairsCount - 1].m_start + pairs[pairsCount - 1].m_count - 1, &nodePtr);
-					lastNode->m_left->m_parent = nodes[pairsCount - 2];
-					const ndVector minP(lastNode->m_left->m_minBox.GetMin(lastNode->m_right->m_minBox));
-					const ndVector maxP(lastNode->m_left->m_maxBox.GetMax(lastNode->m_right->m_maxBox));
-					lastNode->SetAabb(minP, maxP);
-
-					for (ndInt32 i = pairsCount - 2; i; --i)
-					{
-						ndSceneTreeNode* const childNode = nodes[i];
-						ndSceneTreeNode* const parentNode = nodes[i - 1];
-
-						childNode->m_parent = parentNode;
-						parentNode->m_left = childNode;
-						const ndVector minBox(parentNode->m_left->m_minBox.GetMin(parentNode->m_right->m_minBox));
-						const ndVector maxBox(parentNode->m_left->m_maxBox.GetMax(parentNode->m_right->m_maxBox));
-						parentNode->SetAabb(minBox, maxBox);
-					}
-
-					m_rootNode = nodes[0];
+					ndFloat32 areaA = element->m_surfaceArea;
+					ndFloat32 compressedValue = m_factor * ndLog(areaA);
+					dAssert(compressedValue <= 255);
+					ndInt32 key = ndUnsigned32(ndFloor(compressedValue));
+					key = 255 - ndClamp(key, 0, 255);
+					return key;
 				}
 
-				dAssert(!m_rootNode->m_parent);
-				entropy = m_fitness.TotalCost();
-				m_fitness.m_currentCost = entropy;
+				ndFloat32 m_factor;
+			};
 
-				//dTrace(("TopDown\n"));
-				//dAssert((*root)->SanityCheck(0));
-			//}
+			ndUnsigned32 prefixScan[(1 << 8) + 1];
+			ndCountingSort<ndSceneNode*, ndEvaluateKey, 8>(*this, leafArrayUnsorted, leafArray, leafNodesCount, prefixScan, nullptr);
+
+			class ndItemRun
+			{
+				public:
+				ndUnsigned32 m_start;
+				ndUnsigned32 m_count;
+			};
+
+			ndInt32 pairsCount = 0;
+			ndItemRun pairs[1 << 8];
+			for (ndInt32 i = 0; i < (1 << 8); ++i)
+			{
+				ndUnsigned32 count = prefixScan[i + 1] - prefixScan[i];
+				if (count)
+				{
+					pairs[pairsCount].m_count = count;
+					pairs[pairsCount].m_start = prefixScan[i];
+					pairsCount++;
+				}
+			}
+
+			dAssert(pairsCount);
+
+			ndFitnessList::ndNode* nodePtr = m_fitness.GetFirst();
+			if (pairsCount == 1)
+			{
+				dAssert(pairs[0].m_count == leafNodesCount);
+				m_rootNode = BuildTopDown(leafArray, 0, leafNodesCount-1, &nodePtr);
+			}
+			else
+			{
+				ndSceneTreeNode* nodes[1 << 8];
+				for (ndInt32 i = 0; i < (pairsCount - 1); ++i)
+				{
+					ndSceneTreeNode* parentNode = nodePtr->GetInfo();
+					nodePtr = nodePtr->GetNext();
+					parentNode->m_left = nullptr;
+					parentNode->m_parent = nullptr;
+
+					const ndItemRun& pair = pairs[i];
+					parentNode->m_right = BuildTopDown(leafArray, pair.m_start, pair.m_start + pair.m_count - 1, &nodePtr);
+					parentNode->m_right->m_parent = parentNode;
+					nodes[i] = parentNode;
+				}
+
+				ndSceneTreeNode* const lastNode = nodes[pairsCount - 2];
+				lastNode->m_left = BuildTopDown(leafArray, pairs[pairsCount - 1].m_start, pairs[pairsCount - 1].m_start + pairs[pairsCount - 1].m_count - 1, &nodePtr);
+				lastNode->m_left->m_parent = nodes[pairsCount - 2];
+				const ndVector minP(lastNode->m_left->m_minBox.GetMin(lastNode->m_right->m_minBox));
+				const ndVector maxP(lastNode->m_left->m_maxBox.GetMax(lastNode->m_right->m_maxBox));
+				lastNode->SetAabb(minP, maxP);
+
+				for (ndInt32 i = pairsCount - 2; i; --i)
+				{
+					ndSceneTreeNode* const childNode = nodes[i];
+					ndSceneTreeNode* const parentNode = nodes[i - 1];
+
+					childNode->m_parent = parentNode;
+					parentNode->m_left = childNode;
+					const ndVector minBox(parentNode->m_left->m_minBox.GetMin(parentNode->m_right->m_minBox));
+					const ndVector maxBox(parentNode->m_left->m_maxBox.GetMax(parentNode->m_right->m_maxBox));
+					parentNode->SetAabb(minBox, maxBox);
+				}
+
+				m_rootNode = nodes[0];
+			}
+
+			dAssert(!m_rootNode->m_parent);
+			entropy = m_fitness.TotalCost();
+			m_fitness.m_currentCost = entropy;
 
 			m_treeEntropy = entropy;
-			m_forceBalanceScene = 0;
-			m_forceBalanceSceneCounter = 0;
 		}
-		//(*root)->m_parent = parent;
+		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 256) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode->m_parent);
 	}
 }
@@ -1675,12 +1653,16 @@ void ndScene::BalanceScene()
 {
 	D_TRACKTIME();
 #ifdef D_NEW_SCENE
-	if (m_fitness.GetFirst())
+	if (m_rootNode && m_fitness.GetCount())
 	{
-		m_rootNode = BuildBottomUp(m_fitness);
+		if (!m_forceBalanceSceneCounter)
+		{
+			m_rootNode = BuildBottomUp(m_fitness);
+		}
+		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
+		dAssert(!m_rootNode->m_parent);
 	}
 #else
-	//UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 	UpdateFitness();
 #endif
 }
@@ -2087,7 +2069,7 @@ void ndScene::SubmitPairs(ndSceneBodyNode* const leafNode, ndSceneNode* const no
 
 	if (stack)
 	{
-		m_forceBalanceScene = 1;
+		m_forceBalanceSceneCounter = 0;
 	}
 }
 
