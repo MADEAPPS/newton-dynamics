@@ -31,10 +31,6 @@ class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 		GLuint texID = 0;
 		dAssert (texName);
 
-		//ndTextureEntry entry;
-		//entry.m_textureName = texName;
-		//entry.m_textureName.ToLower();
-		//ndUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
 		char name[256];
 		strcpy(name, texName);
 		_strlwr(name);
@@ -61,11 +57,7 @@ class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 
 	~ndTextureCache ()
 	{
-		Iterator iter (*this);
-		for (iter.Begin(); iter; iter ++) 
-		{
-			glDeleteTextures(1, &iter.GetNode()->GetInfo().m_textureID);
-		}
+		dAssert(GetCount() == 0);
 	}
 
 	void RemoveById (GLuint id)
@@ -93,11 +85,20 @@ class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 		{
 			if (iter.GetNode()->GetInfo().m_textureID == id) 
 			{
-				//return iter.GetNode()->GetInfo().m_textureName.GetStr();
 				return iter.GetNode();
 			}
 		}
 		return nullptr;
+	}
+
+	void CleanUp()
+	{
+		while (GetCount())
+		{
+			ndTextureEntry& entry = GetRoot()->GetInfo();
+			glDeleteTextures(1, &entry.m_textureID);
+			Remove (GetRoot());
+		}
 	}
 
 	static ndTextureCache& GetChache()
@@ -318,4 +319,10 @@ GLuint AddTextureRef (GLuint texture)
 GLuint GetDefaultTexture()
 {
 	return LoadTexture("default.tga");
+}
+
+void TextureCacheCleanUp()
+{
+	ndTextureCache& cache = ndTextureCache::GetChache();
+	cache.CleanUp();
 }

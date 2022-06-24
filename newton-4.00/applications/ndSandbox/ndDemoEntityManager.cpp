@@ -459,6 +459,7 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	ImGui::GetIO().Fonts->TexID = 0;
 
 	m_shaderCache.Cleanup();
+	TextureCacheCleanUp();
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -1111,7 +1112,9 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndI
 
 	if (key == GLFW_KEY_F1) 
 	{
+		ndMatrix cameraMatrix(manager->GetCamera()->GetCurrentMatrix());
 		manager->LoadDemo(manager->m_lastCurrentScene);
+		manager->SetCameraMatrix(cameraMatrix, cameraMatrix.m_posit);
 	}
 
 	prevKey = io.KeysDown[key] ? key : 0;
