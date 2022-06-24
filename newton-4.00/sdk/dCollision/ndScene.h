@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_NEW_SCENE
+//#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 
@@ -181,7 +181,8 @@ class ndScene : public ndThreadPool
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
-	void UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root);
+	//void UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root);
+	void UpdateFitness();
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
