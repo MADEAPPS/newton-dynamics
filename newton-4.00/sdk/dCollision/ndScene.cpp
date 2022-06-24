@@ -1003,6 +1003,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						}
 					}
 
+					ndInt32 index0 = block.m_start + block.m_count / 2;
 					if (maxVarian > ndFloat32(1.0e-3f))
 					{
 						class ndCompareContext
@@ -1037,133 +1038,126 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 						ndCompareContext info;
 						ndUnsigned32 scan[8];
-						//ndBottomUpCell tmpBuffer[256];
-						dAssert(block.m_count < sizeof(tmpBuffer) / sizeof(tmpBuffer[1]));
 
 						info.m_index = index;
 						info.m_midPoint = median[index] / ndFloat32(block.m_count);
 						ndCountingSortInPlace<ndBottomUpCell, ndCompareKey, 2>(&m_cellBuffer0[block.m_start], &m_cellBuffer1[block.m_start], block.m_count, scan, &info);
-						ndInt32 index0 = block.m_start + scan[1];
+						index0 = block.m_start + scan[1];
+					}
 
-						dAssert(index0 > block.m_start);
-						dAssert(index0 < (block.m_start + block.m_count));
+					dAssert(index0 > block.m_start);
+					dAssert(index0 < (block.m_start + block.m_count));
 
-						ndUnsigned32 count0 = index0 - block.m_start;
+					ndUnsigned32 count0 = index0 - block.m_start;
 
-						dAssert(count0);
-						if (count0 == 1)
-						{
-							ndSceneNode* const node = m_cellBuffer0[block.m_start].m_node;
-							node->m_bhvLinked = 1;
-							node->m_parent = root;
-							root->m_left = node;
-						}
-						else if (count0 == 2)
-						{
-							ndSceneNode* const node0 = m_cellBuffer0[block.m_start + 0].m_node;
-							ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
-							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							dAssert(root);
-							MakeTwoNodesTree(parent, node0, node1);
-							parent->m_parent = root;
-							root->m_left = parent;
-							rootNodeIndex++;
-						}
-						else if (count0 == 3)
-						{
-							ndSceneNode* const node0 = m_cellBuffer0[block.m_start + 0].m_node;
-							ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
-							ndSceneNode* const node2 = m_cellBuffer0[block.m_start + 2].m_node;
+					dAssert(count0);
+					if (count0 == 1)
+					{
+						ndSceneNode* const node = m_cellBuffer0[block.m_start].m_node;
+						node->m_bhvLinked = 1;
+						node->m_parent = root;
+						root->m_left = node;
+					}
+					else if (count0 == 2)
+					{
+						ndSceneNode* const node0 = m_cellBuffer0[block.m_start + 0].m_node;
+						ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
+						ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						dAssert(root);
+						MakeTwoNodesTree(parent, node0, node1);
+						parent->m_parent = root;
+						root->m_left = parent;
+						rootNodeIndex++;
+					}
+					else if (count0 == 3)
+					{
+						ndSceneNode* const node0 = m_cellBuffer0[block.m_start + 0].m_node;
+						ndSceneNode* const node1 = m_cellBuffer0[block.m_start + 1].m_node;
+						ndSceneNode* const node2 = m_cellBuffer0[block.m_start + 2].m_node;
 
-							ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							rootNodeIndex++;
+						ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						rootNodeIndex++;
 
-							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							rootNodeIndex++;
+						ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						rootNodeIndex++;
 
-							dAssert(root);
-							dAssert(!root->m_left);
-							MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
-							grandParent->m_parent = root;
-							root->m_left = grandParent;
-						}
-						else
-						{
-							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							parent->m_bhvLinked = 1;
-							parent->m_parent = root;
-							parent->m_left = nullptr;
-							parent->m_right = nullptr;
-							root->m_left = parent;
-
-							stackPool[stack].m_rootNodeIndex = rootNodeIndex;
-							stackPool[stack].m_start = block.m_start;
-							stackPool[stack].m_count = count0;
-
-							stack++;
-							rootNodeIndex++;
-							dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
-						}
-
-						ndUnsigned32 count1 = block.m_start + block.m_count - index0;
-						dAssert(count1);
-						if (count1 == 1)
-						{
-							ndSceneNode* const node = m_cellBuffer0[index0].m_node;
-							node->m_bhvLinked = 1;
-							node->m_parent = root;
-							root->m_right = node;
-						}
-						else if (count1 == 2)
-						{
-							ndSceneNode* const node0 = m_cellBuffer0[index0 + 0].m_node;
-							ndSceneNode* const node1 = m_cellBuffer0[index0 + 1].m_node;
-							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							rootNodeIndex++;
-
-							dAssert(root);
-							MakeTwoNodesTree(parent, node0, node1);
-							parent->m_parent = root;
-							root->m_right = parent;
-						}
-						else if (count1 == 3)
-						{
-							ndSceneNode* const node0 = m_cellBuffer0[index0 + 0].m_node;
-							ndSceneNode* const node1 = m_cellBuffer0[index0 + 1].m_node;
-							ndSceneNode* const node2 = m_cellBuffer0[index0 + 2].m_node;
-
-							ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							rootNodeIndex++;
-
-							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							rootNodeIndex++;
-
-							dAssert(root);
-							MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
-							grandParent->m_parent = root;
-							root->m_right = grandParent;
-						}
-						else
-						{
-							ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
-							parent->m_bhvLinked = 1;
-							parent->m_parent = root;
-							parent->m_left = nullptr;
-							parent->m_right = nullptr;
-							root->m_right = parent;
-
-							stackPool[stack].m_rootNodeIndex = rootNodeIndex;
-							stackPool[stack].m_start = index0;
-							stackPool[stack].m_count = count1;
-
-							stack++;
-							rootNodeIndex++;
-							dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
-						}
+						dAssert(root);
+						MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
+						grandParent->m_parent = root;
+						root->m_left = grandParent;
 					}
 					else
 					{
-						dAssert(0);
+						ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						parent->m_bhvLinked = 1;
+						parent->m_parent = root;
+						parent->m_left = nullptr;
+						parent->m_right = nullptr;
+						root->m_left = parent;
+
+						stackPool[stack].m_rootNodeIndex = rootNodeIndex;
+						stackPool[stack].m_start = block.m_start;
+						stackPool[stack].m_count = count0;
+
+						stack++;
+						rootNodeIndex++;
+						dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
+					}
+
+					ndUnsigned32 count1 = block.m_start + block.m_count - index0;
+					dAssert(count1);
+					if (count1 == 1)
+					{
+						ndSceneNode* const node = m_cellBuffer0[index0].m_node;
+						node->m_bhvLinked = 1;
+						node->m_parent = root;
+						root->m_right = node;
+					}
+					else if (count1 == 2)
+					{
+						ndSceneNode* const node0 = m_cellBuffer0[index0 + 0].m_node;
+						ndSceneNode* const node1 = m_cellBuffer0[index0 + 1].m_node;
+						ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						rootNodeIndex++;
+
+						dAssert(root);
+						MakeTwoNodesTree(parent, node0, node1);
+						parent->m_parent = root;
+						root->m_right = parent;
+					}
+					else if (count1 == 3)
+					{
+						ndSceneNode* const node0 = m_cellBuffer0[index0 + 0].m_node;
+						ndSceneNode* const node1 = m_cellBuffer0[index0 + 1].m_node;
+						ndSceneNode* const node2 = m_cellBuffer0[index0 + 2].m_node;
+
+						ndSceneTreeNode* const grandParent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						rootNodeIndex++;
+
+						ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						rootNodeIndex++;
+
+						dAssert(root);
+						MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
+						grandParent->m_parent = root;
+						root->m_right = grandParent;
+					}
+					else
+					{
+						ndSceneTreeNode* const parent = parentsArray[rootNodeIndex]->GetAsSceneTreeNode();
+						parent->m_bhvLinked = 1;
+						parent->m_parent = root;
+						parent->m_left = nullptr;
+						parent->m_right = nullptr;
+						root->m_right = parent;
+
+						stackPool[stack].m_rootNodeIndex = rootNodeIndex;
+						stackPool[stack].m_start = index0;
+						stackPool[stack].m_count = count1;
+
+						stack++;
+						rootNodeIndex++;
+						dAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
 					}
 				}
 				rootNode->m_bhvLinked = 0;
@@ -1495,11 +1489,13 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 				m_cellCounts1[i].m_location = sum;
 				sum += count;
 			}
-			m_cellCounts1[bashCount].m_location = sum; 
-
-			BuildSmallBvh(parentsArray, bashCount);
-			parentsArray += sum;
-			leafNodesCount += sum;
+			if (sum)
+			{
+				m_cellCounts1[bashCount].m_location = sum;
+				BuildSmallBvh(parentsArray, bashCount);
+				parentsArray += sum;
+				leafNodesCount += sum;
+			}
 		}
 	}
 
