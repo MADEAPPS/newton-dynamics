@@ -177,9 +177,9 @@ inline void ndSceneNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
 
+#ifdef _DEBUG
 inline bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
 {
-#ifdef _DEBUG
 	char margin[256];
 	for (ndUnsigned32 i = 0; i < level; ++i)
 	{
@@ -188,8 +188,10 @@ inline bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
 	}
 	margin[level * 2] = 0;
 	dTrace(("%s %d\n", margin, m_nodeId));
+#else
+inline bool ndSceneNode::SanityCheck(ndUnsigned32) const
+{
 #endif
-
 	dAssert(!m_parent || dBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
 	return true;
 }
