@@ -852,9 +852,10 @@ namespace nd_
 			params.m_logger->Log(msg.str().c_str());
 		}
 
-#if 1
 		struct ConvexProxy
 		{
+			Vec3<double> m_bmin;
+			Vec3<double> m_bmax;
 			Mesh* m_hull;
 			int m_id;
 		};
@@ -939,16 +940,38 @@ namespace nd_
 			convexProxyArray.push_back(ConvexProxy());
 			convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[i]);
 			convexProxyArray[i].m_id = i;
+
+			const SArray<Vec3<double>>& inputPoints = convexProxyArray[i].m_hull->GetPointArray();
+			Vec3<double> bmin(inputPoints[0]);
+			Vec3<double> bmax(inputPoints[1]);
+			for (uint32_t j = 1; j < inputPoints.Size(); j++)
+			{
+				const Vec3<double>& p = inputPoints[j];
+				p.UpdateMinMax(bmin, bmax);
+			}
+			convexProxyArray[i].m_bmin = bmin;
+			convexProxyArray[i].m_bmax = bmax;
 		}
 
 		for (int i = 1; i < convexProxyArray.size(); ++i)
 		{
+			Vec3<double> bmin1(convexProxyArray[i].m_bmin);
+			Vec3<double> bmax1(convexProxyArray[i].m_bmax);
 			for (int j = 0; j < i; ++j)
 			{
-				ConvexKey key(i, j);
-				hullGraph.insert(key);
-				convexPairArray[pairsCount] = ConvexPair(i, j);
-				pairsCount++;
+				Vec3<double> bmin0(convexProxyArray[j].m_bmin);
+				Vec3<double> bmax0(convexProxyArray[j].m_bmax);
+				Vec3<double> box1(bmax1 - bmin0);
+				Vec3<double> box0(bmin1 - bmax0);
+				Vec3<double> size(box0.X() * box1.X(), box0.Y()* box1.Y(), box0.Z()* box1.Z());
+
+				if ((size[0] <= 0.0) && (size[1] <= 0.0) && (size[2] <= 0.0))
+				{
+					ConvexKey key(i, j);
+					hullGraph.insert(key);
+					convexPairArray[pairsCount] = ConvexPair(i, j);
+					pairsCount++;
+				}
 			}
 		}
 
@@ -1044,125 +1067,6 @@ namespace nd_
 				}
 			}
 		}
-#else
-
-		if (m_convexHulls.Size() <= params.m_maxConvexHulls)
-		{
-			//			return;
-		}
-
-		// Get the current number of convex hulls
-		size_t nConvexHulls = m_convexHulls.Size();
-		// Iteration counter
-		int32_t iteration = 0;
-		// While we have more than at least one convex hull and the user has not asked us to cancel the operation
-		if (nConvexHulls > 1 && !m_cancel) 
-		{
-			// Get the gamma error threshold for when to exit
-			SArray<Vec3<double> > pts;
-			Mesh combinedCH;
-
-			// Populate the cost matrix
-			size_t idx = 0;
-			SArray<float> costMatrix;
-			costMatrix.Resize(((nConvexHulls * nConvexHulls) - nConvexHulls) >> 1);
-			for (size_t p1 = 1; p1 < nConvexHulls; ++p1) 
-			{
-				const float volume1 = m_convexHulls[p1]->ComputeVolume();
-				for (size_t p2 = 0; p2 < p1; ++p2) 
-				{
-					ComputeConvexHull(m_convexHulls[p1], m_convexHulls[p2], pts, &combinedCH);
-					costMatrix[idx++] = ComputeConcavity(volume1 + m_convexHulls[p2]->ComputeVolume(), combinedCH.ComputeVolume(), m_volumeCH0);
-				}
-			}
-
-			// Until we cant merge below the maximum cost
-			size_t costSize = m_convexHulls.Size();
-			while (!m_cancel) 
-			{
-				msg.str("");
-				msg << "Iteration " << iteration++;
-				m_operation = msg.str();
-
-				// Search for lowest cost
-				float bestCost = (std::numeric_limits<float>::max)();
-				const size_t addr = FindMinimumElement(costMatrix.Data(), &bestCost, 0, int (costMatrix.Size()));
-				if ( (costSize-1) < params.m_maxConvexHulls)
-				{
-					break;
-				}
-				const size_t addrI = (static_cast<int32_t>(sqrt(1 + (8 * addr))) - 1) >> 1;
-				const size_t p1 = addrI + 1;
-				const size_t p2 = addr - ((addrI * (addrI + 1)) >> 1);
-				assert(p1 >= 0);
-				assert(p2 >= 0);
-				assert(p1 < costSize);
-				assert(p2 < costSize);
-
-				if (params.m_logger) 
-				{
-					msg.str("");
-					msg << "\t\t Merging (" << p1 << ", " << p2 << ") " << bestCost << std::endl
-						<< std::endl;
-					params.m_logger->Log(msg.str().c_str());
-				}
-
-				// Make the lowest cost row and column into a new hull
-				Mesh* cch = new Mesh;
-				ComputeConvexHull(m_convexHulls[p1], m_convexHulls[p2], pts, cch);
-				delete m_convexHulls[p2];
-				m_convexHulls[p2] = cch;
-
-				delete m_convexHulls[p1];
-				std::swap(m_convexHulls[p1], m_convexHulls[m_convexHulls.Size() - 1]);
-				m_convexHulls.PopBack();
-
-				costSize = costSize - 1;
-
-				// Calculate costs versus the new hull
-				size_t rowIdx = ((p2 - 1) * p2) >> 1;
-				const float volume1 = m_convexHulls[p2]->ComputeVolume();
-				for (size_t i = 0; (i < p2) && (!m_cancel); ++i) 
-				{
-					ComputeConvexHull(m_convexHulls[p2], m_convexHulls[i], pts, &combinedCH);
-					costMatrix[rowIdx++] = ComputeConcavity(volume1 + m_convexHulls[i]->ComputeVolume(), combinedCH.ComputeVolume(), m_volumeCH0);
-				}
-
-				rowIdx += p2;
-				for (size_t i = p2 + 1; (i < costSize) && (!m_cancel); ++i) 
-				{
-					ComputeConvexHull(m_convexHulls[p2], m_convexHulls[i], pts, &combinedCH);
-					costMatrix[rowIdx] = ComputeConcavity(volume1 + m_convexHulls[i]->ComputeVolume(), combinedCH.ComputeVolume(), m_volumeCH0);
-					rowIdx += i;
-					assert(rowIdx >= 0);
-				}
-
-				// Move the top column in to replace its space
-				const size_t erase_idx = ((costSize - 1) * costSize) >> 1;
-				if (p1 < costSize) {
-					rowIdx = (addrI * p1) >> 1;
-					size_t top_row = erase_idx;
-					for (size_t i = 0; i < p1; ++i) {
-						if (i != p2) {
-							costMatrix[rowIdx] = costMatrix[top_row];
-						}
-						++rowIdx;
-						++top_row;
-					}
-
-					++top_row;
-					rowIdx += p1;
-					for (size_t i = p1 + 1; i < (costSize + 1); ++i) {
-						costMatrix[rowIdx] = costMatrix[top_row++];
-						rowIdx += i;
-						assert(rowIdx >= 0);
-					}
-				}
-				costMatrix.Resize(erase_idx);
-			}
-		}
-
-#endif
 
 		m_overallProgress = 99.0;
 		Update(100.0, 100.0, params);

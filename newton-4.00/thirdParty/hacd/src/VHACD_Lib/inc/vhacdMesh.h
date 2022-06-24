@@ -69,6 +69,7 @@ namespace nd_
 			public:
 			void AddPoint(const Vec3<double>& pt) { m_points.PushBack(pt); };
 			void SetPoint(size_t index, const Vec3<double>& pt) { m_points[index] = pt; };
+			SArray<Vec3<double> >& GetPointArray() { return m_points; };
 			const Vec3<double>& GetPoint(size_t index) const { return m_points[index]; };
 			Vec3<double>& GetPoint(size_t index) { return m_points[index]; };
 			size_t GetNPoints() const { return m_points.Size(); };
