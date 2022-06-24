@@ -987,9 +987,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 					root->m_minBox = minP;
 					root->m_maxBox = maxP;
 					root->m_bhvLinked = 1;
-					//root->m_left = nullptr;
-					//root->m_right = nullptr;
-					//root->m_parent = nullptr;
 
 					const ndVector size(maxP - minP);
 					root->m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
@@ -1040,12 +1037,12 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 						ndCompareContext info;
 						ndUnsigned32 scan[8];
-						ndBottomUpCell tmpBuffer[256];
+						//ndBottomUpCell tmpBuffer[256];
 						dAssert(block.m_count < sizeof(tmpBuffer) / sizeof(tmpBuffer[1]));
 
 						info.m_index = index;
 						info.m_midPoint = median[index] / ndFloat32(block.m_count);
-						ndCountingSortInPlace<ndBottomUpCell, ndCompareKey, 2>(&m_cellBuffer0[block.m_start], tmpBuffer, block.m_count, scan, &info);
+						ndCountingSortInPlace<ndBottomUpCell, ndCompareKey, 2>(&m_cellBuffer0[block.m_start], &m_cellBuffer1[block.m_start], block.m_count, scan, &info);
 						ndInt32 index0 = block.m_start + scan[1];
 
 						dAssert(index0 > block.m_start);
@@ -1324,6 +1321,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			dAssert(x1 >= 0);
 			dAssert(y1 >= 0);
 			dAssert(z1 >= 0);
+
 			const ndUnsigned32 test_x = (((x1 - x0)) >> 1) == 0;
 			const ndUnsigned32 test_y = (((y1 - y0)) >> 1) == 0;
 			const ndUnsigned32 test_z = (((z1 - z0)) >> 1) == 0;
@@ -1389,7 +1387,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			return cell.m_cellTest;
 		}
 	};
-
 	
 	BoxInfo info;
 	info.m_origin = minP;
@@ -1518,12 +1515,8 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 		fitness.UpdateView();
 		m_forceBalanceSceneCounter++;
 		
-#ifdef D_NEW_SCENE
-		if (m_forceBalanceSceneCounter > 2)
-#else
 		//if (m_forceBalanceSceneCounter > 256)
-		if (m_forceBalanceSceneCounter > 2)
-#endif
+		if (m_forceBalanceSceneCounter > 1)
 		{
 			m_forceBalanceScene = 1;
 		}
@@ -1670,21 +1663,6 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 				//dAssert((*root)->SanityCheck(0));
 			}
 
-			#ifdef D_NEW_SCENE
-			if (fitness.GetFirst())
-			{
-				D_TRACKTIME();
-				ndSceneNode* const bottomUpRoot = BuildBottomUp(fitness);
-				*root = bottomUpRoot;
-
-				//dTrace(("bottomDown\n"));
-				//dAssert ((*root)->SanityCheck(0));
-
-				ndFloat64 entropy1 = fitness.TotalCost();
-				//dTrace (("topDown:%f  bottomUp:%f\n", ndFloat32 (entropy), ndFloat32(entropy1)));
-			}
-			#endif 
-
 			oldEntropy = entropy;
 			m_forceBalanceScene = 0;
 			m_forceBalanceSceneCounter = 0;
@@ -1696,7 +1674,14 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSce
 void ndScene::BalanceScene()
 {
 	D_TRACKTIME();
+#ifdef D_NEW_SCENE
+	if (m_fitness.GetFirst())
+	{
+		m_rootNode = BuildBottomUp(m_fitness);
+	}
+#else
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
+#endif
 }
 
 void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body)
