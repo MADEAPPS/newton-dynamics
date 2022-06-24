@@ -1030,21 +1030,44 @@ namespace nd_
 					convexProxyArray.push_back(ConvexProxy());
 					convexProxyArray[index].m_hull = newHull;
 					convexProxyArray[index].m_id = index;
+
+					const SArray<Vec3<double>>& inputPoints = newHull->GetPointArray();
+					Vec3<double> bmin(inputPoints[0]);
+					Vec3<double> bmax(inputPoints[1]);
+					for (uint32_t j = 1; j < inputPoints.Size(); j++)
+					{
+						const Vec3<double>& p = inputPoints[j];
+						p.UpdateMinMax(bmin, bmax);
+					}
+					convexProxyArray[index].m_bmin = bmin;
+					convexProxyArray[index].m_bmax = bmax;
+
+
 					delete convexProxyArray[key.m_p0].m_hull;
 					delete convexProxyArray[key.m_p1].m_hull;
 					convexProxyArray[key.m_p0].m_hull = nullptr;
 					convexProxyArray[key.m_p1].m_hull = nullptr;
 
 					const float volume0 = newHull->ComputeVolume();
+
 					for (int i = 0; i < convexProxyArray.size() - 1; i++)
 					{
 						if (convexProxyArray[i].m_hull)
 						{
-							ConvexPair pair(i, index);
-							const float volume1 = convexProxyArray[i].m_hull->ComputeVolume();
-							ComputeConvexHull(newHull, convexProxyArray[i].m_hull, pts, &combinedCH);
-							float cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
-							priority.Push(pair, cost);
+							Vec3<double> bmin0(convexProxyArray[i].m_bmin);
+							Vec3<double> bmax0(convexProxyArray[i].m_bmax);
+							Vec3<double> box1(bmax - bmin0);
+							Vec3<double> box0(bmin - bmax0);
+							Vec3<double> size(box0.X() * box1.X(), box0.Y() * box1.Y(), box0.Z() * box1.Z());
+
+							if ((size[0] <= 0.0) && (size[1] <= 0.0) && (size[2] <= 0.0))
+							{
+								ConvexPair pair(i, index);
+								const float volume1 = convexProxyArray[i].m_hull->ComputeVolume();
+								ComputeConvexHull(newHull, convexProxyArray[i].m_hull, pts, &combinedCH);
+								float cost = ComputeConcavity(volume0 + volume1, combinedCH.ComputeVolume(), m_volumeCH0);
+								priority.Push(pair, cost);
+							}
 						}
 					}
 
