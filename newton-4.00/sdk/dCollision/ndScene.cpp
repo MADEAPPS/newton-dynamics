@@ -1367,6 +1367,46 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		}
 	};
 
+	class ndSortCell_xMid
+	{
+		public:
+		ndSortCell_xMid(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return (cell.m_x >>8) & 0xff;
+		}
+	};
+
+	class ndSortCell_yMid
+	{
+		public:
+		ndSortCell_yMid(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return (cell.m_y>>8) & 0xff;
+		}
+	};
+
+	class ndSortCell_zMid
+	{
+		public:
+		ndSortCell_zMid(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndBottomUpCell& cell) const
+		{
+			return (cell.m_z >>8) & 0xff;
+		}
+	};
+
+
 	class ndSortCellCount
 	{
 		public:
@@ -1379,14 +1419,14 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			return cell.m_cellTest;
 		}
 	};
-	
+
 	BoxInfo info;
 	info.m_origin = minP;
 	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
 	
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
-
+	
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size * ndVector::m_two;
@@ -1430,22 +1470,32 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			});
 			ParallelExecute(MakeGrids);
 
+			for (ndInt32 i = 1; i < threadCount; ++i)
+			{
+				maxGrids[0][0] = ndMax(maxGrids[i][0], maxGrids[0][0]);
+				maxGrids[0][1] = ndMax(maxGrids[i][1], maxGrids[0][1]);
+				maxGrids[0][2] = ndMax(maxGrids[i][2], maxGrids[0][2]);
+			}
+
 			ndCountingSort<ndBottomUpCell, ndSortCell_xlow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
 			if (maxGrids[0][0] > 256)
 			{
-				dAssert(0);
+				ndCountingSort<ndBottomUpCell, ndSortCell_xMid, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+				dAssert(maxGrids[0][0] < 256 * 256);
 			}
 			
 			ndCountingSort<ndBottomUpCell, ndSortCell_ylow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
-			if (maxGrids[0][0] > 256)
+			if (maxGrids[0][1] > 256)
 			{
-				dAssert(0);
+				ndCountingSort<ndBottomUpCell, ndSortCell_yMid, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+				dAssert(maxGrids[0][1] < 256 * 256);
 			}
 			
 			ndCountingSort<ndBottomUpCell, ndSortCell_zlow, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
-			if (maxGrids[0][0] > 256)
+			if (maxGrids[0][2] > 256)
 			{
-				dAssert(0);
+				ndCountingSort<ndBottomUpCell, ndSortCell_zMid, 8>(*this, m_cellBuffer0, m_cellBuffer1, nullptr, nullptr);
+				dAssert(maxGrids[0][2] < 256 * 256);
 			}
 
 			ndBottomUpCell sentinelCell;
@@ -1481,7 +1531,7 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			
 			ndUnsigned32 sum = 0;
 			const ndUnsigned32 bashCount = prefixScan[1] - 1;
-			for (ndUnsigned32 i = 0; i < bashCount; i++)
+			for (ndUnsigned32 i = 0; i < bashCount; ++i)
 			{
 				const ndUnsigned32 count = m_cellCounts0[i + 1].m_location - m_cellCounts0[i].m_location - 1;
 				m_cellCounts1[i].m_location = sum;
