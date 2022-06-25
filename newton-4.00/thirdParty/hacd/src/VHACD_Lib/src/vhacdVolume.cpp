@@ -560,6 +560,23 @@ namespace nd_
 				}
 			}
 		}
+
+		void VoxelSet::GetPointArray(std::vector<Vec3<double>>& points) const
+		{
+			const size_t nVoxels = m_voxels.Size();
+
+			Vec3<double> pts[8];
+			for (size_t i = 0; i < nVoxels; ++i)
+			{
+				Voxel voxel (m_voxels[i]);
+				GetPoints(voxel, pts);
+				for (int32_t k = 0; k < 8; ++k) 
+				{
+					points.push_back(pts[k]);
+				}
+			}
+		}
+
 		void VoxelSet::ComputeExteriorPoints(const Plane& plane,
 			const Mesh& mesh,
 			SArray<Vec3<double> >* const exteriorPts) const
@@ -1159,6 +1176,13 @@ namespace nd_
 			}
 			m_tetrahedra.PushBack(tetrahedron);
 			return true;
+		}
+
+		void TetrahedronSet::GetPointArray(std::vector<Vec3<double>>&) const
+		{
+			#ifdef _WIN32
+			_ASSERT(0);
+			#endif	
 		}
 
 		void TetrahedronSet::AddClippedTetrahedra(const Vec3<double> (&pts)[10], const int32_t nPts)

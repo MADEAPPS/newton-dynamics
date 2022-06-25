@@ -143,6 +143,19 @@ namespace nd_
 			return true;
 		}
 
+		void Mesh::CalculateBoundingBox(Vec3<double>& p0, Vec3<double>& p1) const
+		{
+			Vec3<double> bmin(m_points[0]);
+			Vec3<double> bmax(m_points[1]);
+			for (uint32_t i = 1; i < m_points.Size(); i++)
+			{
+				const Vec3<double>& p = m_points[i];
+				p.UpdateMinMax(bmin, bmax);
+			}
+			p0 = bmin;
+			p1 = bmax;
+		}
+
 		#ifdef VHACD_DEBUG_MESH
 		bool Mesh::SaveVRML2(const std::string& fileName) const
 		{

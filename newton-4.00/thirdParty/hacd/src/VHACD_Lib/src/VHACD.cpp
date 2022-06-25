@@ -474,6 +474,31 @@ namespace nd_
 	std::vector<BestClippingPlaneJob> jobs;
 	jobs.resize(nPlanes);
 
+
+//SArray<Vec3<double> > leftCHPts;
+//SArray<Vec3<double> > rightCHPts;
+//rightCHPts.Resize(0);
+//leftCHPts.Resize(0);
+//onSurfacePSet->Intersect(planes[2], &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
+//inputPSet->GetConvexHull().Clip(planes[2], rightCHPts, leftCHPts);
+
+#if 0
+	std::vector<Vec3<double>> convexHullPoints;
+	convexHullPoints.resize(0);
+	onSurfacePSet->GetPointArray(convexHullPoints);
+	const size_t nV = inputPSet->GetConvexHull().GetNPoints();
+	for (int i = 0; i < nV; i++)
+	{
+		const Vec3<double>& pt = inputPSet->GetConvexHull().GetPoint(i);
+		convexHullPoints.push_back(pt);
+	}
+	ConvexHull3dSupportAccelerator accelerator(&convexHullPoints[0][0], int(sizeof(Vec3<double>)), int(convexHullPoints.size()));
+	nd_::VHACD::ConvexHull xxxxx(accelerator, 1.0e-5f);
+#endif
+	 
+//rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
+//leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
+
 	CommonData data(this, params);
 	data.m_w = w;
 	data.m_beta = beta;
@@ -940,17 +965,7 @@ namespace nd_
 			convexProxyArray.push_back(ConvexProxy());
 			convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[i]);
 			convexProxyArray[i].m_id = i;
-
-			const SArray<Vec3<double>>& inputPoints = convexProxyArray[i].m_hull->GetPointArray();
-			Vec3<double> bmin(inputPoints[0]);
-			Vec3<double> bmax(inputPoints[1]);
-			for (uint32_t j = 1; j < inputPoints.Size(); j++)
-			{
-				const Vec3<double>& p = inputPoints[j];
-				p.UpdateMinMax(bmin, bmax);
-			}
-			convexProxyArray[i].m_bmin = bmin;
-			convexProxyArray[i].m_bmax = bmax;
+			convexProxyArray[i].m_hull->CalculateBoundingBox(convexProxyArray[i].m_bmin, convexProxyArray[i].m_bmax);
 		}
 
 		for (int i = 1; i < convexProxyArray.size(); ++i)
@@ -1030,18 +1045,7 @@ namespace nd_
 					convexProxyArray.push_back(ConvexProxy());
 					convexProxyArray[index].m_hull = newHull;
 					convexProxyArray[index].m_id = index;
-
-					const SArray<Vec3<double>>& inputPoints = newHull->GetPointArray();
-					Vec3<double> bmin(inputPoints[0]);
-					Vec3<double> bmax(inputPoints[1]);
-					for (uint32_t j = 1; j < inputPoints.Size(); j++)
-					{
-						const Vec3<double>& p = inputPoints[j];
-						p.UpdateMinMax(bmin, bmax);
-					}
-					convexProxyArray[index].m_bmin = bmin;
-					convexProxyArray[index].m_bmax = bmax;
-
+					convexProxyArray[index].m_hull->CalculateBoundingBox(convexProxyArray[index].m_bmin, convexProxyArray[index].m_bmax);
 
 					delete convexProxyArray[key.m_p0].m_hull;
 					delete convexProxyArray[key.m_p1].m_hull;
@@ -1049,6 +1053,9 @@ namespace nd_
 					convexProxyArray[key.m_p1].m_hull = nullptr;
 
 					const float volume0 = newHull->ComputeVolume();
+
+					const Vec3<double> bmin(convexProxyArray[index].m_bmin);
+					const Vec3<double> bmax(convexProxyArray[index].m_bmax);
 
 					for (int i = 0; i < convexProxyArray.size() - 1; i++)
 					{

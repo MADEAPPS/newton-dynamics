@@ -39,7 +39,8 @@ namespace nd_
 	namespace VHACD 
 	{
 		#define VHACD_GOOGOL_SIZE		4
-		#define VHACD_WORKERS_THREADS	4
+		//#define VHACD_WORKERS_THREADS	4
+		#define VHACD_WORKERS_THREADS	1
 
 		class Googol;
 		Googol Determinant2x2(const Googol matrix[2][2]);

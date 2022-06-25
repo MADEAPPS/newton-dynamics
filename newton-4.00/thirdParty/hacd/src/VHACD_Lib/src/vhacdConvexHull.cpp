@@ -25,8 +25,7 @@ namespace nd_
 {
 	namespace VHACD
 	{
-
-		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 8
+		#define DG_STACK_DEPTH_3D 64
 
 		ConvexHullFace::ConvexHullFace()
 		{
@@ -93,149 +92,41 @@ namespace nd_
 			return Determinant3x3(exactMatrix);
 		}
 
-		class ConvexHullVertex : public hullVector
-		{
-			public:
-			int m_mark;
-		};
 
-		class ConvexHullAABBTreeNode
-		{
-			public:
-			//ConvexHullAABBTreeNode(ConvexHullAABBTreeNode* const parent)
-			ConvexHullAABBTreeNode()
-				:m_left(nullptr)
-				,m_right(nullptr)
-				,m_parent(nullptr)
-			{
-			}
+		//int ConvexHullAABBTreeNode::CalcucatePointsCount() const
+		//{
+		//	const ConvexHullAABBTreeNode* stackPool[DG_STACK_DEPTH_3D];
+		//
+		//	int stack = 1;
+		//	stackPool[0] = this;
+		//
+		//	int count = 0;
+		//	while (stack)
+		//	{
+		//		stack--;
+		//		const ConvexHullAABBTreeNode* const me = stackPool[stack];
+		//		if (!me->m_left && !me->m_right)
+		//		{
+		//			ConvexHull3dPointCluster* const cluster = (ConvexHull3dPointCluster*)me;
+		//			count += cluster->m_count;
+		//		}
+		//		else
+		//		{
+		//			stackPool[stack] = me->m_left;
+		//			stack++;
+		//			_ASSERT(stack < DG_STACK_DEPTH_3D);
+		//
+		//			stackPool[stack] = me->m_right;
+		//			stack++;
+		//			_ASSERT(stack < DG_STACK_DEPTH_3D);
+		//		}
+		//	}
+		//
+		//	return count;
+		//}
 
-			ConvexHullAABBTreeNode(ConvexHullAABBTreeNode* const parent)
-				:m_left(nullptr)
-				,m_right(nullptr)
-				,m_parent(parent)
-			{
-			}
-
-			hullVector m_box[2];
-			ConvexHullAABBTreeNode* m_left;
-			ConvexHullAABBTreeNode* m_right;
-			ConvexHullAABBTreeNode* m_parent;
-		};
-
-		class ConvexHull3dPointCluster : public ConvexHullAABBTreeNode
-		{
-			public:
-			ConvexHull3dPointCluster()
-				:ConvexHullAABBTreeNode()
-			{
-			}
-
-			ConvexHull3dPointCluster(ConvexHullAABBTreeNode* const parent)
-				:ConvexHullAABBTreeNode(parent)
-			{
-			}
-
-			int m_count;
-			int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
-		};
-
-		class ConvexHull::ndNormalMap
-		{
-			public:
-			ndNormalMap()
-				:m_count(sizeof(m_normal) / sizeof(m_normal[0]))
-			{
-				hullVector p0(double(1.0f), double(0.0f), double(0.0f), double(0.0f));
-				hullVector p1(double(-1.0f), double(0.0f), double(0.0f), double(0.0f));
-				hullVector p2(double(0.0f), double(1.0f), double(0.0f), double(0.0f));
-				hullVector p3(double(0.0f), double(-1.0f), double(0.0f), double(0.0f));
-				hullVector p4(double(0.0f), double(0.0f), double(1.0f), double(0.0f));
-				hullVector p5(double(0.0f), double(0.0f), double(-1.0f), double(0.0f));
-
-				int count = 0;
-				int subdivitions = 2;
-				TessellateTriangle(subdivitions, p4, p0, p2, count);
-				TessellateTriangle(subdivitions, p0, p5, p2, count);
-				TessellateTriangle(subdivitions, p5, p1, p2, count);
-				TessellateTriangle(subdivitions, p1, p4, p2, count);
-				TessellateTriangle(subdivitions, p0, p4, p3, count);
-				TessellateTriangle(subdivitions, p5, p0, p3, count);
-				TessellateTriangle(subdivitions, p1, p5, p3, count);
-				TessellateTriangle(subdivitions, p4, p1, p3, count);
-			}
-
-			static const ndNormalMap& GetNormaMap()
-			{
-				static ndNormalMap normalMap;
-				return normalMap;
-			}
-
-			void TessellateTriangle(int level, const hullVector& p0, const hullVector& p1, const hullVector& p2, int& count)
-			{
-				if (level) 
-				{
-					_ASSERT(fabs(p0.DotProduct(p0) - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p1.DotProduct(p1) - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p2.DotProduct(p2) - double(1.0f)) < double(1.0e-4f));
-					hullVector p01(p0 + p1);
-					hullVector p12(p1 + p2);
-					hullVector p20(p2 + p0);
-
-					p01 = p01.Scale(1.0 / sqrt(p01.DotProduct(p01)));
-					p12 = p12.Scale(1.0 / sqrt(p12.DotProduct(p12)));
-					p20 = p20.Scale(1.0 / sqrt(p20.DotProduct(p20)));
-
-					_ASSERT(fabs(p01.DotProduct(p01) - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p12.DotProduct(p12) - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p20.DotProduct(p20) - double(1.0f)) < double(1.0e-4f));
-
-					TessellateTriangle(level - 1, p0, p01, p20, count);
-					TessellateTriangle(level - 1, p1, p12, p01, count);
-					TessellateTriangle(level - 1, p2, p20, p12, count);
-					TessellateTriangle(level - 1, p01, p12, p20, count);
-				}
-				else 
-				{
-					hullPlane n(p0, p1, p2);
-					n = n.Scale(double(1.0f) / sqrt(n.DotProduct(n)));
-					n.m_w = double(0.0f);
-					int index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
-					m_normal[index] = n;
-					count++;
-					_ASSERT(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
-				}
-			}
-
-			hullVector m_normal[128];
-			int m_count;
-		};
-
-		ConvexHull::ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
-			:List<ConvexHullFace>()
-			,m_aabbP0(0)
-			,m_aabbP1(0)
-			,m_diag()
-			,m_points()
-		{
-			m_points.resize(0);
-			if (count >= 4)
-			{
-				BuildHull(vertexCloud, strideInBytes, count, distTol, maxVertexCount);
-			}
-		}
-
-		ConvexHull::~ConvexHull()
-		{
-		}
-
-		const std::vector<hullVector>& ConvexHull::GetVertexPool() const
-		{
-			return m_points;
-		}
-
-
-		void ConvexHull::BuildHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
+		ConvexHull3dSupportAccelerator::ConvexHull3dSupportAccelerator(const double* const vertexCloud, int strideInBytes, int count)
+			:m_tree(nullptr)
 		{
 			int treeCount = count / (VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE >> 1);
 			if (treeCount < 4)
@@ -244,29 +135,18 @@ namespace nd_
 			}
 			treeCount *= 2;
 
-			std::vector<ConvexHullVertex> points(count);
-			std::vector<ConvexHull3dPointCluster> treePool(treeCount + 256);
-			points.resize(count);
-			treePool.resize(treeCount + 256);
+			m_points.resize(count);
+			m_treeBuffer.resize(treeCount + 256);
 
 			const int stride = int(strideInBytes / sizeof(double));
 			for (int i = 0; i < count; ++i)
 			{
 				int index = i * stride;
-				hullVector& vertex = points[i];
+				hullVector& vertex = m_points[i];
 				vertex = hullVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], double(0.0f));
-				points[i].m_mark = 0;
+				m_points[i].m_mark = 0;
 			}
-			count = InitVertexArray(points, &treePool[0], sizeof (ConvexHull3dPointCluster) * int (treePool.size()));
 
-			if (m_points.size() >= 4)
-			{
-				CalculateConvexHull3d(&treePool[0], points, count, distTol, maxVertexCount);
-			}
-		}
-
-		void ConvexHull::GetUniquePoints(std::vector<ConvexHullVertex>& points)
-		{
 			class CompareVertex
 			{
 				public:
@@ -287,8 +167,8 @@ namespace nd_
 				}
 			};
 
-			int count = int(points.size());
-			Sort<ConvexHullVertex, CompareVertex>(&points[0], count);
+			count = int(m_points.size());
+			Sort<ConvexHullVertex, CompareVertex>(&m_points[0], count);
 
 			int indexCount = 0;
 			CompareVertex compareVetex;
@@ -296,18 +176,24 @@ namespace nd_
 			{
 				for (; i < count; ++i)
 				{
-					if (compareVetex.Compare(points[indexCount], points[i]))
+					if (compareVetex.Compare(m_points[indexCount], m_points[i]))
 					{
 						indexCount++;
-						points[indexCount] = points[i];
+						m_points[indexCount] = m_points[i];
 						break;
 					}
 				}
 			}
-			points.resize(indexCount + 1);
+			count = indexCount + 1;
+			m_points.resize(count);
+			if (count >= 4)
+			{
+				int memoryIndex = 0;
+				m_tree = BuildRecurse(nullptr, &m_points[0], count, 0, memoryIndex);
+			}
 		}
 
-		ConvexHullAABBTreeNode* ConvexHull::BuildTreeRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, char** memoryPool, int& maxMemSize) const
+		ConvexHullAABBTreeNode* ConvexHull3dSupportAccelerator::BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryIndex)
 		{
 			ConvexHullAABBTreeNode* tree = nullptr;
 
@@ -316,10 +202,9 @@ namespace nd_
 			hullVector maxP(-double(1.0e15f));
 			if (count <= VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE)
 			{
-				ConvexHull3dPointCluster* const clump = new (*memoryPool) ConvexHull3dPointCluster();
-				*memoryPool += sizeof(ConvexHull3dPointCluster);
-				maxMemSize -= sizeof(ConvexHull3dPointCluster);
-				_ASSERT(maxMemSize >= 0);
+				ConvexHull3dPointCluster* const clump = new (&m_treeBuffer[memoryIndex]) ConvexHull3dPointCluster();
+				memoryIndex++;
+				_ASSERT(memoryIndex <= m_treeBuffer.size());
 
 				_ASSERT(clump);
 				clump->m_count = count;
@@ -403,16 +288,15 @@ namespace nd_
 					i0 = count / 2;
 				}
 
-				tree = new (*memoryPool) ConvexHullAABBTreeNode();
-				*memoryPool += sizeof(ConvexHullAABBTreeNode);
-				maxMemSize -= sizeof(ConvexHullAABBTreeNode);
-				_ASSERT(maxMemSize >= 0);
+				tree = new (&m_treeBuffer[memoryIndex]) ConvexHullAABBTreeNode();
+				memoryIndex++;
+				_ASSERT(memoryIndex <= m_treeBuffer.size());
 
 				_ASSERT(i0);
 				_ASSERT(count - i0);
 
-				tree->m_left = BuildTreeRecurse(tree, points, i0, baseIndex, memoryPool, maxMemSize);
-				tree->m_right = BuildTreeRecurse(tree, &points[i0], count - i0, i0 + baseIndex, memoryPool, maxMemSize);
+				tree->m_left = BuildRecurse(tree, points, i0, baseIndex, memoryIndex);
+				tree->m_right = BuildRecurse(tree, &points[i0], count - i0, i0 + baseIndex, memoryIndex);
 			}
 
 			_ASSERT(tree);
@@ -422,408 +306,121 @@ namespace nd_
 			return tree;
 		}
 
-		ConvexHullAABBTreeNode* ConvexHull::BuildTreeOld(std::vector<ConvexHullVertex>& points, char** const memoryPool, int& maxMemSize)
+		class ConvexHull::ndNormalMap
 		{
-			GetUniquePoints(points);
-			int count = int(points.size());
-			if (count < 4)
+			public:
+			ndNormalMap()
+				:m_count(sizeof(m_normal) / sizeof(m_normal[0]))
 			{
-				return nullptr;
+				hullVector p0(double(1.0f), double(0.0f), double(0.0f), double(0.0f));
+				hullVector p1(double(-1.0f), double(0.0f), double(0.0f), double(0.0f));
+				hullVector p2(double(0.0f), double(1.0f), double(0.0f), double(0.0f));
+				hullVector p3(double(0.0f), double(-1.0f), double(0.0f), double(0.0f));
+				hullVector p4(double(0.0f), double(0.0f), double(1.0f), double(0.0f));
+				hullVector p5(double(0.0f), double(0.0f), double(-1.0f), double(0.0f));
+
+				int count = 0;
+				int subdivitions = 2;
+				TessellateTriangle(subdivitions, p4, p0, p2, count);
+				TessellateTriangle(subdivitions, p0, p5, p2, count);
+				TessellateTriangle(subdivitions, p5, p1, p2, count);
+				TessellateTriangle(subdivitions, p1, p4, p2, count);
+				TessellateTriangle(subdivitions, p0, p4, p3, count);
+				TessellateTriangle(subdivitions, p5, p0, p3, count);
+				TessellateTriangle(subdivitions, p1, p5, p3, count);
+				TessellateTriangle(subdivitions, p4, p1, p3, count);
 			}
-			return BuildTreeRecurse(nullptr, &points[0], count, 0, memoryPool, maxMemSize);
+
+			static const ndNormalMap& GetNormaMap()
+			{
+				static ndNormalMap normalMap;
+				return normalMap;
+			}
+
+			void TessellateTriangle(int level, const hullVector& p0, const hullVector& p1, const hullVector& p2, int& count)
+			{
+				if (level) 
+				{
+					_ASSERT(fabs(p0.DotProduct(p0) - double(1.0f)) < double(1.0e-4f));
+					_ASSERT(fabs(p1.DotProduct(p1) - double(1.0f)) < double(1.0e-4f));
+					_ASSERT(fabs(p2.DotProduct(p2) - double(1.0f)) < double(1.0e-4f));
+					hullVector p01(p0 + p1);
+					hullVector p12(p1 + p2);
+					hullVector p20(p2 + p0);
+
+					p01 = p01.Scale(1.0 / sqrt(p01.DotProduct(p01)));
+					p12 = p12.Scale(1.0 / sqrt(p12.DotProduct(p12)));
+					p20 = p20.Scale(1.0 / sqrt(p20.DotProduct(p20)));
+
+					_ASSERT(fabs(p01.DotProduct(p01) - double(1.0f)) < double(1.0e-4f));
+					_ASSERT(fabs(p12.DotProduct(p12) - double(1.0f)) < double(1.0e-4f));
+					_ASSERT(fabs(p20.DotProduct(p20) - double(1.0f)) < double(1.0e-4f));
+
+					TessellateTriangle(level - 1, p0, p01, p20, count);
+					TessellateTriangle(level - 1, p1, p12, p01, count);
+					TessellateTriangle(level - 1, p2, p20, p12, count);
+					TessellateTriangle(level - 1, p01, p12, p20, count);
+				}
+				else 
+				{
+					hullPlane n(p0, p1, p2);
+					n = n.Scale(double(1.0f) / sqrt(n.DotProduct(n)));
+					n.m_w = double(0.0f);
+					int index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
+					m_normal[index] = n;
+					count++;
+					_ASSERT(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
+				}
+			}
+
+			hullVector m_normal[128];
+			int m_count;
+		};
+
+		ConvexHull::ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
+			:List<ConvexHullFace>()
+			,m_aabbP0(0)
+			,m_aabbP1(0)
+			,m_diag()
+			,m_points()
+		{
+			m_points.resize(0);
+			ConvexHull3dSupportAccelerator accelerator(vertexCloud, strideInBytes, count);
+			BuildHull(accelerator, distTol, maxVertexCount);
 		}
 
-		ConvexHullAABBTreeNode* ConvexHull::BuildTreeNew(std::vector<ConvexHullVertex>& points, char** const memoryPool, int& maxMemSize) const
+		ConvexHull::ConvexHull(ConvexHull3dSupportAccelerator& accelerator, double distTol, int maxVertexCount)
+			:List<ConvexHullFace>()
+			,m_aabbP0(0)
+			,m_aabbP1(0)
+			,m_diag()
+			,m_points()
 		{
-			class dCluster
-			{
-				public:
-				hullVector m_sum;
-				hullVector m_sum2;
-				int m_start;
-				int m_count;
-			};
+			m_points.resize(0);
+			BuildHull(accelerator, distTol, maxVertexCount);
+		}
 
-			dCluster firstCluster;
-			firstCluster.m_start = 0;
-			firstCluster.m_count = int (points.size());
-			firstCluster.m_sum = hullVector(0);
-			firstCluster.m_sum2 = hullVector(0);
+		ConvexHull::~ConvexHull()
+		{
+		}
 
-			for (int i = 0; i < firstCluster.m_count; ++i)
+		const std::vector<hullVector>& ConvexHull::GetVertexPool() const
+		{
+			return m_points;
+		}
+
+		void ConvexHull::BuildHull(ConvexHull3dSupportAccelerator& accelerator, double distTol, int maxVertexCount)
+		{
+			//ConvexHull3dSupportAccelerator accelerator(vertexCloud, strideInBytes, count);
+			int count = InitVertexArray(accelerator);
+			if (m_points.size() >= 4)
 			{
-				const hullVector& p = points[i];
-				firstCluster.m_sum += p;
-				firstCluster.m_sum2 += p * p;
+				CalculateConvexHull3d(accelerator.m_tree, accelerator.m_points, count, distTol, maxVertexCount);
 			}
-
-			int baseCount = 0;
-			const int clusterSize = 16;
-
-			if (firstCluster.m_count > clusterSize)
-			{
-				dCluster spliteStack[128];
-				spliteStack[0] = firstCluster;
-				int stack = 1;
-
-				while (stack)
-				{
-					stack--;
-					dCluster cluster (spliteStack[stack]);
-
-					const hullVector origin(cluster.m_sum.Scale(1.0f / cluster.m_count));
-					const hullVector variance2(cluster.m_sum2.Scale(1.0f / cluster.m_count) - origin * origin);
-					double maxVariance2 = Max(Max(variance2.X(), variance2.Y()), variance2.Z());
-
-					if ((cluster.m_count <= clusterSize) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < 1.e-4f))
-					{
-						// no sure if this is beneficial, 
-						// the array is so small that seem too much overhead
-						//int maxIndex = 0;
-						//double min_x = 1.0e20f;
-						//for (int i = 0; i < cluster.m_count; ++i)
-						//{
-						//	if (points[cluster.m_start + i].X() < min_x)
-						//	{
-						//		maxIndex = i;
-						//		min_x = points[cluster.m_start + i].X();
-						//	}
-						//}
-						//Swap(points[cluster.m_start], points[cluster.m_start + maxIndex]);
-						//
-						//for (int i = 2; i < cluster.m_count; ++i)
-						//{
-						//	int j = i;
-						//	ConvexHullVertex tmp(points[cluster.m_start + i]);
-						//	for (; points[cluster.m_start + j - 1].X() > tmp.X(); --j)
-						//	{
-						//		_ASSERT(j > 0);
-						//		points[cluster.m_start + j] = points[cluster.m_start + j - 1];
-						//	}
-						//	points[cluster.m_start + j] = tmp;
-						//}
-
-						int count = cluster.m_count;
-						for (int i = cluster.m_count - 1; i > 0; --i)
-						{
-							for (int j = i - 1; j >= 0; --j)
-							{
-								hullVector error(points[cluster.m_start + j] - points[cluster.m_start + i]);
-								double mag2 = error.DotProduct(error);
-								if (mag2 < 1.0e-6)
-								{
-									points[cluster.m_start + j] = points[cluster.m_start + i];
-									count--;
-									break;
-								}
-							}
-						}
-
-						_ASSERT(baseCount <= cluster.m_start);
-						for (int i = 0; i < count; ++i)
-						{
-							points[baseCount] = points[cluster.m_start + i];
-							baseCount++;
-						}
-					}
-					else
-					{
-						int firstSortAxis = 0;
-						if ((variance2.Y() >= variance2.X()) && (variance2.Y() >= variance2.Z()))
-						{
-							firstSortAxis = 1;
-						}
-						else if ((variance2.Z() >= variance2.X()) && (variance2.Z() >= variance2.Y()))
-						{
-							firstSortAxis = 2;
-						}
-						double axisVal = origin[firstSortAxis];
-
-						int i0 = 0;
-						int i1 = cluster.m_count - 1;
-
-						const int start = cluster.m_start;
-						while (i0 < i1)
-						{
-							while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < i1))
-							{
-								++i0;
-							};
-
-							while ((points[start + i1][firstSortAxis] > axisVal) && (i0 < i1))
-							{
-								--i1;
-							}
-
-							_ASSERT(i0 <= i1);
-							if (i0 < i1)
-							{
-								Swap(points[start + i0], points[start + i1]);
-								++i0;
-								--i1;
-							}
-						}
-
-						while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < cluster.m_count))
-						{
-							++i0;
-						};
-
-						#ifdef _DEBUG
-						for (int i = 0; i < i0; ++i)
-						{
-							_ASSERT(points[start + i][firstSortAxis] <= axisVal);
-						}
-
-						for (int i = i0; i < cluster.m_count; ++i)
-						{
-							_ASSERT(points[start + i][firstSortAxis] > axisVal);
-						}
-						#endif
-
-						hullVector xc(0);
-						hullVector x2c(0);
-						for (int i = 0; i < i0; ++i)
-						{
-							const hullVector& x = points[start + i];
-							xc += x;
-							x2c += x * x;
-						}
-
-						dCluster cluster_i1(cluster);
-						cluster_i1.m_start = start + i0;
-						cluster_i1.m_count = cluster.m_count - i0;
-						cluster_i1.m_sum -= xc;
-						cluster_i1.m_sum2 -= x2c;
-						spliteStack[stack] = cluster_i1;
-						_ASSERT(cluster_i1.m_count > 0);
-						stack++;
-
-						dCluster cluster_i0(cluster);
-						cluster_i0.m_start = start;
-						cluster_i0.m_count = i0;
-						cluster_i0.m_sum = xc;
-						cluster_i0.m_sum2 = x2c;
-						_ASSERT(cluster_i0.m_count > 0);
-						spliteStack[stack] = cluster_i0;
-						stack++;
-					}
-				}
-			}
-
-			points.resize(baseCount);
-			if (baseCount < 4)
-			{
-				return nullptr;
-			}
-
-			hullVector sum(0);
-			hullVector sum2(0);
-			hullVector minP(double(1.0e15f));
-			hullVector maxP(-double(1.0e15f));
-			class dTreeBox
-			{
-				public:
-				hullVector m_min;
-				hullVector m_max;
-				hullVector m_sum;
-				hullVector m_sum2;
-				ConvexHullAABBTreeNode* m_parent;
-				ConvexHullAABBTreeNode** m_child;
-				int m_start;
-				int m_count;
-			};
-
-			for (int i = 0; i < baseCount; ++i)
-			{
-				const hullVector& p = points[i];
-				sum += p;
-				sum2 += p * p;
-				minP = minP.GetMin(p);
-				maxP = maxP.GetMax(p);
-			}
-	
-			dTreeBox treeBoxStack[128];
-			treeBoxStack[0].m_start = 0;
-			treeBoxStack[0].m_count = baseCount;
-			treeBoxStack[0].m_sum = sum;
-			treeBoxStack[0].m_sum2 = sum2;
-			treeBoxStack[0].m_min = minP;
-			treeBoxStack[0].m_max = maxP;
-			treeBoxStack[0].m_child = nullptr;
-			treeBoxStack[0].m_parent = nullptr;
-
-			int stack = 1;
-			ConvexHullAABBTreeNode* root = nullptr;
-			while (stack)
-			{
-				stack--;
-				dTreeBox box (treeBoxStack[stack]);
-				if (box.m_count <= VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE)
-				{
-					ConvexHull3dPointCluster* const clump = new (*memoryPool) ConvexHull3dPointCluster(box.m_parent);
-					*memoryPool += sizeof(ConvexHull3dPointCluster);
-					maxMemSize -= sizeof(ConvexHull3dPointCluster);
-					_ASSERT(maxMemSize >= 0);
-		
-					_ASSERT(clump);
-					clump->m_count = box.m_count;
-					for (int i = 0; i < box.m_count; ++i)
-					{
-						clump->m_indices[i] = i + box.m_start;
-					}
-					clump->m_box[0] = box.m_min;
-					clump->m_box[1] = box.m_max;
-
-					if (box.m_child)
-					{
-						*box.m_child = clump;
-					}
-
-					if (!root)
-					{
-						root = clump;
-					}
-				}
-				else
-				{
-					const hullVector origin(box.m_sum.Scale(1.0f / box.m_count));
-					const hullVector variance2(box.m_sum2.Scale(1.0f / box.m_count) - origin * origin);
-
-					int firstSortAxis = 0;
-					if ((variance2.Y() >= variance2.X()) && (variance2.Y() >= variance2.Z()))
-					{
-						firstSortAxis = 1;
-					}
-					else if ((variance2.Z() >= variance2.X()) && (variance2.Z() >= variance2.Y()))
-					{
-						firstSortAxis = 2;
-					}
-					double axisVal = origin[firstSortAxis];
-
-					int i0 = 0;
-					int i1 = box.m_count - 1;
-
-					const int start = box.m_start;
-					while (i0 < i1)
-					{
-						while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < i1))
-						{
-							++i0;
-						};
-
-						while ((points[start + i1][firstSortAxis] > axisVal) && (i0 < i1))
-						{
-							--i1;
-						}
-
-						_ASSERT(i0 <= i1);
-						if (i0 < i1)
-						{
-							Swap(points[start + i0], points[start + i1]);
-							++i0;
-							--i1;
-						}
-					}
-
-					while ((points[start + i0][firstSortAxis] <= axisVal) && (i0 < box.m_count))
-					{
-						++i0;
-					};
-
-					#ifdef _DEBUG
-					for (int i = 0; i < i0; ++i)
-					{
-						_ASSERT(points[start + i][firstSortAxis] <= axisVal);
-					}
-
-					for (int i = i0; i < box.m_count; ++i)
-					{
-						_ASSERT(points[start + i][firstSortAxis] > axisVal);
-					}
-					#endif
-
-					ConvexHullAABBTreeNode* const node = new (*memoryPool) ConvexHullAABBTreeNode(box.m_parent);
-					*memoryPool += sizeof(ConvexHullAABBTreeNode);
-					maxMemSize -= sizeof(ConvexHullAABBTreeNode);
-					_ASSERT(maxMemSize >= 0);
-
-					node->m_box[0] = box.m_min;
-					node->m_box[1] = box.m_max;
-					if (box.m_child)
-					{
-						*box.m_child = node;
-					}
-
-					if (!root)
-					{
-						root = node;
-					}
-
-					{
-						hullVector xc(0);
-						hullVector x2c(0);
-						hullVector p0(double(1.0e15f));
-						hullVector p1(-double(1.0e15f));
-						for (int i = i0; i < box.m_count; ++i)
-						{
-							const hullVector& p = points[start + i];
-							xc += p;
-							x2c += p * p;
-							p0 = p0.GetMin(p);
-							p1 = p1.GetMax(p);
-						}
-
-						dTreeBox cluster_i1(box);
-						cluster_i1.m_start = start + i0;
-						cluster_i1.m_count = box.m_count - i0;
-						cluster_i1.m_sum = xc;
-						cluster_i1.m_sum2 = x2c;
-						cluster_i1.m_min = p0;
-						cluster_i1.m_max = p1;
-						cluster_i1.m_parent = node;
-						cluster_i1.m_child = &node->m_right;
-						treeBoxStack[stack] = cluster_i1;
-						_ASSERT(cluster_i1.m_count > 0);
-						stack++;
-					}
-
-					{
-						hullVector xc(0);
-						hullVector x2c(0);
-						hullVector p0(double(1.0e15f));
-						hullVector p1(-double(1.0e15f));
-						for (int i = 0; i < i0; ++i)
-						{
-							const hullVector& p = points[start + i];
-							xc += p;
-							x2c += p * p;
-							p0 = p0.GetMin(p);
-							p1 = p1.GetMax(p);
-						}
-
-						dTreeBox cluster_i0(box);
-						cluster_i0.m_start = start;
-						cluster_i0.m_count = i0;
-						cluster_i0.m_min = p0;
-						cluster_i0.m_max = p1;
-						cluster_i0.m_sum = xc;
-						cluster_i0.m_sum2 = x2c;
-						cluster_i0.m_parent = node;
-						cluster_i0.m_child = &node->m_left;
-						_ASSERT(cluster_i0.m_count > 0);
-						treeBoxStack[stack] = cluster_i0;
-						stack++;
-					}
-				}
-			}
-	
-			return root;
 		}
 
 		int ConvexHull::SupportVertex(ConvexHullAABBTreeNode** const treePointer, const std::vector<ConvexHullVertex>& points, const hullVector& dirPlane, const bool removeEntry) const
 		{
-		#define DG_STACK_DEPTH_3D 64
 			double aabbProjection[DG_STACK_DEPTH_3D];
 			const ConvexHullAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
 
@@ -949,39 +546,37 @@ namespace nd_
 			return p3p0.DotProduct(p1p0.CrossProduct(p2p0));
 		}
 
-		int ConvexHull::InitVertexArray(std::vector<ConvexHullVertex>& points, void* const memoryPool, int maxMemSize)
+		int ConvexHull::InitVertexArray(ConvexHull3dSupportAccelerator& accelerator)
 		{
-		#if 1
-			ConvexHullAABBTreeNode* tree = BuildTreeOld(points, (char**)&memoryPool, maxMemSize);
-		#else
-			ConvexHullAABBTreeNode* tree = BuildTreeNew(points, (char**)&memoryPool, maxMemSize);
-		#endif
+			//ConvexHullAABBTreeNode* tree = BuildTree(points, (char**)&memoryPool, maxMemSize);
+			std::vector<ConvexHullVertex>& points = accelerator.m_points;
 			int count = int (points.size());
 			if (count < 4)
 			{
 				m_points.resize(0);
 				return 0;
 			}
-		
 			m_points.resize(count);
+
+			ConvexHullAABBTreeNode* tree = accelerator.m_tree;
 			m_aabbP0 = tree->m_box[0];
 			m_aabbP1 = tree->m_box[1];
-	
+			
 			hullVector boxSize(tree->m_box[1] - tree->m_box[0]);
 			m_diag = double(sqrt(boxSize.DotProduct(boxSize)));
 			const ndNormalMap& normalMap = ndNormalMap::GetNormaMap();
-	
+			
 			int index0 = SupportVertex(&tree, points, normalMap.m_normal[0]);
 			m_points[0] = points[index0];
 			points[index0].m_mark = 1;
-	
+			
 			bool validTetrahedrum = false;
 			hullVector e1(0.0);
 			for (int i = 1; i < normalMap.m_count; ++i)
 			{
 				int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
 				_ASSERT(index >= 0);
-	
+			
 				e1 = points[index] - m_points[0];
 				double error2 = e1.DotProduct(e1);
 				if (error2 > (double(1.0e-4f) * m_diag * m_diag))
@@ -998,7 +593,7 @@ namespace nd_
 				_ASSERT(0);
 				return count;
 			}
-	
+			
 			validTetrahedrum = false;
 			hullVector e2(0.0);
 			hullVector normal(0.0);
@@ -1017,18 +612,18 @@ namespace nd_
 					break;
 				}
 			}
-	
+			
 			if (!validTetrahedrum)
 			{
 				m_points.resize(0);
 				_ASSERT(0);
 				return count;
 			}
-	
+			
 			// find the largest possible tetrahedron
 			validTetrahedrum = false;
 			hullVector e3(0.0);
-	
+			
 			index0 = SupportVertex(&tree, points, normal);
 			e3 = points[index0] - m_points[0];
 			double err2 = normal.DotProduct(e3);
@@ -1059,7 +654,7 @@ namespace nd_
 				{
 					int index = SupportVertex(&tree, points, normalMap.m_normal[i]);
 					_ASSERT(index >= 0);
-	
+			
 					//make sure the volume of the fist tetrahedral is no negative
 					e3 = points[index] - m_points[0];
 					double error2 = normal.DotProduct(e3);
@@ -1079,7 +674,7 @@ namespace nd_
 				m_points.resize(0);
 				return count;
 			}
-	
+			
 			m_points.resize(4);
 			double volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
 			if (volume > double(0.0f))

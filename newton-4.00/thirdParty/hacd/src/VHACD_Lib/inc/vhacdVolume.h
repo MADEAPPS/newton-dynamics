@@ -17,7 +17,9 @@
 #define ND_VHACD_VOLUME_H
 #include "vhacdMesh.h"
 #include "vhacdVector.h"
+#include <vector>
 #include <assert.h>
+
 
 namespace nd_
 {
@@ -61,6 +63,7 @@ namespace nd_
 			virtual void AlignToPrincipalAxes() = 0;
 			virtual void RevertAlignToPrincipalAxes() = 0;
 			virtual void Convert(Mesh& mesh, const VOXEL_VALUE value) const = 0;
+			virtual void GetPointArray(std::vector<Vec3<double> >& points) const = 0;
 			const Mesh& GetConvexHull() const { return m_convexHull; };
 			Mesh& GetConvexHull() { return m_convexHull; };
 			private:
@@ -106,6 +109,9 @@ namespace nd_
 					voxel[1] * m_scale + m_minBB[1],
 					voxel[2] * m_scale + m_minBB[2]);
 			}
+
+			void GetPointArray(std::vector<Vec3<double>>& points) const ;
+
 			void GetPoints(const Voxel& voxel, Vec3<double>* const pts) const;
 			void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) const;
 			void Clip(const Plane& plane, PrimitiveSet* const positivePart, PrimitiveSet* const negativePart) const;
@@ -191,6 +197,7 @@ namespace nd_
 			static const double EPS;
 
 			private:
+			void GetPointArray(std::vector<Vec3<double> >& points) const;
 			void AddClippedTetrahedra(const Vec3<double>(&pts)[10], const int32_t nPts);
 
 			size_t m_numTetrahedraOnSurface;
