@@ -48,7 +48,8 @@ class dPlayerController: public dVehicle
 	void SetLateralSpeed(dFloat speed) { m_lateralSpeed = -speed; }
 
 	dFloat GetHeadingAngle() const { return m_headingAngle; }
-	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
+	//void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
+	void SetHeadingAngle(dFloat angle) { m_headingAngle = angle; }
 
 	DVEHICLE_API dVector GetVelocity() const;
 	DVEHICLE_API void SetVelocity(const dVector& veloc);
