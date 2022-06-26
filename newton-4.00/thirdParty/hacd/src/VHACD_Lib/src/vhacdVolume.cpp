@@ -501,6 +501,7 @@ namespace nd_
 			pts[6][2] = (k + 0.5) * m_scale + m_minBB[2];
 			pts[7][2] = (k + 0.5) * m_scale + m_minBB[2];
 		}
+
 		void VoxelSet::Intersect(const Plane& plane,
 			SArray<Vec3<double> >* const positivePts,
 			SArray<Vec3<double> >* const negativePts,
@@ -516,49 +517,88 @@ namespace nd_
 			Voxel voxel;
 			size_t sp = 0;
 			size_t sn = 0;
-			for (size_t v = 0; v < nVoxels; ++v) {
+			for (size_t v = 0; v < nVoxels; ++v) 
+			{
 				voxel = m_voxels[v];
 				pt = GetPoint(voxel);
 				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
-				//            if      (d >= 0.0 && d <= d0) positivePts->PushBack(pt);
-				//            else if (d < 0.0 && -d <= d0) negativePts->PushBack(pt);
-				if (d >= 0.0) {
-					if (d <= d0) {
+#if 1
+				if (d >= 0.0) 
+				{
+					if (d <= d0) 
+					{
 						GetPoints(voxel, pts);
-						for (int32_t k = 0; k < 8; ++k) {
+						for (int32_t k = 0; k < 8; ++k) 
+						{
 							positivePts->PushBack(pts[k]);
 						}
 					}
-					else {
-						if (++sp == sampling) {
-							//                        positivePts->PushBack(pt);
+					else 
+					{
+						if (++sp == sampling) 
+						{
 							GetPoints(voxel, pts);
-							for (int32_t k = 0; k < 8; ++k) {
+							for (int32_t k = 0; k < 8; ++k) 
+							{
 								positivePts->PushBack(pts[k]);
 							}
 							sp = 0;
 						}
 					}
 				}
-				else {
-					if (-d <= d0) {
+				else 
+				{
+					if (-d <= d0) 
+					{
 						GetPoints(voxel, pts);
-						for (int32_t k = 0; k < 8; ++k) {
+						for (int32_t k = 0; k < 8; ++k) 
+						{
 							negativePts->PushBack(pts[k]);
 						}
 					}
-					else {
-						if (++sn == sampling) {
-							//                        negativePts->PushBack(pt);
+					else 
+					{
+						if (++sn == sampling) 
+						{
 							GetPoints(voxel, pts);
-							for (int32_t k = 0; k < 8; ++k) {
+							for (int32_t k = 0; k < 8; ++k) 
+							{
 								negativePts->PushBack(pts[k]);
 							}
 							sn = 0;
 						}
 					}
 				}
+
+#else
+				GetPoints(voxel, pts);
+				if (d > d0)
+				{
+					for (int32_t k = 0; k < 8; ++k) 
+					{
+						positivePts->PushBack(pts[k]);
+					}
+				}
+				else if (d < -d0)
+				{
+					for (int32_t k = 0; k < 8; ++k) 
+					{
+						negativePts->PushBack(pts[k]);
+					}
+				}
+				else
+				{
+					for (int32_t k = 0; k < 8; ++k)
+					{
+						positivePts->PushBack(pts[k]);
+						negativePts->PushBack(pts[k]);
+					}
+				}
+#endif
 			}
+
+			_ASSERT(positivePts->Size() <= nVoxels * 8);
+			_ASSERT(negativePts->Size() <= nVoxels * 8);
 		}
 
 		void VoxelSet::GetPointArray(std::vector<Vec3<double>>& points) const

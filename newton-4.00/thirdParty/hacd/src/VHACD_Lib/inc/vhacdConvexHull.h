@@ -80,8 +80,13 @@ namespace nd_
 		class ConvexHull3dSupportAccelerator
 		{
 			public:
+			ConvexHull3dSupportAccelerator();
 			ConvexHull3dSupportAccelerator(const double* const vertexCloud, int strideInBytes, int count);
 			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryPool);
+
+			void Prune(VHACD::Vec3<double>& dir, double dist);
+			void Split(VHACD::Vec3<double>& dir, double dist, ConvexHull3dSupportAccelerator& back, ConvexHull3dSupportAccelerator& front) const;
+			
 
 			std::vector<ConvexHullVertex> m_points;
 			std::vector<ConvexHull3dPointCluster> m_treeBuffer;

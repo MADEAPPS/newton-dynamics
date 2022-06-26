@@ -383,12 +383,33 @@ namespace nd_
 		timerComputeCost.Tic();
 	#endif // DEBUG_TEMP
 
+	class HullPoints: public std::vector<Vec3<double>>
+	{
+		public: 
+		HullPoints(const PrimitiveSet* inputPSet, const PrimitiveSet* onSurfacePSet)
+		{
+			resize(0);
+			onSurfacePSet->GetPointArray(*this);
+			const size_t nV = inputPSet->GetConvexHull().GetNPoints();
+			for (int i = 0; i < nV; i++)
+			{
+				const Vec3<double>& pt = inputPSet->GetConvexHull().GetPoint(i);
+				push_back(pt);
+			}
+		}
+
+		~HullPoints()
+		{
+		}
+	};
+
 	class CommonData
 	{
 		public:
-		CommonData(VHACD* me, const Parameters& params)
+		CommonData(VHACD* me, const Parameters& params, HullPoints hullPoints)
 			:m_me(me)
 			,m_params(params)
+			//,m_accelerator(&hullPoints[0][0], int(sizeof(Vec3<double>)), int(hullPoints.size()))
 		{
 		}
 
@@ -405,6 +426,7 @@ namespace nd_
 
 		Vec3<double> m_preferredCuttingDirection;
 		PrimitiveSet** m_psets;
+		//ConvexHull3dSupportAccelerator m_accelerator;
 	};
 
 	class BestClippingPlaneJob : public Job
@@ -417,6 +439,11 @@ namespace nd_
 
 		void Execute(int threadId)
 		{
+			//ConvexHull3dSupportAccelerator leftAccelerator;
+			//ConvexHull3dSupportAccelerator rightAccelerator;
+			//Vec3<double> splitPlane(m_plane.m_a, m_plane.m_b, m_plane.m_c);
+			//m_commonData->m_accelerator.Split(splitPlane, m_plane.m_d, leftAccelerator, rightAccelerator);
+
 			Mesh& leftCH = m_commonData->chs[threadId][0];
 			Mesh& rightCH = m_commonData->chs[threadId][1];
 			rightCH.ResizePoints(0);
@@ -437,6 +464,7 @@ namespace nd_
 			}
 			else 
 			{
+				_ASSERT(0);
 				PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
 				PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
 				m_commonData->m_onSurfacePSet->Clip(m_plane, right, left);
@@ -474,32 +502,7 @@ namespace nd_
 	std::vector<BestClippingPlaneJob> jobs;
 	jobs.resize(nPlanes);
 
-
-//SArray<Vec3<double> > leftCHPts;
-//SArray<Vec3<double> > rightCHPts;
-//rightCHPts.Resize(0);
-//leftCHPts.Resize(0);
-//onSurfacePSet->Intersect(planes[2], &rightCHPts, &leftCHPts, convexhullDownsampling * 32);
-//inputPSet->GetConvexHull().Clip(planes[2], rightCHPts, leftCHPts);
-
-#if 0
-	std::vector<Vec3<double>> convexHullPoints;
-	convexHullPoints.resize(0);
-	onSurfacePSet->GetPointArray(convexHullPoints);
-	const size_t nV = inputPSet->GetConvexHull().GetNPoints();
-	for (int i = 0; i < nV; i++)
-	{
-		const Vec3<double>& pt = inputPSet->GetConvexHull().GetPoint(i);
-		convexHullPoints.push_back(pt);
-	}
-	ConvexHull3dSupportAccelerator accelerator(&convexHullPoints[0][0], int(sizeof(Vec3<double>)), int(convexHullPoints.size()));
-	nd_::VHACD::ConvexHull xxxxx(accelerator, 1.0e-5f);
-#endif
-	 
-//rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
-//leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
-
-	CommonData data(this, params);
+	CommonData data(this, params, HullPoints (inputPSet, onSurfacePSet));
 	data.m_w = w;
 	data.m_beta = beta;
 	data.m_alpha = alpha;
@@ -525,7 +528,7 @@ namespace nd_
 	for (int32_t i = 1; i < nPlanes; ++i)
 	{
 		double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
-		if (total < minTotal || (total < minTotal && i < iBest))
+		if ((total < minTotal && i < iBest) || total < minTotal)
 		{
 			minConcavity = jobs[i].m_concavity;
 			minBalance = jobs[i].m_balance;

@@ -92,38 +92,10 @@ namespace nd_
 			return Determinant3x3(exactMatrix);
 		}
 
-
-		//int ConvexHullAABBTreeNode::CalcucatePointsCount() const
-		//{
-		//	const ConvexHullAABBTreeNode* stackPool[DG_STACK_DEPTH_3D];
-		//
-		//	int stack = 1;
-		//	stackPool[0] = this;
-		//
-		//	int count = 0;
-		//	while (stack)
-		//	{
-		//		stack--;
-		//		const ConvexHullAABBTreeNode* const me = stackPool[stack];
-		//		if (!me->m_left && !me->m_right)
-		//		{
-		//			ConvexHull3dPointCluster* const cluster = (ConvexHull3dPointCluster*)me;
-		//			count += cluster->m_count;
-		//		}
-		//		else
-		//		{
-		//			stackPool[stack] = me->m_left;
-		//			stack++;
-		//			_ASSERT(stack < DG_STACK_DEPTH_3D);
-		//
-		//			stackPool[stack] = me->m_right;
-		//			stack++;
-		//			_ASSERT(stack < DG_STACK_DEPTH_3D);
-		//		}
-		//	}
-		//
-		//	return count;
-		//}
+		ConvexHull3dSupportAccelerator::ConvexHull3dSupportAccelerator()
+			:m_tree(nullptr)
+		{
+		}
 
 		ConvexHull3dSupportAccelerator::ConvexHull3dSupportAccelerator(const double* const vertexCloud, int strideInBytes, int count)
 			:m_tree(nullptr)
@@ -304,6 +276,78 @@ namespace nd_
 			tree->m_box[0] = minP - hullVector(double(1.0e-3f));
 			tree->m_box[1] = maxP + hullVector(double(1.0e-3f));
 			return tree;
+		}
+
+		void ConvexHull3dSupportAccelerator::Prune(VHACD::Vec3<double>& dir, double dist)
+		{
+			int stack = 1;
+			const ConvexHullAABBTreeNode* stackPool[DG_STACK_DEPTH_3D];
+			stackPool[0] = m_tree;
+
+			//int count = 0;
+			while (stack)
+			{
+				stack--;
+				const ConvexHullAABBTreeNode* const me = stackPool[stack];
+				if (!me->m_left && !me->m_right)
+				{
+					//ConvexHull3dPointCluster* const cluster = (ConvexHull3dPointCluster*)me;
+					//count += cluster->m_count;
+				}
+				else
+				{
+					//stackPool[stack] = me->m_left;
+					//stack++;
+					//_ASSERT(stack < DG_STACK_DEPTH_3D);
+					//
+					//stackPool[stack] = me->m_right;
+					//stack++;
+					//_ASSERT(stack < DG_STACK_DEPTH_3D);
+				}
+			}
+		}
+
+		void ConvexHull3dSupportAccelerator::Split(VHACD::Vec3<double>& dir, double dist, ConvexHull3dSupportAccelerator& back, ConvexHull3dSupportAccelerator& front) const
+		{
+			back.m_points = m_points;
+			front.m_points = m_points;
+			back.m_treeBuffer = m_treeBuffer;
+			front.m_treeBuffer = m_treeBuffer;
+
+			_ASSERT(m_tree == &m_treeBuffer[0]);
+			back.m_tree = &back.m_treeBuffer[0];
+			front.m_tree = &front.m_treeBuffer[0];
+
+			for (int i = 0; i < m_treeBuffer.size(); ++i)
+			{
+				const ConvexHullAABBTreeNode* const node = &m_treeBuffer[i];
+				ConvexHullAABBTreeNode* const backNode = &back.m_treeBuffer[i];
+				ConvexHullAABBTreeNode* const frontNode = &front.m_treeBuffer[i];
+				if (node->m_parent)
+				{
+					int index = node->m_parent - m_tree;
+					backNode->m_parent = &back.m_treeBuffer[index];
+					frontNode->m_parent = &front.m_treeBuffer[index];
+				}
+
+				if (node->m_left)
+				{
+					int index = node->m_left - m_tree;
+					backNode->m_left = &back.m_treeBuffer[index];
+					frontNode->m_right = &front.m_treeBuffer[index];
+				}
+
+				if (node->m_right)
+				{
+					int index = node->m_right - m_tree;
+					backNode->m_right = &back.m_treeBuffer[index];
+					frontNode->m_right = &front.m_treeBuffer[index];
+				}
+			}
+			
+			VHACD::Vec3<double> backDir(dir.X() * -1.0, dir.Y() * -1.0, dir.Z() * -1.0);
+			front.Prune(dir, dist);
+			back.Prune(backDir, dist * -1.0);
 		}
 
 		class ConvexHull::ndNormalMap
