@@ -383,33 +383,13 @@ namespace nd_
 		timerComputeCost.Tic();
 	#endif // DEBUG_TEMP
 
-	class HullPoints: public std::vector<Vec3<double>>
-	{
-		public: 
-		HullPoints(const PrimitiveSet* inputPSet, const PrimitiveSet* onSurfacePSet)
-		{
-			resize(0);
-			onSurfacePSet->GetPointArray(*this);
-			const size_t nV = inputPSet->GetConvexHull().GetNPoints();
-			for (int i = 0; i < nV; i++)
-			{
-				const Vec3<double>& pt = inputPSet->GetConvexHull().GetPoint(i);
-				push_back(pt);
-			}
-		}
-
-		~HullPoints()
-		{
-		}
-	};
 
 	class CommonData
 	{
 		public:
-		CommonData(VHACD* me, const Parameters& params, HullPoints hullPoints)
+		CommonData(VHACD* me, const Parameters& params)
 			:m_me(me)
 			,m_params(params)
-			//,m_accelerator(&hullPoints[0][0], int(sizeof(Vec3<double>)), int(hullPoints.size()))
 		{
 		}
 
@@ -426,7 +406,6 @@ namespace nd_
 
 		Vec3<double> m_preferredCuttingDirection;
 		PrimitiveSet** m_psets;
-		//ConvexHull3dSupportAccelerator m_accelerator;
 	};
 
 	class BestClippingPlaneJob : public Job
@@ -439,11 +418,6 @@ namespace nd_
 
 		void Execute(int threadId)
 		{
-			//ConvexHull3dSupportAccelerator leftAccelerator;
-			//ConvexHull3dSupportAccelerator rightAccelerator;
-			//Vec3<double> splitPlane(m_plane.m_a, m_plane.m_b, m_plane.m_c);
-			//m_commonData->m_accelerator.Split(splitPlane, m_plane.m_d, leftAccelerator, rightAccelerator);
-
 			Mesh& leftCH = m_commonData->chs[threadId][0];
 			Mesh& rightCH = m_commonData->chs[threadId][1];
 			rightCH.ResizePoints(0);
@@ -502,7 +476,7 @@ namespace nd_
 	std::vector<BestClippingPlaneJob> jobs;
 	jobs.resize(nPlanes);
 
-	CommonData data(this, params, HullPoints (inputPSet, onSurfacePSet));
+	CommonData data(this, params);
 	data.m_w = w;
 	data.m_beta = beta;
 	data.m_alpha = alpha;
