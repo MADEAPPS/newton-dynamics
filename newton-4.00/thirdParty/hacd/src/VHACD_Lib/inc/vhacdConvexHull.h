@@ -29,7 +29,7 @@ namespace nd_
 {
 	namespace VHACD
 	{
-		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 8
+		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 16
 
 		class ConvexHullVertex : public hullVector
 		{
@@ -77,20 +77,22 @@ namespace nd_
 			int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 		};
 
-		class ConvexHull3dSupportAccelerator
+		class ConvexHull3dPointSet: public std::vector<ConvexHullVertex>
 		{
 			public:
-			ConvexHull3dSupportAccelerator();
-			ConvexHull3dSupportAccelerator(const double* const vertexCloud, int strideInBytes, int count);
+			ConvexHull3dPointSet();
+			ConvexHull3dPointSet(const double* const vertexCloud, int strideInBytes, int count);
+
+			//ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryPool);
+			//void Prune(VHACD::Vec3<double>& dir, double dist);
+			//void Split(VHACD::Vec3<double>& dir, double dist, ConvexHull3dSupportAccelerator& back, ConvexHull3dSupportAccelerator& front) const;
+			ConvexHullAABBTreeNode* BuildAccelerator();
+
+			//std::vector<ConvexHullVertex> m_points;
+			private:
 			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryPool);
-
-			void Prune(VHACD::Vec3<double>& dir, double dist);
-			void Split(VHACD::Vec3<double>& dir, double dist, ConvexHull3dSupportAccelerator& back, ConvexHull3dSupportAccelerator& front) const;
-			
-
-			std::vector<ConvexHullVertex> m_points;
 			std::vector<ConvexHull3dPointCluster> m_treeBuffer;
-			ConvexHullAABBTreeNode* m_tree;
+			//ConvexHullAABBTreeNode* m_tree;
 		};
 
 		class ConvexHullFace
@@ -115,17 +117,15 @@ namespace nd_
 			class ndNormalMap;
 
 			public:
-			//ConvexHull();
-			ConvexHull(ConvexHull3dSupportAccelerator& accelerator, double distTol, int maxVertexCount = 0x7fffffff);
+			ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount = 0x7fffffff);
 			ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
 			~ConvexHull();
 
 			const std::vector<hullVector>& GetVertexPool() const;
 
 			private:
-			int InitVertexArray(ConvexHull3dSupportAccelerator& accelerator);
-			void BuildHull(ConvexHull3dSupportAccelerator& accelerator, double distTol, int maxVertexCount);
-			//void BuildHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount);
+			ConvexHullAABBTreeNode* InitVertexArray(ConvexHull3dPointSet& accelerator);
+			void BuildHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount);
 
 			ndNode* AddFace(int i0, int i1, int i2);
 
