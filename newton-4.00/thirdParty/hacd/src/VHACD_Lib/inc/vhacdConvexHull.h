@@ -82,13 +82,8 @@ namespace nd_
 			public:
 			ConvexHull3dPointSet();
 			ConvexHull3dPointSet(const double* const vertexCloud, int strideInBytes, int count);
-
-			//ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryPool);
-			//void Prune(VHACD::Vec3<double>& dir, double dist);
-			//void Split(VHACD::Vec3<double>& dir, double dist, ConvexHull3dSupportAccelerator& back, ConvexHull3dSupportAccelerator& front) const;
 			ConvexHullAABBTreeNode* BuildAccelerator();
 
-			//std::vector<ConvexHullVertex> m_points;
 			private:
 			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryPool);
 			std::vector<ConvexHull3dPointCluster> m_treeBuffer;

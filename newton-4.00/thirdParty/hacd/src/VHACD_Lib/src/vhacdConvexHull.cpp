@@ -416,12 +416,13 @@ namespace nd_
 			,m_diag()
 			,m_points()
 		{
-			_ASSERT(0);
 			m_points.resize(0);
+			#ifdef _DEBUG
 			for (int i = 0; i < accelerator.size(); i++)
 			{
-				accelerator[i].m_mark = 0;
+				_ASSERT(accelerator[i].m_mark == 0);
 			}
+			#endif
 			BuildHull(accelerator, distTol, maxVertexCount);
 		}
 
