@@ -1877,6 +1877,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			subRoot->m_maxBox = order[0].m_p1;
 			subRoot->m_left->m_parent = subRoot;
 			subRoot->m_right->m_parent = subRoot;
+			subRoot->m_depthLevel = depthLevel - 1;
 
 			root->m_parent = nullptr;
 			root->m_right = subRoot;
@@ -2064,9 +2065,10 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						rootNodeIndex++;
 
 						dAssert(root);
-						MakeThreeNodesTree(grandParent, parent, node0, node1, node2, depthLevel);
+						MakeThreeNodesTree(grandParent, parent, node0, node1, node2, block.m_depthLevel - 1);
 						grandParent->m_parent = root;
 						root->m_left = grandParent;
+						root->m_depthLevel = block.m_depthLevel;
 					}
 					else
 					{
@@ -2122,10 +2124,10 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						rootNodeIndex++;
 
 						dAssert(root);
-						//dAssert(0);
-						MakeThreeNodesTree(grandParent, parent, node0, node1, node2, depthLevel);
+						MakeThreeNodesTree(grandParent, parent, node0, node1, node2, block.m_depthLevel - 1);
 						grandParent->m_parent = root;
 						root->m_right = grandParent;
+						root->m_depthLevel = block.m_depthLevel;
 					}
 					else
 					{
@@ -2537,6 +2539,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 		}
 	}
 
-	dAssert(srcArray[0]->SanityCheck(0));
+	//dAssert(srcArray[0]->SanityCheck(0));
 	return srcArray[0];
 }
