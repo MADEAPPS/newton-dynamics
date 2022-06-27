@@ -29,7 +29,6 @@ class ndSceneBodyNode;
 class ndSceneTreeNode;
 
 D_MSV_NEWTON_ALIGN_32
-//class ndSceneNode: public ndClassAlloc
 class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 {
 	public:
@@ -53,6 +52,7 @@ class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 	ndVector m_maxBox;
 	ndSceneNode* m_parent;
 	ndSpinLock m_lock;
+	ndInt32 m_depthLevel;
 	ndUnsigned8 m_bhvLinked;
 #ifdef _DEBUG
 	ndInt32 m_nodeId;
@@ -105,12 +105,12 @@ class ndSceneTreeNode: public ndSceneNode
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
-	//:ndClassAlloc()
 	:ndContainersFreeListAlloc<ndSceneNode>()
 	,m_minBox(ndFloat32(-1.0e15f))
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
 	,m_lock()
+	,m_depthLevel(0x7fffffff)
 	,m_bhvLinked(0)
 {
 #ifdef _DEBUG
@@ -184,13 +184,16 @@ inline bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
 		margin[i * 2 + 1] = ' ';
 	}
 	margin[level * 2] = 0;
-	dTrace(("%s %d\n", margin, m_nodeId));
-#else
-inline bool ndSceneNode::SanityCheck(ndUnsigned32) const
-{
-#endif
+	dTrace(("%s nodeId:%d  dethth:%d\n", margin, m_nodeId, m_depthLevel));
 	dAssert(!m_parent || dBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
 	return true;
 }
+
+#else
+inline bool ndSceneNode::SanityCheck(ndUnsigned32) const
+{
+	return true;
+}
+#endif
 
 #endif

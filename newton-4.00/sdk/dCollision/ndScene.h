@@ -161,7 +161,7 @@ class ndScene : public ndThreadPool
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
 	ndSceneNode* BuildBottomUp(ndFitnessList& fitness);
-	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
+	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount, ndInt32 depthLevel);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
