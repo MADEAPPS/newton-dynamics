@@ -110,7 +110,7 @@ inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
 	,m_lock()
-	,m_depthLevel(0x7fffffff)
+	,m_depthLevel(0)
 	,m_bhvLinked(0)
 {
 #ifdef _DEBUG
