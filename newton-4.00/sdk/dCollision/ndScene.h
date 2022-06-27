@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-#define D_NEW_SCENE
+//#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 
@@ -79,13 +79,8 @@ class ndScene : public ndThreadPool
 		ndFitnessList();
 		ndFitnessList(const ndFitnessList& src);
 
-		ndFloat64 TotalCost() const;
-
 		void AddNode(ndSceneTreeNode* const node);
 		void RemoveNode(ndSceneTreeNode* const node);
-		
-		ndFloat64 m_currentCost;
-		ndNode* m_currentNode;
 	};
 
 	public:
@@ -135,7 +130,6 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene();
 	D_COLLISION_API ndScene(const ndScene& src);
 
-#ifdef D_NEW_SCENE
 	class ndBottomUpCell
 	{
 		public:
@@ -151,13 +145,10 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_location : 30;
 		ndUnsigned32 m_cellTest : 1;
 	};
-#endif
-
-	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
-	ndFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
 
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
+	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 
 	const ndContactArray& GetContactArray() const;
 	void FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId);
@@ -169,19 +160,10 @@ class ndScene : public ndThreadPool
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-	void RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root);
-	void RotateRight(ndSceneTreeNode* const node, ndSceneNode** const root);
-	ndFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
-	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
-
 	ndSceneNode* BuildBottomUp(ndFitnessList& fitness);
 	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
-	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
-
-	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
-	void UpdateFitness();
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
@@ -212,19 +194,15 @@ class ndScene : public ndThreadPool
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
-
-#ifdef	D_NEW_SCENE
 	ndArray<ndBottomUpCell> m_cellBuffer0;
 	ndArray<ndBottomUpCell> m_cellBuffer1;
 	ndArray<ndCellScanPrefix> m_cellCounts0;
 	ndArray<ndCellScanPrefix> m_cellCounts1;
-#endif
 
 	ndSpinLock m_lock;
 	ndSceneNode* m_rootNode;
 	ndBodyKinematic* m_sentinelBody;
 	ndContactNotify* m_contactNotifyCallback;
-	ndFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;
@@ -310,14 +288,6 @@ inline ndFloat32 ndScene::GetTimestep() const
 inline void ndScene::SetTimestep(ndFloat32 timestep)
 {
 	m_timestep = timestep;
-}
-
-inline ndFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const
-{
-	minBox = node0->m_minBox.GetMin(node1->m_minBox);
-	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
-	ndVector side0(maxBox - minBox);
-	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
 
 inline ndBodyKinematic* ndScene::GetSentinelBody() const

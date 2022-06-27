@@ -29,7 +29,8 @@ class ndSceneBodyNode;
 class ndSceneTreeNode;
 
 D_MSV_NEWTON_ALIGN_32
-class ndSceneNode: public ndClassAlloc
+//class ndSceneNode: public ndClassAlloc
+class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 {
 	public:
 	ndSceneNode(ndSceneNode* const parent);
@@ -51,7 +52,6 @@ class ndSceneNode: public ndClassAlloc
 	ndVector m_minBox;
 	ndVector m_maxBox;
 	ndSceneNode* m_parent;
-	ndFloat32 m_surfaceArea;
 	ndSpinLock m_lock;
 	ndUnsigned8 m_bhvLinked;
 #ifdef _DEBUG
@@ -105,11 +105,11 @@ class ndSceneTreeNode: public ndSceneNode
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
-	:ndClassAlloc()
+	//:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndSceneNode>()
 	,m_minBox(ndFloat32(-1.0e15f))
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
-	,m_surfaceArea(ndFloat32(1.0e20f))
 	,m_lock()
 	,m_bhvLinked(0)
 {
@@ -172,9 +172,6 @@ inline void ndSceneNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 
 	dAssert(m_minBox.m_w == ndFloat32(0.0f));
 	dAssert(m_maxBox.m_w == ndFloat32(0.0f));
-
-	const ndVector size(m_maxBox - m_minBox);
-	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
 
 #ifdef _DEBUG

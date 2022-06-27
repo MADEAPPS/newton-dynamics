@@ -83,8 +83,6 @@ ndSceneTreeNode::ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const 
 
 	m_minBox = left->m_minBox.GetMin(right->m_minBox);
 	m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
-	ndVector side0(m_maxBox - m_minBox);
-	m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
 }
 
 ndSceneTreeNode::~ndSceneTreeNode()
