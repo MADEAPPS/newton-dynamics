@@ -334,48 +334,6 @@ void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const 
 	}
 }
 
-void ndScene::UpdateAabb(ndBodyKinematic* const body)
-{
-	ndUnsigned8 sceneEquilibrium = 1;
-	ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
-	if (!body->m_equilibrium | sceneForceUpdate)
-	{
-		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
-		dAssert(!bodyNode->GetLeft());
-		dAssert(!bodyNode->GetRight());
-		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-
-		body->UpdateCollisionMatrix();
-		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
-		if (!test)
-		{
-			bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
-			if (!m_rootNode->GetAsSceneBodyNode())
-			{
-				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-				dAssert(root == nullptr);
-				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
-				{
-					ndScopeSpinLock lock(parent->m_lock);
-					const ndVector minBox (parent->GetLeft()->m_minBox.GetMin(parent->GetRight()->m_minBox));
-					const ndVector maxBox (parent->GetLeft()->m_maxBox.GetMax(parent->GetRight()->m_maxBox));
-					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
-					{
-						break;
-					}
-					
-					parent->m_minBox = minBox;
-					parent->m_maxBox = maxBox;
-				}
-			}
-		}
-		sceneEquilibrium = !sceneForceUpdate & (test != 0);
-	}
-
-	body->m_sceneForceUpdate = 0;
-	body->m_sceneEquilibrium = sceneEquilibrium;
-}
-
 bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& timestep) const
 {
 	dAssert(contact && (contact->GetAsContact()));
@@ -1744,9 +1702,6 @@ void ndScene::InitBodyArray()
 		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 		ndInt32* const scan = &scans[threadIndex][0];
 
-		//const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
-		//const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-		//const ndArray<ndBodyKinematic*>& view = m_bodyList.m_view;
 		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -1792,6 +1747,48 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_isConstrained = 0;
 	sentinelBody->m_sceneEquilibrium = 1;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
+}
+
+void ndScene::UpdateAabb(ndBodyKinematic* const body)
+{
+	ndUnsigned8 sceneEquilibrium = 1;
+	ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
+	if (ndUnsigned8(!body->m_equilibrium) | sceneForceUpdate)
+	{
+		ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+		dAssert(!bodyNode->GetLeft());
+		dAssert(!bodyNode->GetRight());
+		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+		body->UpdateCollisionMatrix();
+		const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+		if (!test)
+		{
+			bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
+			if (!m_rootNode->GetAsSceneBodyNode())
+			{
+				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				dAssert(root == nullptr);
+				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
+				{
+					ndScopeSpinLock lock(parent->m_lock);
+					const ndVector minBox(parent->GetLeft()->m_minBox.GetMin(parent->GetRight()->m_minBox));
+					const ndVector maxBox(parent->GetLeft()->m_maxBox.GetMax(parent->GetRight()->m_maxBox));
+					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					{
+						break;
+					}
+
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
+				}
+			}
+		}
+		sceneEquilibrium = !sceneForceUpdate & (test != 0);
+	}
+
+	body->m_sceneForceUpdate = 0;
+	body->m_sceneEquilibrium = sceneEquilibrium;
 }
 
 void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount, ndInt32 depthLevel)
