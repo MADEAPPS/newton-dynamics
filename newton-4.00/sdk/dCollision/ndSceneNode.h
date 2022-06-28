@@ -174,26 +174,4 @@ inline void ndSceneNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 	dAssert(m_maxBox.m_w == ndFloat32(0.0f));
 }
 
-#ifdef _DEBUG
-inline bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
-{
-	char margin[256];
-	for (ndUnsigned32 i = 0; i < level; ++i)
-	{
-		margin[i * 2] = ' ';
-		margin[i * 2 + 1] = ' ';
-	}
-	margin[level * 2] = 0;
-	dTrace(("%s nodeId:%d  dethth:%d\n", margin, m_nodeId, m_depthLevel));
-	dAssert(!m_parent || dBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
-	return true;
-}
-
-#else
-inline bool ndSceneNode::SanityCheck(ndUnsigned32) const
-{
-	return true;
-}
-#endif
-
 #endif

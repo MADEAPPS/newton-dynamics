@@ -180,7 +180,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void ThreadFunction();
 
 	D_COLLISION_API virtual void CollisionOnlyUpdate();
-	D_COLLISION_API virtual void UpdateAabb(ndBodyKinematic* const body);
+	//D_COLLISION_API virtual void UpdateAabb(ndBodyKinematic* const body);
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 

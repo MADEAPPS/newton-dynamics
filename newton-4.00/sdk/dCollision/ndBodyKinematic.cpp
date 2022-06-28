@@ -371,7 +371,26 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 	ndScene* const scene = GetScene();
 	if (scene)
 	{
-		scene->UpdateAabb(this);
+		//scene->UpdateAabb(this);
+		ndUnsigned8 sceneEquilibrium = 1;
+		ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
+		if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
+		{
+			ndSceneBodyNode* const bodyNode = GetSceneBodyNode();
+			dAssert(!bodyNode->GetLeft());
+			dAssert(!bodyNode->GetRight());
+			dAssert(!GetCollisionShape().GetShape()->GetAsShapeNull());
+
+			UpdateCollisionMatrix();
+			const ndInt32 test = dBoxInclusionTest(m_minAabb, m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+			if (!test)
+			{
+				bodyNode->SetAabb(m_minAabb, m_maxAabb);
+			}
+			sceneEquilibrium = !sceneForceUpdate & (test != 0);
+		}
+		m_sceneForceUpdate = 0;
+		m_sceneEquilibrium = sceneEquilibrium;
 	}
 }
 

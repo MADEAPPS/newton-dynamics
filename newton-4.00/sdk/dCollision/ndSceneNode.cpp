@@ -107,3 +107,26 @@ bool ndSceneTreeNode::SanityCheck(ndUnsigned32 level) const
 	m_right->SanityCheck(level + 1);
 	return true;
 }
+
+#ifdef _DEBUG
+bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
+{
+	char margin[256];
+	for (ndUnsigned32 i = 0; i < level; ++i)
+	{
+		margin[i * 2] = ' ';
+		margin[i * 2 + 1] = ' ';
+	}
+	margin[level * 2] = 0;
+	dTrace(("%s nodeId:%d  dethth:%d\n", margin, m_nodeId, m_depthLevel));
+	//dAssert(!m_parent || (m_depthLevel < m_parent->m_depthLevel));
+	dAssert(!m_parent || dBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
+	return true;
+}
+
+#else
+bool ndSceneNode::SanityCheck(ndUnsigned32) const
+{
+	return true;
+}
+#endif
