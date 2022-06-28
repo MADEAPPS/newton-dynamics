@@ -162,7 +162,7 @@ class ndScene : public ndThreadPool
 
 	ndSceneNode* BuildBottomUpBvh(ndFitnessList& fitness);
 	void EnumerateBvhDepthLevels(ndSceneTreeNode* const root);
-	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount, ndInt32 depthLevel);
+	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;

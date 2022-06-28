@@ -1803,9 +1803,9 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_weigh = ndFloat32(0.0f);
 }
 
-void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount, ndInt32 depthLevel)
+void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount)
 {
-	auto SmallBhvNodes = ndMakeObject::ndFunction([this, parentsArray, bashCount, depthLevel](ndInt32 threadIndex, ndInt32 threadCount)
+	auto SmallBhvNodes = ndMakeObject::ndFunction([this, parentsArray, bashCount](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		const ndCellScanPrefix* const srcCellNodes = &m_cellCounts0[0];
@@ -2457,7 +2457,6 @@ ndSceneNode* ndScene::BuildBottomUpBvh(ndFitnessList& fitness)
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
-	ndInt32 depthLevel = 100;
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size * ndVector::m_two;
@@ -2571,8 +2570,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh(ndFitnessList& fitness)
 			if (sum)
 			{
 				m_cellCounts1[bashCount].m_location = sum;
-				BuildSmallBvh(parentsArray, bashCount, depthLevel);
-				depthLevel++;
+				BuildSmallBvh(parentsArray, bashCount);
 				parentsArray += sum;
 				leafNodesCount += sum;
 			}
