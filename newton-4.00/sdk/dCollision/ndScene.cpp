@@ -2177,8 +2177,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const ndUnsigned32 parentIndex = newParentsDest[i].m_location;
+			const ndUnsigned32 nodesCount = newParentsDest[i + 1].m_location - newParentsDest[i].m_location;
 			ndSceneTreeNode* const root = parentsArray[parentIndex]->GetAsSceneTreeNode();
-			if (root && !root->m_parent)
+			if (nodesCount && root && !root->m_parent)
 			{
 				root->SanityCheck(0);
 			}
@@ -2553,6 +2554,8 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			}
 			if (sum)
 			{
+if (depthLevel == 102)
+depthLevel *= 1;
 				m_cellCounts1[bashCount].m_location = sum;
 				BuildSmallBvh(parentsArray, bashCount, depthLevel);
 				depthLevel++;
