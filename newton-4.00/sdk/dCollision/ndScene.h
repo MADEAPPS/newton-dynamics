@@ -81,6 +81,9 @@ class ndScene : public ndThreadPool
 
 		void AddNode(ndSceneTreeNode* const node);
 		void RemoveNode(ndSceneTreeNode* const node);
+
+		ndUnsigned32 m_scansCount;
+		ndUnsigned32 m_scans[256];
 	};
 
 	public:
@@ -160,7 +163,7 @@ class ndScene : public ndThreadPool
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-	ndSceneNode* BuildBottomUpBvh(ndFitnessList& fitness);
+	ndSceneNode* BuildBottomUpBvh();
 	void EnumerateBvhDepthLevels(ndSceneTreeNode* const root);
 	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;

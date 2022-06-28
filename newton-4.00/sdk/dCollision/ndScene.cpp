@@ -46,11 +46,13 @@ ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_
 
 ndScene::ndFitnessList::ndFitnessList()
 	:ndListView<ndSceneTreeNode>()
+	,m_scansCount(0)
 {
 }
 
 ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
 	:ndListView<ndSceneTreeNode>(src)
+	,m_scansCount(0)
 {
 }
 
@@ -314,7 +316,7 @@ void ndScene::BalanceScene()
 	{
 		if (!m_forceBalanceSceneCounter)
 		{
-			m_rootNode = BuildBottomUpBvh(m_fitness);
+			m_rootNode = BuildBottomUpBvh();
 		}
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode->m_parent);
@@ -2204,9 +2206,43 @@ void ndScene::EnumerateBvhDepthLevels(ndSceneTreeNode* const root)
 			dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
 		}
 	}
+
+
+	class ndSortGetDethpKey
+	{
+		public:
+		ndSortGetDethpKey(const void* const)
+		{
+		}
+
+		ndUnsigned32 GetKey(const ndSceneTreeNode* const node) const
+		{
+			return node->m_depthLevel;
+		}
+	};
+
+	ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
+	ndSceneTreeNode** tmpBuffer = (ndSceneTreeNode**)&m_scratchBuffer[0];
+
+	ndUnsigned32 scans[257];
+	ndCountingSortInPlace<ndSceneTreeNode*, ndSortGetDethpKey, 8>(*this, &view[0], tmpBuffer, view.GetCount(), scans, nullptr);
+	for (ndInt32 i = 256; i >= 0; --i)
+	{
+		if (!scans[i])
+		{
+			m_fitness.m_scansCount = 0;
+			for (ndInt32 j = i; j < 257; ++j)
+			{
+				m_fitness.m_scans[m_fitness.m_scansCount] = scans[j];
+				m_fitness.m_scansCount++;
+			}
+			m_fitness.m_scansCount--;
+			break;
+		}
+	}
 }
 
-ndSceneNode* ndScene::BuildBottomUpBvh(ndFitnessList& fitness)
+ndSceneNode* ndScene::BuildBottomUpBvh()
 {
 	D_TRACKTIME();
 	const ndUnsigned32 baseCount = m_bodyList.GetCount();
@@ -2236,11 +2272,10 @@ ndSceneNode* ndScene::BuildBottomUpBvh(ndFitnessList& fitness)
 		}
 	});
 
-	auto CopySceneNode = ndMakeObject::ndFunction([this, &fitness, parentsArray](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CopySceneNode = ndMakeObject::ndFunction([this, parentsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
-		const ndArray<ndSceneTreeNode*>& view = fitness.GetView();
-		dAssert(view.GetCount() == fitness.GetCount());
+		const ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
 
 		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -2253,12 +2288,12 @@ ndSceneNode* ndScene::BuildBottomUpBvh(ndFitnessList& fitness)
 	});
 
 	UpdateBodyList();
-	fitness.UpdateView();
+	m_fitness.UpdateView();
 	ParallelExecute(CopyBodyNodes);
 	ParallelExecute(CopySceneNode);
 
 	ndUnsigned32 leafNodesCount = baseCount;
-	dAssert(ndUnsigned32(fitness.GetView().GetCount()) < baseCount);
+	dAssert(ndUnsigned32(m_fitness.GetView().GetCount()) < baseCount);
 
 	ndVector boxes[D_MAX_THREADS_COUNT][2];
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
