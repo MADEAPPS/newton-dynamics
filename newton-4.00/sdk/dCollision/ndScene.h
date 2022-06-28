@@ -160,7 +160,8 @@ class ndScene : public ndThreadPool
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-	ndSceneNode* BuildBottomUp(ndFitnessList& fitness);
+	ndSceneNode* BuildBottomUpBvh(ndFitnessList& fitness);
+	void EnumerateBvhDepthLevels(ndSceneTreeNode* const root);
 	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount, ndInt32 depthLevel);
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
@@ -180,7 +181,6 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void ThreadFunction();
 
 	D_COLLISION_API virtual void CollisionOnlyUpdate();
-	//D_COLLISION_API virtual void UpdateAabb(ndBodyKinematic* const body);
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 

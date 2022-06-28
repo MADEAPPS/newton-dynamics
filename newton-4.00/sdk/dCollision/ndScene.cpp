@@ -314,7 +314,7 @@ void ndScene::BalanceScene()
 	{
 		if (!m_forceBalanceSceneCounter)
 		{
-			m_rootNode = BuildBottomUp(m_fitness);
+			m_rootNode = BuildBottomUpBvh(m_fitness);
 		}
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode->m_parent);
@@ -1813,13 +1813,11 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 		const ndBottomUpCell* const nodesCells = &m_cellBuffer0[0];
 		dAssert(m_cellCounts0.GetCount() == m_cellCounts1.GetCount());
 
-		auto MakeTwoNodesTree = [](ndSceneTreeNode* const root, ndSceneNode* const left, ndSceneNode* const right, ndInt32 depthLevel)
+		auto MakeTwoNodesTree = [](ndSceneTreeNode* const root, ndSceneNode* const left, ndSceneNode* const right)
 		{
 			left->m_bhvLinked = 1;
 			right->m_bhvLinked = 1;
 			root->m_bhvLinked = 1;
-			root->m_depthLevel = depthLevel;
-
 			root->m_left = left;
 			root->m_right = right;
 
@@ -1831,7 +1829,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			root->m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
 		};
 
-		auto MakeThreeNodesTree = [](ndSceneTreeNode* const root, ndSceneTreeNode* const subRoot, ndSceneNode* const node0, ndSceneNode* const node1, ndSceneNode* const node2, ndInt32 depthLevel)
+		auto MakeThreeNodesTree = [](ndSceneTreeNode* const root, ndSceneTreeNode* const subRoot, ndSceneNode* const node0, ndSceneNode* const node1, ndSceneNode* const node2)
 		{
 			class ndNodeOrder
 			{
@@ -1880,7 +1878,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			node1->m_bhvLinked = 1;
 			node2->m_bhvLinked = 1;
 			subRoot->m_bhvLinked = 1;
-			root->m_depthLevel = depthLevel;
 
 			subRoot->m_parent = root;
 			subRoot->m_left = order[0].m_node0;
@@ -1889,7 +1886,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			subRoot->m_maxBox = order[0].m_p1;
 			subRoot->m_left->m_parent = subRoot;
 			subRoot->m_right->m_parent = subRoot;
-			subRoot->m_depthLevel = depthLevel - 1;
 
 			root->m_parent = nullptr;
 			root->m_right = subRoot;
@@ -1914,9 +1910,8 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 				ndSceneTreeNode* const root = parentsArray[parentIndex]->GetAsSceneTreeNode();
 				dAssert(root);
 				dAssert(!root->m_bhvLinked);
-				MakeTwoNodesTree(root, node0, node1, depthLevel);
+				MakeTwoNodesTree(root, node0, node1);
 				root->m_bhvLinked = 0;
-				root->m_depthLevel = depthLevel;
 			}
 			else if (nodesCount == 2)
 			{
@@ -1932,7 +1927,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 				dAssert(root);
 				dAssert(!root->m_bhvLinked);
-				MakeThreeNodesTree(root, subParent, node0, node1, node2, depthLevel);
+				MakeThreeNodesTree(root, subParent, node0, node1, node2);
 				root->m_bhvLinked = 0;
 			}
 			else if (nodesCount > 2)
@@ -1942,7 +1937,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 					public:
 					ndInt32 m_start;
 					ndInt32 m_count;
-					ndInt32 m_depthLevel;
 					ndInt32 m_rootNodeIndex;
 				};
 
@@ -1950,7 +1944,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 
 				ndUnsigned32 stack = 1;
 				ndUnsigned32 rootNodeIndex = newParentsDest[i].m_location;
-				stackPool[0].m_depthLevel = depthLevel;
 				stackPool[0].m_rootNodeIndex = rootNodeIndex;
 				stackPool[0].m_start = srcCellNodes[i].m_location;
 				stackPool[0].m_count = srcCellNodes[i + 1].m_location - srcCellNodes[i].m_location;
@@ -2059,10 +2052,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						rootNodeIndex++;
 
 						dAssert(root);
-						MakeTwoNodesTree(parent, node0, node1, block.m_depthLevel-1);
+						MakeTwoNodesTree(parent, node0, node1);
 						parent->m_parent = root;
 						root->m_left = parent;
-						root->m_depthLevel = block.m_depthLevel;
 					}
 					else if (count0 == 3)
 					{
@@ -2077,10 +2069,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						rootNodeIndex++;
 
 						dAssert(root);
-						MakeThreeNodesTree(grandParent, parent, node0, node1, node2, block.m_depthLevel - 1);
+						MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
 						grandParent->m_parent = root;
 						root->m_left = grandParent;
-						root->m_depthLevel = block.m_depthLevel;
 					}
 					else
 					{
@@ -2094,7 +2085,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						stackPool[stack].m_start = block.m_start;
 						stackPool[stack].m_count = count0;
 						stackPool[stack].m_rootNodeIndex = rootNodeIndex;
-						stackPool[stack].m_depthLevel = block.m_depthLevel - 1;
 
 						stack++;
 						rootNodeIndex++;
@@ -2118,10 +2108,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						rootNodeIndex++;
 
 						dAssert(root);
-						MakeTwoNodesTree(parent, node0, node1, block.m_depthLevel - 1);
+						MakeTwoNodesTree(parent, node0, node1);
 						parent->m_parent = root;
 						root->m_right = parent;
-						root->m_depthLevel = block.m_depthLevel;
 					}
 					else if (count1 == 3)
 					{
@@ -2136,10 +2125,9 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						rootNodeIndex++;
 
 						dAssert(root);
-						MakeThreeNodesTree(grandParent, parent, node0, node1, node2, block.m_depthLevel - 1);
+						MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
 						grandParent->m_parent = root;
 						root->m_right = grandParent;
-						root->m_depthLevel = block.m_depthLevel;
 					}
 					else
 					{
@@ -2153,7 +2141,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 						stackPool[stack].m_start = index0;
 						stackPool[stack].m_count = count1;
 						stackPool[stack].m_rootNodeIndex = rootNodeIndex;
-						stackPool[stack].m_depthLevel = block.m_depthLevel - 1;
 
 						stack++;
 						rootNodeIndex++;
@@ -2161,7 +2148,6 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 					}
 				}
 				rootNode->m_bhvLinked = 0;
-				rootNode->m_depthLevel = depthLevel;
 			}
 			#ifdef _DEBUG
 			else if (nodesCount == 0)
@@ -2172,24 +2158,55 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 			}
 			#endif			
 		}
-
-		#ifdef _DEBUG
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			const ndUnsigned32 parentIndex = newParentsDest[i].m_location;
-			const ndUnsigned32 nodesCount = newParentsDest[i + 1].m_location - newParentsDest[i].m_location;
-			ndSceneTreeNode* const root = parentsArray[parentIndex]->GetAsSceneTreeNode();
-			if (nodesCount && root && !root->m_parent)
-			{
-				root->SanityCheck(0);
-			}
-		}
-		#endif
 	});
 	ParallelExecute(SmallBhvNodes);
 }
 
-ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
+void ndScene::EnumerateBvhDepthLevels(ndSceneTreeNode* const root)
+{
+	D_TRACKTIME();
+	class StackLevel
+	{
+		public: 
+		ndSceneTreeNode* m_node;
+		ndInt32 m_depthLevel;
+	};
+
+	ndInt32 stack = 1;
+	StackLevel m_stackPool[256];
+
+	m_stackPool[0].m_node = root;
+	m_stackPool[0].m_depthLevel = 255;
+
+	while (stack)
+	{
+		stack--;
+		const StackLevel level(m_stackPool[stack]);
+
+		ndSceneTreeNode* const node = level.m_node;
+		node->m_depthLevel = level.m_depthLevel;
+
+		ndSceneTreeNode* const left = node->m_left->GetAsSceneTreeNode();
+		if (left)
+		{
+			m_stackPool[stack].m_node = left;
+			m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
+			stack++;
+			dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
+		}
+
+		ndSceneTreeNode* const right = node->m_right->GetAsSceneTreeNode();
+		if (right)
+		{
+			m_stackPool[stack].m_node = right;
+			m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
+			stack++;
+			dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
+		}
+	}
+}
+
+ndSceneNode* ndScene::BuildBottomUpBvh(ndFitnessList& fitness)
 {
 	D_TRACKTIME();
 	const ndUnsigned32 baseCount = m_bodyList.GetCount();
@@ -2231,7 +2248,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			ndSceneNode* const node = view[i];
 			parentsArray[i] = node;
 			node->m_bhvLinked = 0;
-			node->m_depthLevel = 0;
 			node->m_parent = nullptr;
 		}
 	});
@@ -2554,8 +2570,6 @@ ndSceneNode* ndScene::BuildBottomUp(ndFitnessList& fitness)
 			}
 			if (sum)
 			{
-if (depthLevel == 102)
-depthLevel *= 1;
 				m_cellCounts1[bashCount].m_location = sum;
 				BuildSmallBvh(parentsArray, bashCount, depthLevel);
 				depthLevel++;
@@ -2565,6 +2579,8 @@ depthLevel *= 1;
 		}
 	}
 
-	dAssert(srcArray[0]->SanityCheck(0));
-	return srcArray[0];
+	ndSceneNode* const root = srcArray[0];
+	EnumerateBvhDepthLevels(root->GetAsSceneTreeNode());
+	dAssert(root->SanityCheck(0));
+	return root;
 }
