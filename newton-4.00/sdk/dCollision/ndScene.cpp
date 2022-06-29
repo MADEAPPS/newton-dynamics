@@ -1732,34 +1732,6 @@ void ndScene::InitBodyArray()
 		}
 	});
 
-	auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		D_TRACKTIME();
-		const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
-		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
-
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBodyKinematic* const body = view[i];
-			ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
-
-			const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-			dAssert(root == nullptr);
-			for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
-			{
-				ndScopeSpinLock lock(parent->m_lock);
-				const ndVector minBox(parent->GetLeft()->m_minBox.GetMin(parent->GetRight()->m_minBox));
-				const ndVector maxBox(parent->GetLeft()->m_maxBox.GetMax(parent->GetRight()->m_maxBox));
-				if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
-				{
-					break;
-				}
-				parent->m_minBox = minBox;
-				parent->m_maxBox = maxBox;
-			}
-		}
-	});
-
 	ParallelExecute(BuildBodyArray);
 	ndInt32 sum = 0;
 	ndInt32 threadCount = GetThreadCount();
@@ -1781,14 +1753,67 @@ void ndScene::InitBodyArray()
 	}
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
-	if (movingBodyCount * 10 < m_bodyList.GetCount())
+	//if (movingBodyCount * 10 < m_bodyList.GetCount())
+	if (0)
 	{
+		auto UpdateSceneBvh = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+		{
+			D_TRACKTIME();
+			const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
+			const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
+
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndBodyKinematic* const body = view[i];
+				ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+
+				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				dAssert(root == nullptr);
+				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
+				{
+					ndScopeSpinLock lock(parent->m_lock);
+					const ndVector minBox(parent->GetLeft()->m_minBox.GetMin(parent->GetRight()->m_minBox));
+					const ndVector maxBox(parent->GetLeft()->m_maxBox.GetMax(parent->GetRight()->m_maxBox));
+					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					{
+						break;
+					}
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
+				}
+			}
+		});
 		ParallelExecute(UpdateSceneBvh);
 	}
 	else
 	{ 
-		// TODO: brute force lock free UpdateScenBvh
-		ParallelExecute(UpdateSceneBvh);
+		ndUnsigned32 start = 0;
+		ndUnsigned32 count = 0;
+		auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
+		{
+			D_TRACKTIME();
+			ndSceneTreeNode** const nodes = &m_fitness.GetView()[start];
+			const ndStartEnd startEnd(count, threadIndex, threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndSceneTreeNode* const node = nodes[i];
+
+				const ndVector minBox(node->GetLeft()->m_minBox.GetMin(node->GetRight()->m_minBox));
+				const ndVector maxBox(node->GetLeft()->m_maxBox.GetMax(node->GetRight()->m_maxBox));
+				if (!dBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
+				{
+					node->m_minBox = minBox;
+					node->m_maxBox = maxBox;
+				}
+			}
+		});
+
+		for (ndUnsigned32 i = 0; i < m_fitness.m_scansCount; ++i)
+		{
+			start = m_fitness.m_scans[i];
+			count = m_fitness.m_scans[i + 1] - start;
+			ParallelExecute(UpdateSceneBvh);
+		}
 	}
 
 	ndBodyKinematic* const sentinelBody = m_sentinelBody;
