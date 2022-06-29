@@ -2333,7 +2333,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 			dAssert(node);
 
 			node->m_bhvLinked = 0;
-			node->m_depthLevel = 256;
+			node->m_depthLevel = 0;
 			node->m_parent = nullptr;
 			node->SetAabb(body->m_minAabb, body->m_maxAabb);
 			srcArray[i] = node;
@@ -2351,7 +2351,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 			ndSceneNode* const node = view[i];
 			parentsArray[i] = node;
 			node->m_bhvLinked = 0;
-			node->m_depthLevel = 256;
+			node->m_depthLevel = 0;
 			node->m_parent = nullptr;
 		}
 	});
@@ -2561,7 +2561,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
-	ndUnsigned32 depthLevel = 0;
+	ndUnsigned32 depthLevel = 1;
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size * ndVector::m_two;
@@ -2676,18 +2676,34 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 			{
 				m_cellCounts1[bashCount].m_location = sum;
 				ndUnsigned32 subTreeDepth = BuildSmallBvh(parentsArray, bashCount);
+				depthLevel += subTreeDepth;
+				auto EnumerateSmallBvh = ndMakeObject::ndFunction([this, parentsArray, sum, depthLevel](ndInt32 threadIndex, ndInt32 threadCount)
+				{
+					D_TRACKTIME_NAMED(EnumerateSmallBvh);
+					const ndStartEnd startEnd(sum, threadIndex, threadCount);
+					for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+					{
+						ndSceneTreeNode* const node = parentsArray[i]->GetAsSceneTreeNode();
+						dAssert(node);
+						if (!node->m_parent)
+						{
+							dAssert(node->m_depthLevel == 0);
+							node->m_depthLevel = depthLevel;
+
+						}
+					}
+				});
+				ParallelExecute(EnumerateSmallBvh);
+
 				parentsArray += sum;
 				leafNodesCount += sum;
-
-				depthLevel += subTreeDepth;
-
-				// enumerate small trees in parallel here
 				depthLevel ++;
 			}
 		}
 	}
 
 	ndSceneNode* const root = srcArray[0];
+	dAssert(root->SanityCheck(0));
 	EnumerateBvhDepthLevels(root->GetAsSceneTreeNode());
 	dAssert(root->SanityCheck(0));
 	return root;
