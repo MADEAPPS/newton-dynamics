@@ -197,7 +197,7 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 
 	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(ndBuildHistogram);
 		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
 
 		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
@@ -217,9 +217,9 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 		}
 	});
 
-	auto ndSortArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	auto ndShffleArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(ndShffleArray);
 		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
 
 		ndStartEnd startEnd(size, threadIndex, threadCount);
@@ -266,7 +266,7 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 		prefixScanOut[1 << keyBitSize] = size;
 	}
 
-	threadPool.ParallelExecute(ndSortArray);
+	threadPool.ParallelExecute(ndShffleArray);
 
 	//#ifdef _DEBUG
 #if 0
@@ -345,7 +345,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 
 	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(ndBuildHistogram);
 		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
 
 		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
@@ -364,9 +364,9 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		}
 	});
 
-	auto ndSortArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	auto ndShffleArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(ndShffleArray);
 		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
 
 		ndStartEnd startEnd(size, threadIndex, threadCount);
@@ -413,7 +413,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		prefixScanOut[1 << keyBitSize] = size;
 	}
 
-	threadPool.ParallelExecute(ndSortArray);
+	threadPool.ParallelExecute(ndShffleArray);
 
 //#ifdef _DEBUG
 #if 0

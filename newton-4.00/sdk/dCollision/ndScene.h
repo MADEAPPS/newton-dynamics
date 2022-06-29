@@ -173,6 +173,7 @@ class ndScene : public ndThreadPool
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	// call from substeps update
+	D_COLLISION_API virtual void ApplyExtForce();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void InitBodyArray();
 	D_COLLISION_API virtual void UpdateSpecial();

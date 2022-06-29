@@ -31,9 +31,11 @@
 #ifdef D_PROFILER
 	#include <dTracyProfiler.h>
 	#define D_TRACKTIME() dProfilerZoneScoped(__FUNCTION__)
+	#define D_TRACKTIME_NAMED(name) dProfilerZoneScoped(#name)
 	#define D_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
 #else
 	#define D_TRACKTIME() 
+	#define D_TRACKTIME_NAMED(name)
 	#define D_SET_TRACK_NAME(trackName)
 #endif
 

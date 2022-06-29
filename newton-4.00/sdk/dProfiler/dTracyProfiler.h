@@ -52,7 +52,7 @@ class dgProfile
 
 #define dProfilerEnableProling() dProfilerEnableProlingLow();
 #define dProfilerZoneScoped(name)					\
-static const dProfilerSourceLocation __dprofiler_source_location { __FUNCTION__, __FUNCTION__,  __FILE__, (long long)__LINE__, 0 }; \
+static const dProfilerSourceLocation __dprofiler_source_location { name, __FUNCTION__,  __FILE__, (long long)__LINE__, 0 }; \
 dgProfile ___dgprofile_scoped_zone( &__dprofiler_source_location );
 
 #define dProfilerSetTrackName(trackName) dProfilerSetTrackNameLow(trackName) 

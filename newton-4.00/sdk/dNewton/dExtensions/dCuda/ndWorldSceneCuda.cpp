@@ -231,6 +231,11 @@ void ndWorldSceneCuda::FindCollidingPairs()
 	ndWorldScene::FindCollidingPairs();
 }
 
+void ndWorldSceneCuda::ApplyExtForce()
+{
+	ndWorldScene::ApplyExtForce();
+}
+
 void ndWorldSceneCuda::InitBodyArray()
 {
 	ndWorldScene::InitBodyArray();

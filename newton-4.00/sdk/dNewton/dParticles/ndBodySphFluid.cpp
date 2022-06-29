@@ -382,7 +382,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 
 	auto CountGridScans = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CountGridScans);
 		const ndGridHash* const hashGridMap = &data.m_hashGridMap[0];
 
 		const ndInt32 start = scans[threadIndex];
@@ -408,7 +408,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 
 	auto CalculateScans = ndMakeObject::ndFunction([this, &data, &scans, &sums](ndInt32 threadIndex, ndInt32)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CalculateScans);
 		ndArray<ndInt32>& gridScans = data.m_gridScans;
 		const ndArray<ndInt32>& partialScan = data.m_partialsGridScans[threadIndex];
 		const ndInt32 base = sums[threadIndex];
@@ -494,7 +494,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 
 	auto AddPairs = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(AddPairs);
 		const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
 		const ndArray<ndInt32>& gridScans = data.m_gridScans;
 		const ndFloat32 diameter = GetSphGridSize();
@@ -606,7 +606,7 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 
 	auto CalculateDensity = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CalculateDensity);
 		const ndArray<ndVector>& posit = m_posit;
 
 		const ndFloat32 h = GetSphGridSize();
@@ -646,7 +646,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 
 	auto CalculateAcceleration = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CalculateAcceleration);
 		const ndVector epsilon2 (ndFloat32(1.0e-12f));
 
 		const ndArray<ndVector>& veloc = m_veloc;
@@ -713,7 +713,7 @@ void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
 	ndWorkingData& data = WorkingData();
 	auto IntegrateParticles = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(IntegrateParticles);
 		const ndArray<ndVector>& accel = data.m_accel;
 		ndArray<ndVector>& veloc = m_veloc;
 		ndArray<ndVector>& posit = m_posit;
@@ -756,7 +756,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 	ndBox boxes[D_MAX_THREADS_COUNT];
 	auto CalculateAabb = ndMakeObject::ndFunction([this, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CalculateAabb);
 		ndBox box;
 		const ndArray<ndVector>& posit = m_posit;
 		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
@@ -867,7 +867,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	
 	auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CountGrids);
 		const ndVector origin(m_box0);
 		const ndFloat32 gridSize = GetSphGridSize();
 		const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
@@ -897,7 +897,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 
 	auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CreateGrids);
 		const ndVector origin(m_box0);
 		const ndFloat32 gridSize = GetSphGridSize();
 		ndGridHash* const dst = &data.m_hashGridMap[0];

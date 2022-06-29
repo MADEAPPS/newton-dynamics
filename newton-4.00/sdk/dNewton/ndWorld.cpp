@@ -468,6 +468,8 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->SetTimestep(timestep);
 
 	m_scene->UpdateBodyList();
+
+	m_scene->ApplyExtForce();
 	m_scene->InitBodyArray();
 
 	// update the collision system
@@ -509,7 +511,7 @@ void ndWorld::ModelUpdate()
 	D_TRACKTIME();
 	auto ModelUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(ModelUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		ndModelList& modelList = m_modelList;
 		ndModelList::ndNode* node = modelList.GetFirst();
@@ -537,7 +539,7 @@ void ndWorld::ModelPostUpdate()
 	D_TRACKTIME();
 	auto ModelPostUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(ModelPostUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		ndModelList& modelList = m_modelList;
 		ndModelList::ndNode* node = modelList.GetFirst();
@@ -565,7 +567,7 @@ void ndWorld::PostModelTransform()
 	D_TRACKTIME();
 	auto PostModelTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(PostModelTransform);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		ndModelList& modelList = m_modelList;
 		ndModelList::ndNode* node = modelList.GetFirst();

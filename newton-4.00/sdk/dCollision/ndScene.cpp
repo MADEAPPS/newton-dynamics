@@ -761,7 +761,7 @@ void ndScene::UpdateTransform()
 	D_TRACKTIME();
 	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(TransformUpdate);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1338,7 +1338,7 @@ void ndScene::CalculateContacts()
 	
 	auto CreateNewContacts = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CreateNewContacts);
 		const ndArray<ndContactPairs>& newPairs = m_newPairs;
 		ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
 
@@ -1365,7 +1365,7 @@ void ndScene::CalculateContacts()
 	
 	auto CopyContactArray = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CopyContactArray);
 		ndContact** const contactArray = &m_contactArray[0];
 
 		const ndUnsigned32 start = m_newPairs.GetCount();
@@ -1391,7 +1391,7 @@ void ndScene::CalculateContacts()
 	{
 		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray, &contactCount](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			D_TRACKTIME();
+			D_TRACKTIME_NAMED(CalculateContactPoints);
 			const ndUnsigned32 jointCount = m_contactArray.GetCount();
 
 			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
@@ -1442,7 +1442,7 @@ void ndScene::CalculateContacts()
 		{
 			auto DeleteContactArray = ndMakeObject::ndFunction([this, &prefixScan](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				D_TRACKTIME();
+				D_TRACKTIME_NAMED(DeleteContactArray);
 				ndArray<ndContact*>& contactArray = m_contactArray;
 				const ndUnsigned32 start = prefixScan[m_dead];
 				const ndUnsigned32 count = prefixScan[m_dead + 1] - start;
@@ -1470,7 +1470,7 @@ void ndScene::CalculateContacts()
 		{
 			auto CopyActiveContact = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				D_TRACKTIME();
+				D_TRACKTIME_NAMED(CopyActiveContact);
 				const ndArray<ndContact*>& constraintArray = m_contactArray;
 				ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
 				const ndUnsigned32 activeJointCount = activeConstraintArray.GetCount();
@@ -1491,7 +1491,7 @@ void ndScene::FindCollidingPairs()
 	D_TRACKTIME();
 	auto FindPairs = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(FindPairs);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1503,7 +1503,7 @@ void ndScene::FindCollidingPairs()
 
 	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(FindPairsForward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1515,7 +1515,7 @@ void ndScene::FindCollidingPairs()
 
 	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(FindPairsBackward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 		const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1552,7 +1552,7 @@ void ndScene::FindCollidingPairs()
 		{
 			auto CopyPartialCounts = ndMakeObject::ndFunction([this, &scanCounts](ndInt32 threadIndex, ndInt32)
 			{
-				D_TRACKTIME();
+				D_TRACKTIME_NAMED(CopyPartialCounts);
 				const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
 
 				const ndUnsigned32 count = newPairs.GetCount();
@@ -1669,26 +1669,44 @@ void ndScene::UpdateBodyList()
 	}
 }
 
+void ndScene::ApplyExtForce()
+{
+	D_TRACKTIME();
+
+	auto ApplyForce = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME_NAMED(ApplyForce);
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+
+		const ndFloat32 timestep = m_timestep;
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = view[i];
+			body->ApplyExternalForces(threadIndex, timestep);
+		}
+	});
+	ParallelExecute(ApplyForce);
+}
+
 void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
 	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(BuildBodyArray);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
 		ndInt32* const scan = &scans[threadIndex][0];
 		scan[0] = 0;
 		scan[1] = 0;
-
-		const ndFloat32 timestep = m_timestep;
+			
 		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
 
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = view[i];
-			body->ApplyExternalForces(threadIndex, timestep);
 
 			body->PrepareStep(i);
 			ndUnsigned8 sceneEquilibrium = 1;
@@ -1716,7 +1734,7 @@ void ndScene::InitBodyArray()
 
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CompactMovingBodies);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 		ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
 		ndInt32* const scan = &scans[threadIndex][0];
@@ -1753,12 +1771,12 @@ void ndScene::InitBodyArray()
 	}
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
-	//if (movingBodyCount * 10 < m_bodyList.GetCount())
-	if (0)
+	ndInt32 cutoffCount = 2 * ndExp2(m_bodyList.GetCount()) * movingBodyCount;
+	if (cutoffCount < m_bodyList.GetCount())
 	{
 		auto UpdateSceneBvh = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			D_TRACKTIME();
+			D_TRACKTIME_NAMED(UpdateSceneBvh);
 			const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
 			const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
 
@@ -1783,6 +1801,8 @@ void ndScene::InitBodyArray()
 				}
 			}
 		});
+
+		D_TRACKTIME_NAMED(UpdateSceneBvhLight);
 		ParallelExecute(UpdateSceneBvh);
 	}
 	else
@@ -1791,7 +1811,7 @@ void ndScene::InitBodyArray()
 		ndUnsigned32 count = 0;
 		auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			D_TRACKTIME();
+			D_TRACKTIME_NAMED(UpdateSceneBvh);
 			ndSceneTreeNode** const nodes = &m_fitness.GetView()[start];
 			const ndStartEnd startEnd(count, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1808,6 +1828,7 @@ void ndScene::InitBodyArray()
 			}
 		});
 
+		D_TRACKTIME_NAMED(UpdateSceneBvhFull);
 		for (ndUnsigned32 i = 0; i < m_fitness.m_scansCount; ++i)
 		{
 			start = m_fitness.m_scans[i];
@@ -1834,7 +1855,7 @@ void ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashC
 {
 	auto SmallBhvNodes = ndMakeObject::ndFunction([this, parentsArray, bashCount](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(SmallBhvNodes);
 		const ndCellScanPrefix* const srcCellNodes = &m_cellCounts0[0];
 		const ndCellScanPrefix* const newParentsDest = &m_cellCounts1[0];
 		const ndBottomUpCell* const nodesCells = &m_cellBuffer0[0];
@@ -2279,7 +2300,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 
 	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray, baseCount](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CopyBodyNodes);
 		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
 		dAssert(baseCount == ndUnsigned32(activeBodyArray.GetCount() - 1));
 
@@ -2299,7 +2320,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 
 	auto CopySceneNode = ndMakeObject::ndFunction([this, parentsArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CopySceneNode);
 		const ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
 
 		const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
@@ -2324,7 +2345,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
 	auto CalculateBoxSize = ndMakeObject::ndFunction([this, srcArray, leafNodesCount, &boxSizes, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		D_TRACKTIME();
+		D_TRACKTIME_NAMED(CalculateBoxSize);
 		ndVector minP(ndFloat32(1.0e15f));
 		ndVector maxP(ndFloat32(-1.0e15f));
 		ndFloat32 minSize = ndFloat32(1.0e15f);
@@ -2532,7 +2553,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 			leafNodesCount -= linkedNodes;
 			auto MakeGrids = ndMakeObject::ndFunction([this, srcArray, &gridClassifier, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				D_TRACKTIME();
+				D_TRACKTIME_NAMED(MakeGrids);
 				const ndVector origin(gridClassifier.m_origin);
 				const ndVector invSize(gridClassifier.m_invSize);
 
@@ -2600,7 +2621,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 			m_cellCounts1.SetCount(m_cellBuffer1.GetCount());
 			auto MarkCellBounds = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				D_TRACKTIME();
+				D_TRACKTIME_NAMED(MarkCellBounds);
 				ndCellScanPrefix* const dst = &m_cellCounts0[0];
 				const ndStartEnd startEnd(m_cellBuffer0.GetCount() - 1, threadIndex, threadCount);
 
