@@ -165,10 +165,10 @@ class ndScene : public ndThreadPool
 
 	ndSceneNode* BuildBottomUpBvh();
 	void EnumerateBvhDepthLevels(ndSceneTreeNode* const root);
-	void BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
-	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
+	ndUnsigned32 BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
+	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
