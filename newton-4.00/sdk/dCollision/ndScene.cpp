@@ -1856,7 +1856,7 @@ void ndScene::EnumerateBvhDepthLevels(ndSceneTreeNode* const root)
 	D_TRACKTIME();
 	class StackLevel
 	{
-	public:
+		public:
 		ndSceneTreeNode* m_node;
 		ndInt32 m_depthLevel;
 	};
@@ -2683,13 +2683,50 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 					const ndStartEnd startEnd(sum, threadIndex, threadCount);
 					for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 					{
-						ndSceneTreeNode* const node = parentsArray[i]->GetAsSceneTreeNode();
-						dAssert(node);
-						if (!node->m_parent)
+						ndSceneTreeNode* const root = parentsArray[i]->GetAsSceneTreeNode();
+						dAssert(root);
+						if (!root->m_parent)
 						{
-							dAssert(node->m_depthLevel == 0);
-							node->m_depthLevel = depthLevel;
+							dAssert(root->m_depthLevel == 0);
+							class StackLevel
+							{
+								public:
+								ndSceneTreeNode* m_node;
+								ndInt32 m_depthLevel;
+							};
 
+							ndInt32 stack = 1;
+							StackLevel m_stackPool[32];
+
+							m_stackPool[0].m_node = root;
+							m_stackPool[0].m_depthLevel = depthLevel;
+
+							while (stack)
+							{
+								stack--;
+								const StackLevel level(m_stackPool[stack]);
+
+								ndSceneTreeNode* const node = level.m_node;
+								node->m_depthLevel = level.m_depthLevel;
+
+								ndSceneTreeNode* const left = node->m_left->GetAsSceneTreeNode();
+								if (left && left->m_depthLevel == 0)
+								{
+									m_stackPool[stack].m_node = left;
+									m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
+									stack++;
+									dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
+								}
+
+								ndSceneTreeNode* const right = node->m_right->GetAsSceneTreeNode();
+								if (right && right->m_depthLevel == 0)
+								{
+									m_stackPool[stack].m_node = right;
+									m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
+									stack++;
+									dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
+								}
+							}
 						}
 					}
 				});
@@ -2703,7 +2740,35 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 	}
 
 	ndSceneNode* const root = srcArray[0];
-	dAssert(root->SanityCheck(0));
+
+	class ndSortGetDethpKey
+	{
+		public:
+		ndSortGetDethpKey(const void* const)
+		{
+		}
+	
+		ndUnsigned32 GetKey(const ndSceneTreeNode* const node) const
+		{
+			return node->m_depthLevel;
+		}
+	};
+	
+	ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
+	ndSceneTreeNode** tmpBuffer = (ndSceneTreeNode**)&m_scratchBuffer[0];
+	
+	ndUnsigned32 scans[257];
+	ndCountingSortInPlace<ndSceneTreeNode*, ndSortGetDethpKey, 8>(*this, &view[0], tmpBuffer, view.GetCount(), scans, nullptr);
+
+	m_fitness.m_scansCount = 0;
+	for (ndInt32 i = 1; (i < 257) && (scans[i] < ndUnsigned32(view.GetCount())); ++i)
+	{
+		m_fitness.m_scans[i - 1] = scans[i];
+		m_fitness.m_scansCount++;
+	}
+	m_fitness.m_scans[m_fitness.m_scansCount] = scans[m_fitness.m_scansCount + 1];
+	//dAssert(m_fitness.m_scans[0] == 0);
+
 	EnumerateBvhDepthLevels(root->GetAsSceneTreeNode());
 	dAssert(root->SanityCheck(0));
 	return root;
