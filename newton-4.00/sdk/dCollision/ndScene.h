@@ -164,7 +164,6 @@ class ndScene : public ndThreadPool
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
 	ndSceneNode* BuildBottomUpBvh();
-	void EnumerateBvhDepthLevels(ndSceneTreeNode* const root);
 	ndUnsigned32 BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;

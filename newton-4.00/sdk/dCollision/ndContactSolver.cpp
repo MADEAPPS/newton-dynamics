@@ -2547,9 +2547,6 @@ ndInt32 ndContactSolver::ConvexContactsDiscrete()
 	m_instance0.m_globalMatrix.m_posit = ndVector::m_wOne;
 	m_instance1.m_globalMatrix.m_posit -= (origin0 & ndVector::m_triplexMask);
 
-//static int xxxx;
-//xxxx++;
-
 	// handle rare case of two shapes located exactly at the same origin
 	const ndVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
 	if (error.DotProduct(error).GetScalar() < ndFloat32(1.0e-6f))
@@ -2585,18 +2582,14 @@ ndInt32 ndContactSolver::ConvexContactsDiscrete()
 	m_closestPoint0 += offset;
 	m_closestPoint1 += offset;
 
-//dTrace(("%d y0=%f y1=%f ", xxxx, m_closestPoint0.m_y, m_closestPoint1.m_y));
-
 	if (!m_intersectionTestOnly)
 	{
 		ndContactPoint* const contactOut = m_contactBuffer;
 		for (ndInt32 i = count - 1; i >= 0; i--)
 		{
 			contactOut[i].m_point += offset;
-			//dTrace(("c=%f depth=%f  ", contactOut[i].m_point.m_y, contactOut[i].m_penetration));
 		}
 	}
-//dTrace(("\n"));
 
 	m_instance0.m_globalMatrix.m_posit = origin0;
 	m_instance1.m_globalMatrix.m_posit = origin1;

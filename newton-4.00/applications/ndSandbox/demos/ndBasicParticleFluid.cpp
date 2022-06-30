@@ -410,6 +410,6 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	ndQuaternion rot;
-	ndVector origin(-10.0f, 5.0f, 3.0f, 0.0f);
+	ndVector origin(-10.0f, 5.0f, 3.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -379,6 +379,7 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 
 	dAssert(contact->m_material);
 	dAssert(m_contactNotifyCallback);
+
 	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
 	if (processContacts)
 	{
@@ -1771,69 +1772,73 @@ void ndScene::InitBodyArray()
 	}
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
-	ndInt32 cutoffCount = 2 * ndExp2(m_bodyList.GetCount()) * movingBodyCount;
-	if (cutoffCount < m_bodyList.GetCount())
+	if (m_rootNode && m_rootNode->GetAsSceneTreeNode())
 	{
-		auto UpdateSceneBvh = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+		const ndInt32 bodyCount = m_bodyList.GetCount();
+		const ndInt32 cutoffCount = 2 * ndExp2(bodyCount) * movingBodyCount;
+		if (cutoffCount < bodyCount)
 		{
-			D_TRACKTIME_NAMED(UpdateSceneBvh);
-			const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
-			const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
-
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			auto UpdateSceneBvh = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				ndBodyKinematic* const body = view[i];
-				ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+				D_TRACKTIME_NAMED(UpdateSceneBvh);
+				const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
+				const ndStartEnd startEnd(view.GetCount(), threadIndex, threadCount);
 
-				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-				dAssert(root == nullptr);
-				for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
-					ndScopeSpinLock lock(parent->m_lock);
-					const ndVector minBox(parent->GetLeft()->m_minBox.GetMin(parent->GetRight()->m_minBox));
-					const ndVector maxBox(parent->GetLeft()->m_maxBox.GetMax(parent->GetRight()->m_maxBox));
-					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					ndBodyKinematic* const body = view[i];
+					ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+
+					const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+					dAssert(root == nullptr);
+					for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent)
 					{
-						break;
+						ndScopeSpinLock lock(parent->m_lock);
+						const ndVector minBox(parent->GetLeft()->m_minBox.GetMin(parent->GetRight()->m_minBox));
+						const ndVector maxBox(parent->GetLeft()->m_maxBox.GetMax(parent->GetRight()->m_maxBox));
+						if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+						{
+							break;
+						}
+						parent->m_minBox = minBox;
+						parent->m_maxBox = maxBox;
 					}
-					parent->m_minBox = minBox;
-					parent->m_maxBox = maxBox;
 				}
-			}
-		});
+			});
 
-		D_TRACKTIME_NAMED(UpdateSceneBvhLight);
-		ParallelExecute(UpdateSceneBvh);
-	}
-	else
-	{ 
-		ndUnsigned32 start = 0;
-		ndUnsigned32 count = 0;
-		auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME_NAMED(UpdateSceneBvh);
-			ndSceneTreeNode** const nodes = &m_fitness.GetView()[start];
-			const ndStartEnd startEnd(count, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndSceneTreeNode* const node = nodes[i];
-
-				const ndVector minBox(node->GetLeft()->m_minBox.GetMin(node->GetRight()->m_minBox));
-				const ndVector maxBox(node->GetLeft()->m_maxBox.GetMax(node->GetRight()->m_maxBox));
-				if (!dBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
-				{
-					node->m_minBox = minBox;
-					node->m_maxBox = maxBox;
-				}
-			}
-		});
-
-		D_TRACKTIME_NAMED(UpdateSceneBvhFull);
-		for (ndUnsigned32 i = 0; i < m_fitness.m_scansCount; ++i)
-		{
-			start = m_fitness.m_scans[i];
-			count = m_fitness.m_scans[i + 1] - start;
+			D_TRACKTIME_NAMED(UpdateSceneBvhLight);
 			ParallelExecute(UpdateSceneBvh);
+		}
+		else
+		{
+			ndUnsigned32 start = 0;
+			ndUnsigned32 count = 0;
+			auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
+			{
+				D_TRACKTIME_NAMED(UpdateSceneBvh);
+				ndSceneTreeNode** const nodes = &m_fitness.GetView()[start];
+				const ndStartEnd startEnd(count, threadIndex, threadCount);
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					ndSceneTreeNode* const node = nodes[i];
+
+					const ndVector minBox(node->GetLeft()->m_minBox.GetMin(node->GetRight()->m_minBox));
+					const ndVector maxBox(node->GetLeft()->m_maxBox.GetMax(node->GetRight()->m_maxBox));
+					if (!dBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
+					{
+						node->m_minBox = minBox;
+						node->m_maxBox = maxBox;
+					}
+				}
+			});
+
+			D_TRACKTIME_NAMED(UpdateSceneBvhFull);
+			for (ndUnsigned32 i = 0; i < m_fitness.m_scansCount; ++i)
+			{
+				start = m_fitness.m_scans[i];
+				count = m_fitness.m_scans[i + 1] - start;
+				ParallelExecute(UpdateSceneBvh);
+			}
 		}
 	}
 
@@ -1849,83 +1854,6 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_isConstrained = 0;
 	sentinelBody->m_sceneEquilibrium = 1;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
-}
-
-void ndScene::EnumerateBvhDepthLevels(ndSceneTreeNode* const root)
-{
-	D_TRACKTIME();
-	class StackLevel
-	{
-		public:
-		ndSceneTreeNode* m_node;
-		ndInt32 m_depthLevel;
-	};
-
-	ndInt32 stack = 1;
-	StackLevel m_stackPool[256];
-
-	m_stackPool[0].m_node = root;
-	m_stackPool[0].m_depthLevel = 255;
-
-	while (stack)
-	{
-		stack--;
-		const StackLevel level(m_stackPool[stack]);
-
-		ndSceneTreeNode* const node = level.m_node;
-		node->m_depthLevel = level.m_depthLevel;
-
-		ndSceneTreeNode* const left = node->m_left->GetAsSceneTreeNode();
-		if (left)
-		{
-			m_stackPool[stack].m_node = left;
-			m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
-			stack++;
-			dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
-		}
-
-		ndSceneTreeNode* const right = node->m_right->GetAsSceneTreeNode();
-		if (right)
-		{
-			m_stackPool[stack].m_node = right;
-			m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
-			stack++;
-			dAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
-		}
-	}
-
-	class ndSortGetDethpKey
-	{
-		public:
-		ndSortGetDethpKey(const void* const)
-		{
-		}
-
-		ndUnsigned32 GetKey(const ndSceneTreeNode* const node) const
-		{
-			return node->m_depthLevel;
-		}
-	};
-
-	ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
-	ndSceneTreeNode** tmpBuffer = (ndSceneTreeNode**)&m_scratchBuffer[0];
-
-	ndUnsigned32 scans[257];
-	ndCountingSortInPlace<ndSceneTreeNode*, ndSortGetDethpKey, 8>(*this, &view[0], tmpBuffer, view.GetCount(), scans, nullptr);
-	for (ndInt32 i = 256; i >= 0; --i)
-	{
-		if (!scans[i])
-		{
-			m_fitness.m_scansCount = 0;
-			for (ndInt32 j = i; j < 257; ++j)
-			{
-				m_fitness.m_scans[m_fitness.m_scansCount] = scans[j];
-				m_fitness.m_scansCount++;
-			}
-			m_fitness.m_scansCount--;
-			break;
-		}
-	}
 }
 
 ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount)
@@ -2067,12 +1995,14 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 					ndInt32 m_start;
 					ndInt32 m_count;
 					ndInt32 m_rootNodeIndex;
+					ndUnsigned32 m_depth;
 				};
 
 				ndBlockSegment stackPool[8];
 
 				ndUnsigned32 stack = 1;
 				ndUnsigned32 rootNodeIndex = newParentsDest[i].m_location;
+				stackPool[0].m_depth = 0;
 				stackPool[0].m_rootNodeIndex = rootNodeIndex;
 				stackPool[0].m_start = srcCellNodes[i].m_location;
 				stackPool[0].m_count = srcCellNodes[i + 1].m_location - srcCellNodes[i].m_location;
@@ -2084,7 +2014,7 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 				while (stack)
 				{
 					stack--;
-					const ndBlockSegment block = stackPool[stack];
+					const ndBlockSegment block (stackPool[stack]);
 					dAssert(block.m_count > 2);
 
 					maxStack = ndMax(maxStack, stack);
@@ -2187,7 +2117,7 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 						MakeTwoNodesTree(parent, node0, node1);
 						parent->m_parent = root;
 						root->m_left = parent;
-						maxStack = ndMax(maxStack, stack + 1);
+						maxStack = ndMax(maxStack, block.m_depth + 1);
 					}
 					else if (count0 == 3)
 					{
@@ -2205,7 +2135,7 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 						MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
 						grandParent->m_parent = root;
 						root->m_left = grandParent;
-						maxStack = ndMax(maxStack, stack + 2);
+						maxStack = ndMax(maxStack, block.m_depth + 2);
 					}
 					else
 					{
@@ -2216,8 +2146,9 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 						parent->m_right = nullptr;
 						root->m_left = parent;
 						
-						stackPool[stack].m_start = block.m_start;
 						stackPool[stack].m_count = count0;
+						stackPool[stack].m_start = block.m_start;
+						stackPool[stack].m_depth = block.m_depth + 1;
 						stackPool[stack].m_rootNodeIndex = rootNodeIndex;
 
 						stack++;
@@ -2245,7 +2176,7 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 						MakeTwoNodesTree(parent, node0, node1);
 						parent->m_parent = root;
 						root->m_right = parent;
-						maxStack = ndMax(maxStack, stack + 1);
+						maxStack = ndMax(maxStack, block.m_depth + 1);
 					}
 					else if (count1 == 3)
 					{
@@ -2263,7 +2194,7 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 						MakeThreeNodesTree(grandParent, parent, node0, node1, node2);
 						grandParent->m_parent = root;
 						root->m_right = grandParent;
-						maxStack = ndMax(maxStack, stack + 2);
+						maxStack = ndMax(maxStack, block.m_depth + 2);
 					}
 					else
 					{
@@ -2276,6 +2207,7 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 
 						stackPool[stack].m_start = index0;
 						stackPool[stack].m_count = count1;
+						stackPool[stack].m_depth = block.m_depth + 1;
 						stackPool[stack].m_rootNodeIndex = rootNodeIndex;
 
 						stack++;
@@ -2767,9 +2699,8 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 		m_fitness.m_scansCount++;
 	}
 	m_fitness.m_scans[m_fitness.m_scansCount] = scans[m_fitness.m_scansCount + 1];
-	//dAssert(m_fitness.m_scans[0] == 0);
-
-	EnumerateBvhDepthLevels(root->GetAsSceneTreeNode());
+	dAssert(m_fitness.m_scans[0] == 0);
+	
 	dAssert(root->SanityCheck(0));
 	return root;
 }
