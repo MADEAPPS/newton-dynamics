@@ -1668,6 +1668,7 @@ void ndScene::UpdateBodyList()
 		}
 		view.PushBack(m_sentinelBody);
 	}
+	m_fitness.UpdateView();
 }
 
 void ndScene::ApplyExtForce()
@@ -2289,7 +2290,6 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 	});
 
 	UpdateBodyList();
-	m_fitness.UpdateView();
 	ParallelExecute(CopyBodyNodes);
 	ParallelExecute(CopySceneNode);
 
