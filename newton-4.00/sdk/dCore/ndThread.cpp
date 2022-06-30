@@ -36,12 +36,7 @@ ndThread::ndThread()
 #endif
 {
 	strcpy (m_name, "newtonWorker");
-#ifndef D_USE_THREAD_EMULATION
-	while (load())
-	{
-		ndYield();
-	}
-#endif
+	store(false);
 }
 
 ndThread::~ndThread()
@@ -101,7 +96,10 @@ void ndThread::ThreadFunctionCallback()
 #ifndef D_USE_THREAD_EMULATION
 
 	// wait until constructor was fully initialized.
-	store(false);
+	while (load())
+	{
+		ndYield();
+	}
 
 	D_SET_TRACK_NAME(m_name);
 	ndFloatExceptions exception;
