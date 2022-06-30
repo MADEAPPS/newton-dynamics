@@ -316,7 +316,7 @@ void ndScene::BalanceScene()
 	{
 		if (!m_forceBalanceSceneCounter)
 		{
-			m_rootNode = BuildBottomUpBvh();
+			m_rootNode = BuildBvhTree();
 		}
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode->m_parent);
@@ -1857,7 +1857,7 @@ void ndScene::InitBodyArray()
 	sentinelBody->m_weigh = ndFloat32(0.0f);
 }
 
-ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount)
+ndUnsigned32 ndScene::BuildSmallBvhTree(ndSceneNode** const parentsArray, ndUnsigned32 bashCount)
 {
 	ndUnsigned32 depthLevel[D_MAX_THREADS_COUNT];
 	auto SmallBhvNodes = ndMakeObject::ndFunction([this, parentsArray, bashCount, &depthLevel](ndInt32 threadIndex, ndInt32 threadCount)
@@ -2242,22 +2242,14 @@ ndUnsigned32 ndScene::BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned
 	return depth;
 }
 
-ndSceneNode* ndScene::BuildBottomUpBvh()
+void ndScene::BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray)
 {
-	D_TRACKTIME();
-	const ndUnsigned32 baseCount = m_bodyList.GetCount();
-	m_scratchBuffer.SetCount(4 * (baseCount + 4) * sizeof(ndSceneNode*));
-
-	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
-	ndSceneNode** tmpArray = &srcArray[2 * (baseCount + 4)];
-	ndSceneNode** parentsArray = &srcArray[baseCount];
-
-	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray, baseCount](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CopyBodyNodes);
 		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
-		dAssert(baseCount == ndUnsigned32(activeBodyArray.GetCount() - 1));
-		
+		const ndUnsigned32 baseCount = activeBodyArray.GetCount() - 1;
+
 		const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -2292,19 +2284,20 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 	UpdateBodyList();
 	ParallelExecute(CopyBodyNodes);
 	ParallelExecute(CopySceneNode);
+}
 
-	ndUnsigned32 leafNodesCount = baseCount;
-	dAssert(ndUnsigned32(m_fitness.GetView().GetCount()) < baseCount);
-
+ndScene::BoxInfo ndScene::BuildBvhTreeCalculateLeafBoxes(ndSceneNode** const srcArray)
+{
 	ndVector boxes[D_MAX_THREADS_COUNT][2];
 	ndFloat32 boxSizes[D_MAX_THREADS_COUNT];
-	auto CalculateBoxSize = ndMakeObject::ndFunction([this, srcArray, leafNodesCount, &boxSizes, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CalculateBoxSize = ndMakeObject::ndFunction([this, srcArray, &boxSizes, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CalculateBoxSize);
 		ndVector minP(ndFloat32(1.0e15f));
 		ndVector maxP(ndFloat32(-1.0e15f));
 		ndFloat32 minSize = ndFloat32(1.0e15f);
 
+		ndUnsigned32 leafNodesCount = GetActiveBodyArray().GetCount() - 1;
 		const ndStartEnd startEnd(leafNodesCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -2333,12 +2326,24 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 		minBoxSize = ndMin(minBoxSize, boxSizes[i]);
 	}
 
-	class BoxInfo
-	{
-		public:
-		ndVector m_size;
-		ndVector m_origin;
-	};
+	BoxInfo info;
+	info.m_origin = minP;
+	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
+	return info;
+}
+
+ndSceneNode* ndScene::BuildBvhTree()
+{
+	D_TRACKTIME();
+	const ndUnsigned32 baseCount = m_bodyList.GetCount();
+	m_scratchBuffer.SetCount(4 * (baseCount + 4) * sizeof(ndSceneNode*));
+
+	ndSceneNode** srcArray = (ndSceneNode**)&m_scratchBuffer[0];
+	ndSceneNode** tmpArray = &srcArray[2 * (baseCount + 4)];
+	ndSceneNode** parentsArray = &srcArray[baseCount];
+
+	ndUnsigned32 leafNodesCount = baseCount;
+	
 
 	enum
 	{
@@ -2486,14 +2491,14 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 		}
 	};
 
-	BoxInfo info;
-	info.m_origin = minP;
-	info.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
+	BuildBvhTreeInitNodes(srcArray, parentsArray);
+	BoxInfo info(BuildBvhTreeCalculateLeafBoxes(srcArray));
 
 	ndUnsigned32 prefixScan[8];
 	ndInt32 maxGrids[D_MAX_THREADS_COUNT][3];
 
 	ndUnsigned32 depthLevel = 1;
+	const ndInt32 threadCount = GetThreadCount();
 	while (leafNodesCount > 1)
 	{
 		info.m_size = info.m_size * ndVector::m_two;
@@ -2607,7 +2612,7 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 			if (sum)
 			{
 				m_cellCounts1[bashCount].m_location = sum;
-				ndUnsigned32 subTreeDepth = BuildSmallBvh(parentsArray, bashCount);
+				ndUnsigned32 subTreeDepth = BuildSmallBvhTree(parentsArray, bashCount);
 				depthLevel += subTreeDepth;
 				auto EnumerateSmallBvh = ndMakeObject::ndFunction([this, parentsArray, sum, depthLevel](ndInt32 threadIndex, ndInt32 threadCount)
 				{
@@ -2703,4 +2708,9 @@ ndSceneNode* ndScene::BuildBottomUpBvh()
 	
 	dAssert(root->SanityCheck(0));
 	return root;
+}
+
+ndSceneNode* ndScene::BuildIncrementalBvhTree()
+{
+	return BuildBvhTree();
 }

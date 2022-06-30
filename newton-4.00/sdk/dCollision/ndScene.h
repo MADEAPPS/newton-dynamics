@@ -163,8 +163,21 @@ class ndScene : public ndThreadPool
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-	ndSceneNode* BuildBottomUpBvh();
-	ndUnsigned32 BuildSmallBvh(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
+
+	class BoxInfo
+	{
+		public:
+		ndVector m_size;
+		ndVector m_origin;
+	};
+
+	ndSceneNode* BuildBvhTree();
+	void BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray);
+	BoxInfo BuildBvhTreeCalculateLeafBoxes(ndSceneNode** const srcArray);
+
+
+	ndSceneNode* BuildIncrementalBvhTree();
+	ndUnsigned32 BuildSmallBvhTree(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
