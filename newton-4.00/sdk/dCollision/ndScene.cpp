@@ -2790,9 +2790,30 @@ ndSceneNode* ndScene::BuildIncrementalBvhTree()
 
 		case BuildBvhTreeBuildState::m_buildLayer:
 		{
-			dAssert(0);
-			//BuildBvhTreeCalculateLeafBoxes();
-			m_bvhBuildState.m_state = m_bvhBuildState.m_enumarateLayers;
+			if (m_bvhBuildState.m_leafNodesCount > 1)
+			{
+				m_bvhBuildState.m_size = m_bvhBuildState.m_size * ndVector::m_two;
+				BuildBvhGenerateLayerGrids();
+			}
+			else
+			{
+				m_bvhBuildState.m_root = m_bvhBuildState.m_srcArray[0];
+				m_bvhBuildState.m_state = m_bvhBuildState.m_enumarateLayers;
+			}
+			break;
+		}
+
+		case BuildBvhTreeBuildState::m_enumarateLayers:
+		{
+			BuildBvhTreeSetNodesDepth();
+			m_bvhBuildState.m_state = m_bvhBuildState.m_endBuild;
+			break;
+		}
+
+		case BuildBvhTreeBuildState::m_endBuild:
+		{
+			root = m_bvhBuildState.m_root;
+			dAssert(m_bvhBuildState.m_root->SanityCheck(0));
 			break;
 		}
 		

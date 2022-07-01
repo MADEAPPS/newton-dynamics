@@ -173,6 +173,7 @@ class ndScene : public ndThreadPool
 			m_calculateBoxes,
 			m_buildLayer,
 			m_enumarateLayers,
+			m_endBuild,
 		};
 
 		BuildBvhTreeBuildState();
