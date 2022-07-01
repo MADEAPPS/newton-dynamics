@@ -1881,6 +1881,7 @@ ndScene::BuildBvhTreeBuildState::BuildBvhTreeBuildState()
 	,m_parentsArray(nullptr)
 	,m_depthLevel(0)
 	,m_leafNodesCount(0)
+	,m_state(m_beginBuild)
 {
 }
 
@@ -2748,6 +2749,9 @@ void ndScene::BuildBvhTreeSetNodesDepth()
 ndSceneNode* ndScene::BuildBvhTree()
 {
 	D_TRACKTIME();
+	
+while (!BuildIncrementalBvhTree());
+
 	BuildBvhTreeInitNodes();
 	BuildBvhTreeCalculateLeafBoxes();
 	while (m_bvhBuildState.m_leafNodesCount > 1)
@@ -2766,7 +2770,37 @@ ndSceneNode* ndScene::BuildBvhTree()
 
 ndSceneNode* ndScene::BuildIncrementalBvhTree()
 {
-	return BuildBvhTree();
+	D_TRACKTIME();
+	ndSceneNode* root = nullptr;
+	switch (m_bvhBuildState.m_state)
+	{
+		case BuildBvhTreeBuildState::m_beginBuild:
+		{
+			BuildBvhTreeInitNodes();
+			m_bvhBuildState.m_state = m_bvhBuildState.m_calculateBoxes;
+			break;
+		}
+
+		case BuildBvhTreeBuildState::m_calculateBoxes:
+		{
+			BuildBvhTreeCalculateLeafBoxes();
+			m_bvhBuildState.m_state = m_bvhBuildState.m_buildLayer;
+			break;
+		}
+
+		case BuildBvhTreeBuildState::m_buildLayer:
+		{
+			dAssert(0);
+			//BuildBvhTreeCalculateLeafBoxes();
+			m_bvhBuildState.m_state = m_bvhBuildState.m_enumarateLayers;
+			break;
+		}
+		
+		default:
+			dAssert(0);
+	}
+
+	return root;
 }
 
 

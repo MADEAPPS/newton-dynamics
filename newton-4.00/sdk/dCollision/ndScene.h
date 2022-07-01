@@ -167,6 +167,14 @@ class ndScene : public ndThreadPool
 	class BuildBvhTreeBuildState
 	{
 		public:
+		enum ndState
+		{
+			m_beginBuild,
+			m_calculateBoxes,
+			m_buildLayer,
+			m_enumarateLayers,
+		};
+
 		BuildBvhTreeBuildState();
 
 		void Init(ndUnsigned32 maxCount);
@@ -186,6 +194,7 @@ class ndScene : public ndThreadPool
 
 		ndUnsigned32 m_depthLevel;
 		ndUnsigned32 m_leafNodesCount;
+		ndState m_state;
 	};
 
 	ndSceneNode* BuildBvhTree();
