@@ -82,6 +82,7 @@ class ndSceneBodyNode: public ndSceneNode
 class ndSceneTreeNode: public ndSceneNode
 {
 	public:
+	D_COLLISION_API ndSceneTreeNode();
 	D_COLLISION_API ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode);
 	D_COLLISION_API virtual ~ndSceneTreeNode();
 

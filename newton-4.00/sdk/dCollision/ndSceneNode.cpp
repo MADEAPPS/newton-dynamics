@@ -49,6 +49,20 @@ ndSceneBodyNode::~ndSceneBodyNode()
 	m_body->SetSceneBodyNode(nullptr);
 }
 
+ndSceneTreeNode::ndSceneTreeNode()
+	:ndSceneNode(nullptr)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_fitnessNode(nullptr)
+{
+	dAssert(0);
+#ifdef _DEBUG
+	static ndInt32 nodeId = 1000000;
+	m_nodeId = nodeId;
+	nodeId++;
+#endif
+}
+
 ndSceneTreeNode::ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode)
 	:ndSceneNode(sibling->m_parent)
 	,m_left(sibling)

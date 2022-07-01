@@ -54,11 +54,18 @@ ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
 	:ndListView<ndSceneTreeNode>(src)
 	,m_scansCount(0)
 {
+	dAssert(0);
 }
 
 void ndScene::ndFitnessList::AddNode(ndSceneTreeNode* const node)
 {
 	node->m_fitnessNode = AddItem(node);
+
+#ifdef D_NEW_SCENE
+	dAssert(0);
+	ndSceneTreeNode* const constructionNode = new ndSceneTreeNode;
+	constructionNode->m_fitnessNode = m_contruction.Append(constructionNode);
+#endif
 }
 
 void ndScene::ndFitnessList::RemoveNode(ndSceneTreeNode* const node)
