@@ -179,6 +179,7 @@ class ndScene : public ndThreadPool
 		ndArray<ndCellScanPrefix> m_cellCounts1;
 		ndArray<ndSceneNode*> m_tempNodeBuffer;
 
+		ndSceneNode* m_root;
 		ndSceneNode** m_srcArray;
 		ndSceneNode** m_tmpArray;
 		ndSceneNode** m_parentsArray;
@@ -189,8 +190,10 @@ class ndScene : public ndThreadPool
 
 	ndSceneNode* BuildBvhTree();
 	void BuildBvhTreeInitNodes();
+	void BuildBvhTreeSetNodesDepth();
 	void BuildBvhGenerateLayerGrids();
 	void BuildBvhTreeCalculateLeafBoxes();
+	
 #else
 	class BoxInfo
 	{

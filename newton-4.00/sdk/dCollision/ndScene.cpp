@@ -1875,6 +1875,7 @@ ndScene::BuildBvhTreeBuildState::BuildBvhTreeBuildState()
 	,m_cellCounts0(1024)
 	,m_cellCounts1(1024)
 	,m_tempNodeBuffer(1024)
+	,m_root(nullptr)
 	,m_srcArray(nullptr)
 	,m_tmpArray(nullptr)
 	,m_parentsArray(nullptr)
@@ -1888,6 +1889,7 @@ void ndScene::BuildBvhTreeBuildState::Init(ndUnsigned32 maxCount)
 	m_depthLevel = 1;
 	m_tempNodeBuffer.SetCount(4 * (maxCount + 4));
 
+	m_root = nullptr;
 	m_srcArray = &m_tempNodeBuffer[0];
 	m_tmpArray = &m_srcArray[2 * (maxCount + 4)];
 	m_parentsArray = &m_srcArray[maxCount];
@@ -2290,7 +2292,7 @@ void ndScene::BuildBvhTreeInitNodes()
 		const ndArray<ndBodyKinematic*>& activeBodyArray = GetActiveBodyArray();
 
 		ndSceneNode** const srcArray = m_bvhBuildState.m_srcArray;
-		const ndUnsigned32 baseCount = m_bvhBuildState.m_leafNodesCount - 1;
+		const ndUnsigned32 baseCount = m_bvhBuildState.m_leafNodesCount;
 
 		const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -2329,7 +2331,6 @@ void ndScene::BuildBvhTreeInitNodes()
 	ParallelExecute(CopySceneNode);
 }
 
-
 void ndScene::BuildBvhTreeCalculateLeafBoxes()
 {
 	D_TRACKTIME();
@@ -2344,7 +2345,7 @@ void ndScene::BuildBvhTreeCalculateLeafBoxes()
 		ndFloat32 minSize = ndFloat32(1.0e15f);
 
 		ndSceneNode** const srcArray = m_bvhBuildState.m_srcArray;
-		const ndUnsigned32 leafNodesCount = m_bvhBuildState.m_leafNodesCount - 1;;
+		const ndUnsigned32 leafNodesCount = m_bvhBuildState.m_leafNodesCount;
 		const ndStartEnd startEnd(leafNodesCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -2642,7 +2643,6 @@ void ndScene::BuildBvhGenerateLayerGrids()
 		}
 		if (sum)
 		{
-			dAssert(0);
 			m_bvhBuildState.m_cellCounts1[bashCount].m_location = sum;
 			ndUnsigned32 subTreeDepth = BuildSmallBvhTree(m_bvhBuildState.m_parentsArray, bashCount);
 			m_bvhBuildState.m_depthLevel += subTreeDepth;
@@ -2712,52 +2712,56 @@ void ndScene::BuildBvhGenerateLayerGrids()
 	}
 }
 
+void ndScene::BuildBvhTreeSetNodesDepth()
+{
+	class ndSortGetDethpKey
+	{
+		public:
+		ndSortGetDethpKey(const void* const)
+		{
+		}
+	
+		ndUnsigned32 GetKey(const ndSceneTreeNode* const node) const
+		{
+			return node->m_depthLevel;
+		}
+	};
+	
+	ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
+	ndSceneTreeNode** tmpBuffer = (ndSceneTreeNode**)&m_bvhBuildState.m_tempNodeBuffer[0];
+	
+	ndUnsigned32 scans[257];
+	ndCountingSortInPlace<ndSceneTreeNode*, ndSortGetDethpKey, 8>(*this, &view[0], tmpBuffer, view.GetCount(), scans, nullptr);
+	
+	m_fitness.m_scansCount = 0;
+	for (ndInt32 i = 1; (i < 257) && (scans[i] < ndUnsigned32(view.GetCount())); ++i)
+	{
+		m_fitness.m_scans[i - 1] = scans[i];
+		m_fitness.m_scansCount++;
+	}
+	m_fitness.m_scans[m_fitness.m_scansCount] = scans[m_fitness.m_scansCount + 1];
+	dAssert(m_fitness.m_scans[0] == 0);
+}
+
 ndSceneNode* ndScene::BuildBvhTree()
 {
 	D_TRACKTIME();
 	m_bvhBuildState.Init(m_bodyList.GetCount());
+
 	BuildBvhTreeInitNodes();
 	BuildBvhTreeCalculateLeafBoxes();
-
 	while (m_bvhBuildState.m_leafNodesCount > 1)
 	{
 		m_bvhBuildState.m_size = m_bvhBuildState.m_size * ndVector::m_two;
 		BuildBvhGenerateLayerGrids();
 	}
 
-	//ndSceneNode* const root = srcArray[0];
-	//
-	//class ndSortGetDethpKey
-	//{
-	//	public:
-	//	ndSortGetDethpKey(const void* const)
-	//	{
-	//	}
-	//
-	//	ndUnsigned32 GetKey(const ndSceneTreeNode* const node) const
-	//	{
-	//		return node->m_depthLevel;
-	//	}
-	//};
-	//
-	//ndArray<ndSceneTreeNode*>& view = m_fitness.GetView();
-	//ndSceneTreeNode** tmpBuffer = (ndSceneTreeNode**)&m_scratchBuffer[0];
-	//
-	//ndUnsigned32 scans[257];
-	//ndCountingSortInPlace<ndSceneTreeNode*, ndSortGetDethpKey, 8>(*this, &view[0], tmpBuffer, view.GetCount(), scans, nullptr);
-	//
-	//m_fitness.m_scansCount = 0;
-	//for (ndInt32 i = 1; (i < 257) && (scans[i] < ndUnsigned32(view.GetCount())); ++i)
-	//{
-	//	m_fitness.m_scans[i - 1] = scans[i];
-	//	m_fitness.m_scansCount++;
-	//}
-	//m_fitness.m_scans[m_fitness.m_scansCount] = scans[m_fitness.m_scansCount + 1];
-	//dAssert(m_fitness.m_scans[0] == 0);
-	//
-	//dAssert(root->SanityCheck(0));
-	//return root;
-	return nullptr;
+	m_bvhBuildState.m_root = m_bvhBuildState.m_srcArray[0];
+
+	BuildBvhTreeSetNodesDepth();
+	dAssert(m_bvhBuildState.m_root->SanityCheck(0));
+
+	return m_bvhBuildState.m_root;
 }
 
 
