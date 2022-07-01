@@ -2327,6 +2327,8 @@ void ndScene::BuildBvhTreeInitNodes()
 	});
 
 	UpdateBodyList();
+	m_bvhBuildState.Init(m_bodyList.GetCount());
+
 	ParallelExecute(CopyBodyNodes);
 	ParallelExecute(CopySceneNode);
 }
@@ -2746,8 +2748,6 @@ void ndScene::BuildBvhTreeSetNodesDepth()
 ndSceneNode* ndScene::BuildBvhTree()
 {
 	D_TRACKTIME();
-	m_bvhBuildState.Init(m_bodyList.GetCount());
-
 	BuildBvhTreeInitNodes();
 	BuildBvhTreeCalculateLeafBoxes();
 	while (m_bvhBuildState.m_leafNodesCount > 1)
@@ -2762,6 +2762,11 @@ ndSceneNode* ndScene::BuildBvhTree()
 	dAssert(m_bvhBuildState.m_root->SanityCheck(0));
 
 	return m_bvhBuildState.m_root;
+}
+
+ndSceneNode* ndScene::BuildIncrementalBvhTree()
+{
+	return BuildBvhTree();
 }
 
 
@@ -3619,9 +3624,9 @@ ndSceneNode* ndScene::BuildBvhTree()
 	return root;
 }
 
-#endif
-
 ndSceneNode* ndScene::BuildIncrementalBvhTree()
 {
 	return BuildBvhTree();
 }
+#endif
+
