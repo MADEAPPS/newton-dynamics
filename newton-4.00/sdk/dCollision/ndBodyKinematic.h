@@ -29,7 +29,6 @@
 #include "ndConstraint.h"
 
 class ndScene;
-class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
@@ -190,8 +189,6 @@ class ndBodyKinematic : public ndBody
 	void PrepareStep(ndInt32 index);
 	void SetSceneNodes(ndScene* const scene, ndBodyList::ndNode* const node);
 
-	ndSceneBodyNode* GetSceneBodyNode() const;
-	void SetSceneBodyNode(ndSceneBodyNode* const node);
 	virtual void AddDampingAcceleration(ndFloat32 timestep);
 	
 	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
@@ -211,7 +208,6 @@ class ndBodyKinematic : public ndBody
 	ndScene* m_scene;
 	ndBodyKinematic* m_islandParent;
 	ndBodyList::ndNode* m_sceneNode;
-	ndSceneBodyNode* m_sceneBodyNode;
 	ndSkeletonContainer* m_skeletonContainer;
 	ndList<ndBodyKinematic*>::ndNode* m_spetialUpdateNode;
 
@@ -220,6 +216,8 @@ class ndBodyKinematic : public ndBody
 	ndFloat32 m_weigh;
 	ndInt32 m_rank;
 	ndInt32 m_index;
+	ndInt32 m_bodyNodeIndex;
+	ndInt32 m_sceneNodeIndex;
 	D_COLLISION_API static ndVector m_velocTol;
 
 	friend class ndWorld;
@@ -335,16 +333,6 @@ inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyList::ndN
 {
 	m_scene = scene;
 	m_sceneNode = node;
-}
-
-inline ndSceneBodyNode* ndBodyKinematic::GetSceneBodyNode() const
-{
-	return m_sceneBodyNode;
-}
-
-inline void ndBodyKinematic::SetSceneBodyNode(ndSceneBodyNode* const node)
-{
-	m_sceneBodyNode = node;
 }
 
 inline ndVector ndBodyKinematic::GetForce() const

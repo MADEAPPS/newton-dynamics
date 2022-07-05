@@ -35,12 +35,13 @@ class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 	ndSceneNode(ndSceneNode* const parent);
 	virtual ~ndSceneNode();
 
+	void Kill();
 	void GetAabb(ndVector& minBox, ndVector& maxBox) const;
 	void SetAabb(const ndVector& minBox, const ndVector& maxBox);
 
-	virtual ndSceneNode* GetAsSceneNode();
-	virtual ndSceneBodyNode* GetAsSceneBodyNode();
-	virtual ndSceneTreeNode* GetAsSceneTreeNode();
+	virtual ndSceneNode* GetAsSceneNode() const;
+	virtual ndSceneBodyNode* GetAsSceneBodyNode() const;
+	virtual ndSceneTreeNode* GetAsSceneTreeNode() const;
 	
 	virtual ndSceneNode* GetLeft() const;
 	virtual ndSceneNode* GetRight() const;
@@ -53,6 +54,7 @@ class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 	ndSceneNode* m_parent;
 	ndSpinLock m_lock;
 	ndInt32 m_depthLevel;
+	ndUnsigned8 m_isDead;
 	ndUnsigned8 m_bhvLinked;
 #ifdef _DEBUG
 	ndInt32 m_nodeId;
@@ -66,10 +68,13 @@ D_MSV_NEWTON_ALIGN_32
 class ndSceneBodyNode: public ndSceneNode
 {
 	public:
-	D_COLLISION_API ndSceneBodyNode(ndBodyKinematic* const body);
-	D_COLLISION_API virtual ~ndSceneBodyNode();
+	ndSceneBodyNode(ndBodyKinematic* const body);
+	virtual ~ndSceneBodyNode();
 
-	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return this; }
+	virtual ndSceneBodyNode* GetAsSceneBodyNode() const 
+	{ 
+		return (ndSceneBodyNode*)this;
+	}
 
 	virtual ndBodyKinematic* GetBody() const
 	{
@@ -82,11 +87,13 @@ class ndSceneBodyNode: public ndSceneNode
 class ndSceneTreeNode: public ndSceneNode
 {
 	public:
-	D_COLLISION_API ndSceneTreeNode();
-	D_COLLISION_API ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode);
-	D_COLLISION_API virtual ~ndSceneTreeNode();
+	ndSceneTreeNode();
+	virtual ~ndSceneTreeNode();
 
-	virtual ndSceneTreeNode* GetAsSceneTreeNode() { return this; }
+	virtual ndSceneTreeNode* GetAsSceneTreeNode() const 
+	{ 
+		return (ndSceneTreeNode*)this;
+	}
 	
 	virtual ndSceneNode* GetLeft() const
 	{
@@ -102,7 +109,6 @@ class ndSceneTreeNode: public ndSceneNode
 
 	ndSceneNode* m_left;
 	ndSceneNode* m_right;
-	ndList<ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>::ndNode* m_fitnessNode;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
@@ -111,6 +117,7 @@ inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
 	,m_lock()
+	,m_isDead(0)
 	,m_depthLevel(0)
 	,m_bhvLinked(0)
 {
@@ -123,17 +130,17 @@ inline ndSceneNode::~ndSceneNode()
 {
 }
 
-inline ndSceneNode* ndSceneNode::GetAsSceneNode()
+inline ndSceneNode* ndSceneNode::GetAsSceneNode() const
 { 
-	return this; 
+	return (ndSceneNode*)this;
 }
 
-inline ndSceneBodyNode* ndSceneNode::GetAsSceneBodyNode()
+inline ndSceneBodyNode* ndSceneNode::GetAsSceneBodyNode() const
 { 
 	return nullptr; 
 }
 
-inline ndSceneTreeNode* ndSceneNode::GetAsSceneTreeNode()
+inline ndSceneTreeNode* ndSceneNode::GetAsSceneTreeNode() const
 { 
 	return nullptr; 
 }
@@ -151,6 +158,11 @@ inline ndSceneNode* ndSceneNode::GetLeft() const
 inline ndSceneNode* ndSceneNode::GetRight() const
 {
 	return nullptr;
+}
+
+inline void ndSceneNode::Kill()
+{
+	m_isDead = 1;
 }
 
 inline void ndSceneNode::GetAabb(ndVector& minBox, ndVector& maxBox) const

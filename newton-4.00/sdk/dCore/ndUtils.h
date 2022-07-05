@@ -32,8 +32,8 @@
 
 inline ndInt32 ndExp2 (ndInt32 x)
 {
-	ndInt32 exp;
-	for (exp = -1; x; x >>= 1) 
+	ndInt32 exp = -1;
+	for (; x; x >>= 1) 
 	{
 		exp ++;
 	}

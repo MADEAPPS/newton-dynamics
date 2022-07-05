@@ -45,10 +45,6 @@
 	#include "ndDynamicsUpdateCuda.h"
 #endif
 
-#if _DEBUG
-ndInt32 xxxxxxxxxxxxxxxxxxx;
-#endif
-
 class ndSkeletonQueue : public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
 	public:
@@ -121,8 +117,6 @@ ndWorld::ndWorld()
 	,m_subSteps(1)
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
-	,m_frameIndex(0)
-	,m_subStepIndex(0)
 	,m_inUpdate(false)
 	,m_collisionUpdate(true)
 {
@@ -202,8 +196,6 @@ void ndWorld::CleanUp()
 		delete body;
 	}
 
-	m_frameIndex = 0;
-	m_subStepIndex = 0;
 	ndBody::m_uniqueIdCount = 1;
 	m_scene->Cleanup();
 }
@@ -430,7 +422,6 @@ void ndWorld::ThreadFunction()
 		m_scene->End();
 	}
 	
-	m_frameIndex++;
 	m_lastExecutionTime = (ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();
 }
@@ -460,10 +451,6 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	D_TRACKTIME();
 
 	// do physics step
-#if _DEBUG
-	xxxxxxxxxxxxxxxxxxx = m_subStepIndex;
-#endif
-
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 
@@ -493,7 +480,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// second pass on models
 	ModelPostUpdate();
 
-	m_subStepIndex++;
+	m_scene->m_subStepIndex++;
 }
 
 void ndWorld::ParticleUpdate(ndFloat32 timestep)

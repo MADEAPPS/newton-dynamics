@@ -177,8 +177,6 @@ class ndWorld: public ndClassAlloc
 	ndInt32 m_subSteps;
 	ndSolverModes m_solverMode;
 	ndInt32 m_solverIterations;
-	ndUnsigned32 m_frameIndex;
-	ndUnsigned32 m_subStepIndex;
 	bool m_inUpdate;
 	bool m_collisionUpdate;
 
@@ -296,7 +294,7 @@ inline ndFloat32 ndWorld::GetExtensionAverageUpdateTime() const
 
 inline ndUnsigned32 ndWorld::GetFrameIndex() const
 {
-	return m_frameIndex;
+	return m_scene->m_frameIndex;
 }
 
 inline void ndWorld::OnPostUpdate(ndFloat32)

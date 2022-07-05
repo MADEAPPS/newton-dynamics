@@ -86,7 +86,6 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_scene(nullptr)
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
-	,m_sceneBodyNode(nullptr)
 	,m_skeletonContainer(nullptr)
 	,m_spetialUpdateNode(nullptr)
 	,m_maxAngleStep(ndFloat32 (45.0f) * ndDegreeToRad)
@@ -94,6 +93,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_weigh(ndFloat32 (0.0f))
 	,m_rank(0)
 	,m_index(0)
+	,m_bodyNodeIndex(-1)
+	,m_sceneNodeIndex(-1)
 {
 	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
@@ -117,12 +118,13 @@ ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_scene(nullptr)
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
-	,m_sceneBodyNode(nullptr)
 	,m_skeletonContainer(nullptr)
 	,m_spetialUpdateNode(nullptr)
 	,m_weigh(ndFloat32(0.0f))
 	,m_rank(0)
 	,m_index(0)
+	,m_bodyNodeIndex(-1)
+	,m_sceneNodeIndex(-1)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
@@ -376,11 +378,12 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 		ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
 		if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
 		{
-			ndSceneBodyNode* const bodyNode = GetSceneBodyNode();
+			ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)scene->m_fitness[m_bodyNodeIndex];
+			dAssert(bodyNode->GetAsSceneBodyNode());
 			dAssert(!bodyNode->GetLeft());
 			dAssert(!bodyNode->GetRight());
 			dAssert(!GetCollisionShape().GetShape()->GetAsShapeNull());
-
+		
 			UpdateCollisionMatrix();
 			const ndInt32 test = dBoxInclusionTest(m_minAabb, m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 			if (!test)

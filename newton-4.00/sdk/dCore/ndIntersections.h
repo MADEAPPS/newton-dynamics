@@ -55,7 +55,6 @@ D_CORE_API bool dRayBoxClip (ndVector& ray_p0, ndVector& ray_p1, const ndVector&
 D_CORE_API ndFloat32 dRayCastBox (const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut);
 D_CORE_API ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius);
 
-
 inline ndInt32 dOverlapTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {
 	ndVector r0(p0 - q1);

@@ -73,20 +73,23 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_body1;
 	};
 
-	class ndFitnessList : public ndListView<ndSceneTreeNode>
+	class ndFitnessList : public ndArray<ndSceneNode*>
 	{
 		public:
 		ndFitnessList();
 		ndFitnessList(const ndFitnessList& src);
+		~ndFitnessList();
 
-		void AddNode(ndSceneTreeNode* const node);
-		void RemoveNode(ndSceneTreeNode* const node);
+		void CleanUp();
+		void Update(ndThreadPool& threadPool);
+		void AddNode(ndSceneNode* const node);
 
 #ifdef D_NEW_SCENE
 		ndListView<ndSceneTreeNode> m_contruction;
 #endif
 
 		ndUnsigned32 m_scansCount;
+		bool m_isDirty;
 		ndUnsigned32 m_scans[256];
 	};
 
@@ -153,8 +156,8 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_cellTest : 1;
 	};
 
-	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
+	void AddNode(ndSceneTreeNode* const newNode, ndSceneBodyNode* const bodyNode);
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 
 	const ndContactArray& GetContactArray() const;
@@ -207,7 +210,6 @@ class ndScene : public ndThreadPool
 	void BuildBvhTreeSetNodesDepth();
 	void BuildBvhGenerateLayerGrids();
 	void BuildBvhTreeCalculateLeafBoxes();
-	
 #else
 	class BoxInfo
 	{
@@ -272,6 +274,8 @@ class ndScene : public ndThreadPool
 	ndFitnessList m_fitness;
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;
+	ndUnsigned32 m_frameIndex;
+	ndUnsigned32 m_subStepIndex;
 	ndUnsigned32 m_forceBalanceSceneCounter;
 
 	static ndVector m_velocTol;

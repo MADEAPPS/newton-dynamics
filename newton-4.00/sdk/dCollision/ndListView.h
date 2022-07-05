@@ -61,7 +61,6 @@ class ndBodyList: public ndListView<ndBodyKinematic>
 	}
 };
 
-
 template<class T>
 ndListView<T>::ndListView()
 	:ndList<T*, ndContainersFreeListAlloc<T*>>()

@@ -69,9 +69,9 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const ndVector& origin, con
 void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndInt32 count)
 {
 	ndMatrix matrix(location);
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
-		for (ndInt32 j = 0; j < count; j++)
+		for (ndInt32 j = 0; j < count; ++j)
 		{
 			//ndVector posit(origin + ndVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f));
 			matrix.m_posit = location.m_posit + ndVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f);
@@ -90,7 +90,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + high + 7.0f;
 
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
@@ -117,11 +117,11 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	ndFloat32 spacing = 2.0f;
 
 	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
-	for (ndInt32 i = 0; i < rows_x; i++)
+	for (ndInt32 z = 0; z < rows_z; ++z)
 	{
-		for (ndInt32 j = 0; j < rows_z; j++)
+		for (ndInt32 x = 0; x < rows_x; ++x)
 		{
-			matrix.m_posit = location.m_posit + ndVector ((j - rows_x / 2) * spacing, 0.0f, (i - rows_z / 2) * spacing, 0.0f);
+			matrix.m_posit = location.m_posit + ndVector ((x - rows_x / 2) * spacing, 0.0f, (z - rows_z / 2) * spacing, 0.0f);
 			AddShape(scene, rootEntity, shape, mass, matrix, high, columHigh);
 		}
 	}
@@ -179,7 +179,7 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix&
 {
 	ndInt32 count = 0;
 	ndVector points[1024 * 8];
-	for (ndInt32 i = 0; i < segments; i++)
+	for (ndInt32 i = 0; i < segments; ++i)
 	{
 		ndFloat32 angle = ndFloat32(2.0f) * ndPi * i / segments;
 		ndFloat32 x = radius * ndCos(angle);
