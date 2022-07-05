@@ -135,26 +135,29 @@ void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 		}
 		SetCount(alivedStart);
 
-		auto EnumerateNodes = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+		if (GetCount())
 		{
-			D_TRACKTIME_NAMED(MarkCellBounds);
-			const ndInt32 baseCount = GetCount() / 2;
-			ndSceneNode** const nodes = &(*this)[0];
-			const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
-
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			auto EnumerateNodes = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				ndSceneTreeNode* const sceneNode = (ndSceneTreeNode*)nodes[i];
-				ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)nodes[baseCount + i];
-				dAssert(bodyNode->GetAsSceneBodyNode());
-				dAssert(sceneNode->GetAsSceneTreeNode());
+				D_TRACKTIME_NAMED(MarkCellBounds);
+				const ndInt32 baseCount = GetCount() / 2;
+				ndSceneNode** const nodes = &(*this)[0];
+				const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
 
-				ndBodyKinematic* const body = bodyNode->m_body;
-				body->m_sceneNodeIndex = i;
-				body->m_bodyNodeIndex = baseCount + i;
-			}
-		});
-		threadPool.ParallelExecute(EnumerateNodes);
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					ndSceneTreeNode* const sceneNode = (ndSceneTreeNode*)nodes[i];
+					ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)nodes[baseCount + i];
+					dAssert(bodyNode->GetAsSceneBodyNode());
+					dAssert(sceneNode->GetAsSceneTreeNode());
+
+					ndBodyKinematic* const body = bodyNode->m_body;
+					body->m_sceneNodeIndex = i;
+					body->m_bodyNodeIndex = baseCount + i;
+				}
+			});
+			threadPool.ParallelExecute(EnumerateNodes);
+		}
 
 		m_isDirty = 0;
 	}
