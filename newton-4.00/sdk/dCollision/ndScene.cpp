@@ -51,12 +51,12 @@ ndScene::ndFitnessList::ndFitnessList()
 {
 }
 
-ndScene::ndFitnessList::ndFitnessList(const ndFitnessList&)
+ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
 	:ndArray<ndSceneNode*>(1024)
 	,m_scansCount(0)
 	,m_isDirty(true)
 {
-	dAssert(0);
+	Swap((ndFitnessList&)src);
 }
 
 ndScene::ndFitnessList::~ndFitnessList()
@@ -244,18 +244,17 @@ ndScene::ndScene(const ndScene& src)
 		m_specialUpdateList.Append(node);
 	}
 
-	dAssert(0);
-	//for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndBodyKinematic* const body = node->GetInfo();
-	//	body->m_sceneForceUpdate = 1;
-	//	ndSceneBodyNode* const sceneNode = body->GetSceneBodyNode();
-	//	if (sceneNode)
-	//	{
-	//		body->SetSceneNodes(this, node);
-	//	}
-	//	dAssert (body->GetContactMap().SanityCheck());
-	//}
+	for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyKinematic* const body = node->GetInfo();
+		body->m_sceneForceUpdate = 1;
+		ndScene* const sceneNode = body->GetScene();
+		if (sceneNode)
+		{
+			body->SetSceneNodes(this, node);
+		}
+		dAssert (body->GetContactMap().SanityCheck());
+	}
 
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 	{
