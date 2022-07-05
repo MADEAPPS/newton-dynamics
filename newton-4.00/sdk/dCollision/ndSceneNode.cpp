@@ -43,8 +43,24 @@ ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 	SetAabb(body->m_minAabb, body->m_maxAabb);
 }
 
+ndSceneBodyNode::ndSceneBodyNode(const ndSceneBodyNode& src)
+	:ndSceneNode(src)
+	,m_body(src.m_body)
+{
+#ifdef _DEBUG
+	m_nodeId = src.m_nodeId;
+#endif
+	SetAabb(src.m_minBox, src.m_maxBox);
+}
+
 ndSceneBodyNode::~ndSceneBodyNode()
 {
+}
+
+ndSceneNode* ndSceneBodyNode::Clone() const
+{
+	ndSceneNode* const node = new ndSceneBodyNode(*this);
+	return node;
 }
 
 ndSceneTreeNode::ndSceneTreeNode()
@@ -57,6 +73,22 @@ ndSceneTreeNode::ndSceneTreeNode()
 	m_nodeId = nodeId;
 	nodeId++;
 #endif
+}
+
+ndSceneTreeNode::ndSceneTreeNode(const ndSceneTreeNode& src)
+	:ndSceneNode(src)
+	,m_left(nullptr)
+	,m_right(nullptr)
+{
+#ifdef _DEBUG
+	m_nodeId = src.m_nodeId;
+#endif
+}
+
+ndSceneNode* ndSceneTreeNode::Clone() const
+{
+	ndSceneNode* const node = new ndSceneTreeNode(*this);
+	return node;
 }
 
 ndSceneTreeNode::~ndSceneTreeNode()

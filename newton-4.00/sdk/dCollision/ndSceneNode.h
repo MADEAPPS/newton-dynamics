@@ -33,7 +33,9 @@ class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 {
 	public:
 	ndSceneNode(ndSceneNode* const parent);
+	ndSceneNode(const ndSceneNode& src);
 	virtual ~ndSceneNode();
+	virtual ndSceneNode* Clone() const;
 
 	void Kill();
 	void GetAabb(ndVector& minBox, ndVector& maxBox) const;
@@ -69,7 +71,10 @@ class ndSceneBodyNode: public ndSceneNode
 {
 	public:
 	ndSceneBodyNode(ndBodyKinematic* const body);
+	ndSceneBodyNode(const ndSceneBodyNode& src);
 	virtual ~ndSceneBodyNode();
+
+	virtual ndSceneNode* Clone() const;
 
 	virtual ndSceneBodyNode* GetAsSceneBodyNode() const 
 	{ 
@@ -88,7 +93,9 @@ class ndSceneTreeNode: public ndSceneNode
 {
 	public:
 	ndSceneTreeNode();
+	ndSceneTreeNode(const ndSceneTreeNode& src);
 	virtual ~ndSceneTreeNode();
+	virtual ndSceneNode* Clone() const;
 
 	virtual ndSceneTreeNode* GetAsSceneTreeNode() const 
 	{ 
@@ -116,6 +123,21 @@ inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
 	,m_minBox(ndFloat32(-1.0e15f))
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
+	,m_lock()
+	,m_isDead(0)
+	,m_depthLevel(0)
+	,m_bhvLinked(0)
+{
+#ifdef _DEBUG
+	m_nodeId = 0;
+#endif
+}
+
+inline ndSceneNode::ndSceneNode(const ndSceneNode& src)
+	:ndContainersFreeListAlloc<ndSceneNode>()
+	,m_minBox(src.m_minBox)
+	,m_maxBox(src.m_maxBox)
+	,m_parent(nullptr)
 	,m_lock()
 	,m_isDead(0)
 	,m_depthLevel(0)
@@ -185,6 +207,12 @@ inline void ndSceneNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 
 	dAssert(m_minBox.m_w == ndFloat32(0.0f));
 	dAssert(m_maxBox.m_w == ndFloat32(0.0f));
+}
+
+inline ndSceneNode* ndSceneNode::Clone() const
+{
+	dAssert(0);
+	return nullptr;
 }
 
 #endif

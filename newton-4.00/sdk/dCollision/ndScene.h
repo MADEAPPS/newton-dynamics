@@ -84,10 +84,7 @@ class ndScene : public ndThreadPool
 		void Update(ndThreadPool& threadPool);
 		void AddNode(ndSceneNode* const node);
 
-#ifdef D_NEW_SCENE
-		//ndListView<ndSceneTreeNode> m_contruction;
-#endif
-
+		ndArray<ndSceneNode*> m_buildArray;
 		ndUnsigned32 m_scans[256];
 		ndUnsigned32 m_scansCount;
 		bool m_isDirty;
