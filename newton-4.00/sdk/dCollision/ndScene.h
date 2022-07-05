@@ -85,12 +85,12 @@ class ndScene : public ndThreadPool
 		void AddNode(ndSceneNode* const node);
 
 #ifdef D_NEW_SCENE
-		ndListView<ndSceneTreeNode> m_contruction;
+		//ndListView<ndSceneTreeNode> m_contruction;
 #endif
 
+		ndUnsigned32 m_scans[256];
 		ndUnsigned32 m_scansCount;
 		bool m_isDirty;
-		ndUnsigned32 m_scans[256];
 	};
 
 	public:
