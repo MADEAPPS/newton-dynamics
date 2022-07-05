@@ -1346,7 +1346,13 @@ void ndScene::AddNode(ndSceneTreeNode* const childNode, ndSceneBodyNode* const b
 				break;
 			}
 		}
-		dAssert(depth < 128);
+#ifdef _DEBUG
+		//dAssert(depth < 128);
+		if (depth >= 256)
+		{
+			dTrace(("This may be a pathological scene, consider balancing the scene\n"));
+		}
+#endif
 	}
 	else
 	{
