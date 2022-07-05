@@ -77,7 +77,7 @@ void ndScene::ndFitnessList::CleanUp()
 
 void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 {
-	if (m_isDirty)
+	if (m_isDirty && GetCount())
 	{
 		D_TRACKTIME();
 		const ndInt32 count = GetCount();
@@ -431,10 +431,6 @@ void ndScene::BalanceScene()
 		}
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode->m_parent);
-	}
-	else
-	{
-		dAssert(0);
 	}
 }
 
