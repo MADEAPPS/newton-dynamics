@@ -1343,7 +1343,7 @@ void ndScene::AddNode(ndSceneTreeNode* const childNode, ndSceneBodyNode* const b
 				break;
 			}
 		}
-		dAssert(depth < 64);
+		dAssert(depth < 128);
 	}
 	else
 	{

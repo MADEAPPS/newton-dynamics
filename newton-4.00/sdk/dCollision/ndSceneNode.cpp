@@ -110,6 +110,8 @@ bool ndSceneTreeNode::SanityCheck(ndUnsigned32 level) const
 bool ndSceneNode::SanityCheck(ndUnsigned32 level) const
 {
 	char margin[512];
+	level = ndMin(level, ndUnsigned32(sizeof(margin) / 2 - 1));
+
 	for (ndUnsigned32 i = 0; i < level; ++i)
 	{
 		margin[i * 2] = ' ';
