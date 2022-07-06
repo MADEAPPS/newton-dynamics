@@ -203,7 +203,7 @@ class ndScene : public ndThreadPool
 	};
 
 	ndSceneNode* BuildBvhTree();
-	void BuildBvhTreeInitNodes();
+	bool BuildBvhTreeInitNodes();
 	void BuildBvhTreeSetNodesDepth();
 	void BuildBvhGenerateLayerGrids();
 	void BuildBvhTreeCalculateLeafBoxes();

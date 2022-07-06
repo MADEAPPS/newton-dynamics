@@ -439,7 +439,7 @@ void ndScene::BalanceScene()
 			m_rootNode = BuildBvhTree();
 		}
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
-		dAssert(!m_rootNode->m_parent);
+		dAssert(!m_rootNode || !m_rootNode->m_parent);
 	}
 }
 
@@ -3354,7 +3354,7 @@ ndUnsigned32 ndScene::BuildSmallBvhTree(ndSceneNode** const parentsArray, ndUnsi
 	return depth;
 }
 
-void ndScene::BuildBvhTreeInitNodes()
+bool ndScene::BuildBvhTreeInitNodes()
 {
 	D_TRACKTIME();
 	auto CopyBodyNodes = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
@@ -3401,10 +3401,15 @@ void ndScene::BuildBvhTreeInitNodes()
 	});
 
 	UpdateBodyList();
-	m_bvhBuildState.Init(m_bodyList.GetCount());
-
-	ParallelExecute(CopyBodyNodes);
-	ParallelExecute(CopySceneNode);
+	bool ret = false;
+	if (m_fitness.GetCount())
+	{
+		ret = true;
+		m_bvhBuildState.Init(m_bodyList.GetCount());
+		ParallelExecute(CopyBodyNodes);
+		ParallelExecute(CopySceneNode);
+	}
+	return ret;
 }
 
 void ndScene::BuildBvhTreeCalculateLeafBoxes()
@@ -3826,7 +3831,10 @@ ndSceneNode* ndScene::BuildBvhTree()
 
 	//while (!BuildIncrementalBvhTree());
 
-	BuildBvhTreeInitNodes();
+	if (!BuildBvhTreeInitNodes())
+	{
+		return nullptr;
+	}
 	BuildBvhTreeCalculateLeafBoxes();
 	while (m_bvhBuildState.m_leafNodesCount > 1)
 	{
@@ -3850,8 +3858,10 @@ ndSceneNode* ndScene::BuildIncrementalBvhTree()
 	{
 		case BuildBvhTreeBuildState::m_beginBuild:
 		{
-			BuildBvhTreeInitNodes();
-			m_bvhBuildState.m_state = m_bvhBuildState.m_calculateBoxes;
+			if (BuildBvhTreeInitNodes())
+			{
+				m_bvhBuildState.m_state = m_bvhBuildState.m_calculateBoxes;
+			}
 			break;
 		}
 
