@@ -216,7 +216,7 @@ class ndScene : public ndThreadPool
 	};
 
 	ndSceneNode* BuildBvhTree();
-	void BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray);
+	bool BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray);
 	BoxInfo BuildBvhTreeCalculateLeafBoxes(ndSceneNode** const srcArray);
 #endif
 

@@ -2443,7 +2443,7 @@ ndUnsigned32 ndScene::BuildSmallBvhTree(ndSceneNode** const parentsArray, ndUnsi
 	return depth;
 }
 
-void ndScene::BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray)
+bool ndScene::BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray)
 {
 	D_TRACKTIME();
 	auto CopyBodyNodes = ndMakeObject::ndFunction([this, srcArray](ndInt32 threadIndex, ndInt32 threadCount)
@@ -2491,8 +2491,14 @@ void ndScene::BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** 
 	});
 	
 	UpdateBodyList();
-	ParallelExecute(CopyBodyNodes);
-	ParallelExecute(CopySceneNode);
+	bool ret = false;
+	if (m_fitness.GetCount())
+	{
+		ret = true;
+		ParallelExecute(CopyBodyNodes);
+		ParallelExecute(CopySceneNode);
+	}
+	return ret;
 }
 
 ndScene::BoxInfo ndScene::BuildBvhTreeCalculateLeafBoxes(ndSceneNode** const srcArray)
@@ -2700,7 +2706,10 @@ ndSceneNode* ndScene::BuildBvhTree()
 		}
 	};
 
-	BuildBvhTreeInitNodes(srcArray, parentsArray);
+	if (!BuildBvhTreeInitNodes(srcArray, parentsArray))
+	{
+		return nullptr;
+	}
 	BoxInfo info(BuildBvhTreeCalculateLeafBoxes(srcArray));
 	
 	ndUnsigned32 prefixScan[8];
