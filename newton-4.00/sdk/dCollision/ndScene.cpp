@@ -439,6 +439,15 @@ void ndScene::BalanceScene()
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode || !m_rootNode->m_parent);
 	}
+	else
+	{
+		m_fitness.Update(*this);
+	}
+
+	if (!m_bodyList.GetCount())
+	{
+		m_rootNode = nullptr;
+	}
 }
 
 void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body)
