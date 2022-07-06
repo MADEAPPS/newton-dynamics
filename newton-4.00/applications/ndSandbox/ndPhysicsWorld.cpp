@@ -220,7 +220,6 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 		m_manager->AddEntity(entity);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(m_manager, entity));
-		
 	}
 
 	return true;
@@ -233,6 +232,13 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 
 	ndInt32 maxSteps = MAX_PHYSICS_STEPS;
 	m_timeAccumulator += timestep;
+
+static int xxxx;
+xxxx++;
+if (xxxx == 500)
+{
+	QueueBodyForDelete(GetBodyList().GetFirst()->GetInfo());
+}
 
 	// if the time step is more than max timestep par frame, throw away the extra steps.
 	if (m_timeAccumulator > descreteStep * maxSteps)

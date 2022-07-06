@@ -430,8 +430,6 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 void ndScene::BalanceScene()
 {
 	D_TRACKTIME();
-
-	//dAssert(m_rootNode->SanityCheck(0));
 	if (m_fitness.GetCount() > 2)
 	{
 		if (!m_forceBalanceSceneCounter)
