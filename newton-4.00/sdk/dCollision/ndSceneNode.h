@@ -75,16 +75,8 @@ class ndSceneBodyNode: public ndSceneNode
 	virtual ~ndSceneBodyNode();
 
 	virtual ndSceneNode* Clone() const;
-
-	virtual ndSceneBodyNode* GetAsSceneBodyNode() const 
-	{ 
-		return (ndSceneBodyNode*)this;
-	}
-
-	virtual ndBodyKinematic* GetBody() const
-	{
-		return m_body;
-	}
+	virtual ndBodyKinematic* GetBody() const;
+	virtual ndSceneBodyNode* GetAsSceneBodyNode() const;
 
 	ndBodyKinematic* m_body;
 } D_GCC_NEWTON_ALIGN_32 ;
@@ -97,20 +89,9 @@ class ndSceneTreeNode: public ndSceneNode
 	virtual ~ndSceneTreeNode();
 	virtual ndSceneNode* Clone() const;
 
-	virtual ndSceneTreeNode* GetAsSceneTreeNode() const 
-	{ 
-		return (ndSceneTreeNode*)this;
-	}
-	
-	virtual ndSceneNode* GetLeft() const
-	{
-		return m_left;
-	}
-	
-	virtual ndSceneNode* GetRight() const
-	{
-		return m_right;
-	}
+	virtual ndSceneNode* GetLeft() const;
+	virtual ndSceneNode* GetRight() const;
+	virtual ndSceneTreeNode* GetAsSceneTreeNode() const;
 
 	bool SanityCheck(ndUnsigned32 level) const;
 
@@ -213,6 +194,31 @@ inline ndSceneNode* ndSceneNode::Clone() const
 {
 	dAssert(0);
 	return nullptr;
+}
+
+inline ndSceneBodyNode* ndSceneBodyNode::GetAsSceneBodyNode() const
+{
+	return (ndSceneBodyNode*)this;
+}
+
+inline ndBodyKinematic* ndSceneBodyNode::GetBody() const
+{
+	return m_body;
+}
+
+inline ndSceneTreeNode* ndSceneTreeNode::GetAsSceneTreeNode() const
+{
+	return (ndSceneTreeNode*)this;
+}
+
+inline ndSceneNode* ndSceneTreeNode::GetLeft() const
+{
+	return m_left;
+}
+
+inline ndSceneNode* ndSceneTreeNode::GetRight() const
+{
+	return m_right;
 }
 
 #endif

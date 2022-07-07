@@ -400,8 +400,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndCudaSolver;
-	m_solverMode = ndWorld::ndSimdAvx2Solver;
-	//m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndSimdAvx2Solver;
+	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
