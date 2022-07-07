@@ -73,7 +73,7 @@ class ndScene : public ndThreadPool
 		ndUnsigned32 m_body1;
 	};
 
-	class ndFitnessList : public ndArray<ndSceneNode*>
+	class ndFitnessList
 	{
 		public:
 		ndFitnessList();
@@ -84,7 +84,8 @@ class ndScene : public ndThreadPool
 		void Update(ndThreadPool& threadPool);
 		void AddNode(ndSceneNode* const node);
 
-		ndArray<ndSceneNode*> m_buildArray;
+		ndArray<ndSceneNode*> m_workingArray;
+		//ndArray<ndSceneNode*> m_buildArray;
 		ndUnsigned32 m_scans[256];
 		ndUnsigned32 m_scansCount;
 		bool m_isDirty;
@@ -167,7 +168,6 @@ class ndScene : public ndThreadPool
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-#ifdef D_NEW_SCENE
 	class ndBuildBvhTreeBuildState
 	{
 		public:
@@ -207,18 +207,6 @@ class ndScene : public ndThreadPool
 	void BuildBvhTreeSetNodesDepth();
 	void BuildBvhGenerateLayerGrids();
 	void BuildBvhTreeCalculateLeafBoxes();
-#else
-	class BoxInfo
-	{
-		public:
-		ndVector m_size;
-		ndVector m_origin;
-	};
-
-	ndSceneNode* BuildBvhTree();
-	bool BuildBvhTreeInitNodes(ndSceneNode** const srcArray, ndSceneNode** const parentsArray);
-	BoxInfo BuildBvhTreeCalculateLeafBoxes(ndSceneNode** const srcArray);
-#endif
 
 	ndSceneNode* BuildIncrementalBvhTree();
 	ndUnsigned32 BuildSmallBvhTree(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
@@ -254,15 +242,7 @@ class ndScene : public ndThreadPool
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
-
-#ifdef D_NEW_SCENE
 	ndBuildBvhTreeBuildState m_bvhBuildState;
-#else
-	ndArray<ndBottomUpCell> m_cellBuffer0;
-	ndArray<ndBottomUpCell> m_cellBuffer1;
-	ndArray<ndCellScanPrefix> m_cellCounts0;
-	ndArray<ndCellScanPrefix> m_cellCounts1;
-#endif
 
 	ndSpinLock m_lock;
 	ndSceneNode* m_rootNode;

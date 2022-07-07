@@ -373,12 +373,11 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 	ndScene* const scene = GetScene();
 	if (scene)
 	{
-		//scene->UpdateAabb(this);
 		ndUnsigned8 sceneEquilibrium = 1;
 		ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
 		if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
 		{
-			ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)scene->m_fitness[m_bodyNodeIndex];
+			ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)scene->m_fitness.m_workingArray[m_bodyNodeIndex];
 			dAssert(bodyNode->GetAsSceneBodyNode());
 			dAssert(!bodyNode->GetLeft());
 			dAssert(!bodyNode->GetRight());
