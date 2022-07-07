@@ -27,7 +27,7 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-//#define D_NEW_SCENE
+#define D_NEW_SCENE
 
 #define D_SCENE_MAX_STACK_DEPTH		256
 
@@ -168,7 +168,7 @@ class ndScene : public ndThreadPool
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
 #ifdef D_NEW_SCENE
-	class BuildBvhTreeBuildState
+	class ndBuildBvhTreeBuildState
 	{
 		public:
 		enum ndState
@@ -176,11 +176,11 @@ class ndScene : public ndThreadPool
 			m_beginBuild,
 			m_calculateBoxes,
 			m_buildLayer,
-			m_enumarateLayers,
+			m_enumerateLayers,
 			m_endBuild,
 		};
 
-		BuildBvhTreeBuildState();
+		ndBuildBvhTreeBuildState();
 
 		void Init(ndUnsigned32 maxCount);
 
@@ -256,7 +256,7 @@ class ndScene : public ndThreadPool
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
 
 #ifdef D_NEW_SCENE
-	BuildBvhTreeBuildState m_bvhBuildState;
+	ndBuildBvhTreeBuildState m_bvhBuildState;
 #else
 	ndArray<ndBottomUpCell> m_cellBuffer0;
 	ndArray<ndBottomUpCell> m_cellBuffer1;

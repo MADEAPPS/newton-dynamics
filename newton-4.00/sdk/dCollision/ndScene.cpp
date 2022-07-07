@@ -1853,19 +1853,20 @@ void ndScene::UpdateBodyList()
 {
 	if (m_bodyList.UpdateView())
 	{
-		//D_TRACKTIME();
-		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-		//for (ndInt32 i = 0; i < view.GetCount(); ++i)
-		//{
-		//	ndBodyKinematic* const body = view[i];
-		//	dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-		//	bool inScene = true;
-		//	if (!body->GetSceneBodyNode())
-		//	{
-		//		inScene = AddBody(body);
-		//	}
-		//	dAssert(inScene && body->GetSceneBodyNode());
-		//}
+		#ifdef _DEBUG
+			ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+			for (ndInt32 i = 0; i < view.GetCount(); ++i)
+			{
+				ndBodyKinematic* const body = view[i];
+				dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+				//bool inScene = true;
+				//if (!body->GetSceneBodyNode())
+				//{
+				//	inScene = AddBody(body);
+				//}
+				//dAssert(inScene && body->GetSceneBodyNode());
+			}
+		#endif
 		view.PushBack(m_sentinelBody);
 	}
 	m_fitness.Update(*this);
@@ -2944,7 +2945,7 @@ ndSceneNode* ndScene::BuildIncrementalBvhTree()
 #else
 
 
-ndScene::BuildBvhTreeBuildState::BuildBvhTreeBuildState()
+ndScene::ndBuildBvhTreeBuildState::ndBuildBvhTreeBuildState()
 	:m_size(ndVector::m_zero)
 	,m_origin(ndVector::m_zero)
 	,m_cellBuffer0(1024)
@@ -2962,7 +2963,7 @@ ndScene::BuildBvhTreeBuildState::BuildBvhTreeBuildState()
 {
 }
 
-void ndScene::BuildBvhTreeBuildState::Init(ndUnsigned32 maxCount)
+void ndScene::ndBuildBvhTreeBuildState::Init(ndUnsigned32 maxCount)
 {
 	m_depthLevel = 1;
 	m_tempNodeBuffer.SetCount(4 * (maxCount + 4));
@@ -3481,7 +3482,7 @@ void ndScene::BuildBvhGenerateLayerGrids()
 		public:
 		ndGridClassifier(void* const data)
 		{
-			const BuildBvhTreeBuildState* const info = (BuildBvhTreeBuildState*)data;
+			const ndBuildBvhTreeBuildState* const info = (ndBuildBvhTreeBuildState*)data;
 			m_size = info->m_size;
 			m_origin = info->m_origin;
 			m_invSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / m_size.m_x);
@@ -3832,6 +3833,66 @@ void ndScene::BuildBvhTreeSetNodesDepth()
 	dAssert(m_fitness.m_scans[0] == 0);
 }
 
+
+ndSceneNode* ndScene::BuildIncrementalBvhTree()
+{
+	D_TRACKTIME();
+	ndSceneNode* root = nullptr;
+	switch (m_bvhBuildState.m_state)
+	{
+		case ndBuildBvhTreeBuildState::m_beginBuild:
+		{
+			if (BuildBvhTreeInitNodes())
+			{
+				m_bvhBuildState.m_state = m_bvhBuildState.m_calculateBoxes;
+			}
+			break;
+		}
+
+		case ndBuildBvhTreeBuildState::m_calculateBoxes:
+		{
+			BuildBvhTreeCalculateLeafBoxes();
+			m_bvhBuildState.m_state = m_bvhBuildState.m_buildLayer;
+			break;
+		}
+
+		case ndBuildBvhTreeBuildState::m_buildLayer:
+		{
+			if (m_bvhBuildState.m_leafNodesCount > 1)
+			{
+				m_bvhBuildState.m_size = m_bvhBuildState.m_size * ndVector::m_two;
+				BuildBvhGenerateLayerGrids();
+			}
+			else
+			{
+				m_bvhBuildState.m_root = m_bvhBuildState.m_srcArray[0];
+				m_bvhBuildState.m_state = m_bvhBuildState.m_enumerateLayers;
+			}
+			break;
+		}
+
+		case ndBuildBvhTreeBuildState::m_enumerateLayers:
+		{
+			BuildBvhTreeSetNodesDepth();
+			m_bvhBuildState.m_state = m_bvhBuildState.m_endBuild;
+			break;
+		}
+
+		case ndBuildBvhTreeBuildState::m_endBuild:
+		{
+			root = m_bvhBuildState.m_root;
+			dAssert(m_bvhBuildState.m_root->SanityCheck(0));
+			break;
+		}
+
+		default:
+			dAssert(0);
+	}
+
+	return root;
+}
+
+
 ndSceneNode* ndScene::BuildBvhTree()
 {
 	D_TRACKTIME();
@@ -3855,64 +3916,6 @@ ndSceneNode* ndScene::BuildBvhTree()
 	dAssert(m_bvhBuildState.m_root->SanityCheck(0));
 
 	return m_bvhBuildState.m_root;
-}
-
-ndSceneNode* ndScene::BuildIncrementalBvhTree()
-{
-	D_TRACKTIME();
-	ndSceneNode* root = nullptr;
-	switch (m_bvhBuildState.m_state)
-	{
-		case BuildBvhTreeBuildState::m_beginBuild:
-		{
-			if (BuildBvhTreeInitNodes())
-			{
-				m_bvhBuildState.m_state = m_bvhBuildState.m_calculateBoxes;
-			}
-			break;
-		}
-
-		case BuildBvhTreeBuildState::m_calculateBoxes:
-		{
-			BuildBvhTreeCalculateLeafBoxes();
-			m_bvhBuildState.m_state = m_bvhBuildState.m_buildLayer;
-			break;
-		}
-
-		case BuildBvhTreeBuildState::m_buildLayer:
-		{
-			if (m_bvhBuildState.m_leafNodesCount > 1)
-			{
-				m_bvhBuildState.m_size = m_bvhBuildState.m_size * ndVector::m_two;
-				BuildBvhGenerateLayerGrids();
-			}
-			else
-			{
-				m_bvhBuildState.m_root = m_bvhBuildState.m_srcArray[0];
-				m_bvhBuildState.m_state = m_bvhBuildState.m_enumarateLayers;
-			}
-			break;
-		}
-
-		case BuildBvhTreeBuildState::m_enumarateLayers:
-		{
-			BuildBvhTreeSetNodesDepth();
-			m_bvhBuildState.m_state = m_bvhBuildState.m_endBuild;
-			break;
-		}
-
-		case BuildBvhTreeBuildState::m_endBuild:
-		{
-			root = m_bvhBuildState.m_root;
-			dAssert(m_bvhBuildState.m_root->SanityCheck(0));
-			break;
-		}
-
-		default:
-			dAssert(0);
-	}
-
-	return root;
 }
 
 #endif

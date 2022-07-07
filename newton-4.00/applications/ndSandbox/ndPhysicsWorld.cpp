@@ -233,11 +233,19 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	ndInt32 maxSteps = MAX_PHYSICS_STEPS;
 	m_timeAccumulator += timestep;
 
+// test deleting bodies
 //static int xxxx;
 //xxxx++;
-//if (xxxx == 500)
+//if (xxxx > 5000)
 //{
-//	QueueBodyForDelete(GetBodyList().GetFirst()->GetInfo());
+//	if (!m_hasPendingObjectToDelete.load())
+//	{
+//		const ndBodyList& bodyList = GetBodyList();
+//		if (bodyList.GetCount())
+//		{
+//			QueueBodyForDelete(bodyList.GetLast()->GetInfo());
+//		}
+//	}
 //}
 
 	// if the time step is more than max timestep par frame, throw away the extra steps.
