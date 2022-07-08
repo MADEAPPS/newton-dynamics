@@ -63,9 +63,9 @@
 //%array_class(double, doubleArray);
 
 
-%include "../../../sdk/dCore/dVectorSimd.h"
-%include "../../../sdk/dCore/dMatrix.h"
-%include "../../../sdk/dCore/dQuaternion.h"
+%include "../../../sdk/dCore/ndVectorSimd.h"
+%include "../../../sdk/dCore/ndMatrix.h"
+%include "../../../sdk/dCore/ndQuaternion.h"
 
 %include "../../../sdk/dCollision/ndShape.h"
 %include "../../../sdk/dCollision/ndShapeBox.h"

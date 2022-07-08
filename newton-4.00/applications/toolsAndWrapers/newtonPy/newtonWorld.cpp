@@ -35,9 +35,9 @@ class ndContactCallback : public ndContactNotify
 		{
 		}
 
-		ndMaterailKey(dUnsigned64 low, dUnsigned64 high)
-			:m_lowKey(dUnsigned32(dMin(low, high)))
-			, m_highKey(dUnsigned32(dMax(low, high)))
+		ndMaterailKey(ndUnsigned64 low, ndUnsigned64 high)
+			:m_lowKey(ndUnsigned32(ndMin(low, high)))
+			,m_highKey(ndUnsigned32(ndMax(low, high)))
 		{
 		}
 
@@ -55,10 +55,10 @@ class ndContactCallback : public ndContactNotify
 		{
 			struct
 			{
-				dUnsigned32 m_lowKey;
-				dUnsigned32 m_highKey;
+				ndUnsigned32 m_lowKey;
+				ndUnsigned32 m_highKey;
 			};
-			dUnsigned64 m_key;
+			ndUnsigned64 m_key;
 		};
 	};
 
@@ -70,13 +70,13 @@ class ndContactCallback : public ndContactNotify
 	}
 
 
-	//virtual ndMaterial& RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1);
+	//virtual ndMaterial& RegisterMaterial(ndUnsigned32 id0, ndUnsigned32 id1);
 	//
 	//virtual void OnBodyAdded(ndBodyKinematic* const body) const;
 	//virtual void OnBodyRemoved(ndBodyKinematic* const body) const;
 	//virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
-	//virtual bool OnAabbOverlap(const ndContact* const contactJoint, dFloat32 timestep);
-	//virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep);
+	//virtual bool OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep);
+	//virtual void OnContactCallback(ndInt32 threadIndex, const ndContact* const contactJoint, ndFloat32 timestep);
 	//
 	//void PlaySoundTest(const ndContact* const contactJoint);
 	//
@@ -85,7 +85,7 @@ class ndContactCallback : public ndContactNotify
 
 NewtonWorld::NewtonWorld()
 	:ndWorld()
-	,m_nominalTimestep(dFloat32 (1.0f) / NOMINAL_FPS)
+	,m_nominalTimestep(ndFloat32 (1.0f) / NOMINAL_FPS)
 {
 	ClearCache();
 	SetContactNotify(new ndContactCallback);
@@ -95,26 +95,26 @@ NewtonWorld::~NewtonWorld()
 {
 }
 
-void NewtonWorld::SetSubSteps(dFloat32 timestep)
+void NewtonWorld::SetSubSteps(ndFloat32 timestep)
 {
-	timestep = dClamp(timestep, dFloat32(1.0f/120.0f), dFloat32(1.0f / 24.0f)) - 0.001f;
-	dInt32 substeps = dInt32 (dFloor(timestep / m_nominalTimestep)) + 1;
+	timestep = ndClamp(timestep, ndFloat32(1.0f/120.0f), ndFloat32(1.0f / 24.0f)) - 0.001f;
+	ndInt32 substeps = ndInt32 (ndFloor(timestep / m_nominalTimestep)) + 1;
 	ndWorld::SetSubSteps(substeps);
 }
 
-void NewtonWorld::SetTimestep(dFloat32 nominalTimestep)
+void NewtonWorld::SetTimestep(ndFloat32 nominalTimestep)
 {
-	m_nominalTimestep = dClamp(nominalTimestep, dFloat32(60.0f), dFloat32(600.0f));
+	m_nominalTimestep = ndClamp(nominalTimestep, ndFloat32(60.0f), ndFloat32(600.0f));
 }
 
-void NewtonWorld::SetIterations(dInt32 iterations)
+void NewtonWorld::SetIterations(ndInt32 iterations)
 {
-	iterations = dClamp(iterations, 4, 16);
+	iterations = ndClamp(iterations, 4, 16);
 	SetSolverIterations(iterations);
 }
 
-void NewtonWorld::Update(dFloat32 timestep)
+void NewtonWorld::Update(ndFloat32 timestep)
 {
-	timestep = dClamp(timestep, dFloat32(1.0f / 120.0f), dFloat32(1.0f / 24.0f));
+	timestep = ndClamp(timestep, ndFloat32(1.0f / 120.0f), ndFloat32(1.0f / 24.0f));
 	ndWorld::Update(timestep);
 }

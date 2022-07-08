@@ -22,15 +22,15 @@ class NewtonWorld: public ndWorld
 	NewtonWorld();
 	~NewtonWorld();
 
-	void Update(dFloat32 timestep);
+	void Update(ndFloat32 timestep);
 
-	void SetSubSteps(dFloat32 timestep);
-	void SetIterations(dInt32 iterations);
-	void SetTimestep(dFloat32 nominalTimestep);
+	void SetSubSteps(ndFloat32 timestep);
+	void SetIterations(ndInt32 iterations);
+	void SetTimestep(ndFloat32 nominalTimestep);
 
 
 	private:
-	dFloat32 m_nominalTimestep;
+	ndFloat32 m_nominalTimestep;
 };
 
 #endif

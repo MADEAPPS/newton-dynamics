@@ -36,6 +36,8 @@ include_directories(../../../sdk/dTinyxml)
 include_directories(../../../sdk/dCollision)
 include_directories(../../../sdk/dNewton/dJoints)
 include_directories(../../../sdk/dNewton/dModels)
+include_directories(../../../sdk/dNewton/dIkSolver)
+include_directories(../../../sdk/dNewton/dParticles)
 include_directories(../../../sdk/dNewton/dModels/dVehicle)
 include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
@@ -69,6 +71,7 @@ list(APPEND PY_SOURCE
 	newtonWorld.py)
 
 set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
+
 foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}

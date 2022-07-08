@@ -74,18 +74,17 @@
 	#endif
 #endif
 
-#define dRAND_MAX		0x00ffffff
-
-dFloat32 dRand();
-void dSetRandSeed (dUnsigned32 seed);
-dFloat32 dGaussianRandom (dFloat32 amp);
-
-inline dInt32 dTwosPower (dInt32 x)
-{
-	dInt32 rval=1;
-	for (; rval < x; rval *= 2);
-	return rval;
-}
+//#define dRAND_MAX		0x00ffffff
+//dFloat32 dRand();
+//void dSetRandSeed (dUnsigned32 seed);
+//dFloat32 dGaussianRandom (dFloat32 amp);
+//
+//inline dInt32 dTwosPower (dInt32 x)
+//{
+//	dInt32 rval=1;
+//	for (; rval < x; rval *= 2);
+//	return rval;
+//}
 
 // for some reason specifying a relative does not seem to work in Linus
 // and i have to specify a absolute path
