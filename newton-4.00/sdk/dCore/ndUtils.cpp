@@ -56,17 +56,27 @@ ndFloat32 ndRand()
 }
 
 /// return a pseudo Gaussian random with mean 0 and variance 0.5f
-ndFloat32 ndGaussianRandom(ndFloat32 amp)
+ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 deviation)
 {
-	// yes I know, this is not quite right but for now it will do for now.
-	const ndInt32 count = 4;
-	ndFloat32 r = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < count; i++)
-	{
-		r += ndFloat32(2.0f) * ndRand() - ndFloat32(1.0f);
-	}
-	r *= (amp / count);
-	return r;
+	// dAssert (0);
+	// yes I know central limit, is not quite right but for now it will do for now.
+	//const ndInt32 count = 4;
+	//ndFloat32 r = ndFloat32(0.0f);
+	//for (ndInt32 i = 0; i < count; i++)
+	//{
+	//	r += ndFloat32(2.0f) * ndRand() - ndFloat32(1.0f);
+	//}
+	//r *= (amp / count);
+
+	// a better way if to use cumulative density of a unit Gaussian distribution and form that get a unit 
+	// random variable: from wikipedia media Zelen& Severo(1964) 
+	// give the approximation for ?(x) for x > 0 with the absolute error | epsilon(x) | < 7.5·10?8(algorithm 26.2.17) :
+	// let t = 1 / (1 + b0 * x)
+	// cdf(x) = 1 - phi(x) * (b1 * t + b2 * t ^ 2 + b3 * t ^ 3 + b4 * t ^ 4 + b5 * t ^ 5)
+	// where cdf(x) is the standard normal PDF, 
+	// and b0 = 0.2316419, b1 = 0.319381530, b2 = ?0.356563782, b3 = 1.781477937, b4 = ?1.821255978, b5 = 1.330274429.
+
+	return mean;
 }
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)
