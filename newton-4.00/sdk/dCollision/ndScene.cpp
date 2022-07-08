@@ -155,10 +155,9 @@ void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
-					ndSceneTreeNode* const sceneNode = (ndSceneTreeNode*)nodes[i];
 					ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)nodes[baseCount + i];
-					dAssert(bodyNode->GetAsSceneBodyNode());
-					dAssert(sceneNode->GetAsSceneTreeNode());
+					dAssert(nodes[i]->GetAsSceneTreeNode());
+					dAssert(nodes[baseCount + i]->GetAsSceneBodyNode());
 
 					ndBodyKinematic* const body = bodyNode->m_body;
 					body->m_sceneNodeIndex = i;
@@ -1848,8 +1847,8 @@ void ndScene::UpdateBodyList()
 {
 	if (m_bodyList.UpdateView())
 	{
+		ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 		#ifdef _DEBUG
-			ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 			for (ndInt32 i = 0; i < view.GetCount(); ++i)
 			{
 				ndBodyKinematic* const body = view[i];

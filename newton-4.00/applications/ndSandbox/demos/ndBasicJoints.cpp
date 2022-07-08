@@ -284,29 +284,29 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	mesh->Release();
 }
 
-static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
-	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-	matrix.m_posit.m_y += 5.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndVector posit(matrix.m_posit);
-	for (ndInt32 i = 0; i < 8; i++)
-	{
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
-		world->AddJoint(joint);
-		posit.m_y += diameter * 1.5f;
-		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.01f), 0.0f, ndGaussianRandom(0.01f), 0.0f);
-	}
-
-	mesh2->Release();
-}
+//static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+//{
+//	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+//	matrix.m_posit = origin;
+//	matrix.m_posit.m_w = 1.0f;
+//	
+//	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
+//	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+//	matrix.m_posit.m_y += 5.0f;
+//	
+//	ndPhysicsWorld* const world = scene->GetWorld();
+//	ndVector posit(matrix.m_posit);
+//	for (ndInt32 i = 0; i < 8; i++)
+//	{
+//		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+//		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
+//		world->AddJoint(joint);
+//		posit.m_y += diameter * 1.5f;
+//		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.01f), 0.0f, ndGaussianRandom(0.01f), 0.0f);
+//	}
+//
+//	mesh2->Release();
+//}
 
 static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
@@ -563,34 +563,36 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 	mesh->Release();
 }
 
-//static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-//{
-//	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-//	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-//
-//	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
-//	matrix.m_posit = origin;
-//	matrix.m_posit.m_w = 1.0f;
-//
-//	ndPhysicsWorld* const world = scene->GetWorld();
-//
-//	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-//	matrix.m_posit.m_y = floor.m_y;
-//
-//	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-//	{
-//		// spring damper slider with limits
-//		matrix.m_posit.m_y += 2.0f;
-//		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-//		ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
-//		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
-//		joint->SetLimitsPosit(-1.0f, 1.0f);
-//		world->AddJoint(joint);
-//	}
-//
-//	mesh->Release();
-//}
+#if 1
+static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
+	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	{
+		// spring damper slider with limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
+		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
+		joint->SetLimitsPosit(-1.0f, 1.0f);
+		world->AddJoint(joint);
+	}
+
+	mesh->Release();
+}
+
+#else
 static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.2f/*0.25f*/));
@@ -620,7 +622,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 
 	mesh->Release();
 }
-
+#endif
 
 void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
 {
@@ -797,23 +799,23 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
+	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
 	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
 	
-	//BuildFixDistanceJoints(scene, ndVector(-4.0f, 0.0f, -5.0f, 1.0f));
+	BuildFixDistanceJoints(scene, ndVector( 4.0f, 0.0f, -5.0f, 1.0f));
 	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
+	AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
 
-origin.m_z += 12.0f;
-origin.m_x += 14.0f;
-origin.m_y -= 4.0f;
+//origin.m_z += 12.0f;
+//origin.m_x += 14.0f;
+//origin.m_y -= 4.0f;
 	scene->SetCameraMatrix(rot, origin);
 }
