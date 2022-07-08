@@ -79,5 +79,6 @@
 //	dInt32 Get1() { return xxxxxxxx0; }
 //};
 
+void dGetWorkingFileName(const char* const name, char* const outPathName);
 #endif 
 

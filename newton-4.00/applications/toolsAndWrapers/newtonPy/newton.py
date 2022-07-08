@@ -61,390 +61,384 @@ class _SwigNonDynamicMeta(type):
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
 
-class dVector(object):
+class ndVector(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
     def __init__(self, *args):
-        _newton.dVector_swiginit(self, _newton.new_dVector(*args))
+        _newton.ndVector_swiginit(self, _newton.new_ndVector(*args))
 
     def GetX(self):
-        return _newton.dVector_GetX(self)
+        return _newton.ndVector_GetX(self)
 
     def GetY(self):
-        return _newton.dVector_GetY(self)
+        return _newton.ndVector_GetY(self)
 
     def GetZ(self):
-        return _newton.dVector_GetZ(self)
+        return _newton.ndVector_GetZ(self)
 
     def GetW(self):
-        return _newton.dVector_GetW(self)
+        return _newton.ndVector_GetW(self)
 
     def SetX(self, x):
-        return _newton.dVector_SetX(self, x)
+        return _newton.ndVector_SetX(self, x)
 
     def SetY(self, x):
-        return _newton.dVector_SetY(self, x)
+        return _newton.ndVector_SetY(self, x)
 
     def SetZ(self, x):
-        return _newton.dVector_SetZ(self, x)
+        return _newton.ndVector_SetZ(self, x)
 
     def SetW(self, x):
-        return _newton.dVector_SetW(self, x)
+        return _newton.ndVector_SetW(self, x)
 
     def GetScalar(self):
-        return _newton.dVector_GetScalar(self)
+        return _newton.ndVector_GetScalar(self)
 
     def Store(self, dst):
-        return _newton.dVector_Store(self, dst)
+        return _newton.ndVector_Store(self, dst)
 
     def BroadcastX(self):
-        return _newton.dVector_BroadcastX(self)
+        return _newton.ndVector_BroadcastX(self)
 
     def BroadcastY(self):
-        return _newton.dVector_BroadcastY(self)
+        return _newton.ndVector_BroadcastY(self)
 
     def BroadcastZ(self):
-        return _newton.dVector_BroadcastZ(self)
+        return _newton.ndVector_BroadcastZ(self)
 
     def BroadcastW(self):
-        return _newton.dVector_BroadcastW(self)
+        return _newton.ndVector_BroadcastW(self)
 
     def Scale(self, s):
-        return _newton.dVector_Scale(self, s)
-
-    def GetElement(self, *args):
-        return _newton.dVector_GetElement(self, *args)
+        return _newton.ndVector_Scale(self, s)
 
     def __add__(self, A):
-        return _newton.dVector___add__(self, A)
+        return _newton.ndVector___add__(self, A)
 
     def __sub__(self, A):
-        return _newton.dVector___sub__(self, A)
+        return _newton.ndVector___sub__(self, A)
 
     def __mul__(self, A):
-        return _newton.dVector___mul__(self, A)
+        return _newton.ndVector___mul__(self, A)
 
     def __iadd__(self, A):
-        return _newton.dVector___iadd__(self, A)
+        return _newton.ndVector___iadd__(self, A)
 
     def __isub__(self, A):
-        return _newton.dVector___isub__(self, A)
+        return _newton.ndVector___isub__(self, A)
 
     def __imul__(self, A):
-        return _newton.dVector___imul__(self, A)
+        return _newton.ndVector___imul__(self, A)
 
     def DotProduct(self, A):
-        return _newton.dVector_DotProduct(self, A)
+        return _newton.ndVector_DotProduct(self, A)
 
     def CrossProduct(self, *args):
-        return _newton.dVector_CrossProduct(self, *args)
+        return _newton.ndVector_CrossProduct(self, *args)
 
     def Reciproc(self):
-        return _newton.dVector_Reciproc(self)
+        return _newton.ndVector_Reciproc(self)
 
     def MulAdd(self, A, B):
-        return _newton.dVector_MulAdd(self, A, B)
+        return _newton.ndVector_MulAdd(self, A, B)
 
     def MulSub(self, A, B):
-        return _newton.dVector_MulSub(self, A, B)
+        return _newton.ndVector_MulSub(self, A, B)
 
     def AddHorizontal(self):
-        return _newton.dVector_AddHorizontal(self)
+        return _newton.ndVector_AddHorizontal(self)
 
     def Abs(self):
-        return _newton.dVector_Abs(self)
+        return _newton.ndVector_Abs(self)
 
     def GetMax(self, *args):
-        return _newton.dVector_GetMax(self, *args)
+        return _newton.ndVector_GetMax(self, *args)
 
     def GetMin(self, data):
-        return _newton.dVector_GetMin(self, data)
+        return _newton.ndVector_GetMin(self, data)
 
     def GetInt(self):
-        return _newton.dVector_GetInt(self)
+        return _newton.ndVector_GetInt(self)
 
     def TestZero(self):
-        return _newton.dVector_TestZero(self)
+        return _newton.ndVector_TestZero(self)
 
     def Floor(self):
-        return _newton.dVector_Floor(self)
+        return _newton.ndVector_Floor(self)
 
     def Sqrt(self):
-        return _newton.dVector_Sqrt(self)
+        return _newton.ndVector_Sqrt(self)
 
     def InvSqrt(self):
-        return _newton.dVector_InvSqrt(self)
+        return _newton.ndVector_InvSqrt(self)
 
     def InvMagSqrt(self):
-        return _newton.dVector_InvMagSqrt(self)
+        return _newton.ndVector_InvMagSqrt(self)
 
     def Normalize(self):
-        return _newton.dVector_Normalize(self)
+        return _newton.ndVector_Normalize(self)
 
     def __gt__(self, data):
-        return _newton.dVector___gt__(self, data)
+        return _newton.ndVector___gt__(self, data)
 
     def __eq__(self, data):
-        return _newton.dVector___eq__(self, data)
+        return _newton.ndVector___eq__(self, data)
 
     def __lt__(self, data):
-        return _newton.dVector___lt__(self, data)
+        return _newton.ndVector___lt__(self, data)
 
     def __ge__(self, data):
-        return _newton.dVector___ge__(self, data)
+        return _newton.ndVector___ge__(self, data)
 
     def __le__(self, data):
-        return _newton.dVector___le__(self, data)
+        return _newton.ndVector___le__(self, data)
 
     def __and__(self, data):
-        return _newton.dVector___and__(self, data)
+        return _newton.ndVector___and__(self, data)
 
     def __or__(self, data):
-        return _newton.dVector___or__(self, data)
+        return _newton.ndVector___or__(self, data)
 
     def __xor__(self, data):
-        return _newton.dVector___xor__(self, data)
+        return _newton.ndVector___xor__(self, data)
 
     def AndNot(self, data):
-        return _newton.dVector_AndNot(self, data)
+        return _newton.ndVector_AndNot(self, data)
 
     def Select(self, data, mask):
-        return _newton.dVector_Select(self, data, mask)
+        return _newton.ndVector_Select(self, data, mask)
 
     def GetSignMask(self):
-        return _newton.dVector_GetSignMask(self)
+        return _newton.ndVector_GetSignMask(self)
 
     def ShiftRight(self):
-        return _newton.dVector_ShiftRight(self)
+        return _newton.ndVector_ShiftRight(self)
 
     def ShiftTripleRight(self):
-        return _newton.dVector_ShiftTripleRight(self)
+        return _newton.ndVector_ShiftTripleRight(self)
 
     def ShiftTripleLeft(self):
-        return _newton.dVector_ShiftTripleLeft(self)
+        return _newton.ndVector_ShiftTripleLeft(self)
 
     def ShiftRightLogical(self, bits):
-        return _newton.dVector_ShiftRightLogical(self, bits)
+        return _newton.ndVector_ShiftRightLogical(self, bits)
 
     @staticmethod
     def Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
-        return _newton.dVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+        return _newton.ndVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
 
     def Trace(self, arg2):
-        return _newton.dVector_Trace(self, arg2)
-    m_zero = property(_newton.dVector_m_zero_get, _newton.dVector_m_zero_set)
-    m_one = property(_newton.dVector_m_one_get, _newton.dVector_m_one_set)
-    m_wOne = property(_newton.dVector_m_wOne_get, _newton.dVector_m_wOne_set)
-    m_two = property(_newton.dVector_m_two_get, _newton.dVector_m_two_set)
-    m_half = property(_newton.dVector_m_half_get, _newton.dVector_m_half_set)
-    m_three = property(_newton.dVector_m_three_get, _newton.dVector_m_three_set)
-    m_negOne = property(_newton.dVector_m_negOne_get, _newton.dVector_m_negOne_set)
-    m_xMask = property(_newton.dVector_m_xMask_get, _newton.dVector_m_xMask_set)
-    m_yMask = property(_newton.dVector_m_yMask_get, _newton.dVector_m_yMask_set)
-    m_zMask = property(_newton.dVector_m_zMask_get, _newton.dVector_m_zMask_set)
-    m_wMask = property(_newton.dVector_m_wMask_get, _newton.dVector_m_wMask_set)
-    m_xyzwMask = property(_newton.dVector_m_xyzwMask_get, _newton.dVector_m_xyzwMask_set)
-    m_epsilon = property(_newton.dVector_m_epsilon_get, _newton.dVector_m_epsilon_set)
-    m_signMask = property(_newton.dVector_m_signMask_get, _newton.dVector_m_signMask_set)
-    m_triplexMask = property(_newton.dVector_m_triplexMask_get, _newton.dVector_m_triplexMask_set)
-    __swig_destroy__ = _newton.delete_dVector
+        return _newton.ndVector_Trace(self, arg2)
+    m_zero = property(_newton.ndVector_m_zero_get, _newton.ndVector_m_zero_set)
+    m_one = property(_newton.ndVector_m_one_get, _newton.ndVector_m_one_set)
+    m_wOne = property(_newton.ndVector_m_wOne_get, _newton.ndVector_m_wOne_set)
+    m_two = property(_newton.ndVector_m_two_get, _newton.ndVector_m_two_set)
+    m_half = property(_newton.ndVector_m_half_get, _newton.ndVector_m_half_set)
+    m_three = property(_newton.ndVector_m_three_get, _newton.ndVector_m_three_set)
+    m_negOne = property(_newton.ndVector_m_negOne_get, _newton.ndVector_m_negOne_set)
+    m_xMask = property(_newton.ndVector_m_xMask_get, _newton.ndVector_m_xMask_set)
+    m_yMask = property(_newton.ndVector_m_yMask_get, _newton.ndVector_m_yMask_set)
+    m_zMask = property(_newton.ndVector_m_zMask_get, _newton.ndVector_m_zMask_set)
+    m_wMask = property(_newton.ndVector_m_wMask_get, _newton.ndVector_m_wMask_set)
+    m_xyzwMask = property(_newton.ndVector_m_xyzwMask_get, _newton.ndVector_m_xyzwMask_set)
+    m_epsilon = property(_newton.ndVector_m_epsilon_get, _newton.ndVector_m_epsilon_set)
+    m_signMask = property(_newton.ndVector_m_signMask_get, _newton.ndVector_m_signMask_set)
+    m_triplexMask = property(_newton.ndVector_m_triplexMask_get, _newton.ndVector_m_triplexMask_set)
+    __swig_destroy__ = _newton.delete_ndVector
 
-# Register dVector in _newton:
-_newton.dVector_swigregister(dVector)
+# Register ndVector in _newton:
+_newton.ndVector_swigregister(ndVector)
 
-def dVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
-    return _newton.dVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+def ndVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
+    return _newton.ndVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
 cvar = _newton.cvar
 
-class dBigVector(object):
+class ndBigVector(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
     def __init__(self, *args):
-        _newton.dBigVector_swiginit(self, _newton.new_dBigVector(*args))
+        _newton.ndBigVector_swiginit(self, _newton.new_ndBigVector(*args))
 
     def GetX(self):
-        return _newton.dBigVector_GetX(self)
+        return _newton.ndBigVector_GetX(self)
 
     def GetY(self):
-        return _newton.dBigVector_GetY(self)
+        return _newton.ndBigVector_GetY(self)
 
     def GetZ(self):
-        return _newton.dBigVector_GetZ(self)
+        return _newton.ndBigVector_GetZ(self)
 
     def GetW(self):
-        return _newton.dBigVector_GetW(self)
+        return _newton.ndBigVector_GetW(self)
 
     def SetX(self, x):
-        return _newton.dBigVector_SetX(self, x)
+        return _newton.ndBigVector_SetX(self, x)
 
     def SetY(self, x):
-        return _newton.dBigVector_SetY(self, x)
+        return _newton.ndBigVector_SetY(self, x)
 
     def SetZ(self, x):
-        return _newton.dBigVector_SetZ(self, x)
+        return _newton.ndBigVector_SetZ(self, x)
 
     def SetW(self, x):
-        return _newton.dBigVector_SetW(self, x)
+        return _newton.ndBigVector_SetW(self, x)
 
     def GetScalar(self):
-        return _newton.dBigVector_GetScalar(self)
-
-    def GetElement(self, *args):
-        return _newton.dBigVector_GetElement(self, *args)
+        return _newton.ndBigVector_GetScalar(self)
 
     def __add__(self, A):
-        return _newton.dBigVector___add__(self, A)
+        return _newton.ndBigVector___add__(self, A)
 
     def __sub__(self, A):
-        return _newton.dBigVector___sub__(self, A)
+        return _newton.ndBigVector___sub__(self, A)
 
     def __mul__(self, A):
-        return _newton.dBigVector___mul__(self, A)
+        return _newton.ndBigVector___mul__(self, A)
 
     def __iadd__(self, A):
-        return _newton.dBigVector___iadd__(self, A)
+        return _newton.ndBigVector___iadd__(self, A)
 
     def __isub__(self, A):
-        return _newton.dBigVector___isub__(self, A)
+        return _newton.ndBigVector___isub__(self, A)
 
     def __imul__(self, A):
-        return _newton.dBigVector___imul__(self, A)
+        return _newton.ndBigVector___imul__(self, A)
 
     def MulAdd(self, A, B):
-        return _newton.dBigVector_MulAdd(self, A, B)
+        return _newton.ndBigVector_MulAdd(self, A, B)
 
     def MulSub(self, A, B):
-        return _newton.dBigVector_MulSub(self, A, B)
+        return _newton.ndBigVector_MulSub(self, A, B)
 
     def AddHorizontal(self):
-        return _newton.dBigVector_AddHorizontal(self)
+        return _newton.ndBigVector_AddHorizontal(self)
 
     def BroadcastX(self):
-        return _newton.dBigVector_BroadcastX(self)
+        return _newton.ndBigVector_BroadcastX(self)
 
     def BroadcastY(self):
-        return _newton.dBigVector_BroadcastY(self)
+        return _newton.ndBigVector_BroadcastY(self)
 
     def BroadcastZ(self):
-        return _newton.dBigVector_BroadcastZ(self)
+        return _newton.ndBigVector_BroadcastZ(self)
 
     def BroadcastW(self):
-        return _newton.dBigVector_BroadcastW(self)
+        return _newton.ndBigVector_BroadcastW(self)
 
     def Scale(self, s):
-        return _newton.dBigVector_Scale(self, s)
+        return _newton.ndBigVector_Scale(self, s)
 
     def Abs(self):
-        return _newton.dBigVector_Abs(self)
+        return _newton.ndBigVector_Abs(self)
 
     def Reciproc(self):
-        return _newton.dBigVector_Reciproc(self)
+        return _newton.ndBigVector_Reciproc(self)
 
     def Sqrt(self):
-        return _newton.dBigVector_Sqrt(self)
+        return _newton.ndBigVector_Sqrt(self)
 
     def InvSqrt(self):
-        return _newton.dBigVector_InvSqrt(self)
+        return _newton.ndBigVector_InvSqrt(self)
 
     def InvMagSqrt(self):
-        return _newton.dBigVector_InvMagSqrt(self)
+        return _newton.ndBigVector_InvMagSqrt(self)
 
     def Normalize(self):
-        return _newton.dBigVector_Normalize(self)
+        return _newton.ndBigVector_Normalize(self)
 
     def GetMax(self, *args):
-        return _newton.dBigVector_GetMax(self, *args)
+        return _newton.ndBigVector_GetMax(self, *args)
 
     def GetMin(self, data):
-        return _newton.dBigVector_GetMin(self, data)
+        return _newton.ndBigVector_GetMin(self, data)
 
     def GetInt(self):
-        return _newton.dBigVector_GetInt(self)
+        return _newton.ndBigVector_GetInt(self)
 
     def __gt__(self, data):
-        return _newton.dBigVector___gt__(self, data)
+        return _newton.ndBigVector___gt__(self, data)
 
     def __eq__(self, data):
-        return _newton.dBigVector___eq__(self, data)
+        return _newton.ndBigVector___eq__(self, data)
 
     def __lt__(self, data):
-        return _newton.dBigVector___lt__(self, data)
+        return _newton.ndBigVector___lt__(self, data)
 
     def __ge__(self, data):
-        return _newton.dBigVector___ge__(self, data)
+        return _newton.ndBigVector___ge__(self, data)
 
     def __le__(self, data):
-        return _newton.dBigVector___le__(self, data)
+        return _newton.ndBigVector___le__(self, data)
 
     def __and__(self, data):
-        return _newton.dBigVector___and__(self, data)
+        return _newton.ndBigVector___and__(self, data)
 
     def __or__(self, data):
-        return _newton.dBigVector___or__(self, data)
+        return _newton.ndBigVector___or__(self, data)
 
     def __xor__(self, data):
-        return _newton.dBigVector___xor__(self, data)
+        return _newton.ndBigVector___xor__(self, data)
 
     def AndNot(self, data):
-        return _newton.dBigVector_AndNot(self, data)
+        return _newton.ndBigVector_AndNot(self, data)
 
     def Select(self, data, mask):
-        return _newton.dBigVector_Select(self, data, mask)
+        return _newton.ndBigVector_Select(self, data, mask)
 
     def ShiftRight(self):
-        return _newton.dBigVector_ShiftRight(self)
+        return _newton.ndBigVector_ShiftRight(self)
 
     def ShiftTripleRight(self):
-        return _newton.dBigVector_ShiftTripleRight(self)
+        return _newton.ndBigVector_ShiftTripleRight(self)
 
     def ShiftTripleLeft(self):
-        return _newton.dBigVector_ShiftTripleLeft(self)
+        return _newton.ndBigVector_ShiftTripleLeft(self)
 
     def ShiftRightLogical(self, bits):
-        return _newton.dBigVector_ShiftRightLogical(self, bits)
+        return _newton.ndBigVector_ShiftRightLogical(self, bits)
 
     def GetSignMask(self):
-        return _newton.dBigVector_GetSignMask(self)
+        return _newton.ndBigVector_GetSignMask(self)
 
     def Floor(self):
-        return _newton.dBigVector_Floor(self)
+        return _newton.ndBigVector_Floor(self)
 
     def TestZero(self):
-        return _newton.dBigVector_TestZero(self)
+        return _newton.ndBigVector_TestZero(self)
 
     @staticmethod
     def Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
-        return _newton.dBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+        return _newton.ndBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
 
     def DotProduct(self, A):
-        return _newton.dBigVector_DotProduct(self, A)
+        return _newton.ndBigVector_DotProduct(self, A)
 
     def CrossProduct(self, *args):
-        return _newton.dBigVector_CrossProduct(self, *args)
-    m_zero = property(_newton.dBigVector_m_zero_get, _newton.dBigVector_m_zero_set)
-    m_one = property(_newton.dBigVector_m_one_get, _newton.dBigVector_m_one_set)
-    m_wOne = property(_newton.dBigVector_m_wOne_get, _newton.dBigVector_m_wOne_set)
-    m_two = property(_newton.dBigVector_m_two_get, _newton.dBigVector_m_two_set)
-    m_half = property(_newton.dBigVector_m_half_get, _newton.dBigVector_m_half_set)
-    m_three = property(_newton.dBigVector_m_three_get, _newton.dBigVector_m_three_set)
-    m_negOne = property(_newton.dBigVector_m_negOne_get, _newton.dBigVector_m_negOne_set)
-    m_xMask = property(_newton.dBigVector_m_xMask_get, _newton.dBigVector_m_xMask_set)
-    m_yMask = property(_newton.dBigVector_m_yMask_get, _newton.dBigVector_m_yMask_set)
-    m_zMask = property(_newton.dBigVector_m_zMask_get, _newton.dBigVector_m_zMask_set)
-    m_wMask = property(_newton.dBigVector_m_wMask_get, _newton.dBigVector_m_wMask_set)
-    m_xyzwMask = property(_newton.dBigVector_m_xyzwMask_get, _newton.dBigVector_m_xyzwMask_set)
-    m_epsilon = property(_newton.dBigVector_m_epsilon_get, _newton.dBigVector_m_epsilon_set)
-    m_signMask = property(_newton.dBigVector_m_signMask_get, _newton.dBigVector_m_signMask_set)
-    m_triplexMask = property(_newton.dBigVector_m_triplexMask_get, _newton.dBigVector_m_triplexMask_set)
-    __swig_destroy__ = _newton.delete_dBigVector
+        return _newton.ndBigVector_CrossProduct(self, *args)
+    m_zero = property(_newton.ndBigVector_m_zero_get, _newton.ndBigVector_m_zero_set)
+    m_one = property(_newton.ndBigVector_m_one_get, _newton.ndBigVector_m_one_set)
+    m_wOne = property(_newton.ndBigVector_m_wOne_get, _newton.ndBigVector_m_wOne_set)
+    m_two = property(_newton.ndBigVector_m_two_get, _newton.ndBigVector_m_two_set)
+    m_half = property(_newton.ndBigVector_m_half_get, _newton.ndBigVector_m_half_set)
+    m_three = property(_newton.ndBigVector_m_three_get, _newton.ndBigVector_m_three_set)
+    m_negOne = property(_newton.ndBigVector_m_negOne_get, _newton.ndBigVector_m_negOne_set)
+    m_xMask = property(_newton.ndBigVector_m_xMask_get, _newton.ndBigVector_m_xMask_set)
+    m_yMask = property(_newton.ndBigVector_m_yMask_get, _newton.ndBigVector_m_yMask_set)
+    m_zMask = property(_newton.ndBigVector_m_zMask_get, _newton.ndBigVector_m_zMask_set)
+    m_wMask = property(_newton.ndBigVector_m_wMask_get, _newton.ndBigVector_m_wMask_set)
+    m_xyzwMask = property(_newton.ndBigVector_m_xyzwMask_get, _newton.ndBigVector_m_xyzwMask_set)
+    m_epsilon = property(_newton.ndBigVector_m_epsilon_get, _newton.ndBigVector_m_epsilon_set)
+    m_signMask = property(_newton.ndBigVector_m_signMask_get, _newton.ndBigVector_m_signMask_set)
+    m_triplexMask = property(_newton.ndBigVector_m_triplexMask_get, _newton.ndBigVector_m_triplexMask_set)
+    __swig_destroy__ = _newton.delete_ndBigVector
 
-# Register dBigVector in _newton:
-_newton.dBigVector_swigregister(dBigVector)
+# Register ndBigVector in _newton:
+_newton.ndBigVector_swigregister(ndBigVector)
 
-def dBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
-    return _newton.dBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+def ndBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
+    return _newton.ndBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
 
 
 def dGetZeroMatrix():
@@ -452,89 +446,86 @@ def dGetZeroMatrix():
 
 def dGetIdentityMatrix():
     return _newton.dGetIdentityMatrix()
-class dMatrix(object):
+class ndMatrix(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
-    __swig_destroy__ = _newton.delete_dMatrix
-
-    def GetElement(self, *args):
-        return _newton.dMatrix_GetElement(self, *args)
+    __swig_destroy__ = _newton.delete_ndMatrix
 
     def Inverse(self):
-        return _newton.dMatrix_Inverse(self)
+        return _newton.ndMatrix_Inverse(self)
 
     def Inverse4x4(self):
-        return _newton.dMatrix_Inverse4x4(self)
+        return _newton.ndMatrix_Inverse4x4(self)
 
     def Transpose(self):
-        return _newton.dMatrix_Transpose(self)
+        return _newton.ndMatrix_Transpose(self)
 
     def Transpose4X4(self):
-        return _newton.dMatrix_Transpose4X4(self)
+        return _newton.ndMatrix_Transpose4X4(self)
 
     def RotateVector(self, v):
-        return _newton.dMatrix_RotateVector(self, v)
+        return _newton.ndMatrix_RotateVector(self, v)
 
     def UnrotateVector(self, v):
-        return _newton.dMatrix_UnrotateVector(self, v)
+        return _newton.ndMatrix_UnrotateVector(self, v)
 
     def TransformVector(self, v):
-        return _newton.dMatrix_TransformVector(self, v)
+        return _newton.ndMatrix_TransformVector(self, v)
 
     def UntransformVector(self, v):
-        return _newton.dMatrix_UntransformVector(self, v)
+        return _newton.ndMatrix_UntransformVector(self, v)
 
     def TransformPlane(self, localPlane):
-        return _newton.dMatrix_TransformPlane(self, localPlane)
+        return _newton.ndMatrix_TransformPlane(self, localPlane)
 
     def UntransformPlane(self, globalPlane):
-        return _newton.dMatrix_UntransformPlane(self, globalPlane)
+        return _newton.ndMatrix_UntransformPlane(self, globalPlane)
 
     def TransformVector1x4(self, v):
-        return _newton.dMatrix_TransformVector1x4(self, v)
+        return _newton.ndMatrix_TransformVector1x4(self, v)
 
     def SolveByGaussianElimination(self, v):
-        return _newton.dMatrix_SolveByGaussianElimination(self, v)
+        return _newton.ndMatrix_SolveByGaussianElimination(self, v)
 
     def TransformBBox(self, p0local, p1local, p0, p1):
-        return _newton.dMatrix_TransformBBox(self, p0local, p1local, p0, p1)
+        return _newton.ndMatrix_TransformBBox(self, p0local, p1local, p0, p1)
 
     def CalcPitchYawRoll(self, euler0, euler1):
-        return _newton.dMatrix_CalcPitchYawRoll(self, euler0, euler1)
+        return _newton.ndMatrix_CalcPitchYawRoll(self, euler0, euler1)
 
     def TransformTriplex(self, *args):
-        return _newton.dMatrix_TransformTriplex(self, *args)
+        return _newton.ndMatrix_TransformTriplex(self, *args)
 
     def TestIdentity(self):
-        return _newton.dMatrix_TestIdentity(self)
+        return _newton.ndMatrix_TestIdentity(self)
 
     def TestSymetric3x3(self):
-        return _newton.dMatrix_TestSymetric3x3(self)
+        return _newton.ndMatrix_TestSymetric3x3(self)
 
     def TestOrthogonal(self, *args):
-        return _newton.dMatrix_TestOrthogonal(self, *args)
+        return _newton.ndMatrix_TestOrthogonal(self, *args)
 
     def Multiply3X3(self, B):
-        return _newton.dMatrix_Multiply3X3(self, B)
+        return _newton.ndMatrix_Multiply3X3(self, B)
 
     def __mul__(self, B):
-        return _newton.dMatrix___mul__(self, B)
+        return _newton.ndMatrix___mul__(self, B)
 
     def EigenVectors(self):
-        return _newton.dMatrix_EigenVectors(self)
+        return _newton.ndMatrix_EigenVectors(self)
 
     def PolarDecomposition(self, transformMatrix, scale, stretchAxis):
-        return _newton.dMatrix_PolarDecomposition(self, transformMatrix, scale, stretchAxis)
+        return _newton.ndMatrix_PolarDecomposition(self, transformMatrix, scale, stretchAxis)
 
     def __init__(self, *args):
-        _newton.dMatrix_swiginit(self, _newton.new_dMatrix(*args))
-    m_front = property(_newton.dMatrix_m_front_get, _newton.dMatrix_m_front_set)
-    m_up = property(_newton.dMatrix_m_up_get, _newton.dMatrix_m_up_set)
-    m_right = property(_newton.dMatrix_m_right_get, _newton.dMatrix_m_right_set)
-    m_posit = property(_newton.dMatrix_m_posit_get, _newton.dMatrix_m_posit_set)
+        _newton.ndMatrix_swiginit(self, _newton.new_ndMatrix(*args))
+    m_front = property(_newton.ndMatrix_m_front_get, _newton.ndMatrix_m_front_set)
+    m_up = property(_newton.ndMatrix_m_up_get, _newton.ndMatrix_m_up_set)
+    m_right = property(_newton.ndMatrix_m_right_get, _newton.ndMatrix_m_right_set)
+    m_posit = property(_newton.ndMatrix_m_posit_get, _newton.ndMatrix_m_posit_set)
 
-# Register dMatrix in _newton:
-_newton.dMatrix_swigregister(dMatrix)
+# Register ndMatrix in _newton:
+_newton.ndMatrix_swigregister(ndMatrix)
 
 
 def dPitchMatrix(ang):
@@ -545,40 +536,40 @@ def dYawMatrix(ang):
 
 def dRollMatrix(ang):
     return _newton.dRollMatrix(ang)
-class dQuaternion(dVector):
+class ndQuaternion(ndVector):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
     def __init__(self, *args):
-        _newton.dQuaternion_swiginit(self, _newton.new_dQuaternion(*args))
+        _newton.ndQuaternion_swiginit(self, _newton.new_ndQuaternion(*args))
 
     def Normalize(self):
-        return _newton.dQuaternion_Normalize(self)
+        return _newton.ndQuaternion_Normalize(self)
 
     def Scale(self, scale):
-        return _newton.dQuaternion_Scale(self, scale)
+        return _newton.ndQuaternion_Scale(self, scale)
 
     def Inverse(self):
-        return _newton.dQuaternion_Inverse(self)
+        return _newton.ndQuaternion_Inverse(self)
 
     def __add__(self, B):
-        return _newton.dQuaternion___add__(self, B)
+        return _newton.ndQuaternion___add__(self, B)
 
     def __sub__(self, B):
-        return _newton.dQuaternion___sub__(self, B)
+        return _newton.ndQuaternion___sub__(self, B)
 
     def __mul__(self, B):
-        return _newton.dQuaternion___mul__(self, B)
+        return _newton.ndQuaternion___mul__(self, B)
 
     def Slerp(self, q1, t):
-        return _newton.dQuaternion_Slerp(self, q1, t)
+        return _newton.ndQuaternion_Slerp(self, q1, t)
 
     def CalcAverageOmega(self, q1, invdt):
-        return _newton.dQuaternion_CalcAverageOmega(self, q1, invdt)
-    __swig_destroy__ = _newton.delete_dQuaternion
+        return _newton.ndQuaternion_CalcAverageOmega(self, q1, invdt)
+    __swig_destroy__ = _newton.delete_ndQuaternion
 
-# Register dQuaternion in _newton:
-_newton.dQuaternion_swigregister(dQuaternion)
+# Register ndQuaternion in _newton:
+_newton.ndQuaternion_swigregister(ndQuaternion)
 
 m_box = _newton.m_box
 m_cone = _newton.m_cone
@@ -887,8 +878,8 @@ class ndShape(object):
     def SupportVertexSpecialProjectPoint(self, point, dir):
         return _newton.ndShape_SupportVertexSpecialProjectPoint(self, point, dir)
 
-    def SupportVertexSpecial(self, dir, skinSkinThickness, vertexIndex):
-        return _newton.ndShape_SupportVertexSpecial(self, dir, skinSkinThickness, vertexIndex)
+    def SupportVertexSpecial(self, dir, skinMargin, vertexIndex):
+        return _newton.ndShape_SupportVertexSpecial(self, dir, skinMargin, vertexIndex)
 
     def CalculatePlaneIntersection(self, normal, point, contactsOut):
         return _newton.ndShape_CalculatePlaneIntersection(self, normal, point, contactsOut)
@@ -1071,21 +1062,21 @@ class ndPolygonMeshDesc(object):
     m_boxDistanceTravelInMeshSpace = property(_newton.ndPolygonMeshDesc_m_boxDistanceTravelInMeshSpace_get, _newton.ndPolygonMeshDesc_m_boxDistanceTravelInMeshSpace_set)
     m_faceCount = property(_newton.ndPolygonMeshDesc_m_faceCount_get, _newton.ndPolygonMeshDesc_m_faceCount_set)
     m_vertexStrideInBytes = property(_newton.ndPolygonMeshDesc_m_vertexStrideInBytes_get, _newton.ndPolygonMeshDesc_m_vertexStrideInBytes_set)
-    m_skinThickness = property(_newton.ndPolygonMeshDesc_m_skinThickness_get, _newton.ndPolygonMeshDesc_m_skinThickness_set)
-    m_userData = property(_newton.ndPolygonMeshDesc_m_userData_get, _newton.ndPolygonMeshDesc_m_userData_set)
+    m_skinMargin = property(_newton.ndPolygonMeshDesc_m_skinMargin_get, _newton.ndPolygonMeshDesc_m_skinMargin_set)
     m_convexInstance = property(_newton.ndPolygonMeshDesc_m_convexInstance_get, _newton.ndPolygonMeshDesc_m_convexInstance_set)
     m_polySoupInstance = property(_newton.ndPolygonMeshDesc_m_polySoupInstance_get, _newton.ndPolygonMeshDesc_m_polySoupInstance_set)
     m_vertex = property(_newton.ndPolygonMeshDesc_m_vertex_get, _newton.ndPolygonMeshDesc_m_vertex_set)
     m_faceIndexCount = property(_newton.ndPolygonMeshDesc_m_faceIndexCount_get, _newton.ndPolygonMeshDesc_m_faceIndexCount_set)
     m_faceVertexIndex = property(_newton.ndPolygonMeshDesc_m_faceVertexIndex_get, _newton.ndPolygonMeshDesc_m_faceVertexIndex_set)
+    m_meshData = property(_newton.ndPolygonMeshDesc_m_meshData_get, _newton.ndPolygonMeshDesc_m_meshData_set)
     m_faceIndexStart = property(_newton.ndPolygonMeshDesc_m_faceIndexStart_get, _newton.ndPolygonMeshDesc_m_faceIndexStart_set)
     m_hitDistance = property(_newton.ndPolygonMeshDesc_m_hitDistance_get, _newton.ndPolygonMeshDesc_m_hitDistance_set)
     m_me = property(_newton.ndPolygonMeshDesc_m_me_get, _newton.ndPolygonMeshDesc_m_me_set)
-    m_globalIndexCount = property(_newton.ndPolygonMeshDesc_m_globalIndexCount_get, _newton.ndPolygonMeshDesc_m_globalIndexCount_set)
-    m_maxT = property(_newton.ndPolygonMeshDesc_m_maxT_get, _newton.ndPolygonMeshDesc_m_maxT_set)
-    m_doContinuesCollisionTest = property(_newton.ndPolygonMeshDesc_m_doContinuesCollisionTest_get, _newton.ndPolygonMeshDesc_m_doContinuesCollisionTest_set)
     m_globalFaceVertexIndex = property(_newton.ndPolygonMeshDesc_m_globalFaceVertexIndex_get, _newton.ndPolygonMeshDesc_m_globalFaceVertexIndex_set)
-    m_meshData = property(_newton.ndPolygonMeshDesc_m_meshData_get, _newton.ndPolygonMeshDesc_m_meshData_set)
+    m_maxT = property(_newton.ndPolygonMeshDesc_m_maxT_get, _newton.ndPolygonMeshDesc_m_maxT_set)
+    m_globalIndexCount = property(_newton.ndPolygonMeshDesc_m_globalIndexCount_get, _newton.ndPolygonMeshDesc_m_globalIndexCount_set)
+    m_threadId = property(_newton.ndPolygonMeshDesc_m_threadId_get, _newton.ndPolygonMeshDesc_m_threadId_set)
+    m_doContinueCollisionTest = property(_newton.ndPolygonMeshDesc_m_doContinueCollisionTest_get, _newton.ndPolygonMeshDesc_m_doContinueCollisionTest_set)
     __swig_destroy__ = _newton.delete_ndPolygonMeshDesc
 
 # Register ndPolygonMeshDesc in _newton:
@@ -1099,8 +1090,17 @@ class ndShapeStaticMesh(ndShape):
         _newton.ndShapeStaticMesh_swiginit(self, _newton.new_ndShapeStaticMesh(*args))
     __swig_destroy__ = _newton.delete_ndShapeStaticMesh
 
+    def DebugShape(self, matrix, debugCallback):
+        return _newton.ndShapeStaticMesh_DebugShape(self, matrix, debugCallback)
+
+    def RayCast(self, callback, localP0, localP1, maxT, body, contactOut):
+        return _newton.ndShapeStaticMesh_RayCast(self, callback, localP0, localP1, maxT, body, contactOut)
+
     def GetCollidingFaces(self, data):
         return _newton.ndShapeStaticMesh_GetCollidingFaces(self, data)
+
+    def Save(self, desc):
+        return _newton.ndShapeStaticMesh_Save(self, desc)
 
 # Register ndShapeStaticMesh in _newton:
 _newton.ndShapeStaticMesh_swigregister(ndShapeStaticMesh)
@@ -1155,22 +1155,22 @@ class ndShapeChamferCylinder(ndShapeConvex):
 # Register ndShapeChamferCylinder in _newton:
 _newton.ndShapeChamferCylinder_swigregister(ndShapeChamferCylinder)
 
-class ndShapeDebugCallback(object):
+class ndShapeDebugNotify(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
 
     def __init__(self, *args, **kwargs):
         raise AttributeError("No constructor defined - class is abstract")
     __repr__ = _swig_repr
-    m_shared = _newton.ndShapeDebugCallback_m_shared
-    m_open = _newton.ndShapeDebugCallback_m_open
-    __swig_destroy__ = _newton.delete_ndShapeDebugCallback
+    m_shared = _newton.ndShapeDebugNotify_m_shared
+    m_open = _newton.ndShapeDebugNotify_m_open
+    __swig_destroy__ = _newton.delete_ndShapeDebugNotify
 
     def DrawPolygon(self, vertexCount, faceArray, edgeType):
-        return _newton.ndShapeDebugCallback_DrawPolygon(self, vertexCount, faceArray, edgeType)
-    m_instance = property(_newton.ndShapeDebugCallback_m_instance_get, _newton.ndShapeDebugCallback_m_instance_set)
+        return _newton.ndShapeDebugNotify_DrawPolygon(self, vertexCount, faceArray, edgeType)
+    m_instance = property(_newton.ndShapeDebugNotify_m_instance_get, _newton.ndShapeDebugNotify_m_instance_set)
 
-# Register ndShapeDebugCallback in _newton:
-_newton.ndShapeDebugCallback_swigregister(ndShapeDebugCallback)
+# Register ndShapeDebugNotify in _newton:
+_newton.ndShapeDebugNotify_swigregister(ndShapeDebugNotify)
 
 class ndShapeInstance(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -1218,6 +1218,9 @@ class ndShapeInstance(object):
     def GetShape(self, *args):
         return _newton.ndShapeInstance_GetShape(self, *args)
 
+    def SetShape(self, shape):
+        return _newton.ndShapeInstance_SetShape(self, shape)
+
     def SupportVertex(self, dir):
         return _newton.ndShapeInstance_SupportVertex(self, dir)
 
@@ -1263,11 +1266,14 @@ class ndShapeInstance(object):
     def GetInvScale(self):
         return _newton.ndShapeInstance_GetInvScale(self)
 
+    def GetAlignmentMatrix(self):
+        return _newton.ndShapeInstance_GetAlignmentMatrix(self)
+
     def SetScale(self, scale):
         return _newton.ndShapeInstance_SetScale(self, scale)
 
-    def SetGlobalScale(self, scale):
-        return _newton.ndShapeInstance_SetGlobalScale(self, scale)
+    def SetGlobalScale(self, *args):
+        return _newton.ndShapeInstance_SetGlobalScale(self, *args)
 
     def CalculatePlaneIntersection(self, normal, point, contactsOut):
         return _newton.ndShapeInstance_CalculatePlaneIntersection(self, normal, point, contactsOut)
@@ -1291,7 +1297,7 @@ class ndShapeInstance(object):
         return _newton.ndShapeInstance_GetUserDataID(self)
     m_globalMatrix = property(_newton.ndShapeInstance_m_globalMatrix_get, _newton.ndShapeInstance_m_globalMatrix_set)
     m_localMatrix = property(_newton.ndShapeInstance_m_localMatrix_get, _newton.ndShapeInstance_m_localMatrix_set)
-    m_aligmentMatrix = property(_newton.ndShapeInstance_m_aligmentMatrix_get, _newton.ndShapeInstance_m_aligmentMatrix_set)
+    m_alignmentMatrix = property(_newton.ndShapeInstance_m_alignmentMatrix_get, _newton.ndShapeInstance_m_alignmentMatrix_set)
     m_scale = property(_newton.ndShapeInstance_m_scale_get, _newton.ndShapeInstance_m_scale_set)
     m_invScale = property(_newton.ndShapeInstance_m_invScale_get, _newton.ndShapeInstance_m_invScale_set)
     m_maxScale = property(_newton.ndShapeInstance_m_maxScale_get, _newton.ndShapeInstance_m_maxScale_set)
@@ -1300,7 +1306,7 @@ class ndShapeInstance(object):
     m_ownerBody = property(_newton.ndShapeInstance_m_ownerBody_get, _newton.ndShapeInstance_m_ownerBody_set)
     m_subCollisionHandle = property(_newton.ndShapeInstance_m_subCollisionHandle_get, _newton.ndShapeInstance_m_subCollisionHandle_set)
     m_parent = property(_newton.ndShapeInstance_m_parent_get, _newton.ndShapeInstance_m_parent_set)
-    m_skinThickness = property(_newton.ndShapeInstance_m_skinThickness_get, _newton.ndShapeInstance_m_skinThickness_set)
+    m_skinMargin = property(_newton.ndShapeInstance_m_skinMargin_get, _newton.ndShapeInstance_m_skinMargin_set)
     m_scaleType = property(_newton.ndShapeInstance_m_scaleType_get, _newton.ndShapeInstance_m_scaleType_set)
     m_collisionMode = property(_newton.ndShapeInstance_m_collisionMode_get, _newton.ndShapeInstance_m_collisionMode_set)
 
@@ -1327,14 +1333,14 @@ class ndBody(object):
     def GetAsBodySentinel(self):
         return _newton.ndBody_GetAsBodySentinel(self)
 
+    def GetAsBodySphFluid(self):
+        return _newton.ndBody_GetAsBodySphFluid(self)
+
     def GetAsBodyKinematic(self):
         return _newton.ndBody_GetAsBodyKinematic(self)
 
     def GetAsBodyPlayerCapsule(self):
         return _newton.ndBody_GetAsBodyPlayerCapsule(self)
-
-    def GetAsBodySphFluid(self):
-        return _newton.ndBody_GetAsBodySphFluid(self)
 
     def GetAsBodyParticleSet(self):
         return _newton.ndBody_GetAsBodyParticleSet(self)
@@ -1363,35 +1369,53 @@ class ndBody(object):
     def GetNotifyCallback(self):
         return _newton.ndBody_GetNotifyCallback(self)
 
-    def SetNotifyCallback(self, notify):
-        return _newton.ndBody_SetNotifyCallback(self, notify)
-
     def GetOmega(self):
         return _newton.ndBody_GetOmega(self)
-
-    def SetOmega(self, veloc):
-        return _newton.ndBody_SetOmega(self, veloc)
-
-    def GetVelocity(self):
-        return _newton.ndBody_GetVelocity(self)
-
-    def SetVelocity(self, veloc):
-        return _newton.ndBody_SetVelocity(self, veloc)
 
     def GetMatrix(self):
         return _newton.ndBody_GetMatrix(self)
 
-    def SetMatrix(self, matrix):
-        return _newton.ndBody_SetMatrix(self, matrix)
+    def GetVelocity(self):
+        return _newton.ndBody_GetVelocity(self)
+
+    def GetPosition(self):
+        return _newton.ndBody_GetPosition(self)
 
     def GetRotation(self):
         return _newton.ndBody_GetRotation(self)
+
+    def GetGlobalGetCentreOfMass(self):
+        return _newton.ndBody_GetGlobalGetCentreOfMass(self)
+
+    def SetNotifyCallback(self, notify):
+        return _newton.ndBody_SetNotifyCallback(self, notify)
+
+    def SetOmega(self, veloc):
+        return _newton.ndBody_SetOmega(self, veloc)
+
+    def SetVelocity(self, veloc):
+        return _newton.ndBody_SetVelocity(self, veloc)
+
+    def SetMatrix(self, matrix):
+        return _newton.ndBody_SetMatrix(self, matrix)
 
     def Save(self, desc):
         return _newton.ndBody_Save(self, desc)
 
     def GetVelocityAtPoint(self, point):
         return _newton.ndBody_GetVelocityAtPoint(self, point)
+
+    def SetOmegaNoSleep(self, veloc):
+        return _newton.ndBody_SetOmegaNoSleep(self, veloc)
+
+    def SetVelocityNoSleep(self, veloc):
+        return _newton.ndBody_SetVelocityNoSleep(self, veloc)
+
+    def SetMatrixNoSleep(self, matrix):
+        return _newton.ndBody_SetMatrixNoSleep(self, matrix)
+
+    def SetMatrixAndCentreOfMass(self, rotation, globalcom):
+        return _newton.ndBody_SetMatrixAndCentreOfMass(self, rotation, globalcom)
 
 # Register ndBody in _newton:
 _newton.ndBody_swigregister(ndBody)
@@ -1422,6 +1446,9 @@ class ndBodyKinematic(ndBody):
     def GetGyroAlpha(self):
         return _newton.ndBodyKinematic_GetGyroAlpha(self)
 
+    def GetGyroTorque(self):
+        return _newton.ndBodyKinematic_GetGyroTorque(self)
+
     def GetSleepState(self):
         return _newton.ndBodyKinematic_GetSleepState(self)
 
@@ -1437,14 +1464,23 @@ class ndBodyKinematic(ndBody):
     def SetAutoSleep(self, state):
         return _newton.ndBodyKinematic_SetAutoSleep(self, state)
 
-    def SetDebugMaxAngularIntegrationSteepAndLinearSpeed(self, angleInRadian, speedInMitersPerSeconds):
-        return _newton.ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAndLinearSpeed(self, angleInRadian, speedInMitersPerSeconds)
+    def GetMaxLinearStep(self):
+        return _newton.ndBodyKinematic_GetMaxLinearStep(self)
+
+    def GetMaxAngularStep(self):
+        return _newton.ndBodyKinematic_GetMaxAngularStep(self)
+
+    def SetDebugMaxLinearAndAngularIntegrationStep(self, angleInRadian, stepInUnitPerSeconds):
+        return _newton.ndBodyKinematic_SetDebugMaxLinearAndAngularIntegrationStep(self, angleInRadian, stepInUnitPerSeconds)
 
     def GetLinearDamping(self):
         return _newton.ndBodyKinematic_GetLinearDamping(self)
 
     def SetLinearDamping(self, linearDamp):
         return _newton.ndBodyKinematic_SetLinearDamping(self, linearDamp)
+
+    def GetCachedDamping(self):
+        return _newton.ndBodyKinematic_GetCachedDamping(self)
 
     def GetAngularDamping(self):
         return _newton.ndBodyKinematic_GetAngularDamping(self)
@@ -1476,20 +1512,23 @@ class ndBodyKinematic(ndBody):
     def CalculateInvInertiaMatrix(self):
         return _newton.ndBodyKinematic_CalculateInvInertiaMatrix(self)
 
-    def UpdateInvInertiaMatrix(self):
-        return _newton.ndBodyKinematic_UpdateInvInertiaMatrix(self)
-
     def IntegrateVelocity(self, timestep):
         return _newton.ndBodyKinematic_IntegrateVelocity(self, timestep)
 
     def Save(self, desc):
         return _newton.ndBodyKinematic_Save(self, desc)
 
+    def UpdateInvInertiaMatrix(self):
+        return _newton.ndBodyKinematic_UpdateInvInertiaMatrix(self)
+
     def SetMassMatrix(self, *args):
         return _newton.ndBodyKinematic_SetMassMatrix(self, *args)
 
     def GetMassMatrix(self, *args):
         return _newton.ndBodyKinematic_GetMassMatrix(self, *args)
+
+    def SetMatrixUpdateScene(self, matrix):
+        return _newton.ndBodyKinematic_SetMatrixUpdateScene(self, matrix)
 
     def FindContact(self, otherBody):
         return _newton.ndBodyKinematic_FindContact(self, otherBody)
@@ -1515,6 +1554,21 @@ class ndBodyKinematic(ndBody):
     def SetTorque(self, torque):
         return _newton.ndBodyKinematic_SetTorque(self, torque)
 
+    def AddImpulse(self, pointVeloc, pointPosit, timestep):
+        return _newton.ndBodyKinematic_AddImpulse(self, pointVeloc, pointPosit, timestep)
+
+    def ApplyImpulsePair(self, linearImpulse, angularImpulse, timestep):
+        return _newton.ndBodyKinematic_ApplyImpulsePair(self, linearImpulse, angularImpulse, timestep)
+
+    def ApplyImpulsesAtPoint(self, count, impulseArray, pointArray, timestep):
+        return _newton.ndBodyKinematic_ApplyImpulsesAtPoint(self, count, impulseArray, pointArray, timestep)
+
+    def GetAccel(self):
+        return _newton.ndBodyKinematic_GetAccel(self)
+
+    def GetAlpha(self):
+        return _newton.ndBodyKinematic_GetAlpha(self)
+
     def SetAccel(self, accel):
         return _newton.ndBodyKinematic_SetAccel(self, accel)
 
@@ -1529,6 +1583,17 @@ class ndBodyKinematic(ndBody):
 
 # Register ndBodyKinematic in _newton:
 _newton.ndBodyKinematic_swigregister(ndBodyKinematic)
+
+class ndBodySentinel(ndBodyKinematic):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self):
+        _newton.ndBodySentinel_swiginit(self, _newton.new_ndBodySentinel())
+    __swig_destroy__ = _newton.delete_ndBodySentinel
+
+# Register ndBodySentinel in _newton:
+_newton.ndBodySentinel_swigregister(ndBodySentinel)
 
 class ndBodyTriggerVolume(ndBodyKinematic):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -1549,6 +1614,9 @@ class ndBodyTriggerVolume(ndBodyKinematic):
 
     def OnTriggerExit(self, body, timestep):
         return _newton.ndBodyTriggerVolume_OnTriggerExit(self, body, timestep)
+
+    def SpecialUpdate(self, timestep):
+        return _newton.ndBodyTriggerVolume_SpecialUpdate(self, timestep)
 
     def Save(self, desc):
         return _newton.ndBodyTriggerVolume_Save(self, desc)
@@ -1640,8 +1708,8 @@ class ndMaterial(object):
     m_staticFriction1 = property(_newton.ndMaterial_m_staticFriction1_get, _newton.ndMaterial_m_staticFriction1_set)
     m_dynamicFriction0 = property(_newton.ndMaterial_m_dynamicFriction0_get, _newton.ndMaterial_m_dynamicFriction0_set)
     m_dynamicFriction1 = property(_newton.ndMaterial_m_dynamicFriction1_get, _newton.ndMaterial_m_dynamicFriction1_set)
+    m_skinMargin = property(_newton.ndMaterial_m_skinMargin_get, _newton.ndMaterial_m_skinMargin_set)
     m_softness = property(_newton.ndMaterial_m_softness_get, _newton.ndMaterial_m_softness_set)
-    m_skinThickness = property(_newton.ndMaterial_m_skinThickness_get, _newton.ndMaterial_m_skinThickness_set)
     m_flags = property(_newton.ndMaterial_m_flags_get, _newton.ndMaterial_m_flags_set)
     m_userFlags = property(_newton.ndMaterial_m_userFlags_get, _newton.ndMaterial_m_userFlags_set)
     __swig_destroy__ = _newton.delete_ndMaterial
@@ -1672,8 +1740,8 @@ class ndContactNotify(object):
     def OnAabbOverlap(self, arg2, arg3):
         return _newton.ndContactNotify_OnAabbOverlap(self, arg2, arg3)
 
-    def OnContactCallback(self, arg2, arg3, arg4):
-        return _newton.ndContactNotify_OnContactCallback(self, arg2, arg3, arg4)
+    def OnContactCallback(self, arg2, arg3):
+        return _newton.ndContactNotify_OnContactCallback(self, arg2, arg3)
 
 # Register ndContactNotify in _newton:
 _newton.ndContactNotify_swigregister(ndContactNotify)
