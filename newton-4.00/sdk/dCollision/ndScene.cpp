@@ -45,23 +45,27 @@ ndVector ndScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANG
 ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
 ndScene::ndFitnessList::ndFitnessList()
-	//:ndArray<ndSceneNode*>(1024)
 	:m_workingArray(1024)
-	//,m_buildArray(1024)
+#ifdef D_NEW_SCENE
+	,m_buildArray(1024)
+#endif
 	,m_scansCount(0)
 	,m_isDirty(true)
 {
 }
 
 ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
-	//:ndArray<ndSceneNode*>(1024)
 	:m_workingArray(1024)
-	//,m_buildArray(1024)
+#ifdef D_NEW_SCENE
+	,m_buildArray(1024)
+#endif
 	,m_scansCount(0)
 	,m_isDirty(true)
 {
 	m_workingArray.Swap((ndArray<ndSceneNode*>&)src.m_workingArray);
-	//m_buildArray.Swap((ndArray<ndSceneNode*>&)src.m_buildArray);
+#ifdef D_NEW_SCENE
+	m_buildArray.Swap((ndArray<ndSceneNode*>&)src.m_buildArray);
+#endif
 }
 
 ndScene::ndFitnessList::~ndFitnessList()
@@ -74,7 +78,9 @@ void ndScene::ndFitnessList::AddNode(ndSceneNode* const node)
 	m_isDirty = true;
 	node->m_isDead = 0;
 	m_workingArray.PushBack(node);
-	//m_buildArray.PushBack(node->Clone());
+#ifdef D_NEW_SCENE
+	m_buildArray.PushBack(node->Clone());
+#endif
 }
 
 void ndScene::ndFitnessList::CleanUp()
@@ -86,13 +92,14 @@ void ndScene::ndFitnessList::CleanUp()
 		delete node;
 	}
 	m_workingArray.SetCount(0);
-	
-	//for (ndInt32 i = m_buildArray.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndSceneNode* const node = m_buildArray[i];
-	//	delete node;
-	//}
-	//m_buildArray.SetCount(0);
+#ifdef D_NEW_SCENE	
+	for (ndInt32 i = m_buildArray.GetCount() - 1; i >= 0; --i)
+	{
+		ndSceneNode* const node = m_buildArray[i];
+		delete node;
+	}
+	m_buildArray.SetCount(0);
+#endif
 }
 
 void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)

@@ -27,8 +27,6 @@
 #include "ndSceneNode.h"
 #include "ndContactArray.h"
 
-//#define D_NEW_SCENE
-
 #define D_SCENE_MAX_STACK_DEPTH		256
 
 class ndWorld;
@@ -85,7 +83,9 @@ class ndScene : public ndThreadPool
 		void AddNode(ndSceneNode* const node);
 
 		ndArray<ndSceneNode*> m_workingArray;
-		//ndArray<ndSceneNode*> m_buildArray;
+#ifdef D_NEW_SCENE
+		ndArray<ndSceneNode*> m_buildArray;
+#endif
 		ndUnsigned32 m_scans[256];
 		ndUnsigned32 m_scansCount;
 		bool m_isDirty;

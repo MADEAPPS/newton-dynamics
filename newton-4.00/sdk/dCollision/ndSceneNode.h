@@ -24,6 +24,8 @@
 
 #include "ndCollisionStdafx.h"
 
+#define D_NEW_SCENE
+
 class ndBodyKinematic;
 class ndSceneBodyNode;
 class ndSceneTreeNode;
@@ -54,6 +56,9 @@ class ndSceneNode : public ndContainersFreeListAlloc<ndSceneNode>
 	ndVector m_minBox;
 	ndVector m_maxBox;
 	ndSceneNode* m_parent;
+#ifdef D_NEW_SCENE
+	ndSceneNode* m_buildNode;
+#endif
 	ndSpinLock m_lock;
 	ndInt32 m_depthLevel;
 	ndUnsigned8 m_isDead;
@@ -104,6 +109,9 @@ inline ndSceneNode::ndSceneNode(ndSceneNode* const parent)
 	,m_minBox(ndFloat32(-1.0e15f))
 	,m_maxBox(ndFloat32(1.0e15f))
 	,m_parent(parent)
+#ifdef D_NEW_SCENE
+	,m_buildNode(nullptr)
+#endif
 	,m_lock()
 	,m_isDead(0)
 	,m_depthLevel(0)
@@ -119,11 +127,18 @@ inline ndSceneNode::ndSceneNode(const ndSceneNode& src)
 	,m_minBox(src.m_minBox)
 	,m_maxBox(src.m_maxBox)
 	,m_parent(nullptr)
+#ifdef D_NEW_SCENE
+	,m_buildNode((ndSceneNode*)&src)
+#endif
 	,m_lock()
 	,m_isDead(0)
 	,m_depthLevel(0)
 	,m_bhvLinked(0)
 {
+#ifdef D_NEW_SCENE
+	m_buildNode->m_buildNode = this;
+#endif
+
 #ifdef _DEBUG
 	m_nodeId = 0;
 #endif
