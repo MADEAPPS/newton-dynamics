@@ -60,13 +60,13 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 deviation)
 {
 	// dAssert (0);
 	// yes I know central limit, is not quite right but for now it will do for now.
-	//const ndInt32 count = 4;
-	//ndFloat32 r = ndFloat32(0.0f);
-	//for (ndInt32 i = 0; i < count; i++)
-	//{
-	//	r += ndFloat32(2.0f) * ndRand() - ndFloat32(1.0f);
-	//}
-	//r *= (amp / count);
+	const ndInt32 count = 4;
+	ndFloat32 r = ndFloat32(0.0f);
+	for (ndInt32 i = 0; i < count; i++)
+	{
+		r += ndFloat32(2.0f) * ndRand() - ndFloat32(1.0f);
+	}
+	r *= (deviation / count);
 
 	// a better way if to use cumulative density of a unit Gaussian distribution and form that get a unit 
 	// random variable: from wikipedia media Zelen& Severo(1964) 

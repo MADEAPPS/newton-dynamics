@@ -150,7 +150,7 @@ D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 D_CORE_API ndFloat32 ndRand();
 D_CORE_API ndInt32 ndRandInt();
 D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
-D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 amp);
+D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 deviation);
 
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
 /// \param ndFloat64 val: 64 bit float 

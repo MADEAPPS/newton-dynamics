@@ -174,7 +174,7 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 		for (ndInt32 ix = 0; ix <= grids; ix++)
 		{
 			ndFloat32 x0 = origin.m_x + ix * gridSize;
-			points.PushBack(ndVector(x0, ndGaussianRandom(perturbation), z0, 1.0f));
+			points.PushBack(ndVector(x0, ndGaussianRandom(0.0f, perturbation), z0, 1.0f));
 		}
 	}
 
