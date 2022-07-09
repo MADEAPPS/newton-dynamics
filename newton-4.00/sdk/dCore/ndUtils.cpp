@@ -55,28 +55,38 @@ ndFloat32 ndRand()
 	return r;
 }
 
-/// return a pseudo Gaussian random with mean 0 and variance 0.5f
-ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 deviation)
+// return a pseudo Gaussian random number with mean u and deviation phi
+ndFloat32 ndGaussianRandom(ndFloat32 u, ndFloat32 phi)
 {
-	// dAssert (0);
-	// yes I know central limit, is not quite right but for now it will do for now.
-	const ndInt32 count = 4;
-	ndFloat32 r = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < count; i++)
+	// from Abramowitz and Stegun formula 26.2.23.
+	// calculate a normal value with 0.0 mean and 1.0 deviation 
+	// the absolute value of the error should be less than 4.5 e-4.
+	auto NormalCumulativeDistibutionInverse = [](ndFloat32 r)
 	{
-		r += ndFloat32(2.0f) * ndRand() - ndFloat32(1.0f);
-	}
-	r *= (deviation / count);
+		auto RationalApproximation = [](ndFloat32 t)
+		{
+			ndFloat32 c[] = { ndFloat32(2.515517f), ndFloat32(0.802853f), ndFloat32(0.010328f) };
+			ndFloat32 d[] = { ndFloat32(1.432788f), ndFloat32(0.189269f), ndFloat32(0.001308f) };
+			ndFloat32 numerator = c[0] + (c[2] * t + c[1]) * t;
+			ndFloat32 denominator = ndFloat32(1.0f) + ((d[2] * t + d[1]) * t + d[0]) * t;
+			return t - numerator / denominator;
+		};
 
-	// a better way if to use cumulative density of a unit Gaussian distribution and form that get a unit 
-	// random variable: from wikipedia media Zelen& Severo(1964) 
-	// give the approximation for ?(x) for x > 0 with the absolute error | epsilon(x) | < 7.5·10?8(algorithm 26.2.17) :
-	// let t = 1 / (1 + b0 * x)
-	// cdf(x) = 1 - phi(x) * (b1 * t + b2 * t ^ 2 + b3 * t ^ 3 + b4 * t ^ 4 + b5 * t ^ 5)
-	// where cdf(x) is the standard normal PDF, 
-	// and b0 = 0.2316419, b1 = 0.319381530, b2 = ?0.356563782, b3 = 1.781477937, b4 = ?1.821255978, b5 = 1.330274429.
-
-	return mean;
+		if (r < ndFloat32(0.5f))
+		{
+			// F^-1(p) = - G^-1(p)
+			return -RationalApproximation(ndSqrt(ndFloat32(-2.0f) * ndLog(r)));
+		}
+		else
+		{
+			// F^-1(p) = G^-1(1-p)
+			return RationalApproximation(ndSqrt(ndFloat32(-2.0f) * ndLog(ndFloat32(1.0f) - r)));
+		}
+	};
+	
+	ndFloat32 r = ndClamp (ndRand(), ndFloat32 (1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
+	ndFloat32 normal = NormalCumulativeDistibutionInverse(r);
+	return u + normal/phi;
 }
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)
