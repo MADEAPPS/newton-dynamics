@@ -1027,6 +1027,12 @@ class ndShapeStatic_bvh(object):
         _newton.ndShapeStatic_bvh_swiginit(self, _newton.new_ndShapeStatic_bvh(*args))
     __swig_destroy__ = _newton.delete_ndShapeStatic_bvh
 
+    def Create(self, size):
+        return _newton.ndShapeStatic_bvh_Create(self, size)
+
+    def Destroy(self, ptr):
+        return _newton.ndShapeStatic_bvh_Destroy(self, ptr)
+
 # Register ndShapeStatic_bvh in _newton:
 _newton.ndShapeStatic_bvh_swigregister(ndShapeStatic_bvh)
 

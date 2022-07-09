@@ -23,7 +23,9 @@
 %module newton
 #pragma SWIG nowarn=312		//Nested union not supported
 #pragma SWIG nowarn=325		//Nested struct not currently supported 
+#pragma SWIG nowarn=389		//operator[] ignored
 #pragma SWIG nowarn=401		//Nothing known about base class
+#pragma SWIG nowarn=509		//Overloaded method effectively ignored,
 
 %begin 
 %{
@@ -53,6 +55,10 @@
 %rename(GetElement) dMatrix::operator[](dInt32 i) const;
 
 %rename(Assigment) ndShapeInstance::operator=;  
+
+%rename(Create) ndShapeStatic_bvh::operator new;  
+%rename(Destroy) ndShapeStatic_bvh::operator delete;  
+
 
 //%template(objInfo) pyBaseNodeInfo<dSceneNodeInfo>;
 //%template(meshInfo) pyBaseNodeInfo<dMeshNodeInfo>;
