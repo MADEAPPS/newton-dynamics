@@ -12,8 +12,11 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set (projectName "newtonPy")
 message (${projectName})
-
-set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
+if(MSVC OR MINGW)
+	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
+else()
+	set (swig "/usr/bin/swig")
+endif()
 set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newton.i")
 execute_process(COMMAND ${swig} -c++ -python ${script})
 
@@ -43,11 +46,18 @@ include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-#message ($ENV{PythonInclude})
-target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
 
-#message ("$ENV{Python}")
-target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
+if (MSVC OR MINGW)
+	#message ($ENV{PythonInclude})
+	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
+
+	#message ("$ENV{Python}")
+	target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
+else()
+	find_package (Python COMPONENTS Development REQUIRED)
+	target_include_directories(${projectName} PUBLIC ${Python_INCLUDE_DIRS})
+	target_link_libraries(${projectName} ${Python_LIBRARIES})
+endif()
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndNewton ndCollision ndCore)
