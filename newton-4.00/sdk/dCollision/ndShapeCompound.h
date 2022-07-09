@@ -42,8 +42,8 @@ class ndShapeCompound: public ndShape
 	class ndTreeArray : public ndTree<ndNodeBase*, ndInt32, ndContainersFreeListAlloc<ndNodeBase*>>
 	{
 		public:
-		ndTreeArray();
-		void AddNode(ndNodeBase* const node, ndInt32 index, const ndShapeInstance* const parent);
+		D_COLLISION_API ndTreeArray();
+		D_COLLISION_API void AddNode(ndNodeBase* const node, ndInt32 index, const ndShapeInstance* const parent);
 	};
 
 	D_CLASS_REFLECTION(ndShapeCompound);
@@ -118,11 +118,11 @@ inline void ndShapeCompound::SetOwner(const ndShapeInstance* const instance)
 class ndShapeCompound::ndNodeBase: public ndClassAlloc
 {
 	public:
-	ndNodeBase();
-	ndNodeBase(const ndNodeBase& copyFrom);
-	ndNodeBase(ndShapeInstance* const instance);
-	ndNodeBase(ndNodeBase* const left, ndNodeBase* const right);
-	~ndNodeBase();
+	D_COLLISION_API ndNodeBase();
+	D_COLLISION_API ndNodeBase(const ndNodeBase& copyFrom);
+	D_COLLISION_API ndNodeBase(ndShapeInstance* const instance);
+	D_COLLISION_API ndNodeBase(ndNodeBase* const left, ndNodeBase* const right);
+	D_COLLISION_API ~ndNodeBase();
 
 	//void Sanity(int level = 0);
 	D_COLLISION_API ndShapeInstance* GetShape() const;
