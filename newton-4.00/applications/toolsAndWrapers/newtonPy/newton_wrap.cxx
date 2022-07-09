@@ -2887,6 +2887,7 @@ namespace swig {
 
 	#include <ndNewton.h>
 	#include <newtonWorld.h>
+	#include "newtonConfig.h"
 
 
 SWIGINTERN swig_type_info*
@@ -3198,6 +3199,41 @@ SWIG_AsVal_bool (PyObject *obj, bool *val)
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN PyObject *_wrap_dGetWorkingFileName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) (char *)0 ;
+  char *arg2 = (char *) (char *)0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "dGetWorkingFileName", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(swig_obj[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dGetWorkingFileName" "', argument " "1"" of type '" "char const *const""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dGetWorkingFileName" "', argument " "2"" of type '" "char *const""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  dGetWorkingFileName((char const *)arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_new_ndVector__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **SWIGUNUSEDPARM(swig_obj)) {
   PyObject *resultobj = 0;
   ndVector *result = 0 ;
@@ -27729,6 +27765,7 @@ SWIGINTERN PyObject *NewtonWorld_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObje
 
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { "dGetWorkingFileName", _wrap_dGetWorkingFileName, METH_VARARGS, NULL},
 	 { "new_ndVector", _wrap_new_ndVector, METH_VARARGS, NULL},
 	 { "ndVector_GetX", _wrap_ndVector_GetX, METH_O, NULL},
 	 { "ndVector_GetY", _wrap_ndVector_GetY, METH_O, NULL},

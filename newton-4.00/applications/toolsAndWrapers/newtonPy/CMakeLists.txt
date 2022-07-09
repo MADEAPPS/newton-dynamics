@@ -46,7 +46,6 @@ include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-
 if (MSVC OR MINGW)
 	#message ($ENV{PythonInclude})
 	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
