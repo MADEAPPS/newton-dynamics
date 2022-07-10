@@ -87,8 +87,7 @@
 %rename(Create) ndShapeStatic_bvh::operator new;  
 %rename(Destroy) ndShapeStatic_bvh::operator delete;  
 
-
-%include "../../../sdk/dCore/ndVectorSimd.h"
+%include "../../../sdk/dCore/ndVector.h"
 %include "../../../sdk/dCore/ndMatrix.h"
 %include "../../../sdk/dCore/ndQuaternion.h"
 
