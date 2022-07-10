@@ -36,7 +36,9 @@ ndThread::ndThread()
 #endif
 {
 	strcpy (m_name, "newtonWorker");
+#ifndef D_USE_THREAD_EMULATION
 	store(false);
+#endif
 }
 
 ndThread::~ndThread()
@@ -94,7 +96,6 @@ void ndThread::Signal()
 void ndThread::ThreadFunctionCallback()
 {
 #ifndef D_USE_THREAD_EMULATION
-
 	// wait until constructor was fully initialized.
 	while (load())
 	{

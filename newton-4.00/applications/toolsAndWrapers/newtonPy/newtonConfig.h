@@ -54,18 +54,18 @@
 #define D_GCC_NEWTON_ALIGN_32
 
 
-#define dInt8 signed char
-#define dInt16 signed short
-#define dInt32 signed int
-#define dInt64 signed long long
+#define ndInt8 signed char
+#define ndInt16 signed short
+#define ndInt32 signed int
+#define ndInt64 signed long long
 
-#define dUnsigned8 unsigned char
-#define dUnsigned16 unsigned short
-#define dUnsigned32 unsigned int
-#define dUnsigned64 unsigned long long
+#define ndUnsigned8 unsigned char
+#define ndUnsigned16 unsigned short
+#define ndUnsigned32 unsigned int
+#define ndUnsigned64 unsigned long long
 
-#define dFloat32 float
-#define dFloat64 double
+#define ndFloat32 float
+#define ndFloat64 double
 
 
 

@@ -25,7 +25,6 @@
 #pragma SWIG nowarn=325		//Nested struct not currently supported 
 #pragma SWIG nowarn=389		//operator[] ignored
 #pragma SWIG nowarn=401		//Nothing known about base class
-#pragma SWIG nowarn=509		//Overloaded method ignored
 
 %begin 
 %{

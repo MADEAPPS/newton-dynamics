@@ -367,19 +367,25 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_2(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_3(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_3(float jarg1) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 const *argp1 ;
+  float arg1 ;
   ndVector *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32 const", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (float)jarg1; 
   result = (ndVector *)new ndVector(arg1);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_4(void * jarg1) {
+  void * jresult ;
+  float *arg1 = (float *) (float *)0 ;
+  ndVector *result = 0 ;
+  
+  arg1 = (float *)jarg1; 
+  result = (ndVector *)new ndVector((float const *)arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -387,13 +393,13 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_3(void * jarg1) {
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_5(void * jarg1, void * jarg2) {
   void * jresult ;
-  ndFloat32 *arg1 = (ndFloat32 *) (ndFloat32 *)0 ;
-  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
+  float *arg1 = (float *) (float *)0 ;
+  int *arg2 = (int *) (int *)0 ;
   ndVector *result = 0 ;
   
-  arg1 = (ndFloat32 *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
-  result = (ndVector *)new ndVector((ndFloat32 const *)arg1,(ndInt32 const *)arg2);
+  arg1 = (float *)jarg1; 
+  arg2 = (int *)jarg2; 
+  result = (ndVector *)new ndVector((float const *)arg1,(int const *)arg2);
   jresult = (void *)result; 
   return jresult;
 }
@@ -401,11 +407,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_5(void * jarg1, void * j
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_6(void * jarg1) {
   void * jresult ;
-  ndFloat64 *arg1 = (ndFloat64 *) (ndFloat64 *)0 ;
+  double *arg1 = (double *) (double *)0 ;
   ndVector *result = 0 ;
   
-  arg1 = (ndFloat64 *)jarg1; 
-  result = (ndVector *)new ndVector((ndFloat64 const *)arg1);
+  arg1 = (double *)jarg1; 
+  result = (ndVector *)new ndVector((double const *)arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -443,220 +449,148 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_8(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_9(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_9(float jarg1, float jarg2, float jarg3, float jarg4) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 arg4 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
-  ndFloat32 *argp4 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
   ndVector *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
+  arg4 = (float)jarg4; 
   result = (ndVector *)new ndVector(arg1,arg2,arg3,arg4);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_10(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndVector__SWIG_10(int jarg1, int jarg2, int jarg3, int jarg4) {
   void * jresult ;
-  ndInt32 arg1 ;
-  ndInt32 arg2 ;
-  ndInt32 arg3 ;
-  ndInt32 arg4 ;
-  ndInt32 *argp1 ;
-  ndInt32 *argp2 ;
-  ndInt32 *argp3 ;
-  ndInt32 *argp4 ;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
   ndVector *result = 0 ;
   
-  argp1 = (ndInt32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndInt32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
   result = (ndVector *)new ndVector(arg1,arg2,arg3,arg4);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetX(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_GetX(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result = ((ndVector const *)arg1)->GetX();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndVector const *)arg1)->GetX();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetY(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_GetY(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result = ((ndVector const *)arg1)->GetY();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndVector const *)arg1)->GetY();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetZ(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_GetZ(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result = ((ndVector const *)arg1)->GetZ();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndVector const *)arg1)->GetZ();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetW(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_GetW(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result = ((ndVector const *)arg1)->GetW();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndVector const *)arg1)->GetW();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetX(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetX(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetX(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetY(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetY(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetY(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetZ(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetZ(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetZ(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetW(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_SetW(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetW(arg2);
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetScalar(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_GetScalar(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result = ((ndVector const *)arg1)->GetScalar();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndVector const *)arg1)->GetScalar();
+  jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_Store(void * jarg1, void * jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 *arg2 = (ndFloat32 *) (ndFloat32 *)0 ;
+  float *arg2 = (float *) (float *)0 ;
   
   arg1 = (ndVector *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
+  arg2 = (float *)jarg2; 
   ((ndVector const *)arg1)->Store(arg2);
 }
 
@@ -709,41 +643,29 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_BroadcastW(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Scale(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Scale(void * jarg1, float jarg2) {
   void * jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   ndVector result;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   result = ((ndVector const *)arg1)->Scale(arg2);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetElement__SWIG_0(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetElement__SWIG_0(void * jarg1, int jarg2) {
   void * jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
-  ndFloat32 *result = 0 ;
+  int arg2 ;
+  float *result = 0 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  result = (ndFloat32 *) &(arg1)->operator [](arg2);
+  arg2 = (int)jarg2; 
+  result = (float *) &(arg1)->operator [](arg2);
   jresult = (void *)result; 
   return jresult;
 }
@@ -1319,14 +1241,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Select(void * jarg1, void * jarg2,
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetSignMask(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndVector_GetSignMask(void * jarg1) {
+  int jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndVector *)jarg1; 
-  result = ((ndVector const *)arg1)->GetSignMask();
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndVector const *)arg1)->GetSignMask();
+  jresult = result; 
   return jresult;
 }
 
@@ -1367,20 +1289,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_ShiftTripleLeft(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_ShiftRightLogical(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_ShiftRightLogical(void * jarg1, int jarg2) {
   void * jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   ndVector result;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = ((ndVector const *)arg1)->ShiftRightLogical(arg2);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -1453,14 +1369,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_Trace(void * jarg1, char * jarg2) {
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_f_set(void * jarg1, void * jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 *arg2 ;
+  float *arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
+  arg2 = (float *)jarg2; 
   {
     size_t ii;
-    ndFloat32 *b = (ndFloat32 *) arg1->m_f;
-    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((ndFloat32 *) arg2 + ii);
+    float *b = (float *) arg1->m_f;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((float *) arg2 + ii);
   }
 }
 
@@ -1468,10 +1384,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_f_set(void * jarg1, void * jarg2) 
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_f_get(void * jarg1) {
   void * jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 *result = 0 ;
+  float *result = 0 ;
   
   arg1 = (ndVector *)jarg1; 
-  result = (ndFloat32 *)(ndFloat32 *) ((arg1)->m_f);
+  result = (float *)(float *) ((arg1)->m_f);
   jresult = result; 
   return jresult;
 }
@@ -1479,14 +1395,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_f_get(void * jarg1) {
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_i_set(void * jarg1, void * jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 *arg2 ;
+  int *arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   {
     size_t ii;
-    ndInt32 *b = (ndInt32 *) arg1->m_i;
-    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((ndInt32 *) arg2 + ii);
+    int *b = (int *) arg1->m_i;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((int *) arg2 + ii);
   }
 }
 
@@ -1494,10 +1410,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_i_set(void * jarg1, void * jarg2) 
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_i_get(void * jarg1) {
   void * jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndVector *)jarg1; 
-  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_i);
+  result = (int *)(int *) ((arg1)->m_i);
   jresult = result; 
   return jresult;
 }
@@ -1559,226 +1475,178 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_typeInt_get(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_x_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_x_set(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_x = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_x_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_m_x_get(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_x);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_x);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_y_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_y_set(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_y = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_y_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_m_y_get(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_y);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_y);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_z_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_z_set(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_z = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_z_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_m_z_get(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_z);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_z);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_w_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_w_set(void * jarg1, float jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_w = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_w_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndVector_m_w_get(void * jarg1) {
+  float jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_w);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_w);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_ix_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_ix_set(void * jarg1, int jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_ix = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_ix_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndVector_m_ix_get(void * jarg1) {
+  int jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_ix);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_ix);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_iy_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_iy_set(void * jarg1, int jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_iy = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_iy_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndVector_m_iy_get(void * jarg1) {
+  int jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_iy);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_iy);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_iz_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_iz_set(void * jarg1, int jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_iz = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_iz_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndVector_m_iz_get(void * jarg1) {
+  int jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_iz);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_iz);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_iw_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndVector_m_iw_set(void * jarg1, int jarg2) {
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_iw = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_m_iw_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndVector_m_iw_get(void * jarg1) {
+  int jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndVector *)jarg1; 
-  result =  ((arg1)->m_iw);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_iw);
+  jresult = result; 
   return jresult;
 }
 
@@ -2139,18 +2007,12 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_3(void * jarg1, void 
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_4(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_4(double jarg1) {
   void * jresult ;
-  ndFloat64 arg1 ;
-  ndFloat64 const *argp1 ;
+  double arg1 ;
   ndBigVector *result = 0 ;
   
-  argp1 = (ndFloat64 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64 const", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (double)jarg1; 
   result = (ndBigVector *)new ndBigVector(arg1);
   jresult = (void *)result; 
   return jresult;
@@ -2159,13 +2021,13 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_4(void * jarg1) {
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_5(void * jarg1, void * jarg2) {
   void * jresult ;
-  ndFloat64 *arg1 = (ndFloat64 *) (ndFloat64 *)0 ;
-  ndInt64 *arg2 = (ndInt64 *) (ndInt64 *)0 ;
+  double *arg1 = (double *) (double *)0 ;
+  long long *arg2 = (long long *) (long long *)0 ;
   ndBigVector *result = 0 ;
   
-  arg1 = (ndFloat64 *)jarg1; 
-  arg2 = (ndInt64 *)jarg2; 
-  result = (ndBigVector *)new ndBigVector((ndFloat64 const *)arg1,(ndInt64 const *)arg2);
+  arg1 = (double *)jarg1; 
+  arg2 = (long long *)jarg2; 
+  result = (ndBigVector *)new ndBigVector((double const *)arg1,(long long const *)arg2);
   jresult = (void *)result; 
   return jresult;
 }
@@ -2187,271 +2049,181 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_6(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_8(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_7(void * jarg1) {
   void * jresult ;
-  ndFloat64 arg1 ;
-  ndFloat64 arg2 ;
-  ndFloat64 arg3 ;
-  ndFloat64 arg4 ;
-  ndFloat64 *argp1 ;
-  ndFloat64 *argp2 ;
-  ndFloat64 *argp3 ;
-  ndFloat64 *argp4 ;
+  double *arg1 = (double *) (double *)0 ;
   ndBigVector *result = 0 ;
   
-  argp1 = (ndFloat64 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat64 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndFloat64 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg1 = (double *)jarg1; 
+  result = (ndBigVector *)new ndBigVector((double const *)arg1);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_8(double jarg1, double jarg2, double jarg3, double jarg4) {
+  void * jresult ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  ndBigVector *result = 0 ;
+  
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  arg3 = (double)jarg3; 
+  arg4 = (double)jarg4; 
   result = (ndBigVector *)new ndBigVector(arg1,arg2,arg3,arg4);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_9(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_9(int jarg1, int jarg2, int jarg3, int jarg4) {
   void * jresult ;
-  ndInt32 arg1 ;
-  ndInt32 arg2 ;
-  ndInt32 arg3 ;
-  ndInt32 arg4 ;
-  ndInt32 *argp1 ;
-  ndInt32 *argp2 ;
-  ndInt32 *argp3 ;
-  ndInt32 *argp4 ;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
   ndBigVector *result = 0 ;
   
-  argp1 = (ndInt32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndInt32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
   result = (ndBigVector *)new ndBigVector(arg1,arg2,arg3,arg4);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_10(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBigVector__SWIG_10(long long jarg1, long long jarg2, long long jarg3, long long jarg4) {
   void * jresult ;
-  ndInt64 arg1 ;
-  ndInt64 arg2 ;
-  ndInt64 arg3 ;
-  ndInt64 arg4 ;
-  ndInt64 *argp1 ;
-  ndInt64 *argp2 ;
-  ndInt64 *argp3 ;
-  ndInt64 *argp4 ;
+  long long arg1 ;
+  long long arg2 ;
+  long long arg3 ;
+  long long arg4 ;
   ndBigVector *result = 0 ;
   
-  argp1 = (ndInt64 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndInt64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndInt64 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndInt64 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg1 = (long long)jarg1; 
+  arg2 = (long long)jarg2; 
+  arg3 = (long long)jarg3; 
+  arg4 = (long long)jarg4; 
   result = (ndBigVector *)new ndBigVector(arg1,arg2,arg3,arg4);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetX(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_GetX(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = ((ndBigVector const *)arg1)->GetX();
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double)((ndBigVector const *)arg1)->GetX();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetY(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_GetY(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = ((ndBigVector const *)arg1)->GetY();
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double)((ndBigVector const *)arg1)->GetY();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetZ(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_GetZ(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = ((ndBigVector const *)arg1)->GetZ();
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double)((ndBigVector const *)arg1)->GetZ();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetW(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_GetW(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = ((ndBigVector const *)arg1)->GetW();
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double)((ndBigVector const *)arg1)->GetW();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetX(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetX(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   (arg1)->SetX(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetY(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetY(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   (arg1)->SetY(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetZ(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetZ(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   (arg1)->SetZ(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetW(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_SetW(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   (arg1)->SetW(arg2);
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetScalar(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_GetScalar(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = ((ndBigVector const *)arg1)->GetScalar();
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double)((ndBigVector const *)arg1)->GetScalar();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetElement__SWIG_0(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetElement__SWIG_0(void * jarg1, int jarg2) {
   void * jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
-  ndFloat64 *result = 0 ;
+  int arg2 ;
+  double *result = 0 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  result = (ndFloat64 *) &(arg1)->operator [](arg2);
+  arg2 = (int)jarg2; 
+  result = (double *) &(arg1)->operator [](arg2);
   jresult = (void *)result; 
   return jresult;
 }
@@ -2673,20 +2445,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_BroadcastW(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Scale(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Scale(void * jarg1, double jarg2) {
   void * jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   ndBigVector result;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   result = ((ndBigVector const *)arg1)->Scale(arg2);
   jresult = new ndBigVector((const ndBigVector &)result); 
   return jresult;
@@ -3047,34 +2813,28 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_ShiftTripleLeft(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_ShiftRightLogical(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_ShiftRightLogical(void * jarg1, int jarg2) {
   void * jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   ndBigVector result;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = ((ndBigVector const *)arg1)->ShiftRightLogical(arg2);
   jresult = new ndBigVector((const ndBigVector &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetSignMask(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndBigVector_GetSignMask(void * jarg1) {
+  int jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = ((ndBigVector const *)arg1)->GetSignMask();
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndBigVector const *)arg1)->GetSignMask();
+  jresult = result; 
   return jresult;
 }
 
@@ -3219,14 +2979,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_CrossProduct__SWIG_1(void * jar
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_f_set(void * jarg1, void * jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 *arg2 ;
+  double *arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  arg2 = (ndFloat64 *)jarg2; 
+  arg2 = (double *)jarg2; 
   {
     size_t ii;
-    ndFloat64 *b = (ndFloat64 *) arg1->m_f;
-    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((ndFloat64 *) arg2 + ii);
+    double *b = (double *) arg1->m_f;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((double *) arg2 + ii);
   }
 }
 
@@ -3234,10 +2994,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_f_set(void * jarg1, void * jarg
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_f_get(void * jarg1) {
   void * jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 *result = 0 ;
+  double *result = 0 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = (ndFloat64 *)(ndFloat64 *) ((arg1)->m_f);
+  result = (double *)(double *) ((arg1)->m_f);
   jresult = result; 
   return jresult;
 }
@@ -3245,14 +3005,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_f_get(void * jarg1) {
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_i_set(void * jarg1, void * jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 *arg2 ;
+  long long *arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  arg2 = (ndInt64 *)jarg2; 
+  arg2 = (long long *)jarg2; 
   {
     size_t ii;
-    ndInt64 *b = (ndInt64 *) arg1->m_i;
-    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((ndInt64 *) arg2 + ii);
+    long long *b = (long long *) arg1->m_i;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((long long *) arg2 + ii);
   }
 }
 
@@ -3260,10 +3020,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_i_set(void * jarg1, void * jarg
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_i_get(void * jarg1) {
   void * jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 *result = 0 ;
+  long long *result = 0 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  result = (ndInt64 *)(ndInt64 *) ((arg1)->m_i);
+  result = (long long *)(long long *) ((arg1)->m_i);
   jresult = result; 
   return jresult;
 }
@@ -3381,226 +3141,178 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_typeIntHigh_get(void * jarg1)
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_x_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_x_set(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   if (arg1) (arg1)->m_x = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_x_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_m_x_get(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_x);
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double) ((arg1)->m_x);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_y_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_y_set(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   if (arg1) (arg1)->m_y = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_y_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_m_y_get(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_y);
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double) ((arg1)->m_y);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_z_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_z_set(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   if (arg1) (arg1)->m_z = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_z_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_m_z_get(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_z);
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double) ((arg1)->m_z);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_w_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_w_set(void * jarg1, double jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 arg2 ;
-  ndFloat64 *argp2 ;
+  double arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndFloat64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (double)jarg2; 
   if (arg1) (arg1)->m_w = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_w_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT double SWIGSTDCALL CSharp_ndBigVector_m_w_get(void * jarg1) {
+  double jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndFloat64 result;
+  double result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_w);
-  jresult = new ndFloat64((const ndFloat64 &)result); 
+  result = (double) ((arg1)->m_w);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_ix_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_ix_set(void * jarg1, long long jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 arg2 ;
-  ndInt64 *argp2 ;
+  long long arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndInt64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (long long)jarg2; 
   if (arg1) (arg1)->m_ix = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_ix_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT long long SWIGSTDCALL CSharp_ndBigVector_m_ix_get(void * jarg1) {
+  long long jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 result;
+  long long result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_ix);
-  jresult = new ndInt64((const ndInt64 &)result); 
+  result = (long long) ((arg1)->m_ix);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_iy_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_iy_set(void * jarg1, long long jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 arg2 ;
-  ndInt64 *argp2 ;
+  long long arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndInt64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (long long)jarg2; 
   if (arg1) (arg1)->m_iy = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_iy_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT long long SWIGSTDCALL CSharp_ndBigVector_m_iy_get(void * jarg1) {
+  long long jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 result;
+  long long result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_iy);
-  jresult = new ndInt64((const ndInt64 &)result); 
+  result = (long long) ((arg1)->m_iy);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_iz_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_iz_set(void * jarg1, long long jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 arg2 ;
-  ndInt64 *argp2 ;
+  long long arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndInt64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (long long)jarg2; 
   if (arg1) (arg1)->m_iz = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_iz_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT long long SWIGSTDCALL CSharp_ndBigVector_m_iz_get(void * jarg1) {
+  long long jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 result;
+  long long result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_iz);
-  jresult = new ndInt64((const ndInt64 &)result); 
+  result = (long long) ((arg1)->m_iz);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_iw_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBigVector_m_iw_set(void * jarg1, long long jarg2) {
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 arg2 ;
-  ndInt64 *argp2 ;
+  long long arg2 ;
   
   arg1 = (ndBigVector *)jarg1; 
-  argp2 = (ndInt64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (long long)jarg2; 
   if (arg1) (arg1)->m_iw = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_m_iw_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT long long SWIGSTDCALL CSharp_ndBigVector_m_iw_get(void * jarg1) {
+  long long jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
-  ndInt64 result;
+  long long result;
   
   arg1 = (ndBigVector *)jarg1; 
-  result =  ((arg1)->m_iw);
-  jresult = new ndInt64((const ndInt64 &)result); 
+  result = (long long) ((arg1)->m_iw);
+  jresult = result; 
   return jresult;
 }
 
@@ -3915,11 +3627,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndMatrix__SWIG_0() {
 
 SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndMatrix__SWIG_1(void * jarg1) {
   void * jresult ;
-  ndFloat32 *arg1 = (ndFloat32 *) (ndFloat32 *)0 ;
+  float *arg1 = (float *) (float *)0 ;
   ndMatrix *result = 0 ;
   
-  arg1 = (ndFloat32 *)jarg1; 
-  result = (ndMatrix *)new ndMatrix((ndFloat32 const *)arg1);
+  arg1 = (float *)jarg1; 
+  result = (ndMatrix *)new ndMatrix((float const *)arg1);
   jresult = (void *)result; 
   return jresult;
 }
@@ -4027,20 +3739,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndMatrix__SWIG_5(void * jarg1, void * j
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_GetElement__SWIG_0(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_GetElement__SWIG_0(void * jarg1, int jarg2) {
   void * jresult ;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   ndVector *result = 0 ;
   
   arg1 = (ndMatrix *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   result = (ndVector *) &(arg1)->operator [](arg2);
   jresult = (void *)result; 
   return jresult;
@@ -4291,111 +3997,57 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_CalcPitchYawRoll(void * jarg1, void 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_TransformTriplex__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_TransformTriplex__SWIG_0(void * jarg1, void * jarg2, int jarg3, void * jarg4, int jarg5, int jarg6) {
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  ndFloat32 *arg2 = (ndFloat32 *) (ndFloat32 *)0 ;
-  ndInt32 arg3 ;
-  ndFloat32 *arg4 = (ndFloat32 *) (ndFloat32 *)0 ;
-  ndInt32 arg5 ;
-  ndInt32 arg6 ;
-  ndInt32 *argp3 ;
-  ndInt32 *argp5 ;
-  ndInt32 *argp6 ;
+  float *arg2 = (float *) (float *)0 ;
+  int arg3 ;
+  float *arg4 = (float *) (float *)0 ;
+  int arg5 ;
+  int arg6 ;
   
   arg1 = (ndMatrix *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
-  arg4 = (ndFloat32 *)jarg4; 
-  argp5 = (ndInt32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg5 = *argp5; 
-  argp6 = (ndInt32 *)jarg6; 
-  if (!argp6) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg6 = *argp6; 
-  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(ndFloat32 const *)arg4,arg5,arg6);
+  arg2 = (float *)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (float *)jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = (int)jarg6; 
+  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(float const *)arg4,arg5,arg6);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_TransformTriplex__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_TransformTriplex__SWIG_1(void * jarg1, void * jarg2, int jarg3, void * jarg4, int jarg5, int jarg6) {
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  ndFloat64 *arg2 = (ndFloat64 *) (ndFloat64 *)0 ;
-  ndInt32 arg3 ;
-  ndFloat64 *arg4 = (ndFloat64 *) (ndFloat64 *)0 ;
-  ndInt32 arg5 ;
-  ndInt32 arg6 ;
-  ndInt32 *argp3 ;
-  ndInt32 *argp5 ;
-  ndInt32 *argp6 ;
+  double *arg2 = (double *) (double *)0 ;
+  int arg3 ;
+  double *arg4 = (double *) (double *)0 ;
+  int arg5 ;
+  int arg6 ;
   
   arg1 = (ndMatrix *)jarg1; 
-  arg2 = (ndFloat64 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
-  arg4 = (ndFloat64 *)jarg4; 
-  argp5 = (ndInt32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg5 = *argp5; 
-  argp6 = (ndInt32 *)jarg6; 
-  if (!argp6) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg6 = *argp6; 
-  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(ndFloat64 const *)arg4,arg5,arg6);
+  arg2 = (double *)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (double *)jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = (int)jarg6; 
+  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(double const *)arg4,arg5,arg6);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_TransformTriplex__SWIG_2(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMatrix_TransformTriplex__SWIG_2(void * jarg1, void * jarg2, int jarg3, void * jarg4, int jarg5, int jarg6) {
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  ndFloat64 *arg2 = (ndFloat64 *) (ndFloat64 *)0 ;
-  ndInt32 arg3 ;
-  ndFloat32 *arg4 = (ndFloat32 *) (ndFloat32 *)0 ;
-  ndInt32 arg5 ;
-  ndInt32 arg6 ;
-  ndInt32 *argp3 ;
-  ndInt32 *argp5 ;
-  ndInt32 *argp6 ;
+  double *arg2 = (double *) (double *)0 ;
+  int arg3 ;
+  float *arg4 = (float *) (float *)0 ;
+  int arg5 ;
+  int arg6 ;
   
   arg1 = (ndMatrix *)jarg1; 
-  arg2 = (ndFloat64 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
-  arg4 = (ndFloat32 *)jarg4; 
-  argp5 = (ndInt32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg5 = *argp5; 
-  argp6 = (ndInt32 *)jarg6; 
-  if (!argp6) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg6 = *argp6; 
-  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(ndFloat32 const *)arg4,arg5,arg6);
+  arg2 = (double *)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (float *)jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = (int)jarg6; 
+  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(float const *)arg4,arg5,arg6);
 }
 
 
@@ -4423,20 +4075,14 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndMatrix_TestSymetric3x3(void * jarg1
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndMatrix_TestOrthogonal__SWIG_0(void * jarg1, void * jarg2) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndMatrix_TestOrthogonal__SWIG_0(void * jarg1, float jarg2) {
   unsigned int jresult ;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   bool result;
   
   arg1 = (ndMatrix *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   result = (bool)((ndMatrix const *)arg1)->TestOrthogonal(arg2);
   jresult = result; 
   return jresult;
@@ -4645,54 +4291,36 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_m_posit_get(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_dPitchMatrix(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_dPitchMatrix(float jarg1) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
+  float arg1 ;
   ndMatrix result;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (float)jarg1; 
   result = dPitchMatrix(arg1);
   jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_dYawMatrix(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_dYawMatrix(float jarg1) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
+  float arg1 ;
   ndMatrix result;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (float)jarg1; 
   result = dYawMatrix(arg1);
   jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_dRollMatrix(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_dRollMatrix(float jarg1) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
+  float arg1 ;
   ndMatrix result;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (float)jarg1; 
   result = dRollMatrix(arg1);
   jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
@@ -4757,53 +4385,28 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndQuaternion__SWIG_3(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndQuaternion__SWIG_4(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndQuaternion__SWIG_4(float jarg1, float jarg2, float jarg3, float jarg4) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 arg4 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
-  ndFloat32 *argp4 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
   ndQuaternion *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
+  arg4 = (float)jarg4; 
   result = (ndQuaternion *)new ndQuaternion(arg1,arg2,arg3,arg4);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndQuaternion__SWIG_5(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndQuaternion__SWIG_5(void * jarg1, float jarg2) {
   void * jresult ;
   ndVector *arg1 = 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   ndQuaternion *result = 0 ;
   
   arg1 = (ndVector *)jarg1;
@@ -4811,12 +4414,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndQuaternion__SWIG_5(void * jarg1, void
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   result = (ndQuaternion *)new ndQuaternion((ndVector const &)*arg1,arg2);
   jresult = (void *)result; 
   return jresult;
@@ -4835,20 +4433,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Normalize(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Scale(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Scale(void * jarg1, float jarg2) {
   void * jresult ;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   ndQuaternion result;
   
   arg1 = (ndQuaternion *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   result = ((ndQuaternion const *)arg1)->Scale(arg2);
   jresult = new ndQuaternion((const ndQuaternion &)result); 
   return jresult;
@@ -4921,12 +4513,11 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Mul(void * jarg1, void * jarg2
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Slerp(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Slerp(void * jarg1, void * jarg2, float jarg3) {
   void * jresult ;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   ndQuaternion result;
   
   arg1 = (ndQuaternion *)jarg1; 
@@ -4935,24 +4526,18 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Slerp(void * jarg1, void * jar
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndQuaternion const & type is null", 0);
     return 0;
   } 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   result = ((ndQuaternion const *)arg1)->Slerp((ndQuaternion const &)*arg2,arg3);
   jresult = new ndQuaternion((const ndQuaternion &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_CalcAverageOmega(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_CalcAverageOmega(void * jarg1, void * jarg2, float jarg3) {
   void * jresult ;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   ndVector result;
   
   arg1 = (ndQuaternion *)jarg1; 
@@ -4961,12 +4546,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_CalcAverageOmega(void * jarg1,
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndQuaternion const & type is null", 0);
     return 0;
   } 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   result = ((ndQuaternion const *)arg1)->CalcAverageOmega((ndQuaternion const &)*arg2,arg3);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -4991,30 +4571,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeMaterial() {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_m_userId_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_m_userId_set(void * jarg1, long long jarg2) {
   ndShapeMaterial *arg1 = (ndShapeMaterial *) 0 ;
-  ndInt64 arg2 ;
-  ndInt64 *argp2 ;
+  long long arg2 ;
   
   arg1 = (ndShapeMaterial *)jarg1; 
-  argp2 = (ndInt64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (long long)jarg2; 
   if (arg1) (arg1)->m_userId = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeMaterial_m_userId_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT long long SWIGSTDCALL CSharp_ndShapeMaterial_m_userId_get(void * jarg1) {
+  long long jresult ;
   ndShapeMaterial *arg1 = (ndShapeMaterial *) 0 ;
-  ndInt64 result;
+  long long result;
   
   arg1 = (ndShapeMaterial *)jarg1; 
-  result =  ((arg1)->m_userId);
-  jresult = new ndInt64((const ndInt64 &)result); 
+  result = (long long) ((arg1)->m_userId);
+  jresult = result; 
   return jresult;
 }
 
@@ -5041,30 +4615,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeMaterial_nData_m_userData_get(void *
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_nData_m_alignPad_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_nData_m_alignPad_set(void * jarg1, unsigned long long jarg2) {
   ndShapeMaterial::nData *arg1 = (ndShapeMaterial::nData *) 0 ;
-  ndUnsigned64 arg2 ;
-  ndUnsigned64 *argp2 ;
+  unsigned long long arg2 ;
   
   arg1 = (ndShapeMaterial::nData *)jarg1; 
-  argp2 = (ndUnsigned64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndUnsigned64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned long long)jarg2; 
   if (arg1) (arg1)->m_alignPad = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeMaterial_nData_m_alignPad_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned long long SWIGSTDCALL CSharp_ndShapeMaterial_nData_m_alignPad_get(void * jarg1) {
+  unsigned long long jresult ;
   ndShapeMaterial::nData *arg1 = (ndShapeMaterial::nData *) 0 ;
-  ndUnsigned64 result;
+  unsigned long long result;
   
   arg1 = (ndShapeMaterial::nData *)jarg1; 
-  result =  ((arg1)->m_alignPad);
-  jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
+  result = (unsigned long long) ((arg1)->m_alignPad);
+  jresult = result; 
   return jresult;
 }
 
@@ -5109,58 +4677,46 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeMaterial_m_data_get(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_intData_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_intData_set(void * jarg1, unsigned long long jarg2) {
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  ndUnsigned64 arg2 ;
-  ndUnsigned64 *argp2 ;
+  unsigned long long arg2 ;
   
   arg1 = (ndShapeMaterial::dExtraData *)jarg1; 
-  argp2 = (ndUnsigned64 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndUnsigned64", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned long long)jarg2; 
   if (arg1) (arg1)->m_intData = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_intData_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned long long SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_intData_get(void * jarg1) {
+  unsigned long long jresult ;
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  ndUnsigned64 result;
+  unsigned long long result;
   
   arg1 = (ndShapeMaterial::dExtraData *)jarg1; 
-  result =  ((arg1)->m_intData);
-  jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
+  result = (unsigned long long) ((arg1)->m_intData);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_floatData_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_floatData_set(void * jarg1, float jarg2) {
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndShapeMaterial::dExtraData *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_floatData = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_floatData_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeMaterial_dExtraData_m_floatData_get(void * jarg1) {
+  float jresult ;
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeMaterial::dExtraData *)jarg1; 
-  result =  ((arg1)->m_floatData);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_floatData);
+  jresult = result; 
   return jresult;
 }
 
@@ -5217,86 +4773,68 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndShapeMaterial(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBoxInfo_m_x_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBoxInfo_m_x_set(void * jarg1, float jarg2) {
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBoxInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_x = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBoxInfo_m_x_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBoxInfo_m_x_get(void * jarg1) {
+  float jresult ;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBoxInfo *)jarg1; 
-  result =  ((arg1)->m_x);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_x);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBoxInfo_m_y_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBoxInfo_m_y_set(void * jarg1, float jarg2) {
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBoxInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_y = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBoxInfo_m_y_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBoxInfo_m_y_get(void * jarg1) {
+  float jresult ;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBoxInfo *)jarg1; 
-  result =  ((arg1)->m_y);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_y);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBoxInfo_m_z_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBoxInfo_m_z_set(void * jarg1, float jarg2) {
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBoxInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_z = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBoxInfo_m_z_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBoxInfo_m_z_get(void * jarg1) {
+  float jresult ;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBoxInfo *)jarg1; 
-  result =  ((arg1)->m_z);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_z);
+  jresult = result; 
   return jresult;
 }
 
@@ -5319,30 +4857,24 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndBoxInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPointInfo_m_noUsed_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPointInfo_m_noUsed_set(void * jarg1, float jarg2) {
   ndPointInfo *arg1 = (ndPointInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndPointInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_noUsed = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPointInfo_m_noUsed_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndPointInfo_m_noUsed_get(void * jarg1) {
+  float jresult ;
   ndPointInfo *arg1 = (ndPointInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndPointInfo *)jarg1; 
-  result =  ((arg1)->m_noUsed);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_noUsed);
+  jresult = result; 
   return jresult;
 }
 
@@ -5365,30 +4897,24 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndPointInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndSphereInfo_m_radius_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndSphereInfo_m_radius_set(void * jarg1, float jarg2) {
   ndSphereInfo *arg1 = (ndSphereInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndSphereInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_radius = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndSphereInfo_m_radius_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndSphereInfo_m_radius_get(void * jarg1) {
+  float jresult ;
   ndSphereInfo *arg1 = (ndSphereInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndSphereInfo *)jarg1; 
-  result =  ((arg1)->m_radius);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_radius);
+  jresult = result; 
   return jresult;
 }
 
@@ -5411,86 +4937,68 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndSphereInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCylinderInfo_m_radio0_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCylinderInfo_m_radio0_set(void * jarg1, float jarg2) {
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndCylinderInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_radio0 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCylinderInfo_m_radio0_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndCylinderInfo_m_radio0_get(void * jarg1) {
+  float jresult ;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndCylinderInfo *)jarg1; 
-  result =  ((arg1)->m_radio0);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_radio0);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCylinderInfo_m_radio1_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCylinderInfo_m_radio1_set(void * jarg1, float jarg2) {
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndCylinderInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_radio1 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCylinderInfo_m_radio1_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndCylinderInfo_m_radio1_get(void * jarg1) {
+  float jresult ;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndCylinderInfo *)jarg1; 
-  result =  ((arg1)->m_radio1);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_radio1);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCylinderInfo_m_height_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCylinderInfo_m_height_set(void * jarg1, float jarg2) {
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndCylinderInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCylinderInfo_m_height_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndCylinderInfo_m_height_get(void * jarg1) {
+  float jresult ;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndCylinderInfo *)jarg1; 
-  result =  ((arg1)->m_height);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_height);
+  jresult = result; 
   return jresult;
 }
 
@@ -5513,86 +5021,68 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndCylinderInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio0_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio0_set(void * jarg1, float jarg2) {
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndCapsuleInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_radio0 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio0_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio0_get(void * jarg1) {
+  float jresult ;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndCapsuleInfo *)jarg1; 
-  result =  ((arg1)->m_radio0);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_radio0);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio1_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio1_set(void * jarg1, float jarg2) {
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndCapsuleInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_radio1 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio1_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndCapsuleInfo_m_radio1_get(void * jarg1) {
+  float jresult ;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndCapsuleInfo *)jarg1; 
-  result =  ((arg1)->m_radio1);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_radio1);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCapsuleInfo_m_height_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCapsuleInfo_m_height_set(void * jarg1, float jarg2) {
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndCapsuleInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCapsuleInfo_m_height_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndCapsuleInfo_m_height_get(void * jarg1) {
+  float jresult ;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndCapsuleInfo *)jarg1; 
-  result =  ((arg1)->m_height);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_height);
+  jresult = result; 
   return jresult;
 }
 
@@ -5615,58 +5105,46 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndCapsuleInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndConeInfo_m_radius_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndConeInfo_m_radius_set(void * jarg1, float jarg2) {
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndConeInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_radius = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndConeInfo_m_radius_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndConeInfo_m_radius_get(void * jarg1) {
+  float jresult ;
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndConeInfo *)jarg1; 
-  result =  ((arg1)->m_radius);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_radius);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndConeInfo_m_height_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndConeInfo_m_height_set(void * jarg1, float jarg2) {
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndConeInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndConeInfo_m_height_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndConeInfo_m_height_get(void * jarg1) {
+  float jresult ;
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndConeInfo *)jarg1; 
-  result =  ((arg1)->m_height);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_height);
+  jresult = result; 
   return jresult;
 }
 
@@ -5689,58 +5167,46 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndConeInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_r_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_r_set(void * jarg1, float jarg2) {
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndChamferCylinderInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_r = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_r_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_r_get(void * jarg1) {
+  float jresult ;
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndChamferCylinderInfo *)jarg1; 
-  result =  ((arg1)->m_r);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_r);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_height_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_height_set(void * jarg1, float jarg2) {
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndChamferCylinderInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_height_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndChamferCylinderInfo_m_height_get(void * jarg1) {
+  float jresult ;
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndChamferCylinderInfo *)jarg1; 
-  result =  ((arg1)->m_height);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_height);
+  jresult = result; 
   return jresult;
 }
 
@@ -5763,86 +5229,68 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndChamferCylinderInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndConvexHullInfo_m_vertexCount_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndConvexHullInfo_m_vertexCount_set(void * jarg1, int jarg2) {
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndConvexHullInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_vertexCount = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndConvexHullInfo_m_vertexCount_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndConvexHullInfo_m_vertexCount_get(void * jarg1) {
+  int jresult ;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndConvexHullInfo *)jarg1; 
-  result =  ((arg1)->m_vertexCount);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_vertexCount);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndConvexHullInfo_m_strideInBytes_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndConvexHullInfo_m_strideInBytes_set(void * jarg1, int jarg2) {
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndConvexHullInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_strideInBytes = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndConvexHullInfo_m_strideInBytes_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndConvexHullInfo_m_strideInBytes_get(void * jarg1) {
+  int jresult ;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndConvexHullInfo *)jarg1; 
-  result =  ((arg1)->m_strideInBytes);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_strideInBytes);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndConvexHullInfo_m_faceCount_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndConvexHullInfo_m_faceCount_set(void * jarg1, int jarg2) {
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndConvexHullInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_faceCount = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndConvexHullInfo_m_faceCount_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndConvexHullInfo_m_faceCount_get(void * jarg1) {
+  int jresult ;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndConvexHullInfo *)jarg1; 
-  result =  ((arg1)->m_faceCount);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_faceCount);
+  jresult = result; 
   return jresult;
 }
 
@@ -5887,30 +5335,24 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndConvexHullInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCoumpoundInfo_m_noUsed_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCoumpoundInfo_m_noUsed_set(void * jarg1, int jarg2) {
   ndCoumpoundInfo *arg1 = (ndCoumpoundInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndCoumpoundInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_noUsed = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCoumpoundInfo_m_noUsed_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndCoumpoundInfo_m_noUsed_get(void * jarg1) {
+  int jresult ;
   ndCoumpoundInfo *arg1 = (ndCoumpoundInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndCoumpoundInfo *)jarg1; 
-  result =  ((arg1)->m_noUsed);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_noUsed);
+  jresult = result; 
   return jresult;
 }
 
@@ -5933,30 +5375,24 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndCoumpoundInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndProceduralInfoInfo_m_noUsed_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndProceduralInfoInfo_m_noUsed_set(void * jarg1, int jarg2) {
   ndProceduralInfoInfo *arg1 = (ndProceduralInfoInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndProceduralInfoInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_noUsed = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndProceduralInfoInfo_m_noUsed_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndProceduralInfoInfo_m_noUsed_get(void * jarg1) {
+  int jresult ;
   ndProceduralInfoInfo *arg1 = (ndProceduralInfoInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndProceduralInfoInfo *)jarg1; 
-  result =  ((arg1)->m_noUsed);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_noUsed);
+  jresult = result; 
   return jresult;
 }
 
@@ -5979,58 +5415,46 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndProceduralInfoInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_vertexCount_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_vertexCount_set(void * jarg1, int jarg2) {
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndCollisionBvhInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_vertexCount = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_vertexCount_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_vertexCount_get(void * jarg1) {
+  int jresult ;
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndCollisionBvhInfo *)jarg1; 
-  result =  ((arg1)->m_vertexCount);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_vertexCount);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_indexCount_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_indexCount_set(void * jarg1, int jarg2) {
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndCollisionBvhInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_indexCount = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_indexCount_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndCollisionBvhInfo_m_indexCount_get(void * jarg1) {
+  int jresult ;
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndCollisionBvhInfo *)jarg1; 
-  result =  ((arg1)->m_indexCount);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_indexCount);
+  jresult = result; 
   return jresult;
 }
 
@@ -6053,170 +5477,134 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndCollisionBvhInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_width_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_width_set(void * jarg1, int jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_width = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_width_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndHeighfieldInfo_m_width_get(void * jarg1) {
+  int jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result =  ((arg1)->m_width);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_width);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_height_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_height_set(void * jarg1, int jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_height_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndHeighfieldInfo_m_height_get(void * jarg1) {
+  int jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result =  ((arg1)->m_height);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_height);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_gridsDiagonals_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_gridsDiagonals_set(void * jarg1, int jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_gridsDiagonals = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_gridsDiagonals_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndHeighfieldInfo_m_gridsDiagonals_get(void * jarg1) {
+  int jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result =  ((arg1)->m_gridsDiagonals);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_gridsDiagonals);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_verticalScale_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_verticalScale_set(void * jarg1, float jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_verticalScale = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_verticalScale_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndHeighfieldInfo_m_verticalScale_get(void * jarg1) {
+  float jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result =  ((arg1)->m_verticalScale);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_verticalScale);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_x_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_x_set(void * jarg1, float jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_horizonalScale_x = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_x_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_x_get(void * jarg1) {
+  float jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result =  ((arg1)->m_horizonalScale_x);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_horizonalScale_x);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_z_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_z_set(void * jarg1, float jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_horizonalScale_z = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_z_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndHeighfieldInfo_m_horizonalScale_z_get(void * jarg1) {
+  float jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result =  ((arg1)->m_horizonalScale_z);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_horizonalScale_z);
+  jresult = result; 
   return jresult;
 }
 
@@ -6245,10 +5633,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_elevation_get(void * jar
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_atributes_set(void * jarg1, void * jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt8 *arg2 = (ndInt8 *) 0 ;
+  signed char *arg2 = (signed char *) 0 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  arg2 = (ndInt8 *)jarg2; 
+  arg2 = (signed char *)jarg2; 
   if (arg1) (arg1)->m_atributes = arg2;
 }
 
@@ -6256,10 +5644,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndHeighfieldInfo_m_atributes_set(void * jarg1
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndHeighfieldInfo_m_atributes_get(void * jarg1) {
   void * jresult ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  ndInt8 *result = 0 ;
+  signed char *result = 0 ;
   
   arg1 = (ndHeighfieldInfo *)jarg1; 
-  result = (ndInt8 *) ((arg1)->m_atributes);
+  result = (signed char *) ((arg1)->m_atributes);
   jresult = (void *)result; 
   return jresult;
 }
@@ -6637,14 +6025,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInfo_m_chamferCylinder_get(void * ja
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInfo_m_paramArray_set(void * jarg1, void * jarg2) {
   ndShapeInfo *arg1 = (ndShapeInfo *) 0 ;
-  ndFloat32 *arg2 ;
+  float *arg2 ;
   
   arg1 = (ndShapeInfo *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
+  arg2 = (float *)jarg2; 
   {
     size_t ii;
-    ndFloat32 *b = (ndFloat32 *) arg1->m_paramArray;
-    for (ii = 0; ii < (size_t)32; ii++) b[ii] = *((ndFloat32 *) arg2 + ii);
+    float *b = (float *) arg1->m_paramArray;
+    for (ii = 0; ii < (size_t)32; ii++) b[ii] = *((float *) arg2 + ii);
   }
 }
 
@@ -6652,10 +6040,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInfo_m_paramArray_set(void * jarg1, vo
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInfo_m_paramArray_get(void * jarg1) {
   void * jresult ;
   ndShapeInfo *arg1 = (ndShapeInfo *) 0 ;
-  ndFloat32 *result = 0 ;
+  float *result = 0 ;
   
   arg1 = (ndShapeInfo *)jarg1; 
-  result = (ndFloat32 *)(ndFloat32 *) ((arg1)->m_paramArray);
+  result = (float *)(float *) ((arg1)->m_paramArray);
   jresult = result; 
   return jresult;
 }
@@ -6679,26 +6067,26 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndShapeInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetRefCount(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShape_GetRefCount(void * jarg1) {
+  int jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->GetRefCount();
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndShape const *)arg1)->GetRefCount();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_Release(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShape_Release(void * jarg1) {
+  int jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->Release();
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndShape const *)arg1)->Release();
+  jresult = result; 
   return jresult;
 }
 
@@ -6895,14 +6283,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetAsShapeStaticProceduralMesh(void
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetConvexVertexCount(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShape_GetConvexVertexCount(void * jarg1) {
+  int jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->GetConvexVertexCount();
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndShape const *)arg1)->GetConvexVertexCount();
+  jresult = result; 
   return jresult;
 }
 
@@ -6931,14 +6319,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetObbOrigin(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetUmbraClipSize(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShape_GetUmbraClipSize(void * jarg1) {
+  float jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->GetUmbraClipSize();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShape const *)arg1)->GetUmbraClipSize();
+  jresult = result; 
   return jresult;
 }
 
@@ -6983,38 +6371,38 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetShapeInfo(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetVolume(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShape_GetVolume(void * jarg1) {
+  float jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->GetVolume();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShape const *)arg1)->GetVolume();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetBoxMinRadius(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShape_GetBoxMinRadius(void * jarg1) {
+  float jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->GetBoxMinRadius();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShape const *)arg1)->GetBoxMinRadius();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_GetBoxMaxRadius(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShape_GetBoxMaxRadius(void * jarg1) {
+  float jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShape *)jarg1; 
-  result = ((ndShape const *)arg1)->GetBoxMaxRadius();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShape const *)arg1)->GetBoxMaxRadius();
+  jresult = result; 
   return jresult;
 }
 
@@ -7049,7 +6437,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_SupportVertex(void * jarg1, void * 
   void * jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndVector *arg2 = 0 ;
-  ndInt32 *arg3 = (ndInt32 *) (ndInt32 *)0 ;
+  int *arg3 = (int *) (int *)0 ;
   ndVector result;
   
   arg1 = (ndShape *)jarg1; 
@@ -7058,7 +6446,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_SupportVertex(void * jarg1, void * 
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  arg3 = (ndInt32 *)jarg3; 
+  arg3 = (int *)jarg3; 
   result = ((ndShape const *)arg1)->SupportVertex((ndVector const &)*arg2,arg3);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -7089,13 +6477,12 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_SupportVertexSpecialProjectPoint(vo
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_SupportVertexSpecial(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_SupportVertexSpecial(void * jarg1, void * jarg2, float jarg3, void * jarg4) {
   void * jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndVector *arg2 = 0 ;
-  ndFloat32 arg3 ;
-  ndInt32 *arg4 = (ndInt32 *) (ndInt32 *)0 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
+  int *arg4 = (int *) (int *)0 ;
   ndVector result;
   
   arg1 = (ndShape *)jarg1; 
@@ -7104,26 +6491,21 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_SupportVertexSpecial(void * jarg1, 
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  arg4 = (ndInt32 *)jarg4; 
+  arg3 = (float)jarg3; 
+  arg4 = (int *)jarg4; 
   result = ((ndShape const *)arg1)->SupportVertexSpecial((ndVector const &)*arg2,arg3,arg4);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_CalculatePlaneIntersection(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShape_CalculatePlaneIntersection(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShape *)jarg1; 
   arg2 = (ndVector *)jarg2;
@@ -7137,8 +6519,8 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_CalculatePlaneIntersection(void * j
     return 0;
   } 
   arg4 = (ndVector *)jarg4; 
-  result = ((ndShape const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndShape const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
+  jresult = result; 
   return jresult;
 }
 
@@ -7173,17 +6555,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_CalculateVolumeIntegral(void * jarg
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6, void * jarg7) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShape_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4, float jarg5, void * jarg6, void * jarg7) {
+  float jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
-  ndFloat32 arg5 ;
+  float arg5 ;
   ndBody *arg6 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg7 = 0 ;
-  ndFloat32 *argp5 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShape *)jarg1; 
   arg2 = (ndRayCastNotify *)jarg2;
@@ -7201,20 +6582,15 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_RayCast(void * jarg1, void * jarg2,
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  argp5 = (ndFloat32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg5 = *argp5; 
+  arg5 = (float)jarg5; 
   arg6 = (ndBody *)jarg6; 
   arg7 = (ndContactPoint *)jarg7;
   if (!arg7) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndContactPoint & type is null", 0);
     return 0;
   } 
-  result = ((ndShape const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShape const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
+  jresult = result; 
   return jresult;
 }
 
@@ -7249,14 +6625,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_CalculateInertiaAndCenterOfMass(voi
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_CalculateMassProperties(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShape_CalculateMassProperties(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+  float jresult ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndMatrix *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
   ndVector *arg5 = 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShape *)jarg1; 
   arg2 = (ndMatrix *)jarg2;
@@ -7279,8 +6655,8 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShape_CalculateMassProperties(void * jarg
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector & type is null", 0);
     return 0;
   } 
-  result = ((ndShape const *)arg1)->CalculateMassProperties((ndMatrix const &)*arg2,*arg3,*arg4,*arg5);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShape const *)arg1)->CalculateMassProperties((ndMatrix const &)*arg2,*arg3,*arg4,*arg5);
+  jresult = result; 
   return jresult;
 }
 
@@ -7315,34 +6691,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeBox__SWIG_0(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeBox__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeBox__SWIG_1(float jarg1, float jarg2, float jarg3) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
   ndShapeBox *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
   result = (ndShapeBox *)new ndShapeBox(arg1,arg2,arg3);
   jresult = (void *)result; 
   return jresult;
@@ -7379,26 +6737,14 @@ SWIGEXPORT int SWIGSTDCALL CSharp_D_CONE_SEGMENTS_get() {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCone__SWIG_0(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCone__SWIG_0(float jarg1, float jarg2) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
+  float arg1 ;
+  float arg2 ;
   ndShapeCone *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
   result = (ndShapeCone *)new ndShapeCone(arg1,arg2);
   jresult = (void *)result; 
   return jresult;
@@ -7527,30 +6873,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeConvex_ndConvexSimplexEdge_m_prev_ge
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeConvex_ndConvexSimplexEdge_m_vertex_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeConvex_ndConvexSimplexEdge_m_vertex_set(void * jarg1, int jarg2) {
   ndShapeConvex::ndConvexSimplexEdge *arg1 = (ndShapeConvex::ndConvexSimplexEdge *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndShapeConvex::ndConvexSimplexEdge *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_vertex = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeConvex_ndConvexSimplexEdge_m_vertex_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShapeConvex_ndConvexSimplexEdge_m_vertex_get(void * jarg1) {
+  int jresult ;
   ndShapeConvex::ndConvexSimplexEdge *arg1 = (ndShapeConvex::ndConvexSimplexEdge *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShapeConvex::ndConvexSimplexEdge *)jarg1; 
-  result =  ((arg1)->m_vertex);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_vertex);
+  jresult = result; 
   return jresult;
 }
 
@@ -7583,18 +6923,12 @@ SWIGEXPORT int SWIGSTDCALL CSharp_D_SPHERE_VERTEX_COUNT_get() {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeSphere__SWIG_0(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeSphere__SWIG_0(float jarg1) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
+  float arg1 ;
   ndShapeSphere *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
+  arg1 = (float)jarg1; 
   result = (ndShapeSphere *)new ndShapeSphere(arg1);
   jresult = (void *)result; 
   return jresult;
@@ -7653,34 +6987,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCapsule__SWIG_0(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCapsule__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCapsule__SWIG_1(float jarg1, float jarg2, float jarg3) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
   ndShapeCapsule *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
   result = (ndShapeCapsule *)new ndShapeCapsule(arg1,arg2,arg3);
   jresult = (void *)result; 
   return jresult;
@@ -7727,21 +7043,15 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCompound_ndTreeArray() {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeCompound_ndTreeArray_AddNode(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeCompound_ndTreeArray_AddNode(void * jarg1, void * jarg2, int jarg3, void * jarg4) {
   ndShapeCompound::ndTreeArray *arg1 = (ndShapeCompound::ndTreeArray *) 0 ;
   ndShapeCompound::ndNodeBase *arg2 = (ndShapeCompound::ndNodeBase *) (ndShapeCompound::ndNodeBase *)0 ;
-  ndInt32 arg3 ;
+  int arg3 ;
   ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  ndInt32 *argp3 ;
   
   arg1 = (ndShapeCompound::ndTreeArray *)jarg1; 
   arg2 = (ndShapeCompound::ndNodeBase *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (int)jarg3; 
   arg4 = (ndShapeInstance *)jarg4; 
   (arg1)->AddNode(arg2,arg3,(ndShapeInstance const *)arg4);
 }
@@ -7939,34 +7249,16 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCylinder__SWIG_0(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCylinder__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeCylinder__SWIG_1(float jarg1, float jarg2, float jarg3) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
   ndShapeCylinder *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
   result = (ndShapeCylinder *)new ndShapeCylinder(arg1,arg2,arg3);
   jresult = (void *)result; 
   return jresult;
@@ -8079,14 +7371,14 @@ SWIGEXPORT int SWIGSTDCALL CSharp_D_MAX_COLLIDING_INDICES_get() {
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexCount_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  ndInt32 *arg2 ;
+  int *arg2 ;
   
   arg1 = (ndPolygonMeshDesc::ndMesh *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   {
     size_t ii;
-    ndInt32 *b = (ndInt32 *) arg1->m_globalFaceIndexCount;
-    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((ndInt32 *) arg2 + ii);
+    int *b = (int *) arg1->m_globalFaceIndexCount;
+    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((int *) arg2 + ii);
   }
 }
 
@@ -8094,10 +7386,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexCou
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexCount_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc::ndMesh *)jarg1; 
-  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_globalFaceIndexCount);
+  result = (int *)(int *) ((arg1)->m_globalFaceIndexCount);
   jresult = result; 
   return jresult;
 }
@@ -8105,14 +7397,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexC
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexStart_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  ndInt32 *arg2 ;
+  int *arg2 ;
   
   arg1 = (ndPolygonMeshDesc::ndMesh *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   {
     size_t ii;
-    ndInt32 *b = (ndInt32 *) arg1->m_globalFaceIndexStart;
-    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((ndInt32 *) arg2 + ii);
+    int *b = (int *) arg1->m_globalFaceIndexStart;
+    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((int *) arg2 + ii);
   }
 }
 
@@ -8120,10 +7412,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexSta
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexStart_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc::ndMesh *)jarg1; 
-  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_globalFaceIndexStart);
+  result = (int *)(int *) ((arg1)->m_globalFaceIndexStart);
   jresult = result; 
   return jresult;
 }
@@ -8131,14 +7423,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalFaceIndexS
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalHitDistance_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  ndFloat32 *arg2 ;
+  float *arg2 ;
   
   arg1 = (ndPolygonMeshDesc::ndMesh *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
+  arg2 = (float *)jarg2; 
   {
     size_t ii;
-    ndFloat32 *b = (ndFloat32 *) arg1->m_globalHitDistance;
-    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((ndFloat32 *) arg2 + ii);
+    float *b = (float *) arg1->m_globalHitDistance;
+    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((float *) arg2 + ii);
   }
 }
 
@@ -8146,10 +7438,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalHitDistance_
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_ndMesh_m_globalHitDistance_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  ndFloat32 *result = 0 ;
+  float *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc::ndMesh *)jarg1; 
-  result = (ndFloat32 *)(ndFloat32 *) ((arg1)->m_globalHitDistance);
+  result = (float *)(float *) ((arg1)->m_globalHitDistance);
   jresult = result; 
   return jresult;
 }
@@ -8209,14 +7501,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_SortFaceArray(void * jarg1)
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetSeparetionDistance(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetSeparetionDistance(void * jarg1) {
+  float jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = ((ndPolygonMeshDesc const *)arg1)->GetSeparetionDistance();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndPolygonMeshDesc const *)arg1)->GetSeparetionDistance();
+  jresult = result; 
   return jresult;
 }
 
@@ -8235,110 +7527,80 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_SetDistanceTravel(void * ja
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetFaceIndexCount(void * jarg1, void * jarg2) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetFaceIndexCount(void * jarg1, int jarg2) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
-  ndInt32 result;
+  int arg2 ;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceIndexCount(arg2);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  arg2 = (int)jarg2; 
+  result = (int)((ndPolygonMeshDesc const *)arg1)->GetFaceIndexCount(arg2);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray(void * jarg1, void * jarg2, int jarg3) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
-  ndInt32 arg3 ;
-  ndInt32 *argp3 ;
-  ndInt32 *result = 0 ;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = (ndInt32 *)((ndPolygonMeshDesc const *)arg1)->GetAdjacentFaceEdgeNormalArray((ndInt32 const *)arg2,arg3);
+  arg2 = (int *)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int *)((ndPolygonMeshDesc const *)arg1)->GetAdjacentFaceEdgeNormalArray((int const *)arg2,arg3);
   jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetNormalIndex(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetNormalIndex(void * jarg1, void * jarg2, int jarg3) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
-  ndInt32 arg3 ;
-  ndInt32 *argp3 ;
-  ndInt32 result;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = ((ndPolygonMeshDesc const *)arg1)->GetNormalIndex((ndInt32 const *)arg2,arg3);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  arg2 = (int *)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((ndPolygonMeshDesc const *)arg1)->GetNormalIndex((int const *)arg2,arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetFaceId(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetFaceId(void * jarg1, void * jarg2, int jarg3) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
-  ndInt32 arg3 ;
-  ndInt32 *argp3 ;
-  ndInt32 result;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceId((ndInt32 const *)arg2,arg3);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  arg2 = (int *)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((ndPolygonMeshDesc const *)arg1)->GetFaceId((int const *)arg2,arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetFaceSize(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndPolygonMeshDesc_GetFaceSize(void * jarg1, void * jarg2, int jarg3) {
+  float jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
-  ndInt32 arg3 ;
-  ndInt32 *argp3 ;
-  ndFloat32 result;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
+  float result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
-  argp3 = (ndInt32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceSize((ndInt32 const *)arg2,arg3);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  arg2 = (int *)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (float)((ndPolygonMeshDesc const *)arg1)->GetFaceSize((int const *)arg2,arg3);
+  jresult = result; 
   return jresult;
 }
 
@@ -8365,86 +7627,68 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_boxDistanceTravelInMesh
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceCount_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceCount_set(void * jarg1, int jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_faceCount = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceCount_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceCount_get(void * jarg1) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result =  ((arg1)->m_faceCount);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_faceCount);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertexStrideInBytes_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertexStrideInBytes_set(void * jarg1, int jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_vertexStrideInBytes = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertexStrideInBytes_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertexStrideInBytes_get(void * jarg1) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result =  ((arg1)->m_vertexStrideInBytes);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_vertexStrideInBytes);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_skinMargin_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_skinMargin_set(void * jarg1, float jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_skinMargin = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_skinMargin_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_skinMargin_get(void * jarg1) {
+  float jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result =  ((arg1)->m_skinMargin);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_skinMargin);
+  jresult = result; 
   return jresult;
 }
 
@@ -8495,10 +7739,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_polySoupInstance_get(vo
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertex_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 *arg2 = (ndFloat32 *) 0 ;
+  float *arg2 = (float *) 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
+  arg2 = (float *)jarg2; 
   if (arg1) (arg1)->m_vertex = arg2;
 }
 
@@ -8506,10 +7750,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertex_set(void * jarg1, 
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertex_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 *result = 0 ;
+  float *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = (ndFloat32 *) ((arg1)->m_vertex);
+  result = (float *) ((arg1)->m_vertex);
   jresult = (void *)result; 
   return jresult;
 }
@@ -8517,10 +7761,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_vertex_get(void * jarg1
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexCount_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) 0 ;
+  int *arg2 = (int *) 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   if (arg1) (arg1)->m_faceIndexCount = arg2;
 }
 
@@ -8528,10 +7772,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexCount_set(void *
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexCount_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = (ndInt32 *) ((arg1)->m_faceIndexCount);
+  result = (int *) ((arg1)->m_faceIndexCount);
   jresult = (void *)result; 
   return jresult;
 }
@@ -8539,10 +7783,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexCount_get(void
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceVertexIndex_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) 0 ;
+  int *arg2 = (int *) 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   if (arg1) (arg1)->m_faceVertexIndex = arg2;
 }
 
@@ -8550,10 +7794,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceVertexIndex_set(void 
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceVertexIndex_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = (ndInt32 *) ((arg1)->m_faceVertexIndex);
+  result = (int *) ((arg1)->m_faceVertexIndex);
   jresult = (void *)result; 
   return jresult;
 }
@@ -8583,10 +7827,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_meshData_get(void * jar
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexStart_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 = (ndInt32 *) 0 ;
+  int *arg2 = (int *) 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   if (arg1) (arg1)->m_faceIndexStart = arg2;
 }
 
@@ -8594,10 +7838,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexStart_set(void *
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexStart_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = (ndInt32 *) ((arg1)->m_faceIndexStart);
+  result = (int *) ((arg1)->m_faceIndexStart);
   jresult = (void *)result; 
   return jresult;
 }
@@ -8605,10 +7849,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_faceIndexStart_get(void
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_hitDistance_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 *arg2 = (ndFloat32 *) 0 ;
+  float *arg2 = (float *) 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2; 
+  arg2 = (float *)jarg2; 
   if (arg1) (arg1)->m_hitDistance = arg2;
 }
 
@@ -8616,10 +7860,10 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_hitDistance_set(void * ja
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_hitDistance_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 *result = 0 ;
+  float *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = (ndFloat32 *) ((arg1)->m_hitDistance);
+  result = (float *) ((arg1)->m_hitDistance);
   jresult = (void *)result; 
   return jresult;
 }
@@ -8649,14 +7893,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_me_get(void * jarg1) {
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalFaceVertexIndex_set(void * jarg1, void * jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *arg2 ;
+  int *arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  arg2 = (ndInt32 *)jarg2; 
+  arg2 = (int *)jarg2; 
   {
     size_t ii;
-    ndInt32 *b = (ndInt32 *) arg1->m_globalFaceVertexIndex;
-    for (ii = 0; ii < (size_t)(512*(4*2+3)); ii++) b[ii] = *((ndInt32 *) arg2 + ii);
+    int *b = (int *) arg1->m_globalFaceVertexIndex;
+    for (ii = 0; ii < (size_t)(512*(4*2+3)); ii++) b[ii] = *((int *) arg2 + ii);
   }
 }
 
@@ -8664,95 +7908,77 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalFaceVertexIndex_set
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalFaceVertexIndex_get(void * jarg1) {
   void * jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 *result = 0 ;
+  int *result = 0 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_globalFaceVertexIndex);
+  result = (int *)(int *) ((arg1)->m_globalFaceVertexIndex);
   jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_maxT_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_maxT_set(void * jarg1, float jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_maxT = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_maxT_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_maxT_get(void * jarg1) {
+  float jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result =  ((arg1)->m_maxT);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_maxT);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalIndexCount_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalIndexCount_set(void * jarg1, int jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_globalIndexCount = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalIndexCount_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_globalIndexCount_get(void * jarg1) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result =  ((arg1)->m_globalIndexCount);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_globalIndexCount);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_threadId_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_threadId_set(void * jarg1, int jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   if (arg1) (arg1)->m_threadId = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_threadId_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndPolygonMeshDesc_m_threadId_get(void * jarg1) {
+  int jresult ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndPolygonMeshDesc *)jarg1; 
-  result =  ((arg1)->m_threadId);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int) ((arg1)->m_threadId);
+  jresult = result; 
   return jresult;
 }
 
@@ -8843,17 +8069,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeStaticMesh_DebugShape(void * jarg1, vo
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeStaticMesh_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6, void * jarg7) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeStaticMesh_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4, float jarg5, void * jarg6, void * jarg7) {
+  float jresult ;
   ndShapeStaticMesh *arg1 = (ndShapeStaticMesh *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
-  ndFloat32 arg5 ;
+  float arg5 ;
   ndBody *arg6 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg7 = 0 ;
-  ndFloat32 *argp5 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeStaticMesh *)jarg1; 
   arg2 = (ndRayCastNotify *)jarg2;
@@ -8871,20 +8096,15 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeStaticMesh_RayCast(void * jarg1, voi
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  argp5 = (ndFloat32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg5 = *argp5; 
+  arg5 = (float)jarg5; 
   arg6 = (ndBody *)jarg6; 
   arg7 = (ndContactPoint *)jarg7;
   if (!arg7) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndContactPoint & type is null", 0);
     return 0;
   } 
-  result = ((ndShapeStaticMesh const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeStaticMesh const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
+  jresult = result; 
   return jresult;
 }
 
@@ -8929,37 +8149,19 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeConvexHull__SWIG_0(void * jarg1)
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeConvexHull__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeConvexHull__SWIG_1(int jarg1, int jarg2, float jarg3, void * jarg4) {
   void * jresult ;
-  ndInt32 arg1 ;
-  ndInt32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *arg4 = (ndFloat32 *) (ndFloat32 *)0 ;
-  ndInt32 *argp1 ;
-  ndInt32 *argp2 ;
-  ndFloat32 *argp3 ;
+  int arg1 ;
+  int arg2 ;
+  float arg3 ;
+  float *arg4 = (float *) (float *)0 ;
   ndShapeConvexHull *result = 0 ;
   
-  argp1 = (ndInt32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  arg4 = (ndFloat32 *)jarg4; 
-  result = (ndShapeConvexHull *)new ndShapeConvexHull(arg1,arg2,arg3,(ndFloat32 const *)arg4);
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (float)jarg3; 
+  arg4 = (float *)jarg4; 
+  result = (ndShapeConvexHull *)new ndShapeConvexHull(arg1,arg2,arg3,(float const *)arg4);
   jresult = (void *)result; 
   return jresult;
 }
@@ -8973,44 +8175,20 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndShapeConvexHull(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeHeightfield__SWIG_0(void * jarg1, void * jarg2, int jarg3, void * jarg4, void * jarg5) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeHeightfield__SWIG_0(int jarg1, int jarg2, int jarg3, float jarg4, float jarg5) {
   void * jresult ;
-  ndInt32 arg1 ;
-  ndInt32 arg2 ;
+  int arg1 ;
+  int arg2 ;
   ndShapeHeightfield::ndGridConstruction arg3 ;
-  ndFloat32 arg4 ;
-  ndFloat32 arg5 ;
-  ndInt32 *argp1 ;
-  ndInt32 *argp2 ;
-  ndFloat32 *argp4 ;
-  ndFloat32 *argp5 ;
+  float arg4 ;
+  float arg5 ;
   ndShapeHeightfield *result = 0 ;
   
-  argp1 = (ndInt32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
   arg3 = (ndShapeHeightfield::ndGridConstruction)jarg3; 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
-  argp5 = (ndFloat32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg5 = *argp5; 
+  arg4 = (float)jarg4; 
+  arg5 = (float)jarg5; 
   result = (ndShapeHeightfield *)new ndShapeHeightfield(arg1,arg2,arg3,arg4,arg5);
   jresult = (void *)result; 
   return jresult;
@@ -9123,26 +8301,14 @@ SWIGEXPORT int SWIGSTDCALL CSharp_DG_MAX_CHAMFERCYLINDER_DIR_COUNT_get() {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeChamferCylinder__SWIG_0(void * jarg1, void * jarg2) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndShapeChamferCylinder__SWIG_0(float jarg1, float jarg2) {
   void * jresult ;
-  ndFloat32 arg1 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp1 ;
-  ndFloat32 *argp2 ;
+  float arg1 ;
+  float arg2 ;
   ndShapeChamferCylinder *result = 0 ;
   
-  argp1 = (ndFloat32 *)jarg1; 
-  if (!argp1) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg1 = *argp1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg1 = (float)jarg1; 
+  arg2 = (float)jarg2; 
   result = (ndShapeChamferCylinder *)new ndShapeChamferCylinder(arg1,arg2);
   jresult = (void *)result; 
   return jresult;
@@ -9193,20 +8359,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndShapeDebugNotify(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeDebugNotify_DrawPolygon(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeDebugNotify_DrawPolygon(void * jarg1, int jarg2, void * jarg3, void * jarg4) {
   ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
-  ndInt32 arg2 ;
+  int arg2 ;
   ndVector *arg3 = (ndVector *) (ndVector *)0 ;
   ndShapeDebugNotify::ndEdgeType *arg4 = (ndShapeDebugNotify::ndEdgeType *) (ndShapeDebugNotify::ndEdgeType *)0 ;
-  ndInt32 *argp2 ;
   
   arg1 = (ndShapeDebugNotify *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   arg3 = (ndVector *)jarg3; 
   arg4 = (ndShapeDebugNotify::ndEdgeType *)jarg4; 
   (arg1)->DrawPolygon(arg2,(ndVector const *)arg3,(ndShapeDebugNotify::ndEdgeType const *)arg4);
@@ -9639,15 +8799,15 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInstance_DebugShape(void * jarg1, void
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5, void * jarg6) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
   ndBody *arg5 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg6 = 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
   arg2 = (ndRayCastNotify *)jarg2;
@@ -9671,8 +8831,8 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_RayCast(void * jarg1, void 
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndContactPoint & type is null", 0);
     return 0;
   } 
-  result = ((ndShapeInstance const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,(ndBody const *)arg5,*arg6);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeInstance const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,(ndBody const *)arg5,*arg6);
+  jresult = result; 
   return jresult;
 }
 
@@ -9703,13 +8863,13 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInstance_Save(void * jarg1, void * jar
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_CalculateBuoyancyCenterOfPresure(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_CalculateBuoyancyCenterOfPresure(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndVector *arg2 = 0 ;
   ndMatrix *arg3 = 0 ;
   ndVector *arg4 = 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
   arg2 = (ndVector *)jarg2;
@@ -9727,8 +8887,8 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_CalculateBuoyancyCenterOfPr
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  result = ((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(ndMatrix const &)*arg3,(ndVector const &)*arg4);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(ndMatrix const &)*arg3,(ndVector const &)*arg4);
+  jresult = result; 
   return jresult;
 }
 
@@ -9805,7 +8965,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_SupportVertexSpecial(void *
   void * jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndVector *arg2 = 0 ;
-  ndInt32 *arg3 = (ndInt32 *) (ndInt32 *)0 ;
+  int *arg3 = (int *) (int *)0 ;
   ndVector result;
   
   arg1 = (ndShapeInstance *)jarg1; 
@@ -9814,7 +8974,7 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_SupportVertexSpecial(void *
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  arg3 = (ndInt32 *)jarg3; 
+  arg3 = (int *)jarg3; 
   result = ((ndShapeInstance const *)arg1)->SupportVertexSpecial((ndVector const &)*arg2,arg3);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -9919,14 +9079,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInstance_SetCollisionMode(void * jarg1
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_GetConvexVertexCount(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShapeInstance_GetConvexVertexCount(void * jarg1) {
+  int jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetConvexVertexCount();
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndShapeInstance const *)arg1)->GetConvexVertexCount();
+  jresult = result; 
   return jresult;
 }
 
@@ -10035,13 +9195,13 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInstance_SetGlobalScale__SWIG_1(void *
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_CalculatePlaneIntersection(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
-  void * jresult ;
+SWIGEXPORT int SWIGSTDCALL CSharp_ndShapeInstance_CalculatePlaneIntersection(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  int jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  ndInt32 result;
+  int result;
   
   arg1 = (ndShapeInstance *)jarg1; 
   arg2 = (ndVector *)jarg2;
@@ -10055,44 +9215,44 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_CalculatePlaneIntersection(
     return 0;
   } 
   arg4 = (ndVector *)jarg4; 
-  result = ((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
-  jresult = new ndInt32((const ndInt32 &)result); 
+  result = (int)((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_GetVolume(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_GetVolume(void * jarg1) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetVolume();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeInstance const *)arg1)->GetVolume();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_GetBoxMinRadius(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_GetBoxMinRadius(void * jarg1) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetBoxMinRadius();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeInstance const *)arg1)->GetBoxMinRadius();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_GetBoxMaxRadius(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_GetBoxMaxRadius(void * jarg1) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
+  jresult = result; 
   return jresult;
 }
 
@@ -10109,26 +9269,26 @@ SWIGEXPORT int SWIGSTDCALL CSharp_ndShapeInstance_GetScaleType(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_GetUmbraClipSize(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_GetUmbraClipSize(void * jarg1) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetUmbraClipSize();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndShapeInstance const *)arg1)->GetUmbraClipSize();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_GetUserDataID(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned long long SWIGSTDCALL CSharp_ndShapeInstance_GetUserDataID(void * jarg1) {
+  unsigned long long jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndUnsigned64 result;
+  unsigned long long result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetUserDataID();
-  jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
+  result = (unsigned long long)((ndShapeInstance const *)arg1)->GetUserDataID();
+  jresult = result; 
   return jresult;
 }
 
@@ -10375,30 +9535,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_m_parent_get(void * jarg1) 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInstance_m_skinMargin_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndShapeInstance_m_skinMargin_set(void * jarg1, float jarg2) {
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_skinMargin = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndShapeInstance_m_skinMargin_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndShapeInstance_m_skinMargin_get(void * jarg1) {
+  float jresult ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndShapeInstance *)jarg1; 
-  result =  ((arg1)->m_skinMargin);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_skinMargin);
+  jresult = result; 
   return jresult;
 }
 
@@ -10551,14 +9705,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetAsBodyTriggerVolume(void * jarg1)
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetId(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBody_GetId(void * jarg1) {
+  unsigned int jresult ;
   ndBody *arg1 = (ndBody *) 0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndBody *)jarg1; 
-  result = ((ndBody const *)arg1)->GetId();
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int)((ndBody const *)arg1)->GetId();
+  jresult = result; 
   return jresult;
 }
 
@@ -10583,25 +9737,24 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBody_GetAABB(void * jarg1, void * jarg2, vo
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetInvMass(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBody_GetInvMass(void * jarg1) {
+  float jresult ;
   ndBody *arg1 = (ndBody *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBody *)jarg1; 
-  result = ((ndBody const *)arg1)->GetInvMass();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBody const *)arg1)->GetInvMass();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBody_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBody_RayCast(void * jarg1, void * jarg2, void * jarg3, float jarg4) {
   unsigned int jresult ;
   ndBody *arg1 = (ndBody *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndFastRay *arg3 = 0 ;
-  ndFloat32 arg4 ;
-  ndFloat32 const *argp4 ;
+  float arg4 ;
   bool result;
   
   arg1 = (ndBody *)jarg1; 
@@ -10615,12 +9768,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBody_RayCast(void * jarg1, void * j
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndFastRay const & type is null", 0);
     return 0;
   } 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32 const", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg4 = (float)jarg4; 
   result = (bool)((ndBody const *)arg1)->RayCast(*arg2,(ndFastRay const &)*arg3,arg4);
   jresult = result; 
   return jresult;
@@ -10945,26 +10093,26 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_GetScene(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_GetIndex(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBodyKinematic_GetIndex(void * jarg1) {
+  unsigned int jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  result = ((ndBodyKinematic const *)arg1)->GetIndex();
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int)((ndBodyKinematic const *)arg1)->GetIndex();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_GetInvMass(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyKinematic_GetInvMass(void * jarg1) {
+  float jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  result = ((ndBodyKinematic const *)arg1)->GetInvMass();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyKinematic const *)arg1)->GetInvMass();
+  jresult = result; 
   return jresult;
 }
 
@@ -11083,78 +10231,60 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetAutoSleep(void * jarg1, un
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_GetMaxLinearStep(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyKinematic_GetMaxLinearStep(void * jarg1) {
+  float jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  result = ((ndBodyKinematic const *)arg1)->GetMaxLinearStep();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyKinematic const *)arg1)->GetMaxLinearStep();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_GetMaxAngularStep(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyKinematic_GetMaxAngularStep(void * jarg1) {
+  float jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  result = ((ndBodyKinematic const *)arg1)->GetMaxAngularStep();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyKinematic const *)arg1)->GetMaxAngularStep();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetDebugMaxLinearAndAngularIntegrationStep(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetDebugMaxLinearAndAngularIntegrationStep(void * jarg1, float jarg2, float jarg3) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
+  float arg2 ;
+  float arg3 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
   (arg1)->SetDebugMaxLinearAndAngularIntegrationStep(arg2,arg3);
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_GetLinearDamping(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyKinematic_GetLinearDamping(void * jarg1) {
+  float jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  result = ((ndBodyKinematic const *)arg1)->GetLinearDamping();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyKinematic const *)arg1)->GetLinearDamping();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetLinearDamping(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetLinearDamping(void * jarg1, float jarg2) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetLinearDamping(arg2);
 }
 
@@ -11223,13 +10353,12 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetCollisionShape(void * jarg
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBodyKinematic_RayCast(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBodyKinematic_RayCast(void * jarg1, void * jarg2, void * jarg3, float jarg4) {
   unsigned int jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndFastRay *arg3 = 0 ;
-  ndFloat32 arg4 ;
-  ndFloat32 const *argp4 ;
+  float arg4 ;
   bool result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
@@ -11243,12 +10372,7 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBodyKinematic_RayCast(void * jarg1,
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndFastRay const & type is null", 0);
     return 0;
   } 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32 const", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg4 = (float)jarg4; 
   result = (bool)((ndBodyKinematic const *)arg1)->RayCast(*arg2,(ndFastRay const &)*arg3,arg4);
   jresult = result; 
   return jresult;
@@ -11279,14 +10403,14 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_CalculateAngularMomentum(vo
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_TotalEnergy(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyKinematic_TotalEnergy(void * jarg1) {
+  float jresult ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  result = ((ndBodyKinematic const *)arg1)->TotalEnergy();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyKinematic const *)arg1)->TotalEnergy();
+  jresult = result; 
   return jresult;
 }
 
@@ -11315,18 +10439,12 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyKinematic_CalculateInvInertiaMatrix(v
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_IntegrateVelocity(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_IntegrateVelocity(void * jarg1, float jarg2) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->IntegrateVelocity(arg2);
 }
 
@@ -11367,19 +10485,13 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_0(void * 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_1(void * jarg1, float jarg2, void * jarg3) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 arg2 ;
+  float arg2 ;
   ndShapeInstance *arg3 = 0 ;
-  ndFloat32 *argp2 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   arg3 = (ndShapeInstance *)jarg3;
   if (!arg3) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndShapeInstance const & type is null", 0);
@@ -11389,59 +10501,29 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_1(void * 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_2(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_2(void * jarg1, float jarg2, float jarg3, float jarg4, float jarg5) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 arg4 ;
-  ndFloat32 arg5 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
-  ndFloat32 *argp4 ;
-  ndFloat32 *argp5 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg4 = *argp4; 
-  argp5 = (ndFloat32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg5 = *argp5; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
+  arg4 = (float)jarg4; 
+  arg5 = (float)jarg5; 
   (arg1)->SetMassMatrix(arg2,arg3,arg4,arg5);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_3(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_3(void * jarg1, float jarg2, void * jarg3) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 arg2 ;
+  float arg2 ;
   ndMatrix *arg3 = 0 ;
-  ndFloat32 *argp2 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   arg3 = (ndMatrix *)jarg3;
   if (!arg3) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndMatrix const & type is null", 0);
@@ -11453,30 +10535,30 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetMassMatrix__SWIG_3(void * 
 
 SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_GetMassMatrix__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndFloat32 *arg2 = 0 ;
-  ndFloat32 *arg3 = 0 ;
-  ndFloat32 *arg4 = 0 ;
-  ndFloat32 *arg5 = 0 ;
+  float *arg2 = 0 ;
+  float *arg3 = 0 ;
+  float *arg4 = 0 ;
+  float *arg5 = 0 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  arg2 = (ndFloat32 *)jarg2;
+  arg2 = (float *)jarg2;
   if (!arg2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndFloat32 & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "float & type is null", 0);
     return ;
   } 
-  arg3 = (ndFloat32 *)jarg3;
+  arg3 = (float *)jarg3;
   if (!arg3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndFloat32 & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "float & type is null", 0);
     return ;
   } 
-  arg4 = (ndFloat32 *)jarg4;
+  arg4 = (float *)jarg4;
   if (!arg4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndFloat32 & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "float & type is null", 0);
     return ;
   } 
-  arg5 = (ndFloat32 *)jarg5;
+  arg5 = (float *)jarg5;
   if (!arg5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndFloat32 & type is null", 0);
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "float & type is null", 0);
     return ;
   } 
   (arg1)->GetMassMatrix(*arg2,*arg3,*arg4,*arg5);
@@ -11597,12 +10679,11 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_SetTorque(void * jarg1, void 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_AddImpulse(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_AddImpulse(void * jarg1, void * jarg2, void * jarg3, float jarg4) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
-  ndFloat32 arg4 ;
-  ndFloat32 *argp4 ;
+  float arg4 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
   arg2 = (ndVector *)jarg2;
@@ -11615,22 +10696,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_AddImpulse(void * jarg1, void
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return ;
   } 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg4 = *argp4; 
+  arg4 = (float)jarg4; 
   (arg1)->AddImpulse((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_ApplyImpulsePair(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_ApplyImpulsePair(void * jarg1, void * jarg2, void * jarg3, float jarg4) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
-  ndFloat32 arg4 ;
-  ndFloat32 *argp4 ;
+  float arg4 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
   arg2 = (ndVector *)jarg2;
@@ -11643,40 +10718,23 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_ApplyImpulsePair(void * jarg1
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return ;
   } 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg4 = *argp4; 
+  arg4 = (float)jarg4; 
   (arg1)->ApplyImpulsePair((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_ApplyImpulsesAtPoint(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyKinematic_ApplyImpulsesAtPoint(void * jarg1, int jarg2, void * jarg3, void * jarg4, float jarg5) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  ndInt32 arg2 ;
+  int arg2 ;
   ndVector *arg3 = (ndVector *) (ndVector *)0 ;
   ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  ndFloat32 arg5 ;
-  ndInt32 *argp2 ;
-  ndFloat32 *argp5 ;
+  float arg5 ;
   
   arg1 = (ndBodyKinematic *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   arg3 = (ndVector *)jarg3; 
   arg4 = (ndVector *)jarg4; 
-  argp5 = (ndFloat32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg5 = *argp5; 
+  arg5 = (float)jarg5; 
   (arg1)->ApplyImpulsesAtPoint(arg2,(ndVector const *)arg3,(ndVector const *)arg4,arg5);
 }
 
@@ -11821,72 +10879,48 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyTriggerVolume_GetAsBodyTriggerVolume(
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_OnTrigger(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_OnTrigger(void * jarg1, void * jarg2, float jarg3) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   
   arg1 = (ndBodyTriggerVolume *)jarg1; 
   arg2 = (ndBodyKinematic *)jarg2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   (arg1)->OnTrigger(arg2,arg3);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_OnTriggerEnter(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_OnTriggerEnter(void * jarg1, void * jarg2, float jarg3) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   
   arg1 = (ndBodyTriggerVolume *)jarg1; 
   arg2 = (ndBodyKinematic *)jarg2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   (arg1)->OnTriggerEnter(arg2,arg3);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_OnTriggerExit(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_OnTriggerExit(void * jarg1, void * jarg2, float jarg3) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   
   arg1 = (ndBodyTriggerVolume *)jarg1; 
   arg2 = (ndBodyKinematic *)jarg2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   (arg1)->OnTriggerExit(arg2,arg3);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_SpecialUpdate(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyTriggerVolume_SpecialUpdate(void * jarg1, float jarg2) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyTriggerVolume *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SpecialUpdate(arg2);
 }
 
@@ -11921,17 +10955,13 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBodyPlayerCapsule__SWIG_0(void * jarg
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBodyPlayerCapsule__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBodyPlayerCapsule__SWIG_1(void * jarg1, float jarg2, float jarg3, float jarg4, float jarg5) {
   void * jresult ;
   ndMatrix *arg1 = 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 arg3 ;
-  ndFloat32 arg4 ;
-  ndFloat32 arg5 ;
-  ndFloat32 *argp2 ;
-  ndFloat32 *argp3 ;
-  ndFloat32 *argp4 ;
-  ndFloat32 *argp5 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
   ndBodyPlayerCapsule *result = 0 ;
   
   arg1 = (ndMatrix *)jarg1;
@@ -11939,30 +10969,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndBodyPlayerCapsule__SWIG_1(void * jarg
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndMatrix const & type is null", 0);
     return 0;
   } 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  argp4 = (ndFloat32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
-  argp5 = (ndFloat32 *)jarg5; 
-  if (!argp5) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg5 = *argp5; 
+  arg2 = (float)jarg2; 
+  arg3 = (float)jarg3; 
+  arg4 = (float)jarg4; 
+  arg5 = (float)jarg5; 
   result = (ndBodyPlayerCapsule *)new ndBodyPlayerCapsule((ndMatrix const &)*arg1,arg2,arg3,arg4,arg5);
   jresult = (void *)result; 
   return jresult;
@@ -11989,86 +10999,68 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetAsBodyPlayerCapsule(
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetForwardSpeed(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetForwardSpeed(void * jarg1) {
+  float jresult ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  result = ((ndBodyPlayerCapsule const *)arg1)->GetForwardSpeed();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetForwardSpeed();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_SetForwardSpeed(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_SetForwardSpeed(void * jarg1, float jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetForwardSpeed(arg2);
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetLateralSpeed(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetLateralSpeed(void * jarg1) {
+  float jresult ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  result = ((ndBodyPlayerCapsule const *)arg1)->GetLateralSpeed();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetLateralSpeed();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_SetLateralSpeed(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_SetLateralSpeed(void * jarg1, float jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetLateralSpeed(arg2);
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetHeadingAngle(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyPlayerCapsule_GetHeadingAngle(void * jarg1) {
+  float jresult ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  result = ((ndBodyPlayerCapsule const *)arg1)->GetHeadingAngle();
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetHeadingAngle();
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_SetHeadingAngle(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_SetHeadingAngle(void * jarg1, float jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetHeadingAngle(arg2);
 }
 
@@ -12085,31 +11077,24 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBodyPlayerCapsule_IsOnFloor(void * 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_ApplyInputs(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyPlayerCapsule_ApplyInputs(void * jarg1, float jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->ApplyInputs(arg2);
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyPlayerCapsule_ContactFrictionCallback(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndBodyPlayerCapsule_ContactFrictionCallback(void * jarg1, void * jarg2, void * jarg3, int jarg4, void * jarg5) {
+  float jresult ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
-  ndInt32 arg4 ;
+  int arg4 ;
   ndBodyKinematic *arg5 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  ndInt32 *argp4 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndBodyPlayerCapsule *)jarg1; 
   arg2 = (ndVector *)jarg2;
@@ -12122,15 +11107,10 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodyPlayerCapsule_ContactFrictionCallback
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
     return 0;
   } 
-  argp4 = (ndInt32 *)jarg4; 
-  if (!argp4) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return 0;
-  }
-  arg4 = *argp4; 
+  arg4 = (int)jarg4; 
   arg5 = (ndBodyKinematic *)jarg5; 
-  result = ((ndBodyPlayerCapsule const *)arg1)->ContactFrictionCallback((ndVector const &)*arg2,(ndVector const &)*arg3,arg4,(ndBodyKinematic const *)arg5);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->ContactFrictionCallback((ndVector const &)*arg2,(ndVector const &)*arg3,arg4,(ndBodyKinematic const *)arg5);
+  jresult = result; 
   return jresult;
 }
 
@@ -12225,19 +11205,13 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyNotify_SetGravity(void * jarg1, void * 
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyNotify_OnTransform(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyNotify_OnTransform(void * jarg1, int jarg2, void * jarg3) {
   ndBodyNotify *arg1 = (ndBodyNotify *) 0 ;
-  ndInt32 arg2 ;
+  int arg2 ;
   ndMatrix *arg3 = 0 ;
-  ndInt32 *argp2 ;
   
   arg1 = (ndBodyNotify *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   arg3 = (ndMatrix *)jarg3;
   if (!arg3) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndMatrix const & type is null", 0);
@@ -12261,26 +11235,14 @@ SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyNotify_Save(void * jarg1, void * jarg2)
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyNotify_OnApplyExternalForce(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndBodyNotify_OnApplyExternalForce(void * jarg1, int jarg2, float jarg3) {
   ndBodyNotify *arg1 = (ndBodyNotify *) 0 ;
-  ndInt32 arg2 ;
-  ndFloat32 arg3 ;
-  ndInt32 *argp2 ;
-  ndFloat32 *argp3 ;
+  int arg2 ;
+  float arg3 ;
   
   arg1 = (ndBodyNotify *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg2 = (int)jarg2; 
+  arg3 = (float)jarg3; 
   (arg1)->OnApplyExternalForce(arg2,arg3);
 }
 
@@ -12295,254 +11257,200 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndMaterial() {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_restitution_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_restitution_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_restitution = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_restitution_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_restitution_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_restitution);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_restitution);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_staticFriction0_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_staticFriction0_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_staticFriction0 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_staticFriction0_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_staticFriction0_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_staticFriction0);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_staticFriction0);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_staticFriction1_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_staticFriction1_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_staticFriction1 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_staticFriction1_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_staticFriction1_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_staticFriction1);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_staticFriction1);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction0_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction0_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_dynamicFriction0 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction0_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction0_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_dynamicFriction0);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_dynamicFriction0);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction1_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction1_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_dynamicFriction1 = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction1_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_dynamicFriction1_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_dynamicFriction1);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_dynamicFriction1);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_skinMargin_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_skinMargin_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_skinMargin = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_skinMargin_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_skinMargin_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_skinMargin);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_skinMargin);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_softness_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_softness_set(void * jarg1, float jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_softness = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_softness_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndMaterial_m_softness_get(void * jarg1) {
+  float jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_softness);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_softness);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_flags_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_flags_set(void * jarg1, unsigned int jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndUnsigned32 arg2 ;
-  ndUnsigned32 *argp2 ;
+  unsigned int arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndUnsigned32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndUnsigned32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   if (arg1) (arg1)->m_flags = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_flags_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndMaterial_m_flags_get(void * jarg1) {
+  unsigned int jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_flags);
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int) ((arg1)->m_flags);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_userFlags_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndMaterial_m_userFlags_set(void * jarg1, unsigned int jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndUnsigned32 arg2 ;
-  ndUnsigned32 *argp2 ;
+  unsigned int arg2 ;
   
   arg1 = (ndMaterial *)jarg1; 
-  argp2 = (ndUnsigned32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndUnsigned32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (unsigned int)jarg2; 
   if (arg1) (arg1)->m_userFlags = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndMaterial_m_userFlags_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndMaterial_m_userFlags_get(void * jarg1) {
+  unsigned int jresult ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndMaterial *)jarg1; 
-  result =  ((arg1)->m_userFlags);
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int) ((arg1)->m_userFlags);
+  jresult = result; 
   return jresult;
 }
 
@@ -12619,24 +11527,18 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndContactNotify_GetMaterial(void * jarg1, v
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndContactNotify_OnCompoundSubShapeOverlap(void * jarg1, void * jarg2, void * jarg3, void * jarg4, void * jarg5) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndContactNotify_OnCompoundSubShapeOverlap(void * jarg1, void * jarg2, float jarg3, void * jarg4, void * jarg5) {
   unsigned int jresult ;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  ndFloat32 arg3 ;
+  float arg3 ;
   ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
   ndShapeInstance *arg5 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  ndFloat32 *argp3 ;
   bool result;
   
   arg1 = (ndContactNotify *)jarg1; 
   arg2 = (ndContact *)jarg2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   arg4 = (ndShapeInstance *)jarg4; 
   arg5 = (ndShapeInstance *)jarg5; 
   result = (bool)(arg1)->OnCompoundSubShapeOverlap((ndContact const *)arg2,arg3,(ndShapeInstance const *)arg4,(ndShapeInstance const *)arg5);
@@ -12645,42 +11547,30 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndContactNotify_OnCompoundSubShapeOve
 }
 
 
-SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndContactNotify_OnAabbOverlap(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndContactNotify_OnAabbOverlap(void * jarg1, void * jarg2, float jarg3) {
   unsigned int jresult ;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   bool result;
   
   arg1 = (ndContactNotify *)jarg1; 
   arg2 = (ndContact *)jarg2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   result = (bool)(arg1)->OnAabbOverlap((ndContact const *)arg2,arg3);
   jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndContactNotify_OnContactCallback(void * jarg1, void * jarg2, void * jarg3) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndContactNotify_OnContactCallback(void * jarg1, void * jarg2, float jarg3) {
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
+  float arg3 ;
   
   arg1 = (ndContactNotify *)jarg1; 
   arg2 = (ndContact *)jarg2; 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg3 = *argp3; 
+  arg3 = (float)jarg3; 
   (arg1)->OnContactCallback((ndContact const *)arg2,arg3);
 }
 
@@ -12729,29 +11619,28 @@ SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndRayCastNotify_TraceShape(void * jar
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastNotify_OnRayPrecastAction(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndRayCastNotify_OnRayPrecastAction(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
   ndBody *arg2 = (ndBody *) (ndBody *)0 ;
   ndShapeInstance *arg3 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndRayCastNotify *)jarg1; 
   arg2 = (ndBody *)jarg2; 
   arg3 = (ndShapeInstance *)jarg3; 
-  result = (arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int)(arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastNotify_OnRayCastAction(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndRayCastNotify_OnRayCastAction(void * jarg1, void * jarg2, float jarg3) {
+  float jresult ;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
   ndContactPoint *arg2 = 0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
-  ndFloat32 result;
+  float arg3 ;
+  float result;
   
   arg1 = (ndRayCastNotify *)jarg1; 
   arg2 = (ndContactPoint *)jarg2;
@@ -12759,14 +11648,9 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastNotify_OnRayCastAction(void * jarg
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndContactPoint const & type is null", 0);
     return 0;
   } 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = (arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  arg3 = (float)jarg3; 
+  result = (float)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
+  jresult = result; 
   return jresult;
 }
 
@@ -12793,30 +11677,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastNotify_m_contact_get(void * jarg1)
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_ndRayCastNotify_m_param_set(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_ndRayCastNotify_m_param_set(void * jarg1, float jarg2) {
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (ndRayCastNotify *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   if (arg1) (arg1)->m_param = arg2;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastNotify_m_param_get(void * jarg1) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndRayCastNotify_m_param_get(void * jarg1) {
+  float jresult ;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
-  ndFloat32 result;
+  float result;
   
   arg1 = (ndRayCastNotify *)jarg1; 
-  result =  ((arg1)->m_param);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  result = (float) ((arg1)->m_param);
+  jresult = result; 
   return jresult;
 }
 
@@ -12831,29 +11709,28 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndRayCastClosestHitCallback() {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastClosestHitCallback_OnRayPrecastAction(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndRayCastClosestHitCallback_OnRayPrecastAction(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   ndRayCastClosestHitCallback *arg1 = (ndRayCastClosestHitCallback *) 0 ;
   ndBody *arg2 = (ndBody *) (ndBody *)0 ;
   ndShapeInstance *arg3 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndRayCastClosestHitCallback *)jarg1; 
   arg2 = (ndBody *)jarg2; 
   arg3 = (ndShapeInstance *)jarg3; 
-  result = (arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int)(arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastClosestHitCallback_OnRayCastAction(void * jarg1, void * jarg2, void * jarg3) {
-  void * jresult ;
+SWIGEXPORT float SWIGSTDCALL CSharp_ndRayCastClosestHitCallback_OnRayCastAction(void * jarg1, void * jarg2, float jarg3) {
+  float jresult ;
   ndRayCastClosestHitCallback *arg1 = (ndRayCastClosestHitCallback *) 0 ;
   ndContactPoint *arg2 = 0 ;
-  ndFloat32 arg3 ;
-  ndFloat32 *argp3 ;
-  ndFloat32 result;
+  float arg3 ;
+  float result;
   
   arg1 = (ndRayCastClosestHitCallback *)jarg1; 
   arg2 = (ndContactPoint *)jarg2;
@@ -12861,14 +11738,9 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndRayCastClosestHitCallback_OnRayCastAction
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndContactPoint const & type is null", 0);
     return 0;
   } 
-  argp3 = (ndFloat32 *)jarg3; 
-  if (!argp3) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return 0;
-  }
-  arg3 = *argp3; 
-  result = (arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
-  jresult = new ndFloat32((const ndFloat32 &)result); 
+  arg3 = (float)jarg3; 
+  result = (float)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
+  jresult = result; 
   return jresult;
 }
 
@@ -12899,16 +11771,16 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_ndBodiesInAabbNotify(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBodiesInAabbNotify_OnOverlap(void * jarg1, void * jarg2) {
-  void * jresult ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_ndBodiesInAabbNotify_OnOverlap(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   ndBodiesInAabbNotify *arg1 = (ndBodiesInAabbNotify *) 0 ;
   ndBody *arg2 = (ndBody *) (ndBody *)0 ;
-  ndUnsigned32 result;
+  unsigned int result;
   
   arg1 = (ndBodiesInAabbNotify *)jarg1; 
   arg2 = (ndBody *)jarg2; 
-  result = (arg1)->OnOverlap((ndBody const *)arg2);
-  jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
+  result = (unsigned int)(arg1)->OnOverlap((ndBody const *)arg2);
+  jresult = result; 
   return jresult;
 }
 
@@ -12963,66 +11835,42 @@ SWIGEXPORT void SWIGSTDCALL CSharp_delete_NewtonWorld(void * jarg1) {
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_Update(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_Update(void * jarg1, float jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (NewtonWorld *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->Update(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_SetSubSteps(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_SetSubSteps(void * jarg1, float jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (NewtonWorld *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetSubSteps(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_SetIterations(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_SetIterations(void * jarg1, int jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  ndInt32 arg2 ;
-  ndInt32 *argp2 ;
+  int arg2 ;
   
   arg1 = (NewtonWorld *)jarg1; 
-  argp2 = (ndInt32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (int)jarg2; 
   (arg1)->SetIterations(arg2);
 }
 
 
-SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_SetTimestep(void * jarg1, void * jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_NewtonWorld_SetTimestep(void * jarg1, float jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
+  float arg2 ;
   
   arg1 = (NewtonWorld *)jarg1; 
-  argp2 = (ndFloat32 *)jarg2; 
-  if (!argp2) {
-    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndFloat32", 0);
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (float)jarg2; 
   (arg1)->SetTimestep(arg2);
 }
 
