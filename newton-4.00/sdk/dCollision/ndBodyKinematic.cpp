@@ -95,6 +95,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_index(0)
 	,m_bodyNodeIndex(-1)
 	,m_sceneNodeIndex(-1)
+	,m_buildBodyNodeIndex(-1)
+	,m_buildSceneNodeIndex(-1)
 {
 	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
@@ -125,6 +127,8 @@ ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_index(0)
 	,m_bodyNodeIndex(-1)
 	,m_sceneNodeIndex(-1)
+	,m_buildBodyNodeIndex(-1)
+	,m_buildSceneNodeIndex(-1)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);

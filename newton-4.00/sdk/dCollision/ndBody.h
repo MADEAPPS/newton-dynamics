@@ -34,6 +34,7 @@ class ndBodyKinematic;
 class ndRayCastNotify;
 class ndBodyParticleSet;
 class ndBodyTriggerVolume;
+class ndBodyPlayerCapsule;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
@@ -50,8 +51,8 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual ndBodySentinel* GetAsBodySentinel() { return nullptr; }
 	virtual ndBodySphFluid* GetAsBodySphFluid() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
-	virtual ndBodyKinematic* GetAsBodyPlayerCapsule() { return nullptr; }
 	virtual ndBodyParticleSet* GetAsBodyParticleSet() { return nullptr; }
+	virtual ndBodyPlayerCapsule* GetAsBodyPlayerCapsule() { return nullptr; }
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
 	ndUnsigned32 GetId() const;

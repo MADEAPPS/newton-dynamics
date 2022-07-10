@@ -25,7 +25,7 @@
 #pragma SWIG nowarn=325		//Nested struct not currently supported 
 #pragma SWIG nowarn=389		//operator[] ignored
 #pragma SWIG nowarn=401		//Nothing known about base class
-#pragma SWIG nowarn=509		//Overloaded method effectively ignored,
+#pragma SWIG nowarn=509		//Overloaded method ignored
 
 %begin 
 %{
@@ -40,19 +40,47 @@
 
 %include "newtonConfig.h"
 
-//%rename(New) dVector::operator new;
-//%rename(Delete) dVector::operator delete;
-//%rename(NewArray) dVector::operator new[];
-//%rename(DeleteArray) dVector::operator delete[];
+%rename(GetElement) ndVector::operator[](ndInt32 i);
+%rename(GetElement) ndVector::operator[](ndInt32 i) const;
+%rename(Add) ndVector::operator+(const ndVector& src) const;
+%rename(Sub) ndVector::operator-(const ndVector& src) const;
+%rename(Mul) ndVector::operator*(const ndVector& src) const;
+%rename(AddEqual) ndVector::operator+=(const ndVector& src);
+%rename(SubEqual) ndVector::operator-=(const ndVector& src);
+%rename(MulEqual) ndVector::operator*=(const ndVector& src);
+%rename(Or) ndVector::operator|(const ndVector& src) const;
+%rename(And) ndVector::operator&(const ndVector& src) const;
+%rename(Xor) ndVector::operator^(const ndVector& src) const;
+%rename(Less) ndVector::operator<(const ndVector& src) const;
+%rename(Greather) ndVector::operator>(const ndVector& src) const;
+%rename(Identical) ndVector::operator==(const ndVector& src) const;
+%rename(LessEqual) ndVector::operator<=(const ndVector& src) const;
+%rename(GreatherEqual) ndVector::operator>=(const ndVector& src) const;
 
-%rename(GetElement) dVector::operator[](dInt32 i);
-%rename(GetElement) dVector::operator[](dInt32 i) const;
+%rename(GetElement) ndBigVector::operator[](ndInt32 i);
+%rename(GetElement) ndBigVector::operator[](ndInt32 i) const;
+%rename(Add) ndBigVector::operator+(const ndBigVector& src) const;
+%rename(Sub) ndBigVector::operator-(const ndBigVector& src) const;
+%rename(Mul) ndBigVector::operator*(const ndBigVector& src) const;
+%rename(AddEqual) ndBigVector::operator+=(const ndBigVector& src);
+%rename(SubEqual) ndBigVector::operator-=(const ndBigVector& src);
+%rename(MulEqual) ndBigVector::operator*=(const ndBigVector& src);
+%rename(Or) ndBigVector::operator|(const ndBigVector& src) const;
+%rename(And) ndBigVector::operator&(const ndBigVector& src) const;
+%rename(Xor) ndBigVector::operator^(const ndBigVector& src) const;
+%rename(Less) ndBigVector::operator<(const ndBigVector& src) const;
+%rename(Greather) ndBigVector::operator>(const ndBigVector& src) const;
+%rename(Identical) ndBigVector::operator==(const ndBigVector& src) const;
+%rename(LessEqual) ndBigVector::operator<=(const ndBigVector& src) const;
+%rename(GreatherEqual) ndBigVector::operator>=(const ndBigVector& src) const;
 
-%rename(GetElement) dBigVector::operator[](dInt32 i);
-%rename(GetElement) dBigVector::operator[](dInt32 i) const;
+%rename(GetElement) ndMatrix::operator[](ndInt32 i);
+%rename(GetElement) ndMatrix::operator[](ndInt32 i) const;
+%rename(GetElement) ndMatrix::operator*(const ndMatrix& src) const;
 
-%rename(GetElement) dMatrix::operator[](dInt32 i);
-%rename(GetElement) dMatrix::operator[](dInt32 i) const;
+%rename(Add) ndQuaternion::operator+(const ndQuaternion& src) const;
+%rename(Sub) ndQuaternion::operator-(const ndQuaternion& src) const;
+%rename(Mul) ndQuaternion::operator*(const ndQuaternion& src) const;
 
 %rename(Assigment) ndShapeInstance::operator=;  
 

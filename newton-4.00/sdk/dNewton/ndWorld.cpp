@@ -401,7 +401,7 @@ void ndWorld::ThreadFunction()
 		m_collisionUpdate = true;
 
 		m_scene->SetTimestep(m_timestep);
-		m_scene->BalanceScene();
+		//m_scene->BalanceScene();
 
 		ndInt32 const steps = m_subSteps;
 		ndFloat32 timestep = m_timestep / steps;
@@ -453,9 +453,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// do physics step
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
+	//m_scene->UpdateBodyList();
 
-	m_scene->UpdateBodyList();
-
+	m_scene->BalanceScene();
 	m_scene->ApplyExtForce();
 	m_scene->InitBodyArray();
 

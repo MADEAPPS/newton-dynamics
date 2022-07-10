@@ -24,7 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 
-#define D_NEW_SCENE
+//#define D_NEW_SCENE
 
 class ndBodyKinematic;
 class ndSceneBodyNode;

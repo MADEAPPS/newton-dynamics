@@ -44,28 +44,52 @@ ndVector ndScene::m_velocTol(ndFloat32(1.0e-16f));
 ndVector ndScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
 ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
-ndScene::ndFitnessList::ndFitnessList()
-	:m_workingArray(1024)
-#ifdef D_NEW_SCENE
-	,m_buildArray(1024)
-#endif
+ndScene::ndFitnessList::ndNodeArray::ndNodeArray()
+	:ndArray<ndSceneNode*>(1024)
+	,m_isDirty(1)
 	,m_scansCount(0)
-	,m_isDirty(true)
+{
+}
+
+ndScene::ndFitnessList::ndNodeArray::ndNodeArray(const ndNodeArray& src)
+	:ndArray<ndSceneNode*>(1024)
+	,m_isDirty(1)
+	,m_scansCount(0)
+{
+	dAssert(0);
+	Swap((ndArray<ndSceneNode*>&)src);
+}
+
+ndScene::ndFitnessList::ndNodeArray::~ndNodeArray()
+{
+	CleanUp();
+}
+
+void ndScene::ndFitnessList::ndNodeArray::CleanUp()
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndSceneNode* const node = (*this)[i];
+		dAssert(node->m_isDead);
+		delete node;
+	}
+	SetCount(0);
+}
+
+ndScene::ndFitnessList::ndFitnessList()
+	:m_workingArray()
+#ifdef D_NEW_SCENE
+	,m_buildArray()
+#endif
 {
 }
 
 ndScene::ndFitnessList::ndFitnessList(const ndFitnessList& src)
-	:m_workingArray(1024)
+	:m_workingArray(src.m_workingArray)
 #ifdef D_NEW_SCENE
-	,m_buildArray(1024)
+	,m_buildArray(src.m_buildArray)
 #endif
-	,m_scansCount(0)
-	,m_isDirty(true)
 {
-	m_workingArray.Swap((ndArray<ndSceneNode*>&)src.m_workingArray);
-#ifdef D_NEW_SCENE
-	m_buildArray.Swap((ndArray<ndSceneNode*>&)src.m_buildArray);
-#endif
 }
 
 ndScene::ndFitnessList::~ndFitnessList()
@@ -75,42 +99,39 @@ ndScene::ndFitnessList::~ndFitnessList()
 
 void ndScene::ndFitnessList::AddNode(ndSceneNode* const node)
 {
-	m_isDirty = true;
 	node->m_isDead = 0;
 	m_workingArray.PushBack(node);
+	m_workingArray.m_isDirty = 1;
 #ifdef D_NEW_SCENE
 	m_buildArray.PushBack(node->Clone());
+	m_buildArray.m_isDirty = 1;
 #endif
 }
 
 void ndScene::ndFitnessList::CleanUp()
 {
-	for (ndInt32 i = m_workingArray.GetCount() - 1; i >= 0; --i)
-	{
-		ndSceneNode* const node = m_workingArray[i];
-		dAssert(node->m_isDead);
-		delete node;
-	}
-	m_workingArray.SetCount(0);
+	m_workingArray.CleanUp();
 #ifdef D_NEW_SCENE	
-	for (ndInt32 i = m_buildArray.GetCount() - 1; i >= 0; --i)
-	{
-		ndSceneNode* const node = m_buildArray[i];
-		delete node;
-	}
-	m_buildArray.SetCount(0);
+	m_buildArray.CleanUp();
 #endif
 }
 
 void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 {
-	if (m_isDirty && m_workingArray.GetCount())
+	#ifdef D_NEW_SCENE
+	ndFitnessList::ndNodeArray& nodeArray = m_buildArray;
+	#else
+	ndFitnessList::ndNodeArray& nodeArray = m_workingArray;
+	#endif
+
+	if (nodeArray.m_isDirty && nodeArray.GetCount())
 	{
 		D_TRACKTIME();
-		const ndInt32 count = m_workingArray.GetCount();
-		m_workingArray.SetCount(count * 2);
-		ndSceneNode** const src = &m_workingArray[0];
-		ndSceneNode** const tmp = &m_workingArray[count];
+	
+		const ndInt32 count = nodeArray.GetCount();
+		nodeArray.SetCount(count * 2);
+		ndSceneNode** const src = &nodeArray[0];
+		ndSceneNode** const tmp = &nodeArray[count];
 		
 		class ndSortSceneNodeKey
 		{
@@ -128,7 +149,7 @@ void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 				ndUnsigned32 code = node->m_isDead * 2 + (((ndSceneNode*)node)->GetAsSceneBodyNode() ? 1 : 0);
 				return m_keyCode[code];
 			}
-
+	
 			ndUnsigned32 m_keyCode[3];
 		};
 		
@@ -139,26 +160,29 @@ void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 		const ndInt32 deadCount = scans[3] - alivedStart;
 		for (ndInt32 i = 0; i < deadCount; i++)
 		{
-			ndSceneNode* const node = m_workingArray[alivedStart + i];
+			ndSceneNode* const node = nodeArray[alivedStart + i];
+			#ifdef D_NEW_SCENE
+			dAssert(0);
+			#endif
 			delete node;
 		}
-		m_workingArray.SetCount(alivedStart);
-
-		if (m_workingArray.GetCount())
+		nodeArray.SetCount(alivedStart);
+	
+		if (nodeArray.GetCount())
 		{
-			auto EnumerateNodes = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+			auto EnumerateNodes = ndMakeObject::ndFunction([this, &nodeArray](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				D_TRACKTIME_NAMED(MarkCellBounds);
-				const ndInt32 baseCount = m_workingArray.GetCount() / 2;
-				ndSceneNode** const nodes = &m_workingArray[0];
+				const ndInt32 baseCount = nodeArray.GetCount() / 2;
+				ndSceneNode** const nodes = &nodeArray[0];
 				const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
-
+	
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)nodes[baseCount + i];
 					dAssert(nodes[i]->GetAsSceneTreeNode());
 					dAssert(nodes[baseCount + i]->GetAsSceneBodyNode());
-
+	
 					ndBodyKinematic* const body = bodyNode->m_body;
 					body->m_sceneNodeIndex = i;
 					body->m_bodyNodeIndex = baseCount + i;
@@ -166,8 +190,8 @@ void ndScene::ndFitnessList::Update(ndThreadPool& threadPool)
 			});
 			threadPool.ParallelExecute(EnumerateNodes);
 		}
-
-		m_isDirty = 0;
+	
+		nodeArray.m_isDirty = 0;
 	}
 }
 
@@ -388,7 +412,7 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 
 bool ndScene::RemoveBody(ndBodyKinematic* const body)
 {
-	m_fitness.m_isDirty = 1;
+	m_fitness.m_workingArray.m_isDirty = 1;
 	m_forceBalanceSceneCounter = 0;
 
 	ndSceneBodyNode* const bodyNode = (ndSceneBodyNode*)m_fitness.m_workingArray[body->m_bodyNodeIndex];
@@ -397,6 +421,11 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 	dAssert(sceneNode->GetAsSceneTreeNode());
 	bodyNode->Kill();
 	sceneNode->Kill();
+
+	#ifdef D_NEW_SCENE
+	dAssert(0);
+	m_fitness.m_buildArray.m_isDirty = 1;
+	#endif
 
 	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 	while (contactMap.GetRoot())
@@ -1424,7 +1453,8 @@ void ndScene::RemoveNode(ndSceneNode* const node)
 
 		dAssert(parent->GetAsSceneTreeNode());
 		parent->Kill();
-		m_fitness.m_isDirty = 1;
+		dAssert(0);
+		//m_fitness.m_isDirty = 1;
 	}
 	else
 	{
@@ -2035,10 +2065,10 @@ void ndScene::InitBodyArray()
 			});
 	
 			D_TRACKTIME_NAMED(UpdateSceneBvhFull);
-			for (ndUnsigned32 i = 0; i < m_fitness.m_scansCount; ++i)
+			for (ndUnsigned32 i = 0; i < m_fitness.m_workingArray.m_scansCount; ++i)
 			{
-				start = m_fitness.m_scans[i];
-				count = m_fitness.m_scans[i + 1] - start;
+				start = m_fitness.m_workingArray.m_scans[i];
+				count = m_fitness.m_workingArray.m_scans[i + 1] - start;
 				ParallelExecute(UpdateSceneBvh);
 			}
 		}
@@ -2482,10 +2512,17 @@ bool ndScene::BuildBvhTreeInitNodes()
 	auto CopyBodyNodes = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CopyBodyNodes);
-		const ndUnsigned32 baseCount = m_fitness.m_workingArray.GetCount() / 2;
+
+		#ifdef D_NEW_SCENE
+		ndFitnessList::ndNodeArray& nodeArray = m_fitness.m_buildArray;
+		#else
+		ndFitnessList::ndNodeArray& nodeArray = m_fitness.m_workingArray;
+		#endif
+
+		const ndUnsigned32 baseCount = nodeArray.GetCount() / 2;
 		ndSceneNode** const srcArray = m_bvhBuildState.m_srcArray;
 		dAssert(baseCount == ndUnsigned32(GetActiveBodyArray().GetCount() - 1));
-		ndSceneBodyNode** const bodySceneNodes = (ndSceneBodyNode**)&m_fitness.m_workingArray[baseCount];
+		ndSceneBodyNode** const bodySceneNodes = (ndSceneBodyNode**)&nodeArray[baseCount];
 
 		const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -2505,8 +2542,14 @@ bool ndScene::BuildBvhTreeInitNodes()
 	auto CopySceneNode = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CopySceneNode);
-		const ndUnsigned32 baseCount = m_fitness.m_workingArray.GetCount() / 2;
-		ndSceneTreeNode** const sceneNodes = (ndSceneTreeNode**)&m_fitness.m_workingArray[0];
+		#ifdef D_NEW_SCENE
+		ndFitnessList::ndNodeArray& nodeArray = m_fitness.m_buildArray;
+		#else
+		ndFitnessList::ndNodeArray& nodeArray = m_fitness.m_workingArray;
+		#endif
+
+		const ndUnsigned32 baseCount = nodeArray.GetCount() / 2;
+		ndSceneTreeNode** const sceneNodes = (ndSceneTreeNode**)&nodeArray[0];
 
 		ndSceneNode** const parentsArray = m_bvhBuildState.m_parentsArray;
 		const ndStartEnd startEnd(baseCount, threadIndex, threadCount);
@@ -2524,7 +2567,11 @@ bool ndScene::BuildBvhTreeInitNodes()
 
 	bool ret = false;
 	UpdateBodyList();
+#ifdef D_NEW_SCENE
+	if (m_fitness.m_buildArray.GetCount())
+#else
 	if (m_fitness.m_workingArray.GetCount())
+#endif
 	{
 		ret = true;
 		m_bvhBuildState.Init(m_bodyList.GetCount());
@@ -2930,21 +2977,27 @@ void ndScene::BuildBvhTreeSetNodesDepth()
 		}
 	};
 
-	ndUnsigned32 sceneNodeCount = m_fitness.m_workingArray.GetCount() / 2 - 1;
-	ndSceneTreeNode** const view = (ndSceneTreeNode**)&m_fitness.m_workingArray[0];
+	#ifdef D_NEW_SCENE
+	ndFitnessList::ndNodeArray& nodeArray = m_fitness.m_buildArray;
+	#else
+	ndFitnessList::ndNodeArray& nodeArray = m_fitness.m_workingArray;
+	#endif
+
+	ndUnsigned32 sceneNodeCount = nodeArray.GetCount() / 2 - 1;
+	ndSceneTreeNode** const view = (ndSceneTreeNode**)&nodeArray[0];
 	ndSceneTreeNode** tmpBuffer = (ndSceneTreeNode**)&m_bvhBuildState.m_tempNodeBuffer[0];
 
 	ndUnsigned32 scans[257];
 	ndCountingSortInPlace<ndSceneTreeNode*, ndSortGetDethpKey, 8>(*this, &view[0], tmpBuffer, sceneNodeCount, scans, nullptr);
 
-	m_fitness.m_scansCount = 0;
+	nodeArray.m_scansCount = 0;
 	for (ndInt32 i = 1; (i < 257) && (scans[i] < sceneNodeCount); ++i)
 	{
-		m_fitness.m_scans[i - 1] = scans[i];
-		m_fitness.m_scansCount++;
+		nodeArray.m_scans[i - 1] = scans[i];
+		nodeArray.m_scansCount++;
 	}
-	m_fitness.m_scans[m_fitness.m_scansCount] = scans[m_fitness.m_scansCount + 1];
-	dAssert(m_fitness.m_scans[0] == 0);
+	nodeArray.m_scans[nodeArray.m_scansCount] = scans[nodeArray.m_scansCount + 1];
+	dAssert(nodeArray.m_scans[0] == 0);
 }
 
 ndSceneNode* ndScene::BuildIncrementalBvhTree()
@@ -3027,5 +3080,9 @@ ndSceneNode* ndScene::BuildBvhTree()
 	BuildBvhTreeSetNodesDepth();
 	dAssert(m_bvhBuildState.m_root->SanityCheck(0));
 
+#ifdef D_NEW_SCENE
+	// for now just swap buffers
+	m_fitness.m_buildArray.Swap(m_fitness.m_workingArray);
+#endif
 	return m_bvhBuildState.m_root;
 }

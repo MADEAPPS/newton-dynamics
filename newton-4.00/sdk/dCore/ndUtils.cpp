@@ -55,7 +55,7 @@ ndFloat32 ndRand()
 	return r;
 }
 
-// return a pseudo Gaussian random number with mean u and deviation phi
+/// return a pseudo Gaussian random number with mean u and deviation phi
 ndFloat32 ndGaussianRandom(ndFloat32 u, ndFloat32 phi)
 {
 	// from Abramowitz and Stegun formula 26.2.23.

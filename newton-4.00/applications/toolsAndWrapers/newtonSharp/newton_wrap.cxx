@@ -729,6 +729,134 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Scale(void * jarg1, void * jarg2) 
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GetElement__SWIG_0(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  ndFloat32 *result = 0 ;
+  
+  arg1 = (ndVector *)jarg1; 
+  argp2 = (ndInt32 *)jarg2; 
+  if (!argp2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = (ndFloat32 *) &(arg1)->operator [](arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Add(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator +((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Sub(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator -((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Mul(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator *((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_AddEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector *result = 0 ;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = (ndVector *) &(arg1)->operator +=((ndVector const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_SubEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector *result = 0 ;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = (ndVector *) &(arg1)->operator -=((ndVector const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_MulEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector *result = 0 ;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = (ndVector *) &(arg1)->operator *=((ndVector const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_DotProduct(void * jarg1, void * jarg2) {
   void * jresult ;
   ndVector *arg1 = (ndVector *) 0 ;
@@ -1000,6 +1128,150 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Normalize(void * jarg1) {
   
   arg1 = (ndVector *)jarg1; 
   result = ((ndVector const *)arg1)->Normalize();
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Greather(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator >((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Identical(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator ==((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Less(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator <((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_GreatherEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator >=((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_LessEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator <=((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_And(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator &((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Or(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator |((ndVector const &)*arg2);
+  jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndVector_Xor(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  arg1 = (ndVector *)jarg1; 
+  arg2 = (ndVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndVector const *)arg1)->operator ^((ndVector const &)*arg2);
   jresult = new ndVector((const ndVector &)result); 
   return jresult;
 }
@@ -2165,6 +2437,134 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetScalar(void * jarg1) {
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetElement__SWIG_0(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  ndFloat64 *result = 0 ;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  argp2 = (ndInt32 *)jarg2; 
+  if (!argp2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = (ndFloat64 *) &(arg1)->operator [](arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Add(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator +((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Sub(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator -((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Mul(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator *((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_AddEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector *result = 0 ;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = (ndBigVector *) &(arg1)->operator +=((ndBigVector const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_SubEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector *result = 0 ;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = (ndBigVector *) &(arg1)->operator -=((ndBigVector const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_MulEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector *result = 0 ;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = (ndBigVector *) &(arg1)->operator *=((ndBigVector const &)*arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_MulAdd(void * jarg1, void * jarg2, void * jarg3) {
   void * jresult ;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
@@ -2420,6 +2820,150 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GetInt(void * jarg1) {
   
   arg1 = (ndBigVector *)jarg1; 
   result = ((ndBigVector const *)arg1)->GetInt();
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Greather(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator >((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Identical(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator ==((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Less(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator <((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_GreatherEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator >=((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_LessEqual(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator <=((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_And(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator &((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Or(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator |((ndBigVector const &)*arg2);
+  jresult = new ndBigVector((const ndBigVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBigVector_Xor(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndBigVector *arg2 = 0 ;
+  ndBigVector result;
+  
+  arg1 = (ndBigVector *)jarg1; 
+  arg2 = (ndBigVector *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndBigVector const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndBigVector const *)arg1)->operator ^((ndBigVector const &)*arg2);
   jresult = new ndBigVector((const ndBigVector &)result); 
   return jresult;
 }
@@ -3483,6 +4027,26 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_new_ndMatrix__SWIG_5(void * jarg1, void * j
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_GetElement__SWIG_0(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndMatrix *arg1 = (ndMatrix *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  ndVector *result = 0 ;
+  
+  arg1 = (ndMatrix *)jarg1; 
+  argp2 = (ndInt32 *)jarg2; 
+  if (!argp2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null ndInt32", 0);
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = (ndVector *) &(arg1)->operator [](arg2);
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_Inverse(void * jarg1) {
   void * jresult ;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
@@ -3909,6 +4473,24 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_Multiply3X3(void * jarg1, void * j
 }
 
 
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_GetElement__SWIG_2(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndMatrix *arg1 = (ndMatrix *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  ndMatrix result;
+  
+  arg1 = (ndMatrix *)jarg1; 
+  arg2 = (ndMatrix *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndMatrix const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndMatrix const *)arg1)->operator *((ndMatrix const &)*arg2);
+  jresult = new ndMatrix((const ndMatrix &)result); 
+  return jresult;
+}
+
+
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndMatrix_EigenVectors(void * jarg1) {
   void * jresult ;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
@@ -4280,6 +4862,60 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Inverse(void * jarg1) {
   
   arg1 = (ndQuaternion *)jarg1; 
   result = ((ndQuaternion const *)arg1)->Inverse();
+  jresult = new ndQuaternion((const ndQuaternion &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Add(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndQuaternion *arg1 = (ndQuaternion *) 0 ;
+  ndQuaternion *arg2 = 0 ;
+  ndQuaternion result;
+  
+  arg1 = (ndQuaternion *)jarg1; 
+  arg2 = (ndQuaternion *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndQuaternion const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndQuaternion const *)arg1)->operator +((ndQuaternion const &)*arg2);
+  jresult = new ndQuaternion((const ndQuaternion &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Sub(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndQuaternion *arg1 = (ndQuaternion *) 0 ;
+  ndQuaternion *arg2 = 0 ;
+  ndQuaternion result;
+  
+  arg1 = (ndQuaternion *)jarg1; 
+  arg2 = (ndQuaternion *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndQuaternion const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndQuaternion const *)arg1)->operator -((ndQuaternion const &)*arg2);
+  jresult = new ndQuaternion((const ndQuaternion &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndQuaternion_Mul(void * jarg1, void * jarg2) {
+  void * jresult ;
+  ndQuaternion *arg1 = (ndQuaternion *) 0 ;
+  ndQuaternion *arg2 = 0 ;
+  ndQuaternion result;
+  
+  arg1 = (ndQuaternion *)jarg1; 
+  arg2 = (ndQuaternion *)jarg2;
+  if (!arg2) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "ndQuaternion const & type is null", 0);
+    return 0;
+  } 
+  result = ((ndQuaternion const *)arg1)->operator *((ndQuaternion const &)*arg2);
   jresult = new ndQuaternion((const ndQuaternion &)result); 
   return jresult;
 }
@@ -9879,18 +10515,6 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetAsBodyKinematic(void * jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetAsBodyPlayerCapsule(void * jarg1) {
-  void * jresult ;
-  ndBody *arg1 = (ndBody *) 0 ;
-  ndBodyKinematic *result = 0 ;
-  
-  arg1 = (ndBody *)jarg1; 
-  result = (ndBodyKinematic *)(arg1)->GetAsBodyPlayerCapsule();
-  jresult = (void *)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetAsBodyParticleSet(void * jarg1) {
   void * jresult ;
   ndBody *arg1 = (ndBody *) 0 ;
@@ -9898,6 +10522,18 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetAsBodyParticleSet(void * jarg1) {
   
   arg1 = (ndBody *)jarg1; 
   result = (ndBodyParticleSet *)(arg1)->GetAsBodyParticleSet();
+  jresult = (void *)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void * SWIGSTDCALL CSharp_ndBody_GetAsBodyPlayerCapsule(void * jarg1) {
+  void * jresult ;
+  ndBody *arg1 = (ndBody *) 0 ;
+  ndBodyPlayerCapsule *result = 0 ;
+  
+  arg1 = (ndBody *)jarg1; 
+  result = (ndBodyPlayerCapsule *)(arg1)->GetAsBodyPlayerCapsule();
   jresult = (void *)result; 
   return jresult;
 }

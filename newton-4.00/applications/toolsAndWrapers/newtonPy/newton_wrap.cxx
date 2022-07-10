@@ -4286,7 +4286,125 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___add__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  ndFloat32 *result = 0 ;
+  
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_GetElement" "', argument " "1"" of type '" "ndVector *""'"); 
+  }
+  arg1 = reinterpret_cast< ndVector * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_GetElement" "', argument " "2"" of type '" "ndInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_GetElement" "', argument " "2"" of type '" "ndInt32""'");
+    } else {
+      ndInt32 * temp = reinterpret_cast< ndInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (ndFloat32 *) &(arg1)->operator [](arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndFloat32, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndVector_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  ndVector *arg1 = (ndVector *) 0 ;
+  ndInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  ndFloat32 *result = 0 ;
+  
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_GetElement" "', argument " "1"" of type '" "ndVector const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndVector * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_GetElement" "', argument " "2"" of type '" "ndInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_GetElement" "', argument " "2"" of type '" "ndInt32""'");
+    } else {
+      ndInt32 * temp = reinterpret_cast< ndInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (ndFloat32 *) &((ndVector const *)arg1)->operator [](arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndFloat32, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndVector_GetElement(PyObject *self, PyObject *args) {
+  Py_ssize_t argc;
+  PyObject *argv[3] = {
+    0
+  };
+  
+  if (!(argc = SWIG_Python_UnpackTuple(args, "ndVector_GetElement", 0, 2, argv))) SWIG_fail;
+  --argc;
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndVector, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndInt32, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndVector_GetElement__SWIG_0(self, argc, argv);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndVector, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndInt32, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndVector_GetElement__SWIG_1(self, argc, argv);
+      }
+    }
+  }
+  
+fail:
+  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'ndVector_GetElement'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    ndVector::operator [](ndInt32)\n"
+    "    ndVector::operator [](ndInt32) const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndVector_Add(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -4297,18 +4415,18 @@ SWIGINTERN PyObject *_wrap_ndVector___add__(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___add__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Add", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___add__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Add" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___add__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Add" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___add__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Add" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator +((ndVector const &)*arg2);
@@ -4321,7 +4439,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___sub__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Sub(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -4332,18 +4450,18 @@ SWIGINTERN PyObject *_wrap_ndVector___sub__(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___sub__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Sub", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___sub__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Sub" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___sub__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Sub" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___sub__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Sub" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator -((ndVector const &)*arg2);
@@ -4356,7 +4474,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___mul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Mul(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -4367,18 +4485,18 @@ SWIGINTERN PyObject *_wrap_ndVector___mul__(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___mul__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Mul", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___mul__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Mul" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___mul__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Mul" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___mul__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Mul" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator *((ndVector const &)*arg2);
@@ -4391,7 +4509,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___iadd__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_AddEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -4402,18 +4520,18 @@ SWIGINTERN PyObject *_wrap_ndVector___iadd__(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject *swig_obj[2] ;
   ndVector *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___iadd__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_AddEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___iadd__" "', argument " "1"" of type '" "ndVector *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_AddEqual" "', argument " "1"" of type '" "ndVector *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___iadd__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_AddEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___iadd__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_AddEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = (ndVector *) &(arg1)->operator +=((ndVector const &)*arg2);
@@ -4424,7 +4542,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___isub__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_SubEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -4435,18 +4553,18 @@ SWIGINTERN PyObject *_wrap_ndVector___isub__(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject *swig_obj[2] ;
   ndVector *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___isub__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_SubEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___isub__" "', argument " "1"" of type '" "ndVector *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_SubEqual" "', argument " "1"" of type '" "ndVector *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___isub__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_SubEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___isub__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_SubEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = (ndVector *) &(arg1)->operator -=((ndVector const &)*arg2);
@@ -4457,7 +4575,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___imul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_MulEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -4468,18 +4586,18 @@ SWIGINTERN PyObject *_wrap_ndVector___imul__(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject *swig_obj[2] ;
   ndVector *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___imul__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_MulEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___imul__" "', argument " "1"" of type '" "ndVector *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_MulEqual" "', argument " "1"" of type '" "ndVector *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___imul__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_MulEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___imul__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_MulEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = (ndVector *) &(arg1)->operator *=((ndVector const &)*arg2);
@@ -5090,7 +5208,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___gt__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Greather(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5101,18 +5219,18 @@ SWIGINTERN PyObject *_wrap_ndVector___gt__(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___gt__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Greather", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___gt__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Greather" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___gt__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Greather" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___gt__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Greather" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator >((ndVector const &)*arg2);
@@ -5125,7 +5243,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___eq__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Identical(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5136,18 +5254,18 @@ SWIGINTERN PyObject *_wrap_ndVector___eq__(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___eq__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Identical", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___eq__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Identical" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___eq__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Identical" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___eq__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Identical" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator ==((ndVector const &)*arg2);
@@ -5160,7 +5278,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___lt__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Less(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5171,18 +5289,18 @@ SWIGINTERN PyObject *_wrap_ndVector___lt__(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___lt__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Less", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___lt__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Less" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___lt__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Less" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___lt__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Less" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator <((ndVector const &)*arg2);
@@ -5195,7 +5313,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___ge__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_GreatherEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5206,18 +5324,18 @@ SWIGINTERN PyObject *_wrap_ndVector___ge__(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___ge__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_GreatherEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___ge__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_GreatherEqual" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___ge__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_GreatherEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___ge__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_GreatherEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator >=((ndVector const &)*arg2);
@@ -5230,7 +5348,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___le__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_LessEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5241,18 +5359,18 @@ SWIGINTERN PyObject *_wrap_ndVector___le__(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___le__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_LessEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___le__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_LessEqual" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___le__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_LessEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___le__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_LessEqual" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator <=((ndVector const &)*arg2);
@@ -5265,7 +5383,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___and__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_And(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5276,18 +5394,18 @@ SWIGINTERN PyObject *_wrap_ndVector___and__(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___and__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_And", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___and__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_And" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___and__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_And" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___and__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_And" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator &((ndVector const &)*arg2);
@@ -5300,7 +5418,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___or__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Or(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5311,18 +5429,18 @@ SWIGINTERN PyObject *_wrap_ndVector___or__(PyObject *SWIGUNUSEDPARM(self), PyObj
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___or__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Or", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___or__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Or" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___or__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Or" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___or__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Or" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator |((ndVector const &)*arg2);
@@ -5335,7 +5453,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndVector___xor__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndVector_Xor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndVector *arg1 = (ndVector *) 0 ;
   ndVector *arg2 = 0 ;
@@ -5346,18 +5464,18 @@ SWIGINTERN PyObject *_wrap_ndVector___xor__(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *swig_obj[2] ;
   ndVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndVector___xor__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndVector_Xor", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector___xor__" "', argument " "1"" of type '" "ndVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndVector_Xor" "', argument " "1"" of type '" "ndVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector___xor__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndVector_Xor" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector___xor__" "', argument " "2"" of type '" "ndVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndVector_Xor" "', argument " "2"" of type '" "ndVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndVector * >(argp2);
   result = ((ndVector const *)arg1)->operator ^((ndVector const &)*arg2);
@@ -7273,7 +7391,125 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___add__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  ndFloat64 *result = 0 ;
+  
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_GetElement" "', argument " "1"" of type '" "ndBigVector *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBigVector * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_GetElement" "', argument " "2"" of type '" "ndInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_GetElement" "', argument " "2"" of type '" "ndInt32""'");
+    } else {
+      ndInt32 * temp = reinterpret_cast< ndInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (ndFloat64 *) &(arg1)->operator [](arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndFloat64, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBigVector_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  ndBigVector *arg1 = (ndBigVector *) 0 ;
+  ndInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  ndFloat64 *result = 0 ;
+  
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_GetElement" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBigVector * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_GetElement" "', argument " "2"" of type '" "ndInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_GetElement" "', argument " "2"" of type '" "ndInt32""'");
+    } else {
+      ndInt32 * temp = reinterpret_cast< ndInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (ndFloat64 *) &((ndBigVector const *)arg1)->operator [](arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndFloat64, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBigVector_GetElement(PyObject *self, PyObject *args) {
+  Py_ssize_t argc;
+  PyObject *argv[3] = {
+    0
+  };
+  
+  if (!(argc = SWIG_Python_UnpackTuple(args, "ndBigVector_GetElement", 0, 2, argv))) SWIG_fail;
+  --argc;
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndBigVector, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndInt32, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndBigVector_GetElement__SWIG_0(self, argc, argv);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndBigVector, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndInt32, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndBigVector_GetElement__SWIG_1(self, argc, argv);
+      }
+    }
+  }
+  
+fail:
+  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'ndBigVector_GetElement'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    ndBigVector::operator [](ndInt32)\n"
+    "    ndBigVector::operator [](ndInt32) const\n");
+  return 0;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBigVector_Add(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -7284,18 +7520,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___add__(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___add__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Add", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___add__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Add" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___add__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Add" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___add__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Add" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator +((ndBigVector const &)*arg2);
@@ -7308,7 +7544,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___sub__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Sub(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -7319,18 +7555,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___sub__(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___sub__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Sub", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___sub__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Sub" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___sub__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Sub" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___sub__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Sub" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator -((ndBigVector const &)*arg2);
@@ -7343,7 +7579,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___mul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Mul(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -7354,18 +7590,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___mul__(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___mul__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Mul", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___mul__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Mul" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___mul__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Mul" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___mul__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Mul" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator *((ndBigVector const &)*arg2);
@@ -7378,7 +7614,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___iadd__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_AddEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -7389,18 +7625,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___iadd__(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *swig_obj[2] ;
   ndBigVector *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___iadd__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_AddEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___iadd__" "', argument " "1"" of type '" "ndBigVector *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_AddEqual" "', argument " "1"" of type '" "ndBigVector *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___iadd__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_AddEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___iadd__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_AddEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = (ndBigVector *) &(arg1)->operator +=((ndBigVector const &)*arg2);
@@ -7411,7 +7647,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___isub__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_SubEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -7422,18 +7658,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___isub__(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *swig_obj[2] ;
   ndBigVector *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___isub__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_SubEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___isub__" "', argument " "1"" of type '" "ndBigVector *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_SubEqual" "', argument " "1"" of type '" "ndBigVector *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___isub__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_SubEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___isub__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_SubEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = (ndBigVector *) &(arg1)->operator -=((ndBigVector const &)*arg2);
@@ -7444,7 +7680,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___imul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_MulEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -7455,18 +7691,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___imul__(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *swig_obj[2] ;
   ndBigVector *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___imul__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_MulEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___imul__" "', argument " "1"" of type '" "ndBigVector *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_MulEqual" "', argument " "1"" of type '" "ndBigVector *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___imul__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_MulEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___imul__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_MulEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = (ndBigVector *) &(arg1)->operator *=((ndBigVector const &)*arg2);
@@ -8005,7 +8241,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___gt__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Greather(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8016,18 +8252,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___gt__(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___gt__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Greather", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___gt__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Greather" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___gt__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Greather" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___gt__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Greather" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator >((ndBigVector const &)*arg2);
@@ -8040,7 +8276,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___eq__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Identical(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8051,18 +8287,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___eq__(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___eq__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Identical", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___eq__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Identical" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___eq__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Identical" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___eq__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Identical" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator ==((ndBigVector const &)*arg2);
@@ -8075,7 +8311,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___lt__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Less(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8086,18 +8322,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___lt__(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___lt__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Less", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___lt__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Less" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___lt__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Less" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___lt__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Less" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator <((ndBigVector const &)*arg2);
@@ -8110,7 +8346,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___ge__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_GreatherEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8121,18 +8357,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___ge__(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___ge__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_GreatherEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___ge__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_GreatherEqual" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___ge__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_GreatherEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___ge__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_GreatherEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator >=((ndBigVector const &)*arg2);
@@ -8145,7 +8381,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___le__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_LessEqual(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8156,18 +8392,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___le__(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___le__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_LessEqual", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___le__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_LessEqual" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___le__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_LessEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___le__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_LessEqual" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator <=((ndBigVector const &)*arg2);
@@ -8180,7 +8416,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___and__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_And(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8191,18 +8427,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___and__(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___and__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_And", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___and__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_And" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___and__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_And" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___and__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_And" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator &((ndBigVector const &)*arg2);
@@ -8215,7 +8451,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___or__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Or(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8226,18 +8462,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___or__(PyObject *SWIGUNUSEDPARM(self), Py
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___or__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Or", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___or__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Or" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___or__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Or" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___or__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Or" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator |((ndBigVector const &)*arg2);
@@ -8250,7 +8486,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBigVector___xor__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndBigVector_Xor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBigVector *arg1 = (ndBigVector *) 0 ;
   ndBigVector *arg2 = 0 ;
@@ -8261,18 +8497,18 @@ SWIGINTERN PyObject *_wrap_ndBigVector___xor__(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *swig_obj[2] ;
   ndBigVector result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndBigVector___xor__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndBigVector_Xor", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBigVector, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector___xor__" "', argument " "1"" of type '" "ndBigVector const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBigVector_Xor" "', argument " "1"" of type '" "ndBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< ndBigVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBigVector,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector___xor__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBigVector_Xor" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector___xor__" "', argument " "2"" of type '" "ndBigVector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBigVector_Xor" "', argument " "2"" of type '" "ndBigVector const &""'"); 
   }
   arg2 = reinterpret_cast< ndBigVector * >(argp2);
   result = ((ndBigVector const *)arg1)->operator ^((ndBigVector const &)*arg2);
@@ -9706,6 +9942,80 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_ndMatrix_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  ndMatrix *arg1 = (ndMatrix *) 0 ;
+  ndInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  ndVector *result = 0 ;
+  
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndMatrix, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMatrix_GetElement" "', argument " "1"" of type '" "ndMatrix *""'"); 
+  }
+  arg1 = reinterpret_cast< ndMatrix * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndMatrix_GetElement" "', argument " "2"" of type '" "ndInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndMatrix_GetElement" "', argument " "2"" of type '" "ndInt32""'");
+    } else {
+      ndInt32 * temp = reinterpret_cast< ndInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (ndVector *) &(arg1)->operator [](arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndVector, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndMatrix_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  ndMatrix *arg1 = (ndMatrix *) 0 ;
+  ndInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  ndVector *result = 0 ;
+  
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndMatrix, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMatrix_GetElement" "', argument " "1"" of type '" "ndMatrix const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndMatrix * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndMatrix_GetElement" "', argument " "2"" of type '" "ndInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndMatrix_GetElement" "', argument " "2"" of type '" "ndInt32""'");
+    } else {
+      ndInt32 * temp = reinterpret_cast< ndInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (ndVector *) &((ndMatrix const *)arg1)->operator [](arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndVector, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_ndMatrix_Inverse(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
@@ -10711,7 +11021,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndMatrix___mul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndMatrix_GetElement__SWIG_2(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
   ndMatrix *arg2 = 0 ;
@@ -10719,21 +11029,20 @@ SWIGINTERN PyObject *_wrap_ndMatrix___mul__(PyObject *SWIGUNUSEDPARM(self), PyOb
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  PyObject *swig_obj[2] ;
   ndMatrix result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndMatrix___mul__", 2, 2, swig_obj)) SWIG_fail;
+  if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndMatrix, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMatrix___mul__" "', argument " "1"" of type '" "ndMatrix const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMatrix_GetElement" "', argument " "1"" of type '" "ndMatrix const *""'"); 
   }
   arg1 = reinterpret_cast< ndMatrix * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndMatrix,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndMatrix___mul__" "', argument " "2"" of type '" "ndMatrix const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndMatrix_GetElement" "', argument " "2"" of type '" "ndMatrix const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndMatrix___mul__" "', argument " "2"" of type '" "ndMatrix const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndMatrix_GetElement" "', argument " "2"" of type '" "ndMatrix const &""'"); 
   }
   arg2 = reinterpret_cast< ndMatrix * >(argp2);
   result = ((ndMatrix const *)arg1)->operator *((ndMatrix const &)*arg2);
@@ -10741,6 +11050,60 @@ SWIGINTERN PyObject *_wrap_ndMatrix___mul__(PyObject *SWIGUNUSEDPARM(self), PyOb
   return resultobj;
 fail:
   PyErr_Clear();
+  Py_INCREF(Py_NotImplemented);
+  return Py_NotImplemented;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndMatrix_GetElement(PyObject *self, PyObject *args) {
+  Py_ssize_t argc;
+  PyObject *argv[3] = {
+    0
+  };
+  
+  if (!(argc = SWIG_Python_UnpackTuple(args, "ndMatrix_GetElement", 0, 2, argv))) SWIG_fail;
+  --argc;
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndMatrix, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndInt32, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndMatrix_GetElement__SWIG_0(self, argc, argv);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndMatrix, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndInt32, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndMatrix_GetElement__SWIG_1(self, argc, argv);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_ndMatrix, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_ndMatrix, SWIG_POINTER_NO_NULL | 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_ndMatrix_GetElement__SWIG_2(self, argc, argv);
+      }
+    }
+  }
+  
+fail:
   Py_INCREF(Py_NotImplemented);
   return Py_NotImplemented;
 }
@@ -11651,7 +12014,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndQuaternion___add__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndQuaternion_Add(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
@@ -11662,18 +12025,18 @@ SWIGINTERN PyObject *_wrap_ndQuaternion___add__(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *swig_obj[2] ;
   ndQuaternion result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndQuaternion___add__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndQuaternion_Add", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndQuaternion, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndQuaternion___add__" "', argument " "1"" of type '" "ndQuaternion const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndQuaternion_Add" "', argument " "1"" of type '" "ndQuaternion const *""'"); 
   }
   arg1 = reinterpret_cast< ndQuaternion * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndQuaternion,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndQuaternion___add__" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndQuaternion_Add" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndQuaternion___add__" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndQuaternion_Add" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
   }
   arg2 = reinterpret_cast< ndQuaternion * >(argp2);
   result = ((ndQuaternion const *)arg1)->operator +((ndQuaternion const &)*arg2);
@@ -11686,7 +12049,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndQuaternion___sub__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndQuaternion_Sub(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
@@ -11697,18 +12060,18 @@ SWIGINTERN PyObject *_wrap_ndQuaternion___sub__(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *swig_obj[2] ;
   ndQuaternion result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndQuaternion___sub__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndQuaternion_Sub", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndQuaternion, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndQuaternion___sub__" "', argument " "1"" of type '" "ndQuaternion const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndQuaternion_Sub" "', argument " "1"" of type '" "ndQuaternion const *""'"); 
   }
   arg1 = reinterpret_cast< ndQuaternion * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndQuaternion,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndQuaternion___sub__" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndQuaternion_Sub" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndQuaternion___sub__" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndQuaternion_Sub" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
   }
   arg2 = reinterpret_cast< ndQuaternion * >(argp2);
   result = ((ndQuaternion const *)arg1)->operator -((ndQuaternion const &)*arg2);
@@ -11721,7 +12084,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndQuaternion___mul__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_ndQuaternion_Mul(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
@@ -11732,18 +12095,18 @@ SWIGINTERN PyObject *_wrap_ndQuaternion___mul__(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *swig_obj[2] ;
   ndQuaternion result;
   
-  if (!SWIG_Python_UnpackTuple(args, "ndQuaternion___mul__", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "ndQuaternion_Mul", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndQuaternion, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndQuaternion___mul__" "', argument " "1"" of type '" "ndQuaternion const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndQuaternion_Mul" "', argument " "1"" of type '" "ndQuaternion const *""'"); 
   }
   arg1 = reinterpret_cast< ndQuaternion * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndQuaternion,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndQuaternion___mul__" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndQuaternion_Mul" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndQuaternion___mul__" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndQuaternion_Mul" "', argument " "2"" of type '" "ndQuaternion const &""'"); 
   }
   arg2 = reinterpret_cast< ndQuaternion * >(argp2);
   result = ((ndQuaternion const *)arg1)->operator *((ndQuaternion const &)*arg2);
@@ -22126,29 +22489,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyPlayerCapsule(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  ndBody *arg1 = (ndBody *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  ndBodyKinematic *result = 0 ;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyPlayerCapsule" "', argument " "1"" of type '" "ndBody *""'"); 
-  }
-  arg1 = reinterpret_cast< ndBody * >(argp1);
-  result = (ndBodyKinematic *)(arg1)->GetAsBodyPlayerCapsule();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyKinematic, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyParticleSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBody *arg1 = (ndBody *) 0 ;
@@ -22166,6 +22506,29 @@ SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyParticleSet(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< ndBody * >(argp1);
   result = (ndBodyParticleSet *)(arg1)->GetAsBodyParticleSet();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyParticleSet, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyPlayerCapsule(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyPlayerCapsule *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyPlayerCapsule" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyPlayerCapsule *)(arg1)->GetAsBodyPlayerCapsule();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyPlayerCapsule, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -27954,12 +28317,13 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndVector_BroadcastZ", _wrap_ndVector_BroadcastZ, METH_O, NULL},
 	 { "ndVector_BroadcastW", _wrap_ndVector_BroadcastW, METH_O, NULL},
 	 { "ndVector_Scale", _wrap_ndVector_Scale, METH_VARARGS, NULL},
-	 { "ndVector___add__", _wrap_ndVector___add__, METH_VARARGS, NULL},
-	 { "ndVector___sub__", _wrap_ndVector___sub__, METH_VARARGS, NULL},
-	 { "ndVector___mul__", _wrap_ndVector___mul__, METH_VARARGS, NULL},
-	 { "ndVector___iadd__", _wrap_ndVector___iadd__, METH_VARARGS, NULL},
-	 { "ndVector___isub__", _wrap_ndVector___isub__, METH_VARARGS, NULL},
-	 { "ndVector___imul__", _wrap_ndVector___imul__, METH_VARARGS, NULL},
+	 { "ndVector_GetElement", _wrap_ndVector_GetElement, METH_VARARGS, NULL},
+	 { "ndVector_Add", _wrap_ndVector_Add, METH_VARARGS, NULL},
+	 { "ndVector_Sub", _wrap_ndVector_Sub, METH_VARARGS, NULL},
+	 { "ndVector_Mul", _wrap_ndVector_Mul, METH_VARARGS, NULL},
+	 { "ndVector_AddEqual", _wrap_ndVector_AddEqual, METH_VARARGS, NULL},
+	 { "ndVector_SubEqual", _wrap_ndVector_SubEqual, METH_VARARGS, NULL},
+	 { "ndVector_MulEqual", _wrap_ndVector_MulEqual, METH_VARARGS, NULL},
 	 { "ndVector_DotProduct", _wrap_ndVector_DotProduct, METH_VARARGS, NULL},
 	 { "ndVector_CrossProduct", _wrap_ndVector_CrossProduct, METH_VARARGS, NULL},
 	 { "ndVector_Reciproc", _wrap_ndVector_Reciproc, METH_O, NULL},
@@ -27976,14 +28340,14 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndVector_InvSqrt", _wrap_ndVector_InvSqrt, METH_O, NULL},
 	 { "ndVector_InvMagSqrt", _wrap_ndVector_InvMagSqrt, METH_O, NULL},
 	 { "ndVector_Normalize", _wrap_ndVector_Normalize, METH_O, NULL},
-	 { "ndVector___gt__", _wrap_ndVector___gt__, METH_VARARGS, NULL},
-	 { "ndVector___eq__", _wrap_ndVector___eq__, METH_VARARGS, NULL},
-	 { "ndVector___lt__", _wrap_ndVector___lt__, METH_VARARGS, NULL},
-	 { "ndVector___ge__", _wrap_ndVector___ge__, METH_VARARGS, NULL},
-	 { "ndVector___le__", _wrap_ndVector___le__, METH_VARARGS, NULL},
-	 { "ndVector___and__", _wrap_ndVector___and__, METH_VARARGS, NULL},
-	 { "ndVector___or__", _wrap_ndVector___or__, METH_VARARGS, NULL},
-	 { "ndVector___xor__", _wrap_ndVector___xor__, METH_VARARGS, NULL},
+	 { "ndVector_Greather", _wrap_ndVector_Greather, METH_VARARGS, NULL},
+	 { "ndVector_Identical", _wrap_ndVector_Identical, METH_VARARGS, NULL},
+	 { "ndVector_Less", _wrap_ndVector_Less, METH_VARARGS, NULL},
+	 { "ndVector_GreatherEqual", _wrap_ndVector_GreatherEqual, METH_VARARGS, NULL},
+	 { "ndVector_LessEqual", _wrap_ndVector_LessEqual, METH_VARARGS, NULL},
+	 { "ndVector_And", _wrap_ndVector_And, METH_VARARGS, NULL},
+	 { "ndVector_Or", _wrap_ndVector_Or, METH_VARARGS, NULL},
+	 { "ndVector_Xor", _wrap_ndVector_Xor, METH_VARARGS, NULL},
 	 { "ndVector_AndNot", _wrap_ndVector_AndNot, METH_VARARGS, NULL},
 	 { "ndVector_Select", _wrap_ndVector_Select, METH_VARARGS, NULL},
 	 { "ndVector_GetSignMask", _wrap_ndVector_GetSignMask, METH_O, NULL},
@@ -28036,12 +28400,13 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndBigVector_SetZ", _wrap_ndBigVector_SetZ, METH_VARARGS, NULL},
 	 { "ndBigVector_SetW", _wrap_ndBigVector_SetW, METH_VARARGS, NULL},
 	 { "ndBigVector_GetScalar", _wrap_ndBigVector_GetScalar, METH_O, NULL},
-	 { "ndBigVector___add__", _wrap_ndBigVector___add__, METH_VARARGS, NULL},
-	 { "ndBigVector___sub__", _wrap_ndBigVector___sub__, METH_VARARGS, NULL},
-	 { "ndBigVector___mul__", _wrap_ndBigVector___mul__, METH_VARARGS, NULL},
-	 { "ndBigVector___iadd__", _wrap_ndBigVector___iadd__, METH_VARARGS, NULL},
-	 { "ndBigVector___isub__", _wrap_ndBigVector___isub__, METH_VARARGS, NULL},
-	 { "ndBigVector___imul__", _wrap_ndBigVector___imul__, METH_VARARGS, NULL},
+	 { "ndBigVector_GetElement", _wrap_ndBigVector_GetElement, METH_VARARGS, NULL},
+	 { "ndBigVector_Add", _wrap_ndBigVector_Add, METH_VARARGS, NULL},
+	 { "ndBigVector_Sub", _wrap_ndBigVector_Sub, METH_VARARGS, NULL},
+	 { "ndBigVector_Mul", _wrap_ndBigVector_Mul, METH_VARARGS, NULL},
+	 { "ndBigVector_AddEqual", _wrap_ndBigVector_AddEqual, METH_VARARGS, NULL},
+	 { "ndBigVector_SubEqual", _wrap_ndBigVector_SubEqual, METH_VARARGS, NULL},
+	 { "ndBigVector_MulEqual", _wrap_ndBigVector_MulEqual, METH_VARARGS, NULL},
 	 { "ndBigVector_MulAdd", _wrap_ndBigVector_MulAdd, METH_VARARGS, NULL},
 	 { "ndBigVector_MulSub", _wrap_ndBigVector_MulSub, METH_VARARGS, NULL},
 	 { "ndBigVector_AddHorizontal", _wrap_ndBigVector_AddHorizontal, METH_O, NULL},
@@ -28059,14 +28424,14 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndBigVector_GetMax", _wrap_ndBigVector_GetMax, METH_VARARGS, NULL},
 	 { "ndBigVector_GetMin", _wrap_ndBigVector_GetMin, METH_VARARGS, NULL},
 	 { "ndBigVector_GetInt", _wrap_ndBigVector_GetInt, METH_O, NULL},
-	 { "ndBigVector___gt__", _wrap_ndBigVector___gt__, METH_VARARGS, NULL},
-	 { "ndBigVector___eq__", _wrap_ndBigVector___eq__, METH_VARARGS, NULL},
-	 { "ndBigVector___lt__", _wrap_ndBigVector___lt__, METH_VARARGS, NULL},
-	 { "ndBigVector___ge__", _wrap_ndBigVector___ge__, METH_VARARGS, NULL},
-	 { "ndBigVector___le__", _wrap_ndBigVector___le__, METH_VARARGS, NULL},
-	 { "ndBigVector___and__", _wrap_ndBigVector___and__, METH_VARARGS, NULL},
-	 { "ndBigVector___or__", _wrap_ndBigVector___or__, METH_VARARGS, NULL},
-	 { "ndBigVector___xor__", _wrap_ndBigVector___xor__, METH_VARARGS, NULL},
+	 { "ndBigVector_Greather", _wrap_ndBigVector_Greather, METH_VARARGS, NULL},
+	 { "ndBigVector_Identical", _wrap_ndBigVector_Identical, METH_VARARGS, NULL},
+	 { "ndBigVector_Less", _wrap_ndBigVector_Less, METH_VARARGS, NULL},
+	 { "ndBigVector_GreatherEqual", _wrap_ndBigVector_GreatherEqual, METH_VARARGS, NULL},
+	 { "ndBigVector_LessEqual", _wrap_ndBigVector_LessEqual, METH_VARARGS, NULL},
+	 { "ndBigVector_And", _wrap_ndBigVector_And, METH_VARARGS, NULL},
+	 { "ndBigVector_Or", _wrap_ndBigVector_Or, METH_VARARGS, NULL},
+	 { "ndBigVector_Xor", _wrap_ndBigVector_Xor, METH_VARARGS, NULL},
 	 { "ndBigVector_AndNot", _wrap_ndBigVector_AndNot, METH_VARARGS, NULL},
 	 { "ndBigVector_Select", _wrap_ndBigVector_Select, METH_VARARGS, NULL},
 	 { "ndBigVector_ShiftRight", _wrap_ndBigVector_ShiftRight, METH_O, NULL},
@@ -28134,7 +28499,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndMatrix_TestSymetric3x3", _wrap_ndMatrix_TestSymetric3x3, METH_O, NULL},
 	 { "ndMatrix_TestOrthogonal", _wrap_ndMatrix_TestOrthogonal, METH_VARARGS, NULL},
 	 { "ndMatrix_Multiply3X3", _wrap_ndMatrix_Multiply3X3, METH_VARARGS, NULL},
-	 { "ndMatrix___mul__", _wrap_ndMatrix___mul__, METH_VARARGS, NULL},
+	 { "ndMatrix_GetElement", _wrap_ndMatrix_GetElement, METH_VARARGS, NULL},
 	 { "ndMatrix_EigenVectors", _wrap_ndMatrix_EigenVectors, METH_O, NULL},
 	 { "ndMatrix_PolarDecomposition", _wrap_ndMatrix_PolarDecomposition, METH_VARARGS, NULL},
 	 { "new_ndMatrix", _wrap_new_ndMatrix, METH_VARARGS, NULL},
@@ -28155,9 +28520,9 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndQuaternion_Normalize", _wrap_ndQuaternion_Normalize, METH_O, NULL},
 	 { "ndQuaternion_Scale", _wrap_ndQuaternion_Scale, METH_VARARGS, NULL},
 	 { "ndQuaternion_Inverse", _wrap_ndQuaternion_Inverse, METH_O, NULL},
-	 { "ndQuaternion___add__", _wrap_ndQuaternion___add__, METH_VARARGS, NULL},
-	 { "ndQuaternion___sub__", _wrap_ndQuaternion___sub__, METH_VARARGS, NULL},
-	 { "ndQuaternion___mul__", _wrap_ndQuaternion___mul__, METH_VARARGS, NULL},
+	 { "ndQuaternion_Add", _wrap_ndQuaternion_Add, METH_VARARGS, NULL},
+	 { "ndQuaternion_Sub", _wrap_ndQuaternion_Sub, METH_VARARGS, NULL},
+	 { "ndQuaternion_Mul", _wrap_ndQuaternion_Mul, METH_VARARGS, NULL},
 	 { "ndQuaternion_Slerp", _wrap_ndQuaternion_Slerp, METH_VARARGS, NULL},
 	 { "ndQuaternion_CalcAverageOmega", _wrap_ndQuaternion_CalcAverageOmega, METH_VARARGS, NULL},
 	 { "delete_ndQuaternion", _wrap_delete_ndQuaternion, METH_O, NULL},
@@ -28527,8 +28892,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "ndBody_GetAsBodySentinel", _wrap_ndBody_GetAsBodySentinel, METH_O, NULL},
 	 { "ndBody_GetAsBodySphFluid", _wrap_ndBody_GetAsBodySphFluid, METH_O, NULL},
 	 { "ndBody_GetAsBodyKinematic", _wrap_ndBody_GetAsBodyKinematic, METH_O, NULL},
-	 { "ndBody_GetAsBodyPlayerCapsule", _wrap_ndBody_GetAsBodyPlayerCapsule, METH_O, NULL},
 	 { "ndBody_GetAsBodyParticleSet", _wrap_ndBody_GetAsBodyParticleSet, METH_O, NULL},
+	 { "ndBody_GetAsBodyPlayerCapsule", _wrap_ndBody_GetAsBodyPlayerCapsule, METH_O, NULL},
 	 { "ndBody_GetAsBodyTriggerVolume", _wrap_ndBody_GetAsBodyTriggerVolume, METH_O, NULL},
 	 { "ndBody_GetId", _wrap_ndBody_GetId, METH_O, NULL},
 	 { "ndBody_GetAABB", _wrap_ndBody_GetAABB, METH_VARARGS, NULL},

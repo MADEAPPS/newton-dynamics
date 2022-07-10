@@ -74,6 +74,20 @@ class ndScene : public ndThreadPool
 	class ndFitnessList
 	{
 		public:
+		class ndNodeArray : public ndArray<ndSceneNode*>
+		{
+			public:	
+			ndNodeArray();
+			ndNodeArray(const ndNodeArray& src);
+			~ndNodeArray();
+
+			void CleanUp();
+
+			ndUnsigned32 m_isDirty;
+			ndUnsigned32 m_scansCount;
+			ndUnsigned32 m_scans[256];
+		};
+
 		ndFitnessList();
 		ndFitnessList(const ndFitnessList& src);
 		~ndFitnessList();
@@ -82,13 +96,10 @@ class ndScene : public ndThreadPool
 		void Update(ndThreadPool& threadPool);
 		void AddNode(ndSceneNode* const node);
 
-		ndArray<ndSceneNode*> m_workingArray;
+		ndNodeArray m_workingArray;
 #ifdef D_NEW_SCENE
-		ndArray<ndSceneNode*> m_buildArray;
+		ndNodeArray m_buildArray;
 #endif
-		ndUnsigned32 m_scans[256];
-		ndUnsigned32 m_scansCount;
-		bool m_isDirty;
 	};
 
 	public:
@@ -216,7 +227,7 @@ class ndScene : public ndThreadPool
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
-	// call from substeps update
+	// call from sub steps update
 	D_COLLISION_API virtual void ApplyExtForce();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void InitBodyArray();

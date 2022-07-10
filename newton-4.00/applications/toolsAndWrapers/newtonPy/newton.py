@@ -116,23 +116,26 @@ class ndVector(object):
     def Scale(self, s):
         return _newton.ndVector_Scale(self, s)
 
-    def __add__(self, A):
-        return _newton.ndVector___add__(self, A)
+    def GetElement(self, *args):
+        return _newton.ndVector_GetElement(self, *args)
 
-    def __sub__(self, A):
-        return _newton.ndVector___sub__(self, A)
+    def Add(self, A):
+        return _newton.ndVector_Add(self, A)
 
-    def __mul__(self, A):
-        return _newton.ndVector___mul__(self, A)
+    def Sub(self, A):
+        return _newton.ndVector_Sub(self, A)
 
-    def __iadd__(self, A):
-        return _newton.ndVector___iadd__(self, A)
+    def Mul(self, A):
+        return _newton.ndVector_Mul(self, A)
 
-    def __isub__(self, A):
-        return _newton.ndVector___isub__(self, A)
+    def AddEqual(self, A):
+        return _newton.ndVector_AddEqual(self, A)
 
-    def __imul__(self, A):
-        return _newton.ndVector___imul__(self, A)
+    def SubEqual(self, A):
+        return _newton.ndVector_SubEqual(self, A)
+
+    def MulEqual(self, A):
+        return _newton.ndVector_MulEqual(self, A)
 
     def DotProduct(self, A):
         return _newton.ndVector_DotProduct(self, A)
@@ -182,29 +185,29 @@ class ndVector(object):
     def Normalize(self):
         return _newton.ndVector_Normalize(self)
 
-    def __gt__(self, data):
-        return _newton.ndVector___gt__(self, data)
+    def Greather(self, data):
+        return _newton.ndVector_Greather(self, data)
 
-    def __eq__(self, data):
-        return _newton.ndVector___eq__(self, data)
+    def Identical(self, data):
+        return _newton.ndVector_Identical(self, data)
 
-    def __lt__(self, data):
-        return _newton.ndVector___lt__(self, data)
+    def Less(self, data):
+        return _newton.ndVector_Less(self, data)
 
-    def __ge__(self, data):
-        return _newton.ndVector___ge__(self, data)
+    def GreatherEqual(self, data):
+        return _newton.ndVector_GreatherEqual(self, data)
 
-    def __le__(self, data):
-        return _newton.ndVector___le__(self, data)
+    def LessEqual(self, data):
+        return _newton.ndVector_LessEqual(self, data)
 
-    def __and__(self, data):
-        return _newton.ndVector___and__(self, data)
+    def And(self, data):
+        return _newton.ndVector_And(self, data)
 
-    def __or__(self, data):
-        return _newton.ndVector___or__(self, data)
+    def Or(self, data):
+        return _newton.ndVector_Or(self, data)
 
-    def __xor__(self, data):
-        return _newton.ndVector___xor__(self, data)
+    def Xor(self, data):
+        return _newton.ndVector_Xor(self, data)
 
     def AndNot(self, data):
         return _newton.ndVector_AndNot(self, data)
@@ -291,23 +294,26 @@ class ndBigVector(object):
     def GetScalar(self):
         return _newton.ndBigVector_GetScalar(self)
 
-    def __add__(self, A):
-        return _newton.ndBigVector___add__(self, A)
+    def GetElement(self, *args):
+        return _newton.ndBigVector_GetElement(self, *args)
 
-    def __sub__(self, A):
-        return _newton.ndBigVector___sub__(self, A)
+    def Add(self, A):
+        return _newton.ndBigVector_Add(self, A)
 
-    def __mul__(self, A):
-        return _newton.ndBigVector___mul__(self, A)
+    def Sub(self, A):
+        return _newton.ndBigVector_Sub(self, A)
 
-    def __iadd__(self, A):
-        return _newton.ndBigVector___iadd__(self, A)
+    def Mul(self, A):
+        return _newton.ndBigVector_Mul(self, A)
 
-    def __isub__(self, A):
-        return _newton.ndBigVector___isub__(self, A)
+    def AddEqual(self, A):
+        return _newton.ndBigVector_AddEqual(self, A)
 
-    def __imul__(self, A):
-        return _newton.ndBigVector___imul__(self, A)
+    def SubEqual(self, A):
+        return _newton.ndBigVector_SubEqual(self, A)
+
+    def MulEqual(self, A):
+        return _newton.ndBigVector_MulEqual(self, A)
 
     def MulAdd(self, A, B):
         return _newton.ndBigVector_MulAdd(self, A, B)
@@ -360,29 +366,29 @@ class ndBigVector(object):
     def GetInt(self):
         return _newton.ndBigVector_GetInt(self)
 
-    def __gt__(self, data):
-        return _newton.ndBigVector___gt__(self, data)
+    def Greather(self, data):
+        return _newton.ndBigVector_Greather(self, data)
 
-    def __eq__(self, data):
-        return _newton.ndBigVector___eq__(self, data)
+    def Identical(self, data):
+        return _newton.ndBigVector_Identical(self, data)
 
-    def __lt__(self, data):
-        return _newton.ndBigVector___lt__(self, data)
+    def Less(self, data):
+        return _newton.ndBigVector_Less(self, data)
 
-    def __ge__(self, data):
-        return _newton.ndBigVector___ge__(self, data)
+    def GreatherEqual(self, data):
+        return _newton.ndBigVector_GreatherEqual(self, data)
 
-    def __le__(self, data):
-        return _newton.ndBigVector___le__(self, data)
+    def LessEqual(self, data):
+        return _newton.ndBigVector_LessEqual(self, data)
 
-    def __and__(self, data):
-        return _newton.ndBigVector___and__(self, data)
+    def And(self, data):
+        return _newton.ndBigVector_And(self, data)
 
-    def __or__(self, data):
-        return _newton.ndBigVector___or__(self, data)
+    def Or(self, data):
+        return _newton.ndBigVector_Or(self, data)
 
-    def __xor__(self, data):
-        return _newton.ndBigVector___xor__(self, data)
+    def Xor(self, data):
+        return _newton.ndBigVector_Xor(self, data)
 
     def AndNot(self, data):
         return _newton.ndBigVector_AndNot(self, data)
@@ -511,8 +517,8 @@ class ndMatrix(object):
     def Multiply3X3(self, B):
         return _newton.ndMatrix_Multiply3X3(self, B)
 
-    def __mul__(self, B):
-        return _newton.ndMatrix___mul__(self, B)
+    def GetElement(self, *args):
+        return _newton.ndMatrix_GetElement(self, *args)
 
     def EigenVectors(self):
         return _newton.ndMatrix_EigenVectors(self)
@@ -555,14 +561,14 @@ class ndQuaternion(ndVector):
     def Inverse(self):
         return _newton.ndQuaternion_Inverse(self)
 
-    def __add__(self, B):
-        return _newton.ndQuaternion___add__(self, B)
+    def Add(self, B):
+        return _newton.ndQuaternion_Add(self, B)
 
-    def __sub__(self, B):
-        return _newton.ndQuaternion___sub__(self, B)
+    def Sub(self, B):
+        return _newton.ndQuaternion_Sub(self, B)
 
-    def __mul__(self, B):
-        return _newton.ndQuaternion___mul__(self, B)
+    def Mul(self, B):
+        return _newton.ndQuaternion_Mul(self, B)
 
     def Slerp(self, q1, t):
         return _newton.ndQuaternion_Slerp(self, q1, t)
@@ -1348,11 +1354,11 @@ class ndBody(object):
     def GetAsBodyKinematic(self):
         return _newton.ndBody_GetAsBodyKinematic(self)
 
-    def GetAsBodyPlayerCapsule(self):
-        return _newton.ndBody_GetAsBodyPlayerCapsule(self)
-
     def GetAsBodyParticleSet(self):
         return _newton.ndBody_GetAsBodyParticleSet(self)
+
+    def GetAsBodyPlayerCapsule(self):
+        return _newton.ndBody_GetAsBodyPlayerCapsule(self)
 
     def GetAsBodyTriggerVolume(self):
         return _newton.ndBody_GetAsBodyTriggerVolume(self)

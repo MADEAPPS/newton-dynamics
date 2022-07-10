@@ -218,6 +218,9 @@ class ndBodyKinematic : public ndBody
 	ndInt32 m_index;
 	ndInt32 m_bodyNodeIndex;
 	ndInt32 m_sceneNodeIndex;
+	ndInt32 m_buildBodyNodeIndex;
+	ndInt32 m_buildSceneNodeIndex;
+
 	D_COLLISION_API static ndVector m_velocTol;
 
 	friend class ndWorld;
