@@ -139,7 +139,7 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 			glVertexPointer(3, GL_FLOAT, sizeof(glVector3), m_box);
 		}
 
-		virtual void OnDebugNode(const ndSceneNode* const node)
+		virtual void OnDebugNode(const ndBvhNode* const node)
 		{
 			ndVector p0;
 			ndVector p1;

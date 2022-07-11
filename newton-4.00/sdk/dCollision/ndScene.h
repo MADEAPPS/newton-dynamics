@@ -23,8 +23,8 @@
 #define __ND_SCENE_H__
 
 #include "ndCollisionStdafx.h"
+#include "ndBvhNode.h"
 #include "ndListView.h"
-#include "ndSceneNode.h"
 #include "ndContactArray.h"
 
 #define D_SCENE_MAX_STACK_DEPTH		256
@@ -50,7 +50,7 @@ class ndSceneTreeNotiFy : public ndClassAlloc
 	{
 	}
 
-	virtual void OnDebugNode(const ndSceneNode* const node) = 0;
+	virtual void OnDebugNode(const ndBvhNode* const node) = 0;
 
 } D_GCC_NEWTON_ALIGN_32;
 
@@ -69,37 +69,6 @@ class ndScene : public ndThreadPool
 
 		ndUnsigned32 m_body0;
 		ndUnsigned32 m_body1;
-	};
-
-	class ndFitnessList
-	{
-		public:
-		class ndNodeArray : public ndArray<ndSceneNode*>
-		{
-			public:	
-			ndNodeArray();
-			ndNodeArray(const ndNodeArray& src);
-			~ndNodeArray();
-
-			void CleanUp();
-
-			ndUnsigned32 m_isDirty;
-			ndUnsigned32 m_scansCount;
-			ndUnsigned32 m_scans[256];
-		};
-
-		ndFitnessList();
-		ndFitnessList(const ndFitnessList& src);
-		~ndFitnessList();
-
-		void CleanUp();
-		void Update(ndThreadPool& threadPool);
-		void AddNode(ndSceneNode* const node);
-
-		ndNodeArray m_workingArray;
-#ifdef D_NEW_SCENE
-		ndNodeArray m_buildArray;
-#endif
 	};
 
 	public:
@@ -149,24 +118,8 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene();
 	D_COLLISION_API ndScene(const ndScene& src);
 
-	class ndBottomUpCell
-	{
-		public:
-		ndUnsigned32 m_x;
-		ndUnsigned32 m_y;
-		ndUnsigned32 m_z;
-		ndSceneNode* m_node;
-	};
-
-	class ndCellScanPrefix
-	{
-		public:
-		ndUnsigned32 m_location : 30;
-		ndUnsigned32 m_cellTest : 1;
-	};
-
-	void RemoveNode(ndSceneNode* const newNode);
-	void AddNode(ndSceneTreeNode* const newNode, ndSceneBodyNode* const bodyNode);
+	void RemoveNode(ndBvhNode* const newNode);
+	void AddNode(ndBvhInternalNode* const newNode, ndBvhLeafNode* const bodyNode);
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 
 	const ndContactArray& GetContactArray() const;
@@ -174,58 +127,24 @@ class ndScene : public ndThreadPool
 	void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
 	void FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 threadId);
 	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId);
-	void SubmitPairs(ndSceneBodyNode* const bodyNode, ndSceneNode* const node, ndInt32 threadId);
+	void SubmitPairs(ndBvhLeafNode* const bodyNode, ndBvhNode* const node, ndInt32 threadId);
 
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-	class ndBuildBvhTreeBuildState
-	{
-		public:
-		enum ndState
-		{
-			m_beginBuild,
-			m_calculateBoxes,
-			m_buildLayer,
-			m_enumerateLayers,
-			m_endBuild,
-		};
 
-		ndBuildBvhTreeBuildState();
+	//ndBvhNode* BuildBvhTree();
+	//bool BuildBvhTreeInitNodes();
+	//void BuildBvhTreeSetNodesDepth();
+	//void BuildBvhGenerateLayerGrids();
+	//void BuildBvhTreeCalculateLeafBoxes();
+	//ndBvhNode* BuildIncrementalBvhTree();
+	//ndUnsigned32 BuildSmallBvhTree(ndBvhNode** const parentsArray, ndUnsigned32 bashCount);
 
-		void Init(ndUnsigned32 maxCount);
-
-		ndVector m_size;
-		ndVector m_origin;
-		ndArray<ndBottomUpCell> m_cellBuffer0;
-		ndArray<ndBottomUpCell> m_cellBuffer1;
-		ndArray<ndCellScanPrefix> m_cellCounts0;
-		ndArray<ndCellScanPrefix> m_cellCounts1;
-		ndArray<ndSceneNode*> m_tempNodeBuffer;
-
-		ndSceneNode* m_root;
-		ndSceneNode** m_srcArray;
-		ndSceneNode** m_tmpArray;
-		ndSceneNode** m_parentsArray;
-
-		ndUnsigned32 m_depthLevel;
-		ndUnsigned32 m_leafNodesCount;
-		ndState m_state;
-	};
-
-	ndSceneNode* BuildBvhTree();
-	bool BuildBvhTreeInitNodes();
-	void BuildBvhTreeSetNodesDepth();
-	void BuildBvhGenerateLayerGrids();
-	void BuildBvhTreeCalculateLeafBoxes();
-
-	ndSceneNode* BuildIncrementalBvhTree();
-	ndUnsigned32 BuildSmallBvhTree(ndSceneNode** const parentsArray, ndUnsigned32 bashCount);
-
-	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
+	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndBvhNode** stackPool, ndInt32 stack) const;
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
-	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
-	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
+	bool RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
+	bool ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	// call from sub steps update
 	D_COLLISION_API virtual void ApplyExtForce();
@@ -245,7 +164,7 @@ class ndScene : public ndThreadPool
 
 	ndBodyList m_bodyList;
 	ndContactArray m_contactArray;
-
+	ndBvhSceneManager m_bvhSceneManager;
 	ndArray<ndUnsigned8> m_scratchBuffer;
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
 	ndArray<ndConstraint*> m_activeConstraintArray;
@@ -253,13 +172,13 @@ class ndScene : public ndThreadPool
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
-	ndBuildBvhTreeBuildState m_bvhBuildState;
+	
 
 	ndSpinLock m_lock;
-	ndSceneNode* m_rootNode;
+	ndBvhNode* m_rootNode;
 	ndBodyKinematic* m_sentinelBody;
 	ndContactNotify* m_contactNotifyCallback;
-	ndFitnessList m_fitness;
+	
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;
 	ndUnsigned32 m_frameIndex;

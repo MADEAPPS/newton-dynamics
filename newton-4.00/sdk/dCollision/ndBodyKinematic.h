@@ -227,7 +227,8 @@ class ndBodyKinematic : public ndBody
 	friend class ndScene;
 	friend class ndContact;
 	friend class ndIkSolver;
-	friend class ndSceneBodyNode;
+	friend class ndBvhSceneManager;
+	friend class ndBvhLeafNode;
 	friend class ndDynamicsUpdate;
 	friend class ndWorldSceneCuda;
 	friend class ndSkeletonContainer;

@@ -32,12 +32,12 @@
 #include <ndBody.h>
 #include <ndScene.h>
 #include <ndShape.h>
+#include <ndBvhNode.h>
 #include <ndContact.h>
 #include <ndListView.h>
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
 #include <ndShapeCone.h>
-#include <ndSceneNode.h>
 #include <ndJointList.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>

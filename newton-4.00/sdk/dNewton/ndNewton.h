@@ -34,13 +34,13 @@
 #include <ndWorld.h>
 #include <ndScene.h>
 #include <ndModel.h>
+#include <ndBvhNode.h>
 #include <ndContact.h>
 #include <ndIkSolver.h>
 #include <ndShapeBox.h>
 #include <ndLoadSave.h>
 #include <ndShapeNull.h>
 #include <ndModelList.h>
-#include <ndSceneNode.h>
 #include <ndJointGear.h>
 #include <ndCharacter.h>
 #include <ndConstraint.h>
