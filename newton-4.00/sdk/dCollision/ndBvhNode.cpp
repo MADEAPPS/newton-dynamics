@@ -898,12 +898,12 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		{
 			const ndVector minPosit((m_invSize * (node->m_minBox - m_origin)).GetInt());
 			const ndVector maxPosit((m_invSize * (node->m_maxBox - m_origin)).GetInt());
-			const ndInt32 x0 = minPosit.m_ix;
-			const ndInt32 y0 = minPosit.m_iy;
-			const ndInt32 z0 = minPosit.m_iz;
-			const ndInt32 x1 = maxPosit.m_ix;
-			const ndInt32 y1 = maxPosit.m_iy;
-			const ndInt32 z1 = maxPosit.m_iz;
+			const ndInt32 x0 = ndInt32 (minPosit.m_ix);
+			const ndInt32 y0 = ndInt32 (minPosit.m_iy);
+			const ndInt32 z0 = ndInt32 (minPosit.m_iz);
+			const ndInt32 x1 = ndInt32 (maxPosit.m_ix);
+			const ndInt32 y1 = ndInt32 (maxPosit.m_iy);
+			const ndInt32 z1 = ndInt32 (maxPosit.m_iz);
 
 			dAssert(x0 >= 0);
 			dAssert(y0 >= 0);
@@ -1049,13 +1049,13 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 				const ndVector dist(node->m_minBox - origin);
 				const ndVector posit(invSize * dist);
 				const ndVector intPosit(posit.GetInt());
-				m_bvhBuildState.m_cellBuffer0[i].m_x = intPosit.m_ix;
-				m_bvhBuildState.m_cellBuffer0[i].m_y = intPosit.m_iy;
-				m_bvhBuildState.m_cellBuffer0[i].m_z = intPosit.m_iz;
+				m_bvhBuildState.m_cellBuffer0[i].m_x = ndUnsigned32(intPosit.m_ix);
+				m_bvhBuildState.m_cellBuffer0[i].m_y = ndUnsigned32(intPosit.m_iy);
+				m_bvhBuildState.m_cellBuffer0[i].m_z = ndUnsigned32(intPosit.m_iz);
 				m_bvhBuildState.m_cellBuffer0[i].m_node = node;
-				max_x = ndMax(intPosit.m_ix, max_x);
-				max_y = ndMax(intPosit.m_iy, max_y);
-				max_z = ndMax(intPosit.m_iz, max_z);
+				max_x = ndMax(ndInt32(intPosit.m_ix), max_x);
+				max_y = ndMax(ndInt32(intPosit.m_iy), max_y);
+				max_z = ndMax(ndInt32(intPosit.m_iz), max_z);
 			}
 			maxGrids[threadIndex][0] = max_x;
 			maxGrids[threadIndex][1] = max_y;
