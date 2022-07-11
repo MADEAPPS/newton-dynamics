@@ -151,8 +151,7 @@ ndBvhNodeArray::ndBvhNodeArray(const ndBvhNodeArray& src)
 	,m_isDirty(1)
 	,m_scansCount(0)
 {
-	dAssert(0);
-	ndArray<ndBvhNode*>::Swap((ndArray<ndBvhNode*>&)src);
+	Swap((ndBvhNodeArray&)src);
 }
 
 ndBvhNodeArray::~ndBvhNodeArray()
