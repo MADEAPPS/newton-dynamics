@@ -117,9 +117,6 @@ class ndScene : public ndThreadPool
 	protected:
 	D_COLLISION_API ndScene();
 	D_COLLISION_API ndScene(const ndScene& src);
-
-	void RemoveNode(ndBvhNode* const newNode);
-	//void AddNode(ndBvhInternalNode* const newNode, ndBvhLeafNode* const bodyNode);
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 
 	const ndContactArray& GetContactArray() const;
@@ -131,15 +128,6 @@ class ndScene : public ndThreadPool
 
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
-
-
-	//ndBvhNode* BuildBvhTree();
-	//bool BuildBvhTreeInitNodes();
-	//void BuildBvhTreeSetNodesDepth();
-	//void BuildBvhGenerateLayerGrids();
-	//void BuildBvhTreeCalculateLeafBoxes();
-	//ndBvhNode* BuildIncrementalBvhTree();
-	//ndUnsigned32 BuildSmallBvhTree(ndBvhNode** const parentsArray, ndUnsigned32 bashCount);
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndBvhNode** stackPool, ndInt32 stack) const;
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;

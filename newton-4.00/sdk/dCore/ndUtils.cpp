@@ -86,7 +86,7 @@ ndFloat32 ndGaussianRandom(ndFloat32 u, ndFloat32 phi)
 	
 	ndFloat32 r = ndClamp (ndRand(), ndFloat32 (1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 	ndFloat32 normal = NormalCumulativeDistibutionInverse(r);
-	return u + normal/phi;
+	return u + normal * phi;
 }
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)

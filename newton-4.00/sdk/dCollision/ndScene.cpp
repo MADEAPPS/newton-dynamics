@@ -235,17 +235,6 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 		m_contactNotifyCallback->OnBodyAdded(body);
 		body->UpdateCollisionMatrix();
 
-		//ndBvhInternalNode* const sceneNode = new ndBvhInternalNode();
-		//ndBvhLeafNode* const bodyNode = new ndBvhLeafNode(body);
-		//
-		//m_bvhSceneManager.AddNode(sceneNode);
-		//body->m_sceneNodeIndex = m_bvhSceneManager.GetNodeArray().GetCount() - 1;
-		//
-		//m_bvhSceneManager.AddNode(bodyNode);
-		//body->m_bodyNodeIndex = m_bvhSceneManager.GetNodeArray().GetCount() - 1;
-		//
-		//AddNode(sceneNode, bodyNode);
-
 		m_rootNode = m_bvhSceneManager.AddBody(body, m_rootNode);
 		if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
 		{
@@ -302,7 +291,7 @@ void ndScene::BalanceScene()
 	}
 	else
 	{
-		dAssert(0);
+		UpdateBodyList();
 		//m_bvhSceneManager.Update(*this);
 	}
 
@@ -1150,156 +1139,6 @@ void ndScene::Cleanup()
 	m_scratchBuffer.SetCount(0);
 	m_sceneBodyArray.SetCount(0);
 	m_activeConstraintArray.SetCount(0);
-}
-
-//void ndScene::AddNode(ndBvhInternalNode* const childNode, ndBvhLeafNode* const bodyNode)
-//{
-//	if (m_rootNode)
-//	{
-//		childNode->m_minBox = bodyNode->m_minBox;
-//		childNode->m_maxBox = bodyNode->m_maxBox;
-//		childNode->m_left = bodyNode;
-//		bodyNode->m_parent = childNode;
-//
-//		ndUnsigned32 depth = 0;
-//		ndBvhNode* parent = m_rootNode;
-//		while (1)
-//		{
-//			ndBvhInternalNode* const sceneNode = parent->GetAsSceneTreeNode();
-//			if (sceneNode && dBoxInclusionTest(childNode->m_minBox, childNode->m_maxBox, parent->m_minBox, parent->m_maxBox))
-//			{
-//				const ndVector minLeftBox (sceneNode->m_left->m_minBox.GetMin(childNode->m_minBox));
-//				const ndVector maxLeftBox (sceneNode->m_left->m_maxBox.GetMax(childNode->m_maxBox));
-//				const ndVector minRightBox(sceneNode->m_right->m_minBox.GetMin(childNode->m_minBox));
-//				const ndVector maxRightBox(sceneNode->m_right->m_maxBox.GetMax(childNode->m_maxBox));
-//				const ndVector leftSize(maxLeftBox - minLeftBox);
-//				const ndVector rightSize(maxRightBox - minRightBox);
-//				const ndFloat32 leftArea = leftSize.DotProduct(leftSize.ShiftTripleRight()).GetScalar();
-//				const ndFloat32 rightArea = rightSize.DotProduct(rightSize.ShiftTripleRight()).GetScalar();
-//
-//				parent = (leftArea < rightArea) ? sceneNode->m_left : sceneNode->m_right;
-//				depth++;
-//			}
-//			else
-//			{
-//				if (parent->m_parent)
-//				{
-//					if (parent->m_parent->GetLeft() == parent)
-//					{
-//						parent->m_parent->GetAsSceneTreeNode()->m_left = childNode;
-//					}
-//					else
-//					{
-//						parent->m_parent->GetAsSceneTreeNode()->m_right = childNode;
-//					}
-//					childNode->m_right = parent;
-//					childNode->m_parent = parent->m_parent;
-//					parent->m_parent = childNode;
-//
-//					const ndVector minBox(childNode->m_left->m_minBox.GetMin(childNode->m_right->m_minBox));
-//					const ndVector maxBox(childNode->m_left->m_maxBox.GetMax(childNode->m_right->m_maxBox));
-//					childNode->m_minBox = minBox;
-//					childNode->m_maxBox = maxBox;
-//				}
-//				else
-//				{
-//					const ndVector minBox(parent->m_minBox.GetMin(childNode->m_minBox));
-//					const ndVector maxBox(parent->m_maxBox.GetMax(childNode->m_maxBox));
-//					childNode->m_minBox = minBox;
-//					childNode->m_maxBox = maxBox;
-//					childNode->m_right = parent;
-//					childNode->m_parent = nullptr;
-//					parent->m_parent = childNode;
-//					m_rootNode = childNode;
-//				}
-//				break;
-//			}
-//		}
-//#ifdef _DEBUG
-//		//dAssert(depth < 128);
-//		if (depth >= 256)
-//		{
-//			dTrace(("This may be a pathological scene, consider balancing the scene\n"));
-//		}
-//#endif
-//	}
-//	else
-//	{
-//		m_rootNode = bodyNode;
-//	}
-//}
-
-void ndScene::RemoveNode(ndBvhNode* const node)
-{
-	if (node->m_parent)
-	{
-		ndBvhInternalNode* const parent = (ndBvhInternalNode*)node->m_parent;
-		if (parent->m_parent)
-		{
-			ndBvhInternalNode* const grandParent = (ndBvhInternalNode*)parent->m_parent;
-			if (grandParent->m_left == parent)
-			{
-				if (parent->m_right == node)
-				{
-					grandParent->m_left = parent->m_left;
-					parent->m_left->m_parent = grandParent;
-					parent->m_left = nullptr;
-					parent->m_parent = nullptr;
-				}
-				else
-				{
-					grandParent->m_left = parent->m_right;
-					parent->m_right->m_parent = grandParent;
-					parent->m_right = nullptr;
-					parent->m_parent = nullptr;
-				}
-			}
-			else
-			{
-				if (parent->m_right == node)
-				{
-					grandParent->m_right = parent->m_left;
-					parent->m_left->m_parent = grandParent;
-					parent->m_left = nullptr;
-					parent->m_parent = nullptr;
-				}
-				else
-				{
-					grandParent->m_right = parent->m_right;
-					parent->m_right->m_parent = grandParent;
-					parent->m_right = nullptr;
-					parent->m_parent = nullptr;
-				}
-			}
-		}
-		else
-		{
-			dAssert(!node->m_parent->GetAsSceneBodyNode());
-			ndBvhInternalNode* const parent1 = node->m_parent->GetAsSceneTreeNode();
-			if (parent1->m_right == node)
-			{
-				m_rootNode = parent1->m_left;
-				m_rootNode->m_parent = nullptr;
-				parent1->m_left = nullptr;
-			}
-			else
-			{
-				m_rootNode = parent1->m_right;
-				m_rootNode->m_parent = nullptr;
-				parent1->m_right = nullptr;
-			}
-		}
-
-		dAssert(parent->GetAsSceneTreeNode());
-		parent->Kill();
-		dAssert(0);
-		//m_bvhSceneManager.m_isDirty = 1;
-	}
-	else
-	{
-		delete node;
-		m_rootNode = nullptr;
-	}
 }
 
 bool ndScene::RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const
