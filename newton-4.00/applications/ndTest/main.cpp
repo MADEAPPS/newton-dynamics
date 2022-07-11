@@ -107,7 +107,7 @@ ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	ndVector p0(origin);
-	ndVector p1(origin - ndVector(0.0f, dAbs(dist), 0.0f, 0.0f));
+	ndVector p1(origin - ndVector(0.0f, ndAbs(dist), 0.0f, 0.0f));
 
 	ndRayCastClosestHitCallback rayCaster;
 	world.RayCast(rayCaster, p0, p1);

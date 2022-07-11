@@ -119,7 +119,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene(const ndScene& src);
 
 	void RemoveNode(ndBvhNode* const newNode);
-	void AddNode(ndBvhInternalNode* const newNode, ndBvhLeafNode* const bodyNode);
+	//void AddNode(ndBvhInternalNode* const newNode, ndBvhLeafNode* const bodyNode);
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
 
 	const ndContactArray& GetContactArray() const;

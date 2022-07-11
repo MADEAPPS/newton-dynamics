@@ -381,7 +381,8 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 		ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
 		if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
 		{
-			ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)scene->m_bvhSceneManager.m_workingArray[m_bodyNodeIndex];
+			//ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)scene->m_bvhSceneManager.m_workingArray[m_bodyNodeIndex];
+			ndBvhLeafNode* const bodyNode = scene->m_bvhSceneManager.GetLeafNode(this);
 			dAssert(bodyNode->GetAsSceneBodyNode());
 			dAssert(!bodyNode->GetLeft());
 			dAssert(!bodyNode->GetRight());

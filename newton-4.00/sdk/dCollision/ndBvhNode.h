@@ -166,6 +166,7 @@ class ndBvhNodeArray : public ndArray<ndBvhNode*>
 	ndUnsigned32 m_scansCount;
 	ndUnsigned32 m_scans[256];
 };
+
 class ndBvhSceneManager
 {
 	public:
@@ -174,8 +175,12 @@ class ndBvhSceneManager
 	~ndBvhSceneManager();
 
 	void CleanUp();
-	void AddNode(ndBvhNode* const node);
+	ndBvhNode* AddBody(ndBodyKinematic* const body, ndBvhNode* root);
+	void RemoveBody(ndBodyKinematic* const body);
 	ndBvhNode* BuildBvhTree(ndThreadPool& threadPool);
+
+	ndBvhNodeArray& GetNodeArray();
+	ndBvhLeafNode* GetLeafNode(ndBodyKinematic* const body) const;
 
 	private:
 	void Update(ndThreadPool& threadPool);
@@ -187,13 +192,11 @@ class ndBvhSceneManager
 	//ndBvhNode* BuildIncrementalBvhTree();
 	ndUnsigned32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndUnsigned32 bashCount);
 
-public:
 	ndBvhNodeArray m_workingArray;
 #ifdef D_NEW_SCENE
 	ndBvhNodeArray m_buildArray;
 #endif
 
-private:
 	ndBuildBvhTreeBuildState m_bvhBuildState;
 };
 
@@ -333,6 +336,11 @@ inline ndBvhNode* ndBvhInternalNode::GetLeft() const
 inline ndBvhNode* ndBvhInternalNode::GetRight() const
 {
 	return m_right;
+}
+
+inline ndBvhNodeArray& ndBvhSceneManager::GetNodeArray()
+{
+	return m_workingArray;
 }
 
 #endif

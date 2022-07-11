@@ -194,16 +194,133 @@ ndBvhSceneManager::~ndBvhSceneManager()
 	CleanUp();
 }
 
-void ndBvhSceneManager::AddNode(ndBvhNode* const node)
+ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* root)
 {
-	node->m_isDead = 0;
-	m_workingArray.PushBack(node);
 	m_workingArray.m_isDirty = 1;
+	ndBvhLeafNode* const bodyNode = new ndBvhLeafNode(body);
+	ndBvhInternalNode* sceneNode = new ndBvhInternalNode();
+
+	sceneNode->m_isDead = 0;
+	m_workingArray.PushBack(sceneNode);
+	body->m_sceneNodeIndex = m_workingArray.GetCount() - 1;
+	
+	#ifdef D_NEW_SCENE
+		dAssert(0);
+		//m_buildArray.PushBack(node->Clone());
+		//m_buildArray.m_isDirty = 1;
+	#endif
+	 
+	bodyNode->m_isDead = 0;
+	m_workingArray.PushBack(bodyNode);
+	body->m_bodyNodeIndex = m_workingArray.GetCount() - 1;
+
+	#ifdef D_NEW_SCENE
+		dAssert(0);
+		//m_buildArray.PushBack(node->Clone());
+		//m_buildArray.m_isDirty = 1;
+	#endif
+
+	if (m_workingArray.GetCount() > 2)
+	{
+		dAssert(root);
+		ndBvhInternalNode* childNode = sceneNode;
+		childNode->m_minBox = bodyNode->m_minBox;
+		childNode->m_maxBox = bodyNode->m_maxBox;
+		childNode->m_left = bodyNode;
+		bodyNode->m_parent = childNode;
+
+		ndUnsigned32 depth = 0;
+		ndBvhNode* rootNode = root;
+		ndBvhNode* parent = rootNode;
+		while (1)
+		{
+			sceneNode = parent->GetAsSceneTreeNode();
+			if (sceneNode && dBoxInclusionTest(childNode->m_minBox, childNode->m_maxBox, parent->m_minBox, parent->m_maxBox))
+			{
+				const ndVector minLeftBox (sceneNode->m_left->m_minBox.GetMin(childNode->m_minBox));
+				const ndVector maxLeftBox (sceneNode->m_left->m_maxBox.GetMax(childNode->m_maxBox));
+				const ndVector minRightBox(sceneNode->m_right->m_minBox.GetMin(childNode->m_minBox));
+				const ndVector maxRightBox(sceneNode->m_right->m_maxBox.GetMax(childNode->m_maxBox));
+				const ndVector leftSize(maxLeftBox - minLeftBox);
+				const ndVector rightSize(maxRightBox - minRightBox);
+				const ndFloat32 leftArea = leftSize.DotProduct(leftSize.ShiftTripleRight()).GetScalar();
+				const ndFloat32 rightArea = rightSize.DotProduct(rightSize.ShiftTripleRight()).GetScalar();
+
+				parent = (leftArea < rightArea) ? sceneNode->m_left : sceneNode->m_right;
+				depth++;
+			}
+			else
+			{
+				if (parent->m_parent)
+				{
+					if (parent->m_parent->GetLeft() == parent)
+					{
+						parent->m_parent->GetAsSceneTreeNode()->m_left = childNode;
+					}
+					else
+					{
+						parent->m_parent->GetAsSceneTreeNode()->m_right = childNode;
+					}
+					childNode->m_right = parent;
+					childNode->m_parent = parent->m_parent;
+					parent->m_parent = childNode;
+
+					const ndVector minBox(childNode->m_left->m_minBox.GetMin(childNode->m_right->m_minBox));
+					const ndVector maxBox(childNode->m_left->m_maxBox.GetMax(childNode->m_right->m_maxBox));
+					childNode->m_minBox = minBox;
+					childNode->m_maxBox = maxBox;
+				}
+				else
+				{
+					const ndVector minBox(parent->m_minBox.GetMin(childNode->m_minBox));
+					const ndVector maxBox(parent->m_maxBox.GetMax(childNode->m_maxBox));
+					childNode->m_minBox = minBox;
+					childNode->m_maxBox = maxBox;
+					childNode->m_right = parent;
+					childNode->m_parent = nullptr;
+					parent->m_parent = childNode;
+					rootNode = childNode;
+				}
+				break;
+			}
+		}
+		#ifdef _DEBUG
+		//dAssert(depth < 128);
+		if (depth >= 256)
+		{
+			dTrace(("This may be a pathological scene, consider balancing the scene\n"));
+		}
+		#endif
+		return rootNode;
+	}
+	else
+	{
+		return bodyNode;
+	}
+}
+
+void ndBvhSceneManager::RemoveBody(ndBodyKinematic* const body)
+{
+	m_workingArray.m_isDirty = 1;
+	ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)m_workingArray[body->m_bodyNodeIndex];
+	ndBvhInternalNode* const sceneNode = (ndBvhInternalNode*)m_workingArray[body->m_sceneNodeIndex];
+	dAssert(bodyNode->GetAsSceneBodyNode());
+	dAssert(sceneNode->GetAsSceneTreeNode());
+	bodyNode->Kill();
+	sceneNode->Kill();
+
 #ifdef D_NEW_SCENE
-	m_buildArray.PushBack(node->Clone());
-	m_buildArray.m_isDirty = 1;
+	dAssert(0);
+	m_bvhSceneManager.m_buildArray.m_isDirty = 1;
 #endif
 }
+
+ndBvhLeafNode* ndBvhSceneManager::GetLeafNode(ndBodyKinematic* const body) const
+{
+	dAssert(m_workingArray[body->m_bodyNodeIndex] && m_workingArray[body->m_bodyNodeIndex]->GetAsSceneBodyNode());
+	return (ndBvhLeafNode*)m_workingArray[body->m_bodyNodeIndex];
+}
+
 
 void ndBvhSceneManager::CleanUp()
 {
