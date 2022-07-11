@@ -161,6 +161,7 @@ class ndBvhNodeArray : public ndArray<ndBvhNode*>
 	~ndBvhNodeArray();
 
 	void CleanUp();
+	void Swap(ndBvhNodeArray& src);
 
 	ndUnsigned32 m_isDirty;
 	ndUnsigned32 m_scansCount;
@@ -189,7 +190,7 @@ class ndBvhSceneManager
 	void BuildBvhGenerateLayerGrids(ndThreadPool& threadPool);
 	void BuildBvhTreeCalculateLeafBoxes(ndThreadPool& threadPool);
 	
-	//ndBvhNode* BuildIncrementalBvhTree();
+	ndBvhNode* BuildIncrementalBvhTree(ndThreadPool& threadPool);
 	ndUnsigned32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndUnsigned32 bashCount);
 
 	ndBvhNodeArray m_workingArray;

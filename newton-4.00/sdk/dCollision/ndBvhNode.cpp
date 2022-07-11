@@ -152,7 +152,7 @@ ndBvhNodeArray::ndBvhNodeArray(const ndBvhNodeArray& src)
 	,m_scansCount(0)
 {
 	dAssert(0);
-	Swap((ndArray<ndBvhNode*>&)src);
+	ndArray<ndBvhNode*>::Swap((ndArray<ndBvhNode*>&)src);
 }
 
 ndBvhNodeArray::~ndBvhNodeArray()
@@ -169,6 +169,18 @@ void ndBvhNodeArray::CleanUp()
 		delete node;
 	}
 	SetCount(0);
+}
+
+void ndBvhNodeArray::Swap(ndBvhNodeArray& src)
+{
+	ndArray<ndBvhNode*>::Swap(src);
+
+	ndSwap(m_isDirty, src.m_isDirty);
+	ndSwap(m_scansCount, src.m_scansCount);
+	for (ndInt32 i = 0; i < sizeof(m_scans) / sizeof(m_scans[0]); ++i)
+	{
+		ndSwap(m_scans[i], src.m_scans[i]);
+	}
 }
 
 ndBvhSceneManager::ndBvhSceneManager()
@@ -311,7 +323,7 @@ void ndBvhSceneManager::RemoveBody(ndBodyKinematic* const body)
 
 #ifdef D_NEW_SCENE
 	dAssert(0);
-	m_bvhSceneManager.m_buildArray.m_isDirty = 1;
+	m_buildArray.m_isDirty = 1;
 #endif
 }
 
@@ -445,7 +457,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 		D_TRACKTIME_NAMED(CopyBodyNodes);
 
 		#ifdef D_NEW_SCENE
-		ndBvhNodeArray& nodeArray = m_fitness.m_buildArray;
+		ndBvhNodeArray& nodeArray = m_buildArray;
 		#else
 		ndBvhNodeArray& nodeArray = m_workingArray;
 		#endif
@@ -474,7 +486,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 	{
 		D_TRACKTIME_NAMED(CopySceneNode);
 		#ifdef D_NEW_SCENE
-		ndBvhNodeArray& nodeArray = m_bvhSceneManager.m_buildArray;
+		ndBvhNodeArray& nodeArray = m_buildArray;
 		#else
 		ndBvhNodeArray& nodeArray = m_workingArray;
 		#endif
@@ -1319,8 +1331,8 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 	}
 }
 
-#if 0
-ndBvhNode* ndScene::BuildIncrementalBvhTree()
+
+ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 {
 	D_TRACKTIME();
 	ndBvhNode* root = nullptr;
@@ -1328,7 +1340,7 @@ ndBvhNode* ndScene::BuildIncrementalBvhTree()
 	{
 		case ndBuildBvhTreeBuildState::m_beginBuild:
 		{
-			if (BuildBvhTreeInitNodes())
+			if (BuildBvhTreeInitNodes(threadPool))
 			{
 				m_bvhBuildState.m_state = m_bvhBuildState.m_calculateBoxes;
 			}
@@ -1337,7 +1349,7 @@ ndBvhNode* ndScene::BuildIncrementalBvhTree()
 
 		case ndBuildBvhTreeBuildState::m_calculateBoxes:
 		{
-			BuildBvhTreeCalculateLeafBoxes();
+			BuildBvhTreeCalculateLeafBoxes(threadPool);
 			m_bvhBuildState.m_state = m_bvhBuildState.m_buildLayer;
 			break;
 		}
@@ -1347,7 +1359,7 @@ ndBvhNode* ndScene::BuildIncrementalBvhTree()
 			if (m_bvhBuildState.m_leafNodesCount > 1)
 			{
 				m_bvhBuildState.m_size = m_bvhBuildState.m_size * ndVector::m_two;
-				BuildBvhGenerateLayerGrids();
+				BuildBvhGenerateLayerGrids(threadPool);
 			}
 			else
 			{
@@ -1359,7 +1371,7 @@ ndBvhNode* ndScene::BuildIncrementalBvhTree()
 
 		case ndBuildBvhTreeBuildState::m_enumerateLayers:
 		{
-			BuildBvhTreeSetNodesDepth();
+			BuildBvhTreeSetNodesDepth(threadPool);
 			m_bvhBuildState.m_state = m_bvhBuildState.m_endBuild;
 			break;
 		}
@@ -1376,7 +1388,6 @@ ndBvhNode* ndScene::BuildIncrementalBvhTree()
 	}
 	return root;
 }
-#endif
 
 ndBvhNode* ndBvhSceneManager::BuildBvhTree(ndThreadPool& threadPool)
 {
@@ -1403,7 +1414,7 @@ ndBvhNode* ndBvhSceneManager::BuildBvhTree(ndThreadPool& threadPool)
 
 	#ifdef D_NEW_SCENE
 	// for now just swap buffers
-	m_bvhSceneManager.m_buildArray.Swap(m_bvhSceneManager.m_workingArray);
+	m_buildArray.Swap(m_workingArray);
 	#endif
 	return m_bvhBuildState.m_root;
 }
