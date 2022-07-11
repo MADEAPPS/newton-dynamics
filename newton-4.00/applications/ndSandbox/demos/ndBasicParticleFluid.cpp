@@ -284,9 +284,9 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 				p.m_y = spacing * int(p.m_y / spacing);
 				p.m_z = spacing * int(p.m_z / spacing);
 
-				p.m_x += ndGaussianRandom(0.0f, spacing * 0.05f);
-				p.m_y += ndGaussianRandom(0.0f, spacing * 0.05f);
-				p.m_z += ndGaussianRandom(0.0f, spacing * 0.05f);
+				p.m_x += ndGaussianRandom(0.0f, spacing * 0.01f);
+				p.m_y += ndGaussianRandom(0.0f, spacing * 0.01f);
+				p.m_z += ndGaussianRandom(0.0f, spacing * 0.01f);
 				posit.PushBack(p);
 				veloc.PushBack(v);
 			}
