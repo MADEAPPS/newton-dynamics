@@ -292,7 +292,6 @@ void ndScene::BalanceScene()
 	else
 	{
 		UpdateBodyList();
-		//m_bvhSceneManager.Update(*this);
 	}
 
 	if (!m_bodyList.GetCount())
