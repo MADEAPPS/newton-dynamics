@@ -44,47 +44,45 @@ class dAiBotTest1 : public ndModel
 	{
 		ndFloat32 mass = 10.0f;
 		ndFloat32 radius = 0.25f;
-		ndFloat32 legLength = 0.4f;
-		ndFloat32 legRadios = 0.06f;
 		ndFloat32 limbMass = 0.5f;
-		//ndFloat32 sizez = 0.5f;
-		//ndFloat32 radius = 0.125f * sizex;
-		//
+		ndFloat32 limbLength = 0.4f;
+		ndFloat32 limbRadios = 0.06f;
+
 		ndPhysicsWorld* const world = scene->GetWorld();
-		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		ndBodyKinematic* const torso = AddSphere(scene, location, mass, radius, "smilli.tga");
 
 		ndDemoEntity* const entity = (ndDemoEntity*) torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
-		
 
-		//ndMatrix matrix (dGetIdentityMatrix());
 		ndMatrix matrix(dRollMatrix(20.0f * ndDegreeToRad));
 		ndFloat32 angle = 45.0f * ndDegreeToRad;
-		matrix.m_posit.m_x = radius + legLength * 0.5f + legRadios - radius * 0.1f;
+		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
 		for (ndInt32 i = 0; i < 4; i++)
 		{
-			ndMatrix location(matrix * dYawMatrix(angle));
-			location.m_posit += torso->GetMatrix().m_posit;
-			location.m_posit.m_w = 1.0f;
-			ndBodyKinematic* const leg = AddCapsule(scene, location, limbMass, legRadios, legRadios, legLength);
-			leg->SetMatrix(location);
+			ndMatrix limbLocation(matrix * dYawMatrix(angle));
+			limbLocation.m_posit += torso->GetMatrix().m_posit;
+			limbLocation.m_posit.m_w = 1.0f;
+			ndBodyKinematic* const leg = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+			leg->SetMatrix(limbLocation);
+			ndVector legPivot(limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f));
+			ndMatrix legPinAndPivotFrame(limbLocation);
+			legPinAndPivotFrame.m_posit = legPivot;
+			ndIkJointSpherical* const ball = new ndIkJointSpherical(legPinAndPivotFrame, leg, torso);
+			world->AddJoint(ball);
 
-			ndVector pivot(location.m_posit + location.m_front.Scale(legLength * 0.5f));
-			location = dRollMatrix((-60.0f - 20.0f) * ndDegreeToRad) * location;
-			pivot += location.m_front.Scale(legLength * 0.5f);
+			ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+			limbLocation = dRollMatrix((-60.0f - 20.0f) * ndDegreeToRad) * limbLocation;
+			caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
 
-			//pivot += location.m_front.Scale(legRadios + legRadios);
+			limbLocation.m_posit = caffPivot;
+			ndBodyKinematic* const caff = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+			caff->SetMatrix(limbLocation);
 
-			location.m_posit = pivot;
-			ndBodyKinematic* const caff = AddCapsule(scene, location, limbMass, legRadios, legRadios, legLength);
-			caff->SetMatrix(location);
-
-			ndMatrix pinAndPivotFrame(location.m_right);
-			pinAndPivotFrame.m_posit = location.m_posit - location.m_front.Scale(legLength * 0.5f);
-			ndJointHinge* const hinge = new ndJointHinge(pinAndPivotFrame, caff, leg);
-			scene->GetWorld()->AddJoint(hinge);
+			ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
+			caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
+			ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, caff, leg);
+			world->AddJoint(hinge);
 
 			angle += 90.0f * ndDegreeToRad;
 		}
