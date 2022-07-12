@@ -25,67 +25,15 @@
 #include "ndAnimationSequencePlayer.h"
 
 
-#if 0
-    <body name="torso" pos="0 0 0.75">
-      <geom name="torso_geom" pos="0 0 0" size="0.25" type="sphere"/>
-      <joint armature="0" damping="0" limited="false" margin="0.01" name="root" pos="0 0 0" type="free"/>
-      <body name="front_left_leg" pos="0 0 0">
-        <geom fromto="0.0 0.0 0.0 0.2 0.2 0.0" name="aux_1_geom" size="0.08" type="capsule"/>
-        <body name="aux_1" pos="0.2 0.2 0">
-          <joint axis="0 0 1" name="hip_1" pos="0.0 0.0 0.0" range="-30 30" type="hinge"/>
-          <geom fromto="0.0 0.0 0.0 0.2 0.2 0.0" name="left_leg_geom" size="0.08" type="capsule"/>
-          <body pos="0.2 0.2 0">
-            <joint axis="-1 1 0" name="ankle_1" pos="0.0 0.0 0.0" range="30 70" type="hinge"/>
-            <geom fromto="0.0 0.0 0.0 0.4 0.4 0.0" name="left_ankle_geom" size="0.08" type="capsule"/>
-          </body>
-        </body>
-      </body>
-      <body name="front_right_leg" pos="0 0 0">
-        <geom fromto="0.0 0.0 0.0 -0.2 0.2 0.0" name="aux_2_geom" size="0.08" type="capsule"/>
-        <body name="aux_2" pos="-0.2 0.2 0">
-          <joint axis="0 0 1" name="hip_2" pos="0.0 0.0 0.0" range="-30 30" type="hinge"/>
-          <geom fromto="0.0 0.0 0.0 -0.2 0.2 0.0" name="right_leg_geom" size="0.08" type="capsule"/>
-          <body pos="-0.2 0.2 0">
-            <joint axis="1 1 0" name="ankle_2" pos="0.0 0.0 0.0" range="-70 -30" type="hinge"/>
-            <geom fromto="0.0 0.0 0.0 -0.4 0.4 0.0" name="right_ankle_geom" size="0.08" type="capsule"/>
-          </body>
-        </body>
-      </body>
-      <body name="back_leg" pos="0 0 0">
-        <geom fromto="0.0 0.0 0.0 -0.2 -0.2 0.0" name="aux_3_geom" size="0.08" type="capsule"/>
-        <body name="aux_3" pos="-0.2 -0.2 0">
-          <joint axis="0 0 1" name="hip_3" pos="0.0 0.0 0.0" range="-30 30" type="hinge"/>
-          <geom fromto="0.0 0.0 0.0 -0.2 -0.2 0.0" name="back_leg_geom" size="0.08" type="capsule"/>
-          <body pos="-0.2 -0.2 0">
-            <joint axis="-1 1 0" name="ankle_3" pos="0.0 0.0 0.0" range="-70 -30" type="hinge"/>
-            <geom fromto="0.0 0.0 0.0 -0.4 -0.4 0.0" name="third_ankle_geom" size="0.08" type="capsule"/>
-          </body>
-        </body>
-      </body>
-      <body name="right_back_leg" pos="0 0 0">
-        <geom fromto="0.0 0.0 0.0 0.2 -0.2 0.0" name="aux_4_geom" size="0.08" type="capsule"/>
-        <body name="aux_4" pos="0.2 -0.2 0">
-          <joint axis="0 0 1" name="hip_4" pos="0.0 0.0 0.0" range="-30 30" type="hinge"/>
-          <geom fromto="0.0 0.0 0.0 0.2 -0.2 0.0" name="rightback_leg_geom" size="0.08" type="capsule"/>
-          <body pos="0.2 -0.2 0">
-            <joint axis="1 1 0" name="ankle_4" pos="0.0 0.0 0.0" range="30 70" type="hinge"/>
-            <geom fromto="0.0 0.0 0.0 0.4 -0.4 0.0" name="fourth_ankle_geom" size="0.08" type="capsule"/>
-          </body>
-        </body>
-      </body>
-    </body>
-#endif
-
-
 
 #define D_USE_FORWARD_DYNAMICS
 
-class dAiAntTest : public ndModel
+class dAiBotTest1 : public ndModel
 {
 	public:
-	D_CLASS_REFLECTION(dAiAntTest);
+	D_CLASS_REFLECTION(dAiBotTest1);
 
-	dAiAntTest(ndDemoEntityManager* const scene, const ndMatrix& location)
+	dAiBotTest1(ndDemoEntityManager* const scene, const ndMatrix& location)
 		:ndModel()
 		//,m_gravityDir(0.0f, -1.0f, 0.0f, 0.0f)
 		//,m_solver()
@@ -110,9 +58,10 @@ class dAiAntTest : public ndModel
 		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
 		
 
-		ndMatrix matrix (dGetIdentityMatrix());
+		//ndMatrix matrix (dGetIdentityMatrix());
+		ndMatrix matrix(dRollMatrix(20.0f * ndDegreeToRad));
 		ndFloat32 angle = 45.0f * ndDegreeToRad;
-		matrix.m_posit.m_x = radius + legLength * 0.5f + legRadios;
+		matrix.m_posit.m_x = radius + legLength * 0.5f + legRadios - radius * 0.1f;
 
 		for (ndInt32 i = 0; i < 4; i++)
 		{
@@ -122,22 +71,33 @@ class dAiAntTest : public ndModel
 			ndBodyKinematic* const leg = AddCapsule(scene, location, limbMass, legRadios, legRadios, legLength);
 			leg->SetMatrix(location);
 
-			location.m_posit += location.m_front.Scale(legLength + legRadios + legRadios);
+			ndVector pivot(location.m_posit + location.m_front.Scale(legLength * 0.5f));
+			location = dRollMatrix((-60.0f - 20.0f) * ndDegreeToRad) * location;
+			pivot += location.m_front.Scale(legLength * 0.5f);
+
+			//pivot += location.m_front.Scale(legRadios + legRadios);
+
+			location.m_posit = pivot;
 			ndBodyKinematic* const caff = AddCapsule(scene, location, limbMass, legRadios, legRadios, legLength);
 			caff->SetMatrix(location);
+
+			ndMatrix pinAndPivotFrame(location.m_right);
+			pinAndPivotFrame.m_posit = location.m_posit - location.m_front.Scale(legLength * 0.5f);
+			ndJointHinge* const hinge = new ndJointHinge(pinAndPivotFrame, caff, leg);
+			scene->GetWorld()->AddJoint(hinge);
 
 			angle += 90.0f * ndDegreeToRad;
 		}
 	
 	}
 
-	dAiAntTest(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	dAiBotTest1(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	{
 		dAssert(0);
 	}
 
-	~dAiAntTest()
+	~dAiBotTest1()
 	{
 	}
 
@@ -199,7 +159,7 @@ class dAiAntTest : public ndModel
 
 
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiAntTest);
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest1);
 
 
 
@@ -505,7 +465,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
 
 	//dInvertedPendulum* const robot0 = new dInvertedPendulum(scene, matrix);
-	dAiAntTest* const robot0 = new dAiAntTest(scene, matrix);
+	dAiBotTest1* const robot0 = new dAiBotTest1(scene, matrix);
 	scene->SetSelectedModel(robot0);
 	world->AddModel(robot0);
 	
