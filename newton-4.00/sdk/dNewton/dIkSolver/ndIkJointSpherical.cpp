@@ -25,15 +25,6 @@ ndIkJointSpherical::ndIkJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& d
 	:ndJointSpherical(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,ndJointBilateralConstraint::ndIkInterface()
 {
-	dAssert(0);
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	//m_maxConeAngle = xmlGetFloat(xmlNode, "maxConeAngle");
-	//m_coneFriction = xmlGetFloat(xmlNode, "coneFriction");
-	//m_minTwistAngle = xmlGetFloat(xmlNode, "minTwistAngle");
-	//m_maxTwistAngle = xmlGetFloat(xmlNode, "maxTwistAngle");
-	//m_twistFriction = xmlGetFloat(xmlNode, "twistFriction");
-	//m_coneFrictionRegularizer = xmlGetFloat(xmlNode, "coneFrictionRegularizer");
-	//m_twistFrictionRegularizer = xmlGetFloat(xmlNode, "twistFrictionRegularizer");
 }
 
 ndIkJointSpherical::~ndIkJointSpherical()
@@ -46,15 +37,6 @@ void ndIkJointSpherical::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointSpherical::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	dAssert(0);
-	//xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	//xmlSaveParam(childNode, "coneFriction", m_coneFriction);
-	//xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
-	//xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	//xmlSaveParam(childNode, "twistFriction", m_twistFriction);
-	//xmlSaveParam(childNode, "coneFrictionRegularizer", m_coneFrictionRegularizer);
-	//xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
 }
 
 void ndIkJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) const

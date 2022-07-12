@@ -46,28 +46,23 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_rotationType(m_disabled)
 	,m_controlDofOptions(0xff)
 {
-	dAssert(0);
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	//
-	//m_basePose = xmlGetMatrix(xmlNode, "pivotFrame");
-	//m_targetPosit = xmlGetVector3(xmlNode, "targetPosit");
-	//
-	//m_angle = xmlGetFloat (xmlNode, "m_angle");
-	//m_minAngle = xmlGetFloat (xmlNode, "minAngle");
-	//m_maxAngle = xmlGetFloat (xmlNode, "maxAngle");
-	//m_angularSpring = xmlGetFloat (xmlNode, "angularSpring");
-	//m_angularDamper = xmlGetFloat (xmlNode, "angularDamper");
-	//m_angularMaxTorque = xmlGetFloat (xmlNode, "angularMaxTorque");
-	//m_angularRegularizer = xmlGetFloat (xmlNode, "angularRegularizer");
-	//
-	//m_maxDist = xmlGetFloat(xmlNode, "maxDist");
-	//m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
-	//m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
-	//m_linearMaxForce = xmlGetFloat (xmlNode, "linearMaxForce");
-	//m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
-	//
-	//m_targetPosit.m_w = ndFloat32(1.0f);
-	//m_targetPosit.m_w = ndFloat32(1.0f);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	
+	m_targetFrame = xmlGetMatrix(xmlNode, "targetFrame");
+
+	m_angularSpring = xmlGetFloat(xmlNode, "angularSpring");
+	m_angularDamper = xmlGetFloat(xmlNode, "angularDamper");
+	m_angularMaxTorque = xmlGetFloat(xmlNode, "angularMaxTorque");
+	m_angularRegularizer = xmlGetFloat(xmlNode, "angularRegularizer");
+	
+	m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
+	m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
+	m_linearMaxForce = xmlGetFloat(xmlNode, "linearMaxForce");
+	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
+
+	m_rotationType = ndRotationType(xmlGetInt(xmlNode, "rotationType"));
+	m_controlDofOptions = ndInt8(xmlGetInt(xmlNode, "controlDofOptions"));
+
 	//SetTargetOffset(m_targetPosit);
 }
 
@@ -77,28 +72,22 @@ ndIk6DofEffector::~ndIk6DofEffector()
 
 void ndIk6DofEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
-	dAssert(0);
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-	
-	//xmlSaveParam(childNode, "pivotFrame", m_basePose);
-	//xmlSaveParam(childNode, "targetPosit", m_targetPosit);
-	//
-	//xmlSaveParam(childNode, "angle", m_angle);
-	//xmlSaveParam(childNode, "minAngle", m_minAngle);
-	//xmlSaveParam(childNode, "maxAngle", m_maxAngle);
-	//xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	//xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	//xmlSaveParam(childNode, "angularMaxTorque", m_angularMaxTorque);
-	//xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
-	//
-	//xmlSaveParam(childNode, "maxDist", m_maxDist);
-	//xmlSaveParam(childNode, "linearSpring", m_linearSpring);
-	//xmlSaveParam(childNode, "linearDamper", m_linearDamper);
-	//xmlSaveParam(childNode, "linearMaxForce", m_linearMaxForce);
-	//xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
+
+	xmlSaveParam(childNode, "targetFrame", m_targetFrame);
+	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
+	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
+	xmlSaveParam(childNode, "angularMaxTorque", m_angularMaxTorque);
+	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
+	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
+	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
+	xmlSaveParam(childNode, "linearMaxForce", m_linearMaxForce);
+	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
+	xmlSaveParam(childNode, "rotationType", m_rotationType);
+	xmlSaveParam(childNode, "controlDofOptions", m_controlDofOptions);
 }
 
 void ndIk6DofEffector::EnableAxisX(bool state)

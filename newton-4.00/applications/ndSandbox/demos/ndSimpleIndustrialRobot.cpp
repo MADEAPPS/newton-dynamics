@@ -305,6 +305,13 @@ class dSimpleIndustrialRobot : public ndModel
 		xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
 		if (m_effector)
 		{
+			// save the effector joint
+			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+			jointsNode->LinkEndChild(paramNode);
+			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_effector);
+			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+
+			// and the connection
 			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
 			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
 			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
