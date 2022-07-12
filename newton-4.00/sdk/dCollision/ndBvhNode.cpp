@@ -448,6 +448,42 @@ void ndBuildBvhTreeBuildState::Init(ndUnsigned32 maxCount)
 	m_leafNodesCount = maxCount;
 }
 
+void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
+{
+	D_TRACKTIME();
+
+	ndUnsigned32 start = 0;
+	ndUnsigned32 count = 0;
+	auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME_NAMED(UpdateSceneBvh);
+		ndBvhInternalNode** const nodes = (ndBvhInternalNode**)&m_workingArray[start];
+		const ndStartEnd startEnd(count, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBvhInternalNode* const node = nodes[i];
+			dAssert(node && node->GetAsSceneNode());
+
+			const ndVector minBox(node->m_left->m_minBox.GetMin(node->m_right->m_minBox));
+			const ndVector maxBox(node->m_left->m_maxBox.GetMax(node->m_right->m_maxBox));
+			if (!dBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
+			{
+				node->m_minBox = minBox;
+				node->m_maxBox = maxBox;
+			}
+		}
+	});
+
+	D_TRACKTIME_NAMED(UpdateSceneBvhFull);
+	const ndBvhNodeArray& array = m_workingArray;
+	for (ndUnsigned32 i = 0; i < array.m_scansCount; ++i)
+	{
+		start = array.m_scans[i];
+		count = array.m_scans[i + 1] - start;
+		threadPool.ParallelExecute(UpdateSceneBvh);
+	}
+}
+
 bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 {
 	D_TRACKTIME();
@@ -963,6 +999,7 @@ ndUnsigned32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBv
 
 void ndBvhSceneManager::BuildBvhTreeSetNodesDepth(ndThreadPool& threadPool)
 {
+	D_TRACKTIME();
 	class ndSortGetDethpKey
 	{
 		public:
@@ -1377,10 +1414,13 @@ ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 			break;
 		}
 
+
 		case ndBuildBvhTreeBuildState::m_endBuild:
 		{
 			root = m_bvhBuildState.m_root;
+			BuildBvhTreeSwapBuffers(threadPool);
 			dAssert(m_bvhBuildState.m_root->SanityCheck(0));
+			m_bvhBuildState.m_state = m_bvhBuildState.m_beginBuild;
 			break;
 		}
 
@@ -1394,6 +1434,7 @@ void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& threadPool)
 {
 #ifdef D_NEW_SCENE
 
+	D_TRACKTIME();
 	auto SwapBodyIndices = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(MarkCellBounds);
@@ -1414,6 +1455,8 @@ void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& threadPool)
 
 	// for now just swap buffers
 	m_buildArray.Swap(m_workingArray);
+
+	UpdateScene(threadPool);
 #endif
 }
 

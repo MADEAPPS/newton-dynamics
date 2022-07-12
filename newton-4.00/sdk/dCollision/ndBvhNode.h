@@ -24,7 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 
-//#define D_NEW_SCENE
+#define D_NEW_SCENE
 
 class ndBodyKinematic;
 class ndBvhLeafNode;
@@ -178,6 +178,8 @@ class ndBvhSceneManager
 	void CleanUp();
 	ndBvhNode* AddBody(ndBodyKinematic* const body, ndBvhNode* root);
 	void RemoveBody(ndBodyKinematic* const body);
+
+	void UpdateScene(ndThreadPool& threadPool);
 	ndBvhNode* BuildBvhTree(ndThreadPool& threadPool);
 
 	ndBvhNodeArray& GetNodeArray();

@@ -1715,37 +1715,7 @@ void ndScene::InitBodyArray()
 		}
 		else
 		{
-			ndUnsigned32 start = 0;
-			ndUnsigned32 count = 0;
-			auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
-			{
-				D_TRACKTIME_NAMED(UpdateSceneBvh);
-				//ndBvhInternalNode** const nodes = (ndBvhInternalNode**)&m_bvhSceneManager.m_workingArray[start];
-				ndBvhInternalNode** const nodes = (ndBvhInternalNode**)&m_bvhSceneManager.GetNodeArray()[start];
-				const ndStartEnd startEnd(count, threadIndex, threadCount);
-				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-				{
-					ndBvhInternalNode* const node = nodes[i];
-					dAssert(node && node->GetAsSceneNode());
-				
-					const ndVector minBox(node->m_left->m_minBox.GetMin(node->m_right->m_minBox));
-					const ndVector maxBox(node->m_left->m_maxBox.GetMax(node->m_right->m_maxBox));
-					if (!dBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
-					{
-						node->m_minBox = minBox;
-						node->m_maxBox = maxBox;
-					}
-				}
-			});
-	
-			D_TRACKTIME_NAMED(UpdateSceneBvhFull);
-			const ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
-			for (ndUnsigned32 i = 0; i < array.m_scansCount; ++i)
-			{
-				start = array.m_scans[i];
-				count = array.m_scans[i + 1] - start;
-				ParallelExecute(UpdateSceneBvh);
-			}
+			m_bvhSceneManager.UpdateScene(*this);
 		}
 	}
 	
