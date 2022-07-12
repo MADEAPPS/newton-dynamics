@@ -36,7 +36,7 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -55,7 +55,7 @@
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-//#define DEFAULT_SCENE	19		// inverted pendulum
+#define DEFAULT_SCENE	19		// inverted pendulum
 //#define DEFAULT_SCENE	20		// quadruped robot
 //#define DEFAULT_SCENE	21		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture

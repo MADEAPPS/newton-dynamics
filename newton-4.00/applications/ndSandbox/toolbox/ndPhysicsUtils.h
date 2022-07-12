@@ -12,17 +12,16 @@
 #ifndef __PHYSICS_UTIL__
 #define __PHYSICS_UTIL__
 
-#define DEMO_GRAVITY  ndFloat32(-10.0f)
-//#define DEMO_GRAVITY  ndFloat32(-0.5f)
-//#define DEMO_GRAVITY  ndFloat32(0.0f)
+//#define DEMO_GRAVITY  ndFloat32(-10.0f)
+#define DEMO_GRAVITY  ndFloat32(0.0f)
 
 class ndDemoEntityManager;
 
-ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius);
-ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
-ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high);
-ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments);
-ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& origin, ndFloat32 mass);
+ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.tga");
+ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.tga");
+ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName = "wood_0.tga");
+ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName = "wood_0.tga");
+ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& origin, ndFloat32 mass, const char* const textName = "wood_0.tga");
 
 void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndInt32 count);
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh);

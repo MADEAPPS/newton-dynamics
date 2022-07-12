@@ -294,6 +294,24 @@ class dSimpleIndustrialRobot : public ndModel
 			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
 		}
 
+		// add slidiers
+		{
+			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+			jointsNode->LinkEndChild(paramNode);
+
+			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_leftGripper);
+			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+		}
+
+		// add slidiers
+		{
+			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+			jointsNode->LinkEndChild(paramNode);
+
+			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_rightGripper);
+			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+		}
+
 		// indicate which body is the root
 		xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
 

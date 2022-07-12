@@ -80,6 +80,129 @@
 
 #define D_USE_FORWARD_DYNAMICS
 
+class dAiAntTest : public ndModel
+{
+	public:
+	D_CLASS_REFLECTION(dAiAntTest);
+
+	dAiAntTest(ndDemoEntityManager* const scene, const ndMatrix& location)
+		:ndModel()
+		//,m_gravityDir(0.0f, -1.0f, 0.0f, 0.0f)
+		//,m_solver()
+		//,m_bodies()
+		//,m_effector(nullptr)
+		//,m_contactSensor(nullptr)
+		//,m_efectorLength(1.0f)
+	{
+		ndFloat32 mass = 10.0f;
+		ndFloat32 radius = 0.25f;
+		ndFloat32 legLength = 0.4f;
+		ndFloat32 legRadios = 0.06f;
+		ndFloat32 limbMass = 0.5f;
+		//ndFloat32 sizez = 0.5f;
+		//ndFloat32 radius = 0.125f * sizex;
+		//
+		ndPhysicsWorld* const world = scene->GetWorld();
+		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		ndBodyKinematic* const torso = AddSphere(scene, location, mass, radius, "smilli.tga");
+
+		ndDemoEntity* const entity = (ndDemoEntity*) torso->GetNotifyCallback()->GetUserData();
+		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
+		
+
+		ndMatrix matrix (dGetIdentityMatrix());
+		ndFloat32 angle = 45.0f * ndDegreeToRad;
+		matrix.m_posit.m_x = radius + legLength * 0.5f + legRadios;
+
+		for (ndInt32 i = 0; i < 4; i++)
+		{
+			ndMatrix location(matrix * dYawMatrix(angle));
+			location.m_posit += torso->GetMatrix().m_posit;
+			location.m_posit.m_w = 1.0f;
+			ndBodyKinematic* const leg = AddCapsule(scene, location, limbMass, legRadios, legRadios, legLength);
+			leg->SetMatrix(location);
+
+			location.m_posit += location.m_front.Scale(legLength + legRadios + legRadios);
+			ndBodyKinematic* const caff = AddCapsule(scene, location, limbMass, legRadios, legRadios, legLength);
+			caff->SetMatrix(location);
+
+			angle += 90.0f * ndDegreeToRad;
+		}
+	
+	}
+
+	dAiAntTest(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
+	{
+		dAssert(0);
+	}
+
+	~dAiAntTest()
+	{
+	}
+
+	//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+	void Save(const ndLoadSaveBase::ndSaveDescriptor&) const
+	{
+		dAssert(0);
+	}
+
+	void Debug(ndConstraintDebugCallback& context) const
+	{
+		//ndJointBilateralConstraint* const joint = m_effector;
+		//joint->DebugJoint(context);
+		//ndMatrix rootMatrix(dGetIdentityMatrix());
+		//
+		//ndVector com(CalculateCenterOfMass());
+		//rootMatrix.m_posit = com;
+		////context.DrawFrame(rootMatrix);
+		//context.DrawPoint(com, ndVector(1.0f, 0.0f, 0.0f, 0.0f), 12.0f);
+		//
+		//ndVector p1(com + m_gravityDir.Scale(m_efectorLength * 2.0f));
+		//context.DrawLine(com, p1, ndVector(0.0f, 1.0f, 1.0f, 0.0f));
+	}
+
+	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+	{
+		ndModel::PostUpdate(world, timestep);
+	}
+
+	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
+	{
+		ndModel::PostTransformUpdate(world, timestep);
+	}
+
+	//ndVector CalculateCenterOfMass() const
+	//{
+	//	ndFloat32 toltalMass = 0.0f;
+	//	ndVector com(ndVector::m_zero);
+	//	//comVeloc = ndVector::m_zero;
+	//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	//	{
+	//		ndBodyDynamic* const body = m_bodies[i];
+	//		ndFloat32 mass = body->GetMassMatrix().m_w;
+	//		ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+	//		com += comMass.Scale(mass);
+	//		//comVeloc += body->GetVelocity().Scale(mass);
+	//		toltalMass += mass;
+	//	}
+	//	com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
+	//	//comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
+	//	return com | ndVector::m_wOne;
+	//}
+
+	void Update(ndWorld* const world, ndFloat32 timestep)
+	{
+		ndModel::Update(world, timestep);
+	}
+
+
+
+};
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiAntTest);
+
+
+
 class dInvertedPendulum : public ndModel
 {
 	public:
@@ -381,7 +504,8 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
 
-	dInvertedPendulum* const robot0 = new dInvertedPendulum(scene, matrix);
+	//dInvertedPendulum* const robot0 = new dInvertedPendulum(scene, matrix);
+	dAiAntTest* const robot0 = new dAiAntTest(scene, matrix);
 	scene->SetSelectedModel(robot0);
 	world->AddModel(robot0);
 	
