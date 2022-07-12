@@ -157,13 +157,12 @@ class dSimpleIndustrialRobot : public ndModel
 
 						m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 
-						ndFloat32 relaxation = 0.005f;
+						ndFloat32 relaxation = 0.003f;
 						m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
 						m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
-
-						m_effector->SetMaxForce(8000.0f);
-						m_effector->SetMaxTorque(8000.0f);
+						m_effector->SetMaxForce(10000.0f);
+						m_effector->SetMaxTorque(10000.0f);
 
 						// the effector is part of the rig
 						world->AddJoint(m_effector);

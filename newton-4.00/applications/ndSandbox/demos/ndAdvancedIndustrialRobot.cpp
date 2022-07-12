@@ -122,7 +122,7 @@ class dAdvancedIndustrialRobot : public ndModel
 						m_bodyArray.PushBack(childBody);
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 
-						// here we use a ik joint instead of a regula one.
+						// here we use a ik joints instead of a regular one.
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 						hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
 						m_jointArray.PushBack(hinge);
@@ -160,17 +160,15 @@ class dAdvancedIndustrialRobot : public ndModel
 
 						m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 
-						ndFloat32 relaxation = 0.005f;
+						ndFloat32 relaxation = 0.003f;
 						m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
 						m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
+						m_effector->SetMaxForce(10000.0f);
+						m_effector->SetMaxTorque(10000.0f);
 
-						m_effector->SetMaxForce(4000.0f);
-						m_effector->SetMaxTorque(1000.0f);
-
-						//the effector is not part of the rig, 
-						//instead the Inverse dynamics solver use it to calculate
-						//the joints accelerations.
+						// the effector is not added to the world, 
+						// because is use by teh IK solver to calculate joint motors.
 					}
 					break;
 				}
