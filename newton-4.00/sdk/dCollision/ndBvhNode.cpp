@@ -215,20 +215,16 @@ ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* ro
 	m_workingArray.PushBack(sceneNode);
 	body->m_sceneNodeIndex = m_workingArray.GetCount() - 1;
 	
-	#ifdef D_NEW_SCENE
-		dAssert(0);
-		//m_buildArray.PushBack(node->Clone());
-		//m_buildArray.m_isDirty = 1;
-	#endif
-	 
 	bodyNode->m_isDead = 0;
 	m_workingArray.PushBack(bodyNode);
 	body->m_bodyNodeIndex = m_workingArray.GetCount() - 1;
 
 	#ifdef D_NEW_SCENE
-		dAssert(0);
-		//m_buildArray.PushBack(node->Clone());
-		//m_buildArray.m_isDirty = 1;
+	m_buildArray.m_isDirty = 1;
+	m_buildArray.PushBack(sceneNode->Clone());
+	body->m_buildSceneNodeIndex = m_buildArray.GetCount() - 1;
+	m_buildArray.PushBack(bodyNode->Clone());
+	body->m_buildBodyNodeIndex = m_buildArray.GetCount() - 1;
 	#endif
 
 	if (m_workingArray.GetCount() > 2)
@@ -312,6 +308,10 @@ ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* ro
 
 void ndBvhSceneManager::RemoveBody(ndBodyKinematic* const body)
 {
+	#ifdef D_NEW_SCENE
+	m_buildArray.m_isDirty = 1;
+	#endif
+
 	m_workingArray.m_isDirty = 1;
 	ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)m_workingArray[body->m_bodyNodeIndex];
 	ndBvhInternalNode* const sceneNode = (ndBvhInternalNode*)m_workingArray[body->m_sceneNodeIndex];
@@ -319,11 +319,6 @@ void ndBvhSceneManager::RemoveBody(ndBodyKinematic* const body)
 	dAssert(sceneNode->GetAsSceneTreeNode());
 	bodyNode->Kill();
 	sceneNode->Kill();
-
-#ifdef D_NEW_SCENE
-	dAssert(0);
-	m_buildArray.m_isDirty = 1;
-#endif
 }
 
 ndBvhLeafNode* ndBvhSceneManager::GetLeafNode(ndBodyKinematic* const body) const
@@ -408,8 +403,13 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 					dAssert(nodes[baseCount + i]->GetAsSceneBodyNode());
 
 					ndBodyKinematic* const body = bodyNode->m_body;
+					#ifdef D_NEW_SCENE
+					body->m_buildSceneNodeIndex = i;
+					body->m_buildBodyNodeIndex = baseCount + i;
+					#else
 					body->m_sceneNodeIndex = i;
 					body->m_bodyNodeIndex = baseCount + i;
+					#endif
 				}
 			});
 			threadPool.ParallelExecute(EnumerateNodes);
@@ -510,14 +510,17 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 	Update(threadPool);
 
 	bool ret = false;
+
 	#ifdef D_NEW_SCENE
-	if (m_buildArray.GetCount())
+	ndBvhNodeArray& nodeArray = m_buildArray;
 	#else
-	if (m_workingArray.GetCount())
+	ndBvhNodeArray& nodeArray = m_workingArray;
 	#endif
+
+	if (nodeArray.GetCount())
 	{
 		ret = true;
-		m_bvhBuildState.Init(m_workingArray.GetCount() / 2);
+		m_bvhBuildState.Init(nodeArray.GetCount() / 2);
 		threadPool.ParallelExecute(CopyBodyNodes);
 		threadPool.ParallelExecute(CopySceneNode);
 	}
@@ -1330,7 +1333,6 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 	}
 }
 
-
 ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 {
 	D_TRACKTIME();
@@ -1388,6 +1390,33 @@ ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 	return root;
 }
 
+void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& threadPool)
+{
+#ifdef D_NEW_SCENE
+
+	auto SwapBodyIndices = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME_NAMED(MarkCellBounds);
+		ndBvhNodeArray& array = m_buildArray;
+		ndInt32 baseIndex = array.GetCount() / 2;
+		const ndStartEnd startEnd(baseIndex, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[baseIndex + i];
+			dAssert(bodyNode->GetAsSceneBodyNode());
+
+			ndBodyKinematic* const body = bodyNode->m_body;
+			ndSwap(body->m_bodyNodeIndex, body->m_buildBodyNodeIndex);
+			ndSwap(body->m_sceneNodeIndex, body->m_buildSceneNodeIndex);
+		}
+	});
+	threadPool.ParallelExecute(SwapBodyIndices);
+
+	// for now just swap buffers
+	m_buildArray.Swap(m_workingArray);
+#endif
+}
+
 ndBvhNode* ndBvhSceneManager::BuildBvhTree(ndThreadPool& threadPool)
 {
 	D_TRACKTIME();
@@ -1411,9 +1440,6 @@ ndBvhNode* ndBvhSceneManager::BuildBvhTree(ndThreadPool& threadPool)
 	BuildBvhTreeSetNodesDepth(threadPool);
 	dAssert(m_bvhBuildState.m_root->SanityCheck(0));
 
-	#ifdef D_NEW_SCENE
-	// for now just swap buffers
-	m_buildArray.Swap(m_workingArray);
-	#endif
+	BuildBvhTreeSwapBuffers(threadPool);
 	return m_bvhBuildState.m_root;
 }

@@ -279,19 +279,15 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 void ndScene::BalanceScene()
 {
 	D_TRACKTIME();
+	UpdateBodyList();
 	if (m_bvhSceneManager.GetNodeArray().GetCount() > 2)
 	{
 		if (!m_forceBalanceSceneCounter)
 		{
-			UpdateBodyList();
 			m_rootNode = m_bvhSceneManager.BuildBvhTree(*this);
 		}
 		m_forceBalanceSceneCounter = (m_forceBalanceSceneCounter < 64) ? m_forceBalanceSceneCounter + 1 : 0;
 		dAssert(!m_rootNode || !m_rootNode->m_parent);
-	}
-	else
-	{
-		UpdateBodyList();
 	}
 
 	if (!m_bodyList.GetCount())

@@ -193,6 +193,8 @@ class ndBvhSceneManager
 	ndBvhNode* BuildIncrementalBvhTree(ndThreadPool& threadPool);
 	ndUnsigned32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndUnsigned32 bashCount);
 
+	void BuildBvhTreeSwapBuffers(ndThreadPool& threadPool);
+
 	ndBvhNodeArray m_workingArray;
 #ifdef D_NEW_SCENE
 	ndBvhNodeArray m_buildArray;
@@ -284,6 +286,9 @@ inline ndBvhNode* ndBvhNode::GetRight() const
 inline void ndBvhNode::Kill()
 {
 	m_isDead = 1;
+#ifdef D_NEW_SCENE
+	m_buildNode->m_isDead = 1;
+#endif
 }
 
 inline void ndBvhNode::GetAabb(ndVector& minBox, ndVector& maxBox) const

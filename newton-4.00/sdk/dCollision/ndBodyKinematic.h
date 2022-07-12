@@ -227,10 +227,10 @@ class ndBodyKinematic : public ndBody
 	friend class ndScene;
 	friend class ndContact;
 	friend class ndIkSolver;
-	friend class ndBvhSceneManager;
 	friend class ndBvhLeafNode;
 	friend class ndDynamicsUpdate;
 	friend class ndWorldSceneCuda;
+	friend class ndBvhSceneManager;
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
