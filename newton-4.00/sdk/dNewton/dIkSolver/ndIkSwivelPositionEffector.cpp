@@ -238,7 +238,7 @@ void ndIkSwivelPositionEffector::SubmitShortestPathAxis(const ndMatrix& matrix0,
 
 void ndIkSwivelPositionEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	dAssert(0);
+	//dAssert(0);
 	//switch (m_rotationType)
 	//{
 	//	case m_fixAxis:

@@ -168,7 +168,7 @@ class dAdvancedIndustrialRobot : public ndModel
 						m_effector->SetMaxTorque(10000.0f);
 
 						// the effector is not added to the world, 
-						// because is use by teh IK solver to calculate joint motors.
+						// because is use by the IK solver to calculate joint motors.
 					}
 					break;
 				}

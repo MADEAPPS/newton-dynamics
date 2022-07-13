@@ -1414,7 +1414,6 @@ ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 			break;
 		}
 
-
 		case ndBuildBvhTreeBuildState::m_endBuild:
 		{
 			root = m_bvhBuildState.m_root;

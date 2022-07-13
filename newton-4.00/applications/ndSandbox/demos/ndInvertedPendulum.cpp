@@ -24,8 +24,6 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndAnimationSequencePlayer.h"
 
-
-
 #define D_USE_FORWARD_DYNAMICS
 
 class dAiBotTest1 : public ndModel
@@ -55,22 +53,26 @@ class dAiBotTest1 : public ndModel
 		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
 
 		ndMatrix matrix(dRollMatrix(20.0f * ndDegreeToRad));
-		ndFloat32 angle = 45.0f * ndDegreeToRad;
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
+
+		ndFloat32 angles[] = { 60.0f, 120.0f, 240.0f, 300.0f };
 
 		for (ndInt32 i = 0; i < 4; i++)
 		{
-			ndMatrix limbLocation(matrix * dYawMatrix(angle));
+			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
+
+			// add leg thigh
 			limbLocation.m_posit += torso->GetMatrix().m_posit;
 			limbLocation.m_posit.m_w = 1.0f;
-			ndBodyKinematic* const leg = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
-			leg->SetMatrix(limbLocation);
-			ndVector legPivot(limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f));
-			ndMatrix legPinAndPivotFrame(limbLocation);
-			legPinAndPivotFrame.m_posit = legPivot;
-			ndIkJointSpherical* const ball = new ndIkJointSpherical(legPinAndPivotFrame, leg, torso);
+			ndBodyKinematic* const thigh = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+			thigh->SetMatrix(limbLocation);
+			ndVector thighPivot(limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f));
+			ndMatrix thighFrame(limbLocation);
+			thighFrame.m_posit = thighPivot;
+			ndIkJointSpherical* const ball = new ndIkJointSpherical(thighFrame, thigh, torso);
 			world->AddJoint(ball);
 
+			// add calf
 			ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
 			limbLocation = dRollMatrix((-60.0f - 20.0f) * ndDegreeToRad) * limbLocation;
 			caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
@@ -81,12 +83,22 @@ class dAiBotTest1 : public ndModel
 
 			ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
 			caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
-			ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, caff, leg);
+			ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, caff, thigh);
 			world->AddJoint(hinge);
 
-			angle += 90.0f * ndDegreeToRad;
+			// add leg effector
+			ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+
+			ndMatrix effectorToeFrame(dGetIdentityMatrix());
+			ndMatrix effectorRefFrame(dGetIdentityMatrix());
+			ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
+
+			effectorToeFrame.m_posit = effectorToePosit;
+			effectorRefFrame.m_posit = thighPivot;
+
+			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, caff, torso);
+			world->AddJoint(effector);
 		}
-	
 	}
 
 	dAiBotTest1(const ndLoadSaveBase::ndLoadDescriptor& desc)
