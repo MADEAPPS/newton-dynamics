@@ -83,6 +83,7 @@
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
+#include <ndIkSwivelPositionEffector.h>
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleTireJoint.h>
 #include <ndMultiBodyVehicleTorsionBar.h>
@@ -90,7 +91,6 @@
 #include <ndCharacterInverseDynamicNode.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
-
 
 #endif 
 
