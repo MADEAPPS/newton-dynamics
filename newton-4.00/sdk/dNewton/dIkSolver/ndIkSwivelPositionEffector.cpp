@@ -173,11 +173,12 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	ndMatrix swivelMatrix0(m_localSwivelMatrix0 * m_body0->GetMatrix());
 	ndMatrix swivelMatrix1(m_localSwivelMatrix1 * m_body1->GetMatrix());
 
-	ndVector midPoint = ndVector::m_half * (targetFrame.m_posit + matrix1.m_posit);
+	//ndVector midPoint = ndVector::m_half * (targetFrame.m_posit + matrix1.m_posit);
+	ndVector midPoint = ndVector::m_half * (matrix0.m_posit + matrix1.m_posit);
 	swivelMatrix0.m_posit = midPoint;
 	swivelMatrix1.m_posit = midPoint;
 
-	debugCallback.DrawLine(targetFrame.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 
 	debugCallback.DrawFrame(swivelMatrix0);
 	debugCallback.DrawFrame(swivelMatrix1);
