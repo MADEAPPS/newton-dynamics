@@ -171,9 +171,8 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	const ndMatrix targetFrame(m_targetFrame * matrix1);
 	const ndVector midPoint(ndVector::m_half * (matrix0.m_posit + matrix1.m_posit));
 
-	//ndMatrix swivelMatrix0(m_localSwivelMatrix0 * m_body0->GetMatrix());
+	ndMatrix swivelMatrix0(m_localSwivelMatrix0 * m_body0->GetMatrix());
 	ndMatrix swivelMatrix1(m_localSwivelMatrix1 * m_body1->GetMatrix());
-	//swivelMatrix0.m_posit = midPoint;
 	const ndVector pin(swivelMatrix1.UnrotateVector(matrix0.m_posit - matrix1.m_posit).Normalize());
 	ndMatrix localSwivel1(dGetIdentityMatrix());
 	localSwivel1.m_front = pin;
@@ -184,9 +183,10 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 
 //swivelMatrix1 = dPitchMatrix(30 * ndDegreeToRad) * swivelMatrix1;
 
+	swivelMatrix0.m_posit = midPoint;
 	swivelMatrix1.m_posit = midPoint;
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
-//	debugCallback.DrawFrame(swivelMatrix0);
+	debugCallback.DrawFrame(swivelMatrix0);
 	debugCallback.DrawFrame(swivelMatrix1);
 	
 	//debugCallback.DrawFrame(matrix0);
