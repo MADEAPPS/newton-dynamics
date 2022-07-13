@@ -130,17 +130,8 @@ class dAiBotTest1 : public ndModel
 			ndJointBilateralConstraint* const effector = m_effectors[i];
 			effector->DebugJoint(context);
 		}
-		//ndJointBilateralConstraint* const joint = m_effector;
-		//joint->DebugJoint(context);
-		//ndMatrix rootMatrix(dGetIdentityMatrix());
-		//
-		//ndVector com(CalculateCenterOfMass());
-		//rootMatrix.m_posit = com;
-		////context.DrawFrame(rootMatrix);
-		//context.DrawPoint(com, ndVector(1.0f, 0.0f, 0.0f, 0.0f), 12.0f);
-		//
-		//ndVector p1(com + m_gravityDir.Scale(m_efectorLength * 2.0f));
-		//context.DrawLine(com, p1, ndVector(0.0f, 1.0f, 1.0f, 0.0f));
+
+		//((ndJointBilateralConstraint*)m_effectors[1])->DebugJoint(context);
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
