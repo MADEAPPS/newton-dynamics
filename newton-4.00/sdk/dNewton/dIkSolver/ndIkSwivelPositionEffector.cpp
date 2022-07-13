@@ -15,10 +15,9 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkSwivelPositionEffector)
 
-ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, const ndMatrix& swivelAngleParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, const ndMatrix& swivelFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
 	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
-	,m_swivelFrame(swivelAngleParent)
 	,m_swivelAngle(ndFloat32 (0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -29,13 +28,14 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 	,m_linearMaxForce(D_LCP_MAX_VALUE)
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 {
+	CalculateLocalMatrix(swivelFrame, m_localSwivelMatrix0, m_localSwivelMatrix1);
+
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_targetFrame(dGetIdentityMatrix())
-	,m_swivelFrame(dGetIdentityMatrix())
 	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -49,7 +49,8 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndL
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	
 	m_targetFrame = xmlGetMatrix(xmlNode, "targetFrame");
-	m_swivelFrame = xmlGetMatrix(xmlNode, "swivelFrame");
+	m_localSwivelMatrix0 = xmlGetMatrix(xmlNode, "localSwivelMatrix0");
+	m_localSwivelMatrix1 = xmlGetMatrix(xmlNode, "localSwivelMatrix1");
 
 	m_swivelAngle = xmlGetFloat(xmlNode, "swivelAngle");
 
@@ -76,7 +77,8 @@ void ndIkSwivelPositionEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "targetFrame", m_targetFrame);
-	xmlSaveParam(childNode, "swivelFrame", m_swivelFrame);
+	xmlSaveParam(childNode, "localSwivelMatrix0", m_localSwivelMatrix0);
+	xmlSaveParam(childNode, "localSwivelMatrix1", m_localSwivelMatrix1);
 	xmlSaveParam(childNode, "swivelAngle", m_swivelAngle);
 	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
 	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
@@ -167,11 +169,23 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
 	const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
 	const ndMatrix targetFrame(m_targetFrame * matrix1);
+
+	ndMatrix swivelMatrix0(m_localSwivelMatrix0 * m_body0->GetMatrix());
+	ndMatrix swivelMatrix1(m_localSwivelMatrix1 * m_body1->GetMatrix());
+
+	ndVector minPoint = ndVector::m_half * (targetFrame.m_posit + matrix1.m_posit);
+	swivelMatrix0.m_posit = minPoint;
+	swivelMatrix1.m_posit = minPoint;
+
+	debugCallback.DrawLine(targetFrame.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+
+	debugCallback.DrawFrame(swivelMatrix0);
+	debugCallback.DrawFrame(swivelMatrix1);
 	
-	debugCallback.DrawFrame(matrix0);
+	//debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
-	debugCallback.DrawFrame(targetFrame);
-	debugCallback.DrawPoint(targetFrame.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
+	//debugCallback.DrawFrame(targetFrame);
+	//debugCallback.DrawPoint(targetFrame.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
 void ndIkSwivelPositionEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)

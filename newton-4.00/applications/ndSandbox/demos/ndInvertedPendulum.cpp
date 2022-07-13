@@ -93,10 +93,16 @@ class dAiBotTest1 : public ndModel
 			ndMatrix effectorRefFrame(dGetIdentityMatrix());
 			ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
 
-			effectorToeFrame.m_posit = effectorToePosit;
 			effectorRefFrame.m_posit = thighPivot;
+			effectorToeFrame.m_posit = effectorToePosit;
+			effectorSwivelFrame.m_posit = thighPivot;
+			effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
+			effectorSwivelFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
+			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
 			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, caff, torso);
+			m_effectors.PushBack(effector);
 			world->AddJoint(effector);
 		}
 	}
@@ -119,6 +125,11 @@ class dAiBotTest1 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
+		for (ndInt32 i = 0; i < 4; i++)
+		{
+			ndJointBilateralConstraint* const effector = m_effectors[i];
+			effector->DebugJoint(context);
+		}
 		//ndJointBilateralConstraint* const joint = m_effector;
 		//joint->DebugJoint(context);
 		//ndMatrix rootMatrix(dGetIdentityMatrix());
@@ -166,8 +177,7 @@ class dAiBotTest1 : public ndModel
 		ndModel::Update(world, timestep);
 	}
 
-
-
+	ndFixSizeArray<ndIkSwivelPositionEffector*, 4> m_effectors;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest1);
 

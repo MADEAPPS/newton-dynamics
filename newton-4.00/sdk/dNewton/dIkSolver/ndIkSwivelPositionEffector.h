@@ -51,7 +51,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	
 	ndMatrix m_targetFrame;
-	ndMatrix m_swivelFrame;
+	ndMatrix m_localSwivelMatrix0;
+	ndMatrix m_localSwivelMatrix1;
 	ndFloat32 m_swivelAngle;
 
 	ndFloat32 m_angularSpring;
