@@ -175,11 +175,14 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	ndMatrix swivelMatrix1(m_localSwivelMatrix1 * m_body1->GetMatrix());
 	//swivelMatrix0.m_posit = midPoint;
 	const ndVector pin(swivelMatrix1.UnrotateVector(matrix0.m_posit - matrix1.m_posit).Normalize());
-	ndFloat32 rollAngle = ndAtan2(pin.m_y, pin.m_x);
-	ndFloat32 yawAngle = ndAtan2(pin.m_z, pin.m_x);
-	//ndMatrix swivelMatrix1(dPitchMatrix(m_swivelAngle) * dYawMatrix(yawAngle) * dRollMatrix(rollAngle));
-	//swivelMatrix1 = dPitchMatrix(m_swivelAngle) * dRollMatrix(rollAngle) * dYawMatrix(yawAngle) * swivelMatrix1;
+	ndMatrix localSwivel1(dGetIdentityMatrix());
+	localSwivel1.m_front = pin;
+	localSwivel1.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+	localSwivel1.m_right = (localSwivel1.m_front.CrossProduct(localSwivel1.m_up)).Normalize();
+	localSwivel1.m_up = localSwivel1.m_right.CrossProduct(localSwivel1.m_front);
+	swivelMatrix1 = dPitchMatrix(m_swivelAngle) * localSwivel1 * swivelMatrix1;
 
+//swivelMatrix1 = dPitchMatrix(30 * ndDegreeToRad) * swivelMatrix1;
 
 	swivelMatrix1.m_posit = midPoint;
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
