@@ -26,14 +26,19 @@
 
 #define D_USE_FORWARD_DYNAMICS
 
-class dAiBotTest1 : public ndModel
+class dAiBotTest_1 : public ndModel
 {
 	public:
-	D_CLASS_REFLECTION(dAiBotTest1);
+	D_CLASS_REFLECTION(dAiBotTest_1);
 
-	dAiBotTest1(ndDemoEntityManager* const scene, const ndMatrix& location)
+	dAiBotTest_1(ndDemoEntityManager* const scene, const ndMatrix& location)
 		:ndModel()
-		//,m_gravityDir(0.0f, -1.0f, 0.0f, 0.0f)
+		,m_basePosition(ndVector::m_wOne)
+		,m_x(0.0f)
+		,m_y(0.0f)
+		,m_z(0.0f)
+		,m_swivel(0.0f)
+		,m_rootBody(nullptr)
 		//,m_solver()
 		//,m_bodies()
 		//,m_effector(nullptr)
@@ -48,6 +53,7 @@ class dAiBotTest1 : public ndModel
 
 		ndPhysicsWorld* const world = scene->GetWorld();
 		ndBodyKinematic* const torso = AddSphere(scene, location, mass, radius, "smilli.tga");
+		m_rootBody = torso->GetAsBodyDynamic();
 
 		ndDemoEntity* const entity = (ndDemoEntity*) torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
@@ -55,7 +61,8 @@ class dAiBotTest1 : public ndModel
 		ndMatrix matrix(dRollMatrix(20.0f * ndDegreeToRad));
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
-		ndFloat32 angles[] = { 60.0f, 120.0f, 240.0f, 300.0f };
+		//ndFloat32 angles[] = { 60.0f, 120.0f, 240.0f, 300.0f };
+		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
 		for (ndInt32 i = 0; i < 4; i++)
 		{
@@ -102,18 +109,20 @@ class dAiBotTest1 : public ndModel
 			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
 			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, caff, torso);
-			m_effectors.PushBack(effector);
+			m_effectors[i] = effector;
 			world->AddJoint(effector);
 		}
+
+		m_basePosition = m_effectors[0]->GetPosition();
 	}
 
-	dAiBotTest1(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	dAiBotTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	{
 		dAssert(0);
 	}
 
-	~dAiBotTest1()
+	~dAiBotTest_1()
 	{
 	}
 
@@ -127,11 +136,11 @@ class dAiBotTest1 : public ndModel
 	{
 		for (ndInt32 i = 0; i < 4; i++)
 		{
-			ndJointBilateralConstraint* const effector = m_effectors[i];
-			effector->DebugJoint(context);
+			//ndJointBilateralConstraint* const effector = m_effectors[i];
+			//effector->DebugJoint(context);
 		}
 
-		//((ndJointBilateralConstraint*)m_effectors[1])->DebugJoint(context);
+		((ndJointBilateralConstraint*)m_effectors[0])->DebugJoint(context);
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -166,11 +175,53 @@ class dAiBotTest1 : public ndModel
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
+
+		ndVector posit(m_basePosition);
+		posit.m_x += m_x * 0.25f;
+		posit.m_y += m_y * 0.25f;
+		posit.m_z += m_z * 0.125f;
+		m_effectors[0]->SetPosition(posit);
+		m_effectors[0]->SetSwivelAngle(m_swivel * 45.0f * ndDegreeToRad);
 	}
+
+	void ApplyControls(ndDemoEntityManager* const scene)
+	{
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Control panel");
+
+		bool change = false;
+		ImGui::Text("position x");
+		change = change | ImGui::SliderFloat("##x", &m_x, -1.0f, 1.0f);
+		ImGui::Text("position y");
+		change = change | ImGui::SliderFloat("##y", &m_y, -1.0f, 1.0f);
+		ImGui::Text("position z");
+		change = change | ImGui::SliderFloat("##z", &m_z, -1.0f, 1.0f);
+
+		ImGui::Text("swivel");
+		change = change | ImGui::SliderFloat("##swivel", &m_swivel, -1.0f, 1.0f);
+		
+		if (change)
+		{
+			m_rootBody->SetSleepState(false);
+		}
+	}
+
+	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
+	{
+		dAiBotTest_1* const me = (dAiBotTest_1*)context;
+		me->ApplyControls(scene);
+	}
+
+	ndVector m_basePosition;
+	ndReal m_x;
+	ndReal m_y;
+	ndReal m_z;
+	ndReal m_swivel;
+	ndBodyDynamic* m_rootBody;
 
 	ndFixSizeArray<ndIkSwivelPositionEffector*, 4> m_effectors;
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest1);
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest_1);
 
 
 
@@ -474,12 +525,17 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
+	
+	dAiBotTest_1* const aiBot_1 = new dAiBotTest_1(scene, matrix);
+	scene->SetSelectedModel(aiBot_1);
+	world->AddModel(aiBot_1);
+	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
+
+	//ndBodyDynamic* const root = aiBot_1->m_rootBody;
+	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+
 
 	//dInvertedPendulum* const robot0 = new dInvertedPendulum(scene, matrix);
-	dAiBotTest1* const robot0 = new dAiBotTest1(scene, matrix);
-	scene->SetSelectedModel(robot0);
-	world->AddModel(robot0);
-	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
 	//dInvertedPendulum* const robot1 = new dInvertedPendulum(scene, robotEntity, matrix);

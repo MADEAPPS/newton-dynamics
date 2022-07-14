@@ -433,6 +433,12 @@ class dSimpleIndustrialRobot : public ndModel
 		}
 	}
 
+	static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
+	{
+		dSimpleIndustrialRobot* const me = (dSimpleIndustrialRobot*)context;
+		me->ApplyControls(scene);
+	}
+
 	ndBodyDynamic* m_rootBody;
 	ndJointSlider* m_leftGripper;
 	ndJointSlider* m_rightGripper;
@@ -450,12 +456,6 @@ class dSimpleIndustrialRobot : public ndModel
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dSimpleIndustrialRobot);
 
-static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
-{
-	dSimpleIndustrialRobot* const me = (dSimpleIndustrialRobot*)context;
-	me->ApplyControls(scene);
-}
-
 void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -472,7 +472,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
-	scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot);
+	scene->Set2DDisplayRenderFunction(dSimpleIndustrialRobot::RobotControlPanel, nullptr, robot);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
