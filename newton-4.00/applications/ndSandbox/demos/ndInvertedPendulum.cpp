@@ -140,7 +140,23 @@ class dAiBotTest_1 : public ndModel
 			//effector->DebugJoint(context);
 		}
 
+		ndMatrix swivelMatrix0;
+		ndMatrix swivelMatrix1;
+		m_effectors[0]->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+
+		ndVector posit1(swivelMatrix1.m_posit);
+		posit1.m_y += 1.0f;
+		context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 		((ndJointBilateralConstraint*)m_effectors[0])->DebugJoint(context);
+
+		swivelMatrix1 = dPitchMatrix(m_effectors[0]->GetSwivelAngle()) * swivelMatrix1;
+		const ndVector& pin = swivelMatrix1.m_front;
+		const ndFloat32 angle = m_effectors[0]->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+
+		ndMatrix xxxx0(swivelMatrix0 * swivelMatrix1.Inverse());
+		ndMatrix xxxx1(dGetIdentityMatrix());
+		ndFloat32 angle1 = m_effectors[0]->CalculateAngle(xxxx0[1], xxxx1[1], xxxx1[0]);
+		dTrace(("%f %f\n", angle * ndRadToDegree, angle1 * ndRadToDegree));
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
