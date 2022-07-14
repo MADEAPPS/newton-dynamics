@@ -81,7 +81,7 @@ class dAiBotTest_1 : public ndModel
 
 			// add calf
 			ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
-			limbLocation = dRollMatrix((-60.0f - 20.0f) * ndDegreeToRad) * limbLocation;
+			limbLocation = dRollMatrix((-80.0f - 20.0f) * ndDegreeToRad) * limbLocation;
 			caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
 
 			limbLocation.m_posit = caffPivot;
@@ -179,7 +179,7 @@ class dAiBotTest_1 : public ndModel
 		ndVector posit(m_basePosition);
 		posit.m_x += m_x * 0.25f;
 		posit.m_y += m_y * 0.25f;
-		posit.m_z += m_z * 0.125f;
+		posit.m_z += m_z * 0.2f;
 		m_effectors[0]->SetPosition(posit);
 		m_effectors[0]->SetSwivelAngle(m_swivel * 45.0f * ndDegreeToRad);
 	}
