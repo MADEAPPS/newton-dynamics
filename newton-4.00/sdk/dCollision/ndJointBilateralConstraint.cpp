@@ -183,9 +183,9 @@ void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCall
 	debugCallback.DrawFrame(matrix1);
 }
 
-ndFloat32 ndJointBilateralConstraint::CalculateAngle(const ndVector& dir, const ndVector& cosDir, const ndVector& sinDir) const
+ndFloat32 ndJointBilateralConstraint::CalculateAngle(const ndVector& pin, const ndVector& cosDir, const ndVector& sinDir) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
+	const ndVector dir(pin & ndVector::m_triplexMask);
 	ndVector projectDir(dir - sinDir * dir.DotProduct(sinDir));
 	ndFloat32 cosAngle = projectDir.DotProduct(cosDir).GetScalar();
 	ndFloat32 sinAngle = sinDir.DotProduct(projectDir.CrossProduct(cosDir)).GetScalar();
