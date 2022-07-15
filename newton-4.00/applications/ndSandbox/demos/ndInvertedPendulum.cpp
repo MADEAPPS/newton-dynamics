@@ -162,7 +162,6 @@ class dAiBotTest_1 : public ndModel
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
 			effector->DebugJoint(context);
-
 			ndMatrix swivelMatrix0;
 			ndMatrix swivelMatrix1;
 			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
@@ -171,16 +170,14 @@ class dAiBotTest_1 : public ndModel
 			posit1.m_y += 1.0f;
 			context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 			
-			ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-			const ndFloat32 angle2 = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-			
-			swivelMatrix1 = dPitchMatrix(info.m_effector->GetSwivelAngle()) * swivelMatrix1;
-			const ndFloat32 angle = info.m_effector->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
-			ndMatrix xxxx1(dGetIdentityMatrix());
-			ndMatrix xxxx0(swivelMatrix0 * swivelMatrix1.Inverse());
-			ndFloat32 angle1 = info.m_effector->CalculateAngle(xxxx0[1], xxxx1[1], xxxx1[0]);
-			
-			dTrace(("%f %f %f\n", angle * ndRadToDegree, angle1 * ndRadToDegree, angle2 * ndRadToDegree));
+			//ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+			//const ndFloat32 angle2 = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
+			//swivelMatrix1 = dPitchMatrix(info.m_effector->GetSwivelAngle()) * swivelMatrix1;
+			//const ndFloat32 angle = info.m_effector->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+			//ndMatrix xxxx1(dGetIdentityMatrix());
+			//ndMatrix xxxx0(swivelMatrix0 * swivelMatrix1.Inverse());
+			//ndFloat32 angle1 = info.m_effector->CalculateAngle(xxxx0[1], xxxx1[1], xxxx1[0]);
+			//dTrace(("%f %f %f\n", angle * ndRadToDegree, angle1 * ndRadToDegree, angle2 * ndRadToDegree));
 		}
 	}
 
