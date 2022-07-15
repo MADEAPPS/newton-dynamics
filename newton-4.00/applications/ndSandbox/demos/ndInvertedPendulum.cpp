@@ -204,7 +204,7 @@ class dAiBotTest_1 : public ndModel
 		ndMatrix swivelMatrix0;
 		ndMatrix swivelMatrix1;
 		m_effectors[0]->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-		ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+		ndVector upVector(m_rootBody->GetMatrix().m_up);
 		const ndFloat32 angle = m_effectors[0]->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
 		m_effectors[0]->SetSwivelAngle(m_swivel - angle);
 #else
