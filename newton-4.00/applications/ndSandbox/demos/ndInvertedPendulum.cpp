@@ -89,6 +89,7 @@ class dAiBotTest_1 : public ndModel
 		//ndFloat32 angles[] = { 60.0f, 120.0f, 240.0f, 300.0f };
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
+		const ndVector upDir(location.m_up);
 		for (ndInt32 i = 0; i < 4; i++)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
@@ -129,7 +130,8 @@ class dAiBotTest_1 : public ndModel
 			effectorToeFrame.m_posit = effectorToePosit;
 			effectorSwivelFrame.m_posit = thighPivot;
 			effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
-			effectorSwivelFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			//effectorSwivelFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			effectorSwivelFrame.m_up = upDir;
 			effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
 			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
