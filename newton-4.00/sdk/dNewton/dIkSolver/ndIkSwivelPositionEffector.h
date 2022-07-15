@@ -47,9 +47,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-	D_NEWTON_API void SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API void CalculateSwivelMatrices(const ndVector& effectorPivot, const ndVector& refPivot, ndMatrix& swivelMatrix0, ndMatrix& swivelMatrix1) const;
+	D_NEWTON_API void SubmitLinearAxis(ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitAngularAxis(ndConstraintDescritor& desc);
 	
 	ndMatrix m_targetFrame;
 	ndMatrix m_localSwivelMatrix0;
