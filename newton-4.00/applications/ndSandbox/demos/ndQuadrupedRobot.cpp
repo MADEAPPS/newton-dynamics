@@ -79,6 +79,9 @@ class dQuadrupedRobot : public ndModel
 		dEffectorInfo(ndIkSwivelPositionEffector* const effector)
 			:m_effector(effector)
 		{
+			//m_footOnGround = 0;
+			//m_swayAmp = swayAmp;
+			//m_walkPhase = definition.m_walkPhase;
 		}
 
 		ndIkSwivelPositionEffector* m_effector;
@@ -262,6 +265,7 @@ class dQuadrupedRobot : public ndModel
 			stack++;
 		}
 
+		const ndVector frontSwivelDir(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
 		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		while (stack) 
 		{
@@ -310,42 +314,16 @@ class dQuadrupedRobot : public ndModel
 						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
 						const ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
 
-						//ndShapeInstance sphere(new ndShapeSphere(0.05f));
-						//sphere.SetCollisionMode(false);
-						//
-						//ndBodyDynamic* const childBody = new ndBodyDynamic();
-						//childBody->SetMatrix(effectorFrame);
-						//childBody->SetCollisionShape(sphere);
-						//childBody->SetMassMatrix(1.0f / parentBody->GetInvMass(), sphere);
-						//childBody->SetNotifyCallback(new ndDemoEntityNotify(scene, nullptr, parentBody));
-						//m_bodyArray.PushBack(childBody);
+						ndMatrix swivelFrame(dGetIdentityMatrix());
+						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
+						swivelFrame.m_up = frontSwivelDir;
+						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
+						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
-						ndMatrix bootFrame;
-						bootFrame.m_front = pivotFrame.m_up;
-						bootFrame.m_up = pivotFrame.m_right;
-						bootFrame.m_right = bootFrame.m_front.CrossProduct(bootFrame.m_up);
-						bootFrame.m_posit = effectorFrame.m_posit;
-
-						//ndJointDoubleHinge* const bootJoint = new ndIkJointDoubleHinge(bootFrame, childBody, parentBody);
-						//bootJoint->SetLimits0(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						//bootJoint->SetLimits1(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						//
-						//// add body to the world
-						//scene->GetWorld()->AddBody(childBody);
-						//scene->GetWorld()->AddJoint(bootJoint);
-						//ndVector legSide(m_rootBody->GetMatrix().UntransformVector(pivotFrame.m_posit));
-						//ndFloat32 swayAmp(0.8f * legSide.m_y);
-						
-
-						ndFloat32 regularizer = 0.001;
-						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, bootFrame, parentBody, m_rootBody);
-						//effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+						ndFloat32 regularizer = 0.001f;
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
 						effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
-
-						//info.m_footOnGround = 0;
-						//info.m_swayAmp = swayAmp;
-						//info.m_walkPhase = definition.m_walkPhase;
 
 						world->AddJoint(effector);
 						m_limbs.PushBack(dEffectorInfo(effector));

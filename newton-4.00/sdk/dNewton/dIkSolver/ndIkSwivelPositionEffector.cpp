@@ -192,7 +192,7 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 	swivelMatrix1 = dPitchMatrix(m_swivelAngle) * swivelMatrix1;
 	
-	//debugCallback.DrawFrame(swivelMatrix0);
+	debugCallback.DrawFrame(swivelMatrix0);
 	debugCallback.DrawFrame(swivelMatrix1);
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 	
@@ -211,6 +211,12 @@ void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc)
 
 	const ndVector& pin = swivelMatrix1.m_front;
 	const ndFloat32 angle = CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+	ndFloat32 xxxx = pin.DotProduct(swivelMatrix0[1]).GetScalar();
+	if (xxxx > 0.9f)
+	{
+		xxxx *= 1;
+	}
+
 
 	AddAngularRowJacobian(desc, pin, angle);
 	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
@@ -226,7 +232,6 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc)
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 	
-#if 1
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		const ndVector pin = axisDir[i];
@@ -235,34 +240,6 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc)
 		SetLowerFriction(desc, -m_linearMaxForce);
 		SetHighFriction(desc, m_linearMaxForce);
 	}
-#else
-
-	const ndBodyKinematic* const body0 = GetBody0();
-	const ndBodyKinematic* const body1 = GetBody1();
-
-	const ndVector omega0(body0->GetOmega());
-	const ndVector omega1(body1->GetOmega());
-	const ndVector veloc0 (body0->GetVelocity());
-	const ndVector veloc1 (body1->GetVelocity());
-
-	for (ndInt32 i = 0; i < 3; ++i)
-	{
-		if (m_controlDofOptions & (1 << i))
-		{
-			const ndVector pin = axisDir[i];
-			AddLinearRowJacobian(desc, posit0, posit1, pin);
-			const ndInt32 index = desc.m_rowsCount - 1;
-			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
-			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
-			const ndFloat32 relPosit = (jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
-			const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-			const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
-			SetMotorAcceleration(desc, accel);
-			SetLowerFriction(desc, -m_linearMaxForce);
-			SetHighFriction(desc, m_linearMaxForce);
-		}
-	}
-#endif
 }
 
 void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)

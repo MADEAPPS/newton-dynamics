@@ -124,13 +124,11 @@ class dAiBotTest_1 : public ndModel
 
 			ndMatrix effectorToeFrame(dGetIdentityMatrix());
 			ndMatrix effectorRefFrame(dGetIdentityMatrix());
-			ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
-
 			effectorRefFrame.m_posit = thighPivot;
 			effectorToeFrame.m_posit = effectorToePosit;
-			effectorSwivelFrame.m_posit = thighPivot;
+
+			ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
 			effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
-			//effectorSwivelFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 			effectorSwivelFrame.m_up = upDir;
 			effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
 			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
