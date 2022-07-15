@@ -31,14 +31,39 @@ class dAiBotTest_1 : public ndModel
 	public:
 	D_CLASS_REFLECTION(dAiBotTest_1);
 
+	class ndEffectorInfo
+	{
+		public:
+		ndEffectorInfo()
+			:m_basePosition(ndVector::m_wOne)
+			,m_effector(nullptr)
+			,m_swivel(0.0f)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_z(0.0f)
+		{
+		}
+
+		ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
+			:m_basePosition(effector->GetPosition())
+			,m_effector(effector)
+			,m_swivel(0.0f)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_z(0.0f)
+		{
+		}
+
+		ndVector m_basePosition;
+		ndIkSwivelPositionEffector* m_effector;
+		ndReal m_swivel;
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_z;
+	};
+	
 	dAiBotTest_1(ndDemoEntityManager* const scene, const ndMatrix& location)
 		:ndModel()
-		,m_basePosition(ndVector::m_wOne)
-		,m_x(0.0f)
-		,m_y(0.0f)
-		,m_z(0.0f)
-		,m_swivel(0.0f)
-		,m_rootBody(nullptr)
 		//,m_solver()
 		//,m_bodies()
 		//,m_effector(nullptr)
@@ -109,11 +134,9 @@ class dAiBotTest_1 : public ndModel
 			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
 			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, caff, torso);
-			m_effectors[i] = effector;
 			world->AddJoint(effector);
+			m_effectors.PushBack(ndEffectorInfo(effector));
 		}
-
-		m_basePosition = m_effectors[0]->GetPosition();
 	}
 
 	dAiBotTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -122,7 +145,7 @@ class dAiBotTest_1 : public ndModel
 		dAssert(0);
 	}
 
-	~dAiBotTest_1()
+	~dAiBotTest_1()	
 	{
 	}
 
@@ -136,29 +159,29 @@ class dAiBotTest_1 : public ndModel
 	{
 		for (ndInt32 i = 0; i < 4; i++)
 		{
-			//ndJointBilateralConstraint* const effector = m_effectors[i];
-			//effector->DebugJoint(context);
+			const ndEffectorInfo& info = m_effectors[i];
+			ndJointBilateralConstraint* const effector = info.m_effector;
+			effector->DebugJoint(context);
+
+			ndMatrix swivelMatrix0;
+			ndMatrix swivelMatrix1;
+			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+			
+			ndVector posit1(swivelMatrix1.m_posit);
+			posit1.m_y += 1.0f;
+			context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+			
+			ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+			const ndFloat32 angle2 = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
+			
+			swivelMatrix1 = dPitchMatrix(info.m_effector->GetSwivelAngle()) * swivelMatrix1;
+			const ndFloat32 angle = info.m_effector->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+			ndMatrix xxxx1(dGetIdentityMatrix());
+			ndMatrix xxxx0(swivelMatrix0 * swivelMatrix1.Inverse());
+			ndFloat32 angle1 = info.m_effector->CalculateAngle(xxxx0[1], xxxx1[1], xxxx1[0]);
+			
+			dTrace(("%f %f %f\n", angle * ndRadToDegree, angle1 * ndRadToDegree, angle2 * ndRadToDegree));
 		}
-
-		ndMatrix swivelMatrix0;
-		ndMatrix swivelMatrix1;
-		m_effectors[0]->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-
-		ndVector posit1(swivelMatrix1.m_posit);
-		posit1.m_y += 1.0f;
-		context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
-		((ndJointBilateralConstraint*)m_effectors[0])->DebugJoint(context);
-
-		ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-		const ndFloat32 angle2 = m_effectors[0]->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-
-		swivelMatrix1 = dPitchMatrix(m_effectors[0]->GetSwivelAngle()) * swivelMatrix1;
-		const ndFloat32 angle = m_effectors[0]->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
-		ndMatrix xxxx1(dGetIdentityMatrix());
-		ndMatrix xxxx0(swivelMatrix0 * swivelMatrix1.Inverse());
-		ndFloat32 angle1 = m_effectors[0]->CalculateAngle(xxxx0[1], xxxx1[1], xxxx1[0]);
-		
-		dTrace(("%f %f %f\n", angle * ndRadToDegree, angle1 * ndRadToDegree, angle2 * ndRadToDegree));
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -194,22 +217,26 @@ class dAiBotTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		ndVector posit(m_basePosition);
-		posit.m_x += m_x * 0.25f;
-		posit.m_y += m_y * 0.25f;
-		posit.m_z += m_z * 0.2f;
-		m_effectors[0]->SetPosition(posit);
-
-#if 1
-		ndMatrix swivelMatrix0;
-		ndMatrix swivelMatrix1;
-		m_effectors[0]->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 		ndVector upVector(m_rootBody->GetMatrix().m_up);
-		const ndFloat32 angle = m_effectors[0]->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-		m_effectors[0]->SetSwivelAngle(m_swivel - angle);
-#else
-		m_effectors[0]->SetSwivelAngle(m_swivel);
-#endif
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
+		{
+			ndEffectorInfo& info = m_effectors[i];
+			ndVector posit(info.m_basePosition);
+			posit.m_x += info.m_x * 0.25f;
+			posit.m_y += info.m_y * 0.25f;
+			posit.m_z += info.m_z * 0.2f;
+			info.m_effector->SetPosition(posit);
+
+			#if 1
+			ndMatrix swivelMatrix0;
+			ndMatrix swivelMatrix1;
+			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+			const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
+			info.m_effector->SetSwivelAngle(info.m_swivel - angle);
+			#else
+			info.m_effector->SetSwivelAngle(info.m_swivel);
+			#endif
+		}
 	}
 
 	void ApplyControls(ndDemoEntityManager* const scene)
@@ -217,20 +244,30 @@ class dAiBotTest_1 : public ndModel
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Control panel");
 
+		ndEffectorInfo& info = m_effectors[0];
+
 		bool change = false;
 		ImGui::Text("position x");
-		change = change | ImGui::SliderFloat("##x", &m_x, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
 		ImGui::Text("position y");
-		change = change | ImGui::SliderFloat("##y", &m_y, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
 		ImGui::Text("position z");
-		change = change | ImGui::SliderFloat("##z", &m_z, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
 
 		ImGui::Text("swivel");
-		change = change | ImGui::SliderFloat("##swivel", &m_swivel, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
 		
 		if (change)
 		{
 			m_rootBody->SetSleepState(false);
+
+			for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
+			{
+				m_effectors[i].m_x = info.m_x;
+				m_effectors[i].m_y = info.m_y;
+				m_effectors[i].m_z = info.m_z;
+				m_effectors[i].m_swivel = info.m_swivel;
+			}
 		}
 	}
 
@@ -239,15 +276,9 @@ class dAiBotTest_1 : public ndModel
 		dAiBotTest_1* const me = (dAiBotTest_1*)context;
 		me->ApplyControls(scene);
 	}
-
-	ndVector m_basePosition;
-	ndReal m_x;
-	ndReal m_y;
-	ndReal m_z;
-	ndReal m_swivel;
+	
 	ndBodyDynamic* m_rootBody;
-
-	ndFixSizeArray<ndIkSwivelPositionEffector*, 4> m_effectors;
+	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest_1);
 
