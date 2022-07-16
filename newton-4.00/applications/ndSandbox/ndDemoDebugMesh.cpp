@@ -46,7 +46,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 			
 			ndVector normal((p1 - p0).CrossProduct(p2 - p0));
 			normal = normal.Normalize();
-			for (ndInt32 i = 2; i < vertexCount; i++)
+			for (ndInt32 i = 2; i < vertexCount; ++i)
 			{
 				glPositionNormal point;
 				point.m_posit.m_x = GLfloat(faceVertex[0].m_x);
@@ -193,7 +193,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const edgeType)
 		{
 			ndInt32 i0 = vertexCount - 1;
-			for (ndInt32 i = 0; i < vertexCount; i++)
+			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
 				if (edgeType[i0] == m_edgeType)
 				{

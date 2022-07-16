@@ -338,7 +338,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 					bytesRead = fread(&byteRate, sizeof(ndInt32), 1, wave);
 					bytesRead = fread(&blockAlign, sizeof(short), 1, wave);
 					bytesRead = fread(&bitsPerSample, sizeof(short), 1, wave);
-					for (ndInt32 i = 0; i < (chunkSize - 16); i++)
+					for (ndInt32 i = 0; i < (chunkSize - 16); ++i)
 					{
 						bytesRead = fread(xbuffer, sizeof(char), 1, wave);
 					}

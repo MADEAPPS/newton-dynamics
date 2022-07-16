@@ -55,8 +55,8 @@
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-#define DEFAULT_SCENE	19		// inverted pendulum
-//#define DEFAULT_SCENE	20		// quadruped robot
+//#define DEFAULT_SCENE	19		// inverted pendulum
+#define DEFAULT_SCENE	20		// quadruped robot
 //#define DEFAULT_SCENE	21		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture
 //#define DEFAULT_SCENE	22		// linked voronoi fracture
@@ -150,14 +150,14 @@ void Test0__()
 	ndFloat32 B[6];
 
 	dCovarianceMatrix<ndFloat32>(6, &A[0][0], x, x);
-	for (ndInt32 i = 0; i < 6; i++)
+	for (ndInt32 i = 0; i < 6; ++i)
 	{
 		A[i][i] *= 1.1f;
 	}
 	dAssert(dTestPSDmatrix(6, 6, &A[0][0]));
 
 	dMatrixTimeVector<ndFloat32>(6, &A[0][0], x, B);
-	for (ndInt32 i = 0; i < 6; i++)
+	for (ndInt32 i = 0; i < 6; ++i)
 	{
 		x[i] = 0;
 	}
@@ -572,7 +572,7 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 {
 	ndInt32 axisCount = 0;
-	for (ndInt32 i = 0; i < axisValues.GetCapacity(); i++)
+	for (ndInt32 i = 0; i < axisValues.GetCapacity(); ++i)
 	{
 		axisValues[i] = ndFloat32(0.0f);
 	}

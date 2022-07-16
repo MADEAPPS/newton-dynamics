@@ -38,7 +38,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 				if (ndAbs(dist) < ndFloat32(1.0e-4f)) 
 				{
 					ndInt32 pointCount = 0;
-					for (ndInt32 i = 0; i < m_count; i++)
+					for (ndInt32 i = 0; i < m_count; ++i)
 					{
 						for (ndInt32 j = 0; j < plane.m_count; j++)
 						{
@@ -85,14 +85,14 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;
 		dAssert(vertexCount <= face.m_polygon.GetCapacity());
-		for (ndInt32 i = 0; i < vertexCount; i++)
+		for (ndInt32 i = 0; i < vertexCount; ++i)
 		{
 			face.m_polygon[i] = faceArray[i];
 		}
 
 		ndVector normal(ndVector::m_zero);
 		ndVector edge0(faceArray[1] - faceArray[0]);
-		for (ndInt32 i = 2; i < vertexCount; i++)
+		for (ndInt32 i = 2; i < vertexCount; ++i)
 		{
 			ndVector edge1(faceArray[i] - faceArray[0]);
 			normal += edge0.CrossProduct(edge1);
@@ -111,7 +111,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 		ndFaceArrayDatabase siblingDataBase(-1.0f);
 		shape->DebugShape(dGetIdentityMatrix(), siblingDataBase);
 
-		for (ndInt32 i = 0; i < m_count; i++)
+		for (ndInt32 i = 0; i < m_count; ++i)
 		{
 			const ndFaceInfo& face0 = m_polygons[i];
 
@@ -424,7 +424,7 @@ else
 
 	// create all the joints
 	const ndArray<ndConvexFractureRootEntity::JointPair>& jointConnection = rootEntity->m_jointConnection;
-	for (ndInt32 i = 0; i < jointConnection.GetCount(); i++)
+	for (ndInt32 i = 0; i < jointConnection.GetCount(); ++i)
 	{
 		bool test = false;
 		test = test || ((jointConnection[i].m_m0 == 0) && (jointConnection[i].m_m1 == 1));

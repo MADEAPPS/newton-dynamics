@@ -461,7 +461,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
+		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
 		{
 			m_gearMap[i] = i + 2;
 		}
@@ -643,7 +643,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
+		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
 		{
 			m_gearMap[i] = i + 2;
 		}
@@ -822,7 +822,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
+		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
 		{
 			m_gearMap[i] = i + 2;
 		}

@@ -203,7 +203,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
-			for (ndInt32 i = 0; i < definitionCount; i++) 
+			for (ndInt32 i = 0; i < definitionCount; ++i) 
 			{
 				const dActiveJointDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
@@ -331,13 +331,13 @@ class ndActiveRagdollModel : public ndCharacter
 	void SetModelMass(ndFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const ndFloat32* const massWeight) const
 	{
 		ndFloat32 volume = 0.0f;
-		for (ndInt32 i = 0; i < bodyCount; i++) 
+		for (ndInt32 i = 0; i < bodyCount; ++i) 
 		{
 			volume += bodyArray[i]->GetCollisionShape().GetVolume() * massWeight[i];
 		}
 		ndFloat32 density = mass / volume;
 
-		for (ndInt32 i = 0; i < bodyCount; i++) 
+		for (ndInt32 i = 0; i < bodyCount; ++i) 
 		{
 			ndBodyDynamic* const body = bodyArray[i];
 			ndFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
@@ -410,7 +410,7 @@ class ndActiveRagdollModel : public ndCharacter
 		////m_animBlendTree->Evaluate(m_output, timestep);
 		//m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
 		////m_animBlendTree->Evaluate(m_output, 0.0f);
-		//for (ndInt32 i = 0; i < m_output.GetCount(); i++)
+		//for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
 		//{
 		//	const ndAnimKeyframe& keyFrame = m_output[i];
 		//	ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;

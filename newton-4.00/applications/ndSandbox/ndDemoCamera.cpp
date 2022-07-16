@@ -161,7 +161,7 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 	GLdouble objz;
 	GLdouble modelViewMatrix[16];
 	GLdouble projectionViewMatrix[16];
-	for (ndInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		for (ndInt32 j = 0; j < 4; j++)
 		{

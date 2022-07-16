@@ -169,7 +169,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
 		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
@@ -251,7 +251,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	meshNode->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 	meshNode->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
 		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
@@ -545,7 +545,7 @@ void ndDemoMesh::GetVertexArray(ndArray<ndVector>& points) const
 
 	points.Resize(m_vertexCount);
 	points.SetCount(m_vertexCount);
-	for (ndInt32 i = 0; i < m_vertexCount; i++)
+	for (ndInt32 i = 0; i < m_vertexCount; ++i)
 	{
 		points[i] = ndVector(data[i].m_posit.m_x, data[i].m_posit.m_y, data[i].m_posit.m_z, ndFloat32 (0.0f));
 	}
@@ -561,7 +561,7 @@ void ndDemoMesh::GetIndexArray(ndArray<ndInt32>& indexList) const
 
 	indexList.Resize(m_indexCount);
 	indexList.SetCount(m_indexCount);
-	for (ndInt32 i = 0; i < m_indexCount; i++)
+	for (ndInt32 i = 0; i < m_indexCount; ++i)
 	{
 		indexList[i] = data[i];
 	}

@@ -595,7 +595,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 				ndVector(radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
 			};
 
-			for (ndInt32 i = 0; i < positions.GetCount(); i++)
+			for (ndInt32 i = 0; i < positions.GetCount(); ++i)
 			{
 				const ndVector p(viewMatrix.TransformVector(positions[i]));
 

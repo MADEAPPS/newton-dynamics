@@ -77,7 +77,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 //{
 //	ndVector points[1024];
 //	ndInt32 count = 0;
-//	for (ndInt32 i = 0; i < segments; i++)
+//	for (ndInt32 i = 0; i < segments; ++i)
 //	{
 //		ndFloat32 y = 0.7f * dCos((ndFloat32(2.0f) * dPi) * i / segments);
 //		ndFloat32 z = 0.7f * dSin((ndFloat32(2.0f) * dPi) * i / segments);
@@ -111,7 +111,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 	{
 		for (ndInt32 k = 0; k < count; k++)
 		{
-			for (ndInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; ++i)
 			{
 				ndVector posit(step * (i - count/2), step * j, step * (k - count / 2), 0.0f);
 				ndQuaternion rotation(ndGaussianRandom(0.0f, 1.0f), ndGaussianRandom(0.0f, 1.0f), ndGaussianRandom(0.0f, 1.0f), ndGaussianRandom(0.0f, 1.0f) + 0.1f);

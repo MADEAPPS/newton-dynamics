@@ -63,7 +63,7 @@ void ndDemoSplinePathMesh::SetRenderResolution(ndInt32 breaks)
 
 		ndFloat64 scale = 1.0f / m_renderResolution;
 		ndArray<glVector3> points(m_renderResolution + 1);
-		for (ndInt32 i = 0; i < m_renderResolution; i++)
+		for (ndInt32 i = 0; i < m_renderResolution; ++i)
 		{
 			ndBigVector p(m_curve.CurvePoint(i * scale));
 			points.PushBack(glVector3(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z)));
@@ -110,7 +110,7 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const ndMatr
 		//glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
 		//ndFloat64 scale = 1.0f / m_renderResolution;
 		//ndBigVector p0(m_curve.CurvePoint(0.0f));
-		//for (ndInt32 i = 1; i <= m_renderResolution; i++)
+		//for (ndInt32 i = 1; i <= m_renderResolution; ++i)
 		//{
 		//	ndBigVector p1(m_curve.CurvePoint(i * scale));
 		//	m_line[0].m_x = GLfloat(p0.m_x);

@@ -170,7 +170,7 @@ class ndRagdollModel : public ndModel
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
-			for (ndInt32 i = 0; definition[i].m_boneName[0]; i++)
+			for (ndInt32 i = 0; definition[i].m_boneName[0]; ++i)
 			{
 				if (!strcmp(definition[i].m_boneName, name))
 				{
@@ -194,7 +194,7 @@ class ndRagdollModel : public ndModel
 		
 		SetModelMass(100.0f);
 		
-		//for (ndInt32 i = 0; i < m_bodies.GetCount(); i++)
+		//for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 		//{
 		//	ndDemoEntity* ent = (ndDemoEntity*)m_bodies[i]->GetNotifyCallback()->GetUserData();
 		//	if (ent->GetName() == "mixamorig:Neck") 
@@ -234,13 +234,13 @@ class ndRagdollModel : public ndModel
 	void SetModelMass(ndFloat32 mass) const
 	{
 		ndFloat32 volume = 0.0f;
-		for (int i = 0; i < m_bodies.GetCount(); i++) 
+		for (int i = 0; i < m_bodies.GetCount(); ++i) 
 		{
 			volume += m_bodies[i]->GetCollisionShape().GetVolume();
 		}
 		ndFloat32 density = mass / volume;
 
-		for (ndInt32 i = 0; i < m_bodies.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 		{
 			ndBodyDynamic* const body = m_bodies[i];
 			ndFloat32 normalMass = density * body->GetCollisionShape().GetVolume();

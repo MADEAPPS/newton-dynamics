@@ -177,8 +177,8 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
+	debugCallback.DrawFrame(matrix0, 0.5f);
 
 	const ndInt32 subdiv = 8;
 	const ndFloat32 radius = debugCallback.m_debugScale;

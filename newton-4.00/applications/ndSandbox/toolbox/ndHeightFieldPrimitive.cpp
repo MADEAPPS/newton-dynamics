@@ -122,7 +122,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		}
 
 		ndFloat32 uvScale = 1.0f / 32.0f;
-		for (ndInt32 i = 0; i < points.GetCount(); i++)
+		for (ndInt32 i = 0; i < points.GetCount(); ++i)
 		{
 			ndVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, ndFloat32(0.0f));
 			normal = normal.Normalize();
@@ -158,7 +158,7 @@ static void MakeNoiseHeightfield(ndArray<ndVector>& heightfield)
 
 	ndFloat32 highScale = D_TERRAIN_ELEVATION_SCALE;
 	ndFloat32 scale = ndFloat32(2.0f) / (maxHight - minHeight);
-	for (ndInt32 i = 0; i < heightfield.GetCapacity(); i++)
+	for (ndInt32 i = 0; i < heightfield.GetCapacity(); ++i)
 	{
 		ndFloat32 y = heightfield[i].m_y;
 		y = scale * (y - minHeight) - ndFloat32(1.0f);
@@ -187,7 +187,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	ndArray<ndReal>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
-	for (int i = 0; i < heightfield.GetCount(); i++)
+	for (int i = 0; i < heightfield.GetCount(); ++i)
 	{
 		ndFloat32 high = heightfield[i].m_y;
 		hightMap[i] = ndReal(high);
@@ -222,7 +222,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	ndArray<ndReal>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
-	for (int i = 0; i < heightfield.GetCount(); i++)
+	for (int i = 0; i < heightfield.GetCount(); ++i)
 	{
 		ndFloat32 high = heightfield[i].m_y;
 		hightMap[i] = ndReal(high);

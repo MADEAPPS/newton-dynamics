@@ -81,7 +81,7 @@ ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetTorque(ndFloat32 omegaInR
 	const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
 	omegaInRadPerSeconds = ndClamp(omegaInRadPerSeconds, ndFloat32(0.0f), m_torqueCurve[maxIndex - 1].m_radPerSeconds);
 
-	for (ndInt32 i = 1; i < maxIndex; i++)
+	for (ndInt32 i = 1; i < maxIndex; ++i)
 	{
 		if (omegaInRadPerSeconds <= m_torqueCurve[i].m_radPerSeconds)
 		{
@@ -222,7 +222,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 
 		if (vehiclesCount > 1)
 		{
-			for (ndInt32 i = 0; i < vehiclesCount; i++)
+			for (ndInt32 i = 0; i < vehiclesCount; ++i)
 			{
 				if (vehicleArray[i]->IsPlayer())
 				{
@@ -292,7 +292,7 @@ void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, ndFloat
 
 	ndVector minVal(1.0e10f);
 	ndVector maxVal(-1.0e10f);
-	for (ndInt32 i = 0; i < temp.GetCount(); i++)
+	for (ndInt32 i = 0; i < temp.GetCount(); ++i)
 	{
 		ndVector p(matrix.TransformVector(temp[i]));
 		minVal = minVal.GetMin(p);

@@ -73,18 +73,37 @@ class dQuadrupedRobot : public ndModel
 	{
 		public:
 		dEffectorInfo()
+			:m_basePosition(ndVector::m_wOne)
+			,m_effector(nullptr)
+			,m_swivel(0.0f)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_z(0.0f)
 		{
 		}
 
 		dEffectorInfo(ndIkSwivelPositionEffector* const effector)
-			:m_effector(effector)
+			:m_basePosition(effector->GetPosition())
+			,m_effector(effector)
+			,m_swivel(0.0f)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_z(0.0f)
+
 		{
 			//m_footOnGround = 0;
 			//m_swayAmp = swayAmp;
 			//m_walkPhase = definition.m_walkPhase;
 		}
 
+
+		ndVector m_basePosition;
 		ndIkSwivelPositionEffector* m_effector;
+		ndReal m_swivel;
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_z;
+
 		//ndIk6DofEffector* m_effector;
 		//ndFloat32 m_walkPhase;
 		//ndFloat32 m_swayAmp;
@@ -229,7 +248,7 @@ class dQuadrupedRobot : public ndModel
 		,m_rootBody(nullptr)
 		,m_walkCycle(nullptr)
 		,m_balanceController(nullptr)
-		,m_limbs()
+		,m_effectors()
 		,m_bodyArray()
 		,m_jointArray()
 		,m_walkParam(0.0f)
@@ -326,7 +345,7 @@ class dQuadrupedRobot : public ndModel
 						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
 
 						world->AddJoint(effector);
-						m_limbs.PushBack(dEffectorInfo(effector));
+						m_effectors.PushBack(dEffectorInfo(effector));
 					}
 					break;
 				}
@@ -346,7 +365,7 @@ class dQuadrupedRobot : public ndModel
 	dQuadrupedRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
-		,m_limbs()
+		,m_effectors()
 		,m_walkParam(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
@@ -394,9 +413,9 @@ class dQuadrupedRobot : public ndModel
 		//{
 		//	delete m_balanceController;
 		//}
-		//for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		//{
-		//	ndIk6DofEffector* const effector = m_limbs[i].m_effector;
+		//	ndIk6DofEffector* const effector = m_effectors[i].m_effector;
 		//	if (!effector->IsInWorld())
 		//	{
 		//		delete effector;
@@ -457,19 +476,19 @@ class dQuadrupedRobot : public ndModel
 	{
 		// create a procedural walk cycle
 		dQuadrupedWalkSequence* const walk = new dQuadrupedWalkSequence();
-		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
-			walk->AddTrack(m_limbs[i]);
+			walk->AddTrack(m_effectors[i]);
 		}
 
 		// build the pose tree blender, for now just the walk
 		m_walkCycle = new ndAnimationSequencePlayer(walk);
 
 		// bind animation tree to key frame pose
-		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = m_limbs[i].m_effector;
+			keyFrame.m_userData = m_effectors[i].m_effector;
 			m_output.PushBack(keyFrame);
 		}
 
@@ -504,19 +523,27 @@ class dQuadrupedRobot : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-
-		//ndFixSizeArray<ndVector , 4> supportPolygon;
-		////ndFixSizeArray<ndJointBilateralConstraint*, 4> sockets;
-		//
-		for (ndInt32 i = 0; i < m_limbs.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
-			ndJointBilateralConstraint* const joint = m_limbs[i].m_effector;
+			const dEffectorInfo& info = m_effectors[i];
+			ndJointBilateralConstraint* const joint = info.m_effector;
 			joint->DebugJoint(context);
-			//if (m_limbs[i].m_footOnGround)
+
+			//ndMatrix swivelMatrix0;
+			//ndMatrix swivelMatrix1;
+			//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+
+			//ndVector posit1(swivelMatrix1.m_posit);
+			//posit1.m_y += 1.0f;
+			//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+
+
+			//if (m_effectors[i].m_footOnGround)
 			//{
 			//	const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
 			//	supportPolygon.PushBack(posit);
-			//	//sockets.PushBack(m_limbs[i].m_hipSocket);
+			//	//sockets.PushBack(m_effectors[i].m_hipSocket);
 			//}
 		}
 		
@@ -581,35 +608,53 @@ class dQuadrupedRobot : public ndModel
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Control panel");
 
-		bool change = false;
-		//ImGui::Text("ik solver passes");
+		dEffectorInfo& info = m_effectors[0];
 
-		//ImGui::Text("position x");
-		//change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
-		//ImGui::Text("position y");
-		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
-		//ImGui::Text("azimuth");
-		//change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
-		//
-		//ImGui::Text("gripper");
-		//change = change | ImGui::SliderFloat("##gripperPosit", &m_gripperPosit, -0.2f, 0.03f);
-		//
-		//ImGui::Text("pitch");
-		//change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
-		//ImGui::Text("yaw");
-		//change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
-		//ImGui::Text("roll");
-		//change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
+		bool change = false;
+		ImGui::Text("position x");
+		change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
+		ImGui::Text("position y");
+		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+		ImGui::Text("position z");
+		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+
+		ImGui::Text("swivel");
+		change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
 
 		if (change)
 		{
 			m_rootBody->SetSleepState(false);
+
+			for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
+			{
+				m_effectors[i].m_x = info.m_x;
+				m_effectors[i].m_y = info.m_y;
+				m_effectors[i].m_z = info.m_z;
+				m_effectors[i].m_swivel = info.m_swivel;
+			}
 		}
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::Update(world, timestep);
+
+		const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale (-1.0f));
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		{
+			dEffectorInfo& info = m_effectors[i];
+			ndVector posit(info.m_basePosition);
+			posit.m_x += info.m_x * 0.25f;
+			posit.m_y += info.m_y * 0.25f;
+			posit.m_z += info.m_z * 0.2f;
+			info.m_effector->SetPosition(posit);
+
+			ndMatrix swivelMatrix0;
+			ndMatrix swivelMatrix1;
+			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+			const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
+			info.m_effector->SetSwivelAngle(info.m_swivel - angle);
+		}
 
 		//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		//dAssert(skeleton);
@@ -627,7 +672,7 @@ class dQuadrupedRobot : public ndModel
 		//	dQuadrupedWalkSequence* const sequence = (dQuadrupedWalkSequence*)m_walkCycle->GetSequence();
 		//	for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
 		//	{
-		//		m_limbs[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
+		//		m_effectors[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
 		//	}
 		//	
 		//	m_balanceController->m_world = world;
@@ -636,12 +681,11 @@ class dQuadrupedRobot : public ndModel
 		//}
 	}
 
-	static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
+	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
 	{
 		dQuadrupedRobot* const me = (dQuadrupedRobot*)context;
 		me->ApplyControls(scene);
 	}
-
 
 	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
@@ -649,7 +693,7 @@ class dQuadrupedRobot : public ndModel
 	dQuadrupedBalanceController* m_balanceController;
 	
 	ndAnimationPose m_output;
-	ndFixSizeArray<dEffectorInfo, 4> m_limbs;
+	ndFixSizeArray<dEffectorInfo, 4> m_effectors;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 	ndFloat32 m_walkParam;
@@ -661,11 +705,11 @@ void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeAr
 {
 	dAssert(0);
 	//supportPolygon.SetCount(0);
-	//for (ndInt32 i = 0; i < m_model->m_limbs.GetCount(); ++i)
+	//for (ndInt32 i = 0; i < m_model->m_effectors.GetCount(); ++i)
 	//{
-	//	if (m_model->m_limbs[i].m_footOnGround)
+	//	if (m_model->m_effectors[i].m_footOnGround)
 	//	{
-	//		ndJointBilateralConstraint* const joint = m_model->m_limbs[i].m_effector;
+	//		ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
 	//		const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
 	//		supportPolygon.PushBack(posit);
 	//	}
@@ -762,7 +806,7 @@ void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& out
 	//for (ndInt32 i = 0; i < output.GetCount(); ++i)
 	//{
 	//	const ndAnimKeyframe& keyFrame = output[i];
-	//	const dEffectorInfo& info = m_model->m_limbs[i];
+	//	const dEffectorInfo& info = m_model->m_effectors[i];
 	//
 	//	ndMatrix poseMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 	//	ndMatrix matrix(poseMatrix);
@@ -824,7 +868,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	//scene->Set2DDisplayRenderFunction(RobotControlPanel, nullptr, robot0);
+	scene->Set2DDisplayRenderFunction(dQuadrupedRobot::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
 	matrix.m_posit.m_y += 1.5f;

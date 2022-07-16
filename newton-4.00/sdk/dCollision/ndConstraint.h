@@ -70,16 +70,16 @@ class ndConstraintDebugCallback: public ndClassAlloc
 		return m_debugScale;
 	}
 
-	virtual void DrawFrame(const ndMatrix& matrix)
+	virtual void DrawFrame(const ndMatrix& matrix, ndFloat32 intensity = ndFloat32 (1.0f))
 	{
 		ndVector x(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f))));
-		DrawLine(matrix.m_posit, x, ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
+		DrawLine(matrix.m_posit, x, ndVector(intensity, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 
 		ndVector y(matrix.m_posit + matrix.RotateVector(ndVector(ndFloat32(0.0f), m_debugScale, ndFloat32(0.0f), ndFloat32(0.0f))));
-		DrawLine(matrix.m_posit, y, ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
+		DrawLine(matrix.m_posit, y, ndVector(ndFloat32(0.0f), intensity, ndFloat32(0.0f), ndFloat32(0.0f)));
 
 		ndVector z(matrix.m_posit + matrix.RotateVector(ndVector(ndFloat32(0.0f), ndFloat32(0.0f), m_debugScale, ndFloat32(0.0f))));
-		DrawLine(matrix.m_posit, z, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)));
+		DrawLine(matrix.m_posit, z, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), intensity, ndFloat32(0.0f)));
 	}
 
 	virtual void DrawArrow(const ndMatrix& matrix, const ndVector& color, ndFloat32 length)
@@ -124,7 +124,7 @@ class ndForceImpactPair
 	{
 		m_force = ndFloat32(ndFloat32(0.0f));
 		m_impact = ndFloat32(ndFloat32(0.0f));
-		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
+		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); ++i)
 		{
 			m_initialGuess[i] = ndFloat32(ndFloat32(0.0f));
 		}
@@ -132,7 +132,7 @@ class ndForceImpactPair
 
 	void Push(ndFloat32 val)
 	{
-		for (ndInt32 i = 1; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
+		for (ndInt32 i = 1; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); ++i)
 		{
 			m_initialGuess[i - 1] = m_initialGuess[i];
 		}
@@ -144,7 +144,7 @@ class ndForceImpactPair
 		//return 100.0f;
 		ndFloat32 smallest = ndFloat32(1.0e15f);
 		ndFloat32 value = ndFloat32(ndFloat32(0.0f));
-		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
+		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); ++i)
 		{
 			ndFloat32 mag = ndAbs(m_initialGuess[i]);
 			if (mag < smallest) 

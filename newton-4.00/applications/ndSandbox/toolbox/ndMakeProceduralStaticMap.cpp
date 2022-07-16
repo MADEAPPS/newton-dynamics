@@ -90,7 +90,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 				ndInt32 index = 0;
 				ndVector color(50.0f / 255.0f, 100.0f / 255.0f, 200.0f / 255.0f, 1.0f);
 
-				for (ndInt32 i = 0; i < faceList.GetCount(); i++)
+				for (ndInt32 i = 0; i < faceList.GetCount(); ++i)
 				{
 					ndVector points[32];
 					ndInt32 vCount = faceList[i];

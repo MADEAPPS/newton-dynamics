@@ -147,7 +147,7 @@ class glMatrix
 	public:
 	glMatrix(const ndMatrix& matrix)
 	{
-		for (ndInt32 i = 0; i < 4; i++)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			m_data[i] = matrix[i];
 		}

@@ -60,7 +60,7 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 	
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 2.0f);
@@ -95,7 +95,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 
 //baseMatrix.m_posit.m_y -= 0.02f;
 	ndMatrix rotation(dYawMatrix(20.0f * ndDegreeToRad));
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
@@ -131,7 +131,7 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 
 	ndMatrix rotation(dYawMatrix(20.0f * ndDegreeToRad));
 
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_z);
@@ -168,7 +168,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 	for (ndInt32 j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
-		for (ndInt32 i = 0; i < (count - j); i++) 
+		for (ndInt32 i = 0; i < (count - j); ++i) 
 		{
 			AddRigidBody(scene, matrix, shape, rootEntity, mass);
 			matrix.m_posit.m_z += stepz;
@@ -241,7 +241,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	for (ndInt32 i = 0; i < stackHigh / 2; i++)
+	for (ndInt32 i = 0; i < stackHigh / 2; ++i)
 	{
 		AddRigidBody(scene, matrix0, collision, rootEntity, mass);
 		AddRigidBody(scene, matrix1, collision, rootEntity, mass);
@@ -267,7 +267,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//ndInt32 pyramidHigh = 20;
 	ndInt32 pyramidHigh = 30;
 	//ndInt32 pyramidHigh = 60;
-	for (ndInt32 i = 0; i < 4; i++)
+	for (ndInt32 i = 0; i < 4; ++i)
 	{
 		BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;

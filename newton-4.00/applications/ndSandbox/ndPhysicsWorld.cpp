@@ -118,7 +118,7 @@ void ndPhysicsWorld::DeletePendingObjects()
 	{
 		Sync();
 		m_hasPendingObjectToDelete.store(false);
-		for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); ++i)
 		{
 			DeleteBody(m_deletedBodies[i]);
 		}

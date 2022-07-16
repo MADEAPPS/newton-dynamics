@@ -97,7 +97,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 
 		GLfloat blend = materialCount ? 0.0f : 1.0f;
-		for (ndInt32 i = 0; i < subIndexCount; i++)
+		for (ndInt32 i = 0; i < subIndexCount; ++i)
 		{
 			ndInt32 index = indices[segmentStart + i] + offsetBase;
 			indices[segmentStart + i] = index;
@@ -172,7 +172,7 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glD
 	meshNode->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 	meshNode->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		vertexArray[vertexOffsetBase + i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
 		vertexArray[vertexOffsetBase + i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);

@@ -90,7 +90,7 @@ class dAiBotTest_1 : public ndModel
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 4; i++)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 
@@ -161,7 +161,7 @@ class dAiBotTest_1 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		for (ndInt32 i = 0; i < 1; i++)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
@@ -172,7 +172,7 @@ class dAiBotTest_1 : public ndModel
 			
 			ndVector posit1(swivelMatrix1.m_posit);
 			posit1.m_y += 1.0f;
-			context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+			context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
 
 			//swivelMatrix1 = dPitchMatrix(info.m_effector->GetSwivelAngle()) * swivelMatrix1;
 			//ndMatrix swivelLocal (swivelMatrix0 * swivelMatrix1.Inverse());
@@ -220,7 +220,7 @@ class dAiBotTest_1 : public ndModel
 		ndModel::Update(world, timestep);
 
 		ndVector upVector(m_rootBody->GetMatrix().m_up);
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndEffectorInfo& info = m_effectors[i];
 			ndVector posit(info.m_basePosition);
@@ -229,15 +229,11 @@ class dAiBotTest_1 : public ndModel
 			posit.m_z += info.m_z * 0.2f;
 			info.m_effector->SetPosition(posit);
 
-			#if 1
 			ndMatrix swivelMatrix0;
 			ndMatrix swivelMatrix1;
 			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 			const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
 			info.m_effector->SetSwivelAngle(info.m_swivel - angle);
-			#else
-			info.m_effector->SetSwivelAngle(info.m_swivel);
-			#endif
 		}
 	}
 

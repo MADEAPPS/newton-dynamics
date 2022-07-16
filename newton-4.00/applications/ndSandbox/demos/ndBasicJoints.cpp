@@ -199,7 +199,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		matrix.m_posit.m_z -= 2.0f;
 		matrix.m_posit.m_y = floor.m_y;
 		ndBodyDynamic* array[count];
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			matrix.m_posit.m_y += diameter;
 			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
@@ -211,7 +211,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndFloat32 regularizer = 0.01f;
 
 		ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
-		for (ndInt32 i = 1; i < count; i++)
+		for (ndInt32 i = 1; i < count; ++i)
 		{
 			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
 			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
@@ -241,7 +241,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		matrix.m_posit.m_z -= 2.0f;
 		matrix.m_posit.m_y = floor.m_y;
 		ndBodyDynamic* array[count];
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			matrix.m_posit.m_y += diameter;
 			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
@@ -258,7 +258,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndFloat32 regularizer = 0.1f;
 
 		ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
-		for (ndInt32 i = 1; i < count; i++)
+		for (ndInt32 i = 1; i < count; ++i)
 		{
 			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
 			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
@@ -296,7 +296,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 //	
 //	ndPhysicsWorld* const world = scene->GetWorld();
 //	ndVector posit(matrix.m_posit);
-//	for (ndInt32 i = 0; i < 8; i++)
+//	for (ndInt32 i = 0; i < 8; ++i)
 //	{
 //		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
 //		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
@@ -658,7 +658,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	bodies[7] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
 	ndWorld* world = scene->GetWorld();
-	for (ndInt32 i = 0; i < 8; i++)
+	for (ndInt32 i = 0; i < 8; ++i)
 	{
 		ndBodyDynamic* const body0 = bodies[i];
 		for (ndInt32 j = i + 1; j < 8; j++)
@@ -723,7 +723,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	ndVector positions[count + 1];
 	ndFloat64 knot = spline.FindClosestKnot(point0, ndBigVector(ndVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
 	positions[0] = point0;
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndBigVector point1;
 		ndBigVector tangent(spline.CurveDerivative(knot));
@@ -744,7 +744,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 
 	ndBodyDynamic* bodies[count];
 	ndPhysicsWorld* const world = scene->GetWorld();
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, 0.0);
 		ndVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
@@ -779,7 +779,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 		body->SetVelocity(veloc);
 	}
 
-	for (ndInt32 i = 1; i < count; i++) 
+	for (ndInt32 i = 1; i < count; ++i) 
 	{
 		ndBodyDynamic* const box0 = bodies[i - 1];
 		ndBodyDynamic* const box1 = bodies[i - 0];

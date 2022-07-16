@@ -128,7 +128,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
 	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "userData");
 	
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); ++i)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);
@@ -161,7 +161,7 @@ void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
 	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
 	xmlSaveParam(paramNode, "userData", ndInt64(m_shapeMaterial.m_data.m_alignPad));
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); ++i)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);
@@ -340,7 +340,8 @@ ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, cons
 		{
 			ndVector point1(m_invScale * point);
 			count = m_shape->CalculatePlaneIntersection(normal, point1, contactsOut);
-			for (ndInt32 i = 0; i < count; i++) {
+			for (ndInt32 i = 0; i < count; ++i) 
+			{
 				contactsOut[i] = m_scale * contactsOut[i];
 			}
 			break;
@@ -353,7 +354,8 @@ ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, cons
 			ndVector normal1(m_scale * normal);
 			normal1 = normal1.Normalize();
 			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
-			for (ndInt32 i = 0; i < count; i++) {
+			for (ndInt32 i = 0; i < count; ++i) 
+			{
 				contactsOut[i] = m_scale * contactsOut[i];
 			}
 			break;
@@ -367,7 +369,8 @@ ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, cons
 			ndVector normal1(m_alignmentMatrix.UnrotateVector(m_scale * normal));
 			normal1 = normal1.Normalize();
 			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
-			for (ndInt32 i = 0; i < count; i++) {
+			for (ndInt32 i = 0; i < count; ++i) 
+			{
 				contactsOut[i] = m_scale * m_alignmentMatrix.TransformVector(contactsOut[i]);
 			}
 		}

@@ -81,7 +81,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	
 	m_nodeCount = entityArray.GetCount();
 	m_bindingMatrixArray.SetCount(m_nodeCount);
-	for (ndInt32 i = 0; i < m_nodeCount; i++)
+	for (ndInt32 i = 0; i < m_nodeCount; ++i)
 	{
 		m_bindingMatrixArray[i] = bindMatrixArray[i];
 	}
@@ -99,7 +99,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	{
 		const ndMeshEffect::dVertexCluster* const cluster = &iter.GetNode()->GetInfo();
 		ndInt32 boneIndex = boneClusterRemapIndex.Find(iter.GetKey())->GetInfo();
-		for (ndInt32 i = 0; i < cluster->m_vertexIndex.GetCount(); i++) 
+		for (ndInt32 i = 0; i < cluster->m_vertexIndex.GetCount(); ++i) 
 		{
 			ndInt32 vertexIndex = cluster->m_vertexIndex[i];
 			vCount = ndMax(vertexIndex + 1, vCount);
@@ -122,7 +122,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	}
 	
 	ndInt32 weightcount = 0;
-	for (ndInt32 i = 0; i < weight.GetCount(); i++)
+	for (ndInt32 i = 0; i < weight.GetCount(); ++i)
 	{
 		ndVector w(weight[i]);
 		ndFloat32 invMag = w.m_x + w.m_y + w.m_z + w.m_w;
@@ -180,7 +180,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	meshNode->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 	meshNode->GetVertexIndexChannel(&vertexIndex[0]);
 
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
 		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
@@ -354,7 +354,7 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& mo
 	ndMatrix* const bindMatrix = ndAlloca(ndMatrix, m_nodeCount);
 	ndInt32 count = CalculateMatrixPalette(bindMatrix);
 	glMatrix* const glMatrixPallete = ndAlloca(glMatrix, count);
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		glMatrixPallete[i] = bindMatrix[i];
 	}

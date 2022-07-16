@@ -365,7 +365,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix.m_posit.m_z += sizez;
 	}
 
-	for (ndInt32 i = 1; i < plankCount; i++)
+	for (ndInt32 i = 1; i < plankCount; ++i)
 	{
 		ndBodyKinematic* body0 = array[i - 1];
 		ndBodyKinematic* body1 = array[i];
@@ -514,7 +514,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		//ndBigVector xxxx (spline.CurveDerivative(0.25f));
 		//ndVector xxxx1;
 		//ndVector xxxx2;
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < size; ++i)
 		{
 			//GetPointAndTangentAtLocation(spline, matrix, control[i], xxxx1, xxxx2);
 			ndMatrix matrix1 (GetMatrixAtLocation(spline, control[i]));

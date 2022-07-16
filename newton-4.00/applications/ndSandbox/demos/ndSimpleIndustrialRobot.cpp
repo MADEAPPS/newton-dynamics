@@ -109,7 +109,7 @@ class dSimpleIndustrialRobot : public ndModel
 			ndDemoEntity* const childEntity = childEntities[stack];
 
 			const char* const name = childEntity->GetName().GetStr();
-			for (ndInt32 i = 0; i < definitionCount; i++) 
+			for (ndInt32 i = 0; i < definitionCount; ++i) 
 			{
 				const dSimpleRobotDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
@@ -273,7 +273,7 @@ class dSimpleIndustrialRobot : public ndModel
 		// save all bodies.
 		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
 		modelRootNode->LinkEndChild(bodiesNode);
-		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 		{
 			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
 			bodiesNode->LinkEndChild(paramNode);
@@ -285,7 +285,7 @@ class dSimpleIndustrialRobot : public ndModel
 		// save all joints
 		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
 		modelRootNode->LinkEndChild(jointsNode);
-		for (ndInt32 i = 0; i < m_jointArray.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
 		{
 			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
 			jointsNode->LinkEndChild(paramNode);

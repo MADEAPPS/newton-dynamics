@@ -88,7 +88,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
 		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
@@ -211,7 +211,7 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 
 	const ndInt32 base = start * m_maxInstanceCount;
 	const ndInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndMatrix matrix(m_offsets[base + i]);
 		const ndFloat32* const src = &matrix[0][0];
@@ -270,7 +270,7 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	ndInt32 segments = (m_instanceCount - 1) / m_maxInstanceCount;
-	for (ndInt32 i = 0; i < segments; i++)
+	for (ndInt32 i = 0; i < segments; ++i)
 	{
 		RenderBatch(i, scene, modelMatrix);
 	}

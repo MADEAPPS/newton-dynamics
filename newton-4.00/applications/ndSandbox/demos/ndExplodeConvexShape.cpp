@@ -39,7 +39,7 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 	//desc.m_pointCloud.PushBack(ndVector(size.m_x, size.m_y, -size.m_z, ndFloat32(0.0f)));
 	//desc.m_pointCloud.PushBack(ndVector(size.m_x, size.m_y, size.m_z, ndFloat32(0.0f)));
 	//
-	//for (ndInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
+	//for (ndInt32 i = 0; i < desc.m_pointCloud.GetCount(); ++i)
 	//{
 	//	ndFloat32 x = dGaussianRandom(size.m_x);
 	//	ndFloat32 y = dGaussianRandom(size.m_y);
@@ -57,7 +57,7 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 	ndSetRandSeed(0);
 	const ndVector scale(0.2f);
 	const ndVector invScale(size * scale.Reciproc());
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndFloat32 x = ndRand();
 		ndFloat32 y = ndRand();
@@ -111,7 +111,7 @@ static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const ndMatri
 	for (ndInt32 j = 0; j < count; j++)
 	{
 		location.m_posit.m_z = z0;
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			location.m_posit.m_z += 0.5f;
 			manager->AddEffect(effect, 200.0f, location);
@@ -142,7 +142,7 @@ static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const ndM
 	for (ndInt32 j = 0; j < count; j++)
 	{
 		location.m_posit.m_z = z0;
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			location.m_posit.m_z += 0.5f;
 			manager->AddEffect(effect, 200.0f, location);
@@ -173,7 +173,7 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const nd
 	for (ndInt32 j = 0; j < count; j++)
 	{
 		location.m_posit.m_z = z0;
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			location.m_posit.m_z += 0.5f;
 			manager->AddEffect(effect, 200.0f, location);
