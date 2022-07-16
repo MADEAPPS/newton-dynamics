@@ -19,7 +19,7 @@ void *operator new (size_t size)
 	
 	static bool allowStandardThreadAllocation = true;
 	void* const ptr = ndMemory::Malloc(size);
-	dAssert(allowStandardThreadAllocation || ((dUnsigned64(ptr) & (0x1f)) == 0));
+	dAssert(allowStandardThreadAllocation || ((ndUnsigned64(ptr) & (0x1f)) == 0));
 	allowStandardThreadAllocation = false;
 	return ptr;
 }

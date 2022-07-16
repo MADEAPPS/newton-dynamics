@@ -14,9 +14,7 @@ if (NEWTON_BUILD_TEST)
 	add_subdirectory(ndTest)
 endif()
 
-if (NEWTON_BUILD_TOOLS_AND_WRAPERS)
-	add_subdirectory(toolsAndWrapers)
-endif()
+add_subdirectory(toolsAndWrapers)
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_subdirectory(ndSandbox)

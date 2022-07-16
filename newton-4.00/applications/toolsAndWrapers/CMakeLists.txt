@@ -10,6 +10,14 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-add_subdirectory(newtonPy)
-add_subdirectory(newtonSharp)
+if (NEWTON_BUILD_NEWTON_PYTHON)
+	add_subdirectory(newtonPy)
+endif()
 
+if (NEWTON_BUILD_NEWTON_C_SHARP)
+	add_subdirectory(newtonSharp)
+endif()
+
+if (NEWTON_BUILD_NEWTON_JAVA)
+	add_subdirectory(newtonJava)
+endif()

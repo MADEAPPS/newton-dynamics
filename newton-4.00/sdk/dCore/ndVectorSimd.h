@@ -885,7 +885,6 @@ class ndBigVector
 
 	inline ndBigVector ShiftRightLogical(ndInt32 bits) const
 	{
-		//return ndBigVector(ndInt64(dUnsigned64(m_ix) >> bits), ndInt64(dUnsigned64(m_iy) >> bits), ndInt64(dUnsigned64(m_iz) >> bits), ndInt64(dUnsigned64(m_iw) >> bits));
 		return ndBigVector(_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits));
 	}
 

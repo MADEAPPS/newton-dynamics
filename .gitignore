@@ -57,6 +57,7 @@ bld/
 *.sbr
 *.res
 *.ipa
+*.java
 *.user
 *.tlog
 *.json
