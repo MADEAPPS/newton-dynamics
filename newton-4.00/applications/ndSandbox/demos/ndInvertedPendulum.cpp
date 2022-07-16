@@ -117,6 +117,10 @@ class dAiBotTest_1 : public ndModel
 			ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
 			caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
 			ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, caff, thigh);
+
+			// add joint limit to prevent elbow from flipping
+			hinge->SetLimitState(true);
+			hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
 			world->AddJoint(hinge);
 
 			// add leg effector
@@ -157,7 +161,7 @@ class dAiBotTest_1 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		for (ndInt32 i = 0; i < 4; i++)
+		for (ndInt32 i = 0; i < 1; i++)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
@@ -169,15 +173,16 @@ class dAiBotTest_1 : public ndModel
 			ndVector posit1(swivelMatrix1.m_posit);
 			posit1.m_y += 1.0f;
 			context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
-			
-			//ndVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-			//const ndFloat32 angle2 = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
+
 			//swivelMatrix1 = dPitchMatrix(info.m_effector->GetSwivelAngle()) * swivelMatrix1;
+			//ndMatrix swivelLocal (swivelMatrix0 * swivelMatrix1.Inverse());
+			//ndVector euler0;
+			//ndVector euler1;
+			//swivelLocal.CalcPitchYawRoll(euler0, euler1);
 			//const ndFloat32 angle = info.m_effector->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
-			//ndMatrix xxxx1(dGetIdentityMatrix());
-			//ndMatrix xxxx0(swivelMatrix0 * swivelMatrix1.Inverse());
-			//ndFloat32 angle1 = info.m_effector->CalculateAngle(xxxx0[1], xxxx1[1], xxxx1[0]);
-			//dTrace(("%f %f %f\n", angle * ndRadToDegree, angle1 * ndRadToDegree, angle2 * ndRadToDegree));
+			//
+			//const ndFloat32 angle1 = ndAtan2 (swivelLocal[1][2], swivelLocal[2][2]);
+			//dTrace(("%f %f %f\n", angle * ndRadToDegree, -euler0.m_x * ndRadToDegree, -angle1 * ndRadToDegree));
 		}
 	}
 

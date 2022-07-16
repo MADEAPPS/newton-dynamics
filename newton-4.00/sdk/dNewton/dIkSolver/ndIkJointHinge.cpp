@@ -60,8 +60,6 @@ void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 		ndFloat32 accel = (pin * m_accel0.m_angular - pin * m_accel1.m_angular).AddHorizontal().GetScalar();
 		AddAngularRowJacobian(desc, pin, 0.0f);
 		SetMotorAcceleration(desc, accel);
-		//SetLowerFriction(desc, m_axisAccel.m_minForce);
-		//SetHighFriction(desc, m_axisAccel.m_maxForce);
 	}
 }
 

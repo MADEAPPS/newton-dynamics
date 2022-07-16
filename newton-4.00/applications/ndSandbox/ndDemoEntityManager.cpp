@@ -55,8 +55,8 @@
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-//#define DEFAULT_SCENE	19		// inverted pendulum
-#define DEFAULT_SCENE	20		// quadruped robot
+#define DEFAULT_SCENE	19		// inverted pendulum
+//#define DEFAULT_SCENE	20		// quadruped robot
 //#define DEFAULT_SCENE	21		// simple voronoi fracture
 //#define DEFAULT_SCENE	21		// basic voronoi fracture
 //#define DEFAULT_SCENE	22		// linked voronoi fracture
