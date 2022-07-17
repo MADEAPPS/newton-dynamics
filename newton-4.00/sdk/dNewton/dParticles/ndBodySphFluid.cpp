@@ -362,7 +362,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	}
 
 #ifdef _DEBUG
-	for (int i = 1; i < data.m_hashGridMap.GetCount(); i++)
+	for (int i = 1; i < data.m_hashGridMap.GetCount(); ++i)
 	{
 		ndGridHash cell0(data.m_hashGridMap[i - 1]);
 		ndGridHash cell1(data.m_hashGridMap[i + 0]);
@@ -946,7 +946,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	threadPool->ParallelExecute(CountGrids);
 	
 	ndInt32 gridCount = 0;
-	for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); i++)
+	for (ndInt32 i = 0; i < data.m_gridScans.GetCount(); ++i)
 	{
 		ndInt32 count = data.m_gridScans[i];
 		data.m_gridScans[i] = gridCount;

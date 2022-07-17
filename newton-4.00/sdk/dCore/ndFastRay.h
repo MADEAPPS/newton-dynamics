@@ -115,7 +115,7 @@ inline ndInt32 ndFastRay::BoxTest(const ndVector& minBox, const ndVector& maxBox
 	ndFloat32 tmin = 0.0f;
 	ndFloat32 tmax = 1.0f;
 
-	for (ndInt32 i = 0; i < 3; i++)
+	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		if (m_isParallel[i])
 		{

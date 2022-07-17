@@ -859,11 +859,13 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 		ndInt32 layer = 0;
 		convexPartionMesh->BeginBuild();
-		for (ndList<dgHACDConvacityLookAheadTree*>::ndNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
+		for (ndList<dgHACDConvacityLookAheadTree*>::ndNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) 
+		{
 			dgHACDConvacityLookAheadTree* const cluster = clusterNode->GetInfo();
 
 			ndInt32 vertexCount = 0;
-			for (ndList<ndEdge*>::ndNode* faceNode = cluster->m_faceList.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
+			for (ndList<ndEdge*>::ndNode* faceNode = cluster->m_faceList.GetFirst(); faceNode; faceNode = faceNode->GetNext()) 
+			{
 				ndEdge* const edge = faceNode->GetInfo();
 				ndEdge* ptr = edge;
 				do {
@@ -876,8 +878,10 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 			//dConvexHull3d convexHull(allocator, &convexVertexBuffer[0].m_x, sizeof(ndBigVector), vertexCount, 0.0, maxVertexPerHull);
 			ndMeshEffect convexMesh(allocator, &convexVertexBuffer[0].m_x, vertexCount, sizeof(ndBigVector), ndFloat64(0.0f));
-			if (convexMesh.GetCount()) {
-				for (ndInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
+			if (convexMesh.GetCount()) 
+			{
+				for (ndInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; ++i) 
+				{
 					convexMesh.m_points.m_layers[i] = layer;
 				}
 				convexPartionMesh->MergeFaces(&convexMesh);

@@ -937,7 +937,7 @@ class ndBigVector
 		ndFloat64 array[4][4];
 
 		const ndBigVector& me = *this;
-		for (ndInt32 i = 0; i < 4; i++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -947,7 +947,7 @@ class ndBigVector
 
 		ndBigVector normal;
 		ndFloat64 sign = ndFloat64(-1.0f);
-		for (ndInt32 i = 0; i < 4; i++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			for (ndInt32 j = 0; j < 3; j++) 
 			{

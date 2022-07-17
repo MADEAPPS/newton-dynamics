@@ -43,7 +43,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
 		{
 			m_faceIndexCount.PushBack(vertexCount);
-			for (ndInt32 i = 0; i < vertexCount; i++) 
+			for (ndInt32 i = 0; i < vertexCount; ++i) 
 			{
 				ndBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, ndFloat32(m_brush));
 				m_vertex.PushBack(point);

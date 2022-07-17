@@ -184,7 +184,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 {
 	ndMatrix tmp (*this);
 	ndMatrix inv (dGetIdentityMatrix());
-	for (ndInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 pivot = ndAbs(tmp[i][i]);
 		if (pivot < ndFloat32(0.1f)) 
@@ -231,7 +231,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 
 #ifdef _DEBUG
 	tmp = *this * inv;
-	for (ndInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 error = tmp[i][i] - ndFloat32(1.0f);
 		dAssert(ndAbs(error) < ndFloat32(1.0e-3f));
@@ -250,7 +250,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 {
 	ndMatrix tmp(*this);
 	ndVector ret(v);
-	for (ndInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 pivot = ndAbs(tmp[i][i]);
 		if (pivot < ndFloat32(0.01f)) 
@@ -435,7 +435,7 @@ ndVector ndMatrix::EigenVectors ()
 	// using Jacobi diagonalize instead
 	ndVector d (matrix[0][0], matrix[1][1], matrix[2][2], ndFloat32 (0.0f)); 
 	ndVector b (d);
-	for (ndInt32 i = 0; i < 50; i++) 
+	for (ndInt32 i = 0; i < 50; ++i) 
 	{
 		ndFloat32 sm = matrix[0][1] * matrix[0][1] + matrix[0][2] * matrix[0][2] + matrix[1][2] * matrix[1][2];
 		if (sm < ndFloat32 (1.0e-12f)) 

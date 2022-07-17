@@ -377,7 +377,7 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 
 		const ndInt32 alivedStart = scans[2];
 		const ndInt32 deadCount = scans[3] - alivedStart;
-		for (ndInt32 i = 0; i < deadCount; i++)
+		for (ndInt32 i = 0; i < deadCount; ++i)
 		{
 			ndBvhNode* const node = nodeArray[alivedStart + i];
 			#ifdef D_NEW_SCENE

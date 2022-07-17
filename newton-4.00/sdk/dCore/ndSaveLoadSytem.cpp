@@ -104,7 +104,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::ndLoadDescrip
 		}
 	}
 
-	for (ndInt32 i = i0; i <= i1; i++)
+	for (ndInt32 i = i0; i <= i1; ++i)
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{
@@ -113,7 +113,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::ndLoadDescrip
 	}
 	
 	#ifdef _DEBUG
-	for (ndInt32 i = 0; i < factory.GetCount(); i++)
+	for (ndInt32 i = 0; i < factory.GetCount(); ++i)
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{

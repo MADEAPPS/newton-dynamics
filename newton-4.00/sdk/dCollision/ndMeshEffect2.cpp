@@ -244,7 +244,7 @@ class dgTetraIsoSufaceStuffing
 		{
 			dBigVector box0(dFloat64( 1.0e10f));
 			dBigVector box1(dFloat64(-1.0e10f));
-			for (dInt32 i = 0; i < 4; i++) {
+			for (dInt32 i = 0; i < 4; ++i) {
 				box0 = box0.GetMin(points[tetra[i]]);
 				box1 = box1.GetMax(points[tetra[i]]);
 			}
@@ -545,7 +545,7 @@ class dgTetraIsoSufaceStuffing
 
 	void SnapClosePoints (dgArray<dgTetraEdgeCuts>& tetraEdgeCuts, const dgArray<dgTetraToVertexNode>& tetraGraph, const dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
 	{
-		for (dInt32 i = 0; i < m_pointCount; i++) {
+		for (dInt32 i = 0; i < m_pointCount; ++i) {
 			if (vertexSide[i] == m_outside) {
 /*
 				const dgTetraToVertexNode& graphNode = tetraGraph[i];
@@ -856,7 +856,7 @@ void ndMeshEffect::LoadOffMesh(const char* const fileName)
 					parcel.SkipLine();
 
 					dgArray<dBigVector> points(GetAllocator());
-					for (dInt32 i = 0; i < vertexCount; i++) {
+					for (dInt32 i = 0; i < vertexCount; ++i) {
 						dFloat64 x = parcel.GetFloat();
 						dFloat64 y = parcel.GetFloat();
 						dFloat64 z = parcel.GetFloat();
@@ -867,7 +867,7 @@ void ndMeshEffect::LoadOffMesh(const char* const fileName)
 					dgArray<dInt32> indexList(GetAllocator());
 					dgArray<dInt32> faceVertex(GetAllocator());
 					dInt32 index = 0;
-					for (dInt32 i = 0; i < faceCount; i++) {
+					for (dInt32 i = 0; i < faceCount; ++i) {
 						const dInt32 faceVertexCount = parcel.GetInteger();
 						faceVertex[i] = faceVertexCount;
 						for (dInt32 j = 0; j < faceVertexCount; j++) {
@@ -923,7 +923,7 @@ void ndMeshEffect::LoadTetraMesh (const char* const filename)
 			ret = fscanf(file, "%d %d %d %d", &tetra[0], &tetra[1], &tetra[2], &tetra[3]);
 			ret = 0; 
 			dBigVector pointArray[4];
-			for (dInt32 i = 0; i < 4; i++) {
+			for (dInt32 i = 0; i < 4; ++i) {
 				dInt32 index = tetra[i];
 				pointArray[i] = points[index];
 			}
@@ -932,7 +932,8 @@ void ndMeshEffect::LoadTetraMesh (const char* const filename)
 
 			dAssert(convexMesh.GetCount());
 			convexMesh.CalculateNormals(dFloat32(30.0f * dDegreeToRad));
-			for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
+			for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; ++i) 
+			{
 				convexMesh.m_points.m_layers[i] = layers;
 			}
 			MergeFaces(&convexMesh);
@@ -994,7 +995,8 @@ xxxx.EndBuild(dFloat64(1.0e-8f), false);
 			ndMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dBigVector), dFloat64(0.0f));
 			//dAssert (convexMesh.GetCount());
 			//convexMesh.CalculateNormals(dFloat32 (30.0f * dgDEG2RAD));
-			for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
+			for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; ++i) 
+			{
 				convexMesh.m_points.m_layers[i] = layer;
 			}
 			delaunayPartition->MergeFaces(&convexMesh);
@@ -1114,7 +1116,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 	
 	ndBigVector pMin(ndFloat32(1.0e10f));
 	ndBigVector pMax(ndFloat32(-1.0e10f));
-	for (ndInt32 i = 0; i <pointCloud.GetCount(); i++)
+	for (ndInt32 i = 0; i <pointCloud.GetCount(); ++i)
 	{
 		ndFloat64 x = pointCloud[i].m_x;
 		ndFloat64 y = pointCloud[i].m_y;
@@ -1185,7 +1187,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 		voronoiPoints[index] = tetra.CircumSphereCenter(convexHulPoints);
 		tetradrumNode[index] = node;
 	
-		for (ndInt32 i = 0; i < 4; i++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndTree<ndList<ndInt32>, ndInt32>::ndNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
 			if (!header) 
@@ -1232,7 +1234,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 					convexMesh.m_materials.SetCount(interiorMaterialIndex + 1);
 					convexMesh.CalculateNormals(normalAngleInRadians);
 					convexMesh.UniformBoxMapping(interiorMaterialIndex, textureProjectionMatrix);
-					for (ndInt32 i = 0; i < convexMesh.m_points.m_vertex.GetCount(); i++) 
+					for (ndInt32 i = 0; i < convexMesh.m_points.m_vertex.GetCount(); ++i) 
 					{
 						convexMesh.m_points.m_layers[i] = layer;
 					}
@@ -1248,7 +1250,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 
 	dAssert(interiorMaterialIndex < m_materials.GetCount());
 	voronoiPartition->m_materials.SetCount(m_materials.GetCount());
-	for (ndInt32 i = 0; i < m_materials.GetCount(); i++)
+	for (ndInt32 i = 0; i < m_materials.GetCount(); ++i)
 	{
 		voronoiPartition->m_materials[i] = m_materials[i];
 	}

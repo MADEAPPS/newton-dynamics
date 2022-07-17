@@ -143,7 +143,7 @@ class ndShapeCompound::ndSpliteInfo
 		if (boxCount == 2)
 		{
 			m_axis = 1;
-			for (ndInt32 i = 0; i < boxCount; i++)
+			for (ndInt32 i = 0; i < boxCount; ++i)
 			{
 				ndNodeBase* const node = boxArray[i];
 				dAssert(node->m_type == m_leaf);
@@ -156,7 +156,7 @@ class ndShapeCompound::ndSpliteInfo
 			ndVector median(ndVector::m_zero);
 			ndVector varian(ndVector::m_zero);
 
-			for (ndInt32 i = 0; i < boxCount; i++)
+			for (ndInt32 i = 0; i < boxCount; ++i)
 			{
 				ndNodeBase* const node = boxArray[i];
 				dAssert(node->m_type == m_leaf);
@@ -171,7 +171,7 @@ class ndShapeCompound::ndSpliteInfo
 
 			ndInt32 index = 0;
 			ndFloat32 maxVarian = ndFloat32(-1.0e10f);
-			for (ndInt32 i = 0; i < 3; i++)
+			for (ndInt32 i = 0; i < 3; ++i)
 			{
 				if (varian[i] > maxVarian)
 				{
@@ -419,7 +419,8 @@ ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, cons
 	//ndVector p0(&vertex[j]);
 	//p0 = p0 & ndVector::m_triplexMask;
 	//ndFloat32 side0 = localPlane.Evalue(p0);
-	//for (ndInt32 i = 0; i < indexCount; i++) {
+	//for (ndInt32 i = 0; i < indexCount; ++i) 
+	//{
 	//	j = index[i] * stride;
 	//	ndVector p1(&vertex[j]);
 	//	p1 = p1 & ndVector::m_triplexMask;
@@ -841,7 +842,7 @@ ndFloat64 ndShapeCompound::CalculateEntropy(ndInt32 count, ndNodeBase** array)
 
 		cost0 = ndFloat32(0.0f);
 		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			//ndNodeBase* const node = listNode->GetInfo();
 			ndNodeBase* const node = array[i];
@@ -889,7 +890,7 @@ ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const
 	const ndFloat32 scale = ndFloat32(10.0f);
 	const ndFloat32 scale2 = ndFloat32(3.0f) * scale * scale;
 	const ndInt32 count = lastBox - firstBox;
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		const ndNodeBase* const node0 = leafArray[firstBox + i];
 		const ndNodeBase* const node1 = leafArray[firstBox + i + 1];
@@ -911,7 +912,7 @@ ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const
 	
 	ndVector minP(ndFloat32(1.0e15f));
 	ndVector maxP(-ndFloat32(1.0e15f));
-	for (ndInt32 i = 0; i <= count; i++) 
+	for (ndInt32 i = 0; i <= count; ++i) 
 	{
 		const ndNodeBase* const node = leafArray[firstBox + i];
 		dAssert(node->m_shapeInstance);
@@ -975,7 +976,7 @@ void ndShapeCompound::EndAddRemove()
 			{
 				ndInt32 leafNodesCount = 0;
 				ndNodeBase** leafArray = ndAlloca(ndNodeBase*, nodeCount + 12);
-				for (ndInt32 i = 0; i < nodeCount; i++)
+				for (ndInt32 i = 0; i < nodeCount; ++i)
 				{ 
 					ndNodeBase* const node = nodeArray[i];
 					if (node->m_left->m_type == m_leaf) 

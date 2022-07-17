@@ -166,7 +166,7 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 	ndStack<ndFloat64> pool(vertexCount * stride);
 
 	ndFloat64* const data = &pool[0];
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		ndFloat64* const dst = &data[i * stride];
 		const T* const src = &vertexList[i * stride];
@@ -177,7 +177,7 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 	}
 
 	ndInt32 count = ndVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		const ndFloat64* const src = &data[i * stride];
 		T* const dst = &vertexList[i * stride];

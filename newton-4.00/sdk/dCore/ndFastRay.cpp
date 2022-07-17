@@ -43,7 +43,7 @@ ndFloat32 ndFastRay::PolygonIntersect (const ndVector& faceNormal, ndFloat32 max
 		{
 			ndBigVector p (p0 + diff.Scale (tOut));
 			ndBigVector unitDir(m_unitDir);
-			for (ndInt32 i = 0; i < indexCount; i++) 
+			for (ndInt32 i = 0; i < indexCount; ++i) 
 			{
 				ndInt32 i2 = indexArray[i] * stride;
 				ndBigVector v1(ndVector(&polygon[i2]) & ndVector::m_triplexMask);

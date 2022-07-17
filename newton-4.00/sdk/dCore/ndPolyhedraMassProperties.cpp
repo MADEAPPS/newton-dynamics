@@ -52,7 +52,7 @@ void ndPolyhedraMassProperties::AddCGFace (ndInt32 indexCount, const ndVector* c
 	ndVector p0 (faceVertex[0]);
 	ndVector p1 (faceVertex[1]);
 
-	for (ndInt32 i = 2; i < indexCount; i++) 
+	for (ndInt32 i = 2; i < indexCount; ++i) 
 	{
 		ndVector p2 (faceVertex[i]);
 
@@ -92,7 +92,7 @@ void ndPolyhedraMassProperties::AddInertiaFace (ndInt32 indexCount, const ndVect
 	ndVector p0 (faceVertex[0]);
 	ndVector p1 (faceVertex[1]);
 
-	for (ndInt32 i = 2; i < indexCount; i++) 
+	for (ndInt32 i = 2; i < indexCount; ++i) 
 	{
 		ndVector p2 (faceVertex[i]);
 
@@ -139,7 +139,7 @@ void ndPolyhedraMassProperties::AddInertiaAndCrossFace (ndInt32 indexCount, cons
 
 	ndVector p0 (faceVertex[0]);
 	ndVector p1 (faceVertex[1]);
-	for (ndInt32 i = 2; i < indexCount; i++) 
+	for (ndInt32 i = 2; i < indexCount; ++i) 
 	{
 		ndVector p2 (faceVertex[i]);
 
@@ -178,7 +178,7 @@ void ndPolyhedraMassProperties::AddInertiaAndCrossFace (ndInt32 indexCount, cons
 
 ndFloat32 ndPolyhedraMassProperties::MassProperties (ndVector& cg, ndVector& inertia, ndVector& crossInertia)
 {
-	for (ndInt32 i = 0; i < 10; i++) 
+	for (ndInt32 i = 0; i < 10; ++i) 
 	{
 		intg[i] *= mult[i];
 	}

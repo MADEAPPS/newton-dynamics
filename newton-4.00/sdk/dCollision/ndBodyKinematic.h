@@ -307,7 +307,7 @@ inline void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance
 	ndMatrix inertia(shapeInstance.CalculateInertia());
 
 	ndVector origin(inertia.m_posit);
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		inertia[i] = inertia[i].Scale(mass);
 		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;

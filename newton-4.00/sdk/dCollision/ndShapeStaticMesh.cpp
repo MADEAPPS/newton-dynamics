@@ -84,7 +84,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 	{
 		stride = m_faceCount;
 	}
-	for (ndInt32 i = 1; i < stride; i++)
+	for (ndInt32 i = 1; i < stride; ++i)
 	{
 		if (m_hitDistance[i] < m_hitDistance[0])
 		{
@@ -94,7 +94,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 		}
 	}
 
-	for (ndInt32 i = 1; i < m_faceCount; i++)
+	for (ndInt32 i = 1; i < m_faceCount; ++i)
 	{
 		ndInt32 j = i;
 		ndInt32 ptr = m_faceIndexStart[i];
@@ -113,7 +113,8 @@ void ndPolygonMeshDesc::SortFaceArray()
 	}
 
 #ifdef _DEBUG
-	for (ndInt32 i = 0; i < m_faceCount - 1; i++) {
+	for (ndInt32 i = 0; i < m_faceCount - 1; ++i) 
+	{
 		dAssert(m_hitDistance[i] <= m_hitDistance[i + 1]);
 	}
 #endif
@@ -233,7 +234,8 @@ ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const, co
 	//ndVector p0(&vertex[j]);
 	//p0 = p0 & ndVector::m_triplexMask;
 	//ndFloat32 side0 = localPlane.Evalue(p0);
-	//for (ndInt32 i = 0; i < indexCount; i++) {
+	//for (ndInt32 i = 0; i < indexCount; ++i) 
+	//{
 	//	j = index[i] * stride;
 	//	ndVector p1(&vertex[j]);
 	//	p1 = p1 & ndVector::m_triplexMask;

@@ -75,7 +75,7 @@ void ndShapeCylinder::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	ndFloat32 angle = ndFloat32(0.0f);
 	const ndInt32 offset0 = 0;
 	const ndInt32 offset1 = D_TAPED_CYLINDER_SEGMENTS;
-	for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; ++i) 
 	{
 		ndFloat32 sinAngle = ndSin(angle);
 		ndFloat32 cosAngle = ndCos(angle);
@@ -95,7 +95,7 @@ void ndShapeCylinder::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 
 		ndInt32 j = D_TAPED_CYLINDER_SEGMENTS - 1;
 		polyhedra.BeginFace();
-		for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; ++i) 
 		{
 			wireframe[0] = j;
 			wireframe[1] = i;
@@ -105,13 +105,13 @@ void ndShapeCylinder::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 			polyhedra.AddFace(4, wireframe);
 		}
 
-		for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; ++i) 
 		{
 			wireframe[i] = D_TAPED_CYLINDER_SEGMENTS - 1 - i;
 		}
 		polyhedra.AddFace(D_TAPED_CYLINDER_SEGMENTS, wireframe);
 
-		for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < D_TAPED_CYLINDER_SEGMENTS; ++i) 
 		{
 			wireframe[i] = i + D_TAPED_CYLINDER_SEGMENTS;
 		}
@@ -171,7 +171,7 @@ void ndShapeCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 	ndFloat32 angle = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		ndFloat32 z = ndSin(angle);
 		ndFloat32 y = ndCos(angle);
@@ -189,7 +189,7 @@ void ndShapeCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 	matrix.TransformTriplex(&pool[0].m_x, sizeof(ndVector), &pool[0].m_x, sizeof(ndVector), NUMBER_OF_DEBUG_SEGMENTS * 2);
 
 	ndInt32 j = NUMBER_OF_DEBUG_SEGMENTS - 1;
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		face[0] = pool[j];
 		face[1] = pool[i];
@@ -199,13 +199,13 @@ void ndShapeCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 		debugCallback.DrawPolygon(4, face, edgeType);
 	}
 
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		face[i] = pool[NUMBER_OF_DEBUG_SEGMENTS - 1 - i];
 	}
 	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face, edgeType);
 
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		face[i] = pool[i + NUMBER_OF_DEBUG_SEGMENTS];
 	}
@@ -328,7 +328,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 				ndInt32 dx = 2 * count;
 				ndInt32 acc = dy - count;
 				ndInt32 index = 0;
-				for (ndInt32 i = 0; i < count; i++) 
+				for (ndInt32 i = 0; i < count; ++i) 
 				{
 					if (acc > 0) 
 					{
@@ -341,7 +341,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 				count = index;
 			}
 
-			for (ndInt32 i = 0; i < count; i++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndFloat32 y = contactsOut[i].m_y;
 				ndFloat32 z = contactsOut[i].m_z;
@@ -376,7 +376,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 				ndInt32 dx = 2 * count;
 				ndInt32 acc = dy - count;
 				ndInt32 index = 0;
-				for (ndInt32 i = 0; i < count; i++) 
+				for (ndInt32 i = 0; i < count; ++i) 
 				{
 					if (acc > 0) 
 					{
@@ -389,7 +389,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 				count = index;
 			}
 
-			for (ndInt32 i = 0; i < count; i++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndFloat32 y = contactsOut[i].m_y;
 				ndFloat32 z = contactsOut[i].m_z;
@@ -411,7 +411,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 		count = 0;
 		ndInt32 i0 = 3;
 		ndVector test0((m_profile[i0] - origin1).DotProduct(normal1));
-		for (ndInt32 i = 0; (i < 4) && (count < 2); i++) 
+		for (ndInt32 i = 0; (i < 4) && (count < 2); ++i) 
 		{
 			ndVector test1((m_profile[i] - origin1).DotProduct(normal1));
 			ndVector acrossPlane(test0 * test1);
@@ -425,7 +425,7 @@ ndInt32 ndShapeCylinder::CalculatePlaneIntersection(const ndVector& normal, cons
 			test0 = test1;
 		}
 
-		for (ndInt32 i = 0; i < count; i++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndFloat32 y = contactsOut[i].m_y;
 			ndFloat32 z = contactsOut[i].m_z;

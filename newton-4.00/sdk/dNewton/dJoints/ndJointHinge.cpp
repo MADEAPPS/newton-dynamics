@@ -196,14 +196,14 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 		ndFloat32 angle0 = m_minLimit;
 
 		ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-		for (ndInt32 i = 0; i <= subdiv; i++)
+		for (ndInt32 i = 0; i <= subdiv; ++i)
 		{
 			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
 			debugCallback.DrawLine(pitchMatrix.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}
 
-		for (ndInt32 i = 0; i < subdiv; i++)
+		for (ndInt32 i = 0; i < subdiv; ++i)
 		{
 			debugCallback.DrawLine(arch[i], arch[i + 1], color);
 		}

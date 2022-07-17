@@ -1357,7 +1357,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 
 	ndInt32 last = hullCount - 1;
 	convexHull.SetCount(hullCount + 1);
-	for (ndInt32 i = 0; i < hullCount; i++)
+	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
 		convexHull[i].m_point2d = array[i];
 		convexHull[i].m_next = &convexHull[i + 1];

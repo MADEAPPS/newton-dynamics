@@ -99,7 +99,7 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 	
 		ndFloat32 angle = ndFloat32(0.0f);
 		ndFloat32 omega = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < m_axleCount; i++)
+		for (ndInt32 i = 0; i < m_axleCount; ++i)
 		{
 			ndVector dir(m_axles[i].m_rightTire->GetMatrix().m_posit - m_axles[i].m_leftTire->GetMatrix().m_posit);
 			dir = dir.Normalize();

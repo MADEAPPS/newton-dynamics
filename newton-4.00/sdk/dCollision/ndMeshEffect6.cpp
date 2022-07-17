@@ -1711,7 +1711,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 			n.m_x = normal.m_x;
 			n.m_y = normal.m_y;
 			n.m_z = normal.m_z;
-			for (ndInt32 i = 0; i < attribCount; i++) 
+			for (ndInt32 i = 0; i < attribCount; ++i) 
 			{
 				edgeBuffer[i]->m_mark = mark;
 				ndInt32 index = ndInt32(edgeBuffer[i]->m_userData);
@@ -1725,7 +1725,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 ndBigVector ndMeshEffect::GetOrigin()const
 {
 	ndBigVector origin(ndFloat64(0.0f), ndFloat64(0.0f), ndFloat64(0.0f), ndFloat64(0.0f));
-	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i) 
 	{
 		origin += m_points.m_vertex[i];
 	}
@@ -1739,7 +1739,7 @@ void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const nd
 	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
 	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
-	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i) 
 	{
 		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
@@ -1790,7 +1790,7 @@ void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const nd
 			ndInt32 index = 0;
 			ndFloat64 maxProjection = ndFloat32(0.0f);
 
-			for (ndInt32 i = 0; i < 3; i++) 
+			for (ndInt32 i = 0; i < 3; ++i) 
 			{
 				ndFloat64 proj = fabs(n[i]);
 				if (proj > maxProjection) 
@@ -1836,7 +1836,7 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 	m_attrib.m_materialChannel.m_isValid = true;
 
 	ndInt32 mark = IncLRU();
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		ndMatrix rotationMatrix(dGetIdentityMatrix());
 		if (i == 1) 
@@ -1888,7 +1888,7 @@ void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMat
 {
 	ndBigVector origin(GetOrigin());
 	ndStack<ndBigVector>sphere(m_points.m_vertex.GetCount());
-	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
 		ndBigVector geoPoint(m_points.m_vertex[i] - origin);
 		dAssert(geoPoint.m_w == ndFloat32(0.0f));

@@ -538,7 +538,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				dPlane plane0(n0, -n0.DotProduct(q0).GetScalar());
 				dFloat32 maxDist0 = dFloat32(-1.0f);
 				dInt32 offsetIndex1 = -1;
-				for (dInt32 i = 0; i < indexCount1; i++)
+				for (dInt32 i = 0; i < indexCount1; ++i)
 				{
 					if (edge->m_twin->m_incidentVertex == indexArray1[i])
 					{
@@ -556,7 +556,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 					dPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
 					dFloat32 maxDist1 = dFloat32(-1.0f);
 					dInt32 offsetIndex0 = -1;
-					for (dInt32 i = 0; i < indexCount0; i++)
+					for (dInt32 i = 0; i < indexCount0; ++i)
 					{
 						if (edge->m_incidentVertex == indexArray0[i])
 						{
@@ -615,7 +615,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 			ndPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
 
 			ndFloat32 maxDist0 = ndFloat32(-1.0f);
-			for (ndInt32 i = 0; i < indexCount1; i++)
+			for (ndInt32 i = 0; i < indexCount1; ++i)
 			{
 				if (edge->m_twin->m_incidentVertex == indexArray1[i])
 				{
@@ -627,7 +627,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 			}
 
 			ndFloat32 maxDist1 = ndFloat32(-1.0f);
-			for (ndInt32 i = 0; i < indexCount0; i++)
+			for (ndInt32 i = 0; i < indexCount0; ++i)
 			{
 				if (edge->m_incidentVertex == indexArray0[i])
 				{
@@ -811,7 +811,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const cont
 	ndInt32 face[256];
 	ndInt64 data[256];
 	ndPolyhedra& adjacency = *((ndPolyhedra*)context);
-	for (ndInt32 i = 0; i < indexCount; i++)
+	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
 		face[i] = indexArray[i];
 		data[i] = ndInt64(indexArray);

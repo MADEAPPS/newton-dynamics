@@ -223,7 +223,7 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 
 	const ndInt32 vertexCount = m_vertexPoints.GetCount();
 	const ndInt32 stride = ndInt32 (strideInBytes / sizeof(ndFloat32));
-	for (ndInt32 i = 0; i < indexCount; i++)
+	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
 		pool[i] = i + vertexCount;
 		const ndInt32 j = indexArray[i] * stride;
@@ -297,7 +297,7 @@ void ndPolygonSoupBuilder::AddFace(const ndFloat32* const vertex, ndInt32 stride
 {
 	ndInt32 indexArray[1024];
 	dAssert(vertexCount < ndInt32 (sizeof(indexArray)/sizeof (indexArray[0])));
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		indexArray[i] = i;
 	}
@@ -554,7 +554,7 @@ void ndPolygonSoupBuilder::End(bool optimize)
 		// calculate all face the normals
 		m_normalPoints.Resize(faceCount);
 		m_normalPoints.SetCount(faceCount);
-		for (ndInt32 i = 0; i < faceCount; i++)
+		for (ndInt32 i = 0; i < faceCount; ++i)
 		{
 			ndInt32 faceIndexCount = m_faceVertexCount[i];
 

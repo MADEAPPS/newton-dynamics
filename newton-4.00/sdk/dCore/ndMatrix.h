@@ -237,7 +237,7 @@ inline ndMatrix ndMatrix::Inverse () const
 inline bool ndMatrix::TestIdentity() const
 {
 	const ndMatrix& me = *this;
-	for (ndInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		if (me[i][i] != ndFloat32 (1.0f)) 
 		{
@@ -262,7 +262,7 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 {
 	#ifdef _DEBUG
 		const ndMatrix& me = *this;
-		for (ndInt32 i = 0; i < 4; i++)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			for (ndInt32 j = 0; j < 4; j++)
 			{

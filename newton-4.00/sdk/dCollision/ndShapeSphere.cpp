@@ -130,7 +130,7 @@ void ndShapeSphere::Init(ndFloat32 radius)
 		ndInt32 vertexCount = ndVertexListToIndexList(&tmpVectex[0].m_x, sizeof(ndVector), 3, count, indexList, 0.001f);
 
 		dAssert(vertexCount == D_SPHERE_VERTEX_COUNT);
-		for (ndInt32 i = 0; i < vertexCount; i++) 
+		for (ndInt32 i = 0; i < vertexCount; ++i) 
 		{
 			m_unitSphere[i] = tmpVectex[i];
 		}
@@ -171,7 +171,7 @@ void ndShapeSphere::Init(ndFloat32 radius)
 		}
 	}
 	
-	for (ndInt32 i = 0; i < D_SPHERE_VERTEX_COUNT; i++) 
+	for (ndInt32 i = 0; i < D_SPHERE_VERTEX_COUNT; ++i) 
 	{
 		m_vertex[i] = m_unitSphere[i].Scale(m_radius);
 	}
@@ -272,7 +272,7 @@ void ndShapeSphere::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	TesselateTriangle(index, p5, p3, p1, count, tmpVectex);
 	TesselateTriangle(index, p5, p0, p3, count, tmpVectex);
 
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		edgeType[i] = ndShapeDebugNotify::m_shared;
 		tmpVectex[i] = matrix.TransformVector(tmpVectex[i].Scale(m_radius)) & ndVector::m_triplexMask;

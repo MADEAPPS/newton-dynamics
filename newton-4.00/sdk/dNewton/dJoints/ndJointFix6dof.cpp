@@ -80,7 +80,7 @@ void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	for (ndInt32 i = 0; i < 3; i++)
+	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[i]);
 		SetLowerFriction(desc, -m_maxForce);

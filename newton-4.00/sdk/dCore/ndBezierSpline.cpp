@@ -401,7 +401,7 @@ void ndBezierSpline::CreateCubicKnotVector(ndInt32 count, const ndBigVector* con
 #else
 
 	ndFloat64 d = ndFloat32(0.0f);
-	for (ndInt32 i = 1; i < count; i++)
+	for (ndInt32 i = 1; i < count; ++i)
 	{
 		ndBigVector step(points[i] - points[i - 1]);
 		dAssert(step.m_w == ndFloat32(0.0f));
@@ -410,7 +410,7 @@ void ndBezierSpline::CreateCubicKnotVector(ndInt32 count, const ndBigVector* con
 	}
 
 	d = ndFloat32(1.0f) / d;
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		u[i] *= d;
 	}

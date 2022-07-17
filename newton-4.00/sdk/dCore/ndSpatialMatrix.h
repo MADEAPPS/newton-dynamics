@@ -39,7 +39,7 @@ class ndSpatialMatrix
 	inline ndSpatialMatrix(ndFloat32 val)
 	{
 		const ndSpatialVector row (val);
-		for (ndInt32 i = 0; i < 6; i++) 
+		for (ndInt32 i = 0; i < 6; ++i) 
 		{
 			m_rows[i] = row;
 		}
@@ -68,7 +68,7 @@ class ndSpatialMatrix
 	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian) const
 	{
 		ndSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
-		for (ndInt32 i = 1; i < 6; i++) 
+		for (ndInt32 i = 1; i < 6; ++i) 
 		{
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}
@@ -78,7 +78,7 @@ class ndSpatialMatrix
 	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian, ndInt32 dof) const
 	{
 		ndSpatialVector tmp(ndFloat32 (0.0f));
-		for (ndInt32 i = 0; i < dof; i++) 
+		for (ndInt32 i = 0; i < dof; ++i) 
 		{
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}

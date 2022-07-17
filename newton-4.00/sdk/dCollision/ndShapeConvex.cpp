@@ -80,7 +80,7 @@ void ndShapeConvex::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	memset(mark, 0, sizeof(mark));
 	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 	matrix.TransformTriplex(&tmp[0].m_x, sizeof(ndVector), &m_vertex[0].m_x, sizeof(ndVector), m_vertexCount);
-	for (ndInt32 i = 0; i < m_edgeCount; i++) 
+	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		if (!mark[i]) 
 		{
@@ -107,7 +107,7 @@ void ndShapeConvex::SetVolumeAndCG()
 	memset(&edgeMarks[0], 0, sizeof(ndInt8) * m_edgeCount);
 
 	ndPolyhedraMassProperties localData;
-	for (ndInt32 i = 0; i < m_edgeCount; i++) 
+	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		ndConvexSimplexEdge* const face = &m_simplex[i];
 		if (!edgeMarks[i]) {
@@ -137,7 +137,7 @@ void ndShapeConvex::SetVolumeAndCG()
 	ndVector p0(ndVector::m_zero);
 	ndVector p1(ndVector::m_zero);
 
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		ndVector dir(ndFloat32(0.0f));
 		dir[i] = ndFloat32(-1.0f);
@@ -228,7 +228,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		ndFloat32 originMag2 = origin.DotProduct(origin).GetScalar();
 		ndMatrix Covariance(origin, origin);
 		ndMatrix parallel(dGetIdentityMatrix());
-		for (ndInt32 i = 0; i < 3; i++) 
+		for (ndInt32 i = 0; i < 3; ++i) 
 		{
 			parallel[i][i] = originMag2;
 			inertia[i] += (parallel[i] - Covariance[i]);
@@ -337,7 +337,7 @@ bool ndShapeConvex::SanityCheck(ndInt32 count, const ndVector& normal, ndVector*
 	if (count > 1) 
 	{
 		ndInt32 j = count - 1;
-		for (ndInt32 i = 0; i < count; i++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndVector error(contactsOut[i] - contactsOut[j]);
 			dAssert(error.m_w == ndFloat32(0.0f));
@@ -352,7 +352,7 @@ bool ndShapeConvex::SanityCheck(ndInt32 count, const ndVector& normal, ndVector*
 		{
 			ndVector n(ndFloat32(0.0f));
 			ndVector e0(contactsOut[1] - contactsOut[0]);
-			for (ndInt32 i = 2; i < count; i++) 
+			for (ndInt32 i = 2; i < count; ++i) 
 			{
 				ndVector e1(contactsOut[i] - contactsOut[0]);
 				n += e0.CrossProduct(e1);
@@ -371,7 +371,7 @@ bool ndShapeConvex::SanityCheck(ndInt32 count, const ndVector& normal, ndVector*
 
 			e0 = contactsOut[count - 1] - contactsOut[count - 2];
 			j = count - 1;
-			for (ndInt32 i = 0; i < count; i++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndVector e1(contactsOut[i] - contactsOut[j]);
 				ndVector n1(e0.CrossProduct(e1));
@@ -406,7 +406,7 @@ ndInt32 ndShapeConvex::RectifyConvexSlice(ndInt32 count, const ndVector& normal,
 
 	ndInt32 start = count;
 	ndInt32 i0 = count - 1;
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		convexHull[i].m_vertexIndex = i;
 		convexHull[i].m_next = &convexHull[i + 1];
@@ -417,7 +417,7 @@ ndInt32 ndShapeConvex::RectifyConvexSlice(ndInt32 count, const ndVector& normal,
 
 	ndVector hullArea(ndVector::m_zero);
 	ndVector edge0(contactsOut[1] - contactsOut[0]);
-	for (ndInt32 i = 2; i < count; i++) 
+	for (ndInt32 i = 2; i < count; ++i) 
 	{
 		ndVector edge1(contactsOut[i] - contactsOut[0]);
 		hullArea += edge1.CrossProduct(edge0);
@@ -598,7 +598,7 @@ ndInt32 ndShapeConvex::CalculatePlaneIntersection(const ndVector& normal, const 
 				if (!firstEdge) 
 				{
 					// we may have a local minimal in the convex hull do to a big flat face
-					for (ndInt32 i = 0; i < m_edgeCount; i++) 
+					for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 					{
 						ptr = &m_simplex[i];
 						side0 = plane.Evalue(m_vertex[ptr->m_vertex]);
@@ -638,7 +638,7 @@ ndInt32 ndShapeConvex::CalculatePlaneIntersection(const ndVector& normal, const 
 				if (!firstEdge) 
 				{
 					// we may have a local minimal in the convex hull due to a big flat face
-					for (ndInt32 i = 0; i < m_edgeCount; i++) 
+					for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 					{
 						ptr = &m_simplex[i];
 						side0 = plane.Evalue(m_vertex[ptr->m_vertex]);
@@ -829,7 +829,7 @@ ndVector ndShapeConvex::CalculateVolumeIntegral(const ndPlane& plane) const
 
 	ndInt32 positive = 0;
 	ndInt32 negative = 0;
-	for (ndInt32 i = 0; i < m_vertexCount; i++) 
+	for (ndInt32 i = 0; i < m_vertexCount; ++i) 
 	{
 		test[i] = plane.Evalue(m_vertex[i]);
 		if (test[i] > ndFloat32(1.0e-5f)) 
@@ -861,7 +861,7 @@ ndVector ndShapeConvex::CalculateVolumeIntegral(const ndPlane& plane) const
 
 	ndVector cg(ndVector::m_zero);
 	memset(mark, 0, m_edgeCount);
-	for (ndInt32 i = 0; i < m_edgeCount; i++) 
+	for (ndInt32 i = 0; i < m_edgeCount; ++i) 
 	{
 		if (!mark[i]) 
 		{
@@ -1027,7 +1027,7 @@ ndInt32 ndShapeConvex::BuildCylinderCapPoly(ndFloat32 radius, const ndMatrix& tr
 	ndVector r(ndFloat32(0.0f), ndFloat32(0.0f), radius, ndFloat32(0.0f));
 	ndMatrix rotation(dPitchMatrix(angle));
 
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		vertexOut[i] = transform.TransformVector(r);
 		r = rotation.RotateVector(r);

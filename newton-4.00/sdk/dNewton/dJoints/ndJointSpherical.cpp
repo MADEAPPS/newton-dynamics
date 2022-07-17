@@ -176,14 +176,14 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 		ndFloat32 angle0 = m_minTwistAngle;
 	
 		ndVector color(ndFloat32 (0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-		for (ndInt32 i = 0; i <= subdiv; i++) 
+		for (ndInt32 i = 0; i <= subdiv; ++i) 
 		{
 			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
 			debugCallback.DrawLine(pitchMatrix.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}
 	
-		for (ndInt32 i = 0; i < subdiv; i++) 
+		for (ndInt32 i = 0; i < subdiv; ++i) 
 		{
 			debugCallback.DrawLine(arch[i], arch[i + 1], color);
 		}
@@ -197,7 +197,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 		ndFloat32 angleStep = ndPi * ndFloat32(2.0f) / subdiv;
 	
 		ndFloat32 angle0 = ndFloat32 (0.0f);
-		for (ndInt32 i = 0; i <= subdiv; i++) 
+		for (ndInt32 i = 0; i <= subdiv; ++i) 
 		{
 			ndVector conePoint(dPitchMatrix(angle0).RotateVector(point));
 			ndVector p(matrix1.TransformVector(conePoint));
@@ -206,7 +206,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 			angle0 += angleStep;
 		}
 	
-		for (ndInt32 i = 0; i < subdiv; i++) 
+		for (ndInt32 i = 0; i < subdiv; ++i) 
 		{
 			debugCallback.DrawLine(arch[i], arch[i + 1], color);
 		}

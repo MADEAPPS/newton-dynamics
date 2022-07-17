@@ -142,7 +142,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey1, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount(), nullptr, nullptr);
 
 #ifdef _DEBUG
-	for (int i = 1; i < bodyJointPairs.GetCount(); i++)
+	for (int i = 1; i < bodyJointPairs.GetCount(); ++i)
 	{
 		ndUnsigned32 key0 = bodyJointPairs[i - 1].m_body;
 		ndUnsigned32 key1 = bodyJointPairs[i + 0].m_body;

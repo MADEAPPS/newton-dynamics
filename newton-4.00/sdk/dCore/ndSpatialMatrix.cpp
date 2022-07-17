@@ -28,14 +28,14 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 {
 	ndSpatialMatrix tmp;
 	ndSpatialMatrix inv;
-	for (ndInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; ++i) 
 	{
 		tmp[i] = (*this)[i];
 		inv[i] = ndSpatialVector::m_zero;
 		inv[i][i] = ndFloat32(1.0f);
 	}
 
-	for (ndInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; ++i) 
 	{
 		ndFloat64 pivot = ndAbs(tmp[i][i]);
 		if (pivot < ndFloat64(0.01f)) 
@@ -107,7 +107,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 
 
 #ifdef _DEBUG
-	for (ndInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; ++i) 
 	{
 		for (ndInt32 j = 0; j < rows; j++) 
 		{
@@ -115,7 +115,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 		}
 	}
 
-	for (ndInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; ++i) 
 	{
 		ndSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
 		dAssert(ndAbs(v[i] - ndFloat64(1.0f)) < ndFloat64(1.0e-6f));

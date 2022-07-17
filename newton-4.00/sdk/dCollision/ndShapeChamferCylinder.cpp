@@ -210,7 +210,7 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 	{
 		ndVector p0(-m_height * ndCos(sliceAngle), ndFloat32(0.0f), m_radius + m_height * ndSin(sliceAngle), ndFloat32(0.0f));
 		sliceAngle += sliceStep;
-		for (ndInt32 i = 0; i < brakes; i++)
+		for (ndInt32 i = 0; i < brakes; ++i)
 		{
 			pool[index] = p0;
 			p0 = rot.UnrotateVector(p0);
@@ -228,7 +228,7 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 	for (ndInt32 j = 0; j < slices; j++)
 	{
 		ndInt32 index0 = index + brakes - 1;
-		for (ndInt32 i = 0; i < brakes; i++)
+		for (ndInt32 i = 0; i < brakes; ++i)
 		{
 			face[0] = pool[index];
 			face[1] = pool[index0];
@@ -240,13 +240,13 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 		}
 	}
 
-	for (ndInt32 i = 0; i < brakes; i++)
+	for (ndInt32 i = 0; i < brakes; ++i)
 	{
 		face[i] = pool[i];
 	}
 	debugCallback.DrawPolygon(24, face, edgeType);
 
-	for (ndInt32 i = 0; i < brakes; i++)
+	for (ndInt32 i = 0; i < brakes; ++i)
 	{
 		face[i] = pool[brakes * (slices + 1) - i - 1];
 	}

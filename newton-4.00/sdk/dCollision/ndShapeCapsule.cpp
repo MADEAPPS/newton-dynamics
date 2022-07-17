@@ -81,7 +81,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	m_normal = ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 	ndVector side(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f));
 
-	for (ndInt32 i = 0; i < 16; i++) 
+	for (ndInt32 i = 0; i < 16; ++i) 
 	{
 		ndVector p1p0(m_p1 - m_p0);
 		m_normal = side.CrossProduct(p1p0).Normalize();
@@ -119,7 +119,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 		ndFloat32 r0 = ndSqrt(arg);
 
 		ndFloat32 angle = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; ++i) 
 		{
 			ndFloat32 z = ndSin(angle);
 			ndFloat32 y = ndCos(angle);
@@ -139,7 +139,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 		ndFloat32 arg = ndMax(m_radius1 * m_radius1 - x * x, ndFloat32(1.0e-3f));
 		ndFloat32 r1 = ndSqrt(arg);
 		ndFloat32 angle = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; ++i) 
 		{
 			ndFloat32 z = ndSin(angle);
 			ndFloat32 y = ndCos(angle);
@@ -165,7 +165,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	const ndInt32 n = index / DG_CAPSULE_CAP_SEGMENTS - 1;
 	for (ndInt32 j = 0; j < n; j++) 
 	{
-		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; ++i) 
 		{
 			wireframe[0] = i0;
 			wireframe[1] = i1;
@@ -178,13 +178,13 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 		i0 = i1 + DG_CAPSULE_CAP_SEGMENTS - 1;
 	}
 
-	for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; ++i) 
 	{
 		wireframe[i] = DG_CAPSULE_CAP_SEGMENTS - i - 1;
 	}
 	polyhedra.AddFace(DG_CAPSULE_CAP_SEGMENTS, wireframe);
 
-	for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; ++i) 
 	{
 		wireframe[i] = index - DG_CAPSULE_CAP_SEGMENTS + i;
 	}

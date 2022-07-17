@@ -53,7 +53,7 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 	const ndInt32 count = ndMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
 	if (count)
 	{
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			ndContactPoint& contact = contactBuffer[i];
 			contact.m_body0 = nullptr;
@@ -85,7 +85,7 @@ bool ndConvexCastNotify::CastShape(
 
 	bool cast = CastShape(castingInstance, globalOrigin, globalDest, &body1);
 	//return CastShape(castingInstance, globalOrigin, globalDest, &body1);
-	for (ndInt32 i = 0; i < m_contacts.GetCount(); i++)
+	for (ndInt32 i = 0; i < m_contacts.GetCount(); ++i)
 	{
 		ndContactPoint& contact = m_contacts[i];
 		contact.m_body1 = nullptr;

@@ -306,9 +306,11 @@ class dQuadrupedRobot : public ndModel
 						
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
-						hinge->SetLimits(-60.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						m_jointArray.PushBack(hinge);
+						hinge->SetLimitState(true);
+						hinge->SetLimits(-20.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
 						world->AddJoint(hinge);
+						m_jointArray.PushBack(hinge);
+
 						parentBody = childBody;
 					}
 					else if (definition.m_type == dQuadrupedRobotDefinition::m_spherical)
@@ -318,8 +320,8 @@ class dQuadrupedRobot : public ndModel
 						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
-						socket->SetConeLimit(120.0f * ndDegreeToRad);
-						socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						//socket->SetConeLimit(120.0f * ndDegreeToRad);
+						//socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 						world->AddJoint(socket);
 						parentBody = childBody;
@@ -340,9 +342,14 @@ class dQuadrupedRobot : public ndModel
 						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
 						ndFloat32 regularizer = 0.001f;
-						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
-						effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
-						effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
+
+						ndMatrix effectorBaseFrame(dPitchMatrix(90.0f * ndDegreeToRad) * m_rootBody->GetMatrix());
+						ndMatrix effectorTargetFrame(effectorBaseFrame);
+						effectorBaseFrame.m_posit = pivotFrame.m_posit;
+						effectorTargetFrame.m_posit = effectorFrame.m_posit;
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorTargetFrame, effectorBaseFrame, swivelFrame, parentBody, m_rootBody);
+						//effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
+						//effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
 
 						world->AddJoint(effector);
 						m_effectors.PushBack(dEffectorInfo(effector));

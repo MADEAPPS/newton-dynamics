@@ -266,7 +266,7 @@ ndFloat64 ndConvexHull4dTetraherum::GetTetraVolume(const ndConvexHull4dVector* c
 	const ndBigVector &p3 = points[m_faces[0].m_index[3]];
 
 	ndFloat64 matrix[3][3];
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		matrix[0][i] = p2[i] - p0[i];
 		matrix[1][i] = p1[i] - p0[i];
@@ -284,7 +284,7 @@ ndFloat64 ndConvexHull4dTetraherum::GetTetraVolume(const ndConvexHull4dVector* c
 	}
 
 	ndGoogol exactMatrix[3][3];
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		exactMatrix[0][i] = ndGoogol(p2[i]) - ndGoogol(p0[i]);
 		exactMatrix[1][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
@@ -650,7 +650,7 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 		public:
 		ndInt32 Compare(const ndConvexHull4dVector& elementA, const ndConvexHull4dVector& elementB, void* const) const
 		{
-			for (ndInt32 i = 0; i < 4; i++)
+			for (ndInt32 i = 0; i < 4; ++i)
 			{
 				if (elementA[i] < elementB[i])
 				{
@@ -699,7 +699,7 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 	const ndFloat64 testVol = ndFloat32 (1.0e-6f) * m_diag * m_diag * m_diag;
 
 	const ndNormalMap& normalMap = GetNormaMap();
-	for (ndInt32 i = 0; !validTetrahedrum && (i < normalMap.m_count); i++) 
+	for (ndInt32 i = 0; !validTetrahedrum && (i < normalMap.m_count); ++i) 
 	{
 		ndInt32 index = SupportVertex(&tree, points, normalMap.m_normal[i], false);
 		convexPoints[0] = points[index];

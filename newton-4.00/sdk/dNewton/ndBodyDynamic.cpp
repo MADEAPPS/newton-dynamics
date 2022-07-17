@@ -155,7 +155,7 @@ void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& 
 	tmp[3][3] = ndFloat32(1.0f);
 
 	ndMatrix contactMatrix(tmp * invInertia * tmp);
-	//for (ndInt32 i = 0; i < 3; i++) 
+	//for (ndInt32 i = 0; i < 3; ++i) 
 	//{
 	//	for (ndInt32 j = 0; j < 3; j++) 
 	//	{
@@ -206,7 +206,7 @@ void ndBodyDynamic::ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const im
 	ndVector angularImpulse(ndVector::m_zero);
 
 	ndVector com(m_globalCentreOfMass);
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndVector r(pointArray[i]);
 		ndVector L(impulseArray[i]);

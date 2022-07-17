@@ -245,7 +245,7 @@ void ndIkSolver::BuildMassMatrix()
 	
 	// add close loop 
 	const ndInt32 loopCount = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-	for (ndInt32 i = 0; i < loopCount; i++)
+	for (ndInt32 i = 0; i < loopCount; ++i)
 	{
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
@@ -329,14 +329,14 @@ void ndIkSolver::BuildMassMatrix()
 	}
 	
 	const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
-	for (ndInt32 i = 0; i < loops; i++)
+	for (ndInt32 i = 0; i < loops; ++i)
 	{
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
 		GetJacobianDerivatives(joint);
 		BuildJacobianMatrix(joint);
 	}
 	
-	for (ndInt32 i = 0; i < contacts.GetCount(); i++)
+	for (ndInt32 i = 0; i < contacts.GetCount(); ++i)
 	{
 		ndContact* const contact = contacts[i];
 		GetJacobianDerivatives(contact);

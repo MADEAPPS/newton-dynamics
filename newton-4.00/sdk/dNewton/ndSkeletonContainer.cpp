@@ -495,7 +495,7 @@ void ndSkeletonContainer::CheckSleepState()
 	if (equilibrium)
 	{
 		const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
-		for (ndInt32 i = 0; i < loopCount; i++)
+		for (ndInt32 i = 0; i < loopCount; ++i)
 		{
 			const ndConstraint* const joint = m_loopingJoints[i];
 			ndBodyKinematic* const body0 = joint->GetBody0();
@@ -517,7 +517,7 @@ void ndSkeletonContainer::CheckSleepState()
 		}
 
 		const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
-		for (ndInt32 i = 0; i < loopCount; i++)
+		for (ndInt32 i = 0; i < loopCount; ++i)
 		{
 			const ndConstraint* const joint = m_loopingJoints[i];
 			ndBodyKinematic* const body0 = joint->GetBody0();
@@ -837,7 +837,7 @@ void ndSkeletonContainer::FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat3
 	{
 		srcLine = 0;
 		dstLine = 0;
-		for (ndInt32 i = 0; i < size; i++)
+		for (ndInt32 i = 0; i < size; ++i)
 		{
 			memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(ndFloat32));
 			diagDamp[i] *= ndFloat32(4.0f);
@@ -867,7 +867,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	ndInt32 primaryIndex = 0;
 	ndInt32 auxiliaryIndex = 0;
 	const ndInt32 nodeCount = m_nodeList.GetCount() - 1;
-	for (ndInt32 i = 0; i < nodeCount; i++)
+	for (ndInt32 i = 0; i < nodeCount; ++i)
 	{
 		const ndNode* const node = m_nodesOrder[i];
 		ndJointBilateralConstraint* const joint = node->m_joint;
@@ -1133,7 +1133,7 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 	ndFloat32* const residual = ndAlloca(ndFloat32, size);
 
 	ndInt32 base = 0;
-	for (ndInt32 i = 0; i < size; i++)
+	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const ndInt32 index = normalIndex[i];
 		const ndInt32 mask = index >> 31;
@@ -1149,7 +1149,7 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 	}
 
 	base = 0;
-	for (ndInt32 i = 0; i < size; i++)
+	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const ndFloat32* const row = &matrix[base];
 		residual[i] = b[i] - dDotProduct(size, row, x);
@@ -1164,7 +1164,7 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 		base = 0;
 		iterCount++;
 		tolerance = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < size; i++)
+		for (ndInt32 i = 0; i < size; ++i)
 		{
 			const ndFloat32 r = residual[i];
 			const ndInt32 index = normalIndex[i];
@@ -1225,7 +1225,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 	ndInt32* const tempNormalIndex = ndAlloca(ndInt32, size);
 
 	ndInt32 base = 0;
-	for (ndInt32 i = 0; i < size; i++)
+	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const ndInt32 index = normalIndex[i];
 		const ndInt32 mask = index >> 31;
@@ -1242,7 +1242,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 	}
 
 	base = 0;
-	for (ndInt32 i = 0; i < size; i++)
+	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const ndFloat32* const row = &matrix[base];
 		residual[i] = b[i] - dDotProduct(size, row, x);
@@ -1257,7 +1257,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 		base = 0;
 		iterCount++;
 		tolerance = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < size; i++)
+		for (ndInt32 i = 0; i < size; ++i)
 		{
 			const ndFloat32 r = residual[i];
 			const ndInt32 index = tempNormalIndex[i];
@@ -1422,7 +1422,7 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	ndSpatialMatrix* const jointMassArray = ndAlloca(ndSpatialMatrix, nodeCount);
 	if (m_nodesOrder)
 	{
-		for (ndInt32 i = 0; i < nodeCount - 1; i++)
+		for (ndInt32 i = 0; i < nodeCount - 1; ++i)
 		{
 			ndNode* const node = m_nodesOrder[i];
 			rowCount += node->m_joint->m_rowCount;

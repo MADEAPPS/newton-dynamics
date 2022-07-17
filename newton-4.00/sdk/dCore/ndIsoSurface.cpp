@@ -3210,7 +3210,7 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	const ndVector invGrid(ndFloat32(1.0f) / me->m_gridSize);
 	const ndArray<ndVector>& points = me->m_points;
 	m_triangles.SetCount(points.GetCount());
-	for (ndInt32 i = 0; i < points.GetCount(); i++)
+	for (ndInt32 i = 0; i < points.GetCount(); ++i)
 	{
 		m_triangles[i] = points[i] * invGrid;
 		m_triangles[i].m_w = ndFloat32(i);
@@ -3270,7 +3270,7 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 		vertexCount++;
 	}
 
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		ndInt32 j = strideInFloats * i;
 		m_triangles[i] = ndVector::m_zero;
@@ -3299,7 +3299,7 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	}
 
 	// Normalize normals.
-	for (ndInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		ndVector normal(m_triangles[i] * m_triangles[i].InvMagSqrt());
 		ndInt32 j = strideInFloats * i;

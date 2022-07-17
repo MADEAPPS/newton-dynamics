@@ -206,7 +206,7 @@ inline void ndDynamicsUpdate::ClearJacobianBuffer(ndInt32 count, ndJacobian* con
 {
 	const ndVector zero(ndVector::m_zero);
 	ndVector* const dst = &buffer[0].m_linear;
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		dst[i * 2 + 0] = zero;
 		dst[i * 2 + 1] = zero;
@@ -219,7 +219,7 @@ inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, ndInt32 sizeInByte
 	ndInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
 	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
 	char* const ptr = (char*)buffer;
-	for (ndInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
+	for (ndInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; ++i)
 	{
 		ptr[i] = 0;
 	}

@@ -196,8 +196,8 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	debugCallback.DrawFrame(swivelMatrix1);
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 	
+	debugCallback.DrawFrame(matrix1);
 	debugCallback.DrawFrame(matrix0, 0.5f);
-	//debugCallback.DrawFrame(matrix1);
 	debugCallback.DrawFrame(targetFrame);
 	debugCallback.DrawPoint(targetFrame.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }

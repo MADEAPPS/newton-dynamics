@@ -118,7 +118,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	char* const buffer = ndAlloca(char, count * 4 * 12);
 
 	char* ptr = buffer;
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		for (ndInt32 j = 0; j < 3; j++)
 		{
@@ -176,7 +176,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 
 	size_t start = 0;
 	ndVector point(ndVector::m_zero);
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		char x[64];
 		char y[64];

@@ -118,7 +118,7 @@ class dAiBotTest_1 : public ndModel
 			caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
 			ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, caff, thigh);
 
-			// add joint limit to prevent elbow from flipping
+			// add joint limit to prevent knee from flipping
 			hinge->SetLimitState(true);
 			hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
 			world->AddJoint(hinge);

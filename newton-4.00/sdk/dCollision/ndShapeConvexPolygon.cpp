@@ -280,7 +280,7 @@ ndVector ndShapeConvexPolygon::SupportVertex(const ndVector& dir, ndInt32* const
 
 	ndInt32 index = 0;
 	ndFloat32 val = m_localPoly[0].DotProduct(dir).GetScalar();
-	for (ndInt32 i = 1; i < m_paddedCount; i++) 
+	for (ndInt32 i = 1; i < m_paddedCount; ++i) 
 	{
 		ndFloat32 val1 = m_localPoly[i].DotProduct(dir).GetScalar();
 		if (val1 > val) 
@@ -311,7 +311,7 @@ void ndShapeConvexPolygon::GenerateConvexCap(const ndShapeInstance* const parent
 	ndInt32 count = m_count;
 	const ndVector skirt(D_CONVEX_POLYGON_SKIRT_LENGTH);
 	ndInt32 i0 = m_count - 1;
-	for (ndInt32 i = 0; i < m_count; i++)
+	for (ndInt32 i = 0; i < m_count; ++i)
 	{
 		const ndVector faceEddge(m_localPoly[i] - m_localPoly[i0]);
 		dAssert(faceEddge.m_w == ndFloat32(0.0f));
@@ -352,7 +352,7 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, ndFloat32 dist, 
 	planes[1] = ndPlane(dir, dist - distV);
 	planes[3] = ndPlane(dir * ndVector::m_negOne, dist + distV);
 
-	for (ndInt32 i = 0; i < m_count; i++) 
+	for (ndInt32 i = 0; i < m_count; ++i) 
 	{
 		ndInt32 j = i << 1;
 		dAssert(j < ndInt32 (sizeof(clippedFace) / sizeof(clippedFace[0])));
@@ -379,7 +379,7 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, ndFloat32 dist, 
 	ndInt32 edgeCount = m_count * 2;
 	ndInt32 indexCount = m_count;
 	dgClippedFaceEdge* first = &clippedFace[0];
-	for (ndInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		const ndPlane& plane = planes[i];
 
@@ -521,7 +521,7 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, ndFloat32 dist, 
 		GenerateConvexCap(parentMesh);
 		//const ndVector skirt(D_CONVEX_POLYGON_SKIRT_LENGTH);
 		//ndInt32 i0 = m_count - 1;
-		//for (ndInt32 i = 0; i < m_count; i++) 
+		//for (ndInt32 i = 0; i < m_count; ++i) 
 		//{
 		//	const ndVector faceEddge(m_localPoly[i] - m_localPoly[i0]);
 		//	dAssert(faceEddge.m_w == ndFloat32(0.0f));
@@ -593,7 +593,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 
 	bool inside = true;
 	ndInt32 i0 = m_count - 1;
-	for (ndInt32 i = 0; i < m_count; i++)
+	for (ndInt32 i = 0; i < m_count; ++i)
 	{
 		ndVector e(m_localPoly[i] - m_localPoly[i0]);
 		ndVector edgeBoundaryNormal(m_normal.CrossProduct(e));
@@ -652,7 +652,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 		ndVector step(normalInHull.Scale((contactSolver.m_skinMargin - penetration) * ndFloat32(0.5f)));
 
 		ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-		for (ndInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; ++i)
 		{
 			contactsOut[i].m_point = hullMatrix.TransformVector(contactPoints[i] + step);
 			contactsOut[i].m_normal = m_normal;
@@ -673,7 +673,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 		if (count >= 1)
 		{
 			ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-			for (ndInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; ++i)
 			{
 				contactsOut[i].m_shapeId0 = hullId;
 				contactsOut[i].m_shapeId1 = m_faceId;
@@ -721,7 +721,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 	
 	ndVector polyBoxP0(ndFloat32(1.0e15f));
 	ndVector polyBoxP1(ndFloat32(-1.0e15f));
-	for (ndInt32 i = 0; i < m_count; i++) 
+	for (ndInt32 i = 0; i < m_count; ++i) 
 	{
 		const ndVector point(polygonMatrix.UntransformVector(m_localPoly[i]));
 		polyBoxP0 = polyBoxP0.GetMin(point);
@@ -762,7 +762,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 	
 		inside = true;
 		ndInt32 i0 = m_count - 1;
-		for (ndInt32 i = 0; i < m_count; i++) 
+		for (ndInt32 i = 0; i < m_count; ++i) 
 		{
 			const ndVector e(m_localPoly[i] - m_localPoly[i0]);
 			const ndVector n((e.CrossProduct(m_normal) & ndVector::m_triplexMask).Normalize());
@@ -816,7 +816,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 					ndVector step(relativeVelocity.Scale(timetoImpact));
 					penetration = ndMax(penetration, ndFloat32(0.0f));
 					ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-					for (ndInt32 i = 0; i < count; i++) 
+					for (ndInt32 i = 0; i < count; ++i) 
 					{
 						contactsOut[i].m_point = matrixInstance0.TransformVector(contactPoints[i]) + step;
 						contactsOut[i].m_normal = m_normal;
@@ -834,7 +834,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 			if (count >= 1) 
 			{
 				ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-				for (ndInt32 i = 0; i < count; i++) 
+				for (ndInt32 i = 0; i < count; ++i) 
 				{
 					contactsOut[i].m_shapeId0 = hullId;
 					contactsOut[i].m_shapeId1 = m_faceId;

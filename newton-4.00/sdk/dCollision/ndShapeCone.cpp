@@ -70,7 +70,7 @@ void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)
 	m_height = ndMax(ndAbs(height * ndFloat32(0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	ndFloat32 angle = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < D_CONE_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < D_CONE_SEGMENTS; ++i) 
 	{
 		ndFloat32 sinAngle = ndSin(angle);
 		ndFloat32 cosAngle = ndCos(angle);
@@ -90,7 +90,7 @@ void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)
 
 		ndInt32 j = D_CONE_SEGMENTS - 1;
 		polyhedra.BeginFace();
-		for (ndInt32 i = 0; i < D_CONE_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < D_CONE_SEGMENTS; ++i) 
 		{
 			wireframe[0] = j;
 			wireframe[1] = i;
@@ -99,7 +99,7 @@ void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)
 			polyhedra.AddFace(3, wireframe);
 		}
 
-		for (ndInt32 i = 0; i < D_CONE_SEGMENTS; i++) 
+		for (ndInt32 i = 0; i < D_CONE_SEGMENTS; ++i) 
 		{
 			wireframe[i] = D_CONE_SEGMENTS - 1 - i;
 		}
@@ -158,7 +158,7 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 	ndFloat32 angle = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		ndFloat32 z = ndSin(angle) * m_radius;
 		ndFloat32 y = ndCos(angle) * m_radius;
@@ -175,7 +175,7 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 
 	matrix.TransformTriplex(&pool[0].m_x, sizeof(ndVector), &pool[0].m_x, sizeof(ndVector), NUMBER_OF_DEBUG_SEGMENTS + 1);
 	ndInt32 j = NUMBER_OF_DEBUG_SEGMENTS - 1;
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		face[0] = pool[j];
 		face[1] = pool[i];
@@ -184,7 +184,7 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 		debugCallback.DrawPolygon(3, face, edgeType);
 	}
 
-	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
+	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
 	{
 		face[i] = pool[NUMBER_OF_DEBUG_SEGMENTS - 1 - i];
 	}
@@ -306,7 +306,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 				ndInt32 dx = 2 * count;
 				ndInt32 acc = dy - count;
 				ndInt32 index = 0;
-				for (ndInt32 i = 0; i < count; i++) 
+				for (ndInt32 i = 0; i < count; ++i) 
 				{
 					if (acc > 0) 
 					{
@@ -319,7 +319,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 				count = index;
 			}
 
-			for (ndInt32 i = 0; i < count; i++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndFloat32 y = contactsOut[i].m_y;
 				ndFloat32 z = contactsOut[i].m_z;
@@ -341,7 +341,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 		count = 0;
 		ndInt32 i0 = 2;
 		ndVector test0((m_profile[i0] - origin1).DotProduct(normal1));
-		for (ndInt32 i = 0; (i < 3) && (count < 2); i++) 
+		for (ndInt32 i = 0; (i < 3) && (count < 2); ++i) 
 		{
 			ndVector test1((m_profile[i] - origin1).DotProduct(normal1));
 			ndVector acrossPlane(test0 * test1);
@@ -355,7 +355,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 			test0 = test1;
 		}
 
-		for (ndInt32 i = 0; i < count; i++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndFloat32 y = contactsOut[i].m_y;
 			ndFloat32 z = contactsOut[i].m_z;

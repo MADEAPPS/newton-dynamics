@@ -137,7 +137,7 @@ class ndTemplateVector: public ndClassAlloc
 		T array[4][4];
 
 		const ndTemplateVector<T>& me = *this;
-		for (ndInt32 i = 0; i < 4; i++) {
+		for (ndInt32 i = 0; i < 4; ++i) {
 			array[0][i] = me[i];
 			array[1][i] = A[i];
 			array[2][i] = B[i];
@@ -146,7 +146,7 @@ class ndTemplateVector: public ndClassAlloc
 
 		ndTemplateVector<T> normal;
 		T sign = T(-1.0f);
-		for (ndInt32 i = 0; i < 4; i++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			for (ndInt32 j = 0; j < 3; j++) 
 			{

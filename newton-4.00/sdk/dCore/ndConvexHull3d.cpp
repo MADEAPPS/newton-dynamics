@@ -291,7 +291,7 @@ void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 	ndStack<ndConvexHull3dPointCluster> treePool (treeCount + 256);
 
 	const ndInt32 stride = ndInt32(strideInBytes / sizeof(ndFloat64));
-	for (ndInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndInt32 index = i * stride;
 		ndBigVector& vertex = points[i];
@@ -448,7 +448,7 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, ndIn
 		public:
 		ndInt32 Compare(const ndConvexHull3dVertex& elementA, const ndConvexHull3dVertex& elementB, void* const) const
 		{
-			for (ndInt32 i = 0; i < 3; i++) 
+			for (ndInt32 i = 0; i < 3; ++i) 
 			{
 				if (elementA[i] < elementB[i])
 				{
@@ -467,9 +467,9 @@ ndInt32 ndConvexHull3d::GetUniquePoints(ndConvexHull3dVertex* const points, ndIn
 
 	ndInt32 indexCount = 0;
 	CompareVertex compareVetex;
-	for (ndInt32 i = 1; i < count; i++) 
+	for (ndInt32 i = 1; i < count; ++i) 
 	{
-		for (; i < count; i++) 
+		for (; i < count; ++i) 
 		{
 			if (compareVetex.Compare(points[indexCount], points[i], nullptr))
 			{

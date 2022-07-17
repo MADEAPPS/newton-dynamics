@@ -2701,7 +2701,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 		}
 	}
 
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndEdge* const edge1 = array[i];
 		ndEdge* const twin1 = edge1->m_twin;
@@ -2814,7 +2814,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 						ptr = ptr->m_next;
 					} while (ptr != edge1);
 
-					for (ndInt32 i = 0; i < count1 - 1; i++) 
+					for (ndInt32 i = 0; i < count1 - 1; ++i) 
 					{
 						for (ndInt32 j = i + 1; j < count1; j++) 
 						{
@@ -2991,7 +2991,7 @@ void ndPolyhedra::RemoveInteriorEdges (ndPolyhedra& buildConvex, const ndFloat64
 								ptr = ptr->m_next;
 							} while (ptr != edge);
 
-							for (ndInt32 i = 0; i < count - 1; i++) 
+							for (ndInt32 i = 0; i < count - 1; ++i) 
 							{
 								for (ndInt32 j = i + 1; j < count; j++) 
 								{
@@ -3148,7 +3148,7 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 		//ndVector* const dst = (ndVector*)&pool[0].m_x;
 		//ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
 		const ndArray<ndBigVector>& hullVertexArray = convexHull.GetVertexPool();
-		for (ndInt32 i = 0; i < hullVertexArray.GetCount(); i++)
+		for (ndInt32 i = 0; i < hullVertexArray.GetCount(); ++i)
 		{
 			pool[i] = hullVertexArray[i];
 		}
@@ -3158,7 +3158,7 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 		ndBigVector cov(ndBigVector::m_zero);
 		ndBigVector origin(ndBigVector::m_zero);
 
-		for (ndInt32 i = 0; i < vertexCount; i++) 
+		for (ndInt32 i = 0; i < vertexCount; ++i) 
 		{
 			const ndBigVector p(pool[i] & ndBigVector::m_triplexMask);
 			const ndBigVector q(p.ShiftTripleLeft());
@@ -3188,7 +3188,7 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 
 		ndVector minVal(ndFloat32(1e15f));
 		ndVector maxVal(ndFloat32(-1e15f));
-		for (ndInt32 i = 0; i < vertexCount; i++)
+		for (ndInt32 i = 0; i < vertexCount; ++i)
 		{
 			ndVector tmp(sphere.UnrotateVector(pool[i]));
 			minVal = minVal.GetMin(tmp);

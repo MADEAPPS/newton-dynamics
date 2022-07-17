@@ -111,7 +111,7 @@ void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 	{
 		ndPolyhedra polyhedra;
 		polyhedra.BeginFace();
-		for (ndInt32 i = 0; i < 6; i++) 
+		for (ndInt32 i = 0; i < 6; ++i) 
 		{
 			polyhedra.AddFace(4, &m_faces[i][0]);
 		}
@@ -251,7 +251,7 @@ ndFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const ndVector& localP0, const n
 	ndFloat32 signDir = ndFloat32(0.0f);
 	ndFloat32 tmin = ndFloat32(0.0f);
 	ndFloat32 tmax = ndFloat32(1.0f);
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		ndFloat32 dp = localP1[i] - localP0[i];
 		if (ndAbs(dp) < ndFloat32(1.0e-8f)) 
@@ -374,14 +374,14 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 			ndFloat32 test[8];
 			dAssert(normal.m_w == ndFloat32(0.0f));
 			ndPlane plane(normal, -(normal.DotProduct(point).GetScalar()));
-			for (ndInt32 i = 0; i < 8; i++) 
+			for (ndInt32 i = 0; i < 8; ++i) 
 			{
 				dAssert(m_vertex[i].m_w == ndFloat32(0.0f));
 				test[i] = plane.DotProduct(m_vertex[i] | ndVector::m_wOne).m_x;
 			}
 
 			ndConvexSimplexEdge* edge = nullptr;
-			for (ndInt32 i = 0; i < ndInt32(sizeof(m_edgeEdgeMap) / sizeof(m_edgeEdgeMap[0])); i++) 
+			for (ndInt32 i = 0; i < ndInt32(sizeof(m_edgeEdgeMap) / sizeof(m_edgeEdgeMap[0])); ++i) 
 			{
 				ndConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
 				ndFloat32 side0 = test[ptr->m_vertex];

@@ -44,7 +44,7 @@ class ndDefaultMatrixOperator
 #ifdef D_USE_JACOBI_PRECONDITIONER
 		// use Jacobi preconditiner
 		const T* row = m_matrix;
-		for (ndInt32 i = 0; i < size; i++)
+		for (ndInt32 i = 0; i < size; ++i)
 		{
 			m_preconditoner[i] = T(1.0f) / row[i];
 			row += m_size;
@@ -55,7 +55,7 @@ class ndDefaultMatrixOperator
 		//memcpy(A, matrix, sizeof(A));
 		//
 		//dCholeskyFactorization(size, size, &A[0][0]);
-		//for (ndInt32 i = 2; i < 6; i++)
+		//for (ndInt32 i = 2; i < 6; ++i)
 		//{
 		//	for (ndInt32 j = 0; j < i - 1; j++)
 		//	{
@@ -63,7 +63,7 @@ class ndDefaultMatrixOperator
 		//	}
 		//}
 
-		//for (ndInt32 i = 0; i < 6; i++)
+		//for (ndInt32 i = 0; i < 6; ++i)
 		//{
 		//	for (ndInt32 j = i + 2; j < 6; j++)
 		//	{
@@ -72,7 +72,7 @@ class ndDefaultMatrixOperator
 		//	}
 		//}
 		//
-		//for (ndInt32 i = 0; i < 5; i++)
+		//for (ndInt32 i = 0; i < 5; ++i)
 		//{
 		//	T val = dAbs(A[i][i] * T(0.99f));
 		//	if (val < dAbs(A[i][i + 1]))
@@ -86,7 +86,7 @@ class ndDefaultMatrixOperator
 		//	}
 		//}
 		//
-		//for (ndInt32 i = 1; i < 6; i++)
+		//for (ndInt32 i = 1; i < 6; ++i)
 		//{
 		//	T val = dAbs(A[i][i] * T(0.99f));
 		//	if (val < dAbs(A[i][i - 1]))
@@ -105,7 +105,7 @@ class ndDefaultMatrixOperator
 	void PreconditionerSolve(const T* const input, T* const output)
 	{
 #ifdef D_USE_JACOBI_PRECONDITIONER
-		for (ndInt32 i = 0; i < m_size; i++)
+		for (ndInt32 i = 0; i < m_size; ++i)
 		{
 			output[i] = input[i] * m_preconditoner[i];
 		}

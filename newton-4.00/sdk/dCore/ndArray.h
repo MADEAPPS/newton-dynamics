@@ -95,7 +95,7 @@ ndArray<T>::ndArray(const ndArray& source)
 	{
 		Resize(source.m_capacity);
 		SetCount(source.m_size);
-		for (ndInt32 i = 0; i < source.m_size; i++)
+		for (ndInt32 i = 0; i < source.m_size; ++i)
 		{
 			m_array[i] = source[i];
 		}

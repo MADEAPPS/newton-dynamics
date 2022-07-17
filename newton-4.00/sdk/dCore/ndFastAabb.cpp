@@ -38,7 +38,7 @@ void ndFastAabb::MakeBox1(ndInt32 indexCount, const ndInt32* const indexArray, n
 	ndVector faceBoxP0(&vertexArray[indexArray[0] * stride]);
 	faceBoxP0 = faceBoxP0 & ndVector::m_triplexMask;
 	ndVector faceBoxP1(faceBoxP0);
-	for (ndInt32 i = 1; i < indexCount; i++)
+	for (ndInt32 i = 1; i < indexCount; ++i)
 	{
 		ndVector p(&vertexArray[indexArray[i] * stride]);
 		p = p & ndVector::m_triplexMask;
@@ -54,7 +54,7 @@ void ndFastAabb::MakeBox2(const ndMatrix& faceMatrix, ndInt32 indexCount, const 
 {
 	ndVector faceBoxP0(faceMatrix.TransformVector(ndVector(&vertexArray[indexArray[0] * stride]) & ndVector::m_triplexMask));
 	ndVector faceBoxP1(faceBoxP0);
-	for (ndInt32 i = 1; i < indexCount; i++)
+	for (ndInt32 i = 1; i < indexCount; ++i)
 	{
 		ndVector p(faceMatrix.TransformVector(ndVector(&vertexArray[indexArray[i] * stride]) & ndVector::m_triplexMask));
 		faceBoxP0 = faceBoxP0.GetMin(p);

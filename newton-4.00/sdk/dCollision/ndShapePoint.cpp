@@ -140,7 +140,7 @@ void ndShapePoint::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 	//TesselateTriangle(index, p5, p3, p1, count, tmpVectex);
 	//TesselateTriangle(index, p5, p0, p3, count, tmpVectex);
 	//
-	//for (ndInt32 i = 0; i < count; i++) 
+	//for (ndInt32 i = 0; i < count; ++i) 
 	//{
 	//	tmpVectex[i] = matrix.TransformVector(tmpVectex[i].Scale(m_radius)) & ndVector::m_triplexMask;
 	//}

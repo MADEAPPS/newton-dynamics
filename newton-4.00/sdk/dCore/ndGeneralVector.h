@@ -51,7 +51,7 @@ template<class T>
 T dDotProduct(ndInt32 size, const T* const A, const T* const B)
 {
 	T val(0.0f);
-	for (ndInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		val = val + A[i] * B[i];
 	}
@@ -61,7 +61,7 @@ T dDotProduct(ndInt32 size, const T* const A, const T* const B)
 template<class T>
 void dAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
-	for (ndInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] + B[i];
 	}
@@ -70,7 +70,7 @@ void dAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 template<class T>
 void dSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
-	for (ndInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] - B[i];
 	}
@@ -79,7 +79,7 @@ void dSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 template<class T>
 void dMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
 {
-	for (ndInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] + B[i] * C;
 	}

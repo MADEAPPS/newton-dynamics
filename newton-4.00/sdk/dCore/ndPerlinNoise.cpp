@@ -141,7 +141,7 @@ ndFloat32 BrownianMotion(ndInt32 octaves, ndFloat32 persistence, ndFloat32 x)
 	ndFloat32 amplitud = ndFloat32 (1.0f);
 	ndFloat32 frequency = ndFloat32 (1.0f);
 
-	for (ndInt32 i = 0; i < octaves; i++)
+	for (ndInt32 i = 0; i < octaves; ++i)
 	{
 		ndFloat32 fx = x * frequency;
 		noise += amplitud * dPerlinNoise(fx);
@@ -157,7 +157,7 @@ ndFloat32 BrownianMotion(ndInt32 octaves, ndFloat32 persistence, ndFloat32 x, nd
 	ndFloat32 amplitud = ndFloat32 (1.0f);
 	ndFloat32 frequency = ndFloat32 (1.0f);
 
-	for (ndInt32 i = 0; i < octaves; i++)
+	for (ndInt32 i = 0; i < octaves; ++i)
 	{
 		ndFloat32 fx = x * frequency;
 		ndFloat32 fy = y * frequency;
@@ -174,7 +174,7 @@ ndFloat32 BrownianMotion(ndInt32 octaves, ndFloat32 persistence, ndFloat32 x, nd
 	ndFloat32 amplitud = ndFloat32 (1.0f);
 	ndFloat32 frequency = ndFloat32 (1.0f);
 
-	for (ndInt32 i = 0; i < octaves; i++)
+	for (ndInt32 i = 0; i < octaves; ++i)
 	{
 		ndFloat32 fx = x * frequency;
 		ndFloat32 fy = y * frequency;

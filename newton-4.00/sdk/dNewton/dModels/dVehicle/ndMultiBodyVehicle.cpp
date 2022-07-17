@@ -138,7 +138,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& d
 			m_torsionBar = (ndMultiBodyVehicleTorsionBar*)desc.m_jointMap->Find(hash)->GetInfo();
 
 			const nd::TiXmlNode* barNode = node->FirstChild();
-			for (ndInt32 i = 0; i < m_torsionBar->m_axleCount; i++)
+			for (ndInt32 i = 0; i < m_torsionBar->m_axleCount; ++i)
 			{
 				ndInt32 bodyHash0 = xmlGetInt(barNode, "bodyHash0");
 				ndInt32 bodyHash1 = xmlGetInt(barNode, "bodyHash1");
@@ -396,7 +396,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		dAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 
-		for (ndInt32 i = 0; i < m_torsionBar->m_axleCount; i++)
+		for (ndInt32 i = 0; i < m_torsionBar->m_axleCount; ++i)
 		{
 			nd::TiXmlElement* const barNode = new nd::TiXmlElement("barAxle");
 			paramNode->LinkEndChild(barNode);
@@ -1031,7 +1031,7 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 
 #if 0
 	dFloat32 speed = 0;
-	for (dInt32 i = 0; i < 100; i++)
+	for (dInt32 i = 0; i < 100; ++i)
 	{
 		dTrace(("%f %f\n", speed, GetDownforceFactor(speed) / m_gravity));
 		speed += (150.0f / 100.0f) * 0.27f;
@@ -1071,7 +1071,7 @@ void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) cons
 	parentNode->LinkEndChild(childNode);
 
 	xmlSaveParam(childNode, "gravity", m_gravity);
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); i++)
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
 	{
 		ndVector nod(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, ndFloat32(0.0f));
 		xmlSaveParam(childNode, "downforceCurve", nod);
@@ -1082,7 +1082,7 @@ void ndMultiBodyVehicle::ndDownForce::Load(const nd::TiXmlNode* const xmlNode)
 {
 	m_gravity = xmlGetFloat(xmlNode, "gravity");
 	const nd::TiXmlNode* node = xmlNode->FirstChild();
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); i++)
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
 	{
 		node = node->NextSibling();
 		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;

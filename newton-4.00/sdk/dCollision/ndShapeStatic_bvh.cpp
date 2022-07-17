@@ -159,7 +159,7 @@ dIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const 
 	ndInt32 stride = ndInt32(strideInBytes / sizeof(ndFloat32));
 
 	ndCollisionBvhShowPolyContext& data = *(ndCollisionBvhShowPolyContext*)context;
-	for (ndInt32 i = 0; i < indexCount; i++) 
+	for (ndInt32 i = 0; i < indexCount; ++i) 
 	{
 		ndVector p(&polygon[indexArray[i] * stride]);
 		poly[i] = data.m_matrix.TransformVector(p & ndVector::m_triplexMask);
@@ -242,7 +242,7 @@ dIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFloa
 	ndInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
 
 	//the docks say memcpy is an intrinsic function but as usual this is another Microsoft lied
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		dst[i] = indexArray[i];
 	}

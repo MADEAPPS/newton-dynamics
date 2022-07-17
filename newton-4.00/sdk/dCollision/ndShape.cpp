@@ -88,7 +88,7 @@ void ndShape::MassProperties()
 
 	ndMatrix Covariance(origin, origin);
 	ndMatrix parallel(dGetIdentityMatrix());
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		parallel[i][i] = originMag2;
 		inertia[i] += (parallel[i] - Covariance[i]);

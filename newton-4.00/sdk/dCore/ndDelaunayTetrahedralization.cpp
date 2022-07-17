@@ -49,7 +49,7 @@ ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* cons
 		// the mesh is convex, need to add two steiners point to make tractable
 		ndBigVector origin (ndFloat64 (0.0f));
 		ndFloat64 maxW = ndFloat64 (-1.0e20f);
-		for (ndInt32 i = 0; i < count; i++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndFloat64 x = ndRoundToFloat(vertexCloud[i * stride + 0]);
 			ndFloat64 y = ndRoundToFloat(vertexCloud[i * stride + 1]);

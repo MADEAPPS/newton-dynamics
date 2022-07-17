@@ -361,7 +361,7 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 
 			dList<ndEdge*> list(GetAllocator());
 			dInt32 i0 = curve.GetCount() - 1;
-			for (dInt32 i = 0; i < curve.GetCount(); i++) {
+			for (dInt32 i = 0; i < curve.GetCount(); ++i) {
 				ndEdge* const edge = mesh->AddHalfEdge(indexBase + i0, indexBase + i);
 				ndEdge* const twin = mesh->AddHalfEdge(indexBase + i, indexBase + i0);
 
@@ -880,7 +880,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 	ndInt32 pointCount = GetVertexCount();
 	ndStack <ndFloat64> testPool(2 * pointCount + 1024);
 	ndFloat64* const test = &testPool[0];
-	for (ndInt32 i = 0; i < pointCount; i++)
+	for (ndInt32 i = 0; i < pointCount; ++i)
 	{
 		test[i] = plane.Evalue(m_points.m_vertex[i]);
 		if (fabs(test[i]) < ndFloat32(1.0e-5f))
@@ -1220,7 +1220,7 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 	mergedOutput->BeginBuild();
 
 	ndInt32 layer = 0;
-	for (ndInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); i++)
+	for (ndInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); ++i)
 	{
 		intersection->m_points.m_layers[i] = layer;
 	}
@@ -1275,7 +1275,7 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 				clipTest1.PlaneClip(convexMesh, edge);
 				intersection = new ndMeshEffect(clipTest1);
 				
-				for (ndInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); i++)
+				for (ndInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); ++i)
 				{
 					intersection->m_points.m_layers[i] = layer;
 				}

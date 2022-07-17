@@ -178,7 +178,7 @@ void ndLoadSave::LoadShapes(const nd::TiXmlNode* const rootNode,
 			}
 		}
 
-		for (ndInt32 i = 0; i < pendingCompounds.GetCount(); i++)
+		for (ndInt32 i = 0; i < pendingCompounds.GetCount(); ++i)
 		{
 			ndShapeInstance* const instance = pendingCompounds[i].m_compoundInstance;
 			ndShapeCompound* const compound = instance->GetShape()->GetAsShapeCompound();
