@@ -91,11 +91,6 @@ class dAiBotTest_1 : public ndModel
 	
 	dAiBotTest_1(ndDemoEntityManager* const scene, const ndMatrix& location)
 		:ndModel()
-		//,m_solver()
-		//,m_bodies()
-		//,m_effector(nullptr)
-		//,m_contactSensor(nullptr)
-		//,m_efectorLength(1.0f)
 	{
 		ndFloat32 mass = 10.0f;
 		ndFloat32 radius = 0.25f;
@@ -316,8 +311,6 @@ class dAiBotTest_1 : public ndModel
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest_1);
-
-
 
 class dInvertedPendulum : public ndModel
 {
@@ -574,9 +567,9 @@ xxx++;
 if (xxx == 200)
 {
 //m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
-return;
+//return;
 }
-return;
+//return;
 
 		ndMatrix matrix0;
 		ndMatrix matrix1;

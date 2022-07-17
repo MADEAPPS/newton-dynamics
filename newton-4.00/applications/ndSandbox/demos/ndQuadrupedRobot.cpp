@@ -114,11 +114,7 @@ class dQuadrupedRobot : public ndModel
 			,m_y(0.0f)
 			,m_z(0.0f)
 		{
-			//m_footOnGround = 0;
-			//m_swayAmp = swayAmp;
-			//m_walkPhase = definition.m_walkPhase;
 		}
-
 
 		ndVector m_basePosition;
 		ndIkSwivelPositionEffector* m_effector;
@@ -130,155 +126,12 @@ class dQuadrupedRobot : public ndModel
 		ndParamMapper m_y_mapper;
 		ndParamMapper m_z_mapper;
 		ndParamMapper m_swivel_mapper;
-
-		//ndIk6DofEffector* m_effector;
-		//ndFloat32 m_walkPhase;
-		//ndFloat32 m_swayAmp;
-		//ndInt32 m_footOnGround;
-	};
-
-	class dQuadrupedWalkSequence : public ndAnimationSequence
-	{
-		public:
-		dQuadrupedWalkSequence()
-			:ndAnimationSequence()
-		{
-		}
-
-		void GenerateKeyFrames(const ndEffectorInfo& info, ndVector* const walkCurve)
-		{
-			dAssert(0);
-			//ndIk6DofEffector* const effector = info.m_effector;
-			//for (ndInt32 i = 0; i < (D_SAMPLES_COUNT + 1); ++i)
-			//{
-			//	walkCurve[i] = ndVector::m_zero;
-			//}
-			//
-			//const ndInt32 splitParam = D_SAMPLES_COUNT / 2 + 1;
-			//
-			//// vertical leg motion
-			//ndFloat32 amplitud = 0.1f;
-			//ndFloat32 period = ndPi / (D_SAMPLES_COUNT - splitParam - 2);
-			//for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT; ++i)
-			//{
-			//	ndFloat32 j = ndFloat32(i - splitParam - 1);
-			//	walkCurve[i].m_x = -amplitud * ndSin(period * j);
-			//}
-			//
-			//// horizontal motion
-			//ndFloat32 stride = 0.4f;
-			//for (ndInt32 i = 0; i < splitParam; ++i)
-			//{
-			//	ndFloat32 j = ndFloat32(i);
-			//	walkCurve[i].m_y = stride  * (0.5f - j / splitParam);
-			//}
-			//
-			//for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT; ++i)
-			//{
-			//	ndFloat32 j = ndFloat32(i - splitParam);
-			//	walkCurve[i].m_y = -stride  * (0.5f - j / (D_SAMPLES_COUNT - splitParam));
-			//}
-			//walkCurve[D_SAMPLES_COUNT].m_y = walkCurve[0].m_y;
-			//
-			//// sideway motion
-			//ndFloat32 swayAmp = info.m_swayAmp;
-			//swayAmp = 0.0f;
-			//for (ndInt32 i = 0; i < splitParam; ++i)
-			//{
-			//	walkCurve[i].m_z = swayAmp;
-			//}
-			//for (ndInt32 i = splitParam; i < D_SAMPLES_COUNT; ++i)
-			//{
-			//	ndFloat32 j = ndFloat32(i - splitParam - 1);
-			//	walkCurve[i].m_z = swayAmp * (1.0f - ndSin(period * j));
-			//}
-			//walkCurve[D_SAMPLES_COUNT].m_z = walkCurve[0].m_z;
-			//
-			//ndMatrix offsetMatrix(effector->GetOffsetMatrix());
-			//for (ndInt32 i = 0; i < (D_SAMPLES_COUNT + 1); ++i)
-			//{
-			//	walkCurve[i] += offsetMatrix.m_posit;
-			//}
-		}
-
-		void AddTrack(const ndEffectorInfo& info)
-		{
-			dAssert(0);
-			//ndIk6DofEffector* const effector = info.m_effector;
-			//ndAnimationKeyFramesTrack* const track = ndAnimationSequence::AddTrack();
-			//
-			//ndMatrix offsetMatrix(effector->GetOffsetMatrix());
-			//
-			//// set two identity rotations 
-			//track->m_rotation.m_param.PushBack(0.0f);
-			//track->m_rotation.PushBack(ndQuaternion());
-			//
-			//track->m_rotation.m_param.PushBack(1.0f);
-			//track->m_rotation.PushBack(ndQuaternion());
-			//
-			//// build the position key frames
-			//ndFixSizeArray<ndVector, D_SAMPLES_COUNT + 1> positionCurve;
-			//positionCurve.SetCount(D_SAMPLES_COUNT + 1);
-			//GenerateKeyFrames(info, &positionCurve[0]);
-			//
-			//// apply the phase angle to this sequence
-			//m_phase.PushBack (info.m_walkPhase);
-			//for (ndInt32 i = 0; i <= D_SAMPLES_COUNT; ++i)
-			//{
-			//	ndInt32 index = (i + ndInt32 (info.m_walkPhase * D_SAMPLES_COUNT)) % D_SAMPLES_COUNT;
-			//	track->m_position.PushBack(positionCurve[index]);
-			//	track->m_position.m_param.PushBack(ndFloat32(i) / D_SAMPLES_COUNT);
-			//}
-		}
-
-		bool IsOnGround(ndFloat32 param, ndInt32 trackIndex)
-		{
-			ndInt32 index = ndInt32 ((param + m_phase[trackIndex]) * D_SAMPLES_COUNT) % D_SAMPLES_COUNT;
-			return (index < D_SAMPLES_COUNT / 2 + 1);
-		}
-		ndFixSizeArray<ndFloat32,4> m_phase;
-	};
-
-	class dQuadrupedBalanceController: public ndAnimationBlendTreeNode, public ndIkSolver
-	{
-		public: 
-		dQuadrupedBalanceController(ndAnimationBlendTreeNode* const input, dQuadrupedRobot* const model)
-			:ndAnimationBlendTreeNode(input)
-			,ndIkSolver()
-			,m_world(nullptr)
-			,m_model(model)
-			,m_timestep(ndFloat32 (0.0f))
-		{
-			//m_centerOfMassCorrection.SetCount(4);
-			//for (ndInt32 i = 0; i < m_centerOfMassCorrection.GetCount(); ++i)
-			//{
-			//	m_centerOfMassCorrection[i] = ndVector::m_zero;
-			//}
-		}
-
-		ndVector CalculateCenterOfMass() const;
-		ndVector PredictCenterOfMassVelocity() const;
-		void GetSupportPolygon(ndFixSizeArray<ndVector, 16>& polygon) const;
-		ndVector ProjectCenterOfMass(const ndFixSizeArray<ndVector, 16>& polygon, const ndVector& com) const;
-
-		void Evaluate(ndAnimationPose& output);
-
-		//ndFixSizeArray<ndVector, 4> m_centerOfMassCorrection;
-		ndWorld* m_world;
-		dQuadrupedRobot* m_model;
-		ndFloat32 m_timestep;
 	};
 
 	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
-		,m_referenceFrame(dGetIdentityMatrix())
 		,m_rootBody(nullptr)
-		,m_walkCycle(nullptr)
-		,m_balanceController(nullptr)
 		,m_effectors()
-		,m_bodyArray()
-		,m_jointArray()
-		,m_walkParam(0.0f)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -297,9 +150,7 @@ class dQuadrupedRobot : public ndModel
 
 		// add the root body
 		m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
-		m_bodyArray.PushBack(m_rootBody);
-		m_referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix(rootEntity);
-
+		
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 
@@ -311,7 +162,7 @@ class dQuadrupedRobot : public ndModel
 			stack++;
 		}
 
-		const ndVector frontSwivelDir(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
+		const ndMatrix referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix();
 		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		while (stack) 
 		{
@@ -329,22 +180,16 @@ class dQuadrupedRobot : public ndModel
 					if (definition.m_type == dQuadrupedRobotDefinition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						m_bodyArray.PushBack(childBody);
-						
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 						hinge->SetLimitState(true);
 						hinge->SetLimits(-30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
 						world->AddJoint(hinge);
-						m_jointArray.PushBack(hinge);
-
 						parentBody = childBody;
 					}
 					else if (definition.m_type == dQuadrupedRobotDefinition::m_spherical)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						m_bodyArray.PushBack(childBody);
-						
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
 						//socket->SetConeLimit(120.0f * ndDegreeToRad);
@@ -359,30 +204,33 @@ class dQuadrupedRobot : public ndModel
 						sprintf(refName, "%sreference", name);
 						dAssert(rootEntity->Find(refName));
 
-						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-						const ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
+						ndMatrix pivotFrame(referenceFrame);
+						ndMatrix effectorFrame(referenceFrame);
+						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
+						pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
 
 						ndMatrix swivelFrame(dGetIdentityMatrix());
 						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-						swivelFrame.m_up = frontSwivelDir;
+						swivelFrame.m_up = referenceFrame.m_front;
 						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
 						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
 						ndFloat32 regularizer = 0.001f;
-						ndMatrix effectorBaseFrame(dPitchMatrix(90.0f * ndDegreeToRad) * m_rootBody->GetMatrix());
-						ndMatrix effectorTargetFrame(effectorBaseFrame);
-						effectorBaseFrame.m_posit = pivotFrame.m_posit;
-						effectorTargetFrame.m_posit = effectorFrame.m_posit;
-						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorTargetFrame, effectorBaseFrame, swivelFrame, parentBody, m_rootBody);
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
 						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+
+						ndVector dist0(effectorFrame.m_posit - childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
+						ndVector dist1(childEntity->GetParent()->CalculateGlobalMatrix().m_posit - pivotFrame.m_posit);
+						ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
 
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
 						info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-						info.m_y_mapper = ndParamMapper(-0.4f, 0.07f);
-						info.m_z_mapper = ndParamMapper(-0.08f, 0.08f);
+						info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
+						info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
 						info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 						m_effectors.PushBack(info);
 					}
@@ -397,28 +245,24 @@ class dQuadrupedRobot : public ndModel
 				stack++;
 			}
 		}
-
-		//BuildAnimationTree();
 	}
 
 	dQuadrupedRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effectors()
-		,m_walkParam(0.0f)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
+		dAssert(0);
 		const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
 		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
 		{
 			ndInt32 hashId;
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 			element->Attribute("int32", &hashId);
-			ndBodyLoaderCache::ndNode* const bodyNode = desc.m_bodyMap->Find(hashId);
-
-			ndBody* const body = (ndBody*)bodyNode->GetInfo();
-			m_bodyArray.PushBack(body->GetAsBodyDynamic());
+			//ndBodyLoaderCache::ndNode* const bodyNode = desc.m_bodyMap->Find(hashId);
+			//ndBody* const body = (ndBody*)bodyNode->GetInfo();
 		}
 
 		const nd::TiXmlNode* const joints = modelRootNode->FirstChild("joints");
@@ -427,10 +271,8 @@ class dQuadrupedRobot : public ndModel
 			ndInt32 hashId;
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 			element->Attribute("int32", &hashId);
-			ndJointLoaderCache::ndNode* const jointNode = desc.m_jointMap->Find(hashId);
-
-			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointNode->GetInfo();
-			m_jointArray.PushBack((ndJointHinge*)joint);
+			//ndJointLoaderCache::ndNode* const jointNode = desc.m_jointMap->Find(hashId);
+			//ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointNode->GetInfo();
 		}
 
 		// load root body
@@ -448,18 +290,6 @@ class dQuadrupedRobot : public ndModel
 
 	~dQuadrupedRobot()
 	{
-		//if (m_balanceController)
-		//{
-		//	delete m_balanceController;
-		//}
-		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		//{
-		//	ndIk6DofEffector* const effector = m_effectors[i].m_effector;
-		//	if (!effector->IsInWorld())
-		//	{
-		//		delete effector;
-		//	}
-		//}
 	}
 
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -469,69 +299,47 @@ class dQuadrupedRobot : public ndModel
 		modelRootNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 		ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, modelRootNode));
 
-		// save all bodies.
-		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
-		modelRootNode->LinkEndChild(bodiesNode);
-		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-		{
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
-			bodiesNode->LinkEndChild(paramNode);
-
-			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const bodyPartNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_bodyArray[i]);
-			paramNode->SetAttribute("int32", bodyPartNode->GetInfo());
-		}
-
-		// save all joints
-		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
-		modelRootNode->LinkEndChild(jointsNode);
-		for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
-		{
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
-			jointsNode->LinkEndChild(paramNode);
-
-			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_jointArray[i]);
-			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
-		}
-
-		// indicate which body is the root
-		xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
-
-		// save end effector info
-		nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
-		modelRootNode->LinkEndChild(endEffectorNode);
-
 		dAssert(0);
-		//xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
-		//if (m_effector)
+		// save all bodies.
+		//nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
+		//modelRootNode->LinkEndChild(bodiesNode);
+		//for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 		//{
-		//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
-		//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
-		//	xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
-		//	xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+		//	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
+		//	bodiesNode->LinkEndChild(paramNode);
+		//
+		//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const bodyPartNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_bodyArray[i]);
+		//	paramNode->SetAttribute("int32", bodyPartNode->GetInfo());
 		//}
-	}
-
-	void BuildAnimationTree()
-	{
-		// create a procedural walk cycle
-		dQuadrupedWalkSequence* const walk = new dQuadrupedWalkSequence();
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		{
-			walk->AddTrack(m_effectors[i]);
-		}
-
-		// build the pose tree blender, for now just the walk
-		m_walkCycle = new ndAnimationSequencePlayer(walk);
-
-		// bind animation tree to key frame pose
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		{
-			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = m_effectors[i].m_effector;
-			m_output.PushBack(keyFrame);
-		}
-
-		m_balanceController = new dQuadrupedBalanceController (m_walkCycle, this);
+		//
+		//// save all joints
+		//nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
+		//modelRootNode->LinkEndChild(jointsNode);
+		//for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+		//{
+		//	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+		//	jointsNode->LinkEndChild(paramNode);
+		//
+		//	ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_jointArray[i]);
+		//	paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+		//}
+		//
+		//// indicate which body is the root
+		//xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
+		//
+		//// save end effector info
+		//nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
+		//modelRootNode->LinkEndChild(endEffectorNode);
+		//
+		//dAssert(0);
+		////xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
+		////if (m_effector)
+		////{
+		////	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
+		////	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
+		////	xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
+		////	xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+		////}
 	}
 
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -576,60 +384,7 @@ class dQuadrupedRobot : public ndModel
 			//ndVector posit1(swivelMatrix1.m_posit);
 			//posit1.m_y += 1.0f;
 			//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
-
-
-			//if (m_effectors[i].m_footOnGround)
-			//{
-			//	const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
-			//	supportPolygon.PushBack(posit);
-			//	//sockets.PushBack(m_effectors[i].m_hipSocket);
-			//}
 		}
-		
-		////if (sockets.GetCount() == 2)
-		////{
-		////	ndVector p0(sockets[0]->GetBody0()->GetMatrix().TransformVector(sockets[0]->GetLocalMatrix0().m_posit));
-		////	ndVector p1(sockets[1]->GetBody0()->GetMatrix().TransformVector(sockets[1]->GetLocalMatrix0().m_posit));
-		////	context.DrawLine(p0, p1, ndVector(1.0f, 1.0f, 0.7f, 0.0f), 2);
-		////}
-		//
-		//// Draw support polygon
-		//ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		//ndInt32 i0 = supportPolygon.GetCount() - 1;
-		//for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
-		//{
-		//	context.DrawLine(supportPolygon[i], supportPolygon[i0], color);
-		//	i0 = i;
-		//}
-		//
-		//const ndVector com(m_balanceController->CalculateCenterOfMass());
-		//ndMatrix rootMatrix(m_rootBody->GetMatrix());
-		//rootMatrix.m_posit = com;;
-		//context.DrawFrame(rootMatrix);
-		//
-		//// Draw center of mass projection
-		//ndBigVector p0Out;
-		//ndBigVector p1Out;
-		//ndBigVector p0(rootMatrix.m_posit);
-		//
-		//p0.m_y -= 1.0f;
-		//if (supportPolygon.GetCount() >= 3)
-		//{
-		//	ndBigVector poly[16];
-		//	for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
-		//	{
-		//		poly[i] = supportPolygon[i];
-		//	}
-		//	dRayToPolygonDistance(rootMatrix.m_posit, p0, poly, supportPolygon.GetCount(), p0Out, p1Out);
-		//} 
-		//else if (supportPolygon.GetCount() == 2)
-		//{
-		//	dRayToRayDistance(rootMatrix.m_posit, p0, supportPolygon[0], supportPolygon[1], p0Out, p1Out);
-		//}
-		//ndVector t0(p0Out);
-		//ndVector t1(p1Out);
-		//context.DrawPoint(t0, ndVector(1.0f, 0.0f, 0.0f, 0.0f));
-		//context.DrawPoint(t1, ndVector(0.0f, 0.0f, 1.0f, 0.0f));
 	}
 
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -694,30 +449,6 @@ class dQuadrupedRobot : public ndModel
 			const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
 			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 		}
-
-		//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-		//dAssert(skeleton);
-		//
-		//m_rootBody->SetSleepState(false);
-		//
-		//if (!m_balanceController->IsSleeping(skeleton))
-		//{
-		//	ndFloat32 walkSpeed = 1.0f;
-		//	m_walkParam = ndFmod(m_walkParam + walkSpeed * timestep, ndFloat32 (1.0f));
-		//
-		//	m_walkParam = 0.8f;
-		//	// advance walk animation (for now, later this will be control by game play logic)
-		//	m_walkCycle->SetParam(m_walkParam);
-		//	dQuadrupedWalkSequence* const sequence = (dQuadrupedWalkSequence*)m_walkCycle->GetSequence();
-		//	for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
-		//	{
-		//		m_effectors[i].m_footOnGround = sequence->IsOnGround(m_walkParam, i);
-		//	}
-		//	
-		//	m_balanceController->m_world = world;
-		//	m_balanceController->m_timestep = timestep;
-		//	m_balanceController->Evaluate(m_output);
-		//}
 	}
 
 	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
@@ -726,152 +457,11 @@ class dQuadrupedRobot : public ndModel
 		me->ApplyControls(scene);
 	}
 
-	ndMatrix m_referenceFrame;
+//	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
-	ndAnimationSequencePlayer* m_walkCycle;
-	dQuadrupedBalanceController* m_balanceController;
-	
-	ndAnimationPose m_output;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
-	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
-	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
-	ndFloat32 m_walkParam;
 };
-
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
-
-void dQuadrupedRobot::dQuadrupedBalanceController::GetSupportPolygon(ndFixSizeArray<ndVector, 16>& supportPolygon) const
-{
-	dAssert(0);
-	//supportPolygon.SetCount(0);
-	//for (ndInt32 i = 0; i < m_model->m_effectors.GetCount(); ++i)
-	//{
-	//	if (m_model->m_effectors[i].m_footOnGround)
-	//	{
-	//		ndJointBilateralConstraint* const joint = m_model->m_effectors[i].m_effector;
-	//		const ndVector posit(joint->GetBody0()->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
-	//		supportPolygon.PushBack(posit);
-	//	}
-	//}
-}
-
-ndVector dQuadrupedRobot::dQuadrupedBalanceController::ProjectCenterOfMass(const ndFixSizeArray<ndVector, 16>& supportPolygon, const ndVector& com) const
-{
-	ndBigVector p0Out;
-	ndBigVector p1Out;
-	ndBigVector p1(com);
-	p1.m_y -= 1.0f;
-	if (supportPolygon.GetCount() >= 3)
-	{
-		ndBigVector poly[16];
-		for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
-		{
-			poly[i] = supportPolygon[i];
-		}
-		dRayToPolygonDistance(com, p1, poly, supportPolygon.GetCount(), p0Out, p1Out);
-	}
-	else if (supportPolygon.GetCount() == 2)
-	{
-		dRayToRayDistance(com, p1, supportPolygon[0], supportPolygon[1], p0Out, p1Out);
-	}
-	p1Out.m_y = com.m_y;
-	return p1Out;
-}
-
-ndVector dQuadrupedRobot::dQuadrupedBalanceController::CalculateCenterOfMass() const
-{
-	ndFloat32 toltalMass = 0.0f;
-	ndVector com(ndVector::m_zero);
-	for (ndInt32 i = 0; i < m_model->m_bodyArray.GetCount(); ++i)
-	{
-		ndBodyDynamic* const body = m_model->m_bodyArray[i];
-		ndFloat32 mass = body->GetMassMatrix().m_w;
-		ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-		com += comMass.Scale(mass);
-		toltalMass += mass;
-	}
-	com = com.Scale(1.0f / toltalMass);
-	com.m_w = 1.0f;
-	return com;
-}
-
-ndVector dQuadrupedRobot::dQuadrupedBalanceController::PredictCenterOfMassVelocity() const
-{
-	ndFloat32 toltalMass = 0.0f;
-	ndVector momentum(ndVector::m_zero);
-	for (ndInt32 i = 0; i < m_model->m_bodyArray.GetCount(); ++i)
-	{
-		ndBodyDynamic* const body = m_model->m_bodyArray[i];
-		ndFloat32 mass = body->GetMassMatrix().m_w;
-		const ndVector invMass(body->GetInvMass());
-		ndVector veloc(body->GetVelocity() + body->GetAccel().Scale (body->GetInvMass() * m_timestep));
-		momentum += veloc.Scale(mass);
-		toltalMass += mass;
-	}
-	ndVector veloc (momentum.Scale(1.0f / toltalMass));
-	return veloc;
-}
-
-void dQuadrupedRobot::dQuadrupedBalanceController::Evaluate(ndAnimationPose& output)
-{
-	dAssert(0);
-	//// get the animation pose
-	//ndAnimationBlendTreeNode::Evaluate(output);
-	//
-	//// calculate thee accelerations needed for this pose
-	//ndSkeletonContainer* const skeleton = m_model->GetRoot()->GetSkeleton();
-	//dAssert(skeleton);
-	//
-	//ndJointBilateralConstraint* joints[4];
-	//
-	//// here we will integrate the model to get the center of mass velocity 
-	//// and with that the final pose will be adjusted to keep the balance
-	//// for now just assume the pose is valid and return. 
-	//
-	//ndVector step(ndVector::m_zero);
-	//ndFixSizeArray<ndVector, 16> polygon;
-	//GetSupportPolygon(polygon);
-	//if (polygon.GetCount())
-	//{
-	//	const ndVector origin(CalculateCenterOfMass());
-	//	const ndVector veloc(PredictCenterOfMassVelocity() & ndVector::m_triplexMask);
-	//	const ndVector com(origin + veloc.Scale(m_timestep));
-	//	const ndVector target(ProjectCenterOfMass(polygon, com));
-	//
-	//	ndFloat32 correctionFactor = 0.1f;
-	//	step = ndVector::m_triplexMask & (com - target).Scale(correctionFactor);
-	//}
-	//	
-	//for (ndInt32 i = 0; i < output.GetCount(); ++i)
-	//{
-	//	const ndAnimKeyframe& keyFrame = output[i];
-	//	const dEffectorInfo& info = m_model->m_effectors[i];
-	//
-	//	ndMatrix poseMatrix(keyFrame.m_rotation, keyFrame.m_posit);
-	//	ndMatrix matrix(poseMatrix);
-	//	//matrix.m_posit += m_centerOfMassCorrection[i];
-	//
-	//	ndIk6DofEffector* const effector = info.m_effector;
-	//	joints[i] = effector;
-	//	dAssert(effector == output[i].m_userData);
-	//	
-	//	//if (info.m_footOnGround)
-	//	//{
-	//		//ndMatrix pivotMatrix(effector->GetLocalMatrix1() * effector->GetBody1()->GetMatrix());
-	//		//const ndMatrix effectorMatrix(matrix * pivotMatrix);
-	//		//pivotMatrix.m_posit -= step;
-	//		//matrix = poseMatrix;
-	//		//matrix.m_posit = (effectorMatrix * pivotMatrix.Inverse()).m_posit;
-	//		//effector->SetOffsetMatrix(matrix);
-	//		//m_centerOfMassCorrection[i] = matrix.m_posit - poseMatrix.m_posit;
-	//	//}
-	//	effector->SetOffsetMatrix(matrix);
-	//}
-	//
-	//SolverBegin(skeleton, joints, output.GetCount(), m_world, m_timestep);
-	//Solve();
-	//SolverEnd();
-}
 
 void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 {

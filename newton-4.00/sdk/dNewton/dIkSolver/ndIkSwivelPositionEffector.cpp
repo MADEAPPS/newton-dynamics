@@ -27,8 +27,13 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearMaxForce(D_LCP_MAX_VALUE)
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_minWorkSpaceRadio(ndFloat32(0.0f))
+	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
 {
 	CalculateLocalMatrix(swivelFrame, m_localSwivelMatrix0, m_localSwivelMatrix1);
+
+	const ndVector dist2(ndVector::m_triplexMask & m_targetFrame.m_posit);
+	m_maxWorkSpaceRadio = ndFloat32(0.9f) * ndSqrt(dist2.DotProduct(dist2).GetScalar());
 
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
@@ -45,6 +50,8 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndL
 	,m_linearDamper(ndFloat32(50.0f))
 	,m_linearMaxForce(D_LCP_MAX_VALUE)
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
+	,m_minWorkSpaceRadio(ndFloat32(0.0f))
+	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	
@@ -63,6 +70,9 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndL
 	m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
 	m_linearMaxForce = xmlGetFloat(xmlNode, "linearMaxForce");
 	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
+
+	m_minWorkSpaceRadio = xmlGetFloat(xmlNode, "minWorkSpaceRadior");
+	m_maxWorkSpaceRadio = xmlGetFloat(xmlNode, "maxWorkSpaceRadior");
 }
 
 ndIkSwivelPositionEffector::~ndIkSwivelPositionEffector()
@@ -88,6 +98,9 @@ void ndIkSwivelPositionEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
 	xmlSaveParam(childNode, "linearMaxForce", m_linearMaxForce);
 	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
+
+	xmlSaveParam(childNode, "minWorkSpaceRadio", m_minWorkSpaceRadio);
+	xmlSaveParam(childNode, "maxWorkSpaceRadio", m_maxWorkSpaceRadio);
 }
 
 ndVector ndIkSwivelPositionEffector::GetPosition() const
@@ -97,9 +110,31 @@ ndVector ndIkSwivelPositionEffector::GetPosition() const
 
 void ndIkSwivelPositionEffector::SetPosition(const ndVector& posit)
 {
-	m_targetFrame.m_posit = posit;
-	m_targetFrame.m_posit.m_w = ndFloat32(1.0f);
+	ndVector target = posit & ndVector::m_triplexMask;
+	ndFloat32 dist2 = target.DotProduct(target).GetScalar();
+	if (dist2 > m_maxWorkSpaceRadio * m_maxWorkSpaceRadio)
+	{
+		target = target.Normalize().Scale(m_maxWorkSpaceRadio);
+	}
+	else if (dist2 < m_minWorkSpaceRadio * m_minWorkSpaceRadio)
+	{
+		target = target.Normalize().Scale(m_minWorkSpaceRadio);
+	}
+	m_targetFrame.m_posit = target | ndVector::m_wOne;
 }
+
+void ndIkSwivelPositionEffector::SetWorkSpaceConstraints(ndFloat32 minRadio, ndFloat32 maxRadio)
+{
+	m_minWorkSpaceRadio = minRadio;
+	m_maxWorkSpaceRadio = maxRadio;
+}
+
+void ndIkSwivelPositionEffector::GetWorkSpaceConstraints(ndFloat32& minRadio, ndFloat32& maxRadio) const
+{
+	minRadio = m_minWorkSpaceRadio;
+	maxRadio = m_maxWorkSpaceRadio;
+}
+
 
 ndFloat32 ndIkSwivelPositionEffector::GetMaxForce() const
 {
