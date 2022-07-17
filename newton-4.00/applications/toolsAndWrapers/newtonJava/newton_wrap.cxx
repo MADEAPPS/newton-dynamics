@@ -304,13 +304,13 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndMatrix_1_1SWIG_10(JNIEnv *jenv, j
 
 SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndMatrix_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
-  float *arg1 = (float *) (float *)0 ;
+  ndFloat32 *arg1 = (ndFloat32 *) (ndFloat32 *)0 ;
   ndMatrix *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = *(float **)&jarg1; 
-  result = (ndMatrix *)new ndMatrix((float const *)arg1);
+  arg1 = *(ndFloat32 **)&jarg1; 
+  result = (ndMatrix *)new ndMatrix((ndFloat32 const *)arg1);
   *(ndMatrix **)&jresult = result; 
   return jresult;
 }
@@ -429,17 +429,23 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndMatrix_1_1SWIG_15(JNIEnv *jenv, j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMatrix_1GetElement_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMatrix_1GetElement_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   ndVector *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMatrix **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg2 = *argp2; 
   result = (ndVector *) &(arg1)->operator [](arg2);
   *(ndVector **)&jresult = result; 
   return jresult;
@@ -732,66 +738,120 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1CalcPitchYawRoll(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1TransformTriplex_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3, jlong jarg4, jint jarg5, jint jarg6) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1TransformTriplex_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5, jlong jarg6) {
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  float *arg2 = (float *) (float *)0 ;
-  int arg3 ;
-  float *arg4 = (float *) (float *)0 ;
-  int arg5 ;
-  int arg6 ;
+  ndFloat32 *arg2 = (ndFloat32 *) (ndFloat32 *)0 ;
+  ndInt32 arg3 ;
+  ndFloat32 *arg4 = (ndFloat32 *) (ndFloat32 *)0 ;
+  ndInt32 arg5 ;
+  ndInt32 arg6 ;
+  ndInt32 *argp3 ;
+  ndInt32 *argp5 ;
+  ndInt32 *argp6 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMatrix **)&jarg1; 
-  arg2 = *(float **)&jarg2; 
-  arg3 = (int)jarg3; 
-  arg4 = *(float **)&jarg4; 
-  arg5 = (int)jarg5; 
-  arg6 = (int)jarg6; 
-  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(float const *)arg4,arg5,arg6);
+  arg2 = *(ndFloat32 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg3 = *argp3; 
+  arg4 = *(ndFloat32 **)&jarg4; 
+  argp5 = *(ndInt32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg5 = *argp5; 
+  argp6 = *(ndInt32 **)&jarg6; 
+  if (!argp6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg6 = *argp6; 
+  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(ndFloat32 const *)arg4,arg5,arg6);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1TransformTriplex_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3, jlong jarg4, jint jarg5, jint jarg6) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1TransformTriplex_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5, jlong jarg6) {
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  double *arg2 = (double *) (double *)0 ;
-  int arg3 ;
-  double *arg4 = (double *) (double *)0 ;
-  int arg5 ;
-  int arg6 ;
+  ndFloat64 *arg2 = (ndFloat64 *) (ndFloat64 *)0 ;
+  ndInt32 arg3 ;
+  ndFloat64 *arg4 = (ndFloat64 *) (ndFloat64 *)0 ;
+  ndInt32 arg5 ;
+  ndInt32 arg6 ;
+  ndInt32 *argp3 ;
+  ndInt32 *argp5 ;
+  ndInt32 *argp6 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMatrix **)&jarg1; 
-  arg2 = *(double **)&jarg2; 
-  arg3 = (int)jarg3; 
-  arg4 = *(double **)&jarg4; 
-  arg5 = (int)jarg5; 
-  arg6 = (int)jarg6; 
-  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(double const *)arg4,arg5,arg6);
+  arg2 = *(ndFloat64 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg3 = *argp3; 
+  arg4 = *(ndFloat64 **)&jarg4; 
+  argp5 = *(ndInt32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg5 = *argp5; 
+  argp6 = *(ndInt32 **)&jarg6; 
+  if (!argp6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg6 = *argp6; 
+  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(ndFloat64 const *)arg4,arg5,arg6);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1TransformTriplex_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3, jlong jarg4, jint jarg5, jint jarg6) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMatrix_1TransformTriplex_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5, jlong jarg6) {
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  double *arg2 = (double *) (double *)0 ;
-  int arg3 ;
-  float *arg4 = (float *) (float *)0 ;
-  int arg5 ;
-  int arg6 ;
+  ndFloat64 *arg2 = (ndFloat64 *) (ndFloat64 *)0 ;
+  ndInt32 arg3 ;
+  ndFloat32 *arg4 = (ndFloat32 *) (ndFloat32 *)0 ;
+  ndInt32 arg5 ;
+  ndInt32 arg6 ;
+  ndInt32 *argp3 ;
+  ndInt32 *argp5 ;
+  ndInt32 *argp6 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMatrix **)&jarg1; 
-  arg2 = *(double **)&jarg2; 
-  arg3 = (int)jarg3; 
-  arg4 = *(float **)&jarg4; 
-  arg5 = (int)jarg5; 
-  arg6 = (int)jarg6; 
-  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(float const *)arg4,arg5,arg6);
+  arg2 = *(ndFloat64 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg3 = *argp3; 
+  arg4 = *(ndFloat32 **)&jarg4; 
+  argp5 = *(ndInt32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg5 = *argp5; 
+  argp6 = *(ndInt32 **)&jarg6; 
+  if (!argp6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg6 = *argp6; 
+  ((ndMatrix const *)arg1)->TransformTriplex(arg2,arg3,(ndFloat32 const *)arg4,arg5,arg6);
 }
 
 
@@ -825,17 +885,23 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndMatrix_1TestSymetric3x3(JNIEnv *jen
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndMatrix_1TestOrthogonal_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndMatrix_1TestOrthogonal_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jboolean jresult = 0 ;
   ndMatrix *arg1 = (ndMatrix *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMatrix **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
   result = (bool)((ndMatrix const *)arg1)->TestOrthogonal(arg2);
   jresult = (jboolean)result; 
   return jresult;
@@ -1115,42 +1181,60 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMatrix_1m_1posit_1get(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dPitchMatrix(JNIEnv *jenv, jclass jcls, jfloat jarg1) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_dPitchMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
-  float arg1 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
   ndMatrix result;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
   result = dPitchMatrix(arg1);
   *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dYawMatrix(JNIEnv *jenv, jclass jcls, jfloat jarg1) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_dYawMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
-  float arg1 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
   ndMatrix result;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
   result = dYawMatrix(arg1);
   *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dRollMatrix(JNIEnv *jenv, jclass jcls, jfloat jarg1) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_dRollMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
-  float arg1 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
   ndMatrix result;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
   result = dRollMatrix(arg1);
   *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
@@ -1225,30 +1309,55 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndQuaternion_1_1SWIG_13(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndQuaternion_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jfloat jarg1, jfloat jarg2, jfloat jarg3, jfloat jarg4) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndQuaternion_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
-  float arg1 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
+  ndFloat32 arg1 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 arg4 ;
+  ndFloat32 *argp1 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
+  ndFloat32 *argp4 ;
   ndQuaternion *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
-  arg4 = (float)jarg4; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg4 = *argp4; 
   result = (ndQuaternion *)new ndQuaternion(arg1,arg2,arg3,arg4);
   *(ndQuaternion **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndQuaternion_1_1SWIG_15(JNIEnv *jenv, jclass jcls, jlong jarg1, jfloat jarg2) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndQuaternion_1_1SWIG_15(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   ndVector *arg1 = 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   ndQuaternion *result = 0 ;
   
   (void)jenv;
@@ -1258,7 +1367,12 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndQuaternion_1_1SWIG_15(JNIEnv *jen
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
   result = (ndQuaternion *)new ndQuaternion((ndVector const &)*arg1,arg2);
   *(ndQuaternion **)&jresult = result; 
   return jresult;
@@ -1280,17 +1394,23 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Normalize(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Scale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Scale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   ndQuaternion result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndQuaternion **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
   result = ((ndQuaternion const *)arg1)->Scale(arg2);
   *(ndQuaternion **)&jresult = new ndQuaternion((const ndQuaternion &)result); 
   return jresult;
@@ -1378,11 +1498,12 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Mul(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Slerp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jfloat jarg3) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Slerp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3) {
   jlong jresult = 0 ;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   ndQuaternion result;
   
   (void)jenv;
@@ -1395,18 +1516,24 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1Slerp(JNIEnv *jenv, jclass
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndQuaternion const & reference is null");
     return 0;
   } 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   result = ((ndQuaternion const *)arg1)->Slerp((ndQuaternion const &)*arg2,arg3);
   *(ndQuaternion **)&jresult = new ndQuaternion((const ndQuaternion &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1CalcAverageOmega(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jfloat jarg3) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1CalcAverageOmega(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3) {
   jlong jresult = 0 ;
   ndQuaternion *arg1 = (ndQuaternion *) 0 ;
   ndQuaternion *arg2 = 0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   ndVector result;
   
   (void)jenv;
@@ -1419,7 +1546,12 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndQuaternion_1CalcAverageOmega(JNIEnv *j
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndQuaternion const & reference is null");
     return 0;
   } 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   result = ((ndQuaternion const *)arg1)->CalcAverageOmega((ndQuaternion const &)*arg2,arg3);
   *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -1462,13 +1594,19 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeMaterial(JNIEnv *jenv, jclas
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1m_1userId_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeMaterial *arg1 = (ndShapeMaterial *) 0 ;
-  long long arg2 ;
+  ndInt64 arg2 ;
+  ndInt64 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial **)&jarg1; 
-  arg2 = (long long)jarg2; 
+  argp2 = *(ndInt64 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt64");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_userId = arg2;
 }
 
@@ -1476,14 +1614,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1m_1userId_1set(JNIEnv *j
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeMaterial_1m_1userId_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndShapeMaterial *arg1 = (ndShapeMaterial *) 0 ;
-  long long result;
+  ndInt64 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial **)&jarg1; 
-  result = (long long) ((arg1)->m_userId);
-  jresult = (jlong)result; 
+  result =  ((arg1)->m_userId);
+  *(ndInt64 **)&jresult = new ndInt64((const ndInt64 &)result); 
   return jresult;
 }
 
@@ -1516,72 +1654,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeMaterial_1nData_1m_1userData_1get
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1nData_1m_1alignPad_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1nData_1m_1alignPad_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeMaterial::nData *arg1 = (ndShapeMaterial::nData *) 0 ;
-  unsigned long long arg2 ;
+  ndUnsigned64 arg2 ;
+  ndUnsigned64 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial::nData **)&jarg1; 
-  {
-    jclass clazz;
-    jmethodID mid;
-    jbyteArray ba;
-    jbyte* bae;
-    jsize sz;
-    int i;
-    
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
-      return ;
-    }
-    clazz = jenv->GetObjectClass(jarg2);
-    mid = jenv->GetMethodID(clazz, "toByteArray", "()[B");
-    ba = (jbyteArray)jenv->CallObjectMethod(jarg2, mid);
-    bae = jenv->GetByteArrayElements(ba, 0);
-    sz = jenv->GetArrayLength(ba);
-    arg2 = 0;
-    if (sz > 0) {
-      arg2 = (unsigned long long)(signed char)bae[0];
-      for(i=1; i<sz; i++) {
-        arg2 = (arg2 << 8) | (unsigned long long)(unsigned char)bae[i];
-      }
-    }
-    jenv->ReleaseByteArrayElements(ba, bae, 0);
+  argp2 = *(ndUnsigned64 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndUnsigned64");
+    return ;
   }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_alignPad = arg2;
 }
 
 
-SWIGEXPORT jobject JNICALL Java_newtonJNI_ndShapeMaterial_1nData_1m_1alignPad_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jobject jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeMaterial_1nData_1m_1alignPad_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeMaterial::nData *arg1 = (ndShapeMaterial::nData *) 0 ;
-  unsigned long long result;
+  ndUnsigned64 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial::nData **)&jarg1; 
-  result = (unsigned long long) ((arg1)->m_alignPad);
-  {
-    jbyteArray ba = jenv->NewByteArray(9);
-    jbyte* bae = jenv->GetByteArrayElements(ba, 0);
-    jclass clazz = jenv->FindClass("java/math/BigInteger");
-    jmethodID mid = jenv->GetMethodID(clazz, "<init>", "([B)V");
-    jobject bigint;
-    int i;
-    
-    bae[0] = 0;
-    for(i=1; i<9; i++ ) {
-      bae[i] = (jbyte)(result>>8*(8-i));
-    }
-    
-    jenv->ReleaseByteArrayElements(ba, bae, 0);
-    bigint = jenv->NewObject(clazz, mid, ba);
-    jenv->DeleteLocalRef(ba);
-    jresult = bigint;
-  }
+  result =  ((arg1)->m_alignPad);
+  *(ndUnsigned64 **)&jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
   return jresult;
 }
 
@@ -1637,100 +1739,70 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeMaterial_1m_1data_1get(JNIEnv *je
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1intData_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1intData_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  unsigned long long arg2 ;
+  ndUnsigned64 arg2 ;
+  ndUnsigned64 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial::dExtraData **)&jarg1; 
-  {
-    jclass clazz;
-    jmethodID mid;
-    jbyteArray ba;
-    jbyte* bae;
-    jsize sz;
-    int i;
-    
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
-      return ;
-    }
-    clazz = jenv->GetObjectClass(jarg2);
-    mid = jenv->GetMethodID(clazz, "toByteArray", "()[B");
-    ba = (jbyteArray)jenv->CallObjectMethod(jarg2, mid);
-    bae = jenv->GetByteArrayElements(ba, 0);
-    sz = jenv->GetArrayLength(ba);
-    arg2 = 0;
-    if (sz > 0) {
-      arg2 = (unsigned long long)(signed char)bae[0];
-      for(i=1; i<sz; i++) {
-        arg2 = (arg2 << 8) | (unsigned long long)(unsigned char)bae[i];
-      }
-    }
-    jenv->ReleaseByteArrayElements(ba, bae, 0);
+  argp2 = *(ndUnsigned64 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndUnsigned64");
+    return ;
   }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_intData = arg2;
 }
 
 
-SWIGEXPORT jobject JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1intData_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jobject jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1intData_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  unsigned long long result;
+  ndUnsigned64 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial::dExtraData **)&jarg1; 
-  result = (unsigned long long) ((arg1)->m_intData);
-  {
-    jbyteArray ba = jenv->NewByteArray(9);
-    jbyte* bae = jenv->GetByteArrayElements(ba, 0);
-    jclass clazz = jenv->FindClass("java/math/BigInteger");
-    jmethodID mid = jenv->GetMethodID(clazz, "<init>", "([B)V");
-    jobject bigint;
-    int i;
-    
-    bae[0] = 0;
-    for(i=1; i<9; i++ ) {
-      bae[i] = (jbyte)(result>>8*(8-i));
-    }
-    
-    jenv->ReleaseByteArrayElements(ba, bae, 0);
-    bigint = jenv->NewObject(clazz, mid, ba);
-    jenv->DeleteLocalRef(ba);
-    jresult = bigint;
-  }
+  result =  ((arg1)->m_intData);
+  *(ndUnsigned64 **)&jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1floatData_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1floatData_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial::dExtraData **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_floatData = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1floatData_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeMaterial_1dExtraData_1m_1floatData_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeMaterial::dExtraData *arg1 = (ndShapeMaterial::dExtraData *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeMaterial::dExtraData **)&jarg1; 
-  result = (float) ((arg1)->m_floatData);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_floatData);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -1801,86 +1873,104 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeMaterial(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBoxInfo_1m_1x_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBoxInfo_1m_1x_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBoxInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_x = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBoxInfo_1m_1x_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBoxInfo_1m_1x_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBoxInfo **)&jarg1; 
-  result = (float) ((arg1)->m_x);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_x);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBoxInfo_1m_1y_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBoxInfo_1m_1y_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBoxInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_y = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBoxInfo_1m_1y_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBoxInfo_1m_1y_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBoxInfo **)&jarg1; 
-  result = (float) ((arg1)->m_y);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_y);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBoxInfo_1m_1z_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBoxInfo_1m_1z_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBoxInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_z = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBoxInfo_1m_1z_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBoxInfo_1m_1z_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBoxInfo **)&jarg1; 
-  result = (float) ((arg1)->m_z);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_z);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -1907,30 +1997,36 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndBoxInfo(JNIEnv *jenv, jclass jc
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPointInfo_1m_1noUsed_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPointInfo_1m_1noUsed_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPointInfo *arg1 = (ndPointInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPointInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_noUsed = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndPointInfo_1m_1noUsed_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPointInfo_1m_1noUsed_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPointInfo *arg1 = (ndPointInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPointInfo **)&jarg1; 
-  result = (float) ((arg1)->m_noUsed);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_noUsed);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -1957,30 +2053,36 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndPointInfo(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndSphereInfo_1m_1radius_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndSphereInfo_1m_1radius_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndSphereInfo *arg1 = (ndSphereInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndSphereInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_radius = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndSphereInfo_1m_1radius_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndSphereInfo_1m_1radius_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndSphereInfo *arg1 = (ndSphereInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndSphereInfo **)&jarg1; 
-  result = (float) ((arg1)->m_radius);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_radius);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -2007,86 +2109,104 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndSphereInfo(JNIEnv *jenv, jclass
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCylinderInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_radio0 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCylinderInfo **)&jarg1; 
-  result = (float) ((arg1)->m_radio0);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_radio0);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCylinderInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_radio1 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCylinderInfo_1m_1radio1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCylinderInfo **)&jarg1; 
-  result = (float) ((arg1)->m_radio1);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_radio1);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCylinderInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCylinderInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCylinderInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndCylinderInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCylinderInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCylinderInfo **)&jarg1; 
-  result = (float) ((arg1)->m_height);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_height);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -2113,86 +2233,104 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndCylinderInfo(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCapsuleInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_radio0 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCapsuleInfo **)&jarg1; 
-  result = (float) ((arg1)->m_radio0);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_radio0);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCapsuleInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_radio1 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1radio1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCapsuleInfo **)&jarg1; 
-  result = (float) ((arg1)->m_radio1);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_radio1);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCapsuleInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCapsuleInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCapsuleInfo **)&jarg1; 
-  result = (float) ((arg1)->m_height);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_height);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -2219,58 +2357,70 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndCapsuleInfo(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndConeInfo_1m_1radius_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndConeInfo_1m_1radius_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConeInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_radius = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndConeInfo_1m_1radius_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndConeInfo_1m_1radius_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConeInfo **)&jarg1; 
-  result = (float) ((arg1)->m_radius);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_radius);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndConeInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndConeInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConeInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndConeInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndConeInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConeInfo **)&jarg1; 
-  result = (float) ((arg1)->m_height);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_height);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -2297,58 +2447,70 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndConeInfo(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1r_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1r_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndChamferCylinderInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_r = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1r_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1r_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndChamferCylinderInfo **)&jarg1; 
-  result = (float) ((arg1)->m_r);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_r);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndChamferCylinderInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndChamferCylinderInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndChamferCylinderInfo **)&jarg1; 
-  result = (float) ((arg1)->m_height);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_height);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -2375,86 +2537,104 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndChamferCylinderInfo(JNIEnv *jen
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1vertexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1vertexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConvexHullInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_vertexCount = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1vertexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1vertexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConvexHullInfo **)&jarg1; 
-  result = (int) ((arg1)->m_vertexCount);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_vertexCount);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1strideInBytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1strideInBytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConvexHullInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_strideInBytes = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1strideInBytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1strideInBytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConvexHullInfo **)&jarg1; 
-  result = (int) ((arg1)->m_strideInBytes);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_strideInBytes);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1faceCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1faceCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConvexHullInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_faceCount = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1faceCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndConvexHullInfo_1m_1faceCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndConvexHullInfo **)&jarg1; 
-  result = (int) ((arg1)->m_faceCount);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_faceCount);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -2509,30 +2689,36 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndConvexHullInfo(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCoumpoundInfo_1m_1noUsed_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCoumpoundInfo_1m_1noUsed_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCoumpoundInfo *arg1 = (ndCoumpoundInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCoumpoundInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_noUsed = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndCoumpoundInfo_1m_1noUsed_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCoumpoundInfo_1m_1noUsed_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCoumpoundInfo *arg1 = (ndCoumpoundInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCoumpoundInfo **)&jarg1; 
-  result = (int) ((arg1)->m_noUsed);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_noUsed);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -2559,30 +2745,36 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndCoumpoundInfo(JNIEnv *jenv, jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndProceduralInfoInfo_1m_1noUsed_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndProceduralInfoInfo_1m_1noUsed_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndProceduralInfoInfo *arg1 = (ndProceduralInfoInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndProceduralInfoInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_noUsed = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndProceduralInfoInfo_1m_1noUsed_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndProceduralInfoInfo_1m_1noUsed_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndProceduralInfoInfo *arg1 = (ndProceduralInfoInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndProceduralInfoInfo **)&jarg1; 
-  result = (int) ((arg1)->m_noUsed);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_noUsed);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -2609,58 +2801,70 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndProceduralInfoInfo(JNIEnv *jenv
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1vertexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1vertexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCollisionBvhInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_vertexCount = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1vertexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1vertexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCollisionBvhInfo **)&jarg1; 
-  result = (int) ((arg1)->m_vertexCount);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_vertexCount);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1indexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1indexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCollisionBvhInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_indexCount = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1indexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndCollisionBvhInfo_1m_1indexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndCollisionBvhInfo **)&jarg1; 
-  result = (int) ((arg1)->m_indexCount);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_indexCount);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -2687,170 +2891,206 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndCollisionBvhInfo(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1width_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1width_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_width = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1width_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1width_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (int) ((arg1)->m_width);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_width);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1height_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_height = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1height_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (int) ((arg1)->m_height);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_height);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1gridsDiagonals_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1gridsDiagonals_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_gridsDiagonals = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1gridsDiagonals_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1gridsDiagonals_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (int) ((arg1)->m_gridsDiagonals);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_gridsDiagonals);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1verticalScale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1verticalScale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_verticalScale = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1verticalScale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1verticalScale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (float) ((arg1)->m_verticalScale);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_verticalScale);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1x_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1x_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_horizonalScale_x = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1x_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1x_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (float) ((arg1)->m_horizonalScale_x);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_horizonalScale_x);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1z_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1z_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_horizonalScale_z = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1z_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1horizonalScale_1z_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (float) ((arg1)->m_horizonalScale_z);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_horizonalScale_z);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -2885,13 +3125,13 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1elevation_1get(JNIE
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1atributes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  signed char *arg2 = (signed char *) 0 ;
+  ndInt8 *arg2 = (ndInt8 *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  arg2 = *(signed char **)&jarg2; 
+  arg2 = *(ndInt8 **)&jarg2; 
   if (arg1) (arg1)->m_atributes = arg2;
 }
 
@@ -2899,14 +3139,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1atributes_1set(JNIEn
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndHeighfieldInfo_1m_1atributes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  signed char *result = 0 ;
+  ndInt8 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndHeighfieldInfo **)&jarg1; 
-  result = (signed char *) ((arg1)->m_atributes);
-  *(signed char **)&jresult = result; 
+  result = (ndInt8 *) ((arg1)->m_atributes);
+  *(ndInt8 **)&jresult = result; 
   return jresult;
 }
 
@@ -3403,17 +3643,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInfo_1m_1chamferCylinder_1get(JNI
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInfo_1m_1paramArray_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeInfo *arg1 = (ndShapeInfo *) 0 ;
-  float *arg2 ;
+  ndFloat32 *arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInfo **)&jarg1; 
-  arg2 = *(float **)&jarg2; 
+  arg2 = *(ndFloat32 **)&jarg2; 
   {
     size_t ii;
-    float *b = (float *) arg1->m_paramArray;
-    for (ii = 0; ii < (size_t)32; ii++) b[ii] = *((float *) arg2 + ii);
+    ndFloat32 *b = (ndFloat32 *) arg1->m_paramArray;
+    for (ii = 0; ii < (size_t)32; ii++) b[ii] = *((ndFloat32 *) arg2 + ii);
   }
   
 }
@@ -3422,14 +3662,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInfo_1m_1paramArray_1set(JNIEnv *j
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInfo_1m_1paramArray_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndShapeInfo *arg1 = (ndShapeInfo *) 0 ;
-  float *result = 0 ;
+  ndFloat32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInfo **)&jarg1; 
-  result = (float *)(float *) ((arg1)->m_paramArray);
-  *(float **)&jresult = result; 
+  result = (ndFloat32 *)(ndFloat32 *) ((arg1)->m_paramArray);
+  *(ndFloat32 **)&jresult = result; 
   return jresult;
 }
 
@@ -3456,32 +3696,32 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeInfo(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShape_1GetRefCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetRefCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (int)((ndShape const *)arg1)->GetRefCount();
-  jresult = (jint)result; 
+  result = ((ndShape const *)arg1)->GetRefCount();
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShape_1Release(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1Release(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (int)((ndShape const *)arg1)->Release();
-  jresult = (jint)result; 
+  result = ((ndShape const *)arg1)->Release();
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -3726,17 +3966,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetAsShapeStaticProceduralMesh(
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShape_1GetConvexVertexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetConvexVertexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (int)((ndShape const *)arg1)->GetConvexVertexCount();
-  jresult = (jint)result; 
+  result = ((ndShape const *)arg1)->GetConvexVertexCount();
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -3771,17 +4011,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetObbOrigin(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1GetUmbraClipSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetUmbraClipSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (float)((ndShape const *)arg1)->GetUmbraClipSize();
-  jresult = (jfloat)result; 
+  result = ((ndShape const *)arg1)->GetUmbraClipSize();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -3837,47 +4077,47 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetShapeInfo(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1GetVolume(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetVolume(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (float)((ndShape const *)arg1)->GetVolume();
-  jresult = (jfloat)result; 
+  result = ((ndShape const *)arg1)->GetVolume();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1GetBoxMinRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetBoxMinRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (float)((ndShape const *)arg1)->GetBoxMinRadius();
-  jresult = (jfloat)result; 
+  result = ((ndShape const *)arg1)->GetBoxMinRadius();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1GetBoxMaxRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1GetBoxMaxRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShape **)&jarg1; 
-  result = (float)((ndShape const *)arg1)->GetBoxMaxRadius();
-  jresult = (jfloat)result; 
+  result = ((ndShape const *)arg1)->GetBoxMaxRadius();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -3916,7 +4156,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1SupportVertex(JNIEnv *jenv, jcl
   jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndVector *arg2 = 0 ;
-  int *arg3 = (int *) (int *)0 ;
+  ndInt32 *arg3 = (ndInt32 *) (ndInt32 *)0 ;
   ndVector result;
   
   (void)jenv;
@@ -3928,7 +4168,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1SupportVertex(JNIEnv *jenv, jcl
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg3 = *(int **)&jarg3; 
+  arg3 = *(ndInt32 **)&jarg3; 
   result = ((ndShape const *)arg1)->SupportVertex((ndVector const &)*arg2,arg3);
   *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -3962,12 +4202,13 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1SupportVertexSpecialProjectPoin
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1SupportVertexSpecial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jfloat jarg3, jlong jarg4) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1SupportVertexSpecial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndVector *arg2 = 0 ;
-  float arg3 ;
-  int *arg4 = (int *) (int *)0 ;
+  ndFloat32 arg3 ;
+  ndInt32 *arg4 = (ndInt32 *) (ndInt32 *)0 ;
+  ndFloat32 *argp3 ;
   ndVector result;
   
   (void)jenv;
@@ -3979,21 +4220,26 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1SupportVertexSpecial(JNIEnv *je
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg3 = (float)jarg3; 
-  arg4 = *(int **)&jarg4; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  arg4 = *(ndInt32 **)&jarg4; 
   result = ((ndShape const *)arg1)->SupportVertexSpecial((ndVector const &)*arg2,arg3,arg4);
   *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShape_1CalculatePlaneIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1CalculatePlaneIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
@@ -4010,8 +4256,8 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_ndShape_1CalculatePlaneIntersection(JNIEn
     return 0;
   } 
   arg4 = *(ndVector **)&jarg4; 
-  result = (int)((ndShape const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
-  jresult = (jint)result; 
+  result = ((ndShape const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -4051,16 +4297,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1CalculateVolumeIntegral(JNIEnv 
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jfloat jarg5, jlong jarg6, jobject jarg6_, jlong jarg7) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5, jlong jarg6, jobject jarg6_, jlong jarg7) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
-  float arg5 ;
+  ndFloat32 arg5 ;
   ndBody *arg6 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg7 = 0 ;
-  float result;
+  ndFloat32 *argp5 ;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -4083,15 +4330,20 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1RayCast(JNIEnv *jenv, jclass j
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg5 = (float)jarg5; 
+  argp5 = *(ndFloat32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg5 = *argp5; 
   arg6 = *(ndBody **)&jarg6; 
   arg7 = *(ndContactPoint **)&jarg7;
   if (!arg7) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint & reference is null");
     return 0;
   } 
-  result = (float)((ndShape const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
-  jresult = (jfloat)result; 
+  result = ((ndShape const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -4131,14 +4383,14 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1CalculateInertiaAndCenterOfMass
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1CalculateMassProperties(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShape_1CalculateMassProperties(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5) {
+  jlong jresult = 0 ;
   ndShape *arg1 = (ndShape *) 0 ;
   ndMatrix *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
   ndVector *arg5 = 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -4165,8 +4417,8 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShape_1CalculateMassProperties(JNIEnv
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
     return 0;
   } 
-  result = (float)((ndShape const *)arg1)->CalculateMassProperties((ndMatrix const &)*arg2,*arg3,*arg4,*arg5);
-  jresult = (jfloat)result; 
+  result = ((ndShape const *)arg1)->CalculateMassProperties((ndMatrix const &)*arg2,*arg3,*arg4,*arg5);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -4206,18 +4458,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeBox_1_1SWIG_10(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeBox_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jfloat jarg1, jfloat jarg2, jfloat jarg3) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeBox_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
-  float arg1 ;
-  float arg2 ;
-  float arg3 ;
+  ndFloat32 arg1 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp1 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
   ndShapeBox *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   result = (ndShapeBox *)new ndShapeBox(arg1,arg2,arg3);
   *(ndShapeBox **)&jresult = result; 
   return jresult;
@@ -4261,16 +4531,28 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_D_1CONE_1SEGMENTS_1get(JNIEnv *jenv, jcla
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCone_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jfloat jarg1, jfloat jarg2) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCone_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
-  float arg1 ;
-  float arg2 ;
+  ndFloat32 arg1 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp1 ;
+  ndFloat32 *argp2 ;
   ndShapeCone *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
-  arg2 = (float)jarg2; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
   result = (ndShapeCone *)new ndShapeCone(arg1,arg2);
   *(ndShapeCone **)&jresult = result; 
   return jresult;
@@ -4431,30 +4713,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeConvex_1ndConvexSimplexEdge_1m_1p
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeConvex_1ndConvexSimplexEdge_1m_1vertex_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeConvex_1ndConvexSimplexEdge_1m_1vertex_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeConvex::ndConvexSimplexEdge *arg1 = (ndShapeConvex::ndConvexSimplexEdge *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeConvex::ndConvexSimplexEdge **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_vertex = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeConvex_1ndConvexSimplexEdge_1m_1vertex_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeConvex_1ndConvexSimplexEdge_1m_1vertex_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeConvex::ndConvexSimplexEdge *arg1 = (ndShapeConvex::ndConvexSimplexEdge *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeConvex::ndConvexSimplexEdge **)&jarg1; 
-  result = (int) ((arg1)->m_vertex);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_vertex);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -4493,14 +4781,20 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_D_1SPHERE_1VERTEX_1COUNT_1get(JNIEnv *jen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeSphere_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jfloat jarg1) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeSphere_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
-  float arg1 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
   ndShapeSphere *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
   result = (ndShapeSphere *)new ndShapeSphere(arg1);
   *(ndShapeSphere **)&jresult = result; 
   return jresult;
@@ -4568,18 +4862,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCapsule_1_1SWIG_10(JNIEnv *j
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCapsule_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jfloat jarg1, jfloat jarg2, jfloat jarg3) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCapsule_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
-  float arg1 ;
-  float arg2 ;
-  float arg3 ;
+  ndFloat32 arg1 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp1 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
   ndShapeCapsule *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   result = (ndShapeCapsule *)new ndShapeCapsule(arg1,arg2,arg3);
   *(ndShapeCapsule **)&jresult = result; 
   return jresult;
@@ -4635,11 +4947,12 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCompound_1ndTreeArray(JNIEnv
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeCompound_1ndTreeArray_1AddNode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jlong jarg4, jobject jarg4_) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeCompound_1ndTreeArray_1AddNode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jobject jarg4_) {
   ndShapeCompound::ndTreeArray *arg1 = (ndShapeCompound::ndTreeArray *) 0 ;
   ndShapeCompound::ndNodeBase *arg2 = (ndShapeCompound::ndNodeBase *) (ndShapeCompound::ndNodeBase *)0 ;
-  int arg3 ;
+  ndInt32 arg3 ;
   ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
+  ndInt32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
@@ -4648,7 +4961,12 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeCompound_1ndTreeArray_1AddNode(JNI
   (void)jarg4_;
   arg1 = *(ndShapeCompound::ndTreeArray **)&jarg1; 
   arg2 = *(ndShapeCompound::ndNodeBase **)&jarg2; 
-  arg3 = (int)jarg3; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg3 = *argp3; 
   arg4 = *(ndShapeInstance **)&jarg4; 
   (arg1)->AddNode(arg2,arg3,(ndShapeInstance const *)arg4);
 }
@@ -4892,18 +5210,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCylinder_1_1SWIG_10(JNIEnv *
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCylinder_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jfloat jarg1, jfloat jarg2, jfloat jarg3) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCylinder_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
-  float arg1 ;
-  float arg2 ;
-  float arg3 ;
+  ndFloat32 arg1 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp1 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
   ndShapeCylinder *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   result = (ndShapeCylinder *)new ndShapeCylinder(arg1,arg2,arg3);
   *(ndShapeCylinder **)&jresult = result; 
   return jresult;
@@ -5037,17 +5373,17 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_D_1MAX_1COLLIDING_1INDICES_1get(JNIEnv *j
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalFaceIndexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  int *arg2 ;
+  ndInt32 *arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc::ndMesh **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
+  arg2 = *(ndInt32 **)&jarg2; 
   {
     size_t ii;
-    int *b = (int *) arg1->m_globalFaceIndexCount;
-    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((int *) arg2 + ii);
+    ndInt32 *b = (ndInt32 *) arg1->m_globalFaceIndexCount;
+    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((ndInt32 *) arg2 + ii);
   }
   
 }
@@ -5056,31 +5392,31 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalFaceI
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalFaceIndexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  int *result = 0 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc::ndMesh **)&jarg1; 
-  result = (int *)(int *) ((arg1)->m_globalFaceIndexCount);
-  *(int **)&jresult = result; 
+  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_globalFaceIndexCount);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalFaceIndexStart_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  int *arg2 ;
+  ndInt32 *arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc::ndMesh **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
+  arg2 = *(ndInt32 **)&jarg2; 
   {
     size_t ii;
-    int *b = (int *) arg1->m_globalFaceIndexStart;
-    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((int *) arg2 + ii);
+    ndInt32 *b = (ndInt32 *) arg1->m_globalFaceIndexStart;
+    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((ndInt32 *) arg2 + ii);
   }
   
 }
@@ -5089,31 +5425,31 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalFaceI
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalFaceIndexStart_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  int *result = 0 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc::ndMesh **)&jarg1; 
-  result = (int *)(int *) ((arg1)->m_globalFaceIndexStart);
-  *(int **)&jresult = result; 
+  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_globalFaceIndexStart);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalHitDistance_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  float *arg2 ;
+  ndFloat32 *arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc::ndMesh **)&jarg1; 
-  arg2 = *(float **)&jarg2; 
+  arg2 = *(ndFloat32 **)&jarg2; 
   {
     size_t ii;
-    float *b = (float *) arg1->m_globalHitDistance;
-    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((float *) arg2 + ii);
+    ndFloat32 *b = (ndFloat32 *) arg1->m_globalHitDistance;
+    for (ii = 0; ii < (size_t)512; ii++) b[ii] = *((ndFloat32 *) arg2 + ii);
   }
   
 }
@@ -5122,14 +5458,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalHitDi
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1ndMesh_1m_1globalHitDistance_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc::ndMesh *arg1 = (ndPolygonMeshDesc::ndMesh *) 0 ;
-  float *result = 0 ;
+  ndFloat32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc::ndMesh **)&jarg1; 
-  result = (float *)(float *) ((arg1)->m_globalHitDistance);
-  *(float **)&jresult = result; 
+  result = (ndFloat32 *)(ndFloat32 *) ((arg1)->m_globalHitDistance);
+  *(ndFloat32 **)&jresult = result; 
   return jresult;
 }
 
@@ -5199,17 +5535,17 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1SortFaceArray(JNIEnv *
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetSeparetionDistance(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetSeparetionDistance(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (float)((ndPolygonMeshDesc const *)arg1)->GetSeparetionDistance();
-  jresult = (jfloat)result; 
+  result = ((ndPolygonMeshDesc const *)arg1)->GetSeparetionDistance();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -5231,95 +5567,125 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1SetDistanceTravel(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetFaceIndexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jint jresult = 0 ;
-  ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int arg2 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (int)jarg2; 
-  result = (int)((ndPolygonMeshDesc const *)arg1)->GetFaceIndexCount(arg2);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetAdjacentFaceEdgeNormalArray(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetFaceIndexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) (int *)0 ;
-  int arg3 ;
-  int *result = 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
-  arg3 = (int)jarg3; 
-  result = (int *)((ndPolygonMeshDesc const *)arg1)->GetAdjacentFaceEdgeNormalArray((int const *)arg2,arg3);
-  *(int **)&jresult = result; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceIndexCount(arg2);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetNormalIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetAdjacentFaceEdgeNormalArray(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) (int *)0 ;
-  int arg3 ;
-  int result;
+  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
+  ndInt32 arg3 ;
+  ndInt32 *argp3 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
-  arg3 = (int)jarg3; 
-  result = (int)((ndPolygonMeshDesc const *)arg1)->GetNormalIndex((int const *)arg2,arg3);
-  jresult = (jint)result; 
+  arg2 = *(ndInt32 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (ndInt32 *)((ndPolygonMeshDesc const *)arg1)->GetAdjacentFaceEdgeNormalArray((ndInt32 const *)arg2,arg3);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetFaceId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetNormalIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) (int *)0 ;
-  int arg3 ;
-  int result;
+  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
+  ndInt32 arg3 ;
+  ndInt32 *argp3 ;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
-  arg3 = (int)jarg3; 
-  result = (int)((ndPolygonMeshDesc const *)arg1)->GetFaceId((int const *)arg2,arg3);
-  jresult = (jint)result; 
+  arg2 = *(ndInt32 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = ((ndPolygonMeshDesc const *)arg1)->GetNormalIndex((ndInt32 const *)arg2,arg3);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetFaceSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetFaceId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) (int *)0 ;
-  int arg3 ;
-  float result;
+  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
+  ndInt32 arg3 ;
+  ndInt32 *argp3 ;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
-  arg3 = (int)jarg3; 
-  result = (float)((ndPolygonMeshDesc const *)arg1)->GetFaceSize((int const *)arg2,arg3);
-  jresult = (jfloat)result; 
+  arg2 = *(ndInt32 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceId((ndInt32 const *)arg2,arg3);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1GetFaceSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
+  ndInt32 *arg2 = (ndInt32 *) (ndInt32 *)0 ;
+  ndInt32 arg3 ;
+  ndInt32 *argp3 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndPolygonMeshDesc **)&jarg1; 
+  arg2 = *(ndInt32 **)&jarg2; 
+  argp3 = *(ndInt32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceSize((ndInt32 const *)arg2,arg3);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -5358,86 +5724,104 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1boxDistanceTravelI
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_faceCount = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int) ((arg1)->m_faceCount);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_faceCount);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertexStrideInBytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertexStrideInBytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_vertexStrideInBytes = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertexStrideInBytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertexStrideInBytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int) ((arg1)->m_vertexStrideInBytes);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_vertexStrideInBytes);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_skinMargin = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (float) ((arg1)->m_skinMargin);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_skinMargin);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -5502,13 +5886,13 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1polySoupInstance_1
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertex_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float *arg2 = (float *) 0 ;
+  ndFloat32 *arg2 = (ndFloat32 *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(float **)&jarg2; 
+  arg2 = *(ndFloat32 **)&jarg2; 
   if (arg1) (arg1)->m_vertex = arg2;
 }
 
@@ -5516,27 +5900,27 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertex_1set(JNIEnv 
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1vertex_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float *result = 0 ;
+  ndFloat32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (float *) ((arg1)->m_vertex);
-  *(float **)&jresult = result; 
+  result = (ndFloat32 *) ((arg1)->m_vertex);
+  *(ndFloat32 **)&jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceIndexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) 0 ;
+  ndInt32 *arg2 = (ndInt32 *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
+  arg2 = *(ndInt32 **)&jarg2; 
   if (arg1) (arg1)->m_faceIndexCount = arg2;
 }
 
@@ -5544,27 +5928,27 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceIndexCount_1set
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceIndexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *result = 0 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int *) ((arg1)->m_faceIndexCount);
-  *(int **)&jresult = result; 
+  result = (ndInt32 *) ((arg1)->m_faceIndexCount);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceVertexIndex_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) 0 ;
+  ndInt32 *arg2 = (ndInt32 *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
+  arg2 = *(ndInt32 **)&jarg2; 
   if (arg1) (arg1)->m_faceVertexIndex = arg2;
 }
 
@@ -5572,14 +5956,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceVertexIndex_1se
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceVertexIndex_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *result = 0 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int *) ((arg1)->m_faceVertexIndex);
-  *(int **)&jresult = result; 
+  result = (ndInt32 *) ((arg1)->m_faceVertexIndex);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
@@ -5615,13 +5999,13 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1meshData_1get(JNIE
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceIndexStart_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 = (int *) 0 ;
+  ndInt32 *arg2 = (ndInt32 *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
+  arg2 = *(ndInt32 **)&jarg2; 
   if (arg1) (arg1)->m_faceIndexStart = arg2;
 }
 
@@ -5629,27 +6013,27 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceIndexStart_1set
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1faceIndexStart_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *result = 0 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int *) ((arg1)->m_faceIndexStart);
-  *(int **)&jresult = result; 
+  result = (ndInt32 *) ((arg1)->m_faceIndexStart);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1hitDistance_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float *arg2 = (float *) 0 ;
+  ndFloat32 *arg2 = (ndFloat32 *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(float **)&jarg2; 
+  arg2 = *(ndFloat32 **)&jarg2; 
   if (arg1) (arg1)->m_hitDistance = arg2;
 }
 
@@ -5657,14 +6041,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1hitDistance_1set(JN
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1hitDistance_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float *result = 0 ;
+  ndFloat32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (float *) ((arg1)->m_hitDistance);
-  *(float **)&jresult = result; 
+  result = (ndFloat32 *) ((arg1)->m_hitDistance);
+  *(ndFloat32 **)&jresult = result; 
   return jresult;
 }
 
@@ -5700,17 +6084,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1me_1get(JNIEnv *je
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalFaceVertexIndex_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *arg2 ;
+  ndInt32 *arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = *(int **)&jarg2; 
+  arg2 = *(ndInt32 **)&jarg2; 
   {
     size_t ii;
-    int *b = (int *) arg1->m_globalFaceVertexIndex;
-    for (ii = 0; ii < (size_t)(512*(4*2+3)); ii++) b[ii] = *((int *) arg2 + ii);
+    ndInt32 *b = (ndInt32 *) arg1->m_globalFaceVertexIndex;
+    for (ii = 0; ii < (size_t)(512*(4*2+3)); ii++) b[ii] = *((ndInt32 *) arg2 + ii);
   }
   
 }
@@ -5719,98 +6103,116 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalFaceVertexInd
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalFaceVertexIndex_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int *result = 0 ;
+  ndInt32 *result = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int *)(int *) ((arg1)->m_globalFaceVertexIndex);
-  *(int **)&jresult = result; 
+  result = (ndInt32 *)(ndInt32 *) ((arg1)->m_globalFaceVertexIndex);
+  *(ndInt32 **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1maxT_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1maxT_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_maxT = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1maxT_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1maxT_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (float) ((arg1)->m_maxT);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_maxT);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalIndexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalIndexCount_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_globalIndexCount = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalIndexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1globalIndexCount_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int) ((arg1)->m_globalIndexCount);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_globalIndexCount);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1threadId_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1threadId_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_threadId = arg2;
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1threadId_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPolygonMeshDesc_1m_1threadId_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndPolygonMeshDesc **)&jarg1; 
-  result = (int) ((arg1)->m_threadId);
-  jresult = (jint)result; 
+  result =  ((arg1)->m_threadId);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -5920,16 +6322,17 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeStaticMesh_1DebugShape(JNIEnv *jen
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeStaticMesh_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jfloat jarg5, jlong jarg6, jobject jarg6_, jlong jarg7) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeStaticMesh_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5, jlong jarg6, jobject jarg6_, jlong jarg7) {
+  jlong jresult = 0 ;
   ndShapeStaticMesh *arg1 = (ndShapeStaticMesh *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
-  float arg5 ;
+  ndFloat32 arg5 ;
   ndBody *arg6 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg7 = 0 ;
-  float result;
+  ndFloat32 *argp5 ;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -5952,15 +6355,20 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeStaticMesh_1RayCast(JNIEnv *jenv
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg5 = (float)jarg5; 
+  argp5 = *(ndFloat32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg5 = *argp5; 
   arg6 = *(ndBody **)&jarg6; 
   arg7 = *(ndContactPoint **)&jarg7;
   if (!arg7) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint & reference is null");
     return 0;
   } 
-  result = (float)((ndShapeStaticMesh const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
-  jresult = (jfloat)result; 
+  result = ((ndShapeStaticMesh const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -6014,21 +6422,39 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeConvexHull_1_1SWIG_10(JNIEnv
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeConvexHull_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jfloat jarg3, jlong jarg4) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeConvexHull_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
   jlong jresult = 0 ;
-  int arg1 ;
-  int arg2 ;
-  float arg3 ;
-  float *arg4 = (float *) (float *)0 ;
+  ndInt32 arg1 ;
+  ndInt32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *arg4 = (ndFloat32 *) (ndFloat32 *)0 ;
+  ndInt32 *argp1 ;
+  ndInt32 *argp2 ;
+  ndFloat32 *argp3 ;
   ndShapeConvexHull *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (float)jarg3; 
-  arg4 = *(float **)&jarg4; 
-  result = (ndShapeConvexHull *)new ndShapeConvexHull(arg1,arg2,arg3,(float const *)arg4);
+  argp1 = *(ndInt32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  arg4 = *(ndFloat32 **)&jarg4; 
+  result = (ndShapeConvexHull *)new ndShapeConvexHull(arg1,arg2,arg3,(ndFloat32 const *)arg4);
   *(ndShapeConvexHull **)&jresult = result; 
   return jresult;
 }
@@ -6056,22 +6482,46 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeHeightfield_1m_1normalDiagonals_1g
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeHeightfield_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3, jfloat jarg4, jfloat jarg5) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeHeightfield_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4, jlong jarg5) {
   jlong jresult = 0 ;
-  int arg1 ;
-  int arg2 ;
+  ndInt32 arg1 ;
+  ndInt32 arg2 ;
   ndShapeHeightfield::ndGridConstruction arg3 ;
-  float arg4 ;
-  float arg5 ;
+  ndFloat32 arg4 ;
+  ndFloat32 arg5 ;
+  ndInt32 *argp1 ;
+  ndInt32 *argp2 ;
+  ndFloat32 *argp4 ;
+  ndFloat32 *argp5 ;
   ndShapeHeightfield *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (int)jarg2; 
+  argp1 = *(ndInt32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg2 = *argp2; 
   arg3 = (ndShapeHeightfield::ndGridConstruction)jarg3; 
-  arg4 = (float)jarg4; 
-  arg5 = (float)jarg5; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg4 = *argp4; 
+  argp5 = *(ndFloat32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg5 = *argp5; 
   result = (ndShapeHeightfield *)new ndShapeHeightfield(arg1,arg2,arg3,arg4,arg5);
   *(ndShapeHeightfield **)&jresult = result; 
   return jresult;
@@ -6203,16 +6653,28 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_DG_1MAX_1CHAMFERCYLINDER_1DIR_1COUNT_1get
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeChamferCylinder_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jfloat jarg1, jfloat jarg2) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeChamferCylinder_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
   jlong jresult = 0 ;
-  float arg1 ;
-  float arg2 ;
+  ndFloat32 arg1 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp1 ;
+  ndFloat32 *argp2 ;
   ndShapeChamferCylinder *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (float)jarg1; 
-  arg2 = (float)jarg2; 
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
   result = (ndShapeChamferCylinder *)new ndShapeChamferCylinder(arg1,arg2);
   *(ndShapeChamferCylinder **)&jresult = result; 
   return jresult;
@@ -6272,17 +6734,23 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeDebugNotify(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeDebugNotify_1DrawPolygon(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jlong jarg4) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeDebugNotify_1DrawPolygon(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
   ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
   ndVector *arg3 = (ndVector *) (ndVector *)0 ;
   ndShapeDebugNotify::ndEdgeType *arg4 = (ndShapeDebugNotify::ndEdgeType *) (ndShapeDebugNotify::ndEdgeType *)0 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeDebugNotify **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   arg3 = *(ndVector **)&jarg3; 
   arg4 = *(ndShapeDebugNotify::ndEdgeType **)&jarg4; 
   (arg1)->DrawPolygon(arg2,(ndVector const *)arg3,(ndShapeDebugNotify::ndEdgeType const *)arg4);
@@ -6838,15 +7306,15 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1DebugShape(JNIEnv *jenv,
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5, jobject jarg5_, jlong jarg6) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5, jobject jarg5_, jlong jarg6) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = 0 ;
   ndBody *arg5 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg6 = 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -6875,8 +7343,8 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1RayCast(JNIEnv *jenv, 
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint & reference is null");
     return 0;
   } 
-  result = (float)((ndShapeInstance const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,(ndBody const *)arg5,*arg6);
-  jresult = (jfloat)result; 
+  result = ((ndShapeInstance const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,(ndBody const *)arg5,*arg6);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -6913,13 +7381,13 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1Save(JNIEnv *jenv, jclas
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1CalculateBuoyancyCenterOfPresure(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_, jlong jarg4) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculateBuoyancyCenterOfPresure(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_, jlong jarg4) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndVector *arg2 = 0 ;
   ndMatrix *arg3 = 0 ;
   ndVector *arg4 = 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -6941,8 +7409,8 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1CalculateBuoyancyCente
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  result = (float)((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(ndMatrix const &)*arg3,(ndVector const &)*arg4);
-  jresult = (jfloat)result; 
+  result = ((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(ndMatrix const &)*arg3,(ndVector const &)*arg4);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -7035,7 +7503,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertexSpecial(JN
   jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndVector *arg2 = 0 ;
-  int *arg3 = (int *) (int *)0 ;
+  ndInt32 *arg3 = (ndInt32 *) (ndInt32 *)0 ;
   ndVector result;
   
   (void)jenv;
@@ -7047,7 +7515,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertexSpecial(JN
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg3 = *(int **)&jarg3; 
+  arg3 = *(ndInt32 **)&jarg3; 
   result = ((ndShapeInstance const *)arg1)->SupportVertexSpecial((ndVector const &)*arg2,arg3);
   *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
   return jresult;
@@ -7175,17 +7643,17 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetCollisionMode(JNIEnv 
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1GetConvexVertexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetConvexVertexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (int)((ndShapeInstance const *)arg1)->GetConvexVertexCount();
-  jresult = (jint)result; 
+  result = ((ndShapeInstance const *)arg1)->GetConvexVertexCount();
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
@@ -7320,13 +7788,13 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalScale_1_1SWIG_1
 }
 
 
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1CalculatePlaneIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
-  jint jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculatePlaneIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
   ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  int result;
+  ndInt32 result;
   
   (void)jenv;
   (void)jcls;
@@ -7343,53 +7811,53 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1CalculatePlaneIntersecti
     return 0;
   } 
   arg4 = *(ndVector **)&jarg4; 
-  result = (int)((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
-  jresult = (jint)result; 
+  result = ((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1GetVolume(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetVolume(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (float)((ndShapeInstance const *)arg1)->GetVolume();
-  jresult = (jfloat)result; 
+  result = ((ndShapeInstance const *)arg1)->GetVolume();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMinRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMinRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (float)((ndShapeInstance const *)arg1)->GetBoxMinRadius();
-  jresult = (jfloat)result; 
+  result = ((ndShapeInstance const *)arg1)->GetBoxMinRadius();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMaxRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMaxRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (float)((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
-  jresult = (jfloat)result; 
+  result = ((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -7409,49 +7877,32 @@ SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1GetScaleType(JNIEnv *jen
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1GetUmbraClipSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetUmbraClipSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (float)((ndShapeInstance const *)arg1)->GetUmbraClipSize();
-  jresult = (jfloat)result; 
+  result = ((ndShapeInstance const *)arg1)->GetUmbraClipSize();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jobject JNICALL Java_newtonJNI_ndShapeInstance_1GetUserDataID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jobject jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetUserDataID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  unsigned long long result;
+  ndUnsigned64 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (unsigned long long)((ndShapeInstance const *)arg1)->GetUserDataID();
-  {
-    jbyteArray ba = jenv->NewByteArray(9);
-    jbyte* bae = jenv->GetByteArrayElements(ba, 0);
-    jclass clazz = jenv->FindClass("java/math/BigInteger");
-    jmethodID mid = jenv->GetMethodID(clazz, "<init>", "([B)V");
-    jobject bigint;
-    int i;
-    
-    bae[0] = 0;
-    for(i=1; i<9; i++ ) {
-      bae[i] = (jbyte)(result>>8*(8-i));
-    }
-    
-    jenv->ReleaseByteArrayElements(ba, bae, 0);
-    bigint = jenv->NewObject(clazz, mid, ba);
-    jenv->DeleteLocalRef(ba);
-    jresult = bigint;
-  }
+  result = ((ndShapeInstance const *)arg1)->GetUserDataID();
+  *(ndUnsigned64 **)&jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
   return jresult;
 }
 
@@ -7789,30 +8240,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1parent_1get(JNIEnv *
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_skinMargin = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (float) ((arg1)->m_skinMargin);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_skinMargin);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -8006,14 +8463,14 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBody_1GetAsBodyTriggerVolume(JNIEnv *j
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBody_1GetId(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndBody *arg1 = (ndBody *) 0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBody **)&jarg1; 
-  result = (unsigned int)((ndBody const *)arg1)->GetId();
-  jresult = (jlong)result; 
+  result = ((ndBody const *)arg1)->GetId();
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
@@ -8041,27 +8498,28 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBody_1GetAABB(JNIEnv *jenv, jclass jcls
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBody_1GetInvMass(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBody_1GetInvMass(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBody *arg1 = (ndBody *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBody **)&jarg1; 
-  result = (float)((ndBody const *)arg1)->GetInvMass();
-  jresult = (jfloat)result; 
+  result = ((ndBody const *)arg1)->GetInvMass();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBody_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jfloat jarg4) {
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBody_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4) {
   jboolean jresult = 0 ;
   ndBody *arg1 = (ndBody *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndFastRay *arg3 = 0 ;
-  float arg4 ;
+  ndFloat32 arg4 ;
+  ndFloat32 const *argp4 ;
   bool result;
   
   (void)jenv;
@@ -8079,7 +8537,12 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBody_1RayCast(JNIEnv *jenv, jclass 
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndFastRay const & reference is null");
     return 0;
   } 
-  arg4 = (float)jarg4; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32 const");
+    return 0;
+  }
+  arg4 = *argp4; 
   result = (bool)((ndBody const *)arg1)->RayCast(*arg2,(ndFastRay const &)*arg3,arg4);
   jresult = (jboolean)result; 
   return jresult;
@@ -8482,29 +8945,29 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1GetScene(JNIEnv *jenv, 
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1GetIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  result = (unsigned int)((ndBodyKinematic const *)arg1)->GetIndex();
-  jresult = (jlong)result; 
+  result = ((ndBodyKinematic const *)arg1)->GetIndex();
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyKinematic_1GetInvMass(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1GetInvMass(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  result = (float)((ndBodyKinematic const *)arg1)->GetInvMass();
-  jresult = (jfloat)result; 
+  result = ((ndBodyKinematic const *)arg1)->GetInvMass();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -8653,75 +9116,93 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetAutoSleep(JNIEnv *jen
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyKinematic_1GetMaxLinearStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1GetMaxLinearStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  result = (float)((ndBodyKinematic const *)arg1)->GetMaxLinearStep();
-  jresult = (jfloat)result; 
+  result = ((ndBodyKinematic const *)arg1)->GetMaxLinearStep();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyKinematic_1GetMaxAngularStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1GetMaxAngularStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  result = (float)((ndBodyKinematic const *)arg1)->GetMaxAngularStep();
-  jresult = (jfloat)result; 
+  result = ((ndBodyKinematic const *)arg1)->GetMaxAngularStep();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetDebugMaxLinearAndAngularIntegrationStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2, jfloat jarg3) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetDebugMaxLinearAndAngularIntegrationStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float arg2 ;
-  float arg3 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
   (arg1)->SetDebugMaxLinearAndAngularIntegrationStep(arg2,arg3);
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyKinematic_1GetLinearDamping(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1GetLinearDamping(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  result = (float)((ndBodyKinematic const *)arg1)->GetLinearDamping();
-  jresult = (jfloat)result; 
+  result = ((ndBodyKinematic const *)arg1)->GetLinearDamping();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetLinearDamping(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetLinearDamping(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetLinearDamping(arg2);
 }
 
@@ -8806,12 +9287,13 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetCollisionShape(JNIEnv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBodyKinematic_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jfloat jarg4) {
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBodyKinematic_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4) {
   jboolean jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   ndFastRay *arg3 = 0 ;
-  float arg4 ;
+  ndFloat32 arg4 ;
+  ndFloat32 const *argp4 ;
   bool result;
   
   (void)jenv;
@@ -8829,7 +9311,12 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBodyKinematic_1RayCast(JNIEnv *jenv
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndFastRay const & reference is null");
     return 0;
   } 
-  arg4 = (float)jarg4; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32 const");
+    return 0;
+  }
+  arg4 = *argp4; 
   result = (bool)((ndBodyKinematic const *)arg1)->RayCast(*arg2,(ndFastRay const &)*arg3,arg4);
   jresult = (jboolean)result; 
   return jresult;
@@ -8866,17 +9353,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1CalculateAngularMomentu
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyKinematic_1TotalEnergy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1TotalEnergy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  result = (float)((ndBodyKinematic const *)arg1)->TotalEnergy();
-  jresult = (jfloat)result; 
+  result = ((ndBodyKinematic const *)arg1)->TotalEnergy();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -8911,15 +9398,21 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyKinematic_1CalculateInvInertiaMatr
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1IntegrateVelocity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1IntegrateVelocity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->IntegrateVelocity(arg2);
 }
 
@@ -8969,17 +9462,23 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_10
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
   ndShapeInstance *arg3 = 0 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg3_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   arg3 = *(ndShapeInstance **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
@@ -8989,36 +9488,66 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_11
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2, jfloat jarg3, jfloat jarg4, jfloat jarg5) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  float arg5 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 arg4 ;
+  ndFloat32 arg5 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
+  ndFloat32 *argp4 ;
+  ndFloat32 *argp5 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
-  arg4 = (float)jarg4; 
-  arg5 = (float)jarg5; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg4 = *argp4; 
+  argp5 = *(ndFloat32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg5 = *argp5; 
   (arg1)->SetMassMatrix(arg2,arg3,arg4,arg5);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
   ndMatrix *arg3 = 0 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg3_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   arg3 = *(ndMatrix **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
@@ -9030,33 +9559,33 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetMassMatrix_1_1SWIG_13
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1GetMassMatrix_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  float *arg2 = 0 ;
-  float *arg3 = 0 ;
-  float *arg4 = 0 ;
-  float *arg5 = 0 ;
+  ndFloat32 *arg2 = 0 ;
+  ndFloat32 *arg3 = 0 ;
+  ndFloat32 *arg4 = 0 ;
+  ndFloat32 *arg5 = 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = *(float **)&jarg2;
+  arg2 = *(ndFloat32 **)&jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "float & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndFloat32 & reference is null");
     return ;
   } 
-  arg3 = *(float **)&jarg3;
+  arg3 = *(ndFloat32 **)&jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "float & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndFloat32 & reference is null");
     return ;
   } 
-  arg4 = *(float **)&jarg4;
+  arg4 = *(ndFloat32 **)&jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "float & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndFloat32 & reference is null");
     return ;
   } 
-  arg5 = *(float **)&jarg5;
+  arg5 = *(ndFloat32 **)&jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "float & reference is null");
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndFloat32 & reference is null");
     return ;
   } 
   (arg1)->GetMassMatrix(*arg2,*arg3,*arg4,*arg5);
@@ -9206,11 +9735,12 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1SetTorque(JNIEnv *jenv, 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1AddImpulse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jfloat jarg4) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1AddImpulse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
-  float arg4 ;
+  ndFloat32 arg4 ;
+  ndFloat32 *argp4 ;
   
   (void)jenv;
   (void)jcls;
@@ -9226,16 +9756,22 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1AddImpulse(JNIEnv *jenv,
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return ;
   } 
-  arg4 = (float)jarg4; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg4 = *argp4; 
   (arg1)->AddImpulse((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1ApplyImpulsePair(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jfloat jarg4) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1ApplyImpulsePair(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
-  float arg4 ;
+  ndFloat32 arg4 ;
+  ndFloat32 *argp4 ;
   
   (void)jenv;
   (void)jcls;
@@ -9251,26 +9787,43 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1ApplyImpulsePair(JNIEnv 
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return ;
   } 
-  arg4 = (float)jarg4; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg4 = *argp4; 
   (arg1)->ApplyImpulsePair((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1ApplyImpulsesAtPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jlong jarg4, jfloat jarg5) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyKinematic_1ApplyImpulsesAtPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
   ndVector *arg3 = (ndVector *) (ndVector *)0 ;
   ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  float arg5 ;
+  ndFloat32 arg5 ;
+  ndInt32 *argp2 ;
+  ndFloat32 *argp5 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyKinematic **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   arg3 = *(ndVector **)&jarg3; 
   arg4 = *(ndVector **)&jarg4; 
-  arg5 = (float)jarg5; 
+  argp5 = *(ndFloat32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg5 = *argp5; 
   (arg1)->ApplyImpulsesAtPoint(arg2,(ndVector const *)arg3,(ndVector const *)arg4,arg5);
 }
 
@@ -9446,10 +9999,11 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyTriggerVolume_1GetAsBodyTriggerVol
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTrigger(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jfloat jarg3) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTrigger(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
@@ -9457,15 +10011,21 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTrigger(JNIEnv *je
   (void)jarg2_;
   arg1 = *(ndBodyTriggerVolume **)&jarg1; 
   arg2 = *(ndBodyKinematic **)&jarg2; 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
   (arg1)->OnTrigger(arg2,arg3);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTriggerEnter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jfloat jarg3) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTriggerEnter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
@@ -9473,15 +10033,21 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTriggerEnter(JNIEn
   (void)jarg2_;
   arg1 = *(ndBodyTriggerVolume **)&jarg1; 
   arg2 = *(ndBodyKinematic **)&jarg2; 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
   (arg1)->OnTriggerEnter(arg2,arg3);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTriggerExit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jfloat jarg3) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTriggerExit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
@@ -9489,20 +10055,31 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1OnTriggerExit(JNIEnv
   (void)jarg2_;
   arg1 = *(ndBodyTriggerVolume **)&jarg1; 
   arg2 = *(ndBodyKinematic **)&jarg2; 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
   (arg1)->OnTriggerExit(arg2,arg3);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1SpecialUpdate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyTriggerVolume_1SpecialUpdate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyTriggerVolume **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SpecialUpdate(arg2);
 }
 
@@ -9542,13 +10119,17 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndBodyPlayerCapsule_1_1SWIG_10(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndBodyPlayerCapsule_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2, jfloat jarg3, jfloat jarg4, jfloat jarg5) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndBodyPlayerCapsule_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
   jlong jresult = 0 ;
   ndMatrix *arg1 = 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  float arg5 ;
+  ndFloat32 arg2 ;
+  ndFloat32 arg3 ;
+  ndFloat32 arg4 ;
+  ndFloat32 arg5 ;
+  ndFloat32 *argp2 ;
+  ndFloat32 *argp3 ;
+  ndFloat32 *argp4 ;
+  ndFloat32 *argp5 ;
   ndBodyPlayerCapsule *result = 0 ;
   
   (void)jenv;
@@ -9559,10 +10140,30 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndBodyPlayerCapsule_1_1SWIG_11(JNIE
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
     return 0;
   } 
-  arg2 = (float)jarg2; 
-  arg3 = (float)jarg3; 
-  arg4 = (float)jarg4; 
-  arg5 = (float)jarg5; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  argp4 = *(ndFloat32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg4 = *argp4; 
+  argp5 = *(ndFloat32 **)&jarg5; 
+  if (!argp5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg5 = *argp5; 
   result = (ndBodyPlayerCapsule *)new ndBodyPlayerCapsule((ndMatrix const &)*arg1,arg2,arg3,arg4,arg5);
   *(ndBodyPlayerCapsule **)&jresult = result; 
   return jresult;
@@ -9594,86 +10195,104 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetAsBodyPlayerCaps
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetForwardSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetForwardSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetForwardSpeed();
-  jresult = (jfloat)result; 
+  result = ((ndBodyPlayerCapsule const *)arg1)->GetForwardSpeed();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SetForwardSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SetForwardSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetForwardSpeed(arg2);
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetLateralSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetLateralSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetLateralSpeed();
-  jresult = (jfloat)result; 
+  result = ((ndBodyPlayerCapsule const *)arg1)->GetLateralSpeed();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SetLateralSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SetLateralSpeed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetLateralSpeed(arg2);
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetHeadingAngle(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1GetHeadingAngle(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetHeadingAngle();
-  jresult = (jfloat)result; 
+  result = ((ndBodyPlayerCapsule const *)arg1)->GetHeadingAngle();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SetHeadingAngle(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SetHeadingAngle(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetHeadingAngle(arg2);
 }
 
@@ -9693,27 +10312,34 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1IsOnFloor(JNIEnv
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1ApplyInputs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1ApplyInputs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyPlayerCapsule **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->ApplyInputs(arg2);
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1ContactFrictionCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1ContactFrictionCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5, jobject jarg5_) {
+  jlong jresult = 0 ;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
   ndVector *arg2 = 0 ;
   ndVector *arg3 = 0 ;
-  int arg4 ;
+  ndInt32 arg4 ;
   ndBodyKinematic *arg5 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  float result;
+  ndInt32 *argp4 ;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -9730,10 +10356,15 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1ContactFrictionCal
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
     return 0;
   } 
-  arg4 = (int)jarg4; 
+  argp4 = *(ndInt32 **)&jarg4; 
+  if (!argp4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return 0;
+  }
+  arg4 = *argp4; 
   arg5 = *(ndBodyKinematic **)&jarg5; 
-  result = (float)((ndBodyPlayerCapsule const *)arg1)->ContactFrictionCallback((ndVector const &)*arg2,(ndVector const &)*arg3,arg4,(ndBodyKinematic const *)arg5);
-  jresult = (jfloat)result; 
+  result = ((ndBodyPlayerCapsule const *)arg1)->ContactFrictionCallback((ndVector const &)*arg2,(ndVector const &)*arg3,arg4,(ndBodyKinematic const *)arg5);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -9846,17 +10477,23 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyNotify_1SetGravity(JNIEnv *jenv, jc
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyNotify_1OnTransform(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyNotify_1OnTransform(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_) {
   ndBodyNotify *arg1 = (ndBodyNotify *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
   ndMatrix *arg3 = 0 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg3_;
   arg1 = *(ndBodyNotify **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   arg3 = *(ndMatrix **)&jarg3;
   if (!arg3) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
@@ -9883,17 +10520,29 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyNotify_1Save(JNIEnv *jenv, jclass j
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyNotify_1OnApplyExternalForce(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jfloat jarg3) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndBodyNotify_1OnApplyExternalForce(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   ndBodyNotify *arg1 = (ndBodyNotify *) 0 ;
-  int arg2 ;
-  float arg3 ;
+  ndInt32 arg2 ;
+  ndFloat32 arg3 ;
+  ndInt32 *argp2 ;
+  ndFloat32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndBodyNotify **)&jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (float)jarg3; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
   (arg1)->OnApplyExternalForce(arg2,arg3);
 }
 
@@ -9910,211 +10559,259 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndMaterial(JNIEnv *jenv, jclass jcl
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1restitution_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1restitution_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_restitution = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1restitution_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1restitution_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_restitution);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_restitution);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_staticFriction0 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_staticFriction0);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_staticFriction0);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_staticFriction1 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1staticFriction1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_staticFriction1);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_staticFriction1);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_dynamicFriction0 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_dynamicFriction0);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_dynamicFriction0);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_dynamicFriction1 = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1dynamicFriction1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_dynamicFriction1);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_dynamicFriction1);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_skinMargin = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_skinMargin);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_skinMargin);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1softness_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1softness_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_softness = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndMaterial_1m_1softness_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1softness_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (float) ((arg1)->m_softness);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_softness);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  unsigned int arg2 ;
+  ndUnsigned32 arg2 ;
+  ndUnsigned32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (unsigned int)jarg2; 
+  argp2 = *(ndUnsigned32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndUnsigned32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_flags = arg2;
 }
 
@@ -10122,27 +10819,33 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1flags_1set(JNIEnv *jenv, j
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (unsigned int) ((arg1)->m_flags);
-  jresult = (jlong)result; 
+  result =  ((arg1)->m_flags);
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
 
 SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1userFlags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  unsigned int arg2 ;
+  ndUnsigned32 arg2 ;
+  ndUnsigned32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  arg2 = (unsigned int)jarg2; 
+  argp2 = *(ndUnsigned32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndUnsigned32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_userFlags = arg2;
 }
 
@@ -10150,14 +10853,14 @@ SWIGEXPORT void JNICALL Java_newtonJNI_ndMaterial_1m_1userFlags_1set(JNIEnv *jen
 SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMaterial_1m_1userFlags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndMaterial **)&jarg1; 
-  result = (unsigned int) ((arg1)->m_userFlags);
-  jresult = (jlong)result; 
+  result =  ((arg1)->m_userFlags);
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
@@ -10253,13 +10956,14 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndContactNotify_1GetMaterial(JNIEnv *jen
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnCompoundSubShapeOverlap(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jfloat jarg3, jlong jarg4, jobject jarg4_, jlong jarg5, jobject jarg5_) {
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnCompoundSubShapeOverlap(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jobject jarg4_, jlong jarg5, jobject jarg5_) {
   jboolean jresult = 0 ;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
   ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
   ndShapeInstance *arg5 = (ndShapeInstance *) (ndShapeInstance *)0 ;
+  ndFloat32 *argp3 ;
   bool result;
   
   (void)jenv;
@@ -10269,7 +10973,12 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnCompoundSubShapeOv
   (void)jarg5_;
   arg1 = *(ndContactNotify **)&jarg1; 
   arg2 = *(ndContact **)&jarg2; 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   arg4 = *(ndShapeInstance **)&jarg4; 
   arg5 = *(ndShapeInstance **)&jarg5; 
   result = (bool)(arg1)->OnCompoundSubShapeOverlap((ndContact const *)arg2,arg3,(ndShapeInstance const *)arg4,(ndShapeInstance const *)arg5);
@@ -10278,11 +10987,12 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnCompoundSubShapeOv
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnAabbOverlap(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jfloat jarg3) {
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnAabbOverlap(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jboolean jresult = 0 ;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   bool result;
   
   (void)jenv;
@@ -10290,24 +11000,35 @@ SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndContactNotify_1OnAabbOverlap(JNIEnv
   (void)jarg1_;
   arg1 = *(ndContactNotify **)&jarg1; 
   arg2 = *(ndContact **)&jarg2; 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
   result = (bool)(arg1)->OnAabbOverlap((ndContact const *)arg2,arg3);
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndContactNotify_1OnContactCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jfloat jarg3) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndContactNotify_1OnContactCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  float arg3 ;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndContactNotify **)&jarg1; 
   arg2 = *(ndContact **)&jarg2; 
-  arg3 = (float)jarg3; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg3 = *argp3; 
   (arg1)->OnContactCallback((ndContact const *)arg2,arg3);
 }
 
@@ -10368,7 +11089,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastNotify_1OnRayPrecastAction(JNIE
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
   ndBody *arg2 = (ndBody *) (ndBody *)0 ;
   ndShapeInstance *arg3 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
@@ -10378,18 +11099,19 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastNotify_1OnRayPrecastAction(JNIE
   arg1 = *(ndRayCastNotify **)&jarg1; 
   arg2 = *(ndBody **)&jarg2; 
   arg3 = *(ndShapeInstance **)&jarg3; 
-  result = (unsigned int)(arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
-  jresult = (jlong)result; 
+  result = (arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndRayCastNotify_1OnRayCastAction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jfloat jarg3) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastNotify_1OnRayCastAction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
   ndContactPoint *arg2 = 0 ;
-  float arg3 ;
-  float result;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -10400,9 +11122,14 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndRayCastNotify_1OnRayCastAction(JNIEnv
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint const & reference is null");
     return 0;
   } 
-  arg3 = (float)jarg3; 
-  result = (float)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
-  jresult = (jfloat)result; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -10435,30 +11162,36 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastNotify_1m_1contact_1get(JNIEnv 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_ndRayCastNotify_1m_1param_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_ndRayCastNotify_1m_1param_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndRayCastNotify **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   if (arg1) (arg1)->m_param = arg2;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndRayCastNotify_1m_1param_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastNotify_1m_1param_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
-  float result;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(ndRayCastNotify **)&jarg1; 
-  result = (float) ((arg1)->m_param);
-  jresult = (jfloat)result; 
+  result =  ((arg1)->m_param);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -10480,7 +11213,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastClosestHitCallback_1OnRayPrecas
   ndRayCastClosestHitCallback *arg1 = (ndRayCastClosestHitCallback *) 0 ;
   ndBody *arg2 = (ndBody *) (ndBody *)0 ;
   ndShapeInstance *arg3 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
@@ -10490,18 +11223,19 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastClosestHitCallback_1OnRayPrecas
   arg1 = *(ndRayCastClosestHitCallback **)&jarg1; 
   arg2 = *(ndBody **)&jarg2; 
   arg3 = *(ndShapeInstance **)&jarg3; 
-  result = (unsigned int)(arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
-  jresult = (jlong)result; 
+  result = (arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndRayCastClosestHitCallback_1OnRayCastAction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jfloat jarg3) {
-  jfloat jresult = 0 ;
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRayCastClosestHitCallback_1OnRayCastAction(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
   ndRayCastClosestHitCallback *arg1 = (ndRayCastClosestHitCallback *) 0 ;
   ndContactPoint *arg2 = 0 ;
-  float arg3 ;
-  float result;
+  ndFloat32 arg3 ;
+  ndFloat32 *argp3 ;
+  ndFloat32 result;
   
   (void)jenv;
   (void)jcls;
@@ -10512,9 +11246,14 @@ SWIGEXPORT jfloat JNICALL Java_newtonJNI_ndRayCastClosestHitCallback_1OnRayCastA
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint const & reference is null");
     return 0;
   } 
-  arg3 = (float)jarg3; 
-  result = (float)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
-  jresult = (jfloat)result; 
+  argp3 = *(ndFloat32 **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
   return jresult;
 }
 
@@ -10555,7 +11294,7 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodiesInAabbNotify_1OnOverlap(JNIEnv *
   jlong jresult = 0 ;
   ndBodiesInAabbNotify *arg1 = (ndBodiesInAabbNotify *) 0 ;
   ndBody *arg2 = (ndBody *) (ndBody *)0 ;
-  unsigned int result;
+  ndUnsigned32 result;
   
   (void)jenv;
   (void)jcls;
@@ -10563,8 +11302,8 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodiesInAabbNotify_1OnOverlap(JNIEnv *
   (void)jarg2_;
   arg1 = *(ndBodiesInAabbNotify **)&jarg1; 
   arg2 = *(ndBody **)&jarg2; 
-  result = (unsigned int)(arg1)->OnOverlap((ndBody const *)arg2);
-  jresult = (jlong)result; 
+  result = (arg1)->OnOverlap((ndBody const *)arg2);
+  *(ndUnsigned32 **)&jresult = new ndUnsigned32((const ndUnsigned32 &)result); 
   return jresult;
 }
 
@@ -10631,54 +11370,78 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1NewtonWorld(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1Update(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1Update(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(NewtonWorld **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->Update(arg2);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1SetSubSteps(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1SetSubSteps(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(NewtonWorld **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetSubSteps(arg2);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1SetIterations(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1SetIterations(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  int arg2 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(NewtonWorld **)&jarg1; 
-  arg2 = (int)jarg2; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetIterations(arg2);
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1SetTimestep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+SWIGEXPORT void JNICALL Java_newtonJNI_NewtonWorld_1SetTimestep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   NewtonWorld *arg1 = (NewtonWorld *) 0 ;
-  float arg2 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(NewtonWorld **)&jarg1; 
-  arg2 = (float)jarg2; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
   (arg1)->SetTimestep(arg2);
 }
 

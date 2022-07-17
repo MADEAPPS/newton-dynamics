@@ -53,21 +53,16 @@
 #define D_MSV_NEWTON_ALIGN_32
 #define D_GCC_NEWTON_ALIGN_32
 
-
-#define ndInt8 signed char
-#define ndInt16 signed short
-#define ndInt32 signed int
-#define ndInt64 signed long long
-
-#define ndUnsigned8 unsigned char
-#define ndUnsigned16 unsigned short
-#define ndUnsigned32 unsigned int
-#define ndUnsigned64 unsigned long long
-
-#define ndFloat32 float
-#define ndFloat64 double
-
-
+//#define ndFloat32 float
+//#define ndFloat64 double
+//#define ndInt8 signed char
+//#define ndInt16 signed short
+//#define ndInt32 signed int
+//#define ndInt64 signed long long
+//#define ndUnsigned8 unsigned char
+//#define ndUnsigned16 unsigned short
+//#define ndUnsigned32 unsigned int
+//#define ndUnsigned64 unsigned long long
 
 //class XXXXX
 //{

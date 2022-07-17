@@ -116,15 +116,18 @@ void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 			polyhedra.AddFace(4, &m_faces[i][0]);
 		}
 		polyhedra.EndFace();
-	
+
 		ndInt32 index = 0;
 		ndInt32 mark = polyhedra.IncLRU();;
 		ndPolyhedra::Iterator iter(polyhedra);
-		for (iter.Begin(); iter; iter++) {
+		for (iter.Begin(); iter; iter++) 
+		{
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
-			if (edge->m_mark != mark) {
+			if (edge->m_mark != mark) 
+			{
 				ndEdge* ptr = edge;
-				do {
+				do 
+				{
 					ptr->m_mark = mark;
 					ptr->m_userData = index;
 					index++;
