@@ -31,6 +31,29 @@ class dAiBotTest_1 : public ndModel
 	public:
 	D_CLASS_REFLECTION(dAiBotTest_1);
 
+	class ndParamMapper
+	{
+		public:
+		ndParamMapper()
+			:m_x0(0.0f)
+			,m_scale(0.0f)
+		{
+		}
+
+		ndParamMapper(ndFloat32 x0, ndFloat32 x1)
+			:m_x0(x0 + (x1 - x0) * 0.5f)
+			,m_scale((x1 - x0) * 0.5f)
+		{
+		}
+
+		ndFloat32 Interpolate(const ndFloat32 t)
+		{
+			return m_x0 + m_scale * t;
+		}
+
+		ndFloat32 m_x0;
+		ndFloat32 m_scale;
+	};
 	class ndEffectorInfo
 	{
 		public:
@@ -60,6 +83,10 @@ class dAiBotTest_1 : public ndModel
 		ndReal m_x;
 		ndReal m_y;
 		ndReal m_z;
+		ndParamMapper m_x_mapper;
+		ndParamMapper m_y_mapper;
+		ndParamMapper m_z_mapper;
+		ndParamMapper m_swivel_mapper;
 	};
 	
 	dAiBotTest_1(ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -137,9 +164,19 @@ class dAiBotTest_1 : public ndModel
 			effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
 			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
+			ndFloat32 regularizer = 0.001f;
 			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, caff, torso);
+			effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+			effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+
 			world->AddJoint(effector);
-			m_effectors.PushBack(ndEffectorInfo(effector));
+
+			ndEffectorInfo info(effector);
+			info.m_x_mapper = ndParamMapper(0.2f, -0.2f);
+			info.m_y_mapper = ndParamMapper(0.2f, -0.3f);
+			info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
+			info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+			m_effectors.PushBack(info);
 		}
 	}
 
@@ -224,16 +261,16 @@ class dAiBotTest_1 : public ndModel
 		{
 			ndEffectorInfo& info = m_effectors[i];
 			ndVector posit(info.m_basePosition);
-			posit.m_x += info.m_x * 0.25f;
-			posit.m_y += info.m_y * 0.25f;
-			posit.m_z += info.m_z * 0.2f;
+			posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+			posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+			posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
 			info.m_effector->SetPosition(posit);
 
 			ndMatrix swivelMatrix0;
 			ndMatrix swivelMatrix1;
 			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 			const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-			info.m_effector->SetSwivelAngle(info.m_swivel - angle);
+			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 		}
 	}
 

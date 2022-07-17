@@ -69,10 +69,34 @@ class dQuadrupedRobot : public ndModel
 
 	D_CLASS_REFLECTION(dQuadrupedRobot);
 
-	class dEffectorInfo
+	class ndParamMapper
 	{
 		public:
-		dEffectorInfo()
+		ndParamMapper()
+			:m_x0(0.0f)
+			,m_scale(0.0f)
+		{
+		}
+
+		ndParamMapper(ndFloat32 x0, ndFloat32 x1)
+			:m_x0(x0 + (x1 - x0) * 0.5f)
+			,m_scale((x1 - x0) * 0.5f)
+		{
+		}
+
+		ndFloat32 Interpolate(const ndFloat32 t)
+		{
+			return m_x0 + m_scale * t;
+		}
+
+		ndFloat32 m_x0;
+		ndFloat32 m_scale;
+	};
+
+	class ndEffectorInfo
+	{
+		public:
+		ndEffectorInfo()
 			:m_basePosition(ndVector::m_wOne)
 			,m_effector(nullptr)
 			,m_swivel(0.0f)
@@ -82,14 +106,13 @@ class dQuadrupedRobot : public ndModel
 		{
 		}
 
-		dEffectorInfo(ndIkSwivelPositionEffector* const effector)
+		ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
 			:m_basePosition(effector->GetPosition())
 			,m_effector(effector)
 			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
 			,m_z(0.0f)
-
 		{
 			//m_footOnGround = 0;
 			//m_swayAmp = swayAmp;
@@ -103,6 +126,10 @@ class dQuadrupedRobot : public ndModel
 		ndReal m_x;
 		ndReal m_y;
 		ndReal m_z;
+		ndParamMapper m_x_mapper;
+		ndParamMapper m_y_mapper;
+		ndParamMapper m_z_mapper;
+		ndParamMapper m_swivel_mapper;
 
 		//ndIk6DofEffector* m_effector;
 		//ndFloat32 m_walkPhase;
@@ -118,7 +145,7 @@ class dQuadrupedRobot : public ndModel
 		{
 		}
 
-		void GenerateKeyFrames(const dEffectorInfo& info, ndVector* const walkCurve)
+		void GenerateKeyFrames(const ndEffectorInfo& info, ndVector* const walkCurve)
 		{
 			dAssert(0);
 			//ndIk6DofEffector* const effector = info.m_effector;
@@ -174,7 +201,7 @@ class dQuadrupedRobot : public ndModel
 			//}
 		}
 
-		void AddTrack(const dEffectorInfo& info)
+		void AddTrack(const ndEffectorInfo& info)
 		{
 			dAssert(0);
 			//ndIk6DofEffector* const effector = info.m_effector;
@@ -307,7 +334,7 @@ class dQuadrupedRobot : public ndModel
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 						hinge->SetLimitState(true);
-						hinge->SetLimits(-20.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
+						hinge->SetLimits(-30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
 						world->AddJoint(hinge);
 						m_jointArray.PushBack(hinge);
 
@@ -342,17 +369,22 @@ class dQuadrupedRobot : public ndModel
 						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
 						ndFloat32 regularizer = 0.001f;
-
 						ndMatrix effectorBaseFrame(dPitchMatrix(90.0f * ndDegreeToRad) * m_rootBody->GetMatrix());
 						ndMatrix effectorTargetFrame(effectorBaseFrame);
 						effectorBaseFrame.m_posit = pivotFrame.m_posit;
 						effectorTargetFrame.m_posit = effectorFrame.m_posit;
 						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorTargetFrame, effectorBaseFrame, swivelFrame, parentBody, m_rootBody);
-						//effector->SetLinearSpringDamper(regularizer, 2500.0f, 50.0f);
-						//effector->SetAngularSpringDamper(regularizer, 2500.0f, 50.0f);
+						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
 						world->AddJoint(effector);
-						m_effectors.PushBack(dEffectorInfo(effector));
+
+						ndEffectorInfo info(effector);
+						info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
+						info.m_y_mapper = ndParamMapper(-0.4f, 0.07f);
+						info.m_z_mapper = ndParamMapper(-0.08f, 0.08f);
+						info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+						m_effectors.PushBack(info);
 					}
 					break;
 				}
@@ -533,7 +565,7 @@ class dQuadrupedRobot : public ndModel
 		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		for (ndInt32 i = 0; i < 1; ++i)
 		{
-			const dEffectorInfo& info = m_effectors[i];
+			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const joint = info.m_effector;
 			joint->DebugJoint(context);
 
@@ -615,7 +647,7 @@ class dQuadrupedRobot : public ndModel
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Control panel");
 
-		dEffectorInfo& info = m_effectors[0];
+		ndEffectorInfo& info = m_effectors[0];
 
 		bool change = false;
 		ImGui::Text("position x");
@@ -649,18 +681,18 @@ class dQuadrupedRobot : public ndModel
 		const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale (-1.0f));
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
-			dEffectorInfo& info = m_effectors[i];
+			ndEffectorInfo& info = m_effectors[i];
 			ndVector posit(info.m_basePosition);
-			posit.m_x += info.m_x * 0.25f;
-			posit.m_y += info.m_y * 0.25f;
-			posit.m_z += info.m_z * 0.2f;
+			posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+			posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+			posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
 			info.m_effector->SetPosition(posit);
 
 			ndMatrix swivelMatrix0;
 			ndMatrix swivelMatrix1;
 			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 			const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
-			info.m_effector->SetSwivelAngle(info.m_swivel - angle);
+			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 		}
 
 		//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
@@ -700,7 +732,7 @@ class dQuadrupedRobot : public ndModel
 	dQuadrupedBalanceController* m_balanceController;
 	
 	ndAnimationPose m_output;
-	ndFixSizeArray<dEffectorInfo, 4> m_effectors;
+	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
 	ndFloat32 m_walkParam;
