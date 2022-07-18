@@ -61,6 +61,7 @@ class dAiBotTest_1 : public ndModel
 		ndEffectorInfo()
 			:m_basePosition(ndVector::m_wOne)
 			,m_effector(nullptr)
+			,m_lookActJoint(nullptr)
 			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
@@ -68,9 +69,10 @@ class dAiBotTest_1 : public ndModel
 		{
 		}
 
-		ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
+		ndEffectorInfo(ndIkSwivelPositionEffector* const effector, ndJointHinge* const lookActJoint)
 			:m_basePosition(effector->GetPosition())
 			,m_effector(effector)
+			,m_lookActJoint(lookActJoint)
 			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
@@ -80,6 +82,7 @@ class dAiBotTest_1 : public ndModel
 
 		ndVector m_basePosition;
 		ndIkSwivelPositionEffector* m_effector;
+		ndJointHinge* m_lookActJoint;
 		ndReal m_swivel;
 		ndReal m_x;
 		ndReal m_y;
@@ -153,9 +156,10 @@ class dAiBotTest_1 : public ndModel
 			}
 
 			ndBodyKinematic* calf1 = nullptr;
+			ndJointHinge* lookActHinge = nullptr;
 			{
 				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
-				limbLocation = dRollMatrix(-80.0f * ndDegreeToRad) * limbLocation;
+				limbLocation = dRollMatrix(-45.0f * ndDegreeToRad) * limbLocation;
 				caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
 
 				limbLocation.m_posit = caffPivot;
@@ -164,20 +168,19 @@ class dAiBotTest_1 : public ndModel
 
 				ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
 				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
-				//ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, calf1);
-				ndJointFix6dof* const hinge = new ndJointFix6dof(caffPinAndPivotFrame, calf0, calf1);
 
 				// add joint limit to prevent knee from flipping
-				//hinge->SetLimitState(true);
-				//hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
+				lookActHinge->SetLimitState(true);
+				lookActHinge->SetLimits(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
-				world->AddJoint(hinge);
+				world->AddJoint(lookActHinge);
 			}
 
 			// add leg effector
 			{
 				ndBodyKinematic* const targetBody = calf1;
-				//ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
 				ndVector effectorToePosit(targetBody->GetMatrix().m_posit + targetBody->GetMatrix().m_front.Scale(limbLength * 0.5f));
 
 				ndMatrix effectorToeFrame(dGetIdentityMatrix());
@@ -198,7 +201,7 @@ class dAiBotTest_1 : public ndModel
 
 				world->AddJoint(effector);
 
-				ndEffectorInfo info(effector);
+				ndEffectorInfo info(effector, lookActHinge);
 				info.m_x_mapper = ndParamMapper(0.2f, -0.2f);
 				info.m_y_mapper = ndParamMapper(0.2f, -0.3f);
 				info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
@@ -650,7 +653,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(aiBot_1);
 	world->AddModel(aiBot_1);
 	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
-//	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
