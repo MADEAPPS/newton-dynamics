@@ -29,6 +29,7 @@ class dJointDefinition
 		m_root,
 		m_hinge,
 		m_spherical,
+		m_doubleHinge,
 		m_effector
 	};
 
@@ -60,11 +61,13 @@ static dJointDefinition mannequinDefinition[] =
 
 	{ "rightLeg", dJointDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalf", dJointDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	//{ "Bip001 L Foot", 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "rightFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rightCalfEffector", dJointDefinition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 
 	//{ "leftLeg", dJointDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
 	//{ "leftCalf", dJointDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	//{ "Bip001 R Foot", 1.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	//{ "leftFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "leftCalfEffector", dJointDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "", dJointDefinition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
@@ -110,6 +113,66 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 class ndRagdollModel : public ndModel
 {
 	public:
+
+	class ndParamMapper
+	{
+		public:
+		ndParamMapper()
+			:m_x0(0.0f)
+			,m_scale(0.0f)
+		{
+		}
+
+		ndParamMapper(ndFloat32 x0, ndFloat32 x1)
+			:m_x0(x0 + (x1 - x0) * 0.5f)
+			, m_scale((x1 - x0) * 0.5f)
+		{
+		}
+
+		ndFloat32 Interpolate(const ndFloat32 t)
+		{
+			return m_x0 + m_scale * t;
+		}
+
+		ndFloat32 m_x0;
+		ndFloat32 m_scale;
+	};
+
+	class ndEffectorInfo
+	{
+		public:
+		ndEffectorInfo()
+			:m_basePosition(ndVector::m_wOne)
+			,m_effector(nullptr)
+			,m_swivel(0.0f)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_z(0.0f)
+		{
+		}
+
+		ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
+			:m_basePosition(effector->GetPosition())
+			,m_effector(effector)
+			,m_swivel(0.0f)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_z(0.0f)
+		{
+		}
+
+		ndVector m_basePosition;
+		ndIkSwivelPositionEffector* m_effector;
+		ndReal m_swivel;
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_z;
+		ndParamMapper m_x_mapper;
+		ndParamMapper m_y_mapper;
+		ndParamMapper m_z_mapper;
+		ndParamMapper m_swivel_mapper;
+	};
+
 	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location, dJointDefinition* const definition)
 		:ndModel()
 	{
@@ -124,6 +187,8 @@ class ndRagdollModel : public ndModel
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y + 1.0f;
+
+matrix.m_posit.m_y += 0.2f;
 		rootEntity->ResetMatrix(matrix);
 
 		ndFixSizeArray<ndBodyDynamic*, 64> bodies;
@@ -156,13 +221,47 @@ class ndRagdollModel : public ndModel
 			{
 				if (!strcmp(definition[i].m_boneName, name))
 				{
-					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
-					bodies.PushBack(childBody);
-		
-					// connect this body part to its parentBody with a ragdoll joint
-					ndJointBilateralConstraint* joint = ConnectBodyParts(childBody, parentBone, definition[i]);
-					world->AddJoint(joint);
-					parentBone = childBody;
+					if (definition[i].m_type != dJointDefinition::m_effector)
+					{
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
+						bodies.PushBack(childBody);
+
+						// connect this body part to its parentBody with a ragdoll joint
+						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition[i]);
+						world->AddJoint(joint);
+						parentBone = childBody;
+					}
+					else
+					{ 
+						ndMatrix pivotFrame(m_rootBody->GetMatrix());
+						ndMatrix effectorFrame(m_rootBody->GetMatrix());
+
+						ndRagdollEntityNotify* notify = (ndRagdollEntityNotify*)parentBone->GetNotifyCallback();
+						notify = (ndRagdollEntityNotify*)notify->m_parentBody->GetNotifyCallback();
+
+						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
+						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
+
+						ndMatrix swivelFrame(dGetIdentityMatrix());
+						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
+						swivelFrame.m_up = m_rootBody->GetMatrix().m_front;
+						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
+						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
+
+						ndFloat32 regularizer = 0.001f;
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBone, m_rootBody);
+						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+
+						world->AddJoint(effector);
+
+						ndEffectorInfo info(effector);
+						info.m_x_mapper = ndParamMapper(-0.1f, 0.1f);
+						info.m_y_mapper = ndParamMapper(-0.1f, 0.1f);
+						info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
+						info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+						m_effectors.PushBack(info);
+					}
 					break;
 				}
 			}
@@ -257,10 +356,30 @@ class ndRagdollModel : public ndModel
 				return joint;
 			}
 
+			case dJointDefinition::m_doubleHinge:
+			{
+				ndIkJointDoubleHinge* const joint = new ndIkJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+
+				dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+				//joint->SetLimitState(true);
+				//joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				return joint;
+			}
+
 			default:
 				dAssert(0);
 		}
 		return nullptr;
+	}
+
+	void Debug(ndConstraintDebugCallback& context) const
+	{
+		for (ndInt32 i = 0; i < 1; ++i)
+		{
+			const ndEffectorInfo& info = m_effectors[i];
+			ndJointBilateralConstraint* const joint = info.m_effector;
+			joint->DebugJoint(context);
+		}
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep) 
@@ -316,6 +435,7 @@ class ndRagdollModel : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
+	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
 
 void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
