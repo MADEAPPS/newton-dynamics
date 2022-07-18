@@ -106,14 +106,13 @@ class dAiBotTest_1 : public ndModel
 		ndDemoEntity* const entity = (ndDemoEntity*) torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
 
-		ndMatrix matrix(dRollMatrix(30.0f * ndDegreeToRad));
+		ndMatrix matrix(dRollMatrix(10.0f * ndDegreeToRad));
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
-		//ndFloat32 angles[] = { 60.0f, 120.0f, 240.0f, 300.0f };
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 
@@ -156,7 +155,7 @@ class dAiBotTest_1 : public ndModel
 			ndBodyKinematic* calf1 = nullptr;
 			{
 				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
-				limbLocation = dRollMatrix((-80.0f - 20.0f) * ndDegreeToRad) * limbLocation;
+				limbLocation = dRollMatrix(-80.0f * ndDegreeToRad) * limbLocation;
 				caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
 
 				limbLocation.m_posit = caffPivot;
@@ -175,7 +174,9 @@ class dAiBotTest_1 : public ndModel
 
 			// add leg effector
 			{
-				ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+				ndBodyKinematic* const targetBody = calf0;
+				//ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+				ndVector effectorToePosit(targetBody->GetMatrix().m_posit + targetBody->GetMatrix().m_front.Scale(limbLength * 0.5f));
 
 				ndMatrix effectorToeFrame(dGetIdentityMatrix());
 				ndMatrix effectorRefFrame(dGetIdentityMatrix());
@@ -189,7 +190,7 @@ class dAiBotTest_1 : public ndModel
 				effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
 				ndFloat32 regularizer = 0.001f;
-				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, calf0, torso);
+				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, targetBody, torso);
 				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
