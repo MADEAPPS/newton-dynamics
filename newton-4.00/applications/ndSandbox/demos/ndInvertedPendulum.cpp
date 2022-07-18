@@ -96,7 +96,7 @@ class dAiBotTest_1 : public ndModel
 		ndFloat32 mass = 10.0f;
 		ndFloat32 radius = 0.25f;
 		ndFloat32 limbMass = 0.5f;
-		ndFloat32 limbLength = 0.4f;
+		ndFloat32 limbLength = 0.3f;
 		ndFloat32 limbRadios = 0.06f;
 
 		ndPhysicsWorld* const world = scene->GetWorld();
@@ -106,73 +106,102 @@ class dAiBotTest_1 : public ndModel
 		ndDemoEntity* const entity = (ndDemoEntity*) torso->GetNotifyCallback()->GetUserData();
 		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
 
-		ndMatrix matrix(dRollMatrix(20.0f * ndDegreeToRad));
+		ndMatrix matrix(dRollMatrix(30.0f * ndDegreeToRad));
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
 		//ndFloat32 angles[] = { 60.0f, 120.0f, 240.0f, 300.0f };
 		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 4; ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 
 			// add leg thigh
-			limbLocation.m_posit += torso->GetMatrix().m_posit;
-			limbLocation.m_posit.m_w = 1.0f;
-			ndBodyKinematic* const thigh = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
-			thigh->SetMatrix(limbLocation);
-			ndVector thighPivot(limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f));
-			ndMatrix thighFrame(limbLocation);
-			thighFrame.m_posit = thighPivot;
-			ndIkJointSpherical* const ball = new ndIkJointSpherical(thighFrame, thigh, torso);
-			world->AddJoint(ball);
+			ndVector thighPivot;
+			ndBodyKinematic* thigh = nullptr;
+			{
+				limbLocation.m_posit += torso->GetMatrix().m_posit;
+				limbLocation.m_posit.m_w = 1.0f;
+				thigh = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+				thigh->SetMatrix(limbLocation);
+				thighPivot = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
+				ndMatrix thighFrame(limbLocation);
+				thighFrame.m_posit = thighPivot;
+				ndIkJointSpherical* const ball = new ndIkJointSpherical(thighFrame, thigh, torso);
+				world->AddJoint(ball);
+			}
 
-			// add calf
-			ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
-			limbLocation = dRollMatrix((-80.0f - 20.0f) * ndDegreeToRad) * limbLocation;
-			caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
+			// add calf0
+			ndBodyKinematic* calf0 = nullptr;
+			{
+				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+				limbLocation = dRollMatrix((-45.0f -0.0f) * ndDegreeToRad) * limbLocation;
+				caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
 
-			limbLocation.m_posit = caffPivot;
-			ndBodyKinematic* const caff = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
-			caff->SetMatrix(limbLocation);
+				limbLocation.m_posit = caffPivot;
+				calf0 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+				calf0->SetMatrix(limbLocation);
 
-			ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
-			caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
-			ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, caff, thigh);
+				ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
+				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
+				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, thigh);
 
-			// add joint limit to prevent knee from flipping
-			hinge->SetLimitState(true);
-			hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
-			world->AddJoint(hinge);
+				// add joint limit to prevent knee from flipping
+				hinge->SetLimitState(true);
+				hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				world->AddJoint(hinge);
+			}
+
+			ndBodyKinematic* calf1 = nullptr;
+			{
+				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+				limbLocation = dRollMatrix((-80.0f - 20.0f) * ndDegreeToRad) * limbLocation;
+				caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
+
+				limbLocation.m_posit = caffPivot;
+				calf1 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+				calf1->SetMatrix(limbLocation);
+
+				ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
+				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
+				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, calf1);
+
+				// add joint limit to prevent knee from flipping
+				hinge->SetLimitState(true);
+				hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				world->AddJoint(hinge);
+			}
 
 			// add leg effector
-			ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
+			{
+				ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
 
-			ndMatrix effectorToeFrame(dGetIdentityMatrix());
-			ndMatrix effectorRefFrame(dGetIdentityMatrix());
-			effectorRefFrame.m_posit = thighPivot;
-			effectorToeFrame.m_posit = effectorToePosit;
+				ndMatrix effectorToeFrame(dGetIdentityMatrix());
+				ndMatrix effectorRefFrame(dGetIdentityMatrix());
+				effectorRefFrame.m_posit = thighPivot;
+				effectorToeFrame.m_posit = effectorToePosit;
 
-			ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
-			effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
-			effectorSwivelFrame.m_up = upDir;
-			effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
-			effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
+				ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
+				effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
+				effectorSwivelFrame.m_up = upDir;
+				effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
+				effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
 
-			ndFloat32 regularizer = 0.001f;
-			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, caff, torso);
-			effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-			effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+				ndFloat32 regularizer = 0.001f;
+				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, calf0, torso);
+				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
-			world->AddJoint(effector);
+				world->AddJoint(effector);
 
-			ndEffectorInfo info(effector);
-			info.m_x_mapper = ndParamMapper(0.2f, -0.2f);
-			info.m_y_mapper = ndParamMapper(0.2f, -0.3f);
-			info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
-			info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-			m_effectors.PushBack(info);
+				ndEffectorInfo info(effector);
+				info.m_x_mapper = ndParamMapper(0.2f, -0.2f);
+				info.m_y_mapper = ndParamMapper(0.2f, -0.3f);
+				info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
+				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+				m_effectors.PushBack(info);
+			}
 		}
 	}
 
@@ -618,29 +647,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(aiBot_1);
 	world->AddModel(aiBot_1);
 	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
-
-	//ndBodyDynamic* const root = aiBot_1->m_rootBody;
-	//world->AddJoint(new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
-
-
-	//dInvertedPendulum* const robot0 = new dInvertedPendulum(scene, matrix);
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	//dInvertedPendulum* const robot1 = new dInvertedPendulum(scene, robotEntity, matrix);
-	//world->AddModel(robot1);
-
-	//ndVector posit(matrix.m_posit);
-	//posit.m_x += 1.5f;
-	//posit.m_z += 1.5f;
-	//AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
-	//AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
-
-	//posit.m_x += 0.6f;
-	//posit.m_z += 0.2f;
-	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
-	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
-
-	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
