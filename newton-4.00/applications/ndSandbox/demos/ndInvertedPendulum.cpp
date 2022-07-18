@@ -164,17 +164,19 @@ class dAiBotTest_1 : public ndModel
 
 				ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
 				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
-				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, calf1);
+				//ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, calf1);
+				ndJointFix6dof* const hinge = new ndJointFix6dof(caffPinAndPivotFrame, calf0, calf1);
 
 				// add joint limit to prevent knee from flipping
-				hinge->SetLimitState(true);
-				hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				//hinge->SetLimitState(true);
+				//hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+
 				world->AddJoint(hinge);
 			}
 
 			// add leg effector
 			{
-				ndBodyKinematic* const targetBody = calf0;
+				ndBodyKinematic* const targetBody = calf1;
 				//ndVector effectorToePosit(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
 				ndVector effectorToePosit(targetBody->GetMatrix().m_posit + targetBody->GetMatrix().m_front.Scale(limbLength * 0.5f));
 
@@ -648,7 +650,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(aiBot_1);
 	world->AddModel(aiBot_1);
 	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
-	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
+//	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
