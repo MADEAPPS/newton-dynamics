@@ -54,6 +54,7 @@ class dAiBotTest_1 : public ndModel
 		ndFloat32 m_x0;
 		ndFloat32 m_scale;
 	};
+
 	class ndEffectorInfo
 	{
 		public:

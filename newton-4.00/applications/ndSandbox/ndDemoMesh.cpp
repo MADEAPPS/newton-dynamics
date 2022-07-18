@@ -278,7 +278,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		segment->m_material.m_opacity = GLfloat(material.m_opacity);
 		segment->m_material.m_shiness = GLfloat(material.m_shiness);
 		strcpy(segment->m_material.m_textureName, material.m_textureName);
-		//segment->m_material.m_textureHandle = (GLuint)material.m_textureHandle;
 		segment->m_material.m_textureHandle = LoadTexture(material.m_textureName);
 		segment->SetOpacity(material.m_opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;

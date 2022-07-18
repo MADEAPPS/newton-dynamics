@@ -457,7 +457,6 @@ class dQuadrupedRobot : public ndModel
 		me->ApplyControls(scene);
 	}
 
-//	ndMatrix m_referenceFrame;
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };

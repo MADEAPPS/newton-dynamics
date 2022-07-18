@@ -474,7 +474,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 1.4f;
-	TestPlayerCapsuleInteraction(scene, matrix);
+	//TestPlayerCapsuleInteraction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;

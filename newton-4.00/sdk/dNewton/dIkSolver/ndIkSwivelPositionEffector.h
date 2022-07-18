@@ -38,7 +38,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetWorkSpaceConstraints(ndFloat32 minRadio, ndFloat32 maxRadio);
 	D_NEWTON_API void GetWorkSpaceConstraints(ndFloat32& minRadio, ndFloat32& maxRadio) const;
 
-
 	D_NEWTON_API ndFloat32 GetMaxForce() const;
 	D_NEWTON_API void SetMaxForce(ndFloat32 force);
 	
