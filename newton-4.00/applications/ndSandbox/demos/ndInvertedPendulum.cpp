@@ -112,16 +112,16 @@ class dAiBotTest_1 : public ndModel
 		ndMatrix matrix(dRollMatrix(10.0f * ndDegreeToRad));
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
-		//ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-		ndFloat32 angles[] = { 270.0f, 240.0f, 120.0f, 60.0f };
+		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
+		//ndFloat32 angles[] = { 270.0f, 240.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 
 			// add leg thigh
-			ndVector thighPivot;
+			ndVector thighPivot(ndVector::m_zero);
 			ndBodyKinematic* thigh = nullptr;
 			{
 				limbLocation.m_posit += torso->GetMatrix().m_posit;
@@ -136,6 +136,7 @@ class dAiBotTest_1 : public ndModel
 			}
 
 			// add calf0
+			ndVector effectorPivot(ndVector::m_zero);
 			ndBodyKinematic* calf0 = nullptr;
 			{
 				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
@@ -145,6 +146,7 @@ class dAiBotTest_1 : public ndModel
 				limbLocation.m_posit = caffPivot;
 				calf0 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
 				calf0->SetMatrix(limbLocation);
+				effectorPivot = caffPivot + limbLocation.m_front.Scale(limbLength * 0.5f);
 
 				//ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
 				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
@@ -163,25 +165,26 @@ class dAiBotTest_1 : public ndModel
 			ndBodyKinematic* calf1 = nullptr;
 			ndJointHinge* lookActHinge = nullptr;
 			{
+				ndFloat32 lenght = limbLength * 0.5f;
 				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
-				//limbLocation = dRollMatrix(-45.0f * ndDegreeToRad) * limbLocation;
-				limbLocation = dRollMatrix(-90.0f * ndDegreeToRad) * limbLocation;
-				caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
+				limbLocation = dRollMatrix(-45.0f * ndDegreeToRad) * limbLocation;
+				caffPivot += limbLocation.m_front.Scale(lenght * 0.5f);
 
 				limbLocation.m_posit = caffPivot;
-				calf1 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
+				calf1 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, lenght);
 				calf1->SetMatrix(limbLocation);
+				effectorPivot = caffPivot + limbLocation.m_front.Scale(lenght * 0.5f);
 
 				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
 				caffPinAndPivotFrame.m_front = limbLocation.m_right.Scale(-1.0f);
 				caffPinAndPivotFrame.m_up = limbLocation.m_front;
 				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
+				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(lenght * 0.5f);
 
 				// add joint limit to prevent knee from flipping
 				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
 				lookActHinge->SetLimitState(true);
-				lookActHinge->SetLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+				lookActHinge->SetLimits(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
 				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
 				world->AddJoint(lookActHinge);
@@ -190,12 +193,11 @@ class dAiBotTest_1 : public ndModel
 			// add leg effector
 			{
 				ndBodyKinematic* const targetBody = calf1;
-				ndVector effectorToePosit(targetBody->GetMatrix().m_posit + targetBody->GetMatrix().m_front.Scale(limbLength * 0.5f));
 
 				ndMatrix effectorToeFrame(dGetIdentityMatrix());
 				ndMatrix effectorRefFrame(dGetIdentityMatrix());
 				effectorRefFrame.m_posit = thighPivot;
-				effectorToeFrame.m_posit = effectorToePosit;
+				effectorToeFrame.m_posit = effectorPivot;
 
 				ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
 				effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
@@ -213,7 +215,7 @@ class dAiBotTest_1 : public ndModel
 				ndEffectorInfo info(effector, lookActHinge);
 				info.m_x_mapper = ndParamMapper(0.2f, -0.2f);
 				info.m_y_mapper = ndParamMapper(0.2f, -0.3f);
-				info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
+				info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
 				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				m_effectors.PushBack(info);
 			}
@@ -243,19 +245,15 @@ class dAiBotTest_1 : public ndModel
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
-			ndJointBilateralConstraint* const lookAtJoint = info.m_lookAtJoint;
-			
-			//effector->DebugJoint(context);
-			lookAtJoint->DebugJoint(context);
+			effector->DebugJoint(context);
 
-			ndMatrix lookAtMatrix0;
-			ndMatrix lookAtMatrix1;
-			info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-			//ndVector updir(lookAtMatrix1.UnrotateVector(upVector.Scale(-1.0f)));
-			ndVector updir(lookAtMatrix1.m_posit + upVector.Scale(-1.0f));
-			context.DrawLine(lookAtMatrix1.m_posit, updir, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
-
-
+			//ndMatrix lookAtMatrix0;
+			//ndMatrix lookAtMatrix1;
+			//ndJointBilateralConstraint* const lookAtJoint = info.m_lookAtJoint;
+			//lookAtJoint->DebugJoint(context);
+			//info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+			//ndVector updir(lookAtMatrix1.m_posit + upVector.Scale(-1.0f));
+			//context.DrawLine(lookAtMatrix1.m_posit, updir, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
 
 			//ndMatrix swivelMatrix0;
 			//ndMatrix swivelMatrix1;
@@ -295,20 +293,14 @@ class dAiBotTest_1 : public ndModel
 			ndMatrix swivelMatrix1;
 			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 			const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-			//info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
+			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 
 			// calculate lookAt angle
 			ndMatrix lookAtMatrix0;
 			ndMatrix lookAtMatrix1;
 			info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-			ndVector updir(lookAtMatrix1.UnrotateVector(upVector.Scale(-1.0f)));
-			ndVector updir__(lookAtMatrix1.UnrotateVector(lookAtMatrix0[1].Scale(-1.0f)));
-
-			//const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix1[1], lookAtMatrix1[0]);
-			const ndFloat32 lookAngle1 = ndRadToDegree * info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix1[1], lookAtMatrix1[0]);
-			const ndFloat32 lookAngle = -60.0f * ndDegreeToRad;
-			//info.m_lookAtJoint->SetOffsetAngle(lookAngle);
-			info.m_lookAtJoint->SetOffsetAngle(info.m_swivel * 60.0f * ndDegreeToRad);
+			const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
+			info.m_lookAtJoint->SetOffsetAngle(lookAngle);
 		}
 	}
 
