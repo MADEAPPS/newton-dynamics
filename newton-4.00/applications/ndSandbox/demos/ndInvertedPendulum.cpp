@@ -61,7 +61,7 @@ class dAiBotTest_1 : public ndModel
 		ndEffectorInfo()
 			:m_basePosition(ndVector::m_wOne)
 			,m_effector(nullptr)
-			,m_lookActJoint(nullptr)
+			,m_lookAtJoint(nullptr)
 			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
@@ -72,7 +72,7 @@ class dAiBotTest_1 : public ndModel
 		ndEffectorInfo(ndIkSwivelPositionEffector* const effector, ndJointHinge* const lookActJoint)
 			:m_basePosition(effector->GetPosition())
 			,m_effector(effector)
-			,m_lookActJoint(lookActJoint)
+			,m_lookAtJoint(lookActJoint)
 			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
@@ -82,7 +82,7 @@ class dAiBotTest_1 : public ndModel
 
 		ndVector m_basePosition;
 		ndIkSwivelPositionEffector* m_effector;
-		ndJointHinge* m_lookActJoint;
+		ndJointHinge* m_lookAtJoint;
 		ndReal m_swivel;
 		ndReal m_x;
 		ndReal m_y;
@@ -112,10 +112,11 @@ class dAiBotTest_1 : public ndModel
 		ndMatrix matrix(dRollMatrix(10.0f * ndDegreeToRad));
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
-		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
+		//ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
+		ndFloat32 angles[] = { 270.0f, 240.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 4; ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 
@@ -145,7 +146,11 @@ class dAiBotTest_1 : public ndModel
 				calf0 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
 				calf0->SetMatrix(limbLocation);
 
-				ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
+				//ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
+				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
+				caffPinAndPivotFrame.m_front = limbLocation.m_right.Scale (-1.0f);
+				caffPinAndPivotFrame.m_up = limbLocation.m_front;
+				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
 				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
 				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, thigh);
 
@@ -159,20 +164,24 @@ class dAiBotTest_1 : public ndModel
 			ndJointHinge* lookActHinge = nullptr;
 			{
 				ndVector caffPivot(limbLocation.m_posit + limbLocation.m_front.Scale(limbLength * 0.5f));
-				limbLocation = dRollMatrix(-45.0f * ndDegreeToRad) * limbLocation;
+				//limbLocation = dRollMatrix(-45.0f * ndDegreeToRad) * limbLocation;
+				limbLocation = dRollMatrix(-90.0f * ndDegreeToRad) * limbLocation;
 				caffPivot += limbLocation.m_front.Scale(limbLength * 0.5f);
 
 				limbLocation.m_posit = caffPivot;
 				calf1 = AddCapsule(scene, limbLocation, limbMass, limbRadios, limbRadios, limbLength);
 				calf1->SetMatrix(limbLocation);
 
-				ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
+				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
+				caffPinAndPivotFrame.m_front = limbLocation.m_right.Scale(-1.0f);
+				caffPinAndPivotFrame.m_up = limbLocation.m_front;
+				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
 				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
 
 				// add joint limit to prevent knee from flipping
 				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
 				lookActHinge->SetLimitState(true);
-				lookActHinge->SetLimits(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+				lookActHinge->SetLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
 				world->AddJoint(lookActHinge);
@@ -229,28 +238,32 @@ class dAiBotTest_1 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
+		ndVector upVector(m_rootBody->GetMatrix().m_up);
 		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
-			effector->DebugJoint(context);
-			ndMatrix swivelMatrix0;
-			ndMatrix swivelMatrix1;
-			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+			ndJointBilateralConstraint* const lookAtJoint = info.m_lookAtJoint;
 			
-			ndVector posit1(swivelMatrix1.m_posit);
-			posit1.m_y += 1.0f;
-			context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
+			//effector->DebugJoint(context);
+			lookAtJoint->DebugJoint(context);
 
-			//swivelMatrix1 = dPitchMatrix(info.m_effector->GetSwivelAngle()) * swivelMatrix1;
-			//ndMatrix swivelLocal (swivelMatrix0 * swivelMatrix1.Inverse());
-			//ndVector euler0;
-			//ndVector euler1;
-			//swivelLocal.CalcPitchYawRoll(euler0, euler1);
-			//const ndFloat32 angle = info.m_effector->CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+			ndMatrix lookAtMatrix0;
+			ndMatrix lookAtMatrix1;
+			info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+			//ndVector updir(lookAtMatrix1.UnrotateVector(upVector.Scale(-1.0f)));
+			ndVector updir(lookAtMatrix1.m_posit + upVector.Scale(-1.0f));
+			context.DrawLine(lookAtMatrix1.m_posit, updir, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
+
+
+
+			//ndMatrix swivelMatrix0;
+			//ndMatrix swivelMatrix1;
+			//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 			//
-			//const ndFloat32 angle1 = ndAtan2 (swivelLocal[1][2], swivelLocal[2][2]);
-			//dTrace(("%f %f %f\n", angle * ndRadToDegree, -euler0.m_x * ndRadToDegree, -angle1 * ndRadToDegree));
+			//ndVector posit1(swivelMatrix1.m_posit);
+			//posit1.m_y += 1.0f;
+			//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
 		}
 	}
 
@@ -263,25 +276,6 @@ class dAiBotTest_1 : public ndModel
 	{
 		ndModel::PostTransformUpdate(world, timestep);
 	}
-
-	//ndVector CalculateCenterOfMass() const
-	//{
-	//	ndFloat32 toltalMass = 0.0f;
-	//	ndVector com(ndVector::m_zero);
-	//	//comVeloc = ndVector::m_zero;
-	//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-	//	{
-	//		ndBodyDynamic* const body = m_bodies[i];
-	//		ndFloat32 mass = body->GetMassMatrix().m_w;
-	//		ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-	//		com += comMass.Scale(mass);
-	//		//comVeloc += body->GetVelocity().Scale(mass);
-	//		toltalMass += mass;
-	//	}
-	//	com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
-	//	//comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
-	//	return com | ndVector::m_wOne;
-	//}
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
@@ -301,7 +295,20 @@ class dAiBotTest_1 : public ndModel
 			ndMatrix swivelMatrix1;
 			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 			const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
+			//info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
+
+			// calculate lookAt angle
+			ndMatrix lookAtMatrix0;
+			ndMatrix lookAtMatrix1;
+			info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+			ndVector updir(lookAtMatrix1.UnrotateVector(upVector.Scale(-1.0f)));
+			ndVector updir__(lookAtMatrix1.UnrotateVector(lookAtMatrix0[1].Scale(-1.0f)));
+
+			//const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix1[1], lookAtMatrix1[0]);
+			const ndFloat32 lookAngle1 = ndRadToDegree * info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix1[1], lookAtMatrix1[0]);
+			const ndFloat32 lookAngle = -60.0f * ndDegreeToRad;
+			//info.m_lookAtJoint->SetOffsetAngle(lookAngle);
+			info.m_lookAtJoint->SetOffsetAngle(info.m_swivel * 60.0f * ndDegreeToRad);
 		}
 	}
 
@@ -348,296 +355,6 @@ class dAiBotTest_1 : public ndModel
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest_1);
 
-class dInvertedPendulum : public ndModel
-{
-	public:
-	D_CLASS_REFLECTION(dInvertedPendulum);
-
-	dInvertedPendulum(ndDemoEntityManager* const scene, const ndMatrix& location)
-		:ndModel()
-		,m_gravityDir(0.0f, -1.0f, 0.0f, 0.0f)
-		,m_solver()
-		,m_bodies()
-		,m_effector(nullptr)
-		,m_contactSensor(nullptr)
-		,m_efectorLength(1.0f)
-	{
-		ndFloat32 mass = 1.0f;
-		ndFloat32 sizex = 0.5f;
-		ndFloat32 sizey = 1.0f;
-		ndFloat32 sizez = 0.5f;
-		ndFloat32 radius = 0.125f * sizex;
-		
-		ndPhysicsWorld* const world = scene->GetWorld();
-		ndVector floor(FindFloor(*world, location.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		ndBodyKinematic* const box = AddBox(scene, location, mass, sizex, sizey, sizez);
-
-		ndMatrix boxMatrix(location);
-		boxMatrix.m_posit.m_y = floor.m_y;
-		boxMatrix.m_posit.m_y += 0.5f;
-		ndShapeInfo sizeInfo (box->GetCollisionShape().GetShape()->GetShapeInfo());
-		boxMatrix.m_posit.m_y += sizeInfo.m_box.m_y * 0.5f + radius + m_efectorLength;
-		box->SetMatrix(boxMatrix);
-		box->GetNotifyCallback()->OnTransform(0, boxMatrix);
-		box->GetNotifyCallback()->OnTransform(0, boxMatrix);
-		
-		//ndBodyKinematic* const leg = AddCapsule(scene, matrix, mass / 20.0f, radius, radius, 2.0f * size);
-		ndBodyKinematic* const sph = AddSphere(scene, location, mass / 20.0f, radius);
-		ndMatrix sphMatrix(box->GetMatrix());
-		sphMatrix.m_posit.m_y -= sizeInfo.m_box.m_y * 0.5f + m_efectorLength;
-		// try offsetting the effector.
-		sphMatrix.m_posit.m_z -= (sizez * 0.5f) * 1.0f;
-		sph->SetMatrix(sphMatrix);
-		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
-		sph->GetNotifyCallback()->OnTransform(0, sphMatrix);
-
-// hack to show equilibrium can be dynamics.
-//box->SetAngularDamping(ndVector(1.0f, 1.0f, 1.0f, 0.0f));
-
-		////sph->GetCollisionShape().SetCollisionMode(false);
-		////ndIkJointSpherical* const feetJoint = new ndIkJointSpherical(sphMatrix, sph, leg);
-		////world->AddJoint(feetJoint);
-		
-		////ndMatrix legSocketMatrix(legMatrix);
-		////legSocketMatrix.m_posit = matrix.m_posit;
-		////ndIkJointSpherical* const socketJoint = new ndIkJointSpherical(legSocketMatrix, leg, box);
-		////world->AddJoint(socketJoint);
-		
-		ndMatrix boxPivot(box->GetMatrix());
-		boxPivot.m_posit.m_y -= sizeInfo.m_box.m_y * 0.5f;
-		boxPivot.m_posit.m_z = sphMatrix.m_posit.m_z;
-		m_effector = new ndIk6DofEffector(sphMatrix, boxPivot, sph, box);
-		ndFloat32 regularizer = 1.0e-2f;
-		m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-		m_effector->SetLinearSpringDamper(regularizer, 1500.0f, 100.0f);
-		m_effector->SetAngularSpringDamper(regularizer, 1500.0f, 100.0f);
-		m_effector->SetSolverModel(ndJointBilateralSolverModel::m_jointkinematicOpenLoop);
-		
-		//feetJoint->SetIkMode(false);
-		//socketJoint->SetIkMode(false);
-		//world->AddJoint(new ndJointPlane(matrix.m_posit, matrix.m_front, box, world->GetSentinelBody()));
-		
-		m_bodies.PushBack(box->GetAsBodyDynamic());
-		m_bodies.PushBack(sph->GetAsBodyDynamic());
-		m_contactSensor = sph->GetAsBodyDynamic();
-		
-		#ifdef D_USE_FORWARD_DYNAMICS
-			world->AddJoint(m_effector);
-		#endif
-	}
-
-	dInvertedPendulum(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-	{
-		dAssert(0);
-	}
-
-	~dInvertedPendulum()
-	{
-		if (m_effector && !m_effector->IsInWorld())
-		{
-			delete m_effector;
-		}
-	}
-
-	//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-	void Save(const ndLoadSaveBase::ndSaveDescriptor&) const
-	{
-		dAssert(0);
-	}
-
-	void Debug(ndConstraintDebugCallback& context) const
-	{
-		ndJointBilateralConstraint* const joint = m_effector;
-		joint->DebugJoint(context);
-		ndMatrix rootMatrix(dGetIdentityMatrix());
-
-		ndVector com(CalculateCenterOfMass());
-		rootMatrix.m_posit = com;
-		//context.DrawFrame(rootMatrix);
-		context.DrawPoint(com, ndVector(1.0f, 0.0f, 0.0f, 0.0f), 12.0f);
-
-		ndVector p1(com + m_gravityDir.Scale (m_efectorLength * 2.0f));
-		context.DrawLine(com, p1, ndVector(0.0f, 1.0f, 1.0f, 0.0f));
-	}
-
-	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-	{
-		ndModel::PostUpdate(world, timestep);
-	}
-
-	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
-	{
-		ndModel::PostTransformUpdate(world, timestep);
-	}
-
-	//void CalculateCenterOfMass(ndVector& com, ndVector& comVeloc) const
-	//{
-	//	ndFloat32 toltalMass = 0.0f;
-	//	com = ndVector::m_zero;
-	//	comVeloc = ndVector::m_zero;
-	//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-	//	{
-	//		ndBodyDynamic* const body = m_bodies[i];
-	//		ndFloat32 mass = body->GetMassMatrix().m_w;
-	//		ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-	//		com += comMass.Scale(mass);
-	//		comVeloc += body->GetVelocity().Scale(mass);
-	//		toltalMass += mass;
-	//	}
-	//	com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
-	//	comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
-	//}
-
-	ndVector CalculateCenterOfMass() const
-	{
-		ndFloat32 toltalMass = 0.0f;
-		ndVector com (ndVector::m_zero);
-		//comVeloc = ndVector::m_zero;
-		for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		{
-			ndBodyDynamic* const body = m_bodies[i];
-			ndFloat32 mass = body->GetMassMatrix().m_w;
-			ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-			com += comMass.Scale(mass);
-			//comVeloc += body->GetVelocity().Scale(mass);
-			toltalMass += mass;
-		}
-		com = com.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;
-		//comVeloc = comVeloc.Scale(1.0f / toltalMass) & ndVector::m_triplexMask;;
-		return com | ndVector::m_wOne;
-	}
-
-	void Update(ndWorld* const world, ndFloat32 timestep)
-	{
-		ndModel::Update(world, timestep);
-		if (m_contactSensor)
-		{
-			#ifdef D_USE_FORWARD_DYNAMICS
-			UpdateFK(world, timestep);
-			#else
-			UpdateIK(world, timestep);
-			#endif
-		}
-	}
-
-	//void UpdateIK(ndWorld* const world, ndFloat32 timestep)
-	void UpdateIK(ndWorld* const, ndFloat32)
-	{
-		//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-		//dAssert(skeleton);
-		//
-		//m_rootBody->SetSleepState(false);
-		//
-		//ndJointBilateralConstraint* effector = m_effector;
-		//m_solver.SolverBegin(skeleton, &effector, 1, world, timestep);
-		//m_solver.Solve();
-		//m_solver.SolverEnd();
-	}
-
-	//void UpdateFK(ndWorld* const world, ndFloat32 timestep)
-	void UpdateFK(ndWorld* const, ndFloat32)
-	{
-		// step 1: see if we have a support contacts
-		ndBodyKinematic::ndContactMap::Iterator it(m_contactSensor->GetContactMap());
-		bool hasSupport = false;
-		for (it.Begin(); !hasSupport && it; it++)
-		{
-			const ndContact* const contact = it.GetNode()->GetInfo();
-			hasSupport = hasSupport | contact->IsActive();
-		}
-
-		// step 2: we apply correction only if there is a support contact
-		if (!hasSupport)
-		{
-//			return;
-		}
-
-		// step 3: have support contacts, find the projection of the com over the ground
-		//const ndVector com(CalculateCenterOfMass());
-
-		//// step 4: with the com find the projection to the ground
-		//class rayCaster : public ndConvexCastNotify
-		//{
-		//	public:
-		//	rayCaster(dInvertedPendulum* const owner)
-		//		:m_owner(owner)
-		//	{
-		//	}
-		//
-		//	ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
-		//	{
-		//		for (ndInt32 i = 0; i < m_owner->m_bodies.GetCount(); ++i)
-		//		{
-		//			if (body == m_owner->m_bodies[i])
-		//			{
-		//				return 0;
-		//			}
-		//		}
-		//		return 1;
-		//	}
-		//
-		//	dInvertedPendulum* m_owner;
-		//};
-		//
-		//rayCaster caster(this);
-		//const ndShapeInstance& shape = m_contactSensor->GetCollisionShape();
-		//ndMatrix matrix(m_bodies[0]->GetMatrix());
-		//matrix.m_posit = com | ndVector::m_wOne;
-		//bool hit = world->ConvexCast(caster, shape, matrix, matrix.m_posit - ndVector(0.0f, 1.0f, 0.0f, 0.0f));
-		//if (!hit)
-		//{
-		//	return;
-		//}
-		
-		// step 5: her we have a com support point, the com, com velocity
-		// need calculate translation distance from current contact to the com support contact
-		//ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-		
-static int xxx;
-xxx++;
-
-		ndJointBilateralConstraint* joint = m_effector;
-
-//if (xxx >= 17)
-if (xxx == 200)
-{
-//m_bodies[0]->SetVelocity(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
-//return;
-}
-//return;
-
-		ndMatrix matrix0;
-		ndMatrix matrix1;
-		joint->CalculateGlobalMatrix(matrix0, matrix1);
-
-		ndVector localGravity(matrix1.UnrotateVector(m_gravityDir));
-		ndMatrix targetMatrix(m_effector->GetOffsetMatrix());
-
-		// specify foot orientation. 
-		targetMatrix = dGetIdentityMatrix() * matrix1.Inverse();
-
-		targetMatrix.m_posit = localGravity.Scale(m_efectorLength) | ndVector::m_wOne;
-if (xxx > 200)
-{
-	xxx *= 1;
-}
-
-		m_effector->SetOffsetMatrix(targetMatrix);
-
-		//m_solver.SolverBegin(skeleton, &joint, 1, world, timestep);
-		//m_solver.Solve();
-		//m_solver.SolverEnd();
-	}
-
-	ndVector m_gravityDir;
-	ndIkSolver m_solver;
-	ndFixSizeArray<ndBodyDynamic*, 16> m_bodies;
-	ndBodyDynamic* m_contactSensor;
-	ndIk6DofEffector* m_effector;
-	ndFloat32 m_efectorLength;
-};
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(dInvertedPendulum);
 
 void ndInvertedPendulum(ndDemoEntityManager* const scene)
 {
