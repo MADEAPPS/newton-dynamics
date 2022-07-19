@@ -362,7 +362,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(aiBot_1);
 	world->AddModel(aiBot_1);
 	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
-	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
