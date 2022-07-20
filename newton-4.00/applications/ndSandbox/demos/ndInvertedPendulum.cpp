@@ -51,11 +51,6 @@ class dAiBotTest_1 : public ndModel
 			return m_x0 + m_scale * t;
 		}
 
-		ndFloat32 GetPosit(const ndFloat32 x) const
-		{
-			return (x - m_x0) / m_scale;
-		}
-
 		ndFloat32 m_x0;
 		ndFloat32 m_scale;
 	};
@@ -230,10 +225,6 @@ class dAiBotTest_1 : public ndModel
 				info.m_y_mapper = ndParamMapper(-0.2f, 0.2f);
 				info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
 				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-
-				//info.m_x = info.m_x_mapper.GetPosit(0);
-				//info.m_y = info.m_y_mapper.GetPosit(0);
-				//info.m_z = info.m_z_mapper.GetPosit(0);
 				m_effectors.PushBack(info);
 			}
 		}

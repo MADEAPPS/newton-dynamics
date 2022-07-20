@@ -217,8 +217,6 @@ void ndIkSwivelPositionEffector::CalculateSwivelMatrices(ndMatrix& swivelMatrix0
 
 void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	//const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	//const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -229,14 +227,14 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 	swivelMatrix1 = dPitchMatrix(m_swivelAngle) * swivelMatrix1;
 
-	//debugCallback.DrawFrame(swivelMatrix0);
-	//debugCallback.DrawFrame(swivelMatrix1, 0.5f);
-	//debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+	debugCallback.DrawFrame(swivelMatrix0);
+	debugCallback.DrawFrame(swivelMatrix1, 0.5f);
+	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 	
 	debugCallback.DrawFrame(matrix0);
-	//debugCallback.DrawFrame(matrix1, 0.5f);
-	//debugCallback.DrawFrame(targetFrame, 0.5f);
-	//debugCallback.DrawPoint(targetFrame.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
+	debugCallback.DrawFrame(matrix1, 0.5f);
+	debugCallback.DrawFrame(targetFrame, 0.5f);
+	debugCallback.DrawPoint(targetFrame.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
 void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc)
