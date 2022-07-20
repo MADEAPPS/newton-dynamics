@@ -118,11 +118,11 @@ class dAiBotTest_1 : public ndModel
 		matrix.m_posit.m_x = radius * 0.9f;
 		matrix.m_posit.m_y = -radius * 0.5f;
 
-		//ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-		ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
+		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
+		//ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 2; ++i)
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndMatrix limbPivotLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
@@ -166,7 +166,7 @@ class dAiBotTest_1 : public ndModel
 
 				// add joint limit to prevent knee from flipping
 				hinge->SetLimitState(true);
-				hinge->SetLimits(-60.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
 				world->AddJoint(hinge);
 
 				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
@@ -226,9 +226,9 @@ class dAiBotTest_1 : public ndModel
 				world->AddJoint(effector);
 
 				ndEffectorInfo info(effector, lookActHinge);
-				info.m_x_mapper = ndParamMapper(-0.25f, 0.25f);
+				info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
 				info.m_y_mapper = ndParamMapper(-0.2f, 0.2f);
-				info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
+				info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
 				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 
 				//info.m_x = info.m_x_mapper.GetPosit(0);
@@ -379,7 +379,7 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(aiBot_1);
 	world->AddModel(aiBot_1);
 	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
-	world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.5f;
