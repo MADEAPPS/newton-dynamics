@@ -51,6 +51,11 @@ class dAiBotTest_1 : public ndModel
 			return m_x0 + m_scale * t;
 		}
 
+		ndFloat32 GetPosit(const ndFloat32 x) const
+		{
+			return (x - m_x0) / m_scale;
+		}
+
 		ndFloat32 m_x0;
 		ndFloat32 m_scale;
 	};
@@ -154,7 +159,8 @@ class dAiBotTest_1 : public ndModel
 
 				//ndMatrix caffPinAndPivotFrame(limbLocation.m_right);
 				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
-				caffPinAndPivotFrame.m_front = limbLocation.m_right.Scale (-1.0f);
+				ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
+				caffPinAndPivotFrame.m_front = limbLocation.m_right.Scale (sign);
 				caffPinAndPivotFrame.m_up = limbLocation.m_front;
 				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
 				caffPinAndPivotFrame.m_posit = limbLocation.m_posit - limbLocation.m_front.Scale(limbLength * 0.5f);
@@ -190,7 +196,7 @@ class dAiBotTest_1 : public ndModel
 				// add joint limit to prevent knee from flipping
 				lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
 				lookActHinge->SetLimitState(true);
-				lookActHinge->SetLimits(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+				lookActHinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
 				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
 				world->AddJoint(lookActHinge);
@@ -226,7 +232,13 @@ class dAiBotTest_1 : public ndModel
 				info.m_y_mapper = ndParamMapper(-0.2f, 0.3f);
 				info.m_z_mapper = ndParamMapper(-0.4f, -0.05f);
 				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+
+				//info.m_x = info.m_x_mapper.GetPosit(0);
+				//info.m_y = info.m_y_mapper.GetPosit(0);
+				//info.m_z = info.m_z_mapper.GetPosit(0);
 				m_effectors.PushBack(info);
+
+
 			}
 		}
 	}

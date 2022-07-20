@@ -135,7 +135,6 @@ void ndIkSwivelPositionEffector::GetWorkSpaceConstraints(ndFloat32& minRadio, nd
 	maxRadio = m_maxWorkSpaceRadio;
 }
 
-
 ndFloat32 ndIkSwivelPositionEffector::GetMaxForce() const
 {
 	return m_linearMaxForce;
@@ -249,12 +248,6 @@ void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc)
 
 	const ndVector& pin = swivelMatrix1.m_front;
 	const ndFloat32 angle = CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
-	ndFloat32 xxxx = pin.DotProduct(swivelMatrix0[1]).GetScalar();
-	if (xxxx > 0.9f)
-	{
-		xxxx *= 1;
-	}
-
 
 	AddAngularRowJacobian(desc, pin, angle);
 	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
