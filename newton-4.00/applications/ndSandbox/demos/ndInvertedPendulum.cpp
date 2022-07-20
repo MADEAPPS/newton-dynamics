@@ -249,7 +249,8 @@ class dAiBotTest_1 : public ndModel
 	void Debug(ndConstraintDebugCallback& context) const
 	{
 		ndVector upVector(m_rootBody->GetMatrix().m_up);
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
