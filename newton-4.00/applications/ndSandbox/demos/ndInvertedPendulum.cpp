@@ -113,15 +113,17 @@ class dAiBotTest_1 : public ndModel
 		matrix.m_posit.m_x = radius + limbLength * 0.5f;
 
 		//ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-		ndFloat32 angles[] = { 270.0f, 240.0f, 120.0f, 60.0f };
+		ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
 
 		const ndVector upDir(location.m_up);
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < 2; ++i)
 		{
 			ndMatrix limbLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
 
 			// add leg thigh
 			ndVector thighPivot(ndVector::m_zero);
+
+			ndFloat32 workSpace = 0.0f;
 			ndBodyKinematic* thigh = nullptr;
 			{
 				limbLocation.m_posit += torso->GetMatrix().m_posit;
@@ -133,6 +135,8 @@ class dAiBotTest_1 : public ndModel
 				thighFrame.m_posit = thighPivot;
 				ndIkJointSpherical* const ball = new ndIkJointSpherical(thighFrame, thigh, torso);
 				world->AddJoint(ball);
+
+				workSpace += limbLength;
 			}
 
 			// add calf0
@@ -158,8 +162,10 @@ class dAiBotTest_1 : public ndModel
 
 				// add joint limit to prevent knee from flipping
 				hinge->SetLimitState(true);
-				hinge->SetLimits(-120.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+				hinge->SetLimits(-10.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
 				world->AddJoint(hinge);
+
+				workSpace += limbLength;
 			}
 
 			ndBodyKinematic* calf1 = nullptr;
@@ -188,6 +194,8 @@ class dAiBotTest_1 : public ndModel
 				lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
 				world->AddJoint(lookActHinge);
+
+				workSpace += lenght;
 			}
 
 			// add leg effector
@@ -209,13 +217,14 @@ class dAiBotTest_1 : public ndModel
 				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, targetBody, torso);
 				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 
 				world->AddJoint(effector);
 
 				ndEffectorInfo info(effector, lookActHinge);
-				info.m_x_mapper = ndParamMapper(0.2f, -0.2f);
-				info.m_y_mapper = ndParamMapper(0.2f, -0.3f);
-				info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
+				info.m_x_mapper = ndParamMapper(-0.25f, 0.25f);
+				info.m_y_mapper = ndParamMapper(-0.2f, 0.3f);
+				info.m_z_mapper = ndParamMapper(-0.4f, -0.05f);
 				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 				m_effectors.PushBack(info);
 			}
@@ -241,7 +250,7 @@ class dAiBotTest_1 : public ndModel
 	void Debug(ndConstraintDebugCallback& context) const
 	{
 		ndVector upVector(m_rootBody->GetMatrix().m_up);
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const effector = info.m_effector;
