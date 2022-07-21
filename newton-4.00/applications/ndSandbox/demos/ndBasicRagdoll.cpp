@@ -64,10 +64,10 @@ static dJointDefinition mannequinDefinition[] =
 	{ "rightFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalfEffector", dJointDefinition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 
-	//{ "leftLeg", dJointDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "leftCalf", dJointDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	//{ "leftFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "leftCalfEffector", dJointDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "leftLeg", dJointDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "leftCalf", dJointDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "leftFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "leftCalfEffector", dJointDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "", dJointDefinition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
@@ -453,7 +453,7 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	ndWorld* const world = scene->GetWorld();
 	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition);
 	world->AddModel(ragdoll);
-	world->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, world->GetSentinelBody()));
 
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
