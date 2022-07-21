@@ -78,8 +78,7 @@ namespace nd_
 			return totalVolume / 6.0;
 		}
 
-		void Mesh::ComputeConvexHull(const double* const pts,
-			const size_t nPts)
+		void Mesh::ComputeConvexHull(const double* const pts, const size_t nPts)
 		{
 			ResizePoints(0);
 			ResizeTriangles(0);

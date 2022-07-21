@@ -413,11 +413,12 @@ namespace nd_
 			size_t p = 0;
 			size_t s = 0;
 			short i, j, k;
-			while (p < nVoxels) {
-				//size_t q = 0;
-				//while (q < CLUSTER_SIZE && p < nVoxels) {
-				while (p < nVoxels) {
-					if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) {
+			while (p < nVoxels) 
+			{
+				while (p < nVoxels) 
+				{
+					if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) 
+					{
 						++s;
 						if (s == sampling) {
 							s = 0;
@@ -522,7 +523,6 @@ namespace nd_
 				voxel = m_voxels[v];
 				pt = GetPoint(voxel);
 				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
-#if 1
 				if (d >= 0.0) 
 				{
 					if (d <= d0) 
@@ -569,32 +569,6 @@ namespace nd_
 						}
 					}
 				}
-
-#else
-				GetPoints(voxel, pts);
-				if (d > d0)
-				{
-					for (int32_t k = 0; k < 8; ++k) 
-					{
-						positivePts->PushBack(pts[k]);
-					}
-				}
-				else if (d < -d0)
-				{
-					for (int32_t k = 0; k < 8; ++k) 
-					{
-						negativePts->PushBack(pts[k]);
-					}
-				}
-				else
-				{
-					for (int32_t k = 0; k < 8; ++k)
-					{
-						positivePts->PushBack(pts[k]);
-						negativePts->PushBack(pts[k]);
-					}
-				}
-#endif
 			}
 
 			_ASSERT(positivePts->Size() <= nVoxels * 8);
@@ -952,7 +926,8 @@ namespace nd_
 		}
 		void Volume::Convert(VoxelSet& vset) const
 		{
-			for (int32_t h = 0; h < 3; ++h) {
+			for (int32_t h = 0; h < 3; ++h) 
+			{
 				vset.m_minBB[h] = m_minBB[h];
 			}
 			vset.m_voxels.Allocate(m_numVoxelsInsideSurface + m_numVoxelsOnSurface);
@@ -964,11 +939,15 @@ namespace nd_
 			Voxel voxel;
 			vset.m_numVoxelsOnSurface = 0;
 			vset.m_numVoxelsInsideSurface = 0;
-			for (short i = 0; i < i0; ++i) {
-				for (short j = 0; j < j0; ++j) {
-					for (short k = 0; k < k0; ++k) {
+			for (short i = 0; i < i0; ++i) 
+			{
+				for (short j = 0; j < j0; ++j) 
+				{
+					for (short k = 0; k < k0; ++k) 
+					{
 						const unsigned char& value = GetVoxel(i, j, k);
-						if (value == PRIMITIVE_INSIDE_SURFACE) {
+						if (value == PRIMITIVE_INSIDE_SURFACE) 
+						{
 							voxel.m_coord[0] = i;
 							voxel.m_coord[1] = j;
 							voxel.m_coord[2] = k;
@@ -976,7 +955,8 @@ namespace nd_
 							vset.m_voxels.PushBack(voxel);
 							++vset.m_numVoxelsInsideSurface;
 						}
-						else if (value == PRIMITIVE_ON_SURFACE) {
+						else if (value == PRIMITIVE_ON_SURFACE) 
+						{
 							voxel.m_coord[0] = i;
 							voxel.m_coord[1] = j;
 							voxel.m_coord[2] = k;
