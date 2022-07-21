@@ -18,7 +18,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkSwivelPositionEffector)
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, const ndMatrix& swivelFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
 	,m_targetFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
-	,m_swivelAngle(ndFloat32 (0.0f))
+	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
 	,m_angularMaxTorque(D_LCP_MAX_VALUE)
@@ -29,6 +29,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_minWorkSpaceRadio(ndFloat32(0.0f))
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
+	,m_enableSwivelControl(true)
 {
 	CalculateLocalMatrix(swivelFrame, m_localSwivelMatrix0, m_localSwivelMatrix1);
 
@@ -52,6 +53,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndL
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_minWorkSpaceRadio(ndFloat32(0.0f))
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
+	,m_enableSwivelControl(true)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	
@@ -73,6 +75,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndL
 
 	m_minWorkSpaceRadio = xmlGetFloat(xmlNode, "minWorkSpaceRadior");
 	m_maxWorkSpaceRadio = xmlGetFloat(xmlNode, "maxWorkSpaceRadior");
+	m_enableSwivelControl = xmlGetFloat(xmlNode, "enableSwivelControl") ? true : false;
 }
 
 ndIkSwivelPositionEffector::~ndIkSwivelPositionEffector()
@@ -101,6 +104,17 @@ void ndIkSwivelPositionEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 
 	xmlSaveParam(childNode, "minWorkSpaceRadio", m_minWorkSpaceRadio);
 	xmlSaveParam(childNode, "maxWorkSpaceRadio", m_maxWorkSpaceRadio);
+	xmlSaveParam(childNode, "enableSwivelControl", m_enableSwivelControl ? 1 : 0);
+}
+
+bool ndIkSwivelPositionEffector::GetSwivelMode() const
+{
+	return m_enableSwivelControl;
+}
+
+void ndIkSwivelPositionEffector::SetSwivelMode(bool active)
+{
+	m_enableSwivelControl = active;
 }
 
 ndVector ndIkSwivelPositionEffector::GetPosition() const
@@ -274,5 +288,8 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc)
 void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	SubmitLinearAxis(desc);
-	SubmitAngularAxis(desc);
+	if (m_enableSwivelControl)
+	{
+		SubmitAngularAxis(desc);
+	}
 }
