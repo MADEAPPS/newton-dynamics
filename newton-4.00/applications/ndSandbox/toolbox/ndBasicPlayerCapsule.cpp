@@ -94,7 +94,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	// create bind pose to animation sequences.
 	ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
 	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
 	{
 		ndAnimationKeyFramesTrack& track = node->GetInfo();

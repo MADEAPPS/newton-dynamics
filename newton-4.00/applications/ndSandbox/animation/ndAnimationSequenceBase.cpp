@@ -9,25 +9,26 @@
 * freely
 */
 
-#ifndef __D_ANIMIMATION_SEQUENCE_h__
-#define __D_ANIMIMATION_SEQUENCE_h__
-
 #include "ndSandboxStdafx.h"
+#include "ndAnimationPose.h"
 #include "ndAnimationSequenceBase.h"
-#include "ndAnimationKeyframesTrack.h"
 
-class ndAnimationSequence: public ndAnimationSequenceBase
+ndAnimationSequenceBase::ndAnimationSequenceBase()
+	:m_name("")
 {
-	public:
-	ndAnimationSequence();
-	virtual ~ndAnimationSequence();
+}
 
-	ndAnimationKeyFramesTrack* AddTrack();
-	ndList<ndAnimationKeyFramesTrack>& GetTracks();
-	virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const;
+ndAnimationSequenceBase::~ndAnimationSequenceBase()
+{
+}
 
-	private:
-	ndList<ndAnimationKeyFramesTrack> m_tracks;
-};
+const ndString& ndAnimationSequenceBase::GetName() const
+{
+	return m_name;
+}
 
-#endif
+void ndAnimationSequenceBase::SetName(const char* const name)
+{
+	m_name = name;
+}
+
