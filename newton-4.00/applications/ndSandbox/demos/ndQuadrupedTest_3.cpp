@@ -24,7 +24,7 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndAnimationSequencePlayer.h"
 
-class dQuadrupedRobotDefinition
+class ndAiQuadrupedTest_3_Definition
 {
 	public:
 	enum jointType
@@ -41,33 +41,33 @@ class dQuadrupedRobotDefinition
 	ndFloat32 m_walkPhase;
 };
 
-static dQuadrupedRobotDefinition jointsDefinition[] =
+static ndAiQuadrupedTest_3_Definition jointsDefinition[] =
 {
-	{ "root_Bone010", dQuadrupedRobotDefinition::m_root, 40.0f},
+	{ "root_Bone010", ndAiQuadrupedTest_3_Definition::m_root, 40.0f},
 
-	{ "rb_thigh_Bone014", dQuadrupedRobotDefinition::m_spherical, 3.0f },
-	{ "rb_knee_Bone013", dQuadrupedRobotDefinition::m_hinge, 2.0f },
-	{ "rb_effector_Bone009", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.0f },
+	{ "rb_thigh_Bone014", ndAiQuadrupedTest_3_Definition::m_spherical, 3.0f },
+	{ "rb_knee_Bone013", ndAiQuadrupedTest_3_Definition::m_hinge, 2.0f },
+	{ "rb_effector_Bone009", ndAiQuadrupedTest_3_Definition::m_effector , 0.0f, 0.0f },
 	
-	{ "lb_thigh_Bone011", dQuadrupedRobotDefinition::m_spherical, 3.0f },
-	{ "lb_knee_Bone012", dQuadrupedRobotDefinition::m_hinge, 2.0f },
-	{ "lb_effector_Bone010", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.5f },
+	{ "lb_thigh_Bone011", ndAiQuadrupedTest_3_Definition::m_spherical, 3.0f },
+	{ "lb_knee_Bone012", ndAiQuadrupedTest_3_Definition::m_hinge, 2.0f },
+	{ "lb_effector_Bone010", ndAiQuadrupedTest_3_Definition::m_effector , 0.0f, 0.5f },
 	
-	{ "fr_thigh_Bone003", dQuadrupedRobotDefinition::m_spherical, 3.0f },
-	{ "fr_knee_Bone004", dQuadrupedRobotDefinition::m_hinge, 2.0f },
-	{ "fr_effector_Bone005", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.75f },
+	{ "fr_thigh_Bone003", ndAiQuadrupedTest_3_Definition::m_spherical, 3.0f },
+	{ "fr_knee_Bone004", ndAiQuadrupedTest_3_Definition::m_hinge, 2.0f },
+	{ "fr_effector_Bone005", ndAiQuadrupedTest_3_Definition::m_effector , 0.0f, 0.75f },
 	
-	{ "fl_thigh_Bone008", dQuadrupedRobotDefinition::m_spherical, 3.0f },
-	{ "fl_knee_Bone006", dQuadrupedRobotDefinition::m_hinge, 2.0f },
-	{ "fl_effector_Bone007", dQuadrupedRobotDefinition::m_effector , 0.0f, 0.25f },
+	{ "fl_thigh_Bone008", ndAiQuadrupedTest_3_Definition::m_spherical, 3.0f },
+	{ "fl_knee_Bone006", ndAiQuadrupedTest_3_Definition::m_hinge, 2.0f },
+	{ "fl_effector_Bone007", ndAiQuadrupedTest_3_Definition::m_effector , 0.0f, 0.25f },
 };
 
-class dQuadrupedRobot : public ndModel
+class ndAiQuadrupedTest_3 : public ndModel
 {
 	public:
 	#define D_SAMPLES_COUNT 128
 
-	D_CLASS_REFLECTION(dQuadrupedRobot);
+	D_CLASS_REFLECTION(ndAiQuadrupedTest_3);
 
 	class ndParamMapper
 	{
@@ -128,7 +128,7 @@ class dQuadrupedRobot : public ndModel
 		ndParamMapper m_swivel_mapper;
 	};
 
-	dQuadrupedRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
+	ndAiQuadrupedTest_3(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effectors()
@@ -173,11 +173,11 @@ class dQuadrupedRobot : public ndModel
 			const char* const name = childEntity->GetName().GetStr();
 			for (ndInt32 i = 0; i < definitionCount; ++i) 
 			{
-				const dQuadrupedRobotDefinition& definition = jointsDefinition[i];
+				const ndAiQuadrupedTest_3_Definition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
 				{
 					//dTrace(("name: %s\n", name));
-					if (definition.m_type == dQuadrupedRobotDefinition::m_hinge)
+					if (definition.m_type == ndAiQuadrupedTest_3_Definition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
@@ -187,7 +187,7 @@ class dQuadrupedRobot : public ndModel
 						world->AddJoint(hinge);
 						parentBody = childBody;
 					}
-					else if (definition.m_type == dQuadrupedRobotDefinition::m_spherical)
+					else if (definition.m_type == ndAiQuadrupedTest_3_Definition::m_spherical)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
@@ -247,7 +247,7 @@ class dQuadrupedRobot : public ndModel
 		}
 	}
 
-	dQuadrupedRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	ndAiQuadrupedTest_3(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effectors()
@@ -288,7 +288,7 @@ class dQuadrupedRobot : public ndModel
 		}
 	}
 
-	~dQuadrupedRobot()
+	~ndAiQuadrupedTest_3()
 	{
 	}
 
@@ -453,16 +453,16 @@ class dQuadrupedRobot : public ndModel
 
 	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
 	{
-		dQuadrupedRobot* const me = (dQuadrupedRobot*)context;
+		ndAiQuadrupedTest_3* const me = (ndAiQuadrupedTest_3*)context;
 		me->ApplyControls(scene);
 	}
 
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(dQuadrupedRobot);
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_3);
 
-void ndQuadrupedRobot(ndDemoEntityManager* const scene)
+void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
@@ -473,13 +473,13 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
 
-	dQuadrupedRobot* const robot0 = new dQuadrupedRobot(scene, robotEntity, matrix);
+	ndAiQuadrupedTest_3* const robot0 = new ndAiQuadrupedTest_3(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot0);
 	world->AddModel(robot0);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//dQuadrupedRobot* const robot1 = new dQuadrupedRobot(scene, robotEntity, matrix);
+	//ndAiQuadrupedTest_3* const robot1 = new ndAiQuadrupedTest_3(scene, robotEntity, matrix);
 	//world->AddModel(robot1);
 
 	delete robotEntity;
@@ -496,7 +496,7 @@ void ndQuadrupedRobot(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
 	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	scene->Set2DDisplayRenderFunction(dQuadrupedRobot::ControlPanel, nullptr, robot0);
+	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_3::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
 	matrix.m_posit.m_y += 1.5f;

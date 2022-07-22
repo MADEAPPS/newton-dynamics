@@ -26,10 +26,10 @@
 
 #define D_USE_FORWARD_DYNAMICS
 
-class dAiBotTest_1 : public ndModel
+class ndAiQuadrupedTest_2 : public ndModel
 {
 	public:
-	D_CLASS_REFLECTION(dAiBotTest_1);
+	D_CLASS_REFLECTION(ndAiQuadrupedTest_2);
 
 	class ndParamMapper
 	{
@@ -93,7 +93,7 @@ class dAiBotTest_1 : public ndModel
 		ndParamMapper m_swivel_mapper;
 	};
 	
-	dAiBotTest_1(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndAiQuadrupedTest_2(ndDemoEntityManager* const scene, const ndMatrix& location)
 		:ndModel()
 	{
 		ndFloat32 mass = 10.0f;
@@ -230,13 +230,13 @@ class dAiBotTest_1 : public ndModel
 		}
 	}
 
-	dAiBotTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	ndAiQuadrupedTest_2(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	{
 		dAssert(0);
 	}
 
-	~dAiBotTest_1()	
+	~ndAiQuadrupedTest_2()	
 	{
 	}
 
@@ -347,17 +347,17 @@ class dAiBotTest_1 : public ndModel
 
 	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
 	{
-		dAiBotTest_1* const me = (dAiBotTest_1*)context;
+		ndAiQuadrupedTest_2* const me = (ndAiQuadrupedTest_2*)context;
 		me->ApplyControls(scene);
 	}
 	
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(dAiBotTest_1);
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_2);
 
 
-void ndInvertedPendulum(ndDemoEntityManager* const scene)
+void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
@@ -367,10 +367,10 @@ void ndInvertedPendulum(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
 	
-	dAiBotTest_1* const aiBot_1 = new dAiBotTest_1(scene, matrix);
+	ndAiQuadrupedTest_2* const aiBot_1 = new ndAiQuadrupedTest_2(scene, matrix);
 	scene->SetSelectedModel(aiBot_1);
 	world->AddModel(aiBot_1);
-	scene->Set2DDisplayRenderFunction(dAiBotTest_1::ControlPanel, nullptr, aiBot_1);
+	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_2::ControlPanel, nullptr, aiBot_1);
 	//world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
 
 	matrix.m_posit.m_x -= 4.0f;

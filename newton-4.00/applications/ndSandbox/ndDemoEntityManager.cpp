@@ -48,7 +48,7 @@
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-#define DEFAULT_SCENE	12		// basic rag doll
+#define DEFAULT_SCENE	12		// biped test 1
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
@@ -63,17 +63,17 @@
 //#define DEFAULT_SCENE	23		// skin peel voronoi fracture
 						 
 // demos forward declaration 
+void ndBipedTest(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicRagdoll(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
-void ndActiveRagdoll(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndQuadrupedRobot(ndDemoEntityManager* const scene);
-void ndInvertedPendulum(ndDemoEntityManager* const scene);
+void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
+void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -104,15 +104,15 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
-	{ "basic rag doll", ndBasicRagdoll },
-	{ "active rag doll", ndActiveRagdoll },
+	{ "biped test one", ndBipedTest },
+	{ "active rag doll", ndBipedTest },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
-	{ "simple inverted pendulum", ndInvertedPendulum },
-	{ "quadruped robot", ndQuadrupedRobot},
+	{ "quadruped test two", ndQuadrupedTest_2 },
+	{ "quadruped test three", ndQuadrupedTest_3},
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },

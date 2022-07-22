@@ -21,10 +21,10 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-class dJointDefinition
+class ndAiBipedTest_1_Definition
 {
 	public:
-	enum jointType
+	enum ndjointType
 	{
 		m_root,
 		m_hinge,
@@ -33,14 +33,14 @@ class dJointDefinition
 		m_effector
 	};
 
-	struct dJointLimit
+	struct ndJointLimit
 	{
 		ndFloat32 m_minTwistAngle;
 		ndFloat32 m_maxTwistAngle;
 		ndFloat32 m_coneAngle;
 	};
 
-	struct dFrameMatrix
+	struct ndFrameMatrix
 	{
 		ndFloat32 m_pitch;
 		ndFloat32 m_yaw;
@@ -48,69 +48,31 @@ class dJointDefinition
 	};
 
 	char m_boneName[32];
-	jointType m_type;
-	dJointLimit m_jointLimits;
-	dFrameMatrix m_frameBasics;
+	ndjointType m_type;
+	ndJointLimit m_jointLimits;
+	ndFrameMatrix m_frameBasics;
 };
 
-static dJointDefinition mannequinDefinition[] =
+static ndAiBipedTest_1_Definition mannequinDefinition[] =
 {
-	{ "pelvis", dJointDefinition::m_root, {}, {} },
+	{ "pelvis", ndAiBipedTest_1_Definition::m_root, {}, {} },
 	//{ "Bip001 Spine1", 1.0f,{ -30.0f, 30.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 	//{ "Bip001 Head", 1.0f,{ -60.0f, 60.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
-	{ "rightLeg", dJointDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "rightCalf", dJointDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	{ "rightFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "rightCalfEffector", dJointDefinition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rightLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rightCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "rightFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rightCalfEffector", ndAiBipedTest_1_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 
-	{ "leftLeg", dJointDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "leftCalf", dJointDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	{ "leftFoot", dJointDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "leftCalfEffector", dJointDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "leftLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "leftCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "leftFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "leftCalfEffector", ndAiBipedTest_1_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
-	{ "", dJointDefinition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
+	{ "", ndAiBipedTest_1_Definition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
 
-class ndRagdollEntityNotify : public ndDemoEntityNotify
-{
-	public:
-	ndRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody)
-		:ndDemoEntityNotify(manager, entity, parentBody)
-		,m_bindMatrix(dGetIdentityMatrix())
-	{
-		if (parentBody)
-		{
-			ndDemoEntity* const parentEntity = (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData());
-			m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse();
-		}
-	}
-
-	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
-	{
-		if (!m_parentBody)
-		{
-			ndDemoEntityNotify::OnTransform(thread, matrix);
-		}
-		else
-		{
-			const ndMatrix parentMatrix(m_parentBody->GetMatrix());
-			const ndMatrix localMatrix(matrix * parentMatrix.Inverse() * m_bindMatrix);
-			const ndQuaternion rot(localMatrix);
-			m_entity->SetMatrix(rot, localMatrix.m_posit);
-		}
-	}
-
-	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)
-	{
-		ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
-		// remember to check and clamp huge angular velocities
-	}
-
-	ndMatrix m_bindMatrix;
-};
-
-class ndRagdollModel : public ndModel
+class ndAiBipedTest_1 : public ndModel
 {
 	public:
 
@@ -125,7 +87,7 @@ class ndRagdollModel : public ndModel
 
 		ndParamMapper(ndFloat32 x0, ndFloat32 x1)
 			:m_x0(x0 + (x1 - x0) * 0.5f)
-			, m_scale((x1 - x0) * 0.5f)
+			,m_scale((x1 - x0) * 0.5f)
 		{
 		}
 
@@ -173,7 +135,7 @@ class ndRagdollModel : public ndModel
 		ndParamMapper m_swivel_mapper;
 	};
 
-	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location, dJointDefinition* const definition)
+	ndAiBipedTest_1(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location, ndAiBipedTest_1_Definition* const definition)
 		:ndModel()
 	{
 		// make a clone of the mesh and add it to the scene
@@ -186,9 +148,8 @@ class ndRagdollModel : public ndModel
 
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 1.0f;
+		matrix.m_posit.m_y = floor.m_y + 1.025f;
 
-matrix.m_posit.m_y += 0.025f;
 		rootEntity->ResetMatrix(matrix);
 
 		ndFixSizeArray<ndBodyDynamic*, 64> bodies;
@@ -221,7 +182,7 @@ matrix.m_posit.m_y += 0.025f;
 			{
 				if (!strcmp(definition[i].m_boneName, name))
 				{
-					if (definition[i].m_type != dJointDefinition::m_effector)
+					if (definition[i].m_type != ndAiBipedTest_1_Definition::m_effector)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
 						bodies.PushBack(childBody);
@@ -236,8 +197,8 @@ matrix.m_posit.m_y += 0.025f;
 						ndMatrix pivotFrame(m_rootBody->GetMatrix());
 						ndMatrix effectorFrame(m_rootBody->GetMatrix());
 
-						ndRagdollEntityNotify* notify = (ndRagdollEntityNotify*)parentBone->GetNotifyCallback();
-						notify = (ndRagdollEntityNotify*)notify->m_parentBody->GetNotifyCallback();
+						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBone->GetNotifyCallback();
+						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
 						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
@@ -321,46 +282,46 @@ matrix.m_posit.m_y += 0.025f;
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(1.0f, *shape);
-		body->SetNotifyCallback(new ndRagdollEntityNotify(scene, entityPart, parentBone));
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
 
 		scene->GetWorld()->AddBody(body);
 		delete shape;
 		return body;
 	}
 
-	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBone, const dJointDefinition& definition)
+	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBone, const ndAiBipedTest_1_Definition& definition)
 	{
 		ndMatrix matrix(childBody->GetMatrix());
-		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		ndAiBipedTest_1_Definition::ndFrameMatrix frameAngle(definition.m_frameBasics);
 		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
 		switch (definition.m_type)
 		{
-			case dJointDefinition::m_spherical:
+			case ndAiBipedTest_1_Definition::m_spherical:
 			{
 				ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-				dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+				ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
 				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 				return joint;
 			}
 
-			case dJointDefinition::m_hinge:
+			case ndAiBipedTest_1_Definition::m_hinge:
 			{
 				ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-				dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+				ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
 				joint->SetLimitState(true);
 				joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 				return joint;
 			}
 
-			case dJointDefinition::m_doubleHinge:
+			case ndAiBipedTest_1_Definition::m_doubleHinge:
 			{
 				ndIkJointDoubleHinge* const joint = new ndIkJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-				dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+				ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
 				//joint->SetLimitState(true);
 				//joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 				return joint;
@@ -451,21 +412,21 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	ragdollMesh->ResetMatrix(entMatrix);
 
 	ndWorld* const world = scene->GetWorld();
-	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition);
+	ndAiBipedTest_1* const ragdoll = new ndAiBipedTest_1(scene, ragdollMesh, matrix, mannequinDefinition);
 	world->AddModel(ragdoll);
 	//world->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, world->GetSentinelBody()));
 
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition));
+	//scene->GetWorld()->AddModel(new ndAiBipedTest_1(scene, ragdollMesh, matrix, mannequinDefinition));
 	//
 	//matrix.m_posit.m_z = 2.0f;
-	//scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix, mannequinDefinition));
+	//scene->GetWorld()->AddModel(new ndAiBipedTest_1(scene, ragdollMesh, matrix, mannequinDefinition));
 
 	delete ragdollMesh;
 }
 
-void ndBasicRagdoll (ndDemoEntityManager* const scene)
+void ndBipedTest (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
