@@ -61,13 +61,13 @@ static ndAiBipedTest_1_Definition mannequinDefinition[] =
 
 	{ "rightLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	{ "rightFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "rightFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalfEffector", ndAiBipedTest_1_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 
-	{ "leftLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "leftCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	{ "leftFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "leftCalfEffector", ndAiBipedTest_1_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	//{ "leftLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "leftCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	//{ "leftFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "leftCalfEffector", ndAiBipedTest_1_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "", ndAiBipedTest_1_Definition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
@@ -135,11 +135,11 @@ class ndAiBipedTest_1 : public ndModel
 		ndParamMapper m_swivel_mapper;
 	};
 
-	ndAiBipedTest_1(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location, ndAiBipedTest_1_Definition* const definition)
+	ndAiBipedTest_1(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location, ndAiBipedTest_1_Definition* const definition)
 		:ndModel()
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)ragdollMesh->CreateClone();
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
 		scene->AddEntity(rootEntity);
 		ndWorld* const world = scene->GetWorld();
 
@@ -187,7 +187,7 @@ class ndAiBipedTest_1 : public ndModel
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
 						bodies.PushBack(childBody);
 
-						// connect this body part to its parentBody with a ragdoll joint
+						// connect this body part to its parentBody with a robot joint
 						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition[i]);
 						world->AddJoint(joint);
 						parentBone = childBody;
@@ -300,8 +300,7 @@ class ndAiBipedTest_1 : public ndModel
 			case ndAiBipedTest_1_Definition::m_spherical:
 			{
 				ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
-
-				ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
+				//ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
 				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 				return joint;
@@ -347,6 +346,23 @@ class ndAiBipedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
+		const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		{
+			ndEffectorInfo& info = m_effectors[i];
+			ndVector posit(info.m_basePosition);
+			posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+			posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+			posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+			info.m_effector->SetPosition(posit);
+
+			ndMatrix swivelMatrix0;
+			ndMatrix swivelMatrix1;
+			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+			const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
+			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
+		}
+
 		//bool needProjection = false;
 		//ndFloat32 invtimestep2 = 1.0f / (timestep * timestep);
 		//for (ndInt32 i = 0; (i < m_bodies.GetCount()) && !needProjection; ++i)
@@ -366,33 +382,52 @@ class ndAiBipedTest_1 : public ndModel
 		//}
 	}
 
-	//void PostUpdate(ndWorld* const world, ndFloat32)
-	void PostUpdate(ndWorld* const, ndFloat32)
+	void ApplyControls(ndDemoEntityManager* const scene)
 	{
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Control panel");
+
+		ndEffectorInfo& info = m_effectors[0];
+
+		bool change = false;
+		ImGui::Text("position x");
+		change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
+		ImGui::Text("position y");
+		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+		ImGui::Text("position z");
+		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+
+		ImGui::Text("swivel");
+		change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+
+		if (change)
+		{
+			m_rootBody->SetSleepState(false);
+
+			for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
+			{
+				m_effectors[i].m_x = info.m_x;
+				m_effectors[i].m_y = info.m_y;
+				m_effectors[i].m_z = info.m_z;
+				m_effectors[i].m_swivel = info.m_swivel;
+			}
+		}
 	}
 
-	//void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
-	void PostTransformUpdate(ndWorld* const, ndFloat32)
+	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
 	{
-		//ndInt32 sleepCount = 0;
-		//for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		//{
-		//	ndBodyDynamic* const body = m_bodies[i];
-		//	sleepCount += body->GetSleepState() ? 1 : 0;
-		//}
-		//if ((sleepCount > 0) && (sleepCount < m_bodies.GetCount()))
-		//{
-		//	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-		//	{
-		//		ndBodyDynamic* const body = m_bodies[i];
-		//		if (body->GetSleepState() == true) 
-		//		{
-		//			ndBodyNotify* const notify = body->GetNotifyCallback();
-		//			dAssert(notify);
-		//			notify->OnTransform(0, body->GetMatrix());
-		//		}
-		//	}
-		//}
+		ndAiBipedTest_1* const me = (ndAiBipedTest_1*)context;
+		me->ApplyControls(scene);
+	}
+
+	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+	{
+		ndModel::PostUpdate(world, timestep);
+	}
+
+	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
+	{
+		ndModel::PostTransformUpdate(world, timestep);
 	}
 
 	ndBodyDynamic* m_rootBody;
@@ -406,24 +441,19 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	matrix.m_posit.m_w = 1.0f;
 
 	matrix.m_posit.m_y = 0.5f;
-	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("mannequin.fbx");
+	fbxDemoEntity* const robotMesh = scene->LoadFbxMesh("mannequin.fbx");
 
-	ndMatrix entMatrix(dYawMatrix(-90.0f * ndDegreeToRad) * ragdollMesh->GetRenderMatrix());
-	ragdollMesh->ResetMatrix(entMatrix);
+	ndMatrix entMatrix(dYawMatrix(-90.0f * ndDegreeToRad) * robotMesh->GetRenderMatrix());
+	robotMesh->ResetMatrix(entMatrix);
 
 	ndWorld* const world = scene->GetWorld();
-	ndAiBipedTest_1* const ragdoll = new ndAiBipedTest_1(scene, ragdollMesh, matrix, mannequinDefinition);
-	world->AddModel(ragdoll);
-	//world->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, world->GetSentinelBody()));
+	ndAiBipedTest_1* const robot = new ndAiBipedTest_1(scene, robotMesh, matrix, mannequinDefinition);
+	world->AddModel(robot);
+	world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
 
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndAiBipedTest_1(scene, ragdollMesh, matrix, mannequinDefinition));
-	//
-	//matrix.m_posit.m_z = 2.0f;
-	//scene->GetWorld()->AddModel(new ndAiBipedTest_1(scene, ragdollMesh, matrix, mannequinDefinition));
+	scene->Set2DDisplayRenderFunction(ndAiBipedTest_1::ControlPanel, nullptr, robot);
 
-	delete ragdollMesh;
+	delete robotMesh;
 }
 
 void ndBipedTest (ndDemoEntityManager* const scene)
