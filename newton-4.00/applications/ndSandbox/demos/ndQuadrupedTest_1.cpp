@@ -32,13 +32,13 @@ class ndAiQuadrupedTest_1_Definition
 	{
 		m_root,
 		m_hinge,
-		m_spherical,
 		m_effector
 	};
 
 	char m_boneName[32];
 	jointType m_type;
-	ndFloat32 m_mass;
+	ndFloat32 m_minAngle;
+	ndFloat32 m_maxAngle;
 	ndFloat32 m_walkPhase;
 };
 
@@ -46,21 +46,25 @@ static ndAiQuadrupedTest_1_Definition jointsDefinition[] =
 {
 	{ "spot_body", ndAiQuadrupedTest_1_Definition::m_root, 40.0f},
 
-	//{ "rb_thigh_Bone014", ndAiQuadrupedTest_1_Definition::m_spherical, 3.0f },
-	//{ "rb_knee_Bone013", ndAiQuadrupedTest_1_Definition::m_hinge, 2.0f },
-	//{ "rb_effector_Bone009", ndAiQuadrupedTest_1_Definition::m_effector , 0.0f, 0.0f },
-	
-	//{ "lb_thigh_Bone011", ndAiQuadrupedTest_1_Definition::m_spherical, 3.0f },
-	//{ "lb_knee_Bone012", ndAiQuadrupedTest_1_Definition::m_hinge, 2.0f },
-	//{ "lb_effector_Bone010", ndAiQuadrupedTest_1_Definition::m_effector , 0.0f, 0.5f },
-	//
-	//{ "fr_thigh_Bone003", ndAiQuadrupedTest_1_Definition::m_spherical, 3.0f },
-	//{ "fr_knee_Bone004", ndAiQuadrupedTest_1_Definition::m_hinge, 2.0f },
-	//{ "fr_effector_Bone005", ndAiQuadrupedTest_1_Definition::m_effector , 0.0f, 0.75f },
-	//
-	//{ "fl_thigh_Bone008", ndAiQuadrupedTest_1_Definition::m_spherical, 3.0f },
-	//{ "fl_knee_Bone006", ndAiQuadrupedTest_1_Definition::m_hinge, 2.0f },
-	//{ "fl_effector_Bone007", ndAiQuadrupedTest_1_Definition::m_effector , 0.0f, 0.25f },
+	{ "spot_shoulder_FR", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 90.0f, 0.0f },
+	{ "spot_up_arm_FR", ndAiQuadrupedTest_1_Definition::m_hinge, -130.0f, 130.0f, 0.0f },
+	{ "spot_arm_FR", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 45.0f, 0.0f },
+	{ "spot_arm_FR_effector", ndAiQuadrupedTest_1_Definition::m_effector, 0.0f, 0.0f, 0.0f },
+
+	{ "spot_shoulder_FL", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 90.0f, 0.0f },
+	{ "spot_up_arm_FL", ndAiQuadrupedTest_1_Definition::m_hinge, -130.0f, 130.0f, 0.0f },
+	{ "spot_arm_FL", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 45.0f, 0.0f },
+	{ "spot_arm_FL_effector", ndAiQuadrupedTest_1_Definition::m_effector, 0.0f, 0.0f, 0.0f },
+
+	{ "spot_shoulder_BR", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 90.0f, 0.0f },
+	{ "spot_up_arm_BR", ndAiQuadrupedTest_1_Definition::m_hinge, -130.0f, 130.0f, 0.0f },
+	{ "spot_arm_BR", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 45.0f, 0.0f },
+	{ "spot_arm_BR_effector", ndAiQuadrupedTest_1_Definition::m_effector, 0.0f, 0.0f, 0.0f },
+
+	{ "spot_shoulder_BL", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 90.0f, 0.0f },
+	{ "spot_up_arm_BL", ndAiQuadrupedTest_1_Definition::m_hinge, -130.0f, 130.0f, 0.0f },
+	{ "spot_arm_BL", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 45.0f, 0.0f },
+	{ "spot_arm_BL_effector", ndAiQuadrupedTest_1_Definition::m_effector, 0.0f, 0.0f, 0.0f },
 };
 
 class ndAiQuadrupedTest_1 : public ndModel
@@ -100,7 +104,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndEffectorInfo()
 			:m_basePosition(ndVector::m_wOne)
 			,m_effector(nullptr)
-			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
 			,m_z(0.0f)
@@ -110,7 +113,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
 			:m_basePosition(effector->GetPosition())
 			,m_effector(effector)
-			,m_swivel(0.0f)
 			,m_x(0.0f)
 			,m_y(0.0f)
 			,m_z(0.0f)
@@ -119,14 +121,12 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 		ndVector m_basePosition;
 		ndIkSwivelPositionEffector* m_effector;
-		ndReal m_swivel;
 		ndReal m_x;
 		ndReal m_y;
 		ndReal m_z;
 		ndParamMapper m_x_mapper;
 		ndParamMapper m_y_mapper;
 		ndParamMapper m_z_mapper;
-		ndParamMapper m_swivel_mapper;
 	};
 
 	ndAiQuadrupedTest_1(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
@@ -146,11 +146,13 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 0.71f;
+		matrix.m_posit.m_y += 0.75f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
-		m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
+		ndFixSizeArray<ndBodyDynamic*, 64> bodies;
+		m_rootBody = CreateBodyPart(scene, rootEntity, 1.0f, nullptr);
+		bodies.PushBack(m_rootBody);
 		
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
@@ -163,7 +165,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 			stack++;
 		}
 
-		const ndMatrix referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix();
 		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		while (stack) 
 		{
@@ -180,44 +181,31 @@ class ndAiQuadrupedTest_1 : public ndModel
 					//dTrace(("name: %s\n", name));
 					if (definition.m_type == ndAiQuadrupedTest_1_Definition::m_hinge)
 					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, 1.0f, parentBody);
+						bodies.PushBack(childBody);
+
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 						hinge->SetLimitState(true);
-						hinge->SetLimits(-30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
+						hinge->SetLimits(definition.m_minAngle * ndDegreeToRad, definition.m_maxAngle * ndDegreeToRad);
 						world->AddJoint(hinge);
-						parentBody = childBody;
-					}
-					else if (definition.m_type == ndAiQuadrupedTest_1_Definition::m_spherical)
-					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
-						//socket->SetConeLimit(120.0f * ndDegreeToRad);
-						//socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-
-						world->AddJoint(socket);
 						parentBody = childBody;
 					}
 					else
 					{
-						char refName[256];
-						sprintf(refName, "%sreference", name);
-						dAssert(rootEntity->Find(refName));
+						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
+						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
+						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
-						ndMatrix pivotFrame(referenceFrame);
-						ndMatrix effectorFrame(referenceFrame);
+						ndMatrix effectorFrame(m_rootBody->GetMatrix());
+						ndMatrix pivotFrame(m_rootBody->GetMatrix());
+						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-						pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
-
-						ndMatrix swivelFrame(dGetIdentityMatrix());
-						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-						swivelFrame.m_up = referenceFrame.m_front;
-						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
-						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
 						ndFloat32 regularizer = 0.001f;
-						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, dGetIdentityMatrix(), parentBody, m_rootBody);
+
+						effector->SetSwivelMode(false);
 						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
@@ -229,10 +217,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
-						info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-						info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
-						info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
-						info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+						info.m_x_mapper = ndParamMapper(-0.25f, 0.25f);
+						info.m_y_mapper = ndParamMapper(-0.05f, 0.6f);
+						info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
 						m_effectors.PushBack(info);
 					}
 					break;
@@ -246,6 +233,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 				stack++;
 			}
 		}
+
+		SetModelMass(bodies, 100.0f);
 	}
 
 	ndAiQuadrupedTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -292,6 +281,58 @@ class ndAiQuadrupedTest_1 : public ndModel
 	~ndAiQuadrupedTest_1()
 	{
 	}
+
+	void SetModelMass(const ndFixSizeArray<ndBodyDynamic*, 64>& bodies, ndFloat32 mass) const
+	{
+		ndFloat32 volumeRatio = 0.02f;
+		ndFloat32 maxVolume = -1.0e10f;
+		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		{
+			ndFloat32 volume = bodies[i]->GetCollisionShape().GetVolume();
+			maxVolume = ndMax(maxVolume, volume);
+		}
+
+		ndFloat32 totalVolume = 0.0f;
+		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		{
+			ndFloat32 volume = bodies[i]->GetCollisionShape().GetVolume();
+			if (volume < volumeRatio * maxVolume)
+			{
+				volume = volumeRatio * maxVolume;
+			}
+			totalVolume += volume;
+		}
+
+		ndFloat32 density = mass / totalVolume;
+
+		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		{
+			ndBodyDynamic* const body = bodies[i];
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			if (volume < volumeRatio * maxVolume)
+			{
+				volume = volumeRatio * maxVolume;
+			}
+			ndFloat32 normalMass = density * volume;
+			body->SetMassMatrix(normalMass, body->GetCollisionShape());
+			ndVector inertia(body->GetMassMatrix());
+			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
+			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
+			if (minInertia < maxInertia * 0.125f)
+			{
+				minInertia = maxInertia * 0.125f;
+				for (ndInt32 j = 0; j < 3; j++)
+				{
+					if (inertia[j] < minInertia)
+					{
+						inertia[j] = minInertia;
+					}
+				}
+			}
+			body->SetMassMatrix(inertia);
+		}
+	}
+
 
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	{
@@ -416,9 +457,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ImGui::Text("position z");
 		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
 
-		ImGui::Text("swivel");
-		change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
-
 		if (change)
 		{
 			m_rootBody->SetSleepState(false);
@@ -428,7 +466,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 				m_effectors[i].m_x = info.m_x;
 				m_effectors[i].m_y = info.m_y;
 				m_effectors[i].m_z = info.m_z;
-				m_effectors[i].m_swivel = info.m_swivel;
 			}
 		}
 	}
@@ -446,12 +483,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 			posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
 			posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
 			info.m_effector->SetPosition(posit);
-
-			ndMatrix swivelMatrix0;
-			ndMatrix swivelMatrix1;
-			info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-			const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
-			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 		}
 	}
 

@@ -174,7 +174,7 @@ class ndAiBipedTest_1 : public ndModel
 		while (stack) 
 		{
 			stack--;
-			ndBodyDynamic* parentBone = parentBones[stack];
+			ndBodyDynamic* parentBody = parentBones[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
@@ -184,20 +184,20 @@ class ndAiBipedTest_1 : public ndModel
 				{
 					if (definition[i].m_type != ndAiBipedTest_1_Definition::m_effector)
 					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody);
 						bodies.PushBack(childBody);
 
 						// connect this body part to its parentBody with a robot joint
-						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition[i]);
+						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition[i]);
 						world->AddJoint(joint);
-						parentBone = childBody;
+						parentBody = childBody;
 					}
 					else
 					{ 
 						ndMatrix pivotFrame(m_rootBody->GetMatrix());
 						ndMatrix effectorFrame(m_rootBody->GetMatrix());
 
-						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBone->GetNotifyCallback();
+						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
 						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
 						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
@@ -210,7 +210,7 @@ class ndAiBipedTest_1 : public ndModel
 						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
 						ndFloat32 regularizer = 0.001f;
-						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBone, m_rootBody);
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
 						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
@@ -230,7 +230,7 @@ class ndAiBipedTest_1 : public ndModel
 			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
 			{
 				childEntities[stack] = child;
-				parentBones[stack] = parentBone;
+				parentBones[stack] = parentBody;
 				stack++;
 			}
 		}
@@ -240,17 +240,35 @@ class ndAiBipedTest_1 : public ndModel
 
 	void SetModelMass(const ndFixSizeArray<ndBodyDynamic*, 64>& bodies, ndFloat32 mass) const
 	{
-		ndFloat32 volume = 0.0f;
-		for (int i = 0; i < bodies.GetCount(); ++i) 
+		ndFloat32 maxVolume = -1.0e10f;
+		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
 		{
-			volume += bodies[i]->GetCollisionShape().GetVolume();
+			ndFloat32 volume = bodies[i]->GetCollisionShape().GetVolume();
+			maxVolume = ndMax(maxVolume, volume);
 		}
-		ndFloat32 density = mass / volume;
+
+		ndFloat32 totalVolume = 0.0f;
+		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		{
+			ndFloat32 volume = bodies[i]->GetCollisionShape().GetVolume();
+			if (volume < 0.01f * maxVolume)
+			{
+				volume = 0.01f * maxVolume;
+			}
+			totalVolume += volume;
+		}
+
+		ndFloat32 density = mass / totalVolume;
 
 		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
 		{
 			ndBodyDynamic* const body = bodies[i];
-			ndFloat32 normalMass = density * body->GetCollisionShape().GetVolume();
+			ndFloat32 volume = body->GetCollisionShape().GetVolume();
+			if (volume < 0.01f * maxVolume)
+			{
+				volume = 0.01f * maxVolume;
+			}
+			ndFloat32 normalMass = density * volume;
 			body->SetMassMatrix(normalMass, body->GetCollisionShape());
 			ndVector inertia(body->GetMassMatrix());
 			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);

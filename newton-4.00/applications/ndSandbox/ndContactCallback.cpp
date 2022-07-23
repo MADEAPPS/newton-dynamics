@@ -35,7 +35,6 @@ bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, n
 
 	if ((material0.m_userParam[ndContactCallback::m_modelPointer].m_intData == material1.m_userParam[ndContactCallback::m_modelPointer].m_intData) && material0.m_userParam[ndContactCallback::m_modelPointer].m_intData != 0)
 	{
-		dAssert(0);
 		return false;
 	}
 
