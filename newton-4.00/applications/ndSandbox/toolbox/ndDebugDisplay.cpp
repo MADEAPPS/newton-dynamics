@@ -702,3 +702,29 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 		model->Debug(debugJoint);
 	}
 }
+
+void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale)
+{
+	ndWorld* const world = scene->GetWorld();
+
+	ndJoindDebug debugJoint(scene);
+
+	const ndVector color(1.0f, 1.0f, 0.0f, 1.0f);
+	const ndContactArray& contactList = world->GetContactList();
+	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
+	{
+		const ndContact* const contact = contactList[i];
+		if (contact->IsActive())
+		{
+			const ndContactPointList& contactPoints = contact->GetContactPoints();
+			for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			{
+				const ndContactMaterial& contactPoint = contactPointsNode->GetInfo();
+				const ndVector origin(contactPoint.m_point);
+				const ndVector normal(contactPoint.m_normal);
+				const ndVector dest(origin + normal.Scale(contactPoint.m_normal_Force.m_force * scale));
+				debugJoint.DrawLine(origin, dest, color, 1.0f);
+			}
+		}
+	}
+}

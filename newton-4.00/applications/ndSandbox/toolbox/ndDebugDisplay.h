@@ -62,6 +62,7 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene);
 void RenderContactPoints(ndDemoEntityManager* const scene);
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
+void RenderNormalForces(ndDemoEntityManager* const scene, ndFloat32 scale = 0.005f);
 void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
 
 #endif

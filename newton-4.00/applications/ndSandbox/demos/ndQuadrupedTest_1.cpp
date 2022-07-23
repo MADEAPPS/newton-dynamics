@@ -333,7 +333,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		}
 	}
 
-
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const modelRootNode = new nd::TiXmlElement(ClassName());
@@ -494,7 +493,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston.fbx");
+	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston_1.fbx");
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
