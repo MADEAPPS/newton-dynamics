@@ -90,6 +90,14 @@ class ndContactCallback: public ndContactNotify
 	public: 
 	ndContactCallback();
 
+	enum
+	{
+		m_density,
+		m_friction,
+		m_soundSpeedThreshull,
+		m_modelPointer,
+	};
+
 	virtual ndApplicationMaterial& RegisterMaterial(const ndApplicationMaterial& material, ndUnsigned32 id0, ndUnsigned32 id1);
 
 	virtual void OnBodyAdded(ndBodyKinematic* const body) const;

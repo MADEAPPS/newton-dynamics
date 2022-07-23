@@ -30,6 +30,15 @@ bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, n
 	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
 	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
 
+	const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+	const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+	if ((material0.m_userParam[ndContactCallback::m_modelPointer].m_intData == material1.m_userParam[ndContactCallback::m_modelPointer].m_intData) && material0.m_userParam[ndContactCallback::m_modelPointer].m_intData != 0)
+	{
+		dAssert(0);
+		return false;
+	}
+
 	if ((instanceShape0.GetUserDataID() == ndApplicationMaterial::m_dedris) && (instanceShape1.GetUserDataID() == ndApplicationMaterial::m_dedris))
 	{
 		return false;
@@ -114,7 +123,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 
 	const ndShapeInstance& instance0 = body0->GetCollisionShape();
 	const ndShapeInstance& instance1 = body1->GetCollisionShape();
-	const ndFloat32 speedThreshold = ndMax(instance0.GetMaterial().m_userParam[0].m_floatData, instance1.GetMaterial().m_userParam[0].m_floatData);
+	const ndFloat32 speedThreshold = ndMax(instance0.GetMaterial().m_userParam[m_soundSpeedThreshull].m_floatData, instance1.GetMaterial().m_userParam[m_soundSpeedThreshull].m_floatData);
 	if (maxNornalSpeed > speedThreshold)
 	{
 		// play impact sound here;

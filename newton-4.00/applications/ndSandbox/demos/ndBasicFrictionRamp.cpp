@@ -49,7 +49,7 @@ class FrictionMaterial : public ndApplicationMaterial
 		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 		{
 			ndContactMaterial& contactPoint = contactPointsNode->GetInfo();
-			ndFloat32 friction = contactPoint.m_shapeInstance0->m_shapeMaterial.m_userParam[0].m_floatData;
+			ndFloat32 friction = contactPoint.m_shapeInstance0->m_shapeMaterial.m_userParam[ndContactCallback::m_friction].m_floatData;
 			contactPoint.m_material.m_staticFriction0 = friction;
 			contactPoint.m_material.m_staticFriction1 = friction;
 			contactPoint.m_material.m_dynamicFriction0 = friction;
@@ -146,7 +146,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 
 		// save fiction coefficient
 		ndFloat32 frictionValue = ndFloat32(i) / 15.0f;
-		instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = frictionValue;
+		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_friction].m_floatData = frictionValue;
 
 		// set the user flag so that it is read in the contact callback for doing stuff
 		material.m_userFlags |= ndApplicationMaterial::m_playSound;

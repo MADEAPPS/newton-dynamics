@@ -19,6 +19,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndAnimationPose.h"
+#include "ndContactCallback.h"
 #include "ndAnimationSequence.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
@@ -355,6 +356,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(mass, *shape);
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
+
+		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
 		
 		delete shape;
 

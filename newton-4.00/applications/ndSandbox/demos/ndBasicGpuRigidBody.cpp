@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
@@ -44,7 +45,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 
 	// save the density with the body shape.
 	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
+	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 
 	world->AddBody(body);

@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
@@ -56,7 +57,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndF
 {
 	ndBodyKinematic* const body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
 	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
+	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 }
 
@@ -64,7 +65,7 @@ static void AddSphere1(ndDemoEntityManager* const scene, const ndMatrix& origin,
 {
 	ndBodyKinematic* const body = AddSphere(scene, origin, mass, 0.5f);
 	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
+	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 }
 
@@ -72,7 +73,7 @@ static void AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin,
 {
 	ndBodyKinematic* const body = AddCapsule(scene, origin, mass, 0.5f, 0.5f, 1.0f);
 	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
+	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 }
 
@@ -80,7 +81,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 {
 	ndBodyKinematic* const body = AddConvexHull(scene, origin, mass, radius, high, segments);
 	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
+	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 }
 
