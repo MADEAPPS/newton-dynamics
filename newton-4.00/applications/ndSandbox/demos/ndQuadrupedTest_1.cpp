@@ -217,7 +217,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
-						info.m_x_mapper = ndParamMapper(-0.25f, 0.25f);
+						info.m_x_mapper = ndParamMapper(-0.3f, 0.3f);
 						info.m_y_mapper = ndParamMapper(-0.05f, 0.6f);
 						info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
 						m_effectors.PushBack(info);
@@ -416,19 +416,10 @@ class ndAiQuadrupedTest_1 : public ndModel
 	void Debug(ndConstraintDebugCallback& context) const
 	{
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		//for (ndInt32 i = 0; i < 1; ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const joint = info.m_effector;
 			joint->DebugJoint(context);
-
-			//ndMatrix swivelMatrix0;
-			//ndMatrix swivelMatrix1;
-			//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-
-			//ndVector posit1(swivelMatrix1.m_posit);
-			//posit1.m_y += 1.0f;
-			//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 		}
 	}
 
