@@ -25,10 +25,9 @@ class ndAnimationSequenceBase : public ndClassAlloc
 
 	const ndString& GetName() const;
 	void SetName(const char* const name);
-
-	protected:
 	virtual void CalculatePose(ndAnimationPose& output, ndFloat32 param) const = 0;
 
+	protected:
 	ndString m_name;
 };
 

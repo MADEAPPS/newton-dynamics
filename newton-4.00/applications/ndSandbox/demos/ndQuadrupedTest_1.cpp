@@ -20,9 +20,9 @@
 #include "ndMakeStaticMap.h"
 #include "ndAnimationPose.h"
 #include "ndContactCallback.h"
-#include "ndAnimationSequence.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
+#include "ndAnimationSequenceBase.h"
 #include "ndAnimationSequencePlayer.h"
 
 class ndAiQuadrupedTest_1_Definition
@@ -65,6 +65,28 @@ static ndAiQuadrupedTest_1_Definition jointsDefinition[] =
 	{ "spot_up_arm_BL", ndAiQuadrupedTest_1_Definition::m_hinge, -130.0f, 130.0f, 0.0f },
 	{ "spot_arm_BL", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 45.0f, 0.0f },
 	{ "spot_arm_BL_effector", ndAiQuadrupedTest_1_Definition::m_effector, 0.0f, 0.0f, 0.0f },
+};
+
+class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
+{
+	public:
+	ndAiQuadrupedTestWalkSequence()
+		:ndAnimationSequenceBase()
+		,m_offsets()
+	{
+	}
+
+	~ndAiQuadrupedTestWalkSequence()
+	{
+
+	}
+
+	void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+	{
+
+	}
+
+	ndFixSizeArray<ndFloat32, 4> m_offsets;
 };
 
 class ndAiQuadrupedTest_1 : public ndModel
@@ -133,6 +155,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effectors()
+		,m_walkSequence()
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -235,12 +258,16 @@ class ndAiQuadrupedTest_1 : public ndModel
 		}
 
 		SetModelMass(bodies, 100.0f);
+
+		ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(&m_walkSequence);
+		m_animBlendTree = walk;
 	}
 
 	ndAiQuadrupedTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
 		,m_effectors()
+		,m_animBlendTree(nullptr)
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -280,6 +307,10 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 	~ndAiQuadrupedTest_1()
 	{
+		if (m_animBlendTree)
+		{
+			delete m_animBlendTree;
+		}
 	}
 
 	void SetModelMass(const ndFixSizeArray<ndBodyDynamic*, 64>& bodies, ndFloat32 mass) const
@@ -484,6 +515,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
+
+	ndAnimationBlendTreeNode* m_animBlendTree;
+	ndAiQuadrupedTestWalkSequence m_walkSequence;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_1);
 

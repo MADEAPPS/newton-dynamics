@@ -19,9 +19,9 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndAnimationPose.h"
-#include "ndAnimationSequence.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
+#include "ndAnimationSequenceBase.h"
 #include "ndAnimationSequencePlayer.h"
 
 class ndAiQuadrupedTest_3_Definition

@@ -16,22 +16,22 @@
 #include "ndAnimationBlendTreeNode.h"
 
 class ndAnimPose;
-class ndAnimationSequence;
+class ndAnimationSequenceBase;
 
 class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 {
 	public:
-	ndAnimationSequencePlayer(ndAnimationSequence* const sequence);
+	ndAnimationSequencePlayer(ndAnimationSequenceBase* const sequence);
 	virtual ~ndAnimationSequencePlayer();
 
 	virtual void Evaluate(ndAnimationPose& output);
 
 	ndFloat32 GetParam() const;
 	void SetParam(ndFloat32 param);
-	ndAnimationSequence* GetSequence();
+	ndAnimationSequenceBase* GetSequence();
 
 	private:
-	ndAnimationSequence* m_sequence;
+	ndAnimationSequenceBase* m_sequence;
 	ndFloat32 m_param;
 };
 
