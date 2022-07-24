@@ -78,10 +78,10 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		InitParam(m_x0, m_scaleX0, -0.3f, 0.0f, 0.3f, m_midParam);
 		InitParam(m_x1, m_scaleX1, 0.3f, m_midParam, -0.3f, 1.0f);
 
-		m_offsets.PushBack(0.25f);
-		m_offsets.PushBack(0.5f);
 		m_offsets.PushBack(0.0f);
-		m_offsets.PushBack(0.75f);
+		m_offsets.PushBack(0.0f);
+		m_offsets.PushBack(0.0f);
+		m_offsets.PushBack(0.0f);
 	}
 
 	~ndAiQuadrupedTestWalkSequence()
@@ -104,7 +104,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			ndAnimKeyframe& keyFrame = output[i];
 
 			ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-			//if (i != 1)
+			//if (i == 1 || i == 3)
 			//{
 			//	t = 0.0f;
 			//}
@@ -185,7 +185,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_output()
-		,m_walkSequence()
+		,m_walkCycle()
+		,m_trotCycle()
 		,m_effectors()
 	{
 		// make a clone of the mesh and add it to the scene
@@ -293,8 +294,23 @@ class ndAiQuadrupedTest_1 : public ndModel
 		m_param_x0 = -1.0f;
 		m_param_xxxx = ndParamMapper(1.0, 0.0f);
 		m_output.SetCount(4);
-		m_walk = new ndAnimationSequencePlayer(&m_walkSequence);
+		m_walk = new ndAnimationSequencePlayer(&m_walkCycle);
 		m_animBlendTree = m_walk;
+
+		// set walk sequence
+		// front gait, rear gait is a 3/4 delay form the front gait
+		m_walkCycle.m_offsets[1] = 0.5f; // front right leg
+		m_walkCycle.m_offsets[2] = 0.0f; // front left leg
+
+		// rear gait is a 3/4 delay form the front gait
+		m_walkCycle.m_offsets[3] = 0.25f; // rear right leg
+		m_walkCycle.m_offsets[0] = 0.75f; // rear left leg
+		
+		//m_offsets.PushBack(0.25f);
+		//m_offsets.PushBack(0.5f);
+		//m_offsets.PushBack(0.0f);
+		//m_offsets.PushBack(0.75f);
+
 	}
 
 	ndAiQuadrupedTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -303,7 +319,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_output()
-		,m_walkSequence()
+		,m_walkCycle()
+		,m_trotCycle()
 		,m_effectors()
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
@@ -547,7 +564,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 	ndAnimationSequencePlayer* m_walk;
 	ndAnimationBlendTreeNode* m_animBlendTree;
 	ndAnimationPose m_output;
-	ndAiQuadrupedTestWalkSequence m_walkSequence;
+	ndAiQuadrupedTestWalkSequence m_walkCycle;
+	ndAiQuadrupedTestWalkSequence m_trotCycle;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 
 	ndFloat32 m_param_x0;
