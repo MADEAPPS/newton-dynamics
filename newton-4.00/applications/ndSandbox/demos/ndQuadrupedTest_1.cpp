@@ -557,9 +557,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		ndMatrix matrix(m_rootBody->GetMatrix());
-		matrix.m_posit = CalculateCenterOfMass();
-		context.DrawFrame(matrix);
+		ndMatrix comMatrix(m_rootBody->GetMatrix());
+		comMatrix.m_posit = CalculateCenterOfMass();
+		context.DrawFrame(comMatrix);
 
 		ndFixSizeArray<ndVector, 16> contactPoints;
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
@@ -589,11 +589,24 @@ class ndAiQuadrupedTest_1 : public ndModel
 			ndInt32 supportCount = dConvexHull2d(&contactPoints[0], contactPoints.GetCount());
 			rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
 			ndVector p0(contactPoints[supportCount - 1]);
+			ndBigVector bigPolygon[16];
 			for (ndInt32 i = 0; i < supportCount; ++i)
 			{
+				bigPolygon[i] = contactPoints[i];
 				context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
 				p0 = contactPoints[i];
 			}
+
+			ndBigVector p0Out;
+			ndBigVector p1Out;
+			ndBigVector ray_p0(comMatrix.m_posit);
+			ndBigVector ray_p1(comMatrix.m_posit);
+			ray_p1.m_y -= 1.0f;
+
+			dRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+
+			context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+			context.DrawPoint(p1Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 		}
 	}
 
