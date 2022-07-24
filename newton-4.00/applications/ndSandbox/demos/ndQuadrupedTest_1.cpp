@@ -115,9 +115,10 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		,m_midParam(midParam)
 		,m_offsets()
 	{
-		const ndVector p0(-0.3f, 0.0f, 0.0f, 0.0f);
-		const ndVector p1( 0.3f, 0.0f, 0.0f, 0.0f);
-		const ndVector p2(-0.3f, 0.2f, 0.0f, 0.0f);
+		ndFloat32 walkStride = 0.25f;
+		const ndVector p0(-walkStride, 0.0f, 0.0f, 0.0f);
+		const ndVector p1( walkStride, 0.0f, 0.0f, 0.0f);
+		const ndVector p2(-walkStride, 0.1f, 0.0f, 0.0f);
 		m_segment0.Init(p0, p1, 0.0f, m_midParam);
 		m_segment1.Init(p1, p2, m_midParam, 1.0f);
 
@@ -243,7 +244,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_output()
-		,m_walkCycle(0.6f)
+		,m_walkCycle(0.8f)
 		,m_trotCycle(0.4f)
 		,m_effectors()
 	{
@@ -259,13 +260,12 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 1.0f;
+		matrix.m_posit.m_y += 0.8f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
-		ndFixSizeArray<ndBodyDynamic*, 64> bodies;
 		m_rootBody = CreateBodyPart(scene, rootEntity, 1.0f, nullptr);
-		bodies.PushBack(m_rootBody);
+		m_bodyArray.PushBack(m_rootBody);
 		
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
@@ -295,7 +295,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 					if (definition.m_type == ndAiQuadrupedTest_1_Definition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, 1.0f, parentBody);
-						bodies.PushBack(childBody);
+						m_bodyArray.PushBack(childBody);
 
 						const ndMatrix pivotMatrix(childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
@@ -344,7 +344,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 			}
 		}
 
-		SetModelMass(bodies, 100.0f);
+		SetModelMass(100.0f);
 
 		m_param_x0 = -1.0f;
 		m_param_xxxx = ndParamMapper(1.0, 0.0f);
@@ -359,7 +359,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_output()
-		,m_walkCycle(0.6f)
+		,m_walkCycle(0.75f)
 		,m_trotCycle(0.4f)
 		,m_effectors()
 	{
@@ -407,20 +407,20 @@ class ndAiQuadrupedTest_1 : public ndModel
 		}
 	}
 
-	void SetModelMass(const ndFixSizeArray<ndBodyDynamic*, 64>& bodies, ndFloat32 mass) const
+	void SetModelMass(ndFloat32 mass) const
 	{
 		ndFloat32 volumeRatio = 0.02f;
 		ndFloat32 maxVolume = -1.0e10f;
-		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 		{
-			ndFloat32 volume = bodies[i]->GetCollisionShape().GetVolume();
+			ndFloat32 volume = m_bodyArray[i]->GetCollisionShape().GetVolume();
 			maxVolume = ndMax(maxVolume, volume);
 		}
 
 		ndFloat32 totalVolume = 0.0f;
-		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 		{
-			ndFloat32 volume = bodies[i]->GetCollisionShape().GetVolume();
+			ndFloat32 volume = m_bodyArray[i]->GetCollisionShape().GetVolume();
 			if (volume < volumeRatio * maxVolume)
 			{
 				volume = volumeRatio * maxVolume;
@@ -430,9 +430,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 		ndFloat32 density = mass / totalVolume;
 
-		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 		{
-			ndBodyDynamic* const body = bodies[i];
+			ndBodyDynamic* const body = m_bodyArray[i];
 			ndFloat32 volume = body->GetCollisionShape().GetVolume();
 			if (volume < volumeRatio * maxVolume)
 			{
@@ -537,13 +537,62 @@ class ndAiQuadrupedTest_1 : public ndModel
 		return m_rootBody;
 	}
 
+	ndVector CalculateCenterOfMass() const
+	{
+		ndFloat32 toltalMass = 0.0f;
+		ndVector com(ndVector::m_zero);
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
+		{
+			ndBodyDynamic* const body = m_bodyArray[i];
+			ndFloat32 mass = body->GetMassMatrix().m_w;
+			ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+			com += comMass.Scale(mass);
+			toltalMass += mass;
+		}
+		com = com.Scale(1.0f / toltalMass);
+		com.m_w = 1.0f;
+		return com;
+	}
+
+
 	void Debug(ndConstraintDebugCallback& context) const
 	{
+		ndMatrix matrix(m_rootBody->GetMatrix());
+		matrix.m_posit = CalculateCenterOfMass();
+		context.DrawFrame(matrix);
+
+		ndFixSizeArray<ndVector, 16> contactPoints;
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const joint = info.m_effector;
-			joint->DebugJoint(context);
+			ndBodyKinematic* const body = joint->GetBody0();
+			const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			for (it.Begin(); it; it++)
+			{
+				const ndContact* const contact = *it;
+				if (contact->IsActive())
+				{
+					const ndContactPointList& contactMap = contact->GetContactPoints();
+					contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
+				}
+			}
+		//	joint->DebugJoint(context);
+		}
+
+		if (contactPoints.GetCount() >= 3)
+		{
+			ndMatrix rotation(dPitchMatrix(90.0f * ndDegreeToRad));
+			rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+			ndInt32 supportCount = dConvexHull2d(&contactPoints[0], contactPoints.GetCount());
+			rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+			ndVector p0(contactPoints[supportCount - 1]);
+			for (ndInt32 i = 0; i < supportCount; ++i)
+			{
+				context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
+				p0 = contactPoints[i];
+			}
 		}
 	}
 
@@ -580,7 +629,13 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
+		static ndFloat32 xxxx = 0.0f;
+		xxxx = ndMod (xxxx + timestep * 0.02f, 1.0f);
+
+		//m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
+
+		m_rootBody->SetSleepState(false);
+		m_walk->SetParam(1.0f - xxxx);
 		m_animBlendTree->Evaluate(m_output);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
@@ -607,6 +662,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 	ndAiQuadrupedTestWalkSequence m_walkCycle;
 	ndAiQuadrupedTestWalkSequence m_trotCycle;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
+	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 
 	ndFloat32 m_param_x0;
 	ndParamMapper m_param_xxxx;
@@ -646,7 +702,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_1::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
