@@ -70,11 +70,11 @@ static ndAiQuadrupedTest_1_Definition jointsDefinition[] =
 class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 {
 	public:
-	ndAiQuadrupedTestWalkSequence()
+	ndAiQuadrupedTestWalkSequence(ndFloat32 midParam)
 		:ndAnimationSequenceBase()
 		,m_offsets()
 	{
-		m_midParam = 0.6f;
+		m_midParam = midParam;
 		InitParam(m_x0, m_scaleX0, -0.3f, 0.0f, 0.3f, m_midParam);
 		InitParam(m_x1, m_scaleX1, 0.3f, m_midParam, -0.3f, 1.0f);
 
@@ -82,11 +82,36 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		m_offsets.PushBack(0.0f);
 		m_offsets.PushBack(0.0f);
 		m_offsets.PushBack(0.0f);
+
+		if (m_midParam > 0.5f)
+		{
+			// set walk sequence gait offset
+
+			// front gait, left leg is 1/2 offset form the right leg
+			m_offsets[1] = 0.5f; // front right leg
+			m_offsets[2] = 0.0f; // front left leg
+
+			// rear gait is a 3/4 delay form the front gait
+			m_offsets[3] = 0.25f; // rear right leg
+			m_offsets[0] = 0.75f; // rear left leg
+		}
+		else
+		{
+			// set trot sequence offset
+
+			// front gait, left leg is 1/2 offset form the right leg
+			m_offsets[1] = 0.5f; // front right leg
+			m_offsets[2] = 0.0f; // front left leg
+
+			// rear gait is a 1/2 delay form the front gait
+			m_offsets[3] = 0.0f; // rear right leg
+			m_offsets[0] = 0.5f; // rear left leg
+		}
+
 	}
 
 	~ndAiQuadrupedTestWalkSequence()
 	{
-
 	}
 
 	void InitParam(ndFloat32& b, ndFloat32& a, ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1) const
@@ -185,8 +210,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_output()
-		,m_walkCycle()
-		,m_trotCycle()
+		,m_walkCycle(0.6f)
+		,m_trotCycle(0.4f)
 		,m_effectors()
 	{
 		// make a clone of the mesh and add it to the scene
@@ -296,21 +321,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		m_output.SetCount(4);
 		m_walk = new ndAnimationSequencePlayer(&m_walkCycle);
 		m_animBlendTree = m_walk;
-
-		// set walk sequence
-		// front gait, rear gait is a 3/4 delay form the front gait
-		m_walkCycle.m_offsets[1] = 0.5f; // front right leg
-		m_walkCycle.m_offsets[2] = 0.0f; // front left leg
-
-		// rear gait is a 3/4 delay form the front gait
-		m_walkCycle.m_offsets[3] = 0.25f; // rear right leg
-		m_walkCycle.m_offsets[0] = 0.75f; // rear left leg
-		
-		//m_offsets.PushBack(0.25f);
-		//m_offsets.PushBack(0.5f);
-		//m_offsets.PushBack(0.0f);
-		//m_offsets.PushBack(0.75f);
-
 	}
 
 	ndAiQuadrupedTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -319,8 +329,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
 		,m_output()
-		,m_walkCycle()
-		,m_trotCycle()
+		,m_walkCycle(0.6f)
+		,m_trotCycle(0.4f)
 		,m_effectors()
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
