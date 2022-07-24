@@ -74,6 +74,10 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_offsets()
 	{
+		m_offsets.PushBack(0.25f);
+		m_offsets.PushBack(0.5f);
+		m_offsets.PushBack(0.0f);
+		m_offsets.PushBack(0.75f);
 	}
 
 	~ndAiQuadrupedTestWalkSequence()
@@ -83,7 +87,19 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 
 	void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 	{
+		dAssert(output.GetCount() == m_offsets.GetCount());
+		for (ndInt32 i = 0; i < m_offsets.GetCount(); ++i)
+		{
+			ndAnimKeyframe& keyFrame = output[i];
 
+			ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
+			t = t * 2.0f - 1.0f;
+			keyFrame.m_posit.m_x = t * 0.5f;
+			keyFrame.m_posit.m_y = 0.0f;
+			keyFrame.m_posit.m_z = 0.0f;
+			keyFrame.m_posit.m_w = 1.0f;
+			keyFrame.m_rotation = ndQuaternion();
+		}
 	}
 
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
@@ -154,8 +170,11 @@ class ndAiQuadrupedTest_1 : public ndModel
 	ndAiQuadrupedTest_1(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
 		,m_rootBody(nullptr)
-		,m_effectors()
+		,m_walk(nullptr)
+		,m_animBlendTree(nullptr)
+		,m_output()
 		,m_walkSequence()
+		,m_effectors()
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -169,7 +188,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 0.75f;
+		matrix.m_posit.m_y += 1.0f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
@@ -259,15 +278,19 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 		SetModelMass(bodies, 100.0f);
 
-		ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(&m_walkSequence);
-		m_animBlendTree = walk;
+		m_output.SetCount(4);
+		m_walk = new ndAnimationSequencePlayer(&m_walkSequence);
+		m_animBlendTree = m_walk;
 	}
 
 	ndAiQuadrupedTest_1(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_rootBody(nullptr)
-		,m_effectors()
+		,m_walk(nullptr)
 		,m_animBlendTree(nullptr)
+		,m_output()
+		,m_walkSequence()
+		,m_effectors()
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -495,16 +518,30 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale (-1.0f));
-		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		//{
+		//	ndEffectorInfo& info = m_effectors[i];
+		//	ndVector posit(info.m_basePosition);
+		//	posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+		//	posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+		//	posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+		//	info.m_effector->SetPosition(posit);
+		//}
+
+		m_rootBody->SetSleepState(false);
+		m_walk->SetParam(0.0f);
+		m_animBlendTree->Evaluate(m_output);
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
 			ndEffectorInfo& info = m_effectors[i];
+			const ndAnimKeyframe& keyFrame = m_output[i];
 			ndVector posit(info.m_basePosition);
-			posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-			posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-			posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+			posit.m_x += keyFrame.m_posit.m_x;
+			posit.m_y += keyFrame.m_posit.m_y;
+			posit.m_z += keyFrame.m_posit.m_z;
 			info.m_effector->SetPosition(posit);
 		}
+
 	}
 
 	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
@@ -514,10 +551,11 @@ class ndAiQuadrupedTest_1 : public ndModel
 	}
 
 	ndBodyDynamic* m_rootBody;
-	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
-
+	ndAnimationSequencePlayer* m_walk;
 	ndAnimationBlendTreeNode* m_animBlendTree;
+	ndAnimationPose m_output;
 	ndAiQuadrupedTestWalkSequence m_walkSequence;
+	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_1);
 
@@ -554,7 +592,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_1::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
