@@ -74,6 +74,9 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_offsets()
 	{
+		InitParam(m_x0, m_scaleX0, -0.3f, 0.0f, 0.3f, 0.5f);
+		InitParam(m_x1, m_scaleX1, 0.3f, 0.5f, -0.3f, 1.0f);
+
 		m_offsets.PushBack(0.25f);
 		m_offsets.PushBack(0.5f);
 		m_offsets.PushBack(0.0f);
@@ -85,6 +88,13 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 
 	}
 
+	void InitParam(ndFloat32& b, ndFloat32& a, ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1) const
+	{
+		ndFloat32 den = t1 - t0;
+		a = (x1 - x0) / den;
+		b = (x0 * t1 - x1 * t0) / den;
+	}
+
 	void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 	{
 		dAssert(output.GetCount() == m_offsets.GetCount());
@@ -93,8 +103,8 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			ndAnimKeyframe& keyFrame = output[i];
 
 			ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-			t = t * 2.0f - 1.0f;
-			keyFrame.m_posit.m_x = t * 0.5f;
+			ndFloat32 x = (t <= 0.5f) ? m_x0 + m_scaleX0 * t : m_x1 + m_scaleX1 * t;
+			keyFrame.m_posit.m_x = x;
 			keyFrame.m_posit.m_y = 0.0f;
 			keyFrame.m_posit.m_z = 0.0f;
 			keyFrame.m_posit.m_w = 1.0f;
@@ -102,6 +112,10 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		}
 	}
 
+	ndFloat32 m_x0;
+	ndFloat32 m_x1;
+	ndFloat32 m_scaleX0;
+	ndFloat32 m_scaleX1;
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
 };
 
@@ -142,29 +156,17 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndEffectorInfo()
 			:m_basePosition(ndVector::m_wOne)
 			,m_effector(nullptr)
-			,m_x(0.0f)
-			,m_y(0.0f)
-			,m_z(0.0f)
 		{
 		}
 
 		ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
 			:m_basePosition(effector->GetPosition())
 			,m_effector(effector)
-			,m_x(0.0f)
-			,m_y(0.0f)
-			,m_z(0.0f)
 		{
 		}
 
 		ndVector m_basePosition;
 		ndIkSwivelPositionEffector* m_effector;
-		ndReal m_x;
-		ndReal m_y;
-		ndReal m_z;
-		ndParamMapper m_x_mapper;
-		ndParamMapper m_y_mapper;
-		ndParamMapper m_z_mapper;
 	};
 
 	ndAiQuadrupedTest_1(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
@@ -259,9 +261,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
-						info.m_x_mapper = ndParamMapper(-0.3f, 0.3f);
-						info.m_y_mapper = ndParamMapper(-0.05f, 0.6f);
-						info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
+						//info.m_x_mapper = ndParamMapper(-0.3f, 0.3f);
+						//info.m_y_mapper = ndParamMapper(-0.05f, 0.6f);
+						//info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
 						m_effectors.PushBack(info);
 					}
 					break;
@@ -278,6 +280,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 		SetModelMass(bodies, 100.0f);
 
+		m_param_x0 = -1.0f;
+		m_param_xxxx = ndParamMapper(0.0, 1.0f);
 		m_output.SetCount(4);
 		m_walk = new ndAnimationSequencePlayer(&m_walkSequence);
 		m_animBlendTree = m_walk;
@@ -491,26 +495,17 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Control panel");
 
-		ndEffectorInfo& info = m_effectors[0];
-
 		bool change = false;
 		ImGui::Text("position x");
-		change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
-		ImGui::Text("position y");
-		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-		ImGui::Text("position z");
-		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##x", &m_param_x0, -1.0f, 1.0f);
+		//ImGui::Text("position y");
+		//change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+		//ImGui::Text("position z");
+		//change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
 
 		if (change)
 		{
 			m_rootBody->SetSleepState(false);
-
-			for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
-			{
-				m_effectors[i].m_x = info.m_x;
-				m_effectors[i].m_y = info.m_y;
-				m_effectors[i].m_z = info.m_z;
-			}
 		}
 	}
 
@@ -518,20 +513,10 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		//{
-		//	ndEffectorInfo& info = m_effectors[i];
-		//	ndVector posit(info.m_basePosition);
-		//	posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-		//	posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-		//	posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-		//	info.m_effector->SetPosition(posit);
-		//}
-
-		m_rootBody->SetSleepState(false);
-		m_walk->SetParam(0.0f);
+		m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
 		m_animBlendTree->Evaluate(m_output);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
+		//for (ndInt32 i = 1; i < 2; i++)
 		{
 			ndEffectorInfo& info = m_effectors[i];
 			const ndAnimKeyframe& keyFrame = m_output[i];
@@ -541,7 +526,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 			posit.m_z += keyFrame.m_posit.m_z;
 			info.m_effector->SetPosition(posit);
 		}
-
 	}
 
 	static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
@@ -556,6 +540,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 	ndAnimationPose m_output;
 	ndAiQuadrupedTestWalkSequence m_walkSequence;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
+
+	ndFloat32 m_param_x0;
+	ndParamMapper m_param_xxxx;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_1);
 
