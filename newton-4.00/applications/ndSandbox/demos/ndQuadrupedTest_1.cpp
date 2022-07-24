@@ -574,8 +574,9 @@ class ndAiQuadrupedTest_1 : public ndModel
 				const ndContact* const contact = *it;
 				if (contact->IsActive())
 				{
-					const ndContactPointList& contactMap = contact->GetContactPoints();
-					contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
+					//const ndContactPointList& contactMap = contact->GetContactPoints();
+					//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
+					contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
 				}
 			}
 		//	joint->DebugJoint(context);
