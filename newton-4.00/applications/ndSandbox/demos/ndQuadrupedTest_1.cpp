@@ -74,8 +74,9 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_offsets()
 	{
-		InitParam(m_x0, m_scaleX0, -0.3f, 0.0f, 0.3f, 0.5f);
-		InitParam(m_x1, m_scaleX1, 0.3f, 0.5f, -0.3f, 1.0f);
+		m_midParam = 0.6f;
+		InitParam(m_x0, m_scaleX0, -0.3f, 0.0f, 0.3f, m_midParam);
+		InitParam(m_x1, m_scaleX1, 0.3f, m_midParam, -0.3f, 1.0f);
 
 		m_offsets.PushBack(0.25f);
 		m_offsets.PushBack(0.5f);
@@ -103,7 +104,15 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			ndAnimKeyframe& keyFrame = output[i];
 
 			ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-			ndFloat32 x = (t <= 0.5f) ? m_x0 + m_scaleX0 * t : m_x1 + m_scaleX1 * t;
+			//if (i != 1)
+			//{
+			//	t = 0.0f;
+			//}
+			//else
+			//{
+			//	t *= 1;
+			//}
+			ndFloat32 x = (t <= m_midParam) ? m_x0 + m_scaleX0 * t : m_x1 + m_scaleX1 * t;
 			keyFrame.m_posit.m_x = x;
 			keyFrame.m_posit.m_y = 0.0f;
 			keyFrame.m_posit.m_z = 0.0f;
@@ -116,6 +125,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 	ndFloat32 m_x1;
 	ndFloat32 m_scaleX0;
 	ndFloat32 m_scaleX1;
+	ndFloat32 m_midParam;
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
 };
 
@@ -281,7 +291,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		SetModelMass(bodies, 100.0f);
 
 		m_param_x0 = -1.0f;
-		m_param_xxxx = ndParamMapper(0.0, 1.0f);
+		m_param_xxxx = ndParamMapper(1.0, 0.0f);
 		m_output.SetCount(4);
 		m_walk = new ndAnimationSequencePlayer(&m_walkSequence);
 		m_animBlendTree = m_walk;
@@ -516,7 +526,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
 		m_animBlendTree->Evaluate(m_output);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
-		//for (ndInt32 i = 1; i < 2; i++)
 		{
 			ndEffectorInfo& info = m_effectors[i];
 			const ndAnimKeyframe& keyFrame = m_output[i];
@@ -579,7 +588,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_1::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
