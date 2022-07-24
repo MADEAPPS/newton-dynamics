@@ -76,6 +76,8 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		ndSegment()
 			:m_a(ndVector::m_zero)
 			,m_b(ndVector::m_zero)
+			,m_t0(0.0f)
+			,m_perimeter(0.0f)
 		{
 		}
 
@@ -84,17 +86,26 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			ndFloat32 den = t1 - t0;
 			m_a.m_x = (p1.m_x - p0.m_x) / den;
 			m_b.m_x = (p0.m_x * t1 - p1.m_x * t0) / den;
+
+			m_b.m_y = 0.0f;
+			m_a.m_y = p1.m_y;
+			
+			m_t0 = t0;
+			m_perimeter = ndPi / den;
 		}
 
 		ndVector Interpolate(ndFloat32 t) const
 		{
 			ndVector point(m_b);
 			point.m_x += m_a.m_x * t;
+			point.m_y += m_a.m_y * ndSin (m_perimeter * (t - m_t0));
 			return point;
 		}
 
 		ndVector m_a;
 		ndVector m_b;
+		ndFloat32 m_t0;
+		ndFloat32 m_perimeter;
 	};
 
 	ndAiQuadrupedTestWalkSequence(ndFloat32 midParam)
@@ -106,8 +117,9 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 	{
 		const ndVector p0(-0.3f, 0.0f, 0.0f, 0.0f);
 		const ndVector p1( 0.3f, 0.0f, 0.0f, 0.0f);
+		const ndVector p2(-0.3f, 0.2f, 0.0f, 0.0f);
 		m_segment0.Init(p0, p1, 0.0f, m_midParam);
-		m_segment1.Init(p1, p0, m_midParam, 1.0f);
+		m_segment1.Init(p1, p2, m_midParam, 1.0f);
 
 		m_offsets.PushBack(0.0f);
 		m_offsets.PushBack(0.0f);
@@ -159,7 +171,11 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			ndAnimKeyframe& keyFrame = output[i];
 
 			const ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-			const ndVector posit = (t <= m_midParam) ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t);
+			ndVector posit = (t <= m_midParam) ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t);
+			//if (i != 2)
+			//{
+			//	posit = ndVector::m_zero;
+			//}
 			keyFrame.m_posit = posit;
 			keyFrame.m_rotation = ndQuaternion();
 		}
@@ -630,7 +646,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_1::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
