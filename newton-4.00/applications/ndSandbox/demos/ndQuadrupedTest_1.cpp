@@ -70,13 +70,44 @@ static ndAiQuadrupedTest_1_Definition jointsDefinition[] =
 class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 {
 	public:
+	class ndSegment
+	{
+		public:
+		ndSegment()
+			:m_a(ndVector::m_zero)
+			,m_b(ndVector::m_zero)
+		{
+		}
+
+		void Init(const ndVector& p0, const ndVector& p1, ndFloat32 t0, ndFloat32 t1)
+		{
+			ndFloat32 den = t1 - t0;
+			m_a.m_x = (p1.m_x - p0.m_x) / den;
+			m_b.m_x = (p0.m_x * t1 - p1.m_x * t0) / den;
+		}
+
+		ndVector Interpolate(ndFloat32 t) const
+		{
+			ndVector point(m_b);
+			point.m_x += m_a.m_x * t;
+			return point;
+		}
+
+		ndVector m_a;
+		ndVector m_b;
+	};
+
 	ndAiQuadrupedTestWalkSequence(ndFloat32 midParam)
 		:ndAnimationSequenceBase()
+		,m_segment0()
+		,m_segment1()
+		,m_midParam(midParam)
 		,m_offsets()
 	{
-		m_midParam = midParam;
-		InitParam(m_x0, m_scaleX0, -0.3f, 0.0f, 0.3f, m_midParam);
-		InitParam(m_x1, m_scaleX1, 0.3f, m_midParam, -0.3f, 1.0f);
+		const ndVector p0(-0.3f, 0.0f, 0.0f, 0.0f);
+		const ndVector p1( 0.3f, 0.0f, 0.0f, 0.0f);
+		m_segment0.Init(p0, p1, 0.0f, m_midParam);
+		m_segment1.Init(p1, p0, m_midParam, 1.0f);
 
 		m_offsets.PushBack(0.0f);
 		m_offsets.PushBack(0.0f);
@@ -107,7 +138,6 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			m_offsets[3] = 0.0f; // rear right leg
 			m_offsets[0] = 0.5f; // rear left leg
 		}
-
 	}
 
 	~ndAiQuadrupedTestWalkSequence()
@@ -128,28 +158,15 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		{
 			ndAnimKeyframe& keyFrame = output[i];
 
-			ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-			//if (i == 1 || i == 3)
-			//{
-			//	t = 0.0f;
-			//}
-			//else
-			//{
-			//	t *= 1;
-			//}
-			ndFloat32 x = (t <= m_midParam) ? m_x0 + m_scaleX0 * t : m_x1 + m_scaleX1 * t;
-			keyFrame.m_posit.m_x = x;
-			keyFrame.m_posit.m_y = 0.0f;
-			keyFrame.m_posit.m_z = 0.0f;
-			keyFrame.m_posit.m_w = 1.0f;
+			const ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
+			const ndVector posit = (t <= m_midParam) ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t);
+			keyFrame.m_posit = posit;
 			keyFrame.m_rotation = ndQuaternion();
 		}
 	}
 
-	ndFloat32 m_x0;
-	ndFloat32 m_x1;
-	ndFloat32 m_scaleX0;
-	ndFloat32 m_scaleX1;
+	ndSegment m_segment0;
+	ndSegment m_segment1;
 	ndFloat32 m_midParam;
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
 };
@@ -297,9 +314,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
-						//info.m_x_mapper = ndParamMapper(-0.3f, 0.3f);
-						//info.m_y_mapper = ndParamMapper(-0.05f, 0.6f);
-						//info.m_z_mapper = ndParamMapper(-0.2f, 0.2f);
 						m_effectors.PushBack(info);
 					}
 					break;
