@@ -23,7 +23,6 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 
-
 ndDeepBrain::ndDeepBrain()
 	:ndClassAlloc()
 	,m_layers()
@@ -35,5 +34,12 @@ ndDeepBrain::~ndDeepBrain()
 	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
 	{
 		dAssert(0);
+		delete m_layers[i];
 	}
+}
+
+void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ndType type)
+{
+	ndDeepBrainLayer* const layer = new ndDeepBrainLayer(inputs, outputs, type);
+	m_layers.PushBack(layer);
 }

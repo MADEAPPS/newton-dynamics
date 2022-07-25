@@ -19,24 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_H__
-#define _ND_DEEP_BRAIN_H__
-
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
 
-class ndDeepBrain: public ndClassAlloc
+ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndType type)
+	:ndClassAlloc()
+	,m_type(type)
+	,m_ouputs()
+	,m_neurons()
 {
-	public: 
-	ndDeepBrain();
-	~ndDeepBrain();
+	m_ouputs.SetCount(outputCount);
+	for (ndInt32 i = 0; i < outputCount; ++i)
+	{
+		ndDeepBrainNeuron* const neuron = new ndDeepBrainNeuron(inputCount);
+		m_neurons.PushBack(neuron);
+	}
+}
 
-	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ndType type);
-
-	protected:
-	ndArray<ndDeepBrainLayer*> m_layers;
-};
-
-
-#endif 
-
+ndDeepBrainLayer::~ndDeepBrainLayer()
+{
+	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	{
+		dAssert(0);
+		delete m_neurons[i];
+	}
+}

@@ -19,22 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_H__
-#define _ND_DEEP_BRAIN_H__
+#ifndef _ND_DEEP_BRAIN_VECTOR_H__
+#define _ND_DEEP_BRAIN_VECTOR_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainLayer.h"
+#include "ndDeepBrainVector.h"
 
-class ndDeepBrain: public ndClassAlloc
+class ndDeepBrainVector: public ndArray<ndFloat32> 
 {
 	public: 
-	ndDeepBrain();
-	~ndDeepBrain();
-
-	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ndType type);
-
-	protected:
-	ndArray<ndDeepBrainLayer*> m_layers;
+	ndDeepBrainVector();
+	~ndDeepBrainVector();
 };
 
 

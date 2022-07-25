@@ -554,7 +554,6 @@ class ndAiQuadrupedTest_1 : public ndModel
 		return com;
 	}
 
-
 	void Debug(ndConstraintDebugCallback& context) const
 	{
 		ndMatrix comMatrix(m_rootBody->GetMatrix());
