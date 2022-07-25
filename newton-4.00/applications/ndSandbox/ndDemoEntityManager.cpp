@@ -26,8 +26,9 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndDemoCameraManager.h"
+#include "ndAnimationSequence.h"
 #include "ndHighResolutionTimer.h"
-#include "ndAnimationSequenceBase.h"
+
 
 //#define ENABLE_REPLAY
 #ifdef ENABLE_REPLAY
@@ -48,14 +49,14 @@
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-//#define DEFAULT_SCENE	12		// biped test 1
+#define DEFAULT_SCENE	12		// biped test 1
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
 //#define DEFAULT_SCENE	16		// background vehicle prop
 //#define DEFAULT_SCENE	17		// simple industrial robot
 //#define DEFAULT_SCENE	18		// advanced industrial robot
-#define DEFAULT_SCENE	19		// quadruped test 1
+//#define DEFAULT_SCENE	19		// quadruped test 1
 //#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
 //#define DEFAULT_SCENE	22		// simple voronoi fracture

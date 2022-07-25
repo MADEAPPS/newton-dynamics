@@ -31,7 +31,8 @@ class ndDeepBrain: public ndClassAlloc
 	ndDeepBrain();
 	~ndDeepBrain();
 
-	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ndType type);
+	void AddLayer(ndDeepBrainLayer* const layer);
+	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
 
 	protected:
 	ndArray<ndDeepBrainLayer*> m_layers;

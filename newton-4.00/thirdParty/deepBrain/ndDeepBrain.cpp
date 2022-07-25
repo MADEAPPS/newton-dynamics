@@ -38,8 +38,12 @@ ndDeepBrain::~ndDeepBrain()
 	}
 }
 
-void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ndType type)
+void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
-	ndDeepBrainLayer* const layer = new ndDeepBrainLayer(inputs, outputs, type);
 	m_layers.PushBack(layer);
+}
+
+void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ActivationType type)
+{
+	AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
 }

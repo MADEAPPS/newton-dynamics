@@ -29,16 +29,18 @@
 class ndDeepBrainLayer: public ndClassAlloc
 {
 	public: 
-	enum ndType
+	enum ActivationType
 	{
 		m_relu,
+		m_tanh,
+		m_sigmoid
 	};
 
-	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ndType type);
-	~ndDeepBrainLayer();
+	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ActivationType type);
+	virtual ~ndDeepBrainLayer();
 
 	protected:
-	ndType m_type;
+	ActivationType m_type;
 	ndDeepBrainVector m_ouputs;
 	ndArray<ndDeepBrainNeuron*> m_neurons;
 };

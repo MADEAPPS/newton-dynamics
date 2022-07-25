@@ -364,7 +364,7 @@ class ndAiBipedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
+		const ndVector frontVector(m_rootBody->GetMatrix().m_front);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndEffectorInfo& info = m_effectors[i];
