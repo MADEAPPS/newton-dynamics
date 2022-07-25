@@ -644,7 +644,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndModel::Update(world, timestep);
 
 		static ndFloat32 xxxx = 0.0f;
-		xxxx = ndMod (xxxx + timestep * 0.02f, 1.0f);
+		//xxxx = ndMod (xxxx + timestep * 0.02f, 1.0f);
+		xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
 
 		//m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
 
