@@ -114,6 +114,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		,m_segment1()
 		,m_midParam(midParam)
 		,m_offsets()
+		,m_isGrounded()
 	{
 		ndFloat32 walkStride = 0.25f;
 		const ndVector p0(-walkStride, 0.0f, 0.0f, 0.0f);
@@ -122,6 +123,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		m_segment0.Init(p0, p1, 0.0f, m_midParam);
 		m_segment1.Init(p1, p2, m_midParam, 1.0f);
 
+		m_isGrounded.SetCount(4);
 		m_offsets.PushBack(0.0f);
 		m_offsets.PushBack(0.0f);
 		m_offsets.PushBack(0.0f);
@@ -172,7 +174,8 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			ndAnimKeyframe& keyFrame = output[i];
 
 			const ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
-			ndVector posit = (t <= m_midParam) ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t);
+			m_isGrounded[i] = t <= m_midParam;
+			ndVector posit = m_isGrounded[i] ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t);
 			//if (i != 2)
 			//{
 			//	posit = ndVector::m_zero;
@@ -186,6 +189,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 	ndSegment m_segment1;
 	ndFloat32 m_midParam;
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
+	mutable ndFixSizeArray<bool, 4> m_isGrounded;
 };
 
 class ndAiQuadrupedTest_1 : public ndModel
@@ -563,21 +567,29 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndFixSizeArray<ndVector, 16> contactPoints;
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
-			const ndEffectorInfo& info = m_effectors[i];
-			ndJointBilateralConstraint* const joint = info.m_effector;
-			ndBodyKinematic* const body = joint->GetBody0();
-			const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-			ndBodyKinematic::ndContactMap::Iterator it(contacts);
-			for (it.Begin(); it; it++)
+			//const ndEffectorInfo& info = m_effectors[i];
+			//ndJointBilateralConstraint* const joint = info.m_effector;
+			//ndBodyKinematic* const body = joint->GetBody0();
+			//const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			//ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			//for (it.Begin(); it; it++)
+			//{
+			//	const ndContact* const contact = *it;
+			//	if (contact->IsActive())
+			//	{
+			//		//const ndContactPointList& contactMap = contact->GetContactPoints();
+			//		//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
+			//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
+			//	}
+			//}
+			if (m_walkCycle.m_isGrounded[i])
 			{
-				const ndContact* const contact = *it;
-				if (contact->IsActive())
-				{
-					//const ndContactPointList& contactMap = contact->GetContactPoints();
-					//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
-					contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
-				}
+				const ndEffectorInfo& info = m_effectors[i];
+				ndJointBilateralConstraint* const joint = info.m_effector;
+				ndBodyKinematic* const body = joint->GetBody0();
+				contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
 			}
+
 		//	joint->DebugJoint(context);
 		}
 
@@ -605,7 +617,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 			dRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
 
 			context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-			context.DrawPoint(p1Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+			context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
 		}
 	}
 
@@ -643,8 +655,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndModel::Update(world, timestep);
 
 		static ndFloat32 xxxx = 0.0f;
-		//xxxx = ndMod (xxxx + timestep * 0.02f, 1.0f);
-		xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
+		xxxx = ndMod (xxxx + timestep * 0.01f, 1.0f);
+		//xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
 
 		//m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
 
