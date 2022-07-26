@@ -350,7 +350,8 @@ class ndAiQuadrupedTest_1 : public ndModel
 		SetModelMass(100.0f);
 
 		m_param_x0 = -1.0f;
-		m_param_xxxx = ndParamMapper(1.0, 0.0f);
+		m_param_xxxx = ndParamMapper(0.0, 0.75f);
+
 		m_output.SetCount(4);
 		m_walk = new ndAnimationSequencePlayer(&m_walkCycle);
 		m_animBlendTree = m_walk;
@@ -654,10 +655,11 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndModel::Update(world, timestep);
 
 		static ndFloat32 xxxx = 0.0f;
-		xxxx = ndMod (xxxx + timestep * 0.01f, 1.0f);
-		//xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
 
-		//m_walk->SetParam(m_param_xxxx.Interpolate(m_param_x0));
+		ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
+		xxxx = ndMod (xxxx + timestep * animSpeed, 1.0f);
+		//xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
+		
 
 		m_rootBody->SetSleepState(false);
 		m_walk->SetParam(1.0f - xxxx);
