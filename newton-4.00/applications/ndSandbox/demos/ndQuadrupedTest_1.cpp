@@ -655,11 +655,10 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
+		//m_rootBody->SetSleepState(false);
 		ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
 		m_timer = ndMod (m_timer + timestep * animSpeed, 1.0f);
-		//xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
 
-		m_rootBody->SetSleepState(false);
 		m_walk->SetParam(1.0f - m_timer);
 		m_animBlendTree->Evaluate(m_output);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
