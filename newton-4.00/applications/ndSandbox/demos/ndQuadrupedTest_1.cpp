@@ -349,6 +349,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 		SetModelMass(100.0f);
 
+		m_timer = 0.0f;
 		m_param_x0 = -1.0f;
 		m_param_xxxx = ndParamMapper(0.0, 0.75f);
 
@@ -654,15 +655,12 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		static ndFloat32 xxxx = 0.0f;
-
 		ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
-		xxxx = ndMod (xxxx + timestep * animSpeed, 1.0f);
+		m_timer = ndMod (m_timer + timestep * animSpeed, 1.0f);
 		//xxxx = ndMod(xxxx + timestep * 0.75f, 1.0f);
-		
 
 		m_rootBody->SetSleepState(false);
-		m_walk->SetParam(1.0f - xxxx);
+		m_walk->SetParam(1.0f - m_timer);
 		m_animBlendTree->Evaluate(m_output);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
 		{
@@ -691,6 +689,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 
+	ndFloat32 m_timer;
 	ndFloat32 m_param_x0;
 	ndParamMapper m_param_xxxx;
 };

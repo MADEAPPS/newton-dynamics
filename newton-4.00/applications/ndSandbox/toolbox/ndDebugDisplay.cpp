@@ -18,7 +18,7 @@
 #include "ndDemoEntityManager.h"
 
 #define D_USE_GEOMETRY_SHADERS 
-#define D_TEST_CALCULATE_CONTACTS
+//#define D_TEST_CALCULATE_CONTACTS
 
 #ifndef D_USE_GEOMETRY_SHADERS 
 static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, ndFloat32 x, ndFloat32 y, ndFloat32 w)
