@@ -93,9 +93,11 @@
 #include "ndHacd.h"
 #include "include/VHACD.h"
 
-
 // SDK includes
 #include <ndNewton.h>
+
+#include <ndDeepBrainStdafx.h>
+#include <ndDeepBrain.h>
 
 #ifndef _MSC_VER
 	#ifndef stricmp

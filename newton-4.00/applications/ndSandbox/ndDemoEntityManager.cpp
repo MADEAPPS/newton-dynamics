@@ -29,7 +29,6 @@
 #include "ndAnimationSequence.h"
 #include "ndHighResolutionTimer.h"
 
-
 //#define ENABLE_REPLAY
 #ifdef ENABLE_REPLAY
 	//#define REPLAY_RECORD
@@ -49,14 +48,14 @@
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-#define DEFAULT_SCENE	12		// biped test 1
-//#define DEFAULT_SCENE	13		// active rag doll
-//#define DEFAULT_SCENE	14		// basic vehicle
-//#define DEFAULT_SCENE	15		// heavy vehicle
-//#define DEFAULT_SCENE	16		// background vehicle prop
-//#define DEFAULT_SCENE	17		// simple industrial robot
-//#define DEFAULT_SCENE	18		// advanced industrial robot
-//#define DEFAULT_SCENE	19		// quadruped test 1
+//#define DEFAULT_SCENE	12		// basic vehicle
+//#define DEFAULT_SCENE	13		// heavy vehicle
+//#define DEFAULT_SCENE	14		// background vehicle prop
+//#define DEFAULT_SCENE	15		// simple industrial robot
+//#define DEFAULT_SCENE	16		// advanced industrial robot
+//#define DEFAULT_SCENE	17		// biped test 1
+//#define DEFAULT_SCENE	18		// active rag doll
+#define DEFAULT_SCENE	19		// quadruped test 1
 //#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
 //#define DEFAULT_SCENE	22		// simple voronoi fracture
@@ -107,13 +106,13 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
-	{ "biped test one", ndBipedTest },
-	{ "active rag doll", ndBipedTest },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
+	{ "biped test one", ndBipedTest },
+	{ "active rag doll", ndBipedTest },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},
@@ -211,6 +210,11 @@ void Test1__()
 	//	xxxxx.Remove (index);
 	//	xxxxx.Push (xxx, key);
 	//}
+}
+
+void Test2__()
+{
+	ndDeepBrain neuralNet;
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -433,8 +437,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 		#endif
 	#endif
 
-	Test0__();
+	//Test0__();
 	//Test1__();
+	Test2__();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()
