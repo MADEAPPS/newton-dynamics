@@ -699,7 +699,8 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_1);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFlatPlane(scene, true);
+	//BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston_1.fbx");

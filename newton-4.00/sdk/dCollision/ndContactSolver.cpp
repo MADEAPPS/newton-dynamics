@@ -2535,7 +2535,7 @@ ndInt32 ndContactSolver::CalculateContactsDiscrete()
 
 	m_contact->m_timeOfImpact = m_timestep;
 	m_contact->m_separatingVector = m_separatingVector;
-	dAssert(m_separationDistance < ndFloat32(100.0f));
+	dAssert(!count || (m_separationDistance < ndFloat32(100.0f)));
 	m_contact->m_separationDistance = m_separationDistance;
 	return count;
 }
@@ -3232,7 +3232,7 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 		}
 	}
 
-	dAssert(m_separationDistance < ndFloat32(1.0e6f));
+	dAssert(!count || (m_separationDistance < ndFloat32(1.0e6f)));
 	return count;
 }
 
