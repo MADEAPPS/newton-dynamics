@@ -112,6 +112,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_segment0()
 		,m_segment1()
+		,m_xBias(-0.1f)
 		,m_midParam(midParam)
 		,m_offsets()
 		,m_isGrounded()
@@ -175,11 +176,8 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 
 			const ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
 			m_isGrounded[i] = t <= m_midParam;
-			ndVector posit = m_isGrounded[i] ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t);
-			//if (i != 2)
-			//{
-			//	posit = ndVector::m_zero;
-			//}
+			ndVector posit (m_isGrounded[i] ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t));
+			posit.m_x += m_xBias;
 			keyFrame.m_posit = posit;
 			keyFrame.m_rotation = ndQuaternion();
 		}
@@ -187,6 +185,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 
 	ndSegment m_segment0;
 	ndSegment m_segment1;
+	ndFloat32 m_xBias;
 	ndFloat32 m_midParam;
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
 	mutable ndFixSizeArray<bool, 4> m_isGrounded;
