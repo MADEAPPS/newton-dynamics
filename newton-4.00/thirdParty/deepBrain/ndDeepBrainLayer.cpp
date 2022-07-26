@@ -44,3 +44,14 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 		delete m_neurons[i];
 	}
 }
+
+ndInt32 ndDeepBrainLayer::GetInputSize() const
+{
+	ndDeepBrainNeuron* const neuron = m_neurons[0];
+	return neuron->GetWeights().GetCount();
+}
+
+ndArray<ndDeepBrainNeuron*>& ndDeepBrainLayer::GetNeurons()
+{
+	return m_neurons;
+}

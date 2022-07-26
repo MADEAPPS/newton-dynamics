@@ -24,6 +24,7 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
+#include "ndDeepBrainVector.h"
 
 class ndDeepBrain: public ndClassAlloc
 {
@@ -35,6 +36,7 @@ class ndDeepBrain: public ndClassAlloc
 	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
 
 	protected:
+	ndDeepBrainVector m_workingVector;
 	ndArray<ndDeepBrainLayer*> m_layers;
 };
 

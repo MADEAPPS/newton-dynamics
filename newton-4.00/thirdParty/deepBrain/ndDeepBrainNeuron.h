@@ -32,6 +32,8 @@ class ndDeepBrainNeuron : public ndClassAlloc
 	ndDeepBrainNeuron(ndInt32 inputs);
 	~ndDeepBrainNeuron();
 
+	ndDeepBrainVector& GetWeights();
+
 	protected:
 	ndFloat32 m_weight0;
 	ndDeepBrainVector m_weights;

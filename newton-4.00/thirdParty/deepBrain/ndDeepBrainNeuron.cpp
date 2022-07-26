@@ -34,3 +34,8 @@ ndDeepBrainNeuron::ndDeepBrainNeuron(ndInt32 inputs)
 ndDeepBrainNeuron::~ndDeepBrainNeuron()
 {
 }
+
+ndDeepBrainVector& ndDeepBrainNeuron::GetWeights()
+{
+	return m_weights;
+}

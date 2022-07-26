@@ -39,6 +39,9 @@ class ndDeepBrainLayer: public ndClassAlloc
 	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ActivationType type);
 	virtual ~ndDeepBrainLayer();
 
+	ndInt32 GetInputSize() const ;
+	ndArray<ndDeepBrainNeuron*>& GetNeurons();
+
 	protected:
 	ActivationType m_type;
 	ndDeepBrainVector m_ouputs;

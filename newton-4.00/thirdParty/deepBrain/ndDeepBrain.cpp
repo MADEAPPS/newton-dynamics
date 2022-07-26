@@ -22,9 +22,11 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
+#include "ndDeepBrainNeuron.h"
 
 ndDeepBrain::ndDeepBrain()
 	:ndClassAlloc()
+	,m_workingVector()
 	,m_layers()
 {
 }
@@ -40,6 +42,7 @@ ndDeepBrain::~ndDeepBrain()
 
 void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
+	m_workingVector.SetCount(ndMax (layer->GetInputSize(), m_workingVector.GetCount()));
 	m_layers.PushBack(layer);
 }
 
