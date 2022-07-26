@@ -112,7 +112,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_segment0()
 		,m_segment1()
-		,m_xBias(-0.1f)
+		,m_xBias(-0.11f)
 		,m_midParam(midParam)
 		,m_offsets()
 		,m_isGrounded()
