@@ -112,12 +112,13 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_segment0()
 		,m_segment1()
-		,m_xBias(-0.11f)
+		,m_xStride(1.0f)
+		,m_xBias(0.11f)
 		,m_midParam(midParam)
 		,m_offsets()
 		,m_isGrounded()
 	{
-		ndFloat32 walkStride = 0.25f;
+		ndFloat32 walkStride = 0.3f;
 		const ndVector p0(-walkStride, 0.0f, 0.0f, 0.0f);
 		const ndVector p1( walkStride, 0.0f, 0.0f, 0.0f);
 		const ndVector p2(-walkStride, 0.1f, 0.0f, 0.0f);
@@ -177,7 +178,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 			const ndFloat32 t = ndMod(param + m_offsets[i], ndFloat32(1.0f));
 			m_isGrounded[i] = t <= m_midParam;
 			ndVector posit (m_isGrounded[i] ? m_segment0.Interpolate(t) : m_segment1.Interpolate(t));
-			posit.m_x += m_xBias;
+			posit.m_x = posit.m_x * m_xStride - m_xBias;
 			keyFrame.m_posit = posit;
 			keyFrame.m_rotation = ndQuaternion();
 		}
@@ -186,6 +187,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 	ndSegment m_segment0;
 	ndSegment m_segment1;
 	ndFloat32 m_xBias;
+	ndFloat32 m_xStride;
 	ndFloat32 m_midParam;
 	ndFixSizeArray<ndFloat32, 4> m_offsets;
 	mutable ndFixSizeArray<bool, 4> m_isGrounded;
@@ -655,7 +657,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		//m_rootBody->SetSleepState(false);
+		m_rootBody->SetSleepState(false);
 		ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
 		m_timer = ndMod (m_timer + timestep * animSpeed, 1.0f);
 
