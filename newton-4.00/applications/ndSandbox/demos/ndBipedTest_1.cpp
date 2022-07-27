@@ -148,7 +148,7 @@ class ndAiBipedTest_1 : public ndModel
 
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 1.025f;
+		matrix.m_posit.m_y = floor.m_y + 1.03f;
 
 		rootEntity->ResetMatrix(matrix);
 

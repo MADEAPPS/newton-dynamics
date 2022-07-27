@@ -53,9 +53,9 @@
 //#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// simple industrial robot
 //#define DEFAULT_SCENE	16		// advanced industrial robot
-//#define DEFAULT_SCENE	17		// biped test 1
+#define DEFAULT_SCENE	17		// biped test 1
 //#define DEFAULT_SCENE	18		// active rag doll
-#define DEFAULT_SCENE	19		// quadruped test 1
+//#define DEFAULT_SCENE	19		// quadruped test 1
 //#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
 //#define DEFAULT_SCENE	22		// simple voronoi fracture
