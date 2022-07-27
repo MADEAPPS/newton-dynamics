@@ -61,7 +61,7 @@ static ndAiBipedTest_1_Definition mannequinDefinition[] =
 
 	{ "rightLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	//{ "rightFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rightFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalfEffector", ndAiBipedTest_1_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 
 	//{ "leftLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
@@ -213,6 +213,12 @@ class ndAiBipedTest_1 : public ndModel
 						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
 						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+
+						const ndVector kneePoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
+						const ndVector dist0(effectorFrame.m_posit - kneePoint);
+						const ndVector dist1(kneePoint - pivotFrame.m_posit);
+						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
 
 						world->AddJoint(effector);
 
@@ -467,9 +473,9 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	ndWorld* const world = scene->GetWorld();
 	ndAiBipedTest_1* const robot = new ndAiBipedTest_1(scene, robotMesh, matrix, mannequinDefinition);
 	world->AddModel(robot);
-	world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
-
 	scene->Set2DDisplayRenderFunction(ndAiBipedTest_1::ControlPanel, nullptr, robot);
+
+	world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
 
 	delete robotMesh;
 }

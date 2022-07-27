@@ -34,7 +34,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 	CalculateLocalMatrix(swivelFrame, m_localSwivelMatrix0, m_localSwivelMatrix1);
 
 	const ndVector dist2(ndVector::m_triplexMask & m_targetFrame.m_posit);
-	m_maxWorkSpaceRadio = ndFloat32(0.9f) * ndSqrt(dist2.DotProduct(dist2).GetScalar());
+	m_maxWorkSpaceRadio = ndFloat32(0.99f) * ndSqrt(dist2.DotProduct(dist2).GetScalar());
 
 	SetSolverModel(m_jointkinematicCloseLoop);
 }

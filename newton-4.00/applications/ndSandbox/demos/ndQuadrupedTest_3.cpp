@@ -220,9 +220,10 @@ class ndAiQuadrupedTest_3 : public ndModel
 						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
-						ndVector dist0(effectorFrame.m_posit - childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
-						ndVector dist1(childEntity->GetParent()->CalculateGlobalMatrix().m_posit - pivotFrame.m_posit);
-						ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
+						const ndVector dist0(effectorFrame.m_posit - elbowPoint);
+						const ndVector dist1(elbowPoint - pivotFrame.m_posit);
+						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
 
 						world->AddJoint(effector);
