@@ -265,7 +265,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 
-		matrix.m_posit.m_y += 0.8f;
+		matrix.m_posit.m_y += 0.9f;
 		rootEntity->ResetMatrix(matrix);
 
 		// add the root body
@@ -730,7 +730,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 
-	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	scene->Set2DDisplayRenderFunction(ndAiQuadrupedTest_1::ControlPanel, nullptr, robot0);
 
 	matrix.m_posit.m_x -= 5.0f;
