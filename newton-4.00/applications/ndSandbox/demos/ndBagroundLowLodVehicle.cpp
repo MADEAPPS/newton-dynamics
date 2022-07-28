@@ -42,9 +42,9 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 	{
 	}
 
-	ndApplicationMaterial* Clone(const ndApplicationMaterial& src) const
+	ndApplicationMaterial* Clone() const
 	{
-		return new BackgroundLowLodCVehicleMaterial((BackgroundLowLodCVehicleMaterial&)src);
+		return new BackgroundLowLodCVehicleMaterial(*this);
 	}
 
 	virtual void OnContactCallback(const ndContact* const joint, ndFloat32) const

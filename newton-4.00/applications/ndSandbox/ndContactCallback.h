@@ -22,6 +22,7 @@ class ndApplicationMaterial : public ndMaterial
 		m_frictionTest = 1,
 		m_aiCar = 2,
 		m_aiTerrain = 3,
+		m_modelPart = 4,
 		m_dedris = 100,
 	};
 
@@ -34,9 +35,9 @@ class ndApplicationMaterial : public ndMaterial
 	ndApplicationMaterial();
 	ndApplicationMaterial(const ndApplicationMaterial& src);
 
-	virtual ndApplicationMaterial* Clone(const ndApplicationMaterial& src) const
+	virtual ndApplicationMaterial* Clone() const
 	{
-		return new ndApplicationMaterial(src);
+		return new ndApplicationMaterial(*this);
 	}
 
 	virtual bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep) const;

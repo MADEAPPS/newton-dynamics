@@ -531,6 +531,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
 
 		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
 		instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
 		
 		delete shape;
@@ -697,6 +698,61 @@ class ndAiQuadrupedTest_1 : public ndModel
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_1);
 
+class ndAiQuadrupedTest_1_Material : public ndApplicationMaterial
+{
+	public:
+	ndAiQuadrupedTest_1_Material()
+		:ndApplicationMaterial()
+	{
+	}
+
+	ndAiQuadrupedTest_1_Material(const ndAiQuadrupedTest_1_Material& src)
+		:ndApplicationMaterial(src)
+	{
+	}
+
+	ndApplicationMaterial* Clone() const
+	{
+		return new ndAiQuadrupedTest_1_Material(*this);
+	}
+
+	bool OnAabbOverlap(const ndContact* const joint, ndFloat32) const
+	{
+		// filter self collision when the contact is with in the same model
+		const ndBodyKinematic* const body0 = joint->GetBody0();
+		const ndBodyKinematic* const body1 = joint->GetBody1();
+
+		const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+		const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+
+		const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+		const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+		if ((material0.m_userParam[ndContactCallback::m_modelPointer].m_intData == material1.m_userParam[ndContactCallback::m_modelPointer].m_intData) && material0.m_userParam[ndContactCallback::m_modelPointer].m_intData != 0)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	//void OnContactCallback(const ndContact* const joint, ndFloat32) const
+	//{
+	//	if (joint->IsActive())
+	//	{
+	//		const ndContactPointList& contactPoints = joint->GetContactPoints();
+	//		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+	//		{
+	//			ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+	//			// quick hack to show the solution.
+	//			if (contactPoint.m_normal.m_y < 0.999)
+	//			{
+	//				dTrace(("this is when the bug happens\n"));
+	//			}
+	//		}
+	//	}
+	//}
+};
+
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -708,6 +764,11 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
+
+	// register a material for filtering self collisions 
+	ndAiQuadrupedTest_1_Material material;
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndAiQuadrupedTest_1* const robot0 = new ndAiQuadrupedTest_1(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot0);

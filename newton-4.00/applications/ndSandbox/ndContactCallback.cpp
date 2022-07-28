@@ -33,11 +33,6 @@ bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, n
 	const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
 	const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
 
-	if ((material0.m_userParam[ndContactCallback::m_modelPointer].m_intData == material1.m_userParam[ndContactCallback::m_modelPointer].m_intData) && material0.m_userParam[ndContactCallback::m_modelPointer].m_intData != 0)
-	{
-		return false;
-	}
-
 	if ((instanceShape0.GetUserDataID() == ndApplicationMaterial::m_dedris) && (instanceShape1.GetUserDataID() == ndApplicationMaterial::m_dedris))
 	{
 		return false;
@@ -142,7 +137,8 @@ ndApplicationMaterial& ndContactCallback::RegisterMaterial(const ndApplicationMa
 	ndMaterialGraph::ndNode* node = m_materialGraph.Find(key);
 	if (!node)
 	{
-		node = m_materialGraph.Insert(material.Clone(material), key);
+		ndApplicationMaterial* const materialCopy = material.Clone();
+		node = m_materialGraph.Insert(materialCopy, key);
 	}
 	return *node->GetInfo();
 }

@@ -94,14 +94,13 @@ class ndContact: public ndConstraint
 	D_COLLISION_API void AttachToBodies();
 	D_COLLISION_API void DetachFromBodies();
 
-	ndContact* GetAsContact() { return this; }
+	ndContact* GetAsContact();
+	virtual ndUnsigned32 GetRowsCount() const;
 
 	const ndMaterial* GetMaterial() const;
-
-	virtual ndUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
-
+	
 	ndContactPointList& GetContactPoints();
 	const ndContactPointList& GetContactPoints() const;
 
@@ -147,6 +146,11 @@ class ndContact: public ndConstraint
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+inline ndContact* ndContact::GetAsContact()
+{
+	return this;
+}
+
 inline const ndMaterial* ndContact::GetMaterial() const
 {
 	return m_material;
@@ -191,6 +195,7 @@ inline bool ndContact::IsSkeletonIntraCollision() const
 {
 	return m_skeletonIntraCollision ? true : false;
 }
+
 
 #endif 
 

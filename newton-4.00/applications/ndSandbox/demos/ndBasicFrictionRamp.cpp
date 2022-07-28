@@ -36,9 +36,9 @@ class FrictionMaterial : public ndApplicationMaterial
 	{
 	}
 
-	ndApplicationMaterial* Clone(const ndApplicationMaterial& src) const
+	ndApplicationMaterial* Clone() const
 	{
-		return new FrictionMaterial((FrictionMaterial&)src);
+		return new FrictionMaterial(*this);
 	}
 
 	virtual void OnContactCallback(const ndContact* const joint, ndFloat32) const
