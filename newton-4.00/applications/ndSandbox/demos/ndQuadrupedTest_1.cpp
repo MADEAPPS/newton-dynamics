@@ -728,8 +728,12 @@ class ndAiQuadrupedTest_1_Material : public ndApplicationMaterial
 		const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
 		const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
 
-		if ((material0.m_userParam[ndContactCallback::m_modelPointer].m_intData == material1.m_userParam[ndContactCallback::m_modelPointer].m_intData) && material0.m_userParam[ndContactCallback::m_modelPointer].m_intData != 0)
+		ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+		ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+		if (pointer0 == pointer1)
 		{
+			// here we know teh part are form eth same model.
+			// we can apply some more filtering by for now we just desable all self collisions. 
 			return false;
 		}
 		return true;
