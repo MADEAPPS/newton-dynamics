@@ -223,10 +223,10 @@ class ndAiBipedTest_1 : public ndModel
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
-						info.m_x_mapper = ndParamMapper(-0.1f, 0.1f);
-						info.m_y_mapper = ndParamMapper(-0.1f, 0.1f);
-						info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
-						info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+						info.m_x_mapper = ndParamMapper(-0.1f, workSpace * 0.8f);
+						info.m_y_mapper = ndParamMapper(-ndPi, ndPi);
+						info.m_z_mapper = ndParamMapper(-ndPi, ndPi);
+						info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						m_effectors.PushBack(info);
 					}
 					break;
@@ -374,10 +374,28 @@ class ndAiBipedTest_1 : public ndModel
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndEffectorInfo& info = m_effectors[i];
+
+			//ndFloat32 dist = info.m_x_mapper.Interpolate(info.m_x);
+
+			ndFloat32 yawSin = ndSin(info.m_y_mapper.Interpolate(info.m_y));
+			ndFloat32 yawCos = ndCos(info.m_y_mapper.Interpolate(info.m_y));
+
+			ndFloat32 rollSin = ndSin(info.m_z_mapper.Interpolate(info.m_z));
+			ndFloat32 rollCos = ndCos(info.m_z_mapper.Interpolate(info.m_z));
+
 			ndVector posit(info.m_basePosition);
-			posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-			posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-			posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+			ndFloat32 dist = posit.m_y + info.m_x_mapper.Interpolate(info.m_x);
+
+			ndFloat32 x = dist * yawCos * rollCos;
+			ndFloat32 y = dist * yawCos * rollSin;
+			ndFloat32 z = -dist * yawSin;
+			
+			//posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+			//posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+			//posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+			posit.m_y = x;
+			posit.m_x = z;
+			posit.m_z = y;
 			info.m_effector->SetPosition(posit);
 
 			ndMatrix swivelMatrix0;
@@ -386,24 +404,6 @@ class ndAiBipedTest_1 : public ndModel
 			const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
 			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 		}
-
-		//bool needProjection = false;
-		//ndFloat32 invtimestep2 = 1.0f / (timestep * timestep);
-		//for (ndInt32 i = 0; (i < m_bodies.GetCount()) && !needProjection; ++i)
-		//{
-		//	ndBodyDynamic* const body = m_bodies[i];
-		//	const ndVector veloc(body->GetOmega());
-		//	const ndVector omega(body->GetVelocity());
-		//	ndFloat32 maxVeloc2 = body->GetMaxLinearStep() * body->GetMaxLinearStep() * invtimestep2;
-		//	ndFloat32 maxOmega2 = body->GetMaxAngularStep() * body->GetMaxAngularStep() * invtimestep2;
-		//	needProjection = needProjection || (omega.DotProduct(omega).GetScalar() > maxOmega2);
-		//	needProjection = needProjection || (veloc.DotProduct(veloc).GetScalar() > maxVeloc2);
-		//}
-		//if (needProjection)
-		//{
-		//	ndSkeletonContainer* const skeleton = m_bodies[0]->GetSkeleton();
-		//	m_solver.ProjectVelocities(skeleton, world, timestep);
-		//}
 	}
 
 	void ApplyControls(ndDemoEntityManager* const scene)
@@ -414,11 +414,11 @@ class ndAiBipedTest_1 : public ndModel
 		ndEffectorInfo& info = m_effectors[0];
 
 		bool change = false;
-		ImGui::Text("position x");
-		change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
-		ImGui::Text("position y");
+		ImGui::Text("distance");
+		change = change | ImGui::SliderFloat("##x", &info.m_x, 0.0f, 1.0f);
+		ImGui::Text("yaw");
 		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-		ImGui::Text("position z");
+		ImGui::Text("roll");
 		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
 
 		ImGui::Text("swivel");
@@ -428,13 +428,21 @@ class ndAiBipedTest_1 : public ndModel
 		{
 			m_rootBody->SetSleepState(false);
 
-			for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
-			{
-				m_effectors[i].m_x = info.m_x;
-				m_effectors[i].m_y = info.m_y;
-				m_effectors[i].m_z = info.m_z;
-				m_effectors[i].m_swivel = info.m_swivel;
-			}
+			//for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
+			//{
+			//	ndFloat32 dist = info.m_x_mapper.Interpolate(info.m_x);
+			//
+			//	ndFloat32 yawSin = ndSin (info.m_y_mapper.Interpolate(info.m_y));
+			//	ndFloat32 yawCos = ndCos (info.m_y_mapper.Interpolate(info.m_y));
+			//
+			//	ndFloat32 rollSin = ndSin(info.m_z_mapper.Interpolate(info.m_z));
+			//	ndFloat32 rollCos = ndCos(info.m_z_mapper.Interpolate(info.m_z));
+			//
+			//	m_effectors[i].m_x = dist * yawCos * rollCos;
+			//	m_effectors[i].m_y = dist * yawCos * rollSin;
+			//	m_effectors[i].m_z = -dist * yawSin;
+			//	m_effectors[i].m_swivel = info.m_swivel;
+			//}
 		}
 	}
 
