@@ -732,8 +732,8 @@ class ndAiQuadrupedTest_1_Material : public ndApplicationMaterial
 		ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
 		if (pointer0 == pointer1)
 		{
-			// here we know teh part are form eth same model.
-			// we can apply some more filtering by for now we just desable all self collisions. 
+			// here we know teh part are from the same model.
+			// we can apply some more filtering by for now we just disable all self model collisions. 
 			return false;
 		}
 		return true;
