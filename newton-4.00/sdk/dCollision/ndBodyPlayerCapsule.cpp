@@ -779,7 +779,7 @@ void ndBodyPlayerCapsule::SpecialUpdate(ndFloat32 timestep)
 	m_equilibrium0 = 0;
 
 	// set player orientation
-	ndMatrix matrix(dYawMatrix(GetHeadingAngle()));
+	ndMatrix matrix(ndYawMatrix(GetHeadingAngle()));
 	matrix.m_posit = m_matrix.m_posit;
 	SetMatrix(matrix);
 

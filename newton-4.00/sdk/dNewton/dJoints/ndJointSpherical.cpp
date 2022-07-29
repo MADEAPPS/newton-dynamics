@@ -25,7 +25,7 @@ ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinem
 	,m_maxTwistAngle(ndFloat32(1.0e10f))
 	,m_springDamperRegularizer(ndFloat32(0.0f))
 {
-	//m_rotation = dPitchMatrix(90.0f * ndDegreeToRad);
+	//m_rotation = ndPitchMatrix(90.0f * ndDegreeToRad);
 	//m_rotation = dYawMatrix(60.0f * ndDegreeToRad);
 	//m_rotation = dRollMatrix(60.0f * ndDegreeToRad);
 }
@@ -178,7 +178,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 		ndVector color(ndFloat32 (0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 		for (ndInt32 i = 0; i <= subdiv; ++i) 
 		{
-			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			arch[i] = pitchMatrix.TransformVector(ndPitchMatrix(angle0).RotateVector(point));
 			debugCallback.DrawLine(pitchMatrix.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}
@@ -199,7 +199,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 		ndFloat32 angle0 = ndFloat32 (0.0f);
 		for (ndInt32 i = 0; i <= subdiv; ++i) 
 		{
-			ndVector conePoint(dPitchMatrix(angle0).RotateVector(point));
+			ndVector conePoint(ndPitchMatrix(angle0).RotateVector(point));
 			ndVector p(matrix1.TransformVector(conePoint));
 			arch[i] = p;
 			debugCallback.DrawLine(matrix1.m_posit, p, color);

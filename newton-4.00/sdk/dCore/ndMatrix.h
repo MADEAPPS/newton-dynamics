@@ -33,6 +33,9 @@ class ndQuaternion;
 
 D_CORE_API const ndMatrix& dGetZeroMatrix ();
 D_CORE_API const ndMatrix& dGetIdentityMatrix();
+D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
+D_CORE_API ndMatrix ndYawMatrix(ndFloat32 ang);
+D_CORE_API ndMatrix ndRollMatrix(ndFloat32 ang);
 
 D_MSV_NEWTON_ALIGN_32
 class ndMatrix
@@ -305,38 +308,6 @@ inline bool ndMatrix::TestSymetric3x3() const
 		   (me[3][2] == ndFloat32 (0.0f)) &&
 		   (me[3][3] == ndFloat32 (1.0f));
 }
-
-inline ndMatrix dPitchMatrix(ndFloat32 ang)
-{
-	ndFloat32 sinAng = ndSin (ang);
-	ndFloat32 cosAng = ndCos (ang);
-	return ndMatrix (
-		ndVector (ndFloat32(1.0f),  ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)), 
-		ndVector (ndFloat32(0.0f),  cosAng,          sinAng,        ndFloat32(0.0f)),
-		ndVector (ndFloat32(0.0f), -sinAng,          cosAng,        ndFloat32(0.0f)), 
-		ndVector (ndFloat32(0.0f),  ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f))); 
-}
-
-inline ndMatrix dYawMatrix(ndFloat32 ang)
-{
-	ndFloat32 sinAng = ndSin (ang);
-	ndFloat32 cosAng = ndCos (ang);
-	return ndMatrix (
-		ndVector (cosAng,          ndFloat32(0.0f), -sinAng,        ndFloat32(0.0f)), 
-		ndVector (ndFloat32(0.0f), ndFloat32(1.0f),  ndFloat32(0.0f), ndFloat32(0.0f)), 
-		ndVector (sinAng,          ndFloat32(0.0f),  cosAng,        ndFloat32(0.0f)), 
-		ndVector (ndFloat32(0.0f), ndFloat32(0.0f),  ndFloat32(0.0f), ndFloat32(1.0f))); 
-}
-
-inline ndMatrix dRollMatrix(ndFloat32 ang)
-{
-	ndFloat32 sinAng = ndSin (ang);
-	ndFloat32 cosAng = ndCos (ang);
-	return ndMatrix (ndVector ( cosAng,          sinAng,          ndFloat32(0.0f), ndFloat32(0.0f)), 
-					ndVector (-sinAng,          cosAng,          ndFloat32(0.0f), ndFloat32(0.0f)),
-					ndVector ( ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)), 
-					ndVector ( ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f))); 
-}																		 
 
 #endif
 

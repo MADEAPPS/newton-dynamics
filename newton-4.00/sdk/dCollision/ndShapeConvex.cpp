@@ -1025,7 +1025,7 @@ ndInt32 ndShapeConvex::BuildCylinderCapPoly(ndFloat32 radius, const ndMatrix& tr
 
 	ndFloat32 angle = ndFloat32 (2.0f) * ndPi / count;
 	ndVector r(ndFloat32(0.0f), ndFloat32(0.0f), radius, ndFloat32(0.0f));
-	ndMatrix rotation(dPitchMatrix(angle));
+	ndMatrix rotation(ndPitchMatrix(angle));
 
 	for (ndInt32 i = 0; i < count; ++i) 
 	{

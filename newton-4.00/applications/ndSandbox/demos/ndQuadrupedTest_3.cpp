@@ -180,7 +180,7 @@ class ndAiQuadrupedTest_3 : public ndModel
 					if (definition.m_type == ndAiQuadrupedTest_3_Definition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						const ndMatrix pivotMatrix(dRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+						const ndMatrix pivotMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
 						hinge->SetLimitState(true);
 						hinge->SetLimits(-30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
@@ -190,7 +190,7 @@ class ndAiQuadrupedTest_3 : public ndModel
 					else if (definition.m_type == ndAiQuadrupedTest_3_Definition::m_spherical)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						const ndMatrix pivotMatrix(dYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+						const ndMatrix pivotMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 						ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
 						//socket->SetConeLimit(120.0f * ndDegreeToRad);
 						//socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
@@ -472,7 +472,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
 	ndAiQuadrupedTest_3* const robot0 = new ndAiQuadrupedTest_3(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot0);

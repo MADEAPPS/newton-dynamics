@@ -668,7 +668,7 @@ class dFbxAnimationTrack
 		scaleMatrix[0][0] = scale.m_x;
 		scaleMatrix[1][1] = scale.m_y;
 		scaleMatrix[2][2] = scale.m_z;
-		ndMatrix matrix(scaleMatrix * dPitchMatrix(rotation.m_x) * dYawMatrix(rotation.m_y) * dRollMatrix(rotation.m_z));
+		ndMatrix matrix(scaleMatrix * ndPitchMatrix(rotation.m_x) * ndYawMatrix(rotation.m_y) * ndRollMatrix(rotation.m_z));
 		matrix.m_posit = ndVector(position.m_x, position.m_y, position.m_z, 1.0f);
 		return matrix;
 	}
@@ -716,7 +716,7 @@ class dFbxAnimationTrack
 			scaleMatrix[0][0] = scaleValue.m_x;
 			scaleMatrix[1][1] = scaleValue.m_y;
 			scaleMatrix[2][2] = scaleValue.m_z;
-			ndMatrix m(scaleMatrix * dPitchMatrix(rotationValue.m_x) * dYawMatrix(rotationValue.m_y) * dRollMatrix(rotationValue.m_z));
+			ndMatrix m(scaleMatrix * ndPitchMatrix(rotationValue.m_x) * ndYawMatrix(rotationValue.m_y) * ndRollMatrix(rotationValue.m_z));
 			m.m_posit = ndVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
 			ndMatrix matrix(invert * m * transform);
 
@@ -962,7 +962,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 			{
 				dFbxAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
 				track->m_rotation.m_param.PushBack(keyFrame.m_time);
-				const ndMatrix transform(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
+				const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
 				const ndQuaternion quat(transform);
 				dAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
 				dAssert(quat.DotProduct(quat).GetScalar() < 1.001f);

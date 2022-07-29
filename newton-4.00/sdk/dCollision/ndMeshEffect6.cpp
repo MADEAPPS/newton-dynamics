@@ -1841,11 +1841,11 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 		ndMatrix rotationMatrix(dGetIdentityMatrix());
 		if (i == 1) 
 		{
-			rotationMatrix = dYawMatrix(ndFloat32(90.0f * ndDegreeToRad));
+			rotationMatrix = ndYawMatrix(ndFloat32(90.0f * ndDegreeToRad));
 		}
 		else if (i == 2) 
 		{
-			rotationMatrix = dPitchMatrix(ndFloat32(90.0f * ndDegreeToRad));
+			rotationMatrix = ndPitchMatrix(ndFloat32(90.0f * ndDegreeToRad));
 		}
 
 		ndPolyhedra::Iterator iter(*this);

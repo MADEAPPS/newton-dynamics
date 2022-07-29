@@ -25,22 +25,6 @@
 #include "ndQuaternion.h"
 #include "ndGeneralMatrix.h"
 
-const ndMatrix& dGetIdentityMatrix()
-{
-	static ndMatrix identityMatrix(
-		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
-	return identityMatrix;
-}
-
-const ndMatrix& dGetZeroMatrix ()
-{
-	static ndMatrix zeroMatrix(ndVector::m_zero, ndVector::m_zero, ndVector::m_zero, ndVector::m_zero);
-	return zeroMatrix;
-}
-
 ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 {
 	dAssert((quat.DotProduct(quat).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
@@ -312,8 +296,8 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//ndMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
-		//ndMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//ndMatrix xxxx(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
+		//ndMatrix xxxx1(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
 	} 
 	else if (matrix[0][2] < ndFloat32 (-0.99995f)) 
 	{
@@ -327,8 +311,8 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//ndMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
-		//ndMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//ndMatrix xxxx(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
+		//ndMatrix xxxx1(ndPitchMatrix(picth0) * ndYawMatrix(yaw0) * ndRollMatrix(roll0));
 	} 
 	else 
 	{
@@ -359,8 +343,8 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 	euler1[3] = ndFloat32(0.0f);
 
 #ifdef _DEBUG
-	ndMatrix m0 (dPitchMatrix (euler0[0]) * dYawMatrix(euler0[1]) * dRollMatrix(euler0[2]));
-	ndMatrix m1 (dPitchMatrix (euler1[0]) * dYawMatrix(euler1[1]) * dRollMatrix(euler1[2]));
+	ndMatrix m0 (ndPitchMatrix (euler0[0]) * ndYawMatrix(euler0[1]) * ndRollMatrix(euler0[2]));
+	ndMatrix m1 (ndPitchMatrix (euler1[0]) * ndYawMatrix(euler1[1]) * ndRollMatrix(euler1[2]));
 	for (ndInt32 i = 0; i < 3; i ++) 
 	{
 		for (ndInt32 j = 0; j < 3; j ++) 
@@ -549,4 +533,51 @@ ndVector ndMatrix::EigenVectors ()
 	return d;
 }
 
+const ndMatrix& dGetIdentityMatrix()
+{
+	static ndMatrix identityMatrix(
+		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+	return identityMatrix;
+}
+
+const ndMatrix& dGetZeroMatrix()
+{
+	static ndMatrix zeroMatrix(ndVector::m_zero, ndVector::m_zero, ndVector::m_zero, ndVector::m_zero);
+	return zeroMatrix;
+}
+
+ndMatrix ndPitchMatrix(ndFloat32 ang)
+{
+	ndFloat32 sinAng = ndSin(ang);
+	ndFloat32 cosAng = ndCos(ang);
+	return ndMatrix(
+		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), cosAng, sinAng, ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), -sinAng, cosAng, ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+}
+
+ndMatrix ndYawMatrix(ndFloat32 ang)
+{
+	ndFloat32 sinAng = ndSin(ang);
+	ndFloat32 cosAng = ndCos(ang);
+	return ndMatrix(
+		ndVector(cosAng, ndFloat32(0.0f), -sinAng, ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(sinAng, ndFloat32(0.0f), cosAng, ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+}
+
+ndMatrix ndRollMatrix(ndFloat32 ang)
+{
+	ndFloat32 sinAng = ndSin(ang);
+	ndFloat32 cosAng = ndCos(ang);
+	return ndMatrix(ndVector(cosAng, sinAng, ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(-sinAng, cosAng, ndFloat32(0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+}
 

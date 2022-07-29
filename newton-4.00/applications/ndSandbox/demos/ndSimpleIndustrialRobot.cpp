@@ -417,14 +417,14 @@ class dSimpleIndustrialRobot : public ndModel
 		{
 			// apply target position collected by control panel
 			ndMatrix targetMatrix (
-				dRollMatrix(90.0f * ndDegreeToRad) *
-				dPitchMatrix(m_pitch * ndDegreeToRad) * 
-				dYawMatrix(m_yaw * ndDegreeToRad) * 
-				dRollMatrix(m_roll * ndDegreeToRad) *
-				dRollMatrix(-90.0f * ndDegreeToRad));
+				ndRollMatrix(90.0f * ndDegreeToRad) *
+				ndPitchMatrix(m_pitch * ndDegreeToRad) * 
+				ndYawMatrix(m_yaw * ndDegreeToRad) * 
+				ndRollMatrix(m_roll * ndDegreeToRad) *
+				ndRollMatrix(-90.0f * ndDegreeToRad));
 			
 			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
+			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
 			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 			
 			m_effector->SetOffsetMatrix(targetMatrix);
@@ -465,7 +465,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
 	dSimpleIndustrialRobot* const robot = new dSimpleIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
@@ -478,7 +478,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	//matrix.m_posit.m_z -= 2.0f;
 	//scene->GetWorld()->AddModel(new dSimpleIndustrialRobot(scene, robotEntity, matrix));
 	//ndMatrix location(matrix);
-	//location = dRollMatrix(-65 * ndDegreeToRad) * location;
+	//location = ndRollMatrix(-65 * ndDegreeToRad) * location;
 	//location.m_posit.m_x += 1.5f;
 	//location.m_posit.m_y += 1.5f;
 	//location.m_posit.m_z += 1.5f;

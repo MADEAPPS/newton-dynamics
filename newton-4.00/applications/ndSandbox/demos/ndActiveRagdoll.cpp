@@ -169,7 +169,7 @@ class ndActiveRagdollModel : public ndCharacter
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
-		ndMatrix coronalFrame(dPitchMatrix(180.0f*ndDegreeToRad) * dRollMatrix(90.0f*ndDegreeToRad) * characterFrame->CalculateGlobalMatrix());
+		ndMatrix coronalFrame(ndPitchMatrix(180.0f*ndDegreeToRad) * ndRollMatrix(90.0f*ndDegreeToRad) * characterFrame->CalculateGlobalMatrix());
 		rootNode->SetCoronalFrame(coronalFrame);
 		rootNode->SetName(rootEntity->GetName().GetStr());
 
@@ -368,7 +368,7 @@ class ndActiveRagdollModel : public ndCharacter
 	{
 		ndMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
+		ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
 		if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
 		{
@@ -493,7 +493,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
-	playerMatrix = dYawMatrix(angle) * playerMatrix;
+	playerMatrix = ndYawMatrix(angle) * playerMatrix;
 	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
 	origin.m_z -= 2.0f;

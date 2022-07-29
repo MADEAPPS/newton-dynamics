@@ -116,7 +116,7 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	
 	ndFloat32 spacing = 2.0f;
 
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	for (ndInt32 z = 0; z < rows_z; ++z)
 	{
 		for (ndInt32 x = 0; x < rows_x; ++x)

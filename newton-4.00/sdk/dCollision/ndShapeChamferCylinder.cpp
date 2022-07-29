@@ -77,7 +77,7 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 	ndFloat32 sliceStep = ndPi  / DG_CHAMFERCYLINDER_SLICES; 
 	ndFloat32 breakStep = ndFloat32 (2.0f) * ndPi / DG_CHAMFERCYLINDER_BRAKES;
 
-	ndMatrix rot (dPitchMatrix (breakStep));	
+	ndMatrix rot (ndPitchMatrix (breakStep));	
 	ndInt32 index = 0;
 	for (ndInt32 j = 0; j <= DG_CHAMFERCYLINDER_SLICES; j ++) 
 	{
@@ -103,7 +103,7 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 		ndVector locus(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 		for (ndInt32 i = 0; i < DG_MAX_CHAMFERCYLINDER_DIR_COUNT; i ++) 
 		{
-			ndMatrix matrix (dPitchMatrix (ndFloat32 (2.0f) * ndPi * ndFloat32 (i) / DG_MAX_CHAMFERCYLINDER_DIR_COUNT));
+			ndMatrix matrix (ndPitchMatrix (ndFloat32 (2.0f) * ndPi * ndFloat32 (i) / DG_MAX_CHAMFERCYLINDER_DIR_COUNT));
 			m_shapesDirs[i] = matrix.RotateVector (locus);
 		}
 
@@ -204,7 +204,7 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 	ndFloat32 breakStep = ndFloat32(2.0f) * ndPi / brakes;
 	ndVector pool[24 * (12 + 1)];
 
-	ndMatrix rot(dPitchMatrix(breakStep));
+	ndMatrix rot(ndPitchMatrix(breakStep));
 	ndInt32 index = 0;
 	for (ndInt32 j = 0; j <= slices; j++)
 	{

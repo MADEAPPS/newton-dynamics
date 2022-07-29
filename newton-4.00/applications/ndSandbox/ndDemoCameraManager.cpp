@@ -157,7 +157,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32
 	m_mousePosY = mouseY;
 
 	//m_yaw += 0.01f;
-	ndMatrix matrix (dRollMatrix(m_pitch) * dYawMatrix(m_yaw));
+	ndMatrix matrix (ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw));
 	ndQuaternion rot (matrix);
 	m_camera->SetMatrix (rot, targetMatrix.m_posit);
 

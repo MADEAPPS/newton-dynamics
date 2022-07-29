@@ -208,7 +208,7 @@ void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 		ndVector color(ndVector(0.5f, 0.0f, 0.0f, 0.0f));
 		for (ndInt32 i = 0; i <= subdiv; ++i)
 		{
-			arch[i] = matrix0.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			arch[i] = matrix0.TransformVector(ndPitchMatrix(angle0).RotateVector(point));
 			debugCallback.DrawLine(matrix1.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}
@@ -238,7 +238,7 @@ void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 		ndVector color(ndVector(0.0f, 0.5f, 0.0f, 0.0f));
 		for (ndInt32 i = 0; i <= subdiv; ++i) 
 		{
-			arch[i] = matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point));
+			arch[i] = matrix1.TransformVector(ndYawMatrix(angle0).RotateVector(point));
 			debugCallback.DrawLine(matrix1.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}

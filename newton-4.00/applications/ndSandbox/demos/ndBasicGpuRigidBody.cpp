@@ -56,7 +56,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 //	ndFloat32 diameter = 0.5f;
 //	ndShapeInstance shape(new ndShapeSphere(diameter));
 //
-//	ndMatrix matrix(dPitchMatrix(15.0f*ndDegreeToRad) * dRollMatrix(15.0f*ndDegreeToRad));
+//	ndMatrix matrix(ndPitchMatrix(15.0f*ndDegreeToRad) * ndRollMatrix(15.0f*ndDegreeToRad));
 //	matrix.m_posit = origin;
 //
 //	AddShape(scene, matrix, shape, 10.0f, density);
@@ -67,8 +67,8 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 //	ndFloat32 diameter = 1.0f;
 //	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 //
-//	//ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
-//	ndMatrix matrix(dPitchMatrix(35.0f*ndDegreeToRad) * dRollMatrix(25.0f*ndDegreeToRad));
+//	//ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
+//	ndMatrix matrix(ndPitchMatrix(35.0f*ndDegreeToRad) * ndRollMatrix(25.0f*ndDegreeToRad));
 //	matrix.m_posit = origin;
 //
 //	AddShape(scene, matrix, shape, 10.0f, density);
@@ -90,7 +90,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 //
 //	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
 //	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof (ndVector), 0.0f, &points[0].m_x));
-//	ndMatrix matrix(dPitchMatrix(135.0f*ndDegreeToRad) * dRollMatrix(75.0f*ndDegreeToRad));
+//	ndMatrix matrix(ndPitchMatrix(135.0f*ndDegreeToRad) * ndRollMatrix(75.0f*ndDegreeToRad));
 //	matrix.m_posit = origin;
 //
 //	AddShape(scene, matrix, shape, 10.0f, density);
@@ -99,7 +99,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density, int count)
 {
 	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
-	ndMatrix matrix(dPitchMatrix(10.0f*ndDegreeToRad) * dRollMatrix(150.0f*ndDegreeToRad));
+	ndMatrix matrix(ndPitchMatrix(10.0f*ndDegreeToRad) * ndRollMatrix(150.0f*ndDegreeToRad));
 	matrix.m_posit = origin;
 
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");

@@ -130,14 +130,14 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 {
 	ndMatrix tireMatrix;
 	ndMatrix chassisMatrix;
-	m_localMatrix1 = dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle) * m_baseFrame;
+	m_localMatrix1 = ndYawMatrix(m_normalidedSteering * m_info.m_steeringAngle) * m_baseFrame;
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
 	const ndFloat32 distance = ndClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
 
 	const ndFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
-	ndMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
+	ndMatrix newTireMatrix(ndPitchMatrix(spinAngle) * chassisMatrix);
 	newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
 
 	const ndMatrix tireBodyMatrix(m_localMatrix0.Inverse() * newTireMatrix);

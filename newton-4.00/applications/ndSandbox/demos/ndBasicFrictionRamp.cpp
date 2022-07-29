@@ -106,7 +106,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_frictionTest, ndApplicationMaterial::m_default);
 
-	ndMatrix matrix(dPitchMatrix(30.0f * ndDegreeToRad));
+	ndMatrix matrix(ndPitchMatrix(30.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
@@ -164,7 +164,7 @@ void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 
-	ndMatrix camMatrix(dRollMatrix(10.0f * ndDegreeToRad) *  dYawMatrix(20.0f * ndDegreeToRad));
+	ndMatrix camMatrix(ndRollMatrix(10.0f * ndDegreeToRad) *  ndYawMatrix(20.0f * ndDegreeToRad));
 	ndQuaternion rot(camMatrix);
 	ndVector origin(-40.0f, 10.0f, 15.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);

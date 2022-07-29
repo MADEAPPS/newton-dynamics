@@ -310,7 +310,7 @@ void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint t
 		
 		ndFloat32 angle = minAngle + (maxAngle - minAngle) * cparam;
 
-		ndMatrix modm(dRollMatrix(-angle));
+		ndMatrix modm(ndRollMatrix(-angle));
 		glVector4 color(GLfloat(1.0f), GLfloat(1.0f), GLfloat(1.0f), GLfloat(1.0f));
 
 		glMatrix glModm(modm);

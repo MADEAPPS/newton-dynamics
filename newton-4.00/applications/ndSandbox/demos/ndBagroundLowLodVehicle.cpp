@@ -107,7 +107,7 @@ class BackGroundVehicleController : public ndModel
 
 		// Get the camera to follow the vehicle
 		ndVector origin(m_pAiBody->GetPosition());
-		ndQuaternion rot(dYawMatrix(180.0f * ndDegreeToRad));
+		ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
 		origin.m_x += 10.0f;
 		m_pScene->SetCameraMatrix(rot, origin);
 	}
@@ -270,7 +270,7 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 	auto pAiBody = AddRigidBody(scene, mBodyMatrix, shapeInstance, aiEntity, 1000.0);
 
 	ndVector origin(pAiBody->GetPosition());
-	ndQuaternion rot(dYawMatrix(180.0f * ndDegreeToRad));
+	ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
 	origin.m_x += 10.0f;
 	scene->SetCameraMatrix(rot, origin);
 }

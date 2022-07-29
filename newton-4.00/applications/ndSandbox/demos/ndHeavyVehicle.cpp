@@ -595,7 +595,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			
 			if (wakeUpVehicle)
 			{
-				ndMatrix effectorMatrix (dPitchMatrix(m_turretAngle));
+				ndMatrix effectorMatrix (ndPitchMatrix(m_turretAngle));
 				effectorMatrix.m_posit.m_x = m_cannonHigh;
 				m_effector->SetOffsetMatrix(effectorMatrix);
 

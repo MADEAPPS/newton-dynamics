@@ -68,7 +68,7 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	ndMatrix mWall4Local = dGetIdentityMatrix();
 	mWall4Local.m_posit = ndVector(-1.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix mFloorLocal = dGetIdentityMatrix();
-	//mFloorLocal = dYawMatrix(3.14f / 4.0f);//45 degree
+	//mFloorLocal = ndYawMatrix(3.14f / 4.0f);//45 degree
 	mFloorLocal.m_posit = ndVector(0.0f, -1.0f, 0.0f, 1.0f);
 
 	auto pCompoundShape = parentInstance.GetShape()->GetAsShapeCompound();
@@ -173,6 +173,6 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	origin.m_y += 2.0f;
 	origin.m_z += 10.0f;
 	origin.m_w = 1.0f;
-	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
+	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }

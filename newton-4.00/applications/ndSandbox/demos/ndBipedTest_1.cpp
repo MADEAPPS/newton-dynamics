@@ -194,13 +194,16 @@ class ndAiBipedTest_1 : public ndModel
 					}
 					else
 					{ 
-						ndMatrix pivotFrame(m_rootBody->GetMatrix());
-						ndMatrix effectorFrame(m_rootBody->GetMatrix());
+						//ndMatrix pivotFrame(m_rootBody->GetMatrix());
+						//ndMatrix effectorFrame(m_rootBody->GetMatrix());
 
 						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
 						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
-						pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
+						//pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
+						ndMatrix pivotFrame(notify->GetBody()->GetMatrix());
+						ndMatrix effectorFrame(pivotFrame);
+						pivotFrame = ndRollMatrix(-90.0f * ndDegreeToRad) * pivotFrame;
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 
 						ndMatrix swivelFrame(dGetIdentityMatrix());
@@ -317,7 +320,7 @@ class ndAiBipedTest_1 : public ndModel
 	{
 		ndMatrix matrix(childBody->GetMatrix());
 		ndAiBipedTest_1_Definition::ndFrameMatrix frameAngle(definition.m_frameBasics);
-		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
+		ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
 		switch (definition.m_type)
 		{
@@ -464,7 +467,7 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	matrix.m_posit.m_y = 0.5f;
 	fbxDemoEntity* const robotMesh = scene->LoadFbxMesh("mannequin.fbx");
 
-	ndMatrix entMatrix(dYawMatrix(-90.0f * ndDegreeToRad) * robotMesh->GetRenderMatrix());
+	ndMatrix entMatrix(ndYawMatrix(-90.0f * ndDegreeToRad) * robotMesh->GetRenderMatrix());
 	robotMesh->ResetMatrix(entMatrix);
 
 	ndWorld* const world = scene->GetWorld();

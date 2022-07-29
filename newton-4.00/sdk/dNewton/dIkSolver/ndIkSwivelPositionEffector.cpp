@@ -239,7 +239,7 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	ndMatrix swivelMatrix0;
 	ndMatrix swivelMatrix1;
 	CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-	swivelMatrix1 = dPitchMatrix(m_swivelAngle) * swivelMatrix1;
+	swivelMatrix1 = ndPitchMatrix(m_swivelAngle) * swivelMatrix1;
 
 	debugCallback.DrawFrame(swivelMatrix0);
 	debugCallback.DrawFrame(swivelMatrix1, 0.5f);
@@ -256,7 +256,7 @@ void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc)
 	ndMatrix swivelMatrix0;
 	ndMatrix swivelMatrix1;
 	CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-	swivelMatrix1 = dPitchMatrix(m_swivelAngle) * swivelMatrix1;
+	swivelMatrix1 = ndPitchMatrix(m_swivelAngle) * swivelMatrix1;
 
 	const ndVector& pin = swivelMatrix1.m_front;
 	const ndFloat32 angle = CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);

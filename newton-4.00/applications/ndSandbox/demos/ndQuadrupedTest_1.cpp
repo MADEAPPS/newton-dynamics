@@ -600,7 +600,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 
 		if (contactPoints.GetCount() >= 3)
 		{
-			ndMatrix rotation(dPitchMatrix(90.0f * ndDegreeToRad));
+			ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
 			rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
 			ndInt32 supportCount = dConvexHull2d(&contactPoints[0], contactPoints.GetCount());
 			rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
@@ -767,7 +767,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 
 	// register a material for filtering self collisions 
 	ndAiQuadrupedTest_1_Material material;

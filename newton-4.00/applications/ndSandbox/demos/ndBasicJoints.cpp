@@ -159,7 +159,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			m_rollAngle = ndFmod(m_rollAngle + m_rollOmega * desc.m_timestep, 2.0f * ndPi);
 			m_pitchAngle = ndFmod(m_pitchAngle + m_pitchOmega * desc.m_timestep, 2.0f * ndPi);
 
-			const ndMatrix rotaion(dPitchMatrix(m_pitchAngle) * dRollMatrix(m_rollAngle));
+			const ndMatrix rotaion(ndPitchMatrix(m_pitchAngle) * ndRollMatrix(m_rollAngle));
 			SetOffsetRotation(rotaion);
 			ndJointSpherical::JacobianDerivative(desc);
 		}
@@ -175,7 +175,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -184,7 +184,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		matrix.m_posit.m_y = floor.m_y;
 		matrix.m_posit.m_y += diameter;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
+		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
 		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
 		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 		ndBodyKinematic* const fixBody = world->GetSentinelBody();
@@ -210,7 +210,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndFloat32 spring = 1500.0f;
 		ndFloat32 regularizer = 0.01f;
 
-		ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
+		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
 		for (ndInt32 i = 1; i < count; ++i)
 		{
 			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
@@ -257,7 +257,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		ndFloat32 friction = 10.0f;
 		ndFloat32 regularizer = 0.1f;
 
-		ndMatrix pinAlign(dRollMatrix(180.0f * ndDegreeToRad));
+		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
 		for (ndInt32 i = 1; i < count; ++i)
 		{
 			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
@@ -348,7 +348,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		// spring damper slider with limits
 		matrix.m_posit.m_y += 2.0f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointSlider* const joint = new ndJointSlider(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
 		joint->SetLimits(-1.0f, 1.0f);
 		world->AddJoint(joint);
@@ -358,7 +358,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		// viscous damper slider with limits
 		matrix.m_posit.m_y += 1.2f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointSlider* const joint = new ndJointSlider(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 0.0f, 10.0f);
 		joint->SetLimits(-1.0f, 1.0f);
 		world->AddJoint(joint);
@@ -368,7 +368,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		// proportional derivative slider oscillator with limits
 		matrix.m_posit.m_y += 1.2f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointSlider* const joint = new ndJointSliderOscillator(dYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		ndJointSlider* const joint = new ndJointSliderOscillator(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
 		joint->SetLimits(-1.0f, 1.0f);
 		world->AddJoint(joint);
@@ -420,7 +420,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -502,7 +502,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -554,7 +554,7 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 		// spring damper slider with limits
 		matrix.m_posit.m_y += 2.0f;
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointRoller* const joint = new ndJointRoller(dPitchMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		ndJointRoller* const joint = new ndJointRoller(ndPitchMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
 		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
 		joint->SetLimitsPosit(-1.0f, 1.0f);
 		world->AddJoint(joint);
@@ -569,7 +569,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -598,7 +598,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.2f/*0.25f*/));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dYawMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -676,7 +676,7 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -759,7 +759,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 		matrix.m_right = matrix.m_right.Scale(1.0f / ndSqrt(matrix.m_right.DotProduct(matrix.m_right).GetScalar()));
 		matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
 		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, 1.0));
-		ndMatrix matrix1(dYawMatrix(0.5f * ndPi) * matrix);
+		ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
 		
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix1, rootEntity);

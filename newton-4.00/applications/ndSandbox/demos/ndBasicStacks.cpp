@@ -55,7 +55,7 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_x;
 
 	ndShapeInstance shape(new ndShapeSphere(blockBoxSize.m_x));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, dRollMatrix (ndFloat32 (-90.0f) * ndDegreeToRad));
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, ndRollMatrix (ndFloat32 (-90.0f) * ndDegreeToRad));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -94,7 +94,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	scene->AddEntity(rootEntity);
 
 //baseMatrix.m_posit.m_y -= 0.02f;
-	ndMatrix rotation(dYawMatrix(20.0f * ndDegreeToRad));
+	ndMatrix rotation(ndYawMatrix(20.0f * ndDegreeToRad));
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
@@ -123,13 +123,13 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_z * 0.5f;
 
 	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
-	shape.SetLocalMatrix(dRollMatrix(ndPi * 0.5f));
+	shape.SetLocalMatrix(ndRollMatrix(ndPi * 0.5f));
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	ndMatrix rotation(dYawMatrix(20.0f * ndDegreeToRad));
+	ndMatrix rotation(ndYawMatrix(20.0f * ndDegreeToRad));
 
 	for (ndInt32 i = 0; i < count; ++i)
 	{
@@ -216,7 +216,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	// create the shape and visual mesh as a common data to be re used
 	ndShapeInstance collision(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
 
-	ndMatrix uvMatrix(dPitchMatrix(ndPi));
+	ndMatrix uvMatrix(ndPitchMatrix(ndPi));
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	ndFloat32 vertialStep = blockBoxSize.m_x * 2.0f;
@@ -230,7 +230,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndMatrix matrix1(matrix0);
 	matrix1.m_posit.m_z += horizontalStep;
 
-	ndMatrix matrix2(dYawMatrix(ndPi * 0.5f) * matrix0);
+	ndMatrix matrix2(ndYawMatrix(ndPi * 0.5f) * matrix0);
 	matrix2.m_posit.m_x += horizontalStep * 0.5f;
 	matrix2.m_posit.m_z += horizontalStep * 0.5f;
 	matrix2.m_posit.m_y += vertialStep;
@@ -295,6 +295,6 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_x -= 15.0f;
 	origin.m_z += 15.0f;
 
-	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));
+	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -87,7 +87,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 
 static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
 {
-	ndMatrix matrix(dPitchMatrix(15.0f * ndDegreeToRad));
+	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -120,7 +120,7 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 
 static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin)
 {
-	ndMatrix matrix(dPitchMatrix(15.0f * ndDegreeToRad));
+	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -129,7 +129,7 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += floor.m_y + 0.4f;
 
-	ndMatrix shapeMatrix(dYawMatrix(5.0f * ndDegreeToRad));
+	ndMatrix shapeMatrix(ndYawMatrix(5.0f * ndDegreeToRad));
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetLocalMatrix(shapeMatrix);
@@ -158,9 +158,9 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance shape(new ndShapeCone(0.7f, 1.0f));
-	shape.SetLocalMatrix(dRollMatrix(-90.0f * ndDegreeToRad));
+	shape.SetLocalMatrix(ndRollMatrix(-90.0f * ndDegreeToRad));
 
-	ndMatrix matrix(dPitchMatrix(15.0f * ndDegreeToRad));
+	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 	ndDemoMesh* const geometry = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -200,7 +200,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	compound->AddCollision(&wheel);
 	compound->EndAddRemove();
 
-	ndMatrix matrix(dRollMatrix(tiltAnsgle * ndDegreeToRad));
+	ndMatrix matrix(ndRollMatrix(tiltAnsgle * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;

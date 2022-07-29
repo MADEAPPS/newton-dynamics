@@ -392,14 +392,14 @@ class dAdvancedIndustrialRobot : public ndModel
 	{
 		// apply target position collected by control panel
 		ndMatrix targetMatrix(
-			dRollMatrix(90.0f * ndDegreeToRad) *
-			dPitchMatrix(m_pitch * ndDegreeToRad) *
-			dYawMatrix(m_yaw * ndDegreeToRad) *
-			dRollMatrix(m_roll * ndDegreeToRad) *
-			dRollMatrix(-90.0f * ndDegreeToRad));
+			ndRollMatrix(90.0f * ndDegreeToRad) *
+			ndPitchMatrix(m_pitch * ndDegreeToRad) *
+			ndYawMatrix(m_yaw * ndDegreeToRad) *
+			ndRollMatrix(m_roll * ndDegreeToRad) *
+			ndRollMatrix(-90.0f * ndDegreeToRad));
 
 		ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
-		const ndMatrix aximuthMatrix(dYawMatrix(m_azimuth * ndDegreeToRad));
+		const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
 		targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
 		m_effector->SetOffsetMatrix(targetMatrix);
 
@@ -460,7 +460,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
 	dAdvancedIndustrialRobot* const robot = new dAdvancedIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);

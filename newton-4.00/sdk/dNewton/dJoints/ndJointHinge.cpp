@@ -198,7 +198,7 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 		ndVector color(ndFloat32(0.4f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 		for (ndInt32 i = 0; i <= subdiv; ++i)
 		{
-			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			arch[i] = pitchMatrix.TransformVector(ndPitchMatrix(angle0).RotateVector(point));
 			debugCallback.DrawLine(pitchMatrix.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}

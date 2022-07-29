@@ -107,9 +107,9 @@ class ndAiQuadrupedTest_2 : public ndModel
 		m_rootBody = torso->GetAsBodyDynamic();
 
 		ndDemoEntity* const entity = (ndDemoEntity*) torso->GetNotifyCallback()->GetUserData();
-		entity->SetMeshMatrix(dYawMatrix(90.0f * ndDegreeToRad) * dPitchMatrix(90.0f * ndDegreeToRad));
+		entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));
 
-		ndMatrix matrix(dRollMatrix(45.0f * ndDegreeToRad));
+		ndMatrix matrix(ndRollMatrix(45.0f * ndDegreeToRad));
 		matrix.m_posit.m_x = radius * 0.9f;
 		matrix.m_posit.m_y = -radius * 0.5f;
 
@@ -119,7 +119,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 		const ndVector upDir(location.m_up);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
-			ndMatrix limbPivotLocation(matrix * dYawMatrix(angles[i] * ndDegreeToRad));
+			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
 			limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
 			limbPivotLocation.m_posit.m_w = 1.0f;
 
@@ -144,7 +144,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 			// add calf0
 			ndBodyKinematic* calf0 = nullptr;
 			{
-				limbPivotLocation = dRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
+				limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
 
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
@@ -172,7 +172,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 			ndJointHinge* lookActHinge = nullptr;
 			{
 				ndFloat32 lenght = limbLength * 0.5f;
-				limbPivotLocation = dRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
+				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
 				ndMatrix bodyMatrix(limbPivotLocation);
 				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
 
@@ -365,7 +365,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(dYawMatrix(-0.0f * ndDegreeToRad));
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	
 	ndAiQuadrupedTest_2* const aiBot_1 = new ndAiQuadrupedTest_2(scene, matrix);
 	scene->SetSelectedModel(aiBot_1);

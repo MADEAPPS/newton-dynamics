@@ -246,7 +246,7 @@ ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const nam
 	euler.m_z = ndFloat32(fz);
 	euler = euler.Scale(ndDegreeToRad);
 
-	ndMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_z));
+	ndMatrix matrix (ndPitchMatrix(euler.m_x) * ndYawMatrix(euler.m_y) * ndRollMatrix(euler.m_z));
 	matrix.m_posit = posit;
 	return matrix;
 }
