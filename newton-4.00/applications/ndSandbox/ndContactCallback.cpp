@@ -30,9 +30,6 @@ bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, n
 	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
 	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
 
-	const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
-	const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
-
 	if ((instanceShape0.GetUserDataID() == ndApplicationMaterial::m_dedris) && (instanceShape1.GetUserDataID() == ndApplicationMaterial::m_dedris))
 	{
 		return false;

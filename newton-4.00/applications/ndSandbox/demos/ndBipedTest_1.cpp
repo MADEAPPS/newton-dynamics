@@ -64,10 +64,10 @@ static ndAiBipedTest_1_Definition mannequinDefinition[] =
 	{ "rightFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rightCalfEffector", ndAiBipedTest_1_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
 
-	//{ "leftLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "leftCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	//{ "leftFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "leftCalfEffector", ndAiBipedTest_1_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
+	{ "leftLeg", ndAiBipedTest_1_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "leftCalf", ndAiBipedTest_1_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "leftFoot", ndAiBipedTest_1_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "leftCalfEffector", ndAiBipedTest_1_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "", ndAiBipedTest_1_Definition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
 };
@@ -194,16 +194,13 @@ class ndAiBipedTest_1 : public ndModel
 					}
 					else
 					{ 
-						//ndMatrix pivotFrame(m_rootBody->GetMatrix());
-						//ndMatrix effectorFrame(m_rootBody->GetMatrix());
-
 						ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
 						notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
-						//pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
 						ndMatrix pivotFrame(notify->GetBody()->GetMatrix());
 						ndMatrix effectorFrame(pivotFrame);
-						pivotFrame = ndRollMatrix(-90.0f * ndDegreeToRad) * pivotFrame;
+						pivotFrame = ndYawMatrix(90.0f * ndDegreeToRad) * pivotFrame;
+						pivotFrame = ndPitchMatrix(-90.0f * ndDegreeToRad) * pivotFrame;
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 
 						ndMatrix swivelFrame(dGetIdentityMatrix());
@@ -226,10 +223,12 @@ class ndAiBipedTest_1 : public ndModel
 						world->AddJoint(effector);
 
 						ndEffectorInfo info(effector);
-						info.m_x_mapper = ndParamMapper(-0.1f, workSpace * 0.8f);
-						info.m_y_mapper = ndParamMapper(-ndPi, ndPi);
-						info.m_z_mapper = ndParamMapper(-ndPi, ndPi);
+						info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
+						info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+						info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+
+						info.m_x = 0.98f;
 						m_effectors.PushBack(info);
 					}
 					break;
@@ -377,33 +376,14 @@ class ndAiBipedTest_1 : public ndModel
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndEffectorInfo& info = m_effectors[i];
+			const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+			const ndMatrix roll(ndRollMatrix(info.m_y_mapper.Interpolate(info.m_z)));
 
-			//ndMatrix matrix0;
-			//ndMatrix matrix1;
-			//info.m_effector->CalculateGlobalMatrix(matrix0, matrix1);
-			//matrix0 = matrix0 * matrix1.Inverse();
+			ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
+			posit = roll.RotateVector(posit);
+			posit = yaw.RotateVector(posit);
+			//posit = roll.RotateVector(posit);
 
-			//ndFloat32 dist = info.m_x_mapper.Interpolate(info.m_x);
-
-			ndFloat32 yawSin = ndSin(info.m_y_mapper.Interpolate(info.m_y));
-			ndFloat32 yawCos = ndCos(info.m_y_mapper.Interpolate(info.m_y));
-
-			ndFloat32 rollSin = ndSin(info.m_z_mapper.Interpolate(info.m_z));
-			ndFloat32 rollCos = ndCos(info.m_z_mapper.Interpolate(info.m_z));
-
-			ndVector posit(info.m_basePosition);
-			ndFloat32 dist = posit.m_y + info.m_x_mapper.Interpolate(info.m_x);
-
-			ndFloat32 x = dist * yawCos * rollCos;
-			ndFloat32 y = dist * yawCos * rollSin;
-			ndFloat32 z = -dist * yawSin;
-			
-			//posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-			//posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-			//posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-			posit.m_y = x;
-			posit.m_x = z;
-			posit.m_z = y;
 			info.m_effector->SetPosition(posit);
 
 			ndMatrix swivelMatrix0;
@@ -423,11 +403,11 @@ class ndAiBipedTest_1 : public ndModel
 
 		bool change = false;
 		ImGui::Text("distance");
-		change = change | ImGui::SliderFloat("##x", &info.m_x, 0.0f, 1.0f);
-		ImGui::Text("yaw");
-		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+		change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
 		ImGui::Text("roll");
 		change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+		ImGui::Text("yaw");
+		change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
 
 		ImGui::Text("swivel");
 		change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
@@ -475,7 +455,7 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	world->AddModel(robot);
 	scene->Set2DDisplayRenderFunction(ndAiBipedTest_1::ControlPanel, nullptr, robot);
 
-	world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
 
 	delete robotMesh;
 }
