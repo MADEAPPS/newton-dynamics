@@ -120,11 +120,11 @@ Inheritance diagram for ndMeshEffect:</div>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_mesh_effect_1_1d_cluster_map.html">dClusterMap</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_mesh_effect_1_1d_material.html">dMaterial</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_mesh_effect_1_1d_mesh_vertex_format.html">dMeshVertexFormat</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_mesh_effect_1_1d_vertex_cluster.html">dVertexCluster</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_mesh_effect_1_1nd_material.html">ndMaterial</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -147,9 +147,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetName</b> (const <a
 <tr class="memitem:acfc297a1eb48f6e50b7535796e40ac6d"><td class="memItemLeft" align="right" valign="top"><a id="acfc297a1eb48f6e50b7535796e40ac6d"></a>
 const <a class="el" href="classnd_string.html">ndString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetName</b> () const</td></tr>
 <tr class="separator:acfc297a1eb48f6e50b7535796e40ac6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1221f1ad77378b897bec1dee9a2e6abb"><td class="memItemLeft" align="right" valign="top"><a id="a1221f1ad77378b897bec1dee9a2e6abb"></a>
-<a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_mesh_effect_1_1d_material.html">dMaterial</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterials</b> ()</td></tr>
-<tr class="separator:a1221f1ad77378b897bec1dee9a2e6abb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef40841d9b1d41665fd371eef3cdc807"><td class="memItemLeft" align="right" valign="top"><a id="aef40841d9b1d41665fd371eef3cdc807"></a>
+<a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_mesh_effect_1_1nd_material.html">ndMaterial</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterials</b> ()</td></tr>
+<tr class="separator:aef40841d9b1d41665fd371eef3cdc807"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7d897939e0e895d84689259297b85f2"><td class="memItemLeft" align="right" valign="top"><a id="af7d897939e0e895d84689259297b85f2"></a>
 ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetPropertiesCount</b> () const</td></tr>
 <tr class="separator:af7d897939e0e895d84689259297b85f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -570,18 +570,18 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a31492da1e4306a037f5e5d6abbe1e4e8"><td class="memItemLeft" align="right" valign="top"><a id="a31492da1e4306a037f5e5d6abbe1e4e8"></a>
 <a class="el" href="classnd_string.html">ndString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_name</b></td></tr>
 <tr class="separator:a31492da1e4306a037f5e5d6abbe1e4e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef2565b4b4ade65cebdb6f7805f3f667"><td class="memItemLeft" align="right" valign="top"><a id="aef2565b4b4ade65cebdb6f7805f3f667"></a>
-dPointFormat&#160;</td><td class="memItemRight" valign="bottom"><b>m_points</b></td></tr>
-<tr class="separator:aef2565b4b4ade65cebdb6f7805f3f667"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cce27d1ca4c9b617b37fb35bb2f195f"><td class="memItemLeft" align="right" valign="top"><a id="a3cce27d1ca4c9b617b37fb35bb2f195f"></a>
-dAttibutFormat&#160;</td><td class="memItemRight" valign="bottom"><b>m_attrib</b></td></tr>
-<tr class="separator:a3cce27d1ca4c9b617b37fb35bb2f195f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62293003ca08479f2172e5a667eb182e"><td class="memItemLeft" align="right" valign="top"><a id="a62293003ca08479f2172e5a667eb182e"></a>
+ndPointFormat&#160;</td><td class="memItemRight" valign="bottom"><b>m_points</b></td></tr>
+<tr class="separator:a62293003ca08479f2172e5a667eb182e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20c2ce8885603b0c3fb605c7d727c398"><td class="memItemLeft" align="right" valign="top"><a id="a20c2ce8885603b0c3fb605c7d727c398"></a>
+ndAttibutFormat&#160;</td><td class="memItemRight" valign="bottom"><b>m_attrib</b></td></tr>
+<tr class="separator:a20c2ce8885603b0c3fb605c7d727c398"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a292d974e61eed353f56bba032376b4d2"><td class="memItemLeft" align="right" valign="top"><a id="a292d974e61eed353f56bba032376b4d2"></a>
 <a class="el" href="classnd_mesh_effect_1_1d_cluster_map.html">dClusterMap</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_clusters</b></td></tr>
 <tr class="separator:a292d974e61eed353f56bba032376b4d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86e244bf90b69f3b7729deec0213c64a"><td class="memItemLeft" align="right" valign="top"><a id="a86e244bf90b69f3b7729deec0213c64a"></a>
-<a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_mesh_effect_1_1d_material.html">dMaterial</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_materials</b></td></tr>
-<tr class="separator:a86e244bf90b69f3b7729deec0213c64a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ed460062f85e60ca7b64f27601de0cf"><td class="memItemLeft" align="right" valign="top"><a id="a9ed460062f85e60ca7b64f27601de0cf"></a>
+<a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_mesh_effect_1_1nd_material.html">ndMaterial</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_materials</b></td></tr>
+<tr class="separator:a9ed460062f85e60ca7b64f27601de0cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15080b414464ab81c7c6e7c7b3b71169"><td class="memItemLeft" align="right" valign="top"><a id="a15080b414464ab81c7c6e7c7b3b71169"></a>
 ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertexBaseCount</b></td></tr>
 <tr class="separator:a15080b414464ab81c7c6e7c7b3b71169"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -1,9 +1,9 @@
 var classnd_mesh_effect =
 [
     [ "dClusterMap", "classnd_mesh_effect_1_1d_cluster_map.html", null ],
-    [ "dMaterial", "classnd_mesh_effect_1_1d_material.html", "classnd_mesh_effect_1_1d_material" ],
     [ "dMeshVertexFormat", "classnd_mesh_effect_1_1d_mesh_vertex_format.html", "classnd_mesh_effect_1_1d_mesh_vertex_format" ],
     [ "dVertexCluster", "classnd_mesh_effect_1_1d_vertex_cluster.html", "classnd_mesh_effect_1_1d_vertex_cluster" ],
+    [ "ndMaterial", "classnd_mesh_effect_1_1nd_material.html", "classnd_mesh_effect_1_1nd_material" ],
     [ "ndMeshEffect", "classnd_mesh_effect.html#a72b66cb419bcce777074f378533e201c", null ],
     [ "ndMeshEffect", "classnd_mesh_effect.html#a58d98422c65e1bc0d210e73a12de9bf4", null ],
     [ "ndMeshEffect", "classnd_mesh_effect.html#aa4ad7f8d1ac97baf5efdaccca2fda7a3", null ],
@@ -49,7 +49,7 @@ var classnd_mesh_effect =
     [ "GetMaterialGetIndexStreamShort", "classnd_mesh_effect.html#aea383940f031d3b6fedf423ba86ff942", null ],
     [ "GetMaterialID", "classnd_mesh_effect.html#a6a25bc402bda99e177435af764853d42", null ],
     [ "GetMaterialIndexCount", "classnd_mesh_effect.html#a74c7cf612d210f8b5fee08b4c5f92d23", null ],
-    [ "GetMaterials", "classnd_mesh_effect.html#a1221f1ad77378b897bec1dee9a2e6abb", null ],
+    [ "GetMaterials", "classnd_mesh_effect.html#aef40841d9b1d41665fd371eef3cdc807", null ],
     [ "GetName", "classnd_mesh_effect.html#acfc297a1eb48f6e50b7535796e40ac6d", null ],
     [ "GetNextLayer", "classnd_mesh_effect.html#a6e5ff56e14372bacd334449241d91700", null ],
     [ "GetNextLayer", "classnd_mesh_effect.html#a1bfc186f1a594d6da2118e8d91037e86", null ],
@@ -87,11 +87,11 @@ var classnd_mesh_effect =
     [ "UniformBoxMapping", "classnd_mesh_effect.html#a26c9b62a383be2d4df3534bbcf1102e3", null ],
     [ "UnpackAttibuteData", "classnd_mesh_effect.html#ad77af87bea534f3b255bbb3b8bb701bf", null ],
     [ "UnpackPoints", "classnd_mesh_effect.html#aa24c213acf527cfe363f35bd1939790d", null ],
-    [ "m_attrib", "classnd_mesh_effect.html#a3cce27d1ca4c9b617b37fb35bb2f195f", null ],
+    [ "m_attrib", "classnd_mesh_effect.html#a20c2ce8885603b0c3fb605c7d727c398", null ],
     [ "m_clusters", "classnd_mesh_effect.html#a292d974e61eed353f56bba032376b4d2", null ],
     [ "m_constructionIndex", "classnd_mesh_effect.html#ae797a10c6c2ec22d7bc9d17b353dd207", null ],
-    [ "m_materials", "classnd_mesh_effect.html#a86e244bf90b69f3b7729deec0213c64a", null ],
+    [ "m_materials", "classnd_mesh_effect.html#a9ed460062f85e60ca7b64f27601de0cf", null ],
     [ "m_name", "classnd_mesh_effect.html#a31492da1e4306a037f5e5d6abbe1e4e8", null ],
-    [ "m_points", "classnd_mesh_effect.html#aef2565b4b4ade65cebdb6f7805f3f667", null ],
+    [ "m_points", "classnd_mesh_effect.html#a62293003ca08479f2172e5a667eb182e", null ],
     [ "m_vertexBaseCount", "classnd_mesh_effect.html#a15080b414464ab81c7c6e7c7b3b71169", null ]
 ];
