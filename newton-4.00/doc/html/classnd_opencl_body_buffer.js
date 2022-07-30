@@ -7,7 +7,7 @@ var classnd_opencl_body_buffer =
     [ "CopyToGpu", "classnd_opencl_body_buffer.html#a0742fc024dcedf62f43b5dd2af199d3e", null ],
     [ "Resize", "classnd_opencl_body_buffer.html#aa054c430e159439679b309af9a645f9b", null ],
     [ "SetKernelParameters", "classnd_opencl_body_buffer.html#a7604f9c6d91e00d50db681b465c390ea", null ],
-    [ "m_accel", "classnd_opencl_body_buffer.html#a3880c0d109b7b41a6b55ed4c0c17f6f7", null ],
-    [ "m_transform", "classnd_opencl_body_buffer.html#a83905da944617fbbc06b442cd3ffd54c", null ],
-    [ "m_veloc", "classnd_opencl_body_buffer.html#ae4ce9c26344c140499773876e92e1ef9", null ]
+    [ "m_accel", "classnd_opencl_body_buffer.html#add81403491c0170bfaef652349f300dc", null ],
+    [ "m_transform", "classnd_opencl_body_buffer.html#a40be05b13e4728e273c89ebf416b84fa", null ],
+    [ "m_veloc", "classnd_opencl_body_buffer.html#a50078e7ea40e8ab5a220467ad909b221", null ]
 ];

@@ -13,9 +13,7 @@ var searchData=
   ['dgpolysoupfilterallocator_94',['dgPolySoupFilterAllocator',['../classnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html',1,'ndPolygonSoupBuilder']]],
   ['dguv_95',['dgUV',['../classnd_mesh_effect_1_1nd_attibut_format_1_1dg_u_v.html',1,'ndMeshEffect::ndAttibutFormat']]],
   ['dmeshvertexformat_96',['dMeshVertexFormat',['../classnd_mesh_effect_1_1d_mesh_vertex_format.html',1,'ndMeshEffect']]],
-  ['dopenclbuffer_97',['dOpenclBuffer',['../classd_opencl_buffer.html',1,'']]],
-  ['dopenclbuffer_3c_20ndopenclbodybuffer_3a_3andopencljacobian_20_3e_98',['dOpenclBuffer&lt; ndOpenclBodyBuffer::ndOpenclJacobian &gt;',['../classd_opencl_buffer.html',1,'']]],
-  ['doublevalue_99',['DoubleValue',['../classnd_1_1_ti_xml_attribute.html#adbf46f732435a963f46d73f4e8fd1569',1,'nd::TiXmlAttribute']]],
-  ['drecord_100',['dRecord',['../structnd_heap_1_1d_record.html',1,'ndHeap']]],
-  ['dvertexcluster_101',['dVertexCluster',['../classnd_mesh_effect_1_1d_vertex_cluster.html',1,'ndMeshEffect']]]
+  ['doublevalue_97',['DoubleValue',['../classnd_1_1_ti_xml_attribute.html#adbf46f732435a963f46d73f4e8fd1569',1,'nd::TiXmlAttribute']]],
+  ['drecord_98',['dRecord',['../structnd_heap_1_1d_record.html',1,'ndHeap']]],
+  ['dvertexcluster_99',['dVertexCluster',['../classnd_mesh_effect_1_1d_vertex_cluster.html',1,'ndMeshEffect']]]
 ];

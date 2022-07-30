@@ -29,11 +29,11 @@
 
 
 template<class T>
-class dOpenclBuffer: public ndArray<T>
+class ndOpenclBuffer: public ndArray<T>
 {
 	public:
-	dOpenclBuffer(cl_mem_flags flags);
-	~dOpenclBuffer();
+	ndOpenclBuffer(cl_mem_flags flags);
+	~ndOpenclBuffer();
 
 	void Cleanup();
 	void SyncSize(cl_context context, ndInt32 size);
@@ -72,9 +72,9 @@ class ndOpenclBodyBuffer
 	void DebudKernel(ndFloat32 timestepIn, const ndArray<ndBodyKinematic*>& bodyArray);
 #endif
 
-	dOpenclBuffer<ndOpenclJacobian> m_transform;
-	dOpenclBuffer<ndOpenclJacobian> m_veloc;
-	dOpenclBuffer<ndOpenclJacobian> m_accel;
+	ndOpenclBuffer<ndOpenclJacobian> m_transform;
+	ndOpenclBuffer<ndOpenclJacobian> m_veloc;
+	ndOpenclBuffer<ndOpenclJacobian> m_accel;
 };
 
 class ndOpenclSystem: public ndClassAlloc
@@ -122,7 +122,7 @@ class ndOpenclSystem: public ndClassAlloc
 };
 
 template<class T>
-dOpenclBuffer<T>::dOpenclBuffer(cl_mem_flags flags)
+ndOpenclBuffer<T>::ndOpenclBuffer(cl_mem_flags flags)
 	:ndArray<T>()
 	,m_gpuBuffer(nullptr)
 	,m_flags(flags)
@@ -130,13 +130,13 @@ dOpenclBuffer<T>::dOpenclBuffer(cl_mem_flags flags)
 }
 
 template<class T>
-dOpenclBuffer<T>::~dOpenclBuffer()
+ndOpenclBuffer<T>::~ndOpenclBuffer()
 {
 	dAssert(!m_gpuBuffer);
 }
 
 template<class T>
-void dOpenclBuffer<T>::Cleanup()
+void ndOpenclBuffer<T>::Cleanup()
 {
 	if (m_gpuBuffer)
 	{
@@ -149,7 +149,7 @@ void dOpenclBuffer<T>::Cleanup()
 }
 
 template<class T>
-void dOpenclBuffer<T>::SyncSize(cl_context context, ndInt32 size)
+void ndOpenclBuffer<T>::SyncSize(cl_context context, ndInt32 size)
 {
 	cl_int err = CL_SUCCESS;
 
@@ -175,7 +175,7 @@ void dOpenclBuffer<T>::SyncSize(cl_context context, ndInt32 size)
 }
 
 template<class T>
-void dOpenclBuffer<T>::ReadData(cl_command_queue commandQueue)
+void ndOpenclBuffer<T>::ReadData(cl_command_queue commandQueue)
 {
 	cl_int err = CL_SUCCESS;
 	void* const destination = &(*this)[0];
@@ -187,7 +187,7 @@ void dOpenclBuffer<T>::ReadData(cl_command_queue commandQueue)
 }
 
 template<class T>
-void dOpenclBuffer<T>::WriteData(cl_command_queue commandQueue)
+void ndOpenclBuffer<T>::WriteData(cl_command_queue commandQueue)
 {
 	const void* const source = &(*this)[0];
 

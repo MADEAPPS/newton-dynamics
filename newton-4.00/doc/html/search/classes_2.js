@@ -11,8 +11,6 @@ var searchData=
   ['dgpolysoupfilterallocator_735',['dgPolySoupFilterAllocator',['../classnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html',1,'ndPolygonSoupBuilder']]],
   ['dguv_736',['dgUV',['../classnd_mesh_effect_1_1nd_attibut_format_1_1dg_u_v.html',1,'ndMeshEffect::ndAttibutFormat']]],
   ['dmeshvertexformat_737',['dMeshVertexFormat',['../classnd_mesh_effect_1_1d_mesh_vertex_format.html',1,'ndMeshEffect']]],
-  ['dopenclbuffer_738',['dOpenclBuffer',['../classd_opencl_buffer.html',1,'']]],
-  ['dopenclbuffer_3c_20ndopenclbodybuffer_3a_3andopencljacobian_20_3e_739',['dOpenclBuffer&lt; ndOpenclBodyBuffer::ndOpenclJacobian &gt;',['../classd_opencl_buffer.html',1,'']]],
-  ['drecord_740',['dRecord',['../structnd_heap_1_1d_record.html',1,'ndHeap']]],
-  ['dvertexcluster_741',['dVertexCluster',['../classnd_mesh_effect_1_1d_vertex_cluster.html',1,'ndMeshEffect']]]
+  ['drecord_738',['dRecord',['../structnd_heap_1_1d_record.html',1,'ndHeap']]],
+  ['dvertexcluster_739',['dVertexCluster',['../classnd_mesh_effect_1_1d_vertex_cluster.html',1,'ndMeshEffect']]]
 ];

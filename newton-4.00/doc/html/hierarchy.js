@@ -151,7 +151,7 @@ var hierarchy =
     [ "ndChamferCylinderInfo", "structnd_chamfer_cylinder_info.html", null ],
     [ "ndClassAlloc", "classnd_class_alloc.html", [
       [ "ndArray< T >", "classnd_array.html", [
-        [ "dOpenclBuffer< T >", "classd_opencl_buffer.html", null ],
+        [ "ndOpenclBuffer< T >", "classnd_opencl_buffer.html", null ],
         [ "ndTempArray< T >", "classnd_temp_array.html", null ]
       ] ],
       [ "ndArray< cuBodyProxy >", "classnd_array.html", null ],
@@ -188,7 +188,7 @@ var hierarchy =
       [ "ndArray< ndMeshEffect::ndAttibutFormat::dgUV >", "classnd_array.html", null ],
       [ "ndArray< ndMeshEffect::ndMaterial >", "classnd_array.html", null ],
       [ "ndArray< ndOpenclBodyBuffer::ndOpenclJacobian >", "classnd_array.html", [
-        [ "dOpenclBuffer< ndOpenclBodyBuffer::ndOpenclJacobian >", "classd_opencl_buffer.html", null ]
+        [ "ndOpenclBuffer< ndOpenclBodyBuffer::ndOpenclJacobian >", "classnd_opencl_buffer.html", null ]
       ] ],
       [ "ndArray< ndReal >", "classnd_array.html", null ],
       [ "ndArray< ndRightHandSide >", "classnd_array.html", null ],
@@ -574,10 +574,10 @@ var hierarchy =
     [ "ndPolygonMeshDesc::ndMesh", "classnd_polygon_mesh_desc_1_1nd_mesh.html", null ],
     [ "ndShapeStaticMesh::ndMeshVertexListIndexList", "classnd_shape_static_mesh_1_1nd_mesh_vertex_list_index_list.html", null ],
     [ "ndMinkFace", "classnd_mink_face.html", null ],
-    [ "ndSkeletonContainer::ndNode", "classnd_skeleton_container_1_1nd_node.html", null ],
     [ "ndAabbPolygonSoup::ndNode", "classnd_aabb_polygon_soup_1_1nd_node.html", [
       [ "ndAabbPolygonSoup::ndNodeBuilder", "classnd_aabb_polygon_soup_1_1nd_node_builder.html", null ]
     ] ],
+    [ "ndSkeletonContainer::ndNode", "classnd_skeleton_container_1_1nd_node.html", null ],
     [ "ndSkeletonContainer::ndNodePair", "classnd_skeleton_container_1_1nd_node_pair.html", null ],
     [ "ndConvexHull4d::ndNormalMap", "classnd_convex_hull4d_1_1nd_normal_map.html", null ],
     [ "ndConvexHull3d::ndNormalMap", "classnd_convex_hull3d_1_1nd_normal_map.html", null ],
@@ -607,21 +607,21 @@ var hierarchy =
     [ "ndShapeMaterial", "classnd_shape_material.html", null ],
     [ "ndSkeletonContainer", "classnd_skeleton_container.html", null ],
     [ "ndSoa::ndSoaJacobianPair", "classnd_soa_1_1nd_soa_jacobian_pair.html", null ],
-    [ "ndSoaMatrixElement", "classnd_soa_matrix_element.html", null ],
     [ "ndSoa::ndSoaMatrixElement", "classnd_soa_1_1nd_soa_matrix_element.html", null ],
+    [ "ndSoaMatrixElement", "classnd_soa_matrix_element.html", null ],
     [ "ndSoa::ndSoaVector3", "classnd_soa_1_1nd_soa_vector3.html", null ],
     [ "ndSoa::ndSoaVector6", "classnd_soa_1_1nd_soa_vector6.html", null ],
     [ "ndMeshEffect::ndFormat::ndSortCluster", "classnd_mesh_effect_1_1nd_format_1_1nd_sort_cluster.html", null ],
     [ "ndSortCluster", "classnd_sort_cluster.html", null ],
-    [ "ndMeshEffect::ndFormat::ndSortKey", "classnd_mesh_effect_1_1nd_format_1_1nd_sort_key.html", null ],
     [ "ndSortKey", "classnd_sort_key.html", null ],
+    [ "ndMeshEffect::ndFormat::ndSortKey", "classnd_mesh_effect_1_1nd_format_1_1nd_sort_key.html", null ],
     [ "ndSpatialMatrix", "classnd_spatial_matrix.html", null ],
     [ "ndSpatialVector", "classnd_spatial_vector.html", null ],
     [ "ndMultiBodyVehicle::ndDownForce::ndSpeedForcePair", "classnd_multi_body_vehicle_1_1nd_down_force_1_1nd_speed_force_pair.html", null ],
     [ "ndSphereInfo", "structnd_sphere_info.html", null ],
     [ "ndSpinLock", "classnd_spin_lock.html", null ],
-    [ "ndShapeCompound::ndSpliteInfo", "classnd_shape_compound_1_1nd_splite_info.html", null ],
     [ "ndAabbPolygonSoup::ndSpliteInfo", "classnd_aabb_polygon_soup_1_1nd_splite_info.html", null ],
+    [ "ndShapeCompound::ndSpliteInfo", "classnd_shape_compound_1_1nd_splite_info.html", null ],
     [ "ndStackBvhStackEntry", "classnd_stack_bvh_stack_entry.html", null ],
     [ "ndStackEntry", "classnd_stack_entry.html", null ],
     [ "ndStartEnd", "classnd_start_end.html", null ],
