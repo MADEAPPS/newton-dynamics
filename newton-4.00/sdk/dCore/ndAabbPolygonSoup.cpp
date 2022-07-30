@@ -825,7 +825,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 	#define DG_WELDING_TOL (1.0e-2f)
 	#define DG_WELDING_TOL2 (DG_WELDING_TOL * DG_WELDING_TOL)
 
-	const ndAdjacentdFace& adjacentFace = *((ndAdjacentdFace*)context);
+	const ndAdjacentFace& adjacentFace = *((ndAdjacentFace*)context);
 
 	if (adjacentFace.m_index != indexArray) 
 	{	

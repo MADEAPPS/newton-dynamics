@@ -9,7 +9,7 @@ var classnd_constraint =
     [ "GetBody0", "classnd_constraint.html#af41ca0a38d51c0203ae094667946c32e", null ],
     [ "GetBody1", "classnd_constraint.html#a6933fbf478617bbeb52ec758e028fa0f", null ],
     [ "GetRowsCount", "classnd_constraint.html#abe0f8319ddb1a6b34ee2577d10bbedff", null ],
-    [ "InitPointParam", "classnd_constraint.html#a2275486224b432dec25c2b8c06cb54bf", null ],
+    [ "InitPointParam", "classnd_constraint.html#a99cd5e1ccf72a5bd8068d2a654f402f3", null ],
     [ "IsActive", "classnd_constraint.html#a42049f393fc62998c3f14d64401f3d85", null ],
     [ "IsBilateral", "classnd_constraint.html#ad34051dbf8556556033e4b55b2dad7b6", null ],
     [ "JacobianDerivative", "classnd_constraint.html#a510f5e82ed1d5149ae9ac88792f3f628", null ],

@@ -111,10 +111,10 @@ class ndContact: public ndConstraint
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 
 #ifdef D_USE_PRECONTIONER_EXPERIMENT
-	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir0, const ndVector& dir1, const dgPointParam& param) const;
+	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir0, const ndVector& dir1, const ndPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex, const ndVector& preconditioner0, const ndVector& preconditioner1);
 #else
-	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const dgPointParam& param) const;
+	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const ndPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex);
 #endif
 

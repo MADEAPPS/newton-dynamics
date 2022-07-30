@@ -577,7 +577,7 @@ template<class T, ndMeshEffect::ndChannelType type>
 void ndMeshEffect::ndChannel<T, type>::Clear()
 {
 	m_isValid = false;
-	ndArray<T>::Clear();
+	ndArray<T>::SetCount(0);
 }
 
 template<class T, ndMeshEffect::ndChannelType type>

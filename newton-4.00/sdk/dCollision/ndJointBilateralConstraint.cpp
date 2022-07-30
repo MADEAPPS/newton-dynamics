@@ -287,7 +287,7 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 
 void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir)
 {
-	dgPointParam param;
+	ndPointParam param;
 	InitPointParam(param, pivot0, pivot1);
 
 	const ndInt32 index = desc.m_rowsCount;

@@ -193,7 +193,7 @@ ndSetPrecisionDouble::~ndSetPrecisionDouble()
 	#endif
 }
 
-class dSortCluster
+class ndSortCluster
 {
 	public:
 	ndBigVector m_sum;
@@ -202,7 +202,7 @@ class dSortCluster
 	ndInt32 m_count;
 };
 
-class dSortKey
+class ndSortKey
 {
 	public:
 	ndInt32 m_mask;
@@ -214,8 +214,8 @@ static ndInt32 SortVertices(
 	ndFloat64* const vertListOut, ndInt32* const indexList,
 	const ndFloat64* const vertexList, ndInt32 stride, 
 	ndInt32 compareCount, ndFloat64 tol,
-	dSortKey* const remapIndex,
-	const dSortCluster& cluster, ndInt32 baseCount)
+	ndSortKey* const remapIndex,
+	const ndSortCluster& cluster, ndInt32 baseCount)
 {
 	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
 	const ndBigVector variance(ndVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin).Sqrt());
@@ -242,10 +242,10 @@ static ndInt32 SortVertices(
 	sortContext.m_vertex = vertexList;
 	sortContext.m_stride = stride;
 	sortContext.m_vertexSortIndex = firstSortAxis;
-	class dCompareKey
+	class ndCompareKey
 	{
 		public:
-		ndInt32 Compare(const dSortKey& elementA, const dSortKey& elementB, void* const context) const
+		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB, void* const context) const
 		{
 			const dVertexSortData* const sortContext = (dVertexSortData*)context;
 			ndInt32 index0 = elementA.m_vertexIndex * sortContext->m_stride + sortContext->m_vertexSortIndex;
@@ -262,7 +262,7 @@ static ndInt32 SortVertices(
 			return 0;
 		}
 	};
-	ndSort<dSortKey, dCompareKey>(remapIndex, cluster.m_count, &sortContext);
+	ndSort<ndSortKey, ndCompareKey>(remapIndex, cluster.m_count, &sortContext);
 
 	const ndFloat64 minDist = ndMin(ndMin(variance.m_x, variance.m_y), variance.m_z);
 	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
@@ -329,15 +329,15 @@ static ndInt32 SortVertices(
 
 static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
 {
-	dSortCluster cluster;
+	ndSortCluster cluster;
 	cluster.m_start = 0;
 	cluster.m_count = vertexCount;
 	cluster.m_sum = ndBigVector::m_zero;
 	cluster.m_sum2 = ndBigVector::m_zero;
 
 	ndStack<ndFloat64>pool(stride  * cluster.m_count);
-	ndStack<dSortKey> indirectListBuffer(cluster.m_count);
-	dSortKey* const indirectList = &indirectListBuffer[0];
+	ndStack<ndSortKey> indirectListBuffer(cluster.m_count);
+	ndSortKey* const indirectList = &indirectListBuffer[0];
 
 	ndFloat64* const vertList = &pool[0];
 	memcpy(&vertList[0], &vertListOut[0], cluster.m_count * stride * sizeof(ndFloat64));
@@ -356,7 +356,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	ndInt32 baseCount = 0;
 	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BASH)
 	{
-		dSortCluster spliteStack[128];
+		ndSortCluster spliteStack[128];
 		spliteStack[0] = cluster;
 	
 		ndInt32 stack = 1;
@@ -369,7 +369,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
-			dSortKey* const remapIndex = &indirectList[cluster.m_start];
+			ndSortKey* const remapIndex = &indirectList[cluster.m_start];
 			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				baseCount += SortVertices(vertListOut, indexListOut, vertList, stride, compareCount, tolerance, remapIndex, cluster, baseCount);
@@ -445,7 +445,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 					x2c += x * x;
 				}
 	
-				dSortCluster cluster_i1(cluster);
+				ndSortCluster cluster_i1(cluster);
 				cluster_i1.m_start = cluster.m_start + i0;
 				cluster_i1.m_count = cluster.m_count - i0;
 				cluster_i1.m_sum -= xc;
@@ -453,7 +453,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 				spliteStack[stack] = cluster_i1;
 				stack++;
 	
-				dSortCluster cluster_i0(cluster);
+				ndSortCluster cluster_i0(cluster);
 				cluster_i0.m_start = cluster.m_start;
 				cluster_i0.m_count = i0;
 				cluster_i0.m_sum = xc;

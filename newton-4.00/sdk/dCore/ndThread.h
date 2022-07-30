@@ -36,6 +36,7 @@ class ndThreadName
 	char m_name[32];
 };
 
+/// Base class for for all multi thread functionality.
 class ndThread
 	:public ndClassAlloc
 	,public ndThreadName
@@ -47,14 +48,30 @@ class ndThread
 #endif
 {
 	public:
+	/// Empty default constructor
+	/// after creation all threads go to a wait state
 	D_CORE_API ndThread();
+
+	/// Empty, does not terminate the thread loop. 
+	/// The thread loop is only terminated after calling Finish.
 	D_CORE_API virtual ~ndThread();
 
+	/// Set thread name. 
+	/// Useful for when debugging or profiler and application. 
 	D_CORE_API void SetName(const char* const name);
 
-	D_CORE_API void Finish();
+	/// Set the thread, to execute one call to and go back to a wait state  
 	D_CORE_API void Signal();
 
+	/// Force the thread loop to terminate.
+	/// This function must be call explicitly when the application
+	/// wants to terminate the thread because the destructor does not do it. 
+	D_CORE_API void Finish();
+
+	/// Thread function to execute in a perpetual loop until the thread is terminated.
+	/// Each time the thread owner calls function Signal, the loop execute one call to 
+	/// this function and upon return, the thread goes back to wait for another signal  
+	/// or to exit the loop. 
 	virtual void ThreadFunction() = 0;
 
 	protected:

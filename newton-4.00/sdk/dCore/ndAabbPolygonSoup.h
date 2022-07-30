@@ -35,6 +35,7 @@ class ndPolygonSoupBuilder;
 // index format: i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize
 #define D_CONCAVE_EDGE_MASK	(1<<31)
 
+/// Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh.
 class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 {
 	public:
@@ -194,8 +195,13 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	class ndSpliteInfo;
 	class ndNodeBuilder;
 
+	/// get the root node bounding box of the mesh.
 	D_CORE_API virtual void GetAABB (ndVector& p0, ndVector& p1) const;
+
+	/// writes the entire database to a binary file named path.
 	D_CORE_API virtual void Serialize (const char* const path) const;
+
+	/// Reads a previously saved database binary file named path.
 	D_CORE_API virtual void Deserialize (const char* const path);
 
 	protected:
@@ -210,21 +216,27 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	D_CORE_API virtual void ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 
 	public:
+	/// Get the root node of the hierarchy.
 	inline ndNode* GetRootNode() const
 	{
 		return m_aabb;
 	}
 
+	/// Returns the back child node of the hierarchy.
+	/// Return nullptr if node was a leaf.
 	inline ndNode* GetBackNode(const ndNode* const node) const
 	{
 		return node->m_left.IsLeaf() ? nullptr : node->m_left.GetNode(m_aabb);
 	}
 
+	/// Returns the front child node of the hierarchy.
+	/// Return nullptr if node was a leaf.
 	inline ndNode* GetFrontNode(const ndNode* const node) const
 	{
 		return node->m_right.IsLeaf() ? nullptr : node->m_right.GetNode(m_aabb);
 	}
 
+	/// Returns the bounding box of node in point p0 and p1.
 	inline void GetNodeAabb(const ndNode* const node, ndVector& p0, ndVector& p1) const
 	{
 		p0 = ndVector (&((ndTriplex*)m_localVertex)[node->m_indexBox0].m_x);

@@ -135,41 +135,49 @@ $(document).ready(function(){initNavTree('nd_thread_8h_source.html',''); initRes
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">char</span> m_name[32];</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classnd_thread.html">   39</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_thread.html">ndThread</a></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    :<span class="keyword">public</span> <a class="code" href="classnd_class_alloc.html">ndClassAlloc</a></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classnd_thread_name.html">ndThreadName</a></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classnd_semaphore.html">ndSemaphore</a></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classnd_atomic.html">ndAtomic</a>&lt;bool&gt;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    ,<span class="keyword">public</span> std::condition_variable</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    ,<span class="keyword">public</span> std::thread</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    D_CORE_API <a class="code" href="classnd_thread.html">ndThread</a>();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    D_CORE_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_thread.html">ndThread</a>();</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    D_CORE_API <span class="keywordtype">void</span> SetName(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> name);</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classnd_thread.html">   40</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_thread.html">ndThread</a></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    :<span class="keyword">public</span> <a class="code" href="classnd_class_alloc.html">ndClassAlloc</a></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classnd_thread_name.html">ndThreadName</a></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classnd_semaphore.html">ndSemaphore</a></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classnd_atomic.html">ndAtomic</a>&lt;bool&gt;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    ,<span class="keyword">public</span> std::condition_variable</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    ,<span class="keyword">public</span> std::thread</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;{</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    D_CORE_API <a class="code" href="classnd_thread.html#a3c5a9086702368fab9748d6e3880e80b">ndThread</a>();</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Finish();</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Signal();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> ThreadFunction() = 0;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Release(){}</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <a class="code" href="classnd_thread.html#a0a691445db4125a0c69fa90e852de123">~ndThread</a>();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classnd_thread.html#aab115539d769389c3864e38ab4bf90a7">SetName</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> name);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">void</span> ThreadFunctionCallback();</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;};</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classnd_thread.html#aac490fc877906a5a0c804dbd1c7f4b89">Signal</a>();</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classnd_thread.html#aadf8f7045bb22fb23f76d1cf91e04c35">Finish</a>();</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classnd_thread.html#ab3750f6cb757d1677306aa6fd268edbf">   75</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_thread.html#ab3750f6cb757d1677306aa6fd268edbf">ThreadFunction</a>() = 0;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Release(){}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">void</span> ThreadFunctionCallback();</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;};</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
-<div class="ttc" id="aclassnd_thread_html"><div class="ttname"><a href="classnd_thread.html">ndThread</a></div><div class="ttdef"><b>Definition:</b> ndThread.h:48</div></div>
+<div class="ttc" id="aclassnd_thread_html"><div class="ttname"><a href="classnd_thread.html">ndThread</a></div><div class="ttdoc">Base class for for all multi thread functionality.</div><div class="ttdef"><b>Definition:</b> ndThread.h:49</div></div>
 <div class="ttc" id="aclassnd_thread_name_html"><div class="ttname"><a href="classnd_thread_name.html">ndThreadName</a></div><div class="ttdef"><b>Definition:</b> ndThread.h:30</div></div>
+<div class="ttc" id="aclassnd_thread_html_a3c5a9086702368fab9748d6e3880e80b"><div class="ttname"><a href="classnd_thread.html#a3c5a9086702368fab9748d6e3880e80b">ndThread::ndThread</a></div><div class="ttdeci">D_CORE_API ndThread()</div><div class="ttdoc">Empty default constructor after creation all threads go to a wait state.</div><div class="ttdef"><b>Definition:</b> ndThread.cpp:28</div></div>
+<div class="ttc" id="aclassnd_thread_html_aab115539d769389c3864e38ab4bf90a7"><div class="ttname"><a href="classnd_thread.html#aab115539d769389c3864e38ab4bf90a7">ndThread::SetName</a></div><div class="ttdeci">D_CORE_API void SetName(const char *const name)</div><div class="ttdoc">Set thread name.</div><div class="ttdef"><b>Definition:</b> ndThread.cpp:48</div></div>
+<div class="ttc" id="aclassnd_thread_html_ab3750f6cb757d1677306aa6fd268edbf"><div class="ttname"><a href="classnd_thread.html#ab3750f6cb757d1677306aa6fd268edbf">ndThread::ThreadFunction</a></div><div class="ttdeci">virtual void ThreadFunction()=0</div><div class="ttdoc">Thread function to execute in a perpetual loop until the thread is terminated.</div></div>
+<div class="ttc" id="aclassnd_thread_html_a0a691445db4125a0c69fa90e852de123"><div class="ttname"><a href="classnd_thread.html#a0a691445db4125a0c69fa90e852de123">ndThread::~ndThread</a></div><div class="ttdeci">virtual D_CORE_API ~ndThread()</div><div class="ttdoc">Empty, does not terminate the thread loop.</div><div class="ttdef"><b>Definition:</b> ndThread.cpp:44</div></div>
+<div class="ttc" id="aclassnd_thread_html_aadf8f7045bb22fb23f76d1cf91e04c35"><div class="ttname"><a href="classnd_thread.html#aadf8f7045bb22fb23f76d1cf91e04c35">ndThread::Finish</a></div><div class="ttdeci">D_CORE_API void Finish()</div><div class="ttdoc">Force the thread loop to terminate.</div><div class="ttdef"><b>Definition:</b> ndThread.cpp:81</div></div>
 <div class="ttc" id="aclassnd_semaphore_html"><div class="ttname"><a href="classnd_semaphore.html">ndSemaphore</a></div><div class="ttdoc">Generic counting semaphore for thread synchronization.</div><div class="ttdef"><b>Definition:</b> ndSemaphore.h:29</div></div>
+<div class="ttc" id="aclassnd_thread_html_aac490fc877906a5a0c804dbd1c7f4b89"><div class="ttname"><a href="classnd_thread.html#aac490fc877906a5a0c804dbd1c7f4b89">ndThread::Signal</a></div><div class="ttdeci">D_CORE_API void Signal()</div><div class="ttdoc">Set the thread, to execute one call to and go back to a wait state</div><div class="ttdef"><b>Definition:</b> ndThread.cpp:89</div></div>
 <div class="ttc" id="aclassnd_atomic_html"><div class="ttname"><a href="classnd_atomic.html">ndAtomic</a></div><div class="ttdoc">wrapper over standard atomic operations</div><div class="ttdef"><b>Definition:</b> ndTypes.h:383</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

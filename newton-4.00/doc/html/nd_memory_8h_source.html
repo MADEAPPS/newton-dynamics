@@ -138,17 +138,16 @@ $(document).ready(function(){initNavTree('nd_memory_8h_source.html',''); initRes
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    D_CORE_API <span class="keyword">static</span> ndInt32 <a class="code" href="classnd_memory.html#accfff96b23cf1ef96799aa6ea755a53d">CalculateBufferSize</a>(<span class="keywordtype">size_t</span> size);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    D_CORE_API <span class="keyword">static</span> ndUnsigned64 <a class="code" href="classnd_memory.html#a916fe2175d62d6315d2ca3c0fec7fa2a">GetMemoryUsed</a>();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classnd_memory.html#aaab691c610d911d95089f51b594fd5d8">SetMemoryAllocators</a>(ndMemAllocCallback alloc, ndMemFreeCallback free);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> GetMemoryAllocators(ndMemAllocCallback&amp; alloc, ndMemFreeCallback&amp; free);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_atomic.html">ndAtomic&lt;ndUnsigned64&gt;</a> m_memoryUsed;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;};</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    D_CORE_API <span class="keyword">static</span> ndUnsigned64 <a class="code" href="classnd_memory.html#a916fe2175d62d6315d2ca3c0fec7fa2a">GetMemoryUsed</a>();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classnd_memory.html#aaab691c610d911d95089f51b594fd5d8">SetMemoryAllocators</a>(ndMemAllocCallback alloc, ndMemFreeCallback free);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> GetMemoryAllocators(ndMemAllocCallback&amp; alloc, ndMemFreeCallback&amp; free);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_atomic.html">ndAtomic&lt;ndUnsigned64&gt;</a> m_memoryUsed;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;};</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_memory_html_a28dac2e45b0e04ac67a178ca7ee3d8ec"><div class="ttname"><a href="classnd_memory.html#a28dac2e45b0e04ac67a178ca7ee3d8ec">ndMemory::Malloc</a></div><div class="ttdeci">static D_CORE_API void * Malloc(size_t size)</div><div class="ttdoc">General Memory allocation function.</div><div class="ttdef"><b>Definition:</b> ndMemory.cpp:46</div></div>

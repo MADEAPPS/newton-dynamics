@@ -165,7 +165,7 @@ $(document).ready(function(){initNavTree('nd_thread_pool_8h_source.html',''); in
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        D_CORE_API <span class="keyword">virtual</span> ~ndWorker();</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> ThreadFunction();</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_thread.html#ab3750f6cb757d1677306aa6fd268edbf">ThreadFunction</a>();</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <a class="code" href="classnd_thread_pool.html">ndThreadPool</a>* m_owner;</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <a class="code" href="classnd_atomic.html">ndAtomic&lt;bool&gt;</a> m_begin;</div>
@@ -333,10 +333,11 @@ $(document).ready(function(){initNavTree('nd_thread_pool_8h_source.html',''); in
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_function_html"><div class="ttname"><a href="classnd_function.html">ndFunction</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:109</div></div>
-<div class="ttc" id="aclassnd_thread_html"><div class="ttname"><a href="classnd_thread.html">ndThread</a></div><div class="ttdef"><b>Definition:</b> ndThread.h:48</div></div>
+<div class="ttc" id="aclassnd_thread_html"><div class="ttname"><a href="classnd_thread.html">ndThread</a></div><div class="ttdoc">Base class for for all multi thread functionality.</div><div class="ttdef"><b>Definition:</b> ndThread.h:49</div></div>
 <div class="ttc" id="aclassnd_sync_mutex_html"><div class="ttname"><a href="classnd_sync_mutex.html">ndSyncMutex</a></div><div class="ttdoc">Generic counting mutex for synchronization of thread jobs.</div><div class="ttdef"><b>Definition:</b> ndSyncMutex.h:29</div></div>
 <div class="ttc" id="aclassnd_task_implement_html"><div class="ttname"><a href="classnd_task_implement.html">ndTaskImplement</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:154</div></div>
 <div class="ttc" id="aclassnd_start_end_html"><div class="ttname"><a href="classnd_start_end.html">ndStartEnd</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:38</div></div>
+<div class="ttc" id="aclassnd_thread_html_ab3750f6cb757d1677306aa6fd268edbf"><div class="ttname"><a href="classnd_thread.html#ab3750f6cb757d1677306aa6fd268edbf">ndThread::ThreadFunction</a></div><div class="ttdeci">virtual void ThreadFunction()=0</div><div class="ttdoc">Thread function to execute in a perpetual loop until the thread is terminated.</div></div>
 <div class="ttc" id="aclassnd_function_3_01_type_01_4_html"><div class="ttname"><a href="classnd_function_3_01_type_01_4.html">ndFunction&lt; Type &gt;</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:114</div></div>
 <div class="ttc" id="aclassnd_thread_pool_html"><div class="ttname"><a href="classnd_thread_pool.html">ndThreadPool</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:61</div></div>
 <div class="ttc" id="aclassnd_task_html"><div class="ttname"><a href="classnd_task.html">ndTask</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:52</div></div>

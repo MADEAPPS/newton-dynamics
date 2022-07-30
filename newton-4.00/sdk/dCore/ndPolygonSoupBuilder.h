@@ -34,7 +34,8 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
-class ndAdjacentdFace
+/// Helper intermediate class for encoding a face adjacent face to an edge of a face.
+class ndAdjacentFace
 {
 	public:
 	ndPlane m_normal;

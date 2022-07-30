@@ -33,27 +33,54 @@
 #include "ndVector.h"
 #include "ndClassAlloc.h"
 
+/// Generic template vector.
+/// note: this template vector is similar to std::vector but has some significant differences.
+/// therefore is not meant to be a replacement of the sdt::vector, it is simple a tool for this engine 
 template<class T>
 class ndArray: public ndClassAlloc
 {
 	public:
+	/// constructor, set count and capacity to zero, not memory is allocated.
 	ndArray();
+	/// constructor, set count and capacity, allocated space for count elements.
 	ndArray(ndInt32 count);
+	/// copy constructor, allocate and copy only m_size elements from source.
 	ndArray(const ndArray& source);
 
+	/// deallocate all memory, dos not call destructor on any of th elements.
 	~ndArray ();
 
+	/// return the size of the array.
 	ndInt32 GetCount() const;
+
+	/// Set a new size.
+	/// if count is larger than m_size, the array resized by doubling its size, 
+	/// all the data is simply copied to the new array and old array is deleted.
 	void SetCount(ndInt32 count);
 
-	void Clear();
+	//void Clear();
+	/// Set a new size.
+	/// the array resized to count, all the data is simply copied 
+	/// to the new array and old array is deleted.
 	void Resize(ndInt32 count);
+
+	/// return the capacity of the array.
 	ndInt32 GetCapacity() const;
 	
+	/// Get the i element for the array.
+	/// behavior is undefined is i is larger of equal to the array size
 	T& operator[] (ndInt32 i);
+
+	/// Get the i element for the array.
+	/// behavior is undefined is i is larger of equal to the array size
 	const T& operator[] (ndInt32 i) const;
 
+	/// Interchange all the information with other.
+	/// other must be of the same type.
 	void Swap(ndArray& other);
+
+	/// Add element to the end of the buffer.
+	/// size is incremented by one, and the array is resized if it reaches max capacity
 	void PushBack(const T& element);
 
 	private: 
@@ -161,11 +188,11 @@ ndInt32 ndArray<T>::GetCapacity() const
 	return m_capacity;
 }
 
-template<class T>
-void ndArray<T>::Clear()
-{
-	m_size = 0;
-}
+//template<class T>
+//void ndArray<T>::Clear()
+//{
+//	m_size = 0;
+//}
 
 template<class T>
 void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elements)

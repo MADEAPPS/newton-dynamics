@@ -92,7 +92,7 @@ class ndConstraintDebugCallback: public ndClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class dgPointParam
+class ndPointParam
 {
 	public:
 	ndVector m_r0;
@@ -254,7 +254,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
 	
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
-	void InitPointParam(dgPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
+	void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
 #ifdef D_JOINT_PRECONDITIONER
 	ndFloat32 m_preconditioner0;

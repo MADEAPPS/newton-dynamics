@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['_7edclassalloc_814',['~dClassAlloc',['../classd_class_alloc.html#ab5b8cb26b160797d123fa1329cf87655',1,'dClassAlloc']]],
-  ['_7edsemaphore_815',['~dSemaphore',['../classd_semaphore.html#a5ee195cf593fc23d354ed808d0664a33',1,'dSemaphore']]],
-  ['_7edsyncmutex_816',['~dSyncMutex',['../classd_sync_mutex.html#ac25d0933eca52aa9e7f2ad961b4e1f0f',1,'dSyncMutex']]]
+  ['_7endarray_1312',['~ndArray',['../classnd_array.html#abfcae181655a5fb878515edf50540cb4',1,'ndArray']]],
+  ['_7endclassalloc_1313',['~ndClassAlloc',['../classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce',1,'ndClassAlloc']]],
+  ['_7endsemaphore_1314',['~ndSemaphore',['../classnd_semaphore.html#a32248d41f68f0ccb4464510a777f2c41',1,'ndSemaphore']]],
+  ['_7endsyncmutex_1315',['~ndSyncMutex',['../classnd_sync_mutex.html#a1b3dd08e56dccc5e978d60d898a74db2',1,'ndSyncMutex']]],
+  ['_7endthread_1316',['~ndThread',['../classnd_thread.html#a0a691445db4125a0c69fa90e852de123',1,'ndThread']]]
 ];

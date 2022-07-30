@@ -45,7 +45,6 @@ class ndMemory
 	/// Calculate buffer size.
 	D_CORE_API static ndInt32 CalculateBufferSize(size_t size);
 
-
 	/// Return the total memory allocated by the newton engine and tools.
 	D_CORE_API static ndUnsigned64 GetMemoryUsed();
 

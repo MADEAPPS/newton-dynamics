@@ -133,95 +133,95 @@ $(document).ready(function(){initNavTree('nd_polygon_soup_builder_8h_source.html
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &quot;ndVector.h&quot;</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &quot;ndMatrix.h&quot;</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classnd_adjacentd_face.html">   37</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_adjacentd_face.html">ndAdjacentdFace</a></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classnd_plane.html">ndPlane</a> m_normal;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    ndInt32 m_count;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    ndInt32 *m_index;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    ndInt64 m_edgeMap[256];</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classnd_polygon_soup_builder.html">   46</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>: <span class="keyword">public</span> <a class="code" href="classnd_class_alloc.html">ndClassAlloc</a> </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_face_map.html">dgFaceMap</a>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_face_info.html">dgFaceInfo</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_face_bucket.html">dgFaceBucket</a>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html">dgPolySoupFilterAllocator</a>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    D_CORE_API <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> ();</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    D_CORE_API <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> (<span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>&amp; sopurce);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    D_CORE_API ~<a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> ();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Begin();</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    D_CORE_API <span class="keywordtype">void</span> End(<span class="keywordtype">bool</span> optimize);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    D_CORE_API <span class="keywordtype">void</span> AddFace(<span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> vertex, ndInt32 strideInBytes, ndInt32 vertexCount, <span class="keyword">const</span> ndInt32 faceId);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    D_CORE_API <span class="keywordtype">void</span> AddFaceIndirect(<span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> vertex, ndInt32 strideInBytes, ndInt32 faceId, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    D_CORE_API <span class="keywordtype">void</span> SavePLY(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> fileName) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordtype">void</span> Optimize(ndInt32 faceId, <span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder_1_1dg_face_bucket.html">dgFaceBucket</a>&amp; faceBucket, <span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>&amp; source);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">void</span> Finalize();</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordtype">void</span> OptimizeByIndividualFaces();</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordtype">void</span> FinalizeAndOptimize(ndInt32 <span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    ndInt32 FilterFace (ndInt32 count, ndInt32* <span class="keyword">const</span> indexArray);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    ndInt32 AddConvexFace (ndInt32 count, ndInt32* <span class="keyword">const</span> indexArray, ndInt32* <span class="keyword">const</span>  facesArray);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">void</span> PackArray();</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">   76</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a>: <span class="keyword">public</span> <a class="code" href="classnd_array.html">ndArray</a>&lt;ndBigVector&gt;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    {   </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a>()</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndBigVector&gt;</a>()</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a>(ndInt32 count)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndBigVector&gt;</a>(count)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    };</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="classnd_polygon_soup_builder_1_1nd_index_array.html">   90</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a>: <span class="keyword">public</span> <a class="code" href="classnd_array.html">ndArray</a>&lt;ndInt32&gt;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a>()</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>()</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a>(ndInt32 count)</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>(count)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    };</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a> m_faceVertexCount;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a> m_vertexIndex;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a> m_normalIndex;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a> m_vertexPoints;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a> m_normalPoints;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    ndInt32 m_run;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;};</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classnd_adjacent_face.html">   38</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_adjacent_face.html">ndAdjacentFace</a></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="classnd_plane.html">ndPlane</a> m_normal;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    ndInt32 m_count;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    ndInt32 *m_index;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    ndInt64 m_edgeMap[256];</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classnd_polygon_soup_builder.html">   47</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>: <span class="keyword">public</span> <a class="code" href="classnd_class_alloc.html">ndClassAlloc</a> </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_face_map.html">dgFaceMap</a>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_face_info.html">dgFaceInfo</a>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_face_bucket.html">dgFaceBucket</a>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html">dgPolySoupFilterAllocator</a>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    D_CORE_API <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> ();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    D_CORE_API <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> (<span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>&amp; sopurce);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    D_CORE_API ~<a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> ();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Begin();</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    D_CORE_API <span class="keywordtype">void</span> End(<span class="keywordtype">bool</span> optimize);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    D_CORE_API <span class="keywordtype">void</span> AddFace(<span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> vertex, ndInt32 strideInBytes, ndInt32 vertexCount, <span class="keyword">const</span> ndInt32 faceId);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    D_CORE_API <span class="keywordtype">void</span> AddFaceIndirect(<span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> vertex, ndInt32 strideInBytes, ndInt32 faceId, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    D_CORE_API <span class="keywordtype">void</span> SavePLY(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> fileName) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">void</span> Optimize(ndInt32 faceId, <span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder_1_1dg_face_bucket.html">dgFaceBucket</a>&amp; faceBucket, <span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>&amp; source);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordtype">void</span> Finalize();</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordtype">void</span> OptimizeByIndividualFaces();</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">void</span> FinalizeAndOptimize(ndInt32 <span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    ndInt32 FilterFace (ndInt32 count, ndInt32* <span class="keyword">const</span> indexArray);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    ndInt32 AddConvexFace (ndInt32 count, ndInt32* <span class="keyword">const</span> indexArray, ndInt32* <span class="keyword">const</span>  facesArray);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">void</span> PackArray();</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">   77</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a>: <span class="keyword">public</span> <a class="code" href="classnd_array.html">ndArray</a>&lt;ndBigVector&gt;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    {   </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a>()</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndBigVector&gt;</a>()</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        }</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a>(ndInt32 count)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndBigVector&gt;</a>(count)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        }</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    };</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="classnd_polygon_soup_builder_1_1nd_index_array.html">   91</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a>: <span class="keyword">public</span> <a class="code" href="classnd_array.html">ndArray</a>&lt;ndInt32&gt;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a>()</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>()</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a>(ndInt32 count)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            :<a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>(count)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    };</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a> m_faceVertexCount;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a> m_vertexIndex;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndIndexArray</a> m_normalIndex;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a> m_vertexPoints;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndVertexArray</a> m_normalPoints;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    ndInt32 m_run;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;};</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
-<div class="ttc" id="aclassnd_polygon_soup_builder_1_1nd_vertex_array_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndPolygonSoupBuilder::ndVertexArray</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:77</div></div>
+<div class="ttc" id="aclassnd_polygon_soup_builder_1_1nd_vertex_array_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1nd_vertex_array.html">ndPolygonSoupBuilder::ndVertexArray</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:78</div></div>
 <div class="ttc" id="aclassnd_polygon_soup_builder_1_1dg_face_map_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1dg_face_map.html">ndPolygonSoupBuilder::dgFaceMap</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.cpp:54</div></div>
-<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdef"><b>Definition:</b> ndArray.h:38</div></div>
+<div class="ttc" id="aclassnd_adjacent_face_html"><div class="ttname"><a href="classnd_adjacent_face.html">ndAdjacentFace</a></div><div class="ttdoc">Helper intermediate class for encoding a face adjacent face to an edge of a face.</div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:39</div></div>
+<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:41</div></div>
 <div class="ttc" id="aclassnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html">ndPolygonSoupBuilder::dgPolySoupFilterAllocator</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.cpp:85</div></div>
 <div class="ttc" id="aclassnd_plane_html"><div class="ttname"><a href="classnd_plane.html">ndPlane</a></div><div class="ttdef"><b>Definition:</b> ndPlane.h:35</div></div>
-<div class="ttc" id="aclassnd_polygon_soup_builder_html"><div class="ttname"><a href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:47</div></div>
-<div class="ttc" id="aclassnd_adjacentd_face_html"><div class="ttname"><a href="classnd_adjacentd_face.html">ndAdjacentdFace</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:38</div></div>
+<div class="ttc" id="aclassnd_polygon_soup_builder_html"><div class="ttname"><a href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:48</div></div>
 <div class="ttc" id="aclassnd_polygon_soup_builder_1_1dg_face_bucket_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1dg_face_bucket.html">ndPolygonSoupBuilder::dgFaceBucket</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.cpp:45</div></div>
-<div class="ttc" id="aclassnd_polygon_soup_builder_1_1nd_index_array_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndPolygonSoupBuilder::ndIndexArray</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:91</div></div>
+<div class="ttc" id="aclassnd_polygon_soup_builder_1_1nd_index_array_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1nd_index_array.html">ndPolygonSoupBuilder::ndIndexArray</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:92</div></div>
 <div class="ttc" id="aclassnd_polygon_soup_builder_1_1dg_face_info_html"><div class="ttname"><a href="classnd_polygon_soup_builder_1_1dg_face_info.html">ndPolygonSoupBuilder::dgFaceInfo</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.cpp:38</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

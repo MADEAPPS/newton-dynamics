@@ -29,7 +29,7 @@
 class ndClassAlloc  
 {
 	public:
-	/// Empty
+	/// Empty default constructor
 	inline ndClassAlloc()
 	{
 	}

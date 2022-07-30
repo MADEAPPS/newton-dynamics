@@ -132,7 +132,7 @@ void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 }
 
 #ifdef D_USE_PRECONTIONER_EXPERIMENT
-void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir0, const ndVector& dir1, const dgPointParam& param) const
+void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir0, const ndVector& dir1, const ndPointParam& param) const
 {
 	dAssert(m_body0);
 	dAssert(m_body1);
@@ -153,7 +153,7 @@ void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& d
 
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex, const ndVector& preconditioner0, const ndVector& preconditioner1)
 {
-	dgPointParam pointData;
+	ndPointParam pointData;
 	InitPointParam(pointData, contact.m_point, contact.m_point);
 	CalculatePointDerivative(normalIndex, desc, contact.m_normal * preconditioner0, contact.m_normal * preconditioner1, pointData);
 
@@ -290,7 +290,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 
 #else
 
-void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const dgPointParam& param) const
+void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const ndPointParam& param) const
 {
 	dAssert(m_body0);
 	dAssert(m_body1);
@@ -311,7 +311,7 @@ void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& d
 
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex)
 {
-	dgPointParam pointData;
+	ndPointParam pointData;
 	InitPointParam(pointData, contact.m_point, contact.m_point);
 	CalculatePointDerivative(normalIndex, desc, contact.m_normal, pointData);
 

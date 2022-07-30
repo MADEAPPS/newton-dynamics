@@ -4,7 +4,6 @@ var classnd_array =
     [ "ndArray", "classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae", null ],
     [ "ndArray", "classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb", null ],
     [ "~ndArray", "classnd_array.html#abfcae181655a5fb878515edf50540cb4", null ],
-    [ "Clear", "classnd_array.html#a60fb44b48eaa6c9c58dfe2ae1abd6743", null ],
     [ "GetCapacity", "classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e", null ],
     [ "GetCount", "classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7", null ],
     [ "operator[]", "classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9", null ],

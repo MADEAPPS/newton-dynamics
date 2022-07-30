@@ -528,25 +528,28 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_thread_pool.html">ndThreadPool</a>&amp; threadPool, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; array, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; scratchBuffer, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;{</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    scratchBuffer.SetCount(array.GetCount());</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(threadPool, &amp;array[0], &amp;scratchBuffer[0], array.GetCount(), prefixScanOut, context);</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    array.Swap(scratchBuffer);</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    scratchBuffer.<a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>());</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(threadPool, &amp;array[0], &amp;scratchBuffer[0], array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>(), prefixScanOut, context);</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    array.<a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(scratchBuffer);</div>
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;}</div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160; </div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; array, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; scratchBuffer, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;{</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    scratchBuffer.SetCount(array.GetCount());</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(&amp;array[0], &amp;scratchBuffer[0], array.GetCount(), prefixScanOut, context);</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    array.Swap(scratchBuffer);</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    scratchBuffer.<a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>());</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(&amp;array[0], &amp;scratchBuffer[0], array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>(), prefixScanOut, context);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    array.<a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(scratchBuffer);</div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;}</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdef"><b>Definition:</b> ndArray.h:38</div></div>
+<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:41</div></div>
+<div class="ttc" id="aclassnd_array_html_a76281badc4ffa3d67913fb33a12a7cb7"><div class="ttname"><a href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray::Swap</a></div><div class="ttdeci">void Swap(ndArray &amp;other)</div><div class="ttdoc">Interchange all the information with other.</div><div class="ttdef"><b>Definition:</b> ndArray.h:258</div></div>
 <div class="ttc" id="aclassnd_start_end_html"><div class="ttname"><a href="classnd_start_end.html">ndStartEnd</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:38</div></div>
+<div class="ttc" id="aclassnd_array_html_a0607c75a9ac49efe20ed3f948dcb9cc7"><div class="ttname"><a href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray::GetCount</a></div><div class="ttdeci">ndInt32 GetCount() const</div><div class="ttdoc">return the size of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:171</div></div>
 <div class="ttc" id="aclassnd_thread_pool_html"><div class="ttname"><a href="classnd_thread_pool.html">ndThreadPool</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:61</div></div>
+<div class="ttc" id="aclassnd_array_html_a0f9a0872e8b226746aa8c253b9528840"><div class="ttname"><a href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray::SetCount</a></div><div class="ttdeci">void SetCount(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:177</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

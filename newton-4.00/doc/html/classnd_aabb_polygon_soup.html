@@ -103,6 +103,9 @@ $(document).ready(function(){initNavTree('classnd_aabb_polygon_soup.html',''); i
 <div class="title">ndAabbPolygonSoup Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh.  
+ <a href="classnd_aabb_polygon_soup.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for ndAabbPolygonSoup:</div>
 <div class="dyncontent">
@@ -127,25 +130,30 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a45735adbc055ad1b16a8f19d9964fdcb"><td class="memItemLeft" align="right" valign="top"><a id="a45735adbc055ad1b16a8f19d9964fdcb"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetAABB</b> (<a class="el" href="classnd_vector.html">ndVector</a> &amp;p0, <a class="el" href="classnd_vector.html">ndVector</a> &amp;p1) const</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#a45735adbc055ad1b16a8f19d9964fdcb">GetAABB</a> (<a class="el" href="classnd_vector.html">ndVector</a> &amp;p0, <a class="el" href="classnd_vector.html">ndVector</a> &amp;p1) const</td></tr>
+<tr class="memdesc:a45735adbc055ad1b16a8f19d9964fdcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the root node bounding box of the mesh. <br /></td></tr>
 <tr class="separator:a45735adbc055ad1b16a8f19d9964fdcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7bc24b72eff1046e35ce6ed3bee3bec"><td class="memItemLeft" align="right" valign="top"><a id="aa7bc24b72eff1046e35ce6ed3bee3bec"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Serialize</b> (const char *const path) const</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#aa7bc24b72eff1046e35ce6ed3bee3bec">Serialize</a> (const char *const path) const</td></tr>
+<tr class="memdesc:aa7bc24b72eff1046e35ce6ed3bee3bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">writes the entire database to a binary file named path. <br /></td></tr>
 <tr class="separator:aa7bc24b72eff1046e35ce6ed3bee3bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a626880bcbe457bf19608f2c17270f518"><td class="memItemLeft" align="right" valign="top"><a id="a626880bcbe457bf19608f2c17270f518"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Deserialize</b> (const char *const path)</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#a626880bcbe457bf19608f2c17270f518">Deserialize</a> (const char *const path)</td></tr>
+<tr class="memdesc:a626880bcbe457bf19608f2c17270f518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a previously saved database binary file named path. <br /></td></tr>
 <tr class="separator:a626880bcbe457bf19608f2c17270f518"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae17c8b34fea3f36de4bedfa68ca660db"><td class="memItemLeft" align="right" valign="top"><a id="ae17c8b34fea3f36de4bedfa68ca660db"></a>
-<a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetRootNode</b> () const</td></tr>
+<a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">GetRootNode</a> () const</td></tr>
+<tr class="memdesc:ae17c8b34fea3f36de4bedfa68ca660db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the root node of the hierarchy. <br /></td></tr>
 <tr class="separator:ae17c8b34fea3f36de4bedfa68ca660db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a439e32885f3cf7396b1f336f259ec19e"><td class="memItemLeft" align="right" valign="top"><a id="a439e32885f3cf7396b1f336f259ec19e"></a>
-<a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetBackNode</b> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const node) const</td></tr>
+<tr class="memitem:a439e32885f3cf7396b1f336f259ec19e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">GetBackNode</a> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const node) const</td></tr>
+<tr class="memdesc:a439e32885f3cf7396b1f336f259ec19e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the back child node of the hierarchy.  <a href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">More...</a><br /></td></tr>
 <tr class="separator:a439e32885f3cf7396b1f336f259ec19e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a509545f55d440d122d807098aa9c86fd"><td class="memItemLeft" align="right" valign="top"><a id="a509545f55d440d122d807098aa9c86fd"></a>
-<a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetFrontNode</b> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const node) const</td></tr>
+<tr class="memitem:a509545f55d440d122d807098aa9c86fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">GetFrontNode</a> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const node) const</td></tr>
+<tr class="memdesc:a509545f55d440d122d807098aa9c86fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the front child node of the hierarchy.  <a href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">More...</a><br /></td></tr>
 <tr class="separator:a509545f55d440d122d807098aa9c86fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0eecced4dccecea25865934aa8efc6d6"><td class="memItemLeft" align="right" valign="top"><a id="a0eecced4dccecea25865934aa8efc6d6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>GetNodeAabb</b> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const node, <a class="el" href="classnd_vector.html">ndVector</a> &amp;p0, <a class="el" href="classnd_vector.html">ndVector</a> &amp;p1) const</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">GetNodeAabb</a> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const node, <a class="el" href="classnd_vector.html">ndVector</a> &amp;p0, <a class="el" href="classnd_vector.html">ndVector</a> &amp;p1) const</td></tr>
+<tr class="memdesc:a0eecced4dccecea25865934aa8efc6d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the bounding box of node in point p0 and p1. <br /></td></tr>
 <tr class="separator:a0eecced4dccecea25865934aa8efc6d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_polygon_soup_database"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_polygon_soup_database')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_polygon_soup_database.html">ndPolygonSoupDatabase</a></td></tr>
 <tr class="memitem:a77ff6bc6b15e808a12b43da940f3a6d8 inherit pub_methods_classnd_polygon_soup_database"><td class="memItemLeft" align="right" valign="top"><a id="a77ff6bc6b15e808a12b43da940f3a6d8"></a>
@@ -169,7 +177,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetTagId</b> (const n
 <tr class="inherit_header pub_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
 <tr class="memitem:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="affad975c41ed36eae8c71e3468fc12e3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#affad975c41ed36eae8c71e3468fc12e3">ndClassAlloc</a> ()</td></tr>
-<tr class="memdesc:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="memdesc:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty default constructor. <br /></td></tr>
 <tr class="separator:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a8fea90aa3642db2007a191975bb169ce"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce">~ndClassAlloc</a> ()</td></tr>
@@ -229,6 +237,67 @@ ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_strideInBytes</b
 ndFloat32 *&#160;</td><td class="memItemRight" valign="bottom"><b>m_localVertex</b></td></tr>
 <tr class="separator:a97b30fb24b03c67ece2db646bf565f9a inherit pro_attribs_classnd_polygon_soup_database"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a439e32885f3cf7396b1f336f259ec19e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a439e32885f3cf7396b1f336f259ec19e">&#9670;&nbsp;</a></span>GetBackNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* ndAabbPolygonSoup::GetBackNode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const&#160;</td>
+          <td class="paramname"><em>node</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the back child node of the hierarchy. </p>
+<p>Return nullptr if node was a leaf. </p>
+
+</div>
+</div>
+<a id="a509545f55d440d122d807098aa9c86fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a509545f55d440d122d807098aa9c86fd">&#9670;&nbsp;</a></span>GetFrontNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* ndAabbPolygonSoup::GetFrontNode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> *const&#160;</td>
+          <td class="paramname"><em>node</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the front child node of the hierarchy. </p>
+<p>Return nullptr if node was a leaf. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

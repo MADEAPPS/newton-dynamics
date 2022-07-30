@@ -43,7 +43,7 @@ ndConstraint::ndConstraint()
 {
 }
 
-void ndConstraint::InitPointParam(dgPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const
+void ndConstraint::InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const
 {
 	ndBodyKinematic* const body0 = GetBody0();
 	ndBodyKinematic* const body1 = GetBody1();
