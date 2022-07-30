@@ -376,7 +376,7 @@ class ndAiBipedTest_1 : public ndModel
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			ndEffectorInfo& info = m_effectors[i];
-			const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+			const ndMatrix yaw(ndYawMatrix(-info.m_y_mapper.Interpolate(info.m_y)));
 			const ndMatrix roll(ndRollMatrix(info.m_y_mapper.Interpolate(info.m_z)));
 
 			ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
