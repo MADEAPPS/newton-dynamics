@@ -210,7 +210,7 @@ class ndMeshEffect: public ndPolyhedra
 	
 #endif
 
-	enum dChannelType
+	enum ndChannelType
 	{
 		m_vertex,
 		m_normal,
@@ -223,27 +223,27 @@ class ndMeshEffect: public ndPolyhedra
 		m_point,
 	};
 
-	template<class T, dChannelType type>
-	class dChannel: public ndArray<T>
+	template<class T, ndChannelType type>
+	class ndChannel: public ndArray<T>
 	{
 		public:
-		dChannel();
-		dChannel(const dChannel& source);
-		~dChannel();
+		ndChannel();
+		ndChannel(const ndChannel& source);
+		~ndChannel();
 
 		void Clear();
 		void PushBack(const T& element);
 		
-		dChannelType m_type;
+		ndChannelType m_type;
 		bool m_isValid;
 	};
 
-	class dFormat
+	class ndFormat
 	{
 		public:
-		class dSortCluster;
+		class ndSortCluster;
 
-		class dSortKey
+		class ndSortKey
 		{
 			public:
 			ndInt32 m_mask;
@@ -251,36 +251,37 @@ class ndMeshEffect: public ndPolyhedra
 			ndInt32 m_vertexIndex;
 			ndInt32 m_attibuteIndex;
 		};
-		class dVertexSortData
+
+		class ndVertexSortData
 		{
 			public:
-			const dChannel<ndBigVector, m_point>* m_points;
+			const ndChannel<ndBigVector, m_point>* m_points;
 			ndInt32 m_vertexSortIndex;
 		};
 
-		static ndInt32 CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context);
+		static ndInt32 CompareVertex(const ndSortKey* const ptr0, const ndSortKey* const ptr1, void* const context);
 	};
 
-	class dPointFormat: public dFormat
+	class ndPointFormat: public ndFormat
 	{
 		public:
-		dPointFormat();
-		dPointFormat(const dPointFormat& source);
-		~dPointFormat();
+		ndPointFormat();
+		ndPointFormat(const ndPointFormat& source);
+		~ndPointFormat();
 
 		void Clear();
 		void SetCount(ndInt32 count);
 		void CompactVertexData(ndInt32* const indexList, ndFloat32 tol);
 
 		private:
-		void CompressData(dPointFormat& output, ndInt32* const indexList, dSortKey* const remapIndex, const dSortCluster& batch, ndFloat32 tol);
+		void CompressData(ndPointFormat& output, ndInt32* const indexList, ndSortKey* const remapIndex, const ndSortCluster& batch, ndFloat32 tol);
 		
 		public:
-		dChannel<ndInt32, m_layer> m_layers;
-		dChannel<ndBigVector, m_point> m_vertex;
+		ndChannel<ndInt32, m_layer> m_layers;
+		ndChannel<ndBigVector, m_point> m_vertex;
 	};
 
-	class dAttibutFormat: public dFormat
+	class ndAttibutFormat: public ndFormat
 	{
 		public:
 		class dgUV
@@ -290,34 +291,34 @@ class ndMeshEffect: public ndPolyhedra
 			ndFloat32 m_v;
 		};
 
-		dAttibutFormat();
-		dAttibutFormat(const dAttibutFormat& source);
-		~dAttibutFormat();
+		ndAttibutFormat();
+		ndAttibutFormat(const ndAttibutFormat& source);
+		~ndAttibutFormat();
 
 		void Clear();
 		void SetCount(ndInt32 count);
-		void CopyFrom(const dAttibutFormat& source);
-		void CopyEntryFrom(ndInt32 index, const dAttibutFormat& source, ndInt32 sourceIndex);
-		void CompactVertexData(const dPointFormat& points, ndInt32* const indexList, ndFloat32 tol);
+		void CopyFrom(const ndAttibutFormat& source);
+		void CopyEntryFrom(ndInt32 index, const ndAttibutFormat& source, ndInt32 sourceIndex);
+		void CompactVertexData(const ndPointFormat& points, ndInt32* const indexList, ndFloat32 tol);
 
 		private:
-		void CompressData(dAttibutFormat& output, const dPointFormat& points, ndInt32* const indexList, dSortKey* const remapIndex, const dSortCluster& batch, ndFloat32 tol);
+		void CompressData(ndAttibutFormat& output, const ndPointFormat& points, ndInt32* const indexList, ndSortKey* const remapIndex, const ndSortCluster& batch, ndFloat32 tol);
 
 		public:
-		dChannel<ndInt32, m_vertex> m_pointChannel;
-		dChannel<ndInt32, m_material> m_materialChannel;
-		dChannel<ndTriplex, m_normal> m_normalChannel;
-		dChannel<ndTriplex, m_binormal> m_binormalChannel;
-		dChannel<ndVector, m_color> m_colorChannel;
-		dChannel<dgUV, m_uv0> m_uv0Channel;
-		dChannel<dgUV, m_uv1> m_uv1Channel;
+		ndChannel<ndInt32, m_vertex> m_pointChannel;
+		ndChannel<ndInt32, m_material> m_materialChannel;
+		ndChannel<ndTriplex, m_normal> m_normalChannel;
+		ndChannel<ndTriplex, m_binormal> m_binormalChannel;
+		ndChannel<ndVector, m_color> m_colorChannel;
+		ndChannel<dgUV, m_uv0> m_uv0Channel;
+		ndChannel<dgUV, m_uv1> m_uv1Channel;
 	};
 
 	public:
-	class dMaterial
+	class ndMaterial
 	{
 		public:
-		dMaterial()
+		ndMaterial()
 			:m_ambient(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
 			,m_diffuse(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
 			,m_specular(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f))
@@ -403,7 +404,7 @@ class ndMeshEffect: public ndPolyhedra
 	void SetName (const ndString& name);
 	const ndString& GetName() const;
 
-	ndArray<dMaterial>& GetMaterials();
+	ndArray<ndMaterial>& GetMaterials();
 	ndInt32 GetPropertiesCount() const;
 
 	ndInt32 GetVertexCount() const;
@@ -495,10 +496,10 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API ndMeshEffect* GetNextLayer(ndInt32 mark);
 
 	ndString m_name;
-	dPointFormat m_points;
-	dAttibutFormat m_attrib;
+	ndPointFormat m_points;
+	ndAttibutFormat m_attrib;
 	dClusterMap m_clusters;
-	ndArray<dMaterial> m_materials;
+	ndArray<ndMaterial> m_materials;
 	ndInt32 m_vertexBaseCount;
 	ndInt32 m_constructionIndex;
 };
@@ -551,65 +552,65 @@ inline ndFloat64 ndMeshEffect::QuantizeCordinade(ndFloat64 x) const
 	return x1;
 }
 
-template<class T, ndMeshEffect::dChannelType type>
-ndMeshEffect::dChannel<T, type>::dChannel()
+template<class T, ndMeshEffect::ndChannelType type>
+ndMeshEffect::ndChannel<T, type>::ndChannel()
 	:ndArray<T>()
 	,m_type(type)
 	,m_isValid(false)
 {
 }
 
-template<class T, ndMeshEffect::dChannelType type>
-ndMeshEffect::dChannel<T, type>::dChannel(const dChannel& source)
+template<class T, ndMeshEffect::ndChannelType type>
+ndMeshEffect::ndChannel<T, type>::ndChannel(const ndChannel& source)
 	:ndArray<T>(source)
 	,m_type(source.m_type)
 	,m_isValid(source.m_isValid)
 {
 }
 
-template<class T, ndMeshEffect::dChannelType type>
-ndMeshEffect::dChannel<T, type>::~dChannel()
+template<class T, ndMeshEffect::ndChannelType type>
+ndMeshEffect::ndChannel<T, type>::~ndChannel()
 {
 }
 
-template<class T, ndMeshEffect::dChannelType type>
-void ndMeshEffect::dChannel<T, type>::Clear()
+template<class T, ndMeshEffect::ndChannelType type>
+void ndMeshEffect::ndChannel<T, type>::Clear()
 {
 	m_isValid = false;
 	ndArray<T>::Clear();
 }
 
-template<class T, ndMeshEffect::dChannelType type>
-void ndMeshEffect::dChannel<T, type>::PushBack(const T& element)
+template<class T, ndMeshEffect::ndChannelType type>
+void ndMeshEffect::ndChannel<T, type>::PushBack(const T& element)
 {
 	T tmp(element);
 	m_isValid = true;
 	ndArray<T>::PushBack(tmp);
 }
 
-inline ndMeshEffect::dPointFormat::dPointFormat()
+inline ndMeshEffect::ndPointFormat::ndPointFormat()
 	:m_layers()
 	,m_vertex()
 {
 }
 
-inline ndMeshEffect::dPointFormat::dPointFormat(const dPointFormat& source)
+inline ndMeshEffect::ndPointFormat::ndPointFormat(const ndPointFormat& source)
 	:m_layers(source.m_layers)
 	,m_vertex(source.m_vertex)
 {
 }
 
-inline ndMeshEffect::dPointFormat::~dPointFormat()
+inline ndMeshEffect::ndPointFormat::~ndPointFormat()
 {
 }
 
-inline void ndMeshEffect::dPointFormat::Clear()
+inline void ndMeshEffect::ndPointFormat::Clear()
 {
 	m_layers.Clear();
 	m_vertex.Clear();
 }
 
-inline void ndMeshEffect::dPointFormat::SetCount(ndInt32 count)
+inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
 {
 	m_vertex.Resize(count);
 	m_vertex.SetCount(count);
@@ -618,7 +619,7 @@ inline void ndMeshEffect::dPointFormat::SetCount(ndInt32 count)
 	m_layers.SetCount(count);
 }
 
-inline ndMeshEffect::dAttibutFormat::dAttibutFormat()
+inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat()
 	:m_pointChannel()
 	,m_materialChannel()
 	,m_normalChannel()
@@ -629,7 +630,7 @@ inline ndMeshEffect::dAttibutFormat::dAttibutFormat()
 {
 }
 
-inline ndMeshEffect::dAttibutFormat::dAttibutFormat(const dAttibutFormat& source)
+inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat(const ndAttibutFormat& source)
 	:m_pointChannel(source.m_pointChannel)
 	,m_materialChannel(source.m_materialChannel)
 	,m_normalChannel(source.m_normalChannel)
@@ -640,11 +641,11 @@ inline ndMeshEffect::dAttibutFormat::dAttibutFormat(const dAttibutFormat& source
 {
 }
 
-inline ndMeshEffect::dAttibutFormat::~dAttibutFormat()
+inline ndMeshEffect::ndAttibutFormat::~ndAttibutFormat()
 {
 }
 
-inline void ndMeshEffect::dAttibutFormat::Clear()
+inline void ndMeshEffect::ndAttibutFormat::Clear()
 {
 	m_pointChannel.Clear();
 	m_materialChannel.Clear();
@@ -655,7 +656,7 @@ inline void ndMeshEffect::dAttibutFormat::Clear()
 	m_uv1Channel.Clear();
 }
 
-inline void ndMeshEffect::dAttibutFormat::SetCount(ndInt32 count)
+inline void ndMeshEffect::ndAttibutFormat::SetCount(ndInt32 count)
 {
 	m_pointChannel.Resize(count);
 	m_pointChannel.SetCount(count);
@@ -694,7 +695,7 @@ inline const ndString& ndMeshEffect::GetName() const
 	return m_name;
 }
 
-inline ndArray<ndMeshEffect::dMaterial>& ndMeshEffect::GetMaterials()
+inline ndArray<ndMeshEffect::ndMaterial>& ndMeshEffect::GetMaterials()
 {
 	return m_materials;
 }

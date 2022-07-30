@@ -1147,7 +1147,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 				//alpha2 = 0.0;
 				if (m_attrib.m_uv0Channel.GetCount() && convexMesh.m_attrib.m_uv0Channel.GetCount())
 				{
-					dAttibutFormat::dgUV uv;
+					ndAttibutFormat::dgUV uv;
 					uv.m_u = uv0[0].m_x * alpha0 + uv0[1].m_x * alpha1 + uv0[2].m_x * alpha2;
 					uv.m_v = uv0[0].m_y * alpha0 + uv0[1].m_y * alpha1 + uv0[2].m_y * alpha2;
 					m_attrib.m_uv0Channel.PushBack(uv);
@@ -1155,7 +1155,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 
 				if (m_attrib.m_uv1Channel.GetCount() && convexMesh.m_attrib.m_uv1Channel.GetCount())
 				{
-					dAttibutFormat::dgUV uv;
+					ndAttibutFormat::dgUV uv;
 					uv.m_u = uv1[0].m_x * alpha0 + uv1[1].m_x * alpha1 + uv1[2].m_x * alpha2;
 					uv.m_v = uv1[0].m_y * alpha0 + uv1[1].m_y * alpha1 + uv1[2].m_y * alpha2;
 					m_attrib.m_uv1Channel.PushBack(uv);

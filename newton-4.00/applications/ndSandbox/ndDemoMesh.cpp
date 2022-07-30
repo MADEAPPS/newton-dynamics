@@ -265,13 +265,13 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 
 	ndInt32 segmentStart = 0;
 	bool hasTransparency = false;
-	const ndArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
+	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshNode->GetMaterials();
 	for (ndInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		ndInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 		
-		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
+		const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
 		segment->m_material.m_ambient = glVector4(material.m_ambient);
 		segment->m_material.m_diffuse = glVector4(material.m_diffuse);
 		segment->m_material.m_specular = glVector4(material.m_specular);

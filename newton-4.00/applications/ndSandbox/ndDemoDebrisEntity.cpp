@@ -79,11 +79,11 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 
 	ndInt32 segmentStart = 0;
 	ndInt32 materialCount = 0;
-	const ndArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
+	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshNode->GetMaterials();
 	for (ndInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		ndInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
-		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
+		const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
 
 		m_material[materialCount].m_ambient = glVector4 (material.m_ambient);
 		m_material[materialCount].m_diffuse = glVector4(material.m_diffuse);

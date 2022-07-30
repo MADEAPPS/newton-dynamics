@@ -29,10 +29,10 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticProceduralMesh)
 
 template<class T>
-class dTempArray : public ndArray<T>
+class ndTempArray : public ndArray<T>
 {
 	public:
-	dTempArray(ndInt32 maxSize, T* const buffer) 
+	ndTempArray(ndInt32 maxSize, T* const buffer) 
 		:ndArray<T>()
 		,m_buffer(buffer)
 	{
@@ -40,7 +40,7 @@ class dTempArray : public ndArray<T>
 		ndArray<T>::m_capacity = maxSize;
 	}
 
-	~dTempArray()
+	~ndTempArray()
 	{
 		ndArray<T>::m_array = nullptr;
 	}
@@ -113,10 +113,10 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	ndInt32* const materialBuffer = ndAlloca(ndInt32, m_maxFaceCount);
 	ndInt32* const indexBuffer = ndAlloca(ndInt32, m_maxFaceCount * 4);
 
-	dTempArray<ndInt32> faceList(m_maxFaceCount, faceBuffer);
-	dTempArray<ndInt32> indexList(m_maxFaceCount * 4, indexBuffer);
-	dTempArray<ndVector> vertexList(m_maxVertexCount, vertexBuffer);
-	dTempArray<ndInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
+	ndTempArray<ndInt32> faceList(m_maxFaceCount, faceBuffer);
+	ndTempArray<ndInt32> indexList(m_maxFaceCount * 4, indexBuffer);
+	ndTempArray<ndVector> vertexList(m_maxVertexCount, vertexBuffer);
+	ndTempArray<ndInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
 
 	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertexList, faceList, faceMaterialList, indexList);
 	if (faceList.GetCount() == 0)

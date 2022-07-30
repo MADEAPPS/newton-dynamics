@@ -133,13 +133,13 @@ class ndConvexHull4dAABBTreeNode
 	ndInt32 m_id;
 	#endif
 
-		ndBigVector m_box[2];
-		ndConvexHull4dAABBTreeNode* m_left;
-		ndConvexHull4dAABBTreeNode* m_right;
-		ndConvexHull4dAABBTreeNode* m_parent;
+	ndBigVector m_box[2];
+	ndConvexHull4dAABBTreeNode* m_left;
+	ndConvexHull4dAABBTreeNode* m_right;
+	ndConvexHull4dAABBTreeNode* m_parent;
 };
 
-class dgConvexHull4dPointCluster: public ndConvexHull4dAABBTreeNode
+class ndConvexHull4dPointCluster: public ndConvexHull4dAABBTreeNode
 {
 	public:
 	ndInt32 m_count;
@@ -454,7 +454,7 @@ ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePo
 			} 
 			else 
 			{
-				dgConvexHull4dPointCluster* const cluster = (dgConvexHull4dPointCluster*) me;
+				ndConvexHull4dPointCluster* const cluster = (ndConvexHull4dPointCluster*) me;
 				for (ndInt32 i = 0; i < cluster->m_count; i ++) 
 				{
 					const ndConvexHull4dVector& p = points[cluster->m_indices[i]];
@@ -528,9 +528,9 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 	ndBigVector maxP (-ndFloat32 (1.0e15f)); 
 	if (count <= D_VERTEX_CLUMP_SIZE_4D) 
 	{
-		dgConvexHull4dPointCluster* const clump = new (*memoryPool) dgConvexHull4dPointCluster;
-		*memoryPool += sizeof (dgConvexHull4dPointCluster);
-		maxMemSize -= sizeof (dgConvexHull4dPointCluster);
+		ndConvexHull4dPointCluster* const clump = new (*memoryPool) ndConvexHull4dPointCluster;
+		*memoryPool += sizeof (ndConvexHull4dPointCluster);
+		maxMemSize -= sizeof (ndConvexHull4dPointCluster);
 		dAssert (maxMemSize >= 0);
 
 		dAssert (clump);
@@ -1079,7 +1079,7 @@ void ndConvexHull4d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 	treeCount *= 2;
 
 	ndStack<ndConvexHull4dVector> points (count);
-	ndStack<dgConvexHull4dPointCluster> treePool (treeCount + 256);
+	ndStack<ndConvexHull4dPointCluster> treePool (treeCount + 256);
 
 	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], treePool.GetSizeInBytes());
 	if (m_count >= 4) 

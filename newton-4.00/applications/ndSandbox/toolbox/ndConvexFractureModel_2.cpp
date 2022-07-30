@@ -66,9 +66,9 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 
 	// Get the volume of the original mesh
 	ndMeshEffect mesh(*desc.m_shape);
-	mesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
-	ndMeshEffect::dMaterial& material0 = mesh.GetMaterials()[0];
-	ndMeshEffect::dMaterial& material1 = mesh.GetMaterials()[1];
+	mesh.GetMaterials().PushBack(ndMeshEffect::ndMaterial());
+	ndMeshEffect::ndMaterial& material0 = mesh.GetMaterials()[0];
+	ndMeshEffect::ndMaterial& material1 = mesh.GetMaterials()[1];
 	strcpy(material0.m_textureName, desc.m_outTexture);
 	strcpy(material1.m_textureName, desc.m_innerTexture);
 

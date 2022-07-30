@@ -259,19 +259,19 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 
 static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh)
 {
-	ndArray<ndMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
+	ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
 	
 	ndInt32 materialCount = fbxMesh->getMaterialCount();
 	if (materialCount == 0)
 	{
-		ndMeshEffect::dMaterial defaultMaterial;
+		ndMeshEffect::ndMaterial defaultMaterial;
 		materialArray.PushBack(defaultMaterial);
 	}
 	else
 	{
 		for (ndInt32 i = 0; i < materialCount; ++i)
 		{
-			ndMeshEffect::dMaterial material;
+			ndMeshEffect::ndMaterial material;
 			const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(i);
 			dAssert(fbxMaterial);
 
@@ -352,7 +352,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 
 	ndInt32 count = 0;
 	ndInt32 faceIndex = 0;
-	const ndArray<ndMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
+	const ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
 	ndInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
 	for (ndInt32 i = 0; i < indexCount; ++i)
 	{

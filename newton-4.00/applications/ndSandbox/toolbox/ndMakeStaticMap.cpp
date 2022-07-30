@@ -64,8 +64,8 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	ndMeshEffect meshEffect;
 	meshEffect.BeginBuild();
 
-	ndMeshEffect::dMaterial material;
-	ndArray<ndMeshEffect::dMaterial>& materialArray = meshEffect.GetMaterials();
+	ndMeshEffect::ndMaterial material;
+	ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect.GetMaterials();
 	strcpy(material.m_textureName, "marbleCheckBoard.tga");
 	materialArray.PushBack(material);
 

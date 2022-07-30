@@ -33,14 +33,13 @@
 
 #define D_LOCAL_BUFFER_SIZE  1024
 
-#define dPointerToInt(x) ((size_t)x)
-#define dIntToPointer(x) ((void*)(size_t(x)))
+#define ndPointerToInt(x) ((size_t)x)
+#define ndIntToPointer(x) ((void*)(size_t(x)))
 
-
-class dgDiagonalEdge
+class ndDiagonalEdge
 {
 	public:
-	dgDiagonalEdge (ndEdge* const edge)
+	ndDiagonalEdge (ndEdge* const edge)
 		:m_i0(edge->m_incidentVertex), m_i1(edge->m_twin->m_incidentVertex)
 	{
 	}
@@ -48,37 +47,38 @@ class dgDiagonalEdge
 	ndInt32 m_i1;
 };
 
-struct dEdgeCollapseEdgeHandle
+class ndEdgeCollapseEdgeHandle
 {
-	dEdgeCollapseEdgeHandle (ndEdge* const newEdge)
+	public:
+	ndEdgeCollapseEdgeHandle (ndEdge* const newEdge)
 		:m_edge(newEdge)
 		,m_inList(0)
 	{
 	}
 
-	dEdgeCollapseEdgeHandle (const dEdgeCollapseEdgeHandle &dataHandle)
+	ndEdgeCollapseEdgeHandle (const ndEdgeCollapseEdgeHandle &dataHandle)
 		:m_edge(dataHandle.m_edge)
 		,m_inList(1)
 	{
-		dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *)dIntToPointer (m_edge->m_userData);
+		ndEdgeCollapseEdgeHandle* const handle = (ndEdgeCollapseEdgeHandle *)ndIntToPointer (m_edge->m_userData);
 		if (handle) 
 		{
 			dAssert (handle != this);
 			handle->m_edge = nullptr;
 		}
-		m_edge->m_userData = ndUnsigned64 (dPointerToInt(this));
+		m_edge->m_userData = ndUnsigned64 (ndPointerToInt(this));
 	}
 
-	~dEdgeCollapseEdgeHandle ()
+	~ndEdgeCollapseEdgeHandle ()
 	{
 		if (m_inList) 
 		{
 			if (m_edge) 
 			{
-				dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *)dIntToPointer (m_edge->m_userData);
+				ndEdgeCollapseEdgeHandle* const handle = (ndEdgeCollapseEdgeHandle *)ndIntToPointer (m_edge->m_userData);
 				if (handle == this) 
 				{
-					m_edge->m_userData = dPointerToInt (nullptr);
+					m_edge->m_userData = ndPointerToInt (nullptr);
 				}
 			}
 		}
@@ -1071,7 +1071,7 @@ ndEdge* ndPolyhedra::CollapseEdge(ndEdge* const edge)
 
 void ndPolyhedra::RemoveHalfEdge (ndEdge* const edge)
 {
-	dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *) dIntToPointer (edge->m_userData);
+	ndEdgeCollapseEdgeHandle* const handle = (ndEdgeCollapseEdgeHandle *) ndIntToPointer (edge->m_userData);
 	if (handle) 
 	{ 
 		handle->m_edge = nullptr;
@@ -1382,17 +1382,17 @@ void ndPolyhedra::MarkAdjacentCoplanarFaces (ndPolyhedra& polyhedraOut, ndEdge* 
 
 void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 stride, const ndBigVector& normal, ndInt32 perimeterCount, ndEdge** const perimeter)
 {
-	ndList<dgDiagonalEdge> dignonals;
+	ndList<ndDiagonalEdge> dignonals;
 
 	for (ndInt32 i = 1; i <= perimeterCount; i ++) 
 	{
 		ndEdge* const last = perimeter[i - 1];
 		for (ndEdge* ptr = perimeter[i]->m_prev; ptr != last; ptr = ptr->m_twin->m_prev) 
 		{
-			ndList<dgDiagonalEdge>::ndNode* node = dignonals.GetFirst();
+			ndList<ndDiagonalEdge>::ndNode* node = dignonals.GetFirst();
 			for (; node; node = node->GetNext()) 
 			{
-				const dgDiagonalEdge& key = node->GetInfo();
+				const ndDiagonalEdge& key = node->GetInfo();
 				if (((key.m_i0 == ptr->m_incidentVertex) && (key.m_i1 == ptr->m_twin->m_incidentVertex)) ||
 					((key.m_i1 == ptr->m_incidentVertex) && (key.m_i0 == ptr->m_twin->m_incidentVertex))) 
 				{
@@ -1401,7 +1401,7 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 			}
 			if (!node) 
 			{
-				dgDiagonalEdge key (ptr);
+				ndDiagonalEdge key (ptr);
 				dignonals.Append(key);
 			}
 		}
@@ -1436,8 +1436,8 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 	while (dignonals.GetCount() && maxCount) 
 	{
 		maxCount --;
-		ndList<dgDiagonalEdge>::ndNode* const node = dignonals.GetFirst();
-		dgDiagonalEdge key (node->GetInfo());
+		ndList<ndDiagonalEdge>::ndNode* const node = dignonals.GetFirst();
+		ndDiagonalEdge key (node->GetInfo());
 		dignonals.Remove(node);
 		ndEdge* const edge = FindEdge(key.m_i0, key.m_i1);
 		if (edge) 
@@ -1506,24 +1506,24 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 
 					if (backFace0 && (backFace0->m_incidentFace > 0) && (backFace0->m_twin->m_incidentFace > 0))
 					{
-						dgDiagonalEdge key0 (backFace0);
+						ndDiagonalEdge key0 (backFace0);
 						dignonals.Append(key0);
 					}
 					if (backFace1 && (backFace1->m_incidentFace > 0) && (backFace1->m_twin->m_incidentFace > 0)) 
 					{
-						dgDiagonalEdge key1 (backFace1);
+						ndDiagonalEdge key1 (backFace1);
 						dignonals.Append(key1);
 					}
 
 					if (frontFace0 && (frontFace0->m_incidentFace > 0) && (frontFace0->m_twin->m_incidentFace > 0)) 
 					{
-						dgDiagonalEdge key0 (frontFace0);
+						ndDiagonalEdge key0 (frontFace0);
 						dignonals.Append(key0);
 					}
 
 					if (frontFace1 && (frontFace1->m_incidentFace > 0) && (frontFace1->m_twin->m_incidentFace > 0)) 
 					{
-						dgDiagonalEdge key1 (frontFace1);
+						ndDiagonalEdge key1 (frontFace1);
 						dignonals.Append(key1);
 					}
 				}
@@ -2431,9 +2431,9 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 	ndStack<ndBigVector> vertexPool (maxVertexIndex); 
 	ndStack<ndVertexCollapseVertexMetric> vertexMetrics (maxVertexIndex + 512); 
 
-	ndList<dEdgeCollapseEdgeHandle> edgeHandleList;
-	ndStack<char> heapPool (2 * edgeCount * ndInt32 (sizeof (ndFloat64) + sizeof (dEdgeCollapseEdgeHandle*) + sizeof (ndInt32))); 
-	ndUpHeap<ndList<dEdgeCollapseEdgeHandle>::ndNode* , ndFloat64> bigHeapArray(&heapPool[0], heapPool.GetSizeInBytes());
+	ndList<ndEdgeCollapseEdgeHandle> edgeHandleList;
+	ndStack<char> heapPool (2 * edgeCount * ndInt32 (sizeof (ndFloat64) + sizeof (ndEdgeCollapseEdgeHandle*) + sizeof (ndInt32))); 
+	ndUpHeap<ndList<ndEdgeCollapseEdgeHandle>::ndNode* , ndFloat64> bigHeapArray(&heapPool[0], heapPool.GetSizeInBytes());
 
 	for (ndInt32 i = 0; i < maxVertexIndex; i ++) 
 	{
@@ -2463,8 +2463,8 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 		ndFloat64 faceCost = metric.Evalue (p); 
 		ndFloat64 edgePenalty = EdgePenalty (&vertexPool[0], edge, distTol);
 		dAssert (edgePenalty >= ndFloat32 (0.0f));
-		dEdgeCollapseEdgeHandle handle (edge);
-		ndList<dEdgeCollapseEdgeHandle>::ndNode* handleNodePtr = edgeHandleList.Addtop (handle);
+		ndEdgeCollapseEdgeHandle handle (edge);
+		ndList<ndEdgeCollapseEdgeHandle>::ndNode* handleNodePtr = edgeHandleList.Addtop (handle);
 		bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
 	}
 
@@ -2473,7 +2473,7 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 	ndInt32 faceCount = GetFaceCount();
 	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < maxCost) && ((bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount)) && progress ) 
 	{
-		ndList<dEdgeCollapseEdgeHandle>::ndNode* const handleNodePtr = bigHeapArray[0];
+		ndList<ndEdgeCollapseEdgeHandle>::ndNode* const handleNodePtr = bigHeapArray[0];
 
 		ndEdge* edge = handleNodePtr->GetInfo().m_edge;
 		bigHeapArray.Pop();
@@ -2496,7 +2496,7 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 				{
 					for(ndInt32 i = bigHeapArray.GetCount() - 1; i >= 0; i --) 
 					{
-						ndList<dEdgeCollapseEdgeHandle>::ndNode* const emptyHandle = bigHeapArray[i];
+						ndList<ndEdgeCollapseEdgeHandle>::ndNode* const emptyHandle = bigHeapArray[i];
 						if (!emptyHandle->GetInfo().m_edge) 
 						{
 							bigHeapArray.Remove(i);
@@ -2544,8 +2544,8 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 						ndFloat64 faceCost = metric.Evalue (p); 
 						ndFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr, distTol);
 						dAssert (edgePenalty >= ndFloat32 (0.0f));
-						dEdgeCollapseEdgeHandle handle (ptr);
-						ndList <dEdgeCollapseEdgeHandle>::ndNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
+						ndEdgeCollapseEdgeHandle handle (ptr);
+						ndList <ndEdgeCollapseEdgeHandle>::ndNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
 						bigHeapArray.Push (handleNodePtr1, faceCost + edgePenalty);
 
 						ptr = ptr->m_twin->m_next;
@@ -2572,8 +2572,8 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 								ndFloat64 faceCost = metric.Evalue (p); 
 								ndFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr1, distTol);
 								dAssert (edgePenalty >= ndFloat32 (0.0f));
-								dEdgeCollapseEdgeHandle handle (ptr1);
-								ndList <dEdgeCollapseEdgeHandle>::ndNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
+								ndEdgeCollapseEdgeHandle handle (ptr1);
+								ndList <ndEdgeCollapseEdgeHandle>::ndNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
 								bigHeapArray.Push (handleNodePtr1, faceCost + edgePenalty);
 							}
 
@@ -2585,8 +2585,8 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 								ndFloat64 faceCost = metric.Evalue (p); 
 								ndFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr1->m_twin, distTol);
 								dAssert (edgePenalty >= ndFloat32 (0.0f));
-								dEdgeCollapseEdgeHandle handle (ptr1->m_twin);
-								ndList <dEdgeCollapseEdgeHandle>::ndNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
+								ndEdgeCollapseEdgeHandle handle (ptr1->m_twin);
+								ndList <ndEdgeCollapseEdgeHandle>::ndNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
 								bigHeapArray.Push (handleNodePtr1, faceCost + edgePenalty);
 							}
 
