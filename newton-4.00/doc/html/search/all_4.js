@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['firstattribute_180',['FirstAttribute',['../classnd_1_1_ti_xml_element.html#ae9526632b049f26f4b12c0be05239ed0',1,'nd::TiXmlElement']]],
-  ['firstchild_181',['FirstChild',['../classnd_1_1_ti_xml_node.html#a52b61427de08e0b9f47ea08a7d2b27c4',1,'nd::TiXmlNode::FirstChild() const'],['../classnd_1_1_ti_xml_node.html#ab4c9a6662dc9eb328cbb0417f8789128',1,'nd::TiXmlNode::FirstChild(const char *value) const'],['../classnd_1_1_ti_xml_node.html#a5a61cf50028da0c51979ac5f9d9f842c',1,'nd::TiXmlNode::FirstChild(const char *_value)'],['../classnd_1_1_ti_xml_handle.html#ab7f68f3c3d79d1fc7483cf180cfd4cd2',1,'nd::TiXmlHandle::FirstChild() const'],['../classnd_1_1_ti_xml_handle.html#af24fd80db1b9d87f3f00c62b3424d2b9',1,'nd::TiXmlHandle::FirstChild(const char *value) const']]],
-  ['firstchildelement_182',['FirstChildElement',['../classnd_1_1_ti_xml_node.html#a92c9688017498e48a3c28728c67cea38',1,'nd::TiXmlNode::FirstChildElement() const'],['../classnd_1_1_ti_xml_node.html#a9e935a6b08b9aef7a2a154e46ce8f672',1,'nd::TiXmlNode::FirstChildElement(const char *_value) const'],['../classnd_1_1_ti_xml_handle.html#a7e29008dadbae12d3fc082ac4ab8fff1',1,'nd::TiXmlHandle::FirstChildElement() const'],['../classnd_1_1_ti_xml_handle.html#a54b8aaa17ca360a2b55aeb401e38770b',1,'nd::TiXmlHandle::FirstChildElement(const char *value) const']]],
-  ['free_183',['Free',['../classd_class_alloc.html#a36b92bbda0153a4c2e14853b75016704',1,'dClassAlloc::Free()'],['../classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394',1,'dMemory::Free()']]]
+  ['element_114',['Element',['../classnd_1_1_ti_xml_handle.html#ac009a05ec66b79d4f6a556d80294330c',1,'nd::TiXmlHandle']]],
+  ['encodestring_115',['EncodeString',['../classnd_1_1_ti_xml_base.html#a27da7d65ac28ed4b4af278ef7d0b2e83',1,'nd::TiXmlBase']]],
+  ['encoding_116',['Encoding',['../classnd_1_1_ti_xml_declaration.html#a0d4b3c52710d76339142f8381e0d4f69',1,'nd::TiXmlDeclaration']]],
+  ['error_117',['Error',['../classnd_1_1_ti_xml_document.html#aa9d9458f5a0836974446de6c38d7815c',1,'nd::TiXmlDocument']]],
+  ['errorcol_118',['ErrorCol',['../classnd_1_1_ti_xml_document.html#ade3f628fc61a878e2cee00bd95fe5b24',1,'nd::TiXmlDocument']]],
+  ['errordesc_119',['ErrorDesc',['../classnd_1_1_ti_xml_document.html#a494c1aaf612e0e04a32c545854cebd6e',1,'nd::TiXmlDocument']]],
+  ['errorid_120',['ErrorId',['../classnd_1_1_ti_xml_document.html#a40ddb3cba045eb882fb7907fc91a7437',1,'nd::TiXmlDocument']]],
+  ['errorrow_121',['ErrorRow',['../classnd_1_1_ti_xml_document.html#a741c5a46286d76d7839e944da58809d9',1,'nd::TiXmlDocument']]]
 ];

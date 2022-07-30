@@ -107,7 +107,8 @@ Inheritance diagram for ndBodyKinematic::ndContactMap:</div>
  <div class="center">
   <img src="classnd_body_kinematic_1_1nd_contact_map.png" usemap="#ndBodyKinematic::ndContactMap_map" alt=""/>
   <map id="ndBodyKinematic::ndContactMap_map" name="ndBodyKinematic::ndContactMap_map">
-<area href="classd_tree.html" alt="dTree&lt; ndContact *, ndContactkey, dContainersFreeListAlloc&lt; ndContact * &gt; &gt;" shape="rect" coords="0,0,469,24"/>
+<area href="classnd_tree.html" alt="ndTree&lt; ndContact *, ndContactkey, ndContainersFreeListAlloc&lt; ndContact * &gt; &gt;" shape="rect" coords="0,56,483,80"/>
+<area href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="ndClassAlloc" shape="rect" coords="0,0,483,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -116,76 +117,88 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae1c98de7c4e2aa999cd428a0f3ab6245"><td class="memItemLeft" align="right" valign="top"><a id="ae1c98de7c4e2aa999cd428a0f3ab6245"></a>
 D_COLLISION_API <a class="el" href="classnd_contact.html">ndContact</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FindContact</b> (const <a class="el" href="classnd_body.html">ndBody</a> *const body0, const <a class="el" href="classnd_body.html">ndBody</a> *const body1) const</td></tr>
 <tr class="separator:ae1c98de7c4e2aa999cd428a0f3ab6245"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classd_tree"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_tree')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_tree.html">dTree&lt; ndContact *, ndContactkey, dContainersFreeListAlloc&lt; ndContact * &gt; &gt;</a></td></tr>
-<tr class="memitem:a7971d84738e604d38afac60b2eb1f4bc inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a7971d84738e604d38afac60b2eb1f4bc"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>operator dInt32</b> () const</td></tr>
-<tr class="separator:a7971d84738e604d38afac60b2eb1f4bc inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5729c1e4875b33faebc10875449c862 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="af5729c1e4875b33faebc10875449c862"></a>
-const dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> () const</td></tr>
-<tr class="separator:af5729c1e4875b33faebc10875449c862 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3676a0909152317356d9d8cc11516b85 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3676a0909152317356d9d8cc11516b85"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetRoot</b> () const</td></tr>
-<tr class="separator:a3676a0909152317356d9d8cc11516b85 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00aeff040966628f2f2f765ff15e5942 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a00aeff040966628f2f2f765ff15e5942"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Minimum</b> () const</td></tr>
-<tr class="separator:a00aeff040966628f2f2f765ff15e5942 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9740495d96f897b9f99b8c24c4ffedcd inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a9740495d96f897b9f99b8c24c4ffedcd"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Maximum</b> () const</td></tr>
-<tr class="separator:a9740495d96f897b9f99b8c24c4ffedcd inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf284b0eb4761aa772957e80d7953500 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="aaf284b0eb4761aa772957e80d7953500"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Find</b> (ndContactkey key) const</td></tr>
-<tr class="separator:aaf284b0eb4761aa772957e80d7953500 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e34585dac4874749f63b4de4d57e8df inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6e34585dac4874749f63b4de4d57e8df"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreater</b> (ndContactkey key) const</td></tr>
-<tr class="separator:a6e34585dac4874749f63b4de4d57e8df inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c4b8e56f3eecbea2433695cada781ad inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3c4b8e56f3eecbea2433695cada781ad"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindLessEqual</b> (ndContactkey key) const</td></tr>
-<tr class="separator:a3c4b8e56f3eecbea2433695cada781ad inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a18a8083f5208bd7490993d062b5ccc47"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreaterEqual</b> (ndContactkey key) const</td></tr>
-<tr class="separator:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f23a4fa25dd16132848a3bf129597bf inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6f23a4fa25dd16132848a3bf129597bf"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindCreate</b> (ndContactkey key, bool &amp;wasFound)</td></tr>
-<tr class="separator:a6f23a4fa25dd16132848a3bf129597bf inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65e3bf09ae59d0a9cf2b4fe06f5d9d12 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a65e3bf09ae59d0a9cf2b4fe06f5d9d12"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNodeFromInfo</b> (<a class="el" href="classnd_contact.html">ndContact</a> * &amp;info) const</td></tr>
-<tr class="separator:a65e3bf09ae59d0a9cf2b4fe06f5d9d12 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23907b4618f0a2a2e75df06645059e9d inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a23907b4618f0a2a2e75df06645059e9d"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classnd_contact.html">ndContact</a> * &amp;element, ndContactkey key, bool &amp;wasFound)</td></tr>
-<tr class="separator:a23907b4618f0a2a2e75df06645059e9d inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90c14007977c92a9631075f637225289 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a90c14007977c92a9631075f637225289"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classnd_contact.html">ndContact</a> * &amp;element, ndContactkey key)</td></tr>
-<tr class="separator:a90c14007977c92a9631075f637225289 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10c56365e7ed92c45c54665d54bb3035 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a10c56365e7ed92c45c54665d54bb3035"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (dTreeNode *const node, ndContactkey key)</td></tr>
-<tr class="separator:a10c56365e7ed92c45c54665d54bb3035 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc38bf90809c16144536ebfa253738fe inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="afc38bf90809c16144536ebfa253738fe"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Replace</b> (<a class="el" href="classnd_contact.html">ndContact</a> * &amp;element, ndContactkey key)</td></tr>
-<tr class="separator:afc38bf90809c16144536ebfa253738fe inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09657ae535e3fdbb1d7bd7c33a4f6812 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a09657ae535e3fdbb1d7bd7c33a4f6812"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>ReplaceKey</b> (ndContactkey oldKey, ndContactkey newKey)</td></tr>
-<tr class="separator:a09657ae535e3fdbb1d7bd7c33a4f6812 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2f97f80a24e153b695202f1bcbbcaa2 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="af2f97f80a24e153b695202f1bcbbcaa2"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>ReplaceKey</b> (dTreeNode *const node, ndContactkey key)</td></tr>
-<tr class="separator:af2f97f80a24e153b695202f1bcbbcaa2 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06294f592aa8ff502ad6b8063db42022 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a06294f592aa8ff502ad6b8063db42022"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Remove</b> (ndContactkey key)</td></tr>
-<tr class="separator:a06294f592aa8ff502ad6b8063db42022 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe18afa3fa495dae8fc5a7e7c839e7dd inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="afe18afa3fa495dae8fc5a7e7c839e7dd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Remove</b> (dTreeNode *const node)</td></tr>
-<tr class="separator:afe18afa3fa495dae8fc5a7e7c839e7dd inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91706fc42fc0b4b38e76b5f0f4275178 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a91706fc42fc0b4b38e76b5f0f4275178"></a>
+<tr class="inherit_header pub_methods_classnd_tree"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_tree')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_tree.html">ndTree&lt; ndContact *, ndContactkey, ndContainersFreeListAlloc&lt; ndContact * &gt; &gt;</a></td></tr>
+<tr class="memitem:a23d675c6746f890e4716d76c88498aba inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a23d675c6746f890e4716d76c88498aba"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>operator ndInt32</b> () const</td></tr>
+<tr class="separator:a23d675c6746f890e4716d76c88498aba inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac43ebba071a75a866f5caf2deff74826 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="ac43ebba071a75a866f5caf2deff74826"></a>
+ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> () const</td></tr>
+<tr class="separator:ac43ebba071a75a866f5caf2deff74826 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19a42fa233b5a72fee5ed06229a3d91 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="ac19a42fa233b5a72fee5ed06229a3d91"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetRoot</b> () const</td></tr>
+<tr class="separator:ac19a42fa233b5a72fee5ed06229a3d91 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a072a770ceebe06cd11941497abc2f9a5 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a072a770ceebe06cd11941497abc2f9a5"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Minimum</b> () const</td></tr>
+<tr class="separator:a072a770ceebe06cd11941497abc2f9a5 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0653a08d19d81ddd2516a0a1a1323e1 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="af0653a08d19d81ddd2516a0a1a1323e1"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Maximum</b> () const</td></tr>
+<tr class="separator:af0653a08d19d81ddd2516a0a1a1323e1 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67307c38527c0610b5bd692aba66b96d inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a67307c38527c0610b5bd692aba66b96d"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Find</b> (const ndContactkey &amp;key) const</td></tr>
+<tr class="separator:a67307c38527c0610b5bd692aba66b96d inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a9bfa019c253df2cc3f5f20e30d9cef inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a1a9bfa019c253df2cc3f5f20e30d9cef"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreater</b> (const ndContactkey &amp;key) const</td></tr>
+<tr class="separator:a1a9bfa019c253df2cc3f5f20e30d9cef inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3681b0a9953f2a06f99b945d8772182f inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3681b0a9953f2a06f99b945d8772182f"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindLessEqual</b> (const ndContactkey &amp;key) const</td></tr>
+<tr class="separator:a3681b0a9953f2a06f99b945d8772182f inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbcd9bbefc78ab1910ffecc169569cfe inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="acbcd9bbefc78ab1910ffecc169569cfe"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreaterEqual</b> (const ndContactkey &amp;key) const</td></tr>
+<tr class="separator:acbcd9bbefc78ab1910ffecc169569cfe inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65b1f629dd81c1a15d3d123492618f99 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a65b1f629dd81c1a15d3d123492618f99"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindCreate</b> (const ndContactkey &amp;key, bool &amp;wasFound)</td></tr>
+<tr class="separator:a65b1f629dd81c1a15d3d123492618f99 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16d0f69c96ddcc68b73b0bc91b43d2c5 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a16d0f69c96ddcc68b73b0bc91b43d2c5"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNodeFromInfo</b> (<a class="el" href="classnd_contact.html">ndContact</a> * &amp;info) const</td></tr>
+<tr class="separator:a16d0f69c96ddcc68b73b0bc91b43d2c5 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83f98465dfac40952df13f7955356b1c inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a83f98465dfac40952df13f7955356b1c"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const ndContactkey &amp;key)</td></tr>
+<tr class="separator:a83f98465dfac40952df13f7955356b1c inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9f04c30cefe3bddc40662dd1af61648 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="aa9f04c30cefe3bddc40662dd1af61648"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (ndNode *const node, const ndContactkey &amp;key)</td></tr>
+<tr class="separator:aa9f04c30cefe3bddc40662dd1af61648 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f8cddefd4c1935d646972d2a2d07a35 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a5f8cddefd4c1935d646972d2a2d07a35"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classnd_contact.html">ndContact</a> * &amp;element, const ndContactkey &amp;key)</td></tr>
+<tr class="separator:a5f8cddefd4c1935d646972d2a2d07a35 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41bb85ae05c48c4f3fa114009211f080 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a41bb85ae05c48c4f3fa114009211f080"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classnd_contact.html">ndContact</a> * &amp;element, const ndContactkey &amp;key, bool &amp;wasFound)</td></tr>
+<tr class="separator:a41bb85ae05c48c4f3fa114009211f080 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8389d319288bb7342d95ac9aaaf8bfbc inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a8389d319288bb7342d95ac9aaaf8bfbc"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Replace</b> (<a class="el" href="classnd_contact.html">ndContact</a> * &amp;element, const ndContactkey &amp;key)</td></tr>
+<tr class="separator:a8389d319288bb7342d95ac9aaaf8bfbc inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc655f10ded92f38ba5054cb198b3159 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="acc655f10ded92f38ba5054cb198b3159"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>ReplaceKey</b> (const ndContactkey &amp;oldKey, const ndContactkey &amp;newKey)</td></tr>
+<tr class="separator:acc655f10ded92f38ba5054cb198b3159 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49fb430eecfb6adc299c3854d6e619fd inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a49fb430eecfb6adc299c3854d6e619fd"></a>
+ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>ReplaceKey</b> (ndNode *const node, const ndContactkey &amp;key)</td></tr>
+<tr class="separator:a49fb430eecfb6adc299c3854d6e619fd inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cbc8901200ba19eddca1228512e06eb inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a5cbc8901200ba19eddca1228512e06eb"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveAll</b> ()</td></tr>
-<tr class="separator:a91706fc42fc0b4b38e76b5f0f4275178 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36664bb5c7a904d00070f91b3bab468f inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a36664bb5c7a904d00070f91b3bab468f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Unlink</b> (dTreeNode *const node)</td></tr>
-<tr class="separator:a36664bb5c7a904d00070f91b3bab468f inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3378cd82cd997dcac5687a5bfdcc129f inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3378cd82cd997dcac5687a5bfdcc129f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SwapInfo</b> (<a class="el" href="classd_tree.html">dTree</a> &amp;tree)</td></tr>
-<tr class="separator:a3378cd82cd997dcac5687a5bfdcc129f inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5bdc3720a07bd967625be08f2b17199 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="af5bdc3720a07bd967625be08f2b17199"></a>
+<tr class="separator:a5cbc8901200ba19eddca1228512e06eb inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21ec10c23fb3767428ec0d1a2e6906f6 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a21ec10c23fb3767428ec0d1a2e6906f6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Remove</b> (const ndContactkey &amp;key)</td></tr>
+<tr class="separator:a21ec10c23fb3767428ec0d1a2e6906f6 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a811a75c4986ea81a4a16e2e0eadfd2bb inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a811a75c4986ea81a4a16e2e0eadfd2bb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Remove</b> (ndNode *const node)</td></tr>
+<tr class="separator:a811a75c4986ea81a4a16e2e0eadfd2bb inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15348f3ea610a978720d31b2fb8ce07a inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a15348f3ea610a978720d31b2fb8ce07a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Unlink</b> (ndNode *const node)</td></tr>
+<tr class="separator:a15348f3ea610a978720d31b2fb8ce07a inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ff99c7d014a7b55989b7efa8c8a9126 inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6ff99c7d014a7b55989b7efa8c8a9126"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SwapInfo</b> (<a class="el" href="classnd_tree.html">ndTree</a> &amp;tree)</td></tr>
+<tr class="separator:a6ff99c7d014a7b55989b7efa8c8a9126 inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c894cab770eaac4a24c2af38153016f inherit pub_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6c894cab770eaac4a24c2af38153016f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>SanityCheck</b> () const</td></tr>
-<tr class="separator:af5bdc3720a07bd967625be08f2b17199 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a6c894cab770eaac4a24c2af38153016f inherit pub_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
+<tr class="memitem:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="affad975c41ed36eae8c71e3468fc12e3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#affad975c41ed36eae8c71e3468fc12e3">ndClassAlloc</a> ()</td></tr>
+<tr class="memdesc:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a8fea90aa3642db2007a191975bb169ce"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce">~ndClassAlloc</a> ()</td></tr>
+<tr class="memdesc:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -195,10 +208,19 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>ndBodyKinematic</b><
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_static_methods_classd_tree"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classd_tree')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classd_tree.html">dTree&lt; ndContact *, ndContactkey, dContainersFreeListAlloc&lt; ndContact * &gt; &gt;</a></td></tr>
-<tr class="memitem:aeb65c1ea1a74898400b0599cea8cb9b7 inherit pub_static_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="aeb65c1ea1a74898400b0599cea8cb9b7"></a>
+<tr class="inherit_header pub_static_methods_classnd_tree"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_tree')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_tree.html">ndTree&lt; ndContact *, ndContactkey, ndContainersFreeListAlloc&lt; ndContact * &gt; &gt;</a></td></tr>
+<tr class="memitem:a819741443f1d62a22fe6e46275510d03 inherit pub_static_methods_classnd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a819741443f1d62a22fe6e46275510d03"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>FlushFreeList</b> ()</td></tr>
-<tr class="separator:aeb65c1ea1a74898400b0599cea8cb9b7 inherit pub_static_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a819741443f1d62a22fe6e46275510d03 inherit pub_static_methods_classnd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
+<tr class="memitem:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a1f1766c498c6231d24c63582106d2cfc"></a>
+D_OPERATOR_NEW_AND_DELETE static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a1f1766c498c6231d24c63582106d2cfc">Malloc</a> (size_t size)</td></tr>
+<tr class="memdesc:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic allocation for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
+<tr class="separator:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a5037cbc14d91b2b5e6b5163ed0ef9757"></a>
+static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a5037cbc14d91b2b5e6b5163ed0ef9757">Free</a> (void *const ptr)</td></tr>
+<tr class="memdesc:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic destruction for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
+<tr class="separator:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

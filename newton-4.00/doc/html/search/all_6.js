@@ -1,11 +1,9 @@
 var searchData=
 [
-  ['indent_189',['Indent',['../classnd_1_1_ti_xml_printer.html#ab9b46c8a727a477ccddf76bf4e17e7ab',1,'nd::TiXmlPrinter']]],
-  ['insertafterchild_190',['InsertAfterChild',['../classnd_1_1_ti_xml_node.html#a2bfdd7c49e1528a3c91299689bc0952b',1,'nd::TiXmlNode']]],
-  ['insertbeforechild_191',['InsertBeforeChild',['../classnd_1_1_ti_xml_node.html#aa4f58890dabb3a0673ac824515b2f291',1,'nd::TiXmlNode']]],
-  ['insertendchild_192',['InsertEndChild',['../classnd_1_1_ti_xml_node.html#a96385fe8b28a5c596f2b25a0d7b5b59e',1,'nd::TiXmlNode']]],
-  ['intvalue_193',['IntValue',['../classnd_1_1_ti_xml_attribute.html#a4cf4e8a52f247e188d9bc9b8c424c3a9',1,'nd::TiXmlAttribute']]],
-  ['iswhitespacecondensed_194',['IsWhiteSpaceCondensed',['../classnd_1_1_ti_xml_base.html#ac5ab5b5a4ed5abe6324a0223e5d5da5a',1,'nd::TiXmlBase']]],
-  ['iteratechildren_195',['IterateChildren',['../classnd_1_1_ti_xml_node.html#a441dcf815b9d2cb54817f6dda4a0a2bc',1,'nd::TiXmlNode::IterateChildren(const TiXmlNode *previous) const'],['../classnd_1_1_ti_xml_node.html#ac4b7e5f4f5e79e3a944873663584db70',1,'nd::TiXmlNode::IterateChildren(const char *value, const TiXmlNode *previous) const']]],
-  ['iterator_196',['Iterator',['../classd_list_1_1_iterator.html',1,'dList&lt; T, allocator &gt;::Iterator'],['../classd_tree_1_1_iterator.html',1,'dTree&lt; OBJECT, KEY, allocator &gt;::Iterator']]]
+  ['getcount_126',['GetCount',['../classnd_semaphore.html#a984f887a621ca159c77086bb1ae32bb0',1,'ndSemaphore']]],
+  ['getdocument_127',['GetDocument',['../classnd_1_1_ti_xml_node.html#abcd7b42b500a430ad413377d915cd77e',1,'nd::TiXmlNode']]],
+  ['getmemoryused_128',['GetMemoryUsed',['../classnd_memory.html#a916fe2175d62d6315d2ca3c0fec7fa2a',1,'ndMemory']]],
+  ['getsize_129',['GetSize',['../classnd_memory.html#aefdfceef60a3ea1d51370322c6c57707',1,'ndMemory']]],
+  ['gettext_130',['GetText',['../classnd_1_1_ti_xml_element.html#a6ffb24000335a23f9ed1184d756cb30d',1,'nd::TiXmlElement']]],
+  ['getuserdata_131',['GetUserData',['../classnd_1_1_ti_xml_base.html#a7955aef40caf79c2eab7b677a876e571',1,'nd::TiXmlBase::GetUserData()'],['../classnd_1_1_ti_xml_base.html#ac1a462e5d50bb125d4ecdd4d6a423aed',1,'nd::TiXmlBase::GetUserData() const']]]
 ];

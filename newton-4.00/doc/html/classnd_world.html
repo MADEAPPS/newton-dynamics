@@ -110,85 +110,89 @@ Inheritance diagram for ndWorld:</div>
  <div class="center">
   <img src="classnd_world.png" usemap="#ndWorld_map" alt=""/>
   <map id="ndWorld_map" name="ndWorld_map">
-<area href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="dClassAlloc" shape="rect" coords="0,0,79,24"/>
+<area href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="ndClassAlloc" shape="rect" coords="0,0,86,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a2dda5063df478994d827e7602a849930"><td class="memItemLeft" align="right" valign="top"><a id="a2dda5063df478994d827e7602a849930"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>ndSolverModes</b> { <b>ndStandardSolver</b>, 
-<b>ndSimdAvx2Solver</b>
+<tr class="memitem:a2dda5063df478994d827e7602a849930"><td class="memItemLeft" align="right" valign="top"><a id="a2dda5063df478994d827e7602a849930"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>ndSolverModes</b> { <br />
+&#160;&#160;<b>ndStandardSolver</b>, 
+<b>ndSimdSoaSolver</b>, 
+<b>ndSimdAvx2Solver</b>, 
+<b>ndCudaSolver</b>, 
+<br />
+&#160;&#160;<b>ndOpenclSolver1</b>, 
+<b>ndOpenclSolver2</b>
+<br />
  }</td></tr>
 <tr class="separator:a2dda5063df478994d827e7602a849930"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1549ddc67336fa506e6c88b021d157aa"><td class="memItemLeft" align="right" valign="top"><a id="a1549ddc67336fa506e6c88b021d157aa"></a>
-dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetEngineVersion</b> ()</td></tr>
-<tr class="separator:a1549ddc67336fa506e6c88b021d157aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb42f0eba7dbc566898fce589afe2243"><td class="memItemLeft" align="right" valign="top"><a id="adb42f0eba7dbc566898fce589afe2243"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Sync</b> ()</td></tr>
-<tr class="separator:adb42f0eba7dbc566898fce589afe2243"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b42038139fb245244ba331b82eb5ad3"><td class="memItemLeft" align="right" valign="top"><a id="a2b42038139fb245244ba331b82eb5ad3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (dFloat32 timestep)</td></tr>
-<tr class="separator:a2b42038139fb245244ba331b82eb5ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c437ea9669e7878036779ad4162ddd0"><td class="memItemLeft" align="right" valign="top"><a id="a9c437ea9669e7878036779ad4162ddd0"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>OnPostUpdate</b> (dFloat32 timestep)</td></tr>
-<tr class="separator:a9c437ea9669e7878036779ad4162ddd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d019e8c27e178587c273cf490fc374c"><td class="memItemLeft" align="right" valign="top"><a id="a1d019e8c27e178587c273cf490fc374c"></a>
-dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetThreadCount</b> () const</td></tr>
-<tr class="separator:a1d019e8c27e178587c273cf490fc374c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ab77297420030ccb6bb20bda4f7fb71"><td class="memItemLeft" align="right" valign="top"><a id="a5ab77297420030ccb6bb20bda4f7fb71"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetThreadCount</b> (dInt32 count)</td></tr>
-<tr class="separator:a5ab77297420030ccb6bb20bda4f7fb71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac02ccbb18abb008357dc2076ec1fcc45"><td class="memItemLeft" align="right" valign="top"><a id="ac02ccbb18abb008357dc2076ec1fcc45"></a>
-dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSubSteps</b> () const</td></tr>
-<tr class="separator:ac02ccbb18abb008357dc2076ec1fcc45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b663d9ee1597b7c36e6b504114148cf"><td class="memItemLeft" align="right" valign="top"><a id="a8b663d9ee1597b7c36e6b504114148cf"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSubSteps</b> (dInt32 subSteps)</td></tr>
-<tr class="separator:a8b663d9ee1597b7c36e6b504114148cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa68fe709e04a496c60311f4783a17a5e"><td class="memItemLeft" align="right" valign="top"><a id="aa68fe709e04a496c60311f4783a17a5e"></a>
-dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSelectedSolver</b> () const</td></tr>
-<tr class="separator:aa68fe709e04a496c60311f4783a17a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c67c4703a2195baeeaf0d5c3c5ca696"><td class="memItemLeft" align="right" valign="top"><a id="a7c67c4703a2195baeeaf0d5c3c5ca696"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SelectSolver</b> (dInt32 solver)</td></tr>
-<tr class="separator:a7c67c4703a2195baeeaf0d5c3c5ca696"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99d6de69d9402c9b685ce05751db4c36"><td class="memItemLeft" align="right" valign="top"><a id="a99d6de69d9402c9b685ce05751db4c36"></a>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CleanUp</b> ()</td></tr>
+<tr class="separator:a99d6de69d9402c9b685ce05751db4c36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9c717dfc092dc94ca946044fbaeb6b8"><td class="memItemLeft" align="right" valign="top"><a id="ad9c717dfc092dc94ca946044fbaeb6b8"></a>
+ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetEngineVersion</b> () const</td></tr>
+<tr class="separator:ad9c717dfc092dc94ca946044fbaeb6b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3b8f518ef49c7c3245ad406355938eb"><td class="memItemLeft" align="right" valign="top"><a id="ab3b8f518ef49c7c3245ad406355938eb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Sync</b> () const</td></tr>
+<tr class="separator:ab3b8f518ef49c7c3245ad406355938eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac030e3bf643232b806b85d194ce90111"><td class="memItemLeft" align="right" valign="top"><a id="ac030e3bf643232b806b85d194ce90111"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (ndFloat32 timestep)</td></tr>
+<tr class="separator:ac030e3bf643232b806b85d194ce90111"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a480b3d4dec971712f0bf92c7a4133711"><td class="memItemLeft" align="right" valign="top"><a id="a480b3d4dec971712f0bf92c7a4133711"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>CollisionUpdate</b> (ndFloat32 timestep)</td></tr>
+<tr class="separator:a480b3d4dec971712f0bf92c7a4133711"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb1707bffaa13ce0279d8da229a982c9"><td class="memItemLeft" align="right" valign="top"><a id="adb1707bffaa13ce0279d8da229a982c9"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>OnPostUpdate</b> (ndFloat32 timestep)</td></tr>
+<tr class="separator:adb1707bffaa13ce0279d8da229a982c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2a344a24f8a9827787b222453b9d905"><td class="memItemLeft" align="right" valign="top"><a id="ac2a344a24f8a9827787b222453b9d905"></a>
+ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetThreadCount</b> () const</td></tr>
+<tr class="separator:ac2a344a24f8a9827787b222453b9d905"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a085741ee0007d3cfde1590f937f8f842"><td class="memItemLeft" align="right" valign="top"><a id="a085741ee0007d3cfde1590f937f8f842"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetThreadCount</b> (ndInt32 count)</td></tr>
+<tr class="separator:a085741ee0007d3cfde1590f937f8f842"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a946b3374721dface03a56b207a3764"><td class="memItemLeft" align="right" valign="top"><a id="a9a946b3374721dface03a56b207a3764"></a>
+ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSubSteps</b> () const</td></tr>
+<tr class="separator:a9a946b3374721dface03a56b207a3764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ea43a02e85b89350991cb8eb947dfd3"><td class="memItemLeft" align="right" valign="top"><a id="a6ea43a02e85b89350991cb8eb947dfd3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSubSteps</b> (ndInt32 subSteps)</td></tr>
+<tr class="separator:a6ea43a02e85b89350991cb8eb947dfd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fa39eb12823005c2bc1cd6957d85124"><td class="memItemLeft" align="right" valign="top"><a id="a2fa39eb12823005c2bc1cd6957d85124"></a>
+ndSolverModes&#160;</td><td class="memItemRight" valign="bottom"><b>GetSelectedSolver</b> () const</td></tr>
+<tr class="separator:a2fa39eb12823005c2bc1cd6957d85124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e4dd9378b4e6d85a237470b4ef468fa"><td class="memItemLeft" align="right" valign="top"><a id="a5e4dd9378b4e6d85a237470b4ef468fa"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SelectSolver</b> (ndSolverModes solverMode)</td></tr>
+<tr class="separator:a5e4dd9378b4e6d85a237470b4ef468fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a813b7f9021f904f77f260a3b6f3adef1"><td class="memItemLeft" align="right" valign="top"><a id="a813b7f9021f904f77f260a3b6f3adef1"></a>
+D_NEWTON_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsGPU</b> () const</td></tr>
+<tr class="separator:a813b7f9021f904f77f260a3b6f3adef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5834ab29d5518f683594d1a2da9435be"><td class="memItemLeft" align="right" valign="top"><a id="a5834ab29d5518f683594d1a2da9435be"></a>
+D_NEWTON_API const char *&#160;</td><td class="memItemRight" valign="bottom"><b>GetSolverString</b> () const</td></tr>
+<tr class="separator:a5834ab29d5518f683594d1a2da9435be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3863ff66e1657778dd79087a532d0a80"><td class="memItemLeft" align="right" valign="top"><a id="a3863ff66e1657778dd79087a532d0a80"></a>
-D_NEWTON_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>AddBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
+virtual D_NEWTON_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>AddBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
 <tr class="separator:a3863ff66e1657778dd79087a532d0a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12a0be8521c1f58b8dac9d90477b71c0"><td class="memItemLeft" align="right" valign="top"><a id="a12a0be8521c1f58b8dac9d90477b71c0"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
 <tr class="separator:a12a0be8521c1f58b8dac9d90477b71c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf8fde66129855e8af4f0a4c7313806e"><td class="memItemLeft" align="right" valign="top"><a id="aaf8fde66129855e8af4f0a4c7313806e"></a>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>DeleteBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
+<tr class="separator:aaf8fde66129855e8af4f0a4c7313806e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae34627878c72b78e935da58501ba8dd"><td class="memItemLeft" align="right" valign="top"><a id="aae34627878c72b78e935da58501ba8dd"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddJoint</b> (<a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *const joint)</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddJoint</b> (<a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *const joint)</td></tr>
 <tr class="separator:aae34627878c72b78e935da58501ba8dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc17fa04bdd17cad3b1175e183c1ccf9"><td class="memItemLeft" align="right" valign="top"><a id="abc17fa04bdd17cad3b1175e183c1ccf9"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveJoint</b> (<a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *const joint)</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveJoint</b> (<a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *const joint)</td></tr>
 <tr class="separator:abc17fa04bdd17cad3b1175e183c1ccf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e33302ea6b1eb4f8ffbc05fff10c6c9"><td class="memItemLeft" align="right" valign="top"><a id="a1e33302ea6b1eb4f8ffbc05fff10c6c9"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddModel</b> (<a class="el" href="classnd_model.html">ndModel</a> *const model)</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddModel</b> (<a class="el" href="classnd_model.html">ndModel</a> *const model)</td></tr>
 <tr class="separator:a1e33302ea6b1eb4f8ffbc05fff10c6c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5c622d8abb6a7ace457eef49d72ee94"><td class="memItemLeft" align="right" valign="top"><a id="ac5c622d8abb6a7ace457eef49d72ee94"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveModel</b> (<a class="el" href="classnd_model.html">ndModel</a> *const model)</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveModel</b> (<a class="el" href="classnd_model.html">ndModel</a> *const model)</td></tr>
 <tr class="separator:ac5c622d8abb6a7ace457eef49d72ee94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf8fde66129855e8af4f0a4c7313806e"><td class="memItemLeft" align="right" valign="top"><a id="aaf8fde66129855e8af4f0a4c7313806e"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>DeleteBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
-<tr class="separator:aaf8fde66129855e8af4f0a4c7313806e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30952e73bef6215eab4d9cc70c23ff15"><td class="memItemLeft" align="right" valign="top"><a id="a30952e73bef6215eab4d9cc70c23ff15"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Load</b> (const char *const path)</td></tr>
-<tr class="separator:a30952e73bef6215eab4d9cc70c23ff15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18491a7a027217728247232675830577"><td class="memItemLeft" align="right" valign="top"><a id="a18491a7a027217728247232675830577"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Load</b> (const <a class="el" href="classnd_1_1_ti_xml_element.html">nd::TiXmlElement</a> *const rootNode, const char *const assetPath)</td></tr>
-<tr class="separator:a18491a7a027217728247232675830577"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb36ada2f6b9828f63cde6ba50e5059f"><td class="memItemLeft" align="right" valign="top"><a id="afb36ada2f6b9828f63cde6ba50e5059f"></a>
-virtual D_NEWTON_API <a class="el" href="classnd_body.html">ndBody</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>LoadUserDefinedBody</b> (const <a class="el" href="classnd_1_1_ti_xml_node.html">nd::TiXmlNode</a> *const parentNode, const char *const bodyClassName, <a class="el" href="classd_tree.html">dTree</a>&lt; const <a class="el" href="classnd_shape.html">ndShape</a> *, dUnsigned32 &gt; &amp;shapesCache, const char *const assetPath) const</td></tr>
-<tr class="separator:afb36ada2f6b9828f63cde6ba50e5059f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61d0135b4a2999a505ed8db9b40f9d93"><td class="memItemLeft" align="right" valign="top"><a id="a61d0135b4a2999a505ed8db9b40f9d93"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Save</b> (const char *const path) const</td></tr>
-<tr class="separator:a61d0135b4a2999a505ed8db9b40f9d93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ce76fbf2939d2bf226249c11bad8f25"><td class="memItemLeft" align="right" valign="top"><a id="a7ce76fbf2939d2bf226249c11bad8f25"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Save</b> (<a class="el" href="classnd_1_1_ti_xml_element.html">nd::TiXmlElement</a> *const rootNode, const char *const assetPath) const</td></tr>
-<tr class="separator:a7ce76fbf2939d2bf226249c11bad8f25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1d70169cb963a10926580da66fb0b8c"><td class="memItemLeft" align="right" valign="top"><a id="ab1d70169cb963a10926580da66fb0b8c"></a>
 const <a class="el" href="classnd_body_list.html">ndBodyList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetBodyList</b> () const</td></tr>
 <tr class="separator:ab1d70169cb963a10926580da66fb0b8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -198,36 +202,39 @@ const <a class="el" href="classnd_joint_list.html">ndJointList</a> &amp;&#160;</
 <tr class="memitem:a2fc4b080c04784606ecdac7adaa143d9"><td class="memItemLeft" align="right" valign="top"><a id="a2fc4b080c04784606ecdac7adaa143d9"></a>
 const <a class="el" href="classnd_model_list.html">ndModelList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetModelList</b> () const</td></tr>
 <tr class="separator:a2fc4b080c04784606ecdac7adaa143d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2033563d58e36de0e8fc0e51612d5d9"><td class="memItemLeft" align="right" valign="top"><a id="af2033563d58e36de0e8fc0e51612d5d9"></a>
-const <a class="el" href="classnd_contact_list.html">ndContactList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactList</b> () const</td></tr>
-<tr class="separator:af2033563d58e36de0e8fc0e51612d5d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeee2040e9c1cc8d3c22464a40171668b"><td class="memItemLeft" align="right" valign="top"><a id="aeee2040e9c1cc8d3c22464a40171668b"></a>
+const <a class="el" href="classnd_contact_array.html">ndContactArray</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactList</b> () const</td></tr>
+<tr class="separator:aeee2040e9c1cc8d3c22464a40171668b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac281adc9ce05193d4b9a36e212c28598"><td class="memItemLeft" align="right" valign="top"><a id="ac281adc9ce05193d4b9a36e212c28598"></a>
 const <a class="el" href="classnd_skeleton_list.html">ndSkeletonList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetSkeletonList</b> () const</td></tr>
 <tr class="separator:ac281adc9ce05193d4b9a36e212c28598"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cd1539751ca0ae807c57c1760a2645e"><td class="memItemLeft" align="right" valign="top"><a id="a0cd1539751ca0ae807c57c1760a2645e"></a>
 const <a class="el" href="classnd_body_particle_set_list.html">ndBodyParticleSetList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetParticleList</b> () const</td></tr>
 <tr class="separator:a0cd1539751ca0ae807c57c1760a2645e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99624dfd7fb519a0c7fe98a5b5003b4b"><td class="memItemLeft" align="right" valign="top"><a id="a99624dfd7fb519a0c7fe98a5b5003b4b"></a>
-<a class="el" href="classnd_body_dynamic.html">ndBodyDynamic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetSentinelBody</b> () const</td></tr>
-<tr class="separator:a99624dfd7fb519a0c7fe98a5b5003b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbac217f9bcad5b99b7b1219496bea6b"><td class="memItemLeft" align="right" valign="top"><a id="afbac217f9bcad5b99b7b1219496bea6b"></a>
-const dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSolverIterations</b> () const</td></tr>
-<tr class="separator:afbac217f9bcad5b99b7b1219496bea6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf2a9a1766ecc8e9bc3b1a7fb4ee5ee8"><td class="memItemLeft" align="right" valign="top"><a id="abf2a9a1766ecc8e9bc3b1a7fb4ee5ee8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSolverIterations</b> (dInt32 iterations)</td></tr>
-<tr class="separator:abf2a9a1766ecc8e9bc3b1a7fb4ee5ee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae926824ae69f089253eaa82202b12ee7"><td class="memItemLeft" align="right" valign="top"><a id="ae926824ae69f089253eaa82202b12ee7"></a>
+<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetSentinelBody</b> () const</td></tr>
+<tr class="separator:ae926824ae69f089253eaa82202b12ee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a583cd51204d2f968ebaa7747efb63865"><td class="memItemLeft" align="right" valign="top"><a id="a583cd51204d2f968ebaa7747efb63865"></a>
+ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSolverIterations</b> () const</td></tr>
+<tr class="separator:a583cd51204d2f968ebaa7747efb63865"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9ef7194f339e759252d3db9539c231e"><td class="memItemLeft" align="right" valign="top"><a id="aa9ef7194f339e759252d3db9539c231e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSolverIterations</b> (ndInt32 iterations)</td></tr>
+<tr class="separator:aa9ef7194f339e759252d3db9539c231e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab15258f80ff2a44aefa07dd0458e2be2"><td class="memItemLeft" align="right" valign="top"><a id="ab15258f80ff2a44aefa07dd0458e2be2"></a>
 <a class="el" href="classnd_scene.html">ndScene</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetScene</b> () const</td></tr>
 <tr class="separator:ab15258f80ff2a44aefa07dd0458e2be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e16db0bbeecce0e2aa6a04d8cc1a3c0"><td class="memItemLeft" align="right" valign="top"><a id="a6e16db0bbeecce0e2aa6a04d8cc1a3c0"></a>
-dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetUpdateTime</b> () const</td></tr>
-<tr class="separator:a6e16db0bbeecce0e2aa6a04d8cc1a3c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a348ed66dbe1027fbcedc92bc635c8245"><td class="memItemLeft" align="right" valign="top"><a id="a348ed66dbe1027fbcedc92bc635c8245"></a>
-dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFrameIndex</b> () const</td></tr>
-<tr class="separator:a348ed66dbe1027fbcedc92bc635c8245"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d6e6eb61be82376e30b12ad3565b1e8"><td class="memItemLeft" align="right" valign="top"><a id="a1d6e6eb61be82376e30b12ad3565b1e8"></a>
-dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetAverageUpdateTime</b> () const</td></tr>
-<tr class="separator:a1d6e6eb61be82376e30b12ad3565b1e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e8acbc80a07de69929999eeffabcb88"><td class="memItemLeft" align="right" valign="top"><a id="a0e8acbc80a07de69929999eeffabcb88"></a>
+ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetUpdateTime</b> () const</td></tr>
+<tr class="separator:a0e8acbc80a07de69929999eeffabcb88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa9eb92d9bb04764d0815c7d1744a99c"><td class="memItemLeft" align="right" valign="top"><a id="afa9eb92d9bb04764d0815c7d1744a99c"></a>
+ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFrameIndex</b> () const</td></tr>
+<tr class="separator:afa9eb92d9bb04764d0815c7d1744a99c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0e359a2a945ce99465d50b6e076cecb"><td class="memItemLeft" align="right" valign="top"><a id="ad0e359a2a945ce99465d50b6e076cecb"></a>
+ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetAverageUpdateTime</b> () const</td></tr>
+<tr class="separator:ad0e359a2a945ce99465d50b6e076cecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad377f446bc30c0c23316d8fb7a88cb0c"><td class="memItemLeft" align="right" valign="top"><a id="ad377f446bc30c0c23316d8fb7a88cb0c"></a>
+ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetExtensionAverageUpdateTime</b> () const</td></tr>
+<tr class="separator:ad377f446bc30c0c23316d8fb7a88cb0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed569f489c3e0c4a501091ba5f769e19"><td class="memItemLeft" align="right" valign="top"><a id="aed569f489c3e0c4a501091ba5f769e19"></a>
 <a class="el" href="classnd_contact_notify.html">ndContactNotify</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactNotify</b> () const</td></tr>
 <tr class="separator:aed569f489c3e0c4a501091ba5f769e19"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -237,26 +244,30 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetContactNotify</b> 
 <tr class="memitem:aa74a03c82595e94a9eeab86db1f855a0"><td class="memItemLeft" align="right" valign="top"><a id="aa74a03c82595e94a9eeab86db1f855a0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugScene</b> (<a class="el" href="classnd_scene_tree_noti_fy.html">ndSceneTreeNotiFy</a> *const notify)</td></tr>
 <tr class="separator:aa74a03c82595e94a9eeab86db1f855a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a1c16812d6d1803d282f51ffce5dcd4"><td class="memItemLeft" align="right" valign="top"><a id="a0a1c16812d6d1803d282f51ffce5dcd4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SendBackgroundTask</b> (<a class="el" href="classnd_background_task.html">ndBackgroundTask</a> *const job)</td></tr>
+<tr class="separator:a0a1c16812d6d1803d282f51ffce5dcd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad929d91f74d532350f2bb0a76d0ce2b5"><td class="memItemLeft" align="right" valign="top"><a id="ad929d91f74d532350f2bb0a76d0ce2b5"></a>
 D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ClearCache</b> ()</td></tr>
 <tr class="separator:ad929d91f74d532350f2bb0a76d0ce2b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_class_alloc.html">dClassAlloc</a></td></tr>
-<tr class="memitem:aae7ca43a2cf439a198501ea15bc7e47a inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="aae7ca43a2cf439a198501ea15bc7e47a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#aae7ca43a2cf439a198501ea15bc7e47a">dClassAlloc</a> ()</td></tr>
-<tr class="memdesc:aae7ca43a2cf439a198501ea15bc7e47a inherit pub_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
-<tr class="separator:aae7ca43a2cf439a198501ea15bc7e47a inherit pub_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5b8cb26b160797d123fa1329cf87655 inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="ab5b8cb26b160797d123fa1329cf87655"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#ab5b8cb26b160797d123fa1329cf87655">~dClassAlloc</a> ()</td></tr>
-<tr class="memdesc:ab5b8cb26b160797d123fa1329cf87655 inherit pub_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
-<tr class="separator:ab5b8cb26b160797d123fa1329cf87655 inherit pub_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a177d4db8727ec4c7cd9767295186f69d inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a177d4db8727ec4c7cd9767295186f69d"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#a177d4db8727ec4c7cd9767295186f69d">operator new</a> (size_t size)</td></tr>
-<tr class="memdesc:a177d4db8727ec4c7cd9767295186f69d inherit pub_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded operator new for any subclass derived from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
-<tr class="separator:a177d4db8727ec4c7cd9767295186f69d inherit pub_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a567b53e08b1053c79287c3ab51a0c62a inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a567b53e08b1053c79287c3ab51a0c62a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#a567b53e08b1053c79287c3ab51a0c62a">operator delete</a> (void *ptr)</td></tr>
-<tr class="memdesc:a567b53e08b1053c79287c3ab51a0c62a inherit pub_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded operator delete for any subclass derived from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
-<tr class="separator:a567b53e08b1053c79287c3ab51a0c62a inherit pub_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86a3f742ee185685b923f56c148b4cc3"><td class="memItemLeft" align="right" valign="top"><a id="a86a3f742ee185685b923f56c148b4cc3"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BodiesInAabb</b> (<a class="el" href="classnd_bodies_in_aabb_notify.html">ndBodiesInAabbNotify</a> &amp;callback) const</td></tr>
+<tr class="separator:a86a3f742ee185685b923f56c148b4cc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60ebad4412563c631428c6c1664e5057"><td class="memItemLeft" align="right" valign="top"><a id="a60ebad4412563c631428c6c1664e5057"></a>
+D_NEWTON_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>RayCast</b> (<a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a> &amp;callback, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalOrigin, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalDest) const</td></tr>
+<tr class="separator:a60ebad4412563c631428c6c1664e5057"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e59fc77d3a0805c33b8a31d0d2f1118"><td class="memItemLeft" align="right" valign="top"><a id="a0e59fc77d3a0805c33b8a31d0d2f1118"></a>
+D_NEWTON_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>ConvexCast</b> (<a class="el" href="classnd_convex_cast_notify.html">ndConvexCastNotify</a> &amp;callback, const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> &amp;convexShape, const <a class="el" href="classnd_matrix.html">ndMatrix</a> &amp;globalOrigin, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalDest) const</td></tr>
+<tr class="separator:a0e59fc77d3a0805c33b8a31d0d2f1118"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
+<tr class="memitem:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="affad975c41ed36eae8c71e3468fc12e3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#affad975c41ed36eae8c71e3468fc12e3">ndClassAlloc</a> ()</td></tr>
+<tr class="memdesc:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a8fea90aa3642db2007a191975bb169ce"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce">~ndClassAlloc</a> ()</td></tr>
+<tr class="memdesc:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -266,39 +277,51 @@ virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>
 <tr class="memitem:a91ca88299be721f4f46919bf4de2b7ba"><td class="memItemLeft" align="right" valign="top"><a id="a91ca88299be721f4f46919bf4de2b7ba"></a>
 virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateTransforms</b> ()</td></tr>
 <tr class="separator:a91ca88299be721f4f46919bf4de2b7ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac4c4d3a75ff7b77a212b7373daa748a"><td class="memItemLeft" align="right" valign="top"><a id="aac4c4d3a75ff7b77a212b7373daa748a"></a>
-virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ApplyExternalForces</b> ()</td></tr>
-<tr class="separator:aac4c4d3a75ff7b77a212b7373daa748a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf4897a5dacacd97308ee1974325cce7"><td class="memItemLeft" align="right" valign="top"><a id="aaf4897a5dacacd97308ee1974325cce7"></a>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>PostModelTransform</b> ()</td></tr>
+<tr class="separator:aaf4897a5dacacd97308ee1974325cce7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:a3bf9f82d7440931a3e417bef7fdb94ab"><td class="memItemLeft" align="right" valign="top"><a id="a3bf9f82d7440931a3e417bef7fdb94ab"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>ndScene</b></td></tr>
 <tr class="separator:a3bf9f82d7440931a3e417bef7fdb94ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a546ec90fc0191d0288c31c9631a5443e"><td class="memItemLeft" align="right" valign="top"><a id="a546ec90fc0191d0288c31c9631a5443e"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldScene</b></td></tr>
+<tr class="separator:a546ec90fc0191d0288c31c9631a5443e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5705cc3349446b752ab571e22bed2d68"><td class="memItemLeft" align="right" valign="top"><a id="a5705cc3349446b752ab571e22bed2d68"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndBodyDynamic</b></td></tr>
+<tr class="separator:a5705cc3349446b752ab571e22bed2d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc29a6caf36f06571c6e986c4a8c4b13"><td class="memItemLeft" align="right" valign="top"><a id="acc29a6caf36f06571c6e986c4a8c4b13"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>ndDynamicsUpdate</b></td></tr>
 <tr class="separator:acc29a6caf36f06571c6e986c4a8c4b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a596db98605bdae9f19aca5e739780089"><td class="memItemLeft" align="right" valign="top"><a id="a596db98605bdae9f19aca5e739780089"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldMixedScene</b></td></tr>
-<tr class="separator:a596db98605bdae9f19aca5e739780089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb84137105481cfc21ca9dad3c2e3ea4"><td class="memItemLeft" align="right" valign="top"><a id="acb84137105481cfc21ca9dad3c2e3ea4"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndSkeletonContainer</b></td></tr>
+<tr class="separator:acb84137105481cfc21ca9dad3c2e3ea4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4549ded00f1910692c26b49cce1a0269"><td class="memItemLeft" align="right" valign="top"><a id="a4549ded00f1910692c26b49cce1a0269"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndDynamicsUpdateSoa</b></td></tr>
+<tr class="separator:a4549ded00f1910692c26b49cce1a0269"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13e73ab8747f932c0946acd5f329163b"><td class="memItemLeft" align="right" valign="top"><a id="a13e73ab8747f932c0946acd5f329163b"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>ndDynamicsUpdateAvx2</b></td></tr>
 <tr class="separator:a13e73ab8747f932c0946acd5f329163b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac19a855c7fe758b1218e2b791fa26ccb"><td class="memItemLeft" align="right" valign="top"><a id="ac19a855c7fe758b1218e2b791fa26ccb"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldSegregatedScene</b></td></tr>
-<tr class="separator:ac19a855c7fe758b1218e2b791fa26ccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8153aac26ed93b85d16b1c036852157"><td class="memItemLeft" align="right" valign="top"><a id="aa8153aac26ed93b85d16b1c036852157"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndDynamicsUpdateCuda</b></td></tr>
+<tr class="separator:aa8153aac26ed93b85d16b1c036852157"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addcb55a0928709b721b0da5d67876424"><td class="memItemLeft" align="right" valign="top"><a id="addcb55a0928709b721b0da5d67876424"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndDynamicsUpdateOpencl</b></td></tr>
+<tr class="separator:addcb55a0928709b721b0da5d67876424"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_static_methods_classd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classd_class_alloc.html">dClassAlloc</a></td></tr>
-<tr class="memitem:ae74817104a54a91a0ed1f74fb1733540 inherit pub_static_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="ae74817104a54a91a0ed1f74fb1733540"></a>
-static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#ae74817104a54a91a0ed1f74fb1733540">Malloc</a> (size_t size)</td></tr>
-<tr class="memdesc:ae74817104a54a91a0ed1f74fb1733540 inherit pub_static_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic allocation for any function subclass from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
-<tr class="separator:ae74817104a54a91a0ed1f74fb1733540 inherit pub_static_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36b92bbda0153a4c2e14853b75016704 inherit pub_static_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a36b92bbda0153a4c2e14853b75016704"></a>
-static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#a36b92bbda0153a4c2e14853b75016704">Free</a> (void *const ptr)</td></tr>
-<tr class="memdesc:a36b92bbda0153a4c2e14853b75016704 inherit pub_static_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic destruction for any function subclass from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
-<tr class="separator:a36b92bbda0153a4c2e14853b75016704 inherit pub_static_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
+<tr class="memitem:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a1f1766c498c6231d24c63582106d2cfc"></a>
+D_OPERATOR_NEW_AND_DELETE static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a1f1766c498c6231d24c63582106d2cfc">Malloc</a> (size_t size)</td></tr>
+<tr class="memdesc:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic allocation for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
+<tr class="separator:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a5037cbc14d91b2b5e6b5163ed0ef9757"></a>
+static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a5037cbc14d91b2b5e6b5163ed0ef9757">Free</a> (void *const ptr)</td></tr>
+<tr class="memdesc:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic destruction for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
+<tr class="separator:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

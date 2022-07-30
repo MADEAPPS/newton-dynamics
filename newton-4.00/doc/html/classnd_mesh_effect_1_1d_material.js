@@ -1,10 +1,10 @@
 var classnd_mesh_effect_1_1d_material =
 [
     [ "dMaterial", "classnd_mesh_effect_1_1d_material.html#a9453081485c3242bf657d167cdeb52ba", null ],
-    [ "m_ambient", "classnd_mesh_effect_1_1d_material.html#acfe95ea6742f98a259d843c2cd5f3dfd", null ],
-    [ "m_diffuse", "classnd_mesh_effect_1_1d_material.html#aa8fa2057931563e5a0f4a406cb2e69cc", null ],
-    [ "m_opacity", "classnd_mesh_effect_1_1d_material.html#a487261f16d70df2a946a85af1b9763a2", null ],
-    [ "m_shiness", "classnd_mesh_effect_1_1d_material.html#ad1d279e725e9eaf7bbd574454239a06b", null ],
-    [ "m_specular", "classnd_mesh_effect_1_1d_material.html#a9868b7a7a003ef3dfeda2e565c27a27e", null ],
+    [ "m_ambient", "classnd_mesh_effect_1_1d_material.html#ad1f685a6dae813ecef43e393ef0261cd", null ],
+    [ "m_diffuse", "classnd_mesh_effect_1_1d_material.html#a039b77360a43159dcaae102432307df7", null ],
+    [ "m_opacity", "classnd_mesh_effect_1_1d_material.html#a03cf4083e5fdac4d707a9b6dfc4e7504", null ],
+    [ "m_shiness", "classnd_mesh_effect_1_1d_material.html#aa7f89e1116b78d0fe9cc41d2a3f299bb", null ],
+    [ "m_specular", "classnd_mesh_effect_1_1d_material.html#a1003a1969d60156db5e43db4102e6ef1", null ],
     [ "m_textureName", "classnd_mesh_effect_1_1d_material.html#ab6c118a8ce6fb7fe1425381523edae93", null ]
 ];

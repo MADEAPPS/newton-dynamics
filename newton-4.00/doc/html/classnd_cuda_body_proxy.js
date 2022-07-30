@@ -1,0 +1,25 @@
+var classnd_cuda_body_proxy =
+[
+    [ "AddDampingAcceleration", "classnd_cuda_body_proxy.html#a73d0fba9e97c071b7bbc9ab6ceb77867", null ],
+    [ "CalculateInvInertiaMatrix", "classnd_cuda_body_proxy.html#a2813f077221b46c66e1e895bfda53058", null ],
+    [ "IntegrateExternalForce", "classnd_cuda_body_proxy.html#a519f35c0ca090ad44276ac1fdc6883a1", null ],
+    [ "IntegrateVelocity", "classnd_cuda_body_proxy.html#a4b60e23f1b838d46437f005a0d85d979", null ],
+    [ "ProxyToBody", "classnd_cuda_body_proxy.html#a143f264e8b03f31635665918b0a33bde", null ],
+    [ "m_alignRotation", "classnd_cuda_body_proxy.html#a81f2371f07b494c8ae1d588948e923ef", null ],
+    [ "m_dampCoef", "classnd_cuda_body_proxy.html#a76e4ce856e7c30d8f9e4e69438fcdee2", null ],
+    [ "m_globalSphapePosition", "classnd_cuda_body_proxy.html#ab8880f25e75dfc3fc0cbaaa6864d4915", null ],
+    [ "m_globalSphapeRotation", "classnd_cuda_body_proxy.html#a59adb5f4c3244e9fccc29ab55ed302d0", null ],
+    [ "m_invIntertia", "classnd_cuda_body_proxy.html#a561523469ff58d4503ba15c0ec2b3a64", null ],
+    [ "m_localPosition", "classnd_cuda_body_proxy.html#aeca56a53f25db9b12f367cb1120470bd", null ],
+    [ "m_localRotation", "classnd_cuda_body_proxy.html#a8d94a829ec7a1d8a0b90f17e3b9027b0", null ],
+    [ "m_mass", "classnd_cuda_body_proxy.html#ab4ffc7734a7a019ea4c446669351ce5f", null ],
+    [ "m_maxAabb", "classnd_cuda_body_proxy.html#ab3fbd5761043966205db765c0289b97b", null ],
+    [ "m_minAabb", "classnd_cuda_body_proxy.html#af7de9c9f614217eb66f04e19ca25d6bb", null ],
+    [ "m_obbOrigin", "classnd_cuda_body_proxy.html#a378fbb6d42daa4d731c4987269c2b3db", null ],
+    [ "m_obbSize", "classnd_cuda_body_proxy.html#a08842e0a5cf701ddf3071d804a32ed52", null ],
+    [ "m_omega", "classnd_cuda_body_proxy.html#a0110f982da39c2b826a72acd662c008d", null ],
+    [ "m_posit", "classnd_cuda_body_proxy.html#ab53abafa6238605ab293134c060ff270", null ],
+    [ "m_rotation", "classnd_cuda_body_proxy.html#afb403ef55a62596f476050784c4832e3", null ],
+    [ "m_scale", "classnd_cuda_body_proxy.html#adb803e1289b98bfe505e8826afd157f4", null ],
+    [ "m_veloc", "classnd_cuda_body_proxy.html#af4203fece5f63a1d90bafdfa895a963d", null ]
+];

@@ -1,6 +1,11 @@
 var searchData=
 [
-  ['accept_0',['Accept',['../classnd_1_1_ti_xml_node.html#a056fdda8ecb8b636cfd262721ccde7ae',1,'nd::TiXmlNode::Accept()'],['../classnd_1_1_ti_xml_element.html#a7acbc6a4663aa2377feea261845a1c04',1,'nd::TiXmlElement::Accept()'],['../classnd_1_1_ti_xml_comment.html#a866e70182bf642a16c7956bcc43c80df',1,'nd::TiXmlComment::Accept()'],['../classnd_1_1_ti_xml_text.html#a1a3ec94ec32efbb387164714bfb16aca',1,'nd::TiXmlText::Accept()'],['../classnd_1_1_ti_xml_declaration.html#adc382ecb1ae90ce7e11603dffdcde9b3',1,'nd::TiXmlDeclaration::Accept()'],['../classnd_1_1_ti_xml_unknown.html#a055861a74049fb204e7cc0e48c834eb3',1,'nd::TiXmlUnknown::Accept()'],['../classnd_1_1_ti_xml_document.html#a50c62789589672abfd436044f6fa6538',1,'nd::TiXmlDocument::Accept()']]],
-  ['adjacentdface_1',['AdjacentdFace',['../class_adjacentd_face.html',1,'']]],
-  ['attribute_2',['Attribute',['../classnd_1_1_ti_xml_element.html#a79e0d1033aad1acccfa946823dbe200e',1,'nd::TiXmlElement::Attribute(const char *name) const'],['../classnd_1_1_ti_xml_element.html#ad80aa5209b7adc1ebe07ebfd13e05559',1,'nd::TiXmlElement::Attribute(const char *name, int *i) const'],['../classnd_1_1_ti_xml_element.html#ad237b51add4bbd6767ce1ac24c24ac9d',1,'nd::TiXmlElement::Attribute(const char *name, double *d) const']]]
+  ['_5fcl_5ficd_5fdispatch_0',['_cl_icd_dispatch',['../struct__cl__icd__dispatch.html',1,'']]],
+  ['_5fcl_5fimage_5fformat_1',['_cl_image_format',['../struct__cl__image__format.html',1,'']]],
+  ['_5fcl_5fmem_5fandroid_5fnative_5fbuffer_5fhost_5fptr_2',['_cl_mem_android_native_buffer_host_ptr',['../struct__cl__mem__android__native__buffer__host__ptr.html',1,'']]],
+  ['_5fcl_5fmem_5fext_5fhost_5fptr_3',['_cl_mem_ext_host_ptr',['../struct__cl__mem__ext__host__ptr.html',1,'']]],
+  ['_5fcl_5fmem_5fion_5fhost_5fptr_4',['_cl_mem_ion_host_ptr',['../struct__cl__mem__ion__host__ptr.html',1,'']]],
+  ['_5fcl_5fmotion_5festimation_5fdesc_5fintel_5',['_cl_motion_estimation_desc_intel',['../struct__cl__motion__estimation__desc__intel.html',1,'']]],
+  ['_5fcl_5fname_5fversion_5fkhr_6',['_cl_name_version_khr',['../struct__cl__name__version__khr.html',1,'']]],
+  ['_5fcl_5fqueue_5ffamily_5fproperties_5fintel_7',['_cl_queue_family_properties_intel',['../struct__cl__queue__family__properties__intel.html',1,'']]]
 ];

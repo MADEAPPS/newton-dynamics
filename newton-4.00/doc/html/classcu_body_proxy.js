@@ -1,0 +1,25 @@
+var classcu_body_proxy =
+[
+    [ "AddDampingAcceleration", "classcu_body_proxy.html#a9195f9846a61be4818949aed71970280", null ],
+    [ "CalculateInvInertiaMatrix", "classcu_body_proxy.html#a10178374738e10027ed0e29b45afe237", null ],
+    [ "IntegrateExternalForce", "classcu_body_proxy.html#a90d0d9422570183799306630763e6c89", null ],
+    [ "IntegrateVelocity", "classcu_body_proxy.html#aa6e30ca8fc08d29f9afcaf77273640c7", null ],
+    [ "ProxyToBody", "classcu_body_proxy.html#a1e067b12c620ddfa2d7d32747cfd1267", null ],
+    [ "m_alignRotation", "classcu_body_proxy.html#a56bf1eb967c97855be8f8ed57a89315b", null ],
+    [ "m_dampCoef", "classcu_body_proxy.html#aefbf3506e3776a5c48576c5b214ec4bf", null ],
+    [ "m_globalSphapePosition", "classcu_body_proxy.html#ae0576e23e1545b4ab4881a253fe555e5", null ],
+    [ "m_globalSphapeRotation", "classcu_body_proxy.html#a1651d2aeaf81386050c4de2f83358a76", null ],
+    [ "m_invIntertia", "classcu_body_proxy.html#a1b02e764f41af9533efa130750dda316", null ],
+    [ "m_localPosition", "classcu_body_proxy.html#af073261d939e63cb8f5732a020ebdef4", null ],
+    [ "m_localRotation", "classcu_body_proxy.html#a3f8bec40f8053e7576ac47b4b5afa73b", null ],
+    [ "m_mass", "classcu_body_proxy.html#a127e0459c2ff561dc00722e1be807312", null ],
+    [ "m_maxAabb", "classcu_body_proxy.html#a12d86ac5edafb7da3aeae5bc8e1df8fb", null ],
+    [ "m_minAabb", "classcu_body_proxy.html#a02019789519821c7153a816215f2a6ec", null ],
+    [ "m_obbOrigin", "classcu_body_proxy.html#aec8ba369a500c93c8deb0c3a9e0094a2", null ],
+    [ "m_obbSize", "classcu_body_proxy.html#ad5287e1f62dae4830528cc42e021105d", null ],
+    [ "m_omega", "classcu_body_proxy.html#a2a68a70d1a4c129d613db08cf8a12fe4", null ],
+    [ "m_posit", "classcu_body_proxy.html#aa4670f9aba587b70fd8890df99a4beb6", null ],
+    [ "m_rotation", "classcu_body_proxy.html#a02d338fcbc33402dc6da2ff7003a596d", null ],
+    [ "m_scale", "classcu_body_proxy.html#a1c4cf4739e16f7fc6a3bc4cb7220959e", null ],
+    [ "m_veloc", "classcu_body_proxy.html#a525caa374b27c2b70382c64dbeeefb7a", null ]
+];

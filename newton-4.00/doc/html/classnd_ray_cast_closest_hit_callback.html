@@ -95,8 +95,6 @@ $(document).ready(function(){initNavTree('classnd_ray_cast_closest_hit_callback.
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classnd_ray_cast_closest_hit_callback-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ndRayCastClosestHitCallback Class Reference</div>  </div>
@@ -108,44 +106,51 @@ Inheritance diagram for ndRayCastClosestHitCallback:</div>
  <div class="center">
   <img src="classnd_ray_cast_closest_hit_callback.png" usemap="#ndRayCastClosestHitCallback_map" alt=""/>
   <map id="ndRayCastClosestHitCallback_map" name="ndRayCastClosestHitCallback_map">
-<area href="classnd_ray_cast_notify.html" alt="ndRayCastNotify" shape="rect" coords="0,0,178,24"/>
+<area href="classnd_ray_cast_notify.html" alt="ndRayCastNotify" shape="rect" coords="0,56,178,80"/>
+<area href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="ndClassAlloc" shape="rect" coords="0,0,178,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae14a1947e85542fa01c9d7a18cbb2f12"><td class="memItemLeft" align="right" valign="top"><a id="ae14a1947e85542fa01c9d7a18cbb2f12"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ndRayCastClosestHitCallback</b> (const <a class="el" href="classnd_scene.html">ndScene</a> *const scene)</td></tr>
-<tr class="separator:ae14a1947e85542fa01c9d7a18cbb2f12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74e25587071db761b63811147419af21"><td class="memItemLeft" align="right" valign="top"><a id="a74e25587071db761b63811147419af21"></a>
-dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>OnRayPrecastAction</b> (const <a class="el" href="classnd_body.html">ndBody</a> *const body, const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> *const collision)</td></tr>
-<tr class="separator:a74e25587071db761b63811147419af21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7dd850c65dee076508a095d0fc048e0"><td class="memItemLeft" align="right" valign="top"><a id="ae7dd850c65dee076508a095d0fc048e0"></a>
-dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>OnRayCastAction</b> (const <a class="el" href="classnd_contact_point.html">ndContactPoint</a> &amp;contact, dFloat32 intersetParam)</td></tr>
-<tr class="separator:ae7dd850c65dee076508a095d0fc048e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a431d332371e48351ae6215ed44319153"><td class="memItemLeft" align="right" valign="top"><a id="a431d332371e48351ae6215ed44319153"></a>
+ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>OnRayPrecastAction</b> (const <a class="el" href="classnd_body.html">ndBody</a> *const body, const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> *const)</td></tr>
+<tr class="separator:a431d332371e48351ae6215ed44319153"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fd486e871f1bc53ce7c8ede750b26af"><td class="memItemLeft" align="right" valign="top"><a id="a7fd486e871f1bc53ce7c8ede750b26af"></a>
+ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>OnRayCastAction</b> (const <a class="el" href="classnd_contact_point.html">ndContactPoint</a> &amp;contact, ndFloat32 intersetParam)</td></tr>
+<tr class="separator:a7fd486e871f1bc53ce7c8ede750b26af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_ray_cast_notify"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_ray_cast_notify')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a></td></tr>
-<tr class="memitem:a8eb2c0b1a5a0cbd0a1a1a59e27dcccaa inherit pub_methods_classnd_ray_cast_notify"><td class="memItemLeft" align="right" valign="top"><a id="a8eb2c0b1a5a0cbd0a1a1a59e27dcccaa"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ndRayCastNotify</b> (const <a class="el" href="classnd_scene.html">ndScene</a> *const scene)</td></tr>
-<tr class="separator:a8eb2c0b1a5a0cbd0a1a1a59e27dcccaa inherit pub_methods_classnd_ray_cast_notify"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c5976d31ba646b439609de1fd4e8526 inherit pub_methods_classnd_ray_cast_notify"><td class="memItemLeft" align="right" valign="top"><a id="a0c5976d31ba646b439609de1fd4e8526"></a>
-dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>TraceRay</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;p0, const <a class="el" href="classd_vector.html">dVector</a> &amp;p1)</td></tr>
-<tr class="separator:a0c5976d31ba646b439609de1fd4e8526 inherit pub_methods_classnd_ray_cast_notify"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cf6f98de6e971d2ddf44114bf92eb0a inherit pub_methods_classnd_ray_cast_notify"><td class="memItemLeft" align="right" valign="top"><a id="a3cf6f98de6e971d2ddf44114bf92eb0a"></a>
+D_COLLISION_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>TraceShape</b> (const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalOrigin, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalDestination, const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> &amp;shapeInstance, const <a class="el" href="classnd_matrix.html">ndMatrix</a> &amp;shapeGlobal)</td></tr>
+<tr class="separator:a3cf6f98de6e971d2ddf44114bf92eb0a inherit pub_methods_classnd_ray_cast_notify"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
+<tr class="memitem:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="affad975c41ed36eae8c71e3468fc12e3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#affad975c41ed36eae8c71e3468fc12e3">ndClassAlloc</a> ()</td></tr>
+<tr class="memdesc:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a8fea90aa3642db2007a191975bb169ce"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce">~ndClassAlloc</a> ()</td></tr>
+<tr class="memdesc:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:aafa1cd297098d425a1a6453809239051"><td class="memItemLeft" align="right" valign="top"><a id="aafa1cd297098d425a1a6453809239051"></a>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
+<tr class="memitem:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a1f1766c498c6231d24c63582106d2cfc"></a>
+D_OPERATOR_NEW_AND_DELETE static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a1f1766c498c6231d24c63582106d2cfc">Malloc</a> (size_t size)</td></tr>
+<tr class="memdesc:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic allocation for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
+<tr class="separator:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a5037cbc14d91b2b5e6b5163ed0ef9757"></a>
+static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a5037cbc14d91b2b5e6b5163ed0ef9757">Free</a> (void *const ptr)</td></tr>
+<tr class="memdesc:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic destruction for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
+<tr class="separator:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classnd_ray_cast_notify"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classnd_ray_cast_notify')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a></td></tr>
+<tr class="memitem:a83ff9c8c1043736f112d9ffa50f4d594 inherit pub_attribs_classnd_ray_cast_notify"><td class="memItemLeft" align="right" valign="top"><a id="a83ff9c8c1043736f112d9ffa50f4d594"></a>
 <a class="el" href="classnd_contact_point.html">ndContactPoint</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_contact</b></td></tr>
-<tr class="separator:aafa1cd297098d425a1a6453809239051"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a04336e4ec3c6efc96b60f28d63b869cf"><td class="memItemLeft" align="right" valign="top"><a id="a04336e4ec3c6efc96b60f28d63b869cf"></a>
-dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_param</b></td></tr>
-<tr class="separator:a04336e4ec3c6efc96b60f28d63b869cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classnd_ray_cast_notify"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classnd_ray_cast_notify')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a></td></tr>
-<tr class="memitem:a6526aa8eb1552df95e4a0c8d837de5e4 inherit pro_attribs_classnd_ray_cast_notify"><td class="memItemLeft" align="right" valign="top"><a id="a6526aa8eb1552df95e4a0c8d837de5e4"></a>
-const <a class="el" href="classnd_scene.html">ndScene</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_scene</b></td></tr>
-<tr class="separator:a6526aa8eb1552df95e4a0c8d837de5e4 inherit pro_attribs_classnd_ray_cast_notify"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a83ff9c8c1043736f112d9ffa50f4d594 inherit pub_attribs_classnd_ray_cast_notify"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4502119950c8fc1967686aa4b1176f0 inherit pub_attribs_classnd_ray_cast_notify"><td class="memItemLeft" align="right" valign="top"><a id="ae4502119950c8fc1967686aa4b1176f0"></a>
+ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_param</b></td></tr>
+<tr class="separator:ae4502119950c8fc1967686aa4b1176f0 inherit pub_attribs_classnd_ray_cast_notify"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

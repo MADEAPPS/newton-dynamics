@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wait_401',['Wait',['../classd_semaphore.html#a9f192f85fba7aac7e41b4b97945afcf3',1,'dSemaphore']]]
+  ['wait_634',['Wait',['../classnd_semaphore.html#a460d327165441b0f5819f2c68b6a345b',1,'ndSemaphore']]]
 ];

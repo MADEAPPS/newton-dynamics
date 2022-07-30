@@ -1,16 +1,25 @@
 var classnd_joint_wheel =
 [
-    [ "ndWheelDescriptor", "classnd_joint_wheel_1_1nd_wheel_descriptor.html", "classnd_joint_wheel_1_1nd_wheel_descriptor" ],
-    [ "ndJointWheel", "classnd_joint_wheel.html#a4f485b95ae3693e8ca8766f3ec6647ca", null ],
+    [ "ndJointWheel", "classnd_joint_wheel.html#a71273038a23b2ba66f99d64dc90a5644", null ],
+    [ "ndJointWheel", "classnd_joint_wheel.html#a13ec321904c42d2acd24ba139c259490", null ],
     [ "~ndJointWheel", "classnd_joint_wheel.html#abd340aa68728a6f2f1800982cf267244", null ],
+    [ "CalculateUpperBumperMatrix", "classnd_joint_wheel.html#ae2d1b36c80961c5b0a8de1a0933636bd", null ],
+    [ "D_CLASS_REFLECTION", "classnd_joint_wheel.html#ae0417cb9644db88d0b4df5638271164b", null ],
     [ "GetInfo", "classnd_joint_wheel.html#a437a60728718a0ea79856382915c38ec", null ],
     [ "JacobianDerivative", "classnd_joint_wheel.html#a4bce1f196ecf3b2273ad55bfc76e5d9e", null ],
-    [ "SetBrakeTorque", "classnd_joint_wheel.html#adc595e82660f6dbf42875db69f397c0f", null ],
+    [ "Save", "classnd_joint_wheel.html#acb4fc330d201c671de248c185ca44715", null ],
+    [ "SetBrake", "classnd_joint_wheel.html#aeb4656b1d39034bfb992f761226bb051", null ],
+    [ "SetHandBrake", "classnd_joint_wheel.html#a46bbf8fd7a024448cf4081614f4ab1b7", null ],
     [ "SetInfo", "classnd_joint_wheel.html#a806e7600ff2ab6964ac740ba960a677e", null ],
-    [ "SetSteeringAngle", "classnd_joint_wheel.html#a8309d18a5896cbca9b98bf1ed196157d", null ],
-    [ "m_baseFrame", "classnd_joint_wheel.html#aa69477f2cec7eb6a18975228b0f4044a", null ],
-    [ "m_brakeTorque", "classnd_joint_wheel.html#ae8a3d9034fe3c810dae289b011ef9a29", null ],
+    [ "SetSteering", "classnd_joint_wheel.html#aac2d710824d224187f5fb010c350890d", null ],
+    [ "UpdateTireSteeringAngleMatrix", "classnd_joint_wheel.html#ad05348ad7eb3e439c33c5749ab117534", null ],
+    [ "ndMultiBodyVehicle", "classnd_joint_wheel.html#a9845fa87b7c1745a2d5292d0b45ffb3a", null ],
+    [ "m_baseFrame", "classnd_joint_wheel.html#a37a27cc9c2bc744a0d57f09539e0b1d3", null ],
     [ "m_info", "classnd_joint_wheel.html#aaa2d2e53e1bc6f129cb198f77c4c8aee", null ],
-    [ "m_posit", "classnd_joint_wheel.html#a6b3fd4e97b0982de9df1ed7be0f435aa", null ],
-    [ "m_speed", "classnd_joint_wheel.html#a4826b0bfcf4366aeba7b3a7f96b22c60", null ]
+    [ "m_normalidedSteering", "classnd_joint_wheel.html#a6975991f7d9fc0eff17e700637307e52", null ],
+    [ "m_normalizedBrake", "classnd_joint_wheel.html#a2a7d5f8c07e867bfed06818cc3f90612", null ],
+    [ "m_normalizedHandBrake", "classnd_joint_wheel.html#a01f9040826a4ffb36f952e25279d4f5e", null ],
+    [ "m_posit", "classnd_joint_wheel.html#a37be2f98fabc055c67583e4b4951acd1", null ],
+    [ "m_regularizer", "classnd_joint_wheel.html#a24ebbe68c0118dc8dbfe9b3b07834ced", null ],
+    [ "m_speed", "classnd_joint_wheel.html#a1a9fbae819b799d387e4163d670be51a", null ]
 ];

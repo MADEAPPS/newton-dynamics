@@ -1,6 +1,6 @@
 var classdg_diagonal_edge =
 [
-    [ "dgDiagonalEdge", "classdg_diagonal_edge.html#aac329a300a1b57fe0c1c7362558a787a", null ],
-    [ "m_i0", "classdg_diagonal_edge.html#a63960a17c999a7e3bd399e721a614f68", null ],
-    [ "m_i1", "classdg_diagonal_edge.html#a424afa0626ed790dd6c9b5619ff1510d", null ]
+    [ "dgDiagonalEdge", "classdg_diagonal_edge.html#ad9d0207cd1931bd9cb7bb6eeaf7d6694", null ],
+    [ "m_i0", "classdg_diagonal_edge.html#a6343e4c2ffc46b4d95aee97880684337", null ],
+    [ "m_i1", "classdg_diagonal_edge.html#a3f45bd39515220cfb985fcbde99c852b", null ]
 ];

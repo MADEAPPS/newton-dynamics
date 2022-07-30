@@ -1,8 +1,11 @@
 var searchData=
 [
-  ['lastattribute_197',['LastAttribute',['../classnd_1_1_ti_xml_element.html#aab3fd4393c4601bd889d859064f305b3',1,'nd::TiXmlElement']]],
-  ['lastchild_198',['LastChild',['../classnd_1_1_ti_xml_node.html#a05cd36d3c6b231ce6a8f2fffa5fb66d4',1,'nd::TiXmlNode::LastChild()'],['../classnd_1_1_ti_xml_node.html#a1905f8e809eba72521d33961716ee930',1,'nd::TiXmlNode::LastChild(const char *_value)']]],
-  ['linebreak_199',['LineBreak',['../classnd_1_1_ti_xml_printer.html#ae467fc569d563bad2a15b6785eb5fd9f',1,'nd::TiXmlPrinter']]],
-  ['linkendchild_200',['LinkEndChild',['../classnd_1_1_ti_xml_node.html#ad9c4bb9945675936ad65d5b4f8a1f2ef',1,'nd::TiXmlNode']]],
-  ['loadfile_201',['LoadFile',['../classnd_1_1_ti_xml_document.html#a07f988abda39c15724829ca4b0d06fd5',1,'nd::TiXmlDocument::LoadFile(TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)'],['../classnd_1_1_ti_xml_document.html#ae188534c849e749062c47c6800f85831',1,'nd::TiXmlDocument::LoadFile(const char *filename, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)'],['../classnd_1_1_ti_xml_document.html#a856852512732363666a3d39f39ed357f',1,'nd::TiXmlDocument::LoadFile(FILE *, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)']]]
+  ['indent_132',['Indent',['../classnd_1_1_ti_xml_printer.html#ab9b46c8a727a477ccddf76bf4e17e7ab',1,'nd::TiXmlPrinter']]],
+  ['insertafterchild_133',['InsertAfterChild',['../classnd_1_1_ti_xml_node.html#a2bfdd7c49e1528a3c91299689bc0952b',1,'nd::TiXmlNode']]],
+  ['insertbeforechild_134',['InsertBeforeChild',['../classnd_1_1_ti_xml_node.html#aa4f58890dabb3a0673ac824515b2f291',1,'nd::TiXmlNode']]],
+  ['insertendchild_135',['InsertEndChild',['../classnd_1_1_ti_xml_node.html#a96385fe8b28a5c596f2b25a0d7b5b59e',1,'nd::TiXmlNode']]],
+  ['intvalue_136',['IntValue',['../classnd_1_1_ti_xml_attribute.html#a4cf4e8a52f247e188d9bc9b8c424c3a9',1,'nd::TiXmlAttribute']]],
+  ['iswhitespacecondensed_137',['IsWhiteSpaceCondensed',['../classnd_1_1_ti_xml_base.html#ac5ab5b5a4ed5abe6324a0223e5d5da5a',1,'nd::TiXmlBase']]],
+  ['iteratechildren_138',['IterateChildren',['../classnd_1_1_ti_xml_node.html#a441dcf815b9d2cb54817f6dda4a0a2bc',1,'nd::TiXmlNode::IterateChildren(const TiXmlNode *previous) const'],['../classnd_1_1_ti_xml_node.html#ac4b7e5f4f5e79e3a944873663584db70',1,'nd::TiXmlNode::IterateChildren(const char *value, const TiXmlNode *previous) const']]],
+  ['iterator_139',['Iterator',['../classnd_list_1_1_iterator.html',1,'ndList&lt; T, allocator &gt;::Iterator'],['../classnd_tree_1_1_iterator.html',1,'ndTree&lt; OBJECT, KEY, allocator &gt;::Iterator']]]
 ];

@@ -9,5 +9,9 @@ var classnd_1_1_ti_xml_attribute_set =
     [ "First", "classnd_1_1_ti_xml_attribute_set.html#a24bf613750bfa6429794e8f8492249c3", null ],
     [ "Last", "classnd_1_1_ti_xml_attribute_set.html#a130bb8586b4100343225f4c87b498409", null ],
     [ "Last", "classnd_1_1_ti_xml_attribute_set.html#a8b44247d02a733fd56b01d6cd9e11665", null ],
+    [ "operator delete", "classnd_1_1_ti_xml_attribute_set.html#a57006d036990c22abede5b76d1a6f494", null ],
+    [ "operator delete[]", "classnd_1_1_ti_xml_attribute_set.html#a652f816256b4ed225d2aebedbaa4c274", null ],
+    [ "operator new", "classnd_1_1_ti_xml_attribute_set.html#af16b6c12689fe35574084f2d66c90bc2", null ],
+    [ "operator new[]", "classnd_1_1_ti_xml_attribute_set.html#a260feb1c4652a5d3fee76c99ebc4659f", null ],
     [ "Remove", "classnd_1_1_ti_xml_attribute_set.html#a29bbba1d0c2a6fa9c21a1fadb9a69c4f", null ]
 ];

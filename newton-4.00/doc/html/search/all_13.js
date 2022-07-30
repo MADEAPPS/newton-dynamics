@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['_7edclassalloc_402',['~dClassAlloc',['../classd_class_alloc.html#ab5b8cb26b160797d123fa1329cf87655',1,'dClassAlloc']]],
-  ['_7edsemaphore_403',['~dSemaphore',['../classd_semaphore.html#a5ee195cf593fc23d354ed808d0664a33',1,'dSemaphore']]],
-  ['_7edsyncmutex_404',['~dSyncMutex',['../classd_sync_mutex.html#ac25d0933eca52aa9e7f2ad961b4e1f0f',1,'dSyncMutex']]]
+  ['_7endclassalloc_635',['~ndClassAlloc',['../classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce',1,'ndClassAlloc']]],
+  ['_7endsemaphore_636',['~ndSemaphore',['../classnd_semaphore.html#a32248d41f68f0ccb4464510a777f2c41',1,'ndSemaphore']]],
+  ['_7endsyncmutex_637',['~ndSyncMutex',['../classnd_sync_mutex.html#a1b3dd08e56dccc5e978d60d898a74db2',1,'ndSyncMutex']]]
 ];
