@@ -263,6 +263,9 @@ void ndIk6DofEffector::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix
 			SubmitShortestPathAxis(matrix0, matrix, desc);
 			break;
 		}
+
+		case m_disabled:
+		default:;
 	}
 }
 
