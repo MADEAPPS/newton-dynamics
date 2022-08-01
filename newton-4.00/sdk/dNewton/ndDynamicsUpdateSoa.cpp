@@ -1486,7 +1486,8 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 
 			#ifdef D_USE_EARLY_OUT_JOINT
 			ndVector maxAccel(accNorm);
-			for (ndInt32 k = 0; (k < 4) && (maxAccel.GetMax().GetScalar() > tol2); ++k)
+			ndFloat32 accelMag2 = maxAccel.GetMax().GetScalar();
+			for (ndInt32 k = 0; (k < 4) && (accelMag2 > tol2); ++k)
 			#else
 			for (ndInt32 k = 0; k < 4; ++k)
 			#endif
@@ -1549,6 +1550,10 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
 					forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
 				}
+
+				#ifdef D_USE_EARLY_OUT_JOINT
+				accelMag2 = maxAccel.GetMax().GetScalar();
+				#endif
 			}
 
 			ndVector mask(m_jointMask[group]);
