@@ -786,8 +786,8 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 				{
 					const ndInt32 maxMask = (maxRow - joint->m_rowCount) >> 8;
 					const ndInt32 minMask = (minRow - joint->m_rowCount) >> 8;
-					maxRow = maxMask & joint->m_rowCount | ~maxMask & maxRow;
-					minRow = ~minMask & joint->m_rowCount | minMask & minRow;
+					maxRow = ( maxMask & joint->m_rowCount) | (~maxMask & maxRow);
+					minRow = (~minMask & joint->m_rowCount) | ( minMask & minRow);
 					if (!joint->m_rowCount)
 					{
 						selectMask[j] = ndFloat32(0.0f);
