@@ -144,7 +144,10 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 	#endif
 
 	#if defined (__APPLE__)
-		#ifndef IOS
+		#if (defined (_M_ARM) || defined (_M_ARM64))
+			#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
+		#else
+			// an intel mac
 			fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 		#endif
 	#elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
