@@ -22,6 +22,8 @@
 #ifndef __ND_VECTOR_ARM_NEON_H__
 #define __ND_VECTOR_ARM_NEON_H__
 
+#include <arm_neon.h>
+
 #ifndef D_SCALAR_VECTOR_CLASS
 
 #ifdef D_NEWTON_USE_DOUBLE
@@ -308,22 +310,22 @@ class ndVector
 		return me * InvMagSqrt();
 	}
 
-	ndVector Abs() const
+	inline ndVector Abs() const
 	{
 		return vabsq_f32(m_type);
 	}
 
-	ndFloat32 GetMax() const
+	inline ndVector GetMax() const
 	{
-		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
+		return ndVector(ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w)));
 	}
 
-	ndVector GetMax(const ndVector& data) const
+	inline ndVector GetMax(const ndVector& data) const
 	{
 		return vmaxq_f32(m_type, data.m_type);
 	}
 
-	ndVector GetMin(const ndVector& data) const
+	inline ndVector GetMin(const ndVector& data) const
 	{
 		return vminq_f32(m_type, data.m_type);
 	}
@@ -721,12 +723,12 @@ class ndBigVector
 			(m_w > ndFloat64(0.0f)) ? m_w : -m_w);
 	}
 
-	ndFloat64 GetMax() const
+	inline ndBigVector GetMax() const
 	{
-		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
+		return ndBigVector(ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w)));
 	}
 
-	ndBigVector GetMax(const ndBigVector& data) const
+	inline ndBigVector GetMax(const ndBigVector& data) const
 	{
 		return ndBigVector((m_x > data.m_x) ? m_x : data.m_x,
 			(m_y > data.m_y) ? m_y : data.m_y,
@@ -734,7 +736,7 @@ class ndBigVector
 			(m_w > data.m_w) ? m_w : data.m_w);
 	}
 
-	ndBigVector GetMin(const ndBigVector& data) const
+	inline ndBigVector GetMin(const ndBigVector& data) const
 	{
 		return ndBigVector((m_x < data.m_x) ? m_x : data.m_x,
 			(m_y < data.m_y) ? m_y : data.m_y,

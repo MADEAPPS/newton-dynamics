@@ -322,18 +322,18 @@ class ndVector
 		return _mm_and_ps (m_type, m_signMask.m_type);
 	}
 
-	ndVector GetMax() const
+	inline ndVector GetMax() const
 	{
 		__m128 tmp(_mm_max_ps(m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
 		return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
 	}
 
-	ndVector GetMax (const ndVector& data) const
+	inline ndVector GetMax (const ndVector& data) const
 	{
 		return _mm_max_ps (m_type, data.m_type);
 	}
 
-	ndVector GetMin (const ndVector& data) const
+	inline ndVector GetMin (const ndVector& data) const
 	{
 		return _mm_min_ps (m_type, data.m_type);
 	}
@@ -786,19 +786,19 @@ class ndBigVector
 		return Scale(ndFloat64 (1.0f) / sqrt (mag2));
 	}
 
-	ndBigVector GetMax() const
+	inline ndBigVector GetMax() const
 	{
 		__m128d tmp(_mm_max_pd(m_typeLow, m_typeHigh));
 		tmp = _mm_max_pd(tmp, _mm_shuffle_pd(tmp, tmp, PERMUT_MASK_DOUBLE(0, 1)));
 		return ndBigVector(tmp, tmp);
 	}
 
-	ndBigVector GetMax(const ndBigVector& data) const
+	inline ndBigVector GetMax(const ndBigVector& data) const
 	{
 		return ndBigVector(_mm_max_pd(m_typeLow, data.m_typeLow), _mm_max_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	ndBigVector GetMin(const ndBigVector& data) const
+	inline ndBigVector GetMin(const ndBigVector& data) const
 	{
 		return ndBigVector(_mm_min_pd(m_typeLow, data.m_typeLow), _mm_min_pd(m_typeHigh, data.m_typeHigh));
 	}
