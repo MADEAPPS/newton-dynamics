@@ -1068,10 +1068,10 @@ bool dSolveDantzigLCP(ndInt32 size, T* const symetricMatrix, T* const x, T* cons
 
 	memcpy (choleskyMatrix, symetricMatrix, sizeof (T) * size * size);
 	dCholeskyFactorization(size, choleskyMatrix);
-	for (ndInt32 i = 0; i < size; i ++) 
+	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		T* const row = &choleskyMatrix[i * size];
-		for (ndInt32 j = i + 1; j < size; j ++) 
+		for (ndInt32 j = i + 1; j < size; ++j) 
 		{
 			row[j] = T(0.0f);
 		}

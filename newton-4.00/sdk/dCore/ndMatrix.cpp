@@ -345,9 +345,9 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 #ifdef _DEBUG
 	ndMatrix m0 (ndPitchMatrix (euler0[0]) * ndYawMatrix(euler0[1]) * ndRollMatrix(euler0[2]));
 	ndMatrix m1 (ndPitchMatrix (euler1[0]) * ndYawMatrix(euler1[1]) * ndRollMatrix(euler1[2]));
-	for (ndInt32 i = 0; i < 3; i ++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
-		for (ndInt32 j = 0; j < 3; j ++) 
+		for (ndInt32 j = 0; j < 3; ++j) 
 		{
 			ndFloat32 error = ndAbs (m0[i][j] - matrix[i][j]);
 			dAssert (error < 5.0e-2f);
@@ -440,9 +440,9 @@ ndVector ndMatrix::EigenVectors ()
 		}
 
 		ndVector z (ndVector::m_zero);
-		for (ndInt32 j = 0; j < 2; j ++) 
+		for (ndInt32 j = 0; j < 2; ++j) 
 		{
-			for (ndInt32 k = j + 1; k < 3; k ++) 
+			for (ndInt32 k = j + 1; k < 3; ++k) 
 			{
 				ndFloat32 g = ndFloat32 (100.0f) * ndAbs(matrix[j][k]);
 				if ((i > 3) && ((ndAbs(d[j]) + g) == ndAbs(d[j])) && ((ndAbs(d[k]) + g) == ndAbs(d[k]))) 

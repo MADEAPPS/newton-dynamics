@@ -289,7 +289,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 
 #ifdef _DEBUG
 	const ndArray<ndVector>& point = GetPositions();
-	for (int i = 1; i < data.m_hashGridMap.GetCount(); i ++)
+	for (int i = 1; i < data.m_hashGridMap.GetCount(); ++i)
 	{
 		ndGridHash cell0(data.m_hashGridMap[i - 1]);
 		ndGridHash cell1(data.m_hashGridMap[i + 0]);

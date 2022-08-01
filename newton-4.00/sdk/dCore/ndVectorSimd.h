@@ -255,7 +255,7 @@ class ndVector
 		ndFloat32 cofactor[3][3];
 
 		const ndVector& me = *this;
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -265,12 +265,12 @@ class ndVector
 
 		ndVector normal;
 		ndFloat32  sign = ndFloat32 (-1.0f);
-		for (ndInt32 i = 0; i < 4; i ++)  
+		for (ndInt32 i = 0; i < 4; ++i)  
 		{
-			for (ndInt32 j = 0; j < 3; j ++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				ndInt32 k0 = 0;
-				for (ndInt32 k = 0; k < 4; k ++) 
+				for (ndInt32 k = 0; k < 4; ++k) 
 				{
 					if (k != i) 
 					{

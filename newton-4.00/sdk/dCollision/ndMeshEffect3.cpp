@@ -254,7 +254,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			dInt8 pool[256 * (sizeof (dConvexHull3DFace*) + sizeof (dFloat64))];
 			dUpHeap<dConvexHull3DFace*,dFloat64> heap (pool, sizeof (pool));
 
-			for (dInt32 i = 0; i < 3; i ++) {
+			for (dInt32 i = 0; i < 3; ++i) {
 				dBigVector dist (m_points[closestFace->m_index[i]] - point);
 				dAssert(dist.m_w == dFloat32(0.0f));
 				heap.Push(closestFace, dist.DotProduct(dist).GetScalar());
@@ -271,7 +271,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 				heap.Pop();
 				//face->m_mark = m_mark;
 				face->SetMark(m_mark);
-				for (dInt32 i = 0; i < 3; i ++) {
+				for (dInt32 i = 0; i < 3; ++i) {
 					dConvexHull3DFace* twin = &face->GetTwin(i)->GetInfo();	
 					if (twin->GetMark() != m_mark) {
 						dBigVector dist (m_points[twin->m_index[i]] - point);
@@ -340,7 +340,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 					foundThisBestFace = false;
 				}
 
-				for (dInt32 i = 0; i < 3; i ++) {
+				for (dInt32 i = 0; i < 3; ++i) {
 					dConvexHull3DFace* const face2 = &face1->GetTwin(i)->GetInfo();
 
 					if (face2->GetMark() != m_mark) {
@@ -801,7 +801,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 	~dgHACDClusterGraph ()
 	{
-		for (dInt32 i = 0; i < m_faceCount * 2; i ++) {
+		for (dInt32 i = 0; i < m_faceCount * 2; ++i) {
 			if (m_concavityTreeArray[i]) {
 				delete m_concavityTreeArray[i];
 			}
@@ -1192,7 +1192,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 				bool alreadyLinked = false;
 				ndNode* const node = edgeNodeBA->GetInfo().m_node;
-				for (ndInt32 i = 0; i < adjacentCount; i ++) {
+				for (ndInt32 i = 0; i < adjacentCount; ++i) {
 					if (node == adjacentNodes[i]) {
 						alreadyLinked = true;
 						break;
@@ -1241,7 +1241,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 		if (collapseEdgeState) {
 			ndInt32 treeCounts = 0;
-			for (ndInt32 i = 0; i < m_concavityTreeIndex; i ++) {
+			for (ndInt32 i = 0; i < m_concavityTreeIndex; ++i) {
 				if (m_concavityTreeArray[i]) {
 					m_concavityTreeArray[treeCounts] = m_concavityTreeArray[i];
 					m_concavityTreeArray[i] = nullptr;
@@ -1250,7 +1250,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			}
 
 			if (treeCounts > 1) {
-				for (ndInt32 i = 0; i < treeCounts; i ++) {
+				for (ndInt32 i = 0; i < treeCounts; ++i) {
 					dAssert (m_concavityTreeArray[i]);
 					if (m_concavityTreeArray[i]->m_faceList.GetCount()==1) {
 						delete m_concavityTreeArray[i];

@@ -52,7 +52,7 @@ void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose&)
 	//
 	//	ndAnimKeyframe* const dst = &output[0];
 	//	const ndAnimKeyframe* const src = &localPose[0];
-	//	for (ndInt32 i = 0; i < count; i ++) 
+	//	for (ndInt32 i = 0; i < count; ++i) 
 	//	{
 	//		ndAnimKeyframe& dstFrame = dst[i];
 	//		const ndAnimKeyframe& srcFrame = src[i];

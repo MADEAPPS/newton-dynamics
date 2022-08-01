@@ -46,13 +46,13 @@ ndFloat64 Determinant3x3 (const ndFloat64 matrix[3][3], ndFloat64* const error)
 	ndFloat64 sign = ndFloat64 (-1.0f);
 	ndFloat64 det = ndFloat64 (0.0f);
 	ndFloat64 accError = ndFloat64 (0.0f); 
-	for (ndInt32 i = 0; i < 3; i ++)  
+	for (ndInt32 i = 0; i < 3; ++i)  
 	{
 		ndFloat64 cofactor[2][2];
-		for (ndInt32 j = 0; j < 2; j ++) 
+		for (ndInt32 j = 0; j < 2; ++j) 
 		{
 			ndInt32 k0 = 0;
-			for (ndInt32 k = 0; k < 3; k ++) 
+			for (ndInt32 k = 0; k < 3; ++k) 
 			{
 				if (k != i) 
 				{
@@ -78,13 +78,13 @@ ndGoogol Determinant3x3 (const ndGoogol matrix[3][3])
 	ndGoogol negOne (ndFloat64 (-1.0f));
 	ndGoogol sign (ndFloat64 (-1.0f));
 	ndGoogol det = ndFloat64 (0.0f);
-	for (ndInt32 i = 0; i < 3; i ++)  
+	for (ndInt32 i = 0; i < 3; ++i)  
 	{
 		ndGoogol cofactor[2][2];
-		for (ndInt32 j = 0; j < 2; j ++) 
+		for (ndInt32 j = 0; j < 2; ++j) 
 		{
 			ndInt32 k0 = 0;
-			for (ndInt32 k = 0; k < 3; k ++) 
+			for (ndInt32 k = 0; k < 3; ++k) 
 			{
 				if (k != i) 
 				{
@@ -106,13 +106,13 @@ ndFloat64 Determinant4x4 (const ndFloat64 matrix[4][4], ndFloat64* const error)
 	ndFloat64 sign = ndFloat64 (1.0f);
 	ndFloat64 det = ndFloat64 (0.0f);
 	ndFloat64 accError = ndFloat64 (0.0f); 
-	for (ndInt32 i = 0; i < 4; i ++)  
+	for (ndInt32 i = 0; i < 4; ++i)  
 	{
 		ndFloat64 cofactor[3][3];
-		for (ndInt32 j = 0; j < 3; j ++) 
+		for (ndInt32 j = 0; j < 3; ++j) 
 		{
 			ndInt32 k0 = 0;
-			for (ndInt32 k = 0; k < 4; k ++) 
+			for (ndInt32 k = 0; k < 4; ++k) 
 			{
 				if (k != i) {
 					cofactor[j][k0] = matrix[j][k];
@@ -138,13 +138,13 @@ ndGoogol Determinant4x4 (const ndGoogol matrix[4][4])
 	ndGoogol det = ndFloat64 (0.0f);
 	ndGoogol negOne (ndFloat64 (-1.0f));
 	//dGoogol accError = ndFloat64 (0.0f);
-	for (ndInt32 i = 0; i < 4; i ++)  
+	for (ndInt32 i = 0; i < 4; ++i)  
 	{
 		ndGoogol  cofactor[3][3];
-		for (ndInt32 j = 0; j < 3; j ++) 
+		for (ndInt32 j = 0; j < 3; ++j) 
 		{
 			ndInt32 k0 = 0;
-			for (ndInt32 k = 0; k < 4; k ++) 
+			for (ndInt32 k = 0; k < 4; ++k) 
 			{
 				if (k != i) 
 				{

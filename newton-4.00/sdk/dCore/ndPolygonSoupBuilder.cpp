@@ -60,7 +60,7 @@ class ndPolygonSoupBuilder::dgFaceMap: public ndTree<dgFaceBucket, ndInt32>
 		ndInt32 faceCount = builder.m_faceVertexCount.GetCount();
 		const ndInt32* const faceVertexCounts = &builder.m_faceVertexCount[0];
 		const ndInt32* const faceVertexIndex = &builder.m_vertexIndex[0];
-		for (ndInt32 i = 0; i < faceCount; i ++) 
+		for (ndInt32 i = 0; i < faceCount; ++i) 
 		{
 			ndInt32 count = faceVertexCounts[i];
 			ndInt32 attribute = faceVertexIndex[polygonIndex + count - 1];
@@ -103,13 +103,13 @@ class ndPolygonSoupBuilder::dgPolySoupFilterAllocator: public ndPolyhedra
 			reduction = false;
 			if (count >3) 
 			{
-				for (ndUnsigned32 i = 0; i < count; i ++) 
+				for (ndUnsigned32 i = 0; i < count; ++i) 
 				{
-					for (ndUnsigned32 j = i + 1; j < count; j ++) 
+					for (ndUnsigned32 j = i + 1; j < count; ++j) 
 					{
 						if (pool[j] == pool[i]) 
 						{
-							for (i = j; i < count - 1; i ++) 
+							for (i = j; i < count - 1; ++i) 
 							{
 								pool[i] =  pool[i + 1];
 							}
@@ -195,14 +195,14 @@ void ndPolygonSoupBuilder::SavePLY(const char* const fileName) const
 	fprintf(file, "property list uchar int vertex_index\n");
 	fprintf(file, "end_header\n");
 
-	for (ndInt32 i = 0; i < m_vertexPoints.GetCount(); i ++)
+	for (ndInt32 i = 0; i < m_vertexPoints.GetCount(); ++i)
 	{
 		const ndBigVector& point = m_vertexPoints[i];
 		fprintf(file, "%f %f %f\n", point.m_x, point.m_y, point.m_z);
 	}
 
 	ndInt32 index = 0;
-	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
+	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); ++i)
 	{
 		ndInt32 count = m_faceVertexCount[i];
 		fprintf(file, "%d", count - 1);
@@ -311,10 +311,10 @@ void ndPolygonSoupBuilder::PackArray()
 	ndInt32 vertexCount = ndVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-6f));
 
 	ndInt32 k = 0;
-	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
+	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); ++i)
 	{
 		ndInt32 count = m_faceVertexCount[i] - 1;
-		for (ndInt32 j = 0; j < count; j ++) 
+		for (ndInt32 j = 0; j < count; ++j) 
 		{
 			ndInt32 index = m_vertexIndex[k];
 			index = indexMap[index];
@@ -342,10 +342,10 @@ void ndPolygonSoupBuilder::Finalize()
 		m_vertexPoints.SetCount(vertexCount);
 
 		ndInt32 k = 0;
-		for (ndInt32 i = 0; i < faceCount; i ++) 
+		for (ndInt32 i = 0; i < faceCount; ++i) 
 		{
 			ndInt32 count = m_faceVertexCount[i] - 1;
-			for (ndInt32 j = 0; j < count; j ++) 
+			for (ndInt32 j = 0; j < count; ++j) 
 			{
 				ndInt32 index = m_vertexIndex[k];
 				index = indexMap[index];
@@ -372,7 +372,7 @@ void ndPolygonSoupBuilder::FinalizeAndOptimize(ndInt32 id)
 	polyhedra.BeginFace ();
 	ndInt32 attribute = id;
 	ndInt32 faceIndexNumber = 0;
-	for (ndInt32 i = 0; i < source.m_faceVertexCount.GetCount(); i ++)
+	for (ndInt32 i = 0; i < source.m_faceVertexCount.GetCount(); ++i)
 	{
 		ndInt32 indexCount = source.m_faceVertexCount[i];
 		dAssert (indexCount < 1024);
@@ -380,7 +380,7 @@ void ndPolygonSoupBuilder::FinalizeAndOptimize(ndInt32 id)
 		ndEdge* const face = polyhedra.AddFace(indexCount - 1, &source.m_vertexIndex[faceIndexNumber]);
 		if (!face) 
 		{
-			for (ndInt32 j = 0; j < indexCount - 1; j ++) 
+			for (ndInt32 j = 0; j < indexCount - 1; ++j) 
 			{
 				ndInt32 index = source.m_vertexIndex[faceIndexNumber + j];
 				tmpVertexPool[j] = source.m_vertexPoints[index];
@@ -473,10 +473,10 @@ void ndPolygonSoupBuilder::FinalizeAndOptimize(ndInt32 id)
 	}
 
 	faceIndexNumber = 0;
-	for (ndInt32 i = 0; i < leftOver.m_faceVertexCount.GetCount(); i ++)
+	for (ndInt32 i = 0; i < leftOver.m_faceVertexCount.GetCount(); ++i)
 	{
 		ndInt32 indexCount = leftOver.m_faceVertexCount[i] - 1;
-		for (ndInt32 j = 0; j < indexCount; j ++) 
+		for (ndInt32 j = 0; j < indexCount; ++j) 
 		{
 			ndInt32 index = leftOver.m_vertexIndex[faceIndexNumber + j];
 			tmpVertexPool[j] = leftOver.m_vertexPoints[index];
@@ -504,14 +504,14 @@ void ndPolygonSoupBuilder::OptimizeByIndividualFaces()
 	ndInt32 polygonIndex = 0;
 	ndInt32 newFaceCount = 0;
 	ndInt32 newIndexCount = 0;
-	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
+	for (ndInt32 i = 0; i < m_faceVertexCount.GetCount(); ++i)
 	{
 		ndInt32 oldCount = oldFaceArray[i];
 		ndInt32 count = FilterFace (oldCount - 1, &oldIndexArray[polygonIndex]);
 		if (count) 
 		{
 			faceArray[newFaceCount] = count + 1;
-			for (ndInt32 j = 0; j < count; j ++) 
+			for (ndInt32 j = 0; j < count; ++j) 
 			{
 				indexArray[newIndexCount + j] = oldIndexArray[polygonIndex + j];
 			}
@@ -623,14 +623,14 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 			if (faceCount <= DG_MESH_PARTITION_SIZE) 
 			{
 				ndPolygonSoupBuilder tmpBuilder;
-				for (ndInt32 i = 0; i < faceCount; i ++) 
+				for (ndInt32 i = 0; i < faceCount; ++i) 
 				{
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
 
 					ndInt32 count1 = faceInfo.indexCount - 1;
 					ndInt32 start1 = faceInfo.indexStart;
 					dAssert (faceId == indexArray[start1 + count1]);
-					for (ndInt32 j = 0; j < count1; j ++) 
+					for (ndInt32 j = 0; j < count1; ++j) 
 					{
 						ndInt32 index = indexArray[start1 + j];
 						face[j] = points[index];
@@ -643,10 +643,10 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 				tmpBuilder.FinalizeAndOptimize (faceId);
 
 				ndInt32 faceIndexNumber = 0;
-				for (ndInt32 i = 0; i < tmpBuilder.m_faceVertexCount.GetCount(); i ++)
+				for (ndInt32 i = 0; i < tmpBuilder.m_faceVertexCount.GetCount(); ++i)
 				{
 					ndInt32 indexCount = tmpBuilder.m_faceVertexCount[i] - 1;
-					for (ndInt32 j = 0; j < indexCount; j ++) 
+					for (ndInt32 j = 0; j < indexCount; ++j) 
 					{
 						ndInt32 index = tmpBuilder.m_vertexIndex[faceIndexNumber + j];
 						face[j] = tmpBuilder.m_vertexPoints[index];
@@ -662,14 +662,14 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 			{
 				ndBigVector median (ndBigVector::m_zero);
 				ndBigVector varian (ndBigVector::m_zero);
-				for (ndInt32 i = 0; i < faceCount; i ++) 
+				for (ndInt32 i = 0; i < faceCount; ++i) 
 				{
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
 					ndInt32 count1 = faceInfo.indexCount - 1;
 					ndInt32 start1 = faceInfo.indexStart;
 					ndBigVector p0 (ndFloat32 ( 1.0e10f), ndFloat32 ( 1.0e10f), ndFloat32 ( 1.0e10f), ndFloat32 (0.0f));
 					ndBigVector p1 (ndFloat32 (-1.0e10f), ndFloat32 (-1.0e10f), ndFloat32 (-1.0e10f), ndFloat32 (0.0f));
-					for (ndInt32 j = 0; j < count1; j ++) 
+					for (ndInt32 j = 0; j < count1; ++j) 
 					{
 						ndInt32 index = indexArray[start1 + j];
 						const ndBigVector& p = points[index];
@@ -686,7 +686,7 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 
 				ndInt32 axis = 0;
 				ndFloat32 maxVarian = ndFloat32 (-1.0e10f);
-				for (ndInt32 i = 0; i < 3; i ++) 
+				for (ndInt32 i = 0; i < 3; ++i) 
 				{
 					if (varian[i] > maxVarian) 
 					{
@@ -700,14 +700,14 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 				ndInt32 leftCount = 0;
 				ndInt32 lastFace = faceCount;
 
-				for (ndInt32 i = 0; i < lastFace; i ++) 
+				for (ndInt32 i = 0; i < lastFace; ++i) 
 				{
 					ndInt32 side = 0;
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
 
 					ndInt32 start1 = faceInfo.indexStart;
 					ndInt32 count1 = faceInfo.indexCount - 1;
-					for (ndInt32 j = 0; j < count1; j ++) 
+					for (ndInt32 j = 0; j < count1; ++j) 
 					{
 						ndInt32 index = indexArray[start1 + j];
 						const ndBigVector& p = points[index];
@@ -752,7 +752,7 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 			ndInt32 count = faceInfo.indexCount - 1;
 			ndInt32 start = faceInfo.indexStart;
 			dAssert (faceId == indexArray[start + count]);
-			for (ndInt32 j = 0; j < count; j ++) 
+			for (ndInt32 j = 0; j < count; ++j) 
 			{
 				ndInt32 index = indexArray[start + j];
 				face[j] = points[index];
@@ -765,10 +765,10 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 		tmpBuilder.FinalizeAndOptimize (faceId);
 
 		ndInt32 faceIndexNumber = 0;
-		for (ndInt32 i = 0; i < tmpBuilder.m_faceVertexCount.GetCount(); i ++)
+		for (ndInt32 i = 0; i < tmpBuilder.m_faceVertexCount.GetCount(); ++i)
 		{
 			ndInt32 indexCount = tmpBuilder.m_faceVertexCount[i] - 1;
-			for (ndInt32 j = 0; j < indexCount; j ++) 
+			for (ndInt32 j = 0; j < indexCount; ++j) 
 			{
 				ndInt32 index = tmpBuilder.m_vertexIndex[faceIndexNumber + j];
 				face[j] = tmpBuilder.m_vertexPoints[index];
@@ -788,7 +788,7 @@ ndInt32 ndPolygonSoupBuilder::FilterFace (ndInt32 count, ndInt32* const pool)
 	if (count == 3) 
 	{
 		ndBigVector p0 (m_vertexPoints[pool[2]]);
-		for (ndInt32 i = 0; i < 3; i ++) 
+		for (ndInt32 i = 0; i < 3; ++i) 
 		{
 			ndBigVector p1 (m_vertexPoints[pool[i]]);
 			ndBigVector edge (p1 - p0);

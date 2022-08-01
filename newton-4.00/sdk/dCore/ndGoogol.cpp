@@ -193,7 +193,7 @@ ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 				A.ScaleMantissa (&mantissaScale[i], a);
 
 				ndUnsigned64 carrier = 0;
-				for (ndInt32 j = 0; j < 2 * ND_GOOGOL_SIZE; j ++) 
+				for (ndInt32 j = 0; j < 2 * ND_GOOGOL_SIZE; ++j) 
 				{
 					const ndInt32 k = 2 * ND_GOOGOL_SIZE - 1 - j;
 					ndUnsigned64 m0 = mantissaAcc[k];
@@ -207,7 +207,7 @@ ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 		ndUnsigned64 carrier = 0;
 		//ndInt32 bits = ndUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
 		ndInt32 bits = LeadingZeros (mantissaAcc[0]) - 2;
-		for (ndInt32 i = 0; i < 2 * ND_GOOGOL_SIZE; i ++) 
+		for (ndInt32 i = 0; i < 2 * ND_GOOGOL_SIZE; ++i) 
 		{
 			const ndInt32 k = 2 * ND_GOOGOL_SIZE - 1 - i;
 			ndUnsigned64 a = mantissaAcc[k];
@@ -364,7 +364,7 @@ void ndGoogol::ShiftRightMantissa (ndUnsigned64* const mantissa, ndInt32 bits) c
 	if (bits > 0) 
 	{
 		carrier <<= (64 - bits);
-		for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; i ++) 
+		for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; ++i) 
 		{
 			ndUnsigned64 a = mantissa[i];
 			mantissa[i] = (a >> bits) | carrier;
@@ -409,7 +409,7 @@ ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 		while (!mantissa[0] && bits > (-64 * ND_GOOGOL_SIZE)) 
 		{
 			bits -= 64;
-			for (ndInt32 i = 1; i < ND_GOOGOL_SIZE; i ++) {
+			for (ndInt32 i = 1; i < ND_GOOGOL_SIZE; ++i) {
 				mantissa[i - 1] = mantissa[i];
 			}
 			mantissa[ND_GOOGOL_SIZE - 1] = 0;
@@ -436,7 +436,7 @@ ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 				dAssert (mantissa[0] & ndUnsigned64(3)<<62);
 				ndUnsigned64 carrier = 0;
 				ndInt32 shift = -n;
-				for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; i ++) 
+				for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; ++i) 
 				{
 					ndUnsigned64 a = mantissa[i];
 					mantissa[i] = (a >> shift) | carrier;

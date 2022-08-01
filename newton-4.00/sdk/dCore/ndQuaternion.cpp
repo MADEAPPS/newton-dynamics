@@ -73,7 +73,7 @@ ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 
 	ndMatrix tmp (*this, matrix.m_posit);
 	ndMatrix unitMatrix (tmp * matrix.Inverse());
-	for (ndInt32 i = 0; i < 4; i ++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 err = ndAbs (unitMatrix[i][i] - ndFloat32(1.0f));
 		dAssert (err < ndFloat32 (1.0e-2f));

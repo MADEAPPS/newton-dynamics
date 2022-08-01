@@ -198,12 +198,12 @@ void Test1__()
 	//ndInt32 xxx = 0;
 	//const ndInt32 xxxxxx = 450;
 	//dDownHeap<ndInt32, unsigned> xxxxx (xxxxxx + 2);
-	//for (ndInt32 i = 0; i < xxxxxx; i ++)
+	//for (ndInt32 i = 0; i < xxxxxx; ++i)
 	//{
 	//	xxxxx.Push (xxx, i);
 	//}
 	//
-	//for (ndInt32 i = 0; i < 10000; i ++)
+	//for (ndInt32 i = 0; i < 10000; ++i)
 	//{
 	//	ndInt32 index = dRandInt() % xxxxxx;
 	//	ndInt32 key = xxxxx.Value(index);
@@ -598,7 +598,7 @@ ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axis
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
 		axisCount = ndMin (axisCount, axisValues.GetCapacity());
-		for (ndInt32 i = 0; i < axisCount; i ++) 
+		for (ndInt32 i = 0; i < axisCount; ++i) 
 		{
 			axisValues[i] = axis[i];
 			//if (axis[i] && axis[i] > -1.0f) dTrace(("%d %f\n", i, axis[i]));
@@ -632,7 +632,7 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 	{
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
 		buttonsCount = ndMin (buttonsCount, axisbuttons.GetCapacity());
-		for (ndInt32 i = 0; i < buttonsCount; i ++) 
+		for (ndInt32 i = 0; i < buttonsCount; ++i) 
 		{
 			axisbuttons[i] = buttons[i];
 			//if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
@@ -872,7 +872,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		{
 			m_suspendPhysicsUpdate = true;
 			ndInt32 demosCount = ndInt32 (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
-			for (ndInt32 i = 0; i < demosCount; i ++) 
+			for (ndInt32 i = 0; i < demosCount; ++i) 
 			{
 				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
 				{

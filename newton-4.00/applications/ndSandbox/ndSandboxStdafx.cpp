@@ -73,7 +73,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 	{
 		ndInt32* const ptr = (ndInt32*) array;
 		count /= sizeof (ndInt32);
-		for (ndInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndInt32 x;
 			x = SWAP_INT32 (ptr[i]);

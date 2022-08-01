@@ -834,7 +834,7 @@ ndFloat64 ndShapeCompound::CalculateEntropy(ndInt32 count, ndNodeBase** array)
 	do {
 		cost1 = cost0;
 		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-		for (ndInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndNodeBase* const node = array[i];
 			ImproveNodeFitness(node);

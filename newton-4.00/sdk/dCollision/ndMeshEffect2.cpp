@@ -465,7 +465,7 @@ class dgTetraIsoSufaceStuffing
 		dgVertexSign CalculateVertexSide (const dBigVector& point0) const
 		{
 			dgRayTracePointSide hits;
-			for (dInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; i ++) {
+			for (dInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; ++i) {
 				hits.m_hitCount = 0;
 				hits.m_rayIsDegenerate = false;
 				dBigVector point1 (point0 + dBigVector (m_normals.m_normal[i].Scale (m_diameter))); 
@@ -510,25 +510,25 @@ class dgTetraIsoSufaceStuffing
 	void CalculateEdgeCuts (dgArray<dgTetraEdgeCuts>& tetraEdgeCuts, const dgArray<dgTetraToVertexNode>& tetraGraph, const dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
 	{
 		tetraEdgeCuts.Resize(m_tetraCount);
-		for (dInt32 i = 0; i < m_tetraCount; i ++) {
+		for (dInt32 i = 0; i < m_tetraCount; ++i) {
 			tetraEdgeCuts[i] = dgTetraEdgeCuts();
-			for (dInt32 j = 0; j < 6; j ++) {
+			for (dInt32 j = 0; j < 6; ++j) {
 				tetraEdgeCuts[i].PushBack(dFloat32(-1.0f));
 			}
 		}
 
-		for (dInt32 i = 0; i < m_pointCount; i ++) {
+		for (dInt32 i = 0; i < m_pointCount; ++i) {
 			if (vertexSide[i] == m_outside) {
 				const dgTetraToVertexNode& graphNode = tetraGraph[i];
-				for (dInt32 j = 0; j < graphNode.GetCount(); j ++) {
+				for (dInt32 j = 0; j < graphNode.GetCount(); ++j) {
 					dgTetraEdgeCuts& cuts = tetraEdgeCuts[graphNode[j]];
 					const dgTetrahedra& tetra = m_tetraList[graphNode[j]];
 					dAssert ((tetra[0] == i) || (tetra[1] == i) || (tetra[2] == i) || (tetra[3] == i));
 					
 					dInt32 index = 0;
-					for (dInt32 i0 = 0; i0 < 3; i0 ++) {
+					for (dInt32 i0 = 0; i0 < 3; ++i0) {
 						const dBigVector& p0 = m_points[tetra[i0]];
-						for (dInt32 i1 = i0 + 1; i1 < 4; i1 ++) {
+						for (dInt32 i1 = i0 + 1; i1 < 4; ++i1) {
 							if ((tetra[i0] == i) && (vertexSide[tetra[i1]] == m_inside)) {
 								const dBigVector& p1 = m_points[tetra[i1]];
 								dFloat32 param = rayAccelerator.CalculateEdgeCut (p0, p1);
@@ -576,7 +576,7 @@ class dgTetraIsoSufaceStuffing
 	void CalculateVertexSide (dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
 	{
 		vertexSide.Resize(m_pointCount);
-		for (dInt32 i = 0; i < m_pointCount; i ++) {
+		for (dInt32 i = 0; i < m_pointCount; ++i) {
 			vertexSide[i] = rayAccelerator.CalculateVertexSide (m_points[i]);
 		}
 	}
@@ -647,7 +647,7 @@ class dgTetraIsoSufaceStuffing
 		if (hasInsizePoints) {
 			m_tetraList[m_tetraCount] = tetra;
 			dgTetrahedra& tetraEntry = m_tetraList[m_tetraCount];
-			for (dInt32 i = 0; i < 4; i ++) {
+			for (dInt32 i = 0; i < 4; ++i) {
 				dInt32 vertexIndex = tetra[i];
 				tetraEntry.PushBack(vertexIndex);
 				graph[vertexIndex].PushBack(m_tetraCount);
@@ -659,7 +659,7 @@ class dgTetraIsoSufaceStuffing
 	void BuildTetraGraph(const dgGridDimension& gridDimension, const dgArray<dgVertexSign>& vertexSigns, const dgClosePointsAccelerator& closePoint, dgArray<dgTetraToVertexNode>& graph)
 	{
 		graph.Resize(m_pointCount);
-		for (dInt32 i = 0; i < m_pointCount; i ++) {
+		for (dInt32 i = 0; i < m_pointCount; ++i) {
 			graph[i] = dgTetraToVertexNode();
 		}
 
@@ -670,7 +670,7 @@ class dgTetraIsoSufaceStuffing
 			dgTetrahedra stuffingTetra;
 			dgConvexHull4dTetraherum& delaunayTetra = node->GetInfo();
 			
-			for (dInt32 i = 0; i < 4; i ++) {
+			for (dInt32 i = 0; i < 4; ++i) {
 				stuffingTetra[i] = delaunayTetra.m_faces[0].m_index[i];
 			}
 			dFloat64 volume = CalculateVolume(stuffingTetra);
@@ -906,7 +906,7 @@ void ndMeshEffect::LoadTetraMesh (const char* const filename)
 		dInt32 vertexCount;
 		size_t ret = fscanf(file, "%d", &vertexCount);
 		dgArray<dBigVector> points(GetAllocator());
-		for (dInt32 i = 0; i < vertexCount; i ++) {
+		for (dInt32 i = 0; i < vertexCount; ++i) {
 			float x;
 			float y;
 			float z;
@@ -986,9 +986,9 @@ xxxx.EndBuild(dFloat64(1.0e-8f), false);
 		delaunayPartition->BeginBuild();
 		dInt32 layer = 0;
 		dBigVector pointArray[4];
-		for (dInt32 j = 0; j < tetraIsoStuffing.m_tetraCount; j ++) {
+		for (dInt32 j = 0; j < tetraIsoStuffing.m_tetraCount; ++j) {
 			dgTetraIsoSufaceStuffing::dgTetrahedra& tetra = tetraIsoStuffing.m_tetraList[j];
-			for (dInt32 i = 0; i < 4; i ++) {
+			for (dInt32 i = 0; i < 4; ++i) {
 				dInt32 index = tetra[i];
 				pointArray[i] = tetraIsoStuffing.m_points[index];
 			}
@@ -1017,7 +1017,7 @@ dAssert(0);
 	m_points.m_weights.Reserve(m_points.m_vertex.m_count);
 
 	dBigVector padding (dFloat64(1.0f / 32.0f));
-	for (dInt32 i = 0; i < m_points.m_weights.m_count; i ++) {
+	for (dInt32 i = 0; i < m_points.m_weights.m_count; ++i) {
 		dBigVector p (m_points.m_vertex[i]);
 		dBigVector p0 (p - padding);
 		dBigVector p1 (p + padding);

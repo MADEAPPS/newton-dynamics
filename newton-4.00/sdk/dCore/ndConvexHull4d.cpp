@@ -62,7 +62,7 @@ ndConvexHull4d::ndNormalMap::ndNormalMap()
 		ndFloat64 cosBeta = cos(beta);
 
 		ndFloat64 w = sinBeta;
-		for (ndInt32 i = 0; i < 128; i ++) 
+		for (ndInt32 i = 0; i < 128; ++i) 
 		{
 			ndFloat64 z = cosBeta * tmp[i].m_z;
 			ndFloat64 y = cosBeta * tmp[i].m_y;
@@ -208,7 +208,7 @@ void ndConvexHull4dTetraherum::Init (const ndConvexHull4dVector* const, ndInt32 
 	m_faces[3].m_index[3] = v2;
 
 	SetMark (0); 
-	for (ndInt32 i = 0; i < 4; i ++) {
+	for (ndInt32 i = 0; i < 4; ++i) {
 		m_faces[i].m_twin = nullptr;
 	}
 
@@ -230,7 +230,7 @@ ndFloat64 ndConvexHull4dTetraherum::Evalue (const ndConvexHull4dVector* const po
 	const ndBigVector &p3 = pointArray[m_faces[0].m_index[3]];
 
 	ndFloat64 matrix[4][4];
-	for (ndInt32 i = 0; i < 4; i ++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		matrix[0][i] = p1[i] - p0[i];
 		matrix[1][i] = p2[i] - p0[i];
@@ -248,7 +248,7 @@ ndFloat64 ndConvexHull4dTetraherum::Evalue (const ndConvexHull4dVector* const po
 	}
 
 	ndGoogol exactMatrix[4][4];
-	for (ndInt32 i = 0; i < 4; i ++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		exactMatrix[0][i] = ndGoogol(p1[i]) - ndGoogol(p0[i]);
 		exactMatrix[1][i] = ndGoogol(p2[i]) - ndGoogol(p0[i]);
@@ -303,8 +303,8 @@ ndBigVector ndConvexHull4dTetraherum::CircumSphereCenter (const ndConvexHull4dVe
 	points[2] = pointArray[m_faces[0].m_index[2]];
 	points[3] = pointArray[m_faces[0].m_index[3]];
 
-	for (ndInt32 i = 0; i < 4; i ++) {
-		for (ndInt32 j = 0; j < 3; j ++) {
+	for (ndInt32 i = 0; i < 4; ++i) {
+		for (ndInt32 j = 0; j < 3; ++j) {
 			matrix[i][j] = ndGoogol (points[i][j]);
 		}
 		matrix[i][3] = ndGoogol (1.0f);
@@ -314,10 +314,10 @@ ndBigVector ndConvexHull4dTetraherum::CircumSphereCenter (const ndConvexHull4dVe
 
 	ndBigVector centerOut;
 	ndFloat64 sign = ndFloat64 (1.0f);
-	for (ndInt32 k = 0; k < 3; k ++) {
-		for (ndInt32 i = 0; i < 4; i ++) {
+	for (ndInt32 k = 0; k < 3; ++k) {
+		for (ndInt32 i = 0; i < 4; ++i) {
 			matrix[i][0] = ndGoogol (points[i][3]);
-			for (ndInt32 j = 0; j < 2; j ++) {
+			for (ndInt32 j = 0; j < 2; ++j) {
 				ndInt32 j1 = (j < k) ? j : j + 1; 
 				matrix[i][j + 1] = ndGoogol (points[i][j1]);
 			}
@@ -455,7 +455,7 @@ ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePo
 			else 
 			{
 				ndConvexHull4dPointCluster* const cluster = (ndConvexHull4dPointCluster*) me;
-				for (ndInt32 i = 0; i < cluster->m_count; i ++) 
+				for (ndInt32 i = 0; i < cluster->m_count; ++i) 
 				{
 					const ndConvexHull4dVector& p = points[cluster->m_indices[i]];
 					dAssert (p.m_x >= cluster->m_box[0].m_x);
@@ -535,7 +535,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 
 		dAssert (clump);
 		clump->m_count = count;
-		for (ndInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			clump->m_indices[i] = i + baseIndex;
 			const ndBigVector& p = points[i];
@@ -551,7 +551,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 	{
 		ndBigVector median (ndBigVector::m_zero);
 		ndBigVector varian (ndBigVector::m_zero);
-		for (ndInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			const ndBigVector& p = points[i];
 			median += p;
@@ -564,7 +564,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 
 		ndInt32 index = 0;
 		ndFloat64 maxVarian = ndFloat64 (-1.0e10f);
-		for (ndInt32 i = 0; i < 3; i ++) 
+		for (ndInt32 i = 0; i < 3; ++i) 
 		{
 			if (varian[i] > maxVarian) 
 			{
@@ -580,7 +580,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 		ndInt32 i1 = count - 1;
 		do 
 		{    
-			for (; i0 <= i1; i0 ++) 
+			for (; i0 <= i1; ++i0) 
 			{
 				ndFloat64 val = points[i0][index];
 				if (val > test) 
@@ -589,7 +589,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 				}
 			}
 
-			for (; i1 >= i0; i1 --) 
+			for (; i1 >= i0; --i1) 
 			{
 				ndFloat64 val = points[i1][index];
 				if (val < test) 
@@ -638,7 +638,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, void* const memoryPool, ndInt32 maxMemSize)
 {
 	ndInt32 stride = ndInt32(strideInBytes / sizeof (ndFloat64));
-	for (ndInt32 i = 0; i < count; i ++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		points[i] = ndBigVector (vertexCloud[i * stride + 0], vertexCloud[i * stride + 1], vertexCloud[i * stride + 2], vertexCloud[i * stride + 3]);
 		points[i].m_index = i;
@@ -668,9 +668,9 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 
 	ndInt32 indexCount = 0;
 	CompareVertex compareVetex;
-	for (ndInt32 i = 1; i < count; i ++) 
+	for (ndInt32 i = 1; i < count; ++i) 
 	{
-		for (; i < count; i ++) 
+		for (; i < count; ++i) 
 		{
 			if (compareVetex.Compare (points[indexCount], points[i], nullptr))
 			{
@@ -750,7 +750,7 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 
 	if (validTetrahedrum) 
 	{
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			points[marks[i]].m_mark = 1;
 		}
@@ -778,7 +778,7 @@ bool ndConvexHull4d::Sanity() const
 	{
 		ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
 
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndConvexHull4dTetraherum::ndTetrahedrumFace* const face = &tetra->m_faces[i];
 			ndNode* const twinNode = face->m_twin;
@@ -833,10 +833,10 @@ bool ndConvexHull4d::Sanity() const
 			index1[2] = tetra1->m_faces[0].m_index[2];
 			index1[3] = tetra1->m_faces[0].m_index[3];
 
-			for (ndInt32 i = 0; i < 4; i ++) {
+			for (ndInt32 i = 0; i < 4; ++i) {
 				ndInt32 count = 0;
 				ndInt32 k = index1[i];
-				for (ndInt32 j = 0; j < 4; j ++) {
+				for (ndInt32 j = 0; j < 4; ++j) {
 					count += (k == index0[j]);
 				}
 				if (!count){
@@ -857,7 +857,7 @@ void ndConvexHull4d::LinkSibling (ndNode* node0, ndNode* node1)	const
 {
 	ndConvexHull4dTetraherum* const tetra0 = &node0->GetInfo();
 	ndConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
-	for (ndInt32 i = 0; i < 4; i ++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndConvexHull4dTetraherum::ndTetrahedrumFace* const face0 = &tetra0->m_faces[i];
 		if (!face0->m_twin) 
@@ -865,7 +865,7 @@ void ndConvexHull4d::LinkSibling (ndNode* node0, ndNode* node1)	const
 			ndInt32 i0 = face0->m_index[0];
 			ndInt32 i1 = face0->m_index[1];
 			ndInt32 i2 = face0->m_index[2];
-			for (ndInt32 j = 0; j < 4; j ++) 
+			for (ndInt32 j = 0; j < 4; ++j) 
 			{
 				ndConvexHull4dTetraherum::ndTetrahedrumFace* const face1 = &tetra1->m_faces[j];
 				if (!face1->m_twin) 
@@ -913,7 +913,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 			deletedFaces.Append(node);
 
 			face->SetMark(mark);
-			for (ndInt32 i = 0; i < 4; i ++) 
+			for (ndInt32 i = 0; i < 4; ++i) 
 			{
 				ndNode* const twinNode = (ndNode*)face->m_faces[i].m_twin;
 				dAssert (twinNode);
@@ -933,7 +933,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 		ndNode* const deleteTetraNode = deleteNode->GetInfo();
 		ndConvexHull4dTetraherum* const deletedTetra = &deleteTetraNode->GetInfo();
 		dAssert (deletedTetra->GetMark() == mark);
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndNode* const twinNode = deletedTetra->m_faces[i].m_twin;
 			ndConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
@@ -955,7 +955,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 	{
 		ndNode* const perimeterNode = iter.GetNode()->GetInfo();
 		ndConvexHull4dTetraherum* const perimeterTetra = &perimeterNode->GetInfo();
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndConvexHull4dTetraherum::ndTetrahedrumFace* const perimeterFace = &perimeterTetra->m_faces[i];
 
@@ -1010,7 +1010,7 @@ ndConvexHull4d::ndNode* ndConvexHull4d::FindFacingNode(const ndBigVector& vertex
 		}
 		heap.Pop();
 		ndConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndNode* neigborghNode = tetra1->m_faces[i].m_twin;
 			ndConvexHull4dTetraherum* const neighborgh = &neigborghNode->GetInfo();
@@ -1019,7 +1019,7 @@ ndConvexHull4d::ndNode* ndConvexHull4d::FindFacingNode(const ndBigVector& vertex
 				neighborgh->SetMark(mark);
 				if (heap.GetCount() >= maxCount) 
 				{
-					for (ndInt32 j = 0; j < releafCount; j ++) 
+					for (ndInt32 j = 0; j < releafCount; ++j) 
 					{
 						heap.Remove(heap.GetCount() - 1);
 					}

@@ -253,7 +253,7 @@ class dgHACDClusterGraph
 			dInt8 pool[256 * (sizeof (dConvexHull3DFace*) + sizeof (dFloat64))];
 			dUpHeap<dConvexHull3DFace*,dFloat64> heap (pool, sizeof (pool));
 
-			for (dInt32 i = 0; i < 3; i ++) {
+			for (dInt32 i = 0; i < 3; ++i) {
 				dBigVector dist (m_points[closestFace->m_index[i]] - point);
 				heap.Push(closestFace, dist % dist);
 			}
@@ -269,7 +269,7 @@ class dgHACDClusterGraph
 				heap.Pop();
 				//face->m_mark = m_mark;
 				face->SetMark(m_mark);
-				for (dInt32 i = 0; i < 3; i ++) {
+				for (dInt32 i = 0; i < 3; ++i) {
 					//const dConvexHull3DFace* twin = &face->m_twin[i]->GetInfo();	
 					dConvexHull3DFace* twin = &face->GetTwin(i)->GetInfo();	
 					//if (twin->m_mark != m_mark) {
@@ -340,7 +340,7 @@ class dgHACDClusterGraph
 					foundThisBestFace = false;
 				}
 
-				for (dInt32 i = 0; i < 3; i ++) {
+				for (dInt32 i = 0; i < 3; ++i) {
 					//dConvexHull3DFace* const face1 = &face->m_twin[i]->GetInfo();
 					dConvexHull3DFace* const face1 = &face->GetTwin(i)->GetInfo();
 
@@ -709,7 +709,7 @@ class dgHACDClusterGraph
 		ndInt32 indexList[64];
 
 		ndMatrix matrix (dGetIdentityMatrix());
-		for (ndInt32 i = 0; i < sizeof (polygon) / sizeof (polygon[0]); i ++) {
+		for (ndInt32 i = 0; i < sizeof (polygon) / sizeof (polygon[0]); ++i) {
 			indexList[i] = i;
 		}
 
@@ -779,7 +779,7 @@ class dgHACDClusterGraph
 
 	~dgHACDClusterGraph ()
 	{
-		for (ndInt32 i = 0; i < m_faceCount * 2; i ++) {
+		for (ndInt32 i = 0; i < m_faceCount * 2; ++i) {
 			if (m_concavityTreeArray[i]) {
 				delete m_concavityTreeArray[i];
 			}
@@ -1130,14 +1130,14 @@ class dgHACDClusterGraph
 			,m_threadManager(manager)
 			,m_faceNode(nullptr)
 		{
-			for(ndInt32 i = 0; i < DG_CONCAVITY_MAX_THREADS; i ++) {
+			for(ndInt32 i = 0; i < DG_CONCAVITY_MAX_THREADS; ++i) {
 				hullArray[i] = new (mesh.GetAllocator()) dgHACDConveHull (hull);
 			}
 		}
 
 		~dgConvexHullRayCastContext ()
 		{
-			for(ndInt32 i = 0; i < DG_CONCAVITY_MAX_THREADS; i ++) {
+			for(ndInt32 i = 0; i < DG_CONCAVITY_MAX_THREADS; ++i) {
 				delete hullArray[i];
 			}
 		}
@@ -1152,7 +1152,7 @@ class dgHACDClusterGraph
 		ndFloat64 GetConcavity() const 
 		{
 			ndFloat64 concavity = ndFloat32(0.0f);
-			for (ndInt32 i = 0; i < DG_CONCAVITY_MAX_THREADS; i ++) {	
+			for (ndInt32 i = 0; i < DG_CONCAVITY_MAX_THREADS; ++i) {	
 				if (concavity < m_concavity[i]) {
 					concavity = m_concavity[i];
 				}
@@ -1215,14 +1215,14 @@ class dgHACDClusterGraph
 
 		ndInt32 threadsCount = m_parallerConcavityCalculator.GetThreadCount();	
 		data.SetCluster (clusterA);
-		for (ndInt32 i = 0; i < threadsCount; i ++) {		
+		for (ndInt32 i = 0; i < threadsCount; ++i) {		
 			m_parallerConcavityCalculator.QueueJob(dgConvexHullRayCastContext::RayCastKernel, &data);
 		}
 		m_parallerConcavityCalculator.SynchronizationBarrier();
 		ndFloat64 concavity = data.GetConcavity();
 
 		data.SetCluster (clusterB);
-		for (ndInt32 i = 0; i < threadsCount; i ++) {		
+		for (ndInt32 i = 0; i < threadsCount; ++i) {		
 			m_parallerConcavityCalculator.QueueJob(dgConvexHullRayCastContext::RayCastKernel, &data);
 		}
 		m_parallerConcavityCalculator.SynchronizationBarrier();
@@ -1391,7 +1391,7 @@ class dgHACDClusterGraph
 
 				bool alreadyLinked = false;
 				ndNode* const node = edgeNodeBA->GetInfo().m_node;
-				for (ndInt32 i = 0; i < adjacentCount; i ++) {
+				for (ndInt32 i = 0; i < adjacentCount; ++i) {
 					if (node == adjacentNodes[i]) {
 						alreadyLinked = true;
 						break;
@@ -1445,7 +1445,7 @@ class dgHACDClusterGraph
 
 
 		ndInt32 treeCounts = 0;
-		for (ndInt32 i = 0; i < m_cancavityTreeIndex; i ++) {
+		for (ndInt32 i = 0; i < m_cancavityTreeIndex; ++i) {
 			if (m_concavityTreeArray[i]) {
 				m_concavityTreeArray[treeCounts] = m_concavityTreeArray[i];
 				m_concavityTreeArray[i] = nullptr;
@@ -1455,7 +1455,7 @@ class dgHACDClusterGraph
 
 		if (treeCounts > 1) {
 
-			for (ndInt32 i = 0; i < treeCounts; i ++) {
+			for (ndInt32 i = 0; i < treeCounts; ++i) {
 				if (m_concavityTreeArray[i]->m_faceList.GetCount()==1) {
 					delete m_concavityTreeArray[i];
 					m_concavityTreeArray[i] = m_concavityTreeArray[treeCounts-1];

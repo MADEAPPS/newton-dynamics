@@ -188,27 +188,27 @@ void ndShapeBox::MassProperties()
 	m_crossInertia = ndVector::m_zero;
 	ndFloat32 volume = ndFloat32(8.0f) * m_size[0].m_x * m_size[0].m_y * m_size[0].m_z;
 	m_inertia = ndVector(ndFloat32(1.0f / 3.0f) * (m_size[0].m_y * m_size[0].m_y + m_size[0].m_z * m_size[0].m_z),
-						ndFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_z * m_size[0].m_z),
-						ndFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_y * m_size[0].m_y),
-						ndFloat32(0.0f));
+						 ndFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_z * m_size[0].m_z),
+						 ndFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_y * m_size[0].m_y),
+						 ndFloat32(0.0f));
 	m_centerOfMass.m_w = volume;
 }
 
 void ndShapeBox::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
 {
-	ndVector size(matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
+	const ndVector size(matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
 	p0 = (matrix[3] - size) & ndVector::m_triplexMask;
 	p1 = (matrix[3] + size) & ndVector::m_triplexMask;
 }
 
 ndVector ndShapeBox::SupportVertex(const ndVector& dir0, ndInt32* const vertexIndex) const
 {
-	ndVector mask0(dir0.Abs() > m_flushZero);
-	ndVector dir(dir0 & mask0);
+	const ndVector mask0(dir0.Abs() > m_flushZero);
+	const ndVector dir(dir0 & mask0);
 
 	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	ndVector mask(dir < ndVector::m_zero);
+	const ndVector mask(dir < ndVector::m_zero);
 	if (vertexIndex) 
 	{
 		ndVector index(m_indexMark * (mask & ndVector::m_one));
@@ -220,12 +220,12 @@ ndVector ndShapeBox::SupportVertex(const ndVector& dir0, ndInt32* const vertexIn
 
 ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32, ndInt32* const vertexIndex) const
 {
-	ndVector mask0(dir0.Abs() > m_flushZero);
-	ndVector dir(dir0 & mask0);
+	const ndVector mask0(dir0.Abs() > m_flushZero);
+	const ndVector dir(dir0 & mask0);
 	
 	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	dAssert(dir.m_w == ndFloat32(0.0f));
-	ndVector mask(dir < ndVector::m_zero);
+	const ndVector mask(dir < ndVector::m_zero);
 	if (vertexIndex) 
 	{
 		ndVector index(m_indexMark * (mask & ndVector::m_one));
@@ -233,15 +233,15 @@ ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32, ndInt
 		*vertexIndex = ndInt32(index.m_ix);
 	}
 	
-	ndVector size0(m_size[0] - m_penetrationTol);
-	ndVector size1(m_size[1] + m_penetrationTol);
+	const ndVector size0(m_size[0] - m_penetrationTol);
+	const ndVector size1(m_size[1] + m_penetrationTol);
 	return size0.Select(size1, mask);
 }
 
 ndVector ndShapeBox::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir0) const
 {
-	ndVector mask0(dir0.Abs() > m_flushZero);
-	ndVector dir(dir0 & mask0);
+	const ndVector mask0(dir0.Abs() > m_flushZero);
+	const ndVector dir(dir0 & mask0);
 	dAssert(ndAbs((dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f))) < ndFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }

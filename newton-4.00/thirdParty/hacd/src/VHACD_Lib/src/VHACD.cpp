@@ -971,7 +971,7 @@ namespace nd_
 		if (nConvexHulls > 1 && !m_cancel)
 		{
 			int bashSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
-			for (int32_t j = 0; j <= VHACD_WORKERS_THREADS * 4; j ++)
+			for (int32_t j = 0; j <= VHACD_WORKERS_THREADS * 4; ++j)
 			{
 				int i = j * bashSize;
 				int count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;

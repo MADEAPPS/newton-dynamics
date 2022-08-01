@@ -49,7 +49,7 @@ class ndString::ndStringAllocator
 
 			void Prefetch (ndInt32 chunckSize)
 			{
-				for (ndInt32 i = 0; i < D_DSTRING_ENTRIES_IN_FREELIST; i ++) 
+				for (ndInt32 i = 0; i < D_DSTRING_ENTRIES_IN_FREELIST; ++i) 
 				{
 					dDataChunk* const data = (dDataChunk*) ndMemory::Malloc(chunckSize + sizeof (ndInt32));
 					data->m_count = i + 1; 
@@ -61,7 +61,7 @@ class ndString::ndStringAllocator
 
 			void Flush ()
 			{
-				for (ndInt32 i = 0; m_freeListDataChunk && (i < D_DSTRING_ENTRIES_IN_FREELIST); i ++) 
+				for (ndInt32 i = 0; m_freeListDataChunk && (i < D_DSTRING_ENTRIES_IN_FREELIST); ++i) 
 				{
 					dDataChunk* const ptr = m_freeListDataChunk;
 					m_freeListDataChunk = m_freeListDataChunk->m_next;
@@ -101,7 +101,7 @@ class ndString::ndStringAllocator
 
 		ndStringAllocator()
 		{
-			for (ndInt32 i = 0; i < ndInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) 
+			for (ndInt32 i = 0; i < ndInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); ++i) 
 			{
 				m_buckects[i].Prefetch ((i + 1)* D_STRING_MEM_GRANULARITY);
 			}
@@ -109,7 +109,7 @@ class ndString::ndStringAllocator
 
 		~ndStringAllocator()
 		{
-			for (ndInt32 i = 0; i < ndInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) 
+			for (ndInt32 i = 0; i < ndInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); ++i) 
 			{
 				m_buckects[i].Flush();
 			}
@@ -261,7 +261,7 @@ ndString::ndString (ndInt32 val)
 	if (offset) {
 		m_string[0] = '-';
 	}
-	for (ndInt32 i = 0; i < count; i ++) {
+	for (ndInt32 i = 0; i < count; ++i) {
 		m_string[i + offset] = tmp[count - i - 1];
 	}
 
@@ -293,7 +293,7 @@ ndString::ndString (ndUnsigned64 input)
 	{
 		m_string[0] = '-';
 	}
-	for (ndInt32 i = 0; i < count; i ++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		m_string[i + offset] = tmp[count - i - 1];
 	}
@@ -376,7 +376,7 @@ ndInt32 ndString::ToInteger() const
 	if (m_size) 
 	{
 		ndInt32 base = (m_string[0] == '-') ? 1 : 0;
-		for (ndInt32 i = base; i < m_size; i ++) 
+		for (ndInt32 i = base; i < m_size; ++i) 
 		{
 			char ch = m_string[i]; 		
 			if ((ch >= '0') && (ch <= '9')) 
@@ -400,7 +400,7 @@ ndUnsigned64 ndString::ToInteger64() const
 	if (m_size) 
 	{
 		ndInt32 base = (m_string[0] == '-') ? 1 : 0;
-		for (ndInt32 i = base; i < m_size; i ++) 
+		for (ndInt32 i = base; i < m_size; ++i) 
 		{
 			char ch = m_string[i]; 		
 			if ((ch >= '0') && (ch <= '9')) 
@@ -425,7 +425,7 @@ ndFloat64 ndString::ToFloat() const
 	if (m_size) 
 	{
 		ndInt32 base = (m_string[0] == '-') ? 1 : 0;
-		for (ndInt32 i = base; i < m_size; i ++) 
+		for (ndInt32 i = base; i < m_size; ++i) 
 		{
 			char ch = m_string[i]; 		
 			if ((ch >= '0') && (ch <= '9')) 
@@ -472,7 +472,7 @@ ndInt32 ndString::CalculateSize (const char* const data) const
 	ndInt32 size = 0;
 	if (data) 
 	{
-		for (ndInt32 i = 0; data[i]; i ++) 
+		for (ndInt32 i = 0; data[i]; ++i) 
 		{
 			size ++;
 		}
@@ -510,7 +510,7 @@ void ndString::ToLower()
 
 ndInt32 ndString::Find (char ch, ndInt32 from) const
 {
-	for (ndInt32 i = from; i < m_size; i ++) 
+	for (ndInt32 i = from; i < m_size; ++i) 
 	{
 		if (m_string[i] == ch) 
 		{
@@ -535,7 +535,7 @@ ndInt32 ndString::Find (const char* const subString, ndInt32 subStringLength, nd
 		{
 			char ch = subString[0];
 			const char* const ptr1 = m_string;
-			for (ndInt32 i = 0; i < m_size; i ++) 
+			for (ndInt32 i = 0; i < m_size; ++i) 
 			{
 				if (ch == ptr1[i]) 
 				{
@@ -546,7 +546,7 @@ ndInt32 ndString::Find (const char* const subString, ndInt32 subStringLength, nd
 		else if ((str2Size < 4) || (m_size < 64)) 
 		{
 			const ndInt32 size = m_size - str2Size;
-			for (ndInt32 j = from; j <= size; j ++) 
+			for (ndInt32 j = from; j <= size; ++j) 
 			{
 				const char* const ptr1 = &m_string[j];
 				ndInt32 i = 0;
@@ -565,7 +565,7 @@ ndInt32 ndString::Find (const char* const subString, ndInt32 subStringLength, nd
 			// for large strings smart search
 			ndInt16 frequency[256];
 			memset (frequency, -1, sizeof (frequency));
-			for (ndInt32 i = 0; i < str2Size; i ++) 
+			for (ndInt32 i = 0; i < str2Size; ++i) 
 			{
 				frequency[ndInt32 (subString[i])] = ndInt16(i);
 			}

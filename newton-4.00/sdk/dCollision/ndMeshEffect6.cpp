@@ -136,7 +136,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		m_cosTable = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (ndFloat64));
 
 		// pre-compute sin cos tables
-		for (ndInt32 i = 0; i < m_trianglesCount * 3; i ++) {
+		for (ndInt32 i = 0; i < m_trianglesCount * 3; ++i) {
 			m_sinTable[i] = sin (m_triangleAngles[i]);
 			m_cosTable[i] = cos (m_triangleAngles[i]);
 		}
@@ -215,7 +215,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		ndStack<dInt8> attibuteUsed (m_attibuteCount);
 		memset (&attibuteUsed[0], 0, attibuteUsed.GetSizeInBytes());
 		ndInt32 mark = m_mesh->IncLRU();
-		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 			ndEdge* const face = m_betaEdge[i * 3];
 			if (face->m_mark != mark) {
 				ndEdge* ptr = face;
@@ -313,7 +313,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		m_triangleAngles = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (ndFloat64));
 
 		// calculate initial beta angle for each triangle
-		for (ndInt32 i = 0; i < m_trianglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_trianglesCount; ++i) {
 			ndEdge* const edge = m_triangles[i];
 
 			const ndBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
@@ -362,7 +362,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 	void TraceObjectiveFunction() const
 	{
 		DG_DEBUG_UV (("f["));
-		for (ndInt32 i = 2; i < m_mesh->GetVertexCount(); i ++) {
+		for (ndInt32 i = 2; i < m_mesh->GetVertexCount(); ++i) {
 			DG_DEBUG_UV (("u%d_,v%d_", i, i));
 			if (i != (m_mesh->GetVertexCount() - 1)) {
 				DG_DEBUG_UV ((","));
@@ -370,7 +370,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		}
 		DG_DEBUG_UV (("] := \n"));
 
-		for (ndInt32 i = 0; i < m_trianglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_trianglesCount; ++i) {
 			ndEdge* const face = m_triangles[i];
 
 			ndInt32 v0 = face->m_incidentVertex;
@@ -786,7 +786,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		// trace gradients
 		DG_DEBUG_UV (("\n"));
 		ndInt32 count = m_mesh->GetVertexCount();
-		for (ndInt32 i = 0; i < count; i ++) {
+		for (ndInt32 i = 0; i < count; ++i) {
 			CalculateGradientU (i);
 			CalculateGradientV (i);
 		}
@@ -796,7 +796,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 	void InversePrecoditionerTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
 		const ndInt32 count = m_mesh->GetVertexCount();
-		for (ndInt32 i = 0; i < count; i ++) {
+		for (ndInt32 i = 0; i < count; ++i) {
 			out[2 * i + 0] = m_pinnedPoints[i] * v[i * 2 + 0] / m_diagonal[2 * i + 0];
 			out[2 * i + 1] = m_pinnedPoints[i] * v[i * 2 + 1] / m_diagonal[2 * i + 1];
 		}
@@ -806,7 +806,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 	{
 /*
 		const ndInt32 count = m_mesh->GetVertexCount();
-		for (ndInt32 i = 0; i < count; i ++) {
+		for (ndInt32 i = 0; i < count; ++i) {
 			ndEdge* const vertex = m_vertexEdge[i];
 			dAssert (vertex->m_incidentVertex == i);
 			out[i * 2 + 0] = m_diagonal[2 * i + 0] * v[2 * i + 0];
@@ -814,7 +814,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		}
 		DG_DEBUG_UV (("\n"));
 		ndInt32 count = m_mesh->GetVertexCount();
-		for (ndInt32 i = 0; count; i ++) {
+		for (ndInt32 i = 0; count; ++i) {
 			CalculateHessianDiagonalUU (i);
 		}
 		DG_DEBUG_UV (("\n"));
@@ -900,7 +900,7 @@ dAssert (0);
 
 		m_deltaVariables[0] = 0.0f;
 		m_deltaVariables[1] = 0.0f;
-		for (ndInt32 i = 2; i < m_totalVariablesCount; i ++) {
+		for (ndInt32 i = 2; i < m_totalVariablesCount; ++i) {
 			m_deltaVariables[i] = 1.0f;
 		}
 		dgTriangleAnglesToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
@@ -1059,7 +1059,7 @@ dAssert (0);
 	void CalculateInitialAngles ()
 	{
 		// calculate initial beta angle for each triangle
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			ndEdge* const edge = m_betaEdge[i];
 
 			const ndBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
@@ -1079,7 +1079,7 @@ dAssert (0);
 		}
 
 		#ifdef _DEBUG
-		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 			ndInt32 i0 = i * 3 + 0;
 			ndInt32 i1 = i * 3 + 1;
 			ndInt32 i2 = i * 3 + 2;
@@ -1089,7 +1089,7 @@ dAssert (0);
 
 		// for each interior vertex apply the scale factor
 		ndInt32 mark = m_mesh->IncLRU();
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			ndEdge* const edge = m_betaEdge[i];
 			if ((edge->m_mark != mark) && (GetInteriorVertex(edge) >= 0)) {
 				ndFloat64 scale = ndFloat64 (0.0f);
@@ -1117,7 +1117,7 @@ dAssert (0);
 		}
 
 		// initialized each alpha lambda to the beta angle and also calcual ethe derivatoe coeficent (2.0 / (betai * betai)) 
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			dAssert (m_beta[i] > ndFloat64 (0.0f));
 			m_variables[i] = m_beta[i];
 			m_weight[i] = ndFloat64 (2.0f) / (m_beta[i] * m_beta[i]);
@@ -1215,7 +1215,7 @@ dAssert (0);
 	ndFloat64 CalculateGradientVector ()
 	{
 		// pre-compute sin cos tables
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			m_sinTable[i] = sin (m_variables[i]);
 			m_cosTable[i] = cos (m_variables[i]);
 		}
@@ -1223,14 +1223,14 @@ dAssert (0);
 		ndFloat64 gradientNorm = ndFloat64 (0.0f);
 
 		// calculate gradients due to the difference between a matching edge angle and it projected angle msu be mminimal Wei * (Xei - Bei) ^ e = minimal
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			ndFloat64 gradient = CalculateAngularGradientDerivative (i) + CalculateInteriorVertexGradient (i) + CalculatePlanarityGradient (i);
 			m_gradients[i] = -gradient;
 			gradientNorm += gradient * gradient;
 		}
 
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
-		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 			ndFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
 			m_gradients[m_anglesCount + i] = -gradient;
 			gradientNorm += gradient * gradient;
@@ -1238,7 +1238,7 @@ dAssert (0);
 
 		// calculate the gradient due to the equality that the sum of all the angle incident to and interior vertex must be 3060 degree sum (Xvi) - 2 * pi = 0 
 		ndInt32 mark = m_mesh->IncLRU();
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			ndEdge* const edge = m_betaEdge[i];
 
 			if ((edge->m_mark != mark) && GetInteriorVertex(edge) != -1) {
@@ -1260,7 +1260,7 @@ dAssert (0);
 		// calculate the gradient due to the equality that the difference of the product of the sin of the angle to the
 		// incident to an interior vertex must be zero product (sin (Xvi + 1) - product (sin (Xvi - 1)  = 0 
 		mark = m_mesh->IncLRU();
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			ndEdge* const edge = m_betaEdge[i];
 
 			ndInt32 vertexIndex = GetInteriorVertex(edge);
@@ -1322,12 +1322,12 @@ dAssert (0);
 	// [23][0-n]  0, 0, 0, Cos[x3] Sin[x11] Sin[x12] Sin[x8], -Cos[x4] Sin[x13] Sin[x6] Sin[x9], 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9], 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3], -Cos[x9] Sin[x13] Sin[x4] Sin[x6], 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8], Cos[x12] Sin[x11] Sin[x3] Sin[x8], -Cos[x13] Sin[x4] Sin[x6] Sin[x9], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	void MatrixTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
-		for (ndInt32 i = 0; i < m_interiorVertexCount; i ++) {
+		for (ndInt32 i = 0; i < m_interiorVertexCount; ++i) {
 			out[i + m_anglesCount + m_triangleCount] = ndFloat64 (0.0f);
 			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = ndFloat64 (0.0f);
 		}
 
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			out[i] = m_weight[i] * v[i];
 
 			ndEdge* const edge = m_betaEdge[i];
@@ -1338,7 +1338,7 @@ dAssert (0);
 			}
 		}
 
-		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 			ndInt32 j = i * 3;
 			out[j + 0] += v[i + m_anglesCount];
 			out[j + 1] += v[i + m_anglesCount];
@@ -1346,7 +1346,7 @@ dAssert (0);
 			out[i + m_anglesCount] = v[j + 0] + v[j + 1] +  v[j + 2];
 		}
 
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			{
 				ndEdge* const edge = m_betaEdge[i]->m_prev;
 				ndInt32 vertexIndex = GetInteriorVertex(edge);
@@ -1385,14 +1385,14 @@ dAssert (0);
 
 	void InversePrecoditionerTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
-		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
 			out[i] = v[i] / m_weight[i];
 		}
-		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 			out[i + m_anglesCount] = v[i + m_anglesCount];
 		}
 
-		for (ndInt32 i = 0; i < m_interiorVertexCount; i ++) {
+		for (ndInt32 i = 0; i < m_interiorVertexCount; ++i) {
 			out[i + m_anglesCount + m_triangleCount] = v[i + m_anglesCount + m_triangleCount];
 			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = v[i + m_anglesCount + m_triangleCount + m_interiorVertexCount];
 		}
@@ -1410,7 +1410,7 @@ dAssert (0);
 		memset (m_deltaVariables, 0, m_totalVariablesCount * sizeof (ndFloat64));
 		memset (&m_variables[m_anglesCount], 0, m_triangleCount * sizeof (ndFloat64));	
 
-		for (ndInt32 i = 0; i < m_interiorVertexCount; i ++) {
+		for (ndInt32 i = 0; i < m_interiorVertexCount; ++i) {
 			m_variables[i + m_anglesCount + m_triangleCount] = ndFloat32 (1.0f);
 			m_variables[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = ndFloat32 (1.0f);
 		}
@@ -1428,7 +1428,7 @@ dAssert (0);
 		for (ndInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
 			m_progressDen = m_progressNum + m_totalVariablesCount;
 			Solve(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
-			for (ndInt32 i = 0; i < m_totalVariablesCount; i ++) {
+			for (ndInt32 i = 0; i < m_totalVariablesCount; ++i) {
 				m_variables[i] += m_deltaVariables[i];
 			}
 			gradientNorm = CalculateGradientVector ();
@@ -1438,7 +1438,7 @@ dAssert (0);
 
 #ifdef _DEBUG
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
-//		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+//		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 //			ndFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
 //			dAssert (fabs (gradient) < ndFloat64 (1.0e-2f));
 //		}
@@ -1509,7 +1509,7 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
 	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
-	for (ndInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+	for (ndInt32 i = 0; i < m_points.m_vertex.m_count; ++i) {
 		buffer[i] = uvAligment.RotateVector (m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
 		pMin.m_x = ndMin (pMin.m_x, tmp.m_x);
@@ -1522,7 +1522,7 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 
 	ndStack<ndBigVector>cylinder (m_points.m_vertex.m_count);
     ndBigVector scale (ndFloat64 (1.0f)/ (pMax.m_x - pMin.m_x), ndFloat64 (1.0f)/ (pMax.m_y - pMin.m_y), ndFloat64 (1.0f)/ (pMax.m_z - pMin.m_z), ndFloat64 (0.0f));
-    for (ndInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+    for (ndInt32 i = 0; i < m_points.m_vertex.m_count; ++i) {
 		ndBigVector point (buffer[i]);
 		ndFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 

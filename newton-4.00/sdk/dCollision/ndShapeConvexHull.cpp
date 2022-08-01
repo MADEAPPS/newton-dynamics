@@ -585,7 +585,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		}
 
 		m_soaVertexCount = 0;
-		for (ndInt32 i = 0; i < boxCount; i ++) 
+		for (ndInt32 i = 0; i < boxCount; ++i) 
 		{
 			ndConvexBox* const box = &m_supportTree[i];
 			if (box->m_leftBox == -1)
@@ -659,7 +659,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			indexptr[i] = ndFloat32(i);
 		}
 
-		for (ndInt32 i = 0; i < m_soaVertexCount; i ++)
+		for (ndInt32 i = 0; i < m_soaVertexCount; ++i)
 		{
 			ndVector temp;
 			ndInt32 j = i * 4;

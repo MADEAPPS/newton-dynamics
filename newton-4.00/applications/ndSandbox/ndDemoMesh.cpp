@@ -323,7 +323,7 @@ void ndDemoMesh::RenderNormals()
 	ndFloat32 length = 0.1f;
 	glBegin(GL_LINES);
 
-	for (ndInt32 i = 0; i < m_vertexCount; i ++)
+	for (ndInt32 i = 0; i < m_vertexCount; ++i)
 	{
 		glVertex3f (GLfloat(m_vertex[i * 3 + 0]), GLfloat(m_vertex[i * 3 + 1]), GLfloat(m_vertex[i * 3 + 2]));
 		glVertex3f (GLfloat(m_vertex[i * 3 + 0] + m_normal[i * 3 + 0] * length), GLfloat(m_vertex[i * 3 + 1] + m_normal[i * 3 + 1] * length), GLfloat(m_vertex[i * 3 + 2] + m_normal[i * 3 + 2] * length));

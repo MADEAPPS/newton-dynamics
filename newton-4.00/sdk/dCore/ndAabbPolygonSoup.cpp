@@ -64,7 +64,7 @@ class ndAabbPolygonSoup::ndNodeBuilder: public ndAabbPolygonSoup::ndNode
 	{
 		ndVector minP ( ndFloat32 (1.0e15f)); 
 		ndVector maxP (-ndFloat32 (1.0e15f)); 
-		for (ndInt32 i = 0; i < indexCount; i ++) 
+		for (ndInt32 i = 0; i < indexCount; ++i) 
 		{
 			ndInt32 index = indexArray[i];
 			const ndVector& p (vertexArray[index]);
@@ -145,7 +145,7 @@ class ndAabbPolygonSoup::ndSpliteInfo
 		if (boxCount == 2) 
 		{
 			m_axis = 1;
-			for (ndInt32 i = 0; i < boxCount; i ++) 
+			for (ndInt32 i = 0; i < boxCount; ++i) 
 			{
 				const ndNodeBuilder& box = boxArray[i];
 				const ndVector& p0 = box.m_p0;
@@ -159,7 +159,7 @@ class ndAabbPolygonSoup::ndSpliteInfo
 		{
 			ndVector median (ndVector::m_zero);
 			ndVector varian (ndVector::m_zero);
-			for (ndInt32 i = 0; i < boxCount; i ++) 
+			for (ndInt32 i = 0; i < boxCount; ++i) 
 			{
 				const ndNodeBuilder& box = boxArray[i];
 
@@ -178,7 +178,7 @@ class ndAabbPolygonSoup::ndSpliteInfo
 
 			ndInt32 index = 0;
 			ndFloat32 maxVarian = ndFloat32 (-1.0e10f);
-			for (ndInt32 i = 0; i < 3; i ++) 
+			for (ndInt32 i = 0; i < 3; ++i) 
 			{
 				if (varian[i] > maxVarian) 
 				{
@@ -193,7 +193,7 @@ class ndAabbPolygonSoup::ndSpliteInfo
 			ndInt32 i1 = boxCount - 1;
 			do 
 			{    
-				for (; i0 <= i1; i0 ++) 
+				for (; i0 <= i1; ++i0) 
 				{
 					const ndNodeBuilder& box = boxArray[i0];
 					ndFloat32 val = (box.m_p0[index] + box.m_p1[index]) * ndFloat32 (0.5f);
@@ -203,7 +203,7 @@ class ndAabbPolygonSoup::ndSpliteInfo
 					}
 				}
 
-				for (; i1 >= i0; i1 --) 
+				for (; i1 >= i0; --i1) 
 				{
 					const ndNodeBuilder& box = boxArray[i1];
 					ndFloat32 val = (box.m_p0[index] + box.m_p1[index]) * ndFloat32 (0.5f);
@@ -444,7 +444,7 @@ ndFloat32 ndAabbPolygonSoup::CalculateFaceMaxSize (const ndVector* const vertex,
 	ndFloat32 maxSize = ndFloat32 (0.0f);
 	ndInt32 index = indexArray[indexCount - 1];
 	ndVector p0 (vertex[index]);
-	for (ndInt32 i = 0; i < indexCount; i ++) 
+	for (ndInt32 i = 0; i < indexCount; ++i) 
 	{
 		ndInt32 index1 = indexArray[i];
 		ndVector p1 (vertex[index1]);
@@ -455,7 +455,7 @@ ndFloat32 ndAabbPolygonSoup::CalculateFaceMaxSize (const ndVector* const vertex,
 
 		ndFloat32 maxVal = ndFloat32 (-1.0e10f);
 		ndFloat32 minVal = ndFloat32 ( 1.0e10f);
-		for (ndInt32 j = 0; j < indexCount; j ++) 
+		for (ndInt32 j = 0; j < indexCount; ++j) 
 		{
 			ndInt32 index2 = indexArray[j];
 			ndVector q (vertex[index2]);
@@ -659,7 +659,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 
 	ndStack<ndTriplex> pool ((m_indexCount / 2) - 1);
 	ndInt32 normalCount = 0;
-	for (ndInt32 i = 0; i < m_nodesCount; i ++) 
+	for (ndInt32 i = 0; i < m_nodesCount; ++i) 
 	{
 		const ndNode* const node = &m_aabb[i];
 		if (node->m_left.IsLeaf()) 
@@ -676,7 +676,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				dAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 				ndVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				q0 = q0 & ndVector::m_triplexMask;
-				for (ndInt32 j = 0; j < vCount; j ++) 
+				for (ndInt32 j = 0; j < vCount; ++j) 
 				{
 					ndInt32 j1 = vCount + 2 + j;
 					ndVector q1 (&vertexArray[face[j]].m_x);
@@ -712,7 +712,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				dAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 				ndVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				q0 = q0 & ndVector::m_triplexMask;
-				for (ndInt32 j = 0; j < vCount; j ++) 
+				for (ndInt32 j = 0; j < vCount; ++j) 
 				{
 					ndInt32 j1 = vCount + 2 + j;
 					ndVector q1 (&vertexArray[face[j]].m_x);
@@ -749,7 +749,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 		m_localVertex = &vertexArray1[0].m_x;
 		m_vertexCount = oldCount + newNormalCount;
 	
-		for (ndInt32 i = 0; i < m_nodesCount; i ++) 
+		for (ndInt32 i = 0; i < m_nodesCount; ++i) 
 		{
 			const ndNode* const node = &m_aabb[i];
 			if (node->m_left.IsLeaf()) 
@@ -757,7 +757,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				ndInt32 vCount = ndInt32 (node->m_left.GetCount());
 				ndInt32 index = ndInt32 (node->m_left.GetIndex());
 				ndInt32* const face = &m_indices[index];
-				for (ndInt32 j = 0; j < vCount; j ++) 
+				for (ndInt32 j = 0; j < vCount; ++j) 
 				{
 					ndInt32 edgeIndexNormal = face[vCount + 2 + j];
 					//if (face[vCount + 2 + j] < 0) 
@@ -782,7 +782,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				ndInt32 vCount = ndInt32 (node->m_right.GetCount());
 				ndInt32 index = ndInt32 (node->m_right.GetIndex());
 				ndInt32* const face = &m_indices[index];
-				for (ndInt32 j = 0; j < vCount; j ++) 
+				for (ndInt32 j = 0; j < vCount; ++j) 
 				{
 					ndInt32 edgeIndexNormal = face[vCount + 2 + j];
 					//if (face[vCount + 2 + j] < 0) 
@@ -834,7 +834,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 
 		ndInt32 j0 = adjacentCount - 1;
 		ndInt32 indexJ0 = adjacentFace.m_index[adjacentCount - 1];
-		for (ndInt32 j = 0; j < adjacentCount; j ++) {
+		for (ndInt32 j = 0; j < adjacentCount; ++j) {
 			ndInt32 indexJ1 = adjacentFace.m_index[j];
 			ndBigVector q0 (ndVector(&polygon[indexJ1 * stride]) & ndVector::m_triplexMask);
 			ndBigVector q1 (ndVector(&polygon[indexJ0 * stride]) & ndVector::m_triplexMask);
@@ -842,7 +842,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 			ndFloat64 q1q0Mag2 = q1q0.DotProduct(q1q0).GetScalar();
 
 			ndInt32 indexI0 = indexArray[indexCount - 1];
-			for (ndInt32 i = 0; i < indexCount; i ++) 
+			for (ndInt32 i = 0; i < indexCount; ++i) 
 			{
 				ndInt32 indexI1 = indexArray[i];
 				ndBigVector p0 (ndVector(&polygon[indexI0 * stride]) & ndVector::m_triplexMask);
@@ -871,7 +871,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 							if (err2 < DG_WELDING_TOL2) 
 							{
 								ndFloat32 maxDist = ndFloat32 (0.0f);
-								for (ndInt32 k = 0; k < indexCount; k ++) 
+								for (ndInt32 k = 0; k < indexCount; ++k) 
 								{
 									ndVector r (&polygon[indexArray[k] * stride]);
 									r = r & ndVector::m_triplexMask;
@@ -976,12 +976,12 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	ndStack<ndVector> tmpVertexArrayCount(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount() + builder.m_faceVertexCount.GetCount() * 2 + 4);
 
 	ndVector* const tmpVertexArray = &tmpVertexArrayCount[0];
-	for (ndInt32 i = 0; i < builder.m_vertexPoints.GetCount(); i ++) 
+	for (ndInt32 i = 0; i < builder.m_vertexPoints.GetCount(); ++i) 
 	{
 		tmpVertexArray[i] = builder.m_vertexPoints[i];
 	}
 
-	for (ndInt32 i = 0; i < builder.m_normalPoints.GetCount(); i ++) 
+	for (ndInt32 i = 0; i < builder.m_normalPoints.GetCount(); ++i) 
 	{
 		tmpVertexArray[i + builder.m_vertexPoints.GetCount()] = builder.m_normalPoints[i];
 	}
@@ -997,7 +997,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 		new (&constructor[allocatorIndex]) ndNodeBuilder (&tmpVertexArray[0], 0, indexCount, &indices[0]);
 		allocatorIndex ++;
 	}
-	for (ndInt32 i = 0; i < builder.m_faceVertexCount.GetCount(); i ++) 
+	for (ndInt32 i = 0; i < builder.m_faceVertexCount.GetCount(); ++i) 
 	{
 		ndInt32 indexCount = builder.m_faceVertexCount[i] - 1;
 		new (&constructor[allocatorIndex]) ndNodeBuilder (&tmpVertexArray[0], i, indexCount, &indices[polygonIndex]);
@@ -1137,7 +1137,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 			}
 
 			// index format i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize
-			for (ndInt32 j = 0; j < node->m_indexCount; j ++) 
+			for (ndInt32 j = 0; j < node->m_indexCount; ++j) 
 			{
 				m_indices[indexMap + j] = node->m_faceIndices[j];
 				m_indices[indexMap + j + node->m_indexCount + 2] = D_CONCAVE_EDGE_MASK | 0xffffffff;
@@ -1168,14 +1168,14 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	m_localVertex = (ndFloat32*) ndMemory::Malloc (sizeof (ndTriplex) * m_vertexCount);
 
 	ndTriplex* const dstPoints = (ndTriplex*)m_localVertex;
-	for (ndInt32 i = 0; i < m_vertexCount; i ++) 
+	for (ndInt32 i = 0; i < m_vertexCount; ++i) 
 	{
 		dstPoints[i].m_x = tmpVertexArray[i].m_x;
 		dstPoints[i].m_y = tmpVertexArray[i].m_y;
 		dstPoints[i].m_z = tmpVertexArray[i].m_z;
 	}
 
-	for (ndInt32 i = 0; i < m_nodesCount; i ++) 
+	for (ndInt32 i = 0; i < m_nodesCount; ++i) 
 	{
 		ndNode& box = m_aabb[i];
 
@@ -1276,7 +1276,7 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVectex (const ndVector& dir) con
 					ndInt32 index = ndInt32 (me->m_left.GetIndex());
 					ndInt32 vCount = ndInt32 (me->m_left.GetCount());
 					ndVector vertex (ndFloat32 (0.0f));
-					for (ndInt32 j = 0; j < vCount; j ++) 
+					for (ndInt32 j = 0; j < vCount; ++j) 
 					{
 						ndInt32 i0 = m_indices[index + j] * ndInt32 (sizeof (ndTriplex) / sizeof (ndFloat32));
 						ndVector p (&boxArray[i0].m_x);
@@ -1317,7 +1317,7 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVectex (const ndVector& dir) con
 					ndInt32 index = ndInt32 (me->m_right.GetIndex());
 					ndInt32 vCount = ndInt32 (me->m_right.GetCount());
 					ndVector vertex (ndFloat32 (0.0f));
-					for (ndInt32 j = 0; j < vCount; j ++) 
+					for (ndInt32 j = 0; j < vCount; ++j) 
 					{
 						ndInt32 i0 = m_indices[index + j] * ndInt32 (sizeof (ndTriplex) / sizeof (ndFloat32));
 						ndVector p (&boxArray[i0].m_x);

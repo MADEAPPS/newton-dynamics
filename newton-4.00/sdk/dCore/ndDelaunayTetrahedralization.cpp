@@ -34,7 +34,7 @@ ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* cons
 
 	ndBigVector* const points = &pool[0];
 	ndInt32 stride = ndInt32 (strideInByte / sizeof (ndFloat64));
-	for (ndInt32 i = 0; i < count; i ++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndFloat64 x = ndRoundToFloat (vertexCloud[i * stride + 0]);
 		ndFloat64 y = ndRoundToFloat (vertexCloud[i * stride + 1]);
@@ -72,11 +72,11 @@ ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* cons
 		// add the rest of the points by incremental insertion with small perturbation
 		ndInt32 hullCount = m_count;
 		
-		for (ndInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			bool inHull = false;
 			const ndConvexHull4dVector* const hullPoints = &m_points[0];
-			for (ndInt32 j = 0; j < hullCount; j ++) 
+			for (ndInt32 j = 0; j < hullCount; ++j) 
 			{
 				if (hullPoints[j].m_index == i) 
 				{
@@ -129,10 +129,10 @@ void ndDelaunayTetrahedralization::SortVertexArray ()
 	for (ndNode* node = GetFirst(); node; node = node->GetNext())
 	{	
 		ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndConvexHull4dTetraherum::ndTetrahedrumFace& face = tetra->m_faces[i];
-			for (ndInt32 j = 0; j < 4; j ++) 
+			for (ndInt32 j = 0; j < 4; ++j) 
 			{
 				ndInt32 index = face.m_index[j];
 				face.m_index[j] = points[index].m_index;
@@ -181,13 +181,13 @@ void ndDelaunayTetrahedralization::RemoveUpperHull ()
 void ndDelaunayTetrahedralization::DeleteFace (ndNode* const node)
 {
 	ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
-	for (ndInt32 i = 0; i < 4; i ++) 
+	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndNode* const twinNode = tetra->m_faces[i].m_twin;
 		if (twinNode) 
 		{
 			ndConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
-			for (ndInt32 j = 0; j < 4; j ++) 
+			for (ndInt32 j = 0; j < 4; ++j) 
 			{
 				if (twinTetra->m_faces[j].m_twin == node) 
 				{

@@ -354,7 +354,7 @@ ndEdge* ndPolyhedra::AddFace (ndInt32 count, const ndInt32* const index, const n
 		bool Insert (ndInt64 value)
 		{
 			ndInt32 i = 0;				
-			for (; i < m_count; i ++) 
+			for (; i < m_count; ++i) 
 			{
 				if (m_array[i] == value) 
 				{
@@ -373,7 +373,7 @@ ndEdge* ndPolyhedra::AddFace (ndInt32 count, const ndInt32* const index, const n
 	IntersectionFilter selfIntersectingFaceFilter;
 
 	ndInt32 i0 = index[count-1];
-	for (ndInt32 i = 0; i < count; i ++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndInt32 i1 = index[i];
 		ndPairKey code0 (i0, i1);
@@ -419,7 +419,7 @@ ndEdge* ndPolyhedra::AddFace (ndInt32 count, const ndInt32* const index, const n
 	ndEdge* edge0 = &node->GetInfo();
 	ndEdge* const first = edge0;
 
-	for (ndInt32 i = 1; i < count; i ++) 
+	for (ndInt32 i = 1; i < count; ++i) 
 	{
 		i0 = i1;
 		i1 = index[i];
@@ -486,7 +486,7 @@ bool ndPolyhedra::EndFace ()
 		}
 	}
 
-	for (ndInt32 i = 0; i < edgeCount; i ++) 
+	for (ndInt32 i = 0; i < edgeCount; ++i) 
 	{
 		ndEdge* const edge = edgeArray[i];
 		dAssert (!edge->m_prev);
@@ -515,7 +515,7 @@ void ndPolyhedra::DeleteFace(ndEdge* const face)
 		{
 			ptr->m_incidentFace = -1;
 			ndInt32 i = 0;
-			for (; i < count; i ++) 
+			for (; i < count; ++i) 
 			{
 				if ((edgeList[i] == ptr) || (edgeList[i]->m_twin == ptr)) 
 				{
@@ -530,7 +530,7 @@ void ndPolyhedra::DeleteFace(ndEdge* const face)
 			ptr = ptr->m_next;
 		} while (ptr != face);
 
-		for (ndInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndEdge* const ptr1 = edgeList[i];
 			if (ptr1->m_twin->m_incidentFace < 0) 
@@ -881,7 +881,7 @@ void ndPolyhedra::DeleteDegenerateFaces (const ndFloat64* const pool, ndInt32 st
 	ndFloat64 area2 = area * area;
 	area2 *= ndFloat64 (4.0f);
 
-	for (ndInt32 i = 0; i < count; i ++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndPolyhedra::ndNode* const faceNode = faceArray[i];
 		ndEdge* const edge = &faceNode->GetInfo();
@@ -1384,7 +1384,7 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 {
 	ndList<ndDiagonalEdge> dignonals;
 
-	for (ndInt32 i = 1; i <= perimeterCount; i ++) 
+	for (ndInt32 i = 1; i <= perimeterCount; ++i) 
 	{
 		ndEdge* const last = perimeter[i - 1];
 		for (ndEdge* ptr = perimeter[i]->m_prev; ptr != last; ptr = ptr->m_twin->m_prev) 
@@ -1483,7 +1483,7 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 				{
 					ndEdge* backFace1 = backFace0->m_next;
 					ndEdge* frontFace1 = frontFace0->m_next;
-					for (ndInt32 i = 0; i < perimeterCount; i ++) 
+					for (ndInt32 i = 0; i < perimeterCount; ++i) 
 					{
 						if (frontFace0 == perimeter[i]) 
 						{
@@ -1572,9 +1572,9 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 	if (loopCount == 1) 
 	{
 		#ifdef _DEBUG
-		for (ndInt32 i = 0; i < perimeterCount; i ++) 
+		for (ndInt32 i = 0; i < perimeterCount; ++i) 
 		{
-			for (ndInt32 j = i + 1; j < perimeterCount; j ++) 
+			for (ndInt32 j = i + 1; j < perimeterCount; ++j) 
 			{
 				dAssert (edgePerimeters[i]->m_incidentVertex != edgePerimeters[j]->m_incidentVertex);
 			}
@@ -1748,7 +1748,7 @@ void ndPolyhedra::Triangulate (const ndFloat64* const vertex, ndInt32 strideInBy
 		}
 		dAssert (edge == edge->m_next->m_next->m_next);
 
-		for (ndInt32 i = 0; i < 3; i ++) 
+		for (ndInt32 i = 0; i < 3; ++i) 
 		{ 
 			edge->m_incidentFace = m_faceSecuence; 
 			edge->m_mark = mark;
@@ -1817,7 +1817,7 @@ void ndPolyhedra::RemoveOuterColinearEdges (ndPolyhedra& flatFace, const ndFloat
 
 	ndInt8 buffer[2048 * sizeof (ndFloat64)];
 	ndDownHeap<ndEdge*, ndFloat64> heap(&buffer[0], sizeof (buffer));
-	for (ndInt32 i = 0; i < perimeterCount; i ++) 
+	for (ndInt32 i = 0; i < perimeterCount; ++i) 
 	{
 		ndEdge* edge = edgePerimeters[i];
 		ndEdge* ptr = edge;
@@ -2435,7 +2435,7 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 	ndStack<char> heapPool (2 * edgeCount * ndInt32 (sizeof (ndFloat64) + sizeof (ndEdgeCollapseEdgeHandle*) + sizeof (ndInt32))); 
 	ndUpHeap<ndList<ndEdgeCollapseEdgeHandle>::ndNode* , ndFloat64> bigHeapArray(&heapPool[0], heapPool.GetSizeInBytes());
 
-	for (ndInt32 i = 0; i < maxVertexIndex; i ++) 
+	for (ndInt32 i = 0; i < maxVertexIndex; ++i) 
 	{
 		vertexPool[i].m_x = array[i * stride + 0];
 		vertexPool[i].m_y = array[i * stride + 1];
@@ -2671,7 +2671,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 	} while (edge != face);
 
 	ndInt32 i0 = count - 1;
-	for(ndInt32 i = 0; i < count; i ++) 
+	for(ndInt32 i = 0; i < count; ++i) 
 	{
 		ndEdge* const edge1 = array[i];
 		ndEdge* const prev1 = array[i0];
@@ -2681,7 +2681,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 		i0 = i;
 	} 
 
-	for(ndInt32 i = 0; i < count; i ++) 
+	for(ndInt32 i = 0; i < count; ++i) 
 	{
 		ndEdge* const edge1 = array[i];
 		ndEdge* const twin1 = flatFace.FindEdge (edge1->m_next->m_incidentVertex, edge1->m_incidentVertex);

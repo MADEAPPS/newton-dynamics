@@ -108,7 +108,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 	scene->AddEntity(rootEntity);
 
 	ndFloat32 step = 4.0f;
-	for (ndInt32 j = 0; j < count; j ++)
+	for (ndInt32 j = 0; j < count; ++j)
 	{
 		for (ndInt32 k = 0; k < count; k++)
 		{

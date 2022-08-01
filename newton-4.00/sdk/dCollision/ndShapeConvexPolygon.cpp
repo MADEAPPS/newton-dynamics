@@ -68,7 +68,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 
 	if (projectFactor > ndFloat32 (0.9999f)) 
 	{
-		for (ndInt32 i = 0; i < m_count; i ++) 
+		for (ndInt32 i = 0; i < m_count; ++i) 
 		{
 			contactsOut[count] = m_localPoly[i];
 			count ++;
@@ -76,7 +76,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 
 		#ifdef _DEBUG
 			ndInt32 j = count - 1;
-			for (ndInt32 i = 0; i < count; i ++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndVector error (contactsOut[i] - contactsOut[j]);
 				dAssert (error.m_w == ndFloat32 (0.0f));
@@ -93,7 +93,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 
 		ndVector p0 (m_localPoly[m_count - 1]);
 		ndFloat32 side0 = plane.Evalue (p0);
-		for (ndInt32 i = 0; i < m_count; i ++) 
+		for (ndInt32 i = 0; i < m_count; ++i) 
 		{
 			ndVector p1 (m_localPoly[i]);
 			ndFloat32 side1 = plane.Evalue (p1);
@@ -170,7 +170,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 
 		ndVector p0 (m_localPoly[m_count - 1]);
 		ndFloat32 side0 = plane.Evalue (p0);
-		for (ndInt32 i = 0; i < m_count; i ++) 
+		for (ndInt32 i = 0; i < m_count; ++i) 
 		{
 			ndVector p1 (m_localPoly[i]);
 			ndFloat32 side1 = plane.Evalue (p1);
@@ -214,7 +214,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 			ndFloat32 proj = contactsOut[0].DotProduct(lineDir).GetScalar();
 			ndFloat32 maxProjection = proj;
 			ndFloat32 minProjection = proj;
-			for (ndInt32 i = 1; i < count; i ++) 
+			for (ndInt32 i = 1; i < count; ++i) 
 			{
 				proj = contactsOut[i].DotProduct(lineDir).GetScalar();
 				if (proj > maxProjection) 
@@ -246,7 +246,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 		if (count > 1) 
 		{
 			ndInt32 j = count - 1;
-			for (ndInt32 i = 0; i < count; i ++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndVector error (contactsOut[i] - contactsOut[j]);
 				dAssert (error.m_w == ndFloat32 (0.0f));
@@ -258,7 +258,7 @@ ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normal
 			{
 				ndVector n (ndFloat32 (0.0f));
 				ndVector e0 (contactsOut[1] - contactsOut[0]);
-				for (ndInt32 i = 2; i < count; i ++) 
+				for (ndInt32 i = 2; i < count; ++i) 
 				{
 					ndVector e1 (contactsOut[i] - contactsOut[0]);
 					n += e0.CrossProduct(e1);

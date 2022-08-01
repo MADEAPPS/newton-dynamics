@@ -79,11 +79,11 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 
 	ndMatrix rot (ndPitchMatrix (breakStep));	
 	ndInt32 index = 0;
-	for (ndInt32 j = 0; j <= DG_CHAMFERCYLINDER_SLICES; j ++) 
+	for (ndInt32 j = 0; j <= DG_CHAMFERCYLINDER_SLICES; ++j) 
 	{
 		ndVector p0 (-m_height * ndCos(sliceAngle), ndFloat32 (0.0f), m_radius + m_height * ndSin(sliceAngle), ndFloat32 (0.0f));
 		sliceAngle += sliceStep;
-		for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; i ++) 
+		for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; ++i) 
 		{
 			m_vertex[index] = p0;
 			index ++;
@@ -101,17 +101,17 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 		ndInt32 wireframe[DG_CHAMFERCYLINDER_SLICES + 10];
 
 		ndVector locus(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-		for (ndInt32 i = 0; i < DG_MAX_CHAMFERCYLINDER_DIR_COUNT; i ++) 
+		for (ndInt32 i = 0; i < DG_MAX_CHAMFERCYLINDER_DIR_COUNT; ++i) 
 		{
 			ndMatrix matrix (ndPitchMatrix (ndFloat32 (2.0f) * ndPi * ndFloat32 (i) / DG_MAX_CHAMFERCYLINDER_DIR_COUNT));
 			m_shapesDirs[i] = matrix.RotateVector (locus);
 		}
 
 		ndInt32 index0 = 0;
-		for (ndInt32 j = 0; j < DG_CHAMFERCYLINDER_SLICES; j ++) 
+		for (ndInt32 j = 0; j < DG_CHAMFERCYLINDER_SLICES; ++j) 
 		{
 			ndInt32 index1 = index0 + DG_CHAMFERCYLINDER_BRAKES - 1;
-			for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; i ++) 
+			for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; ++i) 
 			{
 				wireframe[0] = index0;
 				wireframe[1] = index1;
@@ -124,13 +124,13 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 			}
 		}
 
-		for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; i ++) 
+		for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; ++i) 
 		{ 
 			wireframe[i] = i;
 		}
 		polyhedra.AddFace (DG_CHAMFERCYLINDER_BRAKES, wireframe);
 
-		for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; i ++) 
+		for (ndInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; ++i) 
 		{ 
 			wireframe[i] = DG_CHAMFERCYLINDER_BRAKES * (DG_CHAMFERCYLINDER_SLICES + 1) - i - 1;
 		}

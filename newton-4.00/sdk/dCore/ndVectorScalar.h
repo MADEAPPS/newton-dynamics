@@ -212,7 +212,7 @@ class ndVector
 		ndFloat32 array[4][4];
 
 		const ndVector& me = *this;
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -222,12 +222,12 @@ class ndVector
 
 		ndVector normal;
 		ndFloat32  sign = ndFloat32 (-1.0f);
-		for (ndInt32 i = 0; i < 4; i ++)  
+		for (ndInt32 i = 0; i < 4; ++i)  
 		{
-			for (ndInt32 j = 0; j < 3; j ++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				ndInt32 k0 = 0;
-				for (ndInt32 k = 0; k < 4; k ++) 
+				for (ndInt32 k = 0; k < 4; ++k) 
 				{
 					if (k != i) 
 					{
@@ -300,30 +300,33 @@ class ndVector
 		return me * InvMagSqrt();
 	}
 
-	ndVector Abs () const
+	inline ndVector Abs () const
 	{
-		return ndVector ((m_x > ndFloat32 (0.0f)) ? m_x : -m_x,
+		return ndVector (
+			(m_x > ndFloat32 (0.0f)) ? m_x : -m_x,
 			(m_y > ndFloat32 (0.0f)) ? m_y : -m_y,
 			(m_z > ndFloat32 (0.0f)) ? m_z : -m_z,
 			(m_w > ndFloat32 (0.0f)) ? m_w : -m_w);
 	}
 
-	ndFloat32 GetMax () const
+	inline ndVector GetMax () const
 	{
-		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
+		return ndVector (ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w)));
 	}
 
-	ndVector GetMax (const ndVector& data) const
+	inline ndVector GetMax (const ndVector& data) const
 	{
-		return ndVector ((m_x > data.m_x) ? m_x : data.m_x,
+		return ndVector (
+			(m_x > data.m_x) ? m_x : data.m_x,
 			(m_y > data.m_y) ? m_y : data.m_y,
 			(m_z > data.m_z) ? m_z : data.m_z,
 			(m_w > data.m_w) ? m_w : data.m_w);
 	}
 
-	ndVector GetMin (const ndVector& data) const
+	inline ndVector GetMin (const ndVector& data) const
 	{
-		return ndVector ((m_x < data.m_x) ? m_x : data.m_x,
+		return ndVector (
+			(m_x < data.m_x) ? m_x : data.m_x,
 			(m_y < data.m_y) ? m_y : data.m_y,
 			(m_z < data.m_z) ? m_z : data.m_z,
 			(m_w < data.m_w) ? m_w : data.m_w);
@@ -333,7 +336,8 @@ class ndVector
 	// relational operators
 	inline ndVector operator== (const ndVector& data) const
 	{
-		return ndVector ((m_x == data.m_x) ? ndInt32 (0xffffffff) : 0,
+		return ndVector (
+			(m_x == data.m_x) ? ndInt32 (0xffffffff) : 0,
 			(m_y == data.m_y) ? ndInt32 (0xffffffff) : 0,
 			(m_z == data.m_z) ? ndInt32 (0xffffffff) : 0,
 			(m_w == data.m_w) ? ndInt32 (0xffffffff) : 0);
@@ -341,7 +345,8 @@ class ndVector
 
 	inline ndVector operator> (const ndVector& data) const
 	{
-		return ndVector ((m_x > data.m_x) ? ndInt32 (0xffffffff) : 0,
+		return ndVector (
+			(m_x > data.m_x) ? ndInt32 (0xffffffff) : 0,
 			(m_y > data.m_y) ? ndInt32 (0xffffffff) : 0,
 			(m_z > data.m_z) ? ndInt32 (0xffffffff) : 0,
 			(m_w > data.m_w) ? ndInt32 (0xffffffff) : 0);
@@ -349,7 +354,8 @@ class ndVector
 
 	inline ndVector operator< (const ndVector& data) const
 	{
-		return ndVector ((m_x < data.m_x) ? ndInt32 (0xffffffff) : 0,
+		return ndVector (
+			(m_x < data.m_x) ? ndInt32 (0xffffffff) : 0,
 			(m_y < data.m_y) ? ndInt32 (0xffffffff) : 0,
 			(m_z < data.m_z) ? ndInt32 (0xffffffff) : 0,
 			(m_w < data.m_w) ? ndInt32 (0xffffffff) : 0);
@@ -357,7 +363,8 @@ class ndVector
 
 	inline ndVector operator>= (const ndVector& data) const
 	{
-		return ndVector ((m_x >= data.m_x) ? ndInt32 (0xffffffff) : 0, 
+		return ndVector (
+			(m_x >= data.m_x) ? ndInt32 (0xffffffff) : 0, 
 			(m_y >= data.m_y) ? ndInt32 (0xffffffff) : 0,
 			(m_z >= data.m_z) ? ndInt32 (0xffffffff) : 0,
 			(m_w >= data.m_w) ? ndInt32 (0xffffffff) : 0);
@@ -365,7 +372,8 @@ class ndVector
 
 	inline ndVector operator<= (const ndVector& data) const
 	{
-		return ndVector ((m_x <= data.m_x) ? ndInt32 (0xffffffff) : 0,
+		return ndVector (
+			(m_x <= data.m_x) ? ndInt32 (0xffffffff) : 0,
 			(m_y <= data.m_y) ? ndInt32 (0xffffffff) : 0,
 			(m_z <= data.m_z) ? ndInt32 (0xffffffff) : 0,
 			(m_w <= data.m_w) ? ndInt32 (0xffffffff) : 0);
@@ -647,7 +655,7 @@ class ndBigVector
 		ndFloat64 array[4][4];
 
 		const ndBigVector& me = *this;
-		for (ndInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -657,12 +665,12 @@ class ndBigVector
 
 		ndBigVector normal;
 		ndFloat64  sign = ndFloat64 (-1.0f);
-		for (ndInt32 i = 0; i < 4; i ++)  
+		for (ndInt32 i = 0; i < 4; ++i)  
 		{
-			for (ndInt32 j = 0; j < 3; j ++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				ndInt32 k0 = 0;
-				for (ndInt32 k = 0; k < 4; k ++) 
+				for (ndInt32 k = 0; k < 4; ++k) 
 				{
 					if (k != i) 
 					{
@@ -736,7 +744,7 @@ class ndBigVector
 		return *this * InvMagSqrt();
 	}
 
-	ndBigVector Abs () const
+	inline ndBigVector Abs () const
 	{
 		return ndBigVector ((m_x > ndFloat64 (0.0f)) ? m_x : -m_x,
 							(m_y > ndFloat64 (0.0f)) ? m_y : -m_y,
@@ -744,12 +752,12 @@ class ndBigVector
 							(m_w > ndFloat64 (0.0f)) ? m_w : -m_w);
 	}
 
-	ndFloat64 GetMax () const
+	inline ndBigVector GetMax () const
 	{
-		return ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w));
+		return ndBigVector (ndMax(ndMax(m_x, m_y), ndMax(m_z, m_w)));
 	}
 
-	ndBigVector GetMax (const ndBigVector& data) const
+	inline ndBigVector GetMax (const ndBigVector& data) const
 	{
 		return ndBigVector ((m_x > data.m_x) ? m_x : data.m_x,
 							(m_y > data.m_y) ? m_y : data.m_y,
@@ -757,7 +765,7 @@ class ndBigVector
 							(m_w > data.m_w) ? m_w : data.m_w);
 					}
 
-	ndBigVector GetMin (const ndBigVector& data) const
+	inline ndBigVector GetMin (const ndBigVector& data) const
 	{
 		return ndBigVector ((m_x < data.m_x) ? m_x : data.m_x,
 							(m_y < data.m_y) ? m_y : data.m_y,

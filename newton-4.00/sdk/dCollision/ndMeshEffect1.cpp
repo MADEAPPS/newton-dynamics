@@ -862,7 +862,7 @@ ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator, const ndMatrix& p
 		face[2] = ndBigVector (ndFloat32 (0.0f),  witdth,  breadth, ndFloat32 (0.0f));
 		face[3] = ndBigVector (ndFloat32 (0.0f), -witdth,  breadth, ndFloat32 (0.0f));
 
-		for (ndInt32 i = 0; i < 4; i ++) {
+		for (ndInt32 i = 0; i < 4; ++i) {
 			ndBigVector uv0 (textureMatrix0.TransformVector(face[i]));
 			ndBigVector uv1 (textureMatrix1.TransformVector(face[i]));
 
@@ -935,7 +935,7 @@ ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator, dgDeserialize des
 		deserialization (userData, m_attrib, m_atribCount * sizeof (dgVertexAtribute));
 
 		BeginFace();
-		for (ndInt32 i = 0; i < faceCount; i ++) {
+		for (ndInt32 i = 0; i < faceCount; ++i) {
 			ndInt32 vertexCount;
 			ndInt32 face[1024];
 			ndInt64 attrib[1024];
@@ -1549,7 +1549,7 @@ ndInt32 ndMeshEffect::InterpolateVertex(const ndBigVector& srcPoint, const ndEdg
 	//	attribute.m_normal_z = normal.m_z;
 
 		ndFloat64 tol = ndFloat32 (1.0e-4f);
-		for (ndInt32 i = 0; i < 4; i ++) {
+		for (ndInt32 i = 0; i < 4; ++i) {
 			const ndEdge* ptr = face;
 			const ndEdge* const edge0 = ptr;
 			ndBigVector q0 (m_points[ptr->m_incidentVertex]);

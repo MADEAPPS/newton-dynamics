@@ -19,6 +19,7 @@ option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
 option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
 option("NEWTON_ENABLE_OPENCL_SOLVER" "enable gpu solver" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
+option("NEWTON_NO_SIMD_INTRINSICS" "generate double precision" OFF)
 option("NEWTON_BUILD_NEWTON_JAVA" "build a sharp wrapper" OFF)
 option("NEWTON_BUILD_NEWTON_PYTHON" "build python wrapper" OFF)
 option("NEWTON_BUILD_NEWTON_C_SHARP" "build a sharp wrapper" OFF)
@@ -26,6 +27,7 @@ option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" OFF)
 option("NEWTON_BUILD_CREATE_SUB_PROJECTS" "generate independent subproject" OFF)
 option("NEWTON_USE_DEFAULT_NEW_AND_DELETE" "overload new and delete when building dll" OFF)
 option("NEWTON_TEST_NEW_V_HACD" "try newer version of conevex decompistion v-hacd" OFF)
+
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
@@ -41,7 +43,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Don't use e.g. GNU extension (like -std=gnu++11) for portability
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+if(NEWTON_NO_SIMD_INTRINSICS)
+	add_definitions(-DD_SCALAR_VECTOR_CLASS)
+endif()
 
 if(NEWTON_DOUBLE_PRECISION)
 	add_definitions(-DD_NEWTON_USE_DOUBLE)
@@ -101,6 +105,8 @@ if(UNIX)
 endif ()
 
 if (MSVC)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 	if (PTR_SIZE EQUAL 8)
 		set(CMAKE_INSTALL_PREFIX "win64sdk" CACHE PATH "..." FORCE)
 	else()
