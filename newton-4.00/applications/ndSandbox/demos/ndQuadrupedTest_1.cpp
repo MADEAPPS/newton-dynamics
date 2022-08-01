@@ -771,6 +771,12 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 	// register a material for filtering self collisions 
 	ndAiQuadrupedTest_1_Material material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
