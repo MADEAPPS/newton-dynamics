@@ -90,9 +90,9 @@ if(UNIX)
 			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 	endif()
 
-	if(NOT ANDROID OR NOT APPLE)
-		add_compile_options(-msse3)
-	endif()
+	#if(NOT ANDROID OR NOT APPLE)
+	#	add_compile_options(-msse3)
+	#endif()
 
 	add_compile_options(-fpermissive)
 

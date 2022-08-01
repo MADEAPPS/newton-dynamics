@@ -94,7 +94,8 @@
 
 	#include <unistd.h>
 	#include <assert.h>
-	#if (!defined(__arm__) && !defined(__aarch64__)) // it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
+	// it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
+	#if (!defined(__arm__) && !defined(__aarch64__)) 
 		extern "C" 
 		{ 
 			// for SSE3 and up
@@ -108,6 +109,10 @@
 
 #if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#include <immintrin.h>
+#endif
+
+#if defined(__arm__) && defined(__aarch64__) 
+	#include <arm_neon.h>
 #endif
 
 #if defined (__APPLE__)
