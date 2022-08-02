@@ -465,7 +465,8 @@ class dgTetraIsoSufaceStuffing
 		dgVertexSign CalculateVertexSide (const dBigVector& point0) const
 		{
 			dgRayTracePointSide hits;
-			for (dInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; ++i) {
+			for (dInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; ++i) 
+			{
 				hits.m_hitCount = 0;
 				hits.m_rayIsDegenerate = false;
 				dBigVector point1 (point0 + dBigVector (m_normals.m_normal[i].Scale (m_diameter))); 

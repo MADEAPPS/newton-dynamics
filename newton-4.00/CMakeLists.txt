@@ -28,7 +28,6 @@ option("NEWTON_BUILD_CREATE_SUB_PROJECTS" "generate independent subproject" OFF)
 option("NEWTON_USE_DEFAULT_NEW_AND_DELETE" "overload new and delete when building dll" OFF)
 option("NEWTON_TEST_NEW_V_HACD" "try newer version of conevex decompistion v-hacd" OFF)
 
-
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
