@@ -602,7 +602,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		m_soa_index = (ndVector*)ndMemory::Malloc(m_soaVertexCount * sizeof(ndVector));
 
 		ndInt32 startAcc = 0;
-		for (ndInt32 k = 0; k < boxCount; k++)
+		for (ndInt32 k = 0; k < boxCount; ++k)
 		{
 			ndConvexBox* const box = &m_supportTree[k];
 			if (box->m_leftBox == -1)

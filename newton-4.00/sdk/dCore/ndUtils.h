@@ -170,7 +170,7 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 	{
 		ndFloat64* const dst = &data[i * stride];
 		const T* const src = &vertexList[i * stride];
-		for (ndInt32 j = 0; j < stride; j++)
+		for (ndInt32 j = 0; j < stride; ++j)
 		{
 			dst[j] = src[j];
 		}
@@ -181,7 +181,7 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 	{
 		const ndFloat64* const src = &data[i * stride];
 		T* const dst = &vertexList[i * stride];
-		for (ndInt32 j = 0; j < stride; j++)
+		for (ndInt32 j = 0; j < stride; ++j)
 		{
 			dst[j] = T(src[j]);
 		}

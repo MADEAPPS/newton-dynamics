@@ -2351,7 +2351,7 @@ STBTT_DEF int stbtt_GetKerningTable(const stbtt_fontinfo *info, stbtt_kerningent
    if (table_length < length)
       length = table_length;
 
-   for (k = 0; k < length; k++)
+   for (k = 0; k < length; ++k)
    {
       table[k].glyph1 = ttUSHORT(data+18+(k*6));
       table[k].glyph2 = ttUSHORT(data+20+(k*6));

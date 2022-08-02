@@ -302,7 +302,7 @@ void ndPolyhedra::SavePLY(const char* const fileName, const ndFloat64* const ver
 			} while (edge != face);
 
 			fprintf(file, "%d", count);
-			for (ndInt32 j = 0; j < count; j++) 
+			for (ndInt32 j = 0; j < count; ++j) 
 			{
 				fprintf(file, " %d", indices[j]);
 			}
@@ -2816,7 +2816,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 
 					for (ndInt32 i = 0; i < count1 - 1; ++i) 
 					{
-						for (ndInt32 j = i + 1; j < count1; j++) 
+						for (ndInt32 j = i + 1; j < count1; ++j) 
 						{
 							if (polygon[i] == polygon[j]) 
 							{
@@ -2831,7 +2831,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 
 			if (isConvex) 
 			{
-				for (ndInt32 j = 0; j < diagonalCount; j++) 
+				for (ndInt32 j = 0; j < diagonalCount; ++j) 
 				{
 					ndEdge* const diagonal = diagonalsPool[j];
 					flatFace.DeleteEdge(diagonal);
@@ -2839,7 +2839,7 @@ bool ndPolyhedra::PolygonizeFace(ndEdge* const face, const ndFloat64* const pool
 			} 
 			else 
 			{
-				for (ndInt32 j = 0; j < diagonalCount; j++) 
+				for (ndInt32 j = 0; j < diagonalCount; ++j) 
 				{
 					ndEdge* const diagonal = diagonalsPool[j];
 					if (!IsEssensialDiagonal(diagonal, normal1, pool, stride)) 
@@ -2993,7 +2993,7 @@ void ndPolyhedra::RemoveInteriorEdges (ndPolyhedra& buildConvex, const ndFloat64
 
 							for (ndInt32 i = 0; i < count - 1; ++i) 
 							{
-								for (ndInt32 j = i + 1; j < count; j++) 
+								for (ndInt32 j = i + 1; j < count; ++j) 
 								{
 									if (polygon[i] == polygon[j]) 
 									{
@@ -3008,7 +3008,7 @@ void ndPolyhedra::RemoveInteriorEdges (ndPolyhedra& buildConvex, const ndFloat64
 
 					if (isConvex) 
 					{
-						for (ndInt32 j = 0; j < diagonalCount; j++) 
+						for (ndInt32 j = 0; j < diagonalCount; ++j) 
 						{
 							ndEdge* const diagonal = diagonalsPool[j];
 							flatFace.DeleteEdge(diagonal);
@@ -3016,7 +3016,7 @@ void ndPolyhedra::RemoveInteriorEdges (ndPolyhedra& buildConvex, const ndFloat64
 					} 
 					else 
 					{
-						for (ndInt32 j = 0; j < diagonalCount; j++) 
+						for (ndInt32 j = 0; j < diagonalCount; ++j) 
 						{
 							ndEdge* const diagonal = diagonalsPool[j];
 							if (!IsEssensialDiagonal(diagonal, normal, vertex, stride)) 

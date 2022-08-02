@@ -189,7 +189,7 @@ namespace nd_
 			for (size_t f = 0; f < nT; f++) {
 				for (int32_t e = 0; e < 3; e++) {
 					int32_t found = 0;
-					for (int32_t k = 0; k < 2; k++) {
+					for (int32_t k = 0; k < 2; ++k) {
 						if (m_triangles.GetHead()->GetData().m_edges[e]->GetData().m_triangles[k] == m_triangles.GetHead()) {
 							found++;
 						}

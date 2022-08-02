@@ -174,7 +174,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 		if (pivot < ndFloat32(0.1f)) 
 		{
 			ndInt32 permute = i;
-			for (ndInt32 j = i + 1; j < 4; j++) 
+			for (ndInt32 j = i + 1; j < 4; ++j) 
 			{
 				ndFloat32 pivot1 = ndAbs(tmp[j][i]);
 				if (pivot1 > pivot) 
@@ -192,7 +192,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 			}
 		}
 
-		for (ndInt32 j = i + 1; j < 4; j++) 
+		for (ndInt32 j = i + 1; j < 4; ++j) 
 		{
 			ndVector scale (tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
@@ -204,7 +204,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	for (ndInt32 i = 3; i >= 0; i--) 
 	{
 		ndVector acc(ndVector::m_zero);
-		for (ndInt32 j = i + 1; j < 4; j++) 
+		for (ndInt32 j = i + 1; j < 4; ++j) 
 		{
 			ndVector pivot(tmp[i][j]);
 			acc += pivot * inv[j];
@@ -219,7 +219,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	{
 		ndFloat32 error = tmp[i][i] - ndFloat32(1.0f);
 		dAssert(ndAbs(error) < ndFloat32(1.0e-3f));
-		for (ndInt32 j = i + 1; j < 4; j++) 
+		for (ndInt32 j = i + 1; j < 4; ++j) 
 		{
 			dAssert(ndAbs(tmp[i][j]) < ndFloat32(1.0e-3f));
 			dAssert(ndAbs(tmp[j][i]) < ndFloat32(1.0e-3f));
@@ -240,7 +240,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 		if (pivot < ndFloat32(0.01f)) 
 		{
 			ndInt32 permute = i;
-			for (ndInt32 j = i + 1; j < 4; j++) 
+			for (ndInt32 j = i + 1; j < 4; ++j) 
 			{
 				ndFloat32 pivot1 = ndAbs(tmp[j][i]);
 				if (pivot1 > pivot) 
@@ -258,7 +258,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 			}
 		}
 
-		for (ndInt32 j = i + 1; j < 4; j++) 
+		for (ndInt32 j = i + 1; j < 4; ++j) 
 		{
 			const ndVector scale(tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
@@ -520,9 +520,9 @@ ndVector ndMatrix::EigenVectors ()
 		ndMatrix E(eigenVectors.Transpose());
 		ndMatrix originalMatrix(*this);
 		ndMatrix tempMatrix(E * diag * E.Transpose());
-		for (ndInt32 j = 0; j < 3; j++) 
+		for (ndInt32 j = 0; j < 3; ++j) 
 		{
-			for (ndInt32 k = 0; k < 3; k++) 
+			for (ndInt32 k = 0; k < 3; ++k) 
 			{
 				dAssert(ndAreEqual(originalMatrix[j][k], tempMatrix[j][k], ndFloat32(1.0e-3f)));
 			}

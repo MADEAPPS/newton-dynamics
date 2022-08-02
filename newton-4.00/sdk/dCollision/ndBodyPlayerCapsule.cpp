@@ -176,7 +176,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 
 	bool hasStartMatrix = false;
 	const ndFloat32 invTimeStep = ndFloat32 (1.0f) / timestep;
-	for (ndInt32 j = 0; !hasStartMatrix && (j < 4); j++) 
+	for (ndInt32 j = 0; !hasStartMatrix && (j < 4); ++j) 
 	{
 		hasStartMatrix = true;
 		contactSolver.CalculateContacts();
@@ -234,7 +234,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		ndVector veloc(savedVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
 		
 		bool advanceIsBlocked = true;
-		for (ndInt32 j = 0; advanceIsBlocked && (j < 4); j++) 
+		for (ndInt32 j = 0; advanceIsBlocked && (j < 4); ++j) 
 		{
 			advanceIsBlocked = false;
 			SetVelocity(veloc);
@@ -433,7 +433,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 	ndFloat32 invTimestep = ndFloat32(1.0f) / timestep;
 	
 	ndFloat32 penetration = D_MAX_COLLISION_PENETRATION * 10.0f;
-	for (ndInt32 j = 0; (j < 8) && (penetration > D_MAX_COLLISION_PENETRATION); j++) 
+	for (ndInt32 j = 0; (j < 8) && (penetration > D_MAX_COLLISION_PENETRATION); ++j) 
 	{
 		SetVelocity(ndVector::m_zero);
 		ndMatrix matrix(GetMatrix());
@@ -644,7 +644,7 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 		massMatrix[i][i] = a00;
 
 		m_impulseMag[i] = 0.0f;
-		for (ndInt32 j = i + 1; j < m_rowCount; j++) 
+		for (ndInt32 j = i + 1; j < m_rowCount; ++j) 
 		{
 			ndVector tmp1(
 				jInvMass.m_jacobianM0.m_linear * m_jacobianPairs[j].m_jacobianM0.m_linear +

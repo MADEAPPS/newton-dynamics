@@ -549,7 +549,7 @@ class dgTetraIsoSufaceStuffing
 			if (vertexSide[i] == m_outside) {
 /*
 				const dgTetraToVertexNode& graphNode = tetraGraph[i];
-				for (dInt32 j = 0; j < graphNode.GetCount(); j++) {
+				for (dInt32 j = 0; j < graphNode.GetCount(); ++j) {
 					dgTetraEdgeCuts& cuts = tetraEdgeCuts[graphNode[j]];
 					const dgTetrahedra& tetra = m_tetraList[graphNode[j]];
 					dAssert((tetra[0] == i) || (tetra[1] == i) || (tetra[2] == i) || (tetra[3] == i));
@@ -870,7 +870,7 @@ void ndMeshEffect::LoadOffMesh(const char* const fileName)
 					for (dInt32 i = 0; i < faceCount; ++i) {
 						const dInt32 faceVertexCount = parcel.GetInteger();
 						faceVertex[i] = faceVertexCount;
-						for (dInt32 j = 0; j < faceVertexCount; j++) {
+						for (dInt32 j = 0; j < faceVertexCount; ++j) {
 							indexList[index] = parcel.GetInteger();
 							index++;
 						}

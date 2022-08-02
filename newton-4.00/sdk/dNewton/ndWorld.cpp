@@ -790,7 +790,7 @@ void ndWorld::UpdateSkeletons()
 					ndInt32 index = queuePool.m_lastIndex;
 					queuePool.Reset();
 
-					for (ndInt32 j = 0; j < count; j++)
+					for (ndInt32 j = 0; j < count; ++j)
 					{
 						ndSkeletonContainer::ndNode* const parentNode = queuePool[index];
 						ndBodyKinematic* const parentBody = parentNode->m_body;

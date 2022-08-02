@@ -55,7 +55,7 @@ ndConvexHull4d::ndNormalMap::ndNormalMap()
 	TessellateTriangle(subdivitions, p4, p1, p3, tmp, count);
 
 	count = 0;
-	for (ndInt32 j = 0; j < 8; j++) 
+	for (ndInt32 j = 0; j < 8; ++j) 
 	{
 		ndFloat64 beta = (j - 4) * ndFloat64 (22.5f * ndDegreeToRad) + ndFloat64 (10.5f * ndDegreeToRad);
 		ndFloat64 sinBeta = sin(beta);
@@ -704,7 +704,7 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 		ndInt32 index = SupportVertex(&tree, points, normalMap.m_normal[i], false);
 		convexPoints[0] = points[index];
 		marks[0] = index;
-		for (ndInt32 j = i + 1; !validTetrahedrum && (j < normalMap.m_count); j++) 
+		for (ndInt32 j = i + 1; !validTetrahedrum && (j < normalMap.m_count); ++j) 
 		{
 			ndInt32 index1 = SupportVertex(&tree, points, normalMap.m_normal[j], false);
 			convexPoints[1] = points[index1];
@@ -712,7 +712,7 @@ ndInt32 ndConvexHull4d::InitVertexArray(ndConvexHull4dVector* const points, cons
 			if (p10.DotProduct(p10).GetScalar() >(ndFloat32(1.0e-3f) * m_diag)) 
 			{
 				marks[1] = index1;
-				for (ndInt32 k = j + 1; !validTetrahedrum && (k < normalMap.m_count); k++) 
+				for (ndInt32 k = j + 1; !validTetrahedrum && (k < normalMap.m_count); ++k) 
 				{
 					ndInt32 index2 = SupportVertex(&tree, points, normalMap.m_normal[k], false);
 					convexPoints[2] = points[index2];

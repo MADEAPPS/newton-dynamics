@@ -212,7 +212,8 @@ class ndVector
 	// return cross product
 	inline ndVector CrossProduct(const ndVector& B) const
 	{
-		return ndVector(m_y * B.m_z - m_z * B.m_y,
+		return ndVector(
+			m_y * B.m_z - m_z * B.m_y,
 			m_z * B.m_x - m_x * B.m_z,
 			m_x * B.m_y - m_y * B.m_x, m_w);
 	}
@@ -235,10 +236,10 @@ class ndVector
 		ndFloat32  sign = ndFloat32(-1.0f);
 		for (ndInt32 i = 0; i < 4; ++i) 
 		{
-			for (ndInt32 j = 0; j < 3; j++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				ndInt32 k0 = 0;
-				for (ndInt32 k = 0; k < 4; k++) 
+				for (ndInt32 k = 0; k < 4; ++k) 
 				{
 					if (k != i) 
 					{
@@ -638,10 +639,10 @@ class ndBigVector
 		ndFloat64  sign = ndFloat64(-1.0f);
 		for (ndInt32 i = 0; i < 4; ++i) 
 		{
-			for (ndInt32 j = 0; j < 3; j++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				ndInt32 k0 = 0;
-				for (ndInt32 k = 0; k < 4; k++) 
+				for (ndInt32 k = 0; k < 4; ++k) 
 				{
 					if (k != i) 
 					{
@@ -715,9 +716,10 @@ class ndBigVector
 		return *this * InvMagSqrt();
 	}
 
-	ndBigVector Abs() const
+	inline ndBigVector Abs() const
 	{
-		return ndBigVector((m_x > ndFloat64(0.0f)) ? m_x : -m_x,
+		return ndBigVector(
+			(m_x > ndFloat64(0.0f)) ? m_x : -m_x,
 			(m_y > ndFloat64(0.0f)) ? m_y : -m_y,
 			(m_z > ndFloat64(0.0f)) ? m_z : -m_z,
 			(m_w > ndFloat64(0.0f)) ? m_w : -m_w);
@@ -730,7 +732,8 @@ class ndBigVector
 
 	inline ndBigVector GetMax(const ndBigVector& data) const
 	{
-		return ndBigVector((m_x > data.m_x) ? m_x : data.m_x,
+		return ndBigVector(
+			(m_x > data.m_x) ? m_x : data.m_x,
 			(m_y > data.m_y) ? m_y : data.m_y,
 			(m_z > data.m_z) ? m_z : data.m_z,
 			(m_w > data.m_w) ? m_w : data.m_w);
@@ -738,7 +741,8 @@ class ndBigVector
 
 	inline ndBigVector GetMin(const ndBigVector& data) const
 	{
-		return ndBigVector((m_x < data.m_x) ? m_x : data.m_x,
+		return ndBigVector(
+			(m_x < data.m_x) ? m_x : data.m_x,
 			(m_y < data.m_y) ? m_y : data.m_y,
 			(m_z < data.m_z) ? m_z : data.m_z,
 			(m_w < data.m_w) ? m_w : data.m_w);
@@ -747,7 +751,8 @@ class ndBigVector
 	// relational operators
 	inline ndBigVector operator== (const ndBigVector& data) const
 	{
-		return ndBigVector((m_x == data.m_x) ? ndInt64(-1) : ndInt64(0),
+		return ndBigVector(
+			(m_x == data.m_x) ? ndInt64(-1) : ndInt64(0),
 			(m_y == data.m_y) ? ndInt64(-1) : ndInt64(0),
 			(m_z == data.m_z) ? ndInt64(-1) : ndInt64(0),
 			(m_w == data.m_w) ? ndInt64(-1) : ndInt64(0));
@@ -755,7 +760,8 @@ class ndBigVector
 
 	inline ndBigVector operator> (const ndBigVector& data) const
 	{
-		return ndBigVector((m_x > data.m_x) ? ndInt64(-1) : ndInt64(0),
+		return ndBigVector(
+			(m_x > data.m_x) ? ndInt64(-1) : ndInt64(0),
 			(m_y > data.m_y) ? ndInt64(-1) : ndInt64(0),
 			(m_z > data.m_z) ? ndInt64(-1) : ndInt64(0),
 			(m_w > data.m_w) ? ndInt64(-1) : ndInt64(0));
@@ -763,7 +769,8 @@ class ndBigVector
 
 	inline ndBigVector operator< (const ndBigVector& data) const
 	{
-		return ndBigVector((m_x < data.m_x) ? ndInt64(-1) : ndInt64(0),
+		return ndBigVector(
+			(m_x < data.m_x) ? ndInt64(-1) : ndInt64(0),
 			(m_y < data.m_y) ? ndInt64(-1) : ndInt64(0),
 			(m_z < data.m_z) ? ndInt64(-1) : ndInt64(0),
 			(m_w < data.m_w) ? ndInt64(-1) : ndInt64(0));
@@ -771,7 +778,8 @@ class ndBigVector
 
 	inline ndBigVector operator>= (const ndBigVector& data) const
 	{
-		return ndBigVector((m_x >= data.m_x) ? ndInt64(-1) : ndInt64(0),
+		return ndBigVector(
+			(m_x >= data.m_x) ? ndInt64(-1) : ndInt64(0),
 			(m_y >= data.m_y) ? ndInt64(-1) : ndInt64(0),
 			(m_z >= data.m_z) ? ndInt64(-1) : ndInt64(0),
 			(m_w >= data.m_w) ? ndInt64(-1) : ndInt64(0));
@@ -779,13 +787,13 @@ class ndBigVector
 
 	inline ndBigVector operator<= (const ndBigVector& data) const
 	{
-		return ndBigVector((m_x <= data.m_x) ? ndInt64(-1) : ndInt64(0),
+		return ndBigVector(
+			(m_x <= data.m_x) ? ndInt64(-1) : ndInt64(0),
 			(m_y <= data.m_y) ? ndInt64(-1) : ndInt64(0),
 			(m_z <= data.m_z) ? ndInt64(-1) : ndInt64(0),
 			(m_w <= data.m_w) ? ndInt64(-1) : ndInt64(0));
 	}
-
-
+	
 	// logical operations
 	inline ndBigVector operator& (const ndBigVector& data) const
 	{

@@ -3022,11 +3022,11 @@ void ndIsoSurface::ndImplementation::GenerateLowResIsoSurface()
 			ndIsoCell cell;
 			ndVector* const isoValue = &cell.m_isoValues[0];
 			ndVector origin(ndFloat32(startGrid.m_x + 1), ndFloat32(startGrid.m_y + 1), ndFloat32(startGrid.m_z + 1), ndFloat32(0.0f));
-			for (ndInt32 j = 0; j < 8; j++)
+			for (ndInt32 j = 0; j < 8; ++j)
 			{
 				isoValue[j] = origin + m_gridCorners[j];
 			}
-			for (ndInt32 j = 0; j < count; j++)
+			for (ndInt32 j = 0; j < count; ++j)
 			{
 				ndInt32 index = m_hashGridMap[start + j].m_cellType;
 				isoValue[index].m_w = ndFloat32(1.0f);
@@ -3059,11 +3059,11 @@ void ndIsoSurface::ndImplementation::GenerateHighResIsoSurface(ndCalculateIsoVal
 			ndIsoCell cell;
 			ndVector* const isoValue = &cell.m_isoValues[0];
 			ndVector origin(ndFloat32(startGrid.m_x + 1), ndFloat32(startGrid.m_y + 1), ndFloat32(startGrid.m_z + 1), ndFloat32(0.0f));
-			for (ndInt32 j = 0; j < 8; j++)
+			for (ndInt32 j = 0; j < 8; ++j)
 			{
 				isoValue[j] = origin + m_gridCorners[j];
 			}
-			for (ndInt32 j = 0; j < count; j++)
+			for (ndInt32 j = 0; j < count; ++j)
 			{
 				ndInt32 index = m_hashGridMap[start + j].m_cellType;
 				isoValue[index].m_w = ndFloat32(1.0f);

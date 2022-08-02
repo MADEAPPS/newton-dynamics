@@ -120,7 +120,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	char* ptr = buffer;
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		for (ndInt32 j = 0; j < 3; j++)
+		for (ndInt32 j = 0; j < 3; ++j)
 		{
 			ptr = FloatToString(ptr, array[i][j]);
 		}

@@ -206,7 +206,7 @@ void ndPolygonSoupBuilder::SavePLY(const char* const fileName) const
 	{
 		ndInt32 count = m_faceVertexCount[i];
 		fprintf(file, "%d", count - 1);
-		for (ndInt32 j = 0; j < count - 1; j++) 
+		for (ndInt32 j = 0; j < count - 1; ++j) 
 		{
 			fprintf(file, " %d", m_vertexIndex[index + j]);
 		}
@@ -236,7 +236,7 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 	{
 		convexFaces = 1;
 		ndBigVector p0(m_vertexPoints[pool[2]]);
-		for (ndInt32 j = 0; j < 3; j++)
+		for (ndInt32 j = 0; j < 3; ++j)
 		{
 			ndBigVector p1(m_vertexPoints[pool[j]]);
 			ndBigVector edge(p1 - p0);
@@ -273,7 +273,7 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 	}
 
 	ndInt32 indexAcc = 0;
-	for (ndInt32 j = 0; j < convexFaces; j++)
+	for (ndInt32 j = 0; j < convexFaces; ++j)
 	{
 		ndInt32 count1 = faces[j];
 		for (ndInt32 m = 0; m < count1; m++)
@@ -563,7 +563,7 @@ void ndPolygonSoupBuilder::End(bool optimize)
 			ndBigVector v1(&m_vertexPoints[ptr[1]].m_x);
 			ndBigVector e0(v1 - v0);
 			ndBigVector normal0(ndBigVector::m_zero);
-			for (ndInt32 j = 2; j < faceIndexCount - 1; j++)
+			for (ndInt32 j = 2; j < faceIndexCount - 1; ++j)
 			{
 				ndBigVector v2(&m_vertexPoints[ptr[j]].m_x);
 				ndBigVector e1(v2 - v0);

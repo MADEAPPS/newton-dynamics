@@ -216,7 +216,7 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 		ndMatrix matrix(m_offsets[base + i]);
 		const ndFloat32* const src = &matrix[0][0];
 		GLfloat* const dst = &matrixBuffer[i][0][0];
-		for (ndInt32 j = 0; j < 16; j++) 
+		for (ndInt32 j = 0; j < 16; ++j) 
 		{
 			dst[j] = GLfloat(src[j]);
 		}

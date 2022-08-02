@@ -206,7 +206,7 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 
 	ndMatrix rot(ndPitchMatrix(breakStep));
 	ndInt32 index = 0;
-	for (ndInt32 j = 0; j <= slices; j++)
+	for (ndInt32 j = 0; j <= slices; ++j)
 	{
 		ndVector p0(-m_height * ndCos(sliceAngle), ndFloat32(0.0f), m_radius + m_height * ndSin(sliceAngle), ndFloat32(0.0f));
 		sliceAngle += sliceStep;
@@ -225,7 +225,7 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 	index = 0;
-	for (ndInt32 j = 0; j < slices; j++)
+	for (ndInt32 j = 0; j < slices; ++j)
 	{
 		ndInt32 index0 = index + brakes - 1;
 		for (ndInt32 i = 0; i < brakes; ++i)

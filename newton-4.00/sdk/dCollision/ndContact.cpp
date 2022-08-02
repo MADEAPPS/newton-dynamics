@@ -466,7 +466,7 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;
 
-	for (ndInt32 k = 0; k < count; k++) 
+	for (ndInt32 k = 0; k < count; ++k) 
 	{
 		// note: using restitution been negative to indicate that the acceleration was override
 		ndRightHandSide* const rhs = &rightHandSide[k];

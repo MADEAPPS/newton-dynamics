@@ -185,7 +185,7 @@ namespace nd_
 						A.ScaleMantissa(&mantissaScale[i], a);
 
 						uint64_t carrier = 0;
-						for (int j = 0; j < 2 * VHACD_GOOGOL_SIZE; j++)
+						for (int j = 0; j < 2 * VHACD_GOOGOL_SIZE; ++j)
 						{
 							const int k = 2 * VHACD_GOOGOL_SIZE - 1 - j;
 							uint64_t m0 = mantissaAcc[k];
@@ -528,10 +528,10 @@ namespace nd_
 			for (int i = 0; i < 3; i++)
 			{
 				double cofactor[2][2];
-				for (int j = 0; j < 2; j++)
+				for (int j = 0; j < 2; ++j)
 				{
 					int k0 = 0;
-					for (int k = 0; k < 3; k++)
+					for (int k = 0; k < 3; ++k)
 					{
 						if (k != i)
 						{
@@ -567,10 +567,10 @@ namespace nd_
 			for (int i = 0; i < 3; i++)
 			{
 				Googol cofactor[2][2];
-				for (int j = 0; j < 2; j++)
+				for (int j = 0; j < 2; ++j)
 				{
 					int k0 = 0;
-					for (int k = 0; k < 3; k++)
+					for (int k = 0; k < 3; ++k)
 					{
 						if (k != i)
 						{

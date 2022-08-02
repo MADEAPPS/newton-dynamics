@@ -866,7 +866,7 @@ namespace nd_
 			
 								ConvexHullFace* const newFace = &newNode->GetInfo();
 								newFace->m_twin[1] = twinNode;
-								for (int k = 0; k < 3; k++)
+								for (int k = 0; k < 3; ++k)
 								{
 									if (twinFace->m_twin[k] == node1)
 									{
@@ -885,7 +885,7 @@ namespace nd_
 						ndNode* const nodeA = coneList[i];
 						ConvexHullFace* const faceA = &nodeA->GetInfo();
 						_ASSERT(faceA->m_mark == 0);
-						for (int j = i + 1; j < newCount; j++) 
+						for (int j = i + 1; j < newCount; ++j) 
 						{
 							ndNode* const nodeB = coneList[j];
 							ConvexHullFace* const faceB = &nodeB->GetInfo();
@@ -898,7 +898,7 @@ namespace nd_
 							}
 						}
 			
-						for (int j = i + 1; j < newCount; j++)
+						for (int j = i + 1; j < newCount; ++j)
 						{
 							ndNode* const nodeB = coneList[j];
 							ConvexHullFace* const faceB = &nodeB->GetInfo();

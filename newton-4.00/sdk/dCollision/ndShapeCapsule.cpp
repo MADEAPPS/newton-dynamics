@@ -111,7 +111,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	ndInt32 dx0 = ndInt32(ndFloor(DG_CAPSULE_SEGMENTS * ((m_p0.m_x + m_height + m_radius0) / m_radius0)) + ndFloat32(1.0f));
 	ndFloat32 step = m_radius0 / DG_CAPSULE_SEGMENTS;
 	ndFloat32 x0 = m_p0.m_x - step * dx0;
-	for (ndInt32 j = 0; j < dx0; j++) 
+	for (ndInt32 j = 0; j < dx0; ++j) 
 	{
 		x0 += step;
 		ndFloat32 x = x0 + m_height;
@@ -133,7 +133,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	ndFloat32 x1 = m_p1.m_x;
 	ndInt32 dx1 = ndInt32(ndFloor(DG_CAPSULE_SEGMENTS * ((m_height + m_radius1 - m_p1.m_x) / m_radius1)) + ndFloat32(1.0f));
 	step = m_radius1 / DG_CAPSULE_SEGMENTS;
-	for (ndInt32 j = 0; j < dx1; j++) 
+	for (ndInt32 j = 0; j < dx1; ++j) 
 	{
 		ndFloat32 x = x1 - m_height;
 		ndFloat32 arg = ndMax(m_radius1 * m_radius1 - x * x, ndFloat32(1.0e-3f));
@@ -163,7 +163,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	ndInt32 i1 = 0;
 	ndInt32 i0 = DG_CAPSULE_CAP_SEGMENTS - 1;
 	const ndInt32 n = index / DG_CAPSULE_CAP_SEGMENTS - 1;
-	for (ndInt32 j = 0; j < n; j++) 
+	for (ndInt32 j = 0; j < n; ++j) 
 	{
 		for (ndInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; ++i) 
 		{
@@ -299,7 +299,7 @@ void ndShapeCapsule::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debu
 		for (ndInt32 i = 0; i < count; i += 3) 
 		{
 			ndInt32 positive = 0;
-			for (ndInt32 j = 0; j < 3; j++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				if (tmpVectex[i + j].m_x > ndFloat32(0.0f)) 
 				{

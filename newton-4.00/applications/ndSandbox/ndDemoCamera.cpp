@@ -163,7 +163,7 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 	GLdouble projectionViewMatrix[16];
 	for (ndInt32 i = 0; i < 4; ++i) 
 	{
-		for (ndInt32 j = 0; j < 4; j++)
+		for (ndInt32 j = 0; j < 4; ++j)
 		{
 			modelViewMatrix[i * 4 + j] = m_viewMatrix[i][j];
 			projectionViewMatrix[i * 4 + j] = m_projectionMatrix[i][j];

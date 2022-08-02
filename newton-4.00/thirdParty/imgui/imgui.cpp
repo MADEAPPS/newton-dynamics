@@ -11971,7 +11971,7 @@ static const char* GetClipboardTextFn_DefaultImpl(void*)
         PasteboardGetItemIdentifier(main_clipboard, i + 1, &item_id);
         CFArrayRef flavor_type_array = 0;
         PasteboardCopyItemFlavors(main_clipboard, item_id, &flavor_type_array);
-        for (CFIndex j = 0, nj = CFArrayGetCount(flavor_type_array); j < nj; j++)
+        for (CFIndex j = 0, nj = CFArrayGetCount(flavor_type_array); j < nj; ++j)
         {
             CFDataRef cf_data;
             if (PasteboardCopyItemFlavorData(main_clipboard, item_id, CFSTR("public.utf8-plain-text"), &cf_data) == noErr)

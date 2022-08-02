@@ -124,7 +124,7 @@ namespace nd_
 					TMMTriangle& currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
 					if (currentTriangle.m_vertices[0]->GetData().m_name == sc_dummyIndex || currentTriangle.m_vertices[1]->GetData().m_name == sc_dummyIndex || currentTriangle.m_vertices[2]->GetData().m_name == sc_dummyIndex) {
 						m_trianglesToDelete.PushBack(m_mesh.m_triangles.GetHead());
-						for (int32_t k = 0; k < 3; k++) {
+						for (int32_t k = 0; k < 3; ++k) {
 							for (int32_t h = 0; h < 2; h++) {
 								if (currentTriangle.m_edges[k]->GetData().m_triangles[h] == m_mesh.m_triangles.GetHead()) {
 									currentTriangle.m_edges[k]->GetData().m_triangles[h] = 0;
@@ -250,7 +250,7 @@ namespace nd_
 					TMMTriangle& currentTriangle = m_mesh.m_triangles.GetHead()->GetData();
 					if (currentTriangle.m_vertices[0]->GetData().m_name == sc_dummyIndex || currentTriangle.m_vertices[1]->GetData().m_name == sc_dummyIndex || currentTriangle.m_vertices[2]->GetData().m_name == sc_dummyIndex) {
 						m_trianglesToDelete.PushBack(m_mesh.m_triangles.GetHead());
-						for (int32_t k = 0; k < 3; k++) {
+						for (int32_t k = 0; k < 3; ++k) {
 							for (int32_t h = 0; h < 2; h++) {
 								if (currentTriangle.m_edges[k]->GetData().m_triangles[h] == m_mesh.m_triangles.GetHead()) {
 									currentTriangle.m_edges[k]->GetData().m_triangles[h] = 0;
@@ -530,7 +530,7 @@ namespace nd_
 			do {
 				tmp = e->GetNext();
 				nvisible = 0;
-				for (int32_t k = 0; k < 2; k++) {
+				for (int32_t k = 0; k < 2; ++k) {
 					if (e->GetData().m_triangles[k]->GetData().m_visible) {
 						nvisible++;
 					}

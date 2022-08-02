@@ -108,7 +108,7 @@ static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const ndMatri
 	// place few instance of the same effect in the scene.
 	const ndInt32 count = 5;
 	const ndFloat32 z0 = location.m_posit.m_z;
-	for (ndInt32 j = 0; j < count; j++)
+	for (ndInt32 j = 0; j < count; ++j)
 	{
 		location.m_posit.m_z = z0;
 		for (ndInt32 i = 0; i < count; ++i)
@@ -139,7 +139,7 @@ static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const ndM
 
 	const ndInt32 count = 5;
 	const ndFloat32 z0 = location.m_posit.m_z;
-	for (ndInt32 j = 0; j < count; j++)
+	for (ndInt32 j = 0; j < count; ++j)
 	{
 		location.m_posit.m_z = z0;
 		for (ndInt32 i = 0; i < count; ++i)
@@ -170,7 +170,7 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const nd
 
 	const ndInt32 count = 5;
 	const ndFloat32 z0 = location.m_posit.m_z;
-	for (ndInt32 j = 0; j < count; j++)
+	for (ndInt32 j = 0; j < count; ++j)
 	{
 		location.m_posit.m_z = z0;
 		for (ndInt32 i = 0; i < count; ++i)

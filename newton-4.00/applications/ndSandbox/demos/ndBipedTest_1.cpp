@@ -284,7 +284,7 @@ class ndAiBipedTest_1 : public ndModel
 			if (minInertia < maxInertia * 0.125f)
 			{
 				minInertia = maxInertia * 0.125f;
-				for (ndInt32 j = 0; j < 3; j++)
+				for (ndInt32 j = 0; j < 3; ++j)
 				{
 					if (inertia[j] < minInertia)
 					{

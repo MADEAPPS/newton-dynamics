@@ -1147,7 +1147,7 @@ namespace nd_
 				// Ok, before we add this point, we do not want to create points which are extremely close to each other.
 				// This will result in tiny sliver triangles which are really bad for collision detection.
 				bool foundNearbyPoint = false;
-				for (uint32_t j = 0; j < outCount; j++)
+				for (uint32_t j = 0; j < outCount; ++j)
 				{
 					// If this new point is extremely close to an existing point, we do not add it!
 					double squaredDistance = outputPoints[j].GetDistanceSquared(outputPoint);

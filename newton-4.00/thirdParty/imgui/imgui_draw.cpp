@@ -1827,7 +1827,7 @@ void ImDrawData::DeIndexAllBuffers()
         if (cmd_list->IdxBuffer.empty())
             continue;
         new_vtx_buffer.resize(cmd_list->IdxBuffer.Size);
-        for (int j = 0; j < cmd_list->IdxBuffer.Size; j++)
+        for (int j = 0; j < cmd_list->IdxBuffer.Size; ++j)
             new_vtx_buffer[j] = cmd_list->VtxBuffer[cmd_list->IdxBuffer[j]];
         cmd_list->VtxBuffer.swap(new_vtx_buffer);
         cmd_list->IdxBuffer.resize(0);

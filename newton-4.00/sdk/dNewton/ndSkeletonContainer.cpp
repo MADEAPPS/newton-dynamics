@@ -752,7 +752,7 @@ void ndSkeletonContainer::ConditionMassMatrix() const
 			ndSpatialVector& a = forcePair[index].m_joint;
 
 			const ndInt32 count = node->m_dof;
-			for (ndInt32 k = 0; k < count; k++) 
+			for (ndInt32 k = 0; k < count; ++k) 
 			{
 				const ndFloat32 value = matrixRow10[entry0];
 				a[k] = value;
@@ -776,7 +776,7 @@ void ndSkeletonContainer::ConditionMassMatrix() const
 			const ndInt32 index = node->m_index;
 			const ndSpatialVector& f = forcePair[index].m_joint;
 			const ndInt32 count = node->m_dof;
-			for (ndInt32 k = 0; k < count; k++) 
+			for (ndInt32 k = 0; k < count; ++k) 
 			{
 				deltaForcePtr[entry1] = ndFloat32(f[k]);
 				entry1++;
@@ -796,7 +796,7 @@ void ndSkeletonContainer::RebuildMassMatrix(const ndFloat32* const diagDamp) con
 		ndFloat32* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
 
 		ndInt32 indexCount = 0;
-		for (ndInt32 k = 0; k < primaryCount; k++) 
+		for (ndInt32 k = 0; k < primaryCount; ++k) 
 		{
 			indexList[indexCount] = ndInt16(k);
 			indexCount += (matrixRow10[k] != ndFloat32(0.0f)) ? 1 : 0;
@@ -806,7 +806,7 @@ void ndSkeletonContainer::RebuildMassMatrix(const ndFloat32* const diagDamp) con
 		{
 			ndFloat32 offDiagonal = matrixRow11[j];
 			const ndFloat32* const row10 = &m_deltaForce[j * primaryCount];
-			for (ndInt32 k = 0; k < indexCount; k++) 
+			for (ndInt32 k = 0; k < indexCount; ++k) 
 			{
 				ndInt32 index = indexList[k];
 				offDiagonal += matrixRow10[index] * row10[index];
@@ -977,7 +977,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			{
 				const ndFloat32 s = row[j];
 				const ndFloat32* const x = &m_massMatrix11[j * m_auxiliaryRowCount + m_blockSize];
-				for (ndInt32 k = 0; k < boundedSize; k++) 
+				for (ndInt32 k = 0; k < boundedSize; ++k) 
 				{
 					acc[k] += s * x[k];
 				}
@@ -999,7 +999,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			{
 				const ndFloat32 s = m_massMatrix11[j * m_auxiliaryRowCount + i];
 				const ndFloat32* const x = &m_massMatrix11[j * m_auxiliaryRowCount + m_blockSize];
-				for (ndInt32 k = 0; k < boundedSize; k++) 
+				for (ndInt32 k = 0; k < boundedSize; ++k) 
 				{
 					acc[k] += s * x[k];
 				}
@@ -1159,7 +1159,7 @@ void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat3
 	ndInt32 iterCount = 0;
 	ndFloat32 tolerance(tol2 * ndFloat32(2.0f));
 	const ndFloat32* const invDiag = invDiag1;
-	for (ndInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++)
+	for (ndInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); ++k)
 	{
 		base = 0;
 		iterCount++;
@@ -1252,7 +1252,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 	ndInt32 iterCount = 0;
 	ndFloat32 tolerance(tol2 * ndFloat32(2.0f));
 	const ndFloat32* const invDiag = invDiag1;
-	for (ndInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++)
+	for (ndInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); ++k)
 	{
 		base = 0;
 		iterCount++;

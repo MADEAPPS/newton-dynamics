@@ -661,7 +661,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
 		ndBodyDynamic* const body0 = bodies[i];
-		for (ndInt32 j = i + 1; j < 8; j++)
+		for (ndInt32 j = i + 1; j < 8; ++j)
 		{
 			ndBodyDynamic* const body1 = bodies[j];
 			world->AddJoint(new ndJointFixDistance(body0->GetMatrix().m_posit, body1->GetMatrix().m_posit, body0, body1));

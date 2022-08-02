@@ -134,7 +134,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		weight[i].m_w = w.m_w * invMag;
 	
 		dAssert(skinBone[i].m_boneIndex[0] != -1);
-		for (ndInt32 j = 0; j < 4; j++) 
+		for (ndInt32 j = 0; j < 4; ++j) 
 		{
 			if (skinBone[i].m_boneIndex[j] != -1) 
 			{
@@ -192,7 +192,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
 
 		ndInt32 k = vertexIndex[i];
-		for (ndInt32 j = 0; j < 4; j++)
+		for (ndInt32 j = 0; j < 4; ++j)
 		{
 			points[i].m_weighs[j] = GLfloat(weight[k][j]);
 			points[i].m_boneIndex[j] = GLfloat(skinBone[k].m_boneIndex[j]);

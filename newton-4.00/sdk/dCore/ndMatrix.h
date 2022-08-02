@@ -246,7 +246,7 @@ inline bool ndMatrix::TestIdentity() const
 		{
 			return false;
 		}
-		for (ndInt32 j = i + 1; j < 4; j++) 
+		for (ndInt32 j = i + 1; j < 4; ++j) 
 		{
 			if (me[i][j] != ndFloat32 (0.0f)) 
 			{
@@ -267,7 +267,7 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 		const ndMatrix& me = *this;
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
-			for (ndInt32 j = 0; j < 4; j++)
+			for (ndInt32 j = 0; j < 4; ++j)
 			{
 				dAssert(dCheckFloat(me[i][j]));
 			}

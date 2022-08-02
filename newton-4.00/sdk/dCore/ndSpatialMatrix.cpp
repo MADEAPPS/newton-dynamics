@@ -41,7 +41,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 		if (pivot < ndFloat64(0.01f)) 
 		{
 			ndInt32 permute = i;
-			for (ndInt32 j = i + 1; j < rows; j++) 
+			for (ndInt32 j = i + 1; j < rows; ++j) 
 			{
 				ndFloat64 pivot1 = ndAbs(tmp[j][i]);
 				if (pivot1 > pivot) {
@@ -64,7 +64,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 
 			if (permute != i) 
 			{
-				for (ndInt32 j = 0; j < rows; j++) 
+				for (ndInt32 j = 0; j < rows; ++j) 
 				{
 					ndSwap(tmp[i][j], tmp[permute][j]);
 					ndSwap(tmp[i][j], tmp[permute][j]);
@@ -72,15 +72,15 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 			}
 		}
 
-		for (ndInt32 j = i + 1; j < rows; j++) 
+		for (ndInt32 j = i + 1; j < rows; ++j) 
 		{
 			ndFloat64 scale = tmp[j][i] / tmp[i][i];
 			tmp[j][i] = ndFloat64(0.0f);
-			for (ndInt32 k = i + 1; k < rows; k++) 
+			for (ndInt32 k = i + 1; k < rows; ++k) 
 			{
 				tmp[j][k] -= scale * tmp[i][k];
 			}
-			for (ndInt32 k = 0; k <= i; k++) 
+			for (ndInt32 k = 0; k <= i; ++k) 
 			{
 				inv[j][k] -= scale * inv[i][k];
 			}
@@ -90,16 +90,16 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 	for (ndInt32 i = rows - 1; i >= 0; i--) 
 	{
 		ndSpatialVector acc(ndFloat64(0.0f));
-		for (ndInt32 j = i + 1; j < rows; j++) 
+		for (ndInt32 j = i + 1; j < rows; ++j) 
 		{
 			ndFloat64 pivot = tmp[i][j];
-			for (ndInt32 k = 0; k < rows; k++) 
+			for (ndInt32 k = 0; k < rows; ++k) 
 			{
 				acc[k] += pivot * inv[j][k];
 			}
 		}
 		ndFloat64 den = ndFloat64(1.0f) / tmp[i][i];
-		for (ndInt32 k = 0; k < rows; k++) 
+		for (ndInt32 k = 0; k < rows; ++k) 
 		{
 			inv[i][k] = den * (inv[i][k] - acc[k]);
 		}
@@ -109,7 +109,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 #ifdef _DEBUG
 	for (ndInt32 i = 0; i < rows; ++i) 
 	{
-		for (ndInt32 j = 0; j < rows; j++) 
+		for (ndInt32 j = 0; j < rows; ++j) 
 		{
 			tmp[i][j] = m_rows[j][i];
 		}
@@ -119,7 +119,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 	{
 		ndSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
 		dAssert(ndAbs(v[i] - ndFloat64(1.0f)) < ndFloat64(1.0e-6f));
-		for (ndInt32 j = 0; j < rows; j++) 
+		for (ndInt32 j = 0; j < rows; ++j) 
 		{
 			if (j != i) 
 			{

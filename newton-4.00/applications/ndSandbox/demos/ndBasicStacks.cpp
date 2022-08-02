@@ -165,7 +165,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 	matrix.m_posit.m_y = y0;
 	matrix.m_posit.m_y -= 0.01f;
 
-	for (ndInt32 j = 0; j < count; j++) 
+	for (ndInt32 j = 0; j < count; ++j) 
 	{
 		matrix.m_posit.m_z = z0;
 		for (ndInt32 i = 0; i < (count - j); ++i) 

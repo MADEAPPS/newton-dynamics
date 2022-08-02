@@ -1652,7 +1652,7 @@ namespace nd
 						A.ScaleMantissa(&mantissaScale[i], a);
 
 						uint64_t carrier = 0;
-						for (int j = 0; j < 2 * VHACD_GOOGOL_SIZE; j++)
+						for (int j = 0; j < 2 * VHACD_GOOGOL_SIZE; ++j)
 						{
 							const int k = 2 * VHACD_GOOGOL_SIZE - 1 - j;
 							uint64_t m0 = mantissaAcc[k];
@@ -1995,10 +1995,10 @@ namespace nd
 			for (int i = 0; i < 3; i++)
 			{
 				double cofactor[2][2];
-				for (int j = 0; j < 2; j++)
+				for (int j = 0; j < 2; ++j)
 				{
 					int k0 = 0;
-					for (int k = 0; k < 3; k++)
+					for (int k = 0; k < 3; ++k)
 					{
 						if (k != i)
 						{
@@ -2034,10 +2034,10 @@ namespace nd
 			for (int i = 0; i < 3; i++)
 			{
 				Googol cofactor[2][2];
-				for (int j = 0; j < 2; j++)
+				for (int j = 0; j < 2; ++j)
 				{
 					int k0 = 0;
-					for (int k = 0; k < 3; k++)
+					for (int k = 0; k < 3; ++k)
 					{
 						if (k != i)
 						{
@@ -3344,7 +3344,7 @@ namespace nd
 			
 								ConvexHullFace* const newFace = &newNode->GetInfo();
 								newFace->m_twin[1] = twinNode;
-								for (int k = 0; k < 3; k++)
+								for (int k = 0; k < 3; ++k)
 								{
 									if (twinFace->m_twin[k] == node1)
 									{
@@ -3363,7 +3363,7 @@ namespace nd
 						ndNode* const nodeA = coneList[i];
 						ConvexHullFace* const faceA = &nodeA->GetInfo();
 						assert(faceA->m_mark == 0);
-						for (int j = i + 1; j < newCount; j++) 
+						for (int j = i + 1; j < newCount; ++j) 
 						{
 							ndNode* const nodeB = coneList[j];
 							ConvexHullFace* const faceB = &nodeB->GetInfo();
@@ -3376,7 +3376,7 @@ namespace nd
 							}
 						}
 			
-						for (int j = i + 1; j < newCount; j++)
+						for (int j = i + 1; j < newCount; ++j)
 						{
 							ndNode* const nodeB = coneList[j];
 							ConvexHullFace* const faceB = &nodeB->GetInfo();
@@ -8678,7 +8678,7 @@ public:
         std::vector< SVec3 > verts; // New verts for the new convex hull
         // Examine each vertex and see if it is within the voxel distance.
         // If it is, then replace the point with the shrinkwrapped / projected point
-        for (uint32_t j = 0; j < sourceConvexHull.mVertexCount; j++)
+        for (uint32_t j = 0; j < sourceConvexHull.mVertexCount; ++j)
         {
             double *p = &sourceConvexHull.mVertices[j * 3];
             if (doShrinkWrap)
@@ -10605,7 +10605,7 @@ public:
                 {
                     ConvexHull *chA = hulls[i];
 
-                    for (size_t j=0; j<i && !mCanceled; j++)
+                    for (size_t j=0; j<i && !mCanceled; ++j)
                     {
                         ConvexHull *chB = hulls[j];
 

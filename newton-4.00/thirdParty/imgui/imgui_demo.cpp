@@ -5599,7 +5599,7 @@ static void ShowDemoWindowColumns()
         while (clipper.Step())
         {
             for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < 10; ++j)
                 {
                     ImGui::Text("Line %d Column %d...", i, j);
                     ImGui::NextColumn();

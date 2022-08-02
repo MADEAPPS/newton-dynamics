@@ -1347,7 +1347,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 				#ifdef D_USE_EARLY_OUT_JOINT
 				ndVector maxAccel(accNorm);
-				for (ndInt32 k = 0; (k < 4) && (maxAccel.GetScalar() > tol2); k++)
+				for (ndInt32 k = 0; (k < 4) && (maxAccel.GetScalar() > tol2); ++k)
 				#else
 				for (ndInt32 k = 0; k < 4; ++k)
 				#endif

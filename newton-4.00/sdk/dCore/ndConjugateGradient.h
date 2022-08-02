@@ -57,7 +57,7 @@ class ndDefaultMatrixOperator
 		//dCholeskyFactorization(size, size, &A[0][0]);
 		//for (ndInt32 i = 2; i < 6; ++i)
 		//{
-		//	for (ndInt32 j = 0; j < i - 1; j++)
+		//	for (ndInt32 j = 0; j < i - 1; ++j)
 		//	{
 		//		A[i][j] = 0.0f;
 		//	}
@@ -65,7 +65,7 @@ class ndDefaultMatrixOperator
 
 		//for (ndInt32 i = 0; i < 6; ++i)
 		//{
-		//	for (ndInt32 j = i + 2; j < 6; j++)
+		//	for (ndInt32 j = i + 2; j < 6; ++j)
 		//	{
 		//		A[i][j] = 0.0f;
 		//		A[j][i] = 0.0f;
@@ -203,7 +203,7 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolera
 	ndInt32 iter = 0;
 	T num = dDotProduct(size, m_r0, m_p0);
 	T error2 = num;
-	for (ndInt32 j = 0; (j < size) && (error2 > tolerance); j++) 
+	for (ndInt32 j = 0; (j < size) && (error2 > tolerance); ++j) 
 	{
 		matrixOper.MatrixTimeVector(m_p0, m_z0);
 		T den = dDotProduct(size, m_p0, m_z0);

@@ -157,7 +157,7 @@ void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& 
 	ndMatrix contactMatrix(tmp * invInertia * tmp);
 	//for (ndInt32 i = 0; i < 3; ++i) 
 	//{
-	//	for (ndInt32 j = 0; j < 3; j++) 
+	//	for (ndInt32 j = 0; j < 3; ++j) 
 	//	{
 	//		contactMatrix[i][j] *= -ndFloat32(1.0f);
 	//	}

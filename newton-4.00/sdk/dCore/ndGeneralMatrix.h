@@ -54,10 +54,10 @@ void dMatrixTimeMatrix(ndInt32 size, const T* const matrixA, const T* const matr
 	{
 		const T* const rowA = &matrixA[i * size];
 		T* const rowOut = &out[i * size];
-		for (ndInt32 j = 0; j < size; j++) 
+		for (ndInt32 j = 0; j < size; ++j) 
 		{
 			T acc = T(0.0f);
-			for (ndInt32 k = 0; k < size; k++) 
+			for (ndInt32 k = 0; k < size; ++k) 
 			{
 				acc += rowA[k] * matrixB[k * size + j];
 			}
@@ -74,7 +74,7 @@ void dCovarianceMatrix(ndInt32 size, T* const matrix, const T* const vectorA, co
 	{
 		T scale(vectorA[i]);
 		T* const row = &matrix[stride];
-		for (ndInt32 j = 0; j < size; j++) 
+		for (ndInt32 j = 0; j < size; ++j) 
 		{
 			row[j] = scale * vectorB[j];
 		}
@@ -88,11 +88,11 @@ bool dCholeskyFactorizationAddRow(ndInt32, ndInt32 stride, ndInt32 n, T* const m
 	T* const rowN = &matrix[stride * n];
 
 	ndInt32 base = 0;
-	for (ndInt32 j = 0; j <= n; j++) 
+	for (ndInt32 j = 0; j <= n; ++j) 
 	{
 		T s(0.0f);
 		T* const rowJ = &matrix[base];
-		for (ndInt32 k = 0; k < j; k++) 
+		for (ndInt32 k = 0; k < j; ++k) 
 		{
 			s += rowN[k] * rowJ[k];
 		}
@@ -174,7 +174,7 @@ void dSolveCholesky(ndInt32 size, ndInt32 stride, const T* const choleskyMatrix,
 	{
 		T acc(0.0f);
 		const T* const row = &choleskyMatrix[rowStart];
-		for (ndInt32 j = 0; j < i; j++) 
+		for (ndInt32 j = 0; j < i; ++j) 
 		{
 			acc = acc + row[j] * x[j];
 		}
@@ -185,7 +185,7 @@ void dSolveCholesky(ndInt32 size, ndInt32 stride, const T* const choleskyMatrix,
 	for (ndInt32 i = size - 1; i >= 0; i--) 
 	{
 		T acc = 0.0f;
-		for (ndInt32 j = i + 1; j < size; j++) 
+		for (ndInt32 j = i + 1; j < size; ++j) 
 		{
 			acc = acc + choleskyMatrix[stride * j + i] * x[j];
 		}
@@ -207,7 +207,7 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 		const T* const rowI = &matrix[i * size];
 		ndInt32 m = i;
 		T maxVal (ndAbs(rowI[i]));
-		for (ndInt32 j = i + 1; j < size - 1; j++) 
+		for (ndInt32 j = i + 1; j < size - 1; ++j) 
 		{
 			T val (ndAbs(matrix[size * j + i]));
 			if (val > maxVal) 
@@ -226,7 +226,7 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 		{
 			T* const rowK = &matrix[m * size];
 			T* const rowJ = &matrix[i * size];
-			for (ndInt32 j = 0; j < size; j++) 
+			for (ndInt32 j = 0; j < size; ++j) 
 			{
 				ndSwap(rowK[j], rowJ[j]);
 			}
@@ -234,11 +234,11 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 		}
 
 		T den = T(1.0f) / rowI[i];
-		for (ndInt32 k = i + 1; k < size; k++) 
+		for (ndInt32 k = i + 1; k < size; ++k) 
 		{
 			T* const rowK = &matrix[size * k];
 			T factor(-rowK[i] * den);
-			for (ndInt32 j = i + 1; j < size; j++) 
+			for (ndInt32 j = i + 1; j < size; ++j) 
 			{
 				rowK[j] += rowI[j] * factor;
 			}
@@ -251,7 +251,7 @@ bool dSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 	{
 		T acc(0);
 		T* const rowI = &matrix[i * size];
-		for (ndInt32 j = i + 1; j < size; j++) 
+		for (ndInt32 j = i + 1; j < size; ++j) 
 		{
 			acc = acc + rowI[j] * b[j];
 		}
@@ -275,7 +275,7 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 		if (i > 1) 
 		{
 			T scale(0.0f);
-			for (ndInt32 k = 0; k < i; k++) 
+			for (ndInt32 k = 0; k < i; ++k) 
 			{
 				scale += ndAbs(rowI[k]);
 			}
@@ -286,7 +286,7 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 			} 
 			else 
 			{
-				for (ndInt32 k = 0; k < i; k++) 
+				for (ndInt32 k = 0; k < i; ++k) 
 				{
 					rowI[k] /= scale;
 					h += rowI[k] * rowI[k];
@@ -299,15 +299,15 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 				rowI[i - 1] = f - g;
 				f = T(0.0f);
 
-				for (ndInt32 j = 0; j < i; j++) 
+				for (ndInt32 j = 0; j < i; ++j) 
 				{
 					g = T(0.0f);
 					const T* const rowJ = &matrix[j * stride];
-					for (ndInt32 k = 0; k <= j; k++) 
+					for (ndInt32 k = 0; k <= j; ++k) 
 					{
 						g += rowJ[k] * rowI[k];
 					}
-					for (ndInt32 k = j + 1; k < i; k++) 
+					for (ndInt32 k = j + 1; k < i; ++k) 
 					{
 						g += matrix[k * stride + j] * rowI[k];
 					}
@@ -316,13 +316,13 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 				}
 
 				T hh(f / (h + h));
-				for (ndInt32 j = 0; j < i; j++) 
+				for (ndInt32 j = 0; j < i; ++j) 
 				{
 					T f1 (rowI[j]);
 					T g1(offDiag[j] - hh * f1);
 					offDiag[j] = g1;
 					T* const rowJ = &matrix[j * stride];
-					for (ndInt32 k = 0; k <= j; k++) 
+					for (ndInt32 k = 0; k <= j; ++k) 
 					{
 						rowJ[k] -= (f1 * offDiag[k] + g1 * rowI[k]);
 					}
@@ -351,7 +351,7 @@ void dEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symme
 		ndInt32 iter = 0;
 		do 
 		{
-			for (j = i; j < size - 1; j++) 
+			for (j = i; j < size - 1; ++j) 
 			{
   				T dd(ndAbs(eigenValues[j]) + ndAbs(eigenValues[j + 1]));
 				if (ndAbs(offDiag[j]) <= (T(1.e-6f) * dd)) 
@@ -470,7 +470,7 @@ void dGaussSeidelLcpSor(const ndInt32 size, const T* const matrix, T* const x, c
 #ifdef _DEBUG 
 		passes++;
 #endif
-		for (ndInt32 j = 0; j < size; j++) 
+		for (ndInt32 j = 0; j < size; ++j) 
 		{
 			const T* const row = &me[base];
 			T r(b[j] - dDotProduct(size, row, x));
@@ -506,13 +506,13 @@ void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const
 
 	u[size] = T(1.0f);
 	ndInt32 rowStart = 0;
-	for (ndInt32 j = 0; j < size; j++) 
+	for (ndInt32 j = 0; j < size; ++j) 
 	{
 		u[j] = x[j];
 		index[j] = normalIndex[j] ? j + normalIndex[j] : size;
 	}
 
-	for (ndInt32 j = 0; j < size; j++) 
+	for (ndInt32 j = 0; j < size; ++j) 
 	{
 		const T val = u[index[j]];
 		const T l = low[j] * val;
@@ -529,7 +529,7 @@ void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const
 	{
 		ndInt32 base = 0;
 		tolerance = T(0.0f);
-		for (ndInt32 j = 0; j < size; j++) 
+		for (ndInt32 j = 0; j < size; ++j) 
 		{
 			const T* const row = &me[base];
 			T r(b[j] - dDotProduct(size, row, u));
@@ -565,7 +565,7 @@ void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const
 #ifdef _DEBUG 
 		passes++;
 #endif
-		for (ndInt32 j = 0; j < size; j++) 
+		for (ndInt32 j = 0; j < size; ++j) 
 		{
 			const T* const row = &me[base];
 			T r(b[j] - dDotProduct(size, row, u));
@@ -592,7 +592,7 @@ void dGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const
 		}
 	}
 
-	for (ndInt32 j = 0; j < size; j++) 
+	for (ndInt32 j = 0; j < size; ++j) 
 	{
 		x[j] = u[j];
 	}
@@ -630,14 +630,14 @@ void dPermuteRows(ndInt32 size, ndInt32 i, ndInt32 j, T* const matrix, T* const 
 		T* const B = &matrix[size * j];
 		T* const invA = &choleskyMatrix[size * i];
 		T* const invB = &choleskyMatrix[size * j];
-		for (ndInt32 k = 0; k < size; k++) 
+		for (ndInt32 k = 0; k < size; ++k) 
 		{
 			ndSwap(A[k], B[k]);
 			ndSwap(invA[k], invB[k]);
 		}
 
 		ndInt32 stride = 0;
-		for (ndInt32 k = 0; k < size; k++) 
+		for (ndInt32 k = 0; k < size; ++k) 
 		{
 			ndSwap(matrix[stride + i], matrix[stride + j]);
 			stride += size;
@@ -686,7 +686,7 @@ void dHouseholderReflection(ndInt32 size, ndInt32 row, ndInt32 colum, T* const c
 		{
 			T* const rowI = &choleskyMatrix[size * i];
 			T mag2(0.0f);
-			for (ndInt32 j = i + 1; j <= colum; j++) 
+			for (ndInt32 j = i + 1; j <= colum; ++j) 
 			{
 				mag2 += rowI[j] * rowI[j];
 				reflection[j] = rowI[j];
@@ -697,22 +697,22 @@ void dHouseholderReflection(ndInt32 size, ndInt32 row, ndInt32 colum, T* const c
 
 				const T vMag2(mag2 + reflection[i] * reflection[i]);
 				const T den = T(2.0f) / vMag2;
-				for (ndInt32 j = i; j < size; j++) 
+				for (ndInt32 j = i; j < size; ++j) 
 				{
 					T acc(0.0f);
 					T* const rowJ = &choleskyMatrix[size * j];
-					for (ndInt32 k = i; k <= colum; k++) {
+					for (ndInt32 k = i; k <= colum; ++k) {
 						acc += rowJ[k] * reflection[k];
 					}
 					tmp[j] = acc;
 				}
 
-				for (ndInt32 j = i + 1; j < size; j++) 
+				for (ndInt32 j = i + 1; j < size; ++j) 
 				{
 					rowI[j] = T(0.0f);
 					T* const rowJ = &choleskyMatrix[size * j];
 					const T a = tmp[j] * den;
-					for (ndInt32 k = i; k <= colum; k++) 
+					for (ndInt32 k = i; k <= colum; ++k) 
 					{
 						rowJ[k] -= a * reflection[k];
 					}
@@ -722,7 +722,7 @@ void dHouseholderReflection(ndInt32 size, ndInt32 row, ndInt32 colum, T* const c
 
 			if (rowI[i] < T(0.0f)) 
 			{
-				for (ndInt32 k = i; k < size; k++) 
+				for (ndInt32 k = i; k < size; ++k) 
 				{
 					choleskyMatrix[size * k + i] = -choleskyMatrix[size * k + i];
 				}
@@ -762,7 +762,7 @@ void dCholeskyUpdate(ndInt32 size, ndInt32 row, ndInt32 colum, T* const cholesky
 
 	for (dInt32 i = 0; i < size; ++i) 
 	{
-		for (dInt32 j = 0; j < size; j++) 
+		for (dInt32 j = 0; j < size; ++j) 
 		{
 			T err = psdMatrixCopy[i*size + j] - choleskyMatrix[i*size + j];
 			dAssert(dAbs(err) < T(1.0e-4f));
@@ -1121,13 +1121,13 @@ bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* co
 			{
 				T* const A = &symmetricMatrixPSD [size * i];
 				T* const B = &symmetricMatrixPSD [size * j];
-				for (ndInt32 k = 0; k < size; k++) 
+				for (ndInt32 k = 0; k < size; ++k) 
 				{
 					ndSwap(A[k], B[k]);
 				}
 
 				ndInt32 stride = 0;
-				for (ndInt32 k = 0; k < size; k++) 
+				for (ndInt32 k = 0; k < size; ++k) 
 				{
 					ndSwap(symmetricMatrixPSD [stride + i], symmetricMatrixPSD [stride + j]);
 					stride += size;
@@ -1167,7 +1167,7 @@ bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* co
 		{
 			T* const g = &a10[i * unboundedSize];
 			const T* const row = &symmetricMatrixPSD [(unboundedSize + i) * size];
-			for (ndInt32 j = 0; j < unboundedSize; j++) 
+			for (ndInt32 j = 0; j < unboundedSize; ++j) 
 			{
 				g[j] = -row[j];
 			}
@@ -1176,7 +1176,7 @@ bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* co
 			T* const arow = &a11[i * boundedSize];
 			const T* const row2 = &symmetricMatrixPSD[(unboundedSize + i) * size];
 			arow[i] = row2[unboundedSize + i] + dDotProduct(unboundedSize, g, row2);
-			for (ndInt32 j = i + 1; j < boundedSize; j++) 
+			for (ndInt32 j = i + 1; j < boundedSize; ++j) 
 			{
 				const T* const row1 = &symmetricMatrixPSD [(unboundedSize + j) * size];
 				T elem = row1[unboundedSize + i] + dDotProduct(unboundedSize, g, row1);
@@ -1196,7 +1196,7 @@ bool dSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* co
 				const T s = u[i];
 				x[unboundedSize + i] = s;
 				const T* const g = &a10[i * unboundedSize];
-				for (ndInt32 j = 0; j < unboundedSize; j++) 
+				for (ndInt32 j = 0; j < unboundedSize; ++j) 
 				{
 					x[j] += g[j] * s;
 				}

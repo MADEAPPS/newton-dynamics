@@ -40,7 +40,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 					ndInt32 pointCount = 0;
 					for (ndInt32 i = 0; i < m_count; ++i)
 					{
-						for (ndInt32 j = 0; j < plane.m_count; j++)
+						for (ndInt32 j = 0; j < plane.m_count; ++j)
 						{
 							pointCloud2d[pointCount] = plane2d.m_polygon[i] - matrix.TransformVector(plane.m_polygon[j]);
 							pointCount++;
@@ -50,7 +50,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 					pointCount = dConvexHull2d(pointCloud2d, pointCount);
 
 					ndInt32 k0 = pointCount - 1;
-					for (ndInt32 k = 0; k < pointCount; k++)
+					for (ndInt32 k = 0; k < pointCount; ++k)
 					{
 						const ndVector e0(ndVector::m_zero - pointCloud2d[k0]);
 						const ndVector e1(pointCloud2d[k] - pointCloud2d[k0]);
@@ -125,12 +125,12 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 			matrix = matrix.Inverse();
 
 			ndFaceInfo transformedFace;
-			for (ndInt32 j = 0; j < face0.m_count; j++)
+			for (ndInt32 j = 0; j < face0.m_count; ++j)
 			{
 				transformedFace.m_polygon[j] = matrix.TransformVector(face0.m_polygon[j]);
 			}
 
-			for (ndInt32 j = 0; j < siblingDataBase.m_count; j++)
+			for (ndInt32 j = 0; j < siblingDataBase.m_count; ++j)
 			{
 				const ndFaceInfo& face1 = siblingDataBase.m_polygons[j];
 				if (face0.CheckCoplanal(face1, matrix, transformedFace))

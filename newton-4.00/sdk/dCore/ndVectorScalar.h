@@ -378,8 +378,7 @@ class ndVector
 			(m_z <= data.m_z) ? ndInt32 (0xffffffff) : 0,
 			(m_w <= data.m_w) ? ndInt32 (0xffffffff) : 0);
 	}
-
-
+	
 	// logical operations
 	inline ndVector operator& (const ndVector& data) const
 	{

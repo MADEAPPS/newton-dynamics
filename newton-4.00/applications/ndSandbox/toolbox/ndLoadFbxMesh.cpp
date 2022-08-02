@@ -198,7 +198,7 @@ static ndMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix)
 	ndMatrix matrix;
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
-		for (ndInt32 j = 0; j < 4; j++)
+		for (ndInt32 j = 0; j < 4; ++j)
 		{
 			matrix[i][j] = ndFloat32 (fbxMatrix.m[i * 4 + j]);
 		}
@@ -443,7 +443,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
 				const ndInt32* const indices = fbxCluster->getIndices();
 				const double* const weights = fbxCluster->getWeights();
-				for (ndInt32 j = 0; j < clusterIndexCount; j++)
+				for (ndInt32 j = 0; j < clusterIndexCount; ++j)
 				{
 					cluster->m_vertexIndex.PushBack(indices[j]);
 					cluster->m_vertexWeigh.PushBack(ndFloat32 (weights[j]));

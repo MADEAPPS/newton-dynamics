@@ -250,7 +250,7 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 	const ndFloat32 dt = desc->m_timestep;
 	const ndFloat32 ks = D_POS_DAMP * ndFloat32(0.5f);
 	const ndFloat32 kd = D_VEL_DAMP * ndFloat32(4.0f);
-	for (ndInt32 k = 0; k < desc->m_rowsCount; k++)
+	for (ndInt32 k = 0; k < desc->m_rowsCount; ++k)
 	{
 		if (m_rowIsMotor & (1 << k))
 		{

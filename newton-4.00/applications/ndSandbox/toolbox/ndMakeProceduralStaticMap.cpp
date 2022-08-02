@@ -94,7 +94,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 				{
 					ndVector points[32];
 					ndInt32 vCount = faceList[i];
-					for (ndInt32 j = 0; j < vCount; j++)
+					for (ndInt32 j = 0; j < vCount; ++j)
 					{
 						ndInt32 k = indexListList[index + j];
 						points[j] = myMatrix.TransformVector(vertex[k]);
