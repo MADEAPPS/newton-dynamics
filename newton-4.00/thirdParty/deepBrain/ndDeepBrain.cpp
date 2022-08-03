@@ -35,13 +35,13 @@ ndDeepBrain::~ndDeepBrain()
 {
 	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
 	{
-		dAssert(0);
 		delete m_layers[i];
 	}
 }
 
 void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
+	dAssert(!m_layers.GetCount() || (m_layers[m_layers.GetCount() - 1]->GetNeurons().GetCount() == layer->GetInputSize()));
 	m_workingVector.SetCount(ndMax (layer->GetInputSize(), m_workingVector.GetCount()));
 	m_layers.PushBack(layer);
 }

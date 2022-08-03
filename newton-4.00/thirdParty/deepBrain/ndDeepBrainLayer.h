@@ -33,7 +33,8 @@ class ndDeepBrainLayer: public ndClassAlloc
 	{
 		m_relu,
 		m_tanh,
-		m_sigmoid
+		m_sigmoid,
+		m_softmax
 	};
 
 	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ActivationType type);

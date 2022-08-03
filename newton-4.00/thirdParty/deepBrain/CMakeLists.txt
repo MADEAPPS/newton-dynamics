@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "deepBrain")
+set (projectName "ndDeepBrain")
 message (${projectName})
 
 include_directories(../../sdk/dCore)

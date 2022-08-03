@@ -215,6 +215,10 @@ void Test1__()
 void Test2__()
 {
 	ndDeepBrain neuralNet;
+
+	neuralNet.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
+	neuralNet.AddLayer(16, 16, ndDeepBrainLayer::m_relu);
+	neuralNet.AddLayer(16, 10, ndDeepBrainLayer::m_softmax);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

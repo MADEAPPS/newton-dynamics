@@ -40,7 +40,6 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 {
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
-		dAssert(0);
 		delete m_neurons[i];
 	}
 }

@@ -58,7 +58,7 @@ endif(NEWTON_TEST_NEW_V_HACD)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} ndNewton deepBrain vhacd openfbx glfw imgui glatter)
+target_link_libraries (${projectName} ndNewton ndDeepBrain vhacd openfbx glfw imgui glatter)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
