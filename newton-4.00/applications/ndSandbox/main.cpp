@@ -41,10 +41,27 @@ void operator delete (void* ptr) noexcept
 	ndMemory::Free(ptr);
 }
 
-class CheckMemoryLeaks
+class LeakEntry
+{
+	public:
+	void* ptr;
+	ndUnsigned32 m_index;
+};
+
+class ndLeakAllocator
+{
+	public:
+	ndLeakAllocator();
+	void* operator new (size_t size);
+	void operator delete (void* ptr);
+};
+
+
+class CheckMemoryLeaks: public ndTree<ndUnsigned32, void*, ndLeakAllocator>
 {
 	public:
 	CheckMemoryLeaks()
+//		:ndLeakAllocator()
 	{
 		#if defined(_DEBUG) && defined(_MSC_VER)
 			// Track all memory leaks at the operating system level.
