@@ -37,8 +37,11 @@ class ndDeepBrain: public ndClassAlloc
 
 	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
 
+	void FowardPass();
+
 	protected:
-	ndDeepBrainVector m_workingVector;
+	ndDeepBrainVector m_inputs;
+	ndDeepBrainVector m_outputs;
 	ndArray<ndDeepBrainLayer*> m_layers;
 };
 

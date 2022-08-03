@@ -31,6 +31,7 @@ class ndDeepBrainVector: public ndArray<ndFloat32>
 	ndDeepBrainVector();
 	~ndDeepBrainVector();
 
+	void SetValue(ndFloat32 value);
 	void RandomShuffle();
 	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
 };

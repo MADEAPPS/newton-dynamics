@@ -44,10 +44,13 @@ class ndDeepBrainLayer: public ndClassAlloc
 	ndArray<ndDeepBrainNeuron*>& GetNeurons();
 
 	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
+	void FowardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
-	ActivationType m_type;
-	ndDeepBrainVector m_ouputs;
+	void ReluActivation(ndDeepBrainVector& output);
+	void SigmoidActivation(ndDeepBrainVector& output);
+
+	ActivationType m_activation;
 	ndArray<ndDeepBrainNeuron*> m_neurons;
 };
 

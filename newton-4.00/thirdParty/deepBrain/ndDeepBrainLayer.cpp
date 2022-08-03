@@ -22,13 +22,11 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
 
-ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ActivationType type)
+ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ActivationType activation)
 	:ndClassAlloc()
-	,m_type(type)
-	,m_ouputs()
+	,m_activation(activation)
 	,m_neurons()
 {
-	m_ouputs.SetCount(outputCount);
 	for (ndInt32 i = 0; i < outputCount; ++i)
 	{
 		ndDeepBrainNeuron* const neuron = new ndDeepBrainNeuron(inputCount);
@@ -61,4 +59,47 @@ void ndDeepBrainLayer::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
 	{
 		m_neurons[i]->InitGaussianWeights(mean, variance);
 	}
+}
+
+void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output)
+{
+	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	{
+		output[i] = ndMax(ndFloat32(0.0f), output[i]);
+	}
+}
+
+void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
+{
+	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	{
+		//output[i] = ndMax(ndFloat32(0.0f), output[i]);
+	}
+}
+
+void ndDeepBrainLayer::FowardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+{
+	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	{
+		output[i] = m_neurons[i]->FowardPass(input);
+	}
+
+	switch (m_activation)
+	{
+		case m_relu:
+		{
+			ReluActivation(output);
+			break;
+		}
+
+		case m_sigmoid:
+		{
+			SigmoidActivation(output);
+			break;
+		}
+
+		default:
+			dAssert(0);
+	}
+
 }

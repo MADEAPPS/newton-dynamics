@@ -32,6 +32,14 @@ ndDeepBrainVector::~ndDeepBrainVector()
 {
 }
 
+void ndDeepBrainVector::SetValue(ndFloat32 value)
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i] = value;
+	}
+}
+
 void ndDeepBrainVector::RandomShuffle()
 {
 	const ndUnsigned32 size = GetCount();

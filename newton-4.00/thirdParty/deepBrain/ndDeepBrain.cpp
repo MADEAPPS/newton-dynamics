@@ -26,7 +26,8 @@
 
 ndDeepBrain::ndDeepBrain()
 	:ndClassAlloc()
-	,m_workingVector()
+	,m_inputs()
+	,m_outputs()
 	,m_layers()
 {
 }
@@ -42,7 +43,10 @@ ndDeepBrain::~ndDeepBrain()
 void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
 	dAssert(!m_layers.GetCount() || (m_layers[m_layers.GetCount() - 1]->GetNeurons().GetCount() == layer->GetInputSize()));
-	m_workingVector.SetCount(ndMax (layer->GetInputSize(), m_workingVector.GetCount()));
+	m_inputs.SetCount(ndMax (layer->GetInputSize(), m_inputs.GetCount()));
+	m_outputs.SetCount(m_inputs.GetCount());
+	m_inputs.SetValue(0.0f);
+	m_outputs.SetValue(0.0f);
 	m_layers.PushBack(layer);
 }
 
@@ -57,4 +61,14 @@ void ndDeepBrain::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
 	{
 		m_layers[i]->InitGaussianWeights(mean, variance);
 	}
+}
+
+void ndDeepBrain::FowardPass()
+{
+	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
+	{
+		m_layers[i]->FowardPass(m_inputs, m_outputs);
+		m_inputs.Swap(m_outputs);
+	}
+	m_inputs.Swap(m_outputs);
 }
