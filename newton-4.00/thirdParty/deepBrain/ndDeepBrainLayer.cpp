@@ -54,3 +54,11 @@ ndArray<ndDeepBrainNeuron*>& ndDeepBrainLayer::GetNeurons()
 {
 	return m_neurons;
 }
+
+void ndDeepBrainLayer::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+{
+	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	{
+		m_neurons[i]->InitGaussianWeights(mean, variance);
+	}
+}

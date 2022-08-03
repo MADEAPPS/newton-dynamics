@@ -33,6 +33,7 @@ class ndDeepBrainNeuron : public ndClassAlloc
 	~ndDeepBrainNeuron();
 
 	ndDeepBrainVector& GetWeights();
+	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
 
 	protected:
 	ndFloat32 m_weight0;

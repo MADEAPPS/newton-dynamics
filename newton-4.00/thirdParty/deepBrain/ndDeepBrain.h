@@ -35,6 +35,8 @@ class ndDeepBrain: public ndClassAlloc
 	void AddLayer(ndDeepBrainLayer* const layer);
 	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
 
+	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
+
 	protected:
 	ndDeepBrainVector m_workingVector;
 	ndArray<ndDeepBrainLayer*> m_layers;

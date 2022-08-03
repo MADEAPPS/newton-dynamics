@@ -39,3 +39,12 @@ ndDeepBrainVector& ndDeepBrainNeuron::GetWeights()
 {
 	return m_weights;
 }
+
+void ndDeepBrainNeuron::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+{
+	m_weight0 = ndGaussianRandom(mean, variance);
+	for (ndInt32 i = 0; i < m_weights.GetCount(); ++i)
+	{
+		m_weights[i] = ndGaussianRandom(mean, variance);
+	}
+}

@@ -43,6 +43,8 @@ class ndDeepBrainLayer: public ndClassAlloc
 	ndInt32 GetInputSize() const ;
 	ndArray<ndDeepBrainNeuron*>& GetNeurons();
 
+	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
+
 	protected:
 	ActivationType m_type;
 	ndDeepBrainVector m_ouputs;
