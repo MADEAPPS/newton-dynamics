@@ -12,25 +12,77 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntityManager.h"
 
+class ndLeakTrackerAllocator
+{
+	public:
+	ndLeakTrackerAllocator()
+	{
+	}
+
+	void* operator new (size_t size)
+	{
+		void* const mem = malloc(size);
+		return mem;
+	}
+
+	void operator delete (void* ptr)
+	{
+		free(ptr);
+	}
+};
+
+class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTrackerAllocator>
+{
+	public:
+	ApplicationMemoryLeakTracket()
+		:ndTree<ndUnsigned64, void*, ndLeakTrackerAllocator>()
+		,m_allocIndex(0)
+	{
+	}
+
+	~ApplicationMemoryLeakTracket()
+	{
+		dAssert(!GetCount());
+	}
+
+	static ApplicationMemoryLeakTracket& GetLeakTracker()
+	{
+		static ApplicationMemoryLeakTracket leakTracker;
+		return leakTracker;
+	}
+
+	ndUnsigned64 m_allocIndex;
+};
+
+// memory free use by the engine
+static void PhysicsFree(void* ptr)
+{
+#ifdef _DEBUG
+	ApplicationMemoryLeakTracket& leakTracker = ApplicationMemoryLeakTracket::GetLeakTracker();
+	dAssert(leakTracker.Find(ptr));
+	leakTracker.Remove(ptr);
+#endif
+
+	free(ptr);
+}
+
 // memory allocation for Newton
 static void* PhysicsAlloc(size_t sizeInBytes)
 {
 	void* const ptr = malloc(sizeInBytes);
 	dAssert(ptr);
+
+#ifdef _DEBUG
+	ApplicationMemoryLeakTracket& leakTracker = ApplicationMemoryLeakTracket::GetLeakTracker();
+	leakTracker.Insert(leakTracker.m_allocIndex, ptr);
+	leakTracker.m_allocIndex++;
+#endif
+	
 	return ptr;
 }
 
-// memory free use by the engine
-static void PhysicsFree(void* ptr)
+void* operator new (size_t size)
 {
-	free(ptr);
-}
-
-void *operator new (size_t size)
-{
-	// this should not happens on this test
-	// newton should never use global operator new and delete.
-	//dAssert(0);
 	void* const ptr = ndMemory::Malloc(size);
 	dAssert((ndUnsigned64(ptr) & (0x1f)) == 0);
 	return ptr;
@@ -41,53 +93,15 @@ void operator delete (void* ptr) noexcept
 	ndMemory::Free(ptr);
 }
 
-class LeakEntry
+class ndSetAllocators
 {
 	public:
-	void* ptr;
-	ndUnsigned32 m_index;
-};
-
-class ndLeakAllocator
-{
-	public:
-	ndLeakAllocator();
-	void* operator new (size_t size);
-	void operator delete (void* ptr);
-};
-
-
-class CheckMemoryLeaks: public ndTree<ndUnsigned32, void*, ndLeakAllocator>
-{
-	public:
-	CheckMemoryLeaks()
-//		:ndLeakAllocator()
+	ndSetAllocators()
 	{
-		#if defined(_DEBUG) && defined(_MSC_VER)
-			// Track all memory leaks at the operating system level.
-			// make sure no Newton tool or utility leaves leaks behind.
-			ndUnsigned32 flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
-			flags = flags | _CRTDBG_REPORT_FLAG;
-			flags = flags | _CRTDBG_CHECK_EVERY_1024_DF;
-			_CrtSetDbgFlag(flags);
-			//_CrtSetBreakAlloc (2488);
-		#endif
-
-		atexit(CheckMemoryLeaksCallback);
-		// Set the memory allocation function before creation the newton world
-		// this is the only function that can be called before the creation of the newton world.
-		// it should be called once, and the the call is optional 
 		ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 	}
-
-	static void CheckMemoryLeaksCallback()
-	{
-		#if defined(_DEBUG) && defined(_MSC_VER)
-			_CrtDumpMemoryLeaks();
-		#endif
-	}
 };
-static CheckMemoryLeaks checkLeaks;
+static ndSetAllocators setAllocators;
 
 int main(int, char**)
 {
