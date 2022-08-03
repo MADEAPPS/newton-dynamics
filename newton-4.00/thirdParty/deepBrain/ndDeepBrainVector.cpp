@@ -34,10 +34,10 @@ ndDeepBrainVector::~ndDeepBrainVector()
 
 void ndDeepBrainVector::RandomShuffle()
 {
-	const ndInt32 size = GetCount();
-	for (ndInt32 i = size - 1; i >= 0; --i)
+	const ndUnsigned32 size = GetCount();
+	for (ndUnsigned32 i = size - 1; i >= 0; --i)
 	{
-		ndInt32 j = ndRandInt() % size;
+		ndUnsigned32 j = ndRandInt() % size;
 		ndSwap((*this)[i], (*this)[j]);
 	}
 }

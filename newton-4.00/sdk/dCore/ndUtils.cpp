@@ -40,7 +40,7 @@ void ndSetRandSeed(ndUnsigned32 seed)
 	___dRandSeed___ = seed;
 }
 
-ndInt32 ndRandInt()
+ndUnsigned32 ndRandInt()
 {
 	___dRandSeed___ = D_RAND_MUL * ___dRandSeed___ + D_ADD_ADD;
 	return ___dRandSeed___ & D_MAX_RAND;
