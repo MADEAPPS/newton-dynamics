@@ -32,3 +32,20 @@ ndDeepBrainVector::~ndDeepBrainVector()
 {
 }
 
+void ndDeepBrainVector::RandomShuffle()
+{
+	const ndInt32 size = GetCount();
+	for (ndInt32 i = size - 1; i >= 0; --i)
+	{
+		ndInt32 j = ndRandInt() % size;
+		ndSwap((*this)[i], (*this)[j]);
+	}
+}
+
+void ndDeepBrainVector::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
+	{
+		(*this)[i] = ndGaussianRandom(mean, variance);
+	}
+}
