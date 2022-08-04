@@ -55,7 +55,7 @@ ndArray<ndDeepBrainNeuron*>& ndDeepBrainLayer::GetNeurons()
 
 void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
 		m_neurons[i]->InitGaussianWeights(mean, variance);
 	}
@@ -63,7 +63,7 @@ void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 
 void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output)
 {
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] = ndMax(ndReal(0.0f), output[i]);
 	}
@@ -71,7 +71,7 @@ void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output)
 
 void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
 {
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] = 1.0f / (1.0f + ndReal (ndPow (ndEXP, -output[i])));
 	}
@@ -79,7 +79,7 @@ void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
 
 void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output)
 {
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal positivePow = ndReal(ndPow(ndEXP, output[i]));
 		ndReal negativePow = ndReal(ndPow(ndEXP, -output[i]));
@@ -90,7 +90,7 @@ void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output)
 void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 {
 	ndReal acc = 0.0f;
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] = ndReal(ndPow(ndEXP, output[i]));
 		acc += output[i];
@@ -98,16 +98,15 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 
 	dAssert(acc > 0.0f);
 	ndReal invAcc = 1.0f / acc;
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] *= invAcc;
 	}
 }
 
-
 void ndDeepBrainLayer::FowardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = m_neurons.GetCount()-1; i >= 0; --i)
 	{
 		output[i] = m_neurons[i]->FowardPass(input);
 	}
@@ -141,5 +140,44 @@ void ndDeepBrainLayer::FowardPass(const ndDeepBrainVector& input, ndDeepBrainVec
 		default:
 			dAssert(0);
 	}
+}
 
+void ndDeepBrainLayer::BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+{
+	dAssert(0);
+	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	{
+		//output[i] = m_neurons[i]->FowardPass(input);
+	}
+
+	dAssert(0);
+	//switch (m_activation)
+	//{
+	//	case m_relu:
+	//	{
+	//		ReluActivation(output);
+	//		break;
+	//	}
+	//
+	//	case m_tanh:
+	//	{
+	//		HyperbolicTanActivation(output);
+	//		break;
+	//	}
+	//
+	//	case m_sigmoid:
+	//	{
+	//		SoftmaxActivation(output);
+	//		break;
+	//	}
+	//
+	//	case m_softmax:
+	//	{
+	//		SoftmaxActivation(output);
+	//		break;
+	//	}
+	//
+	//	default:
+	//		dAssert(0);
+	//}
 }

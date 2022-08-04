@@ -45,6 +45,7 @@ class ndDeepBrainLayer: public ndClassAlloc
 
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 	void FowardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+	void BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
 	void ReluActivation(ndDeepBrainVector& output);

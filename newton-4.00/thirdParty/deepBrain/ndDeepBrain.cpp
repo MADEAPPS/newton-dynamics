@@ -72,3 +72,13 @@ void ndDeepBrain::FowardPass()
 	}
 	m_inputs.Swap(m_outputs);
 }
+
+void ndDeepBrain::BackwardPass()
+{
+	for (ndInt32 i = m_layers.GetCount()-1; i >= 0; --i)
+	{
+		m_layers[i]->FowardPass(m_inputs, m_outputs);
+		m_inputs.Swap(m_outputs);
+	}
+	//m_inputs.Swap(m_outputs);
+}

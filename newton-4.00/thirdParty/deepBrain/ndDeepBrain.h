@@ -38,6 +38,7 @@ class ndDeepBrain: public ndClassAlloc
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
 	void FowardPass();
+	void BackwardPass();
 
 	protected:
 	ndDeepBrainVector m_inputs;

@@ -216,6 +216,9 @@ void Test2__()
 {
 	ndDeepBrain neuralNet;
 	
+#if 1
+
+#else
 	neuralNet.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
 	neuralNet.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
 	neuralNet.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
@@ -225,8 +228,8 @@ void Test2__()
 
 	//ndDeepBrainVector input;
 	//input.SetCount(784);
-
 	neuralNet.FowardPass();
+#endif
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
