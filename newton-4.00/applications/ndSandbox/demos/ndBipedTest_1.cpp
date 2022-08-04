@@ -344,11 +344,15 @@ class ndAiBipedTest_1 : public ndModel
 
 			case ndAiBipedTest_1_Definition::m_doubleHinge:
 			{
-				ndIkJointDoubleHinge* const joint = new ndIkJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+				//ndIkJointDoubleHinge* const joint = new ndIkJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+				ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
 				ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
 				//joint->SetLimitState(true);
 				//joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+
+				joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
+				joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
 				return joint;
 			}
 
@@ -372,6 +376,7 @@ class ndAiBipedTest_1 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
+		m_rootBody->SetSleepState(false);
 		const ndVector frontVector(m_rootBody->GetMatrix().m_front);
 		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
@@ -411,6 +416,12 @@ class ndAiBipedTest_1 : public ndModel
 
 		ImGui::Text("swivel");
 		change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+
+		ndEffectorInfo& info1 = m_effectors[1];
+		info1.m_x = info.m_x;
+		info1.m_y = info.m_y;
+		info1.m_z = info.m_z;
+		info1.m_swivel = info.m_swivel;
 
 		if (change)
 		{
