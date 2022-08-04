@@ -227,11 +227,10 @@ void Test2__()
 	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
 
 	traning.Train();
-	
 
 	//ndDeepBrainVector input;
 	//input.SetCount(784);
-	brain.FowardPass();
+	//brain.FowardPass();
 #endif
 }
 

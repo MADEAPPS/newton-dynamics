@@ -105,11 +105,11 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 	}
 }
 
-void ndDeepBrainLayer::FowardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndDeepBrainLayer::Predict(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
 	for (ndInt32 i = m_neurons.GetCount()-1; i >= 0; --i)
 	{
-		output[i] = m_neurons[i]->FowardPass(input);
+		output[i] = m_neurons[i]->Predict(input);
 	}
 
 	switch (m_activation)
@@ -143,42 +143,42 @@ void ndDeepBrainLayer::FowardPass(const ndDeepBrainVector& input, ndDeepBrainVec
 	}
 }
 
-void ndDeepBrainLayer::BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output)
-{
-	dAssert(0);
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
-	{
-		//output[i] = m_neurons[i]->FowardPass(input);
-	}
-
-	dAssert(0);
-	//switch (m_activation)
-	//{
-	//	case m_relu:
-	//	{
-	//		ReluActivation(output);
-	//		break;
-	//	}
-	//
-	//	case m_tanh:
-	//	{
-	//		HyperbolicTanActivation(output);
-	//		break;
-	//	}
-	//
-	//	case m_sigmoid:
-	//	{
-	//		SoftmaxActivation(output);
-	//		break;
-	//	}
-	//
-	//	case m_softmax:
-	//	{
-	//		SoftmaxActivation(output);
-	//		break;
-	//	}
-	//
-	//	default:
-	//		dAssert(0);
-	//}
-}
+//void ndDeepBrainLayer::BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+//{
+//	dAssert(0);
+//	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+//	{
+//		//output[i] = m_neurons[i]->FowardPass(input);
+//	}
+//
+//	dAssert(0);
+//	//switch (m_activation)
+//	//{
+//	//	case m_relu:
+//	//	{
+//	//		ReluActivation(output);
+//	//		break;
+//	//	}
+//	//
+//	//	case m_tanh:
+//	//	{
+//	//		HyperbolicTanActivation(output);
+//	//		break;
+//	//	}
+//	//
+//	//	case m_sigmoid:
+//	//	{
+//	//		SoftmaxActivation(output);
+//	//		break;
+//	//	}
+//	//
+//	//	case m_softmax:
+//	//	{
+//	//		SoftmaxActivation(output);
+//	//		break;
+//	//	}
+//	//
+//	//	default:
+//	//		dAssert(0);
+//	//}
+//}

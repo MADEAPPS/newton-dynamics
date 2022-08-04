@@ -70,11 +70,11 @@ void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::Ac
 	AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
 }
 
-void ndDeepBrain::FowardPass()
+void ndDeepBrain::Predict()
 {
 	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
 	{
-		m_layers[i]->FowardPass(m_inputs, m_outputs);
+		m_layers[i]->Predict(m_inputs, m_outputs);
 		m_inputs.Swap(m_outputs);
 	}
 	m_inputs.Swap(m_outputs);

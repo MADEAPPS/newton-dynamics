@@ -46,7 +46,7 @@ void ndDeepBrainNeuron::InitGaussianWeights(ndReal mean, ndReal variance)
 	m_weights.InitGaussianWeights(mean, variance);
 }
 
-ndReal ndDeepBrainNeuron::FowardPass(const ndDeepBrainVector& input)
+ndReal ndDeepBrainNeuron::Predict(const ndDeepBrainVector& input)
 {
 	dAssert(input.GetCount() >= m_weights.GetCount());
 	return m_weight0 + ndDotProduct(m_weights.GetCount(), &m_weights[0], &input[0]);

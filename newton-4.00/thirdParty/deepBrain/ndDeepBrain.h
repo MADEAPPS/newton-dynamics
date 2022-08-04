@@ -36,7 +36,7 @@ class ndDeepBrain: public ndClassAlloc
 	void AddLayer(ndDeepBrainLayer* const layer);
 	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
 
-	void FowardPass();
+	void Predict();
 
 	ndDeepBrainVector& GetInputs();
 	ndDeepBrainVector& GetOutputs();
