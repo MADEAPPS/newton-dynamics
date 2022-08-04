@@ -55,7 +55,7 @@ void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::Ac
 	AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
 }
 
-void ndDeepBrain::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
 	{

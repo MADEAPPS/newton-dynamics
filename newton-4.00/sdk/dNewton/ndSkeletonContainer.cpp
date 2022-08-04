@@ -833,7 +833,7 @@ void ndSkeletonContainer::FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat3
 		srcLine += stride;
 	}
 
-	while (!dCholeskyFactorization(size, stride, matrix))
+	while (!ndCholeskyFactorization(size, stride, matrix))
 	{
 		srcLine = 0;
 		dstLine = 0;
@@ -1024,13 +1024,13 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			for (ndInt32 j = i; j < boundedSize; ++j)  
 			{
 				const ndFloat32* const row1 = &m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount];
-				ndFloat32 elem = row1[m_blockSize + i] + dDotProduct(m_blockSize, acc, row1);
+				ndFloat32 elem = row1[m_blockSize + i] + ndDotProduct(m_blockSize, acc, row1);
 				arow[j] = elem;
 				m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount + m_blockSize + i] = elem;
 			}
 			arow[i] += diagDamp[m_blockSize + i];
 		}
-		dAssert(dTestPSDmatrix(m_auxiliaryRowCount - m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
+		dAssert(ndTestPSDmatrix(m_auxiliaryRowCount - m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
 	}
 }
 
@@ -1245,7 +1245,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const ndFloat32* const row = &matrix[base];
-		residual[i] = b[i] - dDotProduct(size, row, x);
+		residual[i] = b[i] - ndDotProduct(size, row, x);
 		base += stride;
 	}
 
@@ -1289,13 +1289,13 @@ void ndSkeletonContainer::SolveBlockLcp(ndInt32 size, ndInt32 blockSize, const n
 {
 	if (blockSize) 
 	{
-		dSolveCholesky(blockSize, size, m_massMatrix11, x, b);
+		ndSolveCholesky(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) 
 		{
 			ndInt32 base = blockSize * size;
 			for (ndInt32 i = blockSize; i < size; ++i) 
 			{
-				b[i] -= dDotProduct(blockSize, &m_massMatrix11[base], x);
+				b[i] -= ndDotProduct(blockSize, &m_massMatrix11[base], x);
 				base += size;
 			}
 
@@ -1376,7 +1376,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	for (ndInt32 i = 0; i < m_auxiliaryRowCount; ++i) 
 	{
 		ndFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-		b[i] -= dDotProduct(primaryCount, matrixRow10, f);
+		b[i] -= ndDotProduct(primaryCount, matrixRow10, f);
 	}
 
 	const ndInt32* const normalIndex = &m_frictionIndex[primaryCount];
@@ -1388,7 +1388,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	{
 		const ndFloat32 s = u[i];
 		f[primaryCount + i] = s;
-		dMulAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
+		ndMulAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
 	}
 
 	for (ndInt32 i = 0; i < m_rowCount; ++i) 
@@ -1617,7 +1617,7 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndBodyKinematic** const bodyAr
 	for (ndInt32 i = 0; i < m_auxiliaryRowCount; ++i)
 	{
 		ndFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-		b[i] -= dDotProduct(primaryCount, matrixRow10, f);
+		b[i] -= ndDotProduct(primaryCount, matrixRow10, f);
 	}
 
 	const ndInt32* const normalIndex = &m_frictionIndex[primaryCount];
@@ -1629,7 +1629,7 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndBodyKinematic** const bodyAr
 	{
 		const ndFloat32 s = u[i];
 		f[primaryCount + i] = s;
-		dMulAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
+		ndMulAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
 	}
 
 	for (ndInt32 i = 0; i < m_rowCount; ++i)

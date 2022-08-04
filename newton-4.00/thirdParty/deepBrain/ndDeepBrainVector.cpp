@@ -24,7 +24,7 @@
 #include "ndDeepBrainVector.h"
 
 ndDeepBrainVector::ndDeepBrainVector()
-	:ndArray<ndFloat32>()
+	:ndArray<ndReal>()
 {
 }
 
@@ -32,7 +32,7 @@ ndDeepBrainVector::~ndDeepBrainVector()
 {
 }
 
-void ndDeepBrainVector::SetValue(ndFloat32 value)
+void ndDeepBrainVector::SetValue(ndReal value)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
@@ -50,10 +50,10 @@ void ndDeepBrainVector::RandomShuffle()
 	}
 }
 
-void ndDeepBrainVector::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
-		(*this)[i] = ndGaussianRandom(mean, variance);
+		(*this)[i] = ndReal(ndGaussianRandom(mean, variance));
 	}
 }

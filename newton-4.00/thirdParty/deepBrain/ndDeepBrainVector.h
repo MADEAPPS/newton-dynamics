@@ -25,15 +25,15 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
 
-class ndDeepBrainVector: public ndArray<ndFloat32> 
+class ndDeepBrainVector: public ndArray<ndReal> 
 {
 	public: 
 	ndDeepBrainVector();
 	~ndDeepBrainVector();
 
-	void SetValue(ndFloat32 value);
+	void SetValue(ndReal value);
 	void RandomShuffle();
-	void InitGaussianWeights(ndFloat32 mean, ndFloat32 variance);
+	void InitGaussianWeights(ndReal mean, ndReal variance);
 };
 
 #endif 

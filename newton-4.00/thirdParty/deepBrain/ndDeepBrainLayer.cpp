@@ -53,7 +53,7 @@ ndArray<ndDeepBrainNeuron*>& ndDeepBrainLayer::GetNeurons()
 	return m_neurons;
 }
 
-void ndDeepBrainLayer::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
@@ -65,7 +65,7 @@ void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output)
 {
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
-		output[i] = ndMax(ndFloat32(0.0f), output[i]);
+		output[i] = ndMax(ndReal(0.0f), output[i]);
 	}
 }
 
@@ -73,7 +73,7 @@ void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
 {
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
-		output[i] = 1.0f / (1.0f + ndPow (ndEXP, -output[i]));
+		output[i] = 1.0f / (1.0f + ndReal (ndPow (ndEXP, -output[i])));
 	}
 }
 
@@ -81,23 +81,23 @@ void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output)
 {
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
-		ndFloat32 positivePow = ndPow(ndEXP, output[i]);
-		ndFloat32 negativePow = ndPow(ndEXP, -output[i]);
+		ndReal positivePow = ndReal(ndPow(ndEXP, output[i]));
+		ndReal negativePow = ndReal(ndPow(ndEXP, -output[i]));
 		output[i] = (positivePow - negativePow) / (positivePow + negativePow);
 	}
 }
 
 void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 {
-	ndFloat32 acc = 0.0f;
+	ndReal acc = 0.0f;
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
-		output[i] = ndPow(ndEXP, output[i]);
+		output[i] = ndReal(ndPow(ndEXP, output[i]));
 		acc += output[i];
 	}
 
 	dAssert(acc > 0.0f);
-	ndFloat32 invAcc = 1.0f / acc;
+	ndReal invAcc = 1.0f / acc;
 	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
 	{
 		output[i] *= invAcc;

@@ -186,7 +186,7 @@ ndMatrix ndMatrix::Inverse4x4 () const
 			if (permute != i) 
 			{
 				dAssert(pivot > ndFloat32(0.0f));
-				dAssert((pivot > ndFloat32(1.0e-6f)) || (dConditionNumber(4, 4, (ndFloat32*)&(*this)[0][0]) < ndFloat32(1.0e5f)));
+				dAssert((pivot > ndFloat32(1.0e-6f)) || (ndConditionNumber(4, 4, (ndFloat32*)&(*this)[0][0]) < ndFloat32(1.0e5f)));
 				ndSwap(inv[i], inv[permute]);
 				ndSwap(tmp[i], tmp[permute]);
 			}

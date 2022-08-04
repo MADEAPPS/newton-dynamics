@@ -661,8 +661,8 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 		}
 	}
 
-	dAssert(dTestPSDmatrix(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0]));
-	dGaussSeidelLcpSor(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0], m_impulseMag, m_rhs, m_normalIndex, m_low, m_high, ndFloat32(1.0e-6f), 32, ndFloat32(1.1f));
+	dAssert(ndTestPSDmatrix(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0]));
+	ndGaussSeidelLcpSor(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0], m_impulseMag, m_rhs, m_normalIndex, m_low, m_high, ndFloat32(1.0e-6f), 32, ndFloat32(1.1f));
 
 	ndVector netImpulse(0.0f);
 	for (ndInt32 i = 0; i < m_rowCount; ++i) 

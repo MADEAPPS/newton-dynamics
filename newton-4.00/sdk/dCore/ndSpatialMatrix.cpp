@@ -50,8 +50,8 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 				}
 			}
 			dAssert(pivot > ndFloat32(0.0f));
-			dAssert((pivot > ndFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (ndFloat64*)&m_rows[0]) < ndFloat32(1.0e5f)));
-			//if (!((pivot > ndFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < ndFloat32(1.0e5f))))
+			dAssert((pivot > ndFloat32(1.0e-6f)) || (ndConditionNumber(rows, 6, (ndFloat64*)&m_rows[0]) < ndFloat32(1.0e5f)));
+			//if (!((pivot > ndFloat32(1.0e-6f)) || (ndConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < ndFloat32(1.0e5f))))
 			//{
 			//	for (ndInt32 m = 0; m < rows; m++) {
 			//		for (ndInt32 n = 0; n < rows; n++) {

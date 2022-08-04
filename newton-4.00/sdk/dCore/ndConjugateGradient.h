@@ -115,7 +115,7 @@ class ndDefaultMatrixOperator
 
 	void MatrixTimeVector(const T* const input, T* const output)
 	{
-		dMatrixTimeVector(m_size, m_matrix, input, output);
+		ndMatrixTimeVector(m_size, m_matrix, input, output);
 	}
 
 	const T* m_matrix;
@@ -197,37 +197,37 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolera
 	ndMatrixOperator matrixOper(size, matrix, preconditionerBuffer);
 
 	matrixOper.MatrixTimeVector(x, m_z0);
-	dSub(size, m_r0, b, m_z0);
+	ndSub(size, m_r0, b, m_z0);
 	matrixOper.PreconditionerSolve(m_r0, m_p0);
 	
 	ndInt32 iter = 0;
-	T num = dDotProduct(size, m_r0, m_p0);
+	T num = ndDotProduct(size, m_r0, m_p0);
 	T error2 = num;
 	for (ndInt32 j = 0; (j < size) && (error2 > tolerance); ++j) 
 	{
 		matrixOper.MatrixTimeVector(m_p0, m_z0);
-		T den = dDotProduct(size, m_p0, m_z0);
+		T den = ndDotProduct(size, m_p0, m_z0);
 	
 		dAssert(fabs(den) > T(0.0f));
 		T alpha = num / den;
 	
-		dMulAdd(size, x, x, m_p0, alpha);
+		ndMulAdd(size, x, x, m_p0, alpha);
 		if ((j % 50) != 49) 
 		{
-			dMulAdd(size, m_r0, m_r0, m_z0, -alpha);
+			ndMulAdd(size, m_r0, m_r0, m_z0, -alpha);
 		} 
 		else 
 		{
 			matrixOper.MatrixTimeVector(x, m_z0);
-			dSub(size, m_r0, b, m_z0);
+			ndSub(size, m_r0, b, m_z0);
 		}
 	
 		matrixOper.PreconditionerSolve(m_r0, m_q0);
 	
-		T num1 = dDotProduct(size, m_r0, m_q0);
+		T num1 = ndDotProduct(size, m_r0, m_q0);
 		T beta = num1 / num;
-		dMulAdd(size, m_p0, m_q0, m_p0, beta);
-		num = dDotProduct(size, m_r0, m_q0);
+		ndMulAdd(size, m_p0, m_q0, m_p0, beta);
+		num = ndDotProduct(size, m_r0, m_q0);
 		iter++;
 		error2 = num;
 	}

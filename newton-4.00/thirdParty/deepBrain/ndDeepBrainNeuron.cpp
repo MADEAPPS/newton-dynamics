@@ -40,14 +40,14 @@ ndDeepBrainVector& ndDeepBrainNeuron::GetWeights()
 	return m_weights;
 }
 
-void ndDeepBrainNeuron::InitGaussianWeights(ndFloat32 mean, ndFloat32 variance)
+void ndDeepBrainNeuron::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	m_weight0 = ndGaussianRandom(mean, variance);
+	m_weight0 = ndReal(ndGaussianRandom(mean, variance));
 	m_weights.InitGaussianWeights(mean, variance);
 }
 
-ndFloat32 ndDeepBrainNeuron::FowardPass(const ndDeepBrainVector& input)
+ndReal ndDeepBrainNeuron::FowardPass(const ndDeepBrainVector& input)
 {
 	dAssert(input.GetCount() >= m_weights.GetCount());
-	return m_weight0 + dDotProduct(m_weights.GetCount(), &m_weights[0], &input[0]);
+	return m_weight0 + ndDotProduct(m_weights.GetCount(), &m_weights[0], &input[0]);
 }

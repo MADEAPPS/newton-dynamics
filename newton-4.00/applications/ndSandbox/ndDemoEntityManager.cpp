@@ -152,14 +152,14 @@ void Test0__()
 	ndFloat32 A[6][6];
 	ndFloat32 B[6];
 
-	dCovarianceMatrix<ndFloat32>(6, &A[0][0], x, x);
+	ndCovarianceMatrix<ndFloat32>(6, &A[0][0], x, x);
 	for (ndInt32 i = 0; i < 6; ++i)
 	{
 		A[i][i] *= 1.1f;
 	}
-	dAssert(dTestPSDmatrix(6, 6, &A[0][0]));
+	dAssert(ndTestPSDmatrix(6, 6, &A[0][0]));
 
-	dMatrixTimeVector<ndFloat32>(6, &A[0][0], x, B);
+	ndMatrixTimeVector<ndFloat32>(6, &A[0][0], x, B);
 	for (ndInt32 i = 0; i < 6; ++i)
 	{
 		x[i] = 0;
@@ -192,7 +192,7 @@ void Test1__()
 	//h[0] = 0.25f;
 	//h[1] = 1.0f;
 	//
-	//dMatrixTimeVector(2, &A[0][0], x, b);
+	//ndMatrixTimeVector(2, &A[0][0], x, b);
 	//dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 	//
 	//ndInt32 xxx = 0;

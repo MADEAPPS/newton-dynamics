@@ -26,18 +26,18 @@
 #include "ndTypes.h"
 
 template <class T>
-T dSQRH(const T num, const T den)
+T ndSQRH(const T num, const T den)
 {
 	T r(num / den);
 	return T(sqrt(T(1.0f) + r * r));
 }
 
 template <class T>
-T dPythag(const T a, const T b)
+T ndPythag(const T a, const T b)
 {
 	T absa(ndAbs(a));
 	T absb(ndAbs(b));
-	return (absa > absb) ? (absa * dSQRH(absb, absa)) : ((absb == T(0.0f) ? T(0.0f) : (absb * dSQRH(absa, absb))));
+	return (absa > absb) ? (absa * ndSQRH(absb, absa)) : ((absb == T(0.0f) ? T(0.0f) : (absb * ndSQRH(absa, absb))));
 }
 
 template <class T>
@@ -48,7 +48,7 @@ T ndSign(const T a, const T b)
 
 // return dot product
 template<class T>
-T dDotProduct(ndInt32 size, const T* const A, const T* const B)
+T ndDotProduct(ndInt32 size, const T* const A, const T* const B)
 {
 	T val(0.0f);
 	for (ndInt32 i = 0; i < size; ++i) 
@@ -59,7 +59,7 @@ T dDotProduct(ndInt32 size, const T* const A, const T* const B)
 }
 
 template<class T>
-void dAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
+void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
@@ -68,7 +68,7 @@ void dAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void dSub(ndInt32 size, T* const X, const T* const A, const T* const B)
+void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
@@ -77,7 +77,7 @@ void dSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void dMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
+void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
