@@ -19,30 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_H__
-#define _ND_DEEP_BRAIN_H__
+#ifndef _ND_DEEP_BRAIN_TRAINING_OPERATOR_H__
+#define _ND_DEEP_BRAIN_TRAINING_OPERATOR_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainLayer.h"
-#include "ndDeepBrainVector.h"
-#include "ndDeepBrainTrainingOperator.h"
 
-class ndDeepBrain: public ndClassAlloc
+class ndDeepBrain;
+
+class ndDeepBrainTrainingOperator: public ndClassAlloc
 {
 	public: 
-	ndDeepBrain();
-	~ndDeepBrain();
-
-	void AddLayer(ndDeepBrainLayer* const layer);
-	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
-
-	void FowardPass();
-	void InitGaussianWeights(ndReal mean, ndReal variance);
+	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
+	virtual ~ndDeepBrainTrainingOperator();
+	virtual void Train();
 
 	protected:
-	ndDeepBrainVector m_inputs;
-	ndDeepBrainVector m_outputs;
-	ndArray<ndDeepBrainLayer*> m_layers;
+	virtual void BackwardPass();
+
+	ndDeepBrain* m_brain;
+	ndReal m_learnRate;
 };
 
 

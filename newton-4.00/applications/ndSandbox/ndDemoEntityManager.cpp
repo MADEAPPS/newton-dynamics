@@ -214,21 +214,23 @@ void Test1__()
 
 void Test2__()
 {
-	ndDeepBrain neuralNet;
+	ndDeepBrain brain;
 	
 #if 1
+	ndDeepBrainTrainingOperator traning(&brain);
+	traning.Train();
 
 #else
-	neuralNet.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
-	neuralNet.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
-	neuralNet.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
+	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
+	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
+	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
 
 	ndSetRandSeed(142543);
-	neuralNet.InitGaussianWeights(0.0f, 0.2f);
+	brain.InitGaussianWeights(0.0f, 0.2f);
 
 	//ndDeepBrainVector input;
 	//input.SetCount(784);
-	neuralNet.FowardPass();
+	brain.FowardPass();
 #endif
 }
 

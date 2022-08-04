@@ -19,32 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_H__
-#define _ND_DEEP_BRAIN_H__
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainVector.h"
+#include "ndDeepBrainNeuron.h"
 #include "ndDeepBrainTrainingOperator.h"
 
-class ndDeepBrain: public ndClassAlloc
+ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
+	:ndClassAlloc()
+	,m_brain(brain)
+	,m_learnRate(0.01f)
 {
-	public: 
-	ndDeepBrain();
-	~ndDeepBrain();
+}
 
-	void AddLayer(ndDeepBrainLayer* const layer);
-	void AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
+ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
+{
+}
 
-	void FowardPass();
-	void InitGaussianWeights(ndReal mean, ndReal variance);
+void ndDeepBrainTrainingOperator::BackwardPass()
+{
+	//for (ndInt32 i = m_layers.GetCount()-1; i >= 0; --i)
+	//{
+	//	m_layers[i]->FowardPass(m_inputs, m_outputs);
+	//	m_inputs.Swap(m_outputs);
+	//}
+	//m_inputs.Swap(m_outputs);
+}
 
-	protected:
-	ndDeepBrainVector m_inputs;
-	ndDeepBrainVector m_outputs;
-	ndArray<ndDeepBrainLayer*> m_layers;
-};
+void ndDeepBrainTrainingOperator::Train()
+{
 
-
-#endif 
-
+}
