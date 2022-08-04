@@ -49,6 +49,8 @@ class ndDeepBrainLayer: public ndClassAlloc
 	protected:
 	void ReluActivation(ndDeepBrainVector& output);
 	void SigmoidActivation(ndDeepBrainVector& output);
+	void SoftmaxActivation(ndDeepBrainVector& output);
+	void HyperbolicTanActivation(ndDeepBrainVector& output);
 
 	ActivationType m_activation;
 	ndArray<ndDeepBrainNeuron*> m_neurons;
