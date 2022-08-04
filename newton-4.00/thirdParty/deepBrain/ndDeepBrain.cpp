@@ -40,6 +40,21 @@ ndDeepBrain::~ndDeepBrain()
 	}
 }
 
+ndDeepBrainVector& ndDeepBrain::GetInputs()
+{
+	return m_inputs;
+}
+
+ndDeepBrainVector& ndDeepBrain::GetOutputs()
+{
+	return m_outputs;
+}
+
+ndArray<ndDeepBrainLayer*>& ndDeepBrain::GetLayers()
+{
+	return m_layers;
+}
+
 void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
 	dAssert(!m_layers.GetCount() || (m_layers[m_layers.GetCount() - 1]->GetNeurons().GetCount() == layer->GetInputSize()));
@@ -53,14 +68,6 @@ void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ActivationType type)
 {
 	AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
-}
-
-void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
-{
-	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
-	{
-		m_layers[i]->InitGaussianWeights(mean, variance);
-	}
 }
 
 void ndDeepBrain::FowardPass()

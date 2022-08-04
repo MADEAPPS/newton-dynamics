@@ -215,9 +215,10 @@ void Test1__()
 void Test2__()
 {
 	ndDeepBrain brain;
-	
-#if 1
 	ndDeepBrainTrainingOperator traning(&brain);
+	
+	ndSetRandSeed(142543);
+#if 0
 	traning.Train();
 
 #else
@@ -225,8 +226,8 @@ void Test2__()
 	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
 	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
 
-	ndSetRandSeed(142543);
-	brain.InitGaussianWeights(0.0f, 0.2f);
+	traning.Train();
+	
 
 	//ndDeepBrainVector input;
 	//input.SetCount(784);

@@ -31,10 +31,12 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	public: 
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
 	virtual ~ndDeepBrainTrainingOperator();
+
 	virtual void Train();
 
 	protected:
 	virtual void BackwardPass();
+	void InitGaussianWeights(ndReal mean, ndReal variance);
 
 	ndDeepBrain* m_brain;
 	ndReal m_learnRate;

@@ -37,6 +37,15 @@ ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
 {
 }
 
+void ndDeepBrainTrainingOperator::InitGaussianWeights(ndReal mean, ndReal variance)
+{
+	ndArray<ndDeepBrainLayer*>& layers = m_brain->GetLayers();
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		layers[i]->InitGaussianWeights(mean, variance);
+	}
+}
+
 void ndDeepBrainTrainingOperator::BackwardPass()
 {
 	//for (ndInt32 i = m_layers.GetCount()-1; i >= 0; --i)
@@ -49,5 +58,5 @@ void ndDeepBrainTrainingOperator::BackwardPass()
 
 void ndDeepBrainTrainingOperator::Train()
 {
-
+	InitGaussianWeights(0.0f, 0.2f);
 }
