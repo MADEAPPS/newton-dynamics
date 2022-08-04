@@ -73,7 +73,8 @@ void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
 {
 	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = 1.0f / (1.0f + ndReal (ndPow (ndEXP, -output[i])));
+		const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
+		output[i] = exp / (exp + 1.0f);
 	}
 }
 
@@ -81,9 +82,8 @@ void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output)
 {
 	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
-		ndReal positivePow = ndReal(ndPow(ndEXP, output[i]));
-		ndReal negativePow = ndReal(ndPow(ndEXP, -output[i]));
-		output[i] = (positivePow - negativePow) / (positivePow + negativePow);
+		const ndReal exp = ndReal(ndPow(ndEXP, 2.0f * output[i]));
+		output[i] = (exp - 1.0f) / (exp + 1.0f);
 	}
 }
 
@@ -92,8 +92,9 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 	ndReal acc = 0.0f;
 	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = ndReal(ndPow(ndEXP, output[i]));
-		acc += output[i];
+		const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
+		output[i] = exp;
+		acc += exp;
 	}
 
 	dAssert(acc > 0.0f);
