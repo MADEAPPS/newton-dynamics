@@ -89,6 +89,28 @@ ndFloat32 ndGaussianRandom(ndFloat32 u, ndFloat32 phi)
 	return u + normal * phi;
 }
 
+ndOUNoise::ndOUNoise(ndFloat32 value, ndFloat32 theta, ndFloat32 mean, ndFloat32 sigma)
+	:m_value(value)
+	,m_mean(mean)
+	,m_sigma(sigma)
+	,m_theta(theta)
+{
+}
+
+void ndOUNoise::Reset(ndFloat32 value)
+{
+	m_value = value;
+}
+
+ndFloat32 ndOUNoise::Evaluate(ndFloat32 step)
+{
+	//dx = theta * (mu - x) * dt + sigma * np.sqrt(dt) * np.random.normal(size = action_dim)
+	//x = x + dx
+	ndFloat32 dx = m_theta * (m_mean - m_value) * step + m_sigma * ndSqrt(step) * ndGaussianRandom(ndFloat32 (0.0f), ndFloat32(1.0f));
+	m_value += dx;
+	return m_value;
+}
+
 ndFloat64 ndRoundToFloat(ndFloat64 val)
 {
 	ndInt32 exp;
