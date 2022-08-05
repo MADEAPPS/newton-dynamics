@@ -55,19 +55,15 @@ ndArray<ndDeepBrainLayer*>& ndDeepBrain::GetLayers()
 	return m_layers;
 }
 
-void ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
+ndDeepBrainLayer* ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ActivationType type)
 {
+	ndDeepBrainLayer* const layer = new ndDeepBrainLayer(inputs, outputs, type);
 	dAssert(!m_layers.GetCount() || (m_layers[m_layers.GetCount() - 1]->GetNeurons().GetCount() == layer->GetInputSize()));
-	m_inputs.SetCount(ndMax (layer->GetInputSize(), m_inputs.GetCount()));
-	m_outputs.SetCount(m_inputs.GetCount());
-	m_inputs.SetValue(0.0f);
-	m_outputs.SetValue(0.0f);
-	m_layers.PushBack(layer);
-}
 
-void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ActivationType type)
-{
-	AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
+	m_inputs.SetCount(ndMax(layer->GetInputSize(), m_inputs.GetCount()));
+	m_outputs.SetCount(m_inputs.GetCount());
+	m_layers.PushBack(layer);
+	return layer;
 }
 
 void ndDeepBrain::Predict()

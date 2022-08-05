@@ -19,13 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainNeuron.h"
 
 ndDeepBrainNeuron::ndDeepBrainNeuron(ndInt32 inputs)
 	:ndClassAlloc()
-	,m_weight0(0.0f)
+	,m_bias(0.0f)
 	,m_weights()
 {
 	m_weights.SetCount(inputs);
@@ -35,6 +34,16 @@ ndDeepBrainNeuron::~ndDeepBrainNeuron()
 {
 }
 
+ndReal ndDeepBrainNeuron::GetBias() const
+{
+	return m_bias;
+}
+
+void ndDeepBrainNeuron::SetBias(ndReal bias)
+{
+	m_bias = bias;
+}
+
 ndDeepBrainVector& ndDeepBrainNeuron::GetWeights()
 {
 	return m_weights;
@@ -42,12 +51,12 @@ ndDeepBrainVector& ndDeepBrainNeuron::GetWeights()
 
 void ndDeepBrainNeuron::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	m_weight0 = ndReal(ndGaussianRandom(mean, variance));
+	m_bias = ndReal(ndGaussianRandom(mean, variance));
 	m_weights.InitGaussianWeights(mean, variance);
 }
 
 ndReal ndDeepBrainNeuron::Predict(const ndDeepBrainVector& input)
 {
 	dAssert(input.GetCount() >= m_weights.GetCount());
-	return m_weight0 + ndDotProduct(m_weights.GetCount(), &m_weights[0], &input[0]);
+	return m_bias + ndDotProduct(m_weights.GetCount(), &m_weights[0], &input[0]);
 }

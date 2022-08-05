@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #ifndef _ND_DEEP_BRAIN_NEURON_H__
 #define _ND_DEEP_BRAIN_NEURON_H__
 
@@ -32,13 +31,16 @@ class ndDeepBrainNeuron : public ndClassAlloc
 	ndDeepBrainNeuron(ndInt32 inputs);
 	~ndDeepBrainNeuron();
 
+	ndReal GetBias() const;
+	void SetBias(ndReal bias);
+
 	ndDeepBrainVector& GetWeights();
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
 	ndReal Predict(const ndDeepBrainVector& input);
 
 	protected:
-	ndReal m_weight0;
+	ndReal m_bias;
 	ndDeepBrainVector m_weights;
 };
 

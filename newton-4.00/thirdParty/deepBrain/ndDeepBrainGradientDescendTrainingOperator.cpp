@@ -36,8 +36,7 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 {
 }
 
-
-void ndDeepBrainGradientDescendTrainingOperator::Train()
+void ndDeepBrainGradientDescendTrainingOperator::Step()
 {
-//	InitGaussianWeights(0.0f, 0.2f);
+	//InitGaussianWeights(0.0f, 0.2f);
 }

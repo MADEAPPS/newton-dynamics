@@ -218,15 +218,34 @@ void Test2__()
 	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 	
 	ndSetRandSeed(142543);
-#if 0
-	trainer.Train();
 
-#else
+#if 1
+	ndDeepBrainLayer* const inputLayer = brain.AddLayer(2, 1, ndDeepBrainLayer::m_tanh);
+	ndDeepBrainLayer* const outputLayer = brain.AddLayer(1, 1, ndDeepBrainLayer::m_sigmoid);
+
+	ndDeepBrainNeuron* const inputNeuron = inputLayer->GetNeurons()[0];
+	ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
+	inputWeights[0] = 0.6f;
+	inputWeights[1] = -0.1f;
+	inputNeuron->SetBias(0.3f);
+	
+	ndDeepBrainNeuron* const ouputNeuron = outputLayer->GetNeurons()[0];
+	ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
+	ouputWeights[0] = 0.5f;
+	ouputNeuron->SetBias(-0.2f);
+
+	ndDeepBrainVector& inputs = brain.GetInputs();
+	inputs[0] = -0.9f;
+	inputs[1] = 0.1f;
+
+	trainer.Step();
+
+#elif 1
 	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
 	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
 	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
 
-	trainer.Train();
+	trainer.Step();
 
 	//ndDeepBrainVector input;
 	//input.SetCount(784);
