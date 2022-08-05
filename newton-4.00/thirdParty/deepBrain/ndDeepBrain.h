@@ -40,6 +40,8 @@ class ndDeepBrain: public ndClassAlloc
 	ndDeepBrainVector& GetOutputs();
 	ndArray<ndDeepBrainLayer*>& GetLayers();
 
+	void SetInput(const ndDeepBrainVector& input);
+
 	protected:
 	ndDeepBrainVector m_inputs;
 	ndDeepBrainVector m_outputs;

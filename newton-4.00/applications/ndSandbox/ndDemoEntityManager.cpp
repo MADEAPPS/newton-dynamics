@@ -234,16 +234,18 @@ void Test2__()
 	ouputWeights[0] = 0.5f;
 	ouputNeuron->SetBias(-0.2f);
 
-	ndDeepBrainVector& inputs = brain.GetInputs();
-	inputs[0] = -0.9f;
-	inputs[1] = 0.1f;
+	ndDeepBrainMatrix inputBatch(1, 2);
+	ndDeepBrainMatrix groundTruth(1, 1);
+	inputBatch[0][0] = -0.9f;
+	inputBatch[0][1] = 0.1f;
+	groundTruth[0][0] = 1.0f;
 
-	ndDeepBrainMatrix xxxxx0(10, 2);
-	xxxxx0.InitGaussianWeights(0.0f, 0.25f);
-	xxxxx0.RandomShuffle();
-	xxxxx0.RandomShuffle();
-	ndDeepBrainMatrix xxxxx1(3, 2);
-	trainer.Step(xxxxx0, xxxxx1, 0.1f);
+	//ndDeepBrainMatrix xxxxx0(10, 2);
+	//xxxxx0.InitGaussianWeights(0.0f, 0.25f);
+	//xxxxx0.RandomShuffle();
+	//xxxxx0.RandomShuffle();
+	//ndDeepBrainMatrix xxxxx1(3, 2);
+	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
 
 #elif 1
 	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);

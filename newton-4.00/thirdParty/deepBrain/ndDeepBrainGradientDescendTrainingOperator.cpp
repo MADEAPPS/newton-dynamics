@@ -36,8 +36,14 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 {
 }
 
-void ndDeepBrainGradientDescendTrainingOperator::Step(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate)
+void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate, ndInt32 steps)
 {
-	ndReal x = inputBatch[1][0];
 	//InitGaussianWeights(0.0f, 0.2f);
+	for (ndInt32 i = 0; i < steps; ++i)
+	{
+		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
+		{
+			m_brain->SetInput(inputBatch[j]);
+		}
+	}
 }

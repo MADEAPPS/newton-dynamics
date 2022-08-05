@@ -66,6 +66,15 @@ ndDeepBrainLayer* ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepB
 	return layer;
 }
 
+void ndDeepBrain::SetInput(const ndDeepBrainVector& input)
+{
+	dAssert(input.GetCount() == m_layers[0]->GetInputSize());
+	for (ndInt32 i = m_layers[0]->GetInputSize()-1; i >= 0; --i)
+	{
+		m_inputs[i] = input[i];
+	}
+}
+
 void ndDeepBrain::Predict()
 {
 	m_outputs.SetCount(m_inputs.GetCount());
