@@ -72,10 +72,13 @@ void ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::Ac
 
 void ndDeepBrain::Predict()
 {
+	m_outputs.SetCount(m_inputs.GetCount());
 	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
 	{
 		m_layers[i]->Predict(m_inputs, m_outputs);
 		m_inputs.Swap(m_outputs);
 	}
+
 	m_inputs.Swap(m_outputs);
+	m_outputs.SetCount(m_layers[m_layers.GetCount()-1]->GetNeurons().GetCount());
 }
