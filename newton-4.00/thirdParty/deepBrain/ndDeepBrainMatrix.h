@@ -19,31 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_DEEP_BRAIN_MATRIX_H__
+#define _ND_DEEP_BRAIN_MATRIX_H__
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
 
-ndDeepBrainVector::ndDeepBrainVector()
-	:ndArray<ndReal>()
+class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 {
-}
+	public: 
+	ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns);
+	~ndDeepBrainMatrix();
 
-ndDeepBrainVector::~ndDeepBrainVector()
-{
-}
+	void SetValue(ndReal value);
+	void InitGaussianWeights(ndReal mean, ndReal variance);
+};
 
-void ndDeepBrainVector::SetValue(ndReal value)
-{
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		(*this)[i] = value;
-	}
-}
-
-void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
-{
-	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
-	{
-		(*this)[i] = ndReal(ndGaussianRandom(mean, variance));
-	}
-}
+#endif 

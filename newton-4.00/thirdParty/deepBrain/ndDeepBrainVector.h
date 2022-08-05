@@ -23,7 +23,6 @@
 #define _ND_DEEP_BRAIN_VECTOR_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainVector.h"
 
 class ndDeepBrainVector: public ndArray<ndReal> 
 {
@@ -32,7 +31,6 @@ class ndDeepBrainVector: public ndArray<ndReal>
 	~ndDeepBrainVector();
 
 	void SetValue(ndReal value);
-	void RandomShuffle();
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 };
 

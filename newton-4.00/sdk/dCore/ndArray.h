@@ -83,6 +83,13 @@ class ndArray: public ndClassAlloc
 	/// size is incremented by one, and the array is resized if it reaches max capacity
 	void PushBack(const T& element);
 
+	/// Randomize the vectore entries.
+	void RandomShuffle();
+
+	/// set all member to 0.
+	/// useful for want making vectors of vectors (ex matrices)
+	void ResetMembers();
+
 	private: 
 	void CopyData(T* const dst, const T* const src, ndInt32 elements);
 
@@ -188,16 +195,9 @@ ndInt32 ndArray<T>::GetCapacity() const
 	return m_capacity;
 }
 
-//template<class T>
-//void ndArray<T>::Clear()
-//{
-//	m_size = 0;
-//}
-
 template<class T>
 void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elements)
 {
-	//memcpy(dstPtr, srcPtr, elements * sizeof(T));
 	const ndInt32 sizeInBytes = elements * sizeof(T);
 	const ndInt32 size16 = sizeInBytes / sizeof(ndVector);
 
@@ -259,6 +259,25 @@ void ndArray<T>::Swap(ndArray& other)
 	ndSwap(m_array, other.m_array);
 	ndSwap(m_size, other.m_size);
 	ndSwap(m_capacity, other.m_capacity);
+}
+
+template<class T>
+void ndArray<T>::ResetMembers()
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
+template<class T>
+void ndArray<T>::RandomShuffle()
+{
+	const ndUnsigned32 size = GetCount();
+	for (ndUnsigned32 i = size - 1; i != 0; --i)
+	{
+		ndUnsigned32 j = ndRandInt() % size;
+		m_array[i].Swap(m_array[j]);
+	}
 }
 
 #endif

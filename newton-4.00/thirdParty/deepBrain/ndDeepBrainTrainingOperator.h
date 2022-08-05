@@ -23,6 +23,7 @@
 #define _ND_DEEP_BRAIN_TRAINING_OPERATOR_H__
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrainMatrix.h"
 
 class ndDeepBrain;
 
@@ -32,7 +33,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
 	virtual ~ndDeepBrainTrainingOperator();
 
-	virtual void Step() = 0;
+	virtual void Step(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate) = 0;
 
 	protected:
 	virtual void BackwardPass();

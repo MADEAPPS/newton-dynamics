@@ -36,7 +36,8 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 {
 }
 
-void ndDeepBrainGradientDescendTrainingOperator::Step()
+void ndDeepBrainGradientDescendTrainingOperator::Step(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate)
 {
+	ndReal x = inputBatch[1][0];
 	//InitGaussianWeights(0.0f, 0.2f);
 }

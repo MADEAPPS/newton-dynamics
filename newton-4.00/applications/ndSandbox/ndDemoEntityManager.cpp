@@ -238,7 +238,12 @@ void Test2__()
 	inputs[0] = -0.9f;
 	inputs[1] = 0.1f;
 
-	trainer.Step();
+	ndDeepBrainMatrix xxxxx0(10, 2);
+	xxxxx0.InitGaussianWeights(0.0f, 0.25f);
+	xxxxx0.RandomShuffle();
+	xxxxx0.RandomShuffle();
+	ndDeepBrainMatrix xxxxx1(3, 2);
+	trainer.Step(xxxxx0, xxxxx1, 0.1f);
 
 #elif 1
 	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);

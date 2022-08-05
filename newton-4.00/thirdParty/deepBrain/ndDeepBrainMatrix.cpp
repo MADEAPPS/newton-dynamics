@@ -21,29 +21,45 @@
 
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainVector.h"
+#include "ndDeepBrainMatrix.h"
 
-ndDeepBrainVector::ndDeepBrainVector()
-	:ndArray<ndReal>()
+ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
+	:ndArray<ndDeepBrainVector>()
 {
-}
-
-ndDeepBrainVector::~ndDeepBrainVector()
-{
-}
-
-void ndDeepBrainVector::SetValue(ndReal value)
-{
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	SetCount(rows);
+	ndDeepBrainMatrix& me = *this;
+	for (ndInt32 i = 0; i < rows; ++i)
 	{
-		(*this)[i] = value;
+		ndDeepBrainVector& row = me[i];
+		row.ResetMembers();
+		row.SetCount(columns);
 	}
 }
 
-void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
+ndDeepBrainMatrix::~ndDeepBrainMatrix()
 {
+	ndDeepBrainMatrix& me = *this;
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndDeepBrainVector& row = me[i];
+		row.~ndDeepBrainVector();
+	}
+}
+
+void ndDeepBrainMatrix::SetValue(ndReal value)
+{
+	ndDeepBrainMatrix& me = *this;
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		me[i].SetValue(value);
+	}
+}
+
+void ndDeepBrainMatrix::InitGaussianWeights(ndReal mean, ndReal variance)
+{
+	ndDeepBrainMatrix& me = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
-		(*this)[i] = ndReal(ndGaussianRandom(mean, variance));
+		me[i].InitGaussianWeights(mean, variance);
 	}
 }
