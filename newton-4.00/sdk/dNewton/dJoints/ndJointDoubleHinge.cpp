@@ -90,7 +90,7 @@ void ndJointDoubleHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 
 	nd::TiXmlElement* const axis1 = new nd::TiXmlElement("axis1");
 	childNode->LinkEndChild(axis1);
-	m_axis0.Save(axis1);
+	m_axis1.Save(axis1);
 
 }
 
@@ -193,7 +193,7 @@ void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 	{
 		// show pitch angle limits
 		ndVector point(ndFloat32(0.0f), ndFloat32(radius), ndFloat32(0.0f), ndFloat32(0.0f));
-
+	
 		ndFloat32 minAngle = m_axis0.m_minLimit;
 		ndFloat32 maxAngle = m_axis0.m_maxLimit;
 		if ((maxAngle - minAngle) >= ndPi * ndFloat32(2.0f))
@@ -201,10 +201,10 @@ void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 			minAngle = 0.0f;
 			maxAngle = ndPi * ndFloat32(2.0f);
 		}
-
+	
 		ndFloat32 angleStep = (maxAngle - minAngle) / subdiv;
 		ndFloat32 angle0 = minAngle;
-
+	
 		ndVector color(ndVector(0.5f, 0.0f, 0.0f, 0.0f));
 		for (ndInt32 i = 0; i <= subdiv; ++i)
 		{
@@ -212,7 +212,7 @@ void ndJointDoubleHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 			debugCallback.DrawLine(matrix1.m_posit, arch[i], color);
 			angle0 += angleStep;
 		}
-
+	
 		for (ndInt32 i = 0; i < subdiv; ++i)
 		{
 			debugCallback.DrawLine(arch[i], arch[i + 1], color);
@@ -274,12 +274,10 @@ void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatr
 	const ndVector omega1(m_body1->GetOmega());
 	
 	// calculate joint parameters, angles and omega
-	//const ndFloat32 deltaAngle0 = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);
 	const ndFloat32 deltaAngle0 = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_axis0.m_angle);
 	m_axis0.m_angle += deltaAngle0;
 	m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
 	
-	//const ndFloat32 deltaAngle1 = ndAnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_angle1);
 	const ndFloat32 deltaAngle1 = ndAnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_axis1.m_angle);
 	m_axis1.m_angle += deltaAngle1;
 	m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
@@ -292,39 +290,69 @@ ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-//ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
-ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor&, const ndMatrix&, const ndMatrix&)
+ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndInt8 ret = 0;
-	//if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
-	//{
-	//	AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
-	//}
-	//else
-	//{
-	//	const ndFloat32 angle = m_angle + m_omega * desc.m_timestep;
-	//	if (angle < m_minLimit)
-	//	{
-	//		AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
-	//		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-	//		const ndFloat32 penetration = angle - m_minLimit;
-	//		const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
-	//		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-	//		SetLowerFriction(desc, ndFloat32(0.0f));
-	//		ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
-	//	}
-	//	else if (angle > m_maxLimit)
-	//	{
-	//		AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
-	//		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-	//		const ndFloat32 penetration = angle - m_maxLimit;
-	//		const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
-	//		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-	//		SetHighFriction(desc, ndFloat32(0.0f));
-	//		ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
-	//	}
-	//}
-	return ret;
+	ndInt8 ret0 = 0;
+	if ((m_axis0.m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_axis0.m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
+	{
+		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_axis0.m_angle);
+	}
+	else
+	{
+		const ndFloat32 angle = m_axis0.m_angle + m_axis0.m_omega * desc.m_timestep;
+		if (angle < m_axis0.m_minLimit)
+		{
+			AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_axis0.m_minLimit;
+			const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetLowerFriction(desc, ndFloat32(0.0f));
+			ret0 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+		}
+		else if (angle > m_axis0.m_maxLimit)
+		{
+			AddAngularRowJacobian(desc, &matrix0.m_front[0], ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_axis0.m_maxLimit;
+			const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, ndFloat32(0.0f));
+			ret0 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+		}
+	}
+
+	ndInt8 ret1 = 0;
+	if ((m_axis1.m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_axis1.m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
+	{
+		AddAngularRowJacobian(desc, &matrix1.m_up[0], -m_axis1.m_angle);
+	}
+	else
+	{
+		const ndFloat32 angle = m_axis1.m_angle + m_axis1.m_omega * desc.m_timestep;
+		if (angle < m_axis1.m_minLimit)
+		{
+			AddAngularRowJacobian(desc, &matrix1.m_up[0], ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_axis1.m_minLimit;
+			const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetLowerFriction(desc, ndFloat32(0.0f));
+			ret1 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+		}
+		else if (angle > m_axis1.m_maxLimit)
+		{
+			AddAngularRowJacobian(desc, &matrix1.m_up[0], ndFloat32(0.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = angle - m_axis1.m_maxLimit;
+			const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, ndFloat32(0.0f));
+			ret1 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
+		}
+	}
+
+	return ret0 | ret1;
 }
 
 void ndJointDoubleHinge::SubmitSpringDamper0(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix&)
