@@ -19,43 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainNeuron.h"
-#include "ndDeepBrainTrainingOperator.h"
+#include "ndDeepBrainGradientDescendTrainingOperator.h"
 
-ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
-	:ndClassAlloc()
-	,m_brain(brain)
-	,m_learnRate(0.01f)
+
+ndDeepBrainGradientDescendTrainingOperator::ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain)
+	:ndDeepBrainTrainingOperator(brain)
 {
 }
 
-ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
+ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingOperator()
 {
 }
 
-void ndDeepBrainTrainingOperator::InitGaussianWeights(ndReal mean, ndReal variance)
-{
-	ndArray<ndDeepBrainLayer*>& layers = m_brain->GetLayers();
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		layers[i]->InitGaussianWeights(mean, variance);
-	}
-}
 
-void ndDeepBrainTrainingOperator::BackwardPass()
+void ndDeepBrainGradientDescendTrainingOperator::Train()
 {
-	//for (ndInt32 i = m_layers.GetCount()-1; i >= 0; --i)
-	//{
-	//	m_layers[i]->FowardPass(m_inputs, m_outputs);
-	//	m_inputs.Swap(m_outputs);
-	//}
-	//m_inputs.Swap(m_outputs);
-}
-
-//void ndDeepBrainTrainingOperator::Train()
-//{
 //	InitGaussianWeights(0.0f, 0.2f);
-//}
+}

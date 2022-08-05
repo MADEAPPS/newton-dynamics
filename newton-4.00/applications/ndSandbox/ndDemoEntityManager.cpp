@@ -215,18 +215,18 @@ void Test1__()
 void Test2__()
 {
 	ndDeepBrain brain;
-	ndDeepBrainTrainingOperator traning(&brain);
+	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 	
 	ndSetRandSeed(142543);
 #if 0
-	traning.Train();
+	trainer.Train();
 
 #else
 	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
 	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
 	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
 
-	traning.Train();
+	trainer.Train();
 
 	//ndDeepBrainVector input;
 	//input.SetCount(784);

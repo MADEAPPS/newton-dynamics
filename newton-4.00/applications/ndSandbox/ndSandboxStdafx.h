@@ -98,6 +98,7 @@
 
 #include <ndDeepBrainStdafx.h>
 #include <ndDeepBrain.h>
+#include <ndDeepBrainGradientDescendTrainingOperator.h>
 
 #ifndef _MSC_VER
 	#ifndef stricmp

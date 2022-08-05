@@ -32,7 +32,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
 	virtual ~ndDeepBrainTrainingOperator();
 
-	virtual void Train();
+	virtual void Train() = 0;
 
 	protected:
 	virtual void BackwardPass();
