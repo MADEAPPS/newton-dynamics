@@ -104,9 +104,16 @@ void ndOUNoise::Reset(ndFloat32 value)
 
 ndFloat32 ndOUNoise::Evaluate(ndFloat32 step)
 {
+	// form teh paper and wikipedia
 	//dx = theta * (mu - x) * dt + sigma * np.sqrt(dt) * np.random.normal(size = action_dim)
 	//x = x + dx
-	ndFloat32 dx = m_theta * (m_mean - m_value) * step + m_sigma * ndSqrt(step) * ndGaussianRandom(ndFloat32 (0.0f), ndFloat32(1.0f));
+	
+	// but afte subtitutions, 
+	//ndFloat32 dx = m_theta * (m_mean - m_value) * step + m_sigma * ndSqrt(step) * ndGaussianRandom(ndFloat32 (0.0f), ndFloat32(1.0f));
+	//ndFloat32 dx = m_theta * (m_mean - m_value) * step + ndGaussianRandom(ndFloat32(0.0f), m_sigma * ndSqrt(step));
+
+	// the function reduces to a brownian guassian proccess.
+	ndFloat32 dx = ndGaussianRandom(m_theta * (m_mean - m_value) * step, m_sigma * ndSqrt(step));
 	m_value += dx;
 	return m_value;
 }
