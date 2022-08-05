@@ -424,8 +424,8 @@ class ndAiBipedTest_1 : public ndModel
 
 		static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
 		static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
-		info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
-		info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
+		//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
+		//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
 
 		if (change)
 		{
@@ -470,7 +470,7 @@ void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	world->AddModel(robot);
 	scene->Set2DDisplayRenderFunction(ndAiBipedTest_1::ControlPanel, nullptr, robot);
 
-	world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
 
 	delete robotMesh;
 }

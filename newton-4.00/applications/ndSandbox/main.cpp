@@ -12,6 +12,10 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntityManager.h"
 
+#ifdef _DEBUG
+	#define ND_USE_LEAK_TRACKER
+#endif
+
 class ndLeakTrackerAllocator
 {
 	public:
@@ -36,6 +40,7 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 	public:
 	ApplicationMemoryLeakTracket()
 		:ndTree<ndUnsigned64, void*, ndLeakTrackerAllocator>()
+		,m_lock()
 		,m_allocIndex(0)
 	{
 	}
@@ -45,26 +50,29 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 		dAssert(!GetCount());
 	}
 
+	void InsertPointer(void* const ptr)
+	{
+		ndScopeSpinLock lock (m_lock);
+		Insert(m_allocIndex, ptr);
+		m_allocIndex++;
+	}
+
+	void RemovePointer(void* const ptr)
+	{
+		ndScopeSpinLock lock(m_lock);
+		dAssert(Find(ptr));
+		Remove(ptr);
+	}
+
 	static ApplicationMemoryLeakTracket& GetLeakTracker()
 	{
 		static ApplicationMemoryLeakTracket leakTracker;
 		return leakTracker;
 	}
 
+	ndSpinLock m_lock;
 	ndUnsigned64 m_allocIndex;
 };
-
-// memory free use by the engine
-static void PhysicsFree(void* ptr)
-{
-#ifdef _DEBUG
-	ApplicationMemoryLeakTracket& leakTracker = ApplicationMemoryLeakTracket::GetLeakTracker();
-	dAssert(leakTracker.Find(ptr));
-	leakTracker.Remove(ptr);
-#endif
-
-	free(ptr);
-}
 
 // memory allocation for Newton
 static void* PhysicsAlloc(size_t sizeInBytes)
@@ -72,13 +80,21 @@ static void* PhysicsAlloc(size_t sizeInBytes)
 	void* const ptr = malloc(sizeInBytes);
 	dAssert(ptr);
 
-#ifdef _DEBUG
-	ApplicationMemoryLeakTracket& leakTracker = ApplicationMemoryLeakTracket::GetLeakTracker();
-	leakTracker.Insert(leakTracker.m_allocIndex, ptr);
-	leakTracker.m_allocIndex++;
-#endif
+	#ifdef ND_USE_LEAK_TRACKER
+	ApplicationMemoryLeakTracket::GetLeakTracker().InsertPointer(ptr);
+	#endif
 	
 	return ptr;
+}
+
+// memory free use by the engine
+static void PhysicsFree(void* ptr)
+{
+	#ifdef ND_USE_LEAK_TRACKER
+	ApplicationMemoryLeakTracket::GetLeakTracker().RemovePointer(ptr);
+	#endif
+
+	free(ptr);
 }
 
 void* operator new (size_t size)
