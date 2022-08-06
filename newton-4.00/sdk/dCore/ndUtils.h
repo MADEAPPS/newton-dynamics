@@ -152,7 +152,6 @@ D_CORE_API ndUnsigned32 ndRandInt();
 D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
 D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 deviation);
 
-
 class ndOUNoise
 {
 	public: 
@@ -165,7 +164,6 @@ class ndOUNoise
 	ndFloat32 m_sigma;
 	ndFloat32 m_theta;
 };
-
 
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
 /// \param ndFloat64 val: 64 bit float 

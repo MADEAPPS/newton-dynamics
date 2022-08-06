@@ -43,7 +43,7 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 ndInt32 ndDeepBrainLayer::GetInputSize() const
 {
 	ndDeepBrainNeuron* const neuron = (*this)[0];
-	return neuron->GetWeights().GetCount();
+	return neuron->GetCount();
 }
 
 void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
@@ -121,7 +121,7 @@ void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrai
 
 		case m_sigmoid:
 		{
-			SoftmaxActivation(output);
+			SigmoidActivation(output);
 			break;
 		}
 

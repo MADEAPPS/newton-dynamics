@@ -36,7 +36,6 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 
 void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate, ndInt32 steps)
 {
-	//InitGaussianWeights(0.0f, 0.2f);
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)

@@ -37,12 +37,11 @@ ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
 
 void ndDeepBrainTrainingOperator::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	dAssert(0);
-	//ndArray<ndDeepBrainLayer*>& layers = m_brain->GetLayers();
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	layers[i]->InitGaussianWeights(mean, variance);
-	//}
+	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->InitGaussianWeights(mean, variance);
+	}
 }
 
 void ndDeepBrainTrainingOperator::BackwardPass()

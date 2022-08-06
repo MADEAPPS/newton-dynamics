@@ -25,7 +25,7 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
 
-class ndDeepBrainNeuron : public ndClassAlloc
+class ndDeepBrainNeuron : public ndDeepBrainVector
 {
 	public: 
 	ndDeepBrainNeuron(ndInt32 inputs);
@@ -33,15 +33,13 @@ class ndDeepBrainNeuron : public ndClassAlloc
 
 	ndReal GetBias() const;
 	void SetBias(ndReal bias);
-
-	ndDeepBrainVector& GetWeights();
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
 	ndReal LinearPredict(const ndDeepBrainVector& input);
 
 	protected:
 	ndReal m_bias;
-	ndDeepBrainVector m_weights;
+	//ndDeepBrainVector m_weights;
 };
 
 #endif 

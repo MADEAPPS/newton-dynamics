@@ -220,31 +220,39 @@ void Test2__()
 	ndSetRandSeed(142543);
 
 #if 1
-	ndDeepBrainLayer* const inputLayer = brain.AddLayer(2, 1, ndDeepBrainLayer::m_tanh);
-	ndDeepBrainLayer* const outputLayer = brain.AddLayer(1, 1, ndDeepBrainLayer::m_sigmoid);
+	ndDeepBrainLayer* const inputLayer = brain.AddLayer(2, 2, ndDeepBrainLayer::m_tanh);
+	ndDeepBrainLayer* const outputLayer = brain.AddLayer(2, 1, ndDeepBrainLayer::m_sigmoid);
 
-	ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
-	ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
-	inputWeights[0] = 0.6f;
-	inputWeights[1] = -0.1f;
-	inputNeuron->SetBias(0.3f);
-	
-	ndDeepBrainNeuron* const ouputNeuron = (*outputLayer)[0];
-	ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
-	ouputWeights[0] = 0.5f;
-	ouputNeuron->SetBias(-0.2f);
+	//ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
+	//ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
+	//inputWeights[0] = 0.6f;
+	//inputWeights[1] = -0.1f;
+	//inputNeuron->SetBias(0.3f);
+	//
+	//ndDeepBrainNeuron* const ouputNeuron = (*outputLayer)[0];
+	//ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
+	//ouputWeights[0] = 0.5f;
+	//ouputNeuron->SetBias(-0.2f);
 
-	ndDeepBrainMatrix inputBatch(1, 2);
-	ndDeepBrainMatrix groundTruth(1, 1);
-	inputBatch[0][0] = -0.9f;
-	inputBatch[0][1] = 0.1f;
-	groundTruth[0][0] = 1.0f;
+	// test an ex or boolean gate
+	ndDeepBrainMatrix inputBatch(4, 2);
+	ndDeepBrainMatrix groundTruth(4, 1);
+	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
+	inputBatch[1][0] = -1.0f; inputBatch[1][1] =  1.0f;
+	inputBatch[2][0] =  1.0f; inputBatch[2][1] = -1.0f;
+	inputBatch[3][0] =  1.0f; inputBatch[3][1] =  1.0f;
 
+	groundTruth[0][0] = 0.0f;
+	groundTruth[1][0] = 1.0f;
+	groundTruth[2][0] = 1.0f;
+	groundTruth[3][0] = 0.0f;
 	//ndDeepBrainMatrix xxxxx0(10, 2);
 	//xxxxx0.InitGaussianWeights(0.0f, 0.25f);
 	//xxxxx0.RandomShuffle();
 	//xxxxx0.RandomShuffle();
 	//ndDeepBrainMatrix xxxxx1(3, 2);
+	
+	trainer.InitGaussianWeights(0.0f, 0.25f);
 	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
 
 #elif 1

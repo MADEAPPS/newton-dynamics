@@ -23,11 +23,10 @@
 #include "ndDeepBrainNeuron.h"
 
 ndDeepBrainNeuron::ndDeepBrainNeuron(ndInt32 inputs)
-	:ndClassAlloc()
+	:ndDeepBrainVector()
 	,m_bias(0.0f)
-	,m_weights()
 {
-	m_weights.SetCount(inputs);
+	SetCount(inputs);
 }
 
 ndDeepBrainNeuron::~ndDeepBrainNeuron()
@@ -44,19 +43,14 @@ void ndDeepBrainNeuron::SetBias(ndReal bias)
 	m_bias = bias;
 }
 
-ndDeepBrainVector& ndDeepBrainNeuron::GetWeights()
-{
-	return m_weights;
-}
-
 void ndDeepBrainNeuron::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	m_bias = ndReal(ndGaussianRandom(mean, variance));
-	m_weights.InitGaussianWeights(mean, variance);
+	ndDeepBrainVector::InitGaussianWeights(mean, variance);
 }
 
 ndReal ndDeepBrainNeuron::LinearPredict(const ndDeepBrainVector& input)
 {
-	dAssert(input.GetCount() >= m_weights.GetCount());
-	return m_bias + ndDotProduct(m_weights.GetCount(), &m_weights[0], &input[0]);
+	dAssert(input.GetCount() >= GetCount());
+	return m_bias + ndDotProduct(GetCount(), &(*this)[0], &input[0]);
 }
