@@ -24,8 +24,9 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainMatrix.h"
+#include "ndDeepBrainInstance.h"
 
-class ndDeepBrain;
+//class ndDeepBrain;
 
 class ndDeepBrainTrainingOperator: public ndClassAlloc
 {
@@ -39,8 +40,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	virtual void BackwardPass();
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
-	ndDeepBrain* m_brain;
-	ndReal m_learnRate;
+	ndDeepBrainInstance m_instance;
 };
 
 

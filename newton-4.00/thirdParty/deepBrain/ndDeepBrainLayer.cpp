@@ -23,47 +23,40 @@
 #include "ndDeepBrainLayer.h"
 
 ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ActivationType activation)
-	:ndClassAlloc()
+	:ndArray<ndDeepBrainNeuron*>()
 	,m_activation(activation)
-	,m_neurons()
 {
 	for (ndInt32 i = 0; i < outputCount; ++i)
 	{
-		ndDeepBrainNeuron* const neuron = new ndDeepBrainNeuron(inputCount);
-		m_neurons.PushBack(neuron);
+		PushBack(new ndDeepBrainNeuron(inputCount));
 	}
 }
 
 ndDeepBrainLayer::~ndDeepBrainLayer()
 {
-	for (ndInt32 i = 0; i < m_neurons.GetCount(); ++i)
+	for (ndInt32 i = GetCount()-1; i >= 0 ; --i)
 	{
-		delete m_neurons[i];
+		delete (*this)[i];
 	}
 }
 
 ndInt32 ndDeepBrainLayer::GetInputSize() const
 {
-	ndDeepBrainNeuron* const neuron = m_neurons[0];
+	ndDeepBrainNeuron* const neuron = (*this)[0];
 	return neuron->GetWeights().GetCount();
-}
-
-ndArray<ndDeepBrainNeuron*>& ndDeepBrainLayer::GetNeurons()
-{
-	return m_neurons;
 }
 
 void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		m_neurons[i]->InitGaussianWeights(mean, variance);
+		(*this)[i]->InitGaussianWeights(mean, variance);
 	}
 }
 
 void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output)
 {
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		output[i] = ndMax(ndReal(0.0f), output[i]);
 	}
@@ -71,7 +64,7 @@ void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output)
 
 void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
 {
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
 		output[i] = exp / (exp + 1.0f);
@@ -80,7 +73,7 @@ void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output)
 
 void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output)
 {
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		const ndReal exp = ndReal(ndPow(ndEXP, 2.0f * output[i]));
 		output[i] = (exp - 1.0f) / (exp + 1.0f);
@@ -90,7 +83,7 @@ void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output)
 void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 {
 	ndReal acc = 0.0f;
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
 		output[i] = exp;
@@ -99,17 +92,17 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output)
 
 	dAssert(acc > 0.0f);
 	ndReal invAcc = 1.0f / acc;
-	for (ndInt32 i = m_neurons.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		output[i] *= invAcc;
 	}
 }
 
-void ndDeepBrainLayer::Predict(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
-	for (ndInt32 i = m_neurons.GetCount()-1; i >= 0; --i)
+	for (ndInt32 i = GetCount()-1; i >= 0; --i)
 	{
-		output[i] = m_neurons[i]->Predict(input);
+		output[i] = (*this)[i]->LinearPredict(input);
 	}
 
 	switch (m_activation)

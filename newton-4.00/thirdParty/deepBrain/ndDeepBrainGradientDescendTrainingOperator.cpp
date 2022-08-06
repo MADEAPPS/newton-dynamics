@@ -19,13 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainNeuron.h"
 #include "ndDeepBrainGradientDescendTrainingOperator.h"
-
 
 ndDeepBrainGradientDescendTrainingOperator::ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain)
 	:ndDeepBrainTrainingOperator(brain)
@@ -43,7 +41,7 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	{
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
 		{
-			m_brain->SetInput(inputBatch[j]);
+			m_instance.MakePrediction(inputBatch[j]);
 		}
 	}
 }

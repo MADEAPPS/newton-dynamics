@@ -26,7 +26,7 @@
 #include "ndDeepBrainVector.h"
 #include "ndDeepBrainNeuron.h"
 
-class ndDeepBrainLayer: public ndClassAlloc
+class ndDeepBrainLayer: public ndArray<ndDeepBrainNeuron*>
 {
 	public: 
 	enum ActivationType
@@ -40,11 +40,9 @@ class ndDeepBrainLayer: public ndClassAlloc
 	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ActivationType type);
 	virtual ~ndDeepBrainLayer();
 
-	ndInt32 GetInputSize() const ;
-	ndArray<ndDeepBrainNeuron*>& GetNeurons();
-
+	ndInt32 GetInputSize() const;
 	void InitGaussianWeights(ndReal mean, ndReal variance);
-	void Predict(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 	//void BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
@@ -54,7 +52,7 @@ class ndDeepBrainLayer: public ndClassAlloc
 	void HyperbolicTanActivation(ndDeepBrainVector& output);
 
 	ActivationType m_activation;
-	ndArray<ndDeepBrainNeuron*> m_neurons;
+	//ndArray<ndDeepBrainNeuron*> m_neurons;
 };
 
 #endif 

@@ -223,13 +223,13 @@ void Test2__()
 	ndDeepBrainLayer* const inputLayer = brain.AddLayer(2, 1, ndDeepBrainLayer::m_tanh);
 	ndDeepBrainLayer* const outputLayer = brain.AddLayer(1, 1, ndDeepBrainLayer::m_sigmoid);
 
-	ndDeepBrainNeuron* const inputNeuron = inputLayer->GetNeurons()[0];
+	ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
 	ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
 	inputWeights[0] = 0.6f;
 	inputWeights[1] = -0.1f;
 	inputNeuron->SetBias(0.3f);
 	
-	ndDeepBrainNeuron* const ouputNeuron = outputLayer->GetNeurons()[0];
+	ndDeepBrainNeuron* const ouputNeuron = (*outputLayer)[0];
 	ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
 	ouputWeights[0] = 0.5f;
 	ouputNeuron->SetBias(-0.2f);

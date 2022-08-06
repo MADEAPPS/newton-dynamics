@@ -24,30 +24,17 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainVector.h"
 #include "ndDeepBrainTrainingOperator.h"
 
-class ndDeepBrain: public ndClassAlloc
+class ndDeepBrain: public ndArray<ndDeepBrainLayer*>
 {
 	public: 
 	ndDeepBrain();
 	~ndDeepBrain();
+
+	ndDeepBrainLayer* AddLayer(ndDeepBrainLayer* const layer);
 	ndDeepBrainLayer* AddLayer(ndInt32 inputs, ndInt32 output, ndDeepBrainLayer::ActivationType type);
-
-	void Predict();
-
-	ndDeepBrainVector& GetInputs();
-	ndDeepBrainVector& GetOutputs();
-	ndArray<ndDeepBrainLayer*>& GetLayers();
-
-	void SetInput(const ndDeepBrainVector& input);
-
-	protected:
-	ndDeepBrainVector m_inputs;
-	ndDeepBrainVector m_outputs;
-	ndArray<ndDeepBrainLayer*> m_layers;
 };
-
 
 #endif 
 

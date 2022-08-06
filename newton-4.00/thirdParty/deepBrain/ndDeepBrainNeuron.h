@@ -37,7 +37,7 @@ class ndDeepBrainNeuron : public ndClassAlloc
 	ndDeepBrainVector& GetWeights();
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
-	ndReal Predict(const ndDeepBrainVector& input);
+	ndReal LinearPredict(const ndDeepBrainVector& input);
 
 	protected:
 	ndReal m_bias;

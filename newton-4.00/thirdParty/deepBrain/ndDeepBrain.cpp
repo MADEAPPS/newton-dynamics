@@ -19,71 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainNeuron.h"
 
 ndDeepBrain::ndDeepBrain()
-	:ndClassAlloc()
-	,m_inputs()
-	,m_outputs()
-	,m_layers()
+	:ndArray<ndDeepBrainLayer*>()
 {
 }
 
 ndDeepBrain::~ndDeepBrain()
 {
-	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
+	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
-		delete m_layers[i];
+		delete (*this)[i];
 	}
 }
 
-ndDeepBrainVector& ndDeepBrain::GetInputs()
+ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
-	return m_inputs;
-}
-
-ndDeepBrainVector& ndDeepBrain::GetOutputs()
-{
-	return m_outputs;
-}
-
-ndArray<ndDeepBrainLayer*>& ndDeepBrain::GetLayers()
-{
-	return m_layers;
+	dAssert(!GetCount() || ((*this)[GetCount() - 1]->GetCount() == layer->GetInputSize()));
+	PushBack(layer);
+	return layer;
 }
 
 ndDeepBrainLayer* ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ActivationType type)
 {
-	ndDeepBrainLayer* const layer = new ndDeepBrainLayer(inputs, outputs, type);
-	dAssert(!m_layers.GetCount() || (m_layers[m_layers.GetCount() - 1]->GetNeurons().GetCount() == layer->GetInputSize()));
-
-	m_inputs.SetCount(ndMax(layer->GetInputSize(), m_inputs.GetCount()));
-	m_outputs.SetCount(m_inputs.GetCount());
-	m_layers.PushBack(layer);
-	return layer;
+	return AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
 }
 
-void ndDeepBrain::SetInput(const ndDeepBrainVector& input)
-{
-	dAssert(input.GetCount() == m_layers[0]->GetInputSize());
-	for (ndInt32 i = m_layers[0]->GetInputSize()-1; i >= 0; --i)
-	{
-		m_inputs[i] = input[i];
-	}
-}
-
-void ndDeepBrain::Predict()
-{
-	m_outputs.SetCount(m_inputs.GetCount());
-	for (ndInt32 i = 0; i < m_layers.GetCount(); ++i)
-	{
-		m_layers[i]->Predict(m_inputs, m_outputs);
-		m_inputs.Swap(m_outputs);
-	}
-
-	m_inputs.Swap(m_outputs);
-	m_outputs.SetCount(m_layers[m_layers.GetCount()-1]->GetNeurons().GetCount());
-}
