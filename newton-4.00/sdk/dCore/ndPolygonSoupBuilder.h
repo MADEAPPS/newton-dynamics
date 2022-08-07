@@ -54,12 +54,12 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 
 	D_CORE_API ndPolygonSoupBuilder ();
 	D_CORE_API ndPolygonSoupBuilder (const ndPolygonSoupBuilder& sopurce);
-	D_CORE_API ~ndPolygonSoupBuilder ();
+	D_CORE_API virtual ~ndPolygonSoupBuilder ();
 
-	D_CORE_API void Begin();
-	D_CORE_API void End(bool optimize);
-	D_CORE_API void AddFace(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 vertexCount, const ndInt32 faceId);
-	D_CORE_API void AddFaceIndirect(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 faceId, const ndInt32* const indexArray, ndInt32 indexCount);
+	D_CORE_API virtual void Begin();
+	D_CORE_API virtual void End(bool optimize);
+	D_CORE_API virtual void AddFace(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 vertexCount, const ndInt32 faceId);
+	D_CORE_API virtual void AddFaceIndirect(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 faceId, const ndInt32* const indexArray, ndInt32 indexCount);
 
 	D_CORE_API void SavePLY(const char* const fileName) const;
 

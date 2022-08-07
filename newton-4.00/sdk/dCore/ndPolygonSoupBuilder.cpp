@@ -636,8 +636,6 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 						face[j] = points[index];
 						faceIndex[j] = j;
 					}
-					//ndInt32 faceIndexCount = count1;
-					//tmpBuilder.AddMesh (&face[0].m_x, count1, sizeof (ndVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
 					tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(ndVector), faceId, faceIndex, count1);
 				}
 				tmpBuilder.FinalizeAndOptimize (faceId);
@@ -652,8 +650,6 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 						face[j] = tmpBuilder.m_vertexPoints[index];
 						faceIndex[j] = j;
 					}
-					//ndInt32 faceArray = indexCount;
-					//AddMesh (&face[0].m_x, indexCount, sizeof (ndVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
 					AddFaceIndirect(&face[0].m_x, sizeof(ndVector), faceId, faceIndex, indexCount);
 					faceIndexNumber += (indexCount + 1); 
 				}
