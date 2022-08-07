@@ -186,7 +186,6 @@ void ndPolygonSoupBuilder::SavePLY(const char* const fileName) const
 	fprintf(file, "ply\n");
 	fprintf(file, "format ascii 1.0\n");
 
-	//ndInt32 faceCount = 0;
 	fprintf(file, "element vertex %d\n", m_vertexPoints.GetCount());
 	fprintf(file, "property float x\n");
 	fprintf(file, "property float y\n");
