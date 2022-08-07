@@ -53,8 +53,6 @@ message ("cuda debug options ${CMAKE_CUDA_FLAGS_DEBUG}")
 message ("cuda release options ${CMAKE_CUDA_FLAGS_RELEASE}")
 message ("cuda release with debug options ${CMAKE_CUDA_FLAGS_RELWITHDEBINFO}")
 
-add_definitions(-DD_CUDA_PROFILE_FRAME_TIME)
-
 add_definitions(-D_D_CUDA_EXPORT_DLL)
 add_library(${projectName} SHARED ${CPP_SOURCE})
 set_target_properties(${projectName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON CUDA_RESOLVE_DEVICE_SYMBOLS ON)

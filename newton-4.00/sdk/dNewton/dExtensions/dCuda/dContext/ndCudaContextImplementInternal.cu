@@ -33,15 +33,6 @@
 
 static ndCudaBoundingBox __device__ g_boundingBoxBuffer[1024 * 1024 / D_THREADS_PER_BLOCK];
 
-
-__global__ void ndCudaBeginFrameInternal(ndCudaSceneInfo& info)
-{
-}
-
-__global__ void ndCudaEndFrameInternal(ndCudaSceneInfo& info)
-{
-}
-
 __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info)
 {
 	__shared__  ndCudaBoundingBox cacheAabb[D_THREADS_PER_BLOCK];
@@ -272,7 +263,6 @@ __global__ void ndCudaCalculateBodyPairsCountInternal(ndCudaSceneInfo& info)
 	//}
 };
 
-
 __global__ void ndCudaGetBodyTransformsInternal (ndCudaSceneInfo & info)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
@@ -286,16 +276,21 @@ __global__ void ndCudaGetBodyTransformsInternal (ndCudaSceneInfo & info)
 	}
 };
 
-
 __global__ void ndCudaBeginFrame(ndCudaSceneInfo& info)
 {
-	ndCudaBeginFrameInternal << <1, 1, 0 >> > (info);
+	long long start;
+	asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(start));
+	info.m_startFrameTime = start;
 }
 
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount)
 {
+	long long end;
+	asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(end));
+	info.m_frameTimeInNanosecunds = end - info.m_startFrameTime;
+
+	//printf("gpu frame:%d ms:%lld\n", info.m_frameCount, info.m_frameTimeInNanosecunds / 1000000);
 	info.m_frameCount = frameCount;
-	ndCudaEndFrameInternal << <1, 1, 0 >> > (info);
 }
 
 __global__ void ndCudaInitBodyArray(ndCudaSceneInfo& info)
@@ -402,7 +397,6 @@ __global__ void ndCudaGetBodyTransforms(ndCudaSceneInfo& info)
 		ndCudaGetBodyTransformsInternal << <blocks, D_THREADS_PER_BLOCK, 0 >> > (info);
 	}
 }
-
 
 __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
 {

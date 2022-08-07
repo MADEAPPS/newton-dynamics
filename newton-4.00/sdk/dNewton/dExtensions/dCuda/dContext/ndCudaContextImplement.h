@@ -72,7 +72,7 @@ class ndCudaContextImplement
 	// host buffers
 	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu;
 	
-	cudaStream_t m_solverMemCpyStream;
+	cudaStream_t m_solverMemCpuStream;
 	cudaStream_t m_solverComputeStream;
 	double m_timeInSeconds;
 	unsigned m_frameCounter;

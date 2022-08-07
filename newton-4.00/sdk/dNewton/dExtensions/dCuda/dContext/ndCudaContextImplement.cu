@@ -40,13 +40,13 @@ ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 	,m_transformBuffer0()
 	,m_transformBuffer1()
 	,m_transformBufferCpu()
-	,m_solverMemCpyStream(0)
+	,m_solverMemCpuStream(0)
 	,m_solverComputeStream(0)
 	,m_timeInSeconds(0.0f)
 	,m_frameCounter(0)
 {
 	cudaError_t cudaStatus;
-	cudaStatus = cudaStreamCreate(&m_solverMemCpyStream);
+	cudaStatus = cudaStreamCreate(&m_solverMemCpuStream);
 	dAssert(cudaStatus == cudaSuccess);
 
 	cudaStatus = cudaStreamCreate(&m_solverComputeStream);
@@ -78,7 +78,7 @@ ndCudaContextImplement::~ndCudaContextImplement()
 	cudaStatus = cudaStreamDestroy(m_solverComputeStream);
 	dAssert(cudaStatus == cudaSuccess);
 
-	cudaStatus = cudaStreamDestroy(m_solverMemCpyStream);
+	cudaStatus = cudaStreamDestroy(m_solverMemCpuStream);
 	dAssert(cudaStatus == cudaSuccess);
 	
 	if (cudaStatus != cudaSuccess)
@@ -94,37 +94,29 @@ float ndCudaContextImplement::GetTimeInSeconds() const
 
 void ndCudaContextImplement::Begin()
 {
-	float milliseconds = 0;
-	cudaEventSynchronize(m_device->m_endEvent);
-
-#ifdef D_CUDA_PROFILE_FRAME_TIME
-	cudaEventElapsedTime(&milliseconds, m_device->m_startEvent, m_device->m_endEvent);
-#endif
-	m_timeInSeconds = milliseconds * 1.0e-3f;
-
 	cudaDeviceSynchronize();
 	// get the scene info from the update	
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
 
-	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndCudaSceneInfo), cudaMemcpyDeviceToHost, m_solverMemCpyStream);
+	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndCudaSceneInfo), cudaMemcpyDeviceToHost, m_solverMemCpuStream);
 	dAssert(cudaStatus == cudaSuccess);
 	if (cudaStatus != cudaSuccess)
 	{
 		dAssert(0);
 	}
 
+	m_timeInSeconds = double(cpuInfo->m_frameTimeInNanosecunds) * double (1.0e-9f);
+	//printf("cpu frame:%d ms:%lld\n", cpuInfo->m_frameCount, cpuInfo->m_frameTimeInNanosecunds/1000000);
+
 	const int frameCounter = m_frameCounter;
 	if (frameCounter)
 	{
 		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu;
 		ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBuffer1 : m_transformBuffer0;
-		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpyStream);
+		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpuStream);
 	}
 
-#ifdef D_CUDA_PROFILE_FRAME_TIME
-	cudaEventRecord(m_device->m_startEvent);
-#endif
 	ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
 }
 
@@ -133,9 +125,6 @@ void ndCudaContextImplement::End()
 	m_frameCounter = m_frameCounter + 1;
 	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
 	ndCudaEndFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo, m_frameCounter);
-#ifdef D_CUDA_PROFILE_FRAME_TIME
-	cudaEventRecord(m_device->m_endEvent);
-#endif
 }
 
 ndCudaSpatialVector* ndCudaContextImplement::GetTransformBuffer()

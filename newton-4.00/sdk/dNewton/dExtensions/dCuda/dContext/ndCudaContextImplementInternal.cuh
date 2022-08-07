@@ -34,8 +34,6 @@
 
 class ndCudaSceneInfo;
 
-__global__ void ndCudaEndFrameInternal(ndCudaSceneInfo& info);
-__global__ void ndCudaBeginFrameInternal(ndCudaSceneInfo& info);
 __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info);
 __global__ void ndCudaCountAabbInternal(ndCudaSceneInfo& info);
 __global__ void ndCudaInitBodyArrayInternal(ndCudaSceneInfo& info);

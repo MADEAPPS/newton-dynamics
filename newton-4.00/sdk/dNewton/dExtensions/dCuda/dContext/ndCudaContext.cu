@@ -78,7 +78,6 @@ void ndCudaContext::End()
 	m_implement->End();
 }
 
-
 void ndCudaContext::ResizeBuffers(int size)
 {
 	m_implement->ResizeBuffers(size);

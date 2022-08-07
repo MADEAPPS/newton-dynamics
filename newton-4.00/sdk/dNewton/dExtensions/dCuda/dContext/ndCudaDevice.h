@@ -28,8 +28,6 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-//#define D_CUDA_PROFILE_FRAME_TIME
-
 class ndCudaDevice
 {
 	public:
@@ -40,9 +38,6 @@ class ndCudaDevice
 	double m_frequency;
 	unsigned m_valid;
 	unsigned m_blocksPerKernelCall;
-
-	CUevent m_startEvent;
-	CUevent m_endEvent;
 };
 
 #endif

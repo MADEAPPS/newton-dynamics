@@ -15,7 +15,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-ndArray<ndMatrix> ndDemoInstanceEntity::m_matrixStack;
 
 ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix)
 	:ndDemoMesh(name)
@@ -297,6 +296,12 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 	m_instanceMesh->Release();
 }
 
+ndArray<ndMatrix>& ndDemoInstanceEntity::GetMatrixStack()
+{
+	static ndArray<ndMatrix> matrixStack;
+	return matrixStack;
+}
+
 void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	D_TRACKTIME();
@@ -309,15 +314,15 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 	
 	// prepare the transforms buffer form all the children matrices
 	ndInt32 index = 0;
-	//ndMatrix* const matrixStack = dAlloca(ndMatrix, count);
-	m_matrixStack.SetCount(count);
+	ndArray<ndMatrix>& matrixStack = GetMatrixStack();
+	matrixStack.SetCount(count);
 	
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
-		m_matrixStack[index] = child->GetCurrentMatrix();
+		matrixStack[index] = child->GetCurrentMatrix();
 		index++;
 	}
-	m_instanceMesh->SetTransforms(count, &m_matrixStack[0]);
+	m_instanceMesh->SetTransforms(count, &matrixStack[0]);
 	
 	ndMatrix nodeMatrix(m_matrix * matrix);
 	m_instanceMesh->Render(scene, nodeMatrix);

@@ -42,6 +42,8 @@ class ndCudaSceneInfo
 		,m_transformBuffer1()
 		,m_frameCount(0)
 		,m_frameIsValid(0)
+		,m_startFrameTime(0)
+		,m_frameTimeInNanosecunds(0)
 	{
 	}
 
@@ -56,8 +58,9 @@ class ndCudaSceneInfo
 	
 	unsigned m_frameCount;
 	unsigned m_frameIsValid;
+	long long m_startFrameTime;
+	long long m_frameTimeInNanosecunds;
 };
-
 
 inline void __device__ cuInvalidateFrame(ndCudaSceneInfo& info, const char* functionName, unsigned lineNumber)
 {

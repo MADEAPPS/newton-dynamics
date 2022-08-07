@@ -42,8 +42,9 @@ class ndDemoInstanceEntity: public ndDemoEntity
 
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
+	static ndArray<ndMatrix>& GetMatrixStack();
+
 	ndDemoMeshIntance* m_instanceMesh;
-	static ndArray<ndMatrix> m_matrixStack;
 };
 
 #endif
