@@ -29,21 +29,12 @@
 class ndDeepBrainLayer: public ndArray<ndDeepBrainNeuron*>
 {
 	public: 
-	enum ActivationType
-	{
-		m_relu,
-		m_tanh,
-		m_sigmoid,
-		m_softmax
-	};
-
-	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ActivationType type);
+	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ndActivationType type);
 	virtual ~ndDeepBrainLayer();
 
 	ndInt32 GetInputSize() const;
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
-	//void BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
 	void ReluActivation(ndDeepBrainVector& output);
@@ -51,7 +42,9 @@ class ndDeepBrainLayer: public ndArray<ndDeepBrainNeuron*>
 	void SoftmaxActivation(ndDeepBrainVector& output);
 	void HyperbolicTanActivation(ndDeepBrainVector& output);
 
-	ActivationType m_activation;
+	//void BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+
+	ndActivationType m_activation;
 	//ndArray<ndDeepBrainNeuron*> m_neurons;
 };
 

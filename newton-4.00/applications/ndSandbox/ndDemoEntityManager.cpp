@@ -220,8 +220,8 @@ void Test2__()
 	ndSetRandSeed(142543);
 
 #if 1
-	ndDeepBrainLayer* const inputLayer = brain.AddLayer(2, 2, ndDeepBrainLayer::m_tanh);
-	ndDeepBrainLayer* const outputLayer = brain.AddLayer(2, 1, ndDeepBrainLayer::m_sigmoid);
+	ndDeepBrainLayer* const inputLayer = brain.AddLayer(2, 2, m_tanh);
+	ndDeepBrainLayer* const outputLayer = brain.AddLayer(2, 1, m_sigmoid);
 
 	//ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
 	//ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();

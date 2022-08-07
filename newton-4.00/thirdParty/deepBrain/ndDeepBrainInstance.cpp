@@ -51,6 +51,11 @@ ndArray<ndDeepBrainLayer*>& ndDeepBrainInstance::GetLayers()
 	return *m_brain;
 }
 
+const ndArray<ndDeepBrainLayer*>& ndDeepBrainInstance::GetLayers() const
+{
+	return *m_brain;
+}
+
 void ndDeepBrainInstance::SetInput(const ndDeepBrainVector& input)
 {
 	ndDeepBrainLayer* const inputLayer = (*m_brain)[0];
@@ -80,4 +85,37 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input)
 		m_inputs.Swap(m_outputs);
 	}
 	m_inputs.Swap(m_outputs);
+}
+
+void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output, const ndPrefixScan& prefixSum)
+{
+	SetInput(input);
+	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
+	dAssert(layers.GetCount());
+
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		ndDeepBrainLayer* const layer = layers[i];
+		dAssert(m_inputs.GetCount() == layer->GetInputSize());
+
+		ndInt32 neuronsCount = layer->GetCount();
+		m_outputs.SetCount(neuronsCount);
+		layer->MakePrediction(m_inputs, m_outputs);
+		ndInt32 start = prefixSum[i];
+		for (ndInt32 j = neuronsCount - 1; j >= 0; --j)
+		{
+			output[start + j] = m_outputs[j];
+		}
+		m_inputs.Swap(m_outputs);
+	}
+	m_inputs.Swap(m_outputs);
+}
+
+void ndDeepBrainInstance::BackPropagate(const ndDeepBrainVector& output, const ndPrefixScan& prefixSum)
+{
+	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
+	dAssert(layers.GetCount());
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+	}
 }

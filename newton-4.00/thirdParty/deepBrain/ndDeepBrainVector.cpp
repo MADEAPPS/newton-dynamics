@@ -47,3 +47,12 @@ void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 		(*this)[i] = ndReal(ndGaussianRandom(mean, variance));
 	}
 }
+
+void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
+{
+	dAssert(GetCount() == data.GetCount());
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i] = data[i];
+	}
+}

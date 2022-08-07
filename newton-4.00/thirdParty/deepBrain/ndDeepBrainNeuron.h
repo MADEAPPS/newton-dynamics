@@ -39,7 +39,6 @@ class ndDeepBrainNeuron : public ndDeepBrainVector
 
 	protected:
 	ndReal m_bias;
-	//ndDeepBrainVector m_weights;
 };
 
 #endif 

@@ -28,6 +28,9 @@
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
+	,m_prefixScan()
+	,m_error()
+	,m_output()
 {
 }
 
@@ -44,6 +47,29 @@ void ndDeepBrainTrainingOperator::InitGaussianWeights(ndReal mean, ndReal varian
 	}
 }
 
+void ndDeepBrainTrainingOperator::PrefixScan()
+{
+	const ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
+	m_prefixScan.SetCount(layers.GetCount() + 1);
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		m_prefixScan[i] = layers[i]->GetCount();
+	}
+
+	ndInt32 sum = 0;
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		ndInt32 size = m_prefixScan[i];
+		m_prefixScan[i] = sum;
+		sum += size;
+	}
+	m_prefixScan[layers.GetCount()] = sum;
+	m_error.SetCount(sum);
+	m_output.SetCount(sum);
+	m_error.SetValue(0.0f);
+	m_output.SetValue(0.0f);
+}
+
 void ndDeepBrainTrainingOperator::BackwardPass()
 {
 	//for (ndInt32 i = m_layers.GetCount()-1; i >= 0; --i)
@@ -54,7 +80,3 @@ void ndDeepBrainTrainingOperator::BackwardPass()
 	//m_inputs.Swap(m_outputs);
 }
 
-//void ndDeepBrainTrainingOperator::Train()
-//{
-//	InitGaussianWeights(0.0f, 0.2f);
-//}

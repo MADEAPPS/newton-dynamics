@@ -22,7 +22,7 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
 
-ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ActivationType activation)
+ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndActivationType activation)
 	:ndArray<ndDeepBrainNeuron*>()
 	,m_activation(activation)
 {

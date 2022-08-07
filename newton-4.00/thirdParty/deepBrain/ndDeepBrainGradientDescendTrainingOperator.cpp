@@ -34,13 +34,19 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 {
 }
 
-void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate, ndInt32 steps)
+void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
+	dAssert(inputBatch.GetCount() == groundTruth.GetCount());
+
+	PrefixScan();
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
 		{
-			m_instance.MakePrediction(inputBatch[j]);
+			const ndDeepBrainVector& input = inputBatch[j];
+			const ndDeepBrainVector& truth = groundTruth[j];
+			m_instance.MakeTrainingPrediction(input, m_output, m_prefixScan);
+			m_instance.BackPropagate(m_output, m_prefixScan);
 		}
 	}
 }

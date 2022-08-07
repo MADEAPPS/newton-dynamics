@@ -25,6 +25,18 @@
 
 #include <ndCore.h>
 
+enum ndActivationType
+{
+	m_relu,
+	m_tanh,
+	m_sigmoid,
+	m_softmax
+};
+
+class ndPrefixScan: public ndFixSizeArray<ndInt32, 256>
+{
+};
+
 
 #endif 
 

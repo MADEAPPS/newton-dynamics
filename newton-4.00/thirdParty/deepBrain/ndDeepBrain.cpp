@@ -43,7 +43,7 @@ ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 	return layer;
 }
 
-ndDeepBrainLayer* ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainLayer::ActivationType type)
+ndDeepBrainLayer* ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndActivationType type)
 {
 	return AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
 }

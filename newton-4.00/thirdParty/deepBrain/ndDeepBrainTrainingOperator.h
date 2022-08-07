@@ -26,8 +26,6 @@
 #include "ndDeepBrainMatrix.h"
 #include "ndDeepBrainInstance.h"
 
-//class ndDeepBrain;
-
 class ndDeepBrainTrainingOperator: public ndClassAlloc
 {
 	public: 
@@ -35,11 +33,16 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	virtual ~ndDeepBrainTrainingOperator();
 
 	void InitGaussianWeights(ndReal mean, ndReal variance);
-	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruh, ndReal learnRate, ndInt32 steps) = 0;
+	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:
+	void PrefixScan();
 	virtual void BackwardPass();
+
 	ndDeepBrainInstance m_instance;
+	ndPrefixScan m_prefixScan;
+	ndDeepBrainVector m_error;
+	ndDeepBrainVector m_output;
 };
 
 

@@ -37,15 +37,20 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrainVector& GetInputs();
 	ndDeepBrainVector& GetOutputs();
 	ndArray<ndDeepBrainLayer*>& GetLayers();
+	const ndArray<ndDeepBrainLayer*>& GetLayers() const;
 
 	void MakePrediction(const ndDeepBrainVector& input);
 
 	protected:
 	void SetInput(const ndDeepBrainVector& input);
+	void BackPropagate(const ndDeepBrainVector& output, const ndPrefixScan& scan);
+	void MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output, const ndPrefixScan& scan);
 
 	ndDeepBrainVector m_inputs;
 	ndDeepBrainVector m_outputs;
 	ndDeepBrain* m_brain;
+
+	friend class ndDeepBrainGradientDescendTrainingOperator;
 };
 
 

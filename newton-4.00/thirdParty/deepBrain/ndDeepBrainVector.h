@@ -32,6 +32,8 @@ class ndDeepBrainVector: public ndArray<ndReal>
 
 	void SetValue(ndReal value);
 	void InitGaussianWeights(ndReal mean, ndReal variance);
+
+	void CopyData(const ndDeepBrainVector& data);
 };
 
 #endif 
