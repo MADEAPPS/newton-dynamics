@@ -250,8 +250,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	ndFloat32 CalculateFaceMaxSize (const ndVector* const vertex, ndInt32 indexCount, const ndInt32* const indexArray) const;
 	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
-	void ImproveNodeFitness (ndNodeBuilder* const node) const;
-
+	
 	ndNode* m_aabb;
 	ndInt32* m_indices;
 	ndInt32 m_nodesCount;

@@ -102,27 +102,10 @@ class ndAabbPolygonSoup::ndNodeBuilder: public ndAabbPolygonSoup::ndNode
 	{
 		m_p0 = p0;
 		m_p1 = p1;
-		m_size = m_p1 - m_p0;
-		m_origin = (m_p1 + m_p0) * ndVector::m_half;
-		m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
-	}
-
-	inline static ndFloat32 CalculateSurfaceArea (ndNodeBuilder* const node0, ndNodeBuilder* const node1, ndVector& minBox, ndVector& maxBox)
-	{
-		minBox = node0->m_p0.GetMin(node1->m_p0);
-		maxBox = node0->m_p1.GetMax(node1->m_p1);
-
-		ndVector side0 ((maxBox - minBox) * ndVector::m_half);
-		ndVector side1 (side0.ShiftTripleLeft());
-		return side0.DotProduct(side1).GetScalar();
 	}
 
 	ndVector m_p0;
 	ndVector m_p1;
-	ndVector m_size;
-	ndVector m_origin;
-	ndFloat32 m_area;
-	
 	ndNodeBuilder* m_left;
 	ndNodeBuilder* m_right;
 	ndNodeBuilder* m_parent;
@@ -260,182 +243,6 @@ ndAabbPolygonSoup::~ndAabbPolygonSoup ()
 	{
 		ndMemory::Free(m_aabb);
 		ndMemory::Free(m_indices);
-	}
-}
-
-void ndAabbPolygonSoup::ImproveNodeFitness (ndNodeBuilder* const node) const
-{
-	dAssert (node->m_left);
-	dAssert (node->m_right);
-
-	if (node->m_parent)	
-	{
-		dAssert(node->m_parent->m_p0.m_w == ndFloat32(0.0f));
-		dAssert(node->m_parent->m_p1.m_w == ndFloat32(0.0f));
-
-		if (node->m_parent->m_left == node) 
-		{
-			ndFloat32 cost0 = node->m_area;
-
-			ndVector cost1P0;
-			ndVector cost1P1;		
-			ndFloat32 cost1 = ndNodeBuilder::CalculateSurfaceArea (node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
-
-			ndVector cost2P0;
-			ndVector cost2P1;		
-			ndFloat32 cost2 = ndNodeBuilder::CalculateSurfaceArea (node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
-
-			if ((cost1 <= cost0) && (cost1 <= cost2)) 
-			{
-				ndNodeBuilder* const parent = node->m_parent;
-				node->m_p0 = parent->m_p0;
-				node->m_p1 = parent->m_p1;
-				node->m_area = parent->m_area; 
-				node->m_size = parent->m_size;
-				node->m_origin = parent->m_origin;
-
-				if (parent->m_parent) 
-				{
-					if (parent->m_parent->m_left == parent) 
-					{
-						parent->m_parent->m_left = node;
-					} 
-					else 
-					{
-						dAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_right->m_parent = parent;
-				parent->m_left = node->m_right;
-				node->m_right = parent;
-				parent->m_p0 = cost1P0;
-				parent->m_p1 = cost1P1;		
-				parent->m_area = cost1;
-				parent->m_size = (parent->m_p1 - parent->m_p0) * ndVector::m_half;
-				parent->m_origin = (parent->m_p1 + parent->m_p0) * ndVector::m_half;
-
-			} 
-			else if ((cost2 <= cost0) && (cost2 <= cost1)) 
-			{
-				ndNodeBuilder* const parent = node->m_parent;
-				node->m_p0 = parent->m_p0;
-				node->m_p1 = parent->m_p1;
-				node->m_area = parent->m_area; 
-				node->m_size = parent->m_size;
-				node->m_origin = parent->m_origin;
-
-				if (parent->m_parent) 
-				{
-					if (parent->m_parent->m_left == parent) 
-					{
-						parent->m_parent->m_left = node;
-					} 
-					else 
-					{
-						dAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_left->m_parent = parent;
-				parent->m_left = node->m_left;
-				node->m_left = parent;
-
-				parent->m_p0 = cost2P0;
-				parent->m_p1 = cost2P1;		
-				parent->m_area = cost2;
-				parent->m_size = (parent->m_p1 - parent->m_p0) * ndVector::m_half;
-				parent->m_origin = (parent->m_p1 + parent->m_p0) * ndVector::m_half;
-			}
-		} 
-		else 
-		{
-			ndFloat32 cost0 = node->m_area;
-
-			ndVector cost1P0;
-			ndVector cost1P1;		
-			ndFloat32 cost1 = ndNodeBuilder::CalculateSurfaceArea (node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
-
-			ndVector cost2P0;
-			ndVector cost2P1;		
-			ndFloat32 cost2 = ndNodeBuilder::CalculateSurfaceArea (node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
-
-			if ((cost1 <= cost0) && (cost1 <= cost2)) 
-			{
-				ndNodeBuilder* const parent = node->m_parent;
-				node->m_p0 = parent->m_p0;
-				node->m_p1 = parent->m_p1;
-				node->m_area = parent->m_area; 
-				node->m_size = parent->m_size;
-				node->m_origin = parent->m_origin;
-
-				if (parent->m_parent) 
-				{
-					if (parent->m_parent->m_left == parent) 
-					{
-						parent->m_parent->m_left = node;
-					} 
-					else 
-					{
-						dAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_left->m_parent = parent;
-				parent->m_right = node->m_left;
-				node->m_left = parent;
-
-				parent->m_p0 = cost1P0;
-				parent->m_p1 = cost1P1;		
-				parent->m_area = cost1;
-				parent->m_size = (parent->m_p1 - parent->m_p0) * ndVector::m_half;
-				parent->m_origin = (parent->m_p1 + parent->m_p0) * ndVector::m_half;
-
-			} 
-			else if ((cost2 <= cost0) && (cost2 <= cost1)) 
-			{
-				ndNodeBuilder* const parent = node->m_parent;
-				node->m_p0 = parent->m_p0;
-				node->m_p1 = parent->m_p1;
-				node->m_area = parent->m_area; 
-				node->m_size = parent->m_size;
-				node->m_origin = parent->m_origin;
-
-				if (parent->m_parent) 
-				{
-					if (parent->m_parent->m_left == parent) 
-					{
-						parent->m_parent->m_left = node;
-					} 
-					else 
-					{
-						dAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_right->m_parent = parent;
-				parent->m_right = node->m_right;
-				node->m_right = parent;
-
-				parent->m_p0 = cost2P0;
-				parent->m_p1 = cost2P1;		
-				parent->m_area = cost2;
-				parent->m_size = (parent->m_p1 - parent->m_p0) * ndVector::m_half;
-				parent->m_origin = (parent->m_p1 + parent->m_p0) * ndVector::m_half;
-			}
-		}
-	} 
-	else 
-	{
-		// in the future I can handle this but it is too much work for little payoff
 	}
 }
 
@@ -1006,57 +813,9 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	}
 
 	ndNodeBuilder* contructorAllocator = &constructor[allocatorIndex];
-	ndNodeBuilder* root = BuildTopDown (&constructor[0], 0, allocatorIndex - 1, &contructorAllocator);
+	ndNodeBuilder* const root = BuildTopDown (&constructor[0], 0, allocatorIndex - 1, &contructorAllocator);
 
 	dAssert (root);
-	dTrace(("*****->this is broken\n"));
-	//if (root->m_left) 
-	//{
-	//	dAssert (root->m_right);
-	//	ndList<ndNodeBuilder*> list;
-	//	ndList<ndNodeBuilder*> stack;
-	//	stack.Append(root);
-	//	while (stack.GetCount()) 
-	//	{
-	//		ndList<ndNodeBuilder*>::ndNode* const stackNode = stack.GetLast();
-	//		ndNodeBuilder* const node = stackNode->GetInfo();
-	//		stack.Remove(stackNode);
-	//
-	//		if (node->m_left) 
-	//		{
-	//			dAssert (node->m_right);
-	//			list.Append(node);
-	//			stack.Append(node->m_right);
-	//			stack.Append(node->m_left);
-	//		} 
-	//	}
-	//
-	//	ndFloat64 newCost = ndFloat32 (1.0e20f);
-	//	ndFloat64 prevCost = newCost;
-	//	do 
-	//	{
-	//		prevCost = newCost;
-	//		for (ndList<ndNodeBuilder*>::ndNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
-	//		{
-	//			ndNodeBuilder* const node = listNode->GetInfo();
-	//			ImproveNodeFitness (node);
-	//		}
-	//
-	//		newCost = ndFloat32 (0.0f);
-	//		for (ndList<ndNodeBuilder*>::ndNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
-	//		{
-	//			ndNodeBuilder* const node = listNode->GetInfo();
-	//			newCost += node->m_area;
-	//		}
-	//	} while (newCost < (prevCost * ndFloat32 (0.9999f)));
-	//
-	//	root = list.GetLast()->GetInfo();
-	//	while (root->m_parent) 
-	//	{
-	//		root = root->m_parent;
-	//	}
-	//}
-
 	ndList<ndNodeBuilder*> list;
 	list.Append(root);
 	ndInt32 nodeIndex = 0;
