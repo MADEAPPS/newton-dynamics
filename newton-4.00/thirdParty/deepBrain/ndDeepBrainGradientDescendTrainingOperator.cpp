@@ -39,6 +39,8 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	dAssert(inputBatch.GetCount() == groundTruth.GetCount());
 
 	PrefixScan();
+	ndDeepBrainVector leastSquaredError;
+	leastSquaredError.SetCount(m_prefixScan[m_prefixScan.GetCount() - 1] - m_prefixScan[m_prefixScan.GetCount() - 2]);
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
@@ -46,7 +48,8 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			const ndDeepBrainVector& input = inputBatch[j];
 			const ndDeepBrainVector& truth = groundTruth[j];
 			m_instance.MakeTrainingPrediction(input, m_output, m_prefixScan);
-			m_instance.BackPropagate(m_output, m_prefixScan);
+			leastSquaredError.Sub(truth, m_instance.GetOutputs());
+			m_instance.BackPropagate(leastSquaredError, m_output, m_prefixScan);
 		}
 	}
 }

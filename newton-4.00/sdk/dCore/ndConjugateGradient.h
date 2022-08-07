@@ -211,10 +211,10 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolera
 		dAssert(fabs(den) > T(0.0f));
 		T alpha = num / den;
 	
-		ndMulAdd(size, x, x, m_p0, alpha);
+		ndMulScale(size, x, x, m_p0, alpha);
 		if ((j % 50) != 49) 
 		{
-			ndMulAdd(size, m_r0, m_r0, m_z0, -alpha);
+			ndMulScale(size, m_r0, m_r0, m_z0, -alpha);
 		} 
 		else 
 		{
@@ -226,7 +226,7 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolera
 	
 		T num1 = ndDotProduct(size, m_r0, m_q0);
 		T beta = num1 / num;
-		ndMulAdd(size, m_p0, m_q0, m_p0, beta);
+		ndMulScale(size, m_p0, m_q0, m_p0, beta);
 		num = ndDotProduct(size, m_r0, m_q0);
 		iter++;
 		error2 = num;

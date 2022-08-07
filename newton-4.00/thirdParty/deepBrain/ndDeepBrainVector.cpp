@@ -56,3 +56,37 @@ void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
 		(*this)[i] = data[i];
 	}
 }
+
+void ndDeepBrainVector::Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+{
+	dAssert(GetCount() == a.GetCount());
+	dAssert(GetCount() == b.GetCount());
+	ndAdd(GetCount(), &(*this)[0], &a[0], &b[0]);
+}
+
+void ndDeepBrainVector::Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+{
+	dAssert(GetCount() == a.GetCount());
+	dAssert(GetCount() == b.GetCount());
+	ndSub(GetCount(), &(*this)[0], &a[0], &b[0]);
+}
+
+void ndDeepBrainVector::MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+{
+	dAssert(GetCount() == a.GetCount());
+	dAssert(GetCount() == b.GetCount());
+	ndMulAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
+}
+
+void ndDeepBrainVector::MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+{
+	dAssert(GetCount() == a.GetCount());
+	dAssert(GetCount() == b.GetCount());
+	ndMulSub(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
+}
+
+ndReal ndDeepBrainVector::Dot(const ndDeepBrainVector& a) const
+{
+	dAssert(GetCount() == a.GetCount());
+	return ndDotProduct(GetCount(), &(*this)[0], &a[0]);
+}

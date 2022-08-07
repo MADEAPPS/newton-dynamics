@@ -77,11 +77,29 @@ void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
+void ndMulScale(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] + B[i] * C;
+	}
+}
+
+template<class T>
+void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, const T* const C)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = A[i] + B[i] * C[i];
+	}
+}
+
+template<class T>
+void ndMulSub(ndInt32 size, T* const X, const T* const A, const T* const B, const T* const C)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = A[i] - B[i] * C[i];
 	}
 }
 

@@ -111,7 +111,7 @@ void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input,
 	m_inputs.Swap(m_outputs);
 }
 
-void ndDeepBrainInstance::BackPropagate(const ndDeepBrainVector& output, const ndPrefixScan& prefixSum)
+void ndDeepBrainInstance::BackPropagate(const ndDeepBrainVector& leastSquareError, const ndDeepBrainVector& output, const ndPrefixScan& prefixSum)
 {
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	dAssert(layers.GetCount());
