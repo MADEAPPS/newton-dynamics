@@ -20,10 +20,24 @@
 */
 
 
-#ifndef _ND_DEEP_BRAIN_STDAFX_H__
-#define _ND_DEEP_BRAIN_STDAFX_H__
+#ifndef _ND_DEEP_BRAIN_TYPES_H__
+#define _ND_DEEP_BRAIN_TYPES_H__
 
-#include <ndCore.h>
+#include "ndDeepBrainStdafx.h"
+
+enum ndDeepBrainActivationType
+{
+	m_relu,
+	m_tanh,
+	m_sigmoid,
+	m_softmax
+};
+
+class ndDeepBrainPrefixScan : public ndFixSizeArray<ndInt32, 256>
+{
+	public:
+};
+
 
 #endif 
 

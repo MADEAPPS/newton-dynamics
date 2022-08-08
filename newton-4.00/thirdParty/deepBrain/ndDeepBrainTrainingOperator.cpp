@@ -27,9 +27,9 @@
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
-	,m_prefixScan()
 	,m_error()
 	,m_output()
+	,m_prefixScan()
 {
 }
 

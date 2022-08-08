@@ -23,12 +23,13 @@
 #define _ND_DEEP_BRAIN_LAYER_H__
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrainTypes.h"
 #include "ndDeepBrainVector.h"
 
 class ndDeepBrainLayer: public ndClassAlloc
 {
 	public: 
-	ndDeepBrainLayer(ndInt32 outputs, ndActivationType type);
+	ndDeepBrainLayer(ndInt32 outputs, ndDeepBrainActivationType type);
 	virtual ~ndDeepBrainLayer();
 
 	virtual ndInt32 GetOuputSize() const;
@@ -44,7 +45,7 @@ class ndDeepBrainLayer: public ndClassAlloc
 	void HyperbolicTanActivation(ndDeepBrainVector& output) const;
 
 	ndDeepBrainVector m_bias;
-	ndActivationType m_activation;
+	ndDeepBrainActivationType m_activation;
 };
 
 #endif 

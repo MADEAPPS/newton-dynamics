@@ -22,7 +22,7 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainFullyConnectedLayer.h"
 
-ndDeepBrainFullyConnectedLayer::ndDeepBrainFullyConnectedLayer(ndInt32 inputCount, ndInt32 outputCount, ndActivationType activation)
+ndDeepBrainFullyConnectedLayer::ndDeepBrainFullyConnectedLayer(ndInt32 inputCount, ndInt32 outputCount, ndDeepBrainActivationType activation)
 	:ndDeepBrainLayer(outputCount, activation)
 	,ndDeepBrainMatrix(outputCount, inputCount)
 {

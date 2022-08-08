@@ -40,9 +40,9 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	virtual void BackwardPass();
 
 	ndDeepBrainInstance m_instance;
-	ndPrefixScan m_prefixScan;
 	ndDeepBrainVector m_error;
 	ndDeepBrainVector m_output;
+	ndDeepBrainPrefixScan m_prefixScan;
 };
 
 

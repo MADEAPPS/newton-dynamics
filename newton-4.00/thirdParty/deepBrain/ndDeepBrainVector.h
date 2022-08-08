@@ -29,20 +29,16 @@ class ndDeepBrainVector: public ndArray<ndReal>
 	public: 
 	ndDeepBrainVector();
 	~ndDeepBrainVector();
-
-	void SetValue(ndReal value);
+	
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
+	void SetValue(ndReal value);
+	ndReal Dot(const ndDeepBrainVector& a) const;
 	void CopyData(const ndDeepBrainVector& data);
-
-	void MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-	void MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-
 	void Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
 	void Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-	
-	//void Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-	ndReal Dot(const ndDeepBrainVector& a) const;
+	void MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
+	void MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
 };
 
 #endif 

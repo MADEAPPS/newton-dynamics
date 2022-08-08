@@ -30,7 +30,7 @@ class ndDeepBrainFullyConnectedLayer: public ndDeepBrainLayer, public ndDeepBrai
 {
 	public:
 	D_OPERATOR_NEW_AND_DELETE
-	ndDeepBrainFullyConnectedLayer(ndInt32 inputs, ndInt32 outputs, ndActivationType type);
+	ndDeepBrainFullyConnectedLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainActivationType type);
 	virtual ~ndDeepBrainFullyConnectedLayer();
 
 	virtual ndInt32 GetInputSize() const;
