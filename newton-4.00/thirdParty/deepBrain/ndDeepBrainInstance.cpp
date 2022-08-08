@@ -21,7 +21,6 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
-#include "ndDeepBrainNeuron.h"
 #include "ndDeepBrainInstance.h"
 
 ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
@@ -59,19 +58,16 @@ const ndArray<ndDeepBrainLayer*>& ndDeepBrainInstance::GetLayers() const
 void ndDeepBrainInstance::SetInput(const ndDeepBrainVector& input)
 {
 	ndDeepBrainLayer* const inputLayer = (*m_brain)[0];
-
 	ndInt32 size = inputLayer->GetInputSize();
 	dAssert(size == input.GetCount());
 
 	m_inputs.SetCount(size);
-	for (ndInt32 i = size -1; i >= 0; --i)
-	{
-		m_inputs[i] = input[i];
-	}
+	m_inputs.CopyData(input);
 }
 
 void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input)
 {
+	dAssert(0);
 	SetInput(input);
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	dAssert(layers.GetCount());
@@ -80,7 +76,9 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
 		dAssert(m_inputs.GetCount() == layer->GetInputSize());
-		m_outputs.SetCount(layer->GetCount());
+
+		ndInt32 neuronsCount = layer->GetOuputSize();
+		m_outputs.SetCount(neuronsCount);
 		layer->MakePrediction(m_inputs, m_outputs);
 		m_inputs.Swap(m_outputs);
 	}
@@ -97,8 +95,8 @@ void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input,
 	{
 		ndDeepBrainLayer* const layer = layers[i];
 		dAssert(m_inputs.GetCount() == layer->GetInputSize());
-
-		ndInt32 neuronsCount = layer->GetCount();
+		
+		ndInt32 neuronsCount = layer->GetOuputSize();
 		m_outputs.SetCount(neuronsCount);
 		layer->MakePrediction(m_inputs, m_outputs);
 		ndInt32 start = prefixSum[i];

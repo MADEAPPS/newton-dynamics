@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainMatrix.h"
 
@@ -61,5 +60,17 @@ void ndDeepBrainMatrix::InitGaussianWeights(ndReal mean, ndReal variance)
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
 		me[i].InitGaussianWeights(mean, variance);
+	}
+}
+
+void ndDeepBrainMatrix::Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const
+{
+	const ndDeepBrainMatrix& me = *this;
+	ndInt32 columns = input.GetCount();
+	dAssert(columns == me[0].GetCount());
+	dAssert(output.GetCount() == GetCount());
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		output[i] = ndDotProduct(columns, &me[i][0], &input[0]);
 	}
 }

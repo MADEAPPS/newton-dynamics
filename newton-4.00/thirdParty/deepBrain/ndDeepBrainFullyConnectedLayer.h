@@ -19,38 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_DEEP_BRAIN_FULLY_CONNECTED_LAYER_H__
+#define _ND_DEEP_BRAIN_FULLY_CONNECTED_LAYER_H__
+
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainNeuron.h"
+#include "ndDeepBrainLayer.h"
+#include "ndDeepBrainMatrix.h"
 
-ndDeepBrainNeuron::ndDeepBrainNeuron(ndInt32 inputs)
-	:ndDeepBrainVector()
-	,m_bias(0.0f)
+class ndDeepBrainFullyConnectedLayer: public ndDeepBrainLayer, public ndDeepBrainMatrix
 {
-	SetCount(inputs);
-}
+	public:
+	D_OPERATOR_NEW_AND_DELETE
+	ndDeepBrainFullyConnectedLayer(ndInt32 inputs, ndInt32 outputs, ndActivationType type);
+	virtual ~ndDeepBrainFullyConnectedLayer();
 
-ndDeepBrainNeuron::~ndDeepBrainNeuron()
-{
-}
+	virtual ndInt32 GetInputSize() const;
+	virtual void InitGaussianWeights(ndReal mean, ndReal variance);
+	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+};
 
-ndReal ndDeepBrainNeuron::GetBias() const
-{
-	return m_bias;
-}
+#endif 
 
-void ndDeepBrainNeuron::SetBias(ndReal bias)
-{
-	m_bias = bias;
-}
-
-void ndDeepBrainNeuron::InitGaussianWeights(ndReal mean, ndReal variance)
-{
-	m_bias = ndReal(ndGaussianRandom(mean, variance));
-	ndDeepBrainVector::InitGaussianWeights(mean, variance);
-}
-
-ndReal ndDeepBrainNeuron::LinearPredict(const ndDeepBrainVector& input)
-{
-	dAssert(input.GetCount() >= GetCount());
-	return m_bias + Dot(input);
-}

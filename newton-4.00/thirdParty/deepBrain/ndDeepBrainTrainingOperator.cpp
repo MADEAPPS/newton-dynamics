@@ -22,7 +22,6 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainNeuron.h"
 #include "ndDeepBrainTrainingOperator.h"
 
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
@@ -53,9 +52,9 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	m_prefixScan.SetCount(layers.GetCount() + 1);
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		m_prefixScan[i] = layers[i]->GetCount();
+		m_prefixScan[i] = layers[i]->GetOuputSize();
 	}
-
+	
 	ndInt32 sum = 0;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{

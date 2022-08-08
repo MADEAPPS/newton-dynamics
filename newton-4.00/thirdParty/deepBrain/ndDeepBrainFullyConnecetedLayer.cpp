@@ -19,27 +19,36 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_NEURON_H__
-#define _ND_DEEP_BRAIN_NEURON_H__
-
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainVector.h"
+#include "ndDeepBrainFullyConnectedLayer.h"
 
-class ndDeepBrainNeuron : public ndDeepBrainVector
+ndDeepBrainFullyConnectedLayer::ndDeepBrainFullyConnectedLayer(ndInt32 inputCount, ndInt32 outputCount, ndActivationType activation)
+	:ndDeepBrainLayer(outputCount, activation)
+	,ndDeepBrainMatrix(outputCount, inputCount)
 {
-	public: 
-	ndDeepBrainNeuron(ndInt32 inputs);
-	~ndDeepBrainNeuron();
+}
 
-	ndReal GetBias() const;
-	void SetBias(ndReal bias);
-	void InitGaussianWeights(ndReal mean, ndReal variance);
+ndDeepBrainFullyConnectedLayer::~ndDeepBrainFullyConnectedLayer()
+{
+}
 
-	ndReal LinearPredict(const ndDeepBrainVector& input);
+ndInt32 ndDeepBrainFullyConnectedLayer::GetInputSize() const
+{
+	return (*this)[0].GetCount();
+}
 
-	protected:
-	ndReal m_bias;
-};
+void ndDeepBrainFullyConnectedLayer::InitGaussianWeights(ndReal mean, ndReal variance)
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i].InitGaussianWeights(mean, variance);
+	}
+}
 
-#endif 
+void ndDeepBrainFullyConnectedLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+{
+	Mul(input, output);
+	output.Add(output, m_bias);
+	ApplyActivation(output);
+}
 

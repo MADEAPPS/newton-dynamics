@@ -33,6 +33,7 @@ class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 
 	void SetValue(ndReal value);
 	void InitGaussianWeights(ndReal mean, ndReal variance);
+	void Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const;
 };
 
 #endif 

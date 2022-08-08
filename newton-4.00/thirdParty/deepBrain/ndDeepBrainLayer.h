@@ -24,28 +24,27 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
-#include "ndDeepBrainNeuron.h"
 
-class ndDeepBrainLayer: public ndArray<ndDeepBrainNeuron*>
+class ndDeepBrainLayer: public ndClassAlloc
 {
 	public: 
-	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ndActivationType type);
+	ndDeepBrainLayer(ndInt32 outputs, ndActivationType type);
 	virtual ~ndDeepBrainLayer();
 
-	ndInt32 GetInputSize() const;
-	void InitGaussianWeights(ndReal mean, ndReal variance);
-	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+	virtual ndInt32 GetOuputSize() const;
+	virtual ndInt32 GetInputSize() const = 0;
+	virtual void InitGaussianWeights(ndReal mean, ndReal variance) = 0;
+	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output) = 0;
 
 	protected:
-	void ReluActivation(ndDeepBrainVector& output);
-	void SigmoidActivation(ndDeepBrainVector& output);
-	void SoftmaxActivation(ndDeepBrainVector& output);
-	void HyperbolicTanActivation(ndDeepBrainVector& output);
+	void ApplyActivation(ndDeepBrainVector& output) const;
+	void ReluActivation(ndDeepBrainVector& output) const;
+	void SigmoidActivation(ndDeepBrainVector& output) const;
+	void SoftmaxActivation(ndDeepBrainVector& output) const;
+	void HyperbolicTanActivation(ndDeepBrainVector& output) const;
 
-	//void BackwardPass(const ndDeepBrainVector& input, ndDeepBrainVector& output);
-
+	ndDeepBrainVector m_bias;
 	ndActivationType m_activation;
-	//ndArray<ndDeepBrainNeuron*> m_neurons;
 };
 
 #endif 

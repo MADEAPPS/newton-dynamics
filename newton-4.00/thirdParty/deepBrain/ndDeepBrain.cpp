@@ -21,7 +21,6 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
-#include "ndDeepBrainNeuron.h"
 
 ndDeepBrain::ndDeepBrain()
 	:ndArray<ndDeepBrainLayer*>()
@@ -38,13 +37,7 @@ ndDeepBrain::~ndDeepBrain()
 
 ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
-	dAssert(!GetCount() || ((*this)[GetCount() - 1]->GetCount() == layer->GetInputSize()));
+	dAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
 	PushBack(layer);
 	return layer;
 }
-
-ndDeepBrainLayer* ndDeepBrain::AddLayer(ndInt32 inputs, ndInt32 outputs, ndActivationType type)
-{
-	return AddLayer (new ndDeepBrainLayer(inputs, outputs, type));
-}
-

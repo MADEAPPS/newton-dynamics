@@ -35,6 +35,8 @@ class ndBigVector;
 class ndVector
 {
 	public:
+	D_OPERATOR_NEW_AND_DELETE
+
 	inline ndVector()
 	{
 	}
@@ -494,6 +496,8 @@ class ndVector
 class ndBigVector
 {
 	public:
+	D_OPERATOR_NEW_AND_DELETE
+
 	inline ndBigVector()
 	{
 	}
