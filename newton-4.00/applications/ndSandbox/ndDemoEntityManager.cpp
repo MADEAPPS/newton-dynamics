@@ -212,61 +212,118 @@ void Test1__()
 	//}
 }
 
-void Test2__()
+static void BooleanOr()
 {
 	ndDeepBrain brain;
 	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	
+
 	ndSetRandSeed(142543);
 
-#if 1
-
-	ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
-	ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
-
-	//ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
-	//ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
-	//inputWeights[0] = 0.6f;
-	//inputWeights[1] = -0.1f;
-	//inputNeuron->SetBias(0.3f);
-	//
-	//ndDeepBrainNeuron* const ouputNeuron = (*outputLayer)[0];
-	//ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
-	//ouputWeights[0] = 0.5f;
-	//ouputNeuron->SetBias(-0.2f);
+	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_tanh));
 
 	// test an ex or boolean gate
 	ndDeepBrainMatrix inputBatch(4, 2);
 	ndDeepBrainMatrix groundTruth(4, 1);
 	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
-	inputBatch[1][0] = -1.0f; inputBatch[1][1] =  1.0f;
-	inputBatch[2][0] =  1.0f; inputBatch[2][1] = -1.0f;
-	inputBatch[3][0] =  1.0f; inputBatch[3][1] =  1.0f;
+	inputBatch[1][0] = -1.0f; inputBatch[1][1] = 1.0f;
+	inputBatch[2][0] = 1.0f; inputBatch[2][1] = -1.0f;
+	inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
+
+	groundTruth[0][0] = 0.0f;
+	groundTruth[1][0] = 1.0f;
+	groundTruth[2][0] = 1.0f;
+	groundTruth[3][0] = 1.0f;
+
+	trainer.InitGaussianWeights(0.0f, 0.25f);
+	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
+}
+
+static void BooleanXOr()
+{
+	ndDeepBrain brain;
+	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+
+	ndSetRandSeed(142543);
+
+	//ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
+	//ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
+	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+
+	// test an ex or boolean gate
+	ndDeepBrainMatrix inputBatch(4, 2);
+	ndDeepBrainMatrix groundTruth(4, 1);
+	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
+	inputBatch[1][0] = -1.0f; inputBatch[1][1] = 1.0f;
+	inputBatch[2][0] = 1.0f; inputBatch[2][1] = -1.0f;
+	inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
 
 	groundTruth[0][0] = 0.0f;
 	groundTruth[1][0] = 1.0f;
 	groundTruth[2][0] = 1.0f;
 	groundTruth[3][0] = 0.0f;
-	//ndDeepBrainMatrix xxxxx0(10, 2);
-	//xxxxx0.InitGaussianWeights(0.0f, 0.25f);
-	//xxxxx0.RandomShuffle();
-	//xxxxx0.RandomShuffle();
-	//ndDeepBrainMatrix xxxxx1(3, 2);
-	
 	trainer.InitGaussianWeights(0.0f, 0.25f);
 	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
+}
 
-#elif 1
-	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
-	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
-	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
 
-	trainer.Step();
-
-	//ndDeepBrainVector input;
-	//input.SetCount(784);
-	//brain.FowardPass();
-#endif
+void Test2__()
+{
+	BooleanOr();
+	BooleanXOr();
+//	ndDeepBrain brain;
+//	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+//	
+//	ndSetRandSeed(142543);
+//
+//#if 1
+//
+//	ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
+//	ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+//
+//	//ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
+//	//ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
+//	//inputWeights[0] = 0.6f;
+//	//inputWeights[1] = -0.1f;
+//	//inputNeuron->SetBias(0.3f);
+//	//
+//	//ndDeepBrainNeuron* const ouputNeuron = (*outputLayer)[0];
+//	//ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
+//	//ouputWeights[0] = 0.5f;
+//	//ouputNeuron->SetBias(-0.2f);
+//
+//	// test an ex or boolean gate
+//	ndDeepBrainMatrix inputBatch(4, 2);
+//	ndDeepBrainMatrix groundTruth(4, 1);
+//	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
+//	inputBatch[1][0] = -1.0f; inputBatch[1][1] =  1.0f;
+//	inputBatch[2][0] =  1.0f; inputBatch[2][1] = -1.0f;
+//	inputBatch[3][0] =  1.0f; inputBatch[3][1] =  1.0f;
+//
+//	groundTruth[0][0] = 0.0f;
+//	groundTruth[1][0] = 1.0f;
+//	groundTruth[2][0] = 1.0f;
+//	groundTruth[3][0] = 0.0f;
+//	//ndDeepBrainMatrix xxxxx0(10, 2);
+//	//xxxxx0.InitGaussianWeights(0.0f, 0.25f);
+//	//xxxxx0.RandomShuffle();
+//	//xxxxx0.RandomShuffle();
+//	//ndDeepBrainMatrix xxxxx1(3, 2);
+//	
+//	trainer.InitGaussianWeights(0.0f, 0.25f);
+//	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
+//
+//#elif 1
+//	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
+//	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
+//	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
+//
+//	trainer.Step();
+//
+//	//ndDeepBrainVector input;
+//	//input.SetCount(784);
+//	//brain.FowardPass();
+//#endif
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
