@@ -40,17 +40,16 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	PrefixScan();
 
 	ndArray<ndDeepBrainLayer*>& layers = *m_instance.m_brain;
-	ndDeepBrainVector leastSquaredError;
-	leastSquaredError.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
+	m_cost.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
 		{
 			const ndDeepBrainVector& input = inputBatch[j];
 			const ndDeepBrainVector& truth = groundTruth[j];
-			m_instance.MakeTrainingPrediction(input, m_output, m_prefixScan);
-			leastSquaredError.Sub(truth, m_instance.GetOutputs());
-			m_instance.BackPropagate(leastSquaredError, m_output, m_prefixScan);
+			m_instance.MakeTrainingPrediction(input, *this);
+			m_cost.Sub(truth, m_instance.GetOutputs());
+			m_instance.BackPropagate(*this);
 		}
 	}
 }

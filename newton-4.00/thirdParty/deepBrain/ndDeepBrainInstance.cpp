@@ -22,6 +22,7 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainInstance.h"
+#include "ndDeepBrainTrainingOperator.h"
 
 ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
 	:ndClassAlloc()
@@ -85,11 +86,15 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input)
 	m_inputs.Swap(m_outputs);
 }
 
-void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output, const ndDeepBrainPrefixScan& prefixSum)
+//void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output, const ndDeepBrainPrefixScan& prefixSum)
+void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector &input, ndDeepBrainTrainingOperator& trainingOperator)
 {
 	SetInput(input);
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	dAssert(layers.GetCount());
+
+	ndDeepBrainVector& output = trainingOperator.m_output;
+	const ndDeepBrainPrefixScan& prefixSum = trainingOperator.m_ouputPrefixScan;
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -109,8 +114,11 @@ void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input,
 	m_inputs.Swap(m_outputs);
 }
 
-void ndDeepBrainInstance::BackPropagate(const ndDeepBrainVector& leastSquareError, const ndDeepBrainVector& output, const ndDeepBrainPrefixScan& prefixSum)
+//void ndDeepBrainInstance::BackPropagate(const ndDeepBrainVector& leastSquareError, const ndDeepBrainVector& output, const ndDeepBrainPrefixScan& prefixSum)
+void ndDeepBrainInstance::BackPropagate(ndDeepBrainTrainingOperator& trainingOperator)
 {
+	const ndDeepBrainVector& cost = trainingOperator.m_cost;
+
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	dAssert(layers.GetCount());
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)

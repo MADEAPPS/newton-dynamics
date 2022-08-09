@@ -25,6 +25,8 @@
 
 #include "ndDeepBrainStdafx.h"
 
+#define D_DEEP_BRAIN_DATA_ALIGMENT 8
+
 enum ndDeepBrainActivationType
 {
 	m_relu,

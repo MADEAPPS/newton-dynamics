@@ -27,6 +27,7 @@
 
 class ndDeepBrain;
 class ndDeepBrainLayer;
+class ndDeepBrainTrainingOperator;
 
 class ndDeepBrainInstance: public ndClassAlloc
 {
@@ -43,8 +44,8 @@ class ndDeepBrainInstance: public ndClassAlloc
 
 	protected:
 	void SetInput(const ndDeepBrainVector& input);
-	void MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output, const ndDeepBrainPrefixScan& scan);
-	void BackPropagate(const ndDeepBrainVector& leastSquareError, const ndDeepBrainVector& output, const ndDeepBrainPrefixScan& scan);
+	void MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainTrainingOperator& trainingOperator);
+	void BackPropagate(ndDeepBrainTrainingOperator& trainingOperator);
 
 	ndDeepBrainVector m_inputs;
 	ndDeepBrainVector m_outputs;

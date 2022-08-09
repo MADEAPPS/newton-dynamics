@@ -27,9 +27,11 @@
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
-	//,m_error()
+	,m_cost()
 	,m_output()
-	,m_prefixScan()
+	,m_gradient()
+	,m_ouputPrefixScan()
+	,m_gradientPrefixScan()
 {
 }
 
@@ -49,26 +51,42 @@ void ndDeepBrainTrainingOperator::InitGaussianWeights(ndReal mean, ndReal varian
 void ndDeepBrainTrainingOperator::PrefixScan()
 {
 	const ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
-	m_prefixScan.SetCount(layers.GetCount() + 1);
-	m_prefixScan[0] = (layers[0]->GetInputSize() + 3) & -4;
+	m_ouputPrefixScan.SetCount(layers.GetCount() + 1);
+	m_ouputPrefixScan[0] = (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
-		m_prefixScan[i + 1] = (layer->GetOuputSize() + 3) & -4;
+		ndInt32 size = (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		m_ouputPrefixScan[i + 1] = size;
 	}
 	
 	ndInt32 sum = 0;
-	for (ndInt32 i = 0; i < m_prefixScan.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_ouputPrefixScan.GetCount(); ++i)
 	{
-		ndInt32 size = m_prefixScan[i];
-		m_prefixScan[i] = sum;
+		ndInt32 size = m_ouputPrefixScan[i];
+		m_ouputPrefixScan[i] = sum;
 		sum += size;
 	}
-	//m_prefixScan[layers.GetCount()] = sum;
-	//m_error.SetCount(sum);
 	m_output.SetCount(sum);
-	//m_error.SetValue(0.0f);
 	m_output.SetValue(0.0f);
+
+	m_gradientPrefixScan.SetCount(layers.GetCount());
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		ndDeepBrainLayer* const layer = layers[i];
+		ndInt32 size = (layer->GetInputSize() + 1 + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		m_gradientPrefixScan[i] = size * layer->GetOuputSize();
+	}
+
+	sum = 0;
+	for (ndInt32 i = 0; i < m_gradientPrefixScan.GetCount(); ++i)
+	{
+		ndInt32 size = m_gradientPrefixScan[i];
+		m_gradientPrefixScan[i] = sum;
+		sum += size;
+	}
+	m_gradient.SetCount(sum);
+	m_gradient.SetValue(0.0f);
 }
 
 void ndDeepBrainTrainingOperator::BackwardPass()
