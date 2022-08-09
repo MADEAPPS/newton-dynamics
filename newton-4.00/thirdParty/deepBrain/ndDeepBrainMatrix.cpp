@@ -45,6 +45,18 @@ ndDeepBrainMatrix::~ndDeepBrainMatrix()
 	}
 }
 
+ndInt32 ndDeepBrainMatrix::GetRows() const
+{
+	ndInt32 rows = GetCount();
+	return rows;
+}
+
+ndInt32 ndDeepBrainMatrix::GetColumns() const
+{
+	ndInt32 columns = GetCount() ? (*this)[0].GetCount() : 0;
+	return columns;
+}
+
 void ndDeepBrainMatrix::SetValue(ndReal value)
 {
 	ndDeepBrainMatrix& me = *this;
@@ -67,7 +79,8 @@ void ndDeepBrainMatrix::Mul(const ndDeepBrainVector& input, ndDeepBrainVector& o
 {
 	const ndDeepBrainMatrix& me = *this;
 	ndInt32 columns = input.GetCount();
-	dAssert(columns == me[0].GetCount());
+	//dAssert(columns == me[0].GetCount());
+	dAssert(columns == GetColumns());
 	dAssert(output.GetCount() == GetCount());
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{

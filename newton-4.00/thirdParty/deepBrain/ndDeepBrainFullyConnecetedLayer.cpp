@@ -34,7 +34,7 @@ ndDeepBrainFullyConnectedLayer::~ndDeepBrainFullyConnectedLayer()
 
 ndInt32 ndDeepBrainFullyConnectedLayer::GetInputSize() const
 {
-	return (*this)[0].GetCount();
+	return GetColumns();
 }
 
 void ndDeepBrainFullyConnectedLayer::InitGaussianWeights(ndReal mean, ndReal variance)

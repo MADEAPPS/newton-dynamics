@@ -38,8 +38,10 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	dAssert(inputBatch.GetCount() == groundTruth.GetCount());
 
 	PrefixScan();
+
+	ndArray<ndDeepBrainLayer*>& layers = *m_instance.m_brain;
 	ndDeepBrainVector leastSquaredError;
-	leastSquaredError.SetCount(m_prefixScan[m_prefixScan.GetCount() - 1] - m_prefixScan[m_prefixScan.GetCount() - 2]);
+	leastSquaredError.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)

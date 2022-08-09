@@ -27,7 +27,7 @@
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
-	,m_error()
+	//,m_error()
 	,m_output()
 	,m_prefixScan()
 {
@@ -50,22 +50,24 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 {
 	const ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
 	m_prefixScan.SetCount(layers.GetCount() + 1);
+	m_prefixScan[0] = (layers[0]->GetInputSize() + 3) & -4;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		m_prefixScan[i] = layers[i]->GetOuputSize();
+		ndDeepBrainLayer* const layer = layers[i];
+		m_prefixScan[i + 1] = (layer->GetOuputSize() + 3) & -4;
 	}
 	
 	ndInt32 sum = 0;
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_prefixScan.GetCount(); ++i)
 	{
 		ndInt32 size = m_prefixScan[i];
 		m_prefixScan[i] = sum;
 		sum += size;
 	}
-	m_prefixScan[layers.GetCount()] = sum;
-	m_error.SetCount(sum);
+	//m_prefixScan[layers.GetCount()] = sum;
+	//m_error.SetCount(sum);
 	m_output.SetCount(sum);
-	m_error.SetValue(0.0f);
+	//m_error.SetValue(0.0f);
 	m_output.SetValue(0.0f);
 }
 
