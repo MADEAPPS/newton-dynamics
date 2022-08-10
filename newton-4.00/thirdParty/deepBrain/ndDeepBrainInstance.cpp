@@ -118,9 +118,11 @@ void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector &input,
 void ndDeepBrainInstance::BackPropagate(ndDeepBrainTrainingOperator& trainingOperator)
 {
 	const ndDeepBrainVector& cost = trainingOperator.m_cost;
-
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	dAssert(layers.GetCount());
+
+	ndDeepBrainMemVector temVector(&trainingOperator.m_gradient[trainingOperator.m_gradientPrefixScan[layers.GetCount()-1]], cost.GetCount());
+	temVector.CopyData(cost);
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 	}

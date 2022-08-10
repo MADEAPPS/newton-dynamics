@@ -70,7 +70,8 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	m_output.SetCount(sum);
 	m_output.SetValue(0.0f);
 
-	m_gradientPrefixScan.SetCount(layers.GetCount());
+	m_gradientPrefixScan.SetCount(layers.GetCount() + 1);
+	m_gradientPrefixScan[layers.GetCount()] = (layers[layers.GetCount() - 1]->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];

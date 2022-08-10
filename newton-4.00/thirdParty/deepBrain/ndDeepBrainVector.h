@@ -41,4 +41,11 @@ class ndDeepBrainVector: public ndArray<ndReal>
 	void MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
 };
 
+class ndDeepBrainMemVector : public ndDeepBrainVector
+{
+	public:
+	ndDeepBrainMemVector(ndReal* const mem, ndInt32 size);
+	~ndDeepBrainMemVector();
+};
+
 #endif 
