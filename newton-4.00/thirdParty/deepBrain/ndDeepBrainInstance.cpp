@@ -139,17 +139,17 @@ void ndDeepBrainInstance::BackPropagate(ndDeepBrainTrainingOperator& trainingOpe
 		const ndDeepBrainMemVector layerOutput(&output[ouputPrefixScan[i + 1]], outputSize);
 		layer->ActivationDerivative(layerOutput, outputDerivative);
 
-		ndDeepBrainMemVector gradientVector(&gradient[gradientPrefixScan[i + 1]], outputSize);
-		outputDerivative.Scale(outputDerivative, gradientVector[0]);
+		ndDeepBrainMemVector gradientVectorIn(&gradient[gradientPrefixScan[i + 1]], outputSize);
+		outputDerivative.Scale(outputDerivative, gradientVectorIn[0]);
 		
-		//for (ndInt32 j = 0; j < outputSize; j++)
-		//{
-		//	outputDerivative.Scale(outputDerivative, gradientVector[j]);
-		//
-		//		//for (ndInt32 j = layer->GetInputSize() - 1; j >= 0; --j)
-		//		//{
-		//		//
-		//		//}
-		//}
+		ndInt32 inputSize = layer->GetInputSize();
+
+		const ndDeepBrainMemVector layerInput(&output[ouputPrefixScan[i]], inputSize);
+		ndDeepBrainMemVector gradientVectorOut(&gradient[gradientPrefixScan[i]], inputSize + 1);
+		for (ndInt32 j = 0; j < inputSize; j++)
+		{
+			gradientVectorOut[j] = outputDerivative[0] * layerInput[j];
+		}
+		gradientVectorOut[inputSize] = outputDerivative[0];
 	}
 }
