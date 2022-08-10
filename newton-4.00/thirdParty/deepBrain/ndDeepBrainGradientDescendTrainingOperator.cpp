@@ -48,7 +48,7 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			const ndDeepBrainVector& input = inputBatch[j];
 			const ndDeepBrainVector& truth = groundTruth[j];
 			m_instance.MakeTrainingPrediction(input, *this);
-			m_cost.Sub(truth, m_instance.GetOutputs());
+			m_cost.Sub(m_instance.GetOutputs(), truth);
 			m_instance.BackPropagate(*this);
 		}
 	}

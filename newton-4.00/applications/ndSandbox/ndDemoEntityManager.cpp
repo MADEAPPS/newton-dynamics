@@ -219,14 +219,14 @@ static void BooleanOr()
 
 	ndSetRandSeed(142543);
 
-	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_tanh));
+	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
 
 	// test an ex or boolean gate
 	ndDeepBrainMatrix inputBatch(4, 2);
 	ndDeepBrainMatrix groundTruth(4, 1);
-	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
-	inputBatch[1][0] = -1.0f; inputBatch[1][1] = 1.0f;
-	inputBatch[2][0] = 1.0f; inputBatch[2][1] = -1.0f;
+	inputBatch[0][0] = 0.0f; inputBatch[0][1] = 0.0f;
+	inputBatch[1][0] = 0.0f; inputBatch[1][1] = 1.0f;
+	inputBatch[2][0] = 1.0f; inputBatch[2][1] = 0.0f;
 	inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
 
 	groundTruth[0][0] = 0.0f;

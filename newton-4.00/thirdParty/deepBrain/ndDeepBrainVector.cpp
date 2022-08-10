@@ -23,12 +23,12 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
 
-ndDeepBrainMemVector::ndDeepBrainMemVector(ndReal* const mem, ndInt32 size)
+ndDeepBrainMemVector::ndDeepBrainMemVector(const ndReal* const mem, ndInt32 size)
 	:ndDeepBrainVector()
 {
-	m_array = mem;
 	m_size = size;
 	m_capacity = size + 1;
+	m_array = (ndReal*)mem;
 }
 
 ndDeepBrainMemVector::~ndDeepBrainMemVector()

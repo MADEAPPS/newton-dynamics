@@ -44,7 +44,7 @@ class ndDeepBrainVector: public ndArray<ndReal>
 class ndDeepBrainMemVector : public ndDeepBrainVector
 {
 	public:
-	ndDeepBrainMemVector(ndReal* const mem, ndInt32 size);
+	ndDeepBrainMemVector(const ndReal* const mem, ndInt32 size);
 	~ndDeepBrainMemVector();
 };
 

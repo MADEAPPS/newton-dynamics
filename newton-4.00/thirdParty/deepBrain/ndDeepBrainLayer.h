@@ -39,13 +39,20 @@ class ndDeepBrainLayer: public ndClassAlloc
 
 	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
+	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
+
+	private:
 	void ReluActivation(ndDeepBrainVector& output) const;
 	void SigmoidActivation(ndDeepBrainVector& output) const;
 	void SoftmaxActivation(ndDeepBrainVector& output) const;
 	void HyperbolicTanActivation(ndDeepBrainVector& output) const;
 
+	void SigmoidDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
+
 	ndDeepBrainVector m_bias;
 	ndDeepBrainActivationType m_activation;
+	friend class ndDeepBrainInstance;
+	friend class ndDeepBrainFullyConnectedLayer;
 };
 
 #endif 

@@ -86,7 +86,6 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input)
 	m_inputs.Swap(m_outputs);
 }
 
-//void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output, const ndDeepBrainPrefixScan& prefixSum)
 void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector &input, ndDeepBrainTrainingOperator& trainingOperator)
 {
 	SetInput(input);
@@ -104,7 +103,8 @@ void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector &input,
 		ndInt32 outputCount = layer->GetOuputSize();
 		m_outputs.SetCount(outputCount);
 		layer->MakePrediction(m_inputs, m_outputs);
-		ndInt32 start = prefixSum[i];
+dTrace(("xxxxxxxxxxx\n"));
+		ndInt32 start = prefixSum[i + 1];
 		for (ndInt32 j = outputCount - 1; j >= 0; --j)
 		{
 			output[start + j] = m_outputs[j];
@@ -114,16 +114,31 @@ void ndDeepBrainInstance::MakeTrainingPrediction(const ndDeepBrainVector &input,
 	m_inputs.Swap(m_outputs);
 }
 
-//void ndDeepBrainInstance::BackPropagate(const ndDeepBrainVector& leastSquareError, const ndDeepBrainVector& output, const ndDeepBrainPrefixScan& prefixSum)
 void ndDeepBrainInstance::BackPropagate(ndDeepBrainTrainingOperator& trainingOperator)
 {
-	const ndDeepBrainVector& cost = trainingOperator.m_cost;
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	dAssert(layers.GetCount());
 
-	ndDeepBrainMemVector temVector(&trainingOperator.m_gradient[trainingOperator.m_gradientPrefixScan[layers.GetCount()-1]], cost.GetCount());
-	temVector.CopyData(cost);
+	//const ndDeepBrainVector& cost = trainingOperator.m_cost;
+	//const ndDeepBrainVector& gradient = trainingOperator.m_gradient;
+	//const ndDeepBrainPrefixScan& gradientPrefixScan = trainingOperator.m_gradientPrefixScan;
+	//ndDeepBrainMemVector temVector(&gradient[gradientPrefixScan[layers.GetCount()-1]], cost.GetCount());
+	//temVector.CopyData(cost);
+
+	const ndDeepBrainVector& output = trainingOperator.m_output;
+	ndDeepBrainVector& outputDerivative = trainingOperator.m_outputDerivative;
+	const ndDeepBrainPrefixScan& ouputPrefixScan = trainingOperator.m_ouputPrefixScan;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
+		ndDeepBrainLayer* const layer = layers[i];
+		outputDerivative.SetCount(layer->GetOuputSize());
+
+		ndDeepBrainMemVector layerOutput(&output[ouputPrefixScan[i + 1]], layer->GetOuputSize());
+		layer->ActivationDerivative(layerOutput, outputDerivative);
+
+		for (ndInt32 j = layer->GetInputSize() - 1; j >= 0; --j)
+		{
+
+		}
 	}
 }
