@@ -59,6 +59,16 @@ T ndDotProduct(ndInt32 size, const T* const A, const T* const B)
 }
 
 template<class T>
+void ndScale(ndInt32 size, T* const X, const T* const A, T scale)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = A[i] * scale;
+	}
+}
+
+
+template<class T>
 void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i) 

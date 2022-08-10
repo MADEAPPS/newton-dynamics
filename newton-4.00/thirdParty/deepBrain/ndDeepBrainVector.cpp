@@ -72,6 +72,12 @@ void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
 	}
 }
 
+void ndDeepBrainVector::Scale(const ndDeepBrainVector& a, ndReal scale)
+{
+	dAssert(GetCount() == a.GetCount());
+	ndScale(GetCount(), &(*this)[0], &a[0], scale);
+}
+
 void ndDeepBrainVector::Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
 {
 	dAssert(GetCount() == a.GetCount());

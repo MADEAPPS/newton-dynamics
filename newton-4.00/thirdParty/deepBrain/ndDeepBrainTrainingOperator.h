@@ -37,7 +37,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	protected:
 	void PrefixScan();
-	virtual void BackwardPass();
+	//virtual void BackwardPass() = 0;
 
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_cost;

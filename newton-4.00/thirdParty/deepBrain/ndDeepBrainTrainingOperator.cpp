@@ -89,14 +89,3 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	m_gradient.SetCount(sum);
 	m_gradient.SetValue(0.0f);
 }
-
-void ndDeepBrainTrainingOperator::BackwardPass()
-{
-	//for (ndInt32 i = m_layers.GetCount()-1; i >= 0; --i)
-	//{
-	//	m_layers[i]->FowardPass(m_inputs, m_outputs);
-	//	m_inputs.Swap(m_outputs);
-	//}
-	//m_inputs.Swap(m_outputs);
-}
-
