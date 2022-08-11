@@ -135,10 +135,13 @@ void ndDeepBrainTrainingOperator::MakePrediction(const ndDeepBrainVector& traini
 }
 
 //void ndDeepBrainInstance::BackPropagate(ndDeepBrainTrainingOperator& trainingOperator)
-void ndDeepBrainTrainingOperator::BackPropagate()
+void ndDeepBrainTrainingOperator::BackPropagate(ndReal learnRate, const ndDeepBrainVector& groundTruth)
 {
 	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
 	dAssert(layers.GetCount());
+
+	m_cost.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
+	m_cost.Sub(m_instance.GetOutputs(), groundTruth);
 
 	////const ndDeepBrainVector& cost = trainingOperator.m_cost;
 	////const ndDeepBrainVector& gradient = trainingOperator.m_gradient;
