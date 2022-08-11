@@ -37,6 +37,9 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	protected:
 	void PrefixScan();
+	void BackPropagate();
+	void SetInput(const ndDeepBrainVector& input);
+	void MakePrediction(const ndDeepBrainVector& input);
 
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_cost;

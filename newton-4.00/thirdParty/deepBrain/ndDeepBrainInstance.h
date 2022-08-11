@@ -44,14 +44,10 @@ class ndDeepBrainInstance: public ndClassAlloc
 
 	protected:
 	void SetInput(const ndDeepBrainVector& input);
-	void MakeTrainingPrediction(const ndDeepBrainVector& input, ndDeepBrainTrainingOperator& trainingOperator);
-	void BackPropagate(ndDeepBrainTrainingOperator& trainingOperator);
 
 	ndDeepBrainVector m_inputs;
 	ndDeepBrainVector m_outputs;
 	ndDeepBrain* m_brain;
-
-	friend class ndDeepBrainGradientDescendTrainingOperator;
 };
 
 

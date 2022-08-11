@@ -36,10 +36,10 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	dAssert(inputBatch.GetCount() == groundTruth.GetCount());
-
+	
 	PrefixScan();
-
-	ndArray<ndDeepBrainLayer*>& layers = *m_instance.m_brain;
+	
+	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
 	m_cost.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
@@ -47,9 +47,9 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 		{
 			const ndDeepBrainVector& input = inputBatch[j];
 			const ndDeepBrainVector& truth = groundTruth[j];
-			m_instance.MakeTrainingPrediction(input, *this);
+			MakePrediction(input);
 			m_cost.Sub(m_instance.GetOutputs(), truth);
-			m_instance.BackPropagate(*this);
+			BackPropagate();
 		}
 	}
 }
