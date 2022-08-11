@@ -240,37 +240,82 @@ static void BooleanOr()
 
 static void BooleanXOr()
 {
-	ndDeepBrain brain;
-	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-
-	ndSetRandSeed(142543);
-
-	//ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
-	//ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
-	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
-	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
-
-	// test an ex or boolean gate
-	ndDeepBrainMatrix inputBatch(4, 2);
-	ndDeepBrainMatrix groundTruth(4, 1);
-	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
-	inputBatch[1][0] = -1.0f; inputBatch[1][1] = 1.0f;
-	inputBatch[2][0] = 1.0f; inputBatch[2][1] = -1.0f;
-	inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
-
-	groundTruth[0][0] = 0.0f;
-	groundTruth[1][0] = 1.0f;
-	groundTruth[2][0] = 1.0f;
-	groundTruth[3][0] = 0.0f;
-	trainer.InitGaussianWeights(0.0f, 0.25f);
-	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
+	dAssert(0);
+	//ndDeepBrain brain;
+	//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+	//
+	//ndSetRandSeed(142543);
+	//
+	////ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
+	////ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+	//brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
+	//brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+	//
+	//// test an ex or boolean gate
+	////ndDeepBrainMatrix inputBatch(4, 2);
+	////ndDeepBrainMatrix groundTruth(4, 1);
+	////inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
+	////inputBatch[1][0] = -1.0f; inputBatch[1][1] = 1.0f;
+	////inputBatch[2][0] = 1.0f; inputBatch[2][1] = -1.0f;
+	////inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
+	////
+	////groundTruth[0][0] = 0.0f;
+	////groundTruth[1][0] = 1.0f;
+	////groundTruth[2][0] = 1.0f;
+	////groundTruth[3][0] = 0.0f;
+	////trainer.InitGaussianWeights(0.0f, 0.25f);
+	//
+	//ndDeepBrainFullyConnectedLayer* const inputLayer = (ndDeepBrainFullyConnectedLayer*)brain[0];
+	//ndDeepBrainFullyConnectedLayer* const ouputLayer = (ndDeepBrainFullyConnectedLayer*)brain[1];
+	//*inputLayer[0][0] = 0.6f;
+	//*inputLayer[0][1] =-0.1f;
+	//*inputLayer[1][0] =-0.2f;
+	//*inputLayer[1][1] = 0.5f;
+	//
+	//*ouputLayer[1][0] = -0.2f;
+	//*ouputLayer[1][1] = 0.5f;
+	//
+	//trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
 }
 
 
+static void TwoLayers()
+{
+	ndDeepBrain brain;
+	ndSetRandSeed(142543);
+
+	ndDeepBrainFullyConnectedLayer* const inputLayer = new ndDeepBrainFullyConnectedLayer(2, 1, m_tanh);
+	ndDeepBrainFullyConnectedLayer* const ouputLayer = new ndDeepBrainFullyConnectedLayer(1, 1, m_sigmoid);
+
+	brain.AddLayer(inputLayer);
+	brain.AddLayer(ouputLayer);
+
+	inputLayer->GetBias()[0] = 0.3f;
+	(*inputLayer)[0][0] = 0.6f;
+	(*inputLayer)[0][1] =-0.1f;
+
+	ndDeepBrainMatrix inputBatch(1, 2);
+	ndDeepBrainMatrix groundTruth(1, 1);
+	inputBatch[0][0] = -0.9f; 
+	inputBatch[0][1] =  0.1f;
+	groundTruth[0][0] = 1.0f;
+
+	ouputLayer->GetBias()[0] = -0.2f;
+	(*ouputLayer)[0][0] =0.5f;
+
+	ndDeepBrainVector input;
+	input.PushBack(-0.9f);
+	input.PushBack( 0.1f);
+
+	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+	trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
+}
+
 void Test2__()
 {
-	BooleanOr();
-	BooleanXOr();
+	//BooleanOr();
+	//BooleanXOr();
+	TwoLayers();
 //	ndDeepBrain brain;
 //	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 //	

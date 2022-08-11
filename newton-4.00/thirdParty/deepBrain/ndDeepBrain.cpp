@@ -41,3 +41,4 @@ ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 	PushBack(layer);
 	return layer;
 }
+

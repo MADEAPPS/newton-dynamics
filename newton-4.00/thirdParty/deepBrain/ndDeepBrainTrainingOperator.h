@@ -37,15 +37,14 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	protected:
 	void PrefixScan();
-	//virtual void BackwardPass() = 0;
 
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_cost;
 	ndDeepBrainVector m_output;
-	ndDeepBrainVector m_gradient;
+	//ndDeepBrainVector m_gradient;
 	ndDeepBrainVector m_outputDerivative;
 	ndDeepBrainPrefixScan m_ouputPrefixScan;
-	ndDeepBrainPrefixScan m_gradientPrefixScan;
+	//ndDeepBrainPrefixScan m_gradientPrefixScan;
 
 	friend class ndDeepBrainInstance;
 };

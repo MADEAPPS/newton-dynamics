@@ -35,6 +35,11 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 {
 }
 
+ndDeepBrainVector& ndDeepBrainLayer::GetBias()
+{
+	return m_bias;
+}
+
 ndInt32 ndDeepBrainLayer::GetOuputSize() const
 {
 	return m_bias.GetCount();

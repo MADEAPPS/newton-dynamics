@@ -29,9 +29,10 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	,m_instance(brain)
 	,m_cost()
 	,m_output()
-	,m_gradient()
+	//,m_gradient()
+	,m_outputDerivative()
 	,m_ouputPrefixScan()
-	,m_gradientPrefixScan()
+	//,m_gradientPrefixScan()
 {
 }
 
@@ -69,23 +70,25 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	}
 	m_output.SetCount(sum);
 	m_output.SetValue(0.0f);
+	m_outputDerivative.SetCount(sum);
+	m_outputDerivative.SetValue(0.0f);
 
-	m_gradientPrefixScan.SetCount(layers.GetCount() + 1);
-	m_gradientPrefixScan[layers.GetCount()] = (layers[layers.GetCount() - 1]->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		ndDeepBrainLayer* const layer = layers[i];
-		ndInt32 size = (layer->GetInputSize() + 1 + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-		m_gradientPrefixScan[i] = size * layer->GetOuputSize();
-	}
-
-	sum = 0;
-	for (ndInt32 i = 0; i < m_gradientPrefixScan.GetCount(); ++i)
-	{
-		ndInt32 size = m_gradientPrefixScan[i];
-		m_gradientPrefixScan[i] = sum;
-		sum += size;
-	}
-	m_gradient.SetCount(sum);
-	m_gradient.SetValue(0.0f);
+	//m_gradientPrefixScan.SetCount(layers.GetCount() + 1);
+	//m_gradientPrefixScan[layers.GetCount()] = (layers[layers.GetCount() - 1]->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	//{
+	//	ndDeepBrainLayer* const layer = layers[i];
+	//	ndInt32 size = (layer->GetInputSize() + 1 + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	//	m_gradientPrefixScan[i] = size * layer->GetOuputSize();
+	//}
+	//
+	//sum = 0;
+	//for (ndInt32 i = 0; i < m_gradientPrefixScan.GetCount(); ++i)
+	//{
+	//	ndInt32 size = m_gradientPrefixScan[i];
+	//	m_gradientPrefixScan[i] = sum;
+	//	sum += size;
+	//}
+	//m_gradient.SetCount(sum);
+	//m_gradient.SetValue(0.0f);
 }

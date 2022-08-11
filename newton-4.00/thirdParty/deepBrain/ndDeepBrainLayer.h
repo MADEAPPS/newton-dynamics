@@ -32,6 +32,7 @@ class ndDeepBrainLayer: public ndClassAlloc
 	ndDeepBrainLayer(ndInt32 outputs, ndDeepBrainActivationType type);
 	virtual ~ndDeepBrainLayer();
 
+	ndDeepBrainVector& GetBias();
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const = 0;
 	virtual void InitGaussianWeights(ndReal mean, ndReal variance) = 0;
