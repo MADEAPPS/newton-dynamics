@@ -28,30 +28,34 @@
 
 #define D_VERTEXLIST_INDEX_LIST_BASH (1024)
 
-// numerical recipe in c
-#define D_MAX_RAND		0x00ffffff
-#define D_RAND_MUL		1664525u
-#define D_ADD_ADD		1013904223u
-
-static ndUnsigned32 ___dRandSeed___ = 0;
-
-void ndSetRandSeed(ndUnsigned32 seed)
+std::mt19937& GetRandomGenerator()
 {
-	___dRandSeed___ = seed;
+	static std::mt19937 generator;
+	return generator;
 }
 
+void ndSetRandSeed(ndUnsigned32 newSeed)
+{
+	std::mt19937& generator = GetRandomGenerator();
+	generator.seed(newSeed);
+}
+
+/// return an unsigned 32 bit random variable between 0 and 0xffffffff
 ndUnsigned32 ndRandInt()
 {
-	___dRandSeed___ = D_RAND_MUL * ___dRandSeed___ + D_ADD_ADD;
-	return ___dRandSeed___ & D_MAX_RAND;
+	std::mt19937& generator = GetRandomGenerator();
+	static ndSpinLock _lock_;
+	ndScopeSpinLock lock(_lock_);
+	return generator();
 }
 
 /// return a random variable between 0.0 and 1.0
 ndFloat32 ndRand()
 {
-	// numerical recipe in c
-	ndFloat32 r = ndFloat32(ndRandInt()) * ((ndFloat32(1.0f) / D_MAX_RAND));
-	//dTrace(("%f\n", r));
+	ndUnsigned32 minValue = std::mt19937::min();
+	ndUnsigned32 maxValue = std::mt19937::max();
+	ndUnsigned32 spand(maxValue - minValue);
+	ndFloat32 r = ndFloat32(ndRandInt()) / spand;
 	return r;
 }
 

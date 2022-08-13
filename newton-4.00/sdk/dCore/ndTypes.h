@@ -31,17 +31,15 @@
 #define ND_NEWTON_VERSION	402
 
 #if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+	#define NOMINMAX
 	#include <io.h>
 	#include <stdint.h>
 	#include <direct.h>
 	#include <malloc.h>
 	#include <stdarg.h>
 	#include <process.h>
-
-	#pragma warning (push, 3)
-		#include <windows.h>
-		#include <crtdbg.h>
-	#pragma warning (pop)
+	#include <windows.h>
+	#include <crtdbg.h>
 #else
   #include <sys/stat.h>
 #endif
@@ -51,6 +49,7 @@
 #include <atomic>
 #include <thread>
 #include <chrono>
+#include <random> 
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
