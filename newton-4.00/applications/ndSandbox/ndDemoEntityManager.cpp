@@ -219,7 +219,7 @@ static void BooleanOr()
 
 	ndSetRandSeed(142543);
 
-	brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+	brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
 
 	// test an ex or boolean gate
 	ndDeepBrainMatrix inputBatch(4, 2);
@@ -246,10 +246,10 @@ static void BooleanXOr()
 	//
 	//ndSetRandSeed(142543);
 	//
-	////ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
-	////ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
-	//brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
-	//brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+	////ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 2, m_tanh));
+	////ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
+	//brain.AddLayer(new ndDeepBrainLayer(2, 2, m_tanh));
+	//brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
 	//
 	//// test an ex or boolean gate
 	////ndDeepBrainMatrix inputBatch(4, 2);
@@ -265,8 +265,8 @@ static void BooleanXOr()
 	////groundTruth[3][0] = 0.0f;
 	////trainer.InitGaussianWeights(0.0f, 0.25f);
 	//
-	//ndDeepBrainFullyConnectedLayer* const inputLayer = (ndDeepBrainFullyConnectedLayer*)brain[0];
-	//ndDeepBrainFullyConnectedLayer* const ouputLayer = (ndDeepBrainFullyConnectedLayer*)brain[1];
+	//ndDeepBrainLayer* const inputLayer = (ndDeepBrainLayer*)brain[0];
+	//ndDeepBrainLayer* const ouputLayer = (ndDeepBrainLayer*)brain[1];
 	//*inputLayer[0][0] = 0.6f;
 	//*inputLayer[0][1] =-0.1f;
 	//*inputLayer[1][0] =-0.2f;
@@ -279,35 +279,37 @@ static void BooleanXOr()
 }
 
 
-static void TwoLayers()
+static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndDeepBrain brain;
 	ndSetRandSeed(142543);
 
-	ndDeepBrainFullyConnectedLayer* const inputLayer = new ndDeepBrainFullyConnectedLayer(2, 1, m_tanh);
-	ndDeepBrainFullyConnectedLayer* const ouputLayer = new ndDeepBrainFullyConnectedLayer(1, 1, m_sigmoid);
+	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_tanh);
+	ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 2, m_tanh);
+	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
 
 	brain.AddLayer(inputLayer);
+	brain.AddLayer(hiddenLayer);
 	brain.AddLayer(ouputLayer);
 
-	inputLayer->GetBias()[0] = 0.3f;
-	(*inputLayer)[0][0] = 0.6f;
-	(*inputLayer)[0][1] =-0.1f;
+	//inputLayer->GetBias()[0] = 0.3f;
+	//(*inputLayer)[0][0] = 0.6f;
+	//(*inputLayer)[0][1] =-0.1f;
+	//ouputLayer->GetBias()[0] = -0.2f;
+	//(*ouputLayer)[0][0] = 0.5f;
+	//ndDeepBrainVector input;
+	//input.PushBack(-0.9f);
+	//input.PushBack( 0.1f);
 
 	ndDeepBrainMatrix inputBatch(1, 2);
-	ndDeepBrainMatrix groundTruth(1, 1);
+	ndDeepBrainMatrix groundTruth(1, 2);
 	inputBatch[0][0] = -0.9f; 
 	inputBatch[0][1] =  0.1f;
 	groundTruth[0][0] = 1.0f;
-
-	ouputLayer->GetBias()[0] = -0.2f;
-	(*ouputLayer)[0][0] =0.5f;
-
-	ndDeepBrainVector input;
-	input.PushBack(-0.9f);
-	input.PushBack( 0.1f);
+	groundTruth[0][1] = 0.0f;
 
 	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+	trainer.InitGaussianWeights(0.0f, 0.25f);
 	trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
 }
 
@@ -315,7 +317,7 @@ void Test2__()
 {
 	//BooleanOr();
 	//BooleanXOr();
-	TwoLayers();
+	ThreeLayersTwoInputsTwoOutputs();
 //	ndDeepBrain brain;
 //	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 //	
@@ -323,8 +325,8 @@ void Test2__()
 //
 //#if 1
 //
-//	ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 2, m_tanh));
-//	ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainFullyConnectedLayer(2, 1, m_sigmoid));
+//	ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 2, m_tanh));
+//	ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
 //
 //	//ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
 //	//ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();

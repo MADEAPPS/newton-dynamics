@@ -98,7 +98,6 @@
 
 #include <ndDeepBrainStdafx.h>
 #include <ndDeepBrain.h>
-#include <ndDeepBrainFullyConnectedLayer.h>
 #include <ndDeepBrainGradientDescendTrainingOperator.h>
 
 #ifndef _MSC_VER

@@ -25,18 +25,19 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainTypes.h"
 #include "ndDeepBrainVector.h"
+#include "ndDeepBrainMatrix.h"
 
-class ndDeepBrainLayer: public ndClassAlloc
+class ndDeepBrainLayer: public ndDeepBrainMatrix
 {
 	public: 
-	ndDeepBrainLayer(ndInt32 outputs, ndDeepBrainActivationType type);
+	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainActivationType type);
 	virtual ~ndDeepBrainLayer();
 
 	ndDeepBrainVector& GetBias();
 	virtual ndInt32 GetOuputSize() const;
-	virtual ndInt32 GetInputSize() const = 0;
-	virtual void InitGaussianWeights(ndReal mean, ndReal variance) = 0;
-	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output) = 0;
+	virtual ndInt32 GetInputSize() const;
+	virtual void InitGaussianWeights(ndReal mean, ndReal variance);
+	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
@@ -53,10 +54,24 @@ class ndDeepBrainLayer: public ndClassAlloc
 	ndDeepBrainVector m_bias;
 	ndDeepBrainActivationType m_activation;
 	friend class ndDeepBrainInstance;
-	//friend class ndDeepBrainConnectedLayer;
 	friend class ndDeepBrainTrainingOperator;
-
 };
+
+inline ndInt32 ndDeepBrainLayer::GetOuputSize() const
+{
+	dAssert(GetRows() == m_bias.GetCount());
+	return m_bias.GetCount();
+}
+
+inline ndInt32 ndDeepBrainLayer::GetInputSize() const
+{
+	return GetColumns();
+}
+
+inline ndDeepBrainVector& ndDeepBrainLayer::GetBias()
+{
+	return m_bias;
+}
 
 #endif 
 

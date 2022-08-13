@@ -22,8 +22,8 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
 
-ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 outputCount, ndDeepBrainActivationType activation)
-	:ndClassAlloc()
+ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDeepBrainActivationType activation)
+	:ndDeepBrainMatrix(outputCount, inputCount)
 	,m_activation(activation)
 	,m_bias()
 {
@@ -35,14 +35,12 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 {
 }
 
-ndDeepBrainVector& ndDeepBrainLayer::GetBias()
+void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	return m_bias;
-}
-
-ndInt32 ndDeepBrainLayer::GetOuputSize() const
-{
-	return m_bias.GetCount();
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i].InitGaussianWeights(mean, variance);
+	}
 }
 
 void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output) const
@@ -176,5 +174,11 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 		default:
 			dAssert(0);
 	}
+}
 
+void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+{
+	Mul(input, output);
+	output.Add(output, m_bias);
+	ApplyActivation(output);
 }
