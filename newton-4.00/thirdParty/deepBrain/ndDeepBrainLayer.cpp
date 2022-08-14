@@ -178,7 +178,8 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 
 void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
-	Mul(input, output);
-	output.Add(output, m_bias);
-	ApplyActivation(output);
+	dAssert(0);
+	//Mul(input, output);
+	//output.Add(output, m_bias);
+	//ApplyActivation(output);
 }

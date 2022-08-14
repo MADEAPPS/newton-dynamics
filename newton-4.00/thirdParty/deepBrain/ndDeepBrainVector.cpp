@@ -72,10 +72,10 @@ void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
 	}
 }
 
-void ndDeepBrainVector::Scale(const ndDeepBrainVector& a, ndReal scale)
+void ndDeepBrainVector::ScaleSet(const ndDeepBrainVector& a, ndReal scale)
 {
 	dAssert(GetCount() == a.GetCount());
-	ndScale(GetCount(), &(*this)[0], &a[0], scale);
+	ndScaleSet(GetCount(), &(*this)[0], &a[0], scale);
 }
 
 void ndDeepBrainVector::Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
@@ -90,6 +90,12 @@ void ndDeepBrainVector::Sub(const ndDeepBrainVector& a, const ndDeepBrainVector&
 	dAssert(GetCount() == a.GetCount());
 	dAssert(GetCount() == b.GetCount());
 	ndSub(GetCount(), &(*this)[0], &a[0], &b[0]);
+}
+
+void ndDeepBrainVector::MulScale(const ndDeepBrainVector& a, ndReal b)
+{
+	dAssert(GetCount() == a.GetCount());
+	ndMulScale(GetCount(), &(*this)[0], &(*this)[0], &a[0], b);
 }
 
 void ndDeepBrainVector::MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
