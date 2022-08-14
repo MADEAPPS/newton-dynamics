@@ -252,9 +252,9 @@ typedef double ndFloat64;
 #define ndControlFP(x,y) _controlfp(x,y)
 
 #if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
-	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
+	#define ndCheckFloat(x) (_finite(x) && !_isnan(x))
 #else
-	#define dCheckFloat(x) (isfinite(x) && !isnan(x))
+	#define ndCheckFloat(x) (isfinite(x) && !isnan(x))
 #endif
 
 #ifdef D_NEWTON_USE_DOUBLE

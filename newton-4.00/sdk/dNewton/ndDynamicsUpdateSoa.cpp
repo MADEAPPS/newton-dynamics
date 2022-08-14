@@ -1051,7 +1051,7 @@ void ndDynamicsUpdateSoa::UpdateForceFeedback()
 			for (ndInt32 j = 0; j < rows; ++j)
 			{
 				const ndRightHandSide* const rhs = &rightHandSide[j + first];
-				ndAssert(dCheckFloat(rhs->m_force));
+				ndAssert(ndCheckFloat(rhs->m_force));
 				rhs->m_jointFeebackForce->Push(rhs->m_force);
 				rhs->m_jointFeebackForce->m_force = rhs->m_force;
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;

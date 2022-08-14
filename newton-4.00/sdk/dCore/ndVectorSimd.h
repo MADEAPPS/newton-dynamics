@@ -89,7 +89,7 @@ class ndVector
 	inline ndVector (const ndBigVector& copy)
 		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PERMUTE_MASK(1, 0, 1, 0)))
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 
 	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
@@ -586,7 +586,7 @@ class ndBigVector
 		:m_typeLow(_mm_cvtps_pd (v.m_type))
 		,m_typeHigh(_mm_cvtps_pd (_mm_shuffle_ps (v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
 	{
-		ndAssert(dCheckVector((*this)));
+		ndAssert(ndCheckVector((*this)));
 	}
 
 	inline ndBigVector(const ndFloat64* const ptr)

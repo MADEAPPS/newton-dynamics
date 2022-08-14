@@ -57,7 +57,7 @@ class ndVector
 		,m_z(ptr[2])
 		,m_w(ptr[3])
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 
 	// emulate gather instruction
@@ -83,7 +83,7 @@ class ndVector
 	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w) 
 		:m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 
 	inline ndVector (ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
@@ -98,7 +98,7 @@ class ndVector
 		,m_z(ndFloat32 (((ndFloat64*)&copy)[2])) 
 		,m_w(ndFloat32 (((ndFloat64*)&copy)[3])) 
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 #endif
 
@@ -521,20 +521,20 @@ class ndBigVector
 	inline ndBigVector (const ndFloat32* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ndFloat32 (0.0f))
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 #endif
 
 	inline ndBigVector (const ndFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ptr[3])
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 
 	inline ndBigVector (ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w) 
 		:m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		ndAssert (dCheckVector ((*this)));
+		ndAssert (ndCheckVector ((*this)));
 	}
 
 	inline ndBigVector (ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)

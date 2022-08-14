@@ -269,7 +269,7 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 		{
 			for (ndInt32 j = 0; j < 4; ++j)
 			{
-				ndAssert(dCheckFloat(me[i][j]));
+				ndAssert(ndCheckFloat(me[i][j]));
 			}
 		}
 	#endif

@@ -147,24 +147,6 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 /// Returns the time in micro seconds since application started 
 D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 
-D_CORE_API ndFloat32 ndRand();
-D_CORE_API ndUnsigned32 ndRandInt();
-D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
-D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 deviation);
-
-class ndOUNoise
-{
-	public: 
-	D_CORE_API ndOUNoise(ndFloat32 value, ndFloat32 theta, ndFloat32 mean, ndFloat32 sigma);
-	D_CORE_API void Reset(ndFloat32 value);
-	D_CORE_API ndFloat32 Evaluate(ndFloat32 step);
-
-	ndFloat32 m_value;
-	ndFloat32 m_mean;
-	ndFloat32 m_sigma;
-	ndFloat32 m_theta;
-};
-
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
 /// \param ndFloat64 val: 64 bit float 
 /// \return a 64 bit double precision with a 32 bit mantissa

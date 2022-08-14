@@ -26,8 +26,6 @@
 #include "ndTypes.h"
 #include "ndClassAlloc.h"
 
-//#define dCheckVector(x) (dCheckFloat(x[0]) && dCheckFloat(x[1]) && dCheckFloat(x[2]) && dCheckFloat(x[3]))
-
 template<class T>
 class ndTemplateVector: public ndClassAlloc
 {

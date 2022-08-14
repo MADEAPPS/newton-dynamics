@@ -296,7 +296,7 @@ void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 		ndInt32 index = i * stride;
 		ndBigVector& vertex = points[i];
 		vertex = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], ndFloat64(0.0f));
-		ndAssert(dCheckVector(vertex));
+		ndAssert(ndCheckVector(vertex));
 		points[i].m_mark = 0;
 	}
 

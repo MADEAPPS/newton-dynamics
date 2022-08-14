@@ -24,6 +24,7 @@
 
 #include <ndCoreStdafx.h>
 #include <ndCRC.h>
+#include <ndRand.h>
 #include <ndList.h>
 #include <ndTree.h>
 #include <ndHeap.h>

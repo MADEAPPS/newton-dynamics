@@ -504,9 +504,9 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 
 		ndContactMaterial* const contactPoint = &contactNode->GetInfo();
 	
-		ndAssert(dCheckFloat(contactArray[i].m_point.m_x));
-		ndAssert(dCheckFloat(contactArray[i].m_point.m_y));
-		ndAssert(dCheckFloat(contactArray[i].m_point.m_z));
+		ndAssert(ndCheckFloat(contactArray[i].m_point.m_x));
+		ndAssert(ndCheckFloat(contactArray[i].m_point.m_y));
+		ndAssert(ndCheckFloat(contactArray[i].m_point.m_z));
 		ndAssert(contactArray[i].m_body0);
 		ndAssert(contactArray[i].m_body1);
 		ndAssert(contactArray[i].m_shapeInstance0);
