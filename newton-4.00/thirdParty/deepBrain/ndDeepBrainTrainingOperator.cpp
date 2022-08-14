@@ -207,11 +207,38 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 
 void ndDeepBrainTrainingOperator::BackPropagateHiddenLayer()
 {
-	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
-	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
-	//ndAssert(layers.GetCount());
-	//
-	//ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
+	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
+
+	for (ndInt32 layerIndex = layers.GetCount() - 2; layerIndex >= 0; --layerIndex)
+	{
+		ndDeepBrainLayer* const layer = layers[layerIndex];
+		//const ndInt32 inputCount = ouputLayer->GetInputSize();
+		//const ndInt32 outputCount = ouputLayer->GetOuputSize();
+		//const ndInt32 weightGradientStride = (ouputLayer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		//
+		//m_costGradients.SetCount(outputCount);
+		//
+		//const ndDeepBrainMemVector output(&m_output[m_ouputPrefixScan[layerIndex]], outputCount);
+		//m_costGradients.Sub(output, groundTruth);
+		//
+		//ndDeepBrainVector& input = m_instance.GetInputs();
+		//const ndReal* const ptr = layerIndex ? &m_output[m_ouputPrefixScan[layerIndex - 1]] : &input[0];
+		//const ndDeepBrainMemVector prevOutput(ptr, inputCount);
+		//const ndDeepBrainMemVector outputDerivative(&m_outputDerivative[m_ouputPrefixScan[layerIndex]], outputCount);
+		//ndDeepBrainMemVector biasGradients(&m_biasGradients[m_ouputPrefixScan[layerIndex]], outputCount);
+		//
+		//ndInt32 gradientStart = m_gradientsPrefixScan[layerIndex];
+		
+		//for (ndInt32 i = 0; i < outputCount; ++i)
+		{
+			//ndDeepBrainMemVector weightGradient(&m_gradients[gradientStart], inputCount);
+			//ndFloat32 derivative = m_costGradients[i] * outputDerivative[i];
+			//gradientStart += weightGradientStride;
+			//
+			//biasGradients[i] = derivative;
+			//weightGradient.ScaleSet(prevOutput, derivative);
+		}
+	}
 }
 
 void ndDeepBrainTrainingOperator::UpdateWeights(ndReal learnRate)
