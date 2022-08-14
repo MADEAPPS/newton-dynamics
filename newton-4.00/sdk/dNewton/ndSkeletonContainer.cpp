@@ -1388,7 +1388,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	{
 		const ndFloat32 s = u[i];
 		f[primaryCount + i] = s;
-		ndMulScale(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
+		ndScaleAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
 	}
 
 	for (ndInt32 i = 0; i < m_rowCount; ++i) 
@@ -1629,7 +1629,7 @@ void ndSkeletonContainer::SolveAuxiliaryImmediate(ndBodyKinematic** const bodyAr
 	{
 		const ndFloat32 s = u[i];
 		f[primaryCount + i] = s;
-		ndMulScale(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
+		ndScaleAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
 	}
 
 	for (ndInt32 i = 0; i < m_rowCount; ++i)

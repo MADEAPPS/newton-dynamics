@@ -31,6 +31,7 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	,m_preOutput()
 	,m_gradients()
 	,m_costGradients()
+	,m_biasGradients()
 	,m_outputDerivative()
 	,m_ouputPrefixScan()
 	,m_gradientsPrefixScan()
@@ -56,14 +57,13 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	m_ouputPrefixScan.SetCount(layers.GetCount());
 	m_gradientsPrefixScan.SetCount(layers.GetCount());
 	
-	//m_ouputPrefixScan[0] = (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
 		ndInt32 size = (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		m_ouputPrefixScan[i] = size;
 	
-		ndInt32 weightStride = (layer->GetInputSize() + 1 + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		ndInt32 weightStride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		m_gradientsPrefixScan[i] = layer->GetOuputSize() * weightStride;
 	}
 	
@@ -77,10 +77,12 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	
 	m_output.SetCount(sum);
 	m_preOutput.SetCount(sum);
+	m_biasGradients.SetCount(sum);
 	m_outputDerivative.SetCount(sum);
 	
 	m_output.SetValue(0.0f);
 	m_preOutput.SetValue(0.0f);
+	m_biasGradients.SetValue(0.0f);
 	m_outputDerivative.SetValue(0.0f);
 	
 	sum = 0;
@@ -114,8 +116,6 @@ void ndDeepBrainTrainingOperator::PredictInputLayer(const ndDeepBrainVector& tra
 {
 	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
 	dAssert(layers.GetCount());
-	
-	//SetInput(trainingInput);
 
 	ndDeepBrainVector& input = m_instance.GetInputs();
 	ndDeepBrainVector& output = m_instance.GetOutputs();
@@ -172,16 +172,6 @@ void ndDeepBrainTrainingOperator::MakePrediction(const ndDeepBrainVector& traini
 	input.CopyData(trainingInput);
 }
 
-void ndDeepBrainTrainingOperator::BackPropagateHiddenLayer()
-{
-	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
-	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
-	//dAssert(layers.GetCount());
-	//
-	//ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
-
-}
-
 void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth)
 {
 	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
@@ -190,7 +180,7 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 	ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
 	const ndInt32 inputCount = ouputLayer->GetInputSize();
 	const ndInt32 outputCount = ouputLayer->GetOuputSize();
-	const ndInt32 weightGradientStride = (ouputLayer->GetInputSize() + 1 + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	const ndInt32 weightGradientStride = (ouputLayer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	
 	m_costGradients.SetCount(outputCount);
 	
@@ -201,17 +191,27 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 	const ndReal* const ptr = layerIndex ? &m_output[m_ouputPrefixScan[layerIndex - 1]] : &input[0];
 	const ndDeepBrainMemVector prevOutput(ptr, inputCount);
 	const ndDeepBrainMemVector outputDerivative(&m_outputDerivative[m_ouputPrefixScan[layerIndex]], outputCount);
+	ndDeepBrainMemVector biasGradients(&m_biasGradients[m_ouputPrefixScan[layerIndex]], outputCount);
 	
 	ndInt32 gradientStart = m_gradientsPrefixScan[layerIndex];
 	for (ndInt32 i = 0; i < outputCount; ++i)
 	{
-		ndDeepBrainMemVector weightGradient(&m_gradients[gradientStart], inputCount + 1);
+		ndDeepBrainMemVector weightGradient(&m_gradients[gradientStart], inputCount);
 		ndFloat32 derivative = m_costGradients[i] * outputDerivative[i];
-		weightGradient[inputCount] = derivative;
-		weightGradient.SetCount(inputCount);
-		weightGradient.ScaleSet(prevOutput, derivative);
 		gradientStart += weightGradientStride;
+
+		biasGradients[i] = derivative;
+		weightGradient.ScaleSet(prevOutput, derivative);
 	}
+}
+
+void ndDeepBrainTrainingOperator::BackPropagateHiddenLayer()
+{
+	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
+	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
+	//dAssert(layers.GetCount());
+	//
+	//ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
 }
 
 void ndDeepBrainTrainingOperator::UpdateWeights(ndReal learnRate)
@@ -221,19 +221,21 @@ void ndDeepBrainTrainingOperator::UpdateWeights(ndReal learnRate)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
 
-		const ndInt32 weightGradientStride = (layer->GetInputSize() + 1 + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		const ndInt32 weightGradientStride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		ndInt32 gradientStart = m_gradientsPrefixScan[i];
 
-		ndInt32 inputSize = layer->GetInputSize();
+		const ndInt32 inputSize = layer->GetInputSize();
+		const ndInt32 outputSize = layer->GetOuputSize();
+
 		ndDeepBrainVector& bias = layer->GetBias();
-		
-		for (ndInt32 j = 0; j < layer->GetOuputSize(); ++j)
+		const ndDeepBrainMemVector biasGradients(&m_biasGradients[m_ouputPrefixScan[i]], outputSize);
+		bias.ScaleAdd(biasGradients, learnRate);
+
+		for (ndInt32 j = 0; j < outputSize; ++j)
 		{
 			ndDeepBrainVector& weightVector = (*layer)[j];
-			ndDeepBrainMemVector weightDerivative(&m_gradients[gradientStart], inputSize);
-			weightVector.MulScale(weightDerivative, learnRate);
-			gradientStart += weightGradientStride;
-			bias[j] += learnRate * weightDerivative[inputSize];
+			const ndDeepBrainMemVector weightGradients(&m_gradients[gradientStart], inputSize);
+			weightVector.ScaleAdd(weightGradients, learnRate);
 		}
 	}
 }
@@ -243,43 +245,4 @@ void ndDeepBrainTrainingOperator::BackPropagate(ndReal learnRate, const ndDeepBr
 	BackPropagateOutputLayer(groundTruth);
 	BackPropagateHiddenLayer();
 	UpdateWeights(learnRate);
-
-	//ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
-	//dAssert(layers.GetCount());
-	//dAssert(0);
-	//m_cost.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
-	//m_cost.Sub(m_instance.GetOutputs(), groundTruth);
-
-	//const ndDeepBrainVector& cost = trainingOperator.m_cost;
-	//const ndDeepBrainVector& gradient = trainingOperator.m_gradient;
-	//const ndDeepBrainPrefixScan& gradientPrefixScan = trainingOperator.m_gradientPrefixScan;
-	//ndDeepBrainMemVector temVector(&gradient[gradientPrefixScan[layers.GetCount()]], cost.GetCount());
-	//temVector.CopyData(cost);
-	
-	//const ndDeepBrainVector& output = m_output;
-	//ndDeepBrainVector& outputDerivative = m_outputDerivative;
-	//const ndDeepBrainPrefixScan& ouputPrefixScan = m_ouputPrefixScan;
-	//for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	//{
-	//	ndDeepBrainLayer* const layer = layers[i];
-	//
-	//	ndInt32 outputSize = layer->GetOuputSize();
-	//
-	//	const ndDeepBrainMemVector layerOutput(&output[ouputPrefixScan[i + 1]], outputSize);
-	//	ndDeepBrainMemVector layerOutputDevivative(&outputDerivative[ouputPrefixScan[i + 1]], outputSize);
-	//	layer->ActivationDerivative(layerOutput, layerOutputDevivative);
-	//
-	//	//	ndDeepBrainMemVector gradientVectorIn(&gradient[gradientPrefixScan[i + 1]], outputSize);
-	//	//	outputDerivative.Scale(outputDerivative, gradientVectorIn[0]);
-	//	//	
-	//	//	ndInt32 inputSize = layer->GetInputSize();
-	//	//
-	//	//	const ndDeepBrainMemVector layerInput(&output[ouputPrefixScan[i]], inputSize);
-	//	//	ndDeepBrainMemVector gradientVectorOut(&gradient[gradientPrefixScan[i]], inputSize + 1);
-	//	//	for (ndInt32 j = 0; j < inputSize; j++)
-	//	//	{
-	//	//		gradientVectorOut[j] = outputDerivative[0] * layerInput[j];
-	//	//	}
-	//	//	gradientVectorOut[inputSize] = outputDerivative[0];
-	//}
 }

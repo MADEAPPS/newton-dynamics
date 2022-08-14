@@ -87,7 +87,7 @@ void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndMulScale(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
+void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{

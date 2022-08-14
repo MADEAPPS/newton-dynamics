@@ -51,6 +51,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainVector m_preOutput;
 	ndDeepBrainVector m_gradients;
 	ndDeepBrainVector m_costGradients;
+	ndDeepBrainVector m_biasGradients;
 	ndDeepBrainVector m_outputDerivative;
 	ndDeepBrainPrefixScan m_ouputPrefixScan;
 	ndDeepBrainPrefixScan m_gradientsPrefixScan;
