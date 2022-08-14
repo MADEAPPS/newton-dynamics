@@ -110,7 +110,7 @@ inline void ndJointKinematicController::SetTargetRotation(const ndQuaternion& ro
 
 inline ndMatrix ndJointKinematicController::GetTargetMatrix() const
 {
-	dAssert(0);
+	ndAssert(0);
 	return m_localMatrix0;
 }
 

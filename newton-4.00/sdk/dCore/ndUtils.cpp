@@ -442,7 +442,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 						index1 = remapIndex[i1].m_vertexIndex;
 					}
 	
-					dAssert(i0 <= i1);
+					ndAssert(i0 <= i1);
 					if (i0 < i1)
 					{
 						ndSwap(remapIndex[i0], remapIndex[i1]);
@@ -462,13 +462,13 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 				for (ndInt32 i = 0; i < i0; ++i)
 				{
 					index0 = remapIndex[i].m_vertexIndex;
-					dAssert(vertList[index0 * stride + firstSortAxis] <= axisVal);
+					ndAssert(vertList[index0 * stride + firstSortAxis] <= axisVal);
 				}
 	
 				for (ndInt32 i = i0; i < cluster.m_count; ++i)
 				{
 					index0 = remapIndex[i].m_vertexIndex;
-					dAssert(vertList[index0 * stride + firstSortAxis] > axisVal);
+					ndAssert(vertList[index0 * stride + firstSortAxis] > axisVal);
 				}
 				#endif
 	

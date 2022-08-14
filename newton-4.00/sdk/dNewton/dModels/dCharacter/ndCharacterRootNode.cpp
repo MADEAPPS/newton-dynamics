@@ -70,7 +70,7 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
 	}
-	dAssert(bodyNode);
+	ndAssert(bodyNode);
 
 	xmlSaveParam(childNode, "name", GetName().GetStr());
 	xmlSaveParam(childNode, "localPose", m_localPose);

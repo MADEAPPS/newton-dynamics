@@ -60,7 +60,7 @@ void ndDeepBrainInstance::SetInput(const ndDeepBrainVector& input)
 {
 	ndDeepBrainLayer* const inputLayer = (*m_brain)[0];
 	ndInt32 size = inputLayer->GetInputSize();
-	dAssert(size == input.GetCount());
+	ndAssert(size == input.GetCount());
 
 	m_inputs.SetCount(size);
 	m_inputs.CopyData(input);
@@ -70,12 +70,12 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input)
 {
 	SetInput(input);
 	ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
-	dAssert(layers.GetCount());
+	ndAssert(layers.GetCount());
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
-		dAssert(m_inputs.GetCount() == layer->GetInputSize());
+		ndAssert(m_inputs.GetCount() == layer->GetInputSize());
 
 		ndInt32 outputCount = layer->GetOuputSize();
 		m_outputs.SetCount(outputCount);

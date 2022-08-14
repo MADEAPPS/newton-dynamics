@@ -150,14 +150,14 @@ ndMaterial* ndContactCallback::GetMaterial(const ndContact* const, const ndShape
 bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep)
 {
 	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();
-	dAssert(material);
+	ndAssert(material);
 	return material->OnAabbOverlap(contactJoint, timestep);
 }
 
 //bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1)
 bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const, const ndShapeInstance&, const ndShapeInstance&)
 {
-	dAssert(0);
+	ndAssert(0);
 	return 0;
 }
 
@@ -165,6 +165,6 @@ bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const, const 
 void ndContactCallback::OnContactCallback(const ndContact* const contactJoint, ndFloat32 timestep)
 {
 	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();
-	dAssert(material);
+	ndAssert(material);
 	material->OnContactCallback(contactJoint, timestep);
 }

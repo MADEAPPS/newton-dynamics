@@ -48,7 +48,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		//ndWorld* const word = m_manager->GetWorld();
 		//ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
-		dAssert(0);
+		ndAssert(0);
 		//ndFloat32 timestep = word->GetScene()->GetTimestep();
 		//timestep *= 0.25f;
 		//timestep = 1.0f/(30.0f * 4.0f);
@@ -125,7 +125,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree = idleMoveBlend;
 
 	// evaluate twice that interpolation is reset
-	dAssert(0);
+	ndAssert(0);
 	//m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 	//m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
@@ -137,7 +137,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescripto
 	,m_output()
 	,m_animBlendTree(nullptr)
 {
-	//dAssert(0);
+	//ndAssert(0);
 	//for now do not load the player configuration, we can do that is the postprocess pass. 
 	//m_isPlayer = xmlGetInt(xmlNode, "isPlayer") ? true : false;
 	//m_scene = world->GetManager();

@@ -55,13 +55,13 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 			public:
 			inline ndLeafNodePtr ()
 			{
-				dAssert (0);
+				ndAssert (0);
 			}
 
 			inline ndLeafNodePtr (ndUnsigned32 node)
 			{
 				m_node = node;
-				dAssert (!IsLeaf());
+				ndAssert (!IsLeaf());
 			}
 
 			inline ndUnsigned32 IsLeaf () const 
@@ -71,19 +71,19 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 
 			inline ndUnsigned32 GetCount() const 
 			{
-				dAssert (IsLeaf());
+				ndAssert (IsLeaf());
 				return (m_node & (~0x80000000)) >> (32 - DG_INDEX_COUNT_BITS - 1);
 			}
 
 			inline ndUnsigned32 GetIndex() const 
 			{
-				dAssert (IsLeaf());
+				ndAssert (IsLeaf());
 				return m_node & (~(-(1 << (32 - DG_INDEX_COUNT_BITS - 1))));
 			}
 
 			inline ndLeafNodePtr (ndUnsigned32 faceIndexCount, ndUnsigned32 faceIndexStart)
 			{
-				dAssert (faceIndexCount < (1<<DG_INDEX_COUNT_BITS));
+				ndAssert (faceIndexCount < (1<<DG_INDEX_COUNT_BITS));
 				m_node = 0x80000000 | (faceIndexCount << (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;
 			}
 
@@ -120,9 +120,9 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 			p1 = p1 & ndVector::m_triplexMask;
 			ndVector minBox (p0 - obb.m_p1);
 			ndVector maxBox (p1 - obb.m_p0);
-			dAssert(maxBox.m_x >= minBox.m_x);
-			dAssert(maxBox.m_y >= minBox.m_y);
-			dAssert(maxBox.m_z >= minBox.m_z);
+			ndAssert(maxBox.m_x >= minBox.m_x);
+			ndAssert(maxBox.m_y >= minBox.m_y);
+			ndAssert(maxBox.m_z >= minBox.m_z);
 
 			ndVector mask ((minBox * maxBox) < ndVector::m_zero);
 			ndVector dist (maxBox.GetMin (minBox.Abs()) & mask);
@@ -140,9 +140,9 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 				ndVector q1 (origin + size);
 				ndVector minBox1 (q0 - obb.m_size);
 				ndVector maxBox1 (q1 + obb.m_size);
-				dAssert(maxBox1.m_x >= minBox1.m_x);
-				dAssert(maxBox1.m_y >= minBox1.m_y);
-				dAssert(maxBox1.m_z >= minBox1.m_z);
+				ndAssert(maxBox1.m_x >= minBox1.m_x);
+				ndAssert(maxBox1.m_y >= minBox1.m_y);
+				ndAssert(maxBox1.m_z >= minBox1.m_z);
 				ndVector mask1 ((minBox1 * maxBox1) < ndVector::m_zero);
 				ndVector dist1 (maxBox1.GetMin (minBox1.Abs()) & mask1);
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());

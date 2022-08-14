@@ -159,25 +159,25 @@ class ndList: public ndClassAlloc
 
 		void operator++ ()
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->m_next();
 		}
 
 		void operator++ (ndInt32)
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->GetNext();
 		}
 
 		void operator-- () 
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->GetPrev();
 		}
 
 		void operator-- (ndInt32) 
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->GetPrev();
 		}
 
@@ -287,8 +287,8 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetLast() const
 template<class T, class allocator>
 typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append (ndNode* const node)
 {
-	dAssert (node->m_next == nullptr);
-	dAssert (node->m_prev == nullptr);
+	ndAssert (node->m_next == nullptr);
+	ndAssert (node->m_prev == nullptr);
 	m_count	++;
 	if (m_first == nullptr) 
 	{
@@ -301,7 +301,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append (ndNode* const
 		m_last = node;
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 	return m_last;
 }
@@ -320,7 +320,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append ()
 		m_last = new ndNode(m_last, nullptr);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 	return m_last;
 }
@@ -339,7 +339,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append (const T &elem
 		m_last = new ndNode(element, m_last, nullptr);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 
 	return m_last;
@@ -348,8 +348,8 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append (const T &elem
 template<class T, class allocator>
 typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop (ndNode* const node)
 {
-	dAssert (node->m_next == nullptr);
-	dAssert (node->m_prev == nullptr);
+	ndAssert (node->m_next == nullptr);
+	ndAssert (node->m_prev == nullptr);
 	m_count	++;
 	if (m_last == nullptr) 
 	{
@@ -362,7 +362,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop (ndNode* const
 		m_first = node;
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 	return m_first;
 }
@@ -381,7 +381,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop ()
 		m_first = new ndNode(nullptr, m_first);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 	return m_first;
 }
@@ -400,7 +400,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop (const T &elem
 		m_first = new ndNode(element, nullptr, m_first);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 	return m_first;
 }
@@ -408,7 +408,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop (const T &elem
 template<class T, class allocator>
 void ndList<T,allocator>::InsertAfter (ndNode* const root, ndNode* const node)
 {
-	dAssert (root);
+	ndAssert (root);
 	if (node != root) 
 	{
 		if (root->m_next != node) 
@@ -436,11 +436,11 @@ void ndList<T,allocator>::InsertAfter (ndNode* const root, ndNode* const node)
 				m_last = node;
 			}
 
-			dAssert (m_last);
-			dAssert (!m_last->m_next);
-			dAssert (m_first);
-			dAssert (!m_first->m_prev);
-			dAssert (SanityCheck ());
+			ndAssert (m_last);
+			ndAssert (!m_last->m_next);
+			ndAssert (m_first);
+			ndAssert (!m_first->m_prev);
+			ndAssert (SanityCheck ());
 		}
 	}
 }
@@ -448,7 +448,7 @@ void ndList<T,allocator>::InsertAfter (ndNode* const root, ndNode* const node)
 template<class T, class allocator>
 void ndList<T,allocator>::InsertBefore (ndNode* const root, ndNode* const node)
 {
-	dAssert (root);
+	ndAssert (root);
 	if (node != root) 
 	{
 		if (root->m_prev != node) 
@@ -474,11 +474,11 @@ void ndList<T,allocator>::InsertBefore (ndNode* const root, ndNode* const node)
 				m_first = node;
 			}
 
-			dAssert (m_first);
-			dAssert (!m_first->m_prev);
-			dAssert (m_last);
-			dAssert (!m_last->m_next);
-			dAssert (SanityCheck ());
+			ndAssert (m_first);
+			ndAssert (!m_first->m_prev);
+			ndAssert (m_last);
+			ndAssert (!m_last->m_next);
+			ndAssert (SanityCheck ());
 		}
 	}
 }
@@ -501,7 +501,7 @@ void ndList<T,allocator>::RotateToEnd (ndNode* const node)
 	}
 
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 }
 
@@ -523,7 +523,7 @@ void ndList<T,allocator>::RotateToBegin (ndNode* const node)
 	}
 
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 }
 
@@ -548,7 +548,7 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetNodeFromInfo (T &i
 	ndInt64 offset = ((char*) &node->m_info) - ((char *) node);
 	ndNode* const retnode = (ndNode *) (((char *) node) - offset);
 
-	dAssert (&retnode->GetInfo () == &info);
+	ndAssert (&retnode->GetInfo () == &info);
 	return retnode;
 }
 
@@ -565,10 +565,10 @@ void ndList<T,allocator>::Remove (const T &element)
 template<class T, class allocator> 
 void ndList<T,allocator>::Unlink (ndNode* const node)
 {
-	dAssert (node);
+	ndAssert (node);
 
 	m_count --;
-	dAssert (m_count >= 0);
+	ndAssert (m_count >= 0);
 
 	if (node == m_first) 
 	{
@@ -581,7 +581,7 @@ void ndList<T,allocator>::Unlink (ndNode* const node)
 	node->Unlink();
 
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 }
 
@@ -607,7 +607,7 @@ void ndList<T,allocator>::Merge (ndList<T, allocator>& list)
 	list.m_last = nullptr;
 	list.m_first = nullptr;
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert (SanityCheck ());
+	ndAssert (SanityCheck ());
 #endif
 }
 
@@ -628,7 +628,7 @@ void ndList<T,allocator>::RemoveAll ()
 		node->Unlink();
 		delete node;
 	}
-	dAssert (m_count == 0);
+	ndAssert (m_count == 0);
 	m_last = nullptr;
 	m_first = nullptr;
 }
@@ -642,26 +642,26 @@ bool ndList<T,allocator>::SanityCheck () const
 	{
 		tCount ++;
 		if (node->GetPrev()) {
-			dAssert (node->GetPrev() != node->GetNext());
+			ndAssert (node->GetPrev() != node->GetNext());
 			if (node->GetPrev()->GetNext() != node) 
 			{
-				dAssert (0);
+				ndAssert (0);
 				return false; 
 			}
 		}
 		if (node->GetNext()) 
 		{
-			dAssert (node->GetPrev() != node->GetNext());
+			ndAssert (node->GetPrev() != node->GetNext());
 			if (node->GetNext()->GetPrev() != node)	
 			{
-				dAssert (0);
+				ndAssert (0);
 				return false;
 			}
 		}
 	}
 	if (tCount != m_count) 
 	{
-		dAssert (0);
+		ndAssert (0);
 		return false;
 	}
 	#endif

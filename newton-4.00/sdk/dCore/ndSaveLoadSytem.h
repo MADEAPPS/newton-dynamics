@@ -137,7 +137,7 @@ class ndLoadSaveBase: public ndClassAlloc
 
 	virtual void* CreateClass(const ndLoadDescriptor&)
 	{
-		dAssert(0);
+		ndAssert(0);
 		return nullptr;
 	}
 };

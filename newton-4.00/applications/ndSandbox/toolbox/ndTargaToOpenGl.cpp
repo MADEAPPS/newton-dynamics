@@ -29,7 +29,7 @@ class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 	GLuint GetTexture(const char* const texName)
 	{
 		GLuint texID = 0;
-		dAssert (texName);
+		ndAssert (texName);
 
 		char name[256];
 		strcpy(name, texName);
@@ -57,7 +57,7 @@ class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 
 	~ndTextureCache ()
 	{
-		dAssert(GetCount() == 0);
+		ndAssert(GetCount() == 0);
 	}
 
 	void RemoveById (GLuint id)
@@ -164,7 +164,7 @@ static GLuint LoadTargaImage(const char* const cacheName, const char* const buff
 
 		// build our texture mip maps
 		gluBuild2DMipmaps(GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
-		dAssert(glGetError() == GL_NO_ERROR);
+		ndAssert(glGetError() == GL_NO_ERROR);
 
 		// Done with File
 		ndTextureCache& cache = ndTextureCache::GetChache();
@@ -209,7 +209,7 @@ GLuint LoadTexture(const char* const filename)
 			return 0;
 		}
 
-		//dAssert (sizeof (TGAHEADER) == 18);
+		//ndAssert (sizeof (TGAHEADER) == 18);
 		// Read in header (binary) sizeof(TGAHEADER) = 18
 		TGAHEADER tgaHeader;		// TGA file header
 		size_t ret = fread(&tgaHeader, 18, 1, pFile);
@@ -227,7 +227,7 @@ GLuint LoadTexture(const char* const filename)
 		ndInt32 width = tgaHeader.width;
 		ndInt32 height = tgaHeader.height;
 		short sDepth = tgaHeader.bits / 8;
-		dAssert ((sDepth == 3) || (sDepth == 4));
+		ndAssert ((sDepth == 3) || (sDepth == 4));
 
 		// Put some validity checks here. Very simply, I only understand
 		// or care about 8, 24, or 32 bit targa's.

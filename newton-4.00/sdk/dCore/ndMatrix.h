@@ -153,20 +153,20 @@ inline ndMatrix::ndMatrix (const ndVector& front)
 	}
 	m_right = m_right.Normalize();
 	m_up = m_right.CrossProduct(m_front);
-	dAssert(TestOrthogonal());
+	ndAssert(TestOrthogonal());
 }
 
 inline ndVector& ndMatrix::operator[] (ndInt32  i)
 {
-	dAssert (i < 4);
-	dAssert (i >= 0);
+	ndAssert (i < 4);
+	ndAssert (i >= 0);
 	return (&m_front)[i];
 }
 
 inline const ndVector& ndMatrix::operator[] (ndInt32  i) const
 {
-	dAssert (i < 4);
-	dAssert (i >= 0);
+	ndAssert (i < 4);
+	ndAssert (i >= 0);
 	return (&m_front)[i];
 }
 
@@ -269,7 +269,7 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 		{
 			for (ndInt32 j = 0; j < 4; ++j)
 			{
-				dAssert(dCheckFloat(me[i][j]));
+				ndAssert(dCheckFloat(me[i][j]));
 			}
 		}
 	#endif
@@ -289,7 +289,7 @@ inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 				(ndAbs(d - ndFloat32(1.0f)) < tol);
 	if (!ret)
 	{
-		dAssert (0);
+		ndAssert (0);
 	}
 	return ret;
 }

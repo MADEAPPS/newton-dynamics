@@ -95,7 +95,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const ndVector&, const ndVector&, ndArray<ndVector>&, ndArray<ndInt32>&, ndArray<ndInt32>&, ndArray<ndInt32>&) const
 {
-	dAssert(0);
+	ndAssert(0);
 }
 
 inline ndShapeStaticProceduralMesh::ndEdge::ndEdge()

@@ -35,7 +35,7 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 
 void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
-	dAssert(inputBatch.GetCount() == groundTruth.GetCount());
+	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	
 	PrefixScan();
 	for (ndInt32 i = 0; i < steps; ++i)

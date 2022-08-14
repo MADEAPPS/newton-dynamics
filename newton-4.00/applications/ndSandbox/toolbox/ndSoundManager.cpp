@@ -29,21 +29,21 @@ ndSoundChannel::ndSoundChannel()
 	,m_maxDropOffDist(ndFloat32(50.0f))
 {
 	alGenSources(1, (ALuint*)&m_source);
-	dAssert(m_source);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(m_source);
+	ndAssert(alGetError() == AL_NO_ERROR);
 
 	ALfloat distanceModel = DEFAULT_DISTANCE_MODEL;
 	alSourcefv(m_source, AL_DISTANCE_MODEL, &distanceModel);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 
 	ALfloat posit[3];
 	alGetSourcefv(m_source, AL_POSITION, posit);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 	m_posit = ndVector (ndFloat32(posit[0]), ndFloat32(posit[1]), ndFloat32(posit[2]), ndFloat32(1.0f));
 
 	ALfloat veloc[3];
 	alGetSourcefv(m_source, AL_VELOCITY, veloc);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 	m_veloc = ndVector(ndFloat32(veloc[0]), ndFloat32(veloc[1]), ndFloat32(veloc[2]), ndFloat32(0.0f));
 }
 
@@ -51,9 +51,9 @@ ndSoundChannel::~ndSoundChannel()
 {
 	Stop();
 	alDeleteSources(1, (ALuint*)&m_source);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 
-	dAssert(m_asset);
+	ndAssert(m_asset);
 	m_asset->Remove(m_assetNode);
 }
 
@@ -81,9 +81,9 @@ void ndSoundChannel::Play()
 	// set some default values
 	if (!IsPlaying())
 	{
-		dAssert(!m_playingNode);
+		ndAssert(!m_playingNode);
 		alSourcePlay(m_source);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 		m_playingNode = m_manager->m_channelPlaying.Append(this);
 	}
 }
@@ -91,7 +91,7 @@ void ndSoundChannel::Play()
 void ndSoundChannel::Stop()
 {
 	alSourceStop(m_source);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 	if (m_playingNode)
 	{
 		m_manager->m_channelPlaying.Remove(m_playingNode);
@@ -105,7 +105,7 @@ void ndSoundChannel::SetVolume(ndFloat32 volume)
 	{
 		m_volume = volume;
 		alSourcef(m_source, AL_GAIN, ALfloat(m_volume));
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -117,10 +117,10 @@ ndFloat32 ndSoundChannel::GetVolume() const
 void ndSoundChannel::SetAttenuationRefDistance(ndFloat32 dist, ndFloat32 minDropOffDist, ndFloat32 maxDropOffDist)
 {
 	alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(dist));
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 
-	dAssert(dist < minDropOffDist);
-	dAssert(dist < minDropOffDist);
+	ndAssert(dist < minDropOffDist);
+	ndAssert(dist < minDropOffDist);
 	m_minDropOffDist = minDropOffDist;
 	m_maxDropOffDist = maxDropOffDist;
 }
@@ -144,7 +144,7 @@ void ndSoundChannel::ApplyAttenuation(const ndVector& listenerPosit)
 	{
 		m_gain = gain;
 		alSourcef(m_source, AL_GAIN, ALfloat(m_gain));
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -159,7 +159,7 @@ void ndSoundChannel::SetPitch(ndFloat32 pitch)
 	{
 		m_pitch = pitch;
 		alSourcef(m_source, AL_PITCH, ALfloat(m_pitch));
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -172,7 +172,7 @@ ndFloat32 ndSoundChannel::GetPositionInSeconds() const
 {
 	ALfloat position;
 	alGetSourcef(m_source, AL_SEC_OFFSET, &position);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(alGetError() == AL_NO_ERROR);
 	return position;
 }
 
@@ -193,7 +193,7 @@ void ndSoundChannel::SetPosition(const ndVector& position)
 		sourcePosition[1] = ALfloat(posit.m_y);
 		sourcePosition[2] = ALfloat(posit.m_z);
 		alSourcefv(m_source, AL_POSITION, sourcePosition);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -214,7 +214,7 @@ void ndSoundChannel::SetVelocity(const ndVector& velocity)
 		sourceVeloc[1] = ALfloat(veloc.m_y);
 		sourceVeloc[2] = ALfloat(veloc.m_z);
 		alSourcefv(m_source, AL_VELOCITY, sourceVeloc);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -235,8 +235,8 @@ ndSoundAsset::ndSoundAsset(const ndSoundAsset&)
 	,m_node(nullptr)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
-	dAssert(m_buffer);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ndAssert(m_buffer);
+	ndAssert(alGetError() == AL_NO_ERROR);
 }
 
 ndSoundAsset::~ndSoundAsset()
@@ -250,7 +250,7 @@ ndSoundAsset::~ndSoundAsset()
 		}
 
 		alDeleteBuffers(1, (ALuint *)&m_buffer);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -268,27 +268,27 @@ ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 	,m_upDir(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f))
 	,m_frontDir(ndFloat32 (0.0f), ndFloat32(0.0f), ndFloat32(-1.0f), ndFloat32(0.0f))
 {
-	dAssert(m_device);
+	ndAssert(m_device);
 	if (m_device)
 	{
 		m_context = alcCreateContext(m_device, nullptr);
 		alcMakeContextCurrent(m_context);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	
 		ALfloat listenerPosit[] = { 0.0f, 0.0f, 0.0f };
 		alListenerfv(AL_POSITION, listenerPosit);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	
 		ALfloat listenerVeloc[] = { 0.0f, 0.0f, 0.0f };
 		alListenerfv(AL_VELOCITY, listenerVeloc);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	
 		ALfloat listenerOri[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
 		alListenerfv(AL_ORIENTATION, listenerOri);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 
 		alDistanceModel(DEFAULT_DISTANCE_MODEL);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 }
 
@@ -350,7 +350,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 					//0xFFFE WAVE_FORMAT_EXTENSIBLE Determined by SubFormat 
 
 					// I only parse WAVE_FORMAT_PCM format
-					dAssert(audioFormat == WAVE_FORMAT_PCM);
+					ndAssert(audioFormat == WAVE_FORMAT_PCM);
 
 					bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 					if (!strcmp(xbuffer, "fact"))
@@ -380,20 +380,20 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 							}
 							else
 							{
-								dAssert(bitsPerSample == 16);
+								ndAssert(bitsPerSample == 16);
 								waveFormat = AL_FORMAT_MONO16;
 							}
 						}
 						else
 						{
-							dAssert(channels == 2);
+							ndAssert(channels == 2);
 							if (bitsPerSample == 8)
 							{
 								waveFormat = AL_FORMAT_STEREO8;
 							}
 							else
 							{
-								dAssert(bitsPerSample == 16);
+								ndAssert(bitsPerSample == 16);
 								waveFormat = AL_FORMAT_STEREO16;
 							}
 						}
@@ -433,7 +433,7 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 	{
 		ndUnsigned64 code = dCRC64(fileName);
 		ndSoundAssetList::ndNode* const assetNode = m_assets.Find(code);
-		dAssert(assetNode);
+		ndAssert(assetNode);
 	
 		ndSoundAsset& asset = assetNode->GetInfo();
 
@@ -442,7 +442,7 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 		channel->m_asset = &asset;
 		channel->m_manager = this;
 		alSourcei(channel->m_source, AL_BUFFER, asset.m_buffer);
-		dAssert(alGetError() == AL_NO_ERROR);
+		ndAssert(alGetError() == AL_NO_ERROR);
 	}
 	return channel;
 }
@@ -465,7 +465,7 @@ void ndSoundManager::Update(ndWorld* const, ndFloat32 timestep)
 			listenerPosit[1] = ALfloat(matrix.m_posit.m_y);
 			listenerPosit[2] = ALfloat(matrix.m_posit.m_z);
 			alListenerfv(AL_POSITION, listenerPosit);
-			dAssert(alGetError() == AL_NO_ERROR);
+			ndAssert(alGetError() == AL_NO_ERROR);
 		}
 
 		ndVector veloc((matrix.m_posit - m_posit0).Scale(1.0f / timestep));
@@ -479,7 +479,7 @@ void ndSoundManager::Update(ndWorld* const, ndFloat32 timestep)
 			listenerVeloc[1] = ALfloat(veloc.m_y);
 			listenerVeloc[2] = ALfloat(veloc.m_z);
 			alListenerfv(AL_VELOCITY, listenerVeloc);
-			dAssert(alGetError() == AL_NO_ERROR);
+			ndAssert(alGetError() == AL_NO_ERROR);
 		}
 		m_posit0 = matrix.m_posit;
 
@@ -501,7 +501,7 @@ void ndSoundManager::Update(ndWorld* const, ndFloat32 timestep)
 			listenerOrientation[4] = (ALfloat)m_upDir.m_y;
 			listenerOrientation[5] = (ALfloat)m_upDir.m_z;
 			alListenerfv(AL_ORIENTATION, listenerOrientation);
-			dAssert(alGetError() == AL_NO_ERROR);
+			ndAssert(alGetError() == AL_NO_ERROR);
 		}
 
 		//dTrace(("p(%f %f %f)", m_posit[0], m_posit[1], m_posit[2]));

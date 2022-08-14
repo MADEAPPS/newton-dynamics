@@ -287,7 +287,7 @@ inline const ndShape* ndShape::AddRef() const
 inline ndInt32 ndShape::Release() const
 {
 	ndInt32 count = m_refCount.fetch_add(-1);
-	dAssert(count >= 1);
+	ndAssert(count >= 1);
 	if (count == 1) 
 	{
 		delete this;
@@ -302,13 +302,13 @@ inline ndInt32 ndShape::GetRefCount() const
 
 inline ndFloat32 ndShape::CalculateMassProperties(const ndMatrix&, ndVector&, ndVector&, ndVector&) const
 { 
-	dAssert(0); 
+	ndAssert(0); 
 	return 0; 
 }
 
 inline ndMatrix ndShape::CalculateInertiaAndCenterOfMass(const ndMatrix&, const ndVector&, const ndMatrix&) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return dGetZeroMatrix();
 }
 

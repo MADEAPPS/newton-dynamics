@@ -105,7 +105,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 			ndVector e10(p1 - p0);
 			ndVector e20(p2 - p0);
 			ndVector normal(e10.CrossProduct(e20));
-			dAssert(normal.m_w == ndFloat32(0.0f));
+			ndAssert(normal.m_w == ndFloat32(0.0f));
 			normal = normal.Normalize();
 
 			points[i0].m_normal.m_x += GLfloat(normal.m_x);
@@ -186,7 +186,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	ndArray<ndReal>& hightMap = shape->GetElevationMap();
-	dAssert(hightMap.GetCount() == heightfield.GetCount());
+	ndAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); ++i)
 	{
 		ndFloat32 high = heightfield[i].m_y;
@@ -221,7 +221,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	ndArray<ndReal>& hightMap = shape->GetElevationMap();
-	dAssert(hightMap.GetCount() == heightfield.GetCount());
+	ndAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); ++i)
 	{
 		ndFloat32 high = heightfield[i].m_y;

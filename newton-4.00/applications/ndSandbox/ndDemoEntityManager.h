@@ -308,13 +308,13 @@ inline ndInt32 ndDemoEntityManager::GetHeight() const
 
 inline ndInt32 ndDemoEntityManager::GetDebugDisplay() const
 {
-	dAssert (0);
+	ndAssert (0);
 	return 0;
 }
 
 inline void ndDemoEntityManager::SetDebugDisplay(ndInt32) const
 {
-	dAssert (0);
+	ndAssert (0);
 }
 
 inline const ndShaderPrograms& ndDemoEntityManager::GetShaderCache() const

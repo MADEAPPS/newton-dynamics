@@ -48,10 +48,10 @@ class ndBodySphFluid::ndGridHash
 
 	ndGridHash(const ndVector& grid, ndInt32 particleIndex)
 	{
-		dAssert(grid.m_y >= ndFloat32(0.0f));
-		dAssert(grid.m_z >= ndFloat32(0.0f));
-		dAssert(grid.m_y < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
-		dAssert(grid.m_z < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
+		ndAssert(grid.m_y >= ndFloat32(0.0f));
+		ndAssert(grid.m_z >= ndFloat32(0.0f));
+		ndAssert(grid.m_y < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
+		ndAssert(grid.m_z < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
 
 		ndVector hash(grid.GetInt());
 
@@ -147,7 +147,7 @@ class ndBodySphFluid::ndWorkingData
 	ndInt32 WorldToGrid(ndFloat32 x) const
 	{
 		ndInt32 val = ndInt32((x - m_worlToGridOrigin) * m_worlToGridScale);
-		dAssert(val >= 0);
+		ndAssert(val >= 0);
 		return val;
 	}
 
@@ -183,7 +183,7 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_gasConstant(ndFloat32(1.0f))
 {
 	// nothing was saved
-	dAssert(0);
+	ndAssert(0);
 }
 
 ndBodySphFluid::~ndBodySphFluid()
@@ -195,7 +195,7 @@ ndBodySphFluid::~ndBodySphFluid()
 //void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 {
-	dAssert(0);
+	ndAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
@@ -297,8 +297,8 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		const ndVector p1(point[cell1.m_particleIndex]);
 		ndUnsigned32 key0 = data.WorldToGrid(p0.m_x);
 		ndUnsigned32 key1 = data.WorldToGrid(p1.m_x);
-		dAssert(key0 <= key1);
-		//dAssert(p0.m_x <= p1.m_x);
+		ndAssert(key0 <= key1);
+		//ndAssert(p0.m_x <= p1.m_x);
 	}
 #endif
 }
@@ -368,7 +368,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		ndGridHash cell1(data.m_hashGridMap[i + 0]);
 		ndUnsigned64 key0 = (cell0.m_z << (D_SPH_HASH_BITS * 2)) + cell0.m_y;
 		ndUnsigned64 key1 = (cell1.m_z << (D_SPH_HASH_BITS * 2)) + cell1.m_y;
-		dAssert(key0 <= key1);
+		ndAssert(key0 <= key1);
 	}
 #endif
 }
@@ -469,7 +469,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 		const ndGridHash& entry1 = data.m_hashGridMap[i + 1];
 		ndUnsigned64 gridHashA = entry0.m_gridHash;
 		ndUnsigned64 gridHashB = entry1.m_gridHash;
-		dAssert(gridHashA <= gridHashB);
+		ndAssert(gridHashA <= gridHashB);
 	}
 	#endif
 }
@@ -519,26 +519,26 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
 					const ndInt32 particle1 = hash1.m_particleIndex;
-					dAssert(particle0 != particle1);
+					ndAssert(particle0 != particle1);
 					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1].m_x);
-					dAssert((x1 - x0) > ndFloat32(-1.0e-3f));
+					ndAssert((x1 - x0) > ndFloat32(-1.0e-3f));
 					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
 					if (sweeptTest)
 					{
 						break;
 					}
-					dAssert(particle0 != particle1);
+					ndAssert(particle0 != particle1);
 					const ndInt32 homeGridTest1 = (hash1.m_cellType == ndHomeGrid);
 					const ndInt32 test = homeGridTest0 | homeGridTest1;
 					if (test)
 					{
-						dAssert(particle0 != particle1);
+						ndAssert(particle0 != particle1);
 
 						const ndVector p1p0(m_posit[particle0] - m_posit[particle1]);
 						const ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
 						if (dist2 < diameter2)
 						{
-							dAssert(dist2 >= ndFloat32(0.0f));
+							ndAssert(dist2 >= ndFloat32(0.0f));
 							const ndFloat32 dist = ndSqrt(dist2);
 							{
 								ndSpinLock lock(locks[particle0]);
@@ -625,11 +625,11 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 			{
 				const ndFloat32 d = distance.m_dist[j];
 				const ndFloat32 dist2 = h2 - d * d;
-				dAssert(dist2 > ndFloat32(0.0f));
+				ndAssert(dist2 > ndFloat32(0.0f));
 				const ndFloat32 dist6 = dist2 * dist2 * dist2;
 				density += kernelConst * dist6;
 			}
-			dAssert(density > ndFloat32(0.0f));
+			ndAssert(density > ndFloat32(0.0f));
 			data.m_density[i] = density;
 			data.m_invDensity[i] = ndFloat32(1.0f) / density;
 		}
@@ -682,12 +682,12 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 				const ndVector dot(p10.DotProduct(p10) + epsilon2);
 				const ndVector unitDir(p10 * dot.InvSqrt());
 
-				dAssert(unitDir.m_w == ndFloat32(0.0f));
+				ndAssert(unitDir.m_w == ndFloat32(0.0f));
 
 				// kernel distance
 				const ndFloat32 dist = distance.m_dist[j];
 				const ndFloat32 kernelDist = h - dist;
-				dAssert(kernelDist >= ndFloat32(0.0f));
+				ndAssert(kernelDist >= ndFloat32(0.0f));
 
 				// calculate pressure
 				const ndFloat32 kernelDist2 = kernelDist * kernelDist;
@@ -888,8 +888,8 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			const ndGridHash box1Hash(p1, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
-			dAssert(codeHash.m_y <= 1);
-			dAssert(codeHash.m_z <= 1);
+			ndAssert(codeHash.m_y <= 1);
+			ndAssert(codeHash.m_z <= 1);
 			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 			scans[i] = neiborghood.m_counter[code];
 		}
@@ -922,8 +922,8 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			const ndGridHash box1Hash(p1, i);
 			const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
-			dAssert(codeHash.m_y <= 1);
-			dAssert(codeHash.m_z <= 1);
+			ndAssert(codeHash.m_y <= 1);
+			ndAssert(codeHash.m_z <= 1);
 			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 
 			const ndInt32 base = scans[i];
@@ -934,12 +934,12 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 				ndGridHash quadrand(box0Hash);
 				quadrand.m_gridHash += neigborgh[j].m_gridHash;
 				quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
-				dAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+				ndAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
 				dst[base + j] = quadrand;
 			}
 		}
 	});
-	dAssert(sizeof(ndGridHash) <= 16);
+	ndAssert(sizeof(ndGridHash) <= 16);
 
 	data.m_gridScans.SetCount(m_posit.GetCount() + 1);
 	data.m_gridScans[m_posit.GetCount()] = 0;
@@ -961,7 +961,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	dAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
+	ndAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
 
 	CaculateAabb(threadPool);
 	CreateGrids(threadPool);

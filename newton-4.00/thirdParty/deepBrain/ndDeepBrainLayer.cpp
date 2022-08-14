@@ -79,7 +79,7 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output) const
 		acc += exp;
 	}
 	
-	dAssert(acc > 0.0f);
+	ndAssert(acc > 0.0f);
 	ndReal invAcc = 1.0f / acc;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -89,7 +89,7 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output) const
 
 void ndDeepBrainLayer::SigmoidDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
 {
-	dAssert(input.GetCount() == derivativeOutput.GetCount());
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
@@ -99,7 +99,7 @@ void ndDeepBrainLayer::SigmoidDerivative(const ndDeepBrainVector& input, ndDeepB
 
 void ndDeepBrainLayer::HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
 {
-	dAssert(input.GetCount() == derivativeOutput.GetCount());
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
@@ -137,7 +137,7 @@ void ndDeepBrainLayer::ApplyActivation(ndDeepBrainVector& output) const
 		}
 
 		default:
-			dAssert(0);
+			ndAssert(0);
 	}
 }
 
@@ -147,7 +147,7 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 	{
 		case m_relu:
 		{
-			dAssert(0);
+			ndAssert(0);
 			//ReluActivation(output);
 			break;
 		}
@@ -166,19 +166,19 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 
 		case m_softmax:
 		{
-			dAssert(0);
+			ndAssert(0);
 			//SoftmaxActivation(output);
 			break;
 		}
 
 		default:
-			dAssert(0);
+			ndAssert(0);
 	}
 }
 
 void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
-	dAssert(0);
+	ndAssert(0);
 	//Mul(input, output);
 	//output.Add(output, m_bias);
 	//ApplyActivation(output);

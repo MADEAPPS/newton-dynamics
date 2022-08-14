@@ -65,7 +65,7 @@ inline ndModel::ndModel()
 
 inline ndModel::~ndModel()
 {
-	dAssert(!m_node);
+	ndAssert(!m_node);
 }
 
 inline ndModel* ndModel::GetAsModel()

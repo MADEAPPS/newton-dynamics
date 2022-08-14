@@ -204,7 +204,7 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 	for (bodyIter.Begin(); bodyIter; bodyIter++)
 	{
 		ndBodyKinematic* const body = (ndBodyKinematic*)bodyIter.GetNode()->GetInfo();
-		dAssert(body->GetAsBodyKinematic());
+		ndAssert(body->GetAsBodyKinematic());
 		const ndShapeInstance& collision = body->GetCollisionShape();
 
 		ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
@@ -252,7 +252,7 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	if (m_timeAccumulator > descreteStep * maxSteps)
 	{
 		ndFloat32 steps = ndFloor(m_timeAccumulator / descreteStep) - maxSteps;
-		dAssert(steps >= 0.0f);
+		ndAssert(steps >= 0.0f);
 		m_timeAccumulator -= descreteStep * steps;
 	}
 

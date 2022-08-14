@@ -51,8 +51,8 @@ ndGoogol::ndGoogol(ndFloat64 value)
 	m_mantissa[0] = ndUnsigned64 (ndFloat64 (ndUnsigned64(1)<<62) * mantissa);
 
 	// it looks like GCC have problems with this
-	//dAssert (m_mantissa[0] >= 0);
-	dAssert ((m_mantissa[0] & ndUnsigned64(1)<<63) == 0);
+	//ndAssert (m_mantissa[0] >= 0);
+	ndAssert ((m_mantissa[0] & ndUnsigned64(1)<<63) == 0);
 }
 
 void ndGoogol::CopySignedMantissa (ndUnsigned64* const mantissa) const
@@ -74,8 +74,8 @@ ndGoogol::operator double() const
 ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 {
 	ndGoogol tmp;
-	dAssert (ndInt64 (m_mantissa[0]) >= 0);
-	dAssert (ndInt64 (A.m_mantissa[0]) >= 0);
+	ndAssert (ndInt64 (m_mantissa[0]) >= 0);
+	ndAssert (ndInt64 (A.m_mantissa[0]) >= 0);
 
 	if (m_mantissa[0] && A.m_mantissa[0]) 
 	{
@@ -137,7 +137,7 @@ ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 		tmp = *this;
 	}
 
-	dAssert (ndInt64 (tmp.m_mantissa[0]) >= 0);
+	ndAssert (ndInt64 (tmp.m_mantissa[0]) >= 0);
 	return tmp;
 }
 
@@ -160,7 +160,7 @@ void ndGoogol::ScaleMantissa (ndUnsigned64* const dst, ndUnsigned64 scale) const
 			ExtendeMultiply (scale, m_mantissa[i], high, low);
 			ndUnsigned64 acc = low + carrier;
 			carrier = CheckCarrier (low, carrier);	
-			dAssert (CheckCarrier (carrier, high) == 0);
+			ndAssert (CheckCarrier (carrier, high) == 0);
 			carrier += high;
 			dst[i + 1] = acc;
 		} 
@@ -176,8 +176,8 @@ void ndGoogol::ScaleMantissa (ndUnsigned64* const dst, ndUnsigned64 scale) const
 
 ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 {
-	dAssert (ndInt64 (m_mantissa[0]) >= 0);
-	dAssert (ndInt64 (A.m_mantissa[0]) >= 0);
+	ndAssert (ndInt64 (m_mantissa[0]) >= 0);
+	ndAssert (ndInt64 (A.m_mantissa[0]) >= 0);
 
 	if (m_mantissa[0] && A.m_mantissa[0]) 
 	{
@@ -241,7 +241,7 @@ ndGoogol ndGoogol::operator/ (const ndGoogol &A) const
 		tmp = tmp * (m_two - A * tmp);
 		test = memcmp (&tmp0, &tmp, sizeof (ndGoogol));
 	} while (test && (passes < (2 * ND_GOOGOL_SIZE)));	
-	dAssert (passes <= (2 * ND_GOOGOL_SIZE));
+	ndAssert (passes <= (2 * ND_GOOGOL_SIZE));
 	return (*this) * tmp;
 }
 
@@ -278,7 +278,7 @@ ndGoogol ndGoogol::Floor () const
 	tmp.m_mantissa[start] &= mask;
 	if (m_sign) 
 	{
-		dAssert (0);
+		ndAssert (0);
 	}
 
 	return tmp;
@@ -298,7 +298,7 @@ ndGoogol ndGoogol::InvSqrt () const
 		x = m_half * x * (m_three - me * x * x);
 		test = memcmp (&x, &tmp, sizeof (ndGoogol));
 	} while (test && (passes < (2 * ND_GOOGOL_SIZE)));	
-	dAssert (passes <= (2 * ND_GOOGOL_SIZE));
+	ndAssert (passes <= (2 * ND_GOOGOL_SIZE));
 	return x;
 }
 
@@ -383,7 +383,7 @@ ndInt32 ndGoogol::LeadingZeros (ndUnsigned64 a) const
 	}
 
 	ndInt32 n = 0;
-    dAssert (a);
+    ndAssert (a);
 	dgCOUNTBIT (0xffffffff00000000LL, 32);
 	dgCOUNTBIT (0xffff0000ffff0000LL, 16);
 	dgCOUNTBIT (0xff00ff00ff00ff00LL,  8);
@@ -396,7 +396,7 @@ ndInt32 ndGoogol::LeadingZeros (ndUnsigned64 a) const
 
 ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 {
-	dAssert (ndInt64 (mantissa[0]) >= 0);
+	ndAssert (ndInt64 (mantissa[0]) >= 0);
 
 	ndInt32 bits = 0;
 	if(ndInt64 (mantissa[0] * 2) < 0) 
@@ -420,7 +420,7 @@ ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 			ndInt32 n = LeadingZeros (mantissa[0]) - 2;
 			if (n > 0) 
 			{
-				dAssert (n > 0);
+				ndAssert (n > 0);
 				ndUnsigned64 carrier = 0;
 				for (ndInt32 i = ND_GOOGOL_SIZE-1; i >= 0; i --) 
 				{
@@ -433,7 +433,7 @@ ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 			else if (n < 0) 
 			{
 				// this is very rare but it does happens, whee the leading zeros of the mantissa is an exact multiple of 64
-				dAssert (mantissa[0] & ndUnsigned64(3)<<62);
+				ndAssert (mantissa[0] & ndUnsigned64(3)<<62);
 				ndUnsigned64 carrier = 0;
 				ndInt32 shift = -n;
 				for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; ++i) 
@@ -473,7 +473,7 @@ void ndGoogol::ExtendeMultiply (ndUnsigned64 a, ndUnsigned64 b, ndUnsigned64& hi
 	ndUnsigned64 ml = m << 32;	
 	ndUnsigned64 ll = l + ml;
 	ndUnsigned64 mh = (m >> 32) + CheckCarrier (l, ml);	
-	dAssert ((mh & ~0xffffffff) == 0);
+	ndAssert ((mh & ~0xffffffff) == 0);
 
 	ndUnsigned64 hh = h + mh;
 
@@ -531,6 +531,6 @@ bool ndGoogol::operator!= (const ndGoogol &A) const
 
 void ndGoogol::Trace () const
 {
-	dAssert(0);
+	ndAssert(0);
 	//dTrace (("%f ", ndFloat64 (*this)));
 }

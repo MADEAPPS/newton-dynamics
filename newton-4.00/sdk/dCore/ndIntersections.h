@@ -73,7 +73,7 @@ inline ndInt32 dBoxInclusionTest (const ndVector& p0, const ndVector& p1, const 
 
 inline ndInt32 dCompareBox (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {
-	dAssert(0);
+	ndAssert(0);
 	return (p0.m_x != q0.m_x) || (p0.m_y != q0.m_y) || (p0.m_z != q0.m_z) || (p1.m_x != q1.m_x) || (p1.m_y != q1.m_y) || (p1.m_z != q1.m_z);
 }
 
@@ -82,7 +82,7 @@ inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, cons
 	ndVector linearStep (veloc.Scale (timestep));
 
 	// estimate the maximum effect of the angular velocity and enlarge that box by that value (use 45 degrees as max angle not 90)
-	dAssert (omega.m_w == ndFloat32 (0.0f));
+	ndAssert (omega.m_w == ndFloat32 (0.0f));
 	ndFloat32 maxAngle = ndMin (ndSqrt (omega.DotProduct(omega).GetScalar() * timestep * timestep), ndFloat32 (45.0f * ndDegreeToRad));
 
 	ndFloat32 angularTravel = (maxRadius - minRadius) * maxAngle;
@@ -98,9 +98,9 @@ inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, cons
 
 //inline ndFloat32 dBoxPenetration (const ndVector& minBox, const ndVector& maxBox)
 //{
-//	dAssert(maxBox.m_x >= minBox.m_x);
-//	dAssert(maxBox.m_y >= minBox.m_y);
-//	dAssert(maxBox.m_z >= minBox.m_z);
+//	ndAssert(maxBox.m_x >= minBox.m_x);
+//	ndAssert(maxBox.m_y >= minBox.m_y);
+//	ndAssert(maxBox.m_z >= minBox.m_z);
 //
 //	ndVector mask ((minBox * maxBox) < ndVector::m_zero);
 //	ndVector dist (maxBox.GetMin (minBox.Abs()) & mask);
@@ -111,9 +111,9 @@ inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, cons
 
 inline ndFloat32 dBoxDistanceToOrigin2 (const ndVector& minBox, const ndVector& maxBox)
 {
-	dAssert(maxBox.m_x >= minBox.m_x);
-	dAssert(maxBox.m_y >= minBox.m_y);
-	dAssert(maxBox.m_z >= minBox.m_z);
+	ndAssert(maxBox.m_x >= minBox.m_x);
+	ndAssert(maxBox.m_y >= minBox.m_y);
+	ndAssert(maxBox.m_z >= minBox.m_z);
 	const ndVector mask (((minBox * maxBox) > ndVector::m_zero) & ndVector::m_triplexMask);
 	const ndVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
 	return dist.DotProduct(dist).GetScalar();

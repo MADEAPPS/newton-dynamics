@@ -63,7 +63,7 @@ void ndIkSolver::SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha)
 void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
-	dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
+	ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
 	for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
 	{
 		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
@@ -78,7 +78,7 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 	constraintParam.m_invTimestep = m_invTimestep;
 	joint->JacobianDerivative(constraintParam);
 	const ndInt32 dof = constraintParam.m_rowsCount;
-	dAssert(dof <= joint->m_rowCount);
+	ndAssert(dof <= joint->m_rowCount);
 
 	if (joint->GetAsContact())
 	{
@@ -111,7 +111,7 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 	else
 	{
 		ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
-		dAssert(bilareral);
+		ndAssert(bilareral);
 		if (!bilareral->GetSkeletonFlag() && (bilareral->GetSolverModel() == m_jointkinematicAttachment))
 		{
 			ndSkeletonContainer* const skeleton0 = bilareral->GetBody0()->GetSkeleton();
@@ -137,7 +137,7 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 	const ndInt32 baseIndex = joint->m_rowStart;
 	for (ndInt32 i = 0; i < dof; ++i)
 	{
-		dAssert(constraintParam.m_forceBounds[i].m_jointForce);
+		ndAssert(constraintParam.m_forceBounds[i].m_jointForce);
 
 		m_leftHandSide.PushBack(ndLeftHandSide());
 		m_rightHandSide.PushBack(ndRightHandSide());
@@ -156,7 +156,7 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 
-		dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
+		ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		const ndInt32 mask = frictionIndex >> 31;
 		rhs->m_normalForceIndex = frictionIndex;
@@ -166,8 +166,8 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 
 void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 {
-	dAssert(joint->GetBody0());
-	dAssert(joint->GetBody1());
+	ndAssert(joint->GetBody0());
+	ndAssert(joint->GetBody1());
 	const ndBodyKinematic* const body0 = joint->GetBody0();
 	const ndBodyKinematic* const body1 = joint->GetBody1();
 	
@@ -198,7 +198,7 @@ void ndIkSolver::BuildJacobianMatrix (ndConstraint* const joint)
 			JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular);
 		
 		ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
-		dAssert(diag > ndFloat32(0.0f));
+		ndAssert(diag > ndFloat32(0.0f));
 		rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
 	}
 }
@@ -250,7 +250,7 @@ void ndIkSolver::BuildMassMatrix()
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
-		dAssert(body0->GetInvMass() > ndFloat32(0.0f));
+		ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
 		if (body0->m_rank == 0)
 		{
 			m_bodies.PushBack(body0);
@@ -287,7 +287,7 @@ void ndIkSolver::BuildMassMatrix()
 					contacts.PushBack(contact);
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
-					dAssert(body0->GetInvMass() > ndFloat32(0.0f));
+					ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
 					if (body0->m_rank == 0)
 					{
 						m_bodies.PushBack(body0);

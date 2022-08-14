@@ -68,7 +68,7 @@ ndConvexHull4d::ndNormalMap::ndNormalMap()
 			ndFloat64 y = cosBeta * tmp[i].m_y;
 			ndFloat64 x = cosBeta * tmp[i].m_x;
 			ndInt32 index = ndBitReversal(count, sizeof (m_normal) / sizeof (m_normal[0]));
-			dAssert (index < ndInt32 (sizeof (m_normal) / sizeof (m_normal[0])));
+			ndAssert (index < ndInt32 (sizeof (m_normal) / sizeof (m_normal[0])));
 			m_normal[index] = ndBigVector (x, y, z, w);
 			count ++;
 		}
@@ -77,21 +77,21 @@ ndConvexHull4d::ndNormalMap::ndNormalMap()
 
 void ndConvexHull4d::ndNormalMap::TessellateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndBigVector* const buffer, ndInt32& count)
 {
-	dAssert(p0.m_w == ndFloat32(0.0f));
-	dAssert(p1.m_w == ndFloat32(0.0f));
-	dAssert(p2.m_w == ndFloat32(0.0f));
+	ndAssert(p0.m_w == ndFloat32(0.0f));
+	ndAssert(p1.m_w == ndFloat32(0.0f));
+	ndAssert(p2.m_w == ndFloat32(0.0f));
 	if (level) 
 	{
-		dAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndVector p01(p0 + p1);
 		ndVector p12(p1 + p2);
 		ndVector p20(p2 + p0);
 
-		dAssert (p01.m_w == ndFloat32 (0.0f));
-		dAssert (p12.m_w == ndFloat32 (0.0f));
-		dAssert (p20.m_w == ndFloat32 (0.0f));
+		ndAssert (p01.m_w == ndFloat32 (0.0f));
+		ndAssert (p12.m_w == ndFloat32 (0.0f));
+		ndAssert (p20.m_w == ndFloat32 (0.0f));
 		//p01 = p01.Scale(dgRsqrt(p01.DotProduct(p01).GetScalar()));
 		//p12 = p12.Scale(dgRsqrt(p12.DotProduct(p12).GetScalar()));
 		//p20 = p20.Scale(dgRsqrt(p20.DotProduct(p20).GetScalar()));
@@ -99,9 +99,9 @@ void ndConvexHull4d::ndNormalMap::TessellateTriangle(ndInt32 level, const ndVect
 		p12 = p12.Normalize();
 		p20 = p20.Normalize();
 
-		dAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
 		TessellateTriangle(level - 1, p0, p01, p20, buffer, count);
 		TessellateTriangle(level - 1, p1, p12, p01, buffer, count);
@@ -115,7 +115,7 @@ void ndConvexHull4d::ndNormalMap::TessellateTriangle(ndInt32 level, const ndVect
 		n.m_w = ndFloat64(0.0f);
 		ndInt32 index = ndBitReversal(count, 128);
 		buffer[index] = n;
-		dAssert(count < 128);
+		ndAssert(count < 128);
 		count++;
 	}
 }
@@ -218,7 +218,7 @@ void ndConvexHull4dTetraherum::Init (const ndConvexHull4dVector* const, ndInt32 
 	//ndBigVector p3p0 (points[v3] - points[v0]);
 	//ndBigVector normal (p1p0.CrossProduct(p2p0, p3p0));
 	//ndFloat64 volume = normal.DotProduct(normal).m_x;
-	//dAssert (volume > ndFloat64 (0.0f));
+	//ndAssert (volume > ndFloat64 (0.0f));
 #endif
 }
 
@@ -353,7 +353,7 @@ ndConvexHull4d::ndConvexHull4d ()
 ndConvexHull4d::ndConvexHull4d(const ndConvexHull4d&)
 	:ndList<ndConvexHull4dTetraherum>()
 {
-	dAssert(0);
+	ndAssert(0);
 }
 
 ndConvexHull4d::ndConvexHull4d (const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol)
@@ -434,22 +434,22 @@ ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePo
 					aabbProjection[stack] = leftSupportDist;
 					stackPool[stack] = me->m_left;
 					stack++;
-					dAssert (stack < DG_STACK_DEPTH_4D);
+					ndAssert (stack < DG_STACK_DEPTH_4D);
 					aabbProjection[stack] = rightSupportDist;
 					stackPool[stack] = me->m_right;
 					stack++;
-					dAssert (stack < DG_STACK_DEPTH_4D);
+					ndAssert (stack < DG_STACK_DEPTH_4D);
 				} 
 				else 
 				{
 					aabbProjection[stack] = rightSupportDist;
 					stackPool[stack] = me->m_right;
 					stack++;
-					dAssert (stack < DG_STACK_DEPTH_4D);
+					ndAssert (stack < DG_STACK_DEPTH_4D);
 					aabbProjection[stack] = leftSupportDist;
 					stackPool[stack] = me->m_left;
 					stack++;
-					dAssert (stack < DG_STACK_DEPTH_4D);
+					ndAssert (stack < DG_STACK_DEPTH_4D);
 				}
 			} 
 			else 
@@ -458,14 +458,14 @@ ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePo
 				for (ndInt32 i = 0; i < cluster->m_count; ++i) 
 				{
 					const ndConvexHull4dVector& p = points[cluster->m_indices[i]];
-					dAssert (p.m_x >= cluster->m_box[0].m_x);
-					dAssert (p.m_x <= cluster->m_box[1].m_x);
-					dAssert (p.m_y >= cluster->m_box[0].m_y);
-					dAssert (p.m_y <= cluster->m_box[1].m_y);
-					dAssert (p.m_z >= cluster->m_box[0].m_z);
-					dAssert (p.m_z <= cluster->m_box[1].m_z);
-					dAssert (p.m_w >= cluster->m_box[0].m_w);
-					dAssert (p.m_w <= cluster->m_box[1].m_w);
+					ndAssert (p.m_x >= cluster->m_box[0].m_x);
+					ndAssert (p.m_x <= cluster->m_box[1].m_x);
+					ndAssert (p.m_y >= cluster->m_box[0].m_y);
+					ndAssert (p.m_y <= cluster->m_box[1].m_y);
+					ndAssert (p.m_z >= cluster->m_box[0].m_z);
+					ndAssert (p.m_z <= cluster->m_box[1].m_z);
+					ndAssert (p.m_w >= cluster->m_box[0].m_w);
+					ndAssert (p.m_w <= cluster->m_box[1].m_w);
 					if (!p.m_mark) 
 					{
 						ndFloat64 dist = p.DotProduct(dir).m_x;
@@ -489,7 +489,7 @@ ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePo
 					if (parent) 
 					{	
 						ndConvexHull4dAABBTreeNode* const sibling = (parent->m_left != cluster) ? parent->m_left : parent->m_right;
-						dAssert (sibling != cluster);
+						ndAssert (sibling != cluster);
 						ndConvexHull4dAABBTreeNode* const grandParent = parent->m_parent;
 						if (grandParent) 
 						{
@@ -514,7 +514,7 @@ ndInt32 ndConvexHull4d::SupportVertex (ndConvexHull4dAABBTreeNode** const treePo
 		}
 	}
 
-	dAssert (index != -1);
+	ndAssert (index != -1);
 	return index;
 }
 
@@ -523,7 +523,7 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 {
 	ndConvexHull4dAABBTreeNode* tree = nullptr;
 
-	dAssert (count);
+	ndAssert (count);
 	ndBigVector minP ( ndFloat32 (1.0e15f)); 
 	ndBigVector maxP (-ndFloat32 (1.0e15f)); 
 	if (count <= D_VERTEX_CLUMP_SIZE_4D) 
@@ -531,9 +531,9 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 		ndConvexHull4dPointCluster* const clump = new (*memoryPool) ndConvexHull4dPointCluster;
 		*memoryPool += sizeof (ndConvexHull4dPointCluster);
 		maxMemSize -= sizeof (ndConvexHull4dPointCluster);
-		dAssert (maxMemSize >= 0);
+		ndAssert (maxMemSize >= 0);
 
-		dAssert (clump);
+		ndAssert (clump);
 		clump->m_count = count;
 		for (ndInt32 i = 0; i < count; ++i) 
 		{
@@ -619,16 +619,16 @@ ndConvexHull4dAABBTreeNode* ndConvexHull4d::BuildTree (ndConvexHull4dAABBTreeNod
 		tree = new (*memoryPool) ndConvexHull4dAABBTreeNode;
 		*memoryPool += sizeof (ndConvexHull4dAABBTreeNode);
 		maxMemSize -= sizeof (ndConvexHull4dAABBTreeNode);
-		dAssert (maxMemSize >= 0);
+		ndAssert (maxMemSize >= 0);
 
-		dAssert (i0);
-		dAssert (count - i0);
+		ndAssert (i0);
+		ndAssert (count - i0);
 
 		tree->m_left = BuildTree (tree, points, i0, baseIndex, memoryPool, maxMemSize);
 		tree->m_right = BuildTree (tree, &points[i0], count - i0, i0 + baseIndex, memoryPool, maxMemSize);
 	}
 
-	dAssert (tree);
+	ndAssert (tree);
 	tree->m_parent = parent;
 	tree->m_box[0] = minP - ndBigVector (ndFloat64 (1.0e-3f));
 	tree->m_box[1] = maxP + ndBigVector (ndFloat64 (1.0e-3f));
@@ -888,7 +888,7 @@ void ndConvexHull4d::LinkSibling (ndNode* node0, ndNode* node1)	const
 
 void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFace, ndTempList& deletedFaces, ndTempList& newFaces)
 {
-	dAssert (Sanity());
+	ndAssert (Sanity());
 
 	ndTempList stack;
 	
@@ -907,7 +907,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 			#ifdef _DEBUG
 			for (ndTempList::ndNode* deleteNode = deletedFaces.GetFirst(); deleteNode; deleteNode = deleteNode->GetNext())
 			{
-				dAssert (deleteNode->GetInfo() != node);
+				ndAssert (deleteNode->GetInfo() != node);
 			}
 			#endif
 			deletedFaces.Append(node);
@@ -916,7 +916,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 			for (ndInt32 i = 0; i < 4; ++i) 
 			{
 				ndNode* const twinNode = (ndNode*)face->m_faces[i].m_twin;
-				dAssert (twinNode);
+				ndAssert (twinNode);
 				ndConvexHull4dTetraherum* const twinFace = &twinNode->GetInfo();
 
 				if (twinFace->GetMark() != mark) 
@@ -932,7 +932,7 @@ void ndConvexHull4d::InsertNewVertex(ndInt32 vertexIndex, ndNode* const frontFac
 	{
 		ndNode* const deleteTetraNode = deleteNode->GetInfo();
 		ndConvexHull4dTetraherum* const deletedTetra = &deleteTetraNode->GetInfo();
-		dAssert (deletedTetra->GetMark() == mark);
+		ndAssert (deletedTetra->GetMark() == mark);
 		for (ndInt32 i = 0; i < 4; ++i) 
 		{
 			ndNode* const twinNode = deletedTetra->m_faces[i].m_twin;
@@ -1055,7 +1055,7 @@ ndInt32 ndConvexHull4d::AddVertex (const ndBigVector& vertex)
 		m_points[index].m_index = index;
 		m_count ++;
 
-		dAssert(0);
+		ndAssert(0);
 		ndTempList newFaces;
 		ndTempList deleteList;
 		

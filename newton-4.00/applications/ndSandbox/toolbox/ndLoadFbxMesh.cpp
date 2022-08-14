@@ -186,7 +186,7 @@ static ndInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** b
 		{
 			buffer[count] = child;
 			count++;
-			dAssert(count < 1024);
+			ndAssert(count < 1024);
 		}
 		index++;
 	}
@@ -212,7 +212,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 	ofbx::Object* buffer[1024];
 	fbxImportStackData nodeStack[1024];
 	const ofbx::Object* const rootNode = fbxScene->getRoot();
-	dAssert(rootNode);
+	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, buffer);
 
 	fbxDemoEntity* rootEntity = nullptr;
@@ -251,7 +251,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 			ofbx::Object* const child = buffer[count - i - 1];
 			nodeStack[stack] = fbxImportStackData(child, node);
 			stack++;
-			dAssert(stack < ndInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
+			ndAssert(stack < ndInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
 	}
 	return rootEntity;
@@ -273,7 +273,7 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 		{
 			ndMeshEffect::ndMaterial material;
 			const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(i);
-			dAssert(fbxMaterial);
+			ndAssert(fbxMaterial);
 
 			ofbx::Color color = fbxMaterial->getDiffuseColor();
 			material.m_diffuse = ndVector(color.r, color.g, color.b, 1.0f);
@@ -321,7 +321,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 {
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
 
-	dAssert(nodeMap.Find(fbxNode));
+	ndAssert(nodeMap.Find(fbxNode));
 	fbxDemoEntity* const entity = nodeMap.Find(fbxNode)->GetInfo();
 	ndMeshEffect* const mesh = new ndMeshEffect();
 	mesh->SetName(fbxMesh->name);
@@ -439,7 +439,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 			{
 				ndMeshEffect::dVertexCluster* const cluster = mesh->CreateCluster(fbxBone->name);
 
-				dAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
+				ndAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
 				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
 				const ndInt32* const indices = fbxCluster->getIndices();
 				const double* const weights = fbxCluster->getWeights();
@@ -516,7 +516,7 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 			//case FbxNodeAttribute::eCachedEffect:
 			//case FbxNodeAttribute::eUnknown:
 			default:
-				dAssert(0);
+				ndAssert(0);
 				break;
 		}
 	}
@@ -571,7 +571,7 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	FILE* fp = fopen(outPathName, "rb");
 	if (!fp)
 	{
-		dAssert(0);
+		ndAssert(0);
 		return nullptr;
 	}
 
@@ -630,7 +630,7 @@ class dFbxAnimationTrack
 					return val;
 				}
 			}
-			dAssert(0);
+			ndAssert(0);
 			return dCurveValue();
 		}
 	};
@@ -937,7 +937,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 	{
 		ndAnimationSequence* const sequence = new ndAnimationSequence;
 		sequence->SetName(name);
-		dAssert(0);
+		ndAssert(0);
 		//sequence->m_period = m_length;
 
 		Iterator iter(*this);
@@ -964,8 +964,8 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				track->m_rotation.m_param.PushBack(keyFrame.m_time);
 				const ndMatrix transform(ndPitchMatrix(keyFrame.m_x) * ndYawMatrix(keyFrame.m_y) * ndRollMatrix(keyFrame.m_z));
 				const ndQuaternion quat(transform);
-				dAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
-				dAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
+				ndAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
+				ndAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
 				track->m_rotation.PushBack(quat);
 				//dTrace(("%f %f %f %f %f\n", keyFrame.m_param, quat.m_x, quat.m_y, quat.m_z, quat.m_w));
 			}
@@ -1038,7 +1038,7 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 	ndInt32 stack = 0;
 	ofbx::Object* stackPool[1024];
 	const ofbx::Object* const rootNode = fbxScene->getRoot();
-	dAssert(rootNode);
+	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, stackPool);
 
 	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
@@ -1048,7 +1048,7 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 	ndFloat32 framesFloat = period * D_ANIM_BASE_FREQ;
 
 	ndInt32 frames = ndInt32(ndFloor(framesFloat));
-	dAssert(frames > 0);
+	ndAssert(frames > 0);
 	ndFloat32 timestep = period / frames;
 
 	animation.m_length = period;
@@ -1062,7 +1062,7 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 		LoadAnimationCurve(fbxScene, bone, animLayer, animation);
 
 		stack += GetChildrenNodes(bone, &stackPool[stack]);
-		dAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
+		ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
 	}
 }
 
@@ -1092,7 +1092,7 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	FILE* fp = fopen(outPathName, "rb");
 	if (!fp)
 	{
-		dAssert(0);
+		ndAssert(0);
 		return nullptr;
 	}
 

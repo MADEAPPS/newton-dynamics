@@ -89,7 +89,7 @@ inline void ndShapeNull::CalculateAabb(const ndMatrix&, ndVector& p0, ndVector& 
 
 inline ndShapeInfo ndShapeNull::GetShapeInfo() const
 {
-	dAssert(0);
+	ndAssert(0);
 	ndShapeInfo info;
 	return info;
 }

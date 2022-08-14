@@ -44,7 +44,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 						{
 							pointCloud2d[pointCount] = plane2d.m_polygon[i] - matrix.TransformVector(plane.m_polygon[j]);
 							pointCount++;
-							dAssert(pointCount < ndInt32(sizeof(pointCloud2d) / sizeof(pointCloud2d[0])));
+							ndAssert(pointCount < ndInt32(sizeof(pointCloud2d) / sizeof(pointCloud2d[0])));
 						}
 					}
 					pointCount = dConvexHull2d(pointCloud2d, pointCount);
@@ -84,7 +84,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 	{
 		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;
-		dAssert(vertexCount <= face.m_polygon.GetCapacity());
+		ndAssert(vertexCount <= face.m_polygon.GetCapacity());
 		for (ndInt32 i = 0; i < vertexCount; ++i)
 		{
 			face.m_polygon[i] = faceArray[i];
@@ -101,9 +101,9 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 		normal = normal & ndVector::m_triplexMask;
 		normal = normal.Normalize().Scale (m_sign);
 		face.m_plane = ndPlane(normal, -normal.DotProduct(faceArray[0]).GetScalar());
-		//dTrace(("%f %f %f %f\n", face.m_plane.m_x, face.m_plane.m_y, face.m_plane.m_z, face.m_plane.m_w));
+		//ndTrace(("%f %f %f %f\n", face.m_plane.m_x, face.m_plane.m_y, face.m_plane.m_z, face.m_plane.m_w));
 		m_count++;
-		dAssert(m_count < m_polygons.GetCapacity());
+		ndAssert(m_count < m_polygons.GetCapacity());
 	}
 
 	bool IsFaceContact(ndShapeInstance* const shape)
@@ -254,7 +254,7 @@ ndConvexFracture::ndDebrisNotify::ndDebrisNotify(ndDemoEntityManager* const mana
 
 void ndConvexFracture::ndDebrisNotify::OnObjectPick() const
 {
-	dTrace(("debris entity id: %d    ", ((ndConvexFractureEntity*)m_entity)->m_enumerator));
+	ndTrace(("debris entity id: %d    ", ((ndConvexFractureEntity*)m_entity)->m_enumerator));
 	ndDemoEntityNotify::OnObjectPick();
 }
 
@@ -345,7 +345,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 				{
 					if (checkConectivitity.IsFaceContact(ent1->m_collision))
 					{
-						//dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
+						//ndTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
 						ndConvexFractureRootEntity::JointPair pair;
 						pair.m_m0 = ent0->m_enumerator;
 						pair.m_m1 = ent1->m_enumerator;
@@ -369,8 +369,8 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
 	{
 		bodyCount = ndMax(bodyCount, debrisEnt->m_enumerator + 1);
-		dAssert(debrisEnt->m_drebriBody);
-		//dAssert(debrisEnt->m_enumerator < bodyCount);
+		ndAssert(debrisEnt->m_drebriBody);
+		//ndAssert(debrisEnt->m_enumerator < bodyCount);
 	}
 
 	//ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
@@ -378,9 +378,9 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
 	
 	ndInt32 debrisID = ndApplicationMaterial::m_dedris;
-	dAssert(0);
+	ndAssert(0);
 	//ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
-	//dAssert(0);
+	//ndAssert(0);
 	//material0;
 	//ndMaterial& material1 = callback->RegisterMaterial(ndContactCallback::m_dedris, ndContactCallback::m_dedris);
 	//instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
@@ -438,7 +438,7 @@ else
 			if (body0 && body1)
 			{
 				ndJointFix6dof* const joint = new ndJointFix6dof(body0->GetMatrix(), body0, body1);
-				dAssert(0);
+				ndAssert(0);
 				//joint->SetSolverModel(m_secundaryCloseLoop);
 				world->AddJoint(joint);
 			}

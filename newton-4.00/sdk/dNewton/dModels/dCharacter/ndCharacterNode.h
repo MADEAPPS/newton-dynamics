@@ -148,19 +148,19 @@ inline ndCharacterNode* ndCharacterNode::GetAsNode()
 
 inline ndCharacterRootNode* ndCharacterNode::GetAsRootNode()
 {
-	dAssert(0);
+	ndAssert(0);
 	return nullptr;
 }
 
 inline ndCharacterInverseDynamicNode* ndCharacterNode::GetAsInverseDynamicNode()
 {
-	dAssert(0);
+	ndAssert(0);
 	return nullptr;
 }
 
 inline ndCharacterForwardDynamicNode* ndCharacterNode::GetAsForwardDynamicNode()
 {
-	dAssert(0);
+	ndAssert(0);
 	return nullptr;
 }
 

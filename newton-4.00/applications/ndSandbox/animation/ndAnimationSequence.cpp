@@ -46,8 +46,8 @@ void ndAnimationSequence::CalculatePose(ndAnimationPose& output, ndFloat32 param
 			ndAnimKeyframe& keyFrame = keyFrames[index];
 			track.InterpolatePosition(param, keyFrame.m_posit);
 			track.InterpolateRotation(param, keyFrame.m_rotation);
-			dAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation).GetScalar() > 0.999f);
-			dAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation).GetScalar() < 1.001f);
+			ndAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation).GetScalar() > 0.999f);
+			ndAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation).GetScalar() < 1.001f);
 
 			index++;
 		}

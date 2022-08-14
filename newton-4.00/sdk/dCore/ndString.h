@@ -93,17 +93,17 @@ class ndString: public ndClassAlloc
 
 inline char& ndString::operator[] (ndInt32 index)
 {
-	dAssert (m_string);
-	dAssert (index >= 0);
-	dAssert (index < m_size);
+	ndAssert (m_string);
+	ndAssert (index >= 0);
+	ndAssert (index < m_size);
 	return m_string[index];
 }
 
 inline char ndString::operator[] (ndInt32 index) const
 {
-	dAssert (m_string);
-	dAssert (index >= 0);
-	dAssert (index < m_size);
+	ndAssert (m_string);
+	ndAssert (index >= 0);
+	ndAssert (index < m_size);
 	return m_string[index];
 }
 
@@ -124,7 +124,7 @@ inline ndInt32 ndString::Find (const char* const subString, ndInt32 from, ndInt3
 
 inline ndInt32 ndString::Find (const ndString& subStream, ndInt32 from) const
 {
-	dAssert (subStream.m_string);
+	ndAssert (subStream.m_string);
 	return Find (subStream.m_string, subStream.m_size, from, subStream.m_size);
 }
 
@@ -156,15 +156,15 @@ inline ndInt32 ndString::Capacity() const
 
 inline void ndString::CopyData (char* const dst, const char* const src, ndInt32 size) const
 {
-	dAssert (dst);
-	dAssert (src);
+	ndAssert (dst);
+	ndAssert (src);
 	memcpy (dst, src, size);
 }
 
 inline ndInt32 ndString::Compare (const char* const str0, const char* const str1) const
 {
-	dAssert (str0);
-	dAssert (str1);
+	ndAssert (str0);
+	ndAssert (str1);
 	return strcmp (str0, str1);
 }
 
@@ -202,7 +202,7 @@ inline bool ndString::operator>= (const ndString& src) const
 
 inline ndString ndString::SubString(ndInt32 start, ndInt32 size) const
 {
-	dAssert (m_string);
+	ndAssert (m_string);
 	return ndString (&m_string[start], size);
 }
 

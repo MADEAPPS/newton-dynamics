@@ -58,7 +58,7 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
   
 	// if the body has rotated by some amount, the there will be a plane of rotation
 	ndVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
-	dAssert(lateralDir.m_w == ndFloat32(0.0f));
+	ndAssert(lateralDir.m_w == ndFloat32(0.0f));
 	ndFloat32 mag = lateralDir.DotProduct(lateralDir).GetScalar();
 	if (mag > 1.0e-6f) 
 	{

@@ -32,7 +32,7 @@ ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 //void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output)
 void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose&)
 {
-	dAssert(0);
+	ndAssert(0);
 	//if (m_param < 0.001f) 
 	//{
 	//	m_node0->Evaluate(output, timestep);

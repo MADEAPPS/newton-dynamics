@@ -50,7 +50,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
-	dAssert(0);
+	ndAssert(0);
 	//AllocVertexData(mesh.m_vertexCount);
 	//memcpy (m_points, mesh.m_points, m_vertexCount * sizeof (glPositionNormalUV));
 	//
@@ -314,7 +314,7 @@ ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 
 void ndDemoMesh::RenderNormals()
 {
-	dAssert(0);
+	ndAssert(0);
 /*
 	glDisable(GL_TEXTURE_2D);
 
@@ -437,7 +437,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 			//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & ndVector::m_triplexMask).GetScalar();
 			//float d1 = sqrt(d2);
 			//float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
-			//dAssert(attenuation > 0.0f);
+			//ndAssert(attenuation > 0.0f);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			glBindVertexArray(m_vertextArrayBuffer);

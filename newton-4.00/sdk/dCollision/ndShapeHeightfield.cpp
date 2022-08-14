@@ -67,8 +67,8 @@ ndShapeHeightfield::ndShapeHeightfield(
 	,m_diagonalMode(constructionMode)
 	,m_localData()
 {
-	dAssert(width >= 2);
-	dAssert(height >= 2);
+	ndAssert(width >= 2);
+	ndAssert(height >= 2);
 	m_atributeMap.SetCount(width * height);
 	m_elevationMap.SetCount(width * height);
 
@@ -256,8 +256,8 @@ void ndShapeHeightfield::CalculateMinExtend2d(const ndVector& p0, const ndVector
 	const ndVector invScale(m_horizontalScaleInv_x, ndFloat32(0.0f), m_horizontalScaleInv_z, ndFloat32(0.0f));
 	boxP0 = (((q0 * invScale).Floor() * scale)         & m_yMask) - m_elevationPadding;
 	boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + m_elevationPadding;
-	dAssert(boxP0.m_w == ndFloat32(0.0f));
-	dAssert(boxP1.m_w == ndFloat32(0.0f));
+	ndAssert(boxP0.m_w == ndFloat32(0.0f));
+	ndAssert(boxP1.m_w == ndFloat32(0.0f));
 
 	const ndVector minBox(boxP0.Select(m_minBox, m_yMask));
 	const ndVector maxBox(boxP1.Select(m_maxBox, m_yMask));
@@ -268,11 +268,11 @@ void ndShapeHeightfield::CalculateMinExtend2d(const ndVector& p0, const ndVector
 
 void ndShapeHeightfield::CalculateMinExtend3d(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const
 {
-	dAssert(p0.m_x <= p1.m_x);
-	dAssert(p0.m_y <= p1.m_y);
-	dAssert(p0.m_z <= p1.m_z);
-	dAssert(p0.m_w == ndFloat32(0.0f));
-	dAssert(p1.m_w == ndFloat32(0.0f));
+	ndAssert(p0.m_x <= p1.m_x);
+	ndAssert(p0.m_y <= p1.m_y);
+	ndAssert(p0.m_z <= p1.m_z);
+	ndAssert(p0.m_w == ndFloat32(0.0f));
+	ndAssert(p1.m_w == ndFloat32(0.0f));
 
 	const ndVector scale(m_horizontalScale_x, ndFloat32(0.0f), m_horizontalScale_z, ndFloat32(0.0f));
 	const ndVector q0(p0.GetMin(p1) - m_padding);
@@ -288,8 +288,8 @@ void ndShapeHeightfield::CalculateMinExtend3d(const ndVector& p0, const ndVector
 	boxP0 = boxP0.Select(boxP0.GetMin(m_maxBox), m_yMask);
 	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 
-	dAssert(boxP0.m_x <= boxP1.m_x);
-	dAssert(boxP0.m_z <= boxP1.m_z);
+	ndAssert(boxP0.m_x <= boxP1.m_x);
+	ndAssert(boxP0.m_z <= boxP1.m_z);
 }
 
 void ndShapeHeightfield::GetLocalAabb(const ndVector& q0, const ndVector& q1, ndVector& boxP0, ndVector& boxP1) const
@@ -300,10 +300,10 @@ void ndShapeHeightfield::GetLocalAabb(const ndVector& q0, const ndVector& q1, nd
 	const ndVector p0(boxP0.Scale(m_horizontalScaleInv_x).GetInt());
 	const ndVector p1(boxP1.Scale(m_horizontalScaleInv_x).GetInt());
 	
-	dAssert(p0.m_ix == FastInt(boxP0.m_x * m_horizontalScaleInv_x));
-	dAssert(p0.m_iz == FastInt(boxP0.m_z * m_horizontalScaleInv_x));
-	dAssert(p1.m_ix == FastInt(boxP1.m_x * m_horizontalScaleInv_x));
-	dAssert(p1.m_iz == FastInt(boxP1.m_z * m_horizontalScaleInv_x));
+	ndAssert(p0.m_ix == FastInt(boxP0.m_x * m_horizontalScaleInv_x));
+	ndAssert(p0.m_iz == FastInt(boxP0.m_z * m_horizontalScaleInv_x));
+	ndAssert(p1.m_ix == FastInt(boxP1.m_x * m_horizontalScaleInv_x));
+	ndAssert(p1.m_iz == FastInt(boxP1.m_z * m_horizontalScaleInv_x));
 	
 	ndInt32 x0 = ndInt32(p0.m_ix);
 	ndInt32 x1 = ndInt32(p1.m_ix);
@@ -315,9 +315,9 @@ void ndShapeHeightfield::GetLocalAabb(const ndVector& q0, const ndVector& q1, nd
 	CalculateMinAndMaxElevation(x0, x1, z0, z1, minHeight, maxHeight);
 	boxP0.m_y = minHeight;
 	boxP1.m_y = maxHeight;
-	dAssert(boxP0.m_x <= boxP1.m_x);
-	dAssert(boxP0.m_y <= boxP1.m_y);
-	dAssert(boxP0.m_z <= boxP1.m_z);
+	ndAssert(boxP0.m_x <= boxP1.m_x);
+	ndAssert(boxP0.m_y <= boxP1.m_y);
+	ndAssert(boxP0.m_z <= boxP1.m_z);
 }
 
 ndFloat32 ndShapeHeightfield::RayCastCell(const ndFastRay& ray, ndInt32 xIndex0, ndInt32 zIndex0, ndVector& normalOut, ndFloat32 maxT) const
@@ -331,7 +331,7 @@ ndFloat32 ndShapeHeightfield::RayCastCell(const ndFastRay& ray, ndInt32 xIndex0,
 		return ndFloat32(1.2f);
 	}
 
-	dAssert(maxT <= 1.0);
+	ndAssert(maxT <= 1.0);
 
 	ndInt32 base = zIndex0 * m_width + xIndex0;
 
@@ -492,7 +492,7 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 			if (t < maxT) 
 			{
 				// bail out at the first intersection and copy the data into the descriptor
-				dAssert(normalOut.m_w == ndFloat32(0.0f));
+				ndAssert(normalOut.m_w == ndFloat32(0.0f));
 				contactOut.m_normal = normalOut.Normalize();
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
@@ -556,10 +556,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ndVector p0(boxP0.Scale(m_horizontalScaleInv_x).GetInt());
 	ndVector p1(boxP1.Scale(m_horizontalScaleInv_x).GetInt());
 
-	dAssert(p0.m_ix == FastInt(boxP0.m_x * m_horizontalScaleInv_x));
-	dAssert(p0.m_iz == FastInt(boxP0.m_z * m_horizontalScaleInv_x));
-	dAssert(p1.m_ix == FastInt(boxP1.m_x * m_horizontalScaleInv_x));
-	dAssert(p1.m_iz == FastInt(boxP1.m_z * m_horizontalScaleInv_x));
+	ndAssert(p0.m_ix == FastInt(boxP0.m_x * m_horizontalScaleInv_x));
+	ndAssert(p0.m_iz == FastInt(boxP0.m_z * m_horizontalScaleInv_x));
+	ndAssert(p1.m_ix == FastInt(boxP1.m_x * m_horizontalScaleInv_x));
+	ndAssert(p1.m_iz == FastInt(boxP1.m_z * m_horizontalScaleInv_x));
 
 	ndInt32 x0 = ndInt32(p0.m_ix);
 	ndInt32 x1 = ndInt32(p1.m_ix);
@@ -604,7 +604,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			{
 				vertex[vertexIndex] = ndVector(m_horizontalScale_x * x, ndFloat32(m_elevationMap[base + x]), zVal, ndFloat32(0.0f));
 				vertexIndex++;
-				dAssert(vertexIndex <= vertex.GetCount());
+				ndAssert(vertexIndex <= vertex.GetCount());
 			}
 			base += m_width;
 		}
@@ -640,11 +640,11 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				const ndVector e2(vertex[i3] - vertex[i1]);
 				ndVector n0(e0.CrossProduct(e1));
 				ndVector n1(e1.CrossProduct(e2));
-				dAssert(n0.m_w == ndFloat32(0.0f));
-				dAssert(n1.m_w == ndFloat32(0.0f));
+				ndAssert(n0.m_w == ndFloat32(0.0f));
+				ndAssert(n1.m_w == ndFloat32(0.0f));
 	
-				dAssert(n0.DotProduct(n0).GetScalar() > ndFloat32(0.0f));
-				dAssert(n1.DotProduct(n1).GetScalar() > ndFloat32(0.0f));
+				ndAssert(n0.DotProduct(n0).GetScalar() > ndFloat32(0.0f));
+				ndAssert(n1.DotProduct(n1).GetScalar() > ndFloat32(0.0f));
 	
 				//normalBase 
 				const ndInt32 normalIndex0 = normalBase;
@@ -675,7 +675,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				indices[index + 9 + 8] = faceSize;
 	
 				ndVector dp(vertex[i3] - vertex[i1]);
-				dAssert(dp.m_w == ndFloat32(0.0f));
+				ndAssert(dp.m_w == ndFloat32(0.0f));
 				ndFloat32 dist(vertex[normalIndex0].DotProduct(dp).GetScalar());
 				if (dist < -ndFloat32(1.0e-3f)) 
 				{
@@ -711,7 +711,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 					const ndVector& origin = vertex[i0];
 					const ndVector& testPoint = vertex[i1];
 					const ndVector& normal = vertex[i2];
-					dAssert(normal.m_w == ndFloat32(0.0f));
+					ndAssert(normal.m_w == ndFloat32(0.0f));
 					ndFloat32 dist(normal.DotProduct(testPoint - origin).GetScalar());
 					
 					if (dist < -ndFloat32(1.0e-3f)) 
@@ -744,7 +744,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 					const ndVector& origin = vertex[i0];
 					const ndVector& testPoint = vertex[i1];
 					const ndVector& normal = vertex[i2];
-					dAssert(normal.m_w == ndFloat32(0.0f));
+					ndAssert(normal.m_w == ndFloat32(0.0f));
 					ndFloat32 dist(normal.DotProduct(testPoint - origin).GetScalar());
 	
 					if (dist < -ndFloat32(1.0e-3f)) 

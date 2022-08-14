@@ -33,9 +33,9 @@
 
 #ifdef D_TRACE
 	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) ndExpandTraceMessage x;
+	#define ndTrace(x) ndExpandTraceMessage x;
 #else
-	#define dTrace(x);
+	#define ndTrace(x);
 #endif
 
 
@@ -43,8 +43,8 @@
 	inline void TraceFuntionName (const char *name)
 	{
 		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
+		//	ndTrace (("%d %s\n", trace, name));
+		ndTrace (("%s\n", name));
 	}
 
 	//#define TRACE_FUNCTION(name) TraceFuntionName (name)

@@ -170,7 +170,7 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 
 	void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 	{
-		dAssert(output.GetCount() == m_offsets.GetCount());
+		ndAssert(output.GetCount() == m_offsets.GetCount());
 		for (ndInt32 i = 0; i < m_offsets.GetCount(); ++i)
 		{
 			ndAnimKeyframe& keyFrame = output[i];
@@ -373,7 +373,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
-		dAssert(0);
+		ndAssert(0);
 		const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
 		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
 		{
@@ -403,7 +403,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
 		if (xmlGetInt(endEffectorNode, "hasEffector"))
 		{
-			dAssert(0);
+			ndAssert(0);
 		}
 	}
 
@@ -473,7 +473,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		modelRootNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 		ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, modelRootNode));
 
-		dAssert(0);
+		ndAssert(0);
 		// save all bodies.
 		//nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
 		//modelRootNode->LinkEndChild(bodiesNode);
@@ -505,7 +505,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 		//nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
 		//modelRootNode->LinkEndChild(endEffectorNode);
 		//
-		//dAssert(0);
+		//ndAssert(0);
 		////xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
 		////if (m_effector)
 		////{
@@ -519,7 +519,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 	{
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
-		dAssert(shape);
+		ndAssert(shape);
 		
 		// create the rigid body that will make this body
 		ndMatrix matrix(entityPart->CalculateGlobalMatrix());

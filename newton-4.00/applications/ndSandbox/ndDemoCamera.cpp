@@ -177,7 +177,7 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 //ndVector ndDemoCamera::WorldToScreen (const ndVector& worldPoint) const
 ndVector ndDemoCamera::WorldToScreen(const ndVector&) const
 {
-dAssert (0);
+ndAssert (0);
 
 /*
 	ndInt32 win[4]; 

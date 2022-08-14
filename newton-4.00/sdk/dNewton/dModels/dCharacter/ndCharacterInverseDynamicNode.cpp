@@ -76,8 +76,8 @@ void ndCharacterInverseDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
 	}
-	dAssert(jointNode);
-	dAssert(bodyNode);
+	ndAssert(jointNode);
+	ndAssert(bodyNode);
 
 	xmlSaveParam(childNode, "name", GetName().GetStr());
 	xmlSaveParam(childNode, "localPose", m_localPose);

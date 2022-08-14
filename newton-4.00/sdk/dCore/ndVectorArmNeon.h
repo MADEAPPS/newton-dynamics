@@ -65,7 +65,7 @@ class ndVector
 		//: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 		:m_type(vld1q_f32 (ptr))
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 
 	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
@@ -90,7 +90,7 @@ class ndVector
 	inline ndVector(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
 		:m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 
 	inline ndVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
@@ -105,7 +105,7 @@ class ndVector
 		,m_z(ndFloat32(((ndFloat64*)&copy)[2]))
 		,m_w(ndFloat32(((ndFloat64*)&copy)[3]))
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 #endif
 
@@ -141,15 +141,15 @@ class ndVector
 
 	inline ndFloat32& operator[] (ndInt32 i)
 	{
-		dAssert(i < 4);
-		dAssert(i >= 0);
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
 		return (&m_x)[i];
 	}
 
 	inline const ndFloat32& operator[] (ndInt32 i) const
 	{
-		dAssert(i < 4);
-		dAssert(i >= 0);
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
 		return (&m_x)[i];
 	}
 
@@ -306,7 +306,7 @@ class ndVector
 
 	inline ndVector Normalize() const
 	{
-		dAssert(m_w == ndFloat32(0.0f));
+		ndAssert(m_w == ndFloat32(0.0f));
 		const ndVector& me = *this;
 		return me * InvMagSqrt();
 	}
@@ -492,20 +492,20 @@ class ndBigVector
 	inline ndBigVector(const ndFloat32* const ptr)
 		: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ndFloat32(0.0f))
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 #endif
 
 	inline ndBigVector(const ndFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 
 	inline ndBigVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
 		: m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 
 	inline ndBigVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
@@ -553,15 +553,15 @@ class ndBigVector
 
 	inline ndFloat64& operator[] (ndInt32 i)
 	{
-		dAssert(i < 4);
-		dAssert(i >= 0);
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
 		return (&m_x)[i];
 	}
 
 	inline const ndFloat64& operator[] (ndInt32 i) const
 	{
-		dAssert(i < 4);
-		dAssert(i >= 0);
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
 		return (&m_x)[i];
 	}
 
@@ -710,7 +710,7 @@ class ndBigVector
 
 	inline ndBigVector Normalize() const
 	{
-		dAssert(m_w == ndFloat64(0.0f));
+		ndAssert(m_w == ndFloat64(0.0f));
 		//const ndBigVector& me = *this;
 		//return *this * ndBigVector (dgRsqrt(DotProduct(*this).m_x));
 		return *this * InvMagSqrt();

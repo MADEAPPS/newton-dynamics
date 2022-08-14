@@ -179,7 +179,7 @@ class dgHACDClusterGraph
 				}
 				dBigVector dq(step.Scale(dFloat32(1.0f) - param));
 				dFloat64 lenght2 = sqrt (dq % dq);
-				//dAssert (lenght2 < GetDiagonal());
+				//ndAssert (lenght2 < GetDiagonal());
 				if (lenght2 > concavity) {
 					concavity = lenght2;
 				}
@@ -423,8 +423,8 @@ class dgHACDClusterGraph
 			,m_left (leftChild)
 			,m_right (rightChild)
 		{
-			dAssert (leftChild);
-			dAssert (rightChild);
+			ndAssert (leftChild);
+			ndAssert (rightChild);
 
 			ndFloat64 concavityTest = m_concavity - ndFloat64 (1.0e-5f);
 			//if ((m_left->m_faceList.GetCount() == 1) || (m_right->m_faceList.GetCount() == 1)) {
@@ -454,7 +454,7 @@ class dgHACDClusterGraph
 		~dgHACDConvacityLookAheadTree ()
 		{
 			if (m_left) {
-				dAssert (m_right);
+				ndAssert (m_right);
 				delete m_left;
 				delete m_right;
 			}
@@ -471,13 +471,13 @@ class dgHACDClusterGraph
 				count ++;
 				const dgHACDConvacityLookAheadTree* const root = pool[stack];
 				if (root->m_left) {
-					dAssert (root->m_right);
+					ndAssert (root->m_right);
 					pool[stack] = root->m_left;
 					stack ++;
-					dAssert (stack < sizeof (pool)/sizeof (pool[0]));
+					ndAssert (stack < sizeof (pool)/sizeof (pool[0]));
 					pool[stack] = root->m_right;
 					stack ++;
-					dAssert (stack < sizeof (pool)/sizeof (pool[0]));
+					ndAssert (stack < sizeof (pool)/sizeof (pool[0]));
 				}
 			}
 			return count;
@@ -501,8 +501,8 @@ class dgHACDClusterGraph
 					approximation.Pop();
 					approximation.Push(worseCluster, ndFloat32 (-1.0f));
 				} else {
-					dAssert (worseCluster->m_left);
-					dAssert (worseCluster->m_right);
+					ndAssert (worseCluster->m_left);
+					ndAssert (worseCluster->m_right);
 					approximation.Pop();
 					approximation.Push(worseCluster->m_left, worseCluster->m_left->m_concavity);
 					approximation.Push(worseCluster->m_right, worseCluster->m_right->m_concavity);
@@ -524,8 +524,8 @@ class dgHACDClusterGraph
 					approximation.Pop();
 					approximation.Push(worseCluster, ndFloat32 (-1.0f));
 				} else {
-					dAssert (worseCluster->m_left);
-					dAssert (worseCluster->m_right);
+					ndAssert (worseCluster->m_left);
+					ndAssert (worseCluster->m_right);
 					approximation.Pop();
 					approximation.Push(worseCluster->m_left, worseCluster->m_left->m_concavity);
 					approximation.Push(worseCluster->m_right, worseCluster->m_right->m_concavity);
@@ -682,9 +682,9 @@ class dgHACDClusterGraph
 			ndEdge* ptr = edge; 
 			do {
 				if (ptr->m_twin->m_incidentFace > 0) {
-					dAssert (ptr->m_twin->m_userData);
+					ndAssert (ptr->m_twin->m_userData);
 					ndNode* const twinClusterNode = (ndNode*) ptr->m_twin->m_userData;
-					dAssert (twinClusterNode);
+					ndAssert (twinClusterNode);
 
 					bool doubleEdge = false;
 					for (dgGraphNode<dgHACDCluster, dgHACDEdge>::ndNode* edgeNode = clusterNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
@@ -811,13 +811,13 @@ class dgHACDClusterGraph
 		ForAllSectorsRayHit(ray, RayHit, &ray);
 
 		if (ray.m_colorHit != -1) {
-			dAssert (ray.m_colorHit != ray.m_myColor);
+			ndAssert (ray.m_colorHit != ray.m_myColor);
 			ndFloat32 distance = rayDistance * ray.m_param;
 
 			if (distance < distanceThreshold) {
 
-				dAssert (ray.m_colorHit != clusterA.m_color);
-				dAssert (clusterMap.Find(ray.m_colorHit));
+				ndAssert (ray.m_colorHit != clusterA.m_color);
+				ndAssert (clusterMap.Find(ray.m_colorHit));
 				ndNode* const clusterNodeB = clusterMap.Find(ray.m_colorHit)->GetInfo();
 				dgHACDCluster& clusterB = clusterNodeB->GetInfo().m_nodeData;
 
@@ -1005,8 +1005,8 @@ class dgHACDClusterGraph
 						if (clusterNode == clusterNodeA) {
 							dgHACDEdge& edgeBA = edgeNodeBA->GetInfo().m_edgeData;
 							edgeBA.m_mark = m_mark;
-							dAssert (!edgeAB.m_proxyListNode);
-							dAssert (!edgeBA.m_proxyListNode);
+							ndAssert (!edgeAB.m_proxyListNode);
+							ndAssert (!edgeBA.m_proxyListNode);
 
 							ndList<dgPairProxy>::ndNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB, weight * edgeBA.m_backFaceHandicap);
 							edgeAB.m_proxyListNode = proxyNode;
@@ -1043,7 +1043,7 @@ class dgHACDClusterGraph
 
 	void MarkInteriorClusterEdges (ndMeshEffect& mesh, ndInt32 mark, const dgHACDCluster& cluster, ndInt32 colorA, ndInt32 colorB) const
 	{
-		dAssert (colorA != colorB);
+		ndAssert (colorA != colorB);
 		for (ndList<dHACDClusterFace>::ndNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
 			dHACDClusterFace& clusterFace = node->GetInfo();
 			ndEdge* edge = clusterFace.m_edge;
@@ -1059,7 +1059,7 @@ class dgHACDClusterGraph
 
 	ndFloat64 CalculateClusterPerimeter (ndMeshEffect& mesh, ndInt32 mark, const dgHACDCluster& cluster, ndInt32 colorA, ndInt32 colorB) const
 	{
-		dAssert (colorA != colorB);
+		ndAssert (colorA != colorB);
 		ndFloat64 perimeter = ndFloat64 (0.0f);
 		const ndBigVector* const points = (ndBigVector*) mesh.GetVertexPool();
 		for (ndList<dHACDClusterFace>::ndNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
@@ -1229,7 +1229,7 @@ class dgHACDClusterGraph
 		
 		concavity = ndMax(concavity, data.GetConcavity());
 		//ndFloat64 xxx = CalculateConcavitySingleThread (hull, mesh, clusterA, clusterB);
-		//dAssert (fabs(concavity - xxx) < ndFloat64 (1.0e-5f));
+		//ndAssert (fabs(concavity - xxx) < ndFloat64 (1.0e-5f));
 		return concavity;
 	}
 
@@ -1312,31 +1312,31 @@ class dgHACDClusterGraph
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();
 
 
-		dAssert((pair.m_nodeA && pair.m_nodeB) || (!pair.m_nodeA && !pair.m_nodeB));
+		ndAssert((pair.m_nodeA && pair.m_nodeB) || (!pair.m_nodeA && !pair.m_nodeB));
 		if (pair.m_nodeA && pair.m_nodeB) {
 			// call the progress callback
 			ReportProgress();
 
 			ndNode* const clusterNodeA = pair.m_nodeA;
 			ndNode* const clusterNodeB = pair.m_nodeB;
-			dAssert (clusterNodeA != clusterNodeB);
+			ndAssert (clusterNodeA != clusterNodeB);
 
 			dgHACDCluster& clusterA = clusterNodeA->GetInfo().m_nodeData;
 			dgHACDCluster& clusterB = clusterNodeB->GetInfo().m_nodeData;
 
-			dAssert (&clusterA != &clusterB);
-			dAssert(clusterA.m_color != clusterB.m_color);
+			ndAssert (&clusterA != &clusterB);
+			ndAssert(clusterA.m_color != clusterB.m_color);
 
 			dgHACDConvacityLookAheadTree* const leftTree = m_concavityTreeArray[pair.m_hierachicalClusterIndexA];
 			dgHACDConvacityLookAheadTree* const rightTree = m_concavityTreeArray[pair.m_hierachicalClusterIndexB];
-			dAssert (leftTree);
-			dAssert (rightTree);
+			ndAssert (leftTree);
+			ndAssert (rightTree);
 			m_concavityTreeArray[pair.m_hierachicalClusterIndexA] = nullptr;
 			m_concavityTreeArray[pair.m_hierachicalClusterIndexB] = nullptr;
-			dAssert (m_cancavityTreeIndex < (2 * (m_faceCount + 1)));
+			ndAssert (m_cancavityTreeIndex < (2 * (m_faceCount + 1)));
 
 			ndFloat64 treeConcavity = pair.m_distanceConcavity;
-//			 dAssert (treeConcavity < 0.1);
+//			 ndAssert (treeConcavity < 0.1);
 			m_concavityTreeArray[m_cancavityTreeIndex] = new (allocator) dgHACDConvacityLookAheadTree (allocator, leftTree, rightTree, treeConcavity);
 			clusterA.m_hierachicalClusterIndex = m_cancavityTreeIndex;
 			clusterB.m_hierachicalClusterIndex = m_cancavityTreeIndex;
@@ -1368,7 +1368,7 @@ class dgHACDClusterGraph
 				ndList<dgPairProxy>::ndNode* const proxyNode = (ndList<dgPairProxy>::ndNode*) edgeAB.m_proxyListNode;
 				if (proxyNode) {
 					dgPairProxy& pairProxy = proxyNode->GetInfo();
-					dAssert ((edgeNodeAB->GetInfo().m_node == pairProxy.m_nodeA) || (edgeNodeAB->GetInfo().m_node == pairProxy.m_nodeB));
+					ndAssert ((edgeNodeAB->GetInfo().m_node == pairProxy.m_nodeA) || (edgeNodeAB->GetInfo().m_node == pairProxy.m_nodeB));
 					pairProxy.m_nodeA = nullptr;
 					pairProxy.m_nodeB = nullptr;
 					edgeAB.m_proxyListNode = nullptr;
@@ -1376,7 +1376,7 @@ class dgHACDClusterGraph
 
 				adjacentNodes[adjacentCount] = edgeNodeAB->GetInfo().m_node;
 				adjacentCount ++;
-				dAssert (adjacentCount < sizeof (adjacentNodes)/ sizeof (adjacentNodes[0]));
+				ndAssert (adjacentCount < sizeof (adjacentNodes)/ sizeof (adjacentNodes[0]));
 			}
 
 			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::ndNode* edgeNodeBA = clusterNodeB->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
@@ -1532,7 +1532,7 @@ ndMeshEffect* ndMeshEffect::CreateSimplification(ndInt32 maxVertexCount, dgRepor
 	if (GetVertexCount() <= maxVertexCount) {
 		return new (GetAllocator()) ndMeshEffect(*this); 
 	}
-dAssert (0);
+ndAssert (0);
 return new (GetAllocator()) ndMeshEffect(*this); 
 /*
 	//	ndMeshEffect triangleMesh(*this);

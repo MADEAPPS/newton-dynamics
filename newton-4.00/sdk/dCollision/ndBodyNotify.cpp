@@ -83,7 +83,7 @@ void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
 void ndBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
-	dAssert(body);
+	ndAssert(body);
 	if (body->GetInvMass() > 0.0f)
 	{
 		ndVector massMatrix(body->GetMassMatrix());

@@ -53,13 +53,13 @@ void ndDemoEntityNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 
 void ndDemoEntityNotify::OnObjectPick() const
 {
-	dTrace(("picked body id: %d\n", GetBody()->GetId()));
+	ndTrace(("picked body id: %d\n", GetBody()->GetId()));
 }
 
 void ndDemoEntityNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
-	dAssert(body);
+	ndAssert(body);
 	if (body->GetInvMass() > 0.0f)
 	{
 		ndVector massMatrix(body->GetMassMatrix());
@@ -68,7 +68,7 @@ void ndDemoEntityNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 		body->SetTorque(ndVector::m_zero);
 
 		//ndVector L(body->CalculateAngularMomentum());
-		//dTrace(("%f %f %f\n", L.m_x, L.m_y, L.m_z));
+		//ndTrace(("%f %f %f\n", L.m_x, L.m_y, L.m_z));
 	}
 }
 
@@ -136,10 +136,10 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 //	ndMatrix parentMatrix (GetIdentityMatrix());
 	if (parent) {
 		Attach (parent);
-		dAssert (scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType()));
+		ndAssert (scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType()));
 //		dScene::dNode* const parentNode = scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
 //		dSceneNodeInfo* const parentInfo = (dSceneNodeInfo*)scene->GetInfoFromNode (parentNode);
-//		dAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
+//		ndAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
 //		parentMatrix = parentInfo->GetTransform();
 	}
 
@@ -298,7 +298,7 @@ void ndDemoEntity::SetMatrix(const ndQuaternion& rotation, const ndVector& posit
 
 	m_nextPosition = position;
 	m_nextRotation = rotation;
-	dAssert(position.m_w == ndFloat32(1.0f));
+	ndAssert(position.m_w == ndFloat32(1.0f));
 
 	ndFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
@@ -312,7 +312,7 @@ void ndDemoEntity::SetNextMatrix (const ndQuaternion& rotation, const ndVector& 
 	// read the data in a critical section to prevent race condition from other thread  
 	m_nextPosition = position;
 	m_nextRotation = rotation;
-	dAssert(position.m_w == ndFloat32(1.0f));
+	ndAssert(position.m_w == ndFloat32(1.0f));
 
 	ndFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
@@ -358,7 +358,7 @@ void ndDemoEntity::RenderBone() const
 {
 	if (GetParent()) 
 	{
-		dAssert(0);
+		ndAssert(0);
 		//glDisable(GL_TEXTURE_2D);
 		//
 		//glColor3f(0.5f, 0.5f, 0.5f);

@@ -159,7 +159,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// add torque coupling to chassis.
 	const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
-	dAssert(gearBox);
+	ndAssert(gearBox);
 	if (gearBox && ndAbs(gearBox->GetRatio()) > ndFloat32(0.0f))
 	{
 		ndJacobian& chassisJacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;

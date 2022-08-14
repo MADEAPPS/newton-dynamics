@@ -61,14 +61,14 @@ void ndShaderPrograms::LoadShaderCode (const char* const filename, char* const b
 	dGetWorkingFileName (filename, fullPathName);
 
 	file = fopen (fullPathName, "rb");
-	dAssert (file);
+	ndAssert (file);
 	fseek (file, 0, SEEK_END); 
 	
 	size = ftell (file);
 	fseek (file, 0, SEEK_SET); 
 	size_t error = fread (buffer, size, 1, file);
 	// for GCC shit
-	dAssert (error); error = 0;
+	ndAssert (error); error = 0;
 	fclose (file);
 	buffer[size] = 0;
 	buffer[size + 1] = 0;
@@ -96,7 +96,7 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	{
 		GLsizei length;  
 		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
-		dTrace ((errorLog));
+		ndTrace ((errorLog));
 	}
 	glAttachShader(program, vertexShader);
 
@@ -115,7 +115,7 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 		{
 			GLsizei length;
 			glGetShaderInfoLog(geometryShader, sizeof(buffer), &length, errorLog);
-			dTrace((errorLog));
+			ndTrace((errorLog));
 		}
 		glAttachShader(program, geometryShader);
 	}
@@ -131,7 +131,7 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	{
 		GLsizei length;  
 		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
-		dTrace((errorLog));
+		ndTrace((errorLog));
 	}
 	glAttachShader(program, pixelShader);
 
@@ -141,12 +141,12 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	{
 		GLsizei length;  
 		glGetProgramInfoLog(program, sizeof (buffer), &length, errorLog);
-		dTrace((errorLog));
+		ndTrace((errorLog));
 	}
 	
 	glValidateProgram(program);
 	glGetProgramiv(program,  GL_VALIDATE_STATUS, &state);   
-	dAssert (state == GL_TRUE);
+	ndAssert (state == GL_TRUE);
 
 	glDeleteShader(pixelShader);
 	if (geometryShader)

@@ -86,7 +86,7 @@ void ndBodyDynamic::SetForce(const ndVector& force)
 	if (m_equilibrium)
 	{
 		ndVector deltaAccel((m_externalForce - m_savedExternalForce).Scale(m_invMass.m_w));
-		dAssert(deltaAccel.m_w == ndFloat32(0.0f));
+		ndAssert(deltaAccel.m_w == ndFloat32(0.0f));
 		ndFloat32 deltaAccel2 = deltaAccel.DotProduct(deltaAccel).GetScalar();
 		m_equilibrium = (deltaAccel2 < D_ERR_TOLERANCE2);
 	}
@@ -103,7 +103,7 @@ void ndBodyDynamic::SetTorque(const ndVector& torque)
 	if (m_equilibrium)
 	{
 		ndVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque) * m_invMass);
-		dAssert(deltaAlpha.m_w == ndFloat32(0.0f));
+		ndAssert(deltaAlpha.m_w == ndFloat32(0.0f));
 		ndFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
 		m_equilibrium = (deltaAlpha2 < D_ERR_TOLERANCE2);
 	}
@@ -116,8 +116,8 @@ void ndBodyDynamic::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)
 	if (m_notifyCallback)
 	{
 		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
-		dAssert(m_externalForce.m_w == ndFloat32(0.0f));
-		dAssert(m_externalTorque.m_w == ndFloat32(0.0f));
+		ndAssert(m_externalForce.m_w == ndFloat32(0.0f));
+		ndAssert(m_externalTorque.m_w == ndFloat32(0.0f));
 	}
 
 	m_externalForce += m_impulseForce;
@@ -188,8 +188,8 @@ void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulseIn, const ndVe
 {
 	ndVector linearImpulse(linearImpulseIn & ndVector::m_triplexMask);
 	ndVector angularImpulse(angularImpulseIn & ndVector::m_triplexMask);
-	dAssert(linearImpulse.m_w == ndFloat32(0.0f));
-	dAssert(angularImpulse.m_w == ndFloat32(0.0f));
+	ndAssert(linearImpulse.m_w == ndFloat32(0.0f));
+	ndAssert(angularImpulse.m_w == ndFloat32(0.0f));
 	if ((linearImpulse.DotProduct(linearImpulse).GetScalar() > ndFloat32(1.0e-6f)) ||
 		(angularImpulse.DotProduct(angularImpulse).GetScalar() > ndFloat32(1.0e-6f))) 
 	{
@@ -318,11 +318,11 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	const ndFloat32 angular2 = velocStep.m_angular.DotProduct(velocStep.m_angular).GetScalar() * timestep.m_x * timestep.m_x;
 	if ((angular2 > maxAngular2) || (linear2 > maxLinear2))
 	{
-		dTrace(("warning IntegrateForceAndToque %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", 
+		ndTrace(("warning IntegrateForceAndToque %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", 
 			m_uniqueId,
 			velocStep.m_angular.m_x, velocStep.m_angular.m_y, velocStep.m_angular.m_z,
 			velocStep.m_linear.m_x, velocStep.m_linear.m_y, velocStep.m_linear.m_z));
-		//dAssert(0);
+		//ndAssert(0);
 	}
 #endif
 
@@ -339,7 +339,7 @@ void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 		const ndVector omegaAxis(m_omega.Scale(ndFloat32(1.0f) / omegaAngle));
 		const ndQuaternion rotationStep(omegaAxis, omegaAngle * timestep.GetScalar());
 		m_gyroRotation = m_gyroRotation * rotationStep;
-		dAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
+		ndAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
 		
 		// calculate new Gyro torque and Gyro acceleration
 		const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);
@@ -365,13 +365,13 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 	}
 	else
 	{
-		dAssert(m_accel.m_w == ndFloat32(0.0f));
-		dAssert(m_alpha.m_w == ndFloat32(0.0f));
-		dAssert(m_veloc.m_w == ndFloat32(0.0f));
-		dAssert(m_omega.m_w == ndFloat32(0.0f));
+		ndAssert(m_accel.m_w == ndFloat32(0.0f));
+		ndAssert(m_alpha.m_w == ndFloat32(0.0f));
+		ndAssert(m_veloc.m_w == ndFloat32(0.0f));
+		ndAssert(m_omega.m_w == ndFloat32(0.0f));
 		
 		ndInt32 count = ndInt32(m_weigh);
-		dAssert((!m_isConstrained && !m_weigh) || (m_isConstrained && m_weigh));
+		ndAssert((!m_isConstrained && !m_weigh) || (m_isConstrained && m_weigh));
 
 		#ifdef _DEBUG
 		ndInt32 checkConnection = m_jointList.GetCount();
@@ -381,7 +381,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 			ndContact* const contact = it.GetNode()->GetInfo();
 			checkConnection += contact->IsActive() ? 1 : 0;
 		}
-		dAssert(count == checkConnection);
+		ndAssert(count == checkConnection);
 		#endif
 
 		const ndFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
@@ -392,7 +392,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		m_alpha = m_alpha & accelTest;
 
 		ndUnsigned8 equilibrium = m_isStatic | m_autoSleep;
-		dAssert(equilibrium == ((m_invMass.m_w == ndFloat32(0.0f)) ? 1 : m_autoSleep));
+		ndAssert(equilibrium == ((m_invMass.m_w == ndFloat32(0.0f)) ? 1 : m_autoSleep));
 		const ndVector isMovingMask(m_veloc + m_omega + m_accel + m_alpha);
 		const ndVector mask(isMovingMask.TestZero());
 		const ndInt32 test = mask.GetSignMask() & 7;

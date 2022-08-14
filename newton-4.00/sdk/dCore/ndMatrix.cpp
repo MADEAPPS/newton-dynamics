@@ -27,7 +27,7 @@
 
 ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 {
-	dAssert((quat.DotProduct(quat).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+	ndAssert((quat.DotProduct(quat).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 	const ndQuaternion quat0(quat);
 	const ndQuaternion quat1(quat0.Scale (ndFloat32(2.0f)));
 
@@ -37,7 +37,7 @@ ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 
 #ifdef _DEBUG
 	ndFloat32 w2 = quat0.m_w * quat1.m_w;
-	dAssert (ndAbs (w2 + x2 + y2 + z2 - ndFloat32(2.0f)) <ndFloat32 (1.0e-3f));
+	ndAssert (ndAbs (w2 + x2 + y2 + z2 - ndFloat32(2.0f)) <ndFloat32 (1.0e-3f));
 #endif
 
 	const ndFloat32 xy = quat0.m_x * quat1.m_y;
@@ -185,8 +185,8 @@ ndMatrix ndMatrix::Inverse4x4 () const
 			}
 			if (permute != i) 
 			{
-				dAssert(pivot > ndFloat32(0.0f));
-				dAssert((pivot > ndFloat32(1.0e-6f)) || (ndConditionNumber(4, 4, (ndFloat32*)&(*this)[0][0]) < ndFloat32(1.0e5f)));
+				ndAssert(pivot > ndFloat32(0.0f));
+				ndAssert((pivot > ndFloat32(1.0e-6f)) || (ndConditionNumber(4, 4, (ndFloat32*)&(*this)[0][0]) < ndFloat32(1.0e5f)));
 				ndSwap(inv[i], inv[permute]);
 				ndSwap(tmp[i], tmp[permute]);
 			}
@@ -218,11 +218,11 @@ ndMatrix ndMatrix::Inverse4x4 () const
 	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 error = tmp[i][i] - ndFloat32(1.0f);
-		dAssert(ndAbs(error) < ndFloat32(1.0e-3f));
+		ndAssert(ndAbs(error) < ndFloat32(1.0e-3f));
 		for (ndInt32 j = i + 1; j < 4; ++j) 
 		{
-			dAssert(ndAbs(tmp[i][j]) < ndFloat32(1.0e-3f));
-			dAssert(ndAbs(tmp[j][i]) < ndFloat32(1.0e-3f));
+			ndAssert(ndAbs(tmp[i][j]) < ndFloat32(1.0e-3f));
+			ndAssert(ndAbs(tmp[j][i]) < ndFloat32(1.0e-3f));
 		}
 	}
 #endif
@@ -252,7 +252,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 			
 			if (permute != i) 
 			{
-				dAssert(pivot > ndFloat32(1.0e-6f));
+				ndAssert(pivot > ndFloat32(1.0e-6f));
 				ndSwap(ret[i], ret[permute]);
 				ndSwap(tmp[i], tmp[permute]);
 			}
@@ -279,8 +279,8 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 {
 	const ndMatrix& matrix = *this;
-	dAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
-	dAssert (ndAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-4f));
+	ndAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
+	ndAssert (ndAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-4f));
 
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > ndFloat32 (0.99995f)) 
@@ -350,9 +350,9 @@ void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 		for (ndInt32 j = 0; j < 3; ++j) 
 		{
 			ndFloat32 error = ndAbs (m0[i][j] - matrix[i][j]);
-			dAssert (error < 5.0e-2f);
+			ndAssert (error < 5.0e-2f);
 			error = ndAbs (m1[i][j] - matrix[i][j]);
-			dAssert (error < 5.0e-2f);
+			ndAssert (error < 5.0e-2f);
 		}
 	}
 #endif
@@ -429,7 +429,7 @@ ndVector ndMatrix::EigenVectors ()
 			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < ndFloat32(0.0f)) {
 			//	eigenVectors.m_right = eigenVectors.m_right * ndVector::m_negOne;
 			//}
-			dAssert (eigenVectors[0].DotProduct(eigenVectors[1].CrossProduct(eigenVectors[2])).GetScalar() > ndFloat32 (0.0f));
+			ndAssert (eigenVectors[0].DotProduct(eigenVectors[1].CrossProduct(eigenVectors[2])).GetScalar() > ndFloat32 (0.0f));
 			break;
 		}
 
@@ -524,7 +524,7 @@ ndVector ndMatrix::EigenVectors ()
 		{
 			for (ndInt32 k = 0; k < 3; ++k) 
 			{
-				dAssert(ndAreEqual(originalMatrix[j][k], tempMatrix[j][k], ndFloat32(1.0e-3f)));
+				ndAssert(ndAreEqual(originalMatrix[j][k], tempMatrix[j][k], ndFloat32(1.0e-3f)));
 			}
 		}
 	#endif

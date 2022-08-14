@@ -216,9 +216,9 @@ class ndAabbPolygonSoup::ndSpliteInfo
 			m_axis = i0 + 1;
 		}
 
-		dAssert (maxP.m_x - minP.m_x >= ndFloat32 (0.0f));
-		dAssert (maxP.m_y - minP.m_y >= ndFloat32 (0.0f));
-		dAssert (maxP.m_z - minP.m_z >= ndFloat32 (0.0f));
+		ndAssert (maxP.m_x - minP.m_x >= ndFloat32 (0.0f));
+		ndAssert (maxP.m_y - minP.m_y >= ndFloat32 (0.0f));
+		ndAssert (maxP.m_z - minP.m_z >= ndFloat32 (0.0f));
 		m_p0 = minP;
 		m_p1 = maxP;
 	}
@@ -257,7 +257,7 @@ ndFloat32 ndAabbPolygonSoup::CalculateFaceMaxSize (const ndVector* const vertex,
 		ndVector p1 (vertex[index1]);
 
 		ndVector dir (p1 - p0);
-		dAssert (dir.m_w == ndFloat32 (0.0f));
+		ndAssert (dir.m_w == ndFloat32 (0.0f));
 		dir = dir.Normalize();
 
 		ndFloat32 maxVal = ndFloat32 (-1.0e10f);
@@ -454,8 +454,8 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 			//edgeIsConvex = true;
 			if (edgeIsConvex)
 			{
-				dAssert(offsetIndex0 >= 0);
-				dAssert(offsetIndex1 >= 0);
+				ndAssert(offsetIndex0 >= 0);
+				ndAssert(offsetIndex1 >= 0);
 				indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
 				indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
 			}
@@ -480,7 +480,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				ndInt32 j0 = 2 * (vCount + 1) - 1;
 				ndVector normal (&vertexArray[face[vCount + 1]].m_x);
 				normal = normal & ndVector::m_triplexMask;
-				dAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
+				ndAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 				ndVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				q0 = q0 & ndVector::m_triplexMask;
 				for (ndInt32 j = 0; j < vCount; ++j) 
@@ -492,7 +492,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 					{
 						ndVector e (q1 - q0);
 						ndVector n (e.CrossProduct(normal).Normalize());
-						dAssert (ndAbs (n.DotProduct(n).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
+						ndAssert (ndAbs (n.DotProduct(n).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
 						pool[normalCount].m_z = n.m_z;
@@ -516,7 +516,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 				ndInt32 j0 = 2 * (vCount + 1) - 1;
 				ndVector normal (&vertexArray[face[vCount + 1]].m_x);
 				normal = normal & ndVector::m_triplexMask;
-				dAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
+				ndAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 				ndVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				q0 = q0 & ndVector::m_triplexMask;
 				for (ndInt32 j = 0; j < vCount; ++j) 
@@ -528,7 +528,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 					{
 						ndVector e (q1 - q0);
 						ndVector n (e.CrossProduct(normal).Normalize());
-						dAssert (ndAbs (n.DotProduct(n).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
+						ndAssert (ndAbs (n.DotProduct(n).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
 						pool[normalCount].m_z = n.m_z;
@@ -579,7 +579,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 						//ndVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
 						ndVector normal (&vertexArray1[face[vCount + 2 + j] & (~D_CONCAVE_EDGE_MASK)].m_x);
 						normal = normal & ndVector::m_triplexMask;
-						dAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
+						ndAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 					#endif
 				}
 			}
@@ -605,7 +605,7 @@ void ndAabbPolygonSoup::CalculateAdjacendy ()
 						//ndVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
 						ndVector normal(&vertexArray1[face[vCount + 2 + j] & (~D_CONCAVE_EDGE_MASK)].m_x);
 						normal = normal & ndVector::m_triplexMask;
-						dAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
+						ndAssert (ndAbs (normal.DotProduct(normal).GetScalar() - ndFloat32 (1.0f)) < ndFloat32 (1.0e-6f));
 					#endif
 				}
 			}
@@ -665,15 +665,15 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 						ndFloat64 x1 = q1.DotProduct(q1q0).GetScalar();
 						ndFloat64 y0 = p0.DotProduct(q1q0).GetScalar();
 						ndFloat64 y1 = p1.DotProduct(q1q0).GetScalar();
-						dAssert (x1 > x0);
-						dAssert (y1 > y0);
+						ndAssert (x1 > x0);
+						ndAssert (y1 > y0);
 						if (!((y0 >= x1) || (y1 <= x0))) 
 						{
 							ndFloat64 t = q1q0.DotProduct(p0 - q0).GetScalar() / q1q0Mag2;
-							dAssert (q1q0.m_w == ndFloat32 (0.0f));
+							ndAssert (q1q0.m_w == ndFloat32 (0.0f));
 							ndBigVector q (q0 + q1q0.Scale(t));
 							ndBigVector dist (p0 - q);
-							dAssert (dist.m_w == ndFloat32 (0.0f));
+							ndAssert (dist.m_w == ndFloat32 (0.0f));
 							ndFloat64 err2 = dist.DotProduct(dist).GetScalar();
 							if (err2 < DG_WELDING_TOL2) 
 							{
@@ -738,8 +738,8 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 
 ndAabbPolygonSoup::ndNodeBuilder* ndAabbPolygonSoup::BuildTopDown (ndNodeBuilder* const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** const allocator) const
 {
-	dAssert (firstBox >= 0);
-	dAssert (lastBox >= 0);
+	ndAssert (firstBox >= 0);
+	ndAssert (lastBox >= 0);
 
 	if (lastBox == firstBox) 
 	{
@@ -752,7 +752,7 @@ ndAabbPolygonSoup::ndNodeBuilder* ndAabbPolygonSoup::BuildTopDown (ndNodeBuilder
 		ndNodeBuilder* const parent = new (*allocator) ndNodeBuilder (info.m_p0, info.m_p1);
 		*allocator = *allocator + 1;
 
-		dAssert (parent);
+		ndAssert (parent);
 		parent->m_right = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, allocator);
 		parent->m_right->m_parent = parent;
 
@@ -768,7 +768,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	{
 		return;
 	}
-	dAssert (builder.m_faceVertexCount.GetCount() >= 1);
+	ndAssert (builder.m_faceVertexCount.GetCount() >= 1);
 	m_strideInBytes = sizeof (ndTriplex);
 	m_nodesCount = ((builder.m_faceVertexCount.GetCount() - 1) < 1) ? 1 : builder.m_faceVertexCount.GetCount() - 1;
 	m_aabb = (ndNode*) ndMemory::Malloc (sizeof (ndNode) * m_nodesCount);
@@ -815,7 +815,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 	ndNodeBuilder* contructorAllocator = &constructor[allocatorIndex];
 	ndNodeBuilder* const root = BuildTopDown (&constructor[0], 0, allocatorIndex - 1, &contructorAllocator);
 
-	dAssert (root);
+	ndAssert (root);
 	ndList<ndNodeBuilder*> list;
 	list.Append(root);
 	ndInt32 nodeIndex = 0;
@@ -828,12 +828,12 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 		{
 			node->m_enumeration = nodeIndex;
 			nodeIndex ++;
-			dAssert (node->m_right);
+			ndAssert (node->m_right);
 			list.Append(node->m_left);
 			list.Append(node->m_right);
 		}
 	}
-	dAssert(!list.GetCount());
+	ndAssert(!list.GetCount());
 
 	ndInt32 aabbBase = builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount();
 
@@ -850,11 +850,11 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 
 		if (node->m_enumeration >= 0)
 		{
-			dAssert (node->m_left);
-			dAssert (node->m_right);
+			ndAssert (node->m_left);
+			ndAssert (node->m_right);
 			ndNode& aabbNode = m_aabb[aabbNodeIndex];
 			aabbNodeIndex ++;
-			dAssert (aabbNodeIndex <= m_nodesCount);
+			ndAssert (aabbNodeIndex <= m_nodesCount);
 
 			if (node->m_parent)
 			{
@@ -864,7 +864,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 				}
 				else 
 				{
-					dAssert (node->m_parent->m_right == node);
+					ndAssert (node->m_parent->m_right == node);
 					m_aabb[node->m_parent->m_enumeration].m_right = ndNode::ndLeafNodePtr (ndUnsigned32 (&m_aabb[node->m_enumeration] - m_aabb));
 				}
 			}
@@ -879,8 +879,8 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 		}
 		else
 		{
-			dAssert (!node->m_left);
-			dAssert (!node->m_right);
+			ndAssert (!node->m_left);
+			ndAssert (!node->m_right);
 
 			if (node->m_parent)
 			{
@@ -890,7 +890,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 				}
 				else 
 				{
-					dAssert (node->m_parent->m_right == node);
+					ndAssert (node->m_parent->m_right == node);
 					m_aabb[node->m_parent->m_enumeration].m_right = ndNode::ndLeafNodePtr (ndUnsigned32(node->m_indexCount), ndUnsigned32(indexMap));
 				}
 			}
@@ -914,7 +914,7 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 
 		if (node->m_left) 
 		{
-			dAssert (node->m_right);
+			ndAssert (node->m_right);
 			list.Append(node->m_left);
 			list.Append(node->m_right);
 		}
@@ -1178,7 +1178,7 @@ void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 
 				{
 					ndInt32 index = ndInt32 (me->m_left.GetIndex());
 					ndFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), &m_indices[index], vCount);
-					dAssert (param >= ndFloat32 (0.0f));
+					ndAssert (param >= ndFloat32 (0.0f));
 					if (param < maxParam) 
 					{
 						maxParam = param;
@@ -1202,7 +1202,7 @@ void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
-					dAssert (stack < DG_STACK_DEPTH);
+					ndAssert (stack < DG_STACK_DEPTH);
 					stackPool[j] = node;
 					distance[j] = dist1;
 					stack++;
@@ -1216,7 +1216,7 @@ void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 
 				{
 					ndInt32 index = ndInt32 (me->m_right.GetIndex());
 					ndFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), &m_indices[index], vCount);
-					dAssert (param >= ndFloat32 (0.0f));
+					ndAssert (param >= ndFloat32 (0.0f));
 					if (param < maxParam) 
 					{
 						maxParam = param;
@@ -1239,7 +1239,7 @@ void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
-					dAssert (stack < DG_STACK_DEPTH);
+					ndAssert (stack < DG_STACK_DEPTH);
 					stackPool[j] = node;
 					distance[j] = dist1;
 					stack++;
@@ -1251,13 +1251,13 @@ void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 
 
 void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVector& boxDistanceTravel, ndFloat32, dAaabbIntersectCallback callback, void* const context) const
 {
-	dAssert (ndAbs(ndAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < ndFloat32 (1.0e-4f));
-	dAssert (ndAbs(ndAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < ndFloat32 (1.0e-4f));
-	dAssert (ndAbs(ndAbs(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < ndFloat32 (1.0e-4f));
+	ndAssert (ndAbs(ndAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < ndFloat32 (1.0e-4f));
+	ndAssert (ndAbs(ndAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < ndFloat32 (1.0e-4f));
+	ndAssert (ndAbs(ndAbs(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < ndFloat32 (1.0e-4f));
 
-	dAssert (ndAbs(ndAbs(obbAabbInfo[0][1]) - obbAabbInfo.m_absDir[1][0]) < ndFloat32 (1.0e-4f));
-	dAssert (ndAbs(ndAbs(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < ndFloat32 (1.0e-4f));
-	dAssert (ndAbs(ndAbs(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < ndFloat32 (1.0e-4f));
+	ndAssert (ndAbs(ndAbs(obbAabbInfo[0][1]) - obbAabbInfo.m_absDir[1][0]) < ndFloat32 (1.0e-4f));
+	ndAssert (ndAbs(ndAbs(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < ndFloat32 (1.0e-4f));
+	ndAssert (ndAbs(ndAbs(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < ndFloat32 (1.0e-4f));
 
 	if (m_aabb) 
 	{
@@ -1267,7 +1267,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 		const ndInt32 stride = sizeof (ndTriplex) / sizeof (ndFloat32);
 		const ndTriplex* const vertexArray = (ndTriplex*) m_localVertex;
 
-		dAssert (boxDistanceTravel.m_w == ndFloat32 (0.0f));
+		ndAssert (boxDistanceTravel.m_w == ndFloat32 (0.0f));
 		if (boxDistanceTravel.DotProduct(boxDistanceTravel).GetScalar() < ndFloat32 (1.0e-8f)) 
 		{
 			ndInt32 stack = 1;
@@ -1298,7 +1298,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							if (dist1 > ndFloat32 (0.0f)) 
 							{
 								obbAabbInfo.m_separationDistance = ndFloat32(0.0f);
-								dAssert (vCount >= 3);
+								ndAssert (vCount >= 3);
 								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, dist1) == t_StopSearh) 
 								{
 									return;
@@ -1322,7 +1322,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
-							dAssert (stack < DG_STACK_DEPTH);
+							ndAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
 							distance[j] = dist1;
 							stack++;
@@ -1346,7 +1346,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							ndFloat32 dist1 = obbAabbInfo.PolygonBoxDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
 							if (dist1 > ndFloat32 (0.0f)) 
 							{
-								dAssert (vCount >= 3);
+								ndAssert (vCount >= 3);
 								obbAabbInfo.m_separationDistance = ndFloat32(0.0f);
 								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, dist1) == t_StopSearh) 
 								{
@@ -1371,7 +1371,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
-							dAssert (stack < DG_STACK_DEPTH);
+							ndAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
 							distance[j] = dist1;
 							stack++;
@@ -1412,7 +1412,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							ndFloat32 hitDistance = obbAabbInfo.PolygonBoxRayDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 							if (hitDistance < ndFloat32 (1.0f)) 
 							{
-								dAssert (vCount >= 3);
+								ndAssert (vCount >= 3);
 								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, hitDistance) == t_StopSearh) 
 								{
 									return;
@@ -1432,7 +1432,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
-							dAssert (stack < DG_STACK_DEPTH);
+							ndAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
 							distance[j] = dist1;
 							stack++;
@@ -1452,7 +1452,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							ndFloat32 hitDistance = obbAabbInfo.PolygonBoxRayDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 							if (hitDistance < ndFloat32 (1.0f)) 
 							{
-								dAssert (vCount >= 3);
+								ndAssert (vCount >= 3);
 								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 									return;
 								}
@@ -1471,7 +1471,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
-							dAssert (stack < DG_STACK_DEPTH);
+							ndAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
 							distance[j] = dist1;
 							stack ++;
@@ -1485,20 +1485,20 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 
 void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabbInfo, const ndVector& boxDistanceTravel, ndFloat32, dAaabbIntersectCallback callback, void* const context) const
 {
-	dAssert(ndAbs(ndAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < ndFloat32(1.0e-4f));
-	dAssert(ndAbs(ndAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < ndFloat32(1.0e-4f));
-	dAssert(ndAbs(ndAbs(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < ndFloat32(1.0e-4f));
+	ndAssert(ndAbs(ndAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < ndFloat32(1.0e-4f));
+	ndAssert(ndAbs(ndAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < ndFloat32(1.0e-4f));
+	ndAssert(ndAbs(ndAbs(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < ndFloat32(1.0e-4f));
 
-	dAssert(ndAbs(ndAbs(obbAabbInfo[0][1]) - obbAabbInfo.m_absDir[1][0]) < ndFloat32(1.0e-4f));
-	dAssert(ndAbs(ndAbs(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < ndFloat32(1.0e-4f));
-	dAssert(ndAbs(ndAbs(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < ndFloat32(1.0e-4f));
+	ndAssert(ndAbs(ndAbs(obbAabbInfo[0][1]) - obbAabbInfo.m_absDir[1][0]) < ndFloat32(1.0e-4f));
+	ndAssert(ndAbs(ndAbs(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < ndFloat32(1.0e-4f));
+	ndAssert(ndAbs(ndAbs(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < ndFloat32(1.0e-4f));
 
 	if (m_aabb)
 	{
 		const ndInt32 stride = sizeof(ndTriplex) / sizeof(ndFloat32);
 		const ndTriplex* const vertexArray = (ndTriplex*)m_localVertex;
 
-		dAssert(boxDistanceTravel.m_w == ndFloat32(0.0f));
+		ndAssert(boxDistanceTravel.m_w == ndFloat32(0.0f));
 		if (boxDistanceTravel.DotProduct(boxDistanceTravel).GetScalar() < ndFloat32(1.0e-8f))
 		{
 			ndFloat32 dist = node->BoxPenetration(obbAabbInfo, vertexArray);
@@ -1522,7 +1522,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 						if (dist1 > ndFloat32(0.0f))
 						{
 							obbAabbInfo.m_separationDistance = ndFloat32(0.0f);
-							dAssert(vCount >= 3);
+							ndAssert(vCount >= 3);
 							callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, dist1);
 						}
 					}
@@ -1541,7 +1541,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 						ndFloat32 dist1 = obbAabbInfo.PolygonBoxDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
 						if (dist1 > ndFloat32(0.0f))
 						{
-							dAssert(vCount >= 3);
+							ndAssert(vCount >= 3);
 							obbAabbInfo.m_separationDistance = ndFloat32(0.0f);
 							callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, dist1);
 						}
@@ -1551,7 +1551,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 		}
 		else
 		{
-			dAssert(0);
+			ndAssert(0);
 			//ndFastRay ray(ndVector(ndFloat32(0.0f)), boxDistanceTravel);
 			//ndFastRay obbRay(ndVector(ndFloat32(0.0f)), obbAabbInfo.UnrotateVector(boxDistanceTravel));
 			//ndInt32 stack = 1;
@@ -1578,7 +1578,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 			//				ndFloat32 hitDistance = obbAabbInfo.PolygonBoxRayDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 			//				if (hitDistance < ndFloat32(1.0f))
 			//				{
-			//					dAssert(vCount >= 3);
+			//					ndAssert(vCount >= 3);
 			//					if (callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, hitDistance) == t_StopSearh)
 			//					{
 			//						return;
@@ -1598,7 +1598,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 			//					stackPool[j] = stackPool[j - 1];
 			//					distance[j] = distance[j - 1];
 			//				}
-			//				dAssert(stack < DG_STACK_DEPTH);
+			//				ndAssert(stack < DG_STACK_DEPTH);
 			//				stackPool[j] = node;
 			//				distance[j] = dist1;
 			//				stack++;
@@ -1618,7 +1618,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 			//				ndFloat32 hitDistance = obbAabbInfo.PolygonBoxRayDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 			//				if (hitDistance < ndFloat32(1.0f))
 			//				{
-			//					dAssert(vCount >= 3);
+			//					ndAssert(vCount >= 3);
 			//					if (callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 			//						return;
 			//					}
@@ -1637,7 +1637,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 			//					stackPool[j] = stackPool[j - 1];
 			//					distance[j] = distance[j - 1];
 			//				}
-			//				dAssert(stack < DG_STACK_DEPTH);
+			//				ndAssert(stack < DG_STACK_DEPTH);
 			//				stackPool[j] = node;
 			//				distance[j] = dist1;
 			//				stack++;

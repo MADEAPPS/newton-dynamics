@@ -195,7 +195,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
 		newAtom.m_mesh = mesh;
-		dAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+		ndAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
 
 		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
 	}

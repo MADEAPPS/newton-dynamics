@@ -248,7 +248,7 @@ inline ndInt32 ndPolyhedra::GetEdgeCount() const
 	{
 		edgeCount ++;
 	}
-	dAssert (edgeCount == GetCount());;
+	ndAssert (edgeCount == GetCount());;
 #endif
 	return GetCount();
 }
@@ -279,7 +279,7 @@ inline ndInt32 ndPolyhedra::GetLastVertexIndex() const
 inline ndInt32 ndPolyhedra::IncLRU() const
 {	
 	m_edgeMark ++;
-	dAssert (m_edgeMark < 0x7fffffff);
+	ndAssert (m_edgeMark < 0x7fffffff);
 	return m_edgeMark;
 }
 

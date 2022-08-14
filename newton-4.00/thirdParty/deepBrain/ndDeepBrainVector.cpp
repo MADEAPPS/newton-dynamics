@@ -65,7 +65,7 @@ void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 
 void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
 {
-	dAssert(GetCount() == data.GetCount());
+	ndAssert(GetCount() == data.GetCount());
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		(*this)[i] = data[i];
@@ -74,46 +74,46 @@ void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
 
 void ndDeepBrainVector::ScaleSet(const ndDeepBrainVector& a, ndReal scale)
 {
-	dAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == a.GetCount());
 	ndScaleSet(GetCount(), &(*this)[0], &a[0], scale);
 }
 
 void ndDeepBrainVector::ScaleAdd(const ndDeepBrainVector& a, ndReal b)
 {
-	dAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == a.GetCount());
 	ndScaleAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], b);
 }
 
 void ndDeepBrainVector::Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
 {
-	dAssert(GetCount() == a.GetCount());
-	dAssert(GetCount() == b.GetCount());
+	ndAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == b.GetCount());
 	ndAdd(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
 void ndDeepBrainVector::Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
 {
-	dAssert(GetCount() == a.GetCount());
-	dAssert(GetCount() == b.GetCount());
+	ndAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == b.GetCount());
 	ndSub(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
 void ndDeepBrainVector::MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
 {
-	dAssert(GetCount() == a.GetCount());
-	dAssert(GetCount() == b.GetCount());
+	ndAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == b.GetCount());
 	ndMulAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
 }
 
 void ndDeepBrainVector::MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
 {
-	dAssert(GetCount() == a.GetCount());
-	dAssert(GetCount() == b.GetCount());
+	ndAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == b.GetCount());
 	ndMulSub(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
 }
 
 ndReal ndDeepBrainVector::Dot(const ndDeepBrainVector& a) const
 {
-	dAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == a.GetCount());
 	return ndDotProduct(GetCount(), &(*this)[0], &a[0]);
 }

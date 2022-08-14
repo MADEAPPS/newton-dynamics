@@ -171,13 +171,13 @@ inline ndFloat32 ndShapeStaticMesh::GetBoxMaxRadius() const
 
 inline ndVector ndShapeStaticMesh::SupportVertex(const ndVector&, ndInt32* const) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return ndVector::m_zero;
 }
 
 inline ndVector ndShapeStaticMesh::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const vertexIndex) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return SupportVertex(dir, vertexIndex);
 }
 

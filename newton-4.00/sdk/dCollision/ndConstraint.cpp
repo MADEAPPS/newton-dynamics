@@ -47,8 +47,8 @@ void ndConstraint::InitPointParam(ndPointParam& param, const ndVector& p0Global,
 {
 	ndBodyKinematic* const body0 = GetBody0();
 	ndBodyKinematic* const body1 = GetBody1();
-	dAssert(body0);
-	dAssert(body1);
+	ndAssert(body0);
+	ndAssert(body1);
 
 	param.m_posit0 = p0Global;
 	param.m_posit1 = p1Global;

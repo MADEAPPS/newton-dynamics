@@ -83,7 +83,7 @@ void ndCharacterNode::Save(const ndCharacterSaveDescriptor& desc) const
 
 ndNodeBaseHierarchy* ndCharacterNode::CreateClone() const
 {
-	dAssert(0);
+	ndAssert(0);
 	return nullptr;
 }
 

@@ -1152,7 +1152,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 	
 	ndStack<ndInt32> indexList(count);
 	count = ndVertexListToIndexList(&pool[0].m_x, sizeof(ndBigVector), 3, count, &indexList[0], ndFloat64(5.0e-2f));
-	dAssert(count >= 8);
+	ndAssert(count >= 8);
 	
 	//ndFloat64 maxSize = ndMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
 	ndFloat64 maxSize = ndMax(ndMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y), pMax.m_z - pMin.m_z);
@@ -1223,7 +1223,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 				ndInt32 i = ptr->GetInfo();
 				pointArray[count1] = voronoiPoints[i];
 				count1++;
-				dAssert(count1 < ndInt32(sizeof(pointArray) / sizeof(pointArray[0])));
+				ndAssert(count1 < ndInt32(sizeof(pointArray) / sizeof(pointArray[0])));
 			}
 	
 			count1 = ndVertexListToIndexList(&pointArray[0].m_x, sizeof(ndBigVector), 3, count1, &indexArray[0], ndFloat64(1.0e-3f));
@@ -1249,7 +1249,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const ndArray<ndVec
 	voronoiPartition->EndBuild(false);
 	//voronoiPartition->SaveOFF("xxx0.off");
 
-	dAssert(interiorMaterialIndex < m_materials.GetCount());
+	ndAssert(interiorMaterialIndex < m_materials.GetCount());
 	voronoiPartition->m_materials.SetCount(m_materials.GetCount());
 	for (ndInt32 i = 0; i < m_materials.GetCount(); ++i)
 	{

@@ -125,7 +125,7 @@ void ndWordSettings::Load(const ndLoadSaveBase::ndLoadDescriptor& desc)
 void ndLoadSave::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char* const assetPath)
 {
 	const nd::TiXmlNode* const setting = rootNode->FirstChild("ndSettings");
-	dAssert(setting);
+	ndAssert(setting);
 
 	const nd::TiXmlNode* node = setting->FirstChild();
 	const char* const className = node->Value();
@@ -160,7 +160,7 @@ void ndLoadSave::LoadShapes(const nd::TiXmlNode* const rootNode,
 			const char* const name = node->Value();
 			descriptor.m_rootNode = node;
 			ndShape* const shape = D_CLASS_REFLECTION_LOAD_NODE(ndShape, name, descriptor);
-			dAssert(shape);
+			ndAssert(shape);
 			if (shape)
 			{
 				ndInt32 hashId;
@@ -421,7 +421,7 @@ bool ndLoadSave::LoadScene(const char* const path)
 		setlocale(LC_ALL, oldloc);
 		return false;
 	}
-	dAssert(!doc.Error());
+	ndAssert(!doc.Error());
 
 	if (!doc.FirstChild("ndWorld"))
 	{

@@ -39,13 +39,13 @@ class ndTemplateVector: public ndClassAlloc
 	ndTemplateVector (const T* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ptr[3])
 	{
-		//dAssert (dCheckVector ((*this)));
+		//ndAssert (dCheckVector ((*this)));
 	}
 
 	ndTemplateVector (const ndTemplateVector<T>& copy)
 		:m_x(copy.m_x), m_y(copy.m_y), m_z(copy.m_z), m_w (copy.m_w)
 	{
-		//	dAssert (dCheckVector ((*this)));
+		//	ndAssert (dCheckVector ((*this)));
 	}
 
 	ndTemplateVector (T x, T y, T z, T w) 
@@ -55,15 +55,15 @@ class ndTemplateVector: public ndClassAlloc
 	
 	T& operator[] (ndInt32 i)
 	{
-		dAssert (i < 4);
-		dAssert (i >= 0);
+		ndAssert (i < 4);
+		ndAssert (i >= 0);
 		return (&m_x)[i];
 	}	
 
 	const T& operator[] (ndInt32 i) const
 	{
-		dAssert (i < 4);
-		dAssert (i >= 0);
+		ndAssert (i < 4);
+		ndAssert (i >= 0);
 		return (&m_x)[i];
 	}
 
@@ -199,7 +199,7 @@ class ndTemplateVector: public ndClassAlloc
 #ifdef _DEBUG
 	void Trace (char* const name) const
 	{
-		dTrace (("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
+		ndTrace (("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
 #endif
 

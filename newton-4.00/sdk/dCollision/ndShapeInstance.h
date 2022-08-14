@@ -235,8 +235,8 @@ inline ndInt32 ndShapeInstance::GetConvexVertexCount() const
 inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -266,8 +266,8 @@ inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndInt32* const vertexIndex) const
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -287,8 +287,8 @@ inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndI
 inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& inDir) const
 {
 	const ndVector dir(inDir & ndVector::m_triplexMask);
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
 		case m_unit:

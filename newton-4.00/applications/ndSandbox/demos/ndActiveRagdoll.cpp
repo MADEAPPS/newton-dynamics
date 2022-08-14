@@ -232,7 +232,7 @@ class ndActiveRagdollModel : public ndCharacter
 					}
 					else
 					{
-						dAssert(0);
+						ndAssert(0);
 						//ndMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
 						//ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
 						//effectorNode->SetName(name);
@@ -243,7 +243,7 @@ class ndActiveRagdollModel : public ndCharacter
 						//}
 						//else
 						//{
-						//	dAssert(0);
+						//	ndAssert(0);
 						//}
 						//
 						//if (strstr(name, "right"))
@@ -314,7 +314,7 @@ class ndActiveRagdollModel : public ndCharacter
 			const char* const name = track.GetName().GetStr();
 			ndCharacterNode* const skelNode = m_rootNode->Find(name);
 			const ndDemoEntity* const ent = entity->Find(name);
-			dAssert(ent);
+			ndAssert(ent);
 			ndAnimKeyframe keyFrame(ent->GetCurrentTransform());
 			keyFrame.m_userData = skelNode;
 			m_output.PushBack(keyFrame);
@@ -349,7 +349,7 @@ class ndActiveRagdollModel : public ndCharacter
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
-		dAssert(shape);
+		ndAssert(shape);
 
 		// create the rigid body that will make this body
 		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
@@ -372,14 +372,14 @@ class ndActiveRagdollModel : public ndCharacter
 
 		if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
 		{
-			dAssert(0);
+			ndAssert(0);
 			return nullptr;
 			//ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 			//
 			//dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			//ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
 			//
-			//dAssert(0);
+			//ndAssert(0);
 			//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 			//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 			//joint->SetSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
@@ -395,7 +395,7 @@ class ndActiveRagdollModel : public ndCharacter
 			//dTrace (("do not forget to delete this debug\n"))
 			//joint->SetSolverModel(m_jointkinematicCloseLoop);
 
-			dAssert(0);
+			ndAssert(0);
 			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 			joint->SetAsSpringDamper(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -406,7 +406,7 @@ class ndActiveRagdollModel : public ndCharacter
 	//void Update(ndWorld* const world, ndFloat32 timestep) 
 	void Update(ndWorld* const, ndFloat32)
 	{
-		dAssert(0);
+		ndAssert(0);
 		////m_animBlendTree->Evaluate(m_output, timestep);
 		//m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
 		////m_animBlendTree->Evaluate(m_output, 0.0f);

@@ -50,7 +50,7 @@
 #define dgABF_UV_TOL2				ndFloat64 (1.0e-8)
 
 #if 1
-	#define DG_DEBUG_UV	dTrace 
+	#define DG_DEBUG_UV	ndTrace 
 #else
 	#define DG_DEBUG_UV	
 #endif
@@ -80,7 +80,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 				m_trianglesCount ++;
-				dAssert (edge->m_next->m_next->m_next == edge);
+				ndAssert (edge->m_next->m_next->m_next == edge);
 			}
 		}
 
@@ -99,12 +99,12 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 				} while (ptr != edge);
 				m_triangles[count] = ptr;
 				count ++;
-				dAssert (count <= m_trianglesCount);
+				ndAssert (count <= m_trianglesCount);
 			}
 		}
 
 		if (!m_triangleAngles) {
-			dAssert (0);
+			ndAssert (0);
 			AnglesFromUV ();
 		}
 		
@@ -122,7 +122,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-				dAssert (0);
+				ndAssert (0);
 /*
 				ndInt32 index = ndInt32 (uvEdge->m_userData);
 				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
@@ -161,7 +161,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 
 		LagrangeOptimization();
 
-		dAssert (0);
+		ndAssert (0);
 /*
 		ndStack<ndMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
 //		ndInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
@@ -188,7 +188,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			}
 		}
 */
-		dAssert (0);
+		ndAssert (0);
 		//m_mesh->ApplyAttributeArray(&attribArray[0], attribCount);
 	}
 
@@ -323,9 +323,9 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			ndBigVector e10 (p1 - p0);
 			ndBigVector e20 (p2 - p0);
 			ndBigVector e12 (p2 - p1);
-			dAssert(e10.m_w == ndFloat32(0.0f));
-			dAssert(e20.m_w == ndFloat32(0.0f));
-			dAssert(e12.m_w == ndFloat32(0.0f));
+			ndAssert(e10.m_w == ndFloat32(0.0f));
+			ndAssert(e20.m_w == ndFloat32(0.0f));
+			ndAssert(e12.m_w == ndFloat32(0.0f));
 
 			e10 = e10.Scale (ndFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
 			e20 = e20.Scale (ndFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
@@ -468,7 +468,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 				gradient = m_sinTable[alphaIndex0] * m_sinTable[alphaIndex1];
 			}
 		} else {
-			dAssert (faceStartEdge->m_prev == edge);
+			ndAssert (faceStartEdge->m_prev == edge);
 			if (u) {
 				DG_DEBUG_UV ((" - sin(c%d)", faceIndex));
 				gradient = -m_sinTable[alphaIndex2];
@@ -508,7 +508,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 				gradient = m_sinTable[alphaIndex0] * m_sinTable[alphaIndex1];
 			}
 		} else {
-			dAssert (faceStartEdge->m_prev == edge);
+			ndAssert (faceStartEdge->m_prev == edge);
 			if (!u) {
 				DG_DEBUG_UV ((" - sin(c%d)", faceIndex));
 				gradient = -m_sinTable[alphaIndex2];
@@ -562,7 +562,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true) ;
 				DG_DEBUG_UV ((" * "));
 				gradient += a * CalculateExpression_U_face (ptr);
@@ -586,7 +586,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 diag = CalculateGradient_U_Coefficent (ptr, true);
 				diagonal += diag * diag;
 				DG_DEBUG_UV (("^2 +\n"));
@@ -598,7 +598,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			}
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != vertex);
-		dAssert (diagonal > ndFloat32 (0.0f));
+		ndAssert (diagonal > ndFloat32 (0.0f));
 
 		m_hessianCoLumnValue[m_matrixElementCount] = diagonal;
 		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 0;
@@ -613,7 +613,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 				hessianUV += a * CalculateHessianExpression_U_V (ptr);
@@ -643,7 +643,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			DG_DEBUG_UV (("H(u%d,u%d) =\n", vertexIndex, vertexIndex2));
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 //				gradient += diag * TraceExpression_U_face (ptr);
@@ -658,7 +658,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 
 			if (ptr->m_twin->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
 				DG_DEBUG_UV ((" * "));
 				//				gradient += diag * TraceExpression_U_face (ptr);
@@ -676,7 +676,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			if (ptr->m_incidentFace > 0) {
 
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 				//				gradient += diag * TraceExpression_U_face (ptr);
@@ -693,7 +693,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			if (ptr->m_twin->m_incidentFace > 0) {
 
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
 				DG_DEBUG_UV ((" * "));
 				//				gradient += diag * TraceExpression_U_face (ptr);
@@ -725,7 +725,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 a = CalculateGradient_V_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 				gradient += a * CalculateExpression_U_face (ptr);
@@ -750,7 +750,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
-				dAssert (ptr->m_incidentVertex == vertexIndex);
+				ndAssert (ptr->m_incidentVertex == vertexIndex);
 				ndFloat64 diag = CalculateGradient_V_Coefficent (ptr, true);
 				diagonal += diag * diag;
 				DG_DEBUG_UV (("^2 +\n"));
@@ -762,7 +762,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 			}
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != vertex);
-		dAssert (diagonal > ndFloat32 (0.0f));
+		ndAssert (diagonal > ndFloat32 (0.0f));
 
 		m_hessianCoLumnValue[m_matrixElementCount] = diagonal;
 		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 1;
@@ -808,7 +808,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 		const ndInt32 count = m_mesh->GetVertexCount();
 		for (ndInt32 i = 0; i < count; ++i) {
 			ndEdge* const vertex = m_vertexEdge[i];
-			dAssert (vertex->m_incidentVertex == i);
+			ndAssert (vertex->m_incidentVertex == i);
 			out[i * 2 + 0] = m_diagonal[2 * i + 0] * v[2 * i + 0];
 			out[i * 2 + 1] = m_diagonal[2 * i + 1] * v[2 * i + 1];
 		}
@@ -859,7 +859,7 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricConjugateGradientSolver<n
 		,m_progressReportUserData(userData)
 		,m_progressReportCallback(progressReportCallback)
 	{
-dAssert (0);
+ndAssert (0);
 /*
 		AllocVectors();
 		InitEdgeVector();
@@ -882,7 +882,7 @@ dAssert (0);
 		const ndBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
 		const ndBigVector& p1 = m_mesh->GetVertex(twinFace->m_incidentVertex);
 		ndBigVector p10 (p1 - p0);
-		dAssert(p10.m_w == ndFloat32(0.0f));
+		ndAssert(p10.m_w == ndFloat32(0.0f));
 		ndFloat64 e0length = sqrt (p10.DotProduct(p10).GetScalar());
 
 		ptr = twinFace;
@@ -973,7 +973,7 @@ dAssert (0);
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 				m_triangleCount ++;
-				dAssert (edge->m_next->m_next->m_next == edge);
+				ndAssert (edge->m_next->m_next->m_next == edge);
 			}
 		}
 
@@ -1008,7 +1008,7 @@ dAssert (0);
 					m_betaEdge[count] = ptr;
 					ptr->m_incidentFace = count + 1;
 					count ++;
-					dAssert (count <= m_anglesCount);
+					ndAssert (count <= m_anglesCount);
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 			}
@@ -1071,11 +1071,11 @@ dAssert (0);
 
 			e10 = e10.Scale (ndFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
 			e20 = e20.Scale (ndFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
-			dAssert(e10.m_w == ndFloat32(0.0f));
-			dAssert(e20.m_w == ndFloat32(0.0f));
+			ndAssert(e10.m_w == ndFloat32(0.0f));
+			ndAssert(e20.m_w == ndFloat32(0.0f));
 
 			m_beta[i] = acos (ndClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
-			dAssert (m_beta[i] > ndFloat64 (0.0f));
+			ndAssert (m_beta[i] > ndFloat64 (0.0f));
 		}
 
 		#ifdef _DEBUG
@@ -1083,7 +1083,7 @@ dAssert (0);
 			ndInt32 i0 = i * 3 + 0;
 			ndInt32 i1 = i * 3 + 1;
 			ndInt32 i2 = i * 3 + 2;
-			dAssert (fabs (m_beta[i0] + m_beta[i1] + m_beta[i2] - dgABF_PI) < ndFloat64 (1.0e-6f));
+			ndAssert (fabs (m_beta[i0] + m_beta[i1] + m_beta[i2] - dgABF_PI) < ndFloat64 (1.0e-6f));
 		}
 		#endif
 
@@ -1096,20 +1096,20 @@ dAssert (0);
 				ndEdge* ptr = edge; 
 				do {
 					ndInt32 index = GetAlphaLandaIndex (ptr);
-					dAssert (index >= 0);
-					dAssert (index <= m_anglesCount);
+					ndAssert (index >= 0);
+					ndAssert (index <= m_anglesCount);
 					scale += m_beta[index];
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-				dAssert (scale > ndFloat32 (0.0f));
+				ndAssert (scale > ndFloat32 (0.0f));
 
 				scale = ndFloat64 (2.0f) * dgABF_PI / scale;
 				ptr = edge;
 				do {
 					ndInt32 index = GetAlphaLandaIndex (ptr);
-					dAssert (index >= 0);
-					dAssert (index <= m_anglesCount);
+					ndAssert (index >= 0);
+					ndAssert (index <= m_anglesCount);
 					m_beta[index] *= scale;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
@@ -1118,7 +1118,7 @@ dAssert (0);
 
 		// initialized each alpha lambda to the beta angle and also calcual ethe derivatoe coeficent (2.0 / (betai * betai)) 
 		for (ndInt32 i = 0; i < m_anglesCount; ++i) {
-			dAssert (m_beta[i] > ndFloat64 (0.0f));
+			ndAssert (m_beta[i] > ndFloat64 (0.0f));
 			m_variables[i] = m_beta[i];
 			m_weight[i] = ndFloat64 (2.0f) / (m_beta[i] * m_beta[i]);
 		}
@@ -1130,7 +1130,7 @@ dAssert (0);
 	ndFloat64 CalculateAngularGradientDerivative (ndInt32 alphaIndex) const
 	{
 		ndFloat64 gradient = (m_variables[alphaIndex] - m_beta[alphaIndex]) * m_weight[alphaIndex] + m_variables[GetTriangleIndex(alphaIndex)];
-		dAssert (fabs(gradient) < ndFloat64(1.0e10f));
+		ndAssert (fabs(gradient) < ndFloat64(1.0e10f));
 		return gradient;
 	}
 
@@ -1139,7 +1139,7 @@ dAssert (0);
 	{
 		ndInt32 index = GetInteriorVertex(m_betaEdge[alphaIndex]);
 		ndFloat64 gradient = (index != -1) ? m_variables[index] : ndFloat32 (0.0f);
-		dAssert (fabs(gradient) < ndFloat64(1.0e10f));
+		ndAssert (fabs(gradient) < ndFloat64(1.0e10f));
 		return gradient;
 	}
 
@@ -1173,7 +1173,7 @@ dAssert (0);
 			ndInt32 interiorVertexIndex = GetInteriorVertex (incidentEdge->m_prev) + m_interiorVertexCount;
 			gradient += m_variables[interiorVertexIndex] * product;
 		}
-		dAssert (fabs(gradient) < ndFloat64(1.0e10f));
+		ndAssert (fabs(gradient) < ndFloat64(1.0e10f));
 		return gradient;
 	}
 
@@ -1440,7 +1440,7 @@ dAssert (0);
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
 //		for (ndInt32 i = 0; i < m_triangleCount; ++i) {
 //			ndFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
-//			dAssert (fabs (gradient) < ndFloat64 (1.0e-2f));
+//			ndAssert (fabs (gradient) < ndFloat64 (1.0e-2f));
 //		}
 #endif
 	}
@@ -1473,7 +1473,7 @@ dAssert (0);
 /*
 void ndMeshEffect::ClearAttributeArray ()
 {
-	dAssert(0);
+	ndAssert(0);
 
     ndStack<dgVertexAtribute>attribArray (m_pointCount);
 
@@ -1526,8 +1526,8 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 		ndBigVector point (buffer[i]);
 		ndFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
-		dAssert(point.m_w == ndFloat32(0.0f));
-		dAssert(point.DotProduct(point).GetScalar() > ndFloat32 (0.0f));
+		ndAssert(point.m_w == ndFloat32(0.0f));
+		ndAssert(point.DotProduct(point).GetScalar() > ndFloat32 (0.0f));
 		point = point.Normalize();
 		ndFloat64 v = ndAtan2 (point.m_y, point.m_z);
 
@@ -1663,7 +1663,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 			do 
 			{
 				ndVector normal(FaceNormal(edgePtr, &m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
-				dAssert(normal.m_w == ndFloat32(0.0f));
+				ndAssert(normal.m_w == ndFloat32(0.0f));
 				normal = normal.Scale(ndFloat32(1.0f) / ndFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + ndFloat32(1.0e-16f)));
 				faceNormal[edgeIndex] = normal;
 				normalsMap.Insert(edgeIndex, edgePtr);
@@ -1676,7 +1676,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 			for (ndEdge* ptr = edge->m_prev->m_twin; (ptr->m_mark != mark) && (ptr != edge) && (ptr->m_incidentFace > 0); ptr = ptr->m_prev->m_twin) 
 			{
 				const ndVector& normal1(faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-				dAssert(normal0.m_w == ndFloat32(0.0f));
+				ndAssert(normal0.m_w == ndFloat32(0.0f));
 				ndFloat32 dot = normal0.DotProduct(normal1).GetScalar();
 				if (dot < smoothValue) 
 				{
@@ -1693,7 +1693,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 			for (ndEdge* ptr = startEdge->m_twin->m_next; (ptr->m_mark != mark) && (ptr != startEdge) && (ptr->m_incidentFace > 0); ptr = ptr->m_twin->m_next) 
 			{
 				const ndVector& normal1(faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-				dAssert(normal0.m_w == ndFloat32(0.0f));
+				ndAssert(normal0.m_w == ndFloat32(0.0f));
 				ndFloat32 dot = normal0.DotProduct(normal1).GetScalar();
 				if (dot < smoothValue) 
 				{
@@ -1705,7 +1705,7 @@ void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 				normal0 = normal1;
 			}
 
-			dAssert(normal.m_w == ndFloat32(0.0f));
+			ndAssert(normal.m_w == ndFloat32(0.0f));
 			normal = normal.Scale(ndFloat32(1.0f) / ndFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + ndFloat32(1.0e-16f)));
 			ndTriplex n;
 			n.m_x = normal.m_x;
@@ -1891,7 +1891,7 @@ void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMat
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
 	{
 		ndBigVector geoPoint(m_points.m_vertex[i] - origin);
-		dAssert(geoPoint.m_w == ndFloat32(0.0f));
+		ndAssert(geoPoint.m_w == ndFloat32(0.0f));
 		ndVector point(textureMatrix.RotateVector(geoPoint.Normalize()));
 		point.m_x = ndClamp(point.m_x, ndFloat32(-1.0f + 1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 

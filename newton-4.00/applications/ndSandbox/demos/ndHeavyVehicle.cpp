@@ -368,7 +368,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndMultiBodyVehicleMotor* const motor = m_motor;
 		if (motor)
 		{
-			dAssert(motor);
+			ndAssert(motor);
 
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			ndFloat32 gageSize = 200.0f;

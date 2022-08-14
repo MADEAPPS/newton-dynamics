@@ -37,7 +37,7 @@ ndDeepBrain::~ndDeepBrain()
 
 ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 {
-	dAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
+	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
 	PushBack(layer);
 	return layer;
 }

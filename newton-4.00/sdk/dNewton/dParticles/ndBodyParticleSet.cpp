@@ -52,7 +52,7 @@ ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& des
 {
 	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache
 	// nothing was saved
-	dAssert(0);
+	ndAssert(0);
 }
 
 ndBodyParticleSet::~ndBodyParticleSet()
@@ -62,7 +62,7 @@ ndBodyParticleSet::~ndBodyParticleSet()
 //void ndBodyParticleSet::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 void ndBodyParticleSet::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 {
-	dAssert(0);
+	ndAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyParticleSet", nodeid);
 	//ndBody::Save(paramNode, assetPath, nodeid, shapesCache);
 }

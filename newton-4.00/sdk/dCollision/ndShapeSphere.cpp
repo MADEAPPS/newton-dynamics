@@ -49,7 +49,7 @@ ndShapeSphere::ndShapeSphere(const ndLoadSaveBase::ndLoadDescriptor& desc)
 ndShapeSphere::~ndShapeSphere()
 {
 	m_shapeRefCount--;
-	dAssert(m_shapeRefCount >= 0);
+	ndAssert(m_shapeRefCount >= 0);
 
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
@@ -69,9 +69,9 @@ void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const n
 {
 	if (level) 
 	{
-		dAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p0.DotProduct(p0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p1.DotProduct(p1).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p2.DotProduct(p2).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndVector p01(p0 + p1);
 		ndVector p12(p1 + p2);
 		ndVector p20(p2 + p0);
@@ -80,9 +80,9 @@ void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const n
 		p12 = p12.Normalize();
 		p20 = p20.Normalize();
 
-		dAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-		dAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p01.DotProduct(p01).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
 		TesselateTriangle(level - 1, p0, p01, p20, count, ouput);
 		TesselateTriangle(level - 1, p1, p12, p01, count, ouput);
@@ -129,7 +129,7 @@ void ndShapeSphere::Init(ndFloat32 radius)
 
 		ndInt32 vertexCount = ndVertexListToIndexList(&tmpVectex[0].m_x, sizeof(ndVector), 3, count, indexList, 0.001f);
 
-		dAssert(vertexCount == D_SPHERE_VERTEX_COUNT);
+		ndAssert(vertexCount == D_SPHERE_VERTEX_COUNT);
 		for (ndInt32 i = 0; i < vertexCount; ++i) 
 		{
 			m_unitSphere[i] = tmpVectex[i];
@@ -142,7 +142,7 @@ void ndShapeSphere::Init(ndFloat32 radius)
 		{
 			#ifdef _DEBUG
 			ndEdge* const edge = polyhedra.AddFace(indexList[i], indexList[i + 1], indexList[i + 2]);
-			dAssert(edge);
+			ndAssert(edge);
 			#else 
 			polyhedra.AddFace(indexList[i], indexList[i + 1], indexList[i + 2]);
 			#endif
@@ -214,16 +214,16 @@ ndVector ndShapeSphere::SupportVertexSpecial(const ndVector&, ndFloat32, ndInt32
 
 ndVector ndShapeSphere::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
-	dAssert(dir.m_w == 0.0f);
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == 0.0f);
 	return dir.Scale(m_radius);
 }
 
 ndInt32 ndShapeSphere::CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const
 {
-	dAssert(normal.m_w == 0.0f);
-	dAssert(normal.DotProduct(normal).GetScalar() > ndFloat32(0.999f));
+	ndAssert(normal.m_w == 0.0f);
+	ndAssert(normal.DotProduct(normal).GetScalar() > ndFloat32(0.999f));
 	contactsOut[0] = normal * normal.DotProduct(point);
 	return 1;
 }
@@ -234,7 +234,7 @@ ndFloat32 ndShapeSphere::RayCast(ndRayCastNotify&, const ndVector& localP0, cons
 	if (t < maxT) 
 	{
 		ndVector contact(localP0 + (localP1 - localP0).Scale(t));
-		dAssert(contact.m_w == ndFloat32(0.0f));
+		ndAssert(contact.m_w == ndFloat32(0.0f));
 		//contactOut.m_normal = contact.Scale (dgRsqrt (contact.DotProduct(contact).GetScalar()));
 		contactOut.m_normal = contact.Normalize();
 		//contactOut.m_userId = SetUserDataID();

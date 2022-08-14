@@ -174,8 +174,8 @@ void ndJointCylinder::SetLimitStateAngle(bool state)
 
 void ndJointCylinder::SetLimitsAngle(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	dAssert(minLimit <= 0.0f);
-	dAssert(maxLimit >= 0.0f);
+	ndAssert(minLimit <= 0.0f);
+	ndAssert(maxLimit >= 0.0f);
 	m_minLimitAngle = minLimit;
 	m_maxLimitAngle = maxLimit;
 
@@ -248,8 +248,8 @@ void ndJointCylinder::SetLimitStatePosit(bool state)
 
 void ndJointCylinder::SetLimitsPosit(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	dAssert(minLimit <= 0.0f);
-	dAssert(maxLimit >= 0.0f);
+	ndAssert(minLimit <= 0.0f);
+	ndAssert(maxLimit >= 0.0f);
 	m_minLimitPosit = minLimit;
 	m_maxLimitPosit = maxLimit;
 }

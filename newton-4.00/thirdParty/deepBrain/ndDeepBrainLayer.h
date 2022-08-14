@@ -59,7 +59,7 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 inline ndInt32 ndDeepBrainLayer::GetOuputSize() const
 {
-	dAssert(GetRows() == m_bias.GetCount());
+	ndAssert(GetRows() == m_bias.GetCount());
 	return m_bias.GetCount();
 }
 

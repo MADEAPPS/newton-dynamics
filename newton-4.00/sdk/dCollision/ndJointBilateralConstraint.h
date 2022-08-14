@@ -166,8 +166,8 @@ inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() 
 
 inline void ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverModel model)
 {
-	dAssert(model < m_jointModesCount);
-	dAssert(model >= m_jointIterativeSoft);
+	ndAssert(model < m_jointModesCount);
+	ndAssert(model >= m_jointIterativeSoft);
 	m_solverModel = ndClamp(model, m_jointIterativeSoft, m_jointModesCount);
 }
 
@@ -205,16 +205,16 @@ inline const ndMatrix& ndJointBilateralConstraint::GetLocalMatrix1() const
 inline ndFloat32 ndJointBilateralConstraint::GetMotorZeroAcceleration(ndConstraintDescritor& desc) const
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
-	dAssert(index >= 0);
-	dAssert(index < ndInt32(m_maxDof));
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
 	return desc.m_zeroRowAcceleration[index];
 }
 
 inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescritor& desc, ndFloat32 acceleration)
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
-	dAssert(index >= 0);
-	dAssert(index < ndInt32(m_maxDof));
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
 	m_rowIsMotor |= (1 << index);
 	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
@@ -224,20 +224,20 @@ inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescrit
 inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction)
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
-	dAssert(index >= 0);
-	dAssert(index < ndInt32 (m_maxDof));
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32 (m_maxDof));
 	desc.m_forceBounds[index].m_low = ndClamp(friction, ndFloat32(D_MIN_BOUND), ndFloat32(-0.001f));
-	dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
+	ndAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
 
 	#ifdef _DEBUG
 	ndInt32 i0 = 0;
 	ndInt32 i1 = index - 1;
 	while ((i0 <= i1) && (desc.m_forceBounds[i0].m_normalIndex == D_INDEPENDENT_ROW)) i0++;
 	while ((i1 >= i0) && (desc.m_forceBounds[i1].m_normalIndex != D_INDEPENDENT_ROW)) i1--;
-	dAssert((i0 - i1) == 1);
+	ndAssert((i0 - i1) == 1);
 	if ((i0 - i1) != 1) 
 	{
-		dTrace(("make sure that friction joint are issue at last\n"));
+		ndTrace(("make sure that friction joint are issue at last\n"));
 	}
 	#endif
 }
@@ -245,29 +245,29 @@ inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& 
 inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& desc, ndFloat32 friction)
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
-	dAssert(index >= 0);
-	dAssert(index < ndInt32(m_maxDof));
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
 	
 	desc.m_forceBounds[index].m_upper = ndClamp(friction, ndFloat32(0.001f), ndFloat32(D_MAX_BOUND));
-	dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
+	ndAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
 
 	#ifdef _DEBUG
 	ndInt32 i0 = 0;
 	ndInt32 i1 = index - 1;
 	while ((i0 <= i1) && (desc.m_forceBounds[i0].m_normalIndex == D_INDEPENDENT_ROW)) i0++;
 	while ((i1 >= i0) && (desc.m_forceBounds[i1].m_normalIndex != D_INDEPENDENT_ROW)) i1--;
-	dAssert((i0 - i1) == 1);
+	ndAssert((i0 - i1) == 1);
 	if ((i0 - i1) != 1) 
 	{
-		dTrace(("make sure that friction joint are issue at last\n"));
+		ndTrace(("make sure that friction joint are issue at last\n"));
 	}
 	#endif
 }
 
 inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor&)
 {
-	//dAssert(0);
-	dTrace(("error: this joint is an interface\n"));
+	//ndAssert(0);
+	ndTrace(("error: this joint is an interface\n"));
 }
 
 inline bool ndJointBilateralConstraint::GetSkeletonFlag() const
@@ -318,16 +318,16 @@ inline ndVector ndJointBilateralConstraint::GetTorqueBody1() const
 inline ndFloat32 ndJointBilateralConstraint::GetDiagonalRegularizer(const ndConstraintDescritor& desc) const
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
-	dAssert(index >= 0);
-	dAssert(index < ndInt32(m_maxDof));
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
 	return desc.m_diagonalRegularizer[index];
 }
 
 inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 regularizer)
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
-	dAssert(index >= 0);
-	dAssert(index < ndInt32(m_maxDof));
+	ndAssert(index >= 0);
+	ndAssert(index < ndInt32(m_maxDof));
 	desc.m_diagonalRegularizer[index] = ndClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 

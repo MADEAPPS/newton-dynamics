@@ -274,7 +274,7 @@ ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 	if (m_maxConeAngle < D_MAX_SPHERICAL_CONE_ANGLE)
 	{
 		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+		ndAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 		lateralDir = lateralDir.Normalize();
 		const ndFloat32 coneAngle = ndAcos(ndClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 		const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
@@ -324,7 +324,7 @@ void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatri
 {
 	if (m_springK == ndFloat32(0.0f))
 	{
-		dAssert(m_damperC > ndFloat32(0.0f));
+		ndAssert(m_damperC > ndFloat32(0.0f));
 		const ndBodyKinematic* const body0 = GetBody0();
 		const ndBodyKinematic* const body1 = GetBody1();
 		const ndVector omega0(body0->GetOmega());

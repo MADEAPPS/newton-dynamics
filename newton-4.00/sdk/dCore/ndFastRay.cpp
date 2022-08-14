@@ -26,8 +26,8 @@
 
 ndFloat32 ndFastRay::PolygonIntersect (const ndVector& faceNormal, ndFloat32 maxT, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount) const
 {
-	dAssert (m_p0.m_w == ndFloat32 (0.0f));
-	dAssert (m_p1.m_w == ndFloat32 (0.0f));
+	ndAssert (m_p0.m_w == ndFloat32 (0.0f));
+	ndAssert (m_p1.m_w == ndFloat32 (0.0f));
 
 	if (faceNormal.DotProduct(m_unitDir).GetScalar() < ndFloat32 (0.0f)) 
 	{
@@ -70,9 +70,9 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 	const ndVector u(m_diff);
 	const ndVector v(ndVector::m_triplexMask & (ray_q1 - ray_q0));
 	const ndVector w(ndVector::m_triplexMask & (m_p0 - ray_q0));
-	dAssert(u.m_w == ndFloat32(0.0f));
-	dAssert(v.m_w == ndFloat32(0.0f));
-	dAssert(w.m_w == ndFloat32(0.0f));
+	ndAssert(u.m_w == ndFloat32(0.0f));
+	ndAssert(v.m_w == ndFloat32(0.0f));
+	ndAssert(w.m_w == ndFloat32(0.0f));
 	
 	const ndFloat32 a = u.DotProduct(u).GetScalar();
 	const ndFloat32 b = u.DotProduct(v).GetScalar();
@@ -158,7 +158,7 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 	ndFloat32 sc = (ndAbs(sN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : sN / sD);
 	ndFloat32 tc = (ndAbs(tN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : tN / tD);
 	
-	dAssert(u.m_w == ndFloat32(0.0f));
-	dAssert(v.m_w == ndFloat32(0.0f));
+	ndAssert(u.m_w == ndFloat32(0.0f));
+	ndAssert(v.m_w == ndFloat32(0.0f));
 	return ndRay(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
 }

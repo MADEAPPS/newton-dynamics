@@ -83,12 +83,12 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 
 		ndGridHash(const ndVector& grid)
 		{
-			dAssert(grid.m_x >= ndFloat32(0.0f));
-			dAssert(grid.m_y >= ndFloat32(0.0f));
-			dAssert(grid.m_z >= ndFloat32(0.0f));
-			dAssert(grid.m_x < ndFloat32(256.0f * 256.0f));
-			dAssert(grid.m_y < ndFloat32(256.0f * 256.0f));
-			dAssert(grid.m_z < ndFloat32(256.0f * 256.0f));
+			ndAssert(grid.m_x >= ndFloat32(0.0f));
+			ndAssert(grid.m_y >= ndFloat32(0.0f));
+			ndAssert(grid.m_z >= ndFloat32(0.0f));
+			ndAssert(grid.m_x < ndFloat32(256.0f * 256.0f));
+			ndAssert(grid.m_y < ndFloat32(256.0f * 256.0f));
+			ndAssert(grid.m_z < ndFloat32(256.0f * 256.0f));
 			
 			ndVector hash(grid.GetInt());
 			m_gridCellHash = 0;
@@ -2662,7 +2662,7 @@ void ndIsoSurface::ndImplementation::CalculateAabb(const ndArray<ndVector>& poin
 
 ndVector ndIsoSurface::ndImplementation::InterpolateLowResVertex(const ndVector& p0, const ndVector& p1) const
 {
-	dAssert(ndAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
+	ndAssert(ndAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
 	const ndVector p1p0(p1 - p0);
 	return ndVector(p0 + p1p0 * ndVector::m_half);
 }
@@ -2677,8 +2677,8 @@ ndVector ndIsoSurface::ndImplementation::InterpolateHighResVertex(ndFloat32, con
 	//p.m_w = ndFloat32(0.0f);
 	//return p;
 
-	//dAssert(isolevel == ndFloat32(0.5f));
-	dAssert(ndAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
+	//ndAssert(isolevel == ndFloat32(0.5f));
+	ndAssert(ndAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
 	const ndVector p1p0(p1 - p0);
 	return ndVector(p0 + p1p0 * ndVector::m_half);
 }
@@ -2773,7 +2773,7 @@ void ndIsoSurface::ndImplementation::ProcessHighResCell(ndIsoCell& cell, ndCalcu
 void ndIsoSurface::ndImplementation::CalculateNormals(ndIsoSurface* const)
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//ndArray<ndVector>& normals = me->m_normals;
 	//const ndArray<ndVector>& points = me->m_points;
 	//const ndArray<ndInt32>& triangles = me->m_triangles;
@@ -3327,7 +3327,7 @@ void ndIsoSurface::ndImplementation::MakeTriangleList(ndIsoSurface* const me)
 void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* const)
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 }
 
 void ndIsoSurface::ndImplementation::CreateGrids()
@@ -3363,7 +3363,7 @@ void ndIsoSurface::ndImplementation::ClearBuffers()
 void ndIsoSurface::ndImplementation::BuildHighResolutionMesh(ndIsoSurface* const, const ndArray<ndVector>&, ndFloat32, ndCalculateIsoValue* const)
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//CalculateAabb(points, gridSize);
 	//RemoveDuplicates(points);
 	//CreateGrids();
@@ -3403,7 +3403,7 @@ void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 g
 	}
 	else
 	{
-		dAssert(0);
+		ndAssert(0);
 		m_isLowRes = false;
 		implementation.BuildHighResolutionMesh(this, pointCloud, gridSize, computeIsoValue);
 	}
@@ -3424,7 +3424,7 @@ ndInt32 ndIsoSurface::GenerateListIndexList(ndInt32* const indexList, ndInt32 st
 	}
 	else
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 	return vertexCount;
 }

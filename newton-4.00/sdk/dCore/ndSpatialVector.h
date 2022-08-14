@@ -57,15 +57,15 @@ class ndSpatialVector
 
 	inline ndFloat64& operator[] (ndInt32 i)
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32(sizeof(m_f) / sizeof(m_f[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32(sizeof(m_f) / sizeof(m_f[0])));
 		return ((ndFloat64*)&m_f)[i];
 	}
 
 	inline const ndFloat64& operator[] (ndInt32 i) const
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32 (sizeof(m_f) / sizeof(m_f[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32 (sizeof(m_f) / sizeof(m_f[0])));
 		return ((ndFloat64*)&m_f)[i];
 	}
 
@@ -81,8 +81,8 @@ class ndSpatialVector
 
 	inline ndFloat64 DotProduct(const ndSpatialVector& v) const
 	{
-		dAssert(m_f[6] == ndFloat32(0.0f));
-		dAssert(m_f[7] == ndFloat32(0.0f));
+		ndAssert(m_f[6] == ndFloat32(0.0f));
+		ndAssert(m_f[7] == ndFloat32(0.0f));
 		ndBigVector tmp(m_data.m_low * v.m_data.m_low + m_data.m_high * v.m_data.m_high);
 		return tmp.AddHorizontal().GetScalar();
 	}

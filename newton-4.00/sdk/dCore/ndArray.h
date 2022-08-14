@@ -148,23 +148,23 @@ ndArray<T>::~ndArray ()
 template<class T>
 const T& ndArray<T>::operator[] (ndInt32 i) const
 {
-	dAssert(i >= 0);
-	dAssert(i < m_size);
+	ndAssert(i >= 0);
+	ndAssert(i < m_size);
 	return m_array[i];
 }
 
 template<class T>
 T& ndArray<T>::operator[] (ndInt32 i)
 {
-	dAssert(i >= 0);
-	dAssert(i < m_size);
+	ndAssert(i >= 0);
+	ndAssert(i < m_size);
 	return m_array[i];
 }
 
 template<class T>
 void ndArray<T>::PushBack(const T& element)
 {
-	dAssert(m_size <= m_capacity);
+	ndAssert(m_size <= m_capacity);
 	if (m_size == m_capacity)
 	{
 		Resize(m_capacity * 2);

@@ -72,23 +72,23 @@ void ndFixSizeArray<T, maxSize>::SetCount(ndInt32 count)
 template<class T, ndInt32 maxSize>
 T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i)
 {
-	dAssert(i >= 0);
-	dAssert(i < maxSize);
+	ndAssert(i >= 0);
+	ndAssert(i < maxSize);
 	return m_array[i];
 }
 
 template<class T, ndInt32 maxSize>
 const T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i) const
 {
-	dAssert(i >= 0);
-	dAssert(i < maxSize);
+	ndAssert(i >= 0);
+	ndAssert(i < maxSize);
 	return m_array[i];
 }
 
 template<class T, ndInt32 maxSize>
 void ndFixSizeArray<T, maxSize>::PushBack(const T& element)
 {
-	dAssert(m_count <= maxSize);
+	ndAssert(m_count <= maxSize);
 	(*this)[m_count] = element;
 	m_count++;
 }

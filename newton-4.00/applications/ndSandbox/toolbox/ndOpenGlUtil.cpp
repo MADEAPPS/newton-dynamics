@@ -28,7 +28,7 @@ void GetCursorPos(dMOUSE_POINT& point)
 
 void ShowMousePicking(const ndVector&, const ndVector&, const ndVector&, const ndVector&)
 {
-	dTrace((__FUNCTION__));
+	ndTrace((__FUNCTION__));
 	// set up the cube's texture
 	//glDisable(GL_TEXTURE_2D);
 	//glColor3f(GLfloat(lineColor.m_x), GLfloat(lineColor.m_y), GLfloat(lineColor.m_z));

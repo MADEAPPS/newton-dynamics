@@ -131,7 +131,7 @@ class ndHugeVector: public ndTemplateVector<ndGoogol>
 		m_y.Trace();
 		m_z.Trace();
 		m_w.Trace();
-		dAssert(0);
+		ndAssert(0);
 //		dTrace (("\n"));
 	}
 #endif

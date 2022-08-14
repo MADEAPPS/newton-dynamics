@@ -61,10 +61,10 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	m_vertex = nullptr;
 	m_simplex = nullptr;
 	Create(count, strideInBytes, vertexArray, tolerance);
-	dAssert(m_faceCount > 0);
+	ndAssert(m_faceCount > 0);
 	//if (m_faceCount == 0)
 	//{
-	//	dAssert(m_faceCount > 0);
+	//	ndAssert(m_faceCount > 0);
 	//	Create(count, strideInBytes, vertexArray, tolerance);
 	//}
 }
@@ -141,7 +141,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	ndConvexHull3d* convexHull = new ndConvexHull3d(&buffer[0].m_x, sizeof (ndBigVector), count, tolerance);
 	if (!convexHull->GetCount()) 
 	{
-		dAssert(0);
+		ndAssert(0);
 		//// this is a degenerated hull hull to add some thickness and for a thick plane
 		//delete convexHull;
 		//
@@ -206,8 +206,8 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			const ndBigVector& p0 = hullVertexArray[face.m_index[0]];
 			const ndBigVector& p1 = hullVertexArray[face.m_index[1]];
 			const ndBigVector& p2 = hullVertexArray[face.m_index[2]];
-			dAssert(p0.m_w == p1.m_w);
-			dAssert(p0.m_w == p2.m_w);
+			ndAssert(p0.m_w == p1.m_w);
+			ndAssert(p0.m_w == p2.m_w);
 			ndBigVector p1p0(p1 - p0);
 			ndBigVector p2p0(p2 - p0);
 			ndBigVector normal(p2p0.CrossProduct(p1p0));
@@ -232,7 +232,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 				{
 					index = 0;
 				}
-				dAssert(index != -1);
+				ndAssert(index != -1);
 				mask[face.m_index[index]] = 0;
 			}
 		}
@@ -254,7 +254,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		}
 	}
 
-	dAssert(convexHull);
+	ndAssert(convexHull);
 	//ndInt32 vertexCount = convexHull->GetVertexCount();
 	ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
 	if (vertexCount < 4) 
@@ -355,7 +355,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			ndConvexSimplexEdge* ptr = face;
 			do 
 			{
-				dAssert((ptr - m_simplex) >= 0);
+				ndAssert((ptr - m_simplex) >= 0);
 				faceMarks[ndInt32(ptr - m_simplex)] = '1';
 				ptr = ptr->m_next;
 			} while (ptr != face);
@@ -484,7 +484,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 							--i1;
 						}
 
-						dAssert(i0 <= i1);
+						ndAssert(i0 <= i1);
 						if (i0 < i1)
 						{
 							ndSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
@@ -499,16 +499,16 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 					};
 
 					#ifdef _DEBUG
-					dAssert(i0 > 0);
-					dAssert(i0 < box.m_vertexCount);
+					ndAssert(i0 > 0);
+					ndAssert(i0 < box.m_vertexCount);
 					for (ndInt32 i = 0; i < i0; ++i)
 					{
-						dAssert(vertexNodeList[box.m_vertexStart + i]->GetInfo()[index] <= test);
+						ndAssert(vertexNodeList[box.m_vertexStart + i]->GetInfo()[index] <= test);
 					}
 
 					for (ndInt32 i = i0; i < box.m_vertexCount; ++i)
 					{
-						dAssert(vertexNodeList[box.m_vertexStart + i]->GetInfo()[index] > test);
+						ndAssert(vertexNodeList[box.m_vertexStart + i]->GetInfo()[index] > test);
 					}
 					#endif
 				#endif	
@@ -590,7 +590,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			ndConvexBox* const box = &m_supportTree[i];
 			if (box->m_leftBox == -1)
 			{
-				dAssert(box->m_rightBox == -1);
+				ndAssert(box->m_rightBox == -1);
 				ndInt32 soaCount = ((box->m_vertexCount + 3) & -4) / 4;
 				m_soaVertexCount += soaCount;
 			}
@@ -607,7 +607,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 			ndConvexBox* const box = &m_supportTree[k];
 			if (box->m_leftBox == -1)
 			{
-				dAssert(box->m_rightBox == -1);
+				ndAssert(box->m_rightBox == -1);
 				const ndInt32 soaCount = ((box->m_vertexCount + 3) & -4) / 4;
 
 				ndFloat32* const indexptr = &m_soa_index[startAcc].m_x;
@@ -696,9 +696,9 @@ ndBigVector ndShapeConvexHull::FaceNormal(const ndEdge *face, const ndBigVector*
 		ndBigVector e2(p2 - p0);
 		ndBigVector n1(e1.CrossProduct(e2));
 #ifdef _DEBUG
-		dAssert(n1.m_w == ndFloat32(0.0f));
+		ndAssert(n1.m_w == ndFloat32(0.0f));
 		ndFloat64 mag = normal.DotProduct(n1).GetScalar();
-		dAssert(mag >= -ndFloat32(0.1f));
+		ndAssert(mag >= -ndFloat32(0.1f));
 #endif
 		normal += n1;
 		e1 = e2;
@@ -715,7 +715,7 @@ ndBigVector ndShapeConvexHull::FaceNormal(const ndEdge *face, const ndBigVector*
 		ndBigVector de1(pool[edge->m_next->m_incidentVertex] - pool[edge->m_incidentVertex]);
 		ndBigVector dn1(e0.CrossProduct(de1));
 		ndFloat64 x = normal.DotProduct(dn1).GetScalar();
-		dAssert(x > -ndFloat64(0.01f));
+		ndAssert(x > -ndFloat64(0.01f));
 		e0 = de1;
 		edge = edge->m_next;
 	} while (edge != face);
@@ -760,10 +760,10 @@ bool ndShapeConvexHull::RemoveCoplanarEdge(ndPolyhedra& polyhedra, const ndBigVe
 						ndBigVector e1(hullVertexArray[edge0->m_twin->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_incidentVertex]);
 						ndBigVector e0(hullVertexArray[edge0->m_incidentVertex] - hullVertexArray[edge0->m_prev->m_incidentVertex]);
 
-						dAssert(e0.m_w == ndFloat64(0.0f));
-						dAssert(e1.m_w == ndFloat64(0.0f));
-						dAssert(e0.DotProduct(e0).GetScalar() >= ndFloat64(0.0f));
-						dAssert(e1.DotProduct(e1).GetScalar() >= ndFloat64(0.0f));
+						ndAssert(e0.m_w == ndFloat64(0.0f));
+						ndAssert(e1.m_w == ndFloat64(0.0f));
+						ndAssert(e0.DotProduct(e0).GetScalar() >= ndFloat64(0.0f));
+						ndAssert(e1.DotProduct(e1).GetScalar() >= ndFloat64(0.0f));
 
 						e0 = e0.Scale(ndFloat64(1.0f) / sqrt(e0.DotProduct(e0).GetScalar()));
 						e1 = e1.Scale(ndFloat64(1.0f) / sqrt(e1.DotProduct(e1).GetScalar()));
@@ -774,10 +774,10 @@ bool ndShapeConvexHull::RemoveCoplanarEdge(ndPolyhedra& polyhedra, const ndBigVe
 						{
 							ndBigVector e11(hullVertexArray[edge0->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_incidentVertex]);
 							ndBigVector e00(hullVertexArray[edge0->m_twin->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_prev->m_incidentVertex]);
-							dAssert(e00.m_w == ndFloat64(0.0f));
-							dAssert(e11.m_w == ndFloat64(0.0f));
-							dAssert(e00.DotProduct(e00).GetScalar() >= ndFloat64(0.0f));
-							dAssert(e11.DotProduct(e11).GetScalar() >= ndFloat64(0.0f));
+							ndAssert(e00.m_w == ndFloat64(0.0f));
+							ndAssert(e11.m_w == ndFloat64(0.0f));
+							ndAssert(e00.DotProduct(e00).GetScalar() >= ndFloat64(0.0f));
+							ndAssert(e11.DotProduct(e11).GetScalar() >= ndFloat64(0.0f));
 							e00 = e00.Scale(ndFloat64(1.0f) / sqrt(e00.DotProduct(e00).GetScalar()));
 							e11 = e11.Scale(ndFloat64(1.0f) / sqrt(e11.DotProduct(e11).GetScalar()));
 
@@ -785,8 +785,8 @@ bool ndShapeConvexHull::RemoveCoplanarEdge(ndPolyhedra& polyhedra, const ndBigVe
 							projection = n11.DotProduct(normal0).GetScalar();
 							if (projection >= DG_MAX_EDGE_ANGLE) 
 							{
-								dAssert(&(*iter) != edge0);
-								dAssert(&(*iter) != edge0->m_twin);
+								ndAssert(&(*iter) != edge0);
+								ndAssert(&(*iter) != edge0->m_twin);
 								polyhedra.DeleteEdge(edge0);
 								removeEdge = true;
 							}
@@ -849,7 +849,7 @@ inline ndVector ndShapeConvexHull::SupportVertexBruteForce(const ndVector& dir, 
 	{
 		*vertexIndex = index;
 	}
-	dAssert(index != -1);
+	ndAssert(index != -1);
 	return m_vertex[index];
 }
 
@@ -904,7 +904,7 @@ inline ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir
 			const ndConvexBox& box = *stackPool[stack];
 			if (box.m_leftBox > 0)
 			{
-				dAssert(box.m_rightBox > 0);
+				ndAssert(box.m_rightBox > 0);
 				const ndConvexBox& leftBox1 = m_supportTree[box.m_leftBox];
 				const ndConvexBox& rightBox1 = m_supportTree[box.m_rightBox];
 
@@ -918,24 +918,24 @@ inline ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir
 					distPool[stack] = leftBoxDist;
 					stackPool[stack] = &leftBox1;
 					stack++;
-					dAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
 
 					distPool[stack] = rightBoxDist;
 					stackPool[stack] = &rightBox1;
 					stack++;
-					dAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
 				}
 				else
 				{
 					distPool[stack] = rightBoxDist;
 					stackPool[stack] = &rightBox1;
 					stack++;
-					dAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
 
 					distPool[stack] = leftBoxDist;
 					stackPool[stack] = &leftBox1;
 					stack++;
-					dAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
 				}
 			}
 			else
@@ -967,13 +967,13 @@ inline ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir
 	{
 		*vertexIndex = index;
 	}
-	dAssert(index != -1);
+	ndAssert(index != -1);
 	return m_vertex[index];
 }
 
 ndVector ndShapeConvexHull::SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
 	if (m_vertexCount > D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT)
 	{
 		return SupportVertexhierarchical(dir, vertexIndex);
@@ -1009,7 +1009,7 @@ void ndShapeConvexHull::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 		{
 			vertex[count] = m_vertex[ptr->m_vertex];
 			count++;
-			dAssert(count < ndInt32 (sizeof(vertex) / sizeof(vertex[0])));
+			ndAssert(count < ndInt32 (sizeof(vertex) / sizeof(vertex[0])));
 			ptr = ptr->m_next;
 		} while (ptr != face);
 		matrix.TransformTriplex(&vertex[0].m_x, sizeof(ndVector), &vertex[0].m_x, sizeof(ndVector), count);

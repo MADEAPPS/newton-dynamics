@@ -89,7 +89,7 @@ class ndVector
 	inline ndVector (const ndBigVector& copy)
 		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PERMUTE_MASK(1, 0, 1, 0)))
 	{
-		dAssert (dCheckVector ((*this)));
+		ndAssert (dCheckVector ((*this)));
 	}
 
 	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
@@ -180,15 +180,15 @@ class ndVector
 
 	inline ndFloat32& operator[] (ndInt32 i)
 	{
-		dAssert (i < 4);
-		dAssert (i >= 0);
+		ndAssert (i < 4);
+		ndAssert (i >= 0);
 		return m_f[i];
 	}
 
 	inline const ndFloat32& operator[] (ndInt32 i) const
 	{
-		dAssert (i < 4);
-		dAssert (i >= 0);
+		ndAssert (i < 4);
+		ndAssert (i >= 0);
 		return m_f[i];
 	}
 
@@ -353,10 +353,10 @@ class ndVector
 	{
 		ndVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
 		ndVector ret (truncated - (ndVector::m_one & (*this < truncated)));
-		dAssert (ret.m_f[0] == ndFloor(m_f[0]));
-		dAssert (ret.m_f[1] == ndFloor(m_f[1]));
-		dAssert (ret.m_f[2] == ndFloor(m_f[2]));
-		dAssert (ret.m_f[3] == ndFloor(m_f[3]));
+		ndAssert (ret.m_f[0] == ndFloor(m_f[0]));
+		ndAssert (ret.m_f[1] == ndFloor(m_f[1]));
+		ndAssert (ret.m_f[2] == ndFloor(m_f[2]));
+		ndAssert (ret.m_f[3] == ndFloor(m_f[3]));
 		return ret;
 	}
 
@@ -477,7 +477,7 @@ class ndVector
 	//inline void Trace(char* const name) const
 	inline void Trace(char* const) const
 	{
-		dAssert(0);
+		ndAssert(0);
 		//dTrace(("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
 #else 
@@ -586,7 +586,7 @@ class ndBigVector
 		:m_typeLow(_mm_cvtps_pd (v.m_type))
 		,m_typeHigh(_mm_cvtps_pd (_mm_shuffle_ps (v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
 	{
-		dAssert(dCheckVector((*this)));
+		ndAssert(dCheckVector((*this)));
 	}
 
 	inline ndBigVector(const ndFloat64* const ptr)
@@ -660,15 +660,15 @@ class ndBigVector
 
 	inline ndFloat64& operator[] (ndInt32 i)
 	{
-		dAssert(i < 4);
-		dAssert(i >= 0);
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
 		return m_f[i];
 	}
 
 	inline const ndFloat64& operator[] (ndInt32 i) const
 	{
-		dAssert(i < 4);
-		dAssert(i >= 0);
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
 		return m_f[i];
 	}
 

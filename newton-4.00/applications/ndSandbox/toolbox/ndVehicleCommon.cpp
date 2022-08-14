@@ -280,7 +280,7 @@ void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, ndFloat
 {
 	// find the the tire visual mesh 
 	ndDemoEntity* const tirePart = vehEntity->Find(tireName);
-	dAssert(tirePart);
+	ndAssert(tirePart);
 
 	// make a convex hull collision shape to assist in calculation of the tire shape size
 	ndDemoMesh* const tireMesh = (ndDemoMesh*)tirePart->GetMesh();

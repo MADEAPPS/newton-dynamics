@@ -233,7 +233,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 	ndAiQuadrupedTest_2(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 
 	~ndAiQuadrupedTest_2()	
@@ -243,7 +243,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 	//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	void Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 
 	void Debug(ndConstraintDebugCallback& context) const

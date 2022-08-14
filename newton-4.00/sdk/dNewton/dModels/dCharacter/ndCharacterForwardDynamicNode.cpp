@@ -71,14 +71,14 @@ void ndCharacterForwardDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	{
 		jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_joint);
 	}
-	dAssert(jointNode);
+	ndAssert(jointNode);
 
 	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode = desc.m_bodyMap->Find(m_body);
 	if (!bodyNode)
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
 	}
-	dAssert(bodyNode);
+	ndAssert(bodyNode);
 
 	xmlSaveParam(childNode, "name", GetName().GetStr());
 	xmlSaveParam(childNode, "localPose", m_localPose);

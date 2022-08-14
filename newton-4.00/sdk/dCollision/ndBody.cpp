@@ -144,7 +144,7 @@ void ndBody::SetCentreOfMass(const ndVector& com)
 
 void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 {
-	//dAssert(notify->m_body == nullptr);
+	//ndAssert(notify->m_body == nullptr);
 	if (m_notifyCallback)
 	{
 		delete m_notifyCallback;
@@ -181,7 +181,7 @@ void ndBody::SetVelocity(const ndVector& veloc)
 void ndBody::SetMatrixNoSleep(const ndMatrix& matrix)
 {
 	m_matrix = matrix;
-	dAssert(m_matrix.TestOrthogonal(ndFloat32(1.0e-4f)));
+	ndAssert(m_matrix.TestOrthogonal(ndFloat32(1.0e-4f)));
 
 	m_rotation = ndQuaternion(m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
@@ -190,7 +190,7 @@ void ndBody::SetMatrixNoSleep(const ndMatrix& matrix)
 void ndBody::SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom)
 {
 	m_rotation = rotation;
-	dAssert(m_rotation.DotProduct(m_rotation).GetScalar() > ndFloat32(0.9999f));
+	ndAssert(m_rotation.DotProduct(m_rotation).GetScalar() > ndFloat32(0.9999f));
 	m_globalCentreOfMass = globalcom;
 	m_matrix = ndMatrix(rotation, m_matrix.m_posit);
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);

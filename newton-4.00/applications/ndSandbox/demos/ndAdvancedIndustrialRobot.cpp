@@ -234,13 +234,13 @@ class dAdvancedIndustrialRobot : public ndModel
 		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
 		if (xmlGetInt(endEffectorNode, "hasEffector"))
 		{
-			dAssert(0);
+			ndAssert(0);
 			//ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
 			//ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
 			//
 			//ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
 			//ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
-			//dAssert(body1 == m_rootBody);
+			//ndAssert(body1 == m_rootBody);
 			//
 			//const ndMatrix pivotMatrix(body0->GetMatrix());
 			//m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
@@ -316,7 +316,7 @@ class dAdvancedIndustrialRobot : public ndModel
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 	{
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
-		dAssert(shape);
+		ndAssert(shape);
 		
 		// create the rigid body that will make this body
 		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
@@ -412,7 +412,7 @@ class dAdvancedIndustrialRobot : public ndModel
 		ndModel::Update(world, timestep);
 
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-		dAssert(skeleton);
+		ndAssert(skeleton);
 
 		//m_invDynamicsSolver.SetMaxIterations(4);
 		if (m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))

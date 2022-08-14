@@ -227,7 +227,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	ndFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 	if (data->m_doContinueCollisionTest) 
 	{
-		dAssert(0);
+		ndAssert(0);
 		//dFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
 		//for (ndInt32 i = 0; i < faceCount; ++i) 
 		//{

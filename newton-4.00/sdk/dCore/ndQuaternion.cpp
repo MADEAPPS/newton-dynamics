@@ -76,11 +76,11 @@ ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 err = ndAbs (unitMatrix[i][i] - ndFloat32(1.0f));
-		dAssert (err < ndFloat32 (1.0e-2f));
+		ndAssert (err < ndFloat32 (1.0e-2f));
 	}
 
 	ndFloat32 err = ndAbs (DotProduct(*this).GetScalar() - ndFloat32(1.0f));
-	dAssert (err < ndFloat32(ndEpsilon * 100.0f));
+	ndAssert (err < ndFloat32(ndEpsilon * 100.0f));
 #endif
 }
 
@@ -92,7 +92,7 @@ ndQuaternion::ndQuaternion (const ndVector &unitAxis, ndFloat32 angle)
 
 #ifdef _DEBUG
 	if (ndAbs (angle) > ndFloat32(ndEpsilon / 10.0f)) {
-		dAssert (ndAbs (ndFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < ndFloat32(ndEpsilon * 10.0f));
+		ndAssert (ndAbs (ndFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < ndFloat32(ndEpsilon * 10.0f));
 	} 
 #endif
 	m_x = unitAxis.m_x * sinAng;

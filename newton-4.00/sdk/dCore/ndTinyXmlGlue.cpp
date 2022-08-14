@@ -137,7 +137,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 	ndInt32 value;
 	element->Attribute("int32", &value);
 	return value;
@@ -146,7 +146,7 @@ ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 	const char* const data = element->Attribute("int64");
 
 	long long int value;
@@ -157,7 +157,7 @@ ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 	ndFloat64 value;
 	element->Attribute("float", &value);
 	return ndFloat32 (value);
@@ -166,7 +166,7 @@ ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const nam
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 	ndInt32 count;
 	element->Attribute("count", &count);
 	array.Resize(count);
@@ -203,7 +203,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 
 	const char* const positData = element->Attribute("float3");
 
@@ -222,7 +222,7 @@ ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const na
 ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 	
 	const char* const positData = element->Attribute("position");
 	const char* const angleData = element->Attribute("angles");
@@ -254,7 +254,7 @@ ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const nam
 const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
-	dAssert(element);
+	ndAssert(element);
 	return element->Attribute("string");
 }
 

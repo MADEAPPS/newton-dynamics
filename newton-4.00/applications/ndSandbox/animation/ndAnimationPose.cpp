@@ -21,7 +21,7 @@ ndAnimationPose::ndAnimationPose()
 ndAnimationPose::ndAnimationPose(const ndAnimationPose&)
 	:ndArray<ndAnimKeyframe>()
 {
-	dAssert(0);
+	ndAssert(0);
 }
 
 void ndAnimationPose::Clear() 
@@ -32,12 +32,12 @@ void ndAnimationPose::Clear()
 //void ndAnimationPose::CopySource(const ndAnimationPose& source)
 void ndAnimationPose::CopySource(const ndAnimationPose&)
 {
-	dAssert(0);
+	ndAssert(0);
 //	dListNode* destNode = GetFirst();
 //	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
 //		const ndAnimKeyframe& srcFrame = sourceNode->GetInfo();
 //		ndAnimKeyframe& dstFrame = destNode->GetInfo();
-//		dAssert(srcFrame.m_userData == dstFrame.m_userData);
+//		ndAssert(srcFrame.m_userData == dstFrame.m_userData);
 //		dstFrame.m_rotation = srcFrame.m_rotation;
 //		dstFrame.m_posit = srcFrame.m_posit;
 //		destNode = destNode->GetNext();

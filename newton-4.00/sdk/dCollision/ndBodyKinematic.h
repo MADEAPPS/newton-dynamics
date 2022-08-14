@@ -45,7 +45,7 @@ class ndBodyKinematic : public ndBody
 			:m_tagLow(ndMin(tag0, tag1))
 			,m_tagHigh(ndMax(tag0, tag1))
 		{
-			dAssert(m_tagLow < m_tagHigh);
+			ndAssert(m_tagLow < m_tagHigh);
 		}
 
 		bool operator== (const ndContactkey& key) const
@@ -498,17 +498,17 @@ inline ndVector ndBodyKinematic::GetCachedDamping() const
 
 inline void ndBodyKinematic::UpdateInvInertiaMatrix()
 {
-	dAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
+	ndAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
 
 	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
 
-	dAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
+	ndAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
+	ndAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
 }
 
 inline void ndBodyKinematic::IntegrateGyroSubstep(const ndVector&)
@@ -537,7 +537,7 @@ inline void ndBodyKinematic::ApplyImpulsesAtPoint(ndInt32, const ndVector* const
 
 inline void ndBodyKinematic::SpecialUpdate(ndFloat32)
 {
-	dAssert(0);
+	ndAssert(0);
 }
 
 inline void ndBodyKinematic::ApplyExternalForces(ndInt32, ndFloat32)

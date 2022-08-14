@@ -80,7 +80,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const m
 
 	// now we call create we decompose the mesh into several convex pieces 
 	ndMeshEffect* const debrisMeshPieces = mesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
-	dAssert(debrisMeshPieces);
+	ndAssert(debrisMeshPieces);
 
 	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 	ndMeshEffect* nextDebris;
@@ -153,7 +153,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
 		newAtom.m_mesh = mesh;
-		dAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+		ndAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
 
 		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
 	}

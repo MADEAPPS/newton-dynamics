@@ -47,21 +47,21 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 
 	~ApplicationMemoryLeakTracket()
 	{
-		dAssert(!GetCount());
+		ndAssert(!GetCount());
 	}
 
 	void InsertPointer(void* const ptr)
 	{
 		ndScopeSpinLock lock (m_lock);
 		Insert(m_allocIndex, ptr);
-		//dAssert(m_allocIndex != 197194);
+		//ndAssert(m_allocIndex != 197194);
 		m_allocIndex++;
 	}
 
 	void RemovePointer(void* const ptr)
 	{
 		ndScopeSpinLock lock(m_lock);
-		dAssert(Find(ptr));
+		ndAssert(Find(ptr));
 		Remove(ptr);
 	}
 
@@ -79,7 +79,7 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 static void* PhysicsAlloc(size_t sizeInBytes)
 {
 	void* const ptr = malloc(sizeInBytes);
-	dAssert(ptr);
+	ndAssert(ptr);
 
 	#ifdef ND_USE_LEAK_TRACKER
 	ApplicationMemoryLeakTracket::GetLeakTracker().InsertPointer(ptr);
@@ -101,7 +101,7 @@ static void PhysicsFree(void* ptr)
 void* operator new (size_t size)
 {
 	void* const ptr = ndMemory::Malloc(size);
-	dAssert((ndUnsigned64(ptr) & (0x1f)) == 0);
+	ndAssert((ndUnsigned64(ptr) & (0x1f)) == 0);
 	return ptr;
 }
 

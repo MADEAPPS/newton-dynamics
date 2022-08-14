@@ -169,7 +169,7 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 th
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const ndVector& attachmentPointInGlobalSpace)
 	:ndJointBilateralConstraint(6, body, referenceBody, ndMatrix(attachmentPointInGlobalSpace))
 {
-	dAssert(GetBody0() == body);
+	ndAssert(GetBody0() == body);
 	ndMatrix matrix(body->GetMatrix());
 	matrix.m_posit = attachmentPointInGlobalSpace;
 	matrix.m_posit.m_w = ndFloat32(1.0f);
@@ -242,7 +242,7 @@ void ndJointKinematicController::CheckSleep() const
 {
 	GetBody0()->SetSleepState(false);
 
-	//dAssert(0);
+	//ndAssert(0);
 	//ndMatrix matrix0;
 	//ndMatrix matrix1;
 	//CalculateGlobalMatrix(matrix0, matrix1);
@@ -289,7 +289,7 @@ void ndJointKinematicController::CheckSleep() const
 	//			else 
 	//			{
 	//				ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-	//				dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+	//				ndAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 	//				lateralDir = lateralDir.Normalize();
 	//				ndFloat32 coneAngle = dAcos(ndClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
 	//				ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
@@ -357,7 +357,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		{
 			v = damp * dist * invTimestep;
 		}
-		dAssert(ndAbs(v) <= m_maxSpeed);
+		ndAssert(ndAbs(v) <= m_maxSpeed);
 	
 		const ndFloat32 relAccel = ndClamp ((v + speed) * invTimestep, ndFloat32 (-400.0f), ndFloat32 (400.0f));
 
@@ -388,7 +388,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		}
 		else 
 		{
-			dAssert(0);
+			ndAssert(0);
 		//	ndFloat32 pitchAngle = 0.0f;
 		//	const ndFloat32 maxAngle = 2.0f * m_maxOmega * timestep;
 		//	ndFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
@@ -411,7 +411,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//					w = damp * coneAngle * invTimestep;
 		//				}
 		//
-		//				dAssert(ndAbs(w) <= m_maxOmega);
+		//				ndAssert(ndAbs(w) <= m_maxOmega);
 		//				ndFloat32 relAlpha = (w + relOmega) * invTimestep;
 		//
 		//				NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
@@ -424,7 +424,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//	else 
 		//	{
 		//		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-		//		dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+		//		ndAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 		//		lateralDir = lateralDir.Normalize();
 		//		ndFloat32 coneAngle = dAcos(ndClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
 		//		ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
@@ -476,7 +476,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//		{
 		//			w = damp * pitchAngle * invTimestep;
 		//		}
-		//		dAssert(ndAbs(w) <= m_maxOmega);
+		//		ndAssert(ndAbs(w) <= m_maxOmega);
 		//		ndFloat32 relAlpha = (w + relOmega) * invTimestep;
 		//
 		//		NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);

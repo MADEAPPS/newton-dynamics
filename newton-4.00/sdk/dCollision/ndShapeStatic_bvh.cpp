@@ -138,7 +138,7 @@ dIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const 
 	}
 
 	data.m_triangleCount += (indexCount - 2);
-	dAssert((data.m_triangleCount * 3) <= data.m_maxIndexCount);
+	ndAssert((data.m_triangleCount * 3) <= data.m_maxIndexCount);
 	return t_ContinueSearh;
 }
 
@@ -166,7 +166,7 @@ dIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const 
 		ndInt32 edgeIndexType = (indexArray[i + indexCount + 2]) & D_CONCAVE_EDGE_MASK;
 		edgeType[i] = edgeIndexType ? ndShapeDebugNotify::m_open : ndShapeDebugNotify::m_shared;
 	}
-	//dAssert(0);
+	//ndAssert(0);
 	data.m_callback->DrawPolygon(indexCount, poly, edgeType);
 	return t_ContinueSearh;
 }
@@ -210,8 +210,8 @@ ndFloat32 ndShapeStatic_bvh::RayCast(ndRayCastNotify& callback, const ndVector& 
 	if (ray.m_t < maxT)
 	{
 		t = ray.m_t;
-		dAssert(ray.m_normal.m_w == ndFloat32(0.0f));
-		dAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > ndFloat32(0.0f));
+		ndAssert(ray.m_normal.m_w == ndFloat32(0.0f));
+		ndAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > ndFloat32(0.0f));
 		contactOut.m_normal = ray.m_normal.Normalize();
 		contactOut.m_shapeId0 = ray.m_id;
 		contactOut.m_shapeId1 = ray.m_id;
@@ -224,12 +224,12 @@ dIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFloa
 	ndPolygonMeshDesc& data = (*(ndPolygonMeshDesc*)context);
 	if (data.m_faceCount >= D_MAX_COLLIDING_FACES) 
 	{
-		dTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
+		ndTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
 	if ((data.m_globalIndexCount + indexCount * 2 + 3) >= D_MAX_COLLIDING_INDICES) 
 	{
-		dTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
+		ndTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
 

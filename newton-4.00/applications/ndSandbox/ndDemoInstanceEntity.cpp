@@ -280,7 +280,7 @@ ndDemoInstanceEntity::ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
 	,m_instanceMesh(copyFrom.m_instanceMesh)
 {
-	dAssert(0);
+	ndAssert(0);
 	m_instanceMesh->AddRef();
 }
 

@@ -189,7 +189,7 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix&
 		points[count++] = ndVector(0.7f * x,  high * 0.5f, 0.7f * z, 0.0f);
 		points[count++] = ndVector(x, -high * 0.25f, z, 0.0f);
 		points[count++] = ndVector(x, high * 0.25f, z, 0.0f);
-		dAssert(count < ndInt32 (sizeof(points) / sizeof(points[0])));
+		ndAssert(count < ndInt32 (sizeof(points) / sizeof(points[0])));
 	}
 
 	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof(ndVector), 0.0f, &points[0].m_x));

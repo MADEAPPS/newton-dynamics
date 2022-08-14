@@ -186,25 +186,25 @@ class ndTree: public ndClassAlloc
 
 		void operator++ ()
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->Next();
 		}
 
 		void operator++ (ndInt32)
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->Next();
 		}
 
 		void operator-- () 
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->Prev();
 		}
 
 		void operator-- (ndInt32) 
 		{
-			dAssert (m_ptr);
+			ndAssert (m_ptr);
 			m_ptr = m_ptr->Prev();
 		}
 
@@ -380,17 +380,17 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 	{
 		if (key < ptr->m_key) 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == -1) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == -1) ;
 			ptr = ptr->GetLeft();
 		} 
 		else if (key > ptr->m_key) 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == 1) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == 1) ;
 			ptr = ptr->GetRight();
 		} 
 		else 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == 0) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == 0) ;
 			break;
 		}
 	}
@@ -404,8 +404,8 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 	ndInt64 offset = ((char*) &node->m_info) - ((char *) node);
 	ndNode* const retnode = (ndNode* ) (((char *) node) - offset);
 
-	dAssert (retnode->IsInTree ());
-	dAssert (&retnode->GetInfo () == &info);
+	ndAssert (retnode->IsInTree ());
+	ndAssert (&retnode->GetInfo () == &info);
 	return (retnode->IsInTree ()) ? retnode : nullptr;
 }
 
@@ -440,12 +440,12 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 		for (iter.Begin(); iter.GetNode() != prev; iter ++) 
 		{
 			KEY key1 = iter.GetKey(); 
-			dAssert (key1 <= key);
+			ndAssert (key1 <= key);
 		}
 		for (; iter.GetNode(); iter ++) 
 		{
 			KEY key1 = iter.GetKey(); 
-			dAssert (key1 > key);
+			ndAssert (key1 > key);
 		}
 	}
 #endif
@@ -488,12 +488,12 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 		for (iter.Begin(); iter.GetNode() != prev; iter ++) 
 		{
 			KEY key1 = iter.GetKey(); 
-			dAssert (key1 <= key);
+			ndAssert (key1 <= key);
 		}
 		for (; iter.GetNode(); iter ++) 
 		{
 			KEY key1 = iter.GetKey(); 
-			dAssert (key1 >= key);
+			ndAssert (key1 >= key);
 		}
 	}
 #endif
@@ -538,12 +538,12 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 		for (iter.End(); iter.GetNode() != prev; iter --) 
 		{
 			KEY key1 = iter.GetKey(); 
-			dAssert (key1 >= key);
+			ndAssert (key1 >= key);
 		}
 		for (; iter.GetNode(); iter --) 
 		{
 			KEY key1 = iter.GetKey(); 
-			dAssert (key1 < key);
+			ndAssert (key1 < key);
 		}
 	}
 #endif
@@ -563,19 +563,19 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 
 		if (key < ptr->m_key) 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == -1) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == -1) ;
 			val = -1;
 			ptr = ptr->GetLeft();
 		} 
 		else if (key > ptr->m_key) 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == 1) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == 1) ;
 			val = 1;
 			ptr = ptr->GetRight();
 		} 
 		else 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == 0) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == 0) ;
 			wasFound = true;
 			return ptr;
 		}
@@ -616,19 +616,19 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 		parent = ptr;
 		if (key < ptr->m_key)
 		{
-			dAssert(CompareKeys(ptr->m_key, key) == -1);
+			ndAssert(CompareKeys(ptr->m_key, key) == -1);
 			val = -1;
 			ptr = ptr->GetLeft();
 		}
 		else if (key > ptr->m_key)
 		{
-			dAssert(CompareKeys(ptr->m_key, key) == 1);
+			ndAssert(CompareKeys(ptr->m_key, key) == 1);
 			val = 1;
 			ptr = ptr->GetRight();
 		}
 		else
 		{
-			dAssert(CompareKeys(ptr->m_key, key) == 0);
+			ndAssert(CompareKeys(ptr->m_key, key) == 0);
 			wasFound = true;
 			return ptr;
 		}
@@ -690,19 +690,19 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 
 		if (key < ptr->m_key) 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == -1) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == -1) ;
 			val = -1;
 			ptr = ptr->GetLeft();
 		} 
 		else if (key > ptr->m_key) 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == 1) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == 1) ;
 			val = 1;
 			ptr = ptr->GetRight();
 		} 
 		else 
 		{
-			dAssert (CompareKeys (ptr->m_key, key) == 0) ;
+			ndAssert (CompareKeys (ptr->m_key, key) == 0) ;
 			return nullptr;
 		}
 	}
@@ -745,7 +745,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 	{
 		parent = ptr;
 
-		dAssert (0);
+		ndAssert (0);
 		val = CompareKeys (ptr->m_key, key);
 		if (val == 0) 
 		{
@@ -789,7 +789,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 {
 	Unlink (node);
 	ndNode* const ptr = Insert (node, key);
-	dAssert (ptr);
+	ndAssert (ptr);
 	return ptr;
 }
 
@@ -807,7 +807,7 @@ void ndTree<OBJECT, KEY, allocator>::Unlink (typename ndTree<OBJECT, KEY, alloca
 
 	ndNode** const headPtr = (ndNode**) &m_head;
 	node->Unlink ((ndRedBackNode**)headPtr);
-	dAssert (!Find (node->GetKey()));
+	ndAssert (!Find (node->GetKey()));
 }
 
 template<class OBJECT, class KEY, class allocator>

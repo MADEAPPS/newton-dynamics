@@ -50,7 +50,7 @@ inline ndInt32 ndBitReversal(ndInt32 v, ndInt32 base)
 		v >>= 1;
 		power--;
 	} while (v);
-	dAssert(x < base);
+	ndAssert(x < base);
 	return x;
 }
 

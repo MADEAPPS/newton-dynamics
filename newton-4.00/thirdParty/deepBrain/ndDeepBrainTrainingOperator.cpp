@@ -98,10 +98,10 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 
 //void ndDeepBrainTrainingOperator::SetInput(const ndDeepBrainVector& input)
 //{
-//	dAssert(0);
+//	ndAssert(0);
 //	//ndDeepBrainLayer* const inputLayer = m_instance.GetLayers()[0];
 //	//ndInt32 size = inputLayer->GetInputSize();
-//	//dAssert(size == input.GetCount());
+//	//ndAssert(size == input.GetCount());
 //	//
 //	//m_instance.GetInputs().SetCount(size);
 //	//m_instance.GetInputs().CopyData(input);
@@ -115,7 +115,7 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 void ndDeepBrainTrainingOperator::PredictInputLayer(const ndDeepBrainVector& trainingInput)
 {
 	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
-	dAssert(layers.GetCount());
+	ndAssert(layers.GetCount());
 
 	ndDeepBrainVector& input = m_instance.GetInputs();
 	ndDeepBrainVector& output = m_instance.GetOutputs();
@@ -140,7 +140,7 @@ void ndDeepBrainTrainingOperator::MakePrediction(const ndDeepBrainVector& traini
 	PredictInputLayer(trainingInput);
 
 	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
-	dAssert(layers.GetCount());
+	ndAssert(layers.GetCount());
 	
 	ndDeepBrainVector& input = m_instance.GetInputs();
 	ndDeepBrainVector& output = m_instance.GetOutputs();
@@ -148,7 +148,7 @@ void ndDeepBrainTrainingOperator::MakePrediction(const ndDeepBrainVector& traini
 	for (ndInt32 i = 1; i < layers.GetCount(); ++i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
-		dAssert(m_instance.GetInputs().GetCount() == layer->GetInputSize());
+		ndAssert(m_instance.GetInputs().GetCount() == layer->GetInputSize());
 	
 		input.SetCount(layer->GetInputSize());
 		output.SetCount(layer->GetOuputSize());
@@ -209,7 +209,7 @@ void ndDeepBrainTrainingOperator::BackPropagateHiddenLayer()
 {
 	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
 	//ndDeepBrainLayer* const layer = m_instance.GetLayers()[m_instance.GetLayers().GetCount()];
-	//dAssert(layers.GetCount());
+	//ndAssert(layers.GetCount());
 	//
 	//ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
 }

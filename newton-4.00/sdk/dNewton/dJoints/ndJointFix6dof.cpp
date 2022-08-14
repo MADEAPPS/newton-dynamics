@@ -62,7 +62,7 @@ void ndJointFix6dof::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndJointFix6dof::SetAsSoftJoint(bool)
 {
-	dAssert(0);
+	ndAssert(0);
 	//SetSolverModel(mode ? m_secundaryCloseLoop : m_primaryOpenLoop);
 }
 
@@ -76,7 +76,7 @@ void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 
-	dAssert(IsActive());
+	ndAssert(IsActive());
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
@@ -128,7 +128,7 @@ void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatr
 {
 	// calculate cone angle
 	ndVector lateralDir(matrix1.m_front.CrossProduct(matrix0.m_front));
-	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > ndFloat32 (1.0e-6f));
+	ndAssert(lateralDir.DotProduct(lateralDir).GetScalar() > ndFloat32 (1.0e-6f));
 	lateralDir = lateralDir.Normalize();
 	ndFloat32 coneAngle = ndAcos(ndClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
 	ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);

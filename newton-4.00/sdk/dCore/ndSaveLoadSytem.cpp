@@ -117,7 +117,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::ndLoadDescrip
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{
-			dAssert (0);
+			ndAssert (0);
 		}
 	}
 	#endif
@@ -134,7 +134,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::ndLoadDescrip
 		}
 	}
 
-	//dAssert(0);
+	//ndAssert(0);
 	return nullptr;
 }
 

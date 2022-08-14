@@ -63,7 +63,7 @@ ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_axis0()
 	,m_axis1()
 {
-	dAssert(m_maxDof == 8);
+	ndAssert(m_maxDof == 8);
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
 	const nd::TiXmlNode* const axis0 = xmlFind(xmlNode, "axis0");
@@ -106,8 +106,8 @@ ndFloat32 ndJointDoubleHinge::GetOmega0() const
 
 void ndJointDoubleHinge::SetLimits0(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	dAssert(minLimit <= 0.0f);
-	dAssert(maxLimit >= 0.0f);
+	ndAssert(minLimit <= 0.0f);
+	ndAssert(maxLimit >= 0.0f);
 	m_axis0.m_minLimit = minLimit;
 	m_axis0.m_maxLimit = maxLimit;
 }
@@ -147,8 +147,8 @@ ndFloat32 ndJointDoubleHinge::GetOmega1() const
 
 void ndJointDoubleHinge::SetLimits1(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	dAssert(minLimit <= 0.0f);
-	dAssert(maxLimit >= 0.0f);
+	ndAssert(minLimit <= 0.0f);
+	ndAssert(maxLimit >= 0.0f);
 	m_axis1.m_minLimit = minLimit;
 	m_axis1.m_maxLimit = maxLimit;
 }

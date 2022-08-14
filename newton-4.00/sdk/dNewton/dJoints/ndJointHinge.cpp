@@ -124,8 +124,8 @@ void ndJointHinge::SetLimitState(bool state)
 
 void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	dAssert(minLimit <= 0.0f);
-	dAssert(maxLimit >= 0.0f);
+	ndAssert(minLimit <= 0.0f);
+	ndAssert(maxLimit >= 0.0f);
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
 

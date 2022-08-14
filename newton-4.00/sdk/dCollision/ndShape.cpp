@@ -51,7 +51,7 @@ ndShape::ndShape(const ndShape& source)
 
 ndShape::~ndShape()
 {
-	dAssert(m_refCount.load() == 0);
+	ndAssert(m_refCount.load() == 0);
 }
 
 void ndShape::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -92,7 +92,7 @@ void ndShape::MassProperties()
 	{
 		parallel[i][i] = originMag2;
 		inertia[i] += (parallel[i] - Covariance[i]);
-		dAssert(inertia[i][i] > ndFloat32(0.0f));
+		ndAssert(inertia[i][i] > ndFloat32(0.0f));
 	}
 
 	m_inertia[0] = inertia[0][0];

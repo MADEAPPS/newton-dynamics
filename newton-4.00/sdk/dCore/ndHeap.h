@@ -158,7 +158,7 @@ ndInt32 ndHeap<dItem, dKey>::Find(dItem &obj)
 	// ex: m_curCount < 32
 	// this will be change to a binary search in the heap should the 
 	// the size of the heap get larger than 32
-	//	dAssert (m_curCount <= 32);
+	//	ndAssert (m_curCount <= 32);
 	for (ndInt32 i = 0; i < m_curCount; ++i)
 	{
 		if (m_pool[i].obj == obj)
@@ -175,7 +175,7 @@ ndInt32 ndHeap<dItem, dKey>::Find(dKey key)
 	// ex: m_curCount < 32
 	// this will be change to a binary search in the heap should the 
 	// the size of the heap get larger than 32
-	dAssert(m_curCount <= 32);
+	ndAssert(m_curCount <= 32);
 	for (ndInt32 i = 0; i < m_curCount; ++i)
 	{
 		if (m_pool[i].m_key == key)
@@ -189,7 +189,7 @@ ndInt32 ndHeap<dItem, dKey>::Find(dKey key)
 template <class dItem, class dKey>
 const dItem& ndHeap<dItem, dKey>::operator[] (ndInt32 i) const
 {
-	dAssert(i <= m_curCount);
+	ndAssert(i <= m_curCount);
 	return m_pool[i].m_obj;
 }
 
@@ -229,11 +229,11 @@ void ndHeap<dItem, dKey>::Push(dItem &obj, dKey key)
 		}
 		ndHeap<dItem, dKey>::m_pool[i - 1] = ndHeap<dItem, dKey>::m_pool[j - 1];
 	}
-	dAssert(i);
+	ndAssert(i);
 	ndHeap<dItem, dKey>::m_pool[i - 1].m_key = key;
 	ndHeap<dItem, dKey>::m_pool[i - 1].m_obj = obj;
 
-	dAssert(SanityCheck());
+	ndAssert(SanityCheck());
 }
 
 template <class dItem, class dKey>
@@ -276,7 +276,7 @@ void ndHeap<dItem, dKey>::Remove(ndInt32 index)
 			index = i0;
 		}
 	}
-	dAssert(SanityCheck());
+	ndAssert(SanityCheck());
 }
 
 template <class dItem, class dKey>
@@ -306,7 +306,7 @@ void ndHeap<dItem, dKey>::Sort()
 		ndHeap<dItem, dKey>::m_pool[count - i - 1].m_key = key;
 		ndHeap<dItem, dKey>::m_pool[count - i - 1].m_obj = obj;
 	}
-	dAssert(SanityCheck());
+	ndAssert(SanityCheck());
 }
 
 // *****************************************

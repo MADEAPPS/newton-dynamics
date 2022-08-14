@@ -109,7 +109,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	dGetWorkingFileName(filename, fullPathName);
 	
 	FILE* const pFile = fopen(fullPathName, "rb");
-	dAssert(pFile);
+	ndAssert(pFile);
 
 	TGAHEADER tgaHeader;		// TGA file header
 	size_t ret = fread(&tgaHeader, 18, 1, pFile);
@@ -127,13 +127,13 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	ndInt32 width = tgaHeader.width;
 	ndInt32 height = tgaHeader.height;
 	short sDepth = tgaHeader.bits / 8;
-	dAssert((sDepth == 3) || (sDepth == 4));
+	ndAssert((sDepth == 3) || (sDepth == 4));
 	
 	// Put some validity checks here. Very simply, I only understand
 	// or care about 8, 24, or 32 bit targa's.
 	if (tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32)
 	{
-		dAssert(0);
+		ndAssert(0);
 		fclose(pFile);
 		return;
 	}
@@ -145,7 +145,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
 	if (pBits == nullptr)
 	{
-		dAssert(0);
+		ndAssert(0);
 		fclose(pFile);
 		return;
 	}
@@ -153,7 +153,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
 	if (readret != 1)
 	{
-		dAssert(0);
+		ndAssert(0);
 		fclose(pFile);
 		delete[] pBits;
 		return;
@@ -162,11 +162,11 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	glTexImage2D(face, 0, 4, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
 	//gluBuild2DMipmaps(face, 4, width, height, GL_BGR, GL_UNSIGNED_BYTE, pBits);
 
-	//dAssert(glGetError() == GL_NO_ERROR);
+	//ndAssert(glGetError() == GL_NO_ERROR);
 	for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError())
 	{
 		// it looks like I am loading a texture with an invalid format, I am just ignoring this for now 
-		dTrace(("****** opengl error 0x%x\n", err));
+		ndTrace(("****** opengl error 0x%x\n", err));
 	}
 	
 	// Done with File

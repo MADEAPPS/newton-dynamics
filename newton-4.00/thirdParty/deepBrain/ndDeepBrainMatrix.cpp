@@ -79,9 +79,9 @@ void ndDeepBrainMatrix::Mul(const ndDeepBrainVector& input, ndDeepBrainVector& o
 {
 	const ndDeepBrainMatrix& me = *this;
 	ndInt32 columns = input.GetCount();
-	//dAssert(columns == me[0].GetCount());
-	dAssert(columns == GetColumns());
-	dAssert(output.GetCount() == GetCount());
+	//ndAssert(columns == me[0].GetCount());
+	ndAssert(columns == GetColumns());
+	ndAssert(output.GetCount() == GetCount());
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		output[i] = ndDotProduct(columns, &me[i][0], &input[0]);

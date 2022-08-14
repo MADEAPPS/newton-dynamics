@@ -72,11 +72,11 @@ inline ndFastRay::ndFastRay(const ndVector& l0, const ndVector& l1)
 	,m_minT(ndFloat32(0.0f))
 	,m_maxT(ndFloat32(1.0f))
 {
-	dAssert(m_p0.m_w == ndFloat32(0.0f));
-	dAssert(m_p1.m_w == ndFloat32(0.0f));
-	dAssert(m_diff.m_w == ndFloat32(0.0f));
+	ndAssert(m_p0.m_w == ndFloat32(0.0f));
+	ndAssert(m_p1.m_w == ndFloat32(0.0f));
+	ndAssert(m_diff.m_w == ndFloat32(0.0f));
 
-	dAssert(m_diff.DotProduct(m_diff).GetScalar() > ndFloat32(0.0f));
+	ndAssert(m_diff.DotProduct(m_diff).GetScalar() > ndFloat32(0.0f));
 	m_isParallel = (m_diff.Abs() < ndVector(1.0e-8f));
 	m_dpInv = m_diff.Select(ndVector(ndFloat32(1.0e-20f)), m_isParallel).Reciproc() & ndVector::m_triplexMask;
 	m_unitDir = m_diff.Normalize();
@@ -85,7 +85,7 @@ inline ndFastRay::ndFastRay(const ndVector& l0, const ndVector& l1)
 inline ndRay ndFastRay::PointDistance(const ndVector& point) const
 {
 	//dBigVector dp(ray_p1 - ray_p0);
-	//dAssert(dp.m_w == ndFloat32(0.0f));
+	//ndAssert(dp.m_w == ndFloat32(0.0f));
 	ndFloat32 t = ndClamp(m_diff.DotProduct(point - m_p0).GetScalar() / m_diff.DotProduct(m_diff).GetScalar(), ndFloat32(0.0f), ndFloat32(1.0f));
 	return ndRay (m_p0 + m_diff.Scale(t), point);
 }
@@ -169,7 +169,7 @@ inline ndFloat32 ndFastRay::BoxIntersect(const ndVector& minBox, const ndVector&
 	ndVector mask(t0 < t1);
 	ndVector maxDist(ndFloat32(1.2f));
 	t0 = maxDist.Select(t0, mask);
-	dAssert((mask.GetSignMask() & 1) == (t0.m_x < ndFloat32(1.0f)));
+	ndAssert((mask.GetSignMask() & 1) == (t0.m_x < ndFloat32(1.0f)));
 	return t0.GetScalar();
 }
 

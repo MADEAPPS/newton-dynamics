@@ -88,8 +88,8 @@ inline ndFastAabb::ndFastAabb(const ndVector& p0, const ndVector& p1)
 	,m_separationDistance(ndFloat32(1.0e10f))
 {
 	m_posit = (ndVector::m_half * (p1 + p0)) | ndVector::m_wOne;
-	dAssert(m_size.m_w == ndFloat32(0.0f));
-	dAssert(m_posit.m_w == ndFloat32(1.0f));
+	ndAssert(m_size.m_w == ndFloat32(0.0f));
+	ndAssert(m_posit.m_w == ndFloat32(1.0f));
 }
 
 inline const ndVector& ndFastAabb::GetOrigin() const

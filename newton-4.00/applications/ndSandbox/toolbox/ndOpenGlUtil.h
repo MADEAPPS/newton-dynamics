@@ -65,15 +65,15 @@ class glVector3
 
 	GLfloat& operator[] (ndInt32 i)
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32(sizeof(m_data) / sizeof(m_data[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32(sizeof(m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
 	const GLfloat& operator[] (ndInt32 i) const
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32(sizeof(m_data) / sizeof(m_data[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32(sizeof(m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 	union
@@ -117,15 +117,15 @@ class glVector4
 
 	GLfloat& operator[] (ndInt32 i)
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32 (sizeof (m_data) / sizeof(m_data[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
 	const GLfloat& operator[] (ndInt32 i) const
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32 (sizeof (m_data) / sizeof(m_data[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
@@ -155,15 +155,15 @@ class glMatrix
 
 	glVector4& operator[] (ndInt32 i)
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32 (sizeof (m_data) / sizeof(m_data[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
 	const glVector4& operator[] (ndInt32 i) const
 	{
-		dAssert(i >= 0);
-		dAssert(i < ndInt32(sizeof (m_data)/sizeof (m_data[0])));
+		ndAssert(i >= 0);
+		ndAssert(i < ndInt32(sizeof (m_data)/sizeof (m_data[0])));
 		return m_data[i];
 	}
 

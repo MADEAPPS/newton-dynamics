@@ -299,7 +299,7 @@ class ndAiBipedTest_1 : public ndModel
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
-		dAssert(shape);
+		ndAssert(shape);
 
 		// create the rigid body that will make this body
 		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
@@ -356,7 +356,7 @@ class ndAiBipedTest_1 : public ndModel
 			}
 
 			default:
-				dAssert(0);
+				ndAssert(0);
 		}
 		return nullptr;
 	}

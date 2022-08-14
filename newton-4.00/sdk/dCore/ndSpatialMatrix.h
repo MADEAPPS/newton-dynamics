@@ -51,15 +51,15 @@ class ndSpatialMatrix
 	
 	inline ndSpatialVector& operator[] (ndInt32 i)
 	{
-		dAssert(i < 6);
-		dAssert(i >= 0);
+		ndAssert(i < 6);
+		ndAssert(i >= 0);
 		return m_rows[i];
 	}
 
 	inline const ndSpatialVector& operator[] (ndInt32 i) const
 	{
-		dAssert(i < 6);
-		dAssert(i >= 0);
+		ndAssert(i < 6);
+		ndAssert(i >= 0);
 		return m_rows[i];
 	}
 

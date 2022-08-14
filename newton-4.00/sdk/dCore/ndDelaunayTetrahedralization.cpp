@@ -94,9 +94,9 @@ ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* cons
 					q.m_y += ndFloat64 (1.0e-3f);
 					q.m_z += ndFloat64 (1.0e-3f);
 					index = AddVertex(q);
-					dAssert (index != -1);
+					ndAssert (index != -1);
 				}
-				dAssert (index != -1);
+				ndAssert (index != -1);
 				m_points[index].m_index = i;
 			}
 		}
@@ -116,7 +116,7 @@ ndInt32 ndDelaunayTetrahedralization::AddVertex (const ndBigVector& vertex)
 	ndSetPrecisionDouble precision;
 
 	ndBigVector p (vertex);
-	dAssert(p.m_w == ndFloat32(0.0f));
+	ndAssert(p.m_w == ndFloat32(0.0f));
 	p.m_w = p.DotProduct(p).GetScalar();
 	ndInt32 index = ndConvexHull4d::AddVertex(p);
 

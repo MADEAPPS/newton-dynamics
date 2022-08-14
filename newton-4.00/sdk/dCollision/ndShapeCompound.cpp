@@ -71,7 +71,7 @@ ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 	,m_myNode(nullptr)
 	,m_shapeInstance(nullptr)
 {
-	dAssert(!copyFrom.m_shapeInstance);
+	ndAssert(!copyFrom.m_shapeInstance);
 }
 
 ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
@@ -120,8 +120,8 @@ inline void ndShapeCompound::ndNodeBase::SetBox(const ndVector& p0, const ndVect
 {
 	m_p0 = p0;
 	m_p1 = p1;
-	dAssert(m_p0.m_w == ndFloat32(0.0f));
-	dAssert(m_p1.m_w == ndFloat32(0.0f));
+	ndAssert(m_p0.m_w == ndFloat32(0.0f));
+	ndAssert(m_p1.m_w == ndFloat32(0.0f));
 	m_size = ndVector::m_half * (m_p1 - m_p0);
 	m_origin = ndVector::m_half * (m_p1 + m_p0);
 	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
@@ -146,7 +146,7 @@ class ndShapeCompound::ndSpliteInfo
 			for (ndInt32 i = 0; i < boxCount; ++i)
 			{
 				ndNodeBase* const node = boxArray[i];
-				dAssert(node->m_type == m_leaf);
+				ndAssert(node->m_type == m_leaf);
 				minP = minP.GetMin(node->m_p0);
 				maxP = maxP.GetMax(node->m_p1);
 			}
@@ -159,7 +159,7 @@ class ndShapeCompound::ndSpliteInfo
 			for (ndInt32 i = 0; i < boxCount; ++i)
 			{
 				ndNodeBase* const node = boxArray[i];
-				dAssert(node->m_type == m_leaf);
+				ndAssert(node->m_type == m_leaf);
 				minP = minP.GetMin(node->m_p0);
 				maxP = maxP.GetMax(node->m_p1);
 				ndVector p(ndVector::m_half * (node->m_p0 + node->m_p1));
@@ -229,9 +229,9 @@ class ndShapeCompound::ndSpliteInfo
 			m_axis = i0 + 1;
 		}
 
-		dAssert(maxP.m_x - minP.m_x >= ndFloat32(0.0f));
-		dAssert(maxP.m_y - minP.m_y >= ndFloat32(0.0f));
-		dAssert(maxP.m_z - minP.m_z >= ndFloat32(0.0f));
+		ndAssert(maxP.m_x - minP.m_x >= ndFloat32(0.0f));
+		ndAssert(maxP.m_y - minP.m_y >= ndFloat32(0.0f));
+		ndAssert(maxP.m_z - minP.m_z >= ndFloat32(0.0f));
 		m_p0 = minP;
 		m_p1 = maxP;
 	}
@@ -316,7 +316,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 						}
 						else 
 						{
-							dAssert(sourceNode->m_parent->m_right == sourceNode);
+							ndAssert(sourceNode->m_parent->m_right == sourceNode);
 							parent->m_parent->m_right = parent;
 						}
 					}
@@ -325,7 +325,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 			else 
 			{
 				ndNodeBase* const node = m_array.Find(sourceNode->m_myNode->GetKey())->GetInfo();
-				dAssert(node);
+				ndAssert(node);
 				node->m_parent = parents[stack];
 				if (node->m_parent) 
 				{
@@ -335,7 +335,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 					}
 					else 
 					{
-						dAssert(sourceNode->m_parent->m_right == sourceNode);
+						ndAssert(sourceNode->m_parent->m_right == sourceNode);
 						node->m_parent->m_right = node;
 					}
 				}
@@ -350,7 +350,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 				parents[stack] = parent;
 				pool[stack] = sourceNode->m_left;
 				stack++;
-				dAssert(stack < D_COMPOUND_STACK_DEPTH);
+				ndAssert(stack < D_COMPOUND_STACK_DEPTH);
 			}
 	
 			if (sourceNode->m_right) 
@@ -358,7 +358,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 				parents[stack] = parent;
 				pool[stack] = sourceNode->m_right;
 				stack++;
-				dAssert(stack < D_COMPOUND_STACK_DEPTH);
+				ndAssert(stack < D_COMPOUND_STACK_DEPTH);
 			}
 		}
 	}
@@ -412,7 +412,7 @@ void ndShapeCompound::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 //ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
 ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, const ndInt32* const, ndInt32, ndInt32, const dPlane&, ndVector* const) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return 0;
 	//ndInt32 count = 0;
 	//ndInt32 j = index[indexCount - 1] * stride;
@@ -429,13 +429,13 @@ ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, cons
 	//	if (side0 < ndFloat32(0.0f)) {
 	//		if (side1 >= ndFloat32(0.0f)) {
 	//			ndVector dp(p1 - p0);
-	//			dAssert(dp.m_w == ndFloat32(0.0f));
+	//			ndAssert(dp.m_w == ndFloat32(0.0f));
 	//			ndFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//			dAssert(dgAbs(t) >= ndFloat32(0.0f));
+	//			ndAssert(dgAbs(t) >= ndFloat32(0.0f));
 	//			if (dgAbs(t) < ndFloat32(1.0e-8f)) {
 	//				t = dgSign(t) * ndFloat32(1.0e-8f);
 	//			}
-	//			dAssert(0);
+	//			ndAssert(0);
 	//			contactsOut[count] = p0 - dp.Scale(side0 / t);
 	//			count++;
 	//
@@ -443,13 +443,13 @@ ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, cons
 	//	}
 	//	else if (side1 <= ndFloat32(0.0f)) {
 	//		ndVector dp(p1 - p0);
-	//		dAssert(dp.m_w == ndFloat32(0.0f));
+	//		ndAssert(dp.m_w == ndFloat32(0.0f));
 	//		ndFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//		dAssert(dgAbs(t) >= ndFloat32(0.0f));
+	//		ndAssert(dgAbs(t) >= ndFloat32(0.0f));
 	//		if (dgAbs(t) < ndFloat32(1.0e-8f)) {
 	//			t = dgSign(t) * ndFloat32(1.0e-8f);
 	//		}
-	//		dAssert(0);
+	//		ndAssert(0);
 	//		contactsOut[count] = p0 - dp.Scale(side0 / t);
 	//		count++;
 	//	}
@@ -492,7 +492,7 @@ void ndShapeCompound::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 
 ndFloat32 ndShapeCompound::GetVolume() const
 {
-	dAssert(0);
+	ndAssert(0);
 	return ndFloat32(0.0f);
 }
 
@@ -524,32 +524,32 @@ void ndShapeCompound::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 
 ndVector ndShapeCompound::SupportVertex(const ndVector&, ndInt32* const) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return ndVector::m_zero;
 }
 
 //ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
 ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector&) const
 { 
-	dAssert(0);
+	ndAssert(0);
 	return ndVector::m_zero;
 }
 
 ndVector ndShapeCompound::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const vertexIndex) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return SupportVertex(dir, vertexIndex);
 }
 
 ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return 0;
 }
 
 ndVector ndShapeCompound::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return ndVector::m_zero;
 }
 
@@ -581,7 +581,7 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 		else 
 		{
 			const ndNodeBase* const me = stackPool[stack];
-			dAssert (me);
+			ndAssert (me);
 			if (me->m_type == m_leaf) 
 			{
 				ndContactPoint tmpContactOut;
@@ -602,9 +602,9 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			} 
 			else 
 			{
-				dAssert (me->m_type == m_node);
+				ndAssert (me->m_type == m_node);
 				const ndNodeBase* const left = me->m_left;
-				dAssert (left);
+				ndAssert (left);
 				ndFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
 				if (dist1 < maxT) 
 				{
@@ -617,11 +617,11 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 					stackPool[j] = left;
 					distance[j] = dist1;
 					stack++;
-					dAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+					ndAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 				
 				const ndNodeBase* const right = me->m_right;
-				dAssert (right);
+				ndAssert (right);
 				dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
 				if (dist1 < maxT) 
 				{
@@ -634,7 +634,7 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 					stackPool[j] = right;
 					distance[j] = dist1;
 					stack++;
-					dAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+					ndAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 			}
 		}
@@ -644,7 +644,7 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 
 void ndShapeCompound::BeginAddRemove()
 {
-	dAssert(m_myInstance);
+	ndAssert(m_myInstance);
 }
 
 ndFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, ndVector& minBox, ndVector& maxBox) const
@@ -657,8 +657,8 @@ ndFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeB
 
 void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 {
-	dAssert(node->m_left);
-	dAssert(node->m_right);
+	ndAssert(node->m_left);
+	ndAssert(node->m_right);
 
 	if (node->m_parent) 
 	{
@@ -674,8 +674,8 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 			ndVector cost2P1;
 			ndFloat32 cost2 = CalculateSurfaceArea(node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
 
-			dAssert(node->m_parent->m_p0.m_w == ndFloat32(0.0f));
-			dAssert(node->m_parent->m_p1.m_w == ndFloat32(0.0f));
+			ndAssert(node->m_parent->m_p0.m_w == ndFloat32(0.0f));
+			ndAssert(node->m_parent->m_p1.m_w == ndFloat32(0.0f));
 
 			if ((cost1 <= cost0) && (cost1 <= cost2)) 
 			{
@@ -694,7 +694,7 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 					}
 					else 
 					{
-						dAssert(parent->m_parent->m_right == parent);
+						ndAssert(parent->m_parent->m_right == parent);
 						parent->m_parent->m_right = node;
 					}
 				}
@@ -727,7 +727,7 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 					}
 					else 
 					{
-						dAssert(parent->m_parent->m_right == parent);
+						ndAssert(parent->m_parent->m_right == parent);
 						parent->m_parent->m_right = node;
 					}
 				}
@@ -773,7 +773,7 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 					}
 					else 
 					{
-						dAssert(parent->m_parent->m_right == parent);
+						ndAssert(parent->m_parent->m_right == parent);
 						parent->m_parent->m_right = node;
 					}
 				}
@@ -807,7 +807,7 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 					}
 					else 
 					{
-						dAssert(parent->m_parent->m_right == parent);
+						ndAssert(parent->m_parent->m_right == parent);
 						parent->m_parent->m_right = node;
 					}
 				}
@@ -855,8 +855,8 @@ ndFloat64 ndShapeCompound::CalculateEntropy(ndInt32 count, ndNodeBase** array)
 
 ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDown(ndNodeBase** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBase** rootNodesMemory, ndInt32& rootIndex)
 {
-	dAssert(lastBox >= 0);
-	dAssert(firstBox >= 0);
+	ndAssert(lastBox >= 0);
+	ndAssert(firstBox >= 0);
 	
 	if (lastBox == firstBox) 
 	{
@@ -915,7 +915,7 @@ ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const
 	for (ndInt32 i = 0; i <= count; ++i) 
 	{
 		const ndNodeBase* const node = leafArray[firstBox + i];
-		dAssert(node->m_shapeInstance);
+		ndAssert(node->m_shapeInstance);
 		minP = minP.GetMin(node->m_p0);
 		maxP = maxP.GetMax(node->m_p1);
 	}
@@ -957,15 +957,15 @@ void ndShapeCompound::EndAddRemove()
 			{
 				nodeArray[nodeCount] = node;
 				nodeCount++;
-				dAssert(nodeCount <= m_array.GetCount());
+				ndAssert(nodeCount <= m_array.GetCount());
 
 				stackBuffer[stack] = node->m_right;
 				stack++;
-				dAssert(stack < ndInt32 (sizeof(stackBuffer) / sizeof(stackBuffer[0])));
+				ndAssert(stack < ndInt32 (sizeof(stackBuffer) / sizeof(stackBuffer[0])));
 
 				stackBuffer[stack] = node->m_left;
 				stack++;
-				dAssert(stack < ndInt32(sizeof(stackBuffer) / sizeof(stackBuffer[0])));
+				ndAssert(stack < ndInt32(sizeof(stackBuffer) / sizeof(stackBuffer[0])));
 			}
 		}
 		
@@ -983,13 +983,13 @@ void ndShapeCompound::EndAddRemove()
 					{
 						leafArray[leafNodesCount] = node->m_left;
 						leafNodesCount++;
-						dAssert(leafNodesCount <= (nodeCount + 1));
+						ndAssert(leafNodesCount <= (nodeCount + 1));
 					}
 					if (node->m_right->m_type == m_leaf) 
 					{
 						leafArray[leafNodesCount] = node->m_right;
 						leafNodesCount++;
-						dAssert(leafNodesCount <= (nodeCount + 1));
+						ndAssert(leafNodesCount <= (nodeCount + 1));
 					}
 				}
 		
@@ -1031,7 +1031,7 @@ void ndShapeCompound::EndAddRemove()
 			m_treeEntropy = ndFloat32(2.0f);
 		}
 		
-		dAssert(m_root->m_size.m_w == ndFloat32(0.0f));
+		ndAssert(m_root->m_size.m_w == ndFloat32(0.0f));
 		m_boxMinRadius = ndMin(ndMin(m_root->m_size.m_x, m_root->m_size.m_y), m_root->m_size.m_z);
 		m_boxMaxRadius = ndSqrt(m_root->m_size.DotProduct(m_root->m_size).GetScalar());
 		
@@ -1043,7 +1043,7 @@ void ndShapeCompound::EndAddRemove()
 
 ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInstance* const subInstance)
 {
-	dAssert(m_myInstance);
+	ndAssert(m_myInstance);
 	ndNodeBase* const newNode = new ndNodeBase(subInstance);
 	m_array.AddNode(newNode, m_idIndex, m_myInstance);
 
@@ -1107,7 +1107,7 @@ ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInsta
 			}
 			else 
 			{
-				dAssert(parent->m_right == sibling);
+				ndAssert(parent->m_right == sibling);
 				ndNodeBase* const node = new ndNodeBase(sibling, newNode);
 				parent->m_right = node;
 				node->m_parent = parent;
@@ -1127,7 +1127,7 @@ void ndShapeCompound::MassProperties()
 	//	dgPolyhedraMassProperties localData;
 	//	DebugCollision (dgGetIdentityMatrix(), CalculateInertia, &localData);
 	//	ndFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
-	//	dAssert (volume_ > ndFloat32 (0.0f));
+	//	ndAssert (volume_ > ndFloat32 (0.0f));
 	//	ndFloat32 invVolume_ = ndFloat32 (1.0f)/volume_;
 	//	m_centerOfMass = origin_.Scale (invVolume_);
 	//	m_centerOfMass.m_w = volume_;

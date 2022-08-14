@@ -208,7 +208,7 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolera
 		matrixOper.MatrixTimeVector(m_p0, m_z0);
 		T den = ndDotProduct(size, m_p0, m_z0);
 	
-		dAssert(fabs(den) > T(0.0f));
+		ndAssert(fabs(den) > T(0.0f));
 		T alpha = num / den;
 	
 		ndScaleAdd(size, x, x, m_p0, alpha);
@@ -231,7 +231,7 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolera
 		iter++;
 		error2 = num;
 	}
-	dAssert(iter <= size);
+	ndAssert(iter <= size);
 	return num;
 }
 

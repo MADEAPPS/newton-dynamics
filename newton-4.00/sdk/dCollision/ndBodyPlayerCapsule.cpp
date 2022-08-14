@@ -419,7 +419,7 @@ ndFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver&
 			}
 			timestep += dt;
 		}
-		dAssert(0);
+		ndAssert(0);
 	}
 
 	return timestep;
@@ -583,7 +583,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			{
 				m_contactBuffer[m_contactCount] = contactBuffer[i];
 				m_contactCount++;
-				dAssert(m_contactCount < ndInt32 (sizeof(m_contactBuffer) / sizeof(m_contactBuffer[0])));
+				ndAssert(m_contactCount < ndInt32 (sizeof(m_contactBuffer) / sizeof(m_contactBuffer[0])));
 			}
 		}
 	}
@@ -602,7 +602,7 @@ ndInt32 ndBodyPlayerCapsuleImpulseSolver::AddLinearRow(const ndVector& dir, cons
 	m_normalIndex[m_rowCount] = (normalIndex == -1) ? 0 : normalIndex - m_rowCount;
 	m_rhs[m_rowCount] = speed - m_veloc.DotProduct(m_jacobianPairs[m_rowCount].m_jacobianM0.m_linear).GetScalar();
 	m_rowCount++;
-	dAssert(m_rowCount < D_PLAYER_MAX_ROWS);
+	ndAssert(m_rowCount < D_PLAYER_MAX_ROWS);
 	return m_rowCount - 1;
 }
 
@@ -661,7 +661,7 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 		}
 	}
 
-	dAssert(ndTestPSDmatrix(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0]));
+	ndAssert(ndTestPSDmatrix(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0]));
 	ndGaussSeidelLcpSor(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0], m_impulseMag, m_rhs, m_normalIndex, m_low, m_high, ndFloat32(1.0e-6f), 32, ndFloat32(1.1f));
 
 	ndVector netImpulse(0.0f);
@@ -674,7 +674,7 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 
 ndInt32 ndBodyPlayerCapsuleImpulseSolver::AddContactRow(const ndContactPoint* const contact, const ndVector& dir, const ndVector& r, ndFloat32 speed, ndFloat32 low, ndFloat32 high, ndInt32 normalIndex)
 {
-	dAssert(contact->m_body1);
+	ndAssert(contact->m_body1);
 	if (contact->m_body1->GetInvMass() == ndFloat32 (0.0f)) 
 	{
 		return AddLinearRow(dir, r, speed, low, high, normalIndex);
@@ -706,7 +706,7 @@ ndInt32 ndBodyPlayerCapsuleImpulseSolver::AddContactRow(const ndContactPoint* co
 	m_rhs[m_rowCount] = speed - reactionSpeed.AddHorizontal().GetScalar();
 	
 	m_rowCount++;
-	dAssert(m_rowCount < D_PLAYER_MAX_ROWS);
+	ndAssert(m_rowCount < D_PLAYER_MAX_ROWS);
 	return m_rowCount - 1;
 }
 
@@ -726,7 +726,7 @@ void ndBodyPlayerCapsuleImpulseSolver::AddAngularRows()
 		m_impulseMag[m_rowCount] = ndFloat32(0.0f);
 		m_normalIndex[m_rowCount] = 0;
 		m_rowCount++;
-		dAssert(m_rowCount < D_PLAYER_MAX_ROWS);
+		ndAssert(m_rowCount < D_PLAYER_MAX_ROWS);
 	}
 }
 

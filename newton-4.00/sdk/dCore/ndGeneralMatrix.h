@@ -365,7 +365,7 @@ void ndEigenValues(const ndInt32 size, const ndInt32 stride, const T* const symm
 				iter++;
 				if (iter == 10) 
 				{
-					dAssert(0);
+					ndAssert(0);
 					return;
 				}
 
@@ -678,7 +678,7 @@ void ndCalculateDelta_r(ndInt32 size, ndInt32 n, const T* const matrix, const T*
 template<class T>
 void ndHouseholderReflection(ndInt32 size, ndInt32 row, ndInt32 colum, T* const choleskyMatrix, T* const tmp, T* const reflection)
 {
-	dAssert(row <= colum);
+	ndAssert(row <= colum);
 	if (row < colum) 
 	{
 		for (ndInt32 i = row; i <= colum; ++i) 
@@ -839,7 +839,7 @@ void ndSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x,
 	memcpy(lowerTriangularMatrix, symmetricMatrixPSD, sizeof(T) * size * size);
 #ifdef _DEBUG
 	bool valid = ndCholeskyFactorization(size, lowerTriangularMatrix);
-	dAssert(valid);
+	ndAssert(valid);
 #else
 	ndCholeskyFactorization(size, lowerTriangularMatrix);
 #endif
@@ -921,12 +921,12 @@ void ndSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x,
 				ndCalculateDelta_x(size, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
 				ndCalculateDelta_r(size, index, symmetricMatrixPSD, delta_x, delta_r);
 
-				dAssert(delta_r[index] != T(0.0f));
-				dAssert(ndAbs(delta_x[index]) == T(1.0f));
+				ndAssert(delta_r[index] != T(0.0f));
+				ndAssert(ndAbs(delta_x[index]) == T(1.0f));
 				delta_r[index] = (delta_r[index] == T(0.0f)) ? T(1.0e-12f) : delta_r[index];
 
 				T scale = -r0[index] / delta_r[index];
-				dAssert(ndAbs(scale) >= T(0.0f));
+				ndAssert(ndAbs(scale) >= T(0.0f));
 
 				for (ndInt32 i = 0; i <= index; ++i) 
 				{
@@ -944,17 +944,17 @@ void ndSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x,
 						scale = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				dAssert(ndAbs(scale) >= T(0.0f));
+				ndAssert(ndAbs(scale) >= T(0.0f));
 
 				for (ndInt32 i = clampedIndex; (i < size) && (scale > T(1.0e-12f)); ++i) 
 				{
 					T r1 = r0[i] + scale * delta_r[i];
 					if ((r1 * r0[i]) < T(0.0f)) 
 					{
-						dAssert(ndAbs(delta_r[i]) > T(0.0f));
+						ndAssert(ndAbs(delta_r[i]) > T(0.0f));
 						T s1 = -r0[i] / delta_r[i];
-						dAssert(ndAbs(s1) >= T(0.0f));
-						dAssert(ndAbs(s1) <= ndAbs(scale));
+						ndAssert(ndAbs(s1) >= T(0.0f));
+						ndAssert(ndAbs(s1) <= ndAbs(scale));
 						if (ndAbs(s1) < ndAbs(scale)) 
 						{
 							scale = s1;
@@ -994,34 +994,34 @@ void ndSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x,
 			{
 				loop = true;
 				r0[swapIndex] = T(0.0f);
-				dAssert(swapIndex < size);
-				dAssert(clampedIndex <= size);
+				ndAssert(swapIndex < size);
+				ndAssert(clampedIndex <= size);
 				if (swapIndex < clampedIndex) 
 				{
 					count--;
 					clampedIndex--;
 					ndPermuteRows(size, clampedIndex, swapIndex, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
 					ndCholeskyUpdate(size, swapIndex, clampedIndex, lowerTriangularMatrix, tmp0, tmp1, symmetricMatrixPSD);
-					dAssert(clampedIndex >= index);
+					ndAssert(clampedIndex >= index);
 				} 
 				else 
 				{
 					count++;
-					dAssert(clampedIndex < size);
+					ndAssert(clampedIndex < size);
 					ndPermuteRows(size, clampedIndex, swapIndex, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
 					ndCholeskyUpdate(size, clampedIndex, swapIndex, lowerTriangularMatrix, tmp0, tmp1, symmetricMatrixPSD);
 					clampedIndex++;
-					dAssert(clampedIndex <= size);
-					dAssert(clampedIndex >= index);
+					ndAssert(clampedIndex <= size);
+					ndAssert(clampedIndex >= index);
 				}
 			} 
 			else 
 			{
-				dAssert(index > 0);
+				ndAssert(index > 0);
 				x0[swapIndex] = clamp_x;
 				delta_x[index] = T(0.0f);
 
-				dAssert(swapIndex < index);
+				ndAssert(swapIndex < index);
 				ndPermuteRows(size, swapIndex, index - 1, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
 				ndPermuteRows(size, index - 1, index, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
 				ndPermuteRows(size, clampedIndex - 1, index, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);

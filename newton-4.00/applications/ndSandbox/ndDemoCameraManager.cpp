@@ -210,7 +210,7 @@ void ndDemoCameraManager::RenderPickedTarget () const
 {
 	if (m_targetPicked) 
 	{
-		dAssert(0);
+		ndAssert(0);
 		//ndMatrix matrix;
 		//NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
 		//

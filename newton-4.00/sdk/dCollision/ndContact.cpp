@@ -61,15 +61,15 @@ ndContact::~ndContact()
 
 void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
-	dAssert(body0);
-	dAssert(body1);
+	ndAssert(body0);
+	ndAssert(body1);
 	m_body0 = body0;
 	m_body1 = body1;
 	if (m_body0->GetInvMass() == ndFloat32(0.0f))
 	{
 		ndSwap(m_body1, m_body0);
 	}
-	dAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
+	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
 }
 
 void ndContact::AttachToBodies()
@@ -134,8 +134,8 @@ void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 #ifdef D_USE_PRECONTIONER_EXPERIMENT
 void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir0, const ndVector& dir1, const ndPointParam& param) const
 {
-	dAssert(m_body0);
-	dAssert(m_body1);
+	ndAssert(m_body0);
+	ndAssert(m_body1);
 
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
@@ -145,10 +145,10 @@ void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& d
 	jacobian0.m_angular = param.m_r0.CrossProduct(dir0);
 	jacobian1.m_angular = dir1.CrossProduct(param.m_r1);
 
-	dAssert(jacobian0.m_linear.m_w == ndFloat32(0.0f));
-	dAssert(jacobian0.m_angular.m_w == ndFloat32(0.0f));
-	dAssert(jacobian1.m_linear.m_w == ndFloat32(0.0f));
-	dAssert(jacobian1.m_angular.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian0.m_linear.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian0.m_angular.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian1.m_linear.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian1.m_angular.m_w == ndFloat32(0.0f));
 }
 
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex, const ndVector& preconditioner0, const ndVector& preconditioner1)
@@ -164,7 +164,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
 	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 
-	dAssert(contact.m_normal.m_w == ndFloat32(0.0f));
+	ndAssert(contact.m_normal.m_w == ndFloat32(0.0f));
 	const ndJacobian& normalJacobian0 = desc.m_jacobian[normalIndex].m_jacobianM0;
 	const ndJacobian& normalJacobian1 = desc.m_jacobian[normalIndex].m_jacobianM1;
 	const ndFloat32 restitutionCoefficient = contact.m_material.m_restitution;
@@ -181,7 +181,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	const ndFloat32 restitutionVelocity = (relSpeed > D_REST_RELATIVE_VELOCITY) ? relSpeed * restitutionCoefficient : ndFloat32(0.0f);
 	const ndFloat32 penetrationStiffness = D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness;
 	const ndFloat32 penetrationVeloc = penetration * penetrationStiffness;
-	dAssert(ndAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < ndFloat32(1.0e-6f));
+	ndAssert(ndAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < ndFloat32(1.0e-6f));
 	desc.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	relSpeed += ndMax(restitutionVelocity, penetrationVeloc);
 	
@@ -192,7 +192,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * desc.m_timestep;
 	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
-		dAssert(0);
+		ndAssert(0);
 		desc.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 //return;
@@ -202,7 +202,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	{
 		ndInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
-		dAssert(contact.m_dir0.m_w == ndFloat32(0.0f));
+		ndAssert(contact.m_dir0.m_w == ndFloat32(0.0f));
 		CalculatePointDerivative(jacobIndex, desc, contact.m_dir0 * preconditioner0, contact.m_dir0 * preconditioner1, pointData);
 	
 		const ndJacobian &jacobian0 = desc.m_jacobian[jacobIndex].m_jacobianM0;
@@ -221,7 +221,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			desc.m_restitution[jacobIndex] = ndFloat32(-1.0f);
-			dAssert(0);
+			ndAssert(0);
 			desc.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		}
 		else 
@@ -247,7 +247,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	{
 		ndInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
-		dAssert(contact.m_dir1.m_w == ndFloat32(0.0f));
+		ndAssert(contact.m_dir1.m_w == ndFloat32(0.0f));
 		CalculatePointDerivative(jacobIndex, desc, contact.m_dir1 * preconditioner0, contact.m_dir1 * preconditioner1, pointData);
 	
 		const ndJacobian &jacobian0 = desc.m_jacobian[jacobIndex].m_jacobianM0;
@@ -265,7 +265,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			desc.m_restitution[jacobIndex] = ndFloat32(-1.0f);
-			dAssert(0);
+			ndAssert(0);
 			desc.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		}
 		else 
@@ -292,8 +292,8 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 
 void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const ndPointParam& param) const
 {
-	dAssert(m_body0);
-	dAssert(m_body1);
+	ndAssert(m_body0);
+	ndAssert(m_body1);
 
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
@@ -303,10 +303,10 @@ void ndContact::CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& d
 	jacobian0.m_angular = param.m_r0.CrossProduct(dir);
 	jacobian1.m_angular = dir.CrossProduct(param.m_r1);
 
-	dAssert(jacobian0.m_linear.m_w == ndFloat32(0.0f));
-	dAssert(jacobian0.m_angular.m_w == ndFloat32(0.0f));
-	dAssert(jacobian1.m_linear.m_w == ndFloat32(0.0f));
-	dAssert(jacobian1.m_angular.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian0.m_linear.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian0.m_angular.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian1.m_linear.m_w == ndFloat32(0.0f));
+	ndAssert(jacobian1.m_angular.m_w == ndFloat32(0.0f));
 }
 
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex)
@@ -322,7 +322,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
 	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 
-	dAssert(contact.m_normal.m_w == ndFloat32(0.0f));
+	ndAssert(contact.m_normal.m_w == ndFloat32(0.0f));
 	const ndJacobian& normalJacobian0 = desc.m_jacobian[normalIndex].m_jacobianM0;
 	const ndJacobian& normalJacobian1 = desc.m_jacobian[normalIndex].m_jacobianM1;
 	const ndFloat32 restitutionCoefficient = contact.m_material.m_restitution;
@@ -339,7 +339,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	const ndFloat32 restitutionVelocity = (relSpeed > D_REST_RELATIVE_VELOCITY) ? relSpeed * restitutionCoefficient : ndFloat32(0.0f);
 	const ndFloat32 penetrationStiffness = D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness;
 	const ndFloat32 penetrationVeloc = penetration * penetrationStiffness;
-	dAssert(ndAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < ndFloat32(1.0e-6f));
+	ndAssert(ndAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < ndFloat32(1.0e-6f));
 	desc.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	relSpeed += ndMax(restitutionVelocity, penetrationVeloc);
 
@@ -350,7 +350,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * desc.m_timestep;
 	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
-		dAssert(0);
+		ndAssert(0);
 		desc.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 	//return;
@@ -360,7 +360,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	{
 		ndInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
-		dAssert(contact.m_dir0.m_w == ndFloat32(0.0f));
+		ndAssert(contact.m_dir0.m_w == ndFloat32(0.0f));
 		CalculatePointDerivative(jacobIndex, desc, contact.m_dir0, pointData);
 
 		const ndJacobian &jacobian0 = desc.m_jacobian[jacobIndex].m_jacobianM0;
@@ -379,7 +379,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			desc.m_restitution[jacobIndex] = ndFloat32(-1.0f);
-			dAssert(0);
+			ndAssert(0);
 			desc.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		}
 		else
@@ -405,7 +405,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	{
 		ndInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
-		dAssert(contact.m_dir1.m_w == ndFloat32(0.0f));
+		ndAssert(contact.m_dir1.m_w == ndFloat32(0.0f));
 		CalculatePointDerivative(jacobIndex, desc, contact.m_dir1, pointData);
 
 		const ndJacobian &jacobian0 = desc.m_jacobian[jacobIndex].m_jacobianM0;
@@ -423,7 +423,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			desc.m_restitution[jacobIndex] = ndFloat32(-1.0f);
-			dAssert(0);
+			ndAssert(0);
 			desc.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		}
 		else
@@ -460,8 +460,8 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 	const ndInt32 count = desc->m_rowsCount;
 	const ndFloat32 timestep = desc->m_timestep;
 	const ndFloat32 invTimestep = desc->m_invTimestep;
-	dAssert(desc->m_timestep > ndFloat32(0.0f));
-	dAssert(desc->m_invTimestep > ndFloat32(0.0f));
+	ndAssert(desc->m_timestep > ndFloat32(0.0f));
+	ndAssert(desc->m_invTimestep > ndFloat32(0.0f));
 
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;
@@ -482,8 +482,8 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 		
 			if (rhs->m_normalForceIndex == D_INDEPENDENT_ROW) 
 			{
-				dAssert(rhs->m_restitution >= ndFloat32 (0.0f));
-				dAssert(rhs->m_restitution <= ndFloat32(2.0f));
+				ndAssert(rhs->m_restitution >= ndFloat32 (0.0f));
+				ndAssert(rhs->m_restitution <= ndFloat32(2.0f));
 		
 				ndFloat32 penetrationVeloc = ndFloat32(0.0f);
 				ndFloat32 restitution = (vRel <= ndFloat32(0.0f)) ? (ndFloat32(1.0f) + rhs->m_restitution) : ndFloat32(1.0f);
@@ -492,7 +492,7 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 					if (vRel > ndFloat32(0.0f)) 
 					{
 						ndFloat32 penetrationCorrection = vRel * timestep;
-						dAssert(penetrationCorrection >= ndFloat32(0.0f));
+						ndAssert(penetrationCorrection >= ndFloat32(0.0f));
 						rhs->m_penetration = ndMax(ndFloat32(0.0f), rhs->m_penetration - penetrationCorrection);
 					}
 					else 

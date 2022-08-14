@@ -51,7 +51,7 @@ ndShapeChamferCylinder::ndShapeChamferCylinder(const ndLoadSaveBase::ndLoadDescr
 ndShapeChamferCylinder::~ndShapeChamferCylinder()
 {
 	m_shapeRefCount --;
-	dAssert (m_shapeRefCount >= 0);
+	ndAssert (m_shapeRefCount >= 0);
 
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
@@ -137,7 +137,7 @@ void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)
 		polyhedra.AddFace (DG_CHAMFERCYLINDER_BRAKES, wireframe);
 		polyhedra.EndFace ();
 
-		dAssert (SanityCheck (polyhedra));
+		ndAssert (SanityCheck (polyhedra));
 
 		ndUnsigned64 i = 0;
 		ndPolyhedra::Iterator iter (polyhedra);
@@ -179,7 +179,7 @@ void ndShapeChamferCylinder::CalculateAabb(const ndMatrix& matrix, ndVector& p0,
 {
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 
-//	dAssert(0);
+//	ndAssert(0);
 	//ndVector size0(m_radius0);
 	//ndVector size1(m_radius1);
 	//ndVector q0(matrix.m_posit - matrix.m_front.Scale(m_height));
@@ -255,14 +255,14 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 
 ndVector ndShapeChamferCylinder::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
 {
-	dAssert(dir.m_w == 0.0f);
+	ndAssert(dir.m_w == 0.0f);
 	return point + dir.Scale(m_height - D_PENETRATION_TOL);
 }
 
 ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndFloat32 x = dir.GetScalar();
 	if (ndAbs(x) > ndFloat32(0.9999f)) 
@@ -277,8 +277,8 @@ ndVector ndShapeChamferCylinder::SupportVertex(const ndVector& dir, ndInt32* con
 
 ndVector ndShapeChamferCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	ndFloat32 x = dir.GetScalar();
 	if (ndAbs(x) > ndFloat32(0.99995f)) 
@@ -287,7 +287,7 @@ ndVector ndShapeChamferCylinder::SupportVertexSpecial(const ndVector& dir, ndFlo
 	}
 
 	ndVector sideDir(m_yzMask & dir);
-	dAssert(sideDir.DotProduct(sideDir).GetScalar() > ndFloat32(0.0f));
+	ndAssert(sideDir.DotProduct(sideDir).GetScalar() > ndFloat32(0.0f));
 	return sideDir.Normalize().Scale(m_radius);
 }
 
@@ -367,7 +367,7 @@ ndFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const ndVec
 		if ((t0 >= 0.0f) && (t0 <= 1.0f)) 
 		{
 			contactOut.m_normal = localP0 + dq.Scale(t0) - origin0;
-			dAssert(contactOut.m_normal.m_w == ndFloat32(0.0f));
+			ndAssert(contactOut.m_normal.m_w == ndFloat32(0.0f));
 
 			//contactOut.m_normal = contactOut.m_normal * contactOut.m_normal.DotProduct(contactOut.m_normal).InvSqrt();
 			contactOut.m_normal = contactOut.m_normal.Normalize();
@@ -382,7 +382,7 @@ ndFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const ndVec
 		if ((t0 >= 0.0f) && (t0 <= 1.0f)) 
 		{
 			contactOut.m_normal = localP0 + dq.Scale(t0) - origin0;
-			dAssert(contactOut.m_normal.m_w == ndFloat32(0.0f));
+			ndAssert(contactOut.m_normal.m_w == ndFloat32(0.0f));
 
 			//contactOut.m_normal = contactOut.m_normal * contactOut.m_normal.DotProduct(contactOut.m_normal).InvSqrt();
 			contactOut.m_normal = contactOut.m_normal.Normalize();

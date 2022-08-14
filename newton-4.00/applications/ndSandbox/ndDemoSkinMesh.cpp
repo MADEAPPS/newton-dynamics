@@ -126,14 +126,14 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	{
 		ndVector w(weight[i]);
 		ndFloat32 invMag = w.m_x + w.m_y + w.m_z + w.m_w;
-		dAssert(invMag > 0.0f);
+		ndAssert(invMag > 0.0f);
 		invMag = 1.0f / invMag;
 		weight[i].m_x = w.m_x * invMag;
 		weight[i].m_y = w.m_y * invMag;
 		weight[i].m_z = w.m_z * invMag;
 		weight[i].m_w = w.m_w * invMag;
 	
-		dAssert(skinBone[i].m_boneIndex[0] != -1);
+		ndAssert(skinBone[i].m_boneIndex[0] != -1);
 		for (ndInt32 j = 0; j < 4; ++j) 
 		{
 			if (skinBone[i].m_boneIndex[j] != -1) 
@@ -337,8 +337,8 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix * shapeBindMatrix;
 
 		count++;
-		dAssert(count <= 128);
-		dAssert(count <= m_nodeCount);
+		ndAssert(count <= 128);
+		ndAssert(count <= m_nodeCount);
 		for (ndDemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) 
 		{
 			pool[stack] = node;

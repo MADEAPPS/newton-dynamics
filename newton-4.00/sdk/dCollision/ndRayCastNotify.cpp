@@ -40,8 +40,8 @@ bool ndRayCastNotify::TraceShape(const ndVector& globalOrigin, const ndVector& g
 	if (t <= ndFloat32 (1.0f))
 	{
 		ndVector p(shapeGlobal.TransformVector(localOrigin + (localDestination - localOrigin).Scale(t)));
-		dAssert(t >= ndFloat32(0.0f));
-		dAssert(t <= ndFloat32(1.0f));
+		ndAssert(t >= ndFloat32(0.0f));
+		ndAssert(t <= ndFloat32(1.0f));
 		m_param = t;
 		state = true;
 		m_contact.m_body0 = nullptr;

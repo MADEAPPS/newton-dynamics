@@ -252,8 +252,8 @@ void ndShapeInstance::CalculateObb(ndVector& origin, ndVector& size) const
 		}
 	}
 
-	dAssert(size.m_w == ndFloat32(0.0f));
-	dAssert(origin.m_w == ndFloat32(0.0f));
+	ndAssert(size.m_w == ndFloat32(0.0f));
+	ndAssert(origin.m_w == ndFloat32(0.0f));
 }
 
 ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
@@ -281,7 +281,7 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
 				if (t < ndFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					contactOut.m_shapeInstance0 = this;
 					contactOut.m_shapeInstance1 = this;
 				}
@@ -295,7 +295,7 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
 				if (t < ndFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					ndVector normal(m_invScale * contactOut.m_normal);
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
@@ -312,7 +312,7 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
 				if (t < ndFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					ndVector normal(m_alignmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
@@ -328,7 +328,7 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const
 {
 	ndInt32 count = 0;
-	dAssert(normal.m_w == ndFloat32(0.0f));
+	ndAssert(normal.m_w == ndFloat32(0.0f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -383,13 +383,13 @@ void ndShapeInstance::SetScale(const ndVector& scale)
 	ndFloat32 scaleX = ndAbs(scale.m_x);
 	ndFloat32 scaleY = ndAbs(scale.m_y);
 	ndFloat32 scaleZ = ndAbs(scale.m_z);
-	dAssert(scaleX > ndFloat32(0.0f));
-	dAssert(scaleY > ndFloat32(0.0f));
-	dAssert(scaleZ > ndFloat32(0.0f));
+	ndAssert(scaleX > ndFloat32(0.0f));
+	ndAssert(scaleY > ndFloat32(0.0f));
+	ndAssert(scaleZ > ndFloat32(0.0f));
 
 	if (((ndShape*)m_shape)->GetAsShapeCompound())
 	{
-		dAssert(m_scaleType == m_unit);
+		ndAssert(m_scaleType == m_unit);
 		ndShapeCompound* const compound = ((ndShape*)m_shape)->GetAsShapeCompound();
 		compound->ApplyScale(scale);
 	}
@@ -563,6 +563,6 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
 	p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
 #endif
-	dAssert(p0.m_w == ndFloat32(0.0f));
-	dAssert(p1.m_w == ndFloat32(0.0f));
+	ndAssert(p0.m_w == ndFloat32(0.0f));
+	ndAssert(p1.m_w == ndFloat32(0.0f));
 }

@@ -861,13 +861,13 @@ ndMeshEffect* ndMeshEffect::Intersection (const dMatrix& matrix, const ndMeshEff
 // return -2 if function fail
 ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* const convexFace)
 {
-	dAssert(convexFace->m_incidentFace > 0);
+	ndAssert(convexFace->m_incidentFace > 0);
 
 	ndBigVector normal(convexMesh.FaceNormal(convexFace, &convexMesh.m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
 	ndFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 	if (mag2 < ndFloat64(1.0e-30))
 	{
-		dAssert(0);
+		ndAssert(0);
 		return -2;
 	}
 
@@ -875,7 +875,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 	ndBigVector origin(convexMesh.m_points.m_vertex[convexFace->m_incidentVertex]);
 	ndBigPlane plane(normal, -origin.DotProduct(normal).GetScalar());
 
-	dAssert(!HasOpenEdges());
+	ndAssert(!HasOpenEdges());
 
 	ndInt32 pointCount = GetVertexCount();
 	ndStack <ndFloat64> testPool(2 * pointCount + 1024);
@@ -915,8 +915,8 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 		ndBigVector p1(convexMesh.m_points.m_vertex[e1->m_incidentVertex]);
 
 		ndBigVector xDir(p1 - origin);
-		dAssert(xDir.m_w == ndFloat32(0.0f));
-		dAssert(xDir.DotProduct(xDir).GetScalar() > ndFloat32(0.0f));
+		ndAssert(xDir.m_w == ndFloat32(0.0f));
+		ndAssert(xDir.DotProduct(xDir).GetScalar() > ndFloat32(0.0f));
 		matrix[2] = ndVector(normal);
 		matrix[0] = ndVector(xDir.Scale(ndFloat64(1.0f) / sqrt(xDir.DotProduct(xDir).GetScalar())));
 		matrix[1] = matrix[2].CrossProduct(matrix[0]);
@@ -930,7 +930,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 		ndVector p10(q1 - q0);
 		ndVector p20(q2 - q0);
 		ndVector faceNormal(matrix.UnrotateVector(ndVector(normal)));
-		dAssert(faceNormal.m_w == ndFloat32(0.0f));
+		ndAssert(faceNormal.m_w == ndFloat32(0.0f));
 		ndFloat32 areaInv = faceNormal.DotProduct(p10.CrossProduct(p20)).GetScalar();
 		if (e2->m_next != e0)
 		{
@@ -956,7 +956,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 			} while (edge->m_next != e0);
 		}
 
-		dAssert(areaInv > ndFloat32(0.0f));
+		ndAssert(areaInv > ndFloat32(0.0f));
 		areaInv = ndFloat32(1.0f) / areaInv;
 
 		ndVector uv0[3];
@@ -987,7 +987,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 			if ((side0 < ndFloat32(0.0f)) && (side1 > ndFloat64(0.0f)))
 			{
 				ndBigVector dp(m_points.m_vertex[edge->m_incidentVertex] - m_points.m_vertex[edge->m_prev->m_incidentVertex]);
-				dAssert(dp.m_w == ndFloat32(0.0f));
+				ndAssert(dp.m_w == ndFloat32(0.0f));
 				ndFloat64 param = -side0 / plane.DotProduct(dp).GetScalar();
 
 				ndEdge* const splitEdge = InsertEdgeVertex(edge->m_prev, param);
@@ -1044,13 +1044,13 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 
 					end = end->m_next;
 				} while (end != startEdge);
-				dAssert(end != startEdge);
+				ndAssert(end != startEdge);
 				ndEdge* const devideEdge = ConnectVertex(startEdge, end);
-				dAssert(devideEdge);
-				dAssert(devideEdge->m_next->m_mark != colorMark);
-				dAssert(devideEdge->m_prev->m_mark != colorMark);
-				dAssert(devideEdge->m_twin->m_next->m_mark == colorMark);
-				dAssert(devideEdge->m_twin->m_prev->m_mark == colorMark);
+				ndAssert(devideEdge);
+				ndAssert(devideEdge->m_next->m_mark != colorMark);
+				ndAssert(devideEdge->m_prev->m_mark != colorMark);
+				ndAssert(devideEdge->m_twin->m_next->m_mark == colorMark);
+				ndAssert(devideEdge->m_twin->m_prev->m_mark == colorMark);
 				devideEdge->m_mark = colorMark - 1;
 				devideEdge->m_twin->m_mark = colorMark;
 			}
@@ -1119,12 +1119,12 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 
 				if (m_attrib.m_binormalChannel.GetCount())
 				{
-					dAssert(0);
+					ndAssert(0);
 				}
 
 				if (m_attrib.m_colorChannel.GetCount())
 				{
-					dAssert(0);
+					ndAssert(0);
 				}
 
 				if (m_attrib.m_materialChannel.GetCount())
@@ -1137,7 +1137,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 				ndVector p_p0(p - q0);
 				ndVector p_p1(p - q1);
 				ndVector p_p2(p - q2);
-				dAssert(faceNormal.m_w == ndFloat32(0.0f));
+				ndAssert(faceNormal.m_w == ndFloat32(0.0f));
 				ndFloat32 alpha0 = faceNormal.DotProduct(p_p1.CrossProduct(p_p2)).GetScalar() * areaInv;
 				ndFloat32 alpha1 = faceNormal.DotProduct(p_p2.CrossProduct(p_p0)).GetScalar() * areaInv;
 				ndFloat32 alpha2 = faceNormal.DotProduct(p_p0.CrossProduct(p_p1)).GetScalar() * areaInv;

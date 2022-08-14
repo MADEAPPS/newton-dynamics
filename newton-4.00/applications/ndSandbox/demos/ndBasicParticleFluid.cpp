@@ -40,7 +40,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 	{
 		D_TRACKTIME();
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
-		dAssert(points.GetCount());
+		ndAssert(points.GetCount());
 
 		m_points.SetCount(points.GetCount());
 		m_indexList.SetCount(points.GetCount());
@@ -83,7 +83,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 	{
 		D_TRACKTIME();
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
-		dAssert(points.GetCount());
+		ndAssert(points.GetCount());
 
 		m_points.SetCount(points.GetCount() * 3);
 		m_indexList.SetCount(points.GetCount() * 3);
@@ -165,8 +165,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 	//void RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 	void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&)
 	{
-		dAssert(0);
-		dTrace(("implement traparent iso surface render\n"));
+		ndAssert(0);
+		ndTrace(("implement traparent iso surface render\n"));
 		//ndDemoMesh::RenderTransparency(scene, modelMatrix);
 	}
 

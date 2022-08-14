@@ -96,7 +96,7 @@ class ndPolygonSoupBuilder::dgPolySoupFilterAllocator: public ndPolyhedra
 	ndInt32 AddFilterFace (ndUnsigned32 count, ndInt32* const pool)
 	{
 		BeginFace();
-		dAssert (count);
+		ndAssert (count);
 		bool reduction = true;
 		while (reduction && !AddFace (ndInt32 (count), pool)) 
 		{
@@ -251,8 +251,8 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 		{
 			ndBigVector edge0(m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
 			ndBigVector edge1(m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
-			dAssert(edge0.m_w == ndFloat32(0.0f));
-			dAssert(edge1.m_w == ndFloat32(0.0f));
+			ndAssert(edge0.m_w == ndFloat32(0.0f));
+			ndAssert(edge1.m_w == ndFloat32(0.0f));
 			ndBigVector normal(edge0.CrossProduct(edge1));
 			ndFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 			if (mag2 < ndFloat32(1.0e-8f))
@@ -295,7 +295,7 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 void ndPolygonSoupBuilder::AddFace(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 vertexCount, const ndInt32 faceId)
 {
 	ndInt32 indexArray[1024];
-	dAssert(vertexCount < ndInt32 (sizeof(indexArray)/sizeof (indexArray[0])));
+	ndAssert(vertexCount < ndInt32 (sizeof(indexArray)/sizeof (indexArray[0])));
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		indexArray[i] = i;
@@ -337,7 +337,7 @@ void ndPolygonSoupBuilder::Finalize()
 
 		ndInt32* const indexMap = &indexMapPool[0];
 		ndInt32 vertexCount = ndVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-4f));
-		dAssert(vertexCount <= m_vertexPoints.GetCount());
+		ndAssert(vertexCount <= m_vertexPoints.GetCount());
 		m_vertexPoints.SetCount(vertexCount);
 
 		ndInt32 k = 0;
@@ -374,7 +374,7 @@ void ndPolygonSoupBuilder::FinalizeAndOptimize(ndInt32 id)
 	for (ndInt32 i = 0; i < source.m_faceVertexCount.GetCount(); ++i)
 	{
 		ndInt32 indexCount = source.m_faceVertexCount[i];
-		dAssert (indexCount < 1024);
+		ndAssert (indexCount < 1024);
 
 		ndEdge* const face = polyhedra.AddFace(indexCount - 1, &source.m_vertexIndex[faceIndexNumber]);
 		if (!face) 
@@ -520,7 +520,7 @@ void ndPolygonSoupBuilder::OptimizeByIndividualFaces()
 		}
 		polygonIndex += oldCount;
 	}
-	dAssert (polygonIndex == m_vertexIndex.GetCount());
+	ndAssert (polygonIndex == m_vertexIndex.GetCount());
 
 	m_vertexIndex.Resize(newIndexCount);
 	m_faceVertexCount.Resize(newFaceCount);
@@ -583,7 +583,7 @@ void ndPolygonSoupBuilder::End(bool optimize)
 		m_normalIndex.Resize(faceCount);;
 		m_normalIndex.SetCount(faceCount);
 		ndInt32 normalCount = ndVertexListToIndexList(&m_normalPoints[0].m_x, sizeof(ndBigVector), 3, faceCount, &m_normalIndex[0], ndFloat32(1.0e-6f));
-		dAssert(normalCount <= m_normalPoints.GetCount());
+		ndAssert(normalCount <= m_normalPoints.GetCount());
 		m_normalPoints.SetCount(normalCount);
 	}
 }
@@ -628,7 +628,7 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 
 					ndInt32 count1 = faceInfo.indexCount - 1;
 					ndInt32 start1 = faceInfo.indexStart;
-					dAssert (faceId == indexArray[start1 + count1]);
+					ndAssert (faceId == indexArray[start1 + count1]);
 					for (ndInt32 j = 0; j < count1; ++j) 
 					{
 						ndInt32 index = indexArray[start1 + j];
@@ -668,7 +668,7 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 					{
 						ndInt32 index = indexArray[start1 + j];
 						const ndBigVector& p = points[index];
-						dAssert(p.m_w == ndFloat32(0.0f));
+						ndAssert(p.m_w == ndFloat32(0.0f));
 						p0 = p0.GetMin(p);
 						p1 = p1.GetMax(p);
 					}
@@ -724,8 +724,8 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 						leftCount ++;
 					}
 				}
-				dAssert (leftCount);
-				dAssert (leftCount < faceCount);
+				ndAssert (leftCount);
+				ndAssert (leftCount < faceCount);
 
 				segments[stack][0] = faceStart;
 				segments[stack][1] = leftCount;
@@ -746,7 +746,7 @@ void ndPolygonSoupBuilder::Optimize(ndInt32 faceId, const dgFaceBucket& faceBuck
 
 			ndInt32 count = faceInfo.indexCount - 1;
 			ndInt32 start = faceInfo.indexStart;
-			dAssert (faceId == indexArray[start + count]);
+			ndAssert (faceId == indexArray[start + count]);
 			for (ndInt32 j = 0; j < count; ++j) 
 			{
 				ndInt32 index = indexArray[start + j];
@@ -801,9 +801,9 @@ ndInt32 ndPolygonSoupBuilder::FilterFace (ndInt32 count, ndInt32* const pool)
 			ndBigVector edge1 (m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
 			ndBigVector normal (edge0.CrossProduct(edge1));
 
-			dAssert(edge0.m_w == ndFloat32(0.0f));
-			dAssert(edge1.m_w == ndFloat32(0.0f));
-			dAssert (normal.m_w == ndFloat32 (0.0f));
+			ndAssert(edge0.m_w == ndFloat32(0.0f));
+			ndAssert(edge1.m_w == ndFloat32(0.0f));
+			ndAssert (normal.m_w == ndFloat32 (0.0f));
 			ndFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 			if (mag2 < ndFloat32 (1.0e-8f)) 
 			{
@@ -862,9 +862,9 @@ ndInt32 ndPolygonSoupBuilder::FilterFace (ndInt32 count, ndInt32* const pool)
 		{
 			flag = true;
 			ndBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (ndBigVector)));
-			dAssert (normal.m_w == ndFloat32 (0.0f));
+			ndAssert (normal.m_w == ndFloat32 (0.0f));
 
-			dAssert (normal.DotProduct(normal).GetScalar() > ndFloat32 (1.0e-10f)); 
+			ndAssert (normal.DotProduct(normal).GetScalar() > ndFloat32 (1.0e-10f)); 
 			normal = normal.Scale (ndFloat64 (1.0f) / sqrt (normal.DotProduct(normal).GetScalar() + ndFloat32 (1.0e-24f)));
 
 			while (flag) 
@@ -902,7 +902,7 @@ ndInt32 ndPolygonSoupBuilder::FilterFace (ndInt32 count, ndInt32* const pool)
 						}
 
 						ndBigVector n (e0.CrossProduct(e1));
-						dAssert (n.m_w == ndFloat32 (0.0f));
+						ndAssert (n.m_w == ndFloat32 (0.0f));
 						mag2 = n.DotProduct(normal).GetScalar();
 						if (mag2 < ndFloat32 (1.0e-5f)) 
 						{
@@ -971,7 +971,7 @@ ndInt32 ndPolygonSoupBuilder::FilterFace (ndInt32 count, ndInt32* const pool)
 			ndInt32 j0 = count - 2;  
 			ndInt32 j1 = count - 1;  
 			ndBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (ndBigVector)));
-			dAssert (normal.m_w == ndFloat32 (0.0f));
+			ndAssert (normal.m_w == ndFloat32 (0.0f));
 			for (ndInt32 j2 = 0; j2 < count; j2 ++) 
 			{ 
 				ndBigVector p0 (&m_vertexPoints[pool[j0]].m_x);
@@ -985,7 +985,7 @@ ndInt32 ndPolygonSoupBuilder::FilterFace (ndInt32 count, ndInt32* const pool)
 				ndBigVector e1 ((p2 - p1));
 
 				ndBigVector n (e1.CrossProduct(e0));
-				dAssert (n.DotProduct(normal).GetScalar() > ndFloat32 (0.0f));
+				ndAssert (n.DotProduct(normal).GetScalar() > ndFloat32 (0.0f));
 				j0 = j1;
 				j1 = j2;
 			}
@@ -1158,8 +1158,8 @@ ndInt32 ndPolygonSoupBuilder::AddConvexFace (ndInt32 count, ndInt32* const pool,
 #if _DEBUG
 		if (leftOver.GetCount()) 
 		{
-			dTrace (("warning: %d faces with more that a one shared edge\n", leftOver.GetCount()));
-			dTrace (("         this mesh is not a manifold and may lead to collision malfunctions\n"));
+			ndTrace (("warning: %d faces with more that a one shared edge\n", leftOver.GetCount()));
+			ndTrace (("         this mesh is not a manifold and may lead to collision malfunctions\n"));
 		}
 #endif
 

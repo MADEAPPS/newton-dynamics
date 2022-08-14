@@ -91,8 +91,8 @@ ndInt32 ndStack<T>::GetSizeInBytes() const
 template<class T>
 inline T& ndStack<T>::operator[] (ndInt32 entry) 
 {
-	dAssert (entry >= 0);
-	dAssert ((size_t(entry) < m_size) || ((m_size == 0) && (entry == 0)));
+	ndAssert (entry >= 0);
+	ndAssert ((size_t(entry) < m_size) || ((m_size == 0) && (entry == 0)));
 
 	T* const mem = (T*) m_ptr;
 	return mem[entry];
@@ -101,8 +101,8 @@ inline T& ndStack<T>::operator[] (ndInt32 entry)
 template<class T>
 inline const T& ndStack<T>::operator[] (ndInt32 entry) const
 {
-	dAssert (entry >= 0);
-	dAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
+	ndAssert (entry >= 0);
+	ndAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
 
 	const T* const mem = (T*) m_ptr;
 	return mem[entry];

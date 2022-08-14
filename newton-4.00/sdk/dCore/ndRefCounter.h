@@ -55,7 +55,7 @@ template<class T>
 inline ndInt32 ndRefCounter<T>::Release()
 {
 	m_refCount--;
-	dAssert(m_refCount >= 0);
+	ndAssert(m_refCount >= 0);
 	if (!m_refCount)
 	{
 		delete this;

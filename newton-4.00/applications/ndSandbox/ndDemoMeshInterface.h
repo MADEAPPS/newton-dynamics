@@ -57,7 +57,7 @@ class ndDemoMeshInterface: public ndRefCounter<ndDemoMeshInterface>
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) { dAssert(0); return nullptr; }
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) { ndAssert(0); return nullptr; }
 
 	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix) = 0;
 	virtual void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&) {}

@@ -313,7 +313,7 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 //void ndCharacter::CreateKinematicChain(const ndMatrix& globalOrientation, const ndCharacterNode* const footNode)
 void ndCharacter::CreateKinematicChain(const ndMatrix&, const ndCharacterNode* const)
 {
-	dAssert(0);
+	ndAssert(0);
 	//ndCharacterNode* const calf = footNode->GetParent();
 	//ndCharacterNode* const leg = calf->GetParent();
 	//ndCharacterNode* const hip = leg->GetParent();
@@ -391,7 +391,7 @@ void ndCharacter::Update(ndWorld* const, ndFloat32)
 
 //ndCharacterSkeleton* ndCharacter::CreateSkeleton() const
 //{
-//	dAssert(0);
+//	ndAssert(0);
 //	return nullptr;
 //	//ndInt32 stack = 0;
 //	//ndCharacterNode* nodePool[32];
@@ -426,7 +426,7 @@ void ndCharacter::Update(ndWorld* const, ndFloat32)
 
 void ndCharacter::SetPose()
 {
-	dAssert(0);
+	ndAssert(0);
 	//for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	//{
 	//	ndEffetorInfo& info = node->GetInfo();

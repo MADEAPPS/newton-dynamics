@@ -135,7 +135,7 @@ void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 				} while (ptr != edge);
 			}
 		}
-		dAssert(index == 24);
+		ndAssert(index == 24);
 	
 		polyhedra.IncLRU();
 		mark = polyhedra.IncLRU();
@@ -172,7 +172,7 @@ void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 				edge->m_twin->m_mark = mark;
 				m_edgeEdgeMap[count] = &m_simplex[edge->m_userData];
 				count++;
-				dAssert(count <= 12);
+				ndAssert(count <= 12);
 			}
 		}
 	
@@ -206,8 +206,8 @@ ndVector ndShapeBox::SupportVertex(const ndVector& dir0, ndInt32* const vertexIn
 	const ndVector mask0(dir0.Abs() > m_flushZero);
 	const ndVector dir(dir0 & mask0);
 
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
-	dAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
 	const ndVector mask(dir < ndVector::m_zero);
 	if (vertexIndex) 
 	{
@@ -223,8 +223,8 @@ ndVector ndShapeBox::SupportVertexSpecial(const ndVector& dir0, ndFloat32, ndInt
 	const ndVector mask0(dir0.Abs() > m_flushZero);
 	const ndVector dir(dir0 & mask0);
 	
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
-	dAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
 	const ndVector mask(dir < ndVector::m_zero);
 	if (vertexIndex) 
 	{
@@ -242,13 +242,13 @@ ndVector ndShapeBox::SupportVertexSpecialProjectPoint(const ndVector& point, con
 {
 	const ndVector mask0(dir0.Abs() > m_flushZero);
 	const ndVector dir(dir0 & mask0);
-	dAssert(ndAbs((dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f))) < ndFloat32(1.0e-3f));
+	ndAssert(ndAbs((dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f))) < ndFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
 ndFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32, const ndBody* const, ndContactPoint& contactOut) const
 {
-	dAssert(localP0.m_w == localP1.m_w);
+	ndAssert(localP0.m_w == localP1.m_w);
 
 	ndInt32 index = 0;
 	ndFloat32 signDir = ndFloat32(0.0f);
@@ -295,7 +295,7 @@ ndFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const ndVector& localP0, const n
 
 	if (tmin > ndFloat32(0.0f)) 
 	{
-		dAssert(tmin <= 1.0f);
+		ndAssert(tmin <= 1.0f);
 		contactOut.m_normal = ndVector::m_zero;
 		contactOut.m_normal[index] = signDir;
 		//contactOut.m_userId = SetUserDataID();
@@ -375,11 +375,11 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 		default:
 		{
 			ndFloat32 test[8];
-			dAssert(normal.m_w == ndFloat32(0.0f));
+			ndAssert(normal.m_w == ndFloat32(0.0f));
 			ndPlane plane(normal, -(normal.DotProduct(point).GetScalar()));
 			for (ndInt32 i = 0; i < 8; ++i) 
 			{
-				dAssert(m_vertex[i].m_w == ndFloat32(0.0f));
+				ndAssert(m_vertex[i].m_w == ndFloat32(0.0f));
 				test[i] = plane.DotProduct(m_vertex[i] | ndVector::m_wOne).m_x;
 			}
 
@@ -402,14 +402,14 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 				{
 					edge = edge->m_twin;
 				}
-				dAssert(test[edge->m_vertex] > ndFloat32(0.0f));
+				ndAssert(test[edge->m_vertex] > ndFloat32(0.0f));
 
 				ndConvexSimplexEdge* ptr = edge;
 				ndConvexSimplexEdge* firstEdge = nullptr;
 				ndFloat32 side0 = test[edge->m_vertex];
 				do 
 				{
-					dAssert(m_vertex[ptr->m_twin->m_vertex].m_w == ndFloat32(0.0f));
+					ndAssert(m_vertex[ptr->m_twin->m_vertex].m_w == ndFloat32(0.0f));
 					ndFloat32 side1 = test[ptr->m_twin->m_vertex];
 					if (side1 < side0) 
 					{
@@ -451,8 +451,8 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 							}
 						}
 
-						dAssert(t <= ndFloat32(0.01f));
-						dAssert(t >= ndFloat32(-1.05f));
+						ndAssert(t <= ndFloat32(0.01f));
+						ndAssert(t >= ndFloat32(-1.05f));
 						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale(t);
 						count++;
 
@@ -462,11 +462,11 @@ ndInt32 ndShapeBox::CalculatePlaneIntersection(const ndVector& normal, const ndV
 							ndInt32 index0 = ptr1->m_twin->m_vertex;
 							if (test[index0] >= ndFloat32(0.0f)) 
 							{
-								dAssert(test[ptr1->m_vertex] <= ndFloat32(0.0f));
+								ndAssert(test[ptr1->m_vertex] <= ndFloat32(0.0f));
 								break;
 							}
 						}
-						dAssert(ptr != ptr1);
+						ndAssert(ptr != ptr1);
 						ptr = ptr1->m_twin;
 
 					} while ((ptr != edge) && (count < 8));

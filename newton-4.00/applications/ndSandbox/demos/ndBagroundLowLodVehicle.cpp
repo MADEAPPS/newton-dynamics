@@ -58,7 +58,7 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 				// quick hack to show the solution.
 				if (contactPoint.m_normal.m_y < 0.999)
 				{
-					dTrace(("this is when the bug happens\n"));
+					ndTrace(("this is when the bug happens\n"));
 				}
 			}
 		}

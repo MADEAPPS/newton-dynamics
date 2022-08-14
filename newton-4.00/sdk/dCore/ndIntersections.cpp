@@ -31,10 +31,10 @@
 
 bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVector& boxP1) 
 {	
-	dAssert (p0.m_w == ndFloat32(0.0f));
-	dAssert (p1.m_w == ndFloat32(0.0f));
-	dAssert (boxP0.m_w == ndFloat32(0.0f));
-	dAssert (boxP1.m_w == ndFloat32(0.0f));
+	ndAssert (p0.m_w == ndFloat32(0.0f));
+	ndAssert (p1.m_w == ndFloat32(0.0f));
+	ndAssert (boxP0.m_w == ndFloat32(0.0f));
+	ndAssert (boxP1.m_w == ndFloat32(0.0f));
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		ndFloat32 tmp0 = boxP1[i] - p0[i];
@@ -91,7 +91,7 @@ bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVec
 ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1)
 {
 	ndBigVector dp (ray_p1 - ray_p0);
-	dAssert (dp.m_w == ndFloat32 (0.0f));
+	ndAssert (dp.m_w == ndFloat32 (0.0f));
 	ndFloat64 t = ndClamp (dp.DotProduct(point - ray_p0).GetScalar() / dp.DotProduct(dp).GetScalar(), ndFloat64(0.0f), ndFloat64 (1.0f));
 	return ray_p0 + dp.Scale (t);
 }
@@ -105,7 +105,7 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 	const ndFloat64 a01 = e10.DotProduct(e20).GetScalar();
 
 	const ndFloat64 det = a00 * a11 - a01 * a01;
-	dAssert(det >= ndFloat32(0.0f));
+	ndAssert(det >= ndFloat32(0.0f));
 	if (ndAbs(det) > ndFloat32(1.0e-24f)) 
 	{
 		ndBigVector p0Point (point - p0);
@@ -129,7 +129,7 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 		return p0 + (e10.Scale(alpha) + e20.Scale(beta)).Scale(ndFloat64(1.0f) / det);
 	}
 	// this is a degenerated triangle. this should never happens
-	dAssert(0);
+	ndAssert(0);
 	return p0;
 }
 
@@ -189,7 +189,7 @@ ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVe
 		}
 	}
 	// this is a degenerated tetra. this should never happens
-	dAssert(0);
+	ndAssert(0);
 	return p0;
 }
 
@@ -201,9 +201,9 @@ void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, con
 	ndBigVector u(ray_p1 - ray_p0);
 	ndBigVector v(ray_q1 - ray_q0);
 	ndBigVector w(ray_p0 - ray_q0);
-	dAssert(u.m_w == ndFloat64(0.0f));
-	dAssert(v.m_w == ndFloat64(0.0f));
-	dAssert(w.m_w == ndFloat64(0.0f));
+	ndAssert(u.m_w == ndFloat64(0.0f));
+	ndAssert(v.m_w == ndFloat64(0.0f));
+	ndAssert(w.m_w == ndFloat64(0.0f));
 	
 	ndFloat64 a = u.DotProduct(u).GetScalar();
 	ndFloat64 b = u.DotProduct(v).GetScalar();
@@ -286,8 +286,8 @@ void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, con
 	ndFloat64 sc = (ndAbs(sN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : sN / sD);
 	ndFloat64 tc = (ndAbs(tN) < ndFloat64(1.0e-8f) ? ndFloat64(0.0f) : tN / tD);
 	
-	dAssert(u.m_w == ndFloat64(0.0f));
-	dAssert(v.m_w == ndFloat64(0.0f));
+	ndAssert(u.m_w == ndFloat64(0.0f));
+	ndAssert(v.m_w == ndFloat64(0.0f));
 	p0Out = ray_p0 + u.Scale(sc);
 	p1Out = ray_q0 + v.Scale(tc);
 }
@@ -325,11 +325,11 @@ void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1,
 ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius)
 {
 	ndVector p0Origin (p0 - origin);
-	dAssert (p0Origin.m_w == ndFloat32 (0.0f));
+	ndAssert (p0Origin.m_w == ndFloat32 (0.0f));
 	if (p0Origin.DotProduct(p0Origin).GetScalar() < (ndFloat32 (100.0f) * radius * radius)) 
 	{
 		ndVector dp (p1 - p0);
-		dAssert (dp.m_w == ndFloat32 (0.0f));
+		ndAssert (dp.m_w == ndFloat32 (0.0f));
 		ndFloat32 a = dp.DotProduct(dp).GetScalar();
 		ndFloat32 b = ndFloat32 (2.0f) * p0Origin.DotProduct(dp).GetScalar();
 		ndFloat32 c = p0Origin.DotProduct(p0Origin).GetScalar() - radius * radius;
@@ -368,7 +368,7 @@ ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector
 	{
 		ndBigVector p0Origin1 (p0Origin);
 		ndBigVector dp(p1 - p0);
-		dAssert(dp.m_w == ndFloat32(0.0f));
+		ndAssert(dp.m_w == ndFloat32(0.0f));
 		ndFloat64 a = dp.DotProduct(dp).GetScalar();
 		ndFloat64 b = ndFloat32(2.0f) * p0Origin1.DotProduct(dp).GetScalar();
 		ndFloat64 c = p0Origin1.DotProduct(p0Origin1).GetScalar() - ndFloat64(radius) * radius;
@@ -454,7 +454,7 @@ ndFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& bo
 
 	if (tmin > ndFloat32(0.0f))
 	{
-		dAssert(tmin < 1.0f);
+		ndAssert(tmin < 1.0f);
 		normalOut = ndVector(ndFloat32(0.0f));
 		normalOut[index] = signDir;
 	}

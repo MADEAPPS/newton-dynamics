@@ -71,13 +71,13 @@ class ndString::ndStringAllocator
 
 			char* Alloc(ndInt32 size)
 			{
-				dAssert (size < 1024 * 4);
+				ndAssert (size < 1024 * 4);
 				if (!m_freeListDataChunk) 
 				{
 					Prefetch (size);
 				}
 				dDataChunk* const data = m_freeListDataChunk;
-				dAssert (size == data->m_size);
+				ndAssert (size == data->m_size);
 				m_freeListDataChunk = m_freeListDataChunk->m_next;
 				return ((char*)data) + sizeof (ndInt32);
 			}
@@ -117,7 +117,7 @@ class ndString::ndStringAllocator
 
 		char* Alloc(ndInt32 size)
 		{
-			dAssert (size >= 1);
+			ndAssert (size >= 1);
 			if (size <= D_STRING_MEM_MAX_BUCKET_SIZE) 
 			{
 				ndInt32 buckectEntry = (size - 1) / D_STRING_MEM_GRANULARITY;
@@ -523,9 +523,9 @@ ndInt32 ndString::Find (char ch, ndInt32 from) const
 //dInt32 ndString::Find (const ndString& subStream, dInt32 from) const
 ndInt32 ndString::Find (const char* const subString, ndInt32 subStringLength, ndInt32 from, ndInt32 lenght) const
 {
-	dAssert (from >= 0);
-	//dAssert (subStream.m_size >= 0);
-	dAssert (subStringLength >= 1);
+	ndAssert (from >= 0);
+	//ndAssert (subStream.m_size >= 0);
+	ndAssert (subStringLength >= 1);
 
 	ndInt32 location = -1;
 	if (m_size) 

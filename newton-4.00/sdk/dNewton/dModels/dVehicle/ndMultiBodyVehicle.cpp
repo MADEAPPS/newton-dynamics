@@ -171,7 +171,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& d
 		}
 		else
 		{
-			dAssert(0);
+			ndAssert(0);
 		}
 	}
 }
@@ -245,7 +245,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_chassis);
 		}
-		dAssert(bodyNode);
+		ndAssert(bodyNode);
 		paramNode->SetAttribute("int32", bodyNode->GetInfo());
 	}
 
@@ -266,7 +266,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
@@ -287,7 +287,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
@@ -301,7 +301,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
@@ -321,7 +321,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_motor);
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
@@ -336,7 +336,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), body);
 		}
-		dAssert(bodyNode);
+		ndAssert(bodyNode);
 		paramNode->SetAttribute("int32", bodyNode->GetInfo());
 	}
 
@@ -364,7 +364,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
@@ -378,7 +378,7 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_gearBox);
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
@@ -387,13 +387,13 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("torsionBar");
 		childNode->LinkEndChild(paramNode);
 
-		dAssert(m_torsionBar->GetBody1()->GetAsBodySentinel());
+		ndAssert(m_torsionBar->GetBody1()->GetAsBodySentinel());
 		ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* jointNode = desc.m_jointMap->Find(m_torsionBar);
 		if (!jointNode)
 		{
 			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_torsionBar);
 		}
-		dAssert(jointNode);
+		ndAssert(jointNode);
 		paramNode->SetAttribute("int32", jointNode->GetInfo());
 
 		for (ndInt32 i = 0; i < m_torsionBar->m_axleCount; ++i)
@@ -543,7 +543,7 @@ ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndFloat32 mass, ndFloa
 	ndShapeInstance diffCollision(new ndShapeSphere(radius));
 	diffCollision.SetCollisionMode(false);
 
-	dAssert(m_chassis);
+	ndAssert(m_chassis);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetMatrix(m_localFrame * m_chassis->GetMatrix());
 	body->SetCollisionShape(diffCollision);
@@ -613,7 +613,7 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 
 
 ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential)
 {
-	dAssert(m_motor == motor);
+	ndAssert(m_motor == motor);
 	m_gearBox = new ndMultiBodyVehicleGearBox(motor->GetBody0(), differential->GetBody0(), this);
 	return m_gearBox;
 }
@@ -660,7 +660,7 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 {
 	ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
 
-	dAssert(m_chassis);
+	ndAssert(m_chassis);
 	const ndJointList& chassisJoints = m_chassis->GetJointList();
 	for (ndJointList::ndNode* node = chassisJoints.GetFirst(); node; node = node->GetNext())
 	{
@@ -849,8 +849,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	// calculate longitudinal slip ratio
 	const ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 	const ndBodyDynamic* const otherBody = (contactPoint.m_body0 == tireBody) ? ((ndBodyKinematic*)contactPoint.m_body1)->GetAsBodyDynamic() : ((ndBodyKinematic*)contactPoint.m_body0)->GetAsBodyDynamic();
-	dAssert(tireBody != otherBody);
-	dAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
+	ndAssert(tireBody != otherBody);
+	ndAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
 	const ndVector tireVeloc(tireBody->GetVelocity());
 	const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
@@ -915,7 +915,7 @@ void ndMultiBodyVehicle::ApplyTireModel()
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
+		ndAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
 
 		tire->m_lateralSlip = ndFloat32(0.0f);
 		tire->m_longitudinalSlip = ndFloat32(0.0f);
@@ -971,7 +971,7 @@ void ndMultiBodyVehicle::ApplyTireModel()
 						// check if the contact is in the contact patch,
 						// the is the 45 degree point around the tire vehicle axis. 
 						ndVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
-						dAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
+						ndAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
 						ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
 						if (contactPatch < ndFloat32(-0.71f))
 						{
@@ -1049,7 +1049,7 @@ ndFloat32 ndMultiBodyVehicle::ndDownForce::CalculateFactor(const ndSpeedForcePai
 
 ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) const
 {
-	dAssert(speed >= ndFloat32(0.0f));
+	ndAssert(speed >= ndFloat32(0.0f));
 	ndInt32 index = 0;
 	for (ndInt32 i = sizeof(m_downForceTable) / sizeof(m_downForceTable[0]) - 1; i; i--)
 	{

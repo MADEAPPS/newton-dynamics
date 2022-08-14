@@ -108,7 +108,7 @@ void ndRedBackNode::RotateLeft(ndRedBackNode** const head)
 	}
 	
 	// link child and me 
-	dAssert (child);
+	ndAssert (child);
 	child->m_left = me;
 	if (me != nullptr) 
 	{
@@ -151,7 +151,7 @@ void ndRedBackNode::RotateRight(ndRedBackNode ** const head)
 	}
 
 	// link me and child 
-	dAssert (child);
+	ndAssert (child);
 	child->m_right = me;
 	if (me != nullptr) 
 	{
@@ -168,8 +168,8 @@ void ndRedBackNode::InsertFixup(ndRedBackNode ** const head)
 	while ((ptr != *head) && (ptr->m_parent->GetColor() == RED)) 
 	{
 		// we have a violation 
-		dAssert (ptr->m_parent);
-		dAssert (ptr->m_parent->m_parent);
+		ndAssert (ptr->m_parent);
+		ndAssert (ptr->m_parent->m_parent);
 		if (ptr->m_parent == ptr->m_parent->m_parent->m_left) 
 		{
 			ndRedBackNode* const tmp = ptr->m_parent->m_parent->m_right;
@@ -201,7 +201,7 @@ void ndRedBackNode::InsertFixup(ndRedBackNode ** const head)
 		} 
 		else 
 		{
-			dAssert (ptr->m_parent == ptr->m_parent->m_parent->m_right);
+			ndAssert (ptr->m_parent == ptr->m_parent->m_parent->m_right);
 			// mirror image of above code 
 			ndRedBackNode* const tmp = ptr->m_parent->m_parent->m_left;
 			if (tmp && (tmp->GetColor() == RED)) 
@@ -406,14 +406,14 @@ void ndRedBackNode::Unlink (ndRedBackNode ** const head)
 			endNode = endNode->m_left;
 		}
 
-		dAssert (endNode);
-		dAssert (endNode->m_parent);
-		dAssert (!endNode->m_left);
+		ndAssert (endNode);
+		ndAssert (endNode->m_parent);
+		ndAssert (!endNode->m_left);
 
 		// x is y's only child 
 		ndRedBackNode* const child = endNode->m_right;
 
-		dAssert ((endNode != node->m_right) || !child || (child->m_parent == endNode));
+		ndAssert ((endNode != node->m_right) || !child || (child->m_parent == endNode));
 
 		endNode->m_left = node->m_left;
 		node->m_left->m_parent = endNode;

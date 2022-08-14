@@ -29,7 +29,7 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* 
 	:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
 	,m_limitedSlipOmega(slipOmegaLock)
 {
-	dAssert(slipOmegaLock >= 0.0f);
+	ndAssert(slipOmegaLock >= 0.0f);
 }
 
 ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -100,7 +100,7 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 		} 
 		else
 		{
-			dAssert(slipOmega < -m_limitedSlipOmega);
+			ndAssert(slipOmega < -m_limitedSlipOmega);
 			slipOmega += m_limitedSlipOmega;
 			ndFloat32 alpha = slipOmega * desc.m_invTimestep;
 			SetMotorAcceleration(desc, -alpha);

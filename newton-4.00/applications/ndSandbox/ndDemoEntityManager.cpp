@@ -157,7 +157,7 @@ void Test0__()
 	{
 		A[i][i] *= 1.1f;
 	}
-	dAssert(ndTestPSDmatrix(6, 6, &A[0][0]));
+	ndAssert(ndTestPSDmatrix(6, 6, &A[0][0]));
 
 	ndMatrixTimeVector<ndFloat32>(6, &A[0][0], x, B);
 	for (ndInt32 i = 0; i < 6; ++i)
@@ -240,7 +240,7 @@ static void BooleanOr()
 
 static void BooleanXOr()
 {
-	dAssert(0);
+	ndAssert(0);
 	//ndDeepBrain brain;
 	//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 	//
@@ -651,9 +651,9 @@ void ndDemoEntityManager::OpenMessageCallback(GLenum source,
 			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
 				return;
 		}
-		dTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
+		ndTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
 			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
-		dAssert(0);
+		ndAssert(0);
 	}
 }
 #endif
@@ -757,7 +757,7 @@ ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axis
 		for (ndInt32 i = 0; i < axisCount; ++i) 
 		{
 			axisValues[i] = axis[i];
-			//if (axis[i] && axis[i] > -1.0f) dTrace(("%d %f\n", i, axis[i]));
+			//if (axis[i] && axis[i] > -1.0f) ndTrace(("%d %f\n", i, axis[i]));
 		}
 	}
 
@@ -791,7 +791,7 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 		for (ndInt32 i = 0; i < buttonsCount; ++i) 
 		{
 			axisbuttons[i] = buttons[i];
-			//if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
+			//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
 		}
 	}
 
@@ -818,14 +818,14 @@ void ndDemoEntityManager::ResetTimer()
 void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
-	dAssert(!ent->m_rootNode);
+	ndAssert(!ent->m_rootNode);
 	ent->m_rootNode = Append(ent);
 }
 
 void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
-	dAssert(ent->m_rootNode);
+	ndAssert(ent->m_rootNode);
 	Remove(ent->m_rootNode);
 }
 
@@ -986,7 +986,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			if (ImGui::MenuItem("Preferences", "")) 
 			{
-				dAssert (0);
+				ndAssert (0);
 			}
 			ImGui::Separator();
 
@@ -1186,9 +1186,9 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 
 void ndDemoEntityManager::ErrorCallback(ndInt32 error, const char* description)
 {
-	dTrace (("Error %d: %s\n", error, description));
+	ndTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
-	dAssert (0);
+	ndAssert (0);
 }
 
 fbxDemoEntity* ndDemoEntityManager::LoadFbxMesh(const char* const meshName)
@@ -1288,8 +1288,8 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndI
 void ndDemoEntityManager::ToggleProfiler()
 {
 	#ifdef D_PROFILER
-		dAssert(m_world);
-		dTrace(("profiler Enable\n"));
+		ndAssert(m_world);
+		ndTrace(("profiler Enable\n"));
 		m_world->Sync();
 		dProfilerEnableProling();
 	#endif
@@ -1450,7 +1450,7 @@ void ndDemoEntityManager::CreateSkyBox()
 		m_sky = new ndSkyBox(m_shaderCache.m_skyBox);
 		
 		ndScopeSpinLock lock(m_addDeleteLock);
-		dAssert(!m_sky->m_rootNode);
+		ndAssert(!m_sky->m_rootNode);
 		m_sky->m_rootNode = Addtop(m_sky);
 	}
 }
@@ -1466,7 +1466,7 @@ void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const 
 //void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 void ndDemoEntityManager::ImportPLYfile(const char* const)
 {
-	dAssert(0);
+	ndAssert(0);
 	//m_collisionDisplayMode = 2;
 	//CreatePLYMesh (this, fileName, true);
 }
@@ -1501,7 +1501,7 @@ ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
 	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
 	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
-	dAssert (param >= 0.0f);
+	ndAssert (param >= 0.0f);
 	if (param > 1.0f) {
 		param = 1.0f;
 	}

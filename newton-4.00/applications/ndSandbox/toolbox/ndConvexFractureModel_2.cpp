@@ -29,7 +29,7 @@ ndConvexFractureModel_2::ndAtom::ndAtom()
 	,m_collision(nullptr)
 	,m_massFraction(0.0f)
 {
-	dAssert(0);
+	ndAssert(0);
 }
 
 ndConvexFractureModel_2::ndAtom::ndAtom(const ndAtom& atom)
@@ -39,12 +39,12 @@ ndConvexFractureModel_2::ndAtom::ndAtom(const ndAtom& atom)
 	,m_collision(new ndShapeInstance(*atom.m_collision))
 	,m_massFraction(atom.m_massFraction)
 {
-	dAssert(0);
+	ndAssert(0);
 }
 
 ndConvexFractureModel_2::ndAtom::~ndAtom()
 {
-	dAssert(0);
+	ndAssert(0);
 	if (m_collision)
 	{
 		delete m_collision;
@@ -84,7 +84,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 
 	// now we call create we decompose the mesh into several convex pieces 
 	ndMeshEffect* const debrisMeshPieces = mesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
-	dAssert(debrisMeshPieces);
+	ndAssert(debrisMeshPieces);
 
 	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 	ndMeshEffect* nextDebris;
@@ -150,7 +150,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(const ndEffect& effect)
 	,m_debrisRootEnt(new ndDemoDebrisRootEntity(*effect.m_debrisRootEnt))
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
-	dAssert(0);
+	ndAssert(0);
 	m_body->SetCollisionShape(*effect.m_shape);
 
 	ndDemoDebrisEntity* mesh = (ndDemoDebrisEntity*) m_debrisRootEnt->GetChild();
@@ -159,7 +159,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(const ndEffect& effect)
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
 		newAtom.m_mesh = mesh;
-		dAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+		ndAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
 
 		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
 	}
@@ -167,7 +167,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(const ndEffect& effect)
 
 ndConvexFractureModel_2::ndEffect::~ndEffect()
 {
-	dAssert(0);
+	ndAssert(0);
 	if (m_visualMesh)
 	{
 		m_visualMesh->Release();
@@ -200,7 +200,7 @@ ndConvexFractureModel_2::~ndConvexFractureModel_2()
 //void ndConvexFractureModel_2::Update(ndWorld* const world, ndFloat32 timestep)
 void ndConvexFractureModel_2::Update(ndWorld* const, ndFloat32)
 {
-	dAssert(0);
+	ndAssert(0);
 	ndList<ndEffect>::ndNode* nextNody;
 	for (ndList<ndEffect>::ndNode* node = m_effectList.GetFirst(); node; node = nextNody)
 	{
@@ -241,7 +241,7 @@ void ndConvexFractureModel_2::Update(ndWorld* const, ndFloat32)
 //void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32)
 {
-	dAssert(0);
+	ndAssert(0);
 	if (m_pendingEffect.GetCount())
 	{
 		D_TRACKTIME();
@@ -259,7 +259,7 @@ void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32)
 
 void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
 {
-	dAssert(0);
+	ndAssert(0);
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
@@ -276,7 +276,7 @@ void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, 
 
 void ndConvexFractureModel_2::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, ndFloat32 factor) const
 {
-	dAssert(0);
+	ndAssert(0);
 	ndVector center(location.TransformVector(body->GetCentreOfMass()));
 	ndVector radios((center - location.m_posit) & ndVector::m_triplexMask);
 	ndVector dir(radios.Normalize());
@@ -289,7 +289,7 @@ void ndConvexFractureModel_2::ExplodeLocation(ndBodyDynamic* const body, const n
 
 void ndConvexFractureModel_2::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
-	dAssert(0);
+	ndAssert(0);
 	D_TRACKTIME();
 
 	ndVector omega(effect.m_body->GetOmega());

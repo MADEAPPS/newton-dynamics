@@ -48,7 +48,7 @@ ndShapeCone::ndShapeCone(const ndLoadSaveBase::ndLoadDescriptor& desc)
 ndShapeCone::~ndShapeCone()
 {
 	m_shapeRefCount--;
-	dAssert(m_shapeRefCount >= 0);
+	ndAssert(m_shapeRefCount >= 0);
 	ndShapeConvex::m_vertex = nullptr;
 	ndShapeConvex::m_simplex = nullptr;
 }
@@ -106,7 +106,7 @@ void ndShapeCone::Init(ndFloat32 radius, ndFloat32 height)
 		polyhedra.AddFace(D_CONE_SEGMENTS, wireframe);
 		polyhedra.EndFace();
 
-		dAssert(SanityCheck(polyhedra));
+		ndAssert(SanityCheck(polyhedra));
 
 		ndUnsigned64 i = 0;
 		ndPolyhedra::Iterator iter(polyhedra);
@@ -193,15 +193,15 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 
 ndVector ndShapeCone::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
 ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	if (dir.m_x < ndFloat32(-0.9999f)) 
 	{
@@ -214,7 +214,7 @@ ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
 	
 	ndVector dir_yz(dir);
 	dir_yz.m_x = ndFloat32(0.0f);
-	dAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
+	ndAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
 	dir_yz = dir_yz.Normalize();
 
 	ndVector p0(dir_yz.Scale(m_radius));
@@ -235,8 +235,8 @@ ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
 
 ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const) const
 {
-	dAssert(dir.m_w == ndFloat32(0.0f));
-	dAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
 	if (dir.m_x < ndFloat32(-0.9999f)) 
 	{
@@ -248,7 +248,7 @@ ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt
 	}
 
 	ndVector dir_yz(dir);
-	dAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
+	ndAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
 	dir_yz = dir_yz.Normalize();
 
 	ndVector p0(dir_yz.Scale(m_radius - D_PENETRATION_TOL));
@@ -295,7 +295,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 			ndFloat32 cosAng = normal.m_y * magInv;
 			ndFloat32 sinAng = normal.m_z * magInv;
 
-			dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+			ndAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 			ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 			ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 
@@ -334,7 +334,7 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 		ndFloat32 cosAng = normal.m_y * magInv;
 		ndFloat32 sinAng = normal.m_z * magInv;
 
-		dAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
+		ndAssert(ndAbs(normal.m_z * cosAng - normal.m_y * sinAng) < ndFloat32(1.0e-4f));
 		ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, ndFloat32(0.0f), ndFloat32(0.0f));
 		ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, ndFloat32(0.0f));
 

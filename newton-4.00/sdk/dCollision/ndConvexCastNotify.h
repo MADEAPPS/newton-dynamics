@@ -48,14 +48,14 @@ class ndConvexCastNotify : public ndClassAlloc
 	
 	virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{
-		dAssert(0);
+		ndAssert(0);
 		return 1;
 	}
 
 	//virtual ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
 	virtual ndFloat32 OnRayCastAction(const ndContactPoint&, ndFloat32)
 	{
-		dAssert(0);
+		ndAssert(0);
 		return 0;
 	}
 

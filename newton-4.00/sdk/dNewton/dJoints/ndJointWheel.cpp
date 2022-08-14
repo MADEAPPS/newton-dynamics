@@ -28,7 +28,7 @@ void ndWheelDescriptor::Load(const nd::TiXmlNode* const xmlNode)
 		}
 	}
 	
-	dAssert(childNode);
+	ndAssert(childNode);
 	m_springK = xmlGetFloat(childNode, "springK");
 	m_damperC = xmlGetFloat(childNode, "damperC");
 	m_upperStop = xmlGetFloat(childNode, "upperStop");

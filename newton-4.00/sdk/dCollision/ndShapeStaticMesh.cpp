@@ -74,7 +74,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 					stack[stackIndex][1] = j;
 					stackIndex++;
 				}
-				dAssert(stackIndex < ndInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
+				ndAssert(stackIndex < ndInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
 			}
 		}
 	}
@@ -102,7 +102,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 		ndFloat32 dist = m_hitDistance[i];
 		for (; dist < m_hitDistance[j - 1]; j--)
 		{
-			dAssert(j > 0);
+			ndAssert(j > 0);
 			m_hitDistance[j] = m_hitDistance[j - 1];
 			m_faceIndexStart[j] = m_faceIndexStart[j - 1];
 			m_faceIndexCount[j] = m_faceIndexCount[j - 1];
@@ -115,7 +115,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 #ifdef _DEBUG
 	for (ndInt32 i = 0; i < m_faceCount - 1; ++i) 
 	{
-		dAssert(m_hitDistance[i] <= m_hitDistance[i + 1]);
+		ndAssert(m_hitDistance[i] <= m_hitDistance[i + 1]);
 	}
 #endif
 }
@@ -176,7 +176,7 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 		case ndShapeInstance::m_global:
 		default:
 		{
-		   dAssert (0);
+		   ndAssert (0);
 		}
 	}
 	
@@ -189,7 +189,7 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	m_convexInstance->CalculateAabb(convexMatrix, p0, p1);
 	m_size = ndVector::m_half * (p1 - p0);
 	m_posit = matrix.TransformVector(ndVector::m_half * (p1 + p0));
-	dAssert (m_posit.m_w == ndFloat32 (1.0f));
+	ndAssert (m_posit.m_w == ndFloat32 (1.0f));
 }
 
 ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
@@ -227,7 +227,7 @@ void ndShapeStaticMesh::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVe
 //ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
 ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const, const ndInt32* const, ndInt32, ndInt32, const ndPlane&, ndVector* const) const
 {
-	dAssert(0);
+	ndAssert(0);
 	return 0;
 	//ndInt32 count = 0;
 	//ndInt32 j = index[indexCount - 1] * stride;
@@ -244,13 +244,13 @@ ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const, co
 	//	if (side0 < ndFloat32(0.0f)) {
 	//		if (side1 >= ndFloat32(0.0f)) {
 	//			ndVector dp(p1 - p0);
-	//			dAssert(dp.m_w == ndFloat32(0.0f));
+	//			ndAssert(dp.m_w == ndFloat32(0.0f));
 	//			ndFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//			dAssert(dgAbs(t) >= ndFloat32(0.0f));
+	//			ndAssert(dgAbs(t) >= ndFloat32(0.0f));
 	//			if (dgAbs(t) < ndFloat32(1.0e-8f)) {
 	//				t = dgSign(t) * ndFloat32(1.0e-8f);
 	//			}
-	//			dAssert(0);
+	//			ndAssert(0);
 	//			contactsOut[count] = p0 - dp.Scale(side0 / t);
 	//			count++;
 	//
@@ -258,13 +258,13 @@ ndInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const ndFloat32* const, co
 	//	}
 	//	else if (side1 <= ndFloat32(0.0f)) {
 	//		ndVector dp(p1 - p0);
-	//		dAssert(dp.m_w == ndFloat32(0.0f));
+	//		ndAssert(dp.m_w == ndFloat32(0.0f));
 	//		ndFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//		dAssert(dgAbs(t) >= ndFloat32(0.0f));
+	//		ndAssert(dgAbs(t) >= ndFloat32(0.0f));
 	//		if (dgAbs(t) < ndFloat32(1.0e-8f)) {
 	//			t = dgSign(t) * ndFloat32(1.0e-8f);
 	//		}
-	//		dAssert(0);
+	//		ndAssert(0);
 	//		contactsOut[count] = p0 - dp.Scale(side0 / t);
 	//		count++;
 	//	}

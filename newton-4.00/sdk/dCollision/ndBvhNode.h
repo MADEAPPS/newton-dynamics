@@ -301,9 +301,9 @@ inline void ndBvhNode::GetAabb(ndVector& minBox, ndVector& maxBox) const
 
 inline void ndBvhNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 {
-	dAssert(minBox.m_x <= maxBox.m_x);
-	dAssert(minBox.m_y <= maxBox.m_y);
-	dAssert(minBox.m_z <= maxBox.m_z);
+	ndAssert(minBox.m_x <= maxBox.m_x);
+	ndAssert(minBox.m_y <= maxBox.m_y);
+	ndAssert(minBox.m_z <= maxBox.m_z);
 
 	const ndVector p0(minBox * m_aabbQuantization);
 	const ndVector p1(maxBox * m_aabbQuantization + ndVector::m_one);
@@ -311,13 +311,13 @@ inline void ndBvhNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 	m_minBox = p0.Floor() * m_aabbInvQuantization;
 	m_maxBox = p1.Floor() * m_aabbInvQuantization;
 
-	dAssert(m_minBox.m_w == ndFloat32(0.0f));
-	dAssert(m_maxBox.m_w == ndFloat32(0.0f));
+	ndAssert(m_minBox.m_w == ndFloat32(0.0f));
+	ndAssert(m_maxBox.m_w == ndFloat32(0.0f));
 }
 
 inline ndBvhNode* ndBvhNode::Clone() const
 {
-	dAssert(0);
+	ndAssert(0);
 	return nullptr;
 }
 
