@@ -41,7 +41,7 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
-	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
+	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& outputDerivative) const;
 
 	void ReluActivation(ndDeepBrainVector& output) const;
 	void SigmoidActivation(ndDeepBrainVector& output) const;

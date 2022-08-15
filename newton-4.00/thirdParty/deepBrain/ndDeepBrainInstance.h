@@ -35,7 +35,7 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrainInstance(ndDeepBrain* const brain);
 	~ndDeepBrainInstance();
 
-	void Init();
+	void CalculatePrefixScan();
 	ndDeepBrain* GetBrain() const;
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
@@ -43,6 +43,8 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrainVector m_z;
 	ndDeepBrainPrefixScan m_zPrefixScan;
 	ndDeepBrain* m_brain;
+
+	friend class ndDeepBrainTrainingOperator;
 };
 
 inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const

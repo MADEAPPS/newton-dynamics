@@ -615,16 +615,16 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 step = x1 - x0 + 1;
 		ndInt32* const indices = data->m_globalFaceVertexIndex;
 		ndGridQuad* const indices____ = (ndGridQuad*) data->m_globalFaceVertexIndex;
-		ndInt32 maxGrids = sizeof(data->m_globalFaceVertexIndex) / sizeof(ndGridQuad);
+		const ndInt32 maxGrids = sizeof(data->m_globalFaceVertexIndex) / sizeof(ndGridQuad);
 		
 		ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 
 		const ndInt32* const indirectIndex = GetIndexList();
-		for (ndInt32 z = z0; (z < z1) && (faceCount < D_MAX_COLLIDING_FACES); ++z) 
+		for (ndInt32 z = z0; (z < z1) && (faceCount < maxGrids); ++z)
 		{
 			ndInt32 zStep = z * m_width;
-			for (ndInt32 x = x0; (x < x1) && (faceCount < D_MAX_COLLIDING_FACES); ++x) 
+			for (ndInt32 x = x0; (x < x1) && (faceCount < maxGrids); ++x)
 			{
 				ndInt32 vIndex[4];
 				vIndex[0] = vertexIndex;
@@ -653,7 +653,9 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				const ndInt32 normalIndex1 = normalBase + 1;
 				vertex[normalIndex0] = n0.Normalize();
 				vertex[normalIndex1] = n1.Normalize();
-	
+
+				ndGridQuad& quad = indices____[faceCount / 2];
+
 				faceIndexCount[faceCount] = 3;
 				indices[index + 0 + 0] = i2;
 				indices[index + 0 + 1] = i1;

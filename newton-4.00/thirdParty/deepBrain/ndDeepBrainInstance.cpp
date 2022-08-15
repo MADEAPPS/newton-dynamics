@@ -32,7 +32,7 @@ ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
 {
 	if (m_brain->GetCount())
 	{
-		Init();
+		CalculatePrefixScan();
 	}
 }
 
@@ -40,7 +40,7 @@ ndDeepBrainInstance::~ndDeepBrainInstance()
 {
 }
 
-void ndDeepBrainInstance::Init()
+void ndDeepBrainInstance::CalculatePrefixScan()
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 

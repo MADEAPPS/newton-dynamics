@@ -108,7 +108,6 @@ void ndDeepBrainLayer::HyperbolicTanDerivative(const ndDeepBrainVector& input, n
 	}
 }
 
-
 void ndDeepBrainLayer::ApplyActivation(ndDeepBrainVector& output) const
 {
 	switch (m_activation)
