@@ -42,15 +42,6 @@ ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
 {
 }
 
-void ndDeepBrainTrainingOperator::InitGaussianWeights(ndReal mean, ndReal variance)
-{
-	ndArray<ndDeepBrainLayer*>& layers = m_instance.GetLayers();
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
-	{
-		layers[i]->InitGaussianWeights(mean, variance);
-	}
-}
-
 void ndDeepBrainTrainingOperator::PrefixScan()
 {
 	ndAssert(0);

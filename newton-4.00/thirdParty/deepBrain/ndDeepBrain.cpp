@@ -42,3 +42,11 @@ ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 	return layer;
 }
 
+void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
+{
+	ndArray<ndDeepBrainLayer*>& layers = *this;
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		layers[i]->InitGaussianWeights(mean, variance);
+	}
+}

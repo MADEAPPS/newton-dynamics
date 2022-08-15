@@ -31,8 +31,6 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	public: 
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
 	virtual ~ndDeepBrainTrainingOperator();
-
-	void InitGaussianWeights(ndReal mean, ndReal variance);
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:

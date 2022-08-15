@@ -47,14 +47,6 @@ ndDeepBrainVector::~ndDeepBrainVector()
 {
 }
 
-void ndDeepBrainVector::SetValue(ndReal value)
-{
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
-	{
-		(*this)[i] = value;
-	}
-}
-
 void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
@@ -63,7 +55,15 @@ void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 	}
 }
 
-void ndDeepBrainVector::CopyData(const ndDeepBrainVector& data)
+void ndDeepBrainVector::Set(ndReal value)
+{
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i] = value;
+	}
+}
+
+void ndDeepBrainVector::Set(const ndDeepBrainVector& data)
 {
 	ndAssert(GetCount() == data.GetCount());
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)

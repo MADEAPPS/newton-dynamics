@@ -234,7 +234,7 @@ static void BooleanOr()
 	groundTruth[2][0] = 1.0f;
 	groundTruth[3][0] = 1.0f;
 
-	trainer.InitGaussianWeights(0.0f, 0.25f);
+	//trainer.InitGaussianWeights(0.0f, 0.25f);
 	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
 }
 
@@ -308,8 +308,13 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	groundTruth[0][0] = 1.0f;
 	groundTruth[0][1] = 0.0f;
 
-	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	trainer.InitGaussianWeights(0.0f, 0.25f);
+	brain.InitGaussianWeights(0.0f, 0.25f);
+
+	ndDeepBrainVector ouput;
+	ndDeepBrainInstance instance(&brain);
+	instance.MakePrediction(inputBatch[0], ouput);
+
+	//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 	//trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
 }
 

@@ -28,7 +28,7 @@ ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDe
 	,m_bias()
 {
 	m_bias.SetCount(outputCount);
-	m_bias.SetValue(0.0f);
+	m_bias.Set(0.0f);
 }
 
 ndDeepBrainLayer::~ndDeepBrainLayer()
@@ -37,6 +37,7 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 
 void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
+	m_bias.Set(0.0f);
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		(*this)[i].InitGaussianWeights(mean, variance);
@@ -178,8 +179,7 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 
 void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
-	ndAssert(0);
-	//Mul(input, output);
-	//output.Add(output, m_bias);
-	//ApplyActivation(output);
+	Mul(input, output);
+	output.Add(output, m_bias);
+	ApplyActivation(output);
 }

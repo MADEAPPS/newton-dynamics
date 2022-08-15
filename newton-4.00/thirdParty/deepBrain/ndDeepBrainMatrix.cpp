@@ -62,7 +62,7 @@ void ndDeepBrainMatrix::SetValue(ndReal value)
 	ndDeepBrainMatrix& me = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		me[i].SetValue(value);
+		me[i].Set(value);
 	}
 }
 
@@ -79,11 +79,12 @@ void ndDeepBrainMatrix::Mul(const ndDeepBrainVector& input, ndDeepBrainVector& o
 {
 	const ndDeepBrainMatrix& me = *this;
 	ndInt32 columns = input.GetCount();
-	//ndAssert(columns == me[0].GetCount());
 	ndAssert(columns == GetColumns());
 	ndAssert(output.GetCount() == GetCount());
+
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		output[i] = ndDotProduct(columns, &me[i][0], &input[0]);
+		const ndDeepBrainVector& row = me[i];
+		output[i] = ndDotProduct(columns, &row[0], &input[0]);
 	}
 }

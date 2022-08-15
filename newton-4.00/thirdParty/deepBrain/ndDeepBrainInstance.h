@@ -35,18 +35,14 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrainInstance(ndDeepBrain* const brain);
 	~ndDeepBrainInstance();
 
-	ndDeepBrainVector& GetInputs();
-	ndDeepBrainVector& GetOutputs();
+	void Init();
 	ndArray<ndDeepBrainLayer*>& GetLayers();
 	const ndArray<ndDeepBrainLayer*>& GetLayers() const;
-
-	void MakePrediction(const ndDeepBrainVector& input);
+	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
-	void SetInput(const ndDeepBrainVector& input);
-
-	ndDeepBrainVector m_inputs;
-	ndDeepBrainVector m_outputs;
+	ndDeepBrainVector m_z;
+	ndDeepBrainPrefixScan m_zPrefixScan;
 	ndDeepBrain* m_brain;
 };
 
