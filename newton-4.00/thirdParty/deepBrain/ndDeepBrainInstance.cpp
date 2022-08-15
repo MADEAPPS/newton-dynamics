@@ -42,7 +42,7 @@ ndDeepBrainInstance::~ndDeepBrainInstance()
 
 void ndDeepBrainInstance::Init()
 {
-	const ndArray<ndDeepBrainLayer*>& layers = GetLayers();
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 
 	m_zPrefixScan.SetCount(layers.GetCount() + 1);
 	m_zPrefixScan[0] = (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
@@ -64,19 +64,9 @@ void ndDeepBrainInstance::Init()
 	m_z.Set(0.0f);
 }
 
-ndArray<ndDeepBrainLayer*>& ndDeepBrainInstance::GetLayers()
-{
-	return *m_brain;
-}
-
-const ndArray<ndDeepBrainLayer*>& ndDeepBrainInstance::GetLayers() const
-{
-	return *m_brain;
-}
-
 void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
-	const ndArray<ndDeepBrainLayer*>& layers = GetLayers();
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	ndAssert(layers.GetCount());
 
 	ndAssert(layers[0]->GetInputSize() == input.GetCount());

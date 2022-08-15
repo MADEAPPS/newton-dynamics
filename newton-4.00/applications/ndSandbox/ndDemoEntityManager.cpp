@@ -314,8 +314,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndDeepBrainInstance instance(&brain);
 	instance.MakePrediction(inputBatch[0], ouput);
 
-	//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	//trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
+	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+	trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
 }
 
 void Test2__()

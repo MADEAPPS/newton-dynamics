@@ -36,8 +36,7 @@ class ndDeepBrainInstance: public ndClassAlloc
 	~ndDeepBrainInstance();
 
 	void Init();
-	ndArray<ndDeepBrainLayer*>& GetLayers();
-	const ndArray<ndDeepBrainLayer*>& GetLayers() const;
+	ndDeepBrain* GetBrain() const;
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
@@ -46,6 +45,10 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrain* m_brain;
 };
 
+inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const
+{
+	return m_brain;
+}
 
 #endif 
 
