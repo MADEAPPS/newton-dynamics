@@ -573,7 +573,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) 
 	{
-		ndThreadId threadId = ndGetThreadId();
+		ndInt32 threadId = data->m_threadId;
 		ndList<ndLocalThreadData>::ndNode* localDataNode = nullptr;
 		for (ndList<ndLocalThreadData>::ndNode* node = m_localData.GetFirst(); node; node = node->GetNext())
 		{
@@ -583,7 +583,6 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				break;
 			}
 		}
-
 		if (!localDataNode)
 		{
 			localDataNode = m_localData.Append();
@@ -615,6 +614,9 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 faceCount = 0;
 		ndInt32 step = x1 - x0 + 1;
 		ndInt32* const indices = data->m_globalFaceVertexIndex;
+		ndGridQuad* const indices____ = (ndGridQuad*) data->m_globalFaceVertexIndex;
+		ndInt32 maxGrids = sizeof(data->m_globalFaceVertexIndex) / sizeof(ndGridQuad);
+		
 		ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 

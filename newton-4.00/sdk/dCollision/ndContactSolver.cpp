@@ -3199,6 +3199,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 
 	return count;
 }
+
 ndInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 {
 	ndAssert(m_instance0.GetConvexVertexCount());

@@ -28,6 +28,26 @@
 class ndShapeHeightfield: public ndShapeStaticMesh
 {
 	public:
+	class ndTriangle
+	{
+		public:	
+		ndInt32 m_i0;
+		ndInt32 m_i1;
+		ndInt32 m_i2;
+		ndInt32 m_material;
+		ndInt32 m_normal;
+		ndInt32 m_edge01_normal;
+		ndInt32 m_edge12_normal;
+		ndInt32 m_edge23_normal;
+		ndInt32 m_area;
+	};
+
+	class ndGridQuad
+	{
+		ndTriangle m_trinagle0;
+		ndTriangle m_trinagle1;
+	};
+
 	enum ndGridConstruction
 	{
 		m_normalDiagonals = 0,
@@ -60,12 +80,12 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	{
 		public:
 		ndLocalThreadData()
-			:m_threadId()
+			:m_threadId(0)
 		{
 		}
 
 		ndArray<ndVector> m_vertex;
-		ndThreadId m_threadId;
+		ndInt32 m_threadId;
 	};
 
 	void CalculateLocalObb();
