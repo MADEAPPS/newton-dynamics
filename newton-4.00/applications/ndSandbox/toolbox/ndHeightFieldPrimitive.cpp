@@ -26,9 +26,11 @@
 #define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)
 //#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (ndFloat32 (D_TERRAIN_WIDTH) / 5)
 
-#define D_TERRAIN_GRID_SIZE		4.0f
-#define D_TERRAIN_TILE_SIZE		128
-#define D_TERRAIN_ELEVATION_SCALE	64.0f
+//#define D_TERRAIN_GRID_SIZE			4.0f
+#define D_TERRAIN_GRID_SIZE			0.2f
+#define D_TERRAIN_TILE_SIZE			128
+//#define D_TERRAIN_ELEVATION_SCALE	64.0f
+#define D_TERRAIN_ELEVATION_SCALE	0.0f
 
 class ndHeightfieldMesh : public ndDemoMesh
 {

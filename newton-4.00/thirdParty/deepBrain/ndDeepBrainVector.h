@@ -39,6 +39,7 @@ class ndDeepBrainVector: public ndArray<ndReal>
 	void ScaleSet(const ndDeepBrainVector& a, ndReal scale);
 	void Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
 	void Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
+	void Mul(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
 
 	void ScaleAdd(const ndDeepBrainVector& a, ndReal b);
 	void MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b);

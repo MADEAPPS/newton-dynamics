@@ -691,11 +691,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			vertexIndex++;
 		}
 		
-		const int maxIndex = index;
+		const ndInt32 maxIndex = index;
 		ndInt32 stepBase = (x1 - x0) * (2 * 9);
 		for (ndInt32 z = z0; z < z1; ++z) 
 		{
-			//const ndInt32 diagBase = m_width * z;
 			const ndInt32 triangleIndexBase = (z - z0) * stepBase;
 			const ndInt32* const horizontalEdgeMap = &m_horizontalEdgeMap[m_diagonalMode == m_normalDiagonals ? 0 : 1][0];
 			for (ndInt32 x = x0; x < (x1 - 1); ++x) 
@@ -734,7 +733,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			for (ndInt32 z = z0; z < (z1 - 1); ++z) 
 			{
 				ndInt32 index1 = (z - z0) * stepBase + triangleIndexBase;
-				if (index1 < maxIndex) 
+				if ((index1 + stepBase) < maxIndex)
 				{
 					ndInt32* const triangles = &indices[index1];
 					const ndInt32 i0 = triangles[verticalEdgeMap[0]];

@@ -37,7 +37,6 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	protected:
 	void PrefixScan();
-	//void SetInput(const ndDeepBrainVector& input);
 	void MakePrediction(const ndDeepBrainVector& input);
 	void PredictInputLayer(const ndDeepBrainVector& input);
 
@@ -47,14 +46,14 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	void BackPropagate(ndReal learnRate, const ndDeepBrainVector& groundTruth);
 
 	ndDeepBrainInstance m_instance;
-	ndDeepBrainVector m_output;
-	ndDeepBrainVector m_preOutput;
-	ndDeepBrainVector m_gradients;
-	ndDeepBrainVector m_costGradients;
-	ndDeepBrainVector m_biasGradients;
-	ndDeepBrainVector m_outputDerivative;
-	ndDeepBrainPrefixScan m_ouputPrefixScan;
-	ndDeepBrainPrefixScan m_gradientsPrefixScan;
+	//ndDeepBrainVector m_output;
+	//ndDeepBrainVector m_preOutput;
+	//ndDeepBrainVector m_gradients;
+	//ndDeepBrainVector m_costGradients;
+	//ndDeepBrainVector m_biasGradients;
+	//ndDeepBrainVector m_outputDerivative;
+	//ndDeepBrainPrefixScan m_ouputPrefixScan;
+	//ndDeepBrainPrefixScan m_gradientsPrefixScan;
 
 	friend class ndDeepBrainInstance;
 };

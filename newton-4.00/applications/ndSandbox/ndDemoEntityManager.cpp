@@ -285,7 +285,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndSetRandSeed(142543);
 
 	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_tanh);
-	ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 2, m_tanh);
+	ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 3, m_tanh);
 	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
 
 	brain.AddLayer(inputLayer);
@@ -310,7 +310,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 
 	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 	trainer.InitGaussianWeights(0.0f, 0.25f);
-	trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
+	//trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
 }
 
 void Test2__()

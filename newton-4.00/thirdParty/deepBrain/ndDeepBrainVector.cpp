@@ -98,6 +98,13 @@ void ndDeepBrainVector::Sub(const ndDeepBrainVector& a, const ndDeepBrainVector&
 	ndSub(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
+void ndDeepBrainVector::Mul(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+{
+	ndAssert(GetCount() == a.GetCount());
+	ndAssert(GetCount() == b.GetCount());
+	ndMul(GetCount(), &(*this)[0], &a[0], &b[0]);
+}
+
 void ndDeepBrainVector::MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
