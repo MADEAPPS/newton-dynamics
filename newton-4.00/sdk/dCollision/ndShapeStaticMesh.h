@@ -32,7 +32,6 @@ class ndContactSolver;
 #define D_MAX_COLLIDING_FACES		512
 #define D_MAX_COLLIDING_INDICES		(D_MAX_COLLIDING_FACES * (4 * 2 + 3))
 
-
 class ndShapeStaticMesh;
 typedef void (*dgCollisionMeshCollisionCallback) (const ndBodyKinematic* const bodyWithTreeCollision, const ndBodyKinematic* const body, ndInt32 faceID, 
 												  ndInt32 vertexCount, const ndFloat32* const vertex, ndInt32 vertexStrideInBytes); 
