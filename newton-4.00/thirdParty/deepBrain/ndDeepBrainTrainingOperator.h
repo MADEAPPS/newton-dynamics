@@ -44,14 +44,12 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_output;
+
+	ndDeepBrainVector m_g;
 	ndDeepBrainVector m_zDerivative;
-	//ndDeepBrainVector m_preOutput;
-	//ndDeepBrainVector m_gradients;
-	//ndDeepBrainVector m_costGradients;
-	//ndDeepBrainVector m_biasGradients;
-	//ndDeepBrainVector m_outputDerivative;
-	//ndDeepBrainPrefixScan m_ouputPrefixScan;
-	//ndDeepBrainPrefixScan m_gradientsPrefixScan;
+
+	ndDeepBrainVector m_weightGradients;
+	ndDeepBrainPrefixScan m_weightGradientsPrefitScan;
 
 	friend class ndDeepBrainInstance;
 };
