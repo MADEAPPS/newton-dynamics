@@ -31,6 +31,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	public: 
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
 	virtual ~ndDeepBrainTrainingOperator();
+
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:
@@ -50,6 +51,8 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	ndDeepBrainVector m_weightGradients;
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
+
+	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
 
 	friend class ndDeepBrainInstance;
 };

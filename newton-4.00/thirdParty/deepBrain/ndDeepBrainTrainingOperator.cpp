@@ -32,11 +32,37 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	,m_zDerivative()
 	,m_weightGradients()
 	,m_weightGradientsPrefixScan()
+	,m_weightsLayersTranspose()
 {
+	PrefixScan();
+	m_instance.GetBrain()->InitGaussianWeights(0.0f, 0.25f);
+
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	for (ndInt32 i = 0; i < layers.GetCount(); i ++)
+	{
+		const ndDeepBrainLayer& layer = *layers[i];
+
+		m_weightsLayersTranspose.PushBack(new ndDeepBrainMatrix(layer.GetInputSize(), layer.GetOuputSize()));
+
+		ndDeepBrainMatrix& matrix = *m_weightsLayersTranspose[i];
+		for (ndInt32 j = 0; j < layer.GetInputSize(); ++j)
+		{
+			for (ndInt32 k = 0; k < layer.GetOuputSize(); ++k)
+			{
+				ndReal val = layer[k][j];
+				matrix[j][k] = val;
+			}
+		}
+	}
 }
 
 ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
 {
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	for (ndInt32 i = 0; i < layers.GetCount(); i++)
+	{
+		delete (m_weightsLayersTranspose[i]);
+	}
 }
 
 void ndDeepBrainTrainingOperator::PrefixScan()
