@@ -131,8 +131,8 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 	{
 		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
 		ndFloat32 gValue = g[i];
-		weightGradientPtr += stride;
 		weightGradient.ScaleSet(z0, gValue);
+		weightGradientPtr += stride;
 	}
 }
 
@@ -186,15 +186,15 @@ void ndDeepBrainTrainingOperator::UpdateWeights(ndReal learnRate)
 		layer->m_bias.ScaleAdd(biasGradient, -learnRate);
 
 		const ndInt32 weightGradientStride = (inputSize + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-		ndInt32 gradientStart = m_weightGradientsPrefixScan[i];
+		ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
 
 		ndDeepBrainMatrix& weightMatrix = *layer;
 		for (ndInt32 j = 0; j < outputSize; ++j)
 		{
 			ndDeepBrainVector& weightVector = weightMatrix[j];
-			const ndDeepBrainMemVector weightGradients(&m_weightGradients[gradientStart], inputSize);
-			//weightVector.ScaleAdd(weightGradients, -learnRate);
-			gradientStart += weightGradientStride;
+			const ndDeepBrainMemVector weightGradients(weightGradientPtr, inputSize);
+			weightGradientPtr += weightGradientStride;
+			weightVector.ScaleAdd(weightGradients, -learnRate);
 		}
 	}
 }

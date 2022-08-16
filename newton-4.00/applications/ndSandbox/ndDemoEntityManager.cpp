@@ -285,37 +285,38 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndSetRandSeed(142543);
 
 	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_tanh);
-	ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 3, m_tanh);
-	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
+	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 6, m_tanh);
+	ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 6, m_tanh);
+	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 
 	brain.AddLayer(inputLayer);
-	brain.AddLayer(hiddenLayer);
+	brain.AddLayer(hiddenLayer0);
+	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
 
-	//inputLayer->GetBias()[0] = 0.3f;
-	//(*inputLayer)[0][0] = 0.6f;
-	//(*inputLayer)[0][1] =-0.1f;
-	//ouputLayer->GetBias()[0] = -0.2f;
-	//(*ouputLayer)[0][0] = 0.5f;
-	//ndDeepBrainVector input;
-	//input.PushBack(-0.9f);
-	//input.PushBack( 0.1f);
+	ndDeepBrainMatrix inputBatch(100, 2);
+	ndDeepBrainMatrix groundTruth(100, 2);
+	for (ndInt32 i = 0; i < 100; i++)
+	{
+		inputBatch[i][0] = ndGaussianRandom(0.5f, 0.25f);
+		inputBatch[i][1] = ndGaussianRandom(0.5f, 0.25f);
 
-	ndDeepBrainMatrix inputBatch(1, 2);
-	ndDeepBrainMatrix groundTruth(1, 2);
-	inputBatch[0][0] = -0.9f; 
-	inputBatch[0][1] =  0.1f;
-	groundTruth[0][0] = 1.0f;
-	groundTruth[0][1] = 0.0f;
+		groundTruth[i][0] = ((inputBatch[i][0] > 0.5f) && (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
+		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
+	}
 
-	brain.InitGaussianWeights(0.0f, 0.25f);
+	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+	trainer.Optimize(inputBatch, groundTruth, 5.e-2f, 2000);
 
 	ndDeepBrainVector ouput;
 	ndDeepBrainInstance instance(&brain);
-	instance.MakePrediction(inputBatch[0], ouput);
-
-	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
+	for (ndInt32 i = 0; i < 100; i++)
+	{
+		ndDeepBrainVector& input = inputBatch[i];
+		ndDeepBrainVector& truth = groundTruth[i];
+		instance.MakePrediction(input, ouput);
+		instance.MakePrediction(input, ouput);
+	}
 }
 
 void Test2__()
