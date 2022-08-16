@@ -466,10 +466,5 @@ inline void ndYield()
 	std::this_thread::yield();
 }
 
-//inline ndThreadId ndGetThreadId()
-//{
-//	return std::this_thread::get_id();
-//}
-
 #endif
 
