@@ -220,8 +220,6 @@ typedef uint32_t ndUnsigned32;
 typedef int64_t ndInt64;
 typedef uint64_t ndUnsigned64;
 
-//typedef std::thread::id ndThreadId;
-
 typedef double ndFloat64;
 #ifdef D_NEWTON_USE_DOUBLE
 	typedef double ndFloat32;
