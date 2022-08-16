@@ -285,7 +285,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndSetRandSeed(142543);
 
 	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_tanh);
-	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 6, m_tanh);
+	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_tanh);
 	ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 6, m_tanh);
 	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 
@@ -294,9 +294,10 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
 
-	ndDeepBrainMatrix inputBatch(100, 2);
-	ndDeepBrainMatrix groundTruth(100, 2);
-	for (ndInt32 i = 0; i < 100; i++)
+	ndInt32 samples = 1000;
+	ndDeepBrainMatrix inputBatch(samples, 2);
+	ndDeepBrainMatrix groundTruth(samples, 2);
+	for (ndInt32 i = 0; i < samples; i++)
 	{
 		inputBatch[i][0] = ndGaussianRandom(0.5f, 0.25f);
 		inputBatch[i][1] = ndGaussianRandom(0.5f, 0.25f);
@@ -306,14 +307,23 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 
 	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	trainer.Optimize(inputBatch, groundTruth, 5.e-2f, 2000);
+	trainer.Optimize(inputBatch, groundTruth, 5.e-2f, 4000);
 
+	ndDeepBrainVector input;
 	ndDeepBrainVector ouput;
+	ndDeepBrainVector truth;
+	truth.SetCount(2);
+	input.SetCount(2);
+	ouput.SetCount(2);
+
 	ndDeepBrainInstance instance(&brain);
-	for (ndInt32 i = 0; i < 100; i++)
+	for (ndInt32 i = 0; i < 20; i++)
 	{
-		ndDeepBrainVector& input = inputBatch[i];
-		ndDeepBrainVector& truth = groundTruth[i];
+		input[0] = ndGaussianRandom(0.5f, 0.25f);
+		input[1] = ndGaussianRandom(0.5f, 0.25f);
+		truth[0] = ((input[0] > 0.5f) && (input[1] > 0.5f)) ? 1.0f : 0.0f;
+		truth[1] = ((input[0] > 0.5f) || (input[1] > 0.5f)) ? 1.0f : 0.0f;
+
 		instance.MakePrediction(input, ouput);
 		instance.MakePrediction(input, ouput);
 	}
