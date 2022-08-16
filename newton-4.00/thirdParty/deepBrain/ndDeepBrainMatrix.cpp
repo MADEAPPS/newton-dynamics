@@ -45,18 +45,6 @@ ndDeepBrainMatrix::~ndDeepBrainMatrix()
 	}
 }
 
-ndInt32 ndDeepBrainMatrix::GetRows() const
-{
-	ndInt32 rows = GetCount();
-	return rows;
-}
-
-ndInt32 ndDeepBrainMatrix::GetColumns() const
-{
-	ndInt32 columns = GetCount() ? (*this)[0].GetCount() : 0;
-	return columns;
-}
-
 void ndDeepBrainMatrix::SetValue(ndReal value)
 {
 	ndDeepBrainMatrix& me = *this;

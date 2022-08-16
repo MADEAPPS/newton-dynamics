@@ -39,4 +39,17 @@ class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 	void Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const;
 };
 
+inline ndInt32 ndDeepBrainMatrix::GetRows() const
+{
+	ndInt32 rows = GetCount();
+	return rows;
+}
+
+inline ndInt32 ndDeepBrainMatrix::GetColumns() const
+{
+	ndInt32 columns = GetCount() ? (*this)[0].GetCount() : 0;
+	return columns;
+}
+
+
 #endif 

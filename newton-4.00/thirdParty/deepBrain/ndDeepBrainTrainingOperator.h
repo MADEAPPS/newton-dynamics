@@ -49,7 +49,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainVector m_zDerivative;
 
 	ndDeepBrainVector m_weightGradients;
-	ndDeepBrainPrefixScan m_weightGradientsPrefitScan;
+	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 
 	friend class ndDeepBrainInstance;
 };

@@ -31,7 +31,7 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	,m_g()
 	,m_zDerivative()
 	,m_weightGradients()
-	,m_weightGradientsPrefitScan()
+	,m_weightGradientsPrefixScan()
 {
 }
 
@@ -50,19 +50,19 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	m_zDerivative.Set(0.0f);
 	m_output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 
-	m_weightGradientsPrefitScan.SetCount(layers.GetCount());
+	m_weightGradientsPrefixScan.SetCount(layers.GetCount());
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
 		ndInt32 stride = (layer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-		m_weightGradientsPrefitScan[i] = stride * layer->GetOuputSize();
+		m_weightGradientsPrefixScan[i] = stride * layer->GetOuputSize();
 	}
 
 	ndInt32 sum = 0;
-	for (ndInt32 i = 0; i < m_weightGradientsPrefitScan.GetCount(); ++i)
+	for (ndInt32 i = 0; i < m_weightGradientsPrefixScan.GetCount(); ++i)
 	{
-		ndInt32 count = m_weightGradientsPrefitScan[i];
-		m_weightGradientsPrefitScan[i] = sum;
+		ndInt32 count = m_weightGradientsPrefixScan[i];
+		m_weightGradientsPrefixScan[i] = sum;
 		sum += count;
 	}
 	m_weightGradients.SetCount(sum);
@@ -127,7 +127,7 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 
 	const ndInt32 stride = (ouputLayer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 
-	ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefitScan[layerIndex]];
+	ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
 	const ndDeepBrainMemVector z0(&m_instance.m_z[m_instance.m_zPrefixScan[layerIndex]], inputCount);
 	for (ndInt32 i = 0; i < outputCount; ++i)
 	{
@@ -154,7 +154,7 @@ void ndDeepBrainTrainingOperator::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	//
 	//const ndInt32 stride = (ouputLayer->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	//
-	//ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefitScan[layerIndex]];
+	//ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
 	//const ndDeepBrainMemVector z0(&m_instance.m_z[m_instance.m_zPrefixScan[layerIndex]], inputCount);
 	//for (ndInt32 i = 0; i < outputCount; ++i)
 	//{
