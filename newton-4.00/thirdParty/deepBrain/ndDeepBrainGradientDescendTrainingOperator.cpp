@@ -40,13 +40,20 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		m_averageError = 0.0f;
-		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
+		//for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
+		for (ndInt32 j = 0; j < inputBatch.GetCount(); ++j)
 		{
+			if (j == 5381)
+			{
+				j *= 1;
+			}
 			const ndDeepBrainVector& input = inputBatch[j];
 			const ndDeepBrainVector& truth = groundTruth[j];
 			MakePrediction(input);
 			BackPropagate(learnRate, truth);
-			m_averageError += CalculateMeanSquareError(truth);
+			ndFloat32 error = CalculateMeanSquareError(truth);
+			ndTrace(("%d %f\n", j, m_averageError));
+			m_averageError += error;
 		}
 		m_averageError = ndSqrt(m_averageError / inputBatch.GetCount());
 		ndTrace(("%f\n", m_averageError));

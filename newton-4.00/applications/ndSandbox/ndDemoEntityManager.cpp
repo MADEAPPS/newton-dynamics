@@ -325,17 +325,41 @@ static void MnistTrainingSet()
 			digitWith = ndIndian32(digitWith);
 			digitHeight = ndIndian32(digitHeight);
 			trainingDigits = new ndDeepBrainMatrix(numberOfItems, digitWith * digitHeight);
+			trainingDigits->Set(0.0f);
 			ndAssert(numberOfItems == ndUnsigned32(trainingLabels->GetCount()));
 
+			ndUnsigned8 data[32 * 32];
 			for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
 			{
 				ndDeepBrainVector& image = (*trainingDigits)[i];
-				ret = fread(&image[0], digitWith, digitHeight, fp);
+				ret = fread(data, digitWith, digitHeight, fp);
+				for (ndUnsigned32 j = 0; j < digitWith * digitHeight; j++)
+				{
+					image[j] = ndReal(data[j]) / 255.0f;
+				}
 			}
 			fclose(fp);
 		}
 	}
 
+	if (trainingLabels && trainingDigits)
+	{
+		ndDeepBrain brain;
+		ndSetRandSeed(142543);
+
+		ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), 16, m_relu);
+		ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
+		ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 16, m_relu);
+		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
+
+		brain.AddLayer(inputLayer);
+		brain.AddLayer(hiddenLayer0);
+		brain.AddLayer(hiddenLayer1);
+		brain.AddLayer(ouputLayer);
+
+		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+		//trainer.Optimize(*trainingDigits, *trainingLabels, 2.0e-1f, 5000);
+	}
 
 	if (trainingLabels)
 	{
