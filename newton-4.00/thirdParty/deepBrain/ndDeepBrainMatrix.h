@@ -33,8 +33,8 @@ class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 
 	ndInt32 GetRows() const;
 	ndInt32 GetColumns() const;
+	void Set(ndReal value);
 
-	void SetValue(ndReal value);
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 	void Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const;
 };

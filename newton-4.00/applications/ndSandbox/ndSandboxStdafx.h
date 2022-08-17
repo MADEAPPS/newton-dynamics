@@ -136,5 +136,10 @@ void dGetWorkingFileName (const char* const name, char* const outPathName);
 ndUnsigned32 SWAP_INT32(ndUnsigned32 x);
 ndUnsigned16 SWAP_INT16(ndUnsigned16 x);
 void SWAP_FLOAT32_ARRAY (void* const array, ndInt32 count);
+
+
+ndUnsigned16 ndIndian16(ndUnsigned16 x);
+ndUnsigned32 ndIndian32(ndUnsigned32 x);
+
 #endif 
 

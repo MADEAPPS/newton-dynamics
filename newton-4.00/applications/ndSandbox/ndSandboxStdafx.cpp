@@ -57,9 +57,21 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 	#endif
 }
 
-	// endian conversion
+ndUnsigned16 ndIndian16(ndUnsigned16 x)
+{
+	return ((x >> 8) & 0xff) + ((x & 0xff) << 8);
+}
+
+ndUnsigned32 ndIndian32(ndUnsigned32 x)
+{
+	ndUnsigned16 low = ndUnsigned16(x);
+	ndUnsigned16 high = ndUnsigned16(x>>16);
+	return ndUnsigned32(ndIndian16(high)) + (ndUnsigned32(ndIndian16(low)) << 16);
+}
+
+// endian conversion
 #ifdef __ppc__
-	ndUnsigned16 SWAP_INT16(ndUnsigned16 short x)
+	ndUnsigned16 SWAP_INT16(ndUnsigned16 x)
 	{
 		return ((x >> 8) & 0xff) + ((x & 0xff) << 8);
 	}

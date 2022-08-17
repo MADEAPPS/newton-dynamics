@@ -212,73 +212,6 @@ void Test1__()
 	//}
 }
 
-static void BooleanOr()
-{
-	ndDeepBrain brain;
-	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-
-	ndSetRandSeed(142543);
-
-	brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
-
-	// test an ex or boolean gate
-	ndDeepBrainMatrix inputBatch(4, 2);
-	ndDeepBrainMatrix groundTruth(4, 1);
-	inputBatch[0][0] = 0.0f; inputBatch[0][1] = 0.0f;
-	inputBatch[1][0] = 0.0f; inputBatch[1][1] = 1.0f;
-	inputBatch[2][0] = 1.0f; inputBatch[2][1] = 0.0f;
-	inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
-
-	groundTruth[0][0] = 0.0f;
-	groundTruth[1][0] = 1.0f;
-	groundTruth[2][0] = 1.0f;
-	groundTruth[3][0] = 1.0f;
-
-	//trainer.InitGaussianWeights(0.0f, 0.25f);
-	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
-}
-
-static void BooleanXOr()
-{
-	ndAssert(0);
-	//ndDeepBrain brain;
-	//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	//
-	//ndSetRandSeed(142543);
-	//
-	////ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 2, m_tanh));
-	////ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
-	//brain.AddLayer(new ndDeepBrainLayer(2, 2, m_tanh));
-	//brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
-	//
-	//// test an ex or boolean gate
-	////ndDeepBrainMatrix inputBatch(4, 2);
-	////ndDeepBrainMatrix groundTruth(4, 1);
-	////inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
-	////inputBatch[1][0] = -1.0f; inputBatch[1][1] = 1.0f;
-	////inputBatch[2][0] = 1.0f; inputBatch[2][1] = -1.0f;
-	////inputBatch[3][0] = 1.0f; inputBatch[3][1] = 1.0f;
-	////
-	////groundTruth[0][0] = 0.0f;
-	////groundTruth[1][0] = 1.0f;
-	////groundTruth[2][0] = 1.0f;
-	////groundTruth[3][0] = 0.0f;
-	////trainer.InitGaussianWeights(0.0f, 0.25f);
-	//
-	//ndDeepBrainLayer* const inputLayer = (ndDeepBrainLayer*)brain[0];
-	//ndDeepBrainLayer* const ouputLayer = (ndDeepBrainLayer*)brain[1];
-	//*inputLayer[0][0] = 0.6f;
-	//*inputLayer[0][1] =-0.1f;
-	//*inputLayer[1][0] =-0.2f;
-	//*inputLayer[1][1] = 0.5f;
-	//
-	//*ouputLayer[1][0] = -0.2f;
-	//*ouputLayer[1][1] = 0.5f;
-	//
-	//trainer.Optimize(inputBatch, groundTruth, 0.1f, 1);
-}
-
-
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndDeepBrain brain;
@@ -329,64 +262,98 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 }
 
+static void MnistTrainingSet()
+{
+	ndDeepBrainMatrix* trainingLabels = nullptr;
+	ndDeepBrainMatrix* trainingDigits = nullptr;
+
+	char outPathName[1024];
+	dGetWorkingFileName("mnistDatabase/train-labels.idx1-ubyte", outPathName);
+	FILE* fp = fopen(outPathName, "rb");
+	if (fp)
+	{
+		// read training labels
+		//[offset] [type]          [value]          [description]
+		//0000     32 bit integer  0x00000801(2049) magic number(MSB first)
+		//0004     32 bit integer  60000            number of items
+		//0008     unsigned byte ? ? label
+		//0009     unsigned byte ? ? label
+		//........
+		//xxxx     unsigned byte ? ? label
+		//The labels values are 0 to 9.
+
+		ndUnsigned32 magicNumber;
+		ndUnsigned32 numberOfItems;
+		size_t ret = 0;
+		ret = fread(&magicNumber, 4, 1, fp);
+		ret = fread(&numberOfItems, 4, 1, fp);
+		magicNumber = ndIndian32(magicNumber);
+		numberOfItems = ndIndian32(numberOfItems);
+
+		trainingLabels = new ndDeepBrainMatrix(numberOfItems, 10);
+		trainingLabels->Set(0.0f);
+		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
+		{
+			ndUnsigned8 label;
+			ret = fread(&label, 1, 1, fp);
+			(*trainingLabels)[i][label] = 1.0f;
+		}
+		fclose(fp);
+
+		dGetWorkingFileName("mnistDatabase/train-images.idx3-ubyte", outPathName);
+		fp = fopen(outPathName, "rb");
+		if (fp)
+		{
+			//[offset] [type]          [value]          [description]
+			//0000     32 bit integer  0x00000803(2051) magic number
+			//0004     32 bit integer  60000            number of images
+			//0008     32 bit integer  28               number of rows
+			//0012     32 bit integer  28               number of columns
+			//0016     unsigned byte ? ? pixel
+			//0017     unsigned byte ? ? pixel
+			//........
+			//xxxx     unsigned byte ? ? pixel/
+
+			ndUnsigned32 digitWith;
+			ndUnsigned32 digitHeight;
+			ret = fread(&magicNumber, 4, 1, fp);
+			ret = fread(&numberOfItems, 4, 1, fp);
+			ret = fread(&digitWith, 4, 1, fp);
+			ret = fread(&digitHeight, 4, 1, fp);
+			magicNumber = ndIndian32(magicNumber);
+			numberOfItems = ndIndian32(numberOfItems);
+			digitWith = ndIndian32(digitWith);
+			digitHeight = ndIndian32(digitHeight);
+			trainingDigits = new ndDeepBrainMatrix(numberOfItems, digitWith * digitHeight);
+			ndAssert(numberOfItems == ndUnsigned32(trainingLabels->GetCount()));
+
+			for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
+			{
+				ndDeepBrainVector& image = (*trainingDigits)[i];
+				ret = fread(&image[0], digitWith, digitHeight, fp);
+			}
+			fclose(fp);
+		}
+	}
+
+
+	if (trainingLabels)
+	{
+		delete trainingLabels;
+	}
+
+	if (trainingDigits)
+	{
+		delete trainingDigits;
+	}
+
+}
+
 void Test2__()
 {
-	//BooleanOr();
-	//BooleanXOr();
-	ThreeLayersTwoInputsTwoOutputs();
-//	ndDeepBrain brain;
-//	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-//	
-//	ndSetRandSeed(142543);
-//
-//#if 1
-//
-//	ndDeepBrainLayer* const inputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 2, m_tanh));
-//	ndDeepBrainLayer* const outputLayer = brain.AddLayer(new ndDeepBrainLayer(2, 1, m_sigmoid));
-//
-//	//ndDeepBrainNeuron* const inputNeuron = (*inputLayer)[0];
-//	//ndDeepBrainVector& inputWeights = inputNeuron->GetWeights();
-//	//inputWeights[0] = 0.6f;
-//	//inputWeights[1] = -0.1f;
-//	//inputNeuron->SetBias(0.3f);
-//	//
-//	//ndDeepBrainNeuron* const ouputNeuron = (*outputLayer)[0];
-//	//ndDeepBrainVector& ouputWeights = ouputNeuron->GetWeights();
-//	//ouputWeights[0] = 0.5f;
-//	//ouputNeuron->SetBias(-0.2f);
-//
-//	// test an ex or boolean gate
-//	ndDeepBrainMatrix inputBatch(4, 2);
-//	ndDeepBrainMatrix groundTruth(4, 1);
-//	inputBatch[0][0] = -1.0f; inputBatch[0][1] = -1.0f;
-//	inputBatch[1][0] = -1.0f; inputBatch[1][1] =  1.0f;
-//	inputBatch[2][0] =  1.0f; inputBatch[2][1] = -1.0f;
-//	inputBatch[3][0] =  1.0f; inputBatch[3][1] =  1.0f;
-//
-//	groundTruth[0][0] = 0.0f;
-//	groundTruth[1][0] = 1.0f;
-//	groundTruth[2][0] = 1.0f;
-//	groundTruth[3][0] = 0.0f;
-//	//ndDeepBrainMatrix xxxxx0(10, 2);
-//	//xxxxx0.InitGaussianWeights(0.0f, 0.25f);
-//	//xxxxx0.RandomShuffle();
-//	//xxxxx0.RandomShuffle();
-//	//ndDeepBrainMatrix xxxxx1(3, 2);
-//	
-//	trainer.InitGaussianWeights(0.0f, 0.25f);
-//	trainer.Optimize(inputBatch, groundTruth, 0.1f, 10);
-//
-//#elif 1
-//	brain.AddLayer(784, 16, ndDeepBrainLayer::m_relu);
-//	brain.AddLayer(16, 16,  ndDeepBrainLayer::m_relu);
-//	brain.AddLayer(16, 10,  ndDeepBrainLayer::m_sigmoid);
-//
-//	trainer.Step();
-//
-//	//ndDeepBrainVector input;
-//	//input.SetCount(784);
-//	//brain.FowardPass();
-//#endif
+	//ThreeLayersTwoInputsTwoOutputs();
+
+	MnistTrainingSet();
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

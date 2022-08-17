@@ -45,7 +45,7 @@ ndDeepBrainMatrix::~ndDeepBrainMatrix()
 	}
 }
 
-void ndDeepBrainMatrix::SetValue(ndReal value)
+void ndDeepBrainMatrix::Set(ndReal value)
 {
 	ndDeepBrainMatrix& me = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
