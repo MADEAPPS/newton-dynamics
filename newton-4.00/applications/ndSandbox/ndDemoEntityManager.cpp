@@ -307,7 +307,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 
 	ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-	trainer.Optimize(inputBatch, groundTruth, 5.e-2f, 4000);
+	trainer.Optimize(inputBatch, groundTruth, 2.0e-1f, 5000);
 
 	ndDeepBrainVector input;
 	ndDeepBrainVector ouput;

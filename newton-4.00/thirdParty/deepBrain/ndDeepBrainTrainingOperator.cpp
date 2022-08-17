@@ -33,6 +33,7 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	,m_weightGradients()
 	,m_weightGradientsPrefixScan()
 	,m_weightsLayersTranspose()
+	,m_averageError(0.0f)
 {
 	PrefixScan();
 	m_instance.GetBrain()->InitGaussianWeights(0.0f, 0.25f);
@@ -122,6 +123,7 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 	const ndDeepBrainMemVector zDerivative(&m_zDerivative[m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
 
 	g.Sub(z, groundTruth);
+	m_averageError += g.Dot(g);
 	g.Mul(g, zDerivative);
 
 	const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;

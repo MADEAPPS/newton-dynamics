@@ -39,6 +39,7 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
+		m_averageError = 0.0f;
 		for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
 		{
 			const ndDeepBrainVector& input = inputBatch[j];
@@ -46,5 +47,7 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			MakePrediction(input);
 			BackPropagate(learnRate, truth);
 		}
+		m_averageError = ndSqrt(m_averageError / inputBatch.GetCount());
+		ndTrace(("%f\n", m_averageError));
 	}
 }

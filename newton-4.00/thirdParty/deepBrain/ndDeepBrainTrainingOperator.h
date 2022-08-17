@@ -55,6 +55,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 
 	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
+	ndFloat32 m_averageError;
 
 	friend class ndDeepBrainInstance;
 };
