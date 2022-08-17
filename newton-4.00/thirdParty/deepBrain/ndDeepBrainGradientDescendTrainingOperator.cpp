@@ -46,6 +46,7 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			const ndDeepBrainVector& truth = groundTruth[j];
 			MakePrediction(input);
 			BackPropagate(learnRate, truth);
+			m_averageError += CalculateMeanSquareError(truth);
 		}
 		m_averageError = ndSqrt(m_averageError / inputBatch.GetCount());
 		ndTrace(("%f\n", m_averageError));

@@ -50,6 +50,7 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 	void SigmoidDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 	void HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
+	void ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 
 	ndDeepBrainVector m_bias;
 	ndDeepBrainActivationType m_activation;

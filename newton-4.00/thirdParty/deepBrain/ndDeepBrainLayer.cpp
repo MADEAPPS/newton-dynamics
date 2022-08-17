@@ -98,6 +98,16 @@ void ndDeepBrainLayer::SigmoidDerivative(const ndDeepBrainVector& input, ndDeepB
 	}
 }
 
+void ndDeepBrainLayer::ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+{
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		ndReal val = input[i];
+		derivativeOutput[i] = val > 0.0f ? 1.0f : 0.0f;
+	}
+}
+
 void ndDeepBrainLayer::HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
@@ -147,8 +157,7 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 	{
 		case m_relu:
 		{
-			ndAssert(0);
-			//ReluActivation(output);
+			ReluActivationDerivative(input, derivativeOutput);
 			break;
 		}
 

@@ -284,9 +284,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndDeepBrain brain;
 	ndSetRandSeed(142543);
 
-	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_tanh);
-	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_tanh);
-	ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 6, m_tanh);
+	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_relu);
+	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
+	ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 6, m_relu);
 	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 
 	brain.AddLayer(inputLayer);

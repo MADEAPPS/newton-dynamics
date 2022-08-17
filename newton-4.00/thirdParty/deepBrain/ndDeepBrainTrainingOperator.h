@@ -32,6 +32,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
 	virtual ~ndDeepBrainTrainingOperator();
 
+	ndFloat32 CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const;
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:
@@ -40,14 +41,12 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	void UpdateWeights(ndReal learnRate);
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
+	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 	void BackPropagate(ndReal learnRate, const ndDeepBrainVector& groundTruth);
 
-	void BackPropagateCalulateBiasGradient(ndInt32 layerIndex);
-
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_output;
-
 	ndDeepBrainVector m_g;
 	ndDeepBrainVector m_zDerivative;
 

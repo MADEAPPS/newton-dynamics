@@ -96,6 +96,24 @@ void ndDeepBrainTrainingOperator::PrefixScan()
 	m_weightGradients.Set(0.0f);
 }
 
+ndFloat32 ndDeepBrainTrainingOperator::CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const
+{
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	const ndInt32 layerIndex = layers.GetCount() - 1;
+
+	ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
+	const ndInt32 outputCount = ouputLayer->GetOuputSize();
+	const ndDeepBrainMemVector z(&m_instance.m_z[m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
+
+	ndFloat32 error2 = 0;
+	for (ndInt32 i = 0; i < outputCount; i++)
+	{
+		ndFloat32 dist = z[i] - groundTruth[i];
+		error2 += dist * dist;
+	}
+	return error2;
+}
+
 void ndDeepBrainTrainingOperator::MakePrediction(const ndDeepBrainVector& input)
 {
 	m_instance.MakePrediction(input, m_output);
@@ -123,7 +141,6 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 	const ndDeepBrainMemVector zDerivative(&m_zDerivative[m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
 
 	g.Sub(z, groundTruth);
-	m_averageError += g.Dot(g);
 	g.Mul(g, zDerivative);
 
 	const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
@@ -138,7 +155,7 @@ void ndDeepBrainTrainingOperator::BackPropagateOutputLayer(const ndDeepBrainVect
 	}
 }
 
-void ndDeepBrainTrainingOperator::BackPropagateCalulateBiasGradient(ndInt32 layerIndex)
+void ndDeepBrainTrainingOperator::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	ndDeepBrainLayer* const layer = layers[layerIndex + 1];
@@ -155,7 +172,7 @@ void ndDeepBrainTrainingOperator::BackPropagateCalulateBiasGradient(ndInt32 laye
 void ndDeepBrainTrainingOperator::BackPropagateHiddenLayer(ndInt32 layerIndex)
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	BackPropagateCalulateBiasGradient(layerIndex);
+	BackPropagateCalculateBiasGradient(layerIndex);
 
 	ndDeepBrainLayer* const layer = layers[layerIndex];
 
