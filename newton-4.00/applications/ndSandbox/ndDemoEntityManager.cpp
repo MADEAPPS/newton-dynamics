@@ -409,7 +409,7 @@ static void MnistTrainingSet()
 				ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
 			}
 		}
-		ndExpandTraceMessage("success rate on tranning data %f %%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
+		ndExpandTraceMessage("success rate on training data %f %%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
 	}
 
 	if (trainingLabels)
@@ -427,7 +427,7 @@ static void MnistTrainingSet()
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
