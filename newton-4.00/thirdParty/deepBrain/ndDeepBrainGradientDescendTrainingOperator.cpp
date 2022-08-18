@@ -47,11 +47,9 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			MakePrediction(input);
 			BackPropagate(learnRate, truth);
 			ndFloat32 error = CalculateMeanSquareError(truth);
-			//ndTrace(("%d %f\n", j, m_averageError));
 			m_averageError += error;
 		}
 		m_averageError = ndSqrt(m_averageError / inputBatch.GetCount());
-		//ndTrace(("%f\n", m_averageError));
 		ndExpandTraceMessage("%f\n", m_averageError);
 	}
 }

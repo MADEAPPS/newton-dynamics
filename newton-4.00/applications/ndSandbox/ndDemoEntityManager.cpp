@@ -364,8 +364,14 @@ static void MnistTrainingSet()
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
 
-		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+		//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+		ndDeepBrainStochasticGradientDescendTrainingOperator trainer(&brain, 256);
+
+		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		//trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-1f, 1100);
+		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-1f, 10);
+		time = ndGetTimeInMicroseconds() - time;
+		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64 (time) / 1000000.0f);
 	}
 
 	if (trainingLabels)
