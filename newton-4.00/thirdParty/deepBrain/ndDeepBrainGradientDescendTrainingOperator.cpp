@@ -26,6 +26,7 @@
 
 ndDeepBrainGradientDescendTrainingOperator::ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain)
 	:ndDeepBrainTrainingOperator(brain)
+	,m_miniBatchSize(100000)
 {
 }
 
@@ -40,20 +41,18 @@ ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingO
 
 void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
-	ndInt32 miniBatchsize = 2000;
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 
 	ndInt32 index = 0;
-	ndInt32 batchCount = (inputBatch.GetCount() + miniBatchsize - 1) / miniBatchsize;
+	ndInt32 batchCount = (inputBatch.GetCount() + m_miniBatchSize - 1) / m_miniBatchSize;
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
-		const ndInt32 batchStart = index * miniBatchsize;
-		const ndInt32 batchSize = index != (batchCount - 1) ? miniBatchsize : inputBatch.GetCount() - batchStart;
+		const ndInt32 batchStart = index * m_miniBatchSize;
+		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : inputBatch.GetCount() - batchStart;
 		index = (index + 1) % batchCount;
 
 		m_averageError = 0.0f;
-		//for (ndInt32 j = inputBatch.GetCount() - 1; j >= 0; --j)
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{
 			const ndDeepBrainVector& input = inputBatch[batchStart + j];
@@ -65,7 +64,6 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			m_averageError += error;
 		}
 		ApplyWeightTranspose();
-		//m_averageError = ndSqrt(m_averageError / inputBatch.GetCount());
 		m_averageError = ndSqrt(m_averageError / batchSize);
 		ndExpandTraceMessage("%f\n", m_averageError);
 	}

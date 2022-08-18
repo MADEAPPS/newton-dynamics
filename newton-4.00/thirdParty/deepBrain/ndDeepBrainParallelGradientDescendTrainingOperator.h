@@ -25,13 +25,13 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainGradientDescendTrainingOperator.h"
 
-class ndDeepBrainStochasticGradientDescendTrainingOperator
+class ndDeepBrainParallelGradientDescendTrainingOperator
 	:public ndDeepBrainGradientDescendTrainingOperator
 	,public ndThreadPool
 {
 	public: 
-	ndDeepBrainStochasticGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 miniBatchSize);
-	~ndDeepBrainStochasticGradientDescendTrainingOperator();
+	ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain);
+	~ndDeepBrainParallelGradientDescendTrainingOperator();
 
 	void SetThreadCount(ndInt32 threads);
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
@@ -44,8 +44,7 @@ class ndDeepBrainStochasticGradientDescendTrainingOperator
 	const ndDeepBrainMatrix* m_groundTruth;
 	ndReal m_learnRate;
 	ndInt32 m_steps;
-	ndInt32 m_miniBatchSize;
-
+	
 	ndFixSizeArray<ndDeepBrainGradientDescendTrainingOperator*, D_MAX_THREADS_COUNT> m_subBatch;
 };
 

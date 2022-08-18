@@ -47,7 +47,6 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 
-
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_output;
 	ndDeepBrainVector m_g;

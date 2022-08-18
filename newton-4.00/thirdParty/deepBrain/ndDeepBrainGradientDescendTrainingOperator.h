@@ -32,9 +32,16 @@ class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOper
 	ndDeepBrainGradientDescendTrainingOperator(const ndDeepBrainGradientDescendTrainingOperator& src);
 	~ndDeepBrainGradientDescendTrainingOperator();
 
+	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
 	void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+
+	ndInt32 m_miniBatchSize;
 };
 
+inline void ndDeepBrainGradientDescendTrainingOperator::SetMiniBatchSize(ndInt32 miniBatchSize)
+{
+	m_miniBatchSize = miniBatchSize;
+}
 
 #endif 
 

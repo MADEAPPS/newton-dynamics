@@ -365,12 +365,12 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 
 		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-		//ndDeepBrainStochasticGradientDescendTrainingOperator trainer(&brain, 256);
+		trainer.SetMiniBatchSize(2000);
+		//ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain);
 		//trainer.SetThreadCount(1);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
-		//trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 10);
 
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64 (time) / 1000000.0f);

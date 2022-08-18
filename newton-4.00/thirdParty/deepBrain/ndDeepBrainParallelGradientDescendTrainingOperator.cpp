@@ -22,21 +22,20 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainStochasticGradientDescendTrainingOperator.h"
+#include "ndDeepBrainParallelGradientDescendTrainingOperator.h"
 
-ndDeepBrainStochasticGradientDescendTrainingOperator::ndDeepBrainStochasticGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 miniBatchSize)
+ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain)
 	:ndDeepBrainGradientDescendTrainingOperator(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)
 	,m_learnRate(0.0f)
 	,m_steps(0)
-	,m_miniBatchSize(miniBatchSize)
 {
 	SetThreadCount(1);
 }
 
-ndDeepBrainStochasticGradientDescendTrainingOperator::~ndDeepBrainStochasticGradientDescendTrainingOperator()
+ndDeepBrainParallelGradientDescendTrainingOperator::~ndDeepBrainParallelGradientDescendTrainingOperator()
 {
 	Finish();
 	for (ndInt32 i = 0; i < m_subBatch.GetCount(); ++i)
@@ -45,7 +44,7 @@ ndDeepBrainStochasticGradientDescendTrainingOperator::~ndDeepBrainStochasticGrad
 	}
 }
 
-void ndDeepBrainStochasticGradientDescendTrainingOperator::SetThreadCount(ndInt32 threads)
+void ndDeepBrainParallelGradientDescendTrainingOperator::SetThreadCount(ndInt32 threads)
 {
 	threads = ndMin(threads, D_MAX_THREADS_COUNT);
 	if (threads != m_subBatch.GetCount())
@@ -63,14 +62,14 @@ void ndDeepBrainStochasticGradientDescendTrainingOperator::SetThreadCount(ndInt3
 	}
 }
 
-void ndDeepBrainStochasticGradientDescendTrainingOperator::ThreadFunction()
+void ndDeepBrainParallelGradientDescendTrainingOperator::ThreadFunction()
 {
 	Begin();
 	Optimize();
 	End();
 }
 
-void ndDeepBrainStochasticGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	m_inputBatch = &inputBatch;
 	m_groundTruth = &groundTruth;
@@ -80,7 +79,7 @@ void ndDeepBrainStochasticGradientDescendTrainingOperator::Optimize(const ndDeep
 	Sync();
 }
 
-void ndDeepBrainStochasticGradientDescendTrainingOperator::Optimize()
+void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 {
 	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
 	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
