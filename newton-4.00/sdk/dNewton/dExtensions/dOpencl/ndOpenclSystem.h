@@ -132,7 +132,7 @@ ndOpenclBuffer<T>::ndOpenclBuffer(cl_mem_flags flags)
 template<class T>
 ndOpenclBuffer<T>::~ndOpenclBuffer()
 {
-	dAssert(!m_gpuBuffer);
+	ndAssert(!m_gpuBuffer);
 }
 
 template<class T>
@@ -142,7 +142,7 @@ void ndOpenclBuffer<T>::Cleanup()
 	{
 		cl_int err = CL_SUCCESS;
 		err = clReleaseMemObject(m_gpuBuffer);
-		dAssert(err == CL_SUCCESS);
+		ndAssert(err == CL_SUCCESS);
 		ndArray<T>::Resize(0);
 	}
 	m_gpuBuffer = nullptr;
@@ -157,7 +157,7 @@ void ndOpenclBuffer<T>::SyncSize(cl_context context, ndInt32 size)
 	{
 		if (m_flags & CL_MEM_USE_HOST_PTR)
 		{
-			dAssert(0);
+			ndAssert(0);
 			//void* const hostBuffer = &(*this)[0];
 			//m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * ndArray<T>::GetCapacity(), hostBuffer, &err);
 		}
@@ -165,12 +165,12 @@ void ndOpenclBuffer<T>::SyncSize(cl_context context, ndInt32 size)
 		{
 			m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * size, nullptr, &err);
 		}
-		dAssert(err == CL_SUCCESS);
+		ndAssert(err == CL_SUCCESS);
 		ndArray<T>::Resize(size);
 	}
 	else
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 }
 
@@ -183,7 +183,7 @@ void ndOpenclBuffer<T>::ReadData(cl_command_queue commandQueue)
 		commandQueue, m_gpuBuffer,
 		CL_FALSE, 0, sizeof(T) * ndArray<T>::GetCount(), destination,
 		0, nullptr, nullptr);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 }
 
 template<class T>
@@ -196,6 +196,6 @@ void ndOpenclBuffer<T>::WriteData(cl_command_queue commandQueue)
 		commandQueue, m_gpuBuffer,
 		CL_FALSE, 0, sizeof(T) * ndArray<T>::GetCount(), source,
 		0, nullptr, nullptr);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 }
 

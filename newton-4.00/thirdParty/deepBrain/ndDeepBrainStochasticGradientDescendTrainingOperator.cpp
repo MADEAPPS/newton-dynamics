@@ -33,11 +33,34 @@ ndDeepBrainStochasticGradientDescendTrainingOperator::ndDeepBrainStochasticGradi
 	,m_steps(0)
 	,m_miniBatchSize(miniBatchSize)
 {
+	SetThreadCount(1);
 }
 
 ndDeepBrainStochasticGradientDescendTrainingOperator::~ndDeepBrainStochasticGradientDescendTrainingOperator()
 {
 	Finish();
+	for (ndInt32 i = 0; i < m_subBatch.GetCount(); ++i)
+	{
+		delete m_subBatch[i];
+	}
+}
+
+void ndDeepBrainStochasticGradientDescendTrainingOperator::SetThreadCount(ndInt32 threads)
+{
+	threads = ndMin(threads, D_MAX_THREADS_COUNT);
+	if (threads != m_subBatch.GetCount())
+	{
+		for (ndInt32 i = 0; i < m_subBatch.GetCount(); ++i)
+		{
+			delete m_subBatch[i];
+		}
+		m_subBatch.SetCount(0);
+
+		for (ndInt32 i = 0; i < threads; ++i)
+		{
+			m_subBatch.PushBack(new ndDeepBrainGradientDescendTrainingOperator(*this));
+		}
+	}
 }
 
 void ndDeepBrainStochasticGradientDescendTrainingOperator::ThreadFunction()
@@ -70,11 +93,13 @@ void ndDeepBrainStochasticGradientDescendTrainingOperator::Optimize()
 			const ndDeepBrainVector& input = (*m_inputBatch)[j];
 			const ndDeepBrainVector& truth = (*m_groundTruth)[j];
 			MakePrediction(input);
-			BackPropagate(m_learnRate, truth);
+			BackPropagate(truth);
+			UpdateWeights(m_learnRate);
 			ndFloat32 error = CalculateMeanSquareError(truth);
 			//ndTrace(("%d %f\n", j, m_averageError));
 			m_averageError += error;
 		}
+		ApplyWeightTranspose();
 		m_averageError = ndSqrt(m_averageError / m_inputBatch->GetCount());
 		//ndTrace(("%f\n", m_averageError));
 		ndExpandTraceMessage("%f\n", m_averageError);

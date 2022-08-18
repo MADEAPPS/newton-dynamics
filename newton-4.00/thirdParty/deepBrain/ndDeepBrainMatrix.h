@@ -29,11 +29,13 @@ class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 {
 	public: 
 	ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns);
+	ndDeepBrainMatrix(const ndDeepBrainMatrix& src);
 	~ndDeepBrainMatrix();
 
 	ndInt32 GetRows() const;
 	ndInt32 GetColumns() const;
 	void Set(ndReal value);
+	void SetTranspose(const ndDeepBrainMatrix& src);
 
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 	void Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const;

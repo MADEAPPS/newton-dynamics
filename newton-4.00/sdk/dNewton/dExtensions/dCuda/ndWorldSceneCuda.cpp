@@ -151,7 +151,7 @@ void ndWorldSceneCuda::LoadBodyData()
 void ndWorldSceneCuda::GetBodyTransforms()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//auto GetTransform = [] __device__(const cuSceneInfo& info, int frameCount)
 	//{
 	//	int index = threadIdx.x + blockDim.x * blockIdx.x;

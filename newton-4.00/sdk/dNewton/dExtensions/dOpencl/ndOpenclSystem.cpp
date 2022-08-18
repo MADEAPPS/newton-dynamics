@@ -366,7 +366,7 @@ void ndOpenclBodyBuffer::Resize(cl_context context, const ndArray<ndInt32>& body
 {
 	if (m_transform.GetCapacity() < bodyArray.GetCount())
 	{
-		ndInt32 size = dMax(m_transform.GetCapacity(), D_OPENCL_BUFFER_SIZE);
+		ndInt32 size = ndMax(m_transform.GetCapacity(), D_OPENCL_BUFFER_SIZE);
 		while (size < bodyArray.GetCount())
 		{
 			size *= 2;
@@ -390,7 +390,7 @@ void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const ndArray<
 
 	for (ndInt32 i = 0; i < items; i++)
 	{
-		dAssert(0);
+		ndAssert(0);
 		//ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
 		//veloc[i].m_angular = body->GetOmega();
 		//veloc[i].m_linear = body->GetVelocity();
@@ -481,20 +481,20 @@ void ndOpenclBodyBuffer::SetKernelParameters(cl_kernel kernel, ndFloat32 timeste
 	cl_int err = CL_SUCCESS;
 
 	err = clSetKernelArg(kernel, 0, sizeof(cl_float), &timestep);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	cl_int bodyCount = bodyArray.GetCount();
 	err = clSetKernelArg(kernel, 1, sizeof(cl_int), &bodyCount);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &m_transform.m_gpuBuffer);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &m_veloc.m_gpuBuffer);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &m_accel.m_gpuBuffer);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 }
 
 ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
@@ -508,19 +508,19 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 
 	// get the device
 	err = clGetContextInfo(m_context, CL_CONTEXT_DEVICES, sizeof(cl_device_id), &m_device, nullptr);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	// get vendor driver support
 	size_t stringLength;
 
 	char deviceName[1024];
 	err = clGetDeviceInfo(m_device, CL_DEVICE_NAME, sizeof(deviceName), deviceName, &stringLength);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	char driverVersion[1024];
 	err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, sizeof(driverVersion), driverVersion, &stringLength);
-	dAssert(err == CL_SUCCESS);
-	dAssert((strlen(deviceName) + strlen(driverVersion) + 8) < sizeof(m_platformName));
+	ndAssert(err == CL_SUCCESS);
+	ndAssert((strlen(deviceName) + strlen(driverVersion) + 8) < sizeof(m_platformName));
 
 	// linux does not like this;
 	//sprintf(m_platformName, "%s: %s", deviceName, driverVersion);
@@ -530,13 +530,13 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 
 	size_t computeUnits;
 	err = clGetDeviceInfo(m_device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(size_t), &computeUnits, &stringLength);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 	m_computeUnits = ndInt32(computeUnits);
 
 	// create command queue
 	cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 	m_commandQueue = clCreateCommandQueue(m_context, m_device, properties, &err);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	m_solverProgram = CompileProgram();
 
@@ -552,26 +552,26 @@ ndOpenclSystem::~ndOpenclSystem()
 	m_bodyArray.Cleanup();
 
 	err = clReleaseKernel(m_integrateBodiesPosition.m_kernel);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clReleaseKernel(m_integrateBodiesVelocity.m_kernel);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clReleaseKernel(m_integrateUnconstrainedBodies.m_kernel);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 
 	err = clReleaseProgram(m_solverProgram);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clReleaseCommandQueue(m_commandQueue);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clReleaseDevice(m_device);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clReleaseContext(m_context);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 }
 
 ndOpenclSystem* ndOpenclSystem::Singleton(ndInt32 driveNumber)
@@ -583,7 +583,7 @@ ndOpenclSystem* ndOpenclSystem::Singleton(ndInt32 driveNumber)
 		return nullptr;
 	}
 
-	dAssert(numPlatforms < 16);
+	ndAssert(numPlatforms < 16);
 	cl_platform_id platforms[16];
 	err = clGetPlatformIDs(numPlatforms, &platforms[0], nullptr);
 	if (err != CL_SUCCESS)
@@ -631,7 +631,7 @@ cl_program ndOpenclSystem::CompileProgram()
 	source[0] = m_kernelSource;
 	size_t sourceSize = strlen(m_kernelSource);
 	cl_program program = clCreateProgramWithSource(m_context, 1, source, &sourceSize, &err);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clBuildProgram(program, 1, &m_device, "", nullptr, nullptr);
 	if (err == CL_BUILD_PROGRAM_FAILURE)
@@ -639,11 +639,11 @@ cl_program ndOpenclSystem::CompileProgram()
 		size_t log_size = 0;
 		clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
 
-		char* const build_log = dAlloca(char, log_size + 4096);
+		char* const build_log = ndAlloca(char, log_size + 4096);
 		clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, log_size, build_log, nullptr);
-		dTrace((build_log));
+		ndTrace((build_log));
 	}
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 	return program;
 }
 
@@ -652,10 +652,10 @@ void ndOpenclSystem::SetKernel(const char* const name, ndKernel& kerner)
 	cl_int err = CL_SUCCESS;
 
 	kerner.m_kernel = clCreateKernel(m_solverProgram, name, &err);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	err = clGetKernelWorkGroupInfo(kerner.m_kernel, m_device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(kerner.m_workWroupSize), &kerner.m_workWroupSize, nullptr);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 }
 
 void ndOpenclSystem::Resize(const ndArray<ndInt32>& bodyArray)
@@ -672,7 +672,7 @@ void ndOpenclSystem::Finish()
 {
 	cl_int err = CL_SUCCESS;
 	err = clFinish(m_commandQueue);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 }
 
 void ndOpenclSystem::ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndArray<ndBodyKinematic*>& bodyArray)
@@ -685,7 +685,7 @@ void ndOpenclSystem::ExecuteIntegrateBodyPosition(ndFloat32 timestep, const ndAr
 	err = clEnqueueNDRangeKernel(
 		m_commandQueue, m_integrateBodiesPosition.m_kernel, 1,
 		nullptr, &global, nullptr, 0, nullptr, nullptr);
-	dAssert(err == CL_SUCCESS);
+	ndAssert(err == CL_SUCCESS);
 
 	// enqueue to read the body buffers results
 	m_bodyArray.m_accel.ReadData(m_commandQueue);

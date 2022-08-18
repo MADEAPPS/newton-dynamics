@@ -30,6 +30,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 {
 	public: 
 	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
+	ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src);
 	virtual ~ndDeepBrainTrainingOperator();
 
 	ndFloat32 CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const;
@@ -39,11 +40,13 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	void PrefixScan();
 	void MakePrediction(const ndDeepBrainVector& input);
 
+	void ApplyWeightTranspose();
 	void UpdateWeights(ndReal learnRate);
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
+	void BackPropagate(const ndDeepBrainVector& groundTruth);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
-	void BackPropagate(ndReal learnRate, const ndDeepBrainVector& groundTruth);
+
 
 	ndDeepBrainInstance m_instance;
 	ndDeepBrainVector m_output;

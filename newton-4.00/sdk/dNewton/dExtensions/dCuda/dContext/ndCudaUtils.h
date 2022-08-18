@@ -24,15 +24,15 @@
 
 #include "ndCudaStdafx.h"
 #ifdef D_DISABLE_ASSERT
-	#define dAssert(x)
+	#define ndAssert(x)
 #else 
 	#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
-		#define dAssert(x) _ASSERTE(x)
+		#define ndAssert(x) _ASSERTE(x)
 	#else
 		#ifdef _DEBUG
-			#define dAssert(x) assert(x)
+			#define ndAssert(x) assert(x)
 		#else 
-			#define dAssert(x)
+			#define ndAssert(x)
 		#endif
 	#endif
 #endif

@@ -35,6 +35,19 @@ ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
 	}
 }
 
+ndDeepBrainMatrix::ndDeepBrainMatrix(const ndDeepBrainMatrix& src)
+	:ndArray<ndDeepBrainVector>(src)
+{
+	ndDeepBrainMatrix& me = *this;
+	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	{
+		ndDeepBrainVector& row = me[i];
+		row.ResetMembers();
+		row.SetCount(src.GetColumns());
+		row.Set(src[i]);
+	}
+}
+
 ndDeepBrainMatrix::~ndDeepBrainMatrix()
 {
 	ndDeepBrainMatrix& me = *this;
@@ -51,6 +64,21 @@ void ndDeepBrainMatrix::Set(ndReal value)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		me[i].Set(value);
+	}
+}
+
+void ndDeepBrainMatrix::SetTranspose(const ndDeepBrainMatrix& src)
+{
+	ndDeepBrainMatrix& matrix = *this;
+	ndAssert(src.GetColumns() == GetRows());
+	ndAssert(src.GetRows() == GetColumns());
+	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	{
+		for (ndInt32 j = 0; j < src.GetColumns(); ++j)
+		{
+			ndReal val = src[i][j];
+			matrix[j][i] = val;
+		}
 	}
 }
 

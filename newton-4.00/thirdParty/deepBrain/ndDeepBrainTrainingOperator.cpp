@@ -38,21 +38,28 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	PrefixScan();
 
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	for (ndInt32 i = 0; i < layers.GetCount(); i ++)
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		const ndDeepBrainLayer& layer = *layers[i];
-
 		m_weightsLayersTranspose.PushBack(new ndDeepBrainMatrix(layer.GetInputSize(), layer.GetOuputSize()));
+		m_weightsLayersTranspose[i]->SetTranspose(layer);
+	}
+}
 
-		ndDeepBrainMatrix& matrix = *m_weightsLayersTranspose[i];
-		for (ndInt32 j = 0; j < layer.GetInputSize(); ++j)
-		{
-			for (ndInt32 k = 0; k < layer.GetOuputSize(); ++k)
-			{
-				ndReal val = layer[k][j];
-				matrix[j][k] = val;
-			}
-		}
+ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src)
+	:ndClassAlloc()
+	,m_instance(src.m_instance)
+	,m_output(src.m_output)
+	,m_g(src.m_g)
+	,m_zDerivative(src.m_zDerivative)
+	,m_weightGradients(src.m_weightGradients)
+	,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
+	,m_weightsLayersTranspose()
+	,m_averageError(0.0f)
+{
+	for (ndInt32 i = 0; i < src.m_weightsLayersTranspose.GetCount(); i++)
+	{
+		m_weightsLayersTranspose.PushBack(new ndDeepBrainMatrix(*src.m_weightsLayersTranspose[i]));
 	}
 }
 
@@ -217,7 +224,18 @@ void ndDeepBrainTrainingOperator::UpdateWeights(ndReal learnRate)
 	}
 }
 
-void ndDeepBrainTrainingOperator::BackPropagate(ndReal learnRate, const ndDeepBrainVector& groundTruth)
+void ndDeepBrainTrainingOperator::ApplyWeightTranspose()
+{
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	{
+		ndDeepBrainLayer* const layer = layers[i];
+		ndDeepBrainMatrix& weightMatrix = *layer;
+		m_weightsLayersTranspose[i]->SetTranspose(weightMatrix);
+	}
+}
+
+void ndDeepBrainTrainingOperator::BackPropagate(const ndDeepBrainVector& groundTruth)
 {
 	BackPropagateOutputLayer(groundTruth);
 
@@ -226,6 +244,4 @@ void ndDeepBrainTrainingOperator::BackPropagate(ndReal learnRate, const ndDeepBr
 	{
 		BackPropagateHiddenLayer(i);
 	}
-	
-	UpdateWeights(learnRate);
 }

@@ -29,6 +29,7 @@ class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOper
 {
 	public: 
 	ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain);
+	ndDeepBrainGradientDescendTrainingOperator(const ndDeepBrainGradientDescendTrainingOperator& src);
 	~ndDeepBrainGradientDescendTrainingOperator();
 
 	void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);

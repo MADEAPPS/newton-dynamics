@@ -33,6 +33,7 @@ class ndDeepBrainInstance: public ndClassAlloc
 {
 	public: 
 	ndDeepBrainInstance(ndDeepBrain* const brain);
+	ndDeepBrainInstance(const ndDeepBrainInstance& src);
 	~ndDeepBrainInstance();
 
 	void CalculatePrefixScan();

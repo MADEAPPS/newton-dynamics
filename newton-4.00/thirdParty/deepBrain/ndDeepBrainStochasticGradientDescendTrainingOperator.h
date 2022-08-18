@@ -26,13 +26,14 @@
 #include "ndDeepBrainGradientDescendTrainingOperator.h"
 
 class ndDeepBrainStochasticGradientDescendTrainingOperator
-	: public ndDeepBrainGradientDescendTrainingOperator
-	, public ndThreadPool
+	:public ndDeepBrainGradientDescendTrainingOperator
+	,public ndThreadPool
 {
 	public: 
 	ndDeepBrainStochasticGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 miniBatchSize);
 	~ndDeepBrainStochasticGradientDescendTrainingOperator();
 
+	void SetThreadCount(ndInt32 threads);
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	private:
@@ -44,6 +45,8 @@ class ndDeepBrainStochasticGradientDescendTrainingOperator
 	ndReal m_learnRate;
 	ndInt32 m_steps;
 	ndInt32 m_miniBatchSize;
+
+	ndFixSizeArray<ndDeepBrainGradientDescendTrainingOperator*, D_MAX_THREADS_COUNT> m_subBatch;
 };
 
 

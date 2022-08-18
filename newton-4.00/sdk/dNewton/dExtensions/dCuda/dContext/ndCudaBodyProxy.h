@@ -121,7 +121,7 @@ class ndCudaBodyProxy
 	//void ProxyToBody(ndBodyKinematic* const) const
 	void ProxyToBody(void* const) const
 	{
-		dAssert(0);
+		ndAssert(0);
 		//const ndVector veloc(m_veloc.x, m_veloc.y, m_veloc.z, float(0.0f));
 		//const ndVector omega(m_omega.x, m_omega.y, m_omega.z, float(0.0f));
 		//const ndVector position(m_posit.x, m_posit.y, m_posit.z, float(1.0f));

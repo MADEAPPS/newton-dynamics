@@ -47,20 +47,20 @@ ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
 {
 	cudaError_t cudaStatus;
 	cudaStatus = cudaStreamCreate(&m_solverMemCpuStream);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 
 	cudaStatus = cudaStreamCreate(&m_solverComputeStream);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	cudaStatus = cudaMalloc((void**)&m_sceneInfoGpu, sizeof(ndCudaSceneInfo));
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu, sizeof(ndCudaSceneInfo));
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	if (cudaStatus != cudaSuccess)
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 
 	*m_sceneInfoCpu = ndCudaSceneInfo();
@@ -70,20 +70,20 @@ ndCudaContextImplement::~ndCudaContextImplement()
 {
 	cudaError_t cudaStatus;
 	cudaStatus = cudaFreeHost(m_sceneInfoCpu);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	cudaStatus = cudaFree(m_sceneInfoGpu);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	cudaStatus = cudaStreamDestroy(m_solverComputeStream);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 
 	cudaStatus = cudaStreamDestroy(m_solverMemCpuStream);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	if (cudaStatus != cudaSuccess)
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 }
 
@@ -100,10 +100,10 @@ void ndCudaContextImplement::Begin()
 	ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
 
 	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndCudaSceneInfo), cudaMemcpyDeviceToHost, m_solverMemCpuStream);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	if (cudaStatus != cudaSuccess)
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 
 	m_timeInSeconds = double(cpuInfo->m_frameTimeInNanosecunds) * double (1.0e-9f);
@@ -169,7 +169,7 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	
 	*m_sceneInfoCpu = info;
 	cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, &info, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 
 	const int blocksCount = (cpuBodyCount + D_THREADS_PER_BLOCK - 1) / D_THREADS_PER_BLOCK;
 	m_bodyBuffer.ReadData(src, cpuBodyCount);
@@ -179,7 +179,7 @@ void ndCudaContextImplement::LoadBodyData(const ndCudaBodyProxy* const src, int 
 	cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess)
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 }
 
@@ -211,12 +211,12 @@ void ndCudaContextImplement::ValidateContextBuffers()
 			sceneInfo->m_frameIsValid = 1;
 		}
 
-		dAssert(sceneInfo->m_frameIsValid);
+		ndAssert(sceneInfo->m_frameIsValid);
 		cudaError_t cudaStatus = cudaMemcpy(m_sceneInfoGpu, sceneInfo, sizeof(ndCudaSceneInfo), cudaMemcpyHostToDevice);
-		dAssert(cudaStatus == cudaSuccess);
+		ndAssert(cudaStatus == cudaSuccess);
 		if (cudaStatus != cudaSuccess)
 		{
-			dAssert(0);
+			ndAssert(0);
 		}
 		cudaDeviceSynchronize();
 	}

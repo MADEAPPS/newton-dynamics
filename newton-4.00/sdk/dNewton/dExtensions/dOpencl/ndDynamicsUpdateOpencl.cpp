@@ -58,7 +58,7 @@ void ndDynamicsUpdateOpencl::BuildIsland()
 	GetBodyIslandOrder().SetCount(0);
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	dAssert(bodyArray.GetCount() >= 1);
+	ndAssert(bodyArray.GetCount() >= 1);
 	if (bodyArray.GetCount() - 1)
 	{
 		D_TRACKTIME();
@@ -72,7 +72,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	D_TRACKTIME();
 
 	SortJointsScan();
-	dAssert(0);
+	ndAssert(0);
 	//ndScene* const scene = m_world->GetScene();
 	//if (!m_activeJointCount)
 	//{
@@ -90,7 +90,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	//		const ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
 	//		if (!body->m_equilibrium)
 	//		{
-	//			dAssert(i == body->m_index);
+	//			ndAssert(i == body->m_index);
 	//			bodyIndexArray[count] = i;
 	//			count++;
 	//		}
@@ -115,34 +115,34 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	//m_rightHandSide.SetCount(rowCount);
 	//
 	//#ifdef _DEBUG
-	//	dAssert(m_activeJointCount <= jointArray.GetCount());
+	//	ndAssert(m_activeJointCount <= jointArray.GetCount());
 	//	for (ndInt32 i = 0; i < jointArray.GetCount(); i++)
 	//	{
 	//		ndConstraint* const joint = jointArray[i];
-	//		dAssert(joint->m_rowStart < m_leftHandSide.GetCount());
-	//		dAssert((joint->m_rowStart + joint->m_rowCount) <= rowCount);
+	//		ndAssert(joint->m_rowStart < m_leftHandSide.GetCount());
+	//		ndAssert((joint->m_rowStart + joint->m_rowCount) <= rowCount);
 	//	}
 	//
 	//	for (ndInt32 i = 1; i < m_activeJointCount; i++)
 	//	{
 	//		ndConstraint* const joint0 = jointArray[i - 1];
 	//		ndConstraint* const joint1 = jointArray[i - 0];
-	//		dAssert(!joint0->m_resting);
-	//		dAssert(!joint1->m_resting);
-	//		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
-	//		dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
-	//		dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
+	//		ndAssert(!joint0->m_resting);
+	//		ndAssert(!joint1->m_resting);
+	//		ndAssert(joint0->m_rowCount >= joint1->m_rowCount);
+	//		ndAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
+	//		ndAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
 	//	}
 	//
 	//	for (ndInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
 	//	{
 	//		ndConstraint* const joint0 = jointArray[i - 1];
 	//		ndConstraint* const joint1 = jointArray[i - 0];
-	//		dAssert(joint0->m_resting);
-	//		dAssert(joint1->m_resting);
-	//		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
-	//		dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
-	//		dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
+	//		ndAssert(joint0->m_resting);
+	//		ndAssert(joint1->m_resting);
+	//		ndAssert(joint0->m_rowCount >= joint1->m_rowCount);
+	//		ndAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
+	//		ndAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
 	//	}
 	//#endif
 	//SortBodyJointScan();
@@ -151,12 +151,12 @@ void ndDynamicsUpdateOpencl::SortJoints()
 void ndDynamicsUpdateOpencl::SortIslands()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 }
 
 void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 {
-	dAssert(0);
+	ndAssert(0);
 	//class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -182,7 +182,7 @@ void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 	//		{
 	//			ndInt32 index = activeBodyArray[start + i];
 	//			ndBodyKinematic* const body = bodyArray[index]->GetAsBodyKinematic();
-	//			dAssert(body);
+	//			ndAssert(body);
 	//			body->UpdateInvInertiaMatrix();
 	//			body->AddDampingAcceleration(timestep);
 	//			body->IntegrateExternalForce(timestep);
@@ -201,7 +201,7 @@ void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 void ndDynamicsUpdateOpencl::InitWeights()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndInitWeights : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -227,7 +227,7 @@ void ndDynamicsUpdateOpencl::InitWeights()
 	//		{
 	//			const ndInt32 index = indirectBodyArray[start + i];
 	//			ndBodyKinematic* const body = bodyArray[index]->GetAsBodyKinematic();
-	//			dAssert(body->m_invMass.m_w > ndFloat32(0.0f));
+	//			ndAssert(body->m_invMass.m_w > ndFloat32(0.0f));
 	//			const ndFloat32 weigh = ndFloat32(activeJointsCount[index + 1] - activeJointsCount[index]);
 	//			body->m_weigh = weigh;
 	//			maxExtraPasses = dMax(weigh, maxExtraPasses);
@@ -265,7 +265,7 @@ void ndDynamicsUpdateOpencl::InitWeights()
 void ndDynamicsUpdateOpencl::InitBodyArray()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndInitBodyArray : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -292,7 +292,7 @@ void ndDynamicsUpdateOpencl::InitBodyArray()
 	//			ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 	//			if (body)
 	//			{
-	//				dAssert(body->m_bodyIsConstrained);
+	//				ndAssert(body->m_bodyIsConstrained);
 	//				body->UpdateInvInertiaMatrix();
 	//				body->AddDampingAcceleration(timestep);
 	//				const dVector angularMomentum(body->CalculateAngularMomentum());
@@ -314,9 +314,9 @@ void ndDynamicsUpdateOpencl::InitBodyArray()
 //void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const joint)
 void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 {
-	dAssert(0);
+	ndAssert(0);
 	//ndConstraintDescritor constraintParam;
-	//dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
+	//ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
 	//for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
 	//{
 	//	constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
@@ -330,7 +330,7 @@ void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 	//constraintParam.m_invTimestep = m_invTimestep;
 	//joint->JacobianDerivative(constraintParam);
 	//const ndInt32 dof = constraintParam.m_rowsCount;
-	//dAssert(dof <= joint->m_rowCount);
+	//ndAssert(dof <= joint->m_rowCount);
 	//
 	//if (joint->GetAsContact())
 	//{
@@ -363,7 +363,7 @@ void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 	//else
 	//{
 	//	ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
-	//	dAssert(bilareral);
+	//	ndAssert(bilareral);
 	//	if (!bilareral->m_isInSkeleton && (bilareral->GetSolverModel() == m_jointkinematicAttachment))
 	//	{
 	//		ndSkeletonContainer* const skeleton0 = bilareral->m_body0->GetSkeleton();
@@ -388,7 +388,7 @@ void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 	//const ndInt32 baseIndex = joint->m_rowStart;
 	//for (ndInt32 i = 0; i < dof; i++)
 	//{
-	//	dAssert(constraintParam.m_forceBounds[i].m_jointForce);
+	//	ndAssert(constraintParam.m_forceBounds[i].m_jointForce);
 	//
 	//	ndLeftHandSide* const row = &m_leftHandSide[baseIndex + i];
 	//	ndRightHandSide* const rhs = &m_rightHandSide[baseIndex + i];
@@ -405,7 +405,7 @@ void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 	//	rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 	//	rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 	//
-	//	dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
+	//	ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 	//	const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 	//	const ndInt32 mask = frictionIndex >> 31;
 	//	rhs->m_normalForceIndex = frictionIndex;
@@ -415,7 +415,7 @@ void ndDynamicsUpdateOpencl::GetJacobianDerivatives(ndConstraint* const)
 
 void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 {
-	dAssert(0);
+	ndAssert(0);
 	//class ndInitJacobianMatrix : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -426,8 +426,8 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 	//
 	//	void BuildJacobianMatrix(ndConstraint* const joint, ndInt32 jointIndex)
 	//	{
-	//		dAssert(joint->GetBody0());
-	//		dAssert(joint->GetBody1());
+	//		ndAssert(joint->GetBody0());
+	//		ndAssert(joint->GetBody1());
 	//		ndBodyKinematic* const body0 = joint->GetBody0();
 	//		ndBodyKinematic* const body1 = joint->GetBody1();
 	//		const ndBodyDynamic* const dynBody0 = body0->GetAsBodyDynamic();
@@ -505,7 +505,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 	//			const ndFloat32 extenalAcceleration = -tmpAccel.AddHorizontal().GetScalar();
 	//			rhs->m_deltaAccel = extenalAcceleration;
 	//			rhs->m_coordenateAccel += extenalAcceleration;
-	//			dAssert(rhs->m_jointFeebackForce);
+	//			ndAssert(rhs->m_jointFeebackForce);
 	//			const ndFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
 	//
 	//			rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
@@ -518,7 +518,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 	//				weigh1 * (JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular));
 	//
 	//			ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
-	//			dAssert(diag > ndFloat32(0.0f));
+	//			ndAssert(diag > ndFloat32(0.0f));
 	//			rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
 	//
 	//			diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
@@ -605,8 +605,8 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 	//			const ndInt32 startIndex = bodyJointsIndexArray[bodyIndex];
 	//			const ndInt32 count = bodyJointsIndexArray[bodyIndex + 1] - startIndex;
 	//
-	//			dAssert(count);
-	//			dAssert(m_owner->GetActiveBodyArray()[bodyIndex]->m_invMass.m_w > ndFloat32(0.0f));
+	//			ndAssert(count);
+	//			ndAssert(m_owner->GetActiveBodyArray()[bodyIndex]->m_invMass.m_w > ndFloat32(0.0f));
 	//			for (ndInt32 j = 0; j < count; j++)
 	//			{
 	//				const ndInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
@@ -633,7 +633,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndCalculateJointsAcceleration : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -675,7 +675,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
 void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndIntegrateBodiesVelocity : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -705,8 +705,8 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 	//			ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 	//			if (body)
 	//			{
-	//				dAssert(body->m_index == index);
-	//				dAssert(body->m_bodyIsConstrained);
+	//				ndAssert(body->m_index == index);
+	//				ndAssert(body->m_bodyIsConstrained);
 	//				const ndJacobian& forceAndTorque = internalForces[index];
 	//				const dVector force(body->GetForce() + forceAndTorque.m_linear);
 	//				const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
@@ -726,8 +726,8 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 	//					const ndInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 	//					body->m_resting &= equilibrium;
 	//				}
-	//				dAssert(body->m_veloc.m_w == ndFloat32(0.0f));
-	//				dAssert(body->m_omega.m_w == ndFloat32(0.0f));
+	//				ndAssert(body->m_veloc.m_w == ndFloat32(0.0f));
+	//				ndAssert(body->m_omega.m_w == ndFloat32(0.0f));
 	//			}
 	//		}
 	//	}
@@ -740,7 +740,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 void ndDynamicsUpdateOpencl::UpdateForceFeedback()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndUpdateForceFeedback : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -766,7 +766,7 @@ void ndDynamicsUpdateOpencl::UpdateForceFeedback()
 	//			for (ndInt32 j = 0; j < rows; j++)
 	//			{
 	//				const ndRightHandSide* const rhs = &rightHandSide[j + first];
-	//				dAssert(dCheckFloat(rhs->m_force));
+	//				ndAssert(dCheckFloat(rhs->m_force));
 	//				rhs->m_jointFeebackForce->Push(rhs->m_force);
 	//				rhs->m_jointFeebackForce->m_force = rhs->m_force;
 	//				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
@@ -812,13 +812,13 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 void ndDynamicsUpdateOpencl::DetermineSleepStates()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 }
 
 void ndDynamicsUpdateOpencl::InitSkeletons()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndInitSkeletons : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -858,7 +858,7 @@ void ndDynamicsUpdateOpencl::InitSkeletons()
 void ndDynamicsUpdateOpencl::UpdateSkeletons()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndUpdateSkeletons : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -899,7 +899,7 @@ void ndDynamicsUpdateOpencl::UpdateSkeletons()
 void ndDynamicsUpdateOpencl::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//class ndCalculateJointsForce : public ndScene::ndBaseJob
 	//{
 	//	public:
@@ -912,8 +912,8 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 	//	{
 	//		ndBodyKinematic* const body0 = joint->GetBody0();
 	//		ndBodyKinematic* const body1 = joint->GetBody1();
-	//		dAssert(body0);
-	//		dAssert(body1);
+	//		ndAssert(body0);
+	//		ndAssert(body1);
 	//
 	//		const ndInt32 m0 = body0->m_index;
 	//		const ndInt32 m1 = body1->m_index;
@@ -949,7 +949,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 	//					a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 	//
 	//					dVector f(force + a.Scale(rhs->m_invJinvMJt));
-	//					dAssert(rhs->m_normalForceIndexFlat >= 0);
+	//					ndAssert(rhs->m_normalForceIndexFlat >= 0);
 	//					const ndInt32 frictionIndex = rhs->m_normalForceIndexFlat;
 	//					const ndFloat32 frictionNormal = m_rightHandSide[frictionIndex].m_force;
 	//
@@ -1037,7 +1037,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 	//	virtual void Execute()
 	//	{
 	//		D_TRACKTIME();
-	//		dAssert(0);
+	//		ndAssert(0);
 	//		const dVector zero(dVector::m_zero);
 	//		ndWorld* const world = m_owner->GetWorld();
 	//		ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
@@ -1064,8 +1064,8 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 	//			const ndInt32 startIndex = bodyJointsIndexArray[bodyIndex];
 	//			const ndInt32 count = bodyJointsIndexArray[bodyIndex + 1] - startIndex;
 	//
-	//			dAssert(count);
-	//			dAssert(m_owner->GetActiveBodyArray()[bodyIndex]->m_invMass.m_w > ndFloat32(0.0f));
+	//			ndAssert(count);
+	//			ndAssert(m_owner->GetActiveBodyArray()[bodyIndex]->m_invMass.m_w > ndFloat32(0.0f));
 	//			for (ndInt32 j = 0; j < count; j++)
 	//			{
 	//				ndInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
@@ -1093,7 +1093,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 void ndDynamicsUpdateOpencl::CalculateForces()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 	//if (m_world->GetScene()->GetActiveContactArray().GetCount())
 	//{
 	//	m_firstPassCoef = ndFloat32(0.0f);
@@ -1120,7 +1120,7 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 {
 	D_TRACKTIME();
 	m_opencl->Finish();
-	dAssert(0);
+	ndAssert(0);
 	//ndArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder____();
 	//ndJacobian* const accel = (ndJacobian*)&m_opencl->m_bodyArray.m_accel[0];
 	//ndJacobian* const transform = (ndJacobian*)&m_opencl->m_bodyArray.m_transform[0];
@@ -1140,7 +1140,7 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 	//	}
 	//	else
 	//	{
-	//		dAssert(0);
+	//		ndAssert(0);
 	//	}
 	//}
 }
@@ -1148,5 +1148,5 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 void ndDynamicsUpdateOpencl::Update()
 {
 	D_TRACKTIME();
-	dAssert(0);
+	ndAssert(0);
 }

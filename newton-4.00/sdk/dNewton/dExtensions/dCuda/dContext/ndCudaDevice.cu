@@ -27,13 +27,13 @@ ndCudaDevice::ndCudaDevice()
 {
 	cudaError_t cudaStatus;
 	cudaStatus = cudaGetDeviceProperties(&m_prop, 0);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	cudaStatus = cudaSetDevice(0);
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	if (cudaStatus != cudaSuccess)
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 	m_valid = (cudaStatus == cudaSuccess);
 	
@@ -55,11 +55,11 @@ ndCudaDevice::~ndCudaDevice()
 {
 	cudaError_t cudaStatus;
 	cudaStatus = cudaDeviceReset();
-	dAssert(cudaStatus == cudaSuccess);
+	ndAssert(cudaStatus == cudaSuccess);
 	
 	if (cudaStatus != cudaSuccess)
 	{
-		dAssert(0);
+		ndAssert(0);
 	}
 }
 

@@ -29,6 +29,11 @@ ndDeepBrainGradientDescendTrainingOperator::ndDeepBrainGradientDescendTrainingOp
 {
 }
 
+ndDeepBrainGradientDescendTrainingOperator::ndDeepBrainGradientDescendTrainingOperator(const ndDeepBrainGradientDescendTrainingOperator& src)
+	:ndDeepBrainTrainingOperator(src)
+{
+}
+
 ndDeepBrainGradientDescendTrainingOperator::~ndDeepBrainGradientDescendTrainingOperator()
 {
 }
@@ -45,10 +50,12 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			const ndDeepBrainVector& input = inputBatch[j];
 			const ndDeepBrainVector& truth = groundTruth[j];
 			MakePrediction(input);
-			BackPropagate(learnRate, truth);
+			BackPropagate(truth);
+			UpdateWeights(learnRate);
 			ndFloat32 error = CalculateMeanSquareError(truth);
 			m_averageError += error;
 		}
+		ApplyWeightTranspose();
 		m_averageError = ndSqrt(m_averageError / inputBatch.GetCount());
 		ndExpandTraceMessage("%f\n", m_averageError);
 	}

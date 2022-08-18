@@ -36,6 +36,14 @@ ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
 	}
 }
 
+ndDeepBrainInstance::ndDeepBrainInstance(const ndDeepBrainInstance& src)
+	:ndClassAlloc()
+	,m_z(src.m_z)
+	,m_zPrefixScan(src.m_zPrefixScan)
+	,m_brain(src.m_brain)
+{
+}
+
 ndDeepBrainInstance::~ndDeepBrainInstance()
 {
 }
