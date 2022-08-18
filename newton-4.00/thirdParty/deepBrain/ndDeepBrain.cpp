@@ -24,6 +24,7 @@
 
 ndDeepBrain::ndDeepBrain()
 	:ndArray<ndDeepBrainLayer*>()
+	,m_isReady(false)
 {
 }
 
@@ -40,6 +41,17 @@ ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
 	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
 	PushBack(layer);
 	return layer;
+}
+
+void ndDeepBrain::BeginAddLayer()
+{
+	m_isReady = false;
+}
+
+void ndDeepBrain::EndAddLayer()
+{
+	InitGaussianWeights(0.0f, 0.25f);
+	m_isReady = true;
 }
 
 void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)

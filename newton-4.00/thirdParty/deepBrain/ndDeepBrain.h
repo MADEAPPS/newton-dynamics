@@ -31,9 +31,14 @@ class ndDeepBrain: public ndArray<ndDeepBrainLayer*>
 	public: 
 	ndDeepBrain();
 	~ndDeepBrain();
-	ndDeepBrainLayer* AddLayer(ndDeepBrainLayer* const layer);
 
+	void BeginAddLayer();
+	void EndAddLayer();
+
+	ndDeepBrainLayer* AddLayer(ndDeepBrainLayer* const layer);
 	void InitGaussianWeights(ndReal mean, ndReal variance);
+
+	bool m_isReady;
 };
 
 #endif 

@@ -36,7 +36,6 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 	,m_averageError(0.0f)
 {
 	PrefixScan();
-	m_instance.GetBrain()->InitGaussianWeights(0.0f, 0.25f);
 
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 i = 0; i < layers.GetCount(); i ++)

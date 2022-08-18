@@ -222,10 +222,12 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 6, m_relu);
 	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
 
+	brain.BeginAddLayer();
 	brain.AddLayer(inputLayer);
 	brain.AddLayer(hiddenLayer0);
 	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
+	brain.EndAddLayer();
 
 	ndInt32 samples = 1000;
 	ndDeepBrainMatrix inputBatch(samples, 2);
@@ -347,18 +349,23 @@ static void MnistTrainingSet()
 		ndDeepBrain brain;
 		ndSetRandSeed(142543);
 
-		ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), 16, m_relu);
-		ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
-		ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 16, m_relu);
-		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
+		ndInt32 neuronsPerLayers = 64;
+		ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
+		ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
+		ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
+		ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
+		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer2->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
 
+		brain.BeginAddLayer();
 		brain.AddLayer(inputLayer);
 		brain.AddLayer(hiddenLayer0);
 		brain.AddLayer(hiddenLayer1);
+		brain.AddLayer(hiddenLayer2);
 		brain.AddLayer(ouputLayer);
+		brain.EndAddLayer();
 
 		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-		//trainer.Optimize(*trainingDigits, *trainingLabels, 2.0e-1f, 5000);
+		//trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-1f, 1100);
 	}
 
 	if (trainingLabels)

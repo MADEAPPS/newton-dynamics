@@ -54,6 +54,7 @@ T ndDotProduct(ndInt32 size, const T* const A, const T* const B)
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		val = val + A[i] * B[i];
+		ndAssert(ndCheckFloat(val));
 	}
 	return val;
 }
@@ -64,9 +65,9 @@ void ndScaleSet(ndInt32 size, T* const X, const T* const A, T scale)
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		X[i] = A[i] * scale;
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
-
 
 template<class T>
 void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
@@ -74,6 +75,7 @@ void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] + B[i];
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
 
@@ -83,6 +85,7 @@ void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] - B[i];
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
 
@@ -92,6 +95,7 @@ void ndMul(ndInt32 size, T* const X, const T* const A, const T* const B)
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		X[i] = A[i] * B[i];
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
 
@@ -101,6 +105,7 @@ void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T 
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
 		X[i] = A[i] + B[i] * C;
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
 
@@ -110,6 +115,7 @@ void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, cons
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		X[i] = A[i] + B[i] * C[i];
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
 
@@ -119,6 +125,7 @@ void ndMulSub(ndInt32 size, T* const X, const T* const A, const T* const B, cons
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		X[i] = A[i] - B[i] * C[i];
+		ndAssert(ndCheckFloat(X[i]));
 	}
 }
 

@@ -31,13 +31,12 @@
 	#endif
 #endif
 
-#ifdef D_TRACE
 	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
+#ifdef D_TRACE
 	#define ndTrace(x) ndExpandTraceMessage x;
 #else
 	#define ndTrace(x);
 #endif
-
 
 #ifdef _DEBUG
 	inline void TraceFuntionName (const char *name)
@@ -52,7 +51,6 @@
 #else
 	#define TRACE_FUNCTION(name)
 #endif
-
 	
 #endif
 

@@ -49,6 +49,7 @@ void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] = ndMax(ndReal(0.0f), output[i]);
+		ndAssert(ndCheckFloat(output[i]));
 	}
 }
 
@@ -58,6 +59,7 @@ void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output) const
 	{
 		const ndReal exp = ndReal(ndPow(ndEXP, output[i]));
 		output[i] = exp / (exp + 1.0f);
+		ndAssert (ndCheckFloat(output[i]));
 	}
 }
 
@@ -67,6 +69,7 @@ void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output) const
 	{
 		const ndReal exp = ndReal(ndPow(ndEXP, 2.0f * output[i]));
 		output[i] = (exp - 1.0f) / (exp + 1.0f);
+		ndAssert(ndCheckFloat(output[i]));
 	}
 }
 
@@ -85,6 +88,7 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output) const
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
 		output[i] *= invAcc;
+		ndAssert(ndCheckFloat(output[i]));
 	}
 }
 
