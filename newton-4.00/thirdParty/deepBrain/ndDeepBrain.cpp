@@ -62,3 +62,31 @@ void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
 		layers[i]->InitGaussianWeights(mean, variance);
 	}
 }
+
+void ndDeepBrain::Save(const char* const pathName)
+{
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndDeepBrain");
+	asciifile.LinkEndChild(rootNode);
+
+	for (ndInt32 i = 0; i < GetCount(); i++)
+	{
+		ndDeepBrainLayer* const layer = (*this)[i];
+		nd::TiXmlElement* const layerNode = new nd::TiXmlElement("ndLayer");
+		rootNode->LinkEndChild(layerNode);
+		layer->Save (layerNode);
+	}
+
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+	asciifile.SaveFile(pathName);
+	setlocale(LC_ALL, oldloc);
+}
+
+void ndDeepBrain::Load(const char* const pasthName)
+{
+
+}

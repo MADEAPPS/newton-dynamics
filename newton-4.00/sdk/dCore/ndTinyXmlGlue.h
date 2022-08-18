@@ -35,6 +35,7 @@ D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndFloat32* const array);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array);
 
 D_CORE_API ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);

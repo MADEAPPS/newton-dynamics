@@ -375,6 +375,7 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64 (time) / 1000000.0f);
 
+		brain.Save("mnist.nn");
 		ndDeepBrainInstance instance(&brain);
 		
 		ndDeepBrainVector output;
@@ -385,9 +386,9 @@ static void MnistTrainingSet()
 		{
 			const ndDeepBrainVector& input = (*trainingDigits)[i];
 			instance.MakePrediction(input, output);
-
+		
 			const ndDeepBrainVector& truth = (*trainingLabels)[i];
-
+		
 			ndInt32 expectedDigit = 0;
 			ndInt32 predictedDigit = 0;
 			ndFloat32 predictDigitMax = 0;
@@ -427,7 +428,7 @@ static void MnistTrainingSet()
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
+	//MnistTrainingSet();
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

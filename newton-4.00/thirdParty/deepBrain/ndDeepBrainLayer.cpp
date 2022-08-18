@@ -35,6 +35,49 @@ ndDeepBrainLayer::~ndDeepBrainLayer()
 {
 }
 
+void ndDeepBrainLayer::Save(nd::TiXmlElement* const layerNode) const
+{
+	//layerNode->Attribute("Activation ")
+
+	char buffer[256];
+	sprintf(buffer, "%d", GetColumns());
+	layerNode->SetAttribute("inputs", buffer);
+
+	sprintf(buffer, "%d", GetRows());
+	layerNode->SetAttribute("outputs", buffer);
+
+	switch (m_activation)
+	{
+		case m_relu:
+			layerNode->SetAttribute("Activation", "relu");
+			break;
+
+		case m_tanh:
+			layerNode->SetAttribute("Activation", "tanh");
+			break;
+
+		case m_softmax:
+			layerNode->SetAttribute("Activation", "softmax");
+			break;
+
+		case m_sigmoid:
+		default:
+			layerNode->SetAttribute("Activation", "sigmoid");
+			break;
+	}
+	
+	nd::TiXmlElement* const bias = new nd::TiXmlElement("bias");
+	layerNode->LinkEndChild(bias);
+	xmlSaveParam(bias, "weights", m_bias.GetCount(), &m_bias[0]);
+
+	nd::TiXmlElement* const input = new nd::TiXmlElement("inputs");
+	layerNode->LinkEndChild(input);
+	for (ndInt32 i = 0; i < GetCount(); i++)
+	{
+		xmlSaveParam(input, "weights", GetInputSize(), &(*this)[i][0]);
+	}
+}
+
 void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	m_bias.Set(0.0f);

@@ -39,6 +39,8 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	virtual void InitGaussianWeights(ndReal mean, ndReal variance);
 	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
+	virtual void Save(nd::TiXmlElement* const layerNode) const;
+
 	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
 	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& outputDerivative) const;

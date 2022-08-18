@@ -115,7 +115,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
 {
-	char* const buffer = ndAlloca(char, count * 4 * 12);
+	char* const buffer = ndAlloca(char, count * 4 * 12 + 256);
 
 	char* ptr = buffer;
 	for (ndInt32 i = 0; i < count; ++i)
@@ -130,6 +130,24 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 	
+	node->SetAttribute("count", count);
+	node->SetAttribute("float3Array", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndFloat32* const array)
+{
+	char* const buffer = ndAlloca(char, count * 12 + 256);
+
+	char* ptr = buffer;
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ptr = FloatToString(ptr, array[i]);
+	}
+	CleanWhiteSpace(buffer);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
 	node->SetAttribute("count", count);
 	node->SetAttribute("floatArray", buffer);
 }
