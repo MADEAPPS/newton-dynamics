@@ -364,10 +364,9 @@ static void MnistTrainingSet()
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
 
-		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+		//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+		ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain, 2);
 		trainer.SetMiniBatchSize(2000);
-		//ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain);
-		//trainer.SetThreadCount(1);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
@@ -382,34 +381,34 @@ static void MnistTrainingSet()
 		output.SetCount((*trainingLabels)[0].GetCount());
 
 		ndInt32 failCount = 0;
-		for (ndInt32 i = 0; i < trainingDigits->GetCount(); i++)
-		{
-			const ndDeepBrainVector& input = (*trainingDigits)[i];
-			instance.MakePrediction(input, output);
-		
-			const ndDeepBrainVector& truth = (*trainingLabels)[i];
-		
-			ndInt32 expectedDigit = 0;
-			ndInt32 predictedDigit = 0;
-			ndFloat32 predictDigitMax = 0;
-			for (ndInt32 j = 0; j < output.GetCount(); j++)
-			{
-				if (truth[j] > 0.5f)
-				{
-					expectedDigit = j;
-				}
-				if (output[j] > predictDigitMax)
-				{
-					predictDigitMax = output[j];
-					predictedDigit = j;
-				}
-			}
-			if (predictedDigit != expectedDigit)
-			{
-				failCount++;
-				ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
-			}
-		}
+		//for (ndInt32 i = 0; i < trainingDigits->GetCount(); i++)
+		//{
+		//	const ndDeepBrainVector& input = (*trainingDigits)[i];
+		//	instance.MakePrediction(input, output);
+		//
+		//	const ndDeepBrainVector& truth = (*trainingLabels)[i];
+		//
+		//	ndInt32 expectedDigit = 0;
+		//	ndInt32 predictedDigit = 0;
+		//	ndFloat32 predictDigitMax = 0;
+		//	for (ndInt32 j = 0; j < output.GetCount(); j++)
+		//	{
+		//		if (truth[j] > 0.5f)
+		//		{
+		//			expectedDigit = j;
+		//		}
+		//		if (output[j] > predictDigitMax)
+		//		{
+		//			predictDigitMax = output[j];
+		//			predictedDigit = j;
+		//		}
+		//	}
+		//	if (predictedDigit != expectedDigit)
+		//	{
+		//		failCount++;
+		//		ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
+		//	}
+		//}
 		ndExpandTraceMessage("success rate on training data %f %%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
 	}
 
@@ -428,7 +427,7 @@ static void MnistTrainingSet()
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

@@ -63,7 +63,7 @@ void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
 	}
 }
 
-void ndDeepBrain::Save(const char* const pathName)
+void ndDeepBrain::Save(const char* const pathName) const
 {
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
@@ -86,7 +86,8 @@ void ndDeepBrain::Save(const char* const pathName)
 	setlocale(LC_ALL, oldloc);
 }
 
-void ndDeepBrain::Load(const char* const pasthName)
+//void ndDeepBrain::Load(const char* const pathName)
+void ndDeepBrain::Load(const char* const) const
 {
 
 }

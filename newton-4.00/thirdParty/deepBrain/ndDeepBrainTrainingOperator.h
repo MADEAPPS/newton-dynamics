@@ -33,30 +33,14 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src);
 	virtual ~ndDeepBrainTrainingOperator();
 
+	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
 	ndFloat32 CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const;
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:
-	void PrefixScan();
-	void MakePrediction(const ndDeepBrainVector& input);
-
-	void ApplyWeightTranspose();
-	void UpdateWeights(ndReal learnRate);
-	void BackPropagateHiddenLayer(ndInt32 layerIndex);
-	void BackPropagate(const ndDeepBrainVector& groundTruth);
-	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
-	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
-
 	ndDeepBrainInstance m_instance;
-	ndDeepBrainVector m_output;
-	ndDeepBrainVector m_g;
-	ndDeepBrainVector m_zDerivative;
-
-	ndDeepBrainVector m_weightGradients;
-	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
-
-	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
 	ndFloat32 m_averageError;
+	ndInt32 m_miniBatchSize;
 
 	friend class ndDeepBrainInstance;
 };

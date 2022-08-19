@@ -31,17 +31,26 @@ class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOper
 	ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain);
 	ndDeepBrainGradientDescendTrainingOperator(const ndDeepBrainGradientDescendTrainingOperator& src);
 	~ndDeepBrainGradientDescendTrainingOperator();
-
-	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
+	
 	void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
-	ndInt32 m_miniBatchSize;
-};
+	protected:
+	void PrefixScan();
+	void ApplyWeightTranspose();
+	void UpdateWeights(ndReal learnRate);
+	void BackPropagateHiddenLayer(ndInt32 layerIndex);
+	void MakePrediction(const ndDeepBrainVector& input);
+	void BackPropagate(const ndDeepBrainVector& groundTruth);
+	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
+	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 
-inline void ndDeepBrainGradientDescendTrainingOperator::SetMiniBatchSize(ndInt32 miniBatchSize)
-{
-	m_miniBatchSize = miniBatchSize;
-}
+	ndDeepBrainVector m_g;
+	ndDeepBrainVector m_output;
+	ndDeepBrainVector m_zDerivative;
+	ndDeepBrainVector m_weightGradients;
+	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
+	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
+};
 
 #endif 
 

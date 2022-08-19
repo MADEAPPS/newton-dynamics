@@ -41,10 +41,10 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 	virtual void Save(nd::TiXmlElement* const layerNode) const;
 
-	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
 	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& outputDerivative) const;
 
+	protected:
 	void ReluActivation(ndDeepBrainVector& output) const;
 	void SigmoidActivation(ndDeepBrainVector& output) const;
 	void SoftmaxActivation(ndDeepBrainVector& output) const;
@@ -58,6 +58,7 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	ndDeepBrainActivationType m_activation;
 	friend class ndDeepBrainInstance;
 	friend class ndDeepBrainTrainingOperator;
+	friend class ndDeepBrainGradientDescendTrainingOperator;
 };
 
 inline ndInt32 ndDeepBrainLayer::GetOuputSize() const

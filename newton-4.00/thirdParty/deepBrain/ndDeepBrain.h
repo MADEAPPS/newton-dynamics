@@ -32,8 +32,8 @@ class ndDeepBrain: public ndArray<ndDeepBrainLayer*>
 	ndDeepBrain();
 	~ndDeepBrain();
 
-	void Save(const char* const pasthName);
-	void Load(const char* const pasthName);
+	void Save(const char* const pathName) const;
+	void Load(const char* const pathName) const;
 
 	void BeginAddLayer();
 	void EndAddLayer();

@@ -38,6 +38,9 @@ class ndDeepBrainInstance: public ndClassAlloc
 
 	void CalculatePrefixScan();
 	ndDeepBrain* GetBrain() const;
+	ndDeepBrainVector& GetOutPut();
+	const ndDeepBrainPrefixScan& GetPrefixScan() const;
+
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
@@ -46,11 +49,22 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrain* m_brain;
 
 	friend class ndDeepBrainTrainingOperator;
+	friend class ndDeepBrainGradientDescendTrainingOperator;
 };
 
 inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const
 {
 	return m_brain;
+}
+
+inline ndDeepBrainVector& ndDeepBrainInstance::GetOutPut()
+{
+	return m_z;
+}
+
+inline const ndDeepBrainPrefixScan& ndDeepBrainInstance::GetPrefixScan() const
+{
+	return m_zPrefixScan;
 }
 
 #endif 
