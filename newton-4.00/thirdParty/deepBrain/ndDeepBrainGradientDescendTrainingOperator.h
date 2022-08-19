@@ -44,9 +44,9 @@ class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOper
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 
-	ndDeepBrainVector m_g;
 	ndDeepBrainVector m_output;
 	ndDeepBrainVector m_zDerivative;
+	ndDeepBrainVector m_biasGradients;
 	ndDeepBrainVector m_weightGradients;
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;

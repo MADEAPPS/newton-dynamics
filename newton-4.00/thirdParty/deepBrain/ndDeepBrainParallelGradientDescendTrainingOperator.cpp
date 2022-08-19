@@ -29,10 +29,12 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 	public:
 	ndGradientChannel(ndDeepBrainParallelGradientDescendTrainingOperator* const owner)
 		:ndDeepBrainTrainingOperator(owner->m_instance.GetBrain())
-		,m_g(owner->m_g)
 		,m_output(owner->m_output)
 		,m_zDerivative(owner->m_zDerivative)
+		,m_biasGradients(owner->m_biasGradients)
 		,m_weightGradients(owner->m_weightGradients)
+		,m_biasGradientsAcc(owner->m_biasGradients)
+		,m_weightGradientsAcc(owner->m_weightGradients)
 		,m_owner(owner)
 	{
 	}
@@ -41,17 +43,22 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 	{
 	}
 
+	virtual void Optimize(const ndDeepBrainMatrix&, const ndDeepBrainMatrix&, ndReal, ndInt32)
+	{
+		ndAssert(0);
+	}
+
 	void MakePrediction(const ndDeepBrainVector& input)
 	{
 		m_instance.MakePrediction(input, m_output);
 		const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 
-		const ndDeepBrainVector& z = m_instance.GetOutPut();
+		const ndDeepBrainVector& output = m_instance.GetOutPut();
 		const ndDeepBrainPrefixScan& zPrefixScan = m_instance.GetPrefixScan();
 		for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 		{
 			ndDeepBrainLayer* const layer = layers[i];
-			const ndDeepBrainMemVector z(&z[zPrefixScan[i + 1]], layer->GetOuputSize());
+			const ndDeepBrainMemVector z(&output[zPrefixScan[i + 1]], layer->GetOuputSize());
 			ndDeepBrainMemVector zDerivative(&m_zDerivative[zPrefixScan[i + 1]], layer->GetOuputSize());
 			layer->ActivationDerivative(z, zDerivative);
 		}
@@ -59,12 +66,37 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 
 	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth)
 	{
+		const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+		const ndInt32 layerIndex = layers.GetCount() - 1;
 
+		const ndDeepBrainPrefixScan& zPrefixScan = m_instance.GetPrefixScan();
+		ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
+		const ndInt32 inputCount = ouputLayer->GetInputSize();
+		const ndInt32 outputCount = ouputLayer->GetOuputSize();
+
+		const ndDeepBrainVector& output = m_instance.GetOutPut();
+		ndDeepBrainMemVector biasGradients(&m_biasGradients[zPrefixScan[layerIndex + 1]], outputCount);
+		const ndDeepBrainMemVector z(&output[zPrefixScan[layerIndex + 1]], outputCount);
+		const ndDeepBrainMemVector zDerivative(&m_zDerivative[zPrefixScan[layerIndex + 1]], outputCount);
+
+		biasGradients.Sub(z, groundTruth);
+		biasGradients.Mul(biasGradients, zDerivative);
+
+		const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		ndReal* weightGradientPtr = &m_weightGradients[m_owner->m_weightGradientsPrefixScan[layerIndex]];
+		const ndDeepBrainMemVector z0(&output[zPrefixScan[layerIndex]], inputCount);
+		for (ndInt32 i = 0; i < outputCount; ++i)
+		{
+			ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
+			ndFloat32 gValue = biasGradients[i];
+			weightGradient.ScaleSet(z0, gValue);
+			weightGradientPtr += stride;
+		}
 	}
 
 	void BackPropagateHiddenLayer(ndInt32 layerIndex)
 	{
-
+		ndAssert(0);
 	}
 
 	void BackPropagate(const ndDeepBrainVector& groundTruth)
@@ -78,15 +110,12 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 		}
 	}
 
-	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
-	{
-		ndAssert(0);
-	}
-
-	ndDeepBrainVector m_g;
 	ndDeepBrainVector m_output;
 	ndDeepBrainVector m_zDerivative;
+	ndDeepBrainVector m_biasGradients;
 	ndDeepBrainVector m_weightGradients;
+	ndDeepBrainVector m_biasGradientsAcc;
+	ndDeepBrainVector m_weightGradientsAcc;
 
 	ndDeepBrainParallelGradientDescendTrainingOperator* m_owner;
 };
@@ -163,6 +192,8 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 			const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
 
 			ndGradientChannel* const channel = m_subBatch[threadIndex];
+			channel->m_biasGradientsAcc.Set(0.0f);
+			channel->m_weightGradientsAcc.Set(0.0f);
 
 			const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
