@@ -365,7 +365,7 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 
 		//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-		ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain, 2);
+		ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain, 4);
 		trainer.SetMiniBatchSize(2000);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();

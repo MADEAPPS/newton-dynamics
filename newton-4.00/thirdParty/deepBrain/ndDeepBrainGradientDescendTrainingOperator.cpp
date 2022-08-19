@@ -157,8 +157,8 @@ void ndDeepBrainGradientDescendTrainingOperator::BackPropagateHiddenLayer(ndInt3
 	{
 		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
 		ndFloat32 gValue = biasGradients[i];
-		weightGradientPtr += stride;
 		weightGradient.ScaleSet(z0, gValue);
+		weightGradientPtr += stride;
 	}
 }
 
@@ -196,8 +196,8 @@ void ndDeepBrainGradientDescendTrainingOperator::UpdateWeights(ndReal learnRate)
 		{
 			ndDeepBrainVector& weightVector = weightMatrix[j];
 			const ndDeepBrainMemVector weightGradients(weightGradientPtr, inputSize);
-			weightGradientPtr += weightGradientStride;
 			weightVector.ScaleAdd(weightGradients, -learnRate);
+			weightGradientPtr += weightGradientStride;
 		}
 	}
 }
