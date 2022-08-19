@@ -76,20 +76,25 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 
 		const ndDeepBrainVector& output = m_instance.GetOutPut();
 		ndDeepBrainMemVector biasGradients(&m_biasGradients[zPrefixScan[layerIndex + 1]], outputCount);
+		ndDeepBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[zPrefixScan[layerIndex + 1]], outputCount);
 		const ndDeepBrainMemVector z(&output[zPrefixScan[layerIndex + 1]], outputCount);
 		const ndDeepBrainMemVector zDerivative(&m_zDerivative[zPrefixScan[layerIndex + 1]], outputCount);
 
 		biasGradients.Sub(z, groundTruth);
 		biasGradients.Mul(biasGradients, zDerivative);
+		biasGradientsAcc.Add(biasGradientsAcc, biasGradients);
 
 		const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		ndReal* weightGradientPtr = &m_weightGradients[m_owner->m_weightGradientsPrefixScan[layerIndex]];
+		ndReal* weightGradientPtrAcc = &m_weightGradientsAcc[m_owner->m_weightGradientsPrefixScan[layerIndex]];
 		const ndDeepBrainMemVector z0(&output[zPrefixScan[layerIndex]], inputCount);
 		for (ndInt32 i = 0; i < outputCount; ++i)
 		{
 			ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
+			ndDeepBrainMemVector weightGradientAcc(weightGradientPtrAcc, inputCount);
 			ndFloat32 gValue = biasGradients[i];
 			weightGradient.ScaleSet(z0, gValue);
+			weightGradientAcc.Add(weightGradientAcc, weightGradient);
 			weightGradientPtr += stride;
 		}
 	}
