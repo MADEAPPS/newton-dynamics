@@ -36,6 +36,7 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 		,m_biasGradientsAcc(owner->m_biasGradients)
 		,m_weightGradientsAcc(owner->m_weightGradients)
 		,m_owner(owner)
+		,m_averageError(0.0f)
 	{
 	}
 
@@ -160,8 +161,8 @@ class ndDeepBrainParallelGradientDescendTrainingOperator::ndGradientChannel : pu
 	ndDeepBrainVector m_weightGradients;
 	ndDeepBrainVector m_biasGradientsAcc;
 	ndDeepBrainVector m_weightGradientsAcc;
-
 	ndDeepBrainParallelGradientDescendTrainingOperator* m_owner;
+	ndFloat32 m_averageError;
 };
 
 ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads)
@@ -207,7 +208,7 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::SetThreadCount(ndInt32 
 void ndDeepBrainParallelGradientDescendTrainingOperator::ThreadFunction()
 {
 	Begin();
-	//Optimize();
+	Optimize();
 	End();
 }
 
@@ -239,6 +240,7 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 			channel->m_biasGradientsAcc.Set(0.0f);
 			channel->m_weightGradientsAcc.Set(0.0f);
 
+			channel->m_averageError = 0.0f;
 			const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -246,15 +248,55 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 				const ndDeepBrainVector& truth = (*m_groundTruth)[batchStart + i];
 				channel->MakePrediction(input);
 				channel->BackPropagate(truth);
+				ndFloat32 error = channel->CalculateMeanSquareError(truth);
+				channel->m_averageError += error;
 			}
 		});
-
 		ParallelExecute(OptimizeMiniBatch);
 
-		//UpdateWeights(learnRate);
-		//ApplyWeightTranspose();
-		//ndFloat32 error = CalculateMeanSquareError(truth);
-		//m_averageError += error;
+		auto AddPartialBiasGradients = ndMakeObject::ndFunction([this, batchCount](ndInt32 threadIndex, ndInt32 threadCount)
+		{
+			const ndStartEnd startEnd(m_biasGradients.GetCount(), threadIndex, threadCount);
+			ndDeepBrainMemVector biasGradient(&m_biasGradients[startEnd.m_start], startEnd.m_end - startEnd.m_start);
+			biasGradient.Set(0.0f);
+			for (ndInt32 i = 0; i < threadCount; ++i)
+			{
+				ndGradientChannel* const channel = m_subBatch[threadIndex];
+				const ndDeepBrainMemVector partialBiasGradient(&channel->m_biasGradientsAcc[startEnd.m_start], startEnd.m_end - startEnd.m_start);
+				biasGradient.Add(biasGradient, partialBiasGradient);
+			}
+			biasGradient.ScaleAdd(biasGradient, 1.0f / m_miniBatchSize);
+		});
+		ParallelExecute(AddPartialBiasGradients);
+
+		auto AddPartialWeightGradients = ndMakeObject::ndFunction([this, batchCount](ndInt32 threadIndex, ndInt32 threadCount)
+		{
+			const ndStartEnd startEnd(m_weightGradients.GetCount(), threadIndex, threadCount);
+			ndDeepBrainMemVector weightGradient(&m_weightGradients[startEnd.m_start], startEnd.m_end - startEnd.m_start);
+			weightGradient.Set(0.0f);
+			for (ndInt32 i = 0; i < threadCount; ++i)
+			{
+				ndGradientChannel* const channel = m_subBatch[threadIndex];
+				const ndDeepBrainMemVector partialBiasGradient(&channel->m_weightGradientsAcc[startEnd.m_start], startEnd.m_end - startEnd.m_start);
+				weightGradient.Add(weightGradient, partialBiasGradient);
+			}
+			weightGradient.ScaleAdd(weightGradient, 1.0f / m_miniBatchSize);
+		});
+		ParallelExecute(AddPartialWeightGradients);
+
+		UpdateWeights(m_learnRate);
+		ApplyWeightTranspose();
+		ndFloat32 error = 0.0f;
+		for (ndInt32 j = 0; j < GetThreadCount(); ++j)
+		{
+			ndGradientChannel* const channel = m_subBatch[j];
+			error += channel->m_averageError;
+		}
+
+		const ndInt32 batchStart = index * m_miniBatchSize;
+		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
+		m_averageError = ndSqrt(error / batchSize);
+
 		index = (index + 1) % batchCount;
 
 		ndExpandTraceMessage("%f\n", m_averageError);

@@ -205,7 +205,7 @@ void ndDeepBrainGradientDescendTrainingOperator::UpdateWeights(ndReal learnRate)
 void ndDeepBrainGradientDescendTrainingOperator::ApplyWeightTranspose()
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = layers.GetCount() - 1; i >= 1; --i)
 	{
 		ndDeepBrainLayer* const layer = layers[i];
 		ndDeepBrainMatrix& weightMatrix = *layer;
@@ -250,6 +250,6 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 		}
 		ApplyWeightTranspose();
 		m_averageError = ndSqrt(m_averageError / batchSize);
-		ndExpandTraceMessage("%f\n", m_averageError);
+		ndExpandTraceMessage("%f %d\n", m_averageError, i);
 	}
 }
