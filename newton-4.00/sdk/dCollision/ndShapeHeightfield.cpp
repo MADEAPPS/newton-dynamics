@@ -38,18 +38,6 @@ ndInt32 ndShapeHeightfield::m_cellIndices[][4] =
 	{ 1, 3, 0, 2 }
 };
 
-ndInt32 ndShapeHeightfield::m_horizontalEdgeMap[][7] =
-{
-	{ 1 * 9 + 0, 2 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 1 * 9 + 4, 2 * 9 + 4 },
-	{ 0 * 9 + 1, 3 * 9 + 0, 0 * 9 + 4, 0 * 9 + 6, 3 * 9 + 6, 0 * 9 + 4, 3 * 9 + 4 }
-};
-
-ndInt32 ndShapeHeightfield::m_verticalEdgeMap[][7] =
-{
-	{ 1 * 9 + 1, 0 * 9 + 0, 1 * 9 + 4, 1 * 9 + 6, 0 * 9 + 6, 1 * 9 + 4, 0 * 9 + 4 },
-	{ 1 * 9 + 0, 0 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 0 * 9 + 7, 1 * 9 + 4, 0 * 9 + 4 }
-};
-
 ndShapeHeightfield::ndShapeHeightfield(
 	ndInt32 width, ndInt32 height, ndGridConstruction constructionMode,
 	ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z)
@@ -611,20 +599,18 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 normalBase = vertexIndex;
 		vertexIndex = 0;
 		ndInt32 index = 0;
-		ndInt32 faceCount = 0;
+		ndInt32 quadCount = 0;
 		ndInt32 step = x1 - x0 + 1;
-		ndInt32* const indices = data->m_globalFaceVertexIndex;
-		ndGridQuad* const indices____ = (ndGridQuad*) data->m_globalFaceVertexIndex;
-		const ndInt32 maxGrids = sizeof(data->m_globalFaceVertexIndex) / sizeof(ndGridQuad);
+		ndGridQuad* const quadArray = (ndGridQuad*) data->m_globalFaceVertexIndex;
 		
 		ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 
 		const ndInt32* const indirectIndex = GetIndexList();
-		for (ndInt32 z = z0; (z < z1) && (faceCount < maxGrids); ++z)
+		for (ndInt32 z = z0; (z < z1) && (quadCount < D_MAX_COLLIDING_FACES/2); ++z)
 		{
 			ndInt32 zStep = z * m_width;
-			for (ndInt32 x = x0; (x < x1) && (faceCount < maxGrids); ++x)
+			for (ndInt32 x = x0; (x < x1) && (quadCount < D_MAX_COLLIDING_FACES/2); ++x)
 			{
 				ndInt32 vIndex[4];
 				vIndex[0] = vertexIndex;
@@ -654,119 +640,150 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				vertex[normalIndex0] = n0.Normalize();
 				vertex[normalIndex1] = n1.Normalize();
 
-				ndGridQuad& quad = indices____[faceCount / 2];
+				ndGridQuad& quad = quadArray[quadCount];
 
-				faceIndexCount[faceCount] = 3;
-				indices[index + 0 + 0] = i2;
-				indices[index + 0 + 1] = i1;
-				indices[index + 0 + 2] = i0;
-				indices[index + 0 + 3] = m_atributeMap[zStep + x];
-				indices[index + 0 + 4] = normalIndex0;
-				indices[index + 0 + 5] = normalIndex0;
-				indices[index + 0 + 6] = normalIndex0;
-				indices[index + 0 + 7] = normalIndex0;
-				indices[index + 0 + 8] = faceSize;
+				faceIndexCount[quadCount * 2] = 3;
+				quad.m_triangle0.m_i0 = i2;
+				quad.m_triangle0.m_i1 = i1;
+				quad.m_triangle0.m_i2 = i0;
+				quad.m_triangle0.m_material = m_atributeMap[zStep + x];
+				quad.m_triangle0.m_normal = normalIndex0;
+				quad.m_triangle0.m_normal_edge01 = normalIndex0;
+				quad.m_triangle0.m_normal_edge12 = normalIndex0;
+				quad.m_triangle0.m_normal_edge20 = normalIndex0;
+				quad.m_triangle0.m_area = faceSize;
 	
-				faceIndexCount[faceCount + 1] = 3;
-				indices[index + 9 + 0] = i1;
-				indices[index + 9 + 1] = i2;
-				indices[index + 9 + 2] = i3;
-				indices[index + 9 + 3] = m_atributeMap[zStep + x];
-				indices[index + 9 + 4] = normalIndex1;
-				indices[index + 9 + 5] = normalIndex1;
-				indices[index + 9 + 6] = normalIndex1;
-				indices[index + 9 + 7] = normalIndex1;
-				indices[index + 9 + 8] = faceSize;
-	
+				faceIndexCount[quadCount * 2 + 1] = 3;
+				quad.m_triangle1.m_i0 = i1;
+				quad.m_triangle1.m_i1 = i2;
+				quad.m_triangle1.m_i2 = i3;
+				quad.m_triangle1.m_material = m_atributeMap[zStep + x];
+				quad.m_triangle1.m_normal = normalIndex1;
+				quad.m_triangle1.m_normal_edge01 = normalIndex1;
+				quad.m_triangle1.m_normal_edge12 = normalIndex1;
+				quad.m_triangle1.m_normal_edge20 = normalIndex1;
+				quad.m_triangle1.m_area = faceSize;
+
 				ndVector dp(vertex[i3] - vertex[i1]);
 				ndAssert(dp.m_w == ndFloat32(0.0f));
-				ndFloat32 dist(vertex[normalIndex0].DotProduct(dp).GetScalar());
+				ndFloat32 dist = vertex[normalIndex0].DotProduct(dp).GetScalar();
 				if (dist < -ndFloat32(1.0e-3f)) 
 				{
-					indices[index + 0 + 5] = normalIndex1;
-					indices[index + 9 + 5] = normalIndex0;
+					quad.m_triangle0.m_normal_edge01 = normalIndex1;
+					quad.m_triangle1.m_normal_edge01 = normalIndex0;
 				}
 	
 				index += 9 * 2;
 				normalBase += 2;
-				faceCount += 2;
+				quadCount++;
 				vertexIndex++;
 			}
 			vertexIndex++;
 		}
-		
-		const ndInt32 maxIndex = index;
-		ndInt32 stepBase = (x1 - x0) * (2 * 9);
-		for (ndInt32 z = z0; z < z1; ++z) 
+
+		if (m_diagonalMode == m_invertedDiagonals)
 		{
-			const ndInt32 triangleIndexBase = (z - z0) * stepBase;
-			const ndInt32* const horizontalEdgeMap = &m_horizontalEdgeMap[m_diagonalMode == m_normalDiagonals ? 0 : 1][0];
-			for (ndInt32 x = x0; x < (x1 - 1); ++x) 
+			for (ndInt32 i = 1; i < (quadCount - 1); ++i)
 			{
-				ndInt32 index1 = (x - x0) * (2 * 9) + triangleIndexBase;
-				//if (index1 < maxIndex) 
-				//ndAssert((index1 + stepBase) < maxIndex);
-				if ((index1 + stepBase) < maxIndex)
+				ndGridQuad& quad0 = quadArray[i - 1];
+				ndGridQuad& quad1 = quadArray[i - 0];
+
+				ndTriangle& triangle0 = quad0.m_triangle0;
+				ndTriangle& triangle1 = quad1.m_triangle1;
+
+				const ndVector& origin = vertex[triangle1.m_i1];
+				const ndVector& testPoint = vertex[triangle1.m_i0];
+				const ndVector& normal = vertex[triangle0.m_normal];
+				ndAssert(normal.m_w == ndFloat32(0.0f));
+				ndFloat32 dist(normal.DotProduct(testPoint - origin).GetScalar());
+				if (dist < -ndFloat32(1.0e-3f))
 				{
-					ndInt32* const triangles = &indices[index1];
-					const ndInt32 i0 = triangles[horizontalEdgeMap[0]];
-					const ndInt32 i1 = triangles[horizontalEdgeMap[1]];
-					const ndInt32 i2 = triangles[horizontalEdgeMap[2]];
-					
-					const ndVector& origin = vertex[i0];
-					const ndVector& testPoint = vertex[i1];
-					const ndVector& normal = vertex[i2];
+					ndInt32 n0 = triangle0.m_normal;
+					ndInt32 n1 = triangle1.m_normal;
+					triangle0.m_normal_edge12 = n1;
+					triangle1.m_normal_edge12 = n0;
+				}
+			}
+
+			const ndInt32 quadStep = x1 - x0;
+			for (ndInt32 i = 0; i < quadCount; ++i)
+			{
+				ndInt32 j = i + quadStep;
+				if (j < quadCount)
+				{
+					ndGridQuad& quad0 = quadArray[i];
+					ndGridQuad& quad1 = quadArray[j];
+
+					ndTriangle& triangle0 = quad0.m_triangle1;
+					ndTriangle& triangle1 = quad1.m_triangle0;
+
+					const ndVector& origin = vertex[triangle1.m_i0];
+					const ndVector& testPoint = vertex[triangle1.m_i1];
+					const ndVector& normal = vertex[triangle0.m_normal];
 					ndAssert(normal.m_w == ndFloat32(0.0f));
 					ndFloat32 dist(normal.DotProduct(testPoint - origin).GetScalar());
-					
-					if (dist < -ndFloat32(1.0e-3f)) 
+					if (dist < -ndFloat32(1.0e-3f))
 					{
-						const ndInt32 i3 = horizontalEdgeMap[3];
-						const ndInt32 i4 = horizontalEdgeMap[4];
-						const ndInt32 i5 = horizontalEdgeMap[5];
-						const ndInt32 i6 = horizontalEdgeMap[6];
-						triangles[i3] = triangles[i6];
-						triangles[i4] = triangles[i5];
+						ndInt32 n0 = triangle0.m_normal;
+						ndInt32 n1 = triangle1.m_normal;
+						triangle0.m_normal_edge20 = n1;
+						triangle1.m_normal_edge20 = n0;
 					}
 				}
 			}
 		}
-	
-		const ndInt32* const verticalEdgeMap = &m_verticalEdgeMap[m_diagonalMode == m_normalDiagonals ? 0 : 1][0];
-		for (ndInt32 x = x0; x < x1; ++x) 
+		else
 		{
-			const ndInt32 triangleIndexBase = (x - x0) * (2 * 9);
-			for (ndInt32 z = z0; z < (z1 - 1); ++z) 
+			for (ndInt32 i = 1; i < (quadCount - 1); ++i)
 			{
-				ndInt32 index1 = (z - z0) * stepBase + triangleIndexBase;
-				//if (index1 < maxIndex)
-				//ndAssert((index1 + stepBase) < maxIndex);
-				if ((index1 + stepBase) < maxIndex)
+				ndGridQuad& quad0 = quadArray[i - 1];
+				ndGridQuad& quad1 = quadArray[i - 0];
+
+				ndTriangle& triangle0 = quad0.m_triangle1;
+				ndTriangle& triangle1 = quad1.m_triangle0;
+
+				const ndVector& origin = vertex[triangle1.m_i0];
+				const ndVector& testPoint = vertex[triangle1.m_i1];
+				const ndVector& normal = vertex[triangle0.m_normal];
+				ndAssert(normal.m_w == ndFloat32(0.0f));
+				ndFloat32 dist(normal.DotProduct(testPoint - origin).GetScalar());
+				if (dist < -ndFloat32(1.0e-3f))
 				{
-					ndInt32* const triangles = &indices[index1];
-					const ndInt32 i0 = triangles[verticalEdgeMap[0]];
-					const ndInt32 i1 = triangles[verticalEdgeMap[1] + stepBase];
-					const ndInt32 i2 = triangles[verticalEdgeMap[2]];
-	
-					const ndVector& origin = vertex[i0];
-					const ndVector& testPoint = vertex[i1];
-					const ndVector& normal = vertex[i2];
+					ndInt32 n0 = triangle0.m_normal;
+					ndInt32 n1 = triangle1.m_normal;
+					triangle0.m_normal_edge20 = n1;
+					triangle1.m_normal_edge20 = n0;
+				}
+			}
+
+			const ndInt32 quadStep = x1 - x0;
+			for (ndInt32 i = 0; i < quadCount; ++i)
+			{
+				ndInt32 j = i + quadStep;
+				if (j < quadCount)
+				{
+					ndGridQuad& quad0 = quadArray[i];
+					ndGridQuad& quad1 = quadArray[j];
+
+					ndTriangle& triangle0 = quad0.m_triangle1;
+					ndTriangle& triangle1 = quad1.m_triangle0;
+
+					const ndVector& origin = vertex[triangle1.m_i1];
+					const ndVector& testPoint = vertex[triangle1.m_i0];
+					const ndVector& normal = vertex[triangle0.m_normal];
 					ndAssert(normal.m_w == ndFloat32(0.0f));
 					ndFloat32 dist(normal.DotProduct(testPoint - origin).GetScalar());
-	
-					if (dist < -ndFloat32(1.0e-3f)) 
+					if (dist < -ndFloat32(1.0e-3f))
 					{
-						const ndInt32 i3 = verticalEdgeMap[3];
-						const ndInt32 i4 = verticalEdgeMap[4] + stepBase;
-						const ndInt32 i5 = verticalEdgeMap[5];
-						const ndInt32 i6 = verticalEdgeMap[6] + stepBase;
-						triangles[i3] = triangles[i6];
-						triangles[i4] = triangles[i5];
+						ndInt32 n0 = triangle0.m_normal;
+						ndInt32 n1 = triangle1.m_normal;
+						triangle0.m_normal_edge12 = n1;
+						triangle1.m_normal_edge12 = n0;
 					}
 				}
 			}
 		}
-	
+
 		ndInt32 stride = sizeof(ndVector) / sizeof(ndFloat32);
 		ndInt32 faceCount0 = 0;
 		ndInt32 faceIndexCount0 = 0;
@@ -777,8 +794,9 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	
 		if (data->m_doContinueCollisionTest) 
 		{
+			ndInt32* const indices = data->m_globalFaceVertexIndex;
 			ndFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
-			for (ndInt32 i = 0; i < faceCount; ++i)
+			for (ndInt32 i = 0; i < quadCount * 2; ++i)
 			{
 				const ndInt32* const indexArray = &indices[faceIndexCount1];
 				const ndVector& faceNormal = vertex[indexArray[4]];
@@ -796,7 +814,8 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		}
 		else 
 		{
-			for (ndInt32 i = 0; i < faceCount; ++i) 
+			ndInt32* const indices = data->m_globalFaceVertexIndex;
+			for (ndInt32 i = 0; i < quadCount * 2; ++i) 
 			{
 				const ndInt32* const indexArray = &indices[faceIndexCount1];
 				const ndVector& faceNormal = vertex[indexArray[4]];
@@ -818,7 +837,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			// initialize the callback data structure
 			data->m_faceCount = faceCount0;
 			data->m_vertex = &vertex[0].m_x;
-			data->m_faceVertexIndex = indices;
+			data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
 			data->m_faceIndexStart = address;
 			data->m_hitDistance = hitDistance;
 			data->m_faceIndexCount = faceIndexCount;

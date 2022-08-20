@@ -36,16 +36,17 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 		ndInt32 m_i2;
 		ndInt32 m_material;
 		ndInt32 m_normal;
-		ndInt32 m_edge01_normal;
-		ndInt32 m_edge12_normal;
-		ndInt32 m_edge23_normal;
+		ndInt32 m_normal_edge01;
+		ndInt32 m_normal_edge12;
+		ndInt32 m_normal_edge20;
 		ndInt32 m_area;
 	};
 
 	class ndGridQuad
 	{
-		ndTriangle m_trinagle0;
-		ndTriangle m_trinagle1;
+		public:
+		ndTriangle m_triangle0;
+		ndTriangle m_triangle1;
 	};
 
 	enum ndGridConstruction
@@ -56,7 +57,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	D_CLASS_REFLECTION(ndShapeHeightfield);
 	D_COLLISION_API ndShapeHeightfield(
-		ndInt32 width, ndInt32 height, ndGridConstruction contructionMode,
+		ndInt32 width, ndInt32 height, ndGridConstruction constructionMode,
 		ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z);
 	D_COLLISION_API ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
@@ -113,8 +114,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	static ndVector m_padding;
 	static ndVector m_elevationPadding;
 	static ndInt32 m_cellIndices[][4];
-	static ndInt32 m_verticalEdgeMap[][7];
-	static ndInt32 m_horizontalEdgeMap[][7];
 	friend class ndContactSolver;
 };
 

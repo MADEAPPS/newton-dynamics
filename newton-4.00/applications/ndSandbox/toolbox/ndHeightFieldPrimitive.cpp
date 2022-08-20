@@ -30,7 +30,7 @@
 #define D_TERRAIN_GRID_SIZE			0.2f
 #define D_TERRAIN_TILE_SIZE			128
 //#define D_TERRAIN_ELEVATION_SCALE	64.0f
-#define D_TERRAIN_ELEVATION_SCALE	0.0f
+#define D_TERRAIN_ELEVATION_SCALE	0.5f
 
 class ndHeightfieldMesh : public ndDemoMesh
 {
