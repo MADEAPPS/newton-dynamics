@@ -41,10 +41,10 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 	virtual void Save(nd::TiXmlElement* const layerNode) const;
 
+	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
 	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& outputDerivative) const;
 
-	protected:
 	void ReluActivation(ndDeepBrainVector& output) const;
 	void SigmoidActivation(ndDeepBrainVector& output) const;
 	void SoftmaxActivation(ndDeepBrainVector& output) const;
@@ -54,11 +54,14 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	void HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 	void ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 
+	virtual void MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output);
+
 	ndDeepBrainVector m_bias;
 	ndDeepBrainActivationType m_activation;
 	friend class ndDeepBrainInstance;
 	friend class ndDeepBrainTrainingOperator;
 	friend class ndDeepBrainGradientDescendTrainingOperator;
+	friend class ndDeepBrainParallelGradientDescendTrainingOperator;
 };
 
 inline ndInt32 ndDeepBrainLayer::GetOuputSize() const

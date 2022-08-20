@@ -43,7 +43,6 @@ ndThreadPool::ndWorker::~ndWorker()
 void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
-	D_SET_TRACK_NAME(m_name);
 	m_begin.store(true);
 	m_stillLooping.store(true);
 	while (m_begin.load())
@@ -54,10 +53,7 @@ void ndThreadPool::ndWorker::ThreadFunction()
 			task->Execute();
 			m_task.store(nullptr);
 		}
-		else
-		{
-			ndYield();
-		}
+		ndYield();
 	}
 	m_stillLooping.store(false);
 #endif

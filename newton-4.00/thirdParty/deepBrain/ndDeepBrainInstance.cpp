@@ -94,3 +94,23 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input, ndDeepB
 	output.Set(out);
 }
 
+void ndDeepBrainInstance::MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
+{
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
+	ndAssert(layers.GetCount());
+	ndAssert(layers[0]->GetInputSize() == input.GetCount());
+
+	ndDeepBrainMemVector layerInput(&m_z[m_zPrefixScan[0]], input.GetCount());
+	layerInput.Set(input);
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		ndDeepBrainLayer* const layer = layers[i];
+		const ndDeepBrainMemVector in(&m_z[m_zPrefixScan[i + 0]], layer->GetInputSize());
+		ndDeepBrainMemVector out(&m_z[m_zPrefixScan[i + 1]], layer->GetOuputSize());
+		layer->MakePredictionParallel(threadPool, in, out);
+	}
+
+	output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
+	const ndDeepBrainMemVector out(&m_z[m_zPrefixScan[layers.GetCount()]], output.GetCount());
+	output.Set(out);
+}

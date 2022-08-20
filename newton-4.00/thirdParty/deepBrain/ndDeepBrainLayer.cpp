@@ -246,3 +246,26 @@ void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrai
 	output.Add(output, m_bias);
 	ApplyActivation(output);
 }
+
+void ndDeepBrainLayer::MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
+{
+	auto MakePrediction = ndMakeObject::ndFunction([this, &input, &output](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		const ndStartEnd startEnd(output.GetCount(), threadIndex, threadCount);
+		const ndInt32 count(startEnd.m_end - startEnd.m_start);
+		if (count)
+		{
+			ndDeepBrainMemVector out(&output[startEnd.m_start], count);
+			const ndDeepBrainMemVector bias(&m_bias[startEnd.m_start], count);
+
+			const ndDeepBrainMatrix& matrix = (*this);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				output[i] = input.Dot(matrix[i]);
+			}
+			out.Add(out, bias);
+			ApplyActivation(out);
+		}
+	});
+	threadPool.ParallelExecute(MakePrediction);
+}

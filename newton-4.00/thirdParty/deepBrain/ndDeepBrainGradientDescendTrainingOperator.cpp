@@ -139,6 +139,20 @@ void ndDeepBrainGradientDescendTrainingOperator::BackPropagateOutputLayer(const 
 	}
 }
 
+void ndDeepBrainGradientDescendTrainingOperator::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
+{
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	ndDeepBrainLayer* const layer = layers[layerIndex + 1];
+
+	const ndDeepBrainMemVector biasGradients1(&m_biasGradients[m_instance.m_zPrefixScan[layerIndex + 2]], layer->GetOuputSize());
+	ndDeepBrainMemVector biasGradients(&m_biasGradients[m_instance.m_zPrefixScan[layerIndex + 1]], layer->GetInputSize());
+	const ndDeepBrainMatrix& matrix = *m_weightsLayersTranspose[layerIndex + 1];
+	const ndDeepBrainMemVector zDerivative(&m_zDerivative[m_instance.m_zPrefixScan[layerIndex + 1]], layer->GetInputSize());
+
+	matrix.Mul(biasGradients1, biasGradients);
+	biasGradients.Mul(biasGradients, zDerivative);
+}
+
 void ndDeepBrainGradientDescendTrainingOperator::BackPropagateHiddenLayer(ndInt32 layerIndex)
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
@@ -160,20 +174,6 @@ void ndDeepBrainGradientDescendTrainingOperator::BackPropagateHiddenLayer(ndInt3
 		weightGradient.ScaleSet(z0, gValue);
 		weightGradientPtr += stride;
 	}
-}
-
-void ndDeepBrainGradientDescendTrainingOperator::BackPropagateCalculateBiasGradient(ndInt32 layerIndex)
-{
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	ndDeepBrainLayer* const layer = layers[layerIndex + 1];
-
-	const ndDeepBrainMemVector biasGradients1(&m_biasGradients[m_instance.m_zPrefixScan[layerIndex + 2]], layer->GetOuputSize());
-	ndDeepBrainMemVector biasGradients(&m_biasGradients[m_instance.m_zPrefixScan[layerIndex + 1]], layer->GetInputSize());
-	const ndDeepBrainMatrix& matrix = *m_weightsLayersTranspose[layerIndex + 1];
-	const ndDeepBrainMemVector zDerivative(&m_zDerivative[m_instance.m_zPrefixScan[layerIndex + 1]], layer->GetInputSize());
-
-	matrix.Mul(biasGradients1, biasGradients);
-	biasGradients.Mul(biasGradients, zDerivative);
 }
 
 void ndDeepBrainGradientDescendTrainingOperator::UpdateWeights(ndReal learnRate)
@@ -215,9 +215,9 @@ void ndDeepBrainGradientDescendTrainingOperator::ApplyWeightTranspose()
 
 void ndDeepBrainGradientDescendTrainingOperator::BackPropagate(const ndDeepBrainVector& groundTruth)
 {
-	BackPropagateOutputLayer(groundTruth);
-
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+
+	BackPropagateOutputLayer(groundTruth);
 	for (ndInt32 i = layers.GetCount() - 2; i >= 0; --i)
 	{
 		BackPropagateHiddenLayer(i);

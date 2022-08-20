@@ -372,7 +372,6 @@ static void MnistTrainingSet()
 		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
 
 		time = ndGetTimeInMicroseconds() - time;
-		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64 (time) / 1000000.0f);
 
 		brain.Save("mnist.nn");
 		ndDeepBrainInstance instance(&brain);
@@ -409,6 +408,9 @@ static void MnistTrainingSet()
 				ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
 			}
 		}
+		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64(time) / 1000000.0f);
+		ndExpandTraceMessage("training num_right: %d\n", trainingDigits->GetCount() - failCount);
+		ndExpandTraceMessage("training num_wrong: %d\n", failCount);
 		ndExpandTraceMessage("success rate on training data %f %%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
 	}
 
@@ -426,7 +428,7 @@ static void MnistTrainingSet()
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

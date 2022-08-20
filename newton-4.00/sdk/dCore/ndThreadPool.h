@@ -40,8 +40,11 @@ class ndStartEnd
 	ndStartEnd(ndInt32 count, ndInt32 threadIndex, ndInt32 threads)
 	{
 		ndInt32 stride = count / threads;
+		ndInt32 residual = count - stride * threads;
 		m_start = stride * threadIndex;
-		m_end = (threadIndex != (threads - 1)) ? stride + m_start : count;
+		stride += (threadIndex < residual) ? 1 : 0;
+		m_start += (threadIndex < residual) ? threadIndex : residual;
+		m_end = m_start + stride;
 	}
 
 	ndInt32 m_start;

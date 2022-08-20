@@ -30,7 +30,6 @@ class ndDeepBrainParallelGradientDescendTrainingOperator
 	,public ndThreadPool
 {
 	public: 
-	class ndGradientChannel;
 	ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads = 1);
 	~ndDeepBrainParallelGradientDescendTrainingOperator();
 
@@ -38,16 +37,19 @@ class ndDeepBrainParallelGradientDescendTrainingOperator
 
 	private:
 	void Optimize();
-	void SetThreadCount(ndInt32 threads);
 	virtual void ThreadFunction();
+
+	private:
+	void BackPropagateHiddenLayerParallel(ndInt32 layerIndex);
+	void MakePredictionParallel(const ndDeepBrainVector& input);
+	void BackPropagateParallel(const ndDeepBrainVector& groundTruth);
+	void BackPropagateOutputLayerParallel(const ndDeepBrainVector& groundTruth);
 
 	const ndDeepBrainMatrix* m_inputBatch;
 	const ndDeepBrainMatrix* m_groundTruth;
 	ndReal m_learnRate;
 	ndInt32 m_steps;
 	
-	ndFixSizeArray<ndGradientChannel*, D_MAX_THREADS_COUNT> m_subBatch;
-	friend class ndGradientChannel;
 };
 
 

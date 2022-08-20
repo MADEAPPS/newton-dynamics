@@ -44,12 +44,15 @@ class ndDeepBrainInstance: public ndClassAlloc
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
+	void MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output);
+
 	ndDeepBrainVector m_z;
 	ndDeepBrainPrefixScan m_zPrefixScan;
 	ndDeepBrain* m_brain;
 
 	friend class ndDeepBrainTrainingOperator;
 	friend class ndDeepBrainGradientDescendTrainingOperator;
+	friend class ndDeepBrainParallelGradientDescendTrainingOperator;
 };
 
 inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const
