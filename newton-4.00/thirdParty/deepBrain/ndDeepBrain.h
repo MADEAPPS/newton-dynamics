@@ -30,13 +30,16 @@ class ndDeepBrain: public ndArray<ndDeepBrainLayer*>
 {
 	public: 
 	ndDeepBrain();
+	ndDeepBrain(const ndDeepBrain& src);
 	~ndDeepBrain();
 
+	bool Load(const char* const pathName);
 	void Save(const char* const pathName) const;
-	void Load(const char* const pathName) const;
+	void CopyFrom(const ndDeepBrain& src);
 
 	void BeginAddLayer();
 	void EndAddLayer();
+	bool Compare(const ndDeepBrain& src) const;
 
 	ndDeepBrainLayer* AddLayer(ndDeepBrainLayer* const layer);
 	void InitGaussianWeights(ndReal mean, ndReal variance);

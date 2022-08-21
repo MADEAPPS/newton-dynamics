@@ -35,6 +35,30 @@ ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
 	}
 }
 
+ndDeepBrainMatrix::ndDeepBrainMatrix(const nd::TiXmlNode* layerNode)
+	:ndArray<ndDeepBrainVector>()
+{
+	ndInt32 rows = xmlGetInt(layerNode, "outputs");
+	ndInt32 columns = xmlGetInt(layerNode, "inputs");
+
+	const nd::TiXmlNode* const weights = layerNode->FirstChild("inputWeights");
+	if (weights)
+	{
+		SetCount(rows);
+		ndDeepBrainMatrix& me = *this;
+		for (ndInt32 i = 0; i < rows; ++i)
+		{
+			char weightRow[256];
+			sprintf(weightRow, "weights%d", i);
+
+			ndDeepBrainVector& row = me[i];
+			row.ResetMembers();
+			row.SetCount(columns);
+			xmlGetFloatArray(weights, weightRow, row);
+		}
+	}
+}
+
 ndDeepBrainMatrix::ndDeepBrainMatrix(const ndDeepBrainMatrix& src)
 	:ndArray<ndDeepBrainVector>(src)
 {
@@ -64,6 +88,17 @@ void ndDeepBrainMatrix::Set(ndReal value)
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		me[i].Set(value);
+	}
+}
+
+void ndDeepBrainMatrix::Set(const ndDeepBrainMatrix& src)
+{
+	ndAssert(src.GetRows() == GetRows());
+	ndAssert(src.GetColumns() == GetColumns());
+	ndDeepBrainMatrix& matrix = *this;
+	for (ndInt32 i = 0; i < src.GetRows(); ++i)
+	{
+		matrix[i].Set(src[i]);
 	}
 }
 

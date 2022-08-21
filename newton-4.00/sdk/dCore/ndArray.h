@@ -276,7 +276,7 @@ void ndArray<T>::RandomShuffle()
 	for (ndUnsigned32 i = size - 1; i != 0; --i)
 	{
 		ndUnsigned32 j = ndRandInt() % size;
-		m_array[i].Swap(m_array[j]);
+		ndSwap (m_array[i], m_array[j]);
 	}
 }
 

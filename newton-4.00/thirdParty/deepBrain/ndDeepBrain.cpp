@@ -28,11 +28,33 @@ ndDeepBrain::ndDeepBrain()
 {
 }
 
+ndDeepBrain::ndDeepBrain(const ndDeepBrain& src)
+	:ndArray<ndDeepBrainLayer*>()
+	,m_isReady(src.m_isReady)
+{
+	const ndArray<ndDeepBrainLayer*>& srcLayers = src;
+	for (ndInt32 i = 0; i < srcLayers.GetCount(); ++i)
+	{
+		ndDeepBrainLayer* const layer = srcLayers[i]->Clone();
+		PushBack(layer);
+	}
+}
+
 ndDeepBrain::~ndDeepBrain()
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
 		delete (*this)[i];
+	}
+}
+
+void ndDeepBrain::CopyFrom(const ndDeepBrain& src)
+{
+	const ndArray<ndDeepBrainLayer*>& layers = *this;
+	const ndArray<ndDeepBrainLayer*>& srcLayers = src;
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	{
+		layers[i]->CopyFrom(*srcLayers[i]);
 	}
 }
 
@@ -52,6 +74,35 @@ void ndDeepBrain::EndAddLayer()
 {
 	InitGaussianWeights(0.0f, 0.25f);
 	m_isReady = true;
+}
+
+bool ndDeepBrain::Compare(const ndDeepBrain& src) const
+{
+	if (m_isReady != src.m_isReady)
+	{
+		ndAssert(0);
+		return false;
+	}
+
+	if (GetCount() != src.GetCount())
+	{
+		ndAssert(0);
+		return false;
+	}
+
+	const ndArray<ndDeepBrainLayer*>& layers0 = *this;
+	const ndArray<ndDeepBrainLayer*>& layers1 = src;
+	for (ndInt32 i = 0; i < layers0.GetCount(); ++i)
+	{
+		bool test = layers0[i]->Compare(*layers1[i]);
+		if (!test)
+		{
+			ndAssert(0);
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
@@ -86,8 +137,47 @@ void ndDeepBrain::Save(const char* const pathName) const
 	setlocale(LC_ALL, oldloc);
 }
 
-//void ndDeepBrain::Load(const char* const pathName)
-void ndDeepBrain::Load(const char* const) const
+bool ndDeepBrain::Load(const char* const pathName)
 {
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
 
+	nd::TiXmlDocument doc(pathName);
+	doc.LoadFile();
+	if (doc.Error())
+	{
+		setlocale(LC_ALL, oldloc);
+		return false;
+	}
+	ndAssert(!doc.Error());
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
+	if (!rootNode)
+	{
+		return false;
+	}
+	
+	for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
+	{
+		const char* const layerType = xmlGetString(layerNode, "type");
+		if (layerType)
+		{
+			ndDeepBrainLayer* layer = nullptr;
+			if (!strcmp(layerType, "fullyConnected"))
+			{
+				layer = new ndDeepBrainLayer(layerNode);
+			}
+			else
+			{
+				ndAssert(0);
+			}
+			if (layer)
+			{
+				AddLayer(layer);
+			}
+		}
+	}
+	m_isReady = true;
+
+	return true;
 }

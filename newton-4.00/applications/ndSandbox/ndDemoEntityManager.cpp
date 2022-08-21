@@ -354,6 +354,12 @@ static void MnistTrainingSet()
 		ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
 		ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
 		ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
+
+		//ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_sigmoid);
+		//ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_sigmoid);
+		//ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_sigmoid);
+		//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_sigmoid);
+
 		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer2->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
 
 		brain.BeginAddLayer();
@@ -366,17 +372,21 @@ static void MnistTrainingSet()
 
 		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
 		//ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain, 4);
-		trainer.SetMiniBatchSize(2000);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
+		trainer.SetMiniBatchSize(2000);
 		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
 
+		trainer.SetMiniBatchSize(10000);
+		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
 		time = ndGetTimeInMicroseconds() - time;
 
-		brain.Save("mnist.nn");
-		ndDeepBrainInstance instance(&brain);
+		char path[256];
+		dGetWorkingFileName("mnistDatabase/mnist1.nn", path);
+		brain.Save(path);
 		
 		ndDeepBrainVector output;
+		ndDeepBrainInstance instance(&brain);
 		output.SetCount((*trainingLabels)[0].GetCount());
 
 		ndInt32 failCount = 0;
@@ -405,13 +415,13 @@ static void MnistTrainingSet()
 			if (predictedDigit != expectedDigit)
 			{
 				failCount++;
-				ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
+				//ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
 			}
 		}
 		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64(time) / 1000000.0f);
 		ndExpandTraceMessage("training num_right: %d\n", trainingDigits->GetCount() - failCount);
 		ndExpandTraceMessage("training num_wrong: %d\n", failCount);
-		ndExpandTraceMessage("success rate on training data %f %%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
+		ndExpandTraceMessage("success rate on training data %f%%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
 	}
 
 	if (trainingLabels)
@@ -425,10 +435,162 @@ static void MnistTrainingSet()
 	}
 }
 
+static void MnistTestSet(const char* const annName)
+{
+	ndDeepBrainMatrix* testLabels = nullptr;
+	ndDeepBrainMatrix* testDigits = nullptr;
+
+	char outPathName[1024];
+	dGetWorkingFileName("mnistDatabase/t10k-labels.idx1-ubyte", outPathName);
+	FILE* fp = fopen(outPathName, "rb");
+	if (fp)
+	{
+		// read training labels
+		//[offset] [type]          [value]          [description]
+		//0000     32 bit integer  0x00000801(2049) magic number(MSB first)
+		//0004     32 bit integer  60000            number of items
+		//0008     unsigned byte ? ? label
+		//0009     unsigned byte ? ? label
+		//........
+		//xxxx     unsigned byte ? ? label
+		//The labels values are 0 to 9.
+
+		ndUnsigned32 magicNumber;
+		ndUnsigned32 numberOfItems;
+		size_t ret = 0;
+		ret = fread(&magicNumber, 4, 1, fp);
+		ret = fread(&numberOfItems, 4, 1, fp);
+		magicNumber = ndIndian32(magicNumber);
+		numberOfItems = ndIndian32(numberOfItems);
+
+		testLabels = new ndDeepBrainMatrix(numberOfItems, 10);
+		testLabels->Set(0.0f);
+		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
+		{
+			ndUnsigned8 label;
+			ret = fread(&label, 1, 1, fp);
+			(*testLabels)[i][label] = 1.0f;
+		}
+		fclose(fp);
+
+		dGetWorkingFileName("mnistDatabase/t10k-images.idx3-ubyte", outPathName);
+		fp = fopen(outPathName, "rb");
+		if (fp)
+		{
+			//[offset] [type]          [value]          [description]
+			//0000     32 bit integer  0x00000803(2051) magic number
+			//0004     32 bit integer  60000            number of images
+			//0008     32 bit integer  28               number of rows
+			//0012     32 bit integer  28               number of columns
+			//0016     unsigned byte ? ? pixel
+			//0017     unsigned byte ? ? pixel
+			//........
+			//xxxx     unsigned byte ? ? pixel/
+
+			ndUnsigned32 digitWith;
+			ndUnsigned32 digitHeight;
+			ret = fread(&magicNumber, 4, 1, fp);
+			ret = fread(&numberOfItems, 4, 1, fp);
+			ret = fread(&digitWith, 4, 1, fp);
+			ret = fread(&digitHeight, 4, 1, fp);
+			magicNumber = ndIndian32(magicNumber);
+			numberOfItems = ndIndian32(numberOfItems);
+			digitWith = ndIndian32(digitWith);
+			digitHeight = ndIndian32(digitHeight);
+			testDigits = new ndDeepBrainMatrix(numberOfItems, digitWith * digitHeight);
+			testDigits->Set(0.0f);
+			ndAssert(numberOfItems == ndUnsigned32(testLabels->GetCount()));
+
+			ndUnsigned8 data[32 * 32];
+			for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
+			{
+				ndDeepBrainVector& image = (*testDigits)[i];
+				ret = fread(data, digitWith, digitHeight, fp);
+				for (ndUnsigned32 j = 0; j < digitWith * digitHeight; j++)
+				{
+					image[j] = ndReal(data[j]) / 255.0f;
+				}
+			}
+			fclose(fp);
+		}
+	}
+
+	if (testLabels && testDigits)
+	{
+		char path[256];
+		ndDeepBrain brain;
+		dGetWorkingFileName(annName, path);
+
+		brain.Load(path);
+		ndDeepBrainInstance instance(&brain);
+
+		ndDeepBrainVector output;
+		output.SetCount((*testLabels)[0].GetCount());
+
+		ndInt32 failCount = 0;
+		ndUnsigned64 time = ndGetTimeInMicroseconds();
+		for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
+		{
+			const ndDeepBrainVector& input = (*testDigits)[i];
+			instance.MakePrediction(input, output);
+
+			const ndDeepBrainVector& truth = (*testLabels)[i];
+
+			//ndInt32 expectedDigit = 0;
+			//ndInt32 predictedDigit = 0;
+			//ndFloat32 predictDigitMax = 0;
+			ndInt32 index = 0;
+			ndFloat32 maxProbability = 0.0f;
+			for (ndInt32 j = 0; j < output.GetCount(); j++)
+			{
+				//if (truth[j] > 0.5f)
+				//{
+				//	expectedDigit = j;
+				//}
+				//if (output[j] > predictDigitMax)
+				//{
+				//	predictDigitMax = output[j];
+				//	predictedDigit = j;
+				//}
+				if (output[j] > maxProbability)
+				{
+					index = j;
+					maxProbability = output[j];
+				}
+			}
+
+			//ndInt32 expectedDigit = ;
+			//ndInt32 predictedDigit = 0;
+			//if (predictedDigit != expectedDigit)
+			if (truth[index] < 0.5f)
+			{
+				failCount++;
+				//ndExpandTraceMessage("digit %d, classified as %d\n", expectedDigit, predictedDigit);
+			}
+		}
+		time = ndGetTimeInMicroseconds() - time;
+		ndExpandTraceMessage("testing Time %f (sec)\n", ndFloat64(time) / 1000000.0f);
+		ndExpandTraceMessage("test num_right: %d\n", testDigits->GetCount() - failCount);
+		ndExpandTraceMessage("test num_wrong: %d\n", failCount);
+		ndExpandTraceMessage("success rate on training data %f%%\n", (testDigits->GetCount() - failCount) * 100.0f / testDigits->GetCount());
+	}
+
+	if (testLabels)
+	{
+		delete testLabels;
+	}
+
+	if (testDigits)
+	{
+		delete testDigits;
+	}
+}
+
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
+	//MnistTrainingSet();
+	MnistTestSet("mnistDatabase/mnist.nn");
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

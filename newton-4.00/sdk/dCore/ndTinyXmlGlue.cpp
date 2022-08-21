@@ -110,7 +110,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
 {
-	xmlSaveParam(rootNode, name, "char", value);
+	xmlSaveParam(rootNode, name, "string", value);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
@@ -179,6 +179,30 @@ ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const nam
 	ndFloat64 value;
 	element->Attribute("float", &value);
 	return ndFloat32 (value);
+}
+
+void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndFloat32>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+	array.Resize(count);
+	array.SetCount(count);
+
+	const char* const data = element->Attribute("floatArray");
+
+	size_t start = 0;
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		char x[64];
+		sscanf(&data[start], "%[^ ]", x);
+		start += strlen(x) + 1;
+
+		ndFloat64 fx;
+		sscanf(x, "%lf", &fx);
+		array[i] = ndFloat32(fx);
+	}
 }
 
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)

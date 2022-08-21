@@ -30,15 +30,21 @@
 class ndDeepBrainLayer: public ndDeepBrainMatrix
 {
 	public: 
+	ndDeepBrainLayer(const ndDeepBrainLayer& src);
+	ndDeepBrainLayer(const nd::TiXmlNode* layerNode);
 	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainActivationType type);
 	virtual ~ndDeepBrainLayer();
 
+	virtual ndDeepBrainLayer* Clone() const;
+	
 	ndDeepBrainVector& GetBias();
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual void InitGaussianWeights(ndReal mean, ndReal variance);
 	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
+	virtual void CopyFrom(const ndDeepBrainLayer& src);
+	virtual bool Compare(const ndDeepBrainLayer& src) const;
 	virtual void Save(nd::TiXmlElement* const layerNode) const;
 
 	protected:

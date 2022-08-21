@@ -31,50 +31,138 @@ ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDe
 	m_bias.Set(0.0f);
 }
 
+ndDeepBrainLayer::ndDeepBrainLayer(const ndDeepBrainLayer& src)
+	:ndDeepBrainMatrix(src)
+	,m_bias(src.m_bias)
+{
+}
+
+ndDeepBrainLayer::ndDeepBrainLayer(const nd::TiXmlNode* layerNode)
+	:ndDeepBrainMatrix(layerNode)
+{
+	const char* const activationType = xmlGetString(layerNode, "activation");
+	if (!strcmp(activationType, "tanh"))
+	{
+		m_activation = m_tanh;
+	}
+	else if (!strcmp(activationType, "relu"))
+	{
+		m_activation = m_relu;
+	}
+	else if (!strcmp(activationType, "sigmoid"))
+	{
+		m_activation = m_sigmoid;
+	}
+	else
+	{
+		ndAssert(0);
+	}
+
+	ndInt32 rows = xmlGetInt(layerNode, "outputs");
+	m_bias.SetCount(rows);
+	xmlGetFloatArray(layerNode, "biasWeights", m_bias);
+}
+
 ndDeepBrainLayer::~ndDeepBrainLayer()
 {
 }
 
+ndDeepBrainLayer* ndDeepBrainLayer::Clone() const
+{
+	return new ndDeepBrainLayer(*this);
+}
+
+void ndDeepBrainLayer::CopyFrom(const ndDeepBrainLayer& src)
+{
+	Set(src);
+	m_bias.Set(src.m_bias);
+}
+
+bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
+{
+	if (m_activation != src.m_activation)
+	{
+		ndAssert(0);
+		return false;
+	}
+
+	if (m_bias.GetCount() != src.m_bias.GetCount())
+	{
+		ndAssert(0);
+		return false;
+	}
+
+	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
+	{
+		ndReal error = m_bias[i] - src.m_bias[i];
+		if (ndAbs(error) > 1.0e-6f)
+		{
+			ndAssert(0);
+			return false;
+		}
+	}
+
+	const ndDeepBrainMatrix& me = (*this);
+	for (ndInt32 i = 0; i < me.GetCount(); i++)
+	{
+		const ndDeepBrainVector& row0 = me[i];
+		const ndDeepBrainVector& row1 = src[i];
+		if (row0.GetCount() != row1.GetCount())
+		{
+			ndAssert(0);
+			return 0;
+		}
+		for (ndInt32 j = 0; j < row0.GetCount(); j++)
+		{
+			ndReal error = row0[i] - row1[i];
+			if (ndAbs(error) > 1.0e-6f)
+			{
+				ndAssert(0);
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 void ndDeepBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 {
-	//layerNode->Attribute("Activation ")
-
-	char buffer[256];
-	sprintf(buffer, "%d", GetColumns());
-	layerNode->SetAttribute("inputs", buffer);
-
-	sprintf(buffer, "%d", GetRows());
-	layerNode->SetAttribute("outputs", buffer);
+	xmlSaveParam(layerNode, "type", "fullyConnected");
+	xmlSaveParam(layerNode, "inputs", GetColumns());
+	xmlSaveParam(layerNode, "outputs", GetRows());
 
 	switch (m_activation)
 	{
 		case m_relu:
-			layerNode->SetAttribute("Activation", "relu");
+			xmlSaveParam(layerNode, "activation", "relu");
 			break;
 
 		case m_tanh:
-			layerNode->SetAttribute("Activation", "tanh");
+			xmlSaveParam(layerNode, "activation", "tanh");
 			break;
 
 		case m_softmax:
-			layerNode->SetAttribute("Activation", "softmax");
+			xmlSaveParam(layerNode, "activation", "softmax");
 			break;
 
 		case m_sigmoid:
 		default:
-			layerNode->SetAttribute("Activation", "sigmoid");
+			xmlSaveParam(layerNode, "activation", "sigmoid");
 			break;
 	}
 	
-	nd::TiXmlElement* const bias = new nd::TiXmlElement("bias");
-	layerNode->LinkEndChild(bias);
-	xmlSaveParam(bias, "weights", m_bias.GetCount(), &m_bias[0]);
+	//nd::TiXmlElement* const bias = new nd::TiXmlElement("biasWeights");
+	//layerNode->LinkEndChild(bias);
+	xmlSaveParam(layerNode, "biasWeights", m_bias.GetCount(), &m_bias[0]);
 
-	nd::TiXmlElement* const input = new nd::TiXmlElement("inputs");
+	nd::TiXmlElement* const input = new nd::TiXmlElement("inputWeights");
 	layerNode->LinkEndChild(input);
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
-		xmlSaveParam(input, "weights", GetInputSize(), &(*this)[i][0]);
+		char weight[256];
+		sprintf(weight, "weights%d", i);
+		xmlSaveParam(input, weight, GetInputSize(), &(*this)[i][0]);
 	}
 }
 

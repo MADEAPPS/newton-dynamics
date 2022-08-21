@@ -229,19 +229,29 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 
+	ndDeepBrain bestNetwork(*m_instance.GetBrain());
+	ndReal bestCost = 1.0e10f;
+
 	ndInt32 index = 0;
 	ndInt32 batchCount = (inputBatch.GetCount() + m_miniBatchSize - 1) / m_miniBatchSize;
+	ndArray<ndInt32> randomizeVector;
+	randomizeVector.SetCount(inputBatch.GetCount());
+	for (ndInt32 i = 0; i < inputBatch.GetCount(); ++i)
+	{
+		randomizeVector[i] = i;
+	}
+
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : inputBatch.GetCount() - batchStart;
-		index = (index + 1) % batchCount;
 
 		m_averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{
-			const ndDeepBrainVector& input = inputBatch[batchStart + j];
-			const ndDeepBrainVector& truth = groundTruth[batchStart + j];
+			ndInt32 k = randomizeVector[batchStart + j];
+			const ndDeepBrainVector& input = inputBatch[k];
+			const ndDeepBrainVector& truth = groundTruth[k];
 			MakePrediction(input);
 			BackPropagate(truth);
 			UpdateWeights(learnRate);
@@ -251,5 +261,19 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 		ApplyWeightTranspose();
 		m_averageError = ndSqrt(m_averageError / batchSize);
 		ndExpandTraceMessage("%f %d\n", m_averageError, i);
+
+		index = (index + 1) % batchCount;
+		if (index == 0)
+		{
+			randomizeVector.RandomShuffle();
+		}
+		
+		if (m_averageError < bestCost)
+		{
+			bestCost = m_averageError;
+			bestNetwork.CopyFrom(*m_instance.GetBrain());
+		}
 	}
+
+	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
