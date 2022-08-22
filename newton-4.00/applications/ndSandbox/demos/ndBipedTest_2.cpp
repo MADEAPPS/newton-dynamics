@@ -523,12 +523,17 @@ class ndAiBipedTest_2 : public ndModel
 					}
 					else if (!strcmp(token, "OFFSET"))
 					{
-						ndDemoEntity* const parent = stackPool[stack - 1];
+						ndDemoEntity* const node = stackPool[stack - 1];
 						ndMatrix matrix(dGetIdentityMatrix());
 						matrix.m_posit.m_x = ReadFloat() * scale;
 						matrix.m_posit.m_y = ReadFloat() * scale;
 						matrix.m_posit.m_z = ReadFloat() * scale;
-						parent->ResetMatrix(matrix);
+						node->ResetMatrix(matrix);
+
+						if (!strcmp(node->GetName().GetStr(), "ltibia"))
+						{
+							break;
+						}
 					}
 					else if (!strcmp(token, "CHANNELS"))
 					{
