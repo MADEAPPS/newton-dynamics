@@ -12,8 +12,8 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
+#include "ndDemoCamera.h"
 #include "ndAnimationPose.h"
-
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 
@@ -354,23 +354,88 @@ const ndMatrix& ndDemoEntity::GetRenderMatrix () const
 	return m_matrix;
 }
 
-void ndDemoEntity::RenderBone() const
+void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene) const
 {
+	class ndSkelDebug : public ndConstraintDebugCallback
+	{
+		public:
+		ndSkelDebug(ndDemoEntityManager* const scene)
+		{
+			ndDemoCamera* const camera = scene->GetCamera();
+			const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			m_shader = scene->GetShaderCache().m_wireFrame;
+
+			glUseProgram(m_shader);
+
+			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(3, GL_FLOAT, sizeof(glVector3), m_line);
+		}
+
+		~ndSkelDebug()
+		{
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glUseProgram(0);
+		}
+
+		void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness)
+		{
+			m_line[0].m_x = GLfloat(point.m_x);
+			m_line[0].m_y = GLfloat(point.m_y);
+			m_line[0].m_z = GLfloat(point.m_z);
+			glVector4 c(color);
+
+			glPointSize(GLfloat(thickness));
+			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
+			glDrawArrays(GL_POINTS, 0, 1);
+			glPointSize(1);
+		}
+
+		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
+		{
+			m_line[0].m_x = GLfloat(p0.m_x);
+			m_line[0].m_y = GLfloat(p0.m_y);
+			m_line[0].m_z = GLfloat(p0.m_z);
+			m_line[1].m_x = GLfloat(p1.m_x);
+			m_line[1].m_y = GLfloat(p1.m_y);
+			m_line[1].m_z = GLfloat(p1.m_z);
+			glVector4 c(color);
+
+			glLineWidth(GLfloat(thickness));
+			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
+			glDrawArrays(GL_LINES, 0, 2);
+			glLineWidth(1);
+		}
+
+		GLuint m_shader;
+		ndInt32 m_shadeColorLocation;
+		ndInt32 m_projectionViewModelMatrixLocation;
+
+		glVector3 m_line[2];
+	};
+
+	ndSkelDebug debug(scene);
 	if (GetParent()) 
 	{
-		ndAssert(0);
-		//glDisable(GL_TEXTURE_2D);
-		//
-		//glColor3f(0.5f, 0.5f, 0.5f);
-		//glBegin(GL_LINES);
-		//for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
-		//{
-		//	const dVector& posit = child->m_matrix.m_posit;
-		//	glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
-		//	glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
-		//}
-		//
-		//glEnd();
+	//	glDisable(GL_TEXTURE_2D);
+		ndVector p0(m_matrix.m_posit);
+		ndVector p1(GetParent()->m_matrix.m_posit);
+		ndVector color(0.0f, 1.0f, 0.0f, 1.0f);
+		debug.DrawLine(p0, p1, color, 1.0);
+		
+	//	glColor3f(0.5f, 0.5f, 0.5f);
+	//	glBegin(GL_LINES);
+	//	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	//	{
+	//		const ndVector& posit = child->m_matrix.m_posit;
+	//		glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
+	//		glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
+	//	}
+	//
+	//	glEnd();
 	}
 }
 
@@ -384,7 +449,7 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 		m_mesh->Render(scene, modelMatrix);
 	}
 
-//	RenderBone();
+	RenderBone(scene);
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
 	{
 		child->Render(timestep, scene, nodeMatrix);
@@ -605,3 +670,4 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	}
 	return shapeArray[0];
 }
+

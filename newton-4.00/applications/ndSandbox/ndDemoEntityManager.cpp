@@ -53,18 +53,20 @@
 //#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// simple industrial robot
 //#define DEFAULT_SCENE	16		// advanced industrial robot
-#define DEFAULT_SCENE	17		// biped test 1
-//#define DEFAULT_SCENE	18		// active rag doll
-//#define DEFAULT_SCENE	19		// quadruped test 1
-//#define DEFAULT_SCENE	20		// quadruped test 2
-//#define DEFAULT_SCENE	21		// quadruped test 3
-//#define DEFAULT_SCENE	22		// simple voronoi fracture
-//#define DEFAULT_SCENE	23		// basic voronoi fracture
-//#define DEFAULT_SCENE	24		// linked voronoi fracture
-//#define DEFAULT_SCENE	25		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	17		// biped test 1
+#define DEFAULT_SCENE	18		// biped test 2
+//#define DEFAULT_SCENE	19		// active rag doll
+//#define DEFAULT_SCENE	20		// quadruped test 1
+//#define DEFAULT_SCENE	21		// quadruped test 2
+//#define DEFAULT_SCENE	22		// quadruped test 3
+//#define DEFAULT_SCENE	23		// simple voronoi fracture
+//#define DEFAULT_SCENE	24		// basic voronoi fracture
+//#define DEFAULT_SCENE	25		// linked voronoi fracture
+//#define DEFAULT_SCENE	26		// skin peel voronoi fracture
 						 
 // demos forward declaration 
-void ndBipedTest(ndDemoEntityManager* const scene);
+void ndBipedTest_1(ndDemoEntityManager* const scene);
+void ndBipedTest_2(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicRagdoll(ndDemoEntityManager* const scene);
@@ -111,8 +113,9 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
-	{ "biped test one", ndBipedTest },
-	{ "active rag doll", ndBipedTest },
+	{ "biped test one", ndBipedTest_1 },
+	{ "biped test one", ndBipedTest_2 },
+	{ "active rag doll", ndBipedTest_2 },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},
@@ -590,7 +593,7 @@ void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
-	MnistTestSet("mnistDatabase/mnist.nn");
+	//MnistTestSet("mnistDatabase/mnist.nn");
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
