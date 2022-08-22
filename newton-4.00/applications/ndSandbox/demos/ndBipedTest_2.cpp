@@ -478,7 +478,9 @@ class ndAiBipedTest_2 : public ndModel
 		};
 
 		ndInt32 stack = 0;
-		ndDemoEntity* stackPool[256];
+		ndDemoEntity* stackPool[32];
+
+		ndFixSizeArray<ndDemoEntity*, 256> entityList;
 
 		ndFloat32 scale = 0.1f;
 		if (fp)
@@ -492,6 +494,7 @@ class ndAiBipedTest_2 : public ndModel
 					if (!strcmp(token, "ROOT"))
 					{
 						ent = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
+						entityList.PushBack(ent);
 						ReadToken();
 						ent->SetName(token);
 						stackPool[stack] = ent;
@@ -501,6 +504,7 @@ class ndAiBipedTest_2 : public ndModel
 					else if (!strcmp(token, "JOINT"))
 					{
 						ndDemoEntity* const child = new ndDemoEntity(dGetIdentityMatrix(), stackPool[stack-1]);
+						entityList.PushBack(child);
 						ReadToken();
 						child->SetName(token);
 						stackPool[stack] = child;
@@ -510,6 +514,7 @@ class ndAiBipedTest_2 : public ndModel
 					else if (!strcmp(token, "End"))
 					{
 						ndDemoEntity* const child = new ndDemoEntity(dGetIdentityMatrix(), stackPool[stack - 1]);
+						entityList.PushBack(child);
 						ReadToken();
 						child->SetName("end");
 						stackPool[stack] = child;
@@ -545,6 +550,15 @@ class ndAiBipedTest_2 : public ndModel
 			}
 
 			fclose(fp);
+		}
+
+		ndMatrix rotation(ndYawMatrix(90.0f * ndDegreeToRad));
+		ndMatrix invRotation(rotation.Inverse());
+		for (ndInt32 i = 0; i < entityList.GetCount(); ++i)
+		{
+			ndDemoEntity* const child = entityList[i];
+			ndMatrix matrix(invRotation * child->GetRenderMatrix() * rotation);
+			child->ResetMatrix(matrix);
 		}
 
 		return ent;
