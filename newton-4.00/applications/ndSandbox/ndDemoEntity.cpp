@@ -354,7 +354,7 @@ const ndMatrix& ndDemoEntity::GetRenderMatrix () const
 	return m_matrix;
 }
 
-void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene) const
+void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const
 {
 	class ndSkelDebug : public ndConstraintDebugCallback
 	{
@@ -418,24 +418,15 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene) const
 	};
 
 	ndSkelDebug debug(scene);
-	if (GetParent()) 
+	ndDemoEntity* const parent = GetParent();
+	if (parent)
 	{
-	//	glDisable(GL_TEXTURE_2D);
-		ndVector p0(m_matrix.m_posit);
-		ndVector p1(GetParent()->m_matrix.m_posit);
-		ndVector color(0.0f, 1.0f, 0.0f, 1.0f);
+		//glDisable(GL_TEXTURE_2D);
+		ndMatrix parentMatrix(m_matrix.Inverse() * nodeMatrix);
+		ndVector p0(nodeMatrix.m_posit);
+		ndVector p1(parentMatrix.m_posit);
+		ndVector color(1.0f, 0.0f, 0.0f, 1.0f);
 		debug.DrawLine(p0, p1, color, 1.0);
-		
-	//	glColor3f(0.5f, 0.5f, 0.5f);
-	//	glBegin(GL_LINES);
-	//	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
-	//	{
-	//		const ndVector& posit = child->m_matrix.m_posit;
-	//		glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
-	//		glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
-	//	}
-	//
-	//	glEnd();
 	}
 }
 
@@ -449,7 +440,7 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 		m_mesh->Render(scene, modelMatrix);
 	}
 
-	RenderBone(scene);
+	RenderBone(scene, nodeMatrix);
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
 	{
 		child->Render(timestep, scene, nodeMatrix);

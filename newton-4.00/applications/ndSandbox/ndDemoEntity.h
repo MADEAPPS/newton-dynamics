@@ -89,7 +89,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	virtual void InterpolateMatrix (ndFloat32 param);
 	ndMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
 
-	void RenderBone(ndDemoEntityManager* const scene) const;
+	void RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const;
 
 	ndShapeInstance* CreateCollisionFromChildren() const;
 	ndShapeInstance* CreateCompoundFromMesh(bool lowDetail = false) const;

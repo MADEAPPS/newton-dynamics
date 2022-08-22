@@ -480,18 +480,12 @@ class ndAiBipedTest_2 : public ndModel
 		ndInt32 stack = 0;
 		ndDemoEntity* stackPool[256];
 
+		ndFloat32 scale = 0.1f;
 		if (fp)
 		{
 			ReadToken();
 			if (!strcmp(token, "HIERARCHY"))
 			{
-				//ReadToken();
-				//ent = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
-				//ReadToken();
-				//ent->SetName(token);
-				//stackPool[stack] = ent;
-				//stack = 1;
-
 				while (!feof(fp))
 				{
 					ReadToken();
@@ -526,9 +520,9 @@ class ndAiBipedTest_2 : public ndModel
 					{
 						ndDemoEntity* const parent = stackPool[stack - 1];
 						ndMatrix matrix(dGetIdentityMatrix());
-						matrix.m_posit.m_x = ReadFloat();
-						matrix.m_posit.m_y = ReadFloat();
-						matrix.m_posit.m_z = ReadFloat();
+						matrix.m_posit.m_x = ReadFloat() * scale;
+						matrix.m_posit.m_y = ReadFloat() * scale;
+						matrix.m_posit.m_z = ReadFloat() * scale;
 						parent->ResetMatrix(matrix);
 					}
 					else if (!strcmp(token, "CHANNELS"))
@@ -568,7 +562,7 @@ class ndAiBipedTest_2 : public ndModel
 		scene->AddEntity(robotMesh);
 
 		ndMatrix entMatrix(robotMesh->GetRenderMatrix());
-		entMatrix.m_posit.m_y += 0.0f;
+		entMatrix.m_posit.m_y += 1.7f;
 		robotMesh->ResetMatrix(entMatrix);
 		
 		//ndWorld* const world = scene->GetWorld();
