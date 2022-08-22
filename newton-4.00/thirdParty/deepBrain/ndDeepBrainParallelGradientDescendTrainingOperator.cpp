@@ -148,19 +148,32 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
 	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
 
+	ndDeepBrain bestNetwork(*m_instance.GetBrain());
+	ndReal bestCost = 1.0e10f;
+
 	ndInt32 index = 0;
 	ndInt32 batchCount = (m_inputBatch->GetCount() + m_miniBatchSize - 1) / m_miniBatchSize;
+	ndArray<ndInt32> randomizeVector;
+	randomizeVector.SetCount(m_inputBatch->GetCount());
+	for (ndInt32 i = 0; i < m_inputBatch->GetCount(); ++i)
+	{
+		randomizeVector[i] = i;
+	}
+
+	ndInt32 m_movingAverageIndex = 0;
+	ndFloat32 m_movingAverageError = 0.0f;
 	for (ndInt32 i = 0; i < m_steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
 		index = (index + 1) % batchCount;
-		
+
 		m_averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{
-			const ndDeepBrainVector& input = (*m_inputBatch)[batchStart + j];
-			const ndDeepBrainVector& truth = (*m_groundTruth)[batchStart + j];
+			ndInt32 k = randomizeVector[batchStart + j];
+			const ndDeepBrainVector& input = (*m_inputBatch)[k];
+			const ndDeepBrainVector& truth = (*m_groundTruth)[k];
 			//MakePredictionParallel(input);
 			MakePrediction(input);
 			//BackPropagateParallel(truth);
@@ -170,7 +183,25 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 			m_averageError += error;
 		}
 		ApplyWeightTranspose();
+		m_movingAverageError += m_averageError;
+		m_movingAverageIndex += batchSize;
+
 		m_averageError = ndSqrt(m_averageError / batchSize);
 		ndExpandTraceMessage("%f %d\n", m_averageError, i);
+
+		index = (index + 1) % batchCount;
+		if (index == 0)
+		{
+			randomizeVector.RandomShuffle();
+			m_movingAverageError = ndSqrt(m_movingAverageError / m_movingAverageIndex);
+			if (m_movingAverageError < bestCost)
+			{
+				bestCost = m_movingAverageError;
+				bestNetwork.CopyFrom(*m_instance.GetBrain());
+			}
+			m_movingAverageIndex = 0;
+			m_movingAverageError = 0.0f;
+		}
 	}
+	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
