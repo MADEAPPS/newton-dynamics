@@ -382,7 +382,7 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
-		dGetWorkingFileName("mnistDatabase/mnist1.nn", path);
+		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
 		brain.Save(path);
 		
 		ndDeepBrainVector output;

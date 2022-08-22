@@ -272,10 +272,10 @@ void ndArray<T>::ResetMembers()
 template<class T>
 void ndArray<T>::RandomShuffle()
 {
-	const ndUnsigned32 size = GetCount();
-	for (ndUnsigned32 i = size - 1; i != 0; --i)
+	const ndInt32 size = GetCount();
+	for (ndInt32 i = size - 1; i != 0; --i)
 	{
-		ndUnsigned32 j = ndRandInt() % size;
+		ndUnsigned32 j = ndUnsigned32(ndRandInt()) % size;
 		ndSwap (m_array[i], m_array[j]);
 	}
 }

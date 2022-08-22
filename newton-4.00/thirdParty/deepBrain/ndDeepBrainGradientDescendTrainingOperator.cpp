@@ -241,6 +241,8 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 		randomizeVector[i] = i;
 	}
 
+	ndInt32 m_movingAverageIndex = 0;
+	ndFloat32 m_movingAverageError = 0.0f;
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
@@ -259,6 +261,9 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			m_averageError += error;
 		}
 		ApplyWeightTranspose();
+		m_movingAverageError += m_averageError;
+		m_movingAverageIndex += batchSize;
+
 		m_averageError = ndSqrt(m_averageError / batchSize);
 		ndExpandTraceMessage("%f %d\n", m_averageError, i);
 
@@ -266,14 +271,15 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 		if (index == 0)
 		{
 			randomizeVector.RandomShuffle();
-		}
-		
-		if (m_averageError < bestCost)
-		{
-			bestCost = m_averageError;
-			bestNetwork.CopyFrom(*m_instance.GetBrain());
+			m_movingAverageError = ndSqrt(m_movingAverageError / m_movingAverageIndex);
+			if (m_movingAverageError < bestCost)
+			{
+				bestCost = m_movingAverageError;
+				bestNetwork.CopyFrom(*m_instance.GetBrain());
+			}
+			m_movingAverageIndex = 0;
+			m_movingAverageError = 0.0f;
 		}
 	}
-
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
