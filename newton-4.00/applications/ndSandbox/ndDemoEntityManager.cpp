@@ -373,8 +373,8 @@ static void MnistTrainingSet()
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
 
-		ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
-		//ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain, 4);
+		//ndDeepBrainGradientDescendTrainingOperator trainer(&brain);
+		ndDeepBrainParallelGradientDescendTrainingOperator trainer(&brain, 1);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.SetMiniBatchSize(2000);
@@ -592,7 +592,7 @@ static void MnistTestSet(const char* const annName)
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet("mnistDatabase/mnist.nn");
 }
 

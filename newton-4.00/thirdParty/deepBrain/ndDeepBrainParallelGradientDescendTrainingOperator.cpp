@@ -45,7 +45,7 @@ ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientD
 
 	for (ndInt32 i = 0; i < threads; i++)
 	{
-		m_threadData[i] = new LocalData(*this);
+		m_threadData.PushBack(new LocalData(*this));
 	}
 }
 
@@ -75,34 +75,59 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize(const ndDeepBr
 	Sync();
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::AveragerWeights()
+void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
 {
-	for (ndInt32 j = GetCount() - 1; j >= 0; --j)
+	//for (ndInt32 j = GetCount() - 1; j >= 0; --j)
+	//{
+	//	auto AverageWeights = ndMakeObject::ndFunction([this, j](ndInt32 threadIndex, ndInt32 threadCount)
+	//	{
+	//		//LocalData& optimizer = *m_threadData[threadIndex];
+	//		ndDeepBrainLayer& layer = *(*m_instance.GetBrain())[j];
+	//
+	//		ndFixSizeArray<ndDeepBrainLayer*, D_MAX_THREADS_COUNT> threadLayers;
+	//		for (ndInt32 i = 0; i < threadCount; ++i)
+	//		{
+	//			threadLayers.PushBack((*m_threadData[i]->GetBrain())[i]);
+	//		}
+	//
+	//		ndReal scale = 1.0f / threadCount;
+	//		const ndStartEnd startEnd(layer.GetOuputSize(), threadIndex, threadCount);
+	//		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//		{
+	//			ndReal acc = 0.0f;
+	//			for (ndInt32 k = 0; k < threadCount; k++)
+	//			{
+	//				acc += threadLayers[k]->GetBias()[i];
+	//			}
+	//			layer.GetBias()[i] = acc * scale;
+	//		}
+	//	});
+	//	ParallelExecute(AverageWeights);
+	//}
+
+	const ndInt32 threads = m_threadData.GetCount();
+	const ndReal weightFactor = 1.0f / threads;
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	for (ndInt32 j = layers.GetCount() - 1; j >= 0; --j)
 	{
-		auto AverageWeights = ndMakeObject::ndFunction([this, j](ndInt32 threadIndex, ndInt32 threadCount)
+		ndDeepBrainLayer& layer = *layers[j];
+		layer.Set(0);
+		layer.m_bias.Set(0.0f);
+		for (ndInt32 i = 0; i < threads; ++i)
 		{
-			//LocalData& optimizer = *m_threadData[threadIndex];
-			ndDeepBrainLayer& layer = *(*m_instance.GetBrain())[j];
-
-			ndFixSizeArray<ndDeepBrainLayer*, D_MAX_THREADS_COUNT> threadLayers;
-			for (ndInt32 i = 0; i < threadCount; ++i)
+			const ndDeepBrainLayer& srcLayer = *(*m_threadData[i]->GetBrain())[j];
+			layer.m_bias.Add(layer.m_bias, srcLayer.m_bias);
+			for (ndInt32 k = 0; k < layer.GetOuputSize(); k++)
 			{
-				threadLayers.PushBack((*m_threadData[i]->GetBrain())[i]);
+				layer[k].Add(layer[k], srcLayer[k]);
 			}
-
-			ndReal scale = 1.0f / threadCount;
-			const ndStartEnd startEnd(layer.GetOuputSize(), threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndReal acc = 0.0f;
-				for (ndInt32 k = 0; k < threadCount; k++)
-				{
-					acc += threadLayers[k]->GetBias()[i];
-				}
-				layer.GetBias()[i] = acc * scale;
-			}
-		});
-		ParallelExecute(AverageWeights);
+		}
+		
+		layer.m_bias.ScaleSet(layer.m_bias, weightFactor);
+		for (ndInt32 k = 0; k < layer.GetOuputSize(); k++)
+		{
+			layer[k].ScaleSet(layer[k], weightFactor);
+		}
 	}
 }
 
@@ -149,19 +174,20 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 				optimizer.m_averageError += error;
 			}
 		});
+
 		ParallelExecute(CalculateGradients);
+		AverageWeights();
+		ApplyWeightTranspose();
 
 		m_averageError = 0.0f;
 		for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
 		{
 			m_averageError += m_threadData[j]->m_averageError;
+			m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
 		}
 
-		AveragerWeights();
-		ApplyWeightTranspose();
-
-		m_movingAverageError += m_averageError;
 		m_movingAverageIndex += batchSize;
+		m_movingAverageError += m_averageError;
 	
 		m_averageError = ndSqrt(m_averageError / batchSize);
 		ndExpandTraceMessage("%f %d\n", m_averageError, i);

@@ -47,7 +47,7 @@ class ndDeepBrainParallelGradientDescendTrainingOperator
 	virtual void ThreadFunction();
 
 	private:
-	void AveragerWeights();
+	void AverageWeights();
 	ndFixSizeArray<LocalData*, D_MAX_THREADS_COUNT> m_threadData;
 
 	const ndDeepBrainMatrix* m_inputBatch;

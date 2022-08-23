@@ -261,8 +261,9 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 			m_averageError += error;
 		}
 		ApplyWeightTranspose();
-		m_movingAverageError += m_averageError;
+
 		m_movingAverageIndex += batchSize;
+		m_movingAverageError += m_averageError;
 
 		m_averageError = ndSqrt(m_averageError / batchSize);
 		ndExpandTraceMessage("%f %d\n", m_averageError, i);
