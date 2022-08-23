@@ -24,6 +24,14 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainParallelGradientDescendTrainingOperator.h"
 
+ndDeepBrainParallelGradientDescendTrainingOperator::LocalData::LocalData(const ndDeepBrainGradientDescendTrainingOperator& src)
+	:ndDeepBrain(*src.GetBrain())
+	,ndDeepBrainGradientDescendTrainingOperator(((ndDeepBrain*)this))
+	,m_averageError(0.0f)
+{
+//	m_instance.m_brain = new ndDeepBrain(*m_instance.m_brain);
+}
+
 ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads)
 	:ndDeepBrainGradientDescendTrainingOperator(brain)
 	,ndThreadPool("neuralNet")
@@ -34,11 +42,20 @@ ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientD
 {
 	threads = ndMin(threads, D_MAX_THREADS_COUNT);
 	SetThreadCount(threads);
+
+	for (ndInt32 i = 0; i < threads; i++)
+	{
+		m_threadData[i] = new LocalData(*this);
+	}
 }
 
 ndDeepBrainParallelGradientDescendTrainingOperator::~ndDeepBrainParallelGradientDescendTrainingOperator()
 {
 	Finish();
+	for (ndInt32 i = 0; i < GetThreadCount(); i++)
+	{
+		delete m_threadData[i];
+	}
 }
 
 void ndDeepBrainParallelGradientDescendTrainingOperator::ThreadFunction()
@@ -58,92 +75,34 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize(const ndDeepBr
 	Sync();
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::MakePrediction(ndInt32 threadIndex, const ndDeepBrainVector& input)
+void ndDeepBrainParallelGradientDescendTrainingOperator::AveragerWeights()
 {
-	ndAssert(0);
-	//ndDeepBrainGradientDescendTrainingOperator::MakePrediction(input);
-	//m_instance.MakePredictionParallel(*this, input, m_output);
-
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	//const ndDeepBrainVector& output = m_instance.GetOutPut();
-	const ndDeepBrainVector& output = m_threadData[threadIndex].output;
-	const ndDeepBrainVector& zDerivativeThread = m_threadData[threadIndex].m_zDerivative;
-	const ndDeepBrainPrefixScan& zPrefixScan = m_instance.GetPrefixScan();
-	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 j = GetCount() - 1; j >= 0; --j)
 	{
-		ndDeepBrainLayer* const layer = layers[i];
-		const ndDeepBrainMemVector z(&output[zPrefixScan[i + 1]], layer->GetOuputSize());
-		ndDeepBrainMemVector zDerivative(&zDerivativeThread[zPrefixScan[i + 1]], layer->GetOuputSize());
-		layer->ActivationDerivative(z, zDerivative);
-	}
-}
-
-void ndDeepBrainParallelGradientDescendTrainingOperator::BackPropagateOutputLayerParallel(const ndDeepBrainVector& groundTruth)
-{
-	auto BackPropagateOutputLayer = ndMakeObject::ndFunction([this, &groundTruth](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-		const ndInt32 layerIndex = layers.GetCount() - 1;
-		ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
-
-		const ndStartEnd startEnd(ouputLayer->GetOuputSize(), threadIndex, threadCount);
-		const ndInt32 outputCount = startEnd.m_end - startEnd.m_start;
-		if (outputCount)
+		auto AverageWeights = ndMakeObject::ndFunction([this, j](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			const ndInt32 inputCount = ouputLayer->GetInputSize();
-			ndDeepBrainMemVector biasGradients(&m_biasGradients[startEnd.m_start + m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
-			const ndDeepBrainMemVector z(&m_instance.m_z[startEnd.m_start + m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
-			const ndDeepBrainMemVector zDerivative(&m_zDerivative[startEnd.m_start + m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
-			const ndDeepBrainMemVector truth(&groundTruth[startEnd.m_start], outputCount);
+			//LocalData& optimizer = *m_threadData[threadIndex];
+			ndDeepBrainLayer& layer = *(*m_instance.GetBrain())[j];
 
-			biasGradients.Sub(z, truth);
-			biasGradients.Mul(biasGradients, zDerivative);
-
-			const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-			ndReal* weightGradientPtr = &m_weightGradients[startEnd.m_start * stride + m_weightGradientsPrefixScan[layerIndex]];
-			const ndDeepBrainMemVector z0(&m_instance.m_z[m_instance.m_zPrefixScan[layerIndex]], inputCount);
-			for (ndInt32 i = 0; i < outputCount; ++i)
+			ndFixSizeArray<ndDeepBrainLayer*, D_MAX_THREADS_COUNT> threadLayers;
+			for (ndInt32 i = 0; i < threadCount; ++i)
 			{
-				ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
-				ndFloat32 gValue = biasGradients[i];
-				weightGradient.ScaleSet(z0, gValue);
-				weightGradientPtr += stride;
+				threadLayers.PushBack((*m_threadData[i]->GetBrain())[i]);
 			}
-		}
-	});
-	ParallelExecute(BackPropagateOutputLayer);
-}
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::BackPropagateHiddenLayerParallel(ndInt32 layerIndex)
-{
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	BackPropagateCalculateBiasGradient(layerIndex);
-
-	ndDeepBrainLayer* const layer = layers[layerIndex];
-
-	const ndDeepBrainMemVector biasGradients(&m_biasGradients[m_instance.m_zPrefixScan[layerIndex + 1]], layer->GetOuputSize());
-
-	const ndInt32 inputCount = layer->GetInputSize();
-	const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
-	ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
-
-	const ndDeepBrainMemVector z0(&m_instance.m_z[m_instance.m_zPrefixScan[layerIndex]], inputCount);
-	for (ndInt32 i = 0; i < layer->GetOuputSize(); ++i)
-	{
-		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
-		ndFloat32 gValue = biasGradients[i];
-		weightGradient.ScaleSet(z0, gValue);
-		weightGradientPtr += stride;
-	}
-}
-
-void ndDeepBrainParallelGradientDescendTrainingOperator::BackPropagateParallel(const ndDeepBrainVector& groundTruth)
-{
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	BackPropagateOutputLayerParallel(groundTruth);
-	for (ndInt32 i = layers.GetCount() - 2; i >= 0; --i)
-	{
-		BackPropagateHiddenLayerParallel(i);
+			ndReal scale = 1.0f / threadCount;
+			const ndStartEnd startEnd(layer.GetOuputSize(), threadIndex, threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndReal acc = 0.0f;
+				for (ndInt32 k = 0; k < threadCount; k++)
+				{
+					acc += threadLayers[k]->GetBias()[i];
+				}
+				layer.GetBias()[i] = acc * scale;
+			}
+		});
+		ParallelExecute(AverageWeights);
 	}
 }
 
@@ -166,46 +125,28 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 
 	ndInt32 m_movingAverageIndex = 0;
 	ndFloat32 m_movingAverageError = 0.0f;
-
-	//ndFixSizeArray<ndReal, D_MAX_THREADS_COUNT> averageError;
-	//averageError.SetCount(GetThreadCount());
-
 	for (ndInt32 i = 0; i < m_steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
 		index = (index + 1) % batchCount;
 	
-		//for (ndInt32 j = 0; j < batchSize; ++j)
-		//{
-		//	ndInt32 k = randomizeVector[batchStart + j];
-		//	const ndDeepBrainVector& input = (*m_inputBatch)[k];
-		//	const ndDeepBrainVector& truth = (*m_groundTruth)[k];
-		//	//MakePredictionParallel(input);
-		//	MakePrediction(input);
-		//	//BackPropagateParallel(truth);
-		//	BackPropagate(truth);
-		//	UpdateWeights(m_learnRate);
-		//	ndFloat32 error = CalculateMeanSquareError(truth);
-		//	m_averageError += error;
-		//}
-
 		auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			m_threadData[threadIndex].m_averageError = 0.0f;
+			LocalData& optimizer = *m_threadData[threadIndex];
+			optimizer.m_averageError = 0.0f;
+
 			const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndInt32 k = randomizeVector[batchStart + i];
 				const ndDeepBrainVector& input = (*m_inputBatch)[k];
 				const ndDeepBrainVector& truth = (*m_groundTruth)[k];
-				MakePrediction(threadIndex, input);
-				////BackPropagateParallel(truth);
-				//BackPropagate(truth);
-				//UpdateWeights(m_learnRate);
-				ndFloat32 error = CalculateMeanSquareError(truth);
-				m_threadData[threadIndex].m_averageError += error;
-				//m_averageError += error;
+				optimizer.MakePrediction(input);
+				optimizer.BackPropagate(truth);
+				optimizer.UpdateWeights(m_learnRate);
+				ndFloat32 error = optimizer.CalculateMeanSquareError(truth);
+				optimizer.m_averageError += error;
 			}
 		});
 		ParallelExecute(CalculateGradients);
@@ -213,10 +154,12 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 		m_averageError = 0.0f;
 		for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
 		{
-			m_averageError += m_threadData[j].m_averageError;
+			m_averageError += m_threadData[j]->m_averageError;
 		}
 
+		AveragerWeights();
 		ApplyWeightTranspose();
+
 		m_movingAverageError += m_averageError;
 		m_movingAverageIndex += batchSize;
 	

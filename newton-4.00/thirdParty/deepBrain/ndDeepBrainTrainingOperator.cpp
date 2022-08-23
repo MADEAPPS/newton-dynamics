@@ -36,6 +36,7 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(const ndDeepBrainTraini
 	:ndClassAlloc()
 	,m_instance(src.m_instance)
 	,m_averageError(0.0f)
+	,m_miniBatchSize(src.m_miniBatchSize)
 {
 }
 
@@ -63,6 +64,6 @@ ndFloat32 ndDeepBrainTrainingOperator::CalculateMeanSquareError(const ndDeepBrai
 		ndFloat32 dist = z[i] - groundTruth[i];
 		error2 += dist * dist;
 	}
-	return error2;
+	return error2 / outputCount;
 }
 

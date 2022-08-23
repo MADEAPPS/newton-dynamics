@@ -34,13 +34,15 @@ class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOper
 	
 	void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
+	void UpdateWeights(ndReal learnRate);
+	void MakePrediction(const ndDeepBrainVector& input);
+	void BackPropagate(const ndDeepBrainVector& groundTruth);
+
 	protected:
 	void PrefixScan();
 	void ApplyWeightTranspose();
-	void UpdateWeights(ndReal learnRate);
+	
 	void BackPropagateHiddenLayer(ndInt32 layerIndex);
-	void MakePrediction(const ndDeepBrainVector& input);
-	void BackPropagate(const ndDeepBrainVector& groundTruth);
 	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 

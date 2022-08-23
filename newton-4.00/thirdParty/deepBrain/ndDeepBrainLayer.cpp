@@ -34,6 +34,7 @@ ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDe
 ndDeepBrainLayer::ndDeepBrainLayer(const ndDeepBrainLayer& src)
 	:ndDeepBrainMatrix(src)
 	,m_bias(src.m_bias)
+	,m_activation(src.m_activation)
 {
 }
 

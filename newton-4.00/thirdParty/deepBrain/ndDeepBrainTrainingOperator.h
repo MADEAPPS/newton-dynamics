@@ -33,6 +33,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src);
 	virtual ~ndDeepBrainTrainingOperator();
 
+	ndDeepBrain* GetBrain() const;
 	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
 	ndFloat32 CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const;
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
@@ -45,6 +46,9 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	friend class ndDeepBrainInstance;
 };
 
-
+inline ndDeepBrain* ndDeepBrainTrainingOperator::GetBrain() const
+{
+	return m_instance.GetBrain();
+}
 #endif 
 

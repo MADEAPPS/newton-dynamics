@@ -30,11 +30,10 @@ class ndDeepBrainParallelGradientDescendTrainingOperator
 	,public ndThreadPool
 {
 	public: 
-	class LocalData
+	class LocalData: public ndDeepBrain, public ndDeepBrainGradientDescendTrainingOperator
 	{
 		public:
-		ndDeepBrainVector output;
-		ndDeepBrainVector m_zDerivative;
+		LocalData(const ndDeepBrainGradientDescendTrainingOperator& src);
 		ndReal m_averageError;
 	};
 
@@ -48,18 +47,13 @@ class ndDeepBrainParallelGradientDescendTrainingOperator
 	virtual void ThreadFunction();
 
 	private:
-	void BackPropagateHiddenLayerParallel(ndInt32 layerIndex);
-	void MakePrediction(ndInt32 threadIndex, const ndDeepBrainVector& input);
-	void BackPropagateParallel(const ndDeepBrainVector& groundTruth);
-	void BackPropagateOutputLayerParallel(const ndDeepBrainVector& groundTruth);
-
-	ndFixSizeArray<LocalData, D_MAX_THREADS_COUNT> m_threadData;
+	void AveragerWeights();
+	ndFixSizeArray<LocalData*, D_MAX_THREADS_COUNT> m_threadData;
 
 	const ndDeepBrainMatrix* m_inputBatch;
 	const ndDeepBrainMatrix* m_groundTruth;
 	ndReal m_learnRate;
 	ndInt32 m_steps;
-	
 };
 
 
