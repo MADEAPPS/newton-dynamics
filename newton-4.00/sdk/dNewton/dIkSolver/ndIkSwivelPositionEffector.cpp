@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -41,7 +41,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_targetFrame(dGetIdentityMatrix())
+	,m_targetFrame(ndGetIdentityMatrix())
 	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -217,7 +217,7 @@ void ndIkSwivelPositionEffector::CalculateSwivelMatrices(ndMatrix& swivelMatrix0
 
 	const ndVector midPoint(ndVector::m_half * (posit0 + posit1));
 	const ndVector pin(swivelMatrix1.UnrotateVector(posit0 - posit1).Normalize());
-	ndMatrix localSwivel1(dGetIdentityMatrix());
+	ndMatrix localSwivel1(ndGetIdentityMatrix());
 
 	localSwivel1.m_front = pin;
 	localSwivel1.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -302,7 +302,7 @@ void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint t
 {
 	if (m_vaoSta)
 	{
-		ndMatrix aprojm(dGetIdentityMatrix());
+		ndMatrix aprojm(ndGetIdentityMatrix());
 		CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
 		//
 		minAngle *= -ndDegreeToRad;
@@ -354,10 +354,10 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 
 {
 	if (m_vaoDyn)
 	{
-		ndMatrix aprojm(dGetIdentityMatrix());
+		ndMatrix aprojm(ndGetIdentityMatrix());
 		CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
 
-		ndMatrix origin(dGetIdentityMatrix());
+		ndMatrix origin(ndGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = ndVector(origin_x + ptsize * 1.9f, 50.0f, 0.0f, 1.0f);
 

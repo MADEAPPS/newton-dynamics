@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -1424,7 +1424,7 @@ void ndPolyhedra::RefineTriangulation (const ndFloat64* const vertex, ndInt32 st
 	}
 
 	ndAssert (p1p0.m_w == ndFloat32 (0.0f));
-	ndMatrix matrix (dGetIdentityMatrix());
+	ndMatrix matrix (ndGetIdentityMatrix());
 	matrix.m_posit = p0;
 	matrix.m_front = ndVector (p1p0.Scale (ndFloat64 (1.0f) / sqrt (mag2)));
 	matrix.m_right = ndVector (normal.Scale (ndFloat64 (1.0f) / sqrt (normal.DotProduct(normal).GetScalar())));
@@ -3130,7 +3130,7 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 	ndConvexHull3d convexHull(&pool[0].m_x, sizeof(ndBigVector), vertexCountIndex, 0.0f);
 
 	size = ndBigVector::m_zero;
-	ndMatrix sphere(dGetIdentityMatrix());
+	ndMatrix sphere(ndGetIdentityMatrix());
 	if (convexHull.GetCount()) 
 	{
 		ndStack<ndInt32> triangleList(convexHull.GetCount() * 3);

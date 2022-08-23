@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -222,9 +222,9 @@ static ndShapeInstance CreateCompondCollision()
 		2.22016f,  0.903322f,  -0.766362f,  1.46171f,  0.903322f,  -0.766362f,  1.84093f,  0.903322f,  -1.15761f,  1.46171f,  0.903322f,  -0.766362f,  1.46171f,  0.661676f,  -0.766362f,
 		1.84093f,  0.661676f,  -1.15761f,  1.84093f,  0.903322f,  -1.15761f };
 
-	ndMatrix mParentInv = dGetIdentityMatrix();
+	ndMatrix mParentInv = ndGetIdentityMatrix();
 	mParentInv.m_posit = ndVector(ndFloat32(0.0), ndFloat32(-1.0), ndFloat32(0.0), ndFloat32(1.0));
-	ndMatrix mChildWorld = dGetIdentityMatrix();
+	ndMatrix mChildWorld = ndGetIdentityMatrix();
 	mChildWorld.m_front = ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0));
 	mChildWorld.m_up = ndVector(ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0));
 	mChildWorld.m_right = ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0));
@@ -264,7 +264,7 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 	ndDemoMeshIntance* const aiGeometry = new ndDemoMeshIntance("AiVehicle", scene->GetShaderCache(), &shapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	ndDemoInstanceEntity* const aiEntity = new ndDemoInstanceEntity(aiGeometry);
 	scene->AddEntity(aiEntity);
-	ndMatrix mBodyMatrix = dGetIdentityMatrix();
+	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(0.0f, 5.0f, 0.0f, 1.0f);
 	//mBodyMatrix.m_posit = ndVector(0.0f, 1.2f, 0.0f, 1.0f);
 	auto pAiBody = AddRigidBody(scene, mBodyMatrix, shapeInstance, aiEntity, 1000.0);
@@ -281,7 +281,7 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_aiCar, ndApplicationMaterial::m_aiTerrain);
 
-	ndMatrix heighfieldLocation(dGetIdentityMatrix());
+	ndMatrix heighfieldLocation(ndGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;
 

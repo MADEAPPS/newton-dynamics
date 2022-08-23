@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ using namespace ofbx;
 #define D_ANIM_BASE_FREQ ndFloat32 (30.0f)
 
 fbxDemoEntity::fbxDemoEntity(ndDemoEntity* const parent)
-	:ndDemoEntity(dGetIdentityMatrix(), parent)
+	:ndDemoEntity(ndGetIdentityMatrix(), parent)
 	,m_fbxMeshEffect(nullptr)
 {
 }
@@ -158,14 +158,14 @@ static ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 {
 	const ofbx::GlobalSettings* const globalSettings = fbxScene->getGlobalSettings();
 
-	ndMatrix convertMatrix(dGetIdentityMatrix());
+	ndMatrix convertMatrix(ndGetIdentityMatrix());
 
 	ndFloat32 scaleFactor = globalSettings->UnitScaleFactor;
 	convertMatrix[0][0] = ndFloat32(scaleFactor / 100.0f);
 	convertMatrix[1][1] = ndFloat32(scaleFactor / 100.0f);
 	convertMatrix[2][2] = ndFloat32(scaleFactor / 100.0f);
 
-	ndMatrix axisMatrix(dGetZeroMatrix());
+	ndMatrix axisMatrix(ndGetZeroMatrix());
 	axisMatrix.m_up[globalSettings->UpAxis] = ndFloat32(globalSettings->UpAxisSign);
 	axisMatrix.m_front[globalSettings->FrontAxis] = ndFloat32(globalSettings->FrontAxisSign);
 	axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
@@ -530,7 +530,7 @@ static void FreezeScale(fbxDemoEntity* const entity)
 	fbxDemoEntity* entBuffer[1024];
 	ndMatrix parentMatrix[1024];
 	entBuffer[0] = entity;
-	parentMatrix[0] = dGetIdentityMatrix();
+	parentMatrix[0] = ndGetIdentityMatrix();
 	while (stack)
 	{
 		stack--;
@@ -543,14 +543,14 @@ static void FreezeScale(fbxDemoEntity* const entity)
 		ndMatrix matrix(ent->GetRenderMatrix() * scaleMatrix);
 		matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
 		ent->SetRenderMatrix(transformMatrix);
-		scaleMatrix = ndMatrix(dGetIdentityMatrix(), scale, stretchAxis);
+		scaleMatrix = ndMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
 
 		if (ent->m_fbxMeshEffect)
 		{
 			matrix = ent->GetMeshMatrix() * scaleMatrix;
 			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
 			ent->SetMeshMatrix(transformMatrix);
-			ndMatrix meshMatrix(dGetIdentityMatrix(), scale, stretchAxis);
+			ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
 			ent->m_fbxMeshEffect->ApplyTransform(meshMatrix);
 		}
 
@@ -664,7 +664,7 @@ class dFbxAnimationTrack
 		dCurveValue position(m_position.Evaluate(time));
 		dCurveValue rotation(m_rotation.Evaluate(time));
 
-		ndMatrix scaleMatrix(dGetIdentityMatrix());
+		ndMatrix scaleMatrix(ndGetIdentityMatrix());
 		scaleMatrix[0][0] = scale.m_x;
 		scaleMatrix[1][1] = scale.m_y;
 		scaleMatrix[2][2] = scale.m_z;
@@ -712,7 +712,7 @@ class dFbxAnimationTrack
 			dCurveValue& positValue = positNode->GetInfo();
 			dCurveValue& rotationValue = rotationNode->GetInfo();
 
-			ndMatrix scaleMatrix(dGetIdentityMatrix());
+			ndMatrix scaleMatrix(ndGetIdentityMatrix());
 			scaleMatrix[0][0] = scaleValue.m_x;
 			scaleMatrix[1][1] = scaleValue.m_y;
 			scaleMatrix[2][2] = scaleValue.m_z;
@@ -885,7 +885,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 
 			ndInt32 stack = 1;
 			stackPool[0] = entity;
-			parentMatrixStack[0] = dGetIdentityMatrix();
+			parentMatrixStack[0] = ndGetIdentityMatrix();
 			while (stack)
 			{
 				stack--;
@@ -899,7 +899,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				ndVector scale;
 				transform.PolarDecomposition(matrix, scale, stretchAxis);
 
-				ndMatrix scaledAxis(dGetIdentityMatrix());
+				ndMatrix scaledAxis(ndGetIdentityMatrix());
 				scaledAxis[0][0] = scale[0];
 				scaledAxis[1][1] = scale[1];
 				scaledAxis[2][2] = scale[2];

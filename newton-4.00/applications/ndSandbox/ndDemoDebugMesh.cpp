@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -79,7 +79,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	};
 
 	ndDrawShape drawShapes;
-	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
+	collision->DebugShape(ndGetIdentityMatrix(), drawShapes);
 	if (drawShapes.m_triangles.GetCount())
 	{
 		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
@@ -219,7 +219,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 
 	SetColor(ndVector::m_zero);
 	ndDrawShape drawShapes(edgeTypefilter);
-	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
+	collision->DebugShape(ndGetIdentityMatrix(), drawShapes);
 	
 	if (drawShapes.m_lines.GetCount())
 	{

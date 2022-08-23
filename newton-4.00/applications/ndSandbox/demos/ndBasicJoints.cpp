@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -125,7 +125,7 @@ static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMa
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -334,7 +334,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -540,7 +540,7 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -629,7 +629,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	ndShapeInstance shape(new ndShapeSphere(0.25f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 
 	ndBodyDynamic* bodies[8];
 
@@ -704,14 +704,14 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 
 static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& origin)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 
 	SplinePathBody* const pathBody = new SplinePathBody(scene, matrix);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 
 	ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500);
-	rollerCosterPath->SetMesh(mesh, dGetIdentityMatrix());
+	rollerCosterPath->SetMesh(mesh, ndGetIdentityMatrix());
 
 	mesh->SetVisible(true);
 	mesh->Release();
@@ -797,7 +797,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
 	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);

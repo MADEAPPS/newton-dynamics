@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -45,7 +45,7 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndVector blockBoxSize(size);
 
 	// create the stack
-	ndMatrix baseMatrix(dGetIdentityMatrix());
+	ndMatrix baseMatrix(ndGetIdentityMatrix());
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
@@ -78,7 +78,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	blockBoxSize = blockBoxSize.Scale(2.0f);
 
 	// create the stack
-	ndMatrix baseMatrix(dGetIdentityMatrix());
+	ndMatrix baseMatrix(ndGetIdentityMatrix());
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
@@ -113,7 +113,7 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 	ndVector blockBoxSize(size);
 
 	// create the stack
-	ndMatrix baseMatrix(dGetIdentityMatrix());
+	ndMatrix baseMatrix(ndGetIdentityMatrix());
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
@@ -145,7 +145,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& shape,
 	ndFloat32 mass, const ndVector& origin, const ndVector& boxSize, ndInt32 count)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -203,7 +203,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndVector blockBoxSize(size);
 
 	// create the stack
-	ndMatrix baseMatrix(dGetIdentityMatrix());
+	ndMatrix baseMatrix(ndGetIdentityMatrix());
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
@@ -222,7 +222,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndFloat32 vertialStep = blockBoxSize.m_x * 2.0f;
 	ndFloat32 horizontalStep = blockBoxSize.m_z * 0.8f;
 
-	ndMatrix matrix0(dGetIdentityMatrix());
+	ndMatrix matrix0(ndGetIdentityMatrix());
 	matrix0.m_posit = origin;
 	matrix0.m_posit.m_y += blockBoxSize.m_x;
 	matrix0.m_posit.m_w = 1.0f;

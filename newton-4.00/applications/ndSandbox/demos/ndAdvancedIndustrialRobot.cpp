@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -454,7 +454,7 @@ static void RobotControlPanel(ndDemoEntityManager* const scene, void* const cont
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");

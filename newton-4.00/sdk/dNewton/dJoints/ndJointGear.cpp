@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointGear)
 ndJointGear::ndJointGear(ndFloat32 gearRatio,
 	const ndVector& body0Pin, ndBodyKinematic* const body0,
 	const ndVector& body1Pin, ndBodyKinematic* const body1)
-	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(1, body0, body1, ndGetIdentityMatrix())
 	,m_gearRatio(gearRatio)
 {
 	// calculate the two local matrix of the pivot point

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -74,7 +74,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	}
 	else 
 	{
-		ndMatrix matrix(dGetIdentityMatrix());
+		ndMatrix matrix(ndGetIdentityMatrix());
 		instance.DebugShape(matrix, builder);
 	}
 

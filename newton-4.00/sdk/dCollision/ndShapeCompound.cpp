@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -1183,7 +1183,7 @@ void ndShapeCompound::ApplyScale(const ndVector& scale)
 {
 	ndTreeArray::Iterator iter(m_array);
 
-	ndMatrix scaleMatrix(dGetIdentityMatrix());
+	ndMatrix scaleMatrix(ndGetIdentityMatrix());
 	scaleMatrix[0][0] = scale.m_x;
 	scaleMatrix[1][1] = scale.m_y;
 	scaleMatrix[2][2] = scale.m_z;
@@ -1192,7 +1192,7 @@ void ndShapeCompound::ApplyScale(const ndVector& scale)
 		ndNodeBase* const node = iter.GetNode()->GetInfo();
 		ndShapeInstance* const collision = node->GetShape();
 		const ndMatrix matrix(collision->GetScaledTransform(scaleMatrix));
-		collision->SetLocalMatrix(dGetIdentityMatrix());
+		collision->SetLocalMatrix(ndGetIdentityMatrix());
 		collision->SetGlobalScale(matrix);
 	}
 	m_treeEntropy = ndFloat32(0.0f);
@@ -1239,7 +1239,7 @@ ndMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const ndMatrix& alignM
 	centerOfMass = centerOfMass.Scale(invVolume);
 	inertiaII = inertiaII.Scale(invVolume);
 	crossInertia = crossInertia.Scale(invVolume);
-	ndMatrix inertia(dGetIdentityMatrix());
+	ndMatrix inertia(ndGetIdentityMatrix());
 	inertia[0][0] = inertiaII[0];
 	inertia[1][1] = inertiaII[1];
 	inertia[2][2] = inertiaII[2];

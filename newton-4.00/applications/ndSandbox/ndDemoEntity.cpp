@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -100,7 +100,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_nextPosition (matrix.m_posit)
 	,m_curRotation (matrix)
 	,m_nextRotation (matrix)
-	,m_meshMatrix(dGetIdentityMatrix())
+	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
@@ -117,12 +117,12 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<ndDemoEntity>()
-	,m_matrix(dGetIdentityMatrix())
+	,m_matrix(ndGetIdentityMatrix())
 	,m_curPosition(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_nextPosition(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_curRotation(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_nextRotation(0.0f, 0.0f, 0.0f, 1.0f)
-	,m_meshMatrix(dGetIdentityMatrix())
+	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
@@ -191,7 +191,7 @@ ndDemoEntity::~ndDemoEntity(void)
 	{
 		delete m_userData;
 	}
-	SetMesh(nullptr, dGetIdentityMatrix());
+	SetMesh(nullptr, ndGetIdentityMatrix());
 }
 
 ndNodeBaseHierarchy* ndDemoEntity::CreateClone () const
@@ -272,7 +272,7 @@ ndMatrix ndDemoEntity::GetNextMatrix () const
 
 ndMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) const
 {
-	ndMatrix matrix (dGetIdentityMatrix());
+	ndMatrix matrix (ndGetIdentityMatrix());
 	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
 	{
 		matrix = matrix * ptr->GetCurrentMatrix ();
@@ -282,7 +282,7 @@ ndMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) co
 
 ndMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root) const
 {
-	ndMatrix matrix (dGetIdentityMatrix());
+	ndMatrix matrix (ndGetIdentityMatrix());
 	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
 	{
 		matrix = matrix * ptr->m_matrix;
@@ -537,7 +537,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 				maxP = maxP.GetMax(points[i]);
 			}
 			ndVector size(ndVector::m_half * (maxP - minP));
-			ndMatrix alighMatrix(dGetIdentityMatrix());
+			ndMatrix alighMatrix(ndGetIdentityMatrix());
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 			const ndMatrix matrix(child->GetMeshMatrix() * alighMatrix * child->GetCurrentMatrix());

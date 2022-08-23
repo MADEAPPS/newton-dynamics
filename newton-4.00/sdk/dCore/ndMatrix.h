@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -31,8 +31,8 @@
 class ndMatrix;
 class ndQuaternion;
 
-D_CORE_API const ndMatrix& dGetZeroMatrix ();
-D_CORE_API const ndMatrix& dGetIdentityMatrix();
+D_CORE_API const ndMatrix& ndGetZeroMatrix ();
+D_CORE_API const ndMatrix& ndGetIdentityMatrix();
 D_CORE_API ndMatrix ndPitchMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndYawMatrix(ndFloat32 ang);
 D_CORE_API ndMatrix ndRollMatrix(ndFloat32 ang);

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -18,9 +18,9 @@
 #define D_CAMERA_ANGLE			60.0f
 
 ndDemoCamera::ndDemoCamera()
-	:ndDemoEntity (dGetIdentityMatrix(), nullptr) 
-	,m_viewMatrix(dGetIdentityMatrix())
-	,m_projectionMatrix(dGetIdentityMatrix())
+	:ndDemoEntity (ndGetIdentityMatrix(), nullptr) 
+	,m_viewMatrix(ndGetIdentityMatrix())
+	,m_projectionMatrix(ndGetIdentityMatrix())
 	,m_fov(D_CAMERA_ANGLE * ndDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)
@@ -59,7 +59,7 @@ const ndMatrix& ndDemoCamera::GetViewMatrix() const
 
 ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 Left, ndFloat32 Right, ndFloat32 Bottom, ndFloat32 Top, ndFloat32 ZNear, ndFloat32 ZFar)
 {
-	ndMatrix Result(dGetIdentityMatrix());
+	ndMatrix Result(ndGetIdentityMatrix());
 
 	Result[0][0] = 2 * ZNear / (Right - Left);
 	Result[0][1] = 0;
@@ -86,7 +86,7 @@ ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 Left, ndFloat32 Right, 
 
 ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& center, const ndVector& normUp)
 {
-	ndMatrix Result(dGetIdentityMatrix());
+	ndMatrix Result(ndGetIdentityMatrix());
 	
 	ndVector ZAxis (center - eye);
 	ZAxis = ZAxis & ndVector::m_triplexMask;

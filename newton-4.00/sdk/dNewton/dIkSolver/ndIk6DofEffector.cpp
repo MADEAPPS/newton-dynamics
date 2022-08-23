@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ ndIk6DofEffector::ndIk6DofEffector(const ndMatrix& pinAndPivotChild, const ndMat
 
 ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_targetFrame(dGetIdentityMatrix())
+	,m_targetFrame(ndGetIdentityMatrix())
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
 	,m_angularMaxTorque(D_LCP_MAX_VALUE)

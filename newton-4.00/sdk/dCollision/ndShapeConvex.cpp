@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -159,7 +159,7 @@ void ndShapeConvex::SetVolumeAndCG()
 
 void ndShapeConvex::MassProperties()
 {
-	ndFloat32 volume = CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
+	ndFloat32 volume = CalculateMassProperties(ndGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
 	if (volume < D_MAX_MIN_VOLUME) 
 	{
 		volume = D_MAX_MIN_VOLUME;
@@ -209,7 +209,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		// using general central theorem, is much faster and more accurate;
 		//IImatrix = IIorigin + mass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
 		ndFloat32 mag2 = localScale.m_x * localScale.m_x;
-		ndMatrix inertia(dGetIdentityMatrix());
+		ndMatrix inertia(ndGetIdentityMatrix());
 		inertia[0][0] = m_inertia[0] * mag2;
 		inertia[1][1] = m_inertia[1] * mag2;
 		inertia[2][2] = m_inertia[2] * mag2;
@@ -227,7 +227,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		origin.m_w = ndFloat32(0.0f);
 		ndFloat32 originMag2 = origin.DotProduct(origin).GetScalar();
 		ndMatrix Covariance(origin, origin);
-		ndMatrix parallel(dGetIdentityMatrix());
+		ndMatrix parallel(ndGetIdentityMatrix());
 		for (ndInt32 i = 0; i < 3; ++i) 
 		{
 			parallel[i][i] = originMag2;
@@ -260,7 +260,7 @@ ndMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const ndMatrix& alignMat
 		centerOfMass = centerOfMass.Scale(invVolume);
 		inertiaII = inertiaII.Scale(invVolume);
 		crossInertia = crossInertia.Scale(invVolume);
-		ndMatrix inertia(dGetIdentityMatrix());
+		ndMatrix inertia(ndGetIdentityMatrix());
 		inertia[0][0] = inertiaII[0];
 		inertia[1][1] = inertiaII[1];
 		inertia[2][2] = inertiaII[2];

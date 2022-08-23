@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -23,7 +23,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
@@ -32,7 +32,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -135,9 +135,9 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
 	ndDemoMesh* const geometry = new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache());
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -169,15 +169,15 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	meshBuilder.End(optimized);
 
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -481,7 +481,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
 	};
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	{
 		//// build using control points
 		//ndBezierSpline spline;
@@ -493,7 +493,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		//splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
 		//ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
 		//scene->AddEntity(splineEntity);
-		//splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
+		//splineEntity->SetMesh(splineMesh, ndGetIdentityMatrix());
 		//splineMesh->SetVisible(true);
 		//splineMesh->Release();
 	}
@@ -534,7 +534,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		splineMesh->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
 		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
 		scene->AddEntity(splineEntity);
-		splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
+		splineEntity->SetMesh(splineMesh, ndGetIdentityMatrix());
 		splineMesh->SetVisible(true);
 		splineMesh->Release();
 	}

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleDifferentialAxle)
 ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	const ndVector& pin0, const ndVector& upPin, ndBodyKinematic* const differentialBody0,
 	const ndVector& pin1, ndBodyKinematic* const body1)
-	:ndJointBilateralConstraint(1, differentialBody0, body1, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(1, differentialBody0, body1, ndGetIdentityMatrix())
 {
 	ndMatrix temp;
 	ndMatrix matrix0(pin0, upPin, pin0.CrossProduct(upPin), ndVector::m_wOne);

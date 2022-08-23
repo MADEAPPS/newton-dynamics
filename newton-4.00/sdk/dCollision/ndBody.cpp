@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@ ndUnsigned32 ndBody::m_uniqueIdCount = 0;
 
 ndBody::ndBody()
 	:ndContainersFreeListAlloc<ndBody>()
-	,m_matrix(dGetIdentityMatrix())
+	,m_matrix(ndGetIdentityMatrix())
 	,m_veloc(ndVector::m_zero)
 	,m_omega(ndVector::m_zero)
 	,m_localCentreOfMass(ndVector::m_wOne)
@@ -56,7 +56,7 @@ ndBody::ndBody()
 
 ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndContainersFreeListAlloc<ndBody>()
-	,m_matrix(dGetIdentityMatrix())
+	,m_matrix(ndGetIdentityMatrix())
 	,m_veloc(ndVector::m_zero)
 	,m_omega(ndVector::m_zero)
 	,m_localCentreOfMass(ndVector::m_wOne)

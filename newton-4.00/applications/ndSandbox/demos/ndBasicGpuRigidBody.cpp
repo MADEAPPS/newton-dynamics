@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -128,7 +128,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	//ndInt32 count = 50;
 	//ndInt32 count = 40;

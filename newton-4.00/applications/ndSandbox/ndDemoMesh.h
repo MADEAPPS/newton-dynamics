@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name);
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix(), bool stretchMaping = true);
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
 	{ 

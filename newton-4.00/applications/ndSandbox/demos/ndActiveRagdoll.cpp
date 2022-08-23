@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -87,7 +87,7 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 	public:
 	ndActiveRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody)
 		:ndDemoEntityNotify(manager, entity, parentBody)
-		,m_bindMatrix(dGetIdentityMatrix())
+		,m_bindMatrix(ndGetIdentityMatrix())
 	{
 		if (parentBody)
 		{
@@ -441,7 +441,7 @@ class ndActiveRagdollModel : public ndCharacter
 
 static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
-	ndMatrix localAxis(dGetIdentityMatrix());
+	ndMatrix localAxis(ndGetIdentityMatrix());
 	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
 	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
@@ -461,12 +461,12 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const
 void ndActiveRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
 	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -16,7 +16,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointUpVector)
 
 ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(2, child, parent, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(2, child, parent, ndGetIdentityMatrix())
 {
 	ndMatrix matrix(normal);
 	matrix.m_posit = child->GetMatrix().m_posit;

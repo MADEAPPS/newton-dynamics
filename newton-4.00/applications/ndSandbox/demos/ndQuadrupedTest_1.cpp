@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -321,7 +321,7 @@ class ndAiQuadrupedTest_1 : public ndModel
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 
 						ndFloat32 regularizer = 0.001f;
-						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, dGetIdentityMatrix(), parentBody, m_rootBody);
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, ndGetIdentityMatrix(), parentBody, m_rootBody);
 
 						effector->SetSwivelMode(false);
 						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
@@ -761,7 +761,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFlatPlane(scene, true);
-	//BuildFloorBox(scene, dGetIdentityMatrix());
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston.fbx");

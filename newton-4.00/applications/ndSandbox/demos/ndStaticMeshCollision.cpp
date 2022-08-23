@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
-	ndMatrix heighfieldLocation (dGetIdentityMatrix());
+	ndMatrix heighfieldLocation (ndGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
@@ -38,10 +38,10 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "excavator.fbx", false);
 
-	ndMatrix location(dGetIdentityMatrix());
+	ndMatrix location(ndGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
 
-	ndMatrix localAxis(dGetIdentityMatrix());
+	ndMatrix localAxis(ndGetIdentityMatrix());
 	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
 	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
@@ -64,7 +64,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	{
 		public:
 		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-			:ndMatrix(dGetIdentityMatrix())
+			:ndMatrix(ndGetIdentityMatrix())
 		{
 			m_posit.m_x = x;
 			m_posit.m_y = y;

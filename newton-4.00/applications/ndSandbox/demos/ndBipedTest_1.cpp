@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -144,7 +144,7 @@ class ndAiBipedTest_1 : public ndModel
 		ndWorld* const world = scene->GetWorld();
 
 		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
-		rootEntity->ResetMatrix(dGetIdentityMatrix());
+		rootEntity->ResetMatrix(ndGetIdentityMatrix());
 
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -203,7 +203,7 @@ class ndAiBipedTest_1 : public ndModel
 						pivotFrame = ndPitchMatrix(-90.0f * ndDegreeToRad) * pivotFrame;
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 
-						ndMatrix swivelFrame(dGetIdentityMatrix());
+						ndMatrix swivelFrame(ndGetIdentityMatrix());
 						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
 						swivelFrame.m_up = m_rootBody->GetMatrix().m_front;
 						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
@@ -451,7 +451,7 @@ class ndAiBipedTest_1 : public ndModel
 
 	static void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	{
-		ndMatrix matrix(dGetIdentityMatrix());
+		ndMatrix matrix(ndGetIdentityMatrix());
 		matrix.m_posit = origin;
 		matrix.m_posit.m_w = 1.0f;
 
@@ -477,9 +477,9 @@ class ndAiBipedTest_1 : public ndModel
 void ndBipedTest_1 (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	ndMatrix origin(dGetIdentityMatrix());
+	ndMatrix origin(ndGetIdentityMatrix());
 	origin.m_posit.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 

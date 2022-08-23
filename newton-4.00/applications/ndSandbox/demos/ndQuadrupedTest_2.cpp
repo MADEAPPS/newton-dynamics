@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -151,7 +151,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 				calf0 = AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
 				calf0->SetMatrix(bodyMatrix);
 				
-				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
+				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
 				ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
 				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale (sign);
 				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
@@ -179,7 +179,7 @@ class ndAiQuadrupedTest_2 : public ndModel
 				calf1 = AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght);
 				calf1->SetMatrix(bodyMatrix);
 
-				ndMatrix caffPinAndPivotFrame(dGetIdentityMatrix());
+				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
 				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
 				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
 				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
@@ -201,12 +201,12 @@ class ndAiQuadrupedTest_2 : public ndModel
 			{
 				ndBodyKinematic* const targetBody = calf1;
 
-				ndMatrix effectorToeFrame(dGetIdentityMatrix());
-				ndMatrix effectorRefFrame(dGetIdentityMatrix());
+				ndMatrix effectorToeFrame(ndGetIdentityMatrix());
+				ndMatrix effectorRefFrame(ndGetIdentityMatrix());
 				effectorRefFrame.m_posit = thighPivot;
 				effectorToeFrame.m_posit = limbPivotLocation.m_posit;
 
-				ndMatrix effectorSwivelFrame(dGetIdentityMatrix());
+				ndMatrix effectorSwivelFrame(ndGetIdentityMatrix());
 				effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
 				effectorSwivelFrame.m_up = upDir;
 				effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
@@ -360,7 +360,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_2);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);

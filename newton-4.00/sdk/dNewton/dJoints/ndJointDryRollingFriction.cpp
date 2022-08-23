@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -16,7 +16,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDryRollingFriction)
 
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndFloat32 coefficient)
-	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(1, body0, body1, ndGetIdentityMatrix())
 	,m_coefficient(ndClamp (coefficient, ndFloat32(0.0f), ndFloat32 (1.0f)))
 	,m_contactTrail(ndFloat32 (0.1f))
 {

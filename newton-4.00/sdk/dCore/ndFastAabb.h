@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -60,8 +60,8 @@ class ndFastAabb : public ndMatrix
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndFastAabb::ndFastAabb()
-	:ndMatrix(dGetIdentityMatrix())
-	,m_absDir(dGetIdentityMatrix())
+	:ndMatrix(ndGetIdentityMatrix())
+	,m_absDir(ndGetIdentityMatrix())
 	,m_p0(ndVector::m_zero)
 	,m_p1(ndVector::m_zero)
 	,m_size(ndVector::m_zero)
@@ -80,8 +80,8 @@ inline ndFastAabb::ndFastAabb(const ndMatrix& matrix, const ndVector& size)
 }
 
 inline ndFastAabb::ndFastAabb(const ndVector& p0, const ndVector& p1)
-	:ndMatrix(dGetIdentityMatrix())
-	,m_absDir(dGetIdentityMatrix())
+	:ndMatrix(ndGetIdentityMatrix())
+	,m_absDir(ndGetIdentityMatrix())
 	,m_p0(p0)
 	,m_p1(p1)
 	,m_size(ndVector::m_half * (p1 - p0))

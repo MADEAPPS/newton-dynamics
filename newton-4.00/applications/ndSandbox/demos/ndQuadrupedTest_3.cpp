@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -209,7 +209,7 @@ class ndAiQuadrupedTest_3 : public ndModel
 						effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 						pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
 
-						ndMatrix swivelFrame(dGetIdentityMatrix());
+						ndMatrix swivelFrame(ndGetIdentityMatrix());
 						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
 						swivelFrame.m_up = referenceFrame.m_front;
 						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
@@ -466,7 +466,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAiQuadrupedTest_3);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");

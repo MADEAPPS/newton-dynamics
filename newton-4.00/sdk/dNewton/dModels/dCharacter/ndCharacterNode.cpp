@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterNode)
 
 ndCharacterNode::ndCharacterNode(ndCharacterNode* const parent)
 	:ndNodeHierarchy<ndCharacterNode>()
-	,m_localPose(dGetIdentityMatrix())
+	,m_localPose(ndGetIdentityMatrix())
 {
 	if (parent)
 	{

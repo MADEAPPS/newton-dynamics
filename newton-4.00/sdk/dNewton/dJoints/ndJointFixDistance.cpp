@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -16,14 +16,14 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFixDistance)
 
 ndJointFixDistance::ndJointFixDistance(const ndVector& pivotInChildInGlobalSpace, const ndVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(3, child, parent, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(3, child, parent, ndGetIdentityMatrix())
 	,m_distance(ndFloat32 (0.0f))
 {
 	ndVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
 	m_distance = ndSqrt(dist.DotProduct(dist).GetScalar());
 
-	ndMatrix childMatrix(dGetIdentityMatrix());
-	ndMatrix parentMatrix(dGetIdentityMatrix());
+	ndMatrix childMatrix(ndGetIdentityMatrix());
+	ndMatrix parentMatrix(ndGetIdentityMatrix());
 
 	childMatrix.m_posit = pivotInChildInGlobalSpace;
 	parentMatrix.m_posit = pivotInParentInGlobalSpace;

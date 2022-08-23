@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -176,7 +176,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	// create the visual mesh
 	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	mesh->Release();
 	scene->AddEntity(entity);
 
@@ -213,7 +213,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 
 	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	mesh->Release();
 
 	ndShapeInstance heighfieldInstance(

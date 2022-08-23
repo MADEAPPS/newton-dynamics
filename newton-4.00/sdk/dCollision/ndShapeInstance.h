@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -220,7 +220,7 @@ inline void ndShapeInstance::SetGlobalMatrix(const ndMatrix& matrix)
 
 inline ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) const
 {
-	ndMatrix scale(dGetIdentityMatrix());
+	ndMatrix scale(ndGetIdentityMatrix());
 	scale[0][0] = m_scale.m_x;
 	scale[1][1] = m_scale.m_y;
 	scale[2][2] = m_scale.m_z;

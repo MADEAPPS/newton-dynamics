@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -148,7 +148,7 @@ void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& 
 }
 
 ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache)
-	:ndDemoEntity(dGetIdentityMatrix(), parent)
+	:ndDemoEntity(ndGetIdentityMatrix(), parent)
 {
 	ndInt32 vertexCount = meshNode->GetPropertiesCount();
 
@@ -186,7 +186,7 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glD
 	}
 
 	ndDemoDebrisMesh* const mesh = new ndDemoDebrisMesh("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray);
-	SetMesh(mesh, dGetIdentityMatrix());
+	SetMesh(mesh, ndGetIdentityMatrix());
 	mesh->Release();
 }
 
@@ -212,7 +212,7 @@ void ndDemoDebrisEntity::Render(ndFloat32, ndDemoEntityManager* const scene, con
 }
 
 ndDemoDebrisRootEntity::ndDemoDebrisRootEntity()
-	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
+	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
 {
 }
 

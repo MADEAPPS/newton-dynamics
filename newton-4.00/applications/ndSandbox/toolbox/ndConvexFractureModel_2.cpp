@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -61,7 +61,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 {
 	ndVector pMin;
 	ndVector pMax;
-	desc.m_shape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
+	desc.m_shape->CalculateAabb(ndGetIdentityMatrix(), pMin, pMax);
 	ndVector size(pMax - pMin);
 
 	// Get the volume of the original mesh
@@ -73,7 +73,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 	strcpy(material1.m_textureName, desc.m_innerTexture);
 
 	// create a texture matrix, for applying the material's UV to all internal faces
-	ndMatrix textureMatrix(dGetIdentityMatrix());
+	ndMatrix textureMatrix(ndGetIdentityMatrix());
 	textureMatrix[0][0] = 1.0f / size.m_x;
 	textureMatrix[1][1] = 1.0f / size.m_y;
 	textureMatrix.m_posit.m_x = -0.5f;
@@ -88,7 +88,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 
 	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 	ndMeshEffect* nextDebris;
-	ndMatrix translateMatrix(dGetIdentityMatrix());
+	ndMatrix translateMatrix(ndGetIdentityMatrix());
 
 	ndFloat32 volume = ndFloat32(mesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
@@ -263,7 +263,7 @@ void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, 
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh, dGetIdentityMatrix());
+	entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
 	m_scene->AddEntity(entity);
 
 	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();

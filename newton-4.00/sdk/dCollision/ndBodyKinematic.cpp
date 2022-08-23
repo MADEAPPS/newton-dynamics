@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -71,7 +71,7 @@ void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 
 ndBodyKinematic::ndBodyKinematic()
 	:ndBody()
-	,m_invWorldInertiaMatrix(dGetZeroMatrix())
+	,m_invWorldInertiaMatrix(ndGetZeroMatrix())
 	,m_shapeInstance(new ndShapeNull)
 	,m_mass(ndVector::m_zero)
 	,m_invMass(ndVector::m_zero)
@@ -105,7 +105,7 @@ ndBodyKinematic::ndBodyKinematic()
 
 ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBody(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_invWorldInertiaMatrix(dGetZeroMatrix())
+	,m_invWorldInertiaMatrix(ndGetZeroMatrix())
 	,m_shapeInstance(new ndShapeNull)
 	,m_mass(ndVector::m_zero)
 	,m_invMass(ndVector::m_zero)

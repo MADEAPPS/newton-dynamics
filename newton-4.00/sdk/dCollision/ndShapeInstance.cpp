@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -32,9 +32,9 @@ ndVector ndShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_P
 
 ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	:ndClassAlloc()
-	,m_globalMatrix(dGetIdentityMatrix())
-	,m_localMatrix(dGetIdentityMatrix())
-	,m_alignmentMatrix(dGetIdentityMatrix())
+	,m_globalMatrix(ndGetIdentityMatrix())
+	,m_localMatrix(ndGetIdentityMatrix())
+	,m_alignmentMatrix(ndGetIdentityMatrix())
 	,m_scale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_invScale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_maxScale(ndVector::m_one & ndVector::m_triplexMask)
@@ -103,9 +103,9 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 
 ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesCache)
 	:ndClassAlloc()
-	,m_globalMatrix(dGetIdentityMatrix())
-	,m_localMatrix(dGetIdentityMatrix())
-	,m_alignmentMatrix(dGetIdentityMatrix())
+	,m_globalMatrix(ndGetIdentityMatrix())
+	,m_localMatrix(ndGetIdentityMatrix())
+	,m_alignmentMatrix(ndGetIdentityMatrix())
 	,m_scale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_invScale(ndVector::m_one & ndVector::m_triplexMask)
 	,m_maxScale(ndVector::m_one & ndVector::m_triplexMask)
@@ -213,7 +213,7 @@ ndMatrix ndShapeInstance::CalculateInertia() const
 	ndShape* const shape = (ndShape*)m_shape;
 	if (shape->GetAsShapeNull() || !(shape->GetAsShapeConvex() || shape->GetAsShapeCompound()))
 	{
-		return dGetZeroMatrix();
+		return ndGetZeroMatrix();
 	}
 	else 
 	{
@@ -441,7 +441,7 @@ void ndShapeInstance::SetGlobalScale(const ndMatrix& scaleMatrix)
 
 void ndShapeInstance::SetGlobalScale(const ndVector& scale)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix[0][0] = scale.m_x;
 	matrix[1][1] = scale.m_y;
 	matrix[2][2] = scale.m_z;

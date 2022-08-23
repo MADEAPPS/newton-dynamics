@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -73,7 +73,7 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 
 ndJointWheel::ndJointWheel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_baseFrame(dGetIdentityMatrix())
+	,m_baseFrame(ndGetIdentityMatrix())
 	,m_info()
 	,m_posit(ndFloat32(0.0f))
 	,m_speed(ndFloat32(0.0f))

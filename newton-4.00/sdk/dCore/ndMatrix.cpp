@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -167,7 +167,7 @@ void ndMatrix::TransformBBox (const ndVector& p0local, const ndVector& p1local, 
 ndMatrix ndMatrix::Inverse4x4 () const
 {
 	ndMatrix tmp (*this);
-	ndMatrix inv (dGetIdentityMatrix());
+	ndMatrix inv (ndGetIdentityMatrix());
 	for (ndInt32 i = 0; i < 4; ++i) 
 	{
 		ndFloat32 pivot = ndAbs(tmp[i][i]);
@@ -391,7 +391,7 @@ void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, n
 ndVector ndMatrix::EigenVectors ()
 {
 	ndMatrix matrix (*this);
-	ndMatrix eigenVectors(dGetIdentityMatrix());
+	ndMatrix eigenVectors(ndGetIdentityMatrix());
 
 #if 0
 	if (dAbs(m_front.m_z) > dFloat32(1.0e-6f)) {
@@ -513,7 +513,7 @@ ndVector ndMatrix::EigenVectors ()
 	}
 
 	#ifdef _DEBUG___
-		ndMatrix diag(dGetIdentityMatrix());
+		ndMatrix diag(ndGetIdentityMatrix());
 		diag[0][0] = d[0];
 		diag[1][1] = d[1];
 		diag[2][2] = d[2];
@@ -533,7 +533,7 @@ ndVector ndMatrix::EigenVectors ()
 	return d;
 }
 
-const ndMatrix& dGetIdentityMatrix()
+const ndMatrix& ndGetIdentityMatrix()
 {
 	static ndMatrix identityMatrix(
 		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
@@ -543,7 +543,7 @@ const ndMatrix& dGetIdentityMatrix()
 	return identityMatrix;
 }
 
-const ndMatrix& dGetZeroMatrix()
+const ndMatrix& ndGetZeroMatrix()
 {
 	static ndMatrix zeroMatrix(ndVector::m_zero, ndVector::m_zero, ndVector::m_zero, ndVector::m_zero);
 	return zeroMatrix;

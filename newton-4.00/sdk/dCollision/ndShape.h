@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -309,7 +309,7 @@ inline ndFloat32 ndShape::CalculateMassProperties(const ndMatrix&, ndVector&, nd
 inline ndMatrix ndShape::CalculateInertiaAndCenterOfMass(const ndMatrix&, const ndVector&, const ndMatrix&) const
 {
 	ndAssert(0);
-	return dGetZeroMatrix();
+	return ndGetZeroMatrix();
 }
 
 inline ndVector ndShape::GetObbOrigin() const

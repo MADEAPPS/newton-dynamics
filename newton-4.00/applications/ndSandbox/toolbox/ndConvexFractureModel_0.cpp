@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -109,7 +109,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 	bool IsFaceContact(ndShapeInstance* const shape)
 	{
 		ndFaceArrayDatabase siblingDataBase(-1.0f);
-		shape->DebugShape(dGetIdentityMatrix(), siblingDataBase);
+		shape->DebugShape(ndGetIdentityMatrix(), siblingDataBase);
 
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
@@ -196,7 +196,7 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 		
 		// transform the mesh the center mass in order to get the 
 		// local inertia of this debri piece.
-		ndMatrix translateMatrix(dGetIdentityMatrix());
+		ndMatrix translateMatrix(ndGetIdentityMatrix());
 		translateMatrix.m_posit = m_centerOfMass.Scale(-1.0f);
 		translateMatrix.m_posit.m_w = 1.0f;
 		meshNode->ApplyTransform(translateMatrix);
@@ -259,7 +259,7 @@ void ndConvexFracture::ndDebrisNotify::OnObjectPick() const
 }
 
 ndConvexFracture::ndConvexFracture()
-	:m_textureMatrix(dGetIdentityMatrix())
+	:m_textureMatrix(ndGetIdentityMatrix())
 	,m_pointCloud()
 	,m_singleManifoldMesh(nullptr)
 	,m_innerTexture(nullptr)
@@ -328,8 +328,8 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 
 	// calculate joint graph pairs, brute force for now
 	ndShapeInstance::ndDistanceCalculator distanceCalculator(scene->GetWorld()->GetScene());
-	distanceCalculator.m_matrix0 = dGetIdentityMatrix();
-	distanceCalculator.m_matrix1 = dGetIdentityMatrix();
+	distanceCalculator.m_matrix0 = ndGetIdentityMatrix();
+	distanceCalculator.m_matrix1 = ndGetIdentityMatrix();
 	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetSibling())
 	{
 		ndFaceArrayDatabase checkConectivitity;

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -290,7 +290,7 @@ inline void ndBodyKinematic::GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFlo
 
 inline void ndBodyKinematic::SetMassMatrix(const ndVector& massMatrix)
 {
-	ndMatrix inertia(dGetZeroMatrix());
+	ndMatrix inertia(ndGetZeroMatrix());
 	inertia[0][0] = massMatrix.m_x;
 	inertia[1][1] = massMatrix.m_y;
 	inertia[2][2] = massMatrix.m_z;

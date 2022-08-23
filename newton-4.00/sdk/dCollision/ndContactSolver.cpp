@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -1795,7 +1795,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	origin = origin * scale;
 	origin.m_w = ndFloat32(1.0f);
 
-	ndMatrix covariance(dGetZeroMatrix());
+	ndMatrix covariance(ndGetZeroMatrix());
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndVector p((contactArray[i].m_point - origin) & ndVector::m_triplexMask);
@@ -3108,8 +3108,8 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	ndAssert(data.m_faceCount);
 	m_instance1.m_shape = &polygon;
 	m_instance1.SetScale(ndVector::m_one);
-	m_instance1.m_localMatrix = dGetIdentityMatrix();
-	m_instance1.m_globalMatrix = dGetIdentityMatrix();
+	m_instance1.m_localMatrix = ndGetIdentityMatrix();
+	m_instance1.m_globalMatrix = ndGetIdentityMatrix();
 
 	polygon.m_vertex = data.m_vertex;
 	polygon.m_stride = ndInt32(data.m_vertexStrideInBytes / sizeof(ndFloat32));
@@ -4133,8 +4133,8 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 	m_instance1.m_shape->Release();
 	m_instance1.m_shape = polygon.AddRef();
 	m_instance1.SetScale(ndVector::m_one);
-	m_instance1.m_localMatrix = dGetIdentityMatrix();
-	m_instance1.m_globalMatrix = dGetIdentityMatrix();
+	m_instance1.m_localMatrix = ndGetIdentityMatrix();
+	m_instance1.m_globalMatrix = ndGetIdentityMatrix();
 
 	polygon.m_vertex = data.m_vertex;
 	polygon.m_stride = ndInt32(data.m_vertexStrideInBytes / sizeof(ndFloat32));

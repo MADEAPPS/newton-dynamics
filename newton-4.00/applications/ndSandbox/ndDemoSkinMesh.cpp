@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -49,7 +49,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	ndArray<ndDemoEntity*> entityArray;
 
 	pool[0] = root;
-	parentMatrix[0] = dGetIdentityMatrix();
+	parentMatrix[0] = ndGetIdentityMatrix();
 	ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
 
 	ndTree<ndInt32, ndString> boneClusterRemapIndex;
@@ -327,7 +327,7 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 
 	int count = 0;
 	pool[0] = root;
-	parentMatrix[0] = dGetIdentityMatrix();
+	parentMatrix[0] = ndGetIdentityMatrix();
 	ndMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).Inverse());
 	while (stack) 
 	{

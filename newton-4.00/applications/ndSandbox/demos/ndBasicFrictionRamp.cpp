@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -77,7 +77,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMat
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 	scene->AddEntity(entity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -94,7 +94,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndShapeInstance box(new ndShapeBox(30.0f, 0.25f, 30.f));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.25f;
 	uvMatrix[1][1] *= 0.25f;
 	uvMatrix[2][2] *= 0.25f;
@@ -109,7 +109,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndPitchMatrix(30.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 	geometry->Release();
 	
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -128,7 +128,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = floor.m_y + boxSize.m_y;
 
 
-	ndMatrix texMatrix(dGetIdentityMatrix());
+	ndMatrix texMatrix(ndGetIdentityMatrix());
 	texMatrix.m_posit.m_x = -0.5f;
 	texMatrix.m_posit.m_y = -0.5f;
 	const char* const boxTexName = "wood_0.tga";
@@ -158,7 +158,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	BuildFrictionRamp(scene);
 

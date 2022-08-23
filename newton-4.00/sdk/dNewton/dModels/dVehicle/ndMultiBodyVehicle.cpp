@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -39,7 +39,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicle)
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir)
 	:ndModel()
-	,m_localFrame(dGetIdentityMatrix())
+	,m_localFrame(ndGetIdentityMatrix())
 	,m_chassis(nullptr)
 	,m_motor(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)))
@@ -61,7 +61,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndVector& frontDir, const ndVector&
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_localFrame(dGetIdentityMatrix())
+	,m_localFrame(ndGetIdentityMatrix())
 	,m_chassis(nullptr)
 	,m_motor(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)))
@@ -510,7 +510,7 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
 {
-	ndMatrix tireFrame(dGetIdentityMatrix());
+	ndMatrix tireFrame(ndGetIdentityMatrix());
 	tireFrame.m_front = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
 	tireFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 	tireFrame.m_right = ndVector(-1.0f, 0.0f, 0.0f, 0.0f);

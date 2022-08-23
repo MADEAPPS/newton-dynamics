@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -72,7 +72,7 @@ void ndShape::MassProperties()
 	// using general central theorem, to extract the Inertia relative to the center of mass 
 	//IImatrix = IIorigin + unitmass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
 
-	ndMatrix inertia(dGetIdentityMatrix());
+	ndMatrix inertia(ndGetIdentityMatrix());
 	inertia[0][0] = m_inertia[0];
 	inertia[1][1] = m_inertia[1];
 	inertia[2][2] = m_inertia[2];
@@ -87,7 +87,7 @@ void ndShape::MassProperties()
 	ndFloat32 originMag2 = origin.DotProduct(origin & ndVector::m_triplexMask).GetScalar();
 
 	ndMatrix Covariance(origin, origin);
-	ndMatrix parallel(dGetIdentityMatrix());
+	ndMatrix parallel(ndGetIdentityMatrix());
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		parallel[i][i] = originMag2;

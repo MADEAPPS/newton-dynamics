@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -620,7 +620,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 //static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
 static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMatrix&)
 {
-	//ndMatrix localAxis(dGetIdentityMatrix());
+	//ndMatrix localAxis(ndGetIdentityMatrix());
 	//localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
 	//localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
@@ -635,13 +635,13 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMat
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
-	ndMatrix sceneLocation(dGetIdentityMatrix());
+	ndMatrix sceneLocation(ndGetIdentityMatrix());
 
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	//BuildCompoundScene(scene, dGetIdentityMatrix());
+	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	sceneLocation.m_posit.m_x = -200.0f;
@@ -651,7 +651,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
 	
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	ndVector floor(FindFloor(*world, location + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_y += 0.5f;

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -17,7 +17,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSpherical)
 
 ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
-	,m_rotation(dGetIdentityMatrix())
+	,m_rotation(ndGetIdentityMatrix())
 	,m_springK(ndFloat32(0.0f))
 	,m_damperC(ndFloat32(0.0f))
 	,m_maxConeAngle(ndFloat32(1.0e10f))
@@ -32,7 +32,7 @@ ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinem
 
 ndJointSpherical::ndJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_rotation(dGetIdentityMatrix())
+	,m_rotation(ndGetIdentityMatrix())
 	,m_springK(ndFloat32(0.0f))
 	,m_damperC(ndFloat32(0.0f))
 	,m_maxConeAngle(ndFloat32(1.0e10f))
@@ -138,7 +138,7 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	const ndVector& coneDir0 = matrix0.m_front;
 	const ndVector& coneDir1 = matrix1.m_front;
 	ndFloat32 cosAngleCos = coneDir0.DotProduct(coneDir1).GetScalar();
-	ndMatrix coneRotation(dGetIdentityMatrix());
+	ndMatrix coneRotation(ndGetIdentityMatrix());
 	if (cosAngleCos < ndFloat32(0.9999f))
 	{
 		ndVector lateralDir(coneDir1.CrossProduct(coneDir0));

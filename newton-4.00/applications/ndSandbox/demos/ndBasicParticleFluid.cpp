@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -181,14 +181,14 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		,m_fluidBody(fluidBody)
 	{
 		ndShapeInstance box(new ndShapeBox(9.0f, 10.0f, 9.0f));
-		ndMatrix uvMatrix(dGetIdentityMatrix());
+		ndMatrix uvMatrix(ndGetIdentityMatrix());
 		uvMatrix[0][0] *= 1.0f / 20.0f;
 		uvMatrix[1][1] *= 1.0f / 10.0f;
 		uvMatrix[2][2] *= 1.0f / 20.0f;
 		uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
 
 		ndDemoMesh* const geometry = new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
-		SetMesh(geometry, dGetIdentityMatrix());
+		SetMesh(geometry, ndGetIdentityMatrix());
 
 		scene->AddEntity(this);
 		m_isoSurfaceMesh0 = new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry);
@@ -222,7 +222,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 			}
 		}
 
-		ndMatrix nodeMatrix(dGetIdentityMatrix());
+		ndMatrix nodeMatrix(ndGetIdentityMatrix());
 		//nodeMatrix.m_posit.m_y += 0.125f;
 	
 		// render the fluid;
@@ -404,7 +404,7 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
-	ndMatrix location(dGetIdentityMatrix());
+	ndMatrix location(ndGetIdentityMatrix());
 
 	// adding a water volume
 	AddWaterVolume(scene, location);

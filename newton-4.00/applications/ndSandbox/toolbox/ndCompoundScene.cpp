@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location)
 {
 	ndShapeInstance box(new ndShapeBox(0.25f, 4.0f, 0.25f));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
@@ -30,7 +30,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	ndMatrix matrix(location);
 	matrix.m_posit.m_y += 1.9f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 	geometry->Release();
 
 	ndShapeMaterial material(box.GetMaterial());
@@ -49,7 +49,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location, ndInt32 count)
 {
 	ndShapeInstance capsule(new ndShapeCapsule(0.75f, 0.75f, 10.0f));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
@@ -63,7 +63,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-		entity->SetMesh(geometry, dGetIdentityMatrix());
+		entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 		material.m_data.m_userData = entity;
 		capsule.SetMaterial(material);
@@ -160,7 +160,7 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 
-	ndMatrix subShapeLocation(dGetIdentityMatrix());
+	ndMatrix subShapeLocation(ndGetIdentityMatrix());
 	AddStaticMesh(scene, "playerarena.fbx", sceneInstance, rootEntity, subShapeLocation);
 	//AddStaticMesh(scene, "flatplane.fbx", sceneInstance, rootEntity, subShapeLocation);
 

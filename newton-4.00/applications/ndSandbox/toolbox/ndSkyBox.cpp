@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -15,8 +15,8 @@
 #include "ndDemoCamera.h"
 
 ndSkyBox::ndSkyBox(GLuint shader)
-	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
-	,m_textureMatrix(dGetIdentityMatrix())
+	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
+	,m_textureMatrix(ndGetIdentityMatrix())
 	,m_shader(shader)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
@@ -48,7 +48,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
 	};
 
-	ndMatrix texMatrix(dGetIdentityMatrix());
+	ndMatrix texMatrix(ndGetIdentityMatrix());
 	texMatrix[1][1] = -1.0f;
 	texMatrix[1][3] = size;
 	m_textureMatrix = glMatrix(texMatrix);
@@ -226,7 +226,7 @@ void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatri
 
 	ndDemoCamera* const camera = scene->GetCamera();
 	
-	ndMatrix skyMatrix(dGetIdentityMatrix());
+	ndMatrix skyMatrix(ndGetIdentityMatrix());
 	ndMatrix viewMatrix(camera->GetViewMatrix());
 	skyMatrix.m_posit = viewMatrix.UntransformVector(ndVector(0.0f, 0.25f, 0.0f, 1.0f));
 

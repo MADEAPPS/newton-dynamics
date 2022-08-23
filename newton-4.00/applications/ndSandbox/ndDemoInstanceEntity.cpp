@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -285,7 +285,7 @@ ndDemoInstanceEntity::ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom)
 }
 
 ndDemoInstanceEntity::ndDemoInstanceEntity(ndDemoMeshIntance* const instanceMesh)
-	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
+	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
 	,m_instanceMesh(instanceMesh)
 {
 	m_instanceMesh->AddRef();

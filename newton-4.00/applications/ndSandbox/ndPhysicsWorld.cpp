@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ class ndPhysicsWorldSettings : public ndWordSettings
 
 	ndPhysicsWorldSettings(ndPhysicsWorld* const world)
 		:ndWordSettings()
-		,m_cameraMatrix(dGetIdentityMatrix())
+		,m_cameraMatrix(ndGetIdentityMatrix())
 		,m_world(world)
 	{
 	}
@@ -197,7 +197,7 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 	}
 
 	// add some visualization
-	ndMatrix scale(dGetIdentityMatrix());
+	ndMatrix scale(ndGetIdentityMatrix());
 	scale[0][0] = 0.5f;
 	scale[1][1] = 0.5f;
 	scale[2][2] = 0.5f;
@@ -213,7 +213,7 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 		if (!shape->GetAsShapeStaticProceduralMesh())
 		{
 			ndDemoMesh* const mesh = new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale);
-			entity->SetMesh(mesh, dGetIdentityMatrix());
+			entity->SetMesh(mesh, ndGetIdentityMatrix());
 			mesh->Release();
 		}
 

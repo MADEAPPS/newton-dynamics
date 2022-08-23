@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance box(new ndShapeBox(20.0f, 10.0f, 20.0f));
-	ndMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 1.0f / 20.0f;
 	uvMatrix[1][1] *= 1.0f / 10.0f;
 	uvMatrix[2][2] *= 1.0f / 20.0f;
@@ -34,13 +34,13 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndDemoMesh* const geometry = new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
 
 	ndVector floor(FindFloor(*world, ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 	matrix.m_posit.m_y += 2.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -88,7 +88,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& orig
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	// build a floor
 	AddTrigger(scene);
@@ -97,7 +97,7 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	{
 		public:
 		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-			:ndMatrix(dGetIdentityMatrix())
+			:ndMatrix(ndGetIdentityMatrix())
 		{
 			m_posit.m_x = x;
 			m_posit.m_y = y;

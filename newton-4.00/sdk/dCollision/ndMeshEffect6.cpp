@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -1625,7 +1625,7 @@ void ndMeshEffect::AngleBaseFlatteningMapping (ndInt32 material, dgReportProgres
 	ndBigVector size (maxBox - minBox);
 	ndFloat32 scale = ndFloat32 (1.0 / ndMax (size.m_x, size.m_y, size.m_z));
 
-	ndMatrix matrix (dGetIdentityMatrix());
+	ndMatrix matrix (ndGetIdentityMatrix());
 	matrix[0][0] = scale;
 	matrix[1][1] = scale;
 	matrix[2][2] = scale;
@@ -1838,7 +1838,7 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 	ndInt32 mark = IncLRU();
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
-		ndMatrix rotationMatrix(dGetIdentityMatrix());
+		ndMatrix rotationMatrix(ndGetIdentityMatrix());
 		if (i == 1) 
 		{
 			rotationMatrix = ndYawMatrix(ndFloat32(90.0f * ndDegreeToRad));

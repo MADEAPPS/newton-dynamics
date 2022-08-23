@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -592,7 +592,7 @@ static void MnistTestSet(const char* const annName)
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet("mnistDatabase/mnist.nn");
 }
 
@@ -1839,7 +1839,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			if (key->GetAsShapeStaticProceduralMesh())
 			{
 				ndDebugNotify drawShapes(this, body);
-				key->DebugShape(dGetIdentityMatrix(), drawShapes);
+				key->DebugShape(ndGetIdentityMatrix(), drawShapes);
 			}
 			else if (!body->GetAsBodyTriggerVolume())
 			{
@@ -1866,7 +1866,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			{
 				ndShapeInstance shape(body->GetCollisionShape());
 				shape.SetScale(ndVector(1.0f));
-				shape.SetLocalMatrix(dGetIdentityMatrix());
+				shape.SetLocalMatrix(ndGetIdentityMatrix());
 
 				ndDebuMesh debugMesh;
 				debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
@@ -1981,7 +1981,7 @@ void ndDemoEntityManager::RenderScene()
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
 	// render all entities
-	const ndMatrix globalMatrix (dGetIdentityMatrix());
+	const ndMatrix globalMatrix (ndGetIdentityMatrix());
 	if (m_hideVisualMeshes) 
 	{
 		if (m_sky) 

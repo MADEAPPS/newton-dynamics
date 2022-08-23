@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -235,9 +235,9 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 
 	ndDemoMesh* const geometry = new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache());
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	scene->AddEntity(entity);
 	geometry->Release();
@@ -249,7 +249,7 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 	ndPlane planeEquation(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
 	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndBodyDynamic* const body = new ndBodyDynamic();

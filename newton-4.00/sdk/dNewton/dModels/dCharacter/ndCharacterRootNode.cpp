@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterRootNode)
 
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterNode(nullptr)
-	,m_coronalFrame(dGetIdentityMatrix())
+	,m_coronalFrame(ndGetIdentityMatrix())
 	,m_owner(owner)
 	,m_body(body)
 {
@@ -38,7 +38,7 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 
 ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
 	:ndCharacterNode(desc)
-	,m_coronalFrame(dGetIdentityMatrix())
+	,m_coronalFrame(ndGetIdentityMatrix())
 	,m_owner(nullptr)
 	,m_body(nullptr)
 {

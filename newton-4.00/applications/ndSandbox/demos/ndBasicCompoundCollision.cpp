@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -59,15 +59,15 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	ndShapeInstance wall3(new ndShapeBox(2.0f, 2.0f, 0.1f));
 	ndShapeInstance wall4(new ndShapeBox(0.1f, 2.0f, 2.0f));
 	ndShapeInstance floor(new ndShapeBox(2.0f, 0.1f, 2.0f));
-	ndMatrix mWall1Local = dGetIdentityMatrix();
+	ndMatrix mWall1Local = ndGetIdentityMatrix();
 	mWall1Local.m_posit = ndVector(0.0f, 0.0f, -1.0f, 1.0f);
-	ndMatrix mWall2Local = dGetIdentityMatrix();
+	ndMatrix mWall2Local = ndGetIdentityMatrix();
 	mWall2Local.m_posit = ndVector(1.0f, 0.0f, 0.0f, 1.0f);
-	ndMatrix mWall3Local = dGetIdentityMatrix();
+	ndMatrix mWall3Local = ndGetIdentityMatrix();
 	mWall3Local.m_posit = ndVector(0.0f, 0.0f, 1.0f, 1.0f);
-	ndMatrix mWall4Local = dGetIdentityMatrix();
+	ndMatrix mWall4Local = ndGetIdentityMatrix();
 	mWall4Local.m_posit = ndVector(-1.0f, 0.0f, 0.0f, 1.0f);
-	ndMatrix mFloorLocal = dGetIdentityMatrix();
+	ndMatrix mFloorLocal = ndGetIdentityMatrix();
 	//mFloorLocal = ndYawMatrix(3.14f / 4.0f);//45 degree
 	mFloorLocal.m_posit = ndVector(0.0f, -1.0f, 0.0f, 1.0f);
 
@@ -86,10 +86,10 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	ndShapeInstance originShape(new ndShapeSphere(0.125f));
 	ndDemoMesh* const origGeometry = new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 
-	ndDemoEntity* const origEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
-	origEntity->SetMesh(origGeometry, dGetIdentityMatrix());
+	ndDemoEntity* const origEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
+	origEntity->SetMesh(origGeometry, ndGetIdentityMatrix());
 
-	ndMatrix mOrigMatrix = dGetIdentityMatrix();
+	ndMatrix mOrigMatrix = ndGetIdentityMatrix();
 	mOrigMatrix.m_posit.m_x = 2.0f;
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
@@ -106,10 +106,10 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	CreateBoxCompoundShape(compoundShapeInstance);
 
 	ndDemoMesh* const compGeometry = new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-	ndDemoEntity* const compEntity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
-	compEntity->SetMesh(compGeometry, dGetIdentityMatrix());
+	ndDemoEntity* const compEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
+	compEntity->SetMesh(compGeometry, ndGetIdentityMatrix());
 
-	ndMatrix mBodyMatrix = dGetIdentityMatrix();
+	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
 	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
 
@@ -135,20 +135,20 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
-	ndMatrix heighfieldLocation(dGetIdentityMatrix());
+	ndMatrix heighfieldLocation(ndGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
 	// build a floor
 	//BuildPlayArena(scene);
 	BuildFlatPlane(scene, true);
-	//BuildFloorBox(scene, dGetIdentityMatrix());
-	//BuildCompoundScene(scene, dGetIdentityMatrix());
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
-	ndMatrix location(dGetIdentityMatrix());
+	ndMatrix location(ndGetIdentityMatrix());
 
 	AddSphere(scene);
 	AddEmptyBox(scene);

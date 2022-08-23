@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	public:
 	ndAsymetricInertiaBody()
 		:ndBodyDynamic()
-		,m_principalAxis(dGetIdentityMatrix())
+		,m_principalAxis(ndGetIdentityMatrix())
 	{
 	}
 	
@@ -33,7 +33,7 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	{
 		m_principalAxis = inertia;
 		ndVector eigenValues(m_principalAxis.EigenVectors());
-		ndMatrix massMatrix(dGetIdentityMatrix());
+		ndMatrix massMatrix(ndGetIdentityMatrix());
 		massMatrix[0][0] = eigenValues[0];
 		massMatrix[1][1] = eigenValues[1];
 		massMatrix[2][2] = eigenValues[2];
@@ -44,7 +44,7 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	{
 		ndMatrix matrix(m_principalAxis * m_matrix);
 		matrix.m_posit = ndVector::m_wOne;
-		ndMatrix diagonal(dGetIdentityMatrix());
+		ndMatrix diagonal(ndGetIdentityMatrix());
 		diagonal[0][0] = m_invMass[0];
 		diagonal[1][1] = m_invMass[1];
 		diagonal[2][2] = m_invMass[2];
@@ -56,7 +56,7 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 
 static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -71,7 +71,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, 0.0f));
 
 	body->SetOmega(omega);
@@ -104,7 +104,7 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetOmega(omega);
@@ -139,7 +139,7 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 
 	ndBodyDynamic* const body = new ndAsymetricInertiaBody();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetMatrix(matrix);
@@ -165,7 +165,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	matrix.m_posit.m_w = 1.0f;
 	ndDemoMesh* const geometry = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 	matrix.m_posit.m_y += 1.0f;
 
 	const ndFloat32 mass = 1.0f;
@@ -189,7 +189,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	ndShapeInstance rod(new ndShapeCapsule(smallRadius * 0.5f, smallRadius * 0.5f, lenght));
 	ndShapeInstance wheel(new ndShapeCylinder(radius, radius, 0.125f));
 
-	ndMatrix offset(dGetIdentityMatrix());
+	ndMatrix offset(ndGetIdentityMatrix());
 	offset.m_posit.m_x = lenght * 0.5f;
 	wheel.SetLocalMatrix(offset);
 
@@ -205,9 +205,9 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;
 
-	ndDemoEntity* const entity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
+	ndDemoEntity* const entity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
 	ndDemoMesh* const geometry = new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 	geometry->Release();
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -230,7 +230,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix()); 
+	BuildFloorBox(scene, ndGetIdentityMatrix()); 
 
 	// should spins very slowly, with a tilt angle of 30 degrees
 	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);

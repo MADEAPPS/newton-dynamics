@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 {
 	//ndVector pMin;
 	//ndVector pMax;
-	//desc.m_shape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
+	//desc.m_shape->CalculateAabb(ndGetIdentityMatrix(), pMin, pMax);
 	//ndVector size((pMax - pMin).Scale(0.25f));
 	//
 	//desc.m_pointCloud.PushBack(ndVector::m_zero);
@@ -49,7 +49,7 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 
 	ndVector pMin;
 	ndVector pMax;
-	desc.m_shape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
+	desc.m_shape->CalculateAabb(ndGetIdentityMatrix(), pMin, pMax);
 	ndVector size(pMax - pMin);
 
 	const ndInt32 count = 20;
@@ -73,7 +73,7 @@ static ndVector CalculateLocation(ndExplodeConvexShapeModel* const manager, cons
 {
 	ndVector minBox;
 	ndVector maxBox;
-	shape.CalculateAabb(dGetIdentityMatrix(), minBox, maxBox);
+	shape.CalculateAabb(ndGetIdentityMatrix(), minBox, maxBox);
 
 	ndWorld* const world = manager->m_scene->GetWorld();
 	ndVector floor(FindFloor(*world, ndVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, ndFloat32(0.0f)), 2.0f * 100.0f));
@@ -185,13 +185,13 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const nd
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndExplodeConvexShapeModel* const fractureManager = new ndExplodeConvexShapeModel(scene);
 	world->AddModel(fractureManager);
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y += 2.0f;

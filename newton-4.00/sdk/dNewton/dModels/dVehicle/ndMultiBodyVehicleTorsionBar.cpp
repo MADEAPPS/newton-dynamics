@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -30,7 +30,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTorsionBar)
 
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyKinematic* const fixedbody)
-	:ndJointBilateralConstraint(1, vehicle->m_chassis, fixedbody, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(1, vehicle->m_chassis, fixedbody, ndGetIdentityMatrix())
 	,m_springK(ndFloat32 (10.0f))
 	,m_damperC(ndFloat32(1.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))

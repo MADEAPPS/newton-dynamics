@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -1510,7 +1510,7 @@ dgCollisionInstance* ndMeshEffect::CreateCollisionTree(dgWorld* const world, ndI
 	}
 	collision->EndBuild(0);
 
-	dgCollisionInstance* const instance = world->CreateInstance(collision, shapeID, dGetIdentityMatrix());
+	dgCollisionInstance* const instance = world->CreateInstance(collision, shapeID, ndGetIdentityMatrix());
 	collision->Release();
 	return instance;
 }
@@ -4125,7 +4125,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	}
 	else
 	{
-		ndMatrix matrix(dGetIdentityMatrix());
+		ndMatrix matrix(ndGetIdentityMatrix());
 		shape.DebugShape(matrix, builder);
 	}
 
@@ -4153,7 +4153,7 @@ ndMatrix ndMeshEffect::CalculateOOBB(ndBigVector& size) const
 	//size = sphere.m_size;
 	//size.m_w = 0.0f;
 
-	//	ndMatrix permuation (dGetIdentityMatrix());
+	//	ndMatrix permuation (ndGetIdentityMatrix());
 	//	permuation[0][0] = ndFloat32 (0.0f);
 	//	permuation[0][1] = ndFloat32 (1.0f);
 	//	permuation[1][1] = ndFloat32 (0.0f);
@@ -4318,7 +4318,7 @@ ndShapeInstance* ndMeshEffect::CreateConvexCollision(ndFloat64 tolerance) const
 		}
 	}
 	
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit += matrix.RotateVector(com);
 	matrix.m_posit.m_w = ndFloat32(1.0f);
 	

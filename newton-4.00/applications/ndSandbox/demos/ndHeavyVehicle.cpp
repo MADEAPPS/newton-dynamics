@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -853,7 +853,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
-	ndMatrix sceneLocation(dGetIdentityMatrix());
+	ndMatrix sceneLocation(ndGetIdentityMatrix());
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
@@ -867,7 +867,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 
 	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = location;
 
 	// add a model for general controls

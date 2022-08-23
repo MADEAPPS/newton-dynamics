@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -74,7 +74,7 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
 	data.m_maxIndexCount = 1000000000;
 	data.m_triangleCount = 0;
 	ndVector zero(ndVector::m_zero);
-	ndFastAabb box(dGetIdentityMatrix(), ndVector(ndFloat32(1.0e15f)));
+	ndFastAabb box(ndGetIdentityMatrix(), ndVector(ndFloat32(1.0e15f)));
 	ForAllSectors(box, zero, ndFloat32(1.0f), GetTriangleCount, &data);
 	m_trianglesCount = data.m_triangleCount;
 }
@@ -102,7 +102,7 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const ndLoadSaveBase::ndLoadDescriptor& des
 	data.m_maxIndexCount = 1000000000;
 	data.m_triangleCount = 0;
 	ndVector zero(ndVector::m_zero);
-	ndFastAabb box(dGetIdentityMatrix(), ndVector(ndFloat32(1.0e15f)));
+	ndFastAabb box(ndGetIdentityMatrix(), ndVector(ndFloat32(1.0e15f)));
 	ForAllSectors(box, zero, ndFloat32(1.0f), GetTriangleCount, &data);
 	m_trianglesCount = data.m_triangleCount;
 }
@@ -179,7 +179,7 @@ void ndShapeStatic_bvh::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 	context.m_userData = (void*)this;
 	context.m_callback = &debugCallback;
 
-	ndFastAabb box(dGetIdentityMatrix(), ndVector(1.0e15f));
+	ndFastAabb box(ndGetIdentityMatrix(), ndVector(1.0e15f));
 	ForAllSectors(box, ndVector::m_zero, ndFloat32(1.0f), ShowDebugPolygon, &context);
 }
 

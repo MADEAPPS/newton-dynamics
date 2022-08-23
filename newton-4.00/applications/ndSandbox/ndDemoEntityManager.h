@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -76,7 +76,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	{
 		public: 
 		TransparentMesh()
-			:m_matrix(dGetIdentityMatrix())
+			:m_matrix(ndGetIdentityMatrix())
 			,m_mesh(nullptr)
 		{
 		}
