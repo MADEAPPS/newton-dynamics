@@ -116,6 +116,9 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
 
 void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 {
+#if 1
+ndDeepBrainGradientDescendTrainingOperator::Optimize(*m_inputBatch, *m_groundTruth, m_learnRate, m_steps);
+#else
 	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
 	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
 
@@ -195,4 +198,5 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 	}
 
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
+#endif
 }
