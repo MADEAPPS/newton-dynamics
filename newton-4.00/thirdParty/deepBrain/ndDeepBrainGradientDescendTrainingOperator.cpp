@@ -248,6 +248,10 @@ void ndDeepBrainGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatri
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : inputBatch.GetCount() - batchStart;
 
+//char xxxx[256];
+//sprintf(xxxx, "xxxxx0/xxx%d.cnn", i);
+//GetBrain()->Save(xxxx);
+
 		m_averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{

@@ -104,6 +104,6 @@ class ndContactNotify: public ndClassAlloc
 	ndMaterial m_default;
 	ndScene* m_scene;
 	friend class ndScene;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

@@ -592,7 +592,7 @@ static void MnistTestSet(const char* const annName)
 void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet("mnistDatabase/mnist.nn");
 }
 

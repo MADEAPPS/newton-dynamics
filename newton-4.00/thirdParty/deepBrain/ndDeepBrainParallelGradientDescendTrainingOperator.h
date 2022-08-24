@@ -35,6 +35,8 @@ class ndDeepBrainParallelGradientDescendTrainingOperator
 		public:
 		LocalData(const ndDeepBrainGradientDescendTrainingOperator& src);
 		ndReal m_averageError;
+
+		void CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src);
 	};
 
 	ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads = 1);

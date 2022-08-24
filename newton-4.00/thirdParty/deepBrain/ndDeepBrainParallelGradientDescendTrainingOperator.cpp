@@ -29,7 +29,16 @@ ndDeepBrainParallelGradientDescendTrainingOperator::LocalData::LocalData(const n
 	,ndDeepBrainGradientDescendTrainingOperator(((ndDeepBrain*)this))
 	,m_averageError(0.0f)
 {
-//	m_instance.m_brain = new ndDeepBrain(*m_instance.m_brain);
+}
+
+void ndDeepBrainParallelGradientDescendTrainingOperator::LocalData::CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src)
+{
+	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	for (ndInt32 i = layers.GetCount() - 1; i >= 1; --i)
+	{
+		ndDeepBrainMatrix& transposeMatrix = *m_weightsLayersTranspose[i];
+		transposeMatrix.Set(*src[i]);
+	}
 }
 
 ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads)
@@ -107,10 +116,12 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
 
 	const ndInt32 threads = m_threadData.GetCount();
 	const ndReal weightFactor = 1.0f / threads;
+
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 j = layers.GetCount() - 1; j >= 0; --j)
 	{
 		ndDeepBrainLayer& layer = *layers[j];
+
 		layer.Set(0);
 		layer.m_bias.Set(0.0f);
 		for (ndInt32 i = 0; i < threads; ++i)
@@ -154,8 +165,11 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
-		index = (index + 1) % batchCount;
-	
+
+//char xxxx[256];
+//sprintf(xxxx, "xxxxx1/xxx%d.cnn", i);
+//GetBrain()->Save(xxxx);
+
 		auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			LocalData& optimizer = *m_threadData[threadIndex];
@@ -184,6 +198,7 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
 		{
 			m_averageError += m_threadData[j]->m_averageError;
 			m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
+			m_threadData[j]->CopyTranspose(m_weightsLayersTranspose);
 		}
 
 		m_movingAverageIndex += batchSize;
