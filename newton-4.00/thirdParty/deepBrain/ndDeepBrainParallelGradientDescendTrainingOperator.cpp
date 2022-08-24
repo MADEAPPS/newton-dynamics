@@ -86,34 +86,6 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize(const ndDeepBr
 
 void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
 {
-	//for (ndInt32 j = GetCount() - 1; j >= 0; --j)
-	//{
-	//	auto AverageWeights = ndMakeObject::ndFunction([this, j](ndInt32 threadIndex, ndInt32 threadCount)
-	//	{
-	//		//LocalData& optimizer = *m_threadData[threadIndex];
-	//		ndDeepBrainLayer& layer = *(*m_instance.GetBrain())[j];
-	//
-	//		ndFixSizeArray<ndDeepBrainLayer*, D_MAX_THREADS_COUNT> threadLayers;
-	//		for (ndInt32 i = 0; i < threadCount; ++i)
-	//		{
-	//			threadLayers.PushBack((*m_threadData[i]->GetBrain())[i]);
-	//		}
-	//
-	//		ndReal scale = 1.0f / threadCount;
-	//		const ndStartEnd startEnd(layer.GetOuputSize(), threadIndex, threadCount);
-	//		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-	//		{
-	//			ndReal acc = 0.0f;
-	//			for (ndInt32 k = 0; k < threadCount; k++)
-	//			{
-	//				acc += threadLayers[k]->GetBias()[i];
-	//			}
-	//			layer.GetBias()[i] = acc * scale;
-	//		}
-	//	});
-	//	ParallelExecute(AverageWeights);
-	//}
-
 	const ndInt32 threads = m_threadData.GetCount();
 	const ndReal weightFactor = 1.0f / threads;
 

@@ -30,21 +30,20 @@ class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOper
 	public: 
 	ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain);
 	ndDeepBrainGradientDescendTrainingOperator(const ndDeepBrainGradientDescendTrainingOperator& src);
-	~ndDeepBrainGradientDescendTrainingOperator();
-	
-	void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	virtual ~ndDeepBrainGradientDescendTrainingOperator();
 
-	void UpdateWeights(ndReal learnRate);
-	void MakePrediction(const ndDeepBrainVector& input);
-	void BackPropagate(const ndDeepBrainVector& groundTruth);
+	virtual void UpdateWeights(ndReal learnRate);
+	virtual void MakePrediction(const ndDeepBrainVector& input);
+	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
+	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	protected:
-	void PrefixScan();
-	void ApplyWeightTranspose();
+	virtual void PrefixScan();
+	virtual void ApplyWeightTranspose();
 	
-	void BackPropagateHiddenLayer(ndInt32 layerIndex);
-	void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
-	void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
+	virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
+	virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
+	virtual void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 
 	ndDeepBrainVector m_output;
 	ndDeepBrainVector m_zDerivative;
