@@ -139,10 +139,6 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
 
-//char xxxx[256];
-//sprintf(xxxx, "xxxxx1/xxx%d.cnn", i);
-//GetBrain()->Save(xxxx);
-
 		auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			LocalData& optimizer = *m_threadData[threadIndex];
@@ -154,15 +150,11 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 				ndInt32 k = randomizeVector[batchStart + i];
 				const ndDeepBrainVector& input = (*m_inputBatch)[k];
 				const ndDeepBrainVector& truth = (*m_groundTruth)[k];
-				optimizer.MakePrediction(input);
-				optimizer.BackPropagate(truth);
-				optimizer.UpdateWeights(m_learnRate);
-				ndFloat32 error = optimizer.CalculateMeanSquareError(truth);
-				optimizer.m_averageError += error;
+				optimizer.m_averageError += optimizer.TrainingStep(m_learnRate, input, truth);
 			}
 		});
-
 		ParallelExecute(CalculateGradients);
+
 		AverageWeights();
 		ApplyWeightTranspose();
 

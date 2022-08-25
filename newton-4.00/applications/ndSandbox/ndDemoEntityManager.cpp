@@ -374,8 +374,8 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 
 		//ndDeepBrainTrainerSDG trainer(&brain);
-		ndDeepBrainTrainerParallelSDG trainer(&brain, 4);
-		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
+		//ndDeepBrainTrainerParallelSDG trainer(&brain, 4);
+		ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.SetMiniBatchSize(2000);

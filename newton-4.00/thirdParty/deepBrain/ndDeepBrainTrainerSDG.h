@@ -36,11 +36,11 @@ class ndDeepBrainTrainerSDG: public ndDeepBrainTrainingOperator
 	virtual void MakePrediction(const ndDeepBrainVector& input);
 	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	virtual ndReal TrainingStep(ndReal learnRate, const ndDeepBrainVector& input, const ndDeepBrainVector& groundTruth);
 
 	protected:
 	virtual void PrefixScan();
 	virtual void ApplyWeightTranspose();
-	
 	virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
 	virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	virtual void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);

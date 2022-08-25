@@ -235,6 +235,15 @@ void ndDeepBrainTrainerSDG::BackPropagate(const ndDeepBrainVector& groundTruth)
 	}
 }
 
+ndReal ndDeepBrainTrainerSDG::TrainingStep(ndReal learnRate, const ndDeepBrainVector& input, const ndDeepBrainVector& groundTruth)
+{
+	MakePrediction(input);
+	BackPropagate(groundTruth);
+	UpdateWeights(learnRate);
+	ndFloat32 leastSquareError = CalculateMeanSquareError(groundTruth);
+	return leastSquareError;
+}
+
 void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
@@ -259,21 +268,13 @@ void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const 
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : inputBatch.GetCount() - batchStart;
 
-//char xxxx[256];
-//sprintf(xxxx, "xxxxx0/xxx%d.cnn", i);
-//GetBrain()->Save(xxxx);
-
 		m_averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{
 			ndInt32 k = randomizeVector[batchStart + j];
 			const ndDeepBrainVector& input = inputBatch[k];
 			const ndDeepBrainVector& truth = groundTruth[k];
-			MakePrediction(input);
-			BackPropagate(truth);
-			UpdateWeights(learnRate);
-			ndFloat32 error = CalculateMeanSquareError(truth);
-			m_averageError += error;
+			m_averageError += TrainingStep(learnRate, input, truth);
 		}
 		ApplyWeightTranspose();
 
