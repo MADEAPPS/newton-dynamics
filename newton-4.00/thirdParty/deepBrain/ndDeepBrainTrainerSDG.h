@@ -28,10 +28,11 @@
 class ndDeepBrainTrainerSDG: public ndDeepBrainTrainingOperator
 {
 	public: 
-	ndDeepBrainTrainerSDG(ndDeepBrain* const brain);
+	ndDeepBrainTrainerSDG(ndDeepBrain* const brain, ndReal regularizer = 0.0f);
 	ndDeepBrainTrainerSDG(const ndDeepBrainTrainerSDG& src);
 	virtual ~ndDeepBrainTrainerSDG();
 
+	ndReal GetRegularizer() const;
 	virtual void UpdateWeights(ndReal learnRate);
 	virtual void MakePrediction(const ndDeepBrainVector& input);
 	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
@@ -51,7 +52,13 @@ class ndDeepBrainTrainerSDG: public ndDeepBrainTrainingOperator
 	ndDeepBrainVector m_weightGradients;
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
+	ndReal m_regularizer;
 };
+
+inline ndReal ndDeepBrainTrainerSDG::GetRegularizer() const
+{
+	return m_regularizer;
+}
 
 #endif 
 

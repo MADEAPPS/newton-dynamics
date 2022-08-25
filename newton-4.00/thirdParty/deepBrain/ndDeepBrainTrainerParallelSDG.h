@@ -39,7 +39,7 @@ class ndDeepBrainTrainerParallelSDG
 		void CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src);
 	};
 
-	ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndInt32 threads = 1);
+	ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndReal regularizer = 0.0f, ndInt32 threads = 1);
 	~ndDeepBrainTrainerParallelSDG();
 
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);

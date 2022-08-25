@@ -26,7 +26,7 @@
 
 ndDeepBrainTrainerParallelSDG::LocalData::LocalData(const ndDeepBrainTrainerSDG& src)
 	:ndDeepBrain(*src.GetBrain())
-	,ndDeepBrainTrainerSDG(((ndDeepBrain*)this))
+	,ndDeepBrainTrainerSDG((ndDeepBrain*)this, src.GetRegularizer())
 	,m_averageError(0.0f)
 {
 }
@@ -41,8 +41,8 @@ void ndDeepBrainTrainerParallelSDG::LocalData::CopyTranspose(const ndArray<ndDee
 	}
 }
 
-ndDeepBrainTrainerParallelSDG::ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndInt32 threads)
-	:ndDeepBrainTrainerSDG(brain)
+ndDeepBrainTrainerParallelSDG::ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndReal regularizer, ndInt32 threads)
+	:ndDeepBrainTrainerSDG(brain, regularizer)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)
@@ -132,8 +132,8 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 		randomizeVector[i] = i;
 	}
 
-	ndInt32 m_movingAverageIndex = 0;
-	ndFloat32 m_movingAverageError = 0.0f;
+	ndInt32 movingAverageIndex = 0;
+	ndFloat32 movingAverageError = 0.0f;
 	for (ndInt32 i = 0; i < m_steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
@@ -158,32 +158,32 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 		AverageWeights();
 		ApplyWeightTranspose();
 
-		m_averageError = 0.0f;
+		ndReal averageError = 0.0f;
 		for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
 		{
-			m_averageError += m_threadData[j]->m_averageError;
+			averageError += m_threadData[j]->m_averageError;
 			m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
 			m_threadData[j]->CopyTranspose(m_weightsLayersTranspose);
 		}
 
-		m_movingAverageIndex += batchSize;
-		m_movingAverageError += m_averageError;
+		movingAverageIndex += batchSize;
+		movingAverageError += averageError;
 	
-		m_averageError = ndSqrt(m_averageError / batchSize);
-		ndExpandTraceMessage("%f %d\n", m_averageError, i);
+		averageError = ndSqrt(averageError / batchSize);
+		ndExpandTraceMessage("%f %d\n", averageError, i);
 	
 		index = (index + 1) % batchCount;
 		if (index == 0)
 		{
 			randomizeVector.RandomShuffle();
-			m_movingAverageError = ndSqrt(m_movingAverageError / m_movingAverageIndex);
-			if (m_movingAverageError < bestCost)
+			movingAverageError = ndSqrt(movingAverageError / movingAverageIndex);
+			if (movingAverageError < bestCost)
 			{
-				bestCost = m_movingAverageError;
+				bestCost = movingAverageError;
 				bestNetwork.CopyFrom(*m_instance.GetBrain());
 			}
-			m_movingAverageIndex = 0;
-			m_movingAverageError = 0.0f;
+			movingAverageIndex = 0;
+			movingAverageError = 0.0f;
 		}
 	}
 

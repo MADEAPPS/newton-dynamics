@@ -27,7 +27,6 @@
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
-	,m_averageError(0.0f)
 	,m_miniBatchSize(100000)
 {
 }
@@ -35,7 +34,6 @@ ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brai
 ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src)
 	:ndClassAlloc()
 	,m_instance(src.m_instance)
-	,m_averageError(0.0f)
 	,m_miniBatchSize(src.m_miniBatchSize)
 {
 }

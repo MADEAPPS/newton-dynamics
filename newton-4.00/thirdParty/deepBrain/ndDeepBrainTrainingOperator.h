@@ -40,7 +40,6 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 
 	protected:
 	ndDeepBrainInstance m_instance;
-	ndFloat32 m_averageError;
 	ndInt32 m_miniBatchSize;
 
 	friend class ndDeepBrainInstance;

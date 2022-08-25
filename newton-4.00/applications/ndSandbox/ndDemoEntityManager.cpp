@@ -244,7 +244,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 	}
 
-	ndDeepBrainTrainerSDG trainer(&brain);
+	ndDeepBrainTrainerSDG trainer(&brain, 0.001f);
 	trainer.Optimize(inputBatch, groundTruth, 2.0e-1f, 5000);
 
 	ndDeepBrainVector input;
@@ -373,9 +373,9 @@ static void MnistTrainingSet()
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
 
-		//ndDeepBrainTrainerSDG trainer(&brain);
-		//ndDeepBrainTrainerParallelSDG trainer(&brain, 4);
-		ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
+		ndDeepBrainTrainerSDG trainer(&brain, 0.001f);
+		//ndDeepBrainTrainerParallelSDG trainer(&brain, 0.001f, 4);
+		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 0.001f, 4);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.SetMiniBatchSize(2000);

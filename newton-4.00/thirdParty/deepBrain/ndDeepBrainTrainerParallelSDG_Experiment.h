@@ -30,7 +30,7 @@ class ndDeepBrainTrainerParallelSDG_Experiment
 	,public ndThreadPool
 {
 	public: 
-	ndDeepBrainTrainerParallelSDG_Experiment(ndDeepBrain* const brain, ndInt32 threads = 1);
+	ndDeepBrainTrainerParallelSDG_Experiment(ndDeepBrain* const brain, ndReal regularizer = 0.0f, ndInt32 threads = 1);
 	~ndDeepBrainTrainerParallelSDG_Experiment();
 
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);

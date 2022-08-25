@@ -24,7 +24,7 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainTrainerSDG.h"
 
-ndDeepBrainTrainerSDG::ndDeepBrainTrainerSDG(ndDeepBrain* const brain)
+ndDeepBrainTrainerSDG::ndDeepBrainTrainerSDG(ndDeepBrain* const brain, ndReal regularizer)
 	:ndDeepBrainTrainingOperator(brain)
 	,m_output()
 	,m_zDerivative()
@@ -32,7 +32,9 @@ ndDeepBrainTrainerSDG::ndDeepBrainTrainerSDG(ndDeepBrain* const brain)
 	,m_weightGradients()
 	,m_weightGradientsPrefixScan()
 	,m_weightsLayersTranspose()
+	,m_regularizer(regularizer)
 {
+	ndAssert(regularizer >= 0.0f);
 	PrefixScan();
 
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
@@ -52,6 +54,7 @@ ndDeepBrainTrainerSDG::ndDeepBrainTrainerSDG(const ndDeepBrainTrainerSDG& src)
 	,m_weightGradients(src.m_weightGradients)
 	,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
 	,m_weightsLayersTranspose()
+	,m_regularizer(src.m_regularizer)
 {
 	for (ndInt32 i = 0; i < src.m_weightsLayersTranspose.GetCount(); i++)
 	{
@@ -149,7 +152,6 @@ void ndDeepBrainTrainerSDG::BackPropagateCalculateBiasGradient(ndInt32 layerInde
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	ndDeepBrainLayer* const layer = layers[layerIndex + 1];
-	//const ndDeepBrainVector& instance_z = m_instance.GetOutPut();
 	const ndDeepBrainPrefixScan& preFixScan = m_instance.GetPrefixScan();
 
 	const ndDeepBrainMemVector biasGradients1(&m_biasGradients[preFixScan[layerIndex + 2]], layer->GetOuputSize());
@@ -261,41 +263,41 @@ void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const 
 		randomizeVector[i] = i;
 	}
 
-	ndInt32 m_movingAverageIndex = 0;
-	ndFloat32 m_movingAverageError = 0.0f;
+	ndInt32 movingAverageIndex = 0;
+	ndFloat32 movingAverageError = 0.0f;
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : inputBatch.GetCount() - batchStart;
 
-		m_averageError = 0.0f;
+		ndReal averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{
 			ndInt32 k = randomizeVector[batchStart + j];
 			const ndDeepBrainVector& input = inputBatch[k];
 			const ndDeepBrainVector& truth = groundTruth[k];
-			m_averageError += TrainingStep(learnRate, input, truth);
+			averageError += TrainingStep(learnRate, input, truth);
 		}
 		ApplyWeightTranspose();
 
-		m_movingAverageIndex += batchSize;
-		m_movingAverageError += m_averageError;
+		movingAverageIndex += batchSize;
+		movingAverageError += averageError;
 
-		m_averageError = ndSqrt(m_averageError / batchSize);
-		ndExpandTraceMessage("%f %d\n", m_averageError, i);
+		averageError = ndSqrt(averageError / batchSize);
+		ndExpandTraceMessage("%f %d\n", averageError, i);
 
 		index = (index + 1) % batchCount;
 		if (index == 0)
 		{
 			randomizeVector.RandomShuffle();
-			m_movingAverageError = ndSqrt(m_movingAverageError / m_movingAverageIndex);
-			if (m_movingAverageError < bestCost)
+			movingAverageError = ndSqrt(movingAverageError / movingAverageIndex);
+			if (movingAverageError < bestCost)
 			{
-				bestCost = m_movingAverageError;
+				bestCost = movingAverageError;
 				bestNetwork.CopyFrom(*m_instance.GetBrain());
 			}
-			m_movingAverageIndex = 0;
-			m_movingAverageError = 0.0f;
+			movingAverageIndex = 0;
+			movingAverageError = 0.0f;
 		}
 	}
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
