@@ -38,19 +38,22 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	virtual ndDeepBrainLayer* Clone() const;
 	
 	ndDeepBrainVector& GetBias();
+	const ndDeepBrainVector& GetBias() const;
+
 	virtual ndInt32 GetOuputSize() const;
 	virtual ndInt32 GetInputSize() const;
 	virtual void InitGaussianWeights(ndReal mean, ndReal variance);
 	virtual void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+	virtual void MakePrediction(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	virtual void CopyFrom(const ndDeepBrainLayer& src);
 	virtual bool Compare(const ndDeepBrainLayer& src) const;
 	virtual void Save(nd::TiXmlElement* const layerNode) const;
 
-	protected:
 	void ApplyActivation(ndDeepBrainVector& output) const;
 	void ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& outputDerivative) const;
 
+	protected:
 	void ReluActivation(ndDeepBrainVector& output) const;
 	void SigmoidActivation(ndDeepBrainVector& output) const;
 	void SoftmaxActivation(ndDeepBrainVector& output) const;
@@ -60,14 +63,8 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	void HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 	void ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 
-	virtual void MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output);
-
 	ndDeepBrainVector m_bias;
 	ndDeepBrainActivationType m_activation;
-	friend class ndDeepBrainInstance;
-	friend class ndDeepBrainTrainingOperator;
-	friend class ndDeepBrainGradientDescendTrainingOperator;
-	friend class ndDeepBrainParallelGradientDescendTrainingOperator;
 };
 
 inline ndInt32 ndDeepBrainLayer::GetOuputSize() const
@@ -82,6 +79,11 @@ inline ndInt32 ndDeepBrainLayer::GetInputSize() const
 }
 
 inline ndDeepBrainVector& ndDeepBrainLayer::GetBias()
+{
+	return m_bias;
+}
+
+inline const ndDeepBrainVector& ndDeepBrainLayer::GetBias() const
 {
 	return m_bias;
 }

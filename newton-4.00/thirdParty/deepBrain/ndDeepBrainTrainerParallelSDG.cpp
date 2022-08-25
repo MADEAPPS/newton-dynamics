@@ -22,16 +22,16 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainParallelGradientDescendTrainingOperator.h"
+#include "ndDeepBrainTrainerParallelSDG.h"
 
-ndDeepBrainParallelGradientDescendTrainingOperator::LocalData::LocalData(const ndDeepBrainGradientDescendTrainingOperator& src)
+ndDeepBrainTrainerParallelSDG::LocalData::LocalData(const ndDeepBrainTrainerSDG& src)
 	:ndDeepBrain(*src.GetBrain())
-	,ndDeepBrainGradientDescendTrainingOperator(((ndDeepBrain*)this))
+	,ndDeepBrainTrainerSDG(((ndDeepBrain*)this))
 	,m_averageError(0.0f)
 {
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::LocalData::CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src)
+void ndDeepBrainTrainerParallelSDG::LocalData::CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src)
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 i = layers.GetCount() - 1; i >= 1; --i)
@@ -41,8 +41,8 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::LocalData::CopyTranspos
 	}
 }
 
-ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads)
-	:ndDeepBrainGradientDescendTrainingOperator(brain)
+ndDeepBrainTrainerParallelSDG::ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndInt32 threads)
+	:ndDeepBrainTrainerSDG(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)
@@ -58,7 +58,7 @@ ndDeepBrainParallelGradientDescendTrainingOperator::ndDeepBrainParallelGradientD
 	}
 }
 
-ndDeepBrainParallelGradientDescendTrainingOperator::~ndDeepBrainParallelGradientDescendTrainingOperator()
+ndDeepBrainTrainerParallelSDG::~ndDeepBrainTrainerParallelSDG()
 {
 	Finish();
 	for (ndInt32 i = 0; i < GetThreadCount(); i++)
@@ -67,24 +67,24 @@ ndDeepBrainParallelGradientDescendTrainingOperator::~ndDeepBrainParallelGradient
 	}
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::ThreadFunction()
+void ndDeepBrainTrainerParallelSDG::ThreadFunction()
 {
 	Begin();
 	Optimize();
 	End();
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndDeepBrainTrainerParallelSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
+	m_steps = steps;
+	m_learnRate = learnRate;
 	m_inputBatch = &inputBatch;
 	m_groundTruth = &groundTruth;
-	m_learnRate = learnRate;
-	m_steps = steps;
 	TickOne();
 	Sync();
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
+void ndDeepBrainTrainerParallelSDG::AverageWeights()
 {
 	const ndInt32 threads = m_threadData.GetCount();
 	const ndReal weightFactor = 1.0f / threads;
@@ -93,20 +93,21 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
 	for (ndInt32 j = layers.GetCount() - 1; j >= 0; --j)
 	{
 		ndDeepBrainLayer& layer = *layers[j];
+		ndDeepBrainVector& bias = layer.GetBias();
 
 		layer.Set(0);
-		layer.m_bias.Set(0.0f);
+		bias.Set(0.0f);
 		for (ndInt32 i = 0; i < threads; ++i)
 		{
 			const ndDeepBrainLayer& srcLayer = *(*m_threadData[i]->GetBrain())[j];
-			layer.m_bias.Add(layer.m_bias, srcLayer.m_bias);
+			bias.Add(bias, srcLayer.GetBias());
 			for (ndInt32 k = 0; k < layer.GetOuputSize(); k++)
 			{
 				layer[k].Add(layer[k], srcLayer[k]);
 			}
 		}
 		
-		layer.m_bias.ScaleSet(layer.m_bias, weightFactor);
+		layer.GetBias().ScaleSet(layer.GetBias(), weightFactor);
 		for (ndInt32 k = 0; k < layer.GetOuputSize(); k++)
 		{
 			layer[k].ScaleSet(layer[k], weightFactor);
@@ -114,11 +115,8 @@ void ndDeepBrainParallelGradientDescendTrainingOperator::AverageWeights()
 	}
 }
 
-void ndDeepBrainParallelGradientDescendTrainingOperator::Optimize()
+void ndDeepBrainTrainerParallelSDG::Optimize()
 {
-#if 1
-ndDeepBrainGradientDescendTrainingOperator::Optimize(*m_inputBatch, *m_groundTruth, m_learnRate, m_steps);
-#else
 	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
 	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
 
@@ -198,5 +196,4 @@ ndDeepBrainGradientDescendTrainingOperator::Optimize(*m_inputBatch, *m_groundTru
 	}
 
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
-#endif
 }

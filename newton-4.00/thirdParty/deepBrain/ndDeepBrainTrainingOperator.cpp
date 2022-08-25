@@ -56,7 +56,7 @@ ndFloat32 ndDeepBrainTrainingOperator::CalculateMeanSquareError(const ndDeepBrai
 
 	ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
 	const ndInt32 outputCount = ouputLayer->GetOuputSize();
-	const ndDeepBrainMemVector z(&m_instance.m_z[m_instance.m_zPrefixScan[layerIndex + 1]], outputCount);
+	const ndDeepBrainMemVector z(&m_instance.GetOutPut()[m_instance.GetPrefixScan()[layerIndex + 1]], outputCount);
 
 	ndFloat32 error2 = 0;
 	for (ndInt32 i = 0; i < outputCount; i++)

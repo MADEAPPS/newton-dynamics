@@ -19,18 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_GRADIENT_DESCEND_TRAINING_OPERATOR_H__
-#define _ND_DEEP_BRAIN_GRADIENT_DESCEND_TRAINING_OPERATOR_H__
+#ifndef _ND_DEEP_BRAIN_TRAINER_SGD_H__
+#define _ND_DEEP_BRAIN_TRAINER_SGD_H__
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainTrainingOperator.h"
 
-class ndDeepBrainGradientDescendTrainingOperator: public ndDeepBrainTrainingOperator
+class ndDeepBrainTrainerSDG: public ndDeepBrainTrainingOperator
 {
 	public: 
-	ndDeepBrainGradientDescendTrainingOperator(ndDeepBrain* const brain);
-	ndDeepBrainGradientDescendTrainingOperator(const ndDeepBrainGradientDescendTrainingOperator& src);
-	virtual ~ndDeepBrainGradientDescendTrainingOperator();
+	ndDeepBrainTrainerSDG(ndDeepBrain* const brain);
+	ndDeepBrainTrainerSDG(const ndDeepBrainTrainerSDG& src);
+	virtual ~ndDeepBrainTrainerSDG();
 
 	virtual void UpdateWeights(ndReal learnRate);
 	virtual void MakePrediction(const ndDeepBrainVector& input);

@@ -336,7 +336,7 @@ void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrai
 	ApplyActivation(output);
 }
 
-void ndDeepBrainLayer::MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndDeepBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
 	auto MakePrediction = ndMakeObject::ndFunction([this, &input, &output](ndInt32 threadIndex, ndInt32 threadCount)
 	{

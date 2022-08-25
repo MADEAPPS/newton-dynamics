@@ -94,7 +94,7 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input, ndDeepB
 	output.Set(out);
 }
 
-void ndDeepBrainInstance::MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndDeepBrainInstance::MakePrediction(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
 	ndAssert(layers.GetCount());
@@ -107,7 +107,7 @@ void ndDeepBrainInstance::MakePredictionParallel(ndThreadPool& threadPool, const
 		ndDeepBrainLayer* const layer = layers[i];
 		const ndDeepBrainMemVector in(&m_z[m_zPrefixScan[i + 0]], layer->GetInputSize());
 		ndDeepBrainMemVector out(&m_z[m_zPrefixScan[i + 1]], layer->GetOuputSize());
-		layer->MakePredictionParallel(threadPool, in, out);
+		layer->MakePrediction(threadPool, in, out);
 	}
 
 	output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());

@@ -39,20 +39,20 @@ class ndDeepBrainInstance: public ndClassAlloc
 	void CalculatePrefixScan();
 	ndDeepBrain* GetBrain() const;
 	ndDeepBrainVector& GetOutPut();
+	const ndDeepBrainVector& GetOutPut() const;
 	const ndDeepBrainPrefixScan& GetPrefixScan() const;
 
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
+	void MakePrediction(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output);
 
 	protected:
-	void MakePredictionParallel(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output);
-
 	ndDeepBrainVector m_z;
 	ndDeepBrainPrefixScan m_zPrefixScan;
 	ndDeepBrain* m_brain;
 
-	friend class ndDeepBrainTrainingOperator;
-	friend class ndDeepBrainGradientDescendTrainingOperator;
-	friend class ndDeepBrainParallelGradientDescendTrainingOperator;
+	//friend class ndDeepBrainTrainingOperator;
+	//friend class ndDeepBrainGradientDescendTrainingOperator;
+	//friend class ndDeepBrainParallelGradientDescendTrainingOperatorOld;
 };
 
 inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const
@@ -61,6 +61,11 @@ inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const
 }
 
 inline ndDeepBrainVector& ndDeepBrainInstance::GetOutPut()
+{
+	return m_z;
+}
+
+inline const ndDeepBrainVector& ndDeepBrainInstance::GetOutPut() const
 {
 	return m_z;
 }

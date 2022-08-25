@@ -19,28 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_STOCHASTIC_GRADIENT_DESCEND_TRAINING_OPERATOR_H__
-#define _ND_DEEP_BRAIN_STOCHASTIC_GRADIENT_DESCEND_TRAINING_OPERATOR_H__
+#ifndef _ND_DEEP_BRAIN_TRAINER_PARALLEL_SGD_H__
+#define _ND_DEEP_BRAIN_TRAINER_PARALLEL_SGD_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainGradientDescendTrainingOperator.h"
+#include "ndDeepBrainTrainerSDG.h"
 
-class ndDeepBrainParallelGradientDescendTrainingOperator
-	:public ndDeepBrainGradientDescendTrainingOperator
+class ndDeepBrainTrainerParallelSDG
+	:public ndDeepBrainTrainerSDG
 	,public ndThreadPool
 {
 	public: 
-	class LocalData: public ndDeepBrain, public ndDeepBrainGradientDescendTrainingOperator
+	class LocalData: public ndDeepBrain, public ndDeepBrainTrainerSDG
 	{
 		public:
-		LocalData(const ndDeepBrainGradientDescendTrainingOperator& src);
+		LocalData(const ndDeepBrainTrainerSDG& src);
 		ndReal m_averageError;
 
 		void CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src);
 	};
 
-	ndDeepBrainParallelGradientDescendTrainingOperator(ndDeepBrain* const brain, ndInt32 threads = 1);
-	~ndDeepBrainParallelGradientDescendTrainingOperator();
+	ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndInt32 threads = 1);
+	~ndDeepBrainTrainerParallelSDG();
 
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
