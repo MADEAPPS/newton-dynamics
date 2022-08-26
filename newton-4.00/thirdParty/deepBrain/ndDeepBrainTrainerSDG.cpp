@@ -205,10 +205,12 @@ void ndDeepBrainTrainerSDG::UpdateWeights(ndReal learnRate)
 		ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
 
 		ndDeepBrainMatrix& weightMatrix = *layer;
+		ndReal regularizer = GetRegularizer();
 		for (ndInt32 j = 0; j < outputSize; ++j)
 		{
 			ndDeepBrainVector& weightVector = weightMatrix[j];
 			const ndDeepBrainMemVector weightGradients(weightGradientPtr, inputSize);
+			weightVector.ScaleAdd(weightVector, -regularizer);
 			weightVector.ScaleAdd(weightGradients, -learnRate);
 			weightGradientPtr += weightGradientStride;
 		}
@@ -248,6 +250,7 @@ ndReal ndDeepBrainTrainerSDG::TrainingStep(ndReal learnRate, const ndDeepBrainVe
 
 void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
+	ndFloatExceptions exception;
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 

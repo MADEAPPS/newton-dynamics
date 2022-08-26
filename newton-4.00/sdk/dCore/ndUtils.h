@@ -195,8 +195,8 @@ class ndFloatExceptions
 		#define D_FLOAT_EXECTIONS_MASK	0
 	#endif
 
-	ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
-	~ndFloatExceptions();
+	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
+	D_CORE_API ~ndFloatExceptions();
 
 	private:
 	#if (defined(WIN32) || defined(_WIN32))
@@ -208,8 +208,8 @@ class ndFloatExceptions
 class ndSetPrecisionDouble 
 {
 	public:
-	ndSetPrecisionDouble();
-	~ndSetPrecisionDouble();
+	D_CORE_API ndSetPrecisionDouble();
+	D_CORE_API ~ndSetPrecisionDouble();
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	ndInt32 m_mask; 
 	#endif

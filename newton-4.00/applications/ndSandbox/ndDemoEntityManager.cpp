@@ -244,7 +244,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 	}
 
-	ndDeepBrainTrainerSDG trainer(&brain, 0.001f);
+	ndDeepBrainTrainerSDG trainer(&brain, 1.0e-6f);
 	trainer.Optimize(inputBatch, groundTruth, 2.0e-1f, 5000);
 
 	ndDeepBrainVector input;
@@ -356,26 +356,20 @@ static void MnistTrainingSet()
 		ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
 		ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
 		ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
-		ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
-
-		//ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_sigmoid);
-		//ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_sigmoid);
-		//ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_sigmoid);
-		//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_sigmoid);
-
-		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer2->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
+		//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
+		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
 
 		brain.BeginAddLayer();
 		brain.AddLayer(inputLayer);
 		brain.AddLayer(hiddenLayer0);
 		brain.AddLayer(hiddenLayer1);
-		brain.AddLayer(hiddenLayer2);
+		//brain.AddLayer(hiddenLayer2);
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
 
-		ndDeepBrainTrainerSDG trainer(&brain, 0.001f);
-		//ndDeepBrainTrainerParallelSDG trainer(&brain, 0.001f, 4);
-		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 0.001f, 4);
+		//ndDeepBrainTrainerSDG trainer(&brain, 1.0e-6f);
+		ndDeepBrainTrainerParallelSDG trainer(&brain, 1.0e-6f, 4);
+		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 1.0e-6f, 4);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.SetMiniBatchSize(2000);
@@ -423,9 +417,9 @@ static void MnistTrainingSet()
 			}
 		}
 		ndExpandTraceMessage("optimizing Time %f (sec)\n", ndFloat64(time) / 1000000.0f);
-		ndExpandTraceMessage("training num_right: %d\n", trainingDigits->GetCount() - failCount);
-		ndExpandTraceMessage("training num_wrong: %d\n", failCount);
-		ndExpandTraceMessage("success rate on training data %f%%\n",  (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
+		ndExpandTraceMessage("training num_right: %d  out of %d\n", trainingDigits->GetCount() - failCount, trainingDigits->GetCount());
+		ndExpandTraceMessage("training num_wrong: %d  out of %d\n", failCount, trainingDigits->GetCount());
+		ndExpandTraceMessage("success rate on training data %f%%\n", (trainingDigits->GetCount() - failCount) * 100.0f / trainingDigits->GetCount());
 	}
 
 	if (trainingLabels)
@@ -574,9 +568,9 @@ static void MnistTestSet(const char* const annName)
 		}
 		time = ndGetTimeInMicroseconds() - time;
 		ndExpandTraceMessage("testing Time %f (sec)\n", ndFloat64(time) / 1000000.0f);
-		ndExpandTraceMessage("test num_right: %d\n", testDigits->GetCount() - failCount);
-		ndExpandTraceMessage("test num_wrong: %d\n", failCount);
-		ndExpandTraceMessage("success rate on training data %f%%\n", (testDigits->GetCount() - failCount) * 100.0f / testDigits->GetCount());
+		ndExpandTraceMessage("testing num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
+		ndExpandTraceMessage("testing num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
+		ndExpandTraceMessage("success rate on test data %f%%\n", (testDigits->GetCount() - failCount) * 100.0f / testDigits->GetCount());
 	}
 
 	if (testLabels)
@@ -594,7 +588,7 @@ void Test2__()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
-	//MnistTestSet("mnistDatabase/mnist.nn");
+	MnistTestSet("mnistDatabase/mnist.nn");
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -2117,6 +2111,7 @@ void ndDemoEntityManager::TestImGui()
 void ndDemoEntityManager::Run()
 {
 	// Main loop
+	ndFloatExceptions exception;
 	while (!glfwWindowShouldClose(m_mainFrame))
 	{
 		if (m_profilerMode)
