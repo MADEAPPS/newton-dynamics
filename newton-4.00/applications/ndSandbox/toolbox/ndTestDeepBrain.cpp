@@ -164,7 +164,6 @@ static void ValidateData(const char* const title, ndDeepBrain& brain, ndDeepBrai
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndInt32 failCount = 0;
-	ndUnsigned64 time = ndGetTimeInMicroseconds();
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
 		const ndDeepBrainVector& input = (*testDigits)[i];
@@ -188,12 +187,10 @@ static void ValidateData(const char* const title, ndDeepBrain& brain, ndDeepBrai
 			failCount++;
 		}
 	}
-	time = ndGetTimeInMicroseconds() - time;
 	ndExpandTraceMessage("%s\n", title);
-	ndExpandTraceMessage("testing Time %f (sec)\n", ndFloat64(time) / 1000000.0f);
-	ndExpandTraceMessage("testing num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
-	ndExpandTraceMessage("testing num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	ndExpandTraceMessage("success rate on test data %f%%\n", (testDigits->GetCount() - failCount) * 100.0f / testDigits->GetCount());
+	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
+	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
+	ndExpandTraceMessage("success rate %f%%\n", (testDigits->GetCount() - failCount) * 100.0f / testDigits->GetCount());
 }
 
 static void MnistTrainingSet()
@@ -227,16 +224,17 @@ static void MnistTrainingSet()
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.SetMiniBatchSize(2000);
-		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
+		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 5000);
 
-		trainer.SetMiniBatchSize(10000);
-		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
+		trainer.SetMiniBatchSize(20000);
+		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 1000);
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
 		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
 		brain.Save(path);
-		ValidateData("training data", brain, trainingLabels, trainingLabels);
+		ValidateData("training data", brain, trainingLabels, trainingDigits);
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 
 	if (trainingLabels)
@@ -261,7 +259,10 @@ static void MnistTestSet()
 		ndDeepBrain brain;
 		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
 		brain.Load(path);
+		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ValidateData("test data", brain, testLabels, testDigits);
+		time = ndGetTimeInMicroseconds() - time;
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 
 	if (testLabels)
