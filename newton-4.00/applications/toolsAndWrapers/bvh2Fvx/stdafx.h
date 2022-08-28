@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include <float.h>
+#include <map>
 #include <list>
 #include <vector>
 #include <fbxsdk.h>
