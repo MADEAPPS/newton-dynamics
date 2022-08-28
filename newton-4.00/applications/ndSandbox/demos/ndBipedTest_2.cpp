@@ -448,140 +448,18 @@ class ndAiBipedTest_2 : public ndModel
 	{
 		ndModel::PostTransformUpdate(world, timestep);
 	}
-
-
-	static ndDemoEntity* LoadBvhSkeleton(const char* const name)
-	{
-		char outPathName[1024];
-		dGetWorkingFileName(name, outPathName);
-		FILE* const fp = fopen(outPathName, "rt");
-		ndDemoEntity* ent = nullptr;
-
-		char token[256];
-		auto ReadToken = [fp, &token]()
-		{
-			fscanf(fp, "%s", token);
-		};
-
-		auto ReadFloat = [fp]()
-		{
-			ndReal value;
-			fscanf(fp, "%f", &value);
-			return value;
-		};
-
-		auto ReadInt = [fp]()
-		{
-			ndInt32 value;
-			fscanf(fp, "%d", &value);
-			return value;
-		};
-
-		ndInt32 stack = 0;
-		ndDemoEntity* stackPool[32];
-
-		ndFixSizeArray<ndDemoEntity*, 256> entityList;
-
-		ndFloat32 scale = 0.1f;
-		if (fp)
-		{
-			ReadToken();
-			if (!strcmp(token, "HIERARCHY"))
-			{
-				while (!feof(fp))
-				{
-					ReadToken();
-					if (!strcmp(token, "ROOT"))
-					{
-						ent = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-						entityList.PushBack(ent);
-						ReadToken();
-						ent->SetName(token);
-						stackPool[stack] = ent;
-						stack = 1;
-						ReadToken();
-					}
-					else if (!strcmp(token, "JOINT"))
-					{
-						ndDemoEntity* const child = new ndDemoEntity(ndGetIdentityMatrix(), stackPool[stack-1]);
-						entityList.PushBack(child);
-						ReadToken();
-						child->SetName(token);
-						stackPool[stack] = child;
-						stack++;
-						ReadToken();
-					}
-					else if (!strcmp(token, "End"))
-					{
-						ndDemoEntity* const child = new ndDemoEntity(ndGetIdentityMatrix(), stackPool[stack - 1]);
-						entityList.PushBack(child);
-						ReadToken();
-						child->SetName("end");
-						stackPool[stack] = child;
-						stack++;
-						ReadToken();
-					}
-					else if (!strcmp(token, "OFFSET"))
-					{
-						ndDemoEntity* const node = stackPool[stack - 1];
-						ndMatrix matrix(ndGetIdentityMatrix());
-						matrix.m_posit.m_x = ReadFloat() * scale;
-						matrix.m_posit.m_y = ReadFloat() * scale;
-						matrix.m_posit.m_z = ReadFloat() * scale;
-						node->ResetMatrix(matrix);
-
-						if (!strcmp(node->GetName().GetStr(), "ltibia"))
-						{
-							break;
-						}
-					}
-					else if (!strcmp(token, "CHANNELS"))
-					{
-						ndInt32 skips = ReadInt();
-						for (ndInt32 i = 0; i < skips; ++i)
-						{
-							ReadToken();
-						}
-					}
-					else if (!strcmp(token, "}"))
-					{
-						stack--;
-					}
-					else if (!strcmp(token, "MOTION"))
-					{
-						break;
-					}
-				}
-			}
-
-			fclose(fp);
-		}
-
-		ndMatrix rotation(ndYawMatrix(90.0f * ndDegreeToRad));
-		ndMatrix invRotation(rotation.Inverse());
-		for (ndInt32 i = 0; i < entityList.GetCount(); ++i)
-		{
-			ndDemoEntity* const child = entityList[i];
-			ndMatrix matrix(invRotation * child->GetRenderMatrix() * rotation);
-			child->ResetMatrix(matrix);
-		}
-
-		return ent;
-	}
 	
-
 	static void BuildMannequin(ndDemoEntityManager* const scene, const ndVector& origin)
 	{
 		ndMatrix matrix(ndGetIdentityMatrix());
 		matrix.m_posit = origin;
 		matrix.m_posit.m_w = 1.0f;
 
-		matrix.m_posit.m_y = 0.5f;
-		ndDemoEntity* const robotMesh = LoadBvhSkeleton("walker.bvh");
+		ndDemoEntity* const robotMesh = scene->LoadFbxMesh("walker.fbx");
 		scene->AddEntity(robotMesh);
 
 		ndMatrix entMatrix(robotMesh->GetRenderMatrix());
-		entMatrix.m_posit.m_y += 1.7f;
+		entMatrix.m_posit.m_y += 1.0f;
 		robotMesh->ResetMatrix(entMatrix);
 		
 		//ndWorld* const world = scene->GetWorld();

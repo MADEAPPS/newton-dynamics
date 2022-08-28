@@ -107,10 +107,6 @@ class ndMatrix
 	ndVector m_up;
 	ndVector m_right;
 	ndVector m_posit;
-
-	//private:
-	//static ndMatrix m_zeroMatrix;
-	//static ndMatrix m_identityMatrix;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndMatrix::ndMatrix ()

@@ -227,7 +227,7 @@ static void MnistTrainingSet()
 		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 5000);
 
 		trainer.SetMiniBatchSize(20000);
-		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 1000);
+		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];

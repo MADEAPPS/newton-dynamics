@@ -427,7 +427,7 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 		ndVector p1(parentMatrix.m_posit);
 		ndVector color(0.0f, 0.0f, 0.0f, 1.0f);
 		debug.DrawLine(p0, p1, color, 1.0);
-		debug.SetScale(0.25f);
+		debug.SetScale(0.125f);
 		debug.DrawFrame(nodeMatrix);
 	}
 }

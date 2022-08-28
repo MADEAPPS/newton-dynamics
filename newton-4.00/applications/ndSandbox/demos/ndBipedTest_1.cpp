@@ -456,7 +456,7 @@ class ndAiBipedTest_1 : public ndModel
 		matrix.m_posit.m_w = 1.0f;
 
 		matrix.m_posit.m_y = 0.5f;
-		fbxDemoEntity* const robotMesh = scene->LoadFbxMesh("mannequin.fbx");
+		ndDemoEntity* const robotMesh = scene->LoadFbxMesh("mannequin.fbx");
 
 		ndMatrix entMatrix(ndYawMatrix(-90.0f * ndDegreeToRad) * robotMesh->GetRenderMatrix());
 		robotMesh->ResetMatrix(entMatrix);
