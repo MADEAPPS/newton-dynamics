@@ -628,7 +628,7 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMat
 	//ndFloat32 height = 1.9f;
 	//ndFloat32 radio = 0.5f;
 	//ndFloat32 mass = 100.0f;
-	//ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	//ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
 	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	//delete entity;
 }

@@ -61,8 +61,8 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	PlayerInputs m_playerInput;
 	bool m_isPlayer;
 
-	ndAnimationPose m_output;
-	ndAnimationBlendTreeNode* m_animBlendTree;
+	//ndAnimationPose m_output;
+	//ndAnimationBlendTreeNode* m_animBlendTree;
 };
 
 #endif

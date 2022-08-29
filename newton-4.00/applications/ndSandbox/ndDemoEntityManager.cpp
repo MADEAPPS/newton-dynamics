@@ -44,7 +44,7 @@
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
-//#define DEFAULT_SCENE	7		// basic player
+#define DEFAULT_SCENE	7		// basic player
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
@@ -55,7 +55,7 @@
 //#define DEFAULT_SCENE	15		// simple industrial robot
 //#define DEFAULT_SCENE	16		// advanced industrial robot
 //#define DEFAULT_SCENE	17		// biped test 1
-#define DEFAULT_SCENE	18		// biped test 2
+//#define DEFAULT_SCENE	18		// biped test 2
 //#define DEFAULT_SCENE	19		// active rag doll
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2

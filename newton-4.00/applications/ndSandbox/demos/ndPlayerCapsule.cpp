@@ -26,8 +26,8 @@
 void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildPlayArena(scene);
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	//BuildPlayArena(scene);
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 
 	ndMatrix location(ndGetIdentityMatrix());
@@ -41,15 +41,14 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 height = 1.9f;
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
-	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
+	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	
 	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-
+	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 
 	class PlaceMatrix : public ndMatrix
 	{

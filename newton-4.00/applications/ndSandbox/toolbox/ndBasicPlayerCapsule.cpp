@@ -37,18 +37,25 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBasicPlayerCapsule)
 class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 {
 	public:
-	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, const ndVector& meshOrigin)
 		:ndDemoEntityNotify(manager, entity)
+		,m_localRotation(entity->GetRenderMatrix())
+		,m_meshOrigin(meshOrigin)
 	{
+		m_meshOrigin.m_w = 1.0f;
 	}
 
-	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
+	void OnTransform(ndInt32, const ndMatrix& matrix)
 	{
-		ndDemoEntityNotify::OnTransform(thread, matrix);
+		//ndDemoEntityNotify::OnTransform(thread, matrix);
+		const ndBody* const body = GetBody();
+		const ndQuaternion rot(body->GetRotation());
+		m_entity->SetMatrix(m_localRotation * rot, matrix.TransformVector(m_meshOrigin));
 		//ndWorld* const word = m_manager->GetWorld();
 		//ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
-		ndAssert(0);
+		//ndAssert(0);
+		ndTrace(("Play animation here!!!!\n"));
 		//ndFloat32 timestep = word->GetScene()->GetTimestep();
 		//timestep *= 0.25f;
 		//timestep = 1.0f/(30.0f * 4.0f);
@@ -62,6 +69,9 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		//	entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		//}
 	}
+
+	ndQuaternion m_localRotation;
+	ndQuaternion m_meshOrigin;
 };
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
@@ -71,8 +81,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_scene(scene)
 	,m_isPlayer(isPlayer)
-	,m_output()
-	,m_animBlendTree(nullptr)
+	//,m_output()
+	//,m_animBlendTree(nullptr)
 {
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -80,62 +90,66 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	matrix.m_posit.m_y = floor.m_y;
 	
 	ndDemoEntity* const entity = (ndDemoEntity*)modelEntity->CreateClone();
-	entity->ResetMatrix(matrix);
+	entity->ResetMatrix(entity->GetRenderMatrix() * matrix);
 
 	SetMatrix(matrix);
 	world->AddBody(this);
 	scene->AddEntity(entity);
-	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));
+
+	ndVector meshOrigin(matrix.RotateVector(ndVector(0.0f, height * 0.5f, 0.0f, 1.0f)));
+	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity, meshOrigin));
 
 	if (isPlayer)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
-	// create bind pose to animation sequences.
-	ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
-	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
-	{
-		ndAnimationKeyFramesTrack& track = node->GetInfo();
-		ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
-		ndAnimKeyframe keyFrame;
-		keyFrame.m_userData = ent;
-		m_output.PushBack(keyFrame);
-	}
+	ndTrace(("Not animation yet  !!!!\n"));
 
-	// create an animation blend tree
-	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
-	ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
-
-	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
-	ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
-	
-	////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
-	//ndFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
-	ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
-	ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
-	
-	walkRunBlend->SetParam(0.0f);
-	//idleMoveBlend->SetParam(0.0f);
-	idleMoveBlend->SetParam(1.0f);
-	//walkRunBlend->SetTimeDilation1(scale1);
-	m_animBlendTree = idleMoveBlend;
-
-	// evaluate twice that interpolation is reset
-	ndAssert(0);
-	//m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
-	//m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
+	//// create bind pose to animation sequences.
+	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	//const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
+	//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
+	//{
+	//	ndAnimationKeyFramesTrack& track = node->GetInfo();
+	//	ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
+	//	ndAnimKeyframe keyFrame;
+	//	keyFrame.m_userData = ent;
+	//	m_output.PushBack(keyFrame);
+	//}
+	//
+	//// create an animation blend tree
+	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
+	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
+	//
+	//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
+	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
+	//
+	//////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
+	////ndFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
+	//ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
+	//ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
+	//
+	//walkRunBlend->SetParam(0.0f);
+	////idleMoveBlend->SetParam(0.0f);
+	//idleMoveBlend->SetParam(1.0f);
+	////walkRunBlend->SetTimeDilation1(scale1);
+	//m_animBlendTree = idleMoveBlend;
+	//
+	//// evaluate twice that interpolation is reset
+	//ndAssert(0);
+	////m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
+	////m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBodyPlayerCapsule(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_scene(nullptr)
 	,m_isPlayer(false)
-	,m_output()
-	,m_animBlendTree(nullptr)
+	//,m_output()
+	//,m_animBlendTree(nullptr)
 {
 	//ndAssert(0);
 	//for now do not load the player configuration, we can do that is the postprocess pass. 
@@ -158,10 +172,10 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescripto
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 {
-	if (m_animBlendTree)
-	{
-		delete m_animBlendTree;
-	}
+	//if (m_animBlendTree)
+	//{
+	//	delete m_animBlendTree;
+	//}
 }
 
 void ndBasicPlayerCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const

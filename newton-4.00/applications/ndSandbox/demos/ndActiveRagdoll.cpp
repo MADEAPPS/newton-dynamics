@@ -449,7 +449,7 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const
 	ndFloat32 height = 1.9f;
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
-	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
 	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	player->GetNotifyCallback()->SetGravity(ndVector::m_zero);
 	ndMatrix matrix(player->GetMatrix());
@@ -464,7 +464,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
+	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("walker.fbx");
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
