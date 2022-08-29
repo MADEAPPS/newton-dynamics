@@ -17,7 +17,7 @@ class BvhNode
 
 	static BvhNode* LoadSkeleton(const char* const name);
 	private:
-	static BvhNode* LoadBvhSkeleton(const char* const name);
-	static BvhNode* LoadAsfSkeleton(const char* const name);
+	static BvhNode* ImportBvhSkeleton(const char* const name);
+	static BvhNode* ImportAsfSkeleton(const char* const name);
 };
 

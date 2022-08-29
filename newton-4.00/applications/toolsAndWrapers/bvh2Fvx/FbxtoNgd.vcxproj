@@ -165,12 +165,16 @@
     <ClInclude Include="bvhMatrix.h" />
     <ClInclude Include="BvhNode.h" />
     <ClInclude Include="bvhVector.h" />
+    <ClInclude Include="ExportFbx.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bvh2fbx.cpp" />
     <ClCompile Include="BvhNode.cpp" />
+    <ClCompile Include="ExportFbx.cpp" />
+    <ClCompile Include="ImportAsf.cpp" />
+    <ClCompile Include="ImportBvh.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
