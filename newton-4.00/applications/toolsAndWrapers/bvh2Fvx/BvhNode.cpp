@@ -293,7 +293,7 @@ BvhNode* BvhNode::LoadAsfSkeleton(const char* const name)
 				BvhNode* const parent = map[token];
 				for (;1;)
 				{
-					char ch = getc(fp);
+					int ch = getc(fp);
 					if (ch == '\n')
 					{
 						break;
