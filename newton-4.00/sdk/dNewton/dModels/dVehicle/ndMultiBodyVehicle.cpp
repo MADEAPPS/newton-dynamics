@@ -776,7 +776,10 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 
 	ndVector weight(m_chassis->GetForce());
 	ndFloat32 scale = ndSqrt(weight.DotProduct(weight).GetScalar());
-	weight = weight.Normalize().Scale(-2.0f);
+	if (scale > 1.0e-1f)
+	{
+		weight = weight.Normalize().Scale(-2.0f);
+	}
 
 	// draw vehicle weight;
 	ndVector forceColor(ndFloat32 (0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.0f));
