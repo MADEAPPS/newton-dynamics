@@ -55,18 +55,18 @@ class ndAiBipedTest_2_Definition
 
 static ndAiBipedTest_2_Definition mannequinDefinition[] =
 {
-	{ "pelvis", ndAiBipedTest_2_Definition::m_root, {}, {} },
+	{ "root", ndAiBipedTest_2_Definition::m_root, {}, {} },
 	//{ "Bip001 Spine1", 1.0f,{ -30.0f, 30.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 	//{ "Bip001 Head", 1.0f,{ -60.0f, 60.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
-	{ "rightLeg", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "rightCalf", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	{ "rightFoot", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "rightCalfEffector", ndAiBipedTest_2_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "rfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rtibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+	{ "rightCalfEffector", ndAiBipedTest_2_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 0.0f } },
 
-	{ "leftLeg", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "leftCalf", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	{ "leftFoot", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "lhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "lfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "ltibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 	{ "leftCalfEffector", ndAiBipedTest_2_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "", ndAiBipedTest_2_Definition::m_root,{ 0.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f } },
@@ -148,7 +148,7 @@ class ndAiBipedTest_2 : public ndModel
 
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 1.03f;
+		matrix.m_posit.m_y = floor.m_y + 1.15f;
 
 		rootEntity->ResetMatrix(matrix);
 
@@ -461,7 +461,7 @@ class ndAiBipedTest_2 : public ndModel
 		ndAiBipedTest_2* const model = new ndAiBipedTest_2(scene, modelMesh, matrix, mannequinDefinition);
 		world->AddModel(model);
 		//scene->Set2DDisplayRenderFunction(ndAiBipedTest_2::ControlPanel, nullptr, model);
-		//world->AddJoint(new ndJointFix6dof(model->m_rootBody->GetMatrix(), model->m_rootBody, world->GetSentinelBody()));
+		world->AddJoint(new ndJointFix6dof(model->m_rootBody->GetMatrix(), model->m_rootBody, world->GetSentinelBody()));
 		
 		delete modelMesh;
 	}
