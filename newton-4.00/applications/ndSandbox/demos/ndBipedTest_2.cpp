@@ -60,12 +60,12 @@ static ndAiBipedTest_2_Definition mannequinDefinition[] =
 	//{ "Bip001 Head", 1.0f,{ -60.0f, 60.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "rhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "rfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 150.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rtibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 	{ "rightCalfEffector", ndAiBipedTest_2_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 0.0f } },
 
 	{ "lhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "lfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "lfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 150.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "ltibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 	{ "leftCalfEffector", ndAiBipedTest_2_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
