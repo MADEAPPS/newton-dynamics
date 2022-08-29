@@ -455,6 +455,7 @@ class ndAiBipedTest_2 : public ndModel
 		matrix.m_posit = origin;
 		matrix.m_posit.m_w = 1.0f;
 
+		//ndDemoEntity* const robotMesh = scene->LoadFbxMesh("box.fbx");
 		ndDemoEntity* const robotMesh = scene->LoadFbxMesh("walker.fbx");
 		scene->AddEntity(robotMesh);
 

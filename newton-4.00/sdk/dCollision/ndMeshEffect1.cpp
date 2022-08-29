@@ -3953,6 +3953,12 @@ void ndMeshEffect::ApplyTransform(const ndMatrix& matrix)
 		m_attrib.m_binormalChannel[i].m_y = n.m_y;
 		m_attrib.m_binormalChannel[i].m_z = n.m_z;
 	}
+
+	ndFloat32 det = matrix.m_right.DotProduct(matrix.m_front.CrossProduct(matrix.m_up)).GetScalar();
+	if (det < 0.0f)
+	{
+		FlipWinding();
+	}
 }
 
 void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
