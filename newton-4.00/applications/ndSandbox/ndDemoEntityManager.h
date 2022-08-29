@@ -268,6 +268,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_showNormalForces;
 	bool m_showCenterOfMass;
 	bool m_showBodyFrame;
+	bool m_showMeshSkeleton;
 	bool m_updateMenuOptions;
 	bool m_showContactPoints;
 	bool m_showJointDebugInfo;

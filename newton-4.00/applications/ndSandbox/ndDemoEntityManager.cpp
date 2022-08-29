@@ -259,6 +259,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showNormalForces(false)
 	,m_showCenterOfMass(false)
 	,m_showBodyFrame(false)
+	,m_showMeshSkeleton(false)
 	,m_updateMenuOptions(true)
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
@@ -925,6 +926,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show broad phase", &m_showScene);
 			ImGui::Checkbox("show concave edge", &m_showConcaveEdge);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
+			ImGui::Checkbox("show mesh skeleton", &m_showMeshSkeleton);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
 			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
 			ImGui::Checkbox("show normal forces", &m_showNormalForces);
@@ -1623,6 +1625,15 @@ void ndDemoEntityManager::RenderScene()
 			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
 			transparentMesh.m_mesh->RenderTransparency(this, transparentMesh.m_matrix);
 			m_tranparentHeap.Pop();
+		}
+	}
+
+	if (m_showMeshSkeleton)
+	{
+		for (ndNode* node = ndList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext())
+		{
+			ndDemoEntity* const entity = node->GetInfo();
+			entity->RenderSkeleton(this, globalMatrix);
 		}
 	}
 

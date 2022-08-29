@@ -432,6 +432,16 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 	}
 }
 
+void ndDemoEntity::RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const
+{
+	ndMatrix nodeMatrix(m_matrix * matrix);
+	RenderBone(scene, nodeMatrix);
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	{
+		child->RenderSkeleton(scene, nodeMatrix);
+	}
+}
+
 void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	ndMatrix nodeMatrix (m_matrix * matrix);
@@ -442,7 +452,7 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 		m_mesh->Render(scene, modelMatrix);
 	}
 
-	RenderBone(scene, nodeMatrix);
+	//RenderBone(scene, nodeMatrix);
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
 	{
 		child->Render(timestep, scene, nodeMatrix);

@@ -135,11 +135,11 @@ class ndAiBipedTest_2 : public ndModel
 		ndParamMapper m_swivel_mapper;
 	};
 
-	ndAiBipedTest_2(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location, ndAiBipedTest_2_Definition* const definition)
+	ndAiBipedTest_2(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndAiBipedTest_2_Definition* const definition)
 		:ndModel()
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)model->CreateClone();
 		scene->AddEntity(rootEntity);
 		ndWorld* const world = scene->GetWorld();
 
@@ -177,7 +177,7 @@ class ndAiBipedTest_2 : public ndModel
 			ndBodyDynamic* parentBody = parentBones[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
-			//dTrace(("name: %s\n", name));
+			ndTrace(("name: %s\n", name));
 			for (ndInt32 i = 0; definition[i].m_boneName[0]; ++i)
 			{
 				if (!strcmp(definition[i].m_boneName, name))
@@ -363,7 +363,7 @@ class ndAiBipedTest_2 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const joint = info.m_effector;
@@ -455,22 +455,15 @@ class ndAiBipedTest_2 : public ndModel
 		matrix.m_posit = origin;
 		matrix.m_posit.m_w = 1.0f;
 
-		//ndDemoEntity* const robotMesh = scene->LoadFbxMesh("box.fbx");
-		ndDemoEntity* const robotMesh = scene->LoadFbxMesh("walker.fbx");
-		scene->AddEntity(robotMesh);
-
-		ndMatrix entMatrix(robotMesh->GetRenderMatrix());
-		entMatrix.m_posit.m_y += 1.0f;
-		robotMesh->ResetMatrix(entMatrix);
+		ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
 		
-		//ndWorld* const world = scene->GetWorld();
-		//ndAiBipedTest_2* const robot = new ndAiBipedTest_2(scene, robotMesh, matrix, mannequinDefinition);
-		//world->AddModel(robot);
-		//scene->Set2DDisplayRenderFunction(ndAiBipedTest_2::ControlPanel, nullptr, robot);
-		//
-		////world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
-		//
-		//delete robotMesh;
+		ndWorld* const world = scene->GetWorld();
+		ndAiBipedTest_2* const model = new ndAiBipedTest_2(scene, modelMesh, matrix, mannequinDefinition);
+		world->AddModel(model);
+		//scene->Set2DDisplayRenderFunction(ndAiBipedTest_2::ControlPanel, nullptr, model);
+		//world->AddJoint(new ndJointFix6dof(model->m_rootBody->GetMatrix(), model->m_rootBody, world->GetSentinelBody()));
+		
+		delete modelMesh;
 	}
 
 	ndBodyDynamic* m_rootBody;

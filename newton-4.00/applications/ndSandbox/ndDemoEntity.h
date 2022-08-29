@@ -94,6 +94,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	ndShapeInstance* CreateCollisionFromChildren() const;
 	ndShapeInstance* CreateCompoundFromMesh(bool lowDetail = false) const;
 
+	void RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	protected:

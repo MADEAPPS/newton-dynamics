@@ -135,11 +135,11 @@ class ndAiBipedTest_1 : public ndModel
 		ndParamMapper m_swivel_mapper;
 	};
 
-	ndAiBipedTest_1(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location, ndAiBipedTest_1_Definition* const definition)
+	ndAiBipedTest_1(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndAiBipedTest_1_Definition* const definition)
 		:ndModel()
 	{
 		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)model->CreateClone();
 		scene->AddEntity(rootEntity);
 		ndWorld* const world = scene->GetWorld();
 
@@ -363,7 +363,7 @@ class ndAiBipedTest_1 : public ndModel
 
 	void Debug(ndConstraintDebugCallback& context) const
 	{
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 		{
 			const ndEffectorInfo& info = m_effectors[i];
 			ndJointBilateralConstraint* const joint = info.m_effector;
@@ -456,19 +456,19 @@ class ndAiBipedTest_1 : public ndModel
 		matrix.m_posit.m_w = 1.0f;
 
 		matrix.m_posit.m_y = 0.5f;
-		ndDemoEntity* const robotMesh = scene->LoadFbxMesh("mannequin.fbx");
+		ndDemoEntity* const modelMesh = scene->LoadFbxMesh("mannequin.fbx");
 
-		ndMatrix entMatrix(ndYawMatrix(-90.0f * ndDegreeToRad) * robotMesh->GetRenderMatrix());
-		robotMesh->ResetMatrix(entMatrix);
+		ndMatrix entMatrix(ndYawMatrix(-90.0f * ndDegreeToRad) * modelMesh->GetRenderMatrix());
+		modelMesh->ResetMatrix(entMatrix);
 
 		ndWorld* const world = scene->GetWorld();
-		ndAiBipedTest_1* const robot = new ndAiBipedTest_1(scene, robotMesh, matrix, mannequinDefinition);
-		world->AddModel(robot);
-		scene->Set2DDisplayRenderFunction(ndAiBipedTest_1::ControlPanel, nullptr, robot);
+		ndAiBipedTest_1* const model = new ndAiBipedTest_1(scene, modelMesh, matrix, mannequinDefinition);
+		world->AddModel(model);
+		scene->Set2DDisplayRenderFunction(ndAiBipedTest_1::ControlPanel, nullptr, model);
 
-		//world->AddJoint(new ndJointFix6dof(robot->m_rootBody->GetMatrix(), robot->m_rootBody, world->GetSentinelBody()));
+		//world->AddJoint(new ndJointFix6dof(model->m_rootBody->GetMatrix(), model->m_rootBody, world->GetSentinelBody()));
 
-		delete robotMesh;
+		delete modelMesh;
 	}
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
