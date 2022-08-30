@@ -27,25 +27,25 @@ exportMeshNode::~exportMeshNode()
 	}
 }
 
-exportMeshNode* exportMeshNode::LoadSkeleton(const char* const name)
-{
-	char filename[256];
-	sprintf(filename, "%s", name);
-	_strlwr(filename);
-
-	exportMeshNode* root = nullptr;
-	const char* const ext = strrchr(filename, '.');
-	if (ext)
-	{
-		if (strcmp(ext, ".bvh") == 0)
-		{
-			root = ImportBvhSkeleton(name);
-		}
-		else if (strcmp(ext, ".asf") == 0)
-		{
-			root = ImportAsfSkeleton(name);
-		}
-	}
-	return root;
-}
+//exportMeshNode* exportMeshNode::LoadSkeleton(const char* const name)
+//{
+//	char filename[256];
+//	sprintf(filename, "%s", name);
+//	_strlwr(filename);
+//
+//	exportMeshNode* root = nullptr;
+//	const char* const ext = strrchr(filename, '.');
+//	if (ext)
+//	{
+//		if (strcmp(ext, ".bvh") == 0)
+//		{
+//			root = ImportBvhSkeleton(name);
+//		}
+//		else if (strcmp(ext, ".asf") == 0)
+//		{
+//			root = ImportAsfSkeleton(name);
+//		}
+//	}
+//	return root;
+//}
 

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "exportMeshNode.h"
 
-exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const name)
+exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const asfName, const char* const amcName)
 {
-	FILE* const fp = fopen(name, "rt");
+	FILE* const fp = fopen(asfName, "rt");
 
 	char token[256];
 	auto ReadToken = [fp, &token]()
@@ -187,5 +187,15 @@ exportMeshNode* exportMeshNode::ImportAsfSkeleton(const char* const name)
 		}
 	}
 
+	if (entity && amcName)
+	{
+		entity->ImportAmcAnimation(amcName);
+	}
+
 	return entity;
+}
+
+void exportMeshNode::ImportAmcAnimation(const char* const amcName)
+{
+
 }

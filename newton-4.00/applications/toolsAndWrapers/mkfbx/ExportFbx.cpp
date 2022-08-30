@@ -116,7 +116,7 @@ bool SaveScene(FbxManager* manager, FbxDocument* scene, const char* name, int fi
 	sprintf(filename, "%s", name);
 	_strlwr(filename);
 	char* ptr = strrchr(filename, '.');
-	if (ptr && (!strcmp(ptr, ".asf") || !strcmp(ptr, ".bvh")))
+	if (ptr && (!strcmp(ptr, ".asf") || !strcmp(ptr, ".amc") || !strcmp(ptr, ".bvh")))
 	{
 		*ptr = 0;
 	}

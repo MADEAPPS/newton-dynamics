@@ -379,7 +379,13 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		for (it.Begin(); it; it++)
 		{
 			ndContact* const contact = it.GetNode()->GetInfo();
-			checkConnection += contact->IsActive() ? 1 : 0;
+			if (contact->IsActive())
+			{
+				if (contact->GetBody0()->GetAsBodyDynamic() && contact->GetBody1()->GetAsBodyDynamic())
+				{
+					checkConnection++;
+				}
+			}
 		}
 		ndAssert(count == checkConnection);
 		#endif
