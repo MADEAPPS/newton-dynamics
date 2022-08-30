@@ -70,10 +70,14 @@ void ndBipedTest_1(ndDemoEntityManager* const scene);
 void ndBipedTest_2(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
-void ndBasicRagdoll(ndDemoEntityManager* const scene);
+
+//void ndBasicRagdoll(ndDemoEntityManager* const scene);
+
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
+void ndActiveRagdoll(ndDemoEntityManager* const scene);
+
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
@@ -116,7 +120,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "biped test one", ndBipedTest_1 },
 	{ "biped test one", ndBipedTest_2 },
-	{ "active rag doll", ndBipedTest_2 },
+	{ "active rag doll", ndActiveRagdoll },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},

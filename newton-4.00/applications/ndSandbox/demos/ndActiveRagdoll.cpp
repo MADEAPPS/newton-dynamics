@@ -469,6 +469,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
+	ndAssert(0);
 	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
