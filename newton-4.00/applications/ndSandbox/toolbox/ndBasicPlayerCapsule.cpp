@@ -37,12 +37,11 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBasicPlayerCapsule)
 class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 {
 	public:
-	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, const ndVector& meshOrigin)
+	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
 		:ndDemoEntityNotify(manager, entity)
 		,m_localRotation(entity->GetRenderMatrix())
-		,m_meshOrigin(meshOrigin)
+		,m_meshOrigin(entity->GetRenderMatrix().m_posit)
 	{
-		m_meshOrigin.m_w = 1.0f;
 	}
 
 	void OnTransform(ndInt32, const ndMatrix& matrix)
@@ -90,14 +89,14 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	matrix.m_posit.m_y = floor.m_y;
 	
 	ndDemoEntity* const entity = (ndDemoEntity*)modelEntity->CreateClone();
-	entity->ResetMatrix(entity->GetRenderMatrix() * matrix);
+	//entity->ResetMatrix(entity->GetRenderMatrix() * matrix);
+	//entity->ResetMatrix(matrix);
 
 	SetMatrix(matrix);
 	world->AddBody(this);
 	scene->AddEntity(entity);
 
-	ndVector meshOrigin(matrix.RotateVector(ndVector(0.0f, height * 0.5f, 0.0f, 1.0f)));
-	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity, meshOrigin));
+	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));
 
 	if (isPlayer)
 	{

@@ -20,7 +20,7 @@
 
 static int InitializeSdkObjects(FbxManager*& manager, FbxScene*& pScene);
 static FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene);
-static bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, FbxScene* pScene);
+static bool CreateScene(const exportMeshNode* const model, FbxManager *fbxManager, FbxScene* pScene);
 static bool SaveScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename, int pFileFormat = -1, bool pEmbedMedia = false);
 
 bool ExportFbx(const exportMeshNode* const scene, const char* const name)
@@ -179,6 +179,58 @@ bool SaveScene(FbxManager* manager, FbxDocument* scene, const char* name, int fi
 	return status;
 }
 
+FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
+{
+	int stack = 1;
+	FbxNode* fbxNodesParent[256];
+	const exportMeshNode* bvhNodePool[256];
+	
+	bvhNodePool[0] = model;
+	fbxNodesParent[0] = nullptr;
+
+	FbxNode* skeleton = nullptr;
+	while (stack)
+	{
+		stack--;
+		const exportMeshNode* const bvhNode = bvhNodePool[stack];
+		FbxNode* const fbxParent = fbxNodesParent[stack];
+
+		FbxNode* const fbxNode = FbxNode::Create(pScene, bvhNode->m_name.c_str());
+		exportVector posit(bvhNode->m_matrix.m_posit);
+		exportVector euler(bvhNode->m_eulers.Scale(180.0f / 3.14159265f));
+
+		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
+		fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));
+
+		FbxSkeleton* const attribute = FbxSkeleton::Create(pScene, model->m_name.c_str());
+		if (fbxParent)
+		{
+			attribute->Size.Set(0.1f);
+			attribute->SetSkeletonType(FbxSkeleton::eLimbNode);
+			fbxParent->AddChild(fbxNode);
+		}
+		else
+		{
+			attribute->SetSkeletonType(FbxSkeleton::eRoot);
+		}
+		fbxNode->SetNodeAttribute(attribute);
+
+		if (!skeleton)
+		{
+			skeleton = fbxNode;
+		}
+
+		for (std::list<exportMeshNode*>::const_iterator iter = bvhNode->m_children.begin();
+			iter != bvhNode->m_children.end(); iter++)
+		{
+			bvhNodePool[stack] = *iter;
+			fbxNodesParent[stack] = fbxNode;
+			stack++;
+		}
+	}
+
+	return skeleton;
+}
 bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, FbxScene* pScene)
 {
 	// create scene info
@@ -211,57 +263,4 @@ bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, Fbx
 	//AnimateSkeleton(pScene, lSkeletonRoot);
 
 	return true;
-}
-
-FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
-{
-	int stack = 1;
-	const exportMeshNode* bvhNodePool[256];
-	FbxNode* fbxNodesParent[256];
-	bvhNodePool[0] = model;
-	fbxNodesParent[0] = nullptr;
-
-	FbxNode* skeleton = nullptr;
-	while (stack)
-	{
-		stack--;
-		const exportMeshNode* const bvhNode = bvhNodePool[stack];
-		FbxNode* const fbxParent = fbxNodesParent[stack];
-
-		FbxNode* const fbxNode = FbxNode::Create(pScene, bvhNode->m_name.c_str());
-		exportVector posit(bvhNode->m_matrix.m_posit);
-		exportVector euler(bvhNode->m_eulers.Scale(180.0f / 3.14159265f));
-
-		//fbxNode->SetRotationPivot(FbxNode::eSourcePivot, FbxVector4(euler.m_x, euler.m_y, euler.m_z));
-		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
-		fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));
-
-		FbxSkeleton* const attribute = FbxSkeleton::Create(pScene, model->m_name.c_str());
-		if (fbxParent)
-		{
-			attribute->Size.Set(0.1f);
-			attribute->SetSkeletonType(FbxSkeleton::eLimbNode);
-			fbxParent->AddChild(fbxNode);
-		}
-		else
-		{
-			attribute->SetSkeletonType(FbxSkeleton::eRoot);
-		}
-		fbxNode->SetNodeAttribute(attribute);
-
-		if (!skeleton)
-		{
-			skeleton = fbxNode;
-		}
-
-		for (std::list<exportMeshNode*>::const_iterator iter = bvhNode->m_children.begin();
-			iter != bvhNode->m_children.end(); iter++)
-		{
-			bvhNodePool[stack] = *iter;
-			fbxNodesParent[stack] = fbxNode;
-			stack++;
-		}
-	}
-
-	return skeleton;
 }
