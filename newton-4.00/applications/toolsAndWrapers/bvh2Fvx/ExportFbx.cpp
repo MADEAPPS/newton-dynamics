@@ -9,12 +9,9 @@
 * freely
 */
 
-// FbxtoNgd.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
-#include "BvhNode.h"
 #include "ExportFbx.h"
+#include "exportMeshNode.h"
 
 #ifdef IOS_REF
 	#undef  IOS_REF
@@ -22,68 +19,62 @@
 #endif
 
 static int InitializeSdkObjects(FbxManager*& manager, FbxScene*& pScene);
-static FbxNode* CreateSkeleton(BvhNode* const model, FbxScene* pScene);
-static bool CreateScene(BvhNode* const model, FbxManager *pSdkManager, FbxScene* pScene);
+static FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene);
+static bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, FbxScene* pScene);
 static bool SaveScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename, int pFileFormat = -1, bool pEmbedMedia = false);
 
-//int main(int argc, char** argv)
-bool ExportFbx(const BvhNode* const scene, const char* const name)
+bool ExportFbx(const exportMeshNode* const scene, const char* const name)
 {
-	_ASSERT(0);
-//	FbxScene* fbxScene = nullptr;
-//	FbxManager* fbxManager = nullptr;
-//	if (!InitializeSdkObjects(fbxManager, fbxScene))
-//	{
-//		FBXSDK_printf("failed to initialize fbx sdk: %s\n", argv[1]);
-//		delete bvhSkeleton;
-//		return 0;
-//	}
-//
-//	//if (ConvertToFbx(bvhSkeleton, fbxScene, exportSkeleton, exportAnimations))
-//	//{
-//	////	if (exportAnimations) {
-//	////		char name[1024];
-//	////		strcpy(name, argv[1]);
-//	////		_strlwr(name);
-//	////		char* ptr = strstr(name, ".fbx");
-//	////		ptr[0] = 0;
-//	////		strcat(name, ".anm");
-//	////		ExportAnimation(name, *bvhScene);
-//	////	}
-//	////	else {
-//	////		char name[1024];
-//	////		strcpy(name, argv[1]);
-//	////		_strlwr(name);
-//	////		char* ptr = strstr(name, ".fbx");
-//	////		ptr[0] = 0;
-//	////		strcat(name, ".ngd");
-//	////		bvhScene->Serialize(name);
-//	////	}
-//	//}
-//
-//	// Create the scene.
-//	bool lResult = CreateScene(bvhSkeleton, fbxManager, fbxScene);
-//
-//	if (lResult == false)
-//	{
-//		FBXSDK_printf("\n\nAn error occurred while creating the scene...\n");
-//		delete bvhSkeleton;
-//		fbxManager->Destroy();
-//		return 0;
-//	}
-//
-//	// Save the scene.
-//	lResult = SaveScene(fbxManager, fbxScene, name);
-//	if (lResult == false)
-//	{
-//		FBXSDK_printf("\n\nAn error occurred while saving the scene...\n");
-//		delete bvhSkeleton;
-//		fbxManager->Destroy();
-//		return 0;
-//	}
-//
-//	delete bvhSkeleton;
-//	fbxManager->Destroy();
+	FbxScene* fbxScene = nullptr;
+	FbxManager* fbxManager = nullptr;
+	if (!InitializeSdkObjects(fbxManager, fbxScene))
+	{
+		FBXSDK_printf("failed to initialize fbx sdk: %s\n", name);
+		return 0;
+	}
+
+	//if (ConvertToFbx(bvhSkeleton, fbxScene, exportSkeleton, exportAnimations))
+	//{
+	////	if (exportAnimations) {
+	////		char name[1024];
+	////		strcpy(name, argv[1]);
+	////		_strlwr(name);
+	////		char* ptr = strstr(name, ".fbx");
+	////		ptr[0] = 0;
+	////		strcat(name, ".anm");
+	////		ExportAnimation(name, *bvhScene);
+	////	}
+	////	else {
+	////		char name[1024];
+	////		strcpy(name, argv[1]);
+	////		_strlwr(name);
+	////		char* ptr = strstr(name, ".fbx");
+	////		ptr[0] = 0;
+	////		strcat(name, ".ngd");
+	////		bvhScene->Serialize(name);
+	////	}
+	//}
+
+	// Create the scene.
+	bool lResult = CreateScene(scene, fbxManager, fbxScene);
+
+	if (lResult == false)
+	{
+		FBXSDK_printf("\n\nAn error occurred while creating the scene...\n");
+		fbxManager->Destroy();
+		return 0;
+	}
+
+	// Save the scene.
+	lResult = SaveScene(fbxManager, fbxScene, name);
+	if (lResult == false)
+	{
+		FBXSDK_printf("\n\nAn error occurred while saving the scene...\n");
+		fbxManager->Destroy();
+		return 0;
+	}
+
+	fbxManager->Destroy();
 	return true;
 }
 
@@ -188,7 +179,7 @@ bool SaveScene(FbxManager* manager, FbxDocument* scene, const char* name, int fi
 	return status;
 }
 
-bool CreateScene(BvhNode* const model, FbxManager *pSdkManager, FbxScene* pScene)
+bool CreateScene(const exportMeshNode* const model, FbxManager *pSdkManager, FbxScene* pScene)
 {
 	// create scene info
 	FbxDocumentInfo* sceneInfo = FbxDocumentInfo::Create(pSdkManager, "SceneInfo");
@@ -222,10 +213,10 @@ bool CreateScene(BvhNode* const model, FbxManager *pSdkManager, FbxScene* pScene
 	return true;
 }
 
-FbxNode* CreateSkeleton(BvhNode* const model, FbxScene* pScene)
+FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
 {
 	int stack = 1;
-	BvhNode* bvhNodePool[256];
+	const exportMeshNode* bvhNodePool[256];
 	FbxNode* fbxNodesParent[256];
 	bvhNodePool[0] = model;
 	fbxNodesParent[0] = nullptr;
@@ -234,12 +225,12 @@ FbxNode* CreateSkeleton(BvhNode* const model, FbxScene* pScene)
 	while (stack)
 	{
 		stack--;
-		BvhNode* const bvhNode = bvhNodePool[stack];
+		const exportMeshNode* const bvhNode = bvhNodePool[stack];
 		FbxNode* const fbxParent = fbxNodesParent[stack];
 
 		FbxNode* const fbxNode = FbxNode::Create(pScene, bvhNode->m_name.c_str());
-		bvhVector posit(bvhNode->m_matrix.m_posit);
-		bvhVector euler(bvhNode->m_eulers.Scale(180.0f / 3.14159265f));
+		exportVector posit(bvhNode->m_matrix.m_posit);
+		exportVector euler(bvhNode->m_eulers.Scale(180.0f / 3.14159265f));
 
 		//fbxNode->SetRotationPivot(FbxNode::eSourcePivot, FbxVector4(euler.m_x, euler.m_y, euler.m_z));
 		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
@@ -263,7 +254,7 @@ FbxNode* CreateSkeleton(BvhNode* const model, FbxScene* pScene)
 			skeleton = fbxNode;
 		}
 
-		for (std::list<BvhNode*>::const_iterator iter = bvhNode->m_children.begin();
+		for (std::list<exportMeshNode*>::const_iterator iter = bvhNode->m_children.begin();
 			iter != bvhNode->m_children.end(); iter++)
 		{
 			bvhNodePool[stack] = *iter;

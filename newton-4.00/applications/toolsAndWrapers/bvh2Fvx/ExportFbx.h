@@ -1,5 +1,5 @@
 #pragma once
-#include "bvhMatrix.h"
+#include "exportMatrix.h"
 
-class BvhNode;
-bool ExportFbx(const BvhNode* scene, const char* const name);
+class exportMeshNode;
+bool ExportFbx(const exportMeshNode* scene, const char* const name);

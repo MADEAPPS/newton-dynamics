@@ -9,18 +9,9 @@
 * freely
 */
 
-// FbxtoNgd.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
-#include "BvhNode.h"
+#include "exportMeshNode.h"
 #include "ExportFbx.h"
-
-#ifdef IOS_REF
-	#undef  IOS_REF
-	#define IOS_REF (*(manager->GetIOSettings()))
-#endif
-
 
 int main(int argc, char** argv)
 {
@@ -57,7 +48,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	BvhNode* const bvhSkeleton = BvhNode::LoadSkeleton(name);
+	exportMeshNode* const bvhSkeleton = exportMeshNode::LoadSkeleton(name);
 	if (!bvhSkeleton)
 	{
 		printf("failed to load %s\n", name);
@@ -122,7 +113,6 @@ int main(int argc, char** argv)
 	}
 */
 	delete bvhSkeleton;
-	//fbxManager->Destroy();
 	return 0;
 }
 

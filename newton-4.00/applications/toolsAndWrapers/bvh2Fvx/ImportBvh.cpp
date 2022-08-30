@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "BvhNode.h"
+#include "exportMeshNode.h"
 
-BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
+exportMeshNode* exportMeshNode::ImportBvhSkeleton(const char* const name)
 {
-	BvhNode* entity = nullptr;
+	exportMeshNode* entity = nullptr;
 
 	FILE* const fp = fopen(name, "rt");
 
@@ -28,8 +28,8 @@ BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
 	};
 
 	int stack = 0;
-	BvhNode* stackPool[128];
-	std::vector<BvhNode*> entityList;
+	exportMeshNode* stackPool[128];
+	std::vector<exportMeshNode*> entityList;
 	
 	float scale = 6.0f;
 	if (fp)
@@ -42,7 +42,7 @@ BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
 				ReadToken();
 				if (!strcmp(token, "ROOT"))
 				{
-					entity = new BvhNode();
+					entity = new exportMeshNode();
 					entityList.push_back(entity);
 					ReadToken();
 					entity->m_name = token;
@@ -52,7 +52,7 @@ BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
 				}
 				else if (!strcmp(token, "JOINT"))
 				{
-					BvhNode* const child = new BvhNode(stackPool[stack - 1]);
+					exportMeshNode* const child = new exportMeshNode(stackPool[stack - 1]);
 					entityList.push_back(child);
 					ReadToken();
 					if (child->m_parent->m_parent)
@@ -70,7 +70,7 @@ BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
 				}
 				else if (!strcmp(token, "End"))
 				{
-					BvhNode* const child = new BvhNode(stackPool[stack - 1]);
+					exportMeshNode* const child = new exportMeshNode(stackPool[stack - 1]);
 					entityList.push_back(child);
 					ReadToken();
 					child->m_name = "effector";
@@ -80,7 +80,7 @@ BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
 				}
 				else if (!strcmp(token, "OFFSET"))
 				{
-					BvhNode* const node = stackPool[stack - 1];
+					exportMeshNode* const node = stackPool[stack - 1];
 					node->m_matrix.m_posit.m_x = ReadFloat() * scale;
 					node->m_matrix.m_posit.m_y = ReadFloat() * scale;
 					node->m_matrix.m_posit.m_z = ReadFloat() * scale;
@@ -111,7 +111,7 @@ BvhNode* BvhNode::ImportBvhSkeleton(const char* const name)
 	//bvhMatrix invRotation(rotation.Inverse());
 	//for (int i = 0; i < entityList.GetCount(); ++i)
 	//{
-	//	BvhNode* const child = entityList[i];
+	//	exportMeshNode* const child = entityList[i];
 	//	bvhMatrix matrix(invRotation * child->GetRenderMatrix() * rotation);
 	//	child->ResetMatrix(matrix);
 	//}

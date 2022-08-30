@@ -1,14 +1,14 @@
 #include "stdafx.h"
-#include "BvhNode.h"
+#include "exportMeshNode.h"
 
-BvhNode::BvhNode()
+exportMeshNode::exportMeshNode()
 	:m_matrix()
 	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
 	,m_parent(nullptr)
 {
 }
 
-BvhNode::BvhNode(BvhNode* const parent)
+exportMeshNode::exportMeshNode(exportMeshNode* const parent)
 	:m_matrix()
 	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
 	,m_parent(parent)
@@ -17,23 +17,23 @@ BvhNode::BvhNode(BvhNode* const parent)
 	m_parent->m_children.push_back(this);
 }
 
-BvhNode::~BvhNode()
+exportMeshNode::~exportMeshNode()
 {
 	while (m_children.size())
 	{
-		BvhNode* const child = m_children.back();
+		exportMeshNode* const child = m_children.back();
 		m_children.pop_back();
 		delete child;
 	}
 }
 
-BvhNode* BvhNode::LoadSkeleton(const char* const name)
+exportMeshNode* exportMeshNode::LoadSkeleton(const char* const name)
 {
 	char filename[256];
 	sprintf(filename, "%s", name);
 	_strlwr(filename);
 
-	BvhNode* root = nullptr;
+	exportMeshNode* root = nullptr;
 	const char* const ext = strrchr(filename, '.');
 	if (ext)
 	{
