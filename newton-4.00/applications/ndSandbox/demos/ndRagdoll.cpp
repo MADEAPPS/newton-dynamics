@@ -162,7 +162,7 @@ class ndRagdollModel : public ndModel
 
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 1.03f;
+		matrix.m_posit.m_y = floor.m_y + 1.5f;
 
 		// add the root body
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
@@ -375,7 +375,7 @@ void ndRagdoll (ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
 
-	//scene->GetWorld()->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
+	scene->GetWorld()->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
 
 	matrix.m_posit.m_x += 1.4f;
 	//TestPlayerCapsuleInteraction(scene, matrix);
