@@ -19,7 +19,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHinge)
 
 ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
 	,m_springK(ndFloat32(0.0f))
@@ -113,9 +113,7 @@ bool ndJointHinge::GetLimitState() const
 
 void ndJointHinge::SetLimitState(bool state)
 {
-	m_maxDof = state ? 7 : 6;
 	m_limitState = state ? 1 : 0;
-
 	if (m_limitState)
 	{
 		SetLimits(m_minLimit, m_maxLimit);
@@ -247,15 +245,13 @@ ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndInt8 ret = 0;
 	if (m_limitState)
 	{
 		if ((m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
 		{
 			AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
-			ret = 1;
 		}
 		else
 		{
@@ -268,7 +264,6 @@ ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& m
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (angle > m_maxLimit)
 			{
@@ -278,11 +273,9 @@ ndInt8 ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& m
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}
-	return ret;
 }
 
 void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
@@ -292,15 +285,12 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
-	if (!hitLimit)
+	if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
 	{
-		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
-		{
-			// spring damper with limits
-			SubmitSpringDamper(desc, matrix0, matrix1);
-		}
+		// spring damper with limits
+		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
+	SubmitLimits(desc, matrix0, matrix1);
 }
 
 

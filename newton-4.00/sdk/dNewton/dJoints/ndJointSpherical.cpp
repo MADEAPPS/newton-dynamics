@@ -16,7 +16,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSpherical)
 
 ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(9, child, parent, pinAndPivotFrame)
 	,m_rotation(ndGetIdentityMatrix())
 	,m_springK(ndFloat32(0.0f))
 	,m_damperC(ndFloat32(0.0f))
@@ -25,9 +25,6 @@ ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinem
 	,m_maxTwistAngle(ndFloat32(1.0e10f))
 	,m_springDamperRegularizer(ndFloat32(0.0f))
 {
-	//m_rotation = ndPitchMatrix(90.0f * ndDegreeToRad);
-	//m_rotation = dYawMatrix(60.0f * ndDegreeToRad);
-	//m_rotation = dRollMatrix(60.0f * ndDegreeToRad);
 }
 
 ndJointSpherical::ndJointSpherical(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -213,9 +210,8 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 }
 
-ndInt8 ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
 {
-	ndInt8 ret = false;
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * ndDegreeToRad))
 	{
 		AddAngularRowJacobian(desc, pin, -angle);
@@ -232,7 +228,6 @@ ndInt8 ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, 
 			const ndFloat32 recoveringAccel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
-			ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else if (angle >= m_maxTwistAngle)
 		{
@@ -242,13 +237,11 @@ ndInt8 ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, 
 			const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 			SetHighFriction(desc, ndFloat32(0.0f));
-			ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
-	return ret;
 }
 
-ndInt8 ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	if (m_maxConeAngle < (ndFloat32 (1.0f) * ndDegreeToRad))
 	{
@@ -265,12 +258,11 @@ ndInt8 ndJointSpherical::SubmitAngularAxisCartesianApproximation(const ndMatrix&
 	}
 
 	ndFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	return SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	ndInt8 ret = false;
 	if (m_maxConeAngle < D_MAX_SPHERICAL_CONE_ANGLE)
 	{
 		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
@@ -288,7 +280,6 @@ ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 				const ndFloat32 recoveringAccel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAccel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else
 			{
@@ -307,10 +298,8 @@ ndInt8 ndJointSpherical::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatr
 
 		const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		const ndFloat32 pitchAngle = -ndAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-		ndInt8 ret1 = SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
-		ret = ret1 | ret;
+		SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 	}
-	return ret;
 }
 
 void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
@@ -373,21 +362,19 @@ void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatri
 	}
 }
 
-ndInt8 ndJointSpherical::SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointSpherical::SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	ndInt8 ret = false;
 	ndFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= ndFloat32(0.998f))
 	{
 		// special case where the front axis are almost aligned
 		// solve by using Cartesian approximation
-		ret = SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
 	}
 	else
 	{
-		ret = SubmitAngularAxis(matrix0, matrix1, desc);
+		SubmitAngularAxis(matrix0, matrix1, desc);
 	}
-	return ret;
 }
 
 void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
@@ -396,12 +383,9 @@ void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	ApplyBaseRows(matrix0, matrix1, desc);
-	ndInt8 hitLimit = SubmitLimits(matrix0, matrix1, desc);
-	if (!hitLimit)
+	if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
 	{
-		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
-		{
-			SubmitSpringDamper(matrix0, matrix1, desc);
-		}
+		SubmitSpringDamper(matrix0, matrix1, desc);
 	}
+	SubmitLimits(matrix0, matrix1, desc);
 }

@@ -33,9 +33,6 @@ class dActiveJointDefinition
 	public:
 	enum dLimbType
 	{
-		//forwardKinematic,
-		//ballAndSocket,
-		//effector,
 		m_root,
 		m_hinge,
 		m_spherical,
@@ -46,9 +43,9 @@ class dActiveJointDefinition
 	struct dJointPdData
 	{
 		dJointPdData()
-			:m_spring(1500.0f)
-			,m_damper(40.0f)
-			,m_regularizer(0.001f)
+			:m_spring(0.0f)
+			,m_damper(0.5f)
+			,m_regularizer(0.1f)
 		{
 		}
 
@@ -153,7 +150,6 @@ class ndRagdollModel : public ndModel
 	ndRagdollModel(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
 		:ndModel()
 		,m_rootBody(nullptr)
-		//,m_animBlendTree(nullptr)
 	{
 		ndWorld* const world = scene->GetWorld();
 
@@ -213,9 +209,9 @@ class ndRagdollModel : public ndModel
 					bodies.PushBack(childBody);
 					massWeight.PushBack(jointsDefinition[i].m_massWeight);
 
-					//// connect this body part to its parentBody with a ragdoll joint
-					//parentBone = ConnectBodyParts(childBody, parentBone, definition);
-					//parentBone->SetName(name);
+					// connect this body part to its parentBody with a ragdoll joint
+					//ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition);
+					//world->AddJoint(joint);
 
 					parentBone = childBody;
 					break;
@@ -231,62 +227,10 @@ class ndRagdollModel : public ndModel
 		}
 		
 		NormalizeMassDistribution(100.0f, bodies, massWeight);
-		
-		//if (1)
-		//{
-		//	ndBodyKinematic* testBody = m_rootNode->Find("mixamorig:Hips")->GetBody();
-		//	//ndBodyKinematic* testBody = m_rootNode->Find("mixamorig:Spine1")->GetBody();
-		//	ndJointFix6dof* const joint = new ndJointFix6dof(testBody->GetMatrix(), testBody, world->GetSentinelBody());
-		//	world->AddJoint(joint);
-		//	AddAttachment(joint);
-		//}
-		//
-		//// initialize a biped controller and set to the model
-		////m_bipedController.Init(this, bipedConfig);
-		////SetController(&m_bipedController);
-		//
-		//if (righFoot)
-		//{
-		//	CreateKinematicChain(coronalFrame, righFoot);
-		//}
-		//
-		//if (leftFoot)
-		//{
-		//	CreateKinematicChain(coronalFrame, leftFoot);
-		//}
-		//
-		//SetAnimation(scene, entity);
 	}
 
 	~ndRagdollModel()
 	{
-		//if (m_animBlendTree)
-		//{
-		//	delete m_animBlendTree;
-		//}
-	}
-
-	void SetAnimation(ndDemoEntityManager* const scene, const ndDemoEntity* const entity)
-	{
-		//ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		//const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
-		//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
-		//{
-		//	ndAnimationKeyFramesTrack& track = node->GetInfo();
-		//	const char* const name = track.GetName().GetStr();
-		//	ndCharacterNode* const skelNode = m_rootNode->Find(name);
-		//	const ndDemoEntity* const ent = entity->Find(name);
-		//	ndAssert(ent);
-		//	ndAnimKeyframe keyFrame(ent->GetCurrentTransform());
-		//	keyFrame.m_userData = skelNode;
-		//	m_output.PushBack(keyFrame);
-		//}
-		//SetPose();
-		//
-		////ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
-		//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
-		//m_animBlendTree = walk;
 	}
 
 	void NormalizeMassDistribution(ndFloat32 mass, const ndFixSizeArray<ndBodyDynamic*, 64>& bodyArray, const ndFixSizeArray<ndFloat32, 64>& massWeight) const
@@ -326,100 +270,95 @@ class ndRagdollModel : public ndModel
 		return body;
 	}
 
-	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentNode, const dActiveJointDefinition& definition)
+	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dActiveJointDefinition& definition)
 	{
-		//ndMatrix matrix(childBody->GetMatrix());
-		//dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		//ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
-		//
-		//if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
-		//{
-		//	ndAssert(0);
-		//	return nullptr;
-		//	//ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-		//	//
-		//	//dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		//	//ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
-		//	//
-		//	//ndAssert(0);
-		//	//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-		//	//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		//	//joint->SetSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
-		//	//return jointNode;
-		//}
+		ndMatrix matrix(childBody->GetMatrix());
+		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
+
+		switch (definition.m_limbType)
+		{
+			case dActiveJointDefinition::m_spherical:
+			{
+				ndJointSpherical* const joint = new ndJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBody);
+				//ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
+				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+
+			//	ndAssert(0);
+			//	//ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+			//	//
+			//	//dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+			//	//ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
+			//	//
+			//	//ndAssert(0);
+			//	//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+			//	//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				joint->SetAsSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				return joint;
+			}
+
+			case dActiveJointDefinition::m_hinge:
+			{
+				//ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+				//
+				//ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
+				//joint->SetLimitState(true);
+				//joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				//return joint;
+
+				ndJointHinge* const joint = new ndJointHinge(pinAndPivotInGlobalSpace, childBody, parentBody);
+
+				//ndAiBipedTest_2_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
+				//joint->SetLimitState(true);
+				//joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				joint->SetAsSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				return joint;
+			}
+			
+			//case ndAiBipedTest_1_Definition::m_doubleHinge:
+			//{
+			//	ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+			//
+			//	ndAiBipedTest_1_Definition::ndJointLimit jointLimits(definition.m_jointLimits);
+			//	joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
+			//	joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+			//
+			//	joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
+			//	joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
+			//	return joint;
+			//}
+
+			default:
+				ndAssert(0);
+		}
+
 		//else
 		//{
-		//	ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-		//
-		//	dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		//	ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
-		//
-		//	//dTrace (("do not forget to delete this debug\n"))
-		//	//joint->SetSolverModel(m_jointkinematicCloseLoop);
-		//
-		//	ndAssert(0);
-		//	joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-		//	joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		//	joint->SetAsSpringDamper(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-		//	return jointNode;
+		////	ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+		////
+		////	dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+		////	ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
+		////
+		////	//dTrace (("do not forget to delete this debug\n"))
+		////	//joint->SetSolverModel(m_jointkinematicCloseLoop);
+		////
+		////	ndAssert(0);
+		////	joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+		////	joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+		////	joint->SetAsSpringDamper(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+		////	return jointNode;
 		//}
+		return nullptr;
 	}
 
 	//void Update(ndWorld* const world, ndFloat32 timestep) 
 	void Update(ndWorld* const, ndFloat32)
 	{
-		//ndAssert(0);
-		////m_animBlendTree->Evaluate(m_output, timestep);
-		//m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
-		////m_animBlendTree->Evaluate(m_output, 0.0f);
-		//for (ndInt32 i = 0; i < m_output.GetCount(); ++i)
-		//{
-		//	const ndAnimKeyframe& keyFrame = m_output[i];
-		//	ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
-		//	if (skelNode)
-		//	{
-		//		skelNode->SetLocalPose(ndMatrix(keyFrame.m_rotation, keyFrame.m_posit));
-		//	}
-		//}
-		//SetPose();
-		//
-		//ndCharacter::Update(world, timestep);
 	}
-
-	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-	{
-		//ndCharacter::PostUpdate(world, timestep);
-	}
-
-	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
-	{
-		//ndCharacter::PostTransformUpdate(world, timestep);
-	}
-
+	
 	ndBodyDynamic* m_rootBody;
-	//ndAnimationPose m_output;
-	//ndAnimationBlendTreeNode* m_animBlendTree;
-	//ndCharacterBipedPoseController m_bipedController;
 };
-
-//static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
-//{
-//	ndMatrix localAxis(ndGetIdentityMatrix());
-//	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
-//	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
-//	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-//
-//	ndFloat32 height = 1.9f;
-//	ndFloat32 radio = 0.5f;
-//	ndFloat32 mass = 100.0f;
-//	ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
-//	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-//	player->GetNotifyCallback()->SetGravity(ndVector::m_zero);
-//	ndMatrix matrix(player->GetMatrix());
-//	matrix.m_posit.m_y += 0.5f;
-//	player->SetMatrix(matrix);
-//	delete entity;
-//}
 
 void ndRagdoll (ndDemoEntityManager* const scene)
 {
@@ -435,6 +374,8 @@ void ndRagdoll (ndDemoEntityManager* const scene)
 	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix);
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
+
+	//scene->GetWorld()->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
 
 	matrix.m_posit.m_x += 1.4f;
 	//TestPlayerCapsuleInteraction(scene, matrix);

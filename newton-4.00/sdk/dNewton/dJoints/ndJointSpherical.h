@@ -44,10 +44,10 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
 	D_NEWTON_API void ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitSpringDamper(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API ndInt8 SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API ndInt8 SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
-	D_NEWTON_API ndInt8 SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API ndInt8 SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
 	ndMatrix m_rotation;
 	ndFloat32 m_springK;
