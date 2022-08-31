@@ -197,7 +197,7 @@ FbxNode* CreateSkeleton(const exportMeshNode* const model, FbxScene* pScene)
 
 		FbxNode* const fbxNode = FbxNode::Create(pScene, bvhNode->m_name.c_str());
 		exportVector posit(bvhNode->m_matrix.m_posit);
-		exportVector euler(bvhNode->m_eulers.Scale(180.0f / 3.14159265f));
+		exportVector euler(bvhNode->m_eulers.Scale(180.0f / M_PI));
 
 		fbxNode->LclRotation.Set(FbxVector4(euler.m_x, euler.m_y, euler.m_z));
 		fbxNode->LclTranslation.Set(FbxVector4(posit.m_x, posit.m_y, posit.m_z));

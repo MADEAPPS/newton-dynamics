@@ -5,6 +5,8 @@ exportMeshNode::exportMeshNode()
 	:m_matrix()
 	,m_eulers(0.0f, 0.0f, 0.0f, 0.0f)
 	,m_parent(nullptr)
+	,m_positionsKeys()
+	,m_rotationsKeys()
 {
 }
 
@@ -26,26 +28,4 @@ exportMeshNode::~exportMeshNode()
 		delete child;
 	}
 }
-
-//exportMeshNode* exportMeshNode::LoadSkeleton(const char* const name)
-//{
-//	char filename[256];
-//	sprintf(filename, "%s", name);
-//	_strlwr(filename);
-//
-//	exportMeshNode* root = nullptr;
-//	const char* const ext = strrchr(filename, '.');
-//	if (ext)
-//	{
-//		if (strcmp(ext, ".bvh") == 0)
-//		{
-//			root = ImportBvhSkeleton(name);
-//		}
-//		else if (strcmp(ext, ".asf") == 0)
-//		{
-//			root = ImportAsfSkeleton(name);
-//		}
-//	}
-//	return root;
-//}
 
