@@ -91,7 +91,7 @@ static dActiveJointDefinition jointsDefinition[] =
 {
 	//{ "mixamorig:Hips", dActiveJointDefinition::forwardKinematic, 1.0f, {}, {}, {} },
 
-	{ "root", dActiveJointDefinition::m_root, {}, {} },
+	{ "root", dActiveJointDefinition::m_root, 1.0f, {}, {} },
 
 	{ "rhipjoint", dActiveJointDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 0.0f } },
 	{ "rfemur", dActiveJointDefinition::m_hinge, 1.0f, { 0.0f, 150.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
@@ -140,11 +140,13 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
+	void OnTransform(ndInt32, const ndMatrix& matrix)
 	{
 		if (!m_parentBody)
 		{
-			ndDemoEntityNotify::OnTransform(thread, matrix);
+			const ndMatrix localMatrix(matrix * m_bindMatrix);
+			const ndQuaternion rot(localMatrix);
+			m_entity->SetMatrix(rot, localMatrix.m_posit);
 		}
 		else
 		{
@@ -168,56 +170,52 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 class ndRagdollModel : public ndModel
 {
 	public:
-	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location)
+	ndRagdollModel(ndDemoEntityManager* const scene, ndDemoEntity* const ragdollMesh, const ndMatrix& location)
 		:ndModel()
+		,m_rootBody(nullptr)
 		//,m_animBlendTree(nullptr)
 	{
+		ndWorld* const world = scene->GetWorld();
+
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = (ndDemoEntity*)ragdollMesh->CreateClone();
 		scene->AddEntity(entity);
-		ndWorld* const world = scene->GetWorld();
-		
-		//// find the floor location 
-		//ndMatrix matrix(location);
-		//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		//matrix.m_posit.m_y = floor.m_y;
-		//matrix.m_posit.m_y += 0.5f;
-		//
-		//// add the root body
-		//ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
-		//rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
-		//ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
-		//ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
-		//ndMatrix coronalFrame(ndPitchMatrix(180.0f*ndDegreeToRad) * ndRollMatrix(90.0f*ndDegreeToRad) * characterFrame->CalculateGlobalMatrix());
-		//rootNode->SetCoronalFrame(coronalFrame);
-		//rootNode->SetName(rootEntity->GetName().GetStr());
-		//
-		//ndInt32 stack = 0;
-		//const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
-		//
-		//ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		//ndFixSizeArray<ndCharacterNode*, 32> parentBones;
-		//for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
-		//{
-		//	childEntities[stack] = child;
-		//	parentBones[stack] = rootNode;
-		//	stack++;
-		//}
-		//
-		//ndInt32 bodyCount = 1;
-		//ndFloat32 massWeight[1024];
-		//ndBodyDynamic* bodyArray[1024];
-		//massWeight[0] = 1.0f;
-		//bodyArray[0] = rootNode->GetBody();
-		//
-		////ndBipedControllerConfig bipedConfig;
-		//// walk model hierarchic adding all children designed as rigid body bones. 
-		//
-		//ndCharacterNode* righFoot = nullptr;
-		//ndCharacterNode* leftFoot = nullptr;
-		//while (stack) 
-		//{
-		//	stack--;
+
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
+		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
+
+		// find the floor location 
+		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		matrix.m_posit.m_y = floor.m_y + 1.03f;
+
+		// add the root body
+		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+		rootBody->SetMatrix(matrix);
+
+		// set bindimg matrix;
+		ndActiveRagdollEntityNotify* const notify = (ndActiveRagdollEntityNotify*)rootBody->GetNotifyCallback();
+		notify->m_bindMatrix = matrix.Inverse() * rootEntity->CalculateGlobalMatrix(rootEntity->GetParent());
+
+		ndFixSizeArray<ndBodyDynamic*, 64> bodies;
+
+		m_rootBody = rootBody;
+		bodies.PushBack(m_rootBody);
+
+		ndInt32 stack = 0;
+		ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
+		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+		parentBones.SetCount(32);
+		childEntities.SetCount(32);
+		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
+		{
+			childEntities[stack] = child;
+			parentBones[stack] = rootBody;
+			stack++;
+		}
+
+		while (stack) 
+		{
+			stack--;
 		//	ndCharacterNode* parentBone = parentBones[stack];
 		//	ndDemoEntity* const childEntity = childEntities[stack];
 		//	const char* const name = childEntity->GetName().GetStr();
@@ -285,8 +283,8 @@ class ndRagdollModel : public ndModel
 		//		parentBones[stack] = parentBone;
 		//		stack++;
 		//	}
-		//}
-		//
+		}
+		
 		//SetModelMass(100.0f, bodyCount, bodyArray, massWeight);
 		//
 		//if (1)
@@ -378,6 +376,7 @@ class ndRagdollModel : public ndModel
 		body->SetMassMatrix(1.0f, *shape);
 		body->SetNotifyCallback(new ndActiveRagdollEntityNotify(scene, entityPart, parentBone));
 
+		scene->GetWorld()->AddBody(body);
 		delete shape;
 		return body;
 	}
@@ -452,6 +451,7 @@ class ndRagdollModel : public ndModel
 		//ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
+	ndBodyDynamic* m_rootBody;
 	//ndAnimationPose m_output;
 	//ndAnimationBlendTreeNode* m_animBlendTree;
 	//ndCharacterBipedPoseController m_bipedController;

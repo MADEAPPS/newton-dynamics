@@ -470,6 +470,7 @@ class ndAiBipedTest_1 : public ndModel
 
 		delete modelMesh;
 	}
+
 	ndBodyDynamic* m_rootBody;
 	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 };
