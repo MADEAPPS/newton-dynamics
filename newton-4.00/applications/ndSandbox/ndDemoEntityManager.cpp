@@ -44,19 +44,19 @@
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
-#define DEFAULT_SCENE	7		// basic player
-//#define DEFAULT_SCENE	8		// particle fluid
-//#define DEFAULT_SCENE	9		// static mesh collision 
-//#define DEFAULT_SCENE	10		// static user mesh collision 
-//#define DEFAULT_SCENE	11		// basic joints
-//#define DEFAULT_SCENE	12		// basic vehicle
-//#define DEFAULT_SCENE	13		// heavy vehicle
-//#define DEFAULT_SCENE	14		// background vehicle prop
-//#define DEFAULT_SCENE	15		// simple industrial robot
-//#define DEFAULT_SCENE	16		// advanced industrial robot
-//#define DEFAULT_SCENE	17		// biped test 1
-//#define DEFAULT_SCENE	18		// biped test 2
-//#define DEFAULT_SCENE	19		// active rag doll
+//#define DEFAULT_SCENE	7		// particle fluid
+//#define DEFAULT_SCENE	8		// static mesh collision 
+//#define DEFAULT_SCENE	9		// static user mesh collision 
+//#define DEFAULT_SCENE	10		// basic joints
+//#define DEFAULT_SCENE	11		// basic vehicle
+//#define DEFAULT_SCENE	12		// heavy vehicle
+//#define DEFAULT_SCENE	13		// background vehicle prop
+//#define DEFAULT_SCENE	14		// simple industrial robot
+//#define DEFAULT_SCENE	15		// advanced industrial robot
+#define DEFAULT_SCENE	16		// basic player
+//#define DEFAULT_SCENE	17		// rag doll
+//#define DEFAULT_SCENE	18		// biped test 1
+//#define DEFAULT_SCENE	19		// biped test 2
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
@@ -66,18 +66,14 @@
 //#define DEFAULT_SCENE	26		// skin peel voronoi fracture
 						 
 // demos forward declaration 
+void ndRagdoll(ndDemoEntityManager* const scene);
 void ndBipedTest_1(ndDemoEntityManager* const scene);
 void ndBipedTest_2(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
-
-//void ndBasicRagdoll(ndDemoEntityManager* const scene);
-
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
-void ndActiveRagdoll(ndDemoEntityManager* const scene);
-
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
@@ -108,7 +104,6 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic conservation of momentum", ndBasicAngularMomentum },
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
-	{ "basic player", ndPlayerCapsuleDemo },
 	{ "basic particle fluid", ndBasicParticleFluid },
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },
@@ -118,9 +113,10 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
+	{ "basic player", ndPlayerCapsuleDemo },
+	{ "rag doll", ndRagdoll },
 	{ "biped test one", ndBipedTest_1 },
-	{ "biped test one", ndBipedTest_2 },
-	{ "active rag doll", ndActiveRagdoll },
+	{ "biped test two", ndBipedTest_2 },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},

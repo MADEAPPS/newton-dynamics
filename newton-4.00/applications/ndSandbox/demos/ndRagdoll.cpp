@@ -11,12 +11,12 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
+#include "ndTargaToOpenGl.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
@@ -439,26 +439,26 @@ class ndActiveRagdollModel : public ndCharacter
 	//ndCharacterBipedPoseController m_bipedController;
 };
 
-static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
-{
-	ndMatrix localAxis(ndGetIdentityMatrix());
-	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
-	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+//static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
+//{
+//	ndMatrix localAxis(ndGetIdentityMatrix());
+//	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+//	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
+//	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+//
+//	ndFloat32 height = 1.9f;
+//	ndFloat32 radio = 0.5f;
+//	ndFloat32 mass = 100.0f;
+//	ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
+//	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
+//	player->GetNotifyCallback()->SetGravity(ndVector::m_zero);
+//	ndMatrix matrix(player->GetMatrix());
+//	matrix.m_posit.m_y += 0.5f;
+//	player->SetMatrix(matrix);
+//	delete entity;
+//}
 
-	ndFloat32 height = 1.9f;
-	ndFloat32 radio = 0.5f;
-	ndFloat32 mass = 100.0f;
-	ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
-	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-	player->GetNotifyCallback()->SetGravity(ndVector::m_zero);
-	ndMatrix matrix(player->GetMatrix());
-	matrix.m_posit.m_y += 0.5f;
-	player->SetMatrix(matrix);
-	delete entity;
-}
-
-void ndActiveRagdoll (ndDemoEntityManager* const scene)
+void ndRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
