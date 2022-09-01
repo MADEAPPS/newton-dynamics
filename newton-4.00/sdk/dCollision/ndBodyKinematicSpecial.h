@@ -35,12 +35,12 @@ class ndBodyKinematicSpecial : public ndBodyKinematic
 	D_COLLISION_API virtual ~ndBodyKinematicSpecial();
 
 	void SpecialUpdate(ndFloat32 timestep);
-	ndBodyKinematicSpecial* GetAsBodyKinematicSpetial();
+	ndBodyKinematicSpecial* GetAsBodyKinematicSpecial();
 
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline ndBodyKinematicSpecial* ndBodyKinematicSpecial::GetAsBodyKinematicSpetial()
+inline ndBodyKinematicSpecial* ndBodyKinematicSpecial::GetAsBodyKinematicSpecial()
 { 
 	return this; 
 }

@@ -55,7 +55,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual ndBodyParticleSet* GetAsBodyParticleSet() { return nullptr; }
 	virtual ndBodyPlayerCapsule* GetAsBodyPlayerCapsule() { return nullptr; }
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
-	virtual ndBodyKinematicSpecial* GetAsBodyKinematicSpetial() { return nullptr; }
+	virtual ndBodyKinematicSpecial* GetAsBodyKinematicSpecial() { return nullptr; }
 
 	ndUnsigned32 GetId() const;
 	void GetAABB(ndVector& p0, ndVector& p1) const;
