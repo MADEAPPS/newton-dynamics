@@ -89,6 +89,16 @@ static ndRagdollDefinition jointsDefinition[] =
 	{ "root", ndRagdollDefinition::m_root, 1.0f, {}, {} },
 	{ "lowerback", ndRagdollDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 	{ "upperback", ndRagdollDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+	{ "lowerneck", ndRagdollDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+	{ "upperneck", ndRagdollDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+	
+	{ "lclavicle", ndRagdollDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+	{ "lhumerus", ndRagdollDefinition::m_hinge, 1.0f, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "lradius", ndRagdollDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+
+	{ "rclavicle", ndRagdollDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+	{ "rhumerus", ndRagdollDefinition::m_hinge, 1.0f, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "rradius", ndRagdollDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 	{ "rhipjoint", ndRagdollDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
 	{ "rfemur", ndRagdollDefinition::m_hinge, 1.0f, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
@@ -197,7 +207,7 @@ class ndRagdollModel : public ndModel
 			ndBodyDynamic* parentBone = parentBones[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
-			//dTrace(("name: %s\n", name));
+			//ndTrace(("name: %s\n", name));
 			for (ndInt32 i = 0; jointsDefinition[i].m_boneName[0]; ++i)
 			{
 				const ndRagdollDefinition& definition = jointsDefinition[i];
