@@ -87,20 +87,17 @@ class ndRagdollDefinition
 static ndRagdollDefinition jointsDefinition[] =
 {
 	{ "root", ndRagdollDefinition::m_root, 1.0f, {}, {} },
-	{ "lowerback", ndRagdollDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 15.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "upperback", ndRagdollDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 15.0f },{ 0.0f, 0.0f, 0.0f } },
+	{ "lowerback", ndRagdollDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "upperback", ndRagdollDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 
 	{ "rhipjoint", ndRagdollDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
 	{ "rfemur", ndRagdollDefinition::m_hinge, 1.0f, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "rtibia", ndRagdollDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-	//{ "rightCalfEffector", ndRagdollDefinition::m_effector, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 0.0f } },
-	
+	{ "rtibia", ndRagdollDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		
 	{ "lhipjoint", ndRagdollDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-	{ "lfemur", ndRagdollDefinition::m_hinge, 1.0f,{ 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "ltibia", ndRagdollDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-	//{ "leftCalfEffector", ndRagdollDefinition::m_effector, 1.0f, { 0.0f, 0.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
-
-
+	{ "lfemur", ndRagdollDefinition::m_hinge, 1.0f, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "ltibia", ndRagdollDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+	
 	{ "", ndRagdollDefinition::m_root,{},{} },
 };
 
@@ -277,12 +274,13 @@ class ndRagdollModel : public ndModel
 		ndRagdollDefinition::ndOffsetFrameMatrix frameAngle(definition.m_frameBasics);
 		ndMatrix pinAndPivotInGlobalSpace(ndPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * ndYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * ndRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
+		ndRagdollDefinition::ndJointLimits jointLimits(definition.m_jointLimits);
+
 		switch (definition.m_limbType)
 		{
 			case ndRagdollDefinition::m_spherical:
 			{
 				ndJointSpherical* const joint = new ndJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBody);
-				ndRagdollDefinition::ndJointLimits jointLimits(definition.m_jointLimits);
 				joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 				joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 				joint->SetAsSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
@@ -292,26 +290,21 @@ class ndRagdollModel : public ndModel
 			case ndRagdollDefinition::m_hinge:
 			{
 				ndJointHinge* const joint = new ndJointHinge(pinAndPivotInGlobalSpace, childBody, parentBody);
-				ndRagdollDefinition::ndJointLimits jointLimits(definition.m_jointLimits);
-
 				joint->SetLimitState(true);
 				joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 				joint->SetAsSpringDamper(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
 				return joint;
 			}
 			
-			//case ndRagdollDefinition::m_doubleHinge:
-			//{
-			//	ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
-			//
-			//	ndRagdollDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-			//	joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
-			//	joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
-			//
-			//	joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
-			//	joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
-			//	return joint;
-			//}
+			case ndRagdollDefinition::m_doubleHinge:
+			{
+				ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBody);
+				joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
+				joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+				joint->SetAsSpringDamper0(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				joint->SetAsSpringDamper1(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
+				return joint;
+			}
 
 			default:
 				ndAssert(0);
