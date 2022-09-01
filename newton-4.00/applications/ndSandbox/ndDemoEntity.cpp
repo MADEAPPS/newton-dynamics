@@ -67,8 +67,22 @@ void ndDemoEntityNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 		body->SetForce(force);
 		body->SetTorque(ndVector::m_zero);
 
-		//ndVector L(body->CalculateAngularMomentum());
-		//ndTrace(("%f %f %f\n", L.m_x, L.m_y, L.m_z));
+		// clamp execive velocites.
+		ndVector omega(body->GetOmega());
+		ndVector veloc(body->GetVelocity());
+		ndFloat32 omega2(omega.DotProduct(omega).GetScalar());
+		if (omega2 > 100.0f * 100.0f)
+		{
+			omega = omega.Normalize().Scale(100.0f);
+			body->SetOmega(omega);
+		}
+
+		ndFloat32 veloc2(veloc.DotProduct(veloc).GetScalar());
+		if (veloc2 > 100.0f * 100.0f)
+		{
+			veloc = veloc.Normalize().Scale(100.0f);
+			body->SetVelocity(veloc);
+		}
 	}
 }
 
