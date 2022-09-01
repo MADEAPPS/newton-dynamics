@@ -311,54 +311,35 @@ void ndJointSpherical::ApplyBaseRows(const ndMatrix& matrix0, const ndMatrix& ma
 
 void ndJointSpherical::SubmitSpringDamper(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	if (m_springK == ndFloat32(0.0f))
+	const ndMatrix matrix11(m_rotation * matrix1);
+	const ndQuaternion rotation(matrix0.Inverse() * matrix11);
+	const ndVector pin(rotation & ndVector::m_triplexMask);
+	const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
+	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
+	if (dirMag2 > (tol * tol))
 	{
-		ndAssert(m_damperC > ndFloat32(0.0f));
-		const ndBodyKinematic* const body0 = GetBody0();
-		const ndBodyKinematic* const body1 = GetBody1();
-		const ndVector omega0(body0->GetOmega());
-		const ndVector omega1(body1->GetOmega());
-		const ndVector relOmega(omega1 - omega0);
-		ndFloat32 speed(relOmega.DotProduct(relOmega).GetScalar());
-		if (speed > ndFloat32(1.0e-5f))
-		{
-			const ndVector pin (relOmega.Normalize());
-			AddAngularRowJacobian(desc, pin, ndFloat32(0.0f));
-			SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, ndFloat32(0.0f), m_damperC);
-		}
+		const ndMatrix basis(pin);
+		const ndFloat32 dirMag = ndSqrt(dirMag2);
+		const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
+
+		AddAngularRowJacobian(desc, basis[0], angle);
+		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+		AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
+		AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
 	}
 	else
 	{
-		const ndMatrix matrix11(m_rotation * matrix1);
-		const ndQuaternion rotation(matrix0.Inverse() * matrix11);
-		const ndVector pin(rotation & ndVector::m_triplexMask);
-		const ndFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
-		const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
-		if (dirMag2 > (tol * tol))
-		{
-			const ndMatrix basis(pin);
-			const ndFloat32 dirMag = ndSqrt(dirMag2);
-			const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
-
-			AddAngularRowJacobian(desc, basis[0], angle);
-			SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
-			AddAngularRowJacobian(desc, basis[1], ndFloat32(0.0f));
-			AddAngularRowJacobian(desc, basis[2], ndFloat32(0.0f));
-		}
-		else
-		{
-			const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
-			AddAngularRowJacobian(desc, matrix11[0], pitchAngle);
-			SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+		const ndFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix11[1], matrix11[0]);
+		AddAngularRowJacobian(desc, matrix11[0], pitchAngle);
+		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 			
-			const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[1]);
-			AddAngularRowJacobian(desc, matrix11[1], yawAngle);
-			SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+		const ndFloat32 yawAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[1]);
+		AddAngularRowJacobian(desc, matrix11[1], yawAngle);
+		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 			
-			const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[2]);
-			AddAngularRowJacobian(desc, matrix11[2], rollAngle);
-			SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
-		}
+		const ndFloat32 rollAngle = CalculateAngle(matrix0[0], matrix11[0], matrix11[2]);
+		AddAngularRowJacobian(desc, matrix11[2], rollAngle);
+		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 	}
 }
 

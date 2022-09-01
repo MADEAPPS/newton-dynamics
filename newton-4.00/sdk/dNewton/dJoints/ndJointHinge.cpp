@@ -285,7 +285,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
+	if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
 	{
 		// spring damper with limits
 		SubmitSpringDamper(desc, matrix0, matrix1);
