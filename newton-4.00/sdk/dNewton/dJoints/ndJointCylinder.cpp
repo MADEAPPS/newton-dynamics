@@ -372,15 +372,13 @@ ndFloat32 ndJointCylinder::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-ndInt8 ndJointCylinder::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointCylinder::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndInt8 ret = 0;
 	if (m_limitStateAngle)
 	{
 		if ((m_minLimitAngle > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_maxLimitAngle < (ndFloat32(1.0f) * ndDegreeToRad)))
 		{
 			AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
-			ret = 1;
 		}
 		else
 		{
@@ -393,7 +391,6 @@ ndInt8 ndJointCylinder::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndM
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (angle > m_maxLimitAngle)
 			{
@@ -403,11 +400,9 @@ ndInt8 ndJointCylinder::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndM
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}
-	return ret;
 }
 
 ndFloat32 ndJointCylinder::PenetrationSpeed(ndFloat32 penetration) const
@@ -417,15 +412,13 @@ ndFloat32 ndJointCylinder::PenetrationSpeed(ndFloat32 penetration) const
 	return speed;
 }
 
-ndInt8 ndJointCylinder::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointCylinder::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndInt8 ret = false;
 	if (m_limitStatePosit)
 	{
 		if ((m_minLimitPosit == ndFloat32(0.0f)) && (m_maxLimitPosit == ndFloat32(0.0f)))
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
-			ret = 1;
 		}
 		else
 		{
@@ -439,7 +432,6 @@ ndInt8 ndJointCylinder::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndM
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (x > m_maxLimitPosit)
 			{
@@ -449,11 +441,9 @@ ndInt8 ndJointCylinder::SubmitLimitsPosit(ndConstraintDescritor& desc, const ndM
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}
-	return ret;
 }
 
 void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
@@ -463,25 +453,21 @@ void ndJointCylinder::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	ndInt8 hitLimitAngle = SubmitLimitsAngle(desc, matrix0, matrix1);
-	if (!hitLimitAngle)
+
+	if (m_springDamperRegularizerAngle && ((m_springKAngle > ndFloat32(0.0f)) || (m_damperCAngle > ndFloat32(0.0f))))
 	{
-		if ((m_springKAngle > ndFloat32(0.0f)) || (m_damperCAngle > ndFloat32(0.0f)))
-		{
-			// spring damper with limits
-			SubmitSpringDamperAngle(desc, matrix0, matrix1);
-		}
+		// spring damper with limits
+		SubmitSpringDamperAngle(desc, matrix0, matrix1);
 	}
 
-	ndInt8 hitLimitPosit = SubmitLimitsPosit(desc, matrix0, matrix1);
-	if (!hitLimitPosit)
+	if (m_springDamperRegularizerPosit && ((m_springKPosit > ndFloat32(0.0f)) || (m_damperCPosit > ndFloat32(0.0f))))
 	{
-		if ((m_springKPosit > ndFloat32(0.0f)) || (m_damperCPosit > ndFloat32(0.0f)))
-		{
-			// spring damper with limits
-			SubmitSpringDamperPosit(desc, matrix0, matrix1);
-		}
+		// spring damper with limits
+		SubmitSpringDamperPosit(desc, matrix0, matrix1);
 	}
+
+	SubmitLimitsAngle(desc, matrix0, matrix1);
+	SubmitLimitsPosit(desc, matrix0, matrix1);
 }
 
 

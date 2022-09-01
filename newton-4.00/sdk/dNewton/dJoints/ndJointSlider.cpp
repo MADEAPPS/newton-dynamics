@@ -33,7 +33,7 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* 
 }
 
 ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotInChild)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotInChild)
 	,m_posit(ndFloat32(0.0f))
 	,m_speed(ndFloat32(0.0f))
 	,m_springK(ndFloat32(0.0f))
@@ -123,7 +123,6 @@ bool ndJointSlider::GetLimitState() const
 
 void ndJointSlider::SetLimitState(bool state)
 {
-	m_maxDof = state ? 7 : 6;
 	m_limitState = state ? 1 : 0;
 }
 
@@ -162,15 +161,13 @@ ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
 	return speed;
 }
 
-ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndInt8 ret = false;
 	if (m_limitState)
 	{
 		if ((m_minLimit == ndFloat32(0.0f)) && (m_maxLimit == ndFloat32(0.0f)))
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
-			ret = 1;
 		}
 		else
 		{
@@ -184,7 +181,6 @@ ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& 
 				const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationSpeed(-penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetLowerFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 			else if (x > m_maxLimit)
 			{
@@ -194,11 +190,9 @@ ndInt8 ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& 
 				const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationSpeed(penetration);
 				SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 				SetHighFriction(desc, ndFloat32(0.0f));
-				ret = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 			}
 		}
 	}
-	return ret;
 }
 
 void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
@@ -246,15 +240,14 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
-	if (!hitLimit)
+
+	if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
 	{
-		if ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f)))
-		{
-			// spring damper with limits
-			SubmitSpringDamper(desc, matrix0, matrix1);
-		}
+		// spring damper with limits
+		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
+
+	SubmitLimits(desc, matrix0, matrix1);
 }
 
 

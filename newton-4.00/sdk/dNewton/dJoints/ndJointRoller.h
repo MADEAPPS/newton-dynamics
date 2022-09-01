@@ -47,11 +47,11 @@ class ndJointRoller: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
-	D_NEWTON_API ndInt8 SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API void SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void SubmitSpringDamperAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	D_NEWTON_API ndFloat32 PenetrationSpeed(ndFloat32 penetration) const;
-	D_NEWTON_API ndInt8 SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	D_NEWTON_API void SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void SubmitSpringDamperPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

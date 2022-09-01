@@ -290,9 +290,8 @@ ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndInt8 ret0 = 0;
 	if ((m_axis0.m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_axis0.m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
 	{
 		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_axis0.m_angle);
@@ -308,7 +307,6 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMat
 			const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
-			ret0 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else if (angle > m_axis0.m_maxLimit)
 		{
@@ -318,11 +316,9 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMat
 			const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, ndFloat32(0.0f));
-			ret0 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
 
-	ndInt8 ret1 = 0;
 	if ((m_axis1.m_minLimit > (ndFloat32(-1.0f) * ndDegreeToRad)) && (m_axis1.m_maxLimit < (ndFloat32(1.0f) * ndDegreeToRad)))
 	{
 		AddAngularRowJacobian(desc, &matrix1.m_up[0], -m_axis1.m_angle);
@@ -338,7 +334,6 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMat
 			const ndFloat32 recoveringAceel = -desc.m_invTimestep * PenetrationOmega(-penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, ndFloat32(0.0f));
-			ret1 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 		else if (angle > m_axis1.m_maxLimit)
 		{
@@ -348,11 +343,8 @@ ndInt8 ndJointDoubleHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMat
 			const ndFloat32 recoveringAceel = desc.m_invTimestep * PenetrationOmega(penetration);
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, ndFloat32(0.0f));
-			ret1 = ndAbs(stopAccel) > ND_MAX_STOP_ACCEL;
 		}
 	}
-
-	return ret0 | ret1;
 }
 
 void ndJointDoubleHinge::SubmitSpringDamper0(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix&)
@@ -374,24 +366,19 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-
-	ndInt8 hitLimit = SubmitLimits(desc, matrix0, matrix1);
-	if (!(hitLimit & 1))
+	
+	if (m_axis0.m_springDamperRegularizer && ((m_axis0.m_springK > ndFloat32(0.0f)) || (m_axis0.m_damperC > ndFloat32(0.0f))))
 	{
-		if ((m_axis0.m_springK > ndFloat32(0.0f)) || (m_axis0.m_damperC > ndFloat32(0.0f)))
-		{
-			// spring damper with limits
-			SubmitSpringDamper0(desc, matrix0, matrix1);
-		}
+		// spring damper with limits
+		SubmitSpringDamper0(desc, matrix0, matrix1);
 	}
 
-	if (!(hitLimit & 2))
+	if (m_axis1.m_springDamperRegularizer && ((m_axis1.m_springK > ndFloat32(0.0f)) || (m_axis1.m_damperC > ndFloat32(0.0f))))
 	{
-		if ((m_axis1.m_springK > ndFloat32(0.0f)) || (m_axis1.m_damperC > ndFloat32(0.0f)))
-		{
-			// spring damper with limits
-			SubmitSpringDamper1(desc, matrix0, matrix1);
-		}
+		// spring damper with limits
+		SubmitSpringDamper1(desc, matrix0, matrix1);
 	}
+
+	SubmitLimits(desc, matrix0, matrix1);
 }
 

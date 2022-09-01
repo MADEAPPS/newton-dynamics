@@ -309,23 +309,6 @@ class ndRagdollModel : public ndModel
 			default:
 				ndAssert(0);
 		}
-
-		//else
-		//{
-		////	ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-		////
-		////	ndRagdollDefinition::ndJointLimits jointLimits(definition.m_jointLimits);
-		////	ndJointSpherical* const joint = (ndJointSpherical*)jointNode->GetJoint();
-		////
-		////	//dTrace (("do not forget to delete this debug\n"))
-		////	//joint->SetSolverModel(m_jointkinematicCloseLoop);
-		////
-		////	ndAssert(0);
-		////	joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-		////	joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-		////	joint->SetAsSpringDamper(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-		////	return jointNode;
-		//}
 		return nullptr;
 	}
 
