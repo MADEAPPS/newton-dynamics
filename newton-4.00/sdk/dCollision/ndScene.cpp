@@ -236,7 +236,8 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 		body->UpdateCollisionMatrix();
 
 		m_rootNode = m_bvhSceneManager.AddBody(body, m_rootNode);
-		if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
+		//if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
+		if (body->GetAsBodyKinematicSpetial())
 		{
 			body->m_spetialUpdateNode = m_specialUpdateList.Append(body);
 		}
@@ -262,7 +263,8 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 
 	if (body->m_scene && body->m_sceneNode)
 	{
-		if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
+		//if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
+		if (body->GetAsBodyKinematicSpetial())
 		{
 			m_specialUpdateList.Remove(body->m_spetialUpdateNode);
 			body->m_spetialUpdateNode = nullptr;

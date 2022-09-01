@@ -363,7 +363,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
-	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	

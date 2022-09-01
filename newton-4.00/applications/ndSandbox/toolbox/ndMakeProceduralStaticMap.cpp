@@ -165,7 +165,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndRegularProceduralGrid)
 
 ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
-	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
+	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 1.0f);
 
 	ndArray<ndVector> points;
 	for (ndInt32 iz = 0; iz <= grids; iz++)

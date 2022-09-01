@@ -256,6 +256,6 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	scene->GetCameraManager()->SetPickMode(true);
 
 	ndQuaternion rot;
-	ndVector origin(-15.0f, 5.0f, 0.0f, 0.0f);
+	ndVector origin(-15.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

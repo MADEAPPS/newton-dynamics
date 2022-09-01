@@ -383,7 +383,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	ndVector origin(-offset, 1.0f, -offset, ndFloat32(0.0f));
 
 	matrix.m_posit += origin;
-matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
+matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 1.0f);
 
 	BuildBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);

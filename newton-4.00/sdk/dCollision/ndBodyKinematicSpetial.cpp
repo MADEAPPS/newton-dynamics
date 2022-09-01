@@ -22,47 +22,33 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
-#include "ndBodyTriggerVolume.h"
+#include "ndBodyKinematicSpetial.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyTriggerVolume)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematicSpetial)
 
-ndBodyTriggerVolume::ndBodyTriggerVolume()
-	:ndBodyKinematicSpetial()
+ndBodyKinematicSpetial::ndBodyKinematicSpetial()
+	:ndBodyKinematic()
 {
-	//m_contactTestOnly = 1;
+	m_contactTestOnly = 1;
 }
 
-ndBodyTriggerVolume::ndBodyTriggerVolume(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyKinematicSpetial(ndLoadSaveBase::ndLoadDescriptor(desc))
+ndBodyKinematicSpetial::ndBodyKinematicSpetial(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndBodyKinematic(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
-	//m_contactTestOnly = 1;
+	m_contactTestOnly = 1;
 }
 
-ndBodyTriggerVolume::~ndBodyTriggerVolume()
+ndBodyKinematicSpetial::~ndBodyKinematicSpetial()
 {
 }
 
-void ndBodyTriggerVolume::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+void ndBodyKinematicSpetial::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematicSpetial::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+	ndBodyKinematic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	// nothing to save so far
 }
 
-void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
-{
-	const ndContactMap& contactMap = GetContactMap();
-
-	ndBodyKinematic::ndContactMap::Iterator it(contactMap);
-	for (it.Begin(); it; it++)
-	{
-		const ndContact* const contact = *it;
-		if (contact->IsActive())
-		{
-			OnTrigger(contact->GetBody0(), timestep);
-		}
-	}
-}

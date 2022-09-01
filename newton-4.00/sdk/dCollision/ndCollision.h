@@ -64,6 +64,7 @@
 #include <ndBodyTriggerVolume.h>
 #include <ndBodiesInAabbNotify.h>
 #include <ndShapeConvexPolygon.h>
+#include <ndBodyKinematicSpetial.h>
 #include <ndShapeChamferCylinder.h>
 #include <ndJointBilateralConstraint.h>
 #include <ndShapeInstanceMeshBuilder.h>

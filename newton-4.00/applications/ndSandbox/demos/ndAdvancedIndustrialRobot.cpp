@@ -456,7 +456,7 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
 
 	ndWorld* const world = scene->GetWorld();

@@ -763,7 +763,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 
-	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston.fbx");
 
 	ndWorld* const world = scene->GetWorld();

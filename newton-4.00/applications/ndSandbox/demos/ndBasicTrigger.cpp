@@ -113,6 +113,6 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
 
 	ndQuaternion rot;
-	ndVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
