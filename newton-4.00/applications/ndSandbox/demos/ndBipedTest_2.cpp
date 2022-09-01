@@ -56,8 +56,6 @@ class ndAiBipedTest_2_Definition
 static ndAiBipedTest_2_Definition mannequinDefinition[] =
 {
 	{ "root", ndAiBipedTest_2_Definition::m_root, {}, {} },
-	//{ "Bip001 Spine1", 1.0f,{ -30.0f, 30.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
-	//{ "Bip001 Head", 1.0f,{ -60.0f, 60.0f, 60.0f },{ 0.0f, 90.0f, 0.0f } },
 
 	{ "rhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 0.0f } },
 	{ "rfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 150.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },

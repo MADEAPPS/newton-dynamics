@@ -52,15 +52,15 @@ void ndIkJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-	SubmitLimits(desc, matrix0, matrix1);
-
 	if (!m_ikMode)
 	{
 		const ndVector pin(matrix0.m_front);
 		ndFloat32 accel = (pin * m_accel0.m_angular - pin * m_accel1.m_angular).AddHorizontal().GetScalar();
 		AddAngularRowJacobian(desc, pin, 0.0f);
 		SetMotorAcceleration(desc, accel);
+		SetDiagonalRegularizer(desc, m_defualRegularizer);
 	}
+	SubmitLimits(desc, matrix0, matrix1);
 }
 
 
