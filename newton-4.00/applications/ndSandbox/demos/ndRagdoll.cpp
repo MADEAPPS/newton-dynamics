@@ -85,7 +85,7 @@ class ndRagdollDefinition
 	ndDampData m_twistSpringData;
 };
 
-static ndRagdollDefinition jointsDefinition[] =
+static ndRagdollDefinition ragdollDefinition[] =
 {
 	{ "root", ndRagdollDefinition::m_root, 1.0f, {}, {} },
 	{ "lowerback", ndRagdollDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
@@ -125,7 +125,7 @@ class ndRagdollModel : public ndModel
 		ndDemoEntity* const entity = (ndDemoEntity*)ragdollMesh->CreateClone();
 		scene->AddEntity(entity);
 
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
+		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
 		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 
 		// find the floor location 
@@ -154,7 +154,7 @@ class ndRagdollModel : public ndModel
 		}
 
 		bodies.PushBack(m_rootBody);
-		massWeight.PushBack(jointsDefinition[0].m_massWeight);
+		massWeight.PushBack(ragdollDefinition[0].m_massWeight);
 
 		while (stack) 
 		{
@@ -163,14 +163,14 @@ class ndRagdollModel : public ndModel
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//ndTrace(("name: %s\n", name));
-			for (ndInt32 i = 0; jointsDefinition[i].m_boneName[0]; ++i)
+			for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
 			{
-				const ndRagdollDefinition& definition = jointsDefinition[i];
+				const ndRagdollDefinition& definition = ragdollDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
 				{
 					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
 					bodies.PushBack(childBody);
-					massWeight.PushBack(jointsDefinition[i].m_massWeight);
+					massWeight.PushBack(ragdollDefinition[i].m_massWeight);
 
 					//connect this body part to its parentBody with a ragdoll joint
 					ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition);
