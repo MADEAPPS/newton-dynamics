@@ -26,13 +26,13 @@ ndApplicationMaterial::~ndApplicationMaterial()
 {
 }
 
-bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32) const
+//bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32) const
+bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
 {
-	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
-	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
-
-	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
-	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+	//const ndBodyKinematic* const body0 = contactJoint->GetBody0();
+	//const ndBodyKinematic* const body1 = contactJoint->GetBody1();
+	//const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+	//const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
 
 	if ((instanceShape0.GetUserDataID() == ndApplicationMaterial::m_dedris) && (instanceShape1.GetUserDataID() == ndApplicationMaterial::m_dedris))
 	{
@@ -154,14 +154,20 @@ bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, ndFlo
 {
 	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();
 	ndAssert(material);
-	return material->OnAabbOverlap(contactJoint, timestep);
+
+	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
+	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
+	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+	return material->OnAabbOverlap(contactJoint, timestep, instanceShape0, instanceShape1);
 }
 
 //bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1)
-bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const, ndFloat32, const ndShapeInstance* const, const ndShapeInstance* const)
+bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const contactJoint, ndFloat32 timestep, const ndShapeInstance* const instance0, const ndShapeInstance* const instance1)
 {
-	ndAssert(0);
-	return 0;
+	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();
+	ndAssert(material);
+	return material->OnAabbOverlap(contactJoint, timestep, *instance0, *instance1);
 }
 
 //void ndContactCallback::OnContactCallback(ndInt32 threadIndex, const ndContact* const contactJoint, ndFloat32 timestep)

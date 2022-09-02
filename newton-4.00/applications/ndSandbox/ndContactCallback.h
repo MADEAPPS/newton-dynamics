@@ -41,8 +41,8 @@ class ndApplicationMaterial : public ndMaterial
 		return new ndApplicationMaterial(*this);
 	}
 
-	virtual bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep) const;
 	virtual void OnContactCallback(const ndContact* const joint, ndFloat32 timestep) const;
+	virtual bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const;
 };
 
 class ndMaterailKey
