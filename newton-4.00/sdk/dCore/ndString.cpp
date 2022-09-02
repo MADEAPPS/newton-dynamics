@@ -337,7 +337,7 @@ void ndString::LoadFile (FILE* const file)
 	fseek (file, 0, SEEK_SET);
 	Expand (size);
 	size_t ret = fread (m_string, 1, size, file);
-	ret = 0;
+	ret++;
 	m_string[size-1] = 0;
 	m_size = size-1;
 	m_capacity = m_size + 1;

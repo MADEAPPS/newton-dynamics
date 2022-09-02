@@ -85,7 +85,7 @@ namespace nd_
 			ConvexHull ch(pts, 3 * sizeof(double), (int32_t)nPts, 1.0e-5f);
 
 			const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-			for (int32_t v = 0; v < convexPoints.size(); v++) {
+			for (int32_t v = 0; v < int (convexPoints.size()); v++) {
 				AddPoint(convexPoints[v]);
 			}
 
@@ -260,7 +260,8 @@ namespace nd_
 
 		bool Mesh::LoadOFF(const std::string& fileName, bool invert)
 		{
-			int ret;
+			int ret = 0;
+			ret++;
 			FILE* fid = fopen(fileName.c_str(), "r");
 			if (fid) {
 				const std::string strOFF("OFF");

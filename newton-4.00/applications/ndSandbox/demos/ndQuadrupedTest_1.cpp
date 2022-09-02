@@ -44,7 +44,7 @@ class ndAiQuadrupedTest_1_Definition
 
 static ndAiQuadrupedTest_1_Definition jointsDefinition[] =
 {
-	{ "spot_body", ndAiQuadrupedTest_1_Definition::m_root, 40.0f},
+	{ "spot_body", ndAiQuadrupedTest_1_Definition::m_root, 0.0f, 0.0f, 0.0f},
 
 	{ "spot_shoulder_FR", ndAiQuadrupedTest_1_Definition::m_hinge, -90.0f, 90.0f, 0.0f },
 	{ "spot_up_arm_FR", ndAiQuadrupedTest_1_Definition::m_hinge, -130.0f, 130.0f, 0.0f },
@@ -112,8 +112,8 @@ class ndAiQuadrupedTestWalkSequence : public ndAnimationSequenceBase
 		:ndAnimationSequenceBase()
 		,m_segment0()
 		,m_segment1()
-		,m_xStride(1.0f)
 		,m_xBias(0.11f)
+		,m_xStride(1.0f)
 		,m_midParam(midParam)
 		,m_offsets()
 		,m_isGrounded()

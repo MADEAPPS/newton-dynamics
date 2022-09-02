@@ -380,7 +380,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	ndInt32 sums[D_MAX_THREADS_COUNT + 1];
 	ndInt32 scans[D_MAX_THREADS_COUNT + 1];
 
-	auto CountGridScans = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32)
+	auto CountGridScans = ndMakeObject::ndFunction([&data, &scans](ndInt32 threadIndex, ndInt32)
 	{
 		D_TRACKTIME_NAMED(CountGridScans);
 		const ndGridHash* const hashGridMap = &data.m_hashGridMap[0];
@@ -406,7 +406,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 		gridScans.PushBack(count);
 	});
 
-	auto CalculateScans = ndMakeObject::ndFunction([this, &data, &scans, &sums](ndInt32 threadIndex, ndInt32)
+	auto CalculateScans = ndMakeObject::ndFunction([&data, &scans, &sums](ndInt32 threadIndex, ndInt32)
 	{
 		D_TRACKTIME_NAMED(CalculateScans);
 		ndArray<ndInt32>& gridScans = data.m_gridScans;

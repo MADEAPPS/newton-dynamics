@@ -576,6 +576,7 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	}
 
 	size_t readBytes = 0;
+	readBytes++;
 	fseek(fp, 0, SEEK_END);
 	long file_size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -1097,6 +1098,7 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	}
 
 	size_t readBytes = 0;
+	readBytes++;
 	fseek(fp, 0, SEEK_END);
 	long file_size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);

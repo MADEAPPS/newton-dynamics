@@ -22,6 +22,10 @@ ndApplicationMaterial::ndApplicationMaterial(const ndApplicationMaterial& copy)
 {
 }
 
+ndApplicationMaterial::~ndApplicationMaterial()
+{
+}
+
 bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32) const
 {
 	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
@@ -62,7 +66,6 @@ ndMaterialGraph::~ndMaterialGraph()
 	}
 }
 
-
 ndContactCallback::ndContactCallback()
 	:ndContactNotify()
 	,m_materialGraph()
@@ -86,8 +89,8 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 
 	ndFloat32 maxNornalSpeed = ndFloat32(0.0f);
 	ndFloat32 maxTangentSpeed = ndFloat32(0.0f);
-	const ndContactMaterial* normalContact = nullptr;
-	const ndContactMaterial* tangentContact = nullptr;
+	//const ndContactMaterial* normalContact = nullptr;
+	//const ndContactMaterial* tangentContact = nullptr;
 	for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
 		const ndContactMaterial& contactPoint = contactNode->GetInfo();
@@ -100,7 +103,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 		if (nornalSpeed > maxNornalSpeed)
 		{
 			maxNornalSpeed = nornalSpeed;
-			normalContact = &contactPoint;
+			//normalContact = &contactPoint;
 		}
 
 		ndVector tangVeloc(veloc - contactPoint.m_normal.Scale(verticalSpeed));
@@ -108,7 +111,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 		if (tangentSpeed > maxTangentSpeed)
 		{
 			maxTangentSpeed = tangentSpeed;
-			tangentContact = &contactPoint;
+			//tangentContact = &contactPoint;
 		}
 	}
 
@@ -155,7 +158,7 @@ bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, ndFlo
 }
 
 //bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1)
-bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const, const ndShapeInstance&, const ndShapeInstance&)
+bool ndContactCallback::OnCompoundSubShapeOverlap(const ndContact* const, ndFloat32, const ndShapeInstance* const, const ndShapeInstance* const)
 {
 	ndAssert(0);
 	return 0;

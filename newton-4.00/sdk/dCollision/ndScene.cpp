@@ -1289,7 +1289,7 @@ void ndScene::CalculateContacts()
 	m_contactArray.SetCount(contactCount + m_newPairs.GetCount());
 	if (m_contactArray.GetCount())
 	{
-		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray, &contactCount](ndInt32 threadIndex, ndInt32 threadCount)
+		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 			const ndUnsigned32 jointCount = m_contactArray.GetCount();

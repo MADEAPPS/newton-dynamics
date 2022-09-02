@@ -100,7 +100,8 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 	FILE* const file = fopen(filePathName, "rb");
 	if (file)
 	{
-		ndInt64 readBytes;
+		ndInt64 readBytes = 0;
+		readBytes++;
 		m_elevationMap.SetCount(m_width * m_height);
 		m_atributeMap.SetCount(m_width * m_height);
 		readBytes = fread(&m_elevationMap[0], sizeof(ndReal), m_elevationMap.GetCount(), file);
@@ -598,7 +599,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 		ndInt32 normalBase = vertexIndex;
 		vertexIndex = 0;
-		ndInt32 index = 0;
+		//ndInt32 index = 0;
 		ndInt32 quadCount = 0;
 		ndInt32 step = x1 - x0 + 1;
 		ndGridQuad* const quadArray = (ndGridQuad*) data->m_globalFaceVertexIndex;
@@ -673,7 +674,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 					quad.m_triangle1.m_normal_edge01 = normalIndex0;
 				}
 	
-				index += 9 * 2;
+				//index += 9 * 2;
 				normalBase += 2;
 				quadCount++;
 				vertexIndex++;

@@ -39,7 +39,7 @@ class ndSkeletonContainer
 		public:
 		ndOrdinal()
 		{
-			for (ndInt32 i = 0; i < sizeof(m_sourceJacobianIndex); ++i)
+			for (ndInt32 i = 0; i < ndInt32(sizeof(m_sourceJacobianIndex)); ++i)
 			{
 				m_sourceJacobianIndex[i] = ndInt8(i);
 			}

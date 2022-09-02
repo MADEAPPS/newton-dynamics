@@ -1832,7 +1832,7 @@ void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, nd
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
-			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
+			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (ndInt32 (sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				tmpFormat.CompressData(*this, indexList, remapIndex, cluster, tol);
 			}
@@ -2192,7 +2192,7 @@ void ndMeshEffect::ndAttibutFormat::CompactVertexData(const ndPointFormat& point
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
-			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (sizeof (spliteStack) / sizeof (spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
+			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (ndInt32 (sizeof (spliteStack) / sizeof (spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				tmpFormat.CompressData(*this, points, indexList, remapIndex, cluster, tol);
 			}
@@ -2851,7 +2851,7 @@ void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 	}
 
 	bool pendingFaces = true;
-	ndInt32 layerBase = 0;
+	//ndInt32 layerBase = 0;
 	ndInt32 attributeCount = 0;
 
 	ndInt32 normalStride = ndInt32(format->m_normal.m_strideInBytes / sizeof(ndFloat32));
@@ -3005,7 +3005,7 @@ void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 		{
 			//ndAssert (0);
 			layerIndex++;
-			layerBase += vertexCount;
+			//layerBase += vertexCount;
 			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
 				m_points.m_layers.PushBack(layerIndex);

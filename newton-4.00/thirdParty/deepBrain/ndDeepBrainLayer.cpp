@@ -24,8 +24,8 @@
 
 ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDeepBrainActivationType activation)
 	:ndDeepBrainMatrix(outputCount, inputCount)
-	,m_activation(activation)
 	,m_bias()
+	,m_activation(activation)
 {
 	m_bias.SetCount(outputCount);
 	m_bias.Set(0.0f);

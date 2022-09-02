@@ -828,7 +828,7 @@ namespace nd_
 		combinedCH->ResizePoints(0);
 		combinedCH->ResizeTriangles(0);
 		const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-		for (int32_t v = 0; v < convexPoints.size(); v++) {
+		for (int32_t v = 0; v < int (convexPoints.size()); v++) {
 			combinedCH->AddPoint(convexPoints[v]);
 		}
 
@@ -937,7 +937,7 @@ namespace nd_
 		int pairsCount = 0;
 		convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
 
-		for (int i = 0; i < m_convexHulls.Size(); ++i)
+		for (int i = 0; i < int (m_convexHulls.Size()); ++i)
 		{
 			convexProxyArray.push_back(ConvexProxy());
 			convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[i]);
@@ -945,7 +945,7 @@ namespace nd_
 			convexProxyArray[i].m_hull->CalculateBoundingBox(convexProxyArray[i].m_bmin, convexProxyArray[i].m_bmax);
 		}
 
-		for (int i = 1; i < convexProxyArray.size(); ++i)
+		for (int i = 1; i < int (convexProxyArray.size()); ++i)
 		{
 			Vec3<double> bmin1(convexProxyArray[i].m_bmin);
 			Vec3<double> bmax1(convexProxyArray[i].m_bmax);
@@ -1004,7 +1004,7 @@ namespace nd_
 				if (it != hullGraph.end())
 				{
 					hullGraph.erase(it);
-					for (int i = 0; i < convexProxyArray.size(); i++)
+					for (int i = 0; i < int (convexProxyArray.size()); i++)
 					{
 						if (convexProxyArray[i].m_hull)
 						{
@@ -1034,7 +1034,7 @@ namespace nd_
 					const Vec3<double> bmin(convexProxyArray[index].m_bmin);
 					const Vec3<double> bmax(convexProxyArray[index].m_bmax);
 
-					for (int i = 0; i < convexProxyArray.size() - 1; i++)
+					for (int i = 0; i < int (convexProxyArray.size()) - 1; i++)
 					{
 						if (convexProxyArray[i].m_hull)
 						{
@@ -1066,7 +1066,7 @@ namespace nd_
 				m_convexHulls.PopBack();
 			}
 
-			for (int i = 0; i < convexProxyArray.size(); i++)
+			for (int i = 0; i < int (convexProxyArray.size()); i++)
 			{
 				if (convexProxyArray[i].m_hull)
 				{

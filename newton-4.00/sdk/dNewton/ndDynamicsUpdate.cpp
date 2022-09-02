@@ -259,7 +259,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	ndInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const ndInt32 threadCount = scene->GetThreadCount();
 	
-	auto MarkFence0 = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
+	auto MarkFence0 = ndMakeObject::ndFunction([&jointArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(MarkFence0);
 		const ndStartEnd startEnd(jointArray.GetCount(), threadIndex, threadCount);
@@ -289,7 +289,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	});
 
-	auto MarkFence1 = ndMakeObject::ndFunction([this, &jointArray, &movingJoints](ndInt32 threadIndex, ndInt32 threadCount)
+	auto MarkFence1 = ndMakeObject::ndFunction([&jointArray, &movingJoints](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(MarkFence1);
 		ndInt32 activeJointCount = 0;
@@ -315,7 +315,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		movingJoints[threadIndex] = activeJointCount;
 	});
 
-	auto Scan0 = ndMakeObject::ndFunction([this, &jointArray, &histogram, scene](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Scan0 = ndMakeObject::ndFunction([&jointArray, &histogram, scene](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(Scan0);
 		ndInt32* const hist = &histogram[threadIndex][0];
@@ -337,7 +337,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	});
 
-	auto Sort0 = ndMakeObject::ndFunction([this, &jointArray, &histogram, scene](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Sort0 = ndMakeObject::ndFunction([&jointArray, &histogram, scene](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(Sort0);
 		ndInt32* const hist = &histogram[threadIndex][0];
@@ -484,7 +484,7 @@ void ndDynamicsUpdate::SortIslands()
 	activeBodyArray.SetCount(bodyArray.GetCount());
 
 	ndInt32 histogram[D_MAX_THREADS_COUNT][3];
-	auto Scan0 = ndMakeObject::ndFunction([this, &bodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Scan0 = ndMakeObject::ndFunction([&bodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(Scan0);
 		ndInt32* const hist = &histogram[threadIndex][0];
@@ -507,7 +507,7 @@ void ndDynamicsUpdate::SortIslands()
 		}
 	});
 
-	auto Sort0 = ndMakeObject::ndFunction([this, &bodyArray, &activeBodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Sort0 = ndMakeObject::ndFunction([&bodyArray, &activeBodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(Sort0);
 		ndInt32* const hist = &histogram[threadIndex][0];
@@ -1231,9 +1231,9 @@ void ndDynamicsUpdate::UpdateSkeletons()
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
-	const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)(&scene->GetActiveBodyArray()[0]);
+	//const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)(&scene->GetActiveBodyArray()[0]);
 
-	auto UpdateSkeletons = ndMakeObject::ndFunction([this, &bodyArray, &activeSkeletons](ndInt32 threadIndex, ndInt32 threadCount)
+	auto UpdateSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(UpdateSkeletons);
 		ndJacobian* const internalForces = &GetInternalForces()[0];

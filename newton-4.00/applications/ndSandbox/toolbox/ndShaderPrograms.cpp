@@ -23,7 +23,7 @@ ndShaderPrograms::~ndShaderPrograms(void)
 
 void ndShaderPrograms::Cleanup()
 {
-	for (ndInt32 i = 0; i < sizeof(m_shaders) / sizeof(m_shaders[0]); ++i)
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shaders) / sizeof(m_shaders[0])); ++i)
 	{
 		if (m_shaders[i])
 		{

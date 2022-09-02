@@ -29,6 +29,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
+#include "ndRand.h"
 #include "ndUtils.h"
 #include "ndVector.h"
 #include "ndClassAlloc.h"

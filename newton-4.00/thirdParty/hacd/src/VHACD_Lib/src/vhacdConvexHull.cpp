@@ -181,7 +181,7 @@ namespace nd_
 			{
 				ConvexHull3dPointCluster* const clump = new (&m_treeBuffer[memoryIndex]) ConvexHull3dPointCluster();
 				memoryIndex++;
-				_ASSERT(memoryIndex <= m_treeBuffer.size());
+				_ASSERT(memoryIndex <= int (m_treeBuffer.size()));
 		
 				_ASSERT(clump);
 				clump->m_count = count;
@@ -267,7 +267,7 @@ namespace nd_
 		
 				tree = new (&m_treeBuffer[memoryIndex]) ConvexHullAABBTreeNode();
 				memoryIndex++;
-				_ASSERT(memoryIndex <= m_treeBuffer.size());
+				_ASSERT(memoryIndex <= int (m_treeBuffer.size()));
 		
 				_ASSERT(i0);
 				_ASSERT(count - i0);
@@ -418,7 +418,7 @@ namespace nd_
 		{
 			m_points.resize(0);
 			#ifdef _DEBUG
-			for (int i = 0; i < accelerator.size(); i++)
+			for (int i = 0; i < int (accelerator.size()); i++)
 			{
 				_ASSERT(accelerator[i].m_mark == 0);
 			}

@@ -3997,7 +3997,7 @@ namespace nd_
 				else
 					edge = 2;
 
-					float splits[3];
+				float splits[3];
 
 				switch ( edge )
 				{
@@ -4068,7 +4068,7 @@ namespace nd_
 				else
 					edge = 2;
 
-					double splits[3];
+				double splits[3];
 
 				switch ( edge )
 				{

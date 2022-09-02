@@ -220,8 +220,8 @@ inline ndBvhNode::ndBvhNode(ndBvhNode* const parent)
 	,m_buildNode(nullptr)
 #endif
 	,m_lock()
-	,m_isDead(0)
 	,m_depthLevel(0)
+	,m_isDead(0)
 	,m_bhvLinked(0)
 {
 #ifdef _DEBUG
@@ -238,8 +238,8 @@ inline ndBvhNode::ndBvhNode(const ndBvhNode& src)
 	,m_buildNode((ndBvhNode*)&src)
 #endif
 	,m_lock()
-	,m_isDead(0)
 	,m_depthLevel(0)
+	,m_isDead(0)
 	,m_bhvLinked(0)
 {
 #ifdef D_NEW_SCENE

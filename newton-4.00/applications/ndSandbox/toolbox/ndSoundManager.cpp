@@ -313,6 +313,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 		char xbuffer[5];
 		memset(xbuffer, 0, sizeof(xbuffer));
 		size_t bytesRead = fread(xbuffer, sizeof(char), 4, wave);
+		bytesRead++;
 		if (!strcmp(xbuffer, "RIFF"))
 		{
 			ndInt32 chunkSize;

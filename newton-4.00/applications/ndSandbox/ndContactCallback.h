@@ -34,6 +34,7 @@ class ndApplicationMaterial : public ndMaterial
 
 	ndApplicationMaterial();
 	ndApplicationMaterial(const ndApplicationMaterial& src);
+	virtual ~ndApplicationMaterial();
 
 	virtual ndApplicationMaterial* Clone() const
 	{
@@ -106,7 +107,7 @@ class ndContactCallback: public ndContactNotify
 
 	virtual bool OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep);
 	virtual void OnContactCallback(const ndContact* const contactJoint, ndFloat32 timestep);
-	virtual bool OnCompoundSubShapeOverlap(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+	virtual bool OnCompoundSubShapeOverlap(const ndContact* const contactJoint, ndFloat32 timestep, const ndShapeInstance* const instance0, const ndShapeInstance* const instance1);
 
 	virtual ndMaterial* GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
 

@@ -188,10 +188,10 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
 	if (dirMag2 > (tol * tol))
 	{
-		const ndBodyKinematic* const body0 = GetBody0();
-		const ndBodyKinematic* const body1 = GetBody1();
-		const ndVector omega0(body0->GetOmega());
-		const ndVector omega1(body1->GetOmega());
+		//const ndBodyKinematic* const body0 = GetBody0();
+		//const ndBodyKinematic* const body1 = GetBody1();
+		//const ndVector omega0(body0->GetOmega());
+		//const ndVector omega1(body1->GetOmega());
 
 		const ndMatrix basis(pin);
 		const ndFloat32 dirMag = ndSqrt(dirMag2);

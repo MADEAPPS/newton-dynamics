@@ -161,7 +161,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 	auto SetRowStarts = ndMakeObject::ndFunction([this, &jointArray, &rowsCount, &soaJointRowCount](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(SetRowStarts);
-		auto SetRowsCount = [this, &jointArray, &rowsCount]()
+		auto SetRowsCount = [&jointArray, &rowsCount]()
 		{
 			ndInt32 rowCount = 1;
 			const ndInt32 count = jointArray.GetCount();
@@ -243,7 +243,7 @@ void ndDynamicsUpdateSoa::SortIslands()
 	activeBodyArray.SetCount(bodyArray.GetCount());
 
 	ndInt32 histogram[D_MAX_THREADS_COUNT][3];
-	auto Scan0 = ndMakeObject::ndFunction([this, &bodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Scan0 = ndMakeObject::ndFunction([&bodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(Scan0);
 		ndInt32* const hist = &histogram[threadIndex][0];
@@ -266,7 +266,7 @@ void ndDynamicsUpdateSoa::SortIslands()
 		}
 	});
 
-	auto Sort0 = ndMakeObject::ndFunction([this, &bodyArray, &activeBodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
+	auto Sort0 = ndMakeObject::ndFunction([&bodyArray, &activeBodyArray, &histogram](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(Sort0);
 		ndInt32* const hist = &histogram[threadIndex][0];
@@ -1116,9 +1116,9 @@ void ndDynamicsUpdateSoa::UpdateSkeletons()
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
-	const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)(&scene->GetActiveBodyArray()[0]);
+	//const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)(&scene->GetActiveBodyArray()[0]);
 
-	auto UpdateSkeletons = ndMakeObject::ndFunction([this, &bodyArray, &activeSkeletons](ndInt32 threadIndex, ndInt32 threadCount)
+	auto UpdateSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(UpdateSkeletons);
 		ndJacobian* const internalForces = &GetInternalForces()[0];

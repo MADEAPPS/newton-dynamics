@@ -1604,7 +1604,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 			const ndVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
 			ndFloat32 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
-			if ((cluster.m_count <= clusterSize) || (stack > (sizeof(spliteStack) / sizeof(spliteStack[0]) - 4)) || (maxVariance2 < ndFloat32(1.e-4f)))
+			if ((cluster.m_count <= clusterSize) || (stack >  (ndInt32(sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(1.e-4f)))
 			{
 				ndAssert(baseCount <= cluster.m_start);
 				array[baseCount] = array[cluster.m_start];
@@ -2616,7 +2616,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 	{
 		if (penetration <= ndFloat32(1.0e-5f))
 		{
-			if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
+			if (ndInt8 (m_instance0.GetCollisionMode()) & ndInt8(m_instance1.GetCollisionMode()))
 			{
 				count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * ndVector::m_negOne);
 				// skip convex shape polygon because they could have a skirt
@@ -2996,7 +2996,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 			ndShapeInstance* const subShape0 = node0->GetShape();
 			ndShapeInstance* const subShape1 = node1->GetShape();
 
-			if (subShape0->GetCollisionMode() & subShape1->GetCollisionMode())
+			if (ndInt8(subShape0->GetCollisionMode()) & ndInt8(subShape1->GetCollisionMode()))
 			{
 				bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, subShape0, subShape1);
 				if (processContacts)
@@ -3910,7 +3910,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 			ndFloat32 penetration = ndMax(num * ndFloat32(-1.0f) + D_PENETRATION_TOL, ndFloat32(0.0f));
 			if (m_contactBuffer && !m_intersectionTestOnly)
 			{
-				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
+				if (ndInt8(m_instance0.GetCollisionMode()) & ndInt8(m_instance1.GetCollisionMode()))
 				{
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector);
 					if (count)

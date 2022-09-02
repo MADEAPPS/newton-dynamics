@@ -176,7 +176,7 @@ void ndBvhNodeArray::Swap(ndBvhNodeArray& src)
 
 	ndSwap(m_isDirty, src.m_isDirty);
 	ndSwap(m_scansCount, src.m_scansCount);
-	for (ndInt32 i = 0; i < sizeof(m_scans) / sizeof(m_scans[0]); ++i)
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_scans) / sizeof(m_scans[0])); ++i)
 	{
 		ndSwap(m_scans[i], src.m_scans[i]);
 	}
@@ -389,7 +389,7 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 
 		if (nodeArray.GetCount())
 		{
-			auto EnumerateNodes = ndMakeObject::ndFunction([this, &nodeArray](ndInt32 threadIndex, ndInt32 threadCount)
+			auto EnumerateNodes = ndMakeObject::ndFunction([&nodeArray](ndInt32 threadIndex, ndInt32 threadCount)
 			{
 				D_TRACKTIME_NAMED(MarkCellBounds);
 				const ndInt32 baseCount = nodeArray.GetCount() / 2;
@@ -487,7 +487,7 @@ void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
 bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 {
 	D_TRACKTIME();
-	auto CopyBodyNodes = ndMakeObject::ndFunction([this, &threadPool](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CopyBodyNodes = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CopyBodyNodes);
 
@@ -517,7 +517,7 @@ bool ndBvhSceneManager::BuildBvhTreeInitNodes(ndThreadPool& threadPool)
 		}
 	});
 
-	auto CopySceneNode = ndMakeObject::ndFunction([this, &threadPool](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CopySceneNode = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CopySceneNode);
 		#ifdef D_NEW_SCENE
@@ -1346,7 +1346,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 								m_stackPool[stack].m_node = left;
 								m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
 								stack++;
-								ndAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
+								ndAssert(stack < ndInt32 (sizeof(m_stackPool) / sizeof(m_stackPool[0])));
 							}
 
 							ndBvhInternalNode* const right = node->m_right->GetAsSceneTreeNode();
@@ -1355,7 +1355,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 								m_stackPool[stack].m_node = right;
 								m_stackPool[stack].m_depthLevel = level.m_depthLevel - 1;
 								stack++;
-								ndAssert(stack < sizeof(m_stackPool) / sizeof(m_stackPool[0]));
+								ndAssert(stack < ndInt32 (sizeof(m_stackPool) / sizeof(m_stackPool[0])));
 							}
 						}
 					}
@@ -1429,7 +1429,8 @@ ndBvhNode* ndBvhSceneManager::BuildIncrementalBvhTree(ndThreadPool& threadPool)
 	return root;
 }
 
-void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& threadPool)
+//void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& threadPool)
+void ndBvhSceneManager::BuildBvhTreeSwapBuffers(ndThreadPool& )
 {
 #ifdef D_NEW_SCENE
 

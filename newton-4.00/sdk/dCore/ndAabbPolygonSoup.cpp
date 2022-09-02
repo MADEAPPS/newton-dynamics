@@ -975,6 +975,7 @@ void ndAabbPolygonSoup::Deserialize (const char* const path)
 	if (file)
 	{
 		size_t readValues = 0; 
+		readValues++;
 		m_strideInBytes = sizeof(ndTriplex);
 		readValues = fread(&m_vertexCount, sizeof(ndInt32), 1, file);
 		readValues = fread(&m_indexCount, sizeof(ndInt32), 1, file);
