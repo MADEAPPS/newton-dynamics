@@ -44,6 +44,18 @@ class ndDemoEntityNotify: public ndBodyNotify
 	ndDemoEntityManager* m_manager;
 };
 
+class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
+{
+	public:
+	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
+	void OnTransform(ndInt32, const ndMatrix& matrix);
+	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep);
+
+	ndMatrix m_bindMatrix;
+	ndFloat32 m_capSpeed;
+};
+
+
 class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 {
 	public:
