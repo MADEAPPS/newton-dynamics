@@ -17,6 +17,7 @@
 #include "ndOpenGlUtil.h"
 #include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndHighResolutionTimer.h"

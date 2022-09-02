@@ -16,6 +16,7 @@
 #include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndMakeProceduralStaticMap.h"
 

@@ -16,6 +16,7 @@
 #include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 

@@ -19,6 +19,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndAnimationPose.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndAnimationSequenceBase.h"

@@ -13,6 +13,7 @@
 #define __D_CONVEX_FRACTURE_0_H__
 
 #include "ndSandboxStdafx.h"
+#include "ndDemoEntityNotify.h"
 
 class ndDemoMesh;
 class ndDemoDebrisEntity;

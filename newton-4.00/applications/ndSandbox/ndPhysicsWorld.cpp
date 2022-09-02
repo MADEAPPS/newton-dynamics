@@ -15,6 +15,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndSoundManager.h"
 #include "ndContactCallback.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndDemoMeshInterface.h"

@@ -14,6 +14,7 @@
 #include "ndOpenGlUtil.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoCameraManager.h"
 
 //#define D_ENABLE_CAMERA_REPLAY

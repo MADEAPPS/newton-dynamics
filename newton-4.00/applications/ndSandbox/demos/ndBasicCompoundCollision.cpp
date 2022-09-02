@@ -20,6 +20,7 @@
 #include "ndMakeStaticMap.h"
 #include "ndCompoundScene.h"
 #include "ndContactCallback.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndHeightFieldPrimitive.h"

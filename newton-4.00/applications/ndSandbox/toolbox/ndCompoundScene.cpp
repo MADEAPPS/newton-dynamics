@@ -15,6 +15,7 @@
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 

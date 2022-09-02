@@ -18,6 +18,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
@@ -177,7 +178,7 @@ class ndAiBipedTest_2 : public ndModel
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 
 		// set bindimg matrix;
-		ndBindingRagdollEntityNotify* const rootNotify = (ndBindingRagdollEntityNotify*)rootBody->GetNotifyCallback();
+		//ndBindingRagdollEntityNotify* const rootNotify = (ndBindingRagdollEntityNotify*)rootBody->GetNotifyCallback();
 		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 
 		ndInt32 stack = 0;

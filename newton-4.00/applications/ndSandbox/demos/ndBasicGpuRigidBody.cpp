@@ -18,6 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndContactCallback.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 

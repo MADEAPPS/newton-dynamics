@@ -22,6 +22,7 @@
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"

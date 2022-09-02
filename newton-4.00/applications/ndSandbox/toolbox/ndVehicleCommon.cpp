@@ -13,6 +13,7 @@
 #include "ndDemoMesh.h"
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
+#include "ndDemoEntityNotify.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndVehicleSelector)
 

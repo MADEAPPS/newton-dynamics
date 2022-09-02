@@ -22,6 +22,7 @@
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
 #include "ndCompoundScene.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"

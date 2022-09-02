@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoDebrisEntity.h"
 #include "ndDemoEntityManager.h"
 #include "ndExplodeConvexShapeModel.h"

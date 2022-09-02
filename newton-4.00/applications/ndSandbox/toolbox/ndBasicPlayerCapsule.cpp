@@ -15,6 +15,7 @@
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndAnimationSequence.h"
 #include "ndBasicPlayerCapsule.h"
