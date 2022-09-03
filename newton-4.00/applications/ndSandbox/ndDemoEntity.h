@@ -73,6 +73,8 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	void RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
+	ndDemoEntity* FindBySubString(const char* const subString) const;
+
 	protected:
 	mutable ndMatrix m_matrix;			// interpolated matrix
 	ndVector m_curPosition;				// position one physics simulation step in the future

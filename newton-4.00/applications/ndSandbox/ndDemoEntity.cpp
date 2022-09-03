@@ -381,6 +381,22 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 }
 
+ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
+{
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	{
+		ndString tmpName(child->GetName());
+		tmpName.ToLower();
+		const char* const name = tmpName.GetStr();
+		if (strstr(name, subString))
+		{
+			return child;
+		}
+	}
+	return nullptr;
+
+}
+
 ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
 {
 	ndArray<ndVector> points;

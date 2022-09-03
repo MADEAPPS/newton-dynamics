@@ -80,14 +80,15 @@ static ndAiBipedTest_2_Definition ragdollDefinition[] =
 	{ "rhumerus", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rradius", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-
 	{ "rhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
 	{ "rfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "rtibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+	{ "rfoof_effector", ndAiBipedTest_2_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 90.0f } },
 
 	{ "lhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
 	{ "lfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 	{ "ltibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+	{ "lfoof_effector", ndAiBipedTest_2_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 
 	{ "", ndAiBipedTest_2_Definition::m_root,{},{} },
 };
@@ -175,12 +176,10 @@ class ndAiBipedTest_2 : public ndModel
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 
 		// set bindimg matrix;
-		//ndBindingRagdollEntityNotify* const rootNotify = (ndBindingRagdollEntityNotify*)rootBody->GetNotifyCallback();
 		rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 
 		ndInt32 stack = 0;
 		ndFixSizeArray<ndFloat32, 64> massWeight;
-		//ndFixSizeArray<ndBodyDynamic*, 64> bodies;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 
@@ -225,43 +224,52 @@ class ndAiBipedTest_2 : public ndModel
 					}
 					else
 					{ 
-						ndAssert(0);
-						//ndDemoEntityNotify* notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
-						//notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
-						//
-						//ndMatrix pivotFrame(notify->GetBody()->GetMatrix());
-						//ndMatrix effectorFrame(pivotFrame);
-						//pivotFrame = ndYawMatrix(90.0f * ndDegreeToRad) * pivotFrame;
-						//pivotFrame = ndPitchMatrix(-90.0f * ndDegreeToRad) * pivotFrame;
-						//effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-						//
-						//ndMatrix swivelFrame(ndGetIdentityMatrix());
-						//swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-						//swivelFrame.m_up = m_rootBody->GetMatrix().m_front;
-						//swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
-						//swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
-						//
-						//ndFloat32 regularizer = 0.001f;
-						//ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
-						//effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-						//effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-						//
-						//const ndVector kneePoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
-						//const ndVector dist0(effectorFrame.m_posit - kneePoint);
-						//const ndVector dist1(kneePoint - pivotFrame.m_posit);
-						//const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
-						//effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
-						//
-						//world->AddJoint(effector);
-						//
-						//ndEffectorInfo info(effector);
+						ndDemoEntityNotify* const childNotify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
+						ndAssert(childNotify);
+						ndDemoEntityNotify* const midNotify = (ndDemoEntityNotify*)childNotify->m_parentBody->GetNotifyCallback();
+						ndAssert(midNotify);
+						ndDemoEntityNotify* const pivotNotify = (ndDemoEntityNotify*)midNotify->m_parentBody->GetNotifyCallback();
+						ndAssert(pivotNotify);
+
+						ndBodyDynamic* const childBody = childNotify->GetBody()->GetAsBodyDynamic();
+						ndBodyDynamic* const pivotBody = pivotNotify->GetBody()->GetAsBodyDynamic();
+
+						ndDemoEntity* const pivotFrameNode = midNotify->m_entity->FindBySubString("reference");
+						ndDemoEntity* const childFrameNode = childNotify->m_entity->FindBySubString("effector");
+						ndAssert(pivotFrameNode);
+						ndAssert(childFrameNode);
+						ndAssert(childFrameNode == childEntity);
+
+						ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
+						ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
+						
+						ndMatrix swivelFrame(ndGetIdentityMatrix());
+						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
+						swivelFrame.m_up = pivotFrame.m_front;
+						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
+						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
+						
+						ndFloat32 regularizer = 0.001f;
+						ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, childBody, pivotBody);
+						effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+						effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+						
+						const ndVector kneePoint(childFrameNode->GetParent()->CalculateGlobalMatrix().m_posit);
+						const ndVector dist0(effectorFrame.m_posit - kneePoint);
+						const ndVector dist1(kneePoint - pivotFrame.m_posit);
+						const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+						effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
+						
+						world->AddJoint(effector);
+						
+						ndEffectorInfo info(effector);
 						//info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
 						//info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 						//info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						//info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						//
 						//info.m_x = 0.98f;
-						//m_effectors.PushBack(info);
+
+						m_effectors.PushBack(info);
 					}
 					break;
 				}
@@ -424,13 +432,12 @@ class ndAiBipedTest_2 : public ndModel
 		context.DrawFrame(matrix);
 		context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
 
-
-		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		//{
-		//	const ndEffectorInfo& info = m_effectors[i];
-		//	ndJointBilateralConstraint* const joint = info.m_effector;
-		//	joint->DebugJoint(context);
-		//}
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		{
+			const ndEffectorInfo& info = m_effectors[i];
+			ndJointBilateralConstraint* const joint = info.m_effector;
+			joint->DebugJoint(context);
+		}
 	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep) 
@@ -511,8 +518,7 @@ class ndAiBipedTest_2 : public ndModel
 		ndModel::PostTransformUpdate(world, timestep);
 	}
 
-	//ndBodyDynamic* m_rootBody;
-	ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
+	ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 	ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
 };
 
@@ -532,7 +538,7 @@ void ndBipedTest_2 (ndDemoEntityManager* const scene)
 	ndAiBipedTest_2* const model = new ndAiBipedTest_2(scene, modelMesh, origin, ragdollDefinition);
 	world->AddModel(model);
 	//scene->Set2DDisplayRenderFunction(ndAiBipedTest_2::ControlPanel, nullptr, model);
-	world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
 
 	delete modelMesh;
