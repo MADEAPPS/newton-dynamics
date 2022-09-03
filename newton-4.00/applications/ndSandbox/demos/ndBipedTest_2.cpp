@@ -58,6 +58,7 @@ class ndAiBipedTest_2_Definition
 static ndAiBipedTest_2_Definition ragdollDefinition[] =
 {
 	{ "root", ndAiBipedTest_2_Definition::m_root, {}, {} },
+#if 0
 	//{ "lowerback", ndAiBipedTest_2_Definition::m_spherical, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 	//{ "upperback", ndAiBipedTest_2_Definition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 	//{ "lowerneck", ndAiBipedTest_2_Definition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
@@ -69,26 +70,28 @@ static ndAiBipedTest_2_Definition ragdollDefinition[] =
 	//{ "rhumerus", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 	//{ "rradius", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-	{ "lowerback", ndAiBipedTest_2_Definition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "upperback", ndAiBipedTest_2_Definition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-	{ "lowerneck", ndAiBipedTest_2_Definition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-	{ "upperneck", ndAiBipedTest_2_Definition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-	{ "lclavicle", ndAiBipedTest_2_Definition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-	{ "lhumerus", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "lradius", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-	{ "rclavicle", ndAiBipedTest_2_Definition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-	{ "rhumerus", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "rradius", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+#else
+	//{ "lowerback", ndAiBipedTest_2_Definition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "upperback", ndAiBipedTest_2_Definition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+	//{ "lowerneck", ndAiBipedTest_2_Definition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+	//{ "upperneck", ndAiBipedTest_2_Definition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+	//{ "lclavicle", ndAiBipedTest_2_Definition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+	//{ "lhumerus", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "lradius", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+	//{ "rclavicle", ndAiBipedTest_2_Definition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+	//{ "rhumerus", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "rradius", ndAiBipedTest_2_Definition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+#endif
 
 	{ "rhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
 	{ "rfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "rtibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-	{ "rfoof_effector", ndAiBipedTest_2_Definition::m_effector, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "rfoof_effector", ndAiBipedTest_2_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+	//{ "rtibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-	{ "lhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-	{ "lfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "ltibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-	{ "lfoof_effector", ndAiBipedTest_2_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+	//{ "lhipjoint", ndAiBipedTest_2_Definition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+	//{ "lfemur", ndAiBipedTest_2_Definition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "lfoof_effector", ndAiBipedTest_2_Definition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+	//{ "ltibia", ndAiBipedTest_2_Definition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 	{ "", ndAiBipedTest_2_Definition::m_root,{},{} },
 };
@@ -170,7 +173,8 @@ class ndAiBipedTest_2 : public ndModel
 
 		// find the floor location 
 		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 1.5f;
+		//matrix.m_posit.m_y = floor.m_y + 1.5f;
+		matrix.m_posit.m_y = floor.m_y + 4.0f;
 
 		// add the root body
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
@@ -183,11 +187,9 @@ class ndAiBipedTest_2 : public ndModel
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 
-		//m_rootBody = rootBody;
 		parentBones.SetCount(32);
 		childEntities.SetCount(32);
 
-		//m_rootBody = rootBody;
 		parentBones.SetCount(32);
 		childEntities.SetCount(32);
 
@@ -197,9 +199,6 @@ class ndAiBipedTest_2 : public ndModel
 			parentBones[stack] = rootBody;
 			stack++;
 		}
-
-		//bodies.PushBack(m_rootBody);
-		//massWeight.PushBack(ragdollDefinition[0].m_massWeight);
 		
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stack) 
@@ -245,7 +244,7 @@ class ndAiBipedTest_2 : public ndModel
 						
 						ndMatrix swivelFrame(ndGetIdentityMatrix());
 						swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-						swivelFrame.m_up = pivotFrame.m_front;
+						swivelFrame.m_up = pivotFrame.m_up;
 						swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
 						swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 						
@@ -263,11 +262,11 @@ class ndAiBipedTest_2 : public ndModel
 						world->AddJoint(effector);
 						
 						ndEffectorInfo info(effector);
-						//info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
-						//info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
-						//info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						//info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						//info.m_x = 0.98f;
+						info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
+						info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+						info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+						info.m_x = 0.98f;
 
 						m_effectors.PushBack(info);
 					}
@@ -444,27 +443,20 @@ class ndAiBipedTest_2 : public ndModel
 	{
 		ndModel::Update(world, timestep);
 
-		//m_bodyArray[0]->SetSleepState(false);
 		//const ndVector frontVector(m_bodyArray[0]->GetMatrix().m_front);
-		//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-		//{
-		//	ndEffectorInfo& info = m_effectors[i];
-		//	const ndMatrix yaw(ndYawMatrix(-info.m_y_mapper.Interpolate(info.m_y)));
-		//	const ndMatrix roll(ndRollMatrix(info.m_y_mapper.Interpolate(info.m_z)));
-		//
-		//	ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
-		//	posit = roll.RotateVector(posit);
-		//	posit = yaw.RotateVector(posit);
-		//	//posit = roll.RotateVector(posit);
-		//
-		//	info.m_effector->SetPosition(posit);
-		//
-		//	ndMatrix swivelMatrix0;
-		//	ndMatrix swivelMatrix1;
-		//	info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-		//	const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
-		//	info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
-		//}
+		for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+		{
+			ndEffectorInfo& info = m_effectors[i];
+			const ndMatrix yaw(ndYawMatrix(-info.m_y_mapper.Interpolate(info.m_y)));
+			const ndMatrix roll(ndRollMatrix(info.m_y_mapper.Interpolate(info.m_z)));
+		
+			ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
+			posit = roll.RotateVector(posit);
+			posit = yaw.RotateVector(posit);
+		
+			info.m_effector->SetPosition(posit);
+			info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
+		}
 	}
 
 	void ApplyControls(ndDemoEntityManager* const scene)
@@ -498,7 +490,7 @@ class ndAiBipedTest_2 : public ndModel
 
 		if (change)
 		{
-			//m_rootBody->SetSleepState(false);
+			m_bodyArray[0]->SetSleepState(false);
 		}
 	}
 
@@ -537,9 +529,9 @@ void ndBipedTest_2 (ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndAiBipedTest_2* const model = new ndAiBipedTest_2(scene, modelMesh, origin, ragdollDefinition);
 	world->AddModel(model);
-	//scene->Set2DDisplayRenderFunction(ndAiBipedTest_2::ControlPanel, nullptr, model);
-	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	scene->Set2DDisplayRenderFunction(ndAiBipedTest_2::ControlPanel, nullptr, model);
 
+	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
 	delete modelMesh;
 
