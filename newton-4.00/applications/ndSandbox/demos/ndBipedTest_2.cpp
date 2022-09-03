@@ -266,7 +266,7 @@ class ndAiBipedTest_2 : public ndModel
 						info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 						info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 						info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-						info.m_x = 0.98f;
+						info.m_x = 0.99f;
 
 						m_effectors.PushBack(info);
 					}
@@ -282,10 +282,16 @@ class ndAiBipedTest_2 : public ndModel
 			}
 		}
 		
-		SetModelMass(100.0f);
+		NormalizeMassDistribution(100.0f);
+
+		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
+		{
+			m_bodyArray[i]->GetNotifyCallback()->OnTransform(0, m_bodyArray[i]->GetMatrix());
+			m_bodyArray[i]->GetNotifyCallback()->OnTransform(0, m_bodyArray[i]->GetMatrix());
+		}
 	}
 
-	void SetModelMass(ndFloat32 mass) const
+	void NormalizeMassDistribution(ndFloat32 mass) const
 	{
 		ndFloat32 maxVolume = -1.0e10f;
 		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
@@ -331,6 +337,11 @@ class ndAiBipedTest_2 : public ndModel
 					}
 				}
 			}
+
+			ndFloat32 xxxx = ndMax(ndMax(inertia[0], inertia[1]), inertia[2]);
+			inertia[0] = xxxx;
+			inertia[1] = xxxx;
+			inertia[2] = xxxx;
 			body->SetMassMatrix(inertia);
 		}
 	}

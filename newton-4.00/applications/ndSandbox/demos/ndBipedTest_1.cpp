@@ -244,10 +244,10 @@ class ndAiBipedTest_1 : public ndModel
 			}
 		}
 		
-		SetModelMass(bodies, 100.0f);
+		NormalizeMassDistribution(bodies, 100.0f);
 	}
 
-	void SetModelMass(const ndFixSizeArray<ndBodyDynamic*, 64>& bodies, ndFloat32 mass) const
+	void NormalizeMassDistribution(const ndFixSizeArray<ndBodyDynamic*, 64>& bodies, ndFloat32 mass) const
 	{
 		ndFloat32 maxVolume = -1.0e10f;
 		for (ndInt32 i = 0; i < bodies.GetCount(); ++i)
