@@ -22,8 +22,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-
-namespace biped2
+namespace biped1
 {
 	class ndDefinition
 	{
@@ -60,8 +59,8 @@ namespace biped2
 
 	static ndDefinition ragdollDefinition[] =
 	{
-		{ "root", ndDefinition::m_root,{},{} },
-#if 0
+		{ "root", ndDefinition::m_root, {}, {} },
+	#if 0
 		//{ "lowerback", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 		//{ "upperback", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		//{ "lowerneck", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
@@ -73,22 +72,22 @@ namespace biped2
 		//{ "rhumerus", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		//{ "rradius", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-#else
-		{ "lowerback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ "upperback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lowerneck", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "upperneck", ndDefinition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "lhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		{ "rclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "rhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-#endif
+	#else
+		//{ "lowerback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		//{ "upperback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "lowerneck", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "upperneck", ndDefinition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		//{ "lclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		//{ "lhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//{ "rclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "rhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+	#endif
 
-		{ "rhipjoint", ndDefinition::m_spherical,{ -45.0f, 45.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		//{ "rfemur", ndDefinition::m_hinge,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
-		//{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "rhipjoint", ndDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		//{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		//{ "lhipjoint", ndDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
@@ -101,11 +100,11 @@ namespace biped2
 
 	class ndHumanoid : public ndModel
 	{
-	public:
+		public:
 
 		class ndParamMapper
 		{
-		public:
+			public:
 			ndParamMapper()
 				:m_x0(0.0f)
 				, m_scale(0.0f)
@@ -129,7 +128,7 @@ namespace biped2
 
 		class ndEffectorInfo
 		{
-		public:
+			public:
 			ndEffectorInfo()
 				:m_basePosition(ndVector::m_wOne)
 				, m_effector(nullptr)
@@ -379,17 +378,10 @@ namespace biped2
 
 			case ndDefinition::m_spherical:
 			{
-				//ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
+				ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
 				//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
 				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
 				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-
-				ndMatrix pin(ndYawMatrix(-90.0f * ndDegreeToRad) * parentBone->GetMatrix());
-				pin.m_posit = pinAndPivotInGlobalSpace.m_posit;
-				
-				ndJointHinge* const joint = new ndJointHinge(pin, childBody, parentBone);
-				joint->SetAsSpringDamper(0.001f, 1000.0f, 10.0f);
-				xxxxxxxx = joint;
 				return joint;
 			}
 
@@ -457,6 +449,8 @@ namespace biped2
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
+
+			//const ndVector frontVector(m_bodyArray[0]->GetMatrix().m_front);
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
 				ndEffectorInfo& info = m_effectors[i];
@@ -470,10 +464,6 @@ namespace biped2
 				info.m_effector->SetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
 			}
-
-			ndEffectorInfo& info = m_effectors[0];
-			ndFloat32 angle = info.m_z * 90.0f * ndDegreeToRad;
-			xxxxxxxx->SetOffsetAngle(angle);
 		}
 
 		void ApplyControls(ndDemoEntityManager* const scene)
@@ -527,16 +517,13 @@ namespace biped2
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
-		ndJointHinge* xxxxxxxx;
-
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
 	};
 };
 
-using namespace biped2;
-
-void ndBipedTest_2(ndDemoEntityManager* const scene)
+using namespace biped1;
+void ndBipedTest_1 (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());

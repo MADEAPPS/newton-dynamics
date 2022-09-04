@@ -107,7 +107,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndTrace(("Not animation yet  !!!!\n"));
 
 	//// create bind pose to animation sequences.
-	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	//ndAnimationSequence* const sequence = scene->GetAnimationSequence("white_Man_idle.fbx");
 	//const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->GetTracks();
 	//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
 	//{
@@ -119,9 +119,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//}
 	//
 	//// create an animation blend tree
-	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
-	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
+	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("white_Man_idle.fbx");
+	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("white_man_walk.fbx");
+	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("white_man_run.fbx");
 	//
 	//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
 	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
