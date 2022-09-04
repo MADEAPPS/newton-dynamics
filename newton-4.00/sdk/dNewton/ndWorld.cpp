@@ -617,15 +617,15 @@ void ndWorld::UpdateSkeletons()
 					ndBodyKinematic* root1 = solverUpdate.FindRootAndSplit(body1);
 					if (root0 != root1)
 					{
-						if (root0->m_rank > root1->m_rank)
+						if (root0->m_buildSkelIndex > root1->m_buildSkelIndex)
 						{
 							ndSwap(root0, root1);
 						}
 						root0->m_islandParent = root1;
-						if (root0->m_rank == root1->m_rank)
+						if (root0->m_buildSkelIndex == root1->m_buildSkelIndex)
 						{
-							root1->m_rank += 1;
-							ndAssert(root1->m_rank <= 6);
+							root1->m_buildSkelIndex += 1;
+							ndAssert(root1->m_buildSkelIndex <= 6);
 						}
 					}
 				}

@@ -32,6 +32,7 @@ class ndLoaderFactory
 {
 	public:
 	ndUnsigned64 m_classNameHash;
+	char m_className[64];
 	ndLoadSaveBase* m_loader;
 };
 
@@ -67,6 +68,8 @@ void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const load
 	ndLoaderFactory entry;
 	entry.m_classNameHash = dCRC64(className);
 	entry.m_loader = loaderClass;
+	ndAssert(strlen(className) < (sizeof(entry.m_className)-1));
+	strcpy(entry.m_className, className);
 	ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 	factory.PushBack(entry);
 	for (ndInt32 i = factory.GetCount() - 2; i >= 0; i--)

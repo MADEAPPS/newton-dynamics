@@ -265,6 +265,12 @@ void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc)
 	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 }
 
+ndVector ndIkSwivelPositionEffector::GetGlobalPosition() const
+{
+	const ndVector p(GetLocalMatrix1().TransformVector(GetPosition()));
+	return GetBody1()->GetMatrix().TransformVector(p);
+}
+
 void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -274,7 +280,6 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc)
 	const ndMatrix& axisDir = matrix1;
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
-	
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		const ndVector pin = axisDir[i];

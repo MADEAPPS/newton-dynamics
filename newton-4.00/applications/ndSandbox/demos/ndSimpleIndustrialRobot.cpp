@@ -22,441 +22,445 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-class dSimpleRobotDefinition
+namespace ndSimpleRobot
 {
-	public:
-	enum jointType
+	class ndDefinition
 	{
-		m_root,
-		m_hinge,
-		m_slider,
-		m_effector
+		public:
+		enum jointType
+		{
+			m_root,
+			m_hinge,
+			m_slider,
+			m_effector
+		};
+
+		char m_boneName[32];
+		jointType m_type;
+		ndFloat32 m_mass;
+		ndFloat32 m_minLimit;
+		ndFloat32 m_maxLimit;
 	};
 
-	char m_boneName[32];
-	jointType m_type;
-	ndFloat32 m_mass;
-	ndFloat32 m_minLimit;
-	ndFloat32 m_maxLimit;
-};
-
-static dSimpleRobotDefinition jointsDefinition[] =
-{
-	{ "base", dSimpleRobotDefinition::m_root, 100.0f, 0.0f, 0.0f},
-	{ "base_rotator", dSimpleRobotDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
-	{ "arm_0", dSimpleRobotDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad},
-	{ "arm_1", dSimpleRobotDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
-	{ "arm_2", dSimpleRobotDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
-	{ "arm_3", dSimpleRobotDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
-	{ "arm_4", dSimpleRobotDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
-	{ "gripperLeft", dSimpleRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f},
-	{ "gripperRight", dSimpleRobotDefinition::m_slider , 1.0f, -0.2f, 0.03f},
-	{ "effector", dSimpleRobotDefinition::m_effector , 0.0f, 0.0f, 0.0f},
-};
-
-class dSimpleIndustrialRobot : public ndModel
-{
-	public:
-	D_CLASS_REFLECTION(dSimpleIndustrialRobot);
-
-	dSimpleIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
-		:ndModel()
-		,m_rootBody(nullptr)
-		,m_leftGripper(nullptr)
-		,m_rightGripper(nullptr)
-		,m_effector(nullptr)
-		,m_effectorOffset(ndVector::m_wOne)
-		,m_x(0.0f)
-		,m_y(0.0f)
-		,m_azimuth(0.0f)
-		,m_gripperPosit(0.0f)
-		,m_pitch(0.0f)
-		,m_yaw(0.0f)
-		,m_roll(0.0f)
+	static ndDefinition jointsDefinition[] =
 	{
-		// make a clone of the mesh and add it to the scene
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
-		scene->AddEntity(rootEntity);
-		ndWorld* const world = scene->GetWorld();
-		
-		// find the floor location 
-		ndMatrix matrix(location);
-		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y;
+		{ "base", ndDefinition::m_root, 100.0f, 0.0f, 0.0f},
+		{ "base_rotator", ndDefinition::m_hinge, 50.0f, -1.0e10f, 1.0e10f},
+		{ "arm_0", ndDefinition::m_hinge , 5.0f, -140.0f * ndDegreeToRad, 1.0f * ndDegreeToRad},
+		{ "arm_1", ndDefinition::m_hinge , 5.0f, -30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad},
+		{ "arm_2", ndDefinition::m_hinge , 5.0f, -1.0e10f, 1.0e10f},
+		{ "arm_3", ndDefinition::m_hinge , 3.0f, -1.0e10f, 1.0e10f},
+		{ "arm_4", ndDefinition::m_hinge , 2.0f, -1.0e10f, 1.0e10f},
+		{ "gripperLeft", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
+		{ "gripperRight", ndDefinition::m_slider , 1.0f, -0.2f, 0.03f},
+		{ "effector", ndDefinition::m_effector , 0.0f, 0.0f, 0.0f},
+	};
 
-		//matrix.m_posit.m_y += 1.0f;
-		rootEntity->ResetMatrix(matrix);
-		
-		// add the root body
-		m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
-		m_bodyArray.PushBack(m_rootBody);
-		
-		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
+	class ndIndustrialRobot : public ndModel
+	{
+		public:
+		D_CLASS_REFLECTION(ndSimpleRobot::ndIndustrialRobot);
 
-		ndInt32 stack = 0;
-		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
+		ndIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
+			:ndModel()
+			,m_rootBody(nullptr)
+			,m_leftGripper(nullptr)
+			,m_rightGripper(nullptr)
+			,m_effector(nullptr)
+			,m_effectorOffset(ndVector::m_wOne)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_azimuth(0.0f)
+			,m_gripperPosit(0.0f)
+			,m_pitch(0.0f)
+			,m_yaw(0.0f)
+			,m_roll(0.0f)
 		{
-			childEntities[stack] = child;
-			parentBone[stack] = m_rootBody;
-			stack++;
-		}
+			// make a clone of the mesh and add it to the scene
+			ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
+			scene->AddEntity(rootEntity);
+			ndWorld* const world = scene->GetWorld();
 
-		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
-		while (stack) 
-		{
-			stack--;
-			ndBodyDynamic* parentBody = parentBone[stack];
-			ndDemoEntity* const childEntity = childEntities[stack];
+			// find the floor location 
+			ndMatrix matrix(location);
+			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			matrix.m_posit.m_y = floor.m_y;
 
-			const char* const name = childEntity->GetName().GetStr();
-			for (ndInt32 i = 0; i < definitionCount; ++i) 
+			//matrix.m_posit.m_y += 1.0f;
+			rootEntity->ResetMatrix(matrix);
+
+			// add the root body
+			m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
+			m_bodyArray.PushBack(m_rootBody);
+
+			ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+			ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
+
+			ndInt32 stack = 0;
+			for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
 			{
-				const dSimpleRobotDefinition& definition = jointsDefinition[i];
-				if (!strcmp(definition.m_boneName, name))
+				childEntities[stack] = child;
+				parentBone[stack] = m_rootBody;
+				stack++;
+			}
+
+			const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
+			while (stack)
+			{
+				stack--;
+				ndBodyDynamic* parentBody = parentBone[stack];
+				ndDemoEntity* const childEntity = childEntities[stack];
+
+				const char* const name = childEntity->GetName().GetStr();
+				for (ndInt32 i = 0; i < definitionCount; ++i)
 				{
-					ndTrace(("name: %s\n", name));
-					if (definition.m_type == dSimpleRobotDefinition::m_hinge)
+					const ndDefinition& definition = jointsDefinition[i];
+					if (!strcmp(definition.m_boneName, name))
 					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						m_bodyArray.PushBack(childBody);
-						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
-						hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-						m_jointArray.PushBack(hinge);
-						world->AddJoint(hinge);
-						parentBody = childBody;
-					}
-					else if (definition.m_type == dSimpleRobotDefinition::m_slider)
-					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						m_bodyArray.PushBack(childBody);
-
-						const ndMatrix pivotMatrix(childBody->GetMatrix());
-						ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
-						slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
-						slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
-
-						if (!strstr(definition.m_boneName, "Left"))
+						ndTrace(("name: %s\n", name));
+						if (definition.m_type == ndDefinition::m_hinge)
 						{
-							m_leftGripper = slider;
+							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+							m_bodyArray.PushBack(childBody);
+							const ndMatrix pivotMatrix(childBody->GetMatrix());
+							ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
+							hinge->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+							m_jointArray.PushBack(hinge);
+							world->AddJoint(hinge);
+							parentBody = childBody;
+						}
+						else if (definition.m_type == ndDefinition::m_slider)
+						{
+							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+							m_bodyArray.PushBack(childBody);
+
+							const ndMatrix pivotMatrix(childBody->GetMatrix());
+							ndJointSlider* const slider = new ndJointSlider(pivotMatrix, childBody, parentBody);
+							slider->SetLimits(definition.m_minLimit, definition.m_maxLimit);
+							slider->SetAsSpringDamper(0.005f, 2000.0f, 200.0f);
+
+							if (!strstr(definition.m_boneName, "Left"))
+							{
+								m_leftGripper = slider;
+							}
+							else
+							{
+								m_rightGripper = slider;
+							}
+							world->AddJoint(slider);
+							parentBody = childBody;
 						}
 						else
 						{
-							m_rightGripper = slider;
+							ndBodyDynamic* const childBody = parentBody;
+
+							const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+							const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
+							m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
+
+							m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
+
+							ndFloat32 relaxation = 0.003f;
+							m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+							m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
+							m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
+							m_effector->SetMaxForce(10000.0f);
+							m_effector->SetMaxTorque(10000.0f);
+
+							// the effector is part of the rig
+							world->AddJoint(m_effector);
 						}
-						world->AddJoint(slider);
-						parentBody = childBody;
+						break;
 					}
-					else
-					{
-						ndBodyDynamic* const childBody = parentBody;
+				}
 
-						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
-						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-						m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
-
-						m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
-
-						ndFloat32 relaxation = 0.003f;
-						m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-						m_effector->SetLinearSpringDamper(relaxation, 1500.0f, 100.0f);
-						m_effector->SetAngularSpringDamper(relaxation, 1500.0f, 100.0f);
-						m_effector->SetMaxForce(10000.0f);
-						m_effector->SetMaxTorque(10000.0f);
-
-						// the effector is part of the rig
-						world->AddJoint(m_effector);
-					}
-					break;
+				for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+				{
+					childEntities[stack] = child;
+					parentBone[stack] = parentBody;
+					stack++;
 				}
 			}
+		}
 
-			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+		ndIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
+			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
+			,m_rootBody(nullptr)
+			,m_leftGripper(nullptr)
+			,m_rightGripper(nullptr)
+			,m_effector(nullptr)
+			,m_effectorOffset(ndVector::m_wOne)
+			,m_x(0.0f)
+			,m_y(0.0f)
+			,m_azimuth(0.0f)
+			,m_gripperPosit(0.0f)
+			,m_pitch(0.0f)
+			,m_yaw(0.0f)
+			,m_roll(0.0f)
+		{
+			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
+
+			const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
+			for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
 			{
-				childEntities[stack] = child;
-				parentBone[stack] = parentBody;
-				stack++;
+				ndInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("int32", &hashId);
+				ndBodyLoaderCache::ndNode* const bodyNode = desc.m_bodyMap->Find(hashId);
+
+				ndBody* const body = (ndBody*)bodyNode->GetInfo();
+				m_bodyArray.PushBack(body->GetAsBodyDynamic());
+			}
+
+			const nd::TiXmlNode* const joints = modelRootNode->FirstChild("joints");
+			for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
+			{
+				ndInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("int32", &hashId);
+				ndJointLoaderCache::ndNode* const jointNode = desc.m_jointMap->Find(hashId);
+
+				ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointNode->GetInfo();
+				m_jointArray.PushBack((ndJointHinge*)joint);
+			}
+
+			// load root body
+			ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
+			ndBody* const rootbody = (ndBody*)rootBodyNode->GetInfo();
+			m_rootBody = rootbody->GetAsBodyDynamic();
+
+			// load effector joint
+			const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
+			if (xmlGetInt(endEffectorNode, "hasEffector"))
+			{
+				ndAssert(0);
+				//ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
+				//ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
+				//
+				//ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
+				//ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
+				//ndAssert(body1 == m_rootBody);
+				//
+				//const ndMatrix pivotMatrix(body0->GetMatrix());
+				//m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
+				//m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
+				//m_effector->SetMode(true, true);
+				//
+				//ndFloat32 regularizer;
+				//ndFloat32 springConst;
+				//ndFloat32 damperConst;
+				//
+				//m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
+				//m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
+				//
+				//m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
+				//m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
 			}
 		}
-	}
 
-	dSimpleIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-		,m_rootBody(nullptr)
-		,m_leftGripper(nullptr)
-		,m_rightGripper(nullptr)
-		,m_effector(nullptr)
-		,m_effectorOffset(ndVector::m_wOne)
-		,m_x(0.0f)
-		,m_y(0.0f)
-		,m_azimuth(0.0f)
-		,m_gripperPosit(0.0f)
-		,m_pitch(0.0f)
-		,m_yaw(0.0f)
-		,m_roll(0.0f)
-	{
-		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
-
-		const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
-		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
+		~ndIndustrialRobot()
 		{
-			ndInt32 hashId;
-			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			element->Attribute("int32", &hashId);
-			ndBodyLoaderCache::ndNode* const bodyNode = desc.m_bodyMap->Find(hashId);
-
-			ndBody* const body = (ndBody*)bodyNode->GetInfo();
-			m_bodyArray.PushBack(body->GetAsBodyDynamic());
+			if (m_effector && !m_effector->IsInWorld())
+			{
+				delete m_effector;
+			}
 		}
 
-		const nd::TiXmlNode* const joints = modelRootNode->FirstChild("joints");
-		for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
+		void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 		{
-			ndInt32 hashId;
-			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			element->Attribute("int32", &hashId);
-			ndJointLoaderCache::ndNode* const jointNode = desc.m_jointMap->Find(hashId);
+			nd::TiXmlElement* const modelRootNode = new nd::TiXmlElement(ClassName());
+			desc.m_rootNode->LinkEndChild(modelRootNode);
+			modelRootNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+			ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, modelRootNode));
 
-			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointNode->GetInfo();
-			m_jointArray.PushBack((ndJointHinge*)joint);
+			// save all bodies.
+			nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
+			modelRootNode->LinkEndChild(bodiesNode);
+			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
+			{
+				nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
+				bodiesNode->LinkEndChild(paramNode);
+
+				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const bodyPartNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_bodyArray[i]);
+				paramNode->SetAttribute("int32", bodyPartNode->GetInfo());
+			}
+
+			// save all joints
+			nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
+			modelRootNode->LinkEndChild(jointsNode);
+			for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+			{
+				nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+				jointsNode->LinkEndChild(paramNode);
+
+				ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_jointArray[i]);
+				paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			}
+
+			// add slidiers
+			{
+				nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+				jointsNode->LinkEndChild(paramNode);
+
+				ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_leftGripper);
+				paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			}
+
+			// add slidiers
+			{
+				nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+				jointsNode->LinkEndChild(paramNode);
+
+				ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_rightGripper);
+				paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			}
+
+			// indicate which body is the root
+			xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
+
+			// save end effector info
+			nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
+			modelRootNode->LinkEndChild(endEffectorNode);
+
+			xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
+			if (m_effector)
+			{
+				// save the effector joint
+				nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
+				jointsNode->LinkEndChild(paramNode);
+				ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_effector);
+				paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+
+				// and the connection
+				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
+				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
+				xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
+				xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+			}
 		}
 
-		// load root body
-		ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
-		ndBody* const rootbody = (ndBody*)rootBodyNode->GetInfo();
-		m_rootBody = rootbody->GetAsBodyDynamic();
-		
-		// load effector joint
-		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
-		if (xmlGetInt(endEffectorNode, "hasEffector"))
+		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 		{
-			ndAssert(0);
-			//ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
-			//ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
-			//
-			//ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
-			//ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
-			//ndAssert(body1 == m_rootBody);
-			//
-			//const ndMatrix pivotMatrix(body0->GetMatrix());
-			//m_effector = new ndIk6DofEffector(pivotMatrix, body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic());
-			//m_effector->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
-			//m_effector->SetMode(true, true);
-			//
-			//ndFloat32 regularizer;
-			//ndFloat32 springConst;
-			//ndFloat32 damperConst;
-			//
-			//m_effector->GetLinearSpringDamper(regularizer, springConst, damperConst);
-			//m_effector->SetLinearSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
-			//
-			//m_effector->GetAngularSpringDamper(regularizer, springConst, damperConst);
-			//m_effector->SetAngularSpringDamper(regularizer * 0.5f, springConst * 10.0f, damperConst * 10.0f);
-		}
-	}
+			ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
+			ndAssert(shape);
 
-	~dSimpleIndustrialRobot()
-	{
-		if (m_effector && !m_effector->IsInWorld())
+			// create the rigid body that will make this body
+			ndMatrix matrix(entityPart->CalculateGlobalMatrix());
+
+			ndBodyDynamic* const body = new ndBodyDynamic();
+			body->SetMatrix(matrix);
+			body->SetCollisionShape(*shape);
+			body->SetMassMatrix(mass, *shape);
+			body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
+
+			delete shape;
+
+			// add body to the world
+			scene->GetWorld()->AddBody(body);
+			return body;
+		}
+
+		ndBodyDynamic* GetRoot() const
 		{
-			delete m_effector;
+			return m_rootBody;
 		}
-	}
 
-	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-	{
-		nd::TiXmlElement* const modelRootNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(modelRootNode);
-		modelRootNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, modelRootNode));
-
-		// save all bodies.
-		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
-		modelRootNode->LinkEndChild(bodiesNode);
-		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
+		void Debug(ndConstraintDebugCallback& context) const
 		{
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
-			bodiesNode->LinkEndChild(paramNode);
-
-			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const bodyPartNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_bodyArray[i]);
-			paramNode->SetAttribute("int32", bodyPartNode->GetInfo());
+			if (m_effector)
+			{
+				((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
+			}
 		}
 
-		// save all joints
-		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
-		modelRootNode->LinkEndChild(jointsNode);
-		for (ndInt32 i = 0; i < m_jointArray.GetCount(); ++i)
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
-			jointsNode->LinkEndChild(paramNode);
-
-			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_jointArray[i]);
-			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			ndModel::PostUpdate(world, timestep);
 		}
 
-		// add slidiers
+		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
-			jointsNode->LinkEndChild(paramNode);
-
-			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_leftGripper);
-			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			ndModel::PostTransformUpdate(world, timestep);
 		}
 
-		// add slidiers
+		void ApplyControls(ndDemoEntityManager* const scene)
 		{
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
-			jointsNode->LinkEndChild(paramNode);
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "Control panel");
 
-			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_rightGripper);
-			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			bool change = false;
+			ImGui::Text("position x");
+			change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
+			ImGui::Text("position y");
+			//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
+			change = change | ImGui::SliderFloat("##y", &m_y, -2.5f, 2.0f);
+			ImGui::Text("azimuth");
+			change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
+
+			ImGui::Text("gripper");
+			change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
+
+			ImGui::Text("pitch");
+			change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
+
+			if (change)
+			{
+				m_rootBody->SetSleepState(false);
+			}
 		}
 
-		// indicate which body is the root
-		xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
-
-		// save end effector info
-		nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
-		modelRootNode->LinkEndChild(endEffectorNode);
-
-		xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
-		if (m_effector)
+		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			// save the effector joint
-			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
-			jointsNode->LinkEndChild(paramNode);
-			ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* const jointPartNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_effector);
-			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
+			ndModel::Update(world, timestep);
+			if (m_effector)
+			{
+				// apply target position collected by control panel
+				ndMatrix targetMatrix(
+					ndRollMatrix(90.0f * ndDegreeToRad) *
+					ndPitchMatrix(m_pitch * ndDegreeToRad) *
+					ndYawMatrix(m_yaw * ndDegreeToRad) *
+					ndRollMatrix(m_roll * ndDegreeToRad) *
+					ndRollMatrix(-90.0f * ndDegreeToRad));
 
-			// and the connection
-			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
-			ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
-			xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
-			xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
+				ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
+				const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
+				targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
+
+				m_effector->SetOffsetMatrix(targetMatrix);
+				m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+				m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+			}
 		}
-	}
-	
-	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
-	{
-		ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
-		ndAssert(shape);
-		
-		// create the rigid body that will make this body
-		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
-		
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(*shape);
-		body->SetMassMatrix(mass, *shape);
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
-		
-		delete shape;
 
-		// add body to the world
-		scene->GetWorld()->AddBody(body);
-		return body;
-	}
-
-	ndBodyDynamic* GetRoot() const
-	{
-		return m_rootBody;
-	}
-
-	void Debug(ndConstraintDebugCallback& context) const
-	{
-		if (m_effector)
+		static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
 		{
-			((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
+			ndIndustrialRobot* const me = (ndIndustrialRobot*)context;
+			me->ApplyControls(scene);
 		}
-	}
 
-	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
-	{
-		ndModel::PostUpdate(world, timestep);
-	}
-
-	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
-	{
-		ndModel::PostTransformUpdate(world, timestep);
-	}
-
-	void ApplyControls(ndDemoEntityManager* const scene)
-	{
-		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Control panel");
-
-		bool change = false;
-		ImGui::Text("position x");
-		change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
-		ImGui::Text("position y");
-		//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
-		change = change | ImGui::SliderFloat("##y", &m_y, -2.5f, 2.0f);
-		ImGui::Text("azimuth");
-		change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
-
-		ImGui::Text("gripper");
-		change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
-
-		ImGui::Text("pitch");
-		change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
-		ImGui::Text("yaw");
-		change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
-		ImGui::Text("roll");
-		change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
-
-		if (change)
-		{ 
-			m_rootBody->SetSleepState(false);
-		}
-	}
-
-	void Update(ndWorld* const world, ndFloat32 timestep)
-	{
-		ndModel::Update(world, timestep);
-		if (m_effector)
-		{
-			// apply target position collected by control panel
-			ndMatrix targetMatrix (
-				ndRollMatrix(90.0f * ndDegreeToRad) *
-				ndPitchMatrix(m_pitch * ndDegreeToRad) * 
-				ndYawMatrix(m_yaw * ndDegreeToRad) * 
-				ndRollMatrix(m_roll * ndDegreeToRad) *
-				ndRollMatrix(-90.0f * ndDegreeToRad));
-			
-			ndVector localPosit(m_x, m_y, 0.0f, 0.0f);
-			const ndMatrix aximuthMatrix(ndYawMatrix(m_azimuth * ndDegreeToRad));
-			targetMatrix.m_posit = aximuthMatrix.TransformVector(m_effectorOffset + localPosit);
-			
-			m_effector->SetOffsetMatrix(targetMatrix);
-			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-		}
-	}
-
-	static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
-	{
-		dSimpleIndustrialRobot* const me = (dSimpleIndustrialRobot*)context;
-		me->ApplyControls(scene);
-	}
-
-	ndBodyDynamic* m_rootBody;
-	ndJointSlider* m_leftGripper;
-	ndJointSlider* m_rightGripper;
-	ndIk6DofEffector* m_effector;
-	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
-	ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
-	ndVector m_effectorOffset;
-	ndReal m_x;
-	ndReal m_y;
-	ndReal m_azimuth;
-	ndReal m_gripperPosit;
-	ndReal m_pitch;
-	ndReal m_yaw;
-	ndReal m_roll;
+		ndBodyDynamic* m_rootBody;
+		ndJointSlider* m_leftGripper;
+		ndJointSlider* m_rightGripper;
+		ndIk6DofEffector* m_effector;
+		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
+		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
+		ndVector m_effectorOffset;
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_azimuth;
+		ndReal m_gripperPosit;
+		ndReal m_pitch;
+		ndReal m_yaw;
+		ndReal m_roll;
+	};
+	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndSimpleRobot::ndIndustrialRobot);
 };
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(dSimpleIndustrialRobot);
 
+using namespace ndSimpleRobot;
 void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -467,17 +471,17 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));
-	dSimpleIndustrialRobot* const robot = new dSimpleIndustrialRobot(scene, robotEntity, matrix);
+	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 
-	scene->Set2DDisplayRenderFunction(dSimpleIndustrialRobot::RobotControlPanel, nullptr, robot);
+	scene->Set2DDisplayRenderFunction(ndIndustrialRobot::RobotControlPanel, nullptr, robot);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new dSimpleIndustrialRobot(scene, robotEntity, matrix));
+	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
 	//ndMatrix location(matrix);
 	//location = ndRollMatrix(-65 * ndDegreeToRad) * location;
 	//location.m_posit.m_x += 1.5f;

@@ -101,26 +101,31 @@ namespace biped2
 
 	class ndHumanoid : public ndModel
 	{
-	public:
+		public:
 
 		class ndParamMapper
 		{
-		public:
+			public:
 			ndParamMapper()
 				:m_x0(0.0f)
-				, m_scale(0.0f)
+				,m_scale(0.0f)
 			{
 			}
 
 			ndParamMapper(ndFloat32 x0, ndFloat32 x1)
 				:m_x0(x0 + (x1 - x0) * 0.5f)
-				, m_scale((x1 - x0) * 0.5f)
+				,m_scale((x1 - x0) * 0.5f)
 			{
 			}
 
 			ndFloat32 Interpolate(const ndFloat32 t)
 			{
 				return m_x0 + m_scale * t;
+			}
+
+			ndFloat32 CalculateParam(const ndFloat32 value) const
+			{
+				return (value - m_x0) / m_scale;
 			}
 
 			ndFloat32 m_x0;
@@ -269,7 +274,17 @@ namespace biped2
 							info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 							info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-							info.m_x = 0.99f;
+
+							// set the default pose param.
+							ndVector localPosit(effector->GetPosition());
+							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
+
+							ndVector localPositDir(localPosit.Normalize());
+							ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
+							info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
+
+							ndFloat32 rollAngle = ndSin(localPositDir.m_y);
+							info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
 
 							m_effectors.PushBack(info);
 						}
@@ -460,8 +475,8 @@ namespace biped2
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
 				ndEffectorInfo& info = m_effectors[i];
-				const ndMatrix yaw(ndYawMatrix(-info.m_y_mapper.Interpolate(info.m_y)));
-				const ndMatrix roll(ndRollMatrix(info.m_y_mapper.Interpolate(info.m_z)));
+				const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+				const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
 
 				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
 				posit = roll.RotateVector(posit);

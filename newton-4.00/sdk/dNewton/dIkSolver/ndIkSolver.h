@@ -47,11 +47,10 @@ class ndIkSolver: public ndClassAlloc
 	private:
 	void BuildMassMatrix();
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	void BuildJacobianMatrix(ndConstraint* const joint);
+	void BuildJacobianMatrix(ndConstraint* const joint); 
 
-	private:
 	ndBodyKinematic m_sentinelBody;
-	ndArray<ndInt32> m_bodiesIndex;
+	ndArray<ndInt32> m_savedBodiesIndex;
 	ndArray<ndBodyKinematic*> m_bodies;
 	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;

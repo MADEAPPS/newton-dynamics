@@ -152,9 +152,9 @@ class ndSkeletonContainer
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
 	void SolveImmediate(ndIkSolver& solverInfo);
-	void UpdateForcesImmediate(ndBodyKinematic** const bodyArray, const ndForcePair* const force) const;
+	void UpdateForcesImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndForcePair* const force) const;
 	void CalculateJointAccelImmediate(const ndJacobian* const internalForces, ndForcePair* const accel) const;
-	void SolveAuxiliaryImmediate(ndBodyKinematic** const bodyArray, ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
+	void SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 	
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;

@@ -31,7 +31,7 @@
 ndIkSolver::ndIkSolver()
 	:ndClassAlloc()
 	,m_sentinelBody()
-	,m_bodiesIndex(32)
+	,m_savedBodiesIndex(32)
 	,m_bodies(32)
 	,m_internalForces(32)
 	,m_leftHandSide(128)
@@ -236,13 +236,14 @@ void ndIkSolver::BuildMassMatrix()
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
 		ndBodyKinematic* const body = node->m_body;
+		ndAssert(body->m_buildSkelIndex == 0);
 		if (body->GetInvMass() > ndFloat32(0.0f))
 		{
 			m_bodies.PushBack(body);
-			body->m_rank = -1;
+			body->m_buildSkelIndex = -1;
 		}
 	}
-	
+
 	// add close loop 
 	const ndInt32 loopCount = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
 	for (ndInt32 i = 0; i < loopCount; ++i)
@@ -250,16 +251,18 @@ void ndIkSolver::BuildMassMatrix()
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
+
 		ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
-		if (body0->m_rank == 0)
+		if (body0->m_buildSkelIndex == 0)
 		{
 			m_bodies.PushBack(body0);
-			body0->m_rank = -1;
+			body0->m_buildSkelIndex = -1;
 		}
-		if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
+
+		if ((body1->m_buildSkelIndex == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
 		{
-			m_bodies.PushBack(body0);
-			body0->m_rank = -1;
+			m_bodies.PushBack(body1);
+			body1->m_buildSkelIndex = -1;
 		}
 	}
 	
@@ -288,27 +291,29 @@ void ndIkSolver::BuildMassMatrix()
 					ndBodyKinematic* const body0 = contact->GetBody0();
 					ndBodyKinematic* const body1 = contact->GetBody1();
 					ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
-					if (body0->m_rank == 0)
+
+					if (body0->m_buildSkelIndex == 0)
 					{
 						m_bodies.PushBack(body0);
-						body0->m_rank = -1;
+						body0->m_buildSkelIndex = -1;
 					}
-					if ((body1->m_rank == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
+
+					if ((body1->m_buildSkelIndex == 0) && (body1->GetInvMass() > ndFloat32(0.0f)))
 					{
 						m_bodies.PushBack(body1);
-						body1->m_rank = -1;
+						body1->m_buildSkelIndex = -1;
 					}
 				}
 			}
 		}
 	}
 	
-	m_bodiesIndex.SetCount(m_bodies.GetCount());
+	m_savedBodiesIndex.SetCount(m_bodies.GetCount());
 	m_internalForces.SetCount(m_bodies.GetCount());
-	for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0 ; --i)
 	{
 		ndBodyKinematic* const body = m_bodies[i];
-		m_bodiesIndex[i] = body->m_index;
+		m_savedBodiesIndex[i] = body->m_index;
 		body->m_index = i;
 	
 		body->UpdateInvInertiaMatrix();
@@ -370,13 +375,13 @@ void ndIkSolver::SolverEnd()
 {
 	if (m_skeleton)
 	{
-		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
+		for (ndInt32 i = m_bodies.GetCount()-1; i >= 1; --i)
 		{
 			ndBodyKinematic* const body = m_bodies[i];
-			body->m_index = m_bodiesIndex[i];
-			body->m_rank = 0;
+			body->m_buildSkelIndex = 0;
+			body->m_index = m_savedBodiesIndex[i];
 		}
-
+		
 		m_skeleton->ClearCloseLoopJoints();
 	}
 }
@@ -396,25 +401,25 @@ void ndIkSolver::Solve()
 		{
 			ndBodyKinematic* const body = m_bodies[i];
 			const ndInt32 index = body->m_index;
-
+			
 			const ndVector invMass(body->GetInvMass());
 			const ndMatrix& invInertia = body->GetInvInertiaMatrix();
-
+			
 			ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
 			ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
-
+			
 			ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();
 			if (maxAccel2 > (m_maxAccel * m_maxAccel))
 			{
 				accel = accel.Normalize().Scale(m_maxAccel);
 			}
-
+			
 			ndFloat32 maxAlpha2 = alpha.DotProduct(alpha).GetScalar();
 			if (maxAlpha2 > (m_maxAlpha * m_maxAlpha))
 			{
 				alpha = alpha.Normalize().Scale(m_maxAlpha);
 			}
-
+			
 			accelerations[i].m_linear = accel;
 			accelerations[i].m_angular = alpha;
 		}

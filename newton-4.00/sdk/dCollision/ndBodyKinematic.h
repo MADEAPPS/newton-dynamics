@@ -214,9 +214,9 @@ class ndBodyKinematic : public ndBody
 	ndFloat32 m_maxAngleStep;
 	ndFloat32 m_maxLinearStep;
 	ndFloat32 m_weigh;
-	ndInt32 m_rank;
 	ndInt32 m_index;
 	ndInt32 m_bodyNodeIndex;
+	ndInt32 m_buildSkelIndex;
 	ndInt32 m_sceneNodeIndex;
 	ndInt32 m_buildBodyNodeIndex;
 	ndInt32 m_buildSceneNodeIndex;
@@ -389,11 +389,11 @@ inline void ndBodyKinematic::SetAccel(const ndJacobian& accel)
 
 inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 {
-	m_rank = 0;
 	m_index = index;
 	m_isJointFence0 = 1;
 	m_isJointFence1 = 1;
 	m_isConstrained = 0;
+	m_buildSkelIndex = 0;
 	m_islandParent = this;
 	m_weigh = ndFloat32(0.0f);
 	m_isStatic = (m_invMass.m_w == ndFloat32(0.0f));

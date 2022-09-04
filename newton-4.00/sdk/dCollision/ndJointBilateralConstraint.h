@@ -38,17 +38,16 @@ enum ndJointBilateralSolverModel
 	m_jointModesCount
 };
 
-#define D_ADD_IK_INTERFACE()																\
-	virtual void SetIkMode(bool mode)														\
-	{																						\
-		m_ikMode = mode;																	\
-	}																						\
-	virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel)	\
-	{																						\
-		m_accel0 = body0Accel;																\
-		m_accel1 = body1Accel;																\
-	}
-
+#define D_ADD_IK_INTERFACE()															\
+virtual void SetIkMode(bool mode)														\
+{																						\
+	m_ikMode = mode;																	\
+}																						\
+virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel)	\
+{																						\
+	m_accel0 = body0Accel;																\
+	m_accel1 = body1Accel;																\
+}
 
 D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint : public ndConstraint
