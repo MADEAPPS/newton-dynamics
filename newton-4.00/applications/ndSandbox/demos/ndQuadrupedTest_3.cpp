@@ -19,6 +19,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndAnimationPose.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
@@ -63,6 +64,42 @@ namespace ndQuadruped_3
 		{ "fl_thigh_Bone008", ndDefinition::m_spherical, 3.0f },
 		{ "fl_knee_Bone006", ndDefinition::m_hinge, 2.0f },
 		{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f, 0.25f },
+	};
+
+	class ndQuadrupedMaterial : public ndApplicationMaterial
+	{
+		public:
+		ndQuadrupedMaterial()
+			:ndApplicationMaterial()
+		{
+		}
+
+		ndQuadrupedMaterial(const ndQuadrupedMaterial& src)
+			:ndApplicationMaterial(src)
+		{
+		}
+
+		ndApplicationMaterial* Clone() const
+		{
+			return new ndQuadrupedMaterial(*this);
+		}
+
+		bool OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
+		{
+			// filter self collision when the contact is with in the same model
+			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			if (pointer0 == pointer1)
+			{
+				// here we know the part are from the same model.
+				// we can apply some more filtering by for now we just disable all self model collisions. 
+				return false;
+			}
+			return true;
+		}
 	};
 
 	class ndQuadrupedModel : public ndModel
@@ -343,8 +380,11 @@ namespace ndQuadruped_3
 			body->SetMassMatrix(mass, *shape);
 			body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
 
-			delete shape;
+			ndShapeInstance& instanceShape = body->GetCollisionShape();
+			instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
 
+			delete shape;
 			// add body to the world
 			scene->GetWorld()->AddBody(body);
 			return body;
@@ -468,6 +508,18 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
+
+	// register a material for filtering self collisions 
+	ndQuadrupedMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");

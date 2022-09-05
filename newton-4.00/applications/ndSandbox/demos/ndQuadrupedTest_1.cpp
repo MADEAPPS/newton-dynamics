@@ -756,6 +756,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	material.m_dynamicFriction1 = 0.9f;
 
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, robotEntity, matrix);
