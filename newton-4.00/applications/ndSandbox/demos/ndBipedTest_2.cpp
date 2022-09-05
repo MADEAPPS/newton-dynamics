@@ -22,7 +22,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-
 namespace biped2
 {
 	class ndDefinition
@@ -86,15 +85,15 @@ namespace biped2
 		{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 #endif
 
-		{ "rhipjoint", ndDefinition::m_spherical,{ -45.0f, 45.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		//{ "rfemur", ndDefinition::m_hinge,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
-		//{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		//{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rhipjoint", ndDefinition::m_spherical,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_hinge,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		//{ "lhipjoint", ndDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "lfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		//{ "ltibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lhipjoint", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "lfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "ltibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root,{},{} },
 	};
@@ -134,24 +133,24 @@ namespace biped2
 
 		class ndEffectorInfo
 		{
-		public:
+			public:
 			ndEffectorInfo()
 				:m_basePosition(ndVector::m_wOne)
-				, m_effector(nullptr)
-				, m_swivel(0.0f)
-				, m_x(0.0f)
-				, m_y(0.0f)
-				, m_z(0.0f)
+				,m_effector(nullptr)
+				,m_swivel(0.0f)
+				,m_x(0.0f)
+				,m_y(0.0f)
+				,m_z(0.0f)
 			{
 			}
 
 			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
 				:m_basePosition(effector->GetPosition())
-				, m_effector(effector)
-				, m_swivel(0.0f)
-				, m_x(0.0f)
-				, m_y(0.0f)
-				, m_z(0.0f)
+				,m_effector(effector)
+				,m_swivel(0.0f)
+				,m_x(0.0f)
+				,m_y(0.0f)
+				,m_z(0.0f)
 			{
 			}
 
@@ -169,6 +168,10 @@ namespace biped2
 
 		ndHumanoid(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndModel()
+			,m_invDynamicsSolver()
+			,m_effectors()
+			,m_bodyArray()
+			,m_effectorsJoints()
 		{
 			ndWorld* const world = scene->GetWorld();
 
@@ -176,19 +179,16 @@ namespace biped2
 			ndDemoEntity* const entity = (ndDemoEntity*)model->CreateClone();
 			scene->AddEntity(entity);
 
-			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
-			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
-
 			// find the floor location 
-			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
+			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			//matrix.m_posit.m_y = floor.m_y + 1.5f;
-			matrix.m_posit.m_y = floor.m_y + 4.0f;
+			entMatrix.m_posit.m_y = floor.m_y + 2.0f;
+			entity->ResetMatrix(entMatrix);
 
 			// add the root body
+			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
 			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
-
-			// set bindimg matrix;
-			rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 
 			ndInt32 stack = 0;
 			ndFixSizeArray<ndFloat32, 64> massWeight;
@@ -215,7 +215,7 @@ namespace biped2
 				ndBodyDynamic* parentBody = parentBones[stack];
 				ndDemoEntity* const childEntity = childEntities[stack];
 				const char* const name = childEntity->GetName().GetStr();
-				ndTrace(("name: %s\n", name));
+				//ndTrace(("name: %s\n", name));
 				for (ndInt32 i = 0; definition[i].m_boneName[0]; ++i)
 				{
 					if (!strcmp(definition[i].m_boneName, name))
@@ -267,26 +267,24 @@ namespace biped2
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
 
-							world->AddJoint(effector);
-
 							ndEffectorInfo info(effector);
 							info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
 							info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
-							info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+							info.m_z_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 							// set the default pose param.
 							ndVector localPosit(effector->GetPosition());
 							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
 
-							ndVector localPositDir(localPosit.Normalize());
-							ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
-							info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
-
-							ndFloat32 rollAngle = ndSin(localPositDir.m_y);
-							info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
+							//ndVector localPositDir(localPosit.Normalize());
+							//ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
+							//info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
+							//ndFloat32 rollAngle = ndSin(localPositDir.m_y);
+							//info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
 
 							m_effectors.PushBack(info);
+							m_effectorsJoints.PushBack(info.m_effector);
 						}
 						break;
 					}
@@ -301,11 +299,13 @@ namespace biped2
 			}
 
 			NormalizeMassDistribution(100.0f);
+		}
 
-			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
+		~ndHumanoid()
+		{
+			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
 			{
-				m_bodyArray[i]->GetNotifyCallback()->OnTransform(0, m_bodyArray[i]->GetMatrix());
-				m_bodyArray[i]->GetNotifyCallback()->OnTransform(0, m_bodyArray[i]->GetMatrix());
+				delete m_effectorsJoints[i];
 			}
 		}
 
@@ -386,53 +386,46 @@ namespace biped2
 
 			switch (definition.m_type)
 			{
-			case ndDefinition::m_fix:
-			{
-				ndJointFix6dof* const joint = new ndJointFix6dof(pinAndPivotInGlobalSpace, childBody, parentBone);
-				return joint;
-			}
+				case ndDefinition::m_fix:
+				{
+					ndJointFix6dof* const joint = new ndJointFix6dof(pinAndPivotInGlobalSpace, childBody, parentBone);
+					return joint;
+				}
 
-			case ndDefinition::m_spherical:
-			{
-				//ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
-				//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+				case ndDefinition::m_spherical:
+				{
+					ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
+					//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+					//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+					//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+					return joint;
+				}
 
-				ndMatrix pin(ndYawMatrix(-90.0f * ndDegreeToRad) * parentBone->GetMatrix());
-				pin.m_posit = pinAndPivotInGlobalSpace.m_posit;
-				
-				ndJointHinge* const joint = new ndJointHinge(pin, childBody, parentBone);
-				joint->SetAsSpringDamper(0.001f, 1000.0f, 10.0f);
-				xxxxxxxx = joint;
-				return joint;
-			}
+				case ndDefinition::m_hinge:
+				{
+					ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-			case ndDefinition::m_hinge:
-			{
-				ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+					ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+					joint->SetLimitState(true);
+					joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+					return joint;
+				}
 
-				ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-				joint->SetLimitState(true);
-				joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-				return joint;
-			}
+				case ndDefinition::m_doubleHinge:
+				{
+					ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-			case ndDefinition::m_doubleHinge:
-			{
-				ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+					ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+					joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
+					joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
 
-				ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-				joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
-				joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+					joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
+					joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
+					return joint;
+				}
 
-				joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
-				joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
-				return joint;
-			}
-
-			default:
-				ndAssert(0);
+				default:
+					ndAssert(0);
 			}
 			return nullptr;
 		}
@@ -486,9 +479,16 @@ namespace biped2
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
 			}
 
-			ndEffectorInfo& info = m_effectors[0];
-			ndFloat32 angle = info.m_z * 90.0f * ndDegreeToRad;
-			xxxxxxxx->SetOffsetAngle(angle);
+			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
+			ndAssert(skeleton);
+
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
+			}
 		}
 
 		void ApplyControls(ndDemoEntityManager* const scene)
@@ -542,10 +542,10 @@ namespace biped2
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
-		ndJointHinge* xxxxxxxx;
-
+		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
+		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
 	};
 };
 

@@ -73,27 +73,27 @@ namespace ndBiped_1
 		//{ "rradius", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 	#else
-		//{ "lowerback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		//{ "upperback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "lowerneck", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "upperneck", ndDefinition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "lclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		//{ "lhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		//{ "rclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "rhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lowerback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ "upperback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lowerneck", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "upperneck", ndDefinition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "lhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "rhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 	#endif
 
-		{ "rhipjoint", ndDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "rhipjoint", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
 		{ "rfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		//{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		//{ "lhipjoint", ndDefinition::m_spherical, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "lfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		//{ "ltibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lhipjoint", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "lfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "ltibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root,{},{} },
 	};
@@ -175,19 +175,15 @@ namespace ndBiped_1
 			ndDemoEntity* const entity = (ndDemoEntity*)model->CreateClone();
 			scene->AddEntity(entity);
 
-			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
-			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
-
-			// find the floor location 
-			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
+			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			//matrix.m_posit.m_y = floor.m_y + 1.5f;
-			matrix.m_posit.m_y = floor.m_y + 4.0f;
+			entMatrix.m_posit.m_y = floor.m_y + 2.0f;
+			entity->ResetMatrix(entMatrix);
 
 			// add the root body
+			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
 			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
-
-			// set bindimg matrix;
-			rootBody->GetNotifyCallback()->OnTransform(0, matrix);
 
 			ndInt32 stack = 0;
 			ndFixSizeArray<ndFloat32, 64> massWeight;
@@ -214,7 +210,7 @@ namespace ndBiped_1
 				ndBodyDynamic* parentBody = parentBones[stack];
 				ndDemoEntity* const childEntity = childEntities[stack];
 				const char* const name = childEntity->GetName().GetStr();
-				ndTrace(("name: %s\n", name));
+				//ndTrace(("name: %s\n", name));
 				for (ndInt32 i = 0; definition[i].m_boneName[0]; ++i)
 				{
 					if (!strcmp(definition[i].m_boneName, name))
@@ -266,24 +262,21 @@ namespace ndBiped_1
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
 
-							world->AddJoint(effector);
-
 							ndEffectorInfo info(effector);
 							info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
 							info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
-							info.m_z_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+							info.m_z_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 							// set the default pose param.
 							ndVector localPosit(effector->GetPosition());
 							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
 
-							ndVector localPositDir (localPosit.Normalize());
-							ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
-							info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
-							
-							ndFloat32 rollAngle = ndSin(localPositDir.m_y);
-							info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
+							//ndVector localPositDir (localPosit.Normalize());
+							//ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
+							//info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
+							//ndFloat32 rollAngle = ndSin(localPositDir.m_y);
+							//info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
 
 							// verify the param is correct
 							//const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
@@ -293,6 +286,7 @@ namespace ndBiped_1
 							//posit = yaw.RotateVector(posit);
 							//info.m_effector->SetPosition(posit);
 
+							world->AddJoint(effector);
 							m_effectors.PushBack(info);
 						}
 						break;
@@ -308,12 +302,6 @@ namespace ndBiped_1
 			}
 
 			NormalizeMassDistribution(100.0f);
-
-			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
-			{
-				m_bodyArray[i]->GetNotifyCallback()->OnTransform(0, m_bodyArray[i]->GetMatrix());
-				m_bodyArray[i]->GetNotifyCallback()->OnTransform(0, m_bodyArray[i]->GetMatrix());
-			}
 		}
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
@@ -393,46 +381,46 @@ namespace ndBiped_1
 
 			switch (definition.m_type)
 			{
-			case ndDefinition::m_fix:
-			{
-				ndJointFix6dof* const joint = new ndJointFix6dof(pinAndPivotInGlobalSpace, childBody, parentBone);
-				return joint;
-			}
+				case ndDefinition::m_fix:
+				{
+					ndJointFix6dof* const joint = new ndJointFix6dof(pinAndPivotInGlobalSpace, childBody, parentBone);
+					return joint;
+				}
 
-			case ndDefinition::m_spherical:
-			{
-				ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
-				//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-				//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-				//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-				return joint;
-			}
+				case ndDefinition::m_spherical:
+				{
+					ndIkJointSpherical* const joint = new ndIkJointSpherical(pinAndPivotInGlobalSpace, childBody, parentBone);
+					//ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+					//joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+					//joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+					return joint;
+				}
 
-			case ndDefinition::m_hinge:
-			{
-				ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+				case ndDefinition::m_hinge:
+				{
+					ndIkJointHinge* const joint = new ndIkJointHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-				ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-				joint->SetLimitState(true);
-				joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-				return joint;
-			}
+					ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+					joint->SetLimitState(true);
+					joint->SetLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+					return joint;
+				}
 
-			case ndDefinition::m_doubleHinge:
-			{
-				ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
+				case ndDefinition::m_doubleHinge:
+				{
+					ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBone);
 
-				ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
-				joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
-				joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+					ndDefinition::ndJointLimit jointLimits(definition.m_jointLimits);
+					joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
+					joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
 
-				joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
-				joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
-				return joint;
-			}
+					joint->SetAsSpringDamper0(0.01f, 0.0f, 10.0f);
+					joint->SetAsSpringDamper1(0.01f, 0.0f, 10.0f);
+					return joint;
+				}
 
-			default:
-				ndAssert(0);
+				default:
+					ndAssert(0);
 			}
 			return nullptr;
 		}
@@ -473,7 +461,6 @@ namespace ndBiped_1
 		{
 			ndModel::Update(world, timestep);
 
-			//const ndVector frontVector(m_bodyArray[0]->GetMatrix().m_front);
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
 				ndEffectorInfo& info = m_effectors[i];
