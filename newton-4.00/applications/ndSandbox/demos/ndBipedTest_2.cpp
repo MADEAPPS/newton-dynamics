@@ -520,7 +520,6 @@ namespace biped2
 };
 
 using namespace biped2;
-
 void ndBipedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor

@@ -70,6 +70,42 @@ namespace ndQuadruped_1
 		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
 	};
 
+	class ndQuadrupedMaterial: public ndApplicationMaterial
+	{
+		public:
+		ndQuadrupedMaterial()
+			:ndApplicationMaterial()
+		{
+		}
+
+		ndQuadrupedMaterial(const ndQuadrupedMaterial& src)
+			:ndApplicationMaterial(src)
+		{
+		}
+
+		ndApplicationMaterial* Clone() const
+		{
+			return new ndQuadrupedMaterial(*this);
+		}
+
+		bool OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
+		{
+			// filter self collision when the contact is with in the same model
+			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			if (pointer0 == pointer1)
+			{
+				// here we know the part are from the same model.
+				// we can apply some more filtering by for now we just disable all self model collisions. 
+				return false;
+			}
+			return true;
+		}
+	};
+
 	class ndWalkSequence : public ndAnimationSequenceBase
 	{
 		public:
@@ -224,13 +260,15 @@ namespace ndQuadruped_1
 
 		ndQuadrupedModel(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
-			,m_rootBody(nullptr)
+			,m_invDynamicsSolver()
 			,m_walk(nullptr)
 			,m_animBlendTree(nullptr)
 			,m_output()
 			,m_walkCycle(0.8f)
 			,m_trotCycle(0.4f)
 			,m_effectors()
+			,m_bodyArray()
+			,m_effectorsJoints()
 		{
 			// make a clone of the mesh and add it to the scene
 			ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -244,12 +282,12 @@ namespace ndQuadruped_1
 			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			matrix.m_posit.m_y = floor.m_y;
 
-			matrix.m_posit.m_y += 1.2f;
+			matrix.m_posit.m_y += 1.0f;
 			rootEntity->ResetMatrix(matrix);
 
 			// add the root body
-			m_rootBody = CreateBodyPart(scene, rootEntity, 1.0f, nullptr);
-			m_bodyArray.PushBack(m_rootBody);
+			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, 1.0f, nullptr);
+			m_bodyArray.PushBack(rootBody);
 
 			ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 			ndFixSizeArray<ndDemoEntity*, 32> childEntities;
@@ -258,7 +296,7 @@ namespace ndQuadruped_1
 			for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
 			{
 				childEntities[stack] = child;
-				parentBone[stack] = m_rootBody;
+				parentBone[stack] = rootBody;
 				stack++;
 			}
 
@@ -294,13 +332,13 @@ namespace ndQuadruped_1
 							notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 							notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
-							ndMatrix effectorFrame(m_rootBody->GetMatrix());
-							ndMatrix pivotFrame(m_rootBody->GetMatrix());
+							ndMatrix effectorFrame(rootBody->GetMatrix());
+							ndMatrix pivotFrame(rootBody->GetMatrix());
 							pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
 							effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 
 							ndFloat32 regularizer = 0.001f;
-							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, ndGetIdentityMatrix(), parentBody, m_rootBody);
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, ndGetIdentityMatrix(), parentBody, rootBody);
 
 							effector->SetSwivelMode(false);
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
@@ -312,10 +350,11 @@ namespace ndQuadruped_1
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
 
-							world->AddJoint(effector);
+							//world->AddJoint(effector);
 
 							ndEffectorInfo info(effector);
 							m_effectors.PushBack(info);
+							m_effectorsJoints.PushBack(effector);
 						}
 						break;
 					}
@@ -342,13 +381,15 @@ namespace ndQuadruped_1
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-			,m_rootBody(nullptr)
+			,m_invDynamicsSolver()
 			,m_walk(nullptr)
 			,m_animBlendTree(nullptr)
 			,m_output()
 			,m_walkCycle(0.75f)
 			,m_trotCycle(0.4f)
 			,m_effectors()
+			,m_bodyArray()
+			,m_effectorsJoints()
 		{
 			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -374,9 +415,8 @@ namespace ndQuadruped_1
 			}
 
 			// load root body
-			ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
-			ndBody* const rootbody = (ndBody*)rootBodyNode->GetInfo();
-			m_rootBody = rootbody->GetAsBodyDynamic();
+			//ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
+			//ndBodyDynamic* const rootBody = ((ndBody*)rootBodyNode->GetInfo())->GetAsBodyDynamic();
 
 			// load effector joint
 			const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
@@ -391,6 +431,10 @@ namespace ndQuadruped_1
 			if (m_animBlendTree)
 			{
 				delete m_animBlendTree;
+			}
+			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+			{
+				delete m_effectorsJoints[i];
 			}
 		}
 
@@ -522,7 +566,7 @@ namespace ndQuadruped_1
 
 		ndBodyDynamic* GetRoot() const
 		{
-			return m_rootBody;
+			return m_bodyArray[0];
 		}
 
 		ndVector CalculateCenterOfMass() const
@@ -544,7 +588,7 @@ namespace ndQuadruped_1
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndMatrix comMatrix(m_rootBody->GetMatrix());
+			ndMatrix comMatrix(m_bodyArray[0]->GetMatrix());
 			comMatrix.m_posit = CalculateCenterOfMass();
 			context.DrawFrame(comMatrix);
 
@@ -630,7 +674,7 @@ namespace ndQuadruped_1
 
 			if (change)
 			{
-				m_rootBody->SetSleepState(false);
+				m_bodyArray[0]->SetSleepState(false);
 			}
 		}
 
@@ -638,7 +682,7 @@ namespace ndQuadruped_1
 		{
 			ndModel::Update(world, timestep);
 
-			m_rootBody->SetSleepState(false);
+			m_bodyArray[0]->SetSleepState(false);
 			ndFloat32 animSpeed = m_param_xxxx.Interpolate(m_param_x0);
 			m_timer = ndMod(m_timer + timestep * animSpeed, ndFloat32(1.0f));
 
@@ -654,6 +698,17 @@ namespace ndQuadruped_1
 				posit.m_z += keyFrame.m_posit.m_z;
 				info.m_effector->SetPosition(posit);
 			}
+
+			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
+			ndAssert(skeleton);
+
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
+			}
 		}
 
 		static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
@@ -662,7 +717,7 @@ namespace ndQuadruped_1
 			me->ApplyControls(scene);
 		}
 
-		ndBodyDynamic* m_rootBody;
+		ndIkSolver m_invDynamicsSolver;
 		ndAnimationSequencePlayer* m_walk;
 		ndAnimationBlendTreeNode* m_animBlendTree;
 		ndAnimationPose m_output;
@@ -670,71 +725,13 @@ namespace ndQuadruped_1
 		ndWalkSequence m_trotCycle;
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
+		ndFixSizeArray<ndJointBilateralConstraint*, 4> m_effectorsJoints;
 
 		ndFloat32 m_timer;
 		ndReal m_param_x0;
 		ndParamMapper m_param_xxxx;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_1::ndQuadrupedModel);
-
-	class ndQuadrupedMaterial : public ndApplicationMaterial
-	{
-		public:
-		ndQuadrupedMaterial()
-			:ndApplicationMaterial()
-		{
-		}
-
-		ndQuadrupedMaterial(const ndQuadrupedMaterial& src)
-			:ndApplicationMaterial(src)
-		{
-		}
-
-		ndApplicationMaterial* Clone() const
-		{
-			return new ndQuadrupedMaterial(*this);
-		}
-
-		bool OnAabbOverlap(const ndContact* const joint, ndFloat32) const
-		{
-			// filter self collision when the contact is with in the same model
-			const ndBodyKinematic* const body0 = joint->GetBody0();
-			const ndBodyKinematic* const body1 = joint->GetBody1();
-
-			const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
-			const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-
-			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
-			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
-
-			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
-			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
-			if (pointer0 == pointer1)
-			{
-				// here we know the part are from the same model.
-				// we can apply some more filtering by for now we just disable all self model collisions. 
-				return false;
-			}
-			return true;
-		}
-
-		//void OnContactCallback(const ndContact* const joint, ndFloat32) const
-		//{
-		//	if (joint->IsActive())
-		//	{
-		//		const ndContactPointList& contactPoints = joint->GetContactPoints();
-		//		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
-		//		{
-		//			ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-		//			// quick hack to show the solution.
-		//			if (contactPoint.m_normal.m_y < 0.999)
-		//			{
-		//				dTrace(("this is when the bug happens\n"));
-		//			}
-		//		}
-		//	}
-		//}
-	};
 };
 
 using namespace ndQuadruped_1;

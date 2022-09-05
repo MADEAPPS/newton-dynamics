@@ -109,8 +109,10 @@ namespace ndQuadruped_3
 
 		ndQuadrupedModel(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
+			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
 			,m_effectors()
+			,m_effectorsJoints()
 		{
 			// make a clone of the mesh and add it to the scene
 			ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
@@ -205,14 +207,13 @@ namespace ndQuadruped_3
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
 
-							world->AddJoint(effector);
-
 							ndEffectorInfo info(effector);
 							info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
 							info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
 							info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
 							info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 							m_effectors.PushBack(info);
+							m_effectorsJoints.PushBack(effector);
 						}
 						break;
 					}
@@ -229,8 +230,10 @@ namespace ndQuadruped_3
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
+			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
 			,m_effectors()
+			,m_effectorsJoints()
 		{
 			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -270,6 +273,10 @@ namespace ndQuadruped_3
 
 		~ndQuadrupedModel()
 		{
+			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+			{
+				delete m_effectorsJoints[i];
+			}
 		}
 
 		void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -429,6 +436,17 @@ namespace ndQuadruped_3
 				const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 			}
+
+			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			ndAssert(skeleton);
+
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
+			}
 		}
 
 		static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
@@ -437,8 +455,10 @@ namespace ndQuadruped_3
 			me->ApplyControls(scene);
 		}
 
+		ndIkSolver m_invDynamicsSolver;
 		ndBodyDynamic* m_rootBody;
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
+		ndFixSizeArray<ndJointBilateralConstraint*, 4> m_effectorsJoints;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_3::ndQuadrupedModel);
 };

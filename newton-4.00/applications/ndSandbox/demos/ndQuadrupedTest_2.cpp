@@ -73,6 +73,10 @@ namespace ndQuadruped_2
 
 		ndQuadrupedModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 			:ndModel()
+			,m_invDynamicsSolver()
+			,m_rootBody(nullptr)
+			,m_effectors()
+			,m_effectorsJoints()
 		{
 			ndFloat32 mass = 10.0f;
 			ndFloat32 radius = 0.25f;
@@ -196,26 +200,33 @@ namespace ndQuadruped_2
 					effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 					effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 
-					world->AddJoint(effector);
-
 					ndEffectorInfo info(effector, lookActHinge);
 					info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
 					info.m_y_mapper = ndParamMapper(-0.2f, 0.2f);
 					info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
 					info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 					m_effectors.PushBack(info);
+					m_effectorsJoints.PushBack(effector);
 				}
 			}
 		}
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
+			,m_invDynamicsSolver()
+			,m_rootBody(nullptr)
+			,m_effectors()
+			,m_effectorsJoints()
 		{
 			ndAssert(0);
 		}
 
 		~ndQuadrupedModel()
 		{
+			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+			{
+				delete m_effectorsJoints[i];
+			}
 		}
 
 		//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -289,6 +300,17 @@ namespace ndQuadruped_2
 				const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
 				info.m_lookAtJoint->SetOffsetAngle(lookAngle);
 			}
+
+			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			ndAssert(skeleton);
+
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
+			}
 		}
 
 		void ApplyControls(ndDemoEntityManager* const scene)
@@ -329,8 +351,10 @@ namespace ndQuadruped_2
 			me->ApplyControls(scene);
 		}
 
+		ndIkSolver m_invDynamicsSolver;
 		ndBodyDynamic* m_rootBody;
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
+		ndFixSizeArray<ndJointBilateralConstraint*, 4> m_effectorsJoints;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadrupedModel);
 };
