@@ -57,8 +57,8 @@
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// biped test 1
-#define DEFAULT_SCENE	19		// biped test 2
-//#define DEFAULT_SCENE	20		// quadruped test 1
+//#define DEFAULT_SCENE	19		// biped test 2
+#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// simple voronoi fracture
@@ -67,7 +67,7 @@
 //#define DEFAULT_SCENE	26		// skin peel voronoi fracture
 						 
 // demos forward declaration 
-void ndRagdoll(ndDemoEntityManager* const scene);
+void ndRagdollTest(ndDemoEntityManager* const scene);
 void ndBipedTest_1(ndDemoEntityManager* const scene);
 void ndBipedTest_2(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -115,7 +115,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
-	{ "rag doll", ndRagdoll },
+	{ "rag doll", ndRagdollTest },
 	{ "biped test one", ndBipedTest_1 },
 	{ "biped test two", ndBipedTest_2 },
 	{ "quadruped test one", ndQuadrupedTest_1 },

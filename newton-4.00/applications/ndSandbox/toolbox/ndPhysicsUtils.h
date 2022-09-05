@@ -29,4 +29,33 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& origin,
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist);
 ndBodyKinematic* MousePickBody(ndWorld* const nWorld, const ndVector& origin, const ndVector& end, ndFloat32& paramter, ndVector& positionOut, ndVector& normalOut);
 
+
+class ndParamMapper
+{
+	public:
+	ndParamMapper()
+		:m_x0(0.0f)
+		,m_scale(0.0f)
+	{
+	}
+
+	ndParamMapper(ndFloat32 x0, ndFloat32 x1)
+		:m_x0(x0 + (x1 - x0) * 0.5f)
+		,m_scale((x1 - x0) * 0.5f)
+	{
+	}
+
+	ndFloat32 Interpolate(const ndFloat32 t)
+	{
+		return m_x0 + m_scale * t;
+	}
+
+	ndFloat32 CalculateParam(const ndFloat32 value) const
+	{
+		return (value - m_x0) / m_scale;
+	}
+
+	ndFloat32 m_x0;
+	ndFloat32 m_scale;
+};
 #endif

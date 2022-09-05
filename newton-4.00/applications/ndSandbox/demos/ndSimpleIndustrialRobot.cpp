@@ -27,7 +27,7 @@ namespace ndSimpleRobot
 	class ndDefinition
 	{
 		public:
-		enum jointType
+		enum ndJointType
 		{
 			m_root,
 			m_hinge,
@@ -36,7 +36,7 @@ namespace ndSimpleRobot
 		};
 
 		char m_boneName[32];
-		jointType m_type;
+		ndJointType m_type;
 		ndFloat32 m_mass;
 		ndFloat32 m_minLimit;
 		ndFloat32 m_maxLimit;
@@ -474,8 +474,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
 	world->AddModel(robot);
-	ndBodyDynamic* const root = robot->GetRoot();
-	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
+	world->AddJoint (new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
 
 	scene->Set2DDisplayRenderFunction(ndIndustrialRobot::RobotControlPanel, nullptr, robot);
 	

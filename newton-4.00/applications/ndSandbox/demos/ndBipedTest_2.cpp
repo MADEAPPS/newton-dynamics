@@ -98,39 +98,9 @@ namespace biped2
 		{ "", ndDefinition::m_root,{},{} },
 	};
 
-	class ndHumanoid : public ndModel
+	class ndHumanoidModel : public ndModel
 	{
 		public:
-
-		class ndParamMapper
-		{
-			public:
-			ndParamMapper()
-				:m_x0(0.0f)
-				,m_scale(0.0f)
-			{
-			}
-
-			ndParamMapper(ndFloat32 x0, ndFloat32 x1)
-				:m_x0(x0 + (x1 - x0) * 0.5f)
-				,m_scale((x1 - x0) * 0.5f)
-			{
-			}
-
-			ndFloat32 Interpolate(const ndFloat32 t)
-			{
-				return m_x0 + m_scale * t;
-			}
-
-			ndFloat32 CalculateParam(const ndFloat32 value) const
-			{
-				return (value - m_x0) / m_scale;
-			}
-
-			ndFloat32 m_x0;
-			ndFloat32 m_scale;
-		};
-
 		class ndEffectorInfo
 		{
 			public:
@@ -166,7 +136,7 @@ namespace biped2
 			ndParamMapper m_swivel_mapper;
 		};
 
-		ndHumanoid(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
+		ndHumanoidModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_effectors()
@@ -301,7 +271,7 @@ namespace biped2
 			NormalizeMassDistribution(100.0f);
 		}
 
-		~ndHumanoid()
+		~ndHumanoidModel()
 		{
 			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
 			{
@@ -528,7 +498,7 @@ namespace biped2
 
 		static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
 		{
-			ndHumanoid* const me = (ndHumanoid*)context;
+			ndHumanoidModel* const me = (ndHumanoidModel*)context;
 			me->ApplyControls(scene);
 		}
 
@@ -564,9 +534,9 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndHumanoid* const model = new ndHumanoid(scene, modelMesh, origin, ragdollDefinition);
+	ndHumanoidModel* const model = new ndHumanoidModel(scene, modelMesh, origin, ragdollDefinition);
 	world->AddModel(model);
-	scene->Set2DDisplayRenderFunction(ndHumanoid::ControlPanel, nullptr, model);
+	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
 	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
