@@ -18,11 +18,12 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-namespace ndBiped_1
+namespace biped_1
 {
 	class ndDefinition
 	{
@@ -53,14 +54,15 @@ namespace ndBiped_1
 
 		char m_boneName[32];
 		ndjointType m_type;
+		ndInt32 m_selfCollide;
 		ndJointLimit m_jointLimits;
 		ndFrameMatrix m_frameBasics;
 	};
 
 	static ndDefinition ragdollDefinition[] =
 	{
-		{ "root", ndDefinition::m_root, {}, {} },
-	#if 0
+		{ "root", ndDefinition::m_root,{},{} },
+#if 0
 		//{ "lowerback", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
 		//{ "upperback", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
 		//{ "lowerneck", ndDefinition::m_spherical, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
@@ -72,30 +74,71 @@ namespace ndBiped_1
 		//{ "rhumerus", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		//{ "rradius", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-	#else
-		{ "lowerback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ "upperback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lowerneck", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "upperneck", ndDefinition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "lhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		{ "rclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "rhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-	#endif
+#else
+		{ "lowerback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ "upperback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lowerneck", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "upperneck", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "lhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "rhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "rradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+#endif
 
-		{ "rhipjoint", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rhipjoint", ndDefinition::m_spherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		{ "lhipjoint", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "lfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		{ "ltibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		{ "", ndDefinition::m_root,{},{} },
+		{ "", ndDefinition::m_root, 0,{},{} },
+	};
+
+	class ndBipedMaterial : public ndApplicationMaterial
+	{
+		public:
+		ndBipedMaterial()
+			:ndApplicationMaterial()
+		{
+		}
+
+		ndBipedMaterial(const ndBipedMaterial& src)
+			:ndApplicationMaterial(src)
+		{
+		}
+
+		ndApplicationMaterial* Clone() const
+		{
+			return new ndBipedMaterial(*this);
+		}
+
+		bool OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
+		{
+			// filter self collision when the contact is with in the same model
+			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			if (pointer0 == pointer1)
+			{
+				// here we know the part are from the same model.
+				// we can apply some more filtering by for now we just disable all self model collisions. 
+				ndUnsigned64 selfCollide0 = material0.m_userParam[ndContactCallback::m_materialFlags].m_intData;
+				ndUnsigned64 selfCollide1 = material1.m_userParam[ndContactCallback::m_materialFlags].m_intData;
+				if (!(selfCollide0 || selfCollide1))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 	};
 
 	class ndHumanoidModel : public ndModel
@@ -116,11 +159,11 @@ namespace ndBiped_1
 
 			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
 				:m_basePosition(effector->GetPosition())
-				, m_effector(effector)
-				, m_swivel(0.0f)
-				, m_x(0.0f)
-				, m_y(0.0f)
-				, m_z(0.0f)
+				,m_effector(effector)
+				,m_swivel(0.0f)
+				,m_x(0.0f)
+				,m_y(0.0f)
+				,m_z(0.0f)
 			{
 			}
 
@@ -138,6 +181,10 @@ namespace ndBiped_1
 
 		ndHumanoidModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndModel()
+			,m_invDynamicsSolver()
+			,m_effectors()
+			,m_bodyArray()
+			,m_effectorsJoints()
 		{
 			ndWorld* const world = scene->GetWorld();
 
@@ -145,15 +192,15 @@ namespace ndBiped_1
 			ndDemoEntity* const entity = (ndDemoEntity*)model->CreateClone();
 			scene->AddEntity(entity);
 
+			// find the floor location 
 			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			//matrix.m_posit.m_y = floor.m_y + 1.5f;
-			entMatrix.m_posit.m_y = floor.m_y + 2.0f;
+			entMatrix.m_posit.m_y = floor.m_y + 1.1f;
 			entity->ResetMatrix(entMatrix);
 
 			// add the root body
 			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
-			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr, ragdollDefinition[0]);
 
 			ndInt32 stack = 0;
 			ndFixSizeArray<ndFloat32, 64> massWeight;
@@ -187,7 +234,7 @@ namespace ndBiped_1
 					{
 						if (definition[i].m_type != ndDefinition::m_effector)
 						{
-							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody);
+							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody, definition[i]);
 
 							// connect this body part to its parentBody with a robot joint
 							ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition[i]);
@@ -242,7 +289,7 @@ namespace ndBiped_1
 							ndVector localPosit(effector->GetPosition());
 							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
 
-							//ndVector localPositDir (localPosit.Normalize());
+							//ndVector localPositDir(localPosit.Normalize());
 							//ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
 							//info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
 							//ndFloat32 rollAngle = ndSin(localPositDir.m_y);
@@ -256,8 +303,8 @@ namespace ndBiped_1
 							//posit = yaw.RotateVector(posit);
 							//info.m_effector->SetPosition(posit);
 
-							world->AddJoint(effector);
 							m_effectors.PushBack(info);
+							m_effectorsJoints.PushBack(info.m_effector);
 						}
 						break;
 					}
@@ -272,6 +319,14 @@ namespace ndBiped_1
 			}
 
 			NormalizeMassDistribution(100.0f);
+		}
+
+		~ndHumanoidModel()
+		{
+			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+			{
+				delete m_effectorsJoints[i];
+			}
 		}
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
@@ -323,7 +378,7 @@ namespace ndBiped_1
 			}
 		}
 
-		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
+		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone, const ndDefinition& definition)
 		{
 			ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
 			ndAssert(shape);
@@ -336,6 +391,12 @@ namespace ndBiped_1
 			body->SetCollisionShape(*shape);
 			body->SetMassMatrix(1.0f, *shape);
 			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
+
+			// save the shape material type
+			ndShapeInstance& instanceShape = body->GetCollisionShape();
+			instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = definition.m_selfCollide;
 
 			m_bodyArray.PushBack(body);
 			scene->GetWorld()->AddBody(body);
@@ -430,7 +491,6 @@ namespace ndBiped_1
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
-
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
 				ndEffectorInfo& info = m_effectors[i];
@@ -443,6 +503,17 @@ namespace ndBiped_1
 
 				info.m_effector->SetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
+			}
+
+			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
+			ndAssert(skeleton);
+
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
 			}
 		}
 
@@ -497,16 +568,29 @@ namespace ndBiped_1
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
+		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
+		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
 	};
 };
 
-using namespace ndBiped_1;
-void ndBipedTest_1 (ndDemoEntityManager* const scene)
+using namespace biped_1;
+void ndBipedTest_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
+
+	ndBipedMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndMatrix origin(ndGetIdentityMatrix());
 	origin.m_posit.m_x += 20.0f;

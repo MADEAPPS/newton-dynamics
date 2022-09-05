@@ -122,8 +122,16 @@ void ndJointHinge::SetLimitState(bool state)
 
 void ndJointHinge::SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit)
 {
-	ndAssert(minLimit <= 0.0f);
-	ndAssert(maxLimit >= 0.0f);
+	#ifdef _DEBUG
+	if (minLimit > 0.0f)
+	{
+		ndTrace (("warning: %s minLimit %f larger than zero\n", __FUNCTION__, minLimit))
+	}
+	if (m_maxLimit < 0.0f)
+	{
+		ndTrace(("warning: %s m_maxLimit %f smaller than zero\n", __FUNCTION__, minLimit))
+	}
+	#endif
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
 

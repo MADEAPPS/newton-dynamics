@@ -88,16 +88,16 @@ namespace biped2
 #endif
 
 		{ "rhipjoint", ndDefinition::m_spherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_hinge, 1, { 0.0f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
 		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "lfemur", ndDefinition::m_hinge, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		{ "", ndDefinition::m_root, 0,{},{} },
+		{ "", ndDefinition::m_root, 0, {},{} },
 	};
 
 	class ndBipedMaterial : public ndApplicationMaterial
@@ -195,8 +195,7 @@ namespace biped2
 			// find the floor location 
 			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			//matrix.m_posit.m_y = floor.m_y + 1.5f;
-			entMatrix.m_posit.m_y = floor.m_y + 2.0f;
+			entMatrix.m_posit.m_y = floor.m_y + 1.1f;
 			entity->ResetMatrix(entMatrix);
 
 			// add the root body
