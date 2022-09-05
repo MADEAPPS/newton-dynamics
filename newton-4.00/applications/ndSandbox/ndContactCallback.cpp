@@ -117,7 +117,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 
 	const ndShapeInstance& instance0 = body0->GetCollisionShape();
 	const ndShapeInstance& instance1 = body1->GetCollisionShape();
-	const ndFloat32 speedThreshold = ndMax(instance0.GetMaterial().m_userParam[m_soundSpeedThreshull].m_floatData, instance1.GetMaterial().m_userParam[m_soundSpeedThreshull].m_floatData);
+	const ndFloat32 speedThreshold = ndMax(instance0.GetMaterial().m_userParam[m_soundSpeedThreshold ].m_floatData, instance1.GetMaterial().m_userParam[m_soundSpeedThreshold ].m_floatData);
 	if (maxNornalSpeed > speedThreshold)
 	{
 		// play impact sound here;

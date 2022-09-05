@@ -96,8 +96,9 @@ class ndContactCallback: public ndContactNotify
 	{
 		m_density,
 		m_friction,
-		m_soundSpeedThreshull,
 		m_modelPointer,
+		m_materialFlags,
+		m_soundSpeedThreshold,
 	};
 
 	virtual ndApplicationMaterial& RegisterMaterial(const ndApplicationMaterial& material, ndUnsigned32 id0, ndUnsigned32 id1);

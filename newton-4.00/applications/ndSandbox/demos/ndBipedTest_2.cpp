@@ -18,6 +18,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
@@ -53,6 +54,7 @@ namespace biped2
 
 		char m_boneName[32];
 		ndjointType m_type;
+		ndInt32 m_selfCollide;
 		ndJointLimit m_jointLimits;
 		ndFrameMatrix m_frameBasics;
 	};
@@ -73,29 +75,70 @@ namespace biped2
 		//{ "rradius", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 #else
-		{ "lowerback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		{ "upperback", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lowerneck", ndDefinition::m_fix, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "upperneck", ndDefinition::m_fix, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		{ "lclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		{ "lhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		{ "rclavicle", ndDefinition::m_fix, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "rhumerus", ndDefinition::m_fix, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "rradius", ndDefinition::m_fix, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lowerback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ "upperback", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lowerneck", ndDefinition::m_fix, 1, { -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "upperneck", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "lhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rclavicle", ndDefinition::m_fix, 1, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "rhumerus", ndDefinition::m_fix, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "rradius", ndDefinition::m_fix, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 #endif
 
-		{ "rhipjoint", ndDefinition::m_spherical,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
-		{ "rfemur", ndDefinition::m_hinge,{ 0.0f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
-		{ "rfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		{ "rtibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "rhipjoint", ndDefinition::m_spherical, 0,{ -60.0f, 60.0f, 80.0f },{ 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_hinge, 1, { 0.0f, 120.0f, 0.0f },{ 0.0f, 90.0f, 0.0f } },
+		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		{ "lhipjoint", ndDefinition::m_spherical, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "lfemur", ndDefinition::m_hinge, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lfoof_effector", ndDefinition::m_effector,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		{ "ltibia", ndDefinition::m_doubleHinge, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "lfemur", ndDefinition::m_hinge, 1, { 0.0f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		{ "", ndDefinition::m_root,{},{} },
+		{ "", ndDefinition::m_root, 0,{},{} },
+	};
+
+	class ndBipedMaterial : public ndApplicationMaterial
+	{
+		public:
+		ndBipedMaterial()
+			:ndApplicationMaterial()
+		{
+		}
+
+		ndBipedMaterial(const ndBipedMaterial& src)
+			:ndApplicationMaterial(src)
+		{
+		}
+
+		ndApplicationMaterial* Clone() const
+		{
+			return new ndBipedMaterial(*this);
+		}
+
+		bool OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
+		{
+			// filter self collision when the contact is with in the same model
+			const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+			const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+			ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+			if (pointer0 == pointer1)
+			{
+				// here we know the part are from the same model.
+				// we can apply some more filtering by for now we just disable all self model collisions. 
+				ndUnsigned64 selfCollide0 = material0.m_userParam[ndContactCallback::m_materialFlags].m_intData;
+				ndUnsigned64 selfCollide1 = material1.m_userParam[ndContactCallback::m_materialFlags].m_intData;
+				if (!(selfCollide0 || selfCollide1))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 	};
 
 	class ndHumanoidModel : public ndModel
@@ -158,7 +201,7 @@ namespace biped2
 
 			// add the root body
 			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
-			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr, ragdollDefinition[0]);
 
 			ndInt32 stack = 0;
 			ndFixSizeArray<ndFloat32, 64> massWeight;
@@ -192,7 +235,7 @@ namespace biped2
 					{
 						if (definition[i].m_type != ndDefinition::m_effector)
 						{
-							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody);
+							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody, definition[i]);
 
 							// connect this body part to its parentBody with a robot joint
 							ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition[i]);
@@ -328,7 +371,7 @@ namespace biped2
 			}
 		}
 
-		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
+		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone, const ndDefinition& definition)
 		{
 			ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
 			ndAssert(shape);
@@ -341,6 +384,12 @@ namespace biped2
 			body->SetCollisionShape(*shape);
 			body->SetMassMatrix(1.0f, *shape);
 			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
+
+			// save the shape material type
+			ndShapeInstance& instanceShape = body->GetCollisionShape();
+			instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = definition.m_selfCollide;
 
 			m_bodyArray.PushBack(body);
 			scene->GetWorld()->AddBody(body);
@@ -524,6 +573,17 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
+
+	ndBipedMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndMatrix origin(ndGetIdentityMatrix());
 	origin.m_posit.m_x += 20.0f;
