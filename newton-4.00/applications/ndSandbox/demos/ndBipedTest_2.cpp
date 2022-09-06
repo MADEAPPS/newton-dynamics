@@ -141,6 +141,33 @@ namespace biped2
 		}
 	};
 
+	class ndDQNcontroller : public ndDeepBrain
+	{
+		public: 
+		ndDQNcontroller()
+			:ndDeepBrain()
+		{
+			//ndSetRandSeed(142543);
+			ndInt32 numberOfImputs = 4;
+			ndInt32 numberOfOutputs = 3;
+			ndInt32 neuronsPerLayers = 32;
+
+			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(neuronsPerLayers, neuronsPerLayers, m_tanh);
+			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
+			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
+			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
+			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_sigmoid);
+
+			BeginAddLayer();
+			AddLayer(inputLayer);
+			AddLayer(hiddenLayer0);
+			AddLayer(hiddenLayer1);
+			//brain.AddLayer(hiddenLayer2);
+			AddLayer(ouputLayer);
+			EndAddLayer();
+		}
+	};
+
 	class ndHumanoidModel : public ndModel
 	{
 		public:
