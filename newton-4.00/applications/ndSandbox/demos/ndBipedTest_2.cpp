@@ -144,15 +144,12 @@ namespace biped2
 	class ndDQNcontroller : public ndDeepBrain
 	{
 		public: 
-		ndDQNcontroller()
+		ndDQNcontroller(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
 			:ndDeepBrain()
 		{
-			//ndSetRandSeed(142543);
-			ndInt32 numberOfImputs = 4;
-			ndInt32 numberOfOutputs = 3;
 			ndInt32 neuronsPerLayers = 32;
 
-			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(neuronsPerLayers, neuronsPerLayers, m_tanh);
+			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerLayers, m_tanh);
 			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
 			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
 			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
@@ -208,6 +205,7 @@ namespace biped2
 
 		ndHumanoidModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndModel()
+			,m_controller(2, 3)
 			,m_invDynamicsSolver()
 			,m_effectors()
 			,m_bodyArray()
@@ -587,6 +585,7 @@ namespace biped2
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
+		ndDQNcontroller m_controller;
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
@@ -598,6 +597,8 @@ using namespace biped2;
 void ndBipedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
+	ndSetRandSeed(12345);
+
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndBipedMaterial material;
