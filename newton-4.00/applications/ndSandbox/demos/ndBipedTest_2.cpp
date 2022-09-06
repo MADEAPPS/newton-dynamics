@@ -495,13 +495,43 @@ namespace biped2
 			ndMatrix matrix(m_bodyArray[0]->GetMatrix());
 			matrix.m_posit = CalculateCenterOfMass();
 			context.DrawFrame(matrix);
-			context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
 
-			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			if (m_effectors.GetCount() >= 2)
 			{
-				const ndEffectorInfo& info = m_effectors[i];
-				ndJointBilateralConstraint* const joint = info.m_effector;
-				joint->DebugJoint(context);
+				const ndEffectorInfo& info0 = m_effectors[0];
+				const ndEffectorInfo& info1 = m_effectors[1];
+				//	ndJointBilateralConstraint* const joint = info.m_effector;
+				//	joint->DebugJoint(context);
+
+				//ndBodyKinematic* const body0 = info0.m_effector->GetBody0();
+				//ndBodyKinematic* const body1 = info1.m_effector->GetBody0();
+				ndVector p0(info0.m_effector->GetGlobalPosition());
+				ndVector p1(info1.m_effector->GetGlobalPosition());
+				context.DrawLine(p0, p1, ndVector::m_zero);
+
+
+
+				ndVector q0(matrix.m_posit);
+				ndVector q1(matrix.m_posit);
+				q1.m_y -= 1.2f;
+
+				//context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
+				//context.DrawLine(q0, q1, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+
+				ndBigVector p0Out;
+				ndBigVector p1Out;
+
+				dRayToRayDistance(q0, q1, p0, p1, p0Out, p1Out);
+				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 5);
+
+
+				//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+				//{
+				//	const ndEffectorInfo& info = m_effectors[i];
+				//	ndJointBilateralConstraint* const joint = info.m_effector;
+				//	joint->DebugJoint(context);
+				//}
 			}
 		}
 
