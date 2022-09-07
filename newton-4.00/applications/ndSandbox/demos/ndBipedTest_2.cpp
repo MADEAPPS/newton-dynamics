@@ -509,8 +509,6 @@ namespace biped2
 				ndVector p1(info1.m_effector->GetGlobalPosition());
 				context.DrawLine(p0, p1, ndVector::m_zero);
 
-
-
 				ndVector q0(matrix.m_posit);
 				ndVector q1(matrix.m_posit);
 				q1.m_y -= 1.2f;
@@ -621,6 +619,66 @@ namespace biped2
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
 		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
 	};
+
+	class ndHumanoidTraningModel : public ndHumanoidModel
+	{
+		enum ndTraningStage
+		{
+			m_init,
+			m_startEpock,
+		};
+
+		public: 
+		ndHumanoidTraningModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
+			:ndHumanoidModel(scene, model, location, definition)
+			,m_onlineController(m_controller)
+			,m_stage(m_init)
+		{
+		}
+
+		static void TrainingLoop(ndDemoEntityManager* const scene, void* const context)
+		{
+			ndHumanoidTraningModel* const me = (ndHumanoidTraningModel*)context;
+			me->TrainingLoop(scene);
+		}
+
+		void TrainingLoop(ndDemoEntityManager* const scene)
+		{
+			ndWorld* const world = scene->GetWorld();
+
+			switch (m_stage)
+			{
+				case m_init:
+				{
+					world->Sync();
+					InitTraning();
+					break;
+				}
+
+				case m_startEpock:
+				{
+					world->Sync();
+					StartEpock();
+					break;
+				}
+
+				default:;
+			}
+		}
+
+		void InitTraning()
+		{
+			m_stage = m_startEpock;
+		}
+
+		void StartEpock()
+		{
+
+		}
+
+		ndDQNcontroller m_onlineController;
+		ndTraningStage m_stage;
+	};
 };
 
 using namespace biped2;
@@ -650,9 +708,9 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
 
 	ndWorld* const world = scene->GetWorld();
-	ndHumanoidModel* const model = new ndHumanoidModel(scene, modelMesh, origin, ragdollDefinition);
+	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);
 	world->AddModel(model);
-	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+	scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
 
 	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
