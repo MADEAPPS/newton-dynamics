@@ -624,11 +624,49 @@ namespace biped2
 };
 
 using namespace biped2;
-void ndBipedTest_2(ndDemoEntityManager* const scene)
+void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	ndSetRandSeed(12345);
 
+	BuildFloorBox(scene, ndGetIdentityMatrix());
+
+	ndBipedMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+
+	ndMatrix origin(ndGetIdentityMatrix());
+	origin.m_posit.m_x += 20.0f;
+	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+
+	origin.m_posit.m_x -= 20.0f;
+	ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
+
+	ndWorld* const world = scene->GetWorld();
+	ndHumanoidModel* const model = new ndHumanoidModel(scene, modelMesh, origin, ragdollDefinition);
+	world->AddModel(model);
+	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+
+	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+
+	delete modelMesh;
+
+	ndQuaternion rot;
+	origin.m_posit.m_x -= 5.0f;
+	origin.m_posit.m_y = 2.0f;
+	scene->SetCameraMatrix(rot, origin.m_posit);
+}
+
+void ndBipedTest_2(ndDemoEntityManager* const scene)
+{
+	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndBipedMaterial material;

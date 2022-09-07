@@ -57,14 +57,15 @@
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// biped test 1
-#define DEFAULT_SCENE	19		// biped test 2
+//#define DEFAULT_SCENE	19		// biped test 2
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
-//#define DEFAULT_SCENE	23		// simple voronoi fracture
-//#define DEFAULT_SCENE	24		// basic voronoi fracture
-//#define DEFAULT_SCENE	25		// linked voronoi fracture
-//#define DEFAULT_SCENE	26		// skin peel voronoi fracture
+#define DEFAULT_SCENE	23		// train biped test 2
+//#define DEFAULT_SCENE	24		// simple voronoi fracture
+//#define DEFAULT_SCENE	25		// basic voronoi fracture
+//#define DEFAULT_SCENE	26		// linked voronoi fracture
+//#define DEFAULT_SCENE	27		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -83,6 +84,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
+void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
@@ -121,6 +123,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},
+	{ "train biped test two", ndBipedTest_2Trainer },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
