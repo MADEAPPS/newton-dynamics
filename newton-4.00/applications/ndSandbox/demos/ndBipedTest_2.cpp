@@ -533,11 +533,6 @@ namespace biped2
 			}
 		}
 
-		void PredictAction(ndDQNcontroller& controller)
-		{
-
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
@@ -682,11 +677,22 @@ namespace biped2
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndHumanoidModel::Update(world, timestep);
-			TrainingLoop(world);
+			ndModel::Update(world, timestep);
+			TrainingLoop(world, timestep);
+			
+			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
+			ndAssert(skeleton);
+			
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
+			}
 		}
 
-		void TrainingLoop(ndWorld* const world)
+		void TrainingLoop(ndWorld* const world, ndFloat32 timestep)
 		{
 			switch (m_trainingState)
 			{
@@ -698,7 +704,7 @@ namespace biped2
 
 				case m_tickTrainingEpock:
 				{
-					TickEpock(world);
+					TickEpock(world, timestep);
 					break;
 				}
 
@@ -715,15 +721,16 @@ namespace biped2
 				m_basePose[i].SetPose();
 			}
 
+			m_rollAngle = 0;
 			m_traingCounter++;
 			m_epockCounter = 0;
 			m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpock : m_endTraining;
 		}
 
-		void TickEpock(ndWorld* const)
+		void TickEpock(ndWorld* const, ndFloat32 timestep)
 		{
-			PredictAction(m_onlineController);
-
+			//PredictAction(m_onlineController);
+			ExploreActions(timestep);
 
 			m_epockCounter ++;
 			if (m_epockCounter >= 300)
@@ -731,9 +738,40 @@ namespace biped2
 				m_trainingState = m_initTraining;
 			}
 		}
+
+		ndFloat32 GetRandomAction() const
+		{
+			ndFloat32 speed = 2.0f;
+			ndFloat32 accionSpace[] = { -speed , 0.0f, speed };
+			ndInt32 exploreIndex = ndClamp(ndInt32(ndRand() * 3.0f), 0, 2);
+			return accionSpace[exploreIndex];
+		}
+
+		void ExploreActions(ndFloat32 timestep)
+		{
+			ndFloat32 action = GetRandomAction() * timestep;
+			m_rollAngle += action;
+			//ndTrace(("%f\n", m_rollAngle));
+
+			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			{
+				ndEffectorInfo& info = m_effectors[i];
+				const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+				//const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
+				const ndMatrix roll(ndRollMatrix(m_rollAngle));
+			
+				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
+				posit = roll.RotateVector(posit);
+				posit = yaw.RotateVector(posit);
+			
+				info.m_effector->SetPosition(posit);
+				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
+			}
+		}
 		
 		ndDQNcontroller m_onlineController;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
+		ndFloat32 m_rollAngle;
 		ndInt32 m_traingCounter;
 		ndInt32 m_epockCounter;
 		ndTraningStage m_trainingState;
