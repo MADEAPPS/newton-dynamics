@@ -76,32 +76,27 @@ void ndSpinLock::Delay(ndInt32& exp)
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
-	#if	(defined(WIN32) || defined(_WIN32))
-		ndClearFP();
-		m_mask = ndControlFP(0, 0);
-		ndControlFP(m_mask & ~mask, _MCW_EM);
-	#endif
+	ndClearFP();
+	m_x86Mask = ndControlFP(0, 0);
+	ndControlFP(m_x86Mask & ~mask, _MCW_EM);
 
 	#if defined (__APPLE__)
-		#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
-		//#if (defined (_M_ARM) || defined (_M_ARM64))
-		//	#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
-		//#else
-		//	// an intel mac
-		//	//fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
-		//#endif
+		// Sets DAZ and FTZ, clobbering other CSR settings.
+		// See https://opensource.apple.com/source/Libm/Libm-287.1/Source/Intel/, fenv.c and fenv.h.
+		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+		// fesetenv(FE_DFL_ENV) // Disable both, clobbering other CSR settings.
 	#elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		m_sseMask = _mm_getcsr();
+		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-		ndInt32 crs = _mm_getcsr();
-		ndInt32 sseDenormalMask = _MM_FLUSH_ZERO_MASK | _MM_MASK_DENORM;
-		_mm_setcsr(crs | sseDenormalMask);
 	#elif (defined (_M_ARM) || defined (_M_ARM64))
+		#pragma message ("warning!!! arm cpu uncondiotially flushes SIMD to zero, but has to set ")
+		#pragma message ("warning!!! For the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register – FPSCR in Arm32 and FPCR in AArch64. ")
 		//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-		#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
 	#endif
 
 	//ndFloat32 a = ndFloat32(1.0f);
-	//ndFloat32 b = ndFloat32(0.5f);
+	//ndFloat32 b = ndFloat32(0.1f);
 	//ndInt32 count = 0;
 	//while (a != 0.0f)
 	//{
@@ -113,9 +108,10 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 
 ndFloatExceptions::~ndFloatExceptions()
 {
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		_mm_setcsr(m_sseMask);
 		ndClearFP();
-		ndControlFP(m_mask, _MCW_EM);
+		ndControlFP(m_x86Mask, _MCW_EM);
 	#endif
 }
 

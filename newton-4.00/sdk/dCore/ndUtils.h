@@ -189,21 +189,17 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 class ndFloatExceptions
 {
 	public:
-	//#ifdef _MSC_VER
-	//	#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-	//#else 
-	//	#define D_FLOAT_EXECTIONS_MASK	0
-	//#endif 9/
-
 	//#define D_FLOAT_EXECTIONS_MASK	0
-	#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+	//#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+	#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL)
 
 	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
 	D_CORE_API ~ndFloatExceptions();
 
 	private:
-	#if (defined(WIN32) || defined(_WIN32))
-		ndUnsigned32 m_mask;
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	ndUnsigned32 m_x86Mask;
+	ndUnsigned32 m_sseMask;
 	#endif
 };
 
