@@ -533,6 +533,11 @@ namespace biped2
 			}
 		}
 
+		void PredictAction(ndDQNcontroller& controller)
+		{
+
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
@@ -624,11 +629,9 @@ namespace biped2
 	{
 		enum ndTraningStage
 		{
-			m_init,
-			m_tickEpock,
-			//m_startTranningPhase,
-			//m_tickTranning,
-			m_endTranning,
+			m_initTraining,
+			m_tickTrainingEpock,
+			m_endTraining,
 		};
 
 		class ndBasePose
@@ -669,7 +672,7 @@ namespace biped2
 			,m_basePose()
 			,m_traingCounter(0)
 			,m_epockCounter(0)
-			,m_stage(m_init)
+			,m_trainingState(m_initTraining)
 		{
 			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); i++)
 			{
@@ -685,21 +688,21 @@ namespace biped2
 
 		void TrainingLoop(ndWorld* const world)
 		{
-			switch (m_stage)
+			switch (m_trainingState)
 			{
-				case m_init:
+				case m_initTraining:
 				{
 					InitTraning(world);
 					break;
 				}
 
-				case m_tickEpock:
+				case m_tickTrainingEpock:
 				{
 					TickEpock(world);
 					break;
 				}
 
-				case m_endTranning:
+				case m_endTraining:
 				default:;
 					ndAssert(0);
 			}
@@ -714,15 +717,18 @@ namespace biped2
 
 			m_traingCounter++;
 			m_epockCounter = 0;
-			m_stage = (m_traingCounter < 200) ? m_tickEpock : m_endTranning;
+			m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpock : m_endTraining;
 		}
 
 		void TickEpock(ndWorld* const)
 		{
+			PredictAction(m_onlineController);
+
+
 			m_epockCounter ++;
 			if (m_epockCounter >= 300)
 			{
-				m_stage = m_init;
+				m_trainingState = m_initTraining;
 			}
 		}
 		
@@ -730,7 +736,7 @@ namespace biped2
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndInt32 m_traingCounter;
 		ndInt32 m_epockCounter;
-		ndTraningStage m_stage;
+		ndTraningStage m_trainingState;
 	};
 };
 
