@@ -625,58 +625,111 @@ namespace biped2
 		enum ndTraningStage
 		{
 			m_init,
-			m_startEpock,
+			m_tickEpock,
+			//m_startTranningPhase,
+			//m_tickTranning,
+			m_endTranning,
+		};
+
+		class ndBasePose
+		{
+			public:
+			ndBasePose()
+			{
+			}
+
+			ndBasePose(ndBodyDynamic* const body)
+				:m_body(body)
+				,m_veloc(body->GetVelocity())
+				,m_omega(body->GetOmega())
+				,m_posit(body->GetPosition())
+				,m_rotation(body->GetRotation())
+			{
+			}
+
+			void SetPose()
+			{
+				ndMatrix matrix(m_rotation, m_posit);
+				m_body->SetMatrix(matrix);
+				m_body->SetOmega(m_omega);
+				m_body->SetVelocity(m_veloc);
+			}
+
+			ndVector m_veloc;
+			ndVector m_omega;
+			ndVector m_posit;
+			ndQuaternion m_rotation;
+			ndBodyDynamic* m_body;
 		};
 
 		public: 
 		ndHumanoidTraningModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndHumanoidModel(scene, model, location, definition)
 			,m_onlineController(m_controller)
+			,m_basePose()
+			,m_traingCounter(0)
+			,m_epockCounter(0)
 			,m_stage(m_init)
 		{
+			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); i++)
+			{
+				m_basePose.PushBack(ndBasePose(m_bodyArray[i]));
+			}
 		}
 
-		static void TrainingLoop(ndDemoEntityManager* const scene, void* const context)
+		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
-			ndHumanoidTraningModel* const me = (ndHumanoidTraningModel*)context;
-			me->TrainingLoop(scene);
+			ndHumanoidModel::Update(world, timestep);
+			TrainingLoop(world);
 		}
 
-		void TrainingLoop(ndDemoEntityManager* const scene)
+		void TrainingLoop(ndWorld* const world)
 		{
-			ndWorld* const world = scene->GetWorld();
-
 			switch (m_stage)
 			{
 				case m_init:
 				{
-					world->Sync();
-					InitTraning();
+					InitTraning(world);
 					break;
 				}
 
-				case m_startEpock:
+				case m_tickEpock:
 				{
-					world->Sync();
-					StartEpock();
+					TickEpock(world);
 					break;
 				}
 
+				case m_endTranning:
 				default:;
+					ndAssert(0);
 			}
 		}
 
-		void InitTraning()
+		void InitTraning(ndWorld* const)
 		{
-			m_stage = m_startEpock;
+			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+			{
+				m_basePose[i].SetPose();
+			}
+
+			m_traingCounter++;
+			m_epockCounter = 0;
+			m_stage = (m_traingCounter < 200) ? m_tickEpock : m_endTranning;
 		}
 
-		void StartEpock()
+		void TickEpock(ndWorld* const)
 		{
-
+			m_epockCounter ++;
+			if (m_epockCounter >= 300)
+			{
+				m_stage = m_init;
+			}
 		}
-
+		
 		ndDQNcontroller m_onlineController;
+		ndFixSizeArray<ndBasePose, 32> m_basePose;
+		ndInt32 m_traingCounter;
+		ndInt32 m_epockCounter;
 		ndTraningStage m_stage;
 	};
 };
@@ -710,7 +763,8 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);
 	world->AddModel(model);
-	scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
+	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
+	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
 	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
