@@ -221,7 +221,7 @@ namespace biped2
 			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			entMatrix.m_posit.m_y = floor.m_y + 1.1f;
-			entMatrix.m_posit.m_y += 0.5f;
+			//entMatrix.m_posit.m_y += 0.5f;
 			entity->ResetMatrix(entMatrix);
 
 			// add the root body
@@ -781,7 +781,9 @@ namespace biped2
 		void ExploreActions(ndFloat32 timestep)
 		{
 			ndFloat32 action = GetRandomAction() * timestep;
+			action = 0;
 			m_rollAngle += action;
+			m_rollAngle = -2.0f * timestep * 2.0f;
 			//ndTrace(("%f\n", m_rollAngle));
 
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
@@ -841,7 +843,7 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
 	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
-	world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
 	delete modelMesh;
 
