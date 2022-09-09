@@ -221,6 +221,7 @@ namespace biped2
 			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			entMatrix.m_posit.m_y = floor.m_y + 1.1f;
+			entMatrix.m_posit.m_y += 0.5f;
 			entity->ResetMatrix(entMatrix);
 
 			// add the root body
@@ -490,46 +491,76 @@ namespace biped2
 			return com;
 		}
 
+		ndVector CalculateZeroMomentPoint(const ndVector com) const
+		{
+			ndVector zmp(m_bodyArray[0]->GetPosition());
+			if (m_effectors.GetCount() >= 2)
+			{
+				const ndEffectorInfo& info0 = m_effectors[0];
+				const ndEffectorInfo& info1 = m_effectors[1];
+				ndVector p0(info0.m_effector->GetGlobalPosition());
+				ndVector p1(info1.m_effector->GetGlobalPosition());
+
+				ndVector q0(com);
+				ndVector q1(com);
+				q1.m_y -= 1.2f;
+
+				ndBigVector qOq1ut;
+				ndBigVector p0p1Out;
+				dRayToRayDistance(q0, q1, p0, p1, qOq1ut, p0p1Out);
+				zmp = p0p1Out;
+			}
+			return zmp;
+		}
+
 		void Debug(ndConstraintDebugCallback& context) const
 		{
 			ndMatrix matrix(m_bodyArray[0]->GetMatrix());
 			matrix.m_posit = CalculateCenterOfMass();
+			ndVector zmp(CalculateZeroMomentPoint(matrix.m_posit));
+			
+			ndVector segment(zmp - matrix.m_posit);
+			ndFloat32 length = ndSqrt(segment.DotProduct(segment & ndVector::m_triplexMask).GetScalar());
+			ndVector targetPoint(zmp);
+			targetPoint.m_y += length;
+
 			context.DrawFrame(matrix);
+			context.DrawLine(zmp, matrix.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+			context.DrawLine(zmp, targetPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
+
+			context.DrawPoint(zmp, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
+			context.DrawPoint(targetPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
+			context.DrawPoint(matrix.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
 
 			if (m_effectors.GetCount() >= 2)
 			{
 				const ndEffectorInfo& info0 = m_effectors[0];
 				const ndEffectorInfo& info1 = m_effectors[1];
-				//	ndJointBilateralConstraint* const joint = info.m_effector;
-				//	joint->DebugJoint(context);
-
-				//ndBodyKinematic* const body0 = info0.m_effector->GetBody0();
-				//ndBodyKinematic* const body1 = info1.m_effector->GetBody0();
 				ndVector p0(info0.m_effector->GetGlobalPosition());
 				ndVector p1(info1.m_effector->GetGlobalPosition());
-				context.DrawLine(p0, p1, ndVector::m_zero);
-
-				ndVector q0(matrix.m_posit);
-				ndVector q1(matrix.m_posit);
-				q1.m_y -= 1.2f;
-
-				//context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
-				//context.DrawLine(q0, q1, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-
-				ndBigVector p0Out;
-				ndBigVector p1Out;
-
-				dRayToRayDistance(q0, q1, p0, p1, p0Out, p1Out);
-				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 5);
-
-
-				//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-				//{
-				//	const ndEffectorInfo& info = m_effectors[i];
-				//	ndJointBilateralConstraint* const joint = info.m_effector;
-				//	joint->DebugJoint(context);
-				//}
+				context.DrawLine(p0, p1, ndVector(0.5f, 0.5f, 0.5f, 1.0f));
+			
+			//	ndVector q0(matrix.m_posit);
+			//	ndVector q1(matrix.m_posit);
+			//	q1.m_y -= 1.2f;
+			//
+			//	//context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
+			//	//context.DrawLine(q0, q1, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+			//
+			//	ndBigVector p0Out;
+			//	ndBigVector p1Out;
+			//
+			//	dRayToRayDistance(q0, q1, p0, p1, p0Out, p1Out);
+			//	context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+			//	context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 5);
+			//
+			//
+			//	//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			//	//{
+			//	//	const ndEffectorInfo& info = m_effectors[i];
+			//	//	ndJointBilateralConstraint* const joint = info.m_effector;
+			//	//	joint->DebugJoint(context);
+			//	//}
 			}
 		}
 
@@ -810,7 +841,7 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
 	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
-	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
 	delete modelMesh;
 
