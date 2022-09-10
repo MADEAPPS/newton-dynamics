@@ -141,18 +141,26 @@ namespace biped2
 		}
 	};
 
+	class ndModelPhysicState
+	{
+		public:
+		ndMatrix m_zmpFrame;
+		ndVector m_comTarget;
+		ndVector m_centerOfMass;
+		ndVector m_centerOfMassVeloc;
+	};
+
 	class ndDQNcontroller : public ndDeepBrain
 	{
 		public: 
 		ndDQNcontroller(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
 			:ndDeepBrain()
 		{
-			ndInt32 neuronsPerLayers = 32;
-
-			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerLayers, m_tanh);
-			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
-			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
-			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
+			const ndInt32 neuronsPerHiddenLayers = 32;
+			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_tanh);
+			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
+			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
+			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
 			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_sigmoid);
 
 			BeginAddLayer();
@@ -205,6 +213,7 @@ namespace biped2
 
 		ndHumanoidModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndModel()
+			,m_locaFrame(ndGetIdentityMatrix())
 			,m_controller(2, 3)
 			,m_invDynamicsSolver()
 			,m_effectors()
@@ -227,6 +236,10 @@ namespace biped2
 			// add the root body
 			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
 			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr, ragdollDefinition[0]);
+
+			ndDemoEntity* const localFrame = rootEntity->Find("modelLocalFrame");
+			ndAssert(localFrame);
+			m_locaFrame = localFrame->GetRenderMatrix();
 
 			ndInt32 stack = 0;
 			ndFixSizeArray<ndFloat32, 64> massWeight;
@@ -474,25 +487,28 @@ namespace biped2
 			return nullptr;
 		}
 
-		ndVector CalculateCenterOfMass() const
+		ndModelPhysicState CalculateModelState() const
 		{
+			ndModelPhysicState modelState;
+
 			ndFloat32 toltalMass = 0.0f;
 			ndVector com(ndVector::m_zero);
+			ndVector comVeloc(ndVector::m_zero);
 			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 			{
 				ndBodyDynamic* const body = m_bodyArray[i];
 				ndFloat32 mass = body->GetMassMatrix().m_w;
 				ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
 				com += comMass.Scale(mass);
+				comVeloc += body->GetVelocity().Scale(mass);
 				toltalMass += mass;
 			}
-			com = com.Scale(1.0f / toltalMass);
-			com.m_w = 1.0f;
-			return com;
-		}
 
-		ndVector CalculateZeroMomentPoint(const ndVector com) const
-		{
+			ndFloat32 invScaleMass = 1.0f / toltalMass;
+			com = com.Scale(invScaleMass);
+			comVeloc = comVeloc.Scale(invScaleMass);
+			com.m_w = 1.0f;
+
 			ndVector zmp(m_bodyArray[0]->GetPosition());
 			if (m_effectors.GetCount() >= 2)
 			{
@@ -510,58 +526,37 @@ namespace biped2
 				dRayToRayDistance(q0, q1, p0, p1, qOq1ut, p0p1Out);
 				zmp = p0p1Out;
 			}
-			return zmp;
+
+			zmp.m_w = 1.0f;
+			modelState.m_zmpFrame = m_locaFrame * m_bodyArray[0]->GetMatrix();
+			modelState.m_centerOfMass = com;
+			modelState.m_zmpFrame.m_posit = zmp;
+			modelState.m_centerOfMassVeloc = comVeloc;
+
+			ndVector segment(zmp - com);
+			ndFloat32 length = ndSqrt(segment.DotProduct(segment & ndVector::m_triplexMask).GetScalar());
+			ndVector targetPoint(zmp);
+			targetPoint.m_y += length;
+			modelState.m_comTarget = targetPoint;
+
+			return modelState;
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndMatrix matrix(m_bodyArray[0]->GetMatrix());
-			matrix.m_posit = CalculateCenterOfMass();
-			ndVector zmp(CalculateZeroMomentPoint(matrix.m_posit));
-			
-			ndVector segment(zmp - matrix.m_posit);
-			ndFloat32 length = ndSqrt(segment.DotProduct(segment & ndVector::m_triplexMask).GetScalar());
-			ndVector targetPoint(zmp);
-			targetPoint.m_y += length;
+			ndModelPhysicState modeState(CalculateModelState());
 
-			context.DrawFrame(matrix);
-			context.DrawLine(zmp, matrix.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-			context.DrawLine(zmp, targetPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
+			const ndVector& com = modeState.m_centerOfMass;
+			const ndMatrix& zmpFrame = modeState.m_zmpFrame;
+			const ndVector& comTarget = modeState.m_comTarget;
 
-			context.DrawPoint(zmp, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
-			context.DrawPoint(targetPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
-			context.DrawPoint(matrix.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
+			context.DrawFrame(zmpFrame);
+			context.DrawLine(zmpFrame.m_posit, com, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+			context.DrawLine(zmpFrame.m_posit, comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
 
-			if (m_effectors.GetCount() >= 2)
-			{
-				const ndEffectorInfo& info0 = m_effectors[0];
-				const ndEffectorInfo& info1 = m_effectors[1];
-				ndVector p0(info0.m_effector->GetGlobalPosition());
-				ndVector p1(info1.m_effector->GetGlobalPosition());
-				context.DrawLine(p0, p1, ndVector(0.5f, 0.5f, 0.5f, 1.0f));
-			
-			//	ndVector q0(matrix.m_posit);
-			//	ndVector q1(matrix.m_posit);
-			//	q1.m_y -= 1.2f;
-			//
-			//	//context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
-			//	//context.DrawLine(q0, q1, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-			//
-			//	ndBigVector p0Out;
-			//	ndBigVector p1Out;
-			//
-			//	dRayToRayDistance(q0, q1, p0, p1, p0Out, p1Out);
-			//	context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
-			//	context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 5);
-			//
-			//
-			//	//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-			//	//{
-			//	//	const ndEffectorInfo& info = m_effectors[i];
-			//	//	ndJointBilateralConstraint* const joint = info.m_effector;
-			//	//	joint->DebugJoint(context);
-			//	//}
-			}
+			context.DrawPoint(com, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
+			context.DrawPoint(zmpFrame.m_posit, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
+			context.DrawPoint(comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -644,6 +639,7 @@ namespace biped2
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
+		ndMatrix m_locaFrame;
 		ndDQNcontroller m_controller;
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
