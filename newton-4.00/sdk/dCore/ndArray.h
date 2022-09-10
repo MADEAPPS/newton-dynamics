@@ -84,8 +84,8 @@ class ndArray: public ndClassAlloc
 	/// size is incremented by one, and the array is resized if it reaches max capacity
 	void PushBack(const T& element);
 
-	/// Randomize the vectore entries.
-	void RandomShuffle();
+	/// Randomize the vector entries.
+	void RandomShuffle(ndInt32 count);
 
 	/// set all member to 0.
 	/// useful for want making vectors of vectors (ex matrices)
@@ -271,9 +271,9 @@ void ndArray<T>::ResetMembers()
 }
 
 template<class T>
-void ndArray<T>::RandomShuffle()
+void ndArray<T>::RandomShuffle(ndInt32 count)
 {
-	const ndInt32 size = GetCount();
+	const ndInt32 size = ndMin (count, GetCount());
 	for (ndInt32 i = size - 1; i != 0; --i)
 	{
 		ndUnsigned32 j = ndUnsigned32(ndRandInt()) % size;

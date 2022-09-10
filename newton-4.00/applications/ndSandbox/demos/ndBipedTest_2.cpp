@@ -148,6 +148,8 @@ namespace biped2
 		ndVector m_comTarget;
 		ndVector m_centerOfMass;
 		ndVector m_centerOfMassVeloc;
+		ndFloat32 m_comSagitalAngle;
+		ndFloat32 m_comSagitalOmega;
 	};
 
 	class ndDQNcontroller : public ndDeepBrain
@@ -539,6 +541,11 @@ namespace biped2
 			targetPoint.m_y += length;
 			modelState.m_comTarget = targetPoint;
 
+			// calculate sagittal angle and velocity
+			//ndFloat32 m_comSagittalAngle;
+			//ndFloat32 m_comSagittalOmega;
+
+
 			return modelState;
 		}
 
@@ -687,6 +694,68 @@ namespace biped2
 			ndBodyDynamic* m_body;
 		};
 
+		class ndTransition
+		{
+			public:
+			class ndState
+			{
+				ndFloat32 m_comVeloc;
+			};
+
+			class ndAction
+			{
+				public:
+				ndInt32 m_effectorMove;
+			};
+
+			class ndReward
+			{
+				public:
+				ndFloat32 m_reward;
+			};
+
+			ndState m_state;
+			ndAction m_action;
+			ndState m_nextState;
+			ndReward m_reward;
+		};
+
+		#define BASH_SIZE 256
+		class ndTraningBashBuffer : public ndFixSizeArray<ndTransition, BASH_SIZE>
+		{
+			public:
+		};
+
+		class ndReplayBuffer: public ndArray<ndTransition>
+		{
+			public:
+			ndReplayBuffer ()
+				:ndArray<ndTransition>(1024 * 32)
+				,m_randomShaffle(1024 * 32)
+				,m_currentIndex(0)
+			{
+				SetCount(GetCapacity());
+				m_randomShaffle.SetCount(GetCapacity());
+				for (ndInt32 i = 0; i < m_randomShaffle.GetCount(); ++i)
+				{
+					m_randomShaffle[i] = i;
+				}
+			}
+
+			void GetRandomBash(ndTraningBashBuffer& buffer)
+			{
+				m_randomShaffle.RandomShuffle(BASH_SIZE);
+				for (ndInt32 i = 0; i < BASH_SIZE; i++)
+				{
+					ndInt32 index = m_randomShaffle[i];
+					buffer[i] = (*this)[index];
+				}
+			}
+			
+			ndArray<ndUnsigned32> m_randomShaffle;
+			ndInt32 m_currentIndex;
+		};
+
 		public: 
 		ndHumanoidTraningModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndHumanoidModel(scene, model, location, definition)
@@ -709,8 +778,7 @@ namespace biped2
 			
 			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
 			ndAssert(skeleton);
-			
-			//m_invDynamicsSolver.SetMaxIterations(4);
+
 			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
 			{
 				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
@@ -754,18 +822,6 @@ namespace biped2
 			m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpock : m_endTraining;
 		}
 
-		void TickEpock(ndWorld* const, ndFloat32 timestep)
-		{
-			//PredictAction(m_onlineController);
-			ExploreActions(timestep);
-
-			m_epockCounter ++;
-			if (m_epockCounter >= 300)
-			{
-				m_trainingState = m_initTraining;
-			}
-		}
-
 		ndFloat32 GetRandomAction() const
 		{
 			ndFloat32 speed = 2.0f;
@@ -788,17 +844,35 @@ namespace biped2
 				const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
 				//const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
 				const ndMatrix roll(ndRollMatrix(m_rollAngle));
-			
+
 				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
 				posit = roll.RotateVector(posit);
 				posit = yaw.RotateVector(posit);
-			
+
 				info.m_effector->SetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
 			}
 		}
+
+		void TickEpock(ndWorld* const, ndFloat32 timestep)
+		{
+			//PredictAction(m_onlineController);
+			//ExploreActions(timestep);
+
+			//ndTraningBashBuffer xxx;
+			//GetRandomBash(xxx);
+			//GetRandomBash(xxx);
+
+			m_epockCounter ++;
+			if (m_epockCounter >= 300)
+			{
+				m_trainingState = m_initTraining;
+			}
+		}
+
 		
 		ndDQNcontroller m_onlineController;
+		ndReplayBuffer m_replayBuffer;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndFloat32 m_rollAngle;
 		ndInt32 m_traingCounter;

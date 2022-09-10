@@ -175,7 +175,7 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 		index = (index + 1) % batchCount;
 		if (index == 0)
 		{
-			randomizeVector.RandomShuffle();
+			randomizeVector.RandomShuffle(randomizeVector.GetCount());
 			movingAverageError = ndSqrt(movingAverageError / movingAverageIndex);
 			if (movingAverageError < bestCost)
 			{
