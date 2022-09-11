@@ -1,0 +1,7 @@
+set(CMAKE_SYSTEM_NAME Android)
+set(CMAKE_SYSTEM_VERSION 25)
+set(CMAKE_ANDROID_ARCH_ABI x86_64)
+#set(CMAKE_ANDROID_NDK /path/to/android-ndk)
+#set(CMAKE_ANDROID_NDK C:/Users/julio/AppData/Local/Android/Sdk/ndk/)
+set(CMAKE_ANDROID_NDK C:/Users/julio/AppData/Local/Android/Sdk/ndk/25.1.8937393)
+set(CMAKE_ANDROID_STL_TYPE gnustl_static)
