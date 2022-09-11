@@ -35,6 +35,9 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	ndDeepBrainLayer(ndInt32 inputs, ndInt32 outputs, ndDeepBrainActivationType type);
 	virtual ~ndDeepBrainLayer();
 
+	ndReal* SetFloatPointers(ndReal* const mem);
+	ndUnsigned8* SetPointers(ndUnsigned8* const mem);
+
 	virtual ndDeepBrainLayer* Clone() const;
 	
 	ndDeepBrainVector& GetBias();
@@ -48,6 +51,8 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 	virtual void CopyFrom(const ndDeepBrainLayer& src);
 	virtual bool Compare(const ndDeepBrainLayer& src) const;
+
+	virtual void Load(const nd::TiXmlElement* const layerNode);
 	virtual void Save(nd::TiXmlElement* const layerNode) const;
 
 	void ApplyActivation(ndDeepBrainVector& output) const;
@@ -63,19 +68,19 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	void HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 	void ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 
-	ndDeepBrainVector m_bias;
+	ndDeepBrainMemVector m_bias;
 	ndDeepBrainActivationType m_activation;
+	ndInt32 m_columns;
 };
 
 inline ndInt32 ndDeepBrainLayer::GetOuputSize() const
 {
-	ndAssert(GetRows() == m_bias.GetCount());
 	return m_bias.GetCount();
 }
 
 inline ndInt32 ndDeepBrainLayer::GetInputSize() const
 {
-	return GetColumns();
+	return m_columns;
 }
 
 inline ndDeepBrainVector& ndDeepBrainLayer::GetBias()

@@ -197,13 +197,13 @@ void ndDeepBrainTrainerSDG::UpdateWeights(ndReal learnRate)
 		const ndInt32 inputSize = layer->GetInputSize();
 		const ndInt32 outputSize = layer->GetOuputSize();
 		const ndDeepBrainPrefixScan& preFixScan = m_instance.GetPrefixScan();
-
+	
 		const ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[i + 1]], outputSize);
 		layer->GetBias().ScaleAdd(biasGradients, -learnRate);
-
+	
 		const ndInt32 weightGradientStride = (inputSize + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
-
+	
 		ndDeepBrainMatrix& weightMatrix = *layer;
 		ndReal regularizer = GetRegularizer();
 		for (ndInt32 j = 0; j < outputSize; ++j)
@@ -253,10 +253,10 @@ void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const 
 	ndFloatExceptions exception;
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
-
+	
 	ndDeepBrain bestNetwork(*m_instance.GetBrain());
 	ndReal bestCost = 1.0e10f;
-
+	
 	ndInt32 index = 0;
 	ndInt32 batchCount = (inputBatch.GetCount() + m_miniBatchSize - 1) / m_miniBatchSize;
 	ndArray<ndInt32> randomizeVector;
@@ -265,14 +265,14 @@ void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const 
 	{
 		randomizeVector[i] = i;
 	}
-
+	
 	ndInt32 movingAverageIndex = 0;
 	ndFloat32 movingAverageError = 0.0f;
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : inputBatch.GetCount() - batchStart;
-
+	
 		ndReal averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchSize; ++j)
 		{
@@ -282,13 +282,13 @@ void ndDeepBrainTrainerSDG::Optimize(const ndDeepBrainMatrix& inputBatch, const 
 			averageError += TrainingStep(learnRate, input, truth);
 		}
 		ApplyWeightTranspose();
-
+	
 		movingAverageIndex += batchSize;
 		movingAverageError += averageError;
-
+	
 		averageError = ndSqrt(averageError / batchSize);
 		ndExpandTraceMessage("%f %d\n", averageError, i);
-
+	
 		index = (index + 1) % batchCount;
 		if (index == 0)
 		{

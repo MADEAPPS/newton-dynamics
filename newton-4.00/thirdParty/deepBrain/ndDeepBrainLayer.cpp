@@ -23,24 +23,36 @@
 #include "ndDeepBrainLayer.h"
 
 ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDeepBrainActivationType activation)
-	:ndDeepBrainMatrix(outputCount, inputCount)
+	:ndDeepBrainMatrix()
 	,m_bias()
 	,m_activation(activation)
+	,m_columns(inputCount)
 {
-	m_bias.SetCount(outputCount);
-	m_bias.Set(0.0f);
+	m_size = outputCount;
+	m_capacity = outputCount + 1;
+	m_bias.SetSize(outputCount);
 }
 
 ndDeepBrainLayer::ndDeepBrainLayer(const ndDeepBrainLayer& src)
-	:ndDeepBrainMatrix(src)
-	,m_bias(src.m_bias)
+	:ndDeepBrainMatrix()
+	,m_bias()
 	,m_activation(src.m_activation)
+	,m_columns(src.m_columns)
 {
+	m_size = src.GetOuputSize();
+	m_capacity = src.GetOuputSize() + 1;
+	m_bias.SetSize(src.GetOuputSize());
 }
 
 ndDeepBrainLayer::ndDeepBrainLayer(const nd::TiXmlNode* layerNode)
-	:ndDeepBrainMatrix(layerNode)
+	:ndDeepBrainMatrix()
 {
+	ndInt32 rows = xmlGetInt(layerNode, "outputs");
+	m_bias.SetSize(rows);
+	m_size = rows;
+	m_capacity = rows + 1;
+	m_columns = xmlGetInt(layerNode, "inputs");
+
 	const char* const activationType = xmlGetString(layerNode, "activation");
 	if (!strcmp(activationType, "tanh"))
 	{
@@ -58,14 +70,24 @@ ndDeepBrainLayer::ndDeepBrainLayer(const nd::TiXmlNode* layerNode)
 	{
 		ndAssert(0);
 	}
-
-	ndInt32 rows = xmlGetInt(layerNode, "outputs");
-	m_bias.SetCount(rows);
-	xmlGetFloatArray(layerNode, "biasWeights", m_bias);
 }
 
 ndDeepBrainLayer::~ndDeepBrainLayer()
 {
+}
+
+ndUnsigned8* ndDeepBrainLayer::SetPointers(ndUnsigned8* const memPtr)
+{
+	return ndDeepBrainMatrix::SetPointer(memPtr);
+}
+
+ndReal* ndDeepBrainLayer::SetFloatPointers(ndReal* const memPtr)
+{
+	ndInt32 columns = memPtr ? m_columns : 0;
+	ndReal* memory = ndDeepBrainMatrix::SetFloatPointers(memPtr, columns);
+	m_bias.SetPointer(memory);
+	ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	return &memory[count];
 }
 
 ndDeepBrainLayer* ndDeepBrainLayer::Clone() const
@@ -86,13 +108,13 @@ bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
 		ndAssert(0);
 		return false;
 	}
-
+	
 	if (m_bias.GetCount() != src.m_bias.GetCount())
 	{
 		ndAssert(0);
 		return false;
 	}
-
+	
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
 	{
 		ndReal error = m_bias[i] - src.m_bias[i];
@@ -102,7 +124,7 @@ bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
 			return false;
 		}
 	}
-
+	
 	const ndDeepBrainMatrix& me = (*this);
 	for (ndInt32 i = 0; i < me.GetCount(); i++)
 	{
@@ -115,7 +137,7 @@ bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
 		}
 		for (ndInt32 j = 0; j < row0.GetCount(); j++)
 		{
-			ndReal error = row0[i] - row1[i];
+			ndReal error = row0[j] - row1[j];
 			if (ndAbs(error) > 1.0e-6f)
 			{
 				ndAssert(0);
@@ -127,36 +149,58 @@ bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
 	return true;
 }
 
+void ndDeepBrainLayer::Load(const nd::TiXmlElement* const layerNode)
+{
+	const nd::TiXmlNode* const weights = layerNode->FirstChild("inputWeights");
+	ndArray<ndReal> tmpRead;
+	if (weights)
+	{
+		ndDeepBrainMatrix& me = *this;
+		for (ndInt32 i = 0; i < GetOuputSize(); ++i)
+		{
+			char weightRow[256];
+			sprintf(weightRow, "weights%d", i);
+	
+			ndDeepBrainVector& row = me[i];
+			xmlGetFloatArray(weights, weightRow, tmpRead);
+			ndAssert(tmpRead.GetCount() == row.GetCount());
+			memcpy(&row[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
+		}
+	}
+
+	xmlGetFloatArray(layerNode, "biasWeights", tmpRead);
+	ndAssert(tmpRead.GetCount() == m_bias.GetCount());
+	memcpy(&m_bias[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
+}
+
 void ndDeepBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 {
 	xmlSaveParam(layerNode, "type", "fullyConnected");
 	xmlSaveParam(layerNode, "inputs", GetColumns());
 	xmlSaveParam(layerNode, "outputs", GetRows());
-
+	
 	switch (m_activation)
 	{
 		case m_relu:
 			xmlSaveParam(layerNode, "activation", "relu");
 			break;
-
+	
 		case m_tanh:
 			xmlSaveParam(layerNode, "activation", "tanh");
 			break;
-
+	
 		case m_softmax:
 			xmlSaveParam(layerNode, "activation", "softmax");
 			break;
-
+	
 		case m_sigmoid:
 		default:
 			xmlSaveParam(layerNode, "activation", "sigmoid");
 			break;
 	}
 	
-	//nd::TiXmlElement* const bias = new nd::TiXmlElement("biasWeights");
-	//layerNode->LinkEndChild(bias);
 	xmlSaveParam(layerNode, "biasWeights", m_bias.GetCount(), &m_bias[0]);
-
+	
 	nd::TiXmlElement* const input = new nd::TiXmlElement("inputWeights");
 	layerNode->LinkEndChild(input);
 	for (ndInt32 i = 0; i < GetCount(); i++)
@@ -346,7 +390,7 @@ void ndDeepBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndDeepBrai
 		{
 			ndDeepBrainMemVector out(&output[startEnd.m_start], count);
 			const ndDeepBrainMemVector bias(&m_bias[startEnd.m_start], count);
-
+	
 			const ndDeepBrainMatrix& matrix = (*this);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{

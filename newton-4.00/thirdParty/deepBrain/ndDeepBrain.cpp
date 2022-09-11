@@ -24,24 +24,42 @@
 
 ndDeepBrain::ndDeepBrain()
 	:ndArray<ndDeepBrainLayer*>()
+	,m_memory(nullptr)
+	,m_memorySize(0)
 	,m_isReady(false)
 {
 }
 
 ndDeepBrain::ndDeepBrain(const ndDeepBrain& src)
 	:ndArray<ndDeepBrainLayer*>()
+	,m_memory(nullptr)
+	,m_memorySize(0)
 	,m_isReady(src.m_isReady)
 {
 	const ndArray<ndDeepBrainLayer*>& srcLayers = src;
+	BeginAddLayer();
 	for (ndInt32 i = 0; i < srcLayers.GetCount(); ++i)
 	{
 		ndDeepBrainLayer* const layer = srcLayers[i]->Clone();
-		PushBack(layer);
+		AddLayer(layer);
 	}
+	EndAddLayer();
+	CopyFrom(src);
 }
 
 ndDeepBrain::~ndDeepBrain()
 {
+	if (m_memory)
+	{
+		for (ndInt32 i = 0; i < GetCount(); i++)
+		{
+			ndDeepBrainLayer& layer = *(*this)[i];
+			layer.SetFloatPointers(nullptr);
+			layer.SetPointers(nullptr);
+		}
+		ndMemory::Free(m_memory);
+	}
+
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
 		delete (*this)[i];
@@ -72,7 +90,37 @@ void ndDeepBrain::BeginAddLayer()
 
 void ndDeepBrain::EndAddLayer()
 {
-	InitGaussianWeights(0.0f, 0.25f);
+	ndInt32 floatsCount = 0;
+	ndInt32 vectorSizeInBytes = 0;
+	for (ndInt32 i = 0; i < GetCount(); i++)
+	{
+		ndDeepBrainLayer& layer = *(*this)[i];
+		ndInt32 columnSize = (layer.GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+		ndInt32 rowSize = layer.GetOuputSize() + 1;
+		floatsCount += columnSize * rowSize;
+		vectorSizeInBytes += layer.GetOuputSize() * sizeof(ndArray<ndDeepBrainMemVector>);
+	}
+
+	ndInt32 memorySize = floatsCount * sizeof(ndReal) + vectorSizeInBytes + 256;
+	m_memorySize = memorySize;
+	m_memory = ndMemory::Malloc(memorySize);
+	memset(m_memory, 0, memorySize);
+
+	// assign vector pointers
+	ndUnsigned8* mem = (ndUnsigned8*)m_memory;
+	for (ndInt32 i = 0; i < GetCount(); i++)
+	{
+		ndDeepBrainLayer& layer = *(*this)[i];
+		mem = layer.SetPointers(mem);
+	}
+
+	ndReal* floatMemory = (ndReal*) ((ndInt64 (mem) + 31) & -32);
+	for (ndInt32 i = 0; i < GetCount(); i++)
+	{
+		ndDeepBrainLayer& layer = *(*this)[i];
+		floatMemory = layer.SetFloatPointers(floatMemory);
+	}
+
 	m_isReady = true;
 }
 
@@ -156,7 +204,8 @@ bool ndDeepBrain::Load(const char* const pathName)
 	{
 		return false;
 	}
-	
+
+	BeginAddLayer();
 	for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
 	{
 		const char* const layerType = xmlGetString(layerNode, "type");
@@ -177,6 +226,16 @@ bool ndDeepBrain::Load(const char* const pathName)
 			}
 		}
 	}
+	EndAddLayer();
+
+	ndInt32 index = 0;
+	for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
+	{
+		ndDeepBrainLayer* const layer = (*this)[index];
+		layer->Load((nd::TiXmlElement*)layerNode);
+		index++;
+	}
+
 	m_isReady = true;
 
 	return true;

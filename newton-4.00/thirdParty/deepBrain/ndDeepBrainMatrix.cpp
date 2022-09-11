@@ -20,7 +20,13 @@
 */
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrainTypes.h"
 #include "ndDeepBrainMatrix.h"
+
+ndDeepBrainMatrix::ndDeepBrainMatrix()
+	:ndArray<ndDeepBrainVector>()
+{
+}
 
 ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
 	:ndArray<ndDeepBrainVector>()
@@ -32,30 +38,6 @@ ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
 		ndDeepBrainVector& row = me[i];
 		row.ResetMembers();
 		row.SetCount(columns);
-	}
-}
-
-ndDeepBrainMatrix::ndDeepBrainMatrix(const nd::TiXmlNode* layerNode)
-	:ndArray<ndDeepBrainVector>()
-{
-	ndInt32 rows = xmlGetInt(layerNode, "outputs");
-	ndInt32 columns = xmlGetInt(layerNode, "inputs");
-
-	const nd::TiXmlNode* const weights = layerNode->FirstChild("inputWeights");
-	if (weights)
-	{
-		SetCount(rows);
-		ndDeepBrainMatrix& me = *this;
-		for (ndInt32 i = 0; i < rows; ++i)
-		{
-			char weightRow[256];
-			sprintf(weightRow, "weights%d", i);
-
-			ndDeepBrainVector& row = me[i];
-			row.ResetMembers();
-			row.SetCount(columns);
-			xmlGetFloatArray(weights, weightRow, row);
-		}
 	}
 }
 
@@ -74,12 +56,32 @@ ndDeepBrainMatrix::ndDeepBrainMatrix(const ndDeepBrainMatrix& src)
 
 ndDeepBrainMatrix::~ndDeepBrainMatrix()
 {
-	ndDeepBrainMatrix& me = *this;
-	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+	if (m_array)
 	{
-		ndDeepBrainVector& row = me[i];
-		row.~ndDeepBrainVector();
+		ndDeepBrainMatrix& me = *this;
+		for (ndInt32 i = GetCount() - 1; i >= 0; --i)
+		{
+			ndDeepBrainVector& row = me[i];
+			row.~ndDeepBrainVector();
+		}
 	}
+}
+
+ndUnsigned8* ndDeepBrainMatrix::SetPointer(ndUnsigned8* const mem)
+{
+	m_array = (ndDeepBrainMemVector*)mem;
+	return mem + GetCount() * sizeof (ndDeepBrainMemVector);
+}
+
+ndReal* ndDeepBrainMatrix::SetFloatPointers(ndReal* const mem, ndInt32 columns)
+{
+	ndInt32 count = 0;
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		m_array[i].SetMembers(columns, &mem[count]);
+		count += (m_array[i].GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
+	}
+	return &mem[count];
 }
 
 void ndDeepBrainMatrix::Set(ndReal value)
@@ -117,22 +119,13 @@ void ndDeepBrainMatrix::SetTranspose(const ndDeepBrainMatrix& src)
 	}
 }
 
-void ndDeepBrainMatrix::InitGaussianWeights(ndReal mean, ndReal variance)
-{
-	ndDeepBrainMatrix& me = *this;
-	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
-	{
-		me[i].InitGaussianWeights(mean, variance);
-	}
-}
-
 void ndDeepBrainMatrix::Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const
 {
 	const ndDeepBrainMatrix& me = *this;
 	ndInt32 columns = input.GetCount();
 	ndAssert(columns == GetColumns());
 	ndAssert(output.GetCount() == GetCount());
-
+	
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		const ndDeepBrainVector& row = me[i];

@@ -23,6 +23,15 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
 
+
+ndDeepBrainMemVector::ndDeepBrainMemVector()
+	:ndDeepBrainVector()
+{
+	m_size = 0;
+	m_capacity = 0;
+	m_array = nullptr;
+}
+
 ndDeepBrainMemVector::ndDeepBrainMemVector(const ndReal* const mem, ndInt32 size)
 	:ndDeepBrainVector()
 {
@@ -36,6 +45,17 @@ ndDeepBrainMemVector::~ndDeepBrainMemVector()
 	m_size = 0;
 	m_capacity = 0;
 	m_array = nullptr;
+}
+
+void ndDeepBrainMemVector::SetSize(ndInt32 size)
+{
+	m_size = size;
+	m_capacity = size + 1;
+}
+
+void ndDeepBrainMemVector::SetPointer(ndReal* const memmory)
+{
+	m_array = memmory;
 }
 
 ndDeepBrainVector::ndDeepBrainVector()

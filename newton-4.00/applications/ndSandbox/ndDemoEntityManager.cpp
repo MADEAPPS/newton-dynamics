@@ -444,7 +444,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	//Test0__();
 	//Test1__();
-	//ndTestDeedBrian();
+	ndTestDeedBrian();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()

@@ -88,8 +88,12 @@ class ndArray: public ndClassAlloc
 	void RandomShuffle(ndInt32 count);
 
 	/// set all member to 0.
-	/// useful for want making vectors of vectors (ex matrices)
+	/// useful for when making vectors of vectors (ex matrices)
 	void ResetMembers();
+
+	/// assign all members.
+	/// useful for when making vectors of vectors (ex matrices)
+	void SetMembers(ndInt32 size, void* const memory);
 
 	private: 
 	void CopyData(T* const dst, const T* const src, ndInt32 elements);
@@ -260,6 +264,14 @@ void ndArray<T>::Swap(ndArray& other)
 	ndSwap(m_array, other.m_array);
 	ndSwap(m_size, other.m_size);
 	ndSwap(m_capacity, other.m_capacity);
+}
+
+template<class T>
+void ndArray<T>::SetMembers(ndInt32 size, void* const memory)
+{
+	m_size = size;
+	m_capacity = size + 1;
+	m_array = (T*)memory;
 }
 
 template<class T>

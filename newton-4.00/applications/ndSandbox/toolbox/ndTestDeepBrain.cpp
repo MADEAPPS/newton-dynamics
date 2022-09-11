@@ -15,7 +15,7 @@
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndDeepBrain brain;
-	ndSetRandSeed(142543);
+	ndSetRandSeed(12345);
 
 	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_relu);
 	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
@@ -28,6 +28,12 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.AddLayer(hiddenLayer1);
 	brain.AddLayer(ouputLayer);
 	brain.EndAddLayer();
+	brain.InitGaussianWeights(0.0f, 0.25f);
+
+	//brain.Save("xxx.nn");
+	//ndDeepBrain brain1;
+	//brain1.Load("xxx.nn");
+	//ndAssert(brain1.Compare(brain));
 
 	ndInt32 samples = 1000;
 	ndDeepBrainMatrix inputBatch(samples, 2);
@@ -36,29 +42,29 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	{
 		inputBatch[i][0] = ndGaussianRandom(0.5f, 0.25f);
 		inputBatch[i][1] = ndGaussianRandom(0.5f, 0.25f);
-
+	
 		groundTruth[i][0] = ((inputBatch[i][0] > 0.5f) && (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 	}
-
+	
 	ndDeepBrainTrainerSDG trainer(&brain, 1.0e-6f);
-	trainer.Optimize(inputBatch, groundTruth, 2.0e-1f, 5000);
-
+	trainer.Optimize(inputBatch, groundTruth, 1.0e-2f, 5000);
+	
 	ndDeepBrainVector input;
 	ndDeepBrainVector ouput;
 	ndDeepBrainVector truth;
 	truth.SetCount(2);
 	input.SetCount(2);
 	ouput.SetCount(2);
-
+	
 	ndDeepBrainInstance instance(&brain);
-	for (ndInt32 i = 0; i < 20; i++)
+	for (ndInt32 i = 0; i < 50; i++)
 	{
 		input[0] = ndGaussianRandom(0.5f, 0.25f);
 		input[1] = ndGaussianRandom(0.5f, 0.25f);
 		truth[0] = ((input[0] > 0.5f) && (input[1] > 0.5f)) ? 1.0f : 0.0f;
 		truth[1] = ((input[0] > 0.5f) || (input[1] > 0.5f)) ? 1.0f : 0.0f;
-
+	
 		instance.MakePrediction(input, ouput);
 		instance.MakePrediction(input, ouput);
 	}
@@ -139,7 +145,6 @@ static ndDeepBrainMatrix* LoadMnistSampleData(const char* const filename)
 		digitHeight = ndIndian32(digitHeight);
 		trainingDigits = new ndDeepBrainMatrix(numberOfItems, digitWith * digitHeight);
 		trainingDigits->Set(0.0f);
-		//ndAssert(numberOfItems == ndUnsigned32(trainingLabels->GetCount()));
 
 		ndUnsigned8 data[32 * 32];
 		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
@@ -217,6 +222,7 @@ static void MnistTrainingSet()
 		//brain.AddLayer(hiddenLayer2);
 		brain.AddLayer(ouputLayer);
 		brain.EndAddLayer();
+		brain.InitGaussianWeights(0.0f, 0.25f);
 
 		//ndDeepBrainTrainerSDG trainer(&brain, 1.0e-6f);
 		ndDeepBrainTrainerParallelSDG trainer(&brain, 1.0e-6f, 4);
@@ -281,6 +287,6 @@ void ndTestDeedBrian()
 {
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
-	MnistTestSet();
+	//MnistTestSet();
 }
 

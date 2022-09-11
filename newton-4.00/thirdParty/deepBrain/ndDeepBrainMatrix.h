@@ -28,7 +28,6 @@
 class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 {
 	public: 
-	ndDeepBrainMatrix(const nd::TiXmlNode* layerNode);
 	ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns);
 	ndDeepBrainMatrix(const ndDeepBrainMatrix& src);
 	~ndDeepBrainMatrix();
@@ -38,15 +37,17 @@ class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 	void Set(ndReal value);
 	void Set(const ndDeepBrainMatrix& src);
 	void SetTranspose(const ndDeepBrainMatrix& src);
-
-	void InitGaussianWeights(ndReal mean, ndReal variance);
 	void Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const;
+
+	protected:
+	ndDeepBrainMatrix();
+	ndUnsigned8* SetPointer(ndUnsigned8* const mem);
+	ndReal* SetFloatPointers(ndReal* const mem, ndInt32 columns);
 };
 
 inline ndInt32 ndDeepBrainMatrix::GetRows() const
 {
-	ndInt32 rows = GetCount();
-	return rows;
+	return GetCount();
 }
 
 inline ndInt32 ndDeepBrainMatrix::GetColumns() const
@@ -54,6 +55,5 @@ inline ndInt32 ndDeepBrainMatrix::GetColumns() const
 	ndInt32 columns = GetCount() ? (*this)[0].GetCount() : 0;
 	return columns;
 }
-
 
 #endif 

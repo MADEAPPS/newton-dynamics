@@ -49,8 +49,12 @@ class ndDeepBrainVector: public ndArray<ndReal>
 class ndDeepBrainMemVector : public ndDeepBrainVector
 {
 	public:
+	ndDeepBrainMemVector();
 	ndDeepBrainMemVector(const ndReal* const mem, ndInt32 size);
 	~ndDeepBrainMemVector();
+
+	void SetSize(ndInt32 size);
+	void SetPointer(ndReal* const memmory);
 };
 
 #endif 

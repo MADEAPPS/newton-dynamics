@@ -88,13 +88,13 @@ void ndDeepBrainTrainerParallelSDG::AverageWeights()
 {
 	const ndInt32 threads = m_threadData.GetCount();
 	const ndReal weightFactor = 1.0f / threads;
-
+	
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 j = layers.GetCount() - 1; j >= 0; --j)
 	{
 		ndDeepBrainLayer& layer = *layers[j];
 		ndDeepBrainVector& bias = layer.GetBias();
-
+	
 		layer.Set(0);
 		bias.Set(0.0f);
 		for (ndInt32 i = 0; i < threads; ++i)
@@ -119,10 +119,10 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 {
 	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
 	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
-
+	
 	ndDeepBrain bestNetwork(*m_instance.GetBrain());
 	ndReal bestCost = 1.0e10f;
-
+	
 	ndInt32 index = 0;
 	ndInt32 batchCount = (m_inputBatch->GetCount() + m_miniBatchSize - 1) / m_miniBatchSize;
 	ndArray<ndInt32> randomizeVector;
@@ -131,19 +131,19 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 	{
 		randomizeVector[i] = i;
 	}
-
+	
 	ndInt32 movingAverageIndex = 0;
 	ndFloat32 movingAverageError = 0.0f;
 	for (ndInt32 i = 0; i < m_steps; ++i)
 	{
 		const ndInt32 batchStart = index * m_miniBatchSize;
 		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
-
+	
 		auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			LocalData& optimizer = *m_threadData[threadIndex];
 			optimizer.m_averageError = 0.0f;
-
+	
 			const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -154,10 +154,10 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 			}
 		});
 		ParallelExecute(CalculateGradients);
-
+	
 		AverageWeights();
 		ApplyWeightTranspose();
-
+	
 		ndReal averageError = 0.0f;
 		for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
 		{
@@ -165,7 +165,7 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 			m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
 			m_threadData[j]->CopyTranspose(m_weightsLayersTranspose);
 		}
-
+	
 		movingAverageIndex += batchSize;
 		movingAverageError += averageError;
 	
@@ -186,6 +186,6 @@ void ndDeepBrainTrainerParallelSDG::Optimize()
 			movingAverageError = 0.0f;
 		}
 	}
-
+	
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
