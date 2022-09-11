@@ -33,6 +33,7 @@ bld/
 *.cs
 *.tt
 *.db
+*.cxx
 *.suo
 *.obj
 *.sdf
@@ -57,7 +58,7 @@ bld/
 *.sbr
 *.res
 *.ipa
-*.java
+*.libs
 *.user
 *.tlog
 *.json
