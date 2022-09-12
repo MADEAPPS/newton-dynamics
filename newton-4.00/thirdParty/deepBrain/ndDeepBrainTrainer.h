@@ -39,6 +39,7 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	protected:
+	void ClearGradientsAcc();
 	virtual void PrefixScan();
 	virtual void ApplyWeightTranspose();
 	virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
@@ -49,6 +50,7 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	ndDeepBrainVector m_zDerivative;
 	ndDeepBrainVector m_biasGradients;
 	ndDeepBrainVector m_weightGradients;
+	ndDeepBrainVector m_biasGradientsAcc;
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
 	ndReal m_regularizer;
