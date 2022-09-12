@@ -62,6 +62,7 @@ ndFloat32 ndDeepBrainTrainerBase::CalculateMeanSquareError(const ndDeepBrainVect
 		ndFloat32 dist = z[i] - groundTruth[i];
 		error2 += dist * dist;
 	}
-	return error2 / outputCount;
+	//return error2 / outputCount;
+	return error2;
 }
 

@@ -53,6 +53,7 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
 	ndReal m_regularizer;
+	ndReal m_bestCost;
 };
 
 inline ndReal ndDeepBrainTrainer::GetRegularizer() const

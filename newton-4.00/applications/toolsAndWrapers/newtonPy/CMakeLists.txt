@@ -95,12 +95,12 @@ else()
   set (pySuffix ".so")
 endif()
 
-
 foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy ${pySrc}/${file} ${pyDst}/${file})
 endforeach()
+
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton${pySuffix})
