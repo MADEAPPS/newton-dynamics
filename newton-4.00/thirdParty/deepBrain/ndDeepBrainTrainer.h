@@ -19,18 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_TRAINER_SGD_H__
-#define _ND_DEEP_BRAIN_TRAINER_SGD_H__
+#ifndef _ND_DEEP_BRAIN_TRAINER_H__
+#define _ND_DEEP_BRAIN_TRAINER_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainTrainingOperator.h"
+#include "ndDeepBrainTrainerBase.h"
 
-class ndDeepBrainTrainerSDG: public ndDeepBrainTrainingOperator
+class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 {
 	public: 
-	ndDeepBrainTrainerSDG(ndDeepBrain* const brain, ndReal regularizer = 0.0f);
-	ndDeepBrainTrainerSDG(const ndDeepBrainTrainerSDG& src);
-	virtual ~ndDeepBrainTrainerSDG();
+	ndDeepBrainTrainer(ndDeepBrain* const brain, ndReal regularizer = 0.0f);
+	ndDeepBrainTrainer(const ndDeepBrainTrainer& src);
+	virtual ~ndDeepBrainTrainer();
 
 	ndReal GetRegularizer() const;
 	virtual void UpdateWeights(ndReal learnRate);
@@ -55,7 +55,7 @@ class ndDeepBrainTrainerSDG: public ndDeepBrainTrainingOperator
 	ndReal m_regularizer;
 };
 
-inline ndReal ndDeepBrainTrainerSDG::GetRegularizer() const
+inline ndReal ndDeepBrainTrainer::GetRegularizer() const
 {
 	return m_regularizer;
 }

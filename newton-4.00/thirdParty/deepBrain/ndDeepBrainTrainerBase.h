@@ -19,19 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_TRAINING_OPERATOR_H__
-#define _ND_DEEP_BRAIN_TRAINING_OPERATOR_H__
+#ifndef _ND_DEEP_BRAIN_TRAINER_BASE_H__
+#define _ND_DEEP_BRAIN_TRAINER_BASE_H__
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainMatrix.h"
 #include "ndDeepBrainInstance.h"
 
-class ndDeepBrainTrainingOperator: public ndClassAlloc
+class ndDeepBrainTrainerBase: public ndClassAlloc
 {
 	public: 
-	ndDeepBrainTrainingOperator(ndDeepBrain* const brain);
-	ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src);
-	virtual ~ndDeepBrainTrainingOperator();
+	ndDeepBrainTrainerBase(ndDeepBrain* const brain);
+	ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src);
+	virtual ~ndDeepBrainTrainerBase();
 
 	ndDeepBrain* GetBrain() const;
 	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
@@ -45,7 +45,7 @@ class ndDeepBrainTrainingOperator: public ndClassAlloc
 	friend class ndDeepBrainInstance;
 };
 
-inline ndDeepBrain* ndDeepBrainTrainingOperator::GetBrain() const
+inline ndDeepBrain* ndDeepBrainTrainerBase::GetBrain() const
 {
 	return m_instance.GetBrain();
 }

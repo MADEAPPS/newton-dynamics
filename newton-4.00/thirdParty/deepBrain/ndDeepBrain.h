@@ -24,7 +24,7 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainTrainingOperator.h"
+#include "ndDeepBrainTrainerBase.h"
 
 class ndDeepBrain: public ndArray<ndDeepBrainLayer*>
 {

@@ -35,7 +35,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	//brain1.Load("xxx.nn");
 	//ndAssert(brain1.Compare(brain));
 
-	ndInt32 samples = 1000;
+	ndInt32 samples = 2000;
 	ndDeepBrainMatrix inputBatch(samples, 2);
 	ndDeepBrainMatrix groundTruth(samples, 2);
 	for (ndInt32 i = 0; i < samples; i++)
@@ -47,27 +47,47 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 	}
 	
-	ndDeepBrainTrainerSDG trainer(&brain, 1.0e-6f);
+	ndDeepBrainTrainer trainer(&brain, 1.0e-6f);
 	trainer.Optimize(inputBatch, groundTruth, 1.0e-2f, 5000);
 	
-	ndDeepBrainVector input;
-	ndDeepBrainVector ouput;
 	ndDeepBrainVector truth;
+	ndDeepBrainVector input;
+	ndDeepBrainVector output;
+	
 	truth.SetCount(2);
 	input.SetCount(2);
-	ouput.SetCount(2);
+	output.SetCount(2);
 	
+	ndInt32 failCount = 0;
+	ndInt32 testCount = 200;
 	ndDeepBrainInstance instance(&brain);
-	for (ndInt32 i = 0; i < 50; i++)
+	for (ndInt32 i = 0; i < testCount; i++)
 	{
 		input[0] = ndGaussianRandom(0.5f, 0.25f);
 		input[1] = ndGaussianRandom(0.5f, 0.25f);
 		truth[0] = ((input[0] > 0.5f) && (input[1] > 0.5f)) ? 1.0f : 0.0f;
 		truth[1] = ((input[0] > 0.5f) || (input[1] > 0.5f)) ? 1.0f : 0.0f;
 	
-		instance.MakePrediction(input, ouput);
-		instance.MakePrediction(input, ouput);
+		instance.MakePrediction(input, output);
+
+		bool predicted = true;
+		for (ndInt32 j = 0; j < output.GetCount(); j++)
+		{
+			bool trueBit = truth[j] >= 0.5f;
+			bool predictBit = output[j] >= 0.5f;
+			predicted = predicted & (predictBit == trueBit);
+		}
+
+		if (!predicted)
+		{
+			failCount++;
+		}
 	}
+
+	ndExpandTraceMessage("%s\n", "boolean logic");
+	ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
+	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
+	ndExpandTraceMessage("success rate %f%%\n", (testCount - failCount) * 100.0f / testCount);
 }
 
 static ndDeepBrainMatrix* LoadMnistLabelData(const char* const filename)
@@ -224,8 +244,8 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 		brain.InitGaussianWeights(0.0f, 0.25f);
 
-		//ndDeepBrainTrainerSDG trainer(&brain, 1.0e-6f);
-		ndDeepBrainTrainerParallelSDG trainer(&brain, 1.0e-6f, 4);
+		//ndDeepBrainTrainer trainer(&brain, 1.0e-6f);
+		ndDeepBrainParallelTrainer trainer(&brain, 1.0e-6f, 4);
 		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 1.0e-6f, 4);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
@@ -285,7 +305,7 @@ static void MnistTestSet()
 
 void ndTestDeedBrian()
 {
-	//ThreeLayersTwoInputsTwoOutputs();
+	ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }

@@ -27,7 +27,7 @@
 
 class ndDeepBrain;
 class ndDeepBrainLayer;
-class ndDeepBrainTrainingOperator;
+class ndDeepBrainTrainerBase;
 
 class ndDeepBrainInstance: public ndClassAlloc
 {
@@ -50,7 +50,7 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrainPrefixScan m_zPrefixScan;
 	ndDeepBrain* m_brain;
 
-	//friend class ndDeepBrainTrainingOperator;
+	//friend class ndDeepBrainTrainerBase;
 	//friend class ndDeepBrainGradientDescendTrainingOperator;
 	//friend class ndDeepBrainParallelGradientDescendTrainingOperatorOld;
 };

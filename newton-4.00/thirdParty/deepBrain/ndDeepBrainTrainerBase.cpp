@@ -22,32 +22,32 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainTrainingOperator.h"
+#include "ndDeepBrainTrainerBase.h"
 
-ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(ndDeepBrain* const brain)
+ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
 	,m_miniBatchSize(100000)
 {
 }
 
-ndDeepBrainTrainingOperator::ndDeepBrainTrainingOperator(const ndDeepBrainTrainingOperator& src)
+ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src)
 	:ndClassAlloc()
 	,m_instance(src.m_instance)
 	,m_miniBatchSize(src.m_miniBatchSize)
 {
 }
 
-ndDeepBrainTrainingOperator::~ndDeepBrainTrainingOperator()
+ndDeepBrainTrainerBase::~ndDeepBrainTrainerBase()
 {
 }
 
-void ndDeepBrainTrainingOperator::SetMiniBatchSize(ndInt32 miniBatchSize)
+void ndDeepBrainTrainerBase::SetMiniBatchSize(ndInt32 miniBatchSize)
 {
 	m_miniBatchSize = miniBatchSize;
 }
 
-ndFloat32 ndDeepBrainTrainingOperator::CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const
+ndFloat32 ndDeepBrainTrainerBase::CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const
 {
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	const ndInt32 layerIndex = layers.GetCount() - 1;

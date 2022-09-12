@@ -19,38 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_TRAINER_PARALLEL_SGD_H__
-#define _ND_DEEP_BRAIN_TRAINER_PARALLEL_SGD_H__
+#ifndef _ND_DEEP_BRAIN_PARALLEL_TRAINER_EXPERIMENT_H__
+#define _ND_DEEP_BRAIN_PARALLEL_TRAINER_EXPERIMENT_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainTrainerSDG.h"
+#include "ndDeepBrainTrainer.h"
 
-class ndDeepBrainTrainerParallelSDG
-	:public ndDeepBrainTrainerSDG
+class ndDeepBrainParallelTrainer_Experiment
+	:public ndDeepBrainTrainer
 	,public ndThreadPool
 {
 	public: 
-	class LocalData: public ndDeepBrain, public ndDeepBrainTrainerSDG
-	{
-		public:
-		LocalData(const ndDeepBrainTrainerSDG& src);
-		ndReal m_averageError;
-
-		void CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src);
-	};
-
-	ndDeepBrainTrainerParallelSDG(ndDeepBrain* const brain, ndReal regularizer = 0.0f, ndInt32 threads = 1);
-	~ndDeepBrainTrainerParallelSDG();
+	ndDeepBrainParallelTrainer_Experiment(ndDeepBrain* const brain, ndReal regularizer = 0.0f, ndInt32 threads = 1);
+	~ndDeepBrainParallelTrainer_Experiment();
 
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	private:
-	void Optimize();
 	virtual void ThreadFunction();
-
-	private:
-	void AverageWeights();
-	ndFixSizeArray<LocalData*, D_MAX_THREADS_COUNT> m_threadData;
+	void MakePrediction(const ndDeepBrainVector& input);
 
 	const ndDeepBrainMatrix* m_inputBatch;
 	const ndDeepBrainMatrix* m_groundTruth;

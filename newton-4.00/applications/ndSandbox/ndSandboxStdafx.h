@@ -98,9 +98,9 @@
 
 #include <ndDeepBrainStdafx.h>
 #include <ndDeepBrain.h>
-#include <ndDeepBrainTrainerSDG.h>
-#include <ndDeepBrainTrainerParallelSDG.h>
-#include <ndDeepBrainTrainerParallelSDG_Experiment.h>
+#include <ndDeepBrainTrainer.h>
+#include <ndDeepBrainParallelTrainer.h>
+#include <ndDeepBrainParallelTrainer_Experiment.h>
 
 #ifndef _MSC_VER
 	#ifndef stricmp

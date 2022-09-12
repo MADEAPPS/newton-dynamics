@@ -22,10 +22,10 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainLayer.h"
-#include "ndDeepBrainTrainerParallelSDG_Experiment.h"
+#include "ndDeepBrainParallelTrainer_Experiment.h"
 
-ndDeepBrainTrainerParallelSDG_Experiment::ndDeepBrainTrainerParallelSDG_Experiment(ndDeepBrain* const brain, ndReal regularizer, ndInt32 threads)
-	:ndDeepBrainTrainerSDG(brain, regularizer)
+ndDeepBrainParallelTrainer_Experiment::ndDeepBrainParallelTrainer_Experiment(ndDeepBrain* const brain, ndReal regularizer, ndInt32 threads)
+	:ndDeepBrainTrainer(brain, regularizer)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)
@@ -36,19 +36,19 @@ ndDeepBrainTrainerParallelSDG_Experiment::ndDeepBrainTrainerParallelSDG_Experime
 	SetThreadCount(threads);
 }
 
-ndDeepBrainTrainerParallelSDG_Experiment::~ndDeepBrainTrainerParallelSDG_Experiment()
+ndDeepBrainParallelTrainer_Experiment::~ndDeepBrainParallelTrainer_Experiment()
 {
 	Finish();
 }
 
-void ndDeepBrainTrainerParallelSDG_Experiment::ThreadFunction()
+void ndDeepBrainParallelTrainer_Experiment::ThreadFunction()
 {
 	Begin();
-	ndDeepBrainTrainerSDG::Optimize(*m_inputBatch, *m_groundTruth, m_learnRate, m_steps);
+	ndDeepBrainTrainer::Optimize(*m_inputBatch, *m_groundTruth, m_learnRate, m_steps);
 	End();
 }
 
-void ndDeepBrainTrainerParallelSDG_Experiment::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndDeepBrainParallelTrainer_Experiment::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	m_steps = steps;
 	m_learnRate = learnRate;
@@ -58,7 +58,7 @@ void ndDeepBrainTrainerParallelSDG_Experiment::Optimize(const ndDeepBrainMatrix&
 	Sync();
 }
 
-void ndDeepBrainTrainerParallelSDG_Experiment::MakePrediction(const ndDeepBrainVector& input)
+void ndDeepBrainParallelTrainer_Experiment::MakePrediction(const ndDeepBrainVector& input)
 {
 	//m_instance.MakePrediction(input, m_output);
 	m_instance.MakePrediction(*this, input, m_output);

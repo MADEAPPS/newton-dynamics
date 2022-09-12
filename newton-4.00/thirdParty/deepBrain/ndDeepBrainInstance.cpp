@@ -22,7 +22,7 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrain.h"
 #include "ndDeepBrainInstance.h"
-#include "ndDeepBrainTrainingOperator.h"
+#include "ndDeepBrainTrainerBase.h"
 
 ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
 	:ndClassAlloc()
