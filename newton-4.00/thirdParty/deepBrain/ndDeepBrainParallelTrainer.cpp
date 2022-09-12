@@ -150,7 +150,10 @@ void ndDeepBrainParallelTrainer::Optimize()
 				ndInt32 k = randomizeVector[batchStart + i];
 				const ndDeepBrainVector& input = (*m_inputBatch)[k];
 				const ndDeepBrainVector& truth = (*m_groundTruth)[k];
-				optimizer.m_averageError += optimizer.TrainingStep(m_learnRate, input, truth);
+				optimizer.MakePrediction(input);
+				optimizer.BackPropagate(truth);
+				optimizer.UpdateWeights(m_learnRate);
+				optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
 			}
 		});
 		ParallelExecute(CalculateGradients);

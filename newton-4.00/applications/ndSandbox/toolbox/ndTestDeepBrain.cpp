@@ -48,8 +48,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	}
 	
 	ndDeepBrainTrainer trainer(&brain, 1.0e-6f);
-	trainer.Optimize(inputBatch, groundTruth, 0.0e-2f, 5000);
-	//trainer.Optimize(inputBatch, groundTruth, 1.0e-2f, 5000);
+	//trainer.Optimize(inputBatch, groundTruth, 0.0e-2f, 5000);
+	trainer.Optimize(inputBatch, groundTruth, 1.0e-2f, 5000);
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-3f, 100000);
 	
 	ndDeepBrainVector truth;
@@ -307,7 +307,7 @@ static void MnistTestSet()
 
 void ndTestDeedBrian()
 {
-	ThreeLayersTwoInputsTwoOutputs();
+	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }

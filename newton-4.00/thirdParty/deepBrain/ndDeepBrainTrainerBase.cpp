@@ -27,7 +27,7 @@
 ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
-	,m_miniBatchSize(100000)
+	,m_miniBatchSize(1)
 {
 }
 

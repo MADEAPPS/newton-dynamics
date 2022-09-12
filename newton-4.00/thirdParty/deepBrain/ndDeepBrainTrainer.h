@@ -37,7 +37,6 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	virtual void MakePrediction(const ndDeepBrainVector& input);
 	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
 	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
-	virtual ndReal TrainingStep(ndReal learnRate, const ndDeepBrainVector& input, const ndDeepBrainVector& groundTruth);
 
 	protected:
 	virtual void PrefixScan();
