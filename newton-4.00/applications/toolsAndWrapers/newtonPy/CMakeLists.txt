@@ -46,7 +46,7 @@ include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-if (MSVC OR MINGW)
+if(DEFINED ENV{Python})
 	#message ($ENV{PythonInclude})
 	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
 
@@ -89,6 +89,13 @@ list(APPEND PY_SOURCE
 
 set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
 
+if (MSVC OR MINGW)
+  set (pySuffix ".pyd")
+else()
+  set (pySuffix ".so")
+endif()
+
+
 foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
@@ -96,13 +103,17 @@ foreach(file IN LISTS PY_SOURCE)
 endforeach()
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton.pyd)
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton${pySuffix})
 
-foreach(file IN LISTS PY_SOURCE)
+
+if(DEFINED ENV{Blender})
+
+  foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
-endforeach()
-add_custom_command(
+    endforeach()
+    add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton.pyd)
+	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton${pySuffix})
+endif()
