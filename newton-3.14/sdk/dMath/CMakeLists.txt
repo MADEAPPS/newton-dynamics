@@ -17,22 +17,18 @@ message (${projectName})
 file(GLOB CPP_SOURCE *.h *.cpp)
 file(GLOB HEADERS *.h)
 
-if (UNIX OR MINGW)
-	if(NEWTON_BUILD_SHARED_LIBS)
-	   add_library(${projectName} SHARED ${CPP_SOURCE})
-	else(NEWTON_BUILD_SHARED_LIBS)
-	   add_library(${projectName} STATIC ${CPP_SOURCE})
-	endif(NEWTON_BUILD_SHARED_LIBS)
-endif (UNIX OR MINGW)
+if(NEWTON_BUILD_SHARED_LIBS AND NOT MSVC)
+	add_library(${projectName} SHARED ${CPP_SOURCE})
+else()
+	add_library(${projectName} STATIC ${CPP_SOURCE})
+endif()
 
 if (MSVC)
-   add_library(${projectName} STATIC ${CPP_SOURCE})
-
    if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
       set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudStdAfxMath.h")
       set_source_files_properties(dStdAfxMath.cpp PROPERTIES COMPILE_FLAGS "/YcdStdAfxMath.h")
    endif()
-endif(MSVC)
+endif()
 
 target_include_directories(${projectName} PUBLIC .)
 
@@ -40,7 +36,7 @@ if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif()
 
-install(TARGETS ${projectName} 
+install(TARGETS ${projectName}
 		LIBRARY DESTINATION lib
 		ARCHIVE DESTINATION lib
 		RUNTIME DESTINATION bin)
