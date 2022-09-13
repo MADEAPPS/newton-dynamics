@@ -201,6 +201,7 @@ class ndFloatExceptions
 	D_CORE_API ~ndFloatExceptions();
 
 	private:
+	fexcept_t m_pstatus;
 	ndUnsigned32 m_x86Mask;
 	ndUnsigned32 m_sseMask;
 };

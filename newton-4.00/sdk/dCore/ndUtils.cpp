@@ -76,15 +76,10 @@ void ndSpinLock::Delay(ndInt32& exp)
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
-	#if defined (WIN32) || defined(_WIN32)
+	#if (defined (WIN32) || defined(_WIN32))
 		ndClearFP();
 		m_x86Mask = ndControlFP(0, 0);
 		ndControlFP(m_x86Mask & ~mask, _MCW_EM);
-	#else
-		short unsigned int oldMask;
-		fegetexceptflag(&oldMask)
-		m_x86Mask = mask;
-		feenableexcept(short unsigned int (mask));
 	#endif
 
 	#if defined (__APPLE__)
@@ -119,29 +114,27 @@ ndFloatExceptions::~ndFloatExceptions()
 		_mm_setcsr(m_sseMask);
 	#endif
 
-	#if defined (WIN32) || defined(_WIN32)
+	#if (defined (WIN32) || defined(_WIN32))
 		ndClearFP();
 		ndControlFP(m_x86Mask, _MCW_EM);
-	#else
-		feenableexcept(short unsigned int (m_x86Mask));
 	#endif
 }
 
 ndSetPrecisionDouble::ndSetPrecisionDouble()
 {
-	#if defined (WIN32) || defined(_WIN32)
-		ndClearFP();
-		m_mask = ndInt32(ndControlFP(0, 0));
-		ndControlFP(_PC_53, _MCW_PC);
-	#endif
+	//#if defined (WIN32) || defined(_WIN32)
+	//	ndClearFP();
+	//	m_mask = ndInt32(ndControlFP(0, 0));
+	//	ndControlFP(_PC_53, _MCW_PC);
+	//#endif
 }
 
 ndSetPrecisionDouble::~ndSetPrecisionDouble()
 {
-	#if defined (WIN32) || defined(_WIN32)
-		ndClearFP();
-		ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
-	#endif
+	//#if defined (WIN32) || defined(_WIN32)
+	//	ndClearFP();
+	//	ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
+	//#endif
 }
 
 class ndSortCluster

@@ -51,6 +51,7 @@
 #include <chrono>
 #include <random> 
 #include <math.h>
+#include <fenv.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +92,6 @@
 	#define _DEBUG 1
 	#endif
 
-	#include <fenv.h>
 	#include <unistd.h>
 	#include <assert.h>
 	// it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
@@ -120,7 +120,6 @@
 	#include <sys/sysctl.h>
     #include <assert.h> 
     #if (defined __i386__ || defined __x86_64__)
-		#include <fenv.h>
 		#include <immintrin.h>
 		#include <pmmintrin.h> 
 		#include <emmintrin.h>  //sse3
