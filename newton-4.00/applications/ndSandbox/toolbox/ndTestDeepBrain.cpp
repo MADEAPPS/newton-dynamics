@@ -46,11 +46,30 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][0] = ((inputBatch[i][0] > 0.5f) && (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
 	}
+
+	class Validator : public ndDeepBrainTrainer::ndValidation
+	{
+		public: 
+		Validator(ndDeepBrainTrainer& trainer)
+			:ndDeepBrainTrainer::ndValidation(trainer)
+		{
+		}
+
+		ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
+		{
+			ndReal error = ndDeepBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
+			ndExpandTraceMessage("%f\n", error);
+			return error;
+		}
+	};
 	
 	ndDeepBrainTrainer trainer(&brain, 1.0e-6f);
+
+	Validator testError(trainer);
+
 	trainer.SetMiniBatchSize(16);
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-2f, 5000);
-	trainer.Optimize(inputBatch, groundTruth, 1.0e-2f, 5000);
+	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 5000);
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-3f, 100000);
 	
 	ndDeepBrainVector truth;
@@ -308,7 +327,7 @@ static void MnistTestSet()
 
 void ndTestDeedBrian()
 {
-	//ThreeLayersTwoInputsTwoOutputs();
+	ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }

@@ -49,10 +49,6 @@ class ndDeepBrainInstance: public ndClassAlloc
 	ndDeepBrainVector m_z;
 	ndDeepBrainPrefixScan m_zPrefixScan;
 	ndDeepBrain* m_brain;
-
-	//friend class ndDeepBrainTrainerBase;
-	//friend class ndDeepBrainGradientDescendTrainingOperator;
-	//friend class ndDeepBrainParallelGradientDescendTrainingOperatorOld;
 };
 
 inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const

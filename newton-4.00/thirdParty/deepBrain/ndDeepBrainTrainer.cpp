@@ -260,15 +260,13 @@ void ndDeepBrainTrainer::ClearGradientsAcc()
 	m_weightGradients.Set(0.0f);
 }
 
-void ndDeepBrainTrainer::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndDeepBrainTrainer::Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	ndFloatExceptions exception;
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 	
 	ndDeepBrain bestNetwork(*m_instance.GetBrain());
-	ndReal bestCost = m_bestCost;
-	
 	ndArray<ndInt32> randomizeVector;
 	randomizeVector.SetCount(inputBatch.GetCount());
 	for (ndInt32 i = 0; i < inputBatch.GetCount(); ++i)
@@ -279,9 +277,10 @@ void ndDeepBrainTrainer::Optimize(const ndDeepBrainMatrix& inputBatch, const ndD
 	const ndInt32 miniBatchSize = ndMin(m_miniBatchSize, inputBatch.GetCount());
 	const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
 
+	m_bestCost = validator.Validate(inputBatch, groundTruth);
+	ndReal bestCost = m_bestCost;
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
-		ndReal averageError = 0.0f;
 		for (ndInt32 j = 0; j < batchCount; ++j)
 		{
 			ClearGradientsAcc();
@@ -294,18 +293,13 @@ void ndDeepBrainTrainer::Optimize(const ndDeepBrainMatrix& inputBatch, const ndD
 					const ndDeepBrainVector& truth = groundTruth[index];
 					MakePrediction(input);
 					BackPropagate(truth);
-					averageError += CalculateMeanSquareError(truth);
 			}
 			UpdateWeights(learnRate/count);
 		}
 		ApplyWeightTranspose();
-
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 		
-		averageError = ndSqrt(averageError / inputBatch.GetCount());
-		//ndExpandTraceMessage("%f %d\n", averageError, i);
-		ndExpandTraceMessage("%f\n", averageError);
-
+		ndReal averageError = validator.Validate(inputBatch, groundTruth);
 		if (averageError < bestCost)
 		{
 			bestCost = averageError;

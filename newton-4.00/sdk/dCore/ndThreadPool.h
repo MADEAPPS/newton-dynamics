@@ -121,20 +121,6 @@ class ndFunction<Type>
 	{
 	}
 
-	//template<typename... Args> typename
-	////std::result_of<Type(Args...)>::type operator()(Args... args)
-	//void operator()(Args... args)
-	//{
-	//	m_object.operator()(args...);
-	//}
-	//
-	//template<typename... Args> typename
-	////std::result_of<const Type(Args...)>::type operator()(Args... args) const
-	//void operator()(Args... args) const
-	//{
-	//	m_object.operator()(args...);
-	//}
-
 	void operator()(ndInt32 threadIndex, ndInt32 threadCount) const
 	{
 		m_object.operator()(threadIndex, threadCount);
@@ -183,7 +169,7 @@ class ndTaskImplement : public ndTask
 };
 
 template <typename Function>
-void ndThreadPool::ParallelExecute(const Function& ndFunction)
+void ndThreadPool::ParallelExecute(const Function& callback)
 {
 	const ndInt32 threadCount = GetThreadCount();
 	ndTaskImplement<Function>* const jobsArray = ndAlloca(ndTaskImplement<Function>, threadCount);
@@ -191,7 +177,7 @@ void ndThreadPool::ParallelExecute(const Function& ndFunction)
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		ndTaskImplement<Function>* const job = &jobsArray[i];
-		new (job) ndTaskImplement<Function>(i, this, ndFunction);
+		new (job) ndTaskImplement<Function>(i, this, callback);
 	}
 
 	if (m_count > 0)
@@ -210,7 +196,7 @@ void ndThreadPool::ParallelExecute(const Function& ndFunction)
 		}
 	
 		ndTaskImplement<Function>* const job = &jobsArray[m_count];
-		ndFunction(job->m_threadIndex, job->m_threadCount);
+		callback(job->m_threadIndex, job->m_threadCount);
 
 		bool jobsInProgress = true;
 		do
@@ -231,7 +217,7 @@ void ndThreadPool::ParallelExecute(const Function& ndFunction)
 	else
 	{
 		ndTaskImplement<Function>* const job = &jobsArray[0];
-		ndFunction(job->m_threadIndex, job->m_threadCount);
+		callback(job->m_threadIndex, job->m_threadCount);
 	}
 }
 

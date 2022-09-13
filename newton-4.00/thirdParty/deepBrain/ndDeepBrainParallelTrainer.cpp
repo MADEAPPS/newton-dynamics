@@ -54,7 +54,8 @@ ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain,
 
 	for (ndInt32 i = 0; i < threads; i++)
 	{
-		m_threadData.PushBack(new LocalData(*this));
+		ndAssert(0);
+//		m_threadData.PushBack(new LocalData(*this));
 	}
 }
 
@@ -153,7 +154,8 @@ void ndDeepBrainParallelTrainer::Optimize()
 				optimizer.MakePrediction(input);
 				optimizer.BackPropagate(truth);
 				optimizer.UpdateWeights(m_learnRate);
-				optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
+				ndAssert(0);
+				//optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
 			}
 		});
 		ParallelExecute(CalculateGradients);

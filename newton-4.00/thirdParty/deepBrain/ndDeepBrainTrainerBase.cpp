@@ -24,6 +24,7 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainTrainerBase.h"
 
+
 ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
@@ -47,22 +48,21 @@ void ndDeepBrainTrainerBase::SetMiniBatchSize(ndInt32 miniBatchSize)
 	m_miniBatchSize = miniBatchSize;
 }
 
-ndFloat32 ndDeepBrainTrainerBase::CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const
+ndReal ndDeepBrainTrainerBase::ndValidation::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
 {
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	const ndInt32 layerIndex = layers.GetCount() - 1;
-
-	ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
-	const ndInt32 outputCount = ouputLayer->GetOuputSize();
-	const ndDeepBrainMemVector z(&m_instance.GetOutPut()[m_instance.GetPrefixScan()[layerIndex + 1]], outputCount);
-
-	ndFloat32 error2 = 0;
-	for (ndInt32 i = 0; i < outputCount; i++)
+	ndReal error2 = 0;
+	ndDeepBrainInstance& instance = m_trainer.GetInstance();
+	for (ndInt32 i = inputBatch.GetCount() - 1; i >= 0; --i)
 	{
-		ndFloat32 dist = z[i] - groundTruth[i];
-		error2 += dist * dist;
+		const ndDeepBrainVector& input = inputBatch[i];
+		const ndDeepBrainVector& truth = groundTruth[i];
+		instance.MakePrediction(input, m_output);
+		for (ndInt32 j = m_output.GetCount() - 1; j >= 0; --j)
+		{
+			ndFloat32 dist = m_output[j] - truth[j];
+			error2 += dist * dist;
+		}
 	}
-	//return error2 / outputCount;
-	return error2;
+	ndReal error = ndSqrt (error2 / inputBatch.GetCount());
+	return error;
 }
-

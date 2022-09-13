@@ -44,7 +44,8 @@ ndDeepBrainParallelTrainer_Experiment::~ndDeepBrainParallelTrainer_Experiment()
 void ndDeepBrainParallelTrainer_Experiment::ThreadFunction()
 {
 	Begin();
-	ndDeepBrainTrainer::Optimize(*m_inputBatch, *m_groundTruth, m_learnRate, m_steps);
+	ndAssert(0);
+	//ndDeepBrainTrainer::Optimize(*m_inputBatch, *m_groundTruth, m_learnRate, m_steps);
 	End();
 }
 

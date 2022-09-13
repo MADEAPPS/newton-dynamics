@@ -36,7 +36,7 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	virtual void UpdateWeights(ndReal learnRate);
 	virtual void MakePrediction(const ndDeepBrainVector& input);
 	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
-	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	virtual void Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	protected:
 	void ClearGradientsAcc();
@@ -61,6 +61,8 @@ inline ndReal ndDeepBrainTrainer::GetRegularizer() const
 {
 	return m_regularizer;
 }
+
+
 
 #endif 
 

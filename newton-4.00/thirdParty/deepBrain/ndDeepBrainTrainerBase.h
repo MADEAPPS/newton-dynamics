@@ -29,14 +29,34 @@
 class ndDeepBrainTrainerBase: public ndClassAlloc
 {
 	public: 
+	class ndValidation
+	{
+		public:
+		ndValidation(ndDeepBrainTrainerBase& trainer)
+			:m_trainer(trainer)
+		{
+		}
+
+		virtual ~ndValidation()
+		{
+		}
+
+		virtual ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth);
+
+		ndDeepBrainTrainerBase& m_trainer;
+		ndDeepBrainVector m_output;
+	};
+
+
 	ndDeepBrainTrainerBase(ndDeepBrain* const brain);
 	ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src);
 	virtual ~ndDeepBrainTrainerBase();
 
 	ndDeepBrain* GetBrain() const;
+	ndDeepBrainInstance& GetInstance();
+	const ndDeepBrainInstance& GetInstance() const;
 	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
-	ndFloat32 CalculateMeanSquareError(const ndDeepBrainVector& groundTruth) const;
-	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
+	virtual void Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:
 	ndDeepBrainInstance m_instance;
@@ -45,9 +65,19 @@ class ndDeepBrainTrainerBase: public ndClassAlloc
 	friend class ndDeepBrainInstance;
 };
 
+inline ndDeepBrainInstance& ndDeepBrainTrainerBase::GetInstance()
+{
+	return m_instance;
+}
+
+inline const ndDeepBrainInstance& ndDeepBrainTrainerBase::GetInstance() const
+{
+	return m_instance;
+}
+
 inline ndDeepBrain* ndDeepBrainTrainerBase::GetBrain() const
 {
-	return m_instance.GetBrain();
+	return GetInstance().GetBrain();
 }
 #endif 
 
