@@ -191,16 +191,18 @@ class ndFloatExceptions
 	public:
 	//#define D_FLOAT_EXECTIONS_MASK	0
 	//#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-	#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL)
+	#if defined (WIN32) || defined(_WIN32)
+		#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL)
+	#else
+		#define D_FLOAT_EXECTIONS_MASK	(FE_INVALID | FE_DENORMAL)
+	#endif
 
 	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
 	D_CORE_API ~ndFloatExceptions();
 
 	private:
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	ndUnsigned32 m_x86Mask;
 	ndUnsigned32 m_sseMask;
-	#endif
 };
 
 /// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
@@ -209,9 +211,8 @@ class ndSetPrecisionDouble
 	public:
 	D_CORE_API ndSetPrecisionDouble();
 	D_CORE_API ~ndSetPrecisionDouble();
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	
 	ndInt32 m_mask; 
-	#endif
 };
 
 #endif

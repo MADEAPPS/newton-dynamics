@@ -76,9 +76,14 @@ void ndSpinLock::Delay(ndInt32& exp)
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
-	ndClearFP();
-	m_x86Mask = ndControlFP(0, 0);
-	ndControlFP(m_x86Mask & ~mask, _MCW_EM);
+	#if defined (WIN32) || defined(_WIN32)
+		ndClearFP();
+		m_x86Mask = ndControlFP(0, 0);
+		ndControlFP(m_x86Mask & ~mask, _MCW_EM);
+	#else
+		fegetexceptflag(&m_x86Mask)
+		feenableexcept(mask);
+	#endif
 
 	#if defined (__APPLE__)
 		// Sets DAZ and FTZ, clobbering other CSR settings.
@@ -110,14 +115,19 @@ ndFloatExceptions::~ndFloatExceptions()
 {
 	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 		_mm_setcsr(m_sseMask);
+	#endif
+
+	#if defined (WIN32) || defined(_WIN32)
 		ndClearFP();
 		ndControlFP(m_x86Mask, _MCW_EM);
+	#else
+		feenableexcept(m_x86Mask);
 	#endif
 }
 
 ndSetPrecisionDouble::ndSetPrecisionDouble()
 {
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	#if defined (WIN32) || defined(_WIN32)
 		ndClearFP();
 		m_mask = ndInt32(ndControlFP(0, 0));
 		ndControlFP(_PC_53, _MCW_PC);
@@ -126,7 +136,7 @@ ndSetPrecisionDouble::ndSetPrecisionDouble()
 
 ndSetPrecisionDouble::~ndSetPrecisionDouble()
 {
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	#if defined (WIN32) || defined(_WIN32)
 		ndClearFP();
 		ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
 	#endif
