@@ -276,7 +276,7 @@ void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 	ndReal weight = 1.0f / batchSize;
 	m_biasGradientsAcc.ScaleSet(m_biasGradientsAcc, weight);
 	m_weightGradients.ScaleSet(m_weightGradients, weight);
-	if (1)
+	if (0)
 	{
 		// apply adam optimizer
 		ApplyAdamCorrection();
