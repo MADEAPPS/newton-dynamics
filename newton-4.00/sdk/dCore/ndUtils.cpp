@@ -81,8 +81,10 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 		m_x86Mask = ndControlFP(0, 0);
 		ndControlFP(m_x86Mask & ~mask, _MCW_EM);
 	#else
-		fegetexceptflag(&m_x86Mask)
-		feenableexcept(mask);
+		short unsigned int oldMask;
+		fegetexceptflag(&oldMask)
+		m_x86Mask = mask;
+		feenableexcept(short unsigned int (mask));
 	#endif
 
 	#if defined (__APPLE__)
@@ -121,7 +123,7 @@ ndFloatExceptions::~ndFloatExceptions()
 		ndClearFP();
 		ndControlFP(m_x86Mask, _MCW_EM);
 	#else
-		feenableexcept(m_x86Mask);
+		feenableexcept(short unsigned int (m_x86Mask));
 	#endif
 }
 
