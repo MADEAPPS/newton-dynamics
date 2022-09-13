@@ -31,10 +31,19 @@ ndDeepBrainTrainer::ndDeepBrainTrainer(ndDeepBrain* const brain, ndReal regulari
 	,m_biasGradients()
 	,m_weightGradients()
 	,m_biasGradientsAcc()
+	,m_biasGradient_u()
+	,m_biasGradient_v()
+	,m_weightGradient_u()
+	,m_weightGradient_v()
 	,m_weightGradientsPrefixScan()
 	,m_weightsLayersTranspose()
 	,m_regularizer(regularizer)
 	,m_bestCost(1.0e10f)
+	,m_alpha(0.9f)
+	,m_beta(0.999f)
+	,m_epsilon(1.0e-8f)
+	,m_alphaAcc(m_alpha)
+	,m_betaAcc(m_beta)
 {
 	ndAssert(regularizer >= 0.0f);
 	PrefixScan();
@@ -55,9 +64,18 @@ ndDeepBrainTrainer::ndDeepBrainTrainer(const ndDeepBrainTrainer& src)
 	,m_biasGradients(src.m_biasGradients)
 	,m_weightGradients(src.m_weightGradients)
 	,m_biasGradientsAcc(src.m_biasGradientsAcc)
+	,m_biasGradient_u(src.m_biasGradient_u)
+	,m_biasGradient_v(src.m_biasGradient_v)
+	,m_weightGradient_u(src.m_weightGradient_u)
+	,m_weightGradient_v(src.m_weightGradient_v)
 	,m_weightGradientsPrefixScan(src.m_weightGradientsPrefixScan)
 	,m_weightsLayersTranspose()
 	,m_regularizer(src.m_regularizer)
+	,m_alpha(src.m_alpha)
+	,m_beta(src.m_beta)
+	,m_epsilon(src.m_epsilon)
+	,m_alphaAcc(src.m_alphaAcc)
+	,m_betaAcc(src.m_betaAcc)
 {
 	for (ndInt32 i = 0; i < src.m_weightsLayersTranspose.GetCount(); i++)
 	{
@@ -83,10 +101,14 @@ void ndDeepBrainTrainer::PrefixScan()
 	m_zDerivative.SetCount(instance_z.GetCount());
 	m_biasGradients.SetCount(instance_z.GetCount());
 	m_biasGradientsAcc.SetCount(instance_z.GetCount());
+	m_biasGradient_u.SetCount(instance_z.GetCount());;
+	m_biasGradient_v.SetCount(instance_z.GetCount());;
 
 	m_zDerivative.Set(0.0f);
 	m_biasGradients.Set(0.0f);
 	m_biasGradientsAcc.Set(0.0f);
+	m_biasGradient_u.Set(0.0f);
+	m_biasGradient_v.Set(0.0f);
 	m_output.SetCount(layers[layers.GetCount() - 1]->GetOuputSize());
 
 	m_weightGradientsPrefixScan.SetCount(layers.GetCount());
@@ -105,7 +127,12 @@ void ndDeepBrainTrainer::PrefixScan()
 		sum += count;
 	}
 	m_weightGradients.SetCount(sum);
+	m_weightGradient_u.SetCount(sum);
+	m_weightGradient_v.SetCount(sum);
+
 	m_weightGradients.Set(0.0f);
+	m_weightGradient_u.Set(0.0f);
+	m_weightGradient_v.Set(0.0f);
 }
 
 void ndDeepBrainTrainer::MakePrediction(const ndDeepBrainVector& input)
@@ -200,11 +227,61 @@ void ndDeepBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	}
 }
 
+void ndDeepBrainTrainer::ApplyAdamCorrection()
+{
+	ndReal beta0 = m_beta;
+	ndReal alpha0 = m_alpha;
+
+	ndReal beta1 = 1.0f - m_beta;
+	ndReal alpha1 = 1.0f - m_alpha;
+
+	for (ndInt32 i = 0; i < m_biasGradientsAcc.GetCount(); ++i)
+	{
+		m_biasGradient_u[i] = m_biasGradient_u[i] * alpha0 + m_biasGradientsAcc[i] * alpha1;
+		m_biasGradient_v[i] = m_biasGradient_v[i] * beta0 + m_biasGradientsAcc[i] * m_biasGradientsAcc[i] * beta1;
+	}
+
+	for (ndInt32 i = 0; i < m_weightGradients.GetCount(); ++i)
+	{
+		m_weightGradient_u[i] = m_weightGradient_u[i] * alpha0 + m_weightGradients[i] * alpha1;
+		m_weightGradient_v[i] = m_weightGradient_v[i] * beta0 + m_weightGradients[i] * m_weightGradients[i] * beta1;
+	}
+
+	m_betaAcc = m_betaAcc * m_beta;
+	m_alphaAcc = m_alphaAcc * m_alpha;
+
+	ndReal epsilon2 = m_epsilon * m_epsilon;
+	ndReal alphaWeight = 1.0f / (1.0f - m_alphaAcc);
+	ndReal betaWeight = 1.0f / (1.0f - m_betaAcc);
+
+	for (ndInt32 i = 0; i < m_biasGradientsAcc.GetCount(); ++i)
+	{
+		ndReal bias_uHot = m_biasGradient_u[i] * alphaWeight;
+		ndReal bias_vHot = m_biasGradient_v[i] * betaWeight;
+
+		ndReal weight_uHot = m_weightGradient_u[i] * alphaWeight;
+		ndReal weight_vHot = m_weightGradient_v[i] * betaWeight;
+
+		ndReal bias_den = 1.0f / ndSqrt(bias_vHot + epsilon2);
+		ndReal weight_den = 1.0f / ndSqrt(weight_vHot + epsilon2);
+		m_biasGradientsAcc[i] = bias_uHot * bias_den;
+		m_weightGradients[i] = weight_uHot * weight_den;
+	}
+}
+
 void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 {
 	ndReal regularizer = GetRegularizer();
 
-	learnRate = learnRate / batchSize;
+	ndReal weight = 1.0f / batchSize;
+	m_biasGradientsAcc.ScaleSet(m_biasGradientsAcc, weight);
+	m_weightGradients.ScaleSet(m_weightGradients, weight);
+	if (1)
+	{
+		// apply adam optimizer
+		ApplyAdamCorrection();
+	}
+
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
@@ -215,7 +292,6 @@ void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 	
 		ndDeepBrainVector& bias = layer->GetBias();
 		const ndDeepBrainMemVector biasGradients(&m_biasGradientsAcc[preFixScan[i + 1]], outputSize);
-		//bias.ScaleAdd(biasGradients, -regularizer);
 		bias.ScaleAdd(bias, -regularizer);
 		bias.ScaleAdd(biasGradients, -learnRate);
 	

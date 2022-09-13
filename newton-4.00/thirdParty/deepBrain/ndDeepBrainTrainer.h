@@ -46,15 +46,26 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
 	virtual void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
 
+	void ApplyAdamCorrection();
+
 	ndDeepBrainVector m_output;
 	ndDeepBrainVector m_zDerivative;
 	ndDeepBrainVector m_biasGradients;
 	ndDeepBrainVector m_weightGradients;
 	ndDeepBrainVector m_biasGradientsAcc;
+	ndDeepBrainVector m_biasGradient_u;
+	ndDeepBrainVector m_biasGradient_v;
+	ndDeepBrainVector m_weightGradient_u;
+	ndDeepBrainVector m_weightGradient_v;
 	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
 	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
 	ndReal m_regularizer;
 	ndReal m_bestCost;
+	ndReal m_alpha;
+	ndReal m_beta;
+	ndReal m_epsilon;
+	ndReal m_alphaAcc;
+	ndReal m_betaAcc;
 };
 
 inline ndReal ndDeepBrainTrainer::GetRegularizer() const
