@@ -84,13 +84,14 @@
 #endif
 
 #if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
-  // CMake defines NDEBUG for _not_ debug builds. Therefore, set
-  // Newton's _DEBUG flag only when NDEBUG is not defined.
+	//CMake defines NDEBUG for _not_ debug builds. Therefore, set
+	//Newton's _DEBUG flag only when NDEBUG is not defined.
 
-  #ifndef NDEBUG
-    #define _DEBUG 1
-  #endif
+	#ifndef NDEBUG
+	#define _DEBUG 1
+	#endif
 
+	#include <fenv.h>
 	#include <unistd.h>
 	#include <assert.h>
 	// it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
