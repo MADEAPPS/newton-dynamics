@@ -120,7 +120,7 @@ ndBodyDynamic* BuildFloorBox(ndWorld& world)
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
 
 	body->SetNotifyCallback(new ndDemoEntityNotify);
@@ -132,7 +132,7 @@ ndBodyDynamic* BuildFloorBox(ndWorld& world)
 
 ndBodyDynamic* BuildSphere(ndWorld& world, ndFloat32 mass, const ndVector& origin, const ndFloat32 diameter, ndFloat32 offsetHigh)
 {
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
