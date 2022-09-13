@@ -17,23 +17,17 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndDeepBrain brain;
 	ndSetRandSeed(12345);
 
-	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 2, m_relu);
-	ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
-	ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), 6, m_relu);
-	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), 2, m_sigmoid);
+	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 16, m_relu);
+	//ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
+	ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 6, m_relu);
+	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
 
 	brain.BeginAddLayer();
 	brain.AddLayer(inputLayer);
-	brain.AddLayer(hiddenLayer0);
-	brain.AddLayer(hiddenLayer1);
+	brain.AddLayer(hiddenLayer);
 	brain.AddLayer(ouputLayer);
 	brain.EndAddLayer();
 	brain.InitGaussianWeights(0.0f, 0.25f);
-
-	//brain.Save("xxx.nn");
-	//ndDeepBrain brain1;
-	//brain1.Load("xxx.nn");
-	//ndAssert(brain1.Compare(brain));
 
 	ndInt32 samples = 2000;
 	ndDeepBrainMatrix inputBatch(samples, 2);
@@ -43,8 +37,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		inputBatch[i][0] = ndGaussianRandom(0.5f, 0.25f);
 		inputBatch[i][1] = ndGaussianRandom(0.5f, 0.25f);
 	
-		groundTruth[i][0] = ((inputBatch[i][0] > 0.5f) && (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
-		groundTruth[i][1] = ((inputBatch[i][0] > 0.5f) || (inputBatch[i][1] > 0.5f)) ? 1.0f : 0.0f;
+		groundTruth[i][0] = ((inputBatch[i][0] >= 0.5f) && (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
+		groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
 	}
 
 	class Validator : public ndDeepBrainTrainer::ndValidation
@@ -71,7 +65,12 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-2f, 5000);
 	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 5000);
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-3f, 100000);
-	
+
+	brain.Save("xxx.nn");
+	//ndDeepBrain brain1;
+	//brain1.Load("xxx.nn");
+	//ndAssert(brain1.Compare(brain));
+
 	ndDeepBrainVector truth;
 	ndDeepBrainVector input;
 	ndDeepBrainVector output;
@@ -87,8 +86,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	{
 		input[0] = ndGaussianRandom(0.5f, 0.25f);
 		input[1] = ndGaussianRandom(0.5f, 0.25f);
-		truth[0] = ((input[0] > 0.5f) && (input[1] > 0.5f)) ? 1.0f : 0.0f;
-		truth[1] = ((input[0] > 0.5f) || (input[1] > 0.5f)) ? 1.0f : 0.0f;
+		truth[0] = ((input[0] >= 0.5f) && (input[1] >= 0.5f)) ? 1.0f : 0.0f;
+		truth[1] = ((input[0] >= 0.5f) || (input[1] >= 0.5f)) ? 1.0f : 0.0f;
 	
 		instance.MakePrediction(input, output);
 

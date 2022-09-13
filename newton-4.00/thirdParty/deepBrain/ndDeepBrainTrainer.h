@@ -33,7 +33,7 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	virtual ~ndDeepBrainTrainer();
 
 	ndReal GetRegularizer() const;
-	virtual void UpdateWeights(ndReal learnRate);
+	virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	virtual void MakePrediction(const ndDeepBrainVector& input);
 	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
 	virtual void Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);

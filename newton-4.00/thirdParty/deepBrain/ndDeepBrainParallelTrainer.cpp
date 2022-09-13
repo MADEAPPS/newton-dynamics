@@ -153,8 +153,8 @@ void ndDeepBrainParallelTrainer::Optimize()
 				const ndDeepBrainVector& truth = (*m_groundTruth)[k];
 				optimizer.MakePrediction(input);
 				optimizer.BackPropagate(truth);
-				optimizer.UpdateWeights(m_learnRate);
 				ndAssert(0);
+				//optimizer.UpdateWeights(m_learnRate, 1);
 				//optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
 			}
 		});

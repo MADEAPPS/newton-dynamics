@@ -200,9 +200,11 @@ void ndDeepBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	}
 }
 
-void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate)
+void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 {
 	ndReal regularizer = GetRegularizer();
+
+	learnRate = learnRate / batchSize;
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
@@ -211,10 +213,11 @@ void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate)
 		const ndInt32 outputSize = layer->GetOuputSize();
 		const ndDeepBrainPrefixScan& preFixScan = m_instance.GetPrefixScan();
 	
-		//const ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[i + 1]], outputSize);
+		ndDeepBrainVector& bias = layer->GetBias();
 		const ndDeepBrainMemVector biasGradients(&m_biasGradientsAcc[preFixScan[i + 1]], outputSize);
-		layer->GetBias().ScaleAdd(biasGradients, -regularizer);
-		layer->GetBias().ScaleAdd(biasGradients, -learnRate);
+		//bias.ScaleAdd(biasGradients, -regularizer);
+		bias.ScaleAdd(bias, -regularizer);
+		bias.ScaleAdd(biasGradients, -learnRate);
 	
 		const ndInt32 weightGradientStride = (inputSize + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[i]];
@@ -278,14 +281,13 @@ void ndDeepBrainTrainer::Optimize(ndValidation& validator, const ndDeepBrainMatr
 	const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
 
 	m_bestCost = validator.Validate(inputBatch, groundTruth);
-	ndReal bestCost = m_bestCost;
 	for (ndInt32 i = 0; i < steps; ++i)
 	{
 		for (ndInt32 j = 0; j < batchCount; ++j)
 		{
 			ClearGradientsAcc();
 			const ndInt32 start = j * miniBatchSize;
-			const ndInt32 count = (start + miniBatchSize) < inputBatch.GetCount() ? miniBatchSize : inputBatch.GetCount() - start;
+			const ndInt32 count = ((start + miniBatchSize) < inputBatch.GetCount()) ? miniBatchSize : inputBatch.GetCount() - start;
 			for (ndInt32 k = 0; k < count; ++k)
 			{
 					ndInt32 index = randomizeVector[start + k];
@@ -294,18 +296,17 @@ void ndDeepBrainTrainer::Optimize(ndValidation& validator, const ndDeepBrainMatr
 					MakePrediction(input);
 					BackPropagate(truth);
 			}
-			UpdateWeights(learnRate/count);
+			UpdateWeights(learnRate, count);
 		}
 		ApplyWeightTranspose();
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 		
-		ndReal averageError = validator.Validate(inputBatch, groundTruth);
-		if (averageError < bestCost)
+		ndReal batchError = validator.Validate(inputBatch, groundTruth);
+		if (batchError < m_bestCost)
 		{
-			bestCost = averageError;
+			m_bestCost = batchError;
 			bestNetwork.CopyFrom(*m_instance.GetBrain());
 		}
 	}
-	m_bestCost = bestCost;
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
