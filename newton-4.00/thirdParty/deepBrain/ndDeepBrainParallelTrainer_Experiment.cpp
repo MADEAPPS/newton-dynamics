@@ -24,8 +24,8 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainParallelTrainer_Experiment.h"
 
-ndDeepBrainParallelTrainer_Experiment::ndDeepBrainParallelTrainer_Experiment(ndDeepBrain* const brain, ndReal regularizer, ndInt32 threads)
-	:ndDeepBrainTrainer(brain, regularizer)
+ndDeepBrainParallelTrainer_Experiment::ndDeepBrainParallelTrainer_Experiment(ndDeepBrain* const brain, ndInt32 threads)
+	:ndDeepBrainTrainer(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)

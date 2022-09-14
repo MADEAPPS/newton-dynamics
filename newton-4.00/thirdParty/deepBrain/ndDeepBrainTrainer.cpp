@@ -24,7 +24,7 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainTrainer.h"
 
-ndDeepBrainTrainer::ndDeepBrainTrainer(ndDeepBrain* const brain, ndReal regularizer)
+ndDeepBrainTrainer::ndDeepBrainTrainer(ndDeepBrain* const brain)
 	:ndDeepBrainTrainerBase(brain)
 	,m_output()
 	,m_zDerivative()
@@ -37,7 +37,7 @@ ndDeepBrainTrainer::ndDeepBrainTrainer(ndDeepBrain* const brain, ndReal regulari
 	,m_weightGradient_v()
 	,m_weightGradientsPrefixScan()
 	,m_weightsLayersTranspose()
-	,m_regularizer(regularizer)
+	,m_regularizer(1.0e-6f)
 	,m_bestCost(1.0e10f)
 	,m_alpha(0.9f)
 	,m_beta(0.999f)
@@ -45,7 +45,7 @@ ndDeepBrainTrainer::ndDeepBrainTrainer(ndDeepBrain* const brain, ndReal regulari
 	,m_alphaAcc(m_alpha)
 	,m_betaAcc(m_beta)
 {
-	ndAssert(regularizer >= 0.0f);
+	ndAssert(m_regularizer >= 0.0f);
 	PrefixScan();
 
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());

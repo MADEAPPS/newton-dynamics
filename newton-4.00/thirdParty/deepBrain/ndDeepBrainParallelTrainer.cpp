@@ -26,7 +26,7 @@
 
 ndDeepBrainParallelTrainer::LocalData::LocalData(const ndDeepBrainTrainer& src)
 	:ndDeepBrain(*src.GetBrain())
-	,ndDeepBrainTrainer((ndDeepBrain*)this, src.GetRegularizer())
+	,ndDeepBrainTrainer((ndDeepBrain*)this)
 	,m_averageError(0.0f)
 {
 }
@@ -41,11 +41,12 @@ void ndDeepBrainParallelTrainer::LocalData::CopyTranspose(const ndArray<ndDeepBr
 	}
 }
 
-ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndReal regularizer, ndInt32 threads)
-	:ndDeepBrainTrainer(brain, regularizer)
+ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndInt32 threads)
+	:ndDeepBrainTrainer(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)
+	,m_validator(nullptr)
 	,m_learnRate(0.0f)
 	,m_steps(0)
 {
@@ -75,12 +76,13 @@ void ndDeepBrainParallelTrainer::ThreadFunction()
 	End();
 }
 
-void ndDeepBrainParallelTrainer::Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndDeepBrainParallelTrainer::Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	m_steps = steps;
 	m_learnRate = learnRate;
 	m_inputBatch = &inputBatch;
 	m_groundTruth = &groundTruth;
+	m_validator = &validator;
 	TickOne();
 	Sync();
 }

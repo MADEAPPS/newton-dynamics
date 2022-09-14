@@ -28,11 +28,12 @@
 class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 {
 	public: 
-	ndDeepBrainTrainer(ndDeepBrain* const brain, ndReal regularizer = 0.0f);
+	ndDeepBrainTrainer(ndDeepBrain* const brain);
 	ndDeepBrainTrainer(const ndDeepBrainTrainer& src);
 	virtual ~ndDeepBrainTrainer();
 
 	ndReal GetRegularizer() const;
+	void SetRegularizer(ndReal regularizer);
 	virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
 	virtual void MakePrediction(const ndDeepBrainVector& input);
 	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
@@ -73,7 +74,10 @@ inline ndReal ndDeepBrainTrainer::GetRegularizer() const
 	return m_regularizer;
 }
 
-
+inline void ndDeepBrainTrainer::SetRegularizer(ndReal regularizer)
+{
+	m_regularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
+}
 
 #endif 
 

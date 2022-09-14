@@ -37,10 +37,10 @@ class ndDeepBrainParallelTrainer: public ndDeepBrainTrainer, public ndThreadPool
 		void CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src);
 	};
 
-	ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndReal regularizer = 0.0f, ndInt32 threads = 1);
+	ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndInt32 threads = 1);
 	~ndDeepBrainParallelTrainer();
 
-	virtual void Optimize(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	virtual void Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	private:
 	void Optimize();
@@ -52,6 +52,7 @@ class ndDeepBrainParallelTrainer: public ndDeepBrainTrainer, public ndThreadPool
 
 	const ndDeepBrainMatrix* m_inputBatch;
 	const ndDeepBrainMatrix* m_groundTruth;
+	ndValidation* m_validator;
 	ndReal m_learnRate;
 	ndInt32 m_steps;
 };
