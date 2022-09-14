@@ -63,7 +63,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 
 	trainer.SetMiniBatchSize(16);
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-2f, 5000);
-	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 5000);
+	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
 	//trainer.Optimize(inputBatch, groundTruth, 0.0e-3f, 100000);
 
 	brain.Save("xxx.nn");

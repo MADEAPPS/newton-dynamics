@@ -29,6 +29,7 @@ ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(ndDeepBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
 	,m_miniBatchSize(1)
+	,m_model(m_adam)
 {
 }
 
@@ -36,6 +37,7 @@ ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src
 	:ndClassAlloc()
 	,m_instance(src.m_instance)
 	,m_miniBatchSize(src.m_miniBatchSize)
+	,m_model(src.m_model)
 {
 }
 

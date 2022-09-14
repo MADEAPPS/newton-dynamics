@@ -29,6 +29,12 @@
 class ndDeepBrainTrainerBase: public ndClassAlloc
 {
 	public: 
+	enum ndSolveModel
+	{
+		m_cgd,
+		m_adam,
+	};
+
 	class ndValidation
 	{
 		public:
@@ -52,6 +58,9 @@ class ndDeepBrainTrainerBase: public ndClassAlloc
 	ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src);
 	virtual ~ndDeepBrainTrainerBase();
 
+	ndSolveModel GetModel() const;
+	void SetModel(ndSolveModel model);
+
 	ndDeepBrain* GetBrain() const;
 	ndDeepBrainInstance& GetInstance();
 	const ndDeepBrainInstance& GetInstance() const;
@@ -61,9 +70,20 @@ class ndDeepBrainTrainerBase: public ndClassAlloc
 	protected:
 	ndDeepBrainInstance m_instance;
 	ndInt32 m_miniBatchSize;
+	ndSolveModel m_model;
 
 	friend class ndDeepBrainInstance;
 };
+
+inline ndDeepBrainTrainerBase::ndSolveModel ndDeepBrainTrainerBase::GetModel() const
+{
+	return m_model;
+}
+
+inline void ndDeepBrainTrainerBase::SetModel(ndSolveModel model)
+{
+	m_model = model;
+}
 
 inline ndDeepBrainInstance& ndDeepBrainTrainerBase::GetInstance()
 {

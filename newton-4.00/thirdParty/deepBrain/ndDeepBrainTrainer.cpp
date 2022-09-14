@@ -276,7 +276,7 @@ void ndDeepBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 	ndReal weight = 1.0f / batchSize;
 	m_biasGradientsAcc.ScaleSet(m_biasGradientsAcc, weight);
 	m_weightGradients.ScaleSet(m_weightGradients, weight);
-	if (0)
+	if (m_model == m_adam)
 	{
 		// apply adam optimizer
 		ApplyAdamCorrection();
@@ -357,7 +357,7 @@ void ndDeepBrainTrainer::Optimize(ndValidation& validator, const ndDeepBrainMatr
 	const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
 
 	m_bestCost = validator.Validate(inputBatch, groundTruth);
-	for (ndInt32 i = 0; i < steps; ++i)
+	for (ndInt32 i = 0; (i < steps) && (m_bestCost > 0.0f); ++i)
 	{
 		for (ndInt32 j = 0; j < batchCount; ++j)
 		{
