@@ -24,22 +24,22 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainParallelTrainer.h"
 
-ndDeepBrainParallelTrainer::LocalData::LocalData(const ndDeepBrainTrainer& src)
-	:ndDeepBrain(*src.GetBrain())
-	,ndDeepBrainTrainer((ndDeepBrain*)this)
-	,m_averageError(0.0f)
-{
-}
+//ndDeepBrainParallelTrainer::LocalData::LocalData(const ndDeepBrainTrainer& src)
+//	//:ndDeepBrain(*src.GetBrain())
+//	:ndDeepBrainTrainer((ndDeepBrain*)this)
+//	//,m_averageError(0.0f)
+//{
+//}
 
-void ndDeepBrainParallelTrainer::LocalData::CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src)
-{
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-	for (ndInt32 i = layers.GetCount() - 1; i >= 1; --i)
-	{
-		ndDeepBrainMatrix& transposeMatrix = *m_weightsLayersTranspose[i];
-		transposeMatrix.Set(*src[i]);
-	}
-}
+//void ndDeepBrainParallelTrainer::LocalData::CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src)
+//{
+//	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+//	for (ndInt32 i = layers.GetCount() - 1; i >= 1; --i)
+//	{
+//		ndDeepBrainMatrix& transposeMatrix = *m_weightsLayersTranspose[i];
+//		transposeMatrix.Set(*src[i]);
+//	}
+//}
 
 ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndInt32 threads)
 	:ndDeepBrainTrainer(brain)
@@ -55,8 +55,8 @@ ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain,
 
 	for (ndInt32 i = 0; i < threads; i++)
 	{
-		ndAssert(0);
-//		m_threadData.PushBack(new LocalData(*this));
+		//m_threadData.PushBack(new LocalData(*this));
+		m_threadData.PushBack(new ndDeepBrainTrainer(*this));
 	}
 }
 
@@ -120,6 +120,7 @@ void ndDeepBrainParallelTrainer::AverageWeights()
 
 void ndDeepBrainParallelTrainer::Optimize()
 {
+/*
 	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
 	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
 	
@@ -144,55 +145,108 @@ void ndDeepBrainParallelTrainer::Optimize()
 	
 		auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 		{
-			LocalData& optimizer = *m_threadData[threadIndex];
-			optimizer.m_averageError = 0.0f;
-	
-			const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndInt32 k = randomizeVector[batchStart + i];
-				const ndDeepBrainVector& input = (*m_inputBatch)[k];
-				const ndDeepBrainVector& truth = (*m_groundTruth)[k];
-				optimizer.MakePrediction(input);
-				optimizer.BackPropagate(truth);
-				ndAssert(0);
-				//optimizer.UpdateWeights(m_learnRate, 1);
-				//optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
-			}
+			ndAssert(0);
+			//LocalData& optimizer = *m_threadData[threadIndex];
+			//optimizer.m_averageError = 0.0f;
+			//
+			//const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
+			//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			//{
+			//	ndInt32 k = randomizeVector[batchStart + i];
+			//	const ndDeepBrainVector& input = (*m_inputBatch)[k];
+			//	const ndDeepBrainVector& truth = (*m_groundTruth)[k];
+			//	optimizer.MakePrediction(input);
+			//	optimizer.BackPropagate(truth);
+			//	//optimizer.UpdateWeights(m_learnRate, 1);
+			//	//optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
+			//}
 		});
 		ParallelExecute(CalculateGradients);
 	
-		AverageWeights();
-		ApplyWeightTranspose();
-	
-		ndReal averageError = 0.0f;
-		for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
-		{
-			averageError += m_threadData[j]->m_averageError;
-			m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
-			m_threadData[j]->CopyTranspose(m_weightsLayersTranspose);
-		}
-	
-		movingAverageIndex += batchSize;
-		movingAverageError += averageError;
-	
-		averageError = ndSqrt(averageError / batchSize);
-		ndExpandTraceMessage("%f %d\n", averageError, i);
-	
-		index = (index + 1) % batchCount;
-		if (index == 0)
-		{
-			randomizeVector.RandomShuffle(randomizeVector.GetCount());
-			movingAverageError = ndSqrt(movingAverageError / movingAverageIndex);
-			if (movingAverageError < bestCost)
-			{
-				bestCost = movingAverageError;
-				bestNetwork.CopyFrom(*m_instance.GetBrain());
-			}
-			movingAverageIndex = 0;
-			movingAverageError = 0.0f;
-		}
+		//AverageWeights();
+		//ApplyWeightTranspose();
+		//
+		//ndReal averageError = 0.0f;
+		//for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
+		//{
+		//	averageError += m_threadData[j]->m_averageError;
+		//	m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
+		//	m_threadData[j]->CopyTranspose(m_weightsLayersTranspose);
+		//}
+		//
+		//movingAverageIndex += batchSize;
+		//movingAverageError += averageError;
+		//
+		//averageError = ndSqrt(averageError / batchSize);
+		//ndExpandTraceMessage("%f %d\n", averageError, i);
+		//
+		//index = (index + 1) % batchCount;
+		//if (index == 0)
+		//{
+		//	randomizeVector.RandomShuffle(randomizeVector.GetCount());
+		//	movingAverageError = ndSqrt(movingAverageError / movingAverageIndex);
+		//	if (movingAverageError < bestCost)
+		//	{
+		//		bestCost = movingAverageError;
+		//		bestNetwork.CopyFrom(*m_instance.GetBrain());
+		//	}
+		//	movingAverageIndex = 0;
+		//	movingAverageError = 0.0f;
+		//}
 	}
 	
+	m_instance.GetBrain()->CopyFrom(bestNetwork);
+*/
+
+	ndFloatExceptions exception;
+
+	ndValidation& validator = *m_validator;
+	const ndDeepBrainMatrix& inputBatch = *m_inputBatch;
+	const ndDeepBrainMatrix& groundTruth = *m_groundTruth;
+
+	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
+	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
+
+	ndDeepBrain bestNetwork(*m_instance.GetBrain());
+	ndArray<ndInt32> randomizeVector;
+	randomizeVector.SetCount(inputBatch.GetCount());
+	for (ndInt32 i = 0; i < inputBatch.GetCount(); ++i)
+	{
+		randomizeVector[i] = i;
+	}
+
+	const ndInt32 miniBatchSize = ndMin(m_miniBatchSize, inputBatch.GetCount());
+	const ndInt32 batchCount = (inputBatch.GetCount() + miniBatchSize - 1) / miniBatchSize;
+
+	m_bestCost = validator.Validate(inputBatch, groundTruth);
+	for (ndInt32 i = 0; (i < m_steps) && (m_bestCost > 0.0f); ++i)
+	{
+		for (ndInt32 j = 0; j < batchCount; ++j)
+		{
+			const ndInt32 start = j * miniBatchSize;
+			const ndInt32 count = ((start + miniBatchSize) < inputBatch.GetCount()) ? miniBatchSize : inputBatch.GetCount() - start;
+
+			ClearGradientsAcc();
+			for (ndInt32 k = 0; k < count; ++k)
+			{
+				ndInt32 index = randomizeVector[start + k];
+				const ndDeepBrainVector& input = inputBatch[index];
+				const ndDeepBrainVector& truth = groundTruth[index];
+				MakePrediction(input);
+				BackPropagate(truth);
+			}
+
+			UpdateWeights(m_learnRate, count);
+		}
+		ApplyWeightTranspose();
+		randomizeVector.RandomShuffle(randomizeVector.GetCount());
+
+		ndReal batchError = validator.Validate(inputBatch, groundTruth);
+		if (batchError < m_bestCost)
+		{
+			m_bestCost = batchError;
+			bestNetwork.CopyFrom(*m_instance.GetBrain());
+		}
+	}
 	m_instance.GetBrain()->CopyFrom(bestNetwork);
 }
