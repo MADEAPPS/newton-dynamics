@@ -50,21 +50,23 @@ void ndDeepBrainTrainerBase::SetMiniBatchSize(ndInt32 miniBatchSize)
 	m_miniBatchSize = miniBatchSize;
 }
 
-ndReal ndDeepBrainTrainerBase::ndValidation::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
+ndReal ndDeepBrainTrainerBase::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndDeepBrainVector& output)
 {
 	ndReal error2 = 0;
-	ndDeepBrainInstance& instance = m_trainer.GetInstance();
 	for (ndInt32 i = inputBatch.GetCount() - 1; i >= 0; --i)
 	{
 		const ndDeepBrainVector& input = inputBatch[i];
 		const ndDeepBrainVector& truth = groundTruth[i];
-		instance.MakePrediction(input, m_output);
-		for (ndInt32 j = m_output.GetCount() - 1; j >= 0; --j)
-		{
-			ndFloat32 dist = m_output[j] - truth[j];
-			error2 += dist * dist;
-		}
+		m_instance.MakePrediction(input, output);
+
+		output.Sub(output, truth);
+		error2 += output.Dot(output);
 	}
-	ndReal error = ndSqrt (error2 / inputBatch.GetCount());
+	ndReal error = ndSqrt(error2 / inputBatch.GetCount());
 	return error;
+}
+
+ndReal ndDeepBrainTrainerBase::ndValidation::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
+{
+	return m_trainer.Validate(inputBatch, groundTruth, m_output);
 }

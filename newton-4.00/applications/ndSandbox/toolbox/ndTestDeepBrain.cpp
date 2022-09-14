@@ -247,7 +247,7 @@ static void MnistTrainingSet()
 	if (trainingLabels && trainingDigits)
 	{
 		ndDeepBrain brain;
-		ndSetRandSeed(142543);
+		ndSetRandSeed(12345);
 
 		ndInt32 neuronsPerLayers = 64;
 		ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
@@ -265,16 +265,33 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 		brain.InitGaussianWeights(0.0f, 0.25f);
 
-		//ndDeepBrainTrainer trainer(&brain, 1.0e-6f);
-		ndDeepBrainParallelTrainer trainer(&brain, 1.0e-6f, 4);
+		ndDeepBrainTrainer trainer(&brain, 1.0e-6f);
+		//ndDeepBrainParallelTrainer trainer(&brain, 1.0e-6f, 4);
 		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 1.0e-6f, 4);
 
-		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		trainer.SetMiniBatchSize(2000);
-		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 5000);
 
-		trainer.SetMiniBatchSize(20000);
-		trainer.Optimize(*trainingDigits, *trainingLabels, 1.0e-2f, 2000);
+		class Validator : public ndDeepBrainTrainer::ndValidation
+		{
+			public:
+			Validator(ndDeepBrainTrainer& trainer)
+				:ndDeepBrainTrainer::ndValidation(trainer)
+			{
+			}
+
+			ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
+			{
+				ndReal error = ndDeepBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
+				ndExpandTraceMessage("%f\n", error);
+				return error;
+			}
+		};
+
+		Validator validator(trainer);
+
+		ndUnsigned64 time = ndGetTimeInMicroseconds();
+		trainer.SetMiniBatchSize(32);
+		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 2000);
+
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
@@ -326,8 +343,8 @@ static void MnistTestSet()
 
 void ndTestDeedBrian()
 {
-	ThreeLayersTwoInputsTwoOutputs();
+	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }
 

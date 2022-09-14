@@ -65,6 +65,7 @@ class ndDeepBrainTrainerBase: public ndClassAlloc
 	ndDeepBrainInstance& GetInstance();
 	const ndDeepBrainInstance& GetInstance() const;
 	void SetMiniBatchSize(ndInt32 m_miniBatchSize);
+	virtual ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndDeepBrainVector& output);
 	virtual void Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps) = 0;
 
 	protected:
