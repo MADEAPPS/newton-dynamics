@@ -124,6 +124,38 @@ void ndDeepBrainParallelTrainer::AverageWeights()
 	}
 }
 
+ndReal ndDeepBrainParallelTrainer::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndDeepBrainVector&)
+{
+	ndReal subBatchError2[D_MAX_THREADS_COUNT];
+	auto Validate = ndMakeObject::ndFunction([this, &inputBatch, &groundTruth, &subBatchError2](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		ndReal errorAcc = 0.0f;
+		ndDeepBrainTrainer& optimizer = *m_threadData[threadIndex];
+
+		const ndStartEnd startEnd(inputBatch.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			const ndDeepBrainVector& input = inputBatch[i];
+			const ndDeepBrainVector& truth = groundTruth[i];
+			optimizer.m_instance.MakePrediction(input, optimizer.m_output);
+			optimizer.m_output.Sub(optimizer.m_output, truth);
+			errorAcc += optimizer.m_output.Dot(optimizer.m_output);
+		}
+		subBatchError2[threadIndex] = errorAcc;
+	});
+	ParallelExecute(Validate);
+
+	ndReal error2 = 0;
+	for(ndInt32 i = 0; i < GetThreadCount(); ++i)
+	{
+		error2 += subBatchError2[i];
+	}
+
+	ndReal error = ndSqrt(error2 / inputBatch.GetCount());
+	return error;
+}
+
+
 void ndDeepBrainParallelTrainer::Optimize()
 {
 	ndFloatExceptions exception;

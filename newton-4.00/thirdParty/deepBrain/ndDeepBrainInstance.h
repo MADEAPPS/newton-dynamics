@@ -38,8 +38,8 @@ class ndDeepBrainInstance: public ndClassAlloc
 
 	void CalculatePrefixScan();
 	ndDeepBrain* GetBrain() const;
-	ndDeepBrainVector& GetOutPut();
-	const ndDeepBrainVector& GetOutPut() const;
+	ndDeepBrainVector& GetOutput();
+	const ndDeepBrainVector& GetOutput() const;
 	const ndDeepBrainPrefixScan& GetPrefixScan() const;
 
 	void MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output);
@@ -56,12 +56,12 @@ inline ndDeepBrain* ndDeepBrainInstance::GetBrain() const
 	return m_brain;
 }
 
-inline ndDeepBrainVector& ndDeepBrainInstance::GetOutPut()
+inline ndDeepBrainVector& ndDeepBrainInstance::GetOutput()
 {
 	return m_z;
 }
 
-inline const ndDeepBrainVector& ndDeepBrainInstance::GetOutPut() const
+inline const ndDeepBrainVector& ndDeepBrainInstance::GetOutput() const
 {
 	return m_z;
 }

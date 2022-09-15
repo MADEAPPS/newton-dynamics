@@ -97,7 +97,7 @@ void ndDeepBrainTrainer::PrefixScan()
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 	m_instance.CalculatePrefixScan();
 
-	ndDeepBrainVector& instance_z = m_instance.GetOutPut();
+	ndDeepBrainVector& instance_z = m_instance.GetOutput();
 	m_zDerivative.SetCount(instance_z.GetCount());
 	m_biasGradients.SetCount(instance_z.GetCount());
 	m_biasGradientsAcc.SetCount(instance_z.GetCount());
@@ -140,7 +140,7 @@ void ndDeepBrainTrainer::MakePrediction(const ndDeepBrainVector& input)
 	m_instance.MakePrediction(input, m_output);
 	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
 
-	ndDeepBrainVector& instance_z = m_instance.GetOutPut();
+	ndDeepBrainVector& instance_z = m_instance.GetOutput();
 	const ndDeepBrainPrefixScan& preFixScan = m_instance.GetPrefixScan();
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
@@ -159,7 +159,7 @@ void ndDeepBrainTrainer::BackPropagateOutputLayer(const ndDeepBrainVector& groun
 	ndDeepBrainLayer* const ouputLayer = layers[layerIndex];
 	const ndInt32 inputCount = ouputLayer->GetInputSize();
 	const ndInt32 outputCount = ouputLayer->GetOuputSize();
-	const ndDeepBrainVector& instance_z = m_instance.GetOutPut();
+	const ndDeepBrainVector& instance_z = m_instance.GetOutput();
 	const ndDeepBrainPrefixScan& preFixScan = m_instance.GetPrefixScan();
 	ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[layerIndex + 1]], outputCount);
 	ndDeepBrainMemVector biasGradientsAcc(&m_biasGradientsAcc[preFixScan[layerIndex + 1]], outputCount);
@@ -205,7 +205,7 @@ void ndDeepBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	BackPropagateCalculateBiasGradient(layerIndex);
 
 	ndDeepBrainLayer* const layer = layers[layerIndex];
-	const ndDeepBrainVector& instance_z = m_instance.GetOutPut();
+	const ndDeepBrainVector& instance_z = m_instance.GetOutput();
 	const ndDeepBrainPrefixScan& preFixScan = m_instance.GetPrefixScan();
 
 	const ndDeepBrainMemVector biasGradients(&m_biasGradients[preFixScan[layerIndex + 1]], layer->GetOuputSize());

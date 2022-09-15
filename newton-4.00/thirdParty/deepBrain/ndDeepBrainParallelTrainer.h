@@ -37,6 +37,7 @@ class ndDeepBrainParallelTrainer: public ndDeepBrainTrainer, public ndThreadPool
 
 	private:
 	void Optimize();
+	ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndDeepBrainVector& output);
 	virtual void ThreadFunction();
 
 	private:
