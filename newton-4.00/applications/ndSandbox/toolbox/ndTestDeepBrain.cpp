@@ -323,7 +323,7 @@ static void MnistTestSet()
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
-	ThreeLayersTwoInputsTwoOutputs();
+	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	MnistTestSet();
 }

@@ -172,13 +172,11 @@ void ndDeepBrainTrainer::BackPropagateOutputLayer(const ndDeepBrainVector& groun
 
 	const ndInt32 stride = (inputCount + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	ndReal* weightGradientPtr = &m_weightGradients[m_weightGradientsPrefixScan[layerIndex]];
-	//ndReal* weightGradientAccPtr = &m_weightGradientsAcc[m_weightGradientsPrefixScan[layerIndex]];
 	const ndDeepBrainMemVector z0(&instance_z[preFixScan[layerIndex]], inputCount);
 	for (ndInt32 i = 0; i < outputCount; ++i)
 	{
 		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
 		ndFloat32 gValue = biasGradients[i];
-		//weightGradient.ScaleSet(z0, gValue);
 		weightGradient.ScaleAdd(z0, gValue);
 		weightGradientPtr += stride;
 	}
@@ -221,7 +219,6 @@ void ndDeepBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	{
 		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
 		ndFloat32 gValue = biasGradients[i];
-		//weightGradient.ScaleSet(z0, gValue);
 		weightGradient.ScaleAdd(z0, gValue);
 		weightGradientPtr += stride;
 	}

@@ -223,20 +223,37 @@ void ndDeepBrainParallelTrainer::Optimize()
 	{
 		for (ndInt32 j = 0; j < batchCount; ++j)
 		{
-			const ndInt32 start = j * miniBatchSize;
-			const ndInt32 count = ((start + miniBatchSize) < inputBatch.GetCount()) ? miniBatchSize : inputBatch.GetCount() - start;
+			const ndInt32 batchStart = j * miniBatchSize;
+			const ndInt32 batchSize = ((batchStart + miniBatchSize) < inputBatch.GetCount()) ? miniBatchSize : inputBatch.GetCount() - batchStart;
 
-			ClearGradientsAcc();
-			for (ndInt32 k = 0; k < count; ++k)
+			auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				ndInt32 index = randomizeVector[start + k];
-				const ndDeepBrainVector& input = inputBatch[index];
-				const ndDeepBrainVector& truth = groundTruth[index];
-				MakePrediction(input);
-				BackPropagate(truth);
-			}
+				ndDeepBrainTrainer& optimizer = *m_threadData[threadIndex];
 
-			UpdateWeights(m_learnRate, count);
+				optimizer.ClearGradientsAcc();
+				const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
+				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+				{
+					ndInt32 k = randomizeVector[batchStart + i];
+					const ndDeepBrainVector& input = (*m_inputBatch)[k];
+					const ndDeepBrainVector& truth = (*m_groundTruth)[k];
+					optimizer.MakePrediction(input);
+					optimizer.BackPropagate(truth);
+				}
+			});
+			ParallelExecute(CalculateGradients);
+
+			//ClearGradientsAcc();
+			//for (ndInt32 k = 0; k < count; ++k)
+			//{
+			//	ndInt32 index = randomizeVector[start + k];
+			//	const ndDeepBrainVector& input = inputBatch[index];
+			//	const ndDeepBrainVector& truth = groundTruth[index];
+			//	MakePrediction(input);
+			//	BackPropagate(truth);
+			//}
+
+			UpdateWeights(m_learnRate, batchSize);
 		}
 		ApplyWeightTranspose();
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
