@@ -24,22 +24,28 @@
 #include "ndDeepBrainLayer.h"
 #include "ndDeepBrainParallelTrainer.h"
 
-//ndDeepBrainParallelTrainer::LocalData::LocalData(const ndDeepBrainTrainer& src)
-//	//:ndDeepBrain(*src.GetBrain())
-//	:ndDeepBrainTrainer((ndDeepBrain*)this)
-//	//,m_averageError(0.0f)
-//{
-//}
 
-//void ndDeepBrainParallelTrainer::LocalData::CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src)
-//{
-//	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
-//	for (ndInt32 i = layers.GetCount() - 1; i >= 1; --i)
-//	{
-//		ndDeepBrainMatrix& transposeMatrix = *m_weightsLayersTranspose[i];
-//		transposeMatrix.Set(*src[i]);
-//	}
-//}
+class ndDeepBrainTrainerChannel : public ndDeepBrainTrainer
+{	
+	public:
+	ndDeepBrainTrainerChannel(const ndDeepBrainParallelTrainer& src)
+		:ndDeepBrainTrainer(src)
+	{
+		for (ndInt32 i = 0; i < m_weightsLayersTranspose.GetCount(); ++i)
+		{
+			delete m_weightsLayersTranspose[i];
+			m_weightsLayersTranspose[i] = src.m_weightsLayersTranspose[i];
+		}
+	}
+
+	~ndDeepBrainTrainerChannel()
+	{
+		for (ndInt32 i = 0; i < m_weightsLayersTranspose.GetCount(); ++i)
+		{
+			m_weightsLayersTranspose[i] = nullptr;
+		}
+	}
+};
 
 ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndInt32 threads)
 	:ndDeepBrainTrainer(brain)
@@ -55,8 +61,8 @@ ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain,
 
 	for (ndInt32 i = 0; i < threads; i++)
 	{
-		//m_threadData.PushBack(new LocalData(*this));
-		m_threadData.PushBack(new ndDeepBrainTrainer(*this));
+		ndDeepBrainTrainerChannel* const channel = new ndDeepBrainTrainerChannel(*this);
+		m_threadData.PushBack(channel);
 	}
 }
 

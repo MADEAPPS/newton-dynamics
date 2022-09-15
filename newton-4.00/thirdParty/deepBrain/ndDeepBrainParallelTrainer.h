@@ -25,18 +25,11 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainTrainer.h"
 
+class ndDeepBrainTrainerChannel;
+
 class ndDeepBrainParallelTrainer: public ndDeepBrainTrainer, public ndThreadPool
 {
 	public: 
-	//class LocalData: public ndDeepBrain, public ndDeepBrainTrainer
-	//class LocalData : public ndDeepBrainTrainer
-	//{
-	//	public:
-	//	LocalData(const ndDeepBrainTrainer& src);
-	//	//ndReal m_averageError;
-	//	//void CopyTranspose(const ndArray<ndDeepBrainMatrix*>& src);
-	//};
-
 	ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndInt32 threads = 1);
 	~ndDeepBrainParallelTrainer();
 
@@ -48,8 +41,7 @@ class ndDeepBrainParallelTrainer: public ndDeepBrainTrainer, public ndThreadPool
 
 	private:
 	void AverageWeights();
-	//ndFixSizeArray<LocalData*, D_MAX_THREADS_COUNT> m_threadData;
-	ndFixSizeArray<ndDeepBrainTrainer*, D_MAX_THREADS_COUNT> m_threadData;
+	ndFixSizeArray<ndDeepBrainTrainerChannel*, D_MAX_THREADS_COUNT> m_threadData;
 
 	const ndDeepBrainMatrix* m_inputBatch;
 	const ndDeepBrainMatrix* m_groundTruth;

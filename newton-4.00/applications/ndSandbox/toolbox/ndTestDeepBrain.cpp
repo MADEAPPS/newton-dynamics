@@ -269,7 +269,7 @@ static void MnistTrainingSet()
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.SetMiniBatchSize(256);
-		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 2000);
+		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 5000);
 
 		time = ndGetTimeInMicroseconds() - time;
 
@@ -325,6 +325,6 @@ void ndTestDeedBrian()
 	ndSetRandSeed(12345);
 	//ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
-	MnistTestSet();
+	//MnistTestSet();
 }
 

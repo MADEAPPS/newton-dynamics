@@ -67,6 +67,7 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	ndReal m_epsilon;
 	ndReal m_alphaAcc;
 	ndReal m_betaAcc;
+	friend class ndDeepBrainTrainerChannel;
 	friend class ndDeepBrainParallelTrainer;
 };
 

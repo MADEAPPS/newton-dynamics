@@ -186,7 +186,7 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
 			ndTaskImplement<Function>* const job = &jobsArray[i];
-			ndFunction(job->m_threadIndex, job->m_threadCount);
+			callback(job->m_threadIndex, job->m_threadCount);
 		}
 		#else
 		for (ndInt32 i = 0; i < m_count; ++i)
