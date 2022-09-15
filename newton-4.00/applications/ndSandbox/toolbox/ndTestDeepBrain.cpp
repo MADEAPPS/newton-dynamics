@@ -61,7 +61,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndTestValidator testError(trainer);
 
 	trainer.SetMiniBatchSize(16);
-	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
+	//trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
+	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 10);
 
 	brain.Save("xxx.nn");
 	//ndDeepBrain brain1;
@@ -322,7 +323,7 @@ static void MnistTestSet()
 void ndTestDeedBrian()
 {
 	ndSetRandSeed(12345);
-	//ThreeLayersTwoInputsTwoOutputs();
+	ThreeLayersTwoInputsTwoOutputs();
 	//MnistTrainingSet();
 	//MnistTestSet();
 }

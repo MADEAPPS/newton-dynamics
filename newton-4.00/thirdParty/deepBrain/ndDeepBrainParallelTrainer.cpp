@@ -182,12 +182,13 @@ void ndDeepBrainParallelTrainer::Optimize()
 				ndDeepBrainMemVector weightAcc(&m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
 				for (ndInt32 i = 0; i < threadCount; ++i)
 				{
-					const ndDeepBrainTrainer& optimizer = *m_threadData[threadIndex];
+					const ndDeepBrainTrainer& optimizer = *m_threadData[i];
 					const ndDeepBrainMemVector biasSrc(&optimizer.m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
-					const ndDeepBrainMemVector weightSrc(&optimizer.m_weightGradients[biasStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
+					const ndDeepBrainMemVector weightSrc(&optimizer.m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
 					biasAcc.Add(biasAcc, biasSrc);
 					weightAcc.Add(weightAcc, weightSrc);
 				}
+				threadIndex *= 1;
 			});
 			ParallelExecute(AddGradients);
 			UpdateWeights(m_learnRate, batchSize);
