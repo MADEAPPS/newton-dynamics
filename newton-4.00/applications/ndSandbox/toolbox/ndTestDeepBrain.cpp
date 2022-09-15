@@ -17,15 +17,28 @@ class ndTestValidator : public ndDeepBrainTrainer::ndValidation
 	public:
 	ndTestValidator(ndDeepBrainTrainer& trainer)
 		:ndDeepBrainTrainer::ndValidation(trainer)
+		,m_minError(1.0e10f)
+		,m_step(0)
+		,m_step0(0)
 	{
 	}
 
 	ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
 	{
 		ndReal error = ndDeepBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
-		ndExpandTraceMessage("%f\n", error);
+		if (error < m_minError)
+		{
+			m_minError = error;
+			ndExpandTraceMessage("%f; %d; %d\n", m_minError, m_step, m_step - m_step0);
+			m_step0 = m_step;
+		}
+		m_step++;
+		//ndExpandTraceMessage("%f\n", error);
 		return error;
 	}
+	ndReal m_minError;
+	ndInt32 m_step;
+	ndInt32 m_step0;
 };
 
 
@@ -61,8 +74,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndTestValidator testError(trainer);
 
 	trainer.SetMiniBatchSize(16);
-	//trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
-	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 10);
+	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
 
 	brain.Save("xxx.nn");
 	//ndDeepBrain brain1;
@@ -263,14 +275,14 @@ static void MnistTrainingSet()
 		brain.InitGaussianWeights(0.0f, 0.25f);
 
 		//ndDeepBrainTrainer trainer(&brain);
-		ndDeepBrainParallelTrainer trainer(&brain, 2);
+		ndDeepBrainParallelTrainer trainer(&brain, 4);
 		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
 
 		trainer.SetMiniBatchSize(16);
 		ndTestValidator validator(trainer);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 10);
+		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 2000);
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
