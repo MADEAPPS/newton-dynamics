@@ -100,7 +100,6 @@
 #include <ndDeepBrain.h>
 #include <ndDeepBrainTrainer.h>
 #include <ndDeepBrainParallelTrainer.h>
-#include <ndDeepBrainParallelTrainer_Experiment.h>
 
 #ifndef _MSC_VER
 	#ifndef stricmp

@@ -126,84 +126,6 @@ void ndDeepBrainParallelTrainer::AverageWeights()
 
 void ndDeepBrainParallelTrainer::Optimize()
 {
-/*
-	ndAssert(m_inputBatch->GetCount() == m_groundTruth->GetCount());
-	ndAssert(m_output.GetCount() == (*m_groundTruth)[0].GetCount());
-	
-	ndDeepBrain bestNetwork(*m_instance.GetBrain());
-	ndReal bestCost = 1.0e10f;
-	
-	ndInt32 index = 0;
-	ndInt32 batchCount = (m_inputBatch->GetCount() + m_miniBatchSize - 1) / m_miniBatchSize;
-	ndArray<ndInt32> randomizeVector;
-	randomizeVector.SetCount(m_inputBatch->GetCount());
-	for (ndInt32 i = 0; i < m_inputBatch->GetCount(); ++i)
-	{
-		randomizeVector[i] = i;
-	}
-	
-	ndInt32 movingAverageIndex = 0;
-	ndFloat32 movingAverageError = 0.0f;
-	for (ndInt32 i = 0; i < m_steps; ++i)
-	{
-		const ndInt32 batchStart = index * m_miniBatchSize;
-		const ndInt32 batchSize = index != (batchCount - 1) ? m_miniBatchSize : m_inputBatch->GetCount() - batchStart;
-	
-		auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			ndAssert(0);
-			//LocalData& optimizer = *m_threadData[threadIndex];
-			//optimizer.m_averageError = 0.0f;
-			//
-			//const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
-			//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			//{
-			//	ndInt32 k = randomizeVector[batchStart + i];
-			//	const ndDeepBrainVector& input = (*m_inputBatch)[k];
-			//	const ndDeepBrainVector& truth = (*m_groundTruth)[k];
-			//	optimizer.MakePrediction(input);
-			//	optimizer.BackPropagate(truth);
-			//	//optimizer.UpdateWeights(m_learnRate, 1);
-			//	//optimizer.m_averageError += optimizer.CalculateMeanSquareError(truth);
-			//}
-		});
-		ParallelExecute(CalculateGradients);
-	
-		//AverageWeights();
-		//ApplyWeightTranspose();
-		//
-		//ndReal averageError = 0.0f;
-		//for(ndInt32 j = GetThreadCount() - 1; j >= 0; --j)
-		//{
-		//	averageError += m_threadData[j]->m_averageError;
-		//	m_threadData[j]->GetBrain()->CopyFrom(*GetBrain());
-		//	m_threadData[j]->CopyTranspose(m_weightsLayersTranspose);
-		//}
-		//
-		//movingAverageIndex += batchSize;
-		//movingAverageError += averageError;
-		//
-		//averageError = ndSqrt(averageError / batchSize);
-		//ndExpandTraceMessage("%f %d\n", averageError, i);
-		//
-		//index = (index + 1) % batchCount;
-		//if (index == 0)
-		//{
-		//	randomizeVector.RandomShuffle(randomizeVector.GetCount());
-		//	movingAverageError = ndSqrt(movingAverageError / movingAverageIndex);
-		//	if (movingAverageError < bestCost)
-		//	{
-		//		bestCost = movingAverageError;
-		//		bestNetwork.CopyFrom(*m_instance.GetBrain());
-		//	}
-		//	movingAverageIndex = 0;
-		//	movingAverageError = 0.0f;
-		//}
-	}
-	
-	m_instance.GetBrain()->CopyFrom(bestNetwork);
-*/
-
 	ndFloatExceptions exception;
 
 	ndValidation& validator = *m_validator;
@@ -214,6 +136,7 @@ void ndDeepBrainParallelTrainer::Optimize()
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 
 	ndDeepBrain bestNetwork(*m_instance.GetBrain());
+
 	ndArray<ndInt32> randomizeVector;
 	randomizeVector.SetCount(inputBatch.GetCount());
 	for (ndInt32 i = 0; i < inputBatch.GetCount(); ++i)
@@ -249,18 +172,27 @@ void ndDeepBrainParallelTrainer::Optimize()
 			});
 			ParallelExecute(CalculateGradients);
 
-			//ClearGradientsAcc();
-			//for (ndInt32 k = 0; k < count; ++k)
-			//{
-			//	ndInt32 index = randomizeVector[start + k];
-			//	const ndDeepBrainVector& input = inputBatch[index];
-			//	const ndDeepBrainVector& truth = groundTruth[index];
-			//	MakePrediction(input);
-			//	BackPropagate(truth);
-			//}
+			ClearGradientsAcc();
+			auto AddGradients = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+			{
+				const ndStartEnd biasStartEnd(m_biasGradientsAcc.GetCount(), threadIndex, threadCount);
+				const ndStartEnd weightStartEnd(m_weightGradients.GetCount(), threadIndex, threadCount);
 
+				ndDeepBrainMemVector biasAcc(&m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
+				ndDeepBrainMemVector weightAcc(&m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
+				for (ndInt32 i = 0; i < threadCount; ++i)
+				{
+					const ndDeepBrainTrainer& optimizer = *m_threadData[threadIndex];
+					const ndDeepBrainMemVector biasSrc(&optimizer.m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
+					const ndDeepBrainMemVector weightSrc(&optimizer.m_weightGradients[biasStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
+					biasAcc.Add(biasAcc, biasSrc);
+					weightAcc.Add(weightAcc, weightSrc);
+				}
+			});
+			ParallelExecute(AddGradients);
 			UpdateWeights(m_learnRate, batchSize);
 		}
+
 		ApplyWeightTranspose();
 		randomizeVector.RandomShuffle(randomizeVector.GetCount());
 

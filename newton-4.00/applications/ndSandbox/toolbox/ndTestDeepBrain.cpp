@@ -261,16 +261,15 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 		brain.InitGaussianWeights(0.0f, 0.25f);
 
-		ndDeepBrainTrainer trainer(&brain);
-		//ndDeepBrainParallelTrainer trainer(&brain, 4);
+		//ndDeepBrainTrainer trainer(&brain);
+		ndDeepBrainParallelTrainer trainer(&brain, 2);
 		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
 
+		trainer.SetMiniBatchSize(16);
 		ndTestValidator validator(trainer);
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		trainer.SetMiniBatchSize(256);
-		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 5000);
-
+		trainer.Optimize(validator, *trainingDigits, *trainingLabels, 5.0e-3f, 10);
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
