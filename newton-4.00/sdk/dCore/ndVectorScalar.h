@@ -93,7 +93,7 @@ class ndVector
 	}
 
 	inline ndVector (ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		:m_x(*((ndFloat32*)&ix)), m_y(*((ndFloat32*)&iy)), m_z(*((ndFloat32*)&iz)), m_w(*((ndFloat32*)&iw))
+		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 

@@ -62,7 +62,6 @@ class ndVector
 	}
 
 	inline ndVector(const ndFloat32* const ptr)
-		//: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 		:m_type(vld1q_f32 (ptr))
 	{
 		ndAssert(ndCheckVector((*this)));
@@ -94,7 +93,8 @@ class ndVector
 	}
 
 	inline ndVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		: m_x(*((ndFloat32*)&ix)), m_y(*((ndFloat32*)&iy)), m_z(*((ndFloat32*)&iz)), m_w(*((ndFloat32*)&iw))
+		//: m_x(*((ndFloat32*)&ix)), m_y(*((ndFloat32*)&iy)), m_z(*((ndFloat32*)&iz)), m_w(*((ndFloat32*)&iw))
+		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 
