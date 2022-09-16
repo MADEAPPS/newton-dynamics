@@ -268,10 +268,11 @@ class ndVector
 	inline ndVector TestZero() const
 	{
 		const ndInt32* const a = (ndInt32*)&m_x;
-		return ndVector((a[0] == 0) ? ndFloat32(-1.0f) : ndFloat32(1.0f),
-			(a[1] == 0) ? ndFloat32(-1.0f) : ndFloat32(1.0f),
-			(a[2] == 0) ? ndFloat32(-1.0f) : ndFloat32(1.0f),
-			(a[3] == 0) ? ndFloat32(-1.0f) : ndFloat32(1.0f));
+		return ndVector(
+			(a[0] == 0) ? ndFloat32(-1.0f) : ndFloat32(0.0f),
+			(a[1] == 0) ? ndFloat32(-1.0f) : ndFloat32(0.0f),
+			(a[2] == 0) ? ndFloat32(-1.0f) : ndFloat32(0.0f),
+			(a[3] == 0) ? ndFloat32(-1.0f) : ndFloat32(0.0f));
 	}
 
 	inline ndVector Floor() const
@@ -710,9 +711,6 @@ class ndBigVector
 
 	inline ndBigVector Normalize() const
 	{
-		ndAssert(m_w == ndFloat64(0.0f));
-		//const ndBigVector& me = *this;
-		//return *this * ndBigVector (dgRsqrt(DotProduct(*this).m_x));
 		return *this * InvMagSqrt();
 	}
 
@@ -870,7 +868,6 @@ class ndBigVector
 
 	union
 	{
-		ndInt64 m_i[4];
 		struct
 		{
 			ndFloat64 m_x;
@@ -885,6 +882,7 @@ class ndBigVector
 			ndInt64 m_iz;
 			ndInt64 m_iw;
 		};
+		ndInt64 m_i[4];
 	};
 
 	D_CORE_API static ndBigVector m_zero;

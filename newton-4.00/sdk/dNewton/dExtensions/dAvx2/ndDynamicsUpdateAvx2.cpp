@@ -24,6 +24,10 @@
 #define D_AVX_WORK_GROUP			8 
 #define D_AVX_DEFAULT_BUFFER_SIZE	1024
 
+#ifndef PERMUTE_MASK
+#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
+#endif
+
 #ifdef D_NEWTON_USE_DOUBLE
 	D_MSV_NEWTON_ALIGN_32
 	class ndAvxFloat
@@ -334,12 +338,12 @@
 
 		inline ndVector GetLow() const
 		{
-			return _mm256_castps256_ps128(m_type);
+			return m_vector8.m_linear;
 		}
 
 		inline ndVector GetHigh() const
 		{
-			return _mm256_extractf128_ps(m_type, 1);
+			return m_vector8.m_angular;
 		}
 
 		inline ndFloat32 GetMax() const

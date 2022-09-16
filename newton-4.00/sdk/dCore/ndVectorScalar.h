@@ -32,6 +32,11 @@
 #else
 
 class ndBigVector;
+// *****************************************************************************************
+//
+// 4 x 1 single precision SSE vector class declaration
+//
+// *****************************************************************************************
 class ndVector
 {
 	public:
@@ -258,12 +263,11 @@ class ndVector
 	inline ndVector TestZero() const
 	{
 		const ndInt32* const a = (ndInt32*)&m_x;
-		return ndVector ((a[0] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (1.0f),
-						 (a[1] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (1.0f),
-						 (a[2] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (1.0f),
-						 (a[3] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (1.0f));
+		return ndVector ((a[0] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
+						 (a[1] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
+						 (a[2] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
+						 (a[3] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f));
 	}
-
 
 	inline ndVector Floor () const
 	{
@@ -297,7 +301,6 @@ class ndVector
 
 	inline ndVector Normalize () const
 	{
-		ndAssert (m_w == ndFloat32 (0.0f));
 		const ndVector& me = *this; 
 		return me * InvMagSqrt();
 	}
@@ -457,7 +460,6 @@ class ndVector
 
 	union 
 	{
-		ndInt32 m_i[4];
 		struct 
 		{
 			ndFloat32 m_x;
@@ -472,6 +474,7 @@ class ndVector
 			ndInt32 m_iz;
 			ndInt32 m_iw;
 		};
+		ndInt32 m_i[4];
 	};
 
 	D_CORE_API static ndVector m_zero;
@@ -492,7 +495,11 @@ class ndVector
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
-
+// *****************************************************************************************
+//
+// 4 x 1 double precision SSE2 vector class declaration
+//
+// *****************************************************************************************
 class ndBigVector
 {
 	public:
