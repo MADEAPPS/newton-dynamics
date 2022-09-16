@@ -24,10 +24,6 @@
 #define D_AVX_WORK_GROUP			8 
 #define D_AVX_DEFAULT_BUFFER_SIZE	1024
 
-#ifndef PERMUTE_MASK
-#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
-#endif
-
 #ifdef D_NEWTON_USE_DOUBLE
 	D_MSV_NEWTON_ALIGN_32
 	class ndAvxFloat
@@ -220,6 +216,10 @@
 	class ndAvxFloat
 	{
 		public:
+		#ifndef PERMUTE_MASK
+		#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
+		#endif
+
 		inline ndAvxFloat()
 		{
 		}
@@ -246,7 +246,7 @@
 
 		inline ndAvxFloat(const ndVector& low, const ndVector& high)
 			#ifdef D_SCALAR_VECTOR_CLASS
-			:m_type(_mm256_set_m128(_mm_set_ps(low.m_w, low.m_y, low.m_z, low.m_x), _mm_set_ps(high.m_w, high.m_y, high.m_z, high.m_x)))
+			:m_type(_mm256_set_m128(_mm_set_ps(high.m_w, high.m_z, high.m_y, high.m_x), _mm_set_ps(low.m_w, low.m_z, low.m_y, low.m_x)))
 			#else
 			:m_type(_mm256_set_m128(high.m_type, low.m_type))
 			#endif

@@ -264,10 +264,11 @@ class ndVector
 	inline ndVector TestZero() const
 	{
 		const ndInt32* const a = (ndInt32*)&m_x;
-		return ndVector ((a[0] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
-						 (a[1] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
-						 (a[2] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
-						 (a[3] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f));
+		return ndVector (
+			(a[0] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
+			(a[1] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
+			(a[2] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f),
+			(a[3] == 0) ? ndFloat32 (-1.0f) : ndFloat32 (0.0f));
 	}
 
 	inline ndVector Floor () const

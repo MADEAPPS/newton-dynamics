@@ -232,14 +232,6 @@ class ndVector
 	// return 3d cross product
 	inline ndVector CrossProduct (const ndVector& B) const
 	{
-		//__m128 tmp0_a (_mm_shuffle_ps(  m_type,   m_type, PERMUTE_MASK(3, 0, 2, 1)));
-		//__m128 tmp0_b (_mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2)));
-		//__m128 tmp1_a (_mm_shuffle_ps(  m_type,   m_type, PERMUTE_MASK(3, 1, 0, 2)));
-		//__m128 tmp1_b (_mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1)));
-		//__m128 tmp0_ (_mm_mul_ps(tmp0_a, tmp0_b));
-		//__m128 tmp1_ (_mm_mul_ps(tmp1_a, tmp1_b));
-		//__m128 tmp_ (_mm_sub_ps(tmp0_, tmp1_));
-
 		__m128 tmp0 = _mm_shuffle_ps(  m_type,   m_type, _MM_SHUFFLE(3, 0, 2, 1));
 		__m128 tmp1 = _mm_shuffle_ps(B.m_type, B.m_type, _MM_SHUFFLE(3, 1, 0, 2));
 		__m128 tmp2 = _mm_mul_ps(tmp0, B.m_type);
