@@ -30,6 +30,8 @@ class ndDeepBrainAgentDQN: public ndDeepBrainAgent
 	public: 
 	ndDeepBrainAgentDQN(ndDeepBrain* const agent);
 	virtual ~ndDeepBrainAgentDQN();
+
+	ndDeepBrainInstance m_targetNetwork;
 };
 
 #endif 

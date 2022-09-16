@@ -20,13 +20,16 @@
 */
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrain.h"
 #include "ndDeepBrainAgentDQN.h"
 
 ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent)
 	:ndDeepBrainAgent(agent)
+	,m_targetNetwork(new ndDeepBrain(*agent))
 {
 }
 
 ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
 {
+	delete m_targetNetwork.GetBrain();
 }

@@ -23,7 +23,7 @@
 #include "ndDeepBrainAgent.h"
 
 ndDeepBrainAgent::ndDeepBrainAgent(ndDeepBrain* const agent)
-	:m_agentNetwork(agent)
+	:m_network(agent)
 {
 }
 

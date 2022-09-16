@@ -27,13 +27,24 @@
 
 class ndDeepBrain;
 
+class ndDeepBrainTransition
+{
+	public:
+	ndArray<ndReal> m_state;
+	ndArray<ndReal> m_action;
+	ndArray<ndReal> m_nextState;
+	ndReal m_reward;
+};
+
 class ndDeepBrainAgent: public ndClassAlloc
 {
 	public: 
 	ndDeepBrainAgent(ndDeepBrain* const agent);
 	virtual ~ndDeepBrainAgent();
 
-	ndDeepBrainInstance m_agentNetwork;
+	ndDeepBrainInstance m_network;
+	ndArray<ndDeepBrainTransition> m_replayBuffer;
+	ndArray<ndUnsigned32> m_replayBufferRandomShaffle;
 };
 
 #endif 

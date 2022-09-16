@@ -152,13 +152,13 @@ namespace biped2
 		ndFloat32 m_comSagitalOmega;
 	};
 
-	class ndDQNcontroller : public ndDeepBrain
+	class ndHumanoidBrain: public ndDeepBrain
 	{
 		public: 
-		ndDQNcontroller(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
+		ndHumanoidBrain(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
 			:ndDeepBrain()
 		{
-			const ndInt32 neuronsPerHiddenLayers = 32;
+			const ndInt32 neuronsPerHiddenLayers = 16;
 			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_tanh);
 			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
 			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
@@ -217,7 +217,8 @@ namespace biped2
 		ndHumanoidModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndModel()
 			,m_locaFrame(ndGetIdentityMatrix())
-			,m_controller(2, 3)
+			,m_brain(2, 3)
+			,m_controller(&m_brain)
 			,m_invDynamicsSolver()
 			,m_effectors()
 			,m_bodyArray()
@@ -648,7 +649,8 @@ namespace biped2
 		}
 
 		ndMatrix m_locaFrame;
-		ndDQNcontroller m_controller;
+		ndHumanoidBrain m_brain;
+		ndDeepBrainInstance m_controller;
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
@@ -695,72 +697,72 @@ namespace biped2
 			ndBodyDynamic* m_body;
 		};
 
-		class ndTransition
-		{
-			public:
-			class ndState
-			{
-				ndFloat32 m_comVeloc;
-			};
+		//class ndTransition
+		//{
+		//	public:
+		//	class ndState
+		//	{
+		//		ndFloat32 m_comVeloc;
+		//	};
+		//
+		//	class ndAction
+		//	{
+		//		public:
+		//		ndInt32 m_effectorMove;
+		//	};
+		//
+		//	class ndReward
+		//	{
+		//		public:
+		//		ndFloat32 m_reward;
+		//	};
+		//
+		//	ndState m_state;
+		//	ndAction m_action;
+		//	ndState m_nextState;
+		//	ndReward m_reward;
+		//};
 
-			class ndAction
-			{
-				public:
-				ndInt32 m_effectorMove;
-			};
-
-			class ndReward
-			{
-				public:
-				ndFloat32 m_reward;
-			};
-
-			ndState m_state;
-			ndAction m_action;
-			ndState m_nextState;
-			ndReward m_reward;
-		};
-
-		#define BASH_SIZE 256
-		class ndTraningBashBuffer : public ndFixSizeArray<ndTransition, BASH_SIZE>
-		{
-			public:
-		};
-
-		class ndReplayBuffer: public ndArray<ndTransition>
-		{
-			public:
-			ndReplayBuffer ()
-				:ndArray<ndTransition>(1024 * 32)
-				,m_randomShaffle(1024 * 32)
-				,m_currentIndex(0)
-			{
-				SetCount(GetCapacity());
-				m_randomShaffle.SetCount(GetCapacity());
-				for (ndInt32 i = 0; i < m_randomShaffle.GetCount(); ++i)
-				{
-					m_randomShaffle[i] = i;
-				}
-			}
-
-			void GetRandomBash(ndTraningBashBuffer& buffer)
-			{
-				m_randomShaffle.RandomShuffle(BASH_SIZE);
-				for (ndInt32 i = 0; i < BASH_SIZE; i++)
-				{
-					ndInt32 index = m_randomShaffle[i];
-					buffer[i] = (*this)[index];
-				}
-			}
-			
-			ndArray<ndUnsigned32> m_randomShaffle;
-			ndInt32 m_currentIndex;
-		};
+		//#define BASH_SIZE 256
+		//class ndTraningBashBuffer : public ndFixSizeArray<ndTransition, BASH_SIZE>
+		//{
+		//	public:
+		//};
+		//
+		//class ndReplayBuffer: public ndArray<ndTransition>
+		//{
+		//	public:
+		//	ndReplayBuffer ()
+		//		:ndArray<ndTransition>(1024 * 32)
+		//		,m_randomShaffle(1024 * 32)
+		//		,m_currentIndex(0)
+		//	{
+		//		SetCount(GetCapacity());
+		//		m_randomShaffle.SetCount(GetCapacity());
+		//		for (ndInt32 i = 0; i < m_randomShaffle.GetCount(); ++i)
+		//		{
+		//			m_randomShaffle[i] = i;
+		//		}
+		//	}
+		//
+		//	void GetRandomBash(ndTraningBashBuffer& buffer)
+		//	{
+		//		m_randomShaffle.RandomShuffle(BASH_SIZE);
+		//		for (ndInt32 i = 0; i < BASH_SIZE; i++)
+		//		{
+		//			ndInt32 index = m_randomShaffle[i];
+		//			buffer[i] = (*this)[index];
+		//		}
+		//	}
+		//	
+		//	ndArray<ndUnsigned32> m_randomShaffle;
+		//	ndInt32 m_currentIndex;
+		//};
 
 		public: 
 		ndHumanoidTraningModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
 			:ndHumanoidModel(scene, model, location, definition)
-			,m_onlineController(m_controller)
+			,m_dqnAgent(&m_brain)
 			,m_basePose()
 			,m_traingCounter(0)
 			,m_epockCounter(0)
@@ -870,10 +872,10 @@ namespace biped2
 				m_trainingState = m_initTraining;
 			}
 		}
-
 		
-		ndDQNcontroller m_onlineController;
-		ndReplayBuffer m_replayBuffer;
+		//ndHumanoidBrain m_onlineController;
+		//ndReplayBuffer m_replayBuffer;
+		ndDeepBrainAgentDQN m_dqnAgent;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndFloat32 m_rollAngle;
 		ndInt32 m_traingCounter;

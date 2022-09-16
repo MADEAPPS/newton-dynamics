@@ -99,6 +99,8 @@
 #include <ndDeepBrainStdafx.h>
 #include <ndDeepBrain.h>
 #include <ndDeepBrainTrainer.h>
+#include <ndDeepBrainAgentDQN.h>
+#include <ndDeepBrainAgentDDPG.h>
 #include <ndDeepBrainParallelTrainer.h>
 
 #ifndef _MSC_VER
