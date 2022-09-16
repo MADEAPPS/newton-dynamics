@@ -37,6 +37,7 @@ class ndBigVector;
 // 4 x 1 single precision SSE vector class declaration
 //
 // *****************************************************************************************
+D_MSV_NEWTON_ALIGN_16
 class ndVector
 {
 	public:
@@ -500,6 +501,7 @@ class ndVector
 // 4 x 1 double precision SSE2 vector class declaration
 //
 // *****************************************************************************************
+D_MSV_NEWTON_ALIGN_32
 class ndBigVector
 {
 	public:

@@ -461,7 +461,6 @@ class ndVector
 	D_CORE_API static ndVector m_signMask;
 	D_CORE_API static ndVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32 ;
-
 #endif
 
 D_MSV_NEWTON_ALIGN_32
