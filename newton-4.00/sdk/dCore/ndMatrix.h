@@ -260,12 +260,11 @@ inline bool ndMatrix::TestIdentity() const
 inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 {
 	#ifdef _DEBUG
-		const ndMatrix& me = *this;
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			for (ndInt32 j = 0; j < 4; ++j)
 			{
-				ndAssert(ndCheckFloat(me[i][j]));
+				ndAssert(ndCheckFloat((*this)[i][j]));
 			}
 		}
 	#endif
