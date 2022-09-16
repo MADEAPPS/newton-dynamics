@@ -23,6 +23,7 @@
 #define _ND_DEEP_BRAIN_INSTANCE_H__
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrainTypes.h"
 #include "ndDeepBrainVector.h"
 
 class ndDeepBrain;
