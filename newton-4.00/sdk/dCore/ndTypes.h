@@ -253,7 +253,8 @@ typedef double ndFloat64;
 	//#define ndCheckFloat(x) (_finite(x) && !_isnan(x))
 	#define ndCheckFloat(x) (1)
 #else
-	#define ndCheckFloat(x) (isfinite(x) && !isnan(x))
+	//#define ndCheckFloat(x) (isfinite(x) && !isnan(x))
+	#define ndCheckFloat(x) (1)
 #endif
 
 #ifdef D_NEWTON_USE_DOUBLE
