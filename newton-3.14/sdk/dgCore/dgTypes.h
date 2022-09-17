@@ -502,12 +502,12 @@ class dgFloatExceptions
 {
 	public:
 	#ifdef _MSC_VER
-		#define DG_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+		#define DG_FLOAT_EXCEPTIONS_MASK (EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
 	#else 
-		#define DG_FLOAT_EXECTIONS_MASK	0
+		#define DG_FLOAT_EXCEPTIONS_MASK	0
 	#endif
 
-	dgFloatExceptions(dgUnsigned32 mask = DG_FLOAT_EXECTIONS_MASK);
+	dgFloatExceptions(dgUnsigned32 mask = DG_FLOAT_EXCEPTIONS_MASK);
 	~dgFloatExceptions();
 
 	private:
