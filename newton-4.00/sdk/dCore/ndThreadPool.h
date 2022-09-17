@@ -30,7 +30,8 @@
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
 
-#define	D_MAX_THREADS_COUNT	16
+//#define	D_MAX_THREADS_COUNT	16
+#define	D_MAX_THREADS_COUNT	32
 
 class ndThreadPool;
 
@@ -209,8 +210,10 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 			jobsInProgress = jobsInProgress & inProgess;
 			if (jobsInProgress)
 			{
-				ndYield();
+				//ndThreadYield();
+				ndTheadPause();
 			}
+			
 		} while (jobsInProgress);
 		#endif
 	}

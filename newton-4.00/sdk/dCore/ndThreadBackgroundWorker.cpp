@@ -52,7 +52,7 @@ void ndThreadBackgroundWorker::Terminate()
 		m_queueSemaphore.Terminate();
 		while (m_inLoop)
 		{
-			ndYield();
+			ndThreadYield();
 		}
 	}
 }
@@ -61,10 +61,9 @@ void ndBackgroundTask::Sync() const
 {
 	while (m_taskState == m_taskInProccess)
 	{
-		ndYield();
+		ndThreadYield();
 	}
 }
-
 
 void ndThreadBackgroundWorker::SendTask(ndBackgroundTask* const task)
 {

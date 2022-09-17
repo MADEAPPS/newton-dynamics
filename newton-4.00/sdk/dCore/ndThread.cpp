@@ -99,7 +99,7 @@ void ndThread::ThreadFunctionCallback()
 	// wait until constructor was fully initialized.
 	while (load())
 	{
-		ndYield();
+		ndThreadYield();
 	}
 
 	D_SET_TRACK_NAME(m_name);

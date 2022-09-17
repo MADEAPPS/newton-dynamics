@@ -408,65 +408,6 @@ inline void operator delete[](void* ptr)	\
 	};
 #endif
 
-/// Simple spin lock for synchronizing threads for very short period of time.
-class ndSpinLock
-{
-	public:
-	ndSpinLock()
-		#ifndef D_USE_THREAD_EMULATION	
-		:m_lock(0)
-		#endif
-	{
-	}
-
-	void Lock()
-	{
-		#ifndef D_USE_THREAD_EMULATION	
-		ndInt32 exp = 1;
-		for (ndUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)
-		{
-			Delay(exp);
-		}
-		#endif
-	}
-
-	void Unlock()
-	{
-		#ifndef D_USE_THREAD_EMULATION	
-		m_lock.store(0);
-		#endif
-	}
-
-	#ifndef D_USE_THREAD_EMULATION	
-	private:
-	D_CORE_API void Delay(ndInt32& exp);
-
-	ndAtomic<ndUnsigned32> m_lock;
-	#endif
-};
-
-/// Simple scope based spin lock.
-class ndScopeSpinLock
-{
-	public:
-	ndScopeSpinLock(ndSpinLock& spinLock)
-		:m_spinLock(spinLock)
-	{
-		m_spinLock.Lock();
-	}
-
-	~ndScopeSpinLock()
-	{
-		m_spinLock.Unlock();
-	}
-
-	ndSpinLock& m_spinLock;
-};
-
-inline void ndYield()
-{
-	std::this_thread::yield();
-}
 
 #endif
 

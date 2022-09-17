@@ -20,6 +20,7 @@
 */
 
 #include "ndCoreStdafx.h"
+#include "ndUtils.h"
 #include "ndMemory.h"
 #include "ndClassAlloc.h"
 #include "ndFixSizeArray.h"

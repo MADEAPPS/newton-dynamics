@@ -49,6 +49,30 @@ ndUnsigned64 ndGetTimeInMicroseconds()
 	return timeStamp;
 }
 
+void ndThreadYield()
+{
+	std::this_thread::yield();
+}
+
+void ndTheadPause()
+{
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+	#else
+		//static volatile ndUnsigned32 nopEmulator = 0;
+		volatile ndInt32 count = 0;
+		ndInt32 x = 0;
+		for (ndInt32 i = 0; i < 16; i++)
+		{
+			x = count;
+		}
+		//nopEmulator = count;
+	#endif
+}
+
 #ifndef D_USE_THREAD_EMULATION
 void ndSpinLock::Delay(ndInt32& exp)
 {
