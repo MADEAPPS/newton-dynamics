@@ -885,6 +885,12 @@ namespace biped2
 		{
 			m_dqnAgent.m_transition.m_reward = 1.0f;
 			m_dqnAgent.m_transition.m_terminalState = false;
+
+			ndReal dist = ndAbs (m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit]);
+			if (dist > 0.2f)
+			{
+				m_dqnAgent.m_transition.m_terminalState = true;
+			}
 		}
 
 		void TickEpoch(ndWorld* const, ndFloat32)
@@ -894,7 +900,9 @@ namespace biped2
 			m_dqnAgent.OptimzationStep();
 
 			m_epochCounter ++;
-			if (m_epochCounter >= 300)
+			bool isTerminal = m_dqnAgent.m_transition.m_terminalState;
+			if (isTerminal)
+			//if (m_epochCounter >= 300)
 			{
 				m_trainingState = m_initTraining;
 			}
