@@ -60,6 +60,7 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 
 	protected:
 	void ReluActivation(ndDeepBrainVector& output) const;
+	void LinealActivation(ndDeepBrainVector& output) const;
 	void SigmoidActivation(ndDeepBrainVector& output) const;
 	void SoftmaxActivation(ndDeepBrainVector& output) const;
 	void HyperbolicTanActivation(ndDeepBrainVector& output) const;
@@ -67,6 +68,7 @@ class ndDeepBrainLayer: public ndDeepBrainMatrix
 	void SigmoidDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 	void HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 	void ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
+	void LinealActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const;
 
 	ndDeepBrainMemVector m_bias;
 	ndDeepBrainActivationType m_activation;

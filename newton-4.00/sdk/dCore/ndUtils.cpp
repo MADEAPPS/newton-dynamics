@@ -62,14 +62,12 @@ void ndTheadPause()
 		_mm_pause();
 		_mm_pause();
 	#else
-		//static volatile ndUnsigned32 nopEmulator = 0;
 		volatile ndInt32 count = 0;
 		ndInt32 x = 0;
 		for (ndInt32 i = 0; i < 16; i++)
 		{
 			x = count;
 		}
-		//nopEmulator = count;
 	#endif
 }
 

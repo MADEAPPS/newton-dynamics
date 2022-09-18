@@ -24,17 +24,7 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainInstance.h"
-
-class ndDeepBrain;
-
-class ndDeepBrainTransition
-{
-	public:
-	ndArray<ndReal> m_state;
-	ndArray<ndReal> m_action;
-	ndArray<ndReal> m_nextState;
-	ndReal m_reward;
-};
+#include "ndDeepBrainAgentReplayBuffer.h"
 
 class ndDeepBrainAgent: public ndClassAlloc
 {
@@ -42,9 +32,13 @@ class ndDeepBrainAgent: public ndClassAlloc
 	ndDeepBrainAgent(ndDeepBrain* const agent);
 	virtual ~ndDeepBrainAgent();
 
+	virtual void OptimzationStep() = 0;
+	virtual void GetTransition(ndDeepBrainTransition& transition) const = 0;
+
 	ndDeepBrainInstance m_network;
-	ndArray<ndDeepBrainTransition> m_replayBuffer;
+	ndDeepBrainReplayBuffer m_replayBuffer;
 	ndArray<ndUnsigned32> m_replayBufferRandomShaffle;
+	ndInt32 m_replayBufferIndex;
 };
 
 #endif 

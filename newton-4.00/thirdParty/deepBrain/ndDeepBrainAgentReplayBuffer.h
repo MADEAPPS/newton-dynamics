@@ -19,28 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-#ifndef _ND_DEEP_BRAIN_TYPES_H__
-#define _ND_DEEP_BRAIN_TYPES_H__
+#ifndef _ND_DEEP_BRAIN_AGENT_REAPLAY_BUFFER_H__
+#define _ND_DEEP_BRAIN_AGENT_REAPLAY_BUFFER_H__
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrainInstance.h"
 
-#define D_DEEP_BRAIN_DATA_ALIGMENT 8
-
-enum ndDeepBrainActivationType
-{
-	m_relu,
-	m_lineal,
-	m_tanh,
-	m_sigmoid,
-	m_softmax
-};
-
-class ndDeepBrainPrefixScan : public ndFixSizeArray<ndInt32, 256>
+class ndDeepBrainTransition
 {
 	public:
+	void CopyFrom(const ndDeepBrainTransition& src);
+
+	ndArray<ndReal> m_state;
+	ndArray<ndReal> m_action;
+	ndArray<ndReal> m_nextState;
+	ndReal m_reward;
+	bool m_terminalState;
 };
 
+class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
+{
+	public:
+	ndDeepBrainReplayBuffer();
+	~ndDeepBrainReplayBuffer();
+
+	void SetCount(ndInt32 count);
+
+};
 
 #endif 
 

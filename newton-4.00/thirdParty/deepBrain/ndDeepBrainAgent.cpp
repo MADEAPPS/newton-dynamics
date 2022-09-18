@@ -24,6 +24,7 @@
 
 ndDeepBrainAgent::ndDeepBrainAgent(ndDeepBrain* const agent)
 	:m_network(agent)
+	,m_replayBufferIndex(0)
 {
 }
 

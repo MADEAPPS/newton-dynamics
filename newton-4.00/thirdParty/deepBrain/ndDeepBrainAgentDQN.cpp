@@ -27,9 +27,18 @@ ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent)
 	:ndDeepBrainAgent(agent)
 	,m_targetNetwork(new ndDeepBrain(*agent))
 {
+	m_replayBuffer.SetCount(1000);
 }
 
 ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
 {
 	delete m_targetNetwork.GetBrain();
+}
+
+void ndDeepBrainAgentDQN::OptimzationStep()
+{
+	ndInt32 replayIndex = m_replayBufferIndex % m_replayBuffer.GetCount();
+	GetTransition(m_replayBuffer[replayIndex]);
+
+	m_replayBufferIndex++;
 }

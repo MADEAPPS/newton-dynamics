@@ -62,6 +62,10 @@ ndDeepBrainLayer::ndDeepBrainLayer(const nd::TiXmlNode* layerNode)
 	{
 		m_activation = m_relu;
 	}
+	else if (!strcmp(activationType, "lineal"))
+	{
+		m_activation = m_tanh;
+	}
 	else if (!strcmp(activationType, "sigmoid"))
 	{
 		m_activation = m_sigmoid;
@@ -184,7 +188,11 @@ void ndDeepBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 		case m_relu:
 			xmlSaveParam(layerNode, "activation", "relu");
 			break;
-	
+
+		case m_lineal:
+			xmlSaveParam(layerNode, "activation", "lineal");
+			break;
+
 		case m_tanh:
 			xmlSaveParam(layerNode, "activation", "tanh");
 			break;
@@ -218,6 +226,10 @@ void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 	{
 		(*this)[i].InitGaussianWeights(mean, variance);
 	}
+}
+
+void ndDeepBrainLayer::LinealActivation(ndDeepBrainVector&) const
+{
 }
 
 void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output) const
@@ -286,13 +298,22 @@ void ndDeepBrainLayer::SigmoidDerivative(const ndDeepBrainVector& input, ndDeepB
 	}
 }
 
+void ndDeepBrainLayer::LinealActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+{
+	ndAssert(input.GetCount() == derivativeOutput.GetCount());
+	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
+	{
+		derivativeOutput[i] = 1.0f;
+	}
+}
+
 void ndDeepBrainLayer::ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
 	{
 		ndReal val = input[i];
-		derivativeOutput[i] = val > 0.0f ? 1.0f : 0.0f;
+		derivativeOutput[i] = (val > 0.0f) ? 1.0f : 0.0f;
 	}
 }
 
@@ -313,6 +334,12 @@ void ndDeepBrainLayer::ApplyActivation(ndDeepBrainVector& output) const
 		case m_relu:
 		{
 			ReluActivation(output);
+			break;
+		}
+
+		case m_lineal:
+		{
+			LinealActivation(output);
 			break;
 		}
 
@@ -346,6 +373,12 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 		case m_relu:
 		{
 			ReluActivationDerivative(input, derivativeOutput);
+			break;
+		}
+
+		case m_lineal:
+		{
+			LinealActivationDerivative(input, derivativeOutput);
 			break;
 		}
 

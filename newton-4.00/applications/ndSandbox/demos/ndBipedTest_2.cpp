@@ -155,15 +155,30 @@ namespace biped2
 	class ndHumanoidBrain: public ndDeepBrain
 	{
 		public: 
+		enum ndModelStateParam
+		{
+			m_comSagittalSpeed,
+			m_comSagittalPosit,
+			m_stateSize,
+		};
+
+		enum ndModelActionParam
+		{
+			m_goBack,
+			m_state,
+			m_goFoward,
+			m_actionSize,
+		};
+
 		ndHumanoidBrain(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
 			:ndDeepBrain()
 		{
 			const ndInt32 neuronsPerHiddenLayers = 16;
-			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_tanh);
-			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
-			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
-			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_tanh);
-			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_sigmoid);
+			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_relu);
+			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_lineal);
 
 			BeginAddLayer();
 			AddLayer(inputLayer);
@@ -662,7 +677,7 @@ namespace biped2
 		enum ndTraningStage
 		{
 			m_initTraining,
-			m_tickTrainingEpock,
+			m_tickTrainingEpoch,
 			m_endTraining,
 		};
 
@@ -697,67 +712,21 @@ namespace biped2
 			ndBodyDynamic* m_body;
 		};
 
-		//class ndTransition
-		//{
-		//	public:
-		//	class ndState
-		//	{
-		//		ndFloat32 m_comVeloc;
-		//	};
-		//
-		//	class ndAction
-		//	{
-		//		public:
-		//		ndInt32 m_effectorMove;
-		//	};
-		//
-		//	class ndReward
-		//	{
-		//		public:
-		//		ndFloat32 m_reward;
-		//	};
-		//
-		//	ndState m_state;
-		//	ndAction m_action;
-		//	ndState m_nextState;
-		//	ndReward m_reward;
-		//};
+		class ndDeepBrainAgentTrainier : public ndDeepBrainAgentDQN
+		{
+			public:
+			ndDeepBrainAgentTrainier(ndDeepBrain* const agent)
+				:ndDeepBrainAgentDQN(agent)
+			{
+			}
 
-		//#define BASH_SIZE 256
-		//class ndTraningBashBuffer : public ndFixSizeArray<ndTransition, BASH_SIZE>
-		//{
-		//	public:
-		//};
-		//
-		//class ndReplayBuffer: public ndArray<ndTransition>
-		//{
-		//	public:
-		//	ndReplayBuffer ()
-		//		:ndArray<ndTransition>(1024 * 32)
-		//		,m_randomShaffle(1024 * 32)
-		//		,m_currentIndex(0)
-		//	{
-		//		SetCount(GetCapacity());
-		//		m_randomShaffle.SetCount(GetCapacity());
-		//		for (ndInt32 i = 0; i < m_randomShaffle.GetCount(); ++i)
-		//		{
-		//			m_randomShaffle[i] = i;
-		//		}
-		//	}
-		//
-		//	void GetRandomBash(ndTraningBashBuffer& buffer)
-		//	{
-		//		m_randomShaffle.RandomShuffle(BASH_SIZE);
-		//		for (ndInt32 i = 0; i < BASH_SIZE; i++)
-		//		{
-		//			ndInt32 index = m_randomShaffle[i];
-		//			buffer[i] = (*this)[index];
-		//		}
-		//	}
-		//	
-		//	ndArray<ndUnsigned32> m_randomShaffle;
-		//	ndInt32 m_currentIndex;
-		//};
+			void GetTransition(ndDeepBrainTransition& transition) const
+			{
+				transition.CopyFrom(m_transition);
+			}
+
+			ndDeepBrainTransition m_transition;
+		};
 
 		public: 
 		ndHumanoidTraningModel(ndDemoEntityManager* const scene, ndDemoEntity* const model, const ndMatrix& location, ndDefinition* const definition)
@@ -765,7 +734,7 @@ namespace biped2
 			,m_dqnAgent(&m_brain)
 			,m_basePose()
 			,m_traingCounter(0)
-			,m_epockCounter(0)
+			,m_epochCounter(0)
 			,m_trainingState(m_initTraining)
 		{
 			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); i++)
@@ -777,7 +746,43 @@ namespace biped2
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
-			TrainingLoop(world, timestep);
+			TrainingLoopBegin(world, timestep);
+
+			GetStateAndAction();
+			GetReward();
+
+			ndInt32 valueIndex = 0;
+			ndFloat32 maxValue = -1.0e10f;
+			const ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
+			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; ++i)
+			{
+				if (action[i] > maxValue)
+				{
+					valueIndex = i;
+					maxValue = action[i];
+				}
+			}
+
+			ndFloat32 speed = 2.0f;
+			ndFloat32 accionSpace[] = { -speed , 0.0f, speed };
+			ndFloat32 effectorAction = accionSpace[valueIndex];
+			m_rollAngle += effectorAction * timestep;
+
+			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			{
+				ndEffectorInfo& info = m_effectors[i];
+				const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+				//const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
+				const ndMatrix roll(ndRollMatrix(m_rollAngle));
+			
+				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
+				posit = roll.RotateVector(posit);
+				posit = yaw.RotateVector(posit);
+			
+				info.m_effector->SetPosition(posit);
+				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
+			}
+
 			
 			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
 			ndAssert(skeleton);
@@ -790,7 +795,13 @@ namespace biped2
 			}
 		}
 
-		void TrainingLoop(ndWorld* const world, ndFloat32 timestep)
+		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModel::PostUpdate(world, timestep);
+			TrainingLoopEnd(world, timestep);
+		}
+		
+		void TrainingLoopBegin(ndWorld* const world, ndFloat32)
 		{
 			switch (m_trainingState)
 			{
@@ -800,15 +811,22 @@ namespace biped2
 					break;
 				}
 
-				case m_tickTrainingEpock:
+				case m_tickTrainingEpoch:
 				{
-					TickEpock(world, timestep);
 					break;
 				}
 
 				case m_endTraining:
 				default:;
 					ndAssert(0);
+			}
+		}
+
+		void TrainingLoopEnd(ndWorld* const world, ndFloat32 timestep)
+		{
+			if (m_trainingState == m_tickTrainingEpoch)
+			{
+				TickEpoch(world, timestep);
 			}
 		}
 
@@ -821,65 +839,72 @@ namespace biped2
 
 			m_rollAngle = 0;
 			m_traingCounter++;
-			m_epockCounter = 0;
-			m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpock : m_endTraining;
+			m_epochCounter = 0;
+			m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
 		}
 
-		ndFloat32 GetRandomAction() const
+		void GetRandomAction()
 		{
-			ndFloat32 speed = 2.0f;
-			ndFloat32 accionSpace[] = { -speed , 0.0f, speed };
-			ndInt32 exploreIndex = ndClamp(ndInt32(ndRand() * 3.0f), 0, 2);
-			return accionSpace[exploreIndex];
-		}
-
-		void ExploreActions(ndFloat32 timestep)
-		{
-			ndFloat32 action = GetRandomAction() * timestep;
-			action = 0;
-			m_rollAngle += action;
-			m_rollAngle = -2.0f * timestep * 2.0f;
-			//ndTrace(("%f\n", m_rollAngle));
-
-			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
+			action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
+			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
-				ndEffectorInfo& info = m_effectors[i];
-				const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
-				//const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
-				const ndMatrix roll(ndRollMatrix(m_rollAngle));
-
-				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
-				posit = roll.RotateVector(posit);
-				posit = yaw.RotateVector(posit);
-
-				info.m_effector->SetPosition(posit);
-				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
+				action[i] = ndRand() * 2.0f - 1.0f;
 			}
 		}
 
-		void TickEpock(ndWorld* const, ndFloat32 timestep)
+		void GetState(ndArray<ndReal>& state)
 		{
-			//PredictAction(m_onlineController);
-			//ExploreActions(timestep);
+			ndModelPhysicState modelState(CalculateModelState());
 
-			//ndTraningBashBuffer xxx;
-			//GetRandomBash(xxx);
-			//GetRandomBash(xxx);
+			const ndVector sagittalDir(modelState.m_zmpFrame.m_front);
+			const ndVector sagittalDist(modelState.m_comTarget - modelState.m_centerOfMass);
 
-			m_epockCounter ++;
-			if (m_epockCounter >= 300)
+			ndFloat32 sagittalComPosit = sagittalDir.DotProduct(sagittalDist).GetScalar();
+			ndFloat32 sagittalComSpeed = sagittalDir.DotProduct(modelState.m_centerOfMassVeloc).GetScalar();
+
+			state.SetCount(ndHumanoidBrain::ndModelStateParam::m_stateSize);
+			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit] = sagittalComPosit;
+			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalSpeed] = sagittalComSpeed;
+		}
+
+		void GetStateAndAction()
+		{
+			GetState(m_dqnAgent.m_transition.m_state);
+			if (1)
+			{
+				GetRandomAction();
+			}
+			else
+			{
+				ndAssert(0);
+			}
+		}
+
+		void GetReward()
+		{
+			m_dqnAgent.m_transition.m_reward = 1.0f;
+			m_dqnAgent.m_transition.m_terminalState = false;
+		}
+
+		void TickEpoch(ndWorld* const, ndFloat32)
+		{
+			GetState(m_dqnAgent.m_transition.m_nextState);
+
+			m_dqnAgent.OptimzationStep();
+
+			m_epochCounter ++;
+			if (m_epochCounter >= 300)
 			{
 				m_trainingState = m_initTraining;
 			}
 		}
 		
-		//ndHumanoidBrain m_onlineController;
-		//ndReplayBuffer m_replayBuffer;
-		ndDeepBrainAgentDQN m_dqnAgent;
+		ndDeepBrainAgentTrainier m_dqnAgent;
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndFloat32 m_rollAngle;
 		ndInt32 m_traingCounter;
-		ndInt32 m_epockCounter;
+		ndInt32 m_epochCounter;
 		ndTraningStage m_trainingState;
 	};
 };
