@@ -249,7 +249,7 @@ namespace ndQuadruped_1
 			}
 
 			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
-				:m_basePosition(effector->GetPosition())
+				:m_basePosition(effector->GetLocalTargetPosition())
 				,m_effector(effector)
 			{
 			}
@@ -696,7 +696,7 @@ namespace ndQuadruped_1
 				posit.m_x += keyFrame.m_posit.m_x;
 				posit.m_y += keyFrame.m_posit.m_y;
 				posit.m_z += keyFrame.m_posit.m_z;
-				info.m_effector->SetPosition(posit);
+				info.m_effector->SetLocalTargetPosition(posit);
 			}
 
 			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();

@@ -158,7 +158,7 @@ namespace biped_1
 			}
 
 			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
-				:m_basePosition(effector->GetPosition())
+				:m_basePosition(effector->GetLocalTargetPosition())
 				,m_effector(effector)
 				,m_swivel(0.0f)
 				,m_x(0.0f)
@@ -286,7 +286,7 @@ namespace biped_1
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 							// set the default pose param.
-							ndVector localPosit(effector->GetPosition());
+							ndVector localPosit(effector->GetLocalTargetPosition());
 							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
 
 							//ndVector localPositDir(localPosit.Normalize());
@@ -501,7 +501,7 @@ namespace biped_1
 				posit = roll.RotateVector(posit);
 				posit = yaw.RotateVector(posit);
 
-				info.m_effector->SetPosition(posit);
+				info.m_effector->SetLocalTargetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
 			}
 

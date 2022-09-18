@@ -56,17 +56,18 @@ void ndThreadYield()
 
 void ndTheadPause()
 {
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	#if 0
 		_mm_pause();
 		_mm_pause();
 		_mm_pause();
 		_mm_pause();
 	#else
-		volatile ndInt32 count = 0;
 		ndInt32 x = 0;
-		for (ndInt32 i = 0; i < 16; i++)
+		volatile ndInt32 count = 1;
+		for (ndInt32 i = 0; i < 32; i++)
 		{
-			x = count;
+			x += count;
 		}
 	#endif
 }

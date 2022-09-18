@@ -208,7 +208,7 @@ namespace biped2
 			}
 
 			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
-				:m_basePosition(effector->GetPosition())
+				:m_basePosition(effector->GetLocalTargetPosition())
 				,m_effector(effector)
 				,m_swivel(0.0f)
 				,m_x(0.0f)
@@ -249,7 +249,7 @@ namespace biped2
 			ndMatrix entMatrix(entity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, entMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			entMatrix.m_posit.m_y = floor.m_y + 1.1f;
-			//entMatrix.m_posit.m_y += 0.5f;
+		//entMatrix.m_posit.m_y += 0.25f;
 			entity->ResetMatrix(entMatrix);
 
 			// add the root body
@@ -344,7 +344,7 @@ namespace biped2
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 							// set the default pose param.
-							ndVector localPosit(effector->GetPosition());
+							ndVector localPosit(effector->GetLocalTargetPosition());
 							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
 
 							//ndVector localPositDir(localPosit.Normalize());
@@ -535,11 +535,11 @@ namespace biped2
 				const ndEffectorInfo& info1 = m_effectors[1];
 				ndVector p0(info0.m_effector->GetGlobalPosition());
 				ndVector p1(info1.m_effector->GetGlobalPosition());
-
+				
 				ndVector q0(com);
 				ndVector q1(com);
 				q1.m_y -= 1.2f;
-
+				
 				ndBigVector qOq1ut;
 				ndBigVector p0p1Out;
 				dRayToRayDistance(q0, q1, p0, p1, qOq1ut, p0p1Out);
@@ -596,7 +596,7 @@ namespace biped2
 				posit = roll.RotateVector(posit);
 				posit = yaw.RotateVector(posit);
 
-				info.m_effector->SetPosition(posit);
+				info.m_effector->SetLocalTargetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
 			}
 
@@ -763,7 +763,13 @@ namespace biped2
 				}
 			}
 
-			ndFloat32 speed = 2.0f;
+			valueIndex = (m_dqnAgent.m_transition.m_state[1] > 0.0) ? 0 : 2;
+			if (ndAbs(m_dqnAgent.m_transition.m_state[1]) < 0.01f)
+			{
+				valueIndex = 1;
+			}
+
+			ndFloat32 speed = 8.0f;
 			ndFloat32 accionSpace[] = { -speed , 0.0f, speed };
 			ndFloat32 effectorAction = accionSpace[valueIndex];
 			m_rollAngle += effectorAction * timestep;
@@ -771,18 +777,18 @@ namespace biped2
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
 				ndEffectorInfo& info = m_effectors[i];
-				const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+				//const ndMatrix yaw(ndYawMatrix(info.m_y_mapper.Interpolate(info.m_y)));
+				const ndMatrix yaw(ndYawMatrix(0.0f));
 				//const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
 				const ndMatrix roll(ndRollMatrix(m_rollAngle));
 			
 				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
 				posit = roll.RotateVector(posit);
-				posit = yaw.RotateVector(posit);
-			
-				info.m_effector->SetPosition(posit);
+				//posit = yaw.RotateVector(posit);
+
+				info.m_effector->SetLocalTargetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
 			}
-
 			
 			ndSkeletonContainer* const skeleton = m_bodyArray[0]->GetSkeleton();
 			ndAssert(skeleton);
@@ -840,7 +846,8 @@ namespace biped2
 			m_rollAngle = 0;
 			m_traingCounter++;
 			m_epochCounter = 0;
-			m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
+			//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
+			m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
 		}
 
 		void GetRandomAction()
@@ -887,7 +894,7 @@ namespace biped2
 			m_dqnAgent.m_transition.m_terminalState = false;
 
 			ndReal dist = ndAbs (m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit]);
-			if (dist > 0.2f)
+			if (dist > 0.15f)
 			{
 				m_dqnAgent.m_transition.m_terminalState = true;
 			}
@@ -901,8 +908,8 @@ namespace biped2
 
 			m_epochCounter ++;
 			bool isTerminal = m_dqnAgent.m_transition.m_terminalState;
-			if (isTerminal)
-			//if (m_epochCounter >= 300)
+			//if (isTerminal)
+			if (isTerminal || (m_epochCounter >= 300))
 			{
 				m_trainingState = m_initTraining;
 			}
@@ -918,46 +925,6 @@ namespace biped2
 };
 
 using namespace biped2;
-void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
-{
-	// build a floor
-	ndSetRandSeed(12345);
-
-	BuildFloorBox(scene, ndGetIdentityMatrix());
-
-	ndBipedMaterial material;
-	material.m_restitution = 0.1f;
-	material.m_staticFriction0 = 0.9f;
-	material.m_staticFriction1 = 0.9f;
-	material.m_dynamicFriction0 = 0.9f;
-	material.m_dynamicFriction1 = 0.9f;
-
-	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
-
-	ndMatrix origin(ndGetIdentityMatrix());
-	origin.m_posit.m_x += 20.0f;
-	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
-
-	origin.m_posit.m_x -= 20.0f;
-	ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
-
-	ndWorld* const world = scene->GetWorld();
-	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);
-	world->AddModel(model);
-	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
-	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
-
-	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
-
-	delete modelMesh;
-
-	ndQuaternion rot;
-	origin.m_posit.m_x -= 5.0f;
-	origin.m_posit.m_y = 2.0f;
-	scene->SetCameraMatrix(rot, origin.m_posit);
-}
 
 void ndBipedTest_2(ndDemoEntityManager* const scene)
 {
@@ -996,3 +963,46 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	origin.m_posit.m_y = 2.0f;
 	scene->SetCameraMatrix(rot, origin.m_posit);
 }
+
+void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
+{
+	// build a floor
+	ndSetRandSeed(12345);
+
+	BuildFloorBox(scene, ndGetIdentityMatrix());
+
+	ndBipedMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+
+	ndMatrix origin(ndGetIdentityMatrix());
+	origin.m_posit.m_x += 20.0f;
+	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+
+	origin.m_posit.m_x -= 20.0f;
+	ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
+
+	ndWorld* const world = scene->GetWorld();
+	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);
+	world->AddModel(model);
+	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
+	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+
+	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+
+	delete modelMesh;
+
+	ndQuaternion rot(ndYawMatrix(ndPi * 0.5f));
+	//origin.m_posit.m_x -= 5.0f;
+	origin.m_posit.m_z = 4.0f;
+	origin.m_posit.m_y = 1.5f;
+	scene->SetCameraMatrix(rot, origin.m_posit);
+}
+

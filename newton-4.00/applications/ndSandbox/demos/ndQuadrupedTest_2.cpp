@@ -48,7 +48,7 @@ namespace ndQuadruped_2
 			}
 
 			ndEffectorInfo(ndIkSwivelPositionEffector* const effector, ndJointHinge* const lookActJoint)
-				:m_basePosition(effector->GetPosition())
+				:m_basePosition(effector->GetLocalTargetPosition())
 				,m_effector(effector)
 				,m_lookAtJoint(lookActJoint)
 				,m_swivel(0.0f)
@@ -285,7 +285,7 @@ namespace ndQuadruped_2
 				posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
 				posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
 				posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-				info.m_effector->SetPosition(posit);
+				info.m_effector->SetLocalTargetPosition(posit);
 
 				ndMatrix swivelMatrix0;
 				ndMatrix swivelMatrix1;
