@@ -26,6 +26,14 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
+#if defined(__arm__) || defined(__aarch64__)
+  #include <arm_acle.h>
+  #define _pause() __yield()
+  //#define ND_CPUPauseInstruction() __asm__ __volatile__("yield" ::: "memory")
+  #define ARM_FPU_GETCW(fpscr) __asm__ __volatile__("mrs %0, fpscr" : "=r"(fpscr))
+  #define ARM_FPU_SETCW(fpscr) __asm__ __volatile__("msr fpscr, %0" : : "r"(fpscr))
+#endif
+
 #define D_VERTEXLIST_INDEX_LIST_BASH (1024)
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)
@@ -82,22 +90,24 @@ void ndSpinLock::Delay(ndInt32& exp)
 			_mm_pause();
 			_mm_pause();
 		}
-	#else
+    #elif defined(__arm__) || defined(__aarch64__)
+	    for (ndInt32 i = 0; i < exp; ++i)
+	    {
+			ndTheadPause()
+	    }
+     #else
 		// use standard thread yield on non x86 platforms 
-		//std::this_thread::yield();
-		volatile ndInt32 acc = 0;
 		for (ndInt32 i = 0; i < exp; ++i)
 		{
-			acc++;
-			acc++;
+			ndTheadPause()
 		}
-	#endif
+    #endif
 	exp = ndMin(exp * 2, 64);
 }
 #endif
 
 
-ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
+ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask) 
 {
 	#if (defined (WIN32) || defined(_WIN32))
 		ndClearFP();
@@ -116,8 +126,20 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	#elif (defined (_M_ARM) || defined (_M_ARM64))
 		#pragma message ("warning!!! arm cpu uncondiotially flushes SIMD to zero, but has to set ")
-		#pragma message ("warning!!! For the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register – FPSCR in Arm32 and FPCR in AArch64. ")
+		#pragma message ("warning!!! For the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register ï¿½ FPSCR in Arm32 and FPCR in AArch64. ")
 		//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	#endif
+
+	#if defined(__arm__) || defined(__aarch64__)
+	   #define ARM_FAST_GETFLOATS                                                                   \
+	   {                                                                                            \
+		  ndUnsigned32 eE2Hsb4v {}; /* random name to avoid shadowing warnings */                   \
+		  ARM_FPU_GETCW(eE2Hsb4v);                                                                  \
+		  m_armMask = eE2Hsb4v;                                                                     \
+		  eE2Hsb4v |= (1 << 24) | (1 << 19); /* FZ flag, FZ16 flag; flush denormals to zero  */     \
+		  ARM_FPU_SETCW(eE2Hsb4v);                                                                  \
+	   }                                                                                            \
+	   static_assert(true, "require semi-colon after macro with this assert")
 	#endif
 
 	//ndFloat32 a = ndFloat32(1.0f);
@@ -131,7 +153,7 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 	//count++;
 }
 
-ndFloatExceptions::~ndFloatExceptions()
+ndFloatExceptions::~ndFloatExceptions() 
 {
 	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 		_mm_setcsr(m_sseMask);
@@ -140,6 +162,14 @@ ndFloatExceptions::~ndFloatExceptions()
 	#if (defined (WIN32) || defined(_WIN32))
 		ndClearFP();
 		ndControlFP(m_x86Mask, _MCW_EM);
+	#endif
+
+	#if defined(__arm__) || defined(__aarch64__)
+		#define ARM_FAST_SETFLOATS		\
+		{								\
+			ARM_FPU_SETCW(m_armMask);	\
+		}								\
+		static_assert(true, "require semi-colon after macro with this assert")
 	#endif
 }
 

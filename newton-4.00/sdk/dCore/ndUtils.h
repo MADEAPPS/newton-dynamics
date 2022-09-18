@@ -193,7 +193,7 @@ class ndFloatExceptions
 	#if defined (WIN32) || defined(_WIN32)
 		#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL)
 	#else
-		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_INEXACT)
+		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_DENORMAL)
 	#endif
 
 	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXCEPTIONS_MASK);
@@ -203,6 +203,7 @@ class ndFloatExceptions
 	fexcept_t m_pstatus;
 	ndUnsigned32 m_x86Mask;
 	ndUnsigned32 m_sseMask;
+	ndUnsigned32 m_armMask;
 };
 
 /// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
