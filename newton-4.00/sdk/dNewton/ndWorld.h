@@ -106,7 +106,8 @@ class ndWorld: public ndClassAlloc
 	ndScene* GetScene() const;
 
 	ndFloat32 GetUpdateTime() const;
-	ndUnsigned32 GetFrameIndex() const;
+	ndUnsigned32 GetFrameNumber() const;
+	ndUnsigned32 GetSubFrameNumber() const;
 	ndFloat32 GetAverageUpdateTime() const;
 	ndFloat32 GetExtensionAverageUpdateTime() const;
 
@@ -292,9 +293,14 @@ inline ndFloat32 ndWorld::GetExtensionAverageUpdateTime() const
 	return m_extensionAverageUpdateTime;
 }
 
-inline ndUnsigned32 ndWorld::GetFrameIndex() const
+inline ndUnsigned32 ndWorld::GetFrameNumber() const
 {
-	return m_scene->m_frameIndex;
+	return m_scene->m_frameNumber;
+}
+
+inline ndUnsigned32 ndWorld::GetSubFrameNumber() const
+{
+	return m_scene->m_subStepNumber;
 }
 
 inline void ndWorld::OnPostUpdate(ndFloat32)

@@ -836,9 +836,10 @@ namespace biped2
 			}
 		}
 
-		void InitTraning(ndWorld* const)
+		void InitTraning(ndWorld* const world)
 		{
-			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
+			ndTrace(("frame %d\n", world->GetSubFrameNumber()));
+ 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 			{
 				m_basePose[i].SetPose();
 			}

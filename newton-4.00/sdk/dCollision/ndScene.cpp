@@ -61,8 +61,8 @@ ndScene::ndScene()
 	,m_contactNotifyCallback(new ndContactNotify())
 	,m_timestep(ndFloat32 (0.0f))
 	,m_lru(D_CONTACT_DELAY_FRAMES)
-	,m_frameIndex(0)
-	,m_subStepIndex(0)
+	,m_frameNumber(0)
+	,m_subStepNumber(0)
 	,m_forceBalanceSceneCounter(0)
 {
 	m_sentinelBody = new ndBodySentinel;
@@ -91,8 +91,8 @@ ndScene::ndScene(const ndScene& src)
 	,m_contactNotifyCallback(nullptr)
 	,m_timestep(ndFloat32(0.0f))
 	,m_lru(src.m_lru)
-	,m_frameIndex(src.m_frameIndex)
-	,m_subStepIndex(src.m_subStepIndex)
+	,m_frameNumber(src.m_frameNumber)
+	,m_subStepNumber(src.m_subStepNumber)
 	,m_forceBalanceSceneCounter(0)
 {
 	ndScene* const stealData = (ndScene*)&src;
@@ -177,7 +177,7 @@ void ndScene::Begin()
 void ndScene::End()
 {
 	ndThreadPool::End();
-	m_frameIndex++;
+	m_frameNumber++;
 }
 
 void ndScene::Update(ndFloat32 timestep)
@@ -1106,8 +1106,8 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndBvhNode** sta
 void ndScene::Cleanup()
 {
 	Sync();
-	m_frameIndex = 0;
-	m_subStepIndex = 0;
+	m_frameNumber = 0;
+	m_subStepNumber = 0;
 
 	m_backgroundThread.Terminate();
 

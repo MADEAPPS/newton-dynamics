@@ -169,8 +169,8 @@ class ndScene : public ndThreadPool
 	
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;
-	ndUnsigned32 m_frameIndex;
-	ndUnsigned32 m_subStepIndex;
+	ndUnsigned32 m_frameNumber;
+	ndUnsigned32 m_subStepNumber;
 	ndUnsigned32 m_forceBalanceSceneCounter;
 
 	static ndVector m_velocTol;

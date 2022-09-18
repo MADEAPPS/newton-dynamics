@@ -478,7 +478,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// second pass on models
 	ModelPostUpdate();
 
-	m_scene->m_subStepIndex++;
+	m_scene->m_subStepNumber++;
 }
 
 void ndWorld::ParticleUpdate(ndFloat32 timestep)
