@@ -750,6 +750,12 @@ namespace biped2
 			ndModel::Update(world, timestep);
 			TrainingLoopBegin(world, timestep);
 
+
+			if (ndAbs(m_rollAngle) > 45 * ndDegreeToRad)
+			{
+				m_rollAngle *= 1;
+			}
+
 			GetStateAndAction();
 			GetReward();
 
@@ -766,7 +772,7 @@ namespace biped2
 			}
 
 			valueIndex = (m_dqnAgent.m_transition.m_state[1] > 0.0) ? 0 : 2;
-			if (ndAbs(m_dqnAgent.m_transition.m_state[1]) < 0.01f)
+			if (ndAbs(m_dqnAgent.m_transition.m_state[1]) < 0.005f)
 			{
 				valueIndex = 1;
 			}
