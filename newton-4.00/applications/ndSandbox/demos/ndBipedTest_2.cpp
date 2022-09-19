@@ -771,8 +771,11 @@ namespace biped2
 				}
 			}
 
-			valueIndex = (m_dqnAgent.m_transition.m_state[1] > 0.0) ? 0 : 2;
-			if (ndAbs(m_dqnAgent.m_transition.m_state[1]) < 0.005f)
+			ndFloat32 stateSpeed = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalSpeed];
+			ndFloat32 statePosit = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalPosit];
+			ndFloat32 predictePosit = statePosit + stateSpeed * timestep;
+			valueIndex = (predictePosit > 0.0) ? 0 : 2;
+			if (ndAbs(predictePosit) < 0.0025f)
 			{
 				valueIndex = 1;
 			}
