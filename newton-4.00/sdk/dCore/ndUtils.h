@@ -193,7 +193,7 @@ class ndFloatExceptions
 	#if defined (WIN32) || defined(_WIN32)
 		#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL)
 	#else
-		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_DENORMAL)
+		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_INEXACT)
 	#endif
 
 	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXCEPTIONS_MASK);

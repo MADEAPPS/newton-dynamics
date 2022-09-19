@@ -33,9 +33,11 @@
 	#include "ndVectorScalar.h"
 #elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#include "ndVectorSimd.h"
-#else
+#elif (defined(__arm__) && defined(__aarch64__))
 	// assume arm instruction set until otherwise
 	#include "ndVectorArmNeon.h"
+#else // _x86
+	#include "ndVectorScalar.h"
 #endif
 
 #endif

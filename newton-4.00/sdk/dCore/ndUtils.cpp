@@ -93,13 +93,13 @@ void ndSpinLock::Delay(ndInt32& exp)
     #elif defined(__arm__) || defined(__aarch64__)
 	    for (ndInt32 i = 0; i < exp; ++i)
 	    {
-			ndTheadPause()
+			ndTheadPause();
 	    }
      #else
 		// use standard thread yield on non x86 platforms 
 		for (ndInt32 i = 0; i < exp; ++i)
 		{
-			ndTheadPause()
+			ndTheadPause();
 		}
     #endif
 	exp = ndMin(exp * 2, 64);
