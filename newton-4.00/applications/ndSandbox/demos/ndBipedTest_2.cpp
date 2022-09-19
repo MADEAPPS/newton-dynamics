@@ -165,7 +165,7 @@ namespace biped2
 		enum ndModelActionParam
 		{
 			m_goBack,
-			m_state,
+			m_stay,
 			m_goFoward,
 			m_actionSize,
 		};
@@ -178,7 +178,7 @@ namespace biped2
 			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
 			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
 			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_lineal);
+			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_sigmoid);
 
 			BeginAddLayer();
 			AddLayer(inputLayer);
@@ -369,6 +369,10 @@ namespace biped2
 			}
 
 			NormalizeMassDistribution(100.0f);
+
+			m_actionToActiationMap[ndHumanoidBrain::m_goBack] = -8.0f;
+			m_actionToActiationMap[ndHumanoidBrain::m_stay] = 0.0f;
+			m_actionToActiationMap[ndHumanoidBrain::m_goFoward] = 8.0f;
 		}
 
 		~ndHumanoidModel()
@@ -672,6 +676,7 @@ namespace biped2
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
 		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
+		ndFloat32 m_actionToActiationMap[ndHumanoidBrain::m_actionSize];
 	};
 
 	class ndHumanoidTraningModel : public ndHumanoidModel
@@ -750,14 +755,11 @@ namespace biped2
 			ndModel::Update(world, timestep);
 			TrainingLoopBegin(world, timestep);
 
-
-			if (ndAbs(m_rollAngle) > 45 * ndDegreeToRad)
-			{
-				m_rollAngle *= 1;
-			}
-
-			GetStateAndAction();
-			GetReward();
+			//if (ndAbs(m_rollAngle) > 45 * ndDegreeToRad)
+			//{
+			//	m_rollAngle *= 1;
+			//}
+			GetStateAndAction(timestep);
 
 			ndInt32 valueIndex = 0;
 			ndFloat32 maxValue = -1.0e10f;
@@ -770,19 +772,7 @@ namespace biped2
 					maxValue = action[i];
 				}
 			}
-
-			ndFloat32 stateSpeed = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalSpeed];
-			ndFloat32 statePosit = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalPosit];
-			ndFloat32 predictePosit = statePosit + stateSpeed * timestep;
-			valueIndex = (predictePosit > 0.0) ? 0 : 2;
-			if (ndAbs(predictePosit) < 0.0025f)
-			{
-				valueIndex = 1;
-			}
-
-			ndFloat32 speed = 8.0f;
-			ndFloat32 accionSpace[] = { -speed , 0.0f, speed };
-			ndFloat32 effectorAction = accionSpace[valueIndex];
+			ndFloat32 effectorAction = m_actionToActiationMap[valueIndex];
 			m_rollAngle += effectorAction * timestep;
 
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
@@ -849,7 +839,7 @@ namespace biped2
 
 		void InitTraning(ndWorld* const world)
 		{
-			ndTrace(("frame %d\n", world->GetSubFrameNumber()));
+			//ndTrace(("frame %d\n", world->GetSubFrameNumber()));
  			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 			{
 				m_basePose[i].SetPose();
@@ -862,14 +852,31 @@ namespace biped2
 			m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
 		}
 
-		void GetRandomAction()
+		void GetRandomAction(ndFloat32 timestep)
 		{
 			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
 			action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
 			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
-				action[i] = ndRand() * 2.0f - 1.0f;
+				action[i] = 0.0f;
 			}
+
+			#if 0
+				ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
+				action[valueIndex] = 1.0f;
+
+			#else		
+
+				ndFloat32 stateSpeed = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalSpeed];
+				ndFloat32 statePosit = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalPosit];
+				ndFloat32 predictePosit = statePosit + stateSpeed * timestep;
+				ndInt32 valueIndex = (predictePosit > 0.0) ? ndHumanoidBrain::ndModelActionParam::m_goBack : ndHumanoidBrain::ndModelActionParam::m_goFoward;
+				if (ndAbs(predictePosit) < 0.0025f)
+				{
+					valueIndex = ndHumanoidBrain::ndModelActionParam::m_stay;
+				}
+				action[valueIndex] = 1.0f;
+			#endif
 		}
 
 		void GetState(ndArray<ndReal>& state)
@@ -887,29 +894,27 @@ namespace biped2
 			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalSpeed] = sagittalComSpeed;
 		}
 
-		void GetStateAndAction()
+		void GetStateAndAction(ndFloat32 timestep)
 		{
 			GetState(m_dqnAgent.m_transition.m_state);
 			if (1)
 			{
-				GetRandomAction();
+				GetRandomAction(timestep);
 			}
 			else
 			{
 				ndAssert(0);
 			}
-		}
 
-		void GetReward()
-		{
+			// Get the reward of this state
 			m_dqnAgent.m_transition.m_reward = 1.0f;
 			m_dqnAgent.m_transition.m_terminalState = false;
 
-			//ndReal dist = ndAbs (m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit]);
-			//if (dist > 0.15f)
-			//{
-			//	m_dqnAgent.m_transition.m_terminalState = true;
-			//}
+			ndFloat32 dist = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit];
+			if (ndAbs(dist) > 0.25f)
+			{
+				//m_dqnAgent.m_transition.m_terminalState = true;
+			}
 			if (ndAbs(m_rollAngle) > ndFloat32(80.0f * ndDegreeToRad))
 			{
 				m_dqnAgent.m_transition.m_terminalState = true;
@@ -925,8 +930,9 @@ namespace biped2
 			m_epochCounter ++;
 			bool isTerminal = m_dqnAgent.m_transition.m_terminalState;
 			//if (isTerminal)
-			if (isTerminal || (m_epochCounter >= 300))
+			if (isTerminal || (m_epochCounter >= 600))
 			{
+				ndTrace (("frames alived %d\n", m_epochCounter));
 				m_trainingState = m_initTraining;
 			}
 		}
