@@ -23,6 +23,8 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+//#define _TEST_ONE_FUTURE_STE_ACTION
+
 namespace biped2
 {
 	class ndDefinition
@@ -784,8 +786,8 @@ namespace biped2
 				const ndMatrix roll(ndRollMatrix(m_rollAngle));
 			
 				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
+				posit = yaw.RotateVector(posit);
 				posit = roll.RotateVector(posit);
-				//posit = yaw.RotateVector(posit);
 
 				info.m_effector->SetLocalTargetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
@@ -861,12 +863,7 @@ namespace biped2
 				action[i] = 0.0f;
 			}
 
-			#if 0
-				ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
-				action[valueIndex] = 1.0f;
-
-			#else		
-
+			#ifdef _TEST_ONE_FUTURE_STE_ACTION
 				ndFloat32 stateSpeed = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalSpeed];
 				ndFloat32 statePosit = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalPosit];
 				ndFloat32 predictePosit = statePosit + stateSpeed * timestep;
@@ -875,6 +872,9 @@ namespace biped2
 				{
 					valueIndex = ndHumanoidBrain::ndModelActionParam::m_stay;
 				}
+				action[valueIndex] = 1.0f;
+			#else		
+				ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
 				action[valueIndex] = 1.0f;
 			#endif
 		}
