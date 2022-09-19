@@ -905,12 +905,11 @@ namespace biped2
 			m_dqnAgent.m_transition.m_reward = 1.0f;
 			m_dqnAgent.m_transition.m_terminalState = false;
 
-			ndReal dist = ndAbs (m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit]);
-			if (dist > 0.15f)
-			{
-				m_dqnAgent.m_transition.m_terminalState = true;
-			}
-
+			//ndReal dist = ndAbs (m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit]);
+			//if (dist > 0.15f)
+			//{
+			//	m_dqnAgent.m_transition.m_terminalState = true;
+			//}
 			if (ndAbs(m_rollAngle) > ndFloat32(80.0f * ndDegreeToRad))
 			{
 				m_dqnAgent.m_transition.m_terminalState = true;
