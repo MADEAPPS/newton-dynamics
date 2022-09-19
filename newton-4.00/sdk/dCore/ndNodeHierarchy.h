@@ -199,13 +199,11 @@ T* ndNodeHierarchy<T>::GetParent () const
 	return (T*) ndNodeBaseHierarchy::GetParent ();
 }
 
-
 template<class T>
 T* ndNodeHierarchy<T>::GetRoot () const
 {
 	return (T*) ndNodeBaseHierarchy::GetRoot ();
 }
-
 
 template<class T>
 T* ndNodeHierarchy<T>::GetFirst() const

@@ -144,9 +144,9 @@ namespace biped2
 	class ndModelPhysicState
 	{
 		public:
-		ndMatrix m_zmpFrame;
+		ndMatrix m_comFrame;
 		ndVector m_comTarget;
-		ndVector m_centerOfMass;
+		ndVector m_zmpPosit;
 		ndVector m_centerOfMassVeloc;
 		ndFloat32 m_comSagitalAngle;
 		ndFloat32 m_comSagitalOmega;
@@ -328,14 +328,14 @@ namespace biped2
 
 							ndFloat32 regularizer = 0.001f;
 							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, childBody, pivotBody);
-							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-
 							const ndVector kneePoint(childFrameNode->GetParent()->CalculateGlobalMatrix().m_posit);
 							const ndVector dist0(effectorFrame.m_posit - kneePoint);
 							const ndVector dist1(kneePoint - pivotFrame.m_posit);
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
-							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
+							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.995f);
+
+							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
 							ndEffectorInfo info(effector);
 							info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
@@ -547,27 +547,27 @@ namespace biped2
 			}
 
 			zmp.m_w = 1.0f;
-			//modelState.m_zmpFrame = m_locaFrame * m_bodyArray[0]->GetMatrix();
 			const ndMatrix matrix(m_locaFrame * m_bodyArray[0]->GetMatrix());
-			modelState.m_zmpFrame.m_right = matrix.m_right;
-			modelState.m_zmpFrame.m_front = ndVector(0.0f, 1.0f, 0.0f, 0.0f).CrossProduct(matrix.m_right);
-			modelState.m_zmpFrame.m_front = modelState.m_zmpFrame.m_front.Normalize();
-			modelState.m_zmpFrame.m_up = modelState.m_zmpFrame.m_right.CrossProduct(modelState.m_zmpFrame.m_front);
-		
-			modelState.m_centerOfMass = com;
-			modelState.m_zmpFrame.m_posit = zmp;
-			modelState.m_centerOfMassVeloc = comVeloc;
+			//modelState.m_zmpFrame.m_right = matrix.m_right;
+			//modelState.m_zmpFrame.m_front = ndVector(0.0f, 1.0f, 0.0f, 0.0f).CrossProduct(matrix.m_right);
+			//modelState.m_zmpFrame.m_front = modelState.m_zmpFrame.m_front.Normalize();
+			//modelState.m_zmpFrame.m_up = modelState.m_zmpFrame.m_right.CrossProduct(modelState.m_zmpFrame.m_front);
 
+			modelState.m_comFrame.m_right = matrix.m_right;
+			modelState.m_comFrame.m_front = ndVector(0.0f, 1.0f, 0.0f, 0.0f).CrossProduct(matrix.m_right);
+			modelState.m_comFrame.m_front = modelState.m_comFrame.m_front.Normalize();
+			modelState.m_comFrame.m_up = modelState.m_comFrame.m_right.CrossProduct(modelState.m_comFrame.m_front);
+			modelState.m_comFrame.m_posit = com;
+		
+			//modelState.m_centerOfMass = com;
+			modelState.m_zmpPosit = zmp;
+			modelState.m_centerOfMassVeloc = comVeloc;
+			
 			ndVector segment(zmp - com);
 			ndFloat32 length = ndSqrt(segment.DotProduct(segment & ndVector::m_triplexMask).GetScalar());
 			ndVector targetPoint(zmp);
 			targetPoint.m_y += length;
 			modelState.m_comTarget = targetPoint;
-
-			// calculate sagittal angle and velocity
-			//ndFloat32 m_comSagittalAngle;
-			//ndFloat32 m_comSagittalOmega;
-
 
 			return modelState;
 		}
@@ -576,17 +576,13 @@ namespace biped2
 		{
 			ndModelPhysicState modeState(CalculateModelState());
 
-			const ndVector& com = modeState.m_centerOfMass;
-			const ndMatrix& zmpFrame = modeState.m_zmpFrame;
-			const ndVector& comTarget = modeState.m_comTarget;
+			context.DrawFrame(modeState.m_comFrame);
+			context.DrawLine(modeState.m_zmpPosit, modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+			context.DrawLine(modeState.m_zmpPosit, modeState.m_comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
 
-			context.DrawFrame(zmpFrame);
-			context.DrawLine(zmpFrame.m_posit, com, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-			context.DrawLine(zmpFrame.m_posit, comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
-
-			context.DrawPoint(com, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
-			context.DrawPoint(zmpFrame.m_posit, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
-			context.DrawPoint(comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
+			context.DrawPoint(modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
+			context.DrawPoint(modeState.m_comTarget, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
+			context.DrawPoint(modeState.m_zmpPosit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -871,8 +867,8 @@ namespace biped2
 		{
 			ndModelPhysicState modelState(CalculateModelState());
 
-			const ndVector sagittalDir(modelState.m_zmpFrame.m_front);
-			const ndVector sagittalDist(modelState.m_comTarget - modelState.m_centerOfMass);
+			const ndVector sagittalDir(modelState.m_comFrame.m_front);
+			const ndVector sagittalDist(modelState.m_comTarget - modelState.m_comFrame.m_posit);
 
 			ndFloat32 sagittalComPosit = sagittalDir.DotProduct(sagittalDist).GetScalar();
 			ndFloat32 sagittalComSpeed = sagittalDir.DotProduct(modelState.m_centerOfMassVeloc).GetScalar();

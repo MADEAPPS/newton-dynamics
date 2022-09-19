@@ -149,8 +149,6 @@ void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
 
 ndVector ndIkSwivelPositionEffector::GetGlobalPosition() const
 {
-//	const ndVector p(GetLocalMatrix1().TransformVector(GetPosition()));
-//	return GetBody1()->GetMatrix().TransformVector(p);
 	return GetBody0()->GetMatrix().TransformVector(GetLocalMatrix0().m_posit);
 }
 
@@ -158,6 +156,8 @@ void ndIkSwivelPositionEffector::SetWorkSpaceConstraints(ndFloat32 minRadio, ndF
 {
 	m_minWorkSpaceRadio = minRadio;
 	m_maxWorkSpaceRadio = maxRadio;
+	// make sure the taget is with in the workspace constraint
+	SetLocalTargetPosition(GetLocalTargetPosition());
 }
 
 void ndIkSwivelPositionEffector::GetWorkSpaceConstraints(ndFloat32& minRadio, ndFloat32& maxRadio) const
