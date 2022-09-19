@@ -26,13 +26,13 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
-#if (defined(__arm__) || defined(__aarch64__))
-  //#include <arm_acle.h>
-  //#define _pause() __yield()
-  //#define ND_CPUPauseInstruction() __asm__ __volatile__("yield" ::: "memory")
-  #define ARM_FPU_GETCW(fpscr) __asm__ __volatile__("mrs %0, fpscr" : "=r"(fpscr))
-  #define ARM_FPU_SETCW(fpscr) __asm__ __volatile__("msr fpscr, %0" : : "r"(fpscr))
-#endif
+//#if (defined(__arm__) || defined(__aarch64__))
+//  //#include <arm_acle.h>
+//  //#define _pause() __yield()
+//  //#define ND_CPUPauseInstruction() __asm__ __volatile__("yield" ::: "memory")
+//  #define ARM_FPU_GETCW(fpscr) __asm__ __volatile__("mrs %0, fpscr" : "=r"(fpscr))
+//  #define ARM_FPU_SETCW(fpscr) __asm__ __volatile__("msr fpscr, %0" : : "r"(fpscr))
+//#endif
 
 #define D_VERTEXLIST_INDEX_LIST_BASH (1024)
 
@@ -57,28 +57,6 @@ ndUnsigned64 ndGetTimeInMicroseconds()
 	return timeStamp;
 }
 
-void ndThreadYield()
-{
-	std::this_thread::yield();
-}
-
-void ndTheadPause()
-{
-	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-	#if 0
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-	#else
-		ndInt32 x = 0;
-		volatile ndInt32 count = 1;
-		for (ndInt32 i = 0; i < 32; i++)
-		{
-			x += count;
-		}
-	#endif
-}
 
 #ifndef D_USE_THREAD_EMULATION
 void ndSpinLock::Delay(ndInt32& exp)
@@ -107,89 +85,6 @@ void ndSpinLock::Delay(ndInt32& exp)
 #endif
 
 
-ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask) 
-{
-	#if (defined (WIN32) || defined(_WIN32))
-		ndClearFP();
-		m_floatMask = ndControlFP(0, 0);
-		ndControlFP(m_floatMask & ~mask, _MCW_EM);
-	#endif
-
-	#if defined (__APPLE__)
-		// Sets DAZ and FTZ, clobbering other CSR settings.
-		// See https://opensource.apple.com/source/Libm/Libm-287.1/Source/Intel/, fenv.c and fenv.h.
-		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
-		// fesetenv(FE_DFL_ENV) // Disable both, clobbering other CSR settings.
-	#elif (defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
-		m_simdMask = _mm_getcsr();
-		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
-		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-
-	#elif (defined (_M_ARM) || defined (_M_ARM64))
-		#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
-		#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
-
-	#elif (defined(__arm__) || defined(__aarch64__))
-		#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
-		#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
-
-		ndUnsigned32 eE2Hsb4v = 0; /* random name to avoid shadowing warnings */                   
-		ARM_FPU_GETCW(eE2Hsb4v);                                                                  
-		m_simdMask = eE2Hsb4v;
-		eE2Hsb4v |= (1 << 24) | (1 << 19); /* FZ flag, FZ16 flag; flush denormals to zero  */     
-		ARM_FPU_SETCW(eE2Hsb4v);                                                                  
-	#endif
-
-	//ndFloat32 a = ndFloat32(1.0f);
-	//ndFloat32 b = ndFloat32(0.1f);
-	//ndInt32 count = 0;
-	//while (a != 0.0f)
-	//{
-	//	a = a * b;
-	//	count++;
-	//}
-	//count++;
-}
-
-ndFloatExceptions::~ndFloatExceptions() 
-{
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-		_mm_setcsr(m_simdMask);
-	#endif
-
-	#if (defined (WIN32) || defined(_WIN32))
-		ndClearFP();
-		ndControlFP(m_floatMask, _MCW_EM);
-	#endif
-
-	#if (defined (_M_ARM) || defined (_M_ARM64))
-		#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
-		#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
-
-	#elif (defined(__arm__) || defined(__aarch64__))
-		#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
-		#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
-
-		ARM_FPU_SETCW(m_simdMask);
-	#endif
-}
-
-ndSetPrecisionDouble::ndSetPrecisionDouble()
-{
-	//#if defined (WIN32) || defined(_WIN32)
-	//	ndClearFP();
-	//	m_mask = ndInt32(ndControlFP(0, 0));
-	//	ndControlFP(_PC_53, _MCW_PC);
-	//#endif
-}
-
-ndSetPrecisionDouble::~ndSetPrecisionDouble()
-{
-	//#if defined (WIN32) || defined(_WIN32)
-	//	ndClearFP();
-	//	ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
-	//#endif
-}
 
 class ndSortCluster
 {
@@ -486,3 +381,108 @@ ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes
 	return count;
 }
 
+
+
+void ndThreadYield()
+{
+	std::this_thread::yield();
+}
+
+void ndTheadPause()
+{
+	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+#if 0
+	_mm_pause();
+	_mm_pause();
+	_mm_pause();
+	_mm_pause();
+#else
+	ndInt32 x = 0;
+	volatile ndInt32 count = 1;
+	for (ndInt32 i = 0; i < 32; i++)
+	{
+		x += count;
+	}
+#endif
+}
+
+
+ndSetPrecisionDouble::ndSetPrecisionDouble()
+{
+	//#if defined (WIN32) || defined(_WIN32)
+	//	ndClearFP();
+	//	m_mask = ndInt32(ndControlFP(0, 0));
+	//	ndControlFP(_PC_53, _MCW_PC);
+	//#endif
+}
+
+ndSetPrecisionDouble::~ndSetPrecisionDouble()
+{
+	//#if defined (WIN32) || defined(_WIN32)
+	//	ndClearFP();
+	//	ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
+	//#endif
+}
+
+ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
+{
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		ndClearFP();
+		m_floatMask = ndControlFP(0, 0);
+		ndControlFP(m_floatMask & ~mask, _MCW_EM);
+
+		m_simdMask = _mm_getcsr();
+		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	#endif
+
+	//#if defined (__APPLE__)
+	//	// Sets DAZ and FTZ, clobbering other CSR settings.
+	//	// See https://opensource.apple.com/source/Libm/Libm-287.1/Source/Intel/, fenv.c and fenv.h.
+	//	fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+	//	// fesetenv(FE_DFL_ENV) // Disable both, clobbering other CSR settings.
+	//#elif (defined (_M_ARM) || defined (_M_ARM64))
+	//	#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
+	//	#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
+	//
+	//#elif (defined(__arm__) || defined(__aarch64__))
+	//	#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
+	//	#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
+	//
+	//	ndUnsigned32 eE2Hsb4v = 0; /* random name to avoid shadowing warnings */
+	//	ARM_FPU_GETCW(eE2Hsb4v);
+	//	m_simdMask = eE2Hsb4v;
+	//	eE2Hsb4v |= (1 << 24) | (1 << 19); /* FZ flag, FZ16 flag; flush denormals to zero  */
+	//	ARM_FPU_SETCW(eE2Hsb4v);
+	//#endif
+
+	//ndFloat32 a = ndFloat32(1.0f);
+	//ndFloat32 b = ndFloat32(0.1f);
+	//ndInt32 count = 0;
+	//while (a != 0.0f)
+	//{
+	//	a = a * b;
+	//	count++;
+	//}
+	//count++;
+}
+
+ndFloatExceptions::~ndFloatExceptions()
+{
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		_mm_setcsr(m_simdMask);
+		ndClearFP();
+		ndControlFP(m_floatMask, _MCW_EM);
+	#endif
+
+	//#if (defined (_M_ARM) || defined (_M_ARM64))
+	//	#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
+	//	#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
+	//
+	//#elif (defined(__arm__) || defined(__aarch64__))
+	//	#pragma message ("warning!!! assume arm cpu uncondiotially flushes SIMD to zero")
+	//	#pragma message ("warning!!! for the scalar FPUand in the AArch64 SIMD, the flush - to - zero behavior is optional and controlled by the FZ bit of the control register � FPSCR in Arm32 and FPCR in AArch64. ")
+	//
+	//	ARM_FPU_SETCW(m_simdMask);
+	//#endif
+}
