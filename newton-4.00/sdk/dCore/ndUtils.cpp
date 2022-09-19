@@ -426,7 +426,8 @@ ndSetPrecisionDouble::~ndSetPrecisionDouble()
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	#if (defined (WIN32) || defined(_WIN32))
 		ndClearFP();
 		m_floatMask = ndControlFP(0, 0);
 		ndControlFP(m_floatMask & ~mask, _MCW_EM);
@@ -469,7 +470,8 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 
 ndFloatExceptions::~ndFloatExceptions()
 {
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	#if (defined (WIN32) || defined(_WIN32))
 		_mm_setcsr(m_simdMask);
 		ndClearFP();
 		ndControlFP(m_floatMask, _MCW_EM);
