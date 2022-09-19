@@ -246,8 +246,6 @@ typedef double ndFloat64;
 #define ndTan(x)		ndFloat32 (tan(x))
 #define ndAtan2(x,y)	ndFloat32 (atan2(x,y))
 #define ndRsqrt(x)		(ndFloat32 (1.0f) / ndSqrt(x))
-#define ndClearFP()		 _clearfp() 
-#define ndControlFP(x,y) _controlfp(x,y)
 
 #if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	//#define ndCheckFloat(x) (_finite(x) && !_isnan(x))

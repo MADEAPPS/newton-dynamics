@@ -428,9 +428,9 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
 	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#if (defined (WIN32) || defined(_WIN32))
-		ndClearFP();
-		m_floatMask = ndControlFP(0, 0);
-		ndControlFP(m_floatMask & ~mask, _MCW_EM);
+		_clearfp();
+		m_floatMask = _controlfp(0, 0);
+		_controlfp(m_floatMask & ~mask, _MCW_EM);
 
 		m_simdMask = _mm_getcsr();
 		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
@@ -473,8 +473,8 @@ ndFloatExceptions::~ndFloatExceptions()
 	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#if (defined (WIN32) || defined(_WIN32))
 		_mm_setcsr(m_simdMask);
-		ndClearFP();
-		ndControlFP(m_floatMask, _MCW_EM);
+		_clearfp();
+		_controlfp(m_floatMask, _MCW_EM);
 	#endif
 
 	//#if (defined (_M_ARM) || defined (_M_ARM64))
