@@ -547,7 +547,13 @@ namespace biped2
 			}
 
 			zmp.m_w = 1.0f;
-			modelState.m_zmpFrame = m_locaFrame * m_bodyArray[0]->GetMatrix();
+			//modelState.m_zmpFrame = m_locaFrame * m_bodyArray[0]->GetMatrix();
+			const ndMatrix matrix(m_locaFrame * m_bodyArray[0]->GetMatrix());
+			modelState.m_zmpFrame.m_right = matrix.m_right;
+			modelState.m_zmpFrame.m_front = ndVector(0.0f, 1.0f, 0.0f, 0.0f).CrossProduct(matrix.m_right);
+			modelState.m_zmpFrame.m_front = modelState.m_zmpFrame.m_front.Normalize();
+			modelState.m_zmpFrame.m_up = modelState.m_zmpFrame.m_right.CrossProduct(modelState.m_zmpFrame.m_front);
+		
 			modelState.m_centerOfMass = com;
 			modelState.m_zmpFrame.m_posit = zmp;
 			modelState.m_centerOfMassVeloc = comVeloc;

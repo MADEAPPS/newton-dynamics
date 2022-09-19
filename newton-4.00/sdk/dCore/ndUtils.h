@@ -200,9 +200,8 @@ class ndFloatExceptions
 	D_CORE_API ~ndFloatExceptions();
 
 	private:
-	ndUnsigned32 m_x86Mask;
-	ndUnsigned32 m_sseMask;
-	ndUnsigned32 m_armMask;
+	ndUnsigned32 m_floatMask;
+	ndUnsigned32 m_simdMask;
 };
 
 /// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
