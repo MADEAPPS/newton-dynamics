@@ -31,7 +31,7 @@ class ndDeepBrainAgentDQN: public ndDeepBrainAgent
 	ndDeepBrainAgentDQN(ndDeepBrain* const agent);
 	virtual ~ndDeepBrainAgentDQN();
 
-	virtual void OptimzationStep();
+	virtual void OptimizationStep();
 	
 
 	ndDeepBrainInstance m_targetNetwork;

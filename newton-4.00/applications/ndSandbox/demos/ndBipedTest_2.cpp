@@ -901,13 +901,18 @@ namespace biped2
 			{
 				m_dqnAgent.m_transition.m_terminalState = true;
 			}
+
+			if (ndAbs(m_rollAngle) > ndFloat32(80.0f * ndDegreeToRad))
+			{
+				m_dqnAgent.m_transition.m_terminalState = true;
+			}
 		}
 
 		void TickEpoch(ndWorld* const, ndFloat32)
 		{
 			GetState(m_dqnAgent.m_transition.m_nextState);
 
-			m_dqnAgent.OptimzationStep();
+			m_dqnAgent.OptimizationStep();
 
 			m_epochCounter ++;
 			bool isTerminal = m_dqnAgent.m_transition.m_terminalState;

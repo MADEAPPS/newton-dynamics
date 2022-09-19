@@ -35,7 +35,7 @@ ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
 	delete m_targetNetwork.GetBrain();
 }
 
-void ndDeepBrainAgentDQN::OptimzationStep()
+void ndDeepBrainAgentDQN::OptimizationStep()
 {
 	ndInt32 replayIndex = m_replayBufferIndex % m_replayBuffer.GetCount();
 	GetTransition(m_replayBuffer[replayIndex]);

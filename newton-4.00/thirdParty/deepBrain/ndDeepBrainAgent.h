@@ -32,7 +32,7 @@ class ndDeepBrainAgent: public ndClassAlloc
 	ndDeepBrainAgent(ndDeepBrain* const agent);
 	virtual ~ndDeepBrainAgent();
 
-	virtual void OptimzationStep() = 0;
+	virtual void OptimizationStep() = 0;
 	virtual void GetTransition(ndDeepBrainTransition& transition) const = 0;
 
 	ndDeepBrainInstance m_network;
