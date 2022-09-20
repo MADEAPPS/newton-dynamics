@@ -60,7 +60,7 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
 	,m_trianglesCount(0)
 {
 	Create(builder);
-	CalculateAdjacendy();
+	CalculateAdjacent();
 
 	ndVector p0;
 	ndVector p1;

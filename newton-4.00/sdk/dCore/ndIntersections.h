@@ -32,7 +32,7 @@ class ndFastRay;
 
 enum dIntersectStatus
 {
-	t_StopSearh,
+	t_StopSearch,
 	t_ContinueSearh
 };
 

@@ -117,10 +117,10 @@ class ndAabbPolygonSoup::ndNodeBuilder: public ndAabbPolygonSoup::ndNode
 	const ndInt32* m_faceIndices;
 } D_GCC_NEWTON_ALIGN_32;
 
-class ndAabbPolygonSoup::ndSpliteInfo
+class ndAabbPolygonSoup::ndSplitInfo
 {
 	public:
-	ndSpliteInfo (ndNodeBuilder* const boxArray, ndInt32 boxCount)
+	ndSplitInfo (ndNodeBuilder* const boxArray, ndInt32 boxCount)
 	{
 		ndVector minP ( ndFloat32 (1.0e15f)); 
 		ndVector maxP (-ndFloat32 (1.0e15f)); 
@@ -292,7 +292,7 @@ void ndAabbPolygonSoup::GetAABB (ndVector& p0, ndVector& p1) const
 	}
 }
 
-void ndAabbPolygonSoup::CalculateAdjacendy ()
+void ndAabbPolygonSoup::CalculateAdjacent ()
 {
 	ndVector p0;
 	ndVector p1;
@@ -747,7 +747,7 @@ ndAabbPolygonSoup::ndNodeBuilder* ndAabbPolygonSoup::BuildTopDown (ndNodeBuilder
 	} 
 	else 
 	{
-		ndSpliteInfo info (&leafArray[firstBox], lastBox - firstBox + 1);
+		ndSplitInfo info (&leafArray[firstBox], lastBox - firstBox + 1);
 
 		ndNodeBuilder* const parent = new (*allocator) ndNodeBuilder (info.m_p0, info.m_p1);
 		*allocator = *allocator + 1;
