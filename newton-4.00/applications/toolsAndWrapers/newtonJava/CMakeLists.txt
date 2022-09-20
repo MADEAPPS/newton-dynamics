@@ -17,8 +17,8 @@ if(MSVC OR MINGW)
 else()
 	set (swig "/usr/bin/swig")
 endif()
-set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonJava/newton.i")
-execute_process(COMMAND ${swig} -c++ -java ${script})
+set (javaSrc "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonJava")
+execute_process(COMMAND ${swig} -c++ -outdir "${javaSrc}/classes" -java ${javaSrc}/newton.i)
 
 # source and header files
 file(GLOB CPP_SOURCE 
@@ -45,14 +45,16 @@ include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-#if (MSVC OR MINGW)
-#	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
-#	target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
+if (MSVC OR MINGW)
+	#message ("$ENV{Java}")
+	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Java}/include")
+	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Java}/include/win32")
+	target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Java}/lib")
 #else()
 #	find_package (Python COMPONENTS Development REQUIRED)
 #	target_include_directories(${projectName} PUBLIC ${Python_INCLUDE_DIRS})
 #	target_link_libraries(${projectName} ${Python_LIBRARIES})
-#endif()
+endif()
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndNewton ndCollision ndCore)
@@ -76,29 +78,6 @@ if(MSVC OR MINGW)
     endif()
 endif()
 
-
-#set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
-#list(APPEND PY_SOURCE 
-#	ndbpy.py
-#	newton.py
-#	newtonWorld.py)
-
-#set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
-
-#foreach(file IN LISTS PY_SOURCE)
-#	add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy ${pySrc}/${file} ${pyDst}/${file})
-#endforeach()
-#add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton.pyd)
-#
-#foreach(file IN LISTS PY_SOURCE)
-#	add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
-#endforeach()
-#add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton.pyd)
+#message ("${CMAKE_CURRENT_SOURCE_DIR}")
+#message ("${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/classes" DESTINATION "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")

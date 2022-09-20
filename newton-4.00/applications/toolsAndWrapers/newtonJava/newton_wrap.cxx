@@ -266,26 +266,86 @@ SWIGEXPORT void JNICALL Java_newtonJNI_dGetWorkingFileName(JNIEnv *jenv, jclass 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dGetZeroMatrix(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndGetZeroMatrix(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   ndMatrix *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  result = (ndMatrix *) &dGetZeroMatrix();
+  result = (ndMatrix *) &ndGetZeroMatrix();
   *(ndMatrix **)&jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dGetIdentityMatrix(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndGetIdentityMatrix(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   ndMatrix *result = 0 ;
   
   (void)jenv;
   (void)jcls;
-  result = (ndMatrix *) &dGetIdentityMatrix();
+  result = (ndMatrix *) &ndGetIdentityMatrix();
   *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndPitchMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
+  ndMatrix result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = ndPitchMatrix(arg1);
+  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndYawMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
+  ndMatrix result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = ndYawMatrix(arg1);
+  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndRollMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ndFloat32 arg1 ;
+  ndFloat32 *argp1 ;
+  ndMatrix result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(ndFloat32 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = ndRollMatrix(arg1);
+  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
 }
 
@@ -1177,66 +1237,6 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndMatrix_1m_1posit_1get(JNIEnv *jenv, jc
   arg1 = *(ndMatrix **)&jarg1; 
   result =  ((arg1)->m_posit);
   *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dPitchMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
-  ndMatrix result;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(ndFloat32 **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = dPitchMatrix(arg1);
-  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dYawMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
-  ndMatrix result;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(ndFloat32 **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = dYawMatrix(arg1);
-  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_dRollMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ndFloat32 arg1 ;
-  ndFloat32 *argp1 ;
-  ndMatrix result;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(ndFloat32 **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = dRollMatrix(arg1);
-  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
   return jresult;
 }
 
@@ -4844,6 +4844,1612 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeSphere_1GetAsShapeSphere(JNIEnv *
 }
 
 
+SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeDebugNotify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ndShapeDebugNotify **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeDebugNotify_1DrawPolygon(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
+  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
+  ndInt32 arg2 ;
+  ndVector *arg3 = (ndVector *) (ndVector *)0 ;
+  ndShapeDebugNotify::ndEdgeType *arg4 = (ndShapeDebugNotify::ndEdgeType *) (ndShapeDebugNotify::ndEdgeType *)0 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeDebugNotify **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  arg3 = *(ndVector **)&jarg3; 
+  arg4 = *(ndShapeDebugNotify::ndEdgeType **)&jarg4; 
+  (arg1)->DrawPolygon(arg2,(ndVector const *)arg3,(ndShapeDebugNotify::ndEdgeType const *)arg4);
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeDebugNotify_1m_1instance_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
+  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeDebugNotify **)&jarg1; 
+  arg2 = *(ndShapeInstance **)&jarg2; 
+  if (arg1) (arg1)->m_instance = (ndShapeInstance const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeDebugNotify_1m_1instance_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeDebugNotify **)&jarg1; 
+  result = (ndShapeInstance *) ((arg1)->m_instance);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1ndDistanceCalculator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ndScene *arg1 = (ndScene *) (ndScene *)0 ;
+  ndShapeInstance::ndDistanceCalculator *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ndScene **)&jarg1; 
+  result = (ndShapeInstance::ndDistanceCalculator *)new ndShapeInstance::ndDistanceCalculator(arg1);
+  *(ndShapeInstance::ndDistanceCalculator **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1ndDistanceCalculator_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jlong jarg5, jobject jarg5_) {
+  jlong jresult = 0 ;
+  ndScene *arg1 = (ndScene *) (ndScene *)0 ;
+  ndShapeInstance *arg2 = (ndShapeInstance *) (ndShapeInstance *)0 ;
+  ndMatrix *arg3 = 0 ;
+  ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
+  ndMatrix *arg5 = 0 ;
+  ndShapeInstance::ndDistanceCalculator *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  (void)jarg3_;
+  (void)jarg4_;
+  (void)jarg5_;
+  arg1 = *(ndScene **)&jarg1; 
+  arg2 = *(ndShapeInstance **)&jarg2; 
+  arg3 = *(ndMatrix **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return 0;
+  } 
+  arg4 = *(ndShapeInstance **)&jarg4; 
+  arg5 = *(ndMatrix **)&jarg5;
+  if (!arg5) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return 0;
+  } 
+  result = (ndShapeInstance::ndDistanceCalculator *)new ndShapeInstance::ndDistanceCalculator(arg1,arg2,(ndMatrix const &)*arg3,arg4,(ndMatrix const &)*arg5);
+  *(ndShapeInstance::ndDistanceCalculator **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1ClosestPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result = (bool)(arg1)->ClosestPoint();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndMatrix *arg2 = (ndMatrix *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2; 
+  if (arg1) (arg1)->m_matrix0 = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result = (ndMatrix *)& ((arg1)->m_matrix0);
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndMatrix *arg2 = (ndMatrix *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2; 
+  if (arg1) (arg1)->m_matrix1 = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result = (ndMatrix *)& ((arg1)->m_matrix1);
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndVector arg2 ;
+  ndVector *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  argp2 = *(ndVector **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_point0 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result =  ((arg1)->m_point0);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndVector arg2 ;
+  ndVector *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  argp2 = *(ndVector **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_point1 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result =  ((arg1)->m_point1);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1normal_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndVector arg2 ;
+  ndVector *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  argp2 = *(ndVector **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_normal = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1normal_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result =  ((arg1)->m_normal);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1scene_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndScene *arg2 = (ndScene *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  arg2 = *(ndScene **)&jarg2; 
+  if (arg1) (arg1)->m_scene = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1scene_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndScene *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result = (ndScene *) ((arg1)->m_scene);
+  *(ndScene **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  arg2 = *(ndShapeInstance **)&jarg2; 
+  if (arg1) (arg1)->m_shape0 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result = (ndShapeInstance *) ((arg1)->m_shape0);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  arg2 = *(ndShapeInstance **)&jarg2; 
+  if (arg1) (arg1)->m_shape1 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  result = (ndShapeInstance *) ((arg1)->m_shape1);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeInstance_1ndDistanceCalculator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShape *arg1 = (ndShape *) (ndShape *)0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShape **)&jarg1; 
+  result = (ndShapeInstance *)new ndShapeInstance(arg1);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
+    return 0;
+  } 
+  result = (ndShapeInstance *)new ndShapeInstance((ndShapeInstance const &)*arg1);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = 0 ;
+  ndShape *arg2 = (ndShape *) (ndShape *)0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
+    return 0;
+  } 
+  arg2 = *(ndShape **)&jarg2; 
+  result = (ndShapeInstance *)new ndShapeInstance((ndShapeInstance const &)*arg1,arg2);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  nd::TiXmlNode *arg1 = (nd::TiXmlNode *) (nd::TiXmlNode *)0 ;
+  ndShapeLoaderCache *arg2 = 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(nd::TiXmlNode **)&jarg1; 
+  arg2 = *(ndShapeLoaderCache **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeLoaderCache const & reference is null");
+    return 0;
+  } 
+  result = (ndShapeInstance *)new ndShapeInstance((nd::TiXmlNode const *)arg1,(ndShapeLoaderCache const &)*arg2);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeInstance(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1Assigment(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInstance *arg2 = 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndShapeInstance **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
+    return 0;
+  } 
+  result = (ndShapeInstance *) &(arg1)->operator =((ndShapeInstance const &)*arg2);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculateInertia(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->CalculateInertia();
+  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1CalculateObb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector *arg3 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
+    return ;
+  } 
+  arg3 = *(ndVector **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
+    return ;
+  } 
+  ((ndShapeInstance const *)arg1)->CalculateObb(*arg2,*arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1CalculateAabb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  ndVector *arg3 = 0 ;
+  ndVector *arg4 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return ;
+  } 
+  arg3 = *(ndVector **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
+    return ;
+  } 
+  arg4 = *(ndVector **)&jarg4;
+  if (!arg4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
+    return ;
+  } 
+  ((ndShapeInstance const *)arg1)->CalculateAabb((ndMatrix const &)*arg2,*arg3,*arg4);
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1DebugShape(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  ndShapeDebugNotify *arg3 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return ;
+  } 
+  arg3 = *(ndShapeDebugNotify **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeDebugNotify & reference is null");
+    return ;
+  } 
+  ((ndShapeInstance const *)arg1)->DebugShape((ndMatrix const &)*arg2,*arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5, jobject jarg5_, jlong jarg6) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndRayCastNotify *arg2 = 0 ;
+  ndVector *arg3 = 0 ;
+  ndVector *arg4 = 0 ;
+  ndBody *arg5 = (ndBody *) (ndBody *)0 ;
+  ndContactPoint *arg6 = 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg5_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndRayCastNotify **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndRayCastNotify & reference is null");
+    return 0;
+  } 
+  arg3 = *(ndVector **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  arg4 = *(ndVector **)&jarg4;
+  if (!arg4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  arg5 = *(ndBody **)&jarg5; 
+  arg6 = *(ndContactPoint **)&jarg6;
+  if (!arg6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint & reference is null");
+    return 0;
+  } 
+  result = ((ndShapeInstance const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,(ndBody const *)arg5,*arg6);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetShapeInfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInfo result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetShapeInfo();
+  *(ndShapeInfo **)&jresult = new ndShapeInfo((const ndShapeInfo &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1Save(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndLoadSaveBase::ndSaveDescriptor *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndLoadSaveBase::ndSaveDescriptor **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndLoadSaveBase::ndSaveDescriptor const & reference is null");
+    return ;
+  } 
+  ((ndShapeInstance const *)arg1)->Save((ndLoadSaveBase::ndSaveDescriptor const &)*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculateBuoyancyCenterOfPresure(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_, jlong jarg4) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndMatrix *arg3 = 0 ;
+  ndVector *arg4 = 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
+    return 0;
+  } 
+  arg3 = *(ndMatrix **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return 0;
+  } 
+  arg4 = *(ndVector **)&jarg4;
+  if (!arg4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  result = ((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(ndMatrix const &)*arg3,(ndVector const &)*arg4);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxPadding(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = ndShapeInstance::GetBoxPadding();
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetShape_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShape *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndShape *)(arg1)->GetShape();
+  *(ndShape **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetShape(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShape *arg2 = (ndShape *) (ndShape *)0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndShape **)&jarg2; 
+  (arg1)->SetShape(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  result = ((ndShapeInstance const *)arg1)->SupportVertex((ndVector const &)*arg2);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetScaledTransform(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  ndMatrix result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return 0;
+  } 
+  result = ((ndShapeInstance const *)arg1)->GetScaledTransform((ndMatrix const &)*arg2);
+  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertexSpecial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndInt32 *arg3 = (ndInt32 *) (ndInt32 *)0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  arg3 = *(ndInt32 **)&jarg3; 
+  result = ((ndShapeInstance const *)arg1)->SupportVertexSpecial((ndVector const &)*arg2,arg3);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertexSpecialProjectPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector *arg3 = 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  arg3 = *(ndVector **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  result = ((ndShapeInstance const *)arg1)->SupportVertexSpecialProjectPoint((ndVector const &)*arg2,(ndVector const &)*arg3);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetLocalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndMatrix *) &((ndShapeInstance const *)arg1)->GetLocalMatrix();
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetLocalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return ;
+  } 
+  (arg1)->SetLocalMatrix((ndMatrix const &)*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetGlobalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndMatrix *) &((ndShapeInstance const *)arg1)->GetGlobalMatrix();
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return ;
+  } 
+  (arg1)->SetGlobalMatrix((ndMatrix const &)*arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndShapeInstance_1GetCollisionMode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (bool)((ndShapeInstance const *)arg1)->GetCollisionMode();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetCollisionMode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  (arg1)->SetCollisionMode(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetConvexVertexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetConvexVertexCount();
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetMaterial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeMaterial result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetMaterial();
+  *(ndShapeMaterial **)&jresult = new ndShapeMaterial((const ndShapeMaterial &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetMaterial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeMaterial *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndShapeMaterial **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeMaterial const & reference is null");
+    return ;
+  } 
+  (arg1)->SetMaterial((ndShapeMaterial const &)*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetScale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndVector *) &((ndShapeInstance const *)arg1)->GetScale();
+  *(ndVector **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetInvScale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndVector *) &((ndShapeInstance const *)arg1)->GetInvScale();
+  *(ndVector **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetAlignmentMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndMatrix *) &((ndShapeInstance const *)arg1)->GetAlignmentMatrix();
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetScale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return ;
+  } 
+  (arg1)->SetScale((ndVector const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalScale_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return ;
+  } 
+  (arg1)->SetGlobalScale((ndVector const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalScale_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
+    return ;
+  } 
+  (arg1)->SetGlobalScale((ndMatrix const &)*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculatePlaneIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector *arg2 = 0 ;
+  ndVector *arg3 = 0 ;
+  ndVector *arg4 = (ndVector *) (ndVector *)0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndVector **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  arg3 = *(ndVector **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
+    return 0;
+  } 
+  arg4 = *(ndVector **)&jarg4; 
+  result = ((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetVolume(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetVolume();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMinRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetBoxMinRadius();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMaxRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1GetScaleType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInstance::ndScaleType result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndShapeInstance::ndScaleType)((ndShapeInstance const *)arg1)->GetScaleType();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetUmbraClipSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetUmbraClipSize();
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetUserDataID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndUnsigned64 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = ((ndShapeInstance const *)arg1)->GetUserDataID();
+  *(ndUnsigned64 **)&jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1globalMatrix_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = (ndMatrix *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2; 
+  if (arg1) (arg1)->m_globalMatrix = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1globalMatrix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndMatrix *)& ((arg1)->m_globalMatrix);
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1localMatrix_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = (ndMatrix *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2; 
+  if (arg1) (arg1)->m_localMatrix = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1localMatrix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndMatrix *)& ((arg1)->m_localMatrix);
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1alignmentMatrix_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *arg2 = (ndMatrix *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndMatrix **)&jarg2; 
+  if (arg1) (arg1)->m_alignmentMatrix = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1alignmentMatrix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndMatrix *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndMatrix *)& ((arg1)->m_alignmentMatrix);
+  *(ndMatrix **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1scale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector arg2 ;
+  ndVector *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  argp2 = *(ndVector **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_scale = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1scale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result =  ((arg1)->m_scale);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1invScale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector arg2 ;
+  ndVector *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  argp2 = *(ndVector **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_invScale = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1invScale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result =  ((arg1)->m_invScale);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1maxScale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector arg2 ;
+  ndVector *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  argp2 = *(ndVector **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_maxScale = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1maxScale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndVector result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result =  ((arg1)->m_maxScale);
+  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1shapeMaterial_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeMaterial *arg2 = (ndShapeMaterial *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndShapeMaterial **)&jarg2; 
+  if (arg1) (arg1)->m_shapeMaterial = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1shapeMaterial_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeMaterial *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndShapeMaterial *)& ((arg1)->m_shapeMaterial);
+  *(ndShapeMaterial **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1shape_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShape *arg2 = (ndShape *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndShape **)&jarg2; 
+  if (arg1) (arg1)->m_shape = (ndShape const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1shape_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShape *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndShape *) ((arg1)->m_shape);
+  *(ndShape **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1ownerBody_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndBody *arg2 = (ndBody *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndBody **)&jarg2; 
+  if (arg1) (arg1)->m_ownerBody = (ndBody const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1ownerBody_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndBody *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndBody *) ((arg1)->m_ownerBody);
+  *(ndBody **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1subCollisionHandle_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(void **)&jarg2; 
+  if (arg1) (arg1)->m_subCollisionHandle = (void const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1subCollisionHandle_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (void *) ((arg1)->m_subCollisionHandle);
+  *(void **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1parent_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = *(ndShapeInstance **)&jarg2; 
+  if (arg1) (arg1)->m_parent = (ndShapeInstance const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1parent_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInstance *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndShapeInstance *) ((arg1)->m_parent);
+  *(ndShapeInstance **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndFloat32 arg2 ;
+  ndFloat32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  argp2 = *(ndFloat32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_skinMargin = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndFloat32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result =  ((arg1)->m_skinMargin);
+  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1scaleType_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInstance::ndScaleType arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = (ndShapeInstance::ndScaleType)jarg2; 
+  if (arg1) (arg1)->m_scaleType = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1m_1scaleType_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  ndShapeInstance::ndScaleType result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (ndShapeInstance::ndScaleType) ((arg1)->m_scaleType);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1collisionMode_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->m_collisionMode = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndShapeInstance_1m_1collisionMode_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeInstance **)&jarg1; 
+  result = (bool) ((arg1)->m_collisionMode);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeCapsule_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   ndLoadSaveBase::ndLoadDescriptor *arg1 = 0 ;
@@ -6470,6 +8076,414 @@ SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeConvexHull(JNIEnv *jenv, j
 }
 
 
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1i0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_i0 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1i0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_i0);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1i1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_i1 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1i1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_i1);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1i2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_i2 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1i2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_i2);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1material_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_material = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1material_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_material);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_normal = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_normal);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1edge01_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_normal_edge01 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1edge01_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_normal_edge01);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1edge12_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_normal_edge12 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1edge12_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_normal_edge12);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1edge20_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_normal_edge20 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1normal_1edge20_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_normal_edge20);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1area_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 arg2 ;
+  ndInt32 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  argp2 = *(ndInt32 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->m_area = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndTriangle_1m_1area_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  ndInt32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  result =  ((arg1)->m_area);
+  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeHeightfield_1ndTriangle(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndTriangle *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (ndShapeHeightfield::ndTriangle *)new ndShapeHeightfield::ndTriangle();
+  *(ndShapeHeightfield::ndTriangle **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeHeightfield_1ndTriangle(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ndShapeHeightfield::ndTriangle *arg1 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ndShapeHeightfield::ndTriangle **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndGridQuad_1m_1triangle0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeHeightfield::ndGridQuad *arg1 = (ndShapeHeightfield::ndGridQuad *) 0 ;
+  ndShapeHeightfield::ndTriangle *arg2 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeHeightfield::ndGridQuad **)&jarg1; 
+  arg2 = *(ndShapeHeightfield::ndTriangle **)&jarg2; 
+  if (arg1) (arg1)->m_triangle0 = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndGridQuad_1m_1triangle0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndGridQuad *arg1 = (ndShapeHeightfield::ndGridQuad *) 0 ;
+  ndShapeHeightfield::ndTriangle *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndGridQuad **)&jarg1; 
+  result = (ndShapeHeightfield::ndTriangle *)& ((arg1)->m_triangle0);
+  *(ndShapeHeightfield::ndTriangle **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeHeightfield_1ndGridQuad_1m_1triangle1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  ndShapeHeightfield::ndGridQuad *arg1 = (ndShapeHeightfield::ndGridQuad *) 0 ;
+  ndShapeHeightfield::ndTriangle *arg2 = (ndShapeHeightfield::ndTriangle *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(ndShapeHeightfield::ndGridQuad **)&jarg1; 
+  arg2 = *(ndShapeHeightfield::ndTriangle **)&jarg2; 
+  if (arg1) (arg1)->m_triangle1 = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeHeightfield_1ndGridQuad_1m_1triangle1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndGridQuad *arg1 = (ndShapeHeightfield::ndGridQuad *) 0 ;
+  ndShapeHeightfield::ndTriangle *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndShapeHeightfield::ndGridQuad **)&jarg1; 
+  result = (ndShapeHeightfield::ndTriangle *)& ((arg1)->m_triangle1);
+  *(ndShapeHeightfield::ndTriangle **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeHeightfield_1ndGridQuad(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  ndShapeHeightfield::ndGridQuad *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (ndShapeHeightfield::ndGridQuad *)new ndShapeHeightfield::ndGridQuad();
+  *(ndShapeHeightfield::ndGridQuad **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeHeightfield_1ndGridQuad(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ndShapeHeightfield::ndGridQuad *arg1 = (ndShapeHeightfield::ndGridQuad *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ndShapeHeightfield::ndGridQuad **)&jarg1; 
+  delete arg1;
+}
+
+
 SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeHeightfield_1m_1normalDiagonals_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   ndShapeHeightfield::ndGridConstruction result;
@@ -6724,1612 +8738,6 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeChamferCylinder_1GetAsShapeChamfe
 }
 
 
-SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeDebugNotify(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(ndShapeDebugNotify **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeDebugNotify_1DrawPolygon(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
-  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
-  ndInt32 arg2 ;
-  ndVector *arg3 = (ndVector *) (ndVector *)0 ;
-  ndShapeDebugNotify::ndEdgeType *arg4 = (ndShapeDebugNotify::ndEdgeType *) (ndShapeDebugNotify::ndEdgeType *)0 ;
-  ndInt32 *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeDebugNotify **)&jarg1; 
-  argp2 = *(ndInt32 **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndInt32");
-    return ;
-  }
-  arg2 = *argp2; 
-  arg3 = *(ndVector **)&jarg3; 
-  arg4 = *(ndShapeDebugNotify::ndEdgeType **)&jarg4; 
-  (arg1)->DrawPolygon(arg2,(ndVector const *)arg3,(ndShapeDebugNotify::ndEdgeType const *)arg4);
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeDebugNotify_1m_1instance_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
-  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeDebugNotify **)&jarg1; 
-  arg2 = *(ndShapeInstance **)&jarg2; 
-  if (arg1) (arg1)->m_instance = (ndShapeInstance const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeDebugNotify_1m_1instance_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeDebugNotify *arg1 = (ndShapeDebugNotify *) 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeDebugNotify **)&jarg1; 
-  result = (ndShapeInstance *) ((arg1)->m_instance);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1ndDistanceCalculator_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ndScene *arg1 = (ndScene *) (ndScene *)0 ;
-  ndShapeInstance::ndDistanceCalculator *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(ndScene **)&jarg1; 
-  result = (ndShapeInstance::ndDistanceCalculator *)new ndShapeInstance::ndDistanceCalculator(arg1);
-  *(ndShapeInstance::ndDistanceCalculator **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1ndDistanceCalculator_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
-  ndScene *arg1 = (ndScene *) (ndScene *)0 ;
-  ndShapeInstance *arg2 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  ndMatrix *arg3 = 0 ;
-  ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
-  ndMatrix *arg5 = 0 ;
-  ndShapeInstance::ndDistanceCalculator *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  (void)jarg5_;
-  arg1 = *(ndScene **)&jarg1; 
-  arg2 = *(ndShapeInstance **)&jarg2; 
-  arg3 = *(ndMatrix **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return 0;
-  } 
-  arg4 = *(ndShapeInstance **)&jarg4; 
-  arg5 = *(ndMatrix **)&jarg5;
-  if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return 0;
-  } 
-  result = (ndShapeInstance::ndDistanceCalculator *)new ndShapeInstance::ndDistanceCalculator(arg1,arg2,(ndMatrix const &)*arg3,arg4,(ndMatrix const &)*arg5);
-  *(ndShapeInstance::ndDistanceCalculator **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1ClosestPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result = (bool)(arg1)->ClosestPoint();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndMatrix *arg2 = (ndMatrix *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2; 
-  if (arg1) (arg1)->m_matrix0 = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result = (ndMatrix *)& ((arg1)->m_matrix0);
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndMatrix *arg2 = (ndMatrix *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2; 
-  if (arg1) (arg1)->m_matrix1 = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1matrix1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result = (ndMatrix *)& ((arg1)->m_matrix1);
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndVector arg2 ;
-  ndVector *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  argp2 = *(ndVector **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_point0 = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result =  ((arg1)->m_point0);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndVector arg2 ;
-  ndVector *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  argp2 = *(ndVector **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_point1 = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1point1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result =  ((arg1)->m_point1);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1normal_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndVector arg2 ;
-  ndVector *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  argp2 = *(ndVector **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_normal = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1normal_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result =  ((arg1)->m_normal);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1scene_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndScene *arg2 = (ndScene *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  arg2 = *(ndScene **)&jarg2; 
-  if (arg1) (arg1)->m_scene = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1scene_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndScene *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result = (ndScene *) ((arg1)->m_scene);
-  *(ndScene **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  arg2 = *(ndShapeInstance **)&jarg2; 
-  if (arg1) (arg1)->m_shape0 = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result = (ndShapeInstance *) ((arg1)->m_shape0);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  arg2 = *(ndShapeInstance **)&jarg2; 
-  if (arg1) (arg1)->m_shape1 = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1ndDistanceCalculator_1m_1shape1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  result = (ndShapeInstance *) ((arg1)->m_shape1);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeInstance_1ndDistanceCalculator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ndShapeInstance::ndDistanceCalculator *arg1 = (ndShapeInstance::ndDistanceCalculator *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(ndShapeInstance::ndDistanceCalculator **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShape *arg1 = (ndShape *) (ndShape *)0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShape **)&jarg1; 
-  result = (ndShapeInstance *)new ndShapeInstance(arg1);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
-    return 0;
-  } 
-  result = (ndShapeInstance *)new ndShapeInstance((ndShapeInstance const &)*arg1);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = 0 ;
-  ndShape *arg2 = (ndShape *) (ndShape *)0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
-    return 0;
-  } 
-  arg2 = *(ndShape **)&jarg2; 
-  result = (ndShapeInstance *)new ndShapeInstance((ndShapeInstance const &)*arg1,arg2);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_new_1ndShapeInstance_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  jlong jresult = 0 ;
-  nd::TiXmlNode *arg1 = (nd::TiXmlNode *) (nd::TiXmlNode *)0 ;
-  ndShapeLoaderCache *arg2 = 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(nd::TiXmlNode **)&jarg1; 
-  arg2 = *(ndShapeLoaderCache **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeLoaderCache const & reference is null");
-    return 0;
-  } 
-  result = (ndShapeInstance *)new ndShapeInstance((nd::TiXmlNode const *)arg1,(ndShapeLoaderCache const &)*arg2);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndShapeInstance(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1Assigment(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInstance *arg2 = 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndShapeInstance **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeInstance const & reference is null");
-    return 0;
-  } 
-  result = (ndShapeInstance *) &(arg1)->operator =((ndShapeInstance const &)*arg2);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculateInertia(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->CalculateInertia();
-  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1CalculateObb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  ndVector *arg3 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
-    return ;
-  } 
-  arg3 = *(ndVector **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
-    return ;
-  } 
-  ((ndShapeInstance const *)arg1)->CalculateObb(*arg2,*arg3);
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1CalculateAabb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = 0 ;
-  ndVector *arg3 = 0 ;
-  ndVector *arg4 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return ;
-  } 
-  arg3 = *(ndVector **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
-    return ;
-  } 
-  arg4 = *(ndVector **)&jarg4;
-  if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
-    return ;
-  } 
-  ((ndShapeInstance const *)arg1)->CalculateAabb((ndMatrix const &)*arg2,*arg3,*arg4);
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1DebugShape(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = 0 ;
-  ndShapeDebugNotify *arg3 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return ;
-  } 
-  arg3 = *(ndShapeDebugNotify **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeDebugNotify & reference is null");
-    return ;
-  } 
-  ((ndShapeInstance const *)arg1)->DebugShape((ndMatrix const &)*arg2,*arg3);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1RayCast(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jlong jarg5, jobject jarg5_, jlong jarg6) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndRayCastNotify *arg2 = 0 ;
-  ndVector *arg3 = 0 ;
-  ndVector *arg4 = 0 ;
-  ndBody *arg5 = (ndBody *) (ndBody *)0 ;
-  ndContactPoint *arg6 = 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg5_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndRayCastNotify **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndRayCastNotify & reference is null");
-    return 0;
-  } 
-  arg3 = *(ndVector **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  arg4 = *(ndVector **)&jarg4;
-  if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  arg5 = *(ndBody **)&jarg5; 
-  arg6 = *(ndContactPoint **)&jarg6;
-  if (!arg6) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndContactPoint & reference is null");
-    return 0;
-  } 
-  result = ((ndShapeInstance const *)arg1)->RayCast(*arg2,(ndVector const &)*arg3,(ndVector const &)*arg4,(ndBody const *)arg5,*arg6);
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetShapeInfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInfo result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetShapeInfo();
-  *(ndShapeInfo **)&jresult = new ndShapeInfo((const ndShapeInfo &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1Save(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndLoadSaveBase::ndSaveDescriptor *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndLoadSaveBase::ndSaveDescriptor **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndLoadSaveBase::ndSaveDescriptor const & reference is null");
-    return ;
-  } 
-  ((ndShapeInstance const *)arg1)->Save((ndLoadSaveBase::ndSaveDescriptor const &)*arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculateBuoyancyCenterOfPresure(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jobject jarg3_, jlong jarg4) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  ndMatrix *arg3 = 0 ;
-  ndVector *arg4 = 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector & reference is null");
-    return 0;
-  } 
-  arg3 = *(ndMatrix **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return 0;
-  } 
-  arg4 = *(ndVector **)&jarg4;
-  if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  result = ((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(ndMatrix const &)*arg3,(ndVector const &)*arg4);
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxPadding(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = ndShapeInstance::GetBoxPadding();
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetShape_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShape *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndShape *)(arg1)->GetShape();
-  *(ndShape **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetShape(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShape *arg2 = (ndShape *) (ndShape *)0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndShape **)&jarg2; 
-  (arg1)->SetShape(arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  result = ((ndShapeInstance const *)arg1)->SupportVertex((ndVector const &)*arg2);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetScaledTransform(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = 0 ;
-  ndMatrix result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return 0;
-  } 
-  result = ((ndShapeInstance const *)arg1)->GetScaledTransform((ndMatrix const &)*arg2);
-  *(ndMatrix **)&jresult = new ndMatrix((const ndMatrix &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertexSpecial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  ndInt32 *arg3 = (ndInt32 *) (ndInt32 *)0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  arg3 = *(ndInt32 **)&jarg3; 
-  result = ((ndShapeInstance const *)arg1)->SupportVertexSpecial((ndVector const &)*arg2,arg3);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1SupportVertexSpecialProjectPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  ndVector *arg3 = 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  arg3 = *(ndVector **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  result = ((ndShapeInstance const *)arg1)->SupportVertexSpecialProjectPoint((ndVector const &)*arg2,(ndVector const &)*arg3);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetLocalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndMatrix *) &((ndShapeInstance const *)arg1)->GetLocalMatrix();
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetLocalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return ;
-  } 
-  (arg1)->SetLocalMatrix((ndMatrix const &)*arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetGlobalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndMatrix *) &((ndShapeInstance const *)arg1)->GetGlobalMatrix();
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return ;
-  } 
-  (arg1)->SetGlobalMatrix((ndMatrix const &)*arg2);
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndShapeInstance_1GetCollisionMode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (bool)((ndShapeInstance const *)arg1)->GetCollisionMode();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetCollisionMode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  bool arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = jarg2 ? true : false; 
-  (arg1)->SetCollisionMode(arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetConvexVertexCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndInt32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetConvexVertexCount();
-  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetMaterial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeMaterial result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetMaterial();
-  *(ndShapeMaterial **)&jresult = new ndShapeMaterial((const ndShapeMaterial &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetMaterial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeMaterial *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndShapeMaterial **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndShapeMaterial const & reference is null");
-    return ;
-  } 
-  (arg1)->SetMaterial((ndShapeMaterial const &)*arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetScale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndVector *) &((ndShapeInstance const *)arg1)->GetScale();
-  *(ndVector **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetInvScale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndVector *) &((ndShapeInstance const *)arg1)->GetInvScale();
-  *(ndVector **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetAlignmentMatrix(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndMatrix *) &((ndShapeInstance const *)arg1)->GetAlignmentMatrix();
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetScale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return ;
-  } 
-  (arg1)->SetScale((ndVector const &)*arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalScale_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return ;
-  } 
-  (arg1)->SetGlobalScale((ndVector const &)*arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1SetGlobalScale_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndMatrix const & reference is null");
-    return ;
-  } 
-  (arg1)->SetGlobalScale((ndMatrix const &)*arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1CalculatePlaneIntersection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector *arg2 = 0 ;
-  ndVector *arg3 = 0 ;
-  ndVector *arg4 = (ndVector *) (ndVector *)0 ;
-  ndInt32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndVector **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  arg3 = *(ndVector **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ndVector const & reference is null");
-    return 0;
-  } 
-  arg4 = *(ndVector **)&jarg4; 
-  result = ((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((ndVector const &)*arg2,(ndVector const &)*arg3,arg4);
-  *(ndInt32 **)&jresult = new ndInt32((const ndInt32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetVolume(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetVolume();
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMinRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetBoxMinRadius();
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetBoxMaxRadius(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1GetScaleType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInstance::ndScaleType result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndShapeInstance::ndScaleType)((ndShapeInstance const *)arg1)->GetScaleType();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetUmbraClipSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetUmbraClipSize();
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1GetUserDataID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndUnsigned64 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = ((ndShapeInstance const *)arg1)->GetUserDataID();
-  *(ndUnsigned64 **)&jresult = new ndUnsigned64((const ndUnsigned64 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1globalMatrix_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = (ndMatrix *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2; 
-  if (arg1) (arg1)->m_globalMatrix = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1globalMatrix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndMatrix *)& ((arg1)->m_globalMatrix);
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1localMatrix_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = (ndMatrix *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2; 
-  if (arg1) (arg1)->m_localMatrix = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1localMatrix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndMatrix *)& ((arg1)->m_localMatrix);
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1alignmentMatrix_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *arg2 = (ndMatrix *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndMatrix **)&jarg2; 
-  if (arg1) (arg1)->m_alignmentMatrix = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1alignmentMatrix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndMatrix *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndMatrix *)& ((arg1)->m_alignmentMatrix);
-  *(ndMatrix **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1scale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector arg2 ;
-  ndVector *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  argp2 = *(ndVector **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_scale = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1scale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result =  ((arg1)->m_scale);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1invScale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector arg2 ;
-  ndVector *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  argp2 = *(ndVector **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_invScale = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1invScale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result =  ((arg1)->m_invScale);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1maxScale_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector arg2 ;
-  ndVector *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  argp2 = *(ndVector **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndVector");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_maxScale = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1maxScale_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndVector result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result =  ((arg1)->m_maxScale);
-  *(ndVector **)&jresult = new ndVector((const ndVector &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1shapeMaterial_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeMaterial *arg2 = (ndShapeMaterial *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndShapeMaterial **)&jarg2; 
-  if (arg1) (arg1)->m_shapeMaterial = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1shapeMaterial_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeMaterial *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndShapeMaterial *)& ((arg1)->m_shapeMaterial);
-  *(ndShapeMaterial **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1shape_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShape *arg2 = (ndShape *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndShape **)&jarg2; 
-  if (arg1) (arg1)->m_shape = (ndShape const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1shape_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShape *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndShape *) ((arg1)->m_shape);
-  *(ndShape **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1ownerBody_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndBody *arg2 = (ndBody *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndBody **)&jarg2; 
-  if (arg1) (arg1)->m_ownerBody = (ndBody const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1ownerBody_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndBody *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndBody *) ((arg1)->m_ownerBody);
-  *(ndBody **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1subCollisionHandle_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  void *arg2 = (void *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(void **)&jarg2; 
-  if (arg1) (arg1)->m_subCollisionHandle = (void const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1subCollisionHandle_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  void *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (void *) ((arg1)->m_subCollisionHandle);
-  *(void **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1parent_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInstance *arg2 = (ndShapeInstance *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = *(ndShapeInstance **)&jarg2; 
-  if (arg1) (arg1)->m_parent = (ndShapeInstance const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1parent_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInstance *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndShapeInstance *) ((arg1)->m_parent);
-  *(ndShapeInstance **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 arg2 ;
-  ndFloat32 *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  argp2 = *(ndFloat32 **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ndFloat32");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->m_skinMargin = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndShapeInstance_1m_1skinMargin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndFloat32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result =  ((arg1)->m_skinMargin);
-  *(ndFloat32 **)&jresult = new ndFloat32((const ndFloat32 &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1scaleType_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInstance::ndScaleType arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = (ndShapeInstance::ndScaleType)jarg2; 
-  if (arg1) (arg1)->m_scaleType = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_newtonJNI_ndShapeInstance_1m_1scaleType_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  ndShapeInstance::ndScaleType result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (ndShapeInstance::ndScaleType) ((arg1)->m_scaleType);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_newtonJNI_ndShapeInstance_1m_1collisionMode_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  bool arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  arg2 = jarg2 ? true : false; 
-  if (arg1) (arg1)->m_collisionMode = arg2;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_newtonJNI_ndShapeInstance_1m_1collisionMode_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(ndShapeInstance **)&jarg1; 
-  result = (bool) ((arg1)->m_collisionMode);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void JNICALL Java_newtonJNI_delete_1ndBody(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   ndBody *arg1 = (ndBody *) 0 ;
   
@@ -8456,6 +8864,21 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBody_1GetAsBodyTriggerVolume(JNIEnv *j
   arg1 = *(ndBody **)&jarg1; 
   result = (ndBodyTriggerVolume *)(arg1)->GetAsBodyTriggerVolume();
   *(ndBodyTriggerVolume **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBody_1GetAsBodyKinematicSpecial(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  ndBody *arg1 = (ndBody *) 0 ;
+  ndBodyKinematicSpecial *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(ndBody **)&jarg1; 
+  result = (ndBodyKinematicSpecial *)(arg1)->GetAsBodyKinematicSpecial();
+  *(ndBodyKinematicSpecial **)&jresult = result; 
   return jresult;
 }
 
@@ -11531,22 +11954,6 @@ SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodySentinel_1SWIGUpcast(JNIEnv *jenv,
     (void)jenv;
     (void)jcls;
     *(ndBodyKinematic **)&baseptr = *(ndBodySentinel **)&jarg1;
-    return baseptr;
-}
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyTriggerVolume_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(ndBodyKinematic **)&baseptr = *(ndBodyTriggerVolume **)&jarg1;
-    return baseptr;
-}
-
-SWIGEXPORT jlong JNICALL Java_newtonJNI_ndBodyPlayerCapsule_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(ndBodyKinematic **)&baseptr = *(ndBodyPlayerCapsule **)&jarg1;
     return baseptr;
 }
 

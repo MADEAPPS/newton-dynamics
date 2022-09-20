@@ -96,6 +96,7 @@
 %include "../../../sdk/dCollision/ndShapeCone.h"
 %include "../../../sdk/dCollision/ndShapeConvex.h"
 %include "../../../sdk/dCollision/ndShapeSphere.h"
+%include "../../../sdk/dCollision/ndShapeInstance.h"
 %include "../../../sdk/dCollision/ndShapeCapsule.h"
 %include "../../../sdk/dCollision/ndShapeCompound.h"
 %include "../../../sdk/dCollision/ndShapeCylinder.h"
@@ -105,10 +106,9 @@
 %include "../../../sdk/dCollision/ndShapeHeightfield.h"
 %include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
 
-%include "../../../sdk/dCollision/ndShapeInstance.h"
-
 %include "../../../sdk/dCollision/ndBody.h"
 %include "../../../sdk/dCollision/ndBodyKinematic.h"
+#include "../../../sdk/dCollision/ndBodyKinematicSpecial.h"
 %include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
 %include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
 
