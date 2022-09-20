@@ -170,7 +170,7 @@ class ndVector
 
 	inline ndVector& operator+= (const ndVector& A)
 	{
-		return (*this = vsubq_f32(m_type, A.m_type));
+		return (*this = vaddq_f32(m_type, A.m_type));
 	}
 
 	inline ndVector& operator-= (const ndVector& A)
@@ -307,7 +307,6 @@ class ndVector
 
 	inline ndVector Normalize() const
 	{
-		ndAssert(m_w == ndFloat32(0.0f));
 		const ndVector& me = *this;
 		return me * InvMagSqrt();
 	}

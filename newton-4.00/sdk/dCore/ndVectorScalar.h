@@ -751,9 +751,6 @@ class ndBigVector
 
 	inline ndBigVector Normalize() const
 	{
-		ndAssert (m_w == ndFloat64 (0.0f));
-		//const ndBigVector& me = *this;
-		//return *this * ndBigVector (ndRsqrt(DotProduct(*this).m_x));
 		return *this * InvMagSqrt();
 	}
 
