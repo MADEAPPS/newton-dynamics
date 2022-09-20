@@ -28,7 +28,6 @@ file(GLOB CPP_SOURCE
 	*.i
 )
 
-#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(.)
@@ -79,5 +78,7 @@ if(MSVC OR MINGW)
 endif()
 
 #message ("${CMAKE_CURRENT_SOURCE_DIR}")
-#message ("${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/classes" DESTINATION "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
+
+set (wrapper "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
+message ("${wrapper}")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/classes" DESTINATION "${wrapper}")
