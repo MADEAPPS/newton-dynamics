@@ -18,6 +18,12 @@
 class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 {
 	public:
+	enum ndRotationOrder
+	{
+		m_pitchRollYaw,
+		m_pitchYawRoll,
+	};
+
 	D_CLASS_REFLECTION(ndIkSwivelPositionEffector);
 	D_NEWTON_API ndIkSwivelPositionEffector(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndIkSwivelPositionEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, const ndMatrix& swivelAngleParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
@@ -76,8 +82,9 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	ndFloat32 m_minWorkSpaceRadio;
 	ndFloat32 m_maxWorkSpaceRadio;
-
+	ndRotationOrder m_rotationOrder;
 	bool m_enableSwivelControl;
+	
 };
 
 #endif 
