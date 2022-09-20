@@ -92,10 +92,10 @@ namespace biped_1
 		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		//{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		//{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		//{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		//{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root, 0,{},{} },
 	};
@@ -262,14 +262,15 @@ namespace biped_1
 							ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
 							ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
 
-							ndMatrix swivelFrame(ndGetIdentityMatrix());
-							swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-							swivelFrame.m_up = pivotFrame.m_up;
-							swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
-							swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
+							//ndMatrix swivelFrame(ndGetIdentityMatrix());
+							//swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
+							//swivelFrame.m_up = pivotFrame.m_up;
+							//swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
+							//swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
 
 							ndFloat32 regularizer = 0.001f;
-							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, childBody, pivotBody);
+							//ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, childBody, pivotBody);
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, pivotFrame, childBody, pivotBody);
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 
@@ -280,9 +281,9 @@ namespace biped_1
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.999f);
 
 							ndEffectorInfo info(effector);
-							info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
+							info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.995f);
 							info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
-							info.m_z_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+							info.m_z_mapper = ndParamMapper(-120.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 
 							// set the default pose param.
@@ -475,10 +476,10 @@ namespace biped_1
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndMatrix matrix(m_bodyArray[0]->GetMatrix());
-			matrix.m_posit = CalculateCenterOfMass();
-			context.DrawFrame(matrix);
-			context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
+			//ndMatrix matrix(m_bodyArray[0]->GetMatrix());
+			//matrix.m_posit = CalculateCenterOfMass();
+			//context.DrawFrame(matrix);
+			//context.DrawPoint(matrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 8.0f);
 
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
@@ -498,8 +499,8 @@ namespace biped_1
 				const ndMatrix roll(ndRollMatrix(info.m_z_mapper.Interpolate(info.m_z)));
 
 				ndVector posit(info.m_x_mapper.Interpolate(info.m_x), 0.0f, 0.0f, 1.0f);
-				posit = roll.RotateVector(posit);
 				posit = yaw.RotateVector(posit);
+				posit = roll.RotateVector(posit);
 
 				info.m_effector->SetLocalTargetPosition(posit);
 				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
@@ -604,7 +605,7 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(model);
 	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
-	//world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
+	world->AddJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 
 	delete modelMesh;
 
