@@ -24,10 +24,15 @@
 
 ndDeepBrainAgent::ndDeepBrainAgent(ndDeepBrain* const agent)
 	:m_network(agent)
-	,m_replayBufferIndex(0)
+	,m_exploration(1.0f)
 {
 }
 
 ndDeepBrainAgent::~ndDeepBrainAgent()
 {
+}
+
+void ndDeepBrainAgent::PredictAccion(ndDeepBrainTransition& transition)
+{
+	m_network.MakePrediction(transition.m_state, transition.m_action);
 }

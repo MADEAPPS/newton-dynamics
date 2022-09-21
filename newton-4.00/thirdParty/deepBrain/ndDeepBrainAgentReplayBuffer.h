@@ -24,15 +24,17 @@
 
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainInstance.h"
+#include "ndDeepBrainVector.h"
 
 class ndDeepBrainTransition
 {
 	public:
+	ndDeepBrainTransition();
 	void CopyFrom(const ndDeepBrainTransition& src);
 
-	ndArray<ndReal> m_state;
-	ndArray<ndReal> m_action;
-	ndArray<ndReal> m_nextState;
+	ndDeepBrainVector m_state;
+	ndDeepBrainVector m_action;
+	ndDeepBrainVector m_nextState;
 	ndReal m_reward;
 	bool m_terminalState;
 };
@@ -44,7 +46,11 @@ class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
 	~ndDeepBrainReplayBuffer();
 
 	void SetCount(ndInt32 count);
+	ndDeepBrainTransition& GetTransitionEntry();
 
+	ndArray<ndUnsigned32> m_randomShaffle;
+	ndInt32 m_learnBashSize;
+	ndInt32 m_replayBufferIndex;
 };
 
 #endif 

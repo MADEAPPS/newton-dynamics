@@ -19,10 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainVector.h"
-
 
 ndDeepBrainMemVector::ndDeepBrainMemVector()
 	:ndDeepBrainVector()

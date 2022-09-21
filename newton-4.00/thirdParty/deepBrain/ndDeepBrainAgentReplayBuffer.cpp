@@ -22,6 +22,14 @@
 #include "ndDeepBrainStdafx.h"
 #include "ndDeepBrainAgentReplayBuffer.h"
 
+ndDeepBrainTransition::ndDeepBrainTransition()
+	:m_state()
+	,m_action()
+	,m_nextState()
+	,m_reward(0.0f)
+	,m_terminalState(true)
+{
+}
 
 void ndDeepBrainTransition::CopyFrom(const ndDeepBrainTransition& src)
 {
@@ -37,6 +45,8 @@ void ndDeepBrainTransition::CopyFrom(const ndDeepBrainTransition& src)
 
 ndDeepBrainReplayBuffer::ndDeepBrainReplayBuffer()
 	:ndArray<ndDeepBrainTransition>()
+	,m_learnBashSize(0)
+	,m_replayBufferIndex(0)
 {
 }
 
@@ -45,23 +55,41 @@ ndDeepBrainReplayBuffer::~ndDeepBrainReplayBuffer()
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
 		ndDeepBrainTransition& transition = (*this)[i];
-		transition.m_state.~ndArray<ndReal>();
-		transition.m_action.~ndArray<ndReal>();
-		transition.m_nextState.~ndArray<ndReal>();
+		transition.m_state.~ndDeepBrainVector();
+		transition.m_action.~ndDeepBrainVector();
+		transition.m_nextState.~ndDeepBrainVector();
 	}
 }
 
 void ndDeepBrainReplayBuffer::SetCount(ndInt32 count)
 {
+	ndAssert(count > 128);
 	ndAssert(GetCount() == 0);
+	ndAssert(m_learnBashSize == 0);
+
+	m_learnBashSize = 128;
+	m_replayBufferIndex = 0;
+
+	m_randomShaffle.SetCount(count);
 	ndArray<ndDeepBrainTransition>::SetCount(count);
+
 	for (ndInt32 i = 0; i < count; i++)
 	{
 		ndDeepBrainTransition& transition = (*this)[i];
-		transition.m_state = ndArray<ndReal>();
-		transition.m_nextState = ndArray<ndReal>();
-		transition.m_action = ndArray<ndReal>();
+
+		m_randomShaffle[i] = i;
+		transition.m_state = ndDeepBrainVector();
+		transition.m_nextState = ndDeepBrainVector();
+		transition.m_action = ndDeepBrainVector();
 		transition.m_reward = 1.0f;
 		transition.m_terminalState = false;
 	}
+}
+
+ndDeepBrainTransition& ndDeepBrainReplayBuffer::GetTransitionEntry()
+{
+	ndInt32 replayIndex = m_replayBufferIndex % GetCount();
+	ndDeepBrainTransition& transition = (*this)[replayIndex];
+	m_replayBufferIndex++;
+	return transition;
 }

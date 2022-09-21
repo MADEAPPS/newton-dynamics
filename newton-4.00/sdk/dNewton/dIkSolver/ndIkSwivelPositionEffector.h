@@ -81,7 +81,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	ndFloat32 m_maxWorkSpaceRadio;
 	ndRotationOrder m_rotationOrder;
 	bool m_enableSwivelControl;
-	
 };
 
 #endif 

@@ -501,6 +501,7 @@ using namespace ndQuadruped_3;
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
 	// build a floor
+	return;
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	// register a material for filtering self collisions 

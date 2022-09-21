@@ -27,7 +27,7 @@ ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent)
 	:ndDeepBrainAgent(agent)
 	,m_targetNetwork(new ndDeepBrain(*agent))
 {
-	m_replayBuffer.SetCount(1000);
+	m_replayBuffer.SetCount(2000);
 }
 
 ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
@@ -35,10 +35,20 @@ ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
 	delete m_targetNetwork.GetBrain();
 }
 
-void ndDeepBrainAgentDQN::OptimizationStep()
+void ndDeepBrainAgentDQN::PredictAccion(ndDeepBrainTransition& transition)
 {
-	ndInt32 replayIndex = m_replayBufferIndex % m_replayBuffer.GetCount();
-	GetTransition(m_replayBuffer[replayIndex]);
+	ndDeepBrainAgent::PredictAccion(transition);
+}
 
-	m_replayBufferIndex++;
+void ndDeepBrainAgentDQN::LearnStep()
+{
+	ndDeepBrainTransition& transition = m_replayBuffer.GetTransitionEntry();
+	GetTransition(transition);
+
+	if (m_replayBuffer.m_replayBufferIndex < m_replayBuffer.m_learnBashSize)
+	{
+		return;
+	}
+
+	//ndAssert(0);
 }

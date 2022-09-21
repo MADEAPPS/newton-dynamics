@@ -32,13 +32,14 @@ class ndDeepBrainAgent: public ndClassAlloc
 	ndDeepBrainAgent(ndDeepBrain* const agent);
 	virtual ~ndDeepBrainAgent();
 
-	virtual void OptimizationStep() = 0;
+	virtual void LearnStep() = 0;
+	virtual void PredictAccion(ndDeepBrainTransition& transition);
 	virtual void GetTransition(ndDeepBrainTransition& transition) const = 0;
 
 	ndDeepBrainInstance m_network;
 	ndDeepBrainReplayBuffer m_replayBuffer;
-	ndArray<ndUnsigned32> m_replayBufferRandomShaffle;
-	ndInt32 m_replayBufferIndex;
+	
+	ndFloat32 m_exploration;
 };
 
 #endif 

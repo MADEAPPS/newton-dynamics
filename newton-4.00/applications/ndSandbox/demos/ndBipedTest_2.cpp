@@ -23,8 +23,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//#define _TEST_ONE_FUTURE_STE_ACTION
-
 namespace biped2
 {
 	class ndDefinition
@@ -548,10 +546,6 @@ namespace biped2
 
 			zmp.m_w = 1.0f;
 			const ndMatrix matrix(m_locaFrame * m_bodyArray[0]->GetMatrix());
-			//modelState.m_zmpFrame.m_right = matrix.m_right;
-			//modelState.m_zmpFrame.m_front = ndVector(0.0f, 1.0f, 0.0f, 0.0f).CrossProduct(matrix.m_right);
-			//modelState.m_zmpFrame.m_front = modelState.m_zmpFrame.m_front.Normalize();
-			//modelState.m_zmpFrame.m_up = modelState.m_zmpFrame.m_right.CrossProduct(modelState.m_zmpFrame.m_front);
 
 			modelState.m_comFrame.m_right = matrix.m_right;
 			modelState.m_comFrame.m_front = ndVector(0.0f, 1.0f, 0.0f, 0.0f).CrossProduct(matrix.m_right);
@@ -559,7 +553,6 @@ namespace biped2
 			modelState.m_comFrame.m_up = modelState.m_comFrame.m_right.CrossProduct(modelState.m_comFrame.m_front);
 			modelState.m_comFrame.m_posit = com;
 		
-			//modelState.m_centerOfMass = com;
 			modelState.m_zmpPosit = zmp;
 			modelState.m_centerOfMassVeloc = comVeloc;
 			
@@ -576,13 +569,21 @@ namespace biped2
 		{
 			ndModelPhysicState modeState(CalculateModelState());
 
-			context.DrawFrame(modeState.m_comFrame);
-			context.DrawLine(modeState.m_zmpPosit, modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-			context.DrawLine(modeState.m_zmpPosit, modeState.m_comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
+			//context.DrawFrame(modeState.m_comFrame);
+			//context.DrawLine(modeState.m_zmpPosit, modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+			//context.DrawLine(modeState.m_zmpPosit, modeState.m_comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
+			//
+			//context.DrawPoint(modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
+			//context.DrawPoint(modeState.m_comTarget, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
+			//context.DrawPoint(modeState.m_zmpPosit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
 
-			context.DrawPoint(modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
-			context.DrawPoint(modeState.m_comTarget, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
-			context.DrawPoint(modeState.m_zmpPosit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
+			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			{
+				const ndEffectorInfo& info = m_effectors[i];
+				ndJointBilateralConstraint* const joint = info.m_effector;
+				joint->DebugJoint(context);
+			}
+
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -804,13 +805,13 @@ namespace biped2
 			TrainingLoopEnd(world, timestep);
 		}
 		
-		void TrainingLoopBegin(ndWorld* const world, ndFloat32)
+		void TrainingLoopBegin(ndWorld* const, ndFloat32)
 		{
 			switch (m_trainingState)
 			{
 				case m_initTraining:
 				{
-					InitTraning(world);
+					InitTraning();
 					break;
 				}
 
@@ -833,7 +834,7 @@ namespace biped2
 			}
 		}
 
-		void InitTraning(ndWorld* const world)
+		void InitTraning()
 		{
 			//ndTrace(("frame %d\n", world->GetSubFrameNumber()));
  			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -844,11 +845,13 @@ namespace biped2
 			m_rollAngle = 0;
 			m_traingCounter++;
 			m_epochCounter = 0;
+			m_dqnAgent.m_exploration = ndMax(ndFloat32(0.01f), ndFloat32(m_dqnAgent.m_exploration - 0.01f));
+
 			//m_trainingState = (m_traingCounter < 200) ? m_tickTrainingEpoch : m_endTraining;
 			m_trainingState = (m_traingCounter < 1000) ? m_tickTrainingEpoch : m_endTraining;
 		}
 
-		void GetRandomAction(ndFloat32 timestep)
+		void GetRandomAction()
 		{
 			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
 			action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
@@ -857,19 +860,32 @@ namespace biped2
 				action[i] = 0.0f;
 			}
 
-			#ifdef _TEST_ONE_FUTURE_STE_ACTION
-				ndFloat32 stateSpeed = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalSpeed];
-				ndFloat32 statePosit = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalPosit];
-				ndFloat32 predictePosit = statePosit + stateSpeed * timestep;
-				ndInt32 valueIndex = (predictePosit > 0.0) ? ndHumanoidBrain::ndModelActionParam::m_goBack : ndHumanoidBrain::ndModelActionParam::m_goFoward;
-				if (ndAbs(predictePosit) < 0.0025f)
-				{
-					valueIndex = ndHumanoidBrain::ndModelActionParam::m_stay;
-				}
-				action[valueIndex] = 1.0f;
-			#else		
-				ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
-				action[valueIndex] = 1.0f;
+			ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
+			action[valueIndex] = 1.0f;
+		}
+
+		void PredictAction(ndFloat32 timestep)
+		{
+			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
+			action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
+
+			#if 0
+			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
+			{
+				action[i] = 0.0f;
+			}
+			
+			ndFloat32 stateSpeed = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalSpeed];
+			ndFloat32 statePosit = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::m_comSagittalPosit];
+			ndFloat32 predictePosit = statePosit + stateSpeed * timestep;
+			ndInt32 valueIndex = (predictePosit > 0.0) ? ndHumanoidBrain::ndModelActionParam::m_goBack : ndHumanoidBrain::ndModelActionParam::m_goFoward;
+			if (ndAbs(predictePosit) < 0.0025f)
+			{
+				valueIndex = ndHumanoidBrain::ndModelActionParam::m_stay;
+			}
+			action[valueIndex] = 1.0f;
+			#else
+			m_dqnAgent.PredictAccion(m_dqnAgent.m_transition);
 			#endif
 		}
 
@@ -891,13 +907,14 @@ namespace biped2
 		void GetStateAndAction(ndFloat32 timestep)
 		{
 			GetState(m_dqnAgent.m_transition.m_state);
-			if (1)
+			ndFloat32 exploit = ndRand();
+			if (m_dqnAgent.m_exploration > exploit)
 			{
-				GetRandomAction(timestep);
+				GetRandomAction();
 			}
 			else
 			{
-				ndAssert(0);
+				PredictAction(timestep);
 			}
 
 			// Get the reward of this state
@@ -905,9 +922,9 @@ namespace biped2
 			m_dqnAgent.m_transition.m_terminalState = false;
 
 			ndFloat32 dist = m_dqnAgent.m_transition.m_state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit];
-			if (ndAbs(dist) > 0.25f)
+			if (ndAbs(dist) > 0.4f)
 			{
-				//m_dqnAgent.m_transition.m_terminalState = true;
+				m_dqnAgent.m_transition.m_terminalState = true;
 			}
 			if (ndAbs(m_rollAngle) > ndFloat32(80.0f * ndDegreeToRad))
 			{
@@ -919,16 +936,24 @@ namespace biped2
 		{
 			GetState(m_dqnAgent.m_transition.m_nextState);
 
-			m_dqnAgent.OptimizationStep();
+			m_dqnAgent.LearnStep();
 
 			m_epochCounter ++;
 			bool isTerminal = m_dqnAgent.m_transition.m_terminalState;
 			//if (isTerminal)
-			if (isTerminal || (m_epochCounter >= 600))
+			if (isTerminal)
 			{
-				ndTrace (("frames alived %d\n", m_epochCounter));
+				ndTrace (("failed epoch: frames alived %d\n", m_epochCounter));
 				m_trainingState = m_initTraining;
 			}
+
+			if (m_epochCounter >= 600)
+			{
+				ndTrace(("succeded epoch frames alived %d\n", m_epochCounter));
+				m_trainingState = m_initTraining;
+				ndAssert(0);
+			}
+
 		}
 		
 		ndDeepBrainAgentTrainier m_dqnAgent;

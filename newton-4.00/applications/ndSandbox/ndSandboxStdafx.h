@@ -102,6 +102,7 @@
 #include <ndDeepBrainAgentDQN.h>
 #include <ndDeepBrainAgentDDPG.h>
 #include <ndDeepBrainParallelTrainer.h>
+#include <ndDeepBrainAgentReplayBuffer.h>
 
 #ifndef _MSC_VER
 	#ifndef stricmp
