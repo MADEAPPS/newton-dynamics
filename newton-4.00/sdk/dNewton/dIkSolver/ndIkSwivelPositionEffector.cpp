@@ -17,7 +17,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIkSwivelPositionEffector)
 
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPivotChild, const ndMatrix& pinAndPivotParent, const ndMatrix& swivelFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotChild, pinAndPivotParent)
-	,m_targetLocalFrame(pinAndPivotChild * pinAndPivotParent.Inverse())
+	,m_localTargetPosit(pinAndPivotParent.UntransformVector(pinAndPivotChild.m_posit))
 	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -32,14 +32,14 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 	,m_rotationOrder(m_pitchYawRoll)
 	,m_enableSwivelControl(true)
 {
-	CalculateLocalMatrix(swivelFrame, m_localSwivelMatrix0, m_localSwivelMatrix1);
+	//CalculateLocalMatrix(swivelFrame, m_localSwivelMatrix0, m_localSwivelMatrix1);
 
 	ndMatrix temp;
 	ndMatrix matrix1 (pinAndPivotParent);
 	matrix1.m_posit = pinAndPivotChild.m_posit;
 	CalculateLocalMatrix(matrix1, m_localMatrix0, temp);
 
-	const ndVector dist2(ndVector::m_triplexMask & m_targetLocalFrame.m_posit);
+	const ndVector dist2(ndVector::m_triplexMask & m_localTargetPosit);
 	m_maxWorkSpaceRadio = ndFloat32(0.99f) * ndSqrt(dist2.DotProduct(dist2).GetScalar());
 
 	SetSolverModel(m_jointkinematicCloseLoop);
@@ -47,7 +47,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndMatrix& pinAndPiv
 
 ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
-	,m_targetLocalFrame(ndGetIdentityMatrix())
+	,m_localTargetPosit(ndVector::m_wOne)
 	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -64,10 +64,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndLoadSaveBase::ndL
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	
-	m_targetLocalFrame = xmlGetMatrix(xmlNode, "targetFrame");
-	m_localSwivelMatrix0 = xmlGetMatrix(xmlNode, "localSwivelMatrix0");
-	m_localSwivelMatrix1 = xmlGetMatrix(xmlNode, "localSwivelMatrix1");
-
+	m_localTargetPosit = xmlGetVector3(xmlNode, "localTargetPosit");
 	m_swivelAngle = xmlGetFloat(xmlNode, "swivelAngle");
 
 	m_angularSpring = xmlGetFloat(xmlNode, "angularSpring");
@@ -97,9 +94,7 @@ void ndIkSwivelPositionEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& de
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "targetFrame", m_targetLocalFrame);
-	xmlSaveParam(childNode, "localSwivelMatrix0", m_localSwivelMatrix0);
-	xmlSaveParam(childNode, "localSwivelMatrix1", m_localSwivelMatrix1);
+	xmlSaveParam(childNode, "localTargetPosit", m_localTargetPosit);
 	xmlSaveParam(childNode, "swivelAngle", m_swivelAngle);
 	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
 	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
@@ -138,7 +133,7 @@ void ndIkSwivelPositionEffector::SetSwivelAngle(const ndFloat32 angle)
 
 ndVector ndIkSwivelPositionEffector::GetLocalTargetPosition() const
 {
-	return m_targetLocalFrame.m_posit;
+	return m_localTargetPosit;
 }
 
 void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
@@ -153,7 +148,7 @@ void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
 	{
 		target = target.Normalize().Scale(m_minWorkSpaceRadio);
 	}
-	m_targetLocalFrame.m_posit = target | ndVector::m_wOne;
+	m_localTargetPosit = target | ndVector::m_wOne;
 }
 
 ndVector ndIkSwivelPositionEffector::GetGlobalPosition() const
@@ -225,30 +220,31 @@ void ndIkSwivelPositionEffector::GetAngularSpringDamper(ndFloat32& regularizer, 
 
 void ndIkSwivelPositionEffector::CalculateSwivelMatrices(ndMatrix& swivelMatrix0, ndMatrix& swivelMatrix1) const
 {
-	const ndVector posit0(m_body0->GetMatrix().TransformVector(m_localMatrix0.m_posit));
-	const ndVector posit1(m_body1->GetMatrix().TransformVector(m_localMatrix1.m_posit));
-
-	swivelMatrix0 = m_localSwivelMatrix0 * m_body0->GetMatrix();
-	swivelMatrix1 = m_localSwivelMatrix1 * m_body1->GetMatrix();
-
-	const ndVector midPoint(ndVector::m_half * (posit0 + posit1));
-	const ndVector pin(swivelMatrix1.UnrotateVector(posit0 - posit1).Normalize());
-	ndMatrix localSwivel1(ndGetIdentityMatrix());
-
-	localSwivel1.m_front = pin;
-	localSwivel1.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-	localSwivel1.m_right = (localSwivel1.m_front.CrossProduct(localSwivel1.m_up)).Normalize();
-	localSwivel1.m_up = localSwivel1.m_right.CrossProduct(localSwivel1.m_front);
-
-	swivelMatrix1 = localSwivel1 * swivelMatrix1;
-	swivelMatrix0.m_posit = midPoint;
-	swivelMatrix1.m_posit = midPoint;
+	ndAssert(0);
+	//const ndVector posit0(m_body0->GetMatrix().TransformVector(m_localMatrix0.m_posit));
+	//const ndVector posit1(m_body1->GetMatrix().TransformVector(m_localMatrix1.m_posit));
+	//
+	//swivelMatrix0 = m_localSwivelMatrix0 * m_body0->GetMatrix();
+	//swivelMatrix1 = m_localSwivelMatrix1 * m_body1->GetMatrix();
+	//
+	//const ndVector midPoint(ndVector::m_half * (posit0 + posit1));
+	//const ndVector pin(swivelMatrix1.UnrotateVector(posit0 - posit1).Normalize());
+	//ndMatrix localSwivel1(ndGetIdentityMatrix());
+	//
+	//localSwivel1.m_front = pin;
+	//localSwivel1.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+	//localSwivel1.m_right = (localSwivel1.m_front.CrossProduct(localSwivel1.m_up)).Normalize();
+	//localSwivel1.m_up = localSwivel1.m_right.CrossProduct(localSwivel1.m_front);
+	//
+	//swivelMatrix1 = localSwivel1 * swivelMatrix1;
+	//swivelMatrix0.m_posit = midPoint;
+	//swivelMatrix1.m_posit = midPoint;
 }
 
 ndMatrix ndIkSwivelPositionEffector::CalculateSwivelFrame(const ndMatrix& matrix1) const
 {
-	ndVector pin((m_targetLocalFrame.m_posit & ndVector::m_triplexMask).Normalize());
 	ndMatrix swivelMatrix;
+	ndVector pin((m_localTargetPosit & ndVector::m_triplexMask).Normalize());
 	if (m_rotationOrder == m_pitchYawRoll)
 	{
 		ndFloat32 yaw = -ndAsin(pin.m_z);
@@ -262,7 +258,7 @@ ndMatrix ndIkSwivelPositionEffector::CalculateSwivelFrame(const ndMatrix& matrix
 		//ndFloat32 roll = ndAtan2(pin.m_y, pin.m_x);
 		//swivelMatrix = ndYawMatrix(yaw) * ndRollMatrix(roll) * matrix1;
 	}
-	swivelMatrix.m_posit = matrix1.TransformVector(m_targetLocalFrame.m_posit);
+	swivelMatrix.m_posit = matrix1.TransformVector(m_localTargetPosit);
 	return swivelMatrix;
 }
 
@@ -272,35 +268,35 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	ndMatrix swivelMatrix0(CalculateSwivelFrame(matrix1));
-	ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * swivelMatrix0);
+	ndMatrix swivelMatrix(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 	
-	//debugCallback.DrawFrame(matrix0, 0.5f);
+	debugCallback.DrawFrame(matrix0, 0.5f);
 	debugCallback.DrawFrame(matrix1);
-	debugCallback.DrawFrame(swivelMatrix0, 0.5f);
-	debugCallback.DrawFrame(swivelMatrix1);
-	debugCallback.DrawPoint(swivelMatrix0.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
+	debugCallback.DrawFrame(swivelMatrix);
+	debugCallback.DrawPoint(swivelMatrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
-void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc)
+void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	ndMatrix swivelMatrix0;
-	ndMatrix swivelMatrix1;
-	CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-	swivelMatrix1 = ndPitchMatrix(m_swivelAngle) * swivelMatrix1;
+	//ndMatrix swivelMatrix0;
+	//ndMatrix swivelMatrix1;
+	//CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
 
-	const ndVector& pin = swivelMatrix1.m_front;
-	const ndFloat32 angle = CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+	const ndMatrix swivelMatrix1(CalculateSwivelFrame(matrix1));
+	//swivelMatrix1 = ndPitchMatrix(m_swivelAngle) * swivelMatrix1;
 
-	AddAngularRowJacobian(desc, pin, angle);
-	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+	//const ndVector& pin = swivelMatrix1.m_front;
+	//const ndFloat32 angle = CalculateAngle(swivelMatrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+	//
+	//AddAngularRowJacobian(desc, pin, angle);
+	//SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 }
 
 void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	const ndVector posit0(matrix0.m_posit);
-	const ndVector posit1(matrix1.m_posit);
+	const ndVector posit1(matrix1.TransformVector(m_localTargetPosit));
 	const ndMatrix& axisDir = matrix1;
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
@@ -310,11 +306,6 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, c
 		SetLowerFriction(desc, -m_linearMaxForce);
 		SetHighFriction(desc, m_linearMaxForce);
 	}
-
-	//AddLinearRowJacobian(desc, posit0, posit1, matrix1.m_front);
-	//SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-	//SetLowerFriction(desc, -m_linearMaxForce);
-	//SetHighFriction(desc, m_linearMaxForce);
 }
 
 void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
@@ -322,11 +313,10 @@ void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	const ndMatrix swivelMatrix(CalculateSwivelFrame(matrix1));
 
-	SubmitLinearAxis(desc, matrix0, swivelMatrix);
+	SubmitLinearAxis(desc, matrix0, matrix1);
 	if (m_enableSwivelControl)
 	{
-		//SubmitAngularAxis(desc);
+		SubmitAngularAxis(desc, matrix0, matrix1);
 	}
 }
