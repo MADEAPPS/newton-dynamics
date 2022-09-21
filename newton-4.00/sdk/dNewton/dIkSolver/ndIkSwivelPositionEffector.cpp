@@ -245,13 +245,15 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	ndMatrix swivelMatrix(ndPitchMatrix(m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	ndMatrix swivelMatrix0(CalculateSwivelFrame(matrix1));
+	ndMatrix swivelMatrix1(ndPitchMatrix(m_swivelAngle) * swivelMatrix0);
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 	
-	debugCallback.DrawFrame(matrix0, 0.5f);
+	//debugCallback.DrawFrame(matrix0, 0.5f);
 	debugCallback.DrawFrame(matrix1);
-	debugCallback.DrawFrame(swivelMatrix);
-	debugCallback.DrawPoint(swivelMatrix.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
+	debugCallback.DrawFrame(swivelMatrix0);
+	debugCallback.DrawFrame(swivelMatrix1);
+	debugCallback.DrawPoint(swivelMatrix0.m_posit, ndVector(1.0f, 1.0f, 0.0f, 0.0f), 8.0f);
 }
 
 void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)

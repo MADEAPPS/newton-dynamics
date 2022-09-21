@@ -569,13 +569,13 @@ namespace biped2
 		{
 			ndModelPhysicState modeState(CalculateModelState());
 
-			//context.DrawFrame(modeState.m_comFrame);
-			//context.DrawLine(modeState.m_zmpPosit, modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-			//context.DrawLine(modeState.m_zmpPosit, modeState.m_comTarget, ndVector(1.0f, 1.0f, 0.0f, 1.0f));
-			//
-			//context.DrawPoint(modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
-			//context.DrawPoint(modeState.m_comTarget, ndVector(1.0f, 1.0f, 1.0f, 1.0f), 5);
-			//context.DrawPoint(modeState.m_zmpPosit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
+			context.DrawFrame(modeState.m_comFrame);
+			context.DrawLine(modeState.m_zmpPosit, modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+			context.DrawLine(modeState.m_zmpPosit, modeState.m_comTarget, ndVector(0.0f, 1.0f, 1.0f, 1.0f));
+			
+			context.DrawPoint(modeState.m_comTarget, ndVector(0.0f, 1.0f, 1.0f, 1.0f), 5);
+			context.DrawPoint(modeState.m_zmpPosit, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 5);
+			context.DrawPoint(modeState.m_comFrame.m_posit, ndVector(1.0f, 0.0f, 1.0f, 1.0f), 5);
 
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
