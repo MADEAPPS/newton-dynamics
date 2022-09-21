@@ -183,26 +183,21 @@ namespace ndQuadruped_2
 				{
 					ndBodyKinematic* const targetBody = calf1;
 
+					ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
 					ndMatrix effectorToeFrame(ndGetIdentityMatrix());
-					ndMatrix effectorRefFrame(ndGetIdentityMatrix());
+					ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
 					effectorRefFrame.m_posit = thighPivot;
 					effectorToeFrame.m_posit = limbPivotLocation.m_posit;
 
-					ndMatrix effectorSwivelFrame(ndGetIdentityMatrix());
-					effectorSwivelFrame.m_front = (effectorToeFrame.m_posit - effectorRefFrame.m_posit).Normalize();
-					effectorSwivelFrame.m_up = upDir;
-					effectorSwivelFrame.m_right = (effectorSwivelFrame.m_front.CrossProduct(effectorSwivelFrame.m_up)).Normalize();
-					effectorSwivelFrame.m_up = effectorSwivelFrame.m_right.CrossProduct(effectorSwivelFrame.m_front);
-
 					ndFloat32 regularizer = 0.001f;
-					ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame, effectorRefFrame, effectorSwivelFrame, targetBody, torso);
+					ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso);
 					effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 					effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 					effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
-
+					
 					ndEffectorInfo info(effector, lookActHinge);
 					info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-					info.m_y_mapper = ndParamMapper(-0.2f, 0.2f);
+					info.m_y_mapper = ndParamMapper(-0.4f, 0.1f);
 					info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
 					info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
 					m_effectors.PushBack(info);
@@ -239,7 +234,7 @@ namespace ndQuadruped_2
 		{
 			ndVector upVector(m_rootBody->GetMatrix().m_up);
 			//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-			for (ndInt32 i = 0; i < 1; ++i)
+			for (ndInt32 i = 0; i < 4; ++i)
 			{
 				const ndEffectorInfo& info = m_effectors[i];
 				ndJointBilateralConstraint* const effector = info.m_effector;
@@ -287,11 +282,11 @@ namespace ndQuadruped_2
 				posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
 				info.m_effector->SetLocalTargetPosition(posit);
 
-				ndMatrix swivelMatrix0;
-				ndMatrix swivelMatrix1;
-				info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-				const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
-				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
+				//ndMatrix swivelMatrix0;
+				//ndMatrix swivelMatrix1;
+				//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+				//const ndFloat32 angle = info.m_effector->CalculateAngle(upVector, swivelMatrix1[1], swivelMatrix1[0]);
+				//info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;

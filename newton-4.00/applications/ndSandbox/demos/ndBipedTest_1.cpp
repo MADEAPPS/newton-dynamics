@@ -92,10 +92,10 @@ namespace biped_1
 		{ "rfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
 		{ "rtibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
-		//{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
-		//{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lhipjoint", ndDefinition::m_spherical, 0, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "lfemur", ndDefinition::m_hinge, 1, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lfoof_effector", ndDefinition::m_effector, 1, { 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 90.0f } },
+		{ "ltibia", ndDefinition::m_doubleHinge, 1, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root, 0,{},{} },
 	};
@@ -262,15 +262,8 @@ namespace biped_1
 							ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
 							ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
 
-							//ndMatrix swivelFrame(ndGetIdentityMatrix());
-							//swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-							//swivelFrame.m_up = pivotFrame.m_up;
-							//swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
-							//swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
-
 							ndFloat32 regularizer = 0.001f;
-							//ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, childBody, pivotBody);
-							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, pivotFrame, childBody, pivotBody);
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, childBody, pivotBody);
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 

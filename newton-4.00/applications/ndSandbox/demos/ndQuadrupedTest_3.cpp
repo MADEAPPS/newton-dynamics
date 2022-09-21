@@ -227,23 +227,17 @@ namespace ndQuadruped_3
 							effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 							pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
 
-							ndMatrix swivelFrame(ndGetIdentityMatrix());
-							swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-							swivelFrame.m_up = referenceFrame.m_front;
-							swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
-							swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
-
 							ndFloat32 regularizer = 0.001f;
-							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, parentBody, m_rootBody);
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, m_rootBody);
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-
+							
 							const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
 							const ndVector dist0(effectorFrame.m_posit - elbowPoint);
 							const ndVector dist1(elbowPoint - pivotFrame.m_posit);
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
-
+							
 							ndEffectorInfo info(effector);
 							info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
 							info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
@@ -470,11 +464,11 @@ namespace ndQuadruped_3
 				posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
 				info.m_effector->SetLocalTargetPosition(posit);
 
-				ndMatrix swivelMatrix0;
-				ndMatrix swivelMatrix1;
-				info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-				const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
-				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
+				//ndMatrix swivelMatrix0;
+				//ndMatrix swivelMatrix1;
+				//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
+				//const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
+				//info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
 			}
 
 			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();

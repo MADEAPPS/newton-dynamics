@@ -381,8 +381,6 @@ ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes
 	return count;
 }
 
-
-
 void ndThreadYield()
 {
 	std::this_thread::yield();

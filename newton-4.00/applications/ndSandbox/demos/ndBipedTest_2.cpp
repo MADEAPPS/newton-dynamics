@@ -322,39 +322,33 @@ namespace biped2
 							ndMatrix pivotFrame(pivotFrameNode->CalculateGlobalMatrix());
 							ndMatrix effectorFrame(childFrameNode->CalculateGlobalMatrix());
 
-							ndMatrix swivelFrame(ndGetIdentityMatrix());
-							swivelFrame.m_front = (effectorFrame.m_posit - pivotFrame.m_posit).Normalize();
-							swivelFrame.m_up = pivotFrame.m_up;
-							swivelFrame.m_right = (swivelFrame.m_front.CrossProduct(swivelFrame.m_up)).Normalize();
-							swivelFrame.m_up = swivelFrame.m_right.CrossProduct(swivelFrame.m_front);
-
 							ndFloat32 regularizer = 0.001f;
-							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, swivelFrame, childBody, pivotBody);
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, childBody, pivotBody);
 							const ndVector kneePoint(childFrameNode->GetParent()->CalculateGlobalMatrix().m_posit);
 							const ndVector dist0(effectorFrame.m_posit - kneePoint);
 							const ndVector dist1(kneePoint - pivotFrame.m_posit);
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.995f);
-
+							
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-
+							
 							ndEffectorInfo info(effector);
 							info.m_x_mapper = ndParamMapper(0.0f, workSpace * 0.999f);
 							info.m_y_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
-							info.m_z_mapper = ndParamMapper(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+							info.m_z_mapper = ndParamMapper(-120.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
 							info.m_swivel_mapper = ndParamMapper(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-
+							
 							// set the default pose param.
 							ndVector localPosit(effector->GetLocalTargetPosition());
 							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
-
+							
 							//ndVector localPositDir(localPosit.Normalize());
 							//ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
 							//info.m_y = info.m_y_mapper.CalculateParam(yawAngle);
 							//ndFloat32 rollAngle = ndSin(localPositDir.m_y);
 							//info.m_z = info.m_z_mapper.CalculateParam(rollAngle);
-
+							
 							m_effectors.PushBack(info);
 							m_effectorsJoints.PushBack(info.m_effector);
 						}

@@ -333,25 +333,25 @@ namespace ndQuadruped_1
 							notify = (ndDemoEntityNotify*)notify->m_parentBody->GetNotifyCallback();
 
 							ndMatrix effectorFrame(rootBody->GetMatrix());
-							ndMatrix pivotFrame(rootBody->GetMatrix());
+							ndMatrix pivotFrame(ndRollMatrix(-90.0f * ndDegreeToRad) * rootBody->GetMatrix());
 							pivotFrame.m_posit = notify->GetBody()->GetMatrix().m_posit;
 							effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
 
 							ndFloat32 regularizer = 0.001f;
-							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame, pivotFrame, ndGetIdentityMatrix(), parentBody, rootBody);
-
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, rootBody);
+							
 							effector->SetSwivelMode(false);
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-
+							
 							const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
 							const ndVector dist0(effectorFrame.m_posit - elbowPoint);
 							const ndVector dist1(elbowPoint - pivotFrame.m_posit);
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
-
+							
 							//world->AddJoint(effector);
-
+							
 							ndEffectorInfo info(effector);
 							m_effectors.PushBack(info);
 							m_effectorsJoints.PushBack(effector);
