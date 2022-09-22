@@ -14,85 +14,13 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set (projectName "ndNewton")
 message (${projectName})
 
-include_directories(dCore)
-include_directories(dNewton)
-include_directories(dTinyxml)
-include_directories(dCollision)
-include_directories(dNewton/dJoints)
-include_directories(dNewton/dModels)
-include_directories(dNewton/dIkSolver)
-include_directories(dNewton/dParticles)
-include_directories(dNewton/dModels/dVehicle)
-include_directories(dNewton/dModels/dCharacter)
 
-add_subdirectory(dNewton/dExtensions)
+set (srcPath "../../../sdk")
+set (dstPath "${PROJECT_BINARY_DIR}/newtonAndroid/ndNewton")
 
-# source and header files
-file(GLOB HEADERS 
-	dTinyxml/*.h 
-	dCore/*.h 
-	dNewton/*.h 
-	dCollision/*.h 
-	dNewton/dJoints/*.h 
-	dNewton/dModels/*.h 
-	dNewton/dIkSolver/*.h
-	dNewton/dParticles/*.h 
-	dNewton/dModels/dVehicle/*.h
-	dNewton/dModels/dCharacter/*.h)
-
-file(GLOB CPP_SOURCE 
-	dTinyxml/*.h
-	dTinyxml/*.cpp
-	dCore/*.h 
-	dCore/*.cpp
-	dNewton/*.h 
-	dNewton/*.cpp
-	dCollision/*.h 
-	dCollision/*.cpp
-	dNewton/dModels/*.h 
-	dNewton/dModels/*.cpp
-	dNewton/dJoints/*.h 
-	dNewton/dJoints/*.cpp
-	dNewton/dIkSolver/*.h
-	dNewton/dIkSolver/*.cpp
-	dNewton/dParticles/*.h
-	dNewton/dParticles/*.cpp
-	dNewton/dModels/dVehicle/*.h 
-	dNewton/dModels/dVehicle/*.cpp
-	dNewton/dModels/dCharacter/*.h
-	dNewton/dModels/dCharacter/*.cpp)
-
-#if(NEWTON_ENABLE_AVX2_SOLVER)
-#	add_definitions(-D_D_USE_AVX2_SOLVER)
-#	include_directories(dNewton/dExtensions/dAvx2)
-#endif()
-
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
-
-#add_definitions(-D_D_SINGLE_LIBRARY)
-
-#if(NEWTON_BUILD_SHARED_LIBS)
-#	add_definitions(-D_D_CORE_EXPORT_DLL)
-#	add_definitions(-D_D_NEWTON_EXPORT_DLL)
-#	add_definitions(-D_D_TINYXML_EXPORT_DLL)
-#	add_definitions(-D_D_COLLISION_EXPORT_DLL)
-#	add_library(${projectName} SHARED ${CPP_SOURCE})
-#
-#	#if(NEWTON_ENABLE_AVX2_SOLVER)
-#	#	target_link_libraries (${projectName} ndSolverAvx2)
-#	#endif()
-#
-#	if(MSVC OR MINGW)
-#		target_link_options(${projectName} PUBLIC "/DEBUG") 
-#	endif()
-#
-#else()
-#	add_library(${projectName} STATIC ${CPP_SOURCE})
-#endif()
-
-add_library(${projectName} STATIC ${CPP_SOURCE})
-    
-
-#target_include_directories(${projectName} PUBLIC .)
-
+file(COPY "cmakeScript/CMakeLists.txt" DESTINATION "${dstPath}")
+file(COPY "${srcPath}/dCore" DESTINATION "${dstPath}")
+file(COPY "${srcPath}/dNewton" DESTINATION "${dstPath}")
+file(COPY "${srcPath}/dTinyxml" DESTINATION "${dstPath}")
+file(COPY "${srcPath}/dCollision" DESTINATION "${dstPath}")
 
