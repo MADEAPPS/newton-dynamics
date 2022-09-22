@@ -27,7 +27,9 @@ ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent)
 	:ndDeepBrainAgent(agent)
 	,m_targetNetwork(new ndDeepBrain(*agent))
 {
-	m_replayBuffer.SetCount(2000);
+	ndInt32 stateSize = m_network.GetBrain()->GetInputSize();
+	ndInt32 actionSize = m_network.GetBrain()->GetOutputSize();
+	m_replayBuffer.SetCount(2000, stateSize, actionSize);
 }
 
 ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
@@ -50,5 +52,6 @@ void ndDeepBrainAgentDQN::LearnStep()
 		return;
 	}
 
+	m_replayBuffer.MakeRandomBatch();
 	//ndAssert(0);
 }

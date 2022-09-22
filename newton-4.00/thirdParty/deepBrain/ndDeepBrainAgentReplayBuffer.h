@@ -23,8 +23,9 @@
 #define _ND_DEEP_BRAIN_AGENT_REAPLAY_BUFFER_H__
 
 #include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainInstance.h"
 #include "ndDeepBrainVector.h"
+#include "ndDeepBrainMatrix.h"
+#include "ndDeepBrainInstance.h"
 
 class ndDeepBrainTransition
 {
@@ -45,10 +46,20 @@ class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
 	ndDeepBrainReplayBuffer();
 	~ndDeepBrainReplayBuffer();
 
-	void SetCount(ndInt32 count);
+	void SetCount(ndInt32 count, ndInt32 stateSize, ndInt32 actionSize);
+
+	//ndInt32 GetStateSize() const;
+	//ndInt32 GetActionSize() const;
+
 	ndDeepBrainTransition& GetTransitionEntry();
 
+	void MakeRandomBatch();
+
 	ndArray<ndUnsigned32> m_randomShaffle;
+	ndDeepBrainMatrix m_inputBatch;
+	ndDeepBrainMatrix m_outputBatch;
+	ndDeepBrainMatrix m_groundTruth;
+	ndDeepBrainMatrix m_nextInputBatch;
 	ndInt32 m_learnBashSize;
 	ndInt32 m_replayBufferIndex;
 };

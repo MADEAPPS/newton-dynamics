@@ -66,6 +66,17 @@ ndDeepBrain::~ndDeepBrain()
 	}
 }
 
+ndInt32 ndDeepBrain::GetInputSize() const
+{
+	return GetCount() ? (*this)[0]->GetInputSize() : 0;
+}
+
+ndInt32 ndDeepBrain::GetOutputSize() const
+{
+	return GetCount() ? (*this)[GetCount()-1]->GetOuputSize() : 0;
+}
+
+
 void ndDeepBrain::CopyFrom(const ndDeepBrain& src)
 {
 	const ndArray<ndDeepBrainLayer*>& layers = *this;

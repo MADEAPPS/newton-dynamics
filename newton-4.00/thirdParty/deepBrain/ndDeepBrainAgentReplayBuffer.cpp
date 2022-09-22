@@ -45,6 +45,11 @@ void ndDeepBrainTransition::CopyFrom(const ndDeepBrainTransition& src)
 
 ndDeepBrainReplayBuffer::ndDeepBrainReplayBuffer()
 	:ndArray<ndDeepBrainTransition>()
+	,m_randomShaffle()
+	,m_inputBatch()
+	,m_outputBatch()
+	,m_groundTruth()
+	,m_nextInputBatch()
 	,m_learnBashSize(0)
 	,m_replayBufferIndex(0)
 {
@@ -61,7 +66,19 @@ ndDeepBrainReplayBuffer::~ndDeepBrainReplayBuffer()
 	}
 }
 
-void ndDeepBrainReplayBuffer::SetCount(ndInt32 count)
+//ndInt32 ndDeepBrainReplayBuffer::GetStateSize() const
+//{
+//	const ndDeepBrainTransition& transition = (*this)[0];
+//	return transition.m_state.GetCount();
+//}
+//
+//ndInt32 ndDeepBrainReplayBuffer::GetActionSize() const
+//{
+//	const ndDeepBrainTransition& transition = (*this)[0];
+//	return transition.m_action.GetCount();
+//}
+
+void ndDeepBrainReplayBuffer::SetCount(ndInt32 count, ndInt32 stateSize, ndInt32 actionSize)
 {
 	ndAssert(count > 128);
 	ndAssert(GetCount() == 0);
@@ -83,7 +100,16 @@ void ndDeepBrainReplayBuffer::SetCount(ndInt32 count)
 		transition.m_action = ndDeepBrainVector();
 		transition.m_reward = 1.0f;
 		transition.m_terminalState = false;
+
+		transition.m_state.SetCount(stateSize);
+		transition.m_nextState.SetCount(stateSize);
+		transition.m_action.SetCount(actionSize);
 	}
+
+	m_inputBatch.Init(m_learnBashSize, stateSize);
+	m_outputBatch.Init(m_learnBashSize, actionSize);
+	m_groundTruth.Init(m_learnBashSize, actionSize);
+	m_nextInputBatch.Init(m_learnBashSize, stateSize);
 }
 
 ndDeepBrainTransition& ndDeepBrainReplayBuffer::GetTransitionEntry()
@@ -92,4 +118,26 @@ ndDeepBrainTransition& ndDeepBrainReplayBuffer::GetTransitionEntry()
 	ndDeepBrainTransition& transition = (*this)[replayIndex];
 	m_replayBufferIndex++;
 	return transition;
+}
+
+void ndDeepBrainReplayBuffer::MakeRandomBatch()
+{
+	ndInt32 count = ndMin(m_randomShaffle.GetCount(), m_replayBufferIndex);
+	m_randomShaffle.RandomShuffle(count);
+	ndAssert(m_learnBashSize == m_inputBatch.GetRows());
+	for (ndInt32 i = 0; i < m_learnBashSize; ++i)
+	{
+		ndInt32 index = m_randomShaffle[i];
+		const ndDeepBrainTransition& transition = (*this)[index];
+		for (ndInt32 j = 0; j < m_inputBatch.GetColumns(); ++j)
+		{
+			m_inputBatch[i][j] = transition.m_state[j];
+			m_nextInputBatch[i][j] = transition.m_nextState[j];
+		}
+
+		for (ndInt32 j = 0; j < m_outputBatch.GetColumns(); ++j)
+		{
+			m_outputBatch[i][j] = transition.m_action[j];
+		}
+	}
 }

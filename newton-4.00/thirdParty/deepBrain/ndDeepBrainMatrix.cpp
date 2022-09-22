@@ -31,14 +31,7 @@ ndDeepBrainMatrix::ndDeepBrainMatrix()
 ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
 	:ndArray<ndDeepBrainVector>()
 {
-	SetCount(rows);
-	ndDeepBrainMatrix& me = *this;
-	for (ndInt32 i = 0; i < rows; ++i)
-	{
-		ndDeepBrainVector& row = me[i];
-		row.ResetMembers();
-		row.SetCount(columns);
-	}
+	Init(rows, columns);
 }
 
 ndDeepBrainMatrix::ndDeepBrainMatrix(const ndDeepBrainMatrix& src)
@@ -64,6 +57,18 @@ ndDeepBrainMatrix::~ndDeepBrainMatrix()
 			ndDeepBrainVector& row = me[i];
 			row.~ndDeepBrainVector();
 		}
+	}
+}
+
+void ndDeepBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
+{
+	SetCount(rows);
+	ndDeepBrainMatrix& me = *this;
+	for (ndInt32 i = 0; i < rows; ++i)
+	{
+		ndDeepBrainVector& row = me[i];
+		row.ResetMembers();
+		row.SetCount(columns);
 	}
 }
 

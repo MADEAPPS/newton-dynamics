@@ -28,9 +28,12 @@
 class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 {
 	public: 
+	ndDeepBrainMatrix();
 	ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns);
 	ndDeepBrainMatrix(const ndDeepBrainMatrix& src);
 	~ndDeepBrainMatrix();
+
+	void Init(ndInt32 rows, ndInt32 columns);
 
 	ndInt32 GetRows() const;
 	ndInt32 GetColumns() const;
@@ -40,7 +43,6 @@ class ndDeepBrainMatrix: public ndArray<ndDeepBrainVector>
 	void Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const;
 
 	protected:
-	ndDeepBrainMatrix();
 	ndUnsigned8* SetPointer(ndUnsigned8* const mem);
 	ndReal* SetFloatPointers(ndReal* const mem, ndInt32 columns);
 };

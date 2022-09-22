@@ -722,6 +722,9 @@ namespace biped2
 			ndDeepBrainAgentTrainier(ndDeepBrain* const agent)
 				:ndDeepBrainAgentDQN(agent)
 			{
+				m_transition.m_state.SetCount(agent->GetInputSize());
+				m_transition.m_action.SetCount(agent->GetOutputSize());
+				m_transition.m_nextState.SetCount(agent->GetInputSize());
 			}
 
 			void GetTransition(ndDeepBrainTransition& transition) const
@@ -854,7 +857,8 @@ namespace biped2
 		void GetRandomAction()
 		{
 			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
-			action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
+			//action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
+			ndAssert(action.GetCount() == ndHumanoidBrain::ndModelActionParam::m_actionSize);
 			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
 				action[i] = 0.0f;
@@ -866,10 +870,9 @@ namespace biped2
 
 		void PredictAction(ndFloat32 timestep)
 		{
-			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
-			action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
-
 			#if 0
+			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
+			//action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
 			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
 				action[i] = 0.0f;
@@ -899,7 +902,8 @@ namespace biped2
 			ndFloat32 sagittalComPosit = sagittalDir.DotProduct(sagittalDist).GetScalar();
 			ndFloat32 sagittalComSpeed = sagittalDir.DotProduct(modelState.m_centerOfMassVeloc).GetScalar();
 
-			state.SetCount(ndHumanoidBrain::ndModelStateParam::m_stateSize);
+			//state.SetCount(ndHumanoidBrain::ndModelStateParam::m_stateSize);
+			ndAssert(state.GetCount() == ndHumanoidBrain::ndModelStateParam::m_stateSize);
 			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit] = sagittalComPosit;
 			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalSpeed] = sagittalComSpeed;
 		}

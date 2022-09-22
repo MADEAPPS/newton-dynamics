@@ -23,6 +23,7 @@
 #define _ND_DEEP_BRAIN_AGENT_H__
 
 #include "ndDeepBrainStdafx.h"
+#include "ndDeepBrainMatrix.h"
 #include "ndDeepBrainInstance.h"
 #include "ndDeepBrainAgentReplayBuffer.h"
 
