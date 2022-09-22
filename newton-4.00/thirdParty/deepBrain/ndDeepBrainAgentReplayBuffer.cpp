@@ -48,8 +48,9 @@ ndDeepBrainReplayBuffer::ndDeepBrainReplayBuffer()
 	,m_randomShaffle()
 	,m_inputBatch()
 	,m_outputBatch()
-	,m_groundTruth()
 	,m_nextInputBatch()
+	,m_groundTruthBatch()
+	,n_rewardBatch()
 	,m_learnBashSize(0)
 	,m_replayBufferIndex(0)
 {
@@ -65,18 +66,6 @@ ndDeepBrainReplayBuffer::~ndDeepBrainReplayBuffer()
 		transition.m_nextState.~ndDeepBrainVector();
 	}
 }
-
-//ndInt32 ndDeepBrainReplayBuffer::GetStateSize() const
-//{
-//	const ndDeepBrainTransition& transition = (*this)[0];
-//	return transition.m_state.GetCount();
-//}
-//
-//ndInt32 ndDeepBrainReplayBuffer::GetActionSize() const
-//{
-//	const ndDeepBrainTransition& transition = (*this)[0];
-//	return transition.m_action.GetCount();
-//}
 
 void ndDeepBrainReplayBuffer::SetCount(ndInt32 count, ndInt32 stateSize, ndInt32 actionSize)
 {
@@ -106,10 +95,11 @@ void ndDeepBrainReplayBuffer::SetCount(ndInt32 count, ndInt32 stateSize, ndInt32
 		transition.m_action.SetCount(actionSize);
 	}
 
+	n_rewardBatch.SetCount(m_learnBashSize);
 	m_inputBatch.Init(m_learnBashSize, stateSize);
 	m_outputBatch.Init(m_learnBashSize, actionSize);
-	m_groundTruth.Init(m_learnBashSize, actionSize);
 	m_nextInputBatch.Init(m_learnBashSize, stateSize);
+	m_groundTruthBatch.Init(m_learnBashSize, actionSize);
 }
 
 ndDeepBrainTransition& ndDeepBrainReplayBuffer::GetTransitionEntry()

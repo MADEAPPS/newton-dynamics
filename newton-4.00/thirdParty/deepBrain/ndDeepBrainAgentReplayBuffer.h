@@ -58,8 +58,9 @@ class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
 	ndArray<ndUnsigned32> m_randomShaffle;
 	ndDeepBrainMatrix m_inputBatch;
 	ndDeepBrainMatrix m_outputBatch;
-	ndDeepBrainMatrix m_groundTruth;
 	ndDeepBrainMatrix m_nextInputBatch;
+	ndDeepBrainMatrix m_groundTruthBatch;
+	ndDeepBrainVector n_rewardBatch;
 	ndInt32 m_learnBashSize;
 	ndInt32 m_replayBufferIndex;
 };
