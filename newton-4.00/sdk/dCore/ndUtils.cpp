@@ -111,7 +111,7 @@ static ndInt32 SortVertices(
 	const ndSortCluster& cluster, ndInt32 baseCount)
 {
 	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-	const ndBigVector variance(ndVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin).Sqrt());
+	const ndBigVector variance(ndBigVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
 	if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
