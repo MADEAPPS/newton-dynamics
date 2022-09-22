@@ -26,6 +26,6 @@ if (NEWTON_BUILD_NEWTON_BLENDER)
 	add_subdirectory(newtonBlender)
 endif()
 
-if (NEWTON_BUILD_NEWTON_ANDROID)
+if (NEWTON_BUILD_ANDROID_STUDIO)
 	add_subdirectory(newtonAndroid)
 endif()
