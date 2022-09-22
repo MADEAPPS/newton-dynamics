@@ -22,6 +22,10 @@ if (NEWTON_BUILD_NEWTON_JAVA)
 	add_subdirectory(newtonJava)
 endif()
 
+if (NEWTON_BUILD_NEWTON_BLENDER)
+	add_subdirectory(newtonBlender)
+endif()
+
 if (NEWTON_BUILD_NEWTON_ANDROID)
 	add_subdirectory(newtonAndroid)
 endif()

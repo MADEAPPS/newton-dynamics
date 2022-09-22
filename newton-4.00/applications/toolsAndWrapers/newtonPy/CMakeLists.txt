@@ -18,10 +18,9 @@ else()
 	set (swig "/usr/bin/swig")
 endif()
 
-#set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newton.i")
-#execute_process(COMMAND ${swig} -c++ -python ${script})
+set (wrapper "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/${projectName}")
 
-set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy")
 execute_process(COMMAND ${swig} -c++ -python ${swigScript}/newton.i)
 
 # source and header files
@@ -90,8 +89,6 @@ list(APPEND PY_SOURCE
 	newton.py
 	newtonWorld.py)
 
-set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
-
 if (MSVC OR MINGW)
   set (pySuffix ".pyd")
 else()
@@ -101,13 +98,13 @@ endif()
 foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${pySrc}/${file} ${pyDst}/${file})
+	ARGS -E copy ${pySrc}/${file} ${wrapper}/${projectName}/${file})
 endforeach()
 
-#add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton${pySuffix})
-#
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${wrapper}/${projectName}/${projectName}${CMAKE_DEBUG_POSTFIX}${pySuffix})
+
 #if(DEFINED ENV{Blender})
 #  foreach(file IN LISTS PY_SOURCE)
 #	add_custom_command(

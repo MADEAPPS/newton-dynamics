@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "newtonSharp")
+set (projectName "newtonBlender")
 message (${projectName})
 if(MSVC OR MINGW)
 	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
@@ -21,8 +21,7 @@ endif()
 set (wrapper "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
 set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/${projectName}")
 
-file(MAKE_DIRECTORY ${wrapper}/classes)
-execute_process(COMMAND ${swig} -c++ -outdir "${wrapper}/classes" -csharp ${swigScript}/newton.i)
+execute_process(COMMAND ${swig} -c++ -python ${swigScript}/newton.i)
 
 # source and header files
 file(GLOB CPP_SOURCE 
@@ -30,6 +29,7 @@ file(GLOB CPP_SOURCE
 	*.cpp
 	*.cxx
 	*.i
+	*.py
 )
 
 #source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
@@ -49,14 +49,17 @@ include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-#if (MSVC OR MINGW)
-#	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
-#	target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
-#else()
-#	find_package (Python COMPONENTS Development REQUIRED)
-#	target_include_directories(${projectName} PUBLIC ${Python_INCLUDE_DIRS})
-#	target_link_libraries(${projectName} ${Python_LIBRARIES})
-#endif()
+if(DEFINED ENV{Python})
+	#message ($ENV{PythonInclude})
+	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
+
+	#message ("$ENV{Python}")
+	target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
+else()
+	find_package (Python COMPONENTS Development REQUIRED)
+	target_include_directories(${projectName} PUBLIC ${Python_INCLUDE_DIRS})
+	target_link_libraries(${projectName} ${Python_LIBRARIES})
+endif()
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndNewton ndCollision ndCore)
@@ -80,3 +83,35 @@ if(MSVC OR MINGW)
     endif()
 endif()
 
+set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
+list(APPEND PY_SOURCE 
+	ndbpy.py
+	newton.py
+	newtonWorld.py)
+
+if (MSVC OR MINGW)
+  set (pySuffix ".pyd")
+else()
+  set (pySuffix ".so")
+endif()
+
+foreach(file IN LISTS PY_SOURCE)
+	add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${pySrc}/${file} ${wrapper}/${projectName}/${file})
+endforeach()
+
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${wrapper}/${projectName}/${projectName}${CMAKE_DEBUG_POSTFIX}${pySuffix})
+
+#if(DEFINED ENV{Blender})
+#  foreach(file IN LISTS PY_SOURCE)
+#	add_custom_command(
+#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+#	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
+#    endforeach()
+#    add_custom_command(
+#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+#	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton${pySuffix})
+#endif()

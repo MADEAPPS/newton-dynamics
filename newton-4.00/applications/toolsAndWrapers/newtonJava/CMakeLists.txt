@@ -18,8 +18,8 @@ else()
 	set (swig "/usr/bin/swig")
 endif()
 
-set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonJava")
 set (wrapper "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/${projectName}")
 
 file(MAKE_DIRECTORY ${wrapper}/classes)
 execute_process(COMMAND ${swig} -c++ -outdir "${wrapper}/classes" -java ${swigScript}/newton.i)
