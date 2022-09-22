@@ -18,8 +18,8 @@ else()
 	set (swig "/usr/bin/swig")
 endif()
 
-set (javaSrc "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonJava")
-execute_process(COMMAND ${swig} -c++ -outdir "${javaSrc}/classes" -java ${javaSrc}/newton.i)
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonJava")
+execute_process(COMMAND ${swig} -c++ -outdir "${swigScript}/classes" -java ${swigScript}/newton.i)
 
 # source and header files
 file(GLOB CPP_SOURCE 
@@ -77,7 +77,6 @@ if(MSVC OR MINGW)
 		set_source_files_properties(newton_wrap.cxx PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
 endif()
-
 
 set (wrapper "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
 #message ("${wrapper}")

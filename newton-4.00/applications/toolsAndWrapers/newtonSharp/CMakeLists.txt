@@ -18,8 +18,8 @@ else()
 	set (swig "/usr/bin/swig")
 endif()
 
-set (csharpSrc "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonSharp")
-execute_process(COMMAND ${swig} -c++ -outdir "${csharpSrc}/classes" -csharp ${csharpSrc}/newton.i)
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonSharp")
+execute_process(COMMAND ${swig} -c++ -outdir "${swigScript}/classes" -csharp ${swigScript}/newton.i)
 
 # source and header files
 file(GLOB CPP_SOURCE 

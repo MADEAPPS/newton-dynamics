@@ -17,8 +17,12 @@ if(MSVC OR MINGW)
 else()
 	set (swig "/usr/bin/swig")
 endif()
-set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newton.i")
-execute_process(COMMAND ${swig} -c++ -python ${script})
+
+#set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newton.i")
+#execute_process(COMMAND ${swig} -c++ -python ${script})
+
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy")
+execute_process(COMMAND ${swig} -c++ -python ${swigScript}/newton.i)
 
 # source and header files
 file(GLOB CPP_SOURCE 
@@ -80,7 +84,6 @@ if(MSVC OR MINGW)
     endif()
 endif()
 
-
 set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
 list(APPEND PY_SOURCE 
 	ndbpy.py
@@ -101,19 +104,17 @@ foreach(file IN LISTS PY_SOURCE)
 	ARGS -E copy ${pySrc}/${file} ${pyDst}/${file})
 endforeach()
 
-add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton${pySuffix})
-
-
-if(DEFINED ENV{Blender})
-
-  foreach(file IN LISTS PY_SOURCE)
-	add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
-    endforeach()
-    add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton${pySuffix})
-endif()
+#add_custom_command(
+#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+#	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton${pySuffix})
+#
+#if(DEFINED ENV{Blender})
+#  foreach(file IN LISTS PY_SOURCE)
+#	add_custom_command(
+#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+#	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
+#    endforeach()
+#    add_custom_command(
+#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+#	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton${pySuffix})
+#endif()

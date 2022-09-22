@@ -65,11 +65,20 @@ class _SwigNonDynamicMeta(type):
 def dGetWorkingFileName(name, outPathName):
     return _newton.dGetWorkingFileName(name, outPathName)
 
-def dGetZeroMatrix():
-    return _newton.dGetZeroMatrix()
+def ndGetZeroMatrix():
+    return _newton.ndGetZeroMatrix()
 
-def dGetIdentityMatrix():
-    return _newton.dGetIdentityMatrix()
+def ndGetIdentityMatrix():
+    return _newton.ndGetIdentityMatrix()
+
+def ndPitchMatrix(ang):
+    return _newton.ndPitchMatrix(ang)
+
+def ndYawMatrix(ang):
+    return _newton.ndYawMatrix(ang)
+
+def ndRollMatrix(ang):
+    return _newton.ndRollMatrix(ang)
 class ndMatrix(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -151,15 +160,6 @@ class ndMatrix(object):
 # Register ndMatrix in _newton:
 _newton.ndMatrix_swigregister(ndMatrix)
 
-
-def dPitchMatrix(ang):
-    return _newton.dPitchMatrix(ang)
-
-def dYawMatrix(ang):
-    return _newton.dYawMatrix(ang)
-
-def dRollMatrix(ang):
-    return _newton.dRollMatrix(ang)
 class ndQuaternion(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -978,6 +978,9 @@ class ndBody(object):
     def GetAsBodyTriggerVolume(self):
         return _newton.ndBody_GetAsBodyTriggerVolume(self)
 
+    def GetAsBodyKinematicSpecial(self):
+        return _newton.ndBody_GetAsBodyKinematicSpecial(self)
+
     def GetId(self):
         return _newton.ndBody_GetId(self)
 
@@ -1225,7 +1228,7 @@ class ndBodySentinel(ndBodyKinematic):
 # Register ndBodySentinel in _newton:
 _newton.ndBodySentinel_swigregister(ndBodySentinel)
 
-class ndBodyTriggerVolume(ndBodyKinematic):
+class ndBodyTriggerVolume(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
@@ -1254,7 +1257,7 @@ class ndBodyTriggerVolume(ndBodyKinematic):
 # Register ndBodyTriggerVolume in _newton:
 _newton.ndBodyTriggerVolume_swigregister(ndBodyTriggerVolume)
 
-class ndBodyPlayerCapsule(ndBodyKinematic):
+class ndBodyPlayerCapsule(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
@@ -1294,6 +1297,26 @@ class ndBodyPlayerCapsule(ndBodyKinematic):
 
 # Register ndBodyPlayerCapsule in _newton:
 _newton.ndBodyPlayerCapsule_swigregister(ndBodyPlayerCapsule)
+
+class ndBodyKinematicSpecial(ndBodyKinematic):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, *args):
+        _newton.ndBodyKinematicSpecial_swiginit(self, _newton.new_ndBodyKinematicSpecial(*args))
+    __swig_destroy__ = _newton.delete_ndBodyKinematicSpecial
+
+    def SpecialUpdate(self, timestep):
+        return _newton.ndBodyKinematicSpecial_SpecialUpdate(self, timestep)
+
+    def GetAsBodyKinematicSpecial(self):
+        return _newton.ndBodyKinematicSpecial_GetAsBodyKinematicSpecial(self)
+
+    def Save(self, desc):
+        return _newton.ndBodyKinematicSpecial_Save(self, desc)
+
+# Register ndBodyKinematicSpecial in _newton:
+_newton.ndBodyKinematicSpecial_swigregister(ndBodyKinematicSpecial)
 
 class ndBodyNotify(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
