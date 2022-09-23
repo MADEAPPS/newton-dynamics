@@ -149,7 +149,7 @@ struct ndConvexHullInfo
 	ndVector* m_vertex;
 };
 
-struct ndCoumpoundInfo
+struct ndCompoundInfo
 {
 	ndInt32 m_noUsed;
 };
@@ -194,7 +194,7 @@ class ndShapeInfo
 		ndCapsuleInfo m_capsule;
 		ndCollisionBvhInfo m_bvh;
 		ndCylinderInfo m_cylinder;
-		ndCoumpoundInfo m_compound;
+		ndCompoundInfo m_compound;
 		ndConvexHullInfo m_convexhull;
 		ndHeighfieldInfo m_heightfield;
 		ndProceduralInfoInfo m_procedural;
