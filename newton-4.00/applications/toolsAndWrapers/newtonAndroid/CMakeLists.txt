@@ -24,7 +24,7 @@ set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonAndroid"
 set (dstPath "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/newtonAndroid/ndNewton")
 
 file(MAKE_DIRECTORY ${dstPath}/classes)
-execute_process(COMMAND ${swig} -c++ -outdir "${dstPath}/classes" -java ${swigScript}/newton.i)
+execute_process(COMMAND ${swig} -c++ -package "classes" -outdir "${dstPath}/classes" -java ${swigScript}/newton.i)
 
 file(GLOB ANDROID_SOURCE_ROOT *.h *.cpp *.cxx)
 file(GLOB ANDROID_SOURCE_CORE ${srcPath}/dCore/*.h ${srcPath}/dCore/*.cpp)
