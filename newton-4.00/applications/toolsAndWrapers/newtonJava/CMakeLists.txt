@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set (projectName "newtonJava")
 message (${projectName})
+
 if(MSVC OR MINGW)
 	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
 else()

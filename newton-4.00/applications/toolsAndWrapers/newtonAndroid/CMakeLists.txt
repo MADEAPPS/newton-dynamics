@@ -13,10 +13,20 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set (projectName "ndAndroidStudio")
 message (${projectName})
 
+if(MSVC OR MINGW)
+	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
+else()
+	set (swig "/usr/bin/swig")
+endif()
 
 set (srcPath "../../../sdk")
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonAndroid")
 set (dstPath "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/newtonAndroid/ndNewton")
 
+file(MAKE_DIRECTORY ${dstPath}/classes)
+execute_process(COMMAND ${swig} -c++ -outdir "${dstPath}/classes" -java ${swigScript}/newton.i)
+
+file(GLOB ANDROID_SOURCE_ROOT *.h *.cpp *.cxx)
 file(GLOB ANDROID_SOURCE_CORE ${srcPath}/dCore/*.h ${srcPath}/dCore/*.cpp)
 file(GLOB ANDROID_SOURCE_XML ${srcPath}/dTinyxml/*.h ${srcPath}/dTinyxml/*.cpp)
 file(GLOB ANDROID_SOURCE_COLLISION ${srcPath}/dCollision/*.h ${srcPath}/dCollision/*.cpp)
@@ -39,6 +49,12 @@ file(GLOB ANDROID_SOURCE_NEWTON
 )
 
 file(COPY "cmakeScript/CMakeLists.txt" DESTINATION "${dstPath}")
+
+foreach(file IN LISTS ANDROID_SOURCE_ROOT)
+	#get_filename_component(name_ ${file} NAME)
+	#message (${file})
+	file(COPY "${file}" DESTINATION "${dstPath}")
+endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_CORE)
 	#get_filename_component(name_ ${file} NAME)

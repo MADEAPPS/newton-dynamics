@@ -26,9 +26,10 @@ include_directories(dNewton/dModels/dCharacter)
 
 # source and header files
 file(GLOB HEADERS 
-	dTinyxml/*.h 
+	*.h
 	dCore/*.h 
 	dNewton/*.h 
+	dTinyxml/*.h 
 	dCollision/*.h 
 	dNewton/dJoints/*.h 
 	dNewton/dModels/*.h 
@@ -38,12 +39,15 @@ file(GLOB HEADERS
 	dNewton/dModels/dCharacter/*.h)
 
 file(GLOB CPP_SOURCE 
-	dTinyxml/*.h
-	dTinyxml/*.cpp
+	*.h
+	*.cpp
+	*.cxx
 	dCore/*.h 
 	dCore/*.cpp
 	dNewton/*.h 
 	dNewton/*.cpp
+	dTinyxml/*.h
+	dTinyxml/*.cpp
 	dCollision/*.h 
 	dCollision/*.cpp
 	dNewton/dModels/*.h 
