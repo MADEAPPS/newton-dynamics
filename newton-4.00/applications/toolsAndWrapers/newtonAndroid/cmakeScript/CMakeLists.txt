@@ -10,7 +10,6 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-
 set (projectName "ndNewton")
 message (${projectName})
 
@@ -60,18 +59,11 @@ file(GLOB CPP_SOURCE
 	dNewton/dModels/dCharacter/*.h
 	dNewton/dModels/dCharacter/*.cpp)
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	#add_definitions(-D_D_USE_AVX2_SOLVER)
-	#include_directories(dNewton/dExtensions/dAvx2)
-endif()
-
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_definitions(-D_D_SINGLE_LIBRARY)
-
 add_library(${projectName} STATIC ${CPP_SOURCE})
    
-
-target_include_directories(${projectName} PUBLIC .)
+#target_include_directories(${projectName} PUBLIC .)
 
 

@@ -13,11 +13,9 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set (projectName "ndAndroidStudio")
 message (${projectName})
 
-file(GLOB CPP_SOURCE *.cpp)
-add_library(${projectName} STATIC ${CPP_SOURCE})
 
 set (srcPath "../../../sdk")
-set (dstPath "${PROJECT_BINARY_DIR}/newtonAndroid/ndNewton")
+set (dstPath "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/newtonAndroid/ndNewton")
 
 file(GLOB ANDROID_SOURCE_CORE ${srcPath}/dCore/*.h ${srcPath}/dCore/*.cpp)
 file(GLOB ANDROID_SOURCE_XML ${srcPath}/dTinyxml/*.h ${srcPath}/dTinyxml/*.cpp)
@@ -43,29 +41,21 @@ file(GLOB ANDROID_SOURCE_NEWTON
 file(COPY "cmakeScript/CMakeLists.txt" DESTINATION "${dstPath}")
 
 foreach(file IN LISTS ANDROID_SOURCE_CORE)
-	get_filename_component(name_ ${file} NAME)
-	add_custom_command(
-		TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy "${file}" "${dstPath}/dCore/${name}")
+	#get_filename_component(name_ ${file} NAME)
+	file(COPY "${file}" DESTINATION "${dstPath}/dCore")
 endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_COLLISION )
-	get_filename_component(name ${file} NAME)
-	add_custom_command(
-		TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy "${file}" "${dstPath}/dCollision/${name}")
+	#get_filename_component(name ${file} NAME)
+	file(COPY "${file}" DESTINATION "${dstPath}/dCollision")
 endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_XML)
-	get_filename_component(name ${file} NAME)
-	add_custom_command(
-		TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy "${file}" "${dstPath}/dTinyxml/${name}")
+	#get_filename_component(name ${file} NAME)
+	file(COPY "${file}" DESTINATION "${dstPath}/dTinyxml")
 endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_NEWTON)
-	get_filename_component(name ${file} NAME)
-	add_custom_command(
-	   TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	   ARGS -E copy "${file}" "${dstPath}/dNewton/${name}")
+	#get_filename_component(name ${file} NAME)
+	file(COPY "${file}" DESTINATION "${dstPath}/dNewton")
 endforeach()
