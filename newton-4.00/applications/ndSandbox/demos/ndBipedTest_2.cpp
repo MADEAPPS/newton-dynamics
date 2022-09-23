@@ -178,7 +178,7 @@ namespace biped2
 			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
 			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
 			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_sigmoid);
+			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
 
 			BeginAddLayer();
 			AddLayer(inputLayer);
@@ -720,7 +720,7 @@ namespace biped2
 		{
 			public:
 			ndDeepBrainAgentTrainier(ndDeepBrain* const agent)
-				:ndDeepBrainAgentDQN(agent)
+				:ndDeepBrainAgentDQN(agent, 10000, 256)
 			{
 				m_transition.m_state.SetCount(agent->GetInputSize());
 				m_transition.m_action.SetCount(agent->GetOutputSize());
@@ -755,23 +755,8 @@ namespace biped2
 			ndModel::Update(world, timestep);
 			TrainingLoopBegin(world, timestep);
 
-			//if (ndAbs(m_rollAngle) > 45 * ndDegreeToRad)
-			//{
-			//	m_rollAngle *= 1;
-			//}
 			GetStateAndAction(timestep);
-
-			ndInt32 valueIndex = 0;
-			ndFloat32 maxValue = -1.0e10f;
-			const ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
-			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; ++i)
-			{
-				if (action[i] > maxValue)
-				{
-					valueIndex = i;
-					maxValue = action[i];
-				}
-			}
+			ndInt32 valueIndex = m_dqnAgent.m_transition.m_action.GetMaxIndex();
 			ndFloat32 effectorAction = m_actionToActiationMap[valueIndex];
 			m_rollAngle += effectorAction * timestep;
 
@@ -856,16 +841,15 @@ namespace biped2
 
 		void GetRandomAction()
 		{
-			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;
-			//action.SetCount(ndHumanoidBrain::ndModelActionParam::m_actionSize);
+			ndDeepBrainVector& action = m_dqnAgent.m_transition.m_action;
 			ndAssert(action.GetCount() == ndHumanoidBrain::ndModelActionParam::m_actionSize);
 			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
-				action[i] = 0.0f;
+				action[i] = ndRand();
 			}
 
-			ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
-			action[valueIndex] = 1.0f;
+			//ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
+			//action[action GetMaxIndex() valueIndex] = 1.0f;
 		}
 
 		void PredictAction(ndFloat32 timestep)
@@ -892,7 +876,7 @@ namespace biped2
 			#endif
 		}
 
-		void GetState(ndArray<ndReal>& state)
+		void GetState(ndDeepBrainVector& state)
 		{
 			ndModelPhysicState modelState(CalculateModelState());
 
@@ -957,7 +941,6 @@ namespace biped2
 				m_trainingState = m_initTraining;
 				ndAssert(0);
 			}
-
 		}
 		
 		ndDeepBrainAgentTrainier m_dqnAgent;

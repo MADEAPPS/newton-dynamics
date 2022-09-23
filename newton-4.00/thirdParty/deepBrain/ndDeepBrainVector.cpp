@@ -90,6 +90,22 @@ void ndDeepBrainVector::Set(const ndDeepBrainVector& data)
 	}
 }
 
+ndInt32 ndDeepBrainVector::GetMaxIndex() const
+{
+	ndInt32 index = 0;
+	ndFloat32 maxValue = (*this)[0];
+	for (ndInt32 i = GetCount() - 1; i > 0; --i)
+	{
+		ndFloat32 val = (*this)[i];
+		if (val > maxValue)
+		{
+			index = i;
+			maxValue = val;
+		}
+	}
+	return index;
+}
+
 void ndDeepBrainVector::ScaleSet(const ndDeepBrainVector& a, ndReal scale)
 {
 	ndAssert(GetCount() == a.GetCount());

@@ -23,13 +23,13 @@
 #include "ndDeepBrain.h"
 #include "ndDeepBrainAgentDQN.h"
 
-ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent)
+ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize)
 	:ndDeepBrainAgent(agent)
 	,m_targetNetwork(new ndDeepBrain(*agent))
 {
 	ndInt32 stateSize = m_network.GetBrain()->GetInputSize();
 	ndInt32 actionSize = m_network.GetBrain()->GetOutputSize();
-	m_replayBuffer.SetCount(2000, stateSize, actionSize);
+	m_replayBuffer.SetCount(replayBufferSize, replayBatchSize, stateSize, actionSize);
 }
 
 ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
@@ -47,7 +47,7 @@ void ndDeepBrainAgentDQN::LearnStep()
 	ndDeepBrainTransition& transition = m_replayBuffer.GetTransitionEntry();
 	GetTransition(transition);
 
-	if (m_replayBuffer.m_replayBufferIndex < m_replayBuffer.m_learnBashSize)
+	if (m_replayBuffer.m_replayBufferIndex < m_replayBuffer.m_learnBatchSize)
 	{
 		return;
 	}

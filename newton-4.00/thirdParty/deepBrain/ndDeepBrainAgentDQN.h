@@ -28,7 +28,7 @@
 class ndDeepBrainAgentDQN: public ndDeepBrainAgent
 {
 	public: 
-	ndDeepBrainAgentDQN(ndDeepBrain* const agent);
+	ndDeepBrainAgentDQN(ndDeepBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize);
 	virtual ~ndDeepBrainAgentDQN();
 
 	virtual void LearnStep();

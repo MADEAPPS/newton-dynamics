@@ -46,10 +46,7 @@ class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
 	ndDeepBrainReplayBuffer();
 	~ndDeepBrainReplayBuffer();
 
-	void SetCount(ndInt32 count, ndInt32 stateSize, ndInt32 actionSize);
-
-	//ndInt32 GetStateSize() const;
-	//ndInt32 GetActionSize() const;
+	void SetCount(ndInt32 replayBufferSize, ndInt32 replayBatchSize, ndInt32 stateSize, ndInt32 actionSize);
 
 	ndDeepBrainTransition& GetTransitionEntry();
 
@@ -62,7 +59,7 @@ class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
 	ndDeepBrainMatrix m_groundTruthBatch;
 	ndDeepBrainVector n_rewardBatch;
 	ndDeepBrainVector n_terminalBatch;
-	ndInt32 m_learnBashSize;
+	ndInt32 m_learnBatchSize;
 	ndInt32 m_replayBufferIndex;
 };
 

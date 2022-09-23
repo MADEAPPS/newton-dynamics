@@ -35,6 +35,8 @@ class ndDeepBrainVector: public ndArray<ndReal>
 	void Set(ndReal value);
 	void Set(const ndDeepBrainVector& data);
 
+	ndInt32 GetMaxIndex() const;
+
 	ndReal Dot(const ndDeepBrainVector& a) const;
 	void ScaleSet(const ndDeepBrainVector& a, ndReal scale);
 	void Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
