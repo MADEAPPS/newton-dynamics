@@ -1,18 +1,16 @@
-building a cmake export
+The anodirs studio cmake scrip will crate a blanck aroid studion app 
+in the selected folder under directory ../androidApp 
 
 1- open Cmake
-2- set all options off
 3- set option NEWTON_BUILD_ANDROID_STUDIO on
-4- selct a destination folder
+4- select a destination folder
 5- click configure
 6- click generate
-7- after cmake finish get find the cmake destination folder and grab folder 
-   <cmakeDst>/applications/toolsAndWrapers/newtonAndroid/ndNewton
-8- copy this folder to the some directory in your android studio app/src
-9- in android Studio, right click on file app/src/.../ndNewton/CMakeLists.txt
-11- select Add C++ to module
-12- select Link existing cmakefile.txt or Android.mk to this module
-13- brouse for that cmakefile.txt file on the file brouser
-14- click ok.
-15- wait until android parses the cmakefile.txt file.
-16- now you should have newton integrated to your application. 
+
+nwo teh use can open andoirs studio and open project ../androidApp and it 
+should have a blank pure blank andoirs studio project with java classes 
+wrapping teh netwobn engine.
+
+for aready existing android studion apps, the user can manually copy folders
+..\androidApp\app\src\main\cpp ->to you repective cpp folder in your app 
+..\androidApp\app\src\main\java\com\newton ->to you repective java folder in your app 

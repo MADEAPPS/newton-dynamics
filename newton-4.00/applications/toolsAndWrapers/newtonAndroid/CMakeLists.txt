@@ -19,59 +19,82 @@ else()
 	set (swig "/usr/bin/swig")
 endif()
 
-set (srcPath "../../../sdk")
-set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonAndroid")
-set (dstPath "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/newtonAndroid/ndNewton")
+set (newtonSrcPath "../../../sdk")
+set (androidProjectPath "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonAndroid")
+set (dstPath "${PROJECT_BINARY_DIR}/androidApp")
 
-file(MAKE_DIRECTORY ${dstPath}/classes)
-execute_process(COMMAND ${swig} -c++ -package "classes" -outdir "${dstPath}/classes" -java ${swigScript}/newton.i)
+macro(copyJavaAplication srcDir dstDir)
+    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
+
+    foreach(templateFile ${templateFiles})
+		set(srcTemplatePath ${srcDir}/${templateFile})
+		if(IS_DIRECTORY ${srcTemplatePath})
+			set(subDir ${dstDir}/${templateFile})
+			file(MAKE_DIRECTORY ${subDir})
+			copyJavaAplication(${srcTemplatePath} ${subDir})
+		else()
+			file(COPY ${srcTemplatePath} DESTINATION ${dstDir})
+		endif()
+    endforeach(templateFile)
+endmacro(copyJavaAplication)
+
+message (${dstPath})
+file(REMOVE_RECURSE ${dstPath})
+file(MAKE_DIRECTORY ${dstPath})
+copyJavaAplication ("${androidProjectPath}/androidApp" ${dstPath})
+
+set (dstNewtonPath "${dstPath}/app/src/main/cpp")
+file(MAKE_DIRECTORY "${dstNewtonPath}")
+file(COPY "cmakeScript/CMakeLists.txt" DESTINATION ${dstNewtonPath})
+
+set (newtonJavaWrapper "${dstPath}/app/src/main/java/com/newton")
+set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonAndroid")
+file(MAKE_DIRECTORY ${newtonJavaWrapper})
+execute_process(COMMAND ${swig} -c++ -package "com.newton" -outdir "${newtonJavaWrapper}" -java ${swigScript}/newton.i)
+
 
 file(GLOB ANDROID_SOURCE_ROOT *.h *.cpp *.cxx)
-file(GLOB ANDROID_SOURCE_CORE ${srcPath}/dCore/*.h ${srcPath}/dCore/*.cpp)
-file(GLOB ANDROID_SOURCE_XML ${srcPath}/dTinyxml/*.h ${srcPath}/dTinyxml/*.cpp)
-file(GLOB ANDROID_SOURCE_COLLISION ${srcPath}/dCollision/*.h ${srcPath}/dCollision/*.cpp)
+file(GLOB ANDROID_SOURCE_CORE ${newtonSrcPath}/dCore/*.h ${newtonSrcPath}/dCore/*.cpp)
+file(GLOB ANDROID_SOURCE_XML ${newtonSrcPath}/dTinyxml/*.h ${newtonSrcPath}/dTinyxml/*.cpp)
+file(GLOB ANDROID_SOURCE_COLLISION ${newtonSrcPath}/dCollision/*.h ${newtonSrcPath}/dCollision/*.cpp)
 
 file(GLOB ANDROID_SOURCE_NEWTON 
-	${srcPath}/dNewton/*.h 
-	${srcPath}/dNewton/*.cpp
-	${srcPath}/dNewton/dJoints/*.h
-	${srcPath}/dNewton/dJoints/*.cpp
-	${srcPath}/dNewton/dIkSolver/*.h
-	${srcPath}/dNewton/dIkSolver/*.cpp
-	${srcPath}/dNewton/dParticles/*.h
-	${srcPath}/dNewton/dParticles/*.cpp
-	${srcPath}/dNewton/dModels/*.h
-	${srcPath}/dNewton/dModels/*.cpp
-	${srcPath}/dNewton/dModels/dVehicle/*.h
-	${srcPath}/dNewton/dModels/dVehicle/*.cpp
-	${srcPath}/dNewton/dModels/dCharacter/*.h
-	${srcPath}/dNewton/dModels/dCharacter/*.cpp
+	${newtonSrcPath}/dNewton/*.h 
+	${newtonSrcPath}/dNewton/*.cpp
+	${newtonSrcPath}/dNewton/dJoints/*.h
+	${newtonSrcPath}/dNewton/dJoints/*.cpp
+	${newtonSrcPath}/dNewton/dIkSolver/*.h
+	${newtonSrcPath}/dNewton/dIkSolver/*.cpp
+	${newtonSrcPath}/dNewton/dParticles/*.h
+	${newtonSrcPath}/dNewton/dParticles/*.cpp
+	${newtonSrcPath}/dNewton/dModels/*.h
+	${newtonSrcPath}/dNewton/dModels/*.cpp
+	${newtonSrcPath}/dNewton/dModels/dVehicle/*.h
+	${newtonSrcPath}/dNewton/dModels/dVehicle/*.cpp
+	${newtonSrcPath}/dNewton/dModels/dCharacter/*.h
+	${newtonSrcPath}/dNewton/dModels/dCharacter/*.cpp
 )
 
-file(COPY "cmakeScript/CMakeLists.txt" DESTINATION "${dstPath}")
-
 foreach(file IN LISTS ANDROID_SOURCE_ROOT)
-	#get_filename_component(name_ ${file} NAME)
-	#message (${file})
-	file(COPY "${file}" DESTINATION "${dstPath}")
+	file(COPY "${file}" DESTINATION "${dstNewtonPath}")
 endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_CORE)
 	#get_filename_component(name_ ${file} NAME)
-	file(COPY "${file}" DESTINATION "${dstPath}/dCore")
-endforeach()
-
-foreach(file IN LISTS ANDROID_SOURCE_COLLISION )
-	#get_filename_component(name ${file} NAME)
-	file(COPY "${file}" DESTINATION "${dstPath}/dCollision")
+	file(COPY "${file}" DESTINATION "${dstNewtonPath}/dCore")
 endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_XML)
 	#get_filename_component(name ${file} NAME)
-	file(COPY "${file}" DESTINATION "${dstPath}/dTinyxml")
+	file(COPY "${file}" DESTINATION "${dstNewtonPath}/dTinyxml")
+endforeach()
+
+foreach(file IN LISTS ANDROID_SOURCE_COLLISION )
+	#get_filename_component(name ${file} NAME)
+	file(COPY "${file}" DESTINATION "${dstNewtonPath}/dCollision")
 endforeach()
 
 foreach(file IN LISTS ANDROID_SOURCE_NEWTON)
 	#get_filename_component(name ${file} NAME)
-	file(COPY "${file}" DESTINATION "${dstPath}/dNewton")
+	file(COPY "${file}" DESTINATION "${dstNewtonPath}/dNewton")
 endforeach()
