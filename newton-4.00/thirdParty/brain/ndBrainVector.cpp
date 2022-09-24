@@ -19,11 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainVector.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
 
 ndDeepBrainMemVector::ndDeepBrainMemVector()
-	:ndDeepBrainVector()
+	:ndBrainVector()
 {
 	m_size = 0;
 	m_capacity = 0;
@@ -31,7 +31,7 @@ ndDeepBrainMemVector::ndDeepBrainMemVector()
 }
 
 ndDeepBrainMemVector::ndDeepBrainMemVector(const ndReal* const mem, ndInt32 size)
-	:ndDeepBrainVector()
+	:ndBrainVector()
 {
 	m_size = size;
 	m_capacity = size + 1;
@@ -56,16 +56,16 @@ void ndDeepBrainMemVector::SetPointer(ndReal* const memmory)
 	m_array = memmory;
 }
 
-ndDeepBrainVector::ndDeepBrainVector()
+ndBrainVector::ndBrainVector()
 	:ndArray<ndReal>()
 {
 }
 
-ndDeepBrainVector::~ndDeepBrainVector()
+ndBrainVector::~ndBrainVector()
 {
 }
 
-void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
+void ndBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0 ; --i)
 	{
@@ -73,7 +73,7 @@ void ndDeepBrainVector::InitGaussianWeights(ndReal mean, ndReal variance)
 	}
 }
 
-void ndDeepBrainVector::Set(ndReal value)
+void ndBrainVector::Set(ndReal value)
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
@@ -81,7 +81,7 @@ void ndDeepBrainVector::Set(ndReal value)
 	}
 }
 
-void ndDeepBrainVector::Set(const ndDeepBrainVector& data)
+void ndBrainVector::Set(const ndBrainVector& data)
 {
 	ndAssert(GetCount() == data.GetCount());
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
@@ -90,7 +90,7 @@ void ndDeepBrainVector::Set(const ndDeepBrainVector& data)
 	}
 }
 
-ndInt32 ndDeepBrainVector::GetMaxIndex() const
+ndInt32 ndBrainVector::GetMaxIndex() const
 {
 	ndInt32 index = 0;
 	ndFloat32 maxValue = (*this)[0];
@@ -106,54 +106,54 @@ ndInt32 ndDeepBrainVector::GetMaxIndex() const
 	return index;
 }
 
-void ndDeepBrainVector::ScaleSet(const ndDeepBrainVector& a, ndReal scale)
+void ndBrainVector::ScaleSet(const ndBrainVector& a, ndReal scale)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndScaleSet(GetCount(), &(*this)[0], &a[0], scale);
 }
 
-void ndDeepBrainVector::ScaleAdd(const ndDeepBrainVector& a, ndReal b)
+void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndReal b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndScaleAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], b);
 }
 
-void ndDeepBrainVector::Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+void ndBrainVector::Add(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
 	ndAdd(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
-void ndDeepBrainVector::Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+void ndBrainVector::Sub(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
 	ndSub(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
-void ndDeepBrainVector::Mul(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+void ndBrainVector::Mul(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
 	ndMul(GetCount(), &(*this)[0], &a[0], &b[0]);
 }
 
-void ndDeepBrainVector::MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+void ndBrainVector::MulAdd(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
 	ndMulAdd(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
 }
 
-void ndDeepBrainVector::MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b)
+void ndBrainVector::MulSub(const ndBrainVector& a, const ndBrainVector& b)
 {
 	ndAssert(GetCount() == a.GetCount());
 	ndAssert(GetCount() == b.GetCount());
 	ndMulSub(GetCount(), &(*this)[0], &(*this)[0], &a[0], &b[0]);
 }
 
-ndReal ndDeepBrainVector::Dot(const ndDeepBrainVector& a) const
+ndReal ndBrainVector::Dot(const ndBrainVector& a) const
 {
 	ndAssert(GetCount() == a.GetCount());
 	return ndDotProduct(GetCount(), &(*this)[0], &a[0]);

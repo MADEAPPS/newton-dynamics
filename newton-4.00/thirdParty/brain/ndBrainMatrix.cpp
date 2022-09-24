@@ -19,66 +19,66 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainTypes.h"
-#include "ndDeepBrainMatrix.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainTypes.h"
+#include "ndBrainMatrix.h"
 
-ndDeepBrainMatrix::ndDeepBrainMatrix()
-	:ndArray<ndDeepBrainVector>()
+ndBrainMatrix::ndBrainMatrix()
+	:ndArray<ndBrainVector>()
 {
 }
 
-ndDeepBrainMatrix::ndDeepBrainMatrix(ndInt32 rows, ndInt32 columns)
-	:ndArray<ndDeepBrainVector>()
+ndBrainMatrix::ndBrainMatrix(ndInt32 rows, ndInt32 columns)
+	:ndArray<ndBrainVector>()
 {
 	Init(rows, columns);
 }
 
-ndDeepBrainMatrix::ndDeepBrainMatrix(const ndDeepBrainMatrix& src)
-	:ndArray<ndDeepBrainVector>(src)
+ndBrainMatrix::ndBrainMatrix(const ndBrainMatrix& src)
+	:ndArray<ndBrainVector>(src)
 {
-	ndDeepBrainMatrix& me = *this;
+	ndBrainMatrix& me = *this;
 	for (ndInt32 i = 0; i < src.GetRows(); ++i)
 	{
-		ndDeepBrainVector& row = me[i];
+		ndBrainVector& row = me[i];
 		row.ResetMembers();
 		row.SetCount(src.GetColumns());
 		row.Set(src[i]);
 	}
 }
 
-ndDeepBrainMatrix::~ndDeepBrainMatrix()
+ndBrainMatrix::~ndBrainMatrix()
 {
 	if (m_array)
 	{
-		ndDeepBrainMatrix& me = *this;
+		ndBrainMatrix& me = *this;
 		for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 		{
-			ndDeepBrainVector& row = me[i];
-			row.~ndDeepBrainVector();
+			ndBrainVector& row = me[i];
+			row.~ndBrainVector();
 		}
 	}
 }
 
-void ndDeepBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
+void ndBrainMatrix::Init(ndInt32 rows, ndInt32 columns)
 {
 	SetCount(rows);
-	ndDeepBrainMatrix& me = *this;
+	ndBrainMatrix& me = *this;
 	for (ndInt32 i = 0; i < rows; ++i)
 	{
-		ndDeepBrainVector& row = me[i];
+		ndBrainVector& row = me[i];
 		row.ResetMembers();
 		row.SetCount(columns);
 	}
 }
 
-ndUnsigned8* ndDeepBrainMatrix::SetPointer(ndUnsigned8* const mem)
+ndUnsigned8* ndBrainMatrix::SetPointer(ndUnsigned8* const mem)
 {
 	m_array = (ndDeepBrainMemVector*)mem;
 	return mem + GetCount() * sizeof (ndDeepBrainMemVector);
 }
 
-ndReal* ndDeepBrainMatrix::SetFloatPointers(ndReal* const mem, ndInt32 columns)
+ndReal* ndBrainMatrix::SetFloatPointers(ndReal* const mem, ndInt32 columns)
 {
 	ndInt32 count = 0;
 	for (ndInt32 i = 0; i < GetCount(); ++i)
@@ -89,29 +89,29 @@ ndReal* ndDeepBrainMatrix::SetFloatPointers(ndReal* const mem, ndInt32 columns)
 	return &mem[count];
 }
 
-void ndDeepBrainMatrix::Set(ndReal value)
+void ndBrainMatrix::Set(ndReal value)
 {
-	ndDeepBrainMatrix& me = *this;
+	ndBrainMatrix& me = *this;
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
 		me[i].Set(value);
 	}
 }
 
-void ndDeepBrainMatrix::Set(const ndDeepBrainMatrix& src)
+void ndBrainMatrix::Set(const ndBrainMatrix& src)
 {
 	ndAssert(src.GetRows() == GetRows());
 	ndAssert(src.GetColumns() == GetColumns());
-	ndDeepBrainMatrix& matrix = *this;
+	ndBrainMatrix& matrix = *this;
 	for (ndInt32 i = 0; i < src.GetRows(); ++i)
 	{
 		matrix[i].Set(src[i]);
 	}
 }
 
-void ndDeepBrainMatrix::SetTranspose(const ndDeepBrainMatrix& src)
+void ndBrainMatrix::SetTranspose(const ndBrainMatrix& src)
 {
-	ndDeepBrainMatrix& matrix = *this;
+	ndBrainMatrix& matrix = *this;
 	ndAssert(src.GetColumns() == GetRows());
 	ndAssert(src.GetRows() == GetColumns());
 	for (ndInt32 i = 0; i < src.GetRows(); ++i)
@@ -124,16 +124,16 @@ void ndDeepBrainMatrix::SetTranspose(const ndDeepBrainMatrix& src)
 	}
 }
 
-void ndDeepBrainMatrix::Mul(const ndDeepBrainVector& input, ndDeepBrainVector& output) const
+void ndBrainMatrix::Mul(const ndBrainVector& input, ndBrainVector& output) const
 {
-	const ndDeepBrainMatrix& me = *this;
+	const ndBrainMatrix& me = *this;
 	ndInt32 columns = input.GetCount();
 	ndAssert(columns == GetColumns());
 	ndAssert(output.GetCount() == GetCount());
 	
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		const ndDeepBrainVector& row = me[i];
+		const ndBrainVector& row = me[i];
 		output[i] = ndDotProduct(columns, &row[0], &input[0]);
 	}
 }

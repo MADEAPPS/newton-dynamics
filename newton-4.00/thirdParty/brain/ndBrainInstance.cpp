@@ -19,12 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrain.h"
-#include "ndDeepBrainInstance.h"
-#include "ndDeepBrainTrainerBase.h"
+#include "ndBrainStdafx.h"
+#include "ndBrain.h"
+#include "ndBrainInstance.h"
+#include "ndBrainTrainerBase.h"
 
-ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
+ndBrainInstance::ndBrainInstance(ndBrain* const brain)
 	:ndClassAlloc()
 	,m_z()
 	,m_zPrefixScan()
@@ -36,7 +36,7 @@ ndDeepBrainInstance::ndDeepBrainInstance(ndDeepBrain* const brain)
 	}
 }
 
-ndDeepBrainInstance::ndDeepBrainInstance(const ndDeepBrainInstance& src)
+ndBrainInstance::ndBrainInstance(const ndBrainInstance& src)
 	:ndClassAlloc()
 	,m_z(src.m_z)
 	,m_zPrefixScan(src.m_zPrefixScan)
@@ -44,19 +44,19 @@ ndDeepBrainInstance::ndDeepBrainInstance(const ndDeepBrainInstance& src)
 {
 }
 
-ndDeepBrainInstance::~ndDeepBrainInstance()
+ndBrainInstance::~ndBrainInstance()
 {
 }
 
-void ndDeepBrainInstance::CalculatePrefixScan()
+void ndBrainInstance::CalculatePrefixScan()
 {
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
+	const ndArray<ndBrainLayer*>& layers = (*m_brain);
 
 	m_zPrefixScan.SetCount(layers.GetCount() + 1);
 	m_zPrefixScan[0] = (layers[0]->GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
-		ndDeepBrainLayer* const layer = layers[i];
+		ndBrainLayer* const layer = layers[i];
 		m_zPrefixScan[i + 1] = (layer->GetOuputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	}
 
@@ -72,9 +72,9 @@ void ndDeepBrainInstance::CalculatePrefixScan()
 	m_z.Set(0.0f);
 }
 
-void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndBrainInstance::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
+	const ndArray<ndBrainLayer*>& layers = (*m_brain);
 	ndAssert(layers.GetCount());
 
 	ndAssert(layers[0]->GetInputSize() == input.GetCount());
@@ -83,7 +83,7 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input, ndDeepB
 	layerInput.Set(input);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		ndDeepBrainLayer* const layer = layers[i];
+		ndBrainLayer* const layer = layers[i];
 		const ndDeepBrainMemVector in(&m_z[m_zPrefixScan[i + 0]], layer->GetInputSize());
 		ndDeepBrainMemVector out(&m_z[m_zPrefixScan[i + 1]], layer->GetOuputSize());
 		layer->MakePrediction(in, out);
@@ -94,9 +94,9 @@ void ndDeepBrainInstance::MakePrediction(const ndDeepBrainVector& input, ndDeepB
 	output.Set(out);
 }
 
-void ndDeepBrainInstance::MakePrediction(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndBrainInstance::MakePrediction(ndThreadPool& threadPool, const ndBrainVector& input, ndBrainVector& output)
 {
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_brain);
+	const ndArray<ndBrainLayer*>& layers = (*m_brain);
 	ndAssert(layers.GetCount());
 	ndAssert(layers[0]->GetInputSize() == input.GetCount());
 
@@ -104,7 +104,7 @@ void ndDeepBrainInstance::MakePrediction(ndThreadPool& threadPool, const ndDeepB
 	layerInput.Set(input);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		ndDeepBrainLayer* const layer = layers[i];
+		ndBrainLayer* const layer = layers[i];
 		const ndDeepBrainMemVector in(&m_z[m_zPrefixScan[i + 0]], layer->GetInputSize());
 		ndDeepBrainMemVector out(&m_z[m_zPrefixScan[i + 1]], layer->GetOuputSize());
 		layer->MakePrediction(threadPool, in, out);

@@ -19,14 +19,43 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainAgentDDPG.h"
+#ifndef _ND_BRAIN_MATRIX_H__
+#define _ND_BRAIN_MATRIX_H__
 
-ndDeepBrainAgentDDPG::ndDeepBrainAgentDDPG(ndDeepBrain* const agent)
-	:ndDeepBrainAgent(agent)
+#include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
+
+class ndBrainMatrix: public ndArray<ndBrainVector>
 {
+	public: 
+	ndBrainMatrix();
+	ndBrainMatrix(ndInt32 rows, ndInt32 columns);
+	ndBrainMatrix(const ndBrainMatrix& src);
+	~ndBrainMatrix();
+
+	void Init(ndInt32 rows, ndInt32 columns);
+
+	ndInt32 GetRows() const;
+	ndInt32 GetColumns() const;
+	void Set(ndReal value);
+	void Set(const ndBrainMatrix& src);
+	void SetTranspose(const ndBrainMatrix& src);
+	void Mul(const ndBrainVector& input, ndBrainVector& output) const;
+
+	protected:
+	ndUnsigned8* SetPointer(ndUnsigned8* const mem);
+	ndReal* SetFloatPointers(ndReal* const mem, ndInt32 columns);
+};
+
+inline ndInt32 ndBrainMatrix::GetRows() const
+{
+	return GetCount();
 }
 
-ndDeepBrainAgentDDPG::~ndDeepBrainAgentDDPG()
+inline ndInt32 ndBrainMatrix::GetColumns() const
 {
+	ndInt32 columns = GetCount() ? (*this)[0].GetCount() : 0;
+	return columns;
 }
+
+#endif 

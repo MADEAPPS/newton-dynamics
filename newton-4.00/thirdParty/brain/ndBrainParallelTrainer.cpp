@@ -19,17 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrain.h"
-#include "ndDeepBrainLayer.h"
-#include "ndDeepBrainParallelTrainer.h"
+#include "ndBrainStdafx.h"
+#include "ndBrain.h"
+#include "ndBrainLayer.h"
+#include "ndBrainParallelTrainer.h"
 
-
-class ndDeepBrainTrainerChannel : public ndDeepBrainTrainer
+class ndBrainParallelTrainer::ndBrainTrainerChannel : public ndBrainTrainer
 {	
 	public:
-	ndDeepBrainTrainerChannel(const ndDeepBrainParallelTrainer& src)
-		:ndDeepBrainTrainer(src)
+	ndBrainTrainerChannel(const ndBrainParallelTrainer& src)
+		:ndBrainTrainer(src)
 	{
 		for (ndInt32 i = 0; i < m_weightsLayersTranspose.GetCount(); ++i)
 		{
@@ -38,7 +37,7 @@ class ndDeepBrainTrainerChannel : public ndDeepBrainTrainer
 		}
 	}
 
-	~ndDeepBrainTrainerChannel()
+	~ndBrainTrainerChannel()
 	{
 		for (ndInt32 i = 0; i < m_weightsLayersTranspose.GetCount(); ++i)
 		{
@@ -47,8 +46,8 @@ class ndDeepBrainTrainerChannel : public ndDeepBrainTrainer
 	}
 };
 
-ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain, ndInt32 threads)
-	:ndDeepBrainTrainer(brain)
+ndBrainParallelTrainer::ndBrainParallelTrainer(ndBrain* const brain, ndInt32 threads)
+	:ndBrainTrainer(brain)
 	,ndThreadPool("neuralNet")
 	,m_inputBatch(nullptr)
 	,m_groundTruth(nullptr)
@@ -61,12 +60,12 @@ ndDeepBrainParallelTrainer::ndDeepBrainParallelTrainer(ndDeepBrain* const brain,
 
 	for (ndInt32 i = 0; i < threads; i++)
 	{
-		ndDeepBrainTrainerChannel* const channel = new ndDeepBrainTrainerChannel(*this);
+		ndBrainTrainerChannel* const channel = new ndBrainTrainerChannel(*this);
 		m_threadData.PushBack(channel);
 	}
 }
 
-ndDeepBrainParallelTrainer::~ndDeepBrainParallelTrainer()
+ndBrainParallelTrainer::~ndBrainParallelTrainer()
 {
 	Finish();
 	for (ndInt32 i = 0; i < GetThreadCount(); i++)
@@ -75,14 +74,14 @@ ndDeepBrainParallelTrainer::~ndDeepBrainParallelTrainer()
 	}
 }
 
-void ndDeepBrainParallelTrainer::ThreadFunction()
+void ndBrainParallelTrainer::ThreadFunction()
 {
 	Begin();
 	Optimize();
 	End();
 }
 
-void ndDeepBrainParallelTrainer::Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
+void ndBrainParallelTrainer::Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps)
 {
 	m_steps = steps;
 	m_learnRate = learnRate;
@@ -93,22 +92,22 @@ void ndDeepBrainParallelTrainer::Optimize(ndValidation& validator, const ndDeepB
 	Sync();
 }
 
-void ndDeepBrainParallelTrainer::AverageWeights()
+void ndBrainParallelTrainer::AverageWeights()
 {
 	const ndInt32 threads = m_threadData.GetCount();
 	const ndReal weightFactor = 1.0f / threads;
 	
-	const ndArray<ndDeepBrainLayer*>& layers = (*m_instance.GetBrain());
+	const ndArray<ndBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 j = layers.GetCount() - 1; j >= 0; --j)
 	{
-		ndDeepBrainLayer& layer = *layers[j];
-		ndDeepBrainVector& bias = layer.GetBias();
+		ndBrainLayer& layer = *layers[j];
+		ndBrainVector& bias = layer.GetBias();
 	
 		layer.Set(0);
 		bias.Set(0.0f);
 		for (ndInt32 i = 0; i < threads; ++i)
 		{
-			const ndDeepBrainLayer& srcLayer = *(*m_threadData[i]->GetBrain())[j];
+			const ndBrainLayer& srcLayer = *(*m_threadData[i]->GetBrain())[j];
 			bias.Add(bias, srcLayer.GetBias());
 			for (ndInt32 k = 0; k < layer.GetOuputSize(); k++)
 			{
@@ -124,19 +123,19 @@ void ndDeepBrainParallelTrainer::AverageWeights()
 	}
 }
 
-ndReal ndDeepBrainParallelTrainer::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndDeepBrainVector&)
+ndReal ndBrainParallelTrainer::Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector&)
 {
 	ndReal subBatchError2[D_MAX_THREADS_COUNT];
 	auto Validate = ndMakeObject::ndFunction([this, &inputBatch, &groundTruth, &subBatchError2](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		ndReal errorAcc = 0.0f;
-		ndDeepBrainTrainer& optimizer = *m_threadData[threadIndex];
+		ndBrainTrainer& optimizer = *m_threadData[threadIndex];
 
 		const ndStartEnd startEnd(inputBatch.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			const ndDeepBrainVector& input = inputBatch[i];
-			const ndDeepBrainVector& truth = groundTruth[i];
+			const ndBrainVector& input = inputBatch[i];
+			const ndBrainVector& truth = groundTruth[i];
 			optimizer.m_instance.MakePrediction(input, optimizer.m_output);
 			optimizer.m_output.Sub(optimizer.m_output, truth);
 			errorAcc += optimizer.m_output.Dot(optimizer.m_output);
@@ -156,18 +155,18 @@ ndReal ndDeepBrainParallelTrainer::Validate(const ndDeepBrainMatrix& inputBatch,
 }
 
 
-void ndDeepBrainParallelTrainer::Optimize()
+void ndBrainParallelTrainer::Optimize()
 {
 	ndFloatExceptions exception;
 
 	ndValidation& validator = *m_validator;
-	const ndDeepBrainMatrix& inputBatch = *m_inputBatch;
-	const ndDeepBrainMatrix& groundTruth = *m_groundTruth;
+	const ndBrainMatrix& inputBatch = *m_inputBatch;
+	const ndBrainMatrix& groundTruth = *m_groundTruth;
 
 	ndAssert(inputBatch.GetCount() == groundTruth.GetCount());
 	ndAssert(m_output.GetCount() == groundTruth[0].GetCount());
 
-	ndDeepBrain bestNetwork(*m_instance.GetBrain());
+	ndBrain bestNetwork(*m_instance.GetBrain());
 
 	ndArray<ndInt32> randomizeVector;
 	randomizeVector.SetCount(inputBatch.GetCount());
@@ -189,15 +188,15 @@ void ndDeepBrainParallelTrainer::Optimize()
 
 			auto CalculateGradients = ndMakeObject::ndFunction([this, batchStart, batchSize, &randomizeVector](ndInt32 threadIndex, ndInt32 threadCount)
 			{
-				ndDeepBrainTrainer& optimizer = *m_threadData[threadIndex];
+				ndBrainTrainer& optimizer = *m_threadData[threadIndex];
 
 				optimizer.ClearGradientsAcc();
 				const ndStartEnd startEnd(batchSize, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 				{
 					ndInt32 k = randomizeVector[batchStart + i];
-					const ndDeepBrainVector& input = (*m_inputBatch)[k];
-					const ndDeepBrainVector& truth = (*m_groundTruth)[k];
+					const ndBrainVector& input = (*m_inputBatch)[k];
+					const ndBrainVector& truth = (*m_groundTruth)[k];
 					optimizer.MakePrediction(input);
 					optimizer.BackPropagate(truth);
 				}
@@ -214,7 +213,7 @@ void ndDeepBrainParallelTrainer::Optimize()
 				ndDeepBrainMemVector weightAcc(&m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
 				for (ndInt32 i = 0; i < threadCount; ++i)
 				{
-					const ndDeepBrainTrainer& optimizer = *m_threadData[i];
+					const ndBrainTrainer& optimizer = *m_threadData[i];
 					const ndDeepBrainMemVector biasSrc(&optimizer.m_biasGradientsAcc[biasStartEnd.m_start], biasStartEnd.m_end - biasStartEnd.m_start);
 					const ndDeepBrainMemVector weightSrc(&optimizer.m_weightGradients[weightStartEnd.m_start], weightStartEnd.m_end - weightStartEnd.m_start);
 					biasAcc.Add(biasAcc, biasSrc);

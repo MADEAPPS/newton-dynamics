@@ -19,7 +19,38 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_BRAIN_H__
+#define _ND_BRAIN_H__
 
-#include "ndDeepBrainStdafx.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainLayer.h"
+#include "ndBrainTrainerBase.h"
 
+class ndBrain: public ndArray<ndBrainLayer*>
+{
+	public: 
+	ndBrain();
+	ndBrain(const ndBrain& src);
+	~ndBrain();
+
+	ndInt32 GetInputSize() const;
+	ndInt32 GetOutputSize() const;
+
+	bool Load(const char* const pathName);
+	void Save(const char* const pathName) const;
+	void CopyFrom(const ndBrain& src);
+
+	void BeginAddLayer();
+	void EndAddLayer();
+	bool Compare(const ndBrain& src) const;
+
+	ndBrainLayer* AddLayer(ndBrainLayer* const layer);
+	void InitGaussianWeights(ndReal mean, ndReal variance);
+
+	void* m_memory;
+	ndInt32 m_memorySize;
+	bool m_isReady;
+};
+
+#endif 
 

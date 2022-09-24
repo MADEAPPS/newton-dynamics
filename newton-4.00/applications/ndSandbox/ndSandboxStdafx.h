@@ -96,13 +96,13 @@
 // SDK includes
 #include <ndNewton.h>
 
-#include <ndDeepBrainStdafx.h>
-#include <ndDeepBrain.h>
-#include <ndDeepBrainTrainer.h>
-#include <ndDeepBrainAgentDQN.h>
-#include <ndDeepBrainAgentDDPG.h>
-#include <ndDeepBrainParallelTrainer.h>
-#include <ndDeepBrainAgentReplayBuffer.h>
+#include <ndBrainStdafx.h>
+#include <ndBrain.h>
+#include <ndBrainTrainer.h>
+#include <ndBrainAgentDQN.h>
+#include <ndBrainAgentDDPG.h>
+#include "ndBrainReplayBuffer.h"
+#include <ndBrainParallelTrainer.h>
 
 #ifndef _MSC_VER
 	#ifndef stricmp

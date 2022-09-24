@@ -152,7 +152,7 @@ namespace biped2
 		ndFloat32 m_comSagitalOmega;
 	};
 
-	class ndHumanoidBrain: public ndDeepBrain
+	class ndHumanoidBrain: public ndBrain
 	{
 		public: 
 		enum ndModelStateParam
@@ -171,14 +171,14 @@ namespace biped2
 		};
 
 		ndHumanoidBrain(ndInt32 numberOfImputs, ndInt32 numberOfOutputs)
-			:ndDeepBrain()
+			:ndBrain()
 		{
 			const ndInt32 neuronsPerHiddenLayers = 16;
-			ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_relu);
-			ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
-			ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
+			ndBrainLayer* const inputLayer = new ndBrainLayer(numberOfImputs, neuronsPerHiddenLayers, m_relu);
+			ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			//ndBrainLayer* const hiddenLayer2 = new ndBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerHiddenLayers, m_relu);
+			ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), numberOfOutputs, m_relu);
 
 			BeginAddLayer();
 			AddLayer(inputLayer);
@@ -668,7 +668,7 @@ namespace biped2
 
 		ndMatrix m_locaFrame;
 		ndHumanoidBrain m_brain;
-		ndDeepBrainInstance m_controller;
+		ndBrainInstance m_controller;
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
@@ -716,23 +716,23 @@ namespace biped2
 			ndBodyDynamic* m_body;
 		};
 
-		class ndDeepBrainAgentTrainier : public ndDeepBrainAgentDQN
+		class ndDeepBrainAgentTrainier : public ndBrainAgentDQN
 		{
 			public:
-			ndDeepBrainAgentTrainier(ndDeepBrain* const agent)
-				:ndDeepBrainAgentDQN(agent, 10000, 256)
+			ndDeepBrainAgentTrainier(ndBrain* const agent)
+				:ndBrainAgentDQN(agent, 10000, 256)
 			{
 				m_transition.m_state.SetCount(agent->GetInputSize());
 				m_transition.m_action.SetCount(agent->GetOutputSize());
 				m_transition.m_nextState.SetCount(agent->GetInputSize());
 			}
 
-			void GetTransition(ndDeepBrainTransition& transition) const
+			void GetTransition(ndBrainReiforcementTransition& transition) const
 			{
 				transition.CopyFrom(m_transition);
 			}
 
-			ndDeepBrainTransition m_transition;
+			ndBrainReiforcementTransition m_transition;
 		};
 
 		public: 
@@ -841,7 +841,7 @@ namespace biped2
 
 		void GetRandomAction()
 		{
-			ndDeepBrainVector& action = m_dqnAgent.m_transition.m_action;
+			ndBrainVector& action = m_dqnAgent.m_transition.m_action;
 			ndAssert(action.GetCount() == ndHumanoidBrain::ndModelActionParam::m_actionSize);
 			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
@@ -876,7 +876,7 @@ namespace biped2
 			#endif
 		}
 
-		void GetState(ndDeepBrainVector& state)
+		void GetState(ndBrainVector& state)
 		{
 			ndModelPhysicState modelState(CalculateModelState());
 

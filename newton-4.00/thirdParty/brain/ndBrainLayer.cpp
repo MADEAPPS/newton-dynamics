@@ -19,11 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainLayer.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainLayer.h"
 
-ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDeepBrainActivationType activation)
-	:ndDeepBrainMatrix()
+ndBrainLayer::ndBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndBrainActivationType activation)
+	:ndBrainMatrix()
 	,m_bias()
 	,m_activation(activation)
 	,m_columns(inputCount)
@@ -33,8 +33,8 @@ ndDeepBrainLayer::ndDeepBrainLayer(ndInt32 inputCount, ndInt32 outputCount, ndDe
 	m_bias.SetSize(outputCount);
 }
 
-ndDeepBrainLayer::ndDeepBrainLayer(const ndDeepBrainLayer& src)
-	:ndDeepBrainMatrix()
+ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
+	:ndBrainMatrix()
 	,m_bias()
 	,m_activation(src.m_activation)
 	,m_columns(src.m_columns)
@@ -44,8 +44,8 @@ ndDeepBrainLayer::ndDeepBrainLayer(const ndDeepBrainLayer& src)
 	m_bias.SetSize(src.GetOuputSize());
 }
 
-ndDeepBrainLayer::ndDeepBrainLayer(const nd::TiXmlNode* layerNode)
-	:ndDeepBrainMatrix()
+ndBrainLayer::ndBrainLayer(const nd::TiXmlNode* layerNode)
+	:ndBrainMatrix()
 {
 	ndInt32 rows = xmlGetInt(layerNode, "outputs");
 	m_bias.SetSize(rows);
@@ -76,36 +76,36 @@ ndDeepBrainLayer::ndDeepBrainLayer(const nd::TiXmlNode* layerNode)
 	}
 }
 
-ndDeepBrainLayer::~ndDeepBrainLayer()
+ndBrainLayer::~ndBrainLayer()
 {
 }
 
-ndUnsigned8* ndDeepBrainLayer::SetPointers(ndUnsigned8* const memPtr)
+ndUnsigned8* ndBrainLayer::SetPointers(ndUnsigned8* const memPtr)
 {
-	return ndDeepBrainMatrix::SetPointer(memPtr);
+	return ndBrainMatrix::SetPointer(memPtr);
 }
 
-ndReal* ndDeepBrainLayer::SetFloatPointers(ndReal* const memPtr)
+ndReal* ndBrainLayer::SetFloatPointers(ndReal* const memPtr)
 {
 	ndInt32 columns = memPtr ? m_columns : 0;
-	ndReal* memory = ndDeepBrainMatrix::SetFloatPointers(memPtr, columns);
+	ndReal* memory = ndBrainMatrix::SetFloatPointers(memPtr, columns);
 	m_bias.SetPointer(memory);
 	ndInt32 count = (m_bias.GetCount() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 	return &memory[count];
 }
 
-ndDeepBrainLayer* ndDeepBrainLayer::Clone() const
+ndBrainLayer* ndBrainLayer::Clone() const
 {
-	return new ndDeepBrainLayer(*this);
+	return new ndBrainLayer(*this);
 }
 
-void ndDeepBrainLayer::CopyFrom(const ndDeepBrainLayer& src)
+void ndBrainLayer::CopyFrom(const ndBrainLayer& src)
 {
 	Set(src);
 	m_bias.Set(src.m_bias);
 }
 
-bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
+bool ndBrainLayer::Compare(const ndBrainLayer& src) const
 {
 	if (m_activation != src.m_activation)
 	{
@@ -129,11 +129,11 @@ bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
 		}
 	}
 	
-	const ndDeepBrainMatrix& me = (*this);
+	const ndBrainMatrix& me = (*this);
 	for (ndInt32 i = 0; i < me.GetCount(); i++)
 	{
-		const ndDeepBrainVector& row0 = me[i];
-		const ndDeepBrainVector& row1 = src[i];
+		const ndBrainVector& row0 = me[i];
+		const ndBrainVector& row1 = src[i];
 		if (row0.GetCount() != row1.GetCount())
 		{
 			ndAssert(0);
@@ -153,19 +153,19 @@ bool ndDeepBrainLayer::Compare(const ndDeepBrainLayer& src) const
 	return true;
 }
 
-void ndDeepBrainLayer::Load(const nd::TiXmlElement* const layerNode)
+void ndBrainLayer::Load(const nd::TiXmlElement* const layerNode)
 {
 	const nd::TiXmlNode* const weights = layerNode->FirstChild("inputWeights");
 	ndArray<ndReal> tmpRead;
 	if (weights)
 	{
-		ndDeepBrainMatrix& me = *this;
+		ndBrainMatrix& me = *this;
 		for (ndInt32 i = 0; i < GetOuputSize(); ++i)
 		{
 			char weightRow[256];
 			sprintf(weightRow, "weights%d", i);
 	
-			ndDeepBrainVector& row = me[i];
+			ndBrainVector& row = me[i];
 			xmlGetFloatArray(weights, weightRow, tmpRead);
 			ndAssert(tmpRead.GetCount() == row.GetCount());
 			memcpy(&row[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
@@ -177,7 +177,7 @@ void ndDeepBrainLayer::Load(const nd::TiXmlElement* const layerNode)
 	memcpy(&m_bias[0], &tmpRead[0], sizeof(ndReal) * tmpRead.GetCount());
 }
 
-void ndDeepBrainLayer::Save(nd::TiXmlElement* const layerNode) const
+void ndBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 {
 	xmlSaveParam(layerNode, "type", "fullyConnected");
 	xmlSaveParam(layerNode, "inputs", GetColumns());
@@ -219,7 +219,7 @@ void ndDeepBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 	}
 }
 
-void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
+void ndBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 {
 	m_bias.Set(0.0f);
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
@@ -228,11 +228,11 @@ void ndDeepBrainLayer::InitGaussianWeights(ndReal mean, ndReal variance)
 	}
 }
 
-void ndDeepBrainLayer::LinealActivation(ndDeepBrainVector&) const
+void ndBrainLayer::LinealActivation(ndBrainVector&) const
 {
 }
 
-void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output) const
+void ndBrainLayer::ReluActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -241,7 +241,7 @@ void ndDeepBrainLayer::ReluActivation(ndDeepBrainVector& output) const
 	}
 }
 
-void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output) const
+void ndBrainLayer::SigmoidActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -254,7 +254,7 @@ void ndDeepBrainLayer::SigmoidActivation(ndDeepBrainVector& output) const
 	}
 }
 
-void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output) const
+void ndBrainLayer::HyperbolicTanActivation(ndBrainVector& output) const
 {
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
 	{
@@ -267,7 +267,7 @@ void ndDeepBrainLayer::HyperbolicTanActivation(ndDeepBrainVector& output) const
 	}
 }
 
-void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output) const
+void ndBrainLayer::SoftmaxActivation(ndBrainVector& output) const
 {
 	ndReal acc = 0.0f;
 	for (ndInt32 i = output.GetCount() - 1; i >= 0; --i)
@@ -288,7 +288,7 @@ void ndDeepBrainLayer::SoftmaxActivation(ndDeepBrainVector& output) const
 	}
 }
 
-void ndDeepBrainLayer::SigmoidDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+void ndBrainLayer::SigmoidDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -298,7 +298,7 @@ void ndDeepBrainLayer::SigmoidDerivative(const ndDeepBrainVector& input, ndDeepB
 	}
 }
 
-void ndDeepBrainLayer::LinealActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+void ndBrainLayer::LinealActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -307,7 +307,7 @@ void ndDeepBrainLayer::LinealActivationDerivative(const ndDeepBrainVector& input
 	}
 }
 
-void ndDeepBrainLayer::ReluActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+void ndBrainLayer::ReluActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -317,7 +317,7 @@ void ndDeepBrainLayer::ReluActivationDerivative(const ndDeepBrainVector& input, 
 	}
 }
 
-void ndDeepBrainLayer::HyperbolicTanDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+void ndBrainLayer::HyperbolicTanDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	ndAssert(input.GetCount() == derivativeOutput.GetCount());
 	for (ndInt32 i = input.GetCount() - 1; i >= 0; --i)
@@ -327,7 +327,7 @@ void ndDeepBrainLayer::HyperbolicTanDerivative(const ndDeepBrainVector& input, n
 	}
 }
 
-void ndDeepBrainLayer::ApplyActivation(ndDeepBrainVector& output) const
+void ndBrainLayer::ApplyActivation(ndBrainVector& output) const
 {
 	switch (m_activation)
 	{
@@ -366,7 +366,7 @@ void ndDeepBrainLayer::ApplyActivation(ndDeepBrainVector& output) const
 	}
 }
 
-void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDeepBrainVector& derivativeOutput) const
+void ndBrainLayer::ActivationDerivative(const ndBrainVector& input, ndBrainVector& derivativeOutput) const
 {
 	switch (m_activation)
 	{
@@ -406,14 +406,14 @@ void ndDeepBrainLayer::ActivationDerivative(const ndDeepBrainVector& input, ndDe
 	}
 }
 
-void ndDeepBrainLayer::MakePrediction(const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndBrainLayer::MakePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
 	Mul(input, output);
 	output.Add(output, m_bias);
 	ApplyActivation(output);
 }
 
-void ndDeepBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndDeepBrainVector& input, ndDeepBrainVector& output)
+void ndBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndBrainVector& input, ndBrainVector& output)
 {
 	auto MakePrediction = ndMakeObject::ndFunction([this, &input, &output](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -424,7 +424,7 @@ void ndDeepBrainLayer::MakePrediction(ndThreadPool& threadPool, const ndDeepBrai
 			ndDeepBrainMemVector out(&output[startEnd.m_start], count);
 			const ndDeepBrainMemVector bias(&m_bias[startEnd.m_start], count);
 	
-			const ndDeepBrainMatrix& matrix = (*this);
+			const ndBrainMatrix& matrix = (*this);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				output[i] = input.Dot(matrix[i]);

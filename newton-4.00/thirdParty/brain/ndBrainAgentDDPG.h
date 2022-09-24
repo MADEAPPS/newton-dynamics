@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_AGENT_DDPG_H__
-#define _ND_DEEP_BRAIN_AGENT_DDPG_H__
+#ifndef _ND_BRAIN_AGENT_DDPG_H__
+#define _ND_BRAIN_AGENT_DDPG_H__
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainAgent.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainAgent.h"
 
-class ndDeepBrainAgentDDPG : public ndDeepBrainAgent
+class ndBrainAgentDDPG : public ndBrainAgent
 {
 	public: 
-	ndDeepBrainAgentDDPG(ndDeepBrain* const agent);
-	virtual ~ndDeepBrainAgentDDPG();
+	ndBrainAgentDDPG(ndBrain* const agent);
+	virtual ~ndBrainAgentDDPG();
 };
 
 #endif 

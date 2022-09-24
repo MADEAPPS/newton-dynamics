@@ -19,13 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrain.h"
-#include "ndDeepBrainLayer.h"
-#include "ndDeepBrainTrainerBase.h"
+#include "ndBrainStdafx.h"
+#include "ndBrain.h"
+#include "ndBrainLayer.h"
+#include "ndBrainTrainerBase.h"
 
 
-ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(ndDeepBrain* const brain)
+ndBrainTrainerBase::ndBrainTrainerBase(ndBrain* const brain)
 	:ndClassAlloc()
 	,m_instance(brain)
 	,m_miniBatchSize(1)
@@ -33,7 +33,7 @@ ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(ndDeepBrain* const brain)
 {
 }
 
-ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src)
+ndBrainTrainerBase::ndBrainTrainerBase(const ndBrainTrainerBase& src)
 	:ndClassAlloc()
 	,m_instance(src.m_instance)
 	,m_miniBatchSize(src.m_miniBatchSize)
@@ -41,22 +41,22 @@ ndDeepBrainTrainerBase::ndDeepBrainTrainerBase(const ndDeepBrainTrainerBase& src
 {
 }
 
-ndDeepBrainTrainerBase::~ndDeepBrainTrainerBase()
+ndBrainTrainerBase::~ndBrainTrainerBase()
 {
 }
 
-void ndDeepBrainTrainerBase::SetMiniBatchSize(ndInt32 miniBatchSize)
+void ndBrainTrainerBase::SetMiniBatchSize(ndInt32 miniBatchSize)
 {
 	m_miniBatchSize = miniBatchSize;
 }
 
-ndReal ndDeepBrainTrainerBase::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndDeepBrainVector& output)
+ndReal ndBrainTrainerBase::Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector& output)
 {
 	ndReal error2 = 0;
 	for (ndInt32 i = inputBatch.GetCount() - 1; i >= 0; --i)
 	{
-		const ndDeepBrainVector& input = inputBatch[i];
-		const ndDeepBrainVector& truth = groundTruth[i];
+		const ndBrainVector& input = inputBatch[i];
+		const ndBrainVector& truth = groundTruth[i];
 		m_instance.MakePrediction(input, output);
 
 		output.Sub(output, truth);
@@ -66,7 +66,7 @@ ndReal ndDeepBrainTrainerBase::Validate(const ndDeepBrainMatrix& inputBatch, con
 	return error;
 }
 
-ndReal ndDeepBrainTrainerBase::ndValidation::Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
+ndReal ndBrainTrainerBase::ndValidation::Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
 {
 	return m_trainer.Validate(inputBatch, groundTruth, m_output);
 }

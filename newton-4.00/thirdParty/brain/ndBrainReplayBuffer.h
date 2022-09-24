@@ -19,46 +19,46 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_AGENT_REAPLAY_BUFFER_H__
-#define _ND_DEEP_BRAIN_AGENT_REAPLAY_BUFFER_H__
+#ifndef _ND_BRAIN_REPLAY_BUFFER_H__
+#define _ND_BRAIN_REPLAY_BUFFER_H__
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainVector.h"
-#include "ndDeepBrainMatrix.h"
-#include "ndDeepBrainInstance.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
+#include "ndBrainMatrix.h"
+#include "ndBrainInstance.h"
 
-class ndDeepBrainTransition
+class ndBrainReiforcementTransition
 {
 	public:
-	ndDeepBrainTransition();
-	void CopyFrom(const ndDeepBrainTransition& src);
+	ndBrainReiforcementTransition();
+	void CopyFrom(const ndBrainReiforcementTransition& src);
 
-	ndDeepBrainVector m_state;
-	ndDeepBrainVector m_action;
-	ndDeepBrainVector m_nextState;
+	ndBrainVector m_state;
+	ndBrainVector m_action;
+	ndBrainVector m_nextState;
 	ndReal m_reward;
 	bool m_terminalState;
 };
 
-class ndDeepBrainReplayBuffer : public ndArray<ndDeepBrainTransition>
+class ndBrainReplayBuffer : public ndArray<ndBrainReiforcementTransition>
 {
 	public:
-	ndDeepBrainReplayBuffer();
-	~ndDeepBrainReplayBuffer();
+	ndBrainReplayBuffer();
+	~ndBrainReplayBuffer();
 
 	void SetCount(ndInt32 replayBufferSize, ndInt32 replayBatchSize, ndInt32 stateSize, ndInt32 actionSize);
 
-	ndDeepBrainTransition& GetTransitionEntry();
+	ndBrainReiforcementTransition& GetTransitionEntry();
 
 	void MakeRandomBatch();
 
 	ndArray<ndUnsigned32> m_randomShaffle;
-	ndDeepBrainMatrix m_inputBatch;
-	ndDeepBrainMatrix m_outputBatch;
-	ndDeepBrainMatrix m_nextInputBatch;
-	ndDeepBrainMatrix m_groundTruthBatch;
-	ndDeepBrainVector n_rewardBatch;
-	ndDeepBrainVector n_terminalBatch;
+	ndBrainMatrix m_inputBatch;
+	ndBrainMatrix m_outputBatch;
+	ndBrainMatrix m_nextInputBatch;
+	ndBrainMatrix m_groundTruthBatch;
+	ndBrainVector n_rewardBatch;
+	ndBrainVector n_terminalBatch;
 	ndInt32 m_learnBatchSize;
 	ndInt32 m_replayBufferIndex;
 };

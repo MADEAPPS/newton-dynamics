@@ -19,26 +19,36 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_BRAIN_PARALLEL_TRAINER_H__
+#define _ND_BRAIN_PARALLEL_TRAINER_H__
 
-#ifndef _ND_DEEP_BRAIN_TYPES_H__
-#define _ND_DEEP_BRAIN_TYPES_H__
+#include "ndBrainStdafx.h"
+#include "ndBrainTrainer.h"
 
-#include "ndDeepBrainStdafx.h"
 
-#define D_DEEP_BRAIN_DATA_ALIGMENT 8
-
-enum ndDeepBrainActivationType
+class ndBrainParallelTrainer: public ndBrainTrainer, public ndThreadPool
 {
-	m_relu,
-	m_lineal,
-	m_tanh,
-	m_sigmoid,
-	m_softmax
-};
+	public: 
+	class ndBrainTrainerChannel;
+	ndBrainParallelTrainer(ndBrain* const brain, ndInt32 threads = 1);
+	~ndBrainParallelTrainer();
 
-class ndDeepBrainPrefixScan : public ndFixSizeArray<ndInt32, 256>
-{
-	public:
+	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+
+	private:
+	void Optimize();
+	ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndBrainVector& output);
+	virtual void ThreadFunction();
+
+	private:
+	void AverageWeights();
+	ndFixSizeArray<ndBrainTrainerChannel*, D_MAX_THREADS_COUNT> m_threadData;
+
+	const ndBrainMatrix* m_inputBatch;
+	const ndBrainMatrix* m_groundTruth;
+	ndValidation* m_validator;
+	ndReal m_learnRate;
+	ndInt32 m_steps;
 };
 
 

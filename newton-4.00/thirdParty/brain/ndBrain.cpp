@@ -19,41 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrain.h"
+#include "ndBrainStdafx.h"
+#include "ndBrain.h"
 
-ndDeepBrain::ndDeepBrain()
-	:ndArray<ndDeepBrainLayer*>()
+ndBrain::ndBrain()
+	:ndArray<ndBrainLayer*>()
 	,m_memory(nullptr)
 	,m_memorySize(0)
 	,m_isReady(false)
 {
 }
 
-ndDeepBrain::ndDeepBrain(const ndDeepBrain& src)
-	:ndArray<ndDeepBrainLayer*>()
+ndBrain::ndBrain(const ndBrain& src)
+	:ndArray<ndBrainLayer*>()
 	,m_memory(nullptr)
 	,m_memorySize(0)
 	,m_isReady(src.m_isReady)
 {
-	const ndArray<ndDeepBrainLayer*>& srcLayers = src;
+	const ndArray<ndBrainLayer*>& srcLayers = src;
 	BeginAddLayer();
 	for (ndInt32 i = 0; i < srcLayers.GetCount(); ++i)
 	{
-		ndDeepBrainLayer* const layer = srcLayers[i]->Clone();
+		ndBrainLayer* const layer = srcLayers[i]->Clone();
 		AddLayer(layer);
 	}
 	EndAddLayer();
 	CopyFrom(src);
 }
 
-ndDeepBrain::~ndDeepBrain()
+ndBrain::~ndBrain()
 {
 	if (m_memory)
 	{
 		for (ndInt32 i = 0; i < GetCount(); i++)
 		{
-			ndDeepBrainLayer& layer = *(*this)[i];
+			ndBrainLayer& layer = *(*this)[i];
 			layer.SetFloatPointers(nullptr);
 			layer.SetPointers(nullptr);
 		}
@@ -66,46 +66,46 @@ ndDeepBrain::~ndDeepBrain()
 	}
 }
 
-ndInt32 ndDeepBrain::GetInputSize() const
+ndInt32 ndBrain::GetInputSize() const
 {
 	return GetCount() ? (*this)[0]->GetInputSize() : 0;
 }
 
-ndInt32 ndDeepBrain::GetOutputSize() const
+ndInt32 ndBrain::GetOutputSize() const
 {
 	return GetCount() ? (*this)[GetCount()-1]->GetOuputSize() : 0;
 }
 
 
-void ndDeepBrain::CopyFrom(const ndDeepBrain& src)
+void ndBrain::CopyFrom(const ndBrain& src)
 {
-	const ndArray<ndDeepBrainLayer*>& layers = *this;
-	const ndArray<ndDeepBrainLayer*>& srcLayers = src;
+	const ndArray<ndBrainLayer*>& layers = *this;
+	const ndArray<ndBrainLayer*>& srcLayers = src;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		layers[i]->CopyFrom(*srcLayers[i]);
 	}
 }
 
-ndDeepBrainLayer* ndDeepBrain::AddLayer(ndDeepBrainLayer* const layer)
+ndBrainLayer* ndBrain::AddLayer(ndBrainLayer* const layer)
 {
 	ndAssert(!GetCount() || ((*this)[GetCount() - 1]->GetOuputSize() == layer->GetInputSize()));
 	PushBack(layer);
 	return layer;
 }
 
-void ndDeepBrain::BeginAddLayer()
+void ndBrain::BeginAddLayer()
 {
 	m_isReady = false;
 }
 
-void ndDeepBrain::EndAddLayer()
+void ndBrain::EndAddLayer()
 {
 	ndInt32 floatsCount = 0;
 	ndInt32 vectorSizeInBytes = 0;
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
-		ndDeepBrainLayer& layer = *(*this)[i];
+		ndBrainLayer& layer = *(*this)[i];
 		ndInt32 columnSize = (layer.GetInputSize() + D_DEEP_BRAIN_DATA_ALIGMENT - 1) & -D_DEEP_BRAIN_DATA_ALIGMENT;
 		ndInt32 rowSize = layer.GetOuputSize() + 1;
 		floatsCount += columnSize * rowSize;
@@ -121,21 +121,21 @@ void ndDeepBrain::EndAddLayer()
 	ndUnsigned8* mem = (ndUnsigned8*)m_memory;
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
-		ndDeepBrainLayer& layer = *(*this)[i];
+		ndBrainLayer& layer = *(*this)[i];
 		mem = layer.SetPointers(mem);
 	}
 
 	ndReal* floatMemory = (ndReal*) ((ndInt64 (mem) + 31) & -32);
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
-		ndDeepBrainLayer& layer = *(*this)[i];
+		ndBrainLayer& layer = *(*this)[i];
 		floatMemory = layer.SetFloatPointers(floatMemory);
 	}
 
 	m_isReady = true;
 }
 
-bool ndDeepBrain::Compare(const ndDeepBrain& src) const
+bool ndBrain::Compare(const ndBrain& src) const
 {
 	if (m_isReady != src.m_isReady)
 	{
@@ -149,8 +149,8 @@ bool ndDeepBrain::Compare(const ndDeepBrain& src) const
 		return false;
 	}
 
-	const ndArray<ndDeepBrainLayer*>& layers0 = *this;
-	const ndArray<ndDeepBrainLayer*>& layers1 = src;
+	const ndArray<ndBrainLayer*>& layers0 = *this;
+	const ndArray<ndBrainLayer*>& layers1 = src;
 	for (ndInt32 i = 0; i < layers0.GetCount(); ++i)
 	{
 		bool test = layers0[i]->Compare(*layers1[i]);
@@ -164,27 +164,27 @@ bool ndDeepBrain::Compare(const ndDeepBrain& src) const
 	return true;
 }
 
-void ndDeepBrain::InitGaussianWeights(ndReal mean, ndReal variance)
+void ndBrain::InitGaussianWeights(ndReal mean, ndReal variance)
 {
-	ndArray<ndDeepBrainLayer*>& layers = *this;
+	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = layers.GetCount() - 1; i >= 0; --i)
 	{
 		layers[i]->InitGaussianWeights(mean, variance);
 	}
 }
 
-void ndDeepBrain::Save(const char* const pathName) const
+void ndBrain::Save(const char* const pathName) const
 {
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);
 
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndDeepBrain");
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndBrain");
 	asciifile.LinkEndChild(rootNode);
 
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
-		ndDeepBrainLayer* const layer = (*this)[i];
+		ndBrainLayer* const layer = (*this)[i];
 		nd::TiXmlElement* const layerNode = new nd::TiXmlElement("ndLayer");
 		rootNode->LinkEndChild(layerNode);
 		layer->Save (layerNode);
@@ -196,7 +196,7 @@ void ndDeepBrain::Save(const char* const pathName) const
 	setlocale(LC_ALL, oldloc);
 }
 
-bool ndDeepBrain::Load(const char* const pathName)
+bool ndBrain::Load(const char* const pathName)
 {
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
@@ -222,10 +222,10 @@ bool ndDeepBrain::Load(const char* const pathName)
 		const char* const layerType = xmlGetString(layerNode, "type");
 		if (layerType)
 		{
-			ndDeepBrainLayer* layer = nullptr;
+			ndBrainLayer* layer = nullptr;
 			if (!strcmp(layerType, "fullyConnected"))
 			{
-				layer = new ndDeepBrainLayer(layerNode);
+				layer = new ndBrainLayer(layerNode);
 			}
 			else
 			{
@@ -242,7 +242,7 @@ bool ndDeepBrain::Load(const char* const pathName)
 	ndInt32 index = 0;
 	for (const nd::TiXmlNode* layerNode = rootNode->FirstChild("ndLayer"); layerNode; layerNode = layerNode->NextSibling())
 	{
-		ndDeepBrainLayer* const layer = (*this)[index];
+		ndBrainLayer* const layer = (*this)[index];
 		layer->Load((nd::TiXmlElement*)layerNode);
 		index++;
 	}

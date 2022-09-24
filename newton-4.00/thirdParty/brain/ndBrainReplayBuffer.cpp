@@ -19,10 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainAgentReplayBuffer.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainReplayBuffer.h"
 
-ndDeepBrainTransition::ndDeepBrainTransition()
+ndBrainReiforcementTransition::ndBrainReiforcementTransition()
 	:m_state()
 	,m_action()
 	,m_nextState()
@@ -31,7 +31,7 @@ ndDeepBrainTransition::ndDeepBrainTransition()
 {
 }
 
-void ndDeepBrainTransition::CopyFrom(const ndDeepBrainTransition& src)
+void ndBrainReiforcementTransition::CopyFrom(const ndBrainReiforcementTransition& src)
 {
 	m_reward = src.m_reward;
 	m_terminalState = src.m_terminalState;
@@ -44,8 +44,8 @@ void ndDeepBrainTransition::CopyFrom(const ndDeepBrainTransition& src)
 	memcpy(&m_nextState[0], &src.m_nextState[0], src.m_nextState.GetCount() * sizeof(ndReal));
 }
 
-ndDeepBrainReplayBuffer::ndDeepBrainReplayBuffer()
-	:ndArray<ndDeepBrainTransition>()
+ndBrainReplayBuffer::ndBrainReplayBuffer()
+	:ndArray<ndBrainReiforcementTransition>()
 	,m_randomShaffle()
 	,m_inputBatch()
 	,m_outputBatch()
@@ -58,18 +58,18 @@ ndDeepBrainReplayBuffer::ndDeepBrainReplayBuffer()
 {
 }
 
-ndDeepBrainReplayBuffer::~ndDeepBrainReplayBuffer()
+ndBrainReplayBuffer::~ndBrainReplayBuffer()
 {
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
-		ndDeepBrainTransition& transition = (*this)[i];
-		transition.m_state.~ndDeepBrainVector();
-		transition.m_action.~ndDeepBrainVector();
-		transition.m_nextState.~ndDeepBrainVector();
+		ndBrainReiforcementTransition& transition = (*this)[i];
+		transition.m_state.~ndBrainVector();
+		transition.m_action.~ndBrainVector();
+		transition.m_nextState.~ndBrainVector();
 	}
 }
 
-void ndDeepBrainReplayBuffer::SetCount(ndInt32 replayBufferSize, ndInt32 replayBatchSize, ndInt32 stateSize, ndInt32 actionSize)
+void ndBrainReplayBuffer::SetCount(ndInt32 replayBufferSize, ndInt32 replayBatchSize, ndInt32 stateSize, ndInt32 actionSize)
 {
 	ndAssert(GetCount() == 0);
 	ndAssert(m_learnBatchSize == 0);
@@ -79,16 +79,16 @@ void ndDeepBrainReplayBuffer::SetCount(ndInt32 replayBufferSize, ndInt32 replayB
 	m_learnBatchSize = replayBatchSize;
 
 	m_randomShaffle.SetCount(replayBufferSize);
-	ndArray<ndDeepBrainTransition>::SetCount(replayBufferSize);
+	ndArray<ndBrainReiforcementTransition>::SetCount(replayBufferSize);
 
 	for (ndInt32 i = 0; i < replayBufferSize; i++)
 	{
-		ndDeepBrainTransition& transition = (*this)[i];
+		ndBrainReiforcementTransition& transition = (*this)[i];
 
 		m_randomShaffle[i] = i;
-		transition.m_state = ndDeepBrainVector();
-		transition.m_nextState = ndDeepBrainVector();
-		transition.m_action = ndDeepBrainVector();
+		transition.m_state = ndBrainVector();
+		transition.m_nextState = ndBrainVector();
+		transition.m_action = ndBrainVector();
 		transition.m_reward = 1.0f;
 		transition.m_terminalState = false;
 
@@ -105,15 +105,15 @@ void ndDeepBrainReplayBuffer::SetCount(ndInt32 replayBufferSize, ndInt32 replayB
 	m_groundTruthBatch.Init(m_learnBatchSize, actionSize);
 }
 
-ndDeepBrainTransition& ndDeepBrainReplayBuffer::GetTransitionEntry()
+ndBrainReiforcementTransition& ndBrainReplayBuffer::GetTransitionEntry()
 {
 	ndInt32 replayIndex = m_replayBufferIndex % GetCount();
-	ndDeepBrainTransition& transition = (*this)[replayIndex];
+	ndBrainReiforcementTransition& transition = (*this)[replayIndex];
 	m_replayBufferIndex++;
 	return transition;
 }
 
-void ndDeepBrainReplayBuffer::MakeRandomBatch()
+void ndBrainReplayBuffer::MakeRandomBatch()
 {
 	ndInt32 count = ndMin(m_randomShaffle.GetCount(), m_replayBufferIndex);
 	m_randomShaffle.RandomShuffle(count);
@@ -121,7 +121,7 @@ void ndDeepBrainReplayBuffer::MakeRandomBatch()
 	for (ndInt32 i = 0; i < m_learnBatchSize; ++i)
 	{
 		ndInt32 index = m_randomShaffle[i];
-		const ndDeepBrainTransition& transition = (*this)[index];
+		const ndBrainReiforcementTransition& transition = (*this)[index];
 
 		n_rewardBatch[i] = transition.m_reward;
 		n_terminalBatch[i] = transition.m_terminalState ? 0.0f : 1.0f;

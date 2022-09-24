@@ -19,21 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainAgent.h"
 
-ndDeepBrainAgent::ndDeepBrainAgent(ndDeepBrain* const agent)
-	:m_network(agent)
-	,m_replayBuffer()
-	,m_exploration(1.0f)
-{
-}
+#ifndef _ND_BRAIN_STDAFX_H__
+#define _ND_BRAIN_STDAFX_H__
 
-ndDeepBrainAgent::~ndDeepBrainAgent()
-{
-}
+#include <ndCore.h>
 
-void ndDeepBrainAgent::PredictAccion(ndDeepBrainTransition& transition)
-{
-	m_network.MakePrediction(transition.m_state, transition.m_action);
-}
+#endif 
+

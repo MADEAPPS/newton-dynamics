@@ -19,36 +19,36 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_VECTOR_H__
-#define _ND_DEEP_BRAIN_VECTOR_H__
+#ifndef _ND_BRAIN_VECTOR_H__
+#define _ND_BRAIN_VECTOR_H__
 
-#include "ndDeepBrainStdafx.h"
+#include "ndBrainStdafx.h"
 
-class ndDeepBrainVector: public ndArray<ndReal> 
+class ndBrainVector: public ndArray<ndReal> 
 {
 	public: 
-	ndDeepBrainVector();
-	~ndDeepBrainVector();
+	ndBrainVector();
+	~ndBrainVector();
 	
 	void InitGaussianWeights(ndReal mean, ndReal variance);
 
 	void Set(ndReal value);
-	void Set(const ndDeepBrainVector& data);
+	void Set(const ndBrainVector& data);
 
 	ndInt32 GetMaxIndex() const;
 
-	ndReal Dot(const ndDeepBrainVector& a) const;
-	void ScaleSet(const ndDeepBrainVector& a, ndReal scale);
-	void Add(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-	void Sub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-	void Mul(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
+	ndReal Dot(const ndBrainVector& a) const;
+	void ScaleSet(const ndBrainVector& a, ndReal scale);
+	void Add(const ndBrainVector& a, const ndBrainVector& b);
+	void Sub(const ndBrainVector& a, const ndBrainVector& b);
+	void Mul(const ndBrainVector& a, const ndBrainVector& b);
 
-	void ScaleAdd(const ndDeepBrainVector& a, ndReal b);
-	void MulAdd(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
-	void MulSub(const ndDeepBrainVector& a, const ndDeepBrainVector& b);
+	void ScaleAdd(const ndBrainVector& a, ndReal b);
+	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
+	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 };
 
-class ndDeepBrainMemVector : public ndDeepBrainVector
+class ndDeepBrainMemVector : public ndBrainVector
 {
 	public:
 	ndDeepBrainMemVector();

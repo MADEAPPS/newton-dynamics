@@ -19,25 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_TRAINER_H__
-#define _ND_DEEP_BRAIN_TRAINER_H__
+#ifndef _ND_BRAIN_TRAINER_H__
+#define _ND_BRAIN_TRAINER_H__
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainTrainerBase.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainTrainerBase.h"
 
-class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
+class ndBrainTrainer: public ndBrainTrainerBase
 {
 	public: 
-	ndDeepBrainTrainer(ndDeepBrain* const brain);
-	ndDeepBrainTrainer(const ndDeepBrainTrainer& src);
-	virtual ~ndDeepBrainTrainer();
+	ndBrainTrainer(ndBrain* const brain);
+	ndBrainTrainer(const ndBrainTrainer& src);
+	virtual ~ndBrainTrainer();
 
 	ndReal GetRegularizer() const;
 	void SetRegularizer(ndReal regularizer);
 	virtual void UpdateWeights(ndReal learnRate, ndInt32 batchSize);
-	virtual void MakePrediction(const ndDeepBrainVector& input);
-	virtual void BackPropagate(const ndDeepBrainVector& groundTruth);
-	virtual void Optimize(ndValidation& validator, const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
+	virtual void MakePrediction(const ndBrainVector& input);
+	virtual void BackPropagate(const ndBrainVector& groundTruth);
+	virtual void Optimize(ndValidation& validator, const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth, ndReal learnRate, ndInt32 steps);
 
 	protected:
 	void ClearGradientsAcc();
@@ -45,21 +45,21 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	virtual void ApplyWeightTranspose();
 	virtual void BackPropagateHiddenLayer(ndInt32 layerIndex);
 	virtual void BackPropagateCalculateBiasGradient(ndInt32 layerIndex);
-	virtual void BackPropagateOutputLayer(const ndDeepBrainVector& groundTruth);
+	virtual void BackPropagateOutputLayer(const ndBrainVector& groundTruth);
 
 	void ApplyAdamCorrection();
 
-	ndDeepBrainVector m_output;
-	ndDeepBrainVector m_zDerivative;
-	ndDeepBrainVector m_biasGradients;
-	ndDeepBrainVector m_weightGradients;
-	ndDeepBrainVector m_biasGradientsAcc;
-	ndDeepBrainVector m_biasGradient_u;
-	ndDeepBrainVector m_biasGradient_v;
-	ndDeepBrainVector m_weightGradient_u;
-	ndDeepBrainVector m_weightGradient_v;
-	ndDeepBrainPrefixScan m_weightGradientsPrefixScan;
-	ndArray <ndDeepBrainMatrix*> m_weightsLayersTranspose;
+	ndBrainVector m_output;
+	ndBrainVector m_zDerivative;
+	ndBrainVector m_biasGradients;
+	ndBrainVector m_weightGradients;
+	ndBrainVector m_biasGradientsAcc;
+	ndBrainVector m_biasGradient_u;
+	ndBrainVector m_biasGradient_v;
+	ndBrainVector m_weightGradient_u;
+	ndBrainVector m_weightGradient_v;
+	ndBrainPrefixScan m_weightGradientsPrefixScan;
+	ndArray <ndBrainMatrix*> m_weightsLayersTranspose;
 	ndReal m_regularizer;
 	ndReal m_bestCost;
 	ndReal m_alpha;
@@ -67,16 +67,16 @@ class ndDeepBrainTrainer: public ndDeepBrainTrainerBase
 	ndReal m_epsilon;
 	ndReal m_alphaAcc;
 	ndReal m_betaAcc;
-	friend class ndDeepBrainTrainerChannel;
-	friend class ndDeepBrainParallelTrainer;
+	friend class ndBrainTrainerChannel;
+	friend class ndBrainParallelTrainer;
 };
 
-inline ndReal ndDeepBrainTrainer::GetRegularizer() const
+inline ndReal ndBrainTrainer::GetRegularizer() const
 {
 	return m_regularizer;
 }
 
-inline void ndDeepBrainTrainer::SetRegularizer(ndReal regularizer)
+inline void ndBrainTrainer::SetRegularizer(ndReal regularizer)
 {
 	m_regularizer = ndClamp(regularizer, ndReal(0.0f), ndReal(0.01f));
 }

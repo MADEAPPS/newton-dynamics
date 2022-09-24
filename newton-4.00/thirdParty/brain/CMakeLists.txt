@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-set (projectName "ndDeepBrain")
+set (projectName "ndBrain")
 message (${projectName})
 
 include_directories(.)
@@ -27,8 +27,8 @@ if (MSVC)
 	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /Zi /W4 /O2 /fp:fast")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi /GS- /W4 /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
 
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundDeepBrainStdafx.h")
-	set_source_files_properties(ndDeepBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndDeepBrainStdafx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundBrainStdafx.h")
+	set_source_files_properties(ndBrainStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndBrainStdafx.h")
 
 endif()
 

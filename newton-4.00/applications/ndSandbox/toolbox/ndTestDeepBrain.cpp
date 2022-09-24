@@ -12,20 +12,20 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-class ndTestValidator : public ndDeepBrainTrainer::ndValidation
+class ndTestValidator : public ndBrainTrainer::ndValidation
 {
 	public:
-	ndTestValidator(ndDeepBrainTrainer& trainer)
-		:ndDeepBrainTrainer::ndValidation(trainer)
+	ndTestValidator(ndBrainTrainer& trainer)
+		:ndBrainTrainer::ndValidation(trainer)
 		,m_minError(1.0e10f)
 		,m_step(0)
 		,m_step0(0)
 	{
 	}
 
-	ndReal Validate(const ndDeepBrainMatrix& inputBatch, const ndDeepBrainMatrix& groundTruth)
+	ndReal Validate(const ndBrainMatrix& inputBatch, const ndBrainMatrix& groundTruth)
 	{
-		ndReal error = ndDeepBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
+		ndReal error = ndBrainTrainer::ndValidation::Validate(inputBatch, groundTruth);
 		if (error < m_minError)
 		{
 			m_minError = error;
@@ -44,11 +44,11 @@ class ndTestValidator : public ndDeepBrainTrainer::ndValidation
 
 static void ThreeLayersTwoInputsTwoOutputs()
 {
-	ndDeepBrain brain;
-	ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(2, 16, m_relu);
-	//ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
-	ndDeepBrainLayer* const hiddenLayer = new ndDeepBrainLayer(inputLayer->GetOuputSize(), 6, m_relu);
-	ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
+	ndBrain brain;
+	ndBrainLayer* const inputLayer = new ndBrainLayer(2, 16, m_relu);
+	//ndBrainLayer* const hiddenLayer = new ndBrainLayer(inputLayer->GetOuputSize(), 16, m_relu);
+	ndBrainLayer* const hiddenLayer = new ndBrainLayer(inputLayer->GetOuputSize(), 6, m_relu);
+	ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer->GetOuputSize(), 2, m_sigmoid);
 
 	brain.BeginAddLayer();
 	brain.AddLayer(inputLayer);
@@ -58,8 +58,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	brain.InitGaussianWeights(0.0f, 0.25f);
 
 	ndInt32 samples = 2000;
-	ndDeepBrainMatrix inputBatch(samples, 2);
-	ndDeepBrainMatrix groundTruth(samples, 2);
+	ndBrainMatrix inputBatch(samples, 2);
+	ndBrainMatrix groundTruth(samples, 2);
 	for (ndInt32 i = 0; i < samples; i++)
 	{
 		inputBatch[i][0] = ndGaussianRandom(0.5f, 0.25f);
@@ -69,21 +69,21 @@ static void ThreeLayersTwoInputsTwoOutputs()
 		groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
 	}
 	
-	//ndDeepBrainTrainer trainer(&brain);
-	ndDeepBrainParallelTrainer trainer(&brain, 4);
+	//ndBrainTrainer trainer(&brain);
+	ndBrainParallelTrainer trainer(&brain, 4);
 	ndTestValidator testError(trainer);
 
 	trainer.SetMiniBatchSize(16);
 	trainer.Optimize(testError, inputBatch, groundTruth, 1.0e-2f, 2000);
 
 	brain.Save("xxx.nn");
-	//ndDeepBrain brain1;
+	//ndBrain brain1;
 	//brain1.Load("xxx.nn");
 	//ndAssert(brain1.Compare(brain));
 
-	ndDeepBrainVector truth;
-	ndDeepBrainVector input;
-	ndDeepBrainVector output;
+	ndBrainVector truth;
+	ndBrainVector input;
+	ndBrainVector output;
 	
 	truth.SetCount(2);
 	input.SetCount(2);
@@ -91,7 +91,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	
 	ndInt32 failCount = 0;
 	ndInt32 testCount = 200;
-	ndDeepBrainInstance instance(&brain);
+	ndBrainInstance instance(&brain);
 	for (ndInt32 i = 0; i < testCount; i++)
 	{
 		input[0] = ndGaussianRandom(0.5f, 0.25f);
@@ -121,9 +121,9 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndExpandTraceMessage("success rate %f%%\n", (testCount - failCount) * 100.0f / testCount);
 }
 
-static ndDeepBrainMatrix* LoadMnistLabelData(const char* const filename)
+static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
-	ndDeepBrainMatrix* labelsData = nullptr;
+	ndBrainMatrix* labelsData = nullptr;
 
 	char outPathName[1024];
 	dGetWorkingFileName(filename, outPathName);
@@ -148,7 +148,7 @@ static ndDeepBrainMatrix* LoadMnistLabelData(const char* const filename)
 		magicNumber = ndIndian32(magicNumber);
 		numberOfItems = ndIndian32(numberOfItems);
 
-		labelsData = new ndDeepBrainMatrix(numberOfItems, 10);
+		labelsData = new ndBrainMatrix(numberOfItems, 10);
 		labelsData->Set(0.0f);
 		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
 		{
@@ -161,9 +161,9 @@ static ndDeepBrainMatrix* LoadMnistLabelData(const char* const filename)
 	return labelsData;
 }
 
-static ndDeepBrainMatrix* LoadMnistSampleData(const char* const filename)
+static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 {
-	ndDeepBrainMatrix* trainingDigits = nullptr;
+	ndBrainMatrix* trainingDigits = nullptr;
 
 	char outPathName[1024];
 	dGetWorkingFileName(filename, outPathName);
@@ -194,13 +194,13 @@ static ndDeepBrainMatrix* LoadMnistSampleData(const char* const filename)
 		numberOfItems = ndIndian32(numberOfItems);
 		digitWith = ndIndian32(digitWith);
 		digitHeight = ndIndian32(digitHeight);
-		trainingDigits = new ndDeepBrainMatrix(numberOfItems, digitWith * digitHeight);
+		trainingDigits = new ndBrainMatrix(numberOfItems, digitWith * digitHeight);
 		trainingDigits->Set(0.0f);
 
 		ndUnsigned8 data[32 * 32];
 		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
 		{
-			ndDeepBrainVector& image = (*trainingDigits)[i];
+			ndBrainVector& image = (*trainingDigits)[i];
 			ret = fread(data, digitWith, digitHeight, fp);
 			for (ndUnsigned32 j = 0; j < digitWith * digitHeight; j++)
 			{
@@ -212,20 +212,20 @@ static ndDeepBrainMatrix* LoadMnistSampleData(const char* const filename)
 	return trainingDigits;
 }
 
-static void ValidateData(const char* const title, ndDeepBrain& brain, ndDeepBrainMatrix* const testLabels, ndDeepBrainMatrix* const testDigits)
+static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
-	ndDeepBrainInstance instance(&brain);
+	ndBrainInstance instance(&brain);
 
-	ndDeepBrainVector output;
+	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
 	ndInt32 failCount = 0;
 	for (ndInt32 i = 0; i < testDigits->GetCount(); i++)
 	{
-		const ndDeepBrainVector& input = (*testDigits)[i];
+		const ndBrainVector& input = (*testDigits)[i];
 		instance.MakePrediction(input, output);
 
-		const ndDeepBrainVector& truth = (*testLabels)[i];
+		const ndBrainVector& truth = (*testLabels)[i];
 
 		ndInt32 index = 0;
 		ndFloat32 maxProbability = 0.0f;
@@ -251,19 +251,19 @@ static void ValidateData(const char* const title, ndDeepBrain& brain, ndDeepBrai
 
 static void MnistTrainingSet()
 {
-	ndDeepBrainMatrix* trainingLabels = LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte");
-	ndDeepBrainMatrix* trainingDigits = LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte");
+	ndBrainMatrix* trainingLabels = LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte");
+	ndBrainMatrix* trainingDigits = LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte");
 
 	if (trainingLabels && trainingDigits)
 	{
-		ndDeepBrain brain;
+		ndBrain brain;
 
 		ndInt32 neuronsPerLayers = 64;
-		ndDeepBrainLayer* const inputLayer = new ndDeepBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
-		ndDeepBrainLayer* const hiddenLayer0 = new ndDeepBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
-		ndDeepBrainLayer* const hiddenLayer1 = new ndDeepBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
-		//ndDeepBrainLayer* const hiddenLayer2 = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
-		ndDeepBrainLayer* const ouputLayer = new ndDeepBrainLayer(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
+		ndBrainLayer* const inputLayer = new ndBrainLayer(trainingDigits->GetColumns(), neuronsPerLayers, m_tanh);
+		ndBrainLayer* const hiddenLayer0 = new ndBrainLayer(inputLayer->GetOuputSize(), neuronsPerLayers, m_tanh);
+		ndBrainLayer* const hiddenLayer1 = new ndBrainLayer(hiddenLayer0->GetOuputSize(), neuronsPerLayers, m_tanh);
+		//ndBrainLayer* const hiddenLayer2 = new ndBrainLayer(hiddenLayer1->GetOuputSize(), neuronsPerLayers, m_tanh);
+		ndBrainLayer* const ouputLayer = new ndBrainLayer(hiddenLayer1->GetOuputSize(), trainingLabels->GetColumns(), m_sigmoid);
 
 		brain.BeginAddLayer();
 		brain.AddLayer(inputLayer);
@@ -274,8 +274,8 @@ static void MnistTrainingSet()
 		brain.EndAddLayer();
 		brain.InitGaussianWeights(0.0f, 0.25f);
 
-		ndDeepBrainTrainer trainer(&brain);
-		//ndDeepBrainParallelTrainer trainer(&brain, 4);
+		ndBrainTrainer trainer(&brain);
+		//ndBrainParallelTrainer trainer(&brain, 4);
 		//ndDeepBrainTrainerParallelSDG_Experiment trainer(&brain, 4);
 
 		trainer.SetMiniBatchSize(16);
@@ -306,13 +306,13 @@ static void MnistTrainingSet()
 
 static void MnistTestSet()
 {
-	ndDeepBrainMatrix* testLabels = LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte");
-	ndDeepBrainMatrix* testDigits = LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte");
+	ndBrainMatrix* testLabels = LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte");
+	ndBrainMatrix* testDigits = LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte");
 
 	if (testLabels && testDigits)
 	{
 		char path[256];
-		ndDeepBrain brain;
+		ndBrain brain;
 		dGetWorkingFileName("mnistDatabase/mnist.nn", path);
 		brain.Load(path);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();

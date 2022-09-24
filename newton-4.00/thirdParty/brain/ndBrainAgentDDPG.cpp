@@ -19,29 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_AGENT_H__
-#define _ND_DEEP_BRAIN_AGENT_H__
+#include "ndBrainStdafx.h"
+#include "ndBrainAgentDDPG.h"
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainMatrix.h"
-#include "ndDeepBrainInstance.h"
-#include "ndDeepBrainAgentReplayBuffer.h"
-
-class ndDeepBrainAgent: public ndClassAlloc
+ndBrainAgentDDPG::ndBrainAgentDDPG(ndBrain* const agent)
+	:ndBrainAgent(agent)
 {
-	public: 
-	ndDeepBrainAgent(ndDeepBrain* const agent);
-	virtual ~ndDeepBrainAgent();
+}
 
-	virtual void LearnStep() = 0;
-	virtual void PredictAccion(ndDeepBrainTransition& transition);
-	virtual void GetTransition(ndDeepBrainTransition& transition) const = 0;
-
-	ndDeepBrainInstance m_network;
-	ndDeepBrainReplayBuffer m_replayBuffer;
-	
-	ndFloat32 m_exploration;
-};
-
-#endif 
-
+ndBrainAgentDDPG::~ndBrainAgentDDPG()
+{
+}

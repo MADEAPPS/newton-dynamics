@@ -19,22 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DEEP_BRAIN_AGENT_DQN_H__
-#define _ND_DEEP_BRAIN_AGENT_DQN_H__
+#ifndef _ND_BRAIN_AGENT_H__
+#define _ND_BRAIN_AGENT_H__
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrainAgent.h"
+#include "ndBrainStdafx.h"
+#include "ndBrainMatrix.h"
+#include "ndBrainInstance.h"
+#include "ndBrainReplayBuffer.h"
 
-class ndDeepBrainAgentDQN: public ndDeepBrainAgent
+class ndBrainAgent: public ndClassAlloc
 {
 	public: 
-	ndDeepBrainAgentDQN(ndDeepBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize);
-	virtual ~ndDeepBrainAgentDQN();
+	ndBrainAgent(ndBrain* const agent);
+	virtual ~ndBrainAgent();
 
-	virtual void LearnStep();
-	virtual void PredictAccion(ndDeepBrainTransition& transition);
+	virtual void LearnStep() = 0;
+	virtual void PredictAccion(ndBrainReiforcementTransition& transition);
+	virtual void GetTransition(ndBrainReiforcementTransition& transition) const = 0;
 
-	ndDeepBrainInstance m_targetNetwork;
+	ndBrainInstance m_network;
+	ndBrainReplayBuffer m_replayBuffer;
+	
+	ndFloat32 m_exploration;
 };
 
 #endif 

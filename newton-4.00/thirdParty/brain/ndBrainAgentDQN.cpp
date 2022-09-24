@@ -19,32 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndDeepBrainStdafx.h"
-#include "ndDeepBrain.h"
-#include "ndDeepBrainAgentDQN.h"
+#include "ndBrainStdafx.h"
+#include "ndBrain.h"
+#include "ndBrainAgentDQN.h"
 
-ndDeepBrainAgentDQN::ndDeepBrainAgentDQN(ndDeepBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize)
-	:ndDeepBrainAgent(agent)
-	,m_targetNetwork(new ndDeepBrain(*agent))
+ndBrainAgentDQN::ndBrainAgentDQN(ndBrain* const agent, ndInt32 replayBufferSize, ndInt32 replayBatchSize)
+	:ndBrainAgent(agent)
+	,m_targetNetwork(new ndBrain(*agent))
 {
 	ndInt32 stateSize = m_network.GetBrain()->GetInputSize();
 	ndInt32 actionSize = m_network.GetBrain()->GetOutputSize();
 	m_replayBuffer.SetCount(replayBufferSize, replayBatchSize, stateSize, actionSize);
 }
 
-ndDeepBrainAgentDQN::~ndDeepBrainAgentDQN()
+ndBrainAgentDQN::~ndBrainAgentDQN()
 {
 	delete m_targetNetwork.GetBrain();
 }
 
-void ndDeepBrainAgentDQN::PredictAccion(ndDeepBrainTransition& transition)
+void ndBrainAgentDQN::PredictAccion(ndBrainReiforcementTransition& transition)
 {
-	ndDeepBrainAgent::PredictAccion(transition);
+	ndBrainAgent::PredictAccion(transition);
 }
 
-void ndDeepBrainAgentDQN::LearnStep()
+void ndBrainAgentDQN::LearnStep()
 {
-	ndDeepBrainTransition& transition = m_replayBuffer.GetTransitionEntry();
+	ndBrainReiforcementTransition& transition = m_replayBuffer.GetTransitionEntry();
 	GetTransition(transition);
 
 	if (m_replayBuffer.m_replayBufferIndex < m_replayBuffer.m_learnBatchSize)
