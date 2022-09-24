@@ -66,7 +66,6 @@ bld/
 *.hmap
 *.ipdb
 *.iobj
-*.java
 *.cache
 *.ib_tag
 *.opendb
