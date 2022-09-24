@@ -31,7 +31,7 @@
 
 #ifdef D_SCALAR_VECTOR_CLASS
 	#include "ndVectorScalar.h"
-#elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+#elif (defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
 	#include "ndVectorSimd.h"
 #elif (defined(__arm__) && defined(__aarch64__))
 	// assume arm instruction set until otherwise

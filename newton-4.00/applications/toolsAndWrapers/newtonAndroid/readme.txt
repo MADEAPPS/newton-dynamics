@@ -18,7 +18,7 @@ for and aready existing android studio application, the user can manually copy f
 the last step is in android studio explorer, 
 select file  ..\androidApp\app\src\main\cpp\CMakeLists.txt
 
-right click and form the dropdown menu, select add C++ to module
+right click and from the dropdown menu, select add C++ to module
 them in the dialog select "Link an existing CmakeList.txt or Android.mk to this module"
 the in the list box browse for the path to the CMakeLists.txt and click ok.
 

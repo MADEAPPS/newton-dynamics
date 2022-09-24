@@ -10,8 +10,8 @@
 */
 
 
-#ifndef _NEWTON_PY_CONFIG_H_
-#define _NEWTON_PY_CONFIG_H_
+#ifndef _NEWTON_ANDROID_CONFIG_H_
+#define _NEWTON_ANDROID_CONFIG_H_
 
 
 #ifdef D_CLASS_REFLECTION
@@ -47,32 +47,26 @@
 #define D_COLLISION_API
 #define D_OPERATOR_NEW_AND_DELETE
 
-#define D_CLASS_REFLECTION(x)
-#define D_MSV_NEWTON_ALIGN_16
-#define D_GCC_NEWTON_ALIGN_16
-#define D_MSV_NEWTON_ALIGN_32
-#define D_GCC_NEWTON_ALIGN_32
+#ifndef D_CLASS_REFLECTION
+	#define D_CLASS_REFLECTION(x)
+#endif
 
-//#define ndFloat32 float
-//#define ndFloat64 double
-//#define ndInt8 signed char
-//#define ndInt16 signed short
-//#define ndInt32 signed int
-//#define ndInt64 signed long long
-//#define ndUnsigned8 unsigned char
-//#define ndUnsigned16 unsigned short
-//#define ndUnsigned32 unsigned int
-//#define ndUnsigned64 unsigned long long
+#ifndef D_MSV_NEWTON_ALIGN_16
+	#define D_MSV_NEWTON_ALIGN_16
+#endif
 
-//class XXXXX
-//{
-//	public:
-//	int xxxxxxxx0;
-//	dInt32 xxxxxxxx1;
-//
-//	int Get0() {return xxxxxxxx0;}
-//	dInt32 Get1() { return xxxxxxxx0; }
-//};
+#ifndef D_GCC_NEWTON_ALIGN_16
+	#define D_GCC_NEWTON_ALIGN_16
+#endif
+
+#ifndef D_MSV_NEWTON_ALIGN_32
+	#define D_MSV_NEWTON_ALIGN_32
+#endif
+
+#ifndef D_GCC_NEWTON_ALIGN_32
+	#define D_GCC_NEWTON_ALIGN_32
+#endif
+
 
 void dGetWorkingFileName(const char* const name, char* const outPathName);
 #endif 
