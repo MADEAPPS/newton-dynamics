@@ -12,6 +12,7 @@ import com.newton.nRigidBody;
 import com.newton.nBodyNotify;
 import com.newton.nShapeInstance;
 
+import com.javaNewton.RigidBody;
 import com.javaNewton.NewtonWorld;
 
 public class MainActivity extends AppCompatActivity
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 		location.SetIdentity();
 		location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 		
-		nRigidBody floor = new nRigidBody(nRigidBody.Type.m_dynamic);
+		RigidBody floor = new RigidBody(nRigidBody.Type.m_dynamic);
 		nShapeInstance box = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.f));
 
 		floor.SetNotifyCallback(new nBodyNotify());

@@ -61,7 +61,7 @@ class nRigidBody
 		}
 	}
 
-	~nRigidBody()
+	virtual ~nRigidBody()
 	{
 		if (m_body)
 		{
@@ -74,17 +74,17 @@ class nRigidBody
 		return m_body->GetId();
 	}
 
-	void SetMatrix(const nMatrix* const matrix)
+	virtual void SetMatrix(const nMatrix* const matrix)
 	{
 		m_body->SetMatrix(*matrix);
 	}
 
-	void SetCollisionShape(const nShapeInstance* const shapeInstance)
+	virtual void SetCollisionShape(const nShapeInstance* const shapeInstance)
 	{
 		m_body->SetCollisionShape(*shapeInstance);
 	}
 
-	void SetNotifyCallback(nBodyNotify* const notify)
+	virtual void SetNotifyCallback(nBodyNotify* const notify)
 	{
 		m_body->SetNotifyCallback(notify);
 	}
