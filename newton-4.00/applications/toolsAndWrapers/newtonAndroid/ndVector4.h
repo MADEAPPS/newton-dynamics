@@ -14,15 +14,15 @@
 
 #include "ndVector.h"
 
-class ndVector4 : public ndVector
+class vector4 : public ndVector
 {
 	public:
-	ndVector4()
+	vector4()
 		:ndVector()
 	{
 	}
 
-	ndVector4(float x, float y, float z, float w)
+	vector4(float x, float y, float z, float w)
 		:ndVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(y))
 	{
 	}

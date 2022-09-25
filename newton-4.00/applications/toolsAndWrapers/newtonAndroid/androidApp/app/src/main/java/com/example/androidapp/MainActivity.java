@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.newton.ndWorld;
-import com.newton.ndVector4;
+import com.newton.vector4;
 import com.newton.ndMatrix;
 
 public class MainActivity extends AppCompatActivity
@@ -33,10 +33,10 @@ public class MainActivity extends AppCompatActivity
 
 	protected void TestEngine()
     {
-	//world.SetSubSteps(1);
+	    //world.SetSubSteps(1);
 
-	//ndMatrix xxx = new ndMatrix();
-	ndVector4 xxx1 = new ndVector4(1.0f, 2.0f, 4.0f, 0.0f);
+	    //ndMatrix xxx = new ndMatrix();
+	    vector4 xxx1 = new vector4(1.0f, 2.0f, 4.0f, 0.0f);
         //ndVector size(0.5f, 0.25f, 0.8f, 0.0f);
         //ndVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 
