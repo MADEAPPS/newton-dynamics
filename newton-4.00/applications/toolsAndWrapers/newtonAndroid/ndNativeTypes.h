@@ -9,35 +9,53 @@
 * freely
 */
 
-#ifndef _ND_VECTOR4_H_
-#define _ND_VECTOR4_H_
+#ifndef _ND_NATIVE_TYPES_H_
+#define _ND_NATIVE_TYPES_H_
 
-#include "ndVector.h"
+#include "ndTypes.h"
 
-class ndVector4 : public ndVector
+class int32
 {
 	public:
-	ndVector4()
-		:ndVector()
+	int32(int value = 0)
+		:m_value(value)
 	{
 	}
 
-	ndVector4(float x, float y, float z, float w)
-		:ndVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(y))
+	int& operator()()
 	{
+		return m_value;
 	}
 
-	float Get(int i) const
+	const int operator()() const
 	{
-		return (*this)[i];
+		return m_value;
 	}
 
-	void Set(int i, float value)
-	{
-		(*this)[i] = value;
-	}
+	ndInt32 m_value;
 };
 
+
+class float32
+{
+	public:
+	float32(float value = 0)
+		:m_value(value)
+	{
+	}
+
+	float& operator()()
+	{
+		return m_value;
+	}
+
+	const float operator()() const
+	{
+		return m_value;
+	}
+
+	ndFloat32 m_value;
+};
 
 #endif 
 

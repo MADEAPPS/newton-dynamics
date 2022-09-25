@@ -408,17 +408,17 @@ void ndTheadPause()
 ndSetPrecisionDouble::ndSetPrecisionDouble()
 {
 	#if defined (WIN32) || defined(_WIN32)
-		ndClearFP();
-		m_mask = ndInt32(ndControlFP(0, 0));
-		ndControlFP(_PC_53, _MCW_PC);
+		_clearfp();
+		m_mask = ndInt32(_controlfp(0, 0));
+		_controlfp(_PC_53, _MCW_PC);
 	#endif
 }
 
 ndSetPrecisionDouble::~ndSetPrecisionDouble()
 {
 	#if defined (WIN32) || defined(_WIN32)
-		ndClearFP();
-		ndControlFP(ndUnsigned32(m_mask), _MCW_PC);
+		_clearfp();
+		_controlfp(ndUnsigned32(m_mask), _MCW_PC);
 	#endif
 }
 
