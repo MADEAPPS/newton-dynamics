@@ -13,6 +13,7 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set (projectName "ndNewton")
 message (${projectName})
 
+include_directories(.)
 include_directories(dCore)
 include_directories(dNewton)
 include_directories(dTinyxml)

@@ -34,8 +34,8 @@
 
 %{
 	#include <ndNewton.h>
-	//#include <ndWorld.h>
 	#include "newtonConfig.h"
+	#include "ndVector4.h"
 %}
 
 %include "newtonConfig.h"
@@ -119,3 +119,5 @@
 
 %include "../../../sdk/dNewton/ndWorld.h"
 
+
+%include "ndVector4.h"

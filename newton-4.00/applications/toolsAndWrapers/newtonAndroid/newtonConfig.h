@@ -67,7 +67,6 @@
 	#define D_GCC_NEWTON_ALIGN_32
 #endif
 
-
 void dGetWorkingFileName(const char* const name, char* const outPathName);
 #endif 
 
