@@ -35,16 +35,16 @@
 %{
 	#include <ndNewton.h>
 	#include "newtonConfig.h"
-	#include "ndNativeTypes.h"
-	#include "ndVector4.h"
+	#include "nativeTypes.h"
+	#include "vector4.h"
+	#include "matrix4.h"
+	#include "world.h"
+	#include "shape.h"
+	#include "shapeBox.h"
+	#include "shapeInstance.h"
 %}
 
 %include "newtonConfig.h"
-
-%rename(Set) int32::operator()();
-%rename(Get) int32::operator()() const;
-%rename(Set) float32::operator()();
-%rename(Get) float32::operator()() const;
 
 
 //%rename(GetElement) ndVector::operator[](ndInt32 i);
@@ -127,5 +127,10 @@
 %include "../../../sdk/dNewton/ndWorld.h"
 
 
-%include "ndNativeTypes.h"
-%include "ndVector4.h"
+%include "nativeTypes.h"
+%include "vector4.h"
+%include "matrix4.h"
+%include "world.h"
+%include "shape.h"
+%include "shapeBox.h"
+%include "shapeInstance.h"

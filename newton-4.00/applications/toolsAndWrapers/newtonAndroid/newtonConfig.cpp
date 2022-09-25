@@ -12,22 +12,54 @@
 #include "newtonStdafx.h"
 #include "newtonConfig.h"
 
+class MallocAndFree
+{
+	public:
+	static MallocAndFree& GetAllocator()
+	{
+		static MallocAndFree allocator;
+		return allocator;
+	}
+
+	void* Alloc(size_t size)
+	{
+		return PhysicsAlloc(size);
+	}
+
+	void Free(void* const ptr)
+	{
+		PhysicsFree(ptr);
+	}
+
+	private:
+	MallocAndFree()
+	{
+		ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+	}
+
+	static void* PhysicsAlloc(size_t sizeInBytes)
+	{
+		void* const ptr = malloc(sizeInBytes);
+		ndAssert(ptr);
+		return ptr;
+	}
+
+	static void PhysicsFree(void* ptr)
+	{
+		free(ptr);
+	}
+};
+
 void *operator new (size_t size)
 {
-	// this should not happens on this test
-	// newton should never use global operator new and delete.
-	
-	static bool allowStandardThreadAllocation = true;
-	void* const ptr = ndMemory::Malloc(size);
-	ndAssert(allowStandardThreadAllocation || ((ndUnsigned64(ptr) & (0x1f)) == 0));
-	allowStandardThreadAllocation = false;
-	return ptr;
+	MallocAndFree& allocator = MallocAndFree::GetAllocator();
+	return allocator.Alloc(size);
 }
 
 void operator delete (void* ptr) noexcept
 {
-	//dAssert(0);
-	ndMemory::Free(ptr);
+	MallocAndFree& allocator = MallocAndFree::GetAllocator();
+	allocator.Free(ptr);
 }
 
 // Windows user assets path

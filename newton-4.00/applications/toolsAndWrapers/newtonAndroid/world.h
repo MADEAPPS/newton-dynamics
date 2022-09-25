@@ -9,35 +9,28 @@
 * freely
 */
 
-#ifndef _ND_VECTOR4_H_
-#define _ND_VECTOR4_H_
+#ifndef _ND_WORLD_H_
+#define _ND_WORLD_H_
 
 #include "ndVector.h"
 
-class vector4 : public ndVector
+namespace nd
 {
-	public:
-	vector4()
-		:ndVector()
+	class World : public ndWorld
 	{
-	}
+		public:
+		World()
+			:ndWorld()
+		{
+		}
 
-	vector4(float x, float y, float z, float w)
-		:ndVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(y))
-	{
-	}
+		void SetSubSteps(int i)
+		{
+			ndWorld::SetSubSteps(i);
+		}
+	};
 
-	float Get(int i) const
-	{
-		return (*this)[i];
-	}
-
-	void Set(int i, float value)
-	{
-		(*this)[i] = value;
-	}
-};
-
+}
 
 #endif 
 
