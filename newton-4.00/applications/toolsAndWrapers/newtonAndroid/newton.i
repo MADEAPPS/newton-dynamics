@@ -34,62 +34,61 @@
 
 %{
 	#include <ndNewton.h>
-	#include "newtonConfig.h"
-	#include "nativeTypes.h"
-	#include "vector4.h"
-	#include "matrix4.h"
-	#include "world.h"
-	#include "shape.h"
-	#include "shapeBox.h"
-	#include "shapeInstance.h"
+	#include "nConfig.h"
+	#include "nTypes.h"
+	#include "nWorld.h"
+	#include "nShape.h"
+	#include "nVector.h"
+	#include "nMatrix.h"
+	#include "nShapeBox.h"
+	#include "nRigidBody.h"
+	#include "nBodyNotify.h"
+	#include "nShapeInstance.h"
 %}
 
-%include "newtonConfig.h"
-
+%include "nConfig.h"
 
 //%rename(GetElement) ndVector::operator[](ndInt32 i);
 //%rename(GetElement) ndVector::operator[](ndInt32 i) const;
-%rename(Add) ndVector::operator+(const ndVector& src) const;
-%rename(Sub) ndVector::operator-(const ndVector& src) const;
-%rename(Mul) ndVector::operator*(const ndVector& src) const;
-%rename(AddEqual) ndVector::operator+=(const ndVector& src);
-%rename(SubEqual) ndVector::operator-=(const ndVector& src);
-%rename(MulEqual) ndVector::operator*=(const ndVector& src);
-%rename(Or) ndVector::operator|(const ndVector& src) const;
-%rename(And) ndVector::operator&(const ndVector& src) const;
-%rename(Xor) ndVector::operator^(const ndVector& src) const;
-%rename(Less) ndVector::operator<(const ndVector& src) const;
-%rename(Greather) ndVector::operator>(const ndVector& src) const;
-%rename(Identical) ndVector::operator==(const ndVector& src) const;
-%rename(LessEqual) ndVector::operator<=(const ndVector& src) const;
-%rename(GreatherEqual) ndVector::operator>=(const ndVector& src) const;
+//%rename(Add) ndVector::operator+(const ndVector& src) const;
+//%rename(Sub) ndVector::operator-(const ndVector& src) const;
+//%rename(Mul) ndVector::operator*(const ndVector& src) const;
+//%rename(AddEqual) ndVector::operator+=(const ndVector& src);
+//%rename(SubEqual) ndVector::operator-=(const ndVector& src);
+//%rename(MulEqual) ndVector::operator*=(const ndVector& src);
+//%rename(Or) ndVector::operator|(const ndVector& src) const;
+//%rename(And) ndVector::operator&(const ndVector& src) const;
+//%rename(Xor) ndVector::operator^(const ndVector& src) const;
+//%rename(Less) ndVector::operator<(const ndVector& src) const;
+//%rename(Greather) ndVector::operator>(const ndVector& src) const;
+//%rename(Identical) ndVector::operator==(const ndVector& src) const;
+//%rename(LessEqual) ndVector::operator<=(const ndVector& src) const;
+//%rename(GreatherEqual) ndVector::operator>=(const ndVector& src) const;
+//%rename(GetElement) ndBigVector::operator[](ndInt32 i);
+//%rename(GetElement) ndBigVector::operator[](ndInt32 i) const;
+//%rename(Add) ndBigVector::operator+(const ndBigVector& src) const;
+//%rename(Sub) ndBigVector::operator-(const ndBigVector& src) const;
+//%rename(Mul) ndBigVector::operator*(const ndBigVector& src) const;
+//%rename(AddEqual) ndBigVector::operator+=(const ndBigVector& src);
+//%rename(SubEqual) ndBigVector::operator-=(const ndBigVector& src);
+//%rename(MulEqual) ndBigVector::operator*=(const ndBigVector& src);
+//%rename(Or) ndBigVector::operator|(const ndBigVector& src) const;
+//%rename(And) ndBigVector::operator&(const ndBigVector& src) const;
+//%rename(Xor) ndBigVector::operator^(const ndBigVector& src) const;
+//%rename(Less) ndBigVector::operator<(const ndBigVector& src) const;
+//%rename(Greather) ndBigVector::operator>(const ndBigVector& src) const;
+//%rename(Identical) ndBigVector::operator==(const ndBigVector& src) const;
+//%rename(LessEqual) ndBigVector::operator<=(const ndBigVector& src) const;
+//%rename(GreatherEqual) ndBigVector::operator>=(const ndBigVector& src) const;
 
-%rename(GetElement) ndBigVector::operator[](ndInt32 i);
-%rename(GetElement) ndBigVector::operator[](ndInt32 i) const;
-%rename(Add) ndBigVector::operator+(const ndBigVector& src) const;
-%rename(Sub) ndBigVector::operator-(const ndBigVector& src) const;
-%rename(Mul) ndBigVector::operator*(const ndBigVector& src) const;
-%rename(AddEqual) ndBigVector::operator+=(const ndBigVector& src);
-%rename(SubEqual) ndBigVector::operator-=(const ndBigVector& src);
-%rename(MulEqual) ndBigVector::operator*=(const ndBigVector& src);
-%rename(Or) ndBigVector::operator|(const ndBigVector& src) const;
-%rename(And) ndBigVector::operator&(const ndBigVector& src) const;
-%rename(Xor) ndBigVector::operator^(const ndBigVector& src) const;
-%rename(Less) ndBigVector::operator<(const ndBigVector& src) const;
-%rename(Greather) ndBigVector::operator>(const ndBigVector& src) const;
-%rename(Identical) ndBigVector::operator==(const ndBigVector& src) const;
-%rename(LessEqual) ndBigVector::operator<=(const ndBigVector& src) const;
-%rename(GreatherEqual) ndBigVector::operator>=(const ndBigVector& src) const;
 
+%rename(Assigment) ndShapeInstance::operator=;  
 %rename(GetElement) ndMatrix::operator[](ndInt32 i);
 %rename(GetElement) ndMatrix::operator[](ndInt32 i) const;
 %rename(GetElement) ndMatrix::operator*(const ndMatrix& src) const;
-
 %rename(Add) ndQuaternion::operator+(const ndQuaternion& src) const;
 %rename(Sub) ndQuaternion::operator-(const ndQuaternion& src) const;
 %rename(Mul) ndQuaternion::operator*(const ndQuaternion& src) const;
-
-%rename(Assigment) ndShapeInstance::operator=;  
 
 %rename(Create) ndShapeStatic_bvh::operator new;  
 %rename(Destroy) ndShapeStatic_bvh::operator delete;  
@@ -117,7 +116,7 @@
 %include "../../../sdk/dCollision/ndBodyKinematic.h"
 %include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
 %include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
-%include "../../../sdk/dCollision/ndBodyKinematicSpecial.h"
+%include "../../../sdk/dCollision/ndBodyKinematicBase.h"
 
 %include "../../../sdk/dCollision/ndBodyNotify.h"
 %include "../../../sdk/dCollision/ndContactNotify.h"
@@ -126,11 +125,12 @@
 
 %include "../../../sdk/dNewton/ndWorld.h"
 
-
-%include "nativeTypes.h"
-%include "vector4.h"
-%include "matrix4.h"
-%include "world.h"
-%include "shape.h"
-%include "shapeBox.h"
-%include "shapeInstance.h"
+%include "nTypes.h"
+%include "nVector.h"
+%include "nMatrix.h"
+%include "nWorld.h"
+%include "nShape.h"
+%include "nShapeBox.h"
+%include "nRigidBody.h"
+%include "nBodyNotify.h"
+%include "nShapeInstance.h"

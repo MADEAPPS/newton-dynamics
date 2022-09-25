@@ -9,28 +9,21 @@
 * freely
 */
 
-#ifndef _SHAPE_INSTANCE_H_
-#define _SHAPE_INSTANCE_H_
+#ifndef _N_BODY_NOTIFY_H_
+#define _N_BODY_NOTIFY_H_
 
-#include "shape.h"
-#include "ndShape.h"
-#include "ndShapeInstance.h"
+#include "ndBodyNotify.h"
 
-namespace nd
+class nBodyNotify : public ndBodyNotify
 {
-	class ShapeInstance : public ndShapeInstance
+	public:
+	nBodyNotify()
+		:ndBodyNotify(ndVector::m_zero)
 	{
-		public:
-		ShapeInstance(Shape* const shape)
-			:ndShapeInstance(shape->GetShape())
-		{
-		}
+	}
 
-		~ShapeInstance()
-		{
-		}
-	};
-}
+};
+
 
 #endif 
 

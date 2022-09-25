@@ -19,36 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndCoreStdafx.h"
+#ifndef __ND_BODY_KINEMATIC_SPETIAL_H__
+#define __ND_BODY_KINEMATIC_SPETIAL_H__
+
 #include "ndCollisionStdafx.h"
-#include "ndContact.h"
-#include "ndBodyKinematicSpecial.h"
+#include "ndBodyKinematic.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematicSpecial)
-
-ndBodyKinematicSpecial::ndBodyKinematicSpecial()
-	:ndBodyKinematic()
+D_MSV_NEWTON_ALIGN_32
+class ndBodyKinematicBase : public ndBodyKinematic
 {
-	m_contactTestOnly = 1;
+	public:
+	D_CLASS_REFLECTION(ndBodyKinematicBase);
+	D_COLLISION_API ndBodyKinematicBase();
+	D_COLLISION_API ndBodyKinematicBase(const ndLoadSaveBase::ndLoadDescriptor& desc);
+	D_COLLISION_API virtual ~ndBodyKinematicBase();
+
+	void SpecialUpdate(ndFloat32 timestep);
+	ndBodyKinematicBase* GetAsBodyKinematicSpecial();
+
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+} D_GCC_NEWTON_ALIGN_32;
+
+inline ndBodyKinematicBase* ndBodyKinematicBase::GetAsBodyKinematicSpecial()
+{ 
+	return this; 
 }
 
-ndBodyKinematicSpecial::ndBodyKinematicSpecial(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyKinematic(ndLoadSaveBase::ndLoadDescriptor(desc))
+inline void ndBodyKinematicBase::SpecialUpdate(ndFloat32)
 {
-	m_contactTestOnly = 1;
+	ndAssert(0);
 }
 
-ndBodyKinematicSpecial::~ndBodyKinematicSpecial()
-{
-}
-
-void ndBodyKinematicSpecial::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
-
-	// nothing to save so far
-}
-
+#endif

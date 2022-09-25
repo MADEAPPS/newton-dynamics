@@ -407,7 +407,7 @@ void ndTheadPause()
 
 ndSetPrecisionDouble::ndSetPrecisionDouble()
 {
-	#if defined (WIN32) || defined(_WIN32)
+	#if ((defined (WIN32) || defined(_WIN32)) && defined(_M_IX86))
 		_clearfp();
 		m_mask = ndInt32(_controlfp(0, 0));
 		_controlfp(_PC_53, _MCW_PC);
@@ -416,7 +416,7 @@ ndSetPrecisionDouble::ndSetPrecisionDouble()
 
 ndSetPrecisionDouble::~ndSetPrecisionDouble()
 {
-	#if defined (WIN32) || defined(_WIN32)
+	#if ((defined (WIN32) || defined(_WIN32)) && defined(_M_IX86))
 		_clearfp();
 		_controlfp(ndUnsigned32(m_mask), _MCW_PC);
 	#endif
@@ -430,7 +430,7 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 		_controlfp(m_floatMask & ~mask, _MCW_EM);
 	#endif
 	
-	#if (defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
+	#if (defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64))
 		m_simdMask = _mm_getcsr();
 		_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
@@ -453,7 +453,7 @@ ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 
 ndFloatExceptions::~ndFloatExceptions()
 {
-	#if (defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
+	#if (defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64))
 		_mm_setcsr(m_simdMask);
 	#endif
 

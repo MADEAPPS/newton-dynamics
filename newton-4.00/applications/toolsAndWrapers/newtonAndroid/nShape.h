@@ -9,28 +9,26 @@
 * freely
 */
 
-#ifndef _ND_WORLD_H_
-#define _ND_WORLD_H_
+#ifndef _N_SHAPE_H_
+#define _N_SHAPE_H_
 
-#include "ndVector.h"
+#include "ndShape.h"
 
-namespace nd
+class nShape
 {
-	class World : public ndWorld
+	protected:
+	nShape(ndShape* const shape)
+		:m_shape(shape)
 	{
-		public:
-		World()
-			:ndWorld()
-		{
-		}
+	}
 
-		void SetSubSteps(int i)
-		{
-			ndWorld::SetSubSteps(i);
-		}
-	};
+	virtual ~nShape()
+	{
+	}
 
-}
+	ndShape* m_shape;
+	friend class nShapeInstance;
+};
 
 #endif 
 

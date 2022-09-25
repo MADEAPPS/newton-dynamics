@@ -10,8 +10,8 @@
 */
 
 
-#ifndef _NEWTON_PY_STDAFX_H_
-#define _NEWTON_PY_STDAFX_H_
+#ifndef _N_STDAFX_H_
+#define _N_STDAFX_H_
 
 // Insert your headers here
 #define WIN32_LEAN_AND_MEAN	

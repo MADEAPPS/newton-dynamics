@@ -23,13 +23,13 @@
 #define __ND_BODY_PLAYER_CAPSULE_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndBodyKinematicSpecial.h"
+#include "ndBodyKinematicBase.h"
 
 class ndBodyPlayerCapsuleContactSolver;
 class ndBodyPlayerCapsuleImpulseSolver;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyPlayerCapsule : public ndBodyKinematicSpecial
+class ndBodyPlayerCapsule : public ndBodyKinematicBase
 {
 	public:
 	D_CLASS_REFLECTION(ndBodyPlayerCapsule);

@@ -9,5 +9,9 @@
 * freely
 */
 
-#include "newtonStdafx.h"
+#ifndef _N_TYPES_H_
+#define _N_TYPES_H_
+
+
+#endif 
 

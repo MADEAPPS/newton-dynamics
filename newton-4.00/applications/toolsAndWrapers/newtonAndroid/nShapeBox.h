@@ -9,34 +9,20 @@
 * freely
 */
 
-#ifndef _SHAPE_H_
-#define _SHAPE_H_
+#ifndef _N_SHAPE_BOX_H_
+#define _N_SHAPE_BOX_H_
 
-#include "ndShape.h"
+#include "nShape.h"
+#include "ndShapeBox.h"
 
-namespace nd
+class nShapeBox: public nShape
 {
-	class Shape
+	public:
+	nShapeBox(float size_x, float size_y, float size_z)
+		:nShape(new ndShapeBox(size_x, size_y, size_z))
 	{
-		public:
-		ndShape* GetShape() const
-		{
-			return m_shape;
-		}
-		
-		protected:
-		Shape(ndShape* const shape)
-			:m_shape(shape)
-		{
-		}
-
-		virtual ~Shape()
-		{
-		}
-
-		ndShape* m_shape;
-	};
-}
+	}
+};
 
 #endif 
 

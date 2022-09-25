@@ -110,7 +110,7 @@
 %include "../../../sdk/dCollision/ndBodyKinematic.h"
 %include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
 %include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
-%include "../../../sdk/dCollision/ndBodyKinematicSpecial.h"
+%include "../../../sdk/dCollision/ndBodyKinematicBase.h"
 
 %include "../../../sdk/dCollision/ndBodyNotify.h"
 %include "../../../sdk/dCollision/ndContactNotify.h"

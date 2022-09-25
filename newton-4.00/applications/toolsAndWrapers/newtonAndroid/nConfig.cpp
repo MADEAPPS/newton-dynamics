@@ -9,8 +9,8 @@
 * freely
 */
 
-#include "newtonStdafx.h"
-#include "newtonConfig.h"
+#include "nStdafx.h"
+#include "nConfig.h"
 
 class MallocAndFree
 {

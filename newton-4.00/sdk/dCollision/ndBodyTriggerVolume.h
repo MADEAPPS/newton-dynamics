@@ -23,10 +23,10 @@
 #define __ND_BODY_TRIGGER_VOLUME_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndBodyKinematicSpecial.h"
+#include "ndBodyKinematicBase.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyTriggerVolume : public ndBodyKinematicSpecial
+class ndBodyTriggerVolume : public ndBodyKinematicBase
 {
 	public:
 	D_CLASS_REFLECTION(ndBodyTriggerVolume);

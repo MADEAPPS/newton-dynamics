@@ -27,13 +27,13 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyTriggerVolume)
 
 ndBodyTriggerVolume::ndBodyTriggerVolume()
-	:ndBodyKinematicSpecial()
+	:ndBodyKinematicBase()
 {
 	//m_contactTestOnly = 1;
 }
 
 ndBodyTriggerVolume::ndBodyTriggerVolume(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyKinematicSpecial(ndLoadSaveBase::ndLoadDescriptor(desc))
+	:ndBodyKinematicBase(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	//m_contactTestOnly = 1;
 }
@@ -47,7 +47,7 @@ void ndBodyTriggerVolume::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) con
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematicSpecial::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+	ndBodyKinematicBase::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	// nothing to save so far
 }

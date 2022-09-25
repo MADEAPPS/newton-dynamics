@@ -9,23 +9,25 @@
 * freely
 */
 
-#ifndef _SHAPE_BOX_H_
-#define _SHAPE_BOX_H_
+#ifndef _N_SHAPE_INSTANCE_H_
+#define _N_SHAPE_INSTANCE_H_
 
-#include "shape.h"
-#include "ndShapeBox.h"
+#include "nShape.h"
+#include "ndShape.h"
+#include "ndShapeInstance.h"
 
-namespace nd
+class nShapeInstance : public ndShapeInstance
 {
-	class ShapeBox: public Shape
+	public:
+	nShapeInstance(nShape* const shape)
+		:ndShapeInstance(shape->m_shape)
 	{
-		public:
-		ShapeBox(float size_x, float size_y, float size_z)
-			:Shape(new ndShapeBox(size_x, size_y, size_z))
-		{
-		}
-	};
-}
+	}
+
+	~nShapeInstance()
+	{
+	}
+};
 
 #endif 
 

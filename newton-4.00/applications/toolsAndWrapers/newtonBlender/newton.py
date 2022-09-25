@@ -331,17 +331,17 @@ class ndConvexHullInfo(object):
 # Register ndConvexHullInfo in _newton:
 _newton.ndConvexHullInfo_swigregister(ndConvexHullInfo)
 
-class ndCoumpoundInfo(object):
+class ndCompoundInfo(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
-    m_noUsed = property(_newton.ndCoumpoundInfo_m_noUsed_get, _newton.ndCoumpoundInfo_m_noUsed_set)
+    m_noUsed = property(_newton.ndCompoundInfo_m_noUsed_get, _newton.ndCompoundInfo_m_noUsed_set)
 
     def __init__(self):
-        _newton.ndCoumpoundInfo_swiginit(self, _newton.new_ndCoumpoundInfo())
-    __swig_destroy__ = _newton.delete_ndCoumpoundInfo
+        _newton.ndCompoundInfo_swiginit(self, _newton.new_ndCompoundInfo())
+    __swig_destroy__ = _newton.delete_ndCompoundInfo
 
-# Register ndCoumpoundInfo in _newton:
-_newton.ndCoumpoundInfo_swigregister(ndCoumpoundInfo)
+# Register ndCompoundInfo in _newton:
+_newton.ndCompoundInfo_swigregister(ndCompoundInfo)
 
 class ndProceduralInfoInfo(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -1298,25 +1298,25 @@ class ndBodyPlayerCapsule(object):
 # Register ndBodyPlayerCapsule in _newton:
 _newton.ndBodyPlayerCapsule_swigregister(ndBodyPlayerCapsule)
 
-class ndBodyKinematicSpecial(ndBodyKinematic):
+class ndBodyKinematicBase(ndBodyKinematic):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
     def __init__(self, *args):
-        _newton.ndBodyKinematicSpecial_swiginit(self, _newton.new_ndBodyKinematicSpecial(*args))
-    __swig_destroy__ = _newton.delete_ndBodyKinematicSpecial
+        _newton.ndBodyKinematicBase_swiginit(self, _newton.new_ndBodyKinematicBase(*args))
+    __swig_destroy__ = _newton.delete_ndBodyKinematicBase
 
     def SpecialUpdate(self, timestep):
-        return _newton.ndBodyKinematicSpecial_SpecialUpdate(self, timestep)
+        return _newton.ndBodyKinematicBase_SpecialUpdate(self, timestep)
 
     def GetAsBodyKinematicSpecial(self):
-        return _newton.ndBodyKinematicSpecial_GetAsBodyKinematicSpecial(self)
+        return _newton.ndBodyKinematicBase_GetAsBodyKinematicSpecial(self)
 
     def Save(self, desc):
-        return _newton.ndBodyKinematicSpecial_Save(self, desc)
+        return _newton.ndBodyKinematicBase_Save(self, desc)
 
-# Register ndBodyKinematicSpecial in _newton:
-_newton.ndBodyKinematicSpecial_swigregister(ndBodyKinematicSpecial)
+# Register ndBodyKinematicBase in _newton:
+_newton.ndBodyKinematicBase_swigregister(ndBodyKinematicBase)
 
 class ndBodyNotify(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")

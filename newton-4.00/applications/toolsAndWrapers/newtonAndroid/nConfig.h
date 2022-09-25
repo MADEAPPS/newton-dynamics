@@ -10,8 +10,8 @@
 */
 
 
-#ifndef _NEWTON_ANDROID_CONFIG_H_
-#define _NEWTON_ANDROID_CONFIG_H_
+#ifndef _N_CONFIG_H_
+#define _N_CONFIG_H_
 
 
 #ifdef D_CLASS_REFLECTION

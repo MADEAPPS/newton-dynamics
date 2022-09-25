@@ -79,7 +79,7 @@ class ndBodyPlayerCapsuleImpulseSolver
 } D_GCC_NEWTON_ALIGN_32;
 
 ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight)
-	:ndBodyKinematicSpecial()
+	:ndBodyKinematicBase()
 {
 	//m_contactTestOnly = 1;
 	m_impulse = ndVector::m_zero;
@@ -117,7 +117,7 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 ma
 }
 
 ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndBodyKinematicSpecial(ndLoadSaveBase::ndLoadDescriptor(desc))
+	:ndBodyKinematicBase(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	//m_contactTestOnly = 1;
@@ -155,7 +155,7 @@ void ndBodyPlayerCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) con
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematicSpecial::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+	ndBodyKinematicBase::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "localFrame", m_localFrame);
 	xmlSaveParam(childNode, "mass", m_mass);

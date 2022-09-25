@@ -9,43 +9,40 @@
 * freely
 */
 
-#ifndef _ND_MATRIX4_H_
-#define _ND_MATRIX4_H_
+#ifndef _N_MATRIX_H_
+#define _N_MATRIX_H_
 
 #include "ndMatrix.h"
-#include "vector4.h"
+#include "nVector.h"
 
-namespace nd
+class nMatrix : public ndMatrix
 {
-	class Matrix4 : public ndMatrix
+	public:
+	nMatrix()
+		:ndMatrix()
 	{
-		public:
-		Matrix4()
-			:ndMatrix()
-		{
-		}
+	}
 
-		Matrix4(const ndMatrix& matrix)
-			:ndMatrix(matrix)
-		{
-		}
+	nMatrix(const ndMatrix& matrix)
+		:ndMatrix(matrix)
+	{
+	}
 
-		void SetIdentity()
-		{
-			*this = ndGetIdentityMatrix();
-		}
+	void SetIdentity()
+	{
+		*this = ndGetIdentityMatrix();
+	}
 
-		Vector4 Get(int i) const
-		{
-			return Vector4((*this)[i]);
-		}
+	nVector Get(int i) const
+	{
+		return nVector((*this)[i]);
+	}
 
-		void Set(int i, Vector4& value)
-		{
-			(*this)[i] = value;
-		}
-	};
-}
+	void Set(int i, nVector& value)
+	{
+		(*this)[i] = value;
+	}
+};
 
 #endif 
 

@@ -4,11 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.newton.World;
-import com.newton.Vector4;
-import com.newton.Matrix4;
-import com.newton.ShapeBox;
-import com.newton.ShapeInstance;
+import com.newton.nWorld;
+import com.newton.nVector;
+import com.newton.nMatrix;
+import com.newton.nShapeBox;
+import com.newton.nRigidBody;
+import com.newton.nBodyNotify;
+import com.newton.nShapeInstance;
+
+import com.javaNewton.NewtonWorld;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -18,7 +22,7 @@ public class MainActivity extends AppCompatActivity
         System.loadLibrary("ndNewton");
     }
 
-    World world;
+   NewtonWorld world;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -27,25 +31,28 @@ public class MainActivity extends AppCompatActivity
 		setContentView(R.layout.activity_main);
 
 		// create an instance of the newton engine
-		world = new World();
-		world.Sync();
+		world = new NewtonWorld();
+		world.SetSubSteps(2);
+		
 
 		TestEngine();
     }
 
 	protected void TestEngine()
     {
-	    world.SetSubSteps(2);
+	    world.Sync();
 
-		ShapeInstance box = new ShapeInstance(new ShapeBox(200.0f, 1.0f, 200.f));
+		nMatrix location = new nMatrix();
+		location.SetIdentity();
+		location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
+		
+		nRigidBody floor = new nRigidBody(nRigidBody.Type.m_dynamic);
+		nShapeInstance box = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.f));
 
-	    Matrix4 xxx = new Matrix4();
-	    Vector4 xxx1 = new Vector4(1.0f, 2.0f, 4.0f, 0.0f);
-
-		xxx.SetIdentity();
-        //ndVector size(0.5f, 0.25f, 0.8f, 0.0f);
-        //ndVector origin(0.0f, 0.0f, 0.0f, 0.0f);
-
-        //ndBodyDynamic* bodyFloor = BuildFloorBox(world);
+		floor.SetNotifyCallback(new nBodyNotify());
+		floor.SetMatrix(location);
+		floor.SetCollisionShape(box);
+		//body->SetMassMatrix(mass, box);
+		world.AddBody(floor);
     }
 }
