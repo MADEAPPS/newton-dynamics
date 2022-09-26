@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
 set (projectName "ndNewton")
 message (${projectName})
+project(ProjectName)
 
 include_directories(.)
 include_directories(dCore)
