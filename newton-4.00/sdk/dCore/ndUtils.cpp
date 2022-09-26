@@ -26,14 +26,6 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
-//#if (defined(__arm__) || defined(__aarch64__))
-//  //#include <arm_acle.h>
-//  //#define _pause() __yield()
-//  //#define ND_CPUPauseInstruction() __asm__ __volatile__("yield" ::: "memory")
-//  #define ARM_FPU_GETCW(fpscr) __asm__ __volatile__("mrs %0, fpscr" : "=r"(fpscr))
-//  #define ARM_FPU_SETCW(fpscr) __asm__ __volatile__("msr fpscr, %0" : : "r"(fpscr))
-//#endif
-
 #define D_VERTEXLIST_INDEX_LIST_BASH (1024)
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)
@@ -365,8 +357,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 
 ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
 {
-	ndSetPrecisionDouble precision;
-
 	if (strideInBytes < 3 * ndInt32(sizeof(ndFloat64))) 
 	{
 		return 0;
@@ -402,24 +392,6 @@ void ndTheadPause()
 		x += count;
 	}
 #endif
-}
-
-
-ndSetPrecisionDouble::ndSetPrecisionDouble()
-{
-	#if ((defined (WIN32) || defined(_WIN32)) && defined(_M_IX86))
-		_clearfp();
-		m_mask = ndInt32(_controlfp(0, 0));
-		_controlfp(_PC_53, _MCW_PC);
-	#endif
-}
-
-ndSetPrecisionDouble::~ndSetPrecisionDouble()
-{
-	#if ((defined (WIN32) || defined(_WIN32)) && defined(_M_IX86))
-		_clearfp();
-		_controlfp(ndUnsigned32(m_mask), _MCW_PC);
-	#endif
 }
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)

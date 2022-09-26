@@ -152,6 +152,9 @@ D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 /// \return a 64 bit double precision with a 32 bit mantissa
 D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 
+D_CORE_API void ndTheadPause();
+D_CORE_API void ndThreadYield();
+
 D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
 template <class T>
@@ -184,36 +187,6 @@ ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndIn
 
 	return count;
 }
-
-/// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
-class ndFloatExceptions
-{
-	public:
-	//#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-	#if defined (WIN32) || defined(_WIN32)
-		#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL)
-	#else
-		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_INEXACT)
-	#endif
-
-	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXCEPTIONS_MASK);
-	D_CORE_API ~ndFloatExceptions();
-
-	private:
-	ndUnsigned32 m_floatMask;
-	ndUnsigned32 m_simdMask;
-};
-
-/// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
-class ndSetPrecisionDouble 
-{
-	public:
-	D_CORE_API ndSetPrecisionDouble();
-	D_CORE_API ~ndSetPrecisionDouble();
-	
-	ndInt32 m_mask; 
-};
-
 
 /// Simple spin lock for synchronizing threads for very short period of time.
 class ndSpinLock
@@ -269,8 +242,25 @@ class ndScopeSpinLock
 	ndSpinLock& m_spinLock;
 };
 
-D_CORE_API void ndTheadPause();
-D_CORE_API void ndThreadYield();
+/// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
+class ndFloatExceptions
+{
+	public:
+	//#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+	#if defined (WIN32) || defined(_WIN32)
+		#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL)
+	#else
+		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_INEXACT)
+	#endif
+
+	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXCEPTIONS_MASK);
+	D_CORE_API ~ndFloatExceptions();
+
+	private:
+	ndUnsigned32 m_floatMask;
+	ndUnsigned32 m_simdMask;
+};
+
 
 #endif
 

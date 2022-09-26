@@ -278,8 +278,6 @@ void ndConvexHull3d::Save(const char* const filename) const
 
 void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount)
 {
-	ndSetPrecisionDouble precision;
-
 	ndInt32 treeCount = count / (DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE>>1);
 	if (treeCount < 4) 
 	{

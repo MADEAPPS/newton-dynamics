@@ -29,7 +29,6 @@
 ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const ndFloat64* const vertexCloud, ndInt32 count, ndInt32 strideInByte, ndFloat64 distTol)
 	:ndConvexHull4d()
 {
-	ndSetPrecisionDouble precision;
 	ndStack<ndBigVector> pool(count + 2);
 
 	ndBigVector* const points = &pool[0];
@@ -113,8 +112,6 @@ ndDelaunayTetrahedralization::~ndDelaunayTetrahedralization()
 
 ndInt32 ndDelaunayTetrahedralization::AddVertex (const ndBigVector& vertex)
 {
-	ndSetPrecisionDouble precision;
-
 	ndBigVector p (vertex);
 	ndAssert(p.m_w == ndFloat32(0.0f));
 	p.m_w = p.DotProduct(p).GetScalar();
@@ -161,8 +158,6 @@ void ndDelaunayTetrahedralization::SortVertexArray ()
 
 void ndDelaunayTetrahedralization::RemoveUpperHull ()
 {
-	ndSetPrecisionDouble precision;
-
 	ndNode* nextNode = NULL;
 	for (ndNode* node = GetFirst(); node; node = nextNode) 
 	{

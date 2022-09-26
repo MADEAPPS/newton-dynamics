@@ -1045,7 +1045,6 @@ ndConvexHull4d::ndNode* ndConvexHull4d::FindFacingNode(const ndBigVector& vertex
 
 ndInt32 ndConvexHull4d::AddVertex (const ndBigVector& vertex)
 {
-	ndSetPrecisionDouble precision;
 	ndInt32 index = -1;
 	ndNode* const faceNode = FindFacingNode(vertex);
 	if (faceNode) 
