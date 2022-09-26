@@ -35,15 +35,15 @@
 %{
 	#include <ndNewton.h>
 	#include "nConfig.h"
-	#include "nTypes.h"
-	#include "nWorld.h"
+	#include "ndWorldGlue.h"
+	#include "ndRigidBodyGlue.h"
+	#include "ndBodyNotifyGlue.h"
+	#include "ndShapeInstanceGlue.h"
 	#include "nShape.h"
 	#include "nVector.h"
 	#include "nMatrix.h"
 	#include "nShapeBox.h"
-	#include "nRigidBody.h"
-	#include "nBodyNotify.h"
-	#include "nShapeInstance.h"
+	
 %}
 
 %include "nConfig.h"
@@ -125,12 +125,13 @@
 
 %include "../../../sdk/dNewton/ndWorld.h"
 
-%include "nTypes.h"
 %include "nVector.h"
 %include "nMatrix.h"
-%include "nWorld.h"
 %include "nShape.h"
 %include "nShapeBox.h"
-%include "nRigidBody.h"
-%include "nBodyNotify.h"
-%include "nShapeInstance.h"
+
+%include "ndWorldGlue.h"
+%include "ndRigidBodyGlue.h"
+%include "ndBodyNotifyGlue.h"
+%include "ndShapeInstanceGlue.h"
+

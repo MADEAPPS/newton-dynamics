@@ -9,20 +9,20 @@
 * freely
 */
 
-#ifndef _ND_WORLD_H_
-#define _ND_WORLD_H_
+#ifndef _ND_WORLD_GLUE_H_
+#define _ND_WORLD_GLUE_H_
 
-#include "nRigidBody.h"
+#include "ndRigidBodyGlue.h"
 
-class nWorld : public ndWorld
+class ndWorldGlue : public ndWorld
 {
 	public:
-	nWorld()
+	ndWorldGlue()
 		:ndWorld()
 	{
 	}
 
-	~nWorld()
+	~ndWorldGlue()
 	{
 	}
 
@@ -31,16 +31,20 @@ class nWorld : public ndWorld
 		ndWorld::SetSubSteps(i);
 	}
 
-	virtual void AddBody(nRigidBody* const body)
+	virtual void AddBody(ndRigidBodyGlue* const body)
 	{
 		ndWorld::AddBody(body->m_body);
 	}
 
-	virtual void RemoveBody(nRigidBody* const body)
+	virtual void RemoveBody(ndRigidBodyGlue* const body)
 	{
 		ndWorld::RemoveBody(body->m_body);
 	}
 
+	virtual void Update(float timestep)
+	{
+		ndWorld::Update(timestep);
+	}
 };
 
 #endif 

@@ -27,7 +27,7 @@ class nShape
 	}
 
 	ndShape* m_shape;
-	friend class nShapeInstance;
+	friend class ndShapeInstanceGlue;
 };
 
 #endif 

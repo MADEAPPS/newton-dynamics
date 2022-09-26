@@ -9,25 +9,31 @@
 * freely
 */
 
-#ifndef _N_SHAPE_INSTANCE_H_
-#define _N_SHAPE_INSTANCE_H_
+#ifndef _ND_BODY_NOTIFY_GLUE_H_
+#define _ND_BODY_NOTIFY_GLUE_H_
 
-#include "nShape.h"
-#include "ndShape.h"
-#include "ndShapeInstance.h"
+#include "nMatrix.h"
+#include "ndBodyNotify.h"
 
-class nShapeInstance : public ndShapeInstance
+class ndBodyNotifyGlue : public ndBodyNotify
 {
 	public:
-	nShapeInstance(nShape* const shape)
-		:ndShapeInstance(shape->m_shape)
+	ndBodyNotifyGlue()
+		:ndBodyNotify(ndVector::m_zero)
 	{
 	}
 
-	~nShapeInstance()
+	virtual void OnTransform(const nMatrix& matrix)
 	{
 	}
+
+	protected:
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
+	{
+		OnTransform(nMatrix(matrix));
+	}
 };
+
 
 #endif 
 

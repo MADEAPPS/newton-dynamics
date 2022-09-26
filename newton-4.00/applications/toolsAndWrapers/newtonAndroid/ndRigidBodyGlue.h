@@ -9,29 +9,28 @@
 * freely
 */
 
-#ifndef _N_RIGIB_BODY_H_
-#define _N_RIGIB_BODY_H_
+#ifndef _ND_RIGIB_BODY_GLUE_H_
+#define _ND_RIGIB_BODY_GLUE_H_
 
 #include "nMatrix.h"
-#include "nBodyNotify.h"
-#include "nShapeInstance.h"
 #include "ndBodyKinematic.h"
+#include "ndBodyNotifyGlue.h"
 #include "ndBodyKinematicBase.h"
 #include "ndBodyTriggerVolume.h"
 #include "ndBodyPlayerCapsule.h"
+#include "ndShapeInstanceGlue.h"
 
+enum nRigidBodyType
+{
+	m_dynamic,
+	m_triggerVolume,
+	m_playerCapsule,
+};
 
-class nRigidBody
+class ndRigidBodyGlue
 {
 	public:
-	enum Type
-	{
-		m_dynamic,
-		m_triggerVolume,
-		m_playerCapsule,
-	};
-
-	nRigidBody(Type type)
+	ndRigidBodyGlue(nRigidBodyType type)
 		:m_body(nullptr)
 	{
 		switch (type)
@@ -61,7 +60,7 @@ class nRigidBody
 		}
 	}
 
-	virtual ~nRigidBody()
+	virtual ~ndRigidBodyGlue()
 	{
 		if (m_body)
 		{
@@ -79,19 +78,27 @@ class nRigidBody
 		m_body->SetMatrix(*matrix);
 	}
 
-	virtual void SetCollisionShape(const nShapeInstance* const shapeInstance)
+	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
 	{
 		m_body->SetCollisionShape(*shapeInstance);
 	}
 
-	virtual void SetNotifyCallback(nBodyNotify* const notify)
+	//virtual ndShapeInstanceGlue* GetCollisionShape() const
+	//{
+	//	//m_body->GetCollisionShape();
+	//	ndAssert(0);
+	//	return nullptr;
+	//}
+
+
+	virtual void SetNotifyCallback(ndBodyNotifyGlue* const notify)
 	{
 		m_body->SetNotifyCallback(notify);
 	}
 
 	private:
 	ndBodyKinematic* m_body;
-	friend class nWorld;
+	friend class ndWorldGlue;
 };
 
 #endif 
