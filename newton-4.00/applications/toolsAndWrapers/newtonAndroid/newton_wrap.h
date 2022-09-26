@@ -21,7 +21,7 @@ public:
     virtual void OnTransform(ndInt32 threadIndex, ndMatrix const &matrix);
     virtual void Save(ndLoadSaveBase::ndSaveDescriptor const &desc) const;
     virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
-    virtual void OnTransform(nMatrix const &matrix);
+    virtual void OnTransform(ndMatrixGlue const &matrix);
 public:
     bool swig_overrides(int n) {
       return (n < 5 ? swig_override[n] : false);

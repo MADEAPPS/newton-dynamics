@@ -9,21 +9,21 @@
 * freely
 */
 
-#ifndef _N_MATRIX_H_
-#define _N_MATRIX_H_
+#ifndef _ND_MATRIX_GLUE_H_
+#define _ND_MATRIX_GLUE_H_
 
 #include "ndMatrix.h"
 #include "nVector.h"
 
-class nMatrix : public ndMatrix
+class ndMatrixGlue : public ndMatrix
 {
 	public:
-	nMatrix()
+	ndMatrixGlue()
 		:ndMatrix()
 	{
 	}
 
-	nMatrix(const ndMatrix& matrix)
+	ndMatrixGlue(const ndMatrix& matrix)
 		:ndMatrix(matrix)
 	{
 	}

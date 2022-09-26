@@ -12,7 +12,7 @@
 #ifndef _ND_BODY_NOTIFY_GLUE_H_
 #define _ND_BODY_NOTIFY_GLUE_H_
 
-#include "nMatrix.h"
+#include "ndMatrixGlue.h"
 #include "ndBodyNotify.h"
 
 class ndBodyNotifyGlue : public ndBodyNotify
@@ -23,13 +23,13 @@ class ndBodyNotifyGlue : public ndBodyNotify
 	{
 	}
 	
-	virtual void OnTransform(const nMatrix& matrix)
+	virtual void OnTransform(const ndMatrixGlue& matrix)
 	{
 	}
 	
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
 	{
-		OnTransform(nMatrix(matrix));
+		OnTransform(ndMatrixGlue(matrix));
 	}
 
 	void SetGravity(const nVector& gravity)

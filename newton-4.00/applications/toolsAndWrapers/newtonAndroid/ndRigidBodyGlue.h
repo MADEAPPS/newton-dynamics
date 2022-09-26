@@ -12,7 +12,7 @@
 #ifndef _ND_RIGIB_BODY_GLUE_H_
 #define _ND_RIGIB_BODY_GLUE_H_
 
-#include "nMatrix.h"
+#include "ndMatrixGlue.h"
 #include "ndBodyKinematic.h"
 #include "ndBodyNotifyGlue.h"
 #include "ndBodyKinematicBase.h"
@@ -73,7 +73,7 @@ class ndRigidBodyGlue
 		return m_body->GetId();
 	}
 
-	virtual void SetMatrix(const nMatrix* const matrix)
+	virtual void SetMatrix(const ndMatrixGlue* const matrix)
 	{
 		m_body->SetMatrix(*matrix);
 	}

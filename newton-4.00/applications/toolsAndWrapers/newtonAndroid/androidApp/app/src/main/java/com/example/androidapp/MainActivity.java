@@ -4,13 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.javaNewton.nMatrix;
 import com.javaNewton.nWorld;
 import com.javaNewton.nRigidBody;
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nShapeInstance;
 
 import com.newton.nVector;
-import com.newton.nMatrix;
 import com.newton.nShapeBox;
 import com.newton.nRigidBodyType;
 

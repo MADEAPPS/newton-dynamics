@@ -154,7 +154,7 @@ struct ndCompoundInfo
 	ndInt32 m_noUsed;
 };
 
-struct ndProceduralInfoInfo
+struct ndProceduralInfo
 {
 	ndInt32 m_noUsed;
 };
@@ -197,7 +197,7 @@ class ndShapeInfo
 		ndCompoundInfo m_compound;
 		ndConvexHullInfo m_convexhull;
 		ndHeighfieldInfo m_heightfield;
-		ndProceduralInfoInfo m_procedural;
+		ndProceduralInfo m_procedural;
 		ndChamferCylinderInfo m_chamferCylinder;
 		
 		ndFloat32 m_paramArray[32];

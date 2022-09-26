@@ -38,12 +38,12 @@
 	#include <ndNewton.h>
 	#include "nConfig.h"
 	#include "ndWorldGlue.h"
+	#include "ndMatrixGlue.h"
 	#include "ndRigidBodyGlue.h"
 	#include "ndBodyNotifyGlue.h"
 	#include "ndShapeInstanceGlue.h"
 	#include "nShape.h"
 	#include "nVector.h"
-	#include "nMatrix.h"
 	#include "nShapeBox.h"
 %}
 
@@ -129,10 +129,10 @@
 %include "../../../sdk/dNewton/ndWorld.h"
 
 %include "nVector.h"
-%include "nMatrix.h"
 %include "nShape.h"
 %include "nShapeBox.h"
 
+%include "ndMatrixGlue.h"
 %include "ndWorldGlue.h"
 %include "ndRigidBodyGlue.h"
 %include "ndBodyNotifyGlue.h"
