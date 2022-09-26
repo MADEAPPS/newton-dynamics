@@ -20,7 +20,8 @@
 */
 
 // File : example.i 
-%module newton
+%module (directors="1") newton
+
 #pragma SWIG nowarn=312		//Nested union not supported
 #pragma SWIG nowarn=325		//Nested struct not currently supported 
 #pragma SWIG nowarn=389		//operator[] ignored
@@ -43,8 +44,9 @@
 	#include "nVector.h"
 	#include "nMatrix.h"
 	#include "nShapeBox.h"
-	
 %}
+
+%feature("director") ndBodyNotifyGlue;
 
 %include "nConfig.h"
 
