@@ -22,12 +22,13 @@ public:
     virtual void Save(ndLoadSaveBase::ndSaveDescriptor const &desc) const;
     virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
     virtual void OnTransform(ndMatrixGlue const &matrix);
+    virtual void OnApplyExternalForce(ndFloat32 timestep);
 public:
     bool swig_overrides(int n) {
-      return (n < 5 ? swig_override[n] : false);
+      return (n < 6 ? swig_override[n] : false);
     }
 protected:
-    Swig::BoolArray<5> swig_override;
+    Swig::BoolArray<6> swig_override;
 };
 
 

@@ -22,19 +22,37 @@ class ndBodyNotifyGlue : public ndBodyNotify
 		:ndBodyNotify(ndVectorGlue::m_zero)
 	{
 	}
+
+	void SetGravity(const ndVectorGlue& gravity)
+	{
+		ndBodyNotify::SetGravity(gravity);
+	}
 	
+	// callback to Java code
 	virtual void OnTransform(const ndMatrixGlue& matrix)
 	{
 	}
-	
+
+	virtual void OnApplyExternalForce(ndFloat32 timestep)
+	{
+		ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
+		if (body)
+		{
+			ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
+			body->SetForce(force);
+			body->SetTorque(ndVectorGlue::m_zero);
+		}
+	}
+
+	// called from newton cpp core to interact with the app
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
 	{
 		OnTransform(ndMatrixGlue(matrix));
 	}
 
-	void SetGravity(const ndVectorGlue& gravity)
+	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
 	{
-		ndBodyNotify::SetGravity(gravity);
+		OnApplyExternalForce(timestep);
 	}
 };
 
