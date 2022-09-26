@@ -90,6 +90,10 @@ class ndRigidBodyGlue
 	//	return nullptr;
 	//}
 
+	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
+	{
+		m_body->SetMassMatrix(mass, shapeInstance);
+	}
 
 	virtual void SetNotifyCallback(ndBodyNotifyGlue* const notify)
 	{

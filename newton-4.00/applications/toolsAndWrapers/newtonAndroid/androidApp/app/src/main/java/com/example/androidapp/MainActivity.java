@@ -44,13 +44,28 @@ public class MainActivity extends AppCompatActivity
 		location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
 		nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
-		nShapeInstance box = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.f));
+		nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
 
 		floor.SetNotifyCallback(new nBodyNotify());
 		floor.SetMatrix(location);
-		floor.SetCollisionShape(box);
-		//body->SetMassMatrix(mass, box);
+		floor.SetCollisionShape(boxShape);
 		world.AddBody(floor);
+	}
+
+	protected void AddBox()
+	{
+		nMatrix location = new nMatrix();
+		location.SetIdentity();
+		location.Set(3, new nVector(0.0f, 5.0f, 0.0f, 1.0f));
+
+		nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
+		nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
+
+		box.SetNotifyCallback(new nBodyNotify());
+		box.SetMatrix(location);
+		box.SetCollisionShape(boxShape);
+		box.SetMassMatrix(1.0f, boxShape);
+		world.AddBody(box);
 	}
 
 	protected void TestEngine()
@@ -58,14 +73,10 @@ public class MainActivity extends AppCompatActivity
 		world.Sync();
 
 		AddFloor();
-
-		//ndFloat32 totalTime = 0;
+		AddBox();
 		for (int i = 0; i < 100; i++)
 		{
-			//if (i == 0) world.AddJoint(&joint);
-			//if (i == 2) world.RemoveJoint(&joint);
 			world.Update(1.0f / 60.0f);
-			//totalTime += world.GetUpdateTime();
 			world.Sync();
 		}
 	}

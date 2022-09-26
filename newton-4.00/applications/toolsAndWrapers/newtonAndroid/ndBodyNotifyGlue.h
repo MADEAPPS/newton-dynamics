@@ -22,12 +22,11 @@ class ndBodyNotifyGlue : public ndBodyNotify
 		:ndBodyNotify(ndVector::m_zero)
 	{
 	}
-
-	virtual void OnTransform_xxxxx(const nMatrix& matrix)
+	
+	virtual void OnTransform(const nMatrix& matrix)
 	{
 	}
-
-	//protected:
+	
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
 	{
 		OnTransform(nMatrix(matrix));
