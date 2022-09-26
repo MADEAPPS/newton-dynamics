@@ -31,6 +31,11 @@ class ndBodyNotifyGlue : public ndBodyNotify
 	{
 		OnTransform(nMatrix(matrix));
 	}
+
+	void SetGravity(const nVector& gravity)
+	{
+		SetGravity(ndVector(gravity));
+	}
 };
 
 

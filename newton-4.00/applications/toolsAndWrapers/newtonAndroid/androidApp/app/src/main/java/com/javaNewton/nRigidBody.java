@@ -1,5 +1,6 @@
 package com.javaNewton;
 
+import com.newton.nShape;
 import com.newton.nRigidBodyType;
 import com.newton.ndRigidBodyGlue;
 import com.newton.ndBodyNotifyGlue;
@@ -22,9 +23,15 @@ public class nRigidBody extends ndRigidBodyGlue
         super.SetNotifyCallback(m_notify);
     }
 
+    @Override
     public void SetCollisionShape(ndShapeInstanceGlue shapeInstance)
     {
         super.SetCollisionShape(shapeInstance);
-        //m_shapeInstance = new ndShapeInstanceGlue(GetCollisionShape().GetShape());
+        m_shapeInstance = new nShapeInstance(new nShape(GetShape()));
+    }
+
+    public ndShapeInstanceGlue GetCollisionShape()
+    {
+        return m_shapeInstance;
     }
 }

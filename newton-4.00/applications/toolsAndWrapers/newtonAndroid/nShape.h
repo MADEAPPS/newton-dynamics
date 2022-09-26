@@ -16,12 +16,13 @@
 
 class nShape
 {
-	protected:
+	public:
 	nShape(ndShape* const shape)
 		:m_shape(shape)
 	{
 	}
 
+	protected:
 	virtual ~nShape()
 	{
 	}

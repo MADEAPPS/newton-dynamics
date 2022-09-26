@@ -62,10 +62,10 @@ class ndRigidBodyGlue
 
 	virtual ~ndRigidBodyGlue()
 	{
-		if (m_body)
-		{
-			delete m_body;
-		}
+		//if (m_body)
+		//{
+		//	delete m_body;
+		//}
 	}
 
 	int GetId() const
@@ -78,17 +78,15 @@ class ndRigidBodyGlue
 		m_body->SetMatrix(*matrix);
 	}
 
+	virtual ndShape* GetShape() const
+	{
+		return m_body->GetCollisionShape().GetShape();
+	}
+
 	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
 	{
 		m_body->SetCollisionShape(*shapeInstance);
 	}
-
-	//virtual ndShapeInstanceGlue* GetCollisionShape() const
-	//{
-	//	//m_body->GetCollisionShape();
-	//	ndAssert(0);
-	//	return nullptr;
-	//}
 
 	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
 	{
