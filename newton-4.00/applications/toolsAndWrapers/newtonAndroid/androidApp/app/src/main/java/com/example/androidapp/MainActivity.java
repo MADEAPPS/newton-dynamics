@@ -4,13 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.javaNewton.nMatrix;
 import com.javaNewton.nWorld;
+import com.javaNewton.nMatrix;
+import com.javaNewton.nVector;
 import com.javaNewton.nRigidBody;
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nShapeInstance;
 
-import com.newton.nVector;
 import com.newton.nShapeBox;
 import com.newton.nRigidBodyType;
 
@@ -60,8 +60,10 @@ public class MainActivity extends AppCompatActivity
 
 		nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
 		nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
+		nBodyNotify notify = new nBodyNotify();
+		notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
 
-		box.SetNotifyCallback(new nBodyNotify());
+		box.SetNotifyCallback(notify);
 		box.SetMatrix(location);
 		box.SetCollisionShape(boxShape);
 		box.SetMassMatrix(1.0f, boxShape);

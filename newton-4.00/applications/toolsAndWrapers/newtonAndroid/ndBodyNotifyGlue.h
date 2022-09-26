@@ -19,7 +19,7 @@ class ndBodyNotifyGlue : public ndBodyNotify
 {
 	public:
 	ndBodyNotifyGlue()
-		:ndBodyNotify(ndVector::m_zero)
+		:ndBodyNotify(ndVectorGlue::m_zero)
 	{
 	}
 	
@@ -27,14 +27,14 @@ class ndBodyNotifyGlue : public ndBodyNotify
 	{
 	}
 	
-	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
-	{
-		OnTransform(ndMatrixGlue(matrix));
-	}
+	//virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
+	//{
+	//	OnTransform(ndMatrixGlue(matrix));
+	//}
 
-	void SetGravity(const nVector& gravity)
+	void SetGravity(const ndVectorGlue& gravity)
 	{
-		SetGravity(ndVector(gravity));
+		ndBodyNotify::SetGravity(gravity);
 	}
 };
 

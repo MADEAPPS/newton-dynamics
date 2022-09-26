@@ -9,26 +9,30 @@
 * freely
 */
 
-#ifndef _N_VECTOR_H_
-#define _N_VECTOR_H_
+#ifndef _ND_VECTOR_GLUE_H_
+#define _ND_VECTOR_GLUE_H_
 
 #include "ndVector.h"
 
-class nVector : public ndVector
+class ndVectorGlue : public ndVector
 {
 	public:
-	nVector()
+	ndVectorGlue()
 		:ndVector()
 	{
 	}
 
-	nVector(const ndVector& vector)
+	ndVectorGlue(const ndVector& vector)
 		:ndVector(vector)
 	{
 	}
 
+	ndVectorGlue(const ndVectorGlue& vector)
+		:ndVector(vector)
+	{
+	}
 
-	nVector(float x, float y, float z, float w)
+	ndVectorGlue(float x, float y, float z, float w)
 		:ndVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(w))
 	{
 	}

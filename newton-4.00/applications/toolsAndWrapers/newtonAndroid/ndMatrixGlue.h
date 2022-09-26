@@ -12,8 +12,9 @@
 #ifndef _ND_MATRIX_GLUE_H_
 #define _ND_MATRIX_GLUE_H_
 
+#include "ndVectorGlue.h"
 #include "ndMatrix.h"
-#include "nVector.h"
+
 
 class ndMatrixGlue : public ndMatrix
 {
@@ -28,17 +29,22 @@ class ndMatrixGlue : public ndMatrix
 	{
 	}
 
+	ndMatrixGlue(const ndMatrixGlue& matrix)
+		:ndMatrix(matrix)
+	{
+	}
+
 	void SetIdentity()
 	{
 		*this = ndGetIdentityMatrix();
 	}
 
-	nVector Get(int i) const
+	ndVectorGlue Get(int i) const
 	{
-		return nVector((*this)[i]);
+		return ndVectorGlue((*this)[i]);
 	}
 
-	void Set(int i, nVector& value)
+	void Set(int i, ndVectorGlue& value)
 	{
 		(*this)[i] = value;
 	}
