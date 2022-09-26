@@ -6,8 +6,7 @@ import com.newton.ndBodyNotifyGlue;
 public class nBodyNotify extends ndBodyNotifyGlue
 {
 
-    @Override
-    public void OnTransform(nMatrix matrix)
+    public void OnTransform_xxxxx(nMatrix matrix)
     {
 
     }
