@@ -27,10 +27,10 @@ class ndBodyNotifyGlue : public ndBodyNotify
 	{
 	}
 	
-	//virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
-	//{
-	//	OnTransform(ndMatrixGlue(matrix));
-	//}
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
+	{
+		OnTransform(ndMatrixGlue(matrix));
+	}
 
 	void SetGravity(const ndVectorGlue& gravity)
 	{
