@@ -50,7 +50,8 @@ public class RenderLoop extends Thread
             if (deltaTime >= timeStepInMs)
             {
                 float fps = 1000.0f / timeStepInMs;
-                Log.i("ndNewton", String.format("RenderLoop fps %f", fps));
+                String text = String.format("RenderLoop fps %f", fps);
+                Log.i("ndNewton", text);
                 DrawFrame();
                 time0 += timeStepInMs;
             }
