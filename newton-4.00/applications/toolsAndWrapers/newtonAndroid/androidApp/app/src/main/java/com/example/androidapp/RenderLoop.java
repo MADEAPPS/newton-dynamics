@@ -2,7 +2,8 @@ package com.example.androidapp;
 
 import android.util.Log;
 import android.content.Context;
-import android.opengl.GLSurfaceView;
+import com.example.androidapp.MyGLRenderer;
+import com.example.androidapp.MyGLSurfaceView;
 
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nMatrix;
@@ -15,45 +16,57 @@ import com.newton.nRigidBodyType;
 
 public class RenderLoop extends Thread
 {
-    private nWorld m_world;
-    private GLSurfaceView m_glView;
-    private float timestep = 1.0f / 60.0f;
-    private boolean m_teminate;
+    final private nWorld m_world;
+    final private MyGLSurfaceView m_glView;
+    final private MyGLRenderer m_glRender;
+    final private float m_timestep;
+    final private boolean m_teminate;
 
     RenderLoop(Context context)
     {
         m_glView = new MyGLSurfaceView(context);
+        m_glRender = m_glView.GetRenderer();
 
+        m_timestep = 1.0f / 60.0f;
         m_teminate = false;
 
         // create an instance of the newton engine
         m_world = new nWorld();
         m_world.SetSubSteps(2);
-
         TestEngine();
     }
 
-    GLSurfaceView GetView()
+    MyGLSurfaceView GetView()
     {
         return m_glView;
     }
 
     @Override
-    public void run()
+    final public void run()
     {
-        long time0 = System.currentTimeMillis();
-        float timeStepInMs = timestep * 1000.0f;
+
+        double time_0 = 0.0;
+        long baseTime = System.currentTimeMillis();
+        double timeStepInMs = m_timestep * 1000.0f;
         while (m_teminate == false)
         {
-            long time1 = System.currentTimeMillis();
-            float deltaTime = time1 - time0;
+            double time_1 = (System.currentTimeMillis() - baseTime);
+            double deltaTime = time_1 - time_0;
+            if (deltaTime < 0.0)
+            {
+                Log.i("ndNewton", "xxx");
+            }
             if (deltaTime >= timeStepInMs)
             {
-                float fps = 1000.0f / timeStepInMs;
+                float fps = (float)(1000.0 / deltaTime);
                 String text = String.format("RenderLoop fps %f", fps);
                 Log.i("ndNewton", text);
                 DrawFrame();
-                time0 += timeStepInMs;
+                time_0 = time_0 + timeStepInMs;
+                while ((time_0 + timeStepInMs) < time_1)
+                {
+                    time_0 = time_0 + timeStepInMs;
+                }
             }
             yield();
         }
@@ -61,7 +74,11 @@ public class RenderLoop extends Thread
 
     void DrawFrame()
     {
+        m_world.Sync();
+        m_world.Update(m_timestep);
 
+        m_glRender.setAngle(m_glRender.getAngle() + 0.05f) ;
+        m_glView.requestRender();
     }
 
     protected void AddFloor()
@@ -100,13 +117,7 @@ public class RenderLoop extends Thread
     protected void TestEngine()
     {
         m_world.Sync();
-
         AddFloor();
         AddBox();
-        for (int i = 0; i < 100; i++)
-        {
-            m_world.Update(timestep);
-            m_world.Sync();
-        }
     }
 }
