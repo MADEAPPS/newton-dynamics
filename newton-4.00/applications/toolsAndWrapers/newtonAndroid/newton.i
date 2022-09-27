@@ -38,13 +38,13 @@
 	#include <ndNewton.h>
 	#include "nConfig.h"
 	#include "ndWorldGlue.h"
+	#include "ndShapeGlue.h"
 	#include "ndVectorGlue.h"
 	#include "ndMatrixGlue.h"
+	#include "ndShapeBoxGlue.h"
 	#include "ndRigidBodyGlue.h"
 	#include "ndBodyNotifyGlue.h"
 	#include "ndShapeInstanceGlue.h"
-	#include "nShape.h"
-	#include "nShapeBox.h"
 %}
 
 %feature("director") ndBodyNotifyGlue;
@@ -128,12 +128,11 @@
 
 %include "../../../sdk/dNewton/ndWorld.h"
 
-%include "nShape.h"
-%include "nShapeBox.h"
-
 %include "ndMatrixGlue.h"
 %include "ndVectorGlue.h"
 %include "ndWorldGlue.h"
+%include "ndShapeGlue.h"
+%include "ndShapeBoxGlue.h"
 %include "ndRigidBodyGlue.h"
 %include "ndBodyNotifyGlue.h"
 %include "ndShapeInstanceGlue.h"

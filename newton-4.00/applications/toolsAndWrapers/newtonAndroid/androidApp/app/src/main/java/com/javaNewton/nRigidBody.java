@@ -1,6 +1,6 @@
 package com.javaNewton;
 
-import com.newton.nShape;
+import com.newton.ndShapeGlue;
 import com.newton.nRigidBodyType;
 import com.newton.ndRigidBodyGlue;
 import com.newton.ndBodyNotifyGlue;
@@ -27,7 +27,7 @@ public class nRigidBody extends ndRigidBodyGlue
     public void SetCollisionShape(ndShapeInstanceGlue shapeInstance)
     {
         super.SetCollisionShape(shapeInstance);
-        m_shapeInstance = new nShapeInstance(new nShape(GetShape()));
+        m_shapeInstance = new nShapeInstance(new ndShapeGlue(GetShape()));
     }
 
     public ndShapeInstanceGlue GetCollisionShape()

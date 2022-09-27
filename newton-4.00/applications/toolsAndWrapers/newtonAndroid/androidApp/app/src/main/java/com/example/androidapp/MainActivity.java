@@ -7,11 +7,11 @@ import android.os.Bundle;
 import com.javaNewton.nWorld;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nVector;
+import com.javaNewton.nShapeBox;
 import com.javaNewton.nRigidBody;
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nShapeInstance;
 
-import com.newton.nShapeBox;
 import com.newton.nRigidBodyType;
 
 public class MainActivity extends AppCompatActivity
