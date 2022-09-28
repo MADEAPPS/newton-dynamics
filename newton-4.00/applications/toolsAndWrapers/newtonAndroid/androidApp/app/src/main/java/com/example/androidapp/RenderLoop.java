@@ -65,6 +65,7 @@ public class RenderLoop extends Thread
                 time_0 = time_0 + timeStepInMs;
                 while ((time_0 + timeStepInMs) < time_1)
                 {
+                    Log.i("ndNewton", "skip frame");
                     time_0 = time_0 + timeStepInMs;
                 }
             }
@@ -77,7 +78,7 @@ public class RenderLoop extends Thread
         m_world.Sync();
         m_world.Update(m_timestep);
 
-        m_glRender.setAngle(m_glRender.getAngle() + 0.05f) ;
+        m_glRender.setAngle(m_glRender.getAngle() + 0.1f) ;
         m_glView.requestRender();
     }
 
