@@ -17,16 +17,16 @@
 
 class ndDemoMesh;
 class ndDemoEntity;
-class ndShaderPrograms;
+class ndShaderCache;
 class ndDemoEntityManager;
 
 class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 {
 	public:
 	ndDemoMesh(const char* const name);
-	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
+	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderCache& shaderCache);
+	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache);
+	ndDemoMesh(const char* const name, const ndShaderCache& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
 	{ 

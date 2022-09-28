@@ -17,7 +17,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
+ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderCache& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
 	,m_indexCount(0)
 	,m_shadeColorLocation(0)
@@ -170,7 +170,7 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const ndMat
 	}
 }
 
-ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeTypefilter)
+ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderCache& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeTypefilter)
 	:ndDemoMeshInterface()
 	,m_indexCount(0)
 	,m_shadeColorLocation(0)

@@ -18,7 +18,7 @@
 class ndDemoMeshIntance : public ndDemoMesh
 {
 	public:
-	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix());
+	ndDemoMeshIntance(const char* const name, const ndShaderCache& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix());
 	~ndDemoMeshIntance();
 
 	virtual void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);

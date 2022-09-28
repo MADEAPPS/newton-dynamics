@@ -17,14 +17,14 @@
 
 //class ndDemoMesh;
 //class ndDemoEntity;
-class ndShaderPrograms;
+class ndShaderCache;
 //class ndDemoEntityManager;
 
 
 class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 {
 	public:
-	ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
+	ndFlatShadedDebugMesh(const ndShaderCache& shaderCache, const ndShapeInstance* const collision);
 	~ndFlatShadedDebugMesh();
 
 	void SetColor(const ndVector& color)
@@ -49,7 +49,7 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 class ndWireFrameDebugMesh: public ndDemoMeshInterface
 {
 	public:
-	ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeType = ndShapeDebugNotify::ndEdgeType::m_shared);
+	ndWireFrameDebugMesh(const ndShaderCache& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeType = ndShapeDebugNotify::ndEdgeType::m_shared);
 	~ndWireFrameDebugMesh();
 
 	void SetColor(const ndVector& color)

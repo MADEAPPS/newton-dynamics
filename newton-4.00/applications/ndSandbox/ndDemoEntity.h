@@ -17,7 +17,7 @@
 
 class ndDemoEntity;
 class ndAnimKeyframe;
-class ndShaderPrograms;
+class ndShaderCache;
 class ndDemoMeshInterface;
 
 class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>

@@ -59,7 +59,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const n
 	glDisableVertexAttribArray(0);
 }
 
-ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray)
+ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray)
 	:ndDemoMesh(name)
 {
 	m_name = name;
@@ -147,7 +147,7 @@ void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache)
+ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderCache& shaderCache)
 	:ndDemoEntity(ndGetIdentityMatrix(), parent)
 {
 	ndInt32 vertexCount = meshNode->GetPropertiesCount();

@@ -17,13 +17,13 @@
 
 class ndDemoMesh;
 class ndDemoEntity;
-class ndShaderPrograms;
+class ndShaderCache;
 class ndDemoEntityManager;
 
 class ndDemoSplinePathMesh: public ndDemoMeshInterface
 {
 	public:
-	ndDemoSplinePathMesh(const ndBezierSpline& curve, const ndShaderPrograms& shaderCache, ndInt32 resolution);
+	ndDemoSplinePathMesh(const ndBezierSpline& curve, const ndShaderCache& shaderCache, ndInt32 resolution);
 	~ndDemoSplinePathMesh();
 
 	void SetColor(const ndVector& color);

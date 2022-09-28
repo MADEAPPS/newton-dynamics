@@ -10,18 +10,18 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndShaderPrograms.h"
+#include "ndShaderCache.h"
 
-ndShaderPrograms::ndShaderPrograms(void)
+ndShaderCache::ndShaderCache(void)
 {
 	memset(m_shaders, 0, sizeof(m_shaders));
 }
 
-ndShaderPrograms::~ndShaderPrograms(void)
+ndShaderCache::~ndShaderCache(void)
 {
 }
 
-void ndShaderPrograms::Cleanup()
+void ndShaderCache::Cleanup()
 {
 	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shaders) / sizeof(m_shaders[0])); ++i)
 	{
@@ -33,7 +33,7 @@ void ndShaderPrograms::Cleanup()
 	}
 }
 
-bool ndShaderPrograms::CreateAllEffects()
+bool ndShaderCache::CreateAllEffects()
 {
 	m_skyBox = CreateShaderEffect("SkyBox", "SkyBox");
 	m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
@@ -52,7 +52,7 @@ bool ndShaderPrograms::CreateAllEffects()
 	return true;
 }
 
-void ndShaderPrograms::LoadShaderCode (const char* const filename, char* const buffer)
+void ndShaderCache::LoadShaderCode (const char* const filename, char* const buffer)
 {
 	ndInt32 size;
 	FILE* file;
@@ -74,7 +74,7 @@ void ndShaderPrograms::LoadShaderCode (const char* const filename, char* const b
 	buffer[size + 1] = 0;
 }
 
-GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, const char* const pixelShaderName, const char* const geometryShaderName)
+GLuint ndShaderCache::CreateShaderEffect (const char* const vertexShaderName, const char* const pixelShaderName, const char* const geometryShaderName)
 {
 	GLint state;
 	char tmpName[256];

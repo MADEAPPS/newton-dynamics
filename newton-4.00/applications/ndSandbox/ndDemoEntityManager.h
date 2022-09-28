@@ -11,7 +11,7 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
-#include "ndShaderPrograms.h"
+#include "ndShaderCache.h"
 
 struct GLFWwindow;
 struct ImDrawData;
@@ -180,7 +180,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndInt32 GetDebugDisplay() const;
 	void SetDebugDisplay(ndInt32 mode) const;
 
-	const ndShaderPrograms& GetShaderCache() const;  
+	const ndShaderCache& GetShaderCache() const;  
 	fbxDemoEntity* LoadFbxMesh(const char* const meshName);
 	ndAnimationSequence* GetAnimationSequence(const char* const meshName);
 	
@@ -229,7 +229,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndDemoEntity* m_sky;
 	ndPhysicsWorld* m_world;
 	ndDemoCameraManager* m_cameraManager;
-	ndShaderPrograms m_shaderCache;
+	ndShaderCache m_shaderCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	RenderGuiHelpCallback m_renderDemoGUI;
@@ -318,7 +318,7 @@ inline void ndDemoEntityManager::SetDebugDisplay(ndInt32) const
 	ndAssert (0);
 }
 
-inline const ndShaderPrograms& ndDemoEntityManager::GetShaderCache() const
+inline const ndShaderCache& ndDemoEntityManager::GetShaderCache() const
 {
 	return m_shaderCache;
 }

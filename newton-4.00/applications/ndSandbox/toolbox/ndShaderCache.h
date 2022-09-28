@@ -8,20 +8,17 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-
-
-#ifndef __SHADERS_PROGRAMS__
-#define __SHADERS_PROGRAMS__
+#ifndef __SHADER_CACHE_H__
+#define __SHADER_CACHE_H__
 
 #include "ndSandboxStdafx.h"
 #include "ndOpenGlUtil.h"
 
-
-class ndShaderPrograms
+class ndShaderCache
 {
 	public:
-	ndShaderPrograms();
-	~ndShaderPrograms();
+	ndShaderCache();
+	~ndShaderCache();
 
 	void Cleanup();
 	bool CreateAllEffects();

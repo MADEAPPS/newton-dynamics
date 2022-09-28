@@ -134,7 +134,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 class ndIsoSurfaceMesh : public ndDemoMesh
 {
 	public:
-	ndIsoSurfaceMesh(const ndShaderPrograms& shaderCache, ndDemoMesh* const parentMesh)
+	ndIsoSurfaceMesh(const ndShaderCache& shaderCache, ndDemoMesh* const parentMesh)
 		:ndDemoMesh("isoSurface")
 		,m_parentMesh(parentMesh)
 	{

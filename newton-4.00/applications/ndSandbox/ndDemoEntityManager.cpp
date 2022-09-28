@@ -23,7 +23,7 @@
 #include "ndTestDeepBrain.h"
 #include "ndDemoDebugMesh.h"
 #include "ndTargaToOpenGl.h"
-#include "ndShaderPrograms.h"
+#include "ndShaderCache.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"

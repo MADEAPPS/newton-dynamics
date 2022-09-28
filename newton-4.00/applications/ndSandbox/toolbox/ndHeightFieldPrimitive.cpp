@@ -36,7 +36,7 @@
 class ndHeightfieldMesh : public ndDemoMesh
 {
 	public: 
-	ndHeightfieldMesh(const ndArray<ndVector>& heightfield, const ndShaderPrograms& shaderCache)
+	ndHeightfieldMesh(const ndArray<ndVector>& heightfield, const ndShaderCache& shaderCache)
 		:ndDemoMesh ("heightfield")
 	{
 		ndArray<glPositionNormalUV> points(heightfield.GetCount());

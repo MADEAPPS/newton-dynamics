@@ -39,7 +39,7 @@ ndDemoMesh::ndDemoMesh(const char* const name)
 	m_name = name;
 }
 
-ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
+ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderCache&)
 	:ndDemoMeshInterface()
 	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -79,7 +79,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	//OptimizeForRender ();
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix, bool stretchMaping)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix, bool stretchMaping)
 	:ndDemoMeshInterface()
 	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -207,7 +207,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
 	:ndDemoMeshInterface()
 	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)

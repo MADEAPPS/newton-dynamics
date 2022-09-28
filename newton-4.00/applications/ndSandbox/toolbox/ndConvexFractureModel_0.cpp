@@ -179,7 +179,7 @@ class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 class ndConvexFractureEntity: public ndDemoDebrisEntity
 {
 	public:
-	ndConvexFractureEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, ndInt32 enumerator)
+	ndConvexFractureEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderCache& shaderCache, ndShapeInstance* const collision, ndInt32 enumerator)
 		:ndDemoDebrisEntity(meshNode, vertexArray, parent, shaderCache)
 		,m_collision(collision)
 		,m_drebriBody(nullptr)

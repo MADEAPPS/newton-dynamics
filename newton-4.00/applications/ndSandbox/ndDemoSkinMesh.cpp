@@ -24,7 +24,7 @@ class glSkinVertex : public glPositionNormalUV
 	glVector4 m_boneIndex;
 };
 
-ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
 	:ndDemoMeshInterface()
 	,m_shareMesh(new ndDemoMesh(owner->GetName().GetStr()))
 	,m_ownerEntity(owner)

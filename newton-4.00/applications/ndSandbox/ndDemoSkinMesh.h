@@ -18,7 +18,7 @@
 class ndDemoMesh;
 class ndDemoEntity;
 class glSkinVertex;
-class ndShaderPrograms;
+class ndShaderCache;
 class ndDemoEntityManager;
 
 //class ndDemoSkinMesh: public ndDemoMesh
@@ -31,7 +31,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	};
 
 	ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const owner);
-	ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache);
 	~ndDemoSkinMesh();
 
 	protected: 

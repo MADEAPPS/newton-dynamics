@@ -30,7 +30,7 @@ class ndDemoDebrisMesh : public ndDemoMesh
 {
 	public:
 	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArray<glDebrisPoint>& vertexArray);
-	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray);
+	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray);
 
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
@@ -61,7 +61,7 @@ class ndDemoDebrisRootEntity: public ndDemoEntity
 class ndDemoDebrisEntity : public ndDemoEntity
 {
 	public:
-	ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache);
+	ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderCache& shaderCache);
 	ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom);
 	virtual ~ndDemoDebrisEntity();
 	ndNodeBaseHierarchy* CreateClone() const;

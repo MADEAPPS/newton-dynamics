@@ -16,7 +16,7 @@
 #include "ndDemoInstanceEntity.h"
 
 
-ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix)
+ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix)
 	:ndDemoMesh(name)
 	,m_offsets(nullptr)
 	,m_instanceCount(0)

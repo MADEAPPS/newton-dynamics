@@ -16,7 +16,7 @@
 #include "ndDemoSplinePathMesh.h"
 #include "ndDemoEntityManager.h"
 
-ndDemoSplinePathMesh::ndDemoSplinePathMesh(const ndBezierSpline& curve, const ndShaderPrograms& shaderCache, ndInt32 resolution)
+ndDemoSplinePathMesh::ndDemoSplinePathMesh(const ndBezierSpline& curve, const ndShaderCache& shaderCache, ndInt32 resolution)
 	:ndDemoMeshInterface()
 	,m_curve(curve)
 	,m_color(1.0f)
