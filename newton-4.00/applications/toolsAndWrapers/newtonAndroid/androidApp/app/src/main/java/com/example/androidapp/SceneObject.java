@@ -25,6 +25,11 @@ public class SceneObject
         parent.m_firstChild = this;
     }
 
+    void SetMesh (SceneMesh mesh)
+    {
+        m_mesh = mesh;
+    }
+
     void Render (Matrix4 parentMatrix)
     {
         Matrix4 matrix = m_matrix.Mul(parentMatrix);
@@ -43,7 +48,7 @@ public class SceneObject
     Matrix4 m_matrix;
     Matrix4 m_meshMatrix;
 
-    SceneMesh m_mesh;
+    private SceneMesh m_mesh;
     private SceneObject m_next;
     private SceneObject m_prev;
     private SceneObject m_parent;

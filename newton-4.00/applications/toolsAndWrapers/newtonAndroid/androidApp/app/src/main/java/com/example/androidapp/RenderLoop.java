@@ -106,10 +106,14 @@ public class RenderLoop extends Thread
         location.SetIdentity();
         location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
-        SceneObject floorObject = new SceneObject(m_root);
+
 
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
+
+        SceneObject floorObject = new SceneObject(m_root);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
+        floorObject.SetMesh(mesh);
 
         floor.SetNotifyCallback(new nBodyNotify(floorObject));
         floor.SetMatrix(location);
@@ -123,10 +127,13 @@ public class RenderLoop extends Thread
         location.SetIdentity();
         location.Set(3, new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
-        SceneObject boxObject = new SceneObject(m_root);
-
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
+
+        SceneObject boxObject = new SceneObject(m_root);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
+        boxObject.SetMesh(mesh);
+
         nBodyNotify notify = new nBodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
 
