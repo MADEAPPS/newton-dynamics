@@ -30,23 +30,21 @@ public class MainActivity extends AppCompatActivity
 	protected void onPause()
 	{
 		super.onPause();
-		// The following call pauses the rendering thread.
-		// If your OpenGL application is memory intensive,
-		// you should consider de-allocating objects that
-		// consume significant memory here.
-		//mGLView.onPause();
-		m_renderLoop.GetView().onPause();
+		m_renderLoop.OnPause();
     }
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		// The following call resumes a paused rendering thread.
-		// If you de-allocated graphic objects for onPause()
-		// this is a good place to re-allocate them.
-		//mGLView.onResume();
-		m_renderLoop.GetView().onResume();
+		m_renderLoop.OnResume();
+	}
+
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+		m_renderLoop.OnTerminate();
 	}
 
 	@Override

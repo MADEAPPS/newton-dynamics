@@ -2,8 +2,8 @@ package com.example.androidapp;
 
 import android.util.Log;
 import android.content.Context;
-import com.example.androidapp.MyGLRenderer;
-import com.example.androidapp.MyGLSurfaceView;
+//import com.example.androidapp.MyGLRenderer;
+//import com.example.androidapp.MyGLSurfaceView;
 
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nMatrix;
@@ -14,13 +14,16 @@ import com.javaNewton.nVector;
 import com.javaNewton.nWorld;
 import com.newton.nRigidBodyType;
 
+import static android.os.SystemClock.elapsedRealtimeNanos;
+
 public class RenderLoop extends Thread
 {
     final private nWorld m_world;
     final private MyGLSurfaceView m_glView;
     final private MyGLRenderer m_glRender;
     final private float m_timestep;
-    final private boolean m_teminate;
+    private boolean m_onPause;
+    private boolean m_onTeminate;
 
     RenderLoop(Context context)
     {
@@ -28,7 +31,8 @@ public class RenderLoop extends Thread
         m_glRender = m_glView.GetRenderer();
 
         m_timestep = 1.0f / 60.0f;
-        m_teminate = false;
+        m_onPause = false;
+        m_onTeminate = false;
 
         // create an instance of the newton engine
         m_world = new nWorld();
@@ -41,32 +45,50 @@ public class RenderLoop extends Thread
         return m_glView;
     }
 
+    public void OnTerminate()
+    {
+        m_onTeminate = true;
+    }
+
+    public void OnPause()
+    {
+        m_onPause = true;
+        m_glView.onPause();
+    }
+
+    public void OnResume()
+    {
+        m_onPause = false;
+        m_glView.onResume();
+    }
+
     @Override
     final public void run()
     {
-
         double time_0 = 0.0;
-        long baseTime = System.currentTimeMillis();
+        long baseTime = elapsedRealtimeNanos();
+        //long baseTime = System.currentTimeMillis();
         double timeStepInMs = m_timestep * 1000.0f;
-        while (m_teminate == false)
+        while (m_onTeminate == false)
         {
-            double time_1 = (System.currentTimeMillis() - baseTime);
+            double time_1 = (elapsedRealtimeNanos() - baseTime);
             double deltaTime = time_1 - time_0;
             if (deltaTime < 0.0)
             {
                 Log.i("ndNewton", "xxx");
             }
-            if (deltaTime >= timeStepInMs)
+            if (m_onPause == false)
             {
-                float fps = (float)(1000.0 / deltaTime);
-                String text = String.format("RenderLoop fps %f", fps);
-                Log.i("ndNewton", text);
-                DrawFrame();
-                time_0 = time_0 + timeStepInMs;
-                while ((time_0 + timeStepInMs) < time_1)
-                {
-                    Log.i("ndNewton", "skip frame");
+                if (deltaTime >= timeStepInMs) {
+                    float fps = (float) (1000.0 / deltaTime);
+                    String text = String.format("RenderLoop fps %f", fps);
+                    Log.i("ndNewton", text);
+                    DrawFrame();
                     time_0 = time_0 + timeStepInMs;
+                    while ((time_0 + timeStepInMs) < time_1) {
+                        Log.i("ndNewton", "skip frame");
+                        time_0 = time_0 + timeStepInMs;
+                    }
                 }
             }
             yield();
