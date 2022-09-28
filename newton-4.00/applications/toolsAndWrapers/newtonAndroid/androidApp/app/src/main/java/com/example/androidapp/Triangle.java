@@ -24,32 +24,13 @@ import android.opengl.GLES30;
 /**
  * A two-dimensional triangle for use as a drawn object in OpenGL ES 2.0.
  */
-public class Triangle {
-
-    private final String vertexShaderCode =
-            // This matrix member variable provides a hook to manipulate
-            // the coordinates of the objects that use this vertex shader
-            "uniform mat4 uMVPMatrix;" +
-            "attribute vec4 vPosition;" +
-            "void main() {" +
-            // the matrix must be included as a modifier of gl_Position
-            // Note that the uMVPMatrix factor *must be first* in order
-            // for the matrix multiplication product to be correct.
-            "  gl_Position = uMVPMatrix * vPosition;" +
-            "}";
-
-    private final String fragmentShaderCode =
-            "precision mediump float;" +
-            "uniform vec4 vColor;" +
-            "void main() {" +
-            "  gl_FragColor = vColor;" +
-            "}";
-
-    private final FloatBuffer vertexBuffer;
-    private final int mProgram;
+public class Triangle
+{
+    private final int m_program;
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
+    private final FloatBuffer vertexBuffer;
 
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 3;
@@ -67,7 +48,9 @@ public class Triangle {
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public Triangle() {
+    public Triangle(int shaderProgram)
+    {
+        m_program = shaderProgram;
         // initialize vertex byte buffer for shape coordinates
         ByteBuffer bb = ByteBuffer.allocateDirect(
                 // (number of coordinate values * 4 bytes per float)
@@ -81,18 +64,6 @@ public class Triangle {
         vertexBuffer.put(triangleCoords);
         // set the buffer to read the first coordinate
         vertexBuffer.position(0);
-
-        // prepare shaders and OpenGL program
-        int vertexShader = MyGLRenderer.loadShader(
-                GLES30.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = MyGLRenderer.loadShader(
-                GLES30.GL_FRAGMENT_SHADER, fragmentShaderCode);
-
-        mProgram = GLES30.glCreateProgram();             // create empty OpenGL Program
-        GLES30.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES30.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES30.glLinkProgram(mProgram);                  // create OpenGL program executables
-
     }
 
     /**
@@ -103,10 +74,10 @@ public class Triangle {
      */
     public void draw(float[] mvpMatrix) {
         // Add program to OpenGL environment
-        GLES30.glUseProgram(mProgram);
+        GLES30.glUseProgram(m_program);
 
         // get handle to vertex shader's vPosition member
-        mPositionHandle = GLES30.glGetAttribLocation(mProgram, "vPosition");
+        mPositionHandle = GLES30.glGetAttribLocation(m_program, "vPosition");
 
         // Enable a handle to the triangle vertices
         GLES30.glEnableVertexAttribArray(mPositionHandle);
@@ -118,13 +89,13 @@ public class Triangle {
                 vertexStride, vertexBuffer);
 
         // get handle to fragment shader's vColor member
-        mColorHandle = GLES30.glGetUniformLocation(mProgram, "vColor");
+        mColorHandle = GLES30.glGetUniformLocation(m_program, "vColor");
 
         // Set color for drawing the triangle
         GLES30.glUniform4fv(mColorHandle, 1, color, 0);
 
         // get handle to shape's transformation matrix
-        mMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix");
+        mMVPMatrixHandle = GLES30.glGetUniformLocation(m_program, "uMVPMatrix");
         MyGLRenderer.checkGlError("glGetUniformLocation");
 
         // Apply the projection and view transformation
@@ -137,5 +108,4 @@ public class Triangle {
         // Disable vertex array
         GLES30.glDisableVertexAttribArray(mPositionHandle);
     }
-
 }

@@ -35,6 +35,8 @@ import android.util.Log;
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
+
+    private ShaderCache m_shaderCache;
     private Triangle mTriangle;
     private Square   mSquare;
 
@@ -52,8 +54,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Set the background frame color
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        mTriangle = new Triangle();
-        mSquare   = new Square();
+        m_shaderCache = new ShaderCache();
+        mTriangle = new Triangle(m_shaderCache.m_triangleShader);
+        mSquare   = new Square(m_shaderCache.m_squareShader);
     }
 
     @Override

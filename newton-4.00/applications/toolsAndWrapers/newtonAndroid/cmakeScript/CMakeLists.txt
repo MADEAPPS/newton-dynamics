@@ -68,8 +68,10 @@ file(GLOB CPP_SOURCE
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_definitions(-D_D_SINGLE_LIBRARY)
+add_definitions(-DD_SCALAR_VECTOR_CLASS)
+
 add_library(${projectName} SHARED ${CPP_SOURCE})
    
-#target_include_directories(${projectName} PUBLIC .)
+
 
 
