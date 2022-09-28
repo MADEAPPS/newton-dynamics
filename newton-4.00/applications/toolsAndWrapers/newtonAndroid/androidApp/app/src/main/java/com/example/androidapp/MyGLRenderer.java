@@ -32,14 +32,8 @@ import android.util.Log;
  *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceChanged}</li>
  * </ul>
  */
-public class MyGLRenderer implements GLSurfaceView.Renderer {
-
-    private static final String TAG = "MyGLRenderer";
-
-    private ShaderCache m_shaderCache;
-    private Triangle mTriangle;
-    private Square   mSquare;
-
+public class MyGLRenderer implements GLSurfaceView.Renderer
+{
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
@@ -166,4 +160,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         mAngle = angle;
     }
 
+    private static final String TAG = "MyGLRenderer";
+    private ShaderCache m_shaderCache;
+    private Triangle mTriangle;
+    private Square   mSquare;
 }

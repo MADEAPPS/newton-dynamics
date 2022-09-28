@@ -18,15 +18,9 @@ import static android.os.SystemClock.elapsedRealtimeNanos;
 
 public class RenderLoop extends Thread
 {
-    final private nWorld m_world;
-    final private MyGLSurfaceView m_glView;
-    final private MyGLRenderer m_glRender;
-    final private float m_timestep;
-    private boolean m_onPause;
-    private boolean m_onTeminate;
-
     RenderLoop(Context context)
     {
+        m_root = new SceneObject();
         m_glView = new MyGLSurfaceView(context);
         m_glRender = m_glView.GetRenderer();
 
@@ -109,10 +103,12 @@ public class RenderLoop extends Thread
         location.SetIdentity();
         location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
+        SceneObject floorObject = new SceneObject(m_root);
+
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
 
-        floor.SetNotifyCallback(new nBodyNotify());
+        floor.SetNotifyCallback(new nBodyNotify(floorObject));
         floor.SetMatrix(location);
         floor.SetCollisionShape(boxShape);
         m_world.AddBody(floor);
@@ -124,9 +120,11 @@ public class RenderLoop extends Thread
         location.SetIdentity();
         location.Set(3, new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
+        SceneObject boxObject = new SceneObject(m_root);
+
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
-        nBodyNotify notify = new nBodyNotify();
+        nBodyNotify notify = new nBodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
 
         box.SetNotifyCallback(notify);
@@ -142,4 +140,12 @@ public class RenderLoop extends Thread
         AddFloor();
         AddBox();
     }
+
+    final private SceneObject m_root;
+    final private nWorld m_world;
+    final private MyGLSurfaceView m_glView;
+    final private MyGLRenderer m_glRender;
+    final private float m_timestep;
+    private boolean m_onPause;
+    private boolean m_onTeminate;
 }

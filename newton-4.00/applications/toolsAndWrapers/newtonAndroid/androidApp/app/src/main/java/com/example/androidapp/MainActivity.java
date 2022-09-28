@@ -13,8 +13,6 @@ public class MainActivity extends AppCompatActivity
         System.loadLibrary("ndNewton");
     }
 
-	private RenderLoop m_renderLoop;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -60,4 +58,6 @@ public class MainActivity extends AppCompatActivity
 					View.SYSTEM_UI_FLAG_FULLSCREEN);
 		}
 	}
+
+	private RenderLoop m_renderLoop;
 }

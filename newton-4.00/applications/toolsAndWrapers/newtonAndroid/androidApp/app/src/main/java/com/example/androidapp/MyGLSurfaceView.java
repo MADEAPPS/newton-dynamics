@@ -24,11 +24,10 @@ import android.view.MotionEvent;
  * This view can also be used to capture touch events, such as a user
  * interacting with drawn objects.
  */
-public class MyGLSurfaceView extends GLSurfaceView {
-
-    private final MyGLRenderer mRenderer;
-
-    public MyGLSurfaceView(Context context) {
+public class MyGLSurfaceView extends GLSurfaceView
+{
+    public MyGLSurfaceView(Context context)
+    {
         super(context);
 
         // Create an OpenGL ES 2.0 context.  CHANGED to 3.0  JW.
@@ -89,4 +88,5 @@ public class MyGLSurfaceView extends GLSurfaceView {
         return true;
     }
 
+    private final MyGLRenderer mRenderer;
 }
