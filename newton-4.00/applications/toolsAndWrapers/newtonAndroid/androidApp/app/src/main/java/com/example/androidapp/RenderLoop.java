@@ -93,6 +93,9 @@ public class RenderLoop extends Thread
         m_world.Sync();
         m_world.Update(m_timestep);
 
+        Matrix4 matrix = new Matrix4();
+        m_root.Render(matrix);
+
         m_glRender.setAngle(m_glRender.getAngle() + 0.1f) ;
         m_glView.requestRender();
     }
