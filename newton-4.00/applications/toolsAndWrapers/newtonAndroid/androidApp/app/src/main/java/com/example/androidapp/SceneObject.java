@@ -47,7 +47,7 @@ public class SceneObject
 
         for (SceneObject child = m_firstChild; child != null; child = child.m_next)
         {
-            Render (matrix);
+            child.Render (matrix);
         }
     }
 
