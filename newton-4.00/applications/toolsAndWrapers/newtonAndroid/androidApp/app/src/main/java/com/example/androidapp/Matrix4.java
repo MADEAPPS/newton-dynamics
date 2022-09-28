@@ -1,5 +1,8 @@
 package com.example.androidapp;
 
+import com.javaNewton.nMatrix;
+import com.javaNewton.nVector;
+
 public class Matrix4
 {
     Matrix4()
@@ -13,6 +16,20 @@ public class Matrix4
                 m_data[i].m_data[j] = 0.0f;
             }
             m_data[i].m_data[i] = 1.0f;
+        }
+    }
+
+    Matrix4(nMatrix matrix)
+    {
+        m_data = new Vector4[4];
+        for (int i = 0; i < 4; i++)
+        {
+            m_data[i] = new Vector4();
+            Vector4 row = new Vector4(matrix.Get(i));
+            for (int j = 0; j < 4; j++)
+            {
+               m_data[i].m_data[j] = row.m_data[i];
+            }
         }
     }
 

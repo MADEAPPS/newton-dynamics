@@ -106,8 +106,6 @@ public class RenderLoop extends Thread
         location.SetIdentity();
         location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
-
-
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
 

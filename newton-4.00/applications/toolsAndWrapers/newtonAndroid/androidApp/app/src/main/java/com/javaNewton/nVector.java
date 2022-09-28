@@ -8,4 +8,10 @@ public class nVector extends ndVectorGlue
     {
         super(x, y, z, w);
     }
+
+    nVector (ndVectorGlue v)
+    {
+        super(v);
+    }
+
 }
