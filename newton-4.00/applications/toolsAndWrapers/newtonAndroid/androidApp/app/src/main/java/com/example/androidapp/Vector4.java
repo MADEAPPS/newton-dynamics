@@ -2,6 +2,11 @@ package com.example.androidapp;
 
 public class Vector4
 {
+    Vector4 ()
+    {
+        m_data = new float[4];
+    }
+
     Vector4 (float x, float y, float z, float w)
     {
         m_data = new float[4];

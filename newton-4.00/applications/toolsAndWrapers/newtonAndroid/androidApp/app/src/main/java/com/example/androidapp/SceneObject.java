@@ -9,6 +9,9 @@ public class SceneObject
         m_prev = null;
         m_parent = null;
         m_firstChild = null;
+
+        m_matrix = new Matrix4();
+        m_meshMatrix = new Matrix4();;
     }
 
     SceneObject (SceneObject parent)
@@ -23,6 +26,9 @@ public class SceneObject
         m_prev = null;
         m_firstChild = null;
         parent.m_firstChild = this;
+
+        m_matrix = new Matrix4();
+        m_meshMatrix = new Matrix4();;
     }
 
     void SetMesh (SceneMesh mesh)

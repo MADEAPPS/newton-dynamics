@@ -7,6 +7,7 @@ public class Matrix4
         m_data = new Vector4[4];
         for (int i = 0; i < 4; i ++)
         {
+            m_data[i] = new Vector4();
             for (int j = 0; j < 4; j ++)
             {
                 m_data[i].m_data[j] = 0.0f;
