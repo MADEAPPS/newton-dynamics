@@ -65,29 +65,33 @@ public class RenderLoop extends Thread
     @Override
     final public void run()
     {
-        double time_0 = 0.0;
+        long time_0 = 0;
         long baseTime = elapsedRealtimeNanos();
         //long baseTime = System.currentTimeMillis();
-        double timeStepInMs = m_timestep * 1000.0f;
+        long timeStepInNanos = (long) (m_timestep * 1.0e9);
+        long xxx = -1;
         while (m_onTeminate == false)
         {
-            double time_1 = (elapsedRealtimeNanos() - baseTime);
-            double deltaTime = time_1 - time_0;
-            if (deltaTime < 0.0)
+            long time_1 = elapsedRealtimeNanos() - baseTime;
+            long deltaTime = time_1 - time_0;
+            if (deltaTime < 0)
             {
                 Log.i("ndNewton", "xxx");
             }
             if (m_onPause == false)
             {
-                if (deltaTime >= timeStepInMs) {
-                    float fps = (float) (1000.0 / deltaTime);
+                if (deltaTime >= timeStepInNanos)
+                {
+                    float fps = (float) (1.0e9 / deltaTime);
                     String text = String.format("RenderLoop fps %f", fps);
                     Log.i("ndNewton", text);
                     DrawFrame();
-                    time_0 = time_0 + timeStepInMs;
-                    while ((time_0 + timeStepInMs) < time_1) {
+                    time_0 = time_0 + timeStepInNanos;
+                    if (deltaTime > (4 * timeStepInNanos))
+                    {
                         Log.i("ndNewton", "skip frame");
-                        time_0 = time_0 + timeStepInMs;
+                        long skipFrames = timeStepInNanos * ((deltaTime / timeStepInNanos) - 1);
+                        time_0 = time_0 + skipFrames;
                     }
                 }
             }
