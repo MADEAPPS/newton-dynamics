@@ -101,7 +101,7 @@ public class RenderLoop extends Thread
     protected void AddFloor()
     {
         nMatrix location = new nMatrix();
-        location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
+        location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
@@ -119,7 +119,7 @@ public class RenderLoop extends Thread
     protected void AddBox()
     {
         nMatrix location = new nMatrix();
-        location.Set(3, new nVector(0.0f, 5.0f, 0.0f, 1.0f));
+        location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));

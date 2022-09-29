@@ -34,20 +34,21 @@ public class nBodyNotify
         {
             super();
             m_owner = owner;
+            m_cacheMatrix = new nMatrix();
         }
 
-        public void OnTransform(ndMatrixGlue nativeMatrix)
+        public void OnTransform(ndMatrixGlue matrix)
         {
-            m_owner.OnTransform(new nMatrix(nativeMatrix));
+            m_cacheMatrix.Set(matrix);
+            m_owner.OnTransform(m_cacheMatrix);
         }
 
         public void SetBody(nRigidBody body)
         {
-            m_body = body;
             body.SetNotifyCallback(this);
         }
 
-        private nRigidBody m_body;
+        private nMatrix m_cacheMatrix;
     }
 
     private nBodyNotify m_owner;

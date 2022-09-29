@@ -40,13 +40,7 @@ public class SceneObject
 
     public void SetMatrix (nMatrix matrix)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            for (int j = 0; j < 4; j++)
-            {
-                m_matrix.m_data[i].m_data[j] = matrix.m_data[i].m_data[j];
-            }
-        }
+        m_matrix.Set(matrix);
     }
 
     void Render (nMatrix parentMatrix)

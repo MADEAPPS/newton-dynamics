@@ -18,11 +18,7 @@ public class nRigidBody extends ndRigidBodyGlue
 
     public void SetMatrix(nMatrix matrix)
     {
-        ndVectorGlue front = new ndVectorGlue(matrix.m_data[0].m_data[0], matrix.m_data[0].m_data[1], matrix.m_data[0].m_data[2], matrix.m_data[0].m_data[3]);
-        ndVectorGlue up    = new ndVectorGlue(matrix.m_data[1].m_data[0], matrix.m_data[1].m_data[1], matrix.m_data[1].m_data[2], matrix.m_data[1].m_data[3]);
-        ndVectorGlue right = new ndVectorGlue(matrix.m_data[2].m_data[0], matrix.m_data[2].m_data[1], matrix.m_data[2].m_data[2], matrix.m_data[2].m_data[3]);
-        ndVectorGlue posit = new ndVectorGlue(matrix.m_data[3].m_data[0], matrix.m_data[3].m_data[1], matrix.m_data[3].m_data[2], matrix.m_data[3].m_data[3]);
-        super.SetMatrix(new ndMatrixGlue(front, up, right, posit));
+        super.SetMatrix(matrix.CreateNative());
     }
 
     public void SetNotify(nBodyNotify notify)

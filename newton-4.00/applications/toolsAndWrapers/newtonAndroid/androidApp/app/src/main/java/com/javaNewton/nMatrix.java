@@ -2,6 +2,7 @@ package com.javaNewton;
 
 
 import com.newton.ndMatrixGlue;
+import com.newton.ndVectorGlue;
 
 public class nMatrix
 {
@@ -25,12 +26,8 @@ public class nMatrix
         for (int i = 0; i < 4; i++)
         {
             m_data[i] = new nVector();
-            nVector row = new nVector(matrix.Get(i));
-            for (int j = 0; j < 4; j++)
-            {
-                m_data[i].m_data[j] = row.m_data[j];
-            }
         }
+        Set (matrix);
     }
 
     public nMatrix(nMatrix matrix)
@@ -40,17 +37,38 @@ public class nMatrix
         {
             m_data[i] = new nVector(m_data[i]);
         }
+        Set (matrix);
     }
 
-    public void Set (int i, nVector v)
+    public void Set (ndMatrixGlue matrix)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            m_data[i].Set(matrix.Get(i));
+        }
+    }
+
+    public void Set (nMatrix matrix)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            m_data[i].Set(matrix.m_data[i]);
+        }
+    }
+
+    public void SetRow (int i, nVector v)
     {
         m_data[i].Set(v);
+    }
+
+    public void SetPosition (nVector posit)
+    {
+        SetRow (3, posit);
     }
 
     public nMatrix Mul(nMatrix other)
     {
         nMatrix matrix = new nMatrix();
-
         for (int i = 0; i < 4; i ++)
         {
             for (int j = 0; j < 4; j ++)
@@ -64,6 +82,11 @@ public class nMatrix
             }
         }
         return matrix;
+    }
+
+    public ndMatrixGlue CreateNative()
+    {
+        return new ndMatrixGlue (m_data[0].CreateNative(), m_data[1].CreateNative(), m_data[2].CreateNative(), m_data[3].CreateNative());
     }
 
     public nVector[] m_data;

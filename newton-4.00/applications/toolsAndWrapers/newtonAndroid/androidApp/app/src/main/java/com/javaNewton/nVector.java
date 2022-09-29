@@ -2,7 +2,7 @@ package com.javaNewton;
 
 import com.newton.ndVectorGlue;
 
-public class nVector extends ndVectorGlue
+public class nVector
 {
     public nVector()
     {
@@ -21,15 +21,17 @@ public class nVector extends ndVectorGlue
     public nVector (nVector v)
     {
         m_data = new float[4];
-        m_data[0] = v.m_data[0];
-        m_data[1] = v.m_data[1];
-        m_data[2] = v.m_data[2];
-        m_data[3] = v.m_data[3];
+        Set(v);
     }
 
     public nVector (ndVectorGlue v)
     {
         m_data = new float[4];
+        Set(v);
+    }
+
+    public void Set(ndVectorGlue v)
+    {
         m_data[0] = v.Get(0);
         m_data[1] = v.Get(1);
         m_data[2] = v.Get(2);
@@ -42,6 +44,11 @@ public class nVector extends ndVectorGlue
         m_data[1] = v.m_data[1];
         m_data[2] = v.m_data[2];
         m_data[3] = v.m_data[3];
+    }
+
+    public ndVectorGlue CreateNative()
+    {
+        return new ndVectorGlue(m_data[0], m_data[1], m_data[2], m_data[3]);
     }
 
     public float[] m_data;
