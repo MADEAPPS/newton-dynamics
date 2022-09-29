@@ -4,14 +4,12 @@ import android.util.Log;
 
 import com.newton.ndMatrixGlue;
 import com.newton.ndBodyNotifyGlue;
-import com.example.androidapp.SceneObject;
 
 public class nBodyNotify extends ndBodyNotifyGlue
 {
-    public nBodyNotify(SceneObject object)
+    public nBodyNotify()
     {
         super();
-        m_object = object;
     }
 
     public void OnTransform(ndMatrixGlue matrix)
@@ -19,5 +17,4 @@ public class nBodyNotify extends ndBodyNotifyGlue
         Log.i("ndNewton", "OnTransform!!!");
     }
 
-    SceneObject m_object;
 }

@@ -2,6 +2,7 @@ package com.example.androidapp;
 
 import com.javaNewton.nMatrix;
 import com.javaNewton.nVector;
+import com.newton.ndMatrixGlue;
 
 public class Matrix4
 {
@@ -28,10 +29,25 @@ public class Matrix4
             Vector4 row = new Vector4(matrix.Get(i));
             for (int j = 0; j < 4; j++)
             {
-               m_data[i].m_data[j] = row.m_data[i];
+               m_data[i].m_data[j] = row.m_data[j];
             }
         }
     }
+
+    Matrix4(ndMatrixGlue matrix)
+    {
+        m_data = new Vector4[4];
+        for (int i = 0; i < 4; i++)
+        {
+            m_data[i] = new Vector4();
+            Vector4 row = new Vector4(matrix.Get(i));
+            for (int j = 0; j < 4; j++)
+            {
+                m_data[i].m_data[j] = row.m_data[j];
+            }
+        }
+    }
+
 
     Matrix4 Mul(Matrix4 other)
     {

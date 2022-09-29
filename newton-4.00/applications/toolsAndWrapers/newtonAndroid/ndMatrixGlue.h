@@ -24,6 +24,11 @@ class ndMatrixGlue : public ndMatrix
 	{
 	}
 
+	ndMatrixGlue(const ndMatrixGlue& matrix)
+		:ndMatrix(matrix)
+	{
+	}
+
 	ndMatrixGlue(const ndMatrix& matrix)
 		:ndMatrix(matrix)
 	{

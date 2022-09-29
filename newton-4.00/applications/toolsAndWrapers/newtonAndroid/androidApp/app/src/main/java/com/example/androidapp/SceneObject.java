@@ -1,5 +1,8 @@
 package com.example.androidapp;
 
+import com.javaNewton.nMatrix;
+import com.newton.ndMatrixGlue;
+
 public class SceneObject
 {
     SceneObject ()
@@ -34,6 +37,11 @@ public class SceneObject
     void SetMesh (SceneMesh mesh)
     {
         m_mesh = mesh;
+    }
+
+    void SetMatrix (ndMatrixGlue matrix)
+    {
+        m_matrix = new Matrix4(matrix);
     }
 
     void Render (Matrix4 parentMatrix)
