@@ -3,10 +3,17 @@ package com.javaNewton;
 import com.newton.ndShapeGlue;
 import com.newton.ndShapeInstanceGlue;
 
-public class nShapeInstance extends ndShapeInstanceGlue
+public class nShapeInstance
 {
     public nShapeInstance(ndShapeGlue shape)
     {
-        super(shape);
+        m_nativeObject = new ndShapeInstanceGlue(shape);
     }
+
+    public ndShapeInstanceGlue GetNativeObject()
+    {
+        return m_nativeObject;
+    }
+
+    private ndShapeInstanceGlue m_nativeObject;
 }
