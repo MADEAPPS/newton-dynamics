@@ -110,7 +110,7 @@ public class RenderLoop extends Thread
         SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
         floorObject.SetMesh(mesh);
 
-        floor.SetNotifyCallback(new BodyNotify(floorObject));
+        floor.SetNotify(new BodyNotify(floorObject));
         floor.SetMatrix(location);
         floor.SetCollisionShape(boxShape);
         m_world.AddBody(floor);
@@ -131,7 +131,7 @@ public class RenderLoop extends Thread
         nBodyNotify notify = new BodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
 
-        box.SetNotifyCallback(notify);
+        box.SetNotify(notify);
         box.SetMatrix(location);
         box.SetCollisionShape(boxShape);
         box.SetMassMatrix(1.0f, boxShape);

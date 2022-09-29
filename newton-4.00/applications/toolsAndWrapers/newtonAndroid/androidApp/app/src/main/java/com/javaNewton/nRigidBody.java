@@ -4,19 +4,16 @@ package com.javaNewton;
 import com.newton.ndShapeGlue;
 import com.newton.nRigidBodyType;
 import com.newton.ndRigidBodyGlue;
-import com.newton.ndBodyNotifyGlue;
 import com.newton.ndShapeInstanceGlue;
 import com.newton.ndVectorGlue;
 import com.newton.ndMatrixGlue;
 
 public class nRigidBody extends ndRigidBodyGlue
 {
-    private ndBodyNotifyGlue m_notify;
-    private ndShapeInstanceGlue m_shapeInstance;
-
     public nRigidBody(nRigidBodyType type)
     {
         super(type);
+        m_notify = null;
     }
 
     public void SetMatrix(nMatrix matrix)
@@ -28,11 +25,10 @@ public class nRigidBody extends ndRigidBodyGlue
         super.SetMatrix(new ndMatrixGlue(front, up, right, posit));
     }
 
-    @Override
-    public void SetNotifyCallback(ndBodyNotifyGlue notifyCallBack)
+    public void SetNotify(nBodyNotify notify)
     {
-        m_notify = notifyCallBack;
-        super.SetNotifyCallback(m_notify);
+        m_notify = notify;
+        notify.SetBody(this);
     }
 
     @Override
@@ -46,4 +42,7 @@ public class nRigidBody extends ndRigidBodyGlue
     {
         return m_shapeInstance;
     }
+
+    private nBodyNotify m_notify;
+    private ndShapeInstanceGlue m_shapeInstance;
 }

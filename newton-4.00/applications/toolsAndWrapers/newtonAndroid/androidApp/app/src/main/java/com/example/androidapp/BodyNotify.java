@@ -4,7 +4,6 @@ package com.example.androidapp;
 import android.util.Log;
 
 import com.javaNewton.nMatrix;
-import com.newton.ndMatrixGlue;
 import com.javaNewton.nBodyNotify;
 
 public class BodyNotify extends nBodyNotify
@@ -15,10 +14,10 @@ public class BodyNotify extends nBodyNotify
         m_object = object;
     }
 
-    public void OnTransform(ndMatrixGlue matrix)
+    @Override
+    public void OnTransform(nMatrix matrix)
     {
-        nMatrix objectMatrix = new nMatrix(matrix);
-        m_object.SetMatrix(objectMatrix);
+        m_object.SetMatrix(matrix);
     }
 
     SceneObject m_object;
