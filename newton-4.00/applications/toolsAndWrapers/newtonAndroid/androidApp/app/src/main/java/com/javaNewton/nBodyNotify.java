@@ -45,7 +45,7 @@ public class nBodyNotify
 
         public void SetBody(nRigidBody body)
         {
-            body.SetNotifyCallback(this);
+            body.GetNativeObject().SetNotifyCallback(this);
         }
 
         private nMatrix m_cacheMatrix;

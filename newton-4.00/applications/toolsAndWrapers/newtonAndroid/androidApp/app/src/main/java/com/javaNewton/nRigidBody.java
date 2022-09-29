@@ -1,24 +1,27 @@
 package com.javaNewton;
 
-
-import com.newton.ndShapeGlue;
 import com.newton.nRigidBodyType;
 import com.newton.ndRigidBodyGlue;
-import com.newton.ndShapeInstanceGlue;
-import com.newton.ndVectorGlue;
-import com.newton.ndMatrixGlue;
+import com.newton.ndShapeGlue;
+import com.newton.ndShapeInstance;
 
-public class nRigidBody extends ndRigidBodyGlue
+public class nRigidBody
 {
     public nRigidBody(nRigidBodyType type)
     {
-        super(type);
         m_notify = null;
+        m_shapeInstance = null;
+        m_nativeObject = new ndRigidBodyGlue(type);
     }
 
     public void SetMatrix(nMatrix matrix)
     {
-        super.SetMatrix(matrix.CreateNative());
+        m_nativeObject.SetMatrix(matrix.CreateNative());
+    }
+
+    public void SetMassMatrix(float mass, nShapeInstance shape)
+    {
+        m_nativeObject.SetMassMatrix(mass, shape);
     }
 
     public void SetNotify(nBodyNotify notify)
@@ -27,18 +30,28 @@ public class nRigidBody extends ndRigidBodyGlue
         notify.SetBody(this);
     }
 
-    @Override
-    public void SetCollisionShape(ndShapeInstanceGlue shapeInstance)
+    public int GetId()
     {
-        super.SetCollisionShape(shapeInstance);
-        m_shapeInstance = new nShapeInstance(new ndShapeGlue(GetShape()));
+        return m_nativeObject.GetId();
     }
 
-    public ndShapeInstanceGlue GetCollisionShape()
+    public void SetCollisionShape(nShapeInstance shapeInstance)
     {
-        return m_shapeInstance;
+        m_nativeObject.SetCollisionShape(shapeInstance);
+        m_shapeInstance = new nShapeInstance(new ndShapeGlue(m_nativeObject.GetShape()));
+    }
+
+    //public ndShapeInstanceGlue GetCollisionShape()
+    //{
+    //    return m_shapeInstance;
+    //}
+
+    public ndRigidBodyGlue GetNativeObject()
+    {
+        return m_nativeObject;
     }
 
     private nBodyNotify m_notify;
-    private ndShapeInstanceGlue m_shapeInstance;
+    private ndRigidBodyGlue m_nativeObject;
+    private ndShapeInstance m_shapeInstance;
 }

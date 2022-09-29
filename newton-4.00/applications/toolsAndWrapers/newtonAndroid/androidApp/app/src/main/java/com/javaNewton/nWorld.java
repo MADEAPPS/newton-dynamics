@@ -1,25 +1,44 @@
 package com.javaNewton;
 
 import com.newton.ndWorldGlue;
-import com.newton.ndRigidBodyGlue;
 
 import java.util.HashMap;
 
-public class nWorld extends ndWorldGlue
+public class nWorld
 {
-    private HashMap<Integer, ndRigidBodyGlue> bodyMap = new HashMap<>();
-
-    @Override
-    public void AddBody(ndRigidBodyGlue body)
+    public nWorld()
     {
-        super.AddBody(body);
-        bodyMap.put (body.GetId(), body);
+        m_bodyMap = new HashMap<>();
+        m_nativeObject = new ndWorldGlue();
     }
 
-    @Override
-    public void RemoveBody(ndRigidBodyGlue body)
+    public void Sync()
     {
-        bodyMap.remove (body.GetId());
-        super.RemoveBody(body);
+        m_nativeObject.Sync();
     }
+
+    public void SetSubSteps(int substeps)
+    {
+        m_nativeObject.SetSubSteps(substeps);
+    }
+
+    public void Update(float timestep)
+    {
+        m_nativeObject.Update(timestep);
+    }
+
+    public void AddBody(nRigidBody body)
+    {
+        m_nativeObject.AddBody(body.GetNativeObject());
+        m_bodyMap.put (body.GetId(), body);
+    }
+
+    public void RemoveBody(nRigidBody body)
+    {
+        m_nativeObject.RemoveBody(body.GetNativeObject());
+        m_bodyMap.remove (body.GetId());
+    }
+
+    private ndWorldGlue m_nativeObject;
+    private HashMap<Integer, nRigidBody> m_bodyMap = new HashMap<>();
 }
