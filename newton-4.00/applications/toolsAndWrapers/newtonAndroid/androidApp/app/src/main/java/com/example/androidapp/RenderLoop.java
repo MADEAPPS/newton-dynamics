@@ -2,8 +2,6 @@ package com.example.androidapp;
 
 import android.util.Log;
 import android.content.Context;
-//import com.example.androidapp.MyGLRenderer;
-//import com.example.androidapp.MyGLSurfaceView;
 
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nMatrix;
@@ -93,7 +91,7 @@ public class RenderLoop extends Thread
         m_world.Sync();
         m_world.Update(m_timestep);
 
-        Matrix4 matrix = new Matrix4();
+        nMatrix matrix = new nMatrix();
         m_root.Render(matrix);
 
         m_glRender.setAngle(m_glRender.getAngle() + 0.1f) ;
@@ -103,7 +101,6 @@ public class RenderLoop extends Thread
     protected void AddFloor()
     {
         nMatrix location = new nMatrix();
-        location.SetIdentity();
         location.Set(3, new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
@@ -122,7 +119,6 @@ public class RenderLoop extends Thread
     protected void AddBox()
     {
         nMatrix location = new nMatrix();
-        location.SetIdentity();
         location.Set(3, new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);

@@ -17,8 +17,8 @@ public class BodyNotify extends nBodyNotify
 
     public void OnTransform(ndMatrixGlue matrix)
     {
-        //Log.i("ndNewton", "OnTransform!!!");
-        m_object.SetMatrix(matrix);
+        nMatrix objectMatrix = new nMatrix(matrix);
+        m_object.SetMatrix(objectMatrix);
     }
 
     SceneObject m_object;

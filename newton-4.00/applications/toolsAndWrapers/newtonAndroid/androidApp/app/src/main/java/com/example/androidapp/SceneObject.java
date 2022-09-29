@@ -1,7 +1,6 @@
 package com.example.androidapp;
 
 import com.javaNewton.nMatrix;
-import com.newton.ndMatrixGlue;
 
 public class SceneObject
 {
@@ -13,8 +12,8 @@ public class SceneObject
         m_parent = null;
         m_firstChild = null;
 
-        m_matrix = new Matrix4();
-        m_meshMatrix = new Matrix4();;
+        m_matrix = new nMatrix();
+        m_meshMatrix = new nMatrix();
     }
 
     SceneObject (SceneObject parent)
@@ -30,26 +29,32 @@ public class SceneObject
         m_firstChild = null;
         parent.m_firstChild = this;
 
-        m_matrix = new Matrix4();
-        m_meshMatrix = new Matrix4();;
+        m_matrix = new nMatrix();
+        m_meshMatrix = new nMatrix();
     }
 
-    void SetMesh (SceneMesh mesh)
+    public void SetMesh (SceneMesh mesh)
     {
         m_mesh = mesh;
     }
 
-    void SetMatrix (ndMatrixGlue matrix)
+    public void SetMatrix (nMatrix matrix)
     {
-        m_matrix = new Matrix4(matrix);
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                m_matrix.m_data[i].m_data[j] = matrix.m_data[i].m_data[j];
+            }
+        }
     }
 
-    void Render (Matrix4 parentMatrix)
+    void Render (nMatrix parentMatrix)
     {
-        Matrix4 matrix = m_matrix.Mul(parentMatrix);
+        nMatrix matrix = m_matrix.Mul(parentMatrix);
         if (m_mesh != null)
         {
-            Matrix4 renderMesh = m_meshMatrix.Mul(matrix);
+            nMatrix renderMesh = m_meshMatrix.Mul(matrix);
             m_mesh.Render (renderMesh);
         }
 
@@ -59,8 +64,8 @@ public class SceneObject
         }
     }
 
-    Matrix4 m_matrix;
-    Matrix4 m_meshMatrix;
+    private nMatrix m_matrix;
+    private nMatrix m_meshMatrix;
 
     private SceneMesh m_mesh;
     private SceneObject m_next;

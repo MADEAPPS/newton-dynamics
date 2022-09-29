@@ -24,11 +24,6 @@ class ndMatrixGlue : public ndMatrix
 	{
 	}
 
-	ndMatrixGlue(const ndMatrixGlue& matrix)
-		:ndMatrix(matrix)
-	{
-	}
-
 	ndMatrixGlue(const ndMatrix& matrix)
 		:ndMatrix(matrix)
 	{
@@ -36,6 +31,11 @@ class ndMatrixGlue : public ndMatrix
 
 	ndMatrixGlue(const ndMatrixGlue& matrix)
 		:ndMatrix(matrix)
+	{
+	}
+
+	ndMatrixGlue(const ndVectorGlue& front, const ndVectorGlue& up, const ndVectorGlue& right, const ndVectorGlue& posit)
+		:ndMatrix(front, up, right, posit)
 	{
 	}
 

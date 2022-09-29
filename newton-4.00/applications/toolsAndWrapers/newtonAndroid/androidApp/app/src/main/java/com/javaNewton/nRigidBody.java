@@ -1,10 +1,13 @@
 package com.javaNewton;
 
+
 import com.newton.ndShapeGlue;
 import com.newton.nRigidBodyType;
 import com.newton.ndRigidBodyGlue;
 import com.newton.ndBodyNotifyGlue;
 import com.newton.ndShapeInstanceGlue;
+import com.newton.ndVectorGlue;
+import com.newton.ndMatrixGlue;
 
 public class nRigidBody extends ndRigidBodyGlue
 {
@@ -14,6 +17,15 @@ public class nRigidBody extends ndRigidBodyGlue
     public nRigidBody(nRigidBodyType type)
     {
         super(type);
+    }
+
+    public void SetMatrix(nMatrix matrix)
+    {
+        ndVectorGlue front = new ndVectorGlue(matrix.m_data[0].m_data[0], matrix.m_data[0].m_data[1], matrix.m_data[0].m_data[2], matrix.m_data[0].m_data[3]);
+        ndVectorGlue up    = new ndVectorGlue(matrix.m_data[1].m_data[0], matrix.m_data[1].m_data[1], matrix.m_data[1].m_data[2], matrix.m_data[1].m_data[3]);
+        ndVectorGlue right = new ndVectorGlue(matrix.m_data[2].m_data[0], matrix.m_data[2].m_data[1], matrix.m_data[2].m_data[2], matrix.m_data[2].m_data[3]);
+        ndVectorGlue posit = new ndVectorGlue(matrix.m_data[3].m_data[0], matrix.m_data[3].m_data[1], matrix.m_data[3].m_data[2], matrix.m_data[3].m_data[3]);
+        super.SetMatrix(new ndMatrixGlue(front, up, right, posit));
     }
 
     @Override
