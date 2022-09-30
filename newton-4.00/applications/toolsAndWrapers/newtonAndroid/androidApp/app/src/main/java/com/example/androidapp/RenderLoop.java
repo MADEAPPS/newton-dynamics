@@ -20,21 +20,8 @@ public class RenderLoop extends Thread
     {
         m_onPause = false;
         m_onTeminate = false;
-        m_timestep = 1.0f / 60.0f;
-
         m_glView = new MyGLSurfaceView(context);
         m_glRender = m_glView.GetRenderer();
-
-        // create an instance of the newton engine
-        m_world = new nWorld();
-    }
-
-    public void LoadDemo()
-    {
-        m_world.SetSubSteps(2);
-        m_root = new SceneObject();
-        TestEngine();
-        m_glRender.SetReady();
     }
 
     public MyGLSurfaceView GetView()
@@ -71,7 +58,7 @@ public class RenderLoop extends Thread
 
         long time_0 = 0;
         long baseTime = elapsedRealtimeNanos();
-        long timeStepInNanos = (long) (m_timestep * 1.0e9);
+        long timeStepInNanos = (long) (m_glRender.GetTimestep() * 1.0e9);
         while (!m_onTeminate)
         {
             if (!m_onPause)
@@ -81,7 +68,11 @@ public class RenderLoop extends Thread
                 if (deltaTime >= timeStepInNanos)
                 {
                     float timestepInSeconds = (float) ((double)deltaTime/1.0e9);
-                    DrawFrame(timestepInSeconds);
+                    //DrawFrame(timestepInSeconds);
+                    String text = String.format("RenderLoop fps %f", 1.0f / timestepInSeconds);
+                    Log.i("ndNewton", text);
+
+                    m_glView.requestRender();
                     time_0 = time_0 + timeStepInNanos;
                     if (deltaTime > (4 * timeStepInNanos))
                     {
@@ -95,73 +86,54 @@ public class RenderLoop extends Thread
         }
     }
 
-    void DrawFrame(float timestep)
-    {
-        String text = String.format("RenderLoop fps %f", 1.0f / timestep);
-        Log.i("ndNewton", text);
-
-        m_world.Sync();
-        m_world.Update(m_timestep);
-
-        nMatrix matrix = new nMatrix();
-        m_root.Render(matrix);
-
-        m_glRender.setAngle(m_glRender.getAngle() + 0.1f) ;
-        m_glView.requestRender();
-    }
-
     protected void AddFloor()
     {
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
-
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
-
-        SceneObject floorObject = new SceneObject(m_root);
+        SceneObject floorObject = new SceneObject();
         SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
         floorObject.SetMesh(mesh);
-
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         floor.SetMatrix(location);
         floor.SetCollisionShape(boxShape);
         floor.SetNotify(new BodyNotify(floorObject));
-        m_world.AddBody(floor);
+
+        m_glRender.GetWorld().AddBody(floor);
+        m_glRender.AddSceneObject(floorObject);
     }
 
     protected void AddBox()
     {
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
-
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
-
-        SceneObject boxObject = new SceneObject(m_root);
+        SceneObject boxObject = new SceneObject();
         SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
         boxObject.SetMesh(mesh);
-
         nBodyNotify notify = new BodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
-
         box.SetNotify(notify);
         box.SetMatrix(location);
         box.SetCollisionShape(boxShape);
         box.SetMassMatrix(1.0f, boxShape);
-        m_world.AddBody(box);
+
+        m_glRender.GetWorld().AddBody(box);
+        m_glRender.AddSceneObject(boxObject);
     }
 
-    protected void TestEngine()
+    public void LoadDemo()
     {
-        m_world.Sync();
+        m_glRender.GetWorld().Sync();
         AddFloor();
         AddBox();
+        m_glRender.SetReady();
     }
 
-    private SceneObject m_root;
-    final private nWorld m_world;
     final private MyGLSurfaceView m_glView;
     final private MyGLRenderer m_glRender;
-    final private float m_timestep;
+
     private boolean m_onPause;
     private boolean m_onTeminate;
 }

@@ -16,9 +16,8 @@ public class SceneObject
         m_meshMatrix = new nMatrix();
     }
 
-    SceneObject (SceneObject parent)
+    void AttachToParent(SceneObject parent)
     {
-        m_mesh = null;
         m_parent = parent;
         m_next = parent.m_firstChild;
         if (parent.m_firstChild != null)
@@ -28,9 +27,6 @@ public class SceneObject
         m_prev = null;
         m_firstChild = null;
         parent.m_firstChild = this;
-
-        m_matrix = new nMatrix();
-        m_meshMatrix = new nMatrix();
     }
 
     public void SetMesh (SceneMesh mesh)

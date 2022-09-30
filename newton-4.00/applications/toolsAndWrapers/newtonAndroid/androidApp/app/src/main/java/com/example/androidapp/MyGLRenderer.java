@@ -23,24 +23,20 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-/**
- * Provides drawing instructions for a GLSurfaceView object. This class
- * must override the OpenGL ES drawing lifecycle methods:
- * <ul>
- *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceCreated}</li>
- *   <li>{@link android.opengl.GLSurfaceView.Renderer#onDrawFrame}</li>
- *   <li>{@link android.opengl.GLSurfaceView.Renderer#onSurfaceChanged}</li>
- * </ul>
- */
+import com.javaNewton.nMatrix;
+import com.javaNewton.nWorld;
+
 public class MyGLRenderer implements GLSurfaceView.Renderer
 {
-    // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
-    private final float[] mMVPMatrix = new float[16];
-    private final float[] mProjectionMatrix = new float[16];
-    private final float[] mViewMatrix = new float[16];
-    private final float[] mRotationMatrix = new float[16];
+    public nWorld GetWorld()
+    {
+        return m_world;
+    }
 
-    private float mAngle;
+    public float GetTimestep()
+    {
+        return m_timestep;
+    }
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
@@ -48,18 +44,37 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
         // Set the background frame color
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+        m_timestep = 1.0f / 60.0f;
         m_shaderCache = new ShaderCache();
+
+        m_world = new nWorld();
+        m_world.SetSubSteps(2);
+        m_root = new SceneObject();
+
         mSquare   = new Square(m_shaderCache.m_solidColor);
         mTriangle = new Triangle(m_shaderCache.m_solidColor);
+    }
+
+    void AddSceneObject(SceneObject object)
+    {
+        object.AttachToParent(m_root);
     }
 
     @Override
     public void onDrawFrame(GL10 unused)
     {
-        // Draw background color
-        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         if (m_renderReady)
         {
+            m_world.Sync();
+            m_world.Update(m_timestep);
+
+            // Draw background color
+            GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+
+            nMatrix matrix = new nMatrix();
+            m_root.Render(matrix);
+
+            setAngle(getAngle() + 0.1f) ;
             float[] scratch = new float[16];
             // Set the camera position (View matrix)
             Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
@@ -69,23 +84,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
 
             // Draw square
             mSquare.draw(mMVPMatrix);
-
-            // Create a rotation for the triangle
-
-            // Use the following code to generate constant rotation.
-            // Leave this code out when using TouchEvents.
-            // long time = SystemClock.uptimeMillis() % 4000L;
-            // float angle = 0.090f * ((int) time);
-
             Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, 1.0f);
-
-            // Combine the rotation matrix with the projection and camera view
-            // Note that the mMVPMatrix factor *must be first* in order
-            // for the matrix multiplication product to be correct.
             Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
-
-            // Draw triangle
             mTriangle.draw(scratch);
+        }
+        else
+        {
+           GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         }
     }
 
@@ -101,7 +106,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
-
     }
 
     public ShaderCache GetShaderCache()
@@ -150,8 +154,20 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
     }
 
     private static final String TAG = "MyGLRenderer";
-    private ShaderCache m_shaderCache;
+
+    private nWorld m_world = null;
+    private SceneObject m_root = null;
+    private ShaderCache m_shaderCache = null;
+
+    private Square mSquare;
     private Triangle mTriangle;
-    private Square   mSquare;
+
     private Boolean m_renderReady = false;
+    private float m_timestep = 1.0f / 60.0f;
+    private final float[] mMVPMatrix = new float[16];
+    private final float[] mProjectionMatrix = new float[16];
+    private final float[] mViewMatrix = new float[16];
+    private final float[] mRotationMatrix = new float[16];
+    private float mAngle;
+
 }
