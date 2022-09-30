@@ -5,47 +5,33 @@ import android.opengl.GLES30;
 
 public class ShaderCache
 {
-    private class TriangleProgran {
-        static final String vertexShaderCode =
-                "uniform mat4 uMVPMatrix;" +
-                "attribute vec4 vPosition;" +
-                "void main() {" +
-                "  gl_Position = uMVPMatrix * vPosition;" +
-                "}";
-
-        static final String fragmentShaderCode =
-                "precision mediump float;" +
-                "uniform vec4 vColor;" +
-                "void main() " +
-                "{" +
-                "  gl_FragColor = vColor;" +
-                "}";
-    }
-
-    private class SquareProgram
+    private class VertexShaders
     {
-        static final String vertexShaderCode =
-                "uniform mat4 uMVPMatrix;" +
-                "attribute vec4 vPosition;" +
-                "void main() {" +
-                "  gl_Position = uMVPMatrix * vPosition;" +
-                "}";
-
-        static final String fragmentShaderCode =
-                "precision mediump float;" +
-                "uniform vec4 vColor;" +
-                "void main() {" +
-                "  gl_FragColor = vColor;" +
-                "}";
+        static final String passPosition =
+            "uniform mat4 uMVPMatrix;" +
+            "attribute vec4 vPosition;" +
+            "void main() {" +
+            "  gl_Position = uMVPMatrix * vPosition;" +
+            "}";
     }
 
-    public int m_squareShader = 0;
-    public int m_triangleShader = 0;
+    private class PixelShaders
+    {
+        static final String simpleColor =
+            "precision mediump float;" +
+            "uniform vec4 vColor;" +
+            "void main() " +
+            "{" +
+            "  gl_FragColor = vColor;" +
+            "}";
+    }
+
+
+    public int m_solidColor = 0;
 
     ShaderCache()
     {
-        m_squareShader = ShaderCache(SquareProgram.vertexShaderCode, SquareProgram.fragmentShaderCode);
-        m_triangleShader = ShaderCache(TriangleProgran.vertexShaderCode, TriangleProgran.fragmentShaderCode);
+        m_solidColor = CompileProgram(VertexShaders.passPosition, PixelShaders.simpleColor);
     }
 
     private int LoadShader(int type, String shaderCode)
@@ -61,7 +47,7 @@ public class ShaderCache
         return shader;
     }
 
-    private int ShaderCache(String vertexShaderCode, String fragmentShaderCode)
+    private int CompileProgram(String vertexShaderCode, String fragmentShaderCode)
     {
         int vertexShader = LoadShader(GLES30.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = LoadShader(GLES30.GL_FRAGMENT_SHADER, fragmentShaderCode);

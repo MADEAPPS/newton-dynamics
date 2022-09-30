@@ -72,8 +72,7 @@ public class Triangle
      * @param mvpMatrix - The Model View Project matrix in which to draw
      * this shape.
      */
-    public void draw(float[] mvpMatrix)
-    {
+    public void draw(float[] mvpMatrix) {
         // Add program to OpenGL environment
         GLES30.glUseProgram(m_program);
 

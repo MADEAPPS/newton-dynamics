@@ -18,21 +18,26 @@ public class RenderLoop extends Thread
 {
     RenderLoop(Context context)
     {
-        m_root = new SceneObject();
+        m_onPause = false;
+        m_onTeminate = false;
+        m_timestep = 1.0f / 60.0f;
+
         m_glView = new MyGLSurfaceView(context);
         m_glRender = m_glView.GetRenderer();
 
-        m_timestep = 1.0f / 60.0f;
-        m_onPause = false;
-        m_onTeminate = false;
-
         // create an instance of the newton engine
         m_world = new nWorld();
-        m_world.SetSubSteps(2);
-        TestEngine();
     }
 
-    MyGLSurfaceView GetView()
+    public void LoadDemo()
+    {
+        m_world.SetSubSteps(2);
+        m_root = new SceneObject();
+        TestEngine();
+        m_glRender.SetReady();
+    }
+
+    public MyGLSurfaceView GetView()
     {
         return m_glView;
     }
@@ -57,15 +62,22 @@ public class RenderLoop extends Thread
     @Override
     final public void run()
     {
+        while (m_glRender.GetShaderCache() == null)
+        {
+            yield();
+        }
+
+        LoadDemo();
+
         long time_0 = 0;
         long baseTime = elapsedRealtimeNanos();
         long timeStepInNanos = (long) (m_timestep * 1.0e9);
-        while (m_onTeminate == false)
+        while (!m_onTeminate)
         {
-            long time_1 = elapsedRealtimeNanos() - baseTime;
-            long deltaTime = time_1 - time_0;
-            if (m_onPause == false)
+            if (!m_onPause)
             {
+                long time_1 = elapsedRealtimeNanos() - baseTime;
+                long deltaTime = time_1 - time_0;
                 if (deltaTime >= timeStepInNanos)
                 {
                     float timestepInSeconds = (float) ((double)deltaTime/1.0e9);
@@ -145,7 +157,7 @@ public class RenderLoop extends Thread
         AddBox();
     }
 
-    final private SceneObject m_root;
+    private SceneObject m_root;
     final private nWorld m_world;
     final private MyGLSurfaceView m_glView;
     final private MyGLRenderer m_glRender;
