@@ -1,0 +1,27 @@
+name: build and run tests
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build And Install Newton
+      run: |
+        cd newton-4.00
+        cmake -S . -B build/ -DNEWTON_BUILD_SANDBOX_DEMOS=OFF
+        cmake --build build -j2
+        sudo cmake --build build --target install
+
+    - name: Build And Run Hello World App
+      run: |
+        cp -r newton-4.00/applications/hello-world /tmp/myapp
+        cd /tmp/myapp
+        cmake -S . -B build/
+        cmake --build build/
+        echo ""
+        build/newton-hello-world
