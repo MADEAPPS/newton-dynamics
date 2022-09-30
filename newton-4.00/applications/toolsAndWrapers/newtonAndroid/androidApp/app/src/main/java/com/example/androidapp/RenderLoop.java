@@ -103,20 +103,16 @@ public class RenderLoop extends Thread
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
-        nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
-        //nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
-        nShapeBox boxShape = new nShapeBox(200.0f, 1.0f, 200.0f);
-
-        floor.SetCollisionShape(boxShape);
-        nShapeInstance boxShapeInstance = floor.GetCollisionShape();
+        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
 
         SceneObject floorObject = new SceneObject(m_root);
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShapeInstance);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
         floorObject.SetMesh(mesh);
 
-        floor.SetNotify(new BodyNotify(floorObject));
+        nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         floor.SetMatrix(location);
-
+        floor.SetCollisionShape(boxShape);
+        floor.SetNotify(new BodyNotify(floorObject));
         m_world.AddBody(floor);
     }
 
@@ -126,13 +122,10 @@ public class RenderLoop extends Thread
         location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
-        nShapeBox boxShape = new nShapeBox(0.5f, 0.5f, 0.5f);
-
-        box.SetCollisionShape(boxShape);
-        nShapeInstance boxShapeInstance = box.GetCollisionShape();
+        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
 
         SceneObject boxObject = new SceneObject(m_root);
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShapeInstance);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
         boxObject.SetMesh(mesh);
 
         nBodyNotify notify = new BodyNotify(boxObject);
@@ -141,7 +134,7 @@ public class RenderLoop extends Thread
         box.SetNotify(notify);
         box.SetMatrix(location);
         box.SetCollisionShape(boxShape);
-        box.SetMassMatrix(1.0f, boxShapeInstance);
+        box.SetMassMatrix(1.0f, boxShape);
         m_world.AddBody(box);
     }
 

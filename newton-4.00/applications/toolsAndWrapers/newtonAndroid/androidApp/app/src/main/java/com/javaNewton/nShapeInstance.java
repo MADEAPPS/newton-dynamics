@@ -6,12 +6,13 @@ public class nShapeInstance
 {
     public nShapeInstance(nShape shape)
     {
+        m_shape = shape;
         m_nativeObject = new ndShapeInstanceGlue(shape.GetNativeObject());
     }
 
-    public nShapeInstance(ndShapeInstanceGlue nativeObject)
+    public nShape GetShape()
     {
-        m_nativeObject = nativeObject;
+        return m_shape;
     }
 
     public ndShapeInstanceGlue GetNativeObject()
@@ -19,5 +20,6 @@ public class nShapeInstance
         return m_nativeObject;
     }
 
+    private nShape m_shape;
     private ndShapeInstanceGlue m_nativeObject;
 }

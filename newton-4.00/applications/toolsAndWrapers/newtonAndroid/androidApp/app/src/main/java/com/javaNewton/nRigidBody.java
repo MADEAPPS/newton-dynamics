@@ -9,6 +9,7 @@ public class nRigidBody
     public nRigidBody(nRigidBodyType type)
     {
         m_notify = null;
+        m_shapeInstance = null;
         m_nativeObject = new ndRigidBodyGlue(type);
     }
 
@@ -33,15 +34,15 @@ public class nRigidBody
         return m_nativeObject.GetId();
     }
 
-    public void SetCollisionShape(nShape shape)
+    public void SetCollisionShape(nShapeInstance shapeInstance)
     {
-        m_shape = shape;
-        m_nativeObject.SetCollisionShape(new ndShapeInstanceGlue(shape.GetNativeObject()));
+        m_nativeObject.SetCollisionShape(new ndShapeInstanceGlue(shapeInstance.GetNativeObject()));
+        m_shapeInstance = new nShapeInstance(shapeInstance.GetShape());
     }
 
     public nShapeInstance GetCollisionShape()
     {
-        return new nShapeInstance(m_nativeObject.GetCollisionShape());
+        return m_shapeInstance;
     }
 
     public ndRigidBodyGlue GetNativeObject()
@@ -49,7 +50,7 @@ public class nRigidBody
         return m_nativeObject;
     }
 
-    private nShape m_shape;
     private nBodyNotify m_notify;
+    private nShapeInstance m_shapeInstance;
     private ndRigidBodyGlue m_nativeObject;
 }
