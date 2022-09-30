@@ -77,7 +77,35 @@ endif(APPLE)
 
 #check for UNIX
 if(UNIX)
-    set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
+  # ----------------------------------------------------------------------
+  # Ensure the RPATH for libndNewton is set correctly both inside the build
+  # tree as well as in the installed location (ie after `make install`).
+  #
+  # The following settings were adapted from here
+  # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+
+  # Use the full RPATH for the build tree.
+  set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+  # Do not use the install RPATH during building but use later on when we install the library.
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+  # Set this RPATH in the installed library.
+  # NOTE: specify CMAKE_INSTALL_PREFIX as an absolute path or it will almost certainly not work.
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+  # Add the automatically determined parts of the RPATH which point to directories
+  # outside the build tree to the install RPATH.
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+  # Only use the RPATH if the target is not a system directory.
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+  if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  endif("${isSystemDir}" STREQUAL "-1")
+  # ----------------------------------------------------------------------
+
+  set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
 	if(NOT NEWTON_BUILD_SHARED_LIBS)
 		add_compile_options(-fPIC)
 	endif()
