@@ -104,15 +104,19 @@ public class RenderLoop extends Thread
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
-        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
+        //nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
+        nShapeBox boxShape = new nShapeBox(200.0f, 1.0f, 200.0f);
+
+        floor.SetCollisionShape(boxShape);
+        nShapeInstance boxShapeInstance = floor.GetCollisionShape();
 
         SceneObject floorObject = new SceneObject(m_root);
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShapeInstance);
         floorObject.SetMesh(mesh);
 
         floor.SetNotify(new BodyNotify(floorObject));
         floor.SetMatrix(location);
-        floor.SetCollisionShape(boxShape);
+
         m_world.AddBody(floor);
     }
 
@@ -122,10 +126,13 @@ public class RenderLoop extends Thread
         location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
-        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
+        nShapeBox boxShape = new nShapeBox(0.5f, 0.5f, 0.5f);
+
+        box.SetCollisionShape(boxShape);
+        nShapeInstance boxShapeInstance = box.GetCollisionShape();
 
         SceneObject boxObject = new SceneObject(m_root);
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShapeInstance);
         boxObject.SetMesh(mesh);
 
         nBodyNotify notify = new BodyNotify(boxObject);
@@ -134,7 +141,7 @@ public class RenderLoop extends Thread
         box.SetNotify(notify);
         box.SetMatrix(location);
         box.SetCollisionShape(boxShape);
-        box.SetMassMatrix(1.0f, boxShape);
+        box.SetMassMatrix(1.0f, boxShapeInstance);
         m_world.AddBody(box);
     }
 

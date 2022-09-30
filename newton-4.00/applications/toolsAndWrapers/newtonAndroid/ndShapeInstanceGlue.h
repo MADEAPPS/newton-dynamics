@@ -12,14 +12,19 @@
 #ifndef _ND_SHAPE_INSTANCE_GLUE_H_
 #define _ND_SHAPE_INSTANCE_GLUE_H_
 
-#include "ndShapeGlue.h"
+#include "ndShape.h"
 #include "ndShapeInstance.h"
 
 class ndShapeInstanceGlue : public ndShapeInstance
 {
 	public:
-	ndShapeInstanceGlue(ndShapeGlue* const shape)
-		:ndShapeInstance(shape->m_shape)
+	ndShapeInstanceGlue(ndShape* const shape)
+		:ndShapeInstance(shape)
+	{
+	}
+
+	ndShapeInstanceGlue(ndShapeInstanceGlue* const instance)
+		:ndShapeInstance(*instance)
 	{
 	}
 

@@ -38,7 +38,6 @@
 	#include <ndNewton.h>
 	#include "nConfig.h"
 	#include "ndWorldGlue.h"
-	#include "ndShapeGlue.h"
 	#include "ndVectorGlue.h"
 	#include "ndMatrixGlue.h"
 	#include "ndShapeBoxGlue.h"
@@ -131,7 +130,6 @@
 %include "ndMatrixGlue.h"
 %include "ndVectorGlue.h"
 %include "ndWorldGlue.h"
-%include "ndShapeGlue.h"
 %include "ndShapeBoxGlue.h"
 %include "ndRigidBodyGlue.h"
 %include "ndBodyNotifyGlue.h"

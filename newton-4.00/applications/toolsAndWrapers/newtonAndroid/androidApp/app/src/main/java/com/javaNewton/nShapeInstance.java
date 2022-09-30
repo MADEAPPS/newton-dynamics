@@ -1,13 +1,17 @@
 package com.javaNewton;
 
-import com.newton.ndShapeGlue;
 import com.newton.ndShapeInstanceGlue;
 
 public class nShapeInstance
 {
-    public nShapeInstance(ndShapeGlue shape)
+    public nShapeInstance(nShape shape)
     {
-        m_nativeObject = new ndShapeInstanceGlue(shape);
+        m_nativeObject = new ndShapeInstanceGlue(shape.GetNativeObject());
+    }
+
+    public nShapeInstance(ndShapeInstanceGlue nativeObject)
+    {
+        m_nativeObject = nativeObject;
     }
 
     public ndShapeInstanceGlue GetNativeObject()

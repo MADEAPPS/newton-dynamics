@@ -78,9 +78,9 @@ class ndRigidBodyGlue
 		m_body->SetMatrix(*matrix);
 	}
 
-	virtual ndShape* GetShape() const
+	virtual ndShapeInstanceGlue* GetCollisionShape() const
 	{
-		return m_body->GetCollisionShape().GetShape();
+		return (ndShapeInstanceGlue*)(&m_body->GetCollisionShape());
 	}
 
 	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)

@@ -12,14 +12,13 @@
 #ifndef _ND_SHAPE_BOX_GLUE_H_
 #define _ND_SHAPE_BOX_GLUE_H_
 
-#include "ndShapeGlue.h"
 #include "ndShapeBox.h"
 
-class ndShapeBoxGlue: public ndShapeGlue
+class ndShapeBoxGlue: public ndShapeBox
 {
 	public:
 	ndShapeBoxGlue(float size_x, float size_y, float size_z)
-		:ndShapeGlue(new ndShapeBox(size_x, size_y, size_z))
+		:ndShapeBox(size_x, size_y, size_z)
 	{
 	}
 };

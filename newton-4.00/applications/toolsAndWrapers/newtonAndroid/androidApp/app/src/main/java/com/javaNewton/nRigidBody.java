@@ -2,15 +2,13 @@ package com.javaNewton;
 
 import com.newton.nRigidBodyType;
 import com.newton.ndRigidBodyGlue;
-import com.newton.ndShapeGlue;
-import com.newton.ndShapeInstance;
+import com.newton.ndShapeInstanceGlue;
 
 public class nRigidBody
 {
     public nRigidBody(nRigidBodyType type)
     {
         m_notify = null;
-        m_shapeInstance = null;
         m_nativeObject = new ndRigidBodyGlue(type);
     }
 
@@ -35,23 +33,23 @@ public class nRigidBody
         return m_nativeObject.GetId();
     }
 
-    public void SetCollisionShape(nShapeInstance shapeInstance)
+    public void SetCollisionShape(nShape shape)
     {
-        m_nativeObject.SetCollisionShape(shapeInstance.GetNativeObject());
-        m_shapeInstance = new nShapeInstance(new ndShapeGlue(m_nativeObject.GetShape()));
+        m_shape = shape;
+        m_nativeObject.SetCollisionShape(new ndShapeInstanceGlue(shape.GetNativeObject()));
     }
 
-    //public ndShapeInstanceGlue GetCollisionShape()
-    //{
-    //    return m_shapeInstance;
-    //}
+    public nShapeInstance GetCollisionShape()
+    {
+        return new nShapeInstance(m_nativeObject.GetCollisionShape());
+    }
 
     public ndRigidBodyGlue GetNativeObject()
     {
         return m_nativeObject;
     }
 
+    private nShape m_shape;
     private nBodyNotify m_notify;
-    private nShapeInstance m_shapeInstance;
     private ndRigidBodyGlue m_nativeObject;
 }
