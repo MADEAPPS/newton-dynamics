@@ -32,6 +32,22 @@ class ndMeshEffectGlue : public ndMeshEffect
 	{
 		return int (ndMeshEffect::GetPropertiesCount());
 	}
+
+	void GetVertexPosit(float data[], int startOffsetInfloats, int strideInFloats)
+	{
+		GetVertexChannel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
+	}
+
+	void GetVertexNormal(float data[], int startOffsetInfloats, int strideInFloats)
+	{
+		GetNormalChannel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
+	}
+
+	void GetVertexUV0(float data[], int startOffsetInfloats, int strideInFloats)
+	{
+		GetUV0Channel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
+	}
+
 };
 
 #endif 

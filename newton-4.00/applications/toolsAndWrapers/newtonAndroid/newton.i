@@ -49,6 +49,7 @@
 
 %feature("director") ndBodyNotifyGlue;
 
+%include "arrays_java.i";
 %include "nConfig.h"
 
 //%rename(GetElement) ndVector::operator[](ndInt32 i);

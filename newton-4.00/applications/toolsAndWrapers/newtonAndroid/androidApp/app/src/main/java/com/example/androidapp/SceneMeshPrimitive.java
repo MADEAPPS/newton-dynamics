@@ -13,12 +13,21 @@ public class SceneMeshPrimitive extends SceneMesh
     {
         super();
 
+        int vertexSizeInFloats = (3 + 3 + 2);
         nMeshEffect meshEffect = new nMeshEffect(shapeInstance);
-        int vertexSizeInBytes = (3 + 3 + 2) * 4;
+
         int vertexCount = meshEffect.GetVertextCount();
+        float[] floatData = new float[vertexCount * vertexSizeInFloats];
+        meshEffect.GetVertexPosit(floatData, 0, vertexSizeInFloats);
+        meshEffect.GetVertexNormal(floatData, 3, vertexSizeInFloats);
+        meshEffect.GetVertexUV0(floatData, 6, vertexSizeInFloats);
+
+        int vertexSizeInBytes = vertexSizeInFloats * 4;
         ByteBuffer bb = ByteBuffer.allocateDirect(vertexCount * vertexSizeInBytes);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer = vertexBuffer.put(floatData);
+        vertexBuffer.position(0);
     }
 
     @Override
