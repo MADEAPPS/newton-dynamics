@@ -91,7 +91,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	,m_hasTransparency(false)
 {
 	m_name = name;
-	ndShapeInstanceMeshBuilder mesh(*collision);
+	ndMeshEffect mesh(*collision);
 
 	//mesh.CalculateNormals(30.0f * dDegreeToRad);
 

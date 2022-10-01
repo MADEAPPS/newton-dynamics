@@ -1,8 +1,5 @@
 package com.example.androidapp;
 
-
-import android.util.Log;
-
 import com.javaNewton.nMatrix;
 import com.javaNewton.nBodyNotify;
 

@@ -23,7 +23,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	,m_maxInstanceCount(1024)
 	,m_matrixOffsetBuffer(0)
 {
-	ndShapeInstanceMeshBuilder mesh(*collision);
+	ndMeshEffect mesh(*collision);
 
 	ndMatrix aligmentUV(uvMatrix);
 	m_shader = shaderCache.m_diffuseIntanceEffect;

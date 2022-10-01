@@ -3,21 +3,13 @@ package com.example.androidapp;
 import android.util.Log;
 import android.content.Context;
 
-import com.javaNewton.nBodyNotify;
-import com.javaNewton.nMatrix;
-import com.javaNewton.nRigidBody;
-import com.javaNewton.nShapeBox;
-import com.javaNewton.nShapeInstance;
-import com.javaNewton.nVector;
-import com.javaNewton.nWorld;
-import com.newton.nRigidBodyType;
-
 import static android.os.SystemClock.elapsedRealtimeNanos;
 
 public class RenderLoop extends Thread
 {
     RenderLoop(Context context)
     {
+        m_demo = null;
         m_onPause = false;
         m_onTeminate = false;
         m_glView = new MyGLSurfaceView(context);
@@ -86,51 +78,19 @@ public class RenderLoop extends Thread
         }
     }
 
-    protected void AddFloor()
-    {
-        nMatrix location = new nMatrix();
-        location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
-        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
-        SceneObject floorObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
-        floorObject.SetMesh(mesh);
-        nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
-        floor.SetMatrix(location);
-        floor.SetCollisionShape(boxShape);
-        floor.SetNotify(new BodyNotify(floorObject));
-
-        m_glRender.GetWorld().AddBody(floor);
-        m_glRender.AddSceneObject(floorObject);
-    }
-
-    protected void AddBox()
-    {
-        nMatrix location = new nMatrix();
-        location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
-        nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
-        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
-        SceneObject boxObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
-        boxObject.SetMesh(mesh);
-        nBodyNotify notify = new BodyNotify(boxObject);
-        notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
-        box.SetNotify(notify);
-        box.SetMatrix(location);
-        box.SetCollisionShape(boxShape);
-        box.SetMassMatrix(1.0f, boxShape);
-
-        m_glRender.GetWorld().AddBody(box);
-        m_glRender.AddSceneObject(boxObject);
-    }
-
     public void LoadDemo()
     {
         m_glRender.GetWorld().Sync();
-        AddFloor();
-        AddBox();
+        if (m_demo != null)
+        {
+            m_glRender.Pause();
+            m_demo.CleanUp(m_glRender);
+        }
+        m_demo = new DemosBase_BasicRigidBodies(m_glRender);
         m_glRender.SetReady();
     }
 
+    private DemosBase m_demo;
     final private MyGLSurfaceView m_glView;
     final private MyGLRenderer m_glRender;
 

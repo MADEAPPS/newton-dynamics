@@ -28,6 +28,7 @@
 #include "ndShape.h"
 #include "ndMeshEffect.h"
 #include "ndShapeInstance.h"
+#include "ndShapeCompound.h"
 #include "ndShapeConvexHull.h"
 
 #define D_VERTEXLIST_INDEX_LIST_BASH (1024)
@@ -4068,7 +4069,7 @@ ndMeshEffect::ndMeshEffect(const ndFloat64* const vertexCloud, ndInt32 count, nd
 	}
 }
 
-ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
+ndMeshEffect::ndMeshEffect(const ndShapeInstance& shapeInstance)
 	:ndPolyhedra()
 	,m_name()
 	,m_points()
@@ -4078,61 +4079,52 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)
 {
-	class ndMeshEffectBuilder : public ndShapeDebugNotify
+	class dgMeshEffectBuilder : public ndShapeDebugNotify
 	{
 		public:
-		ndMeshEffectBuilder()
-			:ndShapeDebugNotify()
-			, m_vertex(1024)
-			, m_faceMaterial(1024)
-			, m_faceIndexCount(1024)
-			, m_brush(0)
+		dgMeshEffectBuilder()
+			:m_vertex(256)
+			,m_faceIndexCount(256)
+			,m_brush(0)
 		{
 		}
 
-		void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
 		{
-			const ndFloat64 brush = m_brush;
 			m_faceIndexCount.PushBack(vertexCount);
-			m_faceMaterial.PushBack(0);
 			for (ndInt32 i = 0; i < vertexCount; ++i)
 			{
-				const ndBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, brush);
+				ndBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, ndFloat32(m_brush));
 				m_vertex.PushBack(point);
 			}
 		}
 
 		ndArray<ndBigVector> m_vertex;
-		ndArray<ndInt32> m_faceMaterial;
 		ndArray<ndInt32> m_faceIndexCount;
-
 		ndInt32 m_brush;
-		ndInt32 m_materialIndex;
 	};
-	ndMeshEffectBuilder builder;
+	dgMeshEffectBuilder builder;
 
 	Init();
-	if (((ndShape*)shape.GetShape())->GetAsShapeCompound())
+	if (((ndShape*)shapeInstance.GetShape())->GetAsShapeCompound())
 	{
-		ndAssert(0);
-		//	dgCollisionInfo collisionInfo;
-		//	collision->GetCollisionInfo(&collisionInfo);
-		//
-		//	ndInt32 brush = 0;
-		//	ndMatrix matrix(collisionInfo.m_offsetMatrix);
-		//	dgCollisionCompound* const compoundCollision = (dgCollisionCompound*)collision->GetChildShape();
-		//	for (ndTree<dgCollisionCompound::dgNodeBase*, ndInt32>::ndNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
-		//		builder.m_brush = brush;
-		//		brush++;
-		//		dgCollisionInstance* const childShape = compoundCollision->GetCollisionFromNode(node);
-		//		childShape->DebugCollision(matrix, (dgCollision::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
-		//	}
-		//
+		ndInt32 brush = 0;
+		ndMatrix matrix(shapeInstance.GetLocalMatrix());
+		const ndShapeCompound* const compound = ((ndShape*)shapeInstance.GetShape())->GetAsShapeCompound();
+		const ndShapeCompound::ndTreeArray& array = compound->GetTree();
+		ndShapeCompound::ndTreeArray::Iterator iter(array);
+		for (iter.Begin(); iter; iter++)
+		{
+			ndShapeInstance* const childInstance = iter.GetNode()->GetInfo()->GetShape();
+			builder.m_brush = brush;
+			brush++;
+			childInstance->DebugShape(matrix, builder);
+		}
 	}
 	else
 	{
 		ndMatrix matrix(ndGetIdentityMatrix());
-		shape.DebugShape(matrix, builder);
+		shapeInstance.DebugShape(matrix, builder);
 	}
 
 	ndStack<ndInt32>indexListBuffer(builder.m_vertex.GetCount());
@@ -4140,17 +4132,18 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 
 	ndMeshEffect::dMeshVertexFormat vertexFormat;
+
 	vertexFormat.m_faceCount = builder.m_faceIndexCount.GetCount();
 	vertexFormat.m_faceIndexCount = &builder.m_faceIndexCount[0];
-	vertexFormat.m_faceMaterial = &builder.m_faceIndexCount[0];
+	//vertexFormat.m_faceMaterial = materialIndex;
+
 	vertexFormat.m_vertex.m_data = &builder.m_vertex[0].m_x;
 	vertexFormat.m_vertex.m_strideInBytes = sizeof(ndBigVector);
 	vertexFormat.m_vertex.m_indexList = &indexList[0];
 
-	m_materials.PushBack(ndMaterial());
 	BuildFromIndexList(&vertexFormat);
 	RepairTJoints();
-	CalculateNormals(ndFloat32(45.0f * ndDegreeToRad));
+	CalculateNormals(ndFloat32(45.0f) * ndDegreeToRad);
 }
 
 ndMatrix ndMeshEffect::CalculateOOBB(ndBigVector& size) const

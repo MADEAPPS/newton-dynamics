@@ -67,7 +67,6 @@
 #include <ndBodyKinematicBase.h>
 #include <ndShapeChamferCylinder.h>
 #include <ndJointBilateralConstraint.h>
-#include <ndShapeInstanceMeshBuilder.h>
 #include <ndShapeStaticProceduralMesh.h>
 
 #endif 

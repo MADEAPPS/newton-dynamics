@@ -43,6 +43,7 @@
 	#include "ndShapeBoxGlue.h"
 	#include "ndRigidBodyGlue.h"
 	#include "ndBodyNotifyGlue.h"
+	#include "ndMeshEffectGlue.h"
 	#include "ndShapeInstanceGlue.h"
 %}
 
@@ -125,6 +126,8 @@
 %include "../../../sdk/dCollision/ndRayCastNotify.h"
 %include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
 
+%include "../../../sdk/dCollision/ndMeshEffect.h"
+
 %include "../../../sdk/dNewton/ndWorld.h"
 
 %include "ndMatrixGlue.h"
@@ -133,5 +136,6 @@
 %include "ndShapeBoxGlue.h"
 %include "ndRigidBodyGlue.h"
 %include "ndBodyNotifyGlue.h"
+%include "ndMeshEffectGlue.h"
 %include "ndShapeInstanceGlue.h"
 

@@ -1,6 +1,5 @@
 package com.example.androidapp;
 
-
 import android.opengl.GLES30;
 
 public class ShaderCache

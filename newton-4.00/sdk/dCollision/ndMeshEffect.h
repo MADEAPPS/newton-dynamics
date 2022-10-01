@@ -393,7 +393,7 @@ class ndMeshEffect: public ndPolyhedra
 	
 	D_COLLISION_API ndMeshEffect();
 	D_COLLISION_API ndMeshEffect(const ndMeshEffect& source);
-	D_COLLISION_API ndMeshEffect(const ndShapeInstance& shape);
+	D_COLLISION_API ndMeshEffect(const ndShapeInstance& shapeInstance);
 	D_COLLISION_API ndMeshEffect(ndPolyhedra& mesh, const ndMeshEffect& source);
 	
 	// Create a convex hull Mesh from point cloud
