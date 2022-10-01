@@ -20,6 +20,7 @@ class ndMeshEffectGlue : public ndMeshEffect
 	public:
 	ndMeshEffectGlue()
 		:ndMeshEffect()
+		,m_materialHandle(nullptr)
 	{
 	}
 
@@ -30,7 +31,7 @@ class ndMeshEffectGlue : public ndMeshEffect
 
 	int GetVertexSize()
 	{
-		return int (ndMeshEffect::GetPropertiesCount());
+		return int (GetPropertiesCount());
 	}
 
 	void GetVertexPosit(float data[], int startOffsetInfloats, int strideInFloats)
@@ -48,6 +49,43 @@ class ndMeshEffectGlue : public ndMeshEffect
 		GetUV0Channel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
 	}
 
+	void MaterialBegin()
+	{
+		m_materialHandle = MaterialGeometryBegin();
+	}
+
+	int GetFirstMaterial()
+	{
+		ndAssert(m_materialHandle);
+		return ndMeshEffect::GetFirstMaterial(m_materialHandle);
+	}
+
+	int GetNextMaterial(int currentMaterial)
+	{
+		ndAssert(m_materialHandle);
+		return ndMeshEffect::GetNextMaterial(m_materialHandle, currentMaterial);
+	}
+
+	int GetMaterialIndexCount(int materialIndex)
+	{
+		ndAssert(m_materialHandle);
+		return ndMeshEffect::GetMaterialIndexCount(m_materialHandle, materialIndex);
+	}
+
+	void GetMaterialGetIndexStream(int materialIndex, short data[], int startOffsetInShorts)
+	{
+		ndAssert(m_materialHandle);
+		ndMeshEffect::GetMaterialGetIndexStream(m_materialHandle, materialIndex, &data[startOffsetInShorts]);
+	}
+	
+	void MaterialEnd()
+	{
+		ndAssert(m_materialHandle);
+		MaterialGeometryEnd(m_materialHandle);
+		m_materialHandle = nullptr;
+	}
+
+	ndIndexArray* m_materialHandle;
 };
 
 #endif 

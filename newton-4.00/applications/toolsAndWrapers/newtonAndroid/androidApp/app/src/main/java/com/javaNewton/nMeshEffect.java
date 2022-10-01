@@ -34,5 +34,35 @@ public class nMeshEffect
         m_nativeObject.GetVertexUV0(buffer, startOffsetInFloats, strideInFloats);
     }
 
+    public void MaterialBegin()
+    {
+        m_nativeObject.MaterialBegin();
+    }
+
+    public int GetFirstMaterial()
+    {
+        return m_nativeObject.GetFirstMaterial();
+    }
+
+    public int GetNextMaterial(int currentMaterialIndex)
+    {
+        return m_nativeObject.GetNextMaterial(currentMaterialIndex);
+    }
+
+    public int GetMaterialIndexCount(int materialIndex)
+    {
+        return m_nativeObject.GetMaterialIndexCount(materialIndex);
+    }
+
+    public void GetMaterialGetIndexStream(int materialIndex, short[] data, int startOffsetInShorts)
+    {
+        m_nativeObject.GetMaterialGetIndexStream(materialIndex, data, startOffsetInShorts);
+    }
+
+    public void MaterialEnd()
+    {
+        m_nativeObject.MaterialEnd();
+    }
+
     private ndMeshEffectGlue m_nativeObject;
 }

@@ -440,7 +440,7 @@ class ndMeshEffect: public ndPolyhedra
 		D_COLLISION_API ndInt32 GetMaterialID(ndIndexArray* const handle, ndInt32 materialHandle) const;
 		D_COLLISION_API ndInt32 GetMaterialIndexCount(ndIndexArray* const handle, ndInt32 materialHandle) const;
 		D_COLLISION_API void GetMaterialGetIndexStream(ndIndexArray* const handle, ndInt32 materialHandle, ndInt32* const index) const;
-		D_COLLISION_API void GetMaterialGetIndexStreamShort(ndIndexArray* const handle, ndInt32 materialHandle, ndInt16* const index) const;
+		D_COLLISION_API void GetMaterialGetIndexStream(ndIndexArray* const handle, ndInt32 materialHandle, ndInt16* const index) const;
 	D_COLLISION_API void MaterialGeometryEnd(ndIndexArray* const handle);
 
 	D_COLLISION_API void BeginBuild();

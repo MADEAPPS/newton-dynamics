@@ -3908,7 +3908,7 @@ void ndMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, ndInt32
 	}
 }
 
-void ndMeshEffect::GetMaterialGetIndexStreamShort(ndIndexArray* const handle, ndInt32 materialHandle, ndInt16* const indexArray) const
+void ndMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, ndInt32 materialHandle, ndInt16* const indexArray) const
 {
 	ndInt32 index = 0;
 	ndInt32 textureID = handle->m_materials[materialHandle];
