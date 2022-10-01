@@ -96,11 +96,11 @@ public class Triangle
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES30.glGetUniformLocation(m_program, "uMVPMatrix");
-        MyGLRenderer.checkGlError("glGetUniformLocation");
+        RenderScene.checkGlError("glGetUniformLocation");
 
         // Apply the projection and view transformation
         GLES30.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
-        MyGLRenderer.checkGlError("glUniformMatrix4fv");
+        RenderScene.checkGlError("glUniformMatrix4fv");
 
         // Draw the triangle
         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vertexCount);

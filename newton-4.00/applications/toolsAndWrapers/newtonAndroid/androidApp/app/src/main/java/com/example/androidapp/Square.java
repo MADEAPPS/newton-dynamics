@@ -43,41 +43,26 @@ public class Square {
 
     private final short drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
 
-    private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
+    private final int vertexStride = COORDS_PER_VERTEX * 4;
 
     float color[] = { 0.2f, 0.709803922f, 0.898039216f, 1.0f };
 
-    /**
-     * Sets up the drawing object data for use in an OpenGL ES context.
-     */
     public Square(int shaderProgram)
     {
         m_program = shaderProgram;
-        // initialize vertex byte buffer for shape coordinates
-        ByteBuffer bb = ByteBuffer.allocateDirect(
-        // (# of coordinate values * 4 bytes per float)
-                squareCoords.length * 4);
+        ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(squareCoords);
         vertexBuffer.position(0);
 
-        // initialize byte buffer for the draw list
-        ByteBuffer dlb = ByteBuffer.allocateDirect(
-                // (# of coordinate values * 2 bytes per short)
-                drawOrder.length * 2);
+        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
         dlb.order(ByteOrder.nativeOrder());
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
     }
 
-    /**
-     * Encapsulates the OpenGL ES instructions for drawing this shape.
-     *
-     * @param mvpMatrix - The Model View Project matrix in which to draw
-     * this shape.
-     */
     public void draw(float[] mvpMatrix) {
         // Add program to OpenGL environment
         GLES30.glUseProgram(m_program);
@@ -102,11 +87,11 @@ public class Square {
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES30.glGetUniformLocation(m_program, "uMVPMatrix");
-        MyGLRenderer.checkGlError("glGetUniformLocation");
+        RenderScene.checkGlError("glGetUniformLocation");
 
         // Apply the projection and view transformation
         GLES30.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
-        MyGLRenderer.checkGlError("glUniformMatrix4fv");
+        RenderScene.checkGlError("glUniformMatrix4fv");
 
         // Draw the square
         GLES30.glDrawElements(

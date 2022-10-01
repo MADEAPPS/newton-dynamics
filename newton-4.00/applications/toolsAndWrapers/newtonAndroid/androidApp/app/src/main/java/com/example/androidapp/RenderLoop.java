@@ -1,3 +1,14 @@
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely
+ */
+
 package com.example.androidapp;
 
 import android.util.Log;
@@ -12,11 +23,11 @@ public class RenderLoop extends Thread
         m_demo = null;
         m_onPause = false;
         m_onTeminate = false;
-        m_glView = new MyGLSurfaceView(context);
+        m_glView = new SurfaceView(context);
         m_glRender = m_glView.GetRenderer();
     }
 
-    public MyGLSurfaceView GetView()
+    public SurfaceView GetView()
     {
         return m_glView;
     }
@@ -91,8 +102,8 @@ public class RenderLoop extends Thread
     }
 
     private DemosBase m_demo;
-    final private MyGLSurfaceView m_glView;
-    final private MyGLRenderer m_glRender;
+    final private SurfaceView m_glView;
+    final private RenderScene m_glRender;
 
     private boolean m_onPause;
     private boolean m_onTeminate;

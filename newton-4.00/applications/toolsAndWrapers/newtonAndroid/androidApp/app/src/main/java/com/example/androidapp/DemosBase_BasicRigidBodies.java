@@ -1,5 +1,15 @@
-package com.example.androidapp;
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely
+ */
 
+package com.example.androidapp;
 
 import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
@@ -12,7 +22,7 @@ import com.newton.nRigidBodyType;
 
 public class DemosBase_BasicRigidBodies extends DemosBase
 {
-    DemosBase_BasicRigidBodies(MyGLRenderer renderer)
+    DemosBase_BasicRigidBodies(RenderScene renderer)
     {
         super(renderer);
 
@@ -20,7 +30,7 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         AddBox(renderer);
     }
 
-    private void AddFloor(MyGLRenderer renderer)
+    private void AddFloor(RenderScene renderer)
     {
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
@@ -37,7 +47,7 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         renderer.AddSceneObject(floorObject);
     }
 
-    private void AddBox(MyGLRenderer renderer)
+    private void AddBox(RenderScene renderer)
     {
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
