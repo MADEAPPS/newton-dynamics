@@ -41,7 +41,7 @@ public class RenderLoop extends Thread
     @Override
     final public void run()
     {
-        while (m_glRender.GetShaderCache() == null)
+        while (!m_glRender.IsInitialized())
         {
             yield();
         }

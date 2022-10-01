@@ -1,18 +1,23 @@
 package com.javaNewton;
 
-import com.newton.ndMeshEffect;
+import com.newton.ndMeshEffectGlue;
 
 public class nMeshEffect
 {
     public nMeshEffect()
     {
-        m_nativeObject = new ndMeshEffect();
+        m_nativeObject = new ndMeshEffectGlue();
     }
 
     public nMeshEffect(nShapeInstance shapeInstance)
     {
-        m_nativeObject = new ndMeshEffect(shapeInstance.GetNativeObject());
+        m_nativeObject = new ndMeshEffectGlue(shapeInstance.GetNativeObject());
     }
 
-    private ndMeshEffect m_nativeObject;
+    public int GetVertextCount()
+    {
+        return m_nativeObject.GetVertexSize();
+    }
+
+    private ndMeshEffectGlue m_nativeObject;
 }

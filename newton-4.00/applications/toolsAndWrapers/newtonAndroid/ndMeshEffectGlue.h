@@ -27,6 +27,11 @@ class ndMeshEffectGlue : public ndMeshEffect
 		:ndMeshEffect(shapeInstance)
 	{
 	}
+
+	int GetVertexSize()
+	{
+		return int (ndMeshEffect::GetPropertiesCount());
+	}
 };
 
 #endif 

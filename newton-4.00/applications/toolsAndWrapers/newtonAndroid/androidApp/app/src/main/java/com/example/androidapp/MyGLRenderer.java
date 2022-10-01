@@ -53,6 +53,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
 
         mSquare   = new Square(m_shaderCache.m_solidColor);
         mTriangle = new Triangle(m_shaderCache.m_solidColor);
+
+        m_renderInitialized = true;
     }
 
     void AddSceneObject(SceneObject object)
@@ -134,6 +136,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
         }
     }
 
+    public Boolean IsInitialized()
+    {
+        return m_renderInitialized;
+    }
+
     public void SetReady()
     {
         m_renderReady = true;
@@ -163,6 +170,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer
     private Triangle mTriangle;
 
     private Boolean m_renderReady = false;
+    private Boolean m_renderInitialized = false;
     private float m_timestep = 1.0f / 60.0f;
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
