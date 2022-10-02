@@ -133,14 +133,82 @@ public class nMatrix
         return matrix;
     }
 
+    public nVector RotateVector(nVector v)
+    {
+        nVector tmp = new nVector(0.0f, 0.0f, 0.0f, 0.0f);
+        for (int i = 0; i < 3; i ++)
+        {
+            tmp = tmp.MulScale (m_data[i], v.m_data[i]);
+        }
+        tmp.m_data[3] = v.m_data[3];
+        return tmp;
+    }
+
+    public nVector UnrotateVector(nVector v)
+    {
+        nVector tmp = new nVector(0.0f, 0.0f, 0.0f, 0.0f);
+        for (int i = 0; i < 3; i ++)
+        {
+            tmp.m_data[i] = m_data[i].DotProduct(v);
+        }
+        tmp.m_data[3] = v.m_data[3];
+        return tmp;
+    }
+
     public nVector TransformVector(nVector v)
     {
         nVector tmp = new nVector(m_data[3].Scale (v.m_data[3]));
         for (int i = 0; i < 3; i ++)
         {
-            tmp = tmp.MulAdd (m_data[i], v.m_data[i]);
+            tmp = tmp.MulScale (m_data[i], v.m_data[i]);
         }
         return tmp;
+    }
+
+    public nVector UntransformVector(nVector v)
+    {
+        nVector tmp = new nVector();
+        for (int i = 0; i < 4; i ++)
+        {
+            tmp.m_data[i] = m_data[i].DotProduct(v);
+        }
+        return tmp;
+    }
+
+    static public nMatrix PitchMatrix(float angle)
+    {
+        nMatrix matrix = new nMatrix();
+        float cos = (float)Math.cos(angle);
+        float sin = (float)Math.cos(angle);
+        matrix.m_data[1].m_data[1] = cos;
+        matrix.m_data[1].m_data[2] = sin;
+        matrix.m_data[2].m_data[1] = -sin;
+        matrix.m_data[2].m_data[2] = cos;
+        return matrix;
+    }
+
+    static public nMatrix YawMatrix(float angle)
+    {
+        nMatrix matrix = new nMatrix();
+        float cos = (float)Math.cos(angle);
+        float sin = (float)Math.cos(angle);
+        matrix.m_data[0].m_data[0] = cos;
+        matrix.m_data[0].m_data[2] = -sin;
+        matrix.m_data[2].m_data[0] = sin;
+        matrix.m_data[2].m_data[2] = cos;
+        return matrix;
+    }
+
+    static public nMatrix RollMatrix(float angle)
+    {
+        nMatrix matrix = new nMatrix();
+        float cos = (float)Math.cos(angle);
+        float sin = (float)Math.cos(angle);
+        matrix.m_data[0].m_data[0] = cos;
+        matrix.m_data[0].m_data[1] = sin;
+        matrix.m_data[1].m_data[0] = -sin;
+        matrix.m_data[1].m_data[1] = cos;
+        return matrix;
     }
 
     public nVector[] m_data;

@@ -67,17 +67,12 @@ public class nVector
         return new ndVectorGlue(m_data[0], m_data[1], m_data[2], m_data[3]);
     }
 
-    public float DotProduct (nVector v)
-    {
-        return m_data[0] *  v.m_data[0] + m_data[1] *  v.m_data[1] + m_data[2] *  v.m_data[2] + m_data[3] *  v.m_data[3];
-    }
-
     public nVector Scale (float s)
     {
         return  new nVector(m_data[0] * s, m_data[1] * s, m_data[2] * s, m_data[3] * s);
     }
 
-    public nVector MulAdd (nVector v, float s)
+    public nVector MulScale (nVector v, float s)
     {
         nVector tmp = new nVector();
         tmp.m_data[0] = m_data[0] + v.m_data[0] * s;
@@ -85,6 +80,51 @@ public class nVector
         tmp.m_data[2] = m_data[2] + v.m_data[2] * s;
         tmp.m_data[3] = m_data[3] + v.m_data[3] * s;
         return tmp;
+    }
+
+    public nVector Add (nVector v)
+    {
+        nVector tmp = new nVector();
+        tmp.m_data[0] = m_data[0] + v.m_data[0];
+        tmp.m_data[1] = m_data[1] + v.m_data[1];
+        tmp.m_data[2] = m_data[2] + v.m_data[2];
+        tmp.m_data[3] = m_data[3] + v.m_data[3];
+        return tmp;
+    }
+
+    public nVector Sub (nVector v)
+    {
+        nVector tmp = new nVector();
+        tmp.m_data[0] = m_data[0] - v.m_data[0];
+        tmp.m_data[1] = m_data[1] - v.m_data[1];
+        tmp.m_data[2] = m_data[2] - v.m_data[2];
+        tmp.m_data[3] = m_data[3] - v.m_data[3];
+        return tmp;
+    }
+
+    public nVector Mul (nVector v)
+    {
+        nVector tmp = new nVector();
+        tmp.m_data[0] = m_data[0] * v.m_data[0];
+        tmp.m_data[1] = m_data[1] * v.m_data[1];
+        tmp.m_data[2] = m_data[2] * v.m_data[2];
+        tmp.m_data[3] = m_data[3] * v.m_data[3];
+        return tmp;
+    }
+
+    public nVector MulAdd (nVector v, nVector w)
+    {
+        nVector tmp = new nVector();
+        tmp.m_data[0] = m_data[0] + v.m_data[0] * w.m_data[0];
+        tmp.m_data[1] = m_data[1] + v.m_data[1] * w.m_data[1];
+        tmp.m_data[2] = m_data[2] + v.m_data[2] * w.m_data[2];
+        tmp.m_data[3] = m_data[3] + v.m_data[3] * w.m_data[3];
+        return tmp;
+    }
+
+    public float DotProduct (nVector v)
+    {
+        return m_data[0] *  v.m_data[0] + m_data[1] *  v.m_data[1] + m_data[2] *  v.m_data[2] + m_data[3] *  v.m_data[3];
     }
 
     public nVector CrossProduct (nVector v)
