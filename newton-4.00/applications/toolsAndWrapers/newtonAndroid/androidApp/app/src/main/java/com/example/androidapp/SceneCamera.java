@@ -4,6 +4,7 @@ import android.opengl.GLES30;
 import android.opengl.Matrix;
 
 import com.javaNewton.nMatrix;
+import com.javaNewton.nVector;
 
 public class SceneCamera extends SceneObject
 {
@@ -12,7 +13,34 @@ public class SceneCamera extends SceneObject
         super();
 
         m_projectionMatrix = new nMatrix();
+        m_glViewMatrix = new float[16];
         m_glProjectionMatrix = new float[16];
+    }
+
+    void SetLookAtMatrix (nVector origin, nVector front, nVector up)
+    {
+        nMatrix result = new nMatrix();
+
+        nVector zAxis = front.Scale (-1.0f);
+        zAxis.m_data[3] = 0.0f;
+        zAxis = zAxis.Normalize();
+
+        nVector xAxis = up.CrossProduct(zAxis);
+        xAxis.m_data[3] = 0.0f;
+        xAxis = xAxis.Normalize();
+        nVector YAxis = zAxis.CrossProduct(xAxis);
+
+        result.SetRow(0, xAxis);
+        result.SetRow(1, YAxis);
+        result.SetRow(2, zAxis);
+        result = result.Inverxe();
+
+        nVector negEye = origin.Scale (-1.0f);
+        negEye.m_data[3] = 1.0f;
+        result.SetRow(3, result.TransformVector(negEye));
+
+        GetMatrix().Set(result);
+        result.GetFlatArray(m_glViewMatrix);
     }
 
     public nMatrix GetProjectionMatrix()
@@ -30,5 +58,8 @@ public class SceneCamera extends SceneObject
     }
 
     private nMatrix m_projectionMatrix;
+
+    private float[] m_glViewMatrix;
     private float[] m_glProjectionMatrix;
+
 }

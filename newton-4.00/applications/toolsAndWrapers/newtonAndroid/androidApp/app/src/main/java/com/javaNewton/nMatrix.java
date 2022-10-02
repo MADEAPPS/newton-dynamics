@@ -119,5 +119,29 @@ public class nMatrix
         return matrix;
     }
 
+    public nMatrix Inverxe()
+    {
+        nMatrix matrix = new nMatrix();
+        for (int i = 0; i < 3; i ++)
+        {
+            for (int j = 0; j < 3; j ++)
+            {
+                matrix.m_data[i].m_data[j] = m_data[j].m_data[i];
+            }
+            matrix.m_data[3].m_data[i] = -m_data[i].DotProduct(m_data[3]);
+        }
+        return matrix;
+    }
+
+    public nVector TransformVector(nVector v)
+    {
+        nVector tmp = new nVector(m_data[3].Scale (v.m_data[3]));
+        for (int i = 0; i < 3; i ++)
+        {
+            tmp = tmp.MulAdd (m_data[i], v.m_data[i]);
+        }
+        return tmp;
+    }
+
     public nVector[] m_data;
 }

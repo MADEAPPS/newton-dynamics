@@ -43,6 +43,9 @@ public class RenderScene implements GLSurfaceView.Renderer
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
         // Set the background frame color
+        GLES30.glCullFace (GLES30.GL_BACK);
+        GLES30.glFrontFace (GLES30.GL_CCW);
+        GLES30.glEnable (GLES30.GL_CULL_FACE);
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         m_timestep = 1.0f / 60.0f;

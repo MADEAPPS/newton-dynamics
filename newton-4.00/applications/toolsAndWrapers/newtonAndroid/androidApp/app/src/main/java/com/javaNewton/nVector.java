@@ -67,5 +67,46 @@ public class nVector
         return new ndVectorGlue(m_data[0], m_data[1], m_data[2], m_data[3]);
     }
 
+    public float DotProduct (nVector v)
+    {
+        return m_data[0] *  v.m_data[0] + m_data[1] *  v.m_data[1] + m_data[2] *  v.m_data[2] + m_data[3] *  v.m_data[3];
+    }
+
+    public nVector Scale (float s)
+    {
+        return  new nVector(m_data[0] * s, m_data[1] * s, m_data[2] * s, m_data[3] * s);
+    }
+
+    public nVector MulAdd (nVector v, float s)
+    {
+        nVector tmp = new nVector();
+        tmp.m_data[0] = m_data[0] + v.m_data[0] * s;
+        tmp.m_data[1] = m_data[1] + v.m_data[1] * s;
+        tmp.m_data[2] = m_data[2] + v.m_data[2] * s;
+        tmp.m_data[3] = m_data[3] + v.m_data[3] * s;
+        return tmp;
+    }
+
+    public nVector CrossProduct (nVector v)
+    {
+        nVector tmp = new nVector();
+        tmp.m_data[0] = m_data[1] * v.m_data[2] - m_data[2] * v.m_data[1];
+        tmp.m_data[1] = m_data[2] * v.m_data[0] - m_data[0] * v.m_data[2];
+        tmp.m_data[2] = m_data[0] * v.m_data[1] - m_data[1] * v.m_data[0];
+        tmp.m_data[3] = m_data[3];
+        return tmp;
+    }
+
+    public nVector Normalize ()
+    {
+        nVector tmp = new nVector();
+        float invMag = 1.0f / (float)Math.sqrt(DotProduct (this));
+        tmp.m_data[0] = m_data[0] * invMag;
+        tmp.m_data[1] = m_data[1] * invMag;
+        tmp.m_data[2] = m_data[2] * invMag;
+        tmp.m_data[3] = m_data[3] * invMag;
+        return tmp;
+    }
+
     public float[] m_data;
 }

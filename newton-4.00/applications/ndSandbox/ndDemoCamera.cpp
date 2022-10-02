@@ -86,36 +86,27 @@ ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 Left, ndFloat32 Right, 
 
 ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& center, const ndVector& normUp)
 {
-	ndMatrix Result(ndGetIdentityMatrix());
+	ndMatrix result(ndGetIdentityMatrix());
 	
-	ndVector ZAxis (center - eye);
-	ZAxis = ZAxis & ndVector::m_triplexMask;
+	ndVector zAxis(eye - center);
+	zAxis = zAxis & ndVector::m_triplexMask;
+	zAxis = zAxis.Normalize();
 
-	ZAxis = ZAxis.Normalize();
-	ndVector XAxis (ZAxis.CrossProduct(normUp));
+	ndVector xAxis(normUp.CrossProduct(zAxis) & ndVector::m_triplexMask);
+	xAxis = xAxis.Normalize();
+	ndVector YAxis (zAxis.CrossProduct(xAxis) & ndVector::m_triplexMask);
 
-	XAxis = XAxis.Normalize();
-	ndVector YAxis (XAxis.CrossProduct(ZAxis));
+	result[0] = xAxis;
+	result[1] = YAxis;
+	result[2] = zAxis;
+	result[3] = ndVector::m_wOne;
 
-	Result[0] = XAxis;
-	Result[1] = YAxis;
-	Result[2] = ZAxis;
-
-	Result[2] = Result[2].Scale(-1.0f);
-
-	Result[3] = ndVector::m_wOne;
-
-	Result = Result.Transpose();
-
+	result = result.Transpose();
 	ndVector negEye (eye);
 	negEye = negEye.Scale(-1.0f);
 	negEye[3] = 1.0f;
-
-	negEye = Result.TransformVector(negEye);
-
-	Result[3] = negEye;
-
-	return Result;
+	result[3] = result.TransformVector(negEye);
+	return result;
 }
 
 ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar)
