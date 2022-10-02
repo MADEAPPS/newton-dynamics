@@ -20,6 +20,9 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import android.opengl.GLES30;
+import android.opengl.Matrix;
+
+import com.javaNewton.nMatrix;
 
 /**
  * A two-dimensional triangle for use as a drawn object in OpenGL ES 2.0.
@@ -66,13 +69,8 @@ public class Triangle
         vertexBuffer.position(0);
     }
 
-    /**
-     * Encapsulates the OpenGL ES instructions for drawing this shape.
-     *
-     * @param mvpMatrix - The Model View Project matrix in which to draw
-     * this shape.
-     */
-    public void draw(float[] mvpMatrix) {
+    public void draw(SceneCamera camera)
+    {
         // Add program to OpenGL environment
         GLES30.glUseProgram(m_program);
 
@@ -98,6 +96,17 @@ public class Triangle
         mMVPMatrixHandle = GLES30.glGetUniformLocation(m_program, "uMVPMatrix");
         RenderScene.checkGlError("glGetUniformLocation");
 
+        m_angle += 0.1f;
+        Matrix.setRotateM(mRotationMatrix, 0, m_angle, 0, 0, 1.0f);
+
+        nMatrix rotationMatrix = new nMatrix();
+        rotationMatrix.Set(mRotationMatrix);
+        nMatrix viewProjectionMatrix = camera.GetMatrix().Mul(camera.GetProjectionMatrix());
+        viewProjectionMatrix = rotationMatrix.Mul(viewProjectionMatrix);
+        //Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+        float[] mvpMatrix = new float[16];
+        viewProjectionMatrix.GetFlatArray(mvpMatrix);
+
         // Apply the projection and view transformation
         GLES30.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
         RenderScene.checkGlError("glUniformMatrix4fv");
@@ -108,4 +117,7 @@ public class Triangle
         // Disable vertex array
         GLES30.glDisableVertexAttribArray(mPositionHandle);
     }
+
+    float m_angle = 0.0f;
+    private final float[] mRotationMatrix = new float[16];
 }

@@ -22,6 +22,8 @@ import java.nio.ShortBuffer;
 
 import android.opengl.GLES30;
 
+import com.javaNewton.nMatrix;
+
 /**
  * A two-dimensional square for use as a drawn object in OpenGL ES 2.0.
  */
@@ -63,7 +65,8 @@ public class Square {
         drawListBuffer.position(0);
     }
 
-    public void draw(float[] mvpMatrix) {
+    public void draw(SceneCamera camera)
+    {
         // Add program to OpenGL environment
         GLES30.glUseProgram(m_program);
 
@@ -90,6 +93,10 @@ public class Square {
         RenderScene.checkGlError("glGetUniformLocation");
 
         // Apply the projection and view transformation
+        float[] mvpMatrix = new float[16];
+        nMatrix viewProjectionMatrix =  camera.GetMatrix().Mul(camera.GetProjectionMatrix());
+        viewProjectionMatrix.GetFlatArray(mvpMatrix);
+
         GLES30.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
         RenderScene.checkGlError("glUniformMatrix4fv");
 

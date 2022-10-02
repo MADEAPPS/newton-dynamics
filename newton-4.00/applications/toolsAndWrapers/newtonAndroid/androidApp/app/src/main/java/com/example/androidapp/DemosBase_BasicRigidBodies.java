@@ -11,6 +11,8 @@
 
 package com.example.androidapp;
 
+import android.opengl.Matrix;
+
 import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nShapeBox;
@@ -28,6 +30,11 @@ public class DemosBase_BasicRigidBodies extends DemosBase
 
         AddFloor(renderer);
         AddBox(renderer);
+
+        float[] mViewMatrix = new float[16];
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
+        renderer.GetCamera().GetMatrix().Set(mViewMatrix);
     }
 
     private void AddFloor(RenderScene renderer)
@@ -36,7 +43,7 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
         SceneObject floorObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape, renderer);
         floorObject.SetMesh(mesh);
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         floor.SetMatrix(location);
@@ -54,7 +61,7 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
         SceneObject boxObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape, renderer);
         boxObject.SetMesh(mesh);
         nBodyNotify notify = new BodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));

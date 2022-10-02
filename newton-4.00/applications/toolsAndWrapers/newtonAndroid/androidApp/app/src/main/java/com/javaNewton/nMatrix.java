@@ -50,6 +50,15 @@ public class nMatrix
         Set (matrix);
     }
 
+    public void Set (float[] data)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            int base = i * 4;
+            m_data[i].Set(data[base + 0], data[base + 1], data[base + 2], data[base + 3]);
+        }
+    }
+
     public void Set (ndMatrixGlue matrix)
     {
         for (int i = 0; i < 4; i++)
@@ -76,6 +85,22 @@ public class nMatrix
         SetRow (3, posit);
     }
 
+    public ndMatrixGlue CreateNative()
+    {
+        return new ndMatrixGlue (m_data[0].CreateNative(), m_data[1].CreateNative(), m_data[2].CreateNative(), m_data[3].CreateNative());
+    }
+
+    public void GetFlatArray(float[] data)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                data[i * 4 + j] = m_data[i].m_data[j];
+            }
+        }
+    }
+
     public nMatrix Mul(nMatrix other)
     {
         nMatrix matrix = new nMatrix();
@@ -92,11 +117,6 @@ public class nMatrix
             }
         }
         return matrix;
-    }
-
-    public ndMatrixGlue CreateNative()
-    {
-        return new ndMatrixGlue (m_data[0].CreateNative(), m_data[1].CreateNative(), m_data[2].CreateNative(), m_data[3].CreateNative());
     }
 
     public nVector[] m_data;

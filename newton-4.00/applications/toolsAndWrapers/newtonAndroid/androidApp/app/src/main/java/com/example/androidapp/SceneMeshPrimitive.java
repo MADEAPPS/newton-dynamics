@@ -20,9 +20,11 @@ import java.nio.ByteOrder;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
-    SceneMeshPrimitive(nShapeInstance shapeInstance)
+    SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene)
     {
         super();
+
+        m_shader = scene.GetShaderCache().m_solidColor;
 
         // get vertex data from mesh and make a vertex buffer for rendering
         int vertexSizeInFloats = (3 + 3 + 2);

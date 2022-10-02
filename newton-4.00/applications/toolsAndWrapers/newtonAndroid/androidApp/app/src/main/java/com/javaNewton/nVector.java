@@ -23,10 +23,7 @@ public class nVector
     public nVector(float x, float y, float z, float w)
     {
         m_data = new float[4];
-        m_data[0] = x;
-        m_data[1] = y;
-        m_data[2] = z;
-        m_data[3] = w;
+        Set(x, y, z, w);
     }
 
     public nVector (nVector v)
@@ -39,6 +36,14 @@ public class nVector
     {
         m_data = new float[4];
         Set(v);
+    }
+
+    public void Set(float x, float y, float z, float w)
+    {
+        m_data[0] = x;
+        m_data[1] = y;
+        m_data[2] = z;
+        m_data[3] = w;
     }
 
     public void Set(ndVectorGlue v)

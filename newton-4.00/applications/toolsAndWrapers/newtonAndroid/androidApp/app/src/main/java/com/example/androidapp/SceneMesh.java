@@ -24,6 +24,7 @@ public class SceneMesh
 {
     public SceneMesh()
     {
+        m_shader = 0;
         vertexBuffer = null;
         drawListBuffer = null;
         m_segments = new ArrayList<SceneMeshSegment>();
@@ -39,6 +40,7 @@ public class SceneMesh
         Log.i("ndNewton", "Render this mesh");
     }
 
+    protected int m_shader;
     protected FloatBuffer vertexBuffer;
     protected ShortBuffer drawListBuffer;
     ArrayList<SceneMeshSegment> m_segments;

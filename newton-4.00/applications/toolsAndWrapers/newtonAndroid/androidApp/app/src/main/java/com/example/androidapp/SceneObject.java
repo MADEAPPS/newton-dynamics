@@ -40,14 +40,34 @@ public class SceneObject
         parent.m_firstChild = this;
     }
 
-    public void SetMesh (SceneMesh mesh)
+    public nMatrix GetMatrix ()
     {
-        m_mesh = mesh;
+        return m_matrix;
     }
 
     public void SetMatrix (nMatrix matrix)
     {
         m_matrix.Set(matrix);
+    }
+
+    public nMatrix GetMeshMatrix ()
+    {
+        return m_meshMatrix;
+    }
+
+    public void SetMeshMatrix (nMatrix matrix)
+    {
+        m_meshMatrix.Set(matrix);
+    }
+
+    public SceneMesh GetMesh ()
+    {
+        return m_mesh;
+    }
+
+    public void SetMesh (SceneMesh mesh)
+    {
+        m_mesh = mesh;
     }
 
     void Render (nMatrix parentMatrix)
@@ -69,6 +89,7 @@ public class SceneObject
     private nMatrix m_meshMatrix;
 
     private SceneMesh m_mesh;
+
     private SceneObject m_next;
     private SceneObject m_prev;
     private SceneObject m_parent;
