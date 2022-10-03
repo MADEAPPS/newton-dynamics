@@ -37,6 +37,7 @@ class ndSharedPtr
 	const T* operator* () const;
 
 	private:
+	int m_xxxxx;
 	T* m_ptr;
 	ndRefCounter* m_references;
 };
@@ -61,11 +62,14 @@ ndInt32 ndSharedPtr<T>::ndRefCounter::Release()
 	return ref - 1;
 }
 
+static int xxxxx;
+
 template <typename T>
 ndSharedPtr<T>::ndSharedPtr()
 	:m_ptr(nullptr)
 	,m_references(new ndRefCounter)
 {
+	m_xxxxx = xxxxx++;
 	m_references->AddRef();
 }
 
@@ -74,6 +78,7 @@ ndSharedPtr<T>::ndSharedPtr(T* const ptr)
 	:m_ptr(ptr)
 	,m_references(new ndRefCounter)
 {
+	m_xxxxx = xxxxx++;
 	m_references->AddRef();
 }
 
@@ -82,6 +87,7 @@ ndSharedPtr<T>::ndSharedPtr(const ndSharedPtr<T>& sp)
 	:m_ptr(sp.m_ptr)
 	,m_references(sp.m_references)
 {
+	m_xxxxx = xxxxx++;
 	m_references->AddRef();
 }
 
@@ -113,6 +119,7 @@ ndSharedPtr<T>& ndSharedPtr<T>::operator = (const ndSharedPtr<T>& sp)
 			delete m_references;
 		}
 
+		m_xxxxx = xxxxx++;
 		m_ptr = sp.m_ptr;
 		m_references = sp.m_references;
 		m_references->AddRef();

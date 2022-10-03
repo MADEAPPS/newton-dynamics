@@ -211,9 +211,9 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	D_CLASS_REFLECTION(ndShape);
 	D_COLLISION_API virtual ~ndShape();
 
-	ndInt32 GetRefCount() const;
-	virtual ndInt32 Release() const;
-	virtual const ndShape* AddRef() const;
+	D_COLLISION_API ndInt32 GetRefCount() const;
+	D_COLLISION_API virtual ndInt32 Release() const;
+	D_COLLISION_API virtual const ndShape* AddRef() const;
 
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
@@ -277,28 +277,6 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 inline ndInt32 ndShape::GetConvexVertexCount() const
 {
 	return 0;
-}
-
-inline const ndShape* ndShape::AddRef() const
-{
-	m_refCount.fetch_add(1);
-	return this;
-}
-
-inline ndInt32 ndShape::Release() const
-{
-	ndInt32 count = m_refCount.fetch_add(-1);
-	ndAssert(count >= 1);
-	if (count == 1) 
-	{
-		delete this;
-	}
-	return count;
-}
-
-inline ndInt32 ndShape::GetRefCount() const
-{
-	return m_refCount.load();
 }
 
 inline ndFloat32 ndShape::CalculateMassProperties(const ndMatrix&, ndVector&, ndVector&, ndVector&) const

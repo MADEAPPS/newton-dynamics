@@ -61,9 +61,7 @@ class ndRigidBodyGlue
 		}
 
 		ndShapeInstance& instance = m_body->GetCollisionShape();
-		ndShapeInstanceGlue instanceGlue(&instance);
-		m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(&instanceGlue);
-		instance.m_shape->AddRef();
+		m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(new ndShapeInstanceGlue(&instance));
 	}
 
 	virtual ~ndRigidBodyGlue()
@@ -89,9 +87,8 @@ class ndRigidBodyGlue
 
 	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
 	{
-		m_body->SetCollisionShape(*(*(shapeInstance->m_instance)));
-		ndShapeInstanceGlue instanceGlue(&m_body->GetCollisionShape());
-		m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(&instanceGlue);
+		//m_body->SetCollisionShape(*(*(shapeInstance->m_instance)));
+		//m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(new ndShapeInstanceGlue(&m_body->GetCollisionShape()));
 	}
 
 	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)

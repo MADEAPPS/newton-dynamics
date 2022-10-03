@@ -110,3 +110,24 @@ ndShapeInfo ndShape::GetShapeInfo() const
 	return info;
 }
 
+const ndShape* ndShape::AddRef() const
+{
+	m_refCount.fetch_add(1);
+	return this;
+}
+
+ndInt32 ndShape::Release() const
+{
+	ndInt32 count = m_refCount.fetch_add(-1);
+	ndAssert(count >= 1);
+	if (count == 1)
+	{
+		delete this;
+	}
+	return count;
+}
+
+ndInt32 ndShape::GetRefCount() const
+{
+	return m_refCount.load();
+}
