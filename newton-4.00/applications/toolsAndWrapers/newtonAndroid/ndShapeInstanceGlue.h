@@ -26,6 +26,7 @@ class ndShapeInstanceGlue
 	ndShapeInstanceGlue(ndShapeInstance* const shapeInstance)
 		:m_instance(shapeInstance)
 	{
+		m_instance->m_shape->AddRef();
 	}
 
 	//ndShapeInstanceGlue(ndShapeInstanceGlue* const shapeInstance)

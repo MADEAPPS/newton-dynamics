@@ -38,13 +38,13 @@ class ndRigidBodyGlue
 		{
 			case m_dynamic:
 			{
-				m_body = ndSharedPtr<ndBody>(new ndBodyDynamic());
+				m_body = ndSharedPtr<ndBodyKinematic>(new ndBodyDynamic());
 				break;
 			}
 
 			case m_triggerVolume:
 			{
-				m_body = ndSharedPtr<ndBody>(new ndBodyTriggerVolume());
+				m_body = ndSharedPtr<ndBodyKinematic>(new ndBodyTriggerVolume());
 				break;
 			}
 
@@ -60,14 +60,10 @@ class ndRigidBodyGlue
 			}
 		}
 
-		ndBodyKinematic* const body = m_body->GetAsBodyKinematic();
-		if (body)
-		{
-			//ndShapeInstance& xxxx = body->GetCollisionShape();
-			//ndShapeInstanceGlue xxx1(&body->GetCollisionShape());
-			ndShapeInstanceGlue xxx1(&body->GetCollisionShape());
-			m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(&xxx1);
-		}
+		ndShapeInstance& instance = m_body->GetCollisionShape();
+		ndShapeInstanceGlue instanceGlue(&instance);
+		m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(&instanceGlue);
+		instance.m_shape->AddRef();
 	}
 
 	virtual ~ndRigidBodyGlue()
@@ -93,24 +89,15 @@ class ndRigidBodyGlue
 
 	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
 	{
-		ndBodyKinematic* const body = m_body->GetAsBodyKinematic();
-		if (body)
-		{
-			body->SetCollisionShape(*(*(shapeInstance->m_instance)));
-			//m_shapeInstance = ndShapeInstanceGlue(body->GetCollisionShape());
-		}
+		m_body->SetCollisionShape(*(*(shapeInstance->m_instance)));
+		ndShapeInstanceGlue instanceGlue(&m_body->GetCollisionShape());
+		m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(&instanceGlue);
 	}
 
 	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
 	{
-		ndAssert(0);
-		ndBodyKinematic* const body = m_body->GetAsBodyKinematic();
-		if (body)
-		{
-			ndShapeInstance& xxxx = body->GetCollisionShape();
-			ndShapeInstanceGlue xxx1(&body->GetCollisionShape());
-			m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(&xxx1);
-		}
+		const ndShapeInstance& instance = *(*(shapeInstance->m_instance));
+		m_body->SetMassMatrix(mass, instance);
 	}
 
 	virtual void SetNotifyCallback(ndBodyNotifyGlue* const notify)
@@ -119,7 +106,7 @@ class ndRigidBodyGlue
 	}
 
 	private:
-	ndSharedPtr<ndBody> m_body;
+	ndSharedPtr<ndBodyKinematic> m_body;
 	ndSharedPtr<ndShapeInstanceGlue> m_shapeInstance;
 	friend class ndWorldGlue;
 };
