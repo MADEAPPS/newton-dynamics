@@ -209,6 +209,8 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 {
 	public:
 	D_CLASS_REFLECTION(ndShape);
+	D_COLLISION_API virtual ~ndShape();
+
 	ndInt32 GetRefCount() const;
 	virtual ndInt32 Release() const;
 	virtual const ndShape* AddRef() const;
@@ -260,7 +262,6 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);
-	D_COLLISION_API virtual ~ndShape();
 
 	ndVector m_inertia;	
 	ndVector m_crossInertia;	

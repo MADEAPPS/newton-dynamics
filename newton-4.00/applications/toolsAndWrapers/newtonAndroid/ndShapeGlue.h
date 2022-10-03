@@ -25,7 +25,6 @@ class ndShapeGlue
 
 	~ndShapeGlue()
 	{
-		ndAssert(m_shape);
 		m_shape->Release();
 	}
 

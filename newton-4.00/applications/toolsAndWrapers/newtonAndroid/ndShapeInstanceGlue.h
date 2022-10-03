@@ -25,11 +25,10 @@ class ndShapeInstanceGlue
 
 	~ndShapeInstanceGlue()
 	{
-		delete m_instance;
 	}
 
 	private:
-	ndShapeInstance* m_instance;
+	ndSharedPtr<ndShapeInstance> m_instance;
 	friend class ndRigidBodyGlue;
 	friend class ndMeshEffectGlue;
 };

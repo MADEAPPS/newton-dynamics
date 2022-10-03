@@ -38,12 +38,14 @@ class ndWorldGlue
 
 	virtual void AddBody(ndRigidBodyGlue* const body)
 	{
-		m_world->AddBody(body->GetNative());
+		ndAssert(0);
+		m_world->AddBody(*(body->m_body));
 	}
 
 	virtual void RemoveBody(ndRigidBodyGlue* const body)
 	{
-		m_world->RemoveBody(body->GetNative());
+		ndAssert(0);
+		m_world->RemoveBody(*(body->m_body));
 	}
 
 	virtual void Update(float timestep)

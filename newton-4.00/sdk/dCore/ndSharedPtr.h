@@ -16,7 +16,7 @@ template <typename T>
 class ndSharedPtr
 {
 	private:	
-	class ndRefCounter : public ndClassAlloc, ndAtomic<int>
+	class ndRefCounter : public ndAtomic<int>, public ndContainersFreeListAlloc<ndRefCounter>
 	{
 		public: 
 		ndRefCounter();
@@ -31,9 +31,10 @@ class ndSharedPtr
 	~ndSharedPtr();
 	ndSharedPtr<T>& operator = (const ndSharedPtr<T>& sp);
 
-	//T* GetPtr();
-	T& operator* ();
-	T* operator-> ();
+	T* operator->();
+
+	T* operator* ();
+	const T* operator* () const;
 
 	private:
 	T* m_ptr;
@@ -42,7 +43,7 @@ class ndSharedPtr
 
 template <typename T>
 ndSharedPtr<T>::ndRefCounter::ndRefCounter()
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndRefCounter>()
 	,ndAtomic<int>(0)
 {
 }
@@ -120,9 +121,15 @@ ndSharedPtr<T>& ndSharedPtr<T>::operator = (const ndSharedPtr<T>& sp)
 }
 
 template <typename T>
-T& ndSharedPtr<T>::operator* ()
+T* ndSharedPtr<T>::operator* ()
 {
-	return *m_ptr;
+	return m_ptr;
+}
+
+template <typename T>
+const T* ndSharedPtr<T>::operator* () const
+{
+	return m_ptr;
 }
 
 template <typename T>
@@ -130,12 +137,6 @@ T* ndSharedPtr<T>::operator-> ()
 {
 	return m_ptr;
 }
-
-//template <typename T>
-//T* ndSharedPtr<T>::GetPtr()
-//{
-//	return m_ptr;
-//}
 
 #endif 
 

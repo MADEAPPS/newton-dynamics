@@ -27,7 +27,7 @@ class ndMeshEffectGlue
 
 	ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
 		:m_materialHandle(nullptr)
-		,m_meshEffect(new ndMeshEffect(*shapeInstance.m_instance))
+		,m_meshEffect(new ndMeshEffect(*(*shapeInstance.m_instance)))
 	{
 	}
 

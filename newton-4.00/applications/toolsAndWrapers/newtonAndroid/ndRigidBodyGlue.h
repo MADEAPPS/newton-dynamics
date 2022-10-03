@@ -76,6 +76,7 @@ class ndRigidBodyGlue
 
 	virtual ndShapeInstanceGlue* GetCollisionShape() const
 	{
+		ndAssert(0);
 		return m_shapeInstance;
 	}
 
@@ -87,10 +88,12 @@ class ndRigidBodyGlue
 
 	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
 	{
+		ndAssert(0);
 		ndBodyKinematic* const body = m_body->GetAsBodyKinematic();
 		if (body)
 		{
-			body->SetMassMatrix(mass, *shapeInstance->m_instance);
+			//const ndShapeInstance* const instance = *((*shapeInstance)->m_instance);
+			body->SetMassMatrix(mass, *(*(shapeInstance->m_instance)));
 		}
 	}
 
@@ -100,11 +103,6 @@ class ndRigidBodyGlue
 	}
 
 	private:
-	ndBody* GetNative()
-	{
-		return m_body->GetAsBody();
-	}
-
 	ndSharedPtr<ndBody> m_body;
 	ndShapeInstanceGlue* m_shapeInstance;
 	friend class ndWorldGlue;
