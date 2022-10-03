@@ -47,6 +47,7 @@
 #include <ndPolyhedra.h>
 #include <ndSyncMutex.h>
 #include <ndSemaphore.h>
+#include <ndSharedPtr.h>
 #include <ndClassAlloc.h>
 #include <ndRefCounter.h>
 #include <ndThreadPool.h>

@@ -12,25 +12,26 @@
 #ifndef _ND_SHAPE_INSTANCE_GLUE_H_
 #define _ND_SHAPE_INSTANCE_GLUE_H_
 
-#include "ndShape.h"
+#include "ndShapeGlue.h"
 #include "ndShapeInstance.h"
 
-class ndShapeInstanceGlue : public ndShapeInstance
+class ndShapeInstanceGlue
 {
 	public:
-	ndShapeInstanceGlue(ndShape* const shape)
-		:ndShapeInstance(shape)
-	{
-	}
-
-	ndShapeInstanceGlue(ndShapeInstanceGlue* const instance)
-		:ndShapeInstance(*instance)
+	ndShapeInstanceGlue(ndShapeGlue* const shape)
+		:m_instance(new ndShapeInstance(shape->m_shape))
 	{
 	}
 
 	~ndShapeInstanceGlue()
 	{
+		delete m_instance;
 	}
+
+	private:
+	ndShapeInstance* m_instance;
+	friend class ndRigidBodyGlue;
+	friend class ndMeshEffectGlue;
 };
 
 #endif 

@@ -11,20 +11,19 @@
 
 package com.javaNewton;
 
-import com.newton.ndShape;
-import com.newton.ndShape;
+import com.newton.ndShapeGlue;
 
 public class nShape
 {
-    protected nShape(ndShape nativeObjecty)
+    protected nShape(ndShapeGlue nativeObject)
     {
-        m_nativeObject = nativeObjecty;
+        m_nativeObject = nativeObject;
     }
 
-    public ndShape GetNativeObject()
+    public ndShapeGlue GetNativeObject()
     {
         return m_nativeObject;
     }
 
-    private ndShape m_nativeObject;
+    private ndShapeGlue m_nativeObject;
 }

@@ -13,79 +13,86 @@
 #define _ND_MESH_EFFECT_GLUE_H_
 
 #include "ndMeshEffect.h"
+#include "ndShapeInstance.h"
 #include "ndShapeInstanceGlue.h"
 
-class ndMeshEffectGlue : public ndMeshEffect
+class ndMeshEffectGlue
 {
 	public:
 	ndMeshEffectGlue()
-		:ndMeshEffect()
-		,m_materialHandle(nullptr)
+		:m_materialHandle(nullptr)
+		,m_meshEffect(new ndMeshEffect())
 	{
 	}
 
 	ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
-		:ndMeshEffect(shapeInstance)
+		:m_materialHandle(nullptr)
+		,m_meshEffect(new ndMeshEffect(*shapeInstance.m_instance))
+	{
+	}
+
+	~ndMeshEffectGlue()
 	{
 	}
 
 	int GetVertexSize()
 	{
-		return int (GetPropertiesCount());
+		return int (m_meshEffect->GetPropertiesCount());
 	}
 
 	void GetVertexPosit(float data[], int startOffsetInfloats, int strideInFloats)
 	{
-		GetVertexChannel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
+		m_meshEffect->GetVertexChannel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
 	}
 
 	void GetVertexNormal(float data[], int startOffsetInfloats, int strideInFloats)
 	{
-		GetNormalChannel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
+		m_meshEffect->GetNormalChannel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
 	}
 
 	void GetVertexUV0(float data[], int startOffsetInfloats, int strideInFloats)
 	{
-		GetUV0Channel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
+		m_meshEffect->GetUV0Channel(strideInFloats * sizeof(float), &data[startOffsetInfloats]);
 	}
 
 	void MaterialBegin()
 	{
-		m_materialHandle = MaterialGeometryBegin();
+		m_materialHandle = m_meshEffect->MaterialGeometryBegin();
 	}
 
 	int GetFirstMaterial()
 	{
 		ndAssert(m_materialHandle);
-		return ndMeshEffect::GetFirstMaterial(m_materialHandle);
+		return m_meshEffect->GetFirstMaterial(m_materialHandle);
 	}
 
 	int GetNextMaterial(int currentMaterial)
 	{
 		ndAssert(m_materialHandle);
-		return ndMeshEffect::GetNextMaterial(m_materialHandle, currentMaterial);
+		return m_meshEffect->GetNextMaterial(m_materialHandle, currentMaterial);
 	}
 
 	int GetMaterialIndexCount(int materialIndex)
 	{
 		ndAssert(m_materialHandle);
-		return ndMeshEffect::GetMaterialIndexCount(m_materialHandle, materialIndex);
+		return m_meshEffect->GetMaterialIndexCount(m_materialHandle, materialIndex);
 	}
 
 	void GetMaterialGetIndexStream(int materialIndex, short data[], int startOffsetInShorts)
 	{
 		ndAssert(m_materialHandle);
-		ndMeshEffect::GetMaterialGetIndexStream(m_materialHandle, materialIndex, &data[startOffsetInShorts]);
+		m_meshEffect->GetMaterialGetIndexStream(m_materialHandle, materialIndex, &data[startOffsetInShorts]);
 	}
 	
 	void MaterialEnd()
 	{
 		ndAssert(m_materialHandle);
-		MaterialGeometryEnd(m_materialHandle);
+		m_meshEffect->MaterialGeometryEnd(m_materialHandle);
 		m_materialHandle = nullptr;
 	}
 
 	ndIndexArray* m_materialHandle;
+	ndSharedPtr<ndMeshEffect> m_meshEffect;
 };
 
 #endif 

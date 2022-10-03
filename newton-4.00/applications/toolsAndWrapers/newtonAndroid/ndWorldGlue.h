@@ -14,11 +14,11 @@
 
 #include "ndRigidBodyGlue.h"
 
-class ndWorldGlue : public ndWorld
+class ndWorldGlue
 {
 	public:
 	ndWorldGlue()
-		:ndWorld()
+		:m_world(new ndWorld())
 	{
 	}
 
@@ -26,25 +26,32 @@ class ndWorldGlue : public ndWorld
 	{
 	}
 
+	void Sync()
+	{
+		m_world->Sync();
+	}
+
 	void SetSubSteps(int i)
 	{
-		ndWorld::SetSubSteps(i);
+		m_world->SetSubSteps(i);
 	}
 
 	virtual void AddBody(ndRigidBodyGlue* const body)
 	{
-		ndWorld::AddBody(body->m_body);
+		m_world->AddBody(body->GetNative());
 	}
 
 	virtual void RemoveBody(ndRigidBodyGlue* const body)
 	{
-		ndWorld::RemoveBody(body->m_body);
+		m_world->RemoveBody(body->GetNative());
 	}
 
 	virtual void Update(float timestep)
 	{
-		ndWorld::Update(timestep);
+		m_world->Update(timestep);
 	}
+
+	ndSharedPtr<ndWorld> m_world;
 };
 
 #endif 

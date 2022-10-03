@@ -71,7 +71,6 @@ public class SceneMeshPrimitive extends SceneMesh
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(indexData);
         drawListBuffer.position(0);
-
     }
 
     @Override

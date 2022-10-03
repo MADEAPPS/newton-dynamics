@@ -31,19 +31,19 @@ class ndRigidBodyGlue
 {
 	public:
 	ndRigidBodyGlue(nRigidBodyType type)
-		:m_body(nullptr)
+		:m_body()
 	{
 		switch (type)
 		{
 			case m_dynamic:
 			{
-				m_body = new ndBodyDynamic();
+				m_body = ndSharedPtr<ndBody>(new ndBodyDynamic());
 				break;
 			}
 
 			case m_triggerVolume:
 			{
-				m_body = new ndBodyTriggerVolume();
+				m_body = ndSharedPtr<ndBody>(new ndBodyTriggerVolume());
 				break;
 			}
 
@@ -62,13 +62,9 @@ class ndRigidBodyGlue
 
 	virtual ~ndRigidBodyGlue()
 	{
-		//if (m_body)
-		//{
-		//	delete m_body;
-		//}
 	}
 
-	int GetId() const
+	int GetId()
 	{
 		return m_body->GetId();
 	}
@@ -80,17 +76,22 @@ class ndRigidBodyGlue
 
 	virtual ndShapeInstanceGlue* GetCollisionShape() const
 	{
-		return (ndShapeInstanceGlue*)(&m_body->GetCollisionShape());
+		return m_shapeInstance;
 	}
 
 	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
 	{
-		m_body->SetCollisionShape(*shapeInstance);
+		//m_body->SetCollisionShape(*shapeInstance);
+		ndAssert(0);
 	}
 
 	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
 	{
-		m_body->SetMassMatrix(mass, *shapeInstance);
+		ndBodyKinematic* const body = m_body->GetAsBodyKinematic();
+		if (body)
+		{
+			body->SetMassMatrix(mass, *shapeInstance->m_instance);
+		}
 	}
 
 	virtual void SetNotifyCallback(ndBodyNotifyGlue* const notify)
@@ -99,7 +100,13 @@ class ndRigidBodyGlue
 	}
 
 	private:
-	ndBodyKinematic* m_body;
+	ndBody* GetNative()
+	{
+		return m_body->GetAsBody();
+	}
+
+	ndSharedPtr<ndBody> m_body;
+	ndShapeInstanceGlue* m_shapeInstance;
 	friend class ndWorldGlue;
 };
 

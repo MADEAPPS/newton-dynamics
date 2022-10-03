@@ -29,7 +29,7 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         super(renderer);
 
         AddFloor(renderer);
-        AddBox(renderer);
+        //AddBox(renderer);
 
         nVector up = new nVector(0.0f, 1.0f, 0.0f, 0.0f);
         nVector front = new nVector(1.0f, 0.0f, 0.0f, 0.0f);
@@ -41,17 +41,18 @@ public class DemosBase_BasicRigidBodies extends DemosBase
     {
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
-        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
+        nShapeInstance shapeInstance = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer);
+
         SceneObject floorObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape, renderer);
         floorObject.SetMesh(mesh);
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
         floor.SetMatrix(location);
-        floor.SetCollisionShape(boxShape);
-        floor.SetNotify(new BodyNotify(floorObject));
+        //floor.SetCollisionShape(shapeInstance);
+        //floor.SetNotify(new BodyNotify(floorObject));
 
-        renderer.GetWorld().AddBody(floor);
-        renderer.AddSceneObject(floorObject);
+        //renderer.GetWorld().AddBody(floor);
+        //renderer.AddSceneObject(floorObject);
     }
 
     private void AddBox(RenderScene renderer)

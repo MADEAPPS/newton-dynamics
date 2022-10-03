@@ -362,7 +362,6 @@ class ndDownHeap : public ndHeap<dItem, ndDownHeapCompare<dKey>>
 	}
 };
 
-
 template <class dKey>
 class ndUpHeapCompare
 {
