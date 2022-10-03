@@ -23,6 +23,16 @@ class ndShapeInstanceGlue
 	{
 	}
 
+	ndShapeInstanceGlue(ndShapeInstance* const shapeInstance)
+		:m_instance(shapeInstance)
+	{
+	}
+
+	//ndShapeInstanceGlue(ndShapeInstanceGlue* const shapeInstance)
+	//	:m_instance(new ndShapeInstance(*(*shapeInstance->m_instance)))
+	//{
+	//}
+
 	~ndShapeInstanceGlue()
 	{
 	}
