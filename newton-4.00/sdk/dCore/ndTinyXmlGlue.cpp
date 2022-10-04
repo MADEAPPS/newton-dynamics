@@ -151,6 +151,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	node->SetAttribute("floatArray", buffer);
 }
 
+#ifdef D_NEWTON_USE_DOUBLE
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndReal>& array)
 {
 	char* const buffer = ndAlloca(char, array.GetCount() * 12 + 256);
@@ -167,25 +168,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	node->SetAttribute("count", array.GetCount());
 	node->SetAttribute("realArray", buffer);
 }
-
-
-//void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndFloat32* const array)
-//{
-//	char* const buffer = ndAlloca(char, count * 12 + 256);
-//
-//	char* ptr = buffer;
-//	for (ndInt32 i = 0; i < count; ++i)
-//	{
-//		ptr = FloatToString(ptr, array[i]);
-//	}
-//	CleanWhiteSpace(buffer);
-//
-//	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
-//	rootNode->LinkEndChild(node);
-//
-//	node->SetAttribute("count", count);
-//	node->SetAttribute("floatArray", buffer);
-//}
+#endif
 
 ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 {
@@ -216,6 +199,7 @@ ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const nam
 	return ndFloat32 (value);
 }
 
+#ifdef D_NEWTON_USE_DOUBLE
 void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
@@ -239,6 +223,7 @@ void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const nam
 		array[i] = ndReal(fx);
 	}
 }
+#endif
 
 void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndFloat32>& array)
 {
