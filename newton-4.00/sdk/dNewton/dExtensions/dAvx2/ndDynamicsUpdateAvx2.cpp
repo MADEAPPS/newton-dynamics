@@ -189,6 +189,15 @@
 			_mm256_zeroall();
 		}
 
+		static inline void Transpose(
+			ndAvxFloat& dst0, ndAvxFloat& dst1, ndAvxFloat& dst2, ndAvxFloat& dst3,
+			ndAvxFloat& dst4, ndAvxFloat& dst5, ndAvxFloat& dst6, ndAvxFloat& dst7,
+			const ndAvxFloat& src0, const ndAvxFloat& src1, const ndAvxFloat& src2, const ndAvxFloat& src3,
+			const ndAvxFloat& src4, const ndAvxFloat& src5, const ndAvxFloat& src6, const ndAvxFloat& src7)
+		{
+			ndAssert(0);
+		}
+
 		union
 		{
 			struct
@@ -366,6 +375,43 @@
 		{
 			_mm256_zeroall();
 		}
+
+		static inline void Transpose(
+			ndAvxFloat& dst0, ndAvxFloat& dst1, ndAvxFloat& dst2, ndAvxFloat& dst3, 
+			ndAvxFloat& dst4, ndAvxFloat& dst5, ndAvxFloat& dst6, ndAvxFloat& dst7,
+			const ndAvxFloat& src0, const ndAvxFloat& src1, const ndAvxFloat& src2, const ndAvxFloat& src3,
+			const ndAvxFloat& src4, const ndAvxFloat& src5, const ndAvxFloat& src6, const ndAvxFloat& src7)
+		{
+			ndAvxFloat tmp[8];
+			tmp[0].m_typeInt = _mm256_permute2f128_si256(src0.m_typeInt, src4.m_typeInt, 0x20);
+			tmp[1].m_typeInt = _mm256_permute2f128_si256(src0.m_typeInt, src4.m_typeInt, 0x31);
+			tmp[2].m_typeInt = _mm256_permute2f128_si256(src1.m_typeInt, src5.m_typeInt, 0x20);
+			tmp[3].m_typeInt = _mm256_permute2f128_si256(src1.m_typeInt, src5.m_typeInt, 0x31);
+			tmp[4].m_typeInt = _mm256_permute2f128_si256(src2.m_typeInt, src6.m_typeInt, 0x20);
+			tmp[5].m_typeInt = _mm256_permute2f128_si256(src2.m_typeInt, src6.m_typeInt, 0x31);
+			tmp[6].m_typeInt = _mm256_permute2f128_si256(src3.m_typeInt, src7.m_typeInt, 0x20);
+			tmp[7].m_typeInt = _mm256_permute2f128_si256(src3.m_typeInt, src7.m_typeInt, 0x31);
+			
+			ndAvxFloat rrF[8];
+			rrF[0].m_type = _mm256_unpacklo_ps(tmp[0].m_type, tmp[4].m_type);
+			rrF[1].m_type = _mm256_unpackhi_ps(tmp[0].m_type, tmp[4].m_type);
+			rrF[2].m_type = _mm256_unpacklo_ps(tmp[1].m_type, tmp[5].m_type);
+			rrF[3].m_type = _mm256_unpackhi_ps(tmp[1].m_type, tmp[5].m_type);
+			rrF[4].m_type = _mm256_unpacklo_ps(tmp[2].m_type, tmp[6].m_type);
+			rrF[5].m_type = _mm256_unpackhi_ps(tmp[2].m_type, tmp[6].m_type);
+			rrF[6].m_type = _mm256_unpacklo_ps(tmp[3].m_type, tmp[7].m_type);
+			rrF[7].m_type = _mm256_unpackhi_ps(tmp[3].m_type, tmp[7].m_type);
+			
+			dst0.m_type = _mm256_unpacklo_ps(rrF[0].m_type, rrF[4].m_type);
+			dst1.m_type = _mm256_unpackhi_ps(rrF[0].m_type, rrF[4].m_type);
+			dst2.m_type = _mm256_unpacklo_ps(rrF[1].m_type, rrF[5].m_type);
+			dst3.m_type = _mm256_unpackhi_ps(rrF[1].m_type, rrF[5].m_type);
+			dst4.m_type = _mm256_unpacklo_ps(rrF[2].m_type, rrF[6].m_type);
+			dst5.m_type = _mm256_unpackhi_ps(rrF[2].m_type, rrF[6].m_type);
+			dst6.m_type = _mm256_unpacklo_ps(rrF[3].m_type, rrF[7].m_type);
+			dst7.m_type = _mm256_unpackhi_ps(rrF[3].m_type, rrF[7].m_type);
+		}
+
 
 		union
 		{
@@ -1223,6 +1269,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				const ndConstraint* const joint6 = jointsPtr[index + 6];
 				const ndConstraint* const joint7 = jointsPtr[index + 7];
 
+				ndAvxFloat dommy;
 				const ndInt32 rowCount = joint0->m_rowCount;
 				for (ndInt32 j = 0; j < rowCount; ++j)
 				{
@@ -1237,6 +1284,81 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					const ndLeftHandSide* const row7 = &leftHandSide[joint7->m_rowStart + j];
 					ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
 
+				#if 1
+					ndAvxFloat::Transpose(
+						row.m_Jt.m_jacobianM0.m_linear.m_x,
+						row.m_Jt.m_jacobianM0.m_linear.m_y,
+						row.m_Jt.m_jacobianM0.m_linear.m_z,
+						dommy,
+						row.m_Jt.m_jacobianM0.m_angular.m_x,
+						row.m_Jt.m_jacobianM0.m_angular.m_y,
+						row.m_Jt.m_jacobianM0.m_angular.m_z,
+						dommy,
+						(ndAvxFloat&)row0->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row1->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row2->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row3->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row4->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row5->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row6->m_Jt.m_jacobianM0,
+						(ndAvxFloat&)row7->m_Jt.m_jacobianM0);
+
+					ndAvxFloat::Transpose(
+						row.m_Jt.m_jacobianM1.m_linear.m_x,
+						row.m_Jt.m_jacobianM1.m_linear.m_y,
+						row.m_Jt.m_jacobianM1.m_linear.m_z,
+						dommy,
+						row.m_Jt.m_jacobianM1.m_angular.m_x,
+						row.m_Jt.m_jacobianM1.m_angular.m_y,
+						row.m_Jt.m_jacobianM1.m_angular.m_z,
+						dommy,
+						(ndAvxFloat&)row0->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row1->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row2->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row3->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row4->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row5->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row6->m_Jt.m_jacobianM1,
+						(ndAvxFloat&)row7->m_Jt.m_jacobianM1);
+					
+					ndAvxFloat::Transpose(
+						row.m_JMinv.m_jacobianM0.m_linear.m_x,
+						row.m_JMinv.m_jacobianM0.m_linear.m_y,
+						row.m_JMinv.m_jacobianM0.m_linear.m_z,
+						dommy,
+						row.m_JMinv.m_jacobianM0.m_angular.m_x,
+						row.m_JMinv.m_jacobianM0.m_angular.m_y,
+						row.m_JMinv.m_jacobianM0.m_angular.m_z,
+						dommy,
+						(ndAvxFloat&)row0->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row1->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row2->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row3->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row4->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row5->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row6->m_JMinv.m_jacobianM0,
+						(ndAvxFloat&)row7->m_JMinv.m_jacobianM0);
+					
+					ndAvxFloat::Transpose(
+						row.m_JMinv.m_jacobianM1.m_linear.m_x,
+						row.m_JMinv.m_jacobianM1.m_linear.m_y,
+						row.m_JMinv.m_jacobianM1.m_linear.m_z,
+						dommy,
+						row.m_JMinv.m_jacobianM1.m_angular.m_x,
+						row.m_JMinv.m_jacobianM1.m_angular.m_y,
+						row.m_JMinv.m_jacobianM1.m_angular.m_z,
+						dommy,
+						(ndAvxFloat&)row0->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row1->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row2->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row3->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row4->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row5->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row6->m_JMinv.m_jacobianM1,
+						(ndAvxFloat&)row7->m_JMinv.m_jacobianM1);
+			
+				#else	
+
 					ndVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 						row0->m_Jt.m_jacobianM0.m_linear,
 						row1->m_Jt.m_jacobianM0.m_linear,
@@ -1250,6 +1372,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_Jt.m_jacobianM0.m_linear.m_x = ndAvxFloat(tmp[0], tmp[4]);
 					row.m_Jt.m_jacobianM0.m_linear.m_y = ndAvxFloat(tmp[1], tmp[5]);
 					row.m_Jt.m_jacobianM0.m_linear.m_z = ndAvxFloat(tmp[2], tmp[6]);
+
 					ndVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 						row0->m_Jt.m_jacobianM0.m_angular,
 						row1->m_Jt.m_jacobianM0.m_angular,
@@ -1344,6 +1467,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_JMinv.m_jacobianM1.m_angular.m_x = ndAvxFloat(tmp[0], tmp[4]);
 					row.m_JMinv.m_jacobianM1.m_angular.m_y = ndAvxFloat(tmp[1], tmp[5]);
 					row.m_JMinv.m_jacobianM1.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
+				#endif
 
 					#ifdef D_NEWTON_USE_DOUBLE
 					ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
