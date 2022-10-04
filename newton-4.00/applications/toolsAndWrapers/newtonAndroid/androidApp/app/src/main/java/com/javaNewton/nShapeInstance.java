@@ -20,15 +20,11 @@ public class nShapeInstance
         m_nativeObject = new ndShapeInstanceGlue(shape.GetNativeObject());
     }
 
-    //public nShapeInstance(nShapeInstance shapeInstance)
-    //{
-    //    m_nativeObject = new ndShapeInstanceGlue(shapeInstance.m_nativeObject);
-    //}
+    public nShapeInstance(ndShapeInstanceGlue shapeInstance)
+    {
+        m_nativeObject = shapeInstance;
+    }
 
-    //public nShape GetShape()
-    //{
-    //    return m_shape;
-    //}
     public ndShapeInstanceGlue GetNativeObject()
     {
         return m_nativeObject;

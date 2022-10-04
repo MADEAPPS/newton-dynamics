@@ -445,6 +445,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//Test0__();
 	//Test1__();
 	ndTestDeedBrian();
+
+	//ndSharedPtr<ndDemoEntityManager> xxx(this);
+	//ndDemoEntityManager* xxx1 = *xxx;
+	//ndDemoEntityManager* xxx2 = *xxx;
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()

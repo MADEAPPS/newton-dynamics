@@ -48,7 +48,7 @@ public class nRigidBody
     public void SetCollisionShape(nShapeInstance shapeInstance)
     {
         m_nativeObject.SetCollisionShape(shapeInstance.GetNativeObject());
-        //m_shapeInstance = new nShapeInstance(m_nativeObject.GetCollisionShape().GetShape());
+        m_shapeInstance = new nShapeInstance(m_nativeObject.GetCollisionShape());
     }
 
     public nShapeInstance GetCollisionShape()

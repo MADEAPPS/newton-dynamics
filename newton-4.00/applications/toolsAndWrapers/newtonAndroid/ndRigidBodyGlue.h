@@ -64,7 +64,7 @@ class ndRigidBodyGlue
 		m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(new ndShapeInstanceGlue(&instance));
 	}
 
-	virtual ~ndRigidBodyGlue()
+	~ndRigidBodyGlue()
 	{
 	}
 
@@ -73,31 +73,29 @@ class ndRigidBodyGlue
 		return m_body->GetId();
 	}
 
-	virtual void SetMatrix(const ndMatrixGlue* const matrix)
+	void SetMatrix(const ndMatrixGlue* const matrix)
 	{
 		m_body->SetMatrix(*matrix);
 	}
 
-	virtual ndShapeInstanceGlue* GetCollisionShape() const
+	const ndShapeInstanceGlue* GetCollisionShape() const
 	{
-		ndAssert(0);
-		//return *(shapeInstance->m_instance);
-		return nullptr;
+		return *m_shapeInstance;
 	}
 
-	virtual void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
+	void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
 	{
 		//m_body->SetCollisionShape(*(*(shapeInstance->m_instance)));
 		//m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(new ndShapeInstanceGlue(&m_body->GetCollisionShape()));
 	}
 
-	virtual void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
+	void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
 	{
 		const ndShapeInstance& instance = *(*(shapeInstance->m_instance));
 		m_body->SetMassMatrix(mass, instance);
 	}
 
-	virtual void SetNotifyCallback(ndBodyNotifyGlue* const notify)
+	void SetNotifyCallback(ndBodyNotifyGlue* const notify)
 	{
 		m_body->SetNotifyCallback(notify);
 	}
