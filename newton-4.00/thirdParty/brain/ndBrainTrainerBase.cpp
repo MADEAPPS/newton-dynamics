@@ -62,7 +62,7 @@ ndReal ndBrainTrainerBase::Validate(const ndBrainMatrix& inputBatch, const ndBra
 		output.Sub(output, truth);
 		error2 += output.Dot(output);
 	}
-	ndReal error = ndSqrt(error2 / inputBatch.GetCount());
+	ndReal error = ndReal(ndSqrt(error2 / inputBatch.GetCount()));
 	return error;
 }
 

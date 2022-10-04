@@ -62,8 +62,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndBrainMatrix groundTruth(samples, 2);
 	for (ndInt32 i = 0; i < samples; i++)
 	{
-		inputBatch[i][0] = ndGaussianRandom(0.5f, 0.25f);
-		inputBatch[i][1] = ndGaussianRandom(0.5f, 0.25f);
+		inputBatch[i][0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
+		inputBatch[i][1] = ndReal(ndGaussianRandom(0.5f, 0.25f));
 	
 		groundTruth[i][0] = ((inputBatch[i][0] >= 0.5f) && (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
 		groundTruth[i][1] = ((inputBatch[i][0] >= 0.5f) || (inputBatch[i][1] >= 0.5f)) ? 1.0f : 0.0f;
@@ -94,8 +94,8 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndBrainInstance instance(&brain);
 	for (ndInt32 i = 0; i < testCount; i++)
 	{
-		input[0] = ndGaussianRandom(0.5f, 0.25f);
-		input[1] = ndGaussianRandom(0.5f, 0.25f);
+		input[0] = ndReal(ndGaussianRandom(0.5f, 0.25f));
+		input[1] = ndReal(ndGaussianRandom(0.5f, 0.25f));
 		truth[0] = ((input[0] >= 0.5f) && (input[1] >= 0.5f)) ? 1.0f : 0.0f;
 		truth[1] = ((input[0] >= 0.5f) || (input[1] >= 0.5f)) ? 1.0f : 0.0f;
 	

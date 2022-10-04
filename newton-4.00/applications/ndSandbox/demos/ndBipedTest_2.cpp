@@ -339,7 +339,7 @@ namespace biped2
 							
 							// set the default pose param.
 							ndVector localPosit(effector->GetLocalTargetPosition());
-							info.m_x = info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar()));
+							info.m_x = ndReal (info.m_x_mapper.CalculateParam(ndSqrt(localPosit.DotProduct(localPosit & ndVector::m_triplexMask).GetScalar())));
 							
 							//ndVector localPositDir(localPosit.Normalize());
 							//ndFloat32 yawAngle = ndAtan2(-localPositDir.m_z, localPositDir.m_x);;
@@ -845,7 +845,7 @@ namespace biped2
 			ndAssert(action.GetCount() == ndHumanoidBrain::ndModelActionParam::m_actionSize);
 			for (ndInt32 i = 0; i < ndHumanoidBrain::ndModelActionParam::m_actionSize; i++)
 			{
-				action[i] = ndRand();
+				action[i] = ndReal (ndRand());
 			}
 
 			//ndInt32 valueIndex = ndInt32(ndFloat32(ndRand() * ndHumanoidBrain::ndModelActionParam::m_actionSize));
@@ -888,8 +888,8 @@ namespace biped2
 
 			//state.SetCount(ndHumanoidBrain::ndModelStateParam::m_stateSize);
 			ndAssert(state.GetCount() == ndHumanoidBrain::ndModelStateParam::m_stateSize);
-			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit] = sagittalComPosit;
-			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalSpeed] = sagittalComSpeed;
+			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit] = ndReal(sagittalComPosit);
+			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalSpeed] = ndReal(sagittalComSpeed);
 		}
 
 		void GetStateAndAction(ndFloat32 timestep)

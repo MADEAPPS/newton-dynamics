@@ -150,7 +150,7 @@ ndReal ndBrainParallelTrainer::Validate(const ndBrainMatrix& inputBatch, const n
 		error2 += subBatchError2[i];
 	}
 
-	ndReal error = ndSqrt(error2 / inputBatch.GetCount());
+	ndReal error = ndReal(ndSqrt(error2 / inputBatch.GetCount()));
 	return error;
 }
 

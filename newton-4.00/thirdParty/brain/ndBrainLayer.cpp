@@ -207,7 +207,8 @@ void ndBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 			break;
 	}
 	
-	xmlSaveParam(layerNode, "biasWeights", m_bias.GetCount(), &m_bias[0]);
+	//xmlSaveParam(layerNode, "biasWeights", m_bias.GetCount(), &m_bias[0]);
+	xmlSaveParam(layerNode, "biasWeights", m_bias);
 	
 	nd::TiXmlElement* const input = new nd::TiXmlElement("inputWeights");
 	layerNode->LinkEndChild(input);
@@ -215,7 +216,8 @@ void ndBrainLayer::Save(nd::TiXmlElement* const layerNode) const
 	{
 		char weight[256];
 		sprintf(weight, "weights%d", i);
-		xmlSaveParam(input, weight, GetInputSize(), &(*this)[i][0]);
+		//xmlSaveParam(input, weight, GetInputSize(), &(*this)[i][0]);
+		xmlSaveParam(input, weight, (*this)[i]);
 	}
 }
 

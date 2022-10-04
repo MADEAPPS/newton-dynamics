@@ -113,14 +113,14 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	xmlSaveParam(rootNode, name, "string", value);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
+//void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array)
 {
-	char* const buffer = ndAlloca(char, count * 4 * 12 + 256);
-
+	char* const buffer = ndAlloca(char, array.GetCount() * 4 * 12 + 256);
 	char* ptr = buffer;
-	for (ndInt32 i = 0; i < count; ++i)
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
-		for (ndInt32 j = 0; j < 3; ++j)
+		for (ndInt32 j = 0; j < 4; ++j)
 		{
 			ptr = FloatToString(ptr, array[i][j]);
 		}
@@ -130,16 +130,15 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 	
-	node->SetAttribute("count", count);
-	node->SetAttribute("float3Array", buffer);
+	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("float4Array", buffer);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndFloat32* const array)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndFloat32>& array)
 {
-	char* const buffer = ndAlloca(char, count * 12 + 256);
-
+	char* const buffer = ndAlloca(char, array.GetCount() * 12 + 256);
 	char* ptr = buffer;
-	for (ndInt32 i = 0; i < count; ++i)
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
 		ptr = FloatToString(ptr, array[i]);
 	}
@@ -148,9 +147,45 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 
-	node->SetAttribute("count", count);
+	node->SetAttribute("count", array.GetCount());
 	node->SetAttribute("floatArray", buffer);
 }
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndReal>& array)
+{
+	char* const buffer = ndAlloca(char, array.GetCount() * 12 + 256);
+	char* ptr = buffer;
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		ptr = FloatToString(ptr, array[i]);
+	}
+	CleanWhiteSpace(buffer);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
+	node->SetAttribute("count", array.GetCount());
+	node->SetAttribute("realArray", buffer);
+}
+
+
+//void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndFloat32* const array)
+//{
+//	char* const buffer = ndAlloca(char, count * 12 + 256);
+//
+//	char* ptr = buffer;
+//	for (ndInt32 i = 0; i < count; ++i)
+//	{
+//		ptr = FloatToString(ptr, array[i]);
+//	}
+//	CleanWhiteSpace(buffer);
+//
+//	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+//	rootNode->LinkEndChild(node);
+//
+//	node->SetAttribute("count", count);
+//	node->SetAttribute("floatArray", buffer);
+//}
 
 ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 {
@@ -181,9 +216,33 @@ ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const nam
 	return ndFloat32 (value);
 }
 
-void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndFloat32>& array)
+void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+	array.Resize(count);
+	array.SetCount(count);
+
+	const char* const data = element->Attribute("floatArray");
+
+	size_t start = 0;
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		char x[64];
+		sscanf(&data[start], "%[^ ]", x);
+		start += strlen(x) + 1;
+
+		ndFloat64 fx;
+		sscanf(x, "%lf", &fx);
+		array[i] = ndReal(fx);
+	}
+}
+
+void xmlGetFloatArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndFloat32>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
 	ndAssert(element);
 	ndInt32 count;
 	element->Attribute("count", &count);

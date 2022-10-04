@@ -195,7 +195,21 @@
 			const ndAvxFloat& src0, const ndAvxFloat& src1, const ndAvxFloat& src2, const ndAvxFloat& src3,
 			const ndAvxFloat& src4, const ndAvxFloat& src5, const ndAvxFloat& src6, const ndAvxFloat& src7)
 		{
-			ndAssert(0);
+			ndVector::Transpose4x4(
+				dst0.m_vector8.m_linear, dst1.m_vector8.m_linear, dst2.m_vector8.m_linear, dst3.m_vector8.m_linear,
+				src0.m_vector8.m_linear, src1.m_vector8.m_linear, src2.m_vector8.m_linear, src3.m_vector8.m_linear);
+
+			ndVector::Transpose4x4(
+				dst0.m_vector8.m_angular, dst1.m_vector8.m_angular, dst2.m_vector8.m_angular, dst3.m_vector8.m_angular,
+				src4.m_vector8.m_linear, src5.m_vector8.m_linear, src6.m_vector8.m_linear, src7.m_vector8.m_linear);
+
+			ndVector::Transpose4x4(
+				dst4.m_vector8.m_linear, dst5.m_vector8.m_linear, dst6.m_vector8.m_linear, dst7.m_vector8.m_linear,
+				src0.m_vector8.m_angular, src1.m_vector8.m_angular, src2.m_vector8.m_angular, src3.m_vector8.m_angular);
+
+			ndVector::Transpose4x4(
+				dst4.m_vector8.m_angular, dst5.m_vector8.m_angular, dst6.m_vector8.m_angular, dst7.m_vector8.m_angular,
+				src4.m_vector8.m_angular, src5.m_vector8.m_angular, src6.m_vector8.m_angular, src7.m_vector8.m_angular);
 		}
 
 		union

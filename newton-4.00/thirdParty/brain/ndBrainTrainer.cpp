@@ -176,7 +176,7 @@ void ndBrainTrainer::BackPropagateOutputLayer(const ndBrainVector& groundTruth)
 	for (ndInt32 i = 0; i < outputCount; ++i)
 	{
 		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
-		ndFloat32 gValue = biasGradients[i];
+		ndReal gValue = biasGradients[i];
 		weightGradient.ScaleAdd(z0, gValue);
 		weightGradientPtr += stride;
 	}
@@ -218,7 +218,7 @@ void ndBrainTrainer::BackPropagateHiddenLayer(ndInt32 layerIndex)
 	for (ndInt32 i = 0; i < layer->GetOuputSize(); ++i)
 	{
 		ndDeepBrainMemVector weightGradient(weightGradientPtr, inputCount);
-		ndFloat32 gValue = biasGradients[i];
+		ndReal gValue = biasGradients[i];
 		weightGradient.ScaleAdd(z0, gValue);
 		weightGradientPtr += stride;
 	}
@@ -259,8 +259,8 @@ void ndBrainTrainer::ApplyAdamCorrection()
 		ndReal weight_uHot = m_weightGradient_u[i] * alphaWeight;
 		ndReal weight_vHot = m_weightGradient_v[i] * betaWeight;
 
-		ndReal bias_den = 1.0f / ndSqrt(bias_vHot + epsilon2);
-		ndReal weight_den = 1.0f / ndSqrt(weight_vHot + epsilon2);
+		ndReal bias_den = ndReal(1.0f / ndSqrt(bias_vHot + epsilon2));
+		ndReal weight_den = ndReal (1.0f / ndSqrt(weight_vHot + epsilon2));
 		m_biasGradientsAcc[i] = bias_uHot * bias_den;
 		m_weightGradients[i] = weight_uHot * weight_den;
 	}
