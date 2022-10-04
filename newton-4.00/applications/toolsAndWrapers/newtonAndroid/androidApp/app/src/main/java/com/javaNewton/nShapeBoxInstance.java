@@ -11,19 +11,12 @@
 
 package com.javaNewton;
 
-import com.newton.ndShapeGlue;
+import com.newton.ndShapeInstanceBoxGlue;
 
-public class nShape
+public class nShapeBoxInstance extends nShapeInstance
 {
-    protected nShape(ndShapeGlue nativeObject)
+    public nShapeBoxInstance(float size_x, float size_y, float size_z)
     {
-        m_nativeObject = nativeObject;
+        super(new ndShapeInstanceBoxGlue(size_x, size_y, size_z));
     }
-
-    public ndShapeGlue GetNativeObject()
-    {
-        return m_nativeObject;
-    }
-
-    private ndShapeGlue m_nativeObject;
 }

@@ -25,11 +25,11 @@ class ndMeshEffectGlue
 	{
 	}
 
-	ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
-		:m_materialHandle(nullptr)
-		,m_meshEffect(new ndMeshEffect(*(*shapeInstance.m_instance)))
-	{
-	}
+	//ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
+	//	:m_materialHandle(nullptr)
+	//	,m_meshEffect(new ndMeshEffect(*(*shapeInstance.m_instance)))
+	//{
+	//}
 
 	~ndMeshEffectGlue()
 	{

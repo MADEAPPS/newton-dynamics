@@ -15,10 +15,9 @@ import android.opengl.Matrix;
 
 import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
-import com.javaNewton.nShapeBox;
 import com.javaNewton.nRigidBody;
 import com.javaNewton.nBodyNotify;
-import com.javaNewton.nShapeInstance;
+import com.javaNewton.nShapeBoxInstance;
 
 import com.newton.nRigidBodyType;
 
@@ -42,14 +41,14 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
-        nShapeInstance shapeInstance = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer);
-
-        SceneObject floorObject = new SceneObject();
-        floorObject.SetMesh(mesh);
-        nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
-        floor.SetMatrix(location);
-        floor.SetCollisionShape(shapeInstance);
+        //nShapeInstance shapeInstance = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
+        nShapeBoxInstance shapeInstance = new nShapeBoxInstance(200.0f, 1.0f, 200.0f);
+        //SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer);
+        //SceneObject floorObject = new SceneObject();
+        //floorObject.SetMesh(mesh);
+        //nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
+        //floor.SetMatrix(location);
+        //floor.SetCollisionShape(shapeInstance);
         //floor.SetNotify(new BodyNotify(floorObject));
 
         //renderer.GetWorld().AddBody(floor);
@@ -58,21 +57,20 @@ public class DemosBase_BasicRigidBodies extends DemosBase
 
     private void AddBox(RenderScene renderer)
     {
-        nMatrix location = new nMatrix();
-        location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
-        nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
-        nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
-        SceneObject boxObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape, renderer);
-        boxObject.SetMesh(mesh);
-        nBodyNotify notify = new BodyNotify(boxObject);
-        notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
-        box.SetNotify(notify);
-        box.SetMatrix(location);
-        box.SetCollisionShape(boxShape);
-        box.SetMassMatrix(1.0f, boxShape);
-
-        renderer.GetWorld().AddBody(box);
-        renderer.AddSceneObject(boxObject);
+        //nMatrix location = new nMatrix();
+        //location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
+        //nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
+        //nShapeInstance boxShape = new nShapeInstance(new nShapeBox(0.5f, 0.5f, 0.5f));
+        //SceneObject boxObject = new SceneObject();
+        //SceneMeshPrimitive mesh = new SceneMeshPrimitive(boxShape, renderer);
+        //boxObject.SetMesh(mesh);
+        //nBodyNotify notify = new BodyNotify(boxObject);
+        //notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));
+        //box.SetNotify(notify);
+        //box.SetMatrix(location);
+        //box.SetCollisionShape(boxShape);
+        //box.SetMassMatrix(1.0f, boxShape);
+        //renderer.GetWorld().AddBody(box);
+        //renderer.AddSceneObject(boxObject);
     }
 }

@@ -9,17 +9,18 @@
 * freely
 */
 
-#ifndef _ND_SHAPE_BOX_GLUE_H_
-#define _ND_SHAPE_BOX_GLUE_H_
 
-#include "ndShapeGlue.h"
+#ifndef _ND_SHAPE_INSTANCE_BOX_GLUE_H_
+#define _ND_SHAPE_INSTANCE_BOX_GLUE_H_
+
 #include "ndShapeBox.h"
+#include "ndShapeInstanceGlue.h"
 
-class ndShapeBoxGlue: public ndShapeGlue
+class ndShapeInstanceBoxGlue: public ndShapeInstanceGlue
 {
 	public:
-	ndShapeBoxGlue(float size_x, float size_y, float size_z)
-		:ndShapeGlue (new ndShapeBox(size_x, size_y, size_z))
+	ndShapeInstanceBoxGlue(float size_x, float size_y, float size_z)
+		:ndShapeInstanceGlue(new ndShapeInstance(new ndShapeBox(size_x, size_y, size_z)))
 	{
 	}
 };

@@ -31,7 +31,7 @@
 ndVector ndShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, ndFloat32(0.0f));
 
 ndShapeInstance::ndShapeInstance(ndShape* const shape)
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndShapeInstance>()
 	,m_globalMatrix(ndGetIdentityMatrix())
 	,m_localMatrix(ndGetIdentityMatrix())
 	,m_alignmentMatrix(ndGetIdentityMatrix())
@@ -57,7 +57,7 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 }
 
 ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndShapeInstance>()
 	,m_globalMatrix(instance.m_globalMatrix)
 	,m_localMatrix(instance.m_localMatrix)
 	,m_alignmentMatrix(instance.m_alignmentMatrix)
@@ -83,7 +83,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 }
 
 ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape)
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndShapeInstance>()
 	,m_globalMatrix(instance.m_globalMatrix)
 	,m_localMatrix(instance.m_localMatrix)
 	,m_alignmentMatrix(instance.m_alignmentMatrix)
@@ -102,7 +102,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 }
 
 ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesCache)
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndShapeInstance>()
 	,m_globalMatrix(ndGetIdentityMatrix())
 	,m_localMatrix(ndGetIdentityMatrix())
 	,m_alignmentMatrix(ndGetIdentityMatrix())

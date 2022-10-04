@@ -39,14 +39,13 @@
 	#include "nConfig.h"
 	#include "ndSharedPtr.h"
 	#include "ndWorldGlue.h"
-	#include "ndShapeGlue.h"
 	#include "ndVectorGlue.h"
 	#include "ndMatrixGlue.h"
-	#include "ndShapeBoxGlue.h"
 	#include "ndRigidBodyGlue.h"
 	#include "ndBodyNotifyGlue.h"
 	#include "ndMeshEffectGlue.h"
 	#include "ndShapeInstanceGlue.h"
+	#include "ndShapeInstanceBoxGlue.h"
 %}
 
 %feature("director") ndBodyNotifyGlue;
@@ -136,10 +135,9 @@
 %include "ndMatrixGlue.h"
 %include "ndVectorGlue.h"
 %include "ndWorldGlue.h"
-%include "ndShapeGlue.h"
-%include "ndShapeBoxGlue.h"
 %include "ndRigidBodyGlue.h"
 %include "ndBodyNotifyGlue.h"
 %include "ndMeshEffectGlue.h"
 %include "ndShapeInstanceGlue.h"
+%include "ndShapeInstanceBoxGlue.h"
 
