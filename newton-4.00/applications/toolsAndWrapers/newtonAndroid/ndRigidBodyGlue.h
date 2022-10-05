@@ -32,7 +32,7 @@ class ndRigidBodyGlue
 	public:
 	ndRigidBodyGlue(nRigidBodyType type)
 		:m_body()
-		//,m_shapeInstance()
+		,m_shapeInstance(nullptr)
 	{
 		switch (type)
 		{
@@ -60,12 +60,12 @@ class ndRigidBodyGlue
 			}
 		}
 
-		//ndShapeInstance& instance = m_body->GetCollisionShape();
-		//m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(new ndShapeInstanceGlue(&instance));
+		m_shapeInstance = new ndShapeInstanceGlue(&m_body->GetCollisionShape());
 	}
 
 	~ndRigidBodyGlue()
 	{
+		delete m_shapeInstance;
 	}
 
 	int GetId()
@@ -78,25 +78,10 @@ class ndRigidBodyGlue
 		m_body->SetMatrix(*matrix);
 	}
 
-	const ndShapeInstanceGlue* GetCollisionShape() const
-	{
-		ndAssert(0);
-		//return *m_shapeInstance;
-		return nullptr;
-	}
-
-	void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
-	{
-		ndAssert(0);
-		//m_body->SetCollisionShape(*(*(shapeInstance->m_instance)));
-		//m_shapeInstance = ndSharedPtr<ndShapeInstanceGlue>(new ndShapeInstanceGlue(&m_body->GetCollisionShape()));
-	}
-
 	void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
 	{
-		ndAssert(0);
-		//const ndShapeInstance& instance = *(*(shapeInstance->m_instance));
-		//m_body->SetMassMatrix(mass, instance);
+		const ndShapeInstance& instance = *shapeInstance->m_shapeInstance;
+		m_body->SetMassMatrix(mass, instance);
 	}
 
 	void SetNotifyCallback(ndBodyNotifyGlue* const notify)
@@ -104,9 +89,21 @@ class ndRigidBodyGlue
 		m_body->SetNotifyCallback(notify);
 	}
 
+	const ndShapeInstanceGlue* GetCollisionShape() const
+	{
+		return m_shapeInstance;
+	}
+
+	void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
+	{
+		delete m_shapeInstance;
+		m_body->SetCollisionShape(*shapeInstance->m_shapeInstance);
+		m_shapeInstance = new ndShapeInstanceGlue(&m_body->GetCollisionShape());
+	}
+
 	private:
 	ndSharedPtr<ndBodyKinematic> m_body;
-	//ndSharedPtr<ndShapeInstanceGlue> m_shapeInstance;
+	ndShapeInstanceGlue* m_shapeInstance;
 	friend class ndWorldGlue;
 };
 

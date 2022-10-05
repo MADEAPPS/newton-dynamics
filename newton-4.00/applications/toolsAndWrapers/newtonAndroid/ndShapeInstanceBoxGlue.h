@@ -20,7 +20,7 @@ class ndShapeInstanceBoxGlue: public ndShapeInstanceGlue
 {
 	public:
 	ndShapeInstanceBoxGlue(float size_x, float size_y, float size_z)
-		:ndShapeInstanceGlue(new ndShapeInstance(new ndShapeBox(size_x, size_y, size_z)))
+		:ndShapeInstanceGlue(new ndShapeBox(size_x, size_y, size_z))
 	{
 	}
 };

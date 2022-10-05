@@ -18,17 +18,29 @@
 class ndShapeInstanceGlue
 {
 	protected:
-	ndShapeInstanceGlue(ndShapeInstance* const instance)
-		:m_instance(instance)
+	ndShapeInstanceGlue(ndShape* const shape)
+		:m_shapeInstance(new ndShapeInstance(shape))
+		,m_ownData(true)
+	{
+	}
+
+	ndShapeInstanceGlue(ndShapeInstance* const shapeInstance)
+		:m_shapeInstance(shapeInstance)
+		,m_ownData(false)
 	{
 	}
 
 	~ndShapeInstanceGlue()
 	{
+		if (m_ownData)
+		{
+			delete m_shapeInstance;
+		}
 	}
 
-	ndSharedPtr<ndShapeInstance> m_instance;
-	//friend class ndRigidBodyGlue;
+	ndShapeInstance* m_shapeInstance;
+	bool m_ownData;
+	friend class ndRigidBodyGlue;
 	//friend class ndMeshEffectGlue;
 };
 

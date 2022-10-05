@@ -41,13 +41,12 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
-        //nShapeInstance shapeInstance = new nShapeInstance(new nShapeBox(200.0f, 1.0f, 200.0f));
         nShapeBoxInstance shapeInstance = new nShapeBoxInstance(200.0f, 1.0f, 200.0f);
         //SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer);
-        //SceneObject floorObject = new SceneObject();
+        SceneObject floorObject = new SceneObject();
         //floorObject.SetMesh(mesh);
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
-        //floor.SetMatrix(location);
+        floor.SetMatrix(location);
         floor.SetCollisionShape(shapeInstance);
         //floor.SetNotify(new BodyNotify(floorObject));
 
