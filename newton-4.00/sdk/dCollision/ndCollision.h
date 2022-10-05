@@ -55,6 +55,7 @@
 #include <ndContactNotify.h>
 #include <ndShapeCompound.h>
 #include <ndContactOptions.h>
+#include <ndMeshEffectNode.h>
 #include <ndShapeStatic_bvh.h>
 #include <ndShapeConvexHull.h>
 #include <ndShapeStaticMesh.h>
