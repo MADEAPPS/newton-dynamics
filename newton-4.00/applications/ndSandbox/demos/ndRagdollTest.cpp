@@ -294,7 +294,6 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("walker.fbx");
 	ndDemoEntity* const ragdollMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
 
 	ndMatrix matrix(ndGetIdentityMatrix());

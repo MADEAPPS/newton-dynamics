@@ -41,7 +41,7 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndFloat32 height = 1.9f;
 	ndFloat32 radio = 0.5f;
 	ndFloat32 mass = 100.0f;
-	ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
+	ndDemoEntity* const entity = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_z += 2.0f;

@@ -335,7 +335,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
-		//fbxDemoEntity* const vehicleEntity = scene->LoadFbxMesh(filename);
 		ndDemoEntity* const vehicleEntity = ndDemoEntity::LoadFbx(filename, scene);
 		scene->AddEntity(vehicleEntity);
 
@@ -630,7 +629,7 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMat
 	//ndFloat32 height = 1.9f;
 	//ndFloat32 radio = 0.5f;
 	//ndFloat32 mass = 100.0f;
-	//ndDemoEntity* const entity = scene->LoadFbxMesh("walker.fbx");
+	//ndDemoEntity* const entity = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	//delete entity;
 }

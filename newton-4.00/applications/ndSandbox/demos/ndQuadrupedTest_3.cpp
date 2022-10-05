@@ -517,7 +517,6 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");
 	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("spot.fbx", scene);
 
 	ndWorld* const world = scene->GetWorld();

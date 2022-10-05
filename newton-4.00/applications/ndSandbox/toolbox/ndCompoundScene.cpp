@@ -80,7 +80,6 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 
 static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location)
 {
-	//fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
 	ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode(meshName);
 	ndAssert(meshEffectNode);
 	meshEffectNode->m_matrix = location;

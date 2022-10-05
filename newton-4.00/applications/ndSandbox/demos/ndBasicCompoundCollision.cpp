@@ -101,6 +101,7 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	origGeometry->Release();
 	delete origEntity;
 }
+
 static void AddEmptyBox(ndDemoEntityManager* const scene)
 {
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
@@ -119,9 +120,9 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
 {
-	ndDemoEntity* const bowlEntity = scene->LoadFbxMesh(meshName);
+	ndDemoEntity* const bowlEntity = ndDemoEntity::LoadFbx(meshName, scene);
 	ndShapeInstance* const compoundShapeInstance = bowlEntity->CreateCompoundFromMesh();
-
+	
 	ndMatrix mOrigMatrix = matrix;
 	for (ndInt32 i = 0; i < count; ++i)
 	{
@@ -129,7 +130,7 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 		mOrigMatrix.m_posit.m_z += 2.0f;
 		AddRigidBody(scene, mOrigMatrix, *compoundShapeInstance, entity, 5.0f);
 	}
-
+	
 	delete compoundShapeInstance;
 	delete bowlEntity;
 }
