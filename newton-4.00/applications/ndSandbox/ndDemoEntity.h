@@ -40,6 +40,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
 	ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent);
+	ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* const meshEffect);
 	virtual ~ndDemoEntity(void);
 
 	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene);

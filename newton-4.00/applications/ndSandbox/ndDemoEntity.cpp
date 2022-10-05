@@ -37,6 +37,69 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	}
 }
 
+ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* const meshEffectNode)
+	:ndNodeHierarchy<ndDemoEntity>()
+	,m_matrix(ndGetIdentityMatrix())
+	,m_curPosition(ndVector::m_wOne)
+	,m_nextPosition(ndVector::m_wOne)
+	,m_curRotation()
+	,m_nextRotation()
+	,m_meshMatrix(ndGetIdentityMatrix())
+	,m_mesh(nullptr)
+	,m_userData(nullptr)
+	,m_rootNode(nullptr)
+	,m_lock()
+	,m_isVisible(true)
+{
+	ndInt32 stack = 1;
+	ndDemoEntity* parentEntityBuffer[1024];
+	ndMeshEffectNode* effectNodeBuffer[1024];
+
+	bool isRoot = true;
+	effectNodeBuffer[0] = meshEffectNode;
+	parentEntityBuffer[0] = nullptr;
+	while (stack)
+	{
+		stack--;
+		ndDemoEntity* const parent = parentEntityBuffer[stack];
+		ndMeshEffectNode* const effectNode = effectNodeBuffer[stack];
+
+		ndDemoEntity* const entity = isRoot ? this : new ndDemoEntity(effectNode->m_matrix, parent);
+		isRoot = false;
+
+		entity->SetName(effectNode->GetName().GetStr());
+
+		ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
+		if (*meshEffect)
+		{
+			ndDemoMeshInterface* mesh = nullptr;
+			if (!meshEffect->GetCluster().GetCount())
+			{
+				mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+			}
+			else
+			{
+				ndAssert(0);
+				mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			}
+			entity->SetMesh(mesh, effectNode->m_meshMatrix);
+			mesh->Release();
+
+			if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
+			{
+				mesh->m_isVisible = false;
+			}
+		}
+
+		for (ndMeshEffectNode* child = (ndMeshEffectNode*)effectNode->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		{
+			effectNodeBuffer[stack] = child;
+			parentEntityBuffer[stack] = entity;
+			stack++;
+		}
+	}
+}
+
 /*
 ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
 	:dClassInfo()
@@ -116,6 +179,18 @@ ndDemoEntity::~ndDemoEntity(void)
 		delete m_userData;
 	}
 	SetMesh(nullptr, ndGetIdentityMatrix());
+}
+
+ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
+{
+	ndDemoEntity* rootEntity = nullptr;
+	ndMeshEffectNode* const fbxEntity = LoadFbxMeshEffectNode(filename);
+	if (fbxEntity)
+	{
+		rootEntity = new ndDemoEntity(scene, fbxEntity);
+		delete fbxEntity;
+	}
+	return rootEntity;
 }
 
 ndNodeBaseHierarchy* ndDemoEntity::CreateClone () const
@@ -614,64 +689,3 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	return shapeArray[0];
 }
 
-ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
-{
-	ndDemoEntity* rootEntity = nullptr;
-	ndMeshEffectNode* const fbxEntity = LoadFbxMeshEffectNode(filename);
-	if (fbxEntity)
-	{
-		ndInt32 stack = 1;
-		ndDemoEntity* parentEntityBuffer[1024];
-		ndMeshEffectNode* effectNodeBuffer[1024];
-
-		effectNodeBuffer[0] = fbxEntity;
-		parentEntityBuffer[0] = nullptr;
-		while (stack)
-		{
-			stack--;
-			ndDemoEntity* const parent = parentEntityBuffer[stack];
-			ndMeshEffectNode* const effectNode = effectNodeBuffer[stack];
-
-			ndDemoEntity* const entity = new ndDemoEntity(effectNode->m_matrix, parent);
-			if (!rootEntity)
-			{
-				rootEntity = entity;
-			}
-
-			entity->SetName(effectNode->GetName().GetStr());
-
-			ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
-			if (*meshEffect)
-			{
-				ndDemoMeshInterface* mesh = nullptr;
-				if (!meshEffect->GetCluster().GetCount())
-				{
-					mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
-				}
-				else
-				{
-					ndAssert(0);
-					mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
-				}
-				entity->SetMesh(mesh, effectNode->m_meshMatrix);
-				mesh->Release();
-				
-				if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
-				{
-					mesh->m_isVisible = false;
-				}
-			}
-
-			for (ndMeshEffectNode* child = (ndMeshEffectNode*)effectNode->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
-			{
-				effectNodeBuffer[stack] = child;
-				parentEntityBuffer[stack] = entity;
-				stack++;
-			}
-		}
-
-		delete fbxEntity;
-	}
-
-	return rootEntity;
-}
