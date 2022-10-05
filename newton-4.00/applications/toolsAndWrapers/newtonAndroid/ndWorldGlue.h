@@ -14,11 +14,12 @@
 
 #include "ndRigidBodyGlue.h"
 
-class ndWorldGlue
+class ndWorldGlue : public ndContainersFreeListAlloc<ndWorldGlue>
 {
 	public:
 	ndWorldGlue()
-		:m_world(new ndWorld())
+		:ndContainersFreeListAlloc<ndWorldGlue>()
+		,m_world(new ndWorld())
 	{
 	}
 
@@ -38,13 +39,11 @@ class ndWorldGlue
 
 	virtual void AddBody(ndRigidBodyGlue* const body)
 	{
-		ndAssert(0);
 		m_world->AddBody(*(body->m_body));
 	}
 
 	virtual void RemoveBody(ndRigidBodyGlue* const body)
 	{
-		ndAssert(0);
 		m_world->RemoveBody(*(body->m_body));
 	}
 

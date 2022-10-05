@@ -62,6 +62,11 @@ public class nBodyNotify
         private nMatrix m_cacheMatrix;
     }
 
+    public NativeBodyNotify GetNativeObject()
+    {
+        return m_nativeObject;
+    }
+
     private nBodyNotify m_owner;
     private NativeBodyNotify m_nativeObject;
 }

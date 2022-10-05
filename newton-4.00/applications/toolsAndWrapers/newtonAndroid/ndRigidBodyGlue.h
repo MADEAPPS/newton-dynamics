@@ -27,11 +27,12 @@ enum nRigidBodyType
 	m_playerCapsule,
 };
 
-class ndRigidBodyGlue
+class ndRigidBodyGlue: public ndContainersFreeListAlloc<ndRigidBodyGlue>
 {
 	public:
 	ndRigidBodyGlue(nRigidBodyType type)
-		:m_body()
+		:ndContainersFreeListAlloc<ndRigidBodyGlue>()
+		,m_body()
 		,m_shapeInstance(nullptr)
 	{
 		switch (type)
@@ -86,7 +87,7 @@ class ndRigidBodyGlue
 
 	void SetNotifyCallback(ndBodyNotifyGlue* const notify)
 	{
-		m_body->SetNotifyCallback(notify);
+		m_body->SetNotifyCallback(*notify->m_notify);
 	}
 
 	const ndShapeInstanceGlue* GetCollisionShape() const

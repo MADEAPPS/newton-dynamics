@@ -17,18 +17,16 @@ public:
     void swig_connect_director(JNIEnv *jenv, jobject jself, jclass jcls, bool swig_mem_own, bool weak_global);
     SwigDirector_ndBodyNotifyGlue(JNIEnv *jenv);
     virtual ~SwigDirector_ndBodyNotifyGlue();
-    virtual void *GetUserData() const;
-    virtual void OnTransform(ndInt32 threadIndex, ndMatrix const &matrix);
-    virtual void Save(ndLoadSaveBase::ndSaveDescriptor const &desc) const;
-    virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
     virtual void OnTransform(ndMatrixGlue const &matrix);
     virtual void OnApplyExternalForce(ndFloat32 timestep);
+    virtual void OnTransform(ndInt32 threadIndex, ndMatrix const &matrix);
+    virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 public:
     bool swig_overrides(int n) {
-      return (n < 6 ? swig_override[n] : false);
+      return (n < 4 ? swig_override[n] : false);
     }
 protected:
-    Swig::BoolArray<6> swig_override;
+    Swig::BoolArray<4> swig_override;
 };
 
 

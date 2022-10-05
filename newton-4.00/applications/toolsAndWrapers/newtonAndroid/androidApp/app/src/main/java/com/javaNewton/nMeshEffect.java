@@ -22,7 +22,7 @@ public class nMeshEffect
 
     public nMeshEffect(nShapeInstance shapeInstance)
     {
-        //m_nativeObject = new ndMeshEffectGlue(shapeInstance.GetNativeObject());
+        m_nativeObject = new ndMeshEffectGlue(shapeInstance.GetNativeObject());
     }
 
     public int GetVertextCount()

@@ -16,20 +16,22 @@
 #include "ndShapeInstance.h"
 #include "ndShapeInstanceGlue.h"
 
-class ndMeshEffectGlue
+class ndMeshEffectGlue : public ndContainersFreeListAlloc<ndMeshEffectGlue>
 {
 	public:
 	ndMeshEffectGlue()
-		:m_materialHandle(nullptr)
+		:ndContainersFreeListAlloc<ndMeshEffectGlue>()
+		,m_materialHandle(nullptr)
 		,m_meshEffect(new ndMeshEffect())
 	{
 	}
 
-	//ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
-	//	:m_materialHandle(nullptr)
-	//	,m_meshEffect(new ndMeshEffect(*(*shapeInstance.m_instance)))
-	//{
-	//}
+	ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
+		:ndContainersFreeListAlloc<ndMeshEffectGlue>()
+		,m_materialHandle(nullptr)
+		,m_meshEffect(new ndMeshEffect(*(shapeInstance.m_shapeInstance)))
+	{
+	}
 
 	~ndMeshEffectGlue()
 	{

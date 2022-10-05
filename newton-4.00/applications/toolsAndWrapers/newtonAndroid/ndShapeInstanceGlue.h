@@ -15,17 +15,19 @@
 #include "ndShape.h"
 #include "ndShapeInstance.h"
 
-class ndShapeInstanceGlue
+class ndShapeInstanceGlue: public ndContainersFreeListAlloc<ndShapeInstanceGlue>
 {
 	protected:
 	ndShapeInstanceGlue(ndShape* const shape)
-		:m_shapeInstance(new ndShapeInstance(shape))
+		:ndContainersFreeListAlloc<ndShapeInstanceGlue>()
+		,m_shapeInstance(new ndShapeInstance(shape))
 		,m_ownData(true)
 	{
 	}
 
 	ndShapeInstanceGlue(ndShapeInstance* const shapeInstance)
-		:m_shapeInstance(shapeInstance)
+		:ndContainersFreeListAlloc<ndShapeInstanceGlue>()
+		,m_shapeInstance(shapeInstance)
 		,m_ownData(false)
 	{
 	}
@@ -41,7 +43,7 @@ class ndShapeInstanceGlue
 	ndShapeInstance* m_shapeInstance;
 	bool m_ownData;
 	friend class ndRigidBodyGlue;
-	//friend class ndMeshEffectGlue;
+	friend class ndMeshEffectGlue;
 };
 
 #endif 

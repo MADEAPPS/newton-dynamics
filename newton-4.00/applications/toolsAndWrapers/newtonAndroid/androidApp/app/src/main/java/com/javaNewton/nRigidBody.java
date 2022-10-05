@@ -31,13 +31,14 @@ public class nRigidBody
 
     public void SetMassMatrix(float mass, nShapeInstance shape)
     {
-        //m_nativeObject.SetMassMatrix(mass, shape.GetNativeObject());
+        m_nativeObject.SetMassMatrix(mass, shape.GetNativeObject());
     }
 
     public void SetNotify(nBodyNotify notify)
     {
         m_notify = notify;
         notify.SetBody(this);
+        m_nativeObject.SetNotifyCallback(notify.GetNativeObject());
     }
 
     public int GetId()
@@ -48,7 +49,6 @@ public class nRigidBody
     public void SetCollisionShape(nShapeInstance shapeInstance)
     {
         m_nativeObject.SetCollisionShape(shapeInstance.GetNativeObject());
-        //m_shapeInstance = new nShapeInstance(m_nativeObject.GetCollisionShape());
     }
 
     public nShapeInstance GetCollisionShape()

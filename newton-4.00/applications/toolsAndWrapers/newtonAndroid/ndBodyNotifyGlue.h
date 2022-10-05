@@ -15,17 +15,22 @@
 #include "ndMatrixGlue.h"
 #include "ndBodyNotify.h"
 
-class ndBodyNotifyGlue : public ndBodyNotify
+class ndBodyNotifyGlue : public ndContainersFreeListAlloc<ndBodyNotifyGlue>
 {
 	public:
 	ndBodyNotifyGlue()
-		:ndBodyNotify(ndVectorGlue::m_zero)
+		:ndContainersFreeListAlloc<ndBodyNotifyGlue>()
+		,m_notify(new ndBodyNotify(ndVectorGlue::m_zero))
+	{
+	}
+
+	virtual ~ndBodyNotifyGlue()
 	{
 	}
 
 	void SetGravity(const ndVectorGlue& gravity)
 	{
-		ndBodyNotify::SetGravity(gravity);
+		m_notify->SetGravity(gravity);
 	}
 	
 	// callback to Java code
@@ -35,10 +40,10 @@ class ndBodyNotifyGlue : public ndBodyNotify
 
 	virtual void OnApplyExternalForce(ndFloat32 timestep)
 	{
-		ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
+		ndBodyKinematic* const body = m_notify->GetBody()->GetAsBodyKinematic();
 		if (body)
 		{
-			ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
+			ndVector force(m_notify->GetGravity().Scale(body->GetMassMatrix().m_w));
 			body->SetForce(force);
 			body->SetTorque(ndVectorGlue::m_zero);
 		}
@@ -54,6 +59,8 @@ class ndBodyNotifyGlue : public ndBodyNotify
 	{
 		OnApplyExternalForce(timestep);
 	}
+
+	ndSharedPtr<ndBodyNotify> m_notify;
 };
 
 
