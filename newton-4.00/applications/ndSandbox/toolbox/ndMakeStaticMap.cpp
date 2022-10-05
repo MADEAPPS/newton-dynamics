@@ -194,82 +194,87 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
-	fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
-	scene->AddEntity(entity);
-
-	ndPolygonSoupBuilder meshBuilder;
-	meshBuilder.Begin();
-	
-	ndInt32 stack = 1;
-	ndMatrix matrixBuffer[1024];
-	fbxDemoEntity* entBuffer[1024];
-	
-	entBuffer[0] = entity;
-	matrixBuffer[0] = entity->GetCurrentMatrix().Inverse();
-
-	while (stack)
-	{
-		stack--;
-		fbxDemoEntity* const ent = entBuffer[stack];
-		ndMatrix matrix (ent->GetCurrentMatrix() * matrixBuffer[stack]);
-	
-		if (ent->m_fbxMeshEffect)
-		{
-			ndInt32 vertexStride = ent->m_fbxMeshEffect->GetVertexStrideInByte() / sizeof (ndFloat64);
-			const ndFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
-	
-			ndInt32 mark = ent->m_fbxMeshEffect->IncLRU();
-			ndPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
-			
-			ndVector face[256];
-			ndMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
-			for (iter.Begin(); iter; iter++)
-			{
-				ndEdge* const edge = &(*iter);
-				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
-				{
-					ndInt32 count = 0;
-					ndEdge* ptr = edge;
-					do
-					{
-						ndInt32 i = ptr->m_incidentVertex * vertexStride;
-						ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
-						face[count] = worldMatrix.TransformVector(point);
-						count++;
-						ptr->m_mark = mark;
-						ptr = ptr->m_next;
-					} while (ptr != edge);
-	
-					ndInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
-					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
-				}
-			}
-		}
-	
-		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
-		{
-			entBuffer[stack] = child;
-			matrixBuffer[stack] = matrix;
-			stack++;
-		}
-	}
-	meshBuilder.End(optimized);
-	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
-
-	ndMatrix matrix(entity->GetCurrentMatrix());
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	scene->GetWorld()->AddBody(body);
-
-	entity->CleanIntermediate();
-	return body;
+	ndAssert(0);
+	//fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
+	//scene->AddEntity(entity);
+	//
+	//ndPolygonSoupBuilder meshBuilder;
+	//meshBuilder.Begin();
+	//
+	//ndInt32 stack = 1;
+	//ndMatrix matrixBuffer[1024];
+	//ndDemoEntity* entBuffer[1024];
+	//
+	//entBuffer[0] = entity;
+	//matrixBuffer[0] = entity->GetCurrentMatrix().Inverse();
+	//
+	//while (stack)
+	//{
+	//	stack--;
+	//	ndDemoEntity* const ent = entBuffer[stack];
+	//	ndMatrix matrix (ent->GetCurrentMatrix() * matrixBuffer[stack]);
+	//
+	//	if (ent->m_fbxMeshEffect)
+	//	{
+	//		ndInt32 vertexStride = ent->m_fbxMeshEffect->GetVertexStrideInByte() / sizeof (ndFloat64);
+	//		const ndFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
+	//
+	//		ndInt32 mark = ent->m_fbxMeshEffect->IncLRU();
+	//		ndPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
+	//		
+	//		ndVector face[256];
+	//		ndMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
+	//		for (iter.Begin(); iter; iter++)
+	//		{
+	//			ndEdge* const edge = &(*iter);
+	//			if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
+	//			{
+	//				ndInt32 count = 0;
+	//				ndEdge* ptr = edge;
+	//				do
+	//				{
+	//					ndInt32 i = ptr->m_incidentVertex * vertexStride;
+	//					ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
+	//					face[count] = worldMatrix.TransformVector(point);
+	//					count++;
+	//					ptr->m_mark = mark;
+	//					ptr = ptr->m_next;
+	//				} while (ptr != edge);
+	//
+	//				ndInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
+	//				meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
+	//			}
+	//		}
+	//	}
+	//
+	//	for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
+	//	{
+	//		entBuffer[stack] = child;
+	//		matrixBuffer[stack] = matrix;
+	//		stack++;
+	//	}
+	//}
+	//meshBuilder.End(optimized);
+	//ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
+	//
+	//ndMatrix matrix(entity->GetCurrentMatrix());
+	//ndBodyDynamic* const body = new ndBodyDynamic();
+	//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	//body->SetMatrix(matrix);
+	//body->SetCollisionShape(shape);
+	//scene->GetWorld()->AddBody(body);
+	//
+	//entity->CleanIntermediate();
+	//return body;
+	return nullptr;
 }
 
 ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
+/*
 	fbxDemoEntity* const entity = scene->LoadFbxMesh("playerarena.fbx");
+	//ndDemoEntity* const entity = ndDemoEntity::LoadFbx("playerarena.fbx", scene);
 	scene->AddEntity(entity);
 
 	ndPolygonSoupBuilder meshBuilder;
@@ -277,7 +282,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 
 	ndInt32 stack = 1;
 	ndMatrix matrixBuffer[1024];
-	fbxDemoEntity* entBuffer[1024];
+	ndDemoEntity* entBuffer[1024];
 
 	entBuffer[0] = entity;
 	matrixBuffer[0] = entity->GetCurrentMatrix().Inverse();
@@ -285,7 +290,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	while (stack)
 	{
 		stack--;
-		fbxDemoEntity* const ent = entBuffer[stack];
+		//fbxDemoEntity* const ent = entBuffer[stack];
+
 		ndMatrix matrix(ent->GetCurrentMatrix() * matrixBuffer[stack]);
 
 		if (ent->m_fbxMeshEffect)
@@ -416,8 +422,9 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 #endif
 	entity->CleanIntermediate();
 	return body;
+*/
+	return nullptr;
 }
-
 
 //static void GetPointAndTangentAtLocation(const ndBezierSpline& aspline, const ndMatrix amatrix, const ndVector& location, ndVector& positOut, ndVector& tangentOut)
 //{

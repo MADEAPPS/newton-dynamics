@@ -18,12 +18,12 @@
 class ndDemoEntityManager;
 class ndAnimationSequence;
 
-class fbxDemoEntity : public ndDemoEntity
+class fbxDemoEntity____ : public ndDemoEntity
 {
 	public:
-	fbxDemoEntity(ndDemoEntity* const parent);
-	fbxDemoEntity(const fbxDemoEntity& source);
-	~fbxDemoEntity();
+	fbxDemoEntity____(ndDemoEntity* const parent);
+	fbxDemoEntity____(const fbxDemoEntity____& source);
+	~fbxDemoEntity____();
 
 	void SetRenderMatrix(const ndMatrix& matrix)
 	{
@@ -38,7 +38,9 @@ class fbxDemoEntity : public ndDemoEntity
 	ndMeshEffect* m_fbxMeshEffect;
 };
 
-fbxDemoEntity* LoadFbxMesh(const char* const meshName);
+fbxDemoEntity____* LoadFbxMesh(const char* const meshName);
 ndAnimationSequence* LoadFbxAnimation(const char* const meshName);
+
+ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName);
 
 #endif

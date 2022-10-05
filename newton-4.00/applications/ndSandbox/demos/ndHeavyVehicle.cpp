@@ -250,7 +250,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
-		fbxDemoEntity* const vehicleEntity = scene->LoadFbxMesh(filename);
+		//fbxDemoEntity* const vehicleEntity = scene->LoadFbxMesh(filename);
+		ndDemoEntity* const vehicleEntity = ndDemoEntity::LoadFbx(filename, scene);
 		scene->AddEntity(vehicleEntity);
 
 		// load 2d display assets

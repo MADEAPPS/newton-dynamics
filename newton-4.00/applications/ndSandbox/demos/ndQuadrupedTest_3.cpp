@@ -144,7 +144,7 @@ namespace ndQuadruped_3
 			ndParamMapper m_swivel_mapper;
 		};
 
-		ndQuadrupedModel(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
+		ndQuadrupedModel(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
@@ -517,7 +517,8 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");
+	//fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spot.fbx");
+	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("spot.fbx", scene);
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));

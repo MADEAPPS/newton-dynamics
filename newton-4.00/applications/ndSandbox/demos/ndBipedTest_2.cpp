@@ -1015,7 +1015,9 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	origin.m_posit.m_x -= 20.0f;
-	ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
+
+	ndDemoEntity* const modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	//ndDemoEntity* const modelMesh = scene->LoadFbxMesh("walker.fbx");
 
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);

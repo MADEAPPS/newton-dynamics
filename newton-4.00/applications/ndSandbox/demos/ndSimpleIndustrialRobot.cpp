@@ -61,7 +61,7 @@ namespace ndSimpleRobot
 		public:
 		D_CLASS_REFLECTION(ndSimpleRobot::ndIndustrialRobot);
 
-		ndIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
+		ndIndustrialRobot(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
 			,m_rootBody(nullptr)
 			,m_leftGripper(nullptr)
@@ -467,7 +467,8 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
+	//fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
+	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("robot.fbx", scene);
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-90.0f * ndDegreeToRad));

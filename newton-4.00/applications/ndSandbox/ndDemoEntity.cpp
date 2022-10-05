@@ -13,6 +13,8 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
+#include "ndLoadFbxMesh.h"
+#include "ndDemoSkinMesh.h"
 #include "ndAnimationPose.h"
 
 ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
@@ -612,3 +614,64 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	return shapeArray[0];
 }
 
+ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
+{
+	ndDemoEntity* rootEntity = nullptr;
+	ndMeshEffectNode* const fbxEntity = LoadFbxMeshEffectNode(filename);
+	if (fbxEntity)
+	{
+		ndInt32 stack = 1;
+		ndDemoEntity* parentEntityBuffer[1024];
+		ndMeshEffectNode* effectNodeBuffer[1024];
+
+		effectNodeBuffer[0] = fbxEntity;
+		parentEntityBuffer[0] = nullptr;
+		while (stack)
+		{
+			stack--;
+			ndDemoEntity* const parent = parentEntityBuffer[stack];
+			ndMeshEffectNode* const effectNode = effectNodeBuffer[stack];
+
+			ndDemoEntity* const entity = new ndDemoEntity(effectNode->m_matrix, parent);
+			if (!rootEntity)
+			{
+				rootEntity = entity;
+			}
+
+			entity->SetName(effectNode->GetName().GetStr());
+
+			ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
+			if (*meshEffect)
+			{
+				ndDemoMeshInterface* mesh = nullptr;
+				if (!meshEffect->GetCluster().GetCount())
+				{
+					mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+				}
+				else
+				{
+					ndAssert(0);
+					mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+				}
+				entity->SetMesh(mesh, effectNode->m_meshMatrix);
+				mesh->Release();
+				
+				if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
+				{
+					mesh->m_isVisible = false;
+				}
+			}
+
+			for (ndMeshEffectNode* child = (ndMeshEffectNode*)effectNode->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+			{
+				effectNodeBuffer[stack] = child;
+				parentEntityBuffer[stack] = entity;
+				stack++;
+			}
+		}
+
+		delete fbxEntity;
+	}
+
+	return rootEntity;
+}

@@ -42,6 +42,8 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent);
 	virtual ~ndDemoEntity(void);
 
+	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene);
+
 	ndDemoMeshInterface* GetMesh() const;
 	void SetMesh (ndDemoMeshInterface* const m_mesh, const ndMatrix& meshMatrix);
 

@@ -258,7 +258,7 @@ namespace ndQuadruped_1
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
-		ndQuadrupedModel(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
+		ndQuadrupedModel(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_walk(nullptr)
@@ -743,7 +743,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston.fbx");
+	//fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("spotBoston.fbx");
+	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("spotBoston.fbx", scene);
 
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));

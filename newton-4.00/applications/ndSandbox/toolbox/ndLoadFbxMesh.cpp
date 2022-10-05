@@ -23,19 +23,19 @@ using namespace ofbx;
 
 #define D_ANIM_BASE_FREQ ndFloat32 (30.0f)
 
-fbxDemoEntity::fbxDemoEntity(ndDemoEntity* const parent)
+fbxDemoEntity____::fbxDemoEntity____(ndDemoEntity* const parent)
 	:ndDemoEntity(ndGetIdentityMatrix(), parent)
 	,m_fbxMeshEffect(nullptr)
 {
 }
 
-fbxDemoEntity::fbxDemoEntity(const fbxDemoEntity& source)
+fbxDemoEntity____::fbxDemoEntity____(const fbxDemoEntity____& source)
 	:ndDemoEntity(source)
 	,m_fbxMeshEffect(nullptr)
 {
 }
 
-fbxDemoEntity::~fbxDemoEntity()
+fbxDemoEntity____::~fbxDemoEntity____()
 {
 	if (m_fbxMeshEffect)
 	{
@@ -43,12 +43,12 @@ fbxDemoEntity::~fbxDemoEntity()
 	}
 }
 
-ndNodeBaseHierarchy* fbxDemoEntity::CreateClone() const
+ndNodeBaseHierarchy* fbxDemoEntity____::CreateClone() const
 {
-	return new fbxDemoEntity(*this);
+	return new fbxDemoEntity____(*this);
 }
 
-void fbxDemoEntity::CleanIntermediate()
+void fbxDemoEntity____::CleanIntermediate()
 {
 	if (m_fbxMeshEffect)
 	{
@@ -56,21 +56,21 @@ void fbxDemoEntity::CleanIntermediate()
 		m_fbxMeshEffect = nullptr;
 	}
 
-	for (fbxDemoEntity* child = (fbxDemoEntity*)GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
+	for (fbxDemoEntity____* child = (fbxDemoEntity____*)GetChild(); child; child = (fbxDemoEntity____*)child->GetSibling())
 	{
 		child->CleanIntermediate();
 	}
 }
 
-void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
+void fbxDemoEntity____::BuildRenderMeshes(ndDemoEntityManager* const scene)
 {
 	ndInt32 stack = 1;
-	fbxDemoEntity* entBuffer[1024];
+	fbxDemoEntity____* entBuffer[1024];
 	entBuffer[0] = this;
 	while (stack)
 	{
 		stack--;
-		fbxDemoEntity* const ent = entBuffer[stack];
+		fbxDemoEntity____* const ent = entBuffer[stack];
 	
 		if (ent->m_fbxMeshEffect)
 		{
@@ -92,7 +92,7 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 			}
 		}
 	
-		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
+		for (fbxDemoEntity____* child = (fbxDemoEntity____*)ent->GetChild(); child; child = (fbxDemoEntity____*)child->GetSibling())
 		{
 			entBuffer[stack] = child;
 			stack++;
@@ -100,16 +100,16 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 	}
 }
 
-void fbxDemoEntity::ApplyTransform(const ndMatrix& transform)
+void fbxDemoEntity____::ApplyTransform(const ndMatrix& transform)
 {
 	ndInt32 stack = 1;
-	fbxDemoEntity* entBuffer[1024];
+	fbxDemoEntity____* entBuffer[1024];
 	entBuffer[0] = this;
 	ndMatrix invTransform(transform.Inverse4x4());
 	while (stack)
 	{
 		stack--;
-		fbxDemoEntity* const ent = entBuffer[stack];
+		fbxDemoEntity____* const ent = entBuffer[stack];
 
 		ndMatrix entMatrix(invTransform * ent->GetRenderMatrix() * transform);
 		ent->SetRenderMatrix(entMatrix);
@@ -125,7 +125,7 @@ void fbxDemoEntity::ApplyTransform(const ndMatrix& transform)
 			ent->m_fbxMeshEffect->ApplyTransform(transform);
 		}
 
-		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
+		for (fbxDemoEntity____* child = (fbxDemoEntity____*)ent->GetChild(); child; child = (fbxDemoEntity____*)child->GetSibling())
 		{
 			entBuffer[stack] = child;
 			stack++;
@@ -133,7 +133,7 @@ void fbxDemoEntity::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
-class fbxGlobalNodeMap : public ndTree<fbxDemoEntity*, const ofbx::Object*>
+class fbxGlobalNodeMap : public ndTree<fbxDemoEntity____*, const ofbx::Object*>
 {
 };
 
@@ -206,7 +206,7 @@ static ndMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix)
 	return matrix;
 }
 
-static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeMap& nodeMap)
+static fbxDemoEntity____* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeMap& nodeMap)
 {
 	ndInt32 stack = 0;
 	ofbx::Object* buffer[1024];
@@ -215,10 +215,10 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 	ndAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, buffer);
 
-	fbxDemoEntity* rootEntity = nullptr;
+	fbxDemoEntity____* rootEntity = nullptr;
 	if (stack > 1)
 	{
-		rootEntity = new fbxDemoEntity(nullptr);
+		rootEntity = new fbxDemoEntity____(nullptr);
 		rootEntity->SetName("dommyRoot");
 	}
 
@@ -233,7 +233,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 		stack--;
 		fbxImportStackData data(nodeStack[stack]);
 
-		fbxDemoEntity* const node = new fbxDemoEntity(data.m_parentNode);
+		fbxDemoEntity____* const node = new fbxDemoEntity____(data.m_parentNode);
 		if (!rootEntity)
 		{
 			rootEntity = node;
@@ -322,7 +322,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
 
 	ndAssert(nodeMap.Find(fbxNode));
-	fbxDemoEntity* const entity = nodeMap.Find(fbxNode)->GetInfo();
+	fbxDemoEntity____* const entity = nodeMap.Find(fbxNode)->GetInfo();
 	ndMeshEffect* const mesh = new ndMeshEffect();
 	mesh->SetName(fbxMesh->name);
 
@@ -460,10 +460,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 	delete[] indexArray;
 }
 
-static void FreezeScale(fbxDemoEntity* const entity)
+static void FreezeScale(fbxDemoEntity____* const entity)
 {
 	ndInt32 stack = 1;
-	fbxDemoEntity* entBuffer[1024];
+	fbxDemoEntity____* entBuffer[1024];
 	ndMatrix parentMatrix[1024];
 	entBuffer[0] = entity;
 	parentMatrix[0] = ndGetIdentityMatrix();
@@ -471,7 +471,7 @@ static void FreezeScale(fbxDemoEntity* const entity)
 	{
 		stack--;
 		ndMatrix scaleMatrix(parentMatrix[stack]);
-		fbxDemoEntity* const ent = entBuffer[stack];
+		fbxDemoEntity____* const ent = entBuffer[stack];
 
 		ndMatrix transformMatrix;
 		ndMatrix stretchAxis;
@@ -490,7 +490,7 @@ static void FreezeScale(fbxDemoEntity* const entity)
 			ent->m_fbxMeshEffect->ApplyTransform(meshMatrix);
 		}
 
-		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
+		for (fbxDemoEntity____* child = (fbxDemoEntity____*)ent->GetChild(); child; child = (fbxDemoEntity____*)child->GetSibling())
 		{
 			entBuffer[stack] = child;
 			parentMatrix[stack] = scaleMatrix;
@@ -744,7 +744,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 	{
 	}
 
-	dFbxAnimation(const dFbxAnimation& source, fbxDemoEntity* const entity, const ndMatrix& matrix)
+	dFbxAnimation(const dFbxAnimation& source, fbxDemoEntity____* const entity, const ndMatrix& matrix)
 		:ndTree <dFbxAnimationTrack, ndString>()
 		,m_length(source.m_length)
 		,m_timestep(source.m_timestep)
@@ -771,15 +771,15 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 		}
 	}
 
-	void FreezeScale(fbxDemoEntity* const entity, const dFbxAnimation& source)
+	void FreezeScale(fbxDemoEntity____* const entity, const dFbxAnimation& source)
 	{
 		ndMatrix parentMatrixStack[1024];
-		fbxDemoEntity* stackPool[1024];
+		fbxDemoEntity____* stackPool[1024];
 
 		ndFloat32 deltaTimeAcc = ndFloat32 (0.0f);
 		for (ndInt32 i = 0; i < m_framesCount; ++i)
 		{
-			for (fbxDemoEntity* node = (fbxDemoEntity*)entity->GetFirst(); node; node = (fbxDemoEntity*)node->GetNext())
+			for (fbxDemoEntity____* node = (fbxDemoEntity____*)entity->GetFirst(); node; node = (fbxDemoEntity____*)node->GetNext())
 			{
 				const dFbxAnimation::ndNode* const aniNode = source.Find(node->GetName());
 				if (aniNode)
@@ -797,7 +797,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 			{
 				stack--;
 				ndMatrix parentMatrix(parentMatrixStack[stack]);
-				fbxDemoEntity* const rootNode = stackPool[stack];
+				fbxDemoEntity____* const rootNode = stackPool[stack];
 
 				ndMatrix transform(rootNode->GetMeshMatrix() * parentMatrix);
 
@@ -819,7 +819,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 					track.AddKeyframe(deltaTimeAcc, matrix);
 				}
 
-				for (fbxDemoEntity* node = (fbxDemoEntity*)rootNode->GetChild(); node; node = (fbxDemoEntity*)node->GetSibling())
+				for (fbxDemoEntity____* node = (fbxDemoEntity____*)rootNode->GetChild(); node; node = (fbxDemoEntity____*)node->GetSibling())
 				{
 					stackPool[stack] = node;
 					parentMatrixStack[stack] = newParentMatrix;
@@ -991,10 +991,10 @@ static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation
 	animation.OptimizeCurves();
 }
 
-static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
+static fbxDemoEntity____* FbxToEntity(ofbx::IScene* const fbxScene)
 {
 	fbxGlobalNodeMap nodeMap;
-	fbxDemoEntity* const entity = LoadHierarchy(fbxScene, nodeMap);
+	fbxDemoEntity____* const entity = LoadHierarchy(fbxScene, nodeMap);
 
 	fbxGlobalNodeMap::Iterator iter(nodeMap);
 	for (iter.Begin(); iter; iter++)
@@ -1081,7 +1081,7 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 
 	dFbxAnimation animation;
 	LoadAnimation(fbxScene, animation);
-	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
+	fbxDemoEntity____* const entity = FbxToEntity(fbxScene);
 	dFbxAnimation newAnimation(animation, entity, convertMatrix);
 
 	delete entity;
@@ -1090,10 +1090,46 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	return newAnimation.CreateSequence(fileName);
 }
 
+fbxDemoEntity____* LoadFbxMesh(const char* const meshName)
+{
+	char outPathName[1024];
+	dGetWorkingFileName(meshName, outPathName);
+
+	FILE* fp = fopen(outPathName, "rb");
+	if (!fp)
+	{
+		ndAssert(0);
+		return nullptr;
+	}
+
+	size_t readBytes = 0;
+	readBytes++;
+	fseek(fp, 0, SEEK_END);
+	long file_size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	ndArray<ofbx::u8> content;
+	content.SetCount(file_size);
+	readBytes = fread(&content[0], 1, file_size, fp);
+	ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+
+	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
+	fbxDemoEntity____* const entity = FbxToEntity(fbxScene);
+	FreezeScale(entity);
+	entity->ApplyTransform(convertMatrix);
+
+	fbxScene->destroy();
+	return entity;
+}
+
+
+
+
+//************************************************************
+//
+//************************************************************
 class fbxMeshEffectNodeGlobalNodeMap : public ndTree<ndMeshEffectNode*, const ofbx::Object*>
 {
 };
-
 
 class fbxImportndMeshEffectNodeStackData
 {
@@ -1447,8 +1483,7 @@ static void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& trans
 	}
 }
 
-
-fbxDemoEntity* LoadFbxMesh(const char* const meshName)
+ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 {
 	char outPathName[1024];
 	dGetWorkingFileName(meshName, outPathName);
@@ -1475,13 +1510,8 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(fbxScene);
 	FreezeScale(meshEffectNode);
 	ApplyTransform(meshEffectNode, convertMatrix);
-	delete meshEffectNode;
-
-	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
-	FreezeScale(entity);
-	entity->ApplyTransform(convertMatrix);
 
 	fbxScene->destroy();
-	return entity;
+	return meshEffectNode;
 }
 

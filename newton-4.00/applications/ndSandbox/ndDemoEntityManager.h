@@ -19,7 +19,7 @@ struct ImDrawData;
 class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoCamera;
-class fbxDemoEntity;
+class fbxDemoEntity____;
 class ndPhysicsWorld;
 class ndAnimationSequence;
 class ndDemoMeshInterface;
@@ -181,7 +181,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void SetDebugDisplay(ndInt32 mode) const;
 
 	const ndShaderCache& GetShaderCache() const;  
-	fbxDemoEntity* LoadFbxMesh(const char* const meshName);
+	fbxDemoEntity____* LoadFbxMesh(const char* const meshName);
 	ndAnimationSequence* GetAnimationSequence(const char* const meshName);
 	
 	private:

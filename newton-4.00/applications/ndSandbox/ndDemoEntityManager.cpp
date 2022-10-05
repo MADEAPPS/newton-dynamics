@@ -1045,9 +1045,9 @@ void ndDemoEntityManager::ErrorCallback(ndInt32 error, const char* description)
 	ndAssert (0);
 }
 
-fbxDemoEntity* ndDemoEntityManager::LoadFbxMesh(const char* const meshName)
+fbxDemoEntity____* ndDemoEntityManager::LoadFbxMesh(const char* const meshName)
 {
-	fbxDemoEntity* const entity = ::LoadFbxMesh(meshName);
+	fbxDemoEntity____* const entity = ::LoadFbxMesh(meshName);
 	entity->BuildRenderMeshes(this);
 	return entity;
 }

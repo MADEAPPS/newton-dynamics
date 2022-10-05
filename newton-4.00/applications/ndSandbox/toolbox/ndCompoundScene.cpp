@@ -80,6 +80,8 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 
 static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location)
 {
+	ndAssert(0);
+/*
 	fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
 	entity->Attach(rootEntity);
 	entity->ResetMatrix(location);
@@ -150,6 +152,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 	shape.SetLocalMatrix(location);
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->AddCollision(&shape);
+*/
 }
 
 ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
