@@ -11,6 +11,8 @@
 
 package com.example.androidapp;
 
+import android.opengl.GLES30;
+
 import com.javaNewton.nMatrix;
 import com.javaNewton.nMeshEffect;
 import com.javaNewton.nShapeInstance;
@@ -42,6 +44,19 @@ public class SceneMeshPrimitive extends SceneMesh
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(vertexData);
         vertexBuffer.position(0);
+
+        // I can't get GLES30.glGenBuffers tow works, does not seem to do anything at all.
+        int[] m_vertexBuffer = new int[1];
+        int[] m_vertextArrayBuffer = new int[1];
+        m_vertexBuffer[0] = 0;
+        m_vertextArrayBuffer[0] = 0;
+        GLES30.glGenBuffers(1, m_vertexBuffer, 0);
+        GLES30.glGenVertexArrays(1, m_vertextArrayBuffer, 0);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_vertexBuffer[0]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertexSizeInBytes, vertexBuffer, GLES30.GL_STATIC_DRAW);
+
+        GLES30.glBindVertexArray(m_vertextArrayBuffer[0]);
 
         // get index data from mesh and make a vertex buffer for rendering
         meshEffect.MaterialBegin();
@@ -76,6 +91,9 @@ public class SceneMeshPrimitive extends SceneMesh
     @Override
     public void Render (nMatrix matrix)
     {
+        // Add program to OpenGL environment
+        GLES30.glUseProgram(m_shader);
 
+        GLES30.glUseProgram(0);
     }
 }
