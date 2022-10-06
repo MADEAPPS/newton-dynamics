@@ -87,7 +87,7 @@ class ndRigidBodyGlue: public ndContainersFreeListAlloc<ndRigidBodyGlue>
 
 	void SetNotifyCallback(ndBodyNotifyGlue* const notify)
 	{
-		m_body->SetNotifyCallback(*notify->m_notify);
+		m_body->SetNotifyCallback(notify);
 	}
 
 	const ndShapeInstanceGlue* GetCollisionShape() const

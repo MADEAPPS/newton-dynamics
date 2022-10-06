@@ -15,12 +15,11 @@
 #include "ndMatrixGlue.h"
 #include "ndBodyNotify.h"
 
-class ndBodyNotifyGlue : public ndContainersFreeListAlloc<ndBodyNotifyGlue>
+class ndBodyNotifyGlue : public ndBodyNotify
 {
 	public:
 	ndBodyNotifyGlue()
-		:ndContainersFreeListAlloc<ndBodyNotifyGlue>()
-		,m_notify(new ndBodyNotify(ndVectorGlue::m_zero))
+		:ndBodyNotify(ndVectorGlue::m_zero)
 	{
 	}
 
@@ -30,37 +29,33 @@ class ndBodyNotifyGlue : public ndContainersFreeListAlloc<ndBodyNotifyGlue>
 
 	void SetGravity(const ndVectorGlue& gravity)
 	{
-		m_notify->SetGravity(gravity);
+		ndBodyNotify::SetGravity(gravity);
 	}
 	
-	// callback to Java code
-	virtual void OnTransform(const ndMatrixGlue& matrix)
-	{
-	}
-
 	virtual void OnApplyExternalForce(ndFloat32 timestep)
 	{
-		ndBodyKinematic* const body = m_notify->GetBody()->GetAsBodyKinematic();
-		if (body)
-		{
-			ndVector force(m_notify->GetGravity().Scale(body->GetMassMatrix().m_w));
-			body->SetForce(force);
-			body->SetTorque(ndVectorGlue::m_zero);
-		}
+		ndAssert(GetBody()->GetAsBodyKinematic());
+		ndBodyKinematic* const body = (ndBodyKinematic*)GetBody();
+		ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
+		body->SetForce(force);
+		body->SetTorque(ndVectorGlue::m_zero);
+	}
+
+	// callback to Java code
+	virtual void OnTransformCallback(const ndMatrixGlue& matrix)
+	{
 	}
 
 	// called from newton cpp core to interact with the app
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
 	{
-		OnTransform(ndMatrixGlue(matrix));
+		OnTransformCallback(ndMatrixGlue(matrix));
 	}
 
 	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
 	{
 		OnApplyExternalForce(timestep);
 	}
-
-	ndSharedPtr<ndBodyNotify> m_notify;
 };
 
 

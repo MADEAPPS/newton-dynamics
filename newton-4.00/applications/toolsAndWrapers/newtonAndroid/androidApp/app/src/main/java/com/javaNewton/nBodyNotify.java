@@ -17,11 +17,11 @@ import com.newton.ndVectorGlue;
 import com.newton.ndMatrixGlue;
 import com.newton.ndBodyNotifyGlue;
 
-public class nBodyNotify
+public class nBodyNotify extends ndBodyNotifyGlue
 {
     public nBodyNotify()
     {
-        m_nativeObject = new NativeBodyNotify(this);
+        m_cacheMatrix = new nMatrix();
     }
 
     public void OnTransform(nMatrix matrix)
@@ -31,42 +31,14 @@ public class nBodyNotify
 
     public void SetGravity(nVector v)
     {
-        m_nativeObject.SetGravity(new ndVectorGlue(v.m_data[0], v.m_data[1], v.m_data[2], v.m_data[3]));
+        SetGravity(new ndVectorGlue(v.m_data[0], v.m_data[1], v.m_data[2], v.m_data[3]));
     }
 
-    public void SetBody(nRigidBody body)
+    public void OnTransformCallback(ndMatrixGlue matrix)
     {
-        m_nativeObject.SetBody(body);
+        m_cacheMatrix.Set(matrix);
+        OnTransform(m_cacheMatrix);
     }
 
-    private class NativeBodyNotify extends ndBodyNotifyGlue
-    {
-        public NativeBodyNotify(nBodyNotify owner)
-        {
-            super();
-            m_owner = owner;
-            m_cacheMatrix = new nMatrix();
-        }
-
-        public void OnTransform(ndMatrixGlue matrix)
-        {
-            m_cacheMatrix.Set(matrix);
-            m_owner.OnTransform(m_cacheMatrix);
-        }
-
-        public void SetBody(nRigidBody body)
-        {
-            body.GetNativeObject().SetNotifyCallback(this);
-        }
-
-        private nMatrix m_cacheMatrix;
-    }
-
-    public NativeBodyNotify GetNativeObject()
-    {
-        return m_nativeObject;
-    }
-
-    private nBodyNotify m_owner;
-    private NativeBodyNotify m_nativeObject;
+    private nMatrix m_cacheMatrix;
 }

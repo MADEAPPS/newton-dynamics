@@ -37,8 +37,7 @@ public class nRigidBody
     public void SetNotify(nBodyNotify notify)
     {
         m_notify = notify;
-        notify.SetBody(this);
-        m_nativeObject.SetNotifyCallback(notify.GetNativeObject());
+        m_nativeObject.SetNotifyCallback(notify);
     }
 
     public int GetId()

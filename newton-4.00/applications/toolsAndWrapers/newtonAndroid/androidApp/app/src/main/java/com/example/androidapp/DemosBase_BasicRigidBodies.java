@@ -28,7 +28,7 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         super(renderer);
 
         AddFloor(renderer);
-        //AddBox(renderer);
+        AddBox(renderer);
 
         nVector up = new nVector(0.0f, 1.0f, 0.0f, 0.0f);
         nVector front = new nVector(1.0f, 0.0f, 0.0f, 0.0f);

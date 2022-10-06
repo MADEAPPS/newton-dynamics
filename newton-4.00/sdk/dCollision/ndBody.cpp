@@ -144,15 +144,17 @@ void ndBody::SetCentreOfMass(const ndVector& com)
 
 void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 {
-	//ndAssert(notify->m_body == nullptr);
-	if (m_notifyCallback)
+	if (notify != m_notifyCallback)
 	{
-		delete m_notifyCallback;
-	}
-	m_notifyCallback = notify;
-	if (m_notifyCallback)
-	{
-		m_notifyCallback->m_body = this;
+		if (m_notifyCallback)
+		{
+			delete m_notifyCallback;
+		}
+		m_notifyCallback = notify;
+		if (m_notifyCallback)
+		{
+			m_notifyCallback->m_body = this;
+		}
 	}
 }
 

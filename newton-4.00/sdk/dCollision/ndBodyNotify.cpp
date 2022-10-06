@@ -55,7 +55,6 @@ void ndBodyNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "gravity", m_defualtGravity);
 }
 
-
 ndBody* ndBodyNotify::GetBody()
 { 
 	return m_body; 
