@@ -127,7 +127,7 @@ if(UNIX)
 	#	add_compile_options(-msse3)
 	#endif()
 
-	add_compile_options(-fpermissive)
+	#add_compile_options(-fpermissive)
 
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
