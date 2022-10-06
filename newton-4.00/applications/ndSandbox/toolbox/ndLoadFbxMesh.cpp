@@ -1372,38 +1372,38 @@ static ndMeshEffectNode* FbxToMeshEffectNode(ofbx::IScene* const fbxScene)
 				break;
 			}
 	
-	//		case ofbx::Object::Type::LIMB_NODE:
-	//		{
-	//			break;
-	//		}
-	//
-	//		//case FbxNodeAttribute::eLine:
-	//		//{
-	//		//	ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-	//		//	break;
-	//		//}
-	//		//case FbxNodeAttribute::eNurbsCurve:
-	//		//{
-	//		//	ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-	//		//	break;
-	//		//}
-	//		//case FbxNodeAttribute::eMarker:
-	//		//case FbxNodeAttribute::eNurbs:
-	//		//case FbxNodeAttribute::ePatch:
-	//		//case FbxNodeAttribute::eCamera:
-	//		//case FbxNodeAttribute::eCameraStereo:
-	//		//case FbxNodeAttribute::eCameraSwitcher:
-	//		//case FbxNodeAttribute::eLight:
-	//		//case FbxNodeAttribute::eOpticalReference:
-	//		//case FbxNodeAttribute::eOpticalMarker:
-	//		//case FbxNodeAttribute::eTrimNurbsSurface:
-	//		//case FbxNodeAttribute::eBoundary:
-	//		//case FbxNodeAttribute::eNurbsSurface:
-	//		//case FbxNodeAttribute::eShape:
-	//		//case FbxNodeAttribute::eLODGroup:
-	//		//case FbxNodeAttribute::eSubDiv:
-	//		//case FbxNodeAttribute::eCachedEffect:
-	//		//case FbxNodeAttribute::eUnknown:
+			case ofbx::Object::Type::LIMB_NODE:
+			{
+				break;
+			}
+	
+			//case FbxNodeAttribute::eLine:
+			//{
+			//	ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+			//	break;
+			//}
+			//case FbxNodeAttribute::eNurbsCurve:
+			//{
+			//	ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+			//	break;
+			//}
+			//case FbxNodeAttribute::eMarker:
+			//case FbxNodeAttribute::eNurbs:
+			//case FbxNodeAttribute::ePatch:
+			//case FbxNodeAttribute::eCamera:
+			//case FbxNodeAttribute::eCameraStereo:
+			//case FbxNodeAttribute::eCameraSwitcher:
+			//case FbxNodeAttribute::eLight:
+			//case FbxNodeAttribute::eOpticalReference:
+			//case FbxNodeAttribute::eOpticalMarker:
+			//case FbxNodeAttribute::eTrimNurbsSurface:
+			//case FbxNodeAttribute::eBoundary:
+			//case FbxNodeAttribute::eNurbsSurface:
+			//case FbxNodeAttribute::eShape:
+			//case FbxNodeAttribute::eLODGroup:
+			//case FbxNodeAttribute::eSubDiv:
+			//case FbxNodeAttribute::eCachedEffect:
+			//case FbxNodeAttribute::eUnknown:
 			default:
 				ndAssert(0);
 				break;

@@ -60,12 +60,7 @@ ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 
 ndMatrix::ndMatrix (const ndMatrix& transformMatrix, const ndVector& scale, const ndMatrix& stretchAxis)
 {
-	//ndMatrix scaledAxis;
-	//scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
-	//scaledAxis[1] = stretchAxis[1].Scale (scale[1]);
-	//scaledAxis[2] = stretchAxis[2].Scale (scale[2]);
-	//scaledAxis[3] = stretchAxis[3];
-	ndMatrix scaledAxis(
+	const ndMatrix scaledAxis(
 		stretchAxis[0].Scale(scale[0]),
 		stretchAxis[1].Scale(scale[1]),
 		stretchAxis[2].Scale(scale[2]),
