@@ -220,6 +220,24 @@ void Test1__()
 	//}
 }
 
+class ndDemoEntityManager::ndDemoEntityManager::ndDebuMesh
+{
+	public:
+	ndDebuMesh()
+		:m_flatShaded()
+		,m_wireFrameOpenEdge()
+		,m_wireFrameShareEdge()
+	{
+	}
+
+	ndSharedPtr<ndFlatShadedDebugMesh> m_flatShaded;
+	ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameOpenEdge;
+	ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameShareEdge;
+};
+
+class ndDemoEntityManager::ndDemoEntityManager::ndDebugMeshCache : public ndTree<ndDebuMesh, const ndShape*>
+{
+};
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
@@ -275,7 +293,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
-	,m_debugShapeCache()
+	,m_debugShapeCache(new ndDebugMeshCache())
 	,m_replayLogFile(nullptr)
 {
 	// Setup window
@@ -459,6 +477,11 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	}
 
 	Cleanup ();
+
+	if (m_debugShapeCache)
+	{
+		delete m_debugShapeCache;
+	}
 
 	// destroy the empty world
 	if (m_world) 
@@ -697,17 +720,17 @@ void ndDemoEntityManager::Cleanup ()
 	}
 	m_animationCache.RemoveAll();
 
-	while (m_debugShapeCache.GetRoot())
+	while (m_debugShapeCache->GetRoot())
 	{
-		ndDebugMeshCache::ndNode* const root = m_debugShapeCache.GetRoot();
-		ndDebuMesh& debugMesh = root->GetInfo();
-		debugMesh.m_flatShaded->Release();
-		debugMesh.m_wireFrameShareEdge->Release();
-		if (debugMesh.m_wireFrameOpenEdge)
-		{
-			debugMesh.m_wireFrameOpenEdge->Release();
-		}
-		m_debugShapeCache.Remove(root);
+		//ndDebugMeshCache::ndNode* const root = m_debugShapeCache->GetRoot();
+		//ndDebuMesh& debugMesh = root->GetInfo();
+		//debugMesh.m_flatShaded->Release();
+		//debugMesh.m_wireFrameShareEdge->Release();
+		//if (debugMesh.m_wireFrameOpenEdge)
+		//{
+		//	debugMesh.m_wireFrameOpenEdge->Release();
+		//}
+		m_debugShapeCache->Remove(m_debugShapeCache->GetRoot());
 	}
 
 	if (m_cameraManager) 
@@ -1474,7 +1497,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			}
 			else if (!body->GetAsBodyTriggerVolume())
 			{
-				ndDebugMeshCache::ndNode* const shapeNode = m_debugShapeCache.Find(key);
+				ndDebugMeshCache::ndNode* const shapeNode = m_debugShapeCache->Find(key);
 				if (shapeNode)
 				{
 					ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
@@ -1492,7 +1515,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 		ndShape* const key = (ndShape*)shapeInstance.GetShape();
 		if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))
 		{
-			ndDebugMeshCache::ndNode* shapeNode = m_debugShapeCache.Find(key);
+			ndDebugMeshCache::ndNode* shapeNode = m_debugShapeCache->Find(key);
 			if (!shapeNode)
 			{
 				ndShapeInstance shape(body->GetCollisionShape());
@@ -1507,7 +1530,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugNotify::ndEdgeType::m_open);
 					debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
 				}
-				shapeNode = m_debugShapeCache.Insert(debugMesh, key);
+				shapeNode = m_debugShapeCache->Insert(debugMesh, key);
 			}
 
 			ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
@@ -1516,13 +1539,13 @@ void ndDemoEntityManager::DrawDebugShapes()
 
 			if (m_collisionDisplayMode >= 2)
 			{
-				ndWireFrameDebugMesh* const sharedEdgeMesh = shapeNode->GetInfo().m_wireFrameShareEdge;
+				ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
 				sharedEdgeMesh->SetColor(color);
 				sharedEdgeMesh->Render(this, matrix);
 
-				if (shapeNode->GetInfo().m_wireFrameOpenEdge)
+				if (*shapeNode->GetInfo().m_wireFrameOpenEdge)
 				{
-					ndWireFrameDebugMesh* const openEdgeMesh = shapeNode->GetInfo().m_wireFrameOpenEdge;
+					ndWireFrameDebugMesh* const openEdgeMesh = *shapeNode->GetInfo().m_wireFrameOpenEdge;
 					ndVector color1(m_showConcaveEdge ? ndVector(1.0f, 0.0f, 1.0f, 1.0f) : color);
 					openEdgeMesh->SetColor(color1);
 					openEdgeMesh->Render(this, matrix);
@@ -1530,7 +1553,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			}
 			else
 			{
-				ndFlatShadedDebugMesh* const mesh = shapeNode->GetInfo().m_flatShaded;
+				ndFlatShadedDebugMesh* const mesh = *shapeNode->GetInfo().m_flatShaded;
 				mesh->SetColor(color);
 				mesh->Render(this, matrix);
 			}

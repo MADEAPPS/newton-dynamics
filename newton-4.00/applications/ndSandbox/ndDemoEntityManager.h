@@ -71,7 +71,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		ndFloat32 m_shininess;
 	};
 
-
 	class TransparentMesh
 	{
 		public: 
@@ -100,6 +99,9 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		}
 	};
 
+	class ndDebuMesh;
+	class ndDebugMeshCache;
+
 	class SDKDemos
 	{
 		public:
@@ -121,24 +123,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		bool m_memory1;
 	};
 
-	class ndDebuMesh
-	{
-		public:
-		ndDebuMesh()
-			:m_flatShaded(nullptr)
-			,m_wireFrameOpenEdge(nullptr)
-			,m_wireFrameShareEdge(nullptr)
-		{
-		}
-
-		ndFlatShadedDebugMesh* m_flatShaded;
-		ndWireFrameDebugMesh* m_wireFrameOpenEdge;
-		ndWireFrameDebugMesh* m_wireFrameShareEdge;
-	};
-
-	class ndDebugMeshCache: public ndTree<ndDebuMesh, const ndShape*>
-	{
-	};
 
 	ndDemoEntityManager ();
 	~ndDemoEntityManager ();
@@ -283,7 +267,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndWorld::ndSolverModes m_solverMode;
 
 	ndLightSource m_directionalLight;
-	ndDebugMeshCache m_debugShapeCache;
+	ndDebugMeshCache* m_debugShapeCache;
 
 	FILE* m_replayLogFile;
 	static SDKDemos m_demosSelection[];
