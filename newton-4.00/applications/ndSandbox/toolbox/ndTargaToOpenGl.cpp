@@ -12,92 +12,82 @@
 #include "ndSandboxStdafx.h"
 #include "ndTargaToOpenGl.h"
 
-class ndTextureEntry: public ndRefCounter<ndTextureEntry>
+class ndTextureEntry
 {
 	public:
 	ndTextureEntry()
 	{
 	}
 
+	ndUnsigned32 m_ref;
 	GLuint m_textureID;
-	ndString m_textureName;
+	ndUnsigned64 m_hash;
 };
 
-class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
+class ndTextureCache : public ndList<ndTextureEntry>
 {
 	public: 
-	GLuint GetTexture(const char* const texName)
-	{
-		GLuint texID = 0;
-		ndAssert (texName);
-
-		char name[256];
-		strcpy(name, texName);
-		_strlwr(name);
-		ndUnsigned64 crc = dCRC64(name);
-
-		ndNode* node = Find(crc);
-		if (node) 
-		{
-			node->GetInfo().AddRef();
-			texID = node->GetInfo().m_textureID;
-		}
-		return texID;
-	}
-
-	void InsertText (const char* const texName, GLuint id) 
-	{
-		ndTextureEntry entry;
-		entry.m_textureID = id;
-		entry.m_textureName = texName;
-		entry.m_textureName.ToLower();
-		ndUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
-		Insert(entry, crc);
-	}
-
-	~ndTextureCache ()
+	~ndTextureCache()
 	{
 		ndAssert(GetCount() == 0);
+		ndAssert(m_idMap.GetCount() == 0);
+		ndAssert(m_hashMap.GetCount() == 0);
+	}
+
+	ndTextureEntry* Find(const char* const texName)
+	{
+		ndUnsigned64 crc = MakeHash(texName);
+		ndTree<ndList<ndTextureEntry>::ndNode*, ndUnsigned64>::ndNode* const node = m_hashMap.Find(crc);
+		return node ? &node->GetInfo()->GetInfo() : nullptr;
+	}
+
+	ndTextureEntry* InsertText (const char* const texName, GLuint id)
+	{
+		ndList<ndTextureEntry>::ndNode* const node = Append();
+		ndTextureEntry& entry = node->GetInfo();
+		entry.m_ref = 1;
+		entry.m_textureID = id;
+		entry.m_hash = MakeHash(texName);
+		m_hashMap.Insert(node, entry.m_hash);
+		m_idMap.Insert(node, entry.m_textureID);
+		return &entry;
 	}
 
 	void RemoveById (GLuint id)
 	{
-		Iterator iter (*this);
-		for (iter.Begin(); iter; iter ++) 
+		ndTree<ndList<ndTextureEntry>::ndNode*, GLuint>::ndNode* const node = m_idMap.Find(id);
+		if (node)
 		{
-			ndTextureEntry& entry = iter.GetNode()->GetInfo();
-			if (entry.m_textureID == id) 
+			ndList<ndTextureEntry>::ndNode* const texNode = node->GetInfo();
+			ndTextureEntry& entry = texNode->GetInfo();
+			entry.m_ref = entry.m_ref - 1;
+			ndAssert(entry.m_ref >= 0);
+			if (entry.m_ref == 0)
 			{
-				if (entry.GetRef() == 1) 
-				{
-					glDeleteTextures(1, &id);
-					Remove (iter.GetNode());
-				}
-				break;
+				glDeleteTextures(1, &entry.m_textureID);
+				m_idMap.Remove(node);
+				m_hashMap.Remove(entry.m_hash);
+				Remove(texNode);
 			}
 		}
 	}
 
-	ndNode* FindById (GLuint id) const
+	ndUnsigned64 MakeHash(const char* const texName) const
 	{
-		Iterator iter (*this);
-		for (iter.Begin(); iter; iter ++) 
-		{
-			if (iter.GetNode()->GetInfo().m_textureID == id) 
-			{
-				return iter.GetNode();
-			}
-		}
-		return nullptr;
+		char name[256];
+		strcpy(name, texName);
+		_strlwr(name);
+		ndUnsigned64 crc = dCRC64(name);
+		return crc;
 	}
 
 	void CleanUp()
 	{
+		ndAssert(GetCount() == 0);
 		while (GetCount())
 		{
-			ndTextureEntry& entry = GetRoot()->GetInfo();
-			glDeleteTextures(1, &entry.m_textureID);
-			Remove (GetRoot());
+			ndTextureEntry& entry = GetFirst()->GetInfo();
+			RemoveById(entry.m_textureID);
 		}
 	}
 
@@ -106,10 +96,12 @@ class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 		static ndTextureCache texCache;
 		return texCache;
 	}
+
+	ndTree<ndList<ndTextureEntry>::ndNode*, GLuint> m_idMap;
+	ndTree<ndList<ndTextureEntry>::ndNode*, ndUnsigned64> m_hashMap;
 };
 
-
-static GLuint LoadTargaImage(const char* const cacheName, const char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
+static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
 {
 	// Get width, height, and depth of texture
 	GLint iWidth = width;
@@ -119,25 +111,25 @@ static GLuint LoadTargaImage(const char* const cacheName, const char* const buff
 	GLint iComponents = 4;
 	switch (format)
 	{
-	case m_rgb:
-		// Most likely case
-		eFormat = GL_BGR;
-		//eFormat = GL_RGB;
-		iComponents = 4;
-		break;
+		case m_rgb:
+			// Most likely case
+			eFormat = GL_BGR;
+			//eFormat = GL_RGB;
+			iComponents = 4;
+			break;
 
-	case m_rgba:
-		eFormat = GL_BGRA;
-		//eFormat = GL_RGBA;
-		iComponents = 4;
-		break;
+		case m_rgba:
+			eFormat = GL_BGRA;
+			//eFormat = GL_RGBA;
+			iComponents = 4;
+			break;
 
-	case m_luminace:
-		//eFormat = GL_LUMINANCE;
-		eFormat = GL_LUMINANCE_ALPHA;
-		//eFormat = GL_ALPHA;
-		iComponents = 4;
-		break;
+		case m_luminace:
+			//eFormat = GL_LUMINANCE;
+			eFormat = GL_LUMINANCE_ALPHA;
+			//eFormat = GL_ALPHA;
+			iComponents = 4;
+			break;
 	};
 
 	GLuint texture = 0;
@@ -165,10 +157,6 @@ static GLuint LoadTargaImage(const char* const cacheName, const char* const buff
 		// build our texture mip maps
 		gluBuild2DMipmaps(GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
 		ndAssert(glGetError() == GL_NO_ERROR);
-
-		// Done with File
-		ndTextureCache& cache = ndTextureCache::GetChache();
-		cache.InsertText(cacheName, texture);
 	}
 
 	return texture;
@@ -200,21 +188,25 @@ GLuint LoadTexture(const char* const filename)
 	char fullPathName[2048];
 	dGetWorkingFileName (filename, fullPathName);
 	ndTextureCache& cache = ndTextureCache::GetChache();
-	GLuint texture = cache.GetTexture(fullPathName);
-	if (!texture) 
+	ndTextureEntry* texture = cache.Find(fullPathName);
+	if (texture)
+	{
+		texture->m_ref += 1;
+	}
+	else 
 	{
 		FILE* const pFile = fopen (fullPathName, "rb");
 		if(pFile == nullptr) 
 		{
 			return 0;
 		}
-
+		
 		//ndAssert (sizeof (TGAHEADER) == 18);
 		// Read in header (binary) sizeof(TGAHEADER) = 18
 		TGAHEADER tgaHeader;		// TGA file header
 		size_t ret = fread(&tgaHeader, 18, 1, pFile);
 		ret = 0;
-
+		
 		// Do byte swap for big vs little endian
 		tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
 		tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
@@ -222,13 +214,13 @@ GLuint LoadTexture(const char* const filename)
 		tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
 		tgaHeader.width = SWAP_INT16(tgaHeader.width);
 		tgaHeader.height = SWAP_INT16(tgaHeader.height);
-
+		
 		// Get width, height, and depth of texture
 		ndInt32 width = tgaHeader.width;
 		ndInt32 height = tgaHeader.height;
 		short sDepth = tgaHeader.bits / 8;
 		ndAssert ((sDepth == 3) || (sDepth == 4));
-
+		
 		// Put some validity checks here. Very simply, I only understand
 		// or care about 8, 24, or 32 bit targa's.
 		if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
@@ -236,10 +228,10 @@ GLuint LoadTexture(const char* const filename)
 			fclose(pFile);
 			return 0;
 		}
-
+		
 		// Calculate size of image buffer
 		unsigned lImageSize = width * height * sDepth;
-
+		
 		// Allocate memory and check for success
 		char* const pBits = (char*)ndMemory::Malloc (width * height * sizeof (ndInt32));
 		if(pBits == nullptr) 
@@ -247,7 +239,7 @@ GLuint LoadTexture(const char* const filename)
 			fclose(pFile);
 			return 0;
 		}
-
+		
 		// Read in the bits
 		// Check for read error. This should catch RLE or other 
 		// weird formats that I don't want to recognize
@@ -258,30 +250,36 @@ GLuint LoadTexture(const char* const filename)
 			delete[] pBits;
 			return 0; 
 		}
-
+		
 		TextureImageFormat format = m_rgb;
 		switch(sDepth)
 		{
 			case 1:
 				format = m_luminace;
 				break;
-
+		
 			case 3:     
 				format = m_rgb;
 				break;
-
+		
 			case 4:
 				format = m_rgba;
 				break;
 		};
-
-		texture = LoadTargaImage(fullPathName, pBits, tgaHeader.width, tgaHeader.height, format);
-
+		
+		GLuint textureId = LoadTargaImage(pBits, tgaHeader.width, tgaHeader.height, format);
+		
 		// Done with File
 		fclose(pFile);
 		ndMemory::Free (pBits);
+		if (!textureId)
+		{
+			return 0;
+		}
+
+		texture = cache.InsertText(fullPathName, textureId);
 	}
-	return texture;
+	return texture->m_textureID;
 } 
 
 #ifndef GL_BGR
@@ -292,33 +290,6 @@ GLuint LoadTexture(const char* const filename)
 void ReleaseTexture (GLuint texture)
 {
 	ndTextureCache::GetChache().RemoveById (texture);
-}
-
-const char* FindTextureById (GLuint textureID)
-{
-	ndTextureCache& cache = ndTextureCache::GetChache();	
-	ndTextureCache::ndNode* const node = cache.FindById (textureID);
-	if (node) 
-	{
-		return node->GetInfo().m_textureName.GetStr();
-	}
-	return nullptr;
-}
-
-GLuint AddTextureRef (GLuint texture)
-{
-	ndTextureCache& cache = ndTextureCache::GetChache();	
-	ndTextureCache::ndNode* const node = cache.FindById (texture);
-	if (node) 
-	{
-		node->GetInfo().AddRef();
-	}
-	return texture;
-}
-
-GLuint GetDefaultTexture()
-{
-	return LoadTexture("default.tga");
 }
 
 void TextureCacheCleanUp()
