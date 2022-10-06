@@ -42,6 +42,11 @@ ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
 }
 
+ndBodyNotify::~ndBodyNotify()
+{
+
+}
+
 void ndBodyNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
