@@ -10,7 +10,7 @@
 */
 
 #include <iostream>
-#include "testStdafx.h"
+#include "ndNewton.h"
 
 
 class ndDemoEntityNotify: public ndBodyNotify

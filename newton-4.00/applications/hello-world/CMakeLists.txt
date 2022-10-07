@@ -12,5 +12,5 @@ find_library(NEWTON_LIB ndNewton REQUIRED)
 find_library(AVX_LIB ndSolverAvx2 REQUIRED)
 
 # Build the app and link it to the Newton libraries.
-add_executable(${PROJECT_NAME} main.cpp testStdafx.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB} pthread)
