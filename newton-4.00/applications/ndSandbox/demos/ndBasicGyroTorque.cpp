@@ -62,17 +62,15 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-
-	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 5.0f;
 
 	ndShapeInstance shape(new ndShapeBox(2.0f, 0.5f, 1.0));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, 0.0f));
 
 	body->SetOmega(omega);
@@ -82,8 +80,6 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-
-	mesh->Release();
 }
 
 static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
@@ -93,19 +89,17 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-
-	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 0.5f;
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetScale(ndVector (0.5f, 0.5f, 1.0f, 0.0f));
 
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetOmega(omega);
@@ -115,8 +109,6 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-
-	mesh->Release();
 }
 
 static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin)
@@ -136,11 +128,11 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 	shape.SetLocalMatrix(shapeMatrix);
 	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
 
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndBodyDynamic* const body = new ndAsymetricInertiaBody();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetMatrix(matrix);
@@ -150,8 +142,6 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-
-	mesh->Release();
 }
 
 static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& origin)
@@ -164,9 +154,11 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
-	ndDemoMesh* const geometry = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
+
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
 	matrix.m_posit.m_y += 1.0f;
 
 	const ndFloat32 mass = 1.0f;
@@ -178,7 +170,6 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	body->SetOmega(matrix.m_up.Scale(40.0f));
 
 	world->AddBody(body);
-	geometry->Release();
 	scene->AddEntity(entity);
 }
 
@@ -207,9 +198,9 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	matrix.m_posit.m_w = 1.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-	ndDemoMesh* const geometry = new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
-	geometry->Release();
+
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga"));
+	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
