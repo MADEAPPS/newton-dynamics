@@ -26,7 +26,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_nextRotation (matrix)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh(nullptr)
-	//,m_meshNew()
+	,m_meshNew()
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -47,7 +47,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_nextRotation()
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh(nullptr)
-	//,m_meshNew()
+	,m_meshNew()
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -111,7 +111,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
 	,m_mesh(nullptr)
-	//,m_meshNew(copyFrom.m_meshNew)
+	,m_meshNew(copyFrom.m_meshNew)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -155,23 +155,6 @@ void ndDemoEntity::SetUserData (UserData* const data)
 {
 	m_userData = data;
 }
-
-/*
-void ndDemoEntity::TransformCallback(const NewtonBody* body, const ndFloat32* matrix, ndInt32 threadIndex)
-{
-	ndDemoEntity* const ent = (ndDemoEntity*) NewtonBodyGetUserData(body);
-	if (ent) {
-		ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-		ndMatrix transform(matrix);
-		ndQuaternion rot;
-		NewtonBodyGetRotation(body, &rot.m_x);
-
-		scene->Lock(ent->m_lock);
-		ent->SetMatrixUsafe(rot, transform.m_posit);
-		scene->Unlock(ent->m_lock);
-	}
-}
-*/
 
 ndDemoMeshInterface* ndDemoEntity::GetMesh() const
 {

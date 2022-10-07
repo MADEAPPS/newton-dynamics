@@ -28,12 +28,12 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false);
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix, false));
 
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -41,9 +41,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	body->SetCollisionShape(box);
 
 	world->AddBody(body);
-
 	scene->AddEntity(entity);
-	geometry->Release();
 	return body;
 }
 

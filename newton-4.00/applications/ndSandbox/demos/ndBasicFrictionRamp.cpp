@@ -86,6 +86,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMat
 	body->SetMassMatrix(mass, shape);
 	
 	ndWorld* const world = scene->GetWorld();
+	scene->AddEntity(entity);
 	world->AddBody(body);
 	return body;
 }
@@ -126,8 +127,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 
 	ndShapeInstance shape(new ndShapeBox(boxSize.m_x, boxSize.m_y, boxSize.m_z));
 	matrix.m_posit.m_y = floor.m_y + boxSize.m_y;
-
-
+	
 	ndMatrix texMatrix(ndGetIdentityMatrix());
 	texMatrix.m_posit.m_x = -0.5f;
 	texMatrix.m_posit.m_y = -0.5f;
@@ -135,8 +135,8 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	//ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
 	ndSharedPtr<ndDemoMeshInterface> boxGeometry (new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix));
 
-	//for (ndInt32 i = 0; i < 10; ++i)
-	for (ndInt32 i = 0; i < 1; ++i)
+	for (ndInt32 i = 0; i < 10; ++i)
+	//for (ndInt32 i = 0; i < 1; ++i)
 	{
 		ndBodyDynamic* const boxBody = AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);
 		matrix.m_posit.m_x += 2.5f;

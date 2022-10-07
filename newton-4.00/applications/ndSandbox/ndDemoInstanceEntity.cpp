@@ -23,14 +23,13 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	,m_maxInstanceCount(1024)
 	,m_matrixOffsetBuffer(0)
 {
-	ndAssert(0);
-/*
 	ndMeshEffect mesh(*collision);
 
 	ndMatrix aligmentUV(uvMatrix);
 	m_shader = shaderCache.m_diffuseIntanceEffect;
 
 	// apply uv projections
+	ndInt32 tex0 = LoadTexture(texture0);
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
@@ -38,13 +37,12 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 		case ndShapeID::m_capsule:
 		{
 			//aligmentUV = dRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * aligmentUV;
-			mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
+			mesh.SphericalMapping(tex0, &aligmentUV[0][0]);
 			break;
 		}
 
 		case ndShapeID::m_box:
 		{
-			ndInt32 tex0 = LoadTexture(texture0);
 			//mesh.UniformBoxMapping(tex0, aligmentUV);
 			mesh.BoxMapping(tex0, tex0, tex0, aligmentUV);
 			break;
@@ -52,7 +50,6 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 
 		default:
 		{
-			ndInt32 tex0 = LoadTexture(texture0);
 			mesh.UniformBoxMapping(tex0, aligmentUV);
 		}
 	}
@@ -108,7 +105,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 		ndInt32 material = mesh.GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 
-		segment->m_material.m_textureHandle = (GLuint)material;
+		segment->m_material.SetTexture(material);
 		segment->SetOpacity(opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 
@@ -189,9 +186,9 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 
 	glUseProgram(0);
 
+	ReleaseTexture(tex0);
 	m_vertexCount = points.GetCount();
 	m_indexCount = indices.GetCount();
-*/
 }
 
 ndDemoMeshIntance::~ndDemoMeshIntance()

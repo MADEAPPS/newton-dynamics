@@ -102,21 +102,19 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	m_shader = shaderCache.m_diffuseEffect;
 
 	// apply uv projections
-	ndInt32 tex0 = 0;
+	ndInt32 tex0 = LoadTexture(texture0);
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
 		case ndShapeID::m_sphere:
 		case ndShapeID::m_capsule:
 		{
-			tex0 = LoadTexture(texture0);
 			mesh.SphericalMapping(tex0, &aligmentUV[0][0]);
 			break;
 		}
 
 		case ndShapeID::m_box:
 		{
-			tex0 = LoadTexture(texture0);
 			//ndInt32 tex1 = LoadTexture(texture1);
 			//ndInt32 tex2 = LoadTexture(texture2);
 			if (stretchMaping)
@@ -132,7 +130,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 
 		default:
 		{
-			tex0 = LoadTexture(texture0);
 			//ndInt32 tex0 = LoadTexture(texture0);
 			//ndInt32 tex1 = LoadTexture(texture1);
 			//ndInt32 tex2 = LoadTexture(texture2);
@@ -208,10 +205,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 
-	if (tex0)
-	{
-		ReleaseTexture(tex0);
-	}
+	ReleaseTexture(tex0);
 }
 
 ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
