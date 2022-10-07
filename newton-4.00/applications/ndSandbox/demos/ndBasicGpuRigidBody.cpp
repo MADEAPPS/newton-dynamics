@@ -103,7 +103,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 	ndMatrix matrix(ndPitchMatrix(10.0f*ndDegreeToRad) * ndRollMatrix(150.0f*ndDegreeToRad));
 	matrix.m_posit = origin;
 
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -122,8 +122,6 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 			}
 		}
 	}
-
-	geometry->Release();
 }
 
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
