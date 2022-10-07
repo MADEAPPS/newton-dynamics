@@ -98,7 +98,7 @@ ndBodyDynamic* BuildSphere(ndWorld& world, ndFloat32 mass, const ndVector& origi
   return body;
 }
 
-int main(int, const char*)
+int main(int, const char**)
 {
   ndWorld world;
   world.SetSubSteps(1);
