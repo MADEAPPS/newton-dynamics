@@ -722,14 +722,6 @@ void ndDemoEntityManager::Cleanup ()
 
 	while (m_debugShapeCache->GetRoot())
 	{
-		//ndDebugMeshCache::ndNode* const root = m_debugShapeCache->GetRoot();
-		//ndDebuMesh& debugMesh = root->GetInfo();
-		//debugMesh.m_flatShaded->Release();
-		//debugMesh.m_wireFrameShareEdge->Release();
-		//if (debugMesh.m_wireFrameOpenEdge)
-		//{
-		//	debugMesh.m_wireFrameOpenEdge->Release();
-		//}
 		m_debugShapeCache->Remove(m_debugShapeCache->GetRoot());
 	}
 

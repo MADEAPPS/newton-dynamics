@@ -190,11 +190,28 @@
 		}
 
 		static inline void Transpose(
+			__m256d& dst0, __m256d& dst1, __m256d& dst2, __m256d& dst3,
+			const __m256d& src0, const __m256d& src1, const __m256d& src2, const __m256d& src3)
+		{
+			__m256d tmp[4];
+			tmp[0] = _mm256_permute2f128_pd(src0, src2, 0x20);
+			tmp[1] = _mm256_permute2f128_pd(src1, src3, 0x20);
+			tmp[2] = _mm256_permute2f128_pd(src0, src2, 0x31);
+			tmp[3] = _mm256_permute2f128_pd(src1, src3, 0x31);
+
+			dst0 = _mm256_unpacklo_pd(tmp[0], tmp[1]);
+			dst1 = _mm256_unpackhi_pd(tmp[0], tmp[1]);
+			dst2 = _mm256_unpacklo_pd(tmp[2], tmp[3]);
+			dst3 = _mm256_unpackhi_pd(tmp[2], tmp[3]);
+		}
+
+		static inline void Transpose(
 			ndAvxFloat& dst0, ndAvxFloat& dst1, ndAvxFloat& dst2, ndAvxFloat& dst3,
 			ndAvxFloat& dst4, ndAvxFloat& dst5, ndAvxFloat& dst6, ndAvxFloat& dst7,
 			const ndAvxFloat& src0, const ndAvxFloat& src1, const ndAvxFloat& src2, const ndAvxFloat& src3,
 			const ndAvxFloat& src4, const ndAvxFloat& src5, const ndAvxFloat& src6, const ndAvxFloat& src7)
 		{
+#if 1
 			ndVector::Transpose4x4(
 				dst0.m_vector8.m_linear, dst1.m_vector8.m_linear, dst2.m_vector8.m_linear, dst3.m_vector8.m_linear,
 				src0.m_vector8.m_linear, src1.m_vector8.m_linear, src2.m_vector8.m_linear, src3.m_vector8.m_linear);
@@ -210,6 +227,23 @@
 			ndVector::Transpose4x4(
 				dst4.m_vector8.m_angular, dst5.m_vector8.m_angular, dst6.m_vector8.m_angular, dst7.m_vector8.m_angular,
 				src4.m_vector8.m_angular, src5.m_vector8.m_angular, src6.m_vector8.m_angular, src7.m_vector8.m_angular);
+#else
+			Transpose(
+				dst0.m_low, dst1.m_low, dst2.m_low, dst3.m_low,
+				src0.m_low, src1.m_low, src2.m_low, src3.m_low);
+
+			Transpose(
+				dst0.m_high, dst1.m_high, dst2.m_high, dst3.m_high,
+				src4.m_low, src5.m_low, src6.m_low, src7.m_low);
+
+			Transpose(
+				dst4.m_low, dst5.m_low, dst6.m_low, dst7.m_low,
+				src0.m_high, src1.m_high, src2.m_high, src3.m_high);
+
+			Transpose(
+				dst4.m_high, dst5.m_high, dst6.m_high, dst7.m_high,
+				src4.m_high, src5.m_high, src6.m_high, src7.m_high);
+#endif
 		}
 
 		union
