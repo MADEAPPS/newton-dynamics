@@ -412,34 +412,35 @@
 			const ndAvxFloat& src0, const ndAvxFloat& src1, const ndAvxFloat& src2, const ndAvxFloat& src3,
 			const ndAvxFloat& src4, const ndAvxFloat& src5, const ndAvxFloat& src6, const ndAvxFloat& src7)
 		{
-			ndAvxFloat tmp[8];
-			tmp[0].m_type = _mm256_permute2f128_ps(src0.m_type, src4.m_type, 0x20);
-			tmp[1].m_type = _mm256_permute2f128_ps(src0.m_type, src4.m_type, 0x31);
-			tmp[2].m_type = _mm256_permute2f128_ps(src1.m_type, src5.m_type, 0x20);
-			tmp[3].m_type = _mm256_permute2f128_ps(src1.m_type, src5.m_type, 0x31);
-			tmp[4].m_type = _mm256_permute2f128_ps(src2.m_type, src6.m_type, 0x20);
-			tmp[5].m_type = _mm256_permute2f128_ps(src2.m_type, src6.m_type, 0x31);
-			tmp[6].m_type = _mm256_permute2f128_ps(src3.m_type, src7.m_type, 0x20);
-			tmp[7].m_type = _mm256_permute2f128_ps(src3.m_type, src7.m_type, 0x31);
+			ndAvxFloat blocks4x4[8];
 
-			ndAvxFloat rrF[8];
-			rrF[0].m_type = _mm256_unpacklo_ps(tmp[0].m_type, tmp[4].m_type);
-			rrF[1].m_type = _mm256_unpackhi_ps(tmp[0].m_type, tmp[4].m_type);
-			rrF[2].m_type = _mm256_unpacklo_ps(tmp[1].m_type, tmp[5].m_type);
-			rrF[3].m_type = _mm256_unpackhi_ps(tmp[1].m_type, tmp[5].m_type);
-			rrF[4].m_type = _mm256_unpacklo_ps(tmp[2].m_type, tmp[6].m_type);
-			rrF[5].m_type = _mm256_unpackhi_ps(tmp[2].m_type, tmp[6].m_type);
-			rrF[6].m_type = _mm256_unpacklo_ps(tmp[3].m_type, tmp[7].m_type);
-			rrF[7].m_type = _mm256_unpackhi_ps(tmp[3].m_type, tmp[7].m_type);
+			blocks4x4[0].m_type = _mm256_permute2f128_ps(src0.m_type, src4.m_type, 0x20);
+			blocks4x4[1].m_type = _mm256_permute2f128_ps(src0.m_type, src4.m_type, 0x31);
+			blocks4x4[2].m_type = _mm256_permute2f128_ps(src1.m_type, src5.m_type, 0x20);
+			blocks4x4[3].m_type = _mm256_permute2f128_ps(src1.m_type, src5.m_type, 0x31);
+			blocks4x4[4].m_type = _mm256_permute2f128_ps(src2.m_type, src6.m_type, 0x20);
+			blocks4x4[5].m_type = _mm256_permute2f128_ps(src2.m_type, src6.m_type, 0x31);
+			blocks4x4[6].m_type = _mm256_permute2f128_ps(src3.m_type, src7.m_type, 0x20);
+			blocks4x4[7].m_type = _mm256_permute2f128_ps(src3.m_type, src7.m_type, 0x31);
+
+			ndAvxFloat blocks2x2[8];
+			blocks2x2[0].m_type = _mm256_unpacklo_ps(blocks4x4[0].m_type, blocks4x4[4].m_type);
+			blocks2x2[1].m_type = _mm256_unpackhi_ps(blocks4x4[0].m_type, blocks4x4[4].m_type);
+			blocks2x2[2].m_type = _mm256_unpacklo_ps(blocks4x4[1].m_type, blocks4x4[5].m_type);
+			blocks2x2[3].m_type = _mm256_unpackhi_ps(blocks4x4[1].m_type, blocks4x4[5].m_type);
+			blocks2x2[4].m_type = _mm256_unpacklo_ps(blocks4x4[2].m_type, blocks4x4[6].m_type);
+			blocks2x2[5].m_type = _mm256_unpackhi_ps(blocks4x4[2].m_type, blocks4x4[6].m_type);
+			blocks2x2[6].m_type = _mm256_unpacklo_ps(blocks4x4[3].m_type, blocks4x4[7].m_type);
+			blocks2x2[7].m_type = _mm256_unpackhi_ps(blocks4x4[3].m_type, blocks4x4[7].m_type);
 			
-			dst0.m_type = _mm256_unpacklo_ps(rrF[0].m_type, rrF[4].m_type);
-			dst1.m_type = _mm256_unpackhi_ps(rrF[0].m_type, rrF[4].m_type);
-			dst2.m_type = _mm256_unpacklo_ps(rrF[1].m_type, rrF[5].m_type);
-			dst3.m_type = _mm256_unpackhi_ps(rrF[1].m_type, rrF[5].m_type);
-			dst4.m_type = _mm256_unpacklo_ps(rrF[2].m_type, rrF[6].m_type);
-			dst5.m_type = _mm256_unpackhi_ps(rrF[2].m_type, rrF[6].m_type);
-			dst6.m_type = _mm256_unpacklo_ps(rrF[3].m_type, rrF[7].m_type);
-			dst7.m_type = _mm256_unpackhi_ps(rrF[3].m_type, rrF[7].m_type);
+			dst0.m_type = _mm256_unpacklo_ps(blocks2x2[0].m_type, blocks2x2[4].m_type);
+			dst1.m_type = _mm256_unpackhi_ps(blocks2x2[0].m_type, blocks2x2[4].m_type);
+			dst2.m_type = _mm256_unpacklo_ps(blocks2x2[1].m_type, blocks2x2[5].m_type);
+			dst3.m_type = _mm256_unpackhi_ps(blocks2x2[1].m_type, blocks2x2[5].m_type);
+			dst4.m_type = _mm256_unpacklo_ps(blocks2x2[2].m_type, blocks2x2[6].m_type);
+			dst5.m_type = _mm256_unpackhi_ps(blocks2x2[2].m_type, blocks2x2[6].m_type);
+			dst6.m_type = _mm256_unpacklo_ps(blocks2x2[3].m_type, blocks2x2[7].m_type);
+			dst7.m_type = _mm256_unpackhi_ps(blocks2x2[3].m_type, blocks2x2[7].m_type);
 		}
 
 		union
