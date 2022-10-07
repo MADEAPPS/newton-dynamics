@@ -142,7 +142,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 
 		ndDemoSubMesh* const segment = AddSubMesh();
 		//segment->m_material.m_textureHandle = (GLuint)material;
-		segment->m_material.m_textureHandle = (GLuint)1;
+		//segment->m_material.SetTexture((GLuint)material);
+		ndAssert(0);
 
 		segment->m_material.m_diffuse = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
 		segment->m_material.m_ambient = ndVector(0.1f, 0.6f, 0.9f, 0.0f);

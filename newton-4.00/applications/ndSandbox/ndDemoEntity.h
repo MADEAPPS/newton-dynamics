@@ -46,7 +46,10 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene);
 
 	ndDemoMeshInterface* GetMesh() const;
-	void SetMesh (ndDemoMeshInterface* const m_mesh, const ndMatrix& meshMatrix);
+	void SetMesh (ndDemoMeshInterface* const mesh, const ndMatrix& meshMatrix);
+
+	ndSharedPtr<ndDemoMeshInterface> GetMeshNew();
+	void SetMeshNew(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix);
 
 	const ndMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const ndMatrix& matrix);  
@@ -87,6 +90,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 
 	ndMatrix m_meshMatrix;
 	ndDemoMeshInterface* m_mesh;
+	ndSharedPtr<ndDemoMeshInterface> m_meshNew;
 	UserData* m_userData;
 	ndList <ndDemoEntity*>::ndNode* m_rootNode;
 	ndSpinLock m_lock;

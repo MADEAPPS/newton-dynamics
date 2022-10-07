@@ -23,6 +23,8 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	,m_maxInstanceCount(1024)
 	,m_matrixOffsetBuffer(0)
 {
+	ndAssert(0);
+/*
 	ndMeshEffect mesh(*collision);
 
 	ndMatrix aligmentUV(uvMatrix);
@@ -189,6 +191,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 
 	m_vertexCount = points.GetCount();
 	m_indexCount = indices.GetCount();
+*/
 }
 
 ndDemoMeshIntance::~ndDemoMeshIntance()
@@ -255,7 +258,7 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
 			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), m_instanceCount);
 		}
 	}
@@ -280,20 +283,16 @@ ndDemoInstanceEntity::ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
 	,m_instanceMesh(copyFrom.m_instanceMesh)
 {
-	ndAssert(0);
-	m_instanceMesh->AddRef();
 }
 
-ndDemoInstanceEntity::ndDemoInstanceEntity(ndDemoMeshIntance* const instanceMesh)
+ndDemoInstanceEntity::ndDemoInstanceEntity(ndSharedPtr<ndDemoMeshIntance> instanceMesh)
 	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
 	,m_instanceMesh(instanceMesh)
 {
-	m_instanceMesh->AddRef();
 }
 
 ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 {
-	m_instanceMesh->Release();
 }
 
 ndArray<ndMatrix>& ndDemoInstanceEntity::GetMatrixStack()
@@ -322,8 +321,10 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 		matrixStack[index] = child->GetCurrentMatrix();
 		index++;
 	}
-	m_instanceMesh->SetTransforms(count, &matrixStack[0]);
+
+	ndDemoMeshIntance* const instanceMesh = (ndDemoMeshIntance*)*m_instanceMesh;
+	instanceMesh->SetTransforms(count, &matrixStack[0]);
 	
 	ndMatrix nodeMatrix(m_matrix * matrix);
-	m_instanceMesh->Render(scene, nodeMatrix);
+	instanceMesh->Render(scene, nodeMatrix);
 }

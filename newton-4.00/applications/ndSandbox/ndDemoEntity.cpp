@@ -26,6 +26,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_nextRotation (matrix)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh(nullptr)
+	//,m_meshNew()
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -46,6 +47,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_nextRotation()
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh(nullptr)
+	//,m_meshNew()
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -100,61 +102,6 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	}
 }
 
-/*
-ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
-	:dClassInfo()
-	,dHierarchy<ndDemoEntity>()
-	,m_matrix(ndGetIdentityMatrix())
-	,m_curPosition(0.0f, 0.0f, 0.0f, 1.0f)
-	,m_nextPosition(0.0f, 0.0f, 0.0f, 1.0f)
-	,m_curRotation(0.0f, 0.0f, 0.0f, 1.0f)
-	,m_nextRotation(0.0f, 0.0f, 0.0f, 1.0f)
-	,m_meshMatrix(ndGetIdentityMatrix())
-	,m_mesh(nullptr)
-	,m_userData(nullptr)
-	,m_rootNode(nullptr)
-	,m_lock()
-	,m_isVisible(true)
-{
-	// add this entity to the dictionary
-	entityDictionary.Insert(this, rootSceneNode);
-
-	// if this is a child mesh set it as child of the entity
-//	ndMatrix parentMatrix (GetIdentityMatrix());
-	if (parent) {
-		Attach (parent);
-		ndAssert (scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType()));
-//		dScene::dNode* const parentNode = scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
-//		dSceneNodeInfo* const parentInfo = (dSceneNodeInfo*)scene->GetInfoFromNode (parentNode);
-//		ndAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
-//		parentMatrix = parentInfo->GetTransform();
-	}
-
-	dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode (rootSceneNode);
-	//ndMatrix matrix (sceneInfo->GetTransform() * parentMatrix.Inverse4x4());
-	ndMatrix matrix (sceneInfo->GetTransform());
-	ResetMatrix (world, matrix);
-	SetNameID(sceneInfo->GetName());
-
-	// if this node has a mesh, find it and attach it to this entity
-	dScene::dNode* const meshNode = scene->FindChildByType(rootSceneNode, dMeshNodeInfo::GetRttiType());
-	if (meshNode) {
-		ndDemoMeshInterface* const mesh = meshCache.Find(meshNode)->GetInfo();
-		SetMesh(mesh, sceneInfo->GetGeometryTransform());
-	}
-
-	// we now scan for all dSceneNodeInfo node with direct connection to this rootSceneNode, 
-	// and we load the as children of this entity
-	for (void* child = scene->GetFirstChildLink(rootSceneNode); child; child = scene->GetNextChildLink (rootSceneNode, child)) {
-		dScene::dNode* const node = scene->GetNodeFromLink(child);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
-			new ndDemoEntity (world, scene, node, meshCache, entityDictionary, this);
-		}
-	}
-}
-*/
-
 ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	:ndNodeHierarchy<ndDemoEntity>(copyFrom)
 	,m_matrix(copyFrom.m_matrix)
@@ -164,6 +111,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
 	,m_mesh(nullptr)
+	//,m_meshNew(copyFrom.m_meshNew)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -242,6 +190,17 @@ void ndDemoEntity::SetMesh(ndDemoMeshInterface* const mesh, const ndMatrix& mesh
 	{
 		m_mesh = mesh->AddRef();
 	}
+}
+
+ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMeshNew()
+{
+	return m_meshNew;
+}
+
+void ndDemoEntity::SetMeshNew(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix)
+{
+	m_meshNew = mesh;
+	m_meshMatrix = meshMatrix;
 }
 
 const ndMatrix& ndDemoEntity::GetMeshMatrix() const
@@ -444,11 +403,12 @@ void ndDemoEntity::RenderSkeleton(ndDemoEntityManager* const scene, const ndMatr
 void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	ndMatrix nodeMatrix (m_matrix * matrix);
-	if (m_isVisible && m_mesh) 
+	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*) (m_mesh ? m_mesh : *m_meshNew);
+	if (m_isVisible && mesh) 
 	{
 		// Render mesh if there is one 
 		ndMatrix modelMatrix (m_meshMatrix * nodeMatrix);
-		m_mesh->Render(scene, modelMatrix);
+		mesh->Render(scene, modelMatrix);
 	}
 
 	//RenderBone(scene, nodeMatrix);

@@ -102,19 +102,21 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	m_shader = shaderCache.m_diffuseEffect;
 
 	// apply uv projections
+	ndInt32 tex0 = 0;
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
 		case ndShapeID::m_sphere:
 		case ndShapeID::m_capsule:
 		{
-			mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
+			tex0 = LoadTexture(texture0);
+			mesh.SphericalMapping(tex0, &aligmentUV[0][0]);
 			break;
 		}
 
 		case ndShapeID::m_box:
 		{
-			ndInt32 tex0 = LoadTexture(texture0);
+			tex0 = LoadTexture(texture0);
 			//ndInt32 tex1 = LoadTexture(texture1);
 			//ndInt32 tex2 = LoadTexture(texture2);
 			if (stretchMaping)
@@ -130,7 +132,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 
 		default:
 		{
-			ndInt32 tex0 = LoadTexture(texture0);
+			tex0 = LoadTexture(texture0);
 			//ndInt32 tex0 = LoadTexture(texture0);
 			//ndInt32 tex1 = LoadTexture(texture1);
 			//ndInt32 tex2 = LoadTexture(texture2);
@@ -188,7 +190,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 		ndInt32 material = mesh.GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 
-		segment->m_material.m_textureHandle = (GLuint)material;
+		segment->m_material.SetTexture(material);
 		segment->SetOpacity(opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 
@@ -205,6 +207,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
+
+	if (tex0)
+	{
+		ReleaseTexture(tex0);
+	}
 }
 
 ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
@@ -218,6 +225,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
+	ndAssert(0);
+/*
 	m_name = name;
 	m_shader = shaderCache.m_diffuseEffect;
 
@@ -295,6 +304,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
+*/
 }
 
 ndDemoMesh::~ndDemoMesh()
@@ -304,7 +314,9 @@ ndDemoMesh::~ndDemoMesh()
 
 const char* ndDemoMesh::GetTextureName(const ndDemoSubMesh* const subMesh) const
 {
-	return subMesh->m_material.m_textureName;
+	ndAssert(0);
+	//return subMesh->m_material.m_textureName;
+	return nullptr;
 }
 
 ndDemoSubMesh* ndDemoMesh::AddSubMesh()
@@ -454,7 +466,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+					glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
 					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 				}
 			}
@@ -506,7 +518,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}
 	}

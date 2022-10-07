@@ -73,14 +73,13 @@ class FrictionMaterial : public ndApplicationMaterial
 };
 
 
-static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, ndFloat32 mass)
+static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndSharedPtr<ndDemoMeshInterface> geometry, const ndShapeInstance& shape, ndFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
-	scene->AddEntity(entity);
-
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
+	
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
@@ -101,7 +100,8 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	uvMatrix[2][2] *= 0.25f;
 	uvMatrix.m_posit = ndVector(-0.5f, -0.5f, 0.0f, 1.0f);
 	const char* const textureName = "wood_3.tga";
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
+	//ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
+	ndSharedPtr<ndDemoMeshInterface> geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix));
 
 	FrictionMaterial material;
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
@@ -110,8 +110,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndPitchMatrix(30.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
-	geometry->Release();
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 	
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -133,10 +132,11 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	texMatrix.m_posit.m_x = -0.5f;
 	texMatrix.m_posit.m_y = -0.5f;
 	const char* const boxTexName = "wood_0.tga";
-	ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
+	//ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
+	ndSharedPtr<ndDemoMeshInterface> boxGeometry (new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix));
 
-	for (ndInt32 i = 0; i < 10; ++i)
-	//for (ndInt32 i = 0; i < 2; ++i)
+	//for (ndInt32 i = 0; i < 10; ++i)
+	for (ndInt32 i = 0; i < 1; ++i)
 	{
 		ndBodyDynamic* const boxBody = AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);
 		matrix.m_posit.m_x += 2.5f;
@@ -152,8 +152,6 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		// set the user flag so that it is read in the contact callback for doing stuff
 		material.m_userFlags |= ndApplicationMaterial::m_playSound;
 	}
-
-	boxGeometry->Release();
 }
 
 void ndBasicFrictionRamp (ndDemoEntityManager* const scene)

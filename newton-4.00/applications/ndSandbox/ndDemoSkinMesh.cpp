@@ -33,6 +33,8 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	,m_nodeCount(0)
 	,m_matrixPalette(0)
 {
+	ndAssert(0);
+/*
 	m_name = owner->GetName();
 	m_shader = shaderCache.m_skinningDiffuseEffect;
 
@@ -230,6 +232,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 
 	// optimize this mesh for hardware buffers if possible
 	CreateRenderMesh(&points[0], vertexCount, &indices[0], indexCount);
+*/
 }
 
 ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const owner)
@@ -390,7 +393,7 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& mo
 			glUniform3fv(m_shareMesh->m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}
 	}

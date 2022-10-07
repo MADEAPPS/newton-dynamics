@@ -32,6 +32,24 @@ ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
 	}
 }
 
+GLint ndDemoSubMeshMaterial::GetTexture() const
+{
+	return m_textureHandle;
+}
+
+void ndDemoSubMeshMaterial::SetTexture(GLint textureHandle)
+{
+	if (textureHandle != m_textureHandle)
+	{
+		if (m_textureHandle)
+		{
+			ReleaseTexture(m_textureHandle);
+		}
+		AddTextureRef(textureHandle);
+		m_textureHandle = textureHandle;
+	}
+}
+
 ndDemoMeshInterface::ndDemoMeshInterface()
 	:ndClassAlloc()
 	,m_refCount(1)
@@ -53,7 +71,7 @@ ndDemoMeshInterface* ndDemoMeshInterface::AddRef()
 
 ndInt32 ndDemoMeshInterface::Release()
 {
-	//return ndRefCounter<ndDemoMeshInterface>::Release();
+	//ndAssert(0);
 	m_refCount--;
 	if (m_refCount == 0)
 	{

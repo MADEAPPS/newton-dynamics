@@ -40,7 +40,7 @@
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
-//#define DEFAULT_SCENE	2		// friction ramp
+#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
-#define DEFAULT_SCENE	23		// train biped test 2
+//#define DEFAULT_SCENE	23		// train biped test 2
 //#define DEFAULT_SCENE	24		// simple voronoi fracture
 //#define DEFAULT_SCENE	25		// basic voronoi fracture
 //#define DEFAULT_SCENE	26		// linked voronoi fracture
@@ -423,7 +423,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	m_hideVisualMeshes = true;
+	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;

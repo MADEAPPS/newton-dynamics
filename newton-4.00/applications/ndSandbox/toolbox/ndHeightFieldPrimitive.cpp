@@ -63,32 +63,33 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 	void BuildTile(ndArray<ndInt32>& indexList, ndInt32 x0, ndInt32 z0, const char* const texName)
 	{
-		const ndInt32 start = indexList.GetCount();
-		const ndInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
-		const ndInt32 xMax = ((x0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_WIDTH) ? D_TERRAIN_WIDTH - 1 : x0 + D_TERRAIN_TILE_SIZE;
-
-		for (ndInt32 z = z0; z < zMax; z ++)
-		{
-			for (ndInt32 x = x0; x < xMax; x ++)
-			{
-				indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 0);
-				indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 1);
-				indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 1);
-
-				indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 1);
-				indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 0);
-				indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 0);
-			}
-		}
-
-		ndDemoSubMesh* const segment = AddSubMesh();
-		strcpy(segment->m_material.m_textureName, texName);
-		ndInt32 texHandle = LoadTexture("texture1.tga");
-		segment->m_material.m_textureHandle = (GLuint)texHandle;
-
-		segment->SetOpacity(1.0f);
-		segment->m_segmentStart = start;
-		segment->m_indexCount = indexList.GetCount() - start;
+		ndAssert(0);
+		//const ndInt32 start = indexList.GetCount();
+		//const ndInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
+		//const ndInt32 xMax = ((x0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_WIDTH) ? D_TERRAIN_WIDTH - 1 : x0 + D_TERRAIN_TILE_SIZE;
+		//
+		//for (ndInt32 z = z0; z < zMax; z ++)
+		//{
+		//	for (ndInt32 x = x0; x < xMax; x ++)
+		//	{
+		//		indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 0);
+		//		indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 1);
+		//		indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 1);
+		//
+		//		indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 1);
+		//		indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 0);
+		//		indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 0);
+		//	}
+		//}
+		//
+		//ndDemoSubMesh* const segment = AddSubMesh();
+		//strcpy(segment->m_material.m_textureName, texName);
+		//ndInt32 texHandle = LoadTexture("texture1.tga");
+		//segment->m_material.m_textureHandle = (GLuint)texHandle;
+		//
+		//segment->SetOpacity(1.0f);
+		//segment->m_segmentStart = start;
+		//segment->m_indexCount = indexList.GetCount() - start;
 	}
 
 	void BuildVertexAndNormals(const ndArray<ndInt32>& indexList, const ndArray<ndVector>& heightfield, ndArray<glPositionNormalUV>& points)

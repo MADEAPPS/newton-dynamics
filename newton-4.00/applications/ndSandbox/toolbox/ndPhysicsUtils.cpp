@@ -110,13 +110,12 @@ static void AddShape(ndDemoEntityManager* const scene,
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 	
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 	
 	ndFloat32 spacing = 2.0f;
-
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	for (ndInt32 z = 0; z < rows_z; ++z)
 	{
@@ -126,8 +125,6 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 			AddShape(scene, rootEntity, shape, mass, matrix, high, columHigh);
 		}
 	}
-	
-	instanceMesh->Release();
 }
 
 ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass, const char* const textName)

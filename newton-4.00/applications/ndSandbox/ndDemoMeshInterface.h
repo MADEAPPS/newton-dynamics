@@ -24,11 +24,15 @@ class ndDemoSubMeshMaterial
 	ndDemoSubMeshMaterial();
 	~ndDemoSubMeshMaterial();
 
+	GLint GetTexture() const;
+	void SetTexture(GLint textureHandle);
+	
 	glVector4 m_ambient;
 	glVector4 m_diffuse;
 	glVector4 m_specular;
 	GLfloat m_opacity;
 	GLfloat m_shiness;
+	protected:
 	GLint m_textureHandle;
 	char  m_textureName[32];
 };

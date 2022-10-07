@@ -35,7 +35,7 @@ class ndDemoDebrisMesh : public ndDemoMesh
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	private:
-	ndDemoSubMeshMaterial m_material[2];
+	//ndDemoSubMeshMaterial m_material[2];
 	ndInt32 m_textureLocation1;
 
 	friend class ndDemoDebrisRootEntity;

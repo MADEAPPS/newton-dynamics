@@ -36,7 +36,7 @@ class ndDemoMeshIntance : public ndDemoMesh
 class ndDemoInstanceEntity: public ndDemoEntity
 {
 	public:
-	ndDemoInstanceEntity(ndDemoMeshIntance* const instanceMesh);
+	ndDemoInstanceEntity(ndSharedPtr<ndDemoMeshIntance> instanceMesh);
 	ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom);
 	virtual ~ndDemoInstanceEntity(void);
 
@@ -44,7 +44,8 @@ class ndDemoInstanceEntity: public ndDemoEntity
 
 	static ndArray<ndMatrix>& GetMatrixStack();
 
-	ndDemoMeshIntance* m_instanceMesh;
+	//ndDemoMeshIntance* m_instanceMesh;
+	ndSharedPtr<ndDemoMeshIntance> m_instanceMesh;
 };
 
 #endif

@@ -72,6 +72,18 @@ class ndTextureCache : public ndList<ndTextureEntry>
 		}
 	}
 
+	void AddReference(GLuint id)
+	{
+		ndTree<ndList<ndTextureEntry>::ndNode*, GLuint>::ndNode* const node = m_idMap.Find(id);
+		ndAssert(node);
+		if (node)
+		{
+			ndList<ndTextureEntry>::ndNode* const texNode = node->GetInfo();
+			ndTextureEntry& entry = texNode->GetInfo();
+			entry.m_ref = entry.m_ref + 1;
+		}
+	}
+
 	ndUnsigned64 MakeHash(const char* const texName) const
 	{
 		char name[256];
@@ -290,6 +302,12 @@ GLuint LoadTexture(const char* const filename)
 void ReleaseTexture (GLuint texture)
 {
 	ndTextureCache::GetChache().RemoveById (texture);
+}
+
+GLuint AddTextureRef(GLuint texture)
+{
+	ndTextureCache::GetChache().AddReference(texture);
+	return texture;
 }
 
 void TextureCacheCleanUp()
