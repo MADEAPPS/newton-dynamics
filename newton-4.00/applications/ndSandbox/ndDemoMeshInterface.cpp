@@ -33,7 +33,8 @@ ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
 }
 
 ndDemoMeshInterface::ndDemoMeshInterface()
-	:ndRefCounter<ndDemoMeshInterface>()
+	:ndClassAlloc()
+	,m_refCount(1)
 	,m_name()
 	,m_isVisible(true)
 {
@@ -41,11 +42,24 @@ ndDemoMeshInterface::ndDemoMeshInterface()
 
 ndDemoMeshInterface::~ndDemoMeshInterface()
 {
+	//ndAssert(m_refCount == 0);
+}
+
+ndDemoMeshInterface* ndDemoMeshInterface::AddRef()
+{
+	m_refCount++;
+	return this;
 }
 
 ndInt32 ndDemoMeshInterface::Release()
 {
-	return ndRefCounter<ndDemoMeshInterface>::Release();
+	//return ndRefCounter<ndDemoMeshInterface>::Release();
+	m_refCount--;
+	if (m_refCount == 0)
+	{
+		delete this;
+	}
+	return m_refCount;
 }
 
 const ndString& ndDemoMeshInterface::GetName () const

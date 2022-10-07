@@ -46,14 +46,16 @@ class ndDemoSubMesh
 	bool m_hasTranparency;
 };
 
-class ndDemoMeshInterface: public ndRefCounter<ndDemoMeshInterface>
+class ndDemoMeshInterface : public ndClassAlloc
 {
 	public:
 	ndDemoMeshInterface();
-	~ndDemoMeshInterface();
+	virtual ~ndDemoMeshInterface();
 	const ndString& GetName () const;
 
 	ndInt32 Release();
+	ndDemoMeshInterface* AddRef();
+	
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
@@ -63,6 +65,7 @@ class ndDemoMeshInterface: public ndRefCounter<ndDemoMeshInterface>
 	virtual void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&) {}
 
 	ndString m_name;
+	ndInt32 m_refCount;
 	bool m_isVisible;
 };
 
