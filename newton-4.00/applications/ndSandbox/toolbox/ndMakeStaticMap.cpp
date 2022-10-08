@@ -172,11 +172,11 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -184,9 +184,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	body->SetCollisionShape(plane);
 
 	world->AddBody(body);
-
 	scene->AddEntity(entity);
-	geometry->Release();
 	return body;
 }
 
@@ -534,13 +532,13 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		//spline.InsertKnot(u);
 		//spline.InsertKnot(u);
 		//spline.RemoveKnot(u, 1.0e-3f);
-		ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
-		splineMesh->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
+		
+		ndSharedPtr<ndDemoMeshInterface> splineMesh (new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500));
+		((ndDemoSplinePathMesh*)*splineMesh)->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
 		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
 		scene->AddEntity(splineEntity);
-		splineEntity->SetMesh(splineMesh, ndGetIdentityMatrix());
+		splineEntity->SetMeshNew(splineMesh, ndGetIdentityMatrix());
 		splineMesh->SetVisible(true);
-		splineMesh->Release();
 	}
 
 	return BuildStaticMesh(scene, meshName, optimized);

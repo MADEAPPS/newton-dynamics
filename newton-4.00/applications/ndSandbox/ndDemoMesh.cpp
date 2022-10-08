@@ -219,8 +219,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
-	ndAssert(0);
-/*
 	m_name = name;
 	m_shader = shaderCache.m_diffuseEffect;
 
@@ -280,8 +278,10 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		segment->m_material.m_specular = glVector4(material.m_specular);
 		segment->m_material.m_opacity = GLfloat(material.m_opacity);
 		segment->m_material.m_shiness = GLfloat(material.m_shiness);
-		strcpy(segment->m_material.m_textureName, material.m_textureName);
-		segment->m_material.m_textureHandle = LoadTexture(material.m_textureName);
+		segment->m_material.SetTextureName(material.m_textureName);
+		GLuint tex = LoadTexture(material.m_textureName);
+		segment->m_material.SetTexture(tex);
+		ReleaseTexture(tex);
 		segment->SetOpacity(material.m_opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 		
@@ -298,7 +298,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
-*/
 }
 
 ndDemoMesh::~ndDemoMesh()
@@ -308,9 +307,7 @@ ndDemoMesh::~ndDemoMesh()
 
 const char* ndDemoMesh::GetTextureName(const ndDemoSubMesh* const subMesh) const
 {
-	ndAssert(0);
-	//return subMesh->m_material.m_textureName;
-	return nullptr;
+	return subMesh->m_material.GetTextureName();
 }
 
 ndDemoSubMesh* ndDemoMesh::AddSubMesh()

@@ -26,6 +26,9 @@ class ndDemoSubMeshMaterial
 
 	GLint GetTexture() const;
 	void SetTexture(GLint textureHandle);
+
+	const char* GetTextureName() const;
+	void SetTextureName(const char* const name);
 	
 	glVector4 m_ambient;
 	glVector4 m_diffuse;

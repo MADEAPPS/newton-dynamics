@@ -33,9 +33,6 @@ static ndBodyDynamic* AddRigidBody(
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
-	// add the entity to the scene.
-	scene->AddEntity(entity);
-
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
@@ -43,6 +40,7 @@ static ndBodyDynamic* AddRigidBody(
 
 	ndWorld* const world = scene->GetWorld();
 	world->AddBody(body);
+	scene->AddEntity(entity);
 	return body;
 }
 
@@ -85,10 +83,10 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 static void AddSphere(ndDemoEntityManager* const scene)
 {
 	ndShapeInstance originShape(new ndShapeSphere(0.125f));
-	ndDemoMesh* const origGeometry = new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+	ndSharedPtr<ndDemoMeshInterface> origGeometry (new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
 
 	ndDemoEntity* const origEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-	origEntity->SetMesh(origGeometry, ndGetIdentityMatrix());
+	origEntity->SetMeshNew(origGeometry, ndGetIdentityMatrix());
 
 	ndMatrix mOrigMatrix = ndGetIdentityMatrix();
 	mOrigMatrix.m_posit.m_x = 2.0f;
@@ -98,7 +96,6 @@ static void AddSphere(ndDemoEntityManager* const scene)
 		mOrigMatrix.m_posit.m_y += 1.0f;
 		AddRigidBody(scene, mOrigMatrix, originShape, entity, 1.0);
 	}
-	origGeometry->Release();
 	delete origEntity;
 }
 
@@ -107,15 +104,13 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
 	CreateBoxCompoundShape(compoundShapeInstance);
 
-	ndDemoMesh* const compGeometry = new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+	ndSharedPtr<ndDemoMeshInterface> compGeometry (new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
 	ndDemoEntity* const compEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-	compEntity->SetMesh(compGeometry, ndGetIdentityMatrix());
+	compEntity->SetMeshNew(compGeometry, ndGetIdentityMatrix());
 
 	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
 	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
-
-	compGeometry->Release();
 }
 
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
@@ -168,7 +163,6 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	location.m_posit.m_z = 5.0f;
 	location.m_posit.m_y = 2.0f;
 	AddSimpleConcaveMesh(scene, location, "dino.fbx", 4);
-	//AddSimpleConcaveMesh(scene, location, "dino.fbx", 1);
 
 	ndVector origin(ndVector::m_zero);
 	origin.m_x -= 10.0f;

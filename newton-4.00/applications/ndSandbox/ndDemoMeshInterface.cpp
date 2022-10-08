@@ -37,6 +37,16 @@ GLint ndDemoSubMeshMaterial::GetTexture() const
 	return m_textureHandle;
 }
 
+const char* ndDemoSubMeshMaterial::GetTextureName() const
+{
+	return m_textureName;
+}
+
+void ndDemoSubMeshMaterial::SetTextureName(const char* const name)
+{
+	strncpy(m_textureName, name, sizeof(m_textureName) - 1);
+}
+
 void ndDemoSubMeshMaterial::SetTexture(GLint textureHandle)
 {
 	if (textureHandle != m_textureHandle)
@@ -60,7 +70,6 @@ ndDemoMeshInterface::ndDemoMeshInterface()
 
 ndDemoMeshInterface::~ndDemoMeshInterface()
 {
-	//ndAssert(m_refCount == 0);
 }
 
 ndDemoMeshInterface* ndDemoMeshInterface::AddRef()
@@ -71,7 +80,7 @@ ndDemoMeshInterface* ndDemoMeshInterface::AddRef()
 
 ndInt32 ndDemoMeshInterface::Release()
 {
-	//ndAssert(0);
+	ndAssert(0);
 	m_refCount--;
 	if (m_refCount == 0)
 	{

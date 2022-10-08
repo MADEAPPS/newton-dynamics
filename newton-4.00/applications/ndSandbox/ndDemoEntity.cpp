@@ -84,8 +84,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 				ndAssert(0);
 				mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
 			}
-			entity->SetMesh(mesh, effectNode->m_meshMatrix);
-			mesh->Release();
+			entity->SetMeshNew(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
 
 			if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 			{
@@ -417,11 +416,12 @@ ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
 
 }
 
-ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail) const
+ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 {
 	ndArray<ndVector> points;
 	ndArray<ndInt32> indices;
-	ndDemoMesh* const mesh = (ndDemoMesh*)GetMesh();
+	const ndSharedPtr<ndDemoMeshInterface> meshPtr = GetMeshNew();
+	ndDemoMesh* const mesh = (ndDemoMesh*)*meshPtr;
 	mesh->GetVertexArray(points);
 	mesh->GetIndexArray(indices);
 
