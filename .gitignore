@@ -87,3 +87,6 @@ sdk/dCompilerKit/dNewtonLua/dNewtonLuaParcer.cpp.txt
 sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
 sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 
+# Clang/CCLS cache for LSP servers as well as Emacs specific files.
+**/.ccls-cache/
+**/.projectile

@@ -1,4 +1,4 @@
-name: build and run tests
+name: Build and run the Hello World apps
 on:
   push:
     branches: [ "*" ]
@@ -17,11 +17,22 @@ jobs:
         cmake --build build -j2
         sudo cmake --build build --target install
 
-    - name: Build And Run Hello World App
+    - name: Build And Run Hello World Apps
       run: |
         cp -r newton-4.00/applications/hello-world /tmp/myapp
         cd /tmp/myapp
         cmake -S . -B build/
         cmake --build build/
         echo ""
-        build/newton-hello-world
+
+    - name: Run Hello World Demo
+      run: |
+        /tmp/myapp/build/hello
+
+    - name: Run Transform Callback Demo
+      run: |
+        /tmp/myapp/build/transformCallback
+
+    - name: Run Contact Callback Demo
+      run: |
+        /tmp/myapp/build/contactCallback
