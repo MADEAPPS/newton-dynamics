@@ -32,6 +32,8 @@ class ndSharedPtr
 	~ndSharedPtr();
 	ndSharedPtr<T>& operator = (const ndSharedPtr<T>& sp);
 
+	void Swap(ndSharedPtr& src);
+
 	T* operator->();
 
 	T* operator* ();
@@ -120,6 +122,13 @@ ndSharedPtr<T>& ndSharedPtr<T>::operator = (const ndSharedPtr<T>& sp)
 		m_references->AddRef();
 	}
 	return *this;
+}
+
+template <typename T>
+void ndSharedPtr<T>::Swap(ndSharedPtr& src)
+{
+	ndSwap(m_ptr, src.m_ptr);
+	ndSwap(m_references, src.m_references);
 }
 
 template <typename T>

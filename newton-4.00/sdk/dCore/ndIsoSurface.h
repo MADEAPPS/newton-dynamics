@@ -46,7 +46,7 @@ class ndIsoSurface: public ndClassAlloc
 
 	class ndImplementation;
 
-	ndIsoSurface();
+	D_CORE_API ndIsoSurface();
 	D_CORE_API ~ndIsoSurface();
 
 	ndVector GetOrigin() const;
@@ -56,28 +56,15 @@ class ndIsoSurface: public ndClassAlloc
 	D_CORE_API ndInt32 GenerateListIndexList(ndInt32 * const indexList, ndInt32 strideInFloat32, ndReal* const posit, ndReal* const normals) const;
 
 	private:
-	ndImplementation& GetImplementation() const;
-
 	ndVector m_origin;
 	ndArray<ndVector> m_points;
+	ndImplementation* m_implementation;
 	ndFloat32 m_gridSize;
 	ndInt32 m_volumeSizeX;
 	ndInt32 m_volumeSizeY;
 	ndInt32 m_volumeSizeZ;
 	bool m_isLowRes;
-	friend class ndImplementation;
 };
-
-inline ndIsoSurface::ndIsoSurface()
-	:m_origin(ndVector::m_zero)
-	,m_points(1024)
-	,m_gridSize(ndFloat32 (1.0f))
-	,m_volumeSizeX(1)
-	,m_volumeSizeY(1)
-	,m_volumeSizeZ(1)
-	,m_isLowRes(true)
-{
-}
 
 inline const ndArray<ndVector>& ndIsoSurface::GetPoints() const
 {

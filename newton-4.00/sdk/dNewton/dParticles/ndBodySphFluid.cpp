@@ -95,12 +95,12 @@ class ndBodySphFluid::ndParticleKernelDistance
 	ndFloat32 m_dist[32];
 };
 
-class ndBodySphFluid::ndWorkingData
+class ndBodySphFluid::ndWorkingBuffers
 {
 	#define D_SPH_GRID_X_RESOLUTION 4
 
 	public:
-	ndWorkingData()
+	ndWorkingBuffers()
 		:m_accel(D_SPH_BUFFER_GRANULARITY)
 		,m_locks(D_SPH_BUFFER_GRANULARITY)
 		,m_pairCount(D_SPH_BUFFER_GRANULARITY)
@@ -120,22 +120,8 @@ class ndBodySphFluid::ndWorkingData
 		}
 	}
 
-	void Clear()
+	~ndWorkingBuffers()
 	{
-		m_accel.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_locks.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_pairs.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_density.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_pairCount.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_gridScans.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_invDensity.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_hashGridMap.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_kernelDistance.Resize(D_SPH_BUFFER_GRANULARITY);
-		m_hashGridMapScratchBuffer.Resize(D_SPH_BUFFER_GRANULARITY);
-		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
-		{
-			m_partialsGridScans[i].Resize(D_SPH_BUFFER_GRANULARITY);
-		}
 	}
 
 	void SetWorldToGridMapping(ndInt32 gridCount, ndFloat32 xMax, ndFloat32 xMin)
@@ -168,6 +154,7 @@ class ndBodySphFluid::ndWorkingData
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
+	,m_workingBuffers(new ndWorkingBuffers)
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
@@ -177,6 +164,7 @@ ndBodySphFluid::ndBodySphFluid()
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBodyParticleSet(desc)
+	,m_workingBuffers(new ndWorkingBuffers)
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32(1.0f))
 	,m_restDensity(ndFloat32(1000.0f))
@@ -188,8 +176,7 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 
 ndBodySphFluid::~ndBodySphFluid()
 {
-	ndWorkingData& data = WorkingData();
-	data.Clear();
+	delete m_workingBuffers;
 }
 
 //void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
@@ -198,12 +185,6 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	ndAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
-}
-
-ndBodySphFluid::ndWorkingData& ndBodySphFluid::WorkingData()
-{
-	static ndWorkingData workingBuffers;
-	return workingBuffers;
 }
 
 void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
@@ -216,7 +197,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		public:
 		ndKey_low(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
-			,m_data(m_fluid->WorkingData())
+			,m_data(*m_fluid->m_workingBuffers)
 			,m_point(m_fluid->GetPositions())
 		{
 		}
@@ -228,7 +209,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		}
 
 		ndBodySphFluid* m_fluid;
-		ndWorkingData& m_data;
+		ndWorkingBuffers& m_data;
 		const ndArray<ndVector>& m_point;
 	};
 
@@ -237,7 +218,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		public:
 		ndKey_middle(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
-			,m_data(m_fluid->WorkingData())
+			,m_data(*m_fluid->m_workingBuffers)
 			,m_point(m_fluid->GetPositions())
 		{
 		}
@@ -249,7 +230,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		}
 
 		ndBodySphFluid* m_fluid;
-		ndWorkingData& m_data;
+		ndWorkingBuffers& m_data;
 		const ndArray<ndVector>& m_point;
 	};
 
@@ -258,7 +239,7 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		public:
 		ndKey_high(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
-			,m_data(m_fluid->WorkingData())
+			,m_data(*m_fluid->m_workingBuffers)
 			,m_point(m_fluid->GetPositions())
 		{
 		}
@@ -270,11 +251,11 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		}
 
 		ndBodySphFluid* m_fluid;
-		ndWorkingData& m_data;
+		ndWorkingBuffers& m_data;
 		const ndArray<ndVector>& m_point;
 	};
 
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
 
 	ndCountingSort<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, this);
@@ -346,7 +327,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		}
 	};
 
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	const ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
 
 	ndCountingSort<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, nullptr, nullptr);
@@ -376,7 +357,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	ndInt32 sums[D_MAX_THREADS_COUNT + 1];
 	ndInt32 scans[D_MAX_THREADS_COUNT + 1];
 
@@ -462,7 +443,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 	SortCellBuckects(threadPool);
 
 	#ifdef _DEBUG
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	for (ndInt32 i = 0; i < (data.m_hashGridMap.GetCount() - 1); ++i)
 	{
 		const ndGridHash& entry0 = data.m_hashGridMap[i + 0];
@@ -477,7 +458,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	ndInt32 countReset = data.m_locks.GetCount();
 	data.m_pairs.SetCount(m_posit.GetCount());
 	data.m_locks.SetCount(m_posit.GetCount());
@@ -600,7 +581,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	data.m_density.SetCount(m_posit.GetCount());
 	data.m_invDensity.SetCount(m_posit.GetCount());
 
@@ -641,7 +622,7 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	data.m_accel.SetCount(m_posit.GetCount());
 
 	auto CalculateAcceleration = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
@@ -710,7 +691,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	auto IntegrateParticles = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(IntegrateParticles);
@@ -795,7 +776,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 	m_box0 = box.m_min & ndVector::m_triplexMask;
 	m_box1 = box.m_max & ndVector::m_triplexMask;
 
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
 	data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
 }
@@ -863,7 +844,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	};
 	
 	ndGridNeighborInfo neiborghood;
-	ndWorkingData& data = WorkingData();
+	ndWorkingBuffers& data = *m_workingBuffers;
 	
 	auto CountGrids = ndMakeObject::ndFunction([this, &data, &neiborghood](ndInt32 threadIndex, ndInt32 threadCount)
 	{
@@ -963,14 +944,17 @@ void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 	D_TRACKTIME();
 	ndAssert(sizeof(ndGridHash) == sizeof(ndUnsigned64));
 
-	CaculateAabb(threadPool);
-	CreateGrids(threadPool);
-	SortGrids(threadPool);
-	CalculateScans(threadPool);
-	BuildPairs(threadPool);
-	CalculateParticlesDensity(threadPool);
-	CalculateAccelerations(threadPool);
-	IntegrateParticles(threadPool);
+	if (m_posit.GetCount())
+	{
+		CaculateAabb(threadPool);
+		CreateGrids(threadPool);
+		SortGrids(threadPool);
+		CalculateScans(threadPool);
+		BuildPairs(threadPool);
+		CalculateParticlesDensity(threadPool);
+		CalculateAccelerations(threadPool);
+		IntegrateParticles(threadPool);
+	}
 }
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)

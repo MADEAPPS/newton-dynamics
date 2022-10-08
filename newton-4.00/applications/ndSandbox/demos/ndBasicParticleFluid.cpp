@@ -22,13 +22,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-//class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundTask
 class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 {
 	public:
 	ndIsoSurfaceParticleVolume(ndFloat32 radius)
 		:ndBodySphFluid()
-		//,ndBackgroundTask()
 		,m_indexList(1024)
 		,m_points(1024)
 		,m_meshIsReady(0)
@@ -56,7 +54,6 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 			const ndVector vec1(p1 - p0);
 			const ndVector vec2(p2 - p0);
 			const ndVector cross(vec1.CrossProduct(vec2));
-			//const ndVector normal(cross * cross.InvMagSqrt());
 			const ndVector normal(cross.Normalize());
 
 			m_points[i + 0].m_posit = glVector3(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
@@ -84,23 +81,24 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 	{
 		D_TRACKTIME();
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
-		ndAssert(points.GetCount());
-
-		m_points.SetCount(points.GetCount() * 3);
-		m_indexList.SetCount(points.GetCount() * 3);
-
-		ndReal* const posit = &m_points[0].m_posit.m_x;
-		ndReal* const normal = &m_points[0].m_normal.m_x;
-		ndInt32 pointCount = m_isoSurface.GenerateListIndexList(&m_indexList[0], sizeof (glPositionNormalUV)/sizeof (GLfloat), posit, normal);
-
-		const ndVector origin(m_isoSurface.GetOrigin());
-		for (ndInt32 i = 0; i < pointCount; ++i)
+		if (points.GetCount())
 		{
-			m_points[i].m_posit.m_x += GLfloat(origin.m_x);
-			m_points[i].m_posit.m_y += GLfloat(origin.m_y);
-			m_points[i].m_posit.m_z += GLfloat(origin.m_z);
-			m_points[i].m_uv.m_u = GLfloat(0.0f);
-			m_points[i].m_uv.m_v = GLfloat(0.0f);
+			m_points.SetCount(points.GetCount() * 3);
+			m_indexList.SetCount(points.GetCount() * 3);
+
+			ndReal* const posit = &m_points[0].m_posit.m_x;
+			ndReal* const normal = &m_points[0].m_normal.m_x;
+			ndInt32 pointCount = m_isoSurface.GenerateListIndexList(&m_indexList[0], sizeof(glPositionNormalUV) / sizeof(GLfloat), posit, normal);
+
+			const ndVector origin(m_isoSurface.GetOrigin());
+			for (ndInt32 i = 0; i < pointCount; ++i)
+			{
+				m_points[i].m_posit.m_x += GLfloat(origin.m_x);
+				m_points[i].m_posit.m_y += GLfloat(origin.m_y);
+				m_points[i].m_posit.m_z += GLfloat(origin.m_z);
+				m_points[i].m_uv.m_u = GLfloat(0.0f);
+				m_points[i].m_uv.m_v = GLfloat(0.0f);
+			}
 		}
 	}
 
@@ -120,11 +118,6 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 		m_meshIsReady.store(1);
 	}
 
-	//virtual void Execute()
-	//{
-	//	UpdateIsoSurface();
-	//}
-
 	ndArray<ndInt32> m_indexList;
 	ndArray<glPositionNormalUV> m_points;
 	ndIsoSurface m_isoSurface;
@@ -134,16 +127,16 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 class ndIsoSurfaceMesh : public ndDemoMesh
 {
 	public:
-	ndIsoSurfaceMesh(const ndShaderCache& shaderCache, ndDemoMesh* const parentMesh)
+	ndIsoSurfaceMesh(const ndShaderCache& shaderCache, ndSharedPtr<ndDemoMeshInterface> parentMesh)
 		:ndDemoMesh("isoSurface")
 		,m_parentMesh(parentMesh)
 	{
 		m_shader = shaderCache.m_diffuseEffect;
 
 		ndDemoSubMesh* const segment = AddSubMesh();
-		//segment->m_material.m_textureHandle = (GLuint)material;
-		//segment->m_material.SetTexture((GLuint)material);
-		ndAssert(0);
+		int tex = LoadTexture("default.tga");
+		segment->m_material.SetTexture(tex);
+		ReleaseTexture(tex);
 
 		segment->m_material.m_diffuse = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
 		segment->m_material.m_ambient = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
@@ -158,10 +151,13 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 
 	void UpdateBuffers(const ndArray<glPositionNormalUV>& points, const ndArray<ndInt32>& indexList)
 	{
-		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
+		if (points.GetCount())
+		{
+			OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
 
-		ndDemoSubMesh& segment = GetFirst()->GetInfo();
-		segment.m_indexCount = indexList.GetCount();
+			ndDemoSubMesh& segment = GetFirst()->GetInfo();
+			segment.m_indexCount = indexList.GetCount();
+		}
 	}
 
 	//void RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
@@ -172,7 +168,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		//ndDemoMesh::RenderTransparency(scene, modelMatrix);
 	}
 
-	ndDemoMesh* m_parentMesh;
+	//ndDemoMesh* m_parentMesh;
+	ndSharedPtr<ndDemoMeshInterface> m_parentMesh;
 };
 
 class ndWaterVolumeEntity : public ndDemoEntity
@@ -189,20 +186,18 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		uvMatrix[2][2] *= 1.0f / 20.0f;
 		uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
 
-		ndDemoMesh* const geometry = new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
-		SetMesh(geometry, ndGetIdentityMatrix());
-
-		scene->AddEntity(this);
-		m_isoSurfaceMesh0 = new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry);
-		m_isoSurfaceMesh1 = new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry);
-		geometry->Release();
+		ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix));
+		SetMeshNew(geometry, ndGetIdentityMatrix());
+		
+		m_isoSurfaceMesh0 = ndSharedPtr<ndIsoSurfaceMesh>(new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry));
+		m_isoSurfaceMesh1 = ndSharedPtr<ndIsoSurfaceMesh>(new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry));
 	}
 
 	~ndWaterVolumeEntity()
 	{
-		ndScopeSpinLock lock(m_lock);
-		m_isoSurfaceMesh0->Release();
-		m_isoSurfaceMesh1->Release();
+		//ndScopeSpinLock lock(m_lock);
+		//delete m_isoSurfaceMesh0;
+		//delete m_isoSurfaceMesh1;
 	}
 
 	void Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
@@ -244,8 +239,8 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	
 	ndIsoSurfaceParticleVolume* m_fluidBody;
 	mutable ndSpinLock m_lock;
-	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh0;
-	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh1;
+	mutable ndSharedPtr<ndIsoSurfaceMesh> m_isoSurfaceMesh0;
+	mutable ndSharedPtr<ndIsoSurfaceMesh> m_isoSurfaceMesh1;
 };
 
 class ndWaterVolumeCallback: public ndDemoEntityNotify
@@ -282,9 +277,9 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 			for (ndInt32 x = 0; x < size; x++)
 			{
 				ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
-				p.m_x = spacing * int(p.m_x / spacing);
-				p.m_y = spacing * int(p.m_y / spacing);
-				p.m_z = spacing * int(p.m_z / spacing);
+				p.m_x = spacing * ndInt32(p.m_x / spacing);
+				p.m_y = spacing * ndInt32(p.m_y / spacing);
+				p.m_z = spacing * ndInt32(p.m_z / spacing);
 
 				p.m_x += ndGaussianRandom(0.0f, spacing * 0.01f);
 				p.m_y += ndGaussianRandom(0.0f, spacing * 0.01f);
@@ -356,6 +351,7 @@ static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* cons
 
 static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
+	ndSetRandSeed(1);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndMatrix matrix(location);
@@ -371,33 +367,33 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
-
 	fluidObject->SetParticleRadius(diameter * 0.5f);
-
+	
 	//ndInt32 particleCountPerAxis = 64;
 	//ndInt32 particleCountPerAxis = 40;
 	//ndInt32 particleCountPerAxis = 32;
 	//ndInt32 particleCountPerAxis = 10;
 	ndInt32 particleCountPerAxis = 40;
 	ndFloat32 spacing = diameter;
-
+	
 	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;
 	ndVector origin(-offset, 1.0f, -offset, ndFloat32(0.0f));
-
+	
 	matrix.m_posit += origin;
-matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 1.0f);
-
+	matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 1.0f);
+	
 	BuildBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildSphere(matrix, fluidObject, particleCountPerAxis);
-
+	
 	matrix.m_posit.m_z -= 15.0f;
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
-
+	
 	// make sure we have the first surface generated before rendering.
 	fluidObject->UpdateIsoSurface();
 
 	// add particle volume to world
+	scene->AddEntity(entity);
 	world->AddBody(fluidObject);
 }
 

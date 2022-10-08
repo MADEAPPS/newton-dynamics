@@ -26,13 +26,12 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix));
 
 	ndMatrix matrix(location);
 	matrix.m_posit.m_y += 1.9f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
-	geometry->Release();
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 	ndShapeMaterial material(box.GetMaterial());
 	material.m_data.m_userData = entity;
@@ -54,7 +53,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix);
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix));
 
 	ndFloat32 spacing = 3.0f;
 	ndMatrix matrix(location);
@@ -64,7 +63,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-		entity->SetMesh(geometry, ndGetIdentityMatrix());
+		entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 		material.m_data.m_userData = entity;
 		capsule.SetMaterial(material);
@@ -75,7 +74,6 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 
 		matrix.m_posit.m_z += spacing;
 	}
-	geometry->Release();
 }
 
 static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location)
@@ -162,8 +160,6 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndDemoEntity* const rootEntity = new ndDemoEntity(location, nullptr);
-	scene->AddEntity(rootEntity);
-
 	ndShapeInstance sceneInstance (new ndShapeCompound());
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
@@ -195,6 +191,7 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 	body->SetMatrix(location);
 	body->SetCollisionShape(sceneInstance);
 
+	scene->AddEntity(rootEntity);
 	world->AddBody(body);
 	return body;
 }

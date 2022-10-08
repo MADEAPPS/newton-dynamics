@@ -64,11 +64,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 	};
 
 	class ndGridHash;
-	class ndWorkingData;
 	class ndParticlePair;
+	class ndWorkingBuffers;
 	class ndParticleKernelDistance;
 
-	ndWorkingData& WorkingData();
 	void SortGrids(ndThreadPool* const threadPool);
 	void BuildPairs(ndThreadPool* const threadPool);
 	void CreateGrids(ndThreadPool* const threadPool);
@@ -80,6 +79,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void CalculateAccelerations(ndThreadPool* const threadPool);
 	void CalculateParticlesDensity(ndThreadPool* const threadPool);
 
+	ndWorkingBuffers* m_workingBuffers;
 	ndFloat32 m_mass;
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;

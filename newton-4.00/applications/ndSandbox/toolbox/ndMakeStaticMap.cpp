@@ -132,11 +132,11 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	meshBuilder.End(false);
 
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	ndDemoMesh* const geometry = new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache());
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache()));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -145,7 +145,6 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	body->SetCollisionShape(plane);
 	world->AddBody(body);
 	scene->AddEntity(entity);
-	geometry->Release();
 	return body;
 }
 
@@ -472,7 +471,6 @@ static ndMatrix GetMatrixAtLocation(const ndBezierSpline& spline, const ndVector
 
 ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
-	
 	ndBigVector control[] =
 	{
 		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
