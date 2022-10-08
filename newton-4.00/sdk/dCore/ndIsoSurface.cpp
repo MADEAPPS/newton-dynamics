@@ -3381,7 +3381,7 @@ void ndIsoSurface::ndImplementation::BuildLowResolutionMesh(ndIsoSurface* const 
 	ClearBuffers();
 }
 
-inline ndIsoSurface::ndIsoSurface()
+ndIsoSurface::ndIsoSurface()
 	:m_origin(ndVector::m_zero)
 	,m_points(1024)
 	,m_implementation(new ndImplementation())
