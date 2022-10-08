@@ -32,7 +32,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	uvMatrix[1][1] *= 1.0f / 10.0f;
 	uvMatrix[2][2] *= 1.0f / 20.0f;
 	uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
-	ndDemoMesh* const geometry = new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix));
 
 	ndVector floor(FindFloor(*world, ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -41,7 +41,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y += 2.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 	ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -51,7 +51,6 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	world->AddBody(body);
 
 	scene->AddEntity(entity);
-	geometry->Release();
 }
 
 static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)

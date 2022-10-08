@@ -56,7 +56,7 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_x;
 
 	ndShapeInstance shape(new ndShapeSphere(blockBoxSize.m_x));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, ndRollMatrix (ndFloat32 (-90.0f) * ndDegreeToRad));
+	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, ndRollMatrix(ndFloat32(-90.0f) * ndDegreeToRad)));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -66,8 +66,6 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 2.0f);
 	}
-
-	geometry->Release();
 }
 
 static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
@@ -89,7 +87,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
 
 	ndShapeInstance shape(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -102,8 +100,6 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 		baseMatrix = rotation * baseMatrix;
 	}
-
-	geometry->Release();
 }
 
 static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
@@ -125,7 +121,7 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 
 	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
 	shape.SetLocalMatrix(ndRollMatrix(ndPi * 0.5f));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshIntance> geometry(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -138,8 +134,6 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_z);
 		baseMatrix = rotation * baseMatrix;
 	}
-
-	geometry->Release();
 }
 
 static void BuildPyramid(ndDemoEntityManager* const scene, 
@@ -185,7 +179,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 
 	ndVector size(boxSize.Scale(1.0f));
 	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -193,7 +187,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 3.0f;
 	BuildPyramid(scene, rootEntity, shape, mass, origin1, boxSize, stackHigh);
-	geometry->Release();
+
 }
 
 static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 stackHigh)
@@ -218,7 +212,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndShapeInstance collision(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
 
 	ndMatrix uvMatrix(ndPitchMatrix(ndPi));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &collision, "smilli.tga", "smilli.tga", "smilli.tga"));
 
 	ndFloat32 vertialStep = blockBoxSize.m_x * 2.0f;
 	ndFloat32 horizontalStep = blockBoxSize.m_z * 0.8f;
@@ -254,9 +248,6 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 		matrix2.m_posit.m_y += vertialStep * 2.0f;
 		matrix3.m_posit.m_y += vertialStep * 2.0f;
 	}
-
-	// do not forget to release the assets	
-	geometry->Release();
 }
 
 void ndBasicStacks (ndDemoEntityManager* const scene)
