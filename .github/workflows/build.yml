@@ -24,4 +24,5 @@ jobs:
         cmake -S . -B build/
         cmake --build build/
         echo ""
-        build/newton-hello-world
+        build/hello
+        build/transformCallback
