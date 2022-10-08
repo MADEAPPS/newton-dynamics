@@ -25,6 +25,14 @@ jobs:
         cmake --build build/
         echo ""
 
-        build/hello
-        build/transformCallback
-        build/contactCallback
+    - name: Run Hello World Demo
+      run: |
+        /tmp/myapp/build/hello
+
+    - name: Run Transform Callback Demo
+      run: |
+        /tmp/myapp/build/transformCallback
+
+    - name: Run Contact Callback Demo
+      run: |
+        /tmp/myapp/build/contactCallback
