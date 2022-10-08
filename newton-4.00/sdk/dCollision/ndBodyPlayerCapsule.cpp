@@ -554,6 +554,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 {
 	m_contactCount = 0;
 	ndScene* const scene = m_player->GetScene();
+	ndContactNotify* const contactNotify = m_player->GetScene()->GetContactNotify();
 	ndBodyKinematic::ndContactMap::Iterator it(m_player->GetContactMap());
 	for (it.Begin(); it; it++)
 	{
@@ -568,6 +569,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			}
 			ndContact contact;
 			contact.SetBodies(body0, body1);
+			contact.m_material = contactNotify->GetMaterial(&contact, body0->GetCollisionShape(), body1->GetCollisionShape());
 	
 			ndContactPoint contactBuffer[D_MAX_CONTATCS];
 			ndContactSolver contactSolver(&contact, scene->GetContactNotify(), ndFloat32(1.0f), 0);

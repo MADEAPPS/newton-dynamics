@@ -29,10 +29,10 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
-	BuildPlayArena(scene);
+	//BuildPlayArena(scene);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 400, 4.0f, 0.0f);
-	//BuildCompoundScene(scene, ndGetIdentityMatrix());
+	BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//BuildStaticMesh(scene, "track.fbx", false);
