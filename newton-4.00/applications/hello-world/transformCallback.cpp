@@ -80,7 +80,10 @@ int main(int, const char**)
 {
   // Setup the world itself.
   ndWorld world;
-  world.SetSubSteps(1);
+
+  // Two sub-steps per time step is the recommended default. It should provide
+  // stable simulations for most standard scenarios including those with joints.
+  world.SetSubSteps(2);
 
   // Add a single sphere to the world.
   ndBodyDynamic *sphere = BuildSphere();
