@@ -64,6 +64,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const m
 	// Get the volume of the original mesh
 	ndMeshEffect mesh(*desc.m_shape);
 	mesh.GetMaterials().PushBack(ndMeshEffect::ndMaterial());
+	mesh.GetMaterials().PushBack(ndMeshEffect::ndMaterial());
 	ndMeshEffect::ndMaterial& material0 = mesh.GetMaterials()[0];
 	ndMeshEffect::ndMaterial& material1 = mesh.GetMaterials()[1];
 	strcpy(material0.m_textureName, desc.m_outTexture);
@@ -77,7 +78,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const m
 	textureMatrix.m_posit.m_y = -0.5f;
 	mesh.UniformBoxMapping(0, textureMatrix);
 
-	m_visualMesh = new ndDemoMesh("fracture", &mesh, manager->m_scene->GetShaderCache());
+	m_visualMesh = ndSharedPtr<ndDemoMeshInterface>(new ndDemoMesh("fracture", &mesh, manager->m_scene->GetShaderCache()));
 
 	// now we call create we decompose the mesh into several convex pieces 
 	ndMeshEffect* const debrisMeshPieces = mesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
@@ -162,11 +163,6 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
 
 ndExplodeConvexShapeModel::ndEffect::~ndEffect()
 {
-	if (m_visualMesh)
-	{
-		m_visualMesh->Release();
-	}
-
 	if (m_shape)
 	{
 		delete m_shape;
@@ -255,7 +251,7 @@ void ndExplodeConvexShapeModel::AddEffect(const ndEffect& effect, ndFloat32 mass
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
+	entity->SetMeshNew(effect.m_visualMesh, ndGetIdentityMatrix());
 	m_scene->AddEntity(entity);
 
 	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
@@ -310,6 +306,18 @@ void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& eff
 		body->SetMassMatrix(debriMassMatrix);
 		body->SetCentreOfMass(atom.m_centerOfMass);
 		body->SetAngularDamping(ndVector(ndFloat32(0.1f)));
+
+		// cap extreme inertia aspect ratio
+		ndVector mass(body->GetMassMatrix());
+		ndFloat32 maxII = ndMax(ndMax(mass.m_x, mass.m_y), mass.m_z) / 10.0f;
+		ndFloat32 minII = ndMin(ndMin(mass.m_x, mass.m_y), mass.m_z);
+		if (minII < maxII)
+		{
+			mass.m_x = ndMax(mass.m_x, maxII);
+			mass.m_y = ndMax(mass.m_y, maxII);
+			mass.m_z = ndMax(mass.m_z, maxII);
+			body->SetMassMatrix(mass);
+		}
 
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);

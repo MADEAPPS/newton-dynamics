@@ -66,7 +66,7 @@ class ndExplodeConvexShapeModel: public ndModel
 		private:
 		ndBodyKinematic* m_body;
 		ndShapeInstance* m_shape;
-		ndDemoMesh* m_visualMesh;
+		ndSharedPtr<ndDemoMeshInterface> m_visualMesh;
 		ndDemoDebrisRootEntity* m_debrisRootEnt;
 		ndFloat32 m_breakImpactSpeed;
 

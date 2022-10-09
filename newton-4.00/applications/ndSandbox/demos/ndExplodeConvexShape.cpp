@@ -22,50 +22,51 @@
 
 static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 {
-	//ndVector pMin;
-	//ndVector pMax;
-	//desc.m_shape->CalculateAabb(ndGetIdentityMatrix(), pMin, pMax);
-	//ndVector size((pMax - pMin).Scale(0.25f));
-	//
-	//desc.m_pointCloud.PushBack(ndVector::m_zero);
-	//
-	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, -size.m_y, -size.m_z, ndFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, -size.m_y, size.m_z, ndFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, size.m_y, -size.m_z, ndFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, size.m_y, size.m_z, ndFloat32(0.0f)));
-	//
-	//desc.m_pointCloud.PushBack(ndVector(size.m_x, -size.m_y, -size.m_z, ndFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(ndVector(size.m_x, -size.m_y, size.m_z, ndFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(ndVector(size.m_x, size.m_y, -size.m_z, ndFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(ndVector(size.m_x, size.m_y, size.m_z, ndFloat32(0.0f)));
-	//
-	//for (ndInt32 i = 0; i < desc.m_pointCloud.GetCount(); ++i)
-	//{
-	//	ndFloat32 x = dGaussianRandom(size.m_x);
-	//	ndFloat32 y = dGaussianRandom(size.m_y);
-	//	ndFloat32 z = dGaussianRandom(size.m_y);
-	//	desc.m_pointCloud[i] += ndVector(x, y, z, ndFloat32(0.0f));
-	//}
-
 	ndVector pMin;
 	ndVector pMax;
 	desc.m_shape->CalculateAabb(ndGetIdentityMatrix(), pMin, pMax);
 	ndVector size(pMax - pMin);
+	ndSetRandSeed(1234);
 
-	const ndInt32 count = 20;
+	//const ndInt32 count = 20;
+	//const ndVector scale(0.2f);
+	//const ndVector invScale(size * scale.Reciproc());
+	//for (ndInt32 i = 0; i < count; ++i)
+	//{
+	//	ndFloat32 x = ndRand();
+	//	ndFloat32 y = ndRand();
+	//	ndFloat32 z = ndRand();
+	//	ndVector randPoint(x, y, z, ndFloat32(0.0f));
+	//	randPoint *= invScale;
+	//	randPoint = pMin + scale * randPoint.Floor();
+	//	desc.m_pointCloud.PushBack(randPoint);
+	//}
 
-	ndSetRandSeed(0);
-	const ndVector scale(0.2f);
-	const ndVector invScale(size * scale.Reciproc());
-	for (ndInt32 i = 0; i < count; ++i)
+
+	desc.m_pointCloud.PushBack(ndVector(pMin.m_x, pMin.m_y, pMin.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMax.m_x, pMin.m_y, pMin.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMin.m_x, pMax.m_y, pMin.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMax.m_x, pMax.m_y, pMin.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMin.m_x, pMin.m_y, pMax.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMax.m_x, pMin.m_y, pMax.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMin.m_x, pMax.m_y, pMax.m_z, ndFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(ndVector(pMax.m_x, pMax.m_y, pMax.m_z, ndFloat32(0.0f)));
+
+	ndInt32 count = 2;
+	ndVector stepsSpize(size.Scale (1.0f / count));
+	for (ndInt32 z = 0; z <= count; ++z)
 	{
-		ndFloat32 x = ndRand();
-		ndFloat32 y = ndRand();
-		ndFloat32 z = ndRand();
-		ndVector randPoint(x, y, z, ndFloat32(0.0f));
-		randPoint *= invScale;
-		randPoint = pMin + scale * randPoint.Floor();
-		desc.m_pointCloud.PushBack(randPoint);
+		ndFloat32 zf = pMin.m_z + stepsSpize.m_z * z;
+		for (ndInt32 y = 0; y <= count; ++y)
+		{
+			ndFloat32 yf = pMin.m_y + stepsSpize.m_y * y;
+			for (ndInt32 x = 0; x <= count; ++x)
+			{
+				ndFloat32 xf = pMin.m_x + stepsSpize.m_x * x;
+				ndVector randPoint(ndGaussianRandom(xf, 0.05f), ndGaussianRandom(yf, 0.05f), ndGaussianRandom(zf, 0.05f), ndFloat32(0.0f));
+				desc.m_pointCloud.PushBack(randPoint);
+			}
+		}
 	}
 }
 

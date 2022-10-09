@@ -31,11 +31,12 @@ class ndDemoDebrisMesh : public ndDemoMesh
 	public:
 	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArray<glDebrisPoint>& vertexArray);
 	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray);
+	~ndDemoDebrisMesh();
 
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	private:
-	//ndDemoSubMeshMaterial m_material[2];
+	ndDemoSubMeshMaterial m_material[2];
 	ndInt32 m_textureLocation1;
 
 	friend class ndDemoDebrisRootEntity;
