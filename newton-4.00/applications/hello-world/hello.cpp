@@ -20,7 +20,10 @@ int main(int, const char**)
 
   // Create the world.
   ndWorld world;
-  world.SetSubSteps(1);
+
+  // Two sub-steps per time step is the recommended default. It should provide
+  // stable simulations for most standard scenarios including those with joints.
+  world.SetSubSteps(2);
 
   // Step the world and measure how long it takes.
   ndFloat32 totalTime = 0;
