@@ -25,7 +25,7 @@
 ndExplodeConvexShapeModel::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
 	,m_momentOfInertia(0.0f)
-	,m_mesh(nullptr)
+	,m_debriEnt(nullptr)
 	,m_collision(nullptr)
 	,m_massFraction(0.0f)
 {
@@ -34,7 +34,7 @@ ndExplodeConvexShapeModel::ndAtom::ndAtom()
 ndExplodeConvexShapeModel::ndAtom::ndAtom(const ndAtom& atom)
 	:m_centerOfMass(atom.m_centerOfMass)
 	,m_momentOfInertia(atom.m_momentOfInertia)
-	,m_mesh(nullptr)
+	,m_debriEnt(nullptr)
 	,m_collision(new ndShapeInstance(*atom.m_collision))
 	,m_massFraction(atom.m_massFraction)
 {
@@ -108,7 +108,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const m
 			{
 				// we have a piece which has a convex collision  representation, add that to the list
 				ndAtom& atom = Append()->GetInfo();
-				atom.m_mesh = new ndDemoDebrisEntity(fracturePiece, vertexArray, m_debrisRootEnt, scene->GetShaderCache());
+				atom.m_debriEnt = new ndDemoDebrisEntity(fracturePiece, vertexArray, m_debrisRootEnt, scene->GetShaderCache());
 
 				// get center of mass
 				ndMatrix inertia(collision->CalculateInertia());
@@ -149,15 +149,15 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);
-	ndDemoDebrisEntity* mesh = (ndDemoDebrisEntity*)m_debrisRootEnt->GetChild();
+	ndDemoDebrisEntity* debriEnt = (ndDemoDebrisEntity*)m_debrisRootEnt->GetChild();
 	for (ndNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
-		newAtom.m_mesh = mesh;
-		ndAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+		newAtom.m_debriEnt = debriEnt;
+		ndAssert(*newAtom.m_debriEnt->GetMesh() == *srcAtom.m_debriEnt->GetMesh());
 
-		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
+		debriEnt = (ndDemoDebrisEntity*)debriEnt->GetSibling();
 	}
 }
 
@@ -251,7 +251,7 @@ void ndExplodeConvexShapeModel::AddEffect(const ndEffect& effect, ndFloat32 mass
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMeshNew(effect.m_visualMesh, ndGetIdentityMatrix());
+	entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
 	m_scene->AddEntity(entity);
 
 	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
@@ -286,7 +286,7 @@ void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& eff
 	for (ndEffect::ndNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		ndAtom& atom = node->GetInfo();
-		ndDemoDebrisEntity* const entity = atom.m_mesh;
+		ndDemoDebrisEntity* const entity = atom.m_debriEnt;
 		entity->SetMatrix(rotation, matrix.m_posit);
 
 		ndFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
@@ -309,6 +309,10 @@ void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& eff
 
 		// cap extreme inertia aspect ratio
 		ndVector mass(body->GetMassMatrix());
+
+		mass.m_x = ndMax(mass.m_x, ndFloat32(1.0e-5f));
+		mass.m_y = ndMax(mass.m_y, ndFloat32(1.0e-5f));
+		mass.m_z = ndMax(mass.m_z, ndFloat32(1.0e-5f));
 		ndFloat32 maxII = ndMax(ndMax(mass.m_x, mass.m_y), mass.m_z) / 10.0f;
 		ndFloat32 minII = ndMin(ndMin(mass.m_x, mass.m_y), mass.m_z);
 		if (minII < maxII)
@@ -316,8 +320,8 @@ void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& eff
 			mass.m_x = ndMax(mass.m_x, maxII);
 			mass.m_y = ndMax(mass.m_y, maxII);
 			mass.m_z = ndMax(mass.m_z, maxII);
-			body->SetMassMatrix(mass);
 		}
+		body->SetMassMatrix(mass);
 
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);

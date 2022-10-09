@@ -237,7 +237,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 
 ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const owner)
 	:ndDemoMeshInterface()
-	,m_shareMesh((ndDemoMesh*)source.m_shareMesh->AddRef())
+	,m_shareMesh(source.m_shareMesh)
 	,m_ownerEntity(owner)
 	,m_bindingMatrixArray()
 	,m_shader(source.m_shader)
@@ -250,7 +250,6 @@ ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const
 
 ndDemoSkinMesh::~ndDemoSkinMesh()
 {
-	m_shareMesh->Release();
 }
 
 ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const owner)
@@ -262,11 +261,12 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	const glSkinVertex* const points, ndInt32 pointCount,
 	const ndInt32* const indices, ndInt32 indexCount)
 {
-	glGenVertexArrays(1, &m_shareMesh->m_vertextArrayBuffer);
-	glBindVertexArray(m_shareMesh->m_vertextArrayBuffer);
+	ndDemoMesh* const mesh = (ndDemoMesh*)*m_shareMesh;
+	glGenVertexArrays(1, &mesh->m_vertextArrayBuffer);
+	glBindVertexArray(mesh->m_vertextArrayBuffer);
 	
-	glGenBuffers(1, &m_shareMesh->m_vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_shareMesh->m_vertexBuffer);
+	glGenBuffers(1, &mesh->m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(glSkinVertex), &points[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
@@ -293,27 +293,27 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	
-	glGenBuffers(1, &m_shareMesh->m_indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_shareMesh->m_indexBuffer);
+	glGenBuffers(1, &mesh->m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	glUseProgram(m_shader);
-	m_shareMesh->m_textureLocation = glGetUniformLocation(m_shader, "texture");
-	m_shareMesh->m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
-	m_shareMesh->m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-	m_shareMesh->m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_shareMesh->m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-	m_shareMesh->m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+	mesh->m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	mesh->m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
+	mesh->m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	mesh->m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	mesh->m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	mesh->m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
 	
-	m_shareMesh->m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
-	m_shareMesh->m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
-	m_shareMesh->m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+	mesh->m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
+	mesh->m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
+	mesh->m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
 	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	
 	glUseProgram(0);
-	m_shareMesh->m_vertexCount = pointCount;
-	m_shareMesh->m_indexCount = indexCount;
+	mesh->m_vertexCount = pointCount;
+	mesh->m_indexCount = indexCount;
 }
 
 ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
@@ -371,26 +371,27 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& mo
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 	const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
-	glUniform1i(m_shareMesh->m_textureLocation, 0);
-	glUniform1f(m_shareMesh->m_transparencyLocation, 1.0f);
-	glUniform4fv(m_shareMesh->m_directionalLightDirLocation, 1, &directionaLight[0]);
-	glUniformMatrix4fv(m_shareMesh->m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_shareMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(m_shareMesh->m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	ndDemoMesh* const mesh = (ndDemoMesh*)*m_shareMesh;
+	glUniform1i(mesh->m_textureLocation, 0);
+	glUniform1f(mesh->m_transparencyLocation, 1.0f);
+	glUniform4fv(mesh->m_directionalLightDirLocation, 1, &directionaLight[0]);
+	glUniformMatrix4fv(mesh->m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(mesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(mesh->m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
 
-	glBindVertexArray(m_shareMesh->m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_shareMesh->m_indexBuffer);
+	glBindVertexArray(mesh->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (ndDemoMesh::ndNode* node = m_shareMesh->GetFirst(); node; node = node->GetNext())
+	for (ndDemoMesh::ndNode* node = mesh->GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (!segment.m_hasTranparency)
 		{
-			glUniform3fv(m_shareMesh->m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
-			glUniform3fv(m_shareMesh->m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
-			glUniform3fv(m_shareMesh->m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
+			glUniform3fv(mesh->m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+			glUniform3fv(mesh->m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+			glUniform3fv(mesh->m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());

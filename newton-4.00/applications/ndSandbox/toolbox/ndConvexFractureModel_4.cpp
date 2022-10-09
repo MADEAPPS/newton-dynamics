@@ -188,6 +188,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 	,m_debrisRootEnt(new ndDemoDebrisRootEntity(*effect.m_debrisRootEnt))
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
+	ndAssert(0);
 	m_body->SetCollisionShape(*effect.m_shape);
 
 	ndDemoDebrisEntity* mesh = (ndDemoDebrisEntity*) m_debrisRootEnt->GetChild();
@@ -196,7 +197,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
 		newAtom.m_mesh = mesh;
-		ndAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+		ndAssert(newAtom.m_mesh == srcAtom.m_mesh);
 
 		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
 	}
@@ -204,11 +205,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 
 ndConvexFractureModel_4::ndEffect::~ndEffect()
 {
-	if (m_visualMesh)
-	{
-		m_visualMesh->Release();
-	}
-
+	ndAssert(0);
 	if (m_shape)
 	{
 		delete m_shape;
@@ -293,18 +290,19 @@ void ndConvexFractureModel_4::PostUpdate(ndWorld* const world, ndFloat32)
 
 void ndConvexFractureModel_4::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
 {
-	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
-
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
-	m_scene->AddEntity(entity);
-
-	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
-	m_scene->GetWorld()->AddBody(body);
-
-	body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
-	body->SetMatrix(location);
-	body->SetMassMatrix(mass, *effect.m_shape);
+	ndAssert(0);
+	//ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
+	//
+	//ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	//entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
+	//m_scene->AddEntity(entity);
+	//
+	//ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
+	//m_scene->GetWorld()->AddBody(body);
+	//
+	//body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+	//body->SetMatrix(location);
+	//body->SetMassMatrix(mass, *effect.m_shape);
 }
 
 void ndConvexFractureModel_4::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, ndFloat32 factor) const

@@ -31,7 +31,7 @@ class ndExplodeConvexShapeModel: public ndModel
 
 		ndVector m_centerOfMass;
 		ndVector m_momentOfInertia;
-		ndDemoDebrisEntity* m_mesh;
+		ndDemoDebrisEntity* m_debriEnt;
 		ndShapeInstance* m_collision;
 		ndFloat32 m_massFraction;
 	};

@@ -213,9 +213,8 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 		ndShape* const shape = (ndShape*)collision.GetShape();
 		if (!shape->GetAsShapeStaticProceduralMesh())
 		{
-			ndDemoMesh* const mesh = new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale);
+			ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale));
 			entity->SetMesh(mesh, ndGetIdentityMatrix());
-			mesh->Release();
 		}
 
 		m_manager->AddEntity(entity);

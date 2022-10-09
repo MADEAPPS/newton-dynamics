@@ -25,8 +25,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_curRotation (matrix)
 	,m_nextRotation (matrix)
 	,m_meshMatrix(ndGetIdentityMatrix())
-	,m_mesh(nullptr)
-	,m_meshNew()
+	,m_mesh()
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -46,8 +45,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_curRotation(meshEffectNode->m_matrix)
 	,m_nextRotation(m_curRotation)
 	,m_meshMatrix(ndGetIdentityMatrix())
-	,m_mesh(nullptr)
-	,m_meshNew()
+	,m_mesh()
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
@@ -84,7 +82,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 				ndAssert(0);
 				mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
 			}
-			entity->SetMeshNew(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+			entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
 
 			if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 			{
@@ -109,14 +107,12 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_curRotation(copyFrom.m_curRotation)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
-	,m_mesh(nullptr)
-	,m_meshNew(copyFrom.m_meshNew)
+	,m_mesh(copyFrom.m_mesh)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
 {
-	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : nullptr;
 }
 
 ndDemoEntity::~ndDemoEntity(void)
@@ -125,7 +121,6 @@ ndDemoEntity::~ndDemoEntity(void)
 	{
 		delete m_userData;
 	}
-	SetMesh(nullptr, ndGetIdentityMatrix());
 }
 
 ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
@@ -155,33 +150,14 @@ void ndDemoEntity::SetUserData (UserData* const data)
 	m_userData = data;
 }
 
-ndDemoMeshInterface* ndDemoEntity::GetMesh() const
+ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMesh()
 {
 	return m_mesh;
 }
 
-void ndDemoEntity::SetMesh(ndDemoMeshInterface* const mesh, const ndMatrix& meshMatrix)
+void ndDemoEntity::SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix)
 {
-	m_meshMatrix = meshMatrix;
-	if (m_mesh) 
-	{
-		m_mesh->Release();
-	}
-	m_mesh = nullptr;
-	if (mesh) 
-	{
-		m_mesh = mesh->AddRef();
-	}
-}
-
-ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMeshNew()
-{
-	return m_meshNew;
-}
-
-void ndDemoEntity::SetMeshNew(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix)
-{
-	m_meshNew = mesh;
+	m_mesh = mesh;
 	m_meshMatrix = meshMatrix;
 }
 
@@ -385,7 +361,7 @@ void ndDemoEntity::RenderSkeleton(ndDemoEntityManager* const scene, const ndMatr
 void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	ndMatrix nodeMatrix (m_matrix * matrix);
-	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*) (m_mesh ? m_mesh : *m_meshNew);
+	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
 	if (m_isVisible && mesh) 
 	{
 		// Render mesh if there is one 
@@ -420,7 +396,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 {
 	ndArray<ndVector> points;
 	ndArray<ndInt32> indices;
-	const ndSharedPtr<ndDemoMeshInterface> meshPtr = GetMeshNew();
+	const ndSharedPtr<ndDemoMeshInterface> meshPtr = GetMesh();
 	ndDemoMesh* const mesh = (ndDemoMesh*)*meshPtr;
 	ndAssert(mesh);
 	mesh->GetVertexArray(points);
@@ -495,7 +471,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	
 		if (strstr (name, "sphere")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 
@@ -516,7 +492,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		} 
 		else if (strstr (name, "box")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			
@@ -539,7 +515,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		} 
 		else if (strstr (name, "capsule")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 
@@ -563,7 +539,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		} 
 		else if (strstr(name, "convexhull")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x)));
@@ -573,7 +549,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		else if (strstr(name, "vhacd"))
 		{
 			ndArray<ndInt32> indices;
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			mesh->GetIndexArray(indices);

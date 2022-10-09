@@ -138,7 +138,7 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetMatrix(matrix);

@@ -45,11 +45,8 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 
 	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene);
 
-	ndDemoMeshInterface* GetMesh() const;
-	void SetMesh (ndDemoMeshInterface* const mesh, const ndMatrix& meshMatrix);
-
-	ndSharedPtr<ndDemoMeshInterface> GetMeshNew();
-	void SetMeshNew(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix);
+	ndSharedPtr<ndDemoMeshInterface> GetMesh();
+	void SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix);
 
 	const ndMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const ndMatrix& matrix);  
@@ -89,8 +86,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	ndQuaternion m_nextRotation;         // rotation at the current physics simulation step  
 
 	ndMatrix m_meshMatrix;
-	ndDemoMeshInterface* m_mesh;
-	ndSharedPtr<ndDemoMeshInterface> m_meshNew;
+	ndSharedPtr<ndDemoMeshInterface> m_mesh;
 	UserData* m_userData;
 	ndList <ndDemoEntity*>::ndNode* m_rootNode;
 	ndSpinLock m_lock;

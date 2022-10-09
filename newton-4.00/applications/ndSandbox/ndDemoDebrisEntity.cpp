@@ -193,7 +193,7 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glD
 	}
 
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoDebrisMesh("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray));
-	SetMeshNew(mesh, ndGetIdentityMatrix());
+	SetMesh(mesh, ndGetIdentityMatrix());
 }
 
 ndDemoDebrisEntity::ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom)
@@ -213,7 +213,7 @@ ndNodeBaseHierarchy* ndDemoDebrisEntity::CreateClone() const
 void ndDemoDebrisEntity::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	const ndMatrix modelMatrix(m_matrix * matrix);
-	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_meshNew;
+	ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
 	mesh->Render(scene, modelMatrix);
 }
 
@@ -233,14 +233,14 @@ ndDemoDebrisRootEntity::~ndDemoDebrisRootEntity(void)
 
 void ndDemoDebrisRootEntity::FinalizeConstruction(const ndArray<glDebrisPoint>& vertexArray)
 {
-	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)*GetChild()->GetMeshNew();
+	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)*GetChild()->GetMesh();
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoDebrisMesh(shaderMesh, vertexArray));
-	SetMeshNew(mesh, ndGetIdentityMatrix());
+	SetMesh(mesh, ndGetIdentityMatrix());
 }
 
 void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
-	ndDemoDebrisMesh* const shaderMesh = ((ndDemoDebrisMesh*)*m_meshNew);
+	ndDemoDebrisMesh* const shaderMesh = ((ndDemoDebrisMesh*)*m_mesh);
 	glUseProgram(shaderMesh->m_shader);
 	glBindVertexArray(shaderMesh->m_vertextArrayBuffer);
 	

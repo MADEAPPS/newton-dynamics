@@ -160,7 +160,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(const ndEffect& effect)
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
 		newAtom.m_mesh = mesh;
-		ndAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+		ndAssert(newAtom.m_mesh == srcAtom.m_mesh);
 
 		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
 	}
@@ -169,11 +169,6 @@ ndConvexFractureModel_2::ndEffect::ndEffect(const ndEffect& effect)
 ndConvexFractureModel_2::ndEffect::~ndEffect()
 {
 	ndAssert(0);
-	if (m_visualMesh)
-	{
-		m_visualMesh->Release();
-	}
-
 	if (m_shape)
 	{
 		delete m_shape;
@@ -261,18 +256,18 @@ void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32)
 void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
 {
 	ndAssert(0);
-	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
-
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
-	m_scene->AddEntity(entity);
-
-	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
-	m_scene->GetWorld()->AddBody(body);
-
-	body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
-	body->SetMatrix(location);
-	body->SetMassMatrix(mass, *effect.m_shape);
+	//ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
+	//
+	//ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	//entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
+	//m_scene->AddEntity(entity);
+	//
+	//ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
+	//m_scene->GetWorld()->AddBody(body);
+	//
+	//body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+	//body->SetMatrix(location);
+	//body->SetMassMatrix(mass, *effect.m_shape);
 }
 
 void ndConvexFractureModel_2::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, ndFloat32 factor) const

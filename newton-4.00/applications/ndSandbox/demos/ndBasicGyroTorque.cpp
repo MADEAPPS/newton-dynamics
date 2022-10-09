@@ -70,7 +70,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, 0.0f));
 
 	body->SetOmega(omega);
@@ -99,7 +99,7 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetOmega(omega);
@@ -132,7 +132,7 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 
 	ndBodyDynamic* const body = new ndAsymetricInertiaBody();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetMatrix(matrix);
@@ -158,7 +158,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 	matrix.m_posit.m_y += 1.0f;
 
 	const ndFloat32 mass = 1.0f;
@@ -200,7 +200,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	ndDemoEntity* const entity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
 
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga"));
-	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));

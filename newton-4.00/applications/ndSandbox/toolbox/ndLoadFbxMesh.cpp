@@ -83,8 +83,7 @@ void fbxDemoEntity____::BuildRenderMeshes(ndDemoEntityManager* const scene)
 			{
 				mesh = new ndDemoSkinMesh(ent, ent->m_fbxMeshEffect, scene->GetShaderCache());
 			}
-			ent->SetMesh(mesh, ent->GetMeshMatrix());
-			mesh->Release();
+			ent->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), ent->GetMeshMatrix());
 
 			if ((ent->GetName().Find("hidden") >= 0) || (ent->GetName().Find("Hidden") >= 0))
 			{

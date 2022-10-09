@@ -28,12 +28,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderCache& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
-	{ 
-		AddRef(); 
-		return this;
-	}
-
 	ndDemoSubMesh* AddSubMesh();
 	virtual const char* GetTextureName (const ndDemoSubMesh* const subMesh) const;
 

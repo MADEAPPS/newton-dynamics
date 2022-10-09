@@ -31,7 +31,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	ndMatrix matrix(location);
 	matrix.m_posit.m_y += 1.9f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndShapeMaterial material(box.GetMaterial());
 	material.m_data.m_userData = entity;
@@ -63,7 +63,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-		entity->SetMeshNew(geometry, ndGetIdentityMatrix());
+		entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 		material.m_data.m_userData = entity;
 		capsule.SetMaterial(material);

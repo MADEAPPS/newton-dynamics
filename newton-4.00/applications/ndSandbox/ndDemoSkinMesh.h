@@ -43,7 +43,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 
 	ndInt32 CalculateMatrixPalette(ndMatrix* const bindMatrix) const;
 
-	ndDemoMesh* m_shareMesh;
+	ndSharedPtr<ndDemoMeshInterface> m_shareMesh;
 	ndDemoEntity* m_ownerEntity; 
 	ndArray<ndMatrix> m_bindingMatrixArray;
 	GLuint m_shader;

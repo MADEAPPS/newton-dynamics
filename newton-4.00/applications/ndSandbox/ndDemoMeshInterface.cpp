@@ -62,7 +62,6 @@ void ndDemoSubMeshMaterial::SetTexture(GLint textureHandle)
 
 ndDemoMeshInterface::ndDemoMeshInterface()
 	:ndClassAlloc()
-	,m_refCount(1)
 	,m_name()
 	,m_isVisible(true)
 {
@@ -70,23 +69,6 @@ ndDemoMeshInterface::ndDemoMeshInterface()
 
 ndDemoMeshInterface::~ndDemoMeshInterface()
 {
-}
-
-ndDemoMeshInterface* ndDemoMeshInterface::AddRef()
-{
-	m_refCount++;
-	return this;
-}
-
-ndInt32 ndDemoMeshInterface::Release()
-{
-	ndAssert(0);
-	m_refCount--;
-	if (m_refCount == 0)
-	{
-		delete this;
-	}
-	return m_refCount;
 }
 
 const ndString& ndDemoMeshInterface::GetName () const

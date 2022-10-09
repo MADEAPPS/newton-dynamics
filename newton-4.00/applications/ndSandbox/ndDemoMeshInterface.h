@@ -59,9 +59,6 @@ class ndDemoMeshInterface : public ndClassAlloc
 	ndDemoMeshInterface();
 	virtual ~ndDemoMeshInterface();
 	const ndString& GetName () const;
-
-	ndInt32 Release();
-	ndDemoMeshInterface* AddRef();
 	
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
@@ -72,7 +69,6 @@ class ndDemoMeshInterface : public ndClassAlloc
 	virtual void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&) {}
 
 	ndString m_name;
-	ndInt32 m_refCount;
 	bool m_isVisible;
 };
 

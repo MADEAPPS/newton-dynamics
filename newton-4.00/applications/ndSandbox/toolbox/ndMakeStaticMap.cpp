@@ -33,7 +33,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -136,7 +136,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -175,7 +175,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry, ndGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -535,7 +535,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		((ndDemoSplinePathMesh*)*splineMesh)->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
 		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
 		scene->AddEntity(splineEntity);
-		splineEntity->SetMeshNew(splineMesh, ndGetIdentityMatrix());
+		splineEntity->SetMesh(splineMesh, ndGetIdentityMatrix());
 		splineMesh->SetVisible(true);
 	}
 
