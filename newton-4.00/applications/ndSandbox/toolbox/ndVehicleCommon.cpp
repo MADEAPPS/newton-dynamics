@@ -506,3 +506,44 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 		}
 	}
 }
+
+void ndBasicVehicle::Update(ndWorld* const world, ndFloat32 timestep)
+{
+	ndMultiBodyVehicle::Update(world, timestep);
+}
+
+void ndBasicVehicle::PostUpdate(ndWorld* const world, ndFloat32 timestep)
+{
+	ndMultiBodyVehicle::PostUpdate(world, timestep);
+
+#if 1
+	// add a wind tunnel for calibration
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit = m_chassis->GetMatrix().m_posit;
+	matrix.m_posit.m_y = 0.0f;
+	matrix = matrix.Inverse();
+	m_chassis->SetMatrix(m_chassis->GetMatrix() * matrix);
+	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
+		joint->GetBody0()->SetMatrix(joint->GetBody0()->GetMatrix() * matrix);
+	}
+	
+	for (ndList<ndMultiBodyVehicleDifferential*>::ndNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
+		joint->GetBody0()->SetMatrix(joint->GetBody0()->GetMatrix() * matrix);
+	}
+
+	for (ndList<ndBodyDynamic*>::ndNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyDynamic* const body = node->GetInfo();
+		body->SetMatrix(body->GetMatrix() * matrix);
+	}
+
+	if (m_motor)
+	{
+		m_motor->GetBody0()->SetMatrix(m_motor->GetBody0()->GetMatrix() * matrix);
+	}
+#endif
+}

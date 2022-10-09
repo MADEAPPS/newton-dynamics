@@ -141,6 +141,9 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	virtual void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
 
 	protected:
+	void Update(ndWorld* const world, ndFloat32 timestep);
+	void PostUpdate(ndWorld* const world, ndFloat32 timestep);
+
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
 	ndFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 

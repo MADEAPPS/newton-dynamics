@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
-//#define DEFAULT_SCENE	11		// basic vehicle
+#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
@@ -62,7 +62,7 @@
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// train biped test 2
-#define DEFAULT_SCENE	24		// simple voronoi fracture
+//#define DEFAULT_SCENE	24		// simple voronoi fracture
 //#define DEFAULT_SCENE	25		// basic voronoi fracture
 //#define DEFAULT_SCENE	26		// linked voronoi fracture
 //#define DEFAULT_SCENE	27		// skin peel voronoi fracture
@@ -444,7 +444,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
