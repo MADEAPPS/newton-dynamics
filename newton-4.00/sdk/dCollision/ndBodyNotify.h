@@ -31,7 +31,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
-	D_COLLISION_API ndBodyNotify(const ndVector& defualtGravity);
+	D_COLLISION_API ndBodyNotify(const ndVector& defaultGravity);
 	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc);
 
 	D_COLLISION_API virtual ~ndBodyNotify();
@@ -40,7 +40,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	D_COLLISION_API const ndBody* GetBody() const;
 	D_COLLISION_API virtual void* GetUserData() const;
 	D_COLLISION_API ndVector GetGravity() const;
-	D_COLLISION_API void SetGravity(const ndVector& defualtGravity);
+	D_COLLISION_API void SetGravity(const ndVector& defaultGravity);
 
 	D_COLLISION_API virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
@@ -48,7 +48,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	D_COLLISION_API virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 
 	private:
-	ndVector m_defualtGravity;
+	ndVector m_defaultGravity;
 	ndBody* m_body;
 	friend class ndBody;
 
