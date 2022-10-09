@@ -234,14 +234,13 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 	}
 	meshEffect.EndBuild(0.0f);
 
-	ndDemoMesh* const geometry = new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache());
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache()));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMeshNew(geometry, ndGetIdentityMatrix());
 
 	scene->AddEntity(entity);
-	geometry->Release();
 	return entity;
 }
 

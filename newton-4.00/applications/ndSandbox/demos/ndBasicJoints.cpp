@@ -122,11 +122,11 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFollowSplinePath)
 
-static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoMesh* const mesh, ndFloat32 mass)
+static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndDemoMeshInterface> mesh, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMeshNew(mesh, ndGetIdentityMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -144,10 +144,10 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		public:
 		ndJointSphericalMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 			:ndJointSpherical(pinAndPivotFrame, child, parent)
-			, m_rollAngle(0.0f)
-			, m_pitchAngle(0.0f)
-			, m_rollOmega(5.0f)
-			, m_pitchOmega(6.0f)
+			,m_rollAngle(0.0f)
+			,m_pitchAngle(0.0f)
+			,m_rollOmega(5.0f)
+			,m_pitchOmega(6.0f)
 		{
 			ndFloat32 friction = 10.0f;
 			ndFloat32 spring = 1500.0f;
@@ -173,7 +173,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndFloat32 mass = 1.0f;
 	ndFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
@@ -281,33 +281,29 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
 		world->AddJoint(joint);
 	}
-
-	mesh->Release();
 }
 
-//static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-//{
-//	ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
-//	matrix.m_posit = origin;
-//	matrix.m_posit.m_w = 1.0f;
-//	
-//	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
-//	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga");
-//	matrix.m_posit.m_y += 5.0f;
-//	
-//	ndPhysicsWorld* const world = scene->GetWorld();
-//	ndVector posit(matrix.m_posit);
-//	for (ndInt32 i = 0; i < 8; ++i)
-//	{
-//		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-//		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
-//		world->AddJoint(joint);
-//		posit.m_y += diameter * 1.5f;
-//		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.01f), 0.0f, ndGaussianRandom(0.01f), 0.0f);
-//	}
-//
-//	mesh2->Release();
-//}
+static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	
+	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
+	ndSharedPtr<ndDemoMeshInterface> mesh2(new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
+	matrix.m_posit.m_y += 5.0f;
+	
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndVector posit(matrix.m_posit);
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
+		world->AddJoint(joint);
+		posit.m_y += diameter * 1.5f;
+		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.0f, 0.01f), 0.0f, ndGaussianRandom(0.0f, 0.01f), 0.0f);
+	}
+}
 
 static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
@@ -333,7 +329,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	};
 
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -374,8 +370,6 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		joint->SetLimits(-1.0f, 1.0f);
 		world->AddJoint(joint);
 	}
-
-	mesh->Release();
 }
 
 static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
@@ -419,7 +413,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	};
 
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -468,8 +462,6 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
 		world->AddJoint(joint);
 	}
-
-	mesh->Release();
 }
 
 static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
@@ -501,7 +493,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	};
 
 	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -532,14 +524,12 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 		joint->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
 		world->AddJoint(joint);
 	}
-	
-	mesh->Release();
 }
 
 static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -560,15 +550,13 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 		joint->SetLimitsPosit(-1.0f, 1.0f);
 		world->AddJoint(joint);
 	}
-
-	mesh->Release();
 }
 
 #if 1
 static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -589,15 +577,13 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 		joint->SetLimitsPosit(-1.0f, 1.0f);
 		world->AddJoint(joint);
 	}
-
-	mesh->Release();
 }
 
 #else
 static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.2f/*0.25f*/));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -620,15 +606,13 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 		//joint->SetLimitsPosit(-1.0f, 1.0f);
 		//world->AddJoint(joint);
 	}
-
-	mesh->Release();
 }
 #endif
 
 void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndShapeInstance shape(new ndShapeSphere(0.25f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 
@@ -668,14 +652,12 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 			world->AddJoint(new ndJointFixDistance(body0->GetMatrix().m_posit, body1->GetMatrix().m_posit, body0, body1));
 		}
 	}
-
-	mesh->Release();
 }
 
 static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
@@ -699,8 +681,6 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 
 	ndVector pin(matrix.m_front);
 	world->AddJoint(new ndJointGear(4.0f, pin, body0, pin, body1));
-
-	mesh->Release();
 }
 
 static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& origin)
@@ -711,13 +691,12 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	SplinePathBody* const pathBody = new SplinePathBody(scene, matrix);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 
-	ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500);
-	rollerCosterPath->SetMesh(mesh, ndGetIdentityMatrix());
-
+	//ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500);
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500));
+	rollerCosterPath->SetMeshNew(mesh, ndGetIdentityMatrix());
 	mesh->SetVisible(true);
-	mesh->Release();
 
-	ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)rollerCosterPath->GetMesh();
+	ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*rollerCosterPath->GetMeshNew();
 	const ndBezierSpline& spline = splineMesh->m_curve;
 	const ndInt32 count = 32;
 	ndBigVector point0;
@@ -738,10 +717,9 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	ndFloat32 attachmentOffset = 0.8f;
 
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
-	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga"));
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
-	instanceMesh->Release();
 
 	ndBodyDynamic* bodies[count];
 	ndPhysicsWorld* const world = scene->GetWorld();
