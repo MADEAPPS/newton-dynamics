@@ -637,17 +637,17 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMat
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
+	sceneLocation.m_posit.m_x = -200.0f;
+	sceneLocation.m_posit.m_z = -200.0f;
 
 	//BuildFloorBox(scene, sceneLocation);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	sceneLocation.m_posit.m_x = -200.0f;
-	sceneLocation.m_posit.m_z = -200.0f;
-	BuildHeightFieldTerrain(scene, sceneLocation);
+	//BuildHeightFieldTerrain(scene, sceneLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);

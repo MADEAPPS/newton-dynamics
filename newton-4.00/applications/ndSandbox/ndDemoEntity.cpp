@@ -422,6 +422,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 	ndArray<ndInt32> indices;
 	const ndSharedPtr<ndDemoMeshInterface> meshPtr = GetMeshNew();
 	ndDemoMesh* const mesh = (ndDemoMesh*)*meshPtr;
+	ndAssert(mesh);
 	mesh->GetVertexArray(points);
 	mesh->GetIndexArray(indices);
 
@@ -494,7 +495,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	
 		if (strstr (name, "sphere")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 
 			ndVector minP(ndFloat32(1.0e10f));
@@ -514,7 +516,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		} 
 		else if (strstr (name, "box")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			
 			ndVector minP(ndFloat32(1.0e10f));
@@ -536,7 +539,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		} 
 		else if (strstr (name, "capsule")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 
 			ndVector minP(ndFloat32(1.0e10f));
@@ -559,7 +563,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		} 
 		else if (strstr(name, "convexhull")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x)));
 			const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
@@ -568,7 +573,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 		else if (strstr(name, "vhacd"))
 		{
 			ndArray<ndInt32> indices;
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMeshNew();
+			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			mesh->GetIndexArray(indices);
 

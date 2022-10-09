@@ -691,12 +691,11 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	SplinePathBody* const pathBody = new SplinePathBody(scene, matrix);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 
-	//ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500);
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500));
 	rollerCosterPath->SetMeshNew(mesh, ndGetIdentityMatrix());
 	mesh->SetVisible(true);
 
-	ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*rollerCosterPath->GetMeshNew();
+	ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*mesh;
 	const ndBezierSpline& spline = splineMesh->m_curve;
 	const ndInt32 count = 32;
 	ndBigVector point0;
