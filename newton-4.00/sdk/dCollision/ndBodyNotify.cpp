@@ -27,9 +27,9 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
 
-ndBodyNotify::ndBodyNotify(const ndVector& defualtGravity)
+ndBodyNotify::ndBodyNotify(const ndVector& defaultGravity)
 	:ndContainersFreeListAlloc<ndBodyNotify>()
-	,m_defualtGravity(defualtGravity)
+	,m_defaultGravity(defaultGravity)
 	,m_body(nullptr)
 {
 }
@@ -39,7 +39,7 @@ ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_body(nullptr)
 {
 	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
-	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
+	m_defaultGravity = xmlGetVector3(rootNode, "gravity");
 }
 
 ndBodyNotify::~ndBodyNotify()
@@ -52,7 +52,7 @@ void ndBodyNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 
-	xmlSaveParam(childNode, "gravity", m_defualtGravity);
+	xmlSaveParam(childNode, "gravity", m_defaultGravity);
 }
 
 ndBody* ndBodyNotify::GetBody()
@@ -72,12 +72,12 @@ void* ndBodyNotify::GetUserData() const
 
 ndVector ndBodyNotify::GetGravity() const
 {
-	return m_defualtGravity;
+	return m_defaultGravity;
 }
 
-void ndBodyNotify::SetGravity(const ndVector & defualtGravity)
+void ndBodyNotify::SetGravity(const ndVector & defaultGravity)
 {
-	m_defualtGravity = defualtGravity;
+	m_defaultGravity = defaultGravity;
 }
 
 void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
@@ -91,7 +91,7 @@ void ndBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 	if (body->GetInvMass() > 0.0f)
 	{
 		ndVector massMatrix(body->GetMassMatrix());
-		ndVector force (m_defualtGravity.Scale(massMatrix.m_w));
+		ndVector force (m_defaultGravity.Scale(massMatrix.m_w));
 		body->SetForce(force);
 		body->SetTorque(ndVector::m_zero);
 
