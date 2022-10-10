@@ -92,7 +92,11 @@ int main(int, const char**)
   // Step the simulation for a few steps to see the callbacks in action.
   for (ndInt32 i = 0; i < 30; i++)
   {
+    // Trigger an asynchronous update.
     world.Update(1.0f / 60.0f);
+
+    // We need to wait for Newton to finish before we can safely access its objects.
+    world.Sync();
 
     // Access the body directly to print info about the sphere after each step.
     printf("From Main loop:       Pos=(%.1f, %.1f, %.1f)  Vel=(%.1f, %.1f, %.1f)\n\n",

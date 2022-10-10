@@ -26,16 +26,24 @@ int main(int, const char**)
   world.SetSubSteps(2);
 
   // Step the world and measure how long it takes.
-  ndFloat32 totalTime = 0;
   for (ndInt32 i = 0; i < numSteps; i++)
   {
+    // Trigger an asynchronous(!) physics step.
+    // NOTE: this function will return immediately.
     world.Update(1.0f / 60.0f);
-    totalTime += world.GetUpdateTime();
+
+    /* It is generally a bad idea to access Newton objects at this point since
+       it may not have completed the update yet. However, we could do other
+       application logic here if we wanted to. */
+
+    // Explicitly wait until Newton has finished its physics step.
     world.Sync();
+
+    /* It is now safe to access Newton objects, add bodies, modify existing ones etc. */
   }
 
   // Pretty print the results.
   setlocale(LC_NUMERIC, "");
-  printf("Ran %'d Newton steps in %dms\n", numSteps, int(1000 * totalTime));
+  printf("Ran %'d Newton steps\n", numSteps);
   return 0;
 }
