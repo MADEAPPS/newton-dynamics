@@ -47,6 +47,9 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		ndFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
+
+		m_frontTire.m_handBrakeTorque = 0.0f;
+		m_rearTire.m_handBrakeTorque = 5000.0f;
 	}
 };
 

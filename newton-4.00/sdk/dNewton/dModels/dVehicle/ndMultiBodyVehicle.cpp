@@ -840,7 +840,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
 
 					// longitudinal force
-					ndFloat32 longitudinalForce = -tireGravities * contactPoint.m_dir1_Force.m_force;
+					ndFloat32 longitudinalForce = tireGravities * contactPoint.m_dir1_Force.m_force;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
 				}
 			}
@@ -864,13 +864,13 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	const ndVector tireVeloc(tireBody->GetVelocity());
 	const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
 	// tire non linear brush model is only considered 
-	// when is moving faster than 3 mph 
-	// (this is just an arbitrary limit, based of the model 
+	// when is moving faster than 0.25 m/s (0.56 miles / hours) 
+	// this is just an arbitrary limit, based of the model 
 	// not been defined for stationary tires.
-	if (ndAbs(tireSpeed) > ndFloat32(0.9f))
+	if (ndAbs(tireSpeed) > ndFloat32(0.25f))
 	{
-		// apply brush tire model only when center travels faster that 10 miles per hours
-		const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point) - tireBody->GetVelocity() + tireVeloc);
+		//const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point) - tireBody->GetVelocity() + tireVeloc);
+		const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
 		const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
 		const ndVector relVeloc(contactVeloc0 - contactVeloc1);
 
@@ -878,15 +878,24 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 longitudialSlip = relSpeed / tireSpeed;
 
 		// calculate side slip ratio
-		const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		const ndFloat32 lateralSlip = sideSpeed / (relSpeed + ndFloat32(1.0f));
+		//const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
+		//const ndFloat32 lateralSlip = sideSpeed / (relSpeed + ndFloat32(1.0f));
+		const ndFloat32 sideSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
+		const ndFloat32 lateralSlip = sideSpeed / tireSpeed;
 
-		const ndFloat32 den = ndFloat32(1.0f) / (ndFloat32(1.0f) + longitudialSlip);
+		const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
 		const ndFloat32 v = lateralSlip * den;
 		const ndFloat32 u = longitudialSlip * den;
 
-		//if (u > 0.5f || v > 0.5f)
-		//dTrace(("(%d %f %f)\n", tireBody->GetId(), u, v));
+		if (tireBody->GetId() == 3)
+		{
+			if (longitudialSlip > 0.5f)
+			{
+				ndTrace(("(%d longSlip=%f\n", tireBody->GetId(), longitudialSlip));
+			}
+			//ndTrace(("(%d (%f %f) (%f %f))\n", tireBody->GetId(), longitudialSlip, u, lateralSlip, v));
+			ndTrace(("(%d longSlip=%f\n", tireBody->GetId(), longitudialSlip));
+		}
 		tire->m_lateralSlip = ndMax (tire->m_lateralSlip, v);
 		tire->m_longitudinalSlip = ndMax(tire->m_longitudinalSlip, u);
 
