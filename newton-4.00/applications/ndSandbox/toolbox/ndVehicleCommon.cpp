@@ -517,7 +517,7 @@ void ndBasicVehicle::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 {
 	ndMultiBodyVehicle::PostUpdate(world, timestep);
 
-#if 1
+#if 0
 	// add a wind tunnel for calibration
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = m_chassis->GetMatrix().m_posit;
