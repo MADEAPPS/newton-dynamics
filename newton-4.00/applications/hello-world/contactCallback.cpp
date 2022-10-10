@@ -85,8 +85,8 @@ int main(int, const char**)
   // stable simulations for most standard scenarios including those with joints.
   world.SetSubSteps(2);
 
-  // Install global callback handler for various contact events like
-  // AABB overlap and genuine contacts.
+  // Install our own ContactNotify callback handler. Newton will call its
+  // various methods to signal AABB overlaps or contact events.
   world.SetContactNotify(new MyContactNotify());
 
   // Create a ball above a floor box.
@@ -100,8 +100,13 @@ int main(int, const char**)
   for (ndInt32 i = 0; i < 240; i++)
   {
     world.Update(1.0f / 60.0f);
+
+    // Print the body position every 10 frames.
     if (frameCnt++ % 10 == 0)
     {
+      // Wait for Newton to finish its calculations.
+      world.Sync();
+
       ndVector smat = sphere->GetMatrix().m_posit;
       ndVector fmat = floor->GetMatrix().m_posit;
       printf("Frame %3d: Sphere=(%.1f, %.1f, %.1f)  Floor=(%.1f, %.1f, %.1f)\n",
