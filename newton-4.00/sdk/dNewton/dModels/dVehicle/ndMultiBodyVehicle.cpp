@@ -861,6 +861,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	ndAssert(tireBody != otherBody);
 	ndAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
+#if 1
 	const ndVector tireVeloc(tireBody->GetVelocity());
 	const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
 	// tire non linear brush model is only considered 
@@ -926,6 +927,48 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
 		contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
 	}
+#else
+
+	auto SetFriction = [this, tire, &contactPoint](ndFloat32 longitudinalFrictionCoefficient, ndFloat32 lateralFrictionCoefficient)
+	{
+		contactPoint.m_material.m_restitution = ndFloat32(0.1f);
+		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
+		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
+
+		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
+		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+	};
+
+
+	const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
+	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
+	const ndVector relVeloc(contactVeloc0 - contactVeloc1);
+
+	// tire non linear brush model is only considered 
+	// when is moving faster than 0.25 m/s (0.56 miles / hours) 
+	// this is just an arbitrary limit, based of the model 
+	// not been defined for stationary tires.
+	const ndFloat32 relSpeed = relVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
+	if (relSpeed < ndFloat32(-1.0e-5f))
+	{
+		// tire is in traction mode.
+		ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		SetFriction(frictionCoefficient, frictionCoefficient);
+	}
+	if (relSpeed > ndFloat32(1.0e-5f))
+	{
+		// tire is in breaking mode.
+		ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		SetFriction(frictionCoefficient, frictionCoefficient);
+	}
+	else
+	{
+		// tire is low speed use static model.
+		ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		SetFriction(frictionCoefficient, frictionCoefficient);
+	}
+
+#endif
 }
 
 void ndMultiBodyVehicle::ApplyTireModel()
