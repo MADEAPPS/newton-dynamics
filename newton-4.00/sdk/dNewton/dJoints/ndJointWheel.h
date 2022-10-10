@@ -19,7 +19,8 @@ class ndWheelDescriptor
 {
 	public:
 	ndWheelDescriptor()
-		:m_springK(ndFloat32(1.0f))
+		:m_radios(ndFloat32(0.5f))
+		,m_springK(ndFloat32(1.0f))
 		,m_damperC(ndFloat32(0.0f))
 		,m_upperStop(ndFloat32(-0.1f))
 		,m_lowerStop(ndFloat32(0.2f))
@@ -35,6 +36,7 @@ class ndWheelDescriptor
 	D_NEWTON_API void Save(nd::TiXmlNode* const xmlNode) const;
 	D_NEWTON_API void Load(const nd::TiXmlNode* const xmlNode);
 	
+	ndFloat32 m_radios;
 	ndFloat32 m_springK;
 	ndFloat32 m_damperC;
 	ndFloat32 m_upperStop;
@@ -50,7 +52,6 @@ class ndWheelDescriptor
 class ndJointWheel: public ndJointBilateralConstraint
 {
 	public:
-
 	D_CLASS_REFLECTION(ndJointWheel);
 	D_NEWTON_API ndJointWheel(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
@@ -61,17 +62,12 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API void SetSteering(ndFloat32 normalidedSteering);
 	
 	D_NEWTON_API void UpdateTireSteeringAngleMatrix();
+
+	D_NEWTON_API ndMatrix CalculateBaseFrame() const;
 	D_NEWTON_API ndMatrix CalculateUpperBumperMatrix() const;
 
-	const ndWheelDescriptor& GetInfo() const
-	{
-		return m_info;
-	}
-
-	void SetInfo(const ndWheelDescriptor& info)
-	{
-		m_info = info;
-	}
+	D_NEWTON_API const ndWheelDescriptor& GetInfo() const;
+	D_NEWTON_API void SetInfo(const ndWheelDescriptor& info);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

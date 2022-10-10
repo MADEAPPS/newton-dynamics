@@ -197,15 +197,19 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
 		// and attach them to the chassis with a tire joints
-		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
-		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
-		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(m_configuration.m_rearTire, rr_tire_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(m_configuration.m_rearTire, rl_tire_body);
+		ndVehicleDectriptor::ndTireDefinition rr_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition rl_tireConfiguration(m_configuration.m_rearTire);
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, rr_tireConfiguration, "rr_tire");
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, rl_tireConfiguration, "rl_tire");
+		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(rr_tireConfiguration, rr_tire_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(rl_tireConfiguration, rl_tire_body);
 
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
-		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(m_configuration.m_frontTire, fr_tire_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(m_configuration.m_frontTire, fl_tire_body);
+		ndVehicleDectriptor::ndTireDefinition fr_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition fl_tireConfiguration(m_configuration.m_frontTire);
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, fr_tireConfiguration, "fr_tire");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, fl_tireConfiguration, "fl_tire");
+		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;

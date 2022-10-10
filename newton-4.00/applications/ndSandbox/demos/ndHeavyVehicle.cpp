@@ -442,23 +442,31 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		ndWorld* const world = scene->GetWorld();
 		ndBodyDynamic* const chassis = m_chassis;
 
-		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_3");
-		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_3");
-		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_2");
-		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_2");
-		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(m_configuration.m_rearTire, rr_tire0_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(m_configuration.m_rearTire, rl_tire0_body);
-		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(m_configuration.m_rearTire, rr_tire1_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(m_configuration.m_rearTire, rl_tire1_body);
+		ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r2_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r3_tireConfiguration(m_configuration.m_rearTire);
+		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, r0_tireConfiguration, "rtire_3");
+		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, r1_tireConfiguration, "ltire_3");
+		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, r2_tireConfiguration, "rtire_2");
+		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, r3_tireConfiguration, "ltire_2");
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(r2_tireConfiguration, rr_tire1_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(r3_tireConfiguration, rl_tire1_body);
 
-		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_0");
-		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_0");
-		ndBodyDynamic* const fr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_1");
-		ndBodyDynamic* const fl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_1");
-		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddTire(m_configuration.m_frontTire, fr_tire0_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddTire(m_configuration.m_frontTire, fl_tire0_body);
-		ndMultiBodyVehicleTireJoint* const fr_tire1 = AddTire(m_configuration.m_frontTire, fr_tire1_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire1 = AddTire(m_configuration.m_frontTire, fl_tire1_body);
+		ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f2_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f3_tireConfiguration(m_configuration.m_frontTire);
+		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, f0_tireConfiguration, "rtire_0");
+		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, f1_tireConfiguration, "ltire_0");
+		ndBodyDynamic* const fr_tire1_body = CreateTireBody(scene, chassis, f2_tireConfiguration, "rtire_1");
+		ndBodyDynamic* const fl_tire1_body = CreateTireBody(scene, chassis, f3_tireConfiguration, "ltire_1");
+		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddTire(f0_tireConfiguration, fr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddTire(f1_tireConfiguration, fl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire1 = AddTire(f2_tireConfiguration, fr_tire1_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire1 = AddTire(f3_tireConfiguration, fl_tire1_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
@@ -631,16 +639,20 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 		ndBodyDynamic* const chassis = m_chassis;
 
-		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
-		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
-		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(m_configuration.m_rearTire, rr_tire0_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(m_configuration.m_rearTire, rl_tire0_body);
+		ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
+		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, r0_tireConfiguration, "rr_tire");
+		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, r1_tireConfiguration, "rl_tire");
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
 
+		ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
 		ndBodyDynamic* const frontAxel_body = MakeFronAxel(scene, chassis);
-		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, frontAxel_body, m_configuration.m_frontTire, "fr_tire");
-		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, frontAxel_body, m_configuration.m_frontTire, "fl_tire");
-		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddAxleTire(m_configuration.m_frontTire, fr_tire0_body, frontAxel_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddAxleTire(m_configuration.m_frontTire, fl_tire0_body, frontAxel_body);
+		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, frontAxel_body, f0_tireConfiguration, "fr_tire");
+		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, frontAxel_body, f1_tireConfiguration, "fl_tire");
+		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddAxleTire(f0_tireConfiguration, fr_tire0_body, frontAxel_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddAxleTire(f1_tireConfiguration, fl_tire0_body, frontAxel_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
@@ -804,22 +816,26 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		//ndWorld* const world = scene->GetWorld();
 		ndBodyDynamic* const chassis = m_chassis;
 
-		ndVehicleDectriptor::ndTireDefinition frontTireInfo(m_configuration.m_frontTire);
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, frontTireInfo, "fl_tire");
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, frontTireInfo, "fr_tire");
-		AddTire(frontTireInfo, fr_tire_body);
-		AddTire(frontTireInfo, fl_tire_body);
+		ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, f0_tireConfiguration, "fl_tire");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, f1_tireConfiguration, "fr_tire");
+		AddTire(f0_tireConfiguration, fr_tire_body);
+		AddTire(f0_tireConfiguration, fl_tire_body);
 
-		ndVehicleDectriptor::ndTireDefinition rearTireInfo(m_configuration.m_rearTire);
-		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, rearTireInfo, "rl_midle_tire");
-		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, rearTireInfo, "rr_midle_tire");
-		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, rearTireInfo, "rl_tire");
-		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, rearTireInfo, "rr_tire");
+		ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r2_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r3_tireConfiguration(m_configuration.m_rearTire);
+		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, r0_tireConfiguration, "rl_midle_tire");
+		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, r1_tireConfiguration, "rr_midle_tire");
+		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, r2_tireConfiguration, "rl_tire");
+		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, r3_tireConfiguration, "rr_tire");
 		
-		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(rearTireInfo, rr_tire0_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(rearTireInfo, rl_tire0_body);
-		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(rearTireInfo, rr_tire1_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(rearTireInfo, rl_tire1_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(r2_tireConfiguration, rr_tire1_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(r3_tireConfiguration, rl_tire1_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;

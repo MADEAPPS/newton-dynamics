@@ -111,6 +111,17 @@ void ndJointWheel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "normalizedHandBrake", m_normalizedHandBrake);
 }
 
+const ndWheelDescriptor& ndJointWheel::GetInfo() const
+{
+	return m_info;
+}
+
+void ndJointWheel::SetInfo(const ndWheelDescriptor& info)
+{
+	m_info = info;
+}
+
+
 void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
 {
 	m_normalizedBrake = ndClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
@@ -142,6 +153,11 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 
 	const ndMatrix tireBodyMatrix(m_localMatrix0.Inverse() * newTireMatrix);
 	m_body0->SetMatrix(tireBodyMatrix);
+}
+
+ndMatrix ndJointWheel::CalculateBaseFrame() const
+{
+	return m_localMatrix1 * m_body1->GetMatrix();
 }
 
 ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const

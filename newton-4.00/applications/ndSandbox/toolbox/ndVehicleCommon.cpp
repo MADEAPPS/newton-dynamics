@@ -306,13 +306,14 @@ void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, ndFloat
 	radius = size.m_y * 0.5f;
 }
 
-ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
+ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
 {
 	ndFloat32 width;
 	ndFloat32 radius;
 	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
 	CalculateTireDimensions(tireName, width, radius, parentEntity);
 
+	definition.m_radios = radius;
 	ndShapeInstance tireCollision(CreateTireShape(radius, width));
 
 	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);
@@ -523,10 +524,24 @@ void ndBasicVehicle::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	matrix.m_posit.m_y = 0.0f;
 	matrix = matrix.Inverse();
 	m_chassis->SetMatrix(m_chassis->GetMatrix() * matrix);
+
+	ndMatrix chassisMatrix(m_chassis->GetMatrix());
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
-		joint->GetBody0()->SetMatrix(joint->GetBody0()->GetMatrix() * matrix);
+		ndBodyKinematic* const tireBody = joint->GetBody0();
+		
+		ndMatrix timeHubMatrix(joint->CalculateBaseFrame());
+		ndVector tireVeloc(tireBody->GetVelocity());
+		ndFloat32 speed = tireVeloc.DotProduct(timeHubMatrix.m_right).GetScalar();
+
+		ndMatrix tireMatrix(tireBody->GetMatrix());
+		ndFloat32 sign = -ndSign(tireMatrix.m_front.DotProduct(chassisMatrix.m_right).GetScalar());
+
+		ndFloat32 angle = sign * speed * timestep / joint->GetInfo().m_radios;
+		ndMatrix pitchMatrix(ndPitchMatrix(angle));
+		
+		tireBody->SetMatrix(pitchMatrix * tireMatrix * matrix);
 	}
 	
 	for (ndList<ndMultiBodyVehicleDifferential*>::ndNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())

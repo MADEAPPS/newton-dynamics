@@ -852,7 +852,8 @@ namespace biped2
 			//action[action GetMaxIndex() valueIndex] = 1.0f;
 		}
 
-		void PredictAction(ndFloat32 timestep)
+		//void PredictAction(ndFloat32 timestep)
+		void PredictAction(ndFloat32)
 		{
 			#if 0
 			ndArray<ndReal>& action = m_dqnAgent.m_transition.m_action;

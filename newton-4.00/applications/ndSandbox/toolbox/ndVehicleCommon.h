@@ -148,7 +148,7 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	ndFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
-	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
+	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
 	ndVehicleDectriptor m_configuration;
 	ndFloat32 m_steerAngle;

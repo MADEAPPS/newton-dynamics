@@ -760,14 +760,15 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	ndVector effectiveCom(chassisMatrix.m_posit.Scale(totalMass));
 
 	// draw front direction for side slip angle reference
-	ndVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
-	ndVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
-	context.DrawLine(p0, p1, ndVector(1.0f, 1.0f, 1.0f, 0.0f));
 
 	// draw velocity vector
 	ndVector veloc(m_chassis->GetVelocity());
+	ndVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
+	ndVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
 	ndVector p2(p0 + veloc.Scale (0.25f));
+
 	context.DrawLine(p0, p2, ndVector(1.0f, 1.0f, 0.0f, 0.0f));
+	context.DrawLine(p0, p1, ndVector(1.0f, 0.0f, 0.0f, 0.0f));
 
 	// draw body acceleration
 	//ndVector accel(m_chassis->GetAccel());
@@ -796,6 +797,9 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		// draw upper bumper
 		ndMatrix upperBumberMatrix(tireJoint->CalculateUpperBumperMatrix());
 		//context.DrawFrame(tireJoint->CalculateUpperBumperMatrix());
+
+		ndMatrix tireBaseFrame(tireJoint->CalculateBaseFrame());
+		//context.DrawFrame(tireBaseFrame);
 
 		// show tire center of mass;
 		ndMatrix tireFrame(tireBody->GetMatrix());
