@@ -33,7 +33,7 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(ndFloat32(0.0f))
 	,m_maxOmega(ndFloat32(100.0f))
-	,m_omegaStep(ndFloat32(8.0f))
+	,m_omegaStep(ndFloat32(16.0f))
 	,m_targetOmega(ndFloat32(0.0f))
 	,m_engineTorque(ndFloat32(0.0f))
 	,m_internalFriction(ndFloat32(100.0f))
@@ -106,6 +106,7 @@ void ndMultiBodyVehicleMotor::SetOmegaAccel(ndFloat32 rpmStep)
 void ndMultiBodyVehicleMotor::SetTorqueAndRpm(ndFloat32 newtonMeters, ndFloat32 rpm)
 {
 	m_engineTorque = ndMax(newtonMeters, ndFloat32(0.0f));
+//m_engineTorque *= 3.0f;
 	m_targetOmega = ndClamp(rpm / dRadPerSecToRpm, ndFloat32(0.0f), m_maxOmega);
 }
 

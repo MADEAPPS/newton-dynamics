@@ -38,7 +38,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		//m_useHardSolverMode = false;
 		m_comDisplacement = ndVector(0.25f, -0.35f, 0.0f, 0.0f);
 
-		ndFloat32 idleTorquePoundFoot = 100.0f;
+		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 700.0f;
 		ndFloat32 horsePower = 400.0f;
 		ndFloat32 rpm0 = 5000.0f;
