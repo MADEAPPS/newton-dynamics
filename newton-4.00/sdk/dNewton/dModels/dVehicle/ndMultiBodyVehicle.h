@@ -95,7 +95,6 @@ class ndMultiBodyVehicle: public ndModel
 
 	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
 
-
 	private:
 	void ApplySteering();
 	void ApplyTireModel();
