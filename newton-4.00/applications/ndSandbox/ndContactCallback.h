@@ -23,6 +23,7 @@ class ndApplicationMaterial : public ndMaterial
 		m_aiCar = 2,
 		m_aiTerrain = 3,
 		m_modelPart = 4,
+		m_vehicelTirePart = 5,
 		m_dedris = 100,
 	};
 

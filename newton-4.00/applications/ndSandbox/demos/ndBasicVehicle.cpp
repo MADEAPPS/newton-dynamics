@@ -22,11 +22,47 @@
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
+
+class ndVehicleMaterial: public ndApplicationMaterial
+{
+	public:
+	ndVehicleMaterial()
+		:ndApplicationMaterial()
+	{
+	}
+
+	ndVehicleMaterial(const ndVehicleMaterial& src)
+		:ndApplicationMaterial(src)
+	{
+	}
+
+	ndVehicleMaterial* Clone() const
+	{
+		return new ndVehicleMaterial(*this);
+	}
+
+	void OnContactCallback(const ndContact* const joint, ndFloat32) const
+	{
+		// here we override contact friction if needed
+		const ndMaterial* const matetial = ((ndContact*) joint)->GetMaterial();
+		ndContactPointList& contactPoints = ((ndContact*)joint)->GetContactPoints();
+		for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+		{
+			ndContactMaterial& contactPoint = contactNode->GetInfo();
+			ndMaterial& material = contactPoint.m_material;
+			material.m_staticFriction0 = matetial->m_staticFriction0;
+			material.m_dynamicFriction0 = matetial->m_dynamicFriction0;
+			material.m_staticFriction1 = matetial->m_staticFriction1;
+			material.m_dynamicFriction1 = matetial->m_dynamicFriction1;
+		}
+	}
+};
 
 class ndVehicleDectriptorViper : public ndVehicleDectriptor
 {
@@ -213,6 +249,12 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, fl_tireConfiguration, "fl_tire");
 		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
+
+		// asign tirse material id.
+		fr_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
+		fl_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
+		rr_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
+		rl_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
@@ -669,6 +711,17 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}
+
+	ndVehicleMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicelTirePart, ndApplicationMaterial::m_default);
+	//callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();
