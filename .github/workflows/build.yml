@@ -6,33 +6,44 @@ on:
     branches: [ master ]
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
 
+    - name: Setup Linux
+      shell: bash
+      run: |
+        sudo apt update
+        sudo apt install -y cmake ninja-build
+        cmake --version
+        ninja --version
+
     - name: Build And Install Newton
+      shell: bash
       run: |
         cd newton-4.00
-        cmake -S . -B build/ -DNEWTON_BUILD_SANDBOX_DEMOS=OFF
+        cmake \
+            -S . -B build \
+            -DNEWTON_BUILD_SANDBOX_DEMOS=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -G "Ninja" \
+            -DCMAKE_INSTALL_PREFIX:PATH=/tmp/newton
+
         cmake --build build -j2
-        sudo cmake --build build --target install
+        cmake --install build --strip
 
     - name: Build And Run Hello World Apps
+      shell: bash
       run: |
-        cp -r newton-4.00/applications/hello-world /tmp/myapp
-        cd /tmp/myapp
-        cmake -S . -B build/
+        cd newton-4.00/applications/hello-world
+        cmake -S . -B build/ -DCMAKE_INSTALL_PREFIX:PATH=/tmp/newton
         cmake --build build/
-        echo ""
 
-    - name: Run Hello World Demo
-      run: |
-        /tmp/myapp/build/hello
+        echo -e "\n\n---------- Hello World\n"
+        build/hello
 
-    - name: Run Transform Callback Demo
-      run: |
-        /tmp/myapp/build/transformCallback
+        echo -e "\n\n---------- TransformCallback\n"
+        build/transformCallback
 
-    - name: Run Contact Callback Demo
-      run: |
-        /tmp/myapp/build/contactCallback
+        echo -e "\n\n---------- ContactCallback\n"
+        build/contactCallback

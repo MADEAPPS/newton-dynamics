@@ -6,8 +6,8 @@ cmake_minimum_required(VERSION 3.18.0 FATAL_ERROR)
 # ----------------------------------------------------------------------
 
 # Where `make install` put the Newton headers and libraries.
-include_directories(/usr/local/include/ndNewton)
-set(CMAKE_LIBRARY_PATH /usr/local/lib)
+include_directories(${CMAKE_INSTALL_PREFIX}/include/ndNewton)
+set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Ensure the Newton libraries are installed.
 find_library(NEWTON_LIB ndNewton REQUIRED)
