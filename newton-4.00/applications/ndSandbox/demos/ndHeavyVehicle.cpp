@@ -76,7 +76,7 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
-		m_frictionCoefficientScale = 1.3f;
+		m_frictionCoefficientScale = 1.0f;
 		
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_eightWheeldrive;
@@ -137,7 +137,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 
 		m_transmission.m_crownGearRatio = 20.0f;
 
-		m_frictionCoefficientScale = 1.3f;
+		m_frictionCoefficientScale = 1.0f;
 
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
@@ -194,7 +194,7 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 		m_rearTire.m_longitudinalStiffness = 50.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
-		m_frictionCoefficientScale = 1.3f;
+		m_frictionCoefficientScale = 1.0f;
 
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_eightWheeldrive;

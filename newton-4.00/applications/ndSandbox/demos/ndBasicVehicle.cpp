@@ -100,7 +100,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 		
-		m_frictionCoefficientScale = 1.2f;
+		m_frictionCoefficientScale = 1.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}
@@ -150,7 +150,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_rearTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 		
-		m_frictionCoefficientScale = 1.3f;
+		m_frictionCoefficientScale = 1.0f;
 	
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;

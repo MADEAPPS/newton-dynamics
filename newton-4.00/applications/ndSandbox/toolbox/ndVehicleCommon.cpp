@@ -145,8 +145,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_brakeTorque = 1500.0f;
 	m_frontTire.m_handBrakeTorque = 1500.0f;
 	m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
-	m_frontTire.m_laterialStiffness  = 100.0f / 1000.0f;
-	m_frontTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
+	m_frontTire.m_laterialStiffness  = 30.0f * DEMO_GRAVITY * m_chassisMass;
+	m_frontTire.m_longitudinalStiffness  = 10.0f * DEMO_GRAVITY * m_chassisMass;
 
 	m_rearTire.m_mass = 20.0f;
 	m_rearTire.m_springK = 1000.0f;
@@ -158,8 +158,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_verticalOffset = 0.0f;
 	m_rearTire.m_brakeTorque = 1500.0f;
 	m_rearTire.m_handBrakeTorque = 1000.0f;
-	m_rearTire.m_laterialStiffness  = 100.0f / 1000.0f;
-	m_rearTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
+	m_rearTire.m_laterialStiffness  = 30.0f * DEMO_GRAVITY * m_chassisMass;
+	m_rearTire.m_longitudinalStiffness  = 10.0f * DEMO_GRAVITY * m_chassisMass;
 
 	m_motorMass = 20.0f;
 	m_motorRadius = 0.25f;
@@ -167,7 +167,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_differentialMass = 20.0f;
 	m_differentialRadius = 0.25f;
 	m_slipDifferentialRmpLock = 30.0f;
-	m_frictionCoefficientScale = 1.5f;
+	m_frictionCoefficientScale = 1.0f;
 
 	m_torsionBarSpringK = 100.0f;
 	m_torsionBarDamperC = 10.0f;

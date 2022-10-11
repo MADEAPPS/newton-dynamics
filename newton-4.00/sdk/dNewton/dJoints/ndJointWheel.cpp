@@ -69,6 +69,11 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_normalidedSteering(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
 {
+	m_info.m_laterialStiffness = ndAbs(m_info.m_laterialStiffness);
+	m_info.m_longitudinalStiffness = ndAbs(m_info.m_longitudinalStiffness);
+
+	ndAssert(m_info.m_laterialStiffness > ndFloat32(0.0f));
+	ndAssert(m_info.m_longitudinalStiffness > ndFloat32(0.0f));
 }
 
 ndJointWheel::ndJointWheel(const ndLoadSaveBase::ndLoadDescriptor& desc)

@@ -861,109 +861,12 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	ndAssert(tireBody != otherBody);
 	ndAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
-#if 0
-	const ndVector tireVeloc(tireBody->GetVelocity());
-	const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-	// tire non linear brush model is only considered 
-	// when is moving faster than 0.25 m/s (0.56 miles / hours) 
-	// this is just an arbitrary limit, based of the model 
-	// not been defined for stationary tires.
-	if (ndAbs(tireSpeed) > ndFloat32(0.25f))
-	{
-		//const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point) - tireBody->GetVelocity() + tireVeloc);
-		const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
-		const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
-		const ndVector relVeloc(contactVeloc0 - contactVeloc1);
-
-		const ndFloat32 relSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		const ndFloat32 longitudialSlip = relSpeed / tireSpeed;
-
-		// calculate side slip ratio
-		//const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		//const ndFloat32 lateralSlip = sideSpeed / (relSpeed + ndFloat32(1.0f));
-		const ndFloat32 sideSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		const ndFloat32 lateralSlip = sideSpeed / tireSpeed;
-
-		const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
-		const ndFloat32 v = lateralSlip * den;
-		const ndFloat32 u = longitudialSlip * den;
-
-		if (tireBody->GetId() == 3)
-		{
-			if (longitudialSlip > 0.5f)
-			{
-				ndTrace(("(%d longSlip=%f\n", tireBody->GetId(), longitudialSlip));
-			}
-			//ndTrace(("(%d (%f %f) (%f %f))\n", tireBody->GetId(), longitudialSlip, u, lateralSlip, v));
-			ndTrace(("(%d longSlip=%f\n", tireBody->GetId(), longitudialSlip));
-		}
-		tire->m_lateralSlip = ndMax (tire->m_lateralSlip, v);
-		tire->m_longitudinalSlip = ndMax(tire->m_longitudinalSlip, u);
-
-		const ndWheelDescriptor& info = tire->GetInfo();
-		const ndFloat32 cz = info.m_laterialStiffness  * v;
-		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
-		const ndFloat32 gamma = ndMax (ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
-
-		const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-		const ndFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
-		const ndFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-		//dTrace(("(%d %f %f) ", tireBody->GetId(), lateralFrictionCoefficient, longitudinalFrictionCoefficient));
-
-		contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
-		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
-	}
-	else
-	{
-		// at low speed the tire act like a normal rigid body
-		const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-		contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-		contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
-		contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
-
-		contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
-	}
-#else
-
 	auto SetFriction = [this, tire, &contactPoint](ndFloat32 longitudinalFrictionCoefficient, ndFloat32 lateralFrictionCoefficient)
 	{
 		contactPoint.m_material.m_restitution = ndFloat32(0.1f);
 		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 
-		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
-	};
-
-	auto SetBrushFriction = [this, tire, &contactPoint](ndFloat32 longitudialSlip)
-	{
-		ndAssert(longitudialSlip >= 0.0f);
-		const ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
-		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 sideSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		const ndFloat32 lateralSlip = sideSpeed / tireSpeed;
-
-		const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
-		const ndFloat32 v = lateralSlip * den;
-		const ndFloat32 u = longitudialSlip * den;
-
-		const ndWheelDescriptor& info = tire->GetInfo();
-		const ndFloat32 cz = info.m_laterialStiffness  * v;
-		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
-		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
-
-		const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-		const ndFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
-		const ndFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-
-		contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
 		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
 	};
@@ -977,33 +880,58 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	// this is just an arbitrary limit, based of the model 
 	// not been defined for stationary tires.
 	const ndFloat32 relSpeed = relVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
-	if (relSpeed < ndFloat32(-1.0e-5f))
+	if (ndAbs(relSpeed) > ndFloat32(1.0e-5f))
 	{
-		// tire is in traction mode.
-		const ndVector rotationVeloc(tireBody->GetOmega().CrossProduct(contactPoint.m_point - tireBody->GetMatrix().m_posit));
-		ndFloat32 wr = ndAbs (rotationVeloc.DotProduct(contactPoint.m_dir1).GetScalar()) + ndFloat32 (1.0e-4f);
-		ndFloat32 longitudialSlip = -relSpeed / wr;
+		ndFloat32 longitudialSlip = ndFloat32(0.0f);
+		if (relSpeed < ndFloat32(-1.0e-5f))
+		{
+			// tire is in traction mode.
+			const ndVector rotationVeloc(tireBody->GetOmega().CrossProduct(contactPoint.m_point - tireBody->GetMatrix().m_posit));
+			ndFloat32 wr = ndAbs(rotationVeloc.DotProduct(contactPoint.m_dir1).GetScalar()) + ndFloat32(1.0e-4f);
+			longitudialSlip = -relSpeed / wr;
+		}
+		else
+		{
+			// tire is in breaking mode.
+			const ndVector tireVeloc(tireBody->GetVelocity());
+			const ndFloat32 vr = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+			longitudialSlip = relSpeed / vr;
+		}
 
-		//onst ndVector tireVeloc(tireBody->GetVelocity());
-		//onst ndFloat32 vr = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		//dFloat32 longitudialSlip = -relSpeed / vr;
-
-		ndTrace(("%f \n", longitudialSlip));
-		SetBrushFriction(longitudialSlip);
-	}
-	if (relSpeed > ndFloat32(1.0e-5f))
-	{
-		// tire is in breaking mode.
+		ndAssert(longitudialSlip >= 0.0f);
 		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 vr = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		ndFloat32 longitudialSlip = relSpeed / vr;
+		const ndFloat32 sideSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
+		const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+		const ndFloat32 lateralSlip = sideSpeed / tireSpeed;
 
-		//const ndVector rotationVeloc(tireBody->GetOmega().CrossProduct(contactPoint.m_point - tireBody->GetMatrix().m_posit));
-		//ndFloat32 wr = ndAbs(rotationVeloc.DotProduct(contactPoint.m_dir1).GetScalar()) + ndFloat32(1.0e-4f);
-		//ndFloat32 longitudialSlip = relSpeed / wr;
+		const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
+		const ndFloat32 v = lateralSlip * den;
+		const ndFloat32 u = longitudialSlip * den;
 
-		ndTrace(("%f \n", longitudialSlip));
-		SetBrushFriction(longitudialSlip);
+		const ndWheelDescriptor& info = tire->GetInfo();
+		const ndFloat32 cz = info.m_laterialStiffness  * v;
+		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
+
+		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
+		const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32 (1.0f);
+
+		const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
+		const ndFloat32 b = ndFloat32(1.0f) / (ndFloat32(3.0f) * maxForceForce);
+		const ndFloat32 c = ndFloat32(1.0f) / (ndFloat32(27.0f) * maxForceForce * maxForceForce);
+		const ndFloat32 f = (gamma < ndFloat32(3.0f) * maxForceForce) ? gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma) : maxForceForce;
+		
+		const ndFloat32 lateralForce = f * cz / gamma;
+		const ndFloat32 longitudinalForce = f * cx / gamma;
+		
+		const ndFloat32 lateralFrictionCoefficient = lateralForce / normalForce;
+		const ndFloat32 longitudinalFrictionCoefficient = longitudinalForce / normalForce;
+		SetFriction(longitudinalFrictionCoefficient, lateralFrictionCoefficient);
+
+		if (tireBody->GetId() == 3)
+		{
+			//ndTrace(("id: %d  longitudinal:%f lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
+		}
 	}
 	else
 	{
@@ -1011,8 +939,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
 		SetFriction(frictionCoefficient, frictionCoefficient);
 	}
-
-#endif
 }
 
 void ndMultiBodyVehicle::ApplyTireModel()
