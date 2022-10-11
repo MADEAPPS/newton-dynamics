@@ -110,9 +110,6 @@ class ndVehicleDectriptor
 	ndGearBox m_transmission;
 	ndTireDefinition m_frontTire;
 	ndTireDefinition m_rearTire;
-
-	ndFloat32 m_frictionCoefficientScale;
-
 	ndFloat32 m_motorMass;
 	ndFloat32 m_motorRadius;
 
@@ -145,8 +142,6 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
-	ndFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
-
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 

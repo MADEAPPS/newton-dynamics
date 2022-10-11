@@ -412,6 +412,11 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	m_downForce.Save(childNode);
 }
 
+ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
+{
+	return this;
+}
+
 void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 {
 	world->AddBody(m_chassis);
@@ -913,7 +918,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
 
 		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
-		const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
 		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32 (1.0f);
 
 		const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
@@ -932,12 +937,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		{
 			//ndTrace(("id: %d  longitudinal:%f lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
 		}
-	}
-	else
-	{
-		// tire is low speed use static model.
-		ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-		SetFriction(frictionCoefficient, frictionCoefficient);
 	}
 }
 
@@ -1008,26 +1007,6 @@ void ndMultiBodyVehicle::ApplyTireModel()
 						{
 							BrushTireModel(tire, contactPoint);
 						}
-						else
-						{
-							const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-							contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-							contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
-							contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
-
-							contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
-							contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
-						}
-					}
-					else
-					{
-						const ndFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-						contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-						contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
-						contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
-
-						contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
-						contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
 					}
 				}
 			}

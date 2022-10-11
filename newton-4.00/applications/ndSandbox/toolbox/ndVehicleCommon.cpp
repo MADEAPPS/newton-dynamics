@@ -167,7 +167,6 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_differentialMass = 20.0f;
 	m_differentialRadius = 0.25f;
 	m_slipDifferentialRmpLock = 30.0f;
-	m_frictionCoefficientScale = 1.0f;
 
 	m_torsionBarSpringK = 100.0f;
 	m_torsionBarDamperC = 10.0f;
@@ -270,11 +269,6 @@ void ndBasicVehicle::SetAsPlayer(ndDemoEntityManager* const, bool mode)
 bool ndBasicVehicle::IsPlayer() const
 {
 	return m_isPlayer;
-}
-
-ndFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const
-{
-	return m_configuration.m_frictionCoefficientScale;
 }
 
 void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const

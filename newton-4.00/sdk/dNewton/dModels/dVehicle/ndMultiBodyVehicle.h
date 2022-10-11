@@ -74,10 +74,6 @@ class ndMultiBodyVehicle: public ndModel
 
 	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
 	D_NEWTON_API virtual void RemoveFromToWorld(ndWorld* const world);
-
-	ndMultiBodyVehicle* GetAsMultiBodyVehicle();
-	virtual ndFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
-
 	D_NEWTON_API ndFloat32 GetSpeed() const;
 	D_NEWTON_API ndShapeInstance CreateTireShape(ndFloat32 radius, ndFloat32 width) const;
 
@@ -94,6 +90,8 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API void AddExtraJoint(ndJointBilateralConstraint* const joint);
 
 	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
+
+	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	private:
 	void ApplySteering();
@@ -131,16 +129,6 @@ class ndMultiBodyVehicle: public ndModel
 
 inline void ndMultiBodyVehicle::ApplyInputs(ndWorld* const, ndFloat32)
 {
-}
-
-inline ndFloat32 ndMultiBodyVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const
-{
-	return ndFloat32(2.0f);
-}
-
-inline ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle() 
-{ 
-	return this; 
 }
 
 #endif
