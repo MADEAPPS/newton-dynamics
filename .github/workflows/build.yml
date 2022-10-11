@@ -32,6 +32,11 @@ jobs:
         cmake --build build -j2
         cmake --install build --strip
 
+    - name: Run Tests
+      shell: bash
+      run: |
+        newton-4.00/build/tests/newton_tests
+
     - name: Build And Run Hello World Apps
       shell: bash
       run: |
