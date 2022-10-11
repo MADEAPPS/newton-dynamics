@@ -39,6 +39,7 @@ void ndWheelDescriptor::Load(const nd::TiXmlNode* const xmlNode)
 	m_steeringAngle = xmlGetFloat(childNode, "steeringAngle");
 	m_laterialStiffness = xmlGetFloat(childNode, "laterialStiffness");
 	m_longitudinalStiffness = xmlGetFloat(childNode, "longitudinalStiffness");
+	m_frictionModel = ndFrictionModel(xmlGetInt(childNode, "frictionModel"));
 }
 
 void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
@@ -56,6 +57,7 @@ void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
 	xmlSaveParam(childNode, "steeringAngle", m_steeringAngle);
 	xmlSaveParam(childNode, "laterialStiffness", m_laterialStiffness);
 	xmlSaveParam(childNode, "longitudinalStiffness", m_longitudinalStiffness);
+	xmlSaveParam(childNode, "frictionModel", m_frictionModel);
 }
 
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)

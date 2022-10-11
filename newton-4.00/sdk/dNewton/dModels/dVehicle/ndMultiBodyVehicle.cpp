@@ -1005,7 +1005,18 @@ void ndMultiBodyVehicle::ApplyTireModel()
 						ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
 						if (contactPatch < ndFloat32(-0.71f))
 						{
-							BrushTireModel(tire, contactPoint);
+							switch (tire->m_info.m_frictionModel)
+							{
+								case ndWheelDescriptor::m_brushModel:
+								{
+									BrushTireModel(tire, contactPoint);
+									break;
+								}
+
+								case ndWheelDescriptor::m_coulomb:
+								default:;
+									// assume normal columb model
+							}
 						}
 					}
 				}
