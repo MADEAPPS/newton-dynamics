@@ -34,8 +34,6 @@ class ndShapeInstance;
 #define D_CONSTRAINT_MAX_ROWS			(3 * 16)
 #define D_RESTING_CONTACT_PENETRATION	(D_PENETRATION_TOL + ndFloat32 (1.0f / 1024.0f))
 
-//#define D_USE_PRECONTIONER_EXPERIMENT
-
 D_MSV_NEWTON_ALIGN_32
 class ndContactPoint
 {
@@ -109,14 +107,8 @@ class ndContact: public ndConstraint
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-
-#ifdef D_USE_PRECONTIONER_EXPERIMENT
-	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir0, const ndVector& dir1, const ndPointParam& param) const;
-	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex, const ndVector& preconditioner0, const ndVector& preconditioner1);
-#else
 	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const ndPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex);
-#endif
 
 	ndVector m_positAcc;
 	ndQuaternion m_rotationAcc;
