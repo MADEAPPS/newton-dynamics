@@ -866,16 +866,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	ndAssert(tireBody != otherBody);
 	ndAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
-	//auto SetFriction = [this, tire, &contactPoint](ndFloat32 longitudinalFrictionCoefficient, ndFloat32 lateralFrictionCoefficient)
-	//{
-	//	contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-	//	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-	//	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
-	//
-	//	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-	//	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
-	//};
-
 	const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
 	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
 	const ndVector relVeloc(contactVeloc0 - contactVeloc1);
