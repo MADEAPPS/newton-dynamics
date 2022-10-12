@@ -16,18 +16,25 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTireJoint)
 
-ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info, ndMultiBodyVehicle* const vehicle)
+ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndMultiBodyVehicleTireJointInfo& info, ndMultiBodyVehicle* const vehicle)
 	:ndJointWheel(pinAndPivotFrame, child, parent, info)
 	,m_vehicle(vehicle)
+	,m_frictionModel(info)
 	,m_lateralSlip(ndFloat32 (0.0f))
 	,m_longitudinalSlip(ndFloat32(0.0f))
 {
+	m_frictionModel.m_laterialStiffness = ndMax(ndAbs(m_frictionModel.m_laterialStiffness), ndFloat32(5.0e4f));
+	m_frictionModel.m_longitudinalStiffness = ndMax(ndAbs(m_frictionModel.m_longitudinalStiffness), ndFloat32(5.0e4f));
 }
 
 ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointWheel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_vehicle(nullptr)
+	,m_frictionModel()
+	,m_lateralSlip(ndFloat32(0.0f))
+	,m_longitudinalSlip(ndFloat32(0.0f))
 {
+	ndAssert(0);
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
 	m_lateralSlip = xmlGetFloat(xmlNode, "lateralSlip");
@@ -45,6 +52,7 @@ void ndMultiBodyVehicleTireJoint::Save(const ndLoadSaveBase::ndSaveDescriptor& d
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointWheel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
+	ndAssert(0);
 	xmlSaveParam(childNode, "lateralSlip", m_lateralSlip);
 	xmlSaveParam(childNode, "longitudinalSlip", m_longitudinalSlip);
 }

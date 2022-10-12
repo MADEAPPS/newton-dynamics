@@ -26,12 +26,12 @@
 #include "ndModel.h"
 
 class ndWorld;
-class ndWheelDescriptor;
 class ndMultiBodyVehicleMotor;
 class ndMultiBodyVehicleGearBox;
 class ndMultiBodyVehicleTireJoint;
 class ndMultiBodyVehicleTorsionBar;
 class ndMultiBodyVehicleDifferential;
+class ndMultiBodyVehicleTireJointInfo;
 class ndMultiBodyVehicleDifferentialAxle;
 
 #define dRadPerSecToRpm ndFloat32(9.55f)
@@ -79,8 +79,8 @@ class ndMultiBodyVehicle: public ndModel
 
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndFloat32 mass, ndFloat32 radius);
-	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire);
-	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddAxleTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody);
+	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyDynamic* const tire);
+	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody);
 	D_NEWTON_API ndMultiBodyVehicleGearBox* AddGearBox(ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock);

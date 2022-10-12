@@ -513,7 +513,7 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 	m_chassis = chassis;
 }
 
-ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
 {
 	ndMatrix tireFrame(ndGetIdentityMatrix());
 	tireFrame.m_front = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
@@ -538,7 +538,7 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndWheelDescri
 	return tireJoint;
 }
 
-ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyDynamic* const tire)
 {
 	return AddAxleTire(desc, tire, m_chassis);
 }
@@ -903,7 +903,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 v = lateralSlip * den;
 		const ndFloat32 u = longitudialSlip * den;
 
-		const ndWheelDescriptor& info = tire->GetInfo();
+		//const ndWheelDescriptor& info = tire->GetInfo();
+		const ndTireFrictionModel& info = tire->m_frictionModel;
 		const ndFloat32 cz = info.m_laterialStiffness  * v;
 		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
 
@@ -1008,27 +1009,27 @@ void ndMultiBodyVehicle::ApplyTireModel()
 						ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
 						if (contactPatch < ndFloat32(-0.71f))
 						{
-							switch (tire->m_info.m_frictionModel)
+							switch (tire->m_frictionModel.m_frictionModel)
 							{
-								case ndWheelDescriptor::m_brushModel:
+								case ndTireFrictionModel::m_brushModel:
 								{
 									BrushTireModel(tire, contactPoint);
 									break;
 								}
 
-								case ndWheelDescriptor::m_pacejka:
+								case ndTireFrictionModel::m_pacejka:
 								{
 									PacejkaTireModel(tire, contactPoint);
 									break;
 								}
 
-								case ndWheelDescriptor::m_coulombCicleOfFriction:
+								case ndTireFrictionModel::m_coulombCicleOfFriction:
 								{
 									CoulombFrictionCircleTireModel(tire, contactPoint);
 									break;
 								}
 
-								case ndWheelDescriptor::m_coulomb:
+								case ndTireFrictionModel::m_coulomb:
 								default:;
 									// assume normal coulomb model
 							}

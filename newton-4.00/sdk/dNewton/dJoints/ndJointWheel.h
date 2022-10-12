@@ -18,14 +18,6 @@
 class ndWheelDescriptor
 {
 	public:
-	enum ndFrictionModel
-	{	
-		m_coulomb,
-		m_brushModel,
-		m_pacejka,
-		m_coulombCicleOfFriction,
-	};
-
 	ndWheelDescriptor()
 		:m_radios(ndFloat32(0.5f))
 		,m_springK(ndFloat32(1.0f))
@@ -36,8 +28,6 @@ class ndWheelDescriptor
 		,m_brakeTorque(ndFloat32(0.0f))
 		,m_handBrakeTorque(ndFloat32(0.0f))
 		,m_steeringAngle(ndFloat32(0.0f))
-		,m_laterialStiffness (ndFloat32(0.5f))
-		,m_longitudinalStiffness (ndFloat32(0.5f))
 	{
 	}
 	
@@ -53,9 +43,6 @@ class ndWheelDescriptor
 	ndFloat32 m_brakeTorque;
 	ndFloat32 m_handBrakeTorque;
 	ndFloat32 m_steeringAngle;
-	ndFloat32 m_laterialStiffness;
-	ndFloat32 m_longitudinalStiffness;
-	ndFrictionModel m_frictionModel;
 };
 
 class ndJointWheel: public ndJointBilateralConstraint

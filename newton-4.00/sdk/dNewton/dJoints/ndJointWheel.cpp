@@ -37,9 +37,9 @@ void ndWheelDescriptor::Load(const nd::TiXmlNode* const xmlNode)
 	m_brakeTorque = xmlGetFloat(childNode, "brakeTorque");
 	m_handBrakeTorque = xmlGetFloat(childNode, "handBrakeTorque");
 	m_steeringAngle = xmlGetFloat(childNode, "steeringAngle");
-	m_laterialStiffness = xmlGetFloat(childNode, "laterialStiffness");
-	m_longitudinalStiffness = xmlGetFloat(childNode, "longitudinalStiffness");
-	m_frictionModel = ndFrictionModel(xmlGetInt(childNode, "frictionModel"));
+	//m_laterialStiffness = xmlGetFloat(childNode, "laterialStiffness");
+	//m_longitudinalStiffness = xmlGetFloat(childNode, "longitudinalStiffness");
+	//m_frictionModel = ndFrictionModel(xmlGetInt(childNode, "frictionModel"));
 }
 
 void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
@@ -55,9 +55,10 @@ void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
 	xmlSaveParam(childNode, "brakeTorque", m_brakeTorque);
 	xmlSaveParam(childNode, "handBrakeTorque", m_handBrakeTorque);
 	xmlSaveParam(childNode, "steeringAngle", m_steeringAngle);
-	xmlSaveParam(childNode, "laterialStiffness", m_laterialStiffness);
-	xmlSaveParam(childNode, "longitudinalStiffness", m_longitudinalStiffness);
-	xmlSaveParam(childNode, "frictionModel", m_frictionModel);
+	ndAssert(0);
+	//xmlSaveParam(childNode, "laterialStiffness", m_laterialStiffness);
+	//xmlSaveParam(childNode, "longitudinalStiffness", m_longitudinalStiffness);
+	//xmlSaveParam(childNode, "frictionModel", m_frictionModel);
 }
 
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
@@ -71,11 +72,6 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_normalidedSteering(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
 {
-	m_info.m_laterialStiffness = ndAbs(m_info.m_laterialStiffness);
-	m_info.m_longitudinalStiffness = ndAbs(m_info.m_longitudinalStiffness);
-
-	ndAssert(m_info.m_laterialStiffness > ndFloat32(0.0f));
-	ndAssert(m_info.m_longitudinalStiffness > ndFloat32(0.0f));
 }
 
 ndJointWheel::ndJointWheel(const ndLoadSaveBase::ndLoadDescriptor& desc)
