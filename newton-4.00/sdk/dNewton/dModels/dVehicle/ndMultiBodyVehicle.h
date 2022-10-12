@@ -94,12 +94,15 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	private:
-	void ApplySteering();
+	//void ApplySteering();
 	void ApplyTireModel();
 	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
 	ndBodyDynamic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
+
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 
 	protected:
 	virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep);

@@ -940,6 +940,16 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	}
 }
 
+void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+{
+	BrushTireModel(tire, contactPoint);
+}
+
+void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+{
+	BrushTireModel(tire, contactPoint);
+}
+
 void ndMultiBodyVehicle::ApplyTireModel()
 {
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
@@ -1013,9 +1023,21 @@ void ndMultiBodyVehicle::ApplyTireModel()
 									break;
 								}
 
+								case ndWheelDescriptor::m_pacejka:
+								{
+									PacejkaTireModel(tire, contactPoint);
+									break;
+								}
+
+								case ndWheelDescriptor::m_coulombCicleOfFriction:
+								{
+									CoulombFrictionCircleTireModel(tire, contactPoint);
+									break;
+								}
+
 								case ndWheelDescriptor::m_coulomb:
 								default:;
-									// assume normal columb model
+									// assume normal coulomb model
 							}
 						}
 					}
