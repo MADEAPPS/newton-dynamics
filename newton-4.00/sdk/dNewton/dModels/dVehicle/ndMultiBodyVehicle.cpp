@@ -877,17 +877,17 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		ndFloat32 longitudialSlip = ndFloat32(0.0f);
 		if (relSpeed < ndFloat32(-1.0e-5f))
 		{
-			// tire is in traction mode.
-			const ndVector rotationVeloc(tireBody->GetOmega().CrossProduct(contactPoint.m_point - tireBody->GetMatrix().m_posit));
-			ndFloat32 wr = ndAbs(rotationVeloc.DotProduct(contactPoint.m_dir1).GetScalar()) + ndFloat32(1.0e-4f);
-			longitudialSlip = -relSpeed / wr;
+		// tire is in traction mode.
+		const ndVector rotationVeloc(tireBody->GetOmega().CrossProduct(contactPoint.m_point - tireBody->GetMatrix().m_posit));
+		ndFloat32 wr = ndAbs(rotationVeloc.DotProduct(contactPoint.m_dir1).GetScalar()) + ndFloat32(1.0e-4f);
+		longitudialSlip = -relSpeed / wr;
 		}
 		else
 		{
-			// tire is in breaking mode.
-			const ndVector tireVeloc(tireBody->GetVelocity());
-			const ndFloat32 vr = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-			longitudialSlip = relSpeed / vr;
+		// tire is in breaking mode.
+		const ndVector tireVeloc(tireBody->GetVelocity());
+		const ndFloat32 vr = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+		longitudialSlip = relSpeed / vr;
 		}
 
 		ndAssert(longitudialSlip >= 0.0f);
@@ -906,16 +906,16 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 
 		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
 		const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
-		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32 (1.0f);
+		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
 
 		const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
 		const ndFloat32 b = ndFloat32(1.0f) / (ndFloat32(3.0f) * maxForceForce);
 		const ndFloat32 c = ndFloat32(1.0f) / (ndFloat32(27.0f) * maxForceForce * maxForceForce);
 		const ndFloat32 f = (gamma < ndFloat32(3.0f) * maxForceForce) ? gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma) : maxForceForce;
-		
+
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
-		
+
 		contactPoint.m_material.m_staticFriction0 = lateralForce;
 		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
 
@@ -932,45 +932,57 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 #else
 
 	//tire non linear brush model is only considered 
-	//when is moving faster than 0.5 m/s (aproximatly 1.0 miles / hours) 
+	//when is moving faster than 0.5 m/s (approximatly 1.0 miles / hours) 
 	//this is just an arbitrary limit, based of the model 
 	//not been defined for stationary tires.
 	const ndVector contactVeloc0(tireBody->GetVelocity());
 	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
 	const ndVector relVeloc(contactVeloc0 - contactVeloc1);
-	const ndFloat32 relSpeed = relVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
-	if (ndAbs(relSpeed) > ndFloat32(0.5f))
+	const ndFloat32 relSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+	if (relSpeed > ndFloat32(0.5f))
 	{
 		// tire is in breaking and traction mode.
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
-	
+
 		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 vr = contactVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
-		const ndFloat32 longitudialSlip = ndAbs (vr / relSpeed);
+		const ndFloat32 vr = ndAbs(contactVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+		const ndFloat32 longitudialSlip = vr / relSpeed;
 
 		const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		//const ndFloat32 tireSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		const ndFloat32 lateralSlip = sideSpeed / relSpeed;
+		//const ndFloat32 lateralSlip = sideSpeed / relSpeed;
+		const ndFloat32 lateralSlip = ndMin(sideSpeed / relSpeed, ndFloat32(0.25f));
+
+		ndAssert(lateralSlip >= ndFloat32(0.0f));
+		ndAssert(longitudialSlip >= ndFloat32(0.0f));
 
 		tire->m_lateralSlip = ndMax(tire->m_lateralSlip, lateralSlip);
 		tire->m_longitudinalSlip = ndMax(tire->m_longitudinalSlip, longitudialSlip);
-	
+
 		const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
 		const ndFloat32 v = lateralSlip * den;
 		const ndFloat32 u = longitudialSlip * den;
-	
+
 		const ndTireFrictionModel& info = tire->m_frictionModel;
 		const ndFloat32 cz = info.m_laterialStiffness  * v;
 		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
-	
+
 		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
 		const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
 		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
-	
+
 		const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
-		const ndFloat32 b = ndFloat32(1.0f) / (ndFloat32(3.0f) * maxForceForce);
-		const ndFloat32 c = ndFloat32(1.0f) / (ndFloat32(27.0f) * maxForceForce * maxForceForce);
-		const ndFloat32 f = (gamma < ndFloat32(3.0f) * maxForceForce) ? gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma) : maxForceForce;
+		//const ndFloat32 f = (gamma < ndFloat32(3.0f) * maxForceForce) ? gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma) : maxForceForce;
+		ndFloat32 f = maxForceForce;
+		if (gamma < (ndFloat32(3.0f) * maxForceForce))
+		{
+			const ndFloat32 b = ndFloat32(1.0f) / (ndFloat32(3.0f) * maxForceForce);
+			const ndFloat32 c = ndFloat32(1.0f) / (ndFloat32(27.0f) * maxForceForce * maxForceForce);
+			f = gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma);
+		}
+		//else
+		//{
+		//	ndTrace(("saturated tire %d (%f %f)\n", tireBody->GetId(), f, gamma));
+		//}
 	
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
@@ -984,7 +996,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	
 		if (tireBody->GetId() == 3)
 		{
-			//ndTrace(("id: %d  longitudinal:%f lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
+			//ndTrace(("id:%d  longitudinal:%f  lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
 		}
 	}
 
