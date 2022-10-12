@@ -86,6 +86,9 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 
 		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_rearTire.m_handBrakeTorque = 5000.0f;
+
+		m_rearTire.m_frictionModel = ndWheelDescriptor::m_brushModel;
+		m_frontTire.m_frictionModel = ndWheelDescriptor::m_brushModel;
 	}
 };
 

@@ -866,15 +866,15 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	ndAssert(tireBody != otherBody);
 	ndAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
-	auto SetFriction = [this, tire, &contactPoint](ndFloat32 longitudinalFrictionCoefficient, ndFloat32 lateralFrictionCoefficient)
-	{
-		contactPoint.m_material.m_restitution = ndFloat32(0.1f);
-		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
-
-		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
-	};
+	//auto SetFriction = [this, tire, &contactPoint](ndFloat32 longitudinalFrictionCoefficient, ndFloat32 lateralFrictionCoefficient)
+	//{
+	//	contactPoint.m_material.m_restitution = ndFloat32(0.1f);
+	//	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
+	//	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
+	//
+	//	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
+	//	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+	//};
 
 	const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
 	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
@@ -929,9 +929,12 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
 		
-		const ndFloat32 lateralFrictionCoefficient = lateralForce / normalForce;
-		const ndFloat32 longitudinalFrictionCoefficient = longitudinalForce / normalForce;
-		SetFriction(longitudinalFrictionCoefficient, lateralFrictionCoefficient);
+		contactPoint.m_material.m_staticFriction0 = lateralForce;
+		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
+
+		contactPoint.m_material.m_staticFriction1 = longitudinalForce;
+		contactPoint.m_material.m_dynamicFriction1 = longitudinalForce;
+		contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 
 		if (tireBody->GetId() == 3)
 		{
