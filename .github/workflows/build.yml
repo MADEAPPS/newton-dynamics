@@ -52,3 +52,32 @@ jobs:
 
         echo -e "\n\n---------- ContactCallback\n"
         build/contactCallback
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Windows
+      shell: bash
+      run: |
+        choco install ninja cmake
+        cmake --version
+        ninja --version
+
+    - name: Build And Install Newton
+      shell: bash
+      run: |
+        cd newton-4.00
+        cmake \
+            -S . -B build \
+            -DNEWTON_BUILD_SANDBOX_DEMOS=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -G "Visual Studio 17 2022" -A x64 \
+            -DCMAKE_INSTALL_PREFIX:PATH=out
+
+        cmake --build build -j2
+
+        # The installation target does not currently work.
+        # cmake --install build --strip
+
