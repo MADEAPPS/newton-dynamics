@@ -199,4 +199,7 @@ endif()
 add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
-add_subdirectory(tests)
+
+if (NOT MSVC)
+	add_subdirectory(tests)
+endif()
