@@ -19,15 +19,15 @@ find_library(AVX_LIB ndSolverAvx2 REQUIRED)
 
 project("hello")
 add_executable(${PROJECT_NAME} hello.cpp)
-target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB} pthread)
+target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 
 project("transformCallback")
 add_executable(${PROJECT_NAME} transformCallback.cpp)
-target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB} pthread)
+target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 
 project("contactCallback")
 add_executable(${PROJECT_NAME} contactCallback.cpp)
-target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB} pthread)
+target_link_libraries (${PROJECT_NAME} ${NEWTON_LIB} ${AVX_LIB})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
