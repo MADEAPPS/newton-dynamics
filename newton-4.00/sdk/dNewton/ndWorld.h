@@ -230,7 +230,7 @@ inline ndInt32 ndWorld::GetSolverIterations() const
 
 inline void ndWorld::SetSolverIterations(ndInt32 iterations)
 {
-	m_solverIterations = ndUnsigned32(ndMax(4, iterations));
+	m_solverIterations = ndInt32(ndMax(4, iterations));
 }
 
 inline ndContactNotify* ndWorld::GetContactNotify() const

@@ -247,7 +247,7 @@ class ndBodySentinel : public ndBodyKinematic
 
 inline ndUnsigned32 ndBodyKinematic::GetIndex() const
 {
-	return m_index;
+	return ndUnsigned32(m_index);
 }
 
 inline ndFloat32 ndBodyKinematic::GetInvMass() const
@@ -397,7 +397,7 @@ inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 	m_islandParent = this;
 	m_weigh = ndFloat32(0.0f);
 	m_isStatic = (m_invMass.m_w == ndFloat32(0.0f));
-	m_equilibrium = m_isStatic | m_equilibrium;
+	m_equilibrium = ndUnsigned8 (m_isStatic | m_equilibrium);
 	m_equilibrium0 = m_equilibrium;
 }
 
@@ -438,12 +438,12 @@ inline bool ndBodyKinematic::GetSleepState() const
 
 inline void ndBodyKinematic::RestoreSleepState(bool state)
 {
-	m_equilibrium = state ? 1 : 0;
+	m_equilibrium = ndUnsigned8 (state ? 1 : 0);
 }
 
 inline void ndBodyKinematic::SetAutoSleep(bool state)
 {
-	m_autoSleep = state ? 1 : 0;
+	m_autoSleep = ndUnsigned8 (state ? 1 : 0);
 	SetSleepState(false);
 }
 

@@ -216,10 +216,10 @@ inline void ndDynamicsUpdate::ClearJacobianBuffer(ndInt32 count, ndJacobian* con
 inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, ndInt32 sizeInByte) const
 {
 	D_TRACKTIME();
-	ndInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
+	ndInt32 sizeInJacobian = ndInt32 (sizeInByte / sizeof(ndJacobian));
 	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
 	char* const ptr = (char*)buffer;
-	for (ndInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; ++i)
+	for (ndInt32 i = ndInt32 (sizeInJacobian * sizeof(ndJacobian)); i < sizeInByte; ++i)
 	{
 		ptr[i] = 0;
 	}

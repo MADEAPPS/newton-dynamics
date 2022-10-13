@@ -135,6 +135,10 @@ class ndLoadSaveBase: public ndClassAlloc
 		ndTree<ndInt32, const ndJointBilateralConstraint*>* m_jointMap;
 	};
 
+	virtual ~ndLoadSaveBase()
+	{
+	}
+
 	virtual void* CreateClass(const ndLoadDescriptor&)
 	{
 		ndAssert(0);

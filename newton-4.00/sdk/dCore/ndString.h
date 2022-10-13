@@ -158,7 +158,7 @@ inline void ndString::CopyData (char* const dst, const char* const src, ndInt32 
 {
 	ndAssert (dst);
 	ndAssert (src);
-	memcpy (dst, src, size);
+	memcpy (dst, src, size_t(size));
 }
 
 inline ndInt32 ndString::Compare (const char* const str0, const char* const str1) const

@@ -280,6 +280,8 @@ inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndI
 			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin, vertexIndex);
 		}
 
+		case m_global:
+		case m_nonUniform:
 		default:
 			return SupportVertex(dir);
 	}
@@ -301,6 +303,8 @@ inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector
 			return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
 		}
 
+		case m_global:
+		case m_nonUniform:
 		default:
 			return point;
 
@@ -379,7 +383,7 @@ inline ndFloat32 ndShapeInstance::GetUmbraClipSize() const
 
 inline ndUnsigned64 ndShapeInstance::GetUserDataID() const
 {
-	return m_shapeMaterial.m_userId;
+	return ndUnsigned64 (m_shapeMaterial.m_userId);
 }
 
 inline void ndShapeInstance::SetShape(ndShape* const shape)

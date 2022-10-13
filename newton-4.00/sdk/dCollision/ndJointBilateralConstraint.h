@@ -277,7 +277,7 @@ inline bool ndJointBilateralConstraint::GetSkeletonFlag() const
 
 inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)
 {
-	m_isInSkeleton = flag ? 1 : 0;
+	m_isInSkeleton = ndUnsigned32 (flag ? 1 : 0);
 }
 
 inline bool ndJointBilateralConstraint::IsCollidable() const
@@ -292,7 +292,7 @@ inline bool ndJointBilateralConstraint::IsBilateral() const
 
 inline void ndJointBilateralConstraint::SetCollidable(bool state)
 {
-	m_enableCollision = state ? 1 : 0;
+	m_enableCollision = ndUnsigned32 (state ? 1 : 0);
 }
 
 inline ndVector ndJointBilateralConstraint::GetForceBody0() const

@@ -293,7 +293,7 @@ inline bool ndConstraint::IsActive() const
 
 inline void ndConstraint::SetActive(bool state)
 { 
-	m_active = state ? 1 : 0;
+	m_active = ndUnsigned8(state ? 1 : 0);
 }
 
 inline bool ndConstraint::IsBilateral() const

@@ -65,7 +65,7 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 	ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 	{
 		// do not let player capsule picking
-		return ((ndBody*)body)->GetAsBodyPlayerCapsule() ? 0 : 1;
+		return ndUnsigned32 (((ndBody*)body)->GetAsBodyPlayerCapsule() ? 0 : 1);
 	}
 
 	ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)

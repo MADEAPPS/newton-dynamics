@@ -234,7 +234,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	if (newSize > m_capacity || (m_capacity == 0))
 	{
 		newSize = ndMax(newSize, 16);
-		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
+		T* const newArray = (T*)ndMemory::Malloc(size_t(ndInt32(sizeof(T) * newSize)));
 		if (m_array) 
 		{
 			CopyData(newArray, m_array, m_size);
@@ -246,7 +246,7 @@ void ndArray<T>::Resize(ndInt32 newSize)
 	else if (newSize < m_capacity)
 	{
 		newSize = ndMax(newSize, 16);
-		T* const newArray = (T*)ndMemory::Malloc(ndInt32(sizeof(T) * newSize));
+		T* const newArray = (T*)ndMemory::Malloc(size_t(ndInt32(sizeof(T) * newSize)));
 		if (m_array) 
 		{
 			CopyData(newArray, m_array, newSize);
