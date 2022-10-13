@@ -203,8 +203,8 @@ ndInt32 ndArray<T>::GetCapacity() const
 template<class T>
 void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elements)
 {
-	const ndInt32 sizeInBytes = elements * sizeof(T);
-	const ndInt32 size16 = sizeInBytes / sizeof(ndVector);
+	const ndInt32 sizeInBytes = ndInt32 (elements * sizeof(T));
+	const ndInt32 size16 = ndInt32(sizeInBytes / sizeof(ndVector));
 
 	ndVector* const dst = (ndVector*)dstPtr;
 	const ndVector* const src = (ndVector*)srcPtr;
@@ -214,7 +214,7 @@ void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt32 elemen
 	}
 	char* const dstBytes = (char*)dst;
 	const char* const srcBytes = (char*)src;
-	for (ndInt32 i = size16 * sizeof(ndVector); i < sizeInBytes; ++i)
+	for (ndInt32 i = ndInt32(size16 * sizeof(ndVector)); i < sizeInBytes; ++i)
 	{
 		dstBytes[i] = srcBytes[i];
 	}
