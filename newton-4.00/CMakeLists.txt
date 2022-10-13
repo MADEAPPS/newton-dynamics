@@ -199,7 +199,5 @@ endif()
 add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
+add_subdirectory(tests)
 
-if (NOT MSVC OR NEWTON_BUILD_TEST)
-	add_subdirectory(tests)
-endif()
