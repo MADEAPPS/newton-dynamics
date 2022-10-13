@@ -952,6 +952,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		//const ndFloat32 lateralSlip = sideSpeed / relSpeed;
 		const ndFloat32 lateralSlip = ndMin(sideSpeed / relSpeed, ndFloat32(0.25f));
 
+		ndTrace(("(%d: %f %f)  ", tireBody->GetId(), longitudialSlip, lateralSlip));
+
 		ndAssert(lateralSlip >= ndFloat32(0.0f));
 		ndAssert(longitudialSlip >= ndFloat32(0.0f));
 
@@ -1015,6 +1017,12 @@ void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJo
 
 void ndMultiBodyVehicle::ApplyTireModel()
 {
+static int xxxx;
+ndTrace(("Frame:%d  ", xxxx));
+if (xxxx == 1336)
+xxxx *= 1;
+xxxx++;
+
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
@@ -1108,7 +1116,7 @@ void ndMultiBodyVehicle::ApplyTireModel()
 			}
 		}
 	}
-	//dTrace(("\n"));
+ndTrace(("\n"));
 }
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()

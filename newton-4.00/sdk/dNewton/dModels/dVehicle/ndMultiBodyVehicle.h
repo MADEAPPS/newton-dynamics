@@ -94,7 +94,6 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	private:
-	//void ApplySteering();
 	void ApplyTireModel();
 	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
