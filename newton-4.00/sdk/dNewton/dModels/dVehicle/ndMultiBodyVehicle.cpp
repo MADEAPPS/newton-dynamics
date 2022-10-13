@@ -769,7 +769,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	// draw velocity vector
 	ndVector veloc(m_chassis->GetVelocity());
 	ndVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
-	ndVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
+	ndVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(2.0f));
 	ndVector p2(p0 + veloc.Scale (0.25f));
 
 	context.DrawLine(p0, p2, ndVector(1.0f, 1.0f, 0.0f, 0.0f));
@@ -856,6 +856,21 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	chassisMatrix.m_posit = effectiveCom;
 	chassisMatrix.m_posit.m_w = ndFloat32(1.0f);
 	context.DrawFrame(chassisMatrix);
+}
+
+//void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, ndContactMaterial& contactPoint) const
+{
+	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
+	const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
+	const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
+
+	contactPoint.m_material.m_staticFriction0 = maxForceForce;
+	contactPoint.m_material.m_dynamicFriction0 = maxForceForce;
+
+	contactPoint.m_material.m_staticFriction1 = maxForceForce;
+	contactPoint.m_material.m_dynamicFriction1 = maxForceForce;
+	contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 }
 
 void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
@@ -1001,6 +1016,10 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 			//ndTrace(("id:%d  longitudinal:%f  lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
 		}
 	}
+	else
+	{
+		CoulombTireModel(tire, contactPoint);
+	}
 
 #endif
 }
@@ -1088,6 +1107,11 @@ xxxx++;
 						{
 							switch (tire->m_frictionModel.m_frictionModel)
 							{
+								case ndTireFrictionModel::m_coulomb:
+								{
+									CoulombTireModel(tire, contactPoint);
+								}
+
 								case ndTireFrictionModel::m_brushModel:
 								{
 									BrushTireModel(tire, contactPoint);
@@ -1106,7 +1130,6 @@ xxxx++;
 									break;
 								}
 
-								case ndTireFrictionModel::m_coulomb:
 								default:;
 									// assume normal coulomb model
 							}

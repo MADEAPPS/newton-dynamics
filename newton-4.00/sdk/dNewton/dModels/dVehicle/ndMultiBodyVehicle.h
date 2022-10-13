@@ -99,6 +99,7 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyAligmentAndBalancing();
 	ndBodyDynamic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 
+	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
