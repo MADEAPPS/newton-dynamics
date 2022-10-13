@@ -200,7 +200,6 @@ add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
 
-#if (NOT MSVC)
-if (NEWTON_BUILD_TEST)
+if (NOT MSVC OR NEWTON_BUILD_TEST)
 	add_subdirectory(tests)
 endif()
