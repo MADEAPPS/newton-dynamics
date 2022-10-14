@@ -22,7 +22,6 @@ ndBodyDynamic *BuildSphere(const ndVector pos, const ndVector gravity={0.f}) {
   // Set the position of the sphere in the world.
   ndMatrix matrix(ndGetIdentityMatrix());
   matrix.m_posit = pos;
-  matrix.m_posit.m_w = 1.0f;
   body->SetMatrix(matrix);
 
   // Attach the collision shape and use a convenience function to automatically
@@ -46,7 +45,7 @@ TEST(RigidBody, NoMoveWithoutForce) {
   world.SetSubSteps(2);
 
   // Create a sphere at the origin. No gravity will act on it by default.
-  ndVector spherePos = ndVector(0.f);
+  ndVector spherePos = ndVector(0.0f, 0.0f, 0.0f, 1.0f);
   ndBodyDynamic *sphere = BuildSphere(spherePos);
   world.AddBody(sphere);
 
