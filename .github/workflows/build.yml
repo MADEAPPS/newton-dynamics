@@ -81,3 +81,14 @@ jobs:
         # The installation target does not currently work.
         # cmake --install build --strip
 
+    - name: Run Tests
+      shell: bash
+      run: |
+        # We need to copy the "newton_test" binary into the folder with
+        # the Windows DLL files first before we can run it.
+        cd newton-4.00/build/sdk/Debug
+        cp ../../tests/Debug/newton_tests.exe ./
+
+        # Execute the test suite.
+        ./newton_tests
+

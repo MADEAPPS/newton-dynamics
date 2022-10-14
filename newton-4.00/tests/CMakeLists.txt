@@ -52,4 +52,3 @@ target_link_libraries(
 )
 target_link_libraries (${PROJECT_NAME} ndNewton ndSolverAvx2)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-gtest_discover_tests(${PROJECT_NAME})
