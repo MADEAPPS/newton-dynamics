@@ -22,6 +22,7 @@ ndBodyDynamic *BuildSphere(const ndVector pos, const ndVector gravity={0.f}) {
   // Set the position of the sphere in the world.
   ndMatrix matrix(ndGetIdentityMatrix());
   matrix.m_posit = pos;
+  matrix.m_posit.m_w = 1.0f;
   body->SetMatrix(matrix);
 
   // Attach the collision shape and use a convenience function to automatically
