@@ -31,13 +31,13 @@
 class ndStackBase : public ndClassAlloc
 {
 	protected:
-	ndStackBase (size_t size);
+	ndStackBase (ndInt32 size);
 	~ndStackBase ();
 
 	const void* m_ptr;
 };
 
-inline ndStackBase::ndStackBase (size_t size)
+inline ndStackBase::ndStackBase (ndInt32 size)
 	:ndClassAlloc()
 	,m_ptr (ndMemory::Malloc (size_t (size)))
 {
@@ -52,7 +52,7 @@ template<class T>
 class ndStack: public ndStackBase
 {
 	public:
-	ndStack (size_t size);
+	ndStack (ndInt32 size);
 	~ndStack ();
 	ndInt32 GetSizeInBytes() const;
 	ndInt32 GetElementsCount() const;
@@ -61,12 +61,12 @@ class ndStack: public ndStackBase
 	inline const T& operator[] (ndInt32 entry) const;
 
 	private:
-	size_t m_size;
+	ndInt32 m_size;
 };
 
 template<class T>
-ndStack<T>::ndStack (size_t size)
-	:ndStackBase (size * sizeof(T))
+ndStack<T>::ndStack (ndInt32 size)
+	:ndStackBase (size * ndInt32(sizeof(T)))
 	,m_size(size)
 {
 }
@@ -79,7 +79,7 @@ ndStack<T>::~ndStack ()
 template<class T>
 ndInt32 ndStack<T>::GetElementsCount() const
 {
-	return ndInt32 (m_size);
+	return m_size;
 }
 
 template<class T>
@@ -92,7 +92,7 @@ template<class T>
 inline T& ndStack<T>::operator[] (ndInt32 entry) 
 {
 	ndAssert (entry >= 0);
-	ndAssert ((size_t(entry) < m_size) || ((m_size == 0) && (entry == 0)));
+	ndAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
 
 	T* const mem = (T*) m_ptr;
 	return mem[entry];

@@ -46,18 +46,6 @@
 		{
 			case DLL_PROCESS_ATTACH:
 			case DLL_THREAD_ATTACH:
-			{
-				#if defined(_DEBUG) && defined(_MSC_VER)
-					// Track all memory leaks at the operating system level.
-					// make sure no Newton tool or utility leaves leaks behind.
-					ndUnsigned32 flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
-					flags = flags | _CRTDBG_REPORT_FLAG;
-					flags = flags | _CRTDBG_CHECK_EVERY_1024_DF;
-					_CrtSetDbgFlag(flags);
-					//_CrtSetBreakAlloc(3342281);
-				#endif
-			}
-
 			case DLL_THREAD_DETACH:
 			case DLL_PROCESS_DETACH:
 				break;

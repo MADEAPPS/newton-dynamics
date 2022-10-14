@@ -33,7 +33,11 @@ class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
 	ndListView();
 	ndListView(const ndListView& src);
 
+#ifdef _MSC_VER 
+	typename ndNode* AddItem(T* const item);
+#else
 	typename ndListView<T>::ndNode* AddItem(T* const item);
+#endif
 	void RemoveItem(typename ndListView<T>::ndNode* const node);
 
 	bool UpdateView();

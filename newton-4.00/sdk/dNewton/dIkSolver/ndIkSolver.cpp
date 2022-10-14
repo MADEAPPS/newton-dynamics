@@ -64,14 +64,14 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
 	ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
-	for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
+	for (ndInt32 i = ndInt32(joint->GetRowsCount() - 1); i >= 0; i--)
 	{
 		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
 		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
 		constraintParam.m_forceBounds[i].m_jointForce = nullptr;
 		constraintParam.m_forceBounds[i].m_normalIndex = D_INDEPENDENT_ROW;
 	}
-	joint->m_rowCount = joint->GetRowsCount();
+	joint->m_rowCount = ndInt32(joint->GetRowsCount());
 
 	constraintParam.m_rowsCount = 0;
 	constraintParam.m_timestep = m_timestep;

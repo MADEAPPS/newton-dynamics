@@ -50,7 +50,7 @@ ndCharacterNode::ndCharacterNode(const ndCharacterLoadDescriptor& desc)
 	ndInt32 hashId;
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) xmlNode;
 	element->Attribute("hashId", &hashId);
-	desc.m_limbMap->Insert(this, hashId);
+	desc.m_limbMap->Insert(this, ndUnsigned32(hashId));
 
 	ndCharacterLoadDescriptor childDesc(desc);
 	childDesc.m_parentModelNode = this;

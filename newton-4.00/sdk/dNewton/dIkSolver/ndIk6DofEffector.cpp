@@ -61,7 +61,7 @@ ndIk6DofEffector::ndIk6DofEffector(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
 
 	m_rotationType = ndRotationType(xmlGetInt(xmlNode, "rotationType"));
-	m_controlDofOptions = ndInt8(xmlGetInt(xmlNode, "controlDofOptions"));
+	m_controlDofOptions = ndUnsigned8(xmlGetInt(xmlNode, "controlDofOptions"));
 
 	//SetTargetOffset(m_targetPosit);
 }
@@ -92,17 +92,17 @@ void ndIk6DofEffector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndIk6DofEffector::EnableAxisX(bool state)
 {
-	m_axisX = state ? 1 : 0;
+	m_axisX = ndUnsigned8(state ? 1 : 0);
 }
 
 void ndIk6DofEffector::EnableAxisY(bool state)
 {
-	m_axisY = state ? 1 : 0;
+	m_axisY = ndUnsigned8(state ? 1 : 0);
 }
 
 void ndIk6DofEffector::EnableAxisZ(bool state)
 {
-	m_axisZ = state ? 1 : 0;
+	m_axisZ = ndUnsigned8(state ? 1 : 0);
 }
 
 void ndIk6DofEffector::EnableRotationAxis(ndRotationType type)

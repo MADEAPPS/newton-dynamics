@@ -365,7 +365,7 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 
 			ndUnsigned32 GetKey(const ndBvhNode* const node) const
 			{
-				ndUnsigned32 code = node->m_isDead * 2 + (((ndBvhNode*)node)->GetAsSceneBodyNode() ? 1 : 0);
+				ndUnsigned32 code = ndUnsigned32(node->m_isDead * 2 + (((ndBvhNode*)node)->GetAsSceneBodyNode() ? 1 : 0));
 				return m_keyCode[code];
 			}
 
@@ -375,8 +375,8 @@ void ndBvhSceneManager::Update(ndThreadPool& threadPool)
 		ndUnsigned32 scans[5];
 		ndCountingSortInPlace<ndBvhNode*, ndSortSceneNodeKey, 2>(threadPool, src, tmp, count, scans, nullptr);
 
-		const ndInt32 alivedStart = scans[2];
-		const ndInt32 deadCount = scans[3] - alivedStart;
+		const ndInt32 alivedStart = ndInt32(scans[2]);
+		const ndInt32 deadCount = ndInt32(scans[3]) - alivedStart;
 		for (ndInt32 i = 0; i < deadCount; ++i)
 		{
 			ndBvhNode* const node = nodeArray[alivedStart + i];
@@ -439,7 +439,7 @@ ndBuildBvhTreeBuildState::ndBuildBvhTreeBuildState()
 void ndBuildBvhTreeBuildState::Init(ndUnsigned32 maxCount)
 {
 	m_depthLevel = 1;
-	m_tempNodeBuffer.SetCount(4 * (maxCount + 4));
+	m_tempNodeBuffer.SetCount(ndInt32(4 * (maxCount + 4)));
 
 	m_root = nullptr;
 	m_srcArray = &m_tempNodeBuffer[0];
@@ -452,8 +452,8 @@ void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
 {
 	D_TRACKTIME();
 
-	ndUnsigned32 start = 0;
-	ndUnsigned32 count = 0;
+	ndInt32 start = 0;
+	ndInt32 count = 0;
 	auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &start, &count](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(UpdateSceneBvh);
@@ -476,10 +476,10 @@ void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
 
 	D_TRACKTIME_NAMED(UpdateSceneBvhFull);
 	const ndBvhNodeArray& array = m_workingArray;
-	for (ndUnsigned32 i = 0; i < array.m_scansCount; ++i)
+	for (ndInt32 i = 0; i < ndInt32(array.m_scansCount); ++i)
 	{
-		start = array.m_scans[i];
-		count = array.m_scans[i + 1] - start;
+		start = ndInt32(array.m_scans[i]);
+		count = ndInt32(array.m_scans[i + 1] - start);
 		threadPool.ParallelExecute(UpdateSceneBvh);
 	}
 }

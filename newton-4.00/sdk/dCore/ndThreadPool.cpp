@@ -94,7 +94,7 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 		if (count)
 		{
 			m_count = count;
-			m_workers = new ndWorker[count];
+			m_workers = new ndWorker[size_t(count)];
 			for (ndInt32 i = 0; i < count; ++i)
 			{
 				char name[256];

@@ -34,7 +34,7 @@ bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = maxSize;
+	ofn.nMaxFile = DWORD(maxSize);
 	ofn.lpstrFilter = const_cast<LPSTR>("import file *.ply\0*.ply\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
@@ -66,7 +66,7 @@ bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
 	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = maxSize;
+	ofn.nMaxFile = DWORD(maxSize);
 	ofn.lpstrFilter = const_cast<LPSTR>("newton serialized file *.bin\0*.bin\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
@@ -99,7 +99,7 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = maxSize;
+	ofn.nMaxFile = DWORD(maxSize);
 	ofn.lpstrFilter = const_cast<LPSTR>("newton serialized file *.bin\0*.bin\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
@@ -138,7 +138,7 @@ bool dGetSaveNdFileName(char* const fileName, int maxSize)
 	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = maxSize;
+	ofn.nMaxFile = DWORD(maxSize);
 	ofn.lpstrFilter = const_cast<LPSTR>("newton save file *.nd\0*.nd\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics 4.0 demos");
@@ -179,7 +179,7 @@ bool dGetLoadNdFileName(char* const fileName, int maxSize)
 	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = maxSize;
+	ofn.nMaxFile = DWORD(maxSize);
 	ofn.lpstrFilter = const_cast<LPSTR>("newton load file *.nd\0*.nd\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics 4.0 demos");

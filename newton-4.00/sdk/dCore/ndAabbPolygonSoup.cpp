@@ -641,7 +641,8 @@ dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* co
 
 		ndInt32 j0 = adjacentCount - 1;
 		ndInt32 indexJ0 = adjacentFace.m_index[adjacentCount - 1];
-		for (ndInt32 j = 0; j < adjacentCount; ++j) {
+		for (ndInt32 j = 0; j < adjacentCount; ++j) 
+		{
 			ndInt32 indexJ1 = adjacentFace.m_index[j];
 			ndBigVector q0 (ndVector(&polygon[indexJ1 * stride]) & ndVector::m_triplexMask);
 			ndBigVector q1 (ndVector(&polygon[indexJ0 * stride]) & ndVector::m_triplexMask);

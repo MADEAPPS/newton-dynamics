@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 
-option("NEWTON_BUILD_TEST" "generate test project" "OFF")
+option("NEWTON_EXCLUDE_TEST" "generate test project" "OFF")
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
@@ -178,6 +178,14 @@ if (MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4201 /wd4324 /wd4625 /wd4626 /wd4820 /wd5026 /wd5027")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /wd4201 /wd4324 /wd4625 /wd4626 /wd4820 /wd5026 /wd5027")
 
+	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /Wall /Od /fp:fast")
+	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /Zi /Wall /O2 /fp:fast")
+	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /GS /Wall /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
+	#
+	#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4201 /wd4324 /wd4625 /wd4626 /wd4820 /wd5026 /wd5027 /wd5045")
+	#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4201 /wd4324 /wd4625 /wd4626 /wd4820 /wd5026 /wd5027 /wd5045")
+	#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /wd4201 /wd4324 /wd4625 /wd4626 /wd4820 /wd5026 /wd5027 /wd5045")
+
 	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 	message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
@@ -199,5 +207,10 @@ endif()
 add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
-add_subdirectory(tests)
+
+if (NOT NEWTON_EXCLUDE_TEST)
+	message("adding unit tests")
+	add_subdirectory(tests)
+endif()
+
 
