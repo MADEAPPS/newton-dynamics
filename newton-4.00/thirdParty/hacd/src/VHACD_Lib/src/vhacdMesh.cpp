@@ -68,11 +68,11 @@ namespace nd_
 
 			Vec3<double> ver0, ver1, ver2;
 			double totalVolume = 0.0;
-			for (int32_t t = 0; t < int32_t(nT); t++) {
+			for (size_t t = 0; t < nT; t++) {
 				const Vec3<int32_t>& tri = GetTriangle(t);
-				ver0 = GetPoint(tri[0]);
-				ver1 = GetPoint(tri[1]);
-				ver2 = GetPoint(tri[2]);
+				ver0 = GetPoint(size_t(tri[0]));
+				ver1 = GetPoint(size_t(tri[1]));
+				ver2 = GetPoint(size_t(tri[2]));
 				totalVolume += ComputeVolume4(ver0, ver1, ver2, bary);
 			}
 			return totalVolume / 6.0;
@@ -85,7 +85,7 @@ namespace nd_
 			ConvexHull ch(pts, 3 * sizeof(double), (int32_t)nPts, 1.0e-5f);
 
 			const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-			for (int32_t v = 0; v < int (convexPoints.size()); v++) {
+			for (size_t v = 0; v < convexPoints.size(); v++) {
 				AddPoint(convexPoints[v]);
 			}
 
@@ -129,11 +129,11 @@ namespace nd_
 			}
 			Vec3<double> ver0, ver1, ver2;
 			double volume;
-			for (int32_t t = 0; t < int32_t(nT); t++) {
+			for (size_t t = 0; t < nT; t++) {
 				const Vec3<int32_t>& tri = GetTriangle(t);
-				ver0 = GetPoint(tri[0]);
-				ver1 = GetPoint(tri[1]);
-				ver2 = GetPoint(tri[2]);
+				ver0 = GetPoint(size_t(tri[0]));
+				ver1 = GetPoint(size_t(tri[1]));
+				ver2 = GetPoint(size_t(tri[2]));
 				volume = ComputeVolume4(ver0, ver1, ver2, pt);
 				if (volume < 0.0) {
 					return false;
@@ -278,20 +278,20 @@ namespace nd_
 					ret = fscanf(fid, "%i", &nv);
 					ret = fscanf(fid, "%i", &nf);
 					ret = fscanf(fid, "%i", &ne);
-					m_points.Resize(nv);
-					m_triangles.Resize(nf);
+					m_points.Resize(size_t(nv));
+					m_triangles.Resize(size_t(nf));
 					Vec3<double> coord;
 					float x, y, z;
 					for (int32_t p = 0; p < nv; p++) {
 						ret = fscanf(fid, "%f", &x);
 						ret = fscanf(fid, "%f", &y);
 						ret = fscanf(fid, "%f", &z);
-						m_points[p][0] = x;
-						m_points[p][1] = y;
-						m_points[p][2] = z;
+						m_points[size_t(p)][0] = x;
+						m_points[size_t(p)][1] = y;
+						m_points[size_t(p)][2] = z;
 					}
 					int32_t i, j, k, s;
-					for (int32_t t = 0; t < nf; ++t) {
+					for (size_t t = 0; t < size_t(nf); ++t) {
 						ret = fscanf(fid, "%i", &s);
 						if (s == 3) {
 							ret = fscanf(fid, "%i", &i);

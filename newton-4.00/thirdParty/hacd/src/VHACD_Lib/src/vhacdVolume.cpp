@@ -151,7 +151,7 @@ namespace nd_
 			const Vec3<double>& vert,
 			const Vec3<double>& maxbox)
 		{
-			int32_t q;
+			size_t q;
 			Vec3<double> vmin, vmax;
 			double v;
 			for (q = X; q <= Z; q++) {
@@ -381,13 +381,13 @@ namespace nd_
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
 				return;
-			for (int32_t h = 0; h < 3; ++h) {
+			for (size_t h = 0; h < 3; ++h) {
 				m_minBBVoxels[h] = m_voxels[0].m_coord[h];
 				m_maxBBVoxels[h] = m_voxels[0].m_coord[h];
 			}
 			Vec3<double> bary(0.0);
 			for (size_t p = 0; p < nVoxels; ++p) {
-				for (int32_t h = 0; h < 3; ++h) {
+				for (size_t h = 0; h < 3; ++h) {
 					bary[h] += m_voxels[p].m_coord[h];
 					if (m_minBBVoxels[h] > m_voxels[p].m_coord[h])
 						m_minBBVoxels[h] = m_voxels[p].m_coord[h];
@@ -396,7 +396,7 @@ namespace nd_
 				}
 			}
 			bary /= (double)nVoxels;
-			for (int32_t h = 0; h < 3; ++h) {
+			for (size_t h = 0; h < 3; ++h) {
 				m_minBBPts[h] = m_minBBVoxels[h] * m_scale + m_minBB[h];
 				m_maxBBPts[h] = m_maxBBVoxels[h] * m_scale + m_minBB[h];
 				m_barycenter[h] = (short)(bary[h] + 0.5);
@@ -449,7 +449,7 @@ namespace nd_
 
 				ConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
 				const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-				for (int32_t v = 0; v < int(convexPoints.size()); v++)
+				for (size_t v = 0; v < convexPoints.size(); v++)
 				{
 					cpoints.push_back(convexPoints[v]);
 				}
@@ -459,7 +459,7 @@ namespace nd_
 			meshCH.ResizeTriangles(0);
 
 			const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-			for (int32_t v = 0; v < int(convexPoints.size()); v++)
+			for (size_t v = 0; v < convexPoints.size(); v++)
 			{
 				meshCH.AddPoint(convexPoints[v]);
 			}
@@ -644,7 +644,7 @@ namespace nd_
 			if (nVoxels == 0)
 				return;
 
-			for (int32_t h = 0; h < 3; ++h) {
+			for (size_t h = 0; h < 3; ++h) {
 				onSurf->m_minBB[h] = m_minBB[h];
 			}
 			onSurf->m_voxels.Resize(0);
@@ -671,7 +671,7 @@ namespace nd_
 			if (nVoxels == 0)
 				return;
 
-			for (int32_t h = 0; h < 3; ++h) {
+			for (size_t h = 0; h < 3; ++h) {
 				negativePart->m_minBB[h] = positivePart->m_minBB[h] = m_minBB[h];
 			}
 			positivePart->m_voxels.Resize(0);
@@ -838,7 +838,7 @@ namespace nd_
 							current[1] = (short)j;
 							current[2] = (short)k;
 							fifo.push(current);
-							GetVoxel(current[0], current[1], current[2]) = PRIMITIVE_OUTSIDE_SURFACE;
+							GetVoxel(size_t(current[0]), size_t(current[1]), size_t(current[2])) = PRIMITIVE_OUTSIDE_SURFACE;
 							++m_numVoxelsOutsideSurface;
 							while (fifo.size() > 0) {
 								current = fifo.front();
@@ -850,7 +850,7 @@ namespace nd_
 									if (a < 0 || a >= (int32_t)m_dim[0] || b < 0 || b >= (int32_t)m_dim[1] || c < 0 || c >= (int32_t)m_dim[2]) {
 										continue;
 									}
-									unsigned char& v = GetVoxel(a, b, c);
+									unsigned char& v = GetVoxel(size_t(a), size_t(b), size_t(c));
 									if (v == PRIMITIVE_UNDEFINED) {
 										v = PRIMITIVE_OUTSIDE_SURFACE;
 										++m_numVoxelsOutsideSurface;
@@ -926,7 +926,7 @@ namespace nd_
 		}
 		void Volume::Convert(VoxelSet& vset) const
 		{
-			for (int32_t h = 0; h < 3; ++h) 
+			for (size_t h = 0; h < 3; ++h)
 			{
 				vset.m_minBB[h] = m_minBB[h];
 			}
@@ -945,7 +945,7 @@ namespace nd_
 				{
 					for (short k = 0; k < k0; ++k) 
 					{
-						const unsigned char& value = GetVoxel(i, j, k);
+						const unsigned char& value = GetVoxel(size_t(i), size_t(j), size_t(k));
 						if (value == PRIMITIVE_INSIDE_SURFACE) 
 						{
 							voxel.m_coord[0] = i;
@@ -982,7 +982,7 @@ namespace nd_
 			for (short i = 0; i < i0; ++i) {
 				for (short j = 0; j < j0; ++j) {
 					for (short k = 0; k < k0; ++k) {
-						const unsigned char& value = GetVoxel(i, j, k);
+						const unsigned char& value = GetVoxel(size_t(i), size_t(j), size_t(k));
 						if (value == PRIMITIVE_INSIDE_SURFACE || value == PRIMITIVE_ON_SURFACE) {
 							tetrahedron.m_data = value;
 							Vec3<double> p1((i - 0.5) * m_scale + m_minBB[0], (j - 0.5) * m_scale + m_minBB[1], (k - 0.5) * m_scale + m_minBB[2]);
@@ -1045,7 +1045,7 @@ namespace nd_
 			for (short i = 0; i < i0; ++i) {
 				for (short j = 0; j < j0; ++j) {
 					for (short k = 0; k < k0; ++k) {
-						const unsigned char& value = GetVoxel(i, j, k);
+						const unsigned char& value = GetVoxel(size_t(i), size_t(j), size_t(k));
 						if (value == PRIMITIVE_INSIDE_SURFACE || value == PRIMITIVE_ON_SURFACE) {
 							barycenter[0] += i;
 							barycenter[1] += j;
@@ -1064,7 +1064,7 @@ namespace nd_
 			for (short i = 0; i < i0; ++i) {
 				for (short j = 0; j < j0; ++j) {
 					for (short k = 0; k < k0; ++k) {
-						const unsigned char& value = GetVoxel(i, j, k);
+						const unsigned char& value = GetVoxel(size_t(i), size_t(j), size_t(k));
 						if (value == PRIMITIVE_INSIDE_SURFACE || value == PRIMITIVE_ON_SURFACE) {
 							x = i - barycenter[0];
 							y = j - barycenter[1];
@@ -1105,13 +1105,13 @@ namespace nd_
 			if (nTetrahedra == 0)
 				return;
 
-			for (int32_t h = 0; h < 3; ++h) {
+			for (size_t h = 0; h < 3; ++h) {
 				m_minBB[h] = m_maxBB[h] = m_tetrahedra[0].m_pts[0][h];
 				m_barycenter[h] = 0.0;
 			}
 			for (size_t p = 0; p < nTetrahedra; ++p) {
-				for (int32_t i = 0; i < 4; ++i) {
-					for (int32_t h = 0; h < 3; ++h) {
+				for (size_t i = 0; i < 4; ++i) {
+					for (size_t h = 0; h < 3; ++h) {
 						if (m_minBB[h] > m_tetrahedra[p].m_pts[i][h])
 							m_minBB[h] = m_tetrahedra[p].m_pts[i][h];
 						if (m_maxBB[h] < m_tetrahedra[p].m_pts[i][h])
@@ -1142,7 +1142,7 @@ namespace nd_
 							s = 0;
 							for (int32_t a = 0; a < 4; ++a) {
 								points.push_back(m_tetrahedra[p].m_pts[a]);
-								for (int32_t xx = 0; xx < 3; ++xx) {
+								for (size_t xx = 0; xx < 3; ++xx) {
 									assert(m_tetrahedra[p].m_pts[a][xx] + EPS >= m_minBB[xx]);
 									assert(m_tetrahedra[p].m_pts[a][xx] <= m_maxBB[xx] + EPS);
 								}
@@ -1154,7 +1154,7 @@ namespace nd_
 
 				ConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
 				const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-				for (int32_t v = 0; v < int(convexPoints.size()); v++)
+				for (size_t v = 0; v < int(convexPoints.size()); v++)
 				{
 					cpoints.push_back(convexPoints[v]);
 				}
@@ -1164,7 +1164,7 @@ namespace nd_
 			meshCH.ResizePoints(0);
 			meshCH.ResizeTriangles(0);
 			const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-			for (int32_t v = 0; v < int(convexPoints.size()); v++) {
+			for (size_t v = 0; v < int(convexPoints.size()); v++) {
 				meshCH.AddPoint(convexPoints[v]);
 			}
 
@@ -1188,8 +1188,8 @@ namespace nd_
 				tetrahedron.m_pts[1] = tmp;
 			}
 
-			for (int32_t a = 0; a < 4; ++a) {
-				for (int32_t xx = 0; xx < 3; ++xx) {
+			for (size_t a = 0; a < 4; ++a) {
+				for (size_t xx = 0; xx < 3; ++xx) {
 					assert(tetrahedron.m_pts[a][xx] + EPS >= m_minBB[xx]);
 					assert(tetrahedron.m_pts[a][xx] <= m_maxBB[xx] + EPS);
 				}
@@ -1517,7 +1517,7 @@ namespace nd_
 							alpha = -(plane.m_d + (n * P1)) / delta;
 							assert(alpha >= 0.0 && alpha <= 1.0);
 							M = alpha * P0 + (1 - alpha) * P1;
-							for (int32_t xx = 0; xx < 3; ++xx) {
+							for (size_t xx = 0; xx < 3; ++xx) {
 								assert(M[xx] + EPS >= m_minBB[xx]);
 								assert(M[xx] <= m_maxBB[xx] + EPS);
 							}
