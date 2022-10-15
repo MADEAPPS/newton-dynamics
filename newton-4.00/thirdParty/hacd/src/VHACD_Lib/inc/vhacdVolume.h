@@ -227,16 +227,16 @@ namespace nd_
 				const size_t dim, const Vec3<double>& barycenter, const double(&rot)[3][3]);
 			unsigned char& GetVoxel(const size_t i, const size_t j, const size_t k)
 			{
-				assert(i < m_dim[0] || i >= 0);
-				assert(j < m_dim[0] || j >= 0);
-				assert(k < m_dim[0] || k >= 0);
+				//assert(i < m_dim[0] || i >= 0);
+				//assert(j < m_dim[0] || j >= 0);
+				//assert(k < m_dim[0] || k >= 0);
 				return m_data[i + j * m_dim[0] + k * m_dim[0] * m_dim[1]];
 			}
 			const unsigned char& GetVoxel(const size_t i, const size_t j, const size_t k) const
 			{
-				assert(i < m_dim[0] || i >= 0);
-				assert(j < m_dim[0] || j >= 0);
-				assert(k < m_dim[0] || k >= 0);
+				//assert(i < m_dim[0] || i >= 0);
+				//assert(j < m_dim[0] || j >= 0);
+				//assert(k < m_dim[0] || k >= 0);
 				return m_data[i + j * m_dim[0] + k * m_dim[0] * m_dim[1]];
 			}
 			size_t GetNPrimitivesOnSurf() const { return m_numVoxelsOnSurface; }
@@ -300,7 +300,7 @@ namespace nd_
 			m_minBB = pt;
 			for (uint32_t v = 1; v < nPoints; ++v) {
 				ComputeAlignedPoint(points, v * stridePoints, barycenter, rot, pt);
-				for (int32_t i = 0; i < 3; ++i) {
+				for (size_t i = 0; i < 3; ++i) {
 					if (pt[i] < m_minBB[i])
 						m_minBB[i] = pt[i];
 					else if (pt[i] > m_maxBB[i])
@@ -358,7 +358,7 @@ namespace nd_
 				Vec3<int32_t> tri(triangles[ti + 0],
 					triangles[ti + 1],
 					triangles[ti + 2]);
-				for (int32_t c = 0; c < 3; ++c) {
+				for (size_t c = 0; c < 3; ++c) {
 					ComputeAlignedPoint(points, tri[c] * stridePoints, barycenter, rot, pt);
 					p[c][0] = (pt[0] - m_minBB[0]) * invScale;
 					p[c][1] = (pt[1] - m_minBB[1]) * invScale;

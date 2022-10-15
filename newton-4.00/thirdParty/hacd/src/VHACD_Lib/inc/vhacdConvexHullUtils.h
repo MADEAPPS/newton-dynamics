@@ -146,7 +146,7 @@ namespace nd_
 
 		template <class dItem, class dKey>
 		ndHeap<dItem, dKey>::ndHeap(int maxElements)
-			:m_pool(new dRecord[maxElements])
+			:m_pool(new dRecord[size_t(maxElements)])
 			,m_curCount(0)
 			,m_maxCount(maxElements)
 			,m_bufferIsOwnned(true)

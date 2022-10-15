@@ -116,7 +116,7 @@ class ndCellScanPrefix
 {
 	public:
 	ndInt32 m_location : 30;
-	ndInt32 m_cellTest : 1;
+	ndUnsigned32 m_cellTest : 1;
 };
 
 class ndBuildBvhTreeBuildState

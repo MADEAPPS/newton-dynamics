@@ -89,7 +89,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 			}
 		}
 		void* const ptr = ndMemory::Malloc(size_t(size));
-		ndAssert(ndMemory::GetSize(ptr) == ndMemory::CalculateBufferSize(size));
+		ndAssert(ndMemory::GetSize(ptr) == ndMemory::CalculateBufferSize(size_t(size)));
 		return ptr;
 	}
 

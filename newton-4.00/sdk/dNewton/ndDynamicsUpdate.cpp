@@ -144,8 +144,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 #ifdef _DEBUG
 	for (int i = 1; i < bodyJointPairs.GetCount(); ++i)
 	{
-		ndUnsigned32 key0 = bodyJointPairs[i - 1].m_body;
-		ndUnsigned32 key1 = bodyJointPairs[i + 0].m_body;
+		ndInt32 key0 = bodyJointPairs[i - 1].m_body;
+		ndInt32 key1 = bodyJointPairs[i + 0].m_body;
 		ndAssert(key0 <= key1);
 	}
 #endif

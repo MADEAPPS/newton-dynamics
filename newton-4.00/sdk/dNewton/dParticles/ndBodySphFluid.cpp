@@ -277,10 +277,10 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 	{
 		ndGridHash cell0(data.m_hashGridMap[i - 1]);
 		ndGridHash cell1(data.m_hashGridMap[i + 0]);
-		const ndVector p0(point[cell0.m_particleIndex]);
-		const ndVector p1(point[cell1.m_particleIndex]);
-		ndUnsigned32 key0 = data.WorldToGrid(p0.m_x);
-		ndUnsigned32 key1 = data.WorldToGrid(p1.m_x);
+		const ndVector p0(point[ndInt32(cell0.m_particleIndex)]);
+		const ndVector p1(point[ndInt32(cell1.m_particleIndex)]);
+		ndInt32 key0 = data.WorldToGrid(p0.m_x);
+		ndInt32 key1 = data.WorldToGrid(p1.m_x);
 		ndAssert(key0 <= key1);
 		//ndAssert(p0.m_x <= p1.m_x);
 	}

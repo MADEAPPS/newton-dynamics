@@ -3385,10 +3385,10 @@ namespace nd_
 
 		REAL fm_areaPolygon2d(uint32_t pcount,const REAL *points,uint32_t pstride)
 		{
-		  int32_t n = (int32_t)pcount;
+		  uint32_t n = pcount;
 
 		  REAL A=0.0f;
-		  for(int32_t p=n-1,q=0; q<n; p=q++)
+		  for(uint32_t p=n-1,q=0; q<n; p=q++)
 		  {
 			const REAL *p1 = fm_getPoint(points,pstride,p);
 			const REAL *p2 = fm_getPoint(points,pstride,q);
@@ -4818,15 +4818,15 @@ namespace nd_
 					c = V[w];
 					if ( flipped )
 					{
-						indices.push_back(a);
-						indices.push_back(b);
-						indices.push_back(c);
+						indices.push_back(TU32(a));
+						indices.push_back(TU32(b));
+						indices.push_back(TU32(c));
 					}
 					else
 					{
-						indices.push_back(c);
-						indices.push_back(b);
-						indices.push_back(a);
+						indices.push_back(TU32(c));
+						indices.push_back(TU32(b));
+						indices.push_back(TU32(a));
 					}
 					m++;
 					for (s = v, t = v + 1; t < nv; s++, t++)
@@ -4842,9 +4842,9 @@ namespace nd_
 		///     Returns the area of the contour
 		double CTriangulator::_area()
 		{
-			int32_t n = (uint32_t)mPoints.size();
+			size_t n = mPoints.size();
 			double A = 0.0f;
-			for (int32_t p = n - 1, q = 0; q < n; p = q++)
+			for (size_t p = n - 1, q = 0; q < n; p = q++)
 			{
 				const TVec &pval = mPoints[p];
 				const TVec &qval = mPoints[q];
@@ -4858,9 +4858,9 @@ namespace nd_
 		{
 			int32_t p;
 
-			const TVec &A = mPoints[ V[u] ];
-			const TVec &B = mPoints[ V[v] ];
-			const TVec &C = mPoints[ V[w] ];
+			const TVec &A = mPoints[ size_t(V[u]) ];
+			const TVec &B = mPoints[ size_t(V[v]) ];
+			const TVec &C = mPoints[ size_t(V[w]) ];
 
 			if (mEpsilon > (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x))) )
 				return false;
@@ -4869,7 +4869,7 @@ namespace nd_
 			{
 				if ((p == u) || (p == v) || (p == w))
 					continue;
-				const TVec &P = mPoints[ V[p] ];
+				const TVec &P = mPoints[size_t(V[p]) ];
 				if (_insideTriangle(A, B, C, P))
 					return false;
 			}

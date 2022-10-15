@@ -977,7 +977,7 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 			#ifdef _DEBUG
 			else if (nodesCount == 0)
 			{
-				ndUnsigned32 index = srcCellNodes[i].m_location;
+				ndInt32 index = srcCellNodes[i].m_location;
 				ndBvhNode* const node = nodesCells[index].m_node;
 				ndAssert(!node->m_bhvLinked);
 			}
@@ -1181,7 +1181,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 
 		ndInt32 GetKey(const ndCellScanPrefix& cell) const
 		{
-			return cell.m_cellTest;
+			return ndInt32 (cell.m_cellTest);
 		}
 	};
 

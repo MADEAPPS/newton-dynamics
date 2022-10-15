@@ -679,12 +679,21 @@ namespace nd_
 			}
 		}
 
+		#ifdef _MSC_VER
+		#pragma warning( push )
+		#pragma warning( disable : 4355)
+		#endif
+
 		Thread::Thread()
 			:Semaphore()
 			, std::thread(&Thread::ThreadFunctionCallback, this)
 			, m_queue(nullptr)
 		{
 		}
+
+		#ifdef _MSC_VER
+		#pragma warning( pop )
+		#endif
 
 		Thread::~Thread()
 		{

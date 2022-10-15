@@ -1457,7 +1457,7 @@ void ndScene::FindCollidingPairs()
 
 				const ndInt32 count = newPairs.GetCount();
 				const ndInt32 start = ndInt32(scanCounts[threadIndex]);
-				ndAssert((scanCounts[threadIndex + 1] - start) == newPairs.GetCount());
+				ndAssert(ndInt32(scanCounts[threadIndex + 1] - start) == newPairs.GetCount());
 				for (ndInt32 i = 0; i < count; ++i)
 				{
 					m_newPairs[start + i] = newPairs[i];

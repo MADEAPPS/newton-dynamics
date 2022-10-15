@@ -24,7 +24,7 @@
 #include <set>
 #include <sstream>
 #include "vhacdConvexHull.h"
-#include "../public/VHACD.h"
+#include "VHACD.h"
 #include "vhacdICHull.h"
 #include "vhacdMesh.h"
 #include "vhacdSArray.h"
