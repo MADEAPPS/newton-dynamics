@@ -120,6 +120,11 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		return ndClamp (t, ndFloat32 (0.0f), ndFloat32 (1.2f));
 	}
 
+	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const
+	{
+		ndShapeStaticProceduralMesh::GetCollidingFaces(data);
+	}
+
 	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const
 	{
 		// generate the point cloud

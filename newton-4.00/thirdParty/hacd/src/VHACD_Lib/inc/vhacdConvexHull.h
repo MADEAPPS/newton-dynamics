@@ -85,7 +85,7 @@ namespace nd_
 			ConvexHullAABBTreeNode* BuildAccelerator();
 
 			private:
-			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, int& memoryPool);
+			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, size_t& memoryPool);
 			std::vector<ConvexHull3dPointCluster> m_treeBuffer;
 			//ConvexHullAABBTreeNode* m_tree;
 		};
@@ -126,7 +126,7 @@ namespace nd_
 
 			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, std::vector<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
 
-			int SupportVertex(ConvexHullAABBTreeNode** const tree, const std::vector<ConvexHullVertex>& points, const hullVector& dir, const bool removeEntry = true) const;
+			size_t SupportVertex(ConvexHullAABBTreeNode** const tree, const std::vector<ConvexHullVertex>& points, const hullVector& dir, const bool removeEntry = true) const;
 			double TetrahedrumVolume(const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
 
 			hullVector m_aabbP0;

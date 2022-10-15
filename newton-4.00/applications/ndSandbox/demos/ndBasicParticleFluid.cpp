@@ -134,8 +134,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		m_shader = shaderCache.m_diffuseEffect;
 
 		ndDemoSubMesh* const segment = AddSubMesh();
-		int tex = LoadTexture("default.tga");
-		segment->m_material.SetTexture(tex);
+		GLuint tex = LoadTexture("default.tga");
+		segment->m_material.SetTexture(int(tex));
 		ReleaseTexture(tex);
 
 		segment->m_material.m_diffuse = ndVector(0.1f, 0.6f, 0.9f, 0.0f);

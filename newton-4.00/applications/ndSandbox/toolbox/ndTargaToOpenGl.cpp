@@ -61,7 +61,7 @@ class ndTextureCache : public ndList<ndTextureEntry>
 			ndList<ndTextureEntry>::ndNode* const texNode = node->GetInfo();
 			ndTextureEntry& entry = texNode->GetInfo();
 			entry.m_ref = entry.m_ref - 1;
-			ndAssert(entry.m_ref >= 0);
+			ndAssert(entry.m_ref != 0xffffffff);
 			if (entry.m_ref == 0)
 			{
 				glDeleteTextures(1, &entry.m_textureID);

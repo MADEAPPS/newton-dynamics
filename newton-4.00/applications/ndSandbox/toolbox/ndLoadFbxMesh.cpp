@@ -332,7 +332,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 	const ofbx::Vec3* const vertices = geom->getVertices();
 	ndInt32 indexCount = geom->getIndexCount();
-	ndInt32* const indexArray = new ndInt32 [indexCount];
+	ndInt32* const indexArray = new ndInt32 [size_t(indexCount)];
 	memcpy(indexArray, geom->getFaceIndices(), indexCount * sizeof(ndInt32));
 
 	ndInt32 faceCount = 0;
@@ -344,8 +344,8 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 		}
 	}
 
-	ndInt32* const faceIndexArray = new ndInt32[faceCount];
-	ndInt32* const faceMaterialArray = new ndInt32[faceCount];
+	ndInt32* const faceIndexArray = new ndInt32[size_t(faceCount)];
+	ndInt32* const faceMaterialArray = new ndInt32[size_t(faceCount)];
 
 	ImportMaterials(fbxMesh, mesh);
 
@@ -1073,7 +1073,7 @@ ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 	fseek(fp, 0, SEEK_SET);
 	ndArray<ofbx::u8> content;
 	content.SetCount(file_size);
-	readBytes = fread(&content[0], 1, file_size, fp);
+	readBytes = fread(&content[0], 1, size_t(file_size), fp);
 	ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
@@ -1108,7 +1108,7 @@ fbxDemoEntity____* LoadFbxMesh(const char* const meshName)
 	fseek(fp, 0, SEEK_SET);
 	ndArray<ofbx::u8> content;
 	content.SetCount(file_size);
-	readBytes = fread(&content[0], 1, file_size, fp);
+	readBytes = fread(&content[0], 1, size_t(file_size), fp);
 	ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
@@ -1501,7 +1501,7 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 	fseek(fp, 0, SEEK_SET);
 	ndArray<ofbx::u8> content;
 	content.SetCount(file_size);
-	readBytes = fread(&content[0], 1, file_size, fp);
+	readBytes = fread(&content[0], 1, size_t(file_size), fp);
 	ofbx::IScene* const fbxScene = ofbx::load(&content[0], file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));

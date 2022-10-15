@@ -214,7 +214,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 		ndSharedPtr<ndMeshEffect> meshEffect = ent->GetMesh();
 		if (*meshEffect)
 		{
-			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / sizeof (ndFloat64);
+			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32(sizeof (ndFloat64));
 			const ndFloat64* const vertexData = meshEffect->GetVertexPool();
 	
 			ndInt32 mark = meshEffect->IncLRU();
@@ -292,7 +292,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		ndSharedPtr<ndMeshEffect> meshEffect = ent->GetMesh();
 		if (*meshEffect)
 		{
-			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64);
+			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32 (sizeof(ndFloat64));
 			const ndFloat64* const vertexData = meshEffect->GetVertexPool();
 
 			ndInt32 mark = meshEffect->IncLRU();

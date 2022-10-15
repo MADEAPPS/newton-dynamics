@@ -17,7 +17,6 @@ include_directories(.)
 include_directories(backends)
 include_directories(../glfw/include)
 
-#add_definitions(-DIMGUI_DISABLE_OBSOLETE_KEYIO)
 
 # low level core
 file(GLOB HEADERS *.h)
@@ -33,4 +32,4 @@ file(GLOB CPP_SOURCE
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
-
+target_compile_options(${projectName} PRIVATE -W4)

@@ -75,7 +75,7 @@ void ndDemoSplinePathMesh::SetRenderResolution(ndInt32 breaks)
 
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, (m_renderResolution + 1) * sizeof(glVector3), &points[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr((m_renderResolution + 1) * sizeof(glVector3)), &points[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
@@ -85,8 +85,8 @@ void ndDemoSplinePathMesh::SetRenderResolution(ndInt32 breaks)
 
 		glUseProgram(m_shader);
 
-		m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
-		m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+		m_shadeColorLocation = GLuint(glGetUniformLocation(m_shader, "shadeColor"));
+		m_projectionViewModelMatrixLocation = GLuint(glGetUniformLocation(m_shader, "projectionViewModelMatrix"));
 
 		glUseProgram(0);
 	}
@@ -102,8 +102,8 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const ndMatr
 		const glVector4 color(m_color);
 
 		glUseProgram(m_shader);
-		glUniform4fv(m_shadeColorLocation, 1, &color[0]);
-		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+		glUniform4fv(GLint(m_shadeColorLocation), 1, &color[0]);
+		glUniformMatrix4fv(GLint(m_projectionViewModelMatrixLocation), 1, false, &viewProjectionMatrix[0][0]);
 
 		//ndMeshVector m_line[2];
 		//glEnableClientState(GL_VERTEX_ARRAY);

@@ -60,18 +60,17 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_COLLISION_API ndShapeStaticProceduralMesh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
-
-	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
-
-	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const;
-
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API void SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces);
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	private:
+	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
+	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const;
+
+	protected:
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
+	private:
 	class ndLocalData
 	{
 		public:

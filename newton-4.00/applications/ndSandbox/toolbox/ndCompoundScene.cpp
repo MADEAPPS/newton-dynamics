@@ -105,7 +105,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 		ndSharedPtr<ndMeshEffect> meshEffect = ent->GetMesh();
 		if (*meshEffect)
 		{
-			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64);
+			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32 (sizeof(ndFloat64));
 			const ndFloat64* const vertexData = meshEffect->GetVertexPool();
 	
 			ndInt32 mark = meshEffect->IncLRU();

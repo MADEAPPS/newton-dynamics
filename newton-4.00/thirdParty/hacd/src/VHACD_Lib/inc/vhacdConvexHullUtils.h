@@ -23,7 +23,6 @@
 #define __ND_CONVEXHULL_3D_UTILS__
 
 
-#include <mutex>
 #include <vector>
 #include <atomic>
 #include <thread>
