@@ -59,7 +59,7 @@ namespace nd_
 			const hullVector& p2 = pointArray[m_index[2]];
 
 			double matrix[3][3];
-			for (int i = 0; i < 3; ++i) 
+			for (size_t i = 0; i < 3; ++i)
 			{
 				matrix[0][i] = p2[i] - p0[i];
 				matrix[1][i] = p1[i] - p0[i];
@@ -83,7 +83,7 @@ namespace nd_
 			}
 	
 			Googol exactMatrix[3][3];
-			for (int i = 0; i < 3; ++i) 
+			for (size_t i = 0; i < 3; ++i)
 			{
 				exactMatrix[0][i] = Googol(p2[i]) - Googol(p0[i]);
 				exactMatrix[1][i] = Googol(p1[i]) - Googol(p0[i]);
@@ -98,13 +98,13 @@ namespace nd_
 
 		ConvexHull3dPointSet::ConvexHull3dPointSet(const double* const vertexCloud, int strideInBytes, int count)
 		{
-			resize(count);
+			resize(size_t(count));
 
 			std::vector<ConvexHullVertex>& array = *this;
 			const int stride = int(strideInBytes / sizeof(double));
-			for (int i = 0; i < count; ++i)
+			for (size_t i = 0; i < size_t(count); ++i)
 			{
-				int index = i * stride;
+				size_t index = i * stride;
 				hullVector& vertex = array[i];
 				vertex = hullVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], double(0.0f));
 				array[i].m_mark = 0;
@@ -115,7 +115,7 @@ namespace nd_
 				public:
 				int Compare(const ConvexHullVertex& elementA, const ConvexHullVertex& elementB) const
 				{
-					for (int i = 0; i < 3; i++)
+					for (size_t i = 0; i < 3; i++)
 					{
 						if (elementA[i] < elementB[i])
 						{
@@ -133,11 +133,11 @@ namespace nd_
 			count = int(size());
 			Sort<ConvexHullVertex, CompareVertex>(&array[0], count);
 			
-			int indexCount = 0;
+			size_t indexCount = 0;
 			CompareVertex compareVetex;
-			for (int i = 1; i < count; ++i)
+			for (size_t i = 1; i < size_t(count); ++i)
 			{
-				for (; i < count; ++i)
+				for (; i < size_t(count); ++i)
 				{
 					if (compareVetex.Compare(array[indexCount], array[i]))
 					{
@@ -147,13 +147,13 @@ namespace nd_
 					}
 				}
 			}
-			count = indexCount + 1;
-			array.resize(count);
+			count = int (indexCount + 1);
+			array.resize(size_t (count));
 		}
 
 		ConvexHullAABBTreeNode* ConvexHull3dPointSet::BuildAccelerator()
 		{
-			int treeCount = int (size()) / (VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE >> 1);
+			size_t treeCount = size() / (VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE >> 1);
 			if (treeCount < 4)
 			{
 				treeCount = 4;
@@ -754,7 +754,7 @@ namespace nd_
 			boundaryFaces.Append(f2Node);
 			boundaryFaces.Append(f3Node);
 
-			m_points.resize(count);
+			m_points.resize(size_t(count));
 
 			count -= 4;
 			maxVertexCount -= 4;
@@ -764,9 +764,9 @@ namespace nd_
 			std::vector<ndNode*> coneListPool;
 			std::vector<ndNode*> deleteListPool;
 
-			stackPool.resize(1024 + count);
-			coneListPool.resize(1024 + count);
-			deleteListPool.resize(1024 + count);
+			stackPool.resize(size_t(1024 + count));
+			coneListPool.resize(size_t(1024 + count));
+			deleteListPool.resize(size_t(1024 + count));
 
 			ndNode** const stack = &stackPool[0];
 			ndNode** const coneList = &stackPool[0];
