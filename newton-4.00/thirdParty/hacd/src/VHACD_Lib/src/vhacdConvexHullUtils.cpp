@@ -19,6 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include <string.h>
 #include "vhacdConvexHullUtils.h"
 
 namespace nd_
