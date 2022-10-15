@@ -41,7 +41,6 @@ class ndTestValidator : public ndBrainTrainer::ndValidation
 	ndInt32 m_step0;
 };
 
-
 static void ThreeLayersTwoInputsTwoOutputs()
 {
 	ndBrain brain;
@@ -123,7 +122,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
-	ndBrainMatrix* labelsData = nullptr;
+	ndBrainMatrix* labelData = nullptr;
 
 	char outPathName[1024];
 	dGetWorkingFileName(filename, outPathName);
@@ -148,17 +147,17 @@ static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 		magicNumber = ndIndian32(magicNumber);
 		numberOfItems = ndIndian32(numberOfItems);
 
-		labelsData = new ndBrainMatrix(numberOfItems, 10);
-		labelsData->Set(0.0f);
+		labelData = new ndBrainMatrix(ndInt32 (numberOfItems), 10);
+		labelData->Set(0.0f);
 		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
 		{
 			ndUnsigned8 label;
 			ret = fread(&label, 1, 1, fp);
-			(*labelsData)[i][label] = 1.0f;
+			(*labelData)[ndInt32(i)][ndInt32(label)] = 1.0f;
 		}
 		fclose(fp);
 	}
-	return labelsData;
+	return labelData;
 }
 
 static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
@@ -194,17 +193,17 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 		numberOfItems = ndIndian32(numberOfItems);
 		digitWith = ndIndian32(digitWith);
 		digitHeight = ndIndian32(digitHeight);
-		trainingDigits = new ndBrainMatrix(numberOfItems, digitWith * digitHeight);
+		trainingDigits = new ndBrainMatrix(ndInt32(numberOfItems), ndInt32(digitWith * digitHeight));
 		trainingDigits->Set(0.0f);
 
 		ndUnsigned8 data[32 * 32];
 		for (ndUnsigned32 i = 0; i < numberOfItems; ++i)
 		{
-			ndBrainVector& image = (*trainingDigits)[i];
+			ndBrainVector& image = (*trainingDigits)[ndInt32(i)];
 			ret = fread(data, digitWith, digitHeight, fp);
 			for (ndUnsigned32 j = 0; j < digitWith * digitHeight; j++)
 			{
-				image[j] = ndReal(data[j]) / 255.0f;
+				image[ndInt32(j)] = ndReal(data[ndInt32(j)]) / 255.0f;
 			}
 		}
 		fclose(fp);

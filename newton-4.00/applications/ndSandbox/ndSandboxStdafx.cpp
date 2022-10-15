@@ -59,7 +59,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 
 ndUnsigned16 ndIndian16(ndUnsigned16 x)
 {
-	return ((x >> 8) & 0xff) + ((x & 0xff) << 8);
+	return ndUnsigned16 (((x >> 8) & 0xff) + ((x & 0xff) << 8));
 }
 
 ndUnsigned32 ndIndian32(ndUnsigned32 x)
