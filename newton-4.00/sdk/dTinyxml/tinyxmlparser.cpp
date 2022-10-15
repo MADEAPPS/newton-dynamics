@@ -880,8 +880,7 @@ TiXmlNode* TiXmlNode::Identify( const char* p, TiXmlEncoding encoding )
 		#endif
 		returnNode = new TiXmlUnknown();
 	}
-	else if (    IsAlpha(unsigned char (*(p+1)), encoding )
-			  || *(p+1) == '_' )
+	else if (IsAlpha((unsigned char)(*(p+1)), encoding) || *(p+1) == '_' )
 	{
 		#ifdef DEBUG_PARSER
 			TIXML_LOG( "XML parsing Element\n" );
