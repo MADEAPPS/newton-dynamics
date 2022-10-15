@@ -416,19 +416,19 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 	nd_::VHACD::IVHACD::Parameters paramsVHACD;
 	//paramsVHACD.m_maxConvexHulls = 24;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
-	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+	interfaceVHACD->Compute(&meshPoints[0].m_x, uint32_t(points.GetCount()), (uint32_t*)&indices[0], uint32_t(indices.GetCount()) / 3, paramsVHACD);
 
 	ndShapeInstance* const compoundShapeInstance = new ndShapeInstance(new ndShapeCompound());
 
 	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
 	compoundShape->BeginAddRemove();
-	ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
+	ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
 	ndArray<ndVector> convexMeshPoints;
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
 		nd_::VHACD::IVHACD::ConvexHull ch;
-		interfaceVHACD->GetConvexHull(i, ch);
-		convexMeshPoints.SetCount(ch.m_nPoints);
+		interfaceVHACD->GetConvexHull(uint32_t(i), ch);
+		convexMeshPoints.SetCount(ndInt32 (ch.m_nPoints));
 		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
 		{
 			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
@@ -557,16 +557,16 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			nd_::VHACD::IVHACD::Parameters paramsVHACD;
 			//paramsVHACD.m_concavityToVolumeWeigh = 1.0;
 			paramsVHACD.m_concavityToVolumeWeigh = 0.5f;
-			interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(),
-				(uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
+			interfaceVHACD->Compute(&meshPoints[0].m_x, uint32_t(points.GetCount()),
+				(uint32_t*)&indices[0], uint32_t(indices.GetCount()) / 3, paramsVHACD);
 
-			ndInt32 hullCount = interfaceVHACD->GetNConvexHulls();
+			ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
 			ndArray<ndVector> convexMeshPoints;
 			for (ndInt32 i = 0; i < hullCount; ++i)
 			{
 				nd_::VHACD::IVHACD::ConvexHull ch;
-				interfaceVHACD->GetConvexHull(i, ch);
-				convexMeshPoints.SetCount(ch.m_nPoints);
+				interfaceVHACD->GetConvexHull(uint32_t(i), ch);
+				convexMeshPoints.SetCount(ndInt32(ch.m_nPoints));
 				for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
 				{
 					ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));

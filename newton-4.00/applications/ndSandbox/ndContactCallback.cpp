@@ -145,7 +145,7 @@ ndApplicationMaterial& ndContactCallback::RegisterMaterial(const ndApplicationMa
 
 ndMaterial* ndContactCallback::GetMaterial(const ndContact* const, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
 {
-	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);
+	ndMaterailKey key(ndUnsigned32(instance0.GetMaterial().m_userId), ndUnsigned32(instance1.GetMaterial().m_userId));
 	ndMaterialGraph::ndNode* const node = m_materialGraph.Find(key);
 	return node ? node->GetInfo() : (ndMaterial*)&m_defaultMaterial;
 }

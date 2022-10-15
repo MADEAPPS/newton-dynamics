@@ -24,7 +24,8 @@ class glSkinVertex : public glPositionNormalUV
 	glVector4 m_boneIndex;
 };
 
-ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
+//ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
+ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const, const ndShaderCache&)
 	:ndDemoMeshInterface()
 	,m_shareMesh(new ndDemoMesh(owner->GetName().GetStr()))
 	,m_ownerEntity(owner)
@@ -267,7 +268,7 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	
 	glGenBuffers(1, &mesh->m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(glSkinVertex), &points[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(pointCount * sizeof(glSkinVertex)), &points[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)OFFSETOF(glSkinVertex, m_posit));
@@ -295,7 +296,7 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	
 	glGenBuffers(1, &mesh->m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	glUseProgram(m_shader);
@@ -394,7 +395,7 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& mo
 			glUniform3fv(mesh->m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
+			glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}
 	}

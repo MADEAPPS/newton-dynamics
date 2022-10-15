@@ -41,7 +41,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArra
 	
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(glDebrisPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_vertexCount * sizeof(glDebrisPoint)), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)OFFSETOF(glDebrisPoint, m_posit));
@@ -92,9 +92,9 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		m_material[materialCount].m_shiness = GLfloat(material.m_shiness);
 		//strcpy(m_material[materialCount].m_textureName, material.m_textureName);
 		m_material[materialCount].SetTextureName(material.m_textureName);
-		ndInt32 tex = LoadTexture(material.m_textureName);
+		ndInt32 tex = ndInt32(LoadTexture(material.m_textureName));
 		m_material[materialCount].SetTexture(tex);
-		ReleaseTexture(tex);
+		ReleaseTexture(GLuint(tex));
 	
 		ndInt32 subIndexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
@@ -115,7 +115,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 	
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	glUseProgram(m_shader);
@@ -262,11 +262,11 @@ void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* con
 	// these call make the font display wrong
 	glActiveTexture(GL_TEXTURE1);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBindTexture(GL_TEXTURE_2D, shaderMesh->m_material[1].GetTexture());
+	glBindTexture(GL_TEXTURE_2D, GLuint(shaderMesh->m_material[1].GetTexture()));
 	
 	glActiveTexture(GL_TEXTURE0);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBindTexture(GL_TEXTURE_2D, shaderMesh->m_material[0].GetTexture());
+	glBindTexture(GL_TEXTURE_2D, GLuint(shaderMesh->m_material[0].GetTexture()));
 	
 	const ndMatrix nodeMatrix(m_matrix * matrix);
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())

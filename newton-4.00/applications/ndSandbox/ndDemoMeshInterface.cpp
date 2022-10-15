@@ -28,7 +28,7 @@ ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
 {
 	if (m_textureHandle)
 	{
-		ReleaseTexture(m_textureHandle);
+		ReleaseTexture(GLuint(m_textureHandle));
 	}
 }
 
@@ -53,9 +53,9 @@ void ndDemoSubMeshMaterial::SetTexture(GLint textureHandle)
 	{
 		if (m_textureHandle)
 		{
-			ReleaseTexture(m_textureHandle);
+			ReleaseTexture(GLuint(m_textureHandle));
 		}
-		AddTextureRef(textureHandle);
+		AddTextureRef(GLuint(textureHandle));
 		m_textureHandle = textureHandle;
 	}
 }

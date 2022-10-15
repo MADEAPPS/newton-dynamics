@@ -102,7 +102,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	m_shader = shaderCache.m_diffuseEffect;
 
 	// apply uv projections
-	ndInt32 tex0 = LoadTexture(texture0);
+	ndInt32 tex0 = ndInt32(LoadTexture(texture0));
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
@@ -205,7 +205,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 
-	ReleaseTexture(tex0);
+	ReleaseTexture(GLuint(tex0));
 }
 
 ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
@@ -279,9 +279,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		segment->m_material.m_opacity = GLfloat(material.m_opacity);
 		segment->m_material.m_shiness = GLfloat(material.m_shiness);
 		segment->m_material.SetTextureName(material.m_textureName);
-		GLuint tex = LoadTexture(material.m_textureName);
+		GLint tex = GLint(LoadTexture(material.m_textureName));
 		segment->m_material.SetTexture(tex);
-		ReleaseTexture(tex);
+		ReleaseTexture(GLuint(tex));
 		segment->SetOpacity(material.m_opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 		
@@ -348,7 +348,7 @@ void ndDemoMesh::OptimizeForRender(
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(glPositionNormalUV), &points[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr (pointCount * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
@@ -367,7 +367,7 @@ void ndDemoMesh::OptimizeForRender(
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
@@ -457,7 +457,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-					glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
+					glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
 					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 				}
 			}
@@ -509,7 +509,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
+			glBindTexture(GL_TEXTURE_2D, GLuint (segment.m_material.GetTexture()));
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}
 	}
@@ -565,7 +565,7 @@ void ndDemoMesh::GetIndexArray(ndArray<ndInt32>& indexList) const
 	indexList.SetCount(m_indexCount);
 	for (ndInt32 i = 0; i < m_indexCount; ++i)
 	{
-		indexList[i] = data[i];
+		indexList[i] = ndInt32(data[i]);
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -253,7 +253,8 @@ void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32)
 	}
 }
 
-void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
+//void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
+void ndConvexFractureModel_2::AddEffect(const ndEffect&, ndFloat32, const ndMatrix&)
 {
 	ndAssert(0);
 	//ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();

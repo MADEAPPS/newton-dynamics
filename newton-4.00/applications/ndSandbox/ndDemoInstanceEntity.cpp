@@ -29,7 +29,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	m_shader = shaderCache.m_diffuseIntanceEffect;
 
 	// apply uv projections
-	ndInt32 tex0 = LoadTexture(texture0);
+	ndInt32 tex0 = ndInt32(LoadTexture(texture0));
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
@@ -123,7 +123,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	// load index buffer.
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indices.GetCount() * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// create vertex semantic layout
@@ -132,7 +132,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(glPositionNormalUV), &points[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
@@ -147,7 +147,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 	// set vertex buffer for matrix instances
 	glGenBuffers(1, &m_matrixOffsetBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_maxInstanceCount * sizeof(glMatrix), &offsets[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_maxInstanceCount * sizeof(glMatrix)), &offsets[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*) (0 * sizeof(glVector4)));
@@ -186,7 +186,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderCache
 
 	glUseProgram(0);
 
-	ReleaseTexture(tex0);
+	ReleaseTexture(GLuint(tex0));
 	m_vertexCount = points.GetCount();
 	m_indexCount = indices.GetCount();
 }
@@ -255,7 +255,7 @@ void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const sc
 			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glBindTexture(GL_TEXTURE_2D, segment.m_material.GetTexture());
+			glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
 			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), m_instanceCount);
 		}
 	}

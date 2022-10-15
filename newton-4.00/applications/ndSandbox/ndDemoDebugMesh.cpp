@@ -100,7 +100,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderCache& shaderCache, c
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-		glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glPositionNormal), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
@@ -110,7 +110,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderCache& shaderCache, c
 
 		glGenBuffers(1, &m_triangleIndexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_indexCount * sizeof(GLuint)), &m_triangles[0], GL_STATIC_DRAW);
 
 		glBindVertexArray(0);
 
@@ -242,8 +242,8 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderCache& shaderCache, con
 			} key;
 			ndInt32 i0 = m_lines[i - 1];
 			ndInt32 i1 = m_lines[i - 0];
-			key.m_low = ndMin(i0, i1);
-			key.m_high = ndMax(i0, i1);
+			key.m_low = ndUnsigned32(ndMin(i0, i1));
+			key.m_high = ndUnsigned32(ndMax(i0, i1));
 			if (filter.Find(key.m_key))
 			{
 				m_lines[i - 1] = m_lines[m_indexCount - 2];
@@ -268,14 +268,14 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderCache& shaderCache, con
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-		glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glVector3), &drawShapes.m_lines[0].m_x, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glVector3)), &drawShapes.m_lines[0].m_x, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
 
 		glGenBuffers(1, &m_lineIndexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_lines.GetCount() * sizeof(GLuint), &m_lines[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_lines.GetCount() * sizeof(GLuint)), &m_lines[0], GL_STATIC_DRAW);
 
 		glBindVertexArray(0);
 

@@ -444,7 +444,7 @@ namespace biped2
 			ndShapeInstance& instanceShape = body->GetCollisionShape();
 			instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
 			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
-			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = definition.m_selfCollide;
+			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = ndUnsigned64(definition.m_selfCollide);
 
 			m_bodyArray.PushBack(body);
 			scene->GetWorld()->AddBody(body);
