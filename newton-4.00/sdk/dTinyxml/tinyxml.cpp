@@ -150,14 +150,14 @@ FILE* TiXmlFOpen( const char* filename, const char* mode )
 
 void TiXmlBase::EncodeString( const TIXML_STRING& str, TIXML_STRING* outString )
 {
-	int i=0;
+	size_t i=0;
 
-	while( i<(int)str.length() )
+	while( i<str.length() )
 	{
 		unsigned char c = (unsigned char) str[i];
 
 		if (    c == '&' 
-		     && i < ( (int)str.length() - 2 )
+		     && i < ( str.length() - 2 )
 			 && str[i+1] == '#'
 			 && str[i+2] == 'x' )
 		{
@@ -171,7 +171,7 @@ void TiXmlBase::EncodeString( const TIXML_STRING& str, TIXML_STRING* outString )
 			// while fails (error case) and break (semicolon found).
 			// However, there is no mechanism (currently) for
 			// this function to return an error.
-			while ( i<(int)str.length()-1 )
+			while ( i<str.length()-1 )
 			{
 				outString->append( str.c_str() + i, 1 );
 				++i;
@@ -218,7 +218,7 @@ void TiXmlBase::EncodeString( const TIXML_STRING& str, TIXML_STRING* outString )
 
 			//*ME:	warning C4267: convert 'size_t' to 'int'
 			//*ME:	Int-Cast to make compiler happy ...
-			outString->append( buf, (int)strlen( buf ) );
+			outString->append( buf, strlen( buf ) );
 			++i;
 		}
 		else
@@ -1098,7 +1098,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	// If we have a file, assume it is all one big XML file, and read it in.
 	// The document parser may decide the document ends sooner than the entire file, however.
 	TIXML_STRING data;
-	data.reserve( length );
+	data.reserve(size_t(length) );
 
 	// Subtle bug here. TinyXml did use fgets. But from the XML spec:
 	// 2.11 End-of-Line Handling
@@ -1126,7 +1126,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	char* buf = (char*)__alloc__((length + 1) * sizeof(char));
 	buf[0] = 0;
 
-	if ( fread( buf, length, 1, file ) != 1 ) {
+	if ( fread( buf, size_t(length), 1, file ) != 1 ) {
 		//delete [] buf;
 		//dMemory::Free(buf);
 		__free__(buf);
@@ -1143,7 +1143,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 		if ( *p == 0xa ) {
 			// Newline character. No special rules for this. Append all the characters
 			// since the last string, and include the newline.
-			data.append( lastPos, (p-lastPos+1) );	// append, include the newline
+			data.append( lastPos, size_t(p-lastPos+1) );	// append, include the newline
 			++p;									// move past the newline
 			lastPos = p;							// and point to the new buffer (may be 0)
 			assert( p <= (buf+length) );
@@ -1152,7 +1152,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 			// Carriage return. Append what we have so far, then
 			// handle moving forward in the buffer.
 			if ( (p-lastPos) > 0 ) {
-				data.append( lastPos, p-lastPos );	// do not add the CR
+				data.append( lastPos, size_t(p-lastPos) );	// do not add the CR
 			}
 			data += (char)0xa;						// a proper newline
 
@@ -1175,7 +1175,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	}
 	// Handle any left over characters.
 	if ( p-lastPos ) {
-		data.append( lastPos, p-lastPos );
+		data.append( lastPos, size_t(p-lastPos) );
 	}		
 	//delete [] buf;
 	//dMemory::Free(buf);

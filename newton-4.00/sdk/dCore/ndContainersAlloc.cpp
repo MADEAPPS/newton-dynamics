@@ -78,7 +78,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 	{
 		{
 			ndScopeSpinLock lock(m_lock);
-			ndFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size));
+			ndFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size_t(size)));
 			ndAssert(header->m_count >= 0);
 			if (header->m_count)
 			{
@@ -88,7 +88,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 				return self;
 			}
 		}
-		void* const ptr = ndMemory::Malloc(size);
+		void* const ptr = ndMemory::Malloc(size_t(size));
 		ndAssert(ndMemory::GetSize(ptr) == ndMemory::CalculateBufferSize(size));
 		return ptr;
 	}
@@ -120,7 +120,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 	void Flush(ndInt32 size)
 	{
 		ndScopeSpinLock lock(m_lock);
-		ndFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size));
+		ndFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size_t(size)));
 		Flush(header);
 	}
 

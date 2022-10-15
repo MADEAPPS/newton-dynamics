@@ -70,15 +70,15 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 		ndGridHash(const ndGridHash& src, ndInt8 cellType)
 		{
 			m_gridCellHash = src.m_gridCellHash;
-			m_cellType = cellType;
+			m_cellType = ndUnsigned8(cellType);
 		}
 
 		ndGridHash(ndInt32 x, ndInt32 y, ndInt32 z)
 		{
 			m_gridCellHash = 0;
-			m_x = ndInt16(x);
-			m_y = ndInt16(y);
-			m_z = ndInt16(z);
+			m_x = ndUnsigned16(x);
+			m_y = ndUnsigned16(y);
+			m_z = ndUnsigned16(z);
 		}
 
 		ndGridHash(const ndVector& grid)
@@ -92,9 +92,9 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 			
 			ndVector hash(grid.GetInt());
 			m_gridCellHash = 0;
-			m_x = ndInt16(hash.m_ix);
-			m_y = ndInt16(hash.m_iy);
-			m_z = ndInt16(hash.m_iz);
+			m_x = ndUnsigned16(hash.m_ix);
+			m_y = ndUnsigned16(hash.m_iy);
+			m_z = ndUnsigned16(hash.m_iz);
 		}
 
 		union

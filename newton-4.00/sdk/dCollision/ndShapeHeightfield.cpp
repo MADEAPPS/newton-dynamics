@@ -100,12 +100,12 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 	FILE* const file = fopen(filePathName, "rb");
 	if (file)
 	{
-		ndInt64 readBytes = 0;
+		size_t readBytes = 0;
 		readBytes++;
 		m_elevationMap.SetCount(m_width * m_height);
 		m_atributeMap.SetCount(m_width * m_height);
-		readBytes = fread(&m_elevationMap[0], sizeof(ndReal), m_elevationMap.GetCount(), file);
-		readBytes = fread(&m_atributeMap[0], sizeof(ndInt8), m_atributeMap.GetCount(), file);
+		readBytes = fread(&m_elevationMap[0], sizeof(ndReal), size_t(m_elevationMap.GetCount()), file);
+		readBytes = fread(&m_atributeMap[0], sizeof(ndInt8), size_t(m_atributeMap.GetCount()), file);
 		fclose(file);
 	}
 	CalculateLocalObb();
@@ -140,8 +140,8 @@ void ndShapeHeightfield::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	FILE* const file = fopen(filePathName, "wb");
 	if (file) 
 	{
-		fwrite(&m_elevationMap[0], sizeof(ndReal), m_elevationMap.GetCount(), file);
-		fwrite(&m_atributeMap[0], sizeof(ndInt8), m_atributeMap.GetCount(), file);
+		fwrite(&m_elevationMap[0], sizeof(ndReal), size_t(m_elevationMap.GetCount()), file);
+		fwrite(&m_atributeMap[0], sizeof(ndInt8), size_t(m_atributeMap.GetCount()), file);
 		fclose(file);
 	}
 }

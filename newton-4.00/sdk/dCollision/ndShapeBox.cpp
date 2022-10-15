@@ -129,7 +129,7 @@ void ndShapeBox::Init(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 				do 
 				{
 					ptr->m_mark = mark;
-					ptr->m_userData = index;
+					ptr->m_userData = ndUnsigned64(index);
 					index++;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);

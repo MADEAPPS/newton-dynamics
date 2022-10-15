@@ -126,13 +126,13 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	m_skinMargin = xmlGetFloat(xmlNode, "skinMargin");
 	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
-	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "userData");
+	m_shapeMaterial.m_data.m_alignPad = ndUnsigned64 (xmlGetInt64(xmlNode, "userData"));
 	
 	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); ++i)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);
-		m_shapeMaterial.m_userParam[i].m_intData = xmlGetInt64(xmlNode, name);
+		m_shapeMaterial.m_userParam[i].m_intData = ndUnsigned64(xmlGetInt64(xmlNode, name));
 	}
 	
 	ndVector scale (xmlGetVector3(xmlNode, "scale"));

@@ -85,7 +85,7 @@ void ndBrainReplayBuffer::SetCount(ndInt32 replayBufferSize, ndInt32 replayBatch
 	{
 		ndBrainReiforcementTransition& transition = (*this)[i];
 
-		m_randomShaffle[i] = i;
+		m_randomShaffle[i] = ndUnsigned32(i);
 		transition.m_state = ndBrainVector();
 		transition.m_nextState = ndBrainVector();
 		transition.m_action = ndBrainVector();
@@ -120,7 +120,7 @@ void ndBrainReplayBuffer::MakeRandomBatch()
 	ndAssert(m_learnBatchSize == m_inputBatch.GetRows());
 	for (ndInt32 i = 0; i < m_learnBatchSize; ++i)
 	{
-		ndInt32 index = m_randomShaffle[i];
+		ndInt32 index = ndInt32(m_randomShaffle[i]);
 		const ndBrainReiforcementTransition& transition = (*this)[index];
 
 		n_rewardBatch[i] = transition.m_reward;

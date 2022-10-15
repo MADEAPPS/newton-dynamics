@@ -90,10 +90,10 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 						ndConstraint* const joint = jointArray[scan.m_joint >> 1];
 						ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
 						ndAssert(body1 != body);
-						equilibrium = equilibrium & body1->m_isJointFence0;
+						equilibrium = ndUnsigned8 (equilibrium & body1->m_isJointFence0);
 					}
 				}
-				body->m_equilibrium = equilibrium & body->m_autoSleep;
+				body->m_equilibrium = ndUnsigned8(equilibrium & body->m_autoSleep);
 				if (body->m_equilibrium)
 				{
 					body->m_veloc = zero;
@@ -412,7 +412,7 @@ void ndDynamicsUpdateSoa::InitWeights()
 		}
 
 		const ndInt32 conectivity = 7;
-		m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
+		m_solverPasses = ndUnsigned32 (m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2);
 	}
 }
 
@@ -483,7 +483,7 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
 	ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
-	for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
+	for (ndInt32 i = ndInt32(joint->GetRowsCount() - 1); i >= 0; --i)
 	{
 		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
 		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
@@ -1262,7 +1262,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 				const ndVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
 				const ndVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & ndVector::m_negOne);
 				const ndInt8 equilibrium = test.GetSignMask() ? 0 : 1;
-				body->m_equilibrium0 = equilibrium;
+				body->m_equilibrium0 = ndUnsigned8(equilibrium);
 			}
 			ndAssert(body->m_veloc.m_w == ndFloat32(0.0f));
 			ndAssert(body->m_omega.m_w == ndFloat32(0.0f));
@@ -1274,7 +1274,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 void ndDynamicsUpdateSoa::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	const ndInt32 passes = m_solverPasses;
+	const ndUnsigned32 passes = m_solverPasses;
 	ndScene* const scene = m_world->GetScene();
 
 	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
@@ -1706,7 +1706,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 		}
 	});
 
-	for (ndInt32 i = 0; i < passes; ++i)
+	for (ndUnsigned32 i = 0; i < passes; ++i)
 	{
 		scene->ParallelExecute(CalculateJointsForce);
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces);

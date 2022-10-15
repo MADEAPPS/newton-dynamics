@@ -88,7 +88,7 @@ void ndBodyDynamic::SetForce(const ndVector& force)
 		ndVector deltaAccel((m_externalForce - m_savedExternalForce).Scale(m_invMass.m_w));
 		ndAssert(deltaAccel.m_w == ndFloat32(0.0f));
 		ndFloat32 deltaAccel2 = deltaAccel.DotProduct(deltaAccel).GetScalar();
-		m_equilibrium = (deltaAccel2 < D_ERR_TOLERANCE2);
+		m_equilibrium = ndUnsigned8(deltaAccel2 < D_ERR_TOLERANCE2);
 	}
 }
 
@@ -105,7 +105,7 @@ void ndBodyDynamic::SetTorque(const ndVector& torque)
 		ndVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque) * m_invMass);
 		ndAssert(deltaAlpha.m_w == ndFloat32(0.0f));
 		ndFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
-		m_equilibrium = (deltaAlpha2 < D_ERR_TOLERANCE2);
+		m_equilibrium = ndUnsigned8(deltaAlpha2 < D_ERR_TOLERANCE2);
 	}
 }
 
@@ -397,7 +397,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 		m_accel = m_accel & accelTest;
 		m_alpha = m_alpha & accelTest;
 
-		ndUnsigned8 equilibrium = m_isStatic | m_autoSleep;
+		ndUnsigned8 equilibrium = ndUnsigned8(m_isStatic | m_autoSleep);
 		ndAssert(equilibrium == ((m_invMass.m_w == ndFloat32(0.0f)) ? 1 : m_autoSleep));
 		const ndVector isMovingMask(m_veloc + m_omega + m_accel + m_alpha);
 		const ndVector mask(isMovingMask.TestZero());
@@ -409,7 +409,7 @@ void ndBodyDynamic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeA
 			const ndFloat32 alpha2 = m_alpha.DotProduct(m_alpha).GetScalar();
 			const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar();
 			const ndFloat32 omega2 = m_omega.DotProduct(m_omega).GetScalar();
-			ndUnsigned32 equilibriumTest = (accel2 < accelFreeze2) && (alpha2 < accelFreeze2) && (speed2 < freezeSpeed2) && (omega2 < freezeSpeed2);
+			ndUnsigned32 equilibriumTest = ndUnsigned32((accel2 < accelFreeze2) && (alpha2 < accelFreeze2) && (speed2 < freezeSpeed2) && (omega2 < freezeSpeed2));
 
 			if (equilibriumTest)
 			{

@@ -641,7 +641,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 	} 
 
 	ndInt32 count = 0;
-	const ndInt64 hullId = hull->GetUserDataID();
+	const ndUnsigned64 hullId = hull->GetUserDataID();
 	if (inside & !contactSolver.m_intersectionTestOnly)
 	{
 		contactSolver.m_separationDistance = -penetration;
@@ -662,7 +662,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 		{
 			contactsOut[i].m_point = hullMatrix.TransformVector(contactPoints[i] + step);
 			contactsOut[i].m_normal = m_normal;
-			contactsOut[i].m_shapeId0 = hullId;
+			contactsOut[i].m_shapeId0 = ndInt64(hullId);
 			contactsOut[i].m_shapeId1 = m_faceId;
 			contactsOut[i].m_penetration = penetration;
 		}
@@ -681,7 +681,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 			ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
 			for (ndInt32 i = 0; i < count; ++i)
 			{
-				contactsOut[i].m_shapeId0 = hullId;
+				contactsOut[i].m_shapeId0 = ndInt64(hullId);
 				contactsOut[i].m_shapeId1 = m_faceId;
 			}
 		}
@@ -789,7 +789,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 			m_faceClipSize = contactSolver.m_instance0.GetShape()->GetBoxMaxRadius();
 		}
 	
-		const ndInt64 hullId = contactSolver.m_instance0.GetUserDataID();
+		const ndUnsigned64 hullId = contactSolver.m_instance0.GetUserDataID();
 		if (inside & !contactSolver.m_intersectionTestOnly) 
 		{
 			const ndMatrix& matrixInstance0 = contactSolver.m_instance0.m_globalMatrix;
@@ -826,7 +826,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 					{
 						contactsOut[i].m_point = matrixInstance0.TransformVector(contactPoints[i]) + step;
 						contactsOut[i].m_normal = m_normal;
-						contactsOut[i].m_shapeId0 = hullId;
+						contactsOut[i].m_shapeId0 = ndInt64(hullId);
 						contactsOut[i].m_shapeId1 = m_faceId;
 						contactsOut[i].m_penetration = penetration;
 					}
@@ -842,7 +842,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 				ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
 				for (ndInt32 i = 0; i < count; ++i) 
 				{
-					contactsOut[i].m_shapeId0 = hullId;
+					contactsOut[i].m_shapeId0 = ndInt64(hullId);
 					contactsOut[i].m_shapeId1 = m_faceId;
 				}
 			}

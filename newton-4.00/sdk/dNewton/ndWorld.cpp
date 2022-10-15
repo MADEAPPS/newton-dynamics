@@ -896,68 +896,99 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 				break;
 			}
 
-			#ifdef _D_USE_AVX2_SOLVER
 			case ndSimdAvx2Solver:
 			{
-				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-				delete m_scene;
-				m_scene = newScene;
+				#ifdef _D_USE_AVX2_SOLVER
+					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = newScene;
 
-				m_solverMode = solverMode;
-				m_solver = new ndDynamicsUpdateAvx2(this);
+					m_solverMode = solverMode;
+					m_solver = new ndDynamicsUpdateAvx2(this);
+				#else
+					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = newScene;
+
+					m_solverMode = ndSimdSoaSolver;
+					m_solver = new ndDynamicsUpdateSoa(this);
+				#endif
 				break;
 			}
-			#endif
 
-			#ifdef _D_NEWTON_OPENCL
 			case ndOpenclSolver1:
 			{
-				ndWorldScene* const newScene = new ndWorldScene(this);
-				delete m_scene;
-				m_scene = newScene;
+				#ifdef _D_NEWTON_OPENCL
+					ndWorldScene* const newScene = new ndWorldScene(this);
+					delete m_scene;
+					m_scene = newScene;
 
-				m_solverMode = solverMode;
-				m_solver = new ndDynamicsUpdateOpencl(this, 0);
+					m_solverMode = solverMode;
+					m_solver = new ndDynamicsUpdateOpencl(this, 0);
+				#else
+					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = newScene;
+
+					m_solverMode = ndSimdSoaSolver;
+					m_solver = new ndDynamicsUpdateSoa(this);
+				#endif
 				break;
 			}
 
 			case ndOpenclSolver2:
 			{
-				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-				delete m_scene;
-				m_scene = newScene;
+				#ifdef _D_NEWTON_OPENCL
+					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = newScene;
 
-				m_solverMode = solverMode;
-				m_solver = new ndDynamicsUpdateOpencl(this, 1);
+					m_solverMode = solverMode;
+					m_solver = new ndDynamicsUpdateOpencl(this, 1);
+				#else
+					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = newScene;
+
+					m_solverMode = ndSimdSoaSolver;
+					m_solver = new ndDynamicsUpdateSoa(this);
+				#endif
+
 				break;
 			}
-			#endif
-
-			#ifdef _D_NEWTON_CUDA
+			
 			case ndCudaSolver:
 			{
-				ndMemFreeCallback freeMemory;
-				ndMemAllocCallback allocMemory;
-				ndMemory::GetMemoryAllocators(allocMemory,freeMemory);
-				CudaSetMemoryAllocators(allocMemory, freeMemory);
-				ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
-				delete m_scene;
-				m_scene = newScene;
-				m_solverMode = solverMode;
-				m_solver = new ndDynamicsUpdateCuda(this);
-				if (!newScene->IsValid())
-				{
-					delete m_solver;
-					ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				#ifdef _D_NEWTON_CUDA
+					ndMemFreeCallback freeMemory;
+					ndMemAllocCallback allocMemory;
+					ndMemory::GetMemoryAllocators(allocMemory,freeMemory);
+					CudaSetMemoryAllocators(allocMemory, freeMemory);
+					ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
 					delete m_scene;
-					m_scene = defaultScene;
+					m_scene = newScene;
+					m_solverMode = solverMode;
+					m_solver = new ndDynamicsUpdateCuda(this);
+					if (!newScene->IsValid())
+					{
+						delete m_solver;
+						ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+						delete m_scene;
+						m_scene = defaultScene;
 
-					m_solverMode = ndStandardSolver;
-					m_solver = new ndDynamicsUpdate(this);
-				}
+						m_solverMode = ndStandardSolver;
+						m_solver = new ndDynamicsUpdate(this);
+					}
+				#else
+					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					delete m_scene;
+					m_scene = newScene;
+
+					m_solverMode = ndSimdSoaSolver;
+					m_solver = new ndDynamicsUpdateSoa(this);
+				#endif
 				break;
 			}
-			#endif
 
 			case ndStandardSolver:
 			default:

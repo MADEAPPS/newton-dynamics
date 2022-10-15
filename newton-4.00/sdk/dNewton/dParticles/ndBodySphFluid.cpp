@@ -42,8 +42,8 @@ class ndBodySphFluid::ndGridHash
 	ndGridHash(ndInt32 y, ndInt32 z)
 	{
 		m_gridHash = 0;
-		m_y = y;
-		m_z = z;
+		m_y = ndUnsigned64(y);
+		m_z = ndUnsigned64(z);
 	}
 
 	ndGridHash(const ndVector& grid, ndInt32 particleIndex)
@@ -56,11 +56,11 @@ class ndBodySphFluid::ndGridHash
 		ndVector hash(grid.GetInt());
 
 		m_gridHash = 0;
-		m_y = hash.m_iy;
-		m_z = hash.m_iz;
+		m_y = ndUnsigned64(hash.m_iy);
+		m_z = ndUnsigned64(hash.m_iz);
 
 		m_cellType = ndAdjacentGrid;
-		m_particleIndex = particleIndex;
+		m_particleIndex = ndUnsigned64(particleIndex);
 	}
 
 	union
@@ -204,8 +204,9 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			ndUnsigned32 key = m_data.WorldToGrid(m_point[cell.m_particleIndex].m_x);
-			return key & 0xff;
+			ndInt32 index = ndInt32(cell.m_particleIndex);
+			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index].m_x));
+			return ndInt32(key & 0xff);
 		}
 
 		ndBodySphFluid* m_fluid;
@@ -225,8 +226,9 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			ndUnsigned32 key = m_data.WorldToGrid(m_point[cell.m_particleIndex].m_x);
-			return (key >> 8) & 0xff;
+			ndInt32 index = ndInt32 (cell.m_particleIndex);
+			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index].m_x));
+			return ndInt32((key >> 8) & 0xff);
 		}
 
 		ndBodySphFluid* m_fluid;
@@ -246,8 +248,9 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			ndUnsigned32 key = m_data.WorldToGrid(m_point[cell.m_particleIndex].m_x);
-			return (key >> 16) & 0xff;
+			ndInt32 index = ndInt32(cell.m_particleIndex);
+			ndUnsigned32 key = ndUnsigned32(m_data.WorldToGrid(m_point[index].m_x));
+			return ndInt32((key >> 16) & 0xff);
 		}
 
 		ndBodySphFluid* m_fluid;
@@ -293,7 +296,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		ndKey_ylow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			return cell.m_yLow;
+			return ndInt32(cell.m_yLow);
 		}
 	};
 
@@ -303,7 +306,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		ndKey_zlow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			return cell.m_zLow;
+			return ndInt32(cell.m_zLow);
 		}
 	};
 
@@ -313,7 +316,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		ndKey_yhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			return cell.m_yHigh;
+			return ndInt32(cell.m_yHigh);
 		}
 	};
 
@@ -323,7 +326,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 		ndKey_zhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			return cell.m_zHigh;
+			return ndInt32(cell.m_zHigh);
 		}
 	};
 
@@ -494,12 +497,12 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			{
 				const ndGridHash hash0 = hashGridMap[start + i];
 				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
-				const ndInt32 particle0 = hash0.m_particleIndex;
+				const ndInt32 particle0 = ndInt32(hash0.m_particleIndex);
 				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0].m_x);
 				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
-					const ndInt32 particle1 = hash1.m_particleIndex;
+					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
 					ndAssert(particle0 != particle1);
 					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1].m_x);
 					ndAssert((x1 - x0) > ndFloat32(-1.0e-3f));

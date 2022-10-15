@@ -145,7 +145,7 @@ void ndCountingSortInPlace(T* const array, T* const scratchBuffer, ndInt32 size,
 	{
 		const T& entry = array[i];
 		scratchBuffer[i] = entry;
-		const ndInt32 key = ndInt32(evaluator.GetKey(entry));
+		const ndInt32 key = evaluator.GetKey(entry);
 		ndAssert(key >= 0);
 		ndAssert(key < (1 << keyBitSize));
 		scans[key] ++;
@@ -170,8 +170,8 @@ void ndCountingSortInPlace(T* const array, T* const scratchBuffer, ndInt32 size,
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const T& entry = scratchBuffer[i];
-		const ndUnsigned32 key = evaluator.GetKey(entry);
-		//ndAssert(key >= 0);
+		const ndInt32 key = evaluator.GetKey(entry);
+		ndAssert(key >= 0);
 		ndAssert(key < (1 << keyBitSize));
 		const ndUnsigned32 index = scans[key];
 		array[index] = entry;
@@ -209,7 +209,7 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const T& entry = array[i];
-			const ndInt32 key = ndInt32(evaluator.GetKey(entry));
+			const ndInt32 key = evaluator.GetKey(entry);
 			ndAssert(key >= 0);
 			ndAssert(key < (1 << keyBitSize));
 			scan[key] ++;
@@ -226,8 +226,8 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const T& entry = scratchBuffer[i];
-			const ndUnsigned32 key = evaluator.GetKey(entry);
-			//ndAssert(key >= 0);
+			const ndInt32 key = evaluator.GetKey(entry);
+			ndAssert(key >= 0);
 			ndAssert(key < (1 << keyBitSize));
 			const ndUnsigned32 index = scan[key];
 			array[index] = entry;
@@ -299,10 +299,10 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsi
 		scans[key] ++;
 	}
 
-	ndInt32 sum = 0;
+	ndUnsigned32 sum = 0;
 	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
-		ndInt32 partialSum = scans[i];
+		ndUnsigned32 partialSum = scans[i];
 		scans[i] = sum;
 		sum += partialSum;
 	}
@@ -321,7 +321,7 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsi
 		const ndInt32 key = evaluator.GetKey(entry);
 		ndAssert(key >= 0);
 		ndAssert(key < (1 << keyBitSize));
-		const ndInt32 index = scans[key];
+		const ndUnsigned32 index = scans[key];
 		scratchBuffer[index] = entry;
 		scans[key] = index + 1;
 	}
@@ -357,8 +357,8 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const T& entry = array[i];
-			const ndUnsigned32 key = evaluator.GetKey(entry);
-			//ndAssert(key >= 0);
+			const ndInt32 key = evaluator.GetKey(entry);
+			ndAssert(key >= 0);
 			ndAssert(key < (1 << keyBitSize));
 			scan[key] ++;
 		}
@@ -373,8 +373,8 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			const T& entry = array[i];
-			const ndUnsigned32 key = evaluator.GetKey(entry);
-			//ndAssert(key >= 0);
+			const ndInt32 key = evaluator.GetKey(entry);
+			ndAssert(key >= 0);
 			ndAssert(key < (1 << keyBitSize));
 			const ndUnsigned32 index = scan[key];
 			scratchBuffer[index] = entry;

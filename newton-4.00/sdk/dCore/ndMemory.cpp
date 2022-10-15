@@ -47,7 +47,7 @@ void* ndMemory::Malloc(size_t size)
 {
 	size += ndGetBufferSize;
 	void* const ptr = m_allocMemory(size);
-	ndInt64 val = ndUnsigned64(ptr) + ndGetBufferSize;
+	ndUnsigned64 val = ndUnsigned64(ptr) + ndGetBufferSize;
 	ndInt64 mask = -ndInt64(D_MEMORY_ALIGMNET);
 	val = val & mask;
 	ndMemoryHeader* const ret = (ndMemoryHeader*)val;
@@ -63,7 +63,7 @@ void ndMemory::Free(void* const ptr)
 	if (ptr)
 	{
 		ndMemoryHeader* const ret = ((ndMemoryHeader*)ptr) - 1;
-		m_memoryUsed.fetch_sub(ret->m_size);
+		m_memoryUsed.fetch_sub(ndUnsigned64(ret->m_size));
 		m_freeMemory(ret->m_ptr);
 	}
 }

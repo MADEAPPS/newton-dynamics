@@ -173,7 +173,7 @@ void ndBodyKinematic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndBodyKinematic::SetSleepState(bool state)
 {
-	m_equilibrium = state ? 1 : 0;
+	m_equilibrium = ndUnsigned8 (state ? 1 : 0);
 	if ((m_invMass.m_w > ndFloat32(0.0f)) && (m_veloc.DotProduct(m_veloc).GetScalar() < ndFloat32(1.0e-10f)) && (m_omega.DotProduct(m_omega).GetScalar() < ndFloat32(1.0e-10f))) 
 	{
 		ndVector invalidateVeloc(ndFloat32(10.0f));
@@ -218,7 +218,7 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
 	ndScopeSpinLock lock(m_lock);
 	ndAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	m_equilibrium = contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium;
+	m_equilibrium = ndUnsigned8(contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium);
 	m_contactList.DetachContact(contact);
 }
 
@@ -393,7 +393,7 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 			{
 				bodyNode->SetAabb(m_minAabb, m_maxAabb);
 			}
-			sceneEquilibrium = !sceneForceUpdate & (test != 0);
+			sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
 		}
 		m_sceneForceUpdate = 0;
 		m_sceneEquilibrium = sceneEquilibrium;
@@ -601,7 +601,7 @@ void ndBodyKinematic::EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32)
 		{
 			const ndFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar();
 			const ndFloat32 omega2 = m_omega.DotProduct(m_omega).GetScalar();
-			ndUnsigned32 equilibriumTest = (speed2 < freezeSpeed2) && (omega2 < freezeSpeed2);
+			ndUnsigned32 equilibriumTest = ndUnsigned32((speed2 < freezeSpeed2) && (omega2 < freezeSpeed2));
 
 			if (equilibriumTest)
 			{

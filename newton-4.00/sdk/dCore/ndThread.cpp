@@ -25,6 +25,11 @@
 #include "ndThread.h"
 #include "ndProfiler.h"
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4355)
+#endif
+
 ndThread::ndThread()
 	:ndClassAlloc()
 	,ndThreadName()
@@ -40,6 +45,10 @@ ndThread::ndThread()
 	store(false);
 #endif
 }
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 ndThread::~ndThread()
 {

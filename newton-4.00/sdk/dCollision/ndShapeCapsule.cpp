@@ -151,8 +151,8 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 		x1 += step;
 	}
 
-	m_vertexCount = ndInt16(index);
-	ndShapeConvex::m_vertex = (ndVector*)ndMemory::Malloc(ndInt32(m_vertexCount * sizeof(ndVector)));
+	m_vertexCount = ndUnsigned16(index);
+	ndShapeConvex::m_vertex = (ndVector*)ndMemory::Malloc(size_t(m_vertexCount * sizeof(ndVector)));
 	memcpy(ndShapeConvex::m_vertex, tempVertex, m_vertexCount * sizeof(ndVector));
 
 	ndPolyhedra polyhedra;
@@ -193,8 +193,8 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 
 	ndAssert(SanityCheck(polyhedra));
 
-	m_edgeCount = ndInt16(polyhedra.GetEdgeCount());
-	m_simplex = (ndConvexSimplexEdge*)ndMemory::Malloc(ndInt32(m_edgeCount * sizeof(ndConvexSimplexEdge)));
+	m_edgeCount = ndUnsigned16(polyhedra.GetEdgeCount());
+	m_simplex = (ndConvexSimplexEdge*)ndMemory::Malloc(size_t(m_edgeCount * sizeof(ndConvexSimplexEdge)));
 
 	ndUnsigned64 i = 0;
 	ndPolyhedra::Iterator iter(polyhedra);

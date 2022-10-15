@@ -86,7 +86,7 @@ ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	m_veloc = xmlGetVector3(xmlNode, "veloc");
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
-	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
+	m_autoSleep = ndUnsigned8 (xmlGetInt(xmlNode, "autoSleep") ? 1 : 0);
 	
 	SetMatrix(matrix);
 	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("bodyNotifyClass");

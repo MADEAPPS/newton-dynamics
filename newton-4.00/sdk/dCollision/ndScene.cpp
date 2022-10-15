@@ -1222,7 +1222,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		if (isCollidable)
 		{
 			ndArray<ndContactPairs>& particalPairs = m_partialNewPairs[threadId];
-			ndContactPairs pair(body0->m_index, body1->m_index);
+			ndContactPairs pair(ndUnsigned32(body0->m_index), ndUnsigned32(body1->m_index));
 			particalPairs.PushBack(pair);
 		}
 	}
@@ -1232,7 +1232,7 @@ void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
 	ndInt32 contactCount = m_contactArray.GetCount();
-	m_scratchBuffer.SetCount((contactCount + m_newPairs.GetCount() + 16) * sizeof(ndContact*));
+	m_scratchBuffer.SetCount(ndInt32 ((contactCount + m_newPairs.GetCount() + 16) * sizeof(ndContact*)));
 
 	ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
 	
@@ -1242,7 +1242,7 @@ void ndScene::CalculateContacts()
 		const ndArray<ndContactPairs>& newPairs = m_newPairs;
 		ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
 
-		const ndUnsigned32 count = newPairs.GetCount();
+		const ndInt32 count = newPairs.GetCount();
 		const ndStartEnd startEnd(count, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -1268,8 +1268,8 @@ void ndScene::CalculateContacts()
 		D_TRACKTIME_NAMED(CopyContactArray);
 		ndContact** const contactArray = &m_contactArray[0];
 
-		const ndUnsigned32 start = m_newPairs.GetCount();
-		const ndUnsigned32 count = m_contactArray.GetCount();
+		const ndInt32 start = m_newPairs.GetCount();
+		const ndInt32 count = m_contactArray.GetCount();
 		
 		const ndStartEnd startEnd(count, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1292,7 +1292,7 @@ void ndScene::CalculateContacts()
 		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
-			const ndUnsigned32 jointCount = m_contactArray.GetCount();
+			const ndInt32 jointCount = m_contactArray.GetCount();
 
 			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1325,14 +1325,14 @@ void ndScene::CalculateContacts()
 				m_code[3] = m_dead;
 			}
 
-			ndUnsigned32 GetKey(const ndContact* const contact) const
+			ndInt32 GetKey(const ndContact* const contact) const
 			{
-				const ndUnsigned32 inactive = !contact->IsActive() | (contact->m_maxDOF ? 0 : 1);
+				const ndUnsigned32 inactive = ndUnsigned32(!contact->IsActive() | (contact->m_maxDOF ? 0 : 1));
 				const ndUnsigned32 idDead = contact->m_isDead;
 				return m_code[idDead * 2 + inactive];
 			}
 
-			ndUnsigned32 m_code[4];
+			ndInt32 m_code[4];
 		};
 
 		ndUnsigned32 prefixScan[5];
@@ -1344,8 +1344,8 @@ void ndScene::CalculateContacts()
 			{
 				D_TRACKTIME_NAMED(DeleteContactArray);
 				ndArray<ndContact*>& contactArray = m_contactArray;
-				const ndUnsigned32 start = prefixScan[m_dead];
-				const ndUnsigned32 count = prefixScan[m_dead + 1] - start;
+				const ndInt32 start = ndInt32(prefixScan[m_dead]);
+				const ndInt32 count = ndInt32(prefixScan[m_dead + 1] - start);
 
 				const ndStartEnd startEnd(count, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1362,10 +1362,10 @@ void ndScene::CalculateContacts()
 			});
 
 			ParallelExecute(DeleteContactArray);
-			m_contactArray.SetCount(prefixScan[m_inactive + 1]);
+			m_contactArray.SetCount(ndInt32(prefixScan[m_inactive + 1]));
 		}
 
-		m_activeConstraintArray.SetCount(prefixScan[m_active + 1]);
+		m_activeConstraintArray.SetCount(ndInt32(prefixScan[m_active + 1]));
 		if (m_activeConstraintArray.GetCount())
 		{
 			auto CopyActiveContact = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
@@ -1373,7 +1373,7 @@ void ndScene::CalculateContacts()
 				D_TRACKTIME_NAMED(CopyActiveContact);
 				const ndArray<ndContact*>& constraintArray = m_contactArray;
 				ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
-				const ndUnsigned32 activeJointCount = activeConstraintArray.GetCount();
+				const ndInt32 activeJointCount = activeConstraintArray.GetCount();
 
 				const ndStartEnd startEnd(activeJointCount, threadIndex, threadCount);
 				for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -1446,7 +1446,7 @@ void ndScene::FindCollidingPairs()
 			sum += newPairs.GetCount();
 		}
 		scanCounts[threadCount] = sum;
-		m_newPairs.SetCount(sum);
+		m_newPairs.SetCount(ndInt32(sum));
 
 		if (sum)
 		{
@@ -1455,10 +1455,10 @@ void ndScene::FindCollidingPairs()
 				D_TRACKTIME_NAMED(CopyPartialCounts);
 				const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[threadIndex];
 
-				const ndUnsigned32 count = newPairs.GetCount();
-				const ndUnsigned32 start = scanCounts[threadIndex];
-				ndAssert((scanCounts[threadIndex + 1] - start) == ndUnsigned32(newPairs.GetCount()));
-				for (ndUnsigned32 i = 0; i < count; ++i)
+				const ndInt32 count = newPairs.GetCount();
+				const ndInt32 start = ndInt32(scanCounts[threadIndex]);
+				ndAssert((scanCounts[threadIndex + 1] - start) == newPairs.GetCount());
+				for (ndInt32 i = 0; i < count; ++i)
 				{
 					m_newPairs[start + i] = newPairs[i];
 				}
@@ -1476,16 +1476,16 @@ void ndScene::FindCollidingPairs()
 		{
 			sum += m_partialNewPairs[i].GetCount();
 		}
-		m_newPairs.SetCount(sum);
+		m_newPairs.SetCount(ndInt32(sum));
 
 		sum = 0;
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
 			const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
-			const ndUnsigned32 count = newPairs.GetCount();
-			for (ndUnsigned32 j = 0; j < count; ++j)
+			const ndInt32 count = newPairs.GetCount();
+			for (ndInt32 j = 0; j < count; ++j)
 			{
-				m_newPairs[sum + j] = newPairs[j];
+				m_newPairs[ndInt32(sum + j)] = newPairs[j];
 			}
 			sum += count;
 		}
@@ -1525,18 +1525,18 @@ void ndScene::FindCollidingPairs()
 					return 0;
 				}
 			};
-			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], sum, nullptr);
+			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], ndInt32(sum), nullptr);
 
 			CompareKey comparator;
-			for (ndInt32 i = sum - 2; i >= 0; i--)
+			for (ndInt32 i = ndInt32(sum - 2); i >= 0; i--)
 			{
 				if (comparator.Compare(m_newPairs[i], m_newPairs[i + 1], nullptr) == 0)
 				{
 					sum--;
-					m_newPairs[i] = m_newPairs[sum];
+					m_newPairs[i] = m_newPairs[ndInt32(sum)];
 				}
 			}
-			m_newPairs.SetCount(sum);
+			m_newPairs.SetCount(ndInt32(sum));
 
 			#ifdef _DEBUG
 			for (ndInt32 i = 1; i < m_newPairs.GetCount(); ++i)
@@ -1627,7 +1627,7 @@ void ndScene::InitBodyArray()
 				{
 					bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
 				}
-				sceneEquilibrium = !sceneForceUpdate & (test != 0);
+				sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
 			}
 			body->m_sceneForceUpdate = 0;
 			body->m_sceneEquilibrium = sceneEquilibrium;

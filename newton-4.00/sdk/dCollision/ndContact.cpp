@@ -142,7 +142,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 
 	ndFloat32 relSpeed = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	ndFloat32 penetration = ndClamp(contact.m_penetration - D_RESTING_CONTACT_PENETRATION, ndFloat32(0.0f), ndFloat32(0.5f));
-	desc.m_flags[normalIndex] = contact.m_material.m_flags & m_isSoftContact;
+	desc.m_flags[normalIndex] = ndInt32(contact.m_material.m_flags & m_isSoftContact);
 	desc.m_penetration[normalIndex] = penetration;
 	desc.m_restitution[normalIndex] = restitutionCoefficient;
 	desc.m_forceBounds[normalIndex].m_low = ndFloat32(0.0f);

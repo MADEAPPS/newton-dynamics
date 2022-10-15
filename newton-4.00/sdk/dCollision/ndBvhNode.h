@@ -106,17 +106,17 @@ class ndBvhLeafNode : public ndBvhNode
 class ndBottomUpCell
 {
 	public:
-	ndUnsigned32 m_x;
-	ndUnsigned32 m_y;
-	ndUnsigned32 m_z;
+	ndInt32 m_x;
+	ndInt32 m_y;
+	ndInt32 m_z;
 	ndBvhNode* m_node;
 };
 
 class ndCellScanPrefix
 {
 	public:
-	ndUnsigned32 m_location : 30;
-	ndUnsigned32 m_cellTest : 1;
+	ndInt32 m_location : 30;
+	ndInt32 m_cellTest : 1;
 };
 
 class ndBuildBvhTreeBuildState
@@ -133,7 +133,7 @@ class ndBuildBvhTreeBuildState
 
 	ndBuildBvhTreeBuildState();
 
-	void Init(ndUnsigned32 maxCount);
+	void Init(ndInt32 maxCount);
 
 	ndVector m_size;
 	ndVector m_origin;
@@ -148,8 +148,8 @@ class ndBuildBvhTreeBuildState
 	ndBvhNode** m_tmpArray;
 	ndBvhNode** m_parentsArray;
 
-	ndUnsigned32 m_depthLevel;
-	ndUnsigned32 m_leafNodesCount;
+	ndInt32 m_depthLevel;
+	ndInt32 m_leafNodesCount;
 	ndState m_state;
 };
 
@@ -193,7 +193,7 @@ class ndBvhSceneManager
 	void BuildBvhTreeCalculateLeafBoxes(ndThreadPool& threadPool);
 	
 	ndBvhNode* BuildIncrementalBvhTree(ndThreadPool& threadPool);
-	ndUnsigned32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndUnsigned32 bashCount);
+	ndInt32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndInt32 bashCount);
 
 	void BuildBvhTreeSwapBuffers(ndThreadPool& threadPool);
 

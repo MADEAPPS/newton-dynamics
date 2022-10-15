@@ -85,9 +85,9 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		{
 		}
 
-		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
+		ndInt32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
-			return ndUnsigned32(entry.m_body & ((1 << D_MAX_BODY_RADIX_BIT) - 1));
+			return ndInt32(entry.m_body & ((1 << D_MAX_BODY_RADIX_BIT) - 1));
 		}
 	};
 
@@ -98,9 +98,9 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		{
 		}
 
-		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
+		ndInt32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
-			ndUnsigned32 key = ndUnsigned32(entry.m_body >> D_MAX_BODY_RADIX_BIT);
+			ndInt32 key = ndInt32(entry.m_body >> D_MAX_BODY_RADIX_BIT);
 			return key & ((1 << D_MAX_BODY_RADIX_BIT) - 1);
 		}
 	};
@@ -221,10 +221,10 @@ void ndDynamicsUpdate::SortJointsScan()
 		};
 
 		ndEvaluateCountRows(void* const) {}
-		ndUnsigned32 GetKey(const ndConstraint* const joint) const
+		ndInt32 GetKey(const ndConstraint* const joint) const
 		{
 			const ndSortKey key(joint->m_resting, joint->m_rowCount);
-			return ndUnsigned32(key.m_value);
+			return key.m_value;
 		}
 	};
 

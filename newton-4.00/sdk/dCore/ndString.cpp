@@ -150,7 +150,7 @@ class ndString::ndStringAllocator
 	#else 
 		char* Alloc(ndInt32 size)
 		{
-			return (char*) ndMemory::Malloc (size);
+			return (char*) ndMemory::Malloc (size_t(size));
 		}
 
 		void Free(char* const ptr)
@@ -220,8 +220,8 @@ ndString::ndString (const ndString& src, const char* const concatenate, ndInt32 
 	,m_capacity(0)
 {
 	m_string = AllocMem (src.m_size + concatenateSize + 1);
-	memcpy (m_string, src.m_string, src.m_size);
-	memcpy (&m_string[src.m_size], concatenate, concatenateSize);
+	memcpy (m_string, src.m_string, size_t(src.m_size));
+	memcpy (&m_string[src.m_size], concatenate, size_t(concatenateSize));
 	m_size = src.m_size + concatenateSize;
 	m_string[m_size] = 0;
 	m_capacity = m_size + 1;
@@ -247,10 +247,11 @@ ndString::ndString (ndInt32 val)
 	char tmp[256];
 
 	ndInt32 count = 0;
-	unsigned mag = abs (val);
+	//unsigned mag = abs (val);
+	ndUnsigned32 mag = ndUnsigned32(ndAbs(val));
 	do 
 	{
-		unsigned digit = mag % 10;
+		ndUnsigned32 digit = mag % 10;
 		mag /= 10;  
 		tmp[count] = '0' + char(digit);
 		count ++;
@@ -258,10 +259,12 @@ ndString::ndString (ndInt32 val)
 
 	ndInt32 offset = (val >= 0) ? 0: 1;
 	m_string = AllocMem (count + offset + 1);
-	if (offset) {
+	if (offset) 
+	{
 		m_string[0] = '-';
 	}
-	for (ndInt32 i = 0; i < count; ++i) {
+	for (ndInt32 i = 0; i < count; ++i) 
+	{
 		m_string[i + offset] = tmp[count - i - 1];
 	}
 
@@ -278,9 +281,10 @@ ndString::ndString (ndUnsigned64 input)
 	char tmp[256];
 
 	ndInt32 count = 0;
-	ndInt64 val = input;
-	ndUnsigned64 mag = (val > 0ll) ? val : -val;
-	do {
+	ndInt64 val = ndInt64(input);
+	ndUnsigned64 mag = ndUnsigned64((val > 0ll) ? val : -val);
+	do 
+	{
 		ndUnsigned64 digit = mag % 10ll;
 		mag /= 10ll;  
 		tmp[count] = '0' + char(digit);
@@ -336,7 +340,7 @@ void ndString::LoadFile (FILE* const file)
 	}
 	fseek (file, 0, SEEK_SET);
 	Expand (size);
-	size_t ret = fread (m_string, 1, size, file);
+	size_t ret = fread (m_string, 1, size_t(size), file);
 	ret++;
 	m_string[size-1] = 0;
 	m_size = size-1;
@@ -355,8 +359,8 @@ void ndString::operator+= (const char* const src)
 			newCapacity *= 2;
 		}
 		m_string = AllocMem (newCapacity + 1);
-		memcpy (m_string, oldData, m_size);
-		memcpy (&m_string[m_size], src, size);
+		memcpy (m_string, oldData, size_t(m_size));
+		memcpy (&m_string[m_size], src, size_t(size));
 		m_size = m_size + size;
 		m_string[m_size] = 0;
 		m_capacity = newCapacity + 1;
@@ -364,7 +368,7 @@ void ndString::operator+= (const char* const src)
 	} 
 	else 
 	{
-		memcpy (&m_string[m_size], src, size);
+		memcpy (&m_string[m_size], src, size_t(size));
 		m_size = m_size + size;
 		m_string[m_size] = 0;
 	}
@@ -596,9 +600,9 @@ void ndString::Replace (ndInt32 start, ndInt32 size, const char* const str, ndIn
 {
 	char* const oldData = m_string;
 	m_string = AllocMem (m_size - size + strSize + 1);
-	memcpy (m_string, oldData, start);
-	memcpy (&m_string[start], str, strSize);
-	memcpy (&m_string[start + strSize], &oldData[start + size], m_size - (start + size));
+	memcpy (m_string, oldData, size_t(start));
+	memcpy (&m_string[start], str, size_t(strSize));
+	memcpy (&m_string[start + strSize], &oldData[start + size], size_t(m_size - (start + size)));
 	m_size = m_size - size + strSize;
 	m_capacity = m_size + 1;
 	m_string[m_size] = 0;
@@ -612,7 +616,7 @@ void ndString::Expand (ndInt32 size)
 	
 	if (m_capacity) 
 	{
-		memcpy (m_string, oldData, m_size);
+		memcpy (m_string, oldData, size_t(m_size));
 		FreeMem(oldData);
 	}
 	m_string[m_size] = 0;

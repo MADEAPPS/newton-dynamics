@@ -54,7 +54,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 	m_mark0 = 0;
 	m_mark1	= 0;
-	m_maxDof = maxDof;
+	m_maxDof = ndUnsigned32(maxDof);
 	m_rowIsMotor = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
@@ -93,7 +93,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 	m_mark0 = 0;
 	m_mark1 = 0;
-	m_maxDof = maxDof;
+	m_maxDof = ndUnsigned32(maxDof);
 	m_rowIsMotor = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
@@ -132,8 +132,8 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::ndL
 	m_localMatrix0 = xmlGetMatrix(xmlNode, "localMatrix0");
 	m_localMatrix1 = xmlGetMatrix(xmlNode, "localMatrix1");
 	
-	m_maxDof = xmlGetInt(xmlNode, "maxDof");
-	m_enableCollision = xmlGetInt(xmlNode, "enableCollision");
+	m_maxDof = ndUnsigned32(xmlGetInt(xmlNode, "maxDof"));
+	m_enableCollision = ndUnsigned32(xmlGetInt(xmlNode, "enableCollision"));
 	m_solverModel = ndJointBilateralSolverModel(xmlGetInt(xmlNode, "solverModel"));
 	m_defualtDiagonalRegularizer = xmlGetFloat(xmlNode, "defualtDiagonalRegularizer");
 

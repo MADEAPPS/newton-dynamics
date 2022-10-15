@@ -112,10 +112,10 @@ void ndBrain::EndAddLayer()
 		vectorSizeInBytes += layer.GetOuputSize() * sizeof(ndArray<ndDeepBrainMemVector>);
 	}
 
-	ndInt32 memorySize = floatsCount * sizeof(ndReal) + vectorSizeInBytes + 256;
+	ndInt32 memorySize = floatsCount * ndInt32(sizeof(ndReal)) + vectorSizeInBytes + 256;
 	m_memorySize = memorySize;
-	m_memory = ndMemory::Malloc(memorySize);
-	memset(m_memory, 0, memorySize);
+	m_memory = ndMemory::Malloc(size_t(memorySize));
+	memset(m_memory, 0, size_t(memorySize));
 
 	// assign vector pointers
 	ndUnsigned8* mem = (ndUnsigned8*)m_memory;

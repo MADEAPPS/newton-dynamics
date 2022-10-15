@@ -1155,7 +1155,7 @@ ndInt32 ndPolygonSoupBuilder::AddConvexFace (ndInt32 count, ndInt32* const pool,
 		polyhedra2.ConvexPartition (&m_vertexPoints[0].m_x, sizeof (ndBigVector), &leftOver);
 		leftOver.EndFace();
 
-#if _DEBUG
+#ifdef _DEBUG
 		if (leftOver.GetCount()) 
 		{
 			ndTrace (("warning: %d faces with more that a one shared edge\n", leftOver.GetCount()));

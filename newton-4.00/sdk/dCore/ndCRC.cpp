@@ -119,7 +119,7 @@ ndUnsigned64 dCRC64 (const void* const buffer, ndInt32 size, ndUnsigned64 crcAcc
 	const ndInt32 bitshift = (sizeof (ndUnsigned64)<<3) - 8;
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
-		char c = ptr[i];
+		unsigned char c = ptr[i];
 		ndUnsigned64  val = randBits0[((crcAcc >> bitshift) ^ c) & 0xff];
 		crcAcc = (crcAcc << 8) ^ val;
 	}

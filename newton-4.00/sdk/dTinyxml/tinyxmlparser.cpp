@@ -433,7 +433,7 @@ const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name, TiXmlEncodi
 			++p;
 		}
 		if ( p-start > 0 ) {
-			name->assign( start, p-start );
+			name->assign( start, size_t (p-start) );
 		}
 		return p;
 	}
@@ -595,7 +595,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 			int len;
 			char cArr[4] = { 0, 0, 0, 0 };
 			p = GetChar( p, cArr, &len, encoding );
-			text->append( cArr, len );
+			text->append( cArr, size_t (len) );
 		}
 	}
 	else
@@ -632,7 +632,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 				if ( len == 1 )
 					(*text) += cArr[0];	// more efficient
 				else
-					text->append( cArr, len );
+					text->append( cArr, size_t(len) );
 			}
 		}
 	}
@@ -880,7 +880,7 @@ TiXmlNode* TiXmlNode::Identify( const char* p, TiXmlEncoding encoding )
 		#endif
 		returnNode = new TiXmlUnknown();
 	}
-	else if (    IsAlpha( *(p+1), encoding )
+	else if (    IsAlpha(unsigned char (*(p+1)), encoding )
 			  || *(p+1) == '_' )
 	{
 		#ifdef DEBUG_PARSER

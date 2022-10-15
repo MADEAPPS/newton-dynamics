@@ -1105,7 +1105,7 @@ ndInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* co
 			do
 			{
 				edge->m_incidentFace = 1;
-				edge->m_userData = m_attrib.m_pointChannel.GetCount();
+				edge->m_userData = ndUnsigned64(m_attrib.m_pointChannel.GetCount());
 
 				m_attrib.m_pointChannel.PushBack(edge->m_incidentVertex);
 				if (m_attrib.m_normalChannel.GetCount())
@@ -1263,7 +1263,7 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 				do
 				{
 					vetexIndex[count] = ptr->m_incidentVertex;
-					attribIndex[count] = ptr->m_userData;
+					attribIndex[count] = ndInt64(ptr->m_userData);
 					count++;
 					ptr = ptr->m_prev;
 				} while (ptr != concaveFace);

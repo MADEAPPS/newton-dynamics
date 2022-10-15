@@ -247,7 +247,7 @@ void ndPolyhedra::SavePLY(const char* const fileName, const ndFloat64* const ver
 			ndEdge* edge = vertex;
 			do 
 			{
-				edge->m_userData = vertexCount;
+				edge->m_userData = ndUnsigned64(vertexCount);
 				edge->m_mark = mark;
 				edge = edge->m_twin->m_next;
 			} while (edge != vertex);
@@ -1767,7 +1767,7 @@ bool ndPolyhedra::IsFaceConvex(ndEdge* const face, const ndFloat64* const vertex
 	ndBigVector normal(FaceNormal(face, vertex, strideInBytes));
 	ndAssert(normal.m_w == ndFloat32(0.0f));
 
-	ndInt32 stride = strideInBytes / sizeof(ndFloat64);
+	ndInt32 stride = strideInBytes / ndInt32(sizeof(ndFloat64));
 	ndEdge* ptr = face;
 	do 
 	{
@@ -1873,7 +1873,7 @@ void ndPolyhedra::RemoveOuterColinearEdges (ndPolyhedra& flatFace, const ndFloat
 					flatFace.DeleteEdge (edge);								
 					flatFace.ChangeEdgeIncidentVertex (ptr->m_twin, ptr->m_next->m_incidentVertex);
 
-					if (!flatFace.IsFaceConvex(ptr->m_twin, vertex, stride * sizeof(ndFloat64))) 
+					if (!flatFace.IsFaceConvex(ptr->m_twin, vertex, stride * ndInt32 (sizeof(ndFloat64))))
 					{
 						heap.Flush();
 						flatFace.TriangulateFace(ptr->m_twin, vertex, stride, heap, nullptr);

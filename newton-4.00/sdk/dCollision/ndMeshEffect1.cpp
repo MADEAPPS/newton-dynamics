@@ -2721,7 +2721,7 @@ bool ndMeshEffect::EndFace()
 		const ndInt32 currentCount = m_points.m_vertex.GetCount();
 		ndStack<ndInt8> verterCollisionBuffer(currentCount);
 		ndInt8* const verterCollision = &verterCollisionBuffer[0];
-		memset(&verterCollision[0], 0, verterCollisionBuffer.GetSizeInBytes());
+		memset(&verterCollision[0], 0, size_t(verterCollisionBuffer.GetSizeInBytes()));
 
 		Iterator iter(*this);
 		ndInt32 mark = IncLRU();
@@ -2794,7 +2794,7 @@ bool ndMeshEffect::EndFace()
 					{
 						m_attrib.m_uv1Channel.PushBack(m_attrib.m_uv1Channel[index]);
 					}
-					ptr->m_userData = m_attrib.m_pointChannel.GetCount() - 1;
+					ptr->m_userData = ndUnsigned64(m_attrib.m_pointChannel.GetCount() - 1);
 				}
 
 				ndNode* const edgeNode = GetNodeFromInfo(*ptr);
@@ -2862,7 +2862,7 @@ void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 	ndInt32 vertexColorStride = ndInt32(format->m_vertexColor.m_strideInBytes / sizeof(ndFloat32));
 
 	ndStack<ndInt8> faceMark(format->m_faceCount);
-	memset(&faceMark[0], 0, faceMark.GetSizeInBytes());
+	memset(&faceMark[0], 0, size_t(faceMark.GetSizeInBytes()));
 	const ndInt32* const vertexIndex = format->m_vertex.m_indexList;
 
 	while (pendingFaces)
@@ -3051,7 +3051,7 @@ void ndMeshEffect::PackPoints()
 				ptr->m_mark = mark;
 				index[indexCount] = vertexIndexMap[ptr->m_incidentVertex];
 				m_attrib.m_pointChannel[ndInt32(ptr->m_userData)] = vertexIndexMap[ptr->m_incidentVertex];
-				userData[indexCount] = ptr->m_userData;
+				userData[indexCount] = ndInt64(ptr->m_userData);
 
 				indexCount++;
 				ptr = ptr->m_next;
@@ -3105,7 +3105,7 @@ void ndMeshEffect::UnpackPoints()
 				{
 					ptr->m_mark = mark;
 					index[indexCount] = ndInt32(ptr->m_userData);
-					userData[indexCount] = ptr->m_userData;
+					userData[indexCount] = ndInt64(ptr->m_userData);
 					indexCount++;
 					ptr = ptr->m_next;
 				} while (ptr != face);
@@ -3135,7 +3135,7 @@ void ndMeshEffect::PackAttibuteData()
 		ndEdge* const edge = &(*iter);
 		if (edge->m_incidentFace > 0)
 		{
-			edge->m_userData = attrIndexMap[edge->m_userData];
+			edge->m_userData = ndUnsigned64(attrIndexMap[edge->m_userData]);
 		}
 	}
 
@@ -3181,7 +3181,7 @@ void ndMeshEffect::PackAttibuteData()
 					m_attrib.m_colorChannel.PushBack(tmpFormat.m_colorChannel[index]);
 				}
 			}
-			edge->m_userData = attrIndexMap[index];
+			edge->m_userData = ndUnsigned64(attrIndexMap[index]);
 		}
 	}
 }
@@ -3237,7 +3237,7 @@ void ndMeshEffect::UnpackAttibuteData()
 					m_attrib.m_uv1Channel.PushBack(attibutes.m_uv1Channel[ndInt32(ptr->m_userData)]);
 				}
 
-				ptr->m_userData = attributeCount;
+				ptr->m_userData = ndUnsigned64(attributeCount);
 				attributeCount++;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
@@ -3581,7 +3581,7 @@ void ndMeshEffect::RepairTJoints()
 							openEdge->m_next->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
 
 							ndInt32 attibuteIndex = AddInterpolatedHalfAttribute(deletedEdge->m_twin, nextEdge->m_incidentVertex);
-							openEdge->m_next->m_userData = attibuteIndex;
+							openEdge->m_next->m_userData = ndUnsigned64(attibuteIndex);
 							openEdge->m_userData = deletedEdge->m_twin->m_userData;
 
 							deletedEdge->m_twin->m_prev->m_next = openEdge;
@@ -3658,8 +3658,8 @@ void ndMeshEffect::RepairTJoints()
 									ndInt32 attibuteIndex1 = AddInterpolatedHalfAttribute(deletedEdge->m_twin, openEdge->m_next->m_next->m_incidentVertex);
 
 									openEdge->m_userData = deletedEdge->m_twin->m_userData;
-									openEdge->m_next->m_userData = attibuteIndex0;
-									openEdge->m_next->m_next->m_userData = attibuteIndex1;
+									openEdge->m_next->m_userData = ndUnsigned64(attibuteIndex0);
+									openEdge->m_next->m_next->m_userData = ndUnsigned64(attibuteIndex1);
 
 									deletedEdge->m_twin->m_prev->m_next = openEdge;
 									openEdge->m_prev = deletedEdge->m_twin->m_prev;
@@ -3712,7 +3712,7 @@ void ndMeshEffect::GetVertexIndexChannel(ndInt32* const bufferOut) const
 
 void ndMeshEffect::GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat64);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat64));
 	for (ndInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3725,7 +3725,7 @@ void ndMeshEffect::GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const buf
 
 void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat32);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3739,7 +3739,7 @@ void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndFloat32* const buffe
 
 void ndMeshEffect::GetNormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat32);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3751,7 +3751,7 @@ void ndMeshEffect::GetNormalChannel(ndInt32 strideInByte, ndFloat32* const buffe
 
 void ndMeshEffect::GetBinormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat32);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3763,7 +3763,7 @@ void ndMeshEffect::GetBinormalChannel(ndInt32 strideInByte, ndFloat32* const buf
 
 void ndMeshEffect::GetUV0Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat32);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3774,7 +3774,7 @@ void ndMeshEffect::GetUV0Channel(ndInt32 strideInByte, ndFloat32* const bufferOu
 
 void ndMeshEffect::GetUV1Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat32);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_uv1Channel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3785,7 +3785,7 @@ void ndMeshEffect::GetUV1Channel(ndInt32 strideInByte, ndFloat32* const bufferOu
 
 void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / sizeof(ndFloat32);
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_colorChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3804,7 +3804,7 @@ ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 	ndInt32 count = 0;
 	ndInt32 materialCount = 0;
 
-	ndIndexArray* const array = (ndIndexArray*)ndMemory::Malloc(ndInt32(4 * sizeof(ndInt32) * GetCount() + sizeof(ndIndexArray) + 2048));
+	ndIndexArray* const array = (ndIndexArray*)ndMemory::Malloc(size_t(4 * sizeof(ndInt32) * GetCount() + sizeof(ndIndexArray) + 2048));
 	array->m_indexList = (ndInt32*)&array[1];
 
 	ndInt32 mark = IncLRU();
@@ -4263,7 +4263,7 @@ ndMeshEffect* ndMeshEffect::GetNextLayer(ndInt32 mark)
 				{
 					ptr->m_mark = mark;
 					faceIndex[count] = ptr->m_incidentVertex;
-					faceDataIndex[count] = ptr->m_userData;
+					faceDataIndex[count] = ndInt64(ptr->m_userData);
 					count++;
 					ndAssert(count < ndInt32(sizeof(faceIndex) / sizeof(faceIndex[0])));
 					ptr = ptr->m_next;
@@ -4343,7 +4343,7 @@ void ndMeshEffect::ConvertToPolygons()
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndEdge* const edge = &iter.GetNode()->GetInfo();
-		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
+		edge->m_userData = ndUnsigned64(edge->m_incidentFace > 0 ? edge->m_incidentVertex : 0);
 	}
 	PackPoints();
 
@@ -4413,7 +4413,7 @@ void ndMeshEffect::Triangulate()
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndEdge* const edge = &iter.GetNode()->GetInfo();
-		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
+		edge->m_userData = ndUnsigned64(edge->m_incidentFace > 0 ? edge->m_incidentVertex : 0);
 	}
 	PackPoints();
 
@@ -4561,7 +4561,7 @@ void ndMeshEffect::FlipWinding()
 			do 
 			{
 				index[indexCount] = ptr->m_incidentVertex;
-				userData[indexCount] = ptr->m_userData;
+				userData[indexCount] = ndInt64(ptr->m_userData);
 				ptr->m_mark = mark;
 				indexCount++;
 				ptr = ptr->m_prev;

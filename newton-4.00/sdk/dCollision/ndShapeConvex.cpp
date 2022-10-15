@@ -981,6 +981,7 @@ ndVector ndShapeConvex::CalculateVolumeIntegral(const ndMatrix& globalMatrix, co
 			break;
 		}
 
+		case ndShapeInstance::m_global:
 		default:
 		{
 			localPlane = localPlane * (scale | ndVector::m_wOne);
