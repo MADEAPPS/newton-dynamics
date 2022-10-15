@@ -537,9 +537,9 @@ static bool decompress(const u8* in, size_t in_size, u8* out, size_t out_size)
 	mz_stream stream = {};
 	mz_inflateInit(&stream);
 
-	stream.avail_in = (int)in_size;
+	stream.avail_in = (unsigned int)in_size;
 	stream.next_in = in;
-	stream.avail_out = (int)out_size;
+	stream.avail_out = (unsigned int)out_size;
 	stream.next_out = out;
 
 	int status = mz_inflate(&stream, Z_SYNC_FLUSH);
@@ -662,12 +662,12 @@ static OptionalError<u64> readElementOffset(Cursor* cursor, u16 version)
 
 static OptionalError<Element*> readElement(Cursor* cursor, u32 version, Allocator& allocator)
 {
-	OptionalError<u64> end_offset = readElementOffset(cursor, version);
+	OptionalError<u64> end_offset = readElementOffset(cursor, u16(version));
 	if (end_offset.isError()) return Error();
 	if (end_offset.getValue() == 0) return nullptr;
 
-	OptionalError<u64> prop_count = readElementOffset(cursor, version);
-	OptionalError<u64> prop_length = readElementOffset(cursor, version);
+	OptionalError<u64> prop_count = readElementOffset(cursor, u16(version));
+	OptionalError<u64> prop_length = readElementOffset(cursor, u16(version));
 	if (prop_count.isError() || prop_length.isError()) return Error();
 
 	OptionalError<DataView> id = readShortString(cursor);
@@ -767,7 +767,7 @@ static DataView readTextToken(Cursor* cursor)
 {
 	DataView ret;
 	ret.begin = cursor->current;
-	while (cursor->current < cursor->end && isTextTokenChar(*cursor->current))
+	while (cursor->current < cursor->end && isTextTokenChar(char(*cursor->current)))
 	{
 		++cursor->current;
 	}
@@ -1071,7 +1071,7 @@ struct MeshImpl : Mesh
 
 	const Pose* getPose() const override { return pose; }
 	const Geometry* getGeometry() const override { return geometry; }
-	const Material* getMaterial(int index) const override { return materials[index]; }
+	const Material* getMaterial(int index) const override { return materials[size_t(index)]; }
 	int getMaterialCount() const override { return (int)materials.size(); }
 
 
@@ -1313,7 +1313,7 @@ struct ClusterImpl : Cluster
 		{
 			int old_idx = ir[i];
 			double w = wr[i];
-			GeometryImpl::NewVertex* n = &geom->to_new_vertices[old_idx];
+			GeometryImpl::NewVertex* n = &geom->to_new_vertices[size_t(old_idx)];
 			if (n->index == -1) continue; // skip vertices which aren't indexed.
 			while (n)
 			{
@@ -1410,7 +1410,7 @@ struct SkinImpl : Skin
 	}
 
 	int getClusterCount() const override { return (int)clusters.size(); }
-	const Cluster* getCluster(int idx) const override { return clusters[idx]; }
+	const Cluster* getCluster(int idx) const override { return clusters[size_t(idx)]; }
 
 	Type getType() const override { return Type::SKIN; }
 
@@ -1433,7 +1433,7 @@ struct BlendShapeChannelImpl : BlendShapeChannel
 
 	double getDeformPercent() const override { return deformPercent; }
 	int getShapeCount() const override { return (int)shapes.size(); }
-	const Shape* getShape(int idx) const override { return shapes[idx]; }
+	const Shape* getShape(int idx) const override { return shapes[size_t(idx)]; }
 
 	Type getType() const override { return Type::BLEND_SHAPE_CHANNEL; }
 
@@ -1458,7 +1458,7 @@ struct BlendShapeChannelImpl : BlendShapeChannel
 
 		for (int i = 0; i < int (shapes.size()); i++)
 		{
-			auto shape = (ShapeImpl*)shapes[i];
+			auto shape = (ShapeImpl*)shapes[size_t(i)];
 			if (!shape->postprocess(geom, allocator)) return false;
 		}
 
@@ -1487,7 +1487,7 @@ struct BlendShapeImpl : BlendShape
 	}
 
 	int getBlendShapeChannelCount() const override { return (int)blendShapeChannels.size(); }
-	const BlendShapeChannel* getBlendShapeChannel(int idx) const override { return blendShapeChannels[idx]; }
+	const BlendShapeChannel* getBlendShapeChannel(int idx) const override { return blendShapeChannels[size_t(idx)]; }
 
 	Type getType() const override { return Type::BLEND_SHAPE; }
 
@@ -1596,18 +1596,18 @@ struct Scene : IScene
 	}
 
 	DataView getEmbeddedData(int index) const override {
-		return m_videos[index].content;
+		return m_videos[size_t(index)].content;
 	}
 
 	DataView getEmbeddedFilename(int index) const override {
-		return m_videos[index].filename;
+		return m_videos[size_t(index)].filename;
 	}
 
 	const AnimationStack* getAnimationStack(int index) const override
 	{
 		assert(index >= 0);
 		assert(index < int (m_animation_stacks.size()));
-		return m_animation_stacks[index];
+		return m_animation_stacks[size_t(index)];
 	}
 
 
@@ -1615,7 +1615,7 @@ struct Scene : IScene
 	{
 		assert(index >= 0);
 		assert(index < int (m_meshes.size()));
-		return m_meshes[index];
+		return m_meshes[size_t(index)];
 	}
 
 	int getTakeInfoCount() const override
@@ -1625,7 +1625,7 @@ struct Scene : IScene
 
 	virtual const TakeInfo* getTakeInfo(int index) const override
 	{
-		return &m_take_infos[index];
+		return &m_take_infos[size_t(index)];
 	}
 
 	const TakeInfo* getTakeInfo(const char* name) const override
@@ -1671,7 +1671,7 @@ DataView TextureImpl::getEmbeddedData() const {
 	if (!media.begin) return media;
 	for (const Video& v : scene.m_videos) {
 		if (v.media.end - v.media.begin != media.end - media.begin) continue;
-		const size_t len = v.media.end - v.media.begin;
+		const size_t len = size_t(v.media.end - v.media.begin);
 		if (memcmp(v.media.begin, media.begin, len) != 0) continue;
 
 		return v.content;
@@ -1790,7 +1790,7 @@ struct AnimationLayerImpl : AnimationLayer
 	const AnimationCurveNode* getCurveNode(int index) const override
 	{
 		if (index >= int (curve_nodes.size()) || index < 0) return nullptr;
-		return curve_nodes[index];
+		return curve_nodes[size_t(index)];
 	}
 
 
@@ -2051,7 +2051,7 @@ template <typename T> static bool parseArrayRaw(const Property& property, T* out
 		const u8* data = property.value.begin + sizeof(u32) * 3;
 		if (data > property.value.end) return false;
 
-		u32 count = property.getCount();
+		u32 count = u32 (property.getCount());
 		u32 enc = *(const u32*)(property.value.begin + 4);
 		u32 len = *(const u32*)(property.value.begin + 8);
 
@@ -2198,7 +2198,7 @@ template <typename T> static bool parseBinaryArray(const Property& property, std
 	assert(out);
 	if (property.value.is_binary)
 	{
-		u32 count = property.getCount();
+		u32 count = u32(property.getCount());
 		int elem_size = 1;
 		switch (property.type)
 		{
@@ -2207,7 +2207,7 @@ template <typename T> static bool parseBinaryArray(const Property& property, std
 			case 'i': elem_size = 4; break;
 			default: return false;
 		}
-		int elem_count = sizeof(T) / elem_size;
+		int elem_count = int(sizeof(T)) / elem_size;
 		out->resize(count / elem_count);
 
 		if (count == 0) return true;
@@ -2244,7 +2244,7 @@ template <typename T> static bool parseDoubleVecData(Property& property, std::ve
 	double* out = &(*out_vec)[0].x;
 	for (int i = 0, c = (int)tmp->size(); i < c; ++i)
 	{
-		out[i] = (*tmp)[i];
+		out[size_t(i)] = (*tmp)[size_t(i)];
 	}
 	return true;
 }
@@ -2264,7 +2264,7 @@ static bool parseDouble(Property& property, double* out)
 		}
 		const u8* data = property.value.begin;
 		if (data > property.value.end) return false;
-		memcpy(out, data, elem_size);
+		memcpy(out, data, size_t(elem_size));
 		return true;
 	}
     else
@@ -2366,12 +2366,12 @@ static void splat(std::vector<T>* out,
 			int data_size = (int)data.size();
 			for (int i = 0, c = (int)indices.size(); i < c; ++i)
 			{
-				int index = indices[i];
+				int index = indices[size_t(i)];
 
 				if ((index < data_size) && (index >= 0))
-					(*out)[i] = data[index];
+					(*out)[size_t(i)] = data[size_t(index)];
 				else
-					(*out)[i] = T();
+					(*out)[size_t(i)] = T();
 			}
 		}
 	}
@@ -2386,11 +2386,11 @@ static void splat(std::vector<T>* out,
 		int data_size = (int)data.size();
 		for (int i = 0, c = (int)original_indices.size(); i < c; ++i)
 		{
-			int idx = decodeIndex(original_indices[i]);
+			int idx = decodeIndex(original_indices[size_t(i)]);
 			if ((idx < data_size) && (idx >= 0)) //-V560
-				(*out)[i] = data[idx];
+				(*out)[size_t(i)] = data[size_t(idx)];
 			else
-				(*out)[i] = T();
+				(*out)[size_t(i)] = T();
 		}
 	}
 	else
@@ -2409,7 +2409,7 @@ template <typename T> static void remap(std::vector<T>* out, const std::vector<i
 	int old_size = (int)old.size();
 	for (int i = 0, c = (int)map.size(); i < c; ++i)
 	{
-		out->push_back(map[i] < old_size ? old[map[i]] : T());
+		out->push_back(map[size_t(i)] < old_size ? old[size_t(map[size_t(i)])] : T());
 	}
 }
 
@@ -2423,8 +2423,8 @@ static OptionalError<Object*> parseAnimationCurve(const Scene& scene, const Elem
 
 	if (times && times->first_property)
 	{
-		curve->times.resize(times->first_property->getCount());
-		if (!times->first_property->getValues(&curve->times[0], (int)curve->times.size() * sizeof(curve->times[0])))
+		curve->times.resize(size_t(times->first_property->getCount()));
+		if (!times->first_property->getValues(&curve->times[0], int(curve->times.size() * sizeof(curve->times[0]))))
 		{
 			return Error("Invalid animation curve");
 		}
@@ -2432,8 +2432,8 @@ static OptionalError<Object*> parseAnimationCurve(const Scene& scene, const Elem
 
 	if (values && values->first_property)
 	{
-		curve->values.resize(values->first_property->getCount());
-		if (!values->first_property->getValues(&curve->values[0], (int)curve->values.size() * sizeof(curve->values[0])))
+		curve->values.resize(size_t(values->first_property->getCount()));
+		if (!values->first_property->getValues(&curve->values[0], int(curve->values.size() * sizeof(curve->values[0]))))
 		{
 			return Error("Invalid animation curve");
 		}
@@ -2448,7 +2448,7 @@ static OptionalError<Object*> parseAnimationCurve(const Scene& scene, const Elem
 static int getTriCountFromPoly(const std::vector<int>& indices, int* idx)
 {
 	int count = 1;
-	while (indices[*idx + 1 + count] >= 0)
+	while (indices[size_t(*idx + 1 + count)] >= 0)
 	{
 		++count;
 	}
@@ -2485,7 +2485,7 @@ static void triangulate(
 	assert(to_old_indices);
 
 	auto getIdx = [&old_indices](int i) -> int {
-		int idx = old_indices[i];
+		int idx = old_indices[size_t(i)];
 		return decodeIndex(idx);
 	};
 
@@ -2500,21 +2500,20 @@ static void triangulate(
 		}
 		else
 		{
-			to_old_vertices->push_back(old_indices[i - in_polygon_idx]);
+			to_old_vertices->push_back(old_indices[size_t(i - in_polygon_idx)]);
 			to_old_indices->push_back(i - in_polygon_idx);
-			to_old_vertices->push_back(old_indices[i - 1]);
+			to_old_vertices->push_back(old_indices[size_t(i - 1)]);
 			to_old_indices->push_back(i - 1);
 			to_old_vertices->push_back(idx);
 			to_old_indices->push_back(i);
 		}
 		++in_polygon_idx;
-		if (old_indices[i] < 0)
+		if (old_indices[size_t(i)] < 0)
 		{
 			in_polygon_idx = 0;
 		}
 	}
 }
-
 
 static void buildGeometryVertexData(
 	GeometryImpl* geom,
@@ -2529,8 +2528,8 @@ static void buildGeometryVertexData(
 		geom->indices.resize(geom->vertices.size());
 		for (int i = 0, c = (int)geom->to_old_vertices.size(); i < c; ++i)
 		{
-			geom->vertices[i] = vertices[geom->to_old_vertices[i]];
-			geom->indices[i] = codeIndex(i, i % 3 == 2);
+			geom->vertices[size_t(i)] = vertices[size_t(geom->to_old_vertices[size_t(i)])];
+			geom->indices[size_t(i)] = codeIndex(i, i % 3 == 2);
 		}
 	} else {
 		geom->vertices = vertices;
@@ -2548,7 +2547,7 @@ static void buildGeometryVertexData(
 	for (int i = 0, c = (int)geom->to_old_vertices.size(); i < c; ++i)
 	{
 		int old = to_old_vertices[i];
-		add(geom->to_new_vertices[old], i);
+		add(geom->to_new_vertices[size_t(old)], i);
 	}
 }
 
@@ -2583,7 +2582,7 @@ static OptionalError<Object*> parseGeometryMaterials(
 			{
 				int tri_count = getTriCountFromPoly(original_indices, &tmp_i);
 				for (int i = 0; i < tri_count; ++i) {
-					geom->materials.push_back(int_tmp[poly]);
+					geom->materials.push_back(int_tmp[size_t(poly)]);
 				}
 			}
 		}
@@ -2786,12 +2785,12 @@ bool ShapeImpl::postprocess(GeometryImpl* geom, Allocator& allocator)
 	for (int i = 0, c = (int)allocator.int_tmp.size(); i < c; ++i)
 	{
 		int old_idx = ir[i];
-		GeometryImpl::NewVertex* n = &geom->to_new_vertices[old_idx];
+		GeometryImpl::NewVertex* n = &geom->to_new_vertices[size_t(old_idx)];
 		if (n->index == -1) continue; // skip vertices which aren't indexed.
 		while (n)
 		{
-			vertices[n->index] = vertices[n->index] + vr[i];
-			normals[n->index] = vertices[n->index] + nr[i];
+			vertices[size_t(n->index)] = vertices[size_t(n->index)] + vr[i];
+			normals[size_t(n->index)] = vertices[size_t(n->index)] + nr[i];
 			n = n->next;
 		}
 	}
@@ -2996,8 +2995,8 @@ static void parseGlobalSettings(const Element& root, Scene* scene)
 						get_property("OriginalUpAxisSign", OriginalUpAxisSign, int, toInt);
 						get_property("UnitScaleFactor", UnitScaleFactor, float, toDouble);
 						get_property("OriginalUnitScaleFactor", OriginalUnitScaleFactor, float, toDouble);
-						get_time_property("TimeSpanStart", TimeSpanStart, u64, toU64);
-						get_time_property("TimeSpanStop", TimeSpanStop, u64, toU64);
+						get_time_property("TimeSpanStart", TimeSpanStart, i64, toU64);
+						get_time_property("TimeSpanStop", TimeSpanStop, i64, toU64);
 						get_property("TimeMode", TimeMode, FrameRate, toInt);
 						get_property("CustomFrameRate", CustomFrameRate, float, toDouble);
 
@@ -3214,6 +3213,23 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 					node->bone_link_property = con.property;
 				}
 				break;
+
+			//case Object::Type::ROOT:;
+			//case Object::Type::MESH:;
+			//case Object::Type::SKIN:;
+			//case Object::Type::POSE:;
+			//case Object::Type::SHAPE:;
+			//case Object::Type::CLUSTER:;
+			//case Object::Type::TEXTURE:;
+			//case Object::Type::MATERIAL:;
+			//case Object::Type::GEOMETRY:;
+			//case Object::Type::LIMB_NODE:;
+			//case Object::Type::NULL_NODE:;
+			//case Object::Type::BLEND_SHAPE:;
+			//case Object::Type::ANIMATION_STACK:;
+			//case Object::Type::ANIMATION_LAYER:;
+			//case Object::Type::ANIMATION_CURVE:;
+			//case Object::Type::BLEND_SHAPE_CHANNEL:;
 			default:;
 		}
 
@@ -3618,14 +3634,14 @@ Object* Object::getParent() const
 IScene* load(const u8* data, int size, u64 flags, JobProcessor job_processor, void* job_user_ptr)
 {
 	std::unique_ptr<Scene> scene(new Scene());
-	scene->m_data.resize(size);
-	memcpy(&scene->m_data[0], data, size);
+	scene->m_data.resize(size_t(size));
+	memcpy(&scene->m_data[0], data, size_t(size));
 	u32 version;
 
 	const bool is_binary = size >= 18 && strncmp((const char*)data, "Kaydara FBX Binary", 18) == 0;
 	OptionalError<Element*> root(nullptr);
 	if (is_binary) {
-		root = tokenize(&scene->m_data[0], size, version, scene->m_allocator);
+		root = tokenize(&scene->m_data[0], size_t(size), version, scene->m_allocator);
 		if (version < 6200)
 		{
 			Error::s_message = "Unsupported FBX file format version. Minimum supported version is 6.2";
@@ -3638,7 +3654,7 @@ IScene* load(const u8* data, int size, u64 flags, JobProcessor job_processor, vo
 		}
 	}
 	else {
-		root = tokenizeText(&scene->m_data[0], size, scene->m_allocator);
+		root = tokenizeText(&scene->m_data[0], size_t(size), scene->m_allocator);
 		if (root.isError()) return nullptr;
 	}
 
