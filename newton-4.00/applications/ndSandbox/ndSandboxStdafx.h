@@ -90,8 +90,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include "VHACD.h"
-#include "ndHacd.h"
-#include "include/VHACD.h"
+//#include "include/VHACD.h"
 
 // SDK includes
 #include <ndNewton.h>

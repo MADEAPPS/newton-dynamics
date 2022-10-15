@@ -495,7 +495,7 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	}
 
 	// Cleanup
-	GLuint font_texture (m_defaultFont);
+	GLuint font_texture = GLuint(m_defaultFont);
 	glDeleteTextures(1, &font_texture);
 	ImGui::GetIO().Fonts->TexID = 0;
 
@@ -653,7 +653,7 @@ ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axis
 ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
 	ndInt32 buttonsCount = 0;
-	memset(&axisbuttons[0], 0, axisbuttons.GetCapacity());
+	memset(&axisbuttons[0], 0, size_t(axisbuttons.GetCapacity()));
 
 	if (!m_hasJoytick)
 	{
@@ -666,7 +666,7 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 		buttonsCount = ndMin (buttonsCount, axisbuttons.GetCapacity());
 		for (ndInt32 i = 0; i < buttonsCount; ++i) 
 		{
-			axisbuttons[i] = buttons[i];
+			axisbuttons[i] = char(buttons[i]);
 			//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
 		}
 	}
@@ -813,11 +813,11 @@ void ndDemoEntityManager::LoadFont()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	// Store our identifier
-	m_defaultFont = ndInt32 (font_texture);
+	m_defaultFont = GLint(font_texture);
 	io.Fonts->TexID = (void *)(intptr_t)m_defaultFont;
 
 	// Restore state
-	glBindTexture(GL_TEXTURE_2D, last_texture);
+	glBindTexture(GL_TEXTURE_2D, GLuint(last_texture));
 }
 
 void ndDemoEntityManager::ApplyMenuOptions()
@@ -1024,6 +1024,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
+		case m_none:
 		default:
 		{
 			// load a demo 

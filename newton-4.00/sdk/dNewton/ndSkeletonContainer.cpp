@@ -558,7 +558,7 @@ void ndSkeletonContainer::CalculateBufferSizeInBytes()
 	rowCount += extraAuxiliaryRows;
 	auxiliaryRowCount += extraAuxiliaryRows;
 
-	ndInt32 size = sizeof(ndInt32) * rowCount;
+	ndInt32 size = ndInt32(sizeof(ndInt32) * rowCount);
 	size += sizeof(ndInt32) * rowCount;
 	size += sizeof(ndNodePair) * rowCount;
 	size += sizeof(ndFloat32) * auxiliaryRowCount * auxiliaryRowCount;

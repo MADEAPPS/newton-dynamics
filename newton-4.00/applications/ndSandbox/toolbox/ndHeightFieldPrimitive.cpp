@@ -83,9 +83,9 @@ class ndHeightfieldMesh : public ndDemoMesh
 		
 		ndDemoSubMesh* const segment = AddSubMesh();
 		segment->m_material.SetTextureName(texName);
-		ndInt32 texHandle = LoadTexture("texture1.tga");
+		ndInt32 texHandle = ndInt32(LoadTexture("texture1.tga"));
 		segment->m_material.SetTexture(texHandle);
-		ReleaseTexture(texHandle);
+		ReleaseTexture(GLuint(texHandle));
 		
 		segment->SetOpacity(1.0f);
 		segment->m_segmentStart = start;

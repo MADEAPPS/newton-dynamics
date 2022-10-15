@@ -52,11 +52,6 @@ include_directories(../../thirdParty/glatter/include/glatter/)
 include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
-if(NEWTON_TEST_NEW_V_HACD)
-	add_definitions(-D_D_USE_NEW_HACD)
-	include_directories(../../thirdParty/hacdNew)
-endif(NEWTON_TEST_NEW_V_HACD)
-
 add_executable(${projectName} ${CPP_SOURCE})
 
 target_link_libraries (${projectName} ndNewton ndBrain vhacd openfbx glfw imgui glatter)
@@ -65,10 +60,6 @@ if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
 endif()
  
-if(NEWTON_TEST_NEW_V_HACD)
-	target_link_libraries (${projectName} vhacdNew)
-endif(NEWTON_TEST_NEW_V_HACD)
-
 if (NEWTON_BUILD_PROFILER)
 	target_link_libraries (${projectName} dProfiler)
 endif ()

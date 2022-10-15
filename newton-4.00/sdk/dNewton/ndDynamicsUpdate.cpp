@@ -87,7 +87,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 
 		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
-			return entry.m_body & ((1 << D_MAX_BODY_RADIX_BIT) - 1);
+			return ndUnsigned32(entry.m_body & ((1 << D_MAX_BODY_RADIX_BIT) - 1));
 		}
 	};
 
@@ -100,7 +100,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 
 		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
-			ndUnsigned32 key = entry.m_body >> D_MAX_BODY_RADIX_BIT;
+			ndUnsigned32 key = ndUnsigned32(entry.m_body >> D_MAX_BODY_RADIX_BIT);
 			return key & ((1 << D_MAX_BODY_RADIX_BIT) - 1);
 		}
 	};
@@ -135,7 +135,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	});
 	scene->ParallelExecute(CountJointBodyPairs);
 
-	scene->GetScratchBuffer().SetCount(bodyJointPairs.GetCount() * sizeof (ndJointBodyPairIndex));
+	scene->GetScratchBuffer().SetCount(bodyJointPairs.GetCount() * ndInt32 (sizeof (ndJointBodyPairIndex)));
 	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)&scene->GetScratchBuffer()[0];
 
 	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey0, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), nullptr, nullptr);
@@ -156,7 +156,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	ndArray<ndInt32>& bodyJointIndex = GetJointForceIndexBuffer();
 	const ndInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
 	bodyJointIndex.SetCount(bodyJointIndexCount);
-	ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * sizeof(ndInt32));
+	ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * ndInt32 (sizeof(ndInt32)));
 
 	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
 	{
@@ -205,8 +205,8 @@ void ndDynamicsUpdate::SortJointsScan()
 				:m_value(0)
 			{
 				ndAssert(rows > 0);
-				m_upperBit = sleep;
-				m_lowerBit = (1 << 6) - rows - 1;
+				m_upperBit = ndUnsigned32(sleep);
+				m_lowerBit = ndUnsigned32((1 << 6) - rows - 1);
 			}
 
 			union
@@ -224,7 +224,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		ndUnsigned32 GetKey(const ndConstraint* const joint) const
 		{
 			const ndSortKey key(joint->m_resting, joint->m_rowCount);
-			return key.m_value;
+			return ndUnsigned32(key.m_value);
 		}
 	};
 
@@ -268,7 +268,7 @@ void ndDynamicsUpdate::SortJointsScan()
 			ndConstraint* const joint = jointArray[i];
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
-			const ndInt32 rows = joint->GetRowsCount();
+			const ndInt32 rows = ndInt32(joint->GetRowsCount());
 			joint->m_rowCount = rows;
 
 			const ndInt32 equilibrium = body0->m_equilibrium & body1->m_equilibrium;
@@ -280,11 +280,11 @@ void ndDynamicsUpdate::SortJointsScan()
 			}
 
 			body0->m_isConstrained = 1;
-			body0->m_equilibrium0 = body0->m_equilibrium0 & equilibrium;
+			body0->m_equilibrium0 = ndUnsigned8(body0->m_equilibrium0 & equilibrium);
 			if (!body1->m_isStatic)
 			{
 				body1->m_isConstrained = 1;
-				body1->m_equilibrium0 = body1->m_equilibrium0 & equilibrium;
+				body1->m_equilibrium0 = ndUnsigned8(body1->m_equilibrium0 & equilibrium);
 			}
 		}
 	});
@@ -302,7 +302,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 			const ndInt8 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
 			activeJointCount += (1 - resting);
-			joint->m_resting = resting;
+			joint->m_resting = ndUnsigned8(resting);
 
 			const ndInt32 solverSleep0 = body0->m_isJointFence0 & body1->m_isJointFence0;
 			if (!solverSleep0)
@@ -357,7 +357,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	});
 
-	scene->GetScratchBuffer().SetCount((jointArray.GetCount() + 32) * sizeof (ndConstraint*));
+	scene->GetScratchBuffer().SetCount((jointArray.GetCount() + 32) * ndInt32 (sizeof (ndConstraint*)));
 	ndConstraint** const tempJointBuffer = (ndConstraint**)&scene->GetScratchBuffer()[0];
 
 	scene->ParallelExecute(MarkFence0);
@@ -653,7 +653,7 @@ void ndDynamicsUpdate::InitWeights()
 		}
 
 		const ndInt32 conectivity = 7;
-		m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2;
+		m_solverPasses = ndUnsigned32(m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 2);
 	}
 }
 
@@ -693,7 +693,7 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
 	ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
-	for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
+	for (ndInt32 i = ndInt32(joint->GetRowsCount() - 1); i >= 0; i--)
 	{
 		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
 		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
@@ -1048,7 +1048,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 				const ndVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
 				const ndVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & ndVector::m_negOne);
 				const ndInt8 equilibrium = test.GetSignMask() ? 0 : 1;
-				body->m_equilibrium0 = equilibrium;
+				body->m_equilibrium0 = ndUnsigned8(equilibrium);
 			}
 			ndAssert(body->m_veloc.m_w == ndFloat32(0.0f));
 			ndAssert(body->m_omega.m_w == ndFloat32(0.0f));
@@ -1181,10 +1181,10 @@ void ndDynamicsUpdate::DetermineSleepStates()
 						ndConstraint* const joint = jointArray[scan.m_joint >> 1];
 						ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
 						ndAssert(body1 != body);
-						equilibrium = equilibrium & body1->m_isJointFence0;
+						equilibrium = ndUnsigned8(equilibrium & body1->m_isJointFence0);
 					}
 				}
-				body->m_equilibrium = equilibrium & body->m_autoSleep;
+				body->m_equilibrium = ndUnsigned8(equilibrium & body->m_autoSleep);
 				if (body->m_equilibrium)
 				{
 					body->m_veloc = zero;
@@ -1253,7 +1253,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 void ndDynamicsUpdate::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	const ndInt32 passes = m_solverPasses;
+	const ndUnsigned32 passes = m_solverPasses;
 	ndScene* const scene = m_world->GetScene();
 
 	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
@@ -1463,7 +1463,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		}
 	});
 	
-	for (ndInt32 i = 0; i < passes; ++i)
+	for (ndInt32 i = 0; i < ndInt32(passes); ++i)
 	{
 		scene->ParallelExecute(CalculateJointsForce);
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces);

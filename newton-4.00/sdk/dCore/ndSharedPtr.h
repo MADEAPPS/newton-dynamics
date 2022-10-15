@@ -16,7 +16,6 @@ template <typename T>
 class ndSharedPtr
 {
 	private:	
-	//class ndRefCounter : public ndContainersFreeListAlloc<ndRefCounter>, public ndAtomic<ndInt32>
 	class ndRefCounter : public ndClassAlloc, public ndAtomic<ndInt32>
 	{
 		public: 
@@ -46,7 +45,6 @@ class ndSharedPtr
 
 template <typename T>
 ndSharedPtr<T>::ndRefCounter::ndRefCounter()
-	//:ndContainersFreeListAlloc<ndRefCounter>()
 	:ndClassAlloc()
 	,ndAtomic<ndInt32>(0)
 {

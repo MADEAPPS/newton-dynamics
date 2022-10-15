@@ -396,7 +396,7 @@ inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 	m_buildSkelIndex = 0;
 	m_islandParent = this;
 	m_weigh = ndFloat32(0.0f);
-	m_isStatic = (m_invMass.m_w == ndFloat32(0.0f));
+	m_isStatic = ndUnsigned8(m_invMass.m_w == ndFloat32(0.0f));
 	m_equilibrium = ndUnsigned8 (m_isStatic | m_equilibrium);
 	m_equilibrium0 = m_equilibrium;
 }

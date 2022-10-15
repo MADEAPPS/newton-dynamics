@@ -139,7 +139,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	}
 	
 	// Calculate size of image buffer
-	unsigned lImageSize = width * height * sDepth;
+	ndInt32 lImageSize = width * height * sDepth;
 	
 	// Allocate memory and check for success
 	char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
@@ -150,7 +150,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 		return;
 	}
 	
-	ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
+	ndInt32 readret = ndInt32(fread(pBits, size_t(lImageSize), 1, pFile));
 	if (readret != 1)
 	{
 		ndAssert(0);

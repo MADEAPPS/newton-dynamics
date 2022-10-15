@@ -370,7 +370,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 
 						ndArray<char> data;
 						data.SetCount(size);
-						bytesRead = fread(&data[0], sizeof(char), size, wave);
+						bytesRead = fread(&data[0], sizeof(char), size_t(size), wave);
 
 						ndInt32 waveFormat = AL_FORMAT_MONO8;
 						if (channels == 1)
@@ -401,7 +401,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 
 						asset->m_frequecy = ndFloat32(sampleRate);
 						asset->m_durationInSeconds = ndFloat32(size) / byteRate;
-						alBufferData(asset->m_buffer, waveFormat, &data[0], size, sampleRate);
+						alBufferData(ALuint(asset->m_buffer), waveFormat, &data[0], size, sampleRate);
 					}
 				}
 			}

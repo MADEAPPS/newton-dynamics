@@ -242,7 +242,7 @@ GLuint LoadTexture(const char* const filename)
 		}
 		
 		// Calculate size of image buffer
-		unsigned lImageSize = width * height * sDepth;
+		ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
 		
 		// Allocate memory and check for success
 		char* const pBits = (char*)ndMemory::Malloc (width * height * sizeof (ndInt32));

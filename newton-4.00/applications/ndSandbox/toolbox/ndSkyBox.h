@@ -18,7 +18,7 @@
 #define __SKY_BOX_H_
 
 #include "ndSandboxStdafx.h"
-#include "../ndDemoEntity.h"
+#include "ndDemoEntity.h"
 
 class ndDemoEntityManager;
 

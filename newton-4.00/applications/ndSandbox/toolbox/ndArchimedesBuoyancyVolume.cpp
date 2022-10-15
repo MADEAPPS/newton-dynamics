@@ -45,7 +45,7 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 
 		ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 		{
-			return ((ndBody*)body)->GetAsBodyTriggerVolume() ? 1 : 0;
+			return ndUnsigned32(((ndBody*)body)->GetAsBodyTriggerVolume() ? 1 : 0);
 		}
 	};
 

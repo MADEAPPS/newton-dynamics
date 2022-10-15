@@ -207,7 +207,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void TestImGui();
 	
 	GLFWwindow* m_mainFrame;
-	ndInt32	m_defaultFont;
+	GLint m_defaultFont;
 	bool m_mousePressed[3];
 
 	ndDemoEntity* m_sky;

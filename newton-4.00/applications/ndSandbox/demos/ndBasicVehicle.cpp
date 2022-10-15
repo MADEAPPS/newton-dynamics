@@ -596,7 +596,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 					virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 					{
-						return !((body == m_chassis) || (body == m_tire));
+						return ndUnsigned32(!((body == m_chassis) || (body == m_tire)));
 					}
 
 					ndBodyKinematic* m_tire;

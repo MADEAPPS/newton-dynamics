@@ -18,8 +18,9 @@
 * 
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#include "ndCollisionStdafx.h"
+
 #include "ndCoreStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"

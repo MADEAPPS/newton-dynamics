@@ -412,18 +412,11 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 		meshPoints.PushBack(p);
 	}
 
-#ifdef _D_USE_NEW_HACD
-	lowDetail = 0;
-	VHACD::IVHACD* const interfaceVHACD = ndCreateVHACD();
-	VHACD::IVHACD::Parameters paramsVHACD;
-	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
-#else
 	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
 	nd_::VHACD::IVHACD::Parameters paramsVHACD;
 	//paramsVHACD.m_maxConvexHulls = 24;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0].m_x, points.GetCount(), (uint32_t*)&indices[0], indices.GetCount() / 3, paramsVHACD);
-#endif
 
 	ndShapeInstance* const compoundShapeInstance = new ndShapeInstance(new ndShapeCompound());
 
@@ -433,11 +426,7 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 	ndArray<ndVector> convexMeshPoints;
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
-#ifdef _D_USE_NEW_HACD
-		VHACD::IVHACD::ConvexHull ch;
-#else
 		nd_::VHACD::IVHACD::ConvexHull ch;
-#endif
 		interfaceVHACD->GetConvexHull(i, ch);
 		convexMeshPoints.SetCount(ch.m_nPoints);
 		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)

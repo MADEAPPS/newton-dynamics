@@ -52,7 +52,7 @@ class ndSoundChannel: public ndClassAlloc
 	private:
 	void ApplyAttenuation(const ndVector& listenerPosit);
 
-	ndInt32 m_source;
+	ALuint m_source;
 	ndSoundAsset* m_asset;
 	ndSoundManager* m_manager;
 	ndList<ndSoundChannel*>::ndNode* m_assetNode;
@@ -84,7 +84,7 @@ class ndSoundAsset: public ndSoundChannelList
 	ndSoundAsset(const ndSoundAsset& copy);
 	virtual ~ndSoundAsset();
 
-	ndInt32 m_buffer;
+	ALint m_buffer;
 	ndFloat32 m_frequecy;
 	ndFloat32 m_durationInSeconds;
 	ndTree<ndSoundAsset, ndUnsigned64>::ndNode* m_node;
