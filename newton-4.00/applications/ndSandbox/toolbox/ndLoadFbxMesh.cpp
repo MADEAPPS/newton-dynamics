@@ -1147,7 +1147,6 @@ class fbxImportndMeshEffectNodeStackData
 	ndMeshEffectNode* m_parentNode;
 };
 
-
 static void ImportMeshNode(ofbx::Object* const fbxNode, fbxMeshEffectNodeGlobalNodeMap& nodeMap)
 {
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
@@ -1254,7 +1253,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxMeshEffectNodeGlobalN
 	// import skin if there is any
 	if (geom->getSkin())
 	{
-		ndAssert(0);
 		const ofbx::Skin* const skin = geom->getSkin();
 		ndInt32 clusterCount = skin->getClusterCount();
 	

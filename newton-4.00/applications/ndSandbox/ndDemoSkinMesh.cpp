@@ -24,8 +24,7 @@ class glSkinVertex : public glPositionNormalUV
 	glVector4 m_boneIndex;
 };
 
-//ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
-ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const, const ndShaderCache&)
+ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderCache& shaderCache)
 	:ndDemoMeshInterface()
 	,m_shareMesh(new ndDemoMesh(owner->GetName().GetStr()))
 	,m_ownerEntity(owner)
@@ -34,8 +33,6 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const, c
 	,m_nodeCount(0)
 	,m_matrixPalette(0)
 {
-	ndAssert(0);
-/*
 	m_name = owner->GetName();
 	m_shader = shaderCache.m_skinningDiffuseEffect;
 
@@ -205,10 +202,12 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const, c
 	ndInt32 segmentStart = 0;
 	bool hasTransparency = false;
 	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshNode->GetMaterials();
+
+	ndDemoMesh* const shareMesh = (ndDemoMesh*)*m_shareMesh;
 	for (ndInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		ndInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
-		ndDemoSubMesh* const segment = m_shareMesh->AddSubMesh();
+		ndDemoSubMesh* const segment = shareMesh->AddSubMesh();
 	
 		const ndMeshEffect::ndMaterial& material = materialArray[materialIndex];
 		segment->m_material.m_ambient = glVector4(material.m_ambient);
@@ -216,9 +215,11 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const, c
 		segment->m_material.m_specular = glVector4(material.m_specular);
 		segment->m_material.m_opacity = GLfloat(material.m_opacity);
 		segment->m_material.m_shiness = GLfloat(material.m_shiness);
-		strcpy(segment->m_material.m_textureName, material.m_textureName);
-
-		segment->m_material.m_textureHandle = LoadTexture(material.m_textureName);
+		//strcpy(segment->m_material.m_textureName, material.m_textureName);
+		segment->m_material.SetTextureName(material.m_textureName);
+		ndInt32 tex = ndInt32(LoadTexture(material.m_textureName));
+		segment->m_material.SetTexture(tex);
+		ReleaseTexture(GLuint(tex));
 		segment->SetOpacity(material.m_opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 	
@@ -229,11 +230,10 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const, c
 		segmentStart += segment->m_indexCount;
 	}
 	meshNode->MaterialGeometryEnd(geometryHandle);
-	m_shareMesh->m_hasTransparency = hasTransparency;
+	shareMesh->m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
 	CreateRenderMesh(&points[0], vertexCount, &indices[0], indexCount);
-*/
 }
 
 ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const owner)

@@ -52,8 +52,23 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_isVisible(true)
 {
 	ndInt32 stack = 1;
-	ndDemoEntity* parentEntityBuffer[1024];
-	ndMeshEffectNode* effectNodeBuffer[1024];
+	ndDemoEntity* parentEntityBuffer[256];
+	ndMeshEffectNode* effectNodeBuffer[256];
+	struct EntityMeshPair
+	{
+		EntityMeshPair()
+		{
+		}
+
+		EntityMeshPair(ndDemoEntity* const entity, ndMeshEffectNode* const effectNode)
+			:m_entity(entity)
+			,m_effectNode(effectNode)
+		{
+		}
+		ndDemoEntity* m_entity;
+		ndMeshEffectNode* m_effectNode;
+	};
+	ndFixSizeArray<EntityMeshPair, 1024> meshArray;
 
 	bool isRoot = true;
 	effectNodeBuffer[0] = meshEffectNode;
@@ -72,22 +87,23 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 		ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
 		if (*meshEffect)
 		{
-			ndDemoMeshInterface* mesh = nullptr;
-			if (!meshEffect->GetCluster().GetCount())
-			{
-				mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
-			}
-			else
-			{
-				ndAssert(0);
-				mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
-			}
-			entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+			//ndDemoMeshInterface* mesh = nullptr;
+			//if (!meshEffect->GetCluster().GetCount())
+			//{
+			//	mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+			//}
+			//else
+			//{
+			//	mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			//}
+			//entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+			//
+			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
+			//{
+			//	mesh->m_isVisible = false;
+			//}
 
-			if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
-			{
-				mesh->m_isVisible = false;
-			}
+			meshArray.PushBack(EntityMeshPair(entity, effectNode));
 		}
 
 		for (ndMeshEffectNode* child = (ndMeshEffectNode*)effectNode->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
@@ -95,6 +111,29 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 			effectNodeBuffer[stack] = child;
 			parentEntityBuffer[stack] = entity;
 			stack++;
+		}
+	}
+
+	for (ndInt32 i = 0; i < meshArray.GetCount(); ++i)
+	{
+		ndDemoEntity* const entity = meshArray[i].m_entity;
+		ndMeshEffectNode* const effectNode = meshArray[i].m_effectNode;
+		ndDemoMeshInterface* mesh = nullptr;
+
+		ndSharedPtr<ndMeshEffect> meshEffect = effectNode->GetMesh();
+		if (!meshEffect->GetCluster().GetCount())
+		{
+			mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+		}
+		else
+		{
+			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+		}
+		entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+		
+		if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
+		{
+			mesh->m_isVisible = false;
 		}
 	}
 }
