@@ -1056,7 +1056,7 @@ static void tdefl_start_static_block(tdefl_compressor *d)
 
 static const mz_uint mz_bitmasks[17] = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF, 0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
 
-#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES &&MINIZ_LITTLE_ENDIAN &&MINIZ_HAS_64BIT_REGISTERS
+#if defined (MINIZ_USE_UNALIGNED_LOADS_AND_STORES) && defined (MINIZ_LITTLE_ENDIAN) && defined (MINIZ_HAS_64BIT_REGISTERS)
 static mz_bool tdefl_compress_lz_codes(tdefl_compressor *d)
 {
     mz_uint flags;
@@ -2565,7 +2565,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
                     {
                         int sym2;
                         mz_uint code_len;
-#if TINFL_USE_64BIT_BITBUF
+#if defined (TINFL_USE_64BIT_BITBUF)
                         if (num_bits < 30)
                         {
                             bit_buf |= (((tinfl_bit_buf_t)MZ_READ_LE32(pIn_buf_cur)) << num_bits);
@@ -2596,7 +2596,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
                         if (counter & 256)
                             break;
 
-#if !TINFL_USE_64BIT_BITBUF
+#if !defined (TINFL_USE_64BIT_BITBUF)
                         if (num_bits < 15)
                         {
                             bit_buf |= (((tinfl_bit_buf_t)MZ_READ_LE16(pIn_buf_cur)) << num_bits);

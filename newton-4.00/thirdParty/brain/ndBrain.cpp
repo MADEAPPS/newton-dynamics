@@ -125,7 +125,7 @@ void ndBrain::EndAddLayer()
 		mem = layer.SetPointers(mem);
 	}
 
-	ndReal* floatMemory = (ndReal*) ((ndInt64 (mem) + 31) & -32);
+	ndReal* floatMemory = (ndReal*) ((ndUnsigned64 (mem) + 31) & -32);
 	for (ndInt32 i = 0; i < GetCount(); i++)
 	{
 		ndBrainLayer& layer = *(*this)[i];

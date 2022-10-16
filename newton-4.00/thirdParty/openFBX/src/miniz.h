@@ -864,11 +864,11 @@ typedef struct
     mz_int16 m_look_up[TINFL_FAST_LOOKUP_SIZE], m_tree[TINFL_MAX_HUFF_SYMBOLS_0 * 2];
 } tinfl_huff_table;
 
-#if MINIZ_HAS_64BIT_REGISTERS
+#if defined (MINIZ_HAS_64BIT_REGISTERS)
 #define TINFL_USE_64BIT_BITBUF 1
 #endif
 
-#if TINFL_USE_64BIT_BITBUF
+#if defined (TINFL_USE_64BIT_BITBUF)
 typedef mz_uint64 tinfl_bit_buf_t;
 #define TINFL_BITBUF_SIZE (64)
 #else

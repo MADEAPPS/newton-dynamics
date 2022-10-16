@@ -621,7 +621,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const cont
 	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
 		face[i] = indexArray[i];
-		data[i] = ndInt64(indexArray);
+		data[i] = ndInt64(ndUnsigned64(indexArray));
 	}
 	adjacency.AddFace(indexCount, face, data);
 	return t_ContinueSearh;

@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 
 /* Return pointer to dynamic unit sphere. */
-ndBodyDynamic *BuildSphere(const ndVector pos, const ndVector gravity={0.f}) {
+ndBodyDynamic *BuildSphere(const ndVector& pos, const ndVector& gravity={0.f}) {
   // Create the rigid body and configure gravity for it.
   ndBodyDynamic *const body = new ndBodyDynamic();
   body->SetNotifyCallback(new ndBodyNotify(gravity));
