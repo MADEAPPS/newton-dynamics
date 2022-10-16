@@ -32,4 +32,6 @@ file(GLOB CPP_SOURCE
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
-target_compile_options(${projectName} PRIVATE "/W4")
+if (MSVC)
+	target_compile_options(${projectName} PRIVATE "/W4")
+endif()
