@@ -51,4 +51,4 @@ target_link_libraries(
   GTest::gtest_main
 )
 target_link_libraries (${PROJECT_NAME} ndNewton ndSolverAvx2)
-target_compile_options(${PROJECT_NAME} PRIVATE -W4)
+target_compile_options(${PROJECT_NAME} PRIVATE "/W4")
