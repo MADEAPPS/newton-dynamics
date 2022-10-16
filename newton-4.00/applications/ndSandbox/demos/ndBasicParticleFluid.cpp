@@ -187,7 +187,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
 
 		ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix));
-		SetMesh(geometry, ndGetIdentityMatrix());
+		SetMesh(geometry);
 		
 		m_isoSurfaceMesh0 = ndSharedPtr<ndIsoSurfaceMesh>(new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry));
 		m_isoSurfaceMesh1 = ndSharedPtr<ndIsoSurfaceMesh>(new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry));

@@ -41,7 +41,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y += 2.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry);
 
 	ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));

@@ -86,7 +86,7 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoMeshInterface> origGeometry (new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
 
 	ndDemoEntity* const origEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-	origEntity->SetMesh(origGeometry, ndGetIdentityMatrix());
+	origEntity->SetMesh(origGeometry);
 
 	ndMatrix mOrigMatrix = ndGetIdentityMatrix();
 	mOrigMatrix.m_posit.m_x = 2.0f;
@@ -106,7 +106,7 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 
 	ndSharedPtr<ndDemoMeshInterface> compGeometry (new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga"));
 	ndDemoEntity* const compEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-	compEntity->SetMesh(compGeometry, ndGetIdentityMatrix());
+	compEntity->SetMesh(compGeometry);
 
 	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);

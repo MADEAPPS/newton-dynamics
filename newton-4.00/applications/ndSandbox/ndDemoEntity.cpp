@@ -26,7 +26,6 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_nextRotation (matrix)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh()
-	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
 	,m_isVisible(true)
@@ -46,7 +45,6 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_nextRotation(m_curRotation)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh()
-	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
 	,m_isVisible(true)
@@ -147,7 +145,6 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
 	,m_mesh(copyFrom.m_mesh)
-	,m_userData(nullptr)
 	,m_rootNode(nullptr)
 	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
@@ -156,10 +153,6 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 
 ndDemoEntity::~ndDemoEntity(void)
 {
-	if (m_userData) 
-	{
-		delete m_userData;
-	}
 }
 
 ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
@@ -177,16 +170,6 @@ ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityMana
 ndNodeBaseHierarchy* ndDemoEntity::CreateClone () const
 {
 	return new ndDemoEntity(*this);
-}
-
-ndDemoEntity::UserData* ndDemoEntity::GetUserData ()
-{
-	return m_userData;
-}
-
-void ndDemoEntity::SetUserData (UserData* const data)
-{
-	m_userData = data;
 }
 
 ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMesh()

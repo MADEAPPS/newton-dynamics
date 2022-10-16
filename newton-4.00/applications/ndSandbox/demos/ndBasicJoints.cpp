@@ -126,7 +126,7 @@ static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMa
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -692,7 +692,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500));
-	rollerCosterPath->SetMesh(mesh, ndGetIdentityMatrix());
+	rollerCosterPath->SetMesh(mesh);
 	mesh->SetVisible(true);
 
 	ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*mesh;

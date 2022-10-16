@@ -193,7 +193,7 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glD
 	}
 
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoDebrisMesh("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray));
-	SetMesh(mesh, ndGetIdentityMatrix());
+	SetMesh(mesh);
 }
 
 ndDemoDebrisEntity::ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom)
@@ -235,7 +235,7 @@ void ndDemoDebrisRootEntity::FinalizeConstruction(const ndArray<glDebrisPoint>& 
 {
 	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)*GetChild()->GetMesh();
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoDebrisMesh(shaderMesh, vertexArray));
-	SetMesh(mesh, ndGetIdentityMatrix());
+	SetMesh(mesh);
 }
 
 void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const

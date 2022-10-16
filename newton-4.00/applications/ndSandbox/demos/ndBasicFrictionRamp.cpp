@@ -78,7 +78,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMat
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry);
 	
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -111,7 +111,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndPitchMatrix(30.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, ndGetIdentityMatrix());
+	entity->SetMesh(geometry);
 	
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));

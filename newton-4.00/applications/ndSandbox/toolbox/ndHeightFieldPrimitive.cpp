@@ -178,7 +178,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	// create the visual mesh
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndHeightfieldMesh(heightfield, scene->GetShaderCache()));
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh);
 	scene->AddEntity(entity);
 
 	// create the height field collision and rigid body
@@ -214,7 +214,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndHeightfieldMesh(heightfield, scene->GetShaderCache()));
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-	entity->SetMesh(mesh, ndGetIdentityMatrix());
+	entity->SetMesh(mesh);
 
 	ndShapeInstance heighfieldInstance(
 		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,

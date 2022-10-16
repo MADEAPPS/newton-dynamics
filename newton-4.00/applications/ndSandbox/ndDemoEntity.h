@@ -23,21 +23,6 @@ class ndDemoMeshInterface;
 class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 {
 	public:
-
-	class UserData
-	{
-		public:
-		UserData()
-		{
-		}
-
-		virtual ~UserData()
-		{
-		}
-		
-		virtual void OnRender (ndFloat32 timestep) const = 0;
-	};
-
 	ndDemoEntity(const ndDemoEntity& copyFrom);
 	ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent);
 	ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* const meshEffect);
@@ -46,13 +31,10 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	static ndDemoEntity* LoadFbx (const char* const filename, ndDemoEntityManager* const scene);
 
 	ndSharedPtr<ndDemoMeshInterface> GetMesh();
-	void SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix);
+	void SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix = ndGetIdentityMatrix());
 
 	const ndMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const ndMatrix& matrix);  
-
-	UserData* GetUserData ();
-	void SetUserData (UserData* const data);
 
 	ndNodeBaseHierarchy* CreateClone () const;
 
@@ -87,7 +69,6 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 
 	ndMatrix m_meshMatrix;
 	ndSharedPtr<ndDemoMeshInterface> m_mesh;
-	UserData* m_userData;
 	ndList <ndDemoEntity*>::ndNode* m_rootNode;
 	ndSpinLock m_lock;
 	bool m_isVisible;

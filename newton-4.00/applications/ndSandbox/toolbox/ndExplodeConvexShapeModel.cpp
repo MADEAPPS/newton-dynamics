@@ -251,7 +251,7 @@ void ndExplodeConvexShapeModel::AddEffect(const ndEffect& effect, ndFloat32 mass
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh, ndGetIdentityMatrix());
+	entity->SetMesh(effect.m_visualMesh);
 	m_scene->AddEntity(entity);
 
 	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
