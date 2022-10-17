@@ -18,29 +18,7 @@
 class ndDemoEntityManager;
 class ndAnimationSequence;
 
-class fbxDemoEntity____ : public ndDemoEntity
-{
-	public:
-	fbxDemoEntity____(ndDemoEntity* const parent);
-	fbxDemoEntity____(const fbxDemoEntity____& source);
-	~fbxDemoEntity____();
-
-	void SetRenderMatrix(const ndMatrix& matrix)
-	{
-		m_matrix = matrix;
-	}
-
-	void CleanIntermediate();
-	ndNodeBaseHierarchy* CreateClone() const;
-	void ApplyTransform(const ndMatrix& cordinateSystem);
-	void BuildRenderMeshes(ndDemoEntityManager* const scene);
-
-	ndMeshEffect* m_fbxMeshEffect;
-};
-
-fbxDemoEntity____* LoadFbxMesh(const char* const meshName);
 ndAnimationSequence* LoadFbxAnimation(const char* const meshName);
-
 ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName);
 
 #endif

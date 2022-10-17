@@ -1061,13 +1061,6 @@ void ndDemoEntityManager::ErrorCallback(ndInt32 error, const char* description)
 	ndAssert (0);
 }
 
-fbxDemoEntity____* ndDemoEntityManager::LoadFbxMesh(const char* const meshName)
-{
-	fbxDemoEntity____* const entity = ::LoadFbxMesh(meshName);
-	entity->BuildRenderMeshes(this);
-	return entity;
-}
-
 void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, ndInt32 button, ndInt32 action, ndInt32)
 {
 	if (button >= 0 && button < 3) 
