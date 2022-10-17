@@ -154,7 +154,7 @@ static void MakeNoiseHeightfield(ndArray<ndVector>& heightfield)
 		for (ndInt32 x = 0; x < D_TERRAIN_WIDTH; x++)
 		{
 			ndFloat32 noiseVal = BrownianMotion(octaves, persistance, noiseGridScale * ndFloat32(x), noiseGridScale * ndFloat32(z));
-			heightfield[z * D_TERRAIN_WIDTH + x] = ndVector(x * cellSize, noiseVal, z * cellSize, ndFloat32 (0.0f));
+			heightfield[z * D_TERRAIN_WIDTH + x] = ndVector((ndFloat32)x * cellSize, noiseVal, (ndFloat32)z * cellSize, ndFloat32 (0.0f));
 			minHeight = ndMin(minHeight, noiseVal);
 			maxHight = ndMax(maxHight, noiseVal);
 		}

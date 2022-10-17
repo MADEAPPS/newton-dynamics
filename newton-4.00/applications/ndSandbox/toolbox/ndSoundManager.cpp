@@ -400,7 +400,7 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 						}
 
 						asset->m_frequecy = ndFloat32(sampleRate);
-						asset->m_durationInSeconds = ndFloat32(size) / byteRate;
+						asset->m_durationInSeconds = ndFloat32(size) / (ndFloat32)byteRate;
 						alBufferData(ALuint(asset->m_buffer), waveFormat, &data[0], size, sampleRate);
 					}
 				}

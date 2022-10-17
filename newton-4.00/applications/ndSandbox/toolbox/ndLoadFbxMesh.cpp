@@ -615,7 +615,7 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 
 	ndInt32 frames = ndInt32(ndFloor(framesFloat));
 	ndAssert(frames > 0);
-	ndFloat32 timestep = period / frames;
+	ndFloat32 timestep = period / (ndFloat32)frames;
 
 	animation.m_length = period;
 	animation.m_timestep = timestep;

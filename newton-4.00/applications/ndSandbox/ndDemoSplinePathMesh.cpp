@@ -61,7 +61,7 @@ void ndDemoSplinePathMesh::SetRenderResolution(ndInt32 breaks)
 			glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 		}
 
-		ndFloat64 scale = 1.0f / m_renderResolution;
+		ndFloat64 scale = 1.0f / (ndFloat64)m_renderResolution;
 		ndArray<glVector3> points(m_renderResolution + 1);
 		for (ndInt32 i = 0; i < m_renderResolution; ++i)
 		{

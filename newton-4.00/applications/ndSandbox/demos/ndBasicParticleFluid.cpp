@@ -276,10 +276,10 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 		{
 			for (ndInt32 x = 0; x < size; x++)
 			{
-				ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
-				p.m_x = spacing * ndInt32(p.m_x / spacing);
-				p.m_y = spacing * ndInt32(p.m_y / spacing);
-				p.m_z = spacing * ndInt32(p.m_z / spacing);
+				ndVector p(matrix.TransformVector(ndVector((ndFloat32)x * spacing, (ndFloat32)y * spacing, (ndFloat32)z * spacing, ndFloat32(1.0f))));
+				p.m_x = spacing * (ndFloat32)ndInt32(p.m_x / spacing);
+				p.m_y = spacing * (ndFloat32)ndInt32(p.m_y / spacing);
+				p.m_z = spacing * (ndFloat32)ndInt32(p.m_z / spacing);
 
 				p.m_x += ndGaussianRandom(0.0f, spacing * 0.01f);
 				p.m_y += ndGaussianRandom(0.0f, spacing * 0.01f);
@@ -311,7 +311,7 @@ static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* c
 					y >= (size - 1) ||
 					z >= (size - 1))
 				{
-					const ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+					const ndVector p(matrix.TransformVector(ndVector((ndFloat32)x * spacing, (ndFloat32)y * spacing, (ndFloat32)z * spacing, ndFloat32(1.0f))));
 					posit.PushBack(p);
 					veloc.PushBack(v);
 				}
@@ -338,9 +338,9 @@ static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* cons
 				ndInt32 y0 = y - size / 2;
 				ndInt32 z0 = z - size / 2;
 				ndFloat32 tesRadius = ndFloat32 (x0 * x0 + y0 * y0 + z0 * z0);
-				if (tesRadius < radius2)
+				if (tesRadius < (ndFloat32)radius2)
 				{
-					const ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+					const ndVector p(matrix.TransformVector(ndVector((ndFloat32)x * spacing, (ndFloat32)y * spacing, (ndFloat32)z * spacing, ndFloat32(1.0f))));
 					posit.PushBack(p);
 					veloc.PushBack(v);
 				}
@@ -376,7 +376,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	ndInt32 particleCountPerAxis = 40;
 	ndFloat32 spacing = diameter;
 	
-	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;
+	ndFloat32 offset = spacing * (ndFloat32)particleCountPerAxis / 2.0f;
 	ndVector origin(-offset, 1.0f, -offset, ndFloat32(0.0f));
 	
 	matrix.m_posit += origin;

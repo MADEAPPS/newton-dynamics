@@ -155,7 +155,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 	stepy = boxSize.m_y;
 	
 	ndFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
-	ndFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
+	ndFloat32 z0 = matrix.m_posit.m_z - stepz * (ndFloat32)count / 2;
 
 	matrix.m_posit.m_y = y0;
 	matrix.m_posit.m_y -= 0.01f;

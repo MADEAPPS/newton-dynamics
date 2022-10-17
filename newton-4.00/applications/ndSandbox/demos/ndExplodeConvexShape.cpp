@@ -53,16 +53,16 @@ static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 	desc.m_pointCloud.PushBack(ndVector(pMax.m_x, pMax.m_y, pMax.m_z, ndFloat32(0.0f)));
 
 	ndInt32 count = 2;
-	ndVector stepsSpize(size.Scale (1.0f / count));
+	ndVector stepsSpize(size.Scale (1.0f / (ndFloat32)count));
 	for (ndInt32 z = 0; z <= count; ++z)
 	{
-		ndFloat32 zf = pMin.m_z + stepsSpize.m_z * z;
+		ndFloat32 zf = pMin.m_z + stepsSpize.m_z * (ndFloat32)z;
 		for (ndInt32 y = 0; y <= count; ++y)
 		{
-			ndFloat32 yf = pMin.m_y + stepsSpize.m_y * y;
+			ndFloat32 yf = pMin.m_y + stepsSpize.m_y * (ndFloat32)y;
 			for (ndInt32 x = 0; x <= count; ++x)
 			{
-				ndFloat32 xf = pMin.m_x + stepsSpize.m_x * x;
+				ndFloat32 xf = pMin.m_x + stepsSpize.m_x * (ndFloat32)x;
 				ndVector randPoint(ndGaussianRandom(xf, 0.05f), ndGaussianRandom(yf, 0.05f), ndGaussianRandom(zf, 0.05f), ndFloat32(0.0f));
 				desc.m_pointCloud.PushBack(randPoint);
 			}

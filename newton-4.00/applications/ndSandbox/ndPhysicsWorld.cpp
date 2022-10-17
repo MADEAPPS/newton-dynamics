@@ -249,9 +249,9 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 //}
 
 	// if the time step is more than max timestep par frame, throw away the extra steps.
-	if (m_timeAccumulator > descreteStep * maxSteps)
+	if (m_timeAccumulator > descreteStep * (ndFloat32)maxSteps)
 	{
-		ndFloat32 steps = ndFloor(m_timeAccumulator / descreteStep) - maxSteps;
+		ndFloat32 steps = ndFloor(m_timeAccumulator / descreteStep) - (ndFloat32)maxSteps;
 		ndAssert(steps >= 0.0f);
 		m_timeAccumulator -= descreteStep * steps;
 	}

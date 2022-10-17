@@ -693,11 +693,11 @@ namespace biped2
 			}
 
 			ndBasePose(ndBodyDynamic* const body)
-				:m_body(body)
-				,m_veloc(body->GetVelocity())
+				:m_veloc(body->GetVelocity())
 				,m_omega(body->GetOmega())
 				,m_posit(body->GetPosition())
 				,m_rotation(body->GetRotation())
+				,m_body(body)
 			{
 			}
 

@@ -191,7 +191,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	ndFloat32 radius = 4.0f / viewport[3];
+	ndFloat32 radius = 4.0f / (ndFloat32)viewport[3];
 
 	glVector4 quad[] =
 	{

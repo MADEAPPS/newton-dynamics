@@ -117,7 +117,7 @@ static void ThreeLayersTwoInputsTwoOutputs()
 	ndExpandTraceMessage("%s\n", "boolean logic");
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testCount - failCount, testCount);
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testCount);
-	ndExpandTraceMessage("success rate %f%%\n", (testCount - failCount) * 100.0f / testCount);
+	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testCount - failCount) * 100.0f / (ndFloat32)testCount);
 }
 
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
@@ -245,7 +245,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndExpandTraceMessage("%s\n", title);
 	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
 	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	ndExpandTraceMessage("success rate %f%%\n", (testDigits->GetCount() - failCount) * 100.0f / testDigits->GetCount());
+	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
 static void MnistTrainingSet()

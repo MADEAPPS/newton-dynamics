@@ -1175,7 +1175,7 @@ void ndDemoEntityManager::BeginFrame()
 	glfwGetWindowSize(m_mainFrame, &w, &h);
 	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
 	io.DisplaySize = ImVec2((float)w, (float)h);
-	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
+	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / (ndFloat32)w) : 0, h > 0 ? ((float)display_h / (ndFloat32)h) : 0);
 
 	//int display_w, display_h;
 	//glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
@@ -1440,7 +1440,7 @@ void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
 			else
 			{
 				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-				glScissor((ndInt32)pcmd->ClipRect.x, (ndInt32)(fb_height - pcmd->ClipRect.w), (ndInt32)(pcmd->ClipRect.z - pcmd->ClipRect.x), (ndInt32)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+				glScissor((ndInt32)pcmd->ClipRect.x, (ndInt32)((ndFloat32)fb_height - pcmd->ClipRect.w), (ndInt32)(pcmd->ClipRect.z - pcmd->ClipRect.x), (ndInt32)(pcmd->ClipRect.w - pcmd->ClipRect.y));
 				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
 			}
 			idx_buffer += pcmd->ElemCount;

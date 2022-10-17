@@ -144,8 +144,8 @@ ndVehicleUI::~ndVehicleUI()
 
 void ndVehicleUI::CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix)
 {
-	ndFloat32 sizeX = (ndFloat32)(1.0f * uscene->GetWidth());
-	ndFloat32 sizeY = (ndFloat32)(1.0f * uscene->GetHeight());
+	ndFloat32 sizeX = (ndFloat32)(1.0f * (ndFloat32)uscene->GetWidth());
+	ndFloat32 sizeY = (ndFloat32)(1.0f * (ndFloat32)uscene->GetHeight());
 	ndFloat32 L = origin_x;
 	ndFloat32 R = origin_x + sizeX;
 	ndFloat32 T = origin_y;
@@ -362,7 +362,7 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 
 		origin.m_posit = ndVector(origin_x + ptsize * 1.9f, 50.0f, 0.0f, 1.0f);
 
 		ndFloat32 uwith = 0.1f;
-		ndFloat32 u0 = uwith * gearid;
+		ndFloat32 u0 = uwith * (ndFloat32)gearid;
 		ndFloat32 u1 = u0 + uwith;
 		ndFloat32 xy1 = 10.0f;
 

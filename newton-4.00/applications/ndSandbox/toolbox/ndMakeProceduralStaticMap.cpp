@@ -171,15 +171,15 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndRegularProceduralGrid)
 
 ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
-	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 1.0f);
+	ndVector origin(-(ndFloat32)grids * gridSize * 0.5f, 0.0f, -(ndFloat32)grids * gridSize * 0.5f, 1.0f);
 
 	ndArray<ndVector> points;
 	for (ndInt32 iz = 0; iz <= grids; iz++)
 	{
-		ndFloat32 z0 = origin.m_z + iz * gridSize;
+		ndFloat32 z0 = origin.m_z + (ndFloat32)iz * gridSize;
 		for (ndInt32 ix = 0; ix <= grids; ix++)
 		{
-			ndFloat32 x0 = origin.m_x + ix * gridSize;
+			ndFloat32 x0 = origin.m_x + (ndFloat32)ix * gridSize;
 			points.PushBack(ndVector(x0, ndGaussianRandom(0.0f, perturbation), z0, 1.0f));
 		}
 	}
@@ -252,7 +252,7 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
 	ndPlane planeEquation(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
-	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
+	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * (ndFloat32)grids * gridSize, 1.0f, 2.0f * (ndFloat32)grids * gridSize, planeEquation));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndPhysicsWorld* const world = scene->GetWorld();

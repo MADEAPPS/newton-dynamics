@@ -253,8 +253,8 @@ void ndBasicPlayerCapsule::SetCamera()
 		}
 
 		m_playerInput.m_heading = camera->GetYawAngle();
-		m_playerInput.m_forwardSpeed = (ndInt32(m_scene->GetKeyState('W')) - ndInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-		m_playerInput.m_strafeSpeed = (ndInt32(m_scene->GetKeyState('D')) - ndInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+		m_playerInput.m_forwardSpeed = (ndFloat32)(ndInt32(m_scene->GetKeyState('W')) - ndInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+		m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(m_scene->GetKeyState('D')) - ndInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 		m_playerInput.m_jump = m_scene->GetKeyState(' ') && IsOnFloor();
 
 		if (m_playerInput.m_forwardSpeed && m_playerInput.m_strafeSpeed)

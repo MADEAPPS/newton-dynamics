@@ -58,7 +58,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	ndFloat32 spacing = 3.0f;
 	ndMatrix matrix(location);
 	matrix.m_posit.m_y += -0.6f;
-	matrix.m_posit.m_z -= (count/2) * spacing;
+	matrix.m_posit.m_z -= (ndFloat32)(count/2) * spacing;
 	ndShapeMaterial material(capsule.GetMaterial());
 	for (ndInt32 i = 0; i < count; ++i)
 	{

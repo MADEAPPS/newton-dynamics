@@ -483,7 +483,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			ndFloat32 gageSize = 200.0f;
-			ndFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+			ndFloat32 y = (ndFloat32)scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
 			// draw the tachometer
 			ndFloat32 x = gageSize / 2 + 20.0f;
