@@ -127,7 +127,7 @@ class ndBodySphFluid::ndWorkingBuffers
 	void SetWorldToGridMapping(ndInt32 gridCount, ndFloat32 xMax, ndFloat32 xMin)
 	{
 		m_worlToGridOrigin = xMin;
-		m_worlToGridScale = ndFloat32(1<< D_SPH_GRID_X_RESOLUTION) * gridCount / (xMax - xMin);
+		m_worlToGridScale = ndFloat32(1<< D_SPH_GRID_X_RESOLUTION) * (ndFloat32)gridCount / (xMax - xMin);
 	}
 
 	ndInt32 WorldToGrid(ndFloat32 x) const
@@ -505,7 +505,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 					const ndInt32 particle1 = ndInt32(hash1.m_particleIndex);
 					ndAssert(particle0 != particle1);
 					const ndInt32 x1 = data.WorldToGrid(m_posit[particle1].m_x);
-					ndAssert((x1 - x0) > ndFloat32(-1.0e-3f));
+					//ndAssert((x1 - x0) > ndFloat32(-1.0e-3f));
 					const ndInt32 sweeptTest = ((x1 - x0) >= windowsTest);
 					if (sweeptTest)
 					{

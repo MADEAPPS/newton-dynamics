@@ -55,7 +55,7 @@ namespace nd_
 			{
 				LARGE_INTEGER delta;
 				delta.QuadPart = m_stop.QuadPart - m_start.QuadPart;
-				return (1000.0 * delta.QuadPart) / (double)m_freq.QuadPart;
+				return (1000.0 * (double)delta.QuadPart) / (double)m_freq.QuadPart;
 			}
 
 		private:

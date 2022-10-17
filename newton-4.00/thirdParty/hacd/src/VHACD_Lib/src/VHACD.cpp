@@ -594,9 +594,9 @@ namespace nd_
 			const size_t nInputParts = inputParts.Size();
 			Update(m_stageProgress, 0.0, params);
 			for (size_t p = 0; p < nInputParts && !m_cancel; ++p) {
-				const double progress0 = p * 100.0 / nInputParts;
-				const double progress1 = (p + 0.75) * 100.0 / nInputParts;
-				const double progress2 = (p + 1.00) * 100.0 / nInputParts;
+				const double progress0 = double(p) * 100.0 / (double)nInputParts;
+				const double progress1 = (double(p) + 0.75) * 100.0 / (double)nInputParts;
+				const double progress2 = (double(p) + 1.00) * 100.0 / (double)nInputParts;
 
 				Update(m_stageProgress, progress0, params);
 
@@ -770,7 +770,7 @@ namespace nd_
 		Update(m_stageProgress, 0.0, params);
 		m_convexHulls.Resize(0);
 		for (size_t p = 0; p < nConvexHulls && !m_cancel; ++p) {
-			Update(m_stageProgress, p * 100.0 / nConvexHulls, params);
+			Update(m_stageProgress, (double)p * 100.0 / (double)nConvexHulls, params);
 			m_convexHulls.PushBack(new Mesh);
 			parts[p]->ComputeConvexHull(*m_convexHulls[p]);
 			size_t nv = m_convexHulls[p]->GetNPoints();

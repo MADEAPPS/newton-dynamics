@@ -1600,8 +1600,8 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 			stack--;
 			cluster = spliteStack[stack];
 
-			const ndVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-			const ndVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
+			const ndVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+			const ndVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 			ndFloat32 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			if ((cluster.m_count <= clusterSize) || (stack >  (ndInt32(sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(1.e-4f)))
@@ -1791,7 +1791,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	{
 		origin += contactArray[i].m_point;
 	}
-	ndVector scale(ndFloat32(1.0f) / count);
+	ndVector scale(ndFloat32(1.0f) / (ndFloat32)count);
 	origin = origin * scale;
 	origin.m_w = ndFloat32(1.0f);
 

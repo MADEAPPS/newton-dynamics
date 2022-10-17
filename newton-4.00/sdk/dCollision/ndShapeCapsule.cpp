@@ -110,7 +110,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 	ndInt32 index = 0;
 	ndInt32 dx0 = ndInt32(ndFloor(DG_CAPSULE_SEGMENTS * ((m_p0.m_x + m_height + m_radius0) / m_radius0)) + ndFloat32(1.0f));
 	ndFloat32 step = m_radius0 / DG_CAPSULE_SEGMENTS;
-	ndFloat32 x0 = m_p0.m_x - step * dx0;
+	ndFloat32 x0 = m_p0.m_x - step * (ndFloat32)dx0;
 	for (ndInt32 j = 0; j < dx0; ++j) 
 	{
 		x0 += step;

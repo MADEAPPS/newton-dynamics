@@ -71,7 +71,7 @@ static inline ndFloat32 Gradient(int32_t x, int32_t y, int32_t z, ndFloat32 dx, 
 ndFloat32 dPerlinNoise(ndFloat32 x)
 {
 	ndInt32 ix = ndInt32(ndFloor(x));
-	ndFloat32 dx = x - ix;
+	ndFloat32 dx = x - (ndFloat32)ix;
 
 	ndFloat32 w00 = Gradient(ix, dx);
 	ndFloat32 w10 = Gradient(ix + 1, dx - 1.0f);
@@ -84,8 +84,8 @@ ndFloat32 dPerlinNoise(ndFloat32 x, ndFloat32 y)
 {
 	ndInt32 ix = ndInt32(ndFloor(x));
 	ndInt32 iy = ndInt32(ndFloor(y));
-	ndFloat32 dx = x - ix;
-	ndFloat32 dy = y - iy;
+	ndFloat32 dx = x - (ndFloat32)ix;
+	ndFloat32 dy = y - (ndFloat32)iy;
 
 	ndFloat32 w00 = Gradient(ix, iy, dx, dy);
 	ndFloat32 w10 = Gradient(ix + 1, iy, dx - 1.0f, dy);
@@ -107,9 +107,9 @@ ndFloat32 dPerlinNoise(ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	ndInt32 iy = ndInt32(ndFloor(y));
 	ndInt32 iz = ndInt32(ndFloor(z));
 
-	ndFloat32 dx = x - ix;
-	ndFloat32 dy = y - iy;
-	ndFloat32 dz = z - iz;
+	ndFloat32 dx = x - (ndFloat32)ix;
+	ndFloat32 dy = y - (ndFloat32)iy;
+	ndFloat32 dz = z - (ndFloat32)iz;
 
 	ndFloat32 w000 = Gradient(ix, iy, iz, dx, dy, dz);
 	ndFloat32 w100 = Gradient(ix + 1, iy, iz, dx - 1, dy, dz);

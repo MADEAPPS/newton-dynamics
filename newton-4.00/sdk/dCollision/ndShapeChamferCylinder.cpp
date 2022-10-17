@@ -200,8 +200,8 @@ void ndShapeChamferCylinder::DebugShape(const ndMatrix& matrix, ndShapeDebugNoti
 	ndInt32 slices = 12;
 	ndInt32 brakes = 24;
 	ndFloat32 sliceAngle = ndFloat32(0.0f);
-	ndFloat32 sliceStep = ndPi / slices;
-	ndFloat32 breakStep = ndFloat32(2.0f) * ndPi / brakes;
+	ndFloat32 sliceStep = ndPi / (ndFloat32)slices;
+	ndFloat32 breakStep = ndFloat32(2.0f) * ndPi / (ndFloat32)brakes;
 	ndVector pool[24 * (12 + 1)];
 
 	ndMatrix rot(ndPitchMatrix(breakStep));

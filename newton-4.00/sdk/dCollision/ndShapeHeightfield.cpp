@@ -205,16 +205,16 @@ void ndShapeHeightfield::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& 
 	ndInt32 base = 0;
 	for (ndInt32 z = 0; z < m_height - 1; ++z)
 	{
-		const ndVector p0 ((0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0]),               (z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-		const ndVector p1 ((0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+		const ndVector p0 ((ndFloat32)(0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0]),               (ndFloat32)(z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+		const ndVector p1 ((ndFloat32)(0 + 0) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + 0 + m_width + 0]), (ndFloat32)(z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 		points[0 * 2 + 0] = matrix.TransformVector(p0);
 		points[1 * 2 + 0] = matrix.TransformVector(p1);
 
 		for (ndInt32 x = 0; x < m_width - 1; ++x) 
 		{
-			const ndVector p2 ((x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + 1]),			(z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-			const ndVector p3 ((x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+			const ndVector p2 ((ndFloat32)(x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + 1]),			(ndFloat32)(z + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+			const ndVector p3 ((ndFloat32)(x + 1) * m_horizontalScale_x, ndFloat32(m_elevationMap[base + x + m_width + 1]), (ndFloat32)(z + 1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 			points[0 * 2 + 1] = matrix.TransformVector(p2);
 			points[1 * 2 + 1] = matrix.TransformVector(p3);
@@ -324,10 +324,10 @@ ndFloat32 ndShapeHeightfield::RayCastCell(const ndFastRay& ray, ndInt32 xIndex0,
 
 	ndInt32 base = zIndex0 * m_width + xIndex0;
 
-	points[0 * 2 + 0] = ndVector((xIndex0 + 0) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + 0]),			  (zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-	points[0 * 2 + 1] = ndVector((xIndex0 + 1) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + 1]),			  (zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
-	points[1 * 2 + 1] = ndVector((xIndex0 + 1) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + m_width + 1]), (zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
-	points[1 * 2 + 0] = ndVector((xIndex0 + 0) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[0 * 2 + 0] = ndVector((ndFloat32)(xIndex0 + 0) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + 0]),			 (ndFloat32)(zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[0 * 2 + 1] = ndVector((ndFloat32)(xIndex0 + 1) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + 1]),			 (ndFloat32)(zIndex0 + 0) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[1 * 2 + 1] = ndVector((ndFloat32)(xIndex0 + 1) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + m_width + 1]), (ndFloat32)(zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
+	points[1 * 2 + 0] = ndVector((ndFloat32)(xIndex0 + 0) * m_horizontalScale_x, ndFloat32 (m_elevationMap[base + m_width + 0]), (ndFloat32)(zIndex0 + 1) * m_horizontalScale_z, ndFloat32(0.0f));
 
 	ndFloat32 t = ndFloat32(1.2f);
 	if (m_diagonalMode == m_normalDiagonals)
@@ -428,14 +428,14 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 			xInc = 1;
 			ndFloat32 val = ndFloat32(1.0f) / dp.m_x;
 			stepX = scale_x * val;
-			tx = (scale_x * (ix0 + ndFloat32(1.0f)) - p0.m_x) * val;
+			tx = (scale_x * ((ndFloat32)ix0 + ndFloat32(1.0f)) - p0.m_x) * val;
 		}
 		else if (dp.m_x < ndFloat32(0.0f)) 
 		{
 			xInc = -1;
 			ndFloat32 val = -ndFloat32(1.0f) / dp.m_x;
 			stepX = scale_x * val;
-			tx = -(scale_x * ix0 - p0.m_x) * val;
+			tx = -(scale_x * (ndFloat32)ix0 - p0.m_x) * val;
 		}
 		else 
 		{
@@ -452,14 +452,14 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 			zInc = 1;
 			ndFloat32 val = ndFloat32(1.0f) / dp.m_z;
 			stepZ = scale_z * val;
-			tz = (scale_z * (iz0 + ndFloat32(1.0f)) - p0.m_z) * val;
+			tz = (scale_z * ((ndFloat32)iz0 + ndFloat32(1.0f)) - p0.m_z) * val;
 		}
 		else if (dp.m_z < ndFloat32(0.0f)) 
 		{
 			zInc = -1;
 			ndFloat32 val = -ndFloat32(1.0f) / dp.m_z;
 			stepZ = scale_z * val;
-			tz = -(scale_z * iz0 - p0.m_z) * val;
+			tz = -(scale_z * (ndFloat32)iz0 - p0.m_z) * val;
 		}
 		else 
 		{
@@ -587,10 +587,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 base = z0 * m_width;
 		for (ndInt32 z = z0; z <= z1; ++z) 
 		{
-			ndFloat32 zVal = m_horizontalScale_z * z;
+			ndFloat32 zVal = m_horizontalScale_z * (ndFloat32)z;
 			for (ndInt32 x = x0; x <= x1; ++x) 
 			{
-				vertex[vertexIndex] = ndVector(m_horizontalScale_x * x, ndFloat32(m_elevationMap[base + x]), zVal, ndFloat32(0.0f));
+				vertex[vertexIndex] = ndVector(m_horizontalScale_x * (ndFloat32)x, ndFloat32(m_elevationMap[base + x]), zVal, ndFloat32(0.0f));
 				vertexIndex++;
 				ndAssert(vertexIndex <= vertex.GetCount());
 			}

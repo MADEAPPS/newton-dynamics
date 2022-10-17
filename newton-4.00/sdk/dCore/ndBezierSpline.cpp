@@ -715,7 +715,7 @@ ndFloat64 ndBezierSpline::FindClosestKnot(ndBigVector& closestPoint, const ndBig
 	ndFloat64 distance2 = ndFloat32 (1.0e10f);
 	ndBigVector closestControlPoint(m_controlPoints[0]);
 	subdivitionSteps = ndMax(subdivitionSteps, 1);
-	ndFloat64 scale = ndFloat32 (1.0f) / subdivitionSteps;
+	ndFloat64 scale = ndFloat32 (1.0f) / (ndFloat64)subdivitionSteps;
 	for (ndInt32 span = m_degree; span < (m_knotsCount - m_degree - 1); ++span) 
 	{
 		ndFloat64 param = ndFloat32 (0.0f);

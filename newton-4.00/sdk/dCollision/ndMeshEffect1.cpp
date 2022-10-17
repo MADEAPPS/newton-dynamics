@@ -1684,8 +1684,8 @@ void ndMeshEffect::ndPointFormat::CompressData(
 	ndPointFormat& output, ndInt32* const indexList, 
 	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
 {
-	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-	const ndBigVector x2c(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
+	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+	const ndBigVector x2c(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 	const ndBigVector variance((x2c.GetMax(ndVector::m_zero)).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
@@ -1829,8 +1829,8 @@ void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, nd
 			cluster = spliteStack[stack];
 			ndSortKey* const remapIndex = &indirectList[cluster.m_start];
 
-			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
+			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (ndInt32 (sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
@@ -1947,8 +1947,8 @@ void ndMeshEffect::ndAttibutFormat::CompressData(
 	ndAttibutFormat& output,	const ndPointFormat& points, ndInt32* const indexList, 
 	ndSortKey* const remapIndex, const ndSortCluster& cluster, ndFloat32 tol)
 {
-	const ndBigVector origin (cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-	const ndBigVector x2c (cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
+	const ndBigVector origin (cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+	const ndBigVector x2c (cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 	const ndBigVector variance((x2c.GetMax(ndVector::m_zero)).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
@@ -2189,8 +2189,8 @@ void ndMeshEffect::ndAttibutFormat::CompactVertexData(const ndPointFormat& point
 			cluster = spliteStack[stack];
 			ndSortKey* const remapIndex = &indirectList[cluster.m_start];
 
-			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
+			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (ndInt32 (sizeof (spliteStack) / sizeof (spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))

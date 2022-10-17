@@ -107,8 +107,8 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 			omega += (angle - m_axles[i].m_axleAngle) * desc.m_invTimestep;
 			m_axles[i].m_axleAngle = angle;
 		}
-		angle = angle / m_axleCount;
-		omega = omega / m_axleCount;
+		angle = angle / (ndFloat32)m_axleCount;
+		omega = omega / (ndFloat32)m_axleCount;
 		//dTrace(("%f\n", angle * dRadToDegree));
 		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
 		ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, 300.0f, angle, ndFloat32(10.0f), omega);

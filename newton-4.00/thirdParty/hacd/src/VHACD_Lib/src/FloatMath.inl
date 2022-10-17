@@ -2270,6 +2270,7 @@ namespace nd_
 		class KdTreeInterface
 		{
 		public:
+		  virtual ~KdTreeInterface() {}
 		  virtual const double * getPositionDouble(uint32_t index) const = 0;
 		  virtual const float  * getPositionFloat(uint32_t index) const = 0;
 		};

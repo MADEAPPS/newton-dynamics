@@ -2424,7 +2424,7 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 	ndAssert (SanityCheck ());
 #endif
 
-	ndFloat32 progressDen = ndFloat32 (1.0f / GetEdgeCount());
+	ndFloat32 progressDen = ndFloat32 (1.0f) / (ndFloat32)GetEdgeCount();
 	ndInt32 edgeCount = GetEdgeCount() * 4 + D_LOCAL_BUFFER_SIZE * 16;
 	ndInt32 maxVertexIndex = GetLastVertexIndex();
 	
@@ -2489,7 +2489,7 @@ bool ndPolyhedra::Optimize (const ndFloat64* const array, ndInt32 strideInBytes,
 				{
 					interPasses = 0;
 					faceCount = GetFaceCount();
-					progress = ReportProgress(ndFloat32(1.0f) - GetEdgeCount() * progressDen);
+					progress = ReportProgress(ndFloat32(1.0f) - (ndFloat32)GetEdgeCount() * progressDen);
 				}
 
 				if (bigHeapArray.GetCount() > (bigHeapArray.GetMaxCount() - 100)) 

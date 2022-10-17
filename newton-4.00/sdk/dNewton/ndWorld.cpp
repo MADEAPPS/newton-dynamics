@@ -407,7 +407,7 @@ void ndWorld::ThreadFunction()
 		m_scene->SetTimestep(m_timestep);
 
 		ndInt32 const steps = m_subSteps;
-		ndFloat32 timestep = m_timestep / steps;
+		ndFloat32 timestep = m_timestep / (ndFloat32)steps;
 		for (ndInt32 i = 0; i < steps; ++i)
 		{
 			SubStepUpdate(timestep);
@@ -425,7 +425,7 @@ void ndWorld::ThreadFunction()
 		m_scene->End();
 	}
 	
-	m_lastExecutionTime = (ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
+	m_lastExecutionTime = (ndFloat32)(ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();
 }
 
@@ -798,7 +798,6 @@ void ndWorld::UpdateSkeletons()
 					{
 						ndSkeletonContainer::ndNode* const parentNode = queuePool[index];
 						ndBodyKinematic* const parentBody = parentNode->m_body;
-						ndAssert(parentBody->GetId() > ndFloat32(0.0f));
 						if (!parentBody->m_skeletonMark0)
 						{
 							parentBody->m_skeletonMark0 = 1;

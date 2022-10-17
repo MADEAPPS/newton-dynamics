@@ -84,8 +84,8 @@ namespace nd_
 			size_t GetNPrimitivesOnSurf() const { return m_numVoxelsOnSurface; }
 			size_t GetNPrimitivesInsideSurf() const { return m_numVoxelsInsideSurface; }
 			double GetEigenValue(AXIS axis) const { return m_D[axis][axis]; }
-			double ComputeVolume() const { return m_unitVolume * m_voxels.Size(); }
-			double ComputeMaxVolumeError() const { return m_unitVolume * m_numVoxelsOnSurface; }
+			double ComputeVolume() const { return m_unitVolume * (double)m_voxels.Size(); }
+			double ComputeMaxVolumeError() const { return m_unitVolume * (double)m_numVoxelsOnSurface; }
 			const Vec3<short>& GetMinBBVoxels() const { return m_minBBVoxels; }
 			const Vec3<short>& GetMaxBBVoxels() const { return m_maxBBVoxels; }
 			const Vec3<double>& GetMinBB() const { return m_minBB; }
@@ -323,24 +323,24 @@ namespace nd_
 			if (d[0] >= d[1] && d[0] >= d[2]) {
 				r = d[0];
 				m_dim[0] = dim;
-				m_dim[1] = 2 + static_cast<size_t>(dim * d[1] / d[0]);
-				m_dim[2] = 2 + static_cast<size_t>(dim * d[2] / d[0]);
+				m_dim[1] = 2 + static_cast<size_t>(double(dim) * d[1] / d[0]);
+				m_dim[2] = 2 + static_cast<size_t>(double(dim) * d[2] / d[0]);
 			}
 			else if (d[1] >= d[0] && d[1] >= d[2]) {
 				r = d[1];
 				m_dim[1] = dim;
-				m_dim[0] = 2 + static_cast<size_t>(dim * d[0] / d[1]);
-				m_dim[2] = 2 + static_cast<size_t>(dim * d[2] / d[1]);
+				m_dim[0] = 2 + static_cast<size_t>(double(dim) * d[0] / d[1]);
+				m_dim[2] = 2 + static_cast<size_t>(double(dim) * d[2] / d[1]);
 			}
 			else {
 				r = d[2];
 				m_dim[2] = dim;
-				m_dim[0] = 2 + static_cast<size_t>(dim * d[0] / d[2]);
-				m_dim[1] = 2 + static_cast<size_t>(dim * d[1] / d[2]);
+				m_dim[0] = 2 + static_cast<size_t>((double)dim * d[0] / d[2]);
+				m_dim[1] = 2 + static_cast<size_t>((double)dim * d[1] / d[2]);
 			}
 
-			m_scale = r / (dim - 1);
-			double invScale = (dim - 1) / r;
+			m_scale = r / (double(dim) - 1);
+			double invScale = (double(dim) - 1) / r;
 
 			Allocate();
 			m_numVoxelsOnSurface = 0;

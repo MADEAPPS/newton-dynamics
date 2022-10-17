@@ -95,7 +95,7 @@ void ndBrainParallelTrainer::Optimize(ndValidation& validator, const ndBrainMatr
 void ndBrainParallelTrainer::AverageWeights()
 {
 	const ndInt32 threads = m_threadData.GetCount();
-	const ndReal weightFactor = 1.0f / threads;
+	const ndReal weightFactor = 1.0f / ndReal(threads);
 	
 	const ndArray<ndBrainLayer*>& layers = (*m_instance.GetBrain());
 	for (ndInt32 j = layers.GetCount() - 1; j >= 0; --j)
@@ -150,7 +150,7 @@ ndReal ndBrainParallelTrainer::Validate(const ndBrainMatrix& inputBatch, const n
 		error2 += subBatchError2[i];
 	}
 
-	ndReal error = ndReal(ndSqrt(error2 / inputBatch.GetCount()));
+	ndReal error = ndReal(ndSqrt(error2 / ndReal(inputBatch.GetCount())));
 	return error;
 }
 

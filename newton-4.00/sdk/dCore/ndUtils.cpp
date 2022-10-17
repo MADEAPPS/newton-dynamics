@@ -102,8 +102,8 @@ static ndInt32 SortVertices(
 	ndSortKey* const remapIndex,
 	const ndSortCluster& cluster, ndInt32 baseCount)
 {
-	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-	const ndBigVector variance(ndBigVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin).Sqrt());
+	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+	const ndBigVector variance(ndBigVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin).Sqrt());
 
 	ndInt32 firstSortAxis = 0;
 	if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
@@ -250,8 +250,8 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			stack--;
 			cluster = spliteStack[stack];
 
-			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / cluster.m_count));
-			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / cluster.m_count) - origin * origin);
+			const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
 			ndSortKey* const remapIndex = &indirectList[cluster.m_start];

@@ -270,7 +270,7 @@ void ndBrainTrainer::UpdateWeights(ndReal learnRate, ndInt32 batchSize)
 {
 	ndReal regularizer = GetRegularizer();
 
-	ndReal weight = 1.0f / batchSize;
+	ndReal weight = 1.0f / ndReal(batchSize);
 	m_biasGradientsAcc.ScaleSet(m_biasGradientsAcc, weight);
 	m_weightGradients.ScaleSet(m_weightGradients, weight);
 	if (m_model == m_adam)

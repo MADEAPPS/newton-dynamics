@@ -634,8 +634,8 @@ namespace nd_
 				nPositiveVoxels += (d >= 0.0);
 			}
 			size_t nNegativeVoxels = nVoxels - nPositiveVoxels;
-			positiveVolume = m_unitVolume * nPositiveVoxels;
-			negativeVolume = m_unitVolume * nNegativeVoxels;
+			positiveVolume = m_unitVolume * (double)nPositiveVoxels;
+			negativeVolume = m_unitVolume * (double)nNegativeVoxels;
 		}
 		void VoxelSet::SelectOnSurface(PrimitiveSet* const onSurfP) const
 		{
@@ -775,12 +775,12 @@ namespace nd_
 				covMat[0][2] += x * z;
 				covMat[1][2] += y * z;
 			}
-			covMat[0][0] /= nVoxels;
-			covMat[1][1] /= nVoxels;
-			covMat[2][2] /= nVoxels;
-			covMat[0][1] /= nVoxels;
-			covMat[0][2] /= nVoxels;
-			covMat[1][2] /= nVoxels;
+			covMat[0][0] /= (double)nVoxels;
+			covMat[1][1] /= (double)nVoxels;
+			covMat[2][2] /= (double)nVoxels;
+			covMat[0][1] /= (double)nVoxels;
+			covMat[0][2] /= (double)nVoxels;
+			covMat[1][2] /= (double)nVoxels;
 			covMat[1][0] = covMat[0][1];
 			covMat[2][0] = covMat[0][2];
 			covMat[2][1] = covMat[1][2];
@@ -890,14 +890,14 @@ namespace nd_
 					for (size_t k = 0; k < k0; ++k) {
 						const unsigned char& voxel = GetVoxel(i, j, k);
 						if (voxel == value) {
-							Vec3<double> p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3<double> p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3<double> p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3<double> p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
+							Vec3<double> p0(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3<double> p1(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3<double> p2(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3<double> p3(((double)i - 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3<double> p4(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3<double> p5(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3<double> p6(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3<double> p7(((double)i - 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k + 0.5) * m_scale);
 							int32_t s = (int32_t)mesh.GetNPoints();
 							mesh.AddPoint(p0 + m_minBB);
 							mesh.AddPoint(p1 + m_minBB);
@@ -1619,7 +1619,7 @@ namespace nd_
 					covMat[1][2] += y * z;
 				}
 			}
-			double n = nTetrahedra * 4.0;
+			double n = (double)nTetrahedra * 4.0;
 			covMat[0][0] /= n;
 			covMat[1][1] /= n;
 			covMat[2][2] /= n;

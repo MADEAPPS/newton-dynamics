@@ -49,7 +49,7 @@ ndFloat32 ndRand()
 	ndUnsigned32 minValue = std::mt19937::min();
 	ndUnsigned32 maxValue = std::mt19937::max();
 	ndUnsigned32 spand(maxValue - minValue);
-	ndFloat32 r = ndFloat32(ndRandInt()) / spand;
+	ndFloat32 r = ndFloat32(ndRandInt()) / (ndFloat32)spand;
 	return r;
 }
 
