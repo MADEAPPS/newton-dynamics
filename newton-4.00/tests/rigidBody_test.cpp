@@ -28,7 +28,7 @@ ndBodyDynamic *BuildSphere(const ndVector& pos, const ndVector& gravity={0.f}) {
   // compute the inertia matrix for the body.
   ndShapeInstance sphere(new ndShapeSphere(1.0f));
   body->SetCollisionShape(sphere);
-  body->SetMassMatrix(1.0f, sphere);
+  body->SetMassMatrix(2.0f, sphere);
 
   // Disable damping for the tests to better compare the Newton
   // results with the analytical ones.
@@ -65,8 +65,8 @@ TEST(RigidBody, NoMoveWithoutForce) {
 }
 
 
-/* Apply a force of 1N for 1 second to a body with 1kg of mass
-   and verify that it moved 0.5 meters. */
+/* Apply a force of 1N for 1 second to a body with 2kg of mass
+   and verify that it moved 0.25 meters. */
 TEST(RigidBody, MoveWithUnitForce) {
   ndWorld world;
   world.SetSubSteps(2);
@@ -88,8 +88,8 @@ TEST(RigidBody, MoveWithUnitForce) {
     world.Sync();
   }
 
-  // Verify that the sphere moved 0.5 meters in the X-direction.
-  errVec = sphere->GetMatrix().m_posit - ndVector(0.5f, 0.f, 0.f, 1.f);
+  // Verify that the sphere moved 0.25 meters in the X-direction.
+  errVec = sphere->GetMatrix().m_posit - ndVector(0.25f, 0.f, 0.f, 1.f);
   err = errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar();
   EXPECT_NEAR(err, 0, 1E-4);
 }
