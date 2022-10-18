@@ -45,7 +45,9 @@ add_executable(
   ${PROJECT_NAME}
   world_test.cpp
   rigidBody_test.cpp
+  notyfiyBodyCallback_test.cpp
 )
+
 target_link_libraries(
   ${PROJECT_NAME}
   GTest::gtest_main

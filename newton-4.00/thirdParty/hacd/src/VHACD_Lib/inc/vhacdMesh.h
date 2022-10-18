@@ -20,7 +20,7 @@
 
 namespace nd_
 {
-	#define VHACD_DEBUG_MESH
+	//#define VHACD_DEBUG_MESH
 
 	namespace VHACD 
 	{
