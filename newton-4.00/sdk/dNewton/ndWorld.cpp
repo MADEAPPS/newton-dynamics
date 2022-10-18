@@ -215,6 +215,143 @@ void ndWorld::ClearCache()
 	ndFreeListAlloc::Flush();
 }
 
+void ndWorld::Sync() const
+{
+	m_scene->Sync();
+}
+
+ndInt32 ndWorld::GetThreadCount() const
+{
+	return m_scene->GetThreadCount();
+}
+
+void ndWorld::SetThreadCount(ndInt32 count)
+{
+	m_scene->SetThreadCount(count);
+	m_scene->m_backgroundThread.SetThreadCount(count);
+}
+
+ndInt32 ndWorld::GetSubSteps() const
+{
+	return m_subSteps;
+}
+
+void ndWorld::SetSubSteps(ndInt32 subSteps)
+{
+	m_subSteps = ndClamp(subSteps, 1, 16);
+}
+
+ndScene* ndWorld::GetScene() const
+{
+	return m_scene;
+}
+
+ndInt32 ndWorld::GetSolverIterations() const
+{
+	return m_solverIterations;
+}
+
+void ndWorld::SetSolverIterations(ndInt32 iterations)
+{
+	m_solverIterations = ndInt32(ndMax(4, iterations));
+}
+
+ndContactNotify* ndWorld::GetContactNotify() const
+{
+	return m_scene->GetContactNotify();
+}
+
+void ndWorld::SetContactNotify(ndContactNotify* const notify)
+{
+	m_scene->SetContactNotify(notify);
+}
+
+ndBodyKinematic* ndWorld::GetSentinelBody() const
+{
+	return m_scene->GetSentinelBody();
+}
+
+const ndBodyList& ndWorld::GetBodyList() const
+{
+	return m_scene->GetBodyList();
+}
+
+const ndJointList& ndWorld::GetJointList() const
+{
+	return m_jointList;
+}
+
+const ndContactArray& ndWorld::GetContactList() const
+{
+	return m_scene->GetContactArray();
+}
+
+const ndSkeletonList& ndWorld::GetSkeletonList() const
+{
+	return m_skeletonList;
+}
+
+const ndBodyParticleSetList& ndWorld::GetParticleList() const
+{
+	return m_particleSetList;
+}
+
+const ndModelList& ndWorld::GetModelList() const
+{
+	return m_modelList;
+}
+
+ndFloat32 ndWorld::GetUpdateTime() const
+{
+	return m_lastExecutionTime;
+}
+
+ndFloat32 ndWorld::GetAverageUpdateTime() const
+{
+	return m_averageUpdateTime;
+}
+
+ndFloat32 ndWorld::GetExtensionAverageUpdateTime() const
+{
+	return m_extensionAverageUpdateTime;
+}
+
+ndUnsigned32 ndWorld::GetFrameNumber() const
+{
+	return m_scene->m_frameNumber;
+}
+
+ndUnsigned32 ndWorld::GetSubFrameNumber() const
+{
+	return m_scene->m_subStepNumber;
+}
+
+void ndWorld::OnPostUpdate(ndFloat32)
+{
+}
+
+void ndWorld::DebugScene(ndSceneTreeNotiFy* const notify)
+{
+	m_scene->DebugScene(notify);
+}
+
+
+ndWorld::ndSolverModes ndWorld::GetSelectedSolver() const
+{
+	return m_solverMode;
+}
+
+ndInt32 ndWorld::GetEngineVersion() const
+{
+	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
+}
+
+void ndWorld::SendBackgroundTask(ndBackgroundTask* const job)
+{
+	m_scene->SendBackgroundTask(job);
+}
+
+
 void ndWorld::UpdateTransforms()
 {
 	for (ndBodyParticleSetList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
@@ -1010,4 +1147,28 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 		}
 		#endif
 	}
+}
+
+void ndWorld::CollisionUpdate(ndFloat32 timestep)
+{
+	// wait until previous update complete.
+	Sync();
+	m_timestep = timestep;
+
+	// update the next frame asynchronous 
+	m_collisionUpdate = true;
+	m_scene->TickOne();
+}
+
+void ndWorld::Update(ndFloat32 timestep)
+{
+	// wait until previous update complete.
+	Sync();
+
+	// save time state for use by the update callback
+	m_timestep = timestep;
+
+	// update the next frame asynchronous 
+	m_collisionUpdate = false;
+	m_scene->TickOne();
 }

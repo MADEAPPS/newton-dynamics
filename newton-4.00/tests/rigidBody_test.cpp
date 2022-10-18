@@ -79,7 +79,7 @@ TEST(RigidBody, MoveWithUnitForce) {
 
   // Sanity check: the distance to the origin must be zero.
   ndVector errVec = sphere->GetMatrix().m_posit - spherePos;
-  ndFloat32 err = errVec.DotProduct(errVec).GetScalar();
+  ndFloat32 err = errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar();
   EXPECT_NEAR(err, 0, 1E-6);
 
   // Simulate one second.
@@ -90,6 +90,6 @@ TEST(RigidBody, MoveWithUnitForce) {
 
   // Verify that the sphere moved 0.5 meters in the X-direction.
   errVec = sphere->GetMatrix().m_posit - ndVector(0.5f, 0.f, 0.f, 1.f);
-  err = errVec.DotProduct(errVec).GetScalar();
+  err = errVec.DotProduct(errVec & ndVector::m_triplexMask).GetScalar();
   EXPECT_NEAR(err, 0, 1E-4);
 }

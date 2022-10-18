@@ -61,21 +61,21 @@ class ndWorld: public ndClassAlloc
 
 	D_NEWTON_API virtual void CleanUp();
 
-	ndInt32 GetEngineVersion() const;
+	D_NEWTON_API ndInt32 GetEngineVersion() const;
 
-	void Sync() const;
-	void Update(ndFloat32 timestep);
-	void CollisionUpdate(ndFloat32 timestep);
+	D_NEWTON_API void Sync() const;
+	D_NEWTON_API void Update(ndFloat32 timestep);
+	D_NEWTON_API void CollisionUpdate(ndFloat32 timestep);
 
-	virtual void OnPostUpdate(ndFloat32 timestep);
+	D_NEWTON_API virtual void OnPostUpdate(ndFloat32 timestep);
 
-	ndInt32 GetThreadCount() const;
-	void SetThreadCount(ndInt32 count);
+	D_NEWTON_API ndInt32 GetThreadCount() const;
+	D_NEWTON_API void SetThreadCount(ndInt32 count);
 
-	ndInt32 GetSubSteps() const;
-	void SetSubSteps(ndInt32 subSteps);
+	D_NEWTON_API ndInt32 GetSubSteps() const;
+	D_NEWTON_API void SetSubSteps(ndInt32 subSteps);
 
-	ndSolverModes GetSelectedSolver() const;
+	D_NEWTON_API ndSolverModes GetSelectedSolver() const;
 	D_NEWTON_API void SelectSolver(ndSolverModes solverMode);
 
 	D_NEWTON_API bool IsGPU() const;
@@ -91,31 +91,31 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 
-	const ndBodyList& GetBodyList() const;
-	const ndJointList& GetJointList() const;
-	const ndModelList& GetModelList() const;
-	const ndContactArray& GetContactList() const;
-	const ndSkeletonList& GetSkeletonList() const;
-	const ndBodyParticleSetList& GetParticleList() const;
+	D_NEWTON_API const ndBodyList& GetBodyList() const;
+	D_NEWTON_API const ndJointList& GetJointList() const;
+	D_NEWTON_API const ndModelList& GetModelList() const;
+	D_NEWTON_API const ndContactArray& GetContactList() const;
+	D_NEWTON_API const ndSkeletonList& GetSkeletonList() const;
+	D_NEWTON_API const ndBodyParticleSetList& GetParticleList() const;
 
-	ndBodyKinematic* GetSentinelBody() const;
+	D_NEWTON_API ndBodyKinematic* GetSentinelBody() const;
 
-	ndInt32 GetSolverIterations() const;
-	void SetSolverIterations(ndInt32 iterations);
+	D_NEWTON_API ndInt32 GetSolverIterations() const;
+	D_NEWTON_API void SetSolverIterations(ndInt32 iterations);
 
-	ndScene* GetScene() const;
+	D_NEWTON_API ndScene* GetScene() const;
 
-	ndFloat32 GetUpdateTime() const;
-	ndUnsigned32 GetFrameNumber() const;
-	ndUnsigned32 GetSubFrameNumber() const;
-	ndFloat32 GetAverageUpdateTime() const;
-	ndFloat32 GetExtensionAverageUpdateTime() const;
+	D_NEWTON_API ndFloat32 GetUpdateTime() const;
+	D_NEWTON_API ndUnsigned32 GetFrameNumber() const;
+	D_NEWTON_API ndUnsigned32 GetSubFrameNumber() const;
+	D_NEWTON_API ndFloat32 GetAverageUpdateTime() const;
+	D_NEWTON_API ndFloat32 GetExtensionAverageUpdateTime() const;
 
-	ndContactNotify* GetContactNotify() const;
-	void SetContactNotify(ndContactNotify* const notify);
+	D_NEWTON_API ndContactNotify* GetContactNotify() const;
+	D_NEWTON_API void SetContactNotify(ndContactNotify* const notify);
 
-	void DebugScene(ndSceneTreeNotiFy* const notify);
-	void SendBackgroundTask(ndBackgroundTask* const job);
+	D_NEWTON_API void DebugScene(ndSceneTreeNotiFy* const notify);
+	D_NEWTON_API void SendBackgroundTask(ndBackgroundTask* const job);
 
 	D_NEWTON_API void ClearCache();
 	D_NEWTON_API void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
@@ -192,162 +192,4 @@ class ndWorld: public ndClassAlloc
 	friend class ndDynamicsUpdateOpencl;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline void ndWorld::Sync() const
-{
-	m_scene->Sync();
-}
-
-inline ndInt32 ndWorld::GetThreadCount() const
-{
-	return m_scene->GetThreadCount();
-}
-
-inline void ndWorld::SetThreadCount(ndInt32 count)
-{
-	m_scene->SetThreadCount(count);
-	m_scene->m_backgroundThread.SetThreadCount(count);
-}
-
-inline ndInt32 ndWorld::GetSubSteps() const
-{
-	return m_subSteps;
-}
-
-inline void ndWorld::SetSubSteps(ndInt32 subSteps)
-{
-	m_subSteps = ndClamp(subSteps, 1, 16);
-}
-
-inline ndScene* ndWorld::GetScene() const
-{
-	return m_scene;
-}
-
-inline ndInt32 ndWorld::GetSolverIterations() const
-{
-	return m_solverIterations;
-}
-
-inline void ndWorld::SetSolverIterations(ndInt32 iterations)
-{
-	m_solverIterations = ndInt32(ndMax(4, iterations));
-}
-
-inline ndContactNotify* ndWorld::GetContactNotify() const
-{
-	return m_scene->GetContactNotify();
-}
-
-inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
-{
-	m_scene->SetContactNotify(notify);
-}
-
-inline ndBodyKinematic* ndWorld::GetSentinelBody() const
-{
-	return m_scene->GetSentinelBody();
-}
-
-inline const ndBodyList& ndWorld::GetBodyList() const
-{
-	return m_scene->GetBodyList();
-}
-
-inline const ndJointList& ndWorld::GetJointList() const
-{
-	return m_jointList;
-}
-
-inline const ndContactArray& ndWorld::GetContactList() const
-{
-	return m_scene->GetContactArray();
-}
-
-inline const ndSkeletonList& ndWorld::GetSkeletonList() const
-{
-	return m_skeletonList;
-}
-
-inline const ndBodyParticleSetList& ndWorld::GetParticleList() const
-{
-	return m_particleSetList;
-}
-
-inline const ndModelList& ndWorld::GetModelList() const
-{
-	return m_modelList;
-}
-
-inline ndFloat32 ndWorld::GetUpdateTime() const
-{
-	return m_lastExecutionTime;
-}
-
-inline ndFloat32 ndWorld::GetAverageUpdateTime() const
-{
-	return m_averageUpdateTime;
-}
-
-inline ndFloat32 ndWorld::GetExtensionAverageUpdateTime() const
-{
-	return m_extensionAverageUpdateTime;
-}
-
-inline ndUnsigned32 ndWorld::GetFrameNumber() const
-{
-	return m_scene->m_frameNumber;
-}
-
-inline ndUnsigned32 ndWorld::GetSubFrameNumber() const
-{
-	return m_scene->m_subStepNumber;
-}
-
-inline void ndWorld::OnPostUpdate(ndFloat32)
-{
-}
-
-inline void ndWorld::DebugScene(ndSceneTreeNotiFy* const notify)
-{
-	m_scene->DebugScene(notify);
-}
-
-inline void ndWorld::CollisionUpdate(ndFloat32 timestep)
-{
-	// wait until previous update complete.
-	Sync();
-	m_timestep = timestep;
-
-	// update the next frame asynchronous 
-	m_collisionUpdate = true;
-	m_scene->TickOne();
-}
-
-inline void ndWorld::Update(ndFloat32 timestep)
-{
-	// wait until previous update complete.
-	Sync();
-
-	// save time state for use by the update callback
-	m_timestep = timestep;
-
-	// update the next frame asynchronous 
-	m_collisionUpdate = false;
-	m_scene->TickOne();
-}
-
-inline ndWorld::ndSolverModes ndWorld::GetSelectedSolver() const
-{
-	return m_solverMode;
-}
-
-inline ndInt32 ndWorld::GetEngineVersion() const
-{
-	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
-}
-
-inline void ndWorld::SendBackgroundTask(ndBackgroundTask* const job)
-{
-	m_scene->SendBackgroundTask(job);
-}
 #endif
