@@ -674,11 +674,11 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 #ifdef ENABLE_REPLAY
 	#ifdef REPLAY_RECORD
 		fwrite(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
-		fwrite(&axisbuttons[0], axisbuttons.GetCapacity(), 1, m_replayLogFile);
+		fwrite(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
 		fflush(m_replayLogFile);
 	#else 
 		fread(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
-		fread(&axisbuttons[0], axisbuttons.GetCapacity(), 1, m_replayLogFile);
+		fread(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
 	#endif
 #endif
 
