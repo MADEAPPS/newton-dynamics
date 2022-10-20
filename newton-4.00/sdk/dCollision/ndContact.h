@@ -72,7 +72,7 @@ class ndContactMaterial: public ndContactPoint
 	void OverrideFriction1Accel(ndFloat32 accel)
 	{
 		m_dir1_Force.m_force = accel;
-		//m_material.m_flags = m_material.m_flags | m_override1Accel;
+		m_material.m_flags = m_material.m_flags | m_override1Accel;
 	}
 
 	ndVector m_dir0;
