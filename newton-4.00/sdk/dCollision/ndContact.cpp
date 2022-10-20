@@ -244,6 +244,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			const ndFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
+			ndTrace(("%d: %f %f\n", m_body0->GetId(), contact.m_dir1_Force.m_force, relVelocErr * desc.m_invTimestep));
 			//desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
 			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_invTimestep;
 		}

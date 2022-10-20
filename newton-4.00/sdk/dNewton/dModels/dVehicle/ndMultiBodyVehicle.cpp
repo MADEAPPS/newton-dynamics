@@ -960,8 +960,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
 
 		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 vr = ndAbs(contactVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		const ndFloat32 longitudialSlip = vr / relSpeed;
+		const ndFloat32 vr = contactVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
+		const ndFloat32 longitudialSlip = ndAbs(vr) / relSpeed;
 
 		const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
 		//const ndFloat32 lateralSlip = sideSpeed / relSpeed;
@@ -1004,7 +1004,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
 
-		contactPoint.OverrideFriction1Accel(vr / timestep);
+		contactPoint.OverrideFriction1Accel(-vr / timestep);
 	
 		contactPoint.m_material.m_staticFriction0 = lateralForce;
 		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
