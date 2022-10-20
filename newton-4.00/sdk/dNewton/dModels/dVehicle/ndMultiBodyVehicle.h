@@ -94,15 +94,15 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	private:
-	void ApplyTireModel();
 	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
+	void ApplyTireModel(ndFloat32 timestep);
 	ndBodyDynamic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 
-	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
-	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
-	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
-	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
+	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
+	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
+	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 
 	protected:
 	virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep);

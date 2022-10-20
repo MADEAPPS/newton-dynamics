@@ -859,7 +859,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 }
 
 //void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
-void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, ndContactMaterial& contactPoint, ndFloat32) const
 {
 	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
 	const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
@@ -873,7 +873,7 @@ void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, nd
 	contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 }
 
-void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
 	// calculate longitudinal slip ratio
 	const ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
@@ -1003,10 +1003,13 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
+
+		contactPoint.OverrideFriction1Accel(vr / timestep);
 	
 		contactPoint.m_material.m_staticFriction0 = lateralForce;
 		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
-	
+
+
 		contactPoint.m_material.m_staticFriction1 = longitudinalForce;
 		contactPoint.m_material.m_dynamicFriction1 = longitudinalForce;
 		contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
@@ -1018,23 +1021,23 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	}
 	else
 	{
-		CoulombTireModel(tire, contactPoint);
+		CoulombTireModel(tire, contactPoint, timestep);
 	}
 
 #endif
 }
 
-void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
-	BrushTireModel(tire, contactPoint);
+	BrushTireModel(tire, contactPoint, timestep);
 }
 
-void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
-	BrushTireModel(tire, contactPoint);
+	BrushTireModel(tire, contactPoint, timestep);
 }
 
-void ndMultiBodyVehicle::ApplyTireModel()
+void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
 {
 static int xxxx;
 ndTrace(("Frame:%d  ", xxxx));
@@ -1109,24 +1112,24 @@ xxxx++;
 							{
 								case ndTireFrictionModel::m_coulomb:
 								{
-									CoulombTireModel(tire, contactPoint);
+									CoulombTireModel(tire, contactPoint, timestep);
 								}
 
 								case ndTireFrictionModel::m_brushModel:
 								{
-									BrushTireModel(tire, contactPoint);
+									BrushTireModel(tire, contactPoint, timestep);
 									break;
 								}
 
 								case ndTireFrictionModel::m_pacejka:
 								{
-									PacejkaTireModel(tire, contactPoint);
+									PacejkaTireModel(tire, contactPoint, timestep);
 									break;
 								}
 
 								case ndTireFrictionModel::m_coulombCicleOfFriction:
 								{
-									CoulombFrictionCircleTireModel(tire, contactPoint);
+									CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
 									break;
 								}
 
@@ -1247,7 +1250,7 @@ void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
 	// apply down force
 	ApplyAerodynamics();
 	// apply tire model
-	ApplyTireModel();
+	ApplyTireModel(timestep);
 
 	// Apply Vehicle Dynamics controls
 	// no implemented yet

@@ -199,7 +199,8 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			const ndFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
-			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
+			//desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
+			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_invTimestep;
 		}
 		if (ndAbs(relVelocErr) > D_MAX_DYNAMIC_FRICTION_SPEED)
 		{
@@ -243,7 +244,8 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			const ndFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
-			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
+			//desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
+			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_invTimestep;
 		}
 		if (ndAbs(relVelocErr) > D_MAX_DYNAMIC_FRICTION_SPEED)
 		{

@@ -62,6 +62,19 @@ class ndContactMaterial: public ndContactPoint
 		m_dir1_Force.Clear();
 		m_normal_Force.Clear();
 	}
+
+	void OverrideFriction0Accel(ndFloat32 accel)
+	{
+		m_dir0_Force.m_force = accel;
+		m_material.m_flags = m_material.m_flags | m_override0Accel;
+	}
+
+	void OverrideFriction1Accel(ndFloat32 accel)
+	{
+		m_dir1_Force.m_force = accel;
+		//m_material.m_flags = m_material.m_flags | m_override1Accel;
+	}
+
 	ndVector m_dir0;
 	ndVector m_dir1;
 	ndForceImpactPair m_normal_Force;
