@@ -10,15 +10,14 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoEntityManager.h"
-#include "ndLeakTrackler.h"
 
-static ndSetAllocators setAllocators;
+#ifdef _DEBUG
+	#define ND_USE_LEAK_TRACKER
+#endif
 
-int main(int, char**)
+class ndSetAllocators
 {
-	ndDemoEntityManager demos;
-	demos.Run();
-	return 0;
-}
+	public:
+	ndSetAllocators();
+};
 
