@@ -50,7 +50,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         m_timestep = 1.0f / 60.0f;
-        m_shaderCache = new ShaderCache();
+        m_shaderCache = new ShaderCache(this);
 
         m_demo = null;
         m_world = new nWorld();
@@ -61,6 +61,8 @@ public class RenderScene implements GLSurfaceView.Renderer
         mSquare   = new Square(m_shaderCache.m_solidColor);
         mTriangle = new Triangle(m_shaderCache.m_solidColor);
 
+        // load the first scene
+        LoadScene();
         m_renderInitialized = true;
     }
 
@@ -110,7 +112,8 @@ public class RenderScene implements GLSurfaceView.Renderer
     public static void checkGlError(String glOperation)
     {
         int error;
-        while ((error = GLES30.glGetError()) != GLES30.GL_NO_ERROR) {
+        while ((error = GLES30.glGetError()) != GLES30.GL_NO_ERROR)
+        {
             Log.e(TAG, glOperation + ": glError " + error);
             throw new RuntimeException(glOperation + ": glError " + error);
         }
@@ -159,7 +162,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         SetState(RenderState.m_idleState);
     }
 
-    private static final String TAG = "MyGLRenderer";
+    private static final String TAG = "ndNewton";
 
     private nWorld m_world = null;
     private SceneObject m_root = null;

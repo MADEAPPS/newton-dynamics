@@ -26,8 +26,6 @@ public class SceneMeshPrimitive extends SceneMesh
     {
         super();
 
-        m_shader = scene.GetShaderCache().m_solidColor;
-
         // get vertex data from mesh and make a vertex buffer for rendering
         int vertexSizeInFloats = (3 + 3 + 2);
         nMeshEffect meshEffect = new nMeshEffect(shapeInstance);
@@ -84,6 +82,8 @@ public class SceneMeshPrimitive extends SceneMesh
         m_drawListBuffer.put(indexData);
         m_drawListBuffer.position(0);
 
+        m_shader = scene.GetShaderCache().m_directionalDiffuse;
+
         GLES30.glUseProgram(m_shader);
         m_positHandle = GLES30.glGetAttribLocation(m_shader, "in_position");
         m_normalHandle = GLES30.glGetAttribLocation(m_shader, "in_normal");
@@ -95,12 +95,10 @@ public class SceneMeshPrimitive extends SceneMesh
     public void Render (nMatrix matrix)
     {
         // Add program to OpenGL environment
-        GLES30.glUseProgram(m_shader);
-
-        GLES30.glEnableVertexAttribArray(m_positHandle);
-        GLES30.glVertexAttribPointer(m_positHandle, 3, GLES30.GL_FLOAT, false, m_vertexSizeInBytes, m_vertexBuffer);
-
-        GLES30.glUseProgram(0);
+        //GLES30.glUseProgram(m_shader);
+        //GLES30.glEnableVertexAttribArray(m_positHandle);
+        //GLES30.glVertexAttribPointer(m_positHandle, 3, GLES30.GL_FLOAT, false, m_vertexSizeInBytes, m_vertexBuffer);
+        //GLES30.glUseProgram(0);
     }
 
     int m_vertexSizeInBytes;

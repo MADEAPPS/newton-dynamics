@@ -52,7 +52,6 @@ public class Square {
 
     public Square(int shaderProgram)
     {
-        m_program = shaderProgram;
         ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
@@ -64,6 +63,11 @@ public class Square {
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
+
+        m_program = shaderProgram;
+        GLES30.glUseProgram(m_program);
+        mPositionHandle = GLES30.glGetAttribLocation(m_program, "vPosition");
+        GLES30.glUseProgram(0);
     }
 
     public void draw(SceneCamera camera)

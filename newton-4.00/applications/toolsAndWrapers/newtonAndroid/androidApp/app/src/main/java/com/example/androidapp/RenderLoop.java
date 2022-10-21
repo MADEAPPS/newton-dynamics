@@ -55,7 +55,6 @@ public class RenderLoop extends Thread
         {
             yield();
         }
-        m_glRender.SetState(RenderState.m_loadSceneState);
 
         long time_0 = 0;
         long baseTime = elapsedRealtimeNanos();

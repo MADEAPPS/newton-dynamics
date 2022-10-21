@@ -133,10 +133,24 @@ public class ShaderCache
     public int m_solidColor = 0;
     public int m_directionalDiffuse = 0;
 
-    ShaderCache()
+    ShaderCache(RenderScene scene)
     {
+        m_scene = scene;
+
         m_solidColor = CompileProgram(VertexShaders.passPosition, PixelShaders.simpleColor);
         m_directionalDiffuse = CompileProgram(VertexShaders.directionalDiffuse, PixelShaders.directionalDiffuse);
+
+        // test shaders
+        GLES30.glUseProgram(m_solidColor);
+        int xxx0 = GLES30.glGetAttribLocation(m_solidColor, "vPosition");
+        m_scene.checkGlError("compiling shaders");
+
+        GLES30.glUseProgram(m_directionalDiffuse);
+        int xxx1 = GLES30.glGetAttribLocation(m_directionalDiffuse, "in_position");
+        m_scene.checkGlError("compiling shaders");
+        GLES30.glUseProgram(0);
+
+        m_scene = null;
     }
 
     private int LoadShader(int type, String shaderCode)
@@ -161,6 +175,10 @@ public class ShaderCache
         GLES30.glAttachShader(program, vertexShader);   // add the vertex shader to program
         GLES30.glAttachShader(program, fragmentShader); // add the fragment shader to program
         GLES30.glLinkProgram(program);
+
+        m_scene.checkGlError("compiling shaders");
         return program;
     }
+
+    private RenderScene m_scene;
 }
