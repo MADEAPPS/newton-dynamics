@@ -18,8 +18,8 @@ public class ShaderCache
     private class VertexShaders
     {
         static final String passPosition =
-            "uniform mat4 uMVPMatrix;" +
             "attribute vec4 vPosition;" +
+            "uniform mat4 uMVPMatrix;" +
 
             "void main() {" +
             "  gl_Position = uMVPMatrix * vPosition;" +
@@ -83,21 +83,6 @@ public class ShaderCache
 
             "out vec4 pixelColor;" +
 
-            "vec3 FlashLightShading(vec3 normalDir)" +
-            "{" +
-                "vec3 lightDir = -normalize (posit);" +
-
-                "vec3 diffuseCoeff = vec3(0.7f, 0.7f, 0.7f);" +
-
-                "float k1 = 7.0/120.0;" +
-                "float k2 = 1.0/240.0;" +
-                "float d2 = dot(posit, posit);" +
-                "float d1 = sqrt(d2);" +
-                "float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);" +
-
-                "return diffuseCoeff * max (dot(normalDir, lightDir), 0.0) * attenuation;" +
-            "}" +
-
             "vec3 PhongDirectionalShading(vec3 normalDir)" +
             "{" +
                 "vec3 specularDir = normalize (-posit);" +
@@ -141,14 +126,13 @@ public class ShaderCache
         m_directionalDiffuse = CompileProgram(VertexShaders.directionalDiffuse, PixelShaders.directionalDiffuse);
 
         // test shaders
-        GLES30.glUseProgram(m_solidColor);
-        int xxx0 = GLES30.glGetAttribLocation(m_solidColor, "vPosition");
-        m_scene.checkGlError("compiling shaders");
-
-        GLES30.glUseProgram(m_directionalDiffuse);
-        int xxx1 = GLES30.glGetAttribLocation(m_directionalDiffuse, "in_position");
-        m_scene.checkGlError("compiling shaders");
-        GLES30.glUseProgram(0);
+        //GLES30.glUseProgram(m_solidColor);
+        //int xxx0 = GLES30.glGetAttribLocation(m_solidColor, "vPosition");
+        //m_scene.checkGlError("compiling shaders");
+        //GLES30.glUseProgram(m_directionalDiffuse);
+        //int xxx1 = GLES30.glGetAttribLocation(m_directionalDiffuse, "in_position");
+        //m_scene.checkGlError("compiling shaders");
+        //GLES30.glUseProgram(0);
 
         m_scene = null;
     }

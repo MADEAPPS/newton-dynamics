@@ -19,6 +19,8 @@ import com.javaNewton.nShapeInstance;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
@@ -30,29 +32,51 @@ public class SceneMeshPrimitive extends SceneMesh
         int vertexSizeInFloats = (3 + 3 + 2);
         nMeshEffect meshEffect = new nMeshEffect(shapeInstance);
 
+        // get Dat form newton mesh effect.
         int vertexCount = meshEffect.GetVertextCount();
         float[] vertexData = new float[vertexCount * vertexSizeInFloats];
         meshEffect.GetVertexPosit(vertexData, 0, vertexSizeInFloats);
         meshEffect.GetVertexNormal(vertexData, 3, vertexSizeInFloats);
         meshEffect.GetVertexUV0(vertexData, 6, vertexSizeInFloats);
 
-        m_vertexSizeInBytes = vertexSizeInFloats * 4;
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertexCount * m_vertexSizeInBytes);
+        // convert the data to a gpu ready buffer with correct indianess.
+        int vertexSizeInBytes = vertexSizeInFloats * 4;
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertexCount * vertexSizeInBytes);
         bb.order(ByteOrder.nativeOrder());
-        m_vertexBuffer = bb.asFloatBuffer();
-        m_vertexBuffer.put(vertexData);
-        m_vertexBuffer.position(0);
+        FloatBuffer gpuReadyBuffer = bb.asFloatBuffer();
+        gpuReadyBuffer.put(vertexData);
+        gpuReadyBuffer.position(0);
 
-        // I can't get GLES30.glGenBuffers tow works, does not seem to do anything at all.
-        //m_vertexBuffer = new int[1];
-        //m_vertextArrayBuffer = new int[1];
-        //m_vertexBuffer[0] = 0;
-        //m_vertextArrayBuffer[0] = 0;
-        //GLES20.glGenBuffers(1, m_vertexBuffer, 0);
-        //GLES30.glGenVertexArrays(1, m_vertextArrayBuffer, 0);
-        //GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_vertexBuffer[0]);
-        //GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertexSizeInBytes, vertexBuffer, GLES30.GL_STATIC_DRAW);
-        //GLES30.glBindVertexArray(m_vertextArrayBuffer[0]);
+        // load data to gpu vertex buffer
+        IntBuffer vertexBuffer = IntBuffer.allocate(1);
+        GLES30.glGenBuffers(1, vertexBuffer);
+        m_vertexBuffer = vertexBuffer.get(0);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_vertexBuffer);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertexSizeInBytes, gpuReadyBuffer, GLES30.GL_STATIC_DRAW);
+        scene.checkGlError("SceneMeshPrimitive");
+
+        // now create a vertex array buffer and set the data layout
+        IntBuffer vaoIdBuffer = IntBuffer.allocate(1);
+        GLES30.glGenVertexArrays(1, vaoIdBuffer);
+        m_vertextArrayBuffer = vaoIdBuffer.get(0);
+        GLES30.glBindVertexArray(m_vertextArrayBuffer);
+
+        GLES30.glEnableVertexAttribArray(0);
+        GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, vertexSizeInBytes, 0);
+
+        GLES30.glEnableVertexAttribArray(1);
+        GLES30.glVertexAttribPointer(1, 3, GLES30.GL_FLOAT, false, vertexSizeInBytes, 12);
+
+        GLES30.glEnableVertexAttribArray(2);
+        GLES30.glVertexAttribPointer(2, 2, GLES30.GL_FLOAT, false, vertexSizeInBytes, 24);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
+
+        GLES30.glBindVertexArray(0);
+        GLES30.glDisableVertexAttribArray(2);
+        GLES30.glDisableVertexAttribArray(1);
+        GLES30.glDisableVertexAttribArray(0);
+        scene.checkGlError("SceneMeshPrimitive");
+
 
         // get index data from mesh and make a vertex buffer for rendering
         int indexCount = 0;
@@ -84,11 +108,7 @@ public class SceneMeshPrimitive extends SceneMesh
 
         m_shader = scene.GetShaderCache().m_directionalDiffuse;
 
-        GLES30.glUseProgram(m_shader);
-        m_positHandle = GLES30.glGetAttribLocation(m_shader, "in_position");
-        m_normalHandle = GLES30.glGetAttribLocation(m_shader, "in_normal");
-        m_uvlHandle = GLES30.glGetAttribLocation(m_shader, "in_uv");
-        GLES30.glUseProgram(0);
+        scene.checkGlError("SceneMeshPrimitive");
     }
 
     @Override
@@ -101,7 +121,8 @@ public class SceneMeshPrimitive extends SceneMesh
         //GLES30.glUseProgram(0);
     }
 
-    int m_vertexSizeInBytes;
-    //private int[] m_vertexBuffer;
-    //private int[] m_vertextArrayBuffer;
+    //int m_vertexSizeInBytes;
+    private int m_vertexBuffer;
+    private int m_vertextArrayBuffer;
+
 }
