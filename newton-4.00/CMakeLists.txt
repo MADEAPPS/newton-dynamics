@@ -203,7 +203,7 @@ add_subdirectory(thirdParty)
 add_subdirectory(applications)
 
 if (NOT NEWTON_EXCLUDE_TEST)
-	message("build unit tests")
+	message("building unit tests")
 	file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/_deps)
 	add_subdirectory(tests)
 endif()

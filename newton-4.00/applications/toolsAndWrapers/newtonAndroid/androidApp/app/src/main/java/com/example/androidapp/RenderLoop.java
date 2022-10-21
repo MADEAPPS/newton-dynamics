@@ -20,7 +20,6 @@ public class RenderLoop extends Thread
 {
     RenderLoop(Context context)
     {
-        m_demo = null;
         m_onPause = false;
         m_onTeminate = false;
         m_glView = new SurfaceView(context);
@@ -56,8 +55,7 @@ public class RenderLoop extends Thread
         {
             yield();
         }
-
-        LoadDemo();
+        m_glRender.SetState(RenderState.m_loadSceneState);
 
         long time_0 = 0;
         long baseTime = elapsedRealtimeNanos();
@@ -89,19 +87,6 @@ public class RenderLoop extends Thread
         }
     }
 
-    public void LoadDemo()
-    {
-        m_glRender.GetWorld().Sync();
-        if (m_demo != null)
-        {
-            m_glRender.Pause();
-            m_demo.CleanUp(m_glRender);
-        }
-        m_demo = new DemosBase_BasicRigidBodies(m_glRender);
-        m_glRender.SetReady();
-    }
-
-    private DemosBase m_demo;
     final private SurfaceView m_glView;
     final private RenderScene m_glRender;
 

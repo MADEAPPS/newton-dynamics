@@ -22,6 +22,7 @@ import android.util.Log;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nWorld;
 
+
 public class RenderScene implements GLSurfaceView.Renderer
 {
     public float GetTimestep()
@@ -51,6 +52,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         m_timestep = 1.0f / 60.0f;
         m_shaderCache = new ShaderCache();
 
+        m_demo = null;
         m_world = new nWorld();
         m_world.SetSubSteps(2);
         m_root = new SceneObject();
@@ -70,23 +72,27 @@ public class RenderScene implements GLSurfaceView.Renderer
     @Override
     public void onDrawFrame(GL10 unused)
     {
-        if (m_renderReady)
+        //if (m_renderReady)
+        switch(m_renderState)
         {
-            m_world.Sync();
-            m_world.Update(m_timestep);
+            case m_renderSceneState:
+            {
+                RenderScene();
+                break;
+            }
 
-            // Draw background color
-            GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+            case m_loadSceneState:
+            {
+                LoadScene();
+                break;
+            }
 
-            mSquare.draw(m_camera);
-            mTriangle.draw(m_camera);
-
-            nMatrix matrix = new nMatrix();
-            m_root.Render(matrix);
-        }
-        else
-        {
-           GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+            case m_idleState:
+            default:
+            {
+                GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+                break;
+            }
         }
     }
 
@@ -110,19 +116,47 @@ public class RenderScene implements GLSurfaceView.Renderer
         }
     }
 
+    private void RenderScene()
+    {
+        m_world.Sync();
+        m_world.Update(m_timestep);
+
+        // Draw background color
+        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+
+        mSquare.draw(m_camera);
+        mTriangle.draw(m_camera);
+
+        nMatrix matrix = new nMatrix();
+        m_root.Render(matrix);
+    }
+
+    private void LoadScene()
+    {
+        //m_glRender.GetWorld().Sync();
+        if (m_demo != null)
+        {
+            //m_glRender.Pause();
+            m_demo.CleanUp(this);
+        }
+        m_demo = new DemosBase_BasicRigidBodies(this);
+        //m_glRender.SetReady();
+        m_renderState = RenderState.m_renderSceneState;
+    }
+
     public Boolean IsInitialized()
     {
         return m_renderInitialized;
     }
 
-    public void SetReady()
+    public void SetState(RenderState state)
     {
-        m_renderReady = true;
+        m_renderState = state;
     }
 
     public void Pause()
     {
-        m_renderReady = false;
+        SetState(RenderState.m_idleState);
     }
 
     private static final String TAG = "MyGLRenderer";
@@ -132,10 +166,12 @@ public class RenderScene implements GLSurfaceView.Renderer
     private SceneCamera m_camera = null;
     private ShaderCache m_shaderCache = null;
 
-    private Boolean m_renderReady = false;
+    //private Boolean m_renderReady = false;
     private Boolean m_renderInitialized = false;
     private float m_timestep = 1.0f / 60.0f;
 
+    private DemosBase m_demo;
+    private RenderState m_renderState;
     private Square mSquare;
     private Triangle mTriangle;
 }

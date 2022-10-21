@@ -1009,7 +1009,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		contactPoint.m_material.m_staticFriction0 = lateralForce;
 		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
 
-
 		contactPoint.m_material.m_staticFriction1 = longitudinalForce;
 		contactPoint.m_material.m_dynamicFriction1 = longitudinalForce;
 		contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
