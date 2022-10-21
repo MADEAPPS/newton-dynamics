@@ -70,18 +70,18 @@ public class SceneObject
         m_mesh = mesh;
     }
 
-    void Render (nMatrix parentMatrix)
+    void Render (RenderScene scene, nMatrix parentMatrix)
     {
         nMatrix matrix = m_matrix.Mul(parentMatrix);
         if (m_mesh != null)
         {
             nMatrix renderMesh = m_meshMatrix.Mul(matrix);
-            m_mesh.Render (renderMesh);
+            m_mesh.Render (scene, renderMesh);
         }
 
         for (SceneObject child = m_firstChild; child != null; child = child.m_next)
         {
-            child.Render (matrix);
+            child.Render (scene, matrix);
         }
     }
 

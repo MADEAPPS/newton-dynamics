@@ -36,7 +36,7 @@ public class SceneMesh
         m_segments.add (segment);
     }
 
-    public void Render (nMatrix matrix)
+    public void Render (RenderScene scene, nMatrix matrix)
     {
         Log.i("ndNewton", "Render this mesh");
     }

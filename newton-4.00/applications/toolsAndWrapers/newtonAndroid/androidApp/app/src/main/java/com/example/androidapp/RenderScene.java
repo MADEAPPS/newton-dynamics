@@ -79,7 +79,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         {
             case m_renderSceneState:
             {
-                RenderScene();
+                RenderFrame();
                 break;
             }
 
@@ -119,7 +119,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         }
     }
 
-    private void RenderScene()
+    private void RenderFrame()
     {
         m_world.Sync();
         m_world.Update(m_timestep);
@@ -131,7 +131,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         mTriangle.draw(m_camera);
 
         nMatrix matrix = new nMatrix();
-        m_root.Render(matrix);
+        m_root.Render(this, matrix);
     }
 
     private void LoadScene()
