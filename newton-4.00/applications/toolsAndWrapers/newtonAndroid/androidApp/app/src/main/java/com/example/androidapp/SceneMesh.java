@@ -25,12 +25,9 @@ public class SceneMesh
     public SceneMesh()
     {
         m_shader = 0;
-        m_positHandle = 0;
-        m_normalHandle = 0;
-        m_uvlHandle = 0;
-
-        m_vertexBuffer = null;
-        m_drawListBuffer = null;
+        m_indexBuffer = 0;
+        m_vertexBuffer = 0;
+        m_vertextArrayBuffer = 0;
         m_segments = new ArrayList<SceneMeshSegment>();
     }
 
@@ -45,10 +42,8 @@ public class SceneMesh
     }
 
     protected int m_shader;
-    protected int m_positHandle;
-    protected int m_normalHandle;
-    protected int m_uvlHandle;
-    protected FloatBuffer m_vertexBuffer;
-    protected ShortBuffer m_drawListBuffer;
+    protected int m_indexBuffer;
+    protected int m_vertexBuffer;
+    protected int m_vertextArrayBuffer;
     ArrayList<SceneMeshSegment> m_segments;
 }

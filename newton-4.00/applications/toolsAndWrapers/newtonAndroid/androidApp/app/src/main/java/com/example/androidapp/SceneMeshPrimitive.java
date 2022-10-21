@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
@@ -32,14 +33,14 @@ public class SceneMeshPrimitive extends SceneMesh
         int vertexSizeInFloats = (3 + 3 + 2);
         nMeshEffect meshEffect = new nMeshEffect(shapeInstance);
 
-        // get Dat form newton mesh effect.
+        // get vertex data from newton mesh effect.
         int vertexCount = meshEffect.GetVertextCount();
         float[] vertexData = new float[vertexCount * vertexSizeInFloats];
         meshEffect.GetVertexPosit(vertexData, 0, vertexSizeInFloats);
         meshEffect.GetVertexNormal(vertexData, 3, vertexSizeInFloats);
         meshEffect.GetVertexUV0(vertexData, 6, vertexSizeInFloats);
 
-        // convert the data to a gpu ready buffer with correct indianess.
+        // make a gpu formatted vertex buffer.
         int vertexSizeInBytes = vertexSizeInFloats * 4;
         ByteBuffer bb = ByteBuffer.allocateDirect(vertexCount * vertexSizeInBytes);
         bb.order(ByteOrder.nativeOrder());
@@ -52,7 +53,7 @@ public class SceneMeshPrimitive extends SceneMesh
         GLES30.glGenBuffers(1, vertexBuffer);
         m_vertexBuffer = vertexBuffer.get(0);
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_vertexBuffer);
-        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertexSizeInBytes, gpuReadyBuffer, GLES30.GL_STATIC_DRAW);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, vertexCount * vertexSizeInBytes, gpuReadyBuffer, GLES30.GL_STATIC_DRAW);
         scene.checkGlError("SceneMeshPrimitive");
 
         // now create a vertex array buffer and set the data layout
@@ -77,7 +78,6 @@ public class SceneMeshPrimitive extends SceneMesh
         GLES30.glDisableVertexAttribArray(0);
         scene.checkGlError("SceneMeshPrimitive");
 
-
         // get index data from mesh and make a vertex buffer for rendering
         int indexCount = 0;
         meshEffect.MaterialBegin();
@@ -100,15 +100,23 @@ public class SceneMeshPrimitive extends SceneMesh
         }
         meshEffect.MaterialEnd();
 
-        ByteBuffer dlb = ByteBuffer.allocateDirect(indexCount * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        m_drawListBuffer = dlb.asShortBuffer();
-        m_drawListBuffer.put(indexData);
-        m_drawListBuffer.position(0);
+        // make a gpu formatted index buffer
+        ByteBuffer gpuReadyIndexBuffer = ByteBuffer.allocateDirect(indexCount * 2);
+        gpuReadyIndexBuffer.order(ByteOrder.nativeOrder());
+        ShortBuffer drawListBuffer = gpuReadyIndexBuffer.asShortBuffer();
+        drawListBuffer.put(indexData);
+        drawListBuffer.position(0);
+
+        // upload the index buffer data to a gpu index buffer
+        IntBuffer indexBuffer = IntBuffer.allocate(1); ;
+        GLES30.glGenBuffers(1, indexBuffer);
+        m_indexBuffer = indexBuffer.get(0);
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+        GLES30.glBufferData(GLES30.GL_ELEMENT_ARRAY_BUFFER, indexCount * 2, gpuReadyIndexBuffer, GLES30.GL_STATIC_DRAW);
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
+        scene.checkGlError("SceneMeshPrimitive");
 
         m_shader = scene.GetShaderCache().m_directionalDiffuse;
-
-        scene.checkGlError("SceneMeshPrimitive");
     }
 
     @Override
@@ -120,9 +128,4 @@ public class SceneMeshPrimitive extends SceneMesh
         //GLES30.glVertexAttribPointer(m_positHandle, 3, GLES30.GL_FLOAT, false, m_vertexSizeInBytes, m_vertexBuffer);
         //GLES30.glUseProgram(0);
     }
-
-    //int m_vertexSizeInBytes;
-    private int m_vertexBuffer;
-    private int m_vertextArrayBuffer;
-
 }
