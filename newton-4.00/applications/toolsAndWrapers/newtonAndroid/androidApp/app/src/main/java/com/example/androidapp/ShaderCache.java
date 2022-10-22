@@ -20,98 +20,18 @@ import android.content.res.AssetManager;
 
 public class ShaderCache
 {
-    private class VertexShaders
-    {
-            //"layout(location = 0) in vec3 in_position;" +
-            //"layout(location = 1) in vec3 in_normal;" +
-            //"layout(location = 2) in vec2 in_uv;" +
-
-            //"attribute vec3 in_position;" +
-            //"attribute vec3 in_normal;" +
-            //"attribute vec2 in_uv;" +
-
-        static final String directionalDiffuse =
-            "layout(location = 0) in vec3 in_position;" +
-            "layout(location = 1) in vec3 in_normal;" +
-            "layout(location = 2) in vec2 in_uv;" +
-
-            "uniform mat4 normalMatrix;" +
-            "uniform mat4 viewModelMatrix;" +
-            "uniform mat4 projectionMatrix;" +
-            "uniform vec4 directionalLightDir;" +
-
-            "out vec2 uv;" +
-            "out vec3 posit;" +
-            "out vec3 normal;" +
-            "out vec3 lightDir;" +
-
-            "void main()" +
-            "{" +
-                "lightDir = vec3(directionalLightDir.x, directionalLightDir.y, directionalLightDir.z);" +
-                "posit = vec3 (viewModelMatrix * vec4(in_position, 1.0));" +
-                "normal = vec3 (normalize (normalMatrix * vec4(in_normal, 0.0)));" +
-                "uv = in_uv;" +
-                "gl_Position = projectionMatrix * vec4(posit, 1.0);" +
-            "}";
-    }
-
-    private class PixelShaders
-    {
-        static final String directionalDiffuse =
-            "uniform sampler2D texture;" +
-            "uniform float transparency;" +
-            "uniform vec3 material_ambient;" +
-            "uniform vec3 material_diffuse;" +
-            "uniform vec3 material_specular;" +
-
-            "in vec2 uv;" +
-            "in vec3 posit;" +
-            "in vec3 normal;" +
-            "in vec3 lightDir;" +
-
-            "out vec4 pixelColor;" +
-
-            "vec3 PhongDirectionalShading(vec3 normalDir)" +
-            "{" +
-                "vec3 specularDir = normalize (-posit);" +
-
-                "vec3 reflectionDir = -reflect (lightDir, normalDir);" +
-
-                "vec3 ambientCoeff = vec3(0.0f, 0.0f, 0.0f);" +
-                "vec3 diffuseCoeff = vec3(material_diffuse);" +
-                "vec3 specularCoeff = vec3(0.0f, 0.0f, 0.0f);" +
-
-                "vec3 emission = vec3(0.3f, 0.3f, 0.3f);" +
-                "float shininess = 20.0f;" +
-
-                "vec3 ambientColor = ambientCoeff + emission;" +
-                "vec3 diffuseColor = diffuseCoeff * max (dot(normalDir, lightDir), 0.0f);" +
-                "vec3 specularColor = specularCoeff * pow (max (dot (reflectionDir, specularDir), 0.1), shininess);" +
-
-                "return ambientColor + diffuseColor + specularColor;" +
-            "}" +
-
-            "void main()" +
-            "{" +
-                "vec3 normalDir = normalize (normal);" +
-
-                "vec3 lightIntensity = PhongDirectionalShading(normalDir);" +
-
-                "vec3 texColor = lightIntensity * vec3 (texture2D(texture, uv));" +
-                "pixelColor = vec4(texColor, transparency);" +
-            "}";
-    }
-
-
-    public int m_solidColor = 0;
-    public int m_directionalDiffuse = 0;
-
     ShaderCache(RenderScene scene)
     {
         m_scene = scene;
 
         m_solidColor = LoadShaderProgram("solidColor");
-        m_directionalDiffuse = CompileProgram(VertexShaders.directionalDiffuse, PixelShaders.directionalDiffuse);
+        m_directionalDiffuse = LoadShaderProgram("directionalDiffuse");
+
+        // check for open gles errors
+        GLES30.glUseProgram(m_solidColor);
+        scene.checkGlError("ShaderCache");
+        GLES30.glUseProgram(m_directionalDiffuse);
+        scene.checkGlError("ShaderCache");
 
         m_scene = null;
     }
@@ -145,7 +65,7 @@ public class ShaderCache
 
     private String LoadShaderCode(String name)
     {
-        String code = new String();
+        String sourceCode = new String();
 
         AssetManager assetManager = m_scene.GetAssetManager();
         try
@@ -153,7 +73,7 @@ public class ShaderCache
             InputStream stream = assetManager.open(name);
             for (int data = stream.read(); data != -1; data = stream.read())
             {
-                code = code + Character.toString((char)data );
+                sourceCode = sourceCode + Character.toString((char)data );
             }
         }
         catch (IOException e)
@@ -161,22 +81,25 @@ public class ShaderCache
             Log.e("LoadShaderCode", e.getMessage());
         }
 
-        return code;
+        return sourceCode;
     }
 
     private int LoadShaderProgram(String shaderName)
     {
         String vertexShaderName = new String ("shaders/");
-        vertexShaderName = vertexShaderName + shaderName + ".vs";
-        String vertexShader = LoadShaderCode (vertexShaderName);
+        vertexShaderName = vertexShaderName + shaderName + ".ver";
+        String vertexShaderSource = LoadShaderCode (vertexShaderName);
 
         String pixelShaderName = new String ("shaders/");
-        pixelShaderName = pixelShaderName + shaderName + ".ps";
-        String pixelShader = LoadShaderCode (pixelShaderName);
+        pixelShaderName = pixelShaderName + shaderName + ".pix";
+        String pixelShaderSource = LoadShaderCode (pixelShaderName);
 
-        int program = CompileProgram(vertexShader, pixelShader);
+        int program = CompileProgram(vertexShaderSource, pixelShaderSource);
         return program;
     }
 
-    private RenderScene m_scene;
+    private RenderScene m_scene = null;
+
+    public int m_solidColor = 0;
+    public int m_directionalDiffuse = 0;
 }

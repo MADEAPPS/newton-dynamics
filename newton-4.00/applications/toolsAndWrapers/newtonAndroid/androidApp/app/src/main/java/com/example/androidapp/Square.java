@@ -65,9 +65,6 @@ public class Square {
         drawListBuffer.position(0);
 
         m_program = shaderProgram;
-        GLES30.glUseProgram(m_program);
-        mPositionHandle = GLES30.glGetAttribLocation(m_program, "vPosition");
-        GLES30.glUseProgram(0);
     }
 
     public void draw(SceneCamera camera)
