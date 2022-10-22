@@ -13,18 +13,15 @@ package com.example.androidapp;
 
 import android.opengl.GLES30;
 
+import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
+import android.content.res.AssetManager;
+
 public class ShaderCache
 {
     private class VertexShaders
     {
-        static final String passPosition =
-            "attribute vec4 vPosition;" +
-            "uniform mat4 uMVPMatrix;" +
-
-            "void main() {" +
-            "  gl_Position = uMVPMatrix * vPosition;" +
-            "}";
-
             //"layout(location = 0) in vec3 in_position;" +
             //"layout(location = 1) in vec3 in_normal;" +
             //"layout(location = 2) in vec2 in_uv;" +
@@ -60,15 +57,6 @@ public class ShaderCache
 
     private class PixelShaders
     {
-        static final String simpleColor =
-            "precision mediump float;" +
-            "uniform vec4 vColor;" +
-
-            "void main() " +
-            "{" +
-            "  gl_FragColor = vColor;" +
-            "}";
-
         static final String directionalDiffuse =
             "uniform sampler2D texture;" +
             "uniform float transparency;" +
@@ -122,17 +110,8 @@ public class ShaderCache
     {
         m_scene = scene;
 
-        m_solidColor = CompileProgram(VertexShaders.passPosition, PixelShaders.simpleColor);
+        m_solidColor = LoadShaderProgram("solidColor");
         m_directionalDiffuse = CompileProgram(VertexShaders.directionalDiffuse, PixelShaders.directionalDiffuse);
-
-        // test shaders
-        //GLES30.glUseProgram(m_solidColor);
-        //int xxx0 = GLES30.glGetAttribLocation(m_solidColor, "vPosition");
-        //m_scene.checkGlError("compiling shaders");
-        //GLES30.glUseProgram(m_directionalDiffuse);
-        //int xxx1 = GLES30.glGetAttribLocation(m_directionalDiffuse, "in_position");
-        //m_scene.checkGlError("compiling shaders");
-        //GLES30.glUseProgram(0);
 
         m_scene = null;
     }
@@ -161,6 +140,41 @@ public class ShaderCache
         GLES30.glLinkProgram(program);
 
         m_scene.checkGlError("compiling shaders");
+        return program;
+    }
+
+    private String LoadShaderCode(String name)
+    {
+        String code = new String();
+
+        AssetManager assetManager = m_scene.GetAssetManager();
+        try
+        {
+            InputStream stream = assetManager.open(name);
+            for (int data = stream.read(); data != -1; data = stream.read())
+            {
+                code = code + Character.toString((char)data );
+            }
+        }
+        catch (IOException e)
+        {
+            Log.e("LoadShaderCode", e.getMessage());
+        }
+
+        return code;
+    }
+
+    private int LoadShaderProgram(String shaderName)
+    {
+        String vertexShaderName = new String ("shaders/");
+        vertexShaderName = vertexShaderName + shaderName + ".vs";
+        String vertexShader = LoadShaderCode (vertexShaderName);
+
+        String pixelShaderName = new String ("shaders/");
+        pixelShaderName = pixelShaderName + shaderName + ".ps";
+        String pixelShader = LoadShaderCode (pixelShaderName);
+
+        int program = CompileProgram(vertexShader, pixelShader);
         return program;
     }
 

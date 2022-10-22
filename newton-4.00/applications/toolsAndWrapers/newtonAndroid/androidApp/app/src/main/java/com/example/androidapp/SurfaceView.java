@@ -24,6 +24,7 @@ public class SurfaceView extends GLSurfaceView
         setEGLContextClientVersion(3);
         super.setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         mRenderer = new RenderScene();
+        mRenderer.SetAssetManager(context.getAssets());
         setRenderer(mRenderer);
 
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);

@@ -11,17 +11,15 @@
 
 package com.example.androidapp;
 
+import android.util.Log;
+import android.opengl.GLES30;
+import android.opengl.GLSurfaceView;
+import android.content.res.AssetManager;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.opengl.GLES30;
-import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
-import android.util.Log;
-
-import com.javaNewton.nMatrix;
 import com.javaNewton.nWorld;
-
+import com.javaNewton.nMatrix;
 
 public class RenderScene implements GLSurfaceView.Renderer
 {
@@ -38,6 +36,16 @@ public class RenderScene implements GLSurfaceView.Renderer
     public SceneCamera GetCamera()
     {
         return m_camera;
+    }
+
+    public void SetAssetManager(AssetManager assetManager)
+    {
+        m_assetManager = assetManager;
+    }
+
+    public AssetManager GetAssetManager()
+    {
+        return m_assetManager;
     }
 
     @Override
@@ -168,6 +176,7 @@ public class RenderScene implements GLSurfaceView.Renderer
     private SceneObject m_root = null;
     private SceneCamera m_camera = null;
     private ShaderCache m_shaderCache = null;
+    private AssetManager m_assetManager = null;
 
     //private Boolean m_renderReady = false;
     private Boolean m_renderInitialized = false;
