@@ -137,7 +137,7 @@ public class SceneMeshPrimitive extends SceneMesh
     public void Render (RenderScene scene, nMatrix matrix)
     {
         //GLES30.glUseProgram(m_shader);
-        //m_textureLocation = GLES30.glGetUniformLocation(m_shader, "texture");
+        //m_textureLocation = GLES30.glGetUniformLocation(m_shader, "skinSurface");
         //m_transparencyLocation = GLES30.glGetUniformLocation(m_shader, "transparency");
         //m_normalMatrixLocation = GLES30.glGetUniformLocation(m_shader, "normalMatrix");
         //m_projectMatrixLocation = GLES30.glGetUniformLocation(m_shader, "projectionMatrix");
