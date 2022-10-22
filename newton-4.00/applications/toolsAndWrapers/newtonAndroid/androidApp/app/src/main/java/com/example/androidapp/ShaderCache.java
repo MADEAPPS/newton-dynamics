@@ -16,6 +16,8 @@ import android.opengl.GLES30;
 import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.IntBuffer;
+
 import android.content.res.AssetManager;
 
 public class ShaderCache
@@ -30,7 +32,10 @@ public class ShaderCache
         // check for open gles errors
         GLES30.glUseProgram(m_solidColor);
         scene.checkGlError("ShaderCache");
+        int xxx0 = GLES30.glGetUniformLocation(m_solidColor, "uMVPMatrix");
+
         GLES30.glUseProgram(m_directionalDiffuse);
+        int xxx1 = GLES30.glGetUniformLocation(m_directionalDiffuse, "normalMatrix");
         scene.checkGlError("ShaderCache");
 
         m_scene = null;
@@ -46,20 +51,50 @@ public class ShaderCache
         GLES30.glShaderSource(shader, shaderCode);
         GLES30.glCompileShader(shader);
 
+        IntBuffer state = IntBuffer.allocate(1);
+        GLES30.glGetShaderiv(shader, GLES30.GL_COMPILE_STATUS, state);
+        int error = state.get(0);
+        if (error != GLES30.GL_TRUE)
+        {
+            String shaderError = GLES30.glGetShaderInfoLog(shader);
+            Log.e("shaderError", shaderError);
+            throw new RuntimeException("error compiling shader");
+        }
+
         return shader;
     }
 
     private int CompileProgram(String vertexShaderCode, String fragmentShaderCode)
     {
+        // create empty OpenGL Program
+        int program = GLES30.glCreateProgram();
+
         int vertexShader = LoadShader(GLES30.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = LoadShader(GLES30.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
-        int program = GLES30.glCreateProgram();             // create empty OpenGL Program
         GLES30.glAttachShader(program, vertexShader);   // add the vertex shader to program
         GLES30.glAttachShader(program, fragmentShader); // add the fragment shader to program
         GLES30.glLinkProgram(program);
 
-        m_scene.checkGlError("compiling shaders");
+        IntBuffer state = IntBuffer.allocate(1);
+        GLES30.glGetProgramiv(program, GLES30.GL_LINK_STATUS, state);
+        int error = state.get(0);
+        if (error != GLES30.GL_TRUE)
+        {
+            String shaderError = GLES30.glGetProgramInfoLog(program);
+            Log.e("linkShaderProgram", shaderError);
+            throw new RuntimeException("error compiling shader program");
+        }
+
+        GLES30.glValidateProgram(program);
+        GLES30.glGetProgramiv(program, GLES30.GL_VALIDATE_STATUS, state);
+        error = state.get(0);
+        if (error != GLES30.GL_TRUE)
+        {
+            String shaderError = GLES30.glGetProgramInfoLog(program);
+            Log.e("validateProgram", shaderError);
+            throw new RuntimeException("error validating shader program");
+        }
         return program;
     }
 

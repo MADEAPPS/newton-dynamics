@@ -11,6 +11,8 @@
 
 package com.example.androidapp;
 
+import android.app.ActivityManager;
+import android.content.pm.ConfigurationInfo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -29,6 +31,12 @@ public class MainActivity extends AppCompatActivity
     {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+		System.out.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
+		//System.out.println(configurationInfo.reqGlEsVersion >= 0x30000);
+		//System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
 
 		m_renderLoop = new RenderLoop(this);
 		setContentView (m_renderLoop.GetView());

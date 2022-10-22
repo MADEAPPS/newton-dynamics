@@ -39,4 +39,4 @@ void main()
 
    vec3 texColor = lightIntensity * vec3 (texture2D(texture, uv));
    pixelColor = vec4(texColor, transparency);
-};
+}
