@@ -38,7 +38,7 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
-#define DEFAULT_SCENE	11		// basic vehicle
+//#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
@@ -1365,7 +1365,8 @@ ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
 	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	ndAssert (param >= 0.0f);
-	if (param > 1.0f) {
+	if (param > 1.0f) 
+	{
 		param = 1.0f;
 	}
 	return param;
@@ -1380,7 +1381,9 @@ void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
 	ndInt32 fb_width = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 	ndInt32 fb_height = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	if (fb_width == 0 || fb_height == 0)
+	{
 		return;
+	}
 
 	ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
 
@@ -1557,7 +1560,8 @@ void ndDemoEntityManager::RenderScene()
 	UpdatePhysics(timestep);
 	
 	// Get the interpolated location of each body in the scene
-	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
+	ndFloat32 interpolateParam = CalculateInteplationParam();
+	m_cameraManager->InterpolateMatrices (this, interpolateParam);
 
 	ImGuiIO& io = ImGui::GetIO();
 	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);

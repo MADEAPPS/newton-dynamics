@@ -57,31 +57,31 @@ const ndMatrix& ndDemoCamera::GetViewMatrix() const
 	return m_viewMatrix;
 }
 
-ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 Left, ndFloat32 Right, ndFloat32 Bottom, ndFloat32 Top, ndFloat32 ZNear, ndFloat32 ZFar)
+ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 left, ndFloat32 right, ndFloat32 bottom, ndFloat32 top, ndFloat32 front, ndFloat32 back)
 {
-	ndMatrix Result(ndGetIdentityMatrix());
+	ndMatrix projectionMatrix(ndGetIdentityMatrix());
 
-	Result[0][0] = 2 * ZNear / (Right - Left);
-	Result[0][1] = 0;
-	Result[0][2] = 0;
-	Result[0][3] = 0;
+	projectionMatrix[0][0] = 2.0f * front / (right - left);
+	projectionMatrix[0][1] = 0.0f;
+	projectionMatrix[0][2] = 0.0f;
+	projectionMatrix[0][3] = 0.0f;
 
-	Result[1][0] = 0;
-	Result[1][1] = 2 * ZNear / (Top - Bottom);
-	Result[1][2] = 0;
-	Result[1][3] = 0;
+	projectionMatrix[1][0] = 0.0f;
+	projectionMatrix[1][1] = 2.0f * front / (top - bottom);
+	projectionMatrix[1][2] = 0.0f;
+	projectionMatrix[1][3] = 0.0f;
 
-	Result[2][0] = (Right + Left) / (Right - Left);
-	Result[2][1] = (Top + Bottom) / (Top - Bottom);
-	Result[2][2] = -(ZFar + ZNear) / (ZFar - ZNear);
-	Result[2][3] = -1;
+	projectionMatrix[2][0] = (right + left) / (right - left);
+	projectionMatrix[2][1] = (top + bottom) / (top - bottom);
+	projectionMatrix[2][2] = -(back + front) / (back - front);
+	projectionMatrix[2][3] = -1.0f;
 
-	Result[3][0] = 0;
-	Result[3][1] = 0;
-	Result[3][2] = -2 * ZFar * ZNear / (ZFar - ZNear);
-	Result[3][3] = 0;
+	projectionMatrix[3][0] = 0.0f;
+	projectionMatrix[3][1] = 0.0f;
+	projectionMatrix[3][2] = -2.0f * back * front / (back - front);
+	projectionMatrix[3][3] = 0.0f;
 
-	return Result;
+	return projectionMatrix;
 }
 
 ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& center, const ndVector& normUp)
@@ -109,14 +109,13 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& c
 	return result;
 }
 
-ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar)
+ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 aspect, ndFloat32 front, ndFloat32 back)
 {
 	fov = ndClamp (fov, ndFloat32 (0.0f), ndPi);
-	//y = ZNear * (ndFloat32)ndTan((fov * cPIdiv180) * 0.5f);
-	ndFloat32 y = ZNear * ndTan(fov * 0.5f);
-	ndFloat32 x = y * Aspect;
-	ndMatrix Result (CreateMatrixFromFrustum(-x, x, -y, y, ZNear, ZFar));
-	return Result;
+	ndFloat32 y = front * ndTan(fov * 0.5f);
+	ndFloat32 x = y * aspect;
+	ndMatrix projectionMatrix (CreateMatrixFromFrustum(-x, x, -y, y, front, back));
+	return projectionMatrix;
 }
 
 void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
@@ -129,11 +128,8 @@ void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
 
 	// set the model view matrix 
-	ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
-	m_viewMatrix = CreateLookAtMatrix(
-		ndVector(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z, 1.0f),
-		ndVector(pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z, 1.0f),
-		ndVector(m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z, 0.0f));
+	const ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
+	m_viewMatrix = CreateLookAtMatrix(m_matrix.m_posit, pointOfInterest, m_matrix.m_up);
 }
 
 ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
@@ -175,7 +171,7 @@ ndAssert (0);
 	GLint viewport[4]; 
 
 	//Retrieves the viewport and stores it in the variable
-	// get a point on the display arai of the windows
+	//get a point on the display array of the windows
 	GLUI_Master.get_viewport_area(&win[0], &win[1], &win[2], &win[3]);
 	viewport[0] = GLint (win[0]);
 	viewport[1] = GLint (win[1]);
