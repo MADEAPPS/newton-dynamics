@@ -3,9 +3,9 @@
 precision mediump float;
 uniform sampler2D skinSurface;
 uniform float transparency;
-uniform vec3 material_ambient;
 uniform vec3 material_diffuse;
-uniform vec3 material_specular;
+//uniform vec3 material_ambient;
+//uniform vec3 material_specular;
 
 in vec2 uv;
 in vec3 posit;

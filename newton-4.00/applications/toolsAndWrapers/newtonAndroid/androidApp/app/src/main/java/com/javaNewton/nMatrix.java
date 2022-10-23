@@ -22,12 +22,8 @@ public class nMatrix
         for (int i = 0; i < 4; i ++)
         {
             m_data[i] = new nVector();
-            for (int j = 0; j < 4; j ++)
-            {
-                m_data[i].m_data[j] = 0.0f;
-            }
-            m_data[i].m_data[i] = 1.0f;
         }
+        SetIdentity ();
     }
 
     public nMatrix(ndMatrixGlue matrix)
@@ -48,6 +44,18 @@ public class nMatrix
             m_data[i] = new nVector(m_data[i]);
         }
         Set (matrix);
+    }
+
+    public void SetIdentity ()
+    {
+        for (int i = 0; i < 4; i ++)
+        {
+            for (int j = 0; j < 4; j ++)
+            {
+                m_data[i].m_data[j] = 0.0f;
+            }
+            m_data[i].m_data[i] = 1.0f;
+        }
     }
 
     public void Set (float[] data)
@@ -75,6 +83,11 @@ public class nMatrix
         }
     }
 
+    public nVector GetRow (int i)
+    {
+        return m_data[i];
+    }
+
     public void SetRow (int i, nVector v)
     {
         m_data[i].Set(v);
@@ -83,6 +96,11 @@ public class nMatrix
     public void SetPosition (nVector posit)
     {
         SetRow (3, posit);
+    }
+
+    public nVector GetPosition ()
+    {
+        return GetRow(3);
     }
 
     public ndMatrixGlue CreateNative()

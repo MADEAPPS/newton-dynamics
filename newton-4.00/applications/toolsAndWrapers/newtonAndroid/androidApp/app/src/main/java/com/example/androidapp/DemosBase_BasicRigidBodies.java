@@ -30,10 +30,10 @@ public class DemosBase_BasicRigidBodies extends DemosBase
         AddFloor(renderer);
         AddBox(renderer);
 
-        nVector up = new nVector(0.0f, 1.0f, 0.0f, 0.0f);
-        nVector front = new nVector(1.0f, 0.0f, 0.0f, 0.0f);
-        nVector origin = new nVector(-3.0f, 0.0f, 0.0f, 1.0f);
-        renderer.GetCamera().SetLookAtMatrix (origin, front, up);
+        nMatrix matrix = new nMatrix();
+        matrix.SetPosition(new nVector (-3.0f, 0.0f, 0.0f, 1.0f));
+        SceneCamera camera = renderer.GetCamera();
+        camera.SetMatrix(matrix);
     }
 
     private void AddFloor(RenderScene renderer)

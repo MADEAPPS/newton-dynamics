@@ -67,10 +67,9 @@ public class RenderLoop extends Thread
                 long deltaTime = time_1 - time_0;
                 if (deltaTime >= timeStepInNanos)
                 {
-                    float timestepInSeconds = (float) ((double)deltaTime/1.0e9);
-                    //DrawFrame(timestepInSeconds);
-                    String text = String.format("RenderLoop fps %f", 1.0f / timestepInSeconds);
-                    Log.i("ndNewton", text);
+                    //float timestepInSeconds = (float) ((double)deltaTime/1.0e9);
+                    //String text = String.format("RenderLoop fps %f", 1.0f / timestepInSeconds);
+                    //Log.i("ndNewton", text);
 
                     m_glView.requestRender();
                     time_0 = time_0 + timeStepInNanos;

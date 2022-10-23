@@ -13,6 +13,7 @@ package com.example.androidapp;
 
 import android.opengl.GLES30;
 
+import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nMeshEffect;
 import com.javaNewton.nShapeInstance;
@@ -22,6 +23,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.ListIterator;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
@@ -121,32 +124,62 @@ public class SceneMeshPrimitive extends SceneMesh
         // get the shader parameters in class variables
         GLES30.glUseProgram(m_shader);
         scene.checkGlError("RenderPrimitive");
-        //m_textureLocation = GLES30.glGetUniformLocation(m_shader, "texture");
-        //m_transparencyLocation = GLES30.glGetUniformLocation(m_shader, "transparency");
-        //m_normalMatrixLocation = GLES30.glGetUniformLocation(m_shader, "normalMatrix");
-        //m_projectMatrixLocation = GLES30.glGetUniformLocation(m_shader, "projectionMatrix");
-        //m_viewModelMatrixLocation = GLES30.glGetUniformLocation(m_shader, "viewModelMatrix");
-        //m_directionalLightDirLocation = GLES30.glGetUniformLocation(m_shader, "directionalLightDir");
+        m_textureLocation = GLES30.glGetUniformLocation(m_shader, "skinSurface");
+        m_transparencyLocation = GLES30.glGetUniformLocation(m_shader, "transparency");
+        m_normalMatrixLocation = GLES30.glGetUniformLocation(m_shader, "normalMatrix");
+        m_projectMatrixLocation = GLES30.glGetUniformLocation(m_shader, "projectionMatrix");
+        m_viewModelMatrixLocation = GLES30.glGetUniformLocation(m_shader, "viewModelMatrix");
+        m_materialDiffuseLocation = GLES30.glGetUniformLocation(m_shader, "material_diffuse");
         //m_materialAmbientLocation = GLES30.glGetUniformLocation(m_shader, "material_ambient");
-        //m_materialDiffuseLocation = GLES30.glGetUniformLocation(m_shader, "material_diffuse");
         //m_materialSpecularLocation = GLES30.glGetUniformLocation(m_shader, "material_specular");
-        //GLES30.glUseProgram(0);
+        m_directionalLightDirLocation = GLES30.glGetUniformLocation(m_shader, "directionalLightDir");
+        GLES30.glUseProgram(0);
     }
 
     @Override
-    public void Render (RenderScene scene, nMatrix matrix)
+    public void Render (RenderScene scene, nMatrix modelMatrix)
     {
-        //GLES30.glUseProgram(m_shader);
-        //m_textureLocation = GLES30.glGetUniformLocation(m_shader, "skinSurface");
-        //m_transparencyLocation = GLES30.glGetUniformLocation(m_shader, "transparency");
-        //m_normalMatrixLocation = GLES30.glGetUniformLocation(m_shader, "normalMatrix");
-        //m_projectMatrixLocation = GLES30.glGetUniformLocation(m_shader, "projectionMatrix");
-        //m_viewModelMatrixLocation = GLES30.glGetUniformLocation(m_shader, "viewModelMatrix");
-        //m_directionalLightDirLocation = GLES30.glGetUniformLocation(m_shader, "directionalLightDir");
-        //m_materialAmbientLocation = GLES30.glGetUniformLocation(m_shader, "material_ambient");
-        //m_materialDiffuseLocation = GLES30.glGetUniformLocation(m_shader, "material_diffuse");
-        //m_materialSpecularLocation = GLES30.glGetUniformLocation(m_shader, "material_specular");
-        //GLES30.glUseProgram(0);
+        GLES30.glUseProgram(m_shader);
+
+        SceneCamera camera = scene.GetCamera();
+        nMatrix viewMatrix = camera.GetViewMatrix();
+        nMatrix projectionMatrix = camera.GetProjectionMatrix();
+        nMatrix viewModelMatrix = modelMatrix.Mul(viewMatrix);
+        nVector directionaLight = viewMatrix.RotateVector(new nVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize();
+
+        float[] glViewModelMatrix = new float[16];
+        float[] glProjectionMatrix = new float[16];
+
+        projectionMatrix.GetFlatArray(glProjectionMatrix);
+        viewModelMatrix.GetFlatArray(glViewModelMatrix);
+
+        GLES30.glUniform1i(m_textureLocation, 0);
+        GLES30.glUniform1f(m_transparencyLocation, 1.0f);
+        GLES30.glUniform4fv(m_directionalLightDirLocation, 1, directionaLight.m_data, 0);
+        GLES30.glUniformMatrix4fv(m_normalMatrixLocation, 1, false, glViewModelMatrix, 0);
+        GLES30.glUniformMatrix4fv(m_projectMatrixLocation, 1, false, glProjectionMatrix, 0);
+        GLES30.glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, glViewModelMatrix, 0);
+
+        GLES30.glBindVertexArray(m_vertextArrayBuffer);
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+
+        ListIterator<SceneMeshSegment> it = m_segments.listIterator();
+        while (it.hasNext())
+        {
+            SceneMeshSegment segment = it.next();
+            //glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+            //glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+            //glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
+            //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+            //glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
+            GLES30.glDrawElements(GLES30.GL_TRIANGLES, segment.m_indexCount, GLES30.GL_UNSIGNED_SHORT, 2 * segment.m_indexOffset);
+        }
+
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GLES30.glBindVertexArray(0);
+
+        GLES30.glUseProgram(0);
     }
 
     private int m_textureLocation = -1;
@@ -155,7 +188,7 @@ public class SceneMeshPrimitive extends SceneMesh
     private int m_projectMatrixLocation = -1;
     private int m_viewModelMatrixLocation = -1;
     private int m_directionalLightDirLocation = -1;
-    private int m_materialAmbientLocation = -1;
     private int m_materialDiffuseLocation = -1;
-    private int m_materialSpecularLocation = -1;
+    //private int m_materialAmbientLocation = -1;
+    //private int m_materialSpecularLocation = -1;
 }

@@ -84,11 +84,11 @@ ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 left, ndFloat32 right, 
 	return projectionMatrix;
 }
 
-ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& center, const ndVector& normUp)
+ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eyepoint, const ndVector& eyepointTarget, const ndVector& normUp)
 {
 	ndMatrix result(ndGetIdentityMatrix());
 	
-	ndVector zAxis(eye - center);
+	ndVector zAxis(eyepoint - eyepointTarget);
 	zAxis = zAxis & ndVector::m_triplexMask;
 	zAxis = zAxis.Normalize();
 
@@ -100,9 +100,9 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& c
 	result[1] = YAxis;
 	result[2] = zAxis;
 	result[3] = ndVector::m_wOne;
-
 	result = result.Transpose();
-	ndVector negEye (eye);
+
+	ndVector negEye (eyepoint);
 	negEye = negEye.Scale(-1.0f);
 	negEye[3] = 1.0f;
 	result[3] = result.TransformVector(negEye);

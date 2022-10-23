@@ -55,7 +55,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         GLES30.glCullFace (GLES30.GL_BACK);
         GLES30.glFrontFace (GLES30.GL_CCW);
         GLES30.glEnable (GLES30.GL_CULL_FACE);
-        GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES30.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         m_timestep = 1.0f / 60.0f;
         m_shaderCache = new ShaderCache(this);
@@ -65,9 +65,6 @@ public class RenderScene implements GLSurfaceView.Renderer
         m_world.SetSubSteps(2);
         m_root = new SceneObject();
         m_camera = new SceneCamera();
-
-        mSquare   = new Square(m_shaderCache.m_solidColor);
-        mTriangle = new Triangle(m_shaderCache.m_solidColor);
 
         // load the first scene
         LoadScene();
@@ -82,7 +79,6 @@ public class RenderScene implements GLSurfaceView.Renderer
     @Override
     public void onDrawFrame(GL10 unused)
     {
-        //if (m_renderReady)
         switch(m_renderState)
         {
             case m_renderSceneState:
@@ -109,7 +105,8 @@ public class RenderScene implements GLSurfaceView.Renderer
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height)
     {
-        m_camera.SetProjectionMatrix(width, height);
+        m_screenWidth = width;
+        m_screenHeight = height;
     }
 
     public ShaderCache GetShaderCache()
@@ -135,8 +132,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         // Draw background color
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
 
-        mSquare.draw(m_camera);
-        mTriangle.draw(m_camera);
+        m_camera.SetViewMatrix(m_screenWidth, m_screenHeight);
 
         nMatrix matrix = new nMatrix();
         m_root.Render(this, matrix);
@@ -173,17 +169,16 @@ public class RenderScene implements GLSurfaceView.Renderer
     private static final String TAG = "ndNewton";
 
     private nWorld m_world = null;
+    private DemosBase m_demo = null;
     private SceneObject m_root = null;
     private SceneCamera m_camera = null;
     private ShaderCache m_shaderCache = null;
     private AssetManager m_assetManager = null;
 
-    //private Boolean m_renderReady = false;
-    private Boolean m_renderInitialized = false;
     private float m_timestep = 1.0f / 60.0f;
+    private Boolean m_renderInitialized = false;
+    private RenderState m_renderState = RenderState.m_idleState;
 
-    private DemosBase m_demo;
-    private RenderState m_renderState;
-    private Square mSquare;
-    private Triangle mTriangle;
+    private int m_screenWidth = 0;
+    private int m_screenHeight = 0;
 }

@@ -19,7 +19,6 @@ public class SceneMeshSegment
         m_indexOffset = indexOffset;
     }
 
-
-    private int m_indexCount;
-    private int m_indexOffset;
+    public int m_indexCount;
+    public int m_indexOffset;
 }

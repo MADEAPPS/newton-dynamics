@@ -26,17 +26,8 @@ public class ShaderCache
     {
         m_scene = scene;
 
-        m_solidColor = LoadShaderProgram("solidColor");
+        //m_solidColor = LoadShaderProgram("solidColor");
         m_directionalDiffuse = LoadShaderProgram("directionalDiffuse");
-
-        // check for open gles errors
-        GLES30.glUseProgram(m_solidColor);
-        scene.checkGlError("ShaderCache");
-        int xxx0 = GLES30.glGetUniformLocation(m_solidColor, "uMVPMatrix");
-
-        GLES30.glUseProgram(m_directionalDiffuse);
-        int xxx1 = GLES30.glGetUniformLocation(m_directionalDiffuse, "normalMatrix");
-        scene.checkGlError("ShaderCache");
 
         m_scene = null;
     }
@@ -135,6 +126,6 @@ public class ShaderCache
 
     private RenderScene m_scene = null;
 
-    public int m_solidColor = 0;
+    //public int m_solidColor = 0;
     public int m_directionalDiffuse = 0;
 }
