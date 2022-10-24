@@ -73,6 +73,21 @@ public class RenderScene implements GLSurfaceView.Renderer
         m_renderInitialized = true;
     }
 
+    public void DestroyScene()
+    {
+        if (m_demo != null)
+        {
+            m_demo.CleanUp(this);
+        }
+        m_textureCache.Clear();
+
+        m_demo = null;
+        m_root = null;
+        m_world = null;
+        m_camera = null;
+        m_textureCache = null;
+   }
+
     public void AddSceneObject(SceneObject object)
     {
         object.AttachToParent(m_root);

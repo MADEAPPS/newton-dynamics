@@ -34,6 +34,10 @@ public class RenderLoop extends Thread
     public void OnTerminate()
     {
         m_onTeminate = true;
+        while (m_onTeminate)
+        {
+            yield();
+        }
     }
 
     public void OnPause()
@@ -67,10 +71,6 @@ public class RenderLoop extends Thread
                 long deltaTime = time_1 - time_0;
                 if (deltaTime >= timeStepInNanos)
                 {
-                    //float timestepInSeconds = (float) ((double)deltaTime/1.0e9);
-                    //String text = String.format("RenderLoop fps %f", 1.0f / timestepInSeconds);
-                    //Log.i("ndNewton", text);
-
                     m_glView.requestRender();
                     time_0 = time_0 + timeStepInNanos;
                     if (deltaTime > (4 * timeStepInNanos))
@@ -83,6 +83,8 @@ public class RenderLoop extends Thread
             }
             yield();
         }
+        m_glRender.DestroyScene();
+        m_onTeminate = false;
     }
 
     final private SurfaceView m_glView;
