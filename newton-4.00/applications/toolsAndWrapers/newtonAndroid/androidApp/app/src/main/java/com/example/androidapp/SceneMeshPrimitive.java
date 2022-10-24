@@ -28,7 +28,7 @@ import java.util.ListIterator;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
-    SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene)
+    public SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene)
     {
         super();
 
@@ -168,8 +168,8 @@ public class SceneMeshPrimitive extends SceneMesh
         while (it.hasNext())
         {
             SceneMeshSegment segment = it.next();
-            //glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
-            //glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+            //GLES30.glUniform3fv(m_materialAmbientLocation, 1, segment.m_ambient.m_data);
+            GLES30.glUniform3fv(m_materialDiffuseLocation, 1, segment.m_diffuse.m_data, 0);
             //glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
             //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
             //glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));

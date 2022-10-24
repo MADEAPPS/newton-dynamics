@@ -40,7 +40,7 @@ void main()
 
    vec3 lightIntensity = PhongDirectionalShading(normalDir);
 
-   //vec3 texColor = lightIntensity * vec3 (texture2D(skinSurface, uv));
-   vec3 texColor = lightIntensity * vec3 (texture(skinSurface, uv));
+   //vec3 texColor = lightIntensity * vec3 (texture(skinSurface, uv));
+   vec3 texColor = lightIntensity;
    pixelColor = vec4(texColor, transparency);
 }

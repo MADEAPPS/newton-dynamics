@@ -15,7 +15,7 @@ import com.javaNewton.nMatrix;
 
 public class SceneObject
 {
-    SceneObject ()
+    public SceneObject ()
     {
         m_mesh = null;
         m_next = null;
@@ -27,7 +27,7 @@ public class SceneObject
         m_meshMatrix = new nMatrix();
     }
 
-    void AttachToParent(SceneObject parent)
+    public void AttachToParent(SceneObject parent)
     {
         m_parent = parent;
         m_next = parent.m_firstChild;
@@ -70,7 +70,7 @@ public class SceneObject
         m_mesh = mesh;
     }
 
-    void Render (RenderScene scene, nMatrix parentMatrix)
+    public void Render (RenderScene scene, nMatrix parentMatrix)
     {
         nMatrix matrix = m_matrix.Mul(parentMatrix);
         if (m_mesh != null)
@@ -85,10 +85,9 @@ public class SceneObject
         }
     }
 
+    private SceneMesh m_mesh;
     private nMatrix m_matrix;
     private nMatrix m_meshMatrix;
-
-    private SceneMesh m_mesh;
 
     private SceneObject m_next;
     private SceneObject m_prev;

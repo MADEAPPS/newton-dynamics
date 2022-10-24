@@ -11,13 +11,28 @@
 
 package com.example.androidapp;
 
+import com.javaNewton.nVector;
+
 public class SceneMeshSegment
 {
     public SceneMeshSegment(int indexOffset, int indexCount)
     {
         m_indexCount = indexCount;
         m_indexOffset = indexOffset;
+        m_ambient = new nVector(0.8f, 0.8f, 0.8f, 1.0f);
+        m_diffuse = new nVector(0.8f, 0.8f, 0.8f, 1.0f);
+        m_specular = new nVector(1.0f, 1.0f, 1.0f, 1.0f);
+        m_opacity = 1.0f;
+        m_shiness = 100.0f;
     }
+
+    public nVector m_ambient;
+    public nVector m_diffuse;
+    public nVector m_specular;
+    public float m_opacity;
+    public float m_shiness;
+    //GLint m_textureHandle;
+    //char  m_textureName[32];
 
     public int m_indexCount;
     public int m_indexOffset;

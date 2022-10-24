@@ -9,29 +9,33 @@
  * freely
  */
 
-package com.example.androidapp;
+package com.example.androidapp.Demos;
 
-import android.opengl.Matrix;
-
+import com.example.androidapp.BodyNotify;
+import com.example.androidapp.RenderScene;
+import com.example.androidapp.SceneCamera;
+import com.example.androidapp.SceneMeshPrimitive;
+import com.example.androidapp.SceneObject;
 import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nRigidBody;
 import com.javaNewton.nBodyNotify;
 import com.javaNewton.nShapeBoxInstance;
+import com.example.androidapp.Demos.DemoBase;
 
 import com.newton.nRigidBodyType;
 
-public class DemosBase_BasicRigidBodies extends DemosBase
+public class BasicRigidBodies extends DemoBase
 {
-    DemosBase_BasicRigidBodies(RenderScene renderer)
+    public BasicRigidBodies(RenderScene renderer)
     {
-        super(renderer);
+        super();
 
         AddFloor(renderer);
         AddBox(renderer);
 
         nMatrix matrix = new nMatrix();
-        matrix.SetPosition(new nVector (-3.0f, 0.0f, 0.0f, 1.0f));
+        matrix.SetPosition(new nVector (-3.0f, 0.25f, 0.0f, 1.0f));
         SceneCamera camera = renderer.GetCamera();
         camera.SetMatrix(matrix);
     }

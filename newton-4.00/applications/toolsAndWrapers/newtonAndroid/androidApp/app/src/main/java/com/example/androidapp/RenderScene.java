@@ -20,6 +20,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.javaNewton.nWorld;
 import com.javaNewton.nMatrix;
+import com.example.androidapp.Demos.DemoBase;
+import com.example.androidapp.Demos.BasicRigidBodies;
 
 public class RenderScene implements GLSurfaceView.Renderer
 {
@@ -71,7 +73,7 @@ public class RenderScene implements GLSurfaceView.Renderer
         m_renderInitialized = true;
     }
 
-    void AddSceneObject(SceneObject object)
+    public void AddSceneObject(SceneObject object)
     {
         object.AttachToParent(m_root);
     }
@@ -140,14 +142,11 @@ public class RenderScene implements GLSurfaceView.Renderer
 
     private void LoadScene()
     {
-        //m_glRender.GetWorld().Sync();
         if (m_demo != null)
         {
-            //m_glRender.Pause();
             m_demo.CleanUp(this);
         }
-        m_demo = new DemosBase_BasicRigidBodies(this);
-        //m_glRender.SetReady();
+        m_demo = new BasicRigidBodies(this);
         m_renderState = RenderState.m_renderSceneState;
     }
 
@@ -169,7 +168,7 @@ public class RenderScene implements GLSurfaceView.Renderer
     private static final String TAG = "ndNewton";
 
     private nWorld m_world = null;
-    private DemosBase m_demo = null;
+    private DemoBase m_demo = null;
     private SceneObject m_root = null;
     private SceneCamera m_camera = null;
     private ShaderCache m_shaderCache = null;

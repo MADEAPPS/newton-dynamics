@@ -16,7 +16,7 @@ import com.javaNewton.nBodyNotify;
 
 public class BodyNotify extends nBodyNotify
 {
-    BodyNotify(SceneObject object)
+    public BodyNotify(SceneObject object)
     {
         super();
         m_object = object;
@@ -28,5 +28,5 @@ public class BodyNotify extends nBodyNotify
         m_object.SetMatrix(matrix);
     }
 
-    SceneObject m_object;
+    private SceneObject m_object;
 }

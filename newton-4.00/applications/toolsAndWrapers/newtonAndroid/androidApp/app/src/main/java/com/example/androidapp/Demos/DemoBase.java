@@ -9,17 +9,17 @@
  * freely
  */
 
-package com.example.androidapp;
+package com.example.androidapp.Demos;
 
-public class DemosBase
+import com.example.androidapp.RenderScene;
+
+public class DemoBase
 {
-    public DemosBase(RenderScene renderer)
+    public DemoBase()
     {
-        //MyGLRenderer m_glRender;
     }
 
     public void CleanUp(RenderScene renderer)
     {
-
     }
 }
