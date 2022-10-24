@@ -235,7 +235,8 @@ GLuint LoadTexture(const char* const filename)
 		
 		// Put some validity checks here. Very simply, I only understand
 		// or care about 8, 24, or 32 bit targa's.
-		if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
+		//if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
+		if (!((tgaHeader.bits == 8) || (tgaHeader.bits == 24) || (tgaHeader.bits == 32)))
 		{
 			fclose(pFile);
 			return 0;

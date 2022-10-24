@@ -9,9 +9,9 @@
  * freely
  */
 
-package com.example.androidapp.Demos;
+package com.example.androidapp;
 
-import com.example.androidapp.RenderScene;
+//import com.example.androidapp.RenderScene;
 
 public class DemoBase
 {

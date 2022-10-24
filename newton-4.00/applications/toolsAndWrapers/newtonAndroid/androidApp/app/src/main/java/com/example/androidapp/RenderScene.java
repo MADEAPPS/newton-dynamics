@@ -20,7 +20,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.javaNewton.nWorld;
 import com.javaNewton.nMatrix;
-import com.example.androidapp.Demos.DemoBase;
 import com.example.androidapp.Demos.BasicRigidBodies;
 
 public class RenderScene implements GLSurfaceView.Renderer

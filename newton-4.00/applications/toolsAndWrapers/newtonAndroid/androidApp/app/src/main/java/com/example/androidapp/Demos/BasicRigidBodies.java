@@ -20,8 +20,8 @@ import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nRigidBody;
 import com.javaNewton.nBodyNotify;
+import com.example.androidapp.DemoBase;
 import com.javaNewton.nShapeBoxInstance;
-import com.example.androidapp.Demos.DemoBase;
 
 import com.newton.nRigidBodyType;
 
