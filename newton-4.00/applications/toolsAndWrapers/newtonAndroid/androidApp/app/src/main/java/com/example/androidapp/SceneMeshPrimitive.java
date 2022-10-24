@@ -173,8 +173,8 @@ public class SceneMeshPrimitive extends SceneMesh
             //GLES30.glUniform3fv(m_materialAmbientLocation, 1, segment.m_ambient.m_data);
             GLES30.glUniform3fv(m_materialDiffuseLocation, 1, segment.m_diffuse.m_data, 0);
             //glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
-            //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-            //glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_material.GetTexture()));
+            //GLES30.glTexEnvf(GLES30.GL_TEXTURE_ENV, GLES30.GL_TEXTURE_ENV_MODE, GLES30.GL_MODULATE);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, segment.m_texture.m_id);
             GLES30.glDrawElements(GLES30.GL_TRIANGLES, segment.m_indexCount, GLES30.GL_UNSIGNED_SHORT, 2 * segment.m_indexOffset);
         }
 

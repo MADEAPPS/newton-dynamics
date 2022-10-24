@@ -14,8 +14,8 @@ package com.example.androidapp;
 import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 import android.opengl.GLES30;
 import android.content.res.AssetManager;
@@ -91,7 +91,7 @@ public class SceneMeshTexture
         {
             throw new RuntimeException("invalid texture format");
         }
-        int imageSize = width * height * bits / 3;
+        int imageSize = width * height * bits / 8;
 
         int iComponents = 4;
         int eFormat = GLES30.GL_RGB;
@@ -100,7 +100,33 @@ public class SceneMeshTexture
             eFormat = GLES30.GL_RGBA;
         }
 
-        //GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);
+        ByteBuffer data = ByteBuffer.allocateDirect(imageSize);
+        for (int i = 0; i < imageSize; i ++)
+        {
+            //data.put(image.get());
+            if (i % 3 == 1)
+                data.put((byte)128);
+            else
+                data.put((byte)0);
+        }
+        data.rewind();
+
+        IntBuffer textureId = IntBuffer.allocate(1);
+        GLES30.glGenTextures(1, textureId);
+        m_id = textureId.get(0);
+
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, m_id);
+        GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT);
+        GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT);
+        GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
+        GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+
+        //float anisotropic = 0.0f;
+        //GLES30.glGetFloatv(GLES30.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, textureId);
+        //GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic);
+
+        GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D,0, eFormat, width, height,0, eFormat, GLES30.GL_UNSIGNED_BYTE, data );
+        GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);
     }
 
     String m_name;
