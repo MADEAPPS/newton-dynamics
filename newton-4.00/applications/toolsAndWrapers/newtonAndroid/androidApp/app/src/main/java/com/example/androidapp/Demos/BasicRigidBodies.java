@@ -46,7 +46,7 @@ public class BasicRigidBodies extends DemoBase
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
         nShapeBoxInstance shapeInstance = new nShapeBoxInstance(200.0f, 1.0f, 200.0f);
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer, "default.tga");
         SceneObject floorObject = new SceneObject();
         floorObject.SetMesh(mesh);
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
@@ -66,7 +66,7 @@ public class BasicRigidBodies extends DemoBase
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeBoxInstance shapeInstance = new nShapeBoxInstance(0.5f, 0.5f, 0.5f);
         SceneObject boxObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer);
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer, "default.tga");
         boxObject.SetMesh(mesh);
         nBodyNotify notify = new BodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));

@@ -61,6 +61,7 @@ public class RenderScene implements GLSurfaceView.Renderer
 
         m_timestep = 1.0f / 60.0f;
         m_shaderCache = new ShaderCache(this);
+        m_textureCache = new SceneMeshTextureCache(GetAssetManager());
 
         m_demo = null;
         m_world = new nWorld();
@@ -116,6 +117,11 @@ public class RenderScene implements GLSurfaceView.Renderer
         return m_shaderCache;
     }
 
+    public SceneMeshTextureCache GetTextureCache()
+    {
+        return m_textureCache;
+    }
+
     public static void checkGlError(String glOperation)
     {
         int error;
@@ -146,6 +152,8 @@ public class RenderScene implements GLSurfaceView.Renderer
         {
             m_demo.CleanUp(this);
         }
+
+        m_textureCache.Clear();
         m_demo = new BasicRigidBodies(this);
         m_renderState = RenderState.m_renderSceneState;
     }
@@ -173,6 +181,7 @@ public class RenderScene implements GLSurfaceView.Renderer
     private SceneCamera m_camera = null;
     private ShaderCache m_shaderCache = null;
     private AssetManager m_assetManager = null;
+    private SceneMeshTextureCache m_textureCache = null;
 
     private float m_timestep = 1.0f / 60.0f;
     private Boolean m_renderInitialized = false;

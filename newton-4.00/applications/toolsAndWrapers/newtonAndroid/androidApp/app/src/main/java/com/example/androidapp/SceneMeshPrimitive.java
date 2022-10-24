@@ -28,7 +28,7 @@ import java.util.ListIterator;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
-    public SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene)
+    public SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene, String textureName)
     {
         super();
 
@@ -91,12 +91,14 @@ public class SceneMeshPrimitive extends SceneMesh
         short[] indexData = new short[indexCount];
 
         int offset = 0;
+        SceneMeshTextureCache textCache = scene.GetTextureCache();
         for (int index = meshEffect.GetFirstMaterial(); index != -1; index = meshEffect.GetNextMaterial(index))
         {
             meshEffect.GetMaterialGetIndexStream(index, indexData, offset);
             int segIndexCount = meshEffect.GetMaterialIndexCount(index);
 
             SceneMeshSegment segment = new SceneMeshSegment(offset, segIndexCount);
+            segment.m_texture = textCache.GetTexture(textureName);
             AddSegment(segment);
 
             offset += segIndexCount;
@@ -176,10 +178,9 @@ public class SceneMeshPrimitive extends SceneMesh
             GLES30.glDrawElements(GLES30.GL_TRIANGLES, segment.m_indexCount, GLES30.GL_UNSIGNED_SHORT, 2 * segment.m_indexOffset);
         }
 
-        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
-        GLES30.glBindVertexArray(0);
-
-        GLES30.glUseProgram(0);
+        //GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
+        //GLES30.glBindVertexArray(0);
+        //GLES30.glUseProgram(0);
     }
 
     private int m_textureLocation = -1;

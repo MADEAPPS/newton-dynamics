@@ -24,6 +24,7 @@ public class SceneMeshSegment
         m_specular = new nVector(1.0f, 1.0f, 1.0f, 1.0f);
         m_opacity = 1.0f;
         m_shiness = 100.0f;
+        m_texture = null;
     }
 
     public nVector m_ambient;
@@ -31,8 +32,7 @@ public class SceneMeshSegment
     public nVector m_specular;
     public float m_opacity;
     public float m_shiness;
-    //GLint m_textureHandle;
-    //char  m_textureName[32];
+    public SceneMeshTexture m_texture;
 
     public int m_indexCount;
     public int m_indexOffset;
