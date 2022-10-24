@@ -100,8 +100,7 @@ public class SceneMeshTexture
             eFormat = GLES30.GL_RGBA;
         }
 
-        //GLES30.gluBuild2DMipmaps
-        //glu.gluBuild2DMipmaps
+        //GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);
     }
 
     String m_name;
