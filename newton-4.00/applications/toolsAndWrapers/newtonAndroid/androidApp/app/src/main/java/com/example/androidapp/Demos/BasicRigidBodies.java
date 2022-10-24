@@ -35,7 +35,7 @@ public class BasicRigidBodies extends DemoBase
         AddBox(renderer);
 
         nMatrix matrix = new nMatrix();
-        matrix.SetPosition(new nVector (-3.0f, 0.25f, 0.0f, 1.0f));
+        matrix.SetPosition(new nVector (-10.0f, 0.25f, 0.0f, 1.0f));
         SceneCamera camera = renderer.GetCamera();
         camera.SetMatrix(matrix);
     }
