@@ -94,23 +94,30 @@ public class SceneMeshTexture
         int bits = image.get();
         int descriptor = image.get();
 
-        if (!((bits == 24) || (bits == 32)))
+        //if (!((bits == 24) || (bits == 32)))
+        if (bits != 24)
         {
             throw new RuntimeException("invalid texture format");
         }
-        int imageSize = width * height * bits / 8;
+        //int imageSize = width * height * bits / 8;
 
-        int iComponents = 4;
+        //int iComponents = 4;
         int eFormat = GLES30.GL_RGB;
-        if (bits == 32)
-        {
-            eFormat = GLES30.GL_RGBA;
-        }
+        //if (bits == 32)
+        //{
+        //    eFormat = GLES30.GL_RGBA;
+        //}
 
-        ByteBuffer data = ByteBuffer.allocateDirect(imageSize);
+        int imageSize = width * height;
+        ByteBuffer data = ByteBuffer.allocateDirect(imageSize * 3);
         for (int i = 0; i < imageSize; i ++)
         {
-            data.put(image.get());
+            byte red = image.get();
+            byte green = image.get();
+            byte blue = image.get();
+            data.put(blue);
+            data.put(green);
+            data.put(red);
         }
         data.rewind();
 
