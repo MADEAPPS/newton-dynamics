@@ -15,25 +15,22 @@ import com.newton.ndShapeInstanceGlue;
 
 public class nShapeInstance
 {
-    protected nShapeInstance(ndShapeInstanceGlue nativeObject)
+    protected nShapeInstance(nShapeType type, ndShapeInstanceGlue nativeObject)
     {
+        m_type = type;
         m_nativeObject = nativeObject;
     }
 
-    //protected nShapeInstance(nShape shape)
-    //{
-    //    m_nativeObject = new ndShapeInstanceGlue(shape.GetNativeObject());
-    //}
-
-    //public nShapeInstance(ndShapeInstanceGlue shapeInstance)
-    //{
-    //    m_nativeObject = shapeInstance;
-    //}
+    public nShapeType GetType()
+    {
+        return m_type;
+    }
 
     public ndShapeInstanceGlue GetNativeObject()
     {
         return m_nativeObject;
     }
 
+    private nShapeType m_type;
     private ndShapeInstanceGlue m_nativeObject;
 }

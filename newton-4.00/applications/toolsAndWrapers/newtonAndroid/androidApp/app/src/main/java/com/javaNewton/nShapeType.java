@@ -8,15 +8,9 @@
  * including commercial applications, and to alter it and redistribute it
  * freely
  */
-
 package com.javaNewton;
 
-import com.newton.ndShapeInstanceBoxGlue;
-
-public class nShapeBoxInstance extends nShapeInstance
+public enum nShapeType
 {
-    public nShapeBoxInstance(float size_x, float size_y, float size_z)
-    {
-        super(nShapeType.m_box, new ndShapeInstanceBoxGlue(size_x, size_y, size_z));
-    }
+    m_box
 }

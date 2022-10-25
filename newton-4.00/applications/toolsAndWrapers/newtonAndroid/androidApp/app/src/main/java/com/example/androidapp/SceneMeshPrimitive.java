@@ -15,6 +15,7 @@ import android.opengl.GLES30;
 
 import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
+import com.javaNewton.nShapeType;
 import com.javaNewton.nMeshEffect;
 import com.javaNewton.nShapeInstance;
 
@@ -23,18 +24,29 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class SceneMeshPrimitive extends SceneMesh
 {
-    public SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene, String textureName)
+    public SceneMeshPrimitive(nShapeInstance shapeInstance, RenderScene scene, String textureName, nMatrix uvMatrix)
     {
         super();
 
         // get vertex data from mesh and make a vertex buffer for rendering
         int vertexSizeInFloats = (3 + 3 + 2);
         nMeshEffect meshEffect = new nMeshEffect(shapeInstance);
+
+        SceneMeshTextureCache textCache = scene.GetTextureCache();
+        SceneMeshTexture text0 = textCache.GetTexture(textureName);
+
+        nShapeType shapeType = shapeInstance.GetType();
+        switch (shapeType)
+        {
+            case m_box:
+            default:
+                meshEffect.UniformBoxMapping(text0.m_id, uvMatrix);
+                break;
+        }
 
         // get vertex data from newton mesh effect.
         int vertexCount = meshEffect.GetVertextCount();
@@ -91,14 +103,13 @@ public class SceneMeshPrimitive extends SceneMesh
         short[] indexData = new short[indexCount];
 
         int offset = 0;
-        SceneMeshTextureCache textCache = scene.GetTextureCache();
         for (int index = meshEffect.GetFirstMaterial(); index != -1; index = meshEffect.GetNextMaterial(index))
         {
             meshEffect.GetMaterialGetIndexStream(index, indexData, offset);
             int segIndexCount = meshEffect.GetMaterialIndexCount(index);
 
             SceneMeshSegment segment = new SceneMeshSegment(offset, segIndexCount);
-            segment.m_texture = textCache.GetTexture(textureName);
+            segment.m_texture = text0;
             AddSegment(segment);
 
             offset += segIndexCount;

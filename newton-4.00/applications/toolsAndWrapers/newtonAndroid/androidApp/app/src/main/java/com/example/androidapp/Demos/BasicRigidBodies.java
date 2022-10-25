@@ -35,7 +35,7 @@ public class BasicRigidBodies extends DemoBase
         AddBox(renderer);
 
         nMatrix matrix = new nMatrix();
-        matrix.SetPosition(new nVector (-10.0f, 0.25f, 0.0f, 1.0f));
+        matrix.SetPosition(new nVector (-20.0f, 1.0f, 0.0f, 1.0f));
         SceneCamera camera = renderer.GetCamera();
         camera.SetMatrix(matrix);
     }
@@ -45,8 +45,13 @@ public class BasicRigidBodies extends DemoBase
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, -0.5f, 0.0f, 1.0f));
 
+        nMatrix uvMatrix = new nMatrix();
+        uvMatrix.m_data[0].m_data[0] *= 0.025f;
+        uvMatrix.m_data[1].m_data[1] *= 0.025f;
+        uvMatrix.m_data[2].m_data[2] *= 0.025f;
+
         nShapeBoxInstance shapeInstance = new nShapeBoxInstance(200.0f, 1.0f, 200.0f);
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer, "default.tga");
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer, "marbleCheckBoard.tga", uvMatrix);
         SceneObject floorObject = new SceneObject();
         floorObject.SetMesh(mesh);
         nRigidBody floor = new nRigidBody(nRigidBodyType.m_dynamic);
@@ -63,10 +68,15 @@ public class BasicRigidBodies extends DemoBase
         nMatrix location = new nMatrix();
         location.SetPosition(new nVector(0.0f, 5.0f, 0.0f, 1.0f));
 
+        nMatrix uvMatrix = new nMatrix();
+        uvMatrix.m_data[0].m_data[0] *= 0.025f;
+        uvMatrix.m_data[1].m_data[1] *= 0.025f;
+        uvMatrix.m_data[2].m_data[2] *= 0.025f;
+
         nRigidBody box = new nRigidBody(nRigidBodyType.m_dynamic);
         nShapeBoxInstance shapeInstance = new nShapeBoxInstance(0.5f, 0.5f, 0.5f);
         SceneObject boxObject = new SceneObject();
-        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer, "default.tga");
+        SceneMeshPrimitive mesh = new SceneMeshPrimitive(shapeInstance, renderer, "default.tga", uvMatrix);
         boxObject.SetMesh(mesh);
         nBodyNotify notify = new BodyNotify(boxObject);
         notify.SetGravity(new nVector(0.0f, -10.0f, 0.0f, 0.0f));

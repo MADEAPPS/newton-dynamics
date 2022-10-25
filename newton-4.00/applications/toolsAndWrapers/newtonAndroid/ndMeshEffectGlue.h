@@ -93,6 +93,11 @@ class ndMeshEffectGlue : public ndContainersFreeListAlloc<ndMeshEffectGlue>
 		m_materialHandle = nullptr;
 	}
 
+	void UniformBoxMapping(int materialIndex, const ndMatrixGlue& textureMatrix)
+	{
+		m_meshEffect->UniformBoxMapping(materialIndex, textureMatrix);
+	}
+
 	ndIndexArray* m_materialHandle;
 	ndSharedPtr<ndMeshEffect> m_meshEffect;
 };

@@ -75,5 +75,10 @@ public class nMeshEffect
         m_nativeObject.MaterialEnd();
     }
 
+    public void UniformBoxMapping(int materialId, nMatrix matrix)
+    {
+        m_nativeObject.UniformBoxMapping(materialId, matrix.CreateNative());
+    }
+
     private ndMeshEffectGlue m_nativeObject;
 }

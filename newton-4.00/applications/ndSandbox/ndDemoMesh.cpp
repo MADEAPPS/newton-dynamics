@@ -92,13 +92,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderCache& shaderCache,
 {
 	m_name = name;
 	ndMeshEffect mesh(*collision);
-
-	//mesh.CalculateNormals(30.0f * dDegreeToRad);
-
 	ndMatrix aligmentUV(uvMatrix);
-	//ndMatrix aligmentUV (collision->GetLocalMatrix());
-	//aligmentUV = aligmentUV.Inverse();
-
 	m_shader = shaderCache.m_diffuseEffect;
 
 	// apply uv projections

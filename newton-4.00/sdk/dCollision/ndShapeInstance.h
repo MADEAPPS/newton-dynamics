@@ -58,7 +58,6 @@ class ndShapeDebugNotify : public ndClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-//class ndShapeInstance: public ndClassAlloc
 class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 {
 	public:

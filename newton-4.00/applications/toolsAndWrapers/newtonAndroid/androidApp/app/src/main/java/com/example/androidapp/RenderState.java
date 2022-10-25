@@ -22,7 +22,7 @@ import android.util.Log;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nWorld;
 
-enum RenderState
+public enum RenderState
 {
     m_idleState,
     m_loadSceneState,

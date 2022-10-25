@@ -110,11 +110,7 @@ public class SceneMeshTexture
         ByteBuffer data = ByteBuffer.allocateDirect(imageSize);
         for (int i = 0; i < imageSize; i ++)
         {
-            //data.put(image.get());
-            if (i % 3 == 1)
-                data.put((byte)128);
-            else
-                data.put((byte)0);
+            data.put(image.get());
         }
         data.rewind();
 
