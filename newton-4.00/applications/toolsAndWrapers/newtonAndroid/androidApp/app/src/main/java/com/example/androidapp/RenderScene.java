@@ -75,6 +75,7 @@ public class RenderScene implements GLSurfaceView.Renderer
 
     public void DestroyScene()
     {
+        m_world.CleanUp();
         if (m_demo != null)
         {
             m_demo.CleanUp(this);

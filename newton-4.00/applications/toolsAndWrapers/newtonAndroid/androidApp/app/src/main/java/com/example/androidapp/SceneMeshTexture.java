@@ -32,6 +32,13 @@ public class SceneMeshTexture
         ParseTargaImage(image);
     }
 
+    public void Clear()
+    {
+        int[] textureId = new int[1];
+        textureId[0] = m_id;
+        GLES30.glDeleteTextures(1, textureId, 0);
+    }
+
     private ByteBuffer LoadAsset(String name, AssetManager assetManager)
     {
         try

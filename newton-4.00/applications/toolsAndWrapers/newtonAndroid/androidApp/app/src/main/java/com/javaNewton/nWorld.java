@@ -12,8 +12,10 @@
 package com.javaNewton;
 
 import com.newton.ndWorldGlue;
-
+import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 public class nWorld
 {
@@ -21,6 +23,18 @@ public class nWorld
     {
         m_bodyMap = new HashMap<>();
         m_nativeObject = new ndWorldGlue();
+    }
+
+    public void CleanUp()
+    {
+        Iterator<Map.Entry<Integer, nRigidBody>> it = m_bodyMap.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry<Integer, nRigidBody> entry = (Map.Entry<Integer, nRigidBody>) it.next();
+            nRigidBody body = entry.getValue();
+            m_nativeObject.RemoveBody(body.GetNativeObject());
+        }
+        m_bodyMap.clear();
     }
 
     public void Sync()

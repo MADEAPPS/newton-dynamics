@@ -11,7 +11,9 @@
 
 package com.example.androidapp;
 
+import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 import android.content.res.AssetManager;
 
 public class SceneMeshTextureCache
@@ -24,6 +26,13 @@ public class SceneMeshTextureCache
 
     public void Clear()
     {
+        Iterator<Map.Entry<Integer, SceneMeshTexture>> it = m_textureMap.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry<Integer, SceneMeshTexture> entry = (Map.Entry<Integer, SceneMeshTexture>) it.next();
+            SceneMeshTexture texture = entry.getValue();
+            texture.Clear();
+        }
         m_textureMap.clear();
     }
 
