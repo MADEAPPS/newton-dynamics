@@ -44,8 +44,9 @@ ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	const char* const name = xmlGetString(xmlNode, "name");
-	SetName(name);
+	//const char* const name = xmlGetString(xmlNode, "name");
+	//SetName(name);
+	ndAssert(0);
 	m_localPose = xmlGetMatrix(xmlNode, "localPose");
 
 	ndInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
@@ -72,7 +73,8 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	}
 	ndAssert(bodyNode);
 
-	xmlSaveParam(childNode, "name", GetName().GetStr());
+	ndAssert(0);
+	//xmlSaveParam(childNode, "name", GetName().GetStr());
 	xmlSaveParam(childNode, "localPose", m_localPose);
 	xmlSaveParam(childNode, "bodyHash", bodyNode->GetInfo());
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);

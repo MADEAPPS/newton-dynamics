@@ -27,6 +27,7 @@ ndMeshEffectNode::ndMeshEffectNode(ndMeshEffectNode* const parent)
 	:ndNodeHierarchy<ndMeshEffectNode>()
 	,m_matrix(ndGetIdentityMatrix())
 	,m_meshMatrix(ndGetIdentityMatrix())
+	,m_name()
 	,m_mesh()
 {
 	if (parent)
@@ -39,6 +40,7 @@ ndMeshEffectNode::ndMeshEffectNode(const ndMeshEffectNode& src)
 	:ndNodeHierarchy<ndMeshEffectNode>(src)
 	,m_matrix(src.m_matrix)
 	,m_meshMatrix(src.m_meshMatrix)
+	,m_name(src.m_name)
 	,m_mesh(src.m_mesh)
 {
 	ndAssert(0);
@@ -47,6 +49,17 @@ ndMeshEffectNode::ndMeshEffectNode(const ndMeshEffectNode& src)
 ndMeshEffectNode::~ndMeshEffectNode()
 {
 }
+
+const ndString& ndMeshEffectNode::GetName() const
+{
+	return m_name;
+}
+
+void ndMeshEffectNode::SetName(const ndString& name)
+{
+	m_name = name;
+}
+
 
 ndMeshEffectNode* ndMeshEffectNode::CreateClone() const
 {

@@ -20,7 +20,7 @@ class ndAnimKeyframe;
 class ndShaderCache;
 class ndDemoMeshInterface;
 
-class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
+class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 {
 	public:
 	ndDemoEntity(const ndDemoEntity& copyFrom);
@@ -36,7 +36,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	const ndMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const ndMatrix& matrix);  
 
-	ndNodeBaseHierarchy* CreateClone () const;
+	ndDemoEntity* CreateClone () const;
 
 	const ndMatrix& GetRenderMatrix () const;
 	ndMatrix CalculateGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
@@ -58,7 +58,11 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	void RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
+	ndDemoEntity* Find(const char* const name) const;
 	ndDemoEntity* FindBySubString(const char* const subString) const;
+
+	const ndString& GetName() const;
+	void SetName(const ndString& name);
 
 	protected:
 	mutable ndMatrix m_matrix;			// interpolated matrix
@@ -70,6 +74,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	ndMatrix m_meshMatrix;
 	ndSharedPtr<ndDemoMeshInterface> m_mesh;
 	ndList <ndDemoEntity*>::ndNode* m_rootNode;
+	ndString m_name;
 	ndSpinLock m_lock;
 	bool m_isVisible;
 

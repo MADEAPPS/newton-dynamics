@@ -117,7 +117,7 @@ class ndCharacterNode: public ndNodeHierarchy<ndCharacterNode>
 	//D_NEWTON_API virtual ndMatrix GetBoneMatrix() const;
 
 	protected:
-	D_NEWTON_API ndNodeBaseHierarchy* CreateClone() const;
+	D_NEWTON_API ndCharacterNode* CreateClone() const;
 	D_NEWTON_API virtual void Save(const ndCharacterSaveDescriptor& desc) const;
 
 	ndMatrix m_localPose;

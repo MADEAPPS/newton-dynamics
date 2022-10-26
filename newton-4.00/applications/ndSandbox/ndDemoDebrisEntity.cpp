@@ -205,7 +205,7 @@ ndDemoDebrisEntity::~ndDemoDebrisEntity()
 {
 }
 
-ndNodeBaseHierarchy* ndDemoDebrisEntity::CreateClone() const
+ndDemoEntity* ndDemoDebrisEntity::CreateClone() const
 {
 	return new ndDemoDebrisEntity(*this);
 }

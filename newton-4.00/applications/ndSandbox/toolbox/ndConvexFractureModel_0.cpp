@@ -234,7 +234,7 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 		delete m_collision;
 	}
 
-	ndNodeBaseHierarchy* CreateClone() const
+	ndDemoEntity* CreateClone() const
 	{
 		return new ndConvexFractureEntity(*this);
 	}

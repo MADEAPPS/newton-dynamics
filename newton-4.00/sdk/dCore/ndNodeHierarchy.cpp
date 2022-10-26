@@ -12,6 +12,7 @@
 #include "ndCoreStdafx.h"
 #include "ndNodeHierarchy.h"
 
+#if 0
 ndNodeBaseHierarchy::ndNodeBaseHierarchy (const ndNodeBaseHierarchy &clone)
 {
 	Clear ();
@@ -137,10 +138,4 @@ ndNodeBaseHierarchy* ndNodeBaseHierarchy::Find (ndUnsigned64 nameCRC) const
 
 	return nullptr;
 }
-
-
-
-
-
-
-
+#endif

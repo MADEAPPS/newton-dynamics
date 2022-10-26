@@ -27,6 +27,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh()
 	,m_rootNode(nullptr)
+	,m_name(nullptr)
 	,m_lock()
 	,m_isVisible(true)
 {
@@ -46,6 +47,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh()
 	,m_rootNode(nullptr)
+	,m_name(nullptr)
 	,m_lock()
 	,m_isVisible(true)
 {
@@ -104,7 +106,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 			meshArray.PushBack(EntityMeshPair(entity, effectNode));
 		}
 
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)effectNode->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		for (ndMeshEffectNode* child = effectNode->GetLastChild(); child; child = child->GetPrev____())
 		{
 			effectNodeBuffer[stack] = child;
 			parentEntityBuffer[stack] = entity;
@@ -146,6 +148,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
 	,m_mesh(copyFrom.m_mesh)
 	,m_rootNode(nullptr)
+	,m_name(nullptr)
 	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
 {
@@ -153,6 +156,16 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 
 ndDemoEntity::~ndDemoEntity(void)
 {
+}
+
+const ndString& ndDemoEntity::GetName() const
+{
+	return m_name;
+}
+
+void ndDemoEntity::SetName(const ndString& name)
+{
+	m_name = name;
 }
 
 ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityManager* const scene)
@@ -167,7 +180,7 @@ ndDemoEntity* ndDemoEntity::LoadFbx(const char* const filename, ndDemoEntityMana
 	return rootEntity;
 }
 
-ndNodeBaseHierarchy* ndDemoEntity::CreateClone () const
+ndDemoEntity* ndDemoEntity::CreateClone () const
 {
 	return new ndDemoEntity(*this);
 }
@@ -398,6 +411,23 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 }
 
+ndDemoEntity* ndDemoEntity::Find(const char* const name) const
+{
+	ndString string(name);
+	for (ndDemoEntity* child = IteratorFirst(); child; child = child->IteratorNext())
+	{
+		//ndString tmpName(child->GetName());
+		//tmpName.ToLower();
+		//const char* const name = tmpName.GetStr();
+		//if (strstr(name, subString))
+		if (child->GetName() == string)
+		{
+			return child;
+		}
+	}
+	return nullptr;
+}
+
 ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
 {
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
@@ -411,7 +441,6 @@ ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
 		}
 	}
 	return nullptr;
-
 }
 
 ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)

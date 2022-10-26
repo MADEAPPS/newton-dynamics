@@ -65,7 +65,7 @@ class ndDemoDebrisEntity : public ndDemoEntity
 	ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderCache& shaderCache);
 	ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom);
 	virtual ~ndDemoDebrisEntity();
-	ndNodeBaseHierarchy* CreateClone() const;
+	ndDemoEntity* CreateClone() const;
 
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 

@@ -13,235 +13,240 @@
 #define __ND_NODE_HIERARCHY_H__
 
 #include "ndCoreStdafx.h"
-#include "ndCRC.h"
-#include "ndString.h"
 #include "ndContainersAlloc.h"
 
-class ndNodeBaseHierarchy: public ndClassAlloc
-{
-	public:
-	D_CORE_API ndNodeBaseHierarchy* GetChild () const;
-	D_CORE_API ndNodeBaseHierarchy* GetParent () const;
-	D_CORE_API ndNodeBaseHierarchy* GetSibling () const;
-
-	D_CORE_API void Detach ();
-	D_CORE_API void Attach(ndNodeBaseHierarchy* const parent);
-	
-	D_CORE_API ndNodeBaseHierarchy* GetRoot () const;
-	D_CORE_API ndNodeBaseHierarchy* GetFirst() const;
-	D_CORE_API ndNodeBaseHierarchy* GetLast() const;
-	D_CORE_API ndNodeBaseHierarchy* GetNext() const;
-	D_CORE_API ndNodeBaseHierarchy* GetPrev() const;
-
-	D_CORE_API ndNodeBaseHierarchy* Find (ndUnsigned64 nameCRC) const; 
-	D_CORE_API ndNodeBaseHierarchy* Find (const char* const name) const;
-
-	ndUnsigned64 GetNameID() const;
-	const ndString& GetName() const;
-	void SetName(const char* const name);
-	
-	protected:
-	D_CORE_API ndNodeBaseHierarchy ();
-	D_CORE_API ndNodeBaseHierarchy (const char* const name);
-	D_CORE_API ndNodeBaseHierarchy (const ndNodeBaseHierarchy &clone);
-	D_CORE_API virtual  ~ndNodeBaseHierarchy ();
-
-	D_CORE_API virtual  ndNodeBaseHierarchy* CreateClone () const = 0;
-
-	private:
-	inline void Clear();
-
-	ndString m_name;
-	ndUnsigned64 m_nameID;
-	ndNodeBaseHierarchy* m_parent;
-	ndNodeBaseHierarchy* m_child;
-	ndNodeBaseHierarchy* m_sibling;
-};
-
 template<class T>
-class ndNodeHierarchy: public ndNodeBaseHierarchy
+class ndNodeHierarchy: public ndContainersFreeListAlloc<T>
 {
 	public:
 	ndNodeHierarchy ();
-	ndNodeHierarchy (const char* const name);
-	void Attach(T* const parent);
+	ndNodeHierarchy<T>* CreateClone() const;
+	
+	void Attach(ndNodeHierarchy<T>* const parent);
 	void Detach ();
+
+	T* GetParent() const;
 	T* GetChild () const;
-	T* GetParent () const;
+	T* GetLastChild() const;
+
+	T* GetPrev____() const;
+	
 	T* GetSibling () const;
 	T* GetRoot () const;
 	T* GetFirst() const;
 	T* GetLast() const;
 	T* GetNext() const;
 	T* GetPrev() const;
-	T* Find (ndUnsigned64 nameCRC) const;
-	T* Find (const char* const name) const;
+
+	T* IteratorFirst() const;
+	T* IteratorNext() const;
 
 	protected:
-	ndNodeHierarchy (const T &clone);
+	ndNodeHierarchy (const ndNodeHierarchy<T>& clone);
 	virtual ~ndNodeHierarchy ();
+
+	ndNodeHierarchy<T>* m_next;
+	ndNodeHierarchy<T>* m_prev;
+	ndNodeHierarchy<T>* m_parent;
+	ndNodeHierarchy<T>* m_lastChild;
+	ndNodeHierarchy<T>* m_firstChild;
 };
 
 
-inline ndNodeBaseHierarchy::ndNodeBaseHierarchy ()
-{
-	Clear ();
-}
-
-inline ndNodeBaseHierarchy::ndNodeBaseHierarchy (const char* const name)
-{
-	Clear ();
-	SetName (name);
-}
-
-inline void ndNodeBaseHierarchy::Clear()
-{
-	m_child = nullptr;
-	m_parent = nullptr;
-	m_sibling = nullptr;
-	m_nameID = 0;
-	m_name = (char*)nullptr;
-}
-
-inline ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetChild () const
-{
-	return m_child;
-}
-
-inline ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetSibling () const
-{
-	return m_sibling;
-}
-
-inline ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetParent () const
-{
-	return m_parent;
-}
-
-
-inline ndNodeBaseHierarchy* ndNodeBaseHierarchy::Find (const char* const name) const
-{
-	return Find (dCRC64 (name)); 
-} 
-
-inline void ndNodeBaseHierarchy::SetName(const char* const name)
-{
-	m_name = name;
-	m_nameID = dCRC64 (name);
-}
-
-inline ndUnsigned64  ndNodeBaseHierarchy::GetNameID() const
-{
-	return m_nameID;
-}
-
-inline const ndString& ndNodeBaseHierarchy::GetName() const
-{
-	return m_name;
-}
-
 template<class T>
 ndNodeHierarchy<T>::ndNodeHierarchy ()
-	:ndNodeBaseHierarchy ()
+	:ndContainersFreeListAlloc<T>()
+	,m_next(nullptr)
+	,m_prev(nullptr)
+	,m_parent(nullptr)
+	,m_lastChild(nullptr)
+	,m_firstChild(nullptr)
 {
 }
 
 template<class T>
-ndNodeHierarchy<T>::ndNodeHierarchy (const T &clone)
-	:ndNodeBaseHierarchy (clone)
+ndNodeHierarchy<T>::ndNodeHierarchy (const ndNodeHierarchy<T>& clone)
+	:ndContainersFreeListAlloc<T>()
 {
-}
-
-template<class T>
-ndNodeHierarchy<T>::ndNodeHierarchy (const char* const name)
-	:ndNodeBaseHierarchy (name)
-{
+	ndAssert(0);
 }
 
 template<class T>
 ndNodeHierarchy<T>::~ndNodeHierarchy () 
 {
+	while (m_firstChild)
+	{
+		delete m_firstChild;
+	}
+	if (m_parent)
+	{
+		ndAssert(!m_prev);
+		if (m_next)
+		{
+			m_next->m_prev = nullptr;
+		}
+		m_parent->m_firstChild = m_next;
+		if (!m_next)
+		{
+			m_parent->m_lastChild = nullptr;
+		}
+	} 
+	else if (m_next)
+	{
+		m_next->m_prev = nullptr;
+	}
+	m_next = nullptr;
+	ndAssert(!m_prev);
+	ndAssert(!m_lastChild);
+	ndAssert(!m_firstChild);
 }
 
-//template<class T>
-//dNodeBaseHierarchy* ndNodeHierarchy<T>::CreateClone () const
-//{
-//	return new T (*(T*)this);
-//}
-
 template<class T>
-void ndNodeHierarchy<T>::Attach(T* const parent)
+ndNodeHierarchy<T>* ndNodeHierarchy<T>::CreateClone() const
 {
-	ndNodeBaseHierarchy::Attach(parent);
+	ndAssert(0);
+	return new ndNodeHierarchy<T>(*this);
 }
 
 template<class T>
-void ndNodeHierarchy<T>::Detach ()
+void ndNodeHierarchy<T>::Attach(ndNodeHierarchy<T>* const parent)
 {
-	ndNodeBaseHierarchy::Detach ();
+	ndAssert(!m_parent);
+	m_parent = parent;
+	
+	if (m_parent->m_firstChild)
+	{
+		ndAssert(!m_prev);
+		m_prev = m_parent->m_lastChild;
+		m_parent->m_lastChild->m_next = this;
+	}
+	else
+	{
+		m_parent->m_firstChild = this;
+	}
+	m_parent->m_lastChild = this;
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetChild () const
 {
-	return (T*) ndNodeBaseHierarchy::GetChild();
+	return (T*)m_firstChild;
+}
+
+template<class T>
+T* ndNodeHierarchy<T>::GetLastChild() const
+{
+	return (T*)m_lastChild;
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetSibling () const
 {
-	return (T*) ndNodeBaseHierarchy::GetSibling ();
+	return (T*) m_next;
+}
+
+template<class T>
+T* ndNodeHierarchy<T>::GetPrev____() const
+{
+	return (T*)m_prev;
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetParent () const
 {
-	return (T*) ndNodeBaseHierarchy::GetParent ();
+	return (T*) m_parent;
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetRoot () const
 {
-	return (T*) ndNodeBaseHierarchy::GetRoot ();
+	const ndNodeHierarchy<T>* root = this;
+	for (; root->m_parent; root = root->m_parent);
+	return (T*)root;
+}
+
+
+template<class T>
+T* ndNodeHierarchy<T>::IteratorFirst() const
+{
+	const ndNodeHierarchy<T>* ptr = this;
+	for (; ptr->m_firstChild; ptr = ptr->m_firstChild);
+	return (T*) ptr;
+}
+
+template<class T>
+T* ndNodeHierarchy<T>::IteratorNext() const
+{
+	if (m_next)
+	{
+		return m_next->IteratorFirst();
+	}
+
+	const ndNodeHierarchy<T>* x = this;
+	const ndNodeHierarchy<T>* ptr = m_parent;
+	for (; ptr && (x == ptr->m_next); ptr = ptr->m_parent)
+	{
+		x = ptr;
+	}
+	return (T*)ptr;
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetFirst() const
 {
-	return (T*) ndNodeBaseHierarchy::GetFirst ();
+	ndAssert(0);
+	if (m_parent)
+	{
+		return (T*)m_parent->m_firstChild;
+	}
+	else
+	{
+		const ndNodeHierarchy<T>* ptr = this;
+		for (; ptr->m_prev; ptr = ptr->m_prev);
+		return (T*)ptr;
+	}
+}
+
+
+// **************************************************
+template<class T>
+void ndNodeHierarchy<T>::Detach()
+{
+	ndAssert(0);
+	//NodeBaseHierarchy::Detach ();
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetLast() const
 {
-	return (T*) ndNodeBaseHierarchy::GetLast ();
+	ndAssert(0);
+	if (m_parent)
+	{
+		return (T*)m_parent->m_lastChild;
+	}
+	else
+	{
+		const ndNodeHierarchy<T>* ptr = this;
+		for (; ptr->m_next; ptr = ptr->m_next);
+		return (T*)ptr;
+	}
 }
-
 
 template<class T>
 T* ndNodeHierarchy<T>::GetNext() const
 {
-	return (T*) ndNodeBaseHierarchy::GetNext ();
+	ndAssert(0);
+	return nullptr;
+	//return (T*) ndNodeBaseHierarchy::GetNext ();
 }
 
 template<class T>
 T* ndNodeHierarchy<T>::GetPrev() const
 {
-	return (T*) ndNodeBaseHierarchy::GetPrev ();
+	ndAssert(0);
+	return nullptr;
+	//return (T*) ndNodeBaseHierarchy::GetPrev ();
 }
-
-
-template<class T>
-T* ndNodeHierarchy<T>::Find (ndUnsigned64 nameCRC) const 
-{
-	return (T*) ndNodeBaseHierarchy::Find (nameCRC);
-}
-
-template<class T>
-T* ndNodeHierarchy<T>::Find (const char* const name) const
-{
-	return (T*) ndNodeBaseHierarchy::Find (name);
-} 
 
 
 #endif

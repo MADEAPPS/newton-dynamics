@@ -37,10 +37,16 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 	D_COLLISION_API ndSharedPtr<ndMeshEffect> GetMesh();
 	D_COLLISION_API void SetMesh(const ndSharedPtr<ndMeshEffect>& mesh);
 
+	D_COLLISION_API const ndString& GetName() const;
+	D_COLLISION_API void SetName(const ndString& name);
+
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
+
 	protected:
+	ndString m_name;
 	ndSharedPtr<ndMeshEffect> m_mesh;
+	
 };
 
 #endif
