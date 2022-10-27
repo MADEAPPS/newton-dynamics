@@ -33,7 +33,12 @@ class ndListView : public ndList<T, ndContainersFreeListAlloc<T*>>
 	ndListView();
 	ndListView(const ndListView& src);
 
-	typename ndListView<T>::ndNode* AddItem(T const item);
+	#if (_MSC_VER == 1916) || (_MSC_VER == 1929)
+		// I hate to say this, but visual studio 2017 and 2019 are pieces of shit
+		ndNode* AddItem(T const item);
+	#else
+		typename ndListView<T>::ndNode* AddItem(T const item);
+	#endif
 	void RemoveItem(typename ndListView<T>::ndNode* const node);
 
 	bool UpdateView();
