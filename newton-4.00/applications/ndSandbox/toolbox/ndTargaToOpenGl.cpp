@@ -115,7 +115,6 @@ class ndTextureCache : public ndList<ndTextureEntry>
 
 static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
 {
-	// Get width, height, and depth of texture
 	GLint iWidth = width;
 	GLint iHeight = hight;
 
@@ -174,29 +173,30 @@ static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hi
 	return texture;
 }
 
+#pragma pack(1)
+struct TGAHEADER
+{
+	char identsize;					// Size of ID field that follows header (0)
+	char colorMapType;				// 0 = None, 1 = palette
+	char imageType;					// 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8=rle
+	unsigned short colorMapStart;	// First color map entry
+	unsigned short colorMapLength;	// Number of colors
+	unsigned char colorMapBits;		// bits per palette entry
+	unsigned short xstart;			// image x origin
+	unsigned short ystart;			// image y origin
+	unsigned short width;			// width in pixels
+	unsigned short height;			// height in pixels
+	char bits;						// bits per pixel (8 16, 24, 32)
+	char descriptor;				// image descriptor
+};
+#pragma pack(8)
+
+
 //	Loads the texture from the specified file and stores it in iTexture. Note
 //	that we're using the GLAUX library here, which is generally discouraged,
 //	but in this case spares us having to write a bitmap loading routine.
 GLuint LoadTexture(const char* const filename)
 {
-	#pragma pack(1)
-	struct TGAHEADER
-	{
-		char identsize;					// Size of ID field that follows header (0)
-		char colorMapType;				// 0 = None, 1 = palette
-		char imageType;					// 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8=rle
-		unsigned short colorMapStart;	// First color map entry
-		unsigned short colorMapLength;	// Number of colors
-		unsigned char colorMapBits;		// bits per palette entry
-		unsigned short xstart;			// image x origin
-		unsigned short ystart;			// image y origin
-		unsigned short width;			// width in pixels
-		unsigned short height;			// height in pixels
-		char bits;						// bits per pixel (8 16, 24, 32)
-		char descriptor;				// image descriptor
-	};
-	#pragma pack(8)
-
 	char fullPathName[2048];
 	dGetWorkingFileName (filename, fullPathName);
 	ndTextureCache& cache = ndTextureCache::GetChache();
@@ -213,8 +213,6 @@ GLuint LoadTexture(const char* const filename)
 			return 0;
 		}
 		
-		//ndAssert (sizeof (TGAHEADER) == 18);
-		// Read in header (binary) sizeof(TGAHEADER) = 18
 		TGAHEADER tgaHeader;		// TGA file header
 		size_t ret = fread(&tgaHeader, 18, 1, pFile);
 		ret = 0;
@@ -295,10 +293,109 @@ GLuint LoadTexture(const char* const filename)
 	return texture->m_textureID;
 } 
 
-#ifndef GL_BGR
-#define GL_BGR 0x80E0
-#define GL_BGRA 0x80E1
-#endif
+GLuint LoadCubeMapTexture(
+	const char* const filename_x0, const char* const filename_x1,
+	const char* const filename_y0, const char* const filename_y1,
+	const char* const filename_z0, const char* const filename_z1)
+{
+	const char* namesArray[6];
+	GLenum faceArray[6];
+
+	namesArray[0] = filename_x0;
+	namesArray[1] = filename_x1;
+	faceArray[0] = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+	faceArray[1] = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+
+	namesArray[2] = filename_y0;
+	namesArray[3] = filename_y1;
+	faceArray[2] = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+	faceArray[3] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+
+	namesArray[4] = filename_z0;
+	namesArray[5] = filename_z1;
+	faceArray[4] = GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+	faceArray[5] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+
+	GLuint texturecubemap;
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &texturecubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texturecubemap);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	ndTextureCache& cache = ndTextureCache::GetChache();
+	for (ndInt32 i = 0; i < 6; ++i)
+	{
+		char fullPathName[2048];
+		dGetWorkingFileName(namesArray[i], fullPathName);
+		ndAssert(!cache.Find(namesArray[i]));
+
+		FILE* const pFile = fopen(fullPathName, "rb");
+		if (pFile == nullptr)
+		{
+			ndAssert(0);
+			return 0;
+		}
+
+		TGAHEADER tgaHeader;
+		size_t ret = fread(&tgaHeader, 18, 1, pFile);
+		ret = 0;
+
+		// Do byte swap for big vs little endian
+		tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
+		tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
+		tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
+		tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
+		tgaHeader.width = SWAP_INT16(tgaHeader.width);
+		tgaHeader.height = SWAP_INT16(tgaHeader.height);
+
+		// Get width, height, and depth of texture
+		ndInt32 width = tgaHeader.width;
+		ndInt32 height = tgaHeader.height;
+		short sDepth = tgaHeader.bits / 8;
+
+		if (tgaHeader.bits != 32)
+		{
+			ndAssert(0);
+			fclose(pFile);
+			return 0;
+		}
+
+		// Calculate size of image buffer
+		ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
+
+		// Allocate memory and check for success
+		char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
+		if (pBits == nullptr)
+		{
+			fclose(pFile);
+			return 0;
+		}
+
+		// Read in the bits
+		// Check for read error. This should catch RLE or other 
+		// weird formats that I don't want to recognize
+		ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
+		if (readret != 1)
+		{
+			ndAssert(0);
+			fclose(pFile);
+			delete[] pBits;
+			return 0;
+		}
+
+		glTexImage2D(faceArray[i], 0, 4, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
+
+		fclose(pFile);
+		ndMemory::Free(pBits);
+	}
+
+	ndTextureEntry* const texture = cache.InsertText(namesArray[0], texturecubemap);
+	return texture->m_textureID;
+}
 
 void ReleaseTexture (GLuint texture)
 {

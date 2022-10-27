@@ -31,10 +31,6 @@ class ndSkyBox: public ndDemoEntity
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	private:
-	void SetupCubeMap();
-
-	void LoadCubeTexture(GLenum face, const char* const filename);
-
 	glMatrix m_textureMatrix;
 	GLuint m_shader;
 	GLuint m_indexBuffer;

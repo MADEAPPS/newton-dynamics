@@ -9,13 +9,10 @@
 * freely
 */
 
-
-
 #ifndef __TARGA_TO_OPENGL__ 
 #define __TARGA_TO_OPENGL__ 
 
 #include "ndSandboxStdafx.h"
-
 
 enum TextureImageFormat
 {
@@ -27,6 +24,11 @@ enum TextureImageFormat
 void TextureCacheCleanUp();
 GLuint GetDefaultTexture();
 GLuint LoadTexture(const char* const filename);
+
+GLuint LoadCubeMapTexture(
+	const char* const filename_x0, const char* const filename_x1,
+	const char* const filename_y0, const char* const filename_y1,
+	const char* const filename_z0, const char* const filename_z1);
 
 GLuint AddTextureRef (GLuint texture);
 void ReleaseTexture (GLuint texture);
