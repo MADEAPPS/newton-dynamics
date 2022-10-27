@@ -188,10 +188,6 @@ public class SceneMeshPrimitive extends SceneMesh
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, segment.m_texture.m_id);
             GLES30.glDrawElements(GLES30.GL_TRIANGLES, segment.m_indexCount, GLES30.GL_UNSIGNED_SHORT, 2 * segment.m_indexOffset);
         }
-
-        //GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
-        //GLES30.glBindVertexArray(0);
-        //GLES30.glUseProgram(0);
     }
 
     private int m_textureLocation = -1;

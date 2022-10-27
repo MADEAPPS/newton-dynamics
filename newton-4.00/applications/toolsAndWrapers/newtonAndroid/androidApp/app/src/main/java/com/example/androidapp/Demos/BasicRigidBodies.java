@@ -16,6 +16,7 @@ import com.example.androidapp.RenderScene;
 import com.example.androidapp.SceneCamera;
 import com.example.androidapp.SceneMeshPrimitive;
 import com.example.androidapp.SceneObject;
+import com.example.androidapp.SceneObjectSkyBox;
 import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
 import com.javaNewton.nRigidBody;
@@ -31,6 +32,7 @@ public class BasicRigidBodies extends DemoBase
     {
         super();
 
+        renderer.AddSceneObject(new SceneObjectSkyBox(renderer));
         AddFloor(renderer);
         AddBox(renderer);
 

@@ -48,6 +48,18 @@ public class SceneMeshTextureCache
         return texture;
     }
 
+    public SceneMeshTexture GetCubeTexture (
+            String name_x0, String name_x1,
+            String name_y0, String name_y1,
+            String name_z0, String name_z1)
+    {
+        SceneMeshTexture texture = new SceneMeshTexture(m_assetManager,
+                name_x0, name_x1,
+                name_y0, name_y1,
+                name_z0, name_z1);
+        return texture;
+    }
+
     AssetManager m_assetManager;
     private HashMap<Integer, SceneMeshTexture> m_textureMap = new HashMap<>();
 }

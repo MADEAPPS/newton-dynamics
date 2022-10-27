@@ -12,7 +12,7 @@
 package com.example.androidapp;
 
 import android.util.Log;
-
+import android.opengl.GLES30;
 import com.javaNewton.nMatrix;
 
 import java.util.ArrayList;
@@ -29,6 +29,29 @@ public class SceneMesh
         m_vertexBuffer = 0;
         m_vertextArrayBuffer = 0;
         m_segments = new ArrayList<SceneMeshSegment>();
+    }
+
+    public void finalize()
+    {
+        int[] buffer = new int[1];
+        if (m_indexBuffer != 0)
+        {
+            buffer[0] = m_indexBuffer;
+            GLES30.glDeleteBuffers(1, buffer, 0);
+        }
+
+        if (m_vertexBuffer != 0)
+        {
+            buffer[0] = m_vertexBuffer;
+            GLES30.glDeleteBuffers(1, buffer, 0);
+        }
+
+        if (m_vertextArrayBuffer != 0)
+        {
+            buffer[0] = m_vertextArrayBuffer;
+            GLES30.glDeleteVertexArrays(1, buffer, 0);
+        }
+        m_segments.clear();
     }
 
     void AddSegment(SceneMeshSegment segment)

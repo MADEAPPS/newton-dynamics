@@ -32,6 +32,14 @@ public class SceneMeshTexture
         ParseTargaImage(image);
     }
 
+    public SceneMeshTexture(AssetManager assetManager,
+        String name_x0, String name_x1,
+        String name_y0, String name_y1,
+        String name_z0, String name_z1)
+    {
+
+    }
+
     public void Clear()
     {
         int[] textureId = new int[1];
