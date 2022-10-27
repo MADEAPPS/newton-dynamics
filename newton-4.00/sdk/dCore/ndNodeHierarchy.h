@@ -113,10 +113,10 @@ T* ndNodeHierarchy<T>::CreateClone() const
 template<class T>
 void ndNodeHierarchy<T>::Attach(ndNodeHierarchy<T>* const parent)
 {
-	ndAssert(!parent);
+	ndAssert(parent);
 	ndAssert(!m_parent);
+
 	m_parent = parent;
-	
 	if (m_parent->m_firstChild)
 	{
 		ndAssert(!m_prev);
