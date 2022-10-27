@@ -20,7 +20,7 @@ class ndNodeHierarchy: public ndContainersFreeListAlloc<T>
 {
 	public:
 	ndNodeHierarchy ();
-	virtual ndNodeHierarchy<T>* CreateClone() const;
+	virtual T* CreateClone() const;
 	
 	void Attach(ndNodeHierarchy<T>* const parent);
 	void Detach ();
@@ -73,10 +73,9 @@ ndNodeHierarchy<T>::ndNodeHierarchy (const ndNodeHierarchy<T>& clone)
 	,m_lastChild(nullptr)
 	,m_firstChild(nullptr)
 {
-	ndAssert(0);
 	for (ndNodeHierarchy<T>* obj = clone.m_firstChild; obj; obj = obj->m_next)
 	{
-		ndNodeHierarchy<T>* const child = obj->CreateClone();
+		T* const child = obj->CreateClone();
 		child->Attach(this);
 	}
 }
@@ -112,10 +111,10 @@ ndNodeHierarchy<T>::~ndNodeHierarchy ()
 }
 
 template<class T>
-ndNodeHierarchy<T>* ndNodeHierarchy<T>::CreateClone() const
+T* ndNodeHierarchy<T>::CreateClone() const
 {
 	ndAssert(0);
-	return new ndNodeHierarchy<T>(*this);
+	return (T*) new ndNodeHierarchy<T>(*this);
 }
 
 template<class T>

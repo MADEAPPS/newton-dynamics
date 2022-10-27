@@ -148,7 +148,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
 	,m_mesh(copyFrom.m_mesh)
 	,m_rootNode(nullptr)
-	,m_name(nullptr)
+	,m_name(copyFrom.m_name)
 	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
 {
