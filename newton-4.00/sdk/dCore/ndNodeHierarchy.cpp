@@ -10,7 +10,6 @@
 */
 
 #include "ndCoreStdafx.h"
-#include "ndNodeHierarchy.h"
 
 #if 0
 ndNodeBaseHierarchy::ndNodeBaseHierarchy (const ndNodeBaseHierarchy &clone)
