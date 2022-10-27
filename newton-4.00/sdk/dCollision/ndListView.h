@@ -27,43 +27,43 @@
 class ndBodyKinematic;
 
 template<class T>
-class ndListView : public ndList<T*, ndContainersFreeListAlloc<T*>>
+class ndListView : public ndList<T, ndContainersFreeListAlloc<T*>>
 {
 	public:
 	ndListView();
 	ndListView(const ndListView& src);
 
-	typename ndListView<T>::ndNode* AddItem(T* const item);
+	typename ndListView<T>::ndNode* AddItem(T const item);
 	void RemoveItem(typename ndListView<T>::ndNode* const node);
 
 	bool UpdateView();
 	bool IsListDirty() const;
 
-	ndArray<T*>& GetView();
-	const ndArray<T*>& GetView() const;
+	ndArray<T>& GetView();
+	const ndArray<T>& GetView() const;
 
 	protected:
-	ndArray<T*> m_view;
+	ndArray<T> m_view;
 	ndUnsigned8 m_listIsDirty;
 };
 
-class ndBodyList: public ndListView<ndBodyKinematic>
+class ndBodyList: public ndListView<ndBodyKinematic*>
 {
 	public:
 	ndBodyList()
-		:ndListView<ndBodyKinematic>()
+		:ndListView<ndBodyKinematic*>()
 	{
 	}
 
 	ndBodyList(const ndBodyList& src)
-		:ndListView<ndBodyKinematic>(src)
+		:ndListView<ndBodyKinematic*>(src)
 	{
 	}
 };
 
 template<class T>
 ndListView<T>::ndListView()
-	:ndList<T*, ndContainersFreeListAlloc<T*>>()
+	:ndList<T, ndContainersFreeListAlloc<T*>>()
 	,m_view(1024)
 	,m_listIsDirty(1)
 {
@@ -71,7 +71,7 @@ ndListView<T>::ndListView()
 
 template<class T>
 ndListView<T>::ndListView(const ndListView& src)
-	:ndList<T*, ndContainersFreeListAlloc<T*>>()
+	:ndList<T, ndContainersFreeListAlloc<T*>>()
 	,m_view()
 	,m_listIsDirty(1)
 {
@@ -87,19 +87,19 @@ ndListView<T>::ndListView(const ndListView& src)
 }
 
 template<class T>
-ndArray<T*>& ndListView<T>::GetView()
+ndArray<T>& ndListView<T>::GetView()
 {
 	return m_view;
 }
 
 template<class T>
-const ndArray<T*>& ndListView<T>::GetView() const
+const ndArray<T>& ndListView<T>::GetView() const
 {
 	return m_view;
 }
 
 template<class T>
-typename ndListView<T>::ndNode* ndListView<T>::AddItem(T* const item)
+typename ndListView<T>::ndNode* ndListView<T>::AddItem(T const item)
 {
 	m_listIsDirty = 1;
 	return ndListView<T>::Append(item);
