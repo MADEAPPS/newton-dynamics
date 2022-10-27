@@ -414,15 +414,24 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 ndDemoEntity* ndDemoEntity::Find(const char* const name) const
 {
 	ndString string(name);
-	for (ndDemoEntity* child = IteratorFirst(); child; child = child->IteratorNext())
+
+	ndInt32 stack = 1;
+	const ndDemoEntity* pool[1024 * 4];
+	pool[0] = this;
+	while (stack)
 	{
-		//ndString tmpName(child->GetName());
-		//tmpName.ToLower();
-		//const char* const name = tmpName.GetStr();
-		//if (strstr(name, subString))
-		if (child->GetName() == string)
+		stack--;
+		const ndDemoEntity* const entity = pool[stack];
+		if (entity->GetName() == string)
 		{
-			return child;
+			return (ndDemoEntity*) entity;
+		}
+
+		for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
+		{
+			pool[stack] = child;
+			stack++;
+			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
 		}
 	}
 	return nullptr;
@@ -430,16 +439,41 @@ ndDemoEntity* ndDemoEntity::Find(const char* const name) const
 
 ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
 {
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//{
+	//	ndString tmpName(child->GetName());
+	//	tmpName.ToLower();
+	//	const char* const name = tmpName.GetStr();
+	//	if (strstr(name, subString))
+	//	{
+	//		return child;
+	//	}
+	//}
+	
+	ndInt32 stack = 1;
+	const ndDemoEntity* pool[1024 * 4];
+	pool[0] = this;
+	while (stack)
 	{
-		ndString tmpName(child->GetName());
+		stack--;
+		const ndDemoEntity* const entity = pool[stack];
+		ndString tmpName(entity->GetName());
 		tmpName.ToLower();
 		const char* const name = tmpName.GetStr();
 		if (strstr(name, subString))
 		{
-			return child;
+			return (ndDemoEntity*)entity;
+		}
+
+		for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
+		{
+			pool[stack] = child;
+			stack++;
+			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
 		}
 	}
+
+	
 	return nullptr;
 }
 

@@ -46,7 +46,6 @@ class ndMeshEffectNode : public ndNodeHierarchy<ndMeshEffectNode>
 	protected:
 	ndString m_name;
 	ndSharedPtr<ndMeshEffect> m_mesh;
-	
 };
 
 #endif

@@ -60,7 +60,6 @@ void ndMeshEffectNode::SetName(const ndString& name)
 	m_name = name;
 }
 
-
 ndMeshEffectNode* ndMeshEffectNode::CreateClone() const
 {
 	return new ndMeshEffectNode(*this);

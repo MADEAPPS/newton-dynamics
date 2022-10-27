@@ -17,12 +17,13 @@ public class SceneObject
 {
     public SceneObject ()
     {
-        m_mesh = null;
         m_next = null;
         m_prev = null;
         m_parent = null;
+        m_lastChild = null;
         m_firstChild = null;
 
+        m_mesh = null;
         m_matrix = new nMatrix();
         m_meshMatrix = new nMatrix();
     }
@@ -30,14 +31,16 @@ public class SceneObject
     public void AttachToParent(SceneObject parent)
     {
         m_parent = parent;
-        m_next = parent.m_firstChild;
         if (parent.m_firstChild != null)
         {
-            parent.m_firstChild.m_prev = this;
+            m_prev = m_parent.m_lastChild;
+            m_parent.m_lastChild.m_next = this;
         }
-        m_prev = null;
-        m_firstChild = null;
-        parent.m_firstChild = this;
+        else
+        {
+            m_parent.m_firstChild = this;
+        }
+        m_parent.m_lastChild = this;
     }
 
     public nMatrix GetMatrix ()
@@ -92,6 +95,6 @@ public class SceneObject
     private SceneObject m_next;
     private SceneObject m_prev;
     private SceneObject m_parent;
+    private SceneObject m_lastChild;
     private SceneObject m_firstChild;
-
 }

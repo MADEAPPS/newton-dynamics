@@ -229,8 +229,6 @@ void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatri
 	ndMatrix skyMatrix(ndGetIdentityMatrix());
 	ndMatrix viewMatrix(camera->GetViewMatrix());
 	skyMatrix.m_posit = viewMatrix.UntransformVector(ndVector(0.0f, 0.25f, 0.0f, 1.0f));
-
-	//ndMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
 	const glMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);
