@@ -123,7 +123,7 @@ namespace ndRagdoll
 			ndWorld* const world = scene->GetWorld();
 
 			// make a clone of the mesh and add it to the scene
-			ndDemoEntity* const entity = (ndDemoEntity*)ragdollMesh->CreateClone();
+			ndDemoEntity* const entity = ragdollMesh->CreateClone();
 			scene->AddEntity(entity);
 
 			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
@@ -147,7 +147,7 @@ namespace ndRagdoll
 			parentBones.SetCount(32);
 			childEntities.SetCount(32);
 
-			for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
+			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 			{
 				childEntities[stack] = child;
 				parentBones[stack] = rootBody;
@@ -182,7 +182,7 @@ namespace ndRagdoll
 					}
 				}
 
-				for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
 				{
 					childEntities[stack] = child;
 					parentBones[stack] = parentBone;

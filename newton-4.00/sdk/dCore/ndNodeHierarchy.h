@@ -26,17 +26,12 @@ class ndNodeHierarchy: public ndContainersFreeListAlloc<T>
 	void Detach ();
 
 	T* GetParent() const;
-	T* GetChild () const;
 	T* GetLastChild() const;
+	T* GetFirstChild() const;
 
-	T* GetPrev____() const;
-	
-	T* GetSibling () const;
-	T* GetRoot () const;
-	T* GetFirst() const;
-	T* GetLast() const;
-	T* GetNext() const;
 	T* GetPrev() const;
+	T* GetNext () const;
+	T* GetRoot () const;
 
 	T* IteratorFirst() const;
 	T* IteratorNext() const;
@@ -51,7 +46,6 @@ class ndNodeHierarchy: public ndContainersFreeListAlloc<T>
 	ndNodeHierarchy<T>* m_lastChild;
 	ndNodeHierarchy<T>* m_firstChild;
 };
-
 
 template<class T>
 ndNodeHierarchy<T>::ndNodeHierarchy ()
@@ -113,7 +107,6 @@ ndNodeHierarchy<T>::~ndNodeHierarchy ()
 template<class T>
 T* ndNodeHierarchy<T>::CreateClone() const
 {
-	ndAssert(0);
 	return (T*) new ndNodeHierarchy<T>(*this);
 }
 
@@ -137,7 +130,14 @@ void ndNodeHierarchy<T>::Attach(ndNodeHierarchy<T>* const parent)
 }
 
 template<class T>
-T* ndNodeHierarchy<T>::GetChild () const
+void ndNodeHierarchy<T>::Detach()
+{
+	ndAssert(0);
+	//NodeBaseHierarchy::Detach ();
+}
+
+template<class T>
+T* ndNodeHierarchy<T>::GetFirstChild () const
 {
 	return (T*)m_firstChild;
 }
@@ -149,13 +149,13 @@ T* ndNodeHierarchy<T>::GetLastChild() const
 }
 
 template<class T>
-T* ndNodeHierarchy<T>::GetSibling () const
+T* ndNodeHierarchy<T>::GetNext() const
 {
-	return (T*) m_next;
+	return (T*)m_next;
 }
 
 template<class T>
-T* ndNodeHierarchy<T>::GetPrev____() const
+T* ndNodeHierarchy<T>::GetPrev() const
 {
 	return (T*)m_prev;
 }
@@ -172,38 +172,6 @@ T* ndNodeHierarchy<T>::GetRoot () const
 	const ndNodeHierarchy<T>* root = this;
 	for (; root->m_parent; root = root->m_parent);
 	return (T*)root;
-}
-
-template<class T>
-T* ndNodeHierarchy<T>::GetFirst() const
-{
-	ndAssert(0);
-	if (m_parent)
-	{
-		return (T*)m_parent->m_firstChild;
-	}
-	else
-	{
-		const ndNodeHierarchy<T>* ptr = this;
-		for (; ptr->m_prev; ptr = ptr->m_prev);
-		return (T*)ptr;
-	}
-}
-
-template<class T>
-T* ndNodeHierarchy<T>::GetLast() const
-{
-	ndAssert(0);
-	if (m_parent)
-	{
-		return (T*)m_parent->m_lastChild;
-	}
-	else
-	{
-		const ndNodeHierarchy<T>* ptr = this;
-		for (; ptr->m_next; ptr = ptr->m_next);
-		return (T*)ptr;
-	}
 }
 
 template<class T>
@@ -230,31 +198,6 @@ T* ndNodeHierarchy<T>::IteratorNext() const
 	}
 	return (T*)ptr;
 }
-
-// **************************************************
-template<class T>
-void ndNodeHierarchy<T>::Detach()
-{
-	ndAssert(0);
-	//NodeBaseHierarchy::Detach ();
-}
-
-template<class T>
-T* ndNodeHierarchy<T>::GetNext() const
-{
-	ndAssert(0);
-	return nullptr;
-	//return (T*) ndNodeBaseHierarchy::GetNext ();
-}
-
-template<class T>
-T* ndNodeHierarchy<T>::GetPrev() const
-{
-	ndAssert(0);
-	return nullptr;
-	//return (T*) ndNodeBaseHierarchy::GetPrev ();
-}
-
 
 #endif
 

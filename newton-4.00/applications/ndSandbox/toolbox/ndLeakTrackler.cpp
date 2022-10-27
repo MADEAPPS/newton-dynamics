@@ -51,7 +51,7 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 	{
 		ndScopeSpinLock lock (m_lock);
 		Insert(m_allocIndex, ptr);
-		//ndAssert(m_allocIndex != 208);
+		//ndAssert(m_allocIndex != 2717);
 		m_allocIndex++;
 	}
 
@@ -59,6 +59,7 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 	{
 		ndScopeSpinLock lock(m_lock);
 		ndAssert(Find(ptr));
+		//ndAssert(Find(ptr)->GetInfo() != 2717);
 		Remove(ptr);
 	}
 

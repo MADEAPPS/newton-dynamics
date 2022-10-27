@@ -149,7 +149,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);
-	ndDemoDebrisEntity* debriEnt = (ndDemoDebrisEntity*)m_debrisRootEnt->GetChild();
+	ndDemoDebrisEntity* debriEnt = (ndDemoDebrisEntity*)m_debrisRootEnt->GetFirstChild();
 	for (ndNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		const ndAtom& srcAtom = node->GetInfo();
@@ -157,7 +157,7 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
 		newAtom.m_debriEnt = debriEnt;
 		ndAssert(*newAtom.m_debriEnt->GetMesh() == *srcAtom.m_debriEnt->GetMesh());
 
-		debriEnt = (ndDemoDebrisEntity*)debriEnt->GetSibling();
+		debriEnt = (ndDemoDebrisEntity*)debriEnt->GetNext();
 	}
 }
 

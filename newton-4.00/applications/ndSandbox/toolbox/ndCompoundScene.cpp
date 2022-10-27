@@ -136,7 +136,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 			}
 		}
 	
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetFirstChild(); child; child = (ndMeshEffectNode*)child->GetNext())
 		{
 			entBuffer[stack] = child;
 			matrixBuffer[stack] = matrix;

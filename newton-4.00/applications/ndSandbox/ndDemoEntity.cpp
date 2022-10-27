@@ -106,7 +106,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 			meshArray.PushBack(EntityMeshPair(entity, effectNode));
 		}
 
-		for (ndMeshEffectNode* child = effectNode->GetLastChild(); child; child = child->GetPrev____())
+		for (ndMeshEffectNode* child = effectNode->GetLastChild(); child; child = child->GetPrev())
 		{
 			effectNodeBuffer[stack] = child;
 			parentEntityBuffer[stack] = entity;
@@ -286,7 +286,7 @@ void ndDemoEntity::InterpolateMatrix(ndFloat32 param)
 		m_matrix = ndMatrix(rotation, posit);
 	}
 
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext()) 
 	{
 		child->InterpolateMatrix(param);
 	}
@@ -387,7 +387,7 @@ void ndDemoEntity::RenderSkeleton(ndDemoEntityManager* const scene, const ndMatr
 {
 	ndMatrix nodeMatrix(m_matrix * matrix);
 	RenderBone(scene, nodeMatrix);
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		child->RenderSkeleton(scene, nodeMatrix);
 	}
@@ -405,7 +405,7 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 
 	//RenderBone(scene, nodeMatrix);
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext()) 
 	{
 		child->Render(timestep, scene, nodeMatrix);
 	}
@@ -430,7 +430,7 @@ ndDemoEntity* ndDemoEntity::Find(const char* const name) const
 
 ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
 {
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		ndString tmpName(child->GetName());
 		tmpName.ToLower();
@@ -503,7 +503,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	ndArray<ndVector> points;
 	
 	shapeArray.PushBack(nullptr);
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		ndString tmpName(child->GetName());
 		tmpName.ToLower();

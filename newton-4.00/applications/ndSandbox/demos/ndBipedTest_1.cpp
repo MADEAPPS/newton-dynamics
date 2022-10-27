@@ -189,7 +189,7 @@ namespace biped_1
 			ndWorld* const world = scene->GetWorld();
 
 			// make a clone of the mesh and add it to the scene
-			ndDemoEntity* const entity = (ndDemoEntity*)model->CreateClone();
+			ndDemoEntity* const entity = model->CreateClone();
 			scene->AddEntity(entity);
 
 			// find the floor location 
@@ -213,7 +213,7 @@ namespace biped_1
 			parentBones.SetCount(32);
 			childEntities.SetCount(32);
 
-			for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
+			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 			{
 				childEntities[stack] = child;
 				parentBones[stack] = rootBody;
@@ -304,7 +304,7 @@ namespace biped_1
 					}
 				}
 
-				for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
 				{
 					childEntities[stack] = child;
 					parentBones[stack] = parentBody;

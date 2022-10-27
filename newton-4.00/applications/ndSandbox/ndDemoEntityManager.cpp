@@ -483,15 +483,15 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 		delete m_debugShapeCache;
 	}
 
+	if (m_cameraManager)
+	{
+		delete m_cameraManager;
+	}
+
 	// destroy the empty world
 	if (m_world) 
 	{
 		delete m_world;
-	}
-
-	if (m_cameraManager) 
-	{
-		delete m_cameraManager;
 	}
 
 	// Cleanup

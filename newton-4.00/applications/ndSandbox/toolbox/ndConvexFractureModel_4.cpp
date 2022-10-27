@@ -191,7 +191,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 	ndAssert(0);
 	m_body->SetCollisionShape(*effect.m_shape);
 
-	ndDemoDebrisEntity* mesh = (ndDemoDebrisEntity*) m_debrisRootEnt->GetChild();
+	ndDemoDebrisEntity* mesh = (ndDemoDebrisEntity*) m_debrisRootEnt->GetFirstChild();
 	for (ndNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		const ndAtom& srcAtom = node->GetInfo();
@@ -199,7 +199,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 		newAtom.m_mesh = mesh;
 		ndAssert(newAtom.m_mesh == srcAtom.m_mesh);
 
-		mesh = (ndDemoDebrisEntity*)mesh->GetSibling();
+		mesh = (ndDemoDebrisEntity*)mesh->GetNext();
 	}
 }
 

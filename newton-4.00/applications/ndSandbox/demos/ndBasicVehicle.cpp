@@ -628,7 +628,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 			const ndFloat32 rearAxleAngle = ndAtan2(-rearStep.m_y, rearStep.m_z);
 			const ndQuaternion rearAxelRotation(ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)), rearAxleAngle);
-			m_rearAxlePivot->GetChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
+			m_rearAxlePivot->GetFirstChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
 
 			const ndMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
 			const ndMatrix frontLeftTireMatrix(m_fl_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
@@ -638,7 +638,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 			const ndFloat32 frontAxleAngle = ndAtan2(-frontStep.m_y, frontStep.m_z);
 			const ndQuaternion frontAxelRotation(ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)), frontAxleAngle);
-			m_frontAxlePivot->GetChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
+			m_frontAxlePivot->GetFirstChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
 		}
 	}
 

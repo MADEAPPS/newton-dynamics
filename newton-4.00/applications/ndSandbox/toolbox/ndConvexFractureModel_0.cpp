@@ -330,12 +330,12 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 	ndShapeInstance::ndDistanceCalculator distanceCalculator(scene->GetWorld()->GetScene());
 	distanceCalculator.m_matrix0 = ndGetIdentityMatrix();
 	distanceCalculator.m_matrix1 = ndGetIdentityMatrix();
-	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetSibling())
+	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetFirstChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetNext())
 	{
 		ndFaceArrayDatabase checkConectivitity;
 		distanceCalculator.m_shape0 = ent0->m_collision;
 		distanceCalculator.m_shape0->DebugShape(distanceCalculator.m_matrix0, checkConectivitity);
-		for (ndConvexFractureEntity* ent1 = (ndConvexFractureEntity*)ent0->GetSibling(); ent1; ent1 = (ndConvexFractureEntity*)ent1->GetSibling())
+		for (ndConvexFractureEntity* ent1 = (ndConvexFractureEntity*)ent0->GetNext(); ent1; ent1 = (ndConvexFractureEntity*)ent1->GetNext())
 		{
 			distanceCalculator.m_shape1 = ent1->m_collision;
 			if (distanceCalculator.ClosestPoint())
@@ -366,7 +366,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	ndWorld* const world = scene->GetWorld();
 
 	ndInt32 bodyCount = 0;
-	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
+	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetFirstChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetNext())
 	{
 		bodyCount = ndMax(bodyCount, debrisEnt->m_enumerator + 1);
 		ndAssert(debrisEnt->m_drebriBody);
@@ -394,7 +394,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	//material.m_dynamicFriction1 = frictionValue;
 
 
-	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
+	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetFirstChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetNext())
 	{
 
 bool test = debrisEnt->m_enumerator == 0;

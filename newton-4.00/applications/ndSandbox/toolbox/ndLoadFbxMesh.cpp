@@ -436,7 +436,8 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 		ndFloat32 deltaTimeAcc = ndFloat32 (0.0f);
 		for (ndInt32 i = 0; i < m_framesCount; ++i)
 		{
-			for (ndMeshEffectNode* node = (ndMeshEffectNode*)entity->GetFirst(); node; node = (ndMeshEffectNode*)node->GetNext())
+			//for (ndMeshEffectNode* node = (ndMeshEffectNode*)entity->GetFirst(); node; node = (ndMeshEffectNode*)node->GetNext())
+			for (ndMeshEffectNode* node = entity->GetFirstChild(); node; node = node->GetNext())
 			{
 				const dFbxAnimation::ndNode* const aniNode = source.Find(node->GetName());
 				if (aniNode)
@@ -478,7 +479,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 					track.AddKeyframe(deltaTimeAcc, matrix);
 				}
 
-				for (ndMeshEffectNode* node = (ndMeshEffectNode*)rootNode->GetChild(); node; node = (ndMeshEffectNode*)node->GetSibling())
+				for (ndMeshEffectNode* node = rootNode->GetFirstChild(); node; node = node->GetNext())
 				{
 					stackPool[stack] = node;
 					parentMatrixStack[stack] = newParentMatrix;
@@ -944,7 +945,7 @@ static void FreezeScale(ndMeshEffectNode* const entity)
 			mesh->ApplyTransform(meshMatrix);
 		}
 
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			parentMatrix[stack] = scaleMatrix;
@@ -975,7 +976,7 @@ static void ApplyTransform(ndMeshEffectNode* const entity, const ndMatrix& trans
 			mesh->ApplyTransform(transform);
 		}
 
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			stack++;

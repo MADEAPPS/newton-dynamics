@@ -77,7 +77,7 @@ namespace ndSimpleRobot
 			,m_roll(0.0f)
 		{
 			// make a clone of the mesh and add it to the scene
-			ndDemoEntity* const rootEntity = (ndDemoEntity*)robotMesh->CreateClone();
+			ndDemoEntity* const rootEntity = robotMesh->CreateClone();
 			scene->AddEntity(rootEntity);
 			ndWorld* const world = scene->GetWorld();
 
@@ -97,7 +97,7 @@ namespace ndSimpleRobot
 			ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
 
 			ndInt32 stack = 0;
-			for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
+			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 			{
 				childEntities[stack] = child;
 				parentBone[stack] = m_rootBody;
@@ -174,7 +174,7 @@ namespace ndSimpleRobot
 					}
 				}
 
-				for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
 				{
 					childEntities[stack] = child;
 					parentBone[stack] = parentBody;

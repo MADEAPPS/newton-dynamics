@@ -107,7 +107,8 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 
 		ndInt32 stack = 0;
 		ndCharacterNode* nodePool[32];
-		for (ndCharacterNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		ndAssert(0);
+		for (ndCharacterNode* child = m_rootNode->GetFirstChild(); child; child = child->GetNext())
 		{
 			nodePool[stack] = child;
 			stack++;
@@ -127,7 +128,7 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 				world->AddJoint(node->GetJoint());
 			}
 
-			for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
+			for (ndCharacterNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
 				nodePool[stack] = child;
 				stack++;
@@ -168,7 +169,7 @@ void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 
 		ndInt32 stack = 0;
 		ndCharacterNode* nodePool[32];
-		for (ndCharacterNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		for (ndCharacterNode* child = m_rootNode->GetFirstChild(); child; child = child->GetNext())
 		{
 			nodePool[stack] = child;
 			stack++;
@@ -188,7 +189,7 @@ void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 				world->RemoveJoint(node->GetJoint());
 			}
 
-			for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
+			for (ndCharacterNode* child = node->GetFirstChild(); child; child = child->GetNext())
 			{
 				nodePool[stack] = child;
 				stack++;

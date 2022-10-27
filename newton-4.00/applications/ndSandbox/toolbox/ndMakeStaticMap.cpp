@@ -245,7 +245,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 			}
 		}
 	
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			matrixBuffer[stack] = matrix;
@@ -323,7 +323,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 			}
 		}
 
-		for (ndMeshEffectNode* child = (ndMeshEffectNode*)ent->GetChild(); child; child = (ndMeshEffectNode*)child->GetSibling())
+		for (ndMeshEffectNode* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
 			matrixBuffer[stack] = matrix;

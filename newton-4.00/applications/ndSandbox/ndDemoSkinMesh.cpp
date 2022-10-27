@@ -71,7 +71,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 			boneClusterRemapIndex.Insert(entityArray.GetCount() - 1, entity->GetName());
 		}
 	
-		for (ndDemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) 
+		for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
 		{
 			pool[stack] = node;
 			parentMatrix[stack] = boneMatrix;
@@ -343,7 +343,7 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 		count++;
 		ndAssert(count <= 128);
 		ndAssert(count <= m_nodeCount);
-		for (ndDemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) 
+		for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
 		{
 			pool[stack] = node;
 			parentMatrix[stack] = boneMatrix;

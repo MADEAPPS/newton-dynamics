@@ -303,7 +303,7 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 	D_TRACKTIME();
 	//count active instances 
 	ndInt32 count = 0;
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		count++;
 	}
@@ -313,7 +313,7 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 	ndArray<ndMatrix>& matrixStack = GetMatrixStack();
 	matrixStack.SetCount(count);
 	
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		matrixStack[index] = child->GetCurrentMatrix();
 		index++;

@@ -73,9 +73,10 @@ ndCharacterNode::~ndCharacterNode()
 void ndCharacterNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
 	ndCharacterSaveDescriptor childDesc(desc);
-
+	
+	ndAssert(0);
 	childDesc.m_limbMap->Insert(childDesc.m_limbMap->GetCount(), (ndCharacterNode*)this);
-	for (ndCharacterNode* child = GetChild(); child; child = child->GetSibling())
+	for (ndCharacterNode* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		child->Save(childDesc);
 	}
@@ -89,7 +90,8 @@ ndCharacterNode* ndCharacterNode::CreateClone() const
 
 void ndCharacterNode::Debug(ndConstraintDebugCallback& context) const
 {
-	for (ndCharacterNode* child = GetChild(); child; child = child->GetSibling())
+	ndAssert(0);
+	for (ndCharacterNode* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		child->Debug(context);
 	}

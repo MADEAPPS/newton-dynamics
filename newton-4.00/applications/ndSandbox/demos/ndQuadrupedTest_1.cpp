@@ -271,7 +271,7 @@ namespace ndQuadruped_1
 			,m_effectorsJoints()
 		{
 			// make a clone of the mesh and add it to the scene
-			ndDemoEntity* const entity = (ndDemoEntity*)robotMesh->CreateClone();
+			ndDemoEntity* const entity = robotMesh->CreateClone();
 			scene->AddEntity(entity);
 			ndWorld* const world = scene->GetWorld();
 
@@ -293,7 +293,7 @@ namespace ndQuadruped_1
 			ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 
 			ndInt32 stack = 0;
-			for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling())
+			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
 			{
 				childEntities[stack] = child;
 				parentBone[stack] = rootBody;
@@ -360,7 +360,7 @@ namespace ndQuadruped_1
 					}
 				}
 
-				for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
 				{
 					childEntities[stack] = child;
 					parentBone[stack] = parentBody;

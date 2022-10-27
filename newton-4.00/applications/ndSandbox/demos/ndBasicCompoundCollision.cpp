@@ -92,7 +92,7 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	mOrigMatrix.m_posit.m_x = 2.0f;
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
-		ndDemoEntity* const entity = (ndDemoEntity*)origEntity->CreateClone();
+		ndDemoEntity* const entity = origEntity->CreateClone();
 		mOrigMatrix.m_posit.m_y += 1.0f;
 		AddRigidBody(scene, mOrigMatrix, originShape, entity, 1.0);
 	}
@@ -121,7 +121,7 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 	ndMatrix mOrigMatrix = matrix;
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndDemoEntity* const entity = (ndDemoEntity*)bowlEntity->CreateClone();
+		ndDemoEntity* const entity = bowlEntity->CreateClone();
 		mOrigMatrix.m_posit.m_z += 2.0f;
 		AddRigidBody(scene, mOrigMatrix, *compoundShapeInstance, entity, 5.0f);
 	}

@@ -233,7 +233,7 @@ ndDemoDebrisRootEntity::~ndDemoDebrisRootEntity(void)
 
 void ndDemoDebrisRootEntity::FinalizeConstruction(const ndArray<glDebrisPoint>& vertexArray)
 {
-	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)*GetChild()->GetMesh();
+	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)*GetFirstChild()->GetMesh();
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoDebrisMesh(shaderMesh, vertexArray));
 	SetMesh(mesh);
 }
@@ -269,7 +269,7 @@ void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* con
 	glBindTexture(GL_TEXTURE_2D, GLuint(shaderMesh->m_material[0].GetTexture()));
 	
 	const ndMatrix nodeMatrix(m_matrix * matrix);
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		child->Render(timestep, scene, nodeMatrix);
 	}
