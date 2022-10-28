@@ -40,20 +40,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		m_renderLoop.OnPause();
-    }
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		m_renderLoop.OnResume();
-	}
-
-	@Override
 	protected void onStart()
 	{
 		super.onStart();
@@ -68,6 +54,20 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onStop();
 		m_renderLoop.OnTerminate();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		m_renderLoop.OnPause();
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		m_renderLoop.OnResume();
 	}
 
 	@Override
