@@ -26,7 +26,7 @@ public class ShaderCache
     {
         m_scene = scene;
 
-        //m_solidColor = LoadShaderProgram("solidColor");
+        m_skyBox = LoadShaderProgram("skyBox");
         m_directionalDiffuse = LoadShaderProgram("directionalDiffuse");
 
         m_scene = null;
@@ -126,6 +126,6 @@ public class ShaderCache
 
     private RenderScene m_scene = null;
 
-    //public int m_solidColor = 0;
+    public int m_skyBox = 0;
     public int m_directionalDiffuse = 0;
 }

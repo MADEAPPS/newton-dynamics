@@ -26,7 +26,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	,m_textureMatrixLocation(0)
 {
 	GLfloat size = 200.0f;
-	static GLfloat vertices[] =
+	GLfloat vertices[] =
 	{
 		 size, size, size,  -size, size, size,  -size,-size, size,  size,-size, size, // v0,v1,v2,v3 (front)
 		 size, size, size,   size,-size, size,   size,-size,-size,  size, size,-size, // v0,v3,v4,v5 (right)
@@ -38,7 +38,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 	// index array for glDrawElements()
 	// A cube requires 36 indices = 6 sides * 2 tris * 3 verts
-	static ndInt32 indices[] =
+	ndInt32 indices[] =
 	{
 		0, 1, 2,   2, 3, 0,    // v0-v1-v2, v2-v3-v0 (front)
 		4, 5, 6,   6, 7, 4,    // v0-v3-v4, v4-v5-v0 (right)
