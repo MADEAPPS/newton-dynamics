@@ -31,7 +31,8 @@ public class SceneMesh
         m_segments = new ArrayList<SceneMeshSegment>();
     }
 
-    public void finalize()
+    //public void finalize()
+    public void CleanUp (RenderScene scene)
     {
         int[] buffer = new int[1];
         if (m_indexBuffer != 0)

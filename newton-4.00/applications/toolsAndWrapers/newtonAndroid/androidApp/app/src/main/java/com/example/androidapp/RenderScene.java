@@ -80,6 +80,10 @@ public class RenderScene implements GLSurfaceView.Renderer
         {
             m_demo.CleanUp(this);
         }
+        if (m_root != null)
+        {
+            m_root.CleanUp(this);
+        }
         m_textureCache.Clear();
 
         m_demo = null;

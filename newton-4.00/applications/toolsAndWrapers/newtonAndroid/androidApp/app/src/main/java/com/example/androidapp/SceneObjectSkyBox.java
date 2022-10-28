@@ -26,6 +26,13 @@ public class SceneObjectSkyBox extends SceneObject
     }
 
     @Override
+    public void CleanUp (RenderScene scene)
+    {
+        //SceneMeshTextureCache textCache = scene.GetTextureCache();
+        //super.CleanUp(scene);
+    }
+
+    @Override
     public void Render (RenderScene scene, nMatrix parentMatrix)
     {
         // sky box should not have any children

@@ -28,6 +28,19 @@ public class SceneObject
         m_meshMatrix = new nMatrix();
     }
 
+    public void CleanUp (RenderScene scene)
+    {
+        if (m_mesh != null)
+        {
+            m_mesh.CleanUp (scene);
+        }
+
+        for (SceneObject child = m_firstChild; child != null; child = child.m_next)
+        {
+            child.CleanUp (scene);
+        }
+    }
+
     public void AttachToParent(SceneObject parent)
     {
         m_parent = parent;
