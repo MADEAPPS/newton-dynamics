@@ -12,47 +12,26 @@
 #ifndef _ND_WORLD_GLUE_H_
 #define _ND_WORLD_GLUE_H_
 
-#include "ndRigidBodyGlue.h"
+#include "ndClassAlloc.h"
+#include "ndContainersAlloc.h"
 
-class ndWorldGlue : public ndContainersFreeListAlloc<ndWorldGlue>
+class ndWorld;
+class ndRigidBodyGlue;
+
+class ndWorldGlue: public ndContainersFreeListAlloc<ndWorldGlue>
 {
 	public:
-	ndWorldGlue()
-		:ndContainersFreeListAlloc<ndWorldGlue>()
-		,m_world(new ndWorld())
-	{
-	}
+	ndWorldGlue();
+	virtual ~ndWorldGlue();
 
-	~ndWorldGlue()
-	{
-	}
+	void Sync();
+	void SetSubSteps(int i);
+	virtual void AddBody(ndRigidBodyGlue* const body);
+	virtual void RemoveBody(ndRigidBodyGlue* const body);
+	virtual void Update(float timestep);
 
-	void Sync()
-	{
-		m_world->Sync();
-	}
-
-	void SetSubSteps(int i)
-	{
-		m_world->SetSubSteps(i);
-	}
-
-	virtual void AddBody(ndRigidBodyGlue* const body)
-	{
-		m_world->AddBody(*(body->m_body));
-	}
-
-	virtual void RemoveBody(ndRigidBodyGlue* const body)
-	{
-		m_world->RemoveBody(*(body->m_body));
-	}
-
-	virtual void Update(float timestep)
-	{
-		m_world->Update(timestep);
-	}
-
-	ndSharedPtr<ndWorld> m_world;
+	private:
+	ndWorld* m_world;
 };
 
 #endif 

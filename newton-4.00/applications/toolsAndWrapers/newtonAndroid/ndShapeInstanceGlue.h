@@ -12,36 +12,21 @@
 #ifndef _ND_SHAPE_INSTANCE_GLUE_H_
 #define _ND_SHAPE_INSTANCE_GLUE_H_
 
-#include "ndShape.h"
-#include "ndShapeInstance.h"
+#include "ndClassAlloc.h"
+#include "ndContainersAlloc.h"
+
+class ndShape;
+class ndShapeInstance;
 
 class ndShapeInstanceGlue: public ndContainersFreeListAlloc<ndShapeInstanceGlue>
 {
 	protected:
-	ndShapeInstanceGlue(ndShape* const shape)
-		:ndContainersFreeListAlloc<ndShapeInstanceGlue>()
-		,m_shapeInstance(new ndShapeInstance(shape))
-		,m_ownData(true)
-	{
-	}
-
-	ndShapeInstanceGlue(ndShapeInstance* const shapeInstance)
-		:ndContainersFreeListAlloc<ndShapeInstanceGlue>()
-		,m_shapeInstance(shapeInstance)
-		,m_ownData(false)
-	{
-	}
-
-	~ndShapeInstanceGlue()
-	{
-		if (m_ownData)
-		{
-			delete m_shapeInstance;
-		}
-	}
+	ndShapeInstanceGlue(ndShape* const shape);
+	ndShapeInstanceGlue(ndShapeInstance* const shapeInstance);
+	~ndShapeInstanceGlue();
 
 	ndShapeInstance* m_shapeInstance;
-	bool m_ownData;
+	//bool m_ownData;
 	friend class ndRigidBodyGlue;
 	friend class ndMeshEffectGlue;
 };

@@ -12,13 +12,13 @@
 #ifndef _ND_RIGIB_BODY_GLUE_H_
 #define _ND_RIGIB_BODY_GLUE_H_
 
-#include "ndMatrixGlue.h"
-#include "ndBodyKinematic.h"
-#include "ndBodyNotifyGlue.h"
-#include "ndBodyKinematicBase.h"
-#include "ndBodyTriggerVolume.h"
-#include "ndBodyPlayerCapsule.h"
-#include "ndShapeInstanceGlue.h"
+#include "ndClassAlloc.h"
+#include "ndContainersAlloc.h"
+
+class ndMatrixGlue;
+class ndBodyKinematic;
+class ndBodyNotifyGlue;
+class ndShapeInstanceGlue;
 
 enum nRigidBodyType
 {
@@ -30,80 +30,19 @@ enum nRigidBodyType
 class ndRigidBodyGlue: public ndContainersFreeListAlloc<ndRigidBodyGlue>
 {
 	public:
-	ndRigidBodyGlue(nRigidBodyType type)
-		:ndContainersFreeListAlloc<ndRigidBodyGlue>()
-		,m_body()
-		,m_shapeInstance(nullptr)
-	{
-		switch (type)
-		{
-			case m_dynamic:
-			{
-				m_body = ndSharedPtr<ndBodyKinematic>(new ndBodyDynamic());
-				break;
-			}
+	ndRigidBodyGlue(nRigidBodyType type);
+	~ndRigidBodyGlue();
 
-			case m_triggerVolume:
-			{
-				m_body = ndSharedPtr<ndBodyKinematic>(new ndBodyTriggerVolume());
-				break;
-			}
+	int GetId();
+	void SetMatrix(const ndMatrixGlue* const matrix);
+	void SetNotifyCallback(ndBodyNotifyGlue* const notify);
+	void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance);
 
-			case m_playerCapsule:
-			{
-				ndAssert(0);
-				break;
-			}
-
-			default:
-			{
-				ndAssert(0);
-			}
-		}
-
-		m_shapeInstance = new ndShapeInstanceGlue(&m_body->GetCollisionShape());
-	}
-
-	~ndRigidBodyGlue()
-	{
-		delete m_shapeInstance;
-	}
-
-	int GetId()
-	{
-		return m_body->GetId();
-	}
-
-	void SetMatrix(const ndMatrixGlue* const matrix)
-	{
-		m_body->SetMatrix(*matrix);
-	}
-
-	void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance)
-	{
-		const ndShapeInstance& instance = *shapeInstance->m_shapeInstance;
-		m_body->SetMassMatrix(mass, instance);
-	}
-
-	void SetNotifyCallback(ndBodyNotifyGlue* const notify)
-	{
-		m_body->SetNotifyCallback(notify);
-	}
-
-	const ndShapeInstanceGlue* GetCollisionShape() const
-	{
-		return m_shapeInstance;
-	}
-
-	void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance)
-	{
-		delete m_shapeInstance;
-		m_body->SetCollisionShape(*shapeInstance->m_shapeInstance);
-		m_shapeInstance = new ndShapeInstanceGlue(&m_body->GetCollisionShape());
-	}
+	const ndShapeInstanceGlue* GetCollisionShape() const;
+	void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance);
 
 	private:
-	ndSharedPtr<ndBodyKinematic> m_body;
+	ndBodyKinematic* m_body;
 	ndShapeInstanceGlue* m_shapeInstance;
 	friend class ndWorldGlue;
 };

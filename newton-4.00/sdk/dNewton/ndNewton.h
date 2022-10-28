@@ -27,19 +27,11 @@
 #ifndef __ND_NEWTON_H__
 #define __ND_NEWTON_H__
 
-#include <ndCore.h>
 #include <ndNewtonStdafx.h>
-#include <ndBody.h>
-#include <ndShape.h>
 #include <ndWorld.h>
-#include <ndScene.h>
 #include <ndModel.h>
-#include <ndBvhNode.h>
-#include <ndContact.h>
 #include <ndIkSolver.h>
-#include <ndShapeBox.h>
 #include <ndLoadSave.h>
-#include <ndShapeNull.h>
 #include <ndModelList.h>
 #include <ndJointGear.h>
 #include <ndCharacter.h>
@@ -51,7 +43,6 @@
 #include <ndJointRoller.h>
 #include <ndJointSlider.h>
 #include <ndJointPulley.h>
-#include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
 #include <ndIkJointHinge.h>
 #include <ndBodySphFluid.h>
@@ -61,9 +52,6 @@
 #include <ndSkeletonList.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
-#include <ndShapeInstance.h>
-#include <ndRayCastNotify.h>
-#include <ndContactNotify.h>
 #include <ndJointCylinder.h>
 #include <ndCharacterNode.h>
 #include <ndIk6DofEffector.h>

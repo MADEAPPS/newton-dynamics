@@ -37,7 +37,6 @@
 %{
 	#include <ndNewton.h>
 	#include "nConfig.h"
-	#include "ndSharedPtr.h"
 	#include "ndWorldGlue.h"
 	#include "ndVectorGlue.h"
 	#include "ndMatrixGlue.h"

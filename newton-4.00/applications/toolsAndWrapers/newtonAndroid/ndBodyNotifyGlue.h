@@ -15,47 +15,29 @@
 #include "ndMatrixGlue.h"
 #include "ndBodyNotify.h"
 
+class ndWorldGlue;
+
 class ndBodyNotifyGlue : public ndBodyNotify
 {
 	public:
-	ndBodyNotifyGlue()
-		:ndBodyNotify(ndVectorGlue::m_zero)
-	{
-	}
+	ndBodyNotifyGlue();
+	virtual ~ndBodyNotifyGlue();
 
-	virtual ~ndBodyNotifyGlue()
-	{
-	}
-
-	void SetGravity(const ndVectorGlue& gravity)
-	{
-		ndBodyNotify::SetGravity(gravity);
-	}
-	
-	virtual void OnApplyExternalForce(ndFloat32 timestep)
-	{
-		ndAssert(GetBody()->GetAsBodyKinematic());
-		ndBodyKinematic* const body = (ndBodyKinematic*)GetBody();
-		ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
-		body->SetForce(force);
-		body->SetTorque(ndVectorGlue::m_zero);
-	}
+	void SetGravity(const ndVectorGlue& gravity);
+	virtual void OnApplyExternalForce(ndFloat32 timestep);
 
 	// callback to Java code
-	virtual void OnTransformCallback(const ndMatrixGlue& matrix)
-	{
-	}
+	virtual void OnTransformCallback(const ndMatrixGlue& matrix);
 
 	// called from newton cpp core to interact with the app
-	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
-	{
-		OnTransformCallback(ndMatrixGlue(matrix));
-	}
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
-	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
-	{
-		OnApplyExternalForce(timestep);
-	}
+	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
+
+	private:
+	ndWorldGlue* m_world;
+	friend class ndWorldGlue;
+	friend class ndRigidBodyGlue;
 };
 
 

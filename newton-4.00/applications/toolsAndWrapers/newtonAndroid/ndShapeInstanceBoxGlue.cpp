@@ -9,18 +9,11 @@
 * freely
 */
 
+#include "ndNewton.h"
+#include "ndShapeInstanceBoxGlue.h"
 
-#ifndef _ND_SHAPE_INSTANCE_BOX_GLUE_H_
-#define _ND_SHAPE_INSTANCE_BOX_GLUE_H_
-
-
-#include "ndShapeInstanceGlue.h"
-
-class ndShapeInstanceBoxGlue: public ndShapeInstanceGlue
+ndShapeInstanceBoxGlue::ndShapeInstanceBoxGlue(float size_x, float size_y, float size_z)
+	:ndShapeInstanceGlue(new ndShapeBox(size_x, size_y, size_z))
 {
-	public:
-	ndShapeInstanceBoxGlue(float size_x, float size_y, float size_z);
-};
-
-#endif 
+}
 

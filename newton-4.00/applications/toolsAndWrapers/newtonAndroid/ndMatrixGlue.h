@@ -12,47 +12,20 @@
 #ifndef _ND_MATRIX_GLUE_H_
 #define _ND_MATRIX_GLUE_H_
 
-#include "ndVectorGlue.h"
 #include "ndMatrix.h"
-
+class ndVectorGlue;
 
 class ndMatrixGlue : public ndMatrix
 {
 	public:
-	ndMatrixGlue()
-		:ndMatrix()
-	{
-	}
+	ndMatrixGlue();
+	ndMatrixGlue(const ndMatrix& matrix);
+	ndMatrixGlue(const ndMatrixGlue& matrix);
+	ndMatrixGlue(const ndVectorGlue& front, const ndVectorGlue& up, const ndVectorGlue& right, const ndVectorGlue& posit);
 
-	ndMatrixGlue(const ndMatrix& matrix)
-		:ndMatrix(matrix)
-	{
-	}
-
-	ndMatrixGlue(const ndMatrixGlue& matrix)
-		:ndMatrix(matrix)
-	{
-	}
-
-	ndMatrixGlue(const ndVectorGlue& front, const ndVectorGlue& up, const ndVectorGlue& right, const ndVectorGlue& posit)
-		:ndMatrix(front, up, right, posit)
-	{
-	}
-
-	void SetIdentity()
-	{
-		*this = ndGetIdentityMatrix();
-	}
-
-	ndVectorGlue Get(int i) const
-	{
-		return ndVectorGlue((*this)[i]);
-	}
-
-	void Set(int i, ndVectorGlue& value)
-	{
-		(*this)[i] = value;
-	}
+	void SetIdentity();
+	ndVectorGlue Get(int i) const;
+	void Set(int i, ndVectorGlue& value);
 };
 
 #endif 

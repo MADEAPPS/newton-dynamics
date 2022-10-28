@@ -17,35 +17,13 @@
 class ndVectorGlue : public ndVector
 {
 	public:
-	ndVectorGlue()
-		:ndVector()
-	{
-	}
+	ndVectorGlue();
+	ndVectorGlue(const ndVector& vector);
+	ndVectorGlue(const ndVectorGlue& vector);
+	ndVectorGlue(float x, float y, float z, float w);
 
-	ndVectorGlue(const ndVector& vector)
-		:ndVector(vector)
-	{
-	}
-
-	ndVectorGlue(const ndVectorGlue& vector)
-		:ndVector(vector)
-	{
-	}
-
-	ndVectorGlue(float x, float y, float z, float w)
-		:ndVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(w))
-	{
-	}
-
-	float Get(int i) const
-	{
-		return (*this)[i];
-	}
-
-	void Set(int i, float value)
-	{
-		(*this)[i] = value;
-	}
+	float Get(int i) const;
+	void Set(int i, float value);
 };
 
 
