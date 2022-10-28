@@ -35,13 +35,8 @@ public class MainActivity extends AppCompatActivity
 		ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 		ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
 		System.out.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
-		//System.out.println(configurationInfo.reqGlEsVersion >= 0x30000);
-		//System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
 
-		m_renderLoop = new RenderLoop(this);
-		setContentView (m_renderLoop.GetView());
-
-		m_renderLoop.start();
+		m_renderLoop = null;
     }
 
 	@Override
@@ -56,6 +51,16 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onResume();
 		m_renderLoop.OnResume();
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		m_renderLoop = new RenderLoop(this);
+		setContentView (m_renderLoop.GetView());
+		m_renderLoop.start();
+		System.out.println("big shit");
 	}
 
 	@Override

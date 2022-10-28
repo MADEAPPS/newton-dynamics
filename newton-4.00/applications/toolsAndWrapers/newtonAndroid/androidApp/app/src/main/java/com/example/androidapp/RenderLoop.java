@@ -38,6 +38,14 @@ public class RenderLoop extends Thread
         {
             yield();
         }
+        try
+        {
+            join();
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Exception has " + "been caught" + ex);
+        }
     }
 
     public void OnPause()
