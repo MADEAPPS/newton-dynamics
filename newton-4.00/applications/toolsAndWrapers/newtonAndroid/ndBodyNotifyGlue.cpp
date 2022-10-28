@@ -15,6 +15,7 @@
 
 ndBodyNotifyGlue::ndBodyNotifyGlue()
 	:ndBodyNotify(ndVectorGlue::m_zero)
+	,m_world(nullptr)
 {
 }
 

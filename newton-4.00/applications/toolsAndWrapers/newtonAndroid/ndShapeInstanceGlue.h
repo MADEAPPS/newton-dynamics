@@ -26,7 +26,7 @@ class ndShapeInstanceGlue: public ndContainersFreeListAlloc<ndShapeInstanceGlue>
 	~ndShapeInstanceGlue();
 
 	ndShapeInstance* m_shapeInstance;
-	//bool m_ownData;
+	bool m_ownData;
 	friend class ndRigidBodyGlue;
 	friend class ndMeshEffectGlue;
 };

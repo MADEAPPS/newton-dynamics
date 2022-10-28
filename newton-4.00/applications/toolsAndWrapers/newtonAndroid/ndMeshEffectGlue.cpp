@@ -30,6 +30,7 @@ ndMeshEffectGlue::ndMeshEffectGlue(const ndShapeInstanceGlue& shapeInstance)
 
 ndMeshEffectGlue::~ndMeshEffectGlue()
 {
+	delete m_meshEffect;
 }
 
 int ndMeshEffectGlue::GetVertexSize()

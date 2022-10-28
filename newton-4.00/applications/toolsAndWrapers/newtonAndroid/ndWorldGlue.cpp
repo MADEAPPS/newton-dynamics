@@ -23,6 +23,7 @@ ndWorldGlue::ndWorldGlue()
 
 ndWorldGlue::~ndWorldGlue()
 {
+	delete m_world;
 }
 
 void ndWorldGlue::Sync()

@@ -15,22 +15,22 @@
 ndShapeInstanceGlue::ndShapeInstanceGlue(ndShape* const shape)
 	:ndContainersFreeListAlloc<ndShapeInstanceGlue>()
 	,m_shapeInstance(new ndShapeInstance(shape))
-	//,m_ownData(true)
+	,m_ownData(true)
 {
 }
 
 ndShapeInstanceGlue::ndShapeInstanceGlue(ndShapeInstance* const shapeInstance)
 	:ndContainersFreeListAlloc<ndShapeInstanceGlue>()
 	,m_shapeInstance(shapeInstance)
-	//,m_ownData(false)
+	,m_ownData(false)
 {
 }
 
 ndShapeInstanceGlue::~ndShapeInstanceGlue()
 {
-	//if (m_ownData)
-	//{
-	delete m_shapeInstance;
-	//}
+	if (m_ownData)
+	{
+		delete m_shapeInstance;
+	}
 }
 
