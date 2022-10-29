@@ -11,7 +11,6 @@
 
 package com.example.androidapp;
 
-import android.util.Log;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.content.res.AssetManager;
@@ -32,6 +31,11 @@ public class RenderScene implements GLSurfaceView.Renderer
     public nWorld GetWorld()
     {
         return m_world;
+    }
+
+    public SceneObject GetRoot()
+    {
+        return m_root;
     }
 
     public SceneCamera GetCamera()
@@ -58,15 +62,16 @@ public class RenderScene implements GLSurfaceView.Renderer
         GLES30.glEnable (GLES30.GL_CULL_FACE);
         GLES30.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+        m_screenWidth = 0;
+        m_screenHeight = 0;
         m_timestep = 1.0f / 60.0f;
         m_shaderCache = new ShaderCache(this);
         m_textureCache = new SceneMeshTextureCache(GetAssetManager());
 
-        m_demo = null;
+        m_camera = new SceneCamera();
+        m_root = new SceneObject();
         m_world = new nWorld();
         m_world.SetSubSteps(2);
-        m_root = new SceneObject();
-        m_camera = new SceneCamera();
 
         // load the first scene
         LoadScene();
@@ -86,8 +91,8 @@ public class RenderScene implements GLSurfaceView.Renderer
         }
         m_textureCache.Clear();
 
-        m_demo = null;
         m_root = null;
+        m_demo = null;
         m_world = null;
         m_camera = null;
         m_textureCache = null;
@@ -95,7 +100,7 @@ public class RenderScene implements GLSurfaceView.Renderer
 
     public void AddSceneObject(SceneObject object)
     {
-        object.AttachToParent(m_root);
+       object.AttachToParent(m_root);
     }
 
     @Override
@@ -146,7 +151,8 @@ public class RenderScene implements GLSurfaceView.Renderer
         int error;
         while ((error = GLES30.glGetError()) != GLES30.GL_NO_ERROR)
         {
-            Log.e(TAG, glOperation + ": glError " + error);
+            //Log.e(TAG, glOperation + ": glError " + error);
+            System.out.println(glOperation + ": glError " + error);
             throw new RuntimeException(glOperation + ": glError " + error);
         }
     }
@@ -156,7 +162,6 @@ public class RenderScene implements GLSurfaceView.Renderer
         m_world.Sync();
         m_world.Update(m_timestep);
 
-        // Draw background color
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
 
         m_camera.SetViewMatrix(m_screenWidth, m_screenHeight);
@@ -192,8 +197,6 @@ public class RenderScene implements GLSurfaceView.Renderer
         SetState(RenderState.m_idleState);
     }
 
-    private static final String TAG = "ndNewton";
-
     private nWorld m_world = null;
     private DemoBase m_demo = null;
     private SceneObject m_root = null;
@@ -202,10 +205,9 @@ public class RenderScene implements GLSurfaceView.Renderer
     private AssetManager m_assetManager = null;
     private SceneMeshTextureCache m_textureCache = null;
 
+    private int m_screenWidth = 0;
+    private int m_screenHeight = 0;
     private float m_timestep = 1.0f / 60.0f;
     private Boolean m_renderInitialized = false;
     private RenderState m_renderState = RenderState.m_idleState;
-
-    private int m_screenWidth = 0;
-    private int m_screenHeight = 0;
 }

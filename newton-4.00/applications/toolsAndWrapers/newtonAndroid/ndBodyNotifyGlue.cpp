@@ -13,41 +13,65 @@
 #include "ndVectorGlue.h"
 #include "ndBodyNotifyGlue.h"
 
+class ndBodyNotifyInternal : public ndBodyNotify
+{
+	public:
+	ndBodyNotifyInternal(ndBodyNotifyGlue* const parent)
+		:ndBodyNotify(ndVector::m_zero)
+		,m_notifyParent(parent)
+	{
+	}
+
+	virtual ~ndBodyNotifyInternal()
+	{
+	}
+
+	virtual void* GetUserData() const
+	{
+		return m_notifyParent;
+	}
+
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
+	{
+		m_notifyParent->OnTransform((ndMatrixGlue&)matrix);
+	}
+
+	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
+	{
+		m_notifyParent->OnApplyExternalForce(timestep);
+	}
+
+	ndBodyNotifyGlue* m_notifyParent;
+};
+
 ndBodyNotifyGlue::ndBodyNotifyGlue()
-	:ndBodyNotify(ndVectorGlue::m_zero)
-	,m_world(nullptr)
+	:m_world(nullptr)
+	,m_notify(new ndBodyNotifyInternal(this))
 {
 }
 
 ndBodyNotifyGlue::~ndBodyNotifyGlue()
 {
+	// note: m_notify is managed by the newton sdk, do not delete it
 }
 	
 void ndBodyNotifyGlue::SetGravity(const ndVectorGlue& gravity)
 {
-	ndBodyNotify::SetGravity(gravity);
+	m_notify->SetGravity(gravity);
 }
 	
 void ndBodyNotifyGlue::OnApplyExternalForce(ndFloat32 timestep)
 {
-	ndAssert(GetBody()->GetAsBodyKinematic());
-	ndBodyKinematic* const body = (ndBodyKinematic*)GetBody();
-	ndVector force(GetGravity().Scale(body->GetMassMatrix().m_w));
+	ndAssert(m_notify->GetBody()->GetAsBodyKinematic());
+	ndBodyKinematic* const body = (ndBodyKinematic*)m_notify->GetBody();
+	ndVector force(m_notify->GetGravity().Scale(body->GetMassMatrix().m_w));
 	body->SetForce(force);
-	body->SetTorque(ndVectorGlue::m_zero);
+	body->SetTorque(ndVector::m_zero);
 }
 
-void ndBodyNotifyGlue::OnTransformCallback(const ndMatrixGlue& matrix)
+void ndBodyNotifyGlue::OnTransform(const ndMatrixGlue& matrix)
 {
+	ndAssert(0);
 }
 
-void ndBodyNotifyGlue::OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
-{
-	OnTransformCallback(ndMatrixGlue(matrix));
-}
-
-void ndBodyNotifyGlue::OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
-{
-	OnApplyExternalForce(timestep);
-}
 

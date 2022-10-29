@@ -52,8 +52,8 @@ ndRigidBodyGlue::ndRigidBodyGlue(nRigidBodyType type)
 
 ndRigidBodyGlue::~ndRigidBodyGlue()
 {
-	ndBodyNotifyGlue* const notification = (ndBodyNotifyGlue*)m_body->GetNotifyCallback();
-	if (notification->m_world)
+	ndBodyNotifyGlue* const notification = GetNotifyCallback();
+	if (notification && notification->m_world)
 	{
 		notification->m_world->RemoveBody(this);
 	}
@@ -62,7 +62,7 @@ ndRigidBodyGlue::~ndRigidBodyGlue()
 	delete m_shapeInstance;
 }
 
-int ndRigidBodyGlue::GetId()
+int ndRigidBodyGlue::GetId() const
 {
 	return m_body->GetId();
 }
@@ -80,7 +80,8 @@ void ndRigidBodyGlue::SetMassMatrix(float mass, const ndShapeInstanceGlue* const
 
 void ndRigidBodyGlue::SetNotifyCallback(ndBodyNotifyGlue* const notify)
 {
-	m_body->SetNotifyCallback(notify);
+	ndAssert(notify->m_notify);
+	m_body->SetNotifyCallback((ndBodyNotify*)notify->m_notify);
 }
 
 const ndShapeInstanceGlue* ndRigidBodyGlue::GetCollisionShape() const
@@ -93,6 +94,12 @@ void ndRigidBodyGlue::SetCollisionShape(const ndShapeInstanceGlue* const shapeIn
 	delete m_shapeInstance;
 	m_body->SetCollisionShape(*shapeInstance->m_shapeInstance);
 	m_shapeInstance = new ndShapeInstanceGlue(&m_body->GetCollisionShape());
+}
+
+ndBodyNotifyGlue* ndRigidBodyGlue::GetNotifyCallback() const
+{
+	ndAssert(m_body->GetNotifyCallback());
+	return (ndBodyNotifyGlue*)m_body->GetNotifyCallback()->GetUserData();
 }
 
 

@@ -33,13 +33,14 @@ class ndRigidBodyGlue: public ndContainersFreeListAlloc<ndRigidBodyGlue>
 	ndRigidBodyGlue(nRigidBodyType type);
 	~ndRigidBodyGlue();
 
-	int GetId();
+	int GetId() const;
+	ndBodyNotifyGlue* GetNotifyCallback() const;
+	const ndShapeInstanceGlue* GetCollisionShape() const;
+
 	void SetMatrix(const ndMatrixGlue* const matrix);
 	void SetNotifyCallback(ndBodyNotifyGlue* const notify);
-	void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance);
-
-	const ndShapeInstanceGlue* GetCollisionShape() const;
 	void SetCollisionShape(const ndShapeInstanceGlue* const shapeInstance);
+	void SetMassMatrix(float mass, const ndShapeInstanceGlue* const shapeInstance);
 
 	private:
 	ndBodyKinematic* m_body;

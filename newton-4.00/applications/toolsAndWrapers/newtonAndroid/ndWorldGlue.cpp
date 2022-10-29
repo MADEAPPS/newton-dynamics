@@ -39,13 +39,15 @@ void ndWorldGlue::SetSubSteps(int i)
 void ndWorldGlue::AddBody(ndRigidBodyGlue* const body)
 {
 	m_world->AddBody(body->m_body);
-	ndBodyNotifyGlue* const notification = (ndBodyNotifyGlue*)body->m_body->GetNotifyCallback();
+	//ndBodyNotifyGlue* const notification = (ndBodyNotifyGlue*)body->m_body->GetNotifyCallback();
+	ndBodyNotifyGlue* const notification = body->GetNotifyCallback();
 	notification->m_world = this;
 }
 
 void ndWorldGlue::RemoveBody(ndRigidBodyGlue* const body)
 {
-	ndBodyNotifyGlue* const notification = (ndBodyNotifyGlue*)body->m_body->GetNotifyCallback();
+	//ndBodyNotifyGlue* const notification = (ndBodyNotifyGlue*)body->m_body->GetNotifyCallback();
+	ndBodyNotifyGlue* const notification = body->GetNotifyCallback();
 	notification->m_world = nullptr;
 	m_world->RemoveBody(body->m_body);
 }

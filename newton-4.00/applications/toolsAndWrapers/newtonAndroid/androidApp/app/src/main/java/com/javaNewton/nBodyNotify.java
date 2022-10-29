@@ -34,7 +34,7 @@ public class nBodyNotify extends ndBodyNotifyGlue
         SetGravity(new ndVectorGlue(v.m_data[0], v.m_data[1], v.m_data[2], v.m_data[3]));
     }
 
-    public void OnTransformCallback(ndMatrixGlue matrix)
+    public void OnTransform(ndMatrixGlue matrix)
     {
         m_cacheMatrix.Set(matrix);
         OnTransform(m_cacheMatrix);

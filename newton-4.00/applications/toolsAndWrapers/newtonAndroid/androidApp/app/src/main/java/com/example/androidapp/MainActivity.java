@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity
 		m_renderLoop = new RenderLoop(this);
 		setContentView (m_renderLoop.GetView());
 		m_renderLoop.start();
-		System.out.println("big shit");
 	}
 
 	@Override

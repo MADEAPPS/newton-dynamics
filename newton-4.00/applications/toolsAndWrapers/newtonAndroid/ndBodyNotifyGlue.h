@@ -16,30 +16,25 @@
 #include "ndBodyNotify.h"
 
 class ndWorldGlue;
+class ndBodyNotifyInternal;
 
-class ndBodyNotifyGlue : public ndBodyNotify
+class ndBodyNotifyGlue
 {
 	public:
 	ndBodyNotifyGlue();
 	virtual ~ndBodyNotifyGlue();
 
 	void SetGravity(const ndVectorGlue& gravity);
+
+	virtual void OnTransform(const ndMatrixGlue& matrix);
 	virtual void OnApplyExternalForce(ndFloat32 timestep);
-
-	// callback to Java code
-	virtual void OnTransformCallback(const ndMatrixGlue& matrix);
-
-	// called from newton cpp core to interact with the app
-	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
-
-	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 
 	private:
 	ndWorldGlue* m_world;
+	ndBodyNotifyInternal* m_notify;
 	friend class ndWorldGlue;
 	friend class ndRigidBodyGlue;
 };
-
 
 #endif 
 

@@ -39,19 +39,19 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	D_COLLISION_API ndBody* GetBody();
 	D_COLLISION_API const ndBody* GetBody() const;
 	D_COLLISION_API virtual void* GetUserData() const;
+
 	D_COLLISION_API ndVector GetGravity() const;
 	D_COLLISION_API void SetGravity(const ndVector& defaultGravity);
 
 	D_COLLISION_API virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
+	D_COLLISION_API virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-	D_COLLISION_API virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 
 	private:
 	ndVector m_defaultGravity;
 	ndBody* m_body;
 	friend class ndBody;
-
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

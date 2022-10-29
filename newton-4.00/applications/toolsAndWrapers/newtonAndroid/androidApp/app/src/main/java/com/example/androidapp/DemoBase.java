@@ -11,7 +11,8 @@
 
 package com.example.androidapp;
 
-//import com.example.androidapp.RenderScene;
+import android.opengl.GLES30;
+import com.javaNewton.nMatrix;
 
 public class DemoBase
 {
@@ -19,7 +20,7 @@ public class DemoBase
     {
     }
 
-    public void CleanUp(RenderScene renderer)
+    public void CleanUp(RenderScene scene)
     {
     }
 }
