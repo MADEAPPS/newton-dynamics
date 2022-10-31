@@ -8,16 +8,18 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#version 120
+#version 330 core
 
-varying vec3 normal;
-varying vec3 position;
+//in vec2 uv;
+in vec3 posit;
+in vec3 normal;
+//in vec3 lightDir;
 
 vec3 PhongDirectionalShading()
 {
 	vec3 norm = normalize (normal);
 	vec3 lighDir = normalize (gl_LightSource[0].position.xyz);
-	vec3 specularDir = normalize (-position);
+	vec3 specularDir = normalize (-posit);
 	vec3 refectionDir = -reflect (lighDir, normal);
 
 	vec3 ambientCoeff = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
@@ -35,7 +37,7 @@ vec3 PhongDirectionalShading()
 vec3 GouraudPointLightShading(int index)
 {
 	vec3 norm = normalize (normal);
-	vec3 lighDir = normalize (gl_LightSource[index].position.xyz - position);
+	vec3 lighDir = normalize (gl_LightSource[index].position.xyz - posit);
 
 	vec3 diffuseCoeff = vec3(gl_LightSource[index].diffuse * gl_FrontMaterial.diffuse); 
 	vec3 diffuseColor = diffuseCoeff * max (dot(norm, lighDir), 0.0);

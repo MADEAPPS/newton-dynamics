@@ -248,7 +248,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
 
-		// asign tirse material id.
+		// asign tire material id.
 		fr_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
 		fl_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
 		rr_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
@@ -426,6 +426,9 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*chassisCollision);
 		body->SetMassMatrix(mass, *chassisCollision);
+
+		// asign shassis material id.
+		body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
 
 		delete chassisCollision;
 		return body;
