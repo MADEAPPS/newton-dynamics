@@ -11,6 +11,7 @@
 
 package com.example.androidapp;
 
+import com.javaNewton.nVector;
 import com.javaNewton.nMatrix;
 
 import java.nio.ByteBuffer;
@@ -52,12 +53,12 @@ public class SceneObjectSkyBox extends SceneObject
                 20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
         };
 
+        m_skyMatrix = new nMatrix();
         m_textureMatrix = new nMatrix();
         m_textureMatrix.m_data[1].m_data[1] = -1.0f;
         m_textureMatrix.m_data[1].m_data[3] = size;
 
-        //glGenBuffers(1, &m_vertexBuffer); //m_vbo
-        //glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+        m_eyeOffset = new nVector (0.0f, 0.25f, 0.0f, 1.0f);
 
         int vertexSizeInBytes = 3 * 4;
         ByteBuffer bb = ByteBuffer.allocateDirect(24 * vertexSizeInBytes);
@@ -73,8 +74,6 @@ public class SceneObjectSkyBox extends SceneObject
         GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, 24 * vertexSizeInBytes, gpuReadyBuffer, GLES30.GL_STATIC_DRAW);
         scene.checkGlError("SceneMeshPrimitive");
 
-        //glGenVertexArrays(1, &m_vertextArrayBuffer);
-        //glBindVertexArray(m_vertextArrayBuffer);
         IntBuffer vaoIdBuffer = IntBuffer.allocate(1);
         GLES30.glGenVertexArrays(1, vaoIdBuffer);
         m_vertexArrayBuffer = vaoIdBuffer.get(0);
@@ -83,9 +82,6 @@ public class SceneObjectSkyBox extends SceneObject
         GLES30.glEnableVertexAttribArray(0);
         GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 3 * 4, 0);
 
-        //GLES30.glGenBuffers(1, &m_indexBuffer);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
         ByteBuffer gpuReadyIndexBuffer = ByteBuffer.allocateDirect(36 * 2);
         gpuReadyIndexBuffer.order(ByteOrder.nativeOrder());
         ShortBuffer drawListBuffer = gpuReadyIndexBuffer.asShortBuffer();
@@ -151,12 +147,9 @@ public class SceneObjectSkyBox extends SceneObject
 
         SceneCamera camera = scene.GetCamera();
 
-        nMatrix skyMatrix = new nMatrix();
         nMatrix viewMatrix = camera.GetViewMatrix();
-        //skyMatrix.m_posit = viewMatrix.UntransformVector(ndVector(0.0f, 0.25f, 0.0f, 1.0f));
-        skyMatrix.m_data[3].m_data[1] = 0.25f;
-	    //const glMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
-        nMatrix projectionViewModelMatrix = skyMatrix.Mul(viewMatrix).Mul(camera.GetProjectionMatrix());
+        m_skyMatrix.SetPosition(viewMatrix.UntransformVector(m_eyeOffset));
+        nMatrix projectionViewModelMatrix = m_skyMatrix.Mul(viewMatrix).Mul(camera.GetProjectionMatrix());
         projectionViewModelMatrix.GetFlatArray(m_glModelViewProjectionMatrix);
 
         GLES30.glUseProgram(m_shader);
@@ -168,23 +161,22 @@ public class SceneObjectSkyBox extends SceneObject
         GLES30.glBindVertexArray(m_vertexArrayBuffer);
         GLES30.glEnableVertexAttribArray(0);
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_vertexBuffer);
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+        //some how the cube map is no set properlly.
+        //if I draw the box the background is black.
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, 36, GLES30.GL_UNSIGNED_SHORT, 0);
 
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //glDisableVertexAttribArray(0);
-        //glBindVertexArray(0);
-        //glUseProgram(0);
         GLES30.glDepthMask(true);
         GLES30.glCullFace(GLES30.GL_BACK);
         GLES30.glFrontFace(GLES30.GL_CCW);
-
-        // sky box should not have any children
-        //super.Render(scene, parentMatrix);
     }
 
+    private nVector m_eyeOffset;
+    private nMatrix m_skyMatrix;
     private nMatrix m_textureMatrix;
-    float[] m_glTextureMatrix;
-    float[] m_glModelViewProjectionMatrix;
+    private float[] m_glTextureMatrix;
+    private float[] m_glModelViewProjectionMatrix;
     private int m_shader;
     private int m_indexBuffer;
     private int m_vertexBuffer;

@@ -185,11 +185,9 @@ public class nMatrix
 
     public nVector UntransformVector(nVector v)
     {
-        nVector tmp = new nVector();
-        for (int i = 0; i < 4; i ++)
-        {
-            tmp.m_data[i] = m_data[i].DotProduct(v);
-        }
+        nVector x = v.Sub(m_data[3]);
+        nVector tmp = UnrotateVector(x);
+        tmp.m_data[3] = 1.0f;
         return tmp;
     }
 

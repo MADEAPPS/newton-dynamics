@@ -56,7 +56,6 @@ class ndVector
 	}
 
 	inline ndVector (const ndFloat32 a)
-		//:m_type(_mm_set_ps1(a)) 
 		:m_x(a)
 		,m_y(a)
 		,m_z(a)
@@ -80,7 +79,6 @@ class ndVector
 
 #ifndef	D_NEWTON_USE_DOUBLE
 	inline ndVector(const ndFloat64* const ptr)
-		//:m_type(_mm_set_ps(ndFloat32(ptr[3]), ndFloat32(ptr[2]), ndFloat32(ptr[1]), ndFloat32(ptr[0])))
 		:m_x(ndFloat32(ptr[0]))
 		,m_y(ndFloat32(ptr[1]))
 		,m_z(ndFloat32(ptr[2]))
@@ -101,7 +99,6 @@ class ndVector
 	}
 
 	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
-		//:m_type(_mm_set_ps(w, z, y, x))
 		:m_x(x)
 		,m_y(y)
 		,m_z(z)
@@ -110,8 +107,6 @@ class ndVector
 	}
 
 	inline ndVector (ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		//:m_type(_mm_set_ps(*(ndFloat32*)&iw, *(ndFloat32*)&iz, *(ndFloat32*)&iy, *(ndFloat32*)&ix))
-		//:m_typeInt (_mm_set_epi32(iw, iz, iy, ix))
 		:m_ix(ix)
 		,m_iy(iy)
 		,m_iz(iz)

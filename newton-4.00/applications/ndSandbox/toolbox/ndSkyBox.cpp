@@ -135,6 +135,7 @@ void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatri
 	glBindVertexArray(m_vertextArrayBuffer);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
