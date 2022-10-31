@@ -166,6 +166,30 @@ public class RenderScene implements GLSurfaceView.Renderer
 
         m_camera.SetViewMatrix(m_screenWidth, m_screenHeight);
 
+        GLES30.glCullFace (GLES30.GL_BACK);
+        GLES30.glFrontFace (GLES30.GL_CCW);
+        GLES30.glEnable (GLES30.GL_CULL_FACE);
+
+        //	glEnable(GL_DITHER);
+        // z buffer test
+        GLES30.glEnable(GLES30.GL_DEPTH_TEST);
+        GLES30.glDepthFunc (GLES30.GL_LEQUAL);
+
+        //GLES30.glHint(GLES30.GL_PERSPECTIVE_CORRECTION_HINT, GLES30.GL_FASTEST);
+        //GLES30.glHint(GLES30.GL_POLYGON_SMOOTH_HINT, GLES30.GL_FASTEST);
+        // one light from the Camera eye point
+        //nVector camPosition = m_camera.GetMatrix().GetPosition();
+        //GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
+        //GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        //GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        //GLfloat lightPosition1[] = {0.0f, 0.0f, 0.0f, 1.0f};
+        //glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
+        //glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+        //glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+        //glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+        //glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
+        //glEnable(GL_LIGHT1);
+
         nMatrix matrix = new nMatrix();
         m_root.Render(this, matrix);
     }

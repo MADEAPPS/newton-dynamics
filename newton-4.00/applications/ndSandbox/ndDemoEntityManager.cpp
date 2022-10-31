@@ -1570,10 +1570,6 @@ void ndDemoEntityManager::RenderScene()
 	glScissor(0, 0, display_w, display_h);
 	glEnable(GL_SCISSOR_TEST);	
 
-	// Rendering
-	// Our shading model--Goraud (smooth). 
-	glShadeModel (GL_SMOOTH);
-
 	// Culling. 
 	glCullFace (GL_BACK);
 	glFrontFace (GL_CCW);
@@ -1583,43 +1579,6 @@ void ndDemoEntityManager::RenderScene()
 	// z buffer test
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc (GL_LEQUAL);
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-
-	// set default lightning
-	//ndFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	//glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
-	//glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
-	//glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
-	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	//
-	//// set just one directional light
-	//GLfloat lightDiffuse0[] = { 0.8f, 0.8f, 0.8f, 0.0f };
-	//GLfloat lightAmbient0[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-	//GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-	//GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0f };
-	//
-	//glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
-	//glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
-	//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
-	//glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
-	//glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular0);
-	//glEnable(GL_LIGHT0);
-
-	// one light from the Camera eye point
-	ndVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
-	GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
-	GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	GLfloat lightPosition1[] = {0.0f, 0.0f, 0.0f, 1.0f};
-
-	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
-	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
-	glEnable(GL_LIGHT1);
 
 	// Setup camera matrix
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
