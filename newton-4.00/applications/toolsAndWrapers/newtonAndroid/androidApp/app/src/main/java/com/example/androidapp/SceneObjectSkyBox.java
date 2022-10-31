@@ -77,8 +77,8 @@ public class SceneObjectSkyBox extends SceneObject
         //glBindVertexArray(m_vertextArrayBuffer);
         IntBuffer vaoIdBuffer = IntBuffer.allocate(1);
         GLES30.glGenVertexArrays(1, vaoIdBuffer);
-        m_vertextArrayBuffer = vaoIdBuffer.get(0);
-        GLES30.glBindVertexArray(m_vertextArrayBuffer);
+        m_vertexArrayBuffer = vaoIdBuffer.get(0);
+        GLES30.glBindVertexArray(m_vertexArrayBuffer);
 
         GLES30.glEnableVertexAttribArray(0);
         GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 3 * 4, 0);
@@ -107,9 +107,16 @@ public class SceneObjectSkyBox extends SceneObject
         GLES30.glDisableVertexAttribArray(0);
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
 
-        m_shader = 0;
-        m_matrixUniformLocation = 0;
-        m_textureMatrixLocation = 0;
+        m_shader = scene.GetShaderCache().m_skyBox;
+
+        GLES30.glUseProgram(m_shader);
+        m_textureMatrixLocation = GLES30.glGetUniformLocation(m_shader, "textureMatrix");
+        m_matrixUniformLocation = GLES30.glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+        GLES30.glUseProgram(0);
+
+        m_glTextureMatrix = new float[16];
+        m_glModelViewProjectionMatrix = new float[16];
+        m_textureMatrix.GetFlatArray(m_glTextureMatrix);
     }
 
     @Override
@@ -128,9 +135,9 @@ public class SceneObjectSkyBox extends SceneObject
             GLES30.glDeleteBuffers(1, buffer, 0);
         }
 
-        if (m_vertextArrayBuffer != 0)
+        if (m_vertexArrayBuffer != 0)
         {
-            buffer[0] = m_vertextArrayBuffer;
+            buffer[0] = m_vertexArrayBuffer;
             GLES30.glDeleteVertexArrays(1, buffer, 0);
         }
     }
@@ -138,15 +145,50 @@ public class SceneObjectSkyBox extends SceneObject
     @Override
     public void Render (RenderScene scene, nMatrix parentMatrix)
     {
+        GLES30.glCullFace(GLES30.GL_FRONT);
+        GLES30.glFrontFace(GLES30.GL_CCW);
+        GLES30.glDepthMask(false);
+
+        SceneCamera camera = scene.GetCamera();
+
+        nMatrix skyMatrix = new nMatrix();
+        nMatrix viewMatrix = camera.GetViewMatrix();
+        //skyMatrix.m_posit = viewMatrix.UntransformVector(ndVector(0.0f, 0.25f, 0.0f, 1.0f));
+        skyMatrix.m_data[3].m_data[1] = 0.25f;
+	    //const glMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+        nMatrix projectionViewModelMatrix = skyMatrix.Mul(viewMatrix).Mul(camera.GetProjectionMatrix());
+        projectionViewModelMatrix.GetFlatArray(m_glModelViewProjectionMatrix);
+
+        GLES30.glUseProgram(m_shader);
+        GLES30.glUniformMatrix4fv(m_textureMatrixLocation, 1, false, m_glTextureMatrix, 0);
+        GLES30.glUniformMatrix4fv(m_matrixUniformLocation, 1, false, m_glModelViewProjectionMatrix,0);
+
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_CUBE_MAP, m_cubeTexture.m_id);
+        GLES30.glBindVertexArray(m_vertexArrayBuffer);
+        GLES30.glEnableVertexAttribArray(0);
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_vertexBuffer);
+        GLES30.glDrawElements(GLES30.GL_TRIANGLES, 36, GLES30.GL_UNSIGNED_SHORT, 0);
+
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glDisableVertexAttribArray(0);
+        //glBindVertexArray(0);
+        //glUseProgram(0);
+        GLES30.glDepthMask(true);
+        GLES30.glCullFace(GLES30.GL_BACK);
+        GLES30.glFrontFace(GLES30.GL_CCW);
+
         // sky box should not have any children
         //super.Render(scene, parentMatrix);
     }
 
     private nMatrix m_textureMatrix;
+    float[] m_glTextureMatrix;
+    float[] m_glModelViewProjectionMatrix;
     private int m_shader;
     private int m_indexBuffer;
     private int m_vertexBuffer;
-    private int m_vertextArrayBuffer;
+    private int m_vertexArrayBuffer;
     private int m_matrixUniformLocation;
     private int m_textureMatrixLocation;
     private SceneMeshTexture m_cubeTexture;
