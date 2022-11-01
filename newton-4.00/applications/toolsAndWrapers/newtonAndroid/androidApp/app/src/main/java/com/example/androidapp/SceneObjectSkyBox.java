@@ -47,6 +47,12 @@ public class SceneObjectSkyBox extends SceneObject
                 20,22,21,  22,20,23     // v4-v7-v6, v6-v5-v4 (back)
         };
 
+        SceneMeshTextureCache textCache = scene.GetTextureCache();
+        m_cubeTexture = textCache.GetCubeTexture(
+                "NewtonSky0003.tga", "NewtonSky0001.tga",
+                "NewtonSky0006.tga", "NewtonSky0005.tga",
+                "NewtonSky0002.tga", "NewtonSky0004.tga");
+
         m_skyMatrix = new nMatrix();
         m_textureMatrix = new nMatrix();
         m_textureMatrix.m_data[1].m_data[1] = -1.0f;
@@ -107,12 +113,6 @@ public class SceneObjectSkyBox extends SceneObject
         m_glTextureMatrix = new float[16];
         m_glModelViewProjectionMatrix = new float[16];
         m_textureMatrix.GetFlatArray(m_glTextureMatrix);
-
-        SceneMeshTextureCache textCache = scene.GetTextureCache();
-        m_cubeTexture = textCache.GetCubeTexture(
-                "NewtonSky0003.tga", "NewtonSky0001.tga",
-                "NewtonSky0006.tga", "NewtonSky0005.tga",
-                "NewtonSky0002.tga", "NewtonSky0004.tga");
     }
 
     @Override

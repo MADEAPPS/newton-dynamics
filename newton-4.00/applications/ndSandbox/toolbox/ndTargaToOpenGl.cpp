@@ -119,27 +119,27 @@ static GLuint LoadTargaImage(const char* const buffer, ndInt32 width, ndInt32 hi
 	GLint iHeight = hight;
 
 	GLenum eFormat = GL_RGBA;
-	GLint iComponents = 4;
+	GLint iComponents = GL_RGBA;
 	switch (format)
 	{
 		case m_rgb:
 			// Most likely case
 			eFormat = GL_BGR;
 			//eFormat = GL_RGB;
-			iComponents = 4;
+			iComponents = GL_RGBA;
 			break;
 
 		case m_rgba:
 			eFormat = GL_BGRA;
 			//eFormat = GL_RGBA;
-			iComponents = 4;
+			iComponents = GL_RGBA;
 			break;
 
 		case m_luminace:
 			//eFormat = GL_LUMINANCE;
 			eFormat = GL_LUMINANCE_ALPHA;
 			//eFormat = GL_ALPHA;
-			iComponents = 4;
+			iComponents = GL_RGBA;
 			break;
 	};
 
@@ -387,7 +387,7 @@ GLuint LoadCubeMapTexture(
 			return 0;
 		}
 
-		glTexImage2D(faceArray[i], 0, 4, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
+		glTexImage2D(faceArray[i], 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
 
 		fclose(pFile);
 		ndMemory::Free(pBits);

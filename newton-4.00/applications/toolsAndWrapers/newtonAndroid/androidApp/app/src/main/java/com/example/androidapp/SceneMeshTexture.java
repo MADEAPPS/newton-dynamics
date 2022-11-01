@@ -74,9 +74,8 @@ public class SceneMeshTexture
             String pathName = new String("textures/");
             pathName = pathName + namesArray[i];
             ByteBuffer image = LoadAsset(pathName, assetManager);
-            //ParseCubeFaceImage(image, faceArray[i]);
+            ParseCubeFaceImage(image, faceArray[i]);
         }
-        m_id = 0;
     }
 
     public void Clear()
@@ -190,7 +189,6 @@ public class SceneMeshTexture
             throw new RuntimeException("invalid texture format");
         }
 
-        int eFormat = GLES30.GL_RGB;
        int imageSize = width * height;
 
         byte[] srcData = image.array();
@@ -200,18 +198,18 @@ public class SceneMeshTexture
             int j = i * 4;
             int k = i * 3;
 
-            byte red = srcData[j + 0];
-            byte green = srcData[j + 1];
-            byte blue = srcData[j + 2];
-            dstData[k + 0] = blue;
+            byte red = srcData[j + 3];
+            byte green = srcData[j + 2];
+            byte blue = srcData[j + 1];
+            dstData[k + 0] = red;
             dstData[k + 1] = green;
-            dstData[k + 2] = red;
+            dstData[k + 2] = blue;
         }
 
         ByteBuffer data = ByteBuffer.allocateDirect(imageSize * 3);
         data.put(dstData);
         data.rewind();
-        GLES30.glTexImage2D(face, 0, 4, width, height, 0,  GLES30.GL_RGB, GLES30.GL_UNSIGNED_BYTE, data);
+        GLES30.glTexImage2D(face, 0, GLES30.GL_RGB, width, height, 0,  GLES30.GL_RGB, GLES30.GL_UNSIGNED_BYTE, data);
     }
 
     String m_name;
