@@ -33,11 +33,50 @@ public class SceneMeshTexture
     }
 
     public SceneMeshTexture(AssetManager assetManager,
-        String name_x0, String name_x1,
-        String name_y0, String name_y1,
-        String name_z0, String name_z1)
+        String filename_x0, String filename_x1,
+        String filename_y0, String filename_y1,
+        String filename_z0, String filename_z1)
     {
+        m_id = 0;
+        m_name = filename_x0;
 
+        int faceArray[] = new int[6];
+	    String namesArray[] = new String[6];
+
+        namesArray[0] = filename_x0;
+        namesArray[1] = filename_x1;
+        faceArray[0] = GLES30.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+        faceArray[1] = GLES30.GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+
+        namesArray[2] = filename_y0;
+        namesArray[3] = filename_y1;
+        faceArray[2] = GLES30.GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+        faceArray[3] = GLES30.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+
+        namesArray[4] = filename_z0;
+        namesArray[5] = filename_z1;
+        faceArray[4] = GLES30.GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+        faceArray[5] = GLES30.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+
+        IntBuffer textureId = IntBuffer.allocate(1);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+        GLES30.glGenTextures(1, textureId);
+        m_id = textureId.get(0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_CUBE_MAP, m_id);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_WRAP_R, GLES30.GL_CLAMP_TO_EDGE);
+
+        for (int i = 0; i < 6; i ++)
+        {
+            String pathName = new String("textures/");
+            pathName = pathName + namesArray[i];
+            ByteBuffer image = LoadAsset(pathName, assetManager);
+            //ParseCubeFaceImage(image, faceArray[i]);
+        }
+        m_id = 0;
     }
 
     public void Clear()
@@ -52,20 +91,14 @@ public class SceneMeshTexture
         try
         {
             InputStream stream = assetManager.open(name);
-            int size = 0;
-            for (int data = stream.read(); data != -1; data = stream.read())
-            {
-                size ++;
-            }
-            stream.reset();
+            int size = stream.available();
+
+            byte[] srcDdata = new byte[size];
+            stream.read(srcDdata, 0, size);
 
             ByteBuffer buffer = ByteBuffer.allocateDirect(size);
-            for (int data = stream.read(); data != -1; data = stream.read())
-            {
-                buffer.put((byte)data);
-            }
+            buffer.put(srcDdata);
             buffer.rewind();
-
             return buffer;
         }
         catch (IOException e)
@@ -107,15 +140,8 @@ public class SceneMeshTexture
         {
             throw new RuntimeException("invalid texture format");
         }
-        //int imageSize = width * height * bits / 8;
 
-        //int iComponents = 4;
         int eFormat = GLES30.GL_RGB;
-        //if (bits == 32)
-        //{
-        //    eFormat = GLES30.GL_RGBA;
-        //}
-
         int imageSize = width * height;
         ByteBuffer data = ByteBuffer.allocateDirect(imageSize * 3);
         for (int i = 0; i < imageSize; i ++)
@@ -139,12 +165,53 @@ public class SceneMeshTexture
         GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
         GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
 
-        //float anisotropic = 0.0f;
-        //GLES30.glGetFloatv(GLES30.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, textureId);
-        //GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic);
-
         GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D,0, eFormat, width, height,0, eFormat, GLES30.GL_UNSIGNED_BYTE, data );
         GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);
+    }
+
+    private void ParseCubeFaceImage(ByteBuffer image, int face)
+    {
+        image.get();
+        image.get();
+
+        int imageType = image.get();
+        int colorMapStart = SwapOrder(image.getShort());
+        int colorMapLength = SwapOrder(image.getShort());
+        int colorMapBits = image.get();
+        int xstart = SwapOrder(image.getShort());
+        int ystart = SwapOrder(image.getShort());
+        int width = SwapOrder(image.getShort());
+        int height = SwapOrder(image.getShort());
+        int bits = image.get();
+        int descriptor = image.get();
+
+        if (bits != 32)
+        {
+            throw new RuntimeException("invalid texture format");
+        }
+
+        int eFormat = GLES30.GL_RGB;
+       int imageSize = width * height;
+
+        byte[] srcData = image.array();
+        byte[] dstData = new byte[imageSize * 3];
+        for (int i = 0; i < imageSize; i ++)
+        {
+            int j = i * 4;
+            int k = i * 3;
+
+            byte red = srcData[j + 0];
+            byte green = srcData[j + 1];
+            byte blue = srcData[j + 2];
+            dstData[k + 0] = blue;
+            dstData[k + 1] = green;
+            dstData[k + 2] = red;
+        }
+
+        ByteBuffer data = ByteBuffer.allocateDirect(imageSize * 3);
+        data.put(dstData);
+        data.rewind();
+        GLES30.glTexImage2D(face, 0, 4, width, height, 0,  GLES30.GL_RGB, GLES30.GL_UNSIGNED_BYTE, data);
     }
 
     String m_name;

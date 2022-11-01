@@ -53,10 +53,16 @@ public class SceneMeshTextureCache
             String name_y0, String name_y1,
             String name_z0, String name_z1)
     {
-        SceneMeshTexture texture = new SceneMeshTexture(m_assetManager,
+        int hash = name_x0.hashCode();
+        SceneMeshTexture texture = m_textureMap.get(hash);
+        if (texture == null)
+        {
+            texture = new SceneMeshTexture(m_assetManager,
                 name_x0, name_x1,
                 name_y0, name_y1,
                 name_z0, name_z1);
+            m_textureMap.put(hash, texture);
+        }
         return texture;
     }
 

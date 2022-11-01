@@ -26,12 +26,6 @@ public class SceneObjectSkyBox extends SceneObject
     public SceneObjectSkyBox(RenderScene scene)
     {
         super ();
-        SceneMeshTextureCache textCache = scene.GetTextureCache();
-        m_cubeTexture = textCache.GetCubeTexture(
-          "NewtonSky0003.tga", "NewtonSky0001.tga",
-                "NewtonSky0006.tga", "NewtonSky0005.tga",
-                "NewtonSky0002.tga", "NewtonSky0004.tga");
-
         float size = 200.0f;
         float vertices[] =
         {
@@ -113,6 +107,12 @@ public class SceneObjectSkyBox extends SceneObject
         m_glTextureMatrix = new float[16];
         m_glModelViewProjectionMatrix = new float[16];
         m_textureMatrix.GetFlatArray(m_glTextureMatrix);
+
+        SceneMeshTextureCache textCache = scene.GetTextureCache();
+        m_cubeTexture = textCache.GetCubeTexture(
+                "NewtonSky0003.tga", "NewtonSky0001.tga",
+                "NewtonSky0006.tga", "NewtonSky0005.tga",
+                "NewtonSky0002.tga", "NewtonSky0004.tga");
     }
 
     @Override
