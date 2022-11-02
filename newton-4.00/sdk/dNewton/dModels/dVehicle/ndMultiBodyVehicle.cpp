@@ -867,7 +867,6 @@ void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, nd
 
 	contactPoint.m_material.m_staticFriction0 = maxForceForce;
 	contactPoint.m_material.m_dynamicFriction0 = maxForceForce;
-
 	contactPoint.m_material.m_staticFriction1 = maxForceForce;
 	contactPoint.m_material.m_dynamicFriction1 = maxForceForce;
 	contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
@@ -881,71 +880,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	ndAssert(tireBody != otherBody);
 	ndAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
-#if 0
-	const ndVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
-	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
-	const ndVector relVeloc(contactVeloc0 - contactVeloc1);
-
-	const ndFloat32 relSpeed = relVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
-	if (ndAbs(relSpeed) > ndFloat32(1.0e-5f))
-	{
-		ndFloat32 longitudialSlip = ndFloat32(0.0f);
-		if (relSpeed < ndFloat32(-1.0e-5f))
-		{
-		// tire is in traction mode.
-		const ndVector rotationVeloc(tireBody->GetOmega().CrossProduct(contactPoint.m_point - tireBody->GetMatrix().m_posit));
-		ndFloat32 wr = ndAbs(rotationVeloc.DotProduct(contactPoint.m_dir1).GetScalar()) + ndFloat32(1.0e-4f);
-		longitudialSlip = -relSpeed / wr;
-		}
-		else
-		{
-		// tire is in breaking mode.
-		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 vr = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		longitudialSlip = relSpeed / vr;
-		}
-
-		ndAssert(longitudialSlip >= 0.0f);
-		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 sideSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		const ndFloat32 tireSpeed = ndAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-		const ndFloat32 lateralSlip = sideSpeed / tireSpeed;
-
-		const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
-		const ndFloat32 v = lateralSlip * den;
-		const ndFloat32 u = longitudialSlip * den;
-
-		const ndTireFrictionModel& info = tire->m_frictionModel;
-		const ndFloat32 cz = info.m_laterialStiffness  * v;
-		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
-
-		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
-		const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
-		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
-
-		const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
-		const ndFloat32 b = ndFloat32(1.0f) / (ndFloat32(3.0f) * maxForceForce);
-		const ndFloat32 c = ndFloat32(1.0f) / (ndFloat32(27.0f) * maxForceForce * maxForceForce);
-		const ndFloat32 f = (gamma < ndFloat32(3.0f) * maxForceForce) ? gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma) : maxForceForce;
-
-		const ndFloat32 lateralForce = f * cz / gamma;
-		const ndFloat32 longitudinalForce = f * cx / gamma;
-
-		contactPoint.m_material.m_staticFriction0 = lateralForce;
-		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
-
-		contactPoint.m_material.m_staticFriction1 = longitudinalForce;
-		contactPoint.m_material.m_dynamicFriction1 = longitudinalForce;
-		contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
-
-		if (tireBody->GetId() == 3)
-		{
-			//ndTrace(("id: %d  longitudinal:%f lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
-		}
-	}
-
-#else
-
 	//tire non linear brush model is only considered 
 	//when is moving faster than 0.5 m/s (approximatly 1.0 miles / hours) 
 	//this is just an arbitrary limit, based of the model 
@@ -953,18 +887,19 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	const ndVector contactVeloc0(tireBody->GetVelocity());
 	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
 	const ndVector relVeloc(contactVeloc0 - contactVeloc1);
-	const ndFloat32 relSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+	const ndVector lateralDir = contactPoint.m_dir1;
+	const ndVector longitudDir = contactPoint.m_dir0;
+	const ndFloat32 relSpeed = ndAbs(relVeloc.DotProduct(longitudDir).GetScalar());
 	if (relSpeed > ndFloat32(0.5f))
 	{
 		// tire is in breaking and traction mode.
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
 
 		const ndVector tireVeloc(tireBody->GetVelocity());
-		const ndFloat32 vr = contactVeloc.DotProduct(contactPoint.m_dir1).GetScalar();
+		const ndFloat32 vr = contactVeloc.DotProduct(longitudDir).GetScalar();
 		const ndFloat32 longitudialSlip = ndAbs(vr) / relSpeed;
 
-		const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		//const ndFloat32 lateralSlip = sideSpeed / relSpeed;
+		const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(lateralDir).GetScalar());
 		const ndFloat32 lateralSlip = ndMin(sideSpeed / relSpeed, ndFloat32(0.25f));
 
 		ndTrace(("(%d: %f %f)  ", tireBody->GetId(), longitudialSlip, lateralSlip));
@@ -988,7 +923,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
 
 		const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
-		//const ndFloat32 f = (gamma < ndFloat32(3.0f) * maxForceForce) ? gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma) : maxForceForce;
 		ndFloat32 f = maxForceForce;
 		if (gamma < (ndFloat32(3.0f) * maxForceForce))
 		{
@@ -996,21 +930,15 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 			const ndFloat32 c = ndFloat32(1.0f) / (ndFloat32(27.0f) * maxForceForce * maxForceForce);
 			f = gamma * (ndFloat32(1.0f) - b * gamma + c * gamma * gamma);
 		}
-		//else
-		//{
-		//	ndTrace(("saturated tire %d (%f %f)\n", tireBody->GetId(), f, gamma));
-		//}
 	
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
 
-		contactPoint.OverrideFriction1Accel(-vr / timestep);
-	
-		contactPoint.m_material.m_staticFriction0 = lateralForce;
-		contactPoint.m_material.m_dynamicFriction0 = lateralForce;
-
-		contactPoint.m_material.m_staticFriction1 = longitudinalForce;
-		contactPoint.m_material.m_dynamicFriction1 = longitudinalForce;
+		contactPoint.OverrideFriction0Accel(-vr / timestep);
+		contactPoint.m_material.m_staticFriction0 = longitudinalForce;
+		contactPoint.m_material.m_dynamicFriction0 = longitudinalForce;
+		contactPoint.m_material.m_staticFriction1 = lateralForce;
+		contactPoint.m_material.m_dynamicFriction1 = lateralForce;
 		contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 	
 		if (tireBody->GetId() == 3)
@@ -1022,8 +950,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	{
 		CoulombTireModel(tire, contactPoint, timestep);
 	}
-
-#endif
 }
 
 void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
@@ -1096,9 +1022,11 @@ xxxx++;
 					if (contactPathLocation < ndFloat32 (0.71f))
 					{
 						// align tire friction direction
-						const ndVector fronDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front));
-						contactPoint.m_dir1 = fronDir.Normalize();
-						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
+						const ndVector longitudinalDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front).Normalize());
+						const ndVector lateralDir(longitudinalDir.CrossProduct(contactPoint.m_normal));
+
+						contactPoint.m_dir1 = lateralDir;
+						contactPoint.m_dir0 = longitudinalDir;
 						
 						// check if the contact is in the contact patch,
 						// the is the 45 degree point around the tire vehicle axis. 
