@@ -115,8 +115,6 @@ ndSkyBox::~ndSkyBox()
 
 void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 {
-	//glCullFace(GL_FRONT);
-	//glFrontFace(GL_CCW);
 	glDepthMask(GL_FALSE);
 
 	ndDemoCamera* const camera = scene->GetCamera();
@@ -145,6 +143,4 @@ void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatri
 
 	glUseProgram(0);
 	glDepthMask(GL_TRUE);
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CCW);
 }
