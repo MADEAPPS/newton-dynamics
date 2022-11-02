@@ -42,7 +42,6 @@ class ndShaderCache
 			GLuint m_diffuseDebrisEffect;
 			GLuint m_diffuseIntanceEffect;
 			GLuint m_skinningDiffuseEffect;
-			GLuint m_diffuseNoTextureEffect;
 		};
 		GLuint m_shaders[128];
 	};
