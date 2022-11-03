@@ -761,6 +761,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
 	ndAssert(!contact->m_isDead);
+	contact->m_recalculateContacts = 0;
 	if (!(body0->m_equilibrium & body1->m_equilibrium))
 	{
 		bool active = contact->IsActive();
@@ -797,6 +798,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 			if (distance < D_NARROW_PHASE_DIST)
 			{
 				//contact->xxxxx = 1;
+				contact->m_recalculateContacts = 1;
 				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				{
@@ -839,6 +841,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 
 	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
 	{
+		ndAssert (!contact->m_recalculateContacts);
 		const ndBvhLeafNode* const bodyNode0 = m_bvhSceneManager.GetLeafNode(contact->GetBody0());
 		const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
 		ndAssert(bodyNode0->GetAsSceneBodyNode());
@@ -1290,7 +1293,6 @@ void ndScene::CalculateContacts()
 	m_contactArray.SetCount(contactCount + m_newPairs.GetCount());
 	if (m_contactArray.GetCount())
 	{
-
 		enum ndPairGroup
 		{
 			m_active,
@@ -1300,7 +1302,7 @@ void ndScene::CalculateContacts()
 
 		class ndJointActive
 		{
-		public:
+			public:
 			ndJointActive(void* const)
 			{
 				m_code[0] = m_active;
@@ -1332,7 +1334,7 @@ void ndScene::CalculateContacts()
 			{
 				ndContact* const contact = tmpJointsArray[i];
 				ndAssert(contact);
-				//contact->xxxxx = 0;
+				contact->m_recalculateContacts = 0;
 				if (!contact->m_isDead)
 				{
 					CalculateContacts(threadIndex, contact);

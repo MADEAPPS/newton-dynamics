@@ -136,6 +136,7 @@ class ndContact: public ndConstraint
 	ndUnsigned32 m_sceneLru;
 	ndUnsigned32 m_isDead : 1;
 	ndUnsigned32 m_isAttached : 1;
+	ndUnsigned32 m_recalculateContacts : 1;
 	ndUnsigned32 m_isIntersetionTestOnly : 1;
 	ndUnsigned32 m_skeletonIntraCollision : 1;
 	ndUnsigned32 m_skeletonSelftCollision : 1;
