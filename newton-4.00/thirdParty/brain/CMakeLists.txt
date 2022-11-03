@@ -16,6 +16,7 @@ message (${projectName})
 include_directories(.)
 include_directories(../../sdk/dCore)
 include_directories(../../sdk/dTinyxml)
+include_directories(../../sdk/dProfiler)
 
 file(GLOB CPP_SOURCE *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

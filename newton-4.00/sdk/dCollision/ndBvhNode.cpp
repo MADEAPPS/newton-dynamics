@@ -474,7 +474,7 @@ void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
 		}
 	});
 
-	D_TRACKTIME_NAMED(UpdateSceneBvhFull);
+	//D_TRACKTIME_NAMED(UpdateSceneBvhFull);
 	const ndBvhNodeArray& array = m_workingArray;
 	for (ndInt32 i = 0; i < ndInt32(array.m_scansCount); ++i)
 	{
