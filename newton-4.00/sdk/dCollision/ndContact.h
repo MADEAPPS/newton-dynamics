@@ -141,6 +141,8 @@ class ndContact: public ndConstraint
 	ndUnsigned32 m_skeletonSelftCollision : 1;
 	static ndVector m_initialSeparatingVector;
 
+//int xxxxx;
+
 	friend class ndScene;
 	friend class ndContactArray;
 	friend class ndBodyKinematic;

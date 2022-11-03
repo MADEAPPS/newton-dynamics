@@ -45,7 +45,8 @@ add_executable(
   ${PROJECT_NAME}
   world_test.cpp
   rigidBody_test.cpp
-  notyfiyBodyCallback_test.cpp
+  instancing_test.cpp
+  bodyNotifyCallback_test.cpp
 )
 
 target_link_libraries(

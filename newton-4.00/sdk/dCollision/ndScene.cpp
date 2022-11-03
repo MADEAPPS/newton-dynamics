@@ -796,6 +796,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 			}
 			if (distance < D_NARROW_PHASE_DIST)
 			{
+				//contact->xxxxx = 1;
 				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				{
@@ -1289,23 +1290,6 @@ void ndScene::CalculateContacts()
 	m_contactArray.SetCount(contactCount + m_newPairs.GetCount());
 	if (m_contactArray.GetCount())
 	{
-		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME_NAMED(CalculateContactPoints);
-			const ndInt32 jointCount = m_contactArray.GetCount();
-
-			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContact* const contact = tmpJointsArray[i];
-				ndAssert(contact);
-				if (!contact->m_isDead)
-				{
-					CalculateContacts(threadIndex, contact);
-				}
-			}
-		});
-		ParallelExecute(CalculateContactPoints);
 
 		enum ndPairGroup
 		{
@@ -1316,7 +1300,7 @@ void ndScene::CalculateContacts()
 
 		class ndJointActive
 		{
-			public:
+		public:
 			ndJointActive(void* const)
 			{
 				m_code[0] = m_active;
@@ -1334,8 +1318,31 @@ void ndScene::CalculateContacts()
 
 			ndInt32 m_code[4];
 		};
-
 		ndUnsigned32 prefixScan[5];
+
+		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
+		{
+			D_TRACKTIME_NAMED(CalculateContactPoints);
+			const ndInt32 jointCount = m_contactArray.GetCount();
+
+			ndUnsigned64 time0 = ndGetTimeInMicroseconds();
+			int xxxx = 0;
+			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndContact* const contact = tmpJointsArray[i];
+				ndAssert(contact);
+				//contact->xxxxx = 0;
+				if (!contact->m_isDead)
+				{
+					CalculateContacts(threadIndex, contact);
+				}
+				//xxxx += contact->xxxxx;
+			}
+			ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
+			ndTrace(("thread(%d) time(%f) %d\n", threadIndex, ndFloat32 (time * 1.0e-3f), xxxx));
+		});
+		ParallelExecute(CalculateContactPoints);
 		ndCountingSort<ndContact*, ndJointActive, 2>(*this, tmpJointsArray, &m_contactArray[0], m_contactArray.GetCount(), prefixScan, nullptr);
 
 		if (prefixScan[m_dead + 1] != prefixScan[m_dead])

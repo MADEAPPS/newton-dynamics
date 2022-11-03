@@ -378,8 +378,7 @@ void ndThreadYield()
 
 void ndTheadPause()
 {
-	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-#if 0
+#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	_mm_pause();
 	_mm_pause();
 	_mm_pause();

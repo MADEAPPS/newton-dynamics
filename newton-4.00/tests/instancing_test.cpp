@@ -526,7 +526,7 @@ static ndBodyDynamic* BuildBunnyInstance(const ndShapeInstance& collisionShape, 
 	return body;
 }
 
-TEST(RigidBody, Instancing)
+TEST(RigidBodyInstances, Instancing)
 {
 	ndWorld world;
 	world.SetSubSteps(2);

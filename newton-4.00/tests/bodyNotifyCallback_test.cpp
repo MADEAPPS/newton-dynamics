@@ -64,7 +64,8 @@ static ndBodyDynamic *BuildSphere(const ndVector& pos, float mass)
 
 /* Apply a force of 1N for 1 second to a body with 2kg of mass
    and verify that it moved 0.25 meters. */
-TEST(RigidBody1, MoveWithUnitForceDifferentMasses) {
+TEST(RigidBodyNotify, MoveWithUnitForceDifferentMasses) 
+{
   ndWorld world;
   world.SetSubSteps(2);
 
