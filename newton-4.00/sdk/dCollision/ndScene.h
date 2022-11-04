@@ -27,7 +27,7 @@
 #include "ndListView.h"
 #include "ndContactArray.h"
 
-//#define NEW_CONTACT_LOOP
+#define NEW_CONTACT_LOOP
 #define D_SCENE_MAX_STACK_DEPTH		256
 
 class ndWorld;

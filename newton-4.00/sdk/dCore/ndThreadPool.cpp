@@ -94,7 +94,7 @@ void ndThreadPool::ndWorker::ThreadFunction()
 			// fail safe if for some reason more than one 
 			// thread was launched on the same core.
 			ndThreadYield();
-			ndExpandTraceMessage("frame(%d) thread(%d) task idling(%d) switch\n", xxxx, m_threadIndex, idleLoops);
+			ndExpandTraceMessage("frame(%d) thread(%d) task switch, idling(%d ticks)\n", xxxx, m_threadIndex, idleLoops);
 			idleLoops = -1;
 			targetTime = time + idleTime;
 		}
