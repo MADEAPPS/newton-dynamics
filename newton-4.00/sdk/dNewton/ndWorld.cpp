@@ -720,10 +720,6 @@ bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) co
 {
 	bool test = true;
 	ndAssert(constraint && constraint->GetAsBilateral());
-	#ifdef D_JOINT_PRECONDITIONER
-	test = test && (constraint->m_preconditioner0 == ndFloat32(1.0f));
-	test = test && (constraint->m_preconditioner1 == ndFloat32(1.0f));
-	#endif
 	test = test && (constraint->GetRowsCount() > 0);
 	test = test && (constraint->IsSkeleton());
 	return test;

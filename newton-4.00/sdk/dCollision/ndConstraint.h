@@ -29,13 +29,6 @@
 #define D_INDEPENDENT_ROW			-1 
 #define D_CONSTRAINT_MAX_ROWS		(3 * 16)
 
-//#define D_JOINT_PRECONDITIONER
-
-#ifdef D_JOINT_PRECONDITIONER
-#define D_DIAGONAL_PRECONDITIONER	ndFloat32 (25.0f)
-#endif
-
-
 class ndBody;
 class ndContact;
 class ndConstraint;
@@ -256,10 +249,6 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
-#ifdef D_JOINT_PRECONDITIONER
-	ndFloat32 m_preconditioner0;
-	ndFloat32 m_preconditioner1;
-#endif
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;
 	ndUnsigned8 m_active;

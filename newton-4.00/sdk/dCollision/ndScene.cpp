@@ -1345,7 +1345,7 @@ void ndScene::CalculateContacts()
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 			const ndInt32 jointCount = m_contactArray.GetCount();
 
-			ndUnsigned64 time0 = ndGetTimeInMicroseconds();
+			//ndUnsigned64 time0 = ndGetTimeInMicroseconds();
 			for (ndInt32 i = counter.fetch_add(1) ; i < jointCount; i = counter.fetch_add(1))
 			{
 				ndContact* const contact = tmpJointsArray[i];
@@ -1355,8 +1355,8 @@ void ndScene::CalculateContacts()
 					CalculateContacts(threadIndex, contact);
 				}
 			}
-			ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
-			ndTrace(("thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
+			//ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
+			//ndTrace(("thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
 		});
 #endif
 		ParallelExecute(CalculateContactPoints);
