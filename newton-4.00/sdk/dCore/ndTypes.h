@@ -69,9 +69,7 @@
 	#undef __STRICT_ANSI__
 #endif
 
-// include without __STRICT_ANSI__
 #include <float.h>
-// restore __STRICT_ANSI__ back
 #if (defined (__MINGW32__) || defined (__MINGW64__))
 	#pragma pop_macro("__STRICT_ANSI__")
 #endif
@@ -158,6 +156,8 @@
 		#define D_USE_THREAD_EMULATION
 	#endif
 #endif
+
+#define D_AUTO_THREAD_BALANCE
 
 //************************************************************
 #ifdef D_DISABLE_ASSERT

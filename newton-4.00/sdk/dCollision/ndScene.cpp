@@ -35,7 +35,6 @@
 #include "ndJointBilateralConstraint.h"
 #include "ndShapeStaticProceduralMesh.h"
 
-//#define OLD_CONTACT_LOOP
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			ndFloat32 (0.2f)
 #define D_CONTACT_TRANSLATION_ERROR	ndFloat32 (1.0e-3f)
@@ -1318,13 +1317,27 @@ void ndScene::CalculateContacts()
 		};
 		ndUnsigned32 prefixScan[5];
 
-#ifdef OLD_CONTACT_LOOP
+#ifdef D_AUTO_THREAD_BALANCE
+		ndAtomic<ndInt32> counter(0);
+		auto CalculateContactPoints = ndMakeObject::ndFunction([this, &counter, tmpJointsArray](ndInt32 threadIndex, ndInt32)
+		{
+			D_TRACKTIME_NAMED(CalculateContactPoints);
+			const ndInt32 jointCount = m_contactArray.GetCount();
+			for (ndInt32 i = counter.fetch_add(1); i < jointCount; i = counter.fetch_add(1))
+			{
+				ndContact* const contact = tmpJointsArray[i];
+				ndAssert(contact);
+				if (!contact->m_isDead)
+				{
+					CalculateContacts(threadIndex, contact);
+				}
+			}
+		});
+#else
 		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 			const ndInt32 jointCount = m_contactArray.GetCount();
-
-			ndUnsigned64 time0 = ndGetTimeInMicroseconds();
 			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -1335,28 +1348,6 @@ void ndScene::CalculateContacts()
 					CalculateContacts(threadIndex, contact);
 				}
 			}
-			ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
-			ndTrace(("thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
-		});
-#else
-		ndAtomic<ndInt32> counter(0);
-		auto CalculateContactPoints = ndMakeObject::ndFunction([this, &counter, tmpJointsArray](ndInt32 threadIndex, ndInt32)
-		{
-			D_TRACKTIME_NAMED(CalculateContactPoints);
-			const ndInt32 jointCount = m_contactArray.GetCount();
-
-			//ndUnsigned64 time0 = ndGetTimeInMicroseconds();
-			for (ndInt32 i = counter.fetch_add(1) ; i < jointCount; i = counter.fetch_add(1))
-			{
-				ndContact* const contact = tmpJointsArray[i];
-				ndAssert(contact);
-				if (!contact->m_isDead)
-				{
-					CalculateContacts(threadIndex, contact);
-				}
-			}
-			//ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
-			//ndTrace(("thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
 		});
 #endif
 		ParallelExecute(CalculateContactPoints);
@@ -1596,7 +1587,22 @@ void ndScene::UpdateBodyList()
 void ndScene::ApplyExtForce()
 {
 	D_TRACKTIME();
+#ifdef D_AUTO_THREAD_BALANCE
+	ndAtomic<ndInt32> counter(0);
+	auto ApplyForce = ndMakeObject::ndFunction([this, &counter](ndInt32 threadIndex, ndInt32)
+	{
+		D_TRACKTIME_NAMED(ApplyForce);
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
+		const ndFloat32 timestep = m_timestep;
+		const ndInt32 lastCount = view.GetCount() - 1;
+		for (ndInt32 i = counter.fetch_add(1); i < lastCount; i = counter.fetch_add(1))
+		{
+			ndBodyKinematic* const body = view[i];
+			body->ApplyExternalForces(threadIndex, timestep);
+		}
+	});
+#else
 	auto ApplyForce = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ApplyForce);
@@ -1610,6 +1616,8 @@ void ndScene::ApplyExtForce()
 			body->ApplyExternalForces(threadIndex, timestep);
 		}
 	});
+#endif
+
 	ParallelExecute(ApplyForce);
 }
 
@@ -1617,11 +1625,12 @@ void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
+
 	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(BuildBodyArray);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-	
+
 		ndInt32* const scan = &scans[threadIndex][0];
 		scan[0] = 0;
 		scan[1] = 0;
@@ -1631,7 +1640,7 @@ void ndScene::InitBodyArray()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBodyKinematic* const body = view[i];
-	
+
 			body->PrepareStep(i);
 			ndUnsigned8 sceneEquilibrium = 1;
 			ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
@@ -1643,7 +1652,7 @@ void ndScene::InitBodyArray()
 				ndAssert(!bodyNode->GetLeft());
 				ndAssert(!bodyNode->GetRight());
 				ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-			
+
 				body->UpdateCollisionMatrix();
 				const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 				if (!test)
