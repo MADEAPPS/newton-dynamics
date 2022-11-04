@@ -35,6 +35,7 @@
 #include "ndJointBilateralConstraint.h"
 #include "ndShapeStaticProceduralMesh.h"
 
+//#define OLD_CONTACT_LOOP
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			ndFloat32 (0.2f)
 #define D_CONTACT_TRANSLATION_ERROR	ndFloat32 (1.0e-3f)
@@ -752,110 +753,6 @@ void ndScene::UpdateTransform()
 	ParallelExecute(TransformUpdate);
 }
 
-#ifdef NEW_CONTACT_LOOP
-void ndScene::IntegrateContacts(ndContact* const contact)
-{
-	const ndUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
-
-	ndVector deltaTime(m_timestep);
-	ndBodyKinematic* const body0 = contact->GetBody0();
-	ndBodyKinematic* const body1 = contact->GetBody1();
-
-	ndAssert(!contact->m_isDead);
-	contact->m_recalculateContacts = 0;
-	if (!(body0->m_equilibrium & body1->m_equilibrium))
-	{
-		bool active = contact->IsActive();
-		if (ValidateContactCache(contact, deltaTime))
-		{
-			contact->m_sceneLru = m_lru;
-			contact->m_timeOfImpact = ndFloat32(1.0e10f);
-		}
-		else
-		{
-			contact->SetActive(false);
-			contact->m_positAcc = ndVector::m_zero;
-			contact->m_rotationAcc = ndQuaternion();
-
-			ndFloat32 distance = contact->m_separationDistance;
-			if (distance >= D_NARROW_PHASE_DIST)
-			{
-				const ndVector veloc0(body0->GetVelocity());
-				const ndVector veloc1(body1->GetVelocity());
-
-				const ndVector veloc(veloc1 - veloc0);
-				const ndVector omega0(body0->GetOmega());
-				const ndVector omega1(body1->GetOmega());
-				const ndShapeInstance* const collision0 = &body0->GetCollisionShape();
-				const ndShapeInstance* const collision1 = &body1->GetCollisionShape();
-				const ndVector scale(ndFloat32(1.0f), ndFloat32(3.5f) * collision0->GetBoxMaxRadius(), ndFloat32(3.5f) * collision1->GetBoxMaxRadius(), ndFloat32(0.0f));
-				const ndVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), ndFloat32(0.0f));
-				const ndVector velocMag(velocMag2.GetMax(ndVector::m_epsilon).InvSqrt() * velocMag2 * scale);
-				const ndFloat32 speed = velocMag.AddHorizontal().GetScalar() + ndFloat32(0.5f);
-
-				distance -= speed * m_timestep;
-				contact->m_separationDistance = distance;
-			}
-			if (distance < D_NARROW_PHASE_DIST)
-			{
-				contact->m_recalculateContacts = 1;
-				//CalculateJointContacts(threadIndex, contact);
-				//if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
-				//{
-				//	contact->SetActive(true);
-				//	contact->m_timeOfImpact = ndFloat32(1.0e10f);
-				//}
-				contact->m_sceneLru = m_lru;
-			}
-			else
-			{
-				const ndBvhLeafNode* const bodyNode0 = m_bvhSceneManager.GetLeafNode(contact->GetBody0());
-				const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
-				ndAssert(bodyNode0 && bodyNode0->GetAsSceneBodyNode());
-				ndAssert(bodyNode1 && bodyNode1->GetAsSceneBodyNode());
-				if (dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
-				{
-					contact->m_sceneLru = m_lru;
-				}
-				else if (contact->m_sceneLru < lru)
-				{
-					contact->m_isDead = 1;
-				}
-			}
-		}
-
-		if (!contact->m_recalculateContacts & (active ^ contact->IsActive()))
-		{
-			ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
-			body0->m_equilibrium = 0;
-			if (body1->GetInvMass() > ndFloat32(0.0f))
-			{
-				body1->m_equilibrium = 0;
-			}
-		}
-	}
-	else
-	{
-		contact->m_sceneLru = m_lru;
-	}
-
-	if (!contact->m_recalculateContacts)
-	{
-		if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
-		{
-			ndAssert(!contact->m_recalculateContacts);
-			const ndBvhLeafNode* const bodyNode0 = m_bvhSceneManager.GetLeafNode(contact->GetBody0());
-			const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
-			ndAssert(bodyNode0->GetAsSceneBodyNode());
-			ndAssert(bodyNode1->GetAsSceneBodyNode());
-			if (!dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
-			{
-				contact->m_isDead = 1;
-			}
-		}
-	}
-}
-#else
 void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 {
 	const ndUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
@@ -865,7 +762,6 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
 	ndAssert(!contact->m_isDead);
-	contact->m_recalculateContacts = 0;
 	if (!(body0->m_equilibrium & body1->m_equilibrium))
 	{
 		bool active = contact->IsActive();
@@ -901,8 +797,6 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 			}
 			if (distance < D_NARROW_PHASE_DIST)
 			{
-				//contact->xxxxx = 1;
-				contact->m_recalculateContacts = 1;
 				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				{
@@ -945,7 +839,6 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 
 	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
 	{
-		ndAssert (!contact->m_recalculateContacts);
 		const ndBvhLeafNode* const bodyNode0 = m_bvhSceneManager.GetLeafNode(contact->GetBody0());
 		const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
 		ndAssert(bodyNode0->GetAsSceneBodyNode());
@@ -956,7 +849,6 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 		}
 	}
 }
-#endif
 
 void ndScene::UpdateSpecial()
 {
@@ -1426,119 +1318,48 @@ void ndScene::CalculateContacts()
 		};
 		ndUnsigned32 prefixScan[5];
 
-#ifdef NEW_CONTACT_LOOP
-		class ndNeedsNewContacts
-		{
-			public:
-			ndNeedsNewContacts(void* const)
-			{
-			}
-
-			ndInt32 GetKey(const ndContact* const contact) const
-			{
-				const ndInt32 needContact = 1 - ndInt32(contact->m_recalculateContacts);
-				return needContact;
-			}
-		};
-
-		auto IntegrateContactJoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME_NAMED(IntegrateContactJoints);
-			const ndInt32 jointCount = m_contactArray.GetCount();
-
-			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContact* const contact = tmpJointsArray[i];
-				ndAssert(contact);
-				contact->m_recalculateContacts = 0;
-				if (!contact->m_isDead)
-				{
-					IntegrateContacts(contact);
-				}
-				m_contactArray[i] = contact;
-			}
-		});
-		ParallelExecute(IntegrateContactJoints);
-
-		ndCountingSort<ndContact*, ndNeedsNewContacts, 1>(*this, &m_contactArray[0], tmpJointsArray, m_contactArray.GetCount(), prefixScan, nullptr);
-
-		ndInt32 needContactCount = ndInt32(prefixScan[1]);
-		auto CalculateContactJoints = ndMakeObject::ndFunction([this, needContactCount, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
-		{
-			D_TRACKTIME_NAMED(CalculateContactPoints);
-			const ndInt32 jointCount = needContactCount;
-
-			//int xxxx = 0;
-			ndUnsigned64 time0 = ndGetTimeInMicroseconds();
-
-			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndContact* const contact = tmpJointsArray[i];
-				ndBodyKinematic* const body0 = contact->GetBody0();
-				ndBodyKinematic* const body1 = contact->GetBody1();
-
-				bool active = contact->IsActive();
-				CalculateJointContacts(threadIndex, contact);
-				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
-				{
-					contact->SetActive(true);
-					contact->m_timeOfImpact = ndFloat32(1.0e10f);
-				}
-				if (active ^ contact->IsActive())
-				{
-					ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
-					body0->m_equilibrium = 0;
-					if (body1->GetInvMass() > ndFloat32(0.0f))
-					{
-						body1->m_equilibrium = 0;
-					}
-				}
-
-				if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
-				{
-					ndAssert(!contact->m_recalculateContacts);
-					const ndBvhLeafNode* const bodyNode0 = m_bvhSceneManager.GetLeafNode(contact->GetBody0());
-					const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
-					ndAssert(bodyNode0->GetAsSceneBodyNode());
-					ndAssert(bodyNode1->GetAsSceneBodyNode());
-					if (!dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
-					{
-						contact->m_isDead = 1;
-					}
-				}
-			}
-			ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
-			ndTrace(("new contact: thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
-		});
-		ParallelExecute(CalculateContactJoints);
-#else
+#ifdef OLD_CONTACT_LOOP
 		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 			const ndInt32 jointCount = m_contactArray.GetCount();
 
-			//int xxxx = 0;
-			//ndUnsigned64 time0 = ndGetTimeInMicroseconds();
+			ndUnsigned64 time0 = ndGetTimeInMicroseconds();
 			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = tmpJointsArray[i];
 				ndAssert(contact);
-				contact->m_recalculateContacts = 0;
 				if (!contact->m_isDead)
 				{
 					CalculateContacts(threadIndex, contact);
 				}
-				//xxxx += contact->xxxxx;
 			}
-			//ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
-			//ndTrace(("thread(%d) time(%f) %d\n", threadIndex, ndFloat32 (time * 1.0e-3f), xxxx));
+			ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
+			ndTrace(("thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
 		});
-		ParallelExecute(CalculateContactPoints);
-#endif
+#else
+		ndAtomic<ndInt32> counter(0);
+		auto CalculateContactPoints = ndMakeObject::ndFunction([this, &counter, tmpJointsArray](ndInt32 threadIndex, ndInt32)
+		{
+			D_TRACKTIME_NAMED(CalculateContactPoints);
+			const ndInt32 jointCount = m_contactArray.GetCount();
 
+			ndUnsigned64 time0 = ndGetTimeInMicroseconds();
+			for (ndInt32 i = counter.fetch_add(1) ; i < jointCount; i = counter.fetch_add(1))
+			{
+				ndContact* const contact = tmpJointsArray[i];
+				ndAssert(contact);
+				if (!contact->m_isDead)
+				{
+					CalculateContacts(threadIndex, contact);
+				}
+			}
+			ndUnsigned64 time = ndGetTimeInMicroseconds() - time0;
+			ndTrace(("thread(%d) time(%f)\n", threadIndex, ndFloat32(time * 1.0e-3f)));
+		});
+#endif
+		ParallelExecute(CalculateContactPoints);
 		ndCountingSort<ndContact*, ndJointActive, 2>(*this, tmpJointsArray, &m_contactArray[0], m_contactArray.GetCount(), prefixScan, nullptr);
 		if (prefixScan[m_dead + 1] != prefixScan[m_dead])
 		{

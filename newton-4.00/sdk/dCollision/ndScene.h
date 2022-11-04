@@ -27,7 +27,6 @@
 #include "ndListView.h"
 #include "ndContactArray.h"
 
-#define NEW_CONTACT_LOOP
 #define D_SCENE_MAX_STACK_DEPTH		256
 
 class ndWorld;
@@ -148,13 +147,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void ThreadFunction();
 
 	D_COLLISION_API virtual void CollisionOnlyUpdate();
-
-#ifdef NEW_CONTACT_LOOP
-	D_COLLISION_API virtual void IntegrateContacts(ndContact* const contact);
-#else
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
-#endif
-
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 
 	ndBodyList m_bodyList;

@@ -541,7 +541,7 @@ TEST(RigidBodyInstances, Instancing)
 	ndFloat32 stackOffset = 2.0f;
 
 	// make a stack of instances
-	for (int i = 0; i < instanceCount; ++i)
+	for (uint32_t i = 0; i < instanceCount; ++i)
 	{
 		// stack'em
 		bunnyPos.m_y += stackOffset;
