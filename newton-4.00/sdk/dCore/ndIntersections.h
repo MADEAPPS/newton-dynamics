@@ -30,32 +30,32 @@
 class ndPlane;
 class ndFastRay;
 
-enum dIntersectStatus
+enum ndIntersectStatus
 {
 	t_StopSearch,
 	t_ContinueSearh
 };
 
-typedef dIntersectStatus (*dAaabbIntersectCallback) (void* const context, 
+typedef ndIntersectStatus (*ndAaabbIntersectCallback) (void* const context, 
 													  const ndFloat32* const polygon, ndInt32 strideInBytes,
 													  const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 
-typedef ndFloat32 (*dRayIntersectCallback) (void* const context, 
+typedef ndFloat32 (*ndRayIntersectCallback) (void* const context, 
 										   const ndFloat32* const polygon, ndInt32 strideInBytes,
 										   const ndInt32* const indexArray, ndInt32 indexCount);
 
-D_CORE_API ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1);
-D_CORE_API ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
-D_CORE_API ndBigVector dPointToTetrahedrumDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
+D_CORE_API ndBigVector ndPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1);
+D_CORE_API ndBigVector ndPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
+D_CORE_API ndBigVector ndPointToTetrahedrumDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
 
-D_CORE_API void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector& ray_q0, const ndBigVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out);
-D_CORE_API void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector* const points, ndInt32 vertexCount, ndBigVector& p0Out, ndBigVector& p1Out);
+D_CORE_API void ndRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector& ray_q0, const ndBigVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out);
+D_CORE_API void ndRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector* const points, ndInt32 vertexCount, ndBigVector& p0Out, ndBigVector& p1Out);
 
-D_CORE_API bool dRayBoxClip (ndVector& ray_p0, ndVector& ray_p1, const ndVector& boxP0, const ndVector& boxP1); 
-D_CORE_API ndFloat32 dRayCastBox (const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut);
-D_CORE_API ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius);
+D_CORE_API bool ndRayBoxClip (ndVector& ray_p0, ndVector& ray_p1, const ndVector& boxP0, const ndVector& boxP1); 
+D_CORE_API ndFloat32 ndRayCastBox (const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut);
+D_CORE_API ndFloat32 ndRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius);
 
-inline ndInt32 dOverlapTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
+inline ndInt32 ndOverlapTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {
 	ndVector r0(p0 - q1);
 	ndVector r1(p1 - q0);
@@ -64,20 +64,20 @@ inline ndInt32 dOverlapTest (const ndVector& p0, const ndVector& p1, const ndVec
 	return (mask == 0x07);
 }
 
-inline ndInt32 dBoxInclusionTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
+inline ndInt32 ndBoxInclusionTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {
 	ndVector val(ndVector::m_negOne & ((p0 >= q0) & (p1 <= q1)));
 	ndInt32 mask = val.GetSignMask() & 0x07;
 	return (mask == 0x07);
 }
 
-inline ndInt32 dCompareBox (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
+inline ndInt32 ndCompareBox (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {
 	ndAssert(0);
 	return (p0.m_x != q0.m_x) || (p0.m_y != q0.m_y) || (p0.m_z != q0.m_z) || (p1.m_x != q1.m_x) || (p1.m_y != q1.m_y) || (p1.m_z != q1.m_z);
 }
 
-inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, const ndVector& omega, ndFloat32 timestep, ndFloat32 maxRadius, ndFloat32 minRadius)
+inline void ndMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, const ndVector& omega, ndFloat32 timestep, ndFloat32 maxRadius, ndFloat32 minRadius)
 {
 	ndVector linearStep (veloc.Scale (timestep));
 
@@ -96,7 +96,7 @@ inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, cons
 	p1 = r1.GetMax (q1) & ndVector::m_triplexMask;
 }
 
-//inline ndFloat32 dBoxPenetration (const ndVector& minBox, const ndVector& maxBox)
+//inline ndFloat32 ndBoxPenetration (const ndVector& minBox, const ndVector& maxBox)
 //{
 //	ndAssert(maxBox.m_x >= minBox.m_x);
 //	ndAssert(maxBox.m_y >= minBox.m_y);
@@ -109,7 +109,7 @@ inline void dMovingAABB (ndVector& p0, ndVector& p1, const ndVector& veloc, cons
 //	return dist.GetScalar();
 //}
 
-inline ndFloat32 dBoxDistanceToOrigin2 (const ndVector& minBox, const ndVector& maxBox)
+inline ndFloat32 ndBoxDistanceToOrigin2 (const ndVector& minBox, const ndVector& maxBox)
 {
 	ndAssert(maxBox.m_x >= minBox.m_x);
 	ndAssert(maxBox.m_y >= minBox.m_y);

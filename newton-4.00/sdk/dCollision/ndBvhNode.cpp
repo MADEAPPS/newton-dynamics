@@ -127,7 +127,7 @@ bool ndBvhNode::SanityCheck(ndUnsigned32 level) const
 	//	ndTrace(("%s nodeId:%d  depth:%d\n", margin, m_nodeId, m_depthLevel));
 	//}
 	ndAssert(!m_parent || (m_depthLevel < m_parent->m_depthLevel));
-	ndAssert(!m_parent || dBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
+	ndAssert(!m_parent || ndBoxInclusionTest(m_minBox, m_maxBox, m_parent->m_minBox, m_parent->m_maxBox));
 	return true;
 }
 
@@ -242,7 +242,7 @@ ndBvhNode* ndBvhSceneManager::AddBody(ndBodyKinematic* const body, ndBvhNode* ro
 		while (1)
 		{
 			sceneNode = parent->GetAsSceneTreeNode();
-			if (sceneNode && dBoxInclusionTest(childNode->m_minBox, childNode->m_maxBox, parent->m_minBox, parent->m_maxBox))
+			if (sceneNode && ndBoxInclusionTest(childNode->m_minBox, childNode->m_maxBox, parent->m_minBox, parent->m_maxBox))
 			{
 				const ndVector minLeftBox (sceneNode->m_left->m_minBox.GetMin(childNode->m_minBox));
 				const ndVector maxLeftBox (sceneNode->m_left->m_maxBox.GetMax(childNode->m_maxBox));
@@ -466,7 +466,7 @@ void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
 
 			const ndVector minBox(node->m_left->m_minBox.GetMin(node->m_right->m_minBox));
 			const ndVector maxBox(node->m_left->m_maxBox.GetMax(node->m_right->m_maxBox));
-			if (!dBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
+			if (!ndBoxInclusionTest(minBox, maxBox, node->m_minBox, node->m_maxBox))
 			{
 				node->m_minBox = minBox;
 				node->m_maxBox = maxBox;

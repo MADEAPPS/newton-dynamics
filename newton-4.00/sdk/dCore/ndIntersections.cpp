@@ -29,7 +29,7 @@
 #include "ndFastRay.h"
 #include "ndIntersections.h"
 
-bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVector& boxP1) 
+bool ndRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVector& boxP1) 
 {	
 	ndAssert (p0.m_w == ndFloat32(0.0f));
 	ndAssert (p1.m_w == ndFloat32(0.0f));
@@ -88,7 +88,7 @@ bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVec
 	return true;
 }
 
-ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1)
+ndBigVector ndPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1)
 {
 	ndBigVector dp (ray_p1 - ray_p0);
 	ndAssert (dp.m_w == ndFloat32 (0.0f));
@@ -96,7 +96,7 @@ ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray
 	return ray_p0 + dp.Scale (t);
 }
 
-ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2)
+ndBigVector ndPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2)
 {
 	const ndBigVector e10(p1 - p0);
 	const ndBigVector e20(p2 - p0);
@@ -116,15 +116,15 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 		const ndFloat64 alpha = b0 * a11 - a01 * b1;
 		if (beta < ndFloat32(0.0f)) 
 		{
-			return dPointToRayDistance (point, p0, p1);
+			return ndPointToRayDistance (point, p0, p1);
 		} 
 		else if (alpha < ndFloat32(0.0f)) 
 		{
-			return dPointToRayDistance (point, p0, p2);
+			return ndPointToRayDistance (point, p0, p2);
 		} 
 		else if ((alpha + beta) > det) 
 		{
-			return dPointToRayDistance (point, p1, p2);
+			return ndPointToRayDistance (point, p1, p2);
 		}
 		return p0 + (e10.Scale(alpha) + e20.Scale(beta)).Scale(ndFloat64(1.0f) / det);
 	}
@@ -133,7 +133,7 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 	return p0;
 }
 
-ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3)
+ndBigVector ndPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3)
 {
 	const ndBigVector e10(p1 - p0);
 	const ndBigVector e20(p2 - p0);
@@ -170,19 +170,19 @@ ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVe
 				if (u3 < ndFloat64(0.0f)) 
 				{
 					// this looks funny but it is correct
-					return dPointToTriangleDistance(point, p0, p1, p2);
+					return ndPointToTriangleDistance(point, p0, p1, p2);
 				} 
 				else if (u2 < ndFloat64(0.0f)) 
 				{
-					return dPointToTriangleDistance(point, p0, p1, p3);
+					return ndPointToTriangleDistance(point, p0, p1, p3);
 				} 
 				else if (u1 < ndFloat64(0.0f)) 
 				{
-					return dPointToTriangleDistance(point, p0, p2, p3);
+					return ndPointToTriangleDistance(point, p0, p2, p3);
 				} 
 				else if (u1 + u2 + u3 > ndFloat64(1.0f)) 
 				{
-					return dPointToTriangleDistance(point, p1, p2, p3);
+					return ndPointToTriangleDistance(point, p1, p2, p3);
 				}
 				return p0 + e10.Scale(u1) + e20.Scale(u2) + e30.Scale(u3);
 			}
@@ -193,7 +193,7 @@ ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVe
 	return p0;
 }
 
-void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector& ray_q0, const ndBigVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out)
+void ndRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector& ray_q0, const ndBigVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out)
 {
 	ndFloat64 sN;
 	ndFloat64 tN;
@@ -292,7 +292,7 @@ void dRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, con
 	p1Out = ray_q0 + v.Scale(tc);
 }
 
-void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector* const points, ndInt32 vertexCount, ndBigVector& p0Out, ndBigVector& p1Out)
+void ndRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector* const points, ndInt32 vertexCount, ndBigVector& p0Out, ndBigVector& p1Out)
 {
 	ndBigVector normal(ndBigVector::m_zero);
 	ndBigVector e0(points[1] - points[0]);
@@ -311,7 +311,7 @@ void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1,
 	ndFloat64 distance2 = ndFloat32(1.0e10f);
 	for (ndInt32 i = 2; i < vertexCount; ++i)
 	{
-		ndBigVector p (dPointToTriangleDistance(p0Out, points[0], points[i-1], points[i]));
+		ndBigVector p (ndPointToTriangleDistance(p0Out, points[0], points[i-1], points[i]));
 		ndBigVector step (p - p0Out);
 		ndFloat64 d2 = step.DotProduct(step).GetScalar();
 		if (d2 < distance2) 
@@ -322,7 +322,7 @@ void dRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1,
 	}
 }
 
-ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius)
+ndFloat32 ndRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius)
 {
 	ndVector p0Origin (p0 - origin);
 	ndAssert (p0Origin.m_w == ndFloat32 (0.0f));
@@ -406,7 +406,7 @@ ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector
 	return ndFloat32(1.2f);
 }
 
-ndFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut)
+ndFloat32 ndRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut)
 {
 	ndInt32 index = 0;
 	ndFloat32 signDir = ndFloat32(0.0f);

@@ -407,7 +407,7 @@ ndFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const ndVector& localP0,
 	ndVector p1(localP1);
 	
 	// clip the line against the bounding box
-	if (dRayBoxClip(p0, p1, boxP0, boxP1)) 
+	if (ndRayBoxClip(p0, p1, boxP0, boxP1)) 
 	{
 		ndVector dp(p1 - p0);
 		ndVector normalOut(ndVector::m_zero);

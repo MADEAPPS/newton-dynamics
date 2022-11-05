@@ -91,7 +91,7 @@ class ndScene : public ndThreadPool
 
 	D_COLLISION_API virtual void DebugScene(ndSceneTreeNotiFy* const notify);
 
-	D_COLLISION_API virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
+	D_COLLISION_API virtual void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBox, const ndVector& maxBox) const;
 	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
 	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
@@ -129,7 +129,6 @@ class ndScene : public ndThreadPool
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
-	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndBvhNode** stackPool, ndInt32 stack) const;
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	bool RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;

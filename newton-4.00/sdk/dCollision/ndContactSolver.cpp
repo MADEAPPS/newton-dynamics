@@ -133,7 +133,7 @@ class ndContactSolver::ndBoxBoxDistance2
 		const ndVector minBox(minLocalP1 - maxLocalP0);
 		const ndVector maxBox(maxLocalP1 - minLocalP0);
 
-		ndFloat32 dist2 = dBoxDistanceToOrigin2(minBox, maxBox);
+		ndFloat32 dist2 = ndBoxDistanceToOrigin2(minBox, maxBox);
 		return dist2;
 	}
 
@@ -151,7 +151,7 @@ class ndContactSolver::ndBoxBoxDistance2
 		const ndVector minBox(minLocalP1 - maxLocalP0);
 		const ndVector maxBox(maxLocalP1 - minLocalP0);
 
-		ndFloat32 dist2 = dBoxDistanceToOrigin2(minBox, maxBox);
+		ndFloat32 dist2 = ndBoxDistanceToOrigin2(minBox, maxBox);
 		return dist2;
 	}
 

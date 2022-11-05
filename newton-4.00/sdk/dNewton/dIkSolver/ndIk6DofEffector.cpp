@@ -188,27 +188,11 @@ void ndIk6DofEffector::SubmitShortestPathAxis(const ndMatrix& matrix0, const ndM
 	const ndFloat32 tol = ndFloat32(3.0f * ndPi / 180.0f);
 	if (dirMag2 > (tol * tol))
 	{
-		//const ndBodyKinematic* const body0 = GetBody0();
-		//const ndBodyKinematic* const body1 = GetBody1();
-		//const ndVector omega0(body0->GetOmega());
-		//const ndVector omega1(body1->GetOmega());
-
 		const ndMatrix basis(pin);
 		const ndFloat32 dirMag = ndSqrt(dirMag2);
-		//const ndFloat32 angle = ndFloat32(2.0f) * ndAtan2(dirMag, rotation.m_w);
 		const ndFloat32 angle = ndAtan2(dirMag, rotation.m_w);
 		AddAngularRowJacobian(desc, basis[0], angle);
-#if 1
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-#else
-		const ndInt32 index = desc.m_rowsCount - 1;
-		const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
-		const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
-		const ndFloat32 relOmega = (jacobian0.m_angular * omega0 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-		const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_angularSpring, -angle, m_angularDamper, relOmega);
-		desc.m_diagonalRegularizer[index] = m_angularRegularizer;
-		SetMotorAcceleration(desc, accel);
-#endif
 		SetLowerFriction(desc, -m_angularMaxTorque);
 		SetHighFriction(desc, m_angularMaxTorque);
 

@@ -329,7 +329,7 @@ bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const ndFastRay& ray, n
 	ndVector l1(ray.m_p0 + ray.m_diff.Scale(ndMin(maxT, ndFloat32(1.0f))));
 
 	bool state = false;
-	if (dRayBoxClip(l0, l1, m_minAabb, m_maxAabb))
+	if (ndRayBoxClip(l0, l1, m_minAabb, m_maxAabb))
 	{
 		const ndMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
 		ndVector localP0(globalMatrix.UntransformVector(l0) & ndVector::m_triplexMask);
@@ -388,7 +388,7 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 			ndAssert(!GetCollisionShape().GetShape()->GetAsShapeNull());
 		
 			UpdateCollisionMatrix();
-			const ndInt32 test = dBoxInclusionTest(m_minAabb, m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+			const ndInt32 test = ndBoxInclusionTest(m_minAabb, m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 			if (!test)
 			{
 				bodyNode->SetAabb(m_minAabb, m_maxAabb);

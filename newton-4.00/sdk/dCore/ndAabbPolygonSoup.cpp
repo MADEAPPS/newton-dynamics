@@ -613,7 +613,7 @@ void ndAabbPolygonSoup::CalculateAdjacent ()
 	}
 }
 
-dIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
+ndIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
 {
 	ndInt32 face[256];
 	ndInt64 data[256];
@@ -627,7 +627,7 @@ dIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const cont
 	return t_ContinueSearh;
 }
 
-dIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
+ndIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
 {
 	#define DG_WELDING_TOL (1.0e-2f)
 	#define DG_WELDING_TOL2 (DG_WELDING_TOL * DG_WELDING_TOL)
@@ -1151,7 +1151,7 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 	return supportVertex;
 }
 
-void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 maxParam, dRayIntersectCallback callback, void* const context) const
+void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 maxParam, ndRayIntersectCallback callback, void* const context) const
 {
 	const ndNode *stackPool[DG_STACK_DEPTH];
 	ndFloat32 distance[DG_STACK_DEPTH];
@@ -1251,7 +1251,7 @@ void ndAabbPolygonSoup::ForAllSectorsRayHit (const ndFastRay& raySrc, ndFloat32 
 	}
 }
 
-void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVector& boxDistanceTravel, ndFloat32, dAaabbIntersectCallback callback, void* const context) const
+void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVector& boxDistanceTravel, ndFloat32, ndAaabbIntersectCallback callback, void* const context) const
 {
 	ndAssert (ndAbs(ndAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < ndFloat32 (1.0e-4f));
 	ndAssert (ndAbs(ndAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < ndFloat32 (1.0e-4f));
@@ -1485,7 +1485,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 	}
 }
 
-void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabbInfo, const ndVector& boxDistanceTravel, ndFloat32, dAaabbIntersectCallback callback, void* const context) const
+void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabbInfo, const ndVector& boxDistanceTravel, ndFloat32, ndAaabbIntersectCallback callback, void* const context) const
 {
 	ndAssert(ndAbs(ndAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < ndFloat32(1.0e-4f));
 	ndAssert(ndAbs(ndAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < ndFloat32(1.0e-4f));

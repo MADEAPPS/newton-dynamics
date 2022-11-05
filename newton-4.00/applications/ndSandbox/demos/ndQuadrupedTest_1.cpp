@@ -642,7 +642,7 @@ namespace ndQuadruped_1
 				ndBigVector ray_p1(comMatrix.m_posit);
 				ray_p1.m_y -= 1.0f;
 
-				dRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
 
 				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
 				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);

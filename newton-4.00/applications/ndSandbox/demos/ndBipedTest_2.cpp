@@ -540,7 +540,7 @@ namespace biped2
 				
 				ndBigVector qOq1ut;
 				ndBigVector p0p1Out;
-				dRayToRayDistance(q0, q1, p0, p1, qOq1ut, p0p1Out);
+				ndRayToRayDistance(q0, q1, p0, p1, qOq1ut, p0p1Out);
 				zmp = p0p1Out;
 			}
 

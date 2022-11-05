@@ -356,8 +356,8 @@ ndFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const ndVec
 		disc = ndSqrt(disc);
 		ndVector origin0(p0 + dp.Scale((-b + disc) / (ndFloat32(2.0f) * a)));
 		ndVector origin1(p0 + dp.Scale((-b - disc) / (ndFloat32(2.0f) * a)));
-		ndFloat32 t0 = dRayCastSphere(localP0, localP1, origin0, m_height);
-		ndFloat32 t1 = dRayCastSphere(localP0, localP1, origin1, m_height);
+		ndFloat32 t0 = ndRayCastSphere(localP0, localP1, origin0, m_height);
+		ndFloat32 t1 = ndRayCastSphere(localP0, localP1, origin1, m_height);
 		if (t1 < t0) 
 		{
 			t0 = t1;
@@ -376,9 +376,9 @@ ndFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const ndVec
 	}
 	else 
 	{
-		ndVector origin0(dPointToRayDistance(ndVector::m_zero, p0, p1));
+		ndVector origin0(ndPointToRayDistance(ndVector::m_zero, p0, p1));
 		origin0 = origin0.Scale(m_radius / ndSqrt(origin0.DotProduct(origin0).GetScalar()));
-		ndFloat32 t0 = dRayCastSphere(localP0, localP1, origin0, m_height);
+		ndFloat32 t0 = ndRayCastSphere(localP0, localP1, origin0, m_height);
 		if ((t0 >= 0.0f) && (t0 <= 1.0f)) 
 		{
 			contactOut.m_normal = localP0 + dq.Scale(t0) - origin0;

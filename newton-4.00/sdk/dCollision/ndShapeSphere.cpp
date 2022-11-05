@@ -230,7 +230,7 @@ ndInt32 ndShapeSphere::CalculatePlaneIntersection(const ndVector& normal, const 
 
 ndFloat32 ndShapeSphere::RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
 {
-	ndFloat32 t = dRayCastSphere(localP0, localP1, ndVector::m_zero, m_radius);
+	ndFloat32 t = ndRayCastSphere(localP0, localP1, ndVector::m_zero, m_radius);
 	if (t < maxT) 
 	{
 		ndVector contact(localP0 + (localP1 - localP0).Scale(t));

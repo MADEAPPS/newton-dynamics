@@ -211,9 +211,9 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	D_CORE_API void Create (const ndPolygonSoupBuilder& builder);
 	D_CORE_API void CalculateAdjacent ();
 	D_CORE_API virtual ndVector ForAllSectorsSupportVertex(const ndVector& dir) const;
-	D_CORE_API virtual void ForAllSectorsRayHit (const ndFastRay& ray, ndFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForAllSectors (const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectorsRayHit (const ndFastRay& ray, ndFloat32 maxT, ndRayIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectors (const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, ndAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, ndAaabbIntersectCallback callback, void* const context) const;
 
 	public:
 	/// Get the root node of the hierarchy.
@@ -248,8 +248,8 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	private:
 	ndNodeBuilder* BuildTopDown (ndNodeBuilder* const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** const allocator) const;
 	ndFloat32 CalculateFaceMaxSize (const ndVector* const vertex, ndInt32 indexCount, const ndInt32* const indexArray) const;
-	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
-	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
+	static ndIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
+	static ndIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 	
 	ndNode* m_aabb;
 	ndInt32* m_indices;

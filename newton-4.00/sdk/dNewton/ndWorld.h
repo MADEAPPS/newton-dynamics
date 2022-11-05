@@ -118,7 +118,7 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API void SendBackgroundTask(ndBackgroundTask* const job);
 
 	D_NEWTON_API void ClearCache();
-	D_NEWTON_API void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
+	D_NEWTON_API void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBox, const ndVector& maxBox) const;
 	D_NEWTON_API bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
 	D_NEWTON_API bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 

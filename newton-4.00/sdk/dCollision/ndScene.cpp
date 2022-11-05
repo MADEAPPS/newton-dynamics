@@ -621,7 +621,7 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 	{
 		stack--;
 		ndBvhNode* const rootNode = pool[stack];
-		if (dOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) 
+		if (ndOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) 
 		{
 			if (rootNode->GetAsSceneBodyNode()) 
 			{
@@ -810,7 +810,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 				const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
 				ndAssert(bodyNode0 && bodyNode0->GetAsSceneBodyNode());
 				ndAssert(bodyNode1 && bodyNode1->GetAsSceneBodyNode());
-				if (dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) 
+				if (ndOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) 
 				{
 					contact->m_sceneLru = m_lru;
 				}
@@ -842,7 +842,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 		const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
 		ndAssert(bodyNode0->GetAsSceneBodyNode());
 		ndAssert(bodyNode1->GetAsSceneBodyNode());
-		if (!dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
+		if (!ndOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
 		{
 			contact->m_isDead = 1;
 		}
@@ -1067,38 +1067,47 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, nd
 	return state;
 }
 
-void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndBvhNode** stackPool, ndInt32 stack) const
+void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBox, const ndVector& maxBox) const
 {
-	callback.m_bodyArray.SetCount(0);
-	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
+	callback.Reset();
+	if (m_rootNode)
 	{
-		stack--;
-		
-		const ndBvhNode* const me = stackPool[stack];
-		ndAssert(me);
-		ndBodyKinematic* const body = me->GetBody();
-		if (body)
+		const ndBvhNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
+		stackPool[0] = m_rootNode;
+		ndInt32 stack = 1;
+		while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
 		{
-			ndAssert(!me->GetLeft());
-			ndAssert(!me->GetRight());
-			if (callback.OnOverlap(body))
+			stack--;
+			
+			const ndBvhNode* const rootNode = stackPool[stack];
+			ndAssert(rootNode);
+			if (ndOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, minBox, maxBox))
 			{
-				callback.m_bodyArray.PushBack(body);
-			}
-		}
-		else
-		{
-			const ndBvhNode* const left = me->GetLeft();
-			ndAssert(left);
-			stackPool[stack] = left;
-			stack++;
-			ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+				ndBodyKinematic* const body = rootNode->GetBody();
+				if (body)
+				{
+					ndAssert(!rootNode->GetLeft());
+					ndAssert(!rootNode->GetRight());
+					if (ndOverlapTest(body->m_minAabb, body->m_maxAabb, minBox, maxBox))
+					{
+						callback.OnOverlap(body);
+					}
+				}
+				else
+				{
+					const ndBvhNode* const left = rootNode->GetLeft();
+					ndAssert(left);
+					stackPool[stack] = left;
+					stack++;
+					ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 
-			const ndBvhNode* const right = me->GetRight();
-			ndAssert(right);
-			stackPool[stack] = right;
-			stack++;
-			ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+					const ndBvhNode* const right = rootNode->GetRight();
+					ndAssert(right);
+					stackPool[stack] = right;
+					stack++;
+					ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+				}
+			}
 		}
 	}
 }
@@ -1191,23 +1200,10 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 	return state;
 }
 
-void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback) const
-{
-	callback.m_bodyArray.SetCount(0);
-
-	if (m_rootNode)
-	{
-		const ndBvhNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
-		stackPool[0] = m_rootNode;
-		ndScene::BodiesInAabb(callback, stackPool, 1);
-	}
-}
-
 void ndScene::SendBackgroundTask(ndBackgroundTask* const job)
 {
 	m_backgroundThread.SendTask(job);
 }
-
 
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId)
 {
@@ -1593,7 +1589,6 @@ void ndScene::ApplyExtForce()
 	{
 		D_TRACKTIME_NAMED(ApplyForce);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-
 		const ndFloat32 timestep = m_timestep;
 		const ndInt32 lastCount = view.GetCount() - 1;
 		for (ndInt32 i = counter.fetch_add(1); i < lastCount; i = counter.fetch_add(1))
@@ -1617,7 +1612,6 @@ void ndScene::ApplyExtForce()
 		}
 	});
 #endif
-
 	ParallelExecute(ApplyForce);
 }
 
@@ -1647,9 +1641,8 @@ void ndScene::InitBodyArray()
 				ndAssert(!bodyNode->GetLeft());
 				ndAssert(!bodyNode->GetRight());
 				ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-
 				body->UpdateCollisionMatrix();
-				const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+				const ndInt32 test = ndBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 				if (!test)
 				{
 					bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
@@ -1684,7 +1677,7 @@ void ndScene::InitBodyArray()
 				ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
 				body->UpdateCollisionMatrix();
-				const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+				const ndInt32 test = ndBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 				if (!test)
 				{
 					bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
@@ -1783,7 +1776,7 @@ void ndScene::InitBodyArray()
 						ndScopeSpinLock lock(parent->m_lock);
 						const ndVector minBox(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
 						const ndVector maxBox(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
-						if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+						if (ndBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
 						{
 							break;
 						}

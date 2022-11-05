@@ -1004,9 +1004,9 @@ bool ndWorld::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 	return m_scene->ConvexCast(callback, convexShape, globalOrigin, globalDest);
 }
 
-void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
+void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBox, const ndVector& maxBox) const
 {
-	m_scene->BodiesInAabb(callback);
+	m_scene->BodiesInAabb(callback, minBox, maxBox);
 }
 
 void ndWorld::SelectSolver(ndSolverModes solverMode)

@@ -425,8 +425,8 @@ ndFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const ndVector& r0,
 
 	ndVector origin0(-m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 	ndVector origin1(m_height, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-	ndFloat32 t0 = dRayCastSphere(q0, q1, origin0, m_radius0);
-	ndFloat32 t1 = dRayCastSphere(q0, q1, origin1, m_radius1);
+	ndFloat32 t0 = ndRayCastSphere(q0, q1, origin0, m_radius0);
+	ndFloat32 t1 = ndRayCastSphere(q0, q1, origin1, m_radius1);
 	if ((t0 < ndFloat32(1.0f)) && (t1 < ndFloat32 (1.0f)))
 	{
 		if (t0 < t1) 

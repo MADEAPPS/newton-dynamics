@@ -38,12 +38,17 @@ class ndBodiesInAabbNotify : public ndClassAlloc
 	{
 	}
 
-	virtual ndUnsigned32 OnOverlap(const ndBody* const)
+	virtual void Reset()
 	{
-		return 1;
+		m_bodyArray.SetCount(0);
 	}
 
-	ndArray<ndBody*> m_bodyArray;
+	virtual void OnOverlap(const ndBody* const body)
+	{
+		m_bodyArray.PushBack(body);
+	}
+
+	ndArray<const ndBody*> m_bodyArray;
 } D_GCC_NEWTON_ALIGN_32;
 
 

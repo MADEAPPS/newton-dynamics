@@ -22,9 +22,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	{	
 		m_linear,
 		m_full6dof,
-		m_linearAndTwist,
-		m_linearAndCone,
-		m_linearPlusAngularFriction, // this is pick mode from screen
+		m_linearPlusAngularFriction, // for pick mode from screen
 	};
 
 	D_CLASS_REFLECTION(ndJointKinematicController);
@@ -54,11 +52,11 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
+	private:
 	ndFloat32 m_maxSpeed;
 	ndFloat32 m_maxOmega;
 	ndFloat32 m_maxLinearFriction;
 	ndFloat32 m_maxAngularFriction;
-
 	ndFloat32 m_angularFrictionCoefficient;
 	ndControlModes m_controlMode;
 	bool m_autoSleepState;

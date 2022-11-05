@@ -128,7 +128,7 @@ void ndShapeStatic_bvh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	Serialize(filePathName);
 }
 
-dIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const, ndInt32 indexCount, ndFloat32)
+ndIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const, ndInt32 indexCount, ndFloat32)
 {
 	ndMeshVertexListIndexList& data = (*(ndMeshVertexListIndexList*)context);
 
@@ -151,7 +151,7 @@ ndShapeInfo ndShapeStatic_bvh::GetShapeInfo() const
 	return info;
 }
 
-dIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
+ndIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
 {
 	ndVector poly[128];
 	ndShapeDebugNotify::ndEdgeType edgeType[128];
@@ -219,7 +219,7 @@ ndFloat32 ndShapeStatic_bvh::RayCast(ndRayCastNotify& callback, const ndVector& 
 	return t;
 }
 
-dIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance)
+ndIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance)
 {
 	ndPolygonMeshDesc& data = (*(ndPolygonMeshDesc*)context);
 	if (data.m_faceCount >= D_MAX_COLLIDING_FACES) 
