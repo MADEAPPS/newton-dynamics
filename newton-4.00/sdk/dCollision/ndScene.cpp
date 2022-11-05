@@ -1624,23 +1624,18 @@ void ndScene::ApplyExtForce()
 void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
-	ndInt32 scans[D_MAX_THREADS_COUNT][2];
-
-	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+#ifdef D_AUTO_THREAD_BALANCE
+	ndAtomic<ndInt32> counter(0);
+	auto BuildBodyArray = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(BuildBodyArray);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
-		ndInt32* const scan = &scans[threadIndex][0];
-		scan[0] = 0;
-		scan[1] = 0;
-
 		ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
-		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		const ndInt32 lastCount = view.GetCount() - 1;
+		for (ndInt32 i = counter.fetch_add(1); i < lastCount; i = counter.fetch_add(1))
 		{
 			ndBodyKinematic* const body = view[i];
-
 			body->PrepareStep(i);
 			ndUnsigned8 sceneEquilibrium = 1;
 			ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
@@ -1663,10 +1658,65 @@ void ndScene::InitBodyArray()
 			}
 			body->m_sceneForceUpdate = 0;
 			body->m_sceneEquilibrium = sceneEquilibrium;
+		}
+	});
+#else
+	auto BuildBodyArray = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME_NAMED(BuildBodyArray);
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+
+		ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = view[i];
+			body->PrepareStep(i);
+			ndUnsigned8 sceneEquilibrium = 1;
+			ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
+			if (ndUnsigned8(!body->m_equilibrium) | sceneForceUpdate)
+			{
+				ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
+				ndAssert(bodyNode->GetAsSceneBodyNode());
+				ndAssert(bodyNode->m_body == body);
+				ndAssert(!bodyNode->GetLeft());
+				ndAssert(!bodyNode->GetRight());
+				ndAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+				body->UpdateCollisionMatrix();
+				const ndInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+				if (!test)
+				{
+					bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
+				}
+				sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
+			}
+			body->m_sceneForceUpdate = 0;
+			body->m_sceneEquilibrium = sceneEquilibrium;
+		}
+	});
+#endif
+	ParallelExecute(BuildBodyArray);
+
+	ndInt32 scans[D_MAX_THREADS_COUNT][2];
+	auto CountMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME_NAMED(BuildBodyArray);
+		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
+
+		ndInt32* const scan = &scans[threadIndex][0];
+		scan[0] = 0;
+		scan[1] = 0;
+
+		const ndStartEnd startEnd(view.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndBodyKinematic* const body = view[i];
+			ndInt32 sceneEquilibrium = body->m_sceneEquilibrium;
 			scan[sceneEquilibrium] ++;
 		}
 	});
-	
+
 	auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(CompactMovingBodies);
@@ -1684,8 +1734,7 @@ void ndScene::InitBodyArray()
 			scan[key] ++;
 		}
 	});
-
-	ParallelExecute(BuildBodyArray);
+	ParallelExecute(CountMovingBodies);
 	ndInt32 sum = 0;
 	ndInt32 threadCount = GetThreadCount();
 	for (ndInt32 j = 0; j < 2; ++j)
