@@ -10,12 +10,12 @@
  */
 
 package com.javaNewton;
-import com.newton.ndShapeInstanceBoxGlue;
+import com.newton.ndShapeInstanceSphereGlue;
 
-public class nShapeBoxInstance extends nShapeInstance
+public class nShapeSphereInstance extends nShapeInstance
 {
-    public nShapeBoxInstance(float size_x, float size_y, float size_z)
+    public nShapeSphereInstance(float radios)
     {
-        super(nShapeType.m_box, new ndShapeInstanceBoxGlue(size_x, size_y, size_z));
+        super(nShapeType.m_sphere, new ndShapeInstanceSphereGlue(radios));
     }
 }

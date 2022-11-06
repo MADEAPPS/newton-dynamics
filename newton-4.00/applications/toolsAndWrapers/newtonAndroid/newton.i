@@ -45,6 +45,7 @@
 	#include "ndMeshEffectGlue.h"
 	#include "ndShapeInstanceGlue.h"
 	#include "ndShapeInstanceBoxGlue.h"
+	#include "ndShapeInstanceSphereGlue.h"
 %}
 
 %feature("director") ndBodyNotifyGlue;
@@ -105,4 +106,5 @@
 %include "ndMeshEffectGlue.h"
 %include "ndShapeInstanceGlue.h"
 %include "ndShapeInstanceBoxGlue.h"
+%include "ndShapeInstanceSphereGlue.h"
 

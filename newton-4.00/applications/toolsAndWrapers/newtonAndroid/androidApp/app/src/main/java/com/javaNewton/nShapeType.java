@@ -12,5 +12,6 @@ package com.javaNewton;
 
 public enum nShapeType
 {
-    m_box
+    m_box,
+    m_sphere
 }

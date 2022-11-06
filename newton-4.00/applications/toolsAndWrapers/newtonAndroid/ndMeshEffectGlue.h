@@ -36,6 +36,8 @@ class ndMeshEffectGlue : public ndContainersFreeListAlloc<ndMeshEffectGlue>
 	int GetMaterialIndexCount(int materialIndex);
 	void GetMaterialGetIndexStream(int materialIndex, short data[], int startOffsetInShorts);
 	void MaterialEnd();
+
+	void SphericalMapping(int materialIndex, const ndMatrixGlue& textureMatrix);
 	void UniformBoxMapping(int materialIndex, const ndMatrixGlue& textureMatrix);
 
 	private:

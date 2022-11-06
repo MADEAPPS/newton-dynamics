@@ -89,6 +89,11 @@ void ndMeshEffectGlue::MaterialEnd()
 	m_materialHandle = nullptr;
 }
 
+void ndMeshEffectGlue::SphericalMapping(int materialIndex, const ndMatrixGlue& textureMatrix)
+{
+	m_meshEffect->SphericalMapping(materialIndex, textureMatrix);
+}
+
 void ndMeshEffectGlue::UniformBoxMapping(int materialIndex, const ndMatrixGlue& textureMatrix)
 {
 	m_meshEffect->UniformBoxMapping(materialIndex, textureMatrix);

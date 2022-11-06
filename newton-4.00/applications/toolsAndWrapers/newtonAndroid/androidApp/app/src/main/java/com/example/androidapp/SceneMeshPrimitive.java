@@ -42,10 +42,18 @@ public class SceneMeshPrimitive extends SceneMesh
         nShapeType shapeType = shapeInstance.GetType();
         switch (shapeType)
         {
+            case m_sphere:
+            {
+                meshEffect.SphericalMapping(text0.m_id, uvMatrix);
+                break;
+            }
+
             case m_box:
             default:
+            {
                 meshEffect.UniformBoxMapping(text0.m_id, uvMatrix);
                 break;
+            }
         }
 
         // get vertex data from newton mesh effect.

@@ -75,6 +75,11 @@ public class nMeshEffect
         m_nativeObject.MaterialEnd();
     }
 
+    public void SphericalMapping(int materialId, nMatrix matrix)
+    {
+        m_nativeObject.SphericalMapping(materialId, matrix.CreateNative());
+    }
+
     public void UniformBoxMapping(int materialId, nMatrix matrix)
     {
         m_nativeObject.UniformBoxMapping(materialId, matrix.CreateNative());
