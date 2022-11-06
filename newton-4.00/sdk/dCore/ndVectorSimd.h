@@ -234,11 +234,12 @@ class ndVector
 		return (*this = _mm_mul_ps(m_type, A.m_type));
 	}
 
-	// return 4d cross product
+	// return 4d dot product
 	inline ndVector DotProduct(const ndVector& A) const
 	{
-		const ndVector tmp(_mm_mul_ps(m_type, A.m_type));
-		return tmp.AddHorizontal();
+		//const ndVector tmp(_mm_mul_ps(m_type, A.m_type));
+		//return tmp.AddHorizontal();
+		return (*this * A).AddHorizontal();
 	}
 
 	// return 3d cross product
@@ -814,7 +815,6 @@ class ndBigVector
 		ndInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
 		ndInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
 		ndInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
-		//return ndBigVector(_mm_set_pd(*(ndFloat32*)&y, *(ndFloat32*)&x), _mm_set_pd(*(ndFloat32*)&w, *(ndFloat32*)&z));
 		return ndBigVector(_mm_set_epi64x(y, x), _mm_set_epi64x(w, z));
 	}
 
@@ -925,8 +925,9 @@ class ndBigVector
 	// return dot 4d dot product
 	inline ndBigVector DotProduct(const ndBigVector &A) const
 	{
-		const ndBigVector tmp(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
-		return tmp.AddHorizontal();
+		//const ndBigVector tmp(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
+		//return tmp.AddHorizontal();
+		return (*this * A).AddHorizontal();
 	}
 
 	// return 3d cross product

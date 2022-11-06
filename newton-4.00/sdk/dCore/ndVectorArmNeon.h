@@ -277,7 +277,8 @@ class ndVector
 
 	inline ndVector DotProduct(const ndVector &A) const
 	{
-		return ndVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		//return ndVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return (*this * A).AddHorizontal();
 	}
 
 	inline ndVector Reciproc() const
@@ -679,7 +680,8 @@ class ndBigVector
 
 	inline ndBigVector DotProduct(const ndBigVector &A) const
 	{
-		return ndBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		//return ndBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return (*this * A).AddHorizontal();
 	}
 
 	inline ndBigVector Reciproc() const
