@@ -164,8 +164,9 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	meshBuilder.Begin();
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
+	//meshBuilder.LoadPLY("static_mesh.ply");
 	meshBuilder.End(optimized);
-
+	
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
@@ -330,7 +331,11 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 			stack++;
 		}
 	}
+
+	//meshBuilder.SavePLY("xxx.ply");
+	//meshBuilder.LoadPLY("xxx.ply");
 	meshBuilder.End(true);
+
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix matrix(entity->GetCurrentMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();

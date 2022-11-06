@@ -132,20 +132,20 @@ void ndShapeConvexHull::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance)
 {
-	ndInt32 stride = strideInBytes / ndInt32(sizeof(ndFloat32));
 	ndStack<ndBigVector> buffer(2 * count);
+	ndInt32 stride = strideInBytes / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
-		buffer[i] = ndVector(vertexArray[i * stride + 0], vertexArray[i * stride + 1], vertexArray[i * stride + 2], ndFloat32(0.0f));
+		buffer[i] = ndBigVector(vertexArray[i * stride + 0], vertexArray[i * stride + 1], vertexArray[i * stride + 2], ndFloat32(0.0f));
 	}
 
 	ndConvexHull3d* convexHull = new ndConvexHull3d(&buffer[0].m_x, sizeof (ndBigVector), count, tolerance);
 	if (!convexHull->GetCount()) 
 	{
 		ndAssert(0);
-		//// this is a degenerated hull hull to add some thickness and for a thick plane
+		//// this is a degenerated hull, add some thickness and form a thick plane
 		//delete convexHull;
-		//
+		
 		//ndStack<ndVector> tmp(3 * count);
 		//for (ndInt32 i = 0; i < count; ++i) 
 		//{

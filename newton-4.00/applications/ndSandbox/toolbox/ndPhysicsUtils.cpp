@@ -173,21 +173,19 @@ ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& lo
 
 ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName)
 {
-	ndInt32 count = 0;
-	ndVector points[1024 * 8];
+	ndFixSizeArray<ndVector, 1024 * 8> points;
 	for (ndInt32 i = 0; i < segments; ++i)
 	{
-		ndFloat32 angle = ndFloat32(2.0f) * ndPi * (ndFloat32)(i / segments);
+		ndFloat32 angle = ndFloat32(2.0f) * ndPi * ndFloat32(i) / segments;
 		ndFloat32 x = radius * ndCos(angle);
 		ndFloat32 z = radius * ndSin(angle);
-		points[count++] = ndVector(0.7f * x, -high * 0.5f, 0.7f * z, 0.0f);
-		points[count++] = ndVector(0.7f * x,  high * 0.5f, 0.7f * z, 0.0f);
-		points[count++] = ndVector(x, -high * 0.25f, z, 0.0f);
-		points[count++] = ndVector(x, high * 0.25f, z, 0.0f);
-		ndAssert(count < ndInt32 (sizeof(points) / sizeof(points[0])));
+		points.PushBack(ndVector(0.7f * x, -high * 0.5f, 0.7f * z, 0.0f));
+		points.PushBack(ndVector(0.7f * x,  high * 0.5f, 0.7f * z, 0.0f));
+		points.PushBack(ndVector(x, -high * 0.25f, z, 0.0f));
+		points.PushBack(ndVector(x, high * 0.25f, z, 0.0f));
 	}
 
-	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof(ndVector), 0.0f, &points[0].m_x));
+	ndShapeInstance shape(new ndShapeConvexHull(points.GetCount(), sizeof(ndVector), 0.0f, &points[0].m_x));
 	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass, textName);
 	return body;
 }
