@@ -93,7 +93,6 @@ class ndVector
 	}
 
 	inline ndVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
-		//: m_x(*((ndFloat32*)&ix)), m_y(*((ndFloat32*)&iy)), m_z(*((ndFloat32*)&iz)), m_w(*((ndFloat32*)&iw))
 		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
@@ -185,23 +184,17 @@ class ndVector
 
 	inline ndVector MulAdd(const ndVector& A, const ndVector& B) const
 	{
-		//return *this + A * B;
-		//return vfmaq_f32(A.m_type, B.m_type, m_type);
 		return vmlaq_f32(m_type, A.m_type, B.m_type);
 	}
 
 	inline ndVector MulSub(const ndVector& A, const ndVector& B) const
 	{
-		//return *this - A * B;
 		return vmlsq_f32(m_type, A.m_type, B.m_type);
 	}
 
 	inline ndVector AddHorizontal() const
 	{
 		return ndVector(m_x + m_y + m_z + m_w);
-		//float32x2_t temp = vpadd_f32(vget_low_f32(m_type), vget_low_f32(m_type));
-		//temp = vadd_f32(temp, vget_high_f32(m_type));
-		//return vget_lane_f32(temp, 0);
 	}
 
 	inline ndVector Scale(ndFloat32 scale) const

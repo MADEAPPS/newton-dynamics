@@ -21,7 +21,6 @@ const int BUNNY_NUM_TRIANGLES = 902;
 const int BUNNY_NUM_VERTICES = 453;
 const int BUNNY_NUM_INDICES = BUNNY_NUM_TRIANGLES * 3;
 
-
 static REAL gVerticesBunny[BUNNY_NUM_VERTICES * 3] = {
 	REAL(-0.334392), REAL(0.133007), REAL(0.062259),
 	REAL(-0.350189), REAL(0.150354), REAL(-0.147769),
@@ -478,7 +477,8 @@ static REAL gVerticesBunny[BUNNY_NUM_VERTICES * 3] = {
 	REAL(0.337656), REAL(0.131992), REAL(0.066374)
 };
 
-static const unsigned gIndicesBunny[BUNNY_NUM_TRIANGLES][3] = {
+static const unsigned gIndicesBunny[BUNNY_NUM_TRIANGLES][3] = 
+{
 	{126,134,133},
 	{342,138,134},
 	{133,134,138},
@@ -1383,6 +1383,12 @@ static const unsigned gIndicesBunny[BUNNY_NUM_TRIANGLES][3] = {
 	{452,450,449}
 };
 
+// array of material index per face, in this test all set to zero
+static const unsigned faceMaterialId[BUNNY_NUM_TRIANGLES]
+{
+	0
+};
+
 template <typename Type, size_t N>
 constexpr int numElementsInArray(Type(&)[N]) noexcept
 {
@@ -1406,7 +1412,7 @@ static ndBodyDynamic* BuildStaticBunny(const ndVector& pos, const ndVector& grav
 	matrix.m_posit = pos;
 	body->SetMatrix(matrix);
 
-	// pointer to the begining of the float array of bunny vertices
+	// pointer to the beginning of the float array of bunny vertices
 	const ndFloat32* const verticesBegin = gVerticesBunny;
 
 	ndUnsigned32 triCount = numElementsInArray(gIndicesBunny);
@@ -1414,7 +1420,7 @@ static ndBodyDynamic* BuildStaticBunny(const ndVector& pos, const ndVector& grav
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 
-	for (int i = 0; i < triCount; ++i)
+	for (ndUnsigned32 i = 0; i < triCount; ++i)
 	{
 		// pointer to the next set of triangle indices
 		const ndUnsigned32* const triIndices = gIndicesBunny[i];
@@ -1423,15 +1429,17 @@ static ndBodyDynamic* BuildStaticBunny(const ndVector& pos, const ndVector& grav
 		ndVector triangle[3];
 		for (int j = 0; j < 3; ++j)
 		{
-			const ndFloat32* const vertexBegin = verticesBegin + triIndices[j];
+			const ndFloat32* const vertexBegin = verticesBegin + triIndices[j] * 3;
 
 			// the next 3 floats are the x,y,z components of a triangle vertex
 			triangle[j].m_x = *(vertexBegin + 0);
 			triangle[j].m_y = *(vertexBegin + 1);
 			triangle[j].m_z = *(vertexBegin + 2);
+			triangle[j].m_w = 0.0f;
 		}
 
-		meshBuilder.AddFace(&triangle[0].m_x, sizeof(ndVector), 3, i);
+		ndInt32 materialId = faceMaterialId[i];
+		meshBuilder.AddFace(&triangle[0].m_x, sizeof(ndVector), 3, materialId);
 	}
 	bool optimize = true;
 	meshBuilder.End(optimize);
