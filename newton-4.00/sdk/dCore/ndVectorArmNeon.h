@@ -184,11 +184,13 @@ class ndVector
 
 	inline ndVector MulAdd(const ndVector& A, const ndVector& B) const
 	{
+		//return *this + A * B;
 		return vmlaq_f32(m_type, A.m_type, B.m_type);
 	}
 
 	inline ndVector MulSub(const ndVector& A, const ndVector& B) const
 	{
+		//return *this - A * B;
 		return vmlsq_f32(m_type, A.m_type, B.m_type);
 	}
 
