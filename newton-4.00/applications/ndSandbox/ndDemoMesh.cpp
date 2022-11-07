@@ -274,6 +274,10 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		segment->m_material.m_shiness = GLfloat(material.m_shiness);
 		segment->m_material.SetTextureName(material.m_textureName);
 		GLint tex = GLint(LoadTexture(material.m_textureName));
+		if (tex == 0)
+		{
+			tex = GLint(LoadTexture("default.tga"));
+		}
 		segment->m_material.SetTexture(tex);
 		ReleaseTexture(GLuint(tex));
 		segment->SetOpacity(material.m_opacity);

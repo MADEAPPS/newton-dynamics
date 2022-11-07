@@ -269,7 +269,8 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 
 ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 {
-	ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode("playerarena.fbx");
+	//ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode("playerarena.fbx");
+	ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode("ceramic_vase_03_4k.fbx");
 	ndDemoEntity* const entity = new ndDemoEntity(scene, meshEffectNode);
 	scene->AddEntity(entity);
 
