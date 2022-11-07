@@ -36,6 +36,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//BuildStaticMesh(scene, "track.fbx", false);
+	BuildStaticMesh(scene, "ceramic_vase_03_4k.fbx", true);
 
 	ndMatrix location(ndGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
