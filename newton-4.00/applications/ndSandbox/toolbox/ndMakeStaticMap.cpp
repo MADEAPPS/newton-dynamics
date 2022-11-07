@@ -335,7 +335,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 
 	//meshBuilder.SavePLY("xxx.ply");
 	//meshBuilder.LoadPLY("xxx.ply");
-	meshBuilder.End(true);
+	//meshBuilder.End(true);
+	meshBuilder.End(false);
 
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix matrix(entity->GetCurrentMatrix());

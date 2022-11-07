@@ -381,7 +381,8 @@ void ndPolygonSoupBuilder::Finalize()
 	const ndInt32 faceCount = m_faceVertexCount.GetCount();
 	if (faceCount)
 	{
-		ndStack<ndInt32> indexMapPool(m_vertexIndex.GetCount());
+		//ndStack<ndInt32> indexMapPool(m_vertexIndex.GetCount());
+		ndStack<ndInt32> indexMapPool(m_vertexPoints.GetCount());
 
 		ndInt32* const indexMap = &indexMapPool[0];
 		ndInt32 vertexCount = ndVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], ndFloat32 (1.0e-4f));
