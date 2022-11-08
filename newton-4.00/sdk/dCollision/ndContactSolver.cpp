@@ -2648,8 +2648,8 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 						ndFloat64 dist2 = error.DotProduct(error & ndBigVector::m_triplexMask).GetScalar();
 						if (dist2 > ndFloat64 (5.0e-4f))
 						{
-							count--;
-							m_buffer[i] = m_buffer[count];
+							//count--;
+							//m_buffer[i] = m_buffer[count];
 						}
 					}
 				}

@@ -359,7 +359,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y -= sizey * 0.5f;
 	matrix.m_posit.m_z += sizez * 0.5f;
 
-#if 1
+#if 0
 	ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection ));
 
 	ndFixSizeArray<ndBodyKinematic*, plankCount> array;
