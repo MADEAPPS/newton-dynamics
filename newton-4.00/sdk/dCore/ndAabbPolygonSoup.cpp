@@ -276,7 +276,7 @@ ndFloat32 ndAabbPolygonSoup::CalculateFaceMaxSize (const ndVector* const vertex,
 		p0 = p1;
 	}
 
-	return ndFloor (maxSize + ndFloat32 (1.0f));
+	return maxSize;
 }
 
 void ndAabbPolygonSoup::GetAABB (ndVector& p0, ndVector& p1) const
@@ -312,82 +312,6 @@ void ndAabbPolygonSoup::CalculateAdjacent ()
 		ndEdge* const edge = &(*iter);
 		if ((edge->m_mark != mark) && (edge->m_incidentFace >= 0) && (edge->m_twin->m_incidentFace >= 0))
 		{
-			#if 0
-			{
-				dInt32 indexCount0 = 0;
-				dEdge* ptr = edge;
-				do
-				{
-					indexCount0++;
-					ptr = ptr->m_next;
-				} while (ptr != edge);
-
-				dInt32* const indexArray0 = (dInt32*)edge->m_userData;
-				dVector n0(&vertexArray[indexArray0[indexCount0 + 1]].m_x);
-				dVector q0(&vertexArray[indexArray0[0]].m_x);
-				n0 = n0 & dVector::m_triplexMask;
-				q0 = q0 & dVector::m_triplexMask;
-
-				dInt32 indexCount1 = 0;
-				ptr = edge->m_twin;
-				do
-				{
-					indexCount1++;
-					ptr = ptr->m_next;
-				} while (ptr != edge->m_twin);
-
-				dInt32* const indexArray1 = (dInt32*)edge->m_twin->m_userData;
-				dVector n1(&vertexArray[indexArray1[indexCount1 + 1]].m_x);
-				dVector q1(&vertexArray[indexArray1[0]].m_x);
-				n1 = n1 & dVector::m_triplexMask;
-				q1 = q1 & dVector::m_triplexMask;
-
-				dPlane plane0(n0, -n0.DotProduct(q0).GetScalar());
-				dFloat32 maxDist0 = dFloat32(-1.0f);
-				dInt32 offsetIndex1 = -1;
-				for (dInt32 i = 0; i < indexCount1; ++i)
-				{
-					if (edge->m_twin->m_incidentVertex == indexArray1[i])
-					{
-						offsetIndex1 = i;
-					}
-					dVector point(&vertexArray[indexArray1[i]].m_x);
-					dFloat32 dist(plane0.Evalue(point & dVector::m_triplexMask));
-					if (dist > maxDist0)
-					{
-						maxDist0 = dist;
-					}
-				}
-				if (maxDist0 < dFloat32(1.0e-3f))
-				{
-					dPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
-					dFloat32 maxDist1 = dFloat32(-1.0f);
-					dInt32 offsetIndex0 = -1;
-					for (dInt32 i = 0; i < indexCount0; ++i)
-					{
-						if (edge->m_incidentVertex == indexArray0[i])
-						{
-							offsetIndex0 = i;
-						}
-
-						dVector point(&vertexArray[indexArray0[i]].m_x);
-						dFloat32 dist(plane1.Evalue(point & dVector::m_triplexMask));
-						if (dist > maxDist1)
-						{
-							maxDist1 = dist;
-						}
-					}
-					if (maxDist1 < dFloat32(1.0e-3f))
-					{
-						dAssert(offsetIndex0 >= 0);
-						dAssert(offsetIndex1 >= 0);
-						indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
-						indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
-					}
-				}
-			}
-			#endif
-
 			ndInt32 indexCount0 = 0;
 			ndInt32 indexCount1 = 0;
 			ndInt32 offsetIndex0 = -1;
@@ -567,11 +491,8 @@ void ndAabbPolygonSoup::CalculateAdjacent ()
 				for (ndInt32 j = 0; j < vCount; ++j) 
 				{
 					ndInt32 edgeIndexNormal = face[vCount + 2 + j];
-					//if (face[vCount + 2 + j] < 0) 
 					if (edgeIndexNormal & D_CONCAVE_EDGE_MASK)
 					{
-						//ndInt32 k = -1 - face[vCount + 2 + j];
-						//face[vCount + 2 + j] = indexArray[k] + oldCount;
 						ndInt32 k = edgeIndexNormal & (~D_CONCAVE_EDGE_MASK);
 						face[vCount + 2 + j] = (indexArray[k] + oldCount) | D_CONCAVE_EDGE_MASK;
 					}
@@ -592,11 +513,8 @@ void ndAabbPolygonSoup::CalculateAdjacent ()
 				for (ndInt32 j = 0; j < vCount; ++j) 
 				{
 					ndInt32 edgeIndexNormal = face[vCount + 2 + j];
-					//if (face[vCount + 2 + j] < 0) 
 					if (edgeIndexNormal & D_CONCAVE_EDGE_MASK)
 					{
-						//ndInt32 k = -1 - face[vCount + 2 + j];
-						//face[vCount + 2 + j] = indexArray[k] + oldCount;
 						ndInt32 k = edgeIndexNormal & (~D_CONCAVE_EDGE_MASK);
 						face[vCount + 2 + j] = (indexArray[k] + oldCount) | D_CONCAVE_EDGE_MASK;
 					}
@@ -908,7 +826,9 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 			// face normal
 			m_indices[indexMap + node->m_indexCount + 1] = builder.m_vertexPoints.GetCount() + builder.m_normalIndex[node->m_faceIndex];
 			// face size
-			m_indices[indexMap + node->m_indexCount * 2 + 2] = ndInt32 (CalculateFaceMaxSize (&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices));
+			ndFloat32 faceMaxDiag = CalculateFaceMaxSize(&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices);
+			ndInt32 quantizedDiagSize = ndInt32(ndFloor(faceMaxDiag * ndFloat32(1.0f) / D_FACE_CLIP_DIAGONAL_SCALE + ndFloat32(1.0f)));
+			m_indices[indexMap + node->m_indexCount * 2 + 2] = quantizedDiagSize;
 
 			indexMap += node->m_indexCount * 2 + 3;
 		}

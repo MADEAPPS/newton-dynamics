@@ -162,9 +162,10 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
+	//meshBuilder.LoadPLY("sword.ply");
+	//meshBuilder.LoadPLY("static_mesh.ply");
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
-	//meshBuilder.LoadPLY("static_mesh.ply");
 	meshBuilder.End(optimized);
 	
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
@@ -269,8 +270,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 
 ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 {
-	//ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode("playerarena.fbx");
-	ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode("ceramic_vase_03_4k.fbx");
+	ndMeshEffectNode* const meshEffectNode = LoadFbxMeshEffectNode("playerarena.fbx");
 	ndDemoEntity* const entity = new ndDemoEntity(scene, meshEffectNode);
 	scene->AddEntity(entity);
 
@@ -332,12 +332,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 			stack++;
 		}
 	}
-
-	//meshBuilder.SavePLY("xxx.ply");
-	//meshBuilder.LoadPLY("xxx.ply");
-	//meshBuilder.End(true);
-	meshBuilder.End(false);
-
+	meshBuilder.End(true);
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix matrix(entity->GetCurrentMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();

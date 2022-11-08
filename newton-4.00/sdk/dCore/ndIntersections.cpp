@@ -133,6 +133,28 @@ ndBigVector ndPointToTriangleDistance(const ndBigVector& point, const ndBigVecto
 	return p0;
 }
 
+ndBigVector ndPointToPolygonDistance(const ndBigVector& point, const ndBigVector* const points, ndInt32 vertexCount)
+{
+	const ndBigVector p0(points[0]);
+	ndBigVector p1(points[1]);
+	ndFloat64 dist2 = ndFloat32(1.0e10f);
+	ndBigVector minPoint(p0);
+	for (ndInt32 i = 2; i < vertexCount; ++i)
+	{
+		const ndBigVector p2(points[i]);
+		const ndBigVector p(ndPointToTriangleDistance(point, p0, p1, p2));
+		const ndBigVector error(point - p);
+		const ndFloat64 newDist2 = error.DotProduct(error & ndBigVector::m_triplexMask).GetScalar();
+		if (newDist2 < dist2)
+		{
+			minPoint = p;
+			dist2 = newDist2;
+		}
+		p1 = p2;
+	}
+	return minPoint;
+}
+
 ndBigVector ndPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3)
 {
 	const ndBigVector e10(p1 - p0);

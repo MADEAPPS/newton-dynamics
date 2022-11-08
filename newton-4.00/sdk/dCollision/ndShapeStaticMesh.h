@@ -87,7 +87,9 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndFloat32 GetFaceSize(const ndInt32* const faceIndexArray, ndInt32 indexCount) const
 	{
 		ndInt32 size = faceIndexArray[indexCount * 2 + 2];
-		return ndFloat32 ((size >= 1) ? size : ndFloat32 (1.0f));
+		ndAssert(size >= 1);
+		//return ndFloat32 ((size >= 1) ? size : ndFloat32 (1.0f));
+		return ndFloat32(D_FACE_CLIP_DIAGONAL_SCALE * size);
 	}
 
 	ndVector m_boxDistanceTravelInMeshSpace;

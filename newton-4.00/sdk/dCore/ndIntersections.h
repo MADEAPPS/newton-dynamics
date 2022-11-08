@@ -47,6 +47,7 @@ typedef ndFloat32 (*ndRayIntersectCallback) (void* const context,
 D_CORE_API ndBigVector ndPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1);
 D_CORE_API ndBigVector ndPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
 D_CORE_API ndBigVector ndPointToTetrahedrumDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
+D_CORE_API ndBigVector ndPointToPolygonDistance(const ndBigVector& point, const ndBigVector* const points, ndInt32 vertexCount);
 
 D_CORE_API void ndRayToRayDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector& ray_q0, const ndBigVector& ray_q1, ndBigVector& p0Out, ndBigVector& p1Out);
 D_CORE_API void ndRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1, const ndBigVector* const points, ndInt32 vertexCount, ndBigVector& p0Out, ndBigVector& p1Out);

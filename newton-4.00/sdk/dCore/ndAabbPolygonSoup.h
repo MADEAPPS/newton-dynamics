@@ -33,7 +33,8 @@
 class ndPolygonSoupBuilder;
 
 // index format: i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize
-#define D_CONCAVE_EDGE_MASK	(1<<31)
+#define D_CONCAVE_EDGE_MASK			(1<<31)
+#define D_FACE_CLIP_DIAGONAL_SCALE	ndFloat32 (0.25f)
 
 /// Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh.
 class ndAabbPolygonSoup: public ndPolygonSoupDatabase

@@ -2620,13 +2620,38 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 			{
 				count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * ndVector::m_negOne);
 				// skip convex shape polygon because they could have a skirt
-				if (!(count || m_instance1.GetShape()->GetAsShapeAsConvexPolygon()))
+				ndShapeConvexPolygon* const convexPolygon = m_instance1.GetShape()->GetAsShapeAsConvexPolygon();
+				if (!(count || convexPolygon))
 				{
 					// poly line failed probably because of rounding error
 					// but we know the shapes are colliding
 					// just return the closest points as contacts
 					m_buffer[0] = ndVector::m_half * (m_closestPoint0 + m_closestPoint1);
 					count = 1;
+				}
+				else if (convexPolygon && count)
+				{
+					// the contact point most be very close to the polygon
+					ndFixSizeArray<ndBigVector, 32> poly;
+					ndAssert(convexPolygon->m_count < poly.GetCapacity());
+					for (ndInt32 i = 0; i < convexPolygon->m_count; ++i)
+					{
+						poly[i] = convexPolygon->m_localPoly[i];
+					}
+
+					for (ndInt32 i = count - 1; i >= 0; --i)
+					{
+						ndBigVector point(m_buffer[i]);
+						ndBigVector pointInPoly(ndPointToPolygonDistance(point, &poly[0], convexPolygon->m_count));
+
+						const ndBigVector error(point - pointInPoly);
+						ndFloat64 dist2 = error.DotProduct(error & ndBigVector::m_triplexMask).GetScalar();
+						if (dist2 > ndFloat64 (5.0e-4f))
+						{
+							count--;
+							m_buffer[i] = m_buffer[count];
+						}
+					}
 				}
 			}
 		}
@@ -2640,7 +2665,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 		ndShapeInstance* const instance1 = &body1->GetCollisionShape();
 
 		ndVector normal(m_separatingVector * ndVector::m_negOne);
-		for (ndInt32 i = count - 1; i >= 0; i--)
+		for (ndInt32 i = count - 1; i >= 0; --i)
 		{
 			contactOut[i].m_point = m_buffer[i];
 			contactOut[i].m_normal = normal;

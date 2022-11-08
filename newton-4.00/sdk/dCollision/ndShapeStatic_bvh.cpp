@@ -166,7 +166,6 @@ ndIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const
 		ndInt32 edgeIndexType = (indexArray[i + indexCount + 2]) & D_CONCAVE_EDGE_MASK;
 		edgeType[i] = edgeIndexType ? ndShapeDebugNotify::m_open : ndShapeDebugNotify::m_shared;
 	}
-	//ndAssert(0);
 	data.m_callback->DrawPolygon(indexCount, poly, edgeType);
 	return t_ContinueSearh;
 }
