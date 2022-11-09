@@ -341,6 +341,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	body->SetCollisionShape(shape);
 	scene->GetWorld()->AddBody(body);
 
+#if 0
 	ndDemoEntity* const pivot0 = entity->Find("pivot1");
 	ndDemoEntity* const pivot1 = entity->Find("pivot0");
 
@@ -358,8 +359,6 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	matrix = matrix0;
 	matrix.m_posit.m_y -= sizey * 0.5f;
 	matrix.m_posit.m_z += sizez * 0.5f;
-
-#if 0
 	ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection ));
 
 	ndFixSizeArray<ndBodyKinematic*, plankCount> array;
