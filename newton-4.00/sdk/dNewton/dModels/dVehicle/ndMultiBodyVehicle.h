@@ -24,6 +24,7 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndModel.h"
+#include "ndIkSolver.h"
 
 class ndWorld;
 class ndMultiBodyVehicleMotor;
@@ -113,6 +114,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
+	ndIkSolver m_invDynamicsSolver;
 	ndMultiBodyVehicleMotor* m_motor;
 	ndShapeChamferCylinder* m_tireShape;
 	ndMultiBodyVehicleGearBox* m_gearBox;
