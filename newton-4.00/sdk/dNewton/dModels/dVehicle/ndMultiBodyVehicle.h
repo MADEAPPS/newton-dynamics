@@ -40,6 +40,13 @@ class ndMultiBodyVehicleDifferentialAxle;
 class ndMultiBodyVehicle: public ndModel
 {
 	public:
+	class ndTireContactPair
+	{
+		public:
+		ndContact* m_contact;
+		ndMultiBodyVehicleTireJoint* m_tireJoint;
+	};
+
 	class ndDownForce
 	{
 		public:
@@ -99,6 +106,8 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyAligmentAndBalancing();
 	void ApplyTireModel(ndFloat32 timestep);
 	ndBodyDynamic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
+	void ApplyTireModel(ndFloat32 timestep, ndTireContactPair* const tires, ndInt32 tireCount);
+	void ApplyVehicleDynamicControl(ndFloat32 timestep, ndTireContactPair* const tires, ndInt32 tireCount);
 
 	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;

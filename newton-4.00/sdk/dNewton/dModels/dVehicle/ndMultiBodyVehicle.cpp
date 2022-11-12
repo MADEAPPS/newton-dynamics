@@ -32,8 +32,10 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
+#define D_MAX_CONTACT_SPEED_TRESHOLD  ndFloat32 (0.25f)
 #define D_MAX_CONTACT_PENETRATION	  ndFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 ndFloat32 (5.0e-2f * 5.0e-2f)
+
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicle)
 
@@ -892,8 +894,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	const ndVector lateralDir = contactPoint.m_dir1;
 	const ndVector longitudDir = contactPoint.m_dir0;
 	const ndFloat32 relSpeed = ndAbs(relVeloc.DotProduct(longitudDir).GetScalar());
-	const ndFloat32 relSpeedThreshold = ndFloat32(0.0625f);
-	if (relSpeed > relSpeedThreshold)
+	if (relSpeed > D_MAX_CONTACT_SPEED_TRESHOLD)
 	{
 		// tire is in breaking and traction mode.
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
@@ -903,7 +904,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 longitudialSlip = ndAbs(vr) / relSpeed;
 
 		const ndFloat32 sideSpeed = ndAbs(relVeloc.DotProduct(lateralDir).GetScalar());
-		const ndFloat32 lateralSlip = ndMin(sideSpeed / relSpeed, ndFloat32(0.25f));
+		const ndFloat32 lateralSlip = sideSpeed / (relSpeed + ndFloat32 (1.0f));
 
 		ndAssert(lateralSlip >= ndFloat32(0.0f));
 		ndAssert(longitudialSlip >= ndFloat32(0.0f));
@@ -934,7 +935,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	
 		const ndFloat32 lateralForce = f * cz / gamma;
 		const ndFloat32 longitudinalForce = f * cx / gamma;
-		ndTrace(("(%d: %f %f)  ", tireBody->GetId(), longitudinalForce, lateralForce));
+		//ndTrace(("(%d: %f %f)  ", tireBody->GetId(), longitudinalForce, lateralForce));
 
 		contactPoint.OverrideFriction0Accel(-vr / timestep);
 		contactPoint.m_material.m_staticFriction0 = longitudinalForce;
@@ -942,11 +943,6 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		contactPoint.m_material.m_staticFriction1 = lateralForce;
 		contactPoint.m_material.m_dynamicFriction1 = lateralForce;
 		contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
-	
-		if (tireBody->GetId() == 3)
-		{
-			//ndTrace(("id:%d  longitudinal:%f  lateral::%f norm:%f\n", tireBody->GetId(), longitudinalForce, lateralForce, normalForce));
-		}
 	}
 	else
 	{
@@ -964,121 +960,144 @@ void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJo
 	BrushTireModel(tire, contactPoint, timestep);
 }
 
-void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
+void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndTireContactPair* const tireContacts, ndInt32 tireCount)
 {
-static int xxxx;
-ndTrace(("Frame:%d  ", xxxx));
-if (xxxx == 1336)
-xxxx *= 1;
-xxxx++;
-
-#if 0
-	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (ndInt32 i = tireCount - 1; i >= 0; --i)
 	{
-		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		ndAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
-		//tire->m_lateralSlip = ndFloat32(0.0f);
-		//tire->m_longitudinalSlip = ndFloat32(0.0f);
-
-		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
-		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
-		for (it.Begin(); it; it++)
+		ndContact* const contact = tireContacts[i].m_contact;
+		ndMultiBodyVehicleTireJoint* const tire = tireContacts[i].m_tireJoint;
+		ndContactPointList& contactPoints = contact->GetContactPoints();
+		ndMatrix tireBasisMatrix(tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
+		tireBasisMatrix.m_posit = tire->GetBody0()->GetMatrix().m_posit;
+		for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 		{
-			ndContact* const contact = *it;
-			if (contact->IsActive())
+			ndContactMaterial& contactPoint = contactNode->GetInfo();
+			ndFloat32 contactPathLocation = ndAbs(contactPoint.m_normal.DotProduct(tireBasisMatrix.m_front).GetScalar());
+			// contact are consider on the contact patch strip only if the are less than 
+			// 45 degree angle from the tire axle
+			if (contactPathLocation < ndFloat32(0.71f))
 			{
-				ndContactPointList& contactPoints = contact->GetContactPoints();
-				const ndBodyKinematic* const otherBody = contact->GetBody1();
+				// align tire friction direction
+				const ndVector longitudinalDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front).Normalize());
+				const ndVector lateralDir(longitudinalDir.CrossProduct(contactPoint.m_normal));
 
-				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMesh())
+				contactPoint.m_dir1 = lateralDir;
+				contactPoint.m_dir0 = longitudinalDir;
+
+				// check if the contact is in the contact patch,
+				// the is the 45 degree point around the tire vehicle axis. 
+				ndVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
+				ndAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
+				ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
+				if (contactPatch < ndFloat32(-0.71f))
 				{
-					// for mesh collision we need to remove contact duplicates, 
-					// these are contact produced by two or more polygons, 
-					// that can produce two contact so are close that they can generate 
-					// ill formed rows in the solver mass matrix
-					for (ndContactPointList::ndNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
+					switch (tire->m_frictionModel.m_frictionModel)
 					{
-						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
-						for (ndContactPointList::ndNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = contactNode1->GetNext())
+						case ndTireFrictionModel::m_coulomb:
 						{
-							const ndContactPoint& contactPoint1 = contactNode1->GetInfo();
-							const ndVector error(contactPoint1.m_point - contactPoint0.m_point);
-							ndFloat32 err2 = error.DotProduct(error).GetScalar();
-							if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
-							{
-								contactPoints.Remove(contactNode1);
-								break;
-							}
+							CoulombTireModel(tire, contactPoint, timestep);
 						}
-					}
-				}
 
-				ndMatrix tireBasisMatrix(tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
-				tireBasisMatrix.m_posit = tire->GetBody0()->GetMatrix().m_posit;
-				for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
-				{
-					ndContactMaterial& contactPoint = contactNode->GetInfo();
-					ndFloat32 contactPathLocation = ndAbs(contactPoint.m_normal.DotProduct(tireBasisMatrix.m_front).GetScalar());
-					// contact are consider on the contact patch strip only if the are less than 
-					// 45 degree angle from the tire axle
-					if (contactPathLocation < ndFloat32(0.71f))
-					{
-						// align tire friction direction
-						const ndVector longitudinalDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front).Normalize());
-						const ndVector lateralDir(longitudinalDir.CrossProduct(contactPoint.m_normal));
-
-						contactPoint.m_dir1 = lateralDir;
-						contactPoint.m_dir0 = longitudinalDir;
-
-						// check if the contact is in the contact patch,
-						// the is the 45 degree point around the tire vehicle axis. 
-						ndVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
-						ndAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
-						ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
-						if (contactPatch < ndFloat32(-0.71f))
+						case ndTireFrictionModel::m_brushModel:
 						{
-							switch (tire->m_frictionModel.m_frictionModel)
-							{
-							case ndTireFrictionModel::m_coulomb:
-							{
-								CoulombTireModel(tire, contactPoint, timestep);
-							}
-
-							case ndTireFrictionModel::m_brushModel:
-							{
-								BrushTireModel(tire, contactPoint, timestep);
-								break;
-							}
-
-							case ndTireFrictionModel::m_pacejka:
-							{
-								PacejkaTireModel(tire, contactPoint, timestep);
-								break;
-							}
-
-							case ndTireFrictionModel::m_coulombCicleOfFriction:
-							{
-								CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
-								break;
-							}
-
-							default:;
-								// assume normal coulomb model
-							}
+							BrushTireModel(tire, contactPoint, timestep);
+							break;
 						}
+
+						case ndTireFrictionModel::m_pacejka:
+						{
+							PacejkaTireModel(tire, contactPoint, timestep);
+							break;
+						}
+
+						case ndTireFrictionModel::m_coulombCicleOfFriction:
+						{
+							CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
+							break;
+						}
+
+						default:;
+							// assume normal coulomb model
 					}
 				}
 			}
 		}
 	}
+}
 
-#else
-
-	struct ndTireContactPair
+void ndMultiBodyVehicle::ApplyVehicleDynamicControl(ndFloat32 timestep, ndTireContactPair* const tireContacts, ndInt32 tireCount)
+{
+	tireCount = 0;
+	for (ndInt32 i = tireCount - 1; i >= 0; --i)
 	{
-		ndContact* m_contact;
-		ndMultiBodyVehicleTireJoint* m_tireJoint;
-	};
+		ndContact* const contact = tireContacts[i].m_contact;
+		ndMultiBodyVehicleTireJoint* const tire = tireContacts[i].m_tireJoint;
+		ndContactPointList& contactPoints = contact->GetContactPoints();
+		ndMatrix tireBasisMatrix(tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
+		tireBasisMatrix.m_posit = tire->GetBody0()->GetMatrix().m_posit;
+		for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+		{
+			ndContactMaterial& contactPoint = contactNode->GetInfo();
+			ndFloat32 contactPathLocation = ndAbs(contactPoint.m_normal.DotProduct(tireBasisMatrix.m_front).GetScalar());
+			// contact are consider on the contact patch strip only if the are less than 
+			// 45 degree angle from the tire axle
+			if (contactPathLocation < ndFloat32(0.71f))
+			{
+				// align tire friction direction
+				const ndVector longitudinalDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front).Normalize());
+				const ndVector lateralDir(longitudinalDir.CrossProduct(contactPoint.m_normal));
+
+				contactPoint.m_dir1 = lateralDir;
+				contactPoint.m_dir0 = longitudinalDir;
+
+				// check if the contact is in the contact patch,
+				// the is the 45 degree point around the tire vehicle axis. 
+				ndVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
+				ndAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
+				ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
+				if (contactPatch < ndFloat32(-0.71f))
+				{
+					switch (tire->m_frictionModel.m_frictionModel)
+					{
+						case ndTireFrictionModel::m_coulomb:
+						{
+							CoulombTireModel(tire, contactPoint, timestep);
+						}
+
+						case ndTireFrictionModel::m_brushModel:
+						{
+							BrushTireModel(tire, contactPoint, timestep);
+							break;
+						}
+
+						case ndTireFrictionModel::m_pacejka:
+						{
+							PacejkaTireModel(tire, contactPoint, timestep);
+							break;
+						}
+
+						case ndTireFrictionModel::m_coulombCicleOfFriction:
+						{
+							CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
+							break;
+						}
+
+						default:;
+							// assume normal coulomb model
+					}
+				}
+			}
+		}
+	}
+}
+
+void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
+{
+//static int xxxx;
+//ndTrace(("Frame:%d  ", xxxx));
+//if (xxxx == 1336)
+//xxxx *= 1;
+//xxxx++;
 
 	ndFixSizeArray<ndTireContactPair, 64> tireContacts;
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
@@ -1130,70 +1149,10 @@ xxxx++;
 		}
 	}
 
-	for (ndInt32 i = tireContacts.GetCount() - 1; i >= 0; --i)
-	{
-		ndContact* const contact = tireContacts[i].m_contact;
-		ndMultiBodyVehicleTireJoint* const tire = tireContacts[i].m_tireJoint;
-		ndContactPointList& contactPoints = contact->GetContactPoints();
-		ndMatrix tireBasisMatrix(tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
-		tireBasisMatrix.m_posit = tire->GetBody0()->GetMatrix().m_posit;
-		for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
-		{
-			ndContactMaterial& contactPoint = contactNode->GetInfo();
-			ndFloat32 contactPathLocation = ndAbs(contactPoint.m_normal.DotProduct(tireBasisMatrix.m_front).GetScalar());
-			// contact are consider on the contact patch strip only if the are less than 
-			// 45 degree angle from the tire axle
-			if (contactPathLocation < ndFloat32(0.71f))
-			{
-				// align tire friction direction
-				const ndVector longitudinalDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front).Normalize());
-				const ndVector lateralDir(longitudinalDir.CrossProduct(contactPoint.m_normal));
+	ApplyVehicleDynamicControl(timestep, &tireContacts[0], tireContacts.GetCount());
+	ApplyTireModel(timestep, &tireContacts[0], tireContacts.GetCount());
 
-				contactPoint.m_dir1 = lateralDir;
-				contactPoint.m_dir0 = longitudinalDir;
-
-				// check if the contact is in the contact patch,
-				// the is the 45 degree point around the tire vehicle axis. 
-				ndVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
-				ndAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
-				ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
-				if (contactPatch < ndFloat32(-0.71f))
-				{
-					switch (tire->m_frictionModel.m_frictionModel)
-					{
-					case ndTireFrictionModel::m_coulomb:
-					{
-						CoulombTireModel(tire, contactPoint, timestep);
-					}
-
-					case ndTireFrictionModel::m_brushModel:
-					{
-						BrushTireModel(tire, contactPoint, timestep);
-						break;
-					}
-
-					case ndTireFrictionModel::m_pacejka:
-					{
-						PacejkaTireModel(tire, contactPoint, timestep);
-						break;
-					}
-
-					case ndTireFrictionModel::m_coulombCicleOfFriction:
-					{
-						CoulombFrictionCircleTireModel(tire, contactPoint, timestep);
-						break;
-					}
-
-					default:;
-						// assume normal coulomb model
-					}
-				}
-			}
-		}
-	}
-#endif
-
-ndTrace(("\n"));
+//ndTrace(("\n"));
 }
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
@@ -1302,7 +1261,4 @@ void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
 	ApplyAerodynamics();
 	// apply tire model
 	ApplyTireModel(timestep);
-
-	// Apply Vehicle Dynamics controls
-	// no implemented yet
 }
