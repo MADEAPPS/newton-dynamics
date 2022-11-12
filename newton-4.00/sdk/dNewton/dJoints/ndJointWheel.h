@@ -45,7 +45,7 @@ class ndWheelDescriptor
 	ndFloat32 m_steeringAngle;
 };
 
-class ndJointWheel: public ndJointBilateralConstraint
+class ndJointWheel: public ndJointBilateralConstraint, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
 	D_CLASS_REFLECTION(ndJointWheel);
@@ -77,6 +77,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	ndFloat32 m_normalizedBrake;
 	ndFloat32 m_normalidedSteering;
 	ndFloat32 m_normalizedHandBrake;
+	bool m_vcdMode;
 	friend class ndMultiBodyVehicle;
 };
 
