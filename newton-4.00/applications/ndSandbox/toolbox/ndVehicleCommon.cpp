@@ -156,15 +156,18 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_verticalOffset = 0.0f;
 	m_rearTire.m_brakeTorque = 1500.0f;
 	m_rearTire.m_handBrakeTorque = 1000.0f;
+	
+	//ndFloat32 longStiffness = 10.0f * DEMO_GRAVITY * m_chassisMass;
+	//ndFloat32 lateralStiffness = 2.0f * longStiffness;
 
-	ndFloat32 longStiffness = 10.0f * DEMO_GRAVITY * m_chassisMass;
+	ndFloat32 longStiffness = 10.0f * DEMO_GRAVITY;
 	ndFloat32 lateralStiffness = 2.0f * longStiffness;
 
-	m_rearTire.m_longitudinalStiffness = longStiffness;
-	m_frontTire.m_longitudinalStiffness = longStiffness;
-
-	m_rearTire.m_laterialStiffness = lateralStiffness;
-	m_frontTire.m_laterialStiffness = lateralStiffness;
+	m_rearTire.m_longitudinalStiffness____ = longStiffness;
+	m_frontTire.m_longitudinalStiffness____ = longStiffness;
+	
+	m_rearTire.m_laterialStiffness____ = lateralStiffness;
+	m_frontTire.m_laterialStiffness____ = lateralStiffness;
 
 	m_motorMass = 20.0f;
 	m_motorRadius = 0.25f;

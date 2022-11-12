@@ -917,8 +917,9 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndFloat32 u = longitudialSlip * den;
 
 		const ndTireFrictionModel& info = tire->m_frictionModel;
-		const ndFloat32 cz = info.m_laterialStiffness  * v;
-		const ndFloat32 cx = info.m_longitudinalStiffness  * u;
+		const ndFloat32 vehicleMass = m_chassis->GetMassMatrix().m_w;
+		const ndFloat32 cz = vehicleMass * info.m_laterialStiffness____  * v;
+		const ndFloat32 cx = vehicleMass * info.m_longitudinalStiffness____  * u;
 
 		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
 		const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;

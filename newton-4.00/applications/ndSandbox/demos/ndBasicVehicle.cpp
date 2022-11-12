@@ -123,8 +123,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
-		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
+		m_frontTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness____  = 10.0f * DEMO_GRAVITY;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_verticalOffset = -0.15f;
@@ -136,8 +136,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
 		m_rearTire.m_handBrakeTorque = 4000.0f;
-		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
-		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
+		m_rearTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
+		m_rearTire.m_longitudinalStiffness____ = 10.0f * DEMO_GRAVITY;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}
@@ -171,8 +171,8 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
-		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
+		m_frontTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness____ = 10.0f * DEMO_GRAVITY;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_verticalOffset = 0.0f;
@@ -184,8 +184,8 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 2000.0f;
 		m_rearTire.m_handBrakeTorque = 3000.0f;
-		m_rearTire.m_laterialStiffness  = 1.0f / 1000.0f;
-		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
+		m_rearTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
+		m_rearTire.m_longitudinalStiffness____ = 10.0f * DEMO_GRAVITY;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}
