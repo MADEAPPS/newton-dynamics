@@ -100,8 +100,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	{
 		//m_useHardSolverMode = true;
 		m_useHardSolverMode = false;
-		//m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
-		m_comDisplacement = ndVector(0.0f, -0.35f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.50f, 0.0f, 0.0f);
 
 		ndFloat32 idleTorquePoundFoot = 200.0f;
 		ndFloat32 idleRmp = 800.0f;
@@ -123,7 +122,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
+		m_frontTire.m_laterialStiffness____ = 2.0f * DEMO_GRAVITY;
 		m_frontTire.m_longitudinalStiffness____  = 10.0f * DEMO_GRAVITY;
 
 		m_rearTire.m_mass = 100.0f;
@@ -136,7 +135,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
 		m_rearTire.m_handBrakeTorque = 4000.0f;
-		m_rearTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness____ = 2.0f * DEMO_GRAVITY;
 		m_rearTire.m_longitudinalStiffness____ = 10.0f * DEMO_GRAVITY;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
@@ -149,7 +148,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 	ndVehicleDectriptorMonsterTruck()
 		:ndVehicleDectriptor("monsterTruck.fbx")
 	{
-		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
 
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 800.0f;
@@ -171,8 +170,8 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
-		m_frontTire.m_longitudinalStiffness____ = 10.0f * DEMO_GRAVITY;
+		m_frontTire.m_laterialStiffness____ = 2.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness____ = 4.0f * DEMO_GRAVITY;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_verticalOffset = 0.0f;
@@ -183,9 +182,9 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 2000.0f;
-		m_rearTire.m_handBrakeTorque = 3000.0f;
-		m_rearTire.m_laterialStiffness____ = 20.0f * DEMO_GRAVITY;
-		m_rearTire.m_longitudinalStiffness____ = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_handBrakeTorque = 1000000.0f;
+		m_rearTire.m_laterialStiffness____ = 2.0f * DEMO_GRAVITY;
+		m_rearTire.m_longitudinalStiffness____ = 4.0f * DEMO_GRAVITY;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}
@@ -730,6 +729,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
