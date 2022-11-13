@@ -32,7 +32,7 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-#define USE_OLD_TIRE_MODEL
+//#define USE_OLD_TIRE_MODEL
 
 #define D_MAX_CONTACT_SPEED_TRESHOLD  ndFloat32 (0.25f)
 #define D_MAX_CONTACT_PENETRATION	  ndFloat32 (1.0e-2f)
@@ -233,6 +233,21 @@ ndMultiBodyVehicle::~ndMultiBodyVehicle()
 	delete(m_chassis);
 }
 
+void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
+{
+	ApplyAligmentAndBalancing();
+}
+
+void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
+{
+	ApplyInputs(world, timestep);
+
+	// apply down force
+	ApplyAerodynamics();
+	// apply tire model
+	ApplyTireModel(timestep);
+}
+
 void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
@@ -415,6 +430,65 @@ void ndMultiBodyVehicle::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) cons
 	}
 
 	m_downForce.Save(childNode);
+}
+
+ndFloat32 ndMultiBodyVehicle::ndDownForce::CalculateFactor(const ndSpeedForcePair* const entry0) const
+{
+	const ndSpeedForcePair* const entry1 = entry0 + 1;
+	ndFloat32 num = ndMax(entry1->m_forceFactor - entry0->m_forceFactor, ndFloat32(0.0f));
+	ndFloat32 den = ndMax(ndAbs(entry1->m_speed - entry0->m_speed), ndFloat32(1.0f));
+	return num / (den * den);
+}
+
+ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) const
+{
+	ndAssert(speed >= ndFloat32(0.0f));
+	ndInt32 index = 0;
+	for (ndInt32 i = sizeof(m_downForceTable) / sizeof(m_downForceTable[0]) - 1; i; i--)
+	{
+		if (m_downForceTable[i].m_speed <= speed)
+		{
+			index = i;
+			break;
+		}
+	}
+
+	ndFloat32 deltaSpeed = speed - m_downForceTable[index].m_speed;
+	ndFloat32 downForceFactor = m_downForceTable[index].m_forceFactor + m_downForceTable[index + 1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
+	return downForceFactor * m_gravity;
+}
+
+void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement("aerodynamics");
+	parentNode->LinkEndChild(childNode);
+
+	xmlSaveParam(childNode, "gravity", m_gravity);
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
+	{
+		ndVector nod(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, ndFloat32(0.0f));
+		xmlSaveParam(childNode, "downforceCurve", nod);
+	}
+}
+
+void ndMultiBodyVehicle::ndDownForce::Load(const nd::TiXmlNode* const xmlNode)
+{
+	m_gravity = xmlGetFloat(xmlNode, "gravity");
+	const nd::TiXmlNode* node = xmlNode->FirstChild();
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
+	{
+		node = node->NextSibling();
+		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+		const char* const data = element->Attribute("float3");
+
+		ndFloat64 fx;
+		ndFloat64 fy;
+		ndFloat64 fz;
+		sscanf(data, "%lf %lf %lf", &fx, &fy, &fz);
+		m_downForceTable[i].m_speed = ndFloat32(fx);
+		m_downForceTable[i].m_forceFactor = ndFloat32(fy);
+		m_downForceTable[i].m_aerodynamicDownforceConstant = ndFloat32(fz);
+	}
 }
 
 ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
@@ -863,7 +937,32 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-//void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+ndMultiBodyVehicle::ndDownForce::ndDownForce()
+	:m_gravity(ndFloat32(-10.0f))
+	, m_suspensionStiffnessModifier(ndFloat32(1.0f))
+{
+	m_downForceTable[0].m_speed = ndFloat32(0.0f) * ndFloat32(0.27f);
+	m_downForceTable[0].m_forceFactor = 0.0f;
+	m_downForceTable[0].m_aerodynamicDownforceConstant = ndFloat32(0.0f);
+
+	m_downForceTable[1].m_speed = ndFloat32(30.0f) * ndFloat32(0.27f);
+	m_downForceTable[1].m_forceFactor = 1.0f;
+	m_downForceTable[1].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[0]);
+
+	m_downForceTable[2].m_speed = ndFloat32(60.0f) * ndFloat32(0.27f);
+	m_downForceTable[2].m_forceFactor = 1.6f;
+	m_downForceTable[2].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[1]);
+
+	m_downForceTable[3].m_speed = ndFloat32(140.0f) * ndFloat32(0.27f);
+	m_downForceTable[3].m_forceFactor = 3.0f;
+	m_downForceTable[3].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[2]);
+
+	m_downForceTable[4].m_speed = ndFloat32(1000.0f) * ndFloat32(0.27f);
+	m_downForceTable[4].m_forceFactor = 3.0f;
+	m_downForceTable[4].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[3]);
+}
+
+#ifdef USE_OLD_TIRE_MODEL
 void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, ndContactMaterial& contactPoint, ndFloat32) const
 {
 	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
@@ -877,7 +976,6 @@ void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, nd
 	contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 }
 
-#ifdef USE_OLD_TIRE_MODEL
 void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
 	// calculate longitudinal slip ratio
@@ -971,11 +1069,11 @@ void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJo
 
 void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
 {
-static int xxxx;
-ndTrace(("Frame:%d  ", xxxx));
-if (xxxx == 1311)
-	xxxx *= 1;
-xxxx++;
+//static int xxxx;
+//ndTrace(("Frame:%d  ", xxxx));
+//if (xxxx == 1311)
+//	xxxx *= 1;
+//xxxx++;
 
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
@@ -1075,10 +1173,24 @@ xxxx++;
 		}
 	}
 
-	ndTrace(("\n"));
+//	ndTrace(("\n"));
 }
 
 #else
+
+//void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, ndContactMaterial& contactPoint, ndFloat32) const
+{
+	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
+	const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
+	const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
+
+	contactPoint.m_material.m_staticFriction0 = maxForceForce;
+	contactPoint.m_material.m_dynamicFriction0 = maxForceForce;
+	contactPoint.m_material.m_staticFriction1 = maxForceForce;
+	contactPoint.m_material.m_dynamicFriction1 = maxForceForce;
+	contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
+}
 
 void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
@@ -1359,101 +1471,3 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
 }
 #endif
 
-ndMultiBodyVehicle::ndDownForce::ndDownForce()
-	:m_gravity(ndFloat32(-10.0f))
-	, m_suspensionStiffnessModifier(ndFloat32(1.0f))
-{
-	m_downForceTable[0].m_speed = ndFloat32(0.0f) * ndFloat32(0.27f);
-	m_downForceTable[0].m_forceFactor = 0.0f;
-	m_downForceTable[0].m_aerodynamicDownforceConstant = ndFloat32(0.0f);
-
-	m_downForceTable[1].m_speed = ndFloat32(30.0f) * ndFloat32(0.27f);
-	m_downForceTable[1].m_forceFactor = 1.0f;
-	m_downForceTable[1].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[0]);
-
-	m_downForceTable[2].m_speed = ndFloat32(60.0f) * ndFloat32(0.27f);
-	m_downForceTable[2].m_forceFactor = 1.6f;
-	m_downForceTable[2].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[1]);
-
-	m_downForceTable[3].m_speed = ndFloat32(140.0f) * ndFloat32(0.27f);
-	m_downForceTable[3].m_forceFactor = 3.0f;
-	m_downForceTable[3].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[2]);
-
-	m_downForceTable[4].m_speed = ndFloat32(1000.0f) * ndFloat32(0.27f);
-	m_downForceTable[4].m_forceFactor = 3.0f;
-	m_downForceTable[4].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[3]);
-}
-
-ndFloat32 ndMultiBodyVehicle::ndDownForce::CalculateFactor(const ndSpeedForcePair* const entry0) const
-{
-	const ndSpeedForcePair* const entry1 = entry0 + 1;
-	ndFloat32 num = ndMax(entry1->m_forceFactor - entry0->m_forceFactor, ndFloat32(0.0f));
-	ndFloat32 den = ndMax(ndAbs(entry1->m_speed - entry0->m_speed), ndFloat32(1.0f));
-	return num / (den * den);
-}
-
-ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) const
-{
-	ndAssert(speed >= ndFloat32(0.0f));
-	ndInt32 index = 0;
-	for (ndInt32 i = sizeof(m_downForceTable) / sizeof(m_downForceTable[0]) - 1; i; i--)
-	{
-		if (m_downForceTable[i].m_speed <= speed)
-		{
-			index = i;
-			break;
-		}
-	}
-
-	ndFloat32 deltaSpeed = speed - m_downForceTable[index].m_speed;
-	ndFloat32 downForceFactor = m_downForceTable[index].m_forceFactor + m_downForceTable[index + 1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
-	return downForceFactor * m_gravity;
-}
-
-void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement("aerodynamics");
-	parentNode->LinkEndChild(childNode);
-
-	xmlSaveParam(childNode, "gravity", m_gravity);
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
-	{
-		ndVector nod(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, ndFloat32(0.0f));
-		xmlSaveParam(childNode, "downforceCurve", nod);
-	}
-}
-
-void ndMultiBodyVehicle::ndDownForce::Load(const nd::TiXmlNode* const xmlNode)
-{
-	m_gravity = xmlGetFloat(xmlNode, "gravity");
-	const nd::TiXmlNode* node = xmlNode->FirstChild();
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); ++i)
-	{
-		node = node->NextSibling();
-		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-		const char* const data = element->Attribute("float3");
-
-		ndFloat64 fx;
-		ndFloat64 fy;
-		ndFloat64 fz;
-		sscanf(data, "%lf %lf %lf", &fx, &fy, &fz);
-		m_downForceTable[i].m_speed = ndFloat32(fx);
-		m_downForceTable[i].m_forceFactor = ndFloat32(fy);
-		m_downForceTable[i].m_aerodynamicDownforceConstant = ndFloat32(fz);
-	}
-}
-
-void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
-{
-	ApplyAligmentAndBalancing();
-}
-
-void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
-{
-	ApplyInputs(world, timestep);
-
-	// apply down force
-	ApplyAerodynamics();
-	// apply tire model
-	ApplyTireModel(timestep);
-}
