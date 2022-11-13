@@ -1043,12 +1043,6 @@ xxxx++;
 						{
 							switch (tire->m_frictionModel.m_frictionModel)
 							{
-								case ndTireFrictionModel::m_coulomb:
-								{
-									CoulombTireModel(tire, contactPoint, timestep);
-									break;
-								}
-
 								case ndTireFrictionModel::m_brushModel:
 								{
 									BrushTireModel(tire, contactPoint, timestep);
@@ -1067,8 +1061,12 @@ xxxx++;
 									break;
 								}
 
-								default:;
-									// assume normal coulomb model
+								case ndTireFrictionModel::m_coulomb:
+								default:
+								{
+									CoulombTireModel(tire, contactPoint, timestep);
+									break;
+								}
 							}
 						}
 					}
@@ -1200,12 +1198,6 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndTireContactPair* c
 				{
 					switch (tire->m_frictionModel.m_frictionModel)
 					{
-						case ndTireFrictionModel::m_coulomb:
-						{
-							CoulombTireModel(tire, contactPoint, timestep);
-							break;
-						}
-
 						case ndTireFrictionModel::m_brushModel:
 						{
 							BrushTireModel(tire, contactPoint, timestep);
@@ -1224,8 +1216,12 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndTireContactPair* c
 							break;
 						}
 
-						default:;
-							// assume normal coulomb model
+						case ndTireFrictionModel::m_coulomb:
+						default:
+						{
+							CoulombTireModel(tire, contactPoint, timestep);
+							break;
+						}
 					}
 				}
 			}
@@ -1267,12 +1263,6 @@ void ndMultiBodyVehicle::ApplyVehicleDynamicControl(ndFloat32 timestep, ndTireCo
 				{
 					switch (tire->m_frictionModel.m_frictionModel)
 					{
-						case ndTireFrictionModel::m_coulomb:
-						{
-							CoulombTireModel(tire, contactPoint, timestep);
-							break;
-						}
-
 						case ndTireFrictionModel::m_brushModel:
 						{
 							BrushTireModel(tire, contactPoint, timestep);
@@ -1291,8 +1281,12 @@ void ndMultiBodyVehicle::ApplyVehicleDynamicControl(ndFloat32 timestep, ndTireCo
 							break;
 						}
 
-						default:;
-							// assume normal coulomb model
+						case ndTireFrictionModel::m_coulomb:
+						default:
+						{
+							CoulombTireModel(tire, contactPoint, timestep);
+							break;
+						}
 					}
 				}
 			}
