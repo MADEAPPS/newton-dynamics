@@ -145,11 +145,11 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	}
 };
 
-class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
+class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 {
 	public:
-	ndVehicleDectriptorMonsterTruck()
-		:ndVehicleDectriptor("monsterTruck.fbx")
+	ndVehicleDectriptorMonsterTruck0()
+		:ndVehicleDectriptor("monsterTruck0.fbx")
 	{
 		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
 
@@ -196,9 +196,61 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 	}
 };
 
+class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
+{
+	public:
+	ndVehicleDectriptorMonsterTruck1()
+		:ndVehicleDectriptor("monsterTruck1.fbx")
+	{
+		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
+
+		ndFloat32 idleTorquePoundFoot = 250.0f;
+		ndFloat32 idleRmp = 800.0f;
+		ndFloat32 horsePower = 400.0f;
+		ndFloat32 rpm0 = 5000.0f;
+		ndFloat32 rpm1 = 6200.0f;
+		ndFloat32 horsePowerAtRedLine = 150.0f;
+		ndFloat32 redLineRpm = 8000.0f;
+		m_engine.Init(idleTorquePoundFoot, idleRmp,
+			horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
+
+		m_frontTire.m_mass = 100.0f;
+		m_frontTire.m_verticalOffset = 0.0f;
+		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
+		m_frontTire.m_springK = 500.0f;
+		m_frontTire.m_damperC = 50.0f;
+		m_frontTire.m_regularizer = 0.2f;
+		m_frontTire.m_upperStop = -0.05f;
+		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_brakeTorque = 1000.0f;
+		m_frontTire.m_handBrakeTorque = 0.0f;
+		m_frontTire.m_laterialStiffness = 2.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 4.0f * DEMO_GRAVITY;
+
+		m_rearTire.m_mass = 100.0f;
+		m_rearTire.m_verticalOffset = 0.0f;
+		m_rearTire.m_steeringAngle = 0.0f;
+		m_rearTire.m_springK = 500.0f;
+		m_rearTire.m_damperC = 50.0f;
+		m_rearTire.m_regularizer = 0.2f;
+		m_rearTire.m_upperStop = -0.05f;
+		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_brakeTorque = 2000.0f;
+		m_rearTire.m_handBrakeTorque = 1000000.0f;
+		m_rearTire.m_laterialStiffness = 2.0f * DEMO_GRAVITY;
+		m_rearTire.m_longitudinalStiffness = 4.0f * DEMO_GRAVITY;
+		m_torsionBarType = m_fourWheelAxle;
+		m_differentialType = m_fourWheeldrive;
+
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+	}
+};
+
 static ndVehicleDectriptorJeep jeepDesc;
 static ndVehicleDectriptorViper viperDesc;
-static ndVehicleDectriptorMonsterTruck monterTruckDesc;
+static ndVehicleDectriptorMonsterTruck0 monterTruckDesc0;
+static ndVehicleDectriptorMonsterTruck1 monterTruckDesc1;
 
 static const char* engineSounds[] =
 {
@@ -735,7 +787,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
