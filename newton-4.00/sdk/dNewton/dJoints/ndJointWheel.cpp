@@ -240,6 +240,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		ndFloat32 w1 = chassisOmega.DotProduct(jacobian1.m_angular).GetScalar();
 		ndFloat32 wRel = (w0 + w1) * ndFloat32 (0.35f);
 
+		ndTrace(("(%d: %f)\n", m_body0->GetId(), wRel));
+
 		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
 		SetHighFriction(desc, brakeFrictionTorque);
 		SetLowerFriction(desc, -brakeFrictionTorque);

@@ -27,14 +27,14 @@ class ndTireFrictionModel
 	};
 
 	ndTireFrictionModel()
-		:m_laterialStiffness____(ndFloat32(10.0f))
-		,m_longitudinalStiffness____(ndFloat32(10.0f))
-		,m_frictionModel(m_coulomb)
+		:m_laterialStiffness(ndFloat32(10.0f))
+		,m_longitudinalStiffness(ndFloat32(10.0f))
+		,m_frictionModel(m_brushModel)
 	{
 	}
 
-	ndFloat32 m_laterialStiffness____;
-	ndFloat32 m_longitudinalStiffness____;
+	ndFloat32 m_laterialStiffness;
+	ndFloat32 m_longitudinalStiffness;
 	ndFrictionModel m_frictionModel;
 };
 
