@@ -446,6 +446,7 @@ void ndBuildBvhTreeBuildState::Init(ndInt32 maxCount)
 	m_tmpArray = &m_srcArray[2 * (maxCount + 4)];
 	m_parentsArray = &m_srcArray[maxCount];
 	m_leafNodesCount = maxCount;
+	ndAssert(m_leafNodesCount < 1000);
 }
 
 void ndBvhSceneManager::UpdateScene(ndThreadPool& threadPool)
@@ -577,6 +578,7 @@ void ndBvhSceneManager::BuildBvhTreeCalculateLeafBoxes(ndThreadPool& threadPool)
 
 		ndBvhNode** const srcArray = m_bvhBuildState.m_srcArray;
 		const ndInt32 leafNodesCount = m_bvhBuildState.m_leafNodesCount;
+		ndAssert(m_bvhBuildState.m_leafNodesCount < 1000);
 		const ndStartEnd startEnd(leafNodesCount, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -846,6 +848,14 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 						info.m_midPoint = median[index] / ndFloat32(block.m_count);
 						ndCountingSortInPlace<ndBottomUpCell, ndCompareKey, 2>(&m_bvhBuildState.m_cellBuffer0[block.m_start], &m_bvhBuildState.m_cellBuffer1[block.m_start], block.m_count, scan, &info);
 						index0 = block.m_start + ndInt32(scan[1]);
+						if (index0 == block.m_start)
+						{
+							index0 = block.m_start + block.m_count / 2;
+						}
+						if (index0 == (block.m_start + block.m_count))
+						{
+							index0 = block.m_start + block.m_count / 2;
+						}
 					}
 
 					ndAssert(index0 > block.m_start);
@@ -1196,6 +1206,8 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		const ndUnsigned32 linkedNodes = prefixScan[m_linkedCell + 1] - prefixScan[m_linkedCell];
 		m_bvhBuildState.m_srcArray += linkedNodes;
 		m_bvhBuildState.m_leafNodesCount -= linkedNodes;
+		ndAssert(m_bvhBuildState.m_leafNodesCount < 1000);
+
 		auto MakeGrids = ndMakeObject::ndFunction([this, &maxGrids](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME_NAMED(MakeGrids);
@@ -1364,6 +1376,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 
 			m_bvhBuildState.m_parentsArray += sum;
 			m_bvhBuildState.m_leafNodesCount += sum;
+			ndAssert(m_bvhBuildState.m_leafNodesCount < 1000);
 			m_bvhBuildState.m_depthLevel++;
 		}
 	}

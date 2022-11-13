@@ -244,6 +244,53 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 	}
 }
 
+
+ndVehicleMaterial::ndVehicleMaterial()
+	:ndApplicationMaterial()
+{
+}
+
+ndVehicleMaterial::ndVehicleMaterial(const ndVehicleMaterial& src)
+	:ndApplicationMaterial(src)
+{
+}
+
+ndVehicleMaterial* ndVehicleMaterial::Clone() const
+{
+	return new ndVehicleMaterial(*this);
+}
+
+bool ndVehicleMaterial::OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
+{
+	const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
+	const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
+
+	ndUnsigned64 pointer0 = material0.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+	ndUnsigned64 pointer1 = material1.m_userParam[ndContactCallback::m_modelPointer].m_intData;
+	if (pointer0 == pointer1)
+	{
+		// vehicle do not self collide
+		return false;
+	}
+	return ndApplicationMaterial::OnAabbOverlap(joint, timestep, instanceShape0, instanceShape1);
+}
+
+void ndVehicleMaterial::OnContactCallback(const ndContact* const joint, ndFloat32) const
+{
+	// here we override contact friction if needed
+	const ndMaterial* const matetial = ((ndContact*)joint)->GetMaterial();
+	ndContactPointList& contactPoints = ((ndContact*)joint)->GetContactPoints();
+	for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	{
+		ndContactMaterial& contactPoint = contactNode->GetInfo();
+		ndMaterial& material = contactPoint.m_material;
+		material.m_staticFriction0 = matetial->m_staticFriction0;
+		material.m_dynamicFriction0 = matetial->m_dynamicFriction0;
+		material.m_staticFriction1 = matetial->m_staticFriction1;
+		material.m_dynamicFriction1 = matetial->m_dynamicFriction1;
+	}
+}
+
 ndBasicVehicle::ndBasicVehicle(const ndVehicleDectriptor& desc)
 	:ndMultiBodyVehicle(ndVector(1.0f, 0.0f, 0.0f, 0.0f), ndVector(0.0f, 1.0f, 0.0f, 0.0f))
 	,m_configuration(desc)
@@ -277,6 +324,15 @@ void ndBasicVehicle::SetAsPlayer(ndDemoEntityManager* const, bool mode)
 bool ndBasicVehicle::IsPlayer() const
 {
 	return m_isPlayer;
+}
+
+void ndBasicVehicle::SetChassis(ndBodyDynamic* const chassis)
+{
+	AddChassis(chassis);
+	// asign shassis material id.
+	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
+	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
+	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
 }
 
 void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
@@ -329,6 +385,10 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 	tireBody->SetMatrix(matrix);
 	tireBody->SetCollisionShape(tireCollision);
 	tireBody->SetMassMatrix(definition.m_mass, tireCollision);
+
+	ndShapeInstance& instanceShape = tireBody->GetCollisionShape();
+	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
+	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
 
 	return tireBody;
 }

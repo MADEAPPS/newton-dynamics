@@ -29,41 +29,6 @@
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
 
-class ndVehicleMaterial: public ndApplicationMaterial
-{
-	public:
-	ndVehicleMaterial()
-		:ndApplicationMaterial()
-	{
-	}
-
-	ndVehicleMaterial(const ndVehicleMaterial& src)
-		:ndApplicationMaterial(src)
-	{
-	}
-
-	ndVehicleMaterial* Clone() const
-	{
-		return new ndVehicleMaterial(*this);
-	}
-
-	void OnContactCallback(const ndContact* const joint, ndFloat32) const
-	{
-		// here we override contact friction if needed
-		const ndMaterial* const matetial = ((ndContact*) joint)->GetMaterial();
-		ndContactPointList& contactPoints = ((ndContact*)joint)->GetContactPoints();
-		for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
-		{
-			ndContactMaterial& contactPoint = contactNode->GetInfo();
-			ndMaterial& material = contactPoint.m_material;
-			material.m_staticFriction0 = matetial->m_staticFriction0;
-			material.m_dynamicFriction0 = matetial->m_dynamicFriction0;
-			material.m_staticFriction1 = matetial->m_staticFriction1;
-			material.m_dynamicFriction1 = matetial->m_dynamicFriction1;
-		}
-	}
-};
-
 class ndVehicleDectriptorViper : public ndVehicleDectriptor
 {
 	public:
@@ -204,9 +169,9 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 	{
 		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
 
-		ndFloat32 idleTorquePoundFoot = 250.0f;
+		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 800.0f;
-		ndFloat32 horsePower = 400.0f;
+		ndFloat32 horsePower = 600.0f;
 		ndFloat32 rpm0 = 5000.0f;
 		ndFloat32 rpm1 = 6200.0f;
 		ndFloat32 horsePowerAtRedLine = 150.0f;
@@ -286,7 +251,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		chassis->SetCentreOfMass(com);
 
 		// 1- add chassis to the vehicle mode 
-		AddChassis(chassis);
+		//AddChassis(chassis);
+		SetChassis(chassis);
 
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
@@ -304,12 +270,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, fl_tireConfiguration, "fl_tire");
 		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
-
-		// asign tire material id.
-		fr_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
-		fl_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
-		rr_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
-		rl_tire_body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
@@ -417,6 +377,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		m_engineRpmSound->SetLoop(true);
 		m_skipMarks->SetLoop(true);
+
+		scene->GetWorld()->AddModel(this);
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -483,9 +445,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*chassisCollision);
 		body->SetMassMatrix(mass, *chassisCollision);
-
-		// asign shassis material id.
-		body->GetCollisionShape().m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
 
 		delete chassisCollision;
 		return body;
@@ -741,6 +700,16 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMat
 	//delete entity;
 }
 
+class ndPlacementMatrix : public ndMatrix
+{
+	public:
+	ndPlacementMatrix(const ndMatrix base, const ndVector& offset)
+		:ndMatrix (base)
+	{
+		m_posit += offset;
+	}
+};
+
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
@@ -785,26 +754,20 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 	
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, matrix);
-	scene->GetWorld()->AddModel(vehicle);
+	ndBasicMultiBodyVehicle* const vehicle0 = new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)));
+	ndBasicMultiBodyVehicle* const vehicle1 = new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)));
+	ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
+	ndBasicMultiBodyVehicle* const vehicle3 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	ndBasicMultiBodyVehicle* const vehicle = vehicle3;
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
-
-	//matrix.m_posit.m_x += 8.0f;
-	//matrix.m_posit.m_z += 6.0f;
-	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix));
-	//
-	//matrix.m_posit.m_z -= 14.0f;
-	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
-	//
-	//matrix.m_posit.m_x += 15.0f;
-	//AddPlanks(scene, matrix.m_posit, 60.0f, 5);
+	
+	matrix.m_posit.m_x += 20.0f;
+	AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);

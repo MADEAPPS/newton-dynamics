@@ -14,6 +14,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
+#include "ndContactCallback.h"
 
 #define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
 
@@ -126,6 +127,16 @@ class ndVehicleDectriptor
 	bool m_useHardSolverMode;
 };
 
+class ndVehicleMaterial : public ndApplicationMaterial
+{
+	public:
+	ndVehicleMaterial();
+	ndVehicleMaterial(const ndVehicleMaterial& src);
+	ndVehicleMaterial* Clone() const;
+	void OnContactCallback(const ndContact* const joint, ndFloat32) const;
+	bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const;
+};
+
 class ndBasicVehicle : public ndMultiBodyVehicle
 {
 	public:
@@ -142,6 +153,8 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
+
+	void SetChassis(ndBodyDynamic* const chassis);
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
