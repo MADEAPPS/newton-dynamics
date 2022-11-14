@@ -56,10 +56,34 @@ static ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 	convertMatrix[2][2] = ndFloat32(scaleFactor / 100.0f);
 
 	ndMatrix axisMatrix(ndGetZeroMatrix());
-	axisMatrix.m_up[globalSettings->UpAxis] = ndFloat32(globalSettings->UpAxisSign);
-	axisMatrix.m_front[globalSettings->FrontAxis] = ndFloat32(globalSettings->FrontAxisSign);
-	axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
-	axisMatrix = axisMatrix.Transpose();
+	//axisMatrix.m_up[globalSettings->UpAxis] = ndFloat32(globalSettings->UpAxisSign);
+	//axisMatrix.m_front[globalSettings->FrontAxis] = ndFloat32(globalSettings->FrontAxisSign);
+	//axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
+	//axisMatrix = axisMatrix.Transpose();
+
+	switch (globalSettings->UpAxis)
+	{
+		case UpVector_AxisX:
+			ndAssert(0);
+			break;
+
+		case UpVector_AxisY:
+			ndAssert(0);
+			axisMatrix = ndGetIdentityMatrix();
+			break;
+
+		case UpVector_AxisZ:
+			//axisMatrix.m_up[globalSettings->UpAxis] = ndFloat32(globalSettings->UpAxisSign);
+			//axisMatrix.m_front[globalSettings->FrontAxis] = ndFloat32(globalSettings->FrontAxisSign);
+			//axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
+			//axisMatrix = axisMatrix.Transpose();
+
+			axisMatrix[0][2] = ndFloat32(-1.0f);
+			axisMatrix[1][0] = ndFloat32(-1.0f);
+			axisMatrix[2][1] = ndFloat32(1.0f);
+			axisMatrix[3][3] = ndFloat32(1.0f);
+			break;
+	}
 	
 	convertMatrix = axisMatrix * convertMatrix;
 
