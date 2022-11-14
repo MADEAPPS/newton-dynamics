@@ -2761,10 +2761,11 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	stackDistance[0] = data.CalculateDistance2(origin, size, compoundShape->m_root->m_origin, compoundShape->m_root->m_size);
 	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
+	ndTrace(("xxxxxx\n"));
 	while (stack)
 	{
 		stack--;
-
+		
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{

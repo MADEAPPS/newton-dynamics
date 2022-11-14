@@ -688,20 +688,19 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	bool m_startEngineMemory;
 };
 
-//static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
-static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMatrix&)
+static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
-	//ndMatrix localAxis(ndGetIdentityMatrix());
-	//localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
-	//localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
-	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-	//
-	//ndFloat32 height = 1.9f;
-	//ndFloat32 radio = 0.5f;
-	//ndFloat32 mass = 100.0f;
-	//ndDemoEntity* const entity = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	ndMatrix localAxis(ndGetIdentityMatrix());
+	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
+	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+	
+	ndFloat32 height = 1.9f;
+	ndFloat32 radio = 0.5f;
+	ndFloat32 mass = 100.0f;
+	ndDemoEntity* const entity = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-	//delete entity;
+	delete entity;
 }
 
 class ndPlacementMatrix : public ndMatrix
@@ -751,8 +750,11 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	material.m_dynamicFriction1 = 0.9f;
 
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_vehicelTirePart);
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicelTirePart, ndApplicationMaterial::m_default);
-	//callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicelTirePart, ndApplicationMaterial::m_vehicelTirePart);
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();

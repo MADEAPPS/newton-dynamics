@@ -329,7 +329,7 @@ bool ndBasicVehicle::IsPlayer() const
 void ndBasicVehicle::SetChassis(ndBodyDynamic* const chassis)
 {
 	AddChassis(chassis);
-	// asign shassis material id.
+	// assign chassis material id.
 	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
 	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_modelPart;
 	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
@@ -496,7 +496,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 					{
 						m_currentGear--;
 						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
+www						m_gearBox->SetRatio(gearGain);
 						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 					}
 				}
