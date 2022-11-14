@@ -496,7 +496,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 					{
 						m_currentGear--;
 						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-www						m_gearBox->SetRatio(gearGain);
+						m_gearBox->SetRatio(gearGain);
 						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 					}
 				}

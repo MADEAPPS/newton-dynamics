@@ -44,6 +44,7 @@ include(GoogleTest)
 add_executable(
   ${PROJECT_NAME}
   world_test.cpp
+  phantom_test.cpp
   rigidBody_test.cpp
   staticBody_test.cpp
   instancing_test.cpp
