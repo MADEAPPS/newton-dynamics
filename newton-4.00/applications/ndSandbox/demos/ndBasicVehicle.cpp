@@ -50,10 +50,14 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_rearTire.m_handBrakeTorque = 5000.0f;
+		m_rearTire.m_handBrakeTorque = 100000.0f;
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
 	}
 };
 
@@ -87,8 +91,6 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffness = 2.0f * DEMO_GRAVITY;
-		m_frontTire.m_longitudinalStiffness  = 10.0f * DEMO_GRAVITY;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_verticalOffset = -0.15f;
@@ -99,14 +101,16 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
-		m_rearTire.m_handBrakeTorque = 4000.0f;
-		m_rearTire.m_laterialStiffness = 2.0f * DEMO_GRAVITY;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
 	}
 };
 
@@ -138,8 +142,6 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffness = 2.0f * DEMO_GRAVITY;
-		m_frontTire.m_longitudinalStiffness = 4.0f * DEMO_GRAVITY;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_verticalOffset = 0.0f;
@@ -149,15 +151,17 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_rearTire.m_regularizer = 0.2f;
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
-		m_rearTire.m_brakeTorque = 2000.0f;
+		m_rearTire.m_brakeTorque = 5000.0f;
 		m_rearTire.m_handBrakeTorque = 1000000.0f;
-		m_rearTire.m_laterialStiffness = 2.0f * DEMO_GRAVITY;
-		m_rearTire.m_longitudinalStiffness = 4.0f * DEMO_GRAVITY;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
 	}
 };
 
