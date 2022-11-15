@@ -68,8 +68,11 @@ static ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 			break;
 
 		case UpVector_AxisY:
-			ndAssert(0);
-			axisMatrix = ndGetIdentityMatrix();
+			//axisMatrix = ndPitchMatrix(-90.0f * ndDegreeToRad) * ndYawMatrix(90.0f * ndDegreeToRad);
+			axisMatrix[0][2] = ndFloat32(-1.0f);
+			axisMatrix[1][0] = ndFloat32(-1.0f);
+			axisMatrix[2][1] = ndFloat32(1.0f);
+			axisMatrix[3][3] = ndFloat32(1.0f);
 			break;
 
 		case UpVector_AxisZ:
@@ -1035,6 +1038,11 @@ ndMeshEffectNode* LoadFbxMeshEffectNode(const char* const meshName)
 	ndMeshEffectNode* const meshEffectNode = FbxToMeshEffectNode(fbxScene);
 	FreezeScale(meshEffectNode);
 	ApplyTransform(meshEffectNode, convertMatrix);
+
+	if (fbxScene->getGlobalSettings()->UpAxis == UpVector_AxisY)
+	{
+		meshEffectNode->m_matrix = meshEffectNode->m_matrix * ndRollMatrix(-90.0f * ndDegreeToRad);
+	}
 
 	fbxScene->destroy();
 	return meshEffectNode;

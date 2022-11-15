@@ -32,8 +32,6 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-//#define USE_OLD_TIRE_MODEL
-
 #define D_MAX_CONTACT_SPEED_TRESHOLD  ndFloat32 (0.25f)
 #define D_MAX_CONTACT_PENETRATION	  ndFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 ndFloat32 (5.0e-2f * 5.0e-2f)
