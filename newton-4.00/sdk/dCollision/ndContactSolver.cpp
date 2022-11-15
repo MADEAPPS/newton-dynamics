@@ -72,10 +72,6 @@ class ndContactSolver::ndBoxBoxDistance2
 		:m_matrix0(matrix0)
 		,m_matrix1(matrix1)
 	{
-		//m_matrix1.m_posit -= matrix0.m_posit;
-		//m_matrix1.m_posit.m_w = ndFloat32 (1.0f);
-		//m_matrix0.m_posit = ndVector::m_wOne;
-
 		m_localMatrix0 = m_matrix1 * m_matrix0.Inverse();
 		m_localMatrix1 = m_localMatrix0.Inverse();
 
@@ -206,7 +202,6 @@ class ndContactSolver::ndBoxBoxDistance2
 					const ndVector mask((box0 * box1) > ndVector::m_zero);
 					const ndVector dist(box0.Abs().GetMin(box1.Abs()) & mask);
 
-					//separatingDistance2 = dist.GetMax().GetScalar();
 					const ndVector maxVal(dist.GetMax());
 					separatingDistance2 = maxVal.GetScalar();
 					i += 3;
