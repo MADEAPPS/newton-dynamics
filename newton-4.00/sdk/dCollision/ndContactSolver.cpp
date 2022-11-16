@@ -65,12 +65,135 @@ ndInt32 ndContactSolver::m_rayCastSimplex[4][4] =
 };
 
 D_MSV_NEWTON_ALIGN_32
+class ndContactSolver::ndBoxBoxDistance2____
+{
+	public:
+	ndBoxBoxDistance2____(const ndMatrix& matrix0, const ndMatrix& matrix1)
+		:m_matrix(matrix0 * matrix1.Inverse())
+	{
+	}
+
+	void SupportVertex(const ndMatrix& matrix, const ndVector& dir1, const ndVector& size0, const ndVector& size1, ndInt32 vertexIndex) const
+	{
+		const ndVector dir0(matrix.UnrotateVector(dir1 * ndVector::m_negOne));
+		const ndVector mask0(dir0 < ndVector::m_zero);
+		const ndVector mask1(dir1 < ndVector::m_zero);
+		m_p1 = size1.Select(size1 * ndVector::m_negOne, mask1);
+		m_p0 = matrix.TransformVector(size0.Select(size0 * ndVector::m_negOne, mask0));
+		m_hullDiff[vertexIndex] = m_p1 - m_p0;
+	}
+
+	ndFloat32 CalculateDistance2(const ndVector& localOrigin0, const ndVector& size0, const ndVector& localOrigin1, const ndVector& size1) const
+	{
+		ndAssert(0);
+
+		ndMatrix matrix(m_matrix);
+		matrix.m_posit = m_matrix.TransformVector(localOrigin0) - localOrigin1 & ndVector::m_triplexMask;
+
+		ndVector separatingVector(ndVector::m_one & ndVector::m_xMask);
+		ndBigVector v(ndBigVector::m_zero);
+		SupportVertex(matrix, separatingVector, size0, size1, 0);
+#if 0
+		v = m_hullDiff[0];
+		ndVector bestNormal(separatingVector);
+
+		ndInt32 index = 1;
+		ndInt32 iter = 0;
+		ndInt32 cycling = 0;
+		ndFloat64 minDist = ndFloat32(1.0e20f);
+		ndFloat64 bestNormalDist = ndFloat32(1.0e20f);
+		do
+		{
+			ndFloat64 dist = v.DotProduct(v).GetScalar();
+			if (dist < ndFloat32(1.0e-9f))
+			{
+				// very deep penetration, resolve with generic Minkowski solver
+				ndAssert(0);
+				return -index;
+			}
+		
+			if (dist < minDist)
+			{
+				minDist = dist;
+				cycling = -1;
+			}
+			cycling++;
+			if (cycling > 4)
+			{
+				ndAssert(0);
+				return -index;
+			}
+		
+			const ndVector dir(v.Scale(-ndRsqrt(dist)));
+			ndAssert(dir.m_w == ndFloat32(0.0f));
+		//	SupportVertex(dir, index);
+			SupportVertex(matrix, dir, size0, size1, index);
+		
+			const ndBigVector w(m_hullDiff[index]);
+			const ndVector wv(w - v);
+			ndAssert(wv.m_w == ndFloat32(0.0f));
+			const ndFloat64 dist1 = dir.DotProduct(wv).GetScalar();
+			if (dist1 < ndFloat64(1.0e-3f))
+			{
+				ndAssert(0);
+				//m_separatingVector = dir;
+				//return index;
+			}
+		
+			if (dist1 < bestNormalDist)
+			{
+				bestNormal = dir;
+				bestNormalDist = dist1;
+			}
+		
+			index++;
+			switch (index)
+			{
+				case 2:
+				{
+					ndAssert(0);
+					//v = ReduceLine(index);
+					break;
+				}
+		
+				case 3:
+				{
+					ndAssert(0);
+					//v = ReduceTriangle(index);
+					break;
+				}
+		
+				case 4:
+				{
+					ndAssert(0);
+					//v = ReduceTetrahedrum(index);
+					break;
+				}
+			}
+		
+			iter++;
+		} while (iter < D_CONNICS_CONTATS_ITERATIONS);
+		
+		//m_separatingVector = bestNormal;
+		//return (index < 4) ? index : -4;
+#endif
+		return 0.0f;
+	}
+
+	ndMatrix m_matrix;
+	mutable ndVector m_p0;
+	mutable ndVector m_p1;
+	mutable ndVector m_hullDiff[4];
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
 class ndContactSolver::ndBoxBoxDistance2
 {
 	public:
 	ndBoxBoxDistance2(const ndMatrix& matrix0, const ndMatrix& matrix1)
 		:m_matrix0(matrix0)
 		,m_matrix1(matrix1)
+		//,xxxx(matrix0, matrix1)
 	{
 		m_localMatrix0 = m_matrix1 * m_matrix0.Inverse();
 		m_localMatrix1 = m_localMatrix0.Inverse();
@@ -153,6 +276,8 @@ class ndContactSolver::ndBoxBoxDistance2
 
 	ndFloat32 CalculateDistance2(const ndVector& localOrigin0, const ndVector& size0, const ndVector& localOrigin1, const ndVector& size1) const
 	{
+		//ndFloat32 xxx = xxxx.CalculateDistance2(localOrigin0, size0, localOrigin1, size1);
+
 		ndFloat32 separatingDistance2 = CalculateBox0Distance2(localOrigin0, size0, localOrigin1, size1); 
 		if (separatingDistance2 == ndFloat32(0.0f))
 		{
@@ -305,22 +430,12 @@ class ndStackEntry
 		const ndVector p0(origin - size);
 		const ndVector p1(origin + size);
 
-		//const ndVector p0(ndVector::m_triplexMask & (ndVector(20000.0f) - size));
-		//const ndVector p1(ndVector::m_triplexMask & (ndVector(20000.0f) + size));
-
 		ndVector boxP0;
 		ndVector boxP1;
 		ndShapeHeightfield* const shape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
 		shape->GetLocalAabb(p0, p1, boxP0, boxP1);
 		const ndVector boxSize((boxP1 - boxP0) * ndVector::m_half * scale);
 		const ndVector boxOrigin((boxP1 + boxP0) * ndVector::m_half * scale);
-
-		//if ((boxSize.m_x < 0) || (boxSize.m_y < 0) || (boxSize.m_z < 0))
-		//{
-		//	ndTrace(("p0 (%f %f %f)\n", p0.m_x, p0.m_y, p0.m_z));
-		//	ndTrace(("p1 (%f %f %f)\n", p1.m_x, p1.m_y, p1.m_z));
-		//	shape->GetLocalAabb(p0, p1, boxP0, boxP1);
-		//}
 
 		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
 		return dist2;
@@ -443,7 +558,8 @@ void ndContactSolver::SupportVertex(const ndVector& dir0, ndInt32 vertexIndex)
 {
 	ndAssert(dir0.m_w == ndFloat32(0.0f));
 	ndAssert(ndAbs(dir0.DotProduct(dir0).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
-	ndVector dir1 (dir0.Scale(ndFloat32 (-1.0f)));
+	//ndVector dir1 (dir0.Scale(ndFloat32 (-1.0f)));
+	ndVector dir1(dir0 * ndVector::m_negOne);
 	
 	const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
 	const ndMatrix& matrix1 = m_instance1.m_globalMatrix;
@@ -2756,7 +2872,6 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	stackDistance[0] = data.CalculateDistance2(origin, size, compoundShape->m_root->m_origin, compoundShape->m_root->m_size);
 	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
-	ndTrace(("xxxxxx\n"));
 	while (stack)
 	{
 		stack--;

@@ -60,6 +60,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 {
 	public: 
 	class ndBoxBoxDistance2;
+	class ndBoxBoxDistance2____;
 
 	D_COLLISION_API ndContactSolver();
 	~ndContactSolver() {}
