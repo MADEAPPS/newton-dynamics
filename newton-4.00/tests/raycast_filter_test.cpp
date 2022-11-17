@@ -58,10 +58,10 @@ public:
 	}
 	~NotifyClientNode() = default;
 
-	void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix) override
+	void OnTransform(ndInt32, const ndMatrix&) override
 	{
 	}
-	void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep) override
+	void OnApplyExternalForce(ndInt32, ndFloat32) override
 	{
 	}
 

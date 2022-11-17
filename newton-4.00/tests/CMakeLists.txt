@@ -48,6 +48,7 @@ add_executable(
   rigidBody_test.cpp
   staticBody_test.cpp
   instancing_test.cpp
+  raycast_filter_test.cpp
   bodyNotifyCallback_test.cpp
 )
 
