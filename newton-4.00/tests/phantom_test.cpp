@@ -59,7 +59,8 @@ public:
 	ndInt32 getContactCount() const { return contactCount; }
 	ndVector getContactPoint() const { return contactPoint; }
 
-	void Update(ndWorld* const world, ndFloat32 timestep) override
+	//void Update(ndWorld* const world, ndFloat32 timestep) override
+	void Update(ndWorld* const world, ndFloat32) override
 	{
 		// calc the current AABB in world space
 		ndVector boxMin;
@@ -101,10 +102,10 @@ public:
 			}
 		}
 	}
-	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override
+	void PostUpdate(ndWorld* const, ndFloat32) override
 	{
 	}
-	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) override
+	void PostTransformUpdate(ndWorld* const, ndFloat32) override
 	{
 	}
 
