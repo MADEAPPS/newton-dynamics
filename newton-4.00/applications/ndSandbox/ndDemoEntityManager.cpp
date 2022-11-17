@@ -936,7 +936,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Text("iterative solver passes");
 			ImGui::SliderInt("##intera", &m_solverPasses, 4, 32);
 			ImGui::Text("worker threads");
-			ImGui::SliderInt("##worker", &m_workerThreads, 1, D_MAX_THREADS_COUNT);
+			ImGui::SliderInt("##worker", &m_workerThreads, 1, ndThreadPool::GetMaxThreads());
 			ImGui::Separator();
 
 			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);

@@ -121,12 +121,21 @@ ndThreadPool::~ndThreadPool()
 	SetThreadCount(0);
 }
 
+ndInt32 ndThreadPool::GetMaxThreads()
+{
+	#ifdef D_USE_THREAD_EMULATION
+		return D_MAX_THREADS_COUNT;
+	#else
+		return ndClamp(ndInt32(std::thread::hardware_concurrency() + 1) / 2, 1, D_MAX_THREADS_COUNT);
+	#endif
+}
+
 void ndThreadPool::SetThreadCount(ndInt32 count)
 {
-#ifdef	D_USE_THREAD_EMULATION
+#ifdef D_USE_THREAD_EMULATION
 	m_count = ndClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 #else
-	ndInt32 maxThread = ndClamp (ndInt32 (std::thread::hardware_concurrency() + 1)/2, 0, D_MAX_THREADS_COUNT);
+	ndInt32 maxThread = GetMaxThreads();
 	count = ndClamp(count, 1, maxThread) - 1;
 	if (count != m_count)
 	{

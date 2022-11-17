@@ -85,6 +85,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API virtual ~ndThreadPool();
 
 	ndInt32 GetThreadCount() const;
+	D_CORE_API static ndInt32 GetMaxThreads();
 	D_CORE_API void SetThreadCount(ndInt32 count);
 
 	D_CORE_API void TickOne();
