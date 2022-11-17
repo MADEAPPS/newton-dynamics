@@ -194,7 +194,8 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 	ndEvaluateKey evaluator(context);
 	const ndInt32 threadCount = threadPool.GetThreadCount();
 
-	ndUnsigned32 sum[1 << keyBitSize];
+	//ndUnsigned32 sum[1 << keyBitSize];
+	ndUnsigned32* const sum = ndAlloca(ndUnsigned32, 1 << keyBitSize);
 	ndUnsigned32* const scans = ndAlloca(ndUnsigned32, threadCount * (1 << keyBitSize));
 
 	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
@@ -359,7 +360,8 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 	ndEvaluateKey evaluator(context);
 	const ndInt32 threadCount = threadPool.GetThreadCount();
 
-	ndUnsigned32 sum[1 << keyBitSize];
+	//ndUnsigned32 sum[1 << keyBitSize];
+	ndUnsigned32* const sum = ndAlloca(ndUnsigned32, 1 << keyBitSize);
 	ndUnsigned32* const scans = ndAlloca(ndUnsigned32, threadCount * (1 << keyBitSize));
 
 	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
