@@ -738,6 +738,20 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 th
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
+#ifdef D_AUTO_THREAD_BALANCE
+	ndAtomic<ndInt32> counter(0);
+	auto TransformUpdate = ndMakeObject::ndFunction([this, &counter](ndInt32 threadIndex, ndInt32)
+	{
+		D_TRACKTIME_NAMED(TransformUpdate);
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndInt32 bodyCount = bodyArray.GetCount() - 1;
+		for (ndInt32 i = counter.fetch_add(1); i < bodyCount; i = counter.fetch_add(1))
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			UpdateTransformNotify(threadIndex, body);
+		}
+	});
+#else
 	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(TransformUpdate);
@@ -749,6 +763,7 @@ void ndScene::UpdateTransform()
 			UpdateTransformNotify(threadIndex, body);
 		}
 	});
+#endif
 	ParallelExecute(TransformUpdate);
 }
 
