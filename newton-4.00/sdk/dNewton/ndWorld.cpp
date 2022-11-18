@@ -477,24 +477,13 @@ void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 
 void ndWorld::AddModel(ndModel* const model)
 {
-	if (!model->m_node)
-	{
-		ndAssert(0);
-		model->AddToWorld(this);
-		model->m_node = m_modelList.Append(model);
-	}
+	m_modelList.AddModel(model, this);
 }
 
 void ndWorld::RemoveModel(ndModel* const model)
 {
 	ndAssert(!m_inUpdate);
-	if (model->m_node)
-	{
-		ndAssert(0);
-		model->RemoveFromToWorld(this);
-		m_modelList.Remove(model->m_node);
-		model->m_node = nullptr;
-	}
+	m_modelList.RemoveModel(model, this);
 }
 
 ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void*)
@@ -611,8 +600,10 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// Update Particle base physics
 	//ParticleUpdate();
 
-	// Update all models
+	// u[pate skelton topologis
 	UpdateSkeletons();
+
+	// Update all models
 	ModelUpdate();
 
 	// calculate internal forces, integrate bodies and update matrices.
@@ -638,57 +629,40 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	auto ModelUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> counter(0);
+	auto ModelUpdate = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ModelUpdate);
-		ndAssert(0);
-		//const ndFloat32 timestep = m_scene->GetTimestep();
-		//ndModelList& modelList = m_modelList;
-		//ndModelList::ndNode* node = modelList.GetFirst();
-		//for (ndInt32 i = 0; i < threadIndex; ++i)
-		//{
-		//	node = node ? node->GetNext() : nullptr;
-		//}
-		//
-		//while (node)
-		//{
-		//	ndModel* const model = node->GetInfo();
-		//	model->Update(this, timestep);
-		//
-		//	for (ndInt32 i = 0; i < threadCount; ++i)
-		//	{
-		//		node = node ? node->GetNext() : nullptr;
-		//	}
-		//}
+		const ndFloat32 timestep = m_scene->GetTimestep();
+		ndArray<ndModel*> modelList = m_modelList.GetUpdateList();
+		const ndInt32 modelCount = modelList.GetCount();
+		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
+		{
+			ndModel* const model = modelList[i];
+			model->Update(this, timestep);
+		}
 	});
+
+	m_modelList.UpdateDirtyList();
 	m_scene->ParallelExecute(ModelUpdate);
 }
 
 void ndWorld::ModelPostUpdate()
 {
 	D_TRACKTIME();
-	auto ModelPostUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> counter(0);
+	auto ModelPostUpdate = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ModelPostUpdate);
-		ndAssert(0);
-		//const ndFloat32 timestep = m_scene->GetTimestep();
-		//ndModelList& modelList = m_modelList;
-		//ndModelList::ndNode* node = modelList.GetFirst();
-		//for (ndInt32 i = 0; i < threadIndex; ++i)
-		//{
-		//	node = node ? node->GetNext() : nullptr;
-		//}
-		//
-		//while (node)
-		//{
-		//	ndModel* const model = node->GetInfo();
-		//	model->PostUpdate(this, timestep);
-		//
-		//	for (ndInt32 i = 0; i < threadCount; ++i)
-		//	{
-		//		node = node ? node->GetNext() : nullptr;
-		//	}
-		//}
+		const ndFloat32 timestep = m_scene->GetTimestep();
+		ndArray<ndModel*> modelList = m_modelList.GetUpdateList();
+
+		const ndInt32 modelCount = modelList.GetCount();
+		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
+		{
+			ndModel* const model = modelList[i];
+			model->PostUpdate(this, timestep);
+		}
 	});
 	m_scene->ParallelExecute(ModelPostUpdate);
 }
@@ -696,28 +670,18 @@ void ndWorld::ModelPostUpdate()
 void ndWorld::PostModelTransform()
 {
 	D_TRACKTIME();
-	auto PostModelTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
+	ndAtomic<ndInt32> counter(0);
+	auto PostModelTransform = ndMakeObject::ndFunction([this, &counter](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(PostModelTransform);
-		ndAssert(0);
-		//const ndFloat32 timestep = m_scene->GetTimestep();
-		//ndModelList& modelList = m_modelList;
-		//ndModelList::ndNode* node = modelList.GetFirst();
-		//for (ndInt32 i = 0; i < threadIndex; ++i)
-		//{
-		//	node = node ? node->GetNext() : nullptr;
-		//}
-		//
-		//while (node)
-		//{
-		//	ndModel* const model = node->GetInfo();
-		//	model->PostTransformUpdate(this, timestep);
-		//
-		//	for (ndInt32 i = 0; i < threadCount; ++i)
-		//	{
-		//		node = node ? node->GetNext() : nullptr;
-		//	}
-		//}
+		const ndFloat32 timestep = m_scene->GetTimestep();
+		ndArray<ndModel*> modelList = m_modelList.GetUpdateList();
+		const ndInt32 modelCount = modelList.GetCount();
+		for (ndInt32 i = counter.fetch_add(1); i < modelCount; i = counter.fetch_add(1))
+		{
+			ndModel* const model = modelList[i];
+			model->PostTransformUpdate(this, timestep);
+		}
 	});
 	m_scene->ParallelExecute(PostModelTransform);
 }

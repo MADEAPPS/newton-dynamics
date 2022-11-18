@@ -30,19 +30,43 @@ ndModelList::ndModelList()
 {
 }
 
-void ndModelList::AddModel(ndModel* const model)
+ndArray<ndModel*>& ndModelList::GetUpdateList()
 {
-	m_dirty = true;
-	ndAssert(!model->m_node);
-	Append(model);
+	return m_updateArray;
 }
 
-void ndModelList::RemoveModel(ndModel* const model)
+void ndModelList::UpdateDirtyList()
 {
-	ndModelList::ndNode* const node = model->m_node;
-	if (node)
+	if (m_dirty)
+	{
+		m_dirty = false;
+		m_updateArray.SetCount(0);
+		for (ndNode* node = GetFirst(); node; node = node->GetNext())
+		{
+			m_updateArray.PushBack(node->GetInfo());
+		}
+	}
+}
+
+void ndModelList::AddModel(ndModel* const model, ndWorld* const world)
+{
+	ndAssert(!model->m_node);
+	if (!model->m_node)
 	{
 		m_dirty = true;
-		Remove(node);
+		ndNode* const node = Append(model);
+		model->m_node = node;
+		model->AddToWorld(world);
+	}
+}
+
+void ndModelList::RemoveModel(ndModel* const model, ndWorld* const world)
+{
+	if (model->m_node)
+	{
+		m_dirty = true;
+		model->RemoveFromToWorld(world);
+		Remove(model->m_node);
+		model->m_node = nullptr;
 	}
 }

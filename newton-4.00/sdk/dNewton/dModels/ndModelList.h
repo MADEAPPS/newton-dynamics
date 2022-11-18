@@ -27,14 +27,17 @@
 class ndModel;
 class ndModelList : public ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>
 {
-	public:
 	ndModelList();
-	void AddModel(ndModel* const model);
-	void RemoveModel(ndModel* const model);
 
-	private:
+	void UpdateDirtyList();
+	ndArray<ndModel*>& GetUpdateList();
+	void AddModel(ndModel* const model, ndWorld* const world);
+	void RemoveModel(ndModel* const model, ndWorld* const world);
+
 	ndArray<ndModel*> m_updateArray;
 	bool m_dirty;
+	friend class ndWorld;
+	friend class ndLoadSave;
 };
 
 #endif
