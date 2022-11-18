@@ -298,6 +298,7 @@ const ndBodyParticleSetList& ndWorld::GetParticleList() const
 
 const ndModelList& ndWorld::GetModelList() const
 {
+	ndAssert(0);
 	return m_modelList;
 }
 
@@ -478,6 +479,7 @@ void ndWorld::AddModel(ndModel* const model)
 {
 	if (!model->m_node)
 	{
+		ndAssert(0);
 		model->AddToWorld(this);
 		model->m_node = m_modelList.Append(model);
 	}
@@ -488,6 +490,7 @@ void ndWorld::RemoveModel(ndModel* const model)
 	ndAssert(!m_inUpdate);
 	if (model->m_node)
 	{
+		ndAssert(0);
 		model->RemoveFromToWorld(this);
 		m_modelList.Remove(model->m_node);
 		model->m_node = nullptr;
@@ -638,24 +641,25 @@ void ndWorld::ModelUpdate()
 	auto ModelUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ModelUpdate);
-		const ndFloat32 timestep = m_scene->GetTimestep();
-		ndModelList& modelList = m_modelList;
-		ndModelList::ndNode* node = modelList.GetFirst();
-		for (ndInt32 i = 0; i < threadIndex; ++i)
-		{
-			node = node ? node->GetNext() : nullptr;
-		}
-
-		while (node)
-		{
-			ndModel* const model = node->GetInfo();
-			model->Update(this, timestep);
-
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-		}
+		ndAssert(0);
+		//const ndFloat32 timestep = m_scene->GetTimestep();
+		//ndModelList& modelList = m_modelList;
+		//ndModelList::ndNode* node = modelList.GetFirst();
+		//for (ndInt32 i = 0; i < threadIndex; ++i)
+		//{
+		//	node = node ? node->GetNext() : nullptr;
+		//}
+		//
+		//while (node)
+		//{
+		//	ndModel* const model = node->GetInfo();
+		//	model->Update(this, timestep);
+		//
+		//	for (ndInt32 i = 0; i < threadCount; ++i)
+		//	{
+		//		node = node ? node->GetNext() : nullptr;
+		//	}
+		//}
 	});
 	m_scene->ParallelExecute(ModelUpdate);
 }
@@ -666,24 +670,25 @@ void ndWorld::ModelPostUpdate()
 	auto ModelPostUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ModelPostUpdate);
-		const ndFloat32 timestep = m_scene->GetTimestep();
-		ndModelList& modelList = m_modelList;
-		ndModelList::ndNode* node = modelList.GetFirst();
-		for (ndInt32 i = 0; i < threadIndex; ++i)
-		{
-			node = node ? node->GetNext() : nullptr;
-		}
-
-		while (node)
-		{
-			ndModel* const model = node->GetInfo();
-			model->PostUpdate(this, timestep);
-
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-		}
+		ndAssert(0);
+		//const ndFloat32 timestep = m_scene->GetTimestep();
+		//ndModelList& modelList = m_modelList;
+		//ndModelList::ndNode* node = modelList.GetFirst();
+		//for (ndInt32 i = 0; i < threadIndex; ++i)
+		//{
+		//	node = node ? node->GetNext() : nullptr;
+		//}
+		//
+		//while (node)
+		//{
+		//	ndModel* const model = node->GetInfo();
+		//	model->PostUpdate(this, timestep);
+		//
+		//	for (ndInt32 i = 0; i < threadCount; ++i)
+		//	{
+		//		node = node ? node->GetNext() : nullptr;
+		//	}
+		//}
 	});
 	m_scene->ParallelExecute(ModelPostUpdate);
 }
@@ -694,24 +699,25 @@ void ndWorld::PostModelTransform()
 	auto PostModelTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(PostModelTransform);
-		const ndFloat32 timestep = m_scene->GetTimestep();
-		ndModelList& modelList = m_modelList;
-		ndModelList::ndNode* node = modelList.GetFirst();
-		for (ndInt32 i = 0; i < threadIndex; ++i)
-		{
-			node = node ? node->GetNext() : nullptr;
-		}
-
-		while (node)
-		{
-			ndModel* const model = node->GetInfo();
-			model->PostTransformUpdate(this, timestep);
-
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-		}
+		ndAssert(0);
+		//const ndFloat32 timestep = m_scene->GetTimestep();
+		//ndModelList& modelList = m_modelList;
+		//ndModelList::ndNode* node = modelList.GetFirst();
+		//for (ndInt32 i = 0; i < threadIndex; ++i)
+		//{
+		//	node = node ? node->GetNext() : nullptr;
+		//}
+		//
+		//while (node)
+		//{
+		//	ndModel* const model = node->GetInfo();
+		//	model->PostTransformUpdate(this, timestep);
+		//
+		//	for (ndInt32 i = 0; i < threadCount; ++i)
+		//	{
+		//		node = node ? node->GetNext() : nullptr;
+		//	}
+		//}
 	});
 	m_scene->ParallelExecute(PostModelTransform);
 }

@@ -55,6 +55,7 @@ class ndModel: public ndClassAlloc
 
 	friend class ndWorld;
 	friend class ndLoadSave;
+	friend class ndModelList;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndModel::ndModel()

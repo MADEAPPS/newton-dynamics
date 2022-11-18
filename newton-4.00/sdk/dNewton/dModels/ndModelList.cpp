@@ -19,22 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_MODEL_LIST_H__
-#define __ND_MODEL_LIST_H__
-
+#include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "ndModel.h"
 
-class ndModel;
-class ndModelList : public ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>
+ndModelList::ndModelList()
+	:ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>()
+	,m_updateArray()
+	,m_dirty(true)
 {
-	public:
-	ndModelList();
-	void AddModel(ndModel* const model);
-	void RemoveModel(ndModel* const model);
+}
 
-	private:
-	ndArray<ndModel*> m_updateArray;
-	bool m_dirty;
-};
+void ndModelList::AddModel(ndModel* const model)
+{
+	m_dirty = true;
+	ndAssert(!model->m_node);
+	Append(model);
+}
 
-#endif
+void ndModelList::RemoveModel(ndModel* const model)
+{
+	ndModelList::ndNode* const node = model->m_node;
+	if (node)
+	{
+		m_dirty = true;
+		Remove(node);
+	}
+}
