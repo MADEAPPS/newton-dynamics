@@ -298,7 +298,6 @@ const ndBodyParticleSetList& ndWorld::GetParticleList() const
 
 const ndModelList& ndWorld::GetModelList() const
 {
-	ndAssert(0);
 	return m_modelList;
 }
 

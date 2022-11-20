@@ -174,9 +174,10 @@ ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& lo
 ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName)
 {
 	ndFixSizeArray<ndVector, 1024 * 8> points;
+	ndFloat32 den = ndFloat32(segments);
 	for (ndInt32 i = 0; i < segments; ++i)
 	{
-		ndFloat32 angle = ndFloat32(2.0f) * ndPi * ndFloat32(i) / segments;
+		ndFloat32 angle = ndFloat32(2.0f) * ndPi * ndFloat32(i) / den;
 		ndFloat32 x = radius * ndCos(angle);
 		ndFloat32 z = radius * ndSin(angle);
 		points.PushBack(ndVector(0.7f * x, -high * 0.5f, 0.7f * z, 0.0f));

@@ -194,7 +194,6 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 	ndEvaluateKey evaluator(context);
 	const ndInt32 threadCount = threadPool.GetThreadCount();
 
-	//ndUnsigned32 sum[1 << keyBitSize];
 	ndUnsigned32* const sum = ndAlloca(ndUnsigned32, 1 << keyBitSize);
 	ndUnsigned32* const scans = ndAlloca(ndUnsigned32, threadCount * (1 << keyBitSize));
 
@@ -298,7 +297,7 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context)
+void ndCountingSort(const T* const srcArray, T* const dstArray, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context)
 {
 	//D_TRACKTIME();
 	ndAssert(keyBitSize > 0);
@@ -310,7 +309,7 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsi
 	}
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-		const T& entry = array[i];
+		const T& entry = srcArray[i];
 		const ndInt32 key = evaluator.GetKey(entry);
 		ndAssert(key >= 0);
 		ndAssert(key < (1 << keyBitSize));
@@ -335,12 +334,12 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsi
 
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-		const T& entry = array[i];
+		const T& entry = srcArray[i];
 		const ndInt32 key = evaluator.GetKey(entry);
 		ndAssert(key >= 0);
 		ndAssert(key < (1 << keyBitSize));
 		const ndUnsigned32 index = scans[key];
-		scratchBuffer[index] = entry;
+		dstArray[index] = entry;
 		scans[key] = index + 1;
 	}
 
@@ -354,17 +353,16 @@ void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsi
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut,  void* const context)
+void ndCountingSort(ndThreadPool& threadPool, const T* const srcArray, T* const dstArray, ndInt32 size, ndUnsigned32* const prefixScanOut,  void* const context)
 {
 	D_TRACKTIME();
 	ndEvaluateKey evaluator(context);
 	const ndInt32 threadCount = threadPool.GetThreadCount();
 
-	//ndUnsigned32 sum[1 << keyBitSize];
 	ndUnsigned32* const sum = ndAlloca(ndUnsigned32, 1 << keyBitSize);
 	ndUnsigned32* const scans = ndAlloca(ndUnsigned32, threadCount * (1 << keyBitSize));
 
-	auto ndBuildHistogram = ndMakeObject::ndFunction([&array, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	auto ndBuildHistogram = ndMakeObject::ndFunction([&srcArray, size, &evaluator, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ndBuildHistogram);
 		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
@@ -377,7 +375,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		ndStartEnd startEnd(size, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			const T& entry = array[i];
+			const T& entry = srcArray[i];
 			const ndInt32 key = evaluator.GetKey(entry);
 			ndAssert(key >= 0);
 			ndAssert(key < (1 << keyBitSize));
@@ -385,7 +383,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		}
 	});
 
-	auto ndShuffleArray = ndMakeObject::ndFunction([&array, &scratchBuffer, size, &evaluator, &scans, &sum](ndInt32 threadIndex, ndInt32 threadCount)
+	auto ndShuffleArray = ndMakeObject::ndFunction([&srcArray, &dstArray, size, &evaluator, &scans, &sum](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(ndShuffleArray);
 		ndUnsigned32* const scan = &scans[threadIndex * (1 << keyBitSize)];
@@ -398,12 +396,12 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		ndStartEnd startEnd(size, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			const T& entry = array[i];
+			const T& entry = srcArray[i];
 			const ndInt32 key = evaluator.GetKey(entry);
 			ndAssert(key >= 0);
 			ndAssert(key < (1 << keyBitSize));
 			const ndUnsigned32 index = scan[key];
-			scratchBuffer[index] = entry;
+			dstArray[index] = entry;
 			scan[key] = index + 1;
 		}
 	});

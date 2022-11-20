@@ -210,10 +210,6 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 				inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
 			}
 			jobsInProgress = jobsInProgress & inProgess;
-			//if (jobsInProgress)
-			//{
-			//	ndThreadYield();
-			//}
 		} while (jobsInProgress);
 		#endif
 	}

@@ -89,7 +89,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 		ndInt32 size = faceIndexArray[indexCount * 2 + 2];
 		ndAssert(size >= 1);
 		//return ndFloat32 ((size >= 1) ? size : ndFloat32 (1.0f));
-		return ndFloat32(D_FACE_CLIP_DIAGONAL_SCALE * size);
+		return D_FACE_CLIP_DIAGONAL_SCALE * ndFloat32(size);
 	}
 
 	ndVector m_boxDistanceTravelInMeshSpace;

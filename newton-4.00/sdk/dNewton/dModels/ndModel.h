@@ -29,7 +29,7 @@ class ndMultiBodyVehicle;
 class ndConstraintDebugCallback;
 
 D_MSV_NEWTON_ALIGN_32
-class ndModel: public ndClassAlloc
+class ndModel: public ndContainersFreeListAlloc<ndModel>
 {
 	public:
 	D_CLASS_REFLECTION(ndModel);
@@ -59,7 +59,7 @@ class ndModel: public ndClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndModel::ndModel()
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndModel>()
 	,m_node(nullptr)
 {
 }
