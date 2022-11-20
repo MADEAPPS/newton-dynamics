@@ -157,7 +157,7 @@
 	#endif
 #endif
 
-#define D_AUTO_THREAD_BALANCE
+//#define D_AUTO_THREAD_BALANCE
 
 //************************************************************
 #ifdef D_DISABLE_ASSERT

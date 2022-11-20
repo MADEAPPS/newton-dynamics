@@ -124,7 +124,7 @@ class ndScene : public ndThreadPool
 	void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
 	void FindCollidingPairsBackward(ndBodyKinematic* const body, ndInt32 threadId);
 	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndInt32 threadId);
-	void SubmitPairs(ndBvhLeafNode* const bodyNode, ndBvhNode* const node, ndInt32 threadId);
+	void SubmitPairs(ndBvhLeafNode* const bodyNode, ndBvhNode* const node, bool forward, ndInt32 threadId);
 
 	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
