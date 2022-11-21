@@ -50,10 +50,12 @@ void ndThreadPool::ndWorker::ThreadFunction()
 		ndTask* const task = m_task.load();
 		if (task)
 		{
+			//D_TRACKTIME();
 			task->Execute();
 			m_task.store(nullptr);
 		}
-		ndTheadPause();
+		//ndTheadPause();
+		ndThreadYield();
 	}
 	m_stillLooping.store(false);
 #endif
@@ -124,6 +126,12 @@ void ndThreadPool::Begin()
 	{
 		m_workers[i].Signal();
 	}
+
+	auto BeginJobs = ndMakeObject::ndFunction([this](ndInt32, ndInt32)
+	{
+		D_TRACKTIME_NAMED(BeginJobs);
+	});
+	ParallelExecute(BeginJobs);
 }
 
 void ndThreadPool::End()
