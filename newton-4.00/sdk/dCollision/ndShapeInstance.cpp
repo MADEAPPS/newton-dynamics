@@ -169,6 +169,67 @@ void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	}
 }
 
+void ndShapeInstance::SavePLY(const char* const fileName) const
+{
+	class ndDrawShape : public ndShapeDebugNotify
+	{
+		public:
+		ndDrawShape()
+			:ndShapeDebugNotify()
+		{
+		}
+
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+		{
+			m_faceVertexCount.PushBack(vertexCount);
+			for (ndInt32 i = 0; i < vertexCount; ++i)
+			{
+				m_vertex.PushBack(faceVertex[i] & ndVector::m_triplexMask);
+			}
+		}
+
+		ndArray<ndVector> m_vertex;
+		ndArray<ndInt32> m_faceVertexCount;
+	};
+
+	ndDrawShape drawShapes;
+	DebugShape(ndGetIdentityMatrix(), drawShapes);
+	if (drawShapes.m_vertex.GetCount())
+	{
+		FILE* const file = fopen(fileName, "wb");
+		fprintf(file, "ply\n");
+		fprintf(file, "format ascii 1.0\n");
+
+		fprintf(file, "element vertex %d\n", drawShapes.m_vertex.GetCount());
+		fprintf(file, "property float x\n");
+		fprintf(file, "property float y\n");
+		fprintf(file, "property float z\n");
+		fprintf(file, "element face %d\n", drawShapes.m_faceVertexCount.GetCount());
+		fprintf(file, "property list uchar int vertex_index\n");
+		fprintf(file, "end_header\n");
+
+		for (ndInt32 i = 0; i < drawShapes.m_vertex.GetCount(); ++i)
+		{
+			const ndVector& point = drawShapes.m_vertex[i];
+			fprintf(file, "%f %f %f\n", point.m_x, point.m_y, point.m_z);
+		}
+
+		ndInt32 index = 0;
+		for (ndInt32 i = 0; i < drawShapes.m_faceVertexCount.GetCount(); ++i)
+		{
+			ndInt32 count = drawShapes.m_faceVertexCount[i];
+			fprintf(file, "%d", count);
+			for (ndInt32 j = 0; j < count; ++j)
+			{
+				fprintf(file, " %d", index + j);
+			}
+			index += count;
+			fprintf(file, "\n");
+		}
+		fclose(file);
+	}
+}
+
 ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 {
 	m_globalMatrix = instance.m_globalMatrix;
@@ -499,56 +560,6 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 
 void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
 {
-#if 0
-	m_shape->CalculateAabb(matrix, p0, p1);
-	switch (m_scaleType)
-	{
-		case m_unit:
-		{
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-
-		case m_uniform:
-		case m_nonUniform:
-		{
-			ndMatrix matrix1(matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			matrix1 = matrix.Inverse() * matrix1;
-
-			ndVector size0(ndVector::m_half * (p1 - p0));
-			ndVector origin(matrix1.TransformVector(ndVector::m_half * (p0 + p1)));
-			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
-
-			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-			break;
-		}
-
-		case m_global:
-		default:
-		{
-			ndMatrix matrix1(matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			matrix1 = matrix.Inverse() * m_alignmentMatrix * matrix1;
-
-			ndVector size0(ndVector::m_half * (p1 - p0));
-			ndVector origin(matrix1.TransformVector(ndVector::m_half * (p0 + p1)));
-			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
-
-			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-
-			break;
-		}
-	}
-
-#else
 	ndMatrix scaleMatrix;
 	scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
 	scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
@@ -562,7 +573,6 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 
 	p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
 	p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-#endif
 	ndAssert(p0.m_w == ndFloat32(0.0f));
 	ndAssert(p1.m_w == ndFloat32(0.0f));
 }
