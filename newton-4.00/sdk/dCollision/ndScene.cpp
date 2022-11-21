@@ -1700,10 +1700,15 @@ void ndScene::InitBodyArray()
 	};
 
 	ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
-	m_sceneBodyArray.SetCount(view.GetCount() - 1);
-	ndCountingSort<ndBodyKinematic*, ndSortCompactKey, 1>(*this, &view[0], &m_sceneBodyArray[0], view.GetCount() - 1, scans, nullptr);
-	ndInt32 movingBodyCount = ndInt32(scans[1] - scans[0]);
-	m_sceneBodyArray.SetCount(movingBodyCount);
+	ndInt32 movingBodyCount = 0;
+	ndInt32 sceneBodyCount = view.GetCount() - 1;
+	if (sceneBodyCount)
+	{
+		m_sceneBodyArray.SetCount(sceneBodyCount);
+		ndCountingSort<ndBodyKinematic*, ndSortCompactKey, 1>(*this, &view[0], &m_sceneBodyArray[0], sceneBodyCount, scans, nullptr);
+		movingBodyCount = ndInt32(scans[1] - scans[0]);
+		m_sceneBodyArray.SetCount(movingBodyCount);
+	}
 
 	if (m_rootNode && m_rootNode->GetAsSceneTreeNode())
 	{

@@ -33,8 +33,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_manager(nullptr)
 {
 //	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
-//	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
-	ndAssert(0);
+// remember to save member below
 }
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
@@ -48,11 +47,15 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 
 void ndDemoEntityNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
-	ndAssert(0);
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	ndBodyNotify::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 	xmlSaveParam(childNode, "comment", "string", "body notification for Newton 4.0 demos");
+
+	// remember to save member below
+	//ndDemoEntity* m_entity;
+	//ndBodyDynamic* m_parentBody;
+	//ndDemoEntityManager* m_manager;
 }
 
 void ndDemoEntityNotify::OnObjectPick() const

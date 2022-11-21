@@ -126,8 +126,13 @@ void ndShapeConvexHull::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
-	ndAssert(0);
-	//xmlSaveParam(childNode, "vextexArray3", m_vertexCount, m_vertex);
+	ndArray<ndVector> array;
+	array.SetCount(m_vertexCount);
+	for (ndInt32 i = 0; i < m_vertexCount; ++i)
+	{
+		array[i] = m_vertex[i];
+	}
+	xmlSaveParam(childNode, "vextexArray3", array);
 }
 
 bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut)

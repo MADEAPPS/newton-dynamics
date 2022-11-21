@@ -258,8 +258,8 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	array.Resize(count);
 	array.SetCount(count);
 
-	const char* const data = element->Attribute("floatArray");
-
+	const char* const data = element->Attribute("float4Array");
+	
 	size_t start = 0;
 	ndVector point(ndVector::m_zero);
 	for (ndInt32 i = 0; i < count; ++i)
@@ -267,20 +267,24 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		char x[64];
 		char y[64];
 		char z[64];
-		sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
-		start += strlen(x) + strlen(y) + strlen(z) + 3;
+		char w[64];
+		sscanf(&data[start], "%[^ ] %[^ ] %[^ ] %[^ ]", x, y, z, w);
+		start += strlen(x) + strlen(y) + strlen(z) + strlen(w) + 4;
 
 		ndFloat64 fx;
 		ndFloat64 fy;
 		ndFloat64 fz;
+		ndFloat64 fw;
 		
 		sscanf(x, "%lf", &fx);
 		sscanf(y, "%lf", &fy);
 		sscanf(z, "%lf", &fz);
+		sscanf(w, "%lf", &fw);
 
 		point.m_x = ndFloat32(fx);
 		point.m_y = ndFloat32(fy);
 		point.m_z = ndFloat32(fz);
+		point.m_w = ndFloat32(fw);
 
 		array[i] = point;
 	}
