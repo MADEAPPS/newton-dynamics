@@ -52,10 +52,15 @@ void ndThreadPool::ndWorker::ThreadFunction()
 		{
 			//D_TRACKTIME();
 			task->Execute();
+			ndThreadYield();
 			m_task.store(nullptr);
 		}
-		//ndTheadPause();
-		ndThreadYield();
+		else
+		{
+			//D_TRACKTIME();
+			ndTheadPause();
+			//ndThreadYield();
+		}
 	}
 	m_stillLooping.store(false);
 #endif

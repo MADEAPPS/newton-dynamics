@@ -203,7 +203,7 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		bool jobsInProgress = true;
 		do
 		{
-			ndTheadPause();
+			ndThreadYield();
 			bool inProgess = false;
 			for (ndInt32 i = 0; i < m_count; ++i)
 			{

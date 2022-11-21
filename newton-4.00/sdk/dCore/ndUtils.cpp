@@ -375,9 +375,9 @@ void ndThreadYield()
 
 void ndTheadPause()
 {
-#if 0
-		// this trck has quiet a bad behavior on system with many cores.
-		// beeter you just call thjread yieldf and let teh OS figure it out
+#if 1
+		// this trick seem to has quite a bad behavior on system with many cores.
+		// beter you just call thread yield and let the OS figure it out
 	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 		_mm_pause();
 		_mm_pause();
