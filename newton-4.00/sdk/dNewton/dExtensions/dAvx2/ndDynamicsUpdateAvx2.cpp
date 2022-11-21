@@ -1077,96 +1077,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 	ndScene* const scene = m_world->GetScene();
 	ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
-#ifdef D_AUTO_THREAD_BALANCE
-	// using atomic for large kernel payload.	
-	ndAtomic<ndInt32> counter(0);
-	auto InitJacobianMatrix = ndMakeObject::ndFunction([this, &counter, &jointArray](ndInt32, ndInt32)
-	{
-		D_TRACKTIME_NAMED(InitJacobianMatrix);
-		ndAvxFloat* const internalForces = (ndAvxFloat*)&GetTempInternalForces()[0];
-		auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint, ndInt32 jointIndex)
-		{
-			ndAssert(joint->GetBody0());
-			ndAssert(joint->GetBody1());
-			const ndBodyKinematic* const body0 = joint->GetBody0();
-			const ndBodyKinematic* const body1 = joint->GetBody1();
 
-			ndAvxFloat force0(body0->GetForce(), body0->GetTorque());
-			ndAvxFloat force1(body1->GetForce(), body1->GetTorque());
-
-			const ndInt32 index = joint->m_rowStart;
-			const ndInt32 count = joint->m_rowCount;
-
-			const bool isBilateral = joint->IsBilateral();
-
-			const ndMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
-			const ndMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
-			const ndVector invMass0(body0->m_invMass[3]);
-			const ndVector invMass1(body1->m_invMass[3]);
-
-			ndAvxFloat forceAcc0(ndAvxFloat::m_zero);
-			ndAvxFloat forceAcc1(ndAvxFloat::m_zero);
-			const ndAvxFloat weigh0(body0->m_weigh);
-			const ndAvxFloat weigh1(body1->m_weigh);
-
-			for (ndInt32 i = 0; i < count; ++i)
-			{
-				ndLeftHandSide* const row = &m_leftHandSide[index + i];
-				ndRightHandSide* const rhs = &m_rightHandSide[index + i];
-
-				row->m_JMinv.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * invMass0;
-				row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
-				row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
-				row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
-
-				const ndAvxFloat& JMinvM0 = (ndAvxFloat&)row->m_JMinv.m_jacobianM0;
-				const ndAvxFloat& JMinvM1 = (ndAvxFloat&)row->m_JMinv.m_jacobianM1;
-
-				const ndAvxFloat tmpAccel((JMinvM0 * force0).MulAdd(JMinvM1, force1));
-
-				ndFloat32 extenalAcceleration = -tmpAccel.AddHorizontal();
-				rhs->m_deltaAccel = extenalAcceleration;
-				rhs->m_coordenateAccel += extenalAcceleration;
-				ndAssert(rhs->m_jointFeebackForce);
-				const ndFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
-
-				rhs->m_force = isBilateral ? ndClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
-				rhs->m_maxImpact = ndFloat32(0.0f);
-
-				const ndAvxFloat& JtM0 = (ndAvxFloat&)row->m_Jt.m_jacobianM0;
-				const ndAvxFloat& JtM1 = (ndAvxFloat&)row->m_Jt.m_jacobianM1;
-				const ndAvxFloat tmpDiag(weigh0 * JMinvM0 * JtM0 + weigh1 * JMinvM1 * JtM1);
-
-				ndFloat32 diag = tmpDiag.AddHorizontal();
-				ndAssert(diag > ndFloat32(0.0f));
-				rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
-
-				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
-				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
-
-				forceAcc0 = forceAcc0.MulAdd(JtM0, ndAvxFloat(rhs->m_force));
-				forceAcc1 = forceAcc1.MulAdd(JtM1, ndAvxFloat(rhs->m_force));
-			}
-
-			const ndInt32 index0 = jointIndex * 2 + 0;
-			ndAvxFloat& outBody0 = internalForces[index0];
-			outBody0 = forceAcc0;
-
-			const ndInt32 index1 = jointIndex * 2 + 1;
-			ndAvxFloat& outBody1 = internalForces[index1];
-			outBody1 = forceAcc1;
-		};
-
-		const ndInt32 jointCount = jointArray.GetCount();
-		for (ndInt32 i = counter.fetch_add(1); i < jointCount; i = counter.fetch_add(1))
-		{
-			ndConstraint* const joint = jointArray[i];
-			GetJacobianDerivatives(joint);
-			BuildJacobianMatrix(joint, i);
-		}
-	});
-
-#else
 	auto InitJacobianMatrix = ndMakeObject::ndFunction([this, &jointArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(InitJacobianMatrix);
@@ -1252,7 +1163,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			BuildJacobianMatrix(joint, i);
 		}
 	});
-#endif
 
 	auto InitJacobianAccumulatePartialForces = ndMakeObject::ndFunction([this, &bodyArray](ndInt32 threadIndex, ndInt32 threadCount)
 	{
