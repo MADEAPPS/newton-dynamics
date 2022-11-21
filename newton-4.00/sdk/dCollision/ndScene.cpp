@@ -1250,7 +1250,6 @@ void ndScene::FindCollidingPairs()
 	{
 		D_TRACKTIME_NAMED(FindPairsForward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
-		//const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		const ndStartEnd startEnd(m_sceneBodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -1263,7 +1262,6 @@ void ndScene::FindCollidingPairs()
 	{
 		D_TRACKTIME_NAMED(FindPairsBackward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
-		//const ndStartEnd startEnd(bodyArray.GetCount(), threadIndex, threadCount);
 		const ndStartEnd startEnd(m_sceneBodyArray.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
@@ -1372,6 +1370,7 @@ void ndScene::FindCollidingPairs()
 					return 0;
 				}
 			};
+			ndTrace(("this is not longer needed\n"));
 			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], ndInt32(sum), nullptr);
 
 			CompareKey comparator;
@@ -1379,6 +1378,7 @@ void ndScene::FindCollidingPairs()
 			{
 				if (comparator.Compare(m_newPairs[i], m_newPairs[i + 1], nullptr) == 0)
 				{
+					ndAssert(0);
 					sum--;
 					m_newPairs[i] = m_newPairs[ndInt32(sum)];
 				}
@@ -1650,7 +1650,7 @@ void ndScene::CalculateContacts()
 	if (contactCount)
 	{
 		D_TRACKTIME_NAMED(CopyContactArray)
-			const ndInt32 start = m_newPairs.GetCount();
+		const ndInt32 start = m_newPairs.GetCount();
 		ndContact** const contactArray = &m_contactArray[0];
 		for (ndInt32 i = 0; i < contactCount; ++i)
 		{
