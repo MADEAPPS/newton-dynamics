@@ -32,14 +32,14 @@ class ndShapeConvexHull : public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeConvexHull);
 	D_COLLISION_API ndShapeConvexHull(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	D_COLLISION_API ndShapeConvexHull(ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray);
+	D_COLLISION_API ndShapeConvexHull(ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray, ndInt32 maxPointsOut = 0x7fffffff);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
 	ndShapeInfo GetShapeInfo() const;
 	ndBigVector FaceNormal(const ndEdge *face, const ndBigVector* const pool) const;
 	bool RemoveCoplanarEdge(ndPolyhedra& convex, const ndBigVector* const hullVertexArray) const;
-	bool Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance);
+	bool Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut);
 	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -49,9 +49,6 @@ class ndShapeConvexHull : public ndShapeConvex
 	
 	void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 
-	//protected:
-	//ndInt32 GetFaceIndices (ndInt32 index, ndInt32* const indices) const;
-	//virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
 	ndConvexBox* m_supportTree;
 	ndConvexSimplexEdge** m_faceArray;
 	ndVector* m_soa_x;

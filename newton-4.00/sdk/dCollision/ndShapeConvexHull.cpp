@@ -43,7 +43,7 @@ class ndShapeConvexHull::ndConvexBox
 } D_GCC_NEWTON_ALIGN_32;
 
 
-ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray)
+ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray, ndInt32 maxPointsOut)
 	:ndShapeConvex(m_convexHull)
 	,m_supportTree(nullptr)
 	,m_faceArray(nullptr)
@@ -60,7 +60,7 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	m_vertexCount = 0;
 	m_vertex = nullptr;
 	m_simplex = nullptr;
-	Create(count, strideInBytes, vertexArray, tolerance);
+	Create(count, strideInBytes, vertexArray, tolerance, maxPointsOut);
 	ndAssert(m_faceCount > 0);
 	//if (m_faceCount == 0)
 	//{
@@ -90,7 +90,7 @@ ndShapeConvexHull::ndShapeConvexHull(const ndLoadSaveBase::ndLoadDescriptor& des
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	ndArray<ndVector> array;
 	xmlGetFloatArray3(xmlNode, "vextexArray3", array);
-	Create(array.GetCount(), sizeof (ndVector), &array[0].m_x, ndFloat32 (0.0f));
+	Create(array.GetCount(), sizeof (ndVector), &array[0].m_x, ndFloat32 (0.0f), 0x7fffffff);
 }
 
 ndShapeConvexHull::~ndShapeConvexHull()
@@ -130,7 +130,7 @@ void ndShapeConvexHull::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	//xmlSaveParam(childNode, "vextexArray3", m_vertexCount, m_vertex);
 }
 
-bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance)
+bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance, ndInt32 maxPointsOut)
 {
 	ndStack<ndBigVector> buffer(2 * count);
 	ndInt32 stride = strideInBytes / ndInt32(sizeof(ndFloat32));
@@ -139,7 +139,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		buffer[i] = ndBigVector(vertexArray[i * stride + 0], vertexArray[i * stride + 1], vertexArray[i * stride + 2], ndFloat32(0.0f));
 	}
 
-	ndConvexHull3d* convexHull = new ndConvexHull3d(&buffer[0].m_x, sizeof (ndBigVector), count, tolerance);
+	ndConvexHull3d* convexHull = new ndConvexHull3d(&buffer[0].m_x, sizeof (ndBigVector), count, tolerance, maxPointsOut);
 	if (!convexHull->GetCount()) 
 	{
 		ndAssert(0);
