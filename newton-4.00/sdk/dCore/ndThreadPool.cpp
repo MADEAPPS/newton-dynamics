@@ -124,12 +124,6 @@ void ndThreadPool::Begin()
 	{
 		m_workers[i].Signal();
 	}
-
-	auto WakeupThreads = ndMakeObject::ndFunction([this](ndInt32, ndInt32)
-	{
-		D_TRACKTIME();
-	});
-	ParallelExecute(WakeupThreads);
 }
 
 void ndThreadPool::End()

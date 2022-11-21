@@ -49,7 +49,6 @@ ndUnsigned64 ndGetTimeInMicroseconds()
 	return timeStamp;
 }
 
-
 #ifndef D_USE_THREAD_EMULATION
 void ndSpinLock::Delay(ndInt32& exp)
 {
@@ -59,17 +58,15 @@ void ndSpinLock::Delay(ndInt32& exp)
 		{
 			_mm_pause();
 			_mm_pause();
+			_mm_pause();
+			_mm_pause();
 		}
-    #elif defined(__arm__) || defined(__aarch64__)
-	    for (ndInt32 i = 0; i < exp; ++i)
-	    {
-			ndTheadPause();
-	    }
      #else
-		// use standard thread yield on non x86 platforms 
-		for (ndInt32 i = 0; i < exp; ++i)
+		ndInt32 x = 0;
+		volatile ndInt32 count = 1;
+		for (ndInt32 i = 0; i < exp * 2; ++i)
 		{
-			ndTheadPause();
+			x += count;
 		}
     #endif
 	exp = ndMin(exp * 2, 64);
@@ -378,18 +375,24 @@ void ndThreadYield()
 
 void ndTheadPause()
 {
-#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-	_mm_pause();
-	_mm_pause();
-	_mm_pause();
-	_mm_pause();
+#if 0
+		// this trck has quiet a bad behavior on system with many cores.
+		// beeter you just call thjread yieldf and let teh OS figure it out
+	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+	#else
+		ndInt32 x = 0;
+		volatile ndInt32 count = 1;
+		for (ndInt32 i = 0; i < 32; ++i)
+		{
+			x += count;
+		}
+	#endif
 #else
-	ndInt32 x = 0;
-	volatile ndInt32 count = 1;
-	for (ndInt32 i = 0; i < 32; i++)
-	{
-		x += count;
-	}
+	ndThreadYield();
 #endif
 }
 
