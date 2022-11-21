@@ -40,7 +40,6 @@ ndThreadPool::ndWorker::~ndWorker()
 	Finish();
 }
 
-#if 1
 void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
@@ -59,50 +58,6 @@ void ndThreadPool::ndWorker::ThreadFunction()
 	m_stillLooping.store(false);
 #endif
 }
-
-#else
-
-void ndThreadPool::ndWorker::ThreadFunction()
-{
-#ifndef	D_USE_THREAD_EMULATION
-	m_begin.store(true);
-	m_stillLooping.store(true);
-
-	ndInt32 idleLoops = -1;
-	ndUnsigned64 idleTime = 2000;
-	ndUnsigned64 targetTime = ndGetTimeInMicroseconds() + idleTime;
-
-	static int xxxx;
-	xxxx++;
-	while (m_begin.load())
-	{
-		ndTask* const task = m_task.load();
-		if (task)
-		{
-			task->Execute();
-			m_task.store(nullptr);
-
-			idleLoops = -1;
-			targetTime = ndGetTimeInMicroseconds() + idleTime;
-		}
-		ndTheadPause();
-
-		idleLoops++;
-		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		if (time >= targetTime)
-		{
-			// fail safe if for some reason more than one 
-			// thread was launched on the same core.
-			ndThreadYield();
-			ndExpandTraceMessage("frame(%d) thread(%d) task switch, idling(%d ticks)\n", xxxx, m_threadIndex, idleLoops);
-			idleLoops = -1;
-			targetTime = time + idleTime;
-		}
-	}
-	m_stillLooping.store(false);
-#endif
-}
-#endif
 
 ndThreadPool::ndThreadPool(const char* const baseName)
 	:ndSyncMutex()
@@ -169,6 +124,12 @@ void ndThreadPool::Begin()
 	{
 		m_workers[i].Signal();
 	}
+
+	auto WakeupThreads = ndMakeObject::ndFunction([this](ndInt32, ndInt32)
+	{
+		D_TRACKTIME();
+	});
+	ParallelExecute(WakeupThreads);
 }
 
 void ndThreadPool::End()
