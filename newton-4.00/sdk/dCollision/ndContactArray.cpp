@@ -53,7 +53,7 @@ ndContact* ndContactArray::CreateContact(ndBodyKinematic* const body0, ndBodyKin
 	return contact;
 }
 
-void ndContactArray::DeleteContact(ndContact* const contact)
+void ndContactArray::DetachContact(ndContact* const contact)
 {
 	if (contact->m_isAttached)
 	{
@@ -69,7 +69,7 @@ void ndContactArray::DeleteAllContacts()
 		ndContact* const contact = m_array[i];
 		if (contact->m_isAttached)
 		{
-			DeleteContact(contact);
+			DetachContact(contact);
 		}
 		delete (contact);
 	}

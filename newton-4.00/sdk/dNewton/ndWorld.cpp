@@ -591,7 +591,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	// update the collision system
 	m_scene->FindCollidingPairs();
+	m_scene->CreateNewContacts();
 	m_scene->CalculateContacts();
+	m_scene->DeleteDeadContacts();
 
 	// update all special bodies.
 	m_scene->UpdateSpecial();

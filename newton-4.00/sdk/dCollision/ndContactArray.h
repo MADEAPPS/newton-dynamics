@@ -33,7 +33,7 @@ class ndContactArray : public ndArray<ndContact*>
 	~ndContactArray();
 
 	void DeleteAllContacts();
-	void DeleteContact(ndContact* const contact);
+	void DetachContact(ndContact* const contact);
 	ndContact* CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 
 	ndSpinLock m_lock;

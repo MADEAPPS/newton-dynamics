@@ -140,8 +140,10 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void UpdateSpecial();
 	D_COLLISION_API virtual void UpdateBodyList();
 	D_COLLISION_API virtual void UpdateTransform();
+	D_COLLISION_API virtual void CreateNewContacts();
 	D_COLLISION_API virtual void CalculateContacts();
 	D_COLLISION_API virtual void FindCollidingPairs();
+	D_COLLISION_API virtual void DeleteDeadContacts();
 	
 	D_COLLISION_API virtual void ThreadFunction();
 
