@@ -1335,6 +1335,7 @@ void ndScene::FindCollidingPairs()
 			sum += count;
 		}
 
+		#ifdef _DEBUG
 		if (sum)
 		{
 			class CompareKey
@@ -1370,7 +1371,6 @@ void ndScene::FindCollidingPairs()
 					return 0;
 				}
 			};
-			ndTrace(("this is not longer needed\n"));
 			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], ndInt32(sum), nullptr);
 
 			CompareKey comparator;
@@ -1385,13 +1385,12 @@ void ndScene::FindCollidingPairs()
 			}
 			m_newPairs.SetCount(ndInt32(sum));
 
-			#ifdef _DEBUG
 			for (ndInt32 i = 1; i < m_newPairs.GetCount(); ++i)
 			{
 				ndAssert(comparator.Compare(m_newPairs[i], m_newPairs[i - 1], nullptr));
 			}
-			#endif	
 		}
+		#endif
 	}
 }
 
@@ -1727,6 +1726,7 @@ void ndScene::CalculateContacts()
 					{
 						contact->DetachFromBodies();
 					}
+					ndTrace ((" this is redundant\n"))
 					contact->m_isDead = 1;
 					delete contact;
 				}
