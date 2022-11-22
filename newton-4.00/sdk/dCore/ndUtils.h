@@ -131,6 +131,7 @@ inline bool ndAreEqual(T A, T B, T tol)
 	return ndAbs(mantissa0 - mantissa1) < tol;
 }
 
+/// add two angles in a periodic way
 template <class T>
 inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 {
@@ -147,16 +148,19 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 /// Returns the time in micro seconds since application started 
 D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 
-/// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
+/// Round a 64 bit float to a 32 bit float by truncating the mantissa to 24 bits 
 /// \param ndFloat64 val: 64 bit float 
 /// \return a 64 bit double precision with a 32 bit mantissa
 D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 
-//D_CORE_API void ndTheadPause();
+/// tell the operating system the library is done with this job, 
+/// the OS is free to swith to another task if it needs to.
 D_CORE_API void ndThreadYield();
 
+/// removed all duplicate points from an array and place the location in the index array
 D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
+/// removed all duplicate points from an array and place the location in the index array
 template <class T>
 ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, T tolerance = ndEpsilon)
 {

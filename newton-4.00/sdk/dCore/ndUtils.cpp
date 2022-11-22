@@ -373,31 +373,6 @@ void ndThreadYield()
 	std::this_thread::yield();
 }
 
-/*
-void ndTheadPause()
-{
-#if 1
-		// this trick seem to has quite a bad behavior on system with many cores.
-		// beter you just call thread yield and let the OS figure it out
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-	#else
-		ndInt32 x = 0;
-		volatile ndInt32 count = 1;
-		for (ndInt32 i = 0; i < 32; ++i)
-		{
-			x += count;
-		}
-	#endif
-#else
-	ndThreadYield();
-#endif
-}
-*/
-
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {
 	#if (defined (WIN32) || defined(_WIN32))

@@ -1329,63 +1329,6 @@ void ndScene::FindCollidingPairs()
 			}
 			sum += count;
 		}
-
-		#ifdef _DEBUG
-		if (sum)
-		{
-			class CompareKey
-			{
-				public:
-				int Compare(const ndContactPairs& a, const ndContactPairs& b, void*) const
-				{
-					union Key
-					{
-						ndUnsigned64 m_key;
-						struct
-						{
-							ndUnsigned32 m_low;
-							ndUnsigned32 m_high;
-						};
-					};
-
-					Key keyA;
-					Key keyB;
-					keyA.m_low = a.m_body0;
-					keyA.m_high = a.m_body1;
-					keyB.m_low = b.m_body0;
-					keyB.m_high = b.m_body1;
-
-					if (keyA.m_key < keyB.m_key)
-					{
-						return -1;
-					}
-					else if (keyA.m_key > keyB.m_key)
-					{
-						return 1;
-					}
-					return 0;
-				}
-			};
-			ndSort<ndContactPairs, CompareKey>(&m_newPairs[0], ndInt32(sum), nullptr);
-
-			CompareKey comparator;
-			for (ndInt32 i = ndInt32(sum - 2); i >= 0; i--)
-			{
-				if (comparator.Compare(m_newPairs[i], m_newPairs[i + 1], nullptr) == 0)
-				{
-					ndAssert(0);
-					sum--;
-					m_newPairs[i] = m_newPairs[ndInt32(sum)];
-				}
-			}
-			m_newPairs.SetCount(ndInt32(sum));
-
-			for (ndInt32 i = 1; i < m_newPairs.GetCount(); ++i)
-			{
-				ndAssert(comparator.Compare(m_newPairs[i], m_newPairs[i - 1], nullptr));
-			}
-		}
-		#endif
 	}
 }
 
