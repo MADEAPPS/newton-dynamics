@@ -373,6 +373,7 @@ void ndThreadYield()
 	std::this_thread::yield();
 }
 
+/*
 void ndTheadPause()
 {
 #if 1
@@ -395,6 +396,7 @@ void ndTheadPause()
 	ndThreadYield();
 #endif
 }
+*/
 
 ndFloatExceptions::ndFloatExceptions(ndUnsigned32 mask)
 {

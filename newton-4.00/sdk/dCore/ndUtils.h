@@ -152,7 +152,7 @@ D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 /// \return a 64 bit double precision with a 32 bit mantissa
 D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 
-D_CORE_API void ndTheadPause();
+//D_CORE_API void ndTheadPause();
 D_CORE_API void ndThreadYield();
 
 D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);

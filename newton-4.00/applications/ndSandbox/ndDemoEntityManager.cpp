@@ -922,12 +922,13 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			ImGui::Text("solvers");
 			ndInt32 solverMode(m_solverMode);
+			ImGui::RadioButton("default", &solverMode, ndWorld::ndStandardSolver);
+			ImGui::RadioButton("sse", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
-			ImGui::RadioButton("sse soa", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("cuda", &solverMode, ndWorld::ndCudaSolver);
 			ImGui::RadioButton("opencl1", &solverMode, ndWorld::ndOpenclSolver1);
 			ImGui::RadioButton("opencl2", &solverMode, ndWorld::ndOpenclSolver2);
-			ImGui::RadioButton("default", &solverMode, ndWorld::ndStandardSolver);
+
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();
 
