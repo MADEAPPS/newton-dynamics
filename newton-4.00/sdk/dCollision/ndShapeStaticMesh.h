@@ -25,94 +25,8 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
-class ndBodyKinematic;
 class ndShapeInstance;
-class ndContactSolver;
-
-#define D_MAX_COLLIDING_FACES		512
-#define D_MAX_COLLIDING_INDICES		(D_MAX_COLLIDING_FACES * (4 * 2 + 3))
-
-class ndShapeStaticMesh;
-typedef void (*dgCollisionMeshCollisionCallback) (const ndBodyKinematic* const bodyWithTreeCollision, const ndBodyKinematic* const body, ndInt32 faceID, 
-												  ndInt32 vertexCount, const ndFloat32* const vertex, ndInt32 vertexStrideInBytes); 
-
-D_MSV_NEWTON_ALIGN_32 
-class ndPolygonMeshDesc: public ndFastAabb
-{
-	public:
-	class ndMesh
-	{
-		public:
-		ndInt32 m_globalFaceIndexCount[D_MAX_COLLIDING_FACES];
-		ndInt32 m_globalFaceIndexStart[D_MAX_COLLIDING_FACES];
-		ndFloat32 m_globalHitDistance[D_MAX_COLLIDING_FACES];
-	};
-
-	// colliding box in polygonSoup local space
-	ndPolygonMeshDesc()
-		:ndFastAabb()
-		,m_boxDistanceTravelInMeshSpace(ndFloat32 (0.0f))
-		,m_maxT(ndFloat32 (1.0f))
-		,m_threadId(0)
-		,m_doContinueCollisionTest(false)
-	{
-	}
-
-	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
-
-	D_COLLISION_API void SortFaceArray();
-	ndFloat32 GetSeparetionDistance() const;
-	void SetDistanceTravel(const ndVector& distanceInGlobalSpace);
-
-	ndInt32 GetFaceIndexCount(ndInt32 indexCount) const
-	{
-		return indexCount * 2 + 3;
-	}
-
-	const ndInt32* GetAdjacentFaceEdgeNormalArray(const ndInt32* const faceIndexArray, ndInt32 indexCount) const
-	{
-		return &faceIndexArray[indexCount + 2];
-	}
-
-	ndInt32 GetNormalIndex(const ndInt32* const faceIndexArray, ndInt32 indexCount) const
-	{
-		return faceIndexArray[indexCount + 1];
-	}
-
-	ndInt32 GetFaceId(const ndInt32* const faceIndexArray, ndInt32 indexCount) const
-	{
-		return faceIndexArray[indexCount];
-	}
-
-	ndFloat32 GetFaceSize(const ndInt32* const faceIndexArray, ndInt32 indexCount) const
-	{
-		ndInt32 size = faceIndexArray[indexCount * 2 + 2];
-		ndAssert(size >= 1);
-		//return ndFloat32 ((size >= 1) ? size : ndFloat32 (1.0f));
-		return D_FACE_CLIP_DIAGONAL_SCALE * ndFloat32(size);
-	}
-
-	ndVector m_boxDistanceTravelInMeshSpace;
-	ndInt32 m_faceCount;
-	ndInt32 m_vertexStrideInBytes;
-	ndFloat32 m_skinMargin;
-	ndShapeInstance* m_convexInstance;
-	ndShapeInstance* m_polySoupInstance;
-	ndFloat32* m_vertex;
-	ndInt32* m_faceIndexCount;
-	ndInt32* m_faceVertexIndex;
-
-	// private data;
-	ndMesh m_meshData;
-	ndInt32* m_faceIndexStart;
-	ndFloat32* m_hitDistance;
-	const ndShapeStaticMesh* m_me;
-	ndInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
-	ndFloat32 m_maxT;
-	ndInt32 m_globalIndexCount;
-	ndInt32 m_threadId;
-	bool m_doContinueCollisionTest;
-} D_GCC_NEWTON_ALIGN_32;
+class ndPolygonMeshDesc;
 
 class ndShapeStaticMesh: public ndShape
 {
@@ -202,20 +116,6 @@ inline ndShapeStaticMesh* ndShapeStaticMesh::GetAsShapeStaticMesh()
 	return this; 
 }
 
-inline ndFloat32 ndPolygonMeshDesc::GetSeparetionDistance() const
-{
-	return m_separationDistance[0] * m_polySoupInstance->GetScale().GetScalar();
-}
-
-inline void ndPolygonMeshDesc::SetDistanceTravel(const ndVector& distanceInGlobalSpace)
-{
-	const ndMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
-	m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
-	if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < ndFloat32(1.0e-2f))
-	{
-		m_doContinueCollisionTest = false;
-	}
-}
 
 inline void ndShapeStaticMesh::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 {

@@ -29,6 +29,7 @@
 #include "ndShapeCompound.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
+#include "ndPolygonMeshDesc.h"
 #include "ndShapeStatic_bvh.h"
 #include "ndShapeStaticMesh.h"
 #include "ndShapeHeightfield.h"

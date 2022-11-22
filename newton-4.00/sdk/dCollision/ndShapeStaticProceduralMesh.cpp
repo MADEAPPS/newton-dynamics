@@ -24,6 +24,7 @@
 #include "ndContact.h"
 #include "ndBodyKinematic.h"
 #include "ndShapeInstance.h"
+#include "ndPolygonMeshDesc.h"
 #include "ndShapeStaticProceduralMesh.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticProceduralMesh)

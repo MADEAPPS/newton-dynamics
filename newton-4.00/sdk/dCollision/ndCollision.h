@@ -56,6 +56,7 @@
 #include <ndShapeCompound.h>
 #include <ndContactOptions.h>
 #include <ndMeshEffectNode.h>
+#include <ndPolygonMeshDesc.h>
 #include <ndShapeStatic_bvh.h>
 #include <ndShapeConvexHull.h>
 #include <ndShapeStaticMesh.h>

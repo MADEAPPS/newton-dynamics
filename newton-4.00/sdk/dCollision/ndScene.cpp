@@ -1018,7 +1018,6 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, nd
 				ndAssert(!me->GetLeft());
 				ndAssert(!me->GetRight());
 
-				//callback.TraceShape(ray.m_p0, ray.m_p1, body->GetCollisionShape(), body->GetMatrix());
 				if (body->RayCast(callback, ray, callback.m_param))
 				{
 					state = true;

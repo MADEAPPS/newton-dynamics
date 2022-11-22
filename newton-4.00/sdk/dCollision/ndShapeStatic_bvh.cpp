@@ -24,6 +24,7 @@
 #include "ndContact.h"
 #include "ndBodyKinematic.h"
 #include "ndShapeInstance.h"
+#include "ndPolygonMeshDesc.h"
 #include "ndShapeStatic_bvh.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStatic_bvh)
@@ -240,7 +241,6 @@ ndIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFlo
 	data.m_faceCount++;
 	ndInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
 
-	//the docks say memcpy is an intrinsic function but as usual this is another Microsoft lied
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		dst[i] = indexArray[i];
