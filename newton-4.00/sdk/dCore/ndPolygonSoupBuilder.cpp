@@ -290,8 +290,9 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 			ndBigVector p1(m_vertexPoints[pool[j]]);
 			ndBigVector edge(p1 - p0);
 			ndFloat64 mag2 = edge.DotProduct(edge).GetScalar();
-			if (mag2 < ndFloat32(1.0e-6f))
+			if (mag2 < ndFloat32(1.0e-8f))
 			{
+				ndAssert(0);
 				convexFaces = 0;
 			}
 			p0 = p1;
@@ -307,6 +308,7 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 			ndFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 			if (mag2 < ndFloat32(1.0e-8f))
 			{
+				ndAssert(0);
 				convexFaces = 0;
 			}
 		}
