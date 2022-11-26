@@ -109,6 +109,8 @@ void ndShapeStaticProceduralMesh::CalculateLocalObb()
 
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
+ndAssert(0);
+#if 0
 	ndVector* const vertexBuffer = ndAlloca(ndVector, m_maxVertexCount);
 	ndInt32* const faceBuffer = ndAlloca(ndInt32, m_maxFaceCount);
 	ndInt32* const materialBuffer = ndAlloca(ndInt32, m_maxFaceCount);
@@ -277,5 +279,6 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		data->m_faceIndexCount = faceIndexCount;
 		data->m_vertexStrideInBytes = sizeof(ndVector);
 	}
+#endif
 }
 

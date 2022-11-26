@@ -30,20 +30,6 @@
 class ndPlane;
 class ndFastRay;
 
-enum ndIntersectStatus
-{
-	t_StopSearch,
-	t_ContinueSearh
-};
-
-typedef ndIntersectStatus (*ndAaabbIntersectCallback) (void* const context, 
-													  const ndFloat32* const polygon, ndInt32 strideInBytes,
-													  const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
-
-typedef ndFloat32 (*ndRayIntersectCallback) (void* const context, 
-										   const ndFloat32* const polygon, ndInt32 strideInBytes,
-										   const ndInt32* const indexArray, ndInt32 indexCount);
-
 D_CORE_API ndBigVector ndPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1);
 D_CORE_API ndBigVector ndPointToTriangleDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2);
 D_CORE_API ndBigVector ndPointToTetrahedrumDistance(const ndBigVector& point, const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);

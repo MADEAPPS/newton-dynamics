@@ -36,6 +36,20 @@ class ndPolygonSoupBuilder;
 #define D_CONCAVE_EDGE_MASK			(1<<31)
 #define D_FACE_CLIP_DIAGONAL_SCALE	ndFloat32 (0.25f)
 
+enum ndIntersectStatus
+{
+	m_stopSearch,
+	m_continueSearh
+};
+
+typedef ndIntersectStatus(*ndAaabbIntersectCallback) (void* const context,
+	const ndFloat32* const polygon, ndInt32 strideInBytes,
+	const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
+
+typedef ndFloat32(*ndRayIntersectCallback) (void* const context,
+	const ndFloat32* const polygon, ndInt32 strideInBytes,
+	const ndInt32* const indexArray, ndInt32 indexCount);
+
 /// Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh.
 class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 {
@@ -249,7 +263,6 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	private:
 	ndNodeBuilder* BuildTopDown (ndNodeBuilder* const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** const allocator) const;
 	ndFloat32 CalculateFaceMaxSize (const ndVector* const vertex, ndInt32 indexCount, const ndInt32* const indexArray) const;
-	static ndIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 	static ndIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 	
 	ndNode* m_aabb;

@@ -54,7 +54,6 @@ ndShapeHeightfield::ndShapeHeightfield(
 	,m_width(width)
 	,m_height(height)
 	,m_diagonalMode(constructionMode)
-	,m_localData()
 {
 	ndAssert(width >= 2);
 	ndAssert(height >= 2);
@@ -80,7 +79,6 @@ ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_width(0)
 	,m_height(0)
 	,m_diagonalMode(m_normalDiagonals)
-	,m_localData()
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	const char* const assetName = xmlGetString(xmlNode, "assetName");
@@ -563,27 +561,12 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) 
 	{
-		ndInt32 threadId = data->m_threadId;
-		ndList<ndLocalThreadData>::ndNode* localDataNode = nullptr;
-		for (ndList<ndLocalThreadData>::ndNode* node = m_localData.GetFirst(); node; node = node->GetNext())
-		{
-			if (node->GetInfo().m_threadId == threadId)
-			{
-				localDataNode = node;
-				break;
-			}
-		}
-		if (!localDataNode)
-		{
-			localDataNode = m_localData.Append();
-			localDataNode->GetInfo().m_threadId = threadId;
-		}
+		ndArray<ndVector>& vertex = *data->m_tmpVertexArray;
 
 		// scan the vertices's intersected by the box extend
 		ndInt32 vertexCount = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
-		ndArray<ndVector>& vertex = localDataNode->GetInfo().m_vertex;
 		vertex.SetCount(vertexCount);
-	
+
 		ndInt32 vertexIndex = 0;
 		ndInt32 base = z0 * m_width;
 		for (ndInt32 z = z0; z <= z1; ++z) 
@@ -600,19 +583,21 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 		ndInt32 normalBase = vertexIndex;
 		vertexIndex = 0;
-		//ndInt32 index = 0;
 		ndInt32 quadCount = 0;
 		ndInt32 step = x1 - x0 + 1;
-		ndGridQuad* const quadArray = (ndGridQuad*) data->m_globalFaceVertexIndex;
-		
-		ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
-		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 
+		ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data->m_staticMeshQuery;
+		ndArray<ndInt32>& quadDataArray = query.m_faceVertexIndex;
+		ndArray<ndInt32>& faceIndexCount = query.m_faceIndexCount;
+		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
 		const ndInt32* const indirectIndex = GetIndexList();
-		for (ndInt32 z = z0; (z < z1) && (quadCount < D_MAX_COLLIDING_FACES/2); ++z)
+
+		quadDataArray.SetCount(2 * (x1 - x0) * (z1 - x0) * ndInt32(sizeof(ndGridQuad) / sizeof(ndInt32)));
+		ndGridQuad* const quadArray = (ndGridQuad*)&quadDataArray[0];
+		for (ndInt32 z = z0; z < z1; ++z)
 		{
 			ndInt32 zStep = z * m_width;
-			for (ndInt32 x = x0; (x < x1) && (quadCount < D_MAX_COLLIDING_FACES/2); ++x)
+			for (ndInt32 x = x0; x < x1; ++x)
 			{
 				ndInt32 vIndex[4];
 				vIndex[0] = vertexIndex;
@@ -641,10 +626,11 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				const ndInt32 normalIndex1 = normalBase + 1;
 				vertex[normalIndex0] = n0.Normalize();
 				vertex[normalIndex1] = n1.Normalize();
-
+				
 				ndGridQuad& quad = quadArray[quadCount];
 
-				faceIndexCount[quadCount * 2] = 3;
+				//faceIndexCount[quadCount * 2] = 3;
+				faceIndexCount.PushBack(3);
 				quad.m_triangle0.m_i0 = i2;
 				quad.m_triangle0.m_i1 = i1;
 				quad.m_triangle0.m_i2 = i0;
@@ -655,7 +641,8 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				quad.m_triangle0.m_normal_edge20 = normalIndex0;
 				quad.m_triangle0.m_area = faceSize;
 	
-				faceIndexCount[quadCount * 2 + 1] = 3;
+				//faceIndexCount[quadCount * 2 + 1] = 3;
+				faceIndexCount.PushBack(3);
 				quad.m_triangle1.m_i0 = i1;
 				quad.m_triangle1.m_i1 = i2;
 				quad.m_triangle1.m_i2 = i3;
@@ -675,7 +662,6 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 					quad.m_triangle1.m_normal_edge01 = normalIndex0;
 				}
 	
-				//index += 9 * 2;
 				normalBase += 2;
 				quadCount++;
 				vertexIndex++;
@@ -791,12 +777,13 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 faceIndexCount0 = 0;
 		ndInt32 faceIndexCount1 = 0;
 	
-		ndInt32* const address = data->m_meshData.m_globalFaceIndexStart;
-		ndFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
-	
+		ndArray<ndInt32>& address = query.m_faceIndexStart;
+		ndArray<ndFloat32>& hitDistance = query.m_hitDistance;
+
 		if (data->m_doContinueCollisionTest) 
 		{
-			ndInt32* const indices = data->m_globalFaceVertexIndex;
+			ndAssert(0);
+			ndInt32* const indices = &quadDataArray[0];
 			ndFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
 			for (ndInt32 i = 0; i < quadCount * 2; ++i)
 			{
@@ -805,8 +792,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				ndFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
 				if (dist < ndFloat32(1.0f)) 
 				{
-					hitDistance[faceCount0] = dist;
-					address[faceCount0] = faceIndexCount0;
+					//hitDistance[faceCount0] = dist;
+					//address[faceCount0] = faceIndexCount0;
+					hitDistance.PushBack(dist);
+					address.PushBack(faceIndexCount0);
 					memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(ndInt32));
 					faceCount0++;
 					faceIndexCount0 += 9;
@@ -816,7 +805,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		}
 		else 
 		{
-			ndInt32* const indices = data->m_globalFaceVertexIndex;
+			ndInt32* const indices = &quadDataArray[0];
 			for (ndInt32 i = 0; i < quadCount * 2; ++i) 
 			{
 				const ndInt32* const indexArray = &indices[faceIndexCount1];
@@ -824,8 +813,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				ndFloat32 dist = data->PolygonBoxDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x);
 				if (dist > ndFloat32(0.0f)) 
 				{
-					hitDistance[faceCount0] = dist;
-					address[faceCount0] = faceIndexCount0;
+					//hitDistance[faceCount0] = dist;
+					//address[faceCount0] = faceIndexCount0;
+					hitDistance.PushBack(dist);
+					address.PushBack(faceIndexCount0);
 					memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(ndInt32));
 					faceCount0++;
 					faceIndexCount0 += 9;
@@ -834,17 +825,9 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			}
 		}
 	
-		if (faceCount0) 
-		{
-			// initialize the callback data structure
-			data->m_faceCount = faceCount0;
-			data->m_vertex = &vertex[0].m_x;
-			data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
-			data->m_faceIndexStart = address;
-			data->m_hitDistance = hitDistance;
-			data->m_faceIndexCount = faceIndexCount;
-			data->m_vertexStrideInBytes = sizeof(ndVector);
-		}
+		faceIndexCount.SetCount(faceCount0);
+		data->m_vertex = &vertex[0].m_x;
+		data->m_vertexStrideInBytes = sizeof(ndVector);
 	}
 }
 

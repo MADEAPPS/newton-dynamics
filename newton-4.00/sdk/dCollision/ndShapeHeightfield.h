@@ -77,18 +77,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private: 
-	class ndLocalThreadData
-	{
-		public:
-		ndLocalThreadData()
-			:m_threadId(0)
-		{
-		}
-
-		ndArray<ndVector> m_vertex;
-		ndInt32 m_threadId;
-	};
-
 	void CalculateLocalObb();
 	ndInt32 FastInt(ndFloat32 x) const;
 	const ndInt32* GetIndexList() const;
@@ -108,7 +96,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	ndInt32 m_width;
 	ndInt32 m_height;
 	ndGridConstruction m_diagonalMode;
-	mutable ndList<ndLocalThreadData> m_localData;
 
 	static ndVector m_yMask;
 	static ndVector m_padding;

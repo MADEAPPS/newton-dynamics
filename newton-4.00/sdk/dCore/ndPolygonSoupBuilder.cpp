@@ -290,9 +290,10 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 			ndBigVector p1(m_vertexPoints[pool[j]]);
 			ndBigVector edge(p1 - p0);
 			ndFloat64 mag2 = edge.DotProduct(edge).GetScalar();
-			if (mag2 < ndFloat32(1.0e-8f))
+			if (mag2 < ndFloat32(1.0e-12f))
 			{
 				ndAssert(0);
+				ndTrace(("rejecting degenerated face, edge too small\n"));
 				convexFaces = 0;
 			}
 			p0 = p1;
@@ -306,9 +307,9 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 			ndAssert(edge1.m_w == ndFloat32(0.0f));
 			ndBigVector normal(edge0.CrossProduct(edge1));
 			ndFloat64 mag2 = normal.DotProduct(normal).GetScalar();
-			if (mag2 < ndFloat32(1.0e-8f))
+			if (mag2 < ndFloat32(1.0e-12f))
 			{
-				ndAssert(0);
+				ndTrace(("rejecting degenerated face, area too small\n"));
 				convexFaces = 0;
 			}
 		}

@@ -135,12 +135,12 @@ ndIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const
 
 	if ((data.m_triangleCount + indexCount - 2) * 3 > data.m_maxIndexCount) 
 	{
-		return t_StopSearch;
+		return m_stopSearch;
 	}
 
 	data.m_triangleCount += (indexCount - 2);
 	ndAssert((data.m_triangleCount * 3) <= data.m_maxIndexCount);
-	return t_ContinueSearh;
+	return m_continueSearh;
 }
 
 ndShapeInfo ndShapeStatic_bvh::GetShapeInfo() const
@@ -168,7 +168,7 @@ ndIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const
 		edgeType[i] = edgeIndexType ? ndShapeDebugNotify::m_open : ndShapeDebugNotify::m_shared;
 	}
 	data.m_callback->DrawPolygon(indexCount, poly, edgeType);
-	return t_ContinueSearh;
+	return m_continueSearh;
 }
 
 void ndShapeStatic_bvh::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const
@@ -222,47 +222,28 @@ ndFloat32 ndShapeStatic_bvh::RayCast(ndRayCastNotify& callback, const ndVector& 
 ndIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFloat32* const, ndInt32, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance)
 {
 	ndPolygonMeshDesc& data = (*(ndPolygonMeshDesc*)context);
-	if (data.m_faceCount >= D_MAX_COLLIDING_FACES) 
-	{
-		ndTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
-		return t_StopSearch;
-	}
-	if ((data.m_globalIndexCount + indexCount * 2 + 3) >= D_MAX_COLLIDING_INDICES) 
-	{
-		ndTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
-		return t_StopSearch;
-	}
+	ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data.m_staticMeshQuery;
 
 	ndInt32 count = indexCount * 2 + 3;
-
-	data.m_faceIndexCount[data.m_faceCount] = indexCount;
-	data.m_faceIndexStart[data.m_faceCount] = data.m_globalIndexCount;
-	data.m_hitDistance[data.m_faceCount] = hitDistance;
-	data.m_faceCount++;
-	ndInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
+	query.m_hitDistance.PushBack(hitDistance);
+	query.m_faceIndexCount.PushBack(indexCount);
+	query.m_faceIndexStart.PushBack(query.m_faceVertexIndex.GetCount());
 
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
-		dst[i] = indexArray[i];
+		query.m_faceVertexIndex.PushBack(indexArray[i]);
 	}
-
-	data.m_globalIndexCount += count;
-
-	return t_ContinueSearh;
+	return m_continueSearh;
 }
 
 void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
-	data->m_me = this;
+	data->m_shapeStaticMesh = this;
 	data->m_vertex = GetLocalVertexPool();
 	data->m_vertexStrideInBytes = GetStrideInBytes();
 
-	data->m_faceCount = 0;
-	data->m_globalIndexCount = 0;
-	data->m_faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
-	data->m_faceIndexStart = data->m_meshData.m_globalFaceIndexStart;
-	data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
-	data->m_hitDistance = data->m_meshData.m_globalHitDistance;
+	ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data->m_staticMeshQuery;
+	query.Reset();
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 

@@ -30,22 +30,33 @@ class ndShapeInstance;
 class ndContactSolver;
 class ndShapeStaticMesh;
 
-//#define D_BUFFERED_POLYGON_COLLECTION
-
-#ifdef D_BUFFERED_POLYGON_COLLECTION
-#define D_MAX_COLLIDING_FACES		512
-#define D_MAX_COLLIDING_INDICES		(D_MAX_COLLIDING_FACES * (4 * 2 + 3))
-
 D_MSV_NEWTON_ALIGN_32 
 class ndPolygonMeshDesc: public ndFastAabb
 {
 	public:
-	class ndMesh
+	class ndStaticMeshFaceQuery
 	{
 		public:
-		ndInt32 m_globalFaceIndexCount[D_MAX_COLLIDING_FACES];
-		ndInt32 m_globalFaceIndexStart[D_MAX_COLLIDING_FACES];
-		ndFloat32 m_globalHitDistance[D_MAX_COLLIDING_FACES];
+		ndStaticMeshFaceQuery()
+		{
+			m_hitDistance.Resize(256);
+			m_faceIndexCount.Resize(256);
+			m_faceIndexStart.Resize(256);
+			m_faceVertexIndex.Resize(256);
+		}
+
+		void Reset()
+		{
+			m_hitDistance.SetCount(0);
+			m_faceIndexCount.SetCount(0);
+			m_faceIndexStart.SetCount(0);
+			m_faceVertexIndex.SetCount(0);
+		}
+
+		ndArray<ndFloat32> m_hitDistance;
+		ndArray<ndInt32> m_faceIndexCount;
+		ndArray<ndInt32> m_faceIndexStart;
+		ndArray<ndInt32> m_faceVertexIndex;
 	};
 
 	// colliding box in polygonSoup local space
@@ -62,81 +73,20 @@ class ndPolygonMeshDesc: public ndFastAabb
 	D_COLLISION_API const ndInt32* GetAdjacentFaceEdgeNormalArray(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
 
 	ndVector m_boxDistanceTravelInMeshSpace;
-	ndInt32 m_faceCount;
 	ndInt32 m_vertexStrideInBytes;
 	ndFloat32 m_skinMargin;
 	ndShapeInstance* m_convexInstance;
 	ndShapeInstance* m_polySoupInstance;
 	ndFloat32* m_vertex;
-	ndInt32* m_faceIndexCount;
-	ndInt32* m_faceVertexIndex;
+	ndArray<ndVector>* m_tmpVertexArray;
 
 	// private data;
-	ndMesh m_meshData;
-	ndInt32* m_faceIndexStart;
-	ndFloat32* m_hitDistance;
-	const ndShapeStaticMesh* m_me;
-	ndInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
+	ndStaticMeshFaceQuery* m_staticMeshQuery;
+	const ndShapeStaticMesh* m_shapeStaticMesh;
 	ndFloat32 m_maxT;
-	ndInt32 m_globalIndexCount;
 	ndInt32 m_threadId;
 	bool m_doContinueCollisionTest;
 } D_GCC_NEWTON_ALIGN_32;
-
-
-#else
-
-#define D_MAX_COLLIDING_FACES		512
-#define D_MAX_COLLIDING_INDICES		(D_MAX_COLLIDING_FACES * (4 * 2 + 3))
-
-D_MSV_NEWTON_ALIGN_32
-class ndPolygonMeshDesc : public ndFastAabb
-{
-	public:
-	class ndMesh
-	{
-	public:
-		ndInt32 m_globalFaceIndexCount[D_MAX_COLLIDING_FACES];
-		ndInt32 m_globalFaceIndexStart[D_MAX_COLLIDING_FACES];
-		ndFloat32 m_globalHitDistance[D_MAX_COLLIDING_FACES];
-	};
-
-	// colliding box in polygonSoup local space
-	D_COLLISION_API ndPolygonMeshDesc();
-	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
-
-	D_COLLISION_API void SortFaceArray();
-	D_COLLISION_API ndFloat32 GetSeparetionDistance() const;
-	D_COLLISION_API ndInt32 GetFaceIndexCount(ndInt32 indexCount) const;
-	D_COLLISION_API void SetDistanceTravel(const ndVector& distanceInGlobalSpace);
-	D_COLLISION_API ndInt32 GetFaceId(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
-	D_COLLISION_API ndInt32 GetNormalIndex(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
-	D_COLLISION_API ndFloat32 GetFaceSize(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
-	D_COLLISION_API const ndInt32* GetAdjacentFaceEdgeNormalArray(const ndInt32* const faceIndexArray, ndInt32 indexCount) const;
-
-	ndVector m_boxDistanceTravelInMeshSpace;
-	ndInt32 m_faceCount;
-	ndInt32 m_vertexStrideInBytes;
-	ndFloat32 m_skinMargin;
-	ndShapeInstance* m_convexInstance;
-	ndShapeInstance* m_polySoupInstance;
-	ndFloat32* m_vertex;
-	ndInt32* m_faceIndexCount;
-	ndInt32* m_faceVertexIndex;
-
-	// private data;
-	ndMesh m_meshData;
-	ndInt32* m_faceIndexStart;
-	ndFloat32* m_hitDistance;
-	const ndShapeStaticMesh* m_me;
-	ndInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
-	ndFloat32 m_maxT;
-	ndInt32 m_globalIndexCount;
-	ndInt32 m_threadId;
-	bool m_doContinueCollisionTest;
-} D_GCC_NEWTON_ALIGN_32;
-
-#endif
 
 #endif 
 

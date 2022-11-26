@@ -542,117 +542,7 @@ ndIntersectStatus ndAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const con
 		data[i] = ndInt64(ndUnsigned64(indexArray));
 	}
 	adjacency.AddFace(indexCount, face, data);
-	return t_ContinueSearh;
-}
-
-ndIntersectStatus ndAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32)
-{
-	#define DG_WELDING_TOL (1.0e-2f)
-	#define DG_WELDING_TOL2 (DG_WELDING_TOL * DG_WELDING_TOL)
-
-	const ndAdjacentFace& adjacentFace = *((ndAdjacentFace*)context);
-
-	if (adjacentFace.m_index != indexArray) 
-	{	
-		ndInt32 adjacentCount = adjacentFace.m_count;
-		ndInt32 stride = ndInt32 (strideInBytes / sizeof (ndFloat32));
-
-		ndInt32 j0 = adjacentCount - 1;
-		ndInt32 indexJ0 = adjacentFace.m_index[adjacentCount - 1];
-		for (ndInt32 j = 0; j < adjacentCount; ++j) 
-		{
-			ndInt32 indexJ1 = adjacentFace.m_index[j];
-			ndBigVector q0 (ndVector(&polygon[indexJ1 * stride]) & ndVector::m_triplexMask);
-			ndBigVector q1 (ndVector(&polygon[indexJ0 * stride]) & ndVector::m_triplexMask);
-			ndBigVector q1q0 (q1 - q0);
-			ndFloat64 q1q0Mag2 = q1q0.DotProduct(q1q0).GetScalar();
-
-			ndInt32 indexI0 = indexArray[indexCount - 1];
-			for (ndInt32 i = 0; i < indexCount; ++i) 
-			{
-				ndInt32 indexI1 = indexArray[i];
-				ndBigVector p0 (ndVector(&polygon[indexI0 * stride]) & ndVector::m_triplexMask);
-				ndBigVector p1 (ndVector(&polygon[indexI1 * stride]) & ndVector::m_triplexMask);
-				ndBigVector p1p0 (p1 - p0);
-				ndFloat64 dot = p1p0.DotProduct(q1q0).GetScalar();
-				if (dot > 0.0f) 
-				{
-					ndFloat64 q1p0Mag2 = p1p0.DotProduct(p1p0).GetScalar();
-					if ((dot * dot) >= (q1p0Mag2 * q1q0Mag2 * ndFloat64(0.99995f))) 
-					{
-						ndFloat64 x0 = q0.DotProduct(q1q0).GetScalar();
-						ndFloat64 x1 = q1.DotProduct(q1q0).GetScalar();
-						ndFloat64 y0 = p0.DotProduct(q1q0).GetScalar();
-						ndFloat64 y1 = p1.DotProduct(q1q0).GetScalar();
-						ndAssert (x1 > x0);
-						ndAssert (y1 > y0);
-						if (!((y0 >= x1) || (y1 <= x0))) 
-						{
-							ndFloat64 t = q1q0.DotProduct(p0 - q0).GetScalar() / q1q0Mag2;
-							ndAssert (q1q0.m_w == ndFloat32 (0.0f));
-							ndBigVector q (q0 + q1q0.Scale(t));
-							ndBigVector dist (p0 - q);
-							ndAssert (dist.m_w == ndFloat32 (0.0f));
-							ndFloat64 err2 = dist.DotProduct(dist).GetScalar();
-							if (err2 < DG_WELDING_TOL2) 
-							{
-								ndFloat32 maxDist = ndFloat32 (0.0f);
-								for (ndInt32 k = 0; k < indexCount; ++k) 
-								{
-									ndVector r (&polygon[indexArray[k] * stride]);
-									r = r & ndVector::m_triplexMask;
-									ndFloat32 dist1 = adjacentFace.m_normal.Evalue(r);
-									if (ndAbs (dist1) > ndAbs (maxDist)) 
-									{
-										maxDist = dist1;
-									}
-								}
-
-								if (adjacentFace.m_index[j0 + adjacentCount + 2] == -1) 
-								{
-									if (maxDist < -ndFloat32 (1.0e-3f)) 
-									{
-										adjacentFace.m_index[j0 + adjacentCount + 2] = indexArray[indexCount + 1];
-									} 
-									else 
-									{
-										adjacentFace.m_index[j0 + adjacentCount + 2] = adjacentFace.m_index[adjacentCount + 1];
-									}
-								} 
-								else 
-								{
-									if (maxDist < -ndFloat32 (1.0e-3f)) 
-									{
-										ndBigVector n0 (adjacentFace.m_normal[0], adjacentFace.m_normal[1], adjacentFace.m_normal[2], ndFloat64(0.0f));
-										ndBigVector n1 (ndVector(&polygon[adjacentFace.m_index[j0 + adjacentCount + 2] * stride]) & ndVector::m_triplexMask);
-										ndBigVector n2 (ndVector(&polygon[indexArray[indexCount + 1] * stride]) & ndVector::m_triplexMask);
-
-										ndBigVector tilt0 (n0.CrossProduct(n1)); 
-										ndBigVector tilt1 (n0.CrossProduct(n2)); 
-										ndFloat64 dist0 (q1q0.DotProduct(tilt0).GetScalar());
-										ndFloat64 dist1 (q1q0.DotProduct(tilt1).GetScalar());
-										if (dist0 < dist1) 
-										{
-											adjacentFace.m_index[j0 + adjacentCount + 2] = indexArray[indexCount + 1];
-										}
-									} 
-									else 
-									{
-										adjacentFace.m_index[j0 + adjacentCount + 2] = adjacentFace.m_index[adjacentCount + 1];
-									}
-								}
-								break;
-							}
-						}
-					}
-				}
-				indexI0 = indexI1;
-			}
-			j0 = j;
-			indexJ0 = indexJ1;
-		}
-	}
-	return t_ContinueSearh;
+	return m_continueSearh;
 }
 
 ndAabbPolygonSoup::ndNodeBuilder* ndAabbPolygonSoup::BuildTopDown (ndNodeBuilder* const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** const allocator) const
@@ -1221,7 +1111,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							{
 								obbAabbInfo.m_separationDistance = ndFloat32(0.0f);
 								ndAssert (vCount >= 3);
-								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, dist1) == t_StopSearch) 
+								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, dist1) == m_stopSearch) 
 								{
 									return;
 								}
@@ -1270,7 +1160,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							{
 								ndAssert (vCount >= 3);
 								obbAabbInfo.m_separationDistance = ndFloat32(0.0f);
-								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, dist1) == t_StopSearch) 
+								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, dist1) == m_stopSearch) 
 								{
 									return;
 								}
@@ -1335,7 +1225,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							if (hitDistance < ndFloat32 (1.0f)) 
 							{
 								ndAssert (vCount >= 3);
-								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, hitDistance) == t_StopSearch) 
+								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, hitDistance) == m_stopSearch) 
 								{
 									return;
 								}
@@ -1375,7 +1265,7 @@ void ndAabbPolygonSoup::ForAllSectors (const ndFastAabb& obbAabbInfo, const ndVe
 							if (hitDistance < ndFloat32 (1.0f)) 
 							{
 								ndAssert (vCount >= 3);
-								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, hitDistance) == t_StopSearch) {
+								if (callback(context, &vertexArray[0].m_x, sizeof (ndTriplex), indices, vCount, hitDistance) == m_stopSearch) {
 									return;
 								}
 							}
@@ -1501,7 +1391,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 			//				if (hitDistance < ndFloat32(1.0f))
 			//				{
 			//					ndAssert(vCount >= 3);
-			//					if (callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, hitDistance) == t_StopSearch)
+			//					if (callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, hitDistance) == m_stopSearch)
 			//					{
 			//						return;
 			//					}
@@ -1541,7 +1431,7 @@ void ndAabbPolygonSoup::ForThisSector(const ndAabbPolygonSoup::ndNode* const nod
 			//				if (hitDistance < ndFloat32(1.0f))
 			//				{
 			//					ndAssert(vCount >= 3);
-			//					if (callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, hitDistance) == t_StopSearch) {
+			//					if (callback(context, &vertexArray[0].m_x, sizeof(ndTriplex), indices, vCount, hitDistance) == m_stopSearch) {
 			//						return;
 			//					}
 			//				}
