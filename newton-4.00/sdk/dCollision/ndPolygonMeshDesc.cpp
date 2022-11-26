@@ -45,9 +45,8 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	,m_convexInstance(&proxy.m_instance0)
 	,m_polySoupInstance(&proxy.m_instance1)
 	,m_vertex(nullptr)
-	,m_tmpVertexArray(nullptr)
 	,m_staticMeshQuery(nullptr)
-	,m_shapeStaticMesh(nullptr)
+	,m_proceduralStaticMeshFaceQuery(nullptr)
 	,m_maxT(ndFloat32(1.0f))
 	,m_threadId(proxy.m_threadId)
 	,m_doContinueCollisionTest(ccdMode)
@@ -59,11 +58,12 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	matrix = hullMatrix * soupMatrix.Inverse();
 	ndMatrix convexMatrix(ndGetIdentityMatrix());
 
-	m_staticMeshQuery = &proxy.m_contact->GetBody0()->GetScene()->m_staticMeshQuery[proxy.m_threadId];
+	ndScene* const scene = proxy.m_contact->GetBody0()->GetScene();
+	m_staticMeshQuery = &scene->m_staticMeshQuery[proxy.m_threadId];
 	m_staticMeshQuery->Reset();
 
-	m_tmpVertexArray = &proxy.m_contact->GetBody0()->GetScene()->m_heightFieldLocalData[proxy.m_threadId].m_vertex;
-	m_tmpVertexArray->SetCount(0);
+	m_proceduralStaticMeshFaceQuery = &scene->m_proceduralStaticMeshQuery[proxy.m_threadId];
+	m_proceduralStaticMeshFaceQuery->Reset();
 
 	switch (m_polySoupInstance->GetScaleType())
 	{

@@ -561,7 +561,8 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) 
 	{
-		ndArray<ndVector>& vertex = *data->m_tmpVertexArray;
+		ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data->m_staticMeshQuery;
+		ndArray<ndVector>& vertex = data->m_proceduralStaticMeshFaceQuery->m_vertex;
 
 		// scan the vertices's intersected by the box extend
 		ndInt32 vertexCount = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
@@ -586,13 +587,14 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32 quadCount = 0;
 		ndInt32 step = x1 - x0 + 1;
 
-		ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data->m_staticMeshQuery;
 		ndArray<ndInt32>& quadDataArray = query.m_faceVertexIndex;
 		ndArray<ndInt32>& faceIndexCount = query.m_faceIndexCount;
-		ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
+		//ndInt32 faceSize = ndInt32(ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f));
+		ndFloat32 maxDiagonal = ndMax(m_horizontalScale_x, m_horizontalScale_z) * ndFloat32(2.0f);
+		ndInt32 faceSize = ndInt32(ndFloor(maxDiagonal / D_FACE_CLIP_DIAGONAL_SCALE + ndFloat32(1.0f)));
 		const ndInt32* const indirectIndex = GetIndexList();
 
-		quadDataArray.SetCount(2 * (x1 - x0) * (z1 - x0) * ndInt32(sizeof(ndGridQuad) / sizeof(ndInt32)));
+		quadDataArray.SetCount(2 * (x1 - x0) * (z1 - z0) * ndInt32(sizeof(ndGridQuad) / sizeof(ndInt32)));
 		ndGridQuad* const quadArray = (ndGridQuad*)&quadDataArray[0];
 		for (ndInt32 z = z0; z < z1; ++z)
 		{
@@ -629,7 +631,6 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				
 				ndGridQuad& quad = quadArray[quadCount];
 
-				//faceIndexCount[quadCount * 2] = 3;
 				faceIndexCount.PushBack(3);
 				quad.m_triangle0.m_i0 = i2;
 				quad.m_triangle0.m_i1 = i1;
@@ -641,7 +642,6 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				quad.m_triangle0.m_normal_edge20 = normalIndex0;
 				quad.m_triangle0.m_area = faceSize;
 	
-				//faceIndexCount[quadCount * 2 + 1] = 3;
 				faceIndexCount.PushBack(3);
 				quad.m_triangle1.m_i0 = i1;
 				quad.m_triangle1.m_i1 = i2;

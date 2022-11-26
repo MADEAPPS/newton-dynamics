@@ -3117,79 +3117,6 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 	return contactCount;
 }
 
-ndInt32 ndContactSolver::ConvexToSaticStaticBvhContactsNodeDescrete(const ndAabbPolygonSoup::ndNode* const node)
-{
-	ndVector origin0(m_instance0.m_globalMatrix.m_posit);
-	ndVector origin1(m_instance1.m_globalMatrix.m_posit);
-	m_instance0.m_globalMatrix.m_posit = ndVector::m_wOne;
-	m_instance1.m_globalMatrix.m_posit -= (origin0 & ndVector::m_triplexMask);
-
-	ndAssert(m_instance1.GetShape()->GetAsShapeStaticBVH());
-
-	ndShapeStatic_bvh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
-	ndAssert(polysoup);
-
-ndAssert(0);
-return 0;
-#if 0
-	ndPolygonMeshDesc data(*this, false);
-	data.m_shapeStaticMesh = polysoup;
-	data.m_vertex = polysoup->GetLocalVertexPool();
-	data.m_vertexStrideInBytes = polysoup->GetStrideInBytes();
-	data.m_faceCount = 0;
-	data.m_globalIndexCount = 0;
-	data.m_faceIndexCount = data.m_meshData.m_globalFaceIndexCount;
-	data.m_faceIndexStart = data.m_meshData.m_globalFaceIndexStart;
-	data.m_faceVertexIndex = data.m_globalFaceVertexIndex;
-	data.m_hitDistance = data.m_meshData.m_globalHitDistance;
-	polysoup->ForThisSector(node, data, data.m_boxDistanceTravelInMeshSpace, data.m_maxT, polysoup->GetPolygon, &data);
-
-	ndInt32 count = 0;
-	if (data.m_faceCount)
-	{
-		count = CalculatePolySoupToHullContactsDescrete(data);
-	}
-
-	ndBodyKinematic* const body0 = m_contact->GetBody0();
-	ndBodyKinematic* const body1 = m_contact->GetBody1();
-	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
-	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
-
-	//if (!m_intersectionTestOnly)
-	//{
-	//	ndContactPoint* const contactOut = m_contactBuffer;
-	//	for (dInt32 i = count - 1; i >= 0; i--)
-	//	{
-	//		contactOut[i].m_body0 = body0;
-	//		contactOut[i].m_body1 = body1;
-	//		contactOut[i].m_shapeInstance0 = instance0;
-	//		contactOut[i].m_shapeInstance1 = instance1;
-	//	}
-	//}
-
-	ndVector offset = (origin0 & ndVector::m_triplexMask);
-	m_closestPoint0 += offset;
-	m_closestPoint1 += offset;
-
-	if (!m_intersectionTestOnly)
-	{
-		ndContactPoint* const contactOut = m_contactBuffer;
-		for (ndInt32 i = count - 1; i >= 0; i--)
-		{
-			contactOut[i].m_point += offset;
-			contactOut[i].m_body0 = body0;
-			contactOut[i].m_body1 = body1;
-			contactOut[i].m_shapeInstance0 = instance0;
-			contactOut[i].m_shapeInstance1 = instance1;
-		}
-	}
-
-	m_instance0.m_globalMatrix.m_posit = origin0;
-	m_instance1.m_globalMatrix.m_posit = origin1;
-	return count;
-#endif
-}
-
 ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 {
 	ndContact* const contactJoint = m_contact;
@@ -4132,7 +4059,6 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 ndAssert(0);
 return 0;
 #if 0
-
 	ndAssert(m_instance0.GetConvexVertexCount());
 	ndAssert(!m_instance0.GetShape()->GetAsShapeNull());
 	ndAssert(m_instance0.GetShape()->GetAsShapeConvex());
@@ -4361,6 +4287,7 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 	ndInt32 count = 0;
 	ndPolygonMeshDesc data(*this, false);
 	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMesh();
+	ndAssert(polysoup);
 	polysoup->GetCollidingFaces(&data);
 	if (data.m_staticMeshQuery->m_faceIndexCount.GetCount())
 	{
@@ -4385,5 +4312,66 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 	}
 
 	ndAssert(!count || (m_separationDistance < ndFloat32(1.0e6f)));
+	return count;
+}
+
+ndInt32 ndContactSolver::ConvexToSaticStaticBvhContactsNodeDescrete(const ndAabbPolygonSoup::ndNode* const node)
+{
+	ndVector origin0(m_instance0.m_globalMatrix.m_posit);
+	ndVector origin1(m_instance1.m_globalMatrix.m_posit);
+	m_instance0.m_globalMatrix.m_posit = ndVector::m_wOne;
+	m_instance1.m_globalMatrix.m_posit -= (origin0 & ndVector::m_triplexMask);
+
+	ndAssert(m_instance1.GetShape()->GetAsShapeStaticBVH());
+
+	ndShapeStatic_bvh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	ndAssert(polysoup);
+	ndPolygonMeshDesc data(*this, false);
+	data.m_vertex = polysoup->GetLocalVertexPool();
+	data.m_vertexStrideInBytes = polysoup->GetStrideInBytes();
+	polysoup->ForThisSector(node, data, data.m_boxDistanceTravelInMeshSpace, data.m_maxT, polysoup->GetPolygon, &data);
+
+	ndInt32 count = 0;
+	if (data.m_staticMeshQuery->m_faceIndexCount.GetCount())
+	{
+		count = CalculatePolySoupToHullContactsDescrete(data);
+	}
+
+	ndBodyKinematic* const body0 = m_contact->GetBody0();
+	ndBodyKinematic* const body1 = m_contact->GetBody1();
+	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
+	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
+
+	//if (!m_intersectionTestOnly)
+	//{
+	//	ndContactPoint* const contactOut = m_contactBuffer;
+	//	for (dInt32 i = count - 1; i >= 0; i--)
+	//	{
+	//		contactOut[i].m_body0 = body0;
+	//		contactOut[i].m_body1 = body1;
+	//		contactOut[i].m_shapeInstance0 = instance0;
+	//		contactOut[i].m_shapeInstance1 = instance1;
+	//	}
+	//}
+
+	ndVector offset = (origin0 & ndVector::m_triplexMask);
+	m_closestPoint0 += offset;
+	m_closestPoint1 += offset;
+
+	if (!m_intersectionTestOnly)
+	{
+		ndContactPoint* const contactOut = m_contactBuffer;
+		for (ndInt32 i = count - 1; i >= 0; i--)
+		{
+			contactOut[i].m_point += offset;
+			contactOut[i].m_body0 = body0;
+			contactOut[i].m_body1 = body1;
+			contactOut[i].m_shapeInstance0 = instance0;
+			contactOut[i].m_shapeInstance1 = instance1;
+		}
+	}
+
+	m_instance0.m_globalMatrix.m_posit = origin0;
+	m_instance1.m_globalMatrix.m_posit = origin1;
 	return count;
 }

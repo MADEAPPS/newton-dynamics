@@ -238,12 +238,8 @@ ndIntersectStatus ndShapeStatic_bvh::GetPolygon(void* const context, const ndFlo
 
 void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
-	data->m_shapeStaticMesh = this;
 	data->m_vertex = GetLocalVertexPool();
 	data->m_vertexStrideInBytes = GetStrideInBytes();
-
-	ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data->m_staticMeshQuery;
-	query.Reset();
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 

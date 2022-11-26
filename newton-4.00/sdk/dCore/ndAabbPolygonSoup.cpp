@@ -246,7 +246,7 @@ ndAabbPolygonSoup::~ndAabbPolygonSoup ()
 	}
 }
 
-ndFloat32 ndAabbPolygonSoup::CalculateFaceMaxSize (const ndVector* const vertex, ndInt32 indexCount, const ndInt32* const indexArray) const
+ndFloat32 ndAabbPolygonSoup::CalculateFaceMaxDiagonal (const ndVector* const vertex, ndInt32 indexCount, const ndInt32* const indexArray) const
 {
 	ndFloat32 maxSize = ndFloat32 (0.0f);
 	ndInt32 index = indexArray[indexCount - 1];
@@ -716,8 +716,8 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 			// face normal
 			m_indices[indexMap + node->m_indexCount + 1] = builder.m_vertexPoints.GetCount() + builder.m_normalIndex[node->m_faceIndex];
 			// face size
-			ndFloat32 faceMaxDiag = CalculateFaceMaxSize(&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices);
-			ndInt32 quantizedDiagSize = ndInt32(ndFloor(faceMaxDiag * ndFloat32(1.0f) / D_FACE_CLIP_DIAGONAL_SCALE + ndFloat32(1.0f)));
+			ndFloat32 faceMaxDiag = CalculateFaceMaxDiagonal(&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices);
+			ndInt32 quantizedDiagSize = ndInt32(ndFloor(faceMaxDiag / D_FACE_CLIP_DIAGONAL_SCALE + ndFloat32(1.0f)));
 			m_indices[indexMap + node->m_indexCount * 2 + 2] = quantizedDiagSize;
 
 			indexMap += node->m_indexCount * 2 + 3;

@@ -59,16 +59,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndScene : public ndThreadPool
 {
 	protected:
-	class ndLocalThreadData
-	{
-		public:
-		ndLocalThreadData()
-		{
-			m_vertex.Resize(256);
-		}
-		ndArray<ndVector> m_vertex;
-	};
-
 	class ndContactPairs
 	{
 		public:
@@ -172,8 +162,8 @@ class ndScene : public ndThreadPool
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];
-	ndLocalThreadData m_heightFieldLocalData[D_MAX_THREADS_COUNT];
 	ndPolygonMeshDesc::ndStaticMeshFaceQuery m_staticMeshQuery[D_MAX_THREADS_COUNT];
+	ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery m_proceduralStaticMeshQuery[D_MAX_THREADS_COUNT];
 
 	ndSpinLock m_lock;
 	ndBvhNode* m_rootNode;

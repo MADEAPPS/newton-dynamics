@@ -61,7 +61,6 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API void SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces);
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
@@ -71,24 +70,10 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
 	private:
-	class ndLocalData
-	{
-		public:
-		ndLocalData()
-			:m_vertex(64)
-		{
-		}
-		ndArray<ndVector> m_vertex;
-	};
-
 	void CalculateLocalObb();
 	
 	ndVector m_minBox;
 	ndVector m_maxBox;
-	mutable ndLocalData m_localData[D_MAX_THREADS_COUNT];
-	ndInt32 m_maxFaceCount;
-	ndInt32 m_maxVertexCount;
-
 	friend class ndContactSolver;
 };
 

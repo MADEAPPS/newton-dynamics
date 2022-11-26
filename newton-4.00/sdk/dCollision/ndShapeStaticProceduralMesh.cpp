@@ -29,32 +29,10 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticProceduralMesh)
 
-template<class T>
-class ndTempArray : public ndArray<T>
-{
-	public:
-	ndTempArray(ndInt32 maxSize, T* const buffer) 
-		:ndArray<T>()
-		,m_buffer(buffer)
-	{
-		ndArray<T>::m_array = buffer;
-		ndArray<T>::m_capacity = maxSize;
-	}
-
-	~ndTempArray()
-	{
-		ndArray<T>::m_array = nullptr;
-	}
-
-	T* m_buffer;
-};
-
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 	,m_minBox(ndVector::m_negOne * ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
 	,m_maxBox(ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
-	,m_maxFaceCount(64)
-	,m_maxVertexCount(256)
 {
 	CalculateLocalObb();
 }
@@ -66,8 +44,6 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::n
 
 	m_minBox = xmlGetVector3(xmlNode, "minBox");
 	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
-	m_maxFaceCount = xmlGetInt(xmlNode, "maxFaceCount");
-	m_maxVertexCount = xmlGetInt(xmlNode, "maxVertexCount");
 	CalculateLocalObb();
 }
 
@@ -84,14 +60,6 @@ void ndShapeStaticProceduralMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& d
 
 	xmlSaveParam(childNode, "minBox", m_minBox);
 	xmlSaveParam(childNode, "maxBox", m_maxBox);
-	xmlSaveParam(childNode, "maxFaceCount", m_maxFaceCount);
-	xmlSaveParam(childNode, "maxVertexCount", m_maxVertexCount);
-}
-
-void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces)
-{
-	m_maxFaceCount = maxFaces;
-	m_maxVertexCount = maxVertex;
 }
 
 ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const
@@ -109,69 +77,56 @@ void ndShapeStaticProceduralMesh::CalculateLocalObb()
 
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
-ndAssert(0);
-#if 0
-	ndVector* const vertexBuffer = ndAlloca(ndVector, m_maxVertexCount);
-	ndInt32* const faceBuffer = ndAlloca(ndInt32, m_maxFaceCount);
-	ndInt32* const materialBuffer = ndAlloca(ndInt32, m_maxFaceCount);
-	ndInt32* const indexBuffer = ndAlloca(ndInt32, m_maxFaceCount * 4);
+	ndPolygonMeshDesc::ndStaticMeshFaceQuery& query = *data->m_staticMeshQuery;
+	ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery& meshPatch = *data->m_proceduralStaticMeshFaceQuery;
 
-	ndTempArray<ndInt32> faceList(m_maxFaceCount, faceBuffer);
-	ndTempArray<ndInt32> indexList(m_maxFaceCount * 4, indexBuffer);
-	ndTempArray<ndVector> vertexList(m_maxVertexCount, vertexBuffer);
-	ndTempArray<ndInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
+	ndArray<ndVector>& vertex = meshPatch.m_vertex;
+	ndArray<ndInt32>& faceList = query.m_faceIndexCount;
+	ndArray<ndInt32>& indexList = meshPatch.m_indexListList;
+	ndArray<ndInt32>& faceMaterialList = meshPatch.m_faceMaterial;
+	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertex, faceList, faceMaterialList, indexList);
 
-	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertexList, faceList, faceMaterialList, indexList);
 	if (faceList.GetCount() == 0)
 	{
 		return;
 	}
-	if (faceList.GetCount() > D_MAX_COLLIDING_FACES)
-	{
-		faceList.SetCount(D_MAX_COLLIDING_FACES);
-	}
 
-	// scan the vertices's intersected by the box extend
-	ndArray<ndVector>& vertex = m_localData[data->m_threadId].m_vertex;
-	vertex.SetCount(vertexList.GetCount() + faceList.GetCount());
-	
 	ndEdgeMap edgeMap;
-	ndInt32 index = 0;
+	//ndInt32 index = 0;
 	ndInt32 faceStart = 0;
-	ndInt32* const indices = data->m_globalFaceVertexIndex;
-	ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
-
-	for (ndInt32 i = 0; i < vertexList.GetCount(); ++i)
-	{
-		vertex[i] = vertexList[i];
-	}
+	ndArray<ndInt32>& indices = query.m_faceVertexIndex;
+	ndArray<ndInt32>& faceIndexCount = query.m_faceIndexCount;
 	
 	for (ndInt32 i = 0; i < faceList.GetCount(); ++i)
 	{
 		ndInt32 i0 = indexList[faceStart + 0];
 		ndInt32 i1 = indexList[faceStart + 1];
-		ndVector area(ndVector::m_zero);
+		ndVector normal(ndVector::m_zero);
 		ndVector edge0(vertex[i1] - vertex[i0]);
 
+		ndFloat32 maxDiagonal2 = edge0.DotProduct(edge0).GetScalar();
 		for (ndInt32 j = 2; j < faceList[i]; ++j)
 		{
 			ndInt32 i2 = indexList[faceStart + j];
 			const ndVector edge1(vertex[i2] - vertex[i0]);
-			area += edge0.CrossProduct(edge1);
+			maxDiagonal2 = ndMax(maxDiagonal2, edge1.DotProduct(edge1).GetScalar());
+			normal += edge0.CrossProduct(edge1);
 			edge0 = edge1;
 		}
 
-		ndFloat32 faceSize = ndSqrt(area.DotProduct(area & ndVector::m_triplexMask).GetScalar());
-		ndInt32 normalIndex = vertexList.GetCount() + i;
+		ndInt32 normalIndex = vertex.GetCount();
+		ndAssert(normal.m_w == ndFloat32(0.0f));
+		vertex.PushBack(normal.Normalize());
 
-		const ndVector normal(area.Scale(ndFloat32(1.0f) / faceSize));
-		vertex[normalIndex] = normal;
+		ndInt32 quantizedDiagSize = ndInt32(ndFloor(ndSqrt(maxDiagonal2) / D_FACE_CLIP_DIAGONAL_SCALE + ndFloat32(1.0f)));
 
 		const ndPlane plane(normal, -normal.DotProduct(vertex[i0]).GetScalar());
 
+		ndInt32 index = indices.GetCount();
+		indices.SetCount(index + faceList[i] * 2 + 3);
 		indices[index + faceList[i] + 0] = faceMaterialList[i];
 		indices[index + faceList[i] + 1] = normalIndex;
-		indices[index + 2 * faceList[i] + 2] = ndInt32(faceSize * ndFloat32(0.5f));
+		indices[index + 2 * faceList[i] + 2] = quantizedDiagSize;
 
 		ndInt32 j0 = faceList[i] - 1;
 		ndInt32 testIndex = j0 - 1;
@@ -193,7 +148,6 @@ ndAssert(0);
 			j0 = j1;
 		}
 		faceStart += faceVectexCount;
-		index += faceList[i] * 2 + 3;
 	}
 
 	ndEdgeMap::Iterator iter(edgeMap);
@@ -226,8 +180,9 @@ ndAssert(0);
 	ndInt32 faceIndexCount1 = 0;
 	ndInt32 stride = sizeof(ndVector) / sizeof(ndFloat32);
 	
-	ndInt32* const address = data->m_meshData.m_globalFaceIndexStart;
-	ndFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
+	//ndInt32* const address = data->m_meshData.m_globalFaceIndexStart;
+	ndArray<ndInt32>& address = query.m_faceIndexStart;
+	ndArray<ndFloat32>& hitDistance = query.m_hitDistance;
 	if (data->m_doContinueCollisionTest) 
 	{
 		ndAssert(0);
@@ -258,8 +213,10 @@ ndAssert(0);
 			ndFloat32 dist = data->PolygonBoxDistance(faceNormal, vertexCount, indexArray, stride, &vertex[0].m_x);
 			if (dist > ndFloat32(0.0f)) 
 			{
-				hitDistance[faceCount0] = dist;
-				address[faceCount0] = faceIndexCount0;
+				//hitDistance[faceCount0] = dist;
+				//address[faceCount0] = faceIndexCount0;
+				hitDistance.PushBack(dist);
+				address.PushBack(faceIndexCount0);
 				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(ndInt32));
 				faceCount0++;
 				faceIndexCount0 += vertexCount * 2 + 3;
@@ -267,18 +224,10 @@ ndAssert(0);
 			faceIndexCount1 += vertexCount * 2 + 3;
 		}
 	}
-	
-	if (faceCount0) 
-	{
-		// initialize the callback data structure
-		data->m_faceCount = faceCount0;
-		data->m_vertex = &vertex[0].m_x;
-		data->m_faceVertexIndex = indices;
-		data->m_faceIndexStart = address;
-		data->m_hitDistance = hitDistance;
-		data->m_faceIndexCount = faceIndexCount;
-		data->m_vertexStrideInBytes = sizeof(ndVector);
-	}
-#endif
+
+	// initialize the callback data structure
+	faceIndexCount.SetCount(faceCount0);
+	data->m_vertex = &vertex[0].m_x;
+	data->m_vertexStrideInBytes = sizeof(ndVector);
 }
 

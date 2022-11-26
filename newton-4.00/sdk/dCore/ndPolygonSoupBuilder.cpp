@@ -309,6 +309,7 @@ void ndPolygonSoupBuilder::AddFaceIndirect(const ndFloat32* const vertex, ndInt3
 			ndFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 			if (mag2 < ndFloat32(1.0e-12f))
 			{
+				ndAssert(0);
 				ndTrace(("rejecting degenerated face, area too small\n"));
 				convexFaces = 0;
 			}

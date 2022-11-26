@@ -59,6 +59,28 @@ class ndPolygonMeshDesc: public ndFastAabb
 		ndArray<ndInt32> m_faceVertexIndex;
 	};
 
+	class ndProceduralStaticMeshFaceQuery
+	{
+		public:
+		ndProceduralStaticMeshFaceQuery()
+		{
+			m_vertex.Resize(256);
+			m_faceMaterial.Resize(256);
+			m_indexListList.Resize(256);
+		}
+
+		void Reset()
+		{
+			m_vertex.SetCount(0);
+			m_faceMaterial.SetCount(0);
+			m_indexListList.SetCount(0);
+		}
+
+		ndArray<ndVector> m_vertex;
+		ndArray<ndInt32> m_faceMaterial;
+		ndArray<ndInt32> m_indexListList;
+	};
+
 	// colliding box in polygonSoup local space
 	D_COLLISION_API ndPolygonMeshDesc();
 	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
@@ -78,11 +100,10 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndShapeInstance* m_convexInstance;
 	ndShapeInstance* m_polySoupInstance;
 	ndFloat32* m_vertex;
-	ndArray<ndVector>* m_tmpVertexArray;
 
 	// private data;
 	ndStaticMeshFaceQuery* m_staticMeshQuery;
-	const ndShapeStaticMesh* m_shapeStaticMesh;
+	ndProceduralStaticMeshFaceQuery* m_proceduralStaticMeshFaceQuery;
 	ndFloat32 m_maxT;
 	ndInt32 m_threadId;
 	bool m_doContinueCollisionTest;
