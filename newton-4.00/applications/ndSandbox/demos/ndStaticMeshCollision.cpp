@@ -38,8 +38,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "testObject.fbx", false);
 	//BuildStaticMesh(scene, "marine_rocks_corsica.fbx", false);
-	BuildStaticMesh(scene, "marine_rocks_corsica_1.fbx", false);
-	//BuildStaticMesh(scene, "marine_rocks_corsica_2.fbx", false);
+	BuildStaticMesh(scene, "marineRocks1.fbx", false);
+	//BuildStaticMesh(scene, "marineRocks2.fbx", false);
 
 	ndMatrix location(ndGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
