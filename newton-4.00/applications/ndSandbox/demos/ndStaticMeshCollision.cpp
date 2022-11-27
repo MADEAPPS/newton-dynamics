@@ -81,6 +81,10 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	AddConvexHull(scene, PlaceMatrix(0.0f, 1.0f, 2.0f), 10.0f, 0.6f, 1.0f, 15);
 	AddConvexHull(scene, PlaceMatrix(0.0f, 1.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
 	AddConvexHull(scene, PlaceMatrix(1.0f, 1.0f, 0.0f), 10.0f, 0.5f, 1.2f, 6);
+	AddConvexHull(scene, PlaceMatrix(1.0f, 1.0f, 2.0f), 10.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, PlaceMatrix(2.0f, 1.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, PlaceMatrix(1.0f, 1.0f, 1.0f), 10.0f, 0.5f, 1.2f, 6);
+
 	//AddCapsulesStacks(scene, PlaceMatrix(45.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 5, 8, 7);
 
 	delete man;

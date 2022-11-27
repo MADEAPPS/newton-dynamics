@@ -1596,21 +1596,20 @@ void ndScene::CreateNewContacts()
 
 void ndScene::CalculateContacts()
 {
+	D_TRACKTIME();
 	m_activeConstraintArray.SetCount(0);
 	const ndInt32 contactCount = m_contactArray.GetCount() + m_newPairs.GetCount();
 	m_contactArray.SetCount(contactCount);
 	if (contactCount)
 	{
-		D_TRACKTIME();
 		ndAtomic<ndInt32> count(0);
 		ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
 		auto CalculateContactPoints = ndMakeObject::ndFunction([this, &count, tmpJointsArray](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
-			const ndInt32 span = 16;
 			const ndInt32 jointCount = m_contactArray.GetCount();
-			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
-			//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			#if 0
+			const ndInt32 span = 16;
 			for (ndInt32 i = count.fetch_add(span); i < jointCount; i = count.fetch_add(span))
 			{
 				const ndInt32 run = (i + span) <= jointCount ? i + span : jointCount;
@@ -1624,6 +1623,20 @@ void ndScene::CalculateContacts()
 					}
 				}
 			}
+
+			#else
+			const ndStartEnd startEnd(jointCount, threadIndex, threadCount);
+			//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			for (ndInt32 i = count.fetch_add(1); i < jointCount; i = count.fetch_add(1))
+			{
+				ndContact* const contact = tmpJointsArray[i];
+				ndAssert(contact);
+				if (!contact->m_isDead)
+				{
+					CalculateContacts(threadIndex, contact);
+				}
+			}
+			#endif
 		});
 		ParallelExecute(CalculateContactPoints);
 	}
