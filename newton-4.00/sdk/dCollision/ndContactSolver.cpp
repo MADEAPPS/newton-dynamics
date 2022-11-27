@@ -905,13 +905,15 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 		ndInt32 i0 = count1 - 1;
 		for (ndInt32 i1 = 0; i1 < count1; ++i1) 
 		{
-			ndVector n(normal.CrossProduct(shape1[i1] - shape1[i0]));
+			const ndVector testPoint(shape1[i0]);
+			const ndVector n(normal.CrossProduct(shape1[i1] - testPoint));
+			
 			ndAssert(n.m_w == ndFloat32(0.0f));
 			ndAssert(n.DotProduct(n).GetScalar() > ndFloat32(0.0f));
-			ndPlane plane(n, -n.DotProduct(shape1[i0]).GetScalar());
 
-			ndFloat32 test0 = plane.Evalue(ptr[0]);
-			ndFloat32 test1 = plane.Evalue(ptr[1]);
+			ndFloat32 test0 = n.DotProduct(ptr[0] - testPoint).GetScalar();
+			ndFloat32 test1 = n.DotProduct(ptr[1] - testPoint).GetScalar();
+
 			if (test0 >= ndFloat32(0.0f)) 
 			{
 				if (test1 >= ndFloat32(0.0f)) 
@@ -924,7 +926,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 				{
 					ndVector dp(ptr[1] - ptr[0]);
 					ndAssert(dp.m_w == ndFloat32(0.0f));
-					ndFloat32 den = plane.DotProduct(dp).GetScalar();
+					ndFloat32 den = n.DotProduct(dp).GetScalar();
 					if (ndAbs(den) < ndFloat32 (1.0e-10f)) 
 					{
 						den = ndFloat32(1.0e-10f);
@@ -939,7 +941,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 			{
 				ndVector dp(ptr[1] - ptr[0]);
 				ndAssert(dp.m_w == ndFloat32(0.0f));
-				ndFloat32 den = plane.DotProduct(dp).GetScalar();
+				ndFloat32 den = n.DotProduct(dp).GetScalar();
 				if (ndAbs(den) < ndFloat32(1.0e-10f))
 				{
 					den = ndFloat32(1.0e-10f);
@@ -971,8 +973,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 			ndVector n(normal.CrossProduct(shape1[i1] - shape1[i0]));
 			ndAssert(n.m_w == ndFloat32(0.0f));
 			ndAssert(n.DotProduct(n).GetScalar() > ndFloat32(0.0f));
-			ndPlane plane(n, -n.DotProduct(shape1[i0]).GetScalar());
-			ndFloat32 test0 = plane.Evalue(p);
+			ndFloat32 test0 = n.DotProduct(p - shape1[i0]).GetScalar();
 			if (test0 < ndFloat32(-1.e-3f)) 
 			{
 				return 0;
@@ -1036,17 +1037,17 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 		dgPerimenterEdge* poly = &subdivision[0];
 		for (ndInt32 j1 = count0 - 1; j1 >= 0; --j1) 
 		{
-			ndVector n(normal.CrossProduct(shape0[j1] - shape0[j0]));
+			const ndVector testPoint(shape0[j0]);
+			const ndVector n(normal.CrossProduct(shape0[j1] - testPoint));
 			ndAssert(n.m_w == 0.0f);
-			ndPlane plane(n, -n.DotProduct(shape0[j0]).GetScalar());
 			j0 = j1;
 			count = 0;
 			dgPerimenterEdge* tmp = poly;
 			ndInt32 isInside = 0;
-			ndFloat32 test0 = plane.Evalue(*tmp->m_vertex);
+			ndFloat32 test0 = n.DotProduct(*tmp->m_vertex - testPoint).GetScalar();
 			do 
 			{
-				ndFloat32 test1 = plane.Evalue(*tmp->m_next->m_vertex);
+				ndFloat32 test1 = n.DotProduct(*tmp->m_next->m_vertex - testPoint).GetScalar();
 
 				if (test0 >= ndFloat32(0.0f)) 
 				{
@@ -1057,7 +1058,7 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 						const ndVector& p1 = *tmp->m_next->m_vertex;
 						ndVector dp(p1 - p0);
 						ndAssert(dp.m_w == 0.0f);
-						ndFloat32 den = plane.DotProduct(dp).GetScalar();
+						ndFloat32 den = n.DotProduct(dp).GetScalar();
 						if (ndAbs(den) < ndFloat32(1.0e-24f)) 
 						{
 							den = (den >= ndFloat32(0.0f)) ? ndFloat32(1.0e-24f) : ndFloat32(-1.0e-24f);
@@ -1085,7 +1086,7 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 					isInside |= 1;
 					ndVector dp(p1 - p0);
 					ndAssert(dp.m_w == 0.0f);
-					ndFloat32 den = plane.DotProduct(dp).GetScalar();
+					ndFloat32 den = n.DotProduct(dp).GetScalar();
 					if (ndAbs(den) < ndFloat32(1.0e-24f)) 
 					{
 						den = (den >= ndFloat32(0.0f)) ? ndFloat32(1.0e-24f) : ndFloat32(-1.0e-24f);
@@ -3782,7 +3783,8 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	return contactCount;
 }
 
-ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
+//ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
+ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc&)
 {
 ndAssert(0);
 return 0;
@@ -4361,8 +4363,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 						const ndVector n(normal.CrossProduct(e));
 						ndAssert(n.m_w == ndFloat32(0.0f));
 						ndAssert(n.DotProduct(n).GetScalar() > ndFloat32(0.0f));
-						//ndPlane plane(n, -n.DotProduct(shape0[i0]).GetScalar());
-						//ndFloat32 test = plane.Evalue(p);
+
 						ndFloat32 test = n.DotProduct(p - shape0[i0]).GetScalar();
 						if (test < ndFloat32(-1.e-3f))
 						{
