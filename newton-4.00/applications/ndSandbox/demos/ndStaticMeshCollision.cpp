@@ -38,8 +38,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "testObject.fbx", false);
 	//BuildStaticMesh(scene, "marine_rocks_corsica.fbx", false);
-	//BuildStaticMesh(scene, "marine_rocks_corsica_1.fbx", false);
-	BuildStaticMesh(scene, "marine_rocks_corsica_2.fbx", false);
+	BuildStaticMesh(scene, "marine_rocks_corsica_1.fbx", false);
+	//BuildStaticMesh(scene, "marine_rocks_corsica_2.fbx", false);
 
 	ndMatrix location(ndGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
@@ -77,7 +77,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 1.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, PlaceMatrix(1.0f, 1.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(1.0f, 1.0f, 0.0f), 30.0f, 1.0f, 0.25f, 1.0f);
 	//AddConvexHull(scene, PlaceMatrix(0.0f, 1.0f, 2.0f), 10.0f, 0.6f, 1.0f, 15);
 	//AddConvexHull(scene, PlaceMatrix(0.0f, 1.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
 	//AddConvexHull(scene, PlaceMatrix(1.0f, 1.0f, 0.0f), 10.0f, 0.5f, 1.2f, 6);

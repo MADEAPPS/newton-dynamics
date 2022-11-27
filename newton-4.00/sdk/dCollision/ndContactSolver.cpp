@@ -888,158 +888,6 @@ void ndContactSolver::CalculateContactFromFeacture(ndInt32 featureType)
 	ndAssert(ndAbs(m_separatingVector.DotProduct(m_separatingVector).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 }
 
-ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVector& point1, const ndVector& normal)
-{
-	ndAssert(m_instance0.GetShape()->GetAsShapeConvex());
-	ndAssert(m_instance1.GetShape()->GetAsShapeConvex());
-
-	ndInt32 count = 0;
-	ndInt32 count1 = 0;
-	const ndInt32 baseCount = 16;
-	ndVector* const contactsOut = &m_buffer[0];
-	ndVector* const shape1 = &contactsOut[baseCount];
-	ndAssert(normal.m_w == ndFloat32(0.0f));
-
-	ndVector origin(m_instance1.GetShape()->GetAsShapeAsConvexPolygon() ? point1 : (point0 + point1).Scale(ndFloat32(0.5f)));
-	const ndMatrix& matrix1 = m_instance1.m_globalMatrix;
-	ndVector pointOnInstance1(matrix1.UntransformVector(origin));
-	ndVector normalOnInstance1(matrix1.UnrotateVector(normal));
-	ndFloat32 dist = (normal.DotProduct(point0 - point1)).GetScalar();
-	
-	if (dist < (D_PENETRATION_TOL * ndFloat32 (-0.5f)))
-	{
-		count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, pointOnInstance1, shape1);
-	}
-	if (!count1) 
-	{
-		ndVector step(normal.Scale(D_PENETRATION_TOL * ndFloat32(2.0f)));
-		ndVector alternatePoint(point1);
-		for (ndInt32 i = 0; (i < 3) && !count1; ++i) 
-		{
-			alternatePoint -= step;
-			ndVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
-			count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
-		}
-		step = matrix1.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
-		for (ndInt32 i = 0; i < count1; ++i) 
-		{
-			shape1[i] -= step;
-		}
-	}
-
-	if (count1) 
-	{
-		for (ndInt32 i = 0; i < count1; ++i) 
-		{
-			shape1[i] = matrix1.TransformVector(shape1[i]);
-		}
-
-		ndInt32 count0 = 0;
-		ndVector* const shape0 = &contactsOut[baseCount + count1];
-
-		const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
-		ndVector pointOnInstance0(matrix0.UntransformVector(origin));
-		ndVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale(ndFloat32(-1.0f))));
-
-		if (dist < (D_PENETRATION_TOL * ndFloat32(-0.5f)))
-		{
-			count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
-		}
-		if (!count0) 
-		{
-			ndVector step(normal.Scale(D_PENETRATION_TOL * ndFloat32(2.0f)));
-			ndVector alternatePoint(point0);
-			for (ndInt32 i = 0; (i < 3) && !count0; ++i) 
-			{
-				alternatePoint += step;
-				ndVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
-				count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
-			}
-			//ndTrace (("If this is a frequent event, this routine should return the translation distance as the contact point\n"))
-			//ndAssert(count0);
-			step = matrix0.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
-			for (ndInt32 i = 0; i < count0; ++i) 
-			{
-				shape0[i] -= step;
-			}
-		}
-
-		if (count0) 
-		{
-			for (ndInt32 i = 0; i < count0; ++i) 
-			{
-				shape0[i] = matrix0.TransformVector(shape0[i]);
-			}
-
-			if (count1 == 1) 
-			{
-				count = 1;
-				contactsOut[0] = shape1[0];
-			}
-			else if (count0 == 1) 
-			{
-				count = 1;
-				contactsOut[0] = shape0[0];
-			}
-			else if ((count1 == 2) && (count0 == 2)) 
-			{
-				ndVector p0(shape1[0]);
-				ndVector p1(shape1[1]);
-				const ndVector& q0 = shape0[0];
-				const ndVector& q1 = shape0[1];
-				ndVector p10(p1 - p0);
-				ndVector q10(q1 - q0);
-				ndAssert(p10.m_w == ndFloat32(0.0f));
-				ndAssert(q10.m_w == ndFloat32(0.0f));
-				p10 = p10.Scale(ndRsqrt(p10.DotProduct(p10).GetScalar() + ndFloat32(1.0e-8f)));
-				q10 = q10.Scale(ndRsqrt(q10.DotProduct(q10).GetScalar() + ndFloat32(1.0e-8f)));
-				ndFloat32 dot = q10.DotProduct(p10).GetScalar();
-				if (ndAbs(dot) > ndFloat32(0.998f)) 
-				{
-					// segment are collinear, the contact points is the overlapping segment
-					ndFloat32 pl0 = p0.DotProduct(p10).GetScalar();
-					ndFloat32 pl1 = p1.DotProduct(p10).GetScalar();
-					ndFloat32 ql0 = q0.DotProduct(p10).GetScalar();
-					ndFloat32 ql1 = q1.DotProduct(p10).GetScalar();
-					if (pl0 > pl1) 
-					{
-						ndSwap(pl0, pl1);
-						ndSwap(p0, p1);
-						p10 = p10.Scale(ndFloat32(-1.0f));
-					}
-					if (ql0 > ql1) 
-					{
-						ndSwap(ql0, ql1);
-					}
-					if (!((ql0 > pl1) && (ql1 < pl0))) 
-					{
-						ndFloat32 clip0 = (ql0 > pl0) ? ql0 : pl0;
-						ndFloat32 clip1 = (ql1 < pl1) ? ql1 : pl1;
-
-						count = 2;
-						contactsOut[0] = p0 + p10.Scale(clip0 - pl0);
-						contactsOut[1] = p0 + p10.Scale(clip1 - pl0);
-					}
-				}
-				else 
-				{
-					// only on contact at the closest distance segment
-					count = 1;
-					const ndFastRay ray(p0, p1);
-					const ndRay intesect(ray.RayDistance(q0, q1));
-					contactsOut[0] = (intesect.m_p0 + intesect.m_p1).Scale(ndFloat32(0.5f));
-				}
-			}
-			else 
-			{
-				ndAssert((count1 >= 2) && (count0 >= 2));
-				count = ConvexPolygonsIntersection(normal, count0, shape0, count1, shape1, contactsOut, baseCount);
-			}
-		}
-	}
-	return count;
-}
-
 ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal, ndInt32 count1, ndVector* const shape1, ndInt32 count2, ndVector* const shape2, ndVector* const contactOut, ndVector* const mem) const
 {
 	ndInt32 count = 0;
@@ -1055,7 +903,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 	{
 		ptr = (ndVector*)&shape2[0];
 		ndInt32 i0 = count1 - 1;
-		for (ndInt32 i1 = 0; i1 < count1; i1++) 
+		for (ndInt32 i1 = 0; i1 < count1; ++i1) 
 		{
 			ndVector n(normal.CrossProduct(shape1[i1] - shape1[i0]));
 			ndAssert(n.m_w == ndFloat32(0.0f));
@@ -1118,7 +966,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 	{
 		const ndVector& p = shape2[0];
 		ndInt32 i0 = count1 - 1;
-		for (ndInt32 i1 = 0; i1 < count1; i1++) 
+		for (ndInt32 i1 = 0; i1 < count1; ++i1) 
 		{
 			ndVector n(normal.CrossProduct(shape1[i1] - shape1[i0]));
 			ndAssert(n.m_w == ndFloat32(0.0f));
@@ -1140,7 +988,7 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 		count2 = 0;
 	}
 
-	for (ndInt32 i0 = 0; i0 < count2; i0++) 
+	for (ndInt32 i0 = 0; i0 < count2; ++i0) 
 	{
 		contactOut[i0] = ptr[i0];
 	}
@@ -1166,7 +1014,7 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 		dgPerimenterEdge subdivision[128];
 		ndAssert((2 * (count0 + count1)) < ndInt32(sizeof(subdivision) / sizeof(subdivision[0])));
 
-		for (ndInt32 i0 = 1; i0 < count1; i0++) 
+		for (ndInt32 i0 = 1; i0 < count1; ++i0) 
 		{
 			subdivision[i0].m_vertex = &shape1[i0];
 			subdivision[i0].m_prev = &subdivision[i0 - 1];
@@ -1186,7 +1034,7 @@ ndInt32 ndContactSolver::ConvexPolygonsIntersection(const ndVector& normal, ndIn
 		ndInt32 j0 = 0;
 		ndInt32 edgeIndex = count1;
 		dgPerimenterEdge* poly = &subdivision[0];
-		for (ndInt32 j1 = count0 - 1; j1 >= 0; j1--) 
+		for (ndInt32 j1 = count0 - 1; j1 >= 0; --j1) 
 		{
 			ndVector n(normal.CrossProduct(shape0[j1] - shape0[j0]));
 			ndAssert(n.m_w == 0.0f);
@@ -2441,7 +2289,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 				}
 
 				ndInt32 i0 = newCount - 1;
-				for (ndInt32 i1 = 0; i1 < newCount; i1++) 
+				for (ndInt32 i1 = 0; i1 < newCount; ++i1) 
 				{
 					ndMinkFace* const faceA = m_coneFaceList[i0];
 					ndAssert(faceA->m_mark == 0);
@@ -4218,6 +4066,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	ndContact* const contactJoint = m_contact;
 	const ndInt32* const indexArray = &query.m_faceVertexIndex[0];
 
+//static int xxxx;
 	data.SortFaceArray();
 	for (ndInt32 i = query.m_faceIndexCount.GetCount() - 1; (i >= 0) && (count < 32); --i)
 	{
@@ -4241,11 +4090,23 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 		m_maxCount = countleft;
 		m_vertexIndex = 0;
 		m_contactBuffer = &contactOut[count];
+//xxxx++;
+//if (xxxx == 213)
+//xxxx *= 1;
+
 		ndInt32 count1 = polygon.CalculateContactToConvexHullDescrete(&polySoupInstance, *this);
 		closestDist = ndMin(closestDist, m_separationDistance);
 
 		if (count1 > 0)
 		{
+			//for (int k = 0; k < count1; ++k)
+			//{
+			//	ndVector xxx(m_instance0.m_globalMatrix.UntransformVector(m_contactBuffer[k].m_point));
+			//	ndAssert(ndAbs(xxx.m_x) <= 0.501f);
+			//	ndAssert(ndAbs(xxx.m_y) <= 0.128f);
+			//	ndAssert(ndAbs(xxx.m_z) <= 0.501f);
+			//}
+
 			if (!m_intersectionTestOnly)
 			{
 				count += count1;
@@ -4373,5 +4234,199 @@ ndInt32 ndContactSolver::ConvexToSaticStaticBvhContactsNodeDescrete(const ndAabb
 
 	m_instance0.m_globalMatrix.m_posit = origin0;
 	m_instance1.m_globalMatrix.m_posit = origin1;
+	return count;
+}
+
+ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVector& point1, const ndVector& normal)
+{
+	ndAssert(m_instance0.GetShape()->GetAsShapeConvex());
+	ndAssert(m_instance1.GetShape()->GetAsShapeConvex());
+
+//static int xxxx;
+//xxxx++;
+//if (xxxx == 63)
+//xxxx *= 1;
+
+	ndInt32 count = 0;
+	ndInt32 count1 = 0;
+	const ndInt32 baseCount = 16;
+	ndVector* const contactsOut = &m_buffer[0];
+	ndVector* const shape1 = &contactsOut[baseCount];
+	ndAssert(normal.m_w == ndFloat32(0.0f));
+
+	ndVector origin(m_instance1.GetShape()->GetAsShapeAsConvexPolygon() ? point1 : (point0 + point1).Scale(ndFloat32(0.5f)));
+	const ndMatrix& matrix1 = m_instance1.m_globalMatrix;
+	ndVector pointOnInstance1(matrix1.UntransformVector(origin));
+	ndVector normalOnInstance1(matrix1.UnrotateVector(normal));
+	ndFloat32 dist = (normal.DotProduct(point0 - point1)).GetScalar();
+
+	if (dist < (D_PENETRATION_TOL * ndFloat32(-0.5f)))
+	{
+		count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, pointOnInstance1, shape1);
+	}
+	if (!count1)
+	{
+		ndVector step(normal.Scale(D_PENETRATION_TOL * ndFloat32(2.0f)));
+		ndVector alternatePoint(point1);
+		for (ndInt32 i = 0; (i < 3) && !count1; ++i)
+		{
+			alternatePoint -= step;
+			ndVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
+			count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
+		}
+		step = matrix1.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
+		for (ndInt32 i = 0; i < count1; ++i)
+		{
+			shape1[i] -= step;
+		}
+	}
+
+	if (count1)
+	{
+		for (ndInt32 i = 0; i < count1; ++i)
+		{
+			shape1[i] = matrix1.TransformVector(shape1[i]);
+		}
+
+		ndInt32 count0 = 0;
+		ndVector* const shape0 = &contactsOut[baseCount + count1];
+
+		const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
+		ndVector pointOnInstance0(matrix0.UntransformVector(origin));
+		ndVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale(ndFloat32(-1.0f))));
+
+		if (dist < (D_PENETRATION_TOL * ndFloat32(-0.5f)))
+		{
+			count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
+		}
+		if (!count0)
+		{
+			ndVector step(normal.Scale(D_PENETRATION_TOL * ndFloat32(2.0f)));
+			ndVector alternatePoint(point0);
+			for (ndInt32 i = 0; (i < 3) && !count0; ++i)
+			{
+				alternatePoint += step;
+				ndVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
+				count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
+			}
+			//ndTrace (("If this is a frequent event, this routine should return the translation distance as the contact point\n"))
+			//ndAssert(count0);
+			step = matrix0.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
+			for (ndInt32 i = 0; i < count0; ++i)
+			{
+				shape0[i] -= step;
+			}
+		}
+
+		if (count0)
+		{
+			//ndVector aaaaaa[8];
+			//ndShapeConvexPolygon* xxxxxx = m_instance1.GetShape()->GetAsShapeAsConvexPolygon();
+			//for (int k = 0; k < xxxxxx->m_count; ++k)
+			//{
+			//	aaaaaa[k] = m_instance0.m_globalMatrix.UntransformVector(m_instance1.m_globalMatrix.TransformVector(xxxxxx->m_localPoly[k]));
+			//}
+			//ndVector nnnnnn_0(m_instance0.m_globalMatrix.UnrotateVector(normal));
+			//ndVector aaaaaa_0(m_instance0.m_globalMatrix.UntransformVector(point0));
+			//ndVector aaaaaa_1(m_instance0.m_globalMatrix.UntransformVector(point1));
+			//
+			//ndVector bbbbbb[8];
+			//for (ndInt32 i = 0; i < count1; ++i)
+			//{
+			//	bbbbbb[i] = matrix0.UntransformVector(shape1[i]);
+			//}
+
+			for (ndInt32 i = 0; i < count0; ++i)
+			{
+				shape0[i] = matrix0.TransformVector(shape0[i]);
+			}
+
+			if (count0 == 1)
+			{
+				count = 1;
+				contactsOut[0] = shape0[0];
+			}
+			else if (count1 == 1)
+			{
+				count = 1;
+				contactsOut[0] = shape1[0];
+				if (m_instance1.GetShape()->GetAsShapeAsConvexPolygon())
+				{
+					ndInt32 i0 = count0 - 1;
+					const ndVector p (shape1[0]);
+					for (ndInt32 i1 = 0; i1 < count0; i1++)
+					{
+						const ndVector e(shape0[i1] - shape0[i0]);
+						const ndVector n(normal.CrossProduct(e));
+						ndAssert(n.m_w == ndFloat32(0.0f));
+						ndAssert(n.DotProduct(n).GetScalar() > ndFloat32(0.0f));
+						//ndPlane plane(n, -n.DotProduct(shape0[i0]).GetScalar());
+						//ndFloat32 test = plane.Evalue(p);
+						ndFloat32 test = n.DotProduct(p - shape0[i0]).GetScalar();
+						if (test < ndFloat32(-1.e-3f))
+						{
+							count = 0;
+							break;
+						}
+						i0 = i1;
+					}
+				}
+			}
+			else if ((count1 == 2) && (count0 == 2))
+			{
+				ndVector p0(shape1[0]);
+				ndVector p1(shape1[1]);
+				const ndVector& q0 = shape0[0];
+				const ndVector& q1 = shape0[1];
+				ndVector p10(p1 - p0);
+				ndVector q10(q1 - q0);
+				ndAssert(p10.m_w == ndFloat32(0.0f));
+				ndAssert(q10.m_w == ndFloat32(0.0f));
+				p10 = p10.Scale(ndRsqrt(p10.DotProduct(p10).GetScalar() + ndFloat32(1.0e-8f)));
+				q10 = q10.Scale(ndRsqrt(q10.DotProduct(q10).GetScalar() + ndFloat32(1.0e-8f)));
+				ndFloat32 dot = q10.DotProduct(p10).GetScalar();
+				if (ndAbs(dot) > ndFloat32(0.998f))
+				{
+					// segment are collinear, the contact points is the overlapping segment
+					ndFloat32 pl0 = p0.DotProduct(p10).GetScalar();
+					ndFloat32 pl1 = p1.DotProduct(p10).GetScalar();
+					ndFloat32 ql0 = q0.DotProduct(p10).GetScalar();
+					ndFloat32 ql1 = q1.DotProduct(p10).GetScalar();
+					if (pl0 > pl1)
+					{
+						ndSwap(pl0, pl1);
+						ndSwap(p0, p1);
+						p10 = p10.Scale(ndFloat32(-1.0f));
+					}
+					if (ql0 > ql1)
+					{
+						ndSwap(ql0, ql1);
+					}
+					if (!((ql0 > pl1) && (ql1 < pl0)))
+					{
+						ndFloat32 clip0 = (ql0 > pl0) ? ql0 : pl0;
+						ndFloat32 clip1 = (ql1 < pl1) ? ql1 : pl1;
+
+						count = 2;
+						contactsOut[0] = p0 + p10.Scale(clip0 - pl0);
+						contactsOut[1] = p0 + p10.Scale(clip1 - pl0);
+					}
+				}
+				else
+				{
+					// only on contact at the closest distance segment
+					count = 1;
+					const ndFastRay ray(p0, p1);
+					const ndRay intesect(ray.RayDistance(q0, q1));
+					contactsOut[0] = (intesect.m_p0 + intesect.m_p1).Scale(ndFloat32(0.5f));
+				}
+			}
+			else
+			{
+				ndAssert((count1 >= 2) && (count0 >= 2));
+				count = ConvexPolygonsIntersection(normal, count0, shape0, count1, shape1, contactsOut, baseCount);
+			}
+		}
+	}
 	return count;
 }

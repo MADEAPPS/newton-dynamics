@@ -426,7 +426,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
-	m_autoSleepMode = false;
+	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndOpenclSolver1;
 	//m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
@@ -434,12 +434,12 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
-	m_workerThreads = 1;
+	m_workerThreads = 4;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
-	//m_showContactPoints = true;
+	m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
