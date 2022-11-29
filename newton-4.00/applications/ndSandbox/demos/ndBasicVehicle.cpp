@@ -173,6 +173,14 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 	{
 		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
 
+		// reset gear box ratios
+		m_transmission.m_gearsCount = 4;
+		m_transmission.m_forwardRatios[0] = 2.5f;
+		m_transmission.m_forwardRatios[1] = 1.5f;
+		m_transmission.m_forwardRatios[2] = 1.1f;
+		m_transmission.m_forwardRatios[3] = 0.8f;
+		m_transmission.m_crownGearRatio = 12.0f;
+
 		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 800.0f;
 		ndFloat32 horsePower = 600.0f;

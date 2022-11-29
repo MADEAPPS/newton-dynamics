@@ -16,7 +16,7 @@
 #include "ndDemoEntity.h"
 #include "ndContactCallback.h"
 
-#define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
+#define AUTOMATION_TRANSMISSION_FRAME_DELAY 300
 
 class ndVehicleDectriptor
 {

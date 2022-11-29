@@ -118,17 +118,13 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_chassisAngularDrag = 0.25f;
 	m_transmission.m_gearsCount = 4;
 	m_transmission.m_neutral = 0.0f;
-	m_transmission.m_crownGearRatio = 10.0f;
 	m_transmission.m_reverseRatio = -3.0f;
-	//m_transmission.m_forwardRatios[0] = 2.25f;
-	//m_transmission.m_forwardRatios[1] = 1.60f;
-	//m_transmission.m_forwardRatios[2] = 1.10f;
-	//m_transmission.m_forwardRatios[3] = 0.80f;
+	m_transmission.m_crownGearRatio = 10.0f;
 
 	m_transmission.m_forwardRatios[0] = 3.0f;
-	m_transmission.m_forwardRatios[1] = 1.50f;
-	m_transmission.m_forwardRatios[2] = 1.10f;
-	m_transmission.m_forwardRatios[3] = 0.80f;
+	m_transmission.m_forwardRatios[1] = 1.5f;
+	m_transmission.m_forwardRatios[2] = 1.1f;
+	m_transmission.m_forwardRatios[3] = 0.8f;
 
 	m_transmission.m_torqueConverter = 2000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
@@ -517,6 +513,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 			}
 		}
 		m_autoGearShiftTimer--;
+		//ndTrace(("gear:%d gearGain:%f\n", m_currentGear, m_configuration.m_transmission.m_forwardRatios[m_currentGear]));
 
 		// neural gear
 		if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
