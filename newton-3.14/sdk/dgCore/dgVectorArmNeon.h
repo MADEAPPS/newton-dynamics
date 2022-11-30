@@ -1232,7 +1232,7 @@ public:
 
 	DG_INLINE dgVector& operator+= (const dgVector& A)
 	{
-		return (*this = vsubq_f32(m_type, A.m_type));
+		return (*this = vaddq_f32(m_type, A.m_type));
 	}
 
 	DG_INLINE dgVector& operator-= (const dgVector& A)
