@@ -16,7 +16,7 @@
 #include "ndDemoEntity.h"
 #include "ndContactCallback.h"
 
-#define AUTOMATION_TRANSMISSION_FRAME_DELAY 300
+//#define AUTOMATION_TRANSMISSION_FRAME_DELAY 300
 
 class ndVehicleDectriptor
 {
@@ -73,6 +73,7 @@ class ndVehicleDectriptor
 		ndFloat32 m_lockedClutchTorque;
 		ndFloat32 m_crownGearRatio;
 		ndFloat32 m_torqueConverter;
+		ndInt32 m_gearShiftDelayTicks;
 		bool m_manual;
 	};
 

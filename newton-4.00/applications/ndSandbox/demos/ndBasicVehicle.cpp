@@ -179,7 +179,7 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_transmission.m_forwardRatios[1] = 1.5f;
 		m_transmission.m_forwardRatios[2] = 1.1f;
 		m_transmission.m_forwardRatios[3] = 0.8f;
-		m_transmission.m_crownGearRatio = 12.0f;
+		m_transmission.m_crownGearRatio = 20.0f;
 
 		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 800.0f;
@@ -199,7 +199,7 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_frontTire.m_regularizer = 0.2f;
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
-		m_frontTire.m_brakeTorque = 1000.0f;
+		m_frontTire.m_brakeTorque = 10000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
 		m_rearTire.m_mass = 100.0f;
@@ -210,8 +210,8 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_rearTire.m_regularizer = 0.2f;
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
-		m_rearTire.m_brakeTorque = 2000.0f;
-		m_rearTire.m_handBrakeTorque = 1000000.0f;
+		m_rearTire.m_brakeTorque = 10000.0f;
+		m_rearTire.m_handBrakeTorque = 50000.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 

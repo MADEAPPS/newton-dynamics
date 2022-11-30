@@ -129,6 +129,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_torqueConverter = 2000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
 	m_transmission.m_lockedClutchTorque = 1.0e6f;
+	m_transmission.m_gearShiftDelayTicks = 300;
 	m_transmission.m_manual = true;
 
 	m_frontTire.m_mass = 20.0f;
@@ -461,7 +462,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 			}
 			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
+			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
 		}
 
 		// transmission front gear down
@@ -482,7 +483,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 			}
 			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
+			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
 		}
 
 		const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
@@ -497,7 +498,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 						m_currentGear--;
 						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
+						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
 					}
 				}
 				else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
@@ -507,7 +508,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 						m_currentGear++;
 						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
+						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
 					}
 				}
 			}
