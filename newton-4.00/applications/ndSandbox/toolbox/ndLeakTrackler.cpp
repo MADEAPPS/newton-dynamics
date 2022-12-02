@@ -76,6 +76,12 @@ class ApplicationMemoryLeakTracket: public ndTree<ndUnsigned64, void*, ndLeakTra
 // make sure new and delete are all directed to sdk memory callbacks
 void* operator new (size_t size)
 {
+	static bool initialized = false;
+	if (!initialized)
+	{
+		initialized = true;
+		ndSetAllocators allocators;
+	}
 	void* const ptr = ndMemory::Malloc(size);
 	ndAssert((ndUnsigned64(ptr) & (0x1f)) == 0);
 	return ptr;
@@ -111,5 +117,12 @@ static void PhysicsFree(void* ptr)
 
 ndSetAllocators::ndSetAllocators()
 {
-	ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+	ndMemFreeCallback free;
+	ndMemAllocCallback alloc;
+	
+	ndMemory::GetMemoryAllocators(alloc, free);
+	if (alloc != PhysicsAlloc) 
+	{
+		ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+	}
 };

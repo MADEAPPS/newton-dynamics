@@ -15,8 +15,11 @@
 
 static ndSetAllocators setAllocators;
 
+#include <string>
+
 int main(int, char**)
 {
+	std::string xxxx;
 	ndDemoEntityManager demos;
 	demos.Run();
 	return 0;
