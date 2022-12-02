@@ -13,13 +13,14 @@
 #include "ndDemoEntityManager.h"
 #include "ndLeakTrackler.h"
 
-static ndSetAllocators setAllocators;
-
 #include <string>
+std::string xxxx0("before");
+static ndSetAllocators setAllocators;
+std::string xxxx1("after");
 
 int main(int, char**)
 {
-	std::string xxxx;
+	std::string xxxx2("local");
 	ndDemoEntityManager demos;
 	demos.Run();
 	return 0;
