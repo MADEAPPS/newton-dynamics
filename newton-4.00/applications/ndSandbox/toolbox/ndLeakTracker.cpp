@@ -87,16 +87,44 @@ class ApplicationMemoryLeakTracker: public ndTree<ndInt64, void*, ndLeakTrackerA
 	bool m_startTracking;
 };
 
+// memory allocation for Newton
+static void* PhysicsAlloc(size_t sizeInBytes)
+{
+	void* const ptr = malloc(sizeInBytes);
+	ndAssert(ptr);
+
+	#ifdef ND_USE_LEAK_TRACKER
+	ApplicationMemoryLeakTracker::GetLeakTracker().InsertPointer(ptr);
+	#endif
+	return ptr;
+}
+
+// memory free use by the engine
+static void PhysicsFree(void* ptr)
+{
+	#ifdef ND_USE_LEAK_TRACKER
+	ApplicationMemoryLeakTracker::GetLeakTracker().RemovePointer(ptr);
+	#endif
+	free(ptr);
+}
+
 // make sure new and delete are all directed to sdk memory callbacks
 void* operator new (size_t size)
 {
 	static bool initialized = false;
 	if (!initialized)
 	{
+		ndMemFreeCallback free;
+		ndMemAllocCallback alloc;
+
 		initialized = true;
-		ndSetAllocators allocators;
-		ApplicationMemoryLeakTracker& tracker = ApplicationMemoryLeakTracker::GetLeakTracker();
-		tracker.m_startTracking = false;
+		ndMemory::GetMemoryAllocators(alloc, free);
+		if (alloc != PhysicsAlloc)
+		{
+			ndSetAllocators allocators;
+			ApplicationMemoryLeakTracker& tracker = ApplicationMemoryLeakTracker::GetLeakTracker();
+			tracker.m_startTracking = false;
+		}
 	}
 	void* const ptr = ndMemory::Malloc(size);
 	ndAssert((ndUnsigned64(ptr) & (0x1f)) == 0);
@@ -108,28 +136,6 @@ void operator delete (void* ptr) noexcept
 	ndMemory::Free(ptr);
 }
 
-// memory allocation for Newton
-static void* PhysicsAlloc(size_t sizeInBytes)
-{
-	void* const ptr = malloc(sizeInBytes);
-	ndAssert(ptr);
-
-	#ifdef ND_USE_LEAK_TRACKER
-		ApplicationMemoryLeakTracker::GetLeakTracker().InsertPointer(ptr);
-	#endif
-
-	return ptr;
-}
-
-// memory free use by the engine
-static void PhysicsFree(void* ptr)
-{
-	#ifdef ND_USE_LEAK_TRACKER
-		ApplicationMemoryLeakTracker::GetLeakTracker().RemovePointer(ptr);
-	#endif
-
-	free(ptr);
-}
 
 ndSetAllocators::ndSetAllocators()
 {
