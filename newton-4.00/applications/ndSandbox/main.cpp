@@ -11,16 +11,17 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntityManager.h"
-#include "ndLeakTrackler.h"
+#include "ndLeakTracker.h"
 
 #include <string>
 std::string xxxx0("before");
-static ndSetAllocators setAllocators;
-std::string xxxx1("after");
 
 int main(int, char**)
 {
-	std::string xxxx2("local");
+	std::string xxxx2("local0");
+	ndSetAllocators setAllocators;
+	std::string xxxx3("local1");
+
 	ndDemoEntityManager demos;
 	demos.Run();
 	return 0;
