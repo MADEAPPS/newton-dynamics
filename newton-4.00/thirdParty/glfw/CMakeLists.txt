@@ -15,6 +15,11 @@ message (${projectName})
 
 add_definitions(-D_GLFW_WIN32)
 
+if (MSVC)
+	#include_directories(../../sdk/thirdParty/glfw/include/)
+	include_directories(include/GLFW)
+endif()
+
  # low level core
 file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c 
 				 src/context.c src/egl_context.c src/egl_context.c

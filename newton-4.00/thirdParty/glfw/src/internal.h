@@ -46,7 +46,12 @@
 #endif
 
 #define GLFW_INCLUDE_NONE
-#include "../include/GLFW/glfw3.h"
+
+#ifdef _MSC_VER
+	#include "glfw3.h"
+#else
+	#include "../include/GLFW/glfw3.h"
+#endif
 
 typedef int GLFWbool;
 
