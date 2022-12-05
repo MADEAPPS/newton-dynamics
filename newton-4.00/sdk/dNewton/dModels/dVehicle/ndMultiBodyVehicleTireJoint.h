@@ -67,6 +67,7 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	ndTireFrictionModel m_frictionModel;
 	ndFloat32 m_lateralSlip;
 	ndFloat32 m_longitudinalSlip;
+	ndFloat32 m_normalizedAligningTorque;
 	friend class ndMultiBodyVehicle;
 };
 

@@ -22,6 +22,7 @@ ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndP
 	,m_frictionModel(info)
 	,m_lateralSlip(ndFloat32 (0.0f))
 	,m_longitudinalSlip(ndFloat32(0.0f))
+	,m_normalizedAligningTorque(ndFloat32(0.0f))
 {
 	m_frictionModel.m_laterialStiffness = ndMax(ndAbs(m_frictionModel.m_laterialStiffness), ndFloat32(1.0f));
 	m_frictionModel.m_longitudinalStiffness = ndMax(ndAbs(m_frictionModel.m_longitudinalStiffness), ndFloat32(1.0f));
@@ -33,6 +34,7 @@ ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::n
 	,m_frictionModel()
 	,m_lateralSlip(ndFloat32(0.0f))
 	,m_longitudinalSlip(ndFloat32(0.0f))
+	,m_normalizedAligningTorque(ndFloat32(0.0f))
 {
 	ndAssert(0);
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
