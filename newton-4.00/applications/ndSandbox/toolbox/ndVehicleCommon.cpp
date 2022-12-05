@@ -251,7 +251,6 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 	}
 }
 
-
 ndVehicleMaterial::ndVehicleMaterial()
 	:ndApplicationMaterial()
 {
@@ -269,9 +268,6 @@ ndVehicleMaterial* ndVehicleMaterial::Clone() const
 
 bool ndVehicleMaterial::OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const
 {
-	//const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
-	//const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
-
 	// the collision may be a sub part, get the material of the root shape. 
 	const ndShapeMaterial& material0 = joint->GetBody0()->GetCollisionShape().GetMaterial();
 	const ndShapeMaterial& material1 = joint->GetBody1()->GetCollisionShape().GetMaterial();

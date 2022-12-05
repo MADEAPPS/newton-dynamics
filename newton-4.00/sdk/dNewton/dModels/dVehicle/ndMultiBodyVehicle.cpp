@@ -1218,6 +1218,8 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndTireContactPair* c
 		ndContactPointList& contactPoints = contact->GetContactPoints();
 		ndMatrix tireBasisMatrix(tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
 		tireBasisMatrix.m_posit = tire->GetBody0()->GetMatrix().m_posit;
+		const ndMaterial* const material = contact->GetMaterial();
+		bool useCoulombModel = (material->m_flags & m_useBrushTireModel) ? false : true;
 		for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 		{
 			ndContactMaterial& contactPoint = contactNode->GetInfo();
@@ -1238,7 +1240,7 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndTireContactPair* c
 				ndVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
 				ndAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(0.0f));
 				ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
-				if (contactPatch > ndFloat32(-0.71f))
+				if (useCoulombModel || (contactPatch > ndFloat32(-0.71f)))
 				{
 					contactCount--;
 					tireContacts[i] = tireContacts[contactCount];
@@ -1338,7 +1340,7 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
 	}
 
 	//ApplyVehicleDynamicControl(timestep, &tireContacts[0], tireContacts.GetCount());
-	//ApplyTireModel(timestep, &tireContacts[0], tireContacts.GetCount());
+	ApplyTireModel(timestep, &tireContacts[0], tireContacts.GetCount());
 }
 
 

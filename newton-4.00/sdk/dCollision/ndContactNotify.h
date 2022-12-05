@@ -29,11 +29,11 @@ class ndScene;
 class ndContact;
 class ndShapeInstance;
 
-class ndMaterial : public ndClassAlloc
+class ndMaterial : public ndContainersFreeListAlloc<ndMaterial>
 {
 	public:
 	ndMaterial()
-		:ndClassAlloc()
+		:ndContainersFreeListAlloc<ndMaterial>()
 	{
 		m_restitution = ndFloat32(0.4f);
 		m_staticFriction0 = ndFloat32(0.8f);
