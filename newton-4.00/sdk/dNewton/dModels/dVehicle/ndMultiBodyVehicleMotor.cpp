@@ -88,7 +88,7 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	m_body0->SetOmegaNoSleep(omega);
 }
 
-void ndMultiBodyVehicleMotor::SetFrictionLose(ndFloat32 newtonMeters)
+void ndMultiBodyVehicleMotor::SetFrictionLoss(ndFloat32 newtonMeters)
 {
 	m_internalFriction = ndAbs(newtonMeters);
 }
@@ -106,7 +106,6 @@ void ndMultiBodyVehicleMotor::SetOmegaAccel(ndFloat32 rpmStep)
 void ndMultiBodyVehicleMotor::SetTorqueAndRpm(ndFloat32 newtonMeters, ndFloat32 rpm)
 {
 	m_engineTorque = ndMax(newtonMeters, ndFloat32(0.0f));
-//m_engineTorque *= 3.0f;
 	m_targetOmega = ndClamp(rpm / dRadPerSecToRpm, ndFloat32(0.0f), m_maxOmega);
 }
 
@@ -155,7 +154,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	const ndFloat32 torque = ndMax(m_engineTorque, m_internalFriction);
 	SetMotorAcceleration(desc, accel);
 	SetHighFriction(desc, torque);
-	SetLowerFriction(desc, -torque);
+	SetLowerFriction(desc, -m_internalFriction);
 	SetDiagonalRegularizer(desc, ndFloat32(0.1f));
 
 	// add torque coupling to chassis.

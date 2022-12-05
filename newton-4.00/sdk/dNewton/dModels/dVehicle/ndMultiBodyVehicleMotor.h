@@ -37,7 +37,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 GetRpm() const;
 	D_NEWTON_API void SetMaxRpm(ndFloat32 redLineRpm);
 	D_NEWTON_API void SetOmegaAccel(ndFloat32 rpmStep);
-	D_NEWTON_API void SetFrictionLose(ndFloat32 newtonMeters);
+	D_NEWTON_API void SetFrictionLoss(ndFloat32 newtonMeters);
 	D_NEWTON_API void SetTorqueAndRpm(ndFloat32 rpm, ndFloat32 newtonMeters);
 
 	private:

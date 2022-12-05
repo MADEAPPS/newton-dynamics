@@ -325,6 +325,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
 		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		motor->SetFrictionLoss(m_configuration.m_engine.GetTorque(0.0f) * 0.5f);
 
 		// add the gear box
 		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(m_motor, differential);
@@ -696,19 +697,20 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	bool m_startEngineMemory;
 };
 
-static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
+//static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
+static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMatrix&)
 {
-	ndMatrix localAxis(ndGetIdentityMatrix());
-	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
-	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-	
-	ndFloat32 height = 1.9f;
-	ndFloat32 radio = 0.5f;
-	ndFloat32 mass = 100.0f;
-	ndDemoEntity* const entity = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	//ndMatrix localAxis(ndGetIdentityMatrix());
+	//localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+	//localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
+	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+	//
+	//ndFloat32 height = 1.9f;
+	//ndFloat32 radio = 0.5f;
+	//ndFloat32 mass = 100.0f;
+	//ndDemoEntity* const entity = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-	delete entity;
+	//delete entity;
 }
 
 class ndPlacementMatrix : public ndMatrix

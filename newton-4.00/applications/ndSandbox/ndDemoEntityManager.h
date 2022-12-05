@@ -152,10 +152,11 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context);
 
 	bool IsShiftKeyDown () const;
+	bool JoystickDetected() const;
 	bool IsControlKeyDown () const;
 	bool GetKeyState(ndInt32 key) const;
-	ndInt32 GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues);
-	ndInt32 GetJoystickButtons (ndFixSizeArray<char, 32>& axisbuttons);
+	void GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues);
+	void GetJoystickButtons (ndFixSizeArray<char, 32>& axisbuttons);
 
 	bool GetCaptured () const;
 	bool GetMouseKeyState (ndInt32 button ) const;
@@ -242,7 +243,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_showUI;
 	bool m_showAABB;
 	bool m_showStats;
-	bool m_hasJoytick;
 	bool m_autoSleepMode;
 	bool m_showScene;
 	bool m_showConcaveEdge;

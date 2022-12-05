@@ -207,8 +207,18 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 {
 	ndFixSizeArray<char, 32> buttons;
 	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-	scene->GetJoystickButtons(buttons);
-	if (m_changeVehicle.Update(scene->GetKeyState('C') || buttons[5]))
+
+	if (scene->JoystickDetected())
+	{
+		scene->GetJoystickButtons(buttons);
+	}
+	else
+	{
+		buttons.SetCount(4);
+		buttons[3] = scene->GetKeyState('C');
+	}
+		
+	if (m_changeVehicle.Update(buttons[3] ? true : false))
 	{
 		const ndModelList& modelList = world->GetModelList();
 
@@ -394,184 +404,6 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 	return tireBody;
 }
 
-void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
-{
-	if (m_isPlayer && m_motor)
-	{
-		ndFixSizeArray<ndFloat32, 8> axis;
-		ndFixSizeArray<char, 32> buttons;
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-
-		scene->GetJoystickAxis(axis);
-		scene->GetJoystickButtons(buttons);
-		
-		ndFloat32 brake = scene->GetKeyState('S') ? ndFloat32 (1.0f) : ndFloat32 (0.0f);
-		if (brake == 0.0f)
-		{
-			ndFloat32 val = (axis[4] + 1.0f) * 0.5f;
-			brake = val * val * val;
-			//dTrace(("brake %f\n", brake));
-		}
-
-		ndFloat32 throttle = ndFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
-		if (throttle == 0.0f)
-		{
-			throttle = (axis[5] + 1.0f) * 0.5f;
-			throttle = throttle * throttle * throttle;
-		}
-
-		ndFloat32 steerAngle = ndFloat32(scene->GetKeyState('A')) - ndFloat32(scene->GetKeyState('D'));
-		if (ndAbs(steerAngle) == 0.0f)
-		{
-			steerAngle = - axis[0] * axis[0] * axis[0];
-		}
-		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
-
-		ndFloat32 handBrake = (scene->GetKeyState(' ') || buttons[4]) ? 1.0f : 0.0f;
-
-		if (m_parking.Update(scene->GetKeyState('P') || buttons[6]))
-		{
-			m_isParked = !m_isParked;
-		}
-
-		if (m_ignition.Update(scene->GetKeyState('I') || buttons[7]))
-		{
-			m_startEngine = !m_startEngine;
-		}
-
-		if (m_manualTransmission.Update(scene->GetKeyState('?') || scene->GetKeyState('/') || buttons[8]))
-		{
-			m_isManualTransmission = !m_isManualTransmission;
-		}
-
-		// transmission front gear up
-		if (m_forwardGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
-		{
-			m_isParked = false;
-			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-			{
-				m_currentGear = 0;
-			}
-			else
-			{
-				m_currentGear++;
-				if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
-				{
-					m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
-				}
-			}
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-		}
-
-		// transmission front gear down
-		if (m_forwardGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
-		{
-			m_isParked = false;
-			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-			{
-				m_currentGear = 0;
-			}
-			else
-			{
-				m_currentGear--;
-				if (m_currentGear <= 0)
-				{
-					m_currentGear = 0;
-				}
-			}
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-		}
-
-		const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
-		if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
-		{
-			if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
-			{
-				if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
-				{
-					if (m_currentGear > 0)
-					{
-						m_currentGear--;
-						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-					}
-				}
-				else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
-				{
-					if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
-					{
-						m_currentGear++;
-						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-					}
-				}
-			}
-		}
-		m_autoGearShiftTimer--;
-		//ndTrace(("gear:%d gearGain:%f\n", m_currentGear, m_configuration.m_transmission.m_forwardRatios[m_currentGear]));
-
-		// neural gear
-		if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
-		{
-			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
-			m_gearBox->SetRatio(0.0f);
-		}
-
-		// reverse gear
-		if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
-		{
-			m_isParked = false;
-			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
-
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-		}
-
-		if (m_isParked)
-		{
-			brake = 1.0f;
-		}
-
-		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-		{
-			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-			tire->SetSteering(m_steerAngle);
-			tire->SetBrake(brake);
-			tire->SetHandBrake(handBrake);
-		}
-
-		// set the transmission Torque converter when the power reverses.
-		m_gearBox->SetInternalLosesTorque(m_configuration.m_transmission.m_torqueConverter);
-		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
-		{
-			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
-		}
-		else
-		{
-			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
-		}
-
-		if (m_startEngine)
-		{
-			ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
-			ndFloat32 desiredOmega = ndMax (m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
-			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
-			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
-			m_chassis->SetSleepState(false);
-		}
-		else
-		{
-			m_motor->SetTorqueAndRpm(0.0f, 0.0f);
-		}
-	}
-}
-
 void ndBasicVehicle::Update(ndWorld* const world, ndFloat32 timestep)
 {
 	ndMultiBodyVehicle::Update(world, timestep);
@@ -625,4 +457,205 @@ void ndBasicVehicle::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		m_motor->GetBody0()->SetMatrix(m_motor->GetBody0()->GetMatrix() * matrix);
 	}
 #endif
+}
+
+void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
+{
+	if (m_isPlayer && m_motor)
+	{
+		ndFixSizeArray<ndFloat32, 8> axis;
+		ndFixSizeArray<char, 32> buttons;
+		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+
+		if (scene->JoystickDetected())
+		{
+			scene->GetJoystickButtons(buttons);
+			//for (ndInt32 i = 0; i < buttons.GetCount(); i++)
+			//{
+			//	if (buttons[i])
+			//	{
+			//		ndTrace(("button_%d: %d\n", i, buttons[i]));
+			//	}
+			//}
+
+			scene->GetJoystickAxis(axis);
+			//for (ndInt32 i = 0; i < axis.GetCount(); i++)
+			//{
+			//	if ((ndAbs (axis[i]) > 0.01f) && (ndAbs(axis[i]) < 0.99f))
+			//	{
+			//		ndTrace(("axis_%d: %f\n", i, axis[i]));
+			//	}
+			//}
+			axis[0] = -axis[0];
+			axis[1] = (1.0f - axis[1]) * 0.5f;
+			axis[2] = (1.0f - axis[2]) * 0.5f;
+		}
+		else
+		{
+			buttons.SetCount(10);
+			buttons[0] = 0;
+			buttons[1] = scene->GetKeyState(' ');
+			buttons[2] = 0;
+			buttons[3] = 0;
+			buttons[4] = scene->GetKeyState('>') || scene->GetKeyState('.');
+			buttons[5] = scene->GetKeyState('<') || scene->GetKeyState(',');
+			buttons[6] = scene->GetKeyState('N');
+			buttons[7] = scene->GetKeyState('I');
+			buttons[8] = scene->GetKeyState('R');
+			buttons[9] = scene->GetKeyState('?') || scene->GetKeyState('/');
+			buttons[10] = scene->GetKeyState('P');
+
+			axis.SetCount(4);
+			ndFloat32 steerAngle = ndFloat32(scene->GetKeyState('A')) - ndFloat32(scene->GetKeyState('D'));
+			axis[0] = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+			axis[1] = ndFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
+			axis[2] = ndFloat32(scene->GetKeyState('S') ? 1.0f : 0.0f);
+		}
+
+		m_steerAngle = axis[0];
+		ndFloat32 brake = axis[2];
+		ndFloat32 throttle = axis[1];
+		ndFloat32 handBrake = buttons[1] ? 1.0f : 0.0f;
+
+		if (m_parking.Update(buttons[10] ? true : false))
+		{
+			m_isParked = !m_isParked;
+		}
+
+		if (m_ignition.Update(buttons[7] ? true : false))
+		{
+			m_startEngine = !m_startEngine;
+		}
+
+		if (m_manualTransmission.Update(buttons[9] ? true : false))
+		{
+			m_isManualTransmission = !m_isManualTransmission;
+		}
+
+		// transmission front gear up
+		if (m_forwardGearUp.Update(buttons[4] ? true : false))
+		{
+			m_isParked = false;
+			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
+			{
+				m_currentGear = 0;
+			}
+			else
+			{
+				m_currentGear++;
+				if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
+				{
+					m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
+				}
+			}
+			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+			m_gearBox->SetRatio(gearGain);
+			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+		}
+
+		// transmission front gear down
+		if (m_forwardGearDown.Update(buttons[5] ? true : false))
+		{
+			m_isParked = false;
+			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
+			{
+				m_currentGear = 0;
+			}
+			else
+			{
+				m_currentGear--;
+				if (m_currentGear <= 0)
+				{
+					m_currentGear = 0;
+				}
+			}
+			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+			m_gearBox->SetRatio(gearGain);
+			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+		}
+
+		const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
+		if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
+		{
+			if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
+			{
+				if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
+				{
+					if (m_currentGear > 0)
+					{
+						m_currentGear--;
+						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+						m_gearBox->SetRatio(gearGain);
+						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+					}
+				}
+				else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
+				{
+					if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
+					{
+						m_currentGear++;
+						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+						m_gearBox->SetRatio(gearGain);
+						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
+					}
+				}
+			}
+		}
+		m_autoGearShiftTimer--;
+		//ndTrace(("gear:%d gearGain:%f\n", m_currentGear, m_configuration.m_transmission.m_forwardRatios[m_currentGear]));
+
+		// neural gear
+		if (m_neutralGear.Update(buttons[6] ? true : false))
+		{
+			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
+			m_gearBox->SetRatio(0.0f);
+		}
+
+		// reverse gear
+		if (m_reverseGear.Update(buttons[8] ? true : false))
+		{
+			m_isParked = false;
+			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
+
+			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+			m_gearBox->SetRatio(gearGain);
+		}
+
+		if (m_isParked)
+		{
+			brake = 1.0f;
+		}
+
+		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+		{
+			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+			tire->SetSteering(m_steerAngle);
+			tire->SetBrake(brake);
+			tire->SetHandBrake(handBrake);
+		}
+
+		// set the transmission Torque converter when the power reverses.
+		m_gearBox->SetInternalLosesTorque(m_configuration.m_transmission.m_torqueConverter);
+		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
+		{
+			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
+		}
+		else
+		{
+			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
+		}
+
+		if (m_startEngine)
+		{
+			ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
+			ndFloat32 desiredOmega = ndMax(m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
+			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
+			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
+			m_chassis->SetSleepState(false);
+		}
+		else
+		{
+			m_motor->SetTorqueAndRpm(0.0f, 0.0f);
+		}
+	}
 }

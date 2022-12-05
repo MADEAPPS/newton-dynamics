@@ -273,7 +273,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showUI(true)
 	,m_showAABB(false)
 	,m_showStats(true)
-	,m_hasJoytick(false)
 	,m_autoSleepMode(true)
 	,m_showScene(false)
 	,m_showConcaveEdge(false)
@@ -328,7 +327,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	#endif
 
-	m_hasJoytick = glfwJoystickPresent(0) ? true : false;
+	//m_hasJoytick = glfwJoystickPresent(0) ? true : false;
 
 	// Create window with graphics context
 	char version[256];
@@ -610,31 +609,21 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
+bool ndDemoEntityManager::JoystickDetected() const
 {
+	return glfwJoystickPresent(0) ? true : false;
+}
+
+void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
+{
+	ndAssert(JoystickDetected());
 	ndInt32 axisCount = 0;
-	for (ndInt32 i = 0; i < axisValues.GetCapacity(); ++i)
+	axisValues.SetCount(0);
+	const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+	axisCount = ndMin (axisCount, axisValues.GetCapacity());
+	for (ndInt32 i = 0; i < axisCount; ++i) 
 	{
-		axisValues[i] = ndFloat32(0.0f);
-	}
-	// for xbox controllers.
-	axisValues[4] = ndFloat32(-1.0f);
-	axisValues[5] = ndFloat32(-1.0f);
-
-	if (!m_hasJoytick)
-	{
-		m_hasJoytick = glfwJoystickPresent(0) ? true : false;
-	}
-
-	if (m_hasJoytick) 
-	{
-		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-		axisCount = ndMin (axisCount, axisValues.GetCapacity());
-		for (ndInt32 i = 0; i < axisCount; ++i) 
-		{
-			axisValues[i] = axis[i];
-			//if (axis[i] && axis[i] > -1.0f) ndTrace(("%d %f\n", i, axis[i]));
-		}
+		axisValues.PushBack(axis[i]);
 	}
 
 #ifdef ENABLE_REPLAY
@@ -647,28 +636,20 @@ ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axis
 		fread(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
 	#endif
 #endif
-	return axisCount;
 }
 
-ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
+void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
+	ndAssert(JoystickDetected());
 	ndInt32 buttonsCount = 0;
-	memset(&axisbuttons[0], 0, size_t(axisbuttons.GetCapacity()));
+	axisbuttons.SetCount(0);
+	const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
+	buttonsCount = ndMin (buttonsCount, axisbuttons.GetCapacity());
 
-	if (!m_hasJoytick)
+	for (ndInt32 i = 0; i < buttonsCount; ++i) 
 	{
-		m_hasJoytick = glfwJoystickPresent(0) ? true : false;
-	}
-
-	if (m_hasJoytick) 
-	{
-		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-		buttonsCount = ndMin (buttonsCount, axisbuttons.GetCapacity());
-		for (ndInt32 i = 0; i < buttonsCount; ++i) 
-		{
-			axisbuttons[i] = char(buttons[i]);
-			//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
-		}
+		axisbuttons.PushBack(char(buttons[i]));
+		//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
 	}
 
 #ifdef ENABLE_REPLAY
@@ -681,8 +662,6 @@ ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbu
 		fread(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
 	#endif
 #endif
-
-	return buttonsCount;
 }
 
 void ndDemoEntityManager::ResetTimer()

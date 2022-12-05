@@ -136,7 +136,6 @@ void operator delete (void* ptr) noexcept
 	ndMemory::Free(ptr);
 }
 
-
 ndSetAllocators::ndSetAllocators()
 {
 	ndMemFreeCallback free;
