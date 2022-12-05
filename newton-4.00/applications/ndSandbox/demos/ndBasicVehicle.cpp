@@ -241,7 +241,16 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndBasicVehicle(desc)
+		,m_skipMarks(nullptr)
+		,m_startSound(nullptr)
+		,m_engineRpmSound(nullptr)
 		,m_vehicleUI(nullptr)
+		,m_rearAxlePivot(nullptr)
+		,m_frontAxlePivot(nullptr)
+		,m_rr_tire(nullptr)
+		,m_rl_tire(nullptr)
+		,m_fr_tire(nullptr)
+		,m_fl_tire(nullptr)
 	{
 		m_vehicleUI = new ndVehicleUI();
 		m_vehicleUI->CreateBufferUI();
@@ -265,6 +274,12 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		// 1- add chassis to the vehicle mode 
 		//AddChassis(chassis);
 		SetChassis(chassis);
+
+if (strcmp (m_configuration.m_name, "viper.fbx") == 0)
+{
+	scene->GetWorld()->AddModel(this);
+	return;
+}
 
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
@@ -762,17 +777,17 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_vehicelTirePart);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicelTirePart, ndApplicationMaterial::m_default);
-	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicelTirePart, ndApplicationMaterial::m_vehicelTirePart);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_vehicleTirePart);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_vehicleTirePart);
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 	
-	ndBasicMultiBodyVehicle* const vehicle0 = new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)));
+	//ndBasicMultiBodyVehicle* const vehicle0 = new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)));
 	ndBasicMultiBodyVehicle* const vehicle1 = new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)));
-	ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
+	//ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
 	ndBasicMultiBodyVehicle* const vehicle3 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)));
 
 	//ndBasicMultiBodyVehicle* const vehicle = vehicle0;

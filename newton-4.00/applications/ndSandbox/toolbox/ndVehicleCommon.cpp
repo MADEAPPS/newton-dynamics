@@ -272,7 +272,7 @@ bool ndVehicleMaterial::OnAabbOverlap(const ndContact* const joint, ndFloat32 ti
 	//const ndShapeMaterial& material0 = instanceShape0.GetMaterial();
 	//const ndShapeMaterial& material1 = instanceShape1.GetMaterial();
 
-	// the collsion may be a sub part, get the material of the root shape. 
+	// the collision may be a sub part, get the material of the root shape. 
 	const ndShapeMaterial& material0 = joint->GetBody0()->GetCollisionShape().GetMaterial();
 	const ndShapeMaterial& material1 = joint->GetBody1()->GetCollisionShape().GetMaterial();
 
@@ -398,7 +398,7 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 	tireBody->SetMassMatrix(definition.m_mass, tireCollision);
 
 	ndShapeInstance& instanceShape = tireBody->GetCollisionShape();
-	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicelTirePart;
+	instanceShape.m_shapeMaterial.m_userId = ndApplicationMaterial::m_vehicleTirePart;
 	instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_modelPointer].m_intData = ndUnsigned64(this);
 
 	return tireBody;
