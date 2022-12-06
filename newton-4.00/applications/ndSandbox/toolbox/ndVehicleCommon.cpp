@@ -465,6 +465,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 
 		if (scene->JoystickDetected())
 		{
+			const char* xxxxxxx = glfwGetJoystickName(0);
 			scene->GetJoystickButtons(buttons);
 			//for (ndInt32 i = 0; i < buttons.GetCount(); i++)
 			//{
