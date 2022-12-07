@@ -242,6 +242,7 @@ typedef double ndFloat64;
 #define ndPow(x,y)		ndFloat32 (pow(x,y))
 #define ndFmod(x,y)		ndFloat32 (fmod(x,y))
 #define ndTan(x)		ndFloat32 (tan(x))
+#define ndAtan(x)		ndFloat32 (atan(x))
 #define ndAtan2(x,y)	ndFloat32 (atan2(x,y))
 #define ndRsqrt(x)		(ndFloat32 (1.0f) / ndSqrt(x))
 

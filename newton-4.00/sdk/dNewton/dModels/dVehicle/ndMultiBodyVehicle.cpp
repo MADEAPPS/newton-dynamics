@@ -979,11 +979,21 @@ void ndMultiBodyVehicle::CalculateNormalizedAlgningTorque(ndMultiBodyVehicleTire
 	//I need to calculate the integration of the align torque 
 	//using the calculate contact patch, form the standard brush model.
 	//for now just set the torque to zero.
-	sideSlipTangent = 0;
+	ndFloat32 angle = ndAtan(sideSlipTangent);
+	ndFloat32 a = ndFloat32(0.1f);
 
-	ndFloat32 alignTorque = ndFloat32(0.0f);
-	ndFloat32 sign = ndSign(alignTorque);
-	tire->m_normalizedAligningTorque = sign * ndMax(ndAbs(alignTorque), ndAbs(tire->m_normalizedAligningTorque));
+	ndFloat32 slipCos(ndCos(angle));
+	ndFloat32 slipSin(ndSin(angle));
+	ndFloat32 y1 = ndFloat32(2.0f) * slipSin * slipCos;
+	ndFloat32 x1 = -a + ndFloat32(2.0f) * slipCos * slipCos;
+
+	ndVector p1(x1, y1, ndFloat32(0.0f), ndFloat32(0.0f));
+	ndVector p0(-a, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+	
+	
+	//ndFloat32 alignTorque = ndFloat32(0.0f);
+	//ndFloat32 sign = ndSign(alignTorque);
+	//tire->m_normalizedAligningTorque = sign * ndMax(ndAbs(alignTorque), ndAbs(tire->m_normalizedAligningTorque));
 }
 
 void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
