@@ -966,7 +966,7 @@ void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, nd
 	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
 	const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
 	const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
-
+	
 	contactPoint.m_material.m_staticFriction0 = maxForceForce;
 	contactPoint.m_material.m_dynamicFriction0 = maxForceForce;
 	contactPoint.m_material.m_staticFriction1 = maxForceForce;
