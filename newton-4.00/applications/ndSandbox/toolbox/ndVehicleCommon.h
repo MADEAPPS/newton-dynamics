@@ -138,13 +138,33 @@ class ndVehicleMaterial : public ndApplicationMaterial
 	bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const;
 };
 
-class ndBasicVehicle : public ndMultiBodyVehicle
+class ndVehicleCommon : public ndMultiBodyVehicle
 {
 	public:
-	D_CLASS_REFLECTION(ndBasicVehicle);
+	enum ndInputButtons
+	{
+		m_handBreakButton = 0,
+		m_upGearButton,
+		m_downGearButton,
+		m_neutralGearButton,
+		m_ignitionButton,
+		m_reverseGearButton,
+		m_automaticGearBoxButton,
+		m_parkingButton,
+		m_buttonCount,
+	};
 
-	ndBasicVehicle(const ndVehicleDectriptor& desc);
-	virtual ~ndBasicVehicle();
+	enum ndInputAxis
+	{
+		m_steeringWheel,
+		m_gasPedal,
+		m_brakePedal,
+		m_axisCount,
+	};
+	D_CLASS_REFLECTION(ndVehicleCommon);
+
+	ndVehicleCommon(const ndVehicleDectriptor& desc);
+	virtual ~ndVehicleCommon();
 
 	bool IsPlayer() const;
 	virtual void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
@@ -159,9 +179,12 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
-	ndVehicleDectriptor m_configuration;
-	ndFloat32 m_steerAngle;
+	void GetKeyboardInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
+	void GetJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
+	void GetXboxJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
+	void GetWheelJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
 
+	ndVehicleDectriptor m_configuration;
 	ndDemoEntityManager::ndKeyTrigger m_parking;
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
@@ -170,6 +193,7 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
 	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
 
+	ndFloat32 m_steerAngle;
 	ndInt32 m_currentGear;
 	ndInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;

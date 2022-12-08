@@ -145,6 +145,24 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 	return T(ndAtan2(s, c));
 }
 
+#ifndef _MSC_VER 
+	#define _stricmp(x,y) strcasecmp(x,y)
+
+	#ifndef _strlwr
+	inline void _strlwr(char* const string)
+	{
+		for (char * cp = string; *cp; ++cp)
+		{
+			if ((*cp >= 'A') && (*cp <= 'Z'))
+			{
+				*cp += 'a' - 'A';
+			}
+		}
+	}
+	#endif
+#endif
+
+
 /// Returns the time in micro seconds since application started 
 D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 

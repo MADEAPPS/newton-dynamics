@@ -236,11 +236,11 @@ static const char* engineSounds[] =
 	"tire_skid.wav",
 };
 
-class ndBasicMultiBodyVehicle : public ndBasicVehicle
+class ndBasicMultiBodyVehicle : public ndVehicleCommon
 {
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
-		:ndBasicVehicle(desc)
+		:ndVehicleCommon(desc)
 		,m_skipMarks(nullptr)
 		,m_startSound(nullptr)
 		,m_engineRpmSound(nullptr)
@@ -443,7 +443,7 @@ if (strcmp (m_configuration.m_name, "viper.fbx") == 0)
 
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true)
 	{
-		ndBasicVehicle::SetAsPlayer(scene, mode);
+		ndVehicleCommon::SetAsPlayer(scene, mode);
 
 		scene->SetSelectedModel(this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -570,7 +570,7 @@ if (strcmp (m_configuration.m_name, "viper.fbx") == 0)
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndBasicVehicle::ApplyInputs(world, timestep);
+		ndVehicleCommon::ApplyInputs(world, timestep);
 
 		if (m_motor)
 		{

@@ -309,9 +309,6 @@ inline void operator delete[](void* ptr)	\
 	ndMemory::Free(ptr);					\
 }
 
-#ifndef _MSC_VER 
-	#define _stricmp(x,y) strcasecmp(x,y)
-#endif
 
 #ifdef D_USE_THREAD_EMULATION
 	/// wrapper over standard atomic operations

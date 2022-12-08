@@ -207,11 +207,11 @@ static ndVehicleDectriptorLav25 lav25Desc;
 static ndVehicleDectriptorBigRig bigRigDesc;
 static ndVehicleDectriptorTractor tractorDesc;
 
-class ndHeavyMultiBodyVehicle : public ndBasicVehicle
+class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 {
 	public:
 	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
-		:ndBasicVehicle(desc)
+		:ndVehicleCommon(desc)
 		,m_vehicleUI(nullptr)
 	{
 		m_vehicleUI = new ndVehicleUI();
@@ -267,7 +267,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true)
 	{
-		ndBasicVehicle::SetAsPlayer(scene, mode);
+		ndVehicleCommon::SetAsPlayer(scene, mode);
 
 		scene->SetSelectedModel(this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -570,7 +570,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndBasicVehicle::ApplyInputs(world, timestep);
+		ndVehicleCommon::ApplyInputs(world, timestep);
 
 		if (m_isPlayer)
 		{
@@ -752,7 +752,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndBasicVehicle::ApplyInputs(world, timestep);
+		ndVehicleCommon::ApplyInputs(world, timestep);
 		if (m_isPlayer)
 		{
 			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
@@ -866,7 +866,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndBasicVehicle::ApplyInputs(world, timestep);
+		ndVehicleCommon::ApplyInputs(world, timestep);
 	}
 };
 
