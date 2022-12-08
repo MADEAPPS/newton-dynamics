@@ -14,6 +14,8 @@
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
 #include "ndDemoEntityNotify.h"
+#include "ndDemoEntityManager.h"
+#include "ndGameControlerInputs.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndVehicleSelector)
 
@@ -300,8 +302,8 @@ void ndVehicleMaterial::OnContactCallback(const ndContact* const joint, ndFloat3
 
 ndVehicleCommon::ndVehicleCommon(const ndVehicleDectriptor& desc)
 	:ndMultiBodyVehicle(ndVector(1.0f, 0.0f, 0.0f, 0.0f), ndVector(0.0f, 1.0f, 0.0f, 0.0f))
+	,m_inputs()
 	,m_configuration(desc)
-	,m_steerAngle(0.0f)
 	,m_parking()
 	,m_ignition()
 	,m_neutralGear()
@@ -455,420 +457,19 @@ void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 #endif
 }
 
-void ndVehicleCommon::GetKeyboardInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const
-{
-	buttons.SetCount(m_buttonCount);
-	buttons[m_handBreakButton] = scene->GetKeyState(' ');
-	buttons[m_upGearButton] = scene->GetKeyState('>') || scene->GetKeyState('.');
-	buttons[m_downGearButton] = scene->GetKeyState('<') || scene->GetKeyState(',');
-	buttons[m_neutralGearButton] = scene->GetKeyState('N');
-	buttons[m_ignitionButton] = scene->GetKeyState('I');
-	buttons[m_reverseGearButton] = scene->GetKeyState('R');
-	buttons[m_automaticGearBoxButton] = scene->GetKeyState('?') || scene->GetKeyState('/');
-	buttons[m_parkingButton] = scene->GetKeyState('P');
-
-	axis.SetCount(m_axisCount);
-	ndFloat32 steerAngle = ndFloat32(scene->GetKeyState('A')) - ndFloat32(scene->GetKeyState('D'));
-	axis[m_steeringWheel] = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
-	axis[m_gasPedal] = ndFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
-	axis[m_brakePedal] = ndFloat32(scene->GetKeyState('S') ? 1.0f : 0.0f);
-}
-
-void ndVehicleCommon::GetWheelJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const
-{
-	// logitech g920 mapping
-	static ndFixSizeArray<int, 8> axisMapping;
-	static ndFixSizeArray<int, 32> buttonMapping;
-
-	ndFixSizeArray<char, 32> unmappedButtons;
-	ndFixSizeArray<ndFloat32, 8> unmappedAxis;
-
-	scene->GetJoystickAxis(unmappedAxis);
-	scene->GetJoystickButtons(unmappedButtons);
-
-	if (!buttonMapping.GetCount())
-	{
-		if (!buttonMapping.GetCount())
-		{
-			for (ndInt32 i = 0; i < buttonMapping.GetCapacity(); ++i)
-			{
-				buttonMapping.PushBack(m_buttonCount);
-			}
-			//buttons[0] = 0;
-			//buttons[1] = scene->GetKeyState(' ');
-			//buttons[2] = 0;
-			//buttons[3] = 0;
-			//buttons[4] = scene->GetKeyState('>') || scene->GetKeyState('.');
-			//buttons[5] = scene->GetKeyState('<') || scene->GetKeyState(',');
-			//buttons[6] = scene->GetKeyState('N');
-			//buttons[7] = scene->GetKeyState('I');
-			//buttons[8] = scene->GetKeyState('R');
-			//buttons[9] = scene->GetKeyState('?') || scene->GetKeyState('/');
-			//buttons[10] = scene->GetKeyState('P');
-			buttonMapping[1] = m_handBreakButton;
-			buttonMapping[4] = m_upGearButton;
-			buttonMapping[5] = m_downGearButton;
-			buttonMapping[6] = m_neutralGearButton;
-			buttonMapping[7] = m_ignitionButton;
-			buttonMapping[8] = m_reverseGearButton;
-			buttonMapping[9] = m_automaticGearBoxButton;
-			buttonMapping[10] = m_parkingButton;
-		}
-	}
-
-	buttons.SetCount(m_buttonCount);
-	for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
-	{
-		buttons[buttonMapping[i]] = unmappedButtons[i];
-	}
-
-	if (!axisMapping.GetCount())
-	{
-		for (ndInt32 i = 0; i < axisMapping.GetCapacity(); ++i)
-		{
-			axisMapping.PushBack(m_axisCount);
-		}
-		axisMapping[0] = m_steeringWheel;
-		axisMapping[1] = m_gasPedal;
-		axisMapping[2] = m_brakePedal;
-	}
-
-	axis.SetCount(m_axisCount);
-	for (ndInt32 i = 0; i < axisMapping.GetCount(); i++)
-	{
-		axis[axisMapping[i]] = unmappedAxis[i];
-	}
-	axis[m_steeringWheel] = -axis[m_steeringWheel];
-	axis[m_gasPedal] = (1.0f - axis[m_gasPedal]) * 0.5f;
-	axis[m_brakePedal] = (1.0f - axis[m_brakePedal]) * 0.5f;
-}
-
-void ndVehicleCommon::GetXboxJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const
-{
-	// logitech g920 mapping
-	static ndFixSizeArray<int, 8> axisMapping;
-	static ndFixSizeArray<int, 32> buttonMapping;
-
-	ndFixSizeArray<char, 32> unmappedButtons;
-	ndFixSizeArray<ndFloat32, 8> unmappedAxis;
-
-	scene->GetJoystickAxis(unmappedAxis);
-	scene->GetJoystickButtons(unmappedButtons);
-
-	if (!buttonMapping.GetCount())
-	{
-		if (!buttonMapping.GetCount())
-		{
-			for (ndInt32 i = 0; i < buttonMapping.GetCapacity(); ++i)
-			{
-				buttonMapping.PushBack(m_buttonCount);
-			}
-			//buttons[1] = scene->GetKeyState(' ');
-			//buttons[4] = scene->GetKeyState('>') || scene->GetKeyState('.');
-			//buttons[5] = scene->GetKeyState('<') || scene->GetKeyState(',');
-			//buttons[6] = scene->GetKeyState('N');
-			//buttons[7] = scene->GetKeyState('I');
-			//buttons[8] = scene->GetKeyState('R');
-			//buttons[9] = scene->GetKeyState('?') || scene->GetKeyState('/');
-			//buttons[10] = scene->GetKeyState('P');
-
-			buttonMapping[4] = m_automaticGearBoxButton;
-			buttonMapping[5] = m_reverseGearButton;
-			buttonMapping[6] = m_ignitionButton;
-			buttonMapping[7] = m_neutralGearButton;
-			buttonMapping[10] = m_parkingButton;
-			buttonMapping[12] = m_handBreakButton;
-			buttonMapping[11] = m_upGearButton;
-			buttonMapping[13] = m_downGearButton;
-		}
-	}
-
-	buttons.SetCount(m_buttonCount);
-	for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
-	{
-		buttons[buttonMapping[i]] = unmappedButtons[i];
-	}
-
-	if (!axisMapping.GetCount())
-	{
-		for (ndInt32 i = 0; i < axisMapping.GetCapacity(); ++i)
-		{
-			axisMapping.PushBack(m_axisCount);
-		}
-		axisMapping[2] = m_steeringWheel;
-		//axisMapping[1] = m_gasPedal;
-		//axisMapping[2] = m_brakePedal;
-	}
-
-	axis.SetCount(m_axisCount);
-	for (ndInt32 i = 0; i < axisMapping.GetCount(); i++)
-	{
-		axis[axisMapping[i]] = unmappedAxis[i];
-
-		if ((ndAbs(unmappedAxis[i]) > 0.1) && (ndAbs(unmappedAxis[i]) < 0.99))
-		{
-			ndAssert(0);
-			ndTrace(("%d %f\n", i, unmappedAxis[i]));
-		}
-		//axis[axisMapping[i]] = 0;
-	}
-	axis[m_steeringWheel] = -axis[m_steeringWheel] * axis[m_steeringWheel] * axis[m_steeringWheel];
-	//axis[m_gasPedal] = (1.0f - axis[m_gasPedal]) * 0.5f;
-	//axis[m_brakePedal] = (1.0f - axis[m_brakePedal]) * 0.5f;
-}
-
-void ndVehicleCommon::GetJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const
-{
-	ndFixSizeArray<char, 32> unmappedButtons;
-	ndFixSizeArray<ndFloat32, 8> unmappedAxis;
-	
-	scene->GetJoystickAxis(unmappedAxis);
-	scene->GetJoystickButtons(unmappedButtons);
-
-	char joystickName[256];
-	strcpy(&joystickName[0], glfwGetJoystickName(0));
-	_strlwr(joystickName);
-	if (strstr(joystickName, "wheel"))
-	{ 
-		GetWheelJoystickInputs(scene, buttons, axis);
-		// logitech g920 mapping
-		static ndFixSizeArray<int, 8> axisMapping;
-		static ndFixSizeArray<int, 32> buttonMapping;
-
-		if (!buttonMapping.GetCount())
-		{
-			if (!buttonMapping.GetCount())
-			{
-				for (ndInt32 i = 0; i < buttonMapping.GetCapacity(); ++i)
-				{
-					buttonMapping.PushBack(m_buttonCount);
-				}
-				//buttons[0] = 0;
-				//buttons[1] = scene->GetKeyState(' ');
-				//buttons[2] = 0;
-				//buttons[3] = 0;
-				//buttons[4] = scene->GetKeyState('>') || scene->GetKeyState('.');
-				//buttons[5] = scene->GetKeyState('<') || scene->GetKeyState(',');
-				//buttons[6] = scene->GetKeyState('N');
-				//buttons[7] = scene->GetKeyState('I');
-				//buttons[8] = scene->GetKeyState('R');
-				//buttons[9] = scene->GetKeyState('?') || scene->GetKeyState('/');
-				//buttons[10] = scene->GetKeyState('P');
-				buttonMapping[1] = m_handBreakButton;
-				buttonMapping[4] = m_upGearButton;
-				buttonMapping[5] = m_downGearButton;
-				buttonMapping[6] = m_neutralGearButton;
-				buttonMapping[7] = m_ignitionButton;
-				buttonMapping[8] = m_reverseGearButton;
-				buttonMapping[9] = m_automaticGearBoxButton;
-				buttonMapping[10] = m_parkingButton;
-			}
-		}
-		
-		buttons.SetCount(m_buttonCount);
-		for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
-		{
-			buttons[buttonMapping[i]] = unmappedButtons[i];
-		}
-
-		if (!axisMapping.GetCount())
-		{
-			for (ndInt32 i = 0; i < axisMapping.GetCapacity(); ++i)
-			{
-				axisMapping.PushBack(m_axisCount);
-			}
-			axisMapping[0] = m_steeringWheel;
-			axisMapping[1] = m_gasPedal;
-			axisMapping[2] = m_brakePedal;
-		}
-
-		axis.SetCount(m_axisCount);
-		for (ndInt32 i = 0; i < axisMapping.GetCount(); i++)
-		{
-			axis[axisMapping[i]] = unmappedAxis[i];
-		}
-		axis[m_steeringWheel] = -axis[m_steeringWheel];
-		axis[m_gasPedal] = (1.0f - axis[m_gasPedal]) * 0.5f;
-		axis[m_brakePedal] = (1.0f - axis[m_brakePedal]) * 0.5f;
-	}
-	else if (strstr(joystickName, "xbox"))
-	{
-		static ndFixSizeArray<int, 8> axisMapping;
-		static ndFixSizeArray<int, 32> buttonMapping;
-
-		if (!buttonMapping.GetCount())
-		{
-			if (!buttonMapping.GetCount())
-			{
-				for (ndInt32 i = 0; i < buttonMapping.GetCapacity(); ++i)
-				{
-					buttonMapping.PushBack(m_buttonCount);
-				}
-				//buttons[0] = 0;
-				//buttons[1] = scene->GetKeyState(' ');
-				//buttons[2] = 0;
-				//buttons[3] = 0;
-				//buttons[4] = scene->GetKeyState('>') || scene->GetKeyState('.');
-				//buttons[5] = scene->GetKeyState('<') || scene->GetKeyState(',');
-				//buttons[6] = scene->GetKeyState('N');
-				//buttons[7] = scene->GetKeyState('I');
-				//buttons[8] = scene->GetKeyState('R');
-				//buttons[9] = scene->GetKeyState('?') || scene->GetKeyState('/');
-				//buttons[10] = scene->GetKeyState('P');
-				buttonMapping[1] = m_handBreakButton;
-				buttonMapping[4] = m_upGearButton;
-				buttonMapping[5] = m_downGearButton;
-				buttonMapping[6] = m_neutralGearButton;
-				buttonMapping[7] = m_ignitionButton;
-				buttonMapping[8] = m_reverseGearButton;
-				buttonMapping[9] = m_automaticGearBoxButton;
-				buttonMapping[10] = m_parkingButton;
-			}
-		}
-
-		buttons.SetCount(m_buttonCount);
-		for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
-		{
-			buttons[buttonMapping[i]] = unmappedButtons[i];
-		}
-
-		if (!axisMapping.GetCount())
-		{
-			for (ndInt32 i = 0; i < axisMapping.GetCapacity(); ++i)
-			{
-				axisMapping.PushBack(m_axisCount);
-			}
-			axisMapping[0] = m_steeringWheel;
-			axisMapping[1] = m_gasPedal;
-			axisMapping[2] = m_brakePedal;
-		}
-
-		axis.SetCount(m_axisCount);
-		for (ndInt32 i = 0; i < axisMapping.GetCount(); i++)
-		{
-			axis[axisMapping[i]] = unmappedAxis[i];
-		}
-
-		axis[m_steeringWheel] = axis[m_steeringWheel] * axis[m_steeringWheel] * axis[m_steeringWheel];
-		////axis[1] = (1.0f - axis[1]) * 0.5f;
-		////axis[2] = (1.0f - axis[2]) * 0.5f;
-	}
-	else
-	{
-		ndAssert(0);
-
-		static ndFixSizeArray<int, 8> axisMapping;
-		static ndFixSizeArray<int, 32> buttonMapping;
-
-		if (!buttonMapping.GetCount())
-		{
-			if (!buttonMapping.GetCount())
-			{
-				for (ndInt32 i = 0; i < buttonMapping.GetCapacity(); ++i)
-				{
-					buttonMapping.PushBack(m_buttonCount);
-				}
-				//buttons[0] = 0;
-				//buttons[1] = scene->GetKeyState(' ');
-				//buttons[2] = 0;
-				//buttons[3] = 0;
-				//buttons[4] = scene->GetKeyState('>') || scene->GetKeyState('.');
-				//buttons[5] = scene->GetKeyState('<') || scene->GetKeyState(',');
-				//buttons[6] = scene->GetKeyState('N');
-				//buttons[7] = scene->GetKeyState('I');
-				//buttons[8] = scene->GetKeyState('R');
-				//buttons[9] = scene->GetKeyState('?') || scene->GetKeyState('/');
-				//buttons[10] = scene->GetKeyState('P');
-				buttonMapping[1] = m_handBreakButton;
-				buttonMapping[4] = m_upGearButton;
-				buttonMapping[5] = m_downGearButton;
-				buttonMapping[6] = m_neutralGearButton;
-				buttonMapping[7] = m_ignitionButton;
-				buttonMapping[8] = m_reverseGearButton;
-				buttonMapping[9] = m_automaticGearBoxButton;
-				buttonMapping[10] = m_parkingButton;
-			}
-		}
-
-		buttons.SetCount(m_buttonCount);
-		for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
-		{
-			buttons[buttonMapping[i]] = unmappedButtons[i];
-		}
-
-		if (!axisMapping.GetCount())
-		{
-			for (ndInt32 i = 0; i < axisMapping.GetCapacity(); ++i)
-			{
-				axisMapping.PushBack(m_axisCount);
-			}
-			axisMapping[0] = m_steeringWheel;
-			axisMapping[1] = m_gasPedal;
-			axisMapping[2] = m_brakePedal;
-		}
-
-		axis.SetCount(m_axisCount);
-		for (ndInt32 i = 0; i < axisMapping.GetCount(); i++)
-		{
-			axis[axisMapping[i]] = unmappedAxis[i];
-		}
-
-		axis[m_steeringWheel] = axis[m_steeringWheel] * axis[m_steeringWheel] * axis[m_steeringWheel];
-		////axis[1] = (1.0f - axis[1]) * 0.5f;
-		////axis[2] = (1.0f - axis[2]) * 0.5f;
-	}
-
-	//for (ndInt32 i = 0; i < buttons.GetCount(); i++)
-	//{
-	//	if (buttons[i])
-	//	{
-	//		ndTrace(("button_%d: %d\n", i, buttons[i]));
-	//	}
-	//}
-	
-	//for (ndInt32 i = 0; i < axis.GetCount(); i++)
-	//{
-	//	if ((ndAbs (axis[i]) > 0.01f) && (ndAbs(axis[i]) < 0.99f))
-	//	{
-	//		ndTrace(("axis_%d: %f\n", i, axis[i]));
-	//	}
-	//}
-}
-
 void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 {
 	if (m_isPlayer && m_motor)
 	{
-		ndFixSizeArray<char, 32> buttons;
-		ndFixSizeArray<ndFloat32, 8> axis;
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
-		if (scene->JoystickDetected())
-		{
-			char joystickName[256];
-			strcpy(&joystickName[0], glfwGetJoystickName(0));
-			_strlwr(joystickName);
-			if (strstr(joystickName, "wheel"))
-			{
-				GetWheelJoystickInputs(scene, buttons, axis);
-			}
-			else if (strstr(joystickName, "xbox"))
-			{
-				GetXboxJoystickInputs(scene, buttons, axis);
-			}
-			else
-			{
-				GetJoystickInputs(scene, buttons, axis);
-			}
-		}
-		else
-		{
-			GetKeyboardInputs(scene, buttons, axis);
-		}
-
-		m_steerAngle = axis[m_steeringWheel];
+		m_inputs.Update(scene);
+		const ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
+		const ndFixSizeArray<char, 32>& buttons = m_inputs.m_buttons;
+		
 		ndFloat32 brake = axis[m_brakePedal];
 		ndFloat32 throttle = axis[m_gasPedal];
+		ndFloat32 steerAngle = axis[m_steeringWheel];
 		ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;
 
 		if (m_parking.Update(buttons[m_parkingButton] ? true : false))
@@ -983,8 +584,8 @@ void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 		{
 			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-			tire->SetSteering(m_steerAngle);
 			tire->SetBrake(brake);
+			tire->SetSteering(steerAngle);
 			tire->SetHandBrake(handBrake);
 		}
 

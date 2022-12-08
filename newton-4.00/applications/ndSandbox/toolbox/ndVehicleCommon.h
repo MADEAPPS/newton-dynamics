@@ -15,8 +15,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 #include "ndContactCallback.h"
-
-//#define AUTOMATION_TRANSMISSION_FRAME_DELAY 300
+#include "ndGameControlerInputs.h"
 
 class ndVehicleDectriptor
 {
@@ -179,11 +178,7 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
-	void GetKeyboardInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
-	void GetJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
-	void GetXboxJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
-	void GetWheelJoystickInputs(ndDemoEntityManager* const scene, ndFixSizeArray<char, 32>& buttons, ndFixSizeArray<ndFloat32, 8>& axis) const;
-
+	ndGameControllerInputs m_inputs;
 	ndVehicleDectriptor m_configuration;
 	ndDemoEntityManager::ndKeyTrigger m_parking;
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
@@ -193,7 +188,6 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
 	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
 
-	ndFloat32 m_steerAngle;
 	ndInt32 m_currentGear;
 	ndInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;
