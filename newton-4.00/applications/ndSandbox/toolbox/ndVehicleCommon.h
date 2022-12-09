@@ -142,23 +142,22 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 	public:
 	enum ndInputButtons
 	{
-		m_handBreakButton = 0,
-		m_upGearButton,
-		m_downGearButton,
-		m_neutralGearButton,
-		m_ignitionButton,
-		m_reverseGearButton,
-		m_automaticGearBoxButton,
-		m_parkingButton,
-		m_buttonCount,
+		m_handBreakButton = ndGameControllerInputs::m_button_00,
+		m_upGearButton = ndGameControllerInputs::m_button_01,
+		m_downGearButton = ndGameControllerInputs::m_button_02,
+		m_neutralGearButton = ndGameControllerInputs::m_button_03,
+		m_ignitionButton = ndGameControllerInputs::m_button_04,
+		m_reverseGearButton = ndGameControllerInputs::m_button_05,
+		m_automaticGearBoxButton = ndGameControllerInputs::m_button_06,
+		m_parkingButton = ndGameControllerInputs::m_button_07,
 	};
 
 	enum ndInputAxis
 	{
-		m_steeringWheel,
-		m_gasPedal,
-		m_brakePedal,
-		m_axisCount,
+		m_steeringWheel = ndGameControllerInputs::m_azix_00,
+		m_gasPedal = ndGameControllerInputs::m_azix_01,
+		m_brakePedal = ndGameControllerInputs::m_azix_02,
+		m_clutch = ndGameControllerInputs::m_azix_03,
 	};
 	D_CLASS_REFLECTION(ndVehicleCommon);
 

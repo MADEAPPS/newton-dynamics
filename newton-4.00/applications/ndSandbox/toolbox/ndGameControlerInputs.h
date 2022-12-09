@@ -20,22 +20,23 @@ class ndGameControllerInputs
 	public:
 	enum ndAxis
 	{
-		m_steeringWheel,
-		m_gasPedal,
-		m_brakePedal,
+		m_azix_00,
+		m_azix_01,
+		m_azix_02,
+		m_azix_03,
 		m_axisCount,
 	};
 
 	enum ndButtons
 	{
-		m_handBreakButton = 0,
-		m_upGearButton,
-		m_downGearButton,
-		m_neutralGearButton,
-		m_ignitionButton,
-		m_reverseGearButton,
-		m_automaticGearBoxButton,
-		m_parkingButton,
+		m_button_00 = 0,
+		m_button_01,
+		m_button_02,
+		m_button_03,
+		m_button_04,
+		m_button_05,
+		m_button_06,
+		m_button_07,
 		m_buttonCount
 	};
 
@@ -48,6 +49,8 @@ class ndGameControllerInputs
 
 	private:
 	void GetKeyboardInputs(ndDemoEntityManager* const scene);
+	void GetJoystickInputs(ndDemoEntityManager* const scene);
+	void GetXboxJoystickInputs(ndDemoEntityManager* const scene);
 	void GetWheelJoystickInputs(ndDemoEntityManager* const scene);
 
 	ndFloat32 m_keyBoardSteerAngle;
