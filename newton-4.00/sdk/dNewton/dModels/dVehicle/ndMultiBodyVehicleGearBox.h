@@ -36,7 +36,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 
 	D_NEWTON_API void SetIdleOmega(ndFloat32 rpm);
 	D_NEWTON_API void SetClutchTorque(ndFloat32 torqueInNewtonMeters);
-	D_NEWTON_API void SetInternalLosesTorque(ndFloat32 torqueInNewtonMeters);
+	D_NEWTON_API void SetInternalTorqueLoss(ndFloat32 torqueInNewtonMeters);
 
 	protected:
 	void DebugJoint(ndConstraintDebugCallback&) const {}

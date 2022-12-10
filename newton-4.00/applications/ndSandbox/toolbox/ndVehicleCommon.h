@@ -56,7 +56,26 @@ class ndVehicleDectriptor
 	class ndGearBox
 	{
 		public:
-		ndInt32 m_gearsCount;
+		ndGearBox()
+			:m_gearsCount(4)
+			,m_manual(false)
+		{
+
+			m_neutral = 0.0f;
+			m_reverseRatio = -3.0f;
+			m_crownGearRatio = 10.0f;
+
+			m_forwardRatios[0] = 3.0f;
+			m_forwardRatios[1] = 1.5f;
+			m_forwardRatios[2] = 1.1f;
+			m_forwardRatios[3] = 0.8f;
+
+			m_torqueConverter = 2000.0f;
+			m_idleClutchTorque = 200.0f;
+			m_lockedClutchTorque = 1.0e6f;
+			m_gearShiftDelayTicks = 300;
+		}
+
 		union
 		{
 			struct
@@ -72,6 +91,7 @@ class ndVehicleDectriptor
 		ndFloat32 m_lockedClutchTorque;
 		ndFloat32 m_crownGearRatio;
 		ndFloat32 m_torqueConverter;
+		ndInt32 m_gearsCount;
 		ndInt32 m_gearShiftDelayTicks;
 		bool m_manual;
 	};
@@ -150,14 +170,15 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 		m_reverseGearButton = ndGameControllerInputs::m_button_05,
 		m_automaticGearBoxButton = ndGameControllerInputs::m_button_06,
 		m_parkingButton = ndGameControllerInputs::m_button_07,
+		m_isplayerButton = ndGameControllerInputs::m_button_08,
 	};
 
 	enum ndInputAxis
 	{
-		m_steeringWheel = ndGameControllerInputs::m_azix_00,
-		m_gasPedal = ndGameControllerInputs::m_azix_01,
-		m_brakePedal = ndGameControllerInputs::m_azix_02,
-		m_clutch = ndGameControllerInputs::m_azix_03,
+		m_steeringWheel = ndGameControllerInputs::m_azis_00,
+		m_gasPedal = ndGameControllerInputs::m_azis_01,
+		m_brakePedal = ndGameControllerInputs::m_azis_02,
+		m_clutch = ndGameControllerInputs::m_azis_03,
 	};
 	D_CLASS_REFLECTION(ndVehicleCommon);
 

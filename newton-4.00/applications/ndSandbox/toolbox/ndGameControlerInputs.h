@@ -20,10 +20,10 @@ class ndGameControllerInputs
 	public:
 	enum ndAxis
 	{
-		m_azix_00,
-		m_azix_01,
-		m_azix_02,
-		m_azix_03,
+		m_azis_00,
+		m_azis_01,
+		m_azis_02,
+		m_azis_03,
 		m_axisCount,
 	};
 
@@ -37,6 +37,7 @@ class ndGameControllerInputs
 		m_button_05,
 		m_button_06,
 		m_button_07,
+		m_button_08,
 		m_buttonCount
 	};
 

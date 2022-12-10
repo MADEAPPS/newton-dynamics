@@ -132,7 +132,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_idleClutchTorque = 200.0f;
 	m_transmission.m_lockedClutchTorque = 1.0e6f;
 	m_transmission.m_gearShiftDelayTicks = 300;
-	m_transmission.m_manual = true;
+	m_transmission.m_manual = false;
 
 	m_frontTire.m_mass = 20.0f;
 	m_frontTire.m_springK = 1000.0f;
@@ -207,20 +207,12 @@ void ndVehicleSelector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 {
-	ndFixSizeArray<char, 32> buttons;
 	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
-	if (scene->JoystickDetected())
-	{
-		scene->GetJoystickButtons(buttons);
-	}
-	else
-	{
-		buttons.SetCount(4);
-		buttons[3] = scene->GetKeyState('C');
-	}
+	ndGameControllerInputs inputs;
+	inputs.Update(scene);
 		
-	if (m_changeVehicle.Update(buttons[3] ? true : false))
+	if (m_changeVehicle.Update(inputs.m_buttons[ndVehicleCommon::m_isplayerButton] ? true : false))
 	{
 		const ndModelList& modelList = world->GetModelList();
 
@@ -590,7 +582,7 @@ void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 		}
 
 		// set the transmission Torque converter when the power reverses.
-		m_gearBox->SetInternalLosesTorque(m_configuration.m_transmission.m_torqueConverter);
+		m_gearBox->SetInternalTorqueLoss(m_configuration.m_transmission.m_torqueConverter);
 		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
 		{
 			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);

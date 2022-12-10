@@ -275,12 +275,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		//AddChassis(chassis);
 		SetChassis(chassis);
 
-if (strcmp (m_configuration.m_name, "viper.fbx") == 0)
-{
-	scene->GetWorld()->AddModel(this);
-	return;
-}
-
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
 		// and attach them to the chassis with a tire joints
@@ -787,9 +781,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 	
-	//ndBasicMultiBodyVehicle* const vehicle0 = new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)));
+	ndBasicMultiBodyVehicle* const vehicle0 = new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)));
 	ndBasicMultiBodyVehicle* const vehicle1 = new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)));
-	//ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
+	ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
 	ndBasicMultiBodyVehicle* const vehicle3 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)));
 
 	//ndBasicMultiBodyVehicle* const vehicle = vehicle0;

@@ -74,7 +74,7 @@ void ndMultiBodyVehicleGearBox::SetClutchTorque(ndFloat32 torqueInNewtonMeters)
 	m_clutchTorque = ndAbs(torqueInNewtonMeters);
 }
 
-void ndMultiBodyVehicleGearBox::SetInternalLosesTorque(ndFloat32 torqueInNewtonMeters)
+void ndMultiBodyVehicleGearBox::SetInternalTorqueLoss(ndFloat32 torqueInNewtonMeters)
 {
 	m_driveTrainResistanceTorque = ndAbs(torqueInNewtonMeters);
 }
