@@ -13,10 +13,10 @@
 #include "ndNewton.h"
 
 
-// Subclass the callback for a body to customise the gravity and print the transform.
+// Subclass the callback for a body to customize the gravity and print the transform.
 //
 // The default callback for each body will apply the gravity force on each
-// object. To override that behaviour and change the gravity we have to subclass
+// object. To override that behavior and change the gravity we have to subclass
 // from `ndBodyNotify`.
 class MyBodyNotify: public ndBodyNotify
 {
