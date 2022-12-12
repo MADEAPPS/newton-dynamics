@@ -155,14 +155,16 @@ TEST(RayCast, rayCastFilter)
 	ClientNodePtr node0 = ClientNode::create();
 	ndMatrix matrix(ndGetIdentityMatrix());
 	node0->setTransform(matrix);
-	ndBodyDynamic* const body0 = buildNewtonBodyFromClientNode(node0);
+	//ndBodyDynamic* const body0 = buildNewtonBodyFromClientNode(node0);
+	ndSharedPtr<ndBodyKinematic> body0 (buildNewtonBodyFromClientNode(node0));
 	world.AddBody(body0);
 
 	// second is offset down the Z axis
 	ClientNodePtr node1 = ClientNode::create();
 	matrix.m_posit.m_z = Z_OFFSET;
 	node1->setTransform(matrix);
-	ndBodyDynamic* const body1 = buildNewtonBodyFromClientNode(node1);
+	//ndBodyDynamic* const body1 = buildNewtonBodyFromClientNode(node1);
+	ndSharedPtr<ndBodyKinematic> body1 (buildNewtonBodyFromClientNode(node1));
 	world.AddBody(body1);
 
 	PickInfo info;

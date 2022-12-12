@@ -126,12 +126,13 @@ TEST(CollisionShape, Phantom)
 
 	// Create a sphere at the origin. No gravity will act on it by default.
 	ndVector spherePos = ndVector(0.0f, 0.0f, 0.0f, 1.0f);
-	ndBodyDynamic* sphere = BuildSphere(spherePos);
+	ndSharedPtr<ndBodyKinematic> sphere(BuildSphere(spherePos));
 	world.AddBody(sphere);
 
 	// create a Phantom model that contains a collision shape and transform matrix
 	NewtonPhantom* const phantom = new NewtonPhantom;
-	world.AddModel(phantom);
+	ndSharedPtr<ndModel> phantomPtr(phantom);
+	world.AddModel(phantomPtr);
 
 	// move the phantom above the sphere
 	ndMatrix phantomMatrix = ndGetIdentityMatrix();

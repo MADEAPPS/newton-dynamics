@@ -47,7 +47,7 @@ TEST(RigidBody, NoMoveWithoutForce) {
 
   // Create a sphere at the origin. No gravity will act on it by default.
   ndVector spherePos = ndVector(0.0f, 0.0f, 0.0f, 1.0f);
-  ndBodyDynamic *sphere = BuildSphere(spherePos);
+  ndSharedPtr<ndBodyKinematic> sphere (BuildSphere(spherePos));
   world.AddBody(sphere);
 
   // Sanity check: sphere must be at the origin.
@@ -75,7 +75,8 @@ TEST(RigidBody, MoveWithUnitForce) {
   // Create a sphere at the origin and apply a gravity force of 1N.
   ndVector spherePos = ndVector(0.f, 0.f, 0.f, 1.f);
   ndVector gravity = ndVector(1.f, 0.f, 0.f, 1.f);
-  ndBodyDynamic *sphere = BuildSphere(spherePos, gravity);
+  //ndBodyDynamic *sphere = BuildSphere(spherePos, gravity);
+  ndSharedPtr<ndBodyKinematic> sphere (BuildSphere(spherePos, gravity));
   world.AddBody(sphere);
 
   // Sanity check: the distance to the origin must be zero.

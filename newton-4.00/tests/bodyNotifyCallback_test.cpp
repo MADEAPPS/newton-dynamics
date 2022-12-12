@@ -70,11 +70,13 @@ TEST(RigidBodyNotify, MoveWithUnitForceDifferentMasses)
   world.SetSubSteps(2);
 
   // Create a sphere at the origin and apply and mass 1 kg.
-  ndBodyDynamic* sphere0 = BuildSphere(ndVector(0.0f, 0.0f, 0.0f, 1.0f), 1.0f);
+  //ndBodyDynamic* sphere0 = BuildSphere(ndVector(0.0f, 0.0f, 0.0f, 1.0f), 1.0f);
+  ndSharedPtr<ndBodyKinematic> sphere0 (BuildSphere(ndVector(0.0f, 0.0f, 0.0f, 1.0f), 1.0f));
   world.AddBody(sphere0);
 
   // Create a sphere at the origin and apply and mass 2 kg.
-  ndBodyDynamic* sphere1 = BuildSphere(ndVector(0.0f, 0.0f, 2.5f, 1.0f), 2.0f);
+  //ndBodyDynamic* sphere1 = BuildSphere(ndVector(0.0f, 0.0f, 2.5f, 1.0f), 2.0f);
+  ndSharedPtr<ndBodyKinematic> sphere1 (BuildSphere(ndVector(0.0f, 0.0f, 2.5f, 1.0f), 2.0f));
   world.AddBody(sphere1);
 
   // Simulate one second.
