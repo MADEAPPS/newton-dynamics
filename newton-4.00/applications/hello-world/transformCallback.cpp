@@ -75,7 +75,6 @@ ndBodyDynamic* BuildSphere()
   return body;
 }
 
-
 int main(int, const char**)
 {
   // Setup the world itself.
@@ -86,7 +85,8 @@ int main(int, const char**)
   world.SetSubSteps(2);
 
   // Add a single sphere to the world.
-  ndBodyDynamic *sphere = BuildSphere();
+  //ndBodyDynamic *sphere = BuildSphere();
+  ndSharedPtr<ndBodyKinematic> sphere (BuildSphere());
   world.AddBody(sphere);
 
   // Step the simulation for a few steps to see the callbacks in action.

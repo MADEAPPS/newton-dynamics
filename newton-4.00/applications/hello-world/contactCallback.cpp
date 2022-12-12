@@ -31,7 +31,6 @@ public:
   }
 };
 
-
 // Create box that will serve as a static floor and return a pointer to it.
 ndBodyDynamic *BuildFloor() {
   const float thickness = 1.0f;
@@ -39,7 +38,8 @@ ndBodyDynamic *BuildFloor() {
   // Default gravity for the body.
   ndVector defaultGravity = ndVector(0.0f, 0.0f, 0.0f, 0.0f);
 
-  ndBodyDynamic *const body = new ndBodyDynamic();
+  //ndBodyDynamic *const body = new ndBodyDynamic();
+  ndSharedPtr<ndBodyKinematic> body (new ndBodyDynamic());
   body->SetNotifyCallback(new ndBodyNotify(defaultGravity));
   body->SetCollisionShape(new ndShapeBox(200.0f, thickness, 200.f));
 
