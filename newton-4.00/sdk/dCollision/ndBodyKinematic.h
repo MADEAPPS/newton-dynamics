@@ -37,7 +37,6 @@ class ndJointBilateralConstraint;
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic : public ndBody
 {
-	public:
 	class ndContactkey
 	{
 		public:
@@ -58,6 +57,7 @@ class ndBodyKinematic : public ndBody
 		};
 	};
 
+	public:
 	class ndJointList : public ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
 	{
 		public:
