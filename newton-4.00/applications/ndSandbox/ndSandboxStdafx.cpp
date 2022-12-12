@@ -13,9 +13,7 @@
 // NewView.pch will be the pre-compiled header
 // stdafx.obj will contain the pre-compiled type information
 
-
 #include "ndSandboxStdafx.h"
-
 
 // Windows user assets path
 void dGetWorkingFileName (const char* const name, char* const outPathName)
@@ -81,17 +79,17 @@ ndUnsigned32 ndIndian32(ndUnsigned32 x)
 		return SWAP_INT16 ( x >> 16) + (SWAP_INT16 (x) << 16);
 	}
 
-	void SWAP_FLOAT32_ARRAY (void* const array, ndInt32 count)
-	{
-		ndInt32* const ptr = (ndInt32*) array;
-		count /= sizeof (ndInt32);
-		for (ndInt32 i = 0; i < count; ++i) 
-		{
-			ndInt32 x;
-			x = SWAP_INT32 (ptr[i]);
-			ptr[i] = x;
-		}
-	}
+//	void SWAP_FLOAT32_ARRAY (void* const array, ndInt32 count)
+//	{
+//		ndInt32* const ptr = (ndInt32*) array;
+//		count /= sizeof (ndInt32);
+//		for (ndInt32 i = 0; i < count; ++i) 
+//		{
+//			ndInt32 x;
+//			x = SWAP_INT32 (ptr[i]);
+//			ptr[i] = x;
+//		}
+//	}
 
 #else
 
@@ -105,7 +103,7 @@ ndUnsigned32 ndIndian32(ndUnsigned32 x)
 		return x;
 	}
 
-	void SWAP_FLOAT32_ARRAY (void* const, ndInt32)
-	{
-	}
+//	void SWAP_FLOAT32_ARRAY (void* const, ndInt32)
+//	{
+//	}
 #endif

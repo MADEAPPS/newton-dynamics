@@ -103,43 +103,11 @@
 #include "ndBrainReplayBuffer.h"
 #include <ndBrainParallelTrainer.h>
 
-#ifndef _MSC_VER
-	#ifndef stricmp
-		#define stricmp strcasecmp
-	#endif
-
-	#if !defined(_strlwr) && !(defined(__MINGW32__) || defined(__MINGW64__))
-		inline char* _strlwr (char* const ptr)
-		{ 
-			char* ret = ptr; 
-			while (*ret != '\0')
-			{ 
-				*ret = char (tolower (*ret));
-				ret ++;
-			} 
-			return ptr; 
-		}
-	#endif
-#endif
-
-inline ndInt32 dTwosPower (ndInt32 x)
-{
-	ndInt32 rval=1;
-	for (; rval < x; rval *= 2);
-	return rval;
-}
-
-// for some reason specifying a relative does not seem to work in Linus
-// and i have to specify a absolute path
-// #define ASSETS_PATH "."
-//void GetAplicationDirectory (char* const aplicationDir);
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
 // endian conversion
 ndUnsigned32 SWAP_INT32(ndUnsigned32 x);
 ndUnsigned16 SWAP_INT16(ndUnsigned16 x);
-void SWAP_FLOAT32_ARRAY (void* const array, ndInt32 count);
-
 ndUnsigned16 ndIndian16(ndUnsigned16 x);
 ndUnsigned32 ndIndian32(ndUnsigned32 x);
 
