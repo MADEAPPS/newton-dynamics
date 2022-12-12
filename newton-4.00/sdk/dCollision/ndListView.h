@@ -27,11 +27,11 @@
 class ndBodyKinematic;
 
 template<class T>
-class ndSpecialList : public ndList<T*, ndContainersFreeListAlloc<T>>
+class ndSpecialList : public ndList<T*, ndContainersFreeListAlloc<T*>>
 {
 	public:
 	ndSpecialList()
-		:ndList<T*, ndContainersFreeListAlloc<T>>()
+		:ndList<T*, ndContainersFreeListAlloc<T*>>()
 	{
 	}
 };
