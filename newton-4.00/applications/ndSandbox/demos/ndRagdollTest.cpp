@@ -120,78 +120,78 @@ namespace ndRagdoll
 			:ndModel()
 			,m_rootBody(nullptr)
 		{
-			ndAssert(0);
-			//ndWorld* const world = scene->GetWorld();
-			//
-			//// make a clone of the mesh and add it to the scene
-			//ndDemoEntity* const entity = ragdollMesh->CreateClone();
-			//scene->AddEntity(entity);
-			//
-			//ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
-			//ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
-			//
-			//// find the floor location 
-			//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			//matrix.m_posit.m_y = floor.m_y + 1.5f;
-			//
-			//// add the root body
-			//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
-			//rootBody->GetNotifyCallback()->OnTransform(0, matrix);
-			//
-			//ndInt32 stack = 0;
-			//ndFixSizeArray<ndFloat32, 64> massWeight;
-			//ndFixSizeArray<ndBodyDynamic*, 64> bodies;
-			//ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
-			//ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-			//
-			//m_rootBody = rootBody;
-			//parentBones.SetCount(32);
-			//childEntities.SetCount(32);
-			//
-			//for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
-			//{
-			//	childEntities[stack] = child;
-			//	parentBones[stack] = rootBody;
-			//	stack++;
-			//}
-			//
-			//bodies.PushBack(m_rootBody);
-			//massWeight.PushBack(ragdollDefinition[0].m_massWeight);
-			//
-			//while (stack)
-			//{
-			//	stack--;
-			//	ndBodyDynamic* parentBone = parentBones[stack];
-			//	ndDemoEntity* const childEntity = childEntities[stack];
-			//	const char* const name = childEntity->GetName().GetStr();
-			//	//ndTrace(("name: %s\n", name));
-			//	for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
-			//	{
-			//		const ndDefinition& definition = ragdollDefinition[i];
-			//		if (!strcmp(definition.m_boneName, name))
-			//		{
-			//			ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
-			//			bodies.PushBack(childBody);
-			//			massWeight.PushBack(ragdollDefinition[i].m_massWeight);
-			//
-			//			//connect this body part to its parentBody with a ragdoll joint
-			//			ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition);
-			//			world->AddJoint(joint);
-			//
-			//			parentBone = childBody;
-			//			break;
-			//		}
-			//	}
-			//
-			//	for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
-			//	{
-			//		childEntities[stack] = child;
-			//		parentBones[stack] = parentBone;
-			//		stack++;
-			//	}
-			//}
-			//
-			//NormalizeMassDistribution(100.0f, bodies, massWeight);
+			ndWorld* const world = scene->GetWorld();
+			
+			// make a clone of the mesh and add it to the scene
+			ndDemoEntity* const entity = ragdollMesh->CreateClone();
+			scene->AddEntity(entity);
+			
+			ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(ragdollDefinition[0].m_boneName);
+			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
+			
+			// find the floor location 
+			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			matrix.m_posit.m_y = floor.m_y + 1.5f;
+			
+			// add the root body
+			ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+			rootBody->GetNotifyCallback()->OnTransform(0, matrix);
+			
+			ndInt32 stack = 0;
+			ndFixSizeArray<ndFloat32, 64> massWeight;
+			ndFixSizeArray<ndBodyDynamic*, 64> bodies;
+			ndFixSizeArray<ndBodyDynamic*, 32> parentBones;
+			ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+			
+			m_rootBody = rootBody;
+			parentBones.SetCount(32);
+			childEntities.SetCount(32);
+			
+			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
+			{
+				childEntities[stack] = child;
+				parentBones[stack] = rootBody;
+				stack++;
+			}
+			
+			bodies.PushBack(m_rootBody);
+			massWeight.PushBack(ragdollDefinition[0].m_massWeight);
+			
+			while (stack)
+			{
+				stack--;
+				ndBodyDynamic* parentBone = parentBones[stack];
+				ndDemoEntity* const childEntity = childEntities[stack];
+				const char* const name = childEntity->GetName().GetStr();
+				//ndTrace(("name: %s\n", name));
+				for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
+				{
+					const ndDefinition& definition = ragdollDefinition[i];
+					if (!strcmp(definition.m_boneName, name))
+					{
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
+						bodies.PushBack(childBody);
+						massWeight.PushBack(ragdollDefinition[i].m_massWeight);
+			
+						//connect this body part to its parentBody with a ragdoll joint
+						//ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBone, definition);
+						ndSharedPtr<ndJointBilateralConstraint> joint = ConnectBodyParts(childBody, parentBone, definition);
+						world->AddJoint(joint);
+			
+						parentBone = childBody;
+						break;
+					}
+				}
+			
+				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
+				{
+					childEntities[stack] = child;
+					parentBones[stack] = parentBone;
+					stack++;
+				}
+			}
+			
+			NormalizeMassDistribution(100.0f, bodies, massWeight);
 		}
 
 		~ndHumanoidModel()
@@ -218,8 +218,8 @@ namespace ndRagdoll
 
 		ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 		{
-			ndAssert(0);
-			ndShapeInstance* const shape = entityPart->CreateCollisionFromChildren();
+			ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
+			ndShapeInstance* const shape = *shapePtr;
 			ndAssert(shape);
 
 			// create the rigid body that will make this body
@@ -233,7 +233,6 @@ namespace ndRagdoll
 			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
 
 			scene->GetWorld()->AddBody(body);
-			delete shape;
 			return body->GetAsBodyDynamic();
 		}
 
@@ -294,46 +293,48 @@ using namespace ndRagdoll;
 void ndRagdollTest (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	ndAssert(0);
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	//
-	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//ndDemoEntity* const ragdollMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
-	//
-	//ndMatrix matrix(ndGetIdentityMatrix());
-	//matrix.m_posit.m_y = 0.5f;
-	//ndMatrix playerMatrix(matrix);
-	//ndHumanoidModel* const ragdoll = new ndHumanoidModel(scene, ragdollMesh, matrix);
-	//scene->SetSelectedModel(ragdoll);
-	//scene->GetWorld()->AddModel(ragdoll);
-	////scene->GetWorld()->AddJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
-	//
-	//matrix.m_posit.m_x += 1.4f;
-	////TestPlayerCapsuleInteraction(scene, matrix);
-	//
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_y += 2.0f;
-	////ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
-	////reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
-	//
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	////scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
-	//
-	//matrix.m_posit.m_z = 2.0f;
-	////scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
-	//delete ragdollMesh;
-	//
-	//origin1.m_x += 20.0f;
-	////AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
-	//
-	//ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
-	//playerMatrix = ndYawMatrix(angle) * playerMatrix;
-	//ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
-	//origin.m_y += 1.0f;
-	//origin.m_z -= 2.0f;
-	//scene->SetCameraMatrix(playerMatrix, origin);
-	//
-	////ndLoadSave loadScene;
-	////loadScene.SaveModel("xxxxxx", ragdoll);
+	BuildFloorBox(scene, ndGetIdentityMatrix());
+	
+	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
+	ndDemoEntity* const ragdollMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit.m_y = 0.5f;
+	ndMatrix playerMatrix(matrix);
+	ndHumanoidModel* const ragdoll = new ndHumanoidModel(scene, ragdollMesh, matrix);
+	scene->SetSelectedModel(ragdoll);
+
+	ndSharedPtr<ndModel> ragdollPtr(ragdoll);
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(ragdoll->m_rootBody->GetMatrix(), ragdoll->m_rootBody, scene->GetWorld()->GetSentinelBody()));
+	scene->GetWorld()->AddModel(ragdollPtr);
+	//scene->GetWorld()->AddJoint(fixJoint);
+	
+	matrix.m_posit.m_x += 1.4f;
+	//TestPlayerCapsuleInteraction(scene, matrix);
+	
+	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_y += 2.0f;
+	//ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
+	//reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
+	
+	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_z -= 2.0f;
+	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
+	
+	matrix.m_posit.m_z = 2.0f;
+	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, ragdollMesh, matrix));
+	delete ragdollMesh;
+	
+	origin1.m_x += 20.0f;
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+	
+	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
+	playerMatrix = ndYawMatrix(angle) * playerMatrix;
+	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
+	origin.m_y += 1.0f;
+	origin.m_z -= 2.0f;
+	scene->SetCameraMatrix(playerMatrix, origin);
+	
+	//ndLoadSave loadScene;
+	//loadScene.SaveModel("xxxxxx", ragdoll);
 }
