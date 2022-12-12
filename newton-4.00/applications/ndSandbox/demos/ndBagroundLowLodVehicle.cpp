@@ -183,18 +183,20 @@ class BackGroundVehicleController : public ndModel
 
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)
 {
-	ndBodyDynamic* const pBody = new ndBodyDynamic();
-	ndDemoEntity* const pEntity = new ndDemoEntity(matrix, rootEntity);
-	pBody->SetNotifyCallback(new ndDemoEntityNotify(scene, pEntity));
-	pBody->SetMatrix(matrix);
-	pBody->SetCollisionShape(shape);
-	pBody->SetMassMatrix(mass, shape);
-	BackGroundVehicleController* const pController = new BackGroundVehicleController(scene, pBody);
-
-	ndWorld* const world = scene->GetWorld();
-	world->AddModel(pController);
-	world->AddBody(pBody);
-	return pBody;
+	ndAssert(0);
+	return nullptr;
+	//ndSharedPtr<ndBodyKinematic> pBody(new ndBodyDynamic());
+	//ndDemoEntity* const pEntity = new ndDemoEntity(matrix, rootEntity);
+	//pBody->SetNotifyCallback(new ndDemoEntityNotify(scene, pEntity));
+	//pBody->SetMatrix(matrix);
+	//pBody->SetCollisionShape(shape);
+	//pBody->SetMassMatrix(mass, shape);
+	//BackGroundVehicleController* const pController = new BackGroundVehicleController(scene, pBody);
+	//
+	//ndWorld* const world = scene->GetWorld();
+	//world->AddModel(pController);
+	//world->AddBody(pBody);
+	//return pBody->GetAsBodyDynamic();
 }
 
 static ndShapeInstance CreateCompondCollision()

@@ -22,15 +22,14 @@
 #ifndef __ND_JOINT_LIST_H__
 #define __ND_JOINT_LIST_H__
 
-#include "ndCollisionStdafx.h"
+#include "ndCoreStdafx.h"
+#include "ndNewtonStdafx.h"
 
-class ndJointBilateralConstraint;
-
-class ndJointList: public ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndJointBilateralConstraint*>>
+class ndJointList: public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
 {
 	public:
 	ndJointList()
-		:ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndJointBilateralConstraint*>>()
+		:ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
 	{
 	}
 };

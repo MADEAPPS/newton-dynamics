@@ -52,7 +52,6 @@ class ndSceneTreeNotiFy : public ndClassAlloc
 	}
 
 	virtual void OnDebugNode(const ndBvhNode* const node) = 0;
-
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -74,8 +73,10 @@ class ndScene : public ndThreadPool
 
 	public:
 	D_COLLISION_API virtual ~ndScene();
-	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
-	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
+	//D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
+	//D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
+	D_COLLISION_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
+	D_COLLISION_API virtual bool RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
@@ -158,7 +159,7 @@ class ndScene : public ndThreadPool
 	ndArray<ndUnsigned8> m_scratchBuffer;
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
 	ndArray<ndConstraint*> m_activeConstraintArray;
-	ndList<ndBodyKinematic*> m_specialUpdateList;
+	ndSpecialList<ndBodyKinematic> m_specialUpdateList;
 	ndThreadBackgroundWorker m_backgroundThread;
 	ndArray<ndContactPairs> m_newPairs;
 	ndArray<ndContactPairs> m_partialNewPairs[D_MAX_THREADS_COUNT];

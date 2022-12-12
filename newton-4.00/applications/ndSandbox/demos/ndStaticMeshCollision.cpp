@@ -25,6 +25,7 @@
 
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
+	ndAssert(0);
 	ndMatrix heighfieldLocation (ndGetIdentityMatrix());
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;

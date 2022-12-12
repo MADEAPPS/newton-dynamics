@@ -256,31 +256,30 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				{
 					notify->OnObjectPick();
 					m_targetPicked = body;
-
+		
 					m_pickedBodyParam = param;
-					if (m_pickJoint)
+					if (*m_pickJoint)
 					{
 						scene->GetWorld()->RemoveJoint(m_pickJoint);
-						delete m_pickJoint;
-						m_pickJoint = nullptr;
 					}
-
+		
 					ndVector mass(m_targetPicked->GetMassMatrix());
-
+		
 					//change this to make the grabbing stronger or weaker
 					//const ndFloat32 angularFritionAccel = 10.0f;
 					const ndFloat32 angularFritionAccel = 10.0f;
 					const ndFloat32 linearFrictionAccel = 40.0f * ndMax(ndAbs(DEMO_GRAVITY), ndFloat32(10.0f));
 					const ndFloat32 inertia = ndMax(mass.m_z, ndMax(mass.m_x, mass.m_y));
-
-					m_pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
+		
+					ndDemoCameraPickBodyJoint* const pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
+					m_pickJoint = ndSharedPtr<ndJointBilateralConstraint>(pickJoint);
 					scene->GetWorld()->AddJoint(m_pickJoint);
 					m_pickingMode ?
-						m_pickJoint->SetControlMode(ndJointKinematicController::m_linear) :
-						m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
-
-					m_pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
-					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+						pickJoint->SetControlMode(ndJointKinematicController::m_linear) :
+						pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+					
+					pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
+					pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 				}
 			}
 		}
@@ -291,18 +290,17 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 		{
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 			
-			if (m_pickJoint) 
+			if (*m_pickJoint) 
 			{
-				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+				ndDemoCameraPickBodyJoint* const pickJoint = (ndDemoCameraPickBodyJoint*)*m_pickJoint;
+				pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
 			}
 		} 
 		else 
 		{
-			if (m_pickJoint) 
+			if (*m_pickJoint)
 			{
 				scene->GetWorld()->RemoveJoint(m_pickJoint);
-				delete m_pickJoint;
-				m_pickJoint = nullptr;
 			}
 			ResetPickBody();
 		}
@@ -317,10 +315,11 @@ void ndDemoCameraManager::ResetPickBody()
 	{
 		m_targetPicked->SetSleepState(false);
 	}
-	if (m_pickJoint) 
+	if (*m_pickJoint) 
 	{
-		m_pickJoint->m_manager = nullptr;
+		ndDemoCameraPickBodyJoint* const pickJoint = (ndDemoCameraPickBodyJoint*)*m_pickJoint;
+		pickJoint->m_manager = nullptr;
 	}
-	m_pickJoint = nullptr;
+	m_pickJoint = ndSharedPtr<ndJointBilateralConstraint>(nullptr);
 	m_targetPicked = nullptr;
 }

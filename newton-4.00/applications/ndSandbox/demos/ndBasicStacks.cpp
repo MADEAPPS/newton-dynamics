@@ -25,7 +25,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene,
 	const ndMatrix& matrix, const ndShapeInstance& shape, 
 	ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)
 {
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -35,7 +35,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene,
 
 	ndWorld* const world = scene->GetWorld();
 	world->AddBody(body);
-	return body;
+	return body->GetAsBodyDynamic();
 }
 
 static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)

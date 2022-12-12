@@ -53,7 +53,7 @@ class ndDemoCameraManager: public ndClassAlloc
 
 	ndDemoCamera* m_camera;
 	ndBodyKinematic* m_targetPicked;
-	ndDemoCameraPickBodyJoint* m_pickJoint;
+	ndSharedPtr<ndJointBilateralConstraint> m_pickJoint;
 	ndFloat32 m_mousePosX;
 	ndFloat32 m_mousePosY;
 	ndFloat32 m_yaw;

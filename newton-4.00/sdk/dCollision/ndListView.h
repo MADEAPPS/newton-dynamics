@@ -27,7 +27,17 @@
 class ndBodyKinematic;
 
 template<class T>
-class ndListView : public ndList<T, ndContainersFreeListAlloc<T*>>
+class ndSpecialList : public ndList<T*, ndContainersFreeListAlloc<T>>
+{
+	public:
+	ndSpecialList()
+		:ndList<T*, ndContainersFreeListAlloc<T>>()
+	{
+	}
+};
+
+template<class T>
+class ndListView : public ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>
 {
 	public:
 	ndListView();
@@ -37,38 +47,38 @@ class ndListView : public ndList<T, ndContainersFreeListAlloc<T*>>
 		// I hate to say this, but visual studio 2017 and 2019 are pieces of shit
 		ndNode* AddItem(T const item);
 	#else
-		typename ndListView<T>::ndNode* AddItem(T const item);
+		typename ndListView<T>::ndNode* AddItem(ndSharedPtr<T> item);
 	#endif
 	void RemoveItem(typename ndListView<T>::ndNode* const node);
 
 	bool UpdateView();
 	bool IsListDirty() const;
 
-	ndArray<T>& GetView();
-	const ndArray<T>& GetView() const;
+	ndArray<T*>& GetView();
+	const ndArray<T*>& GetView() const;
 
 	protected:
-	ndArray<T> m_view;
+	ndArray<T*> m_view;
 	ndUnsigned8 m_listIsDirty;
 };
 
-class ndBodyList: public ndListView<ndBodyKinematic*>
+class ndBodyList: public ndListView<ndBodyKinematic>
 {
 	public:
 	ndBodyList()
-		:ndListView<ndBodyKinematic*>()
+		:ndListView<ndBodyKinematic>()
 	{
 	}
 
 	ndBodyList(const ndBodyList& src)
-		:ndListView<ndBodyKinematic*>(src)
+		:ndListView<ndBodyKinematic>(src)
 	{
 	}
 };
 
 template<class T>
 ndListView<T>::ndListView()
-	:ndList<T, ndContainersFreeListAlloc<T*>>()
+	:ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>()
 	,m_view(1024)
 	,m_listIsDirty(1)
 {
@@ -76,10 +86,11 @@ ndListView<T>::ndListView()
 
 template<class T>
 ndListView<T>::ndListView(const ndListView& src)
-	:ndList<T, ndContainersFreeListAlloc<T*>>()
+	:ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>()
 	,m_view()
 	,m_listIsDirty(1)
 {
+	ndAssert(0);
 	typename ndListView<T>::ndNode* nextNode;
 	ndListView* const stealData = (ndListView*)&src;
 	for (typename ndListView<T>::ndNode* node = stealData->GetFirst(); node; node = nextNode)
@@ -92,19 +103,19 @@ ndListView<T>::ndListView(const ndListView& src)
 }
 
 template<class T>
-ndArray<T>& ndListView<T>::GetView()
+ndArray<T*>& ndListView<T>::GetView()
 {
 	return m_view;
 }
 
 template<class T>
-const ndArray<T>& ndListView<T>::GetView() const
+const ndArray<T*>& ndListView<T>::GetView() const
 {
 	return m_view;
 }
 
 template<class T>
-typename ndListView<T>::ndNode* ndListView<T>::AddItem(T const item)
+typename ndListView<T>::ndNode* ndListView<T>::AddItem(ndSharedPtr<T> item)
 {
 	m_listIsDirty = 1;
 	return ndListView<T>::Append(item);
@@ -120,6 +131,7 @@ void ndListView<T>::RemoveItem(typename ndListView<T>::ndNode* const node)
 template<class T>
 bool ndListView<T>::IsListDirty() const
 {
+	ndAssert(0);
 	return m_listIsDirty ? true : false;
 }
 
@@ -132,11 +144,11 @@ bool ndListView<T>::UpdateView()
 		D_TRACKTIME();
 		ret = true;
 		m_listIsDirty = 0;
-		m_view.SetCount(ndListView<T>::GetCount());
 		ndInt32 index = 0;
+		m_view.SetCount(ndListView<T>::GetCount());
 		for (typename ndListView<T>::ndNode* node = ndListView<T>::GetFirst(); node; node = node->GetNext())
 		{
-			m_view[index] = node->GetInfo();
+			m_view[index] = *node->GetInfo();
 			index++;
 		}
 	}

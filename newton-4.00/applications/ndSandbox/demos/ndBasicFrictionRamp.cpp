@@ -75,7 +75,7 @@ class FrictionMaterial : public ndApplicationMaterial
 
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndSharedPtr<ndDemoMeshInterface> geometry, const ndShapeInstance& shape, ndFloat32 mass)
 {
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
 	entity->SetMesh(geometry);
@@ -88,7 +88,7 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMat
 	ndWorld* const world = scene->GetWorld();
 	scene->AddEntity(entity);
 	world->AddBody(body);
-	return body;
+	return body->GetAsBodyDynamic();
 }
 
 static void BuildFrictionRamp(ndDemoEntityManager* const scene)
@@ -113,7 +113,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry);
 	
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);

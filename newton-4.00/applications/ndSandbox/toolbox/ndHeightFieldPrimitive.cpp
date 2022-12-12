@@ -198,13 +198,13 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	shape->UpdateElevationMapAabb();
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(location);
 	body->SetCollisionShape(heighfieldInstance);
 
 	world->AddBody(body);
-	return body;
+	return *body;
 }
 
 void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& matrix)

@@ -25,14 +25,15 @@
 #include "ndNewtonStdafx.h"
 
 class ndModel;
-class ndModelList : public ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>
+
+class ndModelList : public ndList<ndSharedPtr<ndModel>, ndContainersFreeListAlloc<ndSharedPtr<ndModel>*>>
 {
 	ndModelList();
 
 	void UpdateDirtyList();
 	ndArray<ndModel*>& GetUpdateList();
-	void AddModel(ndModel* const model, ndWorld* const world);
-	void RemoveModel(ndModel* const model, ndWorld* const world);
+	void AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world);
+	void RemoveModel(ndSharedPtr<ndModel>& model);
 
 	ndArray<ndModel*> m_updateArray;
 	bool m_dirty;

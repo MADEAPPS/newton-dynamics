@@ -35,6 +35,28 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematic);
 
 ndVector ndBodyKinematic::m_velocTol(ndVector(ndFloat32(1.0e-8f)) & ndVector::m_triplexMask);
 
+ndBodyKinematic::ndContactkey::ndContactkey(ndUnsigned32 tag0, ndUnsigned32 tag1)
+	:m_tagLow(ndMin(tag0, tag1))
+	,m_tagHigh(ndMax(tag0, tag1))
+{
+	ndAssert(m_tagLow < m_tagHigh);
+}
+
+bool ndBodyKinematic::ndContactkey::operator== (const ndContactkey& key) const
+{
+	return m_tag == key.m_tag;
+}
+
+bool ndBodyKinematic::ndContactkey::operator< (const ndContactkey& key) const
+{
+	return m_tag < key.m_tag;
+}
+
+bool ndBodyKinematic::ndContactkey::operator> (const ndContactkey& key) const
+{
+	return m_tag > key.m_tag;
+}
+
 ndBodyKinematic::ndContactMap::ndContactMap()
 	:ndTree<ndContact*, ndContactkey, ndContainersFreeListAlloc<ndContact*>>()
 {
@@ -222,7 +244,7 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 	m_contactList.DetachContact(contact);
 }
 
-ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
+ndBodyKinematic::ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
 {
 	m_equilibrium = 0;
 	#ifdef _DEBUG
@@ -243,7 +265,7 @@ ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* co
 		}
 	}
 	#endif
-
+	
 	return m_jointList.Append(joint);
 }
 

@@ -34,6 +34,7 @@
 #include <ndLoadSave.h>
 #include <ndModelList.h>
 #include <ndJointGear.h>
+#include <ndJointList.h>
 #include <ndCharacter.h>
 #include <ndConstraint.h>
 #include <ndJointHinge.h>

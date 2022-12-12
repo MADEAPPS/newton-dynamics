@@ -26,7 +26,6 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
-
 ndBodyNotify::ndBodyNotify(const ndVector& defaultGravity)
 	:ndContainersFreeListAlloc<ndBodyNotify>()
 	,m_defaultGravity(defaultGravity)

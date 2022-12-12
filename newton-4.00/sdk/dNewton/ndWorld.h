@@ -23,13 +23,14 @@
 #define __ND_WORLD_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointList.h"
 #include "ndModelList.h"
+#include "ndJointList.h"
 #include "ndSkeletonList.h"
 #include "ndBodyParticleSetList.h"
 
 class ndWorld;
 class ndModel;
+class ndJointList;
 class ndBodyDynamic;
 class ndRayCastNotify;
 class ndDynamicsUpdate;
@@ -81,15 +82,21 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API bool IsGPU() const;
 	D_NEWTON_API const char* GetSolverString() const;
 
-	D_NEWTON_API virtual bool AddBody(ndBody* const body);
-	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
-	D_NEWTON_API virtual void DeleteBody(ndBody* const body);
+	//D_NEWTON_API virtual bool AddBody(ndBody* const body);
+	//D_NEWTON_API virtual void RemoveBody(ndBody* const body);
+	//D_NEWTON_API virtual void DeleteBody(ndBody* const body);
+	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
+	D_NEWTON_API virtual void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 
-	D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);
-	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
+	//D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);
+	//D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
+	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
+	D_NEWTON_API virtual void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
-	D_NEWTON_API virtual void AddModel(ndModel* const model);
-	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
+	//D_NEWTON_API virtual void AddModel(ndModel* const model);
+	//D_NEWTON_API virtual void RemoveModel(ndModel* const model);
+	D_NEWTON_API virtual void AddModel(ndSharedPtr<ndModel>& model);
+	D_NEWTON_API virtual void RemoveModel(ndSharedPtr<ndModel>& model);
 
 	D_NEWTON_API const ndBodyList& GetBodyList() const;
 	D_NEWTON_API const ndJointList& GetJointList() const;

@@ -220,8 +220,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 		ndVehicleCommon* vehicleArray[1024];
 		for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
 		{
-			ndModel* const model = node->GetInfo();
-			//if (!strcmp(model->ClassName(), "ndVehicleCommon"))
+			ndModel* const model = *node->GetInfo();
 			if (model->GetAsMultiBodyVehicle())
 			{
 				vehicleArray[vehiclesCount] = (ndVehicleCommon*)model->GetAsMultiBodyVehicle();
@@ -327,7 +326,7 @@ bool ndVehicleCommon::IsPlayer() const
 	return m_isPlayer;
 }
 
-void ndVehicleCommon::SetChassis(ndBodyDynamic* const chassis)
+void ndVehicleCommon::SetChassis(ndSharedPtr<ndBodyKinematic>& chassis)
 {
 	AddChassis(chassis);
 	// assign chassis material id.
@@ -365,7 +364,7 @@ void ndVehicleCommon::CalculateTireDimensions(const char* const tireName, ndFloa
 	radius = size.m_y * 0.5f;
 }
 
-ndBodyDynamic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
+ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
 {
 	ndFloat32 width;
 	ndFloat32 radius;
@@ -378,10 +377,13 @@ ndBodyDynamic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scene,
 	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);
 	ndMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
 
-	const ndMatrix chassisMatrix(m_localFrame * m_chassis->GetMatrix());
+	const ndBodyKinematic* const chassis = m_chassis;
+	ndAssert(chassis);
+
+	const ndMatrix chassisMatrix(m_localFrame * chassis->GetMatrix());
 	matrix.m_posit += chassisMatrix.m_up.Scale(definition.m_verticalOffset);
 
-	ndBodyDynamic* const tireBody = new ndBodyDynamic();
+	ndBodyKinematic* const tireBody = new ndBodyDynamic();
 	tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
 	tireBody->SetMatrix(matrix);
 	tireBody->SetCollisionShape(tireCollision);

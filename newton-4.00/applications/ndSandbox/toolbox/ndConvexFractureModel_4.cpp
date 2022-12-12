@@ -352,7 +352,7 @@ void ndConvexFractureModel_4::UpdateEffect(ndWorld* const world, ndEffect& effec
 		ndVector center(matrix.TransformVector(atom.m_centerOfMass));
 		ndVector debriVeloc(veloc + omega.CrossProduct(center - com));
 
-		ndBodyDynamic* const body = new ndBodyDynamic();
+		ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 		world->AddBody(body);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -368,7 +368,7 @@ void ndConvexFractureModel_4::UpdateEffect(ndWorld* const world, ndEffect& effec
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);
 #ifdef DEBRI_EXPLODE_LOCATION
-		ExplodeLocation(body, matrix, 0.3f);
+		ExplodeLocation(body->GetAsBodyDynamic(), matrix, 0.3f);
 #endif
 	}
 }

@@ -439,6 +439,8 @@ static BOOL CALLBACK deviceCallback(const DIDEVICEINSTANCE* di, void* user)
     js->present = GLFW_TRUE;
 
     _glfwInputJoystickChange(joy, GLFW_CONNECTED);
+
+	user = 0;
     return DIENUM_CONTINUE;
 }
 

@@ -38,7 +38,6 @@
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
 #include <ndShapeCone.h>
-#include <ndJointList.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
 #include <ndMeshEffect.h>

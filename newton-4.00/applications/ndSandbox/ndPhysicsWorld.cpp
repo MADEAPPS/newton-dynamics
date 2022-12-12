@@ -117,13 +117,14 @@ void ndPhysicsWorld::DeletePendingObjects()
 {
 	if (m_hasPendingObjectToDelete.load())
 	{
-		Sync();
-		m_hasPendingObjectToDelete.store(false);
-		for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); ++i)
-		{
-			DeleteBody(m_deletedBodies[i]);
-		}
-		m_deletedBodies.SetCount(0);
+		ndAssert(0);
+	//	Sync();
+	//	m_hasPendingObjectToDelete.store(false);
+	//	for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); ++i)
+	//	{
+	//		DeleteBody(m_deletedBodies[i]);
+	//	}
+	//	m_deletedBodies.SetCount(0);
 	}
 }
 
@@ -165,62 +166,63 @@ void ndPhysicsWorld::SaveSceneModel(const char* const path)
 
 bool ndPhysicsWorld::LoadScene(const char* const path)
 {
-	ndLoadSave loadScene;
-	loadScene.LoadScene(path);
-
-	// iterate over the loaded scene and add all objects to the world.
-	if (loadScene.m_setting && (strcmp("ndPhysicsWorldSettings", loadScene.m_setting->SubClassName()) == 0))
-	{
-		ndPhysicsWorldSettings* const settings = (ndPhysicsWorldSettings*)loadScene.m_setting;
-		ndDemoEntityManager* const manager = GetManager();
-		manager->SetCameraMatrix(settings->m_cameraMatrix, settings->m_cameraMatrix.m_posit);
-	}
-
-	ndBodyLoaderCache::Iterator bodyIter(loadScene.m_bodyMap);
-	for (bodyIter.Begin(); bodyIter; bodyIter++)
-	{
-		const ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
-		AddBody((ndBody*)body);
-	}
-
-	ndJointLoaderCache::Iterator jointIter(loadScene.m_jointMap);
-	for (jointIter.Begin(); jointIter; jointIter++)
-	{
-		const ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
-		AddJoint((ndJointBilateralConstraint*)joint);
-	}
-
-	ndModelLoaderCache::Iterator modelIter(loadScene.m_modelMap);
-	for (modelIter.Begin(); modelIter; modelIter++)
-	{
-		const ndModel* const model = modelIter.GetNode()->GetInfo();
-		AddModel((ndModel*)model);
-	}
-
-	// add some visualization
-	ndMatrix scale(ndGetIdentityMatrix());
-	scale[0][0] = 0.5f;
-	scale[1][1] = 0.5f;
-	scale[2][2] = 0.5f;
-	for (bodyIter.Begin(); bodyIter; bodyIter++)
-	{
-		ndBodyKinematic* const body = (ndBodyKinematic*)bodyIter.GetNode()->GetInfo();
-		ndAssert(body->GetAsBodyKinematic());
-		const ndShapeInstance& collision = body->GetCollisionShape();
-
-		ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
-
-		ndShape* const shape = (ndShape*)collision.GetShape();
-		if (!shape->GetAsShapeStaticProceduralMesh())
-		{
-			ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale));
-			entity->SetMesh(mesh);
-		}
-
-		m_manager->AddEntity(entity);
-
-		body->SetNotifyCallback(new ndDemoEntityNotify(m_manager, entity));
-	}
+	ndAssert(0);
+	//ndLoadSave loadScene;
+	//loadScene.LoadScene(path);
+	//
+	//// iterate over the loaded scene and add all objects to the world.
+	//if (loadScene.m_setting && (strcmp("ndPhysicsWorldSettings", loadScene.m_setting->SubClassName()) == 0))
+	//{
+	//	ndPhysicsWorldSettings* const settings = (ndPhysicsWorldSettings*)loadScene.m_setting;
+	//	ndDemoEntityManager* const manager = GetManager();
+	//	manager->SetCameraMatrix(settings->m_cameraMatrix, settings->m_cameraMatrix.m_posit);
+	//}
+	//
+	//ndBodyLoaderCache::Iterator bodyIter(loadScene.m_bodyMap);
+	//for (bodyIter.Begin(); bodyIter; bodyIter++)
+	//{
+	//	const ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
+	//	AddBody((ndBody*)body);
+	//}
+	//
+	//ndJointLoaderCache::Iterator jointIter(loadScene.m_jointMap);
+	//for (jointIter.Begin(); jointIter; jointIter++)
+	//{
+	//	const ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
+	//	AddJoint((ndJointBilateralConstraint*)joint);
+	//}
+	//
+	//ndModelLoaderCache::Iterator modelIter(loadScene.m_modelMap);
+	//for (modelIter.Begin(); modelIter; modelIter++)
+	//{
+	//	const ndModel* const model = modelIter.GetNode()->GetInfo();
+	//	AddModel((ndModel*)model);
+	//}
+	//
+	//// add some visualization
+	//ndMatrix scale(ndGetIdentityMatrix());
+	//scale[0][0] = 0.5f;
+	//scale[1][1] = 0.5f;
+	//scale[2][2] = 0.5f;
+	//for (bodyIter.Begin(); bodyIter; bodyIter++)
+	//{
+	//	ndBodyKinematic* const body = (ndBodyKinematic*)bodyIter.GetNode()->GetInfo();
+	//	ndAssert(body->GetAsBodyKinematic());
+	//	const ndShapeInstance& collision = body->GetCollisionShape();
+	//
+	//	ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
+	//
+	//	ndShape* const shape = (ndShape*)collision.GetShape();
+	//	if (!shape->GetAsShapeStaticProceduralMesh())
+	//	{
+	//		ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale));
+	//		entity->SetMesh(mesh);
+	//	}
+	//
+	//	m_manager->AddEntity(entity);
+	//
+	//	body->SetNotifyCallback(new ndDemoEntityNotify(m_manager, entity));
+	//}
 
 	return true;
 }

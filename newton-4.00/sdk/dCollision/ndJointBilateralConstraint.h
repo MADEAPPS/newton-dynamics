@@ -23,7 +23,6 @@
 #define __ND_JOINT_BILATERAL_CONSTRAINT_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndJointList.h"
 #include "ndConstraint.h"
 #include "ndBodyKinematic.h"
 
@@ -53,6 +52,15 @@ D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
+	class ndJointList : public ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
+	{
+		public:
+		ndJointList()
+			:ndList<ndSharedPtr<ndJointBilateralConstraint>, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
+		{
+		}
+	};
+
 	class ndIkInterface
 	{
 		public:
@@ -137,8 +145,8 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
 	ndJointList::ndNode* m_worldNode;
-	ndJointList::ndNode* m_body0Node;
-	ndJointList::ndNode* m_body1Node;
+	ndBodyKinematic::ndJointList::ndNode* m_body0Node;
+	ndBodyKinematic::ndJointList::ndNode* m_body1Node;
 
 	ndFloat32 m_defualtDiagonalRegularizer;
 	ndUnsigned32 m_maxDof			: 6;

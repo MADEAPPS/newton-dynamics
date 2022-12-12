@@ -351,6 +351,8 @@ static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* cons
 
 static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
+	ndAssert(0);
+#if 0
 	ndSetRandSeed(1);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -395,6 +397,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	// add particle volume to world
 	scene->AddEntity(entity);
 	world->AddBody(fluidObject);
+#endif
 }
 
 void ndBasicParticleFluid (ndDemoEntityManager* const scene)

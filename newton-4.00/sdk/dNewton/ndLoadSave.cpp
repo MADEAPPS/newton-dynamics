@@ -312,84 +312,86 @@ void ndLoadSave::SaveShapes(ndLoadSaveInfo& info)
 
 void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 {
-	ndLoadSaveBase::ndSaveDescriptor descriptor;
-	descriptor.m_assetPath = info.m_assetPath;
-	descriptor.m_assetName = info.m_assetName;
-	descriptor.m_rootNode = info.m_bodiesNode;
-
-	for (ndBodyList::ndNode* bodyNode = info.m_bodyList->GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-	{
-		ndBodyKinematic* const body = bodyNode->GetInfo();
-
-		ndShape* const shape = body->GetCollisionShape().GetShape();
-		ndTree<ndInt32, const ndShape*>::ndNode* shapeNode0 = info.m_shapeMap.Find(shape);
-		if (!shapeNode0)
-		{
-			ndShapeCompound* const compound = shape->GetAsShapeCompound();
-			if (compound)
-			{
-				ndShapeCompound::ndTreeArray::Iterator iter(compound->GetTree());
-				for (iter.Begin(); iter; iter++)
-				{
-					ndShapeCompound::ndNodeBase* const node = iter.GetNode()->GetInfo();
-					ndShapeInstance* const instance = node->GetShape();
-					ndShape* const subShape = instance->GetShape();
-					ndTree<ndInt32, const ndShape*>::ndNode* subShapeNode = info.m_shapeMap.Find(subShape);
-					if (!subShapeNode)
-					{
-						info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), subShape);
-					}
-				}
-			}
-			shapeNode0 = info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), shape);
-		}
-		descriptor.m_shapeNodeHash = shapeNode0->GetInfo();
-
-		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyHashNode = info.m_bodyMap.Find(body);
-		if (!bodyHashNode)
-		{
-			bodyHashNode = info.m_bodyMap.Insert(info.m_bodyMap.GetCount() + 1, body);
-		}
-		descriptor.m_nodeNodeHash = bodyHashNode->GetInfo();
-		body->Save(descriptor);
-	}
+	ndAssert(0);
+	//ndLoadSaveBase::ndSaveDescriptor descriptor;
+	//descriptor.m_assetPath = info.m_assetPath;
+	//descriptor.m_assetName = info.m_assetName;
+	//descriptor.m_rootNode = info.m_bodiesNode;
+	//
+	//for (ndBodyList::ndNode* bodyNode = info.m_bodyList->GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	//{
+	//	ndBodyKinematic* const body = bodyNode->GetInfo();
+	//
+	//	ndShape* const shape = body->GetCollisionShape().GetShape();
+	//	ndTree<ndInt32, const ndShape*>::ndNode* shapeNode0 = info.m_shapeMap.Find(shape);
+	//	if (!shapeNode0)
+	//	{
+	//		ndShapeCompound* const compound = shape->GetAsShapeCompound();
+	//		if (compound)
+	//		{
+	//			ndShapeCompound::ndTreeArray::Iterator iter(compound->GetTree());
+	//			for (iter.Begin(); iter; iter++)
+	//			{
+	//				ndShapeCompound::ndNodeBase* const node = iter.GetNode()->GetInfo();
+	//				ndShapeInstance* const instance = node->GetShape();
+	//				ndShape* const subShape = instance->GetShape();
+	//				ndTree<ndInt32, const ndShape*>::ndNode* subShapeNode = info.m_shapeMap.Find(subShape);
+	//				if (!subShapeNode)
+	//				{
+	//					info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), subShape);
+	//				}
+	//			}
+	//		}
+	//		shapeNode0 = info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), shape);
+	//	}
+	//	descriptor.m_shapeNodeHash = shapeNode0->GetInfo();
+	//
+	//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyHashNode = info.m_bodyMap.Find(body);
+	//	if (!bodyHashNode)
+	//	{
+	//		bodyHashNode = info.m_bodyMap.Insert(info.m_bodyMap.GetCount() + 1, body);
+	//	}
+	//	descriptor.m_nodeNodeHash = bodyHashNode->GetInfo();
+	//	body->Save(descriptor);
+	//}
 }
 
 void ndLoadSave::SaveJoints(ndLoadSaveInfo& info)
 {
-	ndLoadSaveBase::ndSaveDescriptor descriptor;
-	descriptor.m_assetPath = info.m_assetPath;
-	descriptor.m_assetName = info.m_assetName;
-	descriptor.m_rootNode = info.m_jointsNode;
-
-	for (ndJointList::ndNode* jointNode = info.m_jointList->GetFirst(); jointNode; jointNode = jointNode->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
-		const ndBodyKinematic* const body0 = joint->GetBody0();
-		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode0 = info.m_bodyMap.Find(body0);
-		if (!bodyNode0)
-		{
-			bodyNode0 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body0);
-		}
-		const ndBodyKinematic* const body1 = joint->GetBody1()->GetAsBodySentinel() ? nullptr : joint->GetBody1();
-		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode1 = info.m_bodyMap.Find(body1);
-		if (!bodyNode1)
-		{
-			bodyNode1 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body1);
-		}
-
-		descriptor.m_body0NodeHash = bodyNode0->GetInfo();
-		descriptor.m_body1NodeHash = bodyNode1->GetInfo();
-
-		ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* jointHashNode = info.m_jointMap.Find(joint);
-		if (!jointHashNode)
-		{
-			jointHashNode = info.m_jointMap.Insert(info.m_jointMap.GetCount(), joint);
-		}
-
-		descriptor.m_nodeNodeHash = jointHashNode->GetInfo();
-		joint->Save(descriptor);
-	}
+	ndAssert(0);
+	//ndLoadSaveBase::ndSaveDescriptor descriptor;
+	//descriptor.m_assetPath = info.m_assetPath;
+	//descriptor.m_assetName = info.m_assetName;
+	//descriptor.m_rootNode = info.m_jointsNode;
+	//
+	//for (ndJointList::ndNode* jointNode = info.m_jointList->GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	//{
+	//	ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+	//	const ndBodyKinematic* const body0 = joint->GetBody0();
+	//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode0 = info.m_bodyMap.Find(body0);
+	//	if (!bodyNode0)
+	//	{
+	//		bodyNode0 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body0);
+	//	}
+	//	const ndBodyKinematic* const body1 = joint->GetBody1()->GetAsBodySentinel() ? nullptr : joint->GetBody1();
+	//	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode1 = info.m_bodyMap.Find(body1);
+	//	if (!bodyNode1)
+	//	{
+	//		bodyNode1 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body1);
+	//	}
+	//
+	//	descriptor.m_body0NodeHash = bodyNode0->GetInfo();
+	//	descriptor.m_body1NodeHash = bodyNode1->GetInfo();
+	//
+	//	ndTree<ndInt32, const ndJointBilateralConstraint*>::ndNode* jointHashNode = info.m_jointMap.Find(joint);
+	//	if (!jointHashNode)
+	//	{
+	//		jointHashNode = info.m_jointMap.Insert(info.m_jointMap.GetCount(), joint);
+	//	}
+	//
+	//	descriptor.m_nodeNodeHash = jointHashNode->GetInfo();
+	//	joint->Save(descriptor);
+	//}
 }
 
 void ndLoadSave::SaveModels(ndLoadSaveInfo& info)
@@ -403,10 +405,11 @@ void ndLoadSave::SaveModels(ndLoadSaveInfo& info)
 	
 	for (ndModelList::ndNode* modelNode = info.m_modelList->GetFirst(); modelNode; modelNode = modelNode->GetNext())
 	{
-		ndModel* const model = modelNode->GetInfo();
-		descriptor.m_nodeNodeHash = info.m_modelMap.GetCount();
-		info.m_modelMap.Insert(descriptor.m_nodeNodeHash, model);
-		model->Save(descriptor);
+		ndAssert(0);
+		//ndModel* const model = modelNode->GetInfo();
+		//descriptor.m_nodeNodeHash = info.m_modelMap.GetCount();
+		//info.m_modelMap.Insert(descriptor.m_nodeNodeHash, model);
+		//model->Save(descriptor);
 	}
 }
 
@@ -503,63 +506,64 @@ void ndLoadSave::SaveScene(const char* const path, const ndWorld* const world, c
 
 void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 {
-	ndLoadSaveInfo info;
-	info.ExtensionAndFilePath(path);
-
-	nd::TiXmlDocument asciifile;
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
-	
-	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
-	asciifile.LinkEndChild(worldNode);
-	
-	info.m_worldNode = worldNode;
-	info.m_settingsNode = new nd::TiXmlElement("ndSettings");
-	info.m_shapesNode = new nd::TiXmlElement("ndShapes");
-	info.m_bodiesNode = new nd::TiXmlElement("ndBodies");
-	info.m_jointsNode = new nd::TiXmlElement("ndJoints");
-	info.m_modelsNode = new nd::TiXmlElement("ndModels");
-	
-	worldNode->LinkEndChild(info.m_settingsNode);
-	worldNode->LinkEndChild(info.m_shapesNode);
-	worldNode->LinkEndChild(info.m_bodiesNode);
-	worldNode->LinkEndChild(info.m_jointsNode);
-	worldNode->LinkEndChild(info.m_modelsNode);
-	
-	ndModelList modelList;
-	ndJointList jointList;
-	ndBodyList bodyList;
-	modelList.Append((ndModel*)model);
-
-	ndWordSettings settings;
-	info.m_setting = &settings;
-	info.m_bodyList = &bodyList;
-	info.m_modelList = &modelList;
-	info.m_jointList = &jointList;
-
-	info.m_bodyMap.Insert(0, nullptr);
-	SaveSceneSettings(info);
-	SaveModels(info);
-
-	ndTree<ndInt32, const ndJointBilateralConstraint*>::Iterator jointIter(info.m_jointMap);
-	for (jointIter.Begin(); jointIter; jointIter++)
-	{
-		jointList.Append((ndJointBilateralConstraint*)jointIter.GetKey());
-	}
-	SaveJoints(info);
-	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
-
-	ndTree<ndInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);
-	for (bodyIter.Begin(); bodyIter; bodyIter++)
-	{
-		bodyList.Append((ndBodyKinematic*)bodyIter.GetKey());
-	}
-	SaveBodies(info);
-	SaveShapes(info);
-	
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(info.m_fileName);
-	setlocale(LC_ALL, oldloc);
+	ndAssert(0);
+	//ndLoadSaveInfo info;
+	//info.ExtensionAndFilePath(path);
+	//
+	//nd::TiXmlDocument asciifile;
+	//nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	//asciifile.LinkEndChild(decl);
+	//
+	//nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+	//asciifile.LinkEndChild(worldNode);
+	//
+	//info.m_worldNode = worldNode;
+	//info.m_settingsNode = new nd::TiXmlElement("ndSettings");
+	//info.m_shapesNode = new nd::TiXmlElement("ndShapes");
+	//info.m_bodiesNode = new nd::TiXmlElement("ndBodies");
+	//info.m_jointsNode = new nd::TiXmlElement("ndJoints");
+	//info.m_modelsNode = new nd::TiXmlElement("ndModels");
+	//
+	//worldNode->LinkEndChild(info.m_settingsNode);
+	//worldNode->LinkEndChild(info.m_shapesNode);
+	//worldNode->LinkEndChild(info.m_bodiesNode);
+	//worldNode->LinkEndChild(info.m_jointsNode);
+	//worldNode->LinkEndChild(info.m_modelsNode);
+	//
+	//ndModelList modelList;
+	//ndJointList jointList;
+	//ndBodyList bodyList;
+	//modelList.Append((ndModel*)model);
+	//
+	//ndWordSettings settings;
+	//info.m_setting = &settings;
+	//info.m_bodyList = &bodyList;
+	//info.m_modelList = &modelList;
+	//info.m_jointList = &jointList;
+	//
+	//info.m_bodyMap.Insert(0, nullptr);
+	//SaveSceneSettings(info);
+	//SaveModels(info);
+	//
+	//ndTree<ndInt32, const ndJointBilateralConstraint*>::Iterator jointIter(info.m_jointMap);
+	//for (jointIter.Begin(); jointIter; jointIter++)
+	//{
+	//	jointList.Append((ndJointBilateralConstraint*)jointIter.GetKey());
+	//}
+	//SaveJoints(info);
+	//info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
+	//
+	//ndTree<ndInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);
+	//for (bodyIter.Begin(); bodyIter; bodyIter++)
+	//{
+	//	bodyList.Append((ndBodyKinematic*)bodyIter.GetKey());
+	//}
+	//SaveBodies(info);
+	//SaveShapes(info);
+	//
+	//char* const oldloc = setlocale(LC_ALL, 0);
+	//setlocale(LC_ALL, "C");
+	//asciifile.SaveFile(info.m_fileName);
+	//setlocale(LC_ALL, oldloc);
 }
 

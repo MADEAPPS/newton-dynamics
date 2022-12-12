@@ -28,6 +28,19 @@
 class ndMultiBodyVehicle;
 class ndConstraintDebugCallback;
 
+template<class T>
+class ndReferencedObjects : public ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>
+{
+	public:
+	ndReferencedObjects()
+		:ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>()
+	{
+	}
+
+	void AddReferenceBody(ndSharedPtr<T>& object);
+	ndSharedPtr<T>* FindReference(const T* const object) const;
+};
+
 D_MSV_NEWTON_ALIGN_32
 class ndModel: public ndContainersFreeListAlloc<ndModel>
 {
@@ -38,29 +51,61 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	virtual ~ndModel ();
 	
 	virtual void AddToWorld(ndWorld* const world);
-	virtual void RemoveFromToWorld(ndWorld* const world);
+	virtual void RemoveFromToWorld();
 
 	virtual ndModel* GetAsModel();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
+	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+
 	virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
 
-	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
+	ndReferencedObjects<ndBodyKinematic> m_referencedBodies;
+	ndReferencedObjects<ndJointBilateralConstraint> m_referencedJoints;
 	ndModelList::ndNode* m_node;
+	ndWorld* m_world;
 
 	friend class ndWorld;
 	friend class ndLoadSave;
 	friend class ndModelList;
 } D_GCC_NEWTON_ALIGN_32;
 
+template<class T>
+void ndReferencedObjects<T>::AddReferenceBody(ndSharedPtr<T>& object)
+{
+	T* const obj = *object;
+	for (ndNode* node = GetFirst(); node; node = node->GetNext())
+	{
+		if (*node->GetInfo() == obj)
+		{
+			return;
+		}
+	}
+	Append(object);
+}
+
+template<class T>
+ndSharedPtr<T>* ndReferencedObjects<T>::FindReference(const T* const object) const
+{
+	for (ndNode* node = GetFirst(); node; node = node->GetNext())
+	{
+		if (*node->GetInfo() == object)
+		{
+			return &node->GetInfo();
+		}
+	}
+	return nullptr;
+}
+
 inline ndModel::ndModel()
 	:ndContainersFreeListAlloc<ndModel>()
+	,m_referencedBodies()
 	,m_node(nullptr)
+	,m_world(nullptr)
 {
 }
 
@@ -95,11 +140,12 @@ inline void ndModel::PostTransformUpdate(ndWorld* const, ndFloat32)
 {
 }
 
-inline void ndModel::AddToWorld(ndWorld* const)
+inline void ndModel::AddToWorld(ndWorld* const world)
 {
+	m_world = world;
 }
 
-inline void ndModel::RemoveFromToWorld(ndWorld* const)
+inline void ndModel::RemoveFromToWorld()
 {
 }
 

@@ -58,7 +58,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual ~ndCharacter ();
 
 	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
-	D_NEWTON_API virtual void RemoveFromToWorld(ndWorld* const world);
+	D_NEWTON_API virtual void RemoveFromToWorld();
 
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
 	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);

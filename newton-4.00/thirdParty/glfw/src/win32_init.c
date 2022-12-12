@@ -296,7 +296,7 @@ static void createKeyTables(void)
     for (scancode = 0;  scancode < 512;  scancode++)
     {
         if (_glfw.win32.keycodes[scancode] > 0)
-            _glfw.win32.scancodes[_glfw.win32.keycodes[scancode]] = scancode;
+            _glfw.win32.scancodes[_glfw.win32.keycodes[scancode]] = (short)scancode;
     }
 }
 

@@ -25,7 +25,6 @@
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
 #include "ndListView.h"
-#include "ndJointList.h"
 #include "ndConstraint.h"
 
 class ndScene;
@@ -38,31 +37,15 @@ class ndJointBilateralConstraint;
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic : public ndBody
 {
+	public:
 	class ndContactkey
 	{
 		public:
-		ndContactkey(ndUnsigned32 tag0, ndUnsigned32 tag1)
-			:m_tagLow(ndMin(tag0, tag1))
-			,m_tagHigh(ndMax(tag0, tag1))
-		{
-			ndAssert(m_tagLow < m_tagHigh);
-		}
+		ndContactkey(ndUnsigned32 tag0, ndUnsigned32 tag1);
 
-		bool operator== (const ndContactkey& key) const
-		{
-			return m_tag == key.m_tag;
-		}
-
-		bool operator< (const ndContactkey& key) const
-		{
-			return m_tag < key.m_tag;
-		}
-
-		bool operator> (const ndContactkey& key) const
-		{
-			return m_tag > key.m_tag;
-		}
-
+		bool operator> (const ndContactkey& key) const;
+		bool operator< (const ndContactkey& key) const;
+		bool operator== (const ndContactkey& key) const;
 		private:
 		union
 		{
@@ -74,7 +57,16 @@ class ndBodyKinematic : public ndBody
 			};
 		};
 	};
-	public:
+
+	class ndJointList : public ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
+	{
+		public:
+		ndJointList()
+			:ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
+		{
+		}
+	};
+
 	class ndContactMap: public ndTree<ndContact*, ndContactkey, ndContainersFreeListAlloc<ndContact*>>
 	{
 		public:
@@ -168,15 +160,16 @@ class ndBodyKinematic : public ndBody
 	void SetAlpha(const ndVector& alpha);
 
 	ndContactMap& GetContactMap();
-	const ndJointList& GetJointList() const;
 	const ndContactMap& GetContactMap() const;
+	const ndJointList& GetJointList() const;
 
 	protected:
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 
-	D_COLLISION_API virtual ndJointList::ndNode* AttachJoint(ndJointBilateralConstraint* const joint);
 	D_COLLISION_API virtual void DetachJoint(ndJointList::ndNode* const node);
+	D_COLLISION_API virtual ndJointList::ndNode* AttachJoint(ndJointBilateralConstraint* const joint);
+
 	D_COLLISION_API virtual void IntegrateExternalForce(ndFloat32 timestep);
 
 	void SetAccel(const ndJacobian& accel);
@@ -209,7 +202,7 @@ class ndBodyKinematic : public ndBody
 	ndBodyKinematic* m_islandParent;
 	ndBodyList::ndNode* m_sceneNode;
 	ndSkeletonContainer* m_skeletonContainer;
-	ndList<ndBodyKinematic*>::ndNode* m_spetialUpdateNode;
+	ndSpecialList<ndBodyKinematic>::ndNode* m_spetialUpdateNode;
 
 	ndFloat32 m_maxAngleStep;
 	ndFloat32 m_maxLinearStep;
@@ -411,7 +404,7 @@ inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() con
 	return m_contactList;
 }
 
-inline const ndJointList& ndBodyKinematic::GetJointList() const
+inline const ndBodyKinematic::ndJointList& ndBodyKinematic::GetJointList() const
 {
 	return m_jointList;
 }

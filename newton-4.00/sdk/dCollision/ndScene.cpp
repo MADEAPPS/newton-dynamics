@@ -109,8 +109,8 @@ ndScene::ndScene(const ndScene& src)
 	ndSwap(m_contactNotifyCallback, stealData->m_contactNotifyCallback);
 	m_contactNotifyCallback->m_scene = this;
 
-	ndList<ndBodyKinematic*>::ndNode* nextNode;
-	for (ndList<ndBodyKinematic*>::ndNode* node = stealData->m_specialUpdateList.GetFirst(); node; node = nextNode)
+	ndSpecialList<ndBodyKinematic>::ndNode* nextNode;
+	for (ndSpecialList<ndBodyKinematic>::ndNode* node = stealData->m_specialUpdateList.GetFirst(); node; node = nextNode)
 	{
 		nextNode = node->GetNext();
 		stealData->m_specialUpdateList.Unlink(node);
@@ -119,14 +119,15 @@ ndScene::ndScene(const ndScene& src)
 
 	for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyKinematic* const body = node->GetInfo();
-		body->m_sceneForceUpdate = 1;
-		ndScene* const sceneNode = body->GetScene();
-		if (sceneNode)
-		{
-			body->SetSceneNodes(this, node);
-		}
-		ndAssert (body->GetContactMap().SanityCheck());
+		ndAssert(0);
+		//ndBodyKinematic* const body = node->GetInfo();
+		//body->m_sceneForceUpdate = 1;
+		//ndScene* const sceneNode = body->GetScene();
+		//if (sceneNode)
+		//{
+		//	body->SetSceneNodes(this, node);
+		//}
+		//ndAssert (body->GetContactMap().SanityCheck());
 	}
 
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
@@ -226,19 +227,20 @@ void ndScene::DebugScene(ndSceneTreeNotiFy* const notify)
 	}
 }
 
-bool ndScene::AddBody(ndBodyKinematic* const body)
+//bool ndScene::AddBody(ndBodyKinematic* const body)
+bool ndScene::AddBody(ndSharedPtr<ndBodyKinematic>& body)
 {
 	if ((body->m_scene == nullptr) && (body->m_sceneNode == nullptr))
 	{
 		ndBodyList::ndNode* const node = m_bodyList.AddItem(body);
 		body->SetSceneNodes(this, node);
-		m_contactNotifyCallback->OnBodyAdded(body);
+		m_contactNotifyCallback->OnBodyAdded(*body);
 		body->UpdateCollisionMatrix();
-
-		m_rootNode = m_bvhSceneManager.AddBody(body, m_rootNode);
+		
+		m_rootNode = m_bvhSceneManager.AddBody(*body, m_rootNode);
 		if (body->GetAsBodyKinematicSpecial())
 		{
-			body->m_spetialUpdateNode = m_specialUpdateList.Append(body);
+			body->m_spetialUpdateNode = m_specialUpdateList.Append(*body);
 		}
 		
 		m_forceBalanceSceneCounter = 0;
@@ -248,10 +250,10 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 	return false;
 }
 
-bool ndScene::RemoveBody(ndBodyKinematic* const body)
+bool ndScene::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 {
 	m_forceBalanceSceneCounter = 0;
-	m_bvhSceneManager.RemoveBody(body);
+	m_bvhSceneManager.RemoveBody(*body);
 
 	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 	while (contactMap.GetRoot())
@@ -260,7 +262,8 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 		m_contactArray.DetachContact(contact);
 	}
 
-	if (body->m_scene && body->m_sceneNode)
+	ndBodyList::ndNode* const sceneNode = body->m_sceneNode;
+	if (body->m_scene && sceneNode)
 	{
 		if (body->GetAsBodyKinematicSpecial())
 		{
@@ -268,9 +271,9 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 			body->m_spetialUpdateNode = nullptr;
 		}
 
-		m_bodyList.RemoveItem(body->m_sceneNode);
+		m_contactNotifyCallback->OnBodyRemoved(*body);
 		body->SetSceneNodes(nullptr, nullptr);
-		m_contactNotifyCallback->OnBodyRemoved(body);
+		m_bodyList.RemoveItem(sceneNode);
 		return true;
 	}
 	return false;
@@ -666,7 +669,7 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 {
 	if (body0->m_jointList.GetCount() <= body1->m_jointList.GetCount())
 	{
-		for (ndJointList::ndNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndBodyKinematic::ndJointList::ndNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const joint = node->GetInfo();
 			if ((joint->GetBody0() == body1) || (joint->GetBody1() == body1))
@@ -677,7 +680,7 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 	}
 	else
 	{
-		for (ndJointList::ndNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndBodyKinematic::ndJointList::ndNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const joint = node->GetInfo();
 			if ((joint->GetBody0() == body0) || (joint->GetBody1() == body0))
@@ -853,7 +856,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 
 void ndScene::UpdateSpecial()
 {
-	for (ndList<ndBodyKinematic*>::ndNode* node = m_specialUpdateList.GetFirst(); node; node = node->GetNext())
+	for (ndSpecialList<ndBodyKinematic>::ndNode* node = m_specialUpdateList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
 		body->SpecialUpdate(m_timestep);
@@ -1123,9 +1126,8 @@ void ndScene::Cleanup()
 
 	while (m_bodyList.GetFirst())
 	{
-		ndBodyKinematic* const body = m_bodyList.GetFirst()->GetInfo();
+		ndSharedPtr<ndBodyKinematic>& body = m_bodyList.GetFirst()->GetInfo();
 		RemoveBody(body);
-		delete body;
 	}
 	if (m_sentinelBody)
 	{

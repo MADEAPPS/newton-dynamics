@@ -93,8 +93,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//entity->ResetMatrix(entity->GetRenderMatrix() * matrix);
 	//entity->ResetMatrix(matrix);
 
+	ndSharedPtr<ndBodyKinematic> sharedPayer(this);
 	SetMatrix(matrix);
-	world->AddBody(this);
+	world->AddBody(sharedPayer);
 	scene->AddEntity(entity);
 
 	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));

@@ -31,8 +31,7 @@ static ndBodyDynamic* AddRigidBody(
 	const ndMatrix& matrix, const ndShapeInstance& shape,
 	ndDemoEntity* const entity, ndFloat32 mass)
 {
-	ndBodyDynamic* const body = new ndBodyDynamic();
-
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
@@ -41,7 +40,7 @@ static ndBodyDynamic* AddRigidBody(
 	ndWorld* const world = scene->GetWorld();
 	world->AddBody(body);
 	scene->AddEntity(entity);
-	return body;
+	return body->GetAsBodyDynamic();
 }
 
 static void AddToCompoundShape(const ndMatrix& mLocalMatrix, ndShapeInstance& parentShape, ndShapeInstance& childInstance)

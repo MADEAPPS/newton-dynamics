@@ -68,7 +68,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, 0.0f));
@@ -97,7 +97,7 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
 	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -130,7 +130,7 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const n
 
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga"));
 
-	ndBodyDynamic* const body = new ndAsymetricInertiaBody();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -162,7 +162,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	matrix.m_posit.m_y += 1.0f;
 
 	const ndFloat32 mass = 1.0f;
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
@@ -176,44 +176,45 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 speed, ndFloat32 radius, ndFloat32 lenght, ndFloat32 tiltAnsgle)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
-
+	
 	ndFloat32 smallRadius = 0.0625f;
 	ndShapeInstance rod(new ndShapeCapsule(smallRadius * 0.5f, smallRadius * 0.5f, lenght));
 	ndShapeInstance wheel(new ndShapeCylinder(radius, radius, 0.125f));
-
+	
 	ndMatrix offset(ndGetIdentityMatrix());
 	offset.m_posit.m_x = lenght * 0.5f;
 	wheel.SetLocalMatrix(offset);
-
+	
 	ndShapeInstance flyWheelShape(new ndShapeCompound());
 	ndShapeCompound* const compound = flyWheelShape.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 	compound->AddCollision(&rod);
 	compound->AddCollision(&wheel);
 	compound->EndAddRemove();
-
+	
 	ndMatrix matrix(ndRollMatrix(tiltAnsgle * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;
-
+	
 	ndDemoEntity* const entity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
-
+	
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga"));
 	entity->SetMesh(mesh);
-
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(flyWheelShape);
 	body->SetMassMatrix(mass, flyWheelShape);
-
+	
 	ndVector omega(matrix.m_front.Scale (speed));
 	body->SetOmega(omega);
-
+	
 	matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
-	ndJointSpherical* const joint = new ndJointSpherical(matrix, body, world->GetSentinelBody());
-
+	//ndJointSpherical* const joint = new ndJointSpherical(matrix, *body, world->GetSentinelBody());
+	ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointSpherical(matrix, *body, world->GetSentinelBody()));
+	
 	world->AddBody(body);
 	world->AddJoint(joint);
 	scene->AddEntity(entity);

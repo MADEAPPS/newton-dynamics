@@ -43,7 +43,8 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry);
 
-	ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
+	//ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
+	ndSharedPtr<ndBodyKinematic> body(new ndArchimedesBuoyancyVolume());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);

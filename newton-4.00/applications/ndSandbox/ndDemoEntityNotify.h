@@ -25,7 +25,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 	public:
 	D_CLASS_REFLECTION(ndDemoEntityNotify);
 	ndDemoEntityNotify(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 
 	void* GetUserData() const
@@ -40,7 +40,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndDemoEntity* m_entity;
-	ndBodyDynamic* m_parentBody;
+	ndBodyKinematic* m_parentBody;
 	ndDemoEntityManager* m_manager;
 };
 

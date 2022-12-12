@@ -257,11 +257,11 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(plane);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, BuildVisualEntity(scene, grids, gridSize, perturbation)));
 	world->AddBody(body);
-	return body;
+	return *body;
 }
 

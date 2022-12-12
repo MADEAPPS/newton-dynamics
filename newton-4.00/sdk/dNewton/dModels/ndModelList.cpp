@@ -24,7 +24,8 @@
 #include "ndModel.h"
 
 ndModelList::ndModelList()
-	:ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>()
+	//:ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>()
+	:ndList<ndSharedPtr<ndModel>, ndContainersFreeListAlloc<ndSharedPtr<ndModel>*>>()
 	,m_updateArray()
 	,m_dirty(true)
 {
@@ -43,12 +44,12 @@ void ndModelList::UpdateDirtyList()
 		m_updateArray.SetCount(0);
 		for (ndNode* node = GetFirst(); node; node = node->GetNext())
 		{
-			m_updateArray.PushBack(node->GetInfo());
+			m_updateArray.PushBack(*node->GetInfo());
 		}
 	}
 }
 
-void ndModelList::AddModel(ndModel* const model, ndWorld* const world)
+void ndModelList::AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world)
 {
 	ndAssert(!model->m_node);
 	if (!model->m_node)
@@ -60,13 +61,14 @@ void ndModelList::AddModel(ndModel* const model, ndWorld* const world)
 	}
 }
 
-void ndModelList::RemoveModel(ndModel* const model, ndWorld* const world)
+void ndModelList::RemoveModel(ndSharedPtr<ndModel>& model)
 {
-	if (model->m_node)
+	ndNode* node = model->m_node;
+	if (node)
 	{
 		m_dirty = true;
-		model->RemoveFromToWorld(world);
-		Remove(model->m_node);
+		model->RemoveFromToWorld();
 		model->m_node = nullptr;
+		Remove(node);
 	}
 }

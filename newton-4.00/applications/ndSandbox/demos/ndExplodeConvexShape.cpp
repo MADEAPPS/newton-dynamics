@@ -186,26 +186,27 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const nd
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndExplodeConvexShapeModel* const fractureManager = new ndExplodeConvexShapeModel(scene);
-	world->AddModel(fractureManager);
-
-	ndMatrix matrix(ndGetIdentityMatrix());
-
-	matrix.m_posit.m_x += 10.0f;
-	matrix.m_posit.m_y += 2.0f;
-	matrix.m_posit.m_z -= 5.0f;
-	AddBoxEffect(fractureManager, matrix);
-
-	matrix.m_posit.m_z += 5.0f;
-	AddCapsuleEffect(fractureManager, matrix);
-
-	matrix.m_posit.m_z += 5.0f;
-	AddCylinderEffect(fractureManager, matrix);
-
-	ndQuaternion rot;
-	ndVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
-	scene->SetCameraMatrix(rot, origin);
+	ndAssert(0);
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	//
+	//ndPhysicsWorld* const world = scene->GetWorld();
+	//ndExplodeConvexShapeModel* const fractureManager = new ndExplodeConvexShapeModel(scene);
+	//world->AddModel(fractureManager);
+	//
+	//ndMatrix matrix(ndGetIdentityMatrix());
+	//
+	//matrix.m_posit.m_x += 10.0f;
+	//matrix.m_posit.m_y += 2.0f;
+	//matrix.m_posit.m_z -= 5.0f;
+	//AddBoxEffect(fractureManager, matrix);
+	//
+	//matrix.m_posit.m_z += 5.0f;
+	//AddCapsuleEffect(fractureManager, matrix);
+	//
+	//matrix.m_posit.m_z += 5.0f;
+	//AddCylinderEffect(fractureManager, matrix);
+	//
+	//ndQuaternion rot;
+	//ndVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
+	//scene->SetCameraMatrix(rot, origin);
 }

@@ -101,101 +101,105 @@ void ndCharacter::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 void ndCharacter::AddToWorld(ndWorld* const world)
 {
-	if (m_rootNode)
-	{
-		world->AddBody(m_rootNode->GetBody());
-
-		ndInt32 stack = 0;
-		ndCharacterNode* nodePool[32];
-		ndAssert(0);
-		for (ndCharacterNode* child = m_rootNode->GetFirstChild(); child; child = child->GetNext())
-		{
-			nodePool[stack] = child;
-			stack++;
-		}
-
-		while (stack)
-		{
-			stack--;
-			ndCharacterNode* const node = nodePool[stack];
-			if (node->GetBody())
-			{
-				world->AddBody(node->GetBody());
-			}
-
-			if (node->GetJoint())
-			{
-				world->AddJoint(node->GetJoint());
-			}
-
-			for (ndCharacterNode* child = node->GetFirstChild(); child; child = child->GetNext())
-			{
-				nodePool[stack] = child;
-				stack++;
-			}
-		}
-	}
-
-	for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
-		world->AddJoint(joint);
-	}
-
-	for (ndList<ndJointBilateralConstraint*>::ndNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = node->GetInfo();
-		world->AddJoint(joint);
-	}
+	ndAssert(0);
+	//ndModel::AddToWorld(world);
+	//if (m_rootNode)
+	//{
+	//	world->AddBody(m_rootNode->GetBody());
+	//
+	//	ndInt32 stack = 0;
+	//	ndCharacterNode* nodePool[32];
+	//	ndAssert(0);
+	//	for (ndCharacterNode* child = m_rootNode->GetFirstChild(); child; child = child->GetNext())
+	//	{
+	//		nodePool[stack] = child;
+	//		stack++;
+	//	}
+	//
+	//	while (stack)
+	//	{
+	//		stack--;
+	//		ndCharacterNode* const node = nodePool[stack];
+	//		if (node->GetBody())
+	//		{
+	//			world->AddBody(node->GetBody());
+	//		}
+	//
+	//		if (node->GetJoint())
+	//		{
+	//			world->AddJoint(node->GetJoint());
+	//		}
+	//
+	//		for (ndCharacterNode* child = node->GetFirstChild(); child; child = child->GetNext())
+	//		{
+	//			nodePool[stack] = child;
+	//			stack++;
+	//		}
+	//	}
+	//}
+	//
+	//for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
+	//	world->AddJoint(joint);
+	//}
+	//
+	//for (ndList<ndJointBilateralConstraint*>::ndNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndJointBilateralConstraint* const joint = node->GetInfo();
+	//	world->AddJoint(joint);
+	//}
 }
 
-void ndCharacter::RemoveFromToWorld(ndWorld* const world)
+void ndCharacter::RemoveFromToWorld()
 {
-	for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
-		world->RemoveJoint(joint);
-	}
-
-	for (ndList<ndJointBilateralConstraint*>::ndNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = node->GetInfo();
-		world->RemoveJoint(joint);
-	}
-
-	if (m_rootNode)
-	{
-		world->RemoveBody(m_rootNode->GetBody());
-
-		ndInt32 stack = 0;
-		ndCharacterNode* nodePool[32];
-		for (ndCharacterNode* child = m_rootNode->GetFirstChild(); child; child = child->GetNext())
-		{
-			nodePool[stack] = child;
-			stack++;
-		}
-
-		while (stack)
-		{
-			stack--;
-			ndCharacterNode* const node = nodePool[stack];
-			if (node->GetBody())
-			{
-				world->RemoveBody(node->GetBody());
-			}
-
-			if (node->GetJoint())
-			{
-				world->RemoveJoint(node->GetJoint());
-			}
-
-			for (ndCharacterNode* child = node->GetFirstChild(); child; child = child->GetNext())
-			{
-				nodePool[stack] = child;
-				stack++;
-			}
-		}
-	}
+	ndAssert(0);
+	ndAssert(m_world);
+	//for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
+	//	world->RemoveJoint(joint);
+	//}
+	//
+	//for (ndList<ndJointBilateralConstraint*>::ndNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndJointBilateralConstraint* const joint = node->GetInfo();
+	//	world->RemoveJoint(joint);
+	//}
+	//
+	//if (m_rootNode)
+	//{
+	//	world->RemoveBody(m_rootNode->GetBody());
+	//
+	//	ndInt32 stack = 0;
+	//	ndCharacterNode* nodePool[32];
+	//	for (ndCharacterNode* child = m_rootNode->GetFirstChild(); child; child = child->GetNext())
+	//	{
+	//		nodePool[stack] = child;
+	//		stack++;
+	//	}
+	//
+	//	while (stack)
+	//	{
+	//		stack--;
+	//		ndCharacterNode* const node = nodePool[stack];
+	//		if (node->GetBody())
+	//		{
+	//			world->RemoveBody(node->GetBody());
+	//		}
+	//
+	//		if (node->GetJoint())
+	//		{
+	//			world->RemoveJoint(node->GetJoint());
+	//		}
+	//
+	//		for (ndCharacterNode* child = node->GetFirstChild(); child; child = child->GetNext())
+	//		{
+	//			nodePool[stack] = child;
+	//			stack++;
+	//		}
+	//	}
+	//}
 }
 
 ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)

@@ -186,12 +186,12 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 	compound->EndAddRemove();
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, rootEntity));
 	body->SetMatrix(location);
 	body->SetCollisionShape(sceneInstance);
 
 	scene->AddEntity(rootEntity);
 	world->AddBody(body);
-	return body;
+	return *body;
 }

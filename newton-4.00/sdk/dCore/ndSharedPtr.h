@@ -15,15 +15,6 @@
 template <typename T>
 class ndSharedPtr
 {
-	private:	
-	class ndRefCounter : public ndClassAlloc, public ndAtomic<ndInt32>
-	{
-		public: 
-		ndRefCounter();
-		void AddRef();
-		ndInt32 Release();
-	};
-
 	public:
 	ndSharedPtr();
 	ndSharedPtr(T* const ptr);
@@ -39,14 +30,22 @@ class ndSharedPtr
 	const T* operator* () const;
 
 	private:
+	class ndRefCounter : public ndAtomic<ndInt32>, public ndContainersFreeListAlloc<ndRefCounter>
+	{
+		public:
+		ndRefCounter();
+		void AddRef();
+		ndInt32 Release();
+	};
+
 	T* m_ptr;
 	ndRefCounter* m_references;
 };
 
 template <typename T>
 ndSharedPtr<T>::ndRefCounter::ndRefCounter()
-	:ndClassAlloc()
-	,ndAtomic<ndInt32>(0)
+	:ndAtomic<ndInt32>(0)
+	,ndContainersFreeListAlloc<ndRefCounter>()
 {
 }
 

@@ -78,132 +78,133 @@ namespace ndQuadruped_2
 			,m_effectors()
 			,m_effectorsJoints()
 		{
-			ndFloat32 mass = 10.0f;
-			ndFloat32 radius = 0.25f;
-			ndFloat32 limbMass = 0.5f;
-			ndFloat32 limbLength = 0.3f;
-			ndFloat32 limbRadios = 0.06f;
-
-			ndPhysicsWorld* const world = scene->GetWorld();
-			ndBodyKinematic* const torso = AddSphere(scene, location, mass, radius, "smilli.tga");
-			m_rootBody = torso->GetAsBodyDynamic();
-
-			ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
-			entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));
-
-			ndMatrix matrix(ndRollMatrix(45.0f * ndDegreeToRad));
-			matrix.m_posit.m_x = radius * 0.9f;
-			matrix.m_posit.m_y = -radius * 0.5f;
-
-			ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-			//ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
-
-			const ndVector upDir(location.m_up);
-			for (ndInt32 i = 0; i < 4; ++i)
-			{
-				ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
-				limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
-				limbPivotLocation.m_posit.m_w = 1.0f;
-
-				// add leg thigh
-				const ndVector thighPivot(limbPivotLocation.m_posit);
-
-				ndFloat32 workSpace = 0.0f;
-				ndBodyKinematic* thigh = nullptr;
-				{
-					ndMatrix bodyMatrix(limbPivotLocation);
-					bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-					thigh = AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
-					thigh->SetMatrix(bodyMatrix);
-					ndIkJointSpherical* const ball = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
-					world->AddJoint(ball);
-
-					limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
-
-					workSpace += limbLength;
-				}
-
-				// add calf0
-				ndBodyKinematic* calf0 = nullptr;
-				{
-					limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
-
-					ndMatrix bodyMatrix(limbPivotLocation);
-					bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-					calf0 = AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
-					calf0->SetMatrix(bodyMatrix);
-
-					ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
-					ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
-					caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(sign);
-					caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
-					caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-					caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-					ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, thigh);
-
-					// add joint limit to prevent knee from flipping
-					hinge->SetLimitState(true);
-					hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
-					world->AddJoint(hinge);
-
-					limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
-					workSpace += limbLength;
-				}
-
-				ndBodyKinematic* calf1 = nullptr;
-				ndJointHinge* lookActHinge = nullptr;
-				{
-					ndFloat32 lenght = limbLength * 0.5f;
-					limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
-					ndMatrix bodyMatrix(limbPivotLocation);
-					bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
-
-					calf1 = AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght);
-					calf1->SetMatrix(bodyMatrix);
-
-					ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
-					caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
-					caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
-					caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-					caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-
-					// add joint limit to prevent knee from flipping
-					lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
-					lookActHinge->SetLimitState(true);
-					lookActHinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
-					lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-
-					world->AddJoint(lookActHinge);
-
-					limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
-					workSpace += lenght;
-				}
-
-				// add leg effector
-				{
-					ndBodyKinematic* const targetBody = calf1;
-
-					ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
-					ndMatrix effectorToeFrame(ndGetIdentityMatrix());
-					ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
-					effectorRefFrame.m_posit = thighPivot;
-					effectorToeFrame.m_posit = limbPivotLocation.m_posit;
-
-					ndFloat32 regularizer = 0.001f;
-					ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso);
-					effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-					effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-					effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
-					
-					ndEffectorInfo info(effector, lookActHinge);
-					info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-					info.m_y_mapper = ndParamMapper(-0.4f, 0.1f);
-					info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
-					info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-					m_effectors.PushBack(info);
-					m_effectorsJoints.PushBack(effector);
-				}
-			}
+			ndAssert(0);
+			//ndFloat32 mass = 10.0f;
+			//ndFloat32 radius = 0.25f;
+			//ndFloat32 limbMass = 0.5f;
+			//ndFloat32 limbLength = 0.3f;
+			//ndFloat32 limbRadios = 0.06f;
+			//
+			//ndPhysicsWorld* const world = scene->GetWorld();
+			//ndBodyKinematic* const torso = AddSphere(scene, location, mass, radius, "smilli.tga");
+			//m_rootBody = torso->GetAsBodyDynamic();
+			//
+			//ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
+			//entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));
+			//
+			//ndMatrix matrix(ndRollMatrix(45.0f * ndDegreeToRad));
+			//matrix.m_posit.m_x = radius * 0.9f;
+			//matrix.m_posit.m_y = -radius * 0.5f;
+			//
+			//ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
+			////ndFloat32 angles[] = { 270.0f, 90.0f, 120.0f, 60.0f };
+			//
+			//const ndVector upDir(location.m_up);
+			//for (ndInt32 i = 0; i < 4; ++i)
+			//{
+			//	ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
+			//	limbPivotLocation.m_posit += torso->GetMatrix().m_posit;
+			//	limbPivotLocation.m_posit.m_w = 1.0f;
+			//
+			//	// add leg thigh
+			//	const ndVector thighPivot(limbPivotLocation.m_posit);
+			//
+			//	ndFloat32 workSpace = 0.0f;
+			//	ndBodyKinematic* thigh = nullptr;
+			//	{
+			//		ndMatrix bodyMatrix(limbPivotLocation);
+			//		bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+			//		thigh = AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
+			//		thigh->SetMatrix(bodyMatrix);
+			//		ndIkJointSpherical* const ball = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
+			//		world->AddJoint(ball);
+			//
+			//		limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
+			//
+			//		workSpace += limbLength;
+			//	}
+			//
+			//	// add calf0
+			//	ndBodyKinematic* calf0 = nullptr;
+			//	{
+			//		limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
+			//
+			//		ndMatrix bodyMatrix(limbPivotLocation);
+			//		bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
+			//		calf0 = AddCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
+			//		calf0->SetMatrix(bodyMatrix);
+			//
+			//		ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
+			//		ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
+			//		caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(sign);
+			//		caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
+			//		caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
+			//		caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+			//		ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0, thigh);
+			//
+			//		// add joint limit to prevent knee from flipping
+			//		hinge->SetLimitState(true);
+			//		hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
+			//		world->AddJoint(hinge);
+			//
+			//		limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
+			//		workSpace += limbLength;
+			//	}
+			//
+			//	ndBodyKinematic* calf1 = nullptr;
+			//	ndJointHinge* lookActHinge = nullptr;
+			//	{
+			//		ndFloat32 lenght = limbLength * 0.5f;
+			//		limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
+			//		ndMatrix bodyMatrix(limbPivotLocation);
+			//		bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
+			//
+			//		calf1 = AddCapsule(scene, bodyMatrix, limbMass * 0.5f, limbRadios, limbRadios, lenght);
+			//		calf1->SetMatrix(bodyMatrix);
+			//
+			//		ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
+			//		caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(-1.0f);
+			//		caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
+			//		caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
+			//		caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
+			//
+			//		// add joint limit to prevent knee from flipping
+			//		lookActHinge = new ndJointHinge(caffPinAndPivotFrame, calf0, calf1);
+			//		lookActHinge->SetLimitState(true);
+			//		lookActHinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
+			//		lookActHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+			//
+			//		world->AddJoint(lookActHinge);
+			//
+			//		limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(lenght);
+			//		workSpace += lenght;
+			//	}
+			//
+			//	// add leg effector
+			//	{
+			//		ndBodyKinematic* const targetBody = calf1;
+			//
+			//		ndFloat32 angle(i < 2 ? -90.0f : 90.0f);
+			//		ndMatrix effectorToeFrame(ndGetIdentityMatrix());
+			//		ndMatrix effectorRefFrame(ndYawMatrix(angle * ndDegreeToRad));
+			//		effectorRefFrame.m_posit = thighPivot;
+			//		effectorToeFrame.m_posit = limbPivotLocation.m_posit;
+			//
+			//		ndFloat32 regularizer = 0.001f;
+			//		ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorToeFrame.m_posit, effectorRefFrame, targetBody, torso);
+			//		effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+			//		effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+			//		effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
+			//		
+			//		ndEffectorInfo info(effector, lookActHinge);
+			//		info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
+			//		info.m_y_mapper = ndParamMapper(-0.4f, 0.1f);
+			//		info.m_z_mapper = ndParamMapper(-0.15f, 0.15f);
+			//		info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+			//		m_effectors.PushBack(info);
+			//		m_effectorsJoints.PushBack(effector);
+			//	}
+			//}
 		}
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -359,22 +360,23 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
 return;
-	BuildFloorBox(scene, ndGetIdentityMatrix());
-	//BuildFlatPlane(scene, true);
-
-	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	
-	ndQuadrupedModel* const aiBot_1 = new ndQuadrupedModel(scene, matrix);
-	scene->SetSelectedModel(aiBot_1);
-	world->AddModel(aiBot_1);
-	scene->Set2DDisplayRenderFunction(ndQuadrupedModel::ControlPanel, nullptr, aiBot_1);
-	//world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
-
-	matrix.m_posit.m_x -= 4.0f;
-	matrix.m_posit.m_y += 1.5f;
-	matrix.m_posit.m_z += 0.25f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
+	ndAssert(0);
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	////BuildFlatPlane(scene, true);
+	//
+	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
+	//ndWorld* const world = scene->GetWorld();
+	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	//
+	//ndQuadrupedModel* const aiBot_1 = new ndQuadrupedModel(scene, matrix);
+	//scene->SetSelectedModel(aiBot_1);
+	//world->AddModel(aiBot_1);
+	//scene->Set2DDisplayRenderFunction(ndQuadrupedModel::ControlPanel, nullptr, aiBot_1);
+	////world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
+	//
+	//matrix.m_posit.m_x -= 4.0f;
+	//matrix.m_posit.m_y += 1.5f;
+	//matrix.m_posit.m_z += 0.25f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

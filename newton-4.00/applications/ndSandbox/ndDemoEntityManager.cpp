@@ -691,47 +691,47 @@ void ndDemoEntityManager::Cleanup ()
 	{
 		m_world->Sync();
 	}
-
+	
 	ndTree<ndAnimationSequence*, ndString>::Iterator iter(m_animationCache);
 	for (iter.Begin(); iter; iter++)
 	{
 		delete *iter;
 	}
 	m_animationCache.RemoveAll();
-
+	
 	while (m_debugShapeCache->GetRoot())
 	{
 		m_debugShapeCache->Remove(m_debugShapeCache->GetRoot());
 	}
-
+	
 	if (m_cameraManager) 
 	{
 		delete m_cameraManager;
 		m_cameraManager = nullptr;
 	}
-
+	
 	m_sky = nullptr;
 	m_updateCamera = nullptr;
-
+	
 	// destroy the Newton world
 	if (m_world) 
 	{
 		const ndBodyList& bodyList = m_world->GetBodyList();
 		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
-			ndBodyKinematic* const body = bodyNode->GetInfo();
+			ndBodyKinematic* const body = *bodyNode->GetInfo();
 			ndDemoEntityNotify* const callback = (ndDemoEntityNotify*)body->GetNotifyCallback();
 			if (callback)
 			{
 				callback->m_entity = nullptr;
 			}
 		}
-
+		
 		// get serialization call back before destroying the world
 		m_world->CleanUp();
 		delete m_world;
 	}
-
+	
 	// destroy all remaining visual objects
 	while (GetFirst())
 	{
@@ -739,7 +739,7 @@ void ndDemoEntityManager::Cleanup ()
 		RemoveEntity(ent);
 		delete ent;
 	}
-
+	
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);
 	
@@ -747,7 +747,7 @@ void ndDemoEntityManager::Cleanup ()
 	m_cameraManager = new ndDemoCameraManager(this);
 	
 	ApplyMenuOptions();
-
+	
 	// we start without 2d render
 	m_renderDemoGUI = nullptr;
 	m_renderHelpMenus = nullptr;
@@ -802,21 +802,18 @@ void ndDemoEntityManager::LoadFont()
 void ndDemoEntityManager::ApplyMenuOptions()
 {
 	m_world->Sync();
-	// clean up all caches the engine have saved
-	////NewtonInvalidateCache(m_world);
-
 	m_world->SetSubSteps(m_solverSubSteps);
 	m_world->SetSolverIterations(m_solverPasses);
 	m_world->SetThreadCount(m_workerThreads);
-
+	
 	bool state = m_autoSleepMode ? true : false;
 	const ndBodyList& bodyList = m_world->GetBodyList();
 	for (ndBodyList::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyKinematic* const body = node->GetInfo();
+		ndBodyKinematic* const body = *node->GetInfo();
 		body->SetAutoSleep(state);
 	}
-
+	
 	SetParticleUpdateMode();
 	m_world->SelectSolver(m_solverMode);
 	m_solverMode = m_world->GetSelectedSolver();
@@ -1447,16 +1444,16 @@ void ndDemoEntityManager::DrawDebugShapes()
 {
 	const ndVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
 	const ndVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
-
+	
 	const ndBodyList& bodyList = m_world->GetBodyList();
-
+	
 	if (m_collisionDisplayMode == 3)
 	{
 		// do a z buffer pre pass for hidden line 
 		glColorMask(0, 0, 0, 0);
 		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
-			ndBodyKinematic* const body = bodyNode->GetInfo();
+			ndBodyKinematic* const body = *bodyNode->GetInfo();
 			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 			ndShape* const key = (ndShape*)shapeInstance.GetShape();
 			if (key->GetAsShapeStaticProceduralMesh())
@@ -1476,10 +1473,10 @@ void ndDemoEntityManager::DrawDebugShapes()
 		}
 		glColorMask(1, 1, 1, 1);
 	}
-
+	
 	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
-		ndBodyKinematic* const body = bodyNode->GetInfo();
+		ndBodyKinematic* const body = *bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 		ndShape* const key = (ndShape*)shapeInstance.GetShape();
 		if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))
@@ -1490,7 +1487,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 				ndShapeInstance shape(body->GetCollisionShape());
 				shape.SetScale(ndVector(1.0f));
 				shape.SetLocalMatrix(ndGetIdentityMatrix());
-
+	
 				ndDebuMesh debugMesh;
 				debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
 				debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape);
@@ -1501,17 +1498,17 @@ void ndDemoEntityManager::DrawDebugShapes()
 				}
 				shapeNode = m_debugShapeCache->Insert(debugMesh, key);
 			}
-
+	
 			ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 			ndInt32 sleepState = body->GetSleepState();
 			ndVector color((sleepState == 1) ? sleepColor : awakeColor);
-
+	
 			if (m_collisionDisplayMode >= 2)
 			{
 				ndWireFrameDebugMesh* const sharedEdgeMesh = *shapeNode->GetInfo().m_wireFrameShareEdge;
 				sharedEdgeMesh->SetColor(color);
 				sharedEdgeMesh->Render(this, matrix);
-
+	
 				if (*shapeNode->GetInfo().m_wireFrameOpenEdge)
 				{
 					ndWireFrameDebugMesh* const openEdgeMesh = *shapeNode->GetInfo().m_wireFrameOpenEdge;
@@ -1528,7 +1525,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			}
 		}
 	}
-
+	
 	RenderParticles(this);
 }
 

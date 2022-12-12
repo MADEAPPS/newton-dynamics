@@ -17,7 +17,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBindingRagdollEntityNotify)
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 gravity)
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
 	:ndBodyNotify(ndVector (ndFloat32 (0.0f), gravity, ndFloat32(0.0f), ndFloat32(0.0f)))
 	,m_entity(entity)
 	,m_parentBody(parentBody)

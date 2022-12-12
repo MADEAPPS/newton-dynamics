@@ -93,7 +93,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
+		ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -136,7 +136,7 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 	matrix.m_posit.m_y = ndMax (floor.m_y + 1.0f, matrix.m_posit.m_y);
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -147,7 +147,7 @@ ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInsta
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-	return body;
+	return *body;
 }
 
 ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)

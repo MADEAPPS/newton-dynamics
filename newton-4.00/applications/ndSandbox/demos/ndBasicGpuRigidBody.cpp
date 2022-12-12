@@ -30,7 +30,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));

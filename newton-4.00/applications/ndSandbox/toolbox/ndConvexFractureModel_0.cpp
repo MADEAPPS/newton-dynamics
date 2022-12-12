@@ -182,7 +182,7 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 	ndConvexFractureEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderCache& shaderCache, ndShapeInstance* const collision, ndInt32 enumerator)
 		:ndDemoDebrisEntity(meshNode, vertexArray, parent, shaderCache)
 		,m_collision(collision)
-		,m_drebriBody(nullptr)
+		,m_drebriBody____(nullptr)
 		,m_enumerator(enumerator)
 	{
 		// get center of mass
@@ -211,19 +211,19 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 		,m_centerOfMass(clone.m_centerOfMass)
 		,m_momentOfInertia(clone.m_momentOfInertia)
 		,m_collision(new ndShapeInstance(*clone.m_collision))
-		,m_drebriBody(new ndBodyDynamic())
+		,m_drebriBody____(new ndBodyDynamic())
 		,m_massFraction(clone.m_massFraction)
 		,m_enumerator(clone.m_enumerator)
 	{
-		m_drebriBody->SetCollisionShape(*m_collision);
+		m_drebriBody____->SetCollisionShape(*m_collision);
 
 		ndConvexFractureRootEntity* const cloneParent = ((ndConvexFractureRootEntity*)clone.GetParent());
 		ndFloat32 debriMass = m_massFraction * cloneParent->m_mass;
 		ndVector debriMassMatrix(m_momentOfInertia.Scale(debriMass));
 		debriMassMatrix.m_w = debriMass;
-		m_drebriBody->SetMassMatrix(debriMassMatrix);
-		m_drebriBody->SetCentreOfMass(m_centerOfMass);
-		m_drebriBody->SetAngularDamping(ndVector(ndFloat32(0.1f)));
+		m_drebriBody____->SetMassMatrix(debriMassMatrix);
+		m_drebriBody____->SetCentreOfMass(m_centerOfMass);
+		m_drebriBody____->SetAngularDamping(ndVector(ndFloat32(0.1f)));
 		
 		//body->SetOmega(omega);
 		//body->SetVelocity(debriVeloc);
@@ -242,7 +242,8 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 	ndVector m_centerOfMass;
 	ndVector m_momentOfInertia;
 	ndShapeInstance* m_collision;
-	ndBodyDynamic* m_drebriBody;
+	//ndBodyDynamic* m_drebriBody;
+	ndSharedPtr<ndBodyKinematic> m_drebriBody____;
 	ndFloat32 m_massFraction;
 	ndInt32 m_enumerator;
 };
@@ -369,7 +370,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetFirstChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetNext())
 	{
 		bodyCount = ndMax(bodyCount, debrisEnt->m_enumerator + 1);
-		ndAssert(debrisEnt->m_drebriBody);
+		ndAssert(*debrisEnt->m_drebriBody____);
 		//ndAssert(debrisEnt->m_enumerator < bodyCount);
 	}
 
@@ -407,14 +408,14 @@ debrisEnt->SetMatrix(ndQuaternion(location), location.m_posit + ndVector(0.0f, -
 else
 {
 		debrisEnt->SetMatrix(ndQuaternion(location), location.m_posit);
-		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
-		world->AddBody(body);
-		body->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
-		body->SetMatrix(location);
-		bodyArray[debrisEnt->m_enumerator] = body;
+		//ndBodyDynamic* const body = debrisEnt->m_drebriBody;
+		world->AddBody(debrisEnt->m_drebriBody____);
+		debrisEnt->m_drebriBody____->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
+		debrisEnt->m_drebriBody____->SetMatrix(location);
+		bodyArray[debrisEnt->m_enumerator] = debrisEnt->m_drebriBody____->GetAsBodyDynamic();
 
 		// set material id properties
-		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		ndShapeInstance& instanceShape = debrisEnt->m_drebriBody____->GetCollisionShape();
 		instanceShape.m_shapeMaterial.m_userId = debrisID;
 	#if 0
 		ExplodeLocation(body, location, 0.3f);
@@ -433,15 +434,16 @@ else
 		test = true;
 		if (test)
 		{
-			ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];
-			ndBodyDynamic* const body1 = bodyArray[jointConnection[i].m_m1];
-			if (body0 && body1)
-			{
-				ndJointFix6dof* const joint = new ndJointFix6dof(body0->GetMatrix(), body0, body1);
-				ndAssert(0);
-				//joint->SetSolverModel(m_secundaryCloseLoop);
-				world->AddJoint(joint);
-			}
+			ndAssert(0);
+			//ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];
+			//ndBodyDynamic* const body1 = bodyArray[jointConnection[i].m_m1];
+			//if (body0 && body1)
+			//{
+			//	ndJointFix6dof* const joint = new ndJointFix6dof(body0->GetMatrix(), body0, body1);
+			//	ndAssert(0);
+			//	//joint->SetSolverModel(m_secundaryCloseLoop);
+			//	world->AddJoint(joint);
+			//}
 		}
 	}
 }
