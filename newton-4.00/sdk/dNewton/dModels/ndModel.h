@@ -80,7 +80,7 @@ void ndReferencedObjects<T>::AddReferenceBody(ndSharedPtr<T>& object)
 	T* const obj = *object;
 
 	ndReferencedObjects<T>::GetFirst();
-	ndReferencedObjects<T>::ndNode* node1 = ndReferencedObjects<T>::GetFirst();
+	typename ndNode* node1 = ndReferencedObjects<T>::GetFirst();
 	for (ndReferencedObjects<T>::ndNode* node = ndReferencedObjects<T>::GetFirst(); node; node = node->GetNext())
 	{
 		if (*node->GetInfo() == obj)
