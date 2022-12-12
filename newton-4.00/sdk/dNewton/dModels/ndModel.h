@@ -86,7 +86,7 @@ void ndReferencedObjects<T>::AddReferenceBody(ndSharedPtr<T>& object)
 			return;
 		}
 	}
-	Append(object);
+	ndReferencedObjects<T>::Append(object);
 }
 
 template<class T>
