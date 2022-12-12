@@ -87,24 +87,20 @@ class BackGroundVehicleController : public ndModel
 	protected:
 	virtual void Update(ndWorld* const, ndFloat32 timestep) override
 	{
-		//if (m_pAiBody->GetPosition().m_y < 1.5f)
-		if (1)
-		{
-			ndMatrix mMatrix(m_pAiBody->GetRotation(), ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0)));
-			ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
-			ndVector vVelocity = m_pAiBody->GetVelocity();
-			m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
-			ndFloat32 dSpeedDifference = m_dDesiredSpeed - m_dCurrentSpeed;
-			ndFloat32 dForce = _UpdatePIDForDriveForces(dSpeedDifference, timestep);
-			dForce = ndClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
-			ndVector vForce(ndFloat32(0.0), ndFloat32(0.0), dForce, ndFloat32(0.0));
-			ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
-			ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
-			ndVector vForceLS = mMatrix.TransformVector(vForce);      // Force in local space
-			m_pAiBody->SetForce(m_pAiBody->GetForce() + vForceLS);
-			m_pAiBody->SetTorque(m_pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
-			_ApplyLateralForces(timestep);
-		}
+		ndMatrix mMatrix(m_pAiBody->GetRotation(), ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0)));
+		ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
+		ndVector vVelocity = m_pAiBody->GetVelocity();
+		m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
+		ndFloat32 dSpeedDifference = m_dDesiredSpeed - m_dCurrentSpeed;
+		ndFloat32 dForce = _UpdatePIDForDriveForces(dSpeedDifference, timestep);
+		dForce = ndClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
+		ndVector vForce(ndFloat32(0.0), ndFloat32(0.0), dForce, ndFloat32(0.0));
+		ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
+		ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
+		ndVector vForceLS = mMatrix.TransformVector(vForce);      // Force in local space
+		m_pAiBody->SetForce(m_pAiBody->GetForce() + vForceLS);
+		m_pAiBody->SetTorque(m_pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
+		_ApplyLateralForces(timestep);
 
 		// Get the camera to follow the vehicle
 		ndVector origin(m_pAiBody->GetPosition());
@@ -183,25 +179,24 @@ class BackGroundVehicleController : public ndModel
 
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)
 {
-	ndAssert(0);
-	return nullptr;
-	//ndSharedPtr<ndBodyKinematic> pBody(new ndBodyDynamic());
-	//ndDemoEntity* const pEntity = new ndDemoEntity(matrix, rootEntity);
-	//pBody->SetNotifyCallback(new ndDemoEntityNotify(scene, pEntity));
-	//pBody->SetMatrix(matrix);
-	//pBody->SetCollisionShape(shape);
-	//pBody->SetMassMatrix(mass, shape);
-	//BackGroundVehicleController* const pController = new BackGroundVehicleController(scene, pBody);
-	//
-	//ndWorld* const world = scene->GetWorld();
-	//world->AddModel(pController);
-	//world->AddBody(pBody);
-	//return pBody->GetAsBodyDynamic();
+	ndWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndDemoEntity* const pEntity = new ndDemoEntity(matrix, rootEntity);
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, pEntity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+	ndSharedPtr<ndModel> controller (new BackGroundVehicleController(scene, body->GetAsBodyDynamic()));
+
+	world->AddModel(controller);
+	world->AddBody(body);
+	return body->GetAsBodyDynamic();
 }
 
 static ndShapeInstance CreateCompondCollision()
 {
-	ndFloat32 convexHullPoints[336] = { 2.64974f,  0.903322f,  -0.766362f,  2.64974f,  0.903322f,  -0.0842047f,  0.677557f,  0.903322f,  0.662591f,  -0.596817f,  0.903322f,  0.662591f,  -2.77764f,  0.903321f,  0.0424131f,
+	ndFloat32 convexHullPoints[336] = { 
+		2.64974f,  0.903322f,  -0.766362f,  2.64974f,  0.903322f,  -0.0842047f,  0.677557f,  0.903322f,  0.662591f,  -0.596817f,  0.903322f,  0.662591f,  -2.77764f,  0.903321f,  0.0424131f,
 		-2.77764f,  0.903321f,  -0.766362f,  -1.56248f,  0.903322f,  -0.766362f,  -0.784835f,  0.903322f,  -0.766362f,  1.46171f,  0.903322f,  -0.766362f,  2.22016f,  0.903322f,  -0.766362f,
 		-2.77764f,  -0.918637f,  -0.766362f,  -2.77764f,  -0.918637f,  0.0424131f,  -0.596817f,  -0.918637f,  0.662591f,  0.677557f,  -0.918636f,  0.662591f,  2.64974f,  -0.918636f,  -0.0842047f,
 		-1.56248f,  -0.918637f,  -0.766362f,  -0.784834f,  -0.918637f,  -0.766362f,  1.46171f,  -0.918636f,  -0.766362f,  2.22016f,  -0.918636f,  -0.766362f,  2.64974f,  -0.918636f,  -0.766362f,

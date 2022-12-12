@@ -402,9 +402,9 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 			const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
 			while (jointList.GetFirst())
 			{
-				ndAssert(0);
-				//ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
-				//RemoveJoint(joint);
+				ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
+				ndAssert(joint->m_worldNode);
+				RemoveJoint(joint->m_worldNode->GetInfo());
 			}
 			m_scene->RemoveBody(body);
 		}
