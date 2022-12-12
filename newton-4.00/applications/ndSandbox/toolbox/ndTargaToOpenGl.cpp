@@ -88,7 +88,7 @@ class ndTextureCache : public ndList<ndTextureEntry>
 	{
 		char name[256];
 		strcpy(name, texName);
-		_strlwr(name);
+		strtolwr(name);
 		ndUnsigned64 crc = dCRC64(name);
 		return crc;
 	}

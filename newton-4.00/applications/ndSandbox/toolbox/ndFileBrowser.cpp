@@ -16,6 +16,17 @@
 
 #include "ndFileBrowser.h"
 
+static void strtolwr(char* const string)
+{
+	for (char * cp = string; *cp; ++cp)
+	{
+		if ((*cp >= 'A') && (*cp <= 'Z'))
+		{
+			*cp += 'a' - 'A';
+		}
+	}
+}
+
 bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 {
 #if (defined(WIN32) || defined(_WIN32))
@@ -23,7 +34,7 @@ bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 	// open a file name
 	char appPath[256];
 	GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
-	_strlwr(appPath);
+	strtolwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
 	end[0] = 0;
@@ -55,7 +66,7 @@ bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
 	// open a file name
 	char appPath[256];
 	GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
-	_strlwr(appPath);
+	strtolwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
 	end[0] = 0;
@@ -88,7 +99,7 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 	// open a file name
 	char appPath[256];
 	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	_strlwr(appPath);
+	strtolwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
 	end[0] = 0;
@@ -127,7 +138,7 @@ bool dGetSaveNdFileName(char* const fileName, int maxSize)
 	// open a file name
 	char appPath[256];
 	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	_strlwr(appPath);
+	strtolwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
 	end[0] = 0;
@@ -168,7 +179,7 @@ bool dGetLoadNdFileName(char* const fileName, int maxSize)
 	// open a file name
 	char appPath[256];
 	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	_strlwr(appPath);
+	strtolwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
 	end[0] = 0;

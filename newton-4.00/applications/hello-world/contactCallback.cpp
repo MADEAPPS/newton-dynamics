@@ -38,8 +38,7 @@ ndBodyDynamic *BuildFloor() {
   // Default gravity for the body.
   ndVector defaultGravity = ndVector(0.0f, 0.0f, 0.0f, 0.0f);
 
-  //ndBodyDynamic *const body = new ndBodyDynamic();
-  ndSharedPtr<ndBodyKinematic> body (new ndBodyDynamic());
+  ndBodyDynamic *const body = new ndBodyDynamic();
   body->SetNotifyCallback(new ndBodyNotify(defaultGravity));
   body->SetCollisionShape(new ndShapeBox(200.0f, thickness, 200.f));
 
@@ -90,8 +89,10 @@ int main(int, const char**)
   world.SetContactNotify(new MyContactNotify());
 
   // Create a ball above a floor box.
-  ndBodyDynamic *sphere = BuildSphere();
-  ndBodyDynamic *floor = BuildFloor();
+  //ndBodyDynamic *sphere = BuildSphere();
+  //ndBodyDynamic *floor = BuildFloor();
+  ndSharedPtr<ndBodyKinematic>floor(BuildFloor());
+  ndSharedPtr<ndBodyKinematic>sphere (BuildSphere());
   world.AddBody(sphere);
   world.AddBody(floor);
 

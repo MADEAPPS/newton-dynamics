@@ -238,7 +238,7 @@ void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
 	{
 		char joystickName[256];
 		strcpy(&joystickName[0], glfwGetJoystickName(0));
-		_strlwr(joystickName);
+		strtolwr(joystickName);
 		if (strstr(joystickName, "wheel"))
 		{
 			GetWheelJoystickInputs(scene);
