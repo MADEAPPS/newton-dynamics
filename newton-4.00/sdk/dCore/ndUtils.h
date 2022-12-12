@@ -148,18 +148,19 @@ inline T ndAnglesAdd (T angleInRadiand1, T angleInRadiand0)
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
 
-	#ifndef _strlwr
-	inline void _strlwr(char* const string)
-	{
-		for (char * cp = string; *cp; ++cp)
-		{
-			if ((*cp >= 'A') && (*cp <= 'Z'))
-			{
-				*cp += 'a' - 'A';
-			}
-		}
-	}
-	#endif
+	//#ifndef _strlwr
+	//inline char* _strlwr(char* const string)
+	//{
+	//	for (char * cp = string; *cp; ++cp)
+	//	{
+	//		if ((*cp >= 'A') && (*cp <= 'Z'))
+	//		{
+	//			*cp += 'a' - 'A';
+	//		}
+	//	}
+	//	return string;
+	//}
+	//#endif
 #endif
 
 
