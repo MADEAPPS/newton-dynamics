@@ -45,7 +45,7 @@ class ndListView : public ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSha
 
 	#if (_MSC_VER == 1916) || (_MSC_VER == 1929)
 		// I hate to say this, but visual studio 2017 and 2019 are pieces of shit
-		ndNode* AddItem(T const item);
+		ndNode* AddItem(ndSharedPtr<T> item);
 	#else
 		typename ndListView<T>::ndNode* AddItem(ndSharedPtr<T> item);
 	#endif
