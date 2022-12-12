@@ -78,7 +78,7 @@ template<class T>
 void ndReferencedObjects<T>::AddReferenceBody(ndSharedPtr<T>& object)
 {
 	T* const obj = *object;
-	for (ndNode* node = GetFirst(); node; node = node->GetNext())
+	for (ndReferencedObjects<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
 	{
 		if (*node->GetInfo() == obj)
 		{
@@ -91,7 +91,7 @@ void ndReferencedObjects<T>::AddReferenceBody(ndSharedPtr<T>& object)
 template<class T>
 ndSharedPtr<T>* ndReferencedObjects<T>::FindReference(const T* const object) const
 {
-	for (ndNode* node = GetFirst(); node; node = node->GetNext())
+	for (ndReferencedObjects<T>::ndNode* node = GetFirst(); node; node = node->GetNext())
 	{
 		if (*node->GetInfo() == object)
 		{
