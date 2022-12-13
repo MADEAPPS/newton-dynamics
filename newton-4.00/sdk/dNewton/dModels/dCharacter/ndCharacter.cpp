@@ -154,7 +154,7 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 void ndCharacter::RemoveFromToWorld()
 {
 	ndAssert(0);
-	ndAssert(m_world);
+	//ndAssert(m_world);
 	//for (ndList<ndEffetorInfo>::ndNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	//{
 	//	ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;

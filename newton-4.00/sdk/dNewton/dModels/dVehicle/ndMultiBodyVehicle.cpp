@@ -184,11 +184,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& d
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
 {
 	m_tireShape->Release();
-
-	if (m_world)
-	{
-		RemoveFromToWorld();
-	}
+	RemoveFromToWorld();
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
@@ -454,38 +450,6 @@ ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
 	return this;
 }
 
-void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
-{
-	ndModel::AddToWorld(world);
-	for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_referencedBodies.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBodyKinematic>& body = node->GetInfo();
-		world->AddBody(body);
-	}
-
-	for (ndReferencedObjects<ndJointBilateralConstraint>::ndNode* node = m_referencedJoints.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndJointBilateralConstraint>& joint = node->GetInfo();
-		world->AddJoint(joint);
-	}
-}
-
-void ndMultiBodyVehicle::RemoveFromToWorld()
-{
-	ndAssert(m_world);
-	for (ndReferencedObjects<ndJointBilateralConstraint>::ndNode* node = m_referencedJoints.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndJointBilateralConstraint>& joint = node->GetInfo();
-		m_world->RemoveJoint(joint);
-	}
-
-	for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_referencedBodies.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBodyKinematic>& body = node->GetInfo();
-		m_world->RemoveBody(body);
-	}
-}
-
 ndFloat32 ndMultiBodyVehicle::GetSpeed() const
 {
 	//const ndBodyKinematic* const chassis = *m_chassis;
@@ -497,7 +461,7 @@ ndFloat32 ndMultiBodyVehicle::GetSpeed() const
 void ndMultiBodyVehicle::AddChassis(ndSharedPtr<ndBodyKinematic>& chassis)
 {
 	m_chassis = *chassis;
-	m_referencedBodies.AddReferenceBody(chassis);
+	AddBody(chassis);
 }
 
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, ndSharedPtr<ndBodyKinematic>& tire, ndSharedPtr<ndBodyKinematic>& axleBody)
@@ -517,12 +481,12 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVe
 	inertia.m_z = maxInertia;
 	tire->SetMassMatrix(inertia);
 
-	m_referencedBodies.AddReferenceBody(tire);
+	AddBody(tire);
 	ndMultiBodyVehicleTireJoint* const tireJoint = new ndMultiBodyVehicleTireJoint(matrix, *tire, *axleBody, desc, this);
 	m_tireList.Append(tireJoint);
 
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr(tireJoint);
-	m_referencedJoints.Append(jointPtr);
+	AddJoint(jointPtr);
 	
 	tire->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
 	return tireJoint;
@@ -531,7 +495,7 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVe
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicleTireJointInfo& desc, ndSharedPtr<ndBodyKinematic>& tire)
 {
 	ndAssert(m_chassis);
-	ndSharedPtr<ndBodyKinematic>& chassis = *m_referencedBodies.FindReference(m_chassis);
+	ndSharedPtr<ndBodyKinematic>& chassis = *FindBodyReference(m_chassis);
 	return AddAxleTire(desc, tire, chassis);
 }
 
@@ -554,7 +518,7 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 {
 	ndAssert(m_chassis);
 	ndSharedPtr<ndBodyKinematic> differentialBody (CreateInternalBodyPart(mass, radius));
-	m_referencedBodies.AddReferenceBody(differentialBody);
+	AddBody(differentialBody);
 
 	ndMultiBodyVehicleDifferential* const differential = new ndMultiBodyVehicleDifferential(*differentialBody, m_chassis, slipOmegaLock);
 	m_differentialList.Append(differential);
@@ -573,9 +537,9 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr1(rightAxle);
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr2(differential);
 
-	m_referencedJoints.Append(jointPtr0);
-	m_referencedJoints.Append(jointPtr1);
-	m_referencedJoints.Append(jointPtr2);
+	AddJoint(jointPtr0);
+	AddJoint(jointPtr1);
+	AddJoint(jointPtr2);
 	return differential;
 }
 
@@ -583,7 +547,7 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 {
 	ndAssert(m_chassis);
 	ndSharedPtr<ndBodyKinematic> differentialBody(CreateInternalBodyPart(mass, radius));
-	m_referencedBodies.AddReferenceBody(differentialBody);
+	AddBody(differentialBody);
 
 	ndMultiBodyVehicleDifferential* const differential = new ndMultiBodyVehicleDifferential(*differentialBody, m_chassis, slipOmegaLock);
 	m_differentialList.Append(differential);
@@ -602,9 +566,9 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr0(leftAxle);
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr1(rightAxle);
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr2(differential);
-	m_referencedJoints.Append(jointPtr0);
-	m_referencedJoints.Append(jointPtr1);
-	m_referencedJoints.Append(jointPtr2);
+	AddJoint(jointPtr0);
+	AddJoint(jointPtr1);
+	AddJoint(jointPtr2);
 
 	return differential;
 }
@@ -623,10 +587,10 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 
 {
 	ndAssert(m_chassis);
 	ndSharedPtr<ndBodyKinematic> motorBody (CreateInternalBodyPart(mass, radius));
-	m_referencedBodies.AddReferenceBody(motorBody);
+	AddBody(motorBody);
 	m_motor = new ndMultiBodyVehicleMotor(*motorBody, this);
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr(m_motor);
-	m_referencedJoints.Append(jointPtr);
+	AddJoint(jointPtr);
 	return m_motor;
 }
 
@@ -635,7 +599,7 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDiff
 	ndAssert(m_motor);
 	m_gearBox = new ndMultiBodyVehicleGearBox(m_motor->GetBody0(), differential->GetBody0(), this);
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr(m_gearBox);
-	m_referencedJoints.Append(jointPtr);
+	AddJoint(jointPtr);
 
 	return m_gearBox;
 }
@@ -644,7 +608,7 @@ ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic*
 {
 	m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, sentinel);
 	ndSharedPtr<ndJointBilateralConstraint> jointPtr(m_torsionBar);
-	m_referencedJoints.Append(jointPtr);
+	AddJoint(jointPtr);
 	return m_torsionBar;
 }
 

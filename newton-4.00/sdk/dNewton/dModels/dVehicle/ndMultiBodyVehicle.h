@@ -80,8 +80,6 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
-	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
-	D_NEWTON_API virtual void RemoveFromToWorld();
 	D_NEWTON_API ndFloat32 GetSpeed() const;
 	D_NEWTON_API ndShapeInstance CreateTireShape(ndFloat32 radius, ndFloat32 width) const;
 
