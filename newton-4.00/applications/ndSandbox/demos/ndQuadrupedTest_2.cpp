@@ -359,8 +359,8 @@ using namespace ndQuadruped_2;
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
-return;
 	ndAssert(0);
+	return;
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	////BuildFlatPlane(scene, true);
 	//
