@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
+#include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
@@ -94,6 +95,14 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 			const ndQuaternion rot(localMatrix);
 			m_entity->SetMatrix(rot, localMatrix.m_posit);
 		}
+	}
+
+	// check world bounds
+	if (matrix.m_posit.m_y < -100.0f)
+	{
+		ndBody* const body = GetBody();
+		ndPhysicsWorld* const world = m_manager->GetWorld();
+		world->QueueBodyForDelete(body);
 	}
 }
 

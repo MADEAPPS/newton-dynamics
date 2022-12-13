@@ -84,8 +84,8 @@ class ndWorld: public ndClassAlloc
 
 	//D_NEWTON_API virtual bool AddBody(ndBody* const body);
 	//D_NEWTON_API virtual void RemoveBody(ndBody* const body);
-	//D_NEWTON_API virtual void DeleteBody(ndBody* const body);
 	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
+	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
 	D_NEWTON_API virtual void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 
 	//D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);

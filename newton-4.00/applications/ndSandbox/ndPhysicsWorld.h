@@ -43,7 +43,6 @@ class ndPhysicsWorld: public ndWorld
 	ndSoundManager* m_soundManager;
 	ndFloat32 m_timeAccumulator;
 	ndArray<ndBody*> m_deletedBodies;
-	ndAtomic<bool> m_hasPendingObjectToDelete;
 	ndSpinLock m_deletedLock;
 };
 

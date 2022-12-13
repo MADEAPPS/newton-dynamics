@@ -38,7 +38,7 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
-#define DEFAULT_SCENE	11		// basic vehicle
+//#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot

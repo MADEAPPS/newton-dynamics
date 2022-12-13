@@ -417,6 +417,20 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 	}
 }
 
+void ndWorld::RemoveBody(ndBody* const body)
+{
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody->m_scene)
+	{
+		ndAssert(kinematicBody->m_sceneNode);
+		RemoveBody(kinematicBody->m_sceneNode->GetInfo());
+	}
+	else
+	{
+		ndAssert(0);
+	}
+}
+
 void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	// if the second body is nullPtr, replace it the sentinel

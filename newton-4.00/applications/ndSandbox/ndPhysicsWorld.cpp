@@ -79,7 +79,6 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	,m_soundManager(new ndSoundManager(manager))
 	,m_timeAccumulator(0.0f)
 	,m_deletedBodies()
-	,m_hasPendingObjectToDelete(false)
 	,m_deletedLock()
 {
 	ClearCache();
@@ -109,22 +108,19 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 void ndPhysicsWorld::QueueBodyForDelete(ndBody* const body)
 {
 	ndScopeSpinLock lock(m_deletedLock);
-	m_hasPendingObjectToDelete.store(true);
 	m_deletedBodies.PushBack(body);
 }
 
 void ndPhysicsWorld::DeletePendingObjects()
 {
-	if (m_hasPendingObjectToDelete.load())
+	if (m_deletedBodies.GetCount())
 	{
-		ndAssert(0);
-	//	Sync();
-	//	m_hasPendingObjectToDelete.store(false);
-	//	for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); ++i)
-	//	{
-	//		DeleteBody(m_deletedBodies[i]);
-	//	}
-	//	m_deletedBodies.SetCount(0);
+		Sync();
+		for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); ++i)
+		{
+			RemoveBody(m_deletedBodies[i]);
+		}
+		m_deletedBodies.SetCount(0);
 	}
 }
 
