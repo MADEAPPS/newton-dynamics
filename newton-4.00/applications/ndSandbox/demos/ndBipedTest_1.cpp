@@ -593,18 +593,16 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	
 	origin.m_posit.m_x -= 20.0f;
-	ndDemoEntity* const modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	ndSharedPtr<ndDemoEntity> modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
 	
 	ndWorld* const world = scene->GetWorld();
-	ndHumanoidModel* const model = new ndHumanoidModel(scene, modelMesh, origin, ragdollDefinition);
+	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
 	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
 	world->AddJoint(fixJoint);
-	
-	delete modelMesh;
 	
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;
