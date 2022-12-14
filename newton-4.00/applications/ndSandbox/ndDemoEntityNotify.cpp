@@ -23,7 +23,6 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 	,m_entity(entity)
 	,m_parentBody(parentBody)
 	,m_manager(manager)
-	,m_alived(true)
 {
 }
 
@@ -33,7 +32,6 @@ ndDemoEntityNotify::ndDemoEntityNotify(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_entity(nullptr)
 	,m_parentBody(nullptr)
 	,m_manager(nullptr)
-	,m_alived(true)
 {
 //	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
 // remember to save member below
@@ -104,7 +102,7 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 	{
 		ndBody* const body = GetBody();
 		ndPhysicsWorld* const world = m_manager->GetWorld();
-		world->QueueBodyForDelete(body);
+		world->RemoveBody(body);
 	}
 }
 

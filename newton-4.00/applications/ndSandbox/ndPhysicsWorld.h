@@ -29,21 +29,16 @@ class ndPhysicsWorld: public ndWorld
 	ndDemoEntityManager* GetManager() const;
 	ndSoundManager* GetSoundManager() const;
 
-	void QueueBodyForDelete(ndBody* const body);
-
 	bool LoadScene(const char* const path);
 	void SaveScene(const char* const path);
 	void SaveSceneModel(const char* const path);
 
 	private:
-	void DeletePendingObjects();
 	void OnPostUpdate(ndFloat32 timestep);
 
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
 	ndFloat32 m_timeAccumulator;
-	ndArray<ndBody*> m_deletedBodies;
-	ndSpinLock m_deletedLock;
 };
 
 #endif

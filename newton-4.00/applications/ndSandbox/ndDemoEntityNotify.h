@@ -42,7 +42,6 @@ class ndDemoEntityNotify: public ndBodyNotify
 	ndDemoEntity* m_entity;
 	ndBodyKinematic* m_parentBody;
 	ndDemoEntityManager* m_manager;
-	bool m_alived;
 };
 
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify

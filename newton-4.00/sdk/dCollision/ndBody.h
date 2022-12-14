@@ -123,6 +123,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 
 	ndUnsigned8 m_isStatic;
 	ndUnsigned8 m_autoSleep;
+	ndUnsigned8 m_bodyIsdead;
 	ndUnsigned8 m_equilibrium;
 	ndUnsigned8 m_equilibrium0;
 	ndUnsigned8 m_isJointFence0;
@@ -130,6 +131,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndUnsigned8 m_isConstrained;
 	ndUnsigned8 m_sceneForceUpdate;
 	ndUnsigned8 m_sceneEquilibrium;
+	
 	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;

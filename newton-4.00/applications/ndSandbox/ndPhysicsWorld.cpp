@@ -78,8 +78,6 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	,m_manager(manager)
 	,m_soundManager(new ndSoundManager(manager))
 	,m_timeAccumulator(0.0f)
-	,m_deletedBodies()
-	,m_deletedLock()
 {
 	ClearCache();
 	SetContactNotify(new ndContactCallback);
@@ -103,30 +101,6 @@ void ndPhysicsWorld::CleanUp()
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 {
 	return m_manager;
-}
-
-void ndPhysicsWorld::QueueBodyForDelete(ndBody* const body)
-{
-	ndScopeSpinLock lock(m_deletedLock);
-	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-	if (notify->m_alived)
-	{
-		notify->m_alived = false;
-		m_deletedBodies.PushBack(body);
-	}
-}
-
-void ndPhysicsWorld::DeletePendingObjects()
-{
-	if (m_deletedBodies.GetCount())
-	{
-		Sync();
-		for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); ++i)
-		{
-			RemoveBody(m_deletedBodies[i]);
-		}
-		m_deletedBodies.SetCount(0);
-	}
 }
 
 ndSoundManager* ndPhysicsWorld::GetSoundManager() const
@@ -236,21 +210,6 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	ndInt32 maxSteps = MAX_PHYSICS_STEPS;
 	m_timeAccumulator += timestep;
 
-// test deleting bodies
-//static int xxxx;
-//xxxx++;
-//if (xxxx > 5000)
-//{
-//	if (!m_hasPendingObjectToDelete.load())
-//	{
-//		const ndBodyList& bodyList = GetBodyList();
-//		if (bodyList.GetCount())
-//		{
-//			QueueBodyForDelete(bodyList.GetLast()->GetInfo());
-//		}
-//	}
-//}
-
 	// if the time step is more than max timestep par frame, throw away the extra steps.
 	if (m_timeAccumulator > descreteStep * (ndFloat32)maxSteps)
 	{
@@ -263,8 +222,6 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	{
 		Update(descreteStep);
 		m_timeAccumulator -= descreteStep;
-
-		DeletePendingObjects();
 	}
 	if (m_manager->m_synchronousPhysicsUpdate)
 	{

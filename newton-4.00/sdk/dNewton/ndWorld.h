@@ -169,7 +169,10 @@ class ndWorld: public ndClassAlloc
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
+	ndArray<ndBody*> m_deletedBodies;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
+	ndSpinLock m_deletedLock;
+
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;
 	ndFloat32 m_freezeSpeed2;
@@ -186,8 +189,7 @@ class ndWorld: public ndClassAlloc
 	ndSolverModes m_solverMode;
 	ndInt32 m_solverIterations;
 	bool m_inUpdate;
-	bool m_collisionUpdate;
-
+	
 	friend class ndScene;
 	friend class ndWorldScene;
 	friend class ndBodyDynamic;

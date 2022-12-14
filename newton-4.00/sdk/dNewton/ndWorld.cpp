@@ -104,7 +104,9 @@ ndWorld::ndWorld()
 	,m_modelList()
 	,m_skeletonList()
 	,m_particleSetList()
+	,m_deletedBodies(256)
 	,m_activeSkeletons(256)
+	,m_deletedLock()
 	,m_timestep(ndFloat32 (0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
 	,m_freezeSpeed2(D_FREEZE_SPEED2)
@@ -118,7 +120,6 @@ ndWorld::ndWorld()
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
 	,m_inUpdate(false)
-	,m_collisionUpdate(true)
 {
 	// start the engine thread;
 	ndBody::m_uniqueIdCount = 0;
@@ -392,27 +393,38 @@ bool ndWorld::AddBody(ndSharedPtr<ndBodyKinematic>& body)
 
 void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 {
-	ndAssert(!m_inUpdate);
-	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	if (kinematicBody->m_scene)
+	if (m_inUpdate)
 	{
-		ndAssert(kinematicBody != GetSentinelBody());
-		if (kinematicBody)
+		ndScopeSpinLock lock(m_deletedLock);
+		if (!body->m_bodyIsdead)
 		{
-			const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
-			while (jointList.GetFirst())
-			{
-				ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
-				ndAssert(joint->m_worldNode);
-				RemoveJoint(joint->m_worldNode->GetInfo());
-			}
-			m_scene->RemoveBody(body);
+			body->m_bodyIsdead = 1;
+			m_deletedBodies.PushBack(*body);
 		}
-		else if (body->GetAsBodyParticleSet())
+	}
+	else
+	{
+		ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+		if (kinematicBody->m_scene)
 		{
-			ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
-			ndAssert(particleSet->m_listNode);
-			m_particleSetList.Remove(particleSet->m_listNode);
+			ndAssert(kinematicBody != GetSentinelBody());
+			if (kinematicBody)
+			{
+				const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
+				while (jointList.GetFirst())
+				{
+					ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
+					ndAssert(joint->m_worldNode);
+					RemoveJoint(joint->m_worldNode->GetInfo());
+				}
+				m_scene->RemoveBody(body);
+			}
+			else if (body->GetAsBodyParticleSet())
+			{
+				ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
+				ndAssert(particleSet->m_listNode);
+				m_particleSetList.Remove(particleSet->m_listNode);
+			}
 		}
 	}
 }
@@ -436,10 +448,6 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 	// if the second body is nullPtr, replace it the sentinel
 	ndAssert(joint->m_body0);
 	ndAssert(joint->m_body1);
-	//if (joint->m_body1 == nullptr)
-	//{
-	//	joint->m_body1 = GetSentinelBody();
-	//}
 	if (joint->m_worldNode == nullptr)
 	{
 		ndAssert(joint->m_body0Node == nullptr);
@@ -518,42 +526,36 @@ ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const j
 
 void ndWorld::ThreadFunction()
 {
+	D_TRACKTIME();
 	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
-	const bool collisionUpdate = m_collisionUpdate;
 	m_inUpdate = true;
+	m_scene->Begin();
 
-	if (collisionUpdate)
+	m_scene->SetTimestep(m_timestep);
+
+	ndInt32 const steps = m_subSteps;
+	ndFloat32 timestep = m_timestep / (ndFloat32)steps;
+	for (ndInt32 i = 0; i < steps; ++i)
 	{
-		m_collisionUpdate = true;
-		m_scene->CollisionOnlyUpdate();
-		m_inUpdate = false;
+		SubStepUpdate(timestep);
 	}
-	else
+
+	m_scene->SetTimestep(m_timestep);
+		
+	ParticleUpdate(m_timestep);
+		
+	UpdateTransforms();
+	PostModelTransform();
+	m_inUpdate = false;
+	PostUpdate(m_timestep);
+
+	for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
 	{
-		D_TRACKTIME();
-		m_scene->Begin();
-		m_collisionUpdate = true;
-
-		m_scene->SetTimestep(m_timestep);
-
-		ndInt32 const steps = m_subSteps;
-		ndFloat32 timestep = m_timestep / (ndFloat32)steps;
-		for (ndInt32 i = 0; i < steps; ++i)
-		{
-			SubStepUpdate(timestep);
-		}
-
-		m_scene->SetTimestep(m_timestep);
-		
-		ParticleUpdate(m_timestep);
-		
-		UpdateTransforms();
-		PostModelTransform();
-		m_inUpdate = false;
-		PostUpdate(m_timestep);
-
-		m_scene->End();
+		RemoveBody(m_deletedBodies[i]);
 	}
+	m_deletedBodies.SetCount(0);
+	m_scene->End();
+
 	
 	m_lastExecutionTime = (ndFloat32)(ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();
@@ -1126,7 +1128,6 @@ void ndWorld::CollisionUpdate(ndFloat32 timestep)
 	m_timestep = timestep;
 
 	// update the next frame asynchronous 
-	m_collisionUpdate = true;
 	m_scene->TickOne();
 }
 
@@ -1139,6 +1140,5 @@ void ndWorld::Update(ndFloat32 timestep)
 	m_timestep = timestep;
 
 	// update the next frame asynchronous 
-	m_collisionUpdate = false;
 	m_scene->TickOne();
 }
