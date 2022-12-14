@@ -56,6 +56,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	m_mark1	= 0;
 	m_maxDof = ndUnsigned32(maxDof);
 	m_rowIsMotor = 0;
+	m_jointIsdead = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
 	m_solverModel = m_jointkinematicOpenLoop;
@@ -95,6 +96,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	m_mark1 = 0;
 	m_maxDof = ndUnsigned32(maxDof);
 	m_rowIsMotor = 0;
+	m_jointIsdead = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
 	m_solverModel = m_jointkinematicOpenLoop;
@@ -119,6 +121,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::ndL
 	m_mark0 = 0;
 	m_mark1 = 0;
 	m_rowIsMotor = 0;
+	m_jointIsdead = 0;
 	m_isInSkeleton = 0;
 
 	ndInt32 body0Hash = xmlGetInt(xmlNode, "body0Hash");

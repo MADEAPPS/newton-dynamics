@@ -84,14 +84,16 @@ class ndWorld: public ndClassAlloc
 
 	//D_NEWTON_API virtual bool AddBody(ndBody* const body);
 	//D_NEWTON_API virtual void RemoveBody(ndBody* const body);
-	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
 	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
+	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
 	D_NEWTON_API virtual void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 
 	//D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);
 	//D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
+	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 	D_NEWTON_API virtual void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
+
 
 	//D_NEWTON_API virtual void AddModel(ndModel* const model);
 	//D_NEWTON_API virtual void RemoveModel(ndModel* const model);
@@ -170,6 +172,7 @@ class ndWorld: public ndClassAlloc
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
 	ndArray<ndBody*> m_deletedBodies;
+	ndArray<ndJointBilateralConstraint*> m_deletedJoints;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
 	ndSpinLock m_deletedLock;
 

@@ -105,6 +105,7 @@ ndWorld::ndWorld()
 	,m_skeletonList()
 	,m_particleSetList()
 	,m_deletedBodies(256)
+	,m_deletedJoints(256)
 	,m_activeSkeletons(256)
 	,m_deletedLock()
 	,m_timestep(ndFloat32 (0.0f))
@@ -464,23 +465,40 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 
 void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
-	ndJointList::ndNode* const worldNode = joint->m_worldNode;
-	if (worldNode != nullptr)
+	if (m_inUpdate)
 	{
-		ndAssert(!m_inUpdate);
-		ndAssert(joint->m_body0Node != nullptr);
-		ndAssert(joint->m_body1Node != nullptr);
-		joint->GetBody0()->DetachJoint(joint->m_body0Node);
-		joint->GetBody1()->DetachJoint(joint->m_body1Node);
-		
-		if (joint->IsSkeleton())
+		joint->m_jointIsdead = 1;
+		m_deletedJoints.PushBack(*joint);
+	}
+	else
+	{
+		ndJointList::ndNode* const worldNode = joint->m_worldNode;
+		if (worldNode != nullptr)
 		{
-			m_skeletonList.m_skelListIsDirty = true;
+			ndAssert(joint->m_body0Node != nullptr);
+			ndAssert(joint->m_body1Node != nullptr);
+			joint->GetBody0()->DetachJoint(joint->m_body0Node);
+			joint->GetBody1()->DetachJoint(joint->m_body1Node);
+
+			if (joint->IsSkeleton())
+			{
+				m_skeletonList.m_skelListIsDirty = true;
+			}
+			joint->m_worldNode = nullptr;
+			joint->m_body0Node = nullptr;
+			joint->m_body1Node = nullptr;
+			m_jointList.Remove(worldNode);
 		}
-		joint->m_worldNode = nullptr;
-		joint->m_body0Node = nullptr;
-		joint->m_body1Node = nullptr;
-		m_jointList.Remove(worldNode);
+	}
+}
+
+void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
+{
+	ndJointList::ndNode* const worldNode = joint->m_worldNode;
+	if (worldNode)
+	{
+		ndSharedPtr<ndJointBilateralConstraint>& jointPtr = worldNode->GetInfo();
+		RemoveJoint(jointPtr);
 	}
 }
 
@@ -546,13 +564,19 @@ void ndWorld::ThreadFunction()
 		
 	UpdateTransforms();
 	PostModelTransform();
-	m_inUpdate = false;
 	PostUpdate(m_timestep);
 
+	m_inUpdate = false;
+
+	for (ndInt32 i = 0; i < m_deletedJoints.GetCount(); i++)
+	{
+		RemoveJoint(m_deletedJoints[i]);
+	}
 	for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
 	{
 		RemoveBody(m_deletedBodies[i]);
 	}
+	m_deletedJoints.SetCount(0);
 	m_deletedBodies.SetCount(0);
 	m_scene->End();
 
