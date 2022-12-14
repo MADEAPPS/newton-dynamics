@@ -1135,12 +1135,11 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 		}
 
 		#ifdef _DEBUG
-		ndAssert(0);
-		//for (ndBodyList::ndNode* node = m_scene->GetBodyList().GetFirst(); node; node = node->GetNext())
-		//{
-		//	ndBodyKinematic* const body = node->GetInfo();
-		//	ndAssert(body->GetContactMap().SanityCheck());
-		//}
+		for (ndBodyList::ndNode* node = m_scene->GetBodyList().GetFirst(); node; node = node->GetNext())
+		{
+			ndBodyKinematic* const body = *node->GetInfo();
+			ndAssert(body->GetContactMap().SanityCheck());
+		}
 		#endif
 	}
 }

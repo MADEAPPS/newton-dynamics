@@ -90,7 +90,6 @@ ndListView<T>::ndListView(const ndListView& src)
 	,m_view()
 	,m_listIsDirty(1)
 {
-	ndAssert(0);
 	typename ndListView<T>::ndNode* nextNode;
 	ndListView* const stealData = (ndListView*)&src;
 	for (typename ndListView<T>::ndNode* node = stealData->GetFirst(); node; node = nextNode)

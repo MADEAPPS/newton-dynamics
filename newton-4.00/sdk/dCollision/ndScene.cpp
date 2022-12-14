@@ -119,15 +119,14 @@ ndScene::ndScene(const ndScene& src)
 
 	for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ndAssert(0);
-		//ndBodyKinematic* const body = node->GetInfo();
-		//body->m_sceneForceUpdate = 1;
-		//ndScene* const sceneNode = body->GetScene();
-		//if (sceneNode)
-		//{
-		//	body->SetSceneNodes(this, node);
-		//}
-		//ndAssert (body->GetContactMap().SanityCheck());
+		ndBodyKinematic* const body = *node->GetInfo();
+		body->m_sceneForceUpdate = 1;
+		ndScene* const sceneNode = body->GetScene();
+		if (sceneNode)
+		{
+			body->SetSceneNodes(this, node);
+		}
+		ndAssert (body->GetContactMap().SanityCheck());
 	}
 
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
