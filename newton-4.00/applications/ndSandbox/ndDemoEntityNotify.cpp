@@ -23,6 +23,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 	,m_entity(entity)
 	,m_parentBody(parentBody)
 	,m_manager(manager)
+	,m_alived(true)
 {
 }
 
@@ -32,6 +33,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(const ndLoadSaveBase::ndLoadDescriptor& d
 	,m_entity(nullptr)
 	,m_parentBody(nullptr)
 	,m_manager(nullptr)
+	,m_alived(true)
 {
 //	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
 // remember to save member below

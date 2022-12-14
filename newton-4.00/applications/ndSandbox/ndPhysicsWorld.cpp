@@ -108,7 +108,12 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 void ndPhysicsWorld::QueueBodyForDelete(ndBody* const body)
 {
 	ndScopeSpinLock lock(m_deletedLock);
-	m_deletedBodies.PushBack(body);
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+	if (notify->m_alived)
+	{
+		notify->m_alived = false;
+		m_deletedBodies.PushBack(body);
+	}
 }
 
 void ndPhysicsWorld::DeletePendingObjects()
