@@ -31,6 +31,7 @@ ndModel::ndModel(const ndLoadSaveBase::ndLoadDescriptor&)
 	,m_referencedBodies()
 	,m_node(nullptr)
 	,m_world(nullptr)
+	,m_markedForRemoved(0)
 {
 }
 

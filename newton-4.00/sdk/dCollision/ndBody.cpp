@@ -42,7 +42,6 @@ ndBody::ndBody()
 	,m_flags(0)
 	,m_isStatic(0)
 	,m_autoSleep(1)
-	,m_bodyIsdead(0)
 	,m_equilibrium(0)
 	,m_equilibrium0(0)
 	,m_isJointFence0(0)
@@ -50,6 +49,7 @@ ndBody::ndBody()
 	,m_isConstrained(0)
 	,m_sceneForceUpdate(1)
 	,m_sceneEquilibrium(0)
+	,m_markedForRemoved(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -70,7 +70,6 @@ ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_flags(0)
 	,m_isStatic(0)
 	,m_autoSleep(1)
-	,m_bodyIsdead(0)
 	,m_equilibrium(0)
 	,m_equilibrium0(0)
 	,m_isJointFence0(0)
@@ -78,6 +77,7 @@ ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_isConstrained(0)
 	,m_sceneForceUpdate(1)
 	,m_sceneEquilibrium(0)
+	,m_markedForRemoved(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;

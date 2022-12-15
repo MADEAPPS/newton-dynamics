@@ -70,6 +70,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	ndReferencedObjects<ndJointBilateralConstraint> m_referencedJoints;
 	ndModelList::ndNode* m_node;
 	ndWorld* m_world;
+	ndInt8 m_markedForRemoved;
 
 	friend class ndWorld;
 	friend class ndLoadSave;
@@ -115,6 +116,7 @@ inline ndModel::ndModel()
 	,m_referencedBodies()
 	,m_node(nullptr)
 	,m_world(nullptr)
+	,m_markedForRemoved(0)
 {
 }
 

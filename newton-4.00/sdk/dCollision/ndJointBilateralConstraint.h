@@ -155,7 +155,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndUnsigned32 m_isInSkeleton		: 1;
 	ndUnsigned32 m_enableCollision	: 1;
 	ndInt8 m_rowIsMotor;
-	ndInt8 m_jointIsdead;
+	ndInt8 m_markedForRemoved;
 	ndJointBilateralSolverModel m_solverModel;
 
 	friend class ndWorld;

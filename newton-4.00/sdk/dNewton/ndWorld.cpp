@@ -397,9 +397,9 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 	if (m_inUpdate)
 	{
 		ndScopeSpinLock lock(m_deletedLock);
-		if (!body->m_bodyIsdead)
+		if (!body->m_markedForRemoved)
 		{
-			body->m_bodyIsdead = 1;
+			body->m_markedForRemoved = 1;
 			m_deletedBodies.PushBack(*body);
 		}
 	}
@@ -467,7 +467,7 @@ void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	if (m_inUpdate)
 	{
-		joint->m_jointIsdead = 1;
+		joint->m_markedForRemoved = 1;
 		m_deletedJoints.PushBack(*joint);
 	}
 	else
