@@ -28,6 +28,7 @@
 #include "ndConstraint.h"
 
 class ndScene;
+class ndModel;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
@@ -58,11 +59,20 @@ class ndBodyKinematic : public ndBody
 	};
 
 	public:
-	class ndJointList : public ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>
+	class ndJointList : public ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndJointBilateralConstraint*>>
 	{
 		public:
 		ndJointList()
-			:ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndSharedPtr<ndJointBilateralConstraint>*>>()
+			:ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndJointBilateralConstraint*>>()
+		{
+		}
+	};
+
+	class ndModelList : public ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>
+	{
+		public:
+		ndModelList()
+			:ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>()
 		{
 		}
 	};
@@ -163,6 +173,9 @@ class ndBodyKinematic : public ndBody
 	const ndContactMap& GetContactMap() const;
 	const ndJointList& GetJointList() const;
 
+	ndModelList& GetModelList();
+	const ndModelList& GetModelList() const;
+
 	protected:
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
@@ -196,6 +209,7 @@ class ndBodyKinematic : public ndBody
 	ndVector m_gyroTorque;
 	ndQuaternion m_gyroRotation;
 	ndJointList m_jointList;
+	ndModelList m_modelList;
 	ndContactMap m_contactList;
 	mutable ndSpinLock m_lock;
 	ndScene* m_scene;
@@ -407,6 +421,16 @@ inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() con
 inline const ndBodyKinematic::ndJointList& ndBodyKinematic::GetJointList() const
 {
 	return m_jointList;
+}
+
+inline ndBodyKinematic::ndModelList& ndBodyKinematic::GetModelList()
+{
+	return m_modelList;
+}
+
+inline const ndBodyKinematic::ndModelList& ndBodyKinematic::GetModelList() const
+{
+	return m_modelList;
 }
 
 inline ndShapeInstance& ndBodyKinematic::GetCollisionShape()

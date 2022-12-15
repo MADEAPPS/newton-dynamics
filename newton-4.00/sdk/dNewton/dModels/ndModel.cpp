@@ -83,6 +83,8 @@ void ndModel::AddBody(ndSharedPtr<ndBodyKinematic>& body)
 	if (!FindBodyReference(*body))
 	{
 		m_referencedBodies.Append(body);
+		ndBodyKinematic::ndModelList& modelList = body->GetModelList();
+		modelList.Append(this);
 	}
 }
 
