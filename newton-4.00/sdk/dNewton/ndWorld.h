@@ -82,17 +82,11 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API bool IsGPU() const;
 	D_NEWTON_API const char* GetSolverString() const;
 
-	//D_NEWTON_API virtual bool AddBody(ndBody* const body);
-	//D_NEWTON_API virtual void RemoveBody(ndBody* const body);
 	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
 	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
-	D_NEWTON_API virtual void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 
-	//D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);
-	//D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
-	D_NEWTON_API virtual void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 
 	//D_NEWTON_API virtual void AddModel(ndModel* const model);
@@ -141,6 +135,9 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void PostModelTransform();
 
 	private:
+	void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
+	void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
+
 	class dgSolverProgressiveSleepEntry
 	{
 		public:

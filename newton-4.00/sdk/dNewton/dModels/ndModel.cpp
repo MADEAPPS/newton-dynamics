@@ -66,13 +66,13 @@ void ndModel::RemoveFromToWorld()
 		for (ndReferencedObjects<ndJointBilateralConstraint>::ndNode* node = m_referencedJoints.GetFirst(); node; node = node->GetNext())
 		{
 			ndSharedPtr<ndJointBilateralConstraint>& joint = node->GetInfo();
-			world->RemoveJoint(joint);
+			world->RemoveJoint(*joint);
 		}
 
 		for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_referencedBodies.GetFirst(); node; node = node->GetNext())
 		{
 			ndSharedPtr<ndBodyKinematic>& body = node->GetInfo();
-			world->RemoveBody(body);
+			world->RemoveBody(*body);
 		}
 	}
 }

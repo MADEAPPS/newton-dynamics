@@ -260,7 +260,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 					m_pickedBodyParam = param;
 					if (*m_pickJoint)
 					{
-						scene->GetWorld()->RemoveJoint(m_pickJoint);
+						scene->GetWorld()->RemoveJoint(*m_pickJoint);
 					}
 		
 					ndVector mass(m_targetPicked->GetMassMatrix());
@@ -300,7 +300,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 		{
 			if (*m_pickJoint)
 			{
-				scene->GetWorld()->RemoveJoint(m_pickJoint);
+				scene->GetWorld()->RemoveJoint(*m_pickJoint);
 			}
 			ResetPickBody();
 		}
