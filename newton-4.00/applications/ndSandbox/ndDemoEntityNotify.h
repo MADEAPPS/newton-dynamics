@@ -39,6 +39,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 
 	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
+	void OutsideWorldCheck(const ndMatrix& matrix);
+
 	ndDemoEntity* m_entity;
 	ndBodyKinematic* m_parentBody;
 	ndDemoEntityManager* m_manager;

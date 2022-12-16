@@ -82,17 +82,13 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API bool IsGPU() const;
 	D_NEWTON_API const char* GetSolverString() const;
 
-	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
+	D_NEWTON_API virtual void AddModel(ndSharedPtr<ndModel>& model);
 	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
-
-	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
-
-	//D_NEWTON_API virtual void AddModel(ndModel* const model);
-	//D_NEWTON_API virtual void RemoveModel(ndModel* const model);
-	D_NEWTON_API virtual void AddModel(ndSharedPtr<ndModel>& model);
-	D_NEWTON_API virtual void RemoveModel(ndSharedPtr<ndModel>& model);
+	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
+	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
+	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 
 	D_NEWTON_API const ndBodyList& GetBodyList() const;
 	D_NEWTON_API const ndJointList& GetJointList() const;
@@ -135,6 +131,7 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void PostModelTransform();
 
 	private:
+	void RemoveModel(ndSharedPtr<ndModel>& model);
 	void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 	void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
@@ -169,6 +166,7 @@ class ndWorld: public ndClassAlloc
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
 	ndArray<ndBody*> m_deletedBodies;
+	ndArray<ndModel*> m_deletedModels;
 	ndArray<ndJointBilateralConstraint*> m_deletedJoints;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
 	ndSpinLock m_deletedLock;

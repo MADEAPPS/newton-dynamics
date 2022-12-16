@@ -97,6 +97,11 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		}
 	}
 
+	OutsideWorldCheck(matrix);
+}
+
+void ndDemoEntityNotify::OutsideWorldCheck(const ndMatrix& matrix)
+{
 	// check world bounds
 	if (matrix.m_posit.m_y < -100.0f)
 	{
@@ -146,6 +151,8 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		const ndQuaternion rot(localMatrix);
 		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}
+
+	OutsideWorldCheck(matrix);
 }
 
 void ndBindingRagdollEntityNotify::OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)
