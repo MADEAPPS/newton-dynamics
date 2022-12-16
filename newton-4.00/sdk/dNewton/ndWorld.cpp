@@ -413,7 +413,8 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 			const ndBodyKinematic::ndModelList& modelList = kinematicBody->GetModelList();
 			if (modelList.GetCount())
 			{
-				ndAssert(0);
+				//ndAssert(0);
+				ndTrace(("xxxxxxxxx\n"));
 			}
 			
 			const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
