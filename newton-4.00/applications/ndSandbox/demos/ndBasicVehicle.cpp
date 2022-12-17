@@ -567,6 +567,13 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 	{
 		ndVehicleCommon::ApplyInputs(world, timestep);
 
+		static int xxxx;
+		xxxx++;
+		if (xxxx == 1000)
+		{
+			world->RemoveModel(this);
+		}
+
 		if (m_motor)
 		{
 			if (m_startEngineMemory ^ m_startEngine)

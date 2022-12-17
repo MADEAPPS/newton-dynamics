@@ -483,15 +483,18 @@ void ndWorld::ThreadFunction()
 	{
 		RemoveModel(m_deletedModels[i]);
 	}
+	m_deletedModels.SetCount(0);
+
 	for (ndInt32 i = 0; i < m_deletedJoints.GetCount(); i++)
 	{
 		RemoveJoint(m_deletedJoints[i]);
 	}
+	m_deletedJoints.SetCount(0);
+
 	for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
 	{
 		RemoveBody(m_deletedBodies[i]);
 	}
-	m_deletedJoints.SetCount(0);
 	m_deletedBodies.SetCount(0);
 	m_scene->End();
 
@@ -544,7 +547,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// Update Particle base physics
 	//ParticleUpdate();
 
-	// u[pate skelton topologis
+	// u[pate skeleton topologies
 	UpdateSkeletons();
 
 	// Update all models
@@ -1143,8 +1146,12 @@ void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	if (m_inUpdate)
 	{
-		joint->m_markedForRemoved = 1;
-		m_deletedJoints.PushBack(*joint);
+		ndScopeSpinLock lock(m_deletedLock);
+		if (!joint->m_markedForRemoved)
+		{
+			joint->m_markedForRemoved = 1;
+			m_deletedJoints.PushBack(*joint);
+		}
 	}
 	else
 	{
@@ -1159,6 +1166,11 @@ void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 			if (joint->IsSkeleton())
 			{
 				m_skeletonList.m_skelListIsDirty = true;
+				ndSkeletonContainer* const skeleton = joint->GetBody0()->GetSkeleton();
+				if (skeleton)
+				{
+					skeleton->Clear();
+				}
 			}
 			joint->m_worldNode = nullptr;
 			joint->m_body0Node = nullptr;
@@ -1180,12 +1192,14 @@ void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 
 void ndWorld::RemoveModel(ndSharedPtr<ndModel>& model)
 {
-	ndAssert(!m_inUpdate);
 	if (m_inUpdate)
 	{
-		ndAssert(0);
-		model->m_markedForRemoved = true;
-		m_deletedModels.PushBack(*model);
+		ndScopeSpinLock lock(m_deletedLock);
+		if (!model->m_markedForRemoved)
+		{
+			model->m_markedForRemoved = true;
+			m_deletedModels.PushBack(*model);
+		}
 	}
 	else
 	{

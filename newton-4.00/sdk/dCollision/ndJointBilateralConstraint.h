@@ -351,7 +351,6 @@ inline bool ndJointBilateralConstraint::IsSkeleton() const
 	bool test = false;
 	test = test || (mode == m_jointkinematicOpenLoop);
 	test = test || (mode == m_jointkinematicCloseLoop);
-	//test = test || (mode == m_jointkinematicHintOpenLoop);
 	return test;
 }
 

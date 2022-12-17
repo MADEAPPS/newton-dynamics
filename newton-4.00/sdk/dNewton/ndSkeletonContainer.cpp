@@ -390,6 +390,21 @@ ndSkeletonContainer::~ndSkeletonContainer()
 	m_nodeList.RemoveAll();
 }
 
+void ndSkeletonContainer::Clear()
+{
+	for (ndInt32 i = 0; i < m_loopCount; ++i)
+	{
+		ndJointBilateralConstraint* const joint = m_loopingJoints[i]->GetAsBilateral();
+		if (joint)
+		{
+			joint->m_isInSkeleton = false;
+		}
+	}
+
+	m_loopCount = 0;
+	m_dynamicsLoopCount = 0;
+}
+
 void ndSkeletonContainer::Init(ndBodyKinematic* const rootBody)
 {
 	m_skeleton = &m_nodeList.Append()->GetInfo();
@@ -454,15 +469,12 @@ void ndSkeletonContainer::Finalize(ndInt32 loopJointsCount, ndJointBilateralCons
 	SortGraph(m_skeleton, index);
 	ndAssert(index == m_nodeList.GetCount());
 	
-	if (loopJointsCount) 
+	for (ndInt32 i = 0; i < loopJointsCount; ++i) 
 	{
-		for (ndInt32 i = 0; i < loopJointsCount; ++i) 
-		{
-			ndJointBilateralConstraint* const joint = loopJointArray[i];
-			joint->m_isInSkeleton = true;
-			m_loopingJoints.PushBack(joint);
-			m_loopCount++;
-		}
+		ndJointBilateralConstraint* const joint = loopJointArray[i];
+		joint->m_isInSkeleton = true;
+		m_loopingJoints.PushBack(joint);
+		m_loopCount++;
 	}
 }
 
