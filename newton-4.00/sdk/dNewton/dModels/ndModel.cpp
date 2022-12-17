@@ -73,6 +73,15 @@ void ndModel::RemoveFromToWorld()
 		for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_referencedBodies.GetFirst(); node; node = node->GetNext())
 		{
 			ndSharedPtr<ndBodyKinematic>& body = node->GetInfo();
+			ndBodyKinematic::ndModelList& modelList = body->GetModelList();
+			for (ndBodyKinematic::ndModelList::ndNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
+			{
+				if (modelNode->GetInfo() == this)
+				{
+					modelList.Remove(modelNode);
+					break;
+				}
+			}
 			world->RemoveBody(*body);
 		}
 	}

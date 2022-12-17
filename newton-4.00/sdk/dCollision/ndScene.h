@@ -73,8 +73,6 @@ class ndScene : public ndThreadPool
 
 	public:
 	D_COLLISION_API virtual ~ndScene();
-	//D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
-	//D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
 	D_COLLISION_API virtual bool RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 
@@ -86,7 +84,6 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual double GetGPUTime() const;
 
 	D_COLLISION_API virtual void Cleanup();
-	D_COLLISION_API void Update(ndFloat32 timestep);
 
 	D_COLLISION_API ndContactNotify* GetContactNotify() const;
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
@@ -146,10 +143,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void CalculateContacts();
 	D_COLLISION_API virtual void FindCollidingPairs();
 	D_COLLISION_API virtual void DeleteDeadContacts();
-	
-	D_COLLISION_API virtual void ThreadFunction();
 
-	D_COLLISION_API virtual void CollisionOnlyUpdate();
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 

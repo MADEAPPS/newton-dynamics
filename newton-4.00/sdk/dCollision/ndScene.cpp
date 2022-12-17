@@ -151,24 +151,6 @@ void ndScene::Sync()
 	ndThreadPool::Sync();
 }
 
-void ndScene::CollisionOnlyUpdate()
-{
-	D_TRACKTIME();
-	Begin();
-	m_lru = m_lru + 1;
-	InitBodyArray();
-	BalanceScene();
-	FindCollidingPairs();
-	CalculateContacts();
-	End();
-}
-
-void ndScene::ThreadFunction()
-{
-	D_TRACKTIME();
-	CollisionOnlyUpdate();
-}
-
 void ndScene::Begin()
 {
 	ndThreadPool::Begin();
@@ -178,18 +160,6 @@ void ndScene::End()
 {
 	ndThreadPool::End();
 	m_frameNumber++;
-}
-
-void ndScene::Update(ndFloat32 timestep)
-{
-	// wait until previous update complete.
-	Sync();
-
-	// save time state for use by the update callback
-	m_timestep = timestep;
-
-	// update the next frame asynchronous 
-	TickOne();
 }
 
 ndContactNotify* ndScene::GetContactNotify() const
@@ -1123,11 +1093,6 @@ void ndScene::Cleanup()
 
 	m_backgroundThread.Terminate();
 
-	while (m_bodyList.GetFirst())
-	{
-		ndSharedPtr<ndBodyKinematic>& body = m_bodyList.GetFirst()->GetInfo();
-		RemoveBody(body);
-	}
 	if (m_sentinelBody)
 	{
 		delete m_sentinelBody;

@@ -63,7 +63,7 @@ void ndModelList::AddModel(ndSharedPtr<ndModel>& model, ndWorld* const world)
 
 void ndModelList::RemoveModel(ndSharedPtr<ndModel>& model)
 {
-	ndNode* node = model->m_node;
+	ndNode* const node = model->m_node;
 	if (node)
 	{
 		m_dirty = true;

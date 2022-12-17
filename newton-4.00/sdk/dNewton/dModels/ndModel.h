@@ -45,9 +45,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	ndModel();
 	D_NEWTON_API ndModel(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	virtual ~ndModel ();
-	
-	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
-	D_NEWTON_API virtual void RemoveFromToWorld();
+
 
 	D_NEWTON_API virtual void AddBody(ndSharedPtr<ndBodyKinematic>& body);
 	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
@@ -57,6 +55,8 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
+	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
+	D_NEWTON_API virtual void RemoveFromToWorld();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	ndSharedPtr<ndBodyKinematic>* FindBodyReference(const ndBodyKinematic* const body) const;
 	ndSharedPtr<ndJointBilateralConstraint>* FindJointReference(const ndJointBilateralConstraint* const joint) const;

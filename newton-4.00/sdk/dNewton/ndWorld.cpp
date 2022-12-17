@@ -178,16 +178,16 @@ void ndWorld::CleanUp()
 		m_skeletonList.Remove(m_skeletonList.GetFirst());
 	}
 
-	while (m_modelList.GetFirst())
-	{
-		ndSharedPtr<ndModel>& model = m_modelList.GetFirst()->GetInfo();
-		RemoveModel(model);
-	}
-
 	while (m_jointList.GetFirst())
 	{
 		ndSharedPtr<ndJointBilateralConstraint>& joint = m_jointList.GetFirst()->GetInfo();
 		RemoveJoint(joint);
+	}
+
+	while (m_modelList.GetFirst())
+	{
+		ndSharedPtr<ndModel>& model = m_modelList.GetFirst()->GetInfo();
+		RemoveModel(model);
 	}
 
 	while (m_particleSetList.GetFirst())
@@ -196,6 +196,12 @@ void ndWorld::CleanUp()
 		//ndBodyParticleSet* const body = m_particleSetList.GetFirst()->GetInfo();
 		//RemoveBody(body);
 		//delete body;
+	}
+
+	while (m_scene->m_bodyList.GetFirst())
+	{
+		ndSharedPtr<ndBodyKinematic>& body = m_scene->m_bodyList.GetFirst()->GetInfo();
+		RemoveBody(body);
 	}
 
 	ndBody::m_uniqueIdCount = 1;
@@ -393,63 +399,6 @@ bool ndWorld::AddBody(ndSharedPtr<ndBodyKinematic>& body)
 	return false;
 }
 
-void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
-{
-	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	if (m_inUpdate)
-	{
-		ndScopeSpinLock lock(m_deletedLock);
-		if (!body->m_markedForRemoved)
-		{
-			body->m_markedForRemoved = 1;
-			m_deletedBodies.PushBack(*body);
-		}
-	}
-	else
-	{
-		if (kinematicBody && kinematicBody->m_scene)
-		{
-			ndAssert(kinematicBody != GetSentinelBody());
-			const ndBodyKinematic::ndModelList& modelList = kinematicBody->GetModelList();
-			if (modelList.GetCount())
-			{
-				//ndAssert(0);
-				ndTrace(("xxxxxxxxx\n"));
-			}
-			
-			const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
-			while (jointList.GetFirst())
-			{
-				ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
-				ndAssert(joint->m_worldNode);
-				RemoveJoint(joint->m_worldNode->GetInfo());
-			}
-			m_scene->RemoveBody(body);
-		}
-		else if (body->GetAsBodyParticleSet())
-		{
-			ndAssert(0);
-			ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
-			ndAssert(particleSet->m_listNode);
-			m_particleSetList.Remove(particleSet->m_listNode);
-		}
-	}
-}
-
-void ndWorld::RemoveBody(ndBody* const body)
-{
-	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	if (kinematicBody->m_scene)
-	{
-		ndAssert(kinematicBody->m_sceneNode);
-		RemoveBody(kinematicBody->m_sceneNode->GetInfo());
-	}
-	else
-	{
-		ndAssert(0);
-	}
-}
-
 void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
 	// if the second body is nullPtr, replace it the sentinel
@@ -469,59 +418,10 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 	}
 }
 
-void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
-{
-	if (m_inUpdate)
-	{
-		joint->m_markedForRemoved = 1;
-		m_deletedJoints.PushBack(*joint);
-	}
-	else
-	{
-		ndJointList::ndNode* const worldNode = joint->m_worldNode;
-		if (worldNode != nullptr)
-		{
-			ndAssert(joint->m_body0Node != nullptr);
-			ndAssert(joint->m_body1Node != nullptr);
-			joint->GetBody0()->DetachJoint(joint->m_body0Node);
-			joint->GetBody1()->DetachJoint(joint->m_body1Node);
-
-			if (joint->IsSkeleton())
-			{
-				m_skeletonList.m_skelListIsDirty = true;
-			}
-			joint->m_worldNode = nullptr;
-			joint->m_body0Node = nullptr;
-			joint->m_body1Node = nullptr;
-			m_jointList.Remove(worldNode);
-		}
-	}
-}
-
-void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
-{
-	ndJointList::ndNode* const worldNode = joint->m_worldNode;
-	if (worldNode)
-	{
-		ndSharedPtr<ndJointBilateralConstraint>& jointPtr = worldNode->GetInfo();
-		RemoveJoint(jointPtr);
-	}
-}
 
 void ndWorld::AddModel(ndSharedPtr<ndModel>& model)
 {
 	m_modelList.AddModel(model, this);
-}
-
-void ndWorld::RemoveModel(ndSharedPtr<ndModel>& model)
-{
-	ndAssert(!m_inUpdate);
-	m_modelList.RemoveModel(model);
-}
-
-void ndWorld::RemoveModel(ndModel* const model)
-{
-	ndAssert(0);
 }
 
 ndInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void*)
@@ -1179,4 +1079,125 @@ void ndWorld::Update(ndFloat32 timestep)
 
 	// update the next frame asynchronous 
 	m_scene->TickOne();
+}
+
+
+void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
+{
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (m_inUpdate)
+	{
+		ndScopeSpinLock lock(m_deletedLock);
+		if (!body->m_markedForRemoved)
+		{
+			body->m_markedForRemoved = 1;
+			m_deletedBodies.PushBack(*body);
+		}
+	}
+	else
+	{
+		if (kinematicBody && kinematicBody->m_scene)
+		{
+			ndAssert(kinematicBody != GetSentinelBody());
+			const ndBodyKinematic::ndModelList& modelList = kinematicBody->GetModelList();
+			if (modelList.GetCount())
+			{
+				ndAssert(0);
+				ndTrace(("xxxxxxxxx\n"));
+			}
+
+			const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
+			while (jointList.GetFirst())
+			{
+				ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
+				ndAssert(joint->m_worldNode);
+				RemoveJoint(joint->m_worldNode->GetInfo());
+			}
+			m_scene->RemoveBody(body);
+		}
+		else if (body->GetAsBodyParticleSet())
+		{
+			ndAssert(0);
+			ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
+			ndAssert(particleSet->m_listNode);
+			m_particleSetList.Remove(particleSet->m_listNode);
+		}
+	}
+}
+
+void ndWorld::RemoveBody(ndBody* const body)
+{
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody->m_scene)
+	{
+		ndAssert(kinematicBody->m_sceneNode);
+		RemoveBody(kinematicBody->m_sceneNode->GetInfo());
+	}
+	else
+	{
+		ndAssert(0);
+	}
+}
+
+void ndWorld::RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
+{
+	if (m_inUpdate)
+	{
+		joint->m_markedForRemoved = 1;
+		m_deletedJoints.PushBack(*joint);
+	}
+	else
+	{
+		ndJointList::ndNode* const worldNode = joint->m_worldNode;
+		if (worldNode != nullptr)
+		{
+			ndAssert(joint->m_body0Node != nullptr);
+			ndAssert(joint->m_body1Node != nullptr);
+			joint->GetBody0()->DetachJoint(joint->m_body0Node);
+			joint->GetBody1()->DetachJoint(joint->m_body1Node);
+
+			if (joint->IsSkeleton())
+			{
+				m_skeletonList.m_skelListIsDirty = true;
+			}
+			joint->m_worldNode = nullptr;
+			joint->m_body0Node = nullptr;
+			joint->m_body1Node = nullptr;
+			m_jointList.Remove(worldNode);
+		}
+	}
+}
+
+void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
+{
+	ndJointList::ndNode* const worldNode = joint->m_worldNode;
+	if (worldNode)
+	{
+		ndSharedPtr<ndJointBilateralConstraint>& jointPtr = worldNode->GetInfo();
+		RemoveJoint(jointPtr);
+	}
+}
+
+void ndWorld::RemoveModel(ndSharedPtr<ndModel>& model)
+{
+	ndAssert(!m_inUpdate);
+	if (m_inUpdate)
+	{
+		ndAssert(0);
+		model->m_markedForRemoved = true;
+		m_deletedModels.PushBack(*model);
+	}
+	else
+	{
+		m_modelList.RemoveModel(model);
+	}
+}
+
+void ndWorld::RemoveModel(ndModel* const model)
+{
+	if (model->m_node)
+	{
+		ndSharedPtr<ndModel>& modelPtr = model->m_node->GetInfo();
+		RemoveModel(modelPtr);
+	}
 }
