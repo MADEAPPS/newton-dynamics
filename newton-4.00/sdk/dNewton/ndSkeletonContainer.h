@@ -125,8 +125,8 @@ class ndSkeletonContainer
 	private:
 	ndNode* GetRoot() const;
 
-	void CheckSleepState();
 	void Clear();
+	void CheckSleepState();
 	void Init(ndBodyKinematic* const rootBody);
 	ndNode* AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent);
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);

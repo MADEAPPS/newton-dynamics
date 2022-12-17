@@ -18,77 +18,29 @@
 #include "ndVehicleUI.h"
 #include "ndDemoEntityManager.h"
 
-//ndDemoMesh* CreateDialMesh(ndDemoEntityManager* const scene, const char* const texName)
-//{
-//	ndMeshEffect mesh;
-//
-//	dArray<ndMeshEffect::dMaterial>& materialArray = mesh.GetMaterials();
-//	ndMeshEffect::dMaterial material;
-//	strcpy(material.m_textureName, texName);
-//	materialArray.PushBack(material);
-//
-//	ndFloat32 gageSize = 100.0f;
-//	mesh.BeginBuild();
-//	mesh.BeginBuildFace();
-//	mesh.AddPoint(-gageSize, gageSize, 0.0f);
-//	mesh.AddUV0(0.0f, 1.0f);
-//	mesh.AddMaterial(0);
-//
-//	mesh.AddPoint(-gageSize, -gageSize, 0.0f);
-//	mesh.AddUV0(0.0f, 0.0f);
-//	mesh.AddMaterial(0);
-//
-//	mesh.AddPoint(gageSize, -gageSize, 0.0f);
-//	mesh.AddUV0(1.0f, 0.0f);
-//	mesh.AddMaterial(0);
-//	mesh.EndBuildFace();
-//
-//	mesh.BeginBuildFace();
-//	mesh.AddPoint(-gageSize, gageSize, 0.0f);
-//	mesh.AddUV0(0.0f, 1.0f);
-//	mesh.AddMaterial(0);
-//
-//	mesh.AddPoint(gageSize, -gageSize, 0.0f);
-//	mesh.AddUV0(1.0f, 0.0f);
-//	mesh.AddMaterial(0);
-//
-//	mesh.AddPoint(gageSize, gageSize, 0.0f);
-//	mesh.AddUV0(1.0f, 1.0f);
-//	mesh.AddMaterial(0);
-//	mesh.EndBuildFace();
-//
-//	mesh.EndBuild(0.0f);
-//	return new ndDemoMesh("dialMesh", &mesh, scene->GetShaderCache());
-//}
+const GLchar* ndVehicleUI::m_vertexShader = R""""(
+	
+	uniform sampler2D UIText;
+	in vec2 Frag_UV;
+	in vec4 Frag_Color;
+	out vec4 Out_Color;
+	void main()
+	{
+		Out_Color = Frag_Color * texture(UIText, Frag_UV.st);
+	}
+)"""";
 
+const GLchar* ndVehicleUI::m_fragmentShader = R""""(
 
-const GLchar* ndVehicleUI::m_vertexShader =
-	"in vec3 Position;\n"
-	"in vec2 UV;\n"
-	"out vec2 Frag_UV;\n"
-	"out vec4 Frag_Color;\n"
-	"uniform mat4 ProjMtx;\n"
-	"uniform mat4 ModMtx;\n"
-	"uniform float ptsize;\n"
-	"uniform vec4 color;\n"
-	"void main()\n"
-	"{\n"
-	"	Frag_UV = UV;\n"
-	"	Frag_Color = color;\n"
-	"	gl_Position = ProjMtx * ModMtx * vec4(Position.xy * ptsize,0.0,1.0);\n"
-	"}\n"
-;
-
-const GLchar* ndVehicleUI::m_fragmentShader =
-	"uniform sampler2D UIText;\n"
-	"in vec2 Frag_UV;\n"
-	"in vec4 Frag_Color;\n"
-	"out vec4 Out_Color;\n"
-	"void main()\n"
-	"{\n"
-	"	Out_Color = Frag_Color * texture(UIText, Frag_UV.st);\n"
-	"}\n"
-;
+	uniform sampler2D UIText;
+	in vec2 Frag_UV;
+	in vec4 Frag_Color;
+	out vec4 Out_Color;
+	void main()
+	{
+		Out_Color = Frag_Color * texture(UIText, Frag_UV.st);
+	}
+)"""";
 
 const GLchar* ndVehicleUI::m_vertexShaderWithVersion[2] = { "#version 330 core\n", m_vertexShader };
 const GLchar* ndVehicleUI::m_fragmentShaderWithVersion[2] = { "#version 330 core\n", m_fragmentShader };
