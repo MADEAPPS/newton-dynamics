@@ -889,7 +889,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
-#if 1
+#if 0
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndHeavyMultiBodyVehicle* const vehiculemonsterTruck = new ndBigRigVehicle(scene, bigRigDesc, matrix);
 	ndSharedPtr<ndModel> vehiclePtr(vehiculemonsterTruck);
@@ -904,6 +904,21 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->RemoveModel(vehiculemonsterTruck);
 	//}
 #else
+
+
+	ndVehicleMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.8f;
+	material.m_staticFriction1 = 0.8f;
+	material.m_dynamicFriction0 = 0.8f;
+	material.m_dynamicFriction1 = 0.8f;
+
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_modelPart);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_vehicleTirePart);
 
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
 	//BuildFloorBox(scene, sceneLocation);
