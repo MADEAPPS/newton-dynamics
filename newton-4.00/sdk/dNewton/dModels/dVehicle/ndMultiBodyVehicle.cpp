@@ -184,7 +184,6 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& d
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
 {
 	m_tireShape->Release();
-//	RemoveFromToWorld();
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)

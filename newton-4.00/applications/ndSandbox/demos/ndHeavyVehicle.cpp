@@ -889,6 +889,21 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
+#if 1
+	ndMatrix matrix(ndGetIdentityMatrix());
+	ndHeavyMultiBodyVehicle* const vehiculemonsterTruck = new ndBigRigVehicle(scene, bigRigDesc, matrix);
+	ndSharedPtr<ndModel> vehiclePtr(vehiculemonsterTruck);
+	//
+	scene->GetWorld()->AddModel(vehiclePtr);
+	//
+	//m_currentVehicle = m_vehiculeTruck;
+	//m_currentVehicle = m_vehiculemonsterTruck;
+
+	if (vehiculemonsterTruck) {
+		scene->GetWorld()->RemoveModel(vehiculemonsterTruck);
+	}
+#else
+
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
@@ -936,4 +951,5 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
+#endif
 }

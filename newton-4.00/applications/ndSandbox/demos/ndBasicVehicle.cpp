@@ -566,13 +566,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 	{
 		ndVehicleCommon::ApplyInputs(world, timestep);
 
-		static int xxxx;
-		xxxx++;
-		if (xxxx == 1000)
-		{
-			world->RemoveModel(this);
-		}
-
 		if (m_motor)
 		{
 			if (m_startEngineMemory ^ m_startEngine)
@@ -793,8 +786,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndBasicMultiBodyVehicle* const vehicle1 = new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)));
 	ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
 	ndBasicMultiBodyVehicle* const vehicle3 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)));
-
-	world->RemoveModel(vehicle0);
 
 	//ndBasicMultiBodyVehicle* const vehicle = vehicle0;
 	ndBasicMultiBodyVehicle* const vehicle = vehicle3;
