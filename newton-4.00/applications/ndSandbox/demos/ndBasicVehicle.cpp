@@ -272,7 +272,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		chassis->SetCentreOfMass(com);
 
 		// 1- add chassis to the vehicle mode 
-		//AddChassis(chassis);
 		SetChassis(chassis);
 
 		// 2- each tire to the model, 

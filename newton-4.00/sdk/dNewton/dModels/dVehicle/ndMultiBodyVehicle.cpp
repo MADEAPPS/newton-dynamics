@@ -573,14 +573,16 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	return differential;
 }
 
-void ndMultiBodyVehicle::AddExtraBody(ndBodyKinematic* const body)
+void ndMultiBodyVehicle::AddExtraBody(ndSharedPtr<ndBodyKinematic>& body)
 {
-	m_extraBodiesAttachmentList.Append(body);
+	AddBody(body);
+	m_extraBodiesAttachmentList.Append(*body);
 }
 
-void ndMultiBodyVehicle::AddExtraJoint(ndJointBilateralConstraint* const joint)
+void ndMultiBodyVehicle::AddExtraJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 {
-	m_extraJointsAttachmentList.Append(joint);
+	AddJoint(joint);
+	m_extraJointsAttachmentList.Append(*joint);
 }
 
 ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 radius)

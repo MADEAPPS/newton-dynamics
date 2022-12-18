@@ -663,7 +663,7 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation)
 {
 	ndInt32 animationCount = fbxScene->getAnimationStackCount();
-	for (int i = 0; i < animationCount; ++i)
+	for (ndInt32 i = 0; i < animationCount; ++i)
 	{
 		const ofbx::AnimationStack* const animStack = fbxScene->getAnimationStack(i);
 		
@@ -795,7 +795,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxMeshEffectNodeGlobalN
 			clusterBoneMap.Insert(cluster, link);
 		}
 	
-		for (int i = 0; i < clusterCount; ++i)
+		for (ndInt32 i = 0; i < clusterCount; ++i)
 		{
 			const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
 			const ofbx::Object* const fbxBone = fbxCluster->getLink();
