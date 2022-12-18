@@ -898,10 +898,11 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//
 	//m_currentVehicle = m_vehiculeTruck;
 	//m_currentVehicle = m_vehiculemonsterTruck;
+	// this check does not do anything;
+	//if (vehiculemonsterTruck) {
 
-	if (vehiculemonsterTruck) {
-		scene->GetWorld()->RemoveModel(vehiculemonsterTruck);
-	}
+	scene->GetWorld()->RemoveModel(vehiculemonsterTruck);
+	//}
 #else
 
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
