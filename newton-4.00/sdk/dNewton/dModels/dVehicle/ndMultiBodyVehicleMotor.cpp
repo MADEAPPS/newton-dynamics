@@ -158,7 +158,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	SetDiagonalRegularizer(desc, ndFloat32(0.1f));
 
 	// add torque coupling to chassis.
-	const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
+	const ndMultiBodyVehicleGearBox* const gearBox = *m_vehicelModel->m_gearBox;
 	ndAssert(gearBox);
 	if (gearBox && ndAbs(gearBox->GetRatio()) > ndFloat32(0.0f))
 	{

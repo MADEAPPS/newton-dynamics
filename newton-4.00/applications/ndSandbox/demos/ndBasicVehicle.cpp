@@ -272,7 +272,8 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		chassis->SetCentreOfMass(com);
 
 		// 1- add chassis to the vehicle mode 
-		SetChassis(chassis);
+		SetChassis(*chassis);
+		world->AddBody(chassis);
 
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
@@ -281,15 +282,20 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndVehicleDectriptor::ndTireDefinition rl_tireConfiguration(m_configuration.m_rearTire);
 		ndSharedPtr<ndBodyKinematic> rr_tire_body (CreateTireBody(scene, *chassis, rr_tireConfiguration, "rr_tire"));
 		ndSharedPtr<ndBodyKinematic> rl_tire_body (CreateTireBody(scene, *chassis, rl_tireConfiguration, "rl_tire"));
-		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(rr_tireConfiguration, rr_tire_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(rl_tireConfiguration, rl_tire_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(rr_tireConfiguration, *rr_tire_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(rl_tireConfiguration, *rl_tire_body);
 
 		ndVehicleDectriptor::ndTireDefinition fr_tireConfiguration(m_configuration.m_frontTire);
 		ndVehicleDectriptor::ndTireDefinition fl_tireConfiguration(m_configuration.m_frontTire);
 		ndSharedPtr<ndBodyKinematic> fr_tire_body (CreateTireBody(scene, *chassis, fr_tireConfiguration, "fr_tire"));
 		ndSharedPtr<ndBodyKinematic> fl_tire_body (CreateTireBody(scene, *chassis, fl_tireConfiguration, "fl_tire"));
-		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, *fr_tire_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, *fl_tire_body);
+
+		world->AddBody(rr_tire_body);
+		world->AddBody(rl_tire_body);
+		world->AddBody(fr_tire_body);
+		world->AddBody(fl_tire_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
@@ -398,9 +404,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 		m_engineRpmSound->SetLoop(true);
 		m_skipMarks->SetLoop(true);
-
-		ndSharedPtr<ndModel> model(this);
-		scene->GetWorld()->AddModel(model);
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -517,7 +520,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
-		ndMultiBodyVehicleMotor* const motor = m_motor;
+		ndMultiBodyVehicleMotor* const motor = *m_motor;
 		if (motor)
 		{
 			ndAssert(motor);
@@ -566,7 +569,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 	{
 		ndVehicleCommon::ApplyInputs(world, timestep);
 
-		if (m_motor)
+		if (*m_motor)
 		{
 			if (m_startEngineMemory ^ m_startEngine)
 			{
@@ -621,7 +624,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		if (0)
 		{
 			// test convex cast
-			ndMultiBodyVehicleTireJoint* const tire = m_tireList.GetCount() ? m_tireList.GetFirst()->GetInfo() : nullptr;
+			ndMultiBodyVehicleTireJoint* const tire = m_tireList.GetCount() ? *m_tireList.GetFirst()->GetInfo() : nullptr;
 			if (tire)
 			{
 				const ndWheelDescriptor& info = tire->GetInfo();
@@ -780,15 +783,20 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// add a model for general controls
 	//ndVehicleSelector* const controls = new ndVehicleSelector();
 	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
-	scene->GetWorld()->AddModel(controls);
+	world->AddModel(controls);
 	
-	ndBasicMultiBodyVehicle* const vehicle0 = new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)));
-	ndBasicMultiBodyVehicle* const vehicle1 = new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)));
-	ndBasicMultiBodyVehicle* const vehicle2 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)));
-	ndBasicMultiBodyVehicle* const vehicle3 = new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)));
+	ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f))));
+	ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f))));
+	ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f))));
+	ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f))));
+
+	//world->AddModel(vehicle0);
+	//world->AddModel(vehicle1);
+	//world->AddModel(vehicle2);
+	world->AddModel(vehicle3);
 
 	//ndBasicMultiBodyVehicle* const vehicle = vehicle0;
-	ndBasicMultiBodyVehicle* const vehicle = vehicle3;
+	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
 
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);

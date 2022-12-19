@@ -31,45 +31,39 @@ class ndConstraintDebugCallback;
 D_MSV_NEWTON_ALIGN_32
 class ndModel: public ndContainersFreeListAlloc<ndModel>
 {
+	public:
 	template<class T>
 	class ndReferencedObjects : public ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>
 	{
 		public:
-		ndReferencedObjects();
-		void AddReferenceBody(ndSharedPtr<T>& object);
-		ndSharedPtr<T>* FindReference(const T* const object) const;
+		ndReferencedObjects()
+			:ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>()
+		{
+		}
 	};
 
-	public:
 	D_CLASS_REFLECTION(ndModel);
+
 	ndModel();
 	D_NEWTON_API ndModel(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	virtual ~ndModel ();
-
-
-	D_NEWTON_API virtual void AddBody(ndSharedPtr<ndBodyKinematic>& body);
-	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	virtual ndModel* GetAsModel();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
-	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
-	D_NEWTON_API virtual void RemoveFromToWorld();
+	virtual void AddToWorld(ndWorld* const world);
+	virtual void RemoveFromToWorld();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-	ndSharedPtr<ndBodyKinematic>* FindBodyReference(const ndBodyKinematic* const body) const;
-	ndSharedPtr<ndJointBilateralConstraint>* FindJointReference(const ndJointBilateralConstraint* const joint) const;
 
 	virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
 
-	private:
-	ndReferencedObjects<ndBodyKinematic> m_referencedBodies;
-	ndReferencedObjects<ndJointBilateralConstraint> m_referencedJoints;
-	ndModelList::ndNode* m_node;
 	ndWorld* m_world;
+	private:
+	ndModelList::ndNode* m_node;
 	ndInt8 m_markedForRemoved;
 
 	friend class ndWorld;
@@ -77,43 +71,9 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	friend class ndModelList;
 } D_GCC_NEWTON_ALIGN_32;
 
-template<class T>
-ndModel::ndReferencedObjects<T>::ndReferencedObjects()
-	:ndList<ndSharedPtr<T>, ndContainersFreeListAlloc<ndSharedPtr<T>*>>()
-{
-}
-
-template<class T>
-void ndModel::ndReferencedObjects<T>::AddReferenceBody(ndSharedPtr<T>& object)
-{
-	T* const obj = *object;
-
-	for (typename ndReferencedObjects<T>::ndNode* node = ndReferencedObjects<T>::GetFirst(); node; node = node->GetNext())
-	{
-		if (*node->GetInfo() == obj)
-		{
-			return;
-		}
-	}
-	ndReferencedObjects<T>::Append(object);
-}
-
-template<class T>
-ndSharedPtr<T>* ndModel::ndReferencedObjects<T>::FindReference(const T* const object) const
-{
-	for (typename ndReferencedObjects<T>::ndNode* node = ndReferencedObjects<T>::GetFirst(); node; node = node->GetNext())
-	{
-		if (*node->GetInfo() == object)
-		{
-			return &node->GetInfo();
-		}
-	}
-	return nullptr;
-}
 
 inline ndModel::ndModel()
 	:ndContainersFreeListAlloc<ndModel>()
-	,m_referencedBodies()
 	,m_node(nullptr)
 	,m_world(nullptr)
 	,m_markedForRemoved(0)
@@ -151,15 +111,16 @@ inline void ndModel::PostTransformUpdate(ndWorld* const, ndFloat32)
 {
 }
 
-inline ndSharedPtr<ndBodyKinematic>* ndModel::FindBodyReference(const ndBodyKinematic* const body) const
+inline void ndModel::AddToWorld(ndWorld* const world)
 {
-	return m_referencedBodies.FindReference(body);
+	m_world = world;
 }
 
-inline ndSharedPtr<ndJointBilateralConstraint>* ndModel::FindJointReference(const ndJointBilateralConstraint* const joint) const
+inline void ndModel::RemoveFromToWorld()
 {
-	return m_referencedJoints.FindReference(joint);
+	m_world = nullptr;
 }
+
 
 #endif 
 

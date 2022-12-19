@@ -24,7 +24,6 @@
 #include "ndModel.h"
 
 ndModelList::ndModelList()
-	//:ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>()
 	:ndList<ndSharedPtr<ndModel>, ndContainersFreeListAlloc<ndSharedPtr<ndModel>*>>()
 	,m_updateArray()
 	,m_dirty(true)

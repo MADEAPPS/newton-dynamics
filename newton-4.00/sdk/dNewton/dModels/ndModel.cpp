@@ -28,9 +28,8 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndModel)
 
 ndModel::ndModel(const ndLoadSaveBase::ndLoadDescriptor&)
 	:ndContainersFreeListAlloc<ndModel>()
-	,m_referencedBodies()
-	,m_node(nullptr)
 	,m_world(nullptr)
+	,m_node(nullptr)
 	,m_markedForRemoved(0)
 {
 }
@@ -42,65 +41,5 @@ void ndModel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 }
 
-void ndModel::AddToWorld(ndWorld* const world)
-{
-	m_world = world;
-	for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_referencedBodies.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBodyKinematic>& body = node->GetInfo();
-		world->AddBody(body);
-	}
 
-	for (ndReferencedObjects<ndJointBilateralConstraint>::ndNode* node = m_referencedJoints.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndJointBilateralConstraint>& joint = node->GetInfo();
-		world->AddJoint(joint);
-	}
-}
 
-void ndModel::RemoveFromToWorld()
-{
-	if (m_world)
-	{
-		ndWorld* const world = m_world;
-		m_world = nullptr;
-		for (ndReferencedObjects<ndJointBilateralConstraint>::ndNode* node = m_referencedJoints.GetFirst(); node; node = node->GetNext())
-		{
-			ndSharedPtr<ndJointBilateralConstraint>& joint = node->GetInfo();
-			world->RemoveJoint(*joint);
-		}
-
-		for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_referencedBodies.GetFirst(); node; node = node->GetNext())
-		{
-			ndSharedPtr<ndBodyKinematic>& body = node->GetInfo();
-			ndBodyKinematic::ndModelList& modelList = body->GetModelList();
-			for (ndBodyKinematic::ndModelList::ndNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
-			{
-				if (modelNode->GetInfo() == this)
-				{
-					modelList.Remove(modelNode);
-					break;
-				}
-			}
-			world->RemoveBody(*body);
-		}
-	}
-}
-
-void ndModel::AddBody(ndSharedPtr<ndBodyKinematic>& body)
-{
-	if (!FindBodyReference(*body))
-	{
-		m_referencedBodies.Append(body);
-		ndBodyKinematic::ndModelList& modelList = body->GetModelList();
-		modelList.Append(this);
-	}
-}
-
-void ndModel::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
-{
-	if (!FindJointReference(*joint))
-	{
-		m_referencedJoints.Append(joint);
-	}
-}

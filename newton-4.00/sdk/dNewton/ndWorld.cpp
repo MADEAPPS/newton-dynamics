@@ -418,7 +418,6 @@ void ndWorld::AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint)
 	}
 }
 
-
 void ndWorld::AddModel(ndSharedPtr<ndModel>& model)
 {
 	m_modelList.AddModel(model, this);
@@ -1102,13 +1101,6 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 		if (kinematicBody && kinematicBody->m_scene)
 		{
 			ndAssert(kinematicBody != GetSentinelBody());
-			const ndBodyKinematic::ndModelList& modelList = kinematicBody->GetModelList();
-			if (modelList.GetCount())
-			{
-				ndAssert(0);
-				ndTrace(("xxxxxxxxx\n"));
-			}
-
 			const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
 			while (jointList.GetFirst())
 			{

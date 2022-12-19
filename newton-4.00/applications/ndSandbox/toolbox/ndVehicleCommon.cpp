@@ -326,7 +326,7 @@ bool ndVehicleCommon::IsPlayer() const
 	return m_isPlayer;
 }
 
-void ndVehicleCommon::SetChassis(ndSharedPtr<ndBodyKinematic>& chassis)
+void ndVehicleCommon::SetChassis(ndBodyKinematic* const chassis)
 {
 	AddChassis(chassis);
 	// assign chassis material id.
@@ -453,7 +453,7 @@ void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 
 void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 {
-	if (m_isPlayer && m_motor)
+	if (m_isPlayer && *m_motor)
 	{
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
@@ -575,9 +575,9 @@ void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 			brake = 1.0f;
 		}
 
-		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+		for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 		{
-			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+			ndMultiBodyVehicleTireJoint* const tire = *node->GetInfo();
 			tire->SetBrake(brake);
 			tire->SetSteering(steerAngle);
 			tire->SetHandBrake(handBrake);
