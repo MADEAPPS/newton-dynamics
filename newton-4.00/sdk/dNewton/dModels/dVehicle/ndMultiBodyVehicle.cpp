@@ -1282,18 +1282,36 @@ void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 	}
 }
 
+bool ndMultiBodyVehicle::isActive() const
+{
+	bool active = m_chassis->GetScene() ? true : false;
+	for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); active && node; node = node->GetNext())
+	{
+		ndBodyKinematic* const body = node->GetInfo()->GetBody0();
+		active = active && (body->GetScene() ? true : false);
+	}
+
+	return active;
+}
+
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
 {
-	ApplyAligmentAndBalancing();
+	if (isActive())
+	{
+		ApplyAligmentAndBalancing();
+	}
 }
 
 void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
 {
-	ApplyInputs(world, timestep);
+	if (isActive())
+	{
+		ApplyInputs(world, timestep);
 
-	// apply down force
-	ApplyAerodynamics();
-	// apply tire model
-	ApplyTireModel(timestep);
+		// apply down force
+		ApplyAerodynamics();
+		// apply tire model
+		ApplyTireModel(timestep);
+	}
 }
 

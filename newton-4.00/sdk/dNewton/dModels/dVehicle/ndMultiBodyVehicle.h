@@ -111,6 +111,7 @@ class ndMultiBodyVehicle: public ndModel
 	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 
 	protected:
+	bool isActive() const;
 	virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void RemoveFromToWorld();
 	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
