@@ -38,8 +38,8 @@ class ndVehicleUI: public ndClassAlloc
 	GLuint m_shaderHandle;
 	static const GLchar* m_vertexShader;
 	static const GLchar* m_fragmentShader;
-	static const GLchar* m_vertexShaderWithVersion[2];
-	static const GLchar* m_fragmentShaderWithVersion[2];
+	//static const GLchar* m_vertexShaderWithVersion[2];
+	//static const GLchar* m_fragmentShaderWithVersion[2];
 
 	private:
 	GLuint m_vboDyn;
@@ -48,6 +48,11 @@ class ndVehicleUI: public ndClassAlloc
 	GLuint m_vaoSta;
 	GLuint m_iboDyn;
 	GLuint m_iboSta;
+
+	GLint m_colorLocation;
+	GLint m_ptsizeLocation;
+	GLint m_modMtxLocation;
+	GLint m_projMtxLocation;
 	glPositionUV m_vertDyn[4];
 	glPositionUV m_vertSta[4];
 	ndUnsigned32 m_indxDyn[6];

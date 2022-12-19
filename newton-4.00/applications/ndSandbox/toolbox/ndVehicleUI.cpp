@@ -19,31 +19,40 @@
 #include "ndDemoEntityManager.h"
 
 const GLchar* ndVehicleUI::m_vertexShader = R""""(
-	
-	uniform sampler2D UIText;
-	in vec2 Frag_UV;
-	in vec4 Frag_Color;
-	out vec4 Out_Color;
+
+	#version 330 core
+
+	in vec3 Position;
+	in vec2 UV;
+	out vec2 Frag_UV;
+	out vec4 Frag_Color;
+	uniform mat4 ProjMtx;
+	uniform mat4 ModMtx;
+	uniform float ptsize;
+	uniform vec4 color;
+
 	void main()
 	{
-		Out_Color = Frag_Color * texture(UIText, Frag_UV.st);
+		Frag_UV = UV;
+		Frag_Color = color;
+		gl_Position = ProjMtx * ModMtx * vec4(Position.xy * ptsize,0.0,1.0);
 	}
 )"""";
 
 const GLchar* ndVehicleUI::m_fragmentShader = R""""(
 
+	#version 330 core
+
 	uniform sampler2D UIText;
 	in vec2 Frag_UV;
 	in vec4 Frag_Color;
 	out vec4 Out_Color;
+
 	void main()
 	{
 		Out_Color = Frag_Color * texture(UIText, Frag_UV.st);
 	}
 )"""";
-
-const GLchar* ndVehicleUI::m_vertexShaderWithVersion[2] = { "#version 330 core\n", m_vertexShader };
-const GLchar* ndVehicleUI::m_fragmentShaderWithVersion[2] = { "#version 330 core\n", m_fragmentShader };
 
 ndVehicleUI::ndVehicleUI()
 	:ndClassAlloc()
@@ -120,7 +129,7 @@ void ndVehicleUI::CreateBufferUI()
 		GLint Result = GL_FALSE;
 		ndInt32 InfoLogLength = 0;
 
-		glShaderSource(m_vertHandle, 2, m_vertexShaderWithVersion, NULL);
+		glShaderSource(m_vertHandle, 1, &m_vertexShader, NULL);
 		glCompileShader(m_vertHandle);
 		// Check Vertex Shader
 		glGetShaderiv(m_vertHandle, GL_COMPILE_STATUS, &Result);
@@ -132,7 +141,7 @@ void ndVehicleUI::CreateBufferUI()
 			//	glGetShaderInfoLog(g_VertHandle3D, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
 			//	printf("Vertex %s\n", &VertexShaderErrorMessage[0]);
 		}
-		glShaderSource(m_fragHandle, 2, m_fragmentShaderWithVersion, NULL);
+		glShaderSource(m_fragHandle, 1, &m_fragmentShader, NULL);
 		glCompileShader(m_fragHandle);
 
 		// Check Fragment Shader
@@ -241,12 +250,16 @@ void ndVehicleUI::CreateBufferUI()
 		//
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
-		//
-		// Static buffer, Let's it in opengl memory.
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
-		//
 		glBindVertexArray(0);
+
+		glUseProgram(m_shaderHandle);
+
+		m_colorLocation = glGetUniformLocation(m_shaderHandle, "color");
+		m_projMtxLocation = glGetUniformLocation(m_shaderHandle, "ProjMtx");
+		m_modMtxLocation = glGetUniformLocation(m_shaderHandle, "ModMtx");
+		m_ptsizeLocation = glGetUniformLocation(m_shaderHandle, "ptsize");
+
+		glUseProgram(0);
 	}
 };
 
@@ -267,10 +280,11 @@ void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint t
 
 		glMatrix glModm(modm);
 		glMatrix glAprojm(aprojm);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &glAprojm[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &glModm[0][0]);
-		glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), GLfloat(ptsize));
-		glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
+
+		glUniformMatrix4fv(m_projMtxLocation, 1, GL_FALSE, &glAprojm[0][0]);
+		glUniformMatrix4fv(m_modMtxLocation, 1, GL_FALSE, &glModm[0][0]);
+		glUniform1f(m_ptsizeLocation, GLfloat(ptsize));
+		glUniform4fv(m_colorLocation, 1, &color[0]);
 
 		glBindVertexArray(m_vaoSta);
 
@@ -334,10 +348,10 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 
 
 		glMatrix glOrigin(origin);
 		glMatrix glAprojm(aprojm);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &glAprojm[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &glOrigin[0][0]);
-		glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), GLfloat(xy1));
-		glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
+		glUniformMatrix4fv(m_projMtxLocation, 1, GL_FALSE, &glAprojm[0][0]);
+		glUniformMatrix4fv(m_modMtxLocation, 1, GL_FALSE, &glOrigin[0][0]);
+		glUniform1f(m_ptsizeLocation, GLfloat(xy1));
+		glUniform4fv(m_colorLocation, 1, &color[0]);
 
 		glBindVertexArray(m_vaoDyn);
 
