@@ -55,7 +55,7 @@ const GLchar* ndVehicleUI::m_fragmentShader = R""""(
 )"""";
 
 ndVehicleUI::ndVehicleUI()
-	:ndClassAlloc()
+	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
 	,m_shaderHandle(0)
 	,m_vboDyn(0)
 	,m_vboSta(0)

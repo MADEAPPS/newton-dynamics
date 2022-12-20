@@ -19,10 +19,11 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndOpenGlUtil.h"
+#include "ndDemoEntity.h"
 
 class ndDemoEntityManager;
 
-class ndVehicleUI: public ndClassAlloc
+class ndVehicleUI: public ndDemoEntity
 {
 	public:
 
@@ -38,8 +39,6 @@ class ndVehicleUI: public ndClassAlloc
 	GLuint m_shaderHandle;
 	static const GLchar* m_vertexShader;
 	static const GLchar* m_fragmentShader;
-	//static const GLchar* m_vertexShaderWithVersion[2];
-	//static const GLchar* m_fragmentShaderWithVersion[2];
 
 	private:
 	GLuint m_vboDyn;
