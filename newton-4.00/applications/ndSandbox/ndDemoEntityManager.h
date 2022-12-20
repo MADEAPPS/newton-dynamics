@@ -122,6 +122,17 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		bool m_memory1;
 	};
 
+	class ndDefferentDeleteEntities : public ndArray<ndDemoEntity*>
+	{
+		public:
+		ndDefferentDeleteEntities();
+
+		void Update();
+		void RemoveEntity(ndDemoEntity* const entity);
+
+		ndDemoEntityManager* m_manager;
+		std::thread::id m_renderThreadId;
+	};
 
 	ndDemoEntityManager ();
 	~ndDemoEntityManager ();
@@ -131,9 +142,11 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void AddEntity(ndDemoEntity* const ent);
 	void RemoveEntity(ndDemoEntity* const ent);
 
+	void RemoveEntityDeferred(ndDemoEntity* const ent);
+
 	ndInt32 GetWidth() const;
 	ndInt32 GetHeight() const;
-
+	
 	ndPhysicsWorld* GetWorld() const;
 	
 	void CreateSkyBox();
@@ -173,7 +186,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	void LoadFont();
 	void Cleanup();
 
-	//void RenderUI();
 	void RenderScene();
 	ndInt32 ParticleCount() const;
 	void SetParticleUpdateMode() const;
@@ -215,12 +227,14 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndShaderCache m_shaderCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
+	
 	RenderGuiHelpCallback m_renderDemoGUI;
 	RenderGuiHelpCallback m_renderHelpMenus;
 	UpdateCameraCallback m_updateCamera;
 
 	ndUnsigned64 m_microsecunds;
-	TransparentHeap m_tranparentHeap;
+	TransparentHeap m_transparentHeap;
+	ndDefferentDeleteEntities m_deadEntities;
 	ndTree<ndAnimationSequence*, ndString> m_animationCache;
 
 	ndInt32 m_currentScene;

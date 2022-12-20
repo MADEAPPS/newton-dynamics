@@ -29,6 +29,7 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_rootNode(nullptr)
 	,m_name(nullptr)
 	,m_lock()
+	,m_isDead(false)
 	,m_isVisible(true)
 {
 	if (parent) 
@@ -49,6 +50,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMeshEffectNode* c
 	,m_rootNode(nullptr)
 	,m_name(nullptr)
 	,m_lock()
+	,m_isDead(false)
 	,m_isVisible(true)
 {
 	ndInt32 stack = 1;
@@ -150,6 +152,7 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_rootNode(nullptr)
 	,m_name(copyFrom.m_name)
 	,m_lock()
+	,m_isDead(false)
 	,m_isVisible(copyFrom.m_isVisible)
 {
 }

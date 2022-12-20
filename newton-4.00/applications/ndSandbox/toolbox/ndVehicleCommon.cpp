@@ -19,6 +19,32 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndVehicleSelector)
 
+
+ndVehicleNotify::ndVehicleNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody)
+	:ndDemoEntityNotify(manager, entity, parentBody)
+	,m_vehicle(me)
+{
+}
+
+void ndVehicleNotify::OnTransform(ndInt32 thread, const ndMatrix& matrix)
+{
+	bool test = CheckInWorld(matrix);
+	if (test)
+	{
+		ndDemoEntityNotify::OnTransform(thread, matrix);
+	}
+	else
+	{
+		ndPhysicsWorld* const world = m_manager->GetWorld();
+		world->RemoveModel(m_vehicle);
+	}
+}
+
+ndVehicleNotify::~ndVehicleNotify()
+{
+
+}
+
 ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 {
 	// take from the data sheet of a 2005 dodge viper, 
@@ -307,7 +333,6 @@ ndVehicleCommon::ndVehicleCommon(const ndVehicleDectriptor& desc)
 	,m_isPlayer(false)
 	,m_isParked(true)
 	,m_startEngine(false)
-	,m_startEngineMemory(false)
 	,m_isManualTransmission(desc.m_transmission.m_manual)
 {
 }
@@ -384,7 +409,9 @@ ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scen
 	matrix.m_posit += chassisMatrix.m_up.Scale(definition.m_verticalOffset);
 
 	ndBodyKinematic* const tireBody = new ndBodyDynamic();
-	tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
+	//tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
+	ndMultiBodyVehicle* const me = (ndMultiBodyVehicle*) this;
+	tireBody->SetNotifyCallback(new ndVehicleNotify(me, scene, tireEntity, parentBody));
 	tireBody->SetMatrix(matrix);
 	tireBody->SetCollisionShape(tireCollision);
 	tireBody->SetMassMatrix(definition.m_mass, tireCollision);

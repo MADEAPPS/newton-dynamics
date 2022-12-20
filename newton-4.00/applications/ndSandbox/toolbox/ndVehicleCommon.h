@@ -15,6 +15,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 #include "ndContactCallback.h"
+#include "ndDemoEntityNotify.h"
 #include "ndGameControlerInputs.h"
 
 class ndVehicleDectriptor
@@ -157,6 +158,18 @@ class ndVehicleMaterial : public ndApplicationMaterial
 	bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const;
 };
 
+class ndVehicleNotify : public ndDemoEntityNotify
+{
+	public:
+	ndVehicleNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody);
+	~ndVehicleNotify();
+
+	void OnTransform(ndInt32 thread, const ndMatrix& matrix);
+
+	ndMultiBodyVehicle* m_vehicle;
+};
+
+
 class ndVehicleCommon : public ndMultiBodyVehicle
 {
 	public:
@@ -180,6 +193,7 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 		m_brakePedal = ndGameControllerInputs::m_azis_02,
 		m_clutch = ndGameControllerInputs::m_azis_03,
 	};
+
 	D_CLASS_REFLECTION(ndVehicleCommon);
 
 	ndVehicleCommon(const ndVehicleDectriptor& desc);
@@ -213,7 +227,6 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 	bool m_isPlayer;
 	bool m_isParked;
 	bool m_startEngine;
-	bool m_startEngineMemory;
 	bool m_isManualTransmission;
 };
 

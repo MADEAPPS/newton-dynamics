@@ -76,6 +76,7 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	ndList <ndDemoEntity*>::ndNode* m_rootNode;
 	ndString m_name;
 	ndSpinLock m_lock;
+	bool m_isDead;
 	bool m_isVisible;
 
 	friend class ndDemoEntityNotify;

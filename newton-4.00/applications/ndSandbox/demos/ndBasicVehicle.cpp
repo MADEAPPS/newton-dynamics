@@ -466,7 +466,8 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromChildren();
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
+		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
+		body->SetNotifyCallback(new ndVehicleNotify(this, scene, chassisEntity, nullptr));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*chassisCollision);
 		body->SetMassMatrix(mass, *chassisCollision);
@@ -571,6 +572,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 		if (*m_motor)
 		{
+			//ndTrace(("%d %d\n", m_startEngineMemory, m_startEngine));
 			if (m_startEngineMemory ^ m_startEngine)
 			{
 				m_startEngineMemory = m_startEngine;
@@ -785,9 +787,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
 	world->AddModel(controls);
 	
-	ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f))));
-	ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f))));
-	ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f))));
+	//ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f))));
+	//ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f))));
+	//ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f))));
 	ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f))));
 
 	//world->AddModel(vehicle0);

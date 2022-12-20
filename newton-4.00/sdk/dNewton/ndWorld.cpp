@@ -496,7 +496,6 @@ void ndWorld::ThreadFunction()
 	}
 	m_deletedBodies.SetCount(0);
 	m_scene->End();
-
 	
 	m_lastExecutionTime = (ndFloat32)(ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();

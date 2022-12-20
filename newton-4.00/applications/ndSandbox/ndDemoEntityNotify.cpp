@@ -41,8 +41,7 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 {
 	if (m_entity && m_entity->m_rootNode)
 	{
-		m_manager->RemoveEntity(m_entity);
-		delete m_entity;
+		m_manager->RemoveEntityDeferred(m_entity);
 	}
 }
 
@@ -97,18 +96,18 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		}
 	}
 
-	OutsideWorldCheck(matrix);
+	if (!CheckInWorld(matrix))
+	{
+		RemoveBody();
+	}
 }
 
-void ndDemoEntityNotify::OutsideWorldCheck(const ndMatrix& matrix)
+void ndDemoEntityNotify::RemoveBody()
 {
 	// check world bounds
-	if (matrix.m_posit.m_y < -100.0f)
-	{
-		ndBody* const body = GetBody();
-		ndPhysicsWorld* const world = m_manager->GetWorld();
-		world->RemoveBody(body);
-	}
+	ndBody* const body = GetBody();
+	ndPhysicsWorld* const world = m_manager->GetWorld();
+	world->RemoveBody(body);
 }
 
 ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
@@ -152,7 +151,10 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}
 
-	OutsideWorldCheck(matrix);
+	if (!CheckInWorld(matrix))
+	{
+		RemoveBody();
+	}
 }
 
 void ndBindingRagdollEntityNotify::OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)

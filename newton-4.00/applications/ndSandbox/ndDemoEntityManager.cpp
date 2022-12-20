@@ -38,7 +38,7 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
-#define DEFAULT_SCENE	11		// basic vehicle
+//#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
@@ -239,6 +239,40 @@ class ndDemoEntityManager::ndDemoEntityManager::ndDebugMeshCache : public ndTree
 {
 };
 
+ndDemoEntityManager::ndDefferentDeleteEntities::ndDefferentDeleteEntities()
+	:ndArray<ndDemoEntity*>()
+	,m_manager(nullptr)
+	,m_renderThreadId(std::this_thread::get_id())
+{
+}
+
+void ndDemoEntityManager::ndDefferentDeleteEntities::Update()
+{
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		RemoveEntity((*this)[i]);
+	}
+	SetCount(0);
+}
+
+void ndDemoEntityManager::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const entity)
+{
+	if (m_renderThreadId == std::this_thread::get_id())
+	{
+		m_manager->RemoveEntity(entity);
+		delete entity;
+	}
+	else
+	{
+		ndScopeSpinLock lock(entity->m_lock);
+		if (!entity->m_isDead)
+		{
+			entity->m_isDead = true;
+			PushBack(entity);
+		}
+	}
+}
+
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager ()
@@ -253,7 +287,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_renderHelpMenus(nullptr)
 	,m_updateCamera(nullptr)
 	,m_microsecunds(0)
-	,m_tranparentHeap()
+	,m_transparentHeap()
+	,m_deadEntities()
 	,m_animationCache()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
@@ -462,6 +497,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//Test0__();
 	//Test1__();
 	ndTestDeedBrian();
+	m_deadEntities.m_manager = this;
 
 	//ndSharedPtr<ndDemoEntityManager> xxx(this);
 	//ndDemoEntityManager* xxx1 = *xxx;
@@ -682,6 +718,11 @@ void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 	ndScopeSpinLock lock(m_addDeleteLock);
 	ndAssert(ent->m_rootNode);
 	Remove(ent->m_rootNode);
+}
+
+void ndDemoEntityManager::RemoveEntityDeferred(ndDemoEntity* const ent)
+{
+	m_deadEntities.RemoveEntity(ent);
 }
 
 void ndDemoEntityManager::Cleanup ()
@@ -1299,7 +1340,7 @@ void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const 
 {
 	ndVector dist (m_cameraManager->GetCamera()->GetViewMatrix().TransformVector(modelMatrix.m_posit));
 	TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
-	m_tranparentHeap.Push (entry, dist.m_z);
+	m_transparentHeap.Push (entry, dist.m_z);
 }
 
 
@@ -1577,11 +1618,11 @@ void ndDemoEntityManager::RenderScene()
 			entity->Render(timestep, this, globalMatrix);
 		}
 
-		while (m_tranparentHeap.GetCount()) 
+		while (m_transparentHeap.GetCount()) 
 		{
-			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+			const TransparentMesh& transparentMesh = m_transparentHeap[0];
 			transparentMesh.m_mesh->RenderTransparency(this, transparentMesh.m_matrix);
-			m_tranparentHeap.Pop();
+			m_transparentHeap.Pop();
 		}
 	}
 
@@ -1725,6 +1766,8 @@ void ndDemoEntityManager::Run()
 		// Rendering
 		ImGui::Render();
 		RenderScene(ImGui::GetDrawData());
+
+		m_deadEntities.Update();
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(m_mainFrame);

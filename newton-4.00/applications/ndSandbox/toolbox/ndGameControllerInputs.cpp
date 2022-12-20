@@ -197,13 +197,22 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 			buttonMapping[4] = m_button_01;		//m_downGearButton
 			buttonMapping[5] = m_button_02;		//m_upGearButton
 			buttonMapping[6] = m_button_03;		//m_neutralGearButton
-			buttonMapping[21] = m_button_04;	//m_ignitionButton
+			buttonMapping[10] = m_button_04;	//m_ignitionButton
 			buttonMapping[8] = m_button_05;		//m_reverseGearButton
 			buttonMapping[9] = m_button_06;		//m_automaticGearBoxButton
-			buttonMapping[10] = m_button_07;	//m_parkingButton
+			buttonMapping[20] = m_button_07;	//m_parkingButton
 			buttonMapping[7] = m_button_08;		//m_isplayerButton
 		}										
 	}
+
+//static int frame;
+//frame++;
+//ndTrace(("\n%d: ", frame));
+//for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
+//{
+//	if (unmappedButtons[i])
+//		ndTrace(("(%d %d) ", i, unmappedButtons[i]));
+//}
 
 	m_buttons.SetCount(m_buttonCount);
 	for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
