@@ -45,6 +45,9 @@ class ApplicationMemoryLeakTracker: public ndTree<ndInt64, void*, ndLeakTrackerA
 
 	~ApplicationMemoryLeakTracker()
 	{
+		// need to make sure the free list are cleaned up after the last world was deleted
+		ndFreeListAlloc::Flush();
+
 		ndScopeSpinLock lock(m_lock);
 		Iterator it(*this);
 		for (it.Begin(); it; )
