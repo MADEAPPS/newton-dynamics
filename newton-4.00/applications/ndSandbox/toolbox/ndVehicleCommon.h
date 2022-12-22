@@ -18,6 +18,8 @@
 #include "ndDemoEntityNotify.h"
 #include "ndGameControlerInputs.h"
 
+class ndVehicleCommon;
+
 class ndVehicleDectriptor
 {
 	public:
@@ -161,14 +163,13 @@ class ndVehicleMaterial : public ndApplicationMaterial
 class ndVehicleNotify : public ndDemoEntityNotify
 {
 	public:
-	ndVehicleNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody);
+	ndVehicleNotify(ndVehicleCommon* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody);
 	~ndVehicleNotify();
 
 	void OnTransform(ndInt32 thread, const ndMatrix& matrix);
 
-	ndMultiBodyVehicle* m_vehicle;
+	ndVehicleCommon* m_vehicle;
 };
-
 
 class ndVehicleCommon : public ndMultiBodyVehicle
 {
@@ -228,6 +229,8 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 	bool m_isParked;
 	bool m_startEngine;
 	bool m_isManualTransmission;
+
+	friend class ndVehicleUI;
 };
 
 class ndVehicleSelector : public ndModel
@@ -240,6 +243,8 @@ class ndVehicleSelector : public ndModel
 	void Update(ndWorld* const, ndFloat32){}
 	void PostUpdate(ndWorld* const world, ndFloat32);
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+
+	void SelectNext(ndWorld* const world);
 
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };

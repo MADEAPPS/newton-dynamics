@@ -597,7 +597,8 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+	ndAssert(0);
+	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));

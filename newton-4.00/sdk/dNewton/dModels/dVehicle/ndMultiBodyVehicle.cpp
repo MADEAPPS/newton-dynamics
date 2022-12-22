@@ -1214,9 +1214,18 @@ void ndMultiBodyVehicle::RemoveFromToWorld()
 {
 	if (m_world)
 	{
-		m_world->RemoveJoint(*m_motor);
-		m_world->RemoveJoint(*m_gearBox);
-		m_world->RemoveJoint(*m_torsionBar);
+		if (*m_motor)
+		{
+			m_world->RemoveJoint(*m_motor);
+		}
+		if (*m_gearBox)
+		{
+			m_world->RemoveJoint(*m_gearBox);
+		}
+		if (*m_torsionBar)
+		{
+			m_world->RemoveJoint(*m_torsionBar);
+		}
 
 		for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_internalBodies.GetFirst(); node; node = node->GetNext())
 		{
@@ -1250,12 +1259,21 @@ void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 {
 	ndModel::AddToWorld(world);
 
-	ndSharedPtr<ndJointBilateralConstraint>& motor = (ndSharedPtr<ndJointBilateralConstraint>&)m_motor;
-	ndSharedPtr<ndJointBilateralConstraint>& gearBox = (ndSharedPtr<ndJointBilateralConstraint>&)m_gearBox;
-	ndSharedPtr<ndJointBilateralConstraint>& torsionBar = (ndSharedPtr<ndJointBilateralConstraint>&)m_torsionBar;
-	world->AddJoint(motor);
-	world->AddJoint(gearBox);
-	world->AddJoint(torsionBar);
+	if (*m_motor)
+	{
+		ndSharedPtr<ndJointBilateralConstraint>& motor = (ndSharedPtr<ndJointBilateralConstraint>&)m_motor;
+		world->AddJoint(motor);
+	}
+	if (*m_gearBox)
+	{
+		ndSharedPtr<ndJointBilateralConstraint>& gearBox = (ndSharedPtr<ndJointBilateralConstraint>&)m_gearBox;
+		world->AddJoint(gearBox);
+	}
+	if (*m_torsionBar)
+	{
+		ndSharedPtr<ndJointBilateralConstraint>& torsionBar = (ndSharedPtr<ndJointBilateralConstraint>&)m_torsionBar;
+		world->AddJoint(torsionBar);
+	}
 
 	for (ndReferencedObjects<ndBodyKinematic>::ndNode* node = m_internalBodies.GetFirst(); node; node = node->GetNext())
 	{

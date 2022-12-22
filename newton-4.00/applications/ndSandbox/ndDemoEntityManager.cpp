@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndVehicleUI.h"
 #include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
@@ -38,7 +39,7 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -49,7 +50,7 @@
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
-//#define DEFAULT_SCENE	11		// basic vehicle
+#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
@@ -239,40 +240,6 @@ class ndDemoEntityManager::ndDemoEntityManager::ndDebugMeshCache : public ndTree
 {
 };
 
-ndDemoEntityManager::ndDefferentDeleteEntities::ndDefferentDeleteEntities()
-	:ndArray<ndDemoEntity*>()
-	,m_manager(nullptr)
-	,m_renderThreadId(std::this_thread::get_id())
-{
-}
-
-void ndDemoEntityManager::ndDefferentDeleteEntities::Update()
-{
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		RemoveEntity((*this)[i]);
-	}
-	SetCount(0);
-}
-
-void ndDemoEntityManager::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const entity)
-{
-	if (m_renderThreadId == std::this_thread::get_id())
-	{
-		m_manager->RemoveEntity(entity);
-		delete entity;
-	}
-	else
-	{
-		ndScopeSpinLock lock(entity->m_lock);
-		if (!entity->m_isDead)
-		{
-			entity->m_isDead = true;
-			PushBack(entity);
-		}
-	}
-}
-
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager ()
@@ -281,14 +248,11 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_sky(nullptr)
 	,m_world(nullptr)
 	,m_cameraManager(nullptr)
-	,m_renderUIContext(nullptr)
 	,m_updateCameraContext(nullptr)
-	,m_renderDemoGUI(nullptr)
-	,m_renderHelpMenus(nullptr)
+	,m_renderDemoGUI()
 	,m_updateCamera(nullptr)
 	,m_microsecunds(0)
 	,m_transparentHeap()
-	,m_deadEntities()
 	,m_animationCache()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
@@ -497,7 +461,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//Test0__();
 	//Test1__();
 	ndTestDeedBrian();
-	m_deadEntities.m_manager = this;
 
 	//ndSharedPtr<ndDemoEntityManager> xxx(this);
 	//ndDemoEntityManager* xxx1 = *xxx;
@@ -632,11 +595,14 @@ bool ndDemoEntityManager::GetMouseKeyState (ndInt32 button) const
 	return io.MouseDown[button];
 }
 
-void ndDemoEntityManager::Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context)
+void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
 {
-	m_renderUIContext = context;
-	m_renderDemoGUI = UIcallback;
-	m_renderHelpMenus = helpCallback;
+	m_renderDemoGUI = demoGui;
+}
+
+void* ndDemoEntityManager::GetUpdateCameraContext() const
+{
+	return m_updateCameraContext;
 }
 
 void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
@@ -720,11 +686,6 @@ void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 	Remove(ent->m_rootNode);
 }
 
-void ndDemoEntityManager::RemoveEntityDeferred(ndDemoEntity* const ent)
-{
-	m_deadEntities.RemoveEntity(ent);
-}
-
 void ndDemoEntityManager::Cleanup ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
@@ -790,9 +751,7 @@ void ndDemoEntityManager::Cleanup ()
 	ApplyMenuOptions();
 	
 	// we start without 2d render
-	m_renderDemoGUI = nullptr;
-	m_renderHelpMenus = nullptr;
-	m_renderUIContext = nullptr;
+	m_renderDemoGUI = ndSharedPtr<ndUIEntity>();
 }
 
 void ndDemoEntityManager::LoadFont()
@@ -1231,7 +1190,6 @@ void ndDemoEntityManager::SetParticleUpdateMode() const
 	}
 }
 
-
 void ndDemoEntityManager::RenderStats()
 {
 	if (m_showStats) 
@@ -1290,11 +1248,11 @@ void ndDemoEntityManager::RenderStats()
 		}
 	}
 
-	if (m_showUI && m_renderHelpMenus) 
+	if (m_showUI && *m_renderDemoGUI)
 	{
 		if (ImGui::Begin("User Interface", &m_showUI))
 		{
-			m_renderHelpMenus (this, m_renderUIContext);
+			m_renderDemoGUI->RenderHelp();
 			ImGui::End();
 		}
 	}
@@ -1430,9 +1388,9 @@ void ndDemoEntityManager::RenderScene(ImDrawData* const draw_data)
 	glPushMatrix();
 	glLoadIdentity();
 
-	if (window->m_renderDemoGUI) 
+	if (*window->m_renderDemoGUI) 
 	{
-		window->m_renderDemoGUI(window, window->m_renderUIContext);
+		window->m_renderDemoGUI->RenderUI();
 	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1766,8 +1724,6 @@ void ndDemoEntityManager::Run()
 		// Rendering
 		ImGui::Render();
 		RenderScene(ImGui::GetDrawData());
-
-		m_deadEntities.Update();
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(m_mainFrame);

@@ -73,11 +73,47 @@ class ndPhysicsWorldSettings : public ndWordSettings
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndPhysicsWorldSettings);
 
+ndPhysicsWorld::ndDefferentDeleteEntities::ndDefferentDeleteEntities(ndDemoEntityManager* const manager)
+	:ndArray<ndDemoEntity*>()
+	,m_manager(manager)
+	,m_renderThreadId(std::this_thread::get_id())
+{
+}
+
+void ndPhysicsWorld::ndDefferentDeleteEntities::Update()
+{
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		RemoveEntity((*this)[i]);
+	}
+	SetCount(0);
+}
+
+void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const entity)
+{
+	ndAssert(entity->m_rootNode);
+	if (m_renderThreadId == std::this_thread::get_id())
+	{
+		m_manager->RemoveEntity(entity);
+		delete entity;
+	}
+	else
+	{
+		ndScopeSpinLock lock(entity->m_lock);
+		if (!entity->m_isDead)
+		{
+			entity->m_isDead = true;
+			PushBack(entity);
+		}
+	}
+}
+
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
 	,m_soundManager(new ndSoundManager(manager))
 	,m_timeAccumulator(0.0f)
+	,m_deadEntities(manager)
 {
 	ClearCache();
 	SetContactNotify(new ndContactCallback);
@@ -96,6 +132,12 @@ void ndPhysicsWorld::CleanUp()
 		delete m_soundManager;
 		m_soundManager = nullptr;
 	}
+}
+
+void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const entity)
+{
+	ndAssert(entity->m_rootNode);
+	m_deadEntities.RemoveEntity(entity);
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -227,4 +269,6 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	{
 		Sync();
 	}
+
+	m_deadEntities.Update();
 }

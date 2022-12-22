@@ -20,7 +20,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndVehicleSelector)
 
 
-ndVehicleNotify::ndVehicleNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody)
+ndVehicleNotify::ndVehicleNotify(ndVehicleCommon* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody)
 	:ndDemoEntityNotify(manager, entity, parentBody)
 	,m_vehicle(me)
 {
@@ -42,7 +42,6 @@ void ndVehicleNotify::OnTransform(ndInt32 thread, const ndMatrix& matrix)
 
 ndVehicleNotify::~ndVehicleNotify()
 {
-
 }
 
 ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
@@ -231,6 +230,37 @@ void ndVehicleSelector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
+void ndVehicleSelector::SelectNext(ndWorld* const world)
+{
+	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+	const ndModelList& modelList = world->GetModelList();
+
+	//ndInt32 vehiclesCount = 0;
+	ndFixSizeArray<ndVehicleCommon*, 1024> vehicleArray;
+	for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
+	{
+		ndModel* const model = *node->GetInfo();
+		if (model->GetAsMultiBodyVehicle())
+		{
+			vehicleArray.PushBack((ndVehicleCommon*)model->GetAsMultiBodyVehicle());
+		}
+	}
+
+	if (vehicleArray.GetCount() > 1)
+	{
+		for (ndInt32 i = 0; i < vehicleArray.GetCount(); ++i)
+		{
+			if (vehicleArray[i]->IsPlayer())
+			{
+				ndVehicleCommon* const nexVehicle = vehicleArray[(i + 1) % vehicleArray.GetCount()];
+				vehicleArray[i]->SetAsPlayer(scene, false);
+				nexVehicle->SetAsPlayer(scene, true);
+				break;
+			}
+		}
+	}
+}
+
 void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 {
 	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
@@ -240,34 +270,8 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 		
 	if (m_changeVehicle.Update(inputs.m_buttons[ndVehicleCommon::m_isplayerButton] ? true : false))
 	{
-		const ndModelList& modelList = world->GetModelList();
-
-		ndInt32 vehiclesCount = 0;
-		ndVehicleCommon* vehicleArray[1024];
-		for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
-		{
-			ndModel* const model = *node->GetInfo();
-			if (model->GetAsMultiBodyVehicle())
-			{
-				vehicleArray[vehiclesCount] = (ndVehicleCommon*)model->GetAsMultiBodyVehicle();
-				vehiclesCount++;
-			}
-		}
-
-		if (vehiclesCount > 1)
-		{
-			for (ndInt32 i = 0; i < vehiclesCount; ++i)
-			{
-				if (vehicleArray[i]->IsPlayer())
-				{
-					ndVehicleCommon* const nexVehicle = vehicleArray[(i + 1) % vehiclesCount];
-					vehicleArray[i]->SetAsPlayer(scene, false);
-					nexVehicle->SetAsPlayer(scene, true);
-					break;
-				}
-			}
-		}
-	}
+		SelectNext(world);
+	}	
 }
 
 ndVehicleMaterial::ndVehicleMaterial()
@@ -339,6 +343,13 @@ ndVehicleCommon::ndVehicleCommon(const ndVehicleDectriptor& desc)
 
 ndVehicleCommon::~ndVehicleCommon()
 {
+	ndWorld* const world = m_chassis->GetScene()->GetWorld();
+	world->RemoveBody(m_chassis);
+	for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyKinematic* const tireBody = node->GetInfo()->GetBody0();
+		world->RemoveBody(tireBody);
+	}
 }
 
 void ndVehicleCommon::SetAsPlayer(ndDemoEntityManager* const, bool mode)
@@ -410,7 +421,7 @@ ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scen
 
 	ndBodyKinematic* const tireBody = new ndBodyDynamic();
 	//tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
-	ndMultiBodyVehicle* const me = (ndMultiBodyVehicle*) this;
+	ndVehicleCommon* const me = (ndVehicleCommon*) this;
 	tireBody->SetNotifyCallback(new ndVehicleNotify(me, scene, tireEntity, parentBody));
 	tireBody->SetMatrix(matrix);
 	tireBody->SetCollisionShape(tireCollision);

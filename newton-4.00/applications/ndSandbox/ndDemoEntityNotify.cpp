@@ -41,7 +41,7 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 {
 	if (m_entity && m_entity->m_rootNode)
 	{
-		m_manager->RemoveEntityDeferred(m_entity);
+		m_manager->GetWorld()->RemoveEntity(m_entity);
 	}
 }
 

@@ -21,7 +21,7 @@
 #include "ndCompoundScene.h"
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
-#include "ndTargaToOpenGl.h"
+//#include "ndTargaToOpenGl.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
@@ -239,12 +239,12 @@ static const char* engineSounds[] =
 class ndBasicMultiBodyVehicle : public ndVehicleCommon
 {
 	public:
-	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
+	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
 		:ndVehicleCommon(desc)
 		,m_skipMarks(nullptr)
 		,m_startSound(nullptr)
 		,m_engineRpmSound(nullptr)
-		,m_vehicleUI(nullptr)
+		,m_vehicleUI(vehicleUI)
 		,m_rearAxlePivot(nullptr)
 		,m_frontAxlePivot(nullptr)
 		,m_rr_tire(nullptr)
@@ -252,9 +252,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		,m_fr_tire(nullptr)
 		,m_fl_tire(nullptr)
 	{
-		m_vehicleUI = new ndVehicleUI();
-		m_vehicleUI->CreateBufferUI();
-
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
@@ -297,12 +294,12 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		world->AddBody(fr_tire_body);
 		world->AddBody(fl_tire_body);
 
-		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
-		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		for (ndInt32 i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
-		{
-			m_gearMap[i] = i + 2;
-		}
+		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
+		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
+		//for (ndInt32 i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
+		//{
+		//	m_gearMap[i] = i + 2;
+		//}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 
 		// add the slip differential
@@ -408,19 +405,15 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 	~ndBasicMultiBodyVehicle()
 	{
-		ReleaseTexture(m_gears);
-		ReleaseTexture(m_odometer);
-		ReleaseTexture(m_redNeedle);
-		ReleaseTexture(m_tachometer);
-		ReleaseTexture(m_greenNeedle);
-
 		delete m_skipMarks;
 		delete m_startSound;
 		delete m_engineRpmSound;
 
-		if (m_vehicleUI)
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)m_chassis->GetScene()->GetWorld();
+		ndDemoEntityManager* const manager = world->GetManager();
+		if (manager->GetUpdateCameraContext() == this)
 		{
-			delete m_vehicleUI;
+			manager->SetUpdateCameraFunction(nullptr, nullptr);
 		}
 	}
 
@@ -430,11 +423,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		scene->AddEntity(vehicleEntity);
 
 		// load 2d display assets
-		m_gears = LoadTexture("gears_font.tga");
-		m_odometer = LoadTexture("kmh_dial.tga");
-		m_tachometer = LoadTexture("rpm_dial.tga");
-		m_redNeedle = LoadTexture("needle_red.tga");
-		m_greenNeedle = LoadTexture("needle_green.tga");
 		return vehicleEntity;
 	}
 
@@ -442,21 +430,9 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 	{
 		ndVehicleCommon::SetAsPlayer(scene, mode);
 
+		m_vehicleUI->SetVehicle(this);
 		scene->SetSelectedModel(this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-		scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
-	}
-
-	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
-	{
-		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
-		me->RenderUI(scene);
-	}
-
-	static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
-	{
-		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
-		me->RenderHelp(scene);
 	}
 
 	private:
@@ -466,7 +442,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromChildren();
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
-		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
 		body->SetNotifyCallback(new ndVehicleNotify(this, scene, chassisEntity, nullptr));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*chassisCollision);
@@ -495,75 +470,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		camOrigin -= frontDir.Scale(10.0f);
 
 		camera->SetNextMatrix(camMatrix, camOrigin);
-	}
-
-	void RenderHelp(ndDemoEntityManager* const scene)
-	{
-		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Vehicle driving keyboard control");
-		scene->Print(color, "change vehicle     : 'c'");
-		scene->Print(color, "accelerator        : 'w'");
-		scene->Print(color, "brakes             : 's'");
-		scene->Print(color, "turn left          : 'a'");
-		scene->Print(color, "turn right         : 'd'");
-		scene->Print(color, "hand brakes        : 'space'");
-
-		ImGui::Separator();
-		scene->Print(color, "gear box");
-		scene->Print(color, "ignition            : 'i'");
-		scene->Print(color, "manual transmission : '?'");
-		scene->Print(color, "neutral gear	    : 'n'");
-		scene->Print(color, "forward gear up     : '>'");
-		scene->Print(color, "forward gear down   : '<'");
-		scene->Print(color, "reverse gear	    : 'r'");
-		scene->Print(color, "parking gear	    : 'p'");
-	}
-
-	void RenderUI(ndDemoEntityManager* const scene)
-	{
-		ndMultiBodyVehicleMotor* const motor = *m_motor;
-		if (motor)
-		{
-			ndAssert(motor);
-
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			ndFloat32 gageSize = 200.0f;
-			ndFloat32 y = (ndFloat32)scene->GetHeight() - (gageSize / 2.0f + 20.0f);
-
-			// draw the tachometer
-			ndFloat32 x = gageSize / 2 + 20.0f;
-			ndFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
-			maxRpm += 500.0f;
-			//printf("%.3f \n", m_configuration.m_transmission.m_forwardRatios[m_currentGear]);
-			//ndFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
-			ndFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
-			
-			if (m_vehicleUI) 
-			{
-				if (m_vehicleUI->m_shaderHandle) 
-				{
-					glUseProgram(m_vehicleUI->m_shaderHandle);
-					//
-					glActiveTexture(GL_TEXTURE0);
-					//
-					m_vehicleUI->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
-
-					ndFloat32 s = gageSize * 0.7f;
-					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
-					
-					x += gageSize;
-					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
-
-					ndFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
-					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
-
-					// draw the current gear
-					m_vehicleUI->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
-
-					glUseProgram(0);
-				}
-			}
-		}
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
@@ -688,17 +594,10 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		}
 	}
 
-	GLuint m_gears;
-	GLuint m_odometer;
-	GLuint m_redNeedle;
-	GLuint m_tachometer;
-	GLuint m_greenNeedle;
-	ndInt32 m_gearMap[8];
-
+	ndVehicleUI* m_vehicleUI;
 	ndSoundChannel* m_skipMarks;
 	ndSoundChannel* m_startSound;
 	ndSoundChannel* m_engineRpmSound;
-	ndVehicleUI* m_vehicleUI;
 
 	ndDemoEntity* m_rearAxlePivot;
 	ndDemoEntity* m_frontAxlePivot;
@@ -786,23 +685,24 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//ndVehicleSelector* const controls = new ndVehicleSelector();
 	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
 	world->AddModel(controls);
-	
-	//ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f))));
-	//ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f))));
-	//ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f))));
-	ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f))));
 
-	//world->AddModel(vehicle0);
-	//world->AddModel(vehicle1);
-	//world->AddModel(vehicle2);
+	ndVehicleUI* const vehicleUI = new ndVehicleUI(scene);
+	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
+	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
+	
+	ndSharedPtr<ndModel> vehicle0 (new ndBasicMultiBodyVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
+	ndSharedPtr<ndModel> vehicle1 (new ndBasicMultiBodyVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
+	ndSharedPtr<ndModel> vehicle2 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
+	ndSharedPtr<ndModel> vehicle3 (new ndBasicMultiBodyVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
+
+	world->AddModel(vehicle0);
+	world->AddModel(vehicle1);
+	world->AddModel(vehicle2);
 	world->AddModel(vehicle3);
 
-	//ndBasicMultiBodyVehicle* const vehicle = vehicle0;
 	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
 
 	vehicle->SetAsPlayer(scene);
-	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
-
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
 	

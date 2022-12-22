@@ -101,9 +101,9 @@ ndSharedPtr<T>::~ndSharedPtr()
 }
 
 template <typename T>
-ndSharedPtr<T>& ndSharedPtr<T>::operator = (const ndSharedPtr<T>& sp)
+ndSharedPtr<T>& ndSharedPtr<T>::operator = (const ndSharedPtr<T>& src)
 {
-	if (this != &sp)
+	if (this != &src)
 	{
 		if (m_references->Release() == 0)
 		{
@@ -114,8 +114,8 @@ ndSharedPtr<T>& ndSharedPtr<T>::operator = (const ndSharedPtr<T>& sp)
 			delete m_references;
 		}
 
-		m_ptr = sp.m_ptr;
-		m_references = sp.m_references;
+		m_ptr = src.m_ptr;
+		m_references = src.m_references;
 		m_references->AddRef();
 	}
 	return *this;

@@ -19,28 +19,33 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndOpenGlUtil.h"
-#include "ndDemoEntity.h"
+#include "ndUIEntity.h"
 
+class ndVehicleCommon;
+class ndVehicleDectriptor;
 class ndDemoEntityManager;
 
-class ndVehicleUI: public ndDemoEntity
+class ndVehicleUI: public ndUIEntity
 {
 	public:
-
-	ndVehicleUI();
+	ndVehicleUI(ndDemoEntityManager* const scene);
 	~ndVehicleUI();
-	
-	void CreateBufferUI();
-	void CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix);
-	void RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 gearid, GLuint tex1, ndFloat32 origin_x, ndFloat32 origin_y, ndFloat32 ptsize);
-	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle);
 
-	
-	GLuint m_shaderHandle;
-	static const GLchar* m_vertexShader;
-	static const GLchar* m_fragmentShader;
+	virtual void RenderUI();
+	virtual void RenderHelp();
+	void SetVehicle(ndVehicleCommon* const vehicle);
 
 	private:
+	void CreateBufferUI();
+	void CreateOrthoViewMatrix(ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix);
+	void RenderGearUI(const ndInt32 gearid, GLuint tex1, ndFloat32 origin_x, ndFloat32 origin_y, ndFloat32 ptsize);
+	void RenderGageUI(const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle);
+	
+	GLuint m_shaderHandle;
+	ndVehicleCommon* m_vehicle;
+	static const GLchar* m_vertexShader;
+	static const GLchar* m_fragmentShader;
+	
 	GLuint m_vboDyn;
 	GLuint m_vboSta;
 	GLuint m_vaoDyn;
@@ -48,10 +53,16 @@ class ndVehicleUI: public ndDemoEntity
 	GLuint m_iboDyn;
 	GLuint m_iboSta;
 
+	GLuint m_gears;
+	GLuint m_odometer;
+	GLuint m_redNeedle;
+	GLuint m_tachometer;
+	GLuint m_greenNeedle;
 	GLint m_colorLocation;
 	GLint m_ptsizeLocation;
 	GLint m_modMtxLocation;
 	GLint m_projMtxLocation;
+	
 	glPositionUV m_vertDyn[4];
 	glPositionUV m_vertSta[4];
 	ndUnsigned32 m_indxDyn[6];

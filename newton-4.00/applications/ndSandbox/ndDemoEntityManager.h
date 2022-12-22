@@ -17,6 +17,7 @@ struct GLFWwindow;
 struct ImDrawData;
 
 class ndDemoMesh;
+class ndUIEntity;
 class ndDemoEntity;
 class ndDemoCamera;
 class ndPhysicsWorld;
@@ -30,7 +31,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 {
 	public:
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
-	typedef void (*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
 
 	enum ndMenuSelection
@@ -122,18 +122,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 		bool m_memory1;
 	};
 
-	class ndDefferentDeleteEntities : public ndArray<ndDemoEntity*>
-	{
-		public:
-		ndDefferentDeleteEntities();
-
-		void Update();
-		void RemoveEntity(ndDemoEntity* const entity);
-
-		ndDemoEntityManager* m_manager;
-		std::thread::id m_renderThreadId;
-	};
-
 	ndDemoEntityManager ();
 	~ndDemoEntityManager ();
 
@@ -141,8 +129,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	void AddEntity(ndDemoEntity* const ent);
 	void RemoveEntity(ndDemoEntity* const ent);
-
-	void RemoveEntityDeferred(ndDemoEntity* const ent);
 
 	ndInt32 GetWidth() const;
 	ndInt32 GetHeight() const;
@@ -159,10 +145,11 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool GetMousePosition (ndFloat32& posX, ndFloat32& posY) const;
 	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
 	
+	void* GetUpdateCameraContext() const;
 	void SetSelectedModel(ndModel* const model);
 	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
 	void PushTransparentMesh(const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix);
-	void Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context);
+	void Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui);
 
 	bool IsShiftKeyDown () const;
 	bool JoystickDetected() const;
@@ -225,16 +212,13 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndPhysicsWorld* m_world;
 	ndDemoCameraManager* m_cameraManager;
 	ndShaderCache m_shaderCache;
-	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	
-	RenderGuiHelpCallback m_renderDemoGUI;
-	RenderGuiHelpCallback m_renderHelpMenus;
+	ndSharedPtr<ndUIEntity> m_renderDemoGUI;
 	UpdateCameraCallback m_updateCamera;
 
 	ndUnsigned64 m_microsecunds;
 	TransparentHeap m_transparentHeap;
-	ndDefferentDeleteEntities m_deadEntities;
 	ndTree<ndAnimationSequence*, ndString> m_animationCache;
 
 	ndInt32 m_currentScene;

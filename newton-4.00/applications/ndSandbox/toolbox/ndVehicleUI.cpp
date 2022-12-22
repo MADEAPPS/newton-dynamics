@@ -16,6 +16,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndVehicleUI.h"
+#include "ndVehicleCommon.h"
+#include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
 const GLchar* ndVehicleUI::m_vertexShader = R""""(
@@ -54,9 +56,10 @@ const GLchar* ndVehicleUI::m_fragmentShader = R""""(
 	}
 )"""";
 
-ndVehicleUI::ndVehicleUI()
-	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
+ndVehicleUI::ndVehicleUI(ndDemoEntityManager* const scene)
+	:ndUIEntity(scene)
 	,m_shaderHandle(0)
+	,m_vehicle(nullptr)
 	,m_vboDyn(0)
 	,m_vboSta(0)
 	,m_vaoDyn(0)
@@ -64,10 +67,23 @@ ndVehicleUI::ndVehicleUI()
 	,m_iboDyn(0)
 	,m_iboSta(0)
 {
+	m_gears = LoadTexture("gears_font.tga");
+	m_odometer = LoadTexture("kmh_dial.tga");
+	m_tachometer = LoadTexture("rpm_dial.tga");
+	m_redNeedle = LoadTexture("needle_red.tga");
+	m_greenNeedle = LoadTexture("needle_green.tga");
+
+	CreateBufferUI();
 };
 
 ndVehicleUI::~ndVehicleUI()
 {
+	ReleaseTexture(m_gears);
+	ReleaseTexture(m_odometer);
+	ReleaseTexture(m_redNeedle);
+	ReleaseTexture(m_tachometer);
+	ReleaseTexture(m_greenNeedle);
+
 	if (m_shaderHandle)
 	{
 		glDeleteProgram(m_shaderHandle);
@@ -103,18 +119,31 @@ ndVehicleUI::~ndVehicleUI()
 	}
 };
 
-void ndVehicleUI::CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix)
+void ndVehicleUI::SetVehicle(ndVehicleCommon* const vehicle)
 {
-	ndFloat32 sizeX = (ndFloat32)(1.0f * (ndFloat32)uscene->GetWidth());
-	ndFloat32 sizeY = (ndFloat32)(1.0f * (ndFloat32)uscene->GetHeight());
+	m_vehicle = vehicle;
+}
+
+void ndVehicleUI::CreateOrthoViewMatrix(ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix)
+{
+	ndFloat32 sizeX = (ndFloat32)(1.0f * (ndFloat32)m_scene->GetWidth());
+	ndFloat32 sizeY = (ndFloat32)(1.0f * (ndFloat32)m_scene->GetHeight());
 	ndFloat32 L = origin_x;
 	ndFloat32 R = origin_x + sizeX;
 	ndFloat32 T = origin_y;
 	ndFloat32 B = origin_y + sizeY;
-	projmatrix = ndMatrix({ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
-	{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
-	{ 0.0f,   0.0f,          -1.0f, 0.0f },
-	{ (R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f });
+	//projmatrix = ndMatrix(
+	//{ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
+	//{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
+	//{ 0.0f,   0.0f,          -1.0f, 0.0f },
+	//{ (R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f });
+
+	projmatrix = ndMatrix(
+		ndVector(2.0f / (R - L), 0.0f, 0.0f, 0.0f),
+		ndVector(0.0f, 2.0f / (T - B), 0.0f, 0.0f),
+		ndVector(0.0f, 0.0f, -1.0f, 0.0f),
+		ndVector((R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f));
+
 }
 
 void ndVehicleUI::CreateBufferUI()
@@ -263,13 +292,13 @@ void ndVehicleUI::CreateBufferUI()
 	}
 };
 
-void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle)
+void ndVehicleUI::RenderGageUI(const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle)
 {
 	if (m_vaoSta)
 	{
 		ndMatrix aprojm(ndGetIdentityMatrix());
-		CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
-		//
+		CreateOrthoViewMatrix(origin_x, origin_y, aprojm);
+		
 		minAngle *= -ndDegreeToRad;
 		maxAngle *= -ndDegreeToRad;
 		
@@ -316,12 +345,12 @@ void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint t
 	}
 };
 
-void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 gearid, GLuint tex1, ndFloat32 origin_x, ndFloat32 origin_y, ndFloat32 ptsize)
+void ndVehicleUI::RenderGearUI(const ndInt32 gearid, GLuint tex1, ndFloat32 origin_x, ndFloat32 origin_y, ndFloat32 ptsize)
 {
 	if (m_vaoDyn)
 	{
 		ndMatrix aprojm(ndGetIdentityMatrix());
-		CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
+		CreateOrthoViewMatrix(origin_x, origin_y, aprojm);
 
 		ndMatrix origin(ndGetIdentityMatrix());
 		origin[1][1] = -1.0f;
@@ -390,3 +419,70 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 
 		glBindVertexArray(0);
 	}
 };
+
+void ndVehicleUI::RenderHelp()
+{
+	ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+	m_scene->Print(color, "Vehicle driving keyboard control");
+	m_scene->Print(color, "change vehicle     : 'c'");
+	m_scene->Print(color, "accelerator        : 'w'");
+	m_scene->Print(color, "brakes             : 's'");
+	m_scene->Print(color, "turn left          : 'a'");
+	m_scene->Print(color, "turn right         : 'd'");
+	m_scene->Print(color, "hand brakes        : 'space'");
+
+	ImGui::Separator();
+	m_scene->Print(color, "gear box");
+	m_scene->Print(color, "ignition            : 'i'");
+	m_scene->Print(color, "manual transmission : '?'");
+	m_scene->Print(color, "neutral gear	    : 'n'");
+	m_scene->Print(color, "forward gear up     : '>'");
+	m_scene->Print(color, "forward gear down   : '<'");
+	m_scene->Print(color, "reverse gear	    : 'r'");
+	m_scene->Print(color, "parking gear	    : 'p'");
+}
+
+//void ndVehicleUI::RenderDash(ndDemoEntityManager* const scene, ndVehicleCommon* const vehicle)
+void ndVehicleUI::RenderUI()
+{
+	if (!m_vehicle)
+	{
+		return;
+	}
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	ndFloat32 gageSize = 200.0f;
+	ndFloat32 y = (ndFloat32)m_scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+	
+	// draw the tachometer
+	ndFloat32 x = gageSize / 2 + 20.0f;
+	ndFloat32 maxRpm = m_vehicle->m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
+	maxRpm += 500.0f;
+	ndFloat32 rpm = (m_vehicle->m_motor->GetRpm() / maxRpm) * 2.85f;
+	
+	glUseProgram(m_shaderHandle);
+	
+	glActiveTexture(GL_TEXTURE0);
+	
+	RenderGageUI(m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+	
+	ndFloat32 s = gageSize * 0.7f;
+	RenderGageUI(m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
+	
+	x += gageSize;
+	RenderGageUI(m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+	
+	ndFloat32 speed = (m_vehicle->GetSpeed() / 100.0f) * 2.85f;
+	RenderGageUI(m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
+	
+	// draw the current gear
+	ndInt32 gearMap[8];
+	gearMap[sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios) / sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
+	gearMap[sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios) / sizeof(m_vehicle->m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
+	for (ndInt32 i = 0; i < m_vehicle->m_configuration.m_transmission.m_gearsCount; ++i)
+	{
+		gearMap[i] = i + 2;
+	}
+	RenderGearUI(gearMap[m_vehicle->m_currentGear], m_gears, -x, -y, gageSize);
+	
+	glUseProgram(0);
+}

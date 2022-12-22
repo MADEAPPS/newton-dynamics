@@ -79,6 +79,7 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	bool m_isDead;
 	bool m_isVisible;
 
+	friend class ndPhysicsWorld;
 	friend class ndDemoEntityNotify;
 	friend class ndDemoEntityManager;
 };

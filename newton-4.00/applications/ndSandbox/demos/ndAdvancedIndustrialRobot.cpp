@@ -476,7 +476,8 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	world->AddModel(robotPtr);
 	world->AddJoint(fixJoint);
 	
-	scene->Set2DDisplayRenderFunction(ndIndustrialRobot::RobotControlPanel, nullptr, robot);
+	ndAssert(0);
+	//scene->Set2DDisplayRenderFunction(ndIndustrialRobot::RobotControlPanel, nullptr, robot);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;

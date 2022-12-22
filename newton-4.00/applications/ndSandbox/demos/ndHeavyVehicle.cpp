@@ -210,13 +210,10 @@ static ndVehicleDectriptorTractor tractorDesc;
 class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 {
 	public:
-	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
+	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
 		:ndVehicleCommon(desc)
-		,m_vehicleUI(nullptr)
+		,m_vehicleUI(vehicleUI)
 	{
-		m_vehicleUI = new ndVehicleUI();
-		m_vehicleUI->CreateBufferUI();
-		
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -272,7 +269,8 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 
 		scene->SetSelectedModel(this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-		scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
+		ndAssert(0);
+		//scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
 	}
 
 	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
@@ -368,47 +366,15 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
+		ndAssert(0);
 		ndMultiBodyVehicleMotor* const motor = *m_motor;
 		if (motor)
 		{
 			ndAssert(motor);
-
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			ndFloat32 gageSize = 200.0f;
-			ndFloat32 y = (ndFloat32)scene->GetHeight() - (gageSize / 2.0f + 20.0f);
-
-			// draw the tachometer
-			ndFloat32 x = gageSize / 2 + 20.0f;
-			ndFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
-			maxRpm += 500.0f;
-			//printf("%.3f \n", m_configuration.m_transmission.m_forwardRatios[m_currentGear]);
-			//ndFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
-			ndFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
-
 			if (m_vehicleUI)
 			{
-				if (m_vehicleUI->m_shaderHandle)
-				{
-					glUseProgram(m_vehicleUI->m_shaderHandle);
-					//
-					glActiveTexture(GL_TEXTURE0);
-					//
-					m_vehicleUI->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
-
-					ndFloat32 s = gageSize * 0.7f;
-					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
-
-					x += gageSize;
-					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
-
-					ndFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
-					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, ndAbs(speed), -0.0f, 90.0f);
-
-					// draw the current gear
-					m_vehicleUI->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
-
-					glUseProgram(0);
-				}
+				ndAssert(0);
+				//m_vehicleUI->RenderDash(this);
 			}
 		}
 	}
@@ -426,8 +392,8 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 {
 	public:
-	ndLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
-		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
+	ndLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
+		:ndHeavyMultiBodyVehicle(scene, desc, matrix, vehicleUI)
 		,m_effector(nullptr)
 		,m_cannonHigh(0.0f)
 		,m_turretAngle(0.0f)
@@ -631,8 +597,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 {
 	public:
-	ndTractorVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
-		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
+	ndTractorVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
+		:ndHeavyMultiBodyVehicle(scene, desc, matrix, vehicleUI)
 		,m_armHinge(nullptr)
 		,m_bucketHinge(nullptr)
 		,m_armAngle(0.0f)
@@ -824,8 +790,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 {
 	public:
-	ndBigRigVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
-		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
+	ndBigRigVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
+		:ndHeavyMultiBodyVehicle(scene, desc, matrix, vehicleUI)
 	{
 		VehicleAssembly(scene);
 	}
@@ -924,6 +890,9 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = location;
+
+	ndAssert(0);
+	//ndVehicleUI* const vehicleUI = new ndVehicleUI;
 	
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();

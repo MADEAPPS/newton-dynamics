@@ -980,7 +980,8 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+	ndAssert(0);
+	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 	
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
@@ -1022,7 +1023,8 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);
 	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
-	scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+	ndAssert(0);
+	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));

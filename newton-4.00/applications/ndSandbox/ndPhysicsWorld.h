@@ -21,6 +21,18 @@ class ndDemoEntityManager;
 class ndPhysicsWorld: public ndWorld
 {
 	public:
+	class ndDefferentDeleteEntities : public ndArray<ndDemoEntity*>
+	{
+		public:
+		ndDefferentDeleteEntities(ndDemoEntityManager* const manager);
+
+		void Update();
+		void RemoveEntity(ndDemoEntity* const entity);
+
+		ndDemoEntityManager* m_manager;
+		std::thread::id m_renderThreadId;
+	};
+
 	ndPhysicsWorld(ndDemoEntityManager* const manager);
 	virtual ~ndPhysicsWorld();
 	virtual void CleanUp();
@@ -33,12 +45,15 @@ class ndPhysicsWorld: public ndWorld
 	void SaveScene(const char* const path);
 	void SaveSceneModel(const char* const path);
 
+	void RemoveEntity(ndDemoEntity* const entity);
+
 	private:
 	void OnPostUpdate(ndFloat32 timestep);
 
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
 	ndFloat32 m_timeAccumulator;
+	ndDefferentDeleteEntities m_deadEntities;
 };
 
 #endif
