@@ -11,7 +11,6 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndUIEntity.h"
 #include "ndDemoCamera.h"
@@ -386,36 +385,6 @@ namespace ndSimpleRobot
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
-		void ApplyControls(ndDemoEntityManager* const scene)
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Control panel");
-
-			bool change = false;
-			ImGui::Text("position x");
-			change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
-			ImGui::Text("position y");
-			//change = change | ImGui::SliderFloat("##y", &m_y, -1.5f, 2.0f);
-			change = change | ImGui::SliderFloat("##y", &m_y, -2.5f, 2.0f);
-			ImGui::Text("azimuth");
-			change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
-
-			ImGui::Text("gripper");
-			change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
-
-			ImGui::Text("pitch");
-			change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
-			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
-			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
-
-			if (change)
-			{
-				m_rootBody->SetSleepState(false);
-			}
-		}
-
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
@@ -437,12 +406,6 @@ namespace ndSimpleRobot
 				m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 				m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
 			}
-		}
-
-		static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
-		{
-			ndIndustrialRobot* const me = (ndIndustrialRobot*)context;
-			me->ApplyControls(scene);
 		}
 
 		ndBodyDynamic* m_rootBody;

@@ -11,7 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
-#include "ndTargaToOpenGl.h"
+#include "ndUIEntity.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
@@ -66,7 +66,7 @@ namespace ndAdvancedRobot
 			,m_rootBody(nullptr)
 			,m_leftGripper(nullptr)
 			,m_rightGripper(nullptr)
-			,m_effector(nullptr)
+			,m_effector()
 			,m_invDynamicsSolver()
 			,m_effectorOffset(ndVector::m_wOne)
 			,m_x(0.0f)
@@ -163,7 +163,7 @@ namespace ndAdvancedRobot
 			
 							const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
 							const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
-							m_effector = new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody);
+							m_effector = ndSharedPtr<ndIk6DofEffector>(new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, m_rootBody));
 			
 							m_effectorOffset = m_effector->GetOffsetMatrix().m_posit;
 			
@@ -195,7 +195,7 @@ namespace ndAdvancedRobot
 			,m_rootBody(nullptr)
 			,m_leftGripper(nullptr)
 			,m_rightGripper(nullptr)
-			,m_effector(nullptr)
+			,m_effector()
 			,m_invDynamicsSolver()
 			,m_effectorOffset(ndVector::m_wOne)
 			,m_x(0.0f)
@@ -266,10 +266,6 @@ namespace ndAdvancedRobot
 
 		~ndIndustrialRobot()
 		{
-			if (m_effector && !m_effector->IsInWorld())
-			{
-				delete m_effector;
-			}
 		}
 
 		void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -310,11 +306,12 @@ namespace ndAdvancedRobot
 			nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
 			modelRootNode->LinkEndChild(endEffectorNode);
 
-			xmlSaveParam(endEffectorNode, "hasEffector", m_effector ? 1 : 0);
-			if (m_effector)
+			xmlSaveParam(endEffectorNode, "hasEffector", *m_effector ? 1 : 0);
+			if (*m_effector)
 			{
-				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
-				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
+				ndJointBilateralConstraint* const effectJoint = (ndJointBilateralConstraint*)*m_effector;
+				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(effectJoint->GetBody0());
+				ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(effectJoint->GetBody1());
 				xmlSaveParam(endEffectorNode, "body0Hash", effectBody0->GetInfo());
 				xmlSaveParam(endEffectorNode, "body1Hash", effectBody1->GetInfo());
 			}
@@ -348,9 +345,11 @@ namespace ndAdvancedRobot
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			if (m_effector)
+			if (*m_effector)
 			{
-				((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
+				//((ndJointBilateralConstraint*)m_effector)->DebugJoint(context);
+				ndJointBilateralConstraint* const effectJoint = (ndJointBilateralConstraint*)*m_effector;
+				effectJoint->DebugJoint(context);
 			}
 		}
 
@@ -362,37 +361,6 @@ namespace ndAdvancedRobot
 		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::PostTransformUpdate(world, timestep);
-		}
-
-		void ApplyControls(ndDemoEntityManager* const scene)
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Control panel");
-
-			bool change = false;
-			//ImGui::Text("ik solver passes");
-
-			ImGui::Text("position x");
-			change = change | ImGui::SliderFloat("##x", &m_x, 0.0f, 5.0f);
-			ImGui::Text("position y");
-			change = change | ImGui::SliderFloat("##y", &m_y, -2.5f, 2.0f);
-			ImGui::Text("azimuth");
-			change = change | ImGui::SliderFloat("##azimuth", &m_azimuth, -180.0f, 180.0f);
-
-			ImGui::Text("gripper");
-			change = change | ImGui::SliderFloat("##gripper", &m_gripperPosit, -0.2f, 0.4f);
-
-			ImGui::Text("pitch");
-			change = change | ImGui::SliderFloat("##pitch", &m_pitch, -180.0f, 180.0f);
-			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##yaw", &m_yaw, -180.0f, 180.0f);
-			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##roll", &m_roll, -180.0f, 180.0f);
-
-			if (change)
-			{
-				m_rootBody->SetSleepState(false);
-			}
 		}
 
 		void PlaceEffector()
@@ -422,26 +390,20 @@ namespace ndAdvancedRobot
 			ndAssert(skeleton);
 
 			//m_invDynamicsSolver.SetMaxIterations(4);
-			if (m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
+			if (*m_effector && !m_invDynamicsSolver.IsSleeping(skeleton))
 			{
 				PlaceEffector();
-				ndJointBilateralConstraint* joint = m_effector;
+				ndJointBilateralConstraint* const joint = *m_effector;
 				m_invDynamicsSolver.SolverBegin(skeleton, &joint, 1, world, timestep);
 				m_invDynamicsSolver.Solve();
 				m_invDynamicsSolver.SolverEnd();
 			}
 		}
 
-		static void RobotControlPanel(ndDemoEntityManager* const scene, void* const context)
-		{
-			ndIndustrialRobot* const me = (ndIndustrialRobot*)context;
-			me->ApplyControls(scene);
-		}
-
 		ndBodyDynamic* m_rootBody;
 		ndJointSlider* m_leftGripper;
 		ndJointSlider* m_rightGripper;
-		ndIk6DofEffector* m_effector;
+		ndSharedPtr<ndIk6DofEffector> m_effector;
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 		ndFixSizeArray<ndJointBilateralConstraint*, 16> m_jointArray;
@@ -456,6 +418,57 @@ namespace ndAdvancedRobot
 		ndReal m_roll;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndAdvancedRobot::ndIndustrialRobot);
+
+	class ndRobotUI : public ndUIEntity
+	{
+		public:
+		ndRobotUI(ndDemoEntityManager* const scene, ndIndustrialRobot* const robot)
+			:ndUIEntity(scene)
+			, m_robot(robot)
+		{
+		}
+
+		~ndRobotUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			m_scene->Print(color, "Control panel");
+
+			bool change = false;
+			//ImGui::Text("ik solver passes");
+
+			ImGui::Text("position x");
+			change = change | ImGui::SliderFloat("##x", &m_robot->m_x, 0.0f, 5.0f);
+			ImGui::Text("position y");
+			change = change | ImGui::SliderFloat("##y", &m_robot->m_y, -2.5f, 2.0f);
+			ImGui::Text("azimuth");
+			change = change | ImGui::SliderFloat("##azimuth", &m_robot->m_azimuth, -180.0f, 180.0f);
+
+			ImGui::Text("gripper");
+			change = change | ImGui::SliderFloat("##gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f);
+
+			ImGui::Text("pitch");
+			change = change | ImGui::SliderFloat("##pitch", &m_robot->m_pitch, -180.0f, 180.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##yaw", &m_robot->m_yaw, -180.0f, 180.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##roll", &m_robot->m_roll, -180.0f, 180.0f);
+
+			if (change)
+			{
+				m_robot->m_rootBody->SetSleepState(false);
+			}
+		}
+
+		ndIndustrialRobot* m_robot;
+	};
 };
 
 using namespace ndAdvancedRobot;
@@ -477,12 +490,14 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 	world->AddModel(robotPtr);
 	world->AddJoint(fixJoint);
 	
-	ndAssert(0);
-	//scene->Set2DDisplayRenderFunction(ndIndustrialRobot::RobotControlPanel, nullptr, robot);
+	ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
+	ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
+	scene->Set2DDisplayRenderFunction(robotUIPtr);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
+	//ndSharedPtr<ndUIEntity> robotUIPtr1(new ndIndustrialRobot(scene, robotEntity, matrix));
+	//world->AddModel(robotUIPtr1);
 	
 	delete robotEntity;
 	
