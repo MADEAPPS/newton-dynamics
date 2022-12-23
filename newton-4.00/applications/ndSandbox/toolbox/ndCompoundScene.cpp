@@ -32,6 +32,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	matrix.m_posit.m_y += 1.9f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 	entity->SetMesh(geometry);
+	entity->SetName("box");
 
 	ndShapeMaterial material(box.GetMaterial());
 	material.m_data.m_userData = entity;
@@ -40,10 +41,6 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	box.SetLocalMatrix(matrix);
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->AddCollision(&box);
-
-	//ndShapeCompound::ndTreeArray::dNode* const node = compound->AddCollision(&heighfieldInstance);
-	//ndShapeInstance* const subInstance = node->GetInfo()->GetShape();
-	//return subInstance;
 }
 
 static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location, ndInt32 count)
@@ -53,7 +50,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix));
+	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix));
 
 	ndFloat32 spacing = 3.0f;
 	ndMatrix matrix(location);
@@ -64,6 +61,7 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	{
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 		entity->SetMesh(geometry);
+		entity->SetName("capsule");
 
 		material.m_data.m_userData = entity;
 		capsule.SetMaterial(material);
@@ -160,13 +158,13 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndDemoEntity* const rootEntity = new ndDemoEntity(location, nullptr);
+	rootEntity->SetName("arena");
 	ndShapeInstance sceneInstance (new ndShapeCompound());
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 
 	ndMatrix subShapeLocation(ndGetIdentityMatrix());
 	AddStaticMesh(scene, "playerarena.fbx", sceneInstance, rootEntity, subShapeLocation);
-	//AddStaticMesh(scene, "flatplane.fbx", sceneInstance, rootEntity, subShapeLocation);
 
 	subShapeLocation.m_posit.m_x += 10.0f;
 	AddSpeedBumpsSubShape(scene, sceneInstance, rootEntity, subShapeLocation, 14);
@@ -185,14 +183,96 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 	//AddHeightfieldSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 	compound->EndAddRemove();
 
-	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, rootEntity));
 	body->SetMatrix(location);
 	body->SetCollisionShape(sceneInstance);
 
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+#if 1
+	// add the bridge
+	ndDemoEntity* const pivot0 = rootEntity->Find("pivot1");
+	ndDemoEntity* const pivot1 = rootEntity->Find("pivot0");
+
+	ndMatrix matrix0(pivot0->CalculateGlobalMatrix());
+	ndMatrix matrix1(pivot1->CalculateGlobalMatrix());
+	ndVector dir(matrix1.m_posit - matrix0.m_posit);
+	ndFloat32 lenght = ndSqrt(dir.DotProduct(dir).GetScalar());
+
+	const ndInt32 plankCount = 30;
+	ndFloat32 sizex = 10.0f;
+	ndFloat32 sizey = 0.25f;
+	ndFloat32 sizez = lenght / plankCount;
+	ndFloat32 deflection = 0.02f;
+
+	ndMatrix matrix (matrix0);
+	matrix.m_posit.m_y -= sizey * 0.5f;
+	matrix.m_posit.m_z += sizez * 0.5f;
+	ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection));
+
+	ndFixSizeArray<ndBodyKinematic*, plankCount> array;
+	for (ndInt32 i = 0; i < plankCount; ++i)
+	{
+		array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
+		matrix.m_posit.m_z += sizez;
+	}
+
+	for (ndInt32 i = 1; i < plankCount; ++i)
+	{
+		ndBodyKinematic* body0 = array[i - 1];
+		ndBodyKinematic* body1 = array[i];
+		ndMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = ndVector::m_half * (body0->GetMatrix().m_posit + body1->GetMatrix().m_posit);
+		linkMatrix.m_posit.m_y += sizey * 0.5f;
+		ndMatrix matrix_0(linkMatrix);
+		ndMatrix matrix_1(linkMatrix);
+		matrix_0.m_posit.m_z += deflection  * 0.5f;
+		matrix_1.m_posit.m_z -= deflection  * 0.5f;
+		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
+		scene->GetWorld()->AddJoint(jointptr);
+	}
+
+	{
+		ndBodyKinematic* body0 = array[0];
+		ndBodyKinematic* body1 = body;
+		ndMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = body0->GetMatrix().m_posit;
+		linkMatrix.m_posit.m_z -= (sizez + deflection) * 0.5f;
+		linkMatrix.m_posit.m_y += sizey * 0.5f;
+		ndMatrix matrix_0(linkMatrix);
+		ndMatrix matrix_1(linkMatrix);
+		matrix_0.m_posit.m_z += deflection  * 0.5f;
+		matrix_1.m_posit.m_z -= deflection  * 0.5f;
+		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
+		scene->GetWorld()->AddJoint(jointptr);
+	}
+
+	{
+		ndBodyKinematic* body0 = array[plankCount - 1];
+		ndBodyKinematic* body1 = body;
+		ndMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = body0->GetMatrix().m_posit;
+		linkMatrix.m_posit.m_z += (sizez + deflection) * 0.5f;
+		linkMatrix.m_posit.m_y += sizey * 0.5f;
+		ndMatrix matrix_0(linkMatrix);
+		ndMatrix matrix_1(linkMatrix);
+		matrix_0.m_posit.m_z += deflection  * 0.5f;
+		matrix_1.m_posit.m_z -= deflection  * 0.5f;
+		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
+		scene->GetWorld()->AddJoint(jointptr);
+	}
+#endif
+
 	scene->AddEntity(rootEntity);
 	ndSharedPtr<ndBody> bodyPtr(body);
 	world->AddBody(bodyPtr);
+
 	return body;
 }

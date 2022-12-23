@@ -26,8 +26,8 @@
 void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildPlayArena(scene);
-	BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildPlayArena(scene);
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildCompoundScene(scene, ndGetIdentityMatrix());
 
 	ndMatrix location(ndGetIdentityMatrix());

@@ -148,7 +148,6 @@ inline ndString ndString::operator+ (const char* const copy) const
 	return ndString (*this, copy, CalculateSize (copy));
 }
 
-
 inline ndInt32 ndString::Capacity() const
 {
 	return m_capacity;
@@ -167,7 +166,6 @@ inline ndInt32 ndString::Compare (const char* const str0, const char* const str1
 	ndAssert (str1);
 	return strcmp (str0, str1);
 }
-
 
 inline bool ndString::operator== (const ndString& src) const
 {

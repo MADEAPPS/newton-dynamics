@@ -350,7 +350,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> bodyPtr(body);
 	scene->GetWorld()->AddBody(bodyPtr);
 
-#if 0
+#if 1
 	ndDemoEntity* const pivot0 = entity->Find("pivot1");
 	ndDemoEntity* const pivot1 = entity->Find("pivot0");
 
@@ -390,7 +390,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
 		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
-		scene->GetWorld()->AddJoint(hinge);
+		ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
+		scene->GetWorld()->AddJoint(jointptr);
 	}
 
 	{
@@ -406,7 +407,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
 		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
-		scene->GetWorld()->AddJoint(hinge);
+		ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
+		scene->GetWorld()->AddJoint(jointptr);
 	}
 
 	{
@@ -422,7 +424,8 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
 		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
-		scene->GetWorld()->AddJoint(hinge);
+		ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
+		scene->GetWorld()->AddJoint(jointptr);
 	}
 #endif
 	delete meshEffectNode;
