@@ -461,22 +461,21 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		world->AddJoint(effectorPtr);
 	}
 
-	void LinkTires(const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1)
+	void LinkTires(ndDemoEntityManager* const scene, const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1)
 	{
-		ndAssert(0);
-		//ndBodyKinematic* const body0 = tire0->GetBody0();
-		//ndBodyKinematic* const body1 = tire1->GetBody0();
-		//
-		//ndShapeInfo rearInfo(body0->GetCollisionShape().GetShapeInfo());
-		//ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
-		//ndFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
-		//
-		//ndMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
-		//ndMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
-		//
-		//ndSharedPtr<ndJointBilateralConstraint> link(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
-		////world->AddJoint(link);
-		//AddExtraJoint(link);
+		ndBodyKinematic* const body0 = tire0->GetBody0();
+		ndBodyKinematic* const body1 = tire1->GetBody0();
+		
+		ndShapeInfo rearInfo(body0->GetCollisionShape().GetShapeInfo());
+		ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
+		ndFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
+		
+		ndMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
+		ndMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
+		
+		ndWorld* const world = scene->GetWorld();
+		ndSharedPtr<ndJointBilateralConstraint> link(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
+		world->AddJoint(link);
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
@@ -550,128 +549,129 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
 
-		ndAssert(0);
-		//ndWorld* const world = scene->GetWorld();
-		//ndBodyKinematic* const chassis = m_chassis;
-		//
-		//ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
-		//ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
-		//ndSharedPtr<ndBodyKinematic> rr_tire0_body (CreateTireBody(scene, chassis, r0_tireConfiguration, "rr_tire"));
-		//ndSharedPtr<ndBodyKinematic> rl_tire0_body (CreateTireBody(scene, chassis, r1_tireConfiguration, "rl_tire"));
-		//ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
-		//ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
-		//
-		//ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
-		//ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
-		//ndSharedPtr<ndBodyKinematic> frontAxel_body (MakeFronAxel(scene, chassis));
-		//ndSharedPtr<ndBodyKinematic> fr_tire0_body (CreateTireBody(scene, *frontAxel_body, f0_tireConfiguration, "fr_tire"));
-		//ndSharedPtr<ndBodyKinematic> fl_tire0_body (CreateTireBody(scene, *frontAxel_body, f1_tireConfiguration, "fl_tire"));
-		//ndMultiBodyVehicleTireJoint* const fr_tire0 = AddAxleTire(f0_tireConfiguration, fr_tire0_body, frontAxel_body);
-		//ndMultiBodyVehicleTireJoint* const fl_tire0 = AddAxleTire(f1_tireConfiguration, fl_tire0_body, frontAxel_body);
-		//
-		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
-		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		//for (ndInt32 i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
-		//{
-		//	m_gearMap[i] = i + 2;
-		//}
-		//m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
-		//
-		//// add a motor
-		//ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		//motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
-		//
-		//// add 4 x 4 the slip differential
-		//ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-		//ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-		//
-		//// slip differential with high slip ratio 
-		//ndMultiBodyVehicleDifferential* const differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-		//differential->SetSlipOmega(2.0f * differential->GetSlipOmega());
-		//
-		//// add the gear box
-		//ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(differential);
-		//gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
-		//
-		//// add the bucket joints
-		//CreateTractorBucket(scene);
-		//
-		//// set a soft of hard mode
-		//SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
+		ndWorld* const world = scene->GetWorld();
+		ndBodyKinematic* const chassis = m_chassis;
+		
+		ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
+		ndBodyKinematic* const rr_tire0_body = CreateTireBody(scene, chassis, r0_tireConfiguration, "rr_tire");
+		ndBodyKinematic* const rl_tire0_body = CreateTireBody(scene, chassis, r1_tireConfiguration, "rl_tire");
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
+		
+		ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
+		ndBodyKinematic* const frontAxel_body = MakeFronAxel(scene, chassis);
+		ndBodyKinematic* const fr_tire0_body = CreateTireBody(scene, frontAxel_body, f0_tireConfiguration, "fr_tire");
+		ndBodyKinematic* const fl_tire0_body = CreateTireBody(scene, frontAxel_body, f1_tireConfiguration, "fl_tire");
+		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddAxleTire(f0_tireConfiguration, fr_tire0_body, frontAxel_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddAxleTire(f1_tireConfiguration, fl_tire0_body, frontAxel_body);
+
+		ndSharedPtr<ndBody> rr_tire0_body_Ptr(rr_tire0_body);
+		ndSharedPtr<ndBody> rl_tire0_body_Ptr(rl_tire0_body);
+		ndSharedPtr<ndBody> fr_tire0_body_Ptr(fr_tire0_body);
+		ndSharedPtr<ndBody> fl_tire0_body_Ptr(fl_tire0_body);
+		
+		world->AddBody(rr_tire0_body_Ptr);
+		world->AddBody(rl_tire0_body_Ptr);
+		world->AddBody(fr_tire0_body_Ptr);
+		world->AddBody(fl_tire0_body_Ptr);
+		
+		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
+		
+		// add a motor
+		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
+		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		
+		// add 4 x 4 the slip differential
+		ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+		ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+		
+		// slip differential with high slip ratio 
+		ndMultiBodyVehicleDifferential* const differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+		differential->SetSlipOmega(2.0f * differential->GetSlipOmega());
+		
+		// add the gear box
+		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(differential);
+		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
+		
+		// add the bucket joints
+		CreateTractorBucket(scene);
+		
+		// set a soft of hard mode
+		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
 
-	ndSharedPtr<ndBodyKinematic> MakeFronAxel(ndDemoEntityManager* const scene, ndBodyKinematic* const chassis)
+	ndBodyKinematic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyKinematic* const chassis)
 	{
-		ndAssert(0);
-		return ndSharedPtr<ndBodyKinematic>(nullptr);
-		//ndSharedPtr<ndBodyKinematic> axleBody(MakeChildPart(scene, m_chassis, "front_axel", m_configuration.m_chassisMass * 0.2f));
-		//
-		//// connect the part to the main body with a hinge
-		//ndMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
-		//ndJointHinge* const hinge = new ndJointHinge(hingeFrame, *axleBody, chassis);
-		//hinge->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
-		//ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-		//AddExtraBody(axleBody);
-		//AddExtraJoint(hingePtr);
-		//return axleBody;
+		ndSharedPtr<ndBody> axleBody(MakeChildPart(scene, m_chassis, "front_axel", m_configuration.m_chassisMass * 0.2f));
+		
+		// connect the part to the main body with a hinge
+		ndMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
+		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody->GetAsBodyKinematic(), chassis);
+		hinge->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
+		ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
+
+		ndWorld* const world = scene->GetWorld();
+		world->AddBody(axleBody);
+		world->AddJoint(hingePtr);
+		return axleBody->GetAsBodyKinematic();
 	}
 
 	void AddHydraulic(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, const char* const name0, const char* const name1, ndBodyKinematic* const attachmentBody, const char* const attachement)
 	{
-		ndAssert(0);
-		//ndSharedPtr<ndBodyKinematic>body0 (MakeChildPart(scene, parentBody, name0, m_configuration.m_chassisMass * 0.01f));
-		//ndMatrix matrix0(m_localFrame * body0->GetMatrix());
-		////ndJointBilateralConstraint* const joint0 = new ndJointHinge(matrix0, body0, parentBody);
-		//ndSharedPtr<ndJointBilateralConstraint>joint0 (new ndJointHinge(matrix0, *body0, parentBody));
-		//AddExtraBody(body0);
-		//AddExtraJoint(joint0);
-		//
-		//ndSharedPtr<ndBodyKinematic>body1 (MakeChildPart(scene, *body0, name1, m_configuration.m_chassisMass * 0.01f));
-		//ndMatrix matrix1(m_localFrame * body1->GetMatrix());
-		//ndSharedPtr<ndJointBilateralConstraint>joint1 (new ndJointSlider(matrix1, *body1, *body0));
-		//AddExtraBody(body1);
-		//AddExtraJoint(joint1);
-		//
-		//ndDemoEntity* const parentEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
-		//ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
-		//matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
-		//
-		//ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, *body1, attachmentBody);
-		//attachementJoint->EnableAxisX(false);
-		//attachementJoint->EnableAxisY(true);
-		//attachementJoint->EnableAxisZ(true);
-		//attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
-		//
-		//ndSharedPtr<ndJointBilateralConstraint> attachementJointPtr(attachementJoint);
-		//AddExtraJoint(attachementJointPtr);
+		ndWorld* const world = scene->GetWorld();
+		ndSharedPtr<ndBody>body0 (MakeChildPart(scene, parentBody, name0, m_configuration.m_chassisMass * 0.01f));
+		ndMatrix matrix0(m_localFrame * body0->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint>joint0 (new ndJointHinge(matrix0, body0->GetAsBodyKinematic(), parentBody));
+		world->AddBody(body0);
+		world->AddJoint(joint0);
+		
+		ndSharedPtr<ndBody>body1 (MakeChildPart(scene, body0->GetAsBodyKinematic(), name1, m_configuration.m_chassisMass * 0.01f));
+		ndMatrix matrix1(m_localFrame * body1->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint>joint1 (new ndJointSlider(matrix1, body1->GetAsBodyKinematic(), body0->GetAsBodyKinematic()));
+		world->AddBody(body1);
+		world->AddJoint(joint1);
+		
+		ndDemoEntity* const parentEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
+		ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
+		matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
+		
+		ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, body1->GetAsBodyKinematic(), attachmentBody);
+		attachementJoint->EnableAxisX(false);
+		attachementJoint->EnableAxisY(true);
+		attachementJoint->EnableAxisZ(true);
+		attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
+		
+		ndSharedPtr<ndJointBilateralConstraint> attachementJointPtr(attachementJoint);
+		world->AddJoint(attachementJointPtr);
 	}
 
 	void CreateTractorBucket(ndDemoEntityManager* const scene)
 	{
-		ndAssert(0);
-		//ndSharedPtr<ndBodyKinematic>armBody (MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f));
-		//ndMatrix armMatrix(m_localFrame * armBody->GetMatrix());
-		//m_armHinge = new ndJointHinge(armMatrix, *armBody, m_chassis);
-		//m_armHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
-		//ndSharedPtr<ndJointBilateralConstraint> armHingePtr(m_armHinge);
-		//
-		//AddExtraBody(armBody);
-		//AddExtraJoint(armHingePtr);
-		//AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", *armBody, "attach0_left");
-		//AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", *armBody, "attach0_right");
-		//		
-		////cannon servo controller actuator
-		////ndBodyKinematic* const frontBucketBody = MakeChildPart(scene, armBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
-		//ndSharedPtr<ndBodyKinematic>frontBucketBody (MakeChildPart(scene, *armBody, "frontBucket", m_configuration.m_chassisMass * 0.025f));
-		//ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
-		//m_bucketHinge = new ndJointHinge(frontBucketMatrix, *frontBucketBody, *armBody);
-		//m_bucketHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
-		//ndSharedPtr<ndJointBilateralConstraint> bucketHingePtr(m_bucketHinge);
-		//
-		//AddExtraBody(frontBucketBody);
-		//AddExtraJoint(bucketHingePtr);
-		//AddHydraulic(scene, *armBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", *frontBucketBody, "attachment_frontBucket001");
-		//AddHydraulic(scene, *armBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", *frontBucketBody, "attachment_frontBucket002");
+		ndWorld* const world = scene->GetWorld();
+		ndSharedPtr<ndBody>armBody (MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f));
+		ndMatrix armMatrix(m_localFrame * armBody->GetMatrix());
+		m_armHinge = new ndJointHinge(armMatrix, armBody->GetAsBodyKinematic(), m_chassis);
+		m_armHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
+		ndSharedPtr<ndJointBilateralConstraint> armHingePtr(m_armHinge);
+		
+		world->AddBody(armBody);
+		world->AddJoint(armHingePtr);
+		AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", armBody->GetAsBodyKinematic(), "attach0_left");
+		AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", armBody->GetAsBodyKinematic(), "attach0_right");
+				
+		//cannon servo controller actuator
+		ndSharedPtr<ndBody>frontBucketBody (MakeChildPart(scene, armBody->GetAsBodyKinematic(), "frontBucket", m_configuration.m_chassisMass * 0.025f));
+		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
+		m_bucketHinge = new ndJointHinge(frontBucketMatrix, frontBucketBody->GetAsBodyKinematic(), armBody->GetAsBodyKinematic());
+		m_bucketHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
+		ndSharedPtr<ndJointBilateralConstraint> bucketHingePtr(m_bucketHinge);
+		
+		world->AddBody(frontBucketBody);
+		world->AddJoint(bucketHingePtr);
+		AddHydraulic(scene, armBody->GetAsBodyKinematic(), "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody->GetAsBodyKinematic(), "attachment_frontBucket001");
+		AddHydraulic(scene, armBody->GetAsBodyKinematic(), "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody->GetAsBodyKinematic(), "attachment_frontBucket002");
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
@@ -844,7 +844,6 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleUI* const vehicleUI = new ndVehicleUI(scene);
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
-	//scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle1);
 	
 	ndSharedPtr<ndModel> vehicle0(new ndBigRigVehicle(scene, bigRigDesc, matrix, vehicleUI));
 	
@@ -853,19 +852,18 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> vehicle1(new ndLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
-	//ndHeavyMultiBodyVehicle* const vehicle2 = new ndTractorVehicle(scene, tractorDesc, matrix);
-	//ndSharedPtr<ndModel> vehicle2_ptr(vehicle2);
-	//scene->GetWorld()->AddModel(vehicle2_ptr);
+	ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
 
 	world->AddModel(vehicle0);
 	world->AddModel(vehicle1);
+	world->AddModel(vehicle2);
 
-	ndHeavyMultiBodyVehicle* const vehicle = (ndHeavyMultiBodyVehicle*)*vehicle1;
+	ndHeavyMultiBodyVehicle* const vehicle = (ndHeavyMultiBodyVehicle*)*vehicle2;
 	vehicle->SetAsPlayer(scene);
 	
-	//matrix.m_posit.m_x += 25.0f;
-	//matrix.m_posit.m_z += 6.0f;
-	//AddPlanks(scene, matrix, 300.0f, 5);
+	matrix.m_posit.m_x += 25.0f;
+	matrix.m_posit.m_z += 6.0f;
+	AddPlanks(scene, matrix, 300.0f, 5);
 	
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);

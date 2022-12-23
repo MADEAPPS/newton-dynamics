@@ -55,12 +55,8 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 			const ndContactPointList& contactPoints = joint->GetContactPoints();
 			for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 			{
-				ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-				// quick hack to show the solution.
-				if (contactPoint.m_normal.m_y < 0.999)
-				{
-					ndTrace(("this is when the bug happens\n"));
-				}
+				// do some logic here
+				//ndContactPoint& contactPoint = contactPointsNode->GetInfo();
 			}
 		}
 	}
