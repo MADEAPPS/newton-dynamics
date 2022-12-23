@@ -217,9 +217,11 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
+
+		ndPhysicsWorld* const world = scene->GetWorld();
 		
 		// create the vehicle chassis as a normal rigid body
-		ndSharedPtr<ndBodyKinematic> chassis (CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass));
+		ndBodyKinematic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
 		chassis->SetAngularDamping(ndVector(m_configuration.m_chassisAngularDrag));
 		
 		// lower vehicle com;
@@ -230,36 +232,24 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		chassis->SetCentreOfMass(com);
 		
 		// 1- add chassis to the vehicle mode 
-		ndAssert(0);
-		//AddChassis(chassis);
+		SetChassis(chassis);
+		ndSharedPtr<ndBody> bodyPtr(chassis);
+		world->AddBody(bodyPtr);
 	}
 
 	~ndHeavyMultiBodyVehicle()
 	{
-		if (m_vehicleUI)
-		{
-			delete m_vehicleUI;
-		}
-
-		ReleaseTexture(m_gears);
-		ReleaseTexture(m_odometer);
-		ReleaseTexture(m_redNeedle);
-		ReleaseTexture(m_tachometer);
-		ReleaseTexture(m_greenNeedle);
+		//ReleaseTexture(m_gears);
+		//ReleaseTexture(m_odometer);
+		//ReleaseTexture(m_redNeedle);
+		//ReleaseTexture(m_tachometer);
+		//ReleaseTexture(m_greenNeedle);
 	}
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
 		ndDemoEntity* const vehicleEntity = ndDemoEntity::LoadFbx(filename, scene);
 		scene->AddEntity(vehicleEntity);
-
-		// load 2d display assets
-		m_gears = LoadTexture("gears_font.tga");
-		m_odometer = LoadTexture("kmh_dial.tga");
-		m_tachometer = LoadTexture("rpm_dial.tga");
-		m_redNeedle = LoadTexture("needle_red.tga");
-		m_greenNeedle = LoadTexture("needle_green.tga");
-
 		return vehicleEntity;
 	}
 
@@ -267,22 +257,9 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 	{
 		ndVehicleCommon::SetAsPlayer(scene, mode);
 
+		m_vehicleUI->SetVehicle(this);
 		scene->SetSelectedModel(this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-		ndAssert(0);
-		//scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
-	}
-
-	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
-	{
-		ndHeavyMultiBodyVehicle* const me = (ndHeavyMultiBodyVehicle*)context;
-		me->RenderUI(scene);
-	}
-
-	static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
-	{
-		ndHeavyMultiBodyVehicle* const me = (ndHeavyMultiBodyVehicle*)context;
-		me->RenderHelp(scene);
 	}
 
 	protected:
@@ -342,50 +319,7 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		camera->SetNextMatrix(camMatrix, camOrigin);
 	}
 
-	void RenderHelp(ndDemoEntityManager* const scene)
-	{
-		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Vehicle driving keyboard control");
-		scene->Print(color, "change vehicle     : 'c'");
-		scene->Print(color, "accelerator        : 'w'");
-		scene->Print(color, "brakes             : 's'");
-		scene->Print(color, "turn left          : 'a'");
-		scene->Print(color, "turn right         : 'd'");
-		scene->Print(color, "hand brakes        : 'space'");
-
-		ImGui::Separator();
-		scene->Print(color, "gear box");
-		scene->Print(color, "ignition            : 'i'");
-		scene->Print(color, "manual transmission : '?'");
-		scene->Print(color, "neutral gear	    : 'n'");
-		scene->Print(color, "forward gear up     : '>'");
-		scene->Print(color, "forward gear down   : '<'");
-		scene->Print(color, "reverse gear	    : 'r'");
-		scene->Print(color, "parking gear	    : 'p'");
-	}
-
-	void RenderUI(ndDemoEntityManager* const scene)
-	{
-		ndAssert(0);
-		ndMultiBodyVehicleMotor* const motor = *m_motor;
-		if (motor)
-		{
-			ndAssert(motor);
-			if (m_vehicleUI)
-			{
-				ndAssert(0);
-				//m_vehicleUI->RenderDash(this);
-			}
-		}
-	}
-
 	protected:
-	GLuint m_gears;
-	GLuint m_odometer;
-	GLuint m_redNeedle;
-	GLuint m_tachometer;
-	GLuint m_greenNeedle;
-	ndInt32 m_gearMap[8];
 	ndVehicleUI* m_vehicleUI;
 };
 
@@ -802,54 +736,62 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
 	
-		ndAssert(0);
-		//ndWorld* const world = scene->GetWorld();
-		//ndBodyKinematic* const chassis = m_chassis;
-		//
-		//ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
-		//ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
-		//ndSharedPtr<ndBodyKinematic> fl_tire_body (CreateTireBody(scene, chassis, f0_tireConfiguration, "fl_tire"));
-		//ndSharedPtr<ndBodyKinematic> fr_tire_body (CreateTireBody(scene, chassis, f1_tireConfiguration, "fr_tire"));
-		//AddTire(f0_tireConfiguration, fr_tire_body);
-		//AddTire(f0_tireConfiguration, fl_tire_body);
-		//
-		//ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
-		//ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
-		//ndVehicleDectriptor::ndTireDefinition r2_tireConfiguration(m_configuration.m_rearTire);
-		//ndVehicleDectriptor::ndTireDefinition r3_tireConfiguration(m_configuration.m_rearTire);
-		//ndSharedPtr<ndBodyKinematic> rl_tire0_body (CreateTireBody(scene, chassis, r0_tireConfiguration, "rl_midle_tire"));
-		//ndSharedPtr<ndBodyKinematic> rr_tire0_body (CreateTireBody(scene, chassis, r1_tireConfiguration, "rr_midle_tire"));
-		//ndSharedPtr<ndBodyKinematic> rl_tire1_body (CreateTireBody(scene, chassis, r2_tireConfiguration, "rl_tire"));
-		//ndSharedPtr<ndBodyKinematic> rr_tire1_body (CreateTireBody(scene, chassis, r3_tireConfiguration, "rr_tire"));
-		//
-		//ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
-		//ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
-		//ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(r2_tireConfiguration, rr_tire1_body);
-		//ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(r3_tireConfiguration, rl_tire1_body);
-		//
-		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
-		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		//for (ndInt32 i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
-		//{
-		//	m_gearMap[i] = i + 2;
-		//}
-		//m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
-		//
-		//// add the slip differential
-		//ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-		//ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-		//ndMultiBodyVehicleDifferential* const differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential0, rearDifferential1, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-		//
-		//// add a motor
-		//ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		//motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
-		//
-		//// add the gear box
-		//ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(differential);
-		//gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
-		//
-		//// set a soft or hard mode
-		//SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
+
+		ndWorld* const world = scene->GetWorld();
+		ndBodyKinematic* const chassis = m_chassis;
+		
+		ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(m_configuration.m_frontTire);
+		ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(m_configuration.m_frontTire);
+		ndBodyKinematic* const fl_tire_body = CreateTireBody(scene, chassis, f0_tireConfiguration, "fl_tire");
+		ndBodyKinematic* const fr_tire_body = CreateTireBody(scene, chassis, f1_tireConfiguration, "fr_tire");
+		AddTire(f0_tireConfiguration, fr_tire_body);
+		AddTire(f0_tireConfiguration, fl_tire_body);
+		
+		ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r2_tireConfiguration(m_configuration.m_rearTire);
+		ndVehicleDectriptor::ndTireDefinition r3_tireConfiguration(m_configuration.m_rearTire);
+		ndBodyKinematic* const rl_tire0_body = CreateTireBody(scene, chassis, r0_tireConfiguration, "rl_midle_tire");
+		ndBodyKinematic* const rr_tire0_body = CreateTireBody(scene, chassis, r1_tireConfiguration, "rr_midle_tire");
+		ndBodyKinematic* const rl_tire1_body = CreateTireBody(scene, chassis, r2_tireConfiguration, "rl_tire");
+		ndBodyKinematic* const rr_tire1_body = CreateTireBody(scene, chassis, r3_tireConfiguration, "rr_tire");
+		
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(r0_tireConfiguration, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(r1_tireConfiguration, rl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(r2_tireConfiguration, rr_tire1_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(r3_tireConfiguration, rl_tire1_body);
+
+		ndSharedPtr<ndBody> fl_tire_body_Ptr(fl_tire_body);
+		ndSharedPtr<ndBody> fr_tire_body_Ptr(fr_tire_body);
+		ndSharedPtr<ndBody> rl_tire0_body_Ptr(rl_tire0_body);
+		ndSharedPtr<ndBody> rr_tire0_body_Ptr(rr_tire0_body);
+		ndSharedPtr<ndBody> rl_tire1_body_Ptr(rl_tire1_body);
+		ndSharedPtr<ndBody> rr_tire1_body_Ptr(rr_tire1_body);
+
+		world->AddBody(fl_tire_body_Ptr);
+		world->AddBody(fr_tire_body_Ptr);
+		world->AddBody(rl_tire0_body_Ptr);
+		world->AddBody(rr_tire0_body_Ptr);
+		world->AddBody(rl_tire1_body_Ptr);
+		world->AddBody(rr_tire1_body_Ptr);
+
+		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
+		
+		// add the slip differential
+		ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+		ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+		ndMultiBodyVehicleDifferential* const differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential0, rearDifferential1, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+		
+		// add a motor
+		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
+		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		
+		// add the gear box
+		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(differential);
+		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
+		
+		// set a soft or hard mode
+		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
@@ -860,6 +802,18 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
+	ndMatrix sceneLocation(ndGetIdentityMatrix());
+	//BuildFloorBox(scene, sceneLocation);
+	//BuildFlatPlane(scene, true);
+	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
+	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildCompoundScene(scene, sceneLocation);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildSplineTrack(scene, "playerarena.fbx", true);
+	//sceneLocation.m_posit.m_x = -200.0f;
+	//sceneLocation.m_posit.m_z = -200.0f;
+	//BuildHeightFieldTerrain(scene, sceneLocation);
+	
 	ndVehicleMaterial material;
 	material.m_restitution = 0.1f;
 	material.m_staticFriction0 = 0.8f;
@@ -874,35 +828,26 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_modelPart);
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_vehicleTirePart);
 
-	ndMatrix sceneLocation(ndGetIdentityMatrix());
-	//BuildFloorBox(scene, sceneLocation);
-	//BuildFlatPlane(scene, true);
-	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildCompoundScene(scene, sceneLocation);
-	//BuildStaticMesh(scene, "playerarena.fbx", true);
-	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	//sceneLocation.m_posit.m_x = -200.0f;
-	//sceneLocation.m_posit.m_z = -200.0f;
-	//BuildHeightFieldTerrain(scene, sceneLocation);
-	
+	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = location;
 
-	ndAssert(0);
-	//ndVehicleUI* const vehicleUI = new ndVehicleUI;
-	
 	// add a model for general controls
-	ndVehicleSelector* const controls = new ndVehicleSelector();
-	ndSharedPtr<ndModel> controls_ptr(controls);
-	scene->GetWorld()->AddModel(controls_ptr);
+	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
+	world->AddModel(controls);
+
+	ndVehicleUI* const vehicleUI = new ndVehicleUI(scene);
+	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
+	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
+	//scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle1);
 	
 	//ndHeavyMultiBodyVehicle* const vehicle0 = new ndBigRigVehicle(scene, bigRigDesc, matrix);
 	//ndSharedPtr<ndModel> vehicle0_ptr(vehicle0);
 	//scene->GetWorld()->AddModel(vehicle0_ptr);
-	//
+	ndSharedPtr<ndModel> vehicle0(new ndBigRigVehicle(scene, bigRigDesc, matrix, vehicleUI));
+	
 	//matrix.m_posit.m_x += 6.0f;
 	//matrix.m_posit.m_z += 6.0f;
 	//ndHeavyMultiBodyVehicle* const vehicle1 = new ndLav25Vehicle(scene, lav25Desc, matrix);
@@ -913,15 +858,16 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//ndHeavyMultiBodyVehicle* const vehicle2 = new ndTractorVehicle(scene, tractorDesc, matrix);
 	//ndSharedPtr<ndModel> vehicle2_ptr(vehicle2);
 	//scene->GetWorld()->AddModel(vehicle2_ptr);
-	//
-	//vehicle1->SetAsPlayer(scene);
-	//scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle1);
-	//
+
+	world->AddModel(vehicle0);
+	ndHeavyMultiBodyVehicle* const vehicle = (ndHeavyMultiBodyVehicle*)*vehicle0;
+	vehicle->SetAsPlayer(scene);
+	
 	//matrix.m_posit.m_x += 25.0f;
 	//matrix.m_posit.m_z += 6.0f;
 	//AddPlanks(scene, matrix, 300.0f, 5);
-	//
-	//ndQuaternion rot;
-	//ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
-	//scene->SetCameraMatrix(rot, origin);
+	
+	ndQuaternion rot;
+	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(rot, origin);
 }

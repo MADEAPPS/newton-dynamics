@@ -236,7 +236,7 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 	{
 		m_axis[axisMapping[i]] = unmappedAxis[i];
 	}
-	m_axis[m_azis_00] = -m_axis[m_azis_00];
+	m_axis[m_azis_00] = -m_axis[m_azis_00] * 2.0f;
 	m_axis[m_azis_01] = (1.0f - m_axis[m_azis_01]) * 0.5f;
 	m_axis[m_azis_02] = (1.0f - m_axis[m_azis_02]) * 0.5f;
 }

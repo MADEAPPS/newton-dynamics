@@ -1458,9 +1458,7 @@ TEST(StaticBody, mesh)
 	world.SetThreadCount(std::thread::hardware_concurrency() - 1);
 
 	ndVector startPosition = ndVector(2.0f, 4.0f, 6.0f, 1.0f);
-	//ndBodyDynamic* const staticBunny = BuildStaticBunny(startPosition);
-	ndSharedPtr<ndBodyKinematic> staticBunny (BuildStaticBunny(startPosition));
-
+	ndSharedPtr<ndBody> staticBunny (BuildStaticBunny(startPosition));
 	world.AddBody(staticBunny);
 
 	// Simulate one second.

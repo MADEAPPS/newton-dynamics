@@ -533,8 +533,7 @@ TEST(RigidBodyInstances, Instancing)
 
 	// Create a bunny at the origin. Gravity is set to -9.8f
 	ndVector bunnyPos = ndVector(0.0f, 0.0f, 0.0f, 1.0f);
-	//ndBodyDynamic* const bunny = BuildBunny(bunnyPos);
-	ndSharedPtr<ndBodyKinematic> bunny (BuildBunny(bunnyPos));
+	ndSharedPtr<ndBody> bunny (BuildBunny(bunnyPos));
 	world.AddBody(bunny);
 
 	// 1000 instances
@@ -542,15 +541,16 @@ TEST(RigidBodyInstances, Instancing)
 	ndFloat32 stackOffset = 2.0f;
 
 	// make a stack of instances
+	const ndShapeInstance& collisionShape = bunny->GetAsBodyKinematic()->GetCollisionShape();
 	for (uint32_t i = 0; i < instanceCount; ++i)
 	{
 		// stack'em
 		bunnyPos.m_y += stackOffset;
 
 		// make a new instance reusing the original bunny's collision shape
-		//ndBodyDynamic* const bunnyInstamce = BuildBunnyInstance(bunny->GetCollisionShape(), bunnyPos);
-		ndSharedPtr<ndBodyKinematic> bunnyInstamce (BuildBunnyInstance(bunny->GetCollisionShape(), bunnyPos));
-		world.AddBody(bunnyInstamce);
+		
+		ndSharedPtr<ndBody> bunnyInstance (BuildBunnyInstance(collisionShape, bunnyPos));
+		world.AddBody(bunnyInstance);
 	}
 
 	// Simulate one second.
@@ -560,7 +560,7 @@ TEST(RigidBodyInstances, Instancing)
 		world.Sync();
 	}
 
-	const ndBodyList& bodyList = world.GetBodyList();
+	const ndBodyListView& bodyList = world.GetBodyList();
 
 	ndFloat32 predictedY = 0.0f;
 	ndFloat32 stackPos = 0.0f;
@@ -571,7 +571,7 @@ TEST(RigidBodyInstances, Instancing)
 
 	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
-		const ndBodyKinematic* const body = *bodyNode->GetInfo();
+		const ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 		predictedY = stackPos - distanceFallen;
 		ndFloat32 computedY = body->GetMatrix().m_posit.m_y;
 

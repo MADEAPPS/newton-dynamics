@@ -21,7 +21,6 @@
 #include "ndCompoundScene.h"
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
-//#include "ndTargaToOpenGl.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
@@ -273,7 +272,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndSharedPtr<ndBody> bodyPtr(chassis);
 		world->AddBody(bodyPtr);
 
-
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
 		// and attach them to the chassis with a tire joints
@@ -301,12 +299,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		world->AddBody(fr_tire_body_Ptr);
 		world->AddBody(fl_tire_body_Ptr);
 
-		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
-		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		//for (ndInt32 i = 0; i < m_configuration.m_transmission.m_gearsCount; ++i)
-		//{
-		//	m_gearMap[i] = i + 2;
-		//}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 
 		// add the slip differential
@@ -428,8 +420,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 	{
 		ndDemoEntity* const vehicleEntity = ndDemoEntity::LoadFbx(filename, scene);
 		scene->AddEntity(vehicleEntity);
-
-		// load 2d display assets
 		return vehicleEntity;
 	}
 
@@ -689,7 +679,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_vehicleTirePart, ndApplicationMaterial::m_default);
 
 	// add a model for general controls
-	//ndVehicleSelector* const controls = new ndVehicleSelector();
 	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
 	world->AddModel(controls);
 
@@ -708,7 +697,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	world->AddModel(vehicle3);
 
 	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
-
 	vehicle->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
