@@ -91,8 +91,8 @@ int main(int, const char**)
   // Create a ball above a floor box.
   //ndBodyDynamic *sphere = BuildSphere();
   //ndBodyDynamic *floor = BuildFloor();
-  ndSharedPtr<ndBodyKinematic>floor(BuildFloor());
-  ndSharedPtr<ndBodyKinematic>sphere (BuildSphere());
+  ndSharedPtr<ndBody>floor(BuildFloor());
+  ndSharedPtr<ndBody>sphere (BuildSphere());
   world.AddBody(sphere);
   world.AddBody(floor);
 

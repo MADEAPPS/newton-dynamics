@@ -74,8 +74,8 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 
 inline ndModel::ndModel()
 	:ndContainersFreeListAlloc<ndModel>()
-	,m_node(nullptr)
 	,m_world(nullptr)
+	,m_node(nullptr)
 	,m_markedForRemoved(0)
 {
 }
