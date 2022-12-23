@@ -124,15 +124,13 @@ class ndMultiBodyVehicle: public ndModel
 	ndBodyKinematic* m_chassis;
 	ndIkSolver m_invDynamicsSolver;
 	ndShapeChamferCylinder* m_tireShape;
+	ndReferencedObjects<ndBody> m_internalBodies;
 	ndSharedPtr<ndMultiBodyVehicleMotor> m_motor;
 	ndSharedPtr<ndMultiBodyVehicleGearBox> m_gearBox;
 	ndSharedPtr<ndMultiBodyVehicleTorsionBar> m_torsionBar;
-	ndReferencedObjects<ndBodyKinematic> m_internalBodies;
 	ndReferencedObjects<ndMultiBodyVehicleTireJoint> m_tireList;
-	//ndList<ndBodyKinematic*> m_extraBodiesAttachmentList;
 	ndReferencedObjects<ndMultiBodyVehicleDifferentialAxle> m_axleList;
 	ndReferencedObjects<ndMultiBodyVehicleDifferential> m_differentialList;
-	//ndList<ndJointBilateralConstraint*> m_extraJointsAttachmentList;
 	ndDownForce m_downForce;
 	
 	friend class ndMultiBodyVehicleMotor;

@@ -98,12 +98,12 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (glVector3), box);
 	
-	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	const ndBodyListView& bodyList = world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndVector p0;
 		ndVector p1;
-		ndBodyKinematic* const body = *bodyNode->GetInfo();
+		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 		body->GetAABB(p0, p1);
 		DrawBox(p0, p1, box);
 	}
@@ -360,10 +360,10 @@ void RenderBodyFrame(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), line);
 	
-	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	const ndBodyListView& bodyList = world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
-		ndBodyKinematic* const body = *bodyNode->GetInfo();
+		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 	
 		ndMatrix matrix(body->GetMatrix());
 		ndVector o(matrix.m_posit);
@@ -418,10 +418,10 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), line);
 	
-	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	const ndBodyListView& bodyList = world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
-		ndBodyKinematic* const body = *bodyNode->GetInfo();
+		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 	
 		ndMatrix matrix(body->GetMatrix());
 		ndVector com(body->GetCentreOfMass());
@@ -495,10 +495,10 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	const glMatrix glProjectionMatrix(projectionMatrix);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	
-	const ndBodyParticleSetList& particles = world->GetParticleList();
-	for (ndBodyParticleSetList::ndNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
+	const ndBodyList& particles = world->GetParticleList();
+	for (ndBodyList::ndNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
 	{
-		ndBodyParticleSet* const particle = particleNode->GetInfo();
+		ndBodyParticleSet* const particle = particleNode->GetInfo()->GetAsBodyParticleSet();
 		const ndArray<ndVector>& positions = particle->GetPositions();
 		if (positions.GetCount())
 		{

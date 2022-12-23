@@ -192,15 +192,14 @@ void ndWorld::CleanUp()
 
 	while (m_particleSetList.GetFirst())
 	{
-		ndAssert(0);
-		//ndBodyParticleSet* const body = m_particleSetList.GetFirst()->GetInfo();
-		//RemoveBody(body);
-		//delete body;
+		//ndBodyParticleSet* const body = m_particleSetList.GetFirst()->GetInfo()->GetAsBodyParticleSet();
+		ndSharedPtr<ndBody>& body = m_particleSetList.GetFirst()->GetInfo();
+		RemoveBody(body);
 	}
 
 	while (m_scene->m_bodyList.GetFirst())
 	{
-		ndSharedPtr<ndBodyKinematic>& body = m_scene->m_bodyList.GetFirst()->GetInfo();
+		ndSharedPtr<ndBody>& body = m_scene->m_bodyList.GetFirst()->GetInfo();
 		RemoveBody(body);
 	}
 
@@ -279,7 +278,7 @@ ndBodyKinematic* ndWorld::GetSentinelBody() const
 	return m_scene->GetSentinelBody();
 }
 
-const ndBodyList& ndWorld::GetBodyList() const
+const ndBodyListView& ndWorld::GetBodyList() const
 {
 	return m_scene->GetBodyList();
 }
@@ -299,7 +298,7 @@ const ndSkeletonList& ndWorld::GetSkeletonList() const
 	return m_skeletonList;
 }
 
-const ndBodyParticleSetList& ndWorld::GetParticleList() const
+const ndBodyList& ndWorld::GetParticleList() const
 {
 	return m_particleSetList;
 }
@@ -361,9 +360,10 @@ void ndWorld::SendBackgroundTask(ndBackgroundTask* const job)
 
 void ndWorld::UpdateTransforms()
 {
-	for (ndBodyParticleSetList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyParticleSet* const particleSet = node->GetInfo();
+		ndBodyParticleSet* const particleSet = node->GetInfo()->GetAsBodyParticleSet();
+		ndAssert(particleSet);
 		ndBodyNotify* const notify = particleSet->GetNotifyCallback();
 		if (notify)
 		{
@@ -380,7 +380,7 @@ void ndWorld::PostUpdate(ndFloat32)
 	OnPostUpdate(m_timestep);
 }
 
-bool ndWorld::AddBody(ndSharedPtr<ndBodyKinematic>& body)
+bool ndWorld::AddBody(ndSharedPtr<ndBody>& body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	ndAssert(kinematicBody != GetSentinelBody());
@@ -390,11 +390,10 @@ bool ndWorld::AddBody(ndSharedPtr<ndBodyKinematic>& body)
 	}
 	else if (body->GetAsBodyParticleSet())
 	{
-		ndAssert(0);
-		//ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
-		//ndAssert(particleSet->m_listNode == nullptr);
-		//ndBodyParticleSetList::ndNode* const node = m_particleSetList.Append(particleSet);
-		//particleSet->m_listNode = node;
+		ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
+		ndAssert(particleSet->m_listNode == nullptr);
+		ndBodyList::ndNode* const node = m_particleSetList.Append(body);
+		particleSet->m_listNode = node;
 	}
 	return false;
 }
@@ -564,9 +563,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 void ndWorld::ParticleUpdate(ndFloat32 timestep)
 {
 	D_TRACKTIME();
-	for (ndBodyParticleSetList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyParticleSet* const body = node->GetInfo();
+		ndBodyParticleSet* const body = node->GetInfo()->GetAsBodyParticleSet();
 		body->Update(this, timestep);
 	}
 }
@@ -1051,9 +1050,9 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 		}
 
 		#ifdef _DEBUG
-		for (ndBodyList::ndNode* node = m_scene->GetBodyList().GetFirst(); node; node = node->GetNext())
+		for (ndBodyListView::ndNode* node = m_scene->GetBodyList().GetFirst(); node; node = node->GetNext())
 		{
-			ndBodyKinematic* const body = *node->GetInfo();
+			ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
 			ndAssert(body->GetContactMap().SanityCheck());
 		}
 		#endif
@@ -1082,8 +1081,7 @@ void ndWorld::Update(ndFloat32 timestep)
 	m_scene->TickOne();
 }
 
-
-void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
+void ndWorld::RemoveBody(ndSharedPtr<ndBody>& body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (m_inUpdate)
@@ -1107,11 +1105,10 @@ void ndWorld::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 				ndAssert(joint->m_worldNode);
 				RemoveJoint(joint->m_worldNode->GetInfo());
 			}
-			m_scene->RemoveBody(body);
+			m_scene->RemoveBody(kinematicBody);
 		}
 		else if (body->GetAsBodyParticleSet())
 		{
-			ndAssert(0);
 			ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
 			ndAssert(particleSet->m_listNode);
 			m_particleSetList.Remove(particleSet->m_listNode);

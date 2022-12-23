@@ -383,7 +383,7 @@ namespace biped_1
 			// create the rigid body that will make this body
 			ndMatrix matrix(entityPart->CalculateGlobalMatrix());
 
-			ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+			ndBodyKinematic* const body = new ndBodyDynamic();
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(*shape);
 			body->SetMassMatrix(1.0f, *shape);
@@ -396,7 +396,9 @@ namespace biped_1
 			instanceShape.m_shapeMaterial.m_userParam[ndContactCallback::m_materialFlags].m_intData = ndUnsigned64(definition.m_selfCollide);
 
 			m_bodyArray.PushBack(body->GetAsBodyDynamic());
-			scene->GetWorld()->AddBody(body);
+			ndSharedPtr<ndBody> bodyPtr(body);
+			scene->GetWorld()->AddBody(bodyPtr);
+
 			return body->GetAsBodyDynamic();
 		}
 

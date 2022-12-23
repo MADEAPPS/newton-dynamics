@@ -39,7 +39,7 @@ class SplinePathBody : public ndBodyDynamic
 		SetCollisionShape(box);
 		scene->AddEntity(entity);
 
-		ndSharedPtr<ndBodyKinematic> bodyPtr(this);
+		ndSharedPtr<ndBody> bodyPtr(this);
 		world->AddBody(bodyPtr);
 		
 		// create a Bezier Spline path for AI car to drive
@@ -129,12 +129,13 @@ static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMa
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh);
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
 	scene->AddEntity(entity);
 	return body->GetAsBodyDynamic();
 }
@@ -764,7 +765,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, 1.0));
 		ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
 		
-		ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+		ndBodyKinematic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix1, rootEntity);
 		
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -772,7 +773,8 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& orig
 		body->SetCollisionShape(shape);
 		body->SetMassMatrix(1.0f, shape);
 		
-		world->AddBody(body);
+		ndSharedPtr<ndBody> bodyPtr(body);
+		world->AddBody(bodyPtr);
 		
 		bodies[i] = body->GetAsBodyDynamic();
 		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));

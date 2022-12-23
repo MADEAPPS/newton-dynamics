@@ -23,7 +23,6 @@
 #define __ND_BODY_PARTICLE_SET_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndBodyParticleSetList.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyParticleSet: public ndBody, public ndBackgroundTask
@@ -56,7 +55,7 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	ndVector m_gravity;
 	ndArray<ndVector> m_posit;
 	ndArray<ndVector> m_veloc;
-	ndBodyParticleSetList::ndNode* m_listNode;
+	ndBodyList::ndNode* m_listNode;
 	ndFloat32 m_radius;
 	bool m_updateInBackground;
 	friend class ndWorld;

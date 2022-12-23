@@ -49,8 +49,8 @@
 //#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
-//#define DEFAULT_SCENE	10		// basic joints
-#define DEFAULT_SCENE	11		// basic vehicle
+#define DEFAULT_SCENE	10		// basic joints
+//#define DEFAULT_SCENE	11		// basic vehicle
 //#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
@@ -718,10 +718,10 @@ void ndDemoEntityManager::Cleanup ()
 	// destroy the Newton world
 	if (m_world) 
 	{
-		const ndBodyList& bodyList = m_world->GetBodyList();
-		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		const ndBodyListView& bodyList = m_world->GetBodyList();
+		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
-			ndBodyKinematic* const body = *bodyNode->GetInfo();
+			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 			ndDemoEntityNotify* const callback = (ndDemoEntityNotify*)body->GetNotifyCallback();
 			if (callback)
 			{
@@ -807,10 +807,10 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	m_world->SetThreadCount(m_workerThreads);
 	
 	bool state = m_autoSleepMode ? true : false;
-	const ndBodyList& bodyList = m_world->GetBodyList();
-	for (ndBodyList::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	const ndBodyListView& bodyList = m_world->GetBodyList();
+	for (ndBodyListView::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyKinematic* const body = *node->GetInfo();
+		ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
 		body->SetAutoSleep(state);
 	}
 	
@@ -1171,10 +1171,10 @@ void ndDemoEntityManager::BeginFrame()
 ndInt32 ndDemoEntityManager::ParticleCount() const
 {
 	ndInt32 count = 0;
-	const ndBodyParticleSetList& particles = m_world->GetParticleList();
-	for (ndBodyParticleSetList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
+	const ndBodyList& particles = m_world->GetParticleList();
+	for (ndBodyList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyParticleSet* const set = node->GetInfo();
+		ndBodyParticleSet* const set = node->GetInfo()->GetAsBodyParticleSet();
 		count += set->GetPositions().GetCount();
 	}
 	return count;
@@ -1182,10 +1182,10 @@ ndInt32 ndDemoEntityManager::ParticleCount() const
 
 void ndDemoEntityManager::SetParticleUpdateMode() const
 {
-	const ndBodyParticleSetList& particles = m_world->GetParticleList();
-	for (ndBodyParticleSetList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
+	const ndBodyList& particles = m_world->GetParticleList();
+	for (ndBodyList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyParticleSet* const set = node->GetInfo();
+		ndBodyParticleSet* const set = node->GetInfo()->GetAsBodyParticleSet();
 		set->SetAsynUpdate(!m_synchronousParticlesUpdate);
 	}
 }
@@ -1444,15 +1444,15 @@ void ndDemoEntityManager::DrawDebugShapes()
 	const ndVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
 	const ndVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
 	
-	const ndBodyList& bodyList = m_world->GetBodyList();
+	const ndBodyListView& bodyList = m_world->GetBodyList();
 	
 	if (m_collisionDisplayMode == 3)
 	{
 		// do a z buffer pre pass for hidden line 
 		glColorMask(0, 0, 0, 0);
-		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
-			ndBodyKinematic* const body = *bodyNode->GetInfo();
+			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 			ndShape* const key = (ndShape*)shapeInstance.GetShape();
 			if (key->GetAsShapeStaticProceduralMesh())
@@ -1473,9 +1473,9 @@ void ndDemoEntityManager::DrawDebugShapes()
 		glColorMask(1, 1, 1, 1);
 	}
 	
-	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
-		ndBodyKinematic* const body = *bodyNode->GetInfo();
+		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 		ndShape* const key = (ndShape*)shapeInstance.GetShape();
 		if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))

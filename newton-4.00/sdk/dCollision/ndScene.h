@@ -24,7 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndBvhNode.h"
-#include "ndListView.h"
+#include "ndBodyListView.h"
 #include "ndContactArray.h"
 #include "ndPolygonMeshDesc.h"
 
@@ -73,8 +73,8 @@ class ndScene : public ndThreadPool
 
 	public:
 	D_COLLISION_API virtual ~ndScene();
-	D_COLLISION_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
-	D_COLLISION_API virtual bool RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
+	D_COLLISION_API virtual bool AddBody(ndSharedPtr<ndBody>& body);
+	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
 	D_COLLISION_API virtual void Begin();
 	D_COLLISION_API virtual void End();
@@ -99,7 +99,7 @@ class ndScene : public ndThreadPool
 	ndInt32 GetThreadCount() const;
 
 	virtual ndWorld* GetWorld() const;
-	const ndBodyList& GetBodyList() const;
+	const ndBodyListView& GetBodyList() const;
 
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
@@ -147,7 +147,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
 
-	ndBodyList m_bodyList;
+	ndBodyListView m_bodyList;
 	ndContactArray m_contactArray;
 	ndBvhSceneManager m_bvhSceneManager;
 	ndArray<ndUnsigned8> m_scratchBuffer;
@@ -214,7 +214,7 @@ inline ndArray<ndUnsigned8>& ndScene::GetScratchBuffer()
 	return m_scratchBuffer;
 }
 
-inline const ndBodyList& ndScene::GetBodyList() const
+inline const ndBodyListView& ndScene::GetBodyList() const
 {
 	return m_bodyList;
 }

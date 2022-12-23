@@ -36,14 +36,16 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(geometry);
 
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(location);
 	body->SetCollisionShape(box);
 
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
+
 	scene->AddEntity(entity);
-	return *body;
+	return body;
 }
 
 ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
@@ -140,13 +142,15 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	entity->SetMesh(geometry);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(plane);
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
+
 	scene->AddEntity(entity);
-	return *body;
+	return body;
 }
 
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
@@ -180,14 +184,16 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry);
 
-	ndSharedPtr<ndBodyKinematic> body (new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(plane);
 
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
+
 	scene->AddEntity(entity);
-	return *body;
+	return body;
 }
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
@@ -259,14 +265,15 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 	
 	ndMatrix matrix(visualEntity->GetCurrentMatrix());
-	ndSharedPtr<ndBodyKinematic> body (new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualEntity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
-	scene->GetWorld()->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	scene->GetWorld()->AddBody(bodyPtr);
 	
 	delete meshEffectNode;
-	return *body;
+	return body;
 }
 
 ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
@@ -336,11 +343,12 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	meshBuilder.End(true);
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix matrix(entity->GetCurrentMatrix());
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
-	scene->GetWorld()->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	scene->GetWorld()->AddBody(bodyPtr);
 
 #if 0
 	ndDemoEntity* const pivot0 = entity->Find("pivot1");
@@ -418,7 +426,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	}
 #endif
 	delete meshEffectNode;
-	return *body;
+	return body;
 }
 
 //static void GetPointAndTangentAtLocation(const ndBezierSpline& aspline, const ndMatrix amatrix, const ndVector& location, ndVector& positOut, ndVector& tangentOut)

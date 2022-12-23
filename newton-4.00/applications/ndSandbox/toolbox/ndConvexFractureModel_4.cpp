@@ -352,8 +352,9 @@ void ndConvexFractureModel_4::UpdateEffect(ndWorld* const world, ndEffect& effec
 		ndVector center(matrix.TransformVector(atom.m_centerOfMass));
 		ndVector debriVeloc(veloc + omega.CrossProduct(center - com));
 
-		ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
-		world->AddBody(body);
+		ndBodyKinematic* const body = new ndBodyDynamic();
+		ndSharedPtr<ndBody> bodyPtr(body);
+		world->AddBody(bodyPtr);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);

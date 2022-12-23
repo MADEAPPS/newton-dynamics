@@ -19,20 +19,43 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_BODY_PARTICLE_SET_LIST_H__
-#define __ND_BODY_PARTICLE_SET_LIST_H__
+#include "ndCoreStdafx.h"
+#include "ndCollisionStdafx.h"
+#include "ndBodyListView.h"
+#include "ndBodyKinematic.h"
 
-#include "ndNewtonStdafx.h"
-
-class ndBodyParticleSet;
-class ndBodyParticleSetList : public ndList<ndBodyParticleSet*, ndContainersFreeListAlloc<ndBodyParticleSet*>>
+ndBodyListView::ndBodyListView(const ndBodyListView& src)
+	:ndList<ndSharedPtr<ndBody>, ndContainersFreeListAlloc<ndSharedPtr<ndBody>*>>()
+	,m_view(1024)
+	,m_listIsDirty(1)
 {
-	public:
-	ndBodyParticleSetList()
-		:ndList<ndBodyParticleSet*, ndContainersFreeListAlloc<ndBodyParticleSet*>>()
+	ndNode* nextNode;
+	ndBodyListView* const stealData = (ndBodyListView*)&src;
+	for (ndNode* node = stealData->GetFirst(); node; node = nextNode)
 	{
+		nextNode = node->GetNext();
+		stealData->Unlink(node);
+		Append(node);
 	}
-};
+	m_view.Swap(stealData->m_view);
+}
+	
+bool ndBodyListView::UpdateView()
+{
+	bool ret = false;
+	if (m_listIsDirty)
+	{
+		D_TRACKTIME();
+		ret = true;
+		m_listIsDirty = 0;
+		ndInt32 index = 0;
+		m_view.SetCount(GetCount());
+		for (ndNode* node = GetFirst(); node; node = node->GetNext())
+		{
+			m_view[index] = node->GetInfo()->GetAsBodyKinematic();
+			index++;
+		}
+	}
+	return ret;
+}
 
-
-#endif

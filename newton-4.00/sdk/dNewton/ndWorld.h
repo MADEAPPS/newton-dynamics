@@ -26,7 +26,6 @@
 #include "ndModelList.h"
 #include "ndJointList.h"
 #include "ndSkeletonList.h"
-#include "ndBodyParticleSetList.h"
 
 class ndWorld;
 class ndModel;
@@ -80,30 +79,28 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API void SelectSolver(ndSolverModes solverMode);
 
 	D_NEWTON_API bool IsGPU() const;
+	D_NEWTON_API ndScene* GetScene() const;
 	D_NEWTON_API const char* GetSolverString() const;
+	D_NEWTON_API ndBodyKinematic* GetSentinelBody() const;
 
+	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBody>& body);
 	D_NEWTON_API virtual void AddModel(ndSharedPtr<ndModel>& model);
-	D_NEWTON_API virtual bool AddBody(ndSharedPtr<ndBodyKinematic>& body);
 	D_NEWTON_API virtual void AddJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 
-	D_NEWTON_API const ndBodyList& GetBodyList() const;
 	D_NEWTON_API const ndJointList& GetJointList() const;
 	D_NEWTON_API const ndModelList& GetModelList() const;
+	D_NEWTON_API const ndBodyListView& GetBodyList() const;
+	D_NEWTON_API const ndBodyList& GetParticleList() const;
 	D_NEWTON_API const ndContactArray& GetContactList() const;
 	D_NEWTON_API const ndSkeletonList& GetSkeletonList() const;
-	D_NEWTON_API const ndBodyParticleSetList& GetParticleList() const;
-
-	D_NEWTON_API ndBodyKinematic* GetSentinelBody() const;
 
 	D_NEWTON_API ndInt32 GetSolverIterations() const;
 	D_NEWTON_API void SetSolverIterations(ndInt32 iterations);
-
-	D_NEWTON_API ndScene* GetScene() const;
-
+	
 	D_NEWTON_API ndFloat32 GetUpdateTime() const;
 	D_NEWTON_API ndUnsigned32 GetFrameNumber() const;
 	D_NEWTON_API ndUnsigned32 GetSubFrameNumber() const;
@@ -131,8 +128,8 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void PostModelTransform();
 
 	private:
+	void RemoveBody(ndSharedPtr<ndBody>& body);
 	void RemoveModel(ndSharedPtr<ndModel>& model);
-	void RemoveBody(ndSharedPtr<ndBodyKinematic>& body);
 	void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	class dgSolverProgressiveSleepEntry
@@ -164,7 +161,7 @@ class ndWorld: public ndClassAlloc
 	ndJointList m_jointList;
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
-	ndBodyParticleSetList m_particleSetList;
+	ndBodyList m_particleSetList;
 	ndArray<ndBody*> m_deletedBodies;
 	ndArray<ndModel*> m_deletedModels;
 	ndArray<ndJointBilateralConstraint*> m_deletedJoints;

@@ -180,7 +180,8 @@ class BackGroundVehicleController : public ndModel
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)
 {
 	ndWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	ndDemoEntity* const pEntity = new ndDemoEntity(matrix, rootEntity);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, pEntity));
 	body->SetMatrix(matrix);
@@ -189,7 +190,8 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMat
 	ndSharedPtr<ndModel> controller (new BackGroundVehicleController(scene, body->GetAsBodyDynamic()));
 
 	world->AddModel(controller);
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
 	return body->GetAsBodyDynamic();
 }
 

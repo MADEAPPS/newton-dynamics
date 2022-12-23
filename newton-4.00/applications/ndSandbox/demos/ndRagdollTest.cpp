@@ -225,14 +225,15 @@ namespace ndRagdoll
 			// create the rigid body that will make this body
 			ndMatrix matrix(entityPart->CalculateGlobalMatrix());
 
-			//ndBodyKinematic* body = new ndBodyDynamic();
-			ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+			ndBodyKinematic* const body = new ndBodyDynamic();
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(*shape);
 			body->SetMassMatrix(1.0f, *shape);
 			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
 
-			scene->GetWorld()->AddBody(body);
+			ndSharedPtr<ndBody> bodyPtr(body);
+			scene->GetWorld()->AddBody(bodyPtr);
+
 			return body->GetAsBodyDynamic();
 		}
 

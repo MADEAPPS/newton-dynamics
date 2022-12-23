@@ -250,18 +250,19 @@ void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const, ndFloat32)
 
 void ndExplodeConvexShapeModel::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
 {
-	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
-
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh);
-	m_scene->AddEntity(entity);
-
-	//ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
-	m_scene->GetWorld()->AddBody(newEffect.m_body____);
-
-	newEffect.m_body____->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
-	newEffect.m_body____->SetMatrix(location);
-	newEffect.m_body____->SetMassMatrix(mass, *effect.m_shape);
+	ndAssert(0);
+	//ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
+	//
+	//ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	//entity->SetMesh(effect.m_visualMesh);
+	//m_scene->AddEntity(entity);
+	//
+	////ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
+	//m_scene->GetWorld()->AddBody(newEffect.m_body____);
+	//
+	//newEffect.m_body____->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+	//newEffect.m_body____->SetMatrix(location);
+	//newEffect.m_body____->SetMassMatrix(mass, *effect.m_shape);
 }
 
 void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& effect)
@@ -297,8 +298,9 @@ void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& eff
 		ndVector center(matrix.TransformVector(atom.m_centerOfMass));
 		ndVector debriVeloc(veloc + omega.CrossProduct(center - com));
 
-		ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
-		world->AddBody(body);
+		ndBodyKinematic* const body = new ndBodyDynamic();
+		ndSharedPtr<ndBody> bodyPtr(body);
+		world->AddBody(bodyPtr);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);

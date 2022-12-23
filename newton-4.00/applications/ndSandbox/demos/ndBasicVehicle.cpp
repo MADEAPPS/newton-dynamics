@@ -258,7 +258,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndPhysicsWorld* const world = scene->GetWorld();
 
 		// create the vehicle chassis as a normal rigid body
-		ndSharedPtr<ndBodyKinematic> chassis (CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass));
+		ndBodyKinematic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
 		chassis->SetAngularDamping(ndVector(m_configuration.m_chassisAngularDrag));
 
 		// lower vehicle com;
@@ -269,30 +269,37 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		chassis->SetCentreOfMass(com);
 
 		// 1- add chassis to the vehicle mode 
-		SetChassis(*chassis);
-		world->AddBody(chassis);
+		SetChassis(chassis);
+		ndSharedPtr<ndBody> bodyPtr(chassis);
+		world->AddBody(bodyPtr);
+
 
 		// 2- each tire to the model, 
 		// create the tire as a normal rigid body
 		// and attach them to the chassis with a tire joints
 		ndVehicleDectriptor::ndTireDefinition rr_tireConfiguration(m_configuration.m_rearTire);
 		ndVehicleDectriptor::ndTireDefinition rl_tireConfiguration(m_configuration.m_rearTire);
-		ndSharedPtr<ndBodyKinematic> rr_tire_body (CreateTireBody(scene, *chassis, rr_tireConfiguration, "rr_tire"));
-		ndSharedPtr<ndBodyKinematic> rl_tire_body (CreateTireBody(scene, *chassis, rl_tireConfiguration, "rl_tire"));
-		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(rr_tireConfiguration, *rr_tire_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(rl_tireConfiguration, *rl_tire_body);
+		ndBodyKinematic* const rr_tire_body = CreateTireBody(scene, chassis, rr_tireConfiguration, "rr_tire");
+		ndBodyKinematic* const rl_tire_body = CreateTireBody(scene, chassis, rl_tireConfiguration, "rl_tire");
+		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(rr_tireConfiguration, rr_tire_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(rl_tireConfiguration, rl_tire_body);
 
 		ndVehicleDectriptor::ndTireDefinition fr_tireConfiguration(m_configuration.m_frontTire);
 		ndVehicleDectriptor::ndTireDefinition fl_tireConfiguration(m_configuration.m_frontTire);
-		ndSharedPtr<ndBodyKinematic> fr_tire_body (CreateTireBody(scene, *chassis, fr_tireConfiguration, "fr_tire"));
-		ndSharedPtr<ndBodyKinematic> fl_tire_body (CreateTireBody(scene, *chassis, fl_tireConfiguration, "fl_tire"));
-		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, *fr_tire_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, *fl_tire_body);
+		ndBodyKinematic* const fr_tire_body = CreateTireBody(scene, chassis, fr_tireConfiguration, "fr_tire");
+		ndBodyKinematic* const fl_tire_body = CreateTireBody(scene, chassis, fl_tireConfiguration, "fl_tire");
+		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
 
-		world->AddBody(rr_tire_body);
-		world->AddBody(rl_tire_body);
-		world->AddBody(fr_tire_body);
-		world->AddBody(fl_tire_body);
+		ndSharedPtr<ndBody> rr_tire_body_Ptr(rr_tire_body);
+		ndSharedPtr<ndBody> rl_tire_body_Ptr(rl_tire_body);
+		ndSharedPtr<ndBody> fr_tire_body_Ptr(fr_tire_body);
+		ndSharedPtr<ndBody> fl_tire_body_Ptr(fl_tire_body);
+
+		world->AddBody(rr_tire_body_Ptr);
+		world->AddBody(rl_tire_body_Ptr);
+		world->AddBody(fr_tire_body_Ptr);
+		world->AddBody(fl_tire_body_Ptr);
 
 		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		//m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;

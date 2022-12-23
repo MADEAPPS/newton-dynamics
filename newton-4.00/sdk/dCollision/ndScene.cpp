@@ -117,9 +117,9 @@ ndScene::ndScene(const ndScene& src)
 		m_specialUpdateList.Append(node);
 	}
 
-	for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyListView::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyKinematic* const body = *node->GetInfo();
+		ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
 		body->m_sceneForceUpdate = 1;
 		ndScene* const sceneNode = body->GetScene();
 		if (sceneNode)
@@ -196,20 +196,21 @@ void ndScene::DebugScene(ndSceneTreeNotiFy* const notify)
 	}
 }
 
-//bool ndScene::AddBody(ndBodyKinematic* const body)
-bool ndScene::AddBody(ndSharedPtr<ndBodyKinematic>& body)
+bool ndScene::AddBody(ndSharedPtr<ndBody>& body)
 {
-	if ((body->m_scene == nullptr) && (body->m_sceneNode == nullptr))
+	ndAssert(body->GetAsBodyKinematic());
+	ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
+	if ((kinBody->m_scene == nullptr) && (kinBody->m_sceneNode == nullptr))
 	{
-		ndBodyList::ndNode* const node = m_bodyList.AddItem(body);
-		body->SetSceneNodes(this, node);
-		m_contactNotifyCallback->OnBodyAdded(*body);
-		body->UpdateCollisionMatrix();
+		ndBodyListView::ndNode* const node = m_bodyList.AddItem(body);
+		kinBody->SetSceneNodes(this, node);
+		m_contactNotifyCallback->OnBodyAdded(kinBody);
+		kinBody->UpdateCollisionMatrix();
 		
-		m_rootNode = m_bvhSceneManager.AddBody(*body, m_rootNode);
-		if (body->GetAsBodyKinematicSpecial())
+		m_rootNode = m_bvhSceneManager.AddBody(kinBody, m_rootNode);
+		if (kinBody->GetAsBodyKinematicSpecial())
 		{
-			body->m_spetialUpdateNode = m_specialUpdateList.Append(*body);
+			kinBody->m_spetialUpdateNode = m_specialUpdateList.Append(kinBody);
 		}
 		
 		m_forceBalanceSceneCounter = 0;
@@ -219,19 +220,24 @@ bool ndScene::AddBody(ndSharedPtr<ndBodyKinematic>& body)
 	return false;
 }
 
-bool ndScene::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
+//bool ndScene::RemoveBody(ndSharedPtr<ndBody>& bodyPtr)
+bool ndScene::RemoveBody(ndBodyKinematic* const body)
 {
-	m_forceBalanceSceneCounter = 0;
-	m_bvhSceneManager.RemoveBody(*body);
+	//ndAssert(bodyPtr->GetAsBodyKinematic());
 
+	m_forceBalanceSceneCounter = 0;
+	//ndSharedPtr<ndBodyKinematic>& body = (ndSharedPtr<ndBodyKinematic>&) bodyPtr;
+	//ndBodyKinematic* const body = bodyPtr->GetAsBodyKinematic();
+	m_bvhSceneManager.RemoveBody(body);
+	
 	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
 	while (contactMap.GetRoot())
 	{
 		ndContact* const contact = contactMap.GetRoot()->GetInfo();
 		m_contactArray.DetachContact(contact);
 	}
-
-	ndBodyList::ndNode* const sceneNode = body->m_sceneNode;
+	
+	ndBodyListView::ndNode* const sceneNode = body->m_sceneNode;
 	if (body->m_scene && sceneNode)
 	{
 		if (body->GetAsBodyKinematicSpecial())
@@ -239,8 +245,8 @@ bool ndScene::RemoveBody(ndSharedPtr<ndBodyKinematic>& body)
 			m_specialUpdateList.Remove(body->m_spetialUpdateNode);
 			body->m_spetialUpdateNode = nullptr;
 		}
-
-		m_contactNotifyCallback->OnBodyRemoved(*body);
+	
+		m_contactNotifyCallback->OnBodyRemoved(body);
 		body->SetSceneNodes(nullptr, nullptr);
 		m_bodyList.RemoveItem(sceneNode);
 		return true;

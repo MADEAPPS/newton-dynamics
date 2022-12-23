@@ -30,7 +30,7 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
@@ -49,7 +49,8 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	material.m_userParam[ndContactCallback::m_density].m_floatData = density;
 	body->GetCollisionShape().SetMaterial(material);
 
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
 }
 
 //static void AddSphere(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density)

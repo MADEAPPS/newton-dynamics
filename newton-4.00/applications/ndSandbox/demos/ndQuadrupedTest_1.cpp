@@ -549,7 +549,7 @@ namespace ndQuadruped_1
 			// create the rigid body that will make this body
 			ndMatrix matrix(entityPart->CalculateGlobalMatrix());
 
-			ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+			ndBodyKinematic* const body = new ndBodyDynamic();
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(*shape);
 			body->SetMassMatrix(mass, *shape);
@@ -562,7 +562,9 @@ namespace ndQuadruped_1
 			delete shape;
 
 			// add body to the world
-			scene->GetWorld()->AddBody(body);
+			ndSharedPtr<ndBody> bodyPtr(body);
+			scene->GetWorld()->AddBody(bodyPtr);
+
 			return body->GetAsBodyDynamic();
 		}
 

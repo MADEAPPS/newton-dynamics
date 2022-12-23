@@ -88,7 +88,7 @@ class ndLoadSaveInfo
 	nd::TiXmlElement* m_jointsNode;
 	nd::TiXmlElement* m_modelsNode;
 
-	const ndBodyList* m_bodyList;
+	const ndBodyListView* m_bodyList;
 	const ndJointList* m_jointList;
 	const ndModelList* m_modelList;
 	const ndWordSettings* m_setting;
@@ -318,7 +318,7 @@ void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 	//descriptor.m_assetName = info.m_assetName;
 	//descriptor.m_rootNode = info.m_bodiesNode;
 	//
-	//for (ndBodyList::ndNode* bodyNode = info.m_bodyList->GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	//for (ndBodyListView::ndNode* bodyNode = info.m_bodyList->GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	//{
 	//	ndBodyKinematic* const body = bodyNode->GetInfo();
 	//
@@ -532,7 +532,7 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	//
 	//ndModelList modelList;
 	//ndJointList jointList;
-	//ndBodyList bodyList;
+	//ndBodyListView bodyList;
 	//modelList.Append((ndModel*)model);
 	//
 	//ndWordSettings settings;

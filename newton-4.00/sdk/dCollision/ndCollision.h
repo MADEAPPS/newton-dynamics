@@ -34,7 +34,6 @@
 #include <ndShape.h>
 #include <ndBvhNode.h>
 #include <ndContact.h>
-#include <ndListView.h>
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
 #include <ndShapeCone.h>
@@ -44,6 +43,7 @@
 #include <ndShapePoint.h>
 #include <ndShapeSphere.h>
 #include <ndShapeConvex.h>
+#include <ndBodyListView.h>
 #include <ndContactArray.h>
 #include <ndShapeCapsule.h>
 #include <ndShapeCylinder.h>

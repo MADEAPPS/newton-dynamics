@@ -407,16 +407,17 @@ if (!test)
 debrisEnt->SetMatrix(ndQuaternion(location), location.m_posit + ndVector(0.0f, -10.0f, 0.0f, 0.0f));
 else
 {
-		debrisEnt->SetMatrix(ndQuaternion(location), location.m_posit);
-		//ndBodyDynamic* const body = debrisEnt->m_drebriBody;
-		world->AddBody(debrisEnt->m_drebriBody____);
-		debrisEnt->m_drebriBody____->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
-		debrisEnt->m_drebriBody____->SetMatrix(location);
-		bodyArray[debrisEnt->m_enumerator] = debrisEnt->m_drebriBody____->GetAsBodyDynamic();
-
-		// set material id properties
-		ndShapeInstance& instanceShape = debrisEnt->m_drebriBody____->GetCollisionShape();
-		instanceShape.m_shapeMaterial.m_userId = debrisID;
+		ndAssert(0);
+		//debrisEnt->SetMatrix(ndQuaternion(location), location.m_posit);
+		////ndBodyDynamic* const body = debrisEnt->m_drebriBody;
+		//world->AddBody(debrisEnt->m_drebriBody____);
+		//debrisEnt->m_drebriBody____->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
+		//debrisEnt->m_drebriBody____->SetMatrix(location);
+		//bodyArray[debrisEnt->m_enumerator] = debrisEnt->m_drebriBody____->GetAsBodyDynamic();
+		//
+		//// set material id properties
+		//ndShapeInstance& instanceShape = debrisEnt->m_drebriBody____->GetCollisionShape();
+		//instanceShape.m_shapeMaterial.m_userId = debrisID;
 	#if 0
 		ExplodeLocation(body, location, 0.3f);
 	#endif

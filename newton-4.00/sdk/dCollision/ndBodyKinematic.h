@@ -24,8 +24,8 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
-#include "ndListView.h"
 #include "ndConstraint.h"
+#include "ndBodyListView.h"
 
 class ndScene;
 class ndModel;
@@ -181,7 +181,7 @@ class ndBodyKinematic : public ndBody
 
 	void UpdateCollisionMatrix();
 	void PrepareStep(ndInt32 index);
-	void SetSceneNodes(ndScene* const scene, ndBodyList::ndNode* const node);
+	void SetSceneNodes(ndScene* const scene, ndBodyListView::ndNode* const node);
 
 	virtual void AddDampingAcceleration(ndFloat32 timestep);
 	
@@ -201,7 +201,7 @@ class ndBodyKinematic : public ndBody
 	mutable ndSpinLock m_lock;
 	ndScene* m_scene;
 	ndBodyKinematic* m_islandParent;
-	ndBodyList::ndNode* m_sceneNode;
+	ndBodyListView::ndNode* m_sceneNode;
 	ndSkeletonContainer* m_skeletonContainer;
 	ndSpecialList<ndBodyKinematic>::ndNode* m_spetialUpdateNode;
 
@@ -327,7 +327,7 @@ inline ndScene* ndBodyKinematic::GetScene() const
 	return m_scene;
 }
 
-inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyList::ndNode* const node)
+inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyListView::ndNode* const node)
 {
 	m_scene = scene;
 	m_sceneNode = node;

@@ -31,14 +31,15 @@ static ndBodyDynamic* AddRigidBody(
 	const ndMatrix& matrix, const ndShapeInstance& shape,
 	ndDemoEntity* const entity, ndFloat32 mass)
 {
-	ndSharedPtr<ndBodyKinematic> body(new ndBodyDynamic());
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
 
 	ndWorld* const world = scene->GetWorld();
-	world->AddBody(body);
+	ndSharedPtr<ndBody> bodyPtr(body);
+	world->AddBody(bodyPtr);
 	scene->AddEntity(entity);
 	return body->GetAsBodyDynamic();
 }
