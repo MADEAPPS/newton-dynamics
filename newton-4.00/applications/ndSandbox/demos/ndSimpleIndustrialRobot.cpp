@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
+#include "ndUIEntity.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
@@ -265,10 +266,6 @@ namespace ndSimpleRobot
 
 		~ndIndustrialRobot()
 		{
-			if (m_effector && !m_effector->IsInWorld())
-			{
-				delete m_effector;
-			}
 		}
 
 		void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -464,6 +461,55 @@ namespace ndSimpleRobot
 		ndReal m_roll;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndSimpleRobot::ndIndustrialRobot);
+
+	class ndRobotUI : public ndUIEntity
+	{
+		public:
+		ndRobotUI(ndDemoEntityManager* const scene, ndIndustrialRobot* const robot)
+			:ndUIEntity(scene)
+			,m_robot(robot)
+		{
+		}
+
+		~ndRobotUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			m_scene->Print(color, "Control panel");
+
+			bool change = false;
+			ImGui::Text("position x");
+			change = change | ImGui::SliderFloat("##x", &m_robot->m_x, 0.0f, 5.0f);
+			ImGui::Text("position y");
+			change = change | ImGui::SliderFloat("##y", &m_robot->m_y, -2.5f, 2.0f);
+			ImGui::Text("azimuth");
+			change = change | ImGui::SliderFloat("##azimuth", &m_robot->m_azimuth, -180.0f, 180.0f);
+			
+			ImGui::Text("gripper");
+			change = change | ImGui::SliderFloat("##gripper", &m_robot->m_gripperPosit, -0.2f, 0.4f);
+			
+			ImGui::Text("pitch");
+			change = change | ImGui::SliderFloat("##pitch", &m_robot->m_pitch, -180.0f, 180.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##yaw", &m_robot->m_yaw, -180.0f, 180.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##roll", &m_robot->m_roll, -180.0f, 180.0f);
+			
+			if (change)
+			{
+				m_robot->m_rootBody->SetSleepState(false);
+			}
+		}
+
+		ndIndustrialRobot* m_robot;
+	};
 };
 
 using namespace ndSimpleRobot;
@@ -485,8 +531,9 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	world->AddModel(robotPtr);
 	world->AddJoint (fixJoint);
 	
-	ndAssert(0);
-	//scene->Set2DDisplayRenderFunction(ndIndustrialRobot::RobotControlPanel, nullptr, robot);
+	ndRobotUI* const robotUI = new ndRobotUI(scene, robot);
+	ndSharedPtr<ndUIEntity> robotUIPtr(robotUI);
+	scene->Set2DDisplayRenderFunction(robotUIPtr);
 	
 	//matrix.m_posit.m_x += 2.0f;
 	//matrix.m_posit.m_z -= 2.0f;
