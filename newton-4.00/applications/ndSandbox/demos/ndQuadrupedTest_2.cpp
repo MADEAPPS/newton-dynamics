@@ -71,7 +71,7 @@ namespace ndQuadruped_2
 			ndParamMapper m_swivel_mapper;
 		};
 
-		ndQuadrupedModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+		ndQuadrupedModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
@@ -85,8 +85,13 @@ namespace ndQuadruped_2
 			ndFloat32 limbRadios = 0.06f;
 			
 			ndPhysicsWorld* const world = scene->GetWorld();
-			ndBodyKinematic* const torso = AddSphere(scene, location, mass, radius, "smilli.tga");
+			ndVector floor(FindFloor(*world, matrixLocation.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			ndBodyKinematic* const torso = AddSphere(scene, matrixLocation, mass, radius, "smilli.tga");
 			m_rootBody = torso->GetAsBodyDynamic();
+			
+			ndMatrix location(matrixLocation);
+			location.m_posit.m_y = floor.m_y + 1.0f;
+			m_rootBody->SetMatrix(location);
 			
 			ndDemoEntity* const entity = (ndDemoEntity*)torso->GetNotifyCallback()->GetUserData();
 			entity->SetMeshMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * ndPitchMatrix(90.0f * ndDegreeToRad));
@@ -383,7 +388,9 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(robot0);
 	ndSharedPtr<ndModel> modelPtr(robot0);
 	world->AddModel(modelPtr);
-	//world->AddJoint(new ndJointFix6dof(aiBot_1->m_rootBody->GetMatrix(), aiBot_1->m_rootBody, world->GetSentinelBody()));
+
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->m_rootBody->GetMatrix(), robot0->m_rootBody, world->GetSentinelBody()));
+	//world->AddJoint(fixJoint);
 
 	ndQuadrupedUI* const quadrupedUI = new ndQuadrupedUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);

@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
+#include "ndUIEntity.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
@@ -147,123 +148,124 @@ namespace ndQuadruped_3
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
-			,m_effectors()
+			,m_effectorsInfo()
 			,m_effectorsJoints()
 		{
-			ndAssert(0);
-			//// make a clone of the mesh and add it to the scene
-			//ndDemoEntity* const entity = robotMesh->CreateClone();
-			//scene->AddEntity(entity);
-			//ndWorld* const world = scene->GetWorld();
-			//
-			//ndDemoEntity* const rootEntity = entity->Find(jointsDefinition[0].m_boneName);
-			//
-			//// find the floor location 
-			//ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
-			//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			//matrix.m_posit.m_y = floor.m_y;
-			//
-			//matrix.m_posit.m_y += 0.71f;
-			//rootEntity->ResetMatrix(matrix);
-			//
-			//// add the root body
-			//m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
-			//
-			//ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
-			//ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-			//
-			//ndInt32 stack = 0;
-			//for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
-			//{
-			//	childEntities[stack] = child;
-			//	parentBone[stack] = m_rootBody;
-			//	stack++;
-			//}
-			//
-			//const ndMatrix referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix();
-			//const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
-			//while (stack)
-			//{
-			//	stack--;
-			//	ndBodyDynamic* parentBody = parentBone[stack];
-			//	ndDemoEntity* const childEntity = childEntities[stack];
-			//
-			//	const char* const name = childEntity->GetName().GetStr();
-			//	for (ndInt32 i = 0; i < definitionCount; ++i)
-			//	{
-			//		const ndDefinition& definition = jointsDefinition[i];
-			//		if (!strcmp(definition.m_boneName, name))
-			//		{
-			//			//dTrace(("name: %s\n", name));
-			//			if (definition.m_type == ndDefinition::m_hinge)
-			//			{
-			//				ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-			//				const ndMatrix pivotMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-			//				ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
-			//				hinge->SetLimitState(true);
-			//				hinge->SetLimits(-30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
-			//				world->AddJoint(hinge);
-			//				parentBody = childBody;
-			//			}
-			//			else if (definition.m_type == ndDefinition::m_spherical)
-			//			{
-			//				ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-			//				const ndMatrix pivotMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
-			//				ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
-			//				//socket->SetConeLimit(120.0f * ndDegreeToRad);
-			//				//socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-			//
-			//				world->AddJoint(socket);
-			//				parentBody = childBody;
-			//			}
-			//			else
-			//			{
-			//				char refName[256];
-			//				sprintf(refName, "%sreference", name);
-			//				ndAssert(rootEntity->Find(refName));
-			//
-			//				ndMatrix pivotFrame(referenceFrame);
-			//				ndMatrix effectorFrame(referenceFrame);
-			//				effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-			//				pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
-			//
-			//				ndFloat32 regularizer = 0.001f;
-			//				ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, m_rootBody);
-			//				effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-			//				effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-			//				
-			//				const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
-			//				const ndVector dist0(effectorFrame.m_posit - elbowPoint);
-			//				const ndVector dist1(elbowPoint - pivotFrame.m_posit);
-			//				const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
-			//				effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
-			//				
-			//				ndEffectorInfo info(effector);
-			//				info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-			//				info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
-			//				info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
-			//				info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-			//				m_effectors.PushBack(info);
-			//				m_effectorsJoints.PushBack(effector);
-			//			}
-			//			break;
-			//		}
-			//	}
-			//
-			//	for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
-			//	{
-			//		childEntities[stack] = child;
-			//		parentBone[stack] = parentBody;
-			//		stack++;
-			//	}
-			//}
+			// make a clone of the mesh and add it to the scene
+			ndDemoEntity* const entity = robotMesh->CreateClone();
+			scene->AddEntity(entity);
+			ndWorld* const world = scene->GetWorld();
+			
+			ndDemoEntity* const rootEntity = entity->Find(jointsDefinition[0].m_boneName);
+			
+			// find the floor location 
+			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
+			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			matrix.m_posit.m_y = floor.m_y;
+			matrix.m_posit.m_y += 0.5f;
+			
+			matrix.m_posit.m_y += 0.71f;
+			rootEntity->ResetMatrix(matrix);
+			
+			// add the root body
+			m_rootBody = CreateBodyPart(scene, rootEntity, jointsDefinition[0].m_mass, nullptr);
+			
+			ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
+			ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+			
+			ndInt32 stack = 0;
+			for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
+			{
+				childEntities[stack] = child;
+				parentBone[stack] = m_rootBody;
+				stack++;
+			}
+			
+			const ndMatrix referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix();
+			const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
+			while (stack)
+			{
+				stack--;
+				ndBodyDynamic* parentBody = parentBone[stack];
+				ndDemoEntity* const childEntity = childEntities[stack];
+			
+				const char* const name = childEntity->GetName().GetStr();
+				for (ndInt32 i = 0; i < definitionCount; ++i)
+				{
+					const ndDefinition& definition = jointsDefinition[i];
+					if (!strcmp(definition.m_boneName, name))
+					{
+						//dTrace(("name: %s\n", name));
+						if (definition.m_type == ndDefinition::m_hinge)
+						{
+							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+							const ndMatrix pivotMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+							ndIkJointHinge* const hinge = new ndIkJointHinge(pivotMatrix, childBody, parentBody);
+							hinge->SetLimitState(true);
+							hinge->SetLimits(-30.0f * ndDegreeToRad, 120.0f * ndDegreeToRad);
+							ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
+							world->AddJoint(hingePtr);
+							parentBody = childBody;
+						}
+						else if (definition.m_type == ndDefinition::m_spherical)
+						{
+							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+							const ndMatrix pivotMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
+							ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
+							//socket->SetConeLimit(120.0f * ndDegreeToRad);
+							//socket->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+							ndSharedPtr<ndJointBilateralConstraint> ballPtr(socket);
+							world->AddJoint(ballPtr);
+							parentBody = childBody;
+						}
+						else
+						{
+							char refName[256];
+							sprintf(refName, "%sreference", name);
+							ndAssert(rootEntity->Find(refName));
+			
+							ndMatrix pivotFrame(referenceFrame);
+							ndMatrix effectorFrame(referenceFrame);
+							effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
+							pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
+			
+							ndFloat32 regularizer = 0.001f;
+							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, m_rootBody);
+							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+							
+							const ndVector elbowPoint(childEntity->GetParent()->CalculateGlobalMatrix().m_posit);
+							const ndVector dist0(effectorFrame.m_posit - elbowPoint);
+							const ndVector dist1(elbowPoint - pivotFrame.m_posit);
+							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
+							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
+							
+							ndEffectorInfo info(effector);
+							info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
+							info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
+							info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
+							info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
+							m_effectorsInfo.PushBack(info);
+							m_effectorsJoints.PushBack(effector);
+						}
+						break;
+					}
+				}
+			
+				for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
+				{
+					childEntities[stack] = child;
+					parentBone[stack] = parentBody;
+					stack++;
+				}
+			}
 		}
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
-			,m_effectors()
+			,m_effectorsInfo()
 			,m_effectorsJoints()
 		{
 			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
@@ -304,10 +306,6 @@ namespace ndQuadruped_3
 
 		~ndQuadrupedModel()
 		{
-			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
-			{
-				delete m_effectorsJoints[i];
-			}
 		}
 
 		void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -396,7 +394,7 @@ namespace ndQuadruped_3
 			//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			for (ndInt32 i = 0; i < 1; ++i)
 			{
-				const ndEffectorInfo& info = m_effectors[i];
+				const ndEffectorInfo& info = m_effectorsInfo[i];
 				ndJointBilateralConstraint* const joint = info.m_effector;
 				joint->DebugJoint(context);
 
@@ -420,12 +418,70 @@ namespace ndQuadruped_3
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
-		void ApplyControls(ndDemoEntityManager* const scene)
+		void Update(ndWorld* const world, ndFloat32 timestep)
+		{
+			ndModel::Update(world, timestep);
+
+			const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
+			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
+			{
+				ndEffectorInfo& info = m_effectorsInfo[i];
+				ndVector posit(info.m_basePosition);
+				posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
+				posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
+				posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
+				info.m_effector->SetLocalTargetPosition(posit);
+				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
+			}
+
+			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+			ndAssert(skeleton);
+
+			//m_invDynamicsSolver.SetMaxIterations(4);
+			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
+				for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+				{
+					effectors.PushBack(*m_effectorsJoints[i]);
+				}
+
+				//m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+				//m_invDynamicsSolver.Solve();
+				//m_invDynamicsSolver.SolverEnd();
+			}
+		}
+
+		ndIkSolver m_invDynamicsSolver;
+		ndBodyDynamic* m_rootBody;
+		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
+		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
+	};
+	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_3::ndQuadrupedModel);
+
+	class ndQuadrupedUI : public ndUIEntity
+	{
+		public:
+		ndQuadrupedUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
+			:ndUIEntity(scene)
+			,m_quadruped(quadruped)
+		{
+		}
+
+		~ndQuadrupedUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Control panel");
+			m_scene->Print(color, "Control panel");
 
-			ndEffectorInfo& info = m_effectors[0];
+			ndQuadrupedModel::ndEffectorInfo& info = m_quadruped->m_effectorsInfo[0];
 
 			bool change = false;
 			ImGui::Text("position x");
@@ -440,119 +496,79 @@ namespace ndQuadruped_3
 
 			if (change)
 			{
-				m_rootBody->SetSleepState(false);
+				m_quadruped->m_rootBody->SetSleepState(false);
 
-				for (ndInt32 i = 1; i < m_effectors.GetCount(); ++i)
+				for (ndInt32 i = 1; i < m_quadruped->m_effectorsInfo.GetCount(); ++i)
 				{
-					m_effectors[i].m_x = info.m_x;
-					m_effectors[i].m_y = info.m_y;
-					m_effectors[i].m_z = info.m_z;
-					m_effectors[i].m_swivel = info.m_swivel;
+					m_quadruped->m_effectorsInfo[i].m_x = info.m_x;
+					m_quadruped->m_effectorsInfo[i].m_y = info.m_y;
+					m_quadruped->m_effectorsInfo[i].m_z = info.m_z;
+					m_quadruped->m_effectorsInfo[i].m_swivel = info.m_swivel;
 				}
 			}
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
-		{
-			ndModel::Update(world, timestep);
-
-			const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
-			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-			{
-				ndEffectorInfo& info = m_effectors[i];
-				ndVector posit(info.m_basePosition);
-				posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-				posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-				posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-				info.m_effector->SetLocalTargetPosition(posit);
-
-				//ndMatrix swivelMatrix0;
-				//ndMatrix swivelMatrix1;
-				//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-				//const ndFloat32 angle = info.m_effector->CalculateAngle(frontVector, swivelMatrix1[1], swivelMatrix1[0]);
-				//info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel) - angle);
-			}
-
-			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			ndAssert(skeleton);
-
-			//m_invDynamicsSolver.SetMaxIterations(4);
-			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
-			{
-				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
-				m_invDynamicsSolver.Solve();
-				m_invDynamicsSolver.SolverEnd();
-			}
-		}
-
-		static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
-		{
-			ndQuadrupedModel* const me = (ndQuadrupedModel*)context;
-			me->ApplyControls(scene);
-		}
-
-		ndIkSolver m_invDynamicsSolver;
-		ndBodyDynamic* m_rootBody;
-		ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
-		ndFixSizeArray<ndJointBilateralConstraint*, 4> m_effectorsJoints;
+		ndQuadrupedModel* m_quadruped;
 	};
-	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_3::ndQuadrupedModel);
 };
 
 using namespace ndQuadruped_3;
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	ndAssert(0);
-	return;
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	//
-	//// register a material for filtering self collisions 
-	//ndQuadrupedMaterial material;
-	//material.m_restitution = 0.1f;
-	//material.m_staticFriction0 = 0.9f;
-	//material.m_staticFriction1 = 0.9f;
-	//material.m_dynamicFriction0 = 0.9f;
-	//material.m_dynamicFriction1 = 0.9f;
-	//
-	//ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	//callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
-	//callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
-	//
-	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("spot.fbx", scene);
-	//
-	//ndWorld* const world = scene->GetWorld();
-	//ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
-	//
-	//ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, robotEntity, matrix);
-	//scene->SetSelectedModel(robot0);
-	//world->AddModel(robot0);
-	//
-	////matrix.m_posit.m_x += 2.0f;
-	////matrix.m_posit.m_z -= 2.0f;
-	////ndQuadrupedModel* const robot1 = new ndQuadrupedModel(scene, robotEntity, matrix);
-	////world->AddModel(robot1);
-	//
-	//delete robotEntity;
-	//
-	////ndVector posit(matrix.m_posit);
-	////posit.m_x += 1.5f;
-	////posit.m_z += 1.5f;
-	////AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
-	////AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
-	//
-	////posit.m_x += 0.6f;
-	////posit.m_z += 0.2f;
-	////AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
-	////AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
-	//
-	////world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	//scene->Set2DDisplayRenderFunction(ndQuadrupedModel::ControlPanel, nullptr, robot0);
-	//
-	//matrix.m_posit.m_x -= 5.0f;
-	//matrix.m_posit.m_y += 1.5f;
-	//matrix.m_posit.m_z += 0.25f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+	BuildFloorBox(scene, ndGetIdentityMatrix());
+	
+	// register a material for filtering self collisions 
+	ndQuadrupedMaterial material;
+	material.m_restitution = 0.1f;
+	material.m_staticFriction0 = 0.9f;
+	material.m_staticFriction1 = 0.9f;
+	material.m_dynamicFriction0 = 0.9f;
+	material.m_dynamicFriction1 = 0.9f;
+	
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_default);
+	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
+	
+	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
+	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("spot.fbx", scene);
+	
+	ndWorld* const world = scene->GetWorld();
+	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	
+	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, robotEntity, matrix);
+	scene->SetSelectedModel(robot0);
+	ndSharedPtr<ndModel> modelPtr(robot0);
+	world->AddModel(modelPtr);
+	
+	//matrix.m_posit.m_x += 2.0f;
+	//matrix.m_posit.m_z -= 2.0f;
+	//ndQuadrupedModel* const robot1 = new ndQuadrupedModel(scene, robotEntity, matrix);
+	//world->AddModel(robot1);
+	
+	delete robotEntity;
+	
+	//ndVector posit(matrix.m_posit);
+	//posit.m_x += 1.5f;
+	//posit.m_z += 1.5f;
+	//AddBox(scene, posit, 2.0f, 0.3f, 0.4f, 0.7f);
+	//AddBox(scene, posit, 1.0f, 0.3f, 0.4f, 0.7f);
+	
+	//posit.m_x += 0.6f;
+	//posit.m_z += 0.2f;
+	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
+	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
+	
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(fixJoint);
+
+	ndQuadrupedUI* const quadrupedUI = new ndQuadrupedUI(scene, robot0);
+	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
+	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
+	
+	matrix.m_posit.m_x -= 5.0f;
+	matrix.m_posit.m_y += 1.5f;
+	matrix.m_posit.m_z += 0.25f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

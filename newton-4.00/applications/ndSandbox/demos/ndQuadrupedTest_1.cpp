@@ -798,7 +798,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 8.0f, 0.3f, 0.4f, 0.7f);
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 	
-	//world->AddJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
+	//world->AddJoint(fixJoint);
 
 	ndQuadrupedUI* const quadrupedUI = new ndQuadrupedUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
