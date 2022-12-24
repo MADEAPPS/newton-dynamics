@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
+#include "ndUIEntity.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
@@ -370,10 +371,6 @@ namespace biped2
 
 		~ndHumanoidModel()
 		{
-			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
-			{
-				delete m_effectorsJoints[i];
-			}
 		}
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
@@ -610,52 +607,58 @@ namespace biped2
 			//m_invDynamicsSolver.SetMaxIterations(4);
 			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
 			{
-				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
+				for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+				{
+					effectors.PushBack(*m_effectorsJoints[i]);
+				}
+
+				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 				m_invDynamicsSolver.Solve();
 				m_invDynamicsSolver.SolverEnd();
 			}
 		}
 
-		void ApplyControls(ndDemoEntityManager* const scene)
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Control panel");
-
-			ndEffectorInfo& info = m_effectors[0];
-
-			bool change = false;
-			ImGui::Text("distance");
-			change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
-			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
-			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-
-			ImGui::Text("swivel");
-			change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
-
-			ndEffectorInfo& info1 = m_effectors[1];
-			info1.m_x = info.m_x;
-			info1.m_y = info.m_y;
-			info1.m_z = info.m_z;
-			info1.m_swivel = info.m_swivel;
-
-			static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
-			static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
-			//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
-			//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
-
-			if (change)
-			{
-				m_bodyArray[0]->SetSleepState(false);
-			}
-		}
-
-		static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
-		{
-			ndHumanoidModel* const me = (ndHumanoidModel*)context;
-			me->ApplyControls(scene);
-		}
+		//void ApplyControls(ndDemoEntityManager* const scene)
+		//{
+		//	ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		//	scene->Print(color, "Control panel");
+		//
+		//	ndEffectorInfo& info = m_effectors[0];
+		//
+		//	bool change = false;
+		//	ImGui::Text("distance");
+		//	change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
+		//	ImGui::Text("roll");
+		//	change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+		//	ImGui::Text("yaw");
+		//	change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+		//
+		//	ImGui::Text("swivel");
+		//	change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+		//
+		//	ndEffectorInfo& info1 = m_effectors[1];
+		//	info1.m_x = info.m_x;
+		//	info1.m_y = info.m_y;
+		//	info1.m_z = info.m_z;
+		//	info1.m_swivel = info.m_swivel;
+		//
+		//	static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
+		//	static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
+		//	//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
+		//	//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
+		//
+		//	if (change)
+		//	{
+		//		m_bodyArray[0]->SetSleepState(false);
+		//	}
+		//}
+		//
+		//static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
+		//{
+		//	ndHumanoidModel* const me = (ndHumanoidModel*)context;
+		//	me->ApplyControls(scene);
+		//}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
@@ -673,7 +676,7 @@ namespace biped2
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
-		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
+		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 		ndFloat32 m_actionToActiationMap[ndHumanoidBrain::m_actionSize];
 	};
 
@@ -782,7 +785,13 @@ namespace biped2
 
 			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
 			{
-				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
+				for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+				{
+					effectors.PushBack(*m_effectorsJoints[i]);
+				}
+
+				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 				m_invDynamicsSolver.Solve();
 				m_invDynamicsSolver.SolverEnd();
 			}
@@ -952,6 +961,61 @@ namespace biped2
 		ndInt32 m_epochCounter;
 		ndTraningStage m_trainingState;
 	};
+
+	class ndBipedUI : public ndUIEntity
+	{
+		public:
+		ndBipedUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
+			:ndUIEntity(scene)
+			, m_biped(biped)
+		{
+		}
+
+		~ndBipedUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			m_scene->Print(color, "Control panel");
+
+			ndHumanoidModel::ndEffectorInfo& info = m_biped->m_effectors[0];
+
+			bool change = false;
+			ImGui::Text("distance");
+			change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+
+			ImGui::Text("swivel");
+			change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+
+			ndHumanoidModel::ndEffectorInfo& info1 = m_biped->m_effectors[1];
+			info1.m_x = info.m_x;
+			info1.m_y = info.m_y;
+			info1.m_z = info.m_z;
+			info1.m_swivel = info.m_swivel;
+
+			static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
+			static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
+			//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
+			//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
+
+			if (change)
+			{
+				m_biped->m_bodyArray[0]->SetSleepState(false);
+			}
+		}
+
+		ndHumanoidModel* m_biped;
+	};
 };
 
 using namespace biped2;
@@ -981,14 +1045,15 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-	ndAssert(0);
-	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
-	
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
 	//world->AddJoint(fixJoint);
-	
+
+	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
+	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
+	scene->Set2DDisplayRenderFunction(bipedUIPtr);
+
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;
 	origin.m_posit.m_y = 2.0f;
@@ -1019,18 +1084,20 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	
 	origin.m_posit.m_x -= 20.0f;
 	
-	ndDemoEntity* const modelMesh = ndDemoEntity::LoadFbx("walker.fbx", scene);
+	ndSharedPtr<ndDemoEntity> modelMesh(ndDemoEntity::LoadFbx("walker.fbx", scene));
 	
 	ndWorld* const world = scene->GetWorld();
-	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, modelMesh, origin, ragdollDefinition);
-	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
-	ndAssert(0);
-	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
-
+	ndHumanoidTraningModel* const model = new ndHumanoidTraningModel(scene, *modelMesh, origin, ragdollDefinition);
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
 	//world->AddJoint(fixJoint);
+
+	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
+	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
+	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
+	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
+	scene->Set2DDisplayRenderFunction(bipedUIPtr);
 	
 	ndQuaternion rot(ndYawMatrix(ndPi * 0.5f));
 	//origin.m_posit.m_x -= 5.0f;

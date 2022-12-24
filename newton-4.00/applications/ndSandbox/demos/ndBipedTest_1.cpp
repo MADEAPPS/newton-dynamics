@@ -319,10 +319,6 @@ namespace biped_1
 
 		~ndHumanoidModel()
 		{
-			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
-			{
-				delete m_effectorsJoints[i];
-			}
 		}
 
 		void NormalizeMassDistribution(ndFloat32 mass) const
@@ -509,7 +505,13 @@ namespace biped_1
 			//m_invDynamicsSolver.SetMaxIterations(4);
 			if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
 			{
-				m_invDynamicsSolver.SolverBegin(skeleton, &m_effectorsJoints[0], m_effectorsJoints.GetCount(), world, timestep);
+				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
+				for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
+				{
+					effectors.PushBack(*m_effectorsJoints[i]);
+				}
+
+				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 				m_invDynamicsSolver.Solve();
 				m_invDynamicsSolver.SolverEnd();
 			}
@@ -528,7 +530,7 @@ namespace biped_1
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
-		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
+		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 	};
 
 	class ndBipedUI: public ndUIEntity
@@ -613,7 +615,6 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
