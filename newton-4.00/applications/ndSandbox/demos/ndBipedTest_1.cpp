@@ -11,7 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
-#include "ndTargaToOpenGl.h"
+#include "ndUIEntity.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
@@ -515,47 +515,6 @@ namespace biped_1
 			}
 		}
 
-		void ApplyControls(ndDemoEntityManager* const scene)
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Control panel");
-
-			ndEffectorInfo& info = m_effectors[0];
-
-			bool change = false;
-			ImGui::Text("distance");
-			change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
-			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
-			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-
-			ImGui::Text("swivel");
-			change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
-
-			ndEffectorInfo& info1 = m_effectors[1];
-			info1.m_x = info.m_x;
-			info1.m_y = info.m_y;
-			info1.m_z = info.m_z;
-			info1.m_swivel = info.m_swivel;
-
-			static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
-			static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
-			//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
-			//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
-
-			if (change)
-			{
-				m_bodyArray[0]->SetSleepState(false);
-			}
-		}
-
-		static void ControlPanel(ndDemoEntityManager* const scene, void* const context)
-		{
-			ndHumanoidModel* const me = (ndHumanoidModel*)context;
-			me->ApplyControls(scene);
-		}
-
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::PostUpdate(world, timestep);
@@ -570,6 +529,61 @@ namespace biped_1
 		ndFixSizeArray<ndEffectorInfo, 8> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 32> m_bodyArray;
 		ndFixSizeArray<ndJointBilateralConstraint*, 8> m_effectorsJoints;
+	};
+
+	class ndBipedUI: public ndUIEntity
+	{
+		public:
+		ndBipedUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
+			:ndUIEntity(scene)
+			,m_biped(biped)
+		{
+		}
+
+		~ndBipedUI()
+		{
+		}
+
+		virtual void RenderUI()
+		{
+		}
+
+		virtual void RenderHelp()
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			m_scene->Print(color, "Control panel");
+
+			ndHumanoidModel::ndEffectorInfo& info = m_biped->m_effectors[0];
+
+			bool change = false;
+			ImGui::Text("distance");
+			change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+
+			ImGui::Text("swivel");
+			change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+
+			ndHumanoidModel::ndEffectorInfo& info1 = m_biped->m_effectors[1];
+			info1.m_x = info.m_x;
+			info1.m_y = info.m_y;
+			info1.m_z = info.m_z;
+			info1.m_swivel = info.m_swivel;
+
+			static ndOUNoise xxxxxxx0(0.0f, 0.5f, 0.0f, 0.1f);
+			static ndOUNoise xxxxxxx1(0.0f, 0.5f, 0.0f, 0.3f);
+			//info.m_z = xxxxxxx0.Evaluate(1.0f / 500.0f);
+			//info1.m_z = xxxxxxx1.Evaluate(1.0f / 500.0f);
+
+			if (change)
+			{
+				m_biped->m_bodyArray[0]->SetSleepState(false);
+			}
+		}
+
+		ndHumanoidModel* m_biped;
 	};
 };
 
@@ -599,13 +613,15 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	
 	ndWorld* const world = scene->GetWorld();
 	ndHumanoidModel* const model = new ndHumanoidModel(scene, *modelMesh, origin, ragdollDefinition);
-	ndAssert(0);
-	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 
 	ndSharedPtr<ndModel> modelPtr(model);
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
 	world->AddJoint(fixJoint);
+
+	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
+	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
+	scene->Set2DDisplayRenderFunction(bipedUIPtr);
 	
 	ndQuaternion rot;
 	origin.m_posit.m_x -= 5.0f;

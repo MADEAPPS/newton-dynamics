@@ -14,7 +14,6 @@
 #include "ndDemoEntity.h"
 #include "ndDebugDisplay.h"
 #include "ndDemoDebugMesh.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
 ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderCache& shaderCache, const ndShapeInstance* const collision)

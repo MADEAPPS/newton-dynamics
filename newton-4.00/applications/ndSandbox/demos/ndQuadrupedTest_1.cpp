@@ -11,7 +11,6 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"

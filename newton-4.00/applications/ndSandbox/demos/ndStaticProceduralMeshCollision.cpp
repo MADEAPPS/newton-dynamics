@@ -17,7 +17,6 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"

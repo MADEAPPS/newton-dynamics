@@ -20,7 +20,6 @@
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
-#include "ndTargaToOpenGl.h"
 #include "ndCompoundScene.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"

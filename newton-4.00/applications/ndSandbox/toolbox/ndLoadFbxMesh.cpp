@@ -10,7 +10,6 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndLoadFbxMesh.h"
 #include "ndDemoSkinMesh.h"

@@ -51,13 +51,13 @@
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
 //#define DEFAULT_SCENE	11		// basic vehicle
-#define DEFAULT_SCENE	12		// heavy vehicle
+//#define DEFAULT_SCENE	12		// heavy vehicle
 //#define DEFAULT_SCENE	13		// background vehicle prop
 //#define DEFAULT_SCENE	14		// simple industrial robot
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-//#define DEFAULT_SCENE	18		// biped test 1
+#define DEFAULT_SCENE	18		// biped test 1
 //#define DEFAULT_SCENE	19		// biped test 2
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2

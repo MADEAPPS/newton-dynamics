@@ -16,7 +16,6 @@
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
-#include "ndTargaToOpenGl.h"
 #include "ndMakeStaticMap.h"
 #include "ndCompoundScene.h"
 #include "ndDemoEntityManager.h"

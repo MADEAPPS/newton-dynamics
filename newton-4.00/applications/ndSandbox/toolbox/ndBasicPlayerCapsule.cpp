@@ -10,7 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndTargaToOpenGl.h"
+#include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"

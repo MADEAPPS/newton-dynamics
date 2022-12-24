@@ -12,7 +12,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
 #include "ndDemoEntity.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoSplinePathMesh.h"
 #include "ndDemoEntityManager.h"
 

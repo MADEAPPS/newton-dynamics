@@ -10,9 +10,9 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndTargaToOpenGl.h"
 #include "ndSkyBox.h"
 #include "ndDemoCamera.h"
+#include "ndTargaToOpenGl.h"
 
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
