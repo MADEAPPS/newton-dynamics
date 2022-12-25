@@ -240,11 +240,11 @@ void ndPolygonSoupBuilder::LoadPLY(const char* const fileName)
 		vertexArray.SetCount(vertexCount);
 		for (ndInt32 i = 0; i < vertexCount; ++i)
 		{
-			ndFloat32 x;
-			ndFloat32 y;
-			ndFloat32 z;
+			ndReal x;
+			ndReal y;
+			ndReal z;
 			ret1 = fscanf(file, "%f %f %f", &x, &y, &z);
-			vertexArray[i] = ndBigVector(x, y, z, ndFloat32(0.0f));
+			vertexArray[i] = ndBigVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(0.0f));
 		}
 
 		Begin();

@@ -1151,8 +1151,8 @@ void ndDemoEntityManager::BeginFrame()
 	ndInt32 display_w, display_h;
 	glfwGetWindowSize(m_mainFrame, &w, &h);
 	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-	io.DisplaySize = ImVec2((float)w, (float)h);
-	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / (ndFloat32)w) : 0, h > 0 ? ((float)display_h / (ndFloat32)h) : 0);
+	io.DisplaySize = ImVec2((ndReal)w, (ndReal)h);
+	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((ndReal)display_w / (ndReal)w) : 0, h > 0 ? ((ndReal)display_h / (ndReal)h) : 0);
 
 	//int display_w, display_h;
 	//glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
