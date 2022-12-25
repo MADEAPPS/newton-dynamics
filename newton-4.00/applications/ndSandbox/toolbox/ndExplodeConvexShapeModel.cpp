@@ -49,7 +49,7 @@ ndExplodeConvexShapeModel::ndAtom::~ndAtom()
 
 ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const manager, const ndDesc& desc)
 	:ndList<ndAtom>()
-	,m_body____(nullptr)
+	,m_body(nullptr)
 	,m_shape(new ndShapeInstance(*desc.m_shape))
 	,m_visualMesh(nullptr)
 	,m_debrisRootEnt(nullptr)
@@ -141,13 +141,13 @@ ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const m
 }
 
 ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
-	:m_body____(new ndBodyDynamic())
+	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
 	,m_visualMesh(nullptr)
 	,m_debrisRootEnt(new ndDemoDebrisRootEntity(*effect.m_debrisRootEnt))
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
-	m_body____->SetCollisionShape(*effect.m_shape);
+	m_body->GetAsBodyKinematic()->SetCollisionShape(*effect.m_shape);
 	ndDemoDebrisEntity* debriEnt = (ndDemoDebrisEntity*)m_debrisRootEnt->GetFirstChild();
 	for (ndNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
@@ -186,7 +186,6 @@ ndExplodeConvexShapeModel::~ndExplodeConvexShapeModel()
 {
 }
 
-//void ndExplodeConvexShapeModel::Update(ndWorld* const world, ndFloat32 timestep)
 void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
 {
 	ndList<ndEffect>::ndNode* nextNody;
@@ -196,7 +195,7 @@ void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
 		ndEffect& effect = node->GetInfo();
 
 		ndFloat32 maxImpactImpulse = 0.0f;
-		const ndBodyKinematic::ndContactMap& contactMap = effect.m_body____->GetContactMap();
+		const ndBodyKinematic::ndContactMap& contactMap = effect.m_body->GetAsBodyKinematic()->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
 		{
@@ -216,7 +215,7 @@ void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
 			}
 		}
 
-		ndFloat32 impactSpeed = maxImpactImpulse * effect.m_body____->GetInvMass();
+		ndFloat32 impactSpeed = maxImpactImpulse * effect.m_body->GetInvMass();
 		if (impactSpeed >= effect.m_breakImpactSpeed)
 		{
 			ndScopeSpinLock lock (m_lock);
@@ -226,56 +225,50 @@ void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
 	}
 }
 
-//void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, ndFloat32)
-void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const, ndFloat32)
+void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, ndFloat32)
 {
 	if (m_pendingEffect.GetCount())
 	{
 		D_TRACKTIME();
 		ndList<ndEffect>::ndNode* next;
-		//ndPhysicsWorld* const appWorld = (ndPhysicsWorld*)world;
 		for (ndList<ndEffect>::ndNode* node = m_pendingEffect.GetFirst(); node; node = next)
 		{
-			ndAssert(0);
 			next = node->GetNext();
-			//ndEffect& effect = node->GetInfo();
-			//UpdateEffect(world, effect);
-			////world->DeleteBody(effect.m_body);
-			//appWorld->QueueBodyForDelete(effect.m_body);
-			//m_pendingEffect.Remove(node);
+			ndEffect& effect = node->GetInfo();
+			UpdateEffect(world, effect);
+			world->RemoveBody(*effect.m_body);
+			m_pendingEffect.Remove(node);
 		}
 	}
 }
 
 void ndExplodeConvexShapeModel::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
 {
-	ndAssert(0);
-	//ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
-	//
-	//ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	//entity->SetMesh(effect.m_visualMesh);
-	//m_scene->AddEntity(entity);
-	//
-	////ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
-	//m_scene->GetWorld()->AddBody(newEffect.m_body____);
-	//
-	//newEffect.m_body____->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
-	//newEffect.m_body____->SetMatrix(location);
-	//newEffect.m_body____->SetMassMatrix(mass, *effect.m_shape);
+	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
+	
+	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	entity->SetMesh(effect.m_visualMesh);
+	m_scene->AddEntity(entity);
+	
+	m_scene->GetWorld()->AddBody(newEffect.m_body);
+	
+	newEffect.m_body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+	newEffect.m_body->SetMatrix(location);
+	newEffect.m_body->GetAsBodyKinematic()->SetMassMatrix(mass, *effect.m_shape);
 }
 
 void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
 	D_TRACKTIME();
-	ndVector omega(effect.m_body____->GetOmega());
-	ndVector veloc(effect.m_body____->GetVelocity());
-	ndVector massMatrix(effect.m_body____->GetMassMatrix());
-	ndMatrix bodyMatrix(effect.m_body____->GetMatrix());
-	ndVector com(bodyMatrix.TransformVector(effect.m_body____->GetCentreOfMass()));
+	ndVector omega(effect.m_body->GetOmega());
+	ndVector veloc(effect.m_body->GetVelocity());
+	ndVector massMatrix(effect.m_body->GetAsBodyKinematic()->GetMassMatrix());
+	ndMatrix bodyMatrix(effect.m_body->GetMatrix());
+	ndVector com(bodyMatrix.TransformVector(effect.m_body->GetCentreOfMass()));
 
 	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
 	ndDemoEntityManager* const scene = physicsWorld->GetManager();
-	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body____->GetNotifyCallback();
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
 	ndDemoEntity* const visualEntity = (ndDemoEntity*)notify->GetUserData();
 
 	ndMatrix matrix(visualEntity->GetCurrentMatrix());
