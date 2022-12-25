@@ -54,20 +54,20 @@ namespace ndQuadruped_1
 		{ "spot_arm_FR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
 		{ "spot_arm_FR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
 
-		//{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		//{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		//{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		//{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
-		//
-		//{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		//{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		//{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		//{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
-		//
-		//{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
-		//{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
-		//{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
-		//{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		{ "spot_shoulder_FL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
+		{ "spot_up_arm_FL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
+		{ "spot_arm_FL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
+		{ "spot_arm_FL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		
+		{ "spot_shoulder_BR", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
+		{ "spot_up_arm_BR", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
+		{ "spot_arm_BR", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
+		{ "spot_arm_BR_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
+		
+		{ "spot_shoulder_BL", ndDefinition::m_hinge, -90.0f, 90.0f, 0.0f },
+		{ "spot_up_arm_BL", ndDefinition::m_hinge, -130.0f, 130.0f, 0.0f },
+		{ "spot_arm_BL", ndDefinition::m_hinge, -90.0f, 45.0f, 0.0f },
+		{ "spot_arm_BL_effector", ndDefinition::m_effector, 0.0f, 0.0f, 0.0f },
 	};
 
 	class ndQuadrupedMaterial: public ndApplicationMaterial
@@ -266,8 +266,8 @@ namespace ndQuadruped_1
 			,m_output()
 			,m_walkCycle(0.8f)
 			,m_trotCycle(0.4f)
-			,m_effectors()
 			,m_bodyArray()
+			,m_effectorsInfo()
 			,m_effectorsJoints()
 		{
 			// make a clone of the mesh and add it to the scene
@@ -353,7 +353,7 @@ namespace ndQuadruped_1
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
 							
 							ndEffectorInfo info(effector);
-							m_effectors.PushBack(info);
+							m_effectorsInfo.PushBack(info);
 							m_effectorsJoints.PushBack(effector);
 						}
 						break;
@@ -387,7 +387,7 @@ namespace ndQuadruped_1
 			,m_output()
 			,m_walkCycle(0.75f)
 			,m_trotCycle(0.4f)
-			,m_effectors()
+			,m_effectorsInfo()
 			,m_bodyArray()
 			,m_effectorsJoints()
 		{
@@ -585,65 +585,73 @@ namespace ndQuadruped_1
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndMatrix comMatrix(m_bodyArray[0]->GetMatrix());
-			comMatrix.m_posit = CalculateCenterOfMass();
-			context.DrawFrame(comMatrix);
+			//ndMatrix comMatrix(m_bodyArray[0]->GetMatrix());
+			//comMatrix.m_posit = CalculateCenterOfMass();
+			//context.DrawFrame(comMatrix);
+			//
+			//ndFixSizeArray<ndVector, 16> contactPoints;
+			//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			//{
+			//	//const ndEffectorInfo& info = m_effectors[i];
+			//	//ndJointBilateralConstraint* const joint = info.m_effector;
+			//	//ndBodyKinematic* const body = joint->GetBody0();
+			//	//const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			//	//ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			//	//for (it.Begin(); it; it++)
+			//	//{
+			//	//	const ndContact* const contact = *it;
+			//	//	if (contact->IsActive())
+			//	//	{
+			//	//		//const ndContactPointList& contactMap = contact->GetContactPoints();
+			//	//		//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
+			//	//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
+			//	//	}
+			//	//}
+			//	if (m_walkCycle.m_isGrounded[i])
+			//	{
+			//		const ndEffectorInfo& info = m_effectors[i];
+			//		ndJointBilateralConstraint* const joint = info.m_effector;
+			//		ndBodyKinematic* const body = joint->GetBody0();
+			//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
+			//	}
+			//
+			//	//	joint->DebugJoint(context);
+			//}
+			//
+			//if (contactPoints.GetCount() >= 3)
+			//{
+			//	ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+			//	rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+			//	ndInt32 supportCount = dConvexHull2d(&contactPoints[0], contactPoints.GetCount());
+			//	rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
+			//	ndVector p0(contactPoints[supportCount - 1]);
+			//	ndBigVector bigPolygon[16];
+			//	for (ndInt32 i = 0; i < supportCount; ++i)
+			//	{
+			//		bigPolygon[i] = contactPoints[i];
+			//		context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
+			//		p0 = contactPoints[i];
+			//	}
+			//
+			//	ndBigVector p0Out;
+			//	ndBigVector p1Out;
+			//	ndBigVector ray_p0(comMatrix.m_posit);
+			//	ndBigVector ray_p1(comMatrix.m_posit);
+			//	ray_p1.m_y -= 1.0f;
+			//
+			//	ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
+			//
+			//	context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
+			//	context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
+			//}
 
-			ndFixSizeArray<ndVector, 16> contactPoints;
-			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
 			{
-				//const ndEffectorInfo& info = m_effectors[i];
-				//ndJointBilateralConstraint* const joint = info.m_effector;
-				//ndBodyKinematic* const body = joint->GetBody0();
-				//const ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-				//ndBodyKinematic::ndContactMap::Iterator it(contacts);
-				//for (it.Begin(); it; it++)
-				//{
-				//	const ndContact* const contact = *it;
-				//	if (contact->IsActive())
-				//	{
-				//		//const ndContactPointList& contactMap = contact->GetContactPoints();
-				//		//contactPoints.PushBack(contactMap.GetFirst()->GetInfo().m_point);
-				//		contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
-				//	}
-				//}
-				if (m_walkCycle.m_isGrounded[i])
-				{
-					const ndEffectorInfo& info = m_effectors[i];
-					ndJointBilateralConstraint* const joint = info.m_effector;
-					ndBodyKinematic* const body = joint->GetBody0();
-					contactPoints.PushBack(body->GetMatrix().TransformVector(info.m_effector->GetLocalMatrix0().m_posit));
-				}
-
-				//	joint->DebugJoint(context);
+				const ndEffectorInfo& info = m_effectorsInfo[i];
+				ndJointBilateralConstraint* const joint = info.m_effector;
+				joint->DebugJoint(context);
 			}
 
-			if (contactPoints.GetCount() >= 3)
-			{
-				ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-				rotation.TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
-				ndInt32 supportCount = dConvexHull2d(&contactPoints[0], contactPoints.GetCount());
-				rotation.Inverse().TransformTriplex(&contactPoints[0].m_x, sizeof(ndVector), &contactPoints[0].m_x, sizeof(ndVector), contactPoints.GetCount());
-				ndVector p0(contactPoints[supportCount - 1]);
-				ndBigVector bigPolygon[16];
-				for (ndInt32 i = 0; i < supportCount; ++i)
-				{
-					bigPolygon[i] = contactPoints[i];
-					context.DrawLine(contactPoints[i], p0, ndVector::m_zero);
-					p0 = contactPoints[i];
-				}
-
-				ndBigVector p0Out;
-				ndBigVector p1Out;
-				ndBigVector ray_p0(comMatrix.m_posit);
-				ndBigVector ray_p1(comMatrix.m_posit);
-				ray_p1.m_y -= 1.0f;
-
-				ndRayToPolygonDistance(ray_p0, ray_p1, bigPolygon, supportCount, p0Out, p1Out);
-
-				context.DrawPoint(p0Out, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 3);
-				context.DrawPoint(p1Out, ndVector(0.0f, 1.0f, 0.0f, 1.0f), 3);
-			}
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -666,9 +674,9 @@ namespace ndQuadruped_1
 
 			m_walk->SetParam(1.0f - m_timer);
 			m_animBlendTree->Evaluate(m_output);
-			for (ndInt32 i = 0; i < m_effectors.GetCount(); i++)
+			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); i++)
 			{
-				ndEffectorInfo& info = m_effectors[i];
+				ndEffectorInfo& info = m_effectorsInfo[i];
 				const ndAnimKeyframe& keyFrame = m_output[i];
 				ndVector posit(info.m_basePosition);
 				posit.m_x += keyFrame.m_posit.m_x;
@@ -701,8 +709,8 @@ namespace ndQuadruped_1
 		ndAnimationPose m_output;
 		ndWalkSequence m_walkCycle;
 		ndWalkSequence m_trotCycle;
-		ndFixSizeArray<ndEffectorInfo, 4> m_effectors;
 		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
+		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 
 		ndFloat32 m_timer;

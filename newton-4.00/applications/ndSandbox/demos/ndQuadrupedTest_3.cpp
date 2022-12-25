@@ -53,17 +53,17 @@ namespace ndQuadruped_3
 		{ "rb_knee_Bone013", ndDefinition::m_hinge, 2.0f },
 		{ "rb_effector_Bone009", ndDefinition::m_effector , 0.0f, 0.0f },
 
-		//{ "lb_thigh_Bone011", ndDefinition::m_spherical, 3.0f },
-		//{ "lb_knee_Bone012", ndDefinition::m_hinge, 2.0f },
-		//{ "lb_effector_Bone010", ndDefinition::m_effector , 0.0f, 0.5f },
-		//
-		//{ "fr_thigh_Bone003", ndDefinition::m_spherical, 3.0f },
-		//{ "fr_knee_Bone004", ndDefinition::m_hinge, 2.0f },
-		//{ "fr_effector_Bone005", ndDefinition::m_effector , 0.0f, 0.75f },
-		//
-		//{ "fl_thigh_Bone008", ndDefinition::m_spherical, 3.0f },
-		//{ "fl_knee_Bone006", ndDefinition::m_hinge, 2.0f },
-		//{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f, 0.25f },
+		{ "lb_thigh_Bone011", ndDefinition::m_spherical, 3.0f },
+		{ "lb_knee_Bone012", ndDefinition::m_hinge, 2.0f },
+		{ "lb_effector_Bone010", ndDefinition::m_effector , 0.0f, 0.5f },
+		
+		{ "fr_thigh_Bone003", ndDefinition::m_spherical, 3.0f },
+		{ "fr_knee_Bone004", ndDefinition::m_hinge, 2.0f },
+		{ "fr_effector_Bone005", ndDefinition::m_effector , 0.0f, 0.75f },
+		
+		{ "fl_thigh_Bone008", ndDefinition::m_spherical, 3.0f },
+		{ "fl_knee_Bone006", ndDefinition::m_hinge, 2.0f },
+		{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f, 0.25f },
 	};
 
 	class ndQuadrupedMaterial : public ndApplicationMaterial
@@ -161,10 +161,7 @@ namespace ndQuadruped_3
 			// find the floor location 
 			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			matrix.m_posit.m_y = floor.m_y;
-			matrix.m_posit.m_y += 0.5f;
-			
-			matrix.m_posit.m_y += 0.71f;
+			matrix.m_posit.m_y = floor.m_y + 0.71f;
 			rootEntity->ResetMatrix(matrix);
 			
 			// add the root body
@@ -224,13 +221,14 @@ namespace ndQuadruped_3
 							sprintf(refName, "%sreference", name);
 							ndAssert(rootEntity->Find(refName));
 			
-							ndMatrix pivotFrame(referenceFrame);
-							ndMatrix effectorFrame(referenceFrame);
+							ndMatrix pivotFrame(rootEntity->Find(refName)->CalculateGlobalMatrix());
+							ndMatrix effectorFrame(pivotFrame);
 							effectorFrame.m_posit = childEntity->CalculateGlobalMatrix().m_posit;
-							pivotFrame.m_posit = rootEntity->Find(refName)->CalculateGlobalMatrix().m_posit;
 			
 							ndFloat32 regularizer = 0.001f;
 							ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorFrame.m_posit, pivotFrame, parentBody, m_rootBody);
+
+							//effector->SetSwivelMode(false);
 							effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
 							effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
 							
@@ -391,8 +389,7 @@ namespace ndQuadruped_3
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			//for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-			for (ndInt32 i = 0; i < 1; ++i)
+			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
 			{
 				const ndEffectorInfo& info = m_effectorsInfo[i];
 				ndJointBilateralConstraint* const joint = info.m_effector;
@@ -446,9 +443,9 @@ namespace ndQuadruped_3
 					effectors.PushBack(*m_effectorsJoints[i]);
 				}
 
-				//m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
-				//m_invDynamicsSolver.Solve();
-				//m_invDynamicsSolver.SolverEnd();
+				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
 			}
 		}
 
@@ -558,7 +555,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 	
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndQuadrupedUI* const quadrupedUI = new ndQuadrupedUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
