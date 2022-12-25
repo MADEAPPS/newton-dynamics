@@ -23,7 +23,7 @@ var classnd_cuda_context_implement =
     [ "m_sceneInfoCpu", "classnd_cuda_context_implement.html#a4b8214303def7549550ba0ea0d95da21", null ],
     [ "m_sceneInfoGpu", "classnd_cuda_context_implement.html#a45b1ddd4c11ef5066f7c1d4ac4efa5e2", null ],
     [ "m_solverComputeStream", "classnd_cuda_context_implement.html#a0ecab46e2d24b7d9977fd32e3485412d", null ],
-    [ "m_solverMemCpyStream", "classnd_cuda_context_implement.html#a9972fa7199719adbfc998167337a4301", null ],
+    [ "m_solverMemCpuStream", "classnd_cuda_context_implement.html#a3c445405397dd0d6a97a00ee539e2f7e", null ],
     [ "m_timeInSeconds", "classnd_cuda_context_implement.html#a71ae21064c0460ee74ea008de1e1e13a", null ],
     [ "m_transformBuffer0", "classnd_cuda_context_implement.html#aef1a03e1a9d17f521a27de34c8d48d54", null ],
     [ "m_transformBuffer1", "classnd_cuda_context_implement.html#a01d1f271898d89a651829702332ff224", null ],

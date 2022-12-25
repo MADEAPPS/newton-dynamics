@@ -105,6 +105,7 @@ var hierarchy =
     [ "ndPolygonSoupBuilder::dgFaceInfo", "classnd_polygon_soup_builder_1_1dg_face_info.html", null ],
     [ "ndMeshEffect::ndAttibutFormat::dgUV", "classnd_mesh_effect_1_1nd_attibut_format_1_1dg_u_v.html", null ],
     [ "ndMeshEffect::dMeshVertexFormat", "classnd_mesh_effect_1_1d_mesh_vertex_format.html", null ],
+    [ "dProfilerSourceLocation", "structd_profiler_source_location.html", null ],
     [ "ndHeap< dItem, dKey >::dRecord", "structnd_heap_1_1d_record.html", null ],
     [ "ndMeshEffect::dVertexCluster", "classnd_mesh_effect_1_1d_vertex_cluster.html", null ],
     [ "float4", null, [
@@ -115,8 +116,8 @@ var hierarchy =
         [ "ndCudaQuat", "classnd_cuda_quat.html", null ]
       ] ]
     ] ],
-    [ "ndList< T, allocator >::Iterator", "classnd_list_1_1_iterator.html", null ],
     [ "ndTree< OBJECT, KEY, allocator >::Iterator", "classnd_tree_1_1_iterator.html", null ],
+    [ "ndList< T, allocator >::Iterator", "classnd_list_1_1_iterator.html", null ],
     [ "ndAdjacentFace", "classnd_adjacent_face.html", null ],
     [ "ndShapeMaterial::nData", "unionnd_shape_material_1_1n_data.html", null ],
     [ "ndAvxFloat", "classnd_avx_float.html", null ],
@@ -151,9 +152,9 @@ var hierarchy =
     [ "ndChamferCylinderInfo", "structnd_chamfer_cylinder_info.html", null ],
     [ "ndClassAlloc", "classnd_class_alloc.html", [
       [ "ndArray< T >", "classnd_array.html", [
-        [ "ndOpenclBuffer< T >", "classnd_opencl_buffer.html", null ],
-        [ "ndTempArray< T >", "classnd_temp_array.html", null ]
+        [ "ndOpenclBuffer< T >", "classnd_opencl_buffer.html", null ]
       ] ],
+      [ "ndArray< const ndBody * >", "classnd_array.html", null ],
       [ "ndArray< cuBodyProxy >", "classnd_array.html", null ],
       [ "ndArray< ndBigVector >", "classnd_array.html", [
         [ "ndPolygonSoupBuilder::ndVertexArray", "classnd_polygon_soup_builder_1_1nd_vertex_array.html", null ]
@@ -184,9 +185,11 @@ var hierarchy =
       ] ],
       [ "ndArray< ndInt8 >", "classnd_array.html", null ],
       [ "ndArray< ndJacobian >", "classnd_array.html", null ],
+      [ "ndArray< ndJointBilateralConstraint * >", "classnd_array.html", null ],
       [ "ndArray< ndLeftHandSide >", "classnd_array.html", null ],
       [ "ndArray< ndMeshEffect::ndAttibutFormat::dgUV >", "classnd_array.html", null ],
       [ "ndArray< ndMeshEffect::ndMaterial >", "classnd_array.html", null ],
+      [ "ndArray< ndModel * >", "classnd_array.html", null ],
       [ "ndArray< ndOpenclBodyBuffer::ndOpenclJacobian >", "classnd_array.html", [
         [ "ndOpenclBuffer< ndOpenclBodyBuffer::ndOpenclJacobian >", "classnd_opencl_buffer.html", null ]
       ] ],
@@ -202,7 +205,6 @@ var hierarchy =
       [ "ndArray< ndTriplex >", "classnd_array.html", null ],
       [ "ndArray< ndUnsigned8 >", "classnd_array.html", null ],
       [ "ndArray< ndVector >", "classnd_array.html", null ],
-      [ "ndArray< T * >", "classnd_array.html", null ],
       [ "ndBezierSpline", "classnd_bezier_spline.html", null ],
       [ "ndBodiesInAabbNotify", "classnd_bodies_in_aabb_notify.html", null ],
       [ "ndConjugateGradient< T, ndMatrixOperator >", "classnd_conjugate_gradient.html", null ],
@@ -249,15 +251,8 @@ var hierarchy =
       [ "ndList< ndBackgroundTask *, ndContainersFreeListAlloc< ndBackgroundTask * > >", "classnd_list.html", [
         [ "ndThreadBackgroundWorker", "classnd_thread_background_worker.html", null ]
       ] ],
-      [ "ndList< ndBodyDynamic * >", "classnd_list.html", null ],
-      [ "ndList< ndBodyKinematic * >", "classnd_list.html", null ],
       [ "ndList< ndBodyKinematic *, ndContainersFreeListAlloc< ndBodyKinematic * > >", "classnd_list.html", [
-        [ "ndListView< ndBodyKinematic >", "classnd_list_view.html", [
-          [ "ndBodyList", "classnd_body_list.html", null ]
-        ] ]
-      ] ],
-      [ "ndList< ndBodyParticleSet *, ndContainersFreeListAlloc< ndBodyParticleSet * > >", "classnd_list.html", [
-        [ "ndBodyParticleSetList", "classnd_body_particle_set_list.html", null ]
+        [ "ndSpecialList< ndBodyKinematic >", "classnd_special_list.html", null ]
       ] ],
       [ "ndList< ndCharacter::ndEffetorInfo >", "classnd_list.html", null ],
       [ "ndList< ndContactMaterial, ndContainersFreeListAlloc< ndContactMaterial > >", "classnd_list.html", [
@@ -273,45 +268,37 @@ var hierarchy =
       ] ],
       [ "ndList< ndJointBilateralConstraint * >", "classnd_list.html", null ],
       [ "ndList< ndJointBilateralConstraint *, ndContainersFreeListAlloc< ndJointBilateralConstraint * > >", "classnd_list.html", [
-        [ "ndJointList", "classnd_joint_list.html", null ]
+        [ "ndBodyKinematic::ndJointList", "classnd_body_kinematic_1_1nd_joint_list.html", null ]
       ] ],
-      [ "ndList< ndLocalThreadData >", "classnd_list.html", null ],
-      [ "ndList< ndModel *, ndContainersFreeListAlloc< ndModel * > >", "classnd_list.html", [
-        [ "ndModelList", "classnd_model_list.html", null ]
-      ] ],
-      [ "ndList< ndMultiBodyVehicleDifferential * >", "classnd_list.html", null ],
-      [ "ndList< ndMultiBodyVehicleDifferentialAxle * >", "classnd_list.html", null ],
-      [ "ndList< ndMultiBodyVehicleTireJoint * >", "classnd_list.html", null ],
       [ "ndList< ndNode *, ndContainersFreeListAlloc< ndNode * > >", "classnd_list.html", [
         [ "ndConvexHull4d::ndTempList", "classnd_convex_hull4d_1_1nd_temp_list.html", null ]
       ] ],
       [ "ndList< ndNode, ndContainersFreeListAlloc< ndSkeletonContainer::ndNode > >", "classnd_list.html", [
         [ "ndSkeletonContainer::ndNodeList", "classnd_skeleton_container_1_1nd_node_list.html", null ]
       ] ],
+      [ "ndList< ndSharedPtr< ndBody >, ndContainersFreeListAlloc< ndSharedPtr< ndBody > * > >", "classnd_list.html", [
+        [ "ndBodyList", "classnd_body_list.html", null ],
+        [ "ndBodyListView", "classnd_body_list_view.html", null ]
+      ] ],
+      [ "ndList< ndSharedPtr< ndJointBilateralConstraint >, ndContainersFreeListAlloc< ndSharedPtr< ndJointBilateralConstraint > * > >", "classnd_list.html", [
+        [ "ndJointBilateralConstraint::ndJointList", "classnd_joint_bilateral_constraint_1_1nd_joint_list.html", null ],
+        [ "ndJointList", "classnd_joint_list.html", null ]
+      ] ],
+      [ "ndList< ndSharedPtr< ndModel >, ndContainersFreeListAlloc< ndSharedPtr< ndModel > * > >", "classnd_list.html", [
+        [ "ndModelList", "classnd_model_list.html", null ]
+      ] ],
+      [ "ndList< ndSharedPtr< T >, ndContainersFreeListAlloc< ndSharedPtr< T > * > >", "classnd_list.html", [
+        [ "ndModel::ndReferencedObjects< T >", "classnd_model_1_1nd_referenced_objects.html", null ]
+      ] ],
       [ "ndList< ndSkeletonContainer, ndContainersFreeListAlloc< ndSkeletonContainer > >", "classnd_list.html", [
         [ "ndSkeletonList", "classnd_skeleton_list.html", null ]
       ] ],
       [ "ndList< T *, ndContainersFreeListAlloc< T * > >", "classnd_list.html", [
-        [ "ndListView< T >", "classnd_list_view.html", null ]
+        [ "ndSpecialList< T >", "classnd_special_list.html", null ]
       ] ],
       [ "ndLoadSave", "classnd_load_save.html", null ],
       [ "ndLoadSaveBase", "classnd_load_save_base.html", [
         [ "ndLoadSaveClass< T >", "classnd_load_save_class.html", null ]
-      ] ],
-      [ "ndMaterial", "classnd_material.html", null ],
-      [ "ndModel", "classnd_model.html", [
-        [ "ndCharacter", "classnd_character.html", null ],
-        [ "ndMultiBodyVehicle", "classnd_multi_body_vehicle.html", null ]
-      ] ],
-      [ "ndNodeBaseHierarchy", "classnd_node_base_hierarchy.html", [
-        [ "ndNodeHierarchy< T >", "classnd_node_hierarchy.html", null ],
-        [ "ndNodeHierarchy< ndCharacterNode >", "classnd_node_hierarchy.html", [
-          [ "ndCharacterNode", "classnd_character_node.html", [
-            [ "ndCharacterForwardDynamicNode", "classnd_character_forward_dynamic_node.html", null ],
-            [ "ndCharacterInverseDynamicNode", "classnd_character_inverse_dynamic_node.html", null ],
-            [ "ndCharacterRootNode", "classnd_character_root_node.html", null ]
-          ] ]
-        ] ]
       ] ],
       [ "ndOpenclSystem", "classnd_opencl_system.html", null ],
       [ "ndPolygonSoupBuilder", "classnd_polygon_soup_builder.html", null ],
@@ -329,11 +316,9 @@ var hierarchy =
       [ "ndRayCastNotify", "classnd_ray_cast_notify.html", [
         [ "ndRayCastClosestHitCallback", "classnd_ray_cast_closest_hit_callback.html", null ]
       ] ],
-      [ "ndRefCounter< T >", "classnd_ref_counter.html", null ],
       [ "ndSceneTreeNotiFy", "classnd_scene_tree_noti_fy.html", null ],
       [ "ndShapeCompound::ndNodeBase", "classnd_shape_compound_1_1nd_node_base.html", null ],
       [ "ndShapeDebugNotify", "classnd_shape_debug_notify.html", null ],
-      [ "ndShapeInstance", "classnd_shape_instance.html", null ],
       [ "ndStackBase", "classnd_stack_base.html", [
         [ "ndStack< T >", "classnd_stack.html", null ]
       ] ],
@@ -368,9 +353,7 @@ var hierarchy =
       ] ],
       [ "ndTree< ndEdge, ndEdgeKey >", "classnd_tree.html", [
         [ "ndPolyhedra", "classnd_polyhedra.html", [
-          [ "ndMeshEffect", "classnd_mesh_effect.html", [
-            [ "ndShapeInstanceMeshBuilder", "classnd_shape_instance_mesh_builder.html", null ]
-          ] ],
+          [ "ndMeshEffect", "classnd_mesh_effect.html", null ],
           [ "ndPolygonSoupBuilder::dgPolySoupFilterAllocator", "classnd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html", null ]
         ] ]
       ] ],
@@ -390,6 +373,7 @@ var hierarchy =
     ] ],
     [ "ndCollisionBvhInfo", "structnd_collision_bvh_info.html", null ],
     [ "ndCollisionBvhShowPolyContext", "classnd_collision_bvh_show_poly_context.html", null ],
+    [ "ndCompoundInfo", "structnd_compound_info.html", null ],
     [ "ndConeInfo", "structnd_cone_info.html", null ],
     [ "ndConstraintDescritor", "classnd_constraint_descritor.html", null ],
     [ "ndScene::ndContactPairs", "classnd_scene_1_1nd_contact_pairs.html", null ],
@@ -407,7 +391,6 @@ var hierarchy =
     [ "ndConvexHull4dTetraherum", "classnd_convex_hull4d_tetraherum.html", null ],
     [ "ndConvexHullInfo", "structnd_convex_hull_info.html", null ],
     [ "ndShapeConvex::ndConvexSimplexEdge", "classnd_shape_convex_1_1nd_convex_simplex_edge.html", null ],
-    [ "ndCoumpoundInfo", "structnd_coumpound_info.html", null ],
     [ "ndCudaBodyAabbCell", "classnd_cuda_body_aabb_cell.html", null ],
     [ "ndCudaBodyProxy", "classnd_cuda_body_proxy.html", null ],
     [ "ndCudaBoundingBox", "classnd_cuda_bounding_box.html", null ],
@@ -452,14 +435,18 @@ var hierarchy =
     [ "ndForceImpactPair", "classnd_force_impact_pair.html", null ],
     [ "ndSkeletonContainer::ndForcePair", "classnd_skeleton_container_1_1nd_force_pair.html", null ],
     [ "ndFreeListAlloc", "classnd_free_list_alloc.html", [
-      [ "ndContainersFreeListAlloc< T >", "classnd_containers_free_list_alloc.html", null ],
+      [ "ndContainersFreeListAlloc< T >", "classnd_containers_free_list_alloc.html", [
+        [ "ndNodeHierarchy< T >", "classnd_node_hierarchy.html", null ]
+      ] ],
       [ "ndContainersFreeListAlloc< ndBody >", "classnd_containers_free_list_alloc.html", [
         [ "ndBody", "classnd_body.html", [
           [ "ndBodyKinematic", "classnd_body_kinematic.html", [
             [ "ndBodyDynamic", "classnd_body_dynamic.html", null ],
-            [ "ndBodyPlayerCapsule", "classnd_body_player_capsule.html", null ],
-            [ "ndBodySentinel", "classnd_body_sentinel.html", null ],
-            [ "ndBodyTriggerVolume", "classnd_body_trigger_volume.html", null ]
+            [ "ndBodyKinematicBase", "classnd_body_kinematic_base.html", [
+              [ "ndBodyPlayerCapsule", "classnd_body_player_capsule.html", null ],
+              [ "ndBodyTriggerVolume", "classnd_body_trigger_volume.html", null ]
+            ] ],
+            [ "ndBodySentinel", "classnd_body_sentinel.html", null ]
           ] ],
           [ "ndBodyParticleSet", "classnd_body_particle_set.html", null ]
         ] ]
@@ -471,6 +458,15 @@ var hierarchy =
         [ "ndBvhNode", "classnd_bvh_node.html", [
           [ "ndBvhInternalNode", "classnd_bvh_internal_node.html", null ],
           [ "ndBvhLeafNode", "classnd_bvh_leaf_node.html", null ]
+        ] ]
+      ] ],
+      [ "ndContainersFreeListAlloc< ndCharacterNode >", "classnd_containers_free_list_alloc.html", [
+        [ "ndNodeHierarchy< ndCharacterNode >", "classnd_node_hierarchy.html", [
+          [ "ndCharacterNode", "classnd_character_node.html", [
+            [ "ndCharacterForwardDynamicNode", "classnd_character_forward_dynamic_node.html", null ],
+            [ "ndCharacterInverseDynamicNode", "classnd_character_inverse_dynamic_node.html", null ],
+            [ "ndCharacterRootNode", "classnd_character_root_node.html", null ]
+          ] ]
         ] ]
       ] ],
       [ "ndContainersFreeListAlloc< ndConstraint >", "classnd_containers_free_list_alloc.html", [
@@ -512,6 +508,21 @@ var hierarchy =
           ] ]
         ] ]
       ] ],
+      [ "ndContainersFreeListAlloc< ndMaterial >", "classnd_containers_free_list_alloc.html", [
+        [ "ndMaterial", "classnd_material.html", null ]
+      ] ],
+      [ "ndContainersFreeListAlloc< ndMeshEffectNode >", "classnd_containers_free_list_alloc.html", [
+        [ "ndNodeHierarchy< ndMeshEffectNode >", "classnd_node_hierarchy.html", [
+          [ "ndMeshEffectNode", "classnd_mesh_effect_node.html", null ]
+        ] ]
+      ] ],
+      [ "ndContainersFreeListAlloc< ndModel >", "classnd_containers_free_list_alloc.html", [
+        [ "ndModel", "classnd_model.html", [
+          [ "ndCharacter", "classnd_character.html", null ],
+          [ "ndMultiBodyVehicle", "classnd_multi_body_vehicle.html", null ]
+        ] ]
+      ] ],
+      [ "ndContainersFreeListAlloc< ndRefCounter >", "classnd_containers_free_list_alloc.html", null ],
       [ "ndContainersFreeListAlloc< ndShape >", "classnd_containers_free_list_alloc.html", [
         [ "ndShape", "classnd_shape.html", [
           [ "ndShapeCompound", "classnd_shape_compound.html", null ],
@@ -533,6 +544,9 @@ var hierarchy =
             [ "ndShapeStaticProceduralMesh", "classnd_shape_static_procedural_mesh.html", null ]
           ] ]
         ] ]
+      ] ],
+      [ "ndContainersFreeListAlloc< ndShapeInstance >", "classnd_containers_free_list_alloc.html", [
+        [ "ndShapeInstance", "classnd_shape_instance.html", null ]
       ] ]
     ] ],
     [ "ndFreeListEntry", "classnd_free_list_entry.html", null ],
@@ -541,11 +555,13 @@ var hierarchy =
     [ "ndFunction< Type >", "classnd_function_3_01_type_01_4.html", null ],
     [ "ndGoogol", "classnd_googol.html", null ],
     [ "ndBodySphFluid::ndGridHash", "classnd_body_sph_fluid_1_1nd_grid_hash.html", null ],
+    [ "ndShapeHeightfield::ndGridQuad", "classnd_shape_heightfield_1_1nd_grid_quad.html", null ],
     [ "ndHeighfieldInfo", "structnd_heighfield_info.html", null ],
     [ "ndJointBilateralConstraint::ndIkInterface", "classnd_joint_bilateral_constraint_1_1nd_ik_interface.html", [
       [ "ndIkJointDoubleHinge", "classnd_ik_joint_double_hinge.html", null ],
       [ "ndIkJointHinge", "classnd_ik_joint_hinge.html", null ],
-      [ "ndIkJointSpherical", "classnd_ik_joint_spherical.html", null ]
+      [ "ndIkJointSpherical", "classnd_ik_joint_spherical.html", null ],
+      [ "ndJointWheel", "classnd_joint_wheel.html", null ]
     ] ],
     [ "ndIndexArray", "classnd_index_array.html", null ],
     [ "ndDynamicsUpdate::ndIsland", "classnd_dynamics_update_1_1nd_island.html", null ],
@@ -571,7 +587,6 @@ var hierarchy =
     ] ],
     [ "ndMemory", "classnd_memory.html", null ],
     [ "ndMemoryHeader", "classnd_memory_header.html", null ],
-    [ "ndPolygonMeshDesc::ndMesh", "classnd_polygon_mesh_desc_1_1nd_mesh.html", null ],
     [ "ndShapeStaticMesh::ndMeshVertexListIndexList", "classnd_shape_static_mesh_1_1nd_mesh_vertex_list_index_list.html", null ],
     [ "ndMinkFace", "classnd_mink_face.html", null ],
     [ "ndAabbPolygonSoup::ndNode", "classnd_aabb_polygon_soup_1_1nd_node.html", [
@@ -585,12 +600,14 @@ var hierarchy =
     [ "ndOpenclBodyBuffer::ndOpenclJacobian", "unionnd_opencl_body_buffer_1_1nd_opencl_jacobian.html", null ],
     [ "ndOpenclJacobianPair", "classnd_opencl_jacobian_pair.html", null ],
     [ "ndSkeletonContainer::ndOrdinal", "classnd_skeleton_container_1_1nd_ordinal.html", null ],
+    [ "ndOUNoise", "classnd_o_u_noise.html", null ],
     [ "ndPolyhedra::ndPairKey", "classnd_polyhedra_1_1nd_pair_key.html", null ],
     [ "ndBodySphFluid::ndParticleKernelDistance", "classnd_body_sph_fluid_1_1nd_particle_kernel_distance.html", null ],
     [ "ndBodySphFluid::ndParticlePair", "classnd_body_sph_fluid_1_1nd_particle_pair.html", null ],
     [ "ndPointInfo", "structnd_point_info.html", null ],
     [ "ndPointParam", "classnd_point_param.html", null ],
-    [ "ndProceduralInfoInfo", "structnd_procedural_info_info.html", null ],
+    [ "ndProceduralInfo", "structnd_procedural_info.html", null ],
+    [ "ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery", "classnd_polygon_mesh_desc_1_1nd_procedural_static_mesh_face_query.html", null ],
     [ "ndRedBackNode", "classnd_red_back_node.html", [
       [ "ndTree< OBJECT, KEY, allocator >::ndNode", "classnd_tree_1_1nd_node.html", null ]
     ] ],
@@ -602,29 +619,34 @@ var hierarchy =
     [ "ndSemaphore", "classnd_semaphore.html", [
       [ "ndThread", "classnd_thread.html", null ]
     ] ],
-    [ "ndSetPrecisionDouble", "classnd_set_precision_double.html", null ],
     [ "ndShapeInfo", "classnd_shape_info.html", null ],
     [ "ndShapeMaterial", "classnd_shape_material.html", null ],
+    [ "ndSharedPtr< T >", "classnd_shared_ptr.html", null ],
+    [ "ndSharedPtr< ndMeshEffect >", "classnd_shared_ptr.html", null ],
+    [ "ndSharedPtr< ndMultiBodyVehicleGearBox >", "classnd_shared_ptr.html", null ],
+    [ "ndSharedPtr< ndMultiBodyVehicleMotor >", "classnd_shared_ptr.html", null ],
+    [ "ndSharedPtr< ndMultiBodyVehicleTorsionBar >", "classnd_shared_ptr.html", null ],
     [ "ndSkeletonContainer", "classnd_skeleton_container.html", null ],
     [ "ndSoa::ndSoaJacobianPair", "classnd_soa_1_1nd_soa_jacobian_pair.html", null ],
-    [ "ndSoa::ndSoaMatrixElement", "classnd_soa_1_1nd_soa_matrix_element.html", null ],
     [ "ndSoaMatrixElement", "classnd_soa_matrix_element.html", null ],
+    [ "ndSoa::ndSoaMatrixElement", "classnd_soa_1_1nd_soa_matrix_element.html", null ],
     [ "ndSoa::ndSoaVector3", "classnd_soa_1_1nd_soa_vector3.html", null ],
     [ "ndSoa::ndSoaVector6", "classnd_soa_1_1nd_soa_vector6.html", null ],
-    [ "ndMeshEffect::ndFormat::ndSortCluster", "classnd_mesh_effect_1_1nd_format_1_1nd_sort_cluster.html", null ],
     [ "ndSortCluster", "classnd_sort_cluster.html", null ],
-    [ "ndSortKey", "classnd_sort_key.html", null ],
+    [ "ndMeshEffect::ndFormat::ndSortCluster", "classnd_mesh_effect_1_1nd_format_1_1nd_sort_cluster.html", null ],
     [ "ndMeshEffect::ndFormat::ndSortKey", "classnd_mesh_effect_1_1nd_format_1_1nd_sort_key.html", null ],
+    [ "ndSortKey", "classnd_sort_key.html", null ],
     [ "ndSpatialMatrix", "classnd_spatial_matrix.html", null ],
     [ "ndSpatialVector", "classnd_spatial_vector.html", null ],
     [ "ndMultiBodyVehicle::ndDownForce::ndSpeedForcePair", "classnd_multi_body_vehicle_1_1nd_down_force_1_1nd_speed_force_pair.html", null ],
     [ "ndSphereInfo", "structnd_sphere_info.html", null ],
     [ "ndSpinLock", "classnd_spin_lock.html", null ],
-    [ "ndAabbPolygonSoup::ndSpliteInfo", "classnd_aabb_polygon_soup_1_1nd_splite_info.html", null ],
     [ "ndShapeCompound::ndSpliteInfo", "classnd_shape_compound_1_1nd_splite_info.html", null ],
+    [ "ndAabbPolygonSoup::ndSplitInfo", "classnd_aabb_polygon_soup_1_1nd_split_info.html", null ],
     [ "ndStackBvhStackEntry", "classnd_stack_bvh_stack_entry.html", null ],
     [ "ndStackEntry", "classnd_stack_entry.html", null ],
     [ "ndStartEnd", "classnd_start_end.html", null ],
+    [ "ndPolygonMeshDesc::ndStaticMeshFaceQuery", "classnd_polygon_mesh_desc_1_1nd_static_mesh_face_query.html", null ],
     [ "ndString::ndStringAllocator", "classnd_string_1_1nd_string_allocator.html", null ],
     [ "ndSyncMutex", "classnd_sync_mutex.html", [
       [ "ndThreadPool", "classnd_thread_pool.html", null ]
@@ -636,6 +658,11 @@ var hierarchy =
     [ "ndThreadName", "classnd_thread_name.html", [
       [ "ndThread", "classnd_thread.html", null ]
     ] ],
+    [ "ndMultiBodyVehicle::ndTireContactPair", "classnd_multi_body_vehicle_1_1nd_tire_contact_pair.html", null ],
+    [ "ndTireFrictionModel", "classnd_tire_friction_model.html", [
+      [ "ndMultiBodyVehicleTireJointInfo", "classnd_multi_body_vehicle_tire_joint_info.html", null ]
+    ] ],
+    [ "ndShapeHeightfield::ndTriangle", "classnd_shape_heightfield_1_1nd_triangle.html", null ],
     [ "ndTriplex", "classnd_triplex.html", null ],
     [ "ndUpHeapCompare< dKey >", "classnd_up_heap_compare.html", null ],
     [ "ndVector", "classnd_vector.html", [
@@ -644,8 +671,10 @@ var hierarchy =
     ] ],
     [ "ndVertexCollapseVertexMetric", "classnd_vertex_collapse_vertex_metric.html", null ],
     [ "ndMeshEffect::ndFormat::ndVertexSortData", "classnd_mesh_effect_1_1nd_format_1_1nd_vertex_sort_data.html", null ],
-    [ "ndWheelDescriptor", "classnd_wheel_descriptor.html", null ],
-    [ "ndBodySphFluid::ndWorkingData", "classnd_body_sph_fluid_1_1nd_working_data.html", null ],
+    [ "ndWheelDescriptor", "classnd_wheel_descriptor.html", [
+      [ "ndMultiBodyVehicleTireJointInfo", "classnd_multi_body_vehicle_tire_joint_info.html", null ]
+    ] ],
+    [ "ndBodySphFluid::ndWorkingBuffers", "classnd_body_sph_fluid_1_1nd_working_buffers.html", null ],
     [ "thread", null, [
       [ "ndThread", "classnd_thread.html", null ]
     ] ],

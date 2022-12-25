@@ -110,9 +110,8 @@ Inheritance diagram for ndArray&lt; T &gt;:</div>
  <div class="center">
   <img src="classnd_array.png" usemap="#ndArray_3C_20T_20_3E_map" alt=""/>
   <map id="ndArray_3C_20T_20_3E_map" name="ndArray_3C_20T_20_3E_map">
-<area href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="ndClassAlloc" shape="rect" coords="71,0,204,24"/>
+<area href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="ndClassAlloc" shape="rect" coords="0,0,133,24"/>
 <area href="classnd_opencl_buffer.html" alt="ndOpenclBuffer&lt; T &gt;" shape="rect" coords="0,112,133,136"/>
-<area href="classnd_temp_array.html" alt="ndTempArray&lt; T &gt;" shape="rect" coords="143,112,276,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -160,6 +159,16 @@ ndInt32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a2af7fce42c57e6c85dca0c199aa58885"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">PushBack</a> (const T &amp;element)</td></tr>
 <tr class="memdesc:a2af7fce42c57e6c85dca0c199aa58885"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add element to the end of the buffer.  <a href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">More...</a><br /></td></tr>
 <tr class="separator:a2af7fce42c57e6c85dca0c199aa58885"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b87009eb6642596e17e155d41020e17"><td class="memItemLeft" align="right" valign="top"><a id="a3b87009eb6642596e17e155d41020e17"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_array.html#a3b87009eb6642596e17e155d41020e17">RandomShuffle</a> (ndInt32 count)</td></tr>
+<tr class="memdesc:a3b87009eb6642596e17e155d41020e17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Randomize the vector entries. <br /></td></tr>
+<tr class="separator:a3b87009eb6642596e17e155d41020e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ef87db68fc63e09354a584f44867b96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">ResetMembers</a> ()</td></tr>
+<tr class="memdesc:a1ef87db68fc63e09354a584f44867b96"><td class="mdescLeft">&#160;</td><td class="mdescRight">set all member to 0.  <a href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">More...</a><br /></td></tr>
+<tr class="separator:a1ef87db68fc63e09354a584f44867b96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2a09b7eebdf091dfcc22054f35ee7fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">SetMembers</a> (ndInt32 size, void *const memory)</td></tr>
+<tr class="memdesc:ad2a09b7eebdf091dfcc22054f35ee7fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">assign all members.  <a href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">More...</a><br /></td></tr>
+<tr class="separator:ad2a09b7eebdf091dfcc22054f35ee7fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
 <tr class="memitem:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="affad975c41ed36eae8c71e3468fc12e3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#affad975c41ed36eae8c71e3468fc12e3">ndClassAlloc</a> ()</td></tr>
@@ -271,6 +280,25 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a id="a1ef87db68fc63e09354a584f44867b96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ef87db68fc63e09354a584f44867b96">&#9670;&nbsp;</a></span>ResetMembers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classnd_array.html">ndArray</a>&lt; T &gt;::ResetMembers</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>set all member to 0. </p>
+<p>useful for when making vectors of vectors (ex matrices) </p>
+
+</div>
+</div>
 <a id="ac383edb0da15600add54ab14d3b3d309"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac383edb0da15600add54ab14d3b3d309">&#9670;&nbsp;</a></span>Resize()</h2>
 
@@ -314,6 +342,39 @@ template&lt;class T &gt; </div>
 
 <p>Set a new size. </p>
 <p>if count is larger than m_size, the array resized by doubling its size, all the data is simply copied to the new array and old array is deleted. </p>
+
+</div>
+</div>
+<a id="ad2a09b7eebdf091dfcc22054f35ee7fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2a09b7eebdf091dfcc22054f35ee7fa">&#9670;&nbsp;</a></span>SetMembers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classnd_array.html">ndArray</a>&lt; T &gt;::SetMembers </td>
+          <td>(</td>
+          <td class="paramtype">ndInt32&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *const&#160;</td>
+          <td class="paramname"><em>memory</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>assign all members. </p>
+<p>useful for when making vectors of vectors (ex matrices) </p>
 
 </div>
 </div>

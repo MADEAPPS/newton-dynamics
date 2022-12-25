@@ -19,7 +19,7 @@ var classnd_joint_slider =
     [ "SetLimits", "classnd_joint_slider.html#a3a76da7a1df8b26c6175578f31b5fae2", null ],
     [ "SetLimitState", "classnd_joint_slider.html#a222b8aa34737d21a8c048f6124761d7b", null ],
     [ "SetOffsetPosit", "classnd_joint_slider.html#a2a8fc2ed8e5846663aa96df2b17fed8f", null ],
-    [ "SubmitLimits", "classnd_joint_slider.html#a338676f69aa286696a6079065fa90030", null ],
+    [ "SubmitLimits", "classnd_joint_slider.html#a4aaa87e8adf8cabc3115106b1aa63e2f", null ],
     [ "SubmitSpringDamper", "classnd_joint_slider.html#a872ac7ceb977e3604ed312f0fc066514", null ],
     [ "m_damperC", "classnd_joint_slider.html#af7bf67a8cbde8bc410022137f53f9a02", null ],
     [ "m_limitState", "classnd_joint_slider.html#a71ef220703ae821986c2e1a13be5f26f", null ],

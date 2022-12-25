@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="title">ndShape.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -248,12 +248,12 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a>* m_vertex;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;};</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="structnd_coumpound_info.html">  152</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structnd_coumpound_info.html">ndCoumpoundInfo</a></div>
+<div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="structnd_compound_info.html">  152</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structnd_compound_info.html">ndCompoundInfo</a></div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;{</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    ndInt32 m_noUsed;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;};</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno"><a class="line" href="structnd_procedural_info_info.html">  157</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structnd_procedural_info_info.html">ndProceduralInfoInfo</a></div>
+<div class="line"><a name="l00157"></a><span class="lineno"><a class="line" href="structnd_procedural_info.html">  157</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structnd_procedural_info.html">ndProceduralInfo</a></div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;{</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    ndInt32 m_noUsed;</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;};</div>
@@ -293,10 +293,10 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <a class="code" href="structnd_capsule_info.html">ndCapsuleInfo</a> m_capsule;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <a class="code" href="structnd_collision_bvh_info.html">ndCollisionBvhInfo</a> m_bvh;</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        <a class="code" href="structnd_cylinder_info.html">ndCylinderInfo</a> m_cylinder;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <a class="code" href="structnd_coumpound_info.html">ndCoumpoundInfo</a> m_compound;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <a class="code" href="structnd_compound_info.html">ndCompoundInfo</a> m_compound;</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <a class="code" href="structnd_convex_hull_info.html">ndConvexHullInfo</a> m_convexhull;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <a class="code" href="structnd_heighfield_info.html">ndHeighfieldInfo</a> m_heightfield;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <a class="code" href="structnd_procedural_info_info.html">ndProceduralInfoInfo</a> m_procedural;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <a class="code" href="structnd_procedural_info.html">ndProceduralInfo</a> m_procedural;</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        <a class="code" href="structnd_chamfer_cylinder_info.html">ndChamferCylinderInfo</a> m_chamferCylinder;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        </div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        ndFloat32 m_paramArray[32];</div>
@@ -308,127 +308,106 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    D_CLASS_REFLECTION(<a class="code" href="classnd_shape.html">ndShape</a>);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    ndInt32 GetRefCount() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keyword">virtual</span> ndInt32 Release() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="classnd_shape.html">ndShape</a>* AddRef() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_box.html">ndShapeBox</a>* GetAsShapeBox() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_null.html">ndShapeNull</a>* GetAsShapeNull() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_cone.html">ndShapeCone</a>* GetAsShapeCone() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_point.html">ndShapePoint</a>* GetAsShapePoint() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_convex.html">ndShapeConvex</a>* GetAsShapeConvex() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_sphere.html">ndShapeSphere</a>* GetAsShapeSphere() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_capsule.html">ndShapeCapsule</a>* GetAsShapeCapsule() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_cylinder.html">ndShapeCylinder</a>* GetAsShapeCylinder() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_compound.html">ndShapeCompound</a>* GetAsShapeCompound() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static__bvh.html">ndShapeStatic_bvh</a>* GetAsShapeStaticBVH() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a>* GetAsShapeStaticMesh() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_heightfield.html">ndShapeHeightfield</a>* GetAsShapeHeightfield() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>* GetAsShapeAsConvexPolygon() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_chamfer_cylinder.html">ndShapeChamferCylinder</a>* GetAsShapeChamferCylinder() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>* GetAsShapeStaticProceduralMesh() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keyword">virtual</span> ndInt32 GetConvexVertexCount() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_shape.html">ndShape</a>();</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    D_COLLISION_API ndInt32 GetRefCount() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ndInt32 Release() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="classnd_shape.html">ndShape</a>* AddRef() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_box.html">ndShapeBox</a>* GetAsShapeBox() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_null.html">ndShapeNull</a>* GetAsShapeNull() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_cone.html">ndShapeCone</a>* GetAsShapeCone() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_point.html">ndShapePoint</a>* GetAsShapePoint() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_convex.html">ndShapeConvex</a>* GetAsShapeConvex() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_sphere.html">ndShapeSphere</a>* GetAsShapeSphere() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_capsule.html">ndShapeCapsule</a>* GetAsShapeCapsule() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_cylinder.html">ndShapeCylinder</a>* GetAsShapeCylinder() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_compound.html">ndShapeCompound</a>* GetAsShapeCompound() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static__bvh.html">ndShapeStatic_bvh</a>* GetAsShapeStaticBVH() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a>* GetAsShapeStaticMesh() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_heightfield.html">ndShapeHeightfield</a>* GetAsShapeHeightfield() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>* GetAsShapeAsConvexPolygon() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_chamfer_cylinder.html">ndShapeChamferCylinder</a>* GetAsShapeChamferCylinder() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>* GetAsShapeStaticProceduralMesh() { <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; }</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> GetObbSize() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> GetObbOrigin() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    ndFloat32 GetUmbraClipSize() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> MassProperties();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keyword">virtual</span> ndInt32 GetConvexVertexCount() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> GetObbSize() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> GetObbOrigin() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    ndFloat32 GetUmbraClipSize() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> DebugShape(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; matrix, <a class="code" href="classnd_shape_debug_notify.html">ndShapeDebugNotify</a>&amp; debugCallback) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> MassProperties();</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_info.html">ndShapeInfo</a> GetShapeInfo() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keyword">virtual</span> ndFloat32 GetVolume() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keyword">virtual</span> ndFloat32 GetBoxMinRadius() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keyword">virtual</span> ndFloat32 GetBoxMaxRadius() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> CalculateAabb(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; matrix, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p0, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p1) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> SupportVertex(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir, ndInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> SupportVertexSpecialProjectPoint(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; point, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> SupportVertexSpecial(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir, ndFloat32 skinMargin, ndInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keyword">virtual</span> ndInt32 CalculatePlaneIntersection(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; normal, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; point, <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> contactsOut) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> CalculateVolumeIntegral(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; globalMatrix, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; globalPlane, <span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>&amp; parentScale) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keyword">virtual</span> ndFloat32 RayCast(<a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>&amp; callback, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localP0, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localP1, ndFloat32 maxT, <span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contactOut) <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_matrix.html">ndMatrix</a> CalculateInertiaAndCenterOfMass(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; alignMatrix, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localScale, <span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; matrix) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keyword">virtual</span> ndFloat32 CalculateMassProperties(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; offset, <a class="code" href="classnd_vector.html">ndVector</a>&amp; inertia, <a class="code" href="classnd_vector.html">ndVector</a>&amp; crossInertia, <a class="code" href="classnd_vector.html">ndVector</a>&amp; centerOfMass) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a>&amp; desc) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> DebugShape(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; matrix, <a class="code" href="classnd_shape_debug_notify.html">ndShapeDebugNotify</a>&amp; debugCallback) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_info.html">ndShapeInfo</a> GetShapeInfo() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keyword">virtual</span> ndFloat32 GetVolume() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keyword">virtual</span> ndFloat32 GetBoxMinRadius() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keyword">virtual</span> ndFloat32 GetBoxMaxRadius() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> CalculateAabb(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; matrix, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p0, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p1) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> SupportVertex(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir, ndInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> SupportVertexSpecialProjectPoint(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; point, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> SupportVertexSpecial(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir, ndFloat32 skinMargin, ndInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keyword">virtual</span> ndInt32 CalculatePlaneIntersection(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; normal, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; point, <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> contactsOut) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> CalculateVolumeIntegral(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; globalMatrix, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; globalPlane, <span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>&amp; parentScale) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keyword">virtual</span> ndFloat32 RayCast(<a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>&amp; callback, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localP0, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localP1, ndFloat32 maxT, <span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contactOut) <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_matrix.html">ndMatrix</a> CalculateInertiaAndCenterOfMass(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; alignMatrix, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localScale, <span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; matrix) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keyword">virtual</span> ndFloat32 CalculateMassProperties(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; offset, <a class="code" href="classnd_vector.html">ndVector</a>&amp; inertia, <a class="code" href="classnd_vector.html">ndVector</a>&amp; crossInertia, <a class="code" href="classnd_vector.html">ndVector</a>&amp; centerOfMass) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape.html">ndShape</a>(ndShapeID <span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape.html">ndShape</a> (<span class="keyword">const</span> <a class="code" href="classnd_shape.html">ndShape</a>&amp; source);</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_shape.html">ndShape</a>();</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_inertia; </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_crossInertia;    </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_centerOfMass;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_boxSize;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_boxOrigin;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="classnd_atomic.html">ndAtomic&lt;ndInt32&gt;</a> m_refCount;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    ndShapeID m_collisionId;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_vector.html">ndVector</a> m_flushZero;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="keyword">inline</span> ndInt32 ndShape::GetConvexVertexCount()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;}</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classnd_shape.html">ndShape</a>* ndShape::AddRef()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    m_refCount.fetch_add(1);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">this</span>;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;}</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="keyword">inline</span> ndInt32 ndShape::Release()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    ndInt32 count = m_refCount.fetch_add(-1);</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    dAssert(count &gt;= 1);</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keywordflow">if</span> (count == 1) </div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    {</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <span class="keyword">delete</span> <span class="keyword">this</span>;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span> count;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;}</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="keyword">inline</span> ndInt32 ndShape::GetRefCount()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">return</span> m_refCount.load();</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;}</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160; </div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="keyword">inline</span> ndFloat32 ndShape::CalculateMassProperties(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp;, <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <a class="code" href="classnd_vector.html">ndVector</a>&amp;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="keyword"></span>{ </div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    dAssert(0); </div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordflow">return</span> 0; </div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a>&amp; desc) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape.html">ndShape</a>(ndShapeID <span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape.html">ndShape</a> (<span class="keyword">const</span> <a class="code" href="classnd_shape.html">ndShape</a>&amp; source);</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_inertia; </div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_crossInertia;    </div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_centerOfMass;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_boxSize;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_boxOrigin;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keyword">mutable</span> <a class="code" href="classnd_atomic.html">ndAtomic&lt;ndInt32&gt;</a> m_refCount;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    ndShapeID m_collisionId;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_vector.html">ndVector</a> m_flushZero;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="keyword">inline</span> ndInt32 ndShape::GetConvexVertexCount()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword">inline</span> ndFloat32 ndShape::CalculateMassProperties(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp;, <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <a class="code" href="classnd_vector.html">ndVector</a>&amp;)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="keyword"></span>{ </div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    ndAssert(0); </div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">return</span> 0; </div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;}</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_matrix.html">ndMatrix</a> ndShape::CalculateInertiaAndCenterOfMass(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp;, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp;)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    ndAssert(0);</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keywordflow">return</span> ndGetZeroMatrix();</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;}</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_vector.html">ndVector</a> ndShape::GetObbOrigin()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">return</span> m_boxOrigin;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;}</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_vector.html">ndVector</a> ndShape::GetObbSize()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keywordflow">return</span> m_boxSize;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;}</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160; </div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="keyword">inline</span> ndFloat32 ndShape::GetUmbraClipSize()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordflow">return</span> ndFloat32(3.0f) * GetBoxMaxRadius();</div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;}</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_matrix.html">ndMatrix</a> ndShape::CalculateInertiaAndCenterOfMass(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp;, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    dAssert(0);</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordflow">return</span> dGetZeroMatrix();</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;}</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_vector.html">ndVector</a> ndShape::GetObbOrigin()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <span class="keywordflow">return</span> m_boxOrigin;</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;}</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_vector.html">ndVector</a> ndShape::GetObbSize()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="keywordflow">return</span> m_boxSize;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;}</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="keyword">inline</span> ndFloat32 ndShape::GetUmbraClipSize()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">return</span> ndFloat32(3.0f) * GetBoxMaxRadius();</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;}</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="preprocessor">#endif </span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="preprocessor">#endif </span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aunionnd_shape_material_1_1n_data_html"><div class="ttname"><a href="unionnd_shape_material_1_1n_data.html">ndShapeMaterial::nData</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:89</div></div>
@@ -436,11 +415,10 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="ttc" id="astructnd_cone_info_html"><div class="ttname"><a href="structnd_cone_info.html">ndConeInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:133</div></div>
 <div class="ttc" id="astructnd_cylinder_info_html"><div class="ttname"><a href="structnd_cylinder_info.html">ndCylinderInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:119</div></div>
 <div class="ttc" id="aunionnd_shape_material_1_1d_extra_data_html"><div class="ttname"><a href="unionnd_shape_material_1_1d_extra_data.html">ndShapeMaterial::dExtraData</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:95</div></div>
-<div class="ttc" id="astructnd_procedural_info_info_html"><div class="ttname"><a href="structnd_procedural_info_info.html">ndProceduralInfoInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:158</div></div>
+<div class="ttc" id="astructnd_compound_info_html"><div class="ttname"><a href="structnd_compound_info.html">ndCompoundInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:153</div></div>
 <div class="ttc" id="astructnd_convex_hull_info_html"><div class="ttname"><a href="structnd_convex_hull_info.html">ndConvexHullInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:145</div></div>
-<div class="ttc" id="aclassnd_shape_static_mesh_html"><div class="ttname"><a href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticMesh.h:117</div></div>
-<div class="ttc" id="astructnd_coumpound_info_html"><div class="ttname"><a href="structnd_coumpound_info.html">ndCoumpoundInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:153</div></div>
-<div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:42</div></div>
+<div class="ttc" id="aclassnd_shape_static_mesh_html"><div class="ttname"><a href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticMesh.h:32</div></div>
+<div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:43</div></div>
 <div class="ttc" id="aclassnd_shape_material_html"><div class="ttname"><a href="classnd_shape_material.html">ndShapeMaterial</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:80</div></div>
 <div class="ttc" id="aclassnd_shape_null_html"><div class="ttname"><a href="classnd_shape_null.html">ndShapeNull</a></div><div class="ttdef"><b>Definition:</b> ndShapeNull.h:29</div></div>
 <div class="ttc" id="astructnd_heighfield_info_html"><div class="ttname"><a href="structnd_heighfield_info.html">ndHeighfieldInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:169</div></div>
@@ -451,7 +429,7 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="ttc" id="aclassnd_shape_convex_polygon_html"><div class="ttname"><a href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvexPolygon.h:32</div></div>
 <div class="ttc" id="aclassnd_ray_cast_notify_html"><div class="ttname"><a href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:31</div></div>
 <div class="ttc" id="aclassnd_shape_convex_html"><div class="ttname"><a href="classnd_shape_convex.html">ndShapeConvex</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:34</div></div>
-<div class="ttc" id="aclassnd_contact_point_html"><div class="ttname"><a href="classnd_contact_point.html">ndContactPoint</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:41</div></div>
+<div class="ttc" id="aclassnd_contact_point_html"><div class="ttname"><a href="classnd_contact_point.html">ndContactPoint</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:39</div></div>
 <div class="ttc" id="astructnd_capsule_info_html"><div class="ttname"><a href="structnd_capsule_info.html">ndCapsuleInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:126</div></div>
 <div class="ttc" id="aclassnd_shape_cone_html"><div class="ttname"><a href="classnd_shape_cone.html">ndShapeCone</a></div><div class="ttdef"><b>Definition:</b> ndShapeCone.h:31</div></div>
 <div class="ttc" id="astructnd_sphere_info_html"><div class="ttname"><a href="structnd_sphere_info.html">ndSphereInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:114</div></div>
@@ -464,19 +442,20 @@ $(document).ready(function(){initNavTree('nd_shape_8h_source.html',''); initResi
 <div class="ttc" id="aclassnd_shape_box_html"><div class="ttname"><a href="classnd_shape_box.html">ndShapeBox</a></div><div class="ttdef"><b>Definition:</b> ndShapeBox.h:29</div></div>
 <div class="ttc" id="aclassnd_shape_info_html"><div class="ttname"><a href="classnd_shape_info.html">ndShapeInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:182</div></div>
 <div class="ttc" id="aclassnd_containers_free_list_alloc_html"><div class="ttname"><a href="classnd_containers_free_list_alloc.html">ndContainersFreeListAlloc</a></div><div class="ttdef"><b>Definition:</b> ndContainersAlloc.h:60</div></div>
+<div class="ttc" id="astructnd_procedural_info_html"><div class="ttname"><a href="structnd_procedural_info.html">ndProceduralInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:158</div></div>
 <div class="ttc" id="aclassnd_shape_compound_html"><div class="ttname"><a href="classnd_shape_compound.html">ndShapeCompound</a></div><div class="ttdef"><b>Definition:</b> ndShapeCompound.h:33</div></div>
 <div class="ttc" id="aclassnd_shape_static__bvh_html"><div class="ttname"><a href="classnd_shape_static__bvh.html">ndShapeStatic_bvh</a></div><div class="ttdef"><b>Definition:</b> ndShapeStatic_bvh.h:29</div></div>
 <div class="ttc" id="aclassnd_shape_sphere_html"><div class="ttname"><a href="classnd_shape_sphere.html">ndShapeSphere</a></div><div class="ttdef"><b>Definition:</b> ndShapeSphere.h:31</div></div>
 <div class="ttc" id="aclassnd_shape_instance_html"><div class="ttname"><a href="classnd_shape_instance.html">ndShapeInstance</a></div><div class="ttdef"><b>Definition:</b> ndShapeInstance.h:62</div></div>
 <div class="ttc" id="astructnd_chamfer_cylinder_info_html"><div class="ttname"><a href="structnd_chamfer_cylinder_info.html">ndChamferCylinderInfo</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:139</div></div>
 <div class="ttc" id="aclassnd_load_save_base_1_1nd_save_descriptor_html"><div class="ttname"><a href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:93</div></div>
-<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:1024</div></div>
+<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:41</div></div>
 <div class="ttc" id="aclassnd_shape_cylinder_html"><div class="ttname"><a href="classnd_shape_cylinder.html">ndShapeCylinder</a></div><div class="ttdef"><b>Definition:</b> ndShapeCylinder.h:31</div></div>
 <div class="ttc" id="aclassnd_atomic_html"><div class="ttname"><a href="classnd_atomic.html">ndAtomic&lt; ndInt32 &gt;</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_9e485601c42eb04f0475993300f17c6b.html">dCollision</a></li><li class="navelem"><b>ndShape.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_ee7059d835116e7de81274163726d1e4.html">dCollision</a></li><li class="navelem"><b>ndShape.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

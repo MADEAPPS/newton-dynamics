@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_aabb_polygon_soup_8h_source.html','
 <div class="title">ndAabbPolygonSoup.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -132,248 +132,261 @@ $(document).ready(function(){initNavTree('nd_aabb_polygon_soup_8h_source.html','
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">class </span><a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">// index format: i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#define D_CONCAVE_EDGE_MASK (1&lt;&lt;31)</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html">   39</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a>: <span class="keyword">public</span> <a class="code" href="classnd_polygon_soup_database.html">ndPolygonSoupDatabase</a></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#define D_CONCAVE_EDGE_MASK         (1&lt;&lt;31)</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#define D_FACE_CLIP_DIAGONAL_SCALE  ndFloat32 (0.25f)</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">enum</span> ndIntersectStatus</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup_1_1nd_node.html">   42</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">enum</span> ndNodeType</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        {</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            m_binary = 0,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            m_leaf,</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        };</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">   51</a></span>&#160;        <span class="keyword">class </span><a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">            #define DG_INDEX_COUNT_BITS 6</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a> ()</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                dAssert (0);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;            }</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a> (ndUnsigned32 node)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                m_node = node;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                dAssert (!IsLeaf());</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keyword">inline</span> ndUnsigned32 IsLeaf ()<span class="keyword"> const </span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">            </span>{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                <span class="keywordflow">return</span> m_node &amp; 0x80000000;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            }</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <span class="keyword">inline</span> ndUnsigned32 GetCount()<span class="keyword"> const </span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">            </span>{</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                dAssert (IsLeaf());</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                <span class="keywordflow">return</span> (m_node &amp; (~0x80000000)) &gt;&gt; (32 - DG_INDEX_COUNT_BITS - 1);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            }</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            <span class="keyword">inline</span> ndUnsigned32 GetIndex()<span class="keyword"> const </span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">            </span>{</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                dAssert (IsLeaf());</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                <span class="keywordflow">return</span> m_node &amp; (~(-(1 &lt;&lt; (32 - DG_INDEX_COUNT_BITS - 1))));</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a> (ndUnsigned32 faceIndexCount, ndUnsigned32 faceIndexStart)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                dAssert (faceIndexCount &lt; (1&lt;&lt;DG_INDEX_COUNT_BITS));</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                m_node = 0x80000000 | (faceIndexCount &lt;&lt; (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* GetNode (<span class="keyword">const</span> <span class="keywordtype">void</span>* <span class="keyword">const</span> root)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">            </span>{</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                <span class="keywordflow">return</span> ((<a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>*) root) + m_node;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            ndUnsigned32 m_node;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        };</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> ()</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            :m_indexBox0(0)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            ,m_indexBox1(0)</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            ,m_left(0)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            ,m_right(0)</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        }</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keyword">inline</span> ndFloat32 RayDistance (<span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; ray, <span class="keyword">const</span> <a class="code" href="classnd_triplex.html">ndTriplex</a>* <span class="keyword">const</span> vertexArray)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> minBox (&amp;vertexArray[m_indexBox0].m_x);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> maxBox (&amp;vertexArray[m_indexBox1].m_x);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            minBox = minBox &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            maxBox = maxBox &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="keywordflow">return</span> ray.BoxIntersect(minBox, maxBox);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        }</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keyword">inline</span> ndFloat32 BoxPenetration (<span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obb, <span class="keyword">const</span> <a class="code" href="classnd_triplex.html">ndTriplex</a>* <span class="keyword">const</span> vertexArray)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p0 (&amp;vertexArray[m_indexBox0].m_x);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p1 (&amp;vertexArray[m_indexBox1].m_x);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            p0 = p0 &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            p1 = p1 &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> minBox (p0 - obb.m_p1);</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> maxBox (p1 - obb.m_p0);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            dAssert(maxBox.m_x &gt;= minBox.m_x);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            dAssert(maxBox.m_y &gt;= minBox.m_y);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            dAssert(maxBox.m_z &gt;= minBox.m_z);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> mask ((minBox * maxBox) &lt; ndVector::m_zero);</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> dist (maxBox.GetMin (minBox.Abs()) &amp; mask);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            dist = dist.GetMin(dist.ShiftTripleRight());</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            dist = dist.GetMin(dist.ShiftTripleRight());</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <span class="keywordflow">if</span> (dist.GetScalar() &gt; ndFloat32 (0.0f)) </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> origin (ndVector::m_half * (p1 + p0));</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> size (ndVector::m_half * (p1 - p0));</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;                origin = obb.UntransformVector(origin);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;                size = obb.m_absDir.RotateVector(size);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q0 (origin - size);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q1 (origin + size);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> minBox1 (q0 - obb.m_size);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> maxBox1 (q1 + obb.m_size);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;                dAssert(maxBox1.m_x &gt;= minBox1.m_x);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;                dAssert(maxBox1.m_y &gt;= minBox1.m_y);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                dAssert(maxBox1.m_z &gt;= minBox1.m_z);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> mask1 ((minBox1 * maxBox1) &lt; ndVector::m_zero);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> dist1 (maxBox1.GetMin (minBox1.Abs()) &amp; mask1);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                dist1 = dist1.GetMin(dist1.ShiftTripleRight());</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                dist1 = dist1.GetMin(dist1.ShiftTripleRight());</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                dist = dist.GetMin(dist1);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            } </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            <span class="keywordflow">else</span> </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            {</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                dist = p1p0.DotProduct(p1p0);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                dist = dist.Sqrt() * ndVector::m_negOne;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;            }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;            <span class="keywordflow">return</span>  dist.GetScalar();</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        }</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keyword">inline</span> ndFloat32 BoxIntersect (<span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; ray, <span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; obbRay, <span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obb, <span class="keyword">const</span> <a class="code" href="classnd_triplex.html">ndTriplex</a>* <span class="keyword">const</span> vertexArray)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="keyword">        </span>{</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p0 (&amp;vertexArray[m_indexBox0].m_x);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p1 (&amp;vertexArray[m_indexBox1].m_x);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            p0 = p0 &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            p1 = p1 &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> minBox (p0 - obb.m_p1);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> maxBox (p1 - obb.m_p0);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            ndFloat32 dist = ray.BoxIntersect(minBox, maxBox);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            <span class="keywordflow">if</span> (dist &lt; ndFloat32 (1.0f)) </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> origin (ndVector::m_half * (p1 + p0));</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> size (ndVector::m_half * (p1 - p0));</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    m_stopSearch,</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    m_continueSearh</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">typedef</span> ndIntersectStatus(*ndAaabbIntersectCallback) (<span class="keywordtype">void</span>* <span class="keyword">const</span> context,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> polygon, ndInt32 strideInBytes,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount, ndFloat32 hitDistance);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">typedef</span> ndFloat32(*ndRayIntersectCallback) (<span class="keywordtype">void</span>* <span class="keyword">const</span> context,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> polygon, ndInt32 strideInBytes,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html">   54</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a>: <span class="keyword">public</span> <a class="code" href="classnd_polygon_soup_database.html">ndPolygonSoupDatabase</a></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup_1_1nd_node.html">   57</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keyword">enum</span> ndNodeType</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            m_binary = 0,</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            m_leaf,</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        };</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">   66</a></span>&#160;        <span class="keyword">class </span><a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        {</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">            #define DG_INDEX_COUNT_BITS 6</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a> ()</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            {</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                ndAssert (0);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            }</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a> (ndUnsigned32 node)</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                m_node = node;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                ndAssert (!IsLeaf());</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            }</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            <span class="keyword">inline</span> ndUnsigned32 IsLeaf ()<span class="keyword"> const </span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keyword">            </span>{</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                <span class="keywordflow">return</span> m_node &amp; 0x80000000;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            <span class="keyword">inline</span> ndUnsigned32 GetCount()<span class="keyword"> const </span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">            </span>{</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                ndAssert (IsLeaf());</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                <span class="keywordflow">return</span> (m_node &amp; (~0x80000000)) &gt;&gt; (32 - DG_INDEX_COUNT_BITS - 1);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            }</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            <span class="keyword">inline</span> ndUnsigned32 GetIndex()<span class="keyword"> const </span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="keyword">            </span>{</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                ndAssert (IsLeaf());</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                <span class="keywordflow">return</span> m_node &amp; (~(-(1 &lt;&lt; (32 - DG_INDEX_COUNT_BITS - 1))));</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndLeafNodePtr</a> (ndUnsigned32 faceIndexCount, ndUnsigned32 faceIndexStart)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                ndAssert (faceIndexCount &lt; (1&lt;&lt;DG_INDEX_COUNT_BITS));</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                m_node = 0x80000000 | (faceIndexCount &lt;&lt; (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* GetNode (<span class="keyword">const</span> <span class="keywordtype">void</span>* <span class="keyword">const</span> root)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="keyword">            </span>{</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                <span class="keywordflow">return</span> ((<a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>*) root) + m_node;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            }</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            ndUnsigned32 m_node;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        };</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a> ()</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            :m_indexBox0(0)</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            ,m_indexBox1(0)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            ,m_left(0)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            ,m_right(0)</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keyword">inline</span> ndFloat32 RayDistance (<span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; ray, <span class="keyword">const</span> <a class="code" href="classnd_triplex.html">ndTriplex</a>* <span class="keyword">const</span> vertexArray)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> minBox (&amp;vertexArray[m_indexBox0].m_x);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> maxBox (&amp;vertexArray[m_indexBox1].m_x);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            minBox = minBox &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            maxBox = maxBox &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">return</span> ray.BoxIntersect(minBox, maxBox);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keyword">inline</span> ndFloat32 BoxPenetration (<span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obb, <span class="keyword">const</span> <a class="code" href="classnd_triplex.html">ndTriplex</a>* <span class="keyword">const</span> vertexArray)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p0 (&amp;vertexArray[m_indexBox0].m_x);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p1 (&amp;vertexArray[m_indexBox1].m_x);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;            p0 = p0 &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            p1 = p1 &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> minBox (p0 - obb.m_p1);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> maxBox (p1 - obb.m_p0);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            ndAssert(maxBox.m_x &gt;= minBox.m_x);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            ndAssert(maxBox.m_y &gt;= minBox.m_y);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;            ndAssert(maxBox.m_z &gt;= minBox.m_z);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> mask ((minBox * maxBox) &lt; ndVector::m_zero);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> dist (maxBox.GetMin (minBox.Abs()) &amp; mask);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            dist = dist.GetMin(dist.ShiftTripleRight());</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            dist = dist.GetMin(dist.ShiftTripleRight());</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            <span class="keywordflow">if</span> (dist.GetScalar() &gt; ndFloat32 (0.0f)) </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> origin (ndVector::m_half * (p1 + p0));</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> size (ndVector::m_half * (p1 - p0));</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;                origin = obb.UntransformVector(origin);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                size = obb.m_absDir.RotateVector(size);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q0 (origin - size);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q1 (origin + size);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> minBox1 (q0 - obb.m_size);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> maxBox1 (q1 + obb.m_size);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                ndAssert(maxBox1.m_x &gt;= minBox1.m_x);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;                ndAssert(maxBox1.m_y &gt;= minBox1.m_y);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                ndAssert(maxBox1.m_z &gt;= minBox1.m_z);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> mask1 ((minBox1 * maxBox1) &lt; ndVector::m_zero);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> dist1 (maxBox1.GetMin (minBox1.Abs()) &amp; mask1);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;                dist1 = dist1.GetMin(dist1.ShiftTripleRight());</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;                dist1 = dist1.GetMin(dist1.ShiftTripleRight());</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                dist = dist.GetMin(dist1);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            } </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            <span class="keywordflow">else</span> </div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;            {</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;                dist = p1p0.DotProduct(p1p0);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                dist = dist.Sqrt() * ndVector::m_negOne;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            <span class="keywordflow">return</span>  dist.GetScalar();</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        }</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                origin = obb.UntransformVector(origin);</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                size = obb.m_absDir.RotateVector(size);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q0 (origin - size);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q1 (origin + size);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> minBox1 (q0 - obb.m_size);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> maxBox1 (q1 + obb.m_size);</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;                ndFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;                dist = (dist1  &gt; ndFloat32 (1.0f)) ? dist1 : ndMax (dist1, dist);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            <span class="keywordflow">return</span> dist;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        }</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        ndInt32 m_indexBox0;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        ndInt32 m_indexBox1;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        ndLeafNodePtr m_left;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        ndLeafNodePtr m_right;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    };</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">class </span>ndSpliteInfo;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">class </span>ndNodeBuilder;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#a45735adbc055ad1b16a8f19d9964fdcb">GetAABB</a> (<a class="code" href="classnd_vector.html">ndVector</a>&amp; p0, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p1) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#aa7bc24b72eff1046e35ce6ed3bee3bec">Serialize</a> (<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> path) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keyword">inline</span> ndFloat32 BoxIntersect (<span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; ray, <span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; obbRay, <span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obb, <span class="keyword">const</span> <a class="code" href="classnd_triplex.html">ndTriplex</a>* <span class="keyword">const</span> vertexArray)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p0 (&amp;vertexArray[m_indexBox0].m_x);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> p1 (&amp;vertexArray[m_indexBox1].m_x);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            p0 = p0 &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            p1 = p1 &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> minBox (p0 - obb.m_p1);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            <a class="code" href="classnd_vector.html">ndVector</a> maxBox (p1 - obb.m_p0);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            ndFloat32 dist = ray.BoxIntersect(minBox, maxBox);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            <span class="keywordflow">if</span> (dist &lt; ndFloat32 (1.0f)) </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            {</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> origin (ndVector::m_half * (p1 + p0));</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> size (ndVector::m_half * (p1 - p0));</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                origin = obb.UntransformVector(origin);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                size = obb.m_absDir.RotateVector(size);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q0 (origin - size);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> q1 (origin + size);</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> minBox1 (q0 - obb.m_size);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                <a class="code" href="classnd_vector.html">ndVector</a> maxBox1 (q1 + obb.m_size);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                ndFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                dist = (dist1  &gt; ndFloat32 (1.0f)) ? dist1 : ndMax (dist1, dist);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            <span class="keywordflow">return</span> dist;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        }</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#a626880bcbe457bf19608f2c17270f518">Deserialize</a> (<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> path);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    D_CORE_API <a class="code" href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a> ();</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    D_CORE_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a> ();</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Create (<span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>&amp; builder);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    D_CORE_API <span class="keywordtype">void</span> CalculateAdjacendy ();</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> ForAllSectorsSupportVectex(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> ForAllSectorsRayHit (<span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; ray, ndFloat32 maxT, dRayIntersectCallback callback, <span class="keywordtype">void</span>* <span class="keyword">const</span> context) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> ForAllSectors (<span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obbAabb, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, <span class="keywordtype">void</span>* <span class="keyword">const</span> context) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> ForThisSector(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndAabbPolygonSoup::ndNode</a>* <span class="keyword">const</span> node, <span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obbAabb, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, <span class="keywordtype">void</span>* <span class="keyword">const</span> context) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00220"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">  220</a></span>&#160;    <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <a class="code" href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">GetRootNode</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        <span class="keywordflow">return</span> m_aabb;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
-<div class="line"><a name="l00227"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">  227</a></span>&#160;    <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <a class="code" href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">GetBackNode</a>(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <span class="keyword">const</span> node)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keywordflow">return</span> node-&gt;m_left.IsLeaf() ? nullptr : node-&gt;m_left.GetNode(m_aabb);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">  234</a></span>&#160;    <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <a class="code" href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">GetFrontNode</a>(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <span class="keyword">const</span> node)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordflow">return</span> node-&gt;m_right.IsLeaf() ? nullptr : node-&gt;m_right.GetNode(m_aabb);</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">  240</a></span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">GetNodeAabb</a>(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <span class="keyword">const</span> node, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p0, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p1)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        p0 = <a class="code" href="classnd_vector.html">ndVector</a> (&amp;((<a class="code" href="classnd_triplex.html">ndTriplex</a>*)m_localVertex)[node-&gt;m_indexBox0].m_x);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        p1 = <a class="code" href="classnd_vector.html">ndVector</a> (&amp;((<a class="code" href="classnd_triplex.html">ndTriplex</a>*)m_localVertex)[node-&gt;m_indexBox1].m_x);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        p0 = p0 &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        p1 = p1 &amp; ndVector::m_triplexMask;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    ndNodeBuilder* BuildTopDown (ndNodeBuilder* <span class="keyword">const</span> leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** <span class="keyword">const</span> allocator) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    ndFloat32 CalculateFaceMaxSize (<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> vertex, ndInt32 indexCount, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keyword">static</span> dIntersectStatus CalculateDisjointedFaceEdgeNormals (<span class="keywordtype">void</span>* <span class="keyword">const</span> context, <span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> polygon, ndInt32 strideInBytes, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount, ndFloat32 hitDistance);</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">static</span> dIntersectStatus CalculateAllFaceEdgeNormals(<span class="keywordtype">void</span>* <span class="keyword">const</span> context, <span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> polygon, ndInt32 strideInBytes, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount, ndFloat32 hitDistance);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordtype">void</span> ImproveNodeFitness (ndNodeBuilder* <span class="keyword">const</span> node) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    ndNode* m_aabb;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    ndInt32* m_indices;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    ndInt32 m_nodesCount;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    ndInt32 m_indexCount;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_contact_solver.html">ndContactSolver</a>;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;};</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        ndInt32 m_indexBox0;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        ndInt32 m_indexBox1;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        ndLeafNodePtr m_left;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        ndLeafNodePtr m_right;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    };</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keyword">class </span>ndSplitInfo;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keyword">class </span>ndNodeBuilder;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#a45735adbc055ad1b16a8f19d9964fdcb">GetAABB</a> (<a class="code" href="classnd_vector.html">ndVector</a>&amp; p0, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p1) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#aa7bc24b72eff1046e35ce6ed3bee3bec">Serialize</a> (<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> path) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#a626880bcbe457bf19608f2c17270f518">Deserialize</a> (<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> path);</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    D_CORE_API <a class="code" href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a> ();</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    D_CORE_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a> ();</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Create (<span class="keyword">const</span> <a class="code" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a>&amp; builder);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    D_CORE_API <span class="keywordtype">void</span> CalculateAdjacent ();</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <a class="code" href="classnd_vector.html">ndVector</a> ForAllSectorsSupportVertex(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; dir) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> ForAllSectorsRayHit (<span class="keyword">const</span> <a class="code" href="classnd_fast_ray.html">ndFastRay</a>&amp; ray, ndFloat32 maxT, ndRayIntersectCallback callback, <span class="keywordtype">void</span>* <span class="keyword">const</span> context) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> ForAllSectors (<span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obbAabb, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; boxDistanceTravel, ndFloat32 maxT, ndAaabbIntersectCallback callback, <span class="keywordtype">void</span>* <span class="keyword">const</span> context) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    D_CORE_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> ForThisSector(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndAabbPolygonSoup::ndNode</a>* <span class="keyword">const</span> node, <span class="keyword">const</span> <a class="code" href="classnd_fast_aabb.html">ndFastAabb</a>&amp; obbAabb, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; boxDistanceTravel, ndFloat32 maxT, ndAaabbIntersectCallback callback, <span class="keywordtype">void</span>* <span class="keyword">const</span> context) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00235"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">  235</a></span>&#160;    <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <a class="code" href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">GetRootNode</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keywordflow">return</span> m_aabb;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    }</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00242"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">  242</a></span>&#160;    <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <a class="code" href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">GetBackNode</a>(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <span class="keyword">const</span> node)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        <span class="keywordflow">return</span> node-&gt;m_left.IsLeaf() ? nullptr : node-&gt;m_left.GetNode(m_aabb);</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">  249</a></span>&#160;    <span class="keyword">inline</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <a class="code" href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">GetFrontNode</a>(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <span class="keyword">const</span> node)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordflow">return</span> node-&gt;m_right.IsLeaf() ? nullptr : node-&gt;m_right.GetNode(m_aabb);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno"><a class="line" href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">  255</a></span>&#160;    <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">GetNodeAabb</a>(<span class="keyword">const</span> <a class="code" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndNode</a>* <span class="keyword">const</span> node, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p0, <a class="code" href="classnd_vector.html">ndVector</a>&amp; p1)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        p0 = <a class="code" href="classnd_vector.html">ndVector</a> (&amp;((<a class="code" href="classnd_triplex.html">ndTriplex</a>*)m_localVertex)[node-&gt;m_indexBox0].m_x);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        p1 = <a class="code" href="classnd_vector.html">ndVector</a> (&amp;((<a class="code" href="classnd_triplex.html">ndTriplex</a>*)m_localVertex)[node-&gt;m_indexBox1].m_x);</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        p0 = p0 &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        p1 = p1 &amp; ndVector::m_triplexMask;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    }</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    ndNodeBuilder* BuildTopDown (ndNodeBuilder* <span class="keyword">const</span> leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** <span class="keyword">const</span> allocator) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    ndFloat32 CalculateFaceMaxDiagonal (<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> vertex, ndInt32 indexCount, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keyword">static</span> ndIntersectStatus CalculateAllFaceEdgeNormals(<span class="keywordtype">void</span>* <span class="keyword">const</span> context, <span class="keyword">const</span> ndFloat32* <span class="keyword">const</span> polygon, ndInt32 strideInBytes, <span class="keyword">const</span> ndInt32* <span class="keyword">const</span> indexArray, ndInt32 indexCount, ndFloat32 hitDistance);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    </div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    ndNode* m_aabb;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    ndInt32* m_indices;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    ndInt32 m_nodesCount;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    ndInt32 m_indexCount;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_contact_solver.html">ndContactSolver</a>;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;};</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a509545f55d440d122d807098aa9c86fd"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">ndAabbPolygonSoup::GetFrontNode</a></div><div class="ttdeci">ndNode * GetFrontNode(const ndNode *const node) const</div><div class="ttdoc">Returns the front child node of the hierarchy.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:234</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_aa7bc24b72eff1046e35ce6ed3bee3bec"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#aa7bc24b72eff1046e35ce6ed3bee3bec">ndAabbPolygonSoup::Serialize</a></div><div class="ttdeci">virtual D_CORE_API void Serialize(const char *const path) const</div><div class="ttdoc">writes the entire database to a binary file named path.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.cpp:1195</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a509545f55d440d122d807098aa9c86fd"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a509545f55d440d122d807098aa9c86fd">ndAabbPolygonSoup::GetFrontNode</a></div><div class="ttdeci">ndNode * GetFrontNode(const ndNode *const node) const</div><div class="ttdoc">Returns the front child node of the hierarchy.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:249</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_aa7bc24b72eff1046e35ce6ed3bee3bec"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#aa7bc24b72eff1046e35ce6ed3bee3bec">ndAabbPolygonSoup::Serialize</a></div><div class="ttdeci">virtual D_CORE_API void Serialize(const char *const path) const</div><div class="ttdoc">writes the entire database to a binary file named path.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.cpp:765</div></div>
 <div class="ttc" id="aclassnd_polygon_soup_database_html"><div class="ttname"><a href="classnd_polygon_soup_database.html">ndPolygonSoupDatabase</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupDatabase.h:30</div></div>
-<div class="ttc" id="aclassnd_triplex_html"><div class="ttname"><a href="classnd_triplex.html">ndTriplex</a></div><div class="ttdef"><b>Definition:</b> ndTypes.h:283</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a626880bcbe457bf19608f2c17270f518"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a626880bcbe457bf19608f2c17270f518">ndAabbPolygonSoup::Deserialize</a></div><div class="ttdeci">virtual D_CORE_API void Deserialize(const char *const path)</div><div class="ttdoc">Reads a previously saved database binary file named path.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.cpp:1213</div></div>
+<div class="ttc" id="aclassnd_triplex_html"><div class="ttname"><a href="classnd_triplex.html">ndTriplex</a></div><div class="ttdef"><b>Definition:</b> ndTypes.h:284</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a626880bcbe457bf19608f2c17270f518"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a626880bcbe457bf19608f2c17270f518">ndAabbPolygonSoup::Deserialize</a></div><div class="ttdeci">virtual D_CORE_API void Deserialize(const char *const path)</div><div class="ttdoc">Reads a previously saved database binary file named path.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.cpp:783</div></div>
 <div class="ttc" id="aclassnd_contact_solver_html"><div class="ttname"><a href="classnd_contact_solver.html">ndContactSolver</a></div><div class="ttdef"><b>Definition:</b> ndContactSolver.h:60</div></div>
 <div class="ttc" id="aclassnd_polygon_soup_builder_html"><div class="ttname"><a href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a></div><div class="ttdef"><b>Definition:</b> ndPolygonSoupBuilder.h:48</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a439e32885f3cf7396b1f336f259ec19e"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">ndAabbPolygonSoup::GetBackNode</a></div><div class="ttdeci">ndNode * GetBackNode(const ndNode *const node) const</div><div class="ttdoc">Returns the back child node of the hierarchy.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:227</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_1_1nd_node_html"><div class="ttname"><a href="classnd_aabb_polygon_soup_1_1nd_node.html">ndAabbPolygonSoup::ndNode</a></div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:43</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr_html"><div class="ttname"><a href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndAabbPolygonSoup::ndNode::ndLeafNodePtr</a></div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:52</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a0eecced4dccecea25865934aa8efc6d6"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">ndAabbPolygonSoup::GetNodeAabb</a></div><div class="ttdeci">void GetNodeAabb(const ndNode *const node, ndVector &amp;p0, ndVector &amp;p1) const</div><div class="ttdoc">Returns the bounding box of node in point p0 and p1.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:240</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a439e32885f3cf7396b1f336f259ec19e"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a439e32885f3cf7396b1f336f259ec19e">ndAabbPolygonSoup::GetBackNode</a></div><div class="ttdeci">ndNode * GetBackNode(const ndNode *const node) const</div><div class="ttdoc">Returns the back child node of the hierarchy.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:242</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_1_1nd_node_html"><div class="ttname"><a href="classnd_aabb_polygon_soup_1_1nd_node.html">ndAabbPolygonSoup::ndNode</a></div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:58</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr_html"><div class="ttname"><a href="classnd_aabb_polygon_soup_1_1nd_node_1_1nd_leaf_node_ptr.html">ndAabbPolygonSoup::ndNode::ndLeafNodePtr</a></div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:67</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a0eecced4dccecea25865934aa8efc6d6"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a0eecced4dccecea25865934aa8efc6d6">ndAabbPolygonSoup::GetNodeAabb</a></div><div class="ttdeci">void GetNodeAabb(const ndNode *const node, ndVector &amp;p0, ndVector &amp;p1) const</div><div class="ttdoc">Returns the bounding box of node in point p0 and p1.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:255</div></div>
 <div class="ttc" id="aclassnd_fast_ray_html"><div class="ttname"><a href="classnd_fast_ray.html">ndFastRay</a></div><div class="ttdef"><b>Definition:</b> ndFastRay.h:48</div></div>
 <div class="ttc" id="aclassnd_fast_aabb_html"><div class="ttname"><a href="classnd_fast_aabb.html">ndFastAabb</a></div><div class="ttdef"><b>Definition:</b> ndFastAabb.h:32</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html"><div class="ttname"><a href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a></div><div class="ttdoc">Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh...</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:40</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a45735adbc055ad1b16a8f19d9964fdcb"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a45735adbc055ad1b16a8f19d9964fdcb">ndAabbPolygonSoup::GetAABB</a></div><div class="ttdeci">virtual D_CORE_API void GetAABB(ndVector &amp;p0, ndVector &amp;p1) const</div><div class="ttdoc">get the root node bounding box of the mesh.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.cpp:475</div></div>
-<div class="ttc" id="aclassnd_aabb_polygon_soup_html_ae17c8b34fea3f36de4bedfa68ca660db"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">ndAabbPolygonSoup::GetRootNode</a></div><div class="ttdeci">ndNode * GetRootNode() const</div><div class="ttdoc">Get the root node of the hierarchy.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:220</div></div>
-<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:1024</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html"><div class="ttname"><a href="classnd_aabb_polygon_soup.html">ndAabbPolygonSoup</a></div><div class="ttdoc">Base class for creating a leafless bounding box hierarchy for queering a polygon list index list mesh...</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:55</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_a45735adbc055ad1b16a8f19d9964fdcb"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#a45735adbc055ad1b16a8f19d9964fdcb">ndAabbPolygonSoup::GetAABB</a></div><div class="ttdeci">virtual D_CORE_API void GetAABB(ndVector &amp;p0, ndVector &amp;p1) const</div><div class="ttdoc">get the root node bounding box of the mesh.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.cpp:282</div></div>
+<div class="ttc" id="aclassnd_aabb_polygon_soup_html_ae17c8b34fea3f36de4bedfa68ca660db"><div class="ttname"><a href="classnd_aabb_polygon_soup.html#ae17c8b34fea3f36de4bedfa68ca660db">ndAabbPolygonSoup::GetRootNode</a></div><div class="ttdeci">ndNode * GetRootNode() const</div><div class="ttdoc">Get the root node of the hierarchy.</div><div class="ttdef"><b>Definition:</b> ndAabbPolygonSoup.h:235</div></div>
+<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:41</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndAabbPolygonSoup.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndAabbPolygonSoup.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

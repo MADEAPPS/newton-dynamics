@@ -24,7 +24,7 @@ var classnd_joint_double_hinge =
     [ "SetLimits1", "classnd_joint_double_hinge.html#a07e4f656426423e701ae5f49da9af624", null ],
     [ "SetOffsetAngle0", "classnd_joint_double_hinge.html#a5d1b3815125219cdaaca56f653e2866c", null ],
     [ "SetOffsetAngle1", "classnd_joint_double_hinge.html#af1cfd7dd3cb3b7442ac4a30ce09b0ff1", null ],
-    [ "SubmitLimits", "classnd_joint_double_hinge.html#aa02eae7689f170642d41dea97510a728", null ],
+    [ "SubmitLimits", "classnd_joint_double_hinge.html#a7533e7d4372107ecc01e65e2d6b5fa30", null ],
     [ "SubmitSpringDamper0", "classnd_joint_double_hinge.html#ace5f21eadd2bd992b0ba3106a48f4246", null ],
     [ "SubmitSpringDamper1", "classnd_joint_double_hinge.html#a40afc4ba75775296b324c08f5829fa80", null ],
     [ "m_axis0", "classnd_joint_double_hinge.html#aa10d4773f3daeba335eb135487ed95c1", null ],

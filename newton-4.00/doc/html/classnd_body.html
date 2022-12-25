@@ -111,15 +111,16 @@ Inheritance diagram for ndBody:</div>
  <div class="center">
   <img src="classnd_body.png" usemap="#ndBody_map" alt=""/>
   <map id="ndBody_map" name="ndBody_map">
-<area href="classnd_containers_free_list_alloc.html" alt="ndContainersFreeListAlloc&lt; ndBody &gt;" shape="rect" coords="657,56,886,80"/>
-<area href="classnd_free_list_alloc.html" alt="ndFreeListAlloc" shape="rect" coords="657,0,886,24"/>
-<area href="classnd_body_kinematic.html" alt="ndBodyKinematic" shape="rect" coords="358,168,587,192"/>
-<area href="classnd_body_particle_set.html" alt="ndBodyParticleSet" shape="rect" coords="956,168,1185,192"/>
+<area href="classnd_containers_free_list_alloc.html" alt="ndContainersFreeListAlloc&lt; ndBody &gt;" shape="rect" coords="478,56,707,80"/>
+<area href="classnd_free_list_alloc.html" alt="ndFreeListAlloc" shape="rect" coords="478,0,707,24"/>
+<area href="classnd_body_kinematic.html" alt="ndBodyKinematic" shape="rect" coords="239,168,468,192"/>
+<area href="classnd_body_particle_set.html" alt="ndBodyParticleSet" shape="rect" coords="717,168,946,192"/>
 <area href="classnd_body_dynamic.html" alt="ndBodyDynamic" shape="rect" coords="0,224,229,248"/>
-<area href="classnd_body_player_capsule.html" alt="ndBodyPlayerCapsule" shape="rect" coords="239,224,468,248"/>
+<area href="classnd_body_kinematic_base.html" alt="ndBodyKinematicBase" shape="rect" coords="239,224,468,248"/>
 <area href="classnd_body_sentinel.html" alt="ndBodySentinel" shape="rect" coords="478,224,707,248"/>
-<area href="classnd_body_trigger_volume.html" alt="ndBodyTriggerVolume" shape="rect" coords="717,224,946,248"/>
-<area href="classnd_body_sph_fluid.html" alt="ndBodySphFluid" shape="rect" coords="956,224,1185,248"/>
+<area href="classnd_body_sph_fluid.html" alt="ndBodySphFluid" shape="rect" coords="717,224,946,248"/>
+<area href="classnd_body_player_capsule.html" alt="ndBodyPlayerCapsule" shape="rect" coords="119,280,348,304"/>
+<area href="classnd_body_trigger_volume.html" alt="ndBodyTriggerVolume" shape="rect" coords="358,280,587,304"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -155,6 +156,9 @@ virtual <a class="el" href="classnd_body_player_capsule.html">ndBodyPlayerCapsul
 <tr class="memitem:acd3c7d14202ce5331a1dbeceaaa1912f"><td class="memItemLeft" align="right" valign="top"><a id="acd3c7d14202ce5331a1dbeceaaa1912f"></a>
 virtual <a class="el" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBodyTriggerVolume</b> ()</td></tr>
 <tr class="separator:acd3c7d14202ce5331a1dbeceaaa1912f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac64ff4b9672c60d2a6240e95dccdd896"><td class="memItemLeft" align="right" valign="top"><a id="ac64ff4b9672c60d2a6240e95dccdd896"></a>
+virtual <a class="el" href="classnd_body_kinematic_base.html">ndBodyKinematicBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBodyKinematicSpecial</b> ()</td></tr>
+<tr class="separator:ac64ff4b9672c60d2a6240e95dccdd896"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34f0eae41036542188841116924d5508"><td class="memItemLeft" align="right" valign="top"><a id="a34f0eae41036542188841116924d5508"></a>
 ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () const</td></tr>
 <tr class="separator:a34f0eae41036542188841116924d5508"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -341,6 +345,9 @@ ndUnsigned8&#160;</td><td class="memItemRight" valign="bottom"><b>m_sceneForceUp
 <tr class="memitem:ac5e8c1505e78b9fa02a664d1598349b7"><td class="memItemLeft" align="right" valign="top"><a id="ac5e8c1505e78b9fa02a664d1598349b7"></a>
 ndUnsigned8&#160;</td><td class="memItemRight" valign="bottom"><b>m_sceneEquilibrium</b></td></tr>
 <tr class="separator:ac5e8c1505e78b9fa02a664d1598349b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0aeab849c9d3caac0a4abe7ad800b02"><td class="memItemLeft" align="right" valign="top"><a id="aa0aeab849c9d3caac0a4abe7ad800b02"></a>
+ndUnsigned8&#160;</td><td class="memItemRight" valign="bottom"><b>m_markedForRemoved</b></td></tr>
+<tr class="separator:aa0aeab849c9d3caac0a4abe7ad800b02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>

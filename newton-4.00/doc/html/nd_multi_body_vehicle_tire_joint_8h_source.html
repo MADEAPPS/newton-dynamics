@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_multi_body_vehicle_tire_joint_8h_so
 <div class="title">ndMultiBodyVehicleTireJoint.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -114,46 +114,82 @@ $(document).ready(function(){initNavTree('nd_multi_body_vehicle_tire_joint_8h_so
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;ndNewtonStdafx.h&quot;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;ndJointWheel.h&quot;</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classnd_multi_body_vehicle_tire_joint.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>: <span class="keyword">public</span> <a class="code" href="classnd_joint_wheel.html">ndJointWheel</a></div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classnd_tire_friction_model.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_tire_friction_model.html">ndTireFrictionModel</a></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    D_CLASS_REFLECTION(<a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    D_NEWTON_API <a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a>&amp; desc);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    D_NEWTON_API <a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; pinAndPivotFrame, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> child, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> parent, <span class="keyword">const</span> <a class="code" href="classnd_wheel_descriptor.html">ndWheelDescriptor</a>&amp; desc, <a class="code" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a>* <span class="keyword">const</span> vehicle);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    D_NEWTON_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>();</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    D_NEWTON_API ndFloat32 GetSideSlip() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    D_NEWTON_API ndFloat32 GetLongitudinalSlip() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">enum</span> ndFrictionModel</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        m_coulomb,</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        m_brushModel,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        m_pacejka,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        m_coulombCicleOfFriction,</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    };</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    D_NEWTON_API <span class="keywordtype">void</span> JacobianDerivative(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    D_NEWTON_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a>&amp; desc) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a>* m_vehicle;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    ndFloat32 m_lateralSlip;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    ndFloat32 m_longitudinalSlip;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;};</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classnd_tire_friction_model.html">ndTireFrictionModel</a>()</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        :m_laterialStiffness(ndFloat32(10.0f))</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        ,m_longitudinalStiffness(ndFloat32(10.0f))</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        ,m_frictionModel(m_brushModel)</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    ndFloat32 m_laterialStiffness;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    ndFloat32 m_longitudinalStiffness;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    ndFrictionModel m_frictionModel;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif </span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classnd_multi_body_vehicle_tire_joint_info.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_multi_body_vehicle_tire_joint_info.html">ndMultiBodyVehicleTireJointInfo</a> : <span class="keyword">public</span> <a class="code" href="classnd_wheel_descriptor.html">ndWheelDescriptor</a>, <span class="keyword">public</span> <a class="code" href="classnd_tire_friction_model.html">ndTireFrictionModel</a></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;{</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classnd_multi_body_vehicle_tire_joint_info.html">ndMultiBodyVehicleTireJointInfo</a>()</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        :<a class="code" href="classnd_wheel_descriptor.html">ndWheelDescriptor</a>()</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        ,<a class="code" href="classnd_tire_friction_model.html">ndTireFrictionModel</a>()</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classnd_multi_body_vehicle_tire_joint.html">   51</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>: <span class="keyword">public</span> <a class="code" href="classnd_joint_wheel.html">ndJointWheel</a></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    D_CLASS_REFLECTION(<a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    D_NEWTON_API <a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a>&amp; desc);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    D_NEWTON_API <a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>(<span class="keyword">const</span> <a class="code" href="classnd_matrix.html">ndMatrix</a>&amp; pinAndPivotFrame, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> child, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> parent, <span class="keyword">const</span> <a class="code" href="classnd_multi_body_vehicle_tire_joint_info.html">ndMultiBodyVehicleTireJointInfo</a>&amp; desc, <a class="code" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a>* <span class="keyword">const</span> vehicle);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    D_NEWTON_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a>();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    D_NEWTON_API ndFloat32 GetSideSlip() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    D_NEWTON_API ndFloat32 GetLongitudinalSlip() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    D_NEWTON_API <span class="keywordtype">void</span> JacobianDerivative(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    D_NEWTON_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a>&amp; desc) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a>* m_vehicle;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="classnd_tire_friction_model.html">ndTireFrictionModel</a> m_frictionModel;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    ndFloat32 m_lateralSlip;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    ndFloat32 m_longitudinalSlip;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    ndFloat32 m_normalizedAligningTorque;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;};</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif </span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_multi_body_vehicle_html"><div class="ttname"><a href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a></div><div class="ttdef"><b>Definition:</b> ndMultiBodyVehicle.h:40</div></div>
-<div class="ttc" id="aclassnd_joint_wheel_html"><div class="ttname"><a href="classnd_joint_wheel.html">ndJointWheel</a></div><div class="ttdef"><b>Definition:</b> ndJointWheel.h:51</div></div>
-<div class="ttc" id="aclassnd_multi_body_vehicle_tire_joint_html"><div class="ttname"><a href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a></div><div class="ttdef"><b>Definition:</b> ndMultiBodyVehicleTireJoint.h:19</div></div>
-<div class="ttc" id="aclassnd_constraint_descritor_html"><div class="ttname"><a href="classnd_constraint_descritor.html">ndConstraintDescritor</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:186</div></div>
+<div class="ttc" id="aclassnd_multi_body_vehicle_html"><div class="ttname"><a href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle</a></div><div class="ttdef"><b>Definition:</b> ndMultiBodyVehicle.h:41</div></div>
+<div class="ttc" id="aclassnd_joint_wheel_html"><div class="ttname"><a href="classnd_joint_wheel.html">ndJointWheel</a></div><div class="ttdef"><b>Definition:</b> ndJointWheel.h:49</div></div>
+<div class="ttc" id="aclassnd_multi_body_vehicle_tire_joint_html"><div class="ttname"><a href="classnd_multi_body_vehicle_tire_joint.html">ndMultiBodyVehicleTireJoint</a></div><div class="ttdef"><b>Definition:</b> ndMultiBodyVehicleTireJoint.h:52</div></div>
+<div class="ttc" id="aclassnd_constraint_descritor_html"><div class="ttname"><a href="classnd_constraint_descritor.html">ndConstraintDescritor</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:179</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:40</div></div>
 <div class="ttc" id="aclassnd_wheel_descriptor_html"><div class="ttname"><a href="classnd_wheel_descriptor.html">ndWheelDescriptor</a></div><div class="ttdef"><b>Definition:</b> ndJointWheel.h:19</div></div>
+<div class="ttc" id="aclassnd_tire_friction_model_html"><div class="ttname"><a href="classnd_tire_friction_model.html">ndTireFrictionModel</a></div><div class="ttdef"><b>Definition:</b> ndMultiBodyVehicleTireJoint.h:19</div></div>
 <div class="ttc" id="aclassnd_matrix_html"><div class="ttname"><a href="classnd_matrix.html">ndMatrix</a></div><div class="ttdef"><b>Definition:</b> ndMatrix.h:42</div></div>
+<div class="ttc" id="aclassnd_multi_body_vehicle_tire_joint_info_html"><div class="ttname"><a href="classnd_multi_body_vehicle_tire_joint_info.html">ndMultiBodyVehicleTireJointInfo</a></div><div class="ttdef"><b>Definition:</b> ndMultiBodyVehicleTireJoint.h:42</div></div>
 <div class="ttc" id="aclassnd_load_save_base_1_1nd_load_descriptor_html"><div class="ttname"><a href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:59</div></div>
 <div class="ttc" id="aclassnd_load_save_base_1_1nd_save_descriptor_html"><div class="ttname"><a href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:93</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_d5aa3f859e50cce566f2ea2a6855a4d4.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_854c1cf735f4110d23dd3bcc0eb0cab2.html">dModels</a></li><li class="navelem"><a class="el" href="dir_8c69631967c9f540d8378dea276f7a2a.html">dVehicle</a></li><li class="navelem"><b>ndMultiBodyVehicleTireJoint.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_ed97d29386cdd3379a363b5306354b4f.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_2f630dd52c851116f9dcd0cd95ac9204.html">dModels</a></li><li class="navelem"><a class="el" href="dir_54edcebf948bbd32f551b1023d83e6ce.html">dVehicle</a></li><li class="navelem"><b>ndMultiBodyVehicleTireJoint.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

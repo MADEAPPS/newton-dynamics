@@ -231,7 +231,7 @@ $(document).ready(function(){initNavTree('nd_opencl_system_8h_source.html',''); 
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<a class="code" href="classnd_opencl_buffer.html">ndOpenclBuffer&lt;T&gt;::~ndOpenclBuffer</a>()</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;{</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    dAssert(!m_gpuBuffer);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    ndAssert(!m_gpuBuffer);</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
@@ -241,7 +241,7 @@ $(document).ready(function(){initNavTree('nd_opencl_system_8h_source.html',''); 
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    {</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        cl_int err = CL_SUCCESS;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        err = clReleaseMemObject(m_gpuBuffer);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        dAssert(err == CL_SUCCESS);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        ndAssert(err == CL_SUCCESS);</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray&lt;T&gt;::Resize</a>(0);</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    }</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    m_gpuBuffer = <span class="keyword">nullptr</span>;</div>
@@ -256,7 +256,7 @@ $(document).ready(function(){initNavTree('nd_opencl_system_8h_source.html',''); 
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    {</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="keywordflow">if</span> (m_flags &amp; CL_MEM_USE_HOST_PTR)</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;            dAssert(0);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;            ndAssert(0);</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;            <span class="comment">//void* const hostBuffer = &amp;(*this)[0];</span></div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;            <span class="comment">//m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * ndArray&lt;T&gt;::GetCapacity(), hostBuffer, &amp;err);</span></div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        }</div>
@@ -264,12 +264,12 @@ $(document).ready(function(){initNavTree('nd_opencl_system_8h_source.html',''); 
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        {</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            m_gpuBuffer = clCreateBuffer(context, m_flags, <span class="keyword">sizeof</span>(T) * size, <span class="keyword">nullptr</span>, &amp;err);</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        }</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        dAssert(err == CL_SUCCESS);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        ndAssert(err == CL_SUCCESS);</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray&lt;T&gt;::Resize</a>(size);</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        dAssert(0);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        ndAssert(0);</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;}</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
@@ -282,7 +282,7 @@ $(document).ready(function(){initNavTree('nd_opencl_system_8h_source.html',''); 
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        commandQueue, m_gpuBuffer,</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        CL_FALSE, 0, <span class="keyword">sizeof</span>(T) * <a class="code" href="classnd_array.html">ndArray&lt;T&gt;::GetCount</a>(), destination,</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        0, <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    dAssert(err == CL_SUCCESS);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    ndAssert(err == CL_SUCCESS);</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;}</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
@@ -295,25 +295,25 @@ $(document).ready(function(){initNavTree('nd_opencl_system_8h_source.html',''); 
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        commandQueue, m_gpuBuffer,</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        CL_FALSE, 0, <span class="keyword">sizeof</span>(T) * <a class="code" href="classnd_array.html">ndArray&lt;T&gt;::GetCount</a>(), source,</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        0, <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    dAssert(err == CL_SUCCESS);</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    ndAssert(err == CL_SUCCESS);</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;}</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
-<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:41</div></div>
+<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:42</div></div>
 <div class="ttc" id="aclassnd_opencl_body_buffer_html"><div class="ttname"><a href="classnd_opencl_body_buffer.html">ndOpenclBodyBuffer</a></div><div class="ttdef"><b>Definition:</b> ndOpenclSystem.h:48</div></div>
 <div class="ttc" id="aclassnd_opencl_system_html"><div class="ttname"><a href="classnd_opencl_system.html">ndOpenclSystem</a></div><div class="ttdef"><b>Definition:</b> ndOpenclSystem.h:81</div></div>
 <div class="ttc" id="aclassnd_opencl_buffer_html"><div class="ttname"><a href="classnd_opencl_buffer.html">ndOpenclBuffer</a></div><div class="ttdef"><b>Definition:</b> ndOpenclSystem.h:33</div></div>
 <div class="ttc" id="aunioncl__float8_html"><div class="ttname"><a href="unioncl__float8.html">cl_float8</a></div><div class="ttdef"><b>Definition:</b> cl_platform.h:1237</div></div>
 <div class="ttc" id="aunionnd_opencl_body_buffer_1_1nd_opencl_jacobian_html"><div class="ttname"><a href="unionnd_opencl_body_buffer_1_1nd_opencl_jacobian.html">ndOpenclBodyBuffer::ndOpenclJacobian</a></div><div class="ttdef"><b>Definition:</b> ndOpenclSystem.h:51</div></div>
 <div class="ttc" id="aunioncl__float4_html"><div class="ttname"><a href="unioncl__float4.html">cl_float4</a></div><div class="ttdef"><b>Definition:</b> cl_platform.h:1218</div></div>
-<div class="ttc" id="aclassnd_array_html_ac383edb0da15600add54ab14d3b3d309"><div class="ttname"><a href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray::Resize</a></div><div class="ttdeci">void Resize(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:219</div></div>
+<div class="ttc" id="aclassnd_array_html_ac383edb0da15600add54ab14d3b3d309"><div class="ttname"><a href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray::Resize</a></div><div class="ttdeci">void Resize(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:224</div></div>
 <div class="ttc" id="aclassnd_opencl_system_1_1nd_kernel_html"><div class="ttname"><a href="classnd_opencl_system_1_1nd_kernel.html">ndOpenclSystem::ndKernel</a></div><div class="ttdef"><b>Definition:</b> ndOpenclSystem.h:84</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_d5aa3f859e50cce566f2ea2a6855a4d4.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_7b313f37c50872a0a5dc9f321358b446.html">dExtensions</a></li><li class="navelem"><a class="el" href="dir_ba79d8f7af95f61d70e6b0e0fdba0cc6.html">dOpencl</a></li><li class="navelem"><b>ndOpenclSystem.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_ed97d29386cdd3379a363b5306354b4f.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_351ecc9e6445e39d9049fbc56334a529.html">dExtensions</a></li><li class="navelem"><a class="el" href="dir_d9a38502624d577ce40c70905781ea6f.html">dOpencl</a></li><li class="navelem"><b>ndOpenclSystem.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

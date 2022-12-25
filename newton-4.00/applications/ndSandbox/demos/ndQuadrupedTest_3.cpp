@@ -53,17 +53,17 @@ namespace ndQuadruped_3
 		{ "rb_knee_Bone013", ndDefinition::m_hinge, 2.0f },
 		{ "rb_effector_Bone009", ndDefinition::m_effector , 0.0f, 0.0f },
 
-		{ "lb_thigh_Bone011", ndDefinition::m_spherical, 3.0f },
-		{ "lb_knee_Bone012", ndDefinition::m_hinge, 2.0f },
-		{ "lb_effector_Bone010", ndDefinition::m_effector , 0.0f, 0.5f },
-
-		{ "fr_thigh_Bone003", ndDefinition::m_spherical, 3.0f },
-		{ "fr_knee_Bone004", ndDefinition::m_hinge, 2.0f },
-		{ "fr_effector_Bone005", ndDefinition::m_effector , 0.0f, 0.75f },
-
-		{ "fl_thigh_Bone008", ndDefinition::m_spherical, 3.0f },
-		{ "fl_knee_Bone006", ndDefinition::m_hinge, 2.0f },
-		{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f, 0.25f },
+		//{ "lb_thigh_Bone011", ndDefinition::m_spherical, 3.0f },
+		//{ "lb_knee_Bone012", ndDefinition::m_hinge, 2.0f },
+		//{ "lb_effector_Bone010", ndDefinition::m_effector , 0.0f, 0.5f },
+		//
+		//{ "fr_thigh_Bone003", ndDefinition::m_spherical, 3.0f },
+		//{ "fr_knee_Bone004", ndDefinition::m_hinge, 2.0f },
+		//{ "fr_effector_Bone005", ndDefinition::m_effector , 0.0f, 0.75f },
+		//
+		//{ "fl_thigh_Bone008", ndDefinition::m_spherical, 3.0f },
+		//{ "fl_knee_Bone006", ndDefinition::m_hinge, 2.0f },
+		//{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f, 0.25f },
 	};
 
 	class ndQuadrupedMaterial : public ndApplicationMaterial
@@ -531,12 +531,12 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndApplicationMaterial::m_modelPart, ndApplicationMaterial::m_modelPart);
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndDemoEntity* const robotEntity = ndDemoEntity::LoadFbx("spot.fbx", scene);
+	ndSharedPtr<ndDemoEntity> modelMesh (ndDemoEntity::LoadFbx("spot.fbx", scene));
 	
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	
-	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, robotEntity, matrix);
+	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, *modelMesh, matrix);
 	scene->SetSelectedModel(robot0);
 	ndSharedPtr<ndModel> modelPtr(robot0);
 	world->AddModel(modelPtr);
@@ -545,8 +545,6 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	//matrix.m_posit.m_z -= 2.0f;
 	//ndQuadrupedModel* const robot1 = new ndQuadrupedModel(scene, robotEntity, matrix);
 	//world->AddModel(robot1);
-	
-	delete robotEntity;
 	
 	//ndVector posit(matrix.m_posit);
 	//posit.m_x += 1.5f;

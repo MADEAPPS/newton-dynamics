@@ -129,9 +129,9 @@ D_NEWTON_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldScene<
 D_NEWTON_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldScene</b> (const <a class="el" href="classnd_world_scene.html">ndWorldScene</a> &amp;src)</td></tr>
 <tr class="separator:a8fd287ee9358bc1318232d75c291750d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_scene"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_scene')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_scene.html">ndScene</a></td></tr>
-<tr class="memitem:ad376000c55e6de738770cd2a76e82e97 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ad376000c55e6de738770cd2a76e82e97"></a>
-virtual D_COLLISION_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>AddBody</b> (<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body)</td></tr>
-<tr class="separator:ad376000c55e6de738770cd2a76e82e97 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae60803e3c51a9cea0dca6b95d87f84e6 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ae60803e3c51a9cea0dca6b95d87f84e6"></a>
+virtual D_COLLISION_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>AddBody</b> (<a class="el" href="classnd_shared_ptr.html">ndSharedPtr</a>&lt; <a class="el" href="classnd_body.html">ndBody</a> &gt; &amp;body)</td></tr>
+<tr class="separator:ae60803e3c51a9cea0dca6b95d87f84e6 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dd4c4d7d6a734fdf48757f9217ac8ba inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a5dd4c4d7d6a734fdf48757f9217ac8ba"></a>
 virtual D_COLLISION_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveBody</b> (<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body)</td></tr>
 <tr class="separator:a5dd4c4d7d6a734fdf48757f9217ac8ba inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -156,9 +156,6 @@ virtual D_COLLISION_API double&#160;</td><td class="memItemRight" valign="bottom
 <tr class="memitem:a5d7daa91813091810ff2fac6da9d62f6 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a5d7daa91813091810ff2fac6da9d62f6"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Cleanup</b> ()</td></tr>
 <tr class="separator:a5d7daa91813091810ff2fac6da9d62f6 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a891276afa601ab9c130806ec7c2459e9 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a891276afa601ab9c130806ec7c2459e9"></a>
-D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (ndFloat32 timestep)</td></tr>
-<tr class="separator:a891276afa601ab9c130806ec7c2459e9 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76bef1b686b55172138dc2570af449d1 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a76bef1b686b55172138dc2570af449d1"></a>
 D_COLLISION_API <a class="el" href="classnd_contact_notify.html">ndContactNotify</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactNotify</b> () const</td></tr>
 <tr class="separator:a76bef1b686b55172138dc2570af449d1 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,9 +165,9 @@ D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetCo
 <tr class="memitem:ae65b860227e6920bc80ce20aa4e8be11 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ae65b860227e6920bc80ce20aa4e8be11"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugScene</b> (<a class="el" href="classnd_scene_tree_noti_fy.html">ndSceneTreeNotiFy</a> *const notify)</td></tr>
 <tr class="separator:ae65b860227e6920bc80ce20aa4e8be11 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a772e44394ff4ce4fca42e3e01e110d53 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a772e44394ff4ce4fca42e3e01e110d53"></a>
-virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BodiesInAabb</b> (<a class="el" href="classnd_bodies_in_aabb_notify.html">ndBodiesInAabbNotify</a> &amp;callback) const</td></tr>
-<tr class="separator:a772e44394ff4ce4fca42e3e01e110d53 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affa69385270d5d751be9c1bef882867d inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="affa69385270d5d751be9c1bef882867d"></a>
+virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BodiesInAabb</b> (<a class="el" href="classnd_bodies_in_aabb_notify.html">ndBodiesInAabbNotify</a> &amp;callback, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;minBox, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;maxBox) const</td></tr>
+<tr class="separator:affa69385270d5d751be9c1bef882867d inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23c54876d1965be38a368ec2a5e72afa inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a23c54876d1965be38a368ec2a5e72afa"></a>
 virtual D_COLLISION_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>RayCast</b> (<a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a> &amp;callback, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalOrigin, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;globalDest) const</td></tr>
 <tr class="separator:a23c54876d1965be38a368ec2a5e72afa inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,9 +180,9 @@ D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SendB
 <tr class="memitem:a79b8d148ce4b74103802aa9b7ed88309 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a79b8d148ce4b74103802aa9b7ed88309"></a>
 ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetThreadCount</b> () const</td></tr>
 <tr class="separator:a79b8d148ce4b74103802aa9b7ed88309 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80a6f94fdd37f6372832faa00614ca7a inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a80a6f94fdd37f6372832faa00614ca7a"></a>
-const <a class="el" href="classnd_body_list.html">ndBodyList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetBodyList</b> () const</td></tr>
-<tr class="separator:a80a6f94fdd37f6372832faa00614ca7a inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0780a6c23166ff93f5b1a5a64c6a7af inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ad0780a6c23166ff93f5b1a5a64c6a7af"></a>
+const <a class="el" href="classnd_body_list_view.html">ndBodyListView</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetBodyList</b> () const</td></tr>
+<tr class="separator:ad0780a6c23166ff93f5b1a5a64c6a7af inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc83a86d28f7437a681c0f9658ef5478 inherit pub_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="abc83a86d28f7437a681c0f9658ef5478"></a>
 <a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetActiveBodyArray</b> ()</td></tr>
 <tr class="separator:abc83a86d28f7437a681c0f9658ef5478 inherit pub_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -345,18 +342,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>FindCollidingPairsBac
 <tr class="memitem:a3a036d9016b84ceb560d8731acdd2fff inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a3a036d9016b84ceb560d8731acdd2fff"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>AddPair</b> (<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body0, <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body1, ndInt32 threadId)</td></tr>
 <tr class="separator:a3a036d9016b84ceb560d8731acdd2fff inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ace04cd43b0cadabb38bf05abcf0c4f inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a4ace04cd43b0cadabb38bf05abcf0c4f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SubmitPairs</b> (<a class="el" href="classnd_bvh_leaf_node.html">ndBvhLeafNode</a> *const bodyNode, <a class="el" href="classnd_bvh_node.html">ndBvhNode</a> *const node, ndInt32 threadId)</td></tr>
-<tr class="separator:a4ace04cd43b0cadabb38bf05abcf0c4f inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae19f2bdf1ef61a49789d3f91befbbac7 inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ae19f2bdf1ef61a49789d3f91befbbac7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SubmitPairs</b> (<a class="el" href="classnd_bvh_leaf_node.html">ndBvhLeafNode</a> *const bodyNode, <a class="el" href="classnd_bvh_node.html">ndBvhNode</a> *const node, bool forward, ndInt32 threadId)</td></tr>
+<tr class="separator:ae19f2bdf1ef61a49789d3f91befbbac7 inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa013b97cd4f1d6a05748398f7bd1b93f inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="aa013b97cd4f1d6a05748398f7bd1b93f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateJointContacts</b> (ndInt32 threadIndex, <a class="el" href="classnd_contact.html">ndContact</a> *const contact)</td></tr>
 <tr class="separator:aa013b97cd4f1d6a05748398f7bd1b93f inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af29651bcd1c717ce41a16de19aec73a7 inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="af29651bcd1c717ce41a16de19aec73a7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>ProcessContacts</b> (ndInt32 threadIndex, ndInt32 contactCount, <a class="el" href="classnd_contact_solver.html">ndContactSolver</a> *const contactSolver)</td></tr>
 <tr class="separator:af29651bcd1c717ce41a16de19aec73a7 inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5181c6146d20628a82958002de6f0084 inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a5181c6146d20628a82958002de6f0084"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>BodiesInAabb</b> (<a class="el" href="classnd_bodies_in_aabb_notify.html">ndBodiesInAabbNotify</a> &amp;callback, const <a class="el" href="classnd_bvh_node.html">ndBvhNode</a> **stackPool, ndInt32 stack) const</td></tr>
-<tr class="separator:a5181c6146d20628a82958002de6f0084 inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a168b5b4fd3223d1ac22d71d2d3581df4 inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a168b5b4fd3223d1ac22d71d2d3581df4"></a>
 <a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>FindBilateralJoint</b> (<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body0, <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body1) const</td></tr>
 <tr class="separator:a168b5b4fd3223d1ac22d71d2d3581df4 inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -384,15 +378,18 @@ virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="memitem:a7de4711b363b11d026adce9cf9c0b8ac inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a7de4711b363b11d026adce9cf9c0b8ac"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateTransform</b> ()</td></tr>
 <tr class="separator:a7de4711b363b11d026adce9cf9c0b8ac inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1190236cea25f2b9c131a16532b26e8e inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a1190236cea25f2b9c131a16532b26e8e"></a>
+virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CreateNewContacts</b> ()</td></tr>
+<tr class="separator:a1190236cea25f2b9c131a16532b26e8e inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2ff36a248cac9f24943d60f76e256cc inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ae2ff36a248cac9f24943d60f76e256cc"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateContacts</b> ()</td></tr>
 <tr class="separator:ae2ff36a248cac9f24943d60f76e256cc inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6574f2c4f046ea2a69a6fb3e04e22e74 inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a6574f2c4f046ea2a69a6fb3e04e22e74"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>FindCollidingPairs</b> ()</td></tr>
 <tr class="separator:a6574f2c4f046ea2a69a6fb3e04e22e74 inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee8150b850659badfd03679836626049 inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="aee8150b850659badfd03679836626049"></a>
-virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CollisionOnlyUpdate</b> ()</td></tr>
-<tr class="separator:aee8150b850659badfd03679836626049 inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f3f068a22db6618b59ef0d28a7c2a5c inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a1f3f068a22db6618b59ef0d28a7c2a5c"></a>
+virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>DeleteDeadContacts</b> ()</td></tr>
+<tr class="separator:a1f3f068a22db6618b59ef0d28a7c2a5c inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abef4a6207178c3bcb3c2bc2907eaf55f inherit pro_methods_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="abef4a6207178c3bcb3c2bc2907eaf55f"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateContacts</b> (ndInt32 threadIndex, <a class="el" href="classnd_contact.html">ndContact</a> *const contact)</td></tr>
 <tr class="separator:abef4a6207178c3bcb3c2bc2907eaf55f inherit pro_methods_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -406,9 +403,9 @@ Protected Attributes</h2></td></tr>
 <a class="el" href="classnd_world.html">ndWorld</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_world</b></td></tr>
 <tr class="separator:a1e3ac407a0e45fb5a425c0fe53972ab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classnd_scene"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classnd_scene')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classnd_scene.html">ndScene</a></td></tr>
-<tr class="memitem:ad4a7a2c83a067299bce9428971ea56b2 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ad4a7a2c83a067299bce9428971ea56b2"></a>
-<a class="el" href="classnd_body_list.html">ndBodyList</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_bodyList</b></td></tr>
-<tr class="separator:ad4a7a2c83a067299bce9428971ea56b2 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab051b6845c0a206a380536a6000fd566 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ab051b6845c0a206a380536a6000fd566"></a>
+<a class="el" href="classnd_body_list_view.html">ndBodyListView</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_bodyList</b></td></tr>
+<tr class="separator:ab051b6845c0a206a380536a6000fd566 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c7e9bed47668965b13c2bfbe94ebc3c inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a9c7e9bed47668965b13c2bfbe94ebc3c"></a>
 <a class="el" href="classnd_contact_array.html">ndContactArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_contactArray</b></td></tr>
 <tr class="separator:a9c7e9bed47668965b13c2bfbe94ebc3c inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -424,9 +421,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a522f7269c239c97e9a1c3382f446f2b1 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a522f7269c239c97e9a1c3382f446f2b1"></a>
 <a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_constraint.html">ndConstraint</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_activeConstraintArray</b></td></tr>
 <tr class="separator:a522f7269c239c97e9a1c3382f446f2b1 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a483672f3807c2a7b60d7fe3b3703c1c6 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a483672f3807c2a7b60d7fe3b3703c1c6"></a>
-<a class="el" href="classnd_list.html">ndList</a>&lt; <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_specialUpdateList</b></td></tr>
-<tr class="separator:a483672f3807c2a7b60d7fe3b3703c1c6 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdc60cf3de3166c3330c1ce7a6ca3b22 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="abdc60cf3de3166c3330c1ce7a6ca3b22"></a>
+<a class="el" href="classnd_special_list.html">ndSpecialList</a>&lt; <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_specialUpdateList</b></td></tr>
+<tr class="separator:abdc60cf3de3166c3330c1ce7a6ca3b22 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7153267dd9eb78224241acb35b059413 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a7153267dd9eb78224241acb35b059413"></a>
 <a class="el" href="classnd_thread_background_worker.html">ndThreadBackgroundWorker</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_backgroundThread</b></td></tr>
 <tr class="separator:a7153267dd9eb78224241acb35b059413 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -436,6 +433,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:aff9b5bb6424e60e70c460e580ddb4616 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="aff9b5bb6424e60e70c460e580ddb4616"></a>
 <a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_scene_1_1nd_contact_pairs.html">ndContactPairs</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_partialNewPairs</b> [D_MAX_THREADS_COUNT]</td></tr>
 <tr class="separator:aff9b5bb6424e60e70c460e580ddb4616 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a311f84b63900990842e8e0753150a19d inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a311f84b63900990842e8e0753150a19d"></a>
+<a class="el" href="classnd_polygon_mesh_desc_1_1nd_static_mesh_face_query.html">ndPolygonMeshDesc::ndStaticMeshFaceQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_staticMeshQuery</b> [D_MAX_THREADS_COUNT]</td></tr>
+<tr class="separator:a311f84b63900990842e8e0753150a19d inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66b49daf1b9ba9cc64780c6dfef7ba12 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a66b49daf1b9ba9cc64780c6dfef7ba12"></a>
+<a class="el" href="classnd_polygon_mesh_desc_1_1nd_procedural_static_mesh_face_query.html">ndPolygonMeshDesc::ndProceduralStaticMeshFaceQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_proceduralStaticMeshQuery</b> [D_MAX_THREADS_COUNT]</td></tr>
+<tr class="separator:a66b49daf1b9ba9cc64780c6dfef7ba12 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a198a3e7db2fa70c72551a608ee5be2bb inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a198a3e7db2fa70c72551a608ee5be2bb"></a>
 <a class="el" href="classnd_spin_lock.html">ndSpinLock</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_lock</b></td></tr>
 <tr class="separator:a198a3e7db2fa70c72551a608ee5be2bb inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -454,18 +457,22 @@ ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_timestep</b></
 <tr class="memitem:a3cbd027ceb74918e2524205e4339c9d7 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a3cbd027ceb74918e2524205e4339c9d7"></a>
 ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_lru</b></td></tr>
 <tr class="separator:a3cbd027ceb74918e2524205e4339c9d7 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc19c64a8205186052641d0ca139c415 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="afc19c64a8205186052641d0ca139c415"></a>
-ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_frameIndex</b></td></tr>
-<tr class="separator:afc19c64a8205186052641d0ca139c415 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8e0af3b1d2c82a9e82d4b326af9aa53 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="ae8e0af3b1d2c82a9e82d4b326af9aa53"></a>
-ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_subStepIndex</b></td></tr>
-<tr class="separator:ae8e0af3b1d2c82a9e82d4b326af9aa53 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78d7a57566aa7856b97efefe1c3b0e5f inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a78d7a57566aa7856b97efefe1c3b0e5f"></a>
+ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_frameNumber</b></td></tr>
+<tr class="separator:a78d7a57566aa7856b97efefe1c3b0e5f inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafc81d8c92a0d7362960b5423f8e6fca inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="aafc81d8c92a0d7362960b5423f8e6fca"></a>
+ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_subStepNumber</b></td></tr>
+<tr class="separator:aafc81d8c92a0d7362960b5423f8e6fca inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a211e48feac8cfa8926861994383b7315 inherit pro_attribs_classnd_scene"><td class="memItemLeft" align="right" valign="top"><a id="a211e48feac8cfa8926861994383b7315"></a>
 ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_forceBalanceSceneCounter</b></td></tr>
 <tr class="separator:a211e48feac8cfa8926861994383b7315 inherit pro_attribs_classnd_scene"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_methods_classnd_thread_pool"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_thread_pool')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_thread_pool.html">ndThreadPool</a></td></tr>
+<tr class="memitem:ae3abc2fce3adde3b8289e148d2662711 inherit pub_static_methods_classnd_thread_pool"><td class="memItemLeft" align="right" valign="top"><a id="ae3abc2fce3adde3b8289e148d2662711"></a>
+static D_CORE_API ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaxThreads</b> ()</td></tr>
+<tr class="separator:ae3abc2fce3adde3b8289e148d2662711 inherit pub_static_methods_classnd_thread_pool"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
 <tr class="memitem:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a1f1766c498c6231d24c63582106d2cfc"></a>
 D_OPERATOR_NEW_AND_DELETE static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a1f1766c498c6231d24c63582106d2cfc">Malloc</a> (size_t size)</td></tr>
@@ -519,7 +526,7 @@ static <a class="el" href="classnd_vector.html">ndVector</a>&#160;</td><td class
  or to exit the loop. <br  />
  </p>
 
-<p>Reimplemented from <a class="el" href="classnd_scene.html#ad57bd84d08a41ed3ff46085a31146c10">ndScene</a>.</p>
+<p>Implements <a class="el" href="classnd_thread.html#ab3750f6cb757d1677306aa6fd268edbf">ndThread</a>.</p>
 
 </div>
 </div>

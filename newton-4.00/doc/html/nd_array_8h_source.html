@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_array_8h_source.html',''); initResi
 <div class="title">ndArray.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -128,242 +128,272 @@ $(document).ready(function(){initNavTree('nd_array_8h_source.html',''); initResi
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;ndCoreStdafx.h&quot;</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;ndTypes.h&quot;</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &quot;ndUtils.h&quot;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &quot;ndVector.h&quot;</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &quot;ndClassAlloc.h&quot;</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classnd_array.html">   40</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_array.html">ndArray</a>: <span class="keyword">public</span> <a class="code" href="classnd_class_alloc.html">ndClassAlloc</a></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">   44</a></span>&#160;    <a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray</a>();</div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">   46</a></span>&#160;    <a class="code" href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">ndArray</a>(ndInt32 count);</div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">   48</a></span>&#160;    <a class="code" href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">ndArray</a>(<span class="keyword">const</span> <a class="code" href="classnd_array.html">ndArray</a>&amp; source);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">   51</a></span>&#160;    <a class="code" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">~ndArray</a> ();</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">   54</a></span>&#160;    ndInt32 <a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">   59</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(ndInt32 count);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="comment">//void Clear();</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">   65</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">Resize</a>(ndInt32 count);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">   68</a></span>&#160;    ndInt32 <a class="code" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">GetCapacity</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">   72</a></span>&#160;    T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">operator[] </a>(ndInt32 i);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classnd_array.html#a5476dc0dd4e575d5455067974da22f7c">   76</a></span>&#160;    <span class="keyword">const</span> T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">operator[] </a>(ndInt32 i) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">   80</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(<a class="code" href="classnd_array.html">ndArray</a>&amp; other);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">   84</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">PushBack</a>(<span class="keyword">const</span> T&amp; element);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">private</span>: </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordtype">void</span> CopyData(T* <span class="keyword">const</span> dst, <span class="keyword">const</span> T* <span class="keyword">const</span> src, ndInt32 elements);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    T* m_array;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    ndInt32 m_size;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    ndInt32 m_capacity;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;};</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">   96</a></span>&#160;<a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray&lt;T&gt;::ndArray</a>()</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    :<a class="code" href="classnd_class_alloc.html">ndClassAlloc</a>()</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    ,m_array(nullptr)</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    ,m_size(0)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    ,m_capacity(0)</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;{</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">  105</a></span>&#160;<a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray&lt;T&gt;::ndArray</a>(ndInt32 count)</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    :<a class="code" href="classnd_class_alloc.html">ndClassAlloc</a>()</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    ,m_array(nullptr)</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    ,m_size(0)</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    ,m_capacity(0)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">Resize</a>(count);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">  115</a></span>&#160;<a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray&lt;T&gt;::ndArray</a>(<span class="keyword">const</span> <a class="code" href="classnd_array.html">ndArray</a>&amp; source)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    :<a class="code" href="classnd_class_alloc.html">ndClassAlloc</a>()</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    ,m_array(nullptr)</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    ,m_size(0)</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    ,m_capacity(0)</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;{</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">if</span> (source.m_array)</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">Resize</a>(source.m_capacity);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(source.m_size);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; source.m_size; ++i)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            m_array[i] = source[i];</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        }</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;}</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00133"></a><span class="lineno"><a class="line" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">  133</a></span>&#160;<a class="code" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">ndArray&lt;T&gt;::~ndArray</a> ()</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;{</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">if</span> (m_array) </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <a class="code" href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a>(m_array);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    }</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="classnd_array.html#a5476dc0dd4e575d5455067974da22f7c">  142</a></span>&#160;<span class="keyword">const</span> T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">ndArray&lt;T&gt;::operator[] </a>(ndInt32 i)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    dAssert(i &gt;= 0);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    dAssert(i &lt; m_size);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordflow">return</span> m_array[i];</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;}</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">  150</a></span>&#160;T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">ndArray&lt;T&gt;::operator[] </a>(ndInt32 i)</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;{</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    dAssert(i &gt;= 0);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    dAssert(i &lt; m_size);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">return</span> m_array[i];</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;}</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">  158</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">ndArray&lt;T&gt;::PushBack</a>(<span class="keyword">const</span> T&amp; element)</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;{</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    dAssert(m_size &lt;= m_capacity);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">if</span> (m_size == m_capacity)</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        Resize(m_capacity * 2);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    }</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    m_array[m_size] = element;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    m_size++;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &quot;ndRand.h&quot;</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &quot;ndUtils.h&quot;</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &quot;ndVector.h&quot;</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &quot;ndClassAlloc.h&quot;</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classnd_array.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_array.html">ndArray</a>: <span class="keyword">public</span> <a class="code" href="classnd_class_alloc.html">ndClassAlloc</a></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;{</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">   45</a></span>&#160;    <a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray</a>();</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">   47</a></span>&#160;    <a class="code" href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">ndArray</a>(ndInt32 count);</div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">   49</a></span>&#160;    <a class="code" href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">ndArray</a>(<span class="keyword">const</span> <a class="code" href="classnd_array.html">ndArray</a>&amp; source);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">   52</a></span>&#160;    <a class="code" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">~ndArray</a> ();</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">   55</a></span>&#160;    ndInt32 <a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">   60</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(ndInt32 count);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="comment">//void Clear();</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">   66</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">Resize</a>(ndInt32 count);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">   69</a></span>&#160;    ndInt32 <a class="code" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">GetCapacity</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    </div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">   73</a></span>&#160;    T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">operator[] </a>(ndInt32 i);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classnd_array.html#a5476dc0dd4e575d5455067974da22f7c">   77</a></span>&#160;    <span class="keyword">const</span> T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">operator[] </a>(ndInt32 i) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">   81</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(<a class="code" href="classnd_array.html">ndArray</a>&amp; other);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">   85</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">PushBack</a>(<span class="keyword">const</span> T&amp; element);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="classnd_array.html#a3b87009eb6642596e17e155d41020e17">   88</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a3b87009eb6642596e17e155d41020e17">RandomShuffle</a>(ndInt32 count);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">   92</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">ResetMembers</a>();</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">   96</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">SetMembers</a>(ndInt32 size, <span class="keywordtype">void</span>* <span class="keyword">const</span> memory);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">private</span>: </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">void</span> CopyData(T* <span class="keyword">const</span> dst, <span class="keyword">const</span> T* <span class="keyword">const</span> src, ndInt32 elements);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    T* m_array;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    ndInt32 m_size;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    ndInt32 m_capacity;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;};</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">  108</a></span>&#160;<a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray&lt;T&gt;::ndArray</a>()</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    :<a class="code" href="classnd_class_alloc.html">ndClassAlloc</a>()</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    ,m_array(nullptr)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    ,m_size(0)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    ,m_capacity(0)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;{</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">  117</a></span>&#160;<a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray&lt;T&gt;::ndArray</a>(ndInt32 count)</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    :<a class="code" href="classnd_class_alloc.html">ndClassAlloc</a>()</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    ,m_array(nullptr)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    ,m_size(0)</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    ,m_capacity(0)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;{</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">Resize</a>(count);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00127"></a><span class="lineno"><a class="line" href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">  127</a></span>&#160;<a class="code" href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray&lt;T&gt;::ndArray</a>(<span class="keyword">const</span> <a class="code" href="classnd_array.html">ndArray</a>&amp; source)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    :<a class="code" href="classnd_class_alloc.html">ndClassAlloc</a>()</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    ,m_array(nullptr)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    ,m_size(0)</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    ,m_capacity(0)</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;{</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span> (source.m_array)</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">Resize</a>(source.m_capacity);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(source.m_size);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; source.m_size; ++i)</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        {</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            m_array[i] = source[i];</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        }</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    }</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;}</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00145"></a><span class="lineno"><a class="line" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">  145</a></span>&#160;<a class="code" href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">ndArray&lt;T&gt;::~ndArray</a> ()</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;{</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">if</span> (m_array) </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <a class="code" href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a>(m_array);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    }</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;}</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="classnd_array.html#a5476dc0dd4e575d5455067974da22f7c">  154</a></span>&#160;<span class="keyword">const</span> T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">ndArray&lt;T&gt;::operator[] </a>(ndInt32 i)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    ndAssert(i &gt;= 0);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    ndAssert(i &lt; m_size);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordflow">return</span> m_array[i];</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;}</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">  162</a></span>&#160;T&amp; <a class="code" href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">ndArray&lt;T&gt;::operator[] </a>(ndInt32 i)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;{</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    ndAssert(i &gt;= 0);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    ndAssert(i &lt; m_size);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">return</span> m_array[i];</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">  170</a></span>&#160;ndInt32 <a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray&lt;T&gt;::GetCount</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">return</span> m_size;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00176"></a><span class="lineno"><a class="line" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">  176</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray&lt;T&gt;::SetCount</a>(ndInt32 count)</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;{</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">while</span> (count &gt; m_capacity)</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        Resize(m_capacity * 2);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    m_size = count;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;}</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">  186</a></span>&#160;ndInt32 <a class="code" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">ndArray&lt;T&gt;::GetCapacity</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">return</span> m_capacity;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;}</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="comment">//template&lt;class T&gt;</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="comment">//void ndArray&lt;T&gt;::Clear()</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="comment">//{</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment">//  m_size = 0;</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment">//}</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">  170</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">ndArray&lt;T&gt;::PushBack</a>(<span class="keyword">const</span> T&amp; element)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    ndAssert(m_size &lt;= m_capacity);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">if</span> (m_size == m_capacity)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    {</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        Resize(m_capacity * 2);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    m_array[m_size] = element;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    m_size++;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;}</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00182"></a><span class="lineno"><a class="line" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">  182</a></span>&#160;ndInt32 <a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray&lt;T&gt;::GetCount</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> m_size;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;}</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">  188</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray&lt;T&gt;::SetCount</a>(ndInt32 count)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;{</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">while</span> (count &gt; m_capacity)</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        Resize(m_capacity * 2);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    }</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    m_size = count;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;}</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html">ndArray&lt;T&gt;::CopyData</a>(T* <span class="keyword">const</span> dstPtr, <span class="keyword">const</span> T* <span class="keyword">const</span> srcPtr, ndInt32 elements)</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;{</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">//memcpy(dstPtr, srcPtr, elements * sizeof(T));</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keyword">const</span> ndInt32 sizeInBytes = elements * <span class="keyword">sizeof</span>(T);</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keyword">const</span> ndInt32 size16 = sizeInBytes / <span class="keyword">sizeof</span>(<a class="code" href="classnd_vector.html">ndVector</a>);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> dst = (<a class="code" href="classnd_vector.html">ndVector</a>*)dstPtr;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> src = (<a class="code" href="classnd_vector.html">ndVector</a>*)srcPtr;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; size16; ++i)</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    {</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        dst[i] = src[i];</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    }</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordtype">char</span>* <span class="keyword">const</span> dstBytes = (<span class="keywordtype">char</span>*)dst;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> srcBytes = (<span class="keywordtype">char</span>*)src;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = size16 * <span class="keyword">sizeof</span>(<a class="code" href="classnd_vector.html">ndVector</a>); i &lt; sizeInBytes; ++i)</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    {</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        dstBytes[i] = srcBytes[i];</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;}</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">  219</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray&lt;T&gt;::Resize</a>(ndInt32 newSize)</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;{</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="comment">// note: I know some tolls will detect a warning here</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="comment">// because it is copy object from one array</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="comment">// to another with out calling the copy constructor</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="comment">// and destructor, but the ndArray is designed for </span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="comment">// high performance memory resizing of struct,</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">// if an application needs to use an array with</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">// for general purpose classes, </span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">// please use standart lib std::vector</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">if</span> (newSize &gt; m_capacity || (m_capacity == 0))</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        newSize = ndMax(newSize, 16);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)<a class="code" href="classnd_memory.html#a28dac2e45b0e04ac67a178ca7ee3d8ec">ndMemory::Malloc</a>(ndInt32(<span class="keyword">sizeof</span>(T) * newSize));</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordflow">if</span> (m_array) </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        {</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            CopyData(newArray, m_array, m_size);</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            <a class="code" href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a>(m_array);</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        m_array = newArray;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        m_capacity = newSize;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    }</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (newSize &lt; m_capacity)</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        newSize = ndMax(newSize, 16);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)<a class="code" href="classnd_memory.html#a28dac2e45b0e04ac67a178ca7ee3d8ec">ndMemory::Malloc</a>(ndInt32(<span class="keyword">sizeof</span>(T) * newSize));</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordflow">if</span> (m_array) </div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            CopyData(newArray, m_array, newSize);</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            <a class="code" href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a>(m_array);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        m_size = newSize;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        m_array = newArray;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        m_capacity = newSize;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    }</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;}</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00257"></a><span class="lineno"><a class="line" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">  257</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray&lt;T&gt;::Swap</a>(<a class="code" href="classnd_array.html">ndArray</a>&amp; other)</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;{</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    ndSwap(m_array, other.m_array);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    ndSwap(m_size, other.m_size);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    ndSwap(m_capacity, other.m_capacity);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;}</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00198"></a><span class="lineno"><a class="line" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">  198</a></span>&#160;ndInt32 <a class="code" href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">ndArray&lt;T&gt;::GetCapacity</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">return</span> m_capacity;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;}</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html">ndArray&lt;T&gt;::CopyData</a>(T* <span class="keyword">const</span> dstPtr, <span class="keyword">const</span> T* <span class="keyword">const</span> srcPtr, ndInt32 elements)</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;{</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keyword">const</span> ndInt32 sizeInBytes = ndInt32 (elements * <span class="keyword">sizeof</span>(T));</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keyword">const</span> ndInt32 size16 = ndInt32(sizeInBytes / <span class="keyword">sizeof</span>(<a class="code" href="classnd_vector.html">ndVector</a>));</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> dst = (<a class="code" href="classnd_vector.html">ndVector</a>*)dstPtr;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>* <span class="keyword">const</span> src = (<a class="code" href="classnd_vector.html">ndVector</a>*)srcPtr;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; size16; ++i)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        dst[i] = src[i];</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">char</span>* <span class="keyword">const</span> dstBytes = (<span class="keywordtype">char</span>*)dst;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> srcBytes = (<span class="keywordtype">char</span>*)src;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = ndInt32(size16 * <span class="keyword">sizeof</span>(<a class="code" href="classnd_vector.html">ndVector</a>)); i &lt; sizeInBytes; ++i)</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    {</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        dstBytes[i] = srcBytes[i];</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;}</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00224"></a><span class="lineno"><a class="line" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">  224</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray&lt;T&gt;::Resize</a>(ndInt32 newSize)</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;{</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">// note: I know some tolls will detect a warning here</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">// because it is copy object from one array</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">// to another with out calling the copy constructor</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">// and destructor, but the ndArray is designed for </span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">// high performance memory resizing of struct,</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">// if an application needs to use an array with</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="comment">// for general purpose classes, </span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">// please use standart lib std::vector</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">if</span> (newSize &gt; m_capacity || (m_capacity == 0))</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        newSize = ndMax(newSize, 16);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)<a class="code" href="classnd_memory.html#a28dac2e45b0e04ac67a178ca7ee3d8ec">ndMemory::Malloc</a>(<span class="keywordtype">size_t</span>(<span class="keyword">sizeof</span>(T) * newSize));</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <span class="keywordflow">if</span> (m_array) </div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        {</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            CopyData(newArray, m_array, m_size);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <a class="code" href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a>(m_array);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        }</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        m_array = newArray;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        m_capacity = newSize;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (newSize &lt; m_capacity)</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        newSize = ndMax(newSize, 16);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)<a class="code" href="classnd_memory.html#a28dac2e45b0e04ac67a178ca7ee3d8ec">ndMemory::Malloc</a>(<span class="keywordtype">size_t</span>(<span class="keyword">sizeof</span>(T) * newSize));</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">if</span> (m_array) </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            CopyData(newArray, m_array, newSize);</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <a class="code" href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a>(m_array);</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        }</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        m_size = newSize;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        m_array = newArray;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        m_capacity = newSize;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    }</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;}</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00262"></a><span class="lineno"><a class="line" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">  262</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray&lt;T&gt;::Swap</a>(<a class="code" href="classnd_array.html">ndArray</a>&amp; other)</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;{</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    ndSwap(m_array, other.m_array);</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    ndSwap(m_size, other.m_size);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    ndSwap(m_capacity, other.m_capacity);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;}</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">  270</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">ndArray&lt;T&gt;::SetMembers</a>(ndInt32 size, <span class="keywordtype">void</span>* <span class="keyword">const</span> memory)</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    m_size = size;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    m_capacity = size + 1;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    m_array = (T*)memory;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;}</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00278"></a><span class="lineno"><a class="line" href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">  278</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">ndArray&lt;T&gt;::ResetMembers</a>()</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;{</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    m_size = 0;</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    m_capacity = 0;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    m_array = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;}</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160; </div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00286"></a><span class="lineno"><a class="line" href="classnd_array.html#a3b87009eb6642596e17e155d41020e17">  286</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnd_array.html#a3b87009eb6642596e17e155d41020e17">ndArray&lt;T&gt;::RandomShuffle</a>(ndInt32 count)</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;{</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keyword">const</span> ndInt32 size = ndMin (count, GetCount());</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = size - 1; i != 0; --i)</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    {</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        ndUnsigned32 j = ndUnsigned32(ndRandInt()) % size;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        ndSwap (m_array[i], m_array[j]);</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    }</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;}</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
 <div class="ttc" id="aclassnd_memory_html_a28dac2e45b0e04ac67a178ca7ee3d8ec"><div class="ttname"><a href="classnd_memory.html#a28dac2e45b0e04ac67a178ca7ee3d8ec">ndMemory::Malloc</a></div><div class="ttdeci">static D_CORE_API void * Malloc(size_t size)</div><div class="ttdoc">General Memory allocation function.</div><div class="ttdef"><b>Definition:</b> ndMemory.cpp:46</div></div>
-<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:41</div></div>
-<div class="ttc" id="aclassnd_array_html_a76281badc4ffa3d67913fb33a12a7cb7"><div class="ttname"><a href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray::Swap</a></div><div class="ttdeci">void Swap(ndArray &amp;other)</div><div class="ttdoc">Interchange all the information with other.</div><div class="ttdef"><b>Definition:</b> ndArray.h:257</div></div>
-<div class="ttc" id="aclassnd_array_html_ad17a0df56fc4f7048e5c3149b1997eee"><div class="ttname"><a href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray::ndArray</a></div><div class="ttdeci">ndArray()</div><div class="ttdoc">constructor, set count and capacity to zero, not memory is allocated.</div><div class="ttdef"><b>Definition:</b> ndArray.h:96</div></div>
-<div class="ttc" id="aclassnd_array_html_a2af7fce42c57e6c85dca0c199aa58885"><div class="ttname"><a href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">ndArray::PushBack</a></div><div class="ttdeci">void PushBack(const T &amp;element)</div><div class="ttdoc">Add element to the end of the buffer.</div><div class="ttdef"><b>Definition:</b> ndArray.h:158</div></div>
-<div class="ttc" id="aclassnd_array_html_a0607c75a9ac49efe20ed3f948dcb9cc7"><div class="ttname"><a href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray::GetCount</a></div><div class="ttdeci">ndInt32 GetCount() const</div><div class="ttdoc">return the size of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:170</div></div>
-<div class="ttc" id="aclassnd_array_html_a4e581490f02a04eb182ac7cab2cfc3ae"><div class="ttname"><a href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">ndArray::ndArray</a></div><div class="ttdeci">ndArray(ndInt32 count)</div><div class="ttdoc">constructor, set count and capacity, allocated space for count elements.</div><div class="ttdef"><b>Definition:</b> ndArray.h:105</div></div>
-<div class="ttc" id="aclassnd_array_html_ac383edb0da15600add54ab14d3b3d309"><div class="ttname"><a href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray::Resize</a></div><div class="ttdeci">void Resize(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:219</div></div>
-<div class="ttc" id="aclassnd_array_html_a8db63a6e40a828fa8086be20aea82fbb"><div class="ttname"><a href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">ndArray::ndArray</a></div><div class="ttdeci">ndArray(const ndArray &amp;source)</div><div class="ttdoc">copy constructor, allocate and copy only m_size elements from source.</div><div class="ttdef"><b>Definition:</b> ndArray.h:115</div></div>
-<div class="ttc" id="aclassnd_array_html_abfcae181655a5fb878515edf50540cb4"><div class="ttname"><a href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">ndArray::~ndArray</a></div><div class="ttdeci">~ndArray()</div><div class="ttdoc">deallocate all memory, dos not call destructor on any of th elements.</div><div class="ttdef"><b>Definition:</b> ndArray.h:133</div></div>
-<div class="ttc" id="aclassnd_array_html_a2a5a88bb381f8a67d750a3b9b931d25e"><div class="ttname"><a href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">ndArray::GetCapacity</a></div><div class="ttdeci">ndInt32 GetCapacity() const</div><div class="ttdoc">return the capacity of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:186</div></div>
-<div class="ttc" id="aclassnd_array_html_a0f9a0872e8b226746aa8c253b9528840"><div class="ttname"><a href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray::SetCount</a></div><div class="ttdeci">void SetCount(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:176</div></div>
-<div class="ttc" id="aclassnd_array_html_a3c75e614833e256a475ab1cb2e7a5ca9"><div class="ttname"><a href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">ndArray::operator[]</a></div><div class="ttdeci">T &amp; operator[](ndInt32 i)</div><div class="ttdoc">Get the i element for the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:150</div></div>
-<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:1024</div></div>
+<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:42</div></div>
+<div class="ttc" id="aclassnd_array_html_a76281badc4ffa3d67913fb33a12a7cb7"><div class="ttname"><a href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray::Swap</a></div><div class="ttdeci">void Swap(ndArray &amp;other)</div><div class="ttdoc">Interchange all the information with other.</div><div class="ttdef"><b>Definition:</b> ndArray.h:262</div></div>
+<div class="ttc" id="aclassnd_array_html_ad17a0df56fc4f7048e5c3149b1997eee"><div class="ttname"><a href="classnd_array.html#ad17a0df56fc4f7048e5c3149b1997eee">ndArray::ndArray</a></div><div class="ttdeci">ndArray()</div><div class="ttdoc">constructor, set count and capacity to zero, not memory is allocated.</div><div class="ttdef"><b>Definition:</b> ndArray.h:108</div></div>
+<div class="ttc" id="aclassnd_array_html_a2af7fce42c57e6c85dca0c199aa58885"><div class="ttname"><a href="classnd_array.html#a2af7fce42c57e6c85dca0c199aa58885">ndArray::PushBack</a></div><div class="ttdeci">void PushBack(const T &amp;element)</div><div class="ttdoc">Add element to the end of the buffer.</div><div class="ttdef"><b>Definition:</b> ndArray.h:170</div></div>
+<div class="ttc" id="aclassnd_array_html_a3b87009eb6642596e17e155d41020e17"><div class="ttname"><a href="classnd_array.html#a3b87009eb6642596e17e155d41020e17">ndArray::RandomShuffle</a></div><div class="ttdeci">void RandomShuffle(ndInt32 count)</div><div class="ttdoc">Randomize the vector entries.</div><div class="ttdef"><b>Definition:</b> ndArray.h:286</div></div>
+<div class="ttc" id="aclassnd_array_html_a1ef87db68fc63e09354a584f44867b96"><div class="ttname"><a href="classnd_array.html#a1ef87db68fc63e09354a584f44867b96">ndArray::ResetMembers</a></div><div class="ttdeci">void ResetMembers()</div><div class="ttdoc">set all member to 0.</div><div class="ttdef"><b>Definition:</b> ndArray.h:278</div></div>
+<div class="ttc" id="aclassnd_array_html_a0607c75a9ac49efe20ed3f948dcb9cc7"><div class="ttname"><a href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray::GetCount</a></div><div class="ttdeci">ndInt32 GetCount() const</div><div class="ttdoc">return the size of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:182</div></div>
+<div class="ttc" id="aclassnd_array_html_a4e581490f02a04eb182ac7cab2cfc3ae"><div class="ttname"><a href="classnd_array.html#a4e581490f02a04eb182ac7cab2cfc3ae">ndArray::ndArray</a></div><div class="ttdeci">ndArray(ndInt32 count)</div><div class="ttdoc">constructor, set count and capacity, allocated space for count elements.</div><div class="ttdef"><b>Definition:</b> ndArray.h:117</div></div>
+<div class="ttc" id="aclassnd_array_html_ac383edb0da15600add54ab14d3b3d309"><div class="ttname"><a href="classnd_array.html#ac383edb0da15600add54ab14d3b3d309">ndArray::Resize</a></div><div class="ttdeci">void Resize(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:224</div></div>
+<div class="ttc" id="aclassnd_array_html_ad2a09b7eebdf091dfcc22054f35ee7fa"><div class="ttname"><a href="classnd_array.html#ad2a09b7eebdf091dfcc22054f35ee7fa">ndArray::SetMembers</a></div><div class="ttdeci">void SetMembers(ndInt32 size, void *const memory)</div><div class="ttdoc">assign all members.</div><div class="ttdef"><b>Definition:</b> ndArray.h:270</div></div>
+<div class="ttc" id="aclassnd_array_html_a8db63a6e40a828fa8086be20aea82fbb"><div class="ttname"><a href="classnd_array.html#a8db63a6e40a828fa8086be20aea82fbb">ndArray::ndArray</a></div><div class="ttdeci">ndArray(const ndArray &amp;source)</div><div class="ttdoc">copy constructor, allocate and copy only m_size elements from source.</div><div class="ttdef"><b>Definition:</b> ndArray.h:127</div></div>
+<div class="ttc" id="aclassnd_array_html_abfcae181655a5fb878515edf50540cb4"><div class="ttname"><a href="classnd_array.html#abfcae181655a5fb878515edf50540cb4">ndArray::~ndArray</a></div><div class="ttdeci">~ndArray()</div><div class="ttdoc">deallocate all memory, dos not call destructor on any of th elements.</div><div class="ttdef"><b>Definition:</b> ndArray.h:145</div></div>
+<div class="ttc" id="aclassnd_array_html_a2a5a88bb381f8a67d750a3b9b931d25e"><div class="ttname"><a href="classnd_array.html#a2a5a88bb381f8a67d750a3b9b931d25e">ndArray::GetCapacity</a></div><div class="ttdeci">ndInt32 GetCapacity() const</div><div class="ttdoc">return the capacity of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:198</div></div>
+<div class="ttc" id="aclassnd_array_html_a0f9a0872e8b226746aa8c253b9528840"><div class="ttname"><a href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray::SetCount</a></div><div class="ttdeci">void SetCount(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:188</div></div>
+<div class="ttc" id="aclassnd_array_html_a3c75e614833e256a475ab1cb2e7a5ca9"><div class="ttname"><a href="classnd_array.html#a3c75e614833e256a475ab1cb2e7a5ca9">ndArray::operator[]</a></div><div class="ttdeci">T &amp; operator[](ndInt32 i)</div><div class="ttdoc">Get the i element for the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:162</div></div>
+<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:41</div></div>
 <div class="ttc" id="aclassnd_memory_html_a59d0cba27bb02750a034263417d0426c"><div class="ttname"><a href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> ndMemory.cpp:61</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndArray.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndArray.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

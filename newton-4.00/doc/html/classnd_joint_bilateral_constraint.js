@@ -1,6 +1,7 @@
 var classnd_joint_bilateral_constraint =
 [
     [ "ndIkInterface", "classnd_joint_bilateral_constraint_1_1nd_ik_interface.html", "classnd_joint_bilateral_constraint_1_1nd_ik_interface" ],
+    [ "ndJointList", "classnd_joint_bilateral_constraint_1_1nd_joint_list.html", "classnd_joint_bilateral_constraint_1_1nd_joint_list" ],
     [ "ndJointBilateralConstraint", "classnd_joint_bilateral_constraint.html#a501ffce01fcfb2c7eb87f9b47bedda1f", null ],
     [ "ndJointBilateralConstraint", "classnd_joint_bilateral_constraint.html#aa5eafae204095ef78794c617076b1e59", null ],
     [ "ndJointBilateralConstraint", "classnd_joint_bilateral_constraint.html#a198efb8f9567fd292a5f5360001ecfb3", null ],
@@ -54,9 +55,9 @@ var classnd_joint_bilateral_constraint =
     [ "ndSkeletonContainer", "classnd_joint_bilateral_constraint.html#acb84137105481cfc21ca9dad3c2e3ea4", null ],
     [ "ndWorld", "classnd_joint_bilateral_constraint.html#ad49f00efc60b56b55283b4fe56f31c09", null ],
     [ "m_body0", "classnd_joint_bilateral_constraint.html#a208d095939ce1e269de744f65a69042b", null ],
-    [ "m_body0Node", "classnd_joint_bilateral_constraint.html#ab360335b9efc7b2e5e381b600adfee3b", null ],
+    [ "m_body0Node", "classnd_joint_bilateral_constraint.html#ac41aefd49fc4bc2e6d7119a4fb8ca142", null ],
     [ "m_body1", "classnd_joint_bilateral_constraint.html#a62ed12ff0c0b894f90e5ed8e578cba04", null ],
-    [ "m_body1Node", "classnd_joint_bilateral_constraint.html#acd977bb2efd97b10225dbc692060ecaa", null ],
+    [ "m_body1Node", "classnd_joint_bilateral_constraint.html#a449ce3a8ffa27ca4e7c36d99e5b0f7fc", null ],
     [ "m_defualtDiagonalRegularizer", "classnd_joint_bilateral_constraint.html#a8754389f7fffa2a5d95bae704c430057", null ],
     [ "m_enableCollision", "classnd_joint_bilateral_constraint.html#ad6cb0cbe24069dafbd3c769c019bb0cb", null ],
     [ "m_forceBody0", "classnd_joint_bilateral_constraint.html#a1e4cc54b068a6afe2979fa190331592b", null ],
@@ -67,6 +68,7 @@ var classnd_joint_bilateral_constraint =
     [ "m_localMatrix1", "classnd_joint_bilateral_constraint.html#acbca5683fb0c1680b55a8f70673c3e68", null ],
     [ "m_mark0", "classnd_joint_bilateral_constraint.html#ac93bb402f3a8feeaaecd50d3fa0d3574", null ],
     [ "m_mark1", "classnd_joint_bilateral_constraint.html#adef8b30da433da6a01476ba3a2848e3a", null ],
+    [ "m_markedForRemoved", "classnd_joint_bilateral_constraint.html#a1557b9798244f73c740669d2733aed19", null ],
     [ "m_maxDof", "classnd_joint_bilateral_constraint.html#a28cc137eb6917f2e54bd524b9a42ac99", null ],
     [ "m_motorAcceleration", "classnd_joint_bilateral_constraint.html#adbc86f24aa7e4e4dd88935aea0ba074e", null ],
     [ "m_r0", "classnd_joint_bilateral_constraint.html#a704e8ce2be288cd4b9a801e39830bff6", null ],

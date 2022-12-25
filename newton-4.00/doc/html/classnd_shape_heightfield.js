@@ -1,10 +1,12 @@
 var classnd_shape_heightfield =
 [
+    [ "ndGridQuad", "classnd_shape_heightfield_1_1nd_grid_quad.html", "classnd_shape_heightfield_1_1nd_grid_quad" ],
+    [ "ndTriangle", "classnd_shape_heightfield_1_1nd_triangle.html", "classnd_shape_heightfield_1_1nd_triangle" ],
     [ "ndGridConstruction", "classnd_shape_heightfield.html#add1f6a5d611661bec18fceae8ba20124", [
       [ "m_normalDiagonals", "classnd_shape_heightfield.html#add1f6a5d611661bec18fceae8ba20124a441090f82f0f0e716a5eeed8b5e1b582", null ],
       [ "m_invertedDiagonals", "classnd_shape_heightfield.html#add1f6a5d611661bec18fceae8ba20124aef8090439f597fe42c4f4f2d5324036b", null ]
     ] ],
-    [ "ndShapeHeightfield", "classnd_shape_heightfield.html#a294f82344b63c92176f67b6e28e8dcc8", null ],
+    [ "ndShapeHeightfield", "classnd_shape_heightfield.html#adb4e8476f47bc27efbacd652338f1927", null ],
     [ "ndShapeHeightfield", "classnd_shape_heightfield.html#a5ee9dd7aa0ba8612c443a3702858663f", null ],
     [ "~ndShapeHeightfield", "classnd_shape_heightfield.html#a553859c4e5a63979112db96d07c6f4b1", null ],
     [ "D_CLASS_REFLECTION", "classnd_shape_heightfield.html#a6aca900c4f45b26a1a9c6d4529fd7646", null ],

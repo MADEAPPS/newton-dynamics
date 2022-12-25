@@ -1,8 +1,8 @@
 var classnd_shape =
 [
+    [ "~ndShape", "classnd_shape.html#af1a57dcc85642d91818a2ebfe4476e01", null ],
     [ "ndShape", "classnd_shape.html#ad68bada310ae3c115583963e7be36cad", null ],
     [ "ndShape", "classnd_shape.html#ab91401321ddcb50f781cdb2c4dcf31f8", null ],
-    [ "~ndShape", "classnd_shape.html#af1a57dcc85642d91818a2ebfe4476e01", null ],
     [ "AddRef", "classnd_shape.html#ad25e5e5aa2b20218aa4964f2346e2bba", null ],
     [ "CalculateAabb", "classnd_shape.html#afc95df76cd377279aabc6e776fd32737", null ],
     [ "CalculateInertiaAndCenterOfMass", "classnd_shape.html#a4e1973115745734e0eb9e447c21969aa", null ],

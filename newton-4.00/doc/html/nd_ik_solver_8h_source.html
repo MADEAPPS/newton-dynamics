@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_ik_solver_8h_source.html',''); init
 <div class="title">ndIkSolver.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -146,44 +146,43 @@ $(document).ready(function(){initNavTree('nd_ik_solver_8h_source.html',''); init
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">private</span>:</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">void</span> BuildMassMatrix();</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">void</span> GetJacobianDerivatives(<a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> BuildJacobianMatrix(<a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> BuildJacobianMatrix(<a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint); </div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a> m_sentinelBody;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a> m_bodiesIndex;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndBodyKinematic*&gt;</a> m_bodies;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndJacobian&gt;</a> m_internalForces;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndLeftHandSide&gt;</a> m_leftHandSide;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndRightHandSide&gt;</a> m_rightHandSide;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classnd_world.html">ndWorld</a>* m_world;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <a class="code" href="classnd_skeleton_container.html">ndSkeletonContainer</a>* m_skeleton;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    ndFloat32 m_timestep;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    ndFloat32 m_invTimestep;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    ndFloat32 m_maxAccel;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    ndFloat32 m_maxAlpha;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_skeleton_container.html">ndSkeletonContainer</a>;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;};</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a> m_sentinelBody;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a> m_savedBodiesIndex;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndBodyKinematic*&gt;</a> m_bodies;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndJacobian&gt;</a> m_internalForces;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndLeftHandSide&gt;</a> m_leftHandSide;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classnd_array.html">ndArray&lt;ndRightHandSide&gt;</a> m_rightHandSide;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="classnd_world.html">ndWorld</a>* m_world;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classnd_skeleton_container.html">ndSkeletonContainer</a>* m_skeleton;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    ndFloat32 m_timestep;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    ndFloat32 m_invTimestep;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    ndFloat32 m_maxAccel;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    ndFloat32 m_maxAlpha;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_skeleton_container.html">ndSkeletonContainer</a>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
 <div class="ttc" id="aclassnd_skeleton_container_html"><div class="ttname"><a href="classnd_skeleton_container.html">ndSkeletonContainer</a></div><div class="ttdef"><b>Definition:</b> ndSkeletonContainer.h:31</div></div>
 <div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray&lt; ndInt32 &gt;</a></div></div>
-<div class="ttc" id="aclassnd_joint_bilateral_constraint_html"><div class="ttname"><a href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a></div><div class="ttdef"><b>Definition:</b> ndJointBilateralConstraint.h:56</div></div>
+<div class="ttc" id="aclassnd_joint_bilateral_constraint_html"><div class="ttname"><a href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a></div><div class="ttdef"><b>Definition:</b> ndJointBilateralConstraint.h:53</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:40</div></div>
-<div class="ttc" id="aclassnd_constraint_html"><div class="ttname"><a href="classnd_constraint.html">ndConstraint</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:236</div></div>
-<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:1024</div></div>
+<div class="ttc" id="aclassnd_constraint_html"><div class="ttname"><a href="classnd_constraint.html">ndConstraint</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:229</div></div>
+<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:41</div></div>
 <div class="ttc" id="aclassnd_ik_solver_html"><div class="ttname"><a href="classnd_ik_solver.html">ndIkSolver</a></div><div class="ttdef"><b>Definition:</b> ndIkSolver.h:32</div></div>
 <div class="ttc" id="aclassnd_world_html"><div class="ttname"><a href="classnd_world.html">ndWorld</a></div><div class="ttdef"><b>Definition:</b> ndWorld.h:47</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_d5aa3f859e50cce566f2ea2a6855a4d4.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_afcdc66852fd87419b1031ffc7b1731a.html">dIkSolver</a></li><li class="navelem"><b>ndIkSolver.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_ed97d29386cdd3379a363b5306354b4f.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_42f8436bff97dedaaf672514bdbd3ee0.html">dIkSolver</a></li><li class="navelem"><b>ndIkSolver.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

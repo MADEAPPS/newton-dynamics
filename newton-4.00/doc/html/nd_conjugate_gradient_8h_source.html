@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('nd_conjugate_gradient_8h_source.html',
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">*</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -156,7 +156,7 @@ $(document).ready(function(){initNavTree('nd_conjugate_gradient_8h_source.html',
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="comment">//dCholeskyFactorization(size, size, &amp;A[0][0]);</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="comment">//for (ndInt32 i = 2; i &lt; 6; ++i)</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="comment">//{</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="comment">//  for (ndInt32 j = 0; j &lt; i - 1; j++)</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="comment">//  for (ndInt32 j = 0; j &lt; i - 1; ++j)</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="comment">//  {</span></div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="comment">//      A[i][j] = 0.0f;</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="comment">//  }</span></div>
@@ -164,7 +164,7 @@ $(document).ready(function(){initNavTree('nd_conjugate_gradient_8h_source.html',
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="comment">//for (ndInt32 i = 0; i &lt; 6; ++i)</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="comment">//{</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="comment">//  for (ndInt32 j = i + 2; j &lt; 6; j++)</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="comment">//  for (ndInt32 j = i + 2; j &lt; 6; ++j)</span></div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="comment">//  {</span></div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="comment">//      A[i][j] = 0.0f;</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="comment">//      A[j][i] = 0.0f;</span></div>
@@ -214,7 +214,7 @@ $(document).ready(function(){initNavTree('nd_conjugate_gradient_8h_source.html',
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">void</span> MatrixTimeVector(<span class="keyword">const</span> T* <span class="keyword">const</span> input, T* <span class="keyword">const</span> output)</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        dMatrixTimeVector(m_size, m_matrix, input, output);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        ndMatrixTimeVector(m_size, m_matrix, input, output);</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    }</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keyword">const</span> T* m_matrix;</div>
@@ -296,41 +296,41 @@ $(document).ready(function(){initNavTree('nd_conjugate_gradient_8h_source.html',
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    ndMatrixOperator matrixOper(size, matrix, preconditionerBuffer);</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    matrixOper.MatrixTimeVector(x, m_z0);</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    dSub(size, m_r0, b, m_z0);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    ndSub(size, m_r0, b, m_z0);</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    matrixOper.PreconditionerSolve(m_r0, m_p0);</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    </div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    ndInt32 iter = 0;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    T num = dDotProduct(size, m_r0, m_p0);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    T num = ndDotProduct(size, m_r0, m_p0);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    T error2 = num;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">for</span> (ndInt32 j = 0; (j &lt; size) &amp;&amp; (error2 &gt; tolerance); j++) </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">for</span> (ndInt32 j = 0; (j &lt; size) &amp;&amp; (error2 &gt; tolerance); ++j) </div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    {</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        matrixOper.MatrixTimeVector(m_p0, m_z0);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        T den = dDotProduct(size, m_p0, m_z0);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        T den = ndDotProduct(size, m_p0, m_z0);</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    </div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        dAssert(fabs(den) &gt; T(0.0f));</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        ndAssert(fabs(den) &gt; T(0.0f));</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        T alpha = num / den;</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        dMulAdd(size, x, x, m_p0, alpha);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        ndScaleAdd(size, x, x, m_p0, alpha);</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <span class="keywordflow">if</span> ((j % 50) != 49) </div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        {</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            dMulAdd(size, m_r0, m_r0, m_z0, -alpha);</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            ndScaleAdd(size, m_r0, m_r0, m_z0, -alpha);</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        } </div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <span class="keywordflow">else</span> </div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        {</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;            matrixOper.MatrixTimeVector(x, m_z0);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;            dSub(size, m_r0, b, m_z0);</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;            ndSub(size, m_r0, b, m_z0);</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        }</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    </div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        matrixOper.PreconditionerSolve(m_r0, m_q0);</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        T num1 = dDotProduct(size, m_r0, m_q0);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        T num1 = ndDotProduct(size, m_r0, m_q0);</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        T beta = num1 / num;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        dMulAdd(size, m_p0, m_q0, m_p0, beta);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        num = dDotProduct(size, m_r0, m_q0);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        ndScaleAdd(size, m_p0, m_q0, m_p0, beta);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        num = ndDotProduct(size, m_r0, m_q0);</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        iter++;</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        error2 = num;</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    }</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    dAssert(iter &lt;= size);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    ndAssert(iter &lt;= size);</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">return</span> num;</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;}</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
@@ -343,7 +343,7 @@ $(document).ready(function(){initNavTree('nd_conjugate_gradient_8h_source.html',
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndConjugateGradient.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndConjugateGradient.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

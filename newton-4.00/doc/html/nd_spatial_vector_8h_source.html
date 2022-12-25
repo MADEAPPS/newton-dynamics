@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_spatial_vector_8h_source.html','');
 <div class="title">ndSpatialVector.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -156,15 +156,15 @@ $(document).ready(function(){initNavTree('nd_spatial_vector_8h_source.html','');
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">inline</span> ndFloat64&amp; operator[] (ndInt32 i)</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        dAssert(i &gt;= 0);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        dAssert(i &lt; ndInt32(<span class="keyword">sizeof</span>(m_f) / <span class="keyword">sizeof</span>(m_f[0])));</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        ndAssert(i &gt;= 0);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        ndAssert(i &lt; ndInt32(<span class="keyword">sizeof</span>(m_f) / <span class="keyword">sizeof</span>(m_f[0])));</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">return</span> ((ndFloat64*)&amp;m_f)[i];</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">inline</span> <span class="keyword">const</span> ndFloat64&amp; operator[] (ndInt32 i)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        dAssert(i &gt;= 0);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        dAssert(i &lt; ndInt32 (<span class="keyword">sizeof</span>(m_f) / <span class="keyword">sizeof</span>(m_f[0])));</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        ndAssert(i &gt;= 0);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        ndAssert(i &lt; ndInt32 (<span class="keyword">sizeof</span>(m_f) / <span class="keyword">sizeof</span>(m_f[0])));</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">return</span> ((ndFloat64*)&amp;m_f)[i];</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    }</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
@@ -180,8 +180,8 @@ $(document).ready(function(){initNavTree('nd_spatial_vector_8h_source.html','');
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">inline</span> ndFloat64 DotProduct(<span class="keyword">const</span> <a class="code" href="classnd_spatial_vector.html">ndSpatialVector</a>&amp; v)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        dAssert(m_f[6] == ndFloat32(0.0f));</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        dAssert(m_f[7] == ndFloat32(0.0f));</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        ndAssert(m_f[6] == ndFloat32(0.0f));</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        ndAssert(m_f[7] == ndFloat32(0.0f));</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <a class="code" href="classnd_big_vector.html">ndBigVector</a> tmp(m_data.m_low * v.m_data.m_low + m_data.m_high * v.m_data.m_high);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">return</span> tmp.AddHorizontal().GetScalar();</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
@@ -230,11 +230,11 @@ $(document).ready(function(){initNavTree('nd_spatial_vector_8h_source.html','');
 </div><!-- doc-content -->
 <div class="ttc" id="astructnd_spatial_vector_1_1nd_data_html"><div class="ttname"><a href="structnd_spatial_vector_1_1nd_data.html">ndSpatialVector::ndData</a></div><div class="ttdef"><b>Definition:</b> ndSpatialVector.h:97</div></div>
 <div class="ttc" id="aclassnd_spatial_vector_html"><div class="ttname"><a href="classnd_spatial_vector.html">ndSpatialVector</a></div><div class="ttdef"><b>Definition:</b> ndSpatialVector.h:31</div></div>
-<div class="ttc" id="aclassnd_big_vector_html"><div class="ttname"><a href="classnd_big_vector.html">ndBigVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:1450</div></div>
+<div class="ttc" id="aclassnd_big_vector_html"><div class="ttname"><a href="classnd_big_vector.html">ndBigVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:463</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndSpatialVector.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndSpatialVector.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

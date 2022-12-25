@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="title">ndHeap.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -257,7 +257,7 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="comment">// ex: m_curCount &lt; 32</span></div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">// this will be change to a binary search in the heap should the </span></div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">// the size of the heap get larger than 32</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="comment">//  dAssert (m_curCount &lt;= 32);</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="comment">//  ndAssert (m_curCount &lt;= 32);</span></div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; m_curCount; ++i)</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    {</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">if</span> (m_pool[i].obj == obj)</div>
@@ -274,7 +274,7 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">// ex: m_curCount &lt; 32</span></div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">// this will be change to a binary search in the heap should the </span></div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">// the size of the heap get larger than 32</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    dAssert(m_curCount &lt;= 32);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    ndAssert(m_curCount &lt;= 32);</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; m_curCount; ++i)</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    {</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        <span class="keywordflow">if</span> (m_pool[i].m_key == key)</div>
@@ -288,7 +288,7 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dItem, <span class="keyword">class</span> dKey&gt;</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="keyword">const</span> dItem&amp; <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::operator[] </a>(ndInt32 i)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    dAssert(i &lt;= m_curCount);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    ndAssert(i &lt;= m_curCount);</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">return</span> m_pool[i].m_obj;</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;}</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
@@ -328,11 +328,11 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        }</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::m_pool</a>[i - 1] = <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::m_pool</a>[j - 1];</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    dAssert(i);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    ndAssert(i);</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::m_pool</a>[i - 1].m_key = key;</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::m_pool</a>[i - 1].m_obj = obj;</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    dAssert(SanityCheck());</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    ndAssert(SanityCheck());</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;}</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dItem, <span class="keyword">class</span> dKey&gt;</div>
@@ -375,7 +375,7 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            index = i0;</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        }</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    }</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    dAssert(SanityCheck());</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    ndAssert(SanityCheck());</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dItem, <span class="keyword">class</span> dKey&gt;</div>
@@ -405,7 +405,7 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::m_pool</a>[count - i - 1].m_key = key;</div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <a class="code" href="classnd_heap.html">ndHeap&lt;dItem, dKey&gt;::m_pool</a>[count - i - 1].m_obj = obj;</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    }</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    dAssert(SanityCheck());</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    ndAssert(SanityCheck());</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;}</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment">// *****************************************</span></div>
@@ -461,56 +461,55 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    }</div>
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;};</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160; </div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dKey&gt;</div>
-<div class="line"><a name="l00367"></a><span class="lineno"><a class="line" href="classnd_up_heap_compare.html">  367</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare</a></div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;{</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare</a>(dKey key)</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        :m_key(key)</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    {</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    }</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="keywordtype">bool</span> operator&gt; (<span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&amp; key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="keywordflow">return</span> m_key &lt; key.m_key;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    }</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160; </div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordtype">bool</span> operator&lt; (<span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&amp; key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        <span class="keywordflow">return</span> m_key &gt; key.m_key;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    }</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordtype">bool</span> operator&lt;= (<span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&amp; key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        <span class="keywordflow">return</span> m_key &gt;= key.m_key;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    }</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    dKey m_key;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;};</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160; </div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dItem, <span class="keyword">class</span> dKey&gt;</div>
-<div class="line"><a name="l00394"></a><span class="lineno"><a class="line" href="classnd_up_heap.html">  394</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_up_heap.html">ndUpHeap</a> : <span class="keyword">public</span> <a class="code" href="classnd_heap.html">ndHeap</a>&lt;dItem, ndUpHeapCompare&lt;dKey&gt;&gt;</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;{</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    <a class="code" href="classnd_up_heap.html">ndUpHeap</a>(ndInt32 maxElements)</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        :<a class="code" href="classnd_heap.html">ndHeap&lt;dItem, ndUpHeapCompare&lt;dKey&gt;</a>&gt;(maxElements)</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    }</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <a class="code" href="classnd_up_heap.html">ndUpHeap</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* <span class="keyword">const</span> buffer, ndInt32 sizeInBytes)</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        :<a class="code" href="classnd_heap.html">ndHeap&lt;dItem, ndUpHeapCompare&lt;dKey&gt;</a>&gt;(buffer, sizeInBytes)</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    {</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    }</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    dKey Value(ndInt32 i = 0)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a> key(<a class="code" href="classnd_heap.html">ndHeap</a>&lt;dItem, <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&gt;::Value(i));</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        <span class="keywordflow">return</span> key.m_key;</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    }</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;};</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dKey&gt;</div>
+<div class="line"><a name="l00366"></a><span class="lineno"><a class="line" href="classnd_up_heap_compare.html">  366</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare</a></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;{</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare</a>(dKey key)</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        :m_key(key)</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    {</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    }</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordtype">bool</span> operator&gt; (<span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&amp; key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        <span class="keywordflow">return</span> m_key &lt; key.m_key;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    }</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <span class="keywordtype">bool</span> operator&lt; (<span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&amp; key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;        <span class="keywordflow">return</span> m_key &gt; key.m_key;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    }</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordtype">bool</span> operator&lt;= (<span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&amp; key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        <span class="keywordflow">return</span> m_key &gt;= key.m_key;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    }</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160; </div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    dKey m_key;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;};</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160; </div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> dItem, <span class="keyword">class</span> dKey&gt;</div>
+<div class="line"><a name="l00393"></a><span class="lineno"><a class="line" href="classnd_up_heap.html">  393</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_up_heap.html">ndUpHeap</a> : <span class="keyword">public</span> <a class="code" href="classnd_heap.html">ndHeap</a>&lt;dItem, ndUpHeapCompare&lt;dKey&gt;&gt;</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;{</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <a class="code" href="classnd_up_heap.html">ndUpHeap</a>(ndInt32 maxElements)</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        :<a class="code" href="classnd_heap.html">ndHeap&lt;dItem, ndUpHeapCompare&lt;dKey&gt;</a>&gt;(maxElements)</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    {</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    }</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <a class="code" href="classnd_up_heap.html">ndUpHeap</a>(<span class="keyword">const</span> <span class="keywordtype">void</span>* <span class="keyword">const</span> buffer, ndInt32 sizeInBytes)</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        :<a class="code" href="classnd_heap.html">ndHeap&lt;dItem, ndUpHeapCompare&lt;dKey&gt;</a>&gt;(buffer, sizeInBytes)</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    {</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    }</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    dKey Value(ndInt32 i = 0)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a> key(<a class="code" href="classnd_heap.html">ndHeap</a>&lt;dItem, <a class="code" href="classnd_up_heap_compare.html">ndUpHeapCompare&lt;dKey&gt;</a>&gt;::Value(i));</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">return</span> key.m_key;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    }</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;};</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
@@ -519,13 +518,13 @@ $(document).ready(function(){initNavTree('nd_heap_8h_source.html',''); initResiz
 <div class="ttc" id="aclassnd_down_heap_html"><div class="ttname"><a href="classnd_down_heap.html">ndDownHeap</a></div><div class="ttdef"><b>Definition:</b> ndHeap.h:346</div></div>
 <div class="ttc" id="aclassnd_memory_html"><div class="ttname"><a href="classnd_memory.html">ndMemory</a></div><div class="ttdef"><b>Definition:</b> ndMemory.h:32</div></div>
 <div class="ttc" id="aclassnd_down_heap_compare_html"><div class="ttname"><a href="classnd_down_heap_compare.html">ndDownHeapCompare</a></div><div class="ttdef"><b>Definition:</b> ndHeap.h:319</div></div>
-<div class="ttc" id="aclassnd_up_heap_compare_html"><div class="ttname"><a href="classnd_up_heap_compare.html">ndUpHeapCompare</a></div><div class="ttdef"><b>Definition:</b> ndHeap.h:368</div></div>
-<div class="ttc" id="aclassnd_up_heap_html"><div class="ttname"><a href="classnd_up_heap.html">ndUpHeap</a></div><div class="ttdef"><b>Definition:</b> ndHeap.h:395</div></div>
+<div class="ttc" id="aclassnd_up_heap_compare_html"><div class="ttname"><a href="classnd_up_heap_compare.html">ndUpHeapCompare</a></div><div class="ttdef"><b>Definition:</b> ndHeap.h:367</div></div>
+<div class="ttc" id="aclassnd_up_heap_html"><div class="ttname"><a href="classnd_up_heap.html">ndUpHeap</a></div><div class="ttdef"><b>Definition:</b> ndHeap.h:394</div></div>
 <div class="ttc" id="aclassnd_memory_html_a59d0cba27bb02750a034263417d0426c"><div class="ttname"><a href="classnd_memory.html#a59d0cba27bb02750a034263417d0426c">ndMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> ndMemory.cpp:61</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndHeap.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndHeap.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

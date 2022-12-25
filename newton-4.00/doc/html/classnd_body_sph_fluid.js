@@ -3,7 +3,7 @@ var classnd_body_sph_fluid =
     [ "ndGridHash", "classnd_body_sph_fluid_1_1nd_grid_hash.html", "classnd_body_sph_fluid_1_1nd_grid_hash" ],
     [ "ndParticleKernelDistance", "classnd_body_sph_fluid_1_1nd_particle_kernel_distance.html", "classnd_body_sph_fluid_1_1nd_particle_kernel_distance" ],
     [ "ndParticlePair", "classnd_body_sph_fluid_1_1nd_particle_pair.html", "classnd_body_sph_fluid_1_1nd_particle_pair" ],
-    [ "ndWorkingData", "classnd_body_sph_fluid_1_1nd_working_data.html", "classnd_body_sph_fluid_1_1nd_working_data" ],
+    [ "ndWorkingBuffers", "classnd_body_sph_fluid_1_1nd_working_buffers.html", "classnd_body_sph_fluid_1_1nd_working_buffers" ],
     [ "ndBodySphFluid", "classnd_body_sph_fluid.html#a4ef7ba368532e388fd81d5ee9395326d", null ],
     [ "ndBodySphFluid", "classnd_body_sph_fluid.html#a131a30a5243f4d59e9ca021119a444a5", null ],
     [ "~ndBodySphFluid", "classnd_body_sph_fluid.html#a27693dc6b1431bf4bd00e2f13df41428", null ],

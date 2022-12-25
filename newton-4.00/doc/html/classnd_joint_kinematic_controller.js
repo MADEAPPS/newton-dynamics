@@ -3,8 +3,6 @@ var classnd_joint_kinematic_controller =
     [ "ndControlModes", "classnd_joint_kinematic_controller.html#a6fd3a38e0e9e58bac73e5c2da75e4fac", [
       [ "m_linear", "classnd_joint_kinematic_controller.html#a6fd3a38e0e9e58bac73e5c2da75e4faca5cb7c6ff8dfed1627df6eb5e3d4678a2", null ],
       [ "m_full6dof", "classnd_joint_kinematic_controller.html#a6fd3a38e0e9e58bac73e5c2da75e4faca5cac150896ca2e4eb0024c05fe61b7cc", null ],
-      [ "m_linearAndTwist", "classnd_joint_kinematic_controller.html#a6fd3a38e0e9e58bac73e5c2da75e4facae7508c027fa6d0f50376d1a7a229b21e", null ],
-      [ "m_linearAndCone", "classnd_joint_kinematic_controller.html#a6fd3a38e0e9e58bac73e5c2da75e4faca4541bc1a13b362ce9a50bdcd34635d5d", null ],
       [ "m_linearPlusAngularFriction", "classnd_joint_kinematic_controller.html#a6fd3a38e0e9e58bac73e5c2da75e4faca35c7eaf8ef3a42fae895928ec5521245", null ]
     ] ],
     [ "ndJointKinematicController", "classnd_joint_kinematic_controller.html#aa0557dcbb580156fd558f3cea9475252", null ],
@@ -26,12 +24,5 @@ var classnd_joint_kinematic_controller =
     [ "SetMaxSpeed", "classnd_joint_kinematic_controller.html#abe14cc481f4b7867b424404b8c0000fb", null ],
     [ "SetTargetMatrix", "classnd_joint_kinematic_controller.html#a41bdca71e01244610232734394f3c60a", null ],
     [ "SetTargetPosit", "classnd_joint_kinematic_controller.html#a852c9749f291dd2a129f88f18add04da", null ],
-    [ "SetTargetRotation", "classnd_joint_kinematic_controller.html#aa4380951e51ae44676099fb3c2a931ff", null ],
-    [ "m_angularFrictionCoefficient", "classnd_joint_kinematic_controller.html#a5e5a11eb42ab7ad2f93016f9d5265dab", null ],
-    [ "m_autoSleepState", "classnd_joint_kinematic_controller.html#aee46079affd9996d4a46254269e1d8b8", null ],
-    [ "m_controlMode", "classnd_joint_kinematic_controller.html#a32fe9f4b76fb095dbb055a465e6417df", null ],
-    [ "m_maxAngularFriction", "classnd_joint_kinematic_controller.html#a40d5fc3a9234a3605ad7485d4dc14b4d", null ],
-    [ "m_maxLinearFriction", "classnd_joint_kinematic_controller.html#a7bda6d8a180f307fd5e2117c3b1215ed", null ],
-    [ "m_maxOmega", "classnd_joint_kinematic_controller.html#ae1e3e42d8c1fb860d1b74dd4fa7b2b87", null ],
-    [ "m_maxSpeed", "classnd_joint_kinematic_controller.html#a548f6a18c5b52b293f5dc979a60b0b6a", null ]
+    [ "SetTargetRotation", "classnd_joint_kinematic_controller.html#aa4380951e51ae44676099fb3c2a931ff", null ]
 ];

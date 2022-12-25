@@ -117,6 +117,13 @@ Inheritance diagram for ndShapeHeightfield:</div>
   </map>
 </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_shape_heightfield_1_1nd_grid_quad.html">ndGridQuad</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_shape_heightfield_1_1nd_triangle.html">ndTriangle</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:add1f6a5d611661bec18fceae8ba20124"><td class="memItemLeft" align="right" valign="top"><a id="add1f6a5d611661bec18fceae8ba20124"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>ndGridConstruction</b> { <b>m_normalDiagonals</b> = 0, 
@@ -129,9 +136,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6aca900c4f45b26a1a9c6d4529fd7646"><td class="memItemLeft" align="right" valign="top"><a id="a6aca900c4f45b26a1a9c6d4529fd7646"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>D_CLASS_REFLECTION</b> (<a class="el" href="classnd_shape_heightfield.html">ndShapeHeightfield</a>)</td></tr>
 <tr class="separator:a6aca900c4f45b26a1a9c6d4529fd7646"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a294f82344b63c92176f67b6e28e8dcc8"><td class="memItemLeft" align="right" valign="top"><a id="a294f82344b63c92176f67b6e28e8dcc8"></a>
-D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShapeHeightfield</b> (ndInt32 width, ndInt32 height, ndGridConstruction contructionMode, ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z)</td></tr>
-<tr class="separator:a294f82344b63c92176f67b6e28e8dcc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb4e8476f47bc27efbacd652338f1927"><td class="memItemLeft" align="right" valign="top"><a id="adb4e8476f47bc27efbacd652338f1927"></a>
+D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShapeHeightfield</b> (ndInt32 width, ndInt32 height, ndGridConstruction constructionMode, ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z)</td></tr>
+<tr class="separator:adb4e8476f47bc27efbacd652338f1927"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ee9dd7aa0ba8612c443a3702858663f"><td class="memItemLeft" align="right" valign="top"><a id="a5ee9dd7aa0ba8612c443a3702858663f"></a>
 D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShapeHeightfield</b> (const <a class="el" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a> &amp;desc)</td></tr>
 <tr class="separator:a5ee9dd7aa0ba8612c443a3702858663f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,13 +172,13 @@ D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Save<
 &#160;</td><td class="memItemRight" valign="bottom"><b>D_CLASS_REFLECTION</b> (<a class="el" href="classnd_shape.html">ndShape</a>)</td></tr>
 <tr class="separator:a2016b736297c8342dbf2bded2b6ef81b inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ef40d772d33d93d0a1dbd6509104964 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a8ef40d772d33d93d0a1dbd6509104964"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetRefCount</b> () const</td></tr>
+D_COLLISION_API ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetRefCount</b> () const</td></tr>
 <tr class="separator:a8ef40d772d33d93d0a1dbd6509104964 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81e190b6b5bed060eb0adba41e15604d inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a81e190b6b5bed060eb0adba41e15604d"></a>
-virtual ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>Release</b> () const</td></tr>
+virtual D_COLLISION_API ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>Release</b> () const</td></tr>
 <tr class="separator:a81e190b6b5bed060eb0adba41e15604d inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad25e5e5aa2b20218aa4964f2346e2bba inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ad25e5e5aa2b20218aa4964f2346e2bba"></a>
-virtual const <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>AddRef</b> () const</td></tr>
+virtual D_COLLISION_API const <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>AddRef</b> () const</td></tr>
 <tr class="separator:ad25e5e5aa2b20218aa4964f2346e2bba inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade4df021c83d95f7f0af3e32b8ed5318 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ade4df021c83d95f7f0af3e32b8ed5318"></a>
 virtual <a class="el" href="classnd_shape_box.html">ndShapeBox</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeBox</b> ()</td></tr>

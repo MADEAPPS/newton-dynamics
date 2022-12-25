@@ -94,6 +94,7 @@ $(document).ready(function(){initNavTree('classnd_model.html',''); initResizable
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
@@ -109,12 +110,18 @@ Inheritance diagram for ndModel:</div>
  <div class="center">
   <img src="classnd_model.png" usemap="#ndModel_map" alt=""/>
   <map id="ndModel_map" name="ndModel_map">
-<area href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="ndClassAlloc" shape="rect" coords="67,0,192,24"/>
-<area href="classnd_character.html" alt="ndCharacter" shape="rect" coords="0,112,125,136"/>
-<area href="classnd_multi_body_vehicle.html" alt="ndMultiBodyVehicle" shape="rect" coords="135,112,260,136"/>
+<area href="classnd_containers_free_list_alloc.html" alt="ndContainersFreeListAlloc&lt; ndModel &gt;" shape="rect" coords="122,56,357,80"/>
+<area href="classnd_free_list_alloc.html" alt="ndFreeListAlloc" shape="rect" coords="122,0,357,24"/>
+<area href="classnd_character.html" alt="ndCharacter" shape="rect" coords="0,168,235,192"/>
+<area href="classnd_multi_body_vehicle.html" alt="ndMultiBodyVehicle" shape="rect" coords="245,168,480,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_model_1_1nd_referenced_objects.html">ndReferencedObjects</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a67783a2aa45258d65f062600e5d9103a"><td class="memItemLeft" align="right" valign="top"><a id="a67783a2aa45258d65f062600e5d9103a"></a>
@@ -123,12 +130,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a01cdc525cba7788dcfada16bd465ee57"><td class="memItemLeft" align="right" valign="top"><a id="a01cdc525cba7788dcfada16bd465ee57"></a>
 D_NEWTON_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndModel</b> (const <a class="el" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a> &amp;desc)</td></tr>
 <tr class="separator:a01cdc525cba7788dcfada16bd465ee57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab41d93dcc137fb37e373a77823bbd681"><td class="memItemLeft" align="right" valign="top"><a id="ab41d93dcc137fb37e373a77823bbd681"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>AddToWorld</b> (<a class="el" href="classnd_world.html">ndWorld</a> *const world)</td></tr>
-<tr class="separator:ab41d93dcc137fb37e373a77823bbd681"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89e21c67fbfb2450f47fc754b7fa114b"><td class="memItemLeft" align="right" valign="top"><a id="a89e21c67fbfb2450f47fc754b7fa114b"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveFromToWorld</b> (<a class="el" href="classnd_world.html">ndWorld</a> *const world)</td></tr>
-<tr class="separator:a89e21c67fbfb2450f47fc754b7fa114b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ee90daf05d4838721776dcdb0ff2928"><td class="memItemLeft" align="right" valign="top"><a id="a9ee90daf05d4838721776dcdb0ff2928"></a>
 virtual <a class="el" href="classnd_model.html">ndModel</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsModel</b> ()</td></tr>
 <tr class="separator:a9ee90daf05d4838721776dcdb0ff2928"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,18 +139,25 @@ virtual <a class="el" href="classnd_multi_body_vehicle.html">ndMultiBodyVehicle<
 <tr class="memitem:a75d92bb511fb77b095269fe400371932"><td class="memItemLeft" align="right" valign="top"><a id="a75d92bb511fb77b095269fe400371932"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Debug</b> (<a class="el" href="classnd_constraint_debug_callback.html">ndConstraintDebugCallback</a> &amp;context) const</td></tr>
 <tr class="separator:a75d92bb511fb77b095269fe400371932"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
-<tr class="memitem:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="affad975c41ed36eae8c71e3468fc12e3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#affad975c41ed36eae8c71e3468fc12e3">ndClassAlloc</a> ()</td></tr>
-<tr class="memdesc:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty default constructor. <br /></td></tr>
-<tr class="separator:affad975c41ed36eae8c71e3468fc12e3 inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a8fea90aa3642db2007a191975bb169ce"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a8fea90aa3642db2007a191975bb169ce">~ndClassAlloc</a> ()</td></tr>
-<tr class="memdesc:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
-<tr class="separator:a8fea90aa3642db2007a191975bb169ce inherit pub_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classnd_free_list_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_free_list_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_free_list_alloc.html">ndFreeListAlloc</a></td></tr>
+<tr class="memitem:a29669b21daa590ec82840c9f802f54be inherit pub_methods_classnd_free_list_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a29669b21daa590ec82840c9f802f54be"></a>
+D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><b>operator new</b> (size_t size)</td></tr>
+<tr class="separator:a29669b21daa590ec82840c9f802f54be inherit pub_methods_classnd_free_list_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a151417d70ebb388e68bbe9cd12c4be99 inherit pub_methods_classnd_free_list_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a151417d70ebb388e68bbe9cd12c4be99"></a>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>operator delete</b> (void *ptr)</td></tr>
+<tr class="separator:a151417d70ebb388e68bbe9cd12c4be99 inherit pub_methods_classnd_free_list_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:ab41d93dcc137fb37e373a77823bbd681"><td class="memItemLeft" align="right" valign="top"><a id="ab41d93dcc137fb37e373a77823bbd681"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>AddToWorld</b> (<a class="el" href="classnd_world.html">ndWorld</a> *const world)</td></tr>
+<tr class="separator:ab41d93dcc137fb37e373a77823bbd681"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79bfd655db33abf8800626fb2903b078"><td class="memItemLeft" align="right" valign="top"><a id="a79bfd655db33abf8800626fb2903b078"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveFromToWorld</b> ()</td></tr>
+<tr class="separator:a79bfd655db33abf8800626fb2903b078"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a826cab8256273f201de4551bf10afea1"><td class="memItemLeft" align="right" valign="top"><a id="a826cab8256273f201de4551bf10afea1"></a>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Save</b> (const <a class="el" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a> &amp;desc) const</td></tr>
+<tr class="separator:a826cab8256273f201de4551bf10afea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14c21cc76994c3451b3c20edf0ca86ab"><td class="memItemLeft" align="right" valign="top"><a id="a14c21cc76994c3451b3c20edf0ca86ab"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (<a class="el" href="classnd_world.html">ndWorld</a> *const world, ndFloat32 timestep)</td></tr>
 <tr class="separator:a14c21cc76994c3451b3c20edf0ca86ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,15 +167,12 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>PostUpdate</b
 <tr class="memitem:a1739fb5a9ace30745d074d9d586b7514"><td class="memItemLeft" align="right" valign="top"><a id="a1739fb5a9ace30745d074d9d586b7514"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>PostTransformUpdate</b> (<a class="el" href="classnd_world.html">ndWorld</a> *const world, ndFloat32 timestep)</td></tr>
 <tr class="separator:a1739fb5a9ace30745d074d9d586b7514"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a826cab8256273f201de4551bf10afea1"><td class="memItemLeft" align="right" valign="top"><a id="a826cab8256273f201de4551bf10afea1"></a>
-virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Save</b> (const <a class="el" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a> &amp;desc) const</td></tr>
-<tr class="separator:a826cab8256273f201de4551bf10afea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a264f5c534b72b64eeeb367d29de3af88"><td class="memItemLeft" align="right" valign="top"><a id="a264f5c534b72b64eeeb367d29de3af88"></a>
-ndModelList::ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m_node</b></td></tr>
-<tr class="separator:a264f5c534b72b64eeeb367d29de3af88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae58ffff3bf6df7394077ebf27dc86816"><td class="memItemLeft" align="right" valign="top"><a id="ae58ffff3bf6df7394077ebf27dc86816"></a>
+<a class="el" href="classnd_world.html">ndWorld</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_world</b></td></tr>
+<tr class="separator:ae58ffff3bf6df7394077ebf27dc86816"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -177,18 +182,23 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorld</b></td></tr
 <tr class="memitem:a6c40c7a863345e4b33b5d32dd1c91b25"><td class="memItemLeft" align="right" valign="top"><a id="a6c40c7a863345e4b33b5d32dd1c91b25"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>ndLoadSave</b></td></tr>
 <tr class="separator:a6c40c7a863345e4b33b5d32dd1c91b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a408311bfcee81134e2d42bfc0de9c144"><td class="memItemLeft" align="right" valign="top"><a id="a408311bfcee81134e2d42bfc0de9c144"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndModelList</b></td></tr>
+<tr class="separator:a408311bfcee81134e2d42bfc0de9c144"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_static_methods_classnd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_class_alloc.html">ndClassAlloc</a></td></tr>
-<tr class="memitem:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a1f1766c498c6231d24c63582106d2cfc"></a>
-D_OPERATOR_NEW_AND_DELETE static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a1f1766c498c6231d24c63582106d2cfc">Malloc</a> (size_t size)</td></tr>
-<tr class="memdesc:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic allocation for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
-<tr class="separator:a1f1766c498c6231d24c63582106d2cfc inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a5037cbc14d91b2b5e6b5163ed0ef9757"></a>
-static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_class_alloc.html#a5037cbc14d91b2b5e6b5163ed0ef9757">Free</a> (void *const ptr)</td></tr>
-<tr class="memdesc:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic destruction for any function subclass from <a class="el" href="classnd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">ndClassAlloc</a>. <br /></td></tr>
-<tr class="separator:a5037cbc14d91b2b5e6b5163ed0ef9757 inherit pub_static_methods_classnd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classnd_containers_free_list_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_containers_free_list_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_containers_free_list_alloc.html">ndContainersFreeListAlloc&lt; ndModel &gt;</a></td></tr>
+<tr class="memitem:a14803efc29e2fc42c9e6def138ae205b inherit pub_static_methods_classnd_containers_free_list_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a14803efc29e2fc42c9e6def138ae205b"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>FlushFreeList</b> (ndInt32 size)</td></tr>
+<tr class="separator:a14803efc29e2fc42c9e6def138ae205b inherit pub_static_methods_classnd_containers_free_list_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classnd_free_list_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_free_list_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_free_list_alloc.html">ndFreeListAlloc</a></td></tr>
+<tr class="memitem:a6c99b6984522021a7283d61322834b55 inherit pub_static_methods_classnd_free_list_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a6c99b6984522021a7283d61322834b55"></a>
+static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Flush</b> ()</td></tr>
+<tr class="separator:a6c99b6984522021a7283d61322834b55 inherit pub_static_methods_classnd_free_list_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a650545592aefe804454c61569eb98c15 inherit pub_static_methods_classnd_free_list_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a650545592aefe804454c61569eb98c15"></a>
+static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Flush</b> (ndInt32 size)</td></tr>
+<tr class="separator:a650545592aefe804454c61569eb98c15 inherit pub_static_methods_classnd_free_list_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

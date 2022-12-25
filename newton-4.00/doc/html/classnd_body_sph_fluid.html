@@ -124,7 +124,7 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_body_sph_fluid_1_1nd_particle_pair.html">ndParticlePair</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_body_sph_fluid_1_1nd_working_data.html">ndWorkingData</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_body_sph_fluid_1_1nd_working_buffers.html">ndWorkingBuffers</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -230,6 +230,9 @@ virtual <a class="el" href="classnd_body_player_capsule.html">ndBodyPlayerCapsul
 <tr class="memitem:acd3c7d14202ce5331a1dbeceaaa1912f inherit pub_methods_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="acd3c7d14202ce5331a1dbeceaaa1912f"></a>
 virtual <a class="el" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBodyTriggerVolume</b> ()</td></tr>
 <tr class="separator:acd3c7d14202ce5331a1dbeceaaa1912f inherit pub_methods_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac64ff4b9672c60d2a6240e95dccdd896 inherit pub_methods_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="ac64ff4b9672c60d2a6240e95dccdd896"></a>
+virtual <a class="el" href="classnd_body_kinematic_base.html">ndBodyKinematicBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBodyKinematicSpecial</b> ()</td></tr>
+<tr class="separator:ac64ff4b9672c60d2a6240e95dccdd896 inherit pub_methods_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34f0eae41036542188841116924d5508 inherit pub_methods_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="a34f0eae41036542188841116924d5508"></a>
 ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () const</td></tr>
 <tr class="separator:a34f0eae41036542188841116924d5508 inherit pub_methods_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -365,9 +368,9 @@ static D_COLLISION_API const <a class="el" href="classnd_1_1_ti_xml_node.html">n
 <tr class="memitem:a41d7e34ad771503a5ab0da06dbb1a13b inherit pro_attribs_classnd_body_particle_set"><td class="memItemLeft" align="right" valign="top"><a id="a41d7e34ad771503a5ab0da06dbb1a13b"></a>
 <a class="el" href="classnd_array.html">ndArray</a>&lt; <a class="el" href="classnd_vector.html">ndVector</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_veloc</b></td></tr>
 <tr class="separator:a41d7e34ad771503a5ab0da06dbb1a13b inherit pro_attribs_classnd_body_particle_set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49099c170c52ace09885400dc88fd101 inherit pro_attribs_classnd_body_particle_set"><td class="memItemLeft" align="right" valign="top"><a id="a49099c170c52ace09885400dc88fd101"></a>
-ndBodyParticleSetList::ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m_listNode</b></td></tr>
-<tr class="separator:a49099c170c52ace09885400dc88fd101 inherit pro_attribs_classnd_body_particle_set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad137393e551ec6556fd239d2c5a53b04 inherit pro_attribs_classnd_body_particle_set"><td class="memItemLeft" align="right" valign="top"><a id="ad137393e551ec6556fd239d2c5a53b04"></a>
+ndBodyList::ndNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m_listNode</b></td></tr>
+<tr class="separator:ad137393e551ec6556fd239d2c5a53b04 inherit pro_attribs_classnd_body_particle_set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d60716ec3fba78bf00e0d65b52dd2f6 inherit pro_attribs_classnd_body_particle_set"><td class="memItemLeft" align="right" valign="top"><a id="a3d60716ec3fba78bf00e0d65b52dd2f6"></a>
 ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_radius</b></td></tr>
 <tr class="separator:a3d60716ec3fba78bf00e0d65b52dd2f6 inherit pro_attribs_classnd_body_particle_set"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -464,6 +467,9 @@ ndUnsigned8&#160;</td><td class="memItemRight" valign="bottom"><b>m_sceneForceUp
 <tr class="memitem:ac5e8c1505e78b9fa02a664d1598349b7 inherit pro_attribs_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="ac5e8c1505e78b9fa02a664d1598349b7"></a>
 ndUnsigned8&#160;</td><td class="memItemRight" valign="bottom"><b>m_sceneEquilibrium</b></td></tr>
 <tr class="separator:ac5e8c1505e78b9fa02a664d1598349b7 inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0aeab849c9d3caac0a4abe7ad800b02 inherit pro_attribs_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="aa0aeab849c9d3caac0a4abe7ad800b02"></a>
+ndUnsigned8&#160;</td><td class="memItemRight" valign="bottom"><b>m_markedForRemoved</b></td></tr>
+<tr class="separator:aa0aeab849c9d3caac0a4abe7ad800b02 inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classnd_body"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classnd_body')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classnd_body.html">ndBody</a></td></tr>
 <tr class="memitem:a2b16d209258a8f6201d247b6801f11f2 inherit pro_static_attribs_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="a2b16d209258a8f6201d247b6801f11f2"></a>
 static D_COLLISION_API ndUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_uniqueIdCount</b> = 0</td></tr>

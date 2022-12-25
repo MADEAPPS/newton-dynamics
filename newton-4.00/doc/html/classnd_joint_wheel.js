@@ -3,9 +3,10 @@ var classnd_joint_wheel =
     [ "ndJointWheel", "classnd_joint_wheel.html#a71273038a23b2ba66f99d64dc90a5644", null ],
     [ "ndJointWheel", "classnd_joint_wheel.html#a13ec321904c42d2acd24ba139c259490", null ],
     [ "~ndJointWheel", "classnd_joint_wheel.html#abd340aa68728a6f2f1800982cf267244", null ],
+    [ "CalculateBaseFrame", "classnd_joint_wheel.html#a4af2c51b5d2f22178f3714ef9c42f177", null ],
     [ "CalculateUpperBumperMatrix", "classnd_joint_wheel.html#ae2d1b36c80961c5b0a8de1a0933636bd", null ],
     [ "D_CLASS_REFLECTION", "classnd_joint_wheel.html#ae0417cb9644db88d0b4df5638271164b", null ],
-    [ "GetInfo", "classnd_joint_wheel.html#a437a60728718a0ea79856382915c38ec", null ],
+    [ "GetInfo", "classnd_joint_wheel.html#a47cb1cf81a6e5c0687905a455593dcd7", null ],
     [ "JacobianDerivative", "classnd_joint_wheel.html#a4bce1f196ecf3b2273ad55bfc76e5d9e", null ],
     [ "Save", "classnd_joint_wheel.html#acb4fc330d201c671de248c185ca44715", null ],
     [ "SetBrake", "classnd_joint_wheel.html#aeb4656b1d39034bfb992f761226bb051", null ],
@@ -21,5 +22,6 @@ var classnd_joint_wheel =
     [ "m_normalizedHandBrake", "classnd_joint_wheel.html#a01f9040826a4ffb36f952e25279d4f5e", null ],
     [ "m_posit", "classnd_joint_wheel.html#a37be2f98fabc055c67583e4b4951acd1", null ],
     [ "m_regularizer", "classnd_joint_wheel.html#a24ebbe68c0118dc8dbfe9b3b07834ced", null ],
-    [ "m_speed", "classnd_joint_wheel.html#a1a9fbae819b799d387e4163d670be51a", null ]
+    [ "m_speed", "classnd_joint_wheel.html#a1a9fbae819b799d387e4163d670be51a", null ],
+    [ "m_vcdMode", "classnd_joint_wheel.html#ae004a24c4b4105c206476cdaba0dc29b", null ]
 ];

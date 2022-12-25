@@ -124,7 +124,7 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_node_builder.html">ndNodeBuilder</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_splite_info.html">ndSpliteInfo</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_aabb_polygon_soup_1_1nd_split_info.html">ndSplitInfo</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -189,21 +189,21 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:abdf002ec2504bafe9bd4d4d431eee4c4"><td class="memItemLeft" align="right" valign="top"><a id="abdf002ec2504bafe9bd4d4d431eee4c4"></a>
 D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Create</b> (const <a class="el" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> &amp;builder)</td></tr>
 <tr class="separator:abdf002ec2504bafe9bd4d4d431eee4c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac35d6161003a893c78622b6f200169d6"><td class="memItemLeft" align="right" valign="top"><a id="ac35d6161003a893c78622b6f200169d6"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateAdjacendy</b> ()</td></tr>
-<tr class="separator:ac35d6161003a893c78622b6f200169d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62e09cf7f6a595cf0d3512cf98f6e5f4"><td class="memItemLeft" align="right" valign="top"><a id="a62e09cf7f6a595cf0d3512cf98f6e5f4"></a>
-virtual D_CORE_API <a class="el" href="classnd_vector.html">ndVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ForAllSectorsSupportVectex</b> (const <a class="el" href="classnd_vector.html">ndVector</a> &amp;dir) const</td></tr>
-<tr class="separator:a62e09cf7f6a595cf0d3512cf98f6e5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a438b0117df98db32fc5ebddd3e417bfb"><td class="memItemLeft" align="right" valign="top"><a id="a438b0117df98db32fc5ebddd3e417bfb"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ForAllSectorsRayHit</b> (const <a class="el" href="classnd_fast_ray.html">ndFastRay</a> &amp;ray, ndFloat32 maxT, dRayIntersectCallback callback, void *const context) const</td></tr>
-<tr class="separator:a438b0117df98db32fc5ebddd3e417bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af26a45ce7433cf23144fefa4c3538896"><td class="memItemLeft" align="right" valign="top"><a id="af26a45ce7433cf23144fefa4c3538896"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ForAllSectors</b> (const <a class="el" href="classnd_fast_aabb.html">ndFastAabb</a> &amp;obbAabb, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void *const context) const</td></tr>
-<tr class="separator:af26a45ce7433cf23144fefa4c3538896"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8bd13364d1fa83dc69b55743ab14fc8"><td class="memItemLeft" align="right" valign="top"><a id="ae8bd13364d1fa83dc69b55743ab14fc8"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ForThisSector</b> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndAabbPolygonSoup::ndNode</a> *const node, const <a class="el" href="classnd_fast_aabb.html">ndFastAabb</a> &amp;obbAabb, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void *const context) const</td></tr>
-<tr class="separator:ae8bd13364d1fa83dc69b55743ab14fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27864758fec75a6c028d8e54e1d1c946"><td class="memItemLeft" align="right" valign="top"><a id="a27864758fec75a6c028d8e54e1d1c946"></a>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateAdjacent</b> ()</td></tr>
+<tr class="separator:a27864758fec75a6c028d8e54e1d1c946"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69447ec4d9860d6d46f716ba75366b47"><td class="memItemLeft" align="right" valign="top"><a id="a69447ec4d9860d6d46f716ba75366b47"></a>
+virtual D_CORE_API <a class="el" href="classnd_vector.html">ndVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ForAllSectorsSupportVertex</b> (const <a class="el" href="classnd_vector.html">ndVector</a> &amp;dir) const</td></tr>
+<tr class="separator:a69447ec4d9860d6d46f716ba75366b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98162b412c03a75e7324ee8dc01db059"><td class="memItemLeft" align="right" valign="top"><a id="a98162b412c03a75e7324ee8dc01db059"></a>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ForAllSectorsRayHit</b> (const <a class="el" href="classnd_fast_ray.html">ndFastRay</a> &amp;ray, ndFloat32 maxT, ndRayIntersectCallback callback, void *const context) const</td></tr>
+<tr class="separator:a98162b412c03a75e7324ee8dc01db059"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62c660a22ac6c8db51867cd200a816c7"><td class="memItemLeft" align="right" valign="top"><a id="a62c660a22ac6c8db51867cd200a816c7"></a>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ForAllSectors</b> (const <a class="el" href="classnd_fast_aabb.html">ndFastAabb</a> &amp;obbAabb, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;boxDistanceTravel, ndFloat32 maxT, ndAaabbIntersectCallback callback, void *const context) const</td></tr>
+<tr class="separator:a62c660a22ac6c8db51867cd200a816c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c3f46839fd1cac640ed1bb909fa087"><td class="memItemLeft" align="right" valign="top"><a id="ad0c3f46839fd1cac640ed1bb909fa087"></a>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ForThisSector</b> (const <a class="el" href="classnd_aabb_polygon_soup_1_1nd_node.html">ndAabbPolygonSoup::ndNode</a> *const node, const <a class="el" href="classnd_fast_aabb.html">ndFastAabb</a> &amp;obbAabb, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;boxDistanceTravel, ndFloat32 maxT, ndAaabbIntersectCallback callback, void *const context) const</td></tr>
+<tr class="separator:ad0c3f46839fd1cac640ed1bb909fa087"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classnd_polygon_soup_database"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classnd_polygon_soup_database')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classnd_polygon_soup_database.html">ndPolygonSoupDatabase</a></td></tr>
 <tr class="memitem:a3789672aca133121899cf881dcf1792d inherit pro_methods_classnd_polygon_soup_database"><td class="memItemLeft" align="right" valign="top"><a id="a3789672aca133121899cf881dcf1792d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ndPolygonSoupDatabase</b> (const char *const name=nullptr)</td></tr>

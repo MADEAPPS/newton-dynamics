@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_save_load_sytem_8h_source.html','')
 <div class="title">ndSaveLoadSytem.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -234,44 +234,48 @@ $(document).ready(function(){initNavTree('nd_save_load_sytem_8h_source.html','')
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <a class="code" href="classnd_tree.html">ndTree&lt;ndInt32, const ndJointBilateralConstraint*&gt;</a>* m_jointMap;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    };</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span>* CreateClass(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadDescriptor</a>&amp;)</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classnd_load_save_base.html">ndLoadSaveBase</a>()</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        dAssert(0);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;};</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;D_CORE_API <span class="keywordtype">void</span>* LoadClass(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> className, <span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a>&amp; desc);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;D_CORE_API <span class="keywordtype">void</span> RegisterLoaderClass(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> className, <a class="code" href="classnd_load_save_base.html">ndLoadSaveBase</a>* <span class="keyword">const</span> loaderClass);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00149"></a><span class="lineno"><a class="line" href="classnd_load_save_class.html">  149</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_load_save_class.html">ndLoadSaveClass</a>: <span class="keyword">public</span> <a class="code" href="classnd_load_save_base.html">ndLoadSaveBase</a></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;{</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <a class="code" href="classnd_load_save_class.html">ndLoadSaveClass&lt;T&gt;</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> className)</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    {</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        RegisterLoaderClass(className, <span class="keyword">this</span>);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    }</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span>* CreateClass(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadDescriptor</a>&amp; desc)</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    {</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> T(desc);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;};</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="preprocessor">#define D_CLASS_REFLECTION(Class)                               \</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="preprocessor">    const virtual char* SubClassName() {return #Class;}         \</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="preprocessor">    static const char* ClassName() {return #Class;}             \</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="preprocessor">    static ndLoadSaveClass&lt;Class&gt; __classLoader__;</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor">#define D_CLASS_REFLECTION_IMPLEMENT_LOADER(Class) \</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="preprocessor">    ndLoadSaveClass&lt;Class&gt; Class::__classLoader__(#Class);</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="preprocessor">#define D_CLASS_REFLECTION_LOAD_NODE(castType,className,desc) \</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="preprocessor">    (castType*)LoadClass(className, desc);</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    }</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span>* CreateClass(<span class="keyword">const</span> ndLoadDescriptor&amp;)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        ndAssert(0);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;};</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;D_CORE_API <span class="keywordtype">void</span>* LoadClass(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> className, <span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a>&amp; desc);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;D_CORE_API <span class="keywordtype">void</span> RegisterLoaderClass(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> className, <a class="code" href="classnd_load_save_base.html">ndLoadSaveBase</a>* <span class="keyword">const</span> loaderClass);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00153"></a><span class="lineno"><a class="line" href="classnd_load_save_class.html">  153</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_load_save_class.html">ndLoadSaveClass</a>: <span class="keyword">public</span> <a class="code" href="classnd_load_save_base.html">ndLoadSaveBase</a></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;{</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <a class="code" href="classnd_load_save_class.html">ndLoadSaveClass&lt;T&gt;</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> className)</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    {</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        RegisterLoaderClass(className, <span class="keyword">this</span>);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    }</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span>* CreateClass(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadDescriptor</a>&amp; desc)</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    {</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">new</span> T(desc);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;};</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="preprocessor">#define D_CLASS_REFLECTION(Class)                               \</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor">    const virtual char* SubClassName() {return #Class;}         \</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="preprocessor">    static const char* ClassName() {return #Class;}             \</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="preprocessor">    static ndLoadSaveClass&lt;Class&gt; __classLoader__;</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="preprocessor">#define D_CLASS_REFLECTION_IMPLEMENT_LOADER(Class) \</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="preprocessor">    ndLoadSaveClass&lt;Class&gt; Class::__classLoader__(#Class);</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="preprocessor">#define D_CLASS_REFLECTION_LOAD_NODE(castType,className,desc) \</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="preprocessor">    (castType*)LoadClass(className, desc);</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_class_alloc_html"><div class="ttname"><a href="classnd_class_alloc.html">ndClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> ndClassAlloc.h:30</div></div>
@@ -281,12 +285,12 @@ $(document).ready(function(){initNavTree('nd_save_load_sytem_8h_source.html','')
 <div class="ttc" id="aclassnd_1_1_ti_xml_node_html"><div class="ttname"><a href="classnd_1_1_ti_xml_node.html">nd::TiXmlNode</a></div><div class="ttdoc">The parent class for everything in the Document Object Model.</div><div class="ttdef"><b>Definition:</b> tinyxml.h:437</div></div>
 <div class="ttc" id="aclassnd_model_html"><div class="ttname"><a href="classnd_model.html">ndModel</a></div><div class="ttdef"><b>Definition:</b> ndModel.h:33</div></div>
 <div class="ttc" id="aclassnd_joint_loader_cache_html"><div class="ttname"><a href="classnd_joint_loader_cache.html">ndJointLoaderCache</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:48</div></div>
-<div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:42</div></div>
+<div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:43</div></div>
 <div class="ttc" id="aclassnd_character_node_html"><div class="ttname"><a href="classnd_character_node.html">ndCharacterNode</a></div><div class="ttdef"><b>Definition:</b> ndCharacterNode.h:95</div></div>
 <div class="ttc" id="aclassnd_tree_html"><div class="ttname"><a href="classnd_tree.html">ndTree</a></div><div class="ttdef"><b>Definition:</b> ndTree.h:82</div></div>
 <div class="ttc" id="aclassnd_shape_html"><div class="ttname"><a href="classnd_shape.html">ndShape</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:209</div></div>
-<div class="ttc" id="aclassnd_joint_bilateral_constraint_html"><div class="ttname"><a href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a></div><div class="ttdef"><b>Definition:</b> ndJointBilateralConstraint.h:56</div></div>
-<div class="ttc" id="aclassnd_load_save_class_html"><div class="ttname"><a href="classnd_load_save_class.html">ndLoadSaveClass</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:150</div></div>
+<div class="ttc" id="aclassnd_joint_bilateral_constraint_html"><div class="ttname"><a href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a></div><div class="ttdef"><b>Definition:</b> ndJointBilateralConstraint.h:53</div></div>
+<div class="ttc" id="aclassnd_load_save_class_html"><div class="ttname"><a href="classnd_load_save_class.html">ndLoadSaveClass</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:154</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:40</div></div>
 <div class="ttc" id="aclassnd_model_loader_cache_html"><div class="ttname"><a href="classnd_model_loader_cache.html">ndModelLoaderCache</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:52</div></div>
 <div class="ttc" id="aclassnd_1_1_ti_xml_node_html_a52b61427de08e0b9f47ea08a7d2b27c4"><div class="ttname"><a href="classnd_1_1_ti_xml_node.html#a52b61427de08e0b9f47ea08a7d2b27c4">nd::TiXmlNode::FirstChild</a></div><div class="ttdeci">const TiXmlNode * FirstChild() const</div><div class="ttdoc">The first child of this node. Will be null if there are no children.</div><div class="ttdef"><b>Definition:</b> tinyxml.h:535</div></div>
@@ -296,7 +300,7 @@ $(document).ready(function(){initNavTree('nd_save_load_sytem_8h_source.html','')
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndSaveLoadSytem.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndSaveLoadSytem.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

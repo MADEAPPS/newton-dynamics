@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_shape_static_procedural_mesh_8h_sou
 <div class="title">ndShapeStaticProceduralMesh.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -159,80 +159,64 @@ $(document).ready(function(){initNavTree('nd_shape_static_procedural_mesh_8h_sou
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a>&amp; desc);</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>();</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>* GetAsShapeStaticProceduralMesh() { <span class="keywordflow">return</span> <span class="keyword">this</span>; }</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classnd_shape_info.html">ndShapeInfo</a> GetShapeInfo() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a>&amp; desc) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> GetCollidingFaces(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; minBox, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; maxBox, <a class="code" href="classnd_array.html">ndArray&lt;ndVector&gt;</a>&amp; vertex, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp; faceList, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp; faceMaterial, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp; indexListList) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classnd_shape_info.html">ndShapeInfo</a> GetShapeInfo() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<span class="keyword">const</span> <a class="code" href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a>&amp; desc) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a>* GetAsShapeStaticProceduralMesh() { <span class="keywordflow">return</span> <span class="keyword">this</span>; }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> GetCollidingFaces(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; minBox, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; maxBox, <a class="code" href="classnd_array.html">ndArray&lt;ndVector&gt;</a>&amp; vertex, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp; faceList, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp; faceMaterial, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp; indexListList) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> GetCollidingFaces(<a class="code" href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a>* <span class="keyword">const</span> data) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> GetCollidingFaces(<a class="code" href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a>* <span class="keyword">const</span> data) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">class </span>ndLocalData</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        ndLocalData()</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            :m_vertex(64)</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <a class="code" href="classnd_array.html">ndArray&lt;ndVector&gt;</a> m_vertex;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    };</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">void</span> CalculateLocalObb();</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_minBox;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_maxBox;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_contact_solver.html">ndContactSolver</a>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;};</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndShapeStaticProceduralMesh::GetCollidingFaces(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndVector&gt;</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp;)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    ndAssert(0);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordtype">void</span> CalculateLocalObb();</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_minBox;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> m_maxBox;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">mutable</span> ndLocalData m_localData[D_MAX_THREADS_COUNT];</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    ndInt32 m_maxFaceCount;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    ndInt32 m_maxVertexCount;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_contact_solver.html">ndContactSolver</a>;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;};</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndShapeStaticProceduralMesh::GetCollidingFaces(<span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndVector&gt;</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp;, <a class="code" href="classnd_array.html">ndArray&lt;ndInt32&gt;</a>&amp;)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    dAssert(0);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">inline</span> ndShapeStaticProceduralMesh::ndEdge::ndEdge()</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;}</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">inline</span> ndShapeStaticProceduralMesh::ndEdge::ndEdge(ndInt32 i0, ndInt32 i1, </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_plane.html">ndPlane</a>&amp; plane, ndInt32 testIndex)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    :m_plane(plane)</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    ,m_testIndex(testIndex)</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    ,m_i0(i0)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    ,m_i1(i1)</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;{</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> ndShapeStaticProceduralMesh::ndEdge::operator&lt; (<span class="keyword">const</span> <a class="code" href="classnd_edge.html">ndEdge</a>&amp; edge)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">return</span> m_key &lt; edge.m_key;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> ndShapeStaticProceduralMesh::ndEdge::operator&gt; (<span class="keyword">const</span> <a class="code" href="classnd_edge.html">ndEdge</a>&amp; edge)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">return</span> m_key &gt; edge.m_key;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keyword">inline</span> ndShapeStaticProceduralMesh::ndEdgeMap::ndEdgeMap()</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    :<a class="code" href="classnd_tree.html">ndTree</a>&lt;ndInt32, <a class="code" href="classnd_edge.html">ndEdge</a>, <a class="code" href="classnd_containers_free_list_alloc.html">ndContainersFreeListAlloc</a>&lt;ndInt32&gt;&gt;()</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;}</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">inline</span> ndShapeStaticProceduralMesh::ndEdge::ndEdge()</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;{</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">inline</span> ndShapeStaticProceduralMesh::ndEdge::ndEdge(ndInt32 i0, ndInt32 i1, </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_plane.html">ndPlane</a>&amp; plane, ndInt32 testIndex)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    :m_plane(plane)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    ,m_testIndex(testIndex)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    ,m_i0(i0)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    ,m_i1(i1)</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;{</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> ndShapeStaticProceduralMesh::ndEdge::operator&lt; (<span class="keyword">const</span> <a class="code" href="classnd_edge.html">ndEdge</a>&amp; edge)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">return</span> m_key &lt; edge.m_key;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> ndShapeStaticProceduralMesh::ndEdge::operator&gt; (<span class="keyword">const</span> <a class="code" href="classnd_edge.html">ndEdge</a>&amp; edge)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">return</span> m_key &gt; edge.m_key;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keyword">inline</span> ndShapeStaticProceduralMesh::ndEdgeMap::ndEdgeMap()</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    :<a class="code" href="classnd_tree.html">ndTree</a>&lt;ndInt32, <a class="code" href="classnd_edge.html">ndEdge</a>, <a class="code" href="classnd_containers_free_list_alloc.html">ndContainersFreeListAlloc</a>&lt;ndInt32&gt;&gt;()</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;}</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_edge_html"><div class="ttname"><a href="classnd_edge.html">ndEdge</a></div><div class="ttdef"><b>Definition:</b> ndPolyhedra.h:44</div></div>
-<div class="ttc" id="aclassnd_polygon_mesh_desc_html"><div class="ttname"><a href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticMesh.h:42</div></div>
+<div class="ttc" id="aclassnd_polygon_mesh_desc_html"><div class="ttname"><a href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a></div><div class="ttdef"><b>Definition:</b> ndPolygonMeshDesc.h:35</div></div>
 <div class="ttc" id="aclassnd_shape_static_procedural_mesh_1_1nd_edge_html"><div class="ttname"><a href="classnd_shape_static_procedural_mesh_1_1nd_edge.html">ndShapeStaticProceduralMesh::ndEdge</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticProceduralMesh.h:32</div></div>
 <div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray&lt; ndVector &gt;</a></div></div>
-<div class="ttc" id="aclassnd_shape_static_mesh_html"><div class="ttname"><a href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticMesh.h:117</div></div>
+<div class="ttc" id="aclassnd_shape_static_mesh_html"><div class="ttname"><a href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticMesh.h:32</div></div>
 <div class="ttc" id="aclassnd_tree_html"><div class="ttname"><a href="classnd_tree.html">ndTree</a></div><div class="ttdef"><b>Definition:</b> ndTree.h:82</div></div>
 <div class="ttc" id="aclassnd_shape_static_procedural_mesh_html"><div class="ttname"><a href="classnd_shape_static_procedural_mesh.html">ndShapeStaticProceduralMesh</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticProceduralMesh.h:29</div></div>
 <div class="ttc" id="aclassnd_shape_static_procedural_mesh_1_1nd_edge_map_html"><div class="ttname"><a href="classnd_shape_static_procedural_mesh_1_1nd_edge_map.html">ndShapeStaticProceduralMesh::ndEdgeMap</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticProceduralMesh.h:54</div></div>
@@ -242,11 +226,11 @@ $(document).ready(function(){initNavTree('nd_shape_static_procedural_mesh_8h_sou
 <div class="ttc" id="aclassnd_containers_free_list_alloc_html"><div class="ttname"><a href="classnd_containers_free_list_alloc.html">ndContainersFreeListAlloc</a></div><div class="ttdef"><b>Definition:</b> ndContainersAlloc.h:60</div></div>
 <div class="ttc" id="aclassnd_load_save_base_1_1nd_load_descriptor_html"><div class="ttname"><a href="classnd_load_save_base_1_1nd_load_descriptor.html">ndLoadSaveBase::ndLoadDescriptor</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:59</div></div>
 <div class="ttc" id="aclassnd_load_save_base_1_1nd_save_descriptor_html"><div class="ttname"><a href="classnd_load_save_base_1_1nd_save_descriptor.html">ndLoadSaveBase::ndSaveDescriptor</a></div><div class="ttdef"><b>Definition:</b> ndSaveLoadSytem.h:93</div></div>
-<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:1024</div></div>
+<div class="ttc" id="aclassnd_vector_html"><div class="ttname"><a href="classnd_vector.html">ndVector</a></div><div class="ttdef"><b>Definition:</b> ndVectorArmNeon.h:41</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_9e485601c42eb04f0475993300f17c6b.html">dCollision</a></li><li class="navelem"><b>ndShapeStaticProceduralMesh.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_ee7059d835116e7de81274163726d1e4.html">dCollision</a></li><li class="navelem"><b>ndShapeStaticProceduralMesh.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

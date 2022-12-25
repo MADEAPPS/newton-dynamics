@@ -141,32 +141,35 @@ $(document).ready(function(){initNavTree('nd_cuda_scene_info_8h_source.html','')
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        ,m_transformBuffer1()</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        ,m_frameCount(0)</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        ,m_frameIsValid(0)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    }</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classnd_cuda_bounding_box.html">ndCudaBoundingBox</a> m_worldBox;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;unsigned&gt;</a> m_histogram;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaBodyProxy&gt;</a> m_bodyArray;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaSceneNode&gt;</a> m_sceneGraph;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaBodyAabbCell&gt;</a> m_bodyAabbCell;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaBodyAabbCell&gt;</a> m_bodyAabbCellScratch;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaSpatialVector&gt;</a> m_transformBuffer0;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaSpatialVector&gt;</a> m_transformBuffer1;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">unsigned</span> m_frameCount;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">unsigned</span> m_frameIsValid;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;};</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> __device__ cuInvalidateFrame(<a class="code" href="classnd_cuda_scene_info.html">ndCudaSceneInfo</a>&amp; info, <span class="keyword">const</span> <span class="keywordtype">char</span>* functionName, <span class="keywordtype">unsigned</span> lineNumber)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">//cudaDeviceSynchronize();</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    info.m_frameIsValid = 0;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    printf(<span class="stringliteral">&quot;skipping frame %d  function %s  line %d\n&quot;</span>, info.m_frameCount, functionName, lineNumber);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        ,m_startFrameTime(0)</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        ,m_frameTimeInNanosecunds(0)</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classnd_cuda_bounding_box.html">ndCudaBoundingBox</a> m_worldBox;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;unsigned&gt;</a> m_histogram;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaBodyProxy&gt;</a> m_bodyArray;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaSceneNode&gt;</a> m_sceneGraph;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaBodyAabbCell&gt;</a> m_bodyAabbCell;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaBodyAabbCell&gt;</a> m_bodyAabbCellScratch;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaSpatialVector&gt;</a> m_transformBuffer0;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classnd_cuda_buffer.html">ndCudaBuffer&lt;ndCudaSpatialVector&gt;</a> m_transformBuffer1;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">unsigned</span> m_frameCount;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">unsigned</span> m_frameIsValid;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">long</span> <span class="keywordtype">long</span> m_startFrameTime;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">long</span> <span class="keywordtype">long</span> m_frameTimeInNanosecunds;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;};</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> __device__ cuInvalidateFrame(<a class="code" href="classnd_cuda_scene_info.html">ndCudaSceneInfo</a>&amp; info, <span class="keyword">const</span> <span class="keywordtype">char</span>* functionName, <span class="keywordtype">unsigned</span> lineNumber)</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;{</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="comment">//cudaDeviceSynchronize();</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    info.m_frameIsValid = 0;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    printf(<span class="stringliteral">&quot;skipping frame %d  function %s  line %d\n&quot;</span>, info.m_frameCount, functionName, lineNumber);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_cuda_scene_info_html"><div class="ttname"><a href="classnd_cuda_scene_info.html">ndCudaSceneInfo</a></div><div class="ttdef"><b>Definition:</b> ndCudaSceneInfo.h:32</div></div>
@@ -175,7 +178,7 @@ $(document).ready(function(){initNavTree('nd_cuda_scene_info_8h_source.html','')
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_d5aa3f859e50cce566f2ea2a6855a4d4.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_7b313f37c50872a0a5dc9f321358b446.html">dExtensions</a></li><li class="navelem"><a class="el" href="dir_964567b6dce23bcbb50b3907a3d22306.html">dCuda</a></li><li class="navelem"><a class="el" href="dir_4f1c9e4f3eb7cf6e56e59108ff051027.html">dContext</a></li><li class="navelem"><b>ndCudaSceneInfo.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_ed97d29386cdd3379a363b5306354b4f.html">dNewton</a></li><li class="navelem"><a class="el" href="dir_351ecc9e6445e39d9049fbc56334a529.html">dExtensions</a></li><li class="navelem"><a class="el" href="dir_10277ae5c74379b8256ec5ba7dadb09d.html">dCuda</a></li><li class="navelem"><a class="el" href="dir_cbcb4712266920915a21e7e36e6bf899.html">dContext</a></li><li class="navelem"><b>ndCudaSceneInfo.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

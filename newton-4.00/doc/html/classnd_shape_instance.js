@@ -39,6 +39,7 @@ var classnd_shape_instance =
     [ "operator=", "classnd_shape_instance.html#aef7416e3e6b0150bf993ded712212e8c", null ],
     [ "RayCast", "classnd_shape_instance.html#a6ae777d4312a6bd58e9d224a82bd3e0a", null ],
     [ "Save", "classnd_shape_instance.html#a978a8f938ffc8ceeb353c5eefada5f2c", null ],
+    [ "SavePLY", "classnd_shape_instance.html#ad0f61a4fa05b991d70eb60db963d8aa6", null ],
     [ "SetCollisionMode", "classnd_shape_instance.html#ab0953ae0f166f7a8634f7399b76521f2", null ],
     [ "SetGlobalMatrix", "classnd_shape_instance.html#a5646ccb8a1c4bee47b4760f6a56e818e", null ],
     [ "SetGlobalScale", "classnd_shape_instance.html#a1cdc573dd5fbe47d4cdd10e2188d2d69", null ],

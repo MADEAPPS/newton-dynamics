@@ -7,6 +7,5 @@ var classnd_iso_surface =
     [ "GenerateListIndexList", "classnd_iso_surface.html#ad39f0882f3ee6a8a9bb94e6d0d9206b5", null ],
     [ "GenerateMesh", "classnd_iso_surface.html#a1eef9cc9660acfe2ef516a38c3639e7e", null ],
     [ "GetOrigin", "classnd_iso_surface.html#ab27fc3f24dc585e4f8744e2aaf584a70", null ],
-    [ "GetPoints", "classnd_iso_surface.html#a5db77f15f14d69c9e7b246769cdc8a76", null ],
-    [ "ndImplementation", "classnd_iso_surface.html#ac25e3a6c5788a5dfa94340343062a96a", null ]
+    [ "GetPoints", "classnd_iso_surface.html#a5db77f15f14d69c9e7b246769cdc8a76", null ]
 ];

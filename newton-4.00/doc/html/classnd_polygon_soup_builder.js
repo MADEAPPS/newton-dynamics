@@ -13,6 +13,7 @@ var classnd_polygon_soup_builder =
     [ "AddFaceIndirect", "classnd_polygon_soup_builder.html#a5469377ec1d757dc0817043c672bebb1", null ],
     [ "Begin", "classnd_polygon_soup_builder.html#afa6fdbe95e45be7893f3723455900819", null ],
     [ "End", "classnd_polygon_soup_builder.html#a72cd94c140a174a9ecf822607c99d065", null ],
+    [ "LoadPLY", "classnd_polygon_soup_builder.html#aeeea2c1ca75c6461f367551870aeeb74", null ],
     [ "SavePLY", "classnd_polygon_soup_builder.html#a402184735c95aeaa5939af6301d159a3", null ],
     [ "m_faceVertexCount", "classnd_polygon_soup_builder.html#aa4d1cb9439270b2983bfcba094cab2e3", null ],
     [ "m_normalIndex", "classnd_polygon_soup_builder.html#ac4d7d3c717d7ac00eeb7a829c0e85017", null ],

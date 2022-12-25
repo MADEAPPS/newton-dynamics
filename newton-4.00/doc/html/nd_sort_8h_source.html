@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="title">ndSort.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2021&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* Copyright (c) &lt;2003-2022&gt; &lt;Julio Jerez, Newton Game Dynamics&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* </span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* This software is provided &#39;as-is&#39;, without any express or implied</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">* warranty. In no event will the authors be held liable for any damages</span></div>
@@ -191,7 +191,7 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                stack[stackIndex][1] = j;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                stackIndex++;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            }</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            dAssert(stackIndex &lt; ndInt32(<span class="keyword">sizeof</span>(stack) / (2 * <span class="keyword">sizeof</span>(stack[0][0]))));</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            ndAssert(stackIndex &lt; ndInt32(<span class="keyword">sizeof</span>(stack) / (2 * <span class="keyword">sizeof</span>(stack[0][0]))));</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        }</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
@@ -214,7 +214,7 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keyword">const</span> T tmp(array[i]);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">for</span> (; comparator.Compare(array[j - 1], tmp, context) &gt; 0; --j)</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            dAssert(j &gt; 0);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            ndAssert(j &gt; 0);</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            array[j] = array[j - 1];</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        }</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        array[j] = tmp;</div>
@@ -224,7 +224,7 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="preprocessor">#if 0</span></div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (elements - 1); ++i)</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        dAssert(comparator.Compare(array[i], array[i + 1], context) &lt;= 0);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        ndAssert(comparator.Compare(array[i], array[i + 1], context) &lt;= 0);</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    }</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;}</div>
@@ -233,7 +233,7 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keywordtype">void</span> ndCountingSortInPlace(T* <span class="keyword">const</span> array, T* <span class="keyword">const</span> scratchBuffer, ndInt32 size, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;{</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//D_TRACKTIME();</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    dAssert(keyBitSize &gt; 0);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    ndAssert(keyBitSize &gt; 0);</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    ndUnsigned32 scans[(1 &lt;&lt; keyBitSize) + 1];</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    ndEvaluateKey evaluator(context);</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
@@ -245,15 +245,15 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <span class="keyword">const</span> T&amp; entry = array[i];</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        scratchBuffer[i] = entry;</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        scans[key] ++;</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    ndInt32 sum = 0;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    ndUnsigned32 sum = 0;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    {</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        ndInt32 partialSum = scans[i];</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        ndUnsigned32 partialSum = scans[i];</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        scans[i] = sum;</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        sum += partialSum;</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    }</div>
@@ -270,9 +270,9 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keyword">const</span> T&amp; entry = scratchBuffer[i];</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keyword">const</span> ndInt32 index = scans[key];</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keyword">const</span> ndUnsigned32 index = scans[key];</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        array[index] = entry;</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        scans[key] = index + 1;</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
@@ -281,7 +281,7 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="preprocessor">#if 0</span></div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = size - 2; i &gt;= 0; --i)</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    {</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        dAssert(evaluator.GetKey(scratchBuffer[i]) &lt;= evaluator.GetKey(scratchBuffer[i + 1]));</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        ndAssert(evaluator.GetKey(scratchBuffer[i]) &lt;= evaluator.GetKey(scratchBuffer[i + 1]));</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;}</div>
@@ -292,268 +292,303 @@ $(document).ready(function(){initNavTree('nd_sort_8h_source.html',''); initResiz
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    D_TRACKTIME();</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    ndEvaluateKey evaluator(context);</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">const</span> ndInt32 threadCount = threadPool.GetThreadCount();</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    ndUnsigned32* <span class="keyword">const</span> scans = ndAlloca(ndUnsigned32, threadCount * ((1 &lt;&lt; keyBitSize) + 1));</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keyword">auto</span> ndBuildHistogram = ndMakeObject::ndFunction([&amp;array, &amp;scratchBuffer, size, &amp;evaluator, &amp;scans](ndInt32 threadIndex, ndInt32 threadCount)</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        D_TRACKTIME_NAMED(ndBuildHistogram);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        {</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            scan[i] = 0;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        }</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;            <span class="keyword">const</span> T&amp; entry = array[i];</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;            dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;            scan[key] ++;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;            scratchBuffer[i] = entry;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        }</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    });</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">auto</span> ndShffleArray = ndMakeObject::ndFunction([&amp;array, &amp;scratchBuffer, size, &amp;evaluator, &amp;scans](ndInt32 threadIndex, ndInt32 threadCount)</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    {</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        D_TRACKTIME_NAMED(ndShffleArray);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        {</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            <span class="keyword">const</span> T&amp; entry = scratchBuffer[i];</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;            dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            <span class="keyword">const</span> ndInt32 index = scan[key];</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            array[index] = entry;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            scan[key] = index + 1;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        }</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    });</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    threadPool.ParallelExecute(ndBuildHistogram);</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    ndInt32 bits = keyBitSize;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">if</span> (bits &lt; 11)</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        ndInt32 sum = 0;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        {</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;            <span class="keywordflow">for</span> (ndInt32 j = 0; j &lt; threadCount; ++j)</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            {</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                ndInt32 k = j * (1 &lt;&lt; keyBitSize) + i;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                ndInt32 partialSum = scans[k];</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;                scans[k] = sum;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                sum += partialSum;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            }</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        }</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    }</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    {</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        dAssert(0);</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    }</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">if</span> (prefixScanOut)</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    {</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        {</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            prefixScanOut[i] = scans[i];</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        prefixScanOut[1 &lt;&lt; keyBitSize] = size;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    threadPool.ParallelExecute(ndShffleArray);</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="comment">//#ifdef _DEBUG</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 1; i &lt; size; ++i)</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    {</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        ndInt32 key0 = evaluator.GetKey(array[i - 1]);</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        ndInt32 key1 = evaluator.GetKey(array[i + 0]);</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        dAssert(key0 &lt;= key1);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    }</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="keywordtype">void</span> ndCountingSort(T* <span class="keyword">const</span> array, T* <span class="keyword">const</span> scratchBuffer, ndInt32 size, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;{</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="comment">//D_TRACKTIME();</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    dAssert(keyBitSize &gt; 0);</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    ndUnsigned32 scans[(1 &lt;&lt; keyBitSize) + 1];</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    ndEvaluateKey evaluator(context);</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    {</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        scans[i] = 0;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    }</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; size; ++i)</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    {</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keyword">const</span> T&amp; entry = array[i];</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        scans[key] ++;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    }</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160; </div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    ndInt32 sum = 0;</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    {</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        ndInt32 partialSum = scans[i];</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        scans[i] = sum;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        sum += partialSum;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    }</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160; </div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keywordflow">if</span> (prefixScanOut)</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    { </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; ((1 &lt;&lt; keyBitSize) + 1); ++i)</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        {</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;            prefixScanOut[i] = scans[i];</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        }</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    }</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; size; ++i)</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    {</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        <span class="keyword">const</span> T&amp; entry = array[i];</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        <span class="keyword">const</span> ndInt32 index = scans[key];</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        scratchBuffer[index] = entry;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        scans[key] = index + 1;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    }</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment">//#ifdef _DEBUG</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = size - 2; i &gt;= 0; --i)</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    {</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;        dAssert(evaluator.GetKey(scratchBuffer[i]) &lt;= evaluator.GetKey(scratchBuffer[i + 1]));</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    }</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;}</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160; </div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_thread_pool.html">ndThreadPool</a>&amp; threadPool, T* <span class="keyword">const</span> array, T* <span class="keyword">const</span> scratchBuffer, ndInt32 size, ndUnsigned32* <span class="keyword">const</span> prefixScanOut,  <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;{</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    D_TRACKTIME();</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    ndEvaluateKey evaluator(context);</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keyword">const</span> ndInt32 threadCount = threadPool.GetThreadCount();</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    ndUnsigned32* <span class="keyword">const</span> scans = ndAlloca(ndUnsigned32, threadCount * ((1 &lt;&lt; keyBitSize) + 1));</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    ndUnsigned32* <span class="keyword">const</span> sum = ndAlloca(ndUnsigned32, 1 &lt;&lt; keyBitSize);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    ndUnsigned32* <span class="keyword">const</span> scans = ndAlloca(ndUnsigned32, threadCount * (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keyword">auto</span> ndBuildHistogram = ndMakeObject::ndFunction([&amp;array, &amp;scratchBuffer, size, &amp;evaluator, &amp;scans](ndInt32 threadIndex, ndInt32 threadCount)</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        D_TRACKTIME_NAMED(ndBuildHistogram);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        {</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            scan[i] = 0;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        }</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            <span class="keyword">const</span> T&amp; entry = array[i];</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;            ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;            ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            scan[key] ++;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            scratchBuffer[i] = entry;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    });</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">auto</span> ndShuffleArray = ndMakeObject::ndFunction([&amp;array, &amp;scratchBuffer, size, &amp;evaluator, &amp;scans, &amp;sum](ndInt32 threadIndex, ndInt32 threadCount)</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        D_TRACKTIME_NAMED(ndShuffleArray);</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        {</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            scan[i] += sum[i];</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            <span class="keyword">const</span> T&amp; entry = scratchBuffer[i];</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <span class="keyword">const</span> ndUnsigned32 index = scan[key];</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            array[index] = entry;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            scan[key] = index + 1;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    });</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    threadPool.ParallelExecute(ndBuildHistogram);</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    ndInt32 bits = keyBitSize;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">if</span> (bits &lt; 11)</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    {</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        {</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            sum[i] = 0;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordflow">for</span> (ndInt32 j = 0; j &lt; threadCount; ++j)</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        {</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;            ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[j * (1 &lt;&lt; keyBitSize)];</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            {</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                ndUnsigned32 partialSum = scan[i];</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                scan[i] = sum[i];</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                sum[i] += partialSum;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            }</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        }</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        ndUnsigned32 accSum = 0;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        {</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            ndUnsigned32 partialSum = sum[i];</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            sum[i] = accSum;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            accSum += partialSum;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        }</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    {</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        ndAssert(0);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    }</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span> (prefixScanOut)</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    {</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        {</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            prefixScanOut[i] = sum[i];</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        }</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        prefixScanOut[1 &lt;&lt; keyBitSize] = ndUnsigned32(size);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    threadPool.ParallelExecute(ndShuffleArray);</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">//#ifdef _DEBUG</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 1; i &lt; size; ++i)</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    {</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        ndInt32 key0 = evaluator.GetKey(array[i - 1]);</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        ndInt32 key1 = evaluator.GetKey(array[i + 0]);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        ndAssert(key0 &lt;= key1);</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    }</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;}</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<span class="keyword">const</span> T* <span class="keyword">const</span> srcArray, T* <span class="keyword">const</span> dstArray, ndInt32 size, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;{</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="comment">//D_TRACKTIME();</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    ndAssert(keyBitSize &gt; 0);</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    ndUnsigned32 scans[(1 &lt;&lt; keyBitSize) + 1];</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    ndEvaluateKey evaluator(context);</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    {</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        scans[i] = 0;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; size; ++i)</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    {</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keyword">const</span> T&amp; entry = srcArray[i];</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        scans[key] ++;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    }</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    ndUnsigned32 sum = 0;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    {</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        ndUnsigned32 partialSum = scans[i];</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        scans[i] = sum;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        sum += partialSum;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    }</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">if</span> (prefixScanOut)</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    { </div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; ((1 &lt;&lt; keyBitSize) + 1); ++i)</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;        {</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;            prefixScanOut[i] = scans[i];</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        }</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    }</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; size; ++i)</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    {</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="keyword">const</span> T&amp; entry = srcArray[i];</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;        ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;        ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;        <span class="keyword">const</span> ndUnsigned32 index = scans[key];</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;        dstArray[index] = entry;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        scans[key] = index + 1;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    }</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160; </div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keyword">auto</span> ndBuildHistogram = ndMakeObject::ndFunction([&amp;array, size, &amp;evaluator, &amp;scans](ndInt32 threadIndex, ndInt32 threadCount)</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    {</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        D_TRACKTIME_NAMED(ndBuildHistogram);</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;        {</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            scan[i] = 0;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;        }</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;            <span class="keyword">const</span> T&amp; entry = array[i];</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;            dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;            scan[key] ++;</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        }</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    });</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keyword">auto</span> ndShffleArray = ndMakeObject::ndFunction([&amp;array, &amp;scratchBuffer, size, &amp;evaluator, &amp;scans](ndInt32 threadIndex, ndInt32 threadCount)</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    {</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        D_TRACKTIME_NAMED(ndShffleArray);</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160; </div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;        {</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;            <span class="keyword">const</span> T&amp; entry = array[i];</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;            dAssert(key &gt;= 0);</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;            dAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;            <span class="keyword">const</span> ndInt32 index = scan[key];</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            scratchBuffer[index] = entry;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;            scan[key] = index + 1;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        }</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    });</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    threadPool.ParallelExecute(ndBuildHistogram);</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    ndInt32 bits = keyBitSize;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keywordflow">if</span> (bits &lt; 11)</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    {</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;        ndInt32 sum = 0;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="comment">//#ifdef _DEBUG</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = size - 2; i &gt;= 0; --i)</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    {</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        ndAssert(evaluator.GetKey(scratchBuffer[i]) &lt;= evaluator.GetKey(scratchBuffer[i + 1]));</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    }</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;}</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_thread_pool.html">ndThreadPool</a>&amp; threadPool, <span class="keyword">const</span> T* <span class="keyword">const</span> srcArray, T* <span class="keyword">const</span> dstArray, ndInt32 size, ndUnsigned32* <span class="keyword">const</span> prefixScanOut,  <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;{</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    D_TRACKTIME();</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    ndEvaluateKey evaluator(context);</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keyword">const</span> ndInt32 threadCount = threadPool.GetThreadCount();</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160; </div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    ndUnsigned32* <span class="keyword">const</span> sum = ndAlloca(ndUnsigned32, 1 &lt;&lt; keyBitSize);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    ndUnsigned32* <span class="keyword">const</span> scans = ndAlloca(ndUnsigned32, threadCount * (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keyword">auto</span> ndBuildHistogram = ndMakeObject::ndFunction([&amp;srcArray, size, &amp;evaluator, &amp;scans](ndInt32 threadIndex, ndInt32 threadCount)</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    {</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        D_TRACKTIME_NAMED(ndBuildHistogram);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        {</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            scan[i] = 0;</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        }</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        {</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;            <span class="keyword">const</span> T&amp; entry = srcArray[i];</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;            ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            scan[key] ++;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        }</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    });</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160; </div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keyword">auto</span> ndShuffleArray = ndMakeObject::ndFunction([&amp;srcArray, &amp;dstArray, size, &amp;evaluator, &amp;scans, &amp;sum](ndInt32 threadIndex, ndInt32 threadCount)</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    {</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;        D_TRACKTIME_NAMED(ndShuffleArray);</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[threadIndex * (1 &lt;&lt; keyBitSize)];</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160; </div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        {</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;            <span class="keywordflow">for</span> (ndInt32 j = 0; j &lt; threadCount; ++j)</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;            {</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                ndInt32 k = j * (1 &lt;&lt; keyBitSize) + i;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                ndInt32 partialSum = scans[k];</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                scans[k] = sum;</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;                sum += partialSum;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            }</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        }</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    }</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    {</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        dAssert(0);</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    }</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordflow">if</span> (prefixScanOut)</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    {</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        {</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;            prefixScanOut[i] = scans[i];</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        }</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        prefixScanOut[1 &lt;&lt; keyBitSize] = size;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    }</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160; </div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    threadPool.ParallelExecute(ndShffleArray);</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="comment">//#ifdef _DEBUG</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 1; i &lt; size; ++i)</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    {</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        ndInt32 key0 = evaluator.GetKey(scratchBuffer[i - 1]);</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        ndInt32 key1 = evaluator.GetKey(scratchBuffer[i + 0]);</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        dAssert(key0 &lt;= key1);</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;}</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;            scan[i] += sum[i];</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        }</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160; </div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        <a class="code" href="classnd_start_end.html">ndStartEnd</a> startEnd(size, threadIndex, threadCount);</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = startEnd.m_start; i &lt; startEnd.m_end; ++i)</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        {</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            <span class="keyword">const</span> T&amp; entry = srcArray[i];</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;            <span class="keyword">const</span> ndInt32 key = evaluator.GetKey(entry);</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;            ndAssert(key &gt;= 0);</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;            ndAssert(key &lt; (1 &lt;&lt; keyBitSize));</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;            <span class="keyword">const</span> ndUnsigned32 index = scan[key];</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;            dstArray[index] = entry;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;            scan[key] = index + 1;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        }</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    });</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    threadPool.ParallelExecute(ndBuildHistogram);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    ndInt32 bits = keyBitSize;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <span class="keywordflow">if</span> (bits &lt; 11)</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    {</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        {</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            sum[i] = 0;</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        }</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        <span class="keywordflow">for</span> (ndInt32 j = 0; j &lt; threadCount; ++j)</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        {</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;            ndUnsigned32* <span class="keyword">const</span> scan = &amp;scans[j * (1 &lt;&lt; keyBitSize)];</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;            <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;            {</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;                ndUnsigned32 partialSum = scan[i];</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;                scan[i] = sum[i];</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;                sum[i] += partialSum;</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;            }</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        }</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160; </div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_thread_pool.html">ndThreadPool</a>&amp; threadPool, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; array, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; scratchBuffer, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;{</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    scratchBuffer.<a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>());</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(threadPool, &amp;array[0], &amp;scratchBuffer[0], array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>(), prefixScanOut, context);</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    array.<a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(scratchBuffer);</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;}</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160; </div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; array, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; scratchBuffer, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;{</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    scratchBuffer.<a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>());</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(&amp;array[0], &amp;scratchBuffer[0], array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>(), prefixScanOut, context);</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    array.<a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(scratchBuffer);</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;}</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        ndUnsigned32 accSum = 0;</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        {</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;            ndUnsigned32 partialSum = sum[i];</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;            sum[i] = accSum;</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;            accSum += partialSum;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        }</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    }</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    {</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        ndAssert(0);</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    }</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    <span class="keywordflow">if</span> (prefixScanOut)</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    {</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        <span class="keywordflow">for</span> (ndInt32 i = 0; i &lt; (1 &lt;&lt; keyBitSize); ++i)</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        {</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;            prefixScanOut[i] = sum[i];</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        }</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        prefixScanOut[1 &lt;&lt; keyBitSize] = ndUnsigned32(size);</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    }</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    threadPool.ParallelExecute(ndShuffleArray);</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;<span class="comment">//#ifdef _DEBUG</span></div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keywordflow">for</span> (ndInt32 i = 1; i &lt; size; ++i)</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    {</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;        ndInt32 key0 = evaluator.GetKey(scratchBuffer[i - 1]);</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        ndInt32 key1 = evaluator.GetKey(scratchBuffer[i + 0]);</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;        ndAssert(key0 &lt;= key1);</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    }</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;}</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_thread_pool.html">ndThreadPool</a>&amp; threadPool, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; array, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; scratchBuffer, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;{</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    scratchBuffer.<a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>());</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(threadPool, &amp;array[0], &amp;scratchBuffer[0], array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>(), prefixScanOut, context);</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    array.<a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(scratchBuffer);</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;}</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T, <span class="keyword">class</span> ndEvaluateKey, ndInt32 keyBitSize&gt;</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="keywordtype">void</span> ndCountingSort(<a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; array, <a class="code" href="classnd_array.html">ndArray&lt;T&gt;</a>&amp; scratchBuffer, ndUnsigned32* <span class="keyword">const</span> prefixScanOut, <span class="keywordtype">void</span>* <span class="keyword">const</span> context)</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;{</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    scratchBuffer.<a class="code" href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">SetCount</a>(array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>());</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    ndCountingSort&lt;T, ndEvaluateKey, keyBitSize&gt;(&amp;array[0], &amp;scratchBuffer[0], array.<a class="code" href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">GetCount</a>(), prefixScanOut, context);</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    array.<a class="code" href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">Swap</a>(scratchBuffer);</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;}</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:41</div></div>
-<div class="ttc" id="aclassnd_array_html_a76281badc4ffa3d67913fb33a12a7cb7"><div class="ttname"><a href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray::Swap</a></div><div class="ttdeci">void Swap(ndArray &amp;other)</div><div class="ttdoc">Interchange all the information with other.</div><div class="ttdef"><b>Definition:</b> ndArray.h:257</div></div>
-<div class="ttc" id="aclassnd_start_end_html"><div class="ttname"><a href="classnd_start_end.html">ndStartEnd</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:38</div></div>
-<div class="ttc" id="aclassnd_array_html_a0607c75a9ac49efe20ed3f948dcb9cc7"><div class="ttname"><a href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray::GetCount</a></div><div class="ttdeci">ndInt32 GetCount() const</div><div class="ttdoc">return the size of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:170</div></div>
-<div class="ttc" id="aclassnd_thread_pool_html"><div class="ttname"><a href="classnd_thread_pool.html">ndThreadPool</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:61</div></div>
-<div class="ttc" id="aclassnd_array_html_a0f9a0872e8b226746aa8c253b9528840"><div class="ttname"><a href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray::SetCount</a></div><div class="ttdeci">void SetCount(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:176</div></div>
+<div class="ttc" id="aclassnd_array_html"><div class="ttname"><a href="classnd_array.html">ndArray</a></div><div class="ttdoc">Generic template vector.</div><div class="ttdef"><b>Definition:</b> ndArray.h:42</div></div>
+<div class="ttc" id="aclassnd_array_html_a76281badc4ffa3d67913fb33a12a7cb7"><div class="ttname"><a href="classnd_array.html#a76281badc4ffa3d67913fb33a12a7cb7">ndArray::Swap</a></div><div class="ttdeci">void Swap(ndArray &amp;other)</div><div class="ttdoc">Interchange all the information with other.</div><div class="ttdef"><b>Definition:</b> ndArray.h:262</div></div>
+<div class="ttc" id="aclassnd_start_end_html"><div class="ttname"><a href="classnd_start_end.html">ndStartEnd</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:39</div></div>
+<div class="ttc" id="aclassnd_array_html_a0607c75a9ac49efe20ed3f948dcb9cc7"><div class="ttname"><a href="classnd_array.html#a0607c75a9ac49efe20ed3f948dcb9cc7">ndArray::GetCount</a></div><div class="ttdeci">ndInt32 GetCount() const</div><div class="ttdoc">return the size of the array.</div><div class="ttdef"><b>Definition:</b> ndArray.h:182</div></div>
+<div class="ttc" id="aclassnd_thread_pool_html"><div class="ttname"><a href="classnd_thread_pool.html">ndThreadPool</a></div><div class="ttdef"><b>Definition:</b> ndThreadPool.h:65</div></div>
+<div class="ttc" id="aclassnd_array_html_a0f9a0872e8b226746aa8c253b9528840"><div class="ttname"><a href="classnd_array.html#a0f9a0872e8b226746aa8c253b9528840">ndArray::SetCount</a></div><div class="ttdeci">void SetCount(ndInt32 count)</div><div class="ttdoc">Set a new size.</div><div class="ttdef"><b>Definition:</b> ndArray.h:188</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_576187522c208298cdcbb28dcf7d7358.html">Development</a></li><li class="navelem"><a class="el" href="dir_e4e15e73e4a9eec1637f931f93c9abcf.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_6acb029d2bcbdc9429097c90bb585863.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_bd8ae0dd2a5fa7761e7492e4dc248ba3.html">sdk</a></li><li class="navelem"><a class="el" href="dir_86cc7c9bf68616eaf57a10c300df72f9.html">dCore</a></li><li class="navelem"><b>ndSort.h</b></li>
+    <li class="navelem"><a class="el" href="dir_3b1dd73b9fb2aae500397c690f6e720e.html">newton-dynamics</a></li><li class="navelem"><a class="el" href="dir_884601d3c3a6558edcfce6787edcf8d1.html">newton-4.00</a></li><li class="navelem"><a class="el" href="dir_d26a41558ed903aead586c87f46b012f.html">sdk</a></li><li class="navelem"><a class="el" href="dir_e6025d0a45e21f3ed95ba73e94d27527.html">dCore</a></li><li class="navelem"><b>ndSort.h</b></li>
     <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>

@@ -115,7 +115,9 @@ Inheritance diagram for ndPolygonMeshDesc:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_polygon_mesh_desc_1_1nd_mesh.html">ndMesh</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_polygon_mesh_desc_1_1nd_procedural_static_mesh_face_query.html">ndProceduralStaticMeshFaceQuery</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnd_polygon_mesh_desc_1_1nd_static_mesh_face_query.html">ndStaticMeshFaceQuery</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -127,26 +129,26 @@ D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndPolygonM
 D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SortFaceArray</b> ()</td></tr>
 <tr class="separator:a6343f88d2bf821642c4bdf0084b299cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66c4d20153eb8b2efeeb837d20ea6aab"><td class="memItemLeft" align="right" valign="top"><a id="a66c4d20153eb8b2efeeb837d20ea6aab"></a>
-ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSeparetionDistance</b> () const</td></tr>
+D_COLLISION_API ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSeparetionDistance</b> () const</td></tr>
 <tr class="separator:a66c4d20153eb8b2efeeb837d20ea6aab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c74f121c323da5be47ec77218201c22"><td class="memItemLeft" align="right" valign="top"><a id="a5c74f121c323da5be47ec77218201c22"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDistanceTravel</b> (const <a class="el" href="classnd_vector.html">ndVector</a> &amp;distanceInGlobalSpace)</td></tr>
-<tr class="separator:a5c74f121c323da5be47ec77218201c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68146a8019c0d306e1f32a696345fc6e"><td class="memItemLeft" align="right" valign="top"><a id="a68146a8019c0d306e1f32a696345fc6e"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceIndexCount</b> (ndInt32 indexCount) const</td></tr>
+D_COLLISION_API ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceIndexCount</b> (ndInt32 indexCount) const</td></tr>
 <tr class="separator:a68146a8019c0d306e1f32a696345fc6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d614198e2b3a00dd4e7a6a15125a9ad"><td class="memItemLeft" align="right" valign="top"><a id="a9d614198e2b3a00dd4e7a6a15125a9ad"></a>
-const ndInt32 *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAdjacentFaceEdgeNormalArray</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
-<tr class="separator:a9d614198e2b3a00dd4e7a6a15125a9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed2c2e62242750dac9d4f909907a6c8f"><td class="memItemLeft" align="right" valign="top"><a id="aed2c2e62242750dac9d4f909907a6c8f"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetNormalIndex</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
-<tr class="separator:aed2c2e62242750dac9d4f909907a6c8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c74f121c323da5be47ec77218201c22"><td class="memItemLeft" align="right" valign="top"><a id="a5c74f121c323da5be47ec77218201c22"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDistanceTravel</b> (const <a class="el" href="classnd_vector.html">ndVector</a> &amp;distanceInGlobalSpace)</td></tr>
+<tr class="separator:a5c74f121c323da5be47ec77218201c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20a82d64dbcdfea26423bba9b8e486dc"><td class="memItemLeft" align="right" valign="top"><a id="a20a82d64dbcdfea26423bba9b8e486dc"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceId</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
+D_COLLISION_API ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceId</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
 <tr class="separator:a20a82d64dbcdfea26423bba9b8e486dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed2c2e62242750dac9d4f909907a6c8f"><td class="memItemLeft" align="right" valign="top"><a id="aed2c2e62242750dac9d4f909907a6c8f"></a>
+D_COLLISION_API ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetNormalIndex</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
+<tr class="separator:aed2c2e62242750dac9d4f909907a6c8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3a58f2f908f80e71ffd5457e04a0810"><td class="memItemLeft" align="right" valign="top"><a id="aa3a58f2f908f80e71ffd5457e04a0810"></a>
-ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceSize</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
+D_COLLISION_API ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceSize</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
 <tr class="separator:aa3a58f2f908f80e71ffd5457e04a0810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83d1abef6185e7bfb8c7cc8fa4668617"><td class="memItemLeft" align="right" valign="top"><a id="a83d1abef6185e7bfb8c7cc8fa4668617"></a>
+D_COLLISION_API const ndInt32 *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAdjacentFaceEdgeNormalArray</b> (const ndInt32 *const faceIndexArray, ndInt32 indexCount) const</td></tr>
+<tr class="separator:a83d1abef6185e7bfb8c7cc8fa4668617"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_fast_aabb"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_fast_aabb')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_fast_aabb.html">ndFastAabb</a></td></tr>
 <tr class="memitem:a83e9e764215bbe48039348e3b5266911 inherit pub_methods_classnd_fast_aabb"><td class="memItemLeft" align="right" valign="top"><a id="a83e9e764215bbe48039348e3b5266911"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ndFastAabb</b> (const <a class="el" href="classnd_vector.html">ndVector</a> &amp;p0, const <a class="el" href="classnd_vector.html">ndVector</a> &amp;p1)</td></tr>
@@ -275,9 +277,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a3e5eeadb721514293e3595a17bbbfd96"><td class="memItemLeft" align="right" valign="top"><a id="a3e5eeadb721514293e3595a17bbbfd96"></a>
 <a class="el" href="classnd_vector.html">ndVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_boxDistanceTravelInMeshSpace</b></td></tr>
 <tr class="separator:a3e5eeadb721514293e3595a17bbbfd96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac77fa600fc918b359d0da390b2c6d6f5"><td class="memItemLeft" align="right" valign="top"><a id="ac77fa600fc918b359d0da390b2c6d6f5"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_faceCount</b></td></tr>
-<tr class="separator:ac77fa600fc918b359d0da390b2c6d6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a77531d879f037b3f06d6b11d6cc887"><td class="memItemLeft" align="right" valign="top"><a id="a2a77531d879f037b3f06d6b11d6cc887"></a>
 ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertexStrideInBytes</b></td></tr>
 <tr class="separator:a2a77531d879f037b3f06d6b11d6cc887"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -293,33 +292,15 @@ ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_skinMargin</b>
 <tr class="memitem:a863f1a73ff73ed243db662d6b8bacc44"><td class="memItemLeft" align="right" valign="top"><a id="a863f1a73ff73ed243db662d6b8bacc44"></a>
 ndFloat32 *&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertex</b></td></tr>
 <tr class="separator:a863f1a73ff73ed243db662d6b8bacc44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1f00e9b7e889f7597cfd99057a8f685"><td class="memItemLeft" align="right" valign="top"><a id="ac1f00e9b7e889f7597cfd99057a8f685"></a>
-ndInt32 *&#160;</td><td class="memItemRight" valign="bottom"><b>m_faceIndexCount</b></td></tr>
-<tr class="separator:ac1f00e9b7e889f7597cfd99057a8f685"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a588896fd6cdc3ca03dcf6a01ae95546e"><td class="memItemLeft" align="right" valign="top"><a id="a588896fd6cdc3ca03dcf6a01ae95546e"></a>
-ndInt32 *&#160;</td><td class="memItemRight" valign="bottom"><b>m_faceVertexIndex</b></td></tr>
-<tr class="separator:a588896fd6cdc3ca03dcf6a01ae95546e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab279f39bf426eadb4907bbbb374dcb10"><td class="memItemLeft" align="right" valign="top"><a id="ab279f39bf426eadb4907bbbb374dcb10"></a>
-<a class="el" href="classnd_polygon_mesh_desc_1_1nd_mesh.html">ndMesh</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_meshData</b></td></tr>
-<tr class="separator:ab279f39bf426eadb4907bbbb374dcb10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3239dd0e70e598be11883fc6138415c1"><td class="memItemLeft" align="right" valign="top"><a id="a3239dd0e70e598be11883fc6138415c1"></a>
-ndInt32 *&#160;</td><td class="memItemRight" valign="bottom"><b>m_faceIndexStart</b></td></tr>
-<tr class="separator:a3239dd0e70e598be11883fc6138415c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57874fc5ba88565d8ca9e51999542963"><td class="memItemLeft" align="right" valign="top"><a id="a57874fc5ba88565d8ca9e51999542963"></a>
-ndFloat32 *&#160;</td><td class="memItemRight" valign="bottom"><b>m_hitDistance</b></td></tr>
-<tr class="separator:a57874fc5ba88565d8ca9e51999542963"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86465c081436a0b10becba8ebba7d2a1"><td class="memItemLeft" align="right" valign="top"><a id="a86465c081436a0b10becba8ebba7d2a1"></a>
-const <a class="el" href="classnd_shape_static_mesh.html">ndShapeStaticMesh</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_me</b></td></tr>
-<tr class="separator:a86465c081436a0b10becba8ebba7d2a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5562e45611dd25d9d2ba94fb44db2c6"><td class="memItemLeft" align="right" valign="top"><a id="ad5562e45611dd25d9d2ba94fb44db2c6"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_globalFaceVertexIndex</b> [D_MAX_COLLIDING_INDICES]</td></tr>
-<tr class="separator:ad5562e45611dd25d9d2ba94fb44db2c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a922a47b5fa7681c096de74cec40619"><td class="memItemLeft" align="right" valign="top"><a id="a1a922a47b5fa7681c096de74cec40619"></a>
+<a class="el" href="classnd_polygon_mesh_desc_1_1nd_static_mesh_face_query.html">ndStaticMeshFaceQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_staticMeshQuery</b></td></tr>
+<tr class="separator:a1a922a47b5fa7681c096de74cec40619"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea5fb8d9dc63aa70f1b0faa388e9d2ef"><td class="memItemLeft" align="right" valign="top"><a id="aea5fb8d9dc63aa70f1b0faa388e9d2ef"></a>
+<a class="el" href="classnd_polygon_mesh_desc_1_1nd_procedural_static_mesh_face_query.html">ndProceduralStaticMeshFaceQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_proceduralStaticMeshFaceQuery</b></td></tr>
+<tr class="separator:aea5fb8d9dc63aa70f1b0faa388e9d2ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad144922543610a89b7a789983050bc94"><td class="memItemLeft" align="right" valign="top"><a id="ad144922543610a89b7a789983050bc94"></a>
 ndFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_maxT</b></td></tr>
 <tr class="separator:ad144922543610a89b7a789983050bc94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67f7506da2e91a203f9bed7ced087832"><td class="memItemLeft" align="right" valign="top"><a id="a67f7506da2e91a203f9bed7ced087832"></a>
-ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_globalIndexCount</b></td></tr>
-<tr class="separator:a67f7506da2e91a203f9bed7ced087832"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0972f06a85dd5954f847917bcd1e4bbc"><td class="memItemLeft" align="right" valign="top"><a id="a0972f06a85dd5954f847917bcd1e4bbc"></a>
 ndInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_threadId</b></td></tr>
 <tr class="separator:a0972f06a85dd5954f847917bcd1e4bbc"><td class="memSeparator" colspan="2">&#160;</td></tr>

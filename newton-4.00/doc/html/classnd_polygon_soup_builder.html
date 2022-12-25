@@ -133,17 +133,20 @@ Public Member Functions</h2></td></tr>
 D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndPolygonSoupBuilder</b> (const <a class="el" href="classnd_polygon_soup_builder.html">ndPolygonSoupBuilder</a> &amp;sopurce)</td></tr>
 <tr class="separator:af3134ffafdd7cf0c070d3550f396894a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa6fdbe95e45be7893f3723455900819"><td class="memItemLeft" align="right" valign="top"><a id="afa6fdbe95e45be7893f3723455900819"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Begin</b> ()</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Begin</b> ()</td></tr>
 <tr class="separator:afa6fdbe95e45be7893f3723455900819"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72cd94c140a174a9ecf822607c99d065"><td class="memItemLeft" align="right" valign="top"><a id="a72cd94c140a174a9ecf822607c99d065"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>End</b> (bool optimize)</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>End</b> (bool optimize)</td></tr>
 <tr class="separator:a72cd94c140a174a9ecf822607c99d065"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33e63d731842b766fed5c871347fdcc1"><td class="memItemLeft" align="right" valign="top"><a id="a33e63d731842b766fed5c871347fdcc1"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddFace</b> (const ndFloat32 *const vertex, ndInt32 strideInBytes, ndInt32 vertexCount, const ndInt32 faceId)</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddFace</b> (const ndFloat32 *const vertex, ndInt32 strideInBytes, ndInt32 vertexCount, const ndInt32 faceId)</td></tr>
 <tr class="separator:a33e63d731842b766fed5c871347fdcc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5469377ec1d757dc0817043c672bebb1"><td class="memItemLeft" align="right" valign="top"><a id="a5469377ec1d757dc0817043c672bebb1"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddFaceIndirect</b> (const ndFloat32 *const vertex, ndInt32 strideInBytes, ndInt32 faceId, const ndInt32 *const indexArray, ndInt32 indexCount)</td></tr>
+virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddFaceIndirect</b> (const ndFloat32 *const vertex, ndInt32 strideInBytes, ndInt32 faceId, const ndInt32 *const indexArray, ndInt32 indexCount)</td></tr>
 <tr class="separator:a5469377ec1d757dc0817043c672bebb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeeea2c1ca75c6461f367551870aeeb74"><td class="memItemLeft" align="right" valign="top"><a id="aeeea2c1ca75c6461f367551870aeeb74"></a>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>LoadPLY</b> (const char *const fileName)</td></tr>
+<tr class="separator:aeeea2c1ca75c6461f367551870aeeb74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a402184735c95aeaa5939af6301d159a3"><td class="memItemLeft" align="right" valign="top"><a id="a402184735c95aeaa5939af6301d159a3"></a>
 D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SavePLY</b> (const char *const fileName) const</td></tr>
 <tr class="separator:a402184735c95aeaa5939af6301d159a3"><td class="memSeparator" colspan="2">&#160;</td></tr>

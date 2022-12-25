@@ -4,7 +4,7 @@ var classnd_multi_body_vehicle_motor =
     [ "ndMultiBodyVehicleMotor", "classnd_multi_body_vehicle_motor.html#a9254ca00261a61039fa52679bd7b9ed6", null ],
     [ "D_CLASS_REFLECTION", "classnd_multi_body_vehicle_motor.html#aa410a392d418611d566fb341f859251e", null ],
     [ "GetRpm", "classnd_multi_body_vehicle_motor.html#ac72db240f2179b1d3bbffb899f4fa5d2", null ],
-    [ "SetFrictionLose", "classnd_multi_body_vehicle_motor.html#a82fb14a7a752223f4acebf2f1ebe4ffb", null ],
+    [ "SetFrictionLoss", "classnd_multi_body_vehicle_motor.html#a4c70dad09f73b3e29366ae12246c7ed8", null ],
     [ "SetMaxRpm", "classnd_multi_body_vehicle_motor.html#a4cad3bd087a6015ee3f808297c725d86", null ],
     [ "SetOmegaAccel", "classnd_multi_body_vehicle_motor.html#a45e594841d816c260b85b6f2e359e7f7", null ],
     [ "SetTorqueAndRpm", "classnd_multi_body_vehicle_motor.html#a60284f57c6cd866147a49116048d2894", null ],
