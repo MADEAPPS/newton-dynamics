@@ -123,7 +123,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "biped test two", ndBipedTest_2 },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
-	{ "quadruped test three", ndQuadrupedTest_3},
+	{ "quadruped test three", ndQuadrupedTest_3 },
 	{ "train biped test two", ndBipedTest_2Trainer },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
