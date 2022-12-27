@@ -37,9 +37,7 @@
 	//#define REPLAY_RECORD
 #endif
 
-#define PROJECTILE_INITIAL_SPEED	20.0f
-
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -59,7 +57,7 @@
 //#define DEFAULT_SCENE	17		// rag doll
 //#define DEFAULT_SCENE	18		// biped test 1
 //#define DEFAULT_SCENE	19		// biped test 2
-#define DEFAULT_SCENE	20		// quadruped test 1
+//#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// train biped test 2
