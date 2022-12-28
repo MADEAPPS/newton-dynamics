@@ -22,7 +22,7 @@ ndGameControllerInputs::~ndGameControllerInputs()
 {
 }
 
-void ndGameControllerInputs::GetKeyboardInputs(ndDemoEntityManager* const scene)
+bool ndGameControllerInputs::GetKeyboardInputs(ndDemoEntityManager* const scene)
 {
 	m_buttons.SetCount(m_buttonCount);
 	m_buttons[m_button_00] = scene->GetKeyState(' ');
@@ -38,10 +38,45 @@ void ndGameControllerInputs::GetKeyboardInputs(ndDemoEntityManager* const scene)
 	m_axis.SetCount(m_axisCount);
 	ndFloat32 steerAngle = ndFloat32(scene->GetKeyState('A')) - ndFloat32(scene->GetKeyState('D'));
 	m_keyBoardSteerAngle += (steerAngle - m_keyBoardSteerAngle) * 0.10f;
+	m_keyBoardSteerAngle = (m_keyBoardSteerAngle < (1.0e-4f)) ? (m_keyBoardSteerAngle > (-1.0e-4f) ? 0.0f : m_keyBoardSteerAngle) : m_keyBoardSteerAngle;
 	m_axis[m_azis_00] = m_keyBoardSteerAngle;
 	m_axis[m_azis_01] = ndFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
 	m_axis[m_azis_02] = ndFloat32(scene->GetKeyState('S') ? 1.0f : 0.0f);
 	m_axis[m_azis_03] = ndFloat32(0.0f);
+
+//static int frame;
+//frame++;
+//bool check = false;
+//for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
+//{
+//	if (m_buttons[i])
+//	{
+//		check = true;
+//	}
+//}
+//if (check)
+//{
+//	ndTrace(("\n%d: ", frame));
+//	for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
+//	{
+//		if (m_buttons[i])
+//		{
+//			ndTrace(("(%d %d) ", i, m_buttons[i]));
+//		}
+//	}
+//}
+	
+	char ret = false;
+	for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
+	{
+		ret = ret | m_buttons[i];
+	}
+	for (ndInt32 i = 0; i < m_axis.GetCount(); ++i)
+	{
+		ret = ret | ((m_axis[i] != 0.0f) ? 1 : 0);
+	}
+
+	return ret ? true : false;
 }
 
 void ndGameControllerInputs::GetJoystickInputs(ndDemoEntityManager* const scene)
@@ -205,20 +240,29 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 		}										
 	}
 
-//static int frame;
-//frame++;
-//ndTrace(("\n%d: ", frame));
-//for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
-//{
-//	if (unmappedButtons[i])
-//		ndTrace(("(%d %d) ", i, unmappedButtons[i]));
-//}
-
 	m_buttons.SetCount(m_buttonCount);
 	for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
 	{
 		m_buttons[buttonMapping[i]] = unmappedButtons[i];
 	}
+
+//static int frame;
+//frame++;
+//bool check = false;
+//for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
+//{
+//	if (m_buttons[i])
+//		check = true;
+//}
+//if (check)
+//{
+//	ndTrace(("\n%d: ", frame));
+//	for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
+//	{
+//		if (m_buttons[i])
+//			ndTrace(("(%d %d) ", i, m_buttons[i]));
+//	}
+//}
 
 	if (!axisMapping.GetCount())
 	{
@@ -245,20 +289,23 @@ void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
 {
 	if (scene->JoystickDetected())
 	{
-		char joystickName[256];
-		strcpy(&joystickName[0], glfwGetJoystickName(0));
-		strtolwr(joystickName);
-		if (strstr(joystickName, "wheel"))
+		if (!GetKeyboardInputs(scene))
 		{
-			GetWheelJoystickInputs(scene);
-		}
-		else if (strstr(joystickName, "xbox"))
-		{
-			GetXboxJoystickInputs(scene);
-		}
-		else
-		{
-			GetJoystickInputs(scene);
+			char joystickName[256];
+			strcpy(&joystickName[0], glfwGetJoystickName(0));
+			strtolwr(joystickName);
+			if (strstr(joystickName, "wheel"))
+			{
+				GetWheelJoystickInputs(scene);
+			}
+			else if (strstr(joystickName, "xbox"))
+			{
+				GetXboxJoystickInputs(scene);
+			}
+			else
+			{
+				GetJoystickInputs(scene);
+			}
 		}
 	}
 	else

@@ -1354,7 +1354,9 @@ void ndScene::InitBodyArray()
 			body->PrepareStep(i);
 			ndUnsigned8 sceneEquilibrium = 1;
 			ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
-			if (ndUnsigned8(!body->m_equilibrium) | sceneForceUpdate)
+			ndUnsigned8 moving = !body->m_equilibrium;
+			//if (ndUnsigned8(!body->m_equilibrium) | sceneForceUpdate)
+			if (moving | sceneForceUpdate)
 			{
 				ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
 				ndAssert(bodyNode->GetAsSceneBodyNode());

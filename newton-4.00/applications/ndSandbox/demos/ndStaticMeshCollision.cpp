@@ -50,9 +50,9 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	ndDemoEntity* const man = ndDemoEntity::LoadFbx("walker.fbx", scene);
 
-	ndFloat32 height = 1.9f;
-	ndFloat32 radio = 0.5f;
-	ndFloat32 mass = 100.0f;
+	//ndFloat32 height = 1.9f;
+	//ndFloat32 radio = 0.5f;
+	//ndFloat32 mass = 100.0f;
 	//new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_x += 8.0f;

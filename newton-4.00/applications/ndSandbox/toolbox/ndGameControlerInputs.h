@@ -49,7 +49,7 @@ class ndGameControllerInputs
 	void Update(ndDemoEntityManager* const scene);
 
 	private:
-	void GetKeyboardInputs(ndDemoEntityManager* const scene);
+	bool GetKeyboardInputs(ndDemoEntityManager* const scene);
 	void GetJoystickInputs(ndDemoEntityManager* const scene);
 	void GetXboxJoystickInputs(ndDemoEntityManager* const scene);
 	void GetWheelJoystickInputs(ndDemoEntityManager* const scene);

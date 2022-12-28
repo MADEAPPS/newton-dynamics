@@ -240,10 +240,10 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
 		:ndVehicleCommon(desc)
+		,m_vehicleUI(vehicleUI)
 		,m_skipMarks(nullptr)
 		,m_startSound(nullptr)
 		,m_engineRpmSound(nullptr)
-		,m_vehicleUI(vehicleUI)
 		,m_rearAxlePivot(nullptr)
 		,m_frontAxlePivot(nullptr)
 		,m_rr_tire(nullptr)

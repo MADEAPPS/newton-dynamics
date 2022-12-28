@@ -847,7 +847,10 @@ void ndMultiBodyVehicle::CalculateNormalizedAlgningTorque(ndMultiBodyVehicleTire
 	
 	static int xxxx;
 	xxxx++;
-	if (xxxx % 1000 == 0) ndTrace(("aligning torque\n"));
+	if (xxxx % 1000 == 0)
+	{
+		ndTrace(("aligning torque\n"));
+	}
 	//ndFloat32 alignTorque = ndFloat32(0.0f);
 	//ndFloat32 sign = ndSign(alignTorque);
 	//tire->m_normalizedAligningTorque = sign * ndMax(ndAbs(alignTorque), ndAbs(tire->m_normalizedAligningTorque));

@@ -606,12 +606,13 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndSharedPtr<ndBody> axleBody(MakeChildPart(scene, m_chassis, "front_axel", m_configuration.m_chassisMass * 0.2f));
 		
 		// connect the part to the main body with a hinge
+		ndWorld* const world = scene->GetWorld();
 		ndMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody->GetAsBodyKinematic(), chassis);
+		hinge->SetLimitState(true);
 		hinge->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
 		ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-
-		ndWorld* const world = scene->GetWorld();
+		
 		world->AddBody(axleBody);
 		world->AddJoint(hingePtr);
 		return axleBody->GetAsBodyKinematic();
