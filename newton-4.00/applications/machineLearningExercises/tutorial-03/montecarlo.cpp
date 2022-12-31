@@ -41,16 +41,16 @@ class Direction
 	enum Dir
 	{
 		north,
-		east,
 		south,
+		east,
 		west
 	};
 
 	Direction()
 	{
 		m_dir[0] = north;
-		m_dir[1] = east;
-		m_dir[2] = south;
+		m_dir[1] = south;
+		m_dir[2] = east;
 		m_dir[3] = west;
 	}
 
@@ -63,8 +63,8 @@ class SimpleGridWorld
 	struct StateStep
 	{
 		Point m_posit;
-		int m_reward;
 		int m_action;
+		int m_reward;
 		bool m_isTerminal;
 	};
 
@@ -181,6 +181,9 @@ class MonteCarloGeneration
 		m_enviroment.Print();
 		Point state = m_enviroment.m_curPosition;
 
+static int xxxx;
+xxxx++;
+
 		buffer.resize(0);
 		while (!terminal)
 		{
@@ -248,6 +251,17 @@ class MonteCarloExperiment
 			:std::map<DictKey, float>()
 		{
 		}
+
+		float GetValue(const DictKey& key) const
+		{
+			float value = 0;
+			const_iterator node = find(key);
+			if (node != end())
+			{
+				value = node->second;
+			}
+			return value;
+		}
 	};
 
 	MonteCarloExperiment()
@@ -257,7 +271,15 @@ class MonteCarloExperiment
 
 	float ActionValue(Point& state, int action)
 	{
-		return 0;
+		DictKey key(state, action);
+		float value = 0.0f;
+		if (m_counts.find(key) != m_counts.end())
+		{
+			float num = m_values.GetValue(key);
+			float den = m_counts.GetValue(key);
+			value = num/den;
+		}
+		return value;
 	}
 
 	void RunEpisode()
@@ -265,6 +287,8 @@ class MonteCarloExperiment
 		std::vector<SimpleGridWorld::StateStep> trajectoty;
 		m_generator.Run(trajectoty);
 		int episodeReward = 0;
+		//m_values.clear();
+		//m_counts.clear();
 		for (int i = trajectoty.size() - 1; i >= 0; --i)
 		{
 			SimpleGridWorld::StateStep stateActionReward(trajectoty[i]);
@@ -307,7 +331,7 @@ void TestTrajectory()
 void RunEpisode()
 {
 	MonteCarloExperiment agent;
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		agent.RunEpisode();
 
@@ -315,7 +339,7 @@ void RunEpisode()
 		for (int j = 0; j < sizeof(Direction::m_dir) / sizeof(Direction::m_dir[0]); ++j)
 		{
 			int d = agent.m_generator.m_enviroment.m_actionSpace.m_dir[j];
-			float value = agent.ActionValue(Point(3, 0), d);
+			float value = agent.ActionValue(Point(1, 3), d);
 			printf("%f ", value);
 		}
 		printf("]\n");

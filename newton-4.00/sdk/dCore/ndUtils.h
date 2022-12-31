@@ -265,11 +265,11 @@ class ndScopeSpinLock
 class ndFloatExceptions
 {
 	public:
-	//#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-	#if defined (WIN32) || defined(_WIN32)
-		#define D_FLOAT_EXCEPTIONS_MASK	(EM_INVALID | EM_DENORMAL)
+	//#if defined (WIN32) || defined(_WIN32)
+	#if defined (_MSC_VER)
+		#define D_FLOAT_EXCEPTIONS_MASK	(_EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL)
 	#else
-		#define D_FLOAT_EXCEPTIONS_MASK	(FE_INVALID | FE_INEXACT)
+		#define D_FLOAT_EXCEPTIONS_MASK	(FE_DIVBYZERO | FE_INVALID | FE_INEXACT)
 	#endif
 
 	D_CORE_API ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXCEPTIONS_MASK);
