@@ -967,7 +967,7 @@ namespace biped2
 		public:
 		ndBipedUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
 			:ndUIEntity(scene)
-			, m_biped(biped)
+			,m_biped(biped)
 		{
 		}
 

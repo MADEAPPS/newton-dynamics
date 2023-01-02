@@ -102,54 +102,227 @@ namespace ndQuadruped_2
 		}
 	};
 
+
+	class ndEffectorPosit
+	{
+		public:
+		ndEffectorPosit()
+		{
+		}
+
+		ndEffectorPosit(ndIkSwivelPositionEffector* const effector)
+			:m_posit(effector->GetLocalTargetPosition())
+			,m_swivel(0.0f)
+			,m_effector(effector)
+		{
+		}
+
+		ndVector m_posit;
+		ndFloat32 m_swivel;
+		ndIkSwivelPositionEffector* m_effector;
+	};
+
+	class ndGaitController: public ndClassAlloc
+	{
+		public:
+		ndGaitController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+			:ndClassAlloc()
+			,m_effectorsPosit(effectorsPosit)
+		{
+		}
+
+		virtual ~ndGaitController()
+		{
+		}
+
+		virtual void ExecuteStep(ndFloat32)
+		{
+			for (ndInt32 i = 0; i < m_effectorsPosit.GetCount(); ++i)
+			{
+				const ndEffectorPosit& posit = m_effectorsPosit[i];
+				posit.m_effector->SetLocalTargetPosition(posit.m_posit);
+				posit.m_effector->SetSwivelAngle(posit.m_swivel);
+			}
+		}
+
+		ndFixSizeArray<ndEffectorPosit, 4> m_effectorsPosit;
+	};
+
+	class ndStandController : public ndGaitController
+	{
+		public:
+		ndStandController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+			:ndGaitController(effectorsPosit)
+		{
+		}
+
+		~ndStandController()
+		{
+		}
+
+		virtual void ExecuteStep(ndFloat32 timestep)
+		{
+			ndGaitController::ExecuteStep(timestep);
+		}
+
+		ndFixSizeArray<ndEffectorPosit, 4> m_effectorsPosit;
+	};
+
+	class ndTrotController : public ndGaitController
+	{
+		public:
+		ndTrotController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+			:ndGaitController(effectorsPosit)
+		{
+		}
+
+		~ndTrotController()
+		{
+		}
+
+		virtual void ExecuteStep(ndFloat32 timestep)
+		{
+			ndGaitController::ExecuteStep(timestep);
+		}
+	};
+
+	class ndWalkController : public ndGaitController
+	{
+		public:
+		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+			:ndGaitController(effectorsPosit)
+		{
+		}
+
+		~ndWalkController()
+		{
+		}
+
+		virtual void ExecuteStep(ndFloat32 timestep)
+		{
+			ndGaitController::ExecuteStep(timestep);
+		}
+	};
+
+	class ndState
+	{
+		public:
+		enum ControllerState
+		{
+			m_stand,
+			m_walk, 
+			m_trot,
+		};
+
+		ndState()
+			:m_controller(nullptr)
+			,m_state(m_stand)
+			,m_state0(m_stand)
+			,m_posit()
+			,m_tick(0)
+		{
+		}
+
+		void Update()
+		{
+			if (m_state != m_state0)
+			{
+				m_state0 = m_state;
+				switch (m_state)
+				{
+					case m_stand:
+					{
+						m_tick = 0;
+						break;
+					}
+
+					case m_walk:
+					{
+						ndAssert(0);
+						m_tick = 0;
+						break;
+					}
+
+					case m_trot:
+					{
+						ndAssert(0);
+						break;
+					}
+				}
+			}
+
+			m_posit.SetCount(0);
+			for (ndInt32 i = 0; i < m_controller->m_effectorsPosit.GetCount(); ++i)
+			{
+				m_posit.PushBack(m_controller->m_effectorsPosit[i]);
+			}
+		}
+
+		ndSharedPtr<ndGaitController> m_controller;
+		ControllerState m_state;
+		ControllerState m_state0;
+		ndFixSizeArray<ndEffectorPosit, 4> m_posit;
+		ndInt32 m_tick;
+	};
+
 	class ndQuadrupedModel : public ndModel
 	{
 		public:
-		#define D_SAMPLES_COUNT 128
-
 		D_CLASS_REFLECTION(ndQuadruped_2::ndQuadrupedModel);
 
-		class ndEffectorInfo
+		class ndQuadrupedUI : public ndUIEntity
 		{
 			public:
-			ndEffectorInfo()
-				:m_basePosition(ndVector::m_wOne)
-				,m_effector(nullptr)
-				,m_swivel(0.0f)
-				,m_x(0.0f)
-				,m_y(0.0f)
-				,m_z(0.0f)
+			ndQuadrupedUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
+				:ndUIEntity(scene)
+				,m_quadruped(quadruped)
 			{
 			}
 
-			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
-				:m_basePosition(effector->GetLocalTargetPosition())
-				,m_effector(effector)
-				,m_swivel(0.0f)
-				,m_x(0.0f)
-				,m_y(0.0f)
-				,m_z(0.0f)
+			~ndQuadrupedUI()
 			{
 			}
 
-			ndVector m_basePosition;
-			ndIkSwivelPositionEffector* m_effector;
-			ndReal m_swivel;
-			ndReal m_x;
-			ndReal m_y;
-			ndReal m_z;
-			ndParamMapper m_x_mapper;
-			ndParamMapper m_y_mapper;
-			ndParamMapper m_z_mapper;
-			ndParamMapper m_swivel_mapper;
+			virtual void RenderUI()
+			{
+			}
+
+			virtual void RenderHelp()
+			{
+				ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+				m_scene->Print(color, "Control panel");
+
+				ndState& control = m_quadruped->m_state;
+				
+				//bool change = false;
+				ImGui::Text("position x");
+				ndInt32 controllerMode = control.m_state;
+				ImGui::RadioButton("stand", &controllerMode, ndState::m_stand);
+				ImGui::RadioButton("walk", &controllerMode, ndState::m_walk);
+				ImGui::RadioButton("trot", &controllerMode, ndState::m_trot);
+				ImGui::Separator();
+
+				bool change = controllerMode != control.m_state;
+				control.m_state = ndState::ControllerState (controllerMode);
+				
+				if (change)
+				{
+					m_quadruped->m_rootBody->SetSleepState(false);
+				}
+			}
+
+			ndQuadrupedModel* m_quadruped;
 		};
 
 		ndQuadrupedModel(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
-			,m_effectorsInfo()
 			,m_effectorsJoints()
+			,m_state()
+			,m_walkController(nullptr)
+			,m_trotController(nullptr)
+			,m_standController(nullptr)
 		{
 			// make a clone of the mesh and add it to the scene
 			ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -180,6 +353,8 @@ namespace ndQuadruped_2
 			
 			const ndMatrix referenceFrame = rootEntity->Find("referenceFrame")->CalculateGlobalMatrix();
 			const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
+
+			ndFixSizeArray<ndEffectorPosit, 4> effectorsPosit;
 			while (stack)
 			{
 				stack--;
@@ -238,13 +413,8 @@ namespace ndQuadruped_2
 							const ndFloat32 workSpace = ndSqrt(dist0.DotProduct(dist0).GetScalar()) + ndSqrt(dist1.DotProduct(dist1).GetScalar());
 							effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.95f);
 							
-							ndEffectorInfo info(effector);
-							info.m_x_mapper = ndParamMapper(-0.2f, 0.2f);
-							info.m_y_mapper = ndParamMapper(-0.06f, 0.4f);
-							info.m_z_mapper = ndParamMapper(-0.1f, 0.1f);
-							info.m_swivel_mapper = ndParamMapper(-20.0f * ndDegreeToRad, 20.0f * ndDegreeToRad);
-							m_effectorsInfo.PushBack(info);
 							m_effectorsJoints.PushBack(effector);
+							effectorsPosit.PushBack(ndEffectorPosit(effector));
 						}
 						break;
 					}
@@ -257,14 +427,22 @@ namespace ndQuadruped_2
 					stack++;
 				}
 			}
+
+			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit));
+			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
+			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
+			m_state.m_controller = m_standController;
 		}
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
-			,m_effectorsInfo()
 			,m_effectorsJoints()
+			,m_state()
+			,m_walkController(nullptr)
+			,m_trotController(nullptr)
+			,m_standController(nullptr)
 		{
 			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -389,19 +567,10 @@ namespace ndQuadruped_2
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
 			{
-				const ndEffectorInfo& info = m_effectorsInfo[i];
-				ndJointBilateralConstraint* const joint = info.m_effector;
+				ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*) *m_effectorsJoints[i];
 				joint->DebugJoint(context);
-
-				//ndMatrix swivelMatrix0;
-				//ndMatrix swivelMatrix1;
-				//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-
-				//ndVector posit1(swivelMatrix1.m_posit);
-				//posit1.m_y += 1.0f;
-				//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
 			}
 		}
 
@@ -418,18 +587,9 @@ namespace ndQuadruped_2
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
-
-			const ndVector frontVector(m_rootBody->GetMatrix().m_front.Scale(-1.0f));
-			for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
-			{
-				ndEffectorInfo& info = m_effectorsInfo[i];
-				ndVector posit(info.m_basePosition);
-				posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-				posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-				posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-				info.m_effector->SetLocalTargetPosition(posit);
-				info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
-			}
+			ndAssert(*m_state.m_controller);
+			m_state.m_controller->ExecuteStep(timestep);
+			m_state.Update();
 
 			ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 			ndAssert(skeleton);
@@ -451,62 +611,14 @@ namespace ndQuadruped_2
 
 		ndIkSolver m_invDynamicsSolver;
 		ndBodyDynamic* m_rootBody;
-		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
+
+		ndState m_state;
+		ndSharedPtr<ndGaitController> m_walkController;
+		ndSharedPtr<ndGaitController> m_trotController;
+		ndSharedPtr<ndGaitController> m_standController;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_2::ndQuadrupedModel);
-
-	class ndQuadrupedUI : public ndUIEntity
-	{
-		public:
-		ndQuadrupedUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
-			:ndUIEntity(scene)
-			,m_quadruped(quadruped)
-		{
-		}
-
-		~ndQuadrupedUI()
-		{
-		}
-
-		virtual void RenderUI()
-		{
-		}
-
-		virtual void RenderHelp()
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			m_scene->Print(color, "Control panel");
-
-			ndQuadrupedModel::ndEffectorInfo& info = m_quadruped->m_effectorsInfo[0];
-
-			bool change = false;
-			ImGui::Text("position x");
-			change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
-			ImGui::Text("position y");
-			change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-			ImGui::Text("position z");
-			change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
-
-			ImGui::Text("swivel");
-			change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
-
-			if (change)
-			{
-				m_quadruped->m_rootBody->SetSleepState(false);
-
-				for (ndInt32 i = 1; i < m_quadruped->m_effectorsInfo.GetCount(); ++i)
-				{
-					m_quadruped->m_effectorsInfo[i].m_x = info.m_x;
-					m_quadruped->m_effectorsInfo[i].m_y = info.m_y;
-					m_quadruped->m_effectorsInfo[i].m_z = info.m_z;
-					m_quadruped->m_effectorsInfo[i].m_swivel = info.m_swivel;
-				}
-			}
-		}
-
-		ndQuadrupedModel* m_quadruped;
-	};
 };
 
 using namespace ndQuadruped_2;
@@ -555,15 +667,15 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 	
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 
-	ndQuadrupedUI* const quadrupedUI = new ndQuadrupedUI(scene, robot0);
+	ndQuadrupedModel::ndQuadrupedUI* const quadrupedUI = new ndQuadrupedModel::ndQuadrupedUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
 	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 	
-	matrix.m_posit.m_x -= 5.0f;
+	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 1.5f;
-	matrix.m_posit.m_z += 0.25f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	matrix.m_posit.m_z += 5.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
