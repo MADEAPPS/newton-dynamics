@@ -216,11 +216,22 @@ namespace ndQuadruped_2
 
 		ndState()
 			:m_controller(nullptr)
+			,m_walkController(nullptr)
+			,m_trotController(nullptr)
+			,m_standController(nullptr)
 			,m_state(m_stand)
 			,m_state0(m_stand)
 			,m_posit()
 			,m_tick(0)
 		{
+		}
+
+		void Init(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+		{
+			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit));
+			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
+			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
+			m_controller = m_standController;
 		}
 
 		void Update()
@@ -233,6 +244,7 @@ namespace ndQuadruped_2
 					case m_stand:
 					{
 						m_tick = 0;
+						m_controller = m_standController;
 						break;
 					}
 
@@ -240,12 +252,15 @@ namespace ndQuadruped_2
 					{
 						ndAssert(0);
 						m_tick = 0;
+						m_controller = m_walkController;
 						break;
 					}
 
 					case m_trot:
 					{
 						ndAssert(0);
+						m_tick = 0;
+						m_controller = m_trotController;
 						break;
 					}
 				}
@@ -259,6 +274,9 @@ namespace ndQuadruped_2
 		}
 
 		ndSharedPtr<ndGaitController> m_controller;
+		ndSharedPtr<ndGaitController> m_walkController;
+		ndSharedPtr<ndGaitController> m_trotController;
+		ndSharedPtr<ndGaitController> m_standController;
 		ControllerState m_state;
 		ControllerState m_state0;
 		ndFixSizeArray<ndEffectorPosit, 4> m_posit;
@@ -320,9 +338,6 @@ namespace ndQuadruped_2
 			,m_rootBody(nullptr)
 			,m_effectorsJoints()
 			,m_state()
-			,m_walkController(nullptr)
-			,m_trotController(nullptr)
-			,m_standController(nullptr)
 		{
 			// make a clone of the mesh and add it to the scene
 			ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -428,10 +443,7 @@ namespace ndQuadruped_2
 				}
 			}
 
-			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit));
-			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
-			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
-			m_state.m_controller = m_standController;
+			m_state.Init(effectorsPosit);
 		}
 
 		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -440,11 +452,10 @@ namespace ndQuadruped_2
 			,m_rootBody(nullptr)
 			,m_effectorsJoints()
 			,m_state()
-			,m_walkController(nullptr)
-			,m_trotController(nullptr)
-			,m_standController(nullptr)
 		{
 			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
+
+			//m_state.Init(effectorsPosit);
 
 			ndAssert(0);
 			const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
@@ -614,9 +625,6 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 
 		ndState m_state;
-		ndSharedPtr<ndGaitController> m_walkController;
-		ndSharedPtr<ndGaitController> m_trotController;
-		ndSharedPtr<ndGaitController> m_standController;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_2::ndQuadrupedModel);
 };
