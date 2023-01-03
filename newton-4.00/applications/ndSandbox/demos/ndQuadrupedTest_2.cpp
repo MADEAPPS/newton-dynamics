@@ -207,6 +207,10 @@ namespace ndQuadruped_2
 		{
 		}
 
+		virtual void OnChangeState()
+		{
+		}
+
 		virtual ndSupportContacts GetSupportContacts() const
 		{
 			return ndSupportContacts();
@@ -405,7 +409,7 @@ namespace ndQuadruped_2
 				ndInt32 controllerMode = control.m_state;
 				ImGui::RadioButton("stand", &controllerMode, ndState::m_stand);
 				ImGui::RadioButton("walk", &controllerMode, ndState::m_walk);
-				ImGui::RadioButton("trot", &controllerMode, ndState::m_trot);
+				//ImGui::RadioButton("trot", &controllerMode, ndState::m_trot);
 				ImGui::Separator();
 
 				bool change = controllerMode != control.m_state;
