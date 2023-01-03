@@ -125,6 +125,36 @@ namespace ndQuadruped_2
 	class ndGaitController: public ndClassAlloc
 	{
 		public:
+		class ndContactSequence
+		{
+			public:
+			ndContactSequence()
+			{
+				Init();
+			}
+
+			ndContactSequence(ndInt32 index)
+			{
+				Init();
+				m_mask[index] = 0;
+			}
+
+			void Init()
+			{
+				m_mask[0] = 1;
+				m_mask[1] = 1;
+				m_mask[2] = 1;
+				m_mask[3] = 1;
+			}
+
+			ndInt32 operator[] (ndInt32 i) const
+			{
+				return m_mask[i];
+			}
+
+			ndInt32 m_mask[4];
+		};
+
 		ndGaitController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 			:ndClassAlloc()
 			,m_effectorsPosit(effectorsPosit)
@@ -189,9 +219,18 @@ namespace ndQuadruped_2
 	class ndWalkController : public ndGaitController
 	{
 		public:
+
 		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 			:ndGaitController(effectorsPosit)
 		{
+			m_sequence.PushBack(ndContactSequence());
+			m_sequence.PushBack(ndContactSequence(2));
+			m_sequence.PushBack(ndContactSequence());
+			m_sequence.PushBack(ndContactSequence(0));
+			m_sequence.PushBack(ndContactSequence());
+			m_sequence.PushBack(ndContactSequence(3));
+			m_sequence.PushBack(ndContactSequence());
+			m_sequence.PushBack(ndContactSequence(1));
 		}
 
 		~ndWalkController()
@@ -200,8 +239,12 @@ namespace ndQuadruped_2
 
 		virtual void ExecuteStep(ndFloat32 timestep)
 		{
+
+
 			ndGaitController::ExecuteStep(timestep);
 		}
+
+		ndFixSizeArray<ndContactSequence, 8> m_sequence;
 	};
 
 	class ndState
@@ -219,7 +262,7 @@ namespace ndQuadruped_2
 			,m_walkController(nullptr)
 			,m_trotController(nullptr)
 			,m_standController(nullptr)
-			,m_state(m_stand)
+			,m_state(m_walk)
 			,m_state0(m_stand)
 			,m_posit()
 			,m_tick(0)
@@ -250,7 +293,6 @@ namespace ndQuadruped_2
 
 					case m_walk:
 					{
-						ndAssert(0);
 						m_tick = 0;
 						m_controller = m_walkController;
 						break;
@@ -266,6 +308,7 @@ namespace ndQuadruped_2
 				}
 			}
 
+			m_tick++;
 			m_posit.SetCount(0);
 			for (ndInt32 i = 0; i < m_controller->m_effectorsPosit.GetCount(); ++i)
 			{
