@@ -25,6 +25,7 @@ class ndSharedPtr
 	void Swap(ndSharedPtr& src);
 
 	T* operator->();
+	T* operator->() const;
 
 	T* operator* ();
 	const T* operator* () const;
@@ -142,6 +143,12 @@ const T* ndSharedPtr<T>::operator* () const
 
 template <typename T>
 T* ndSharedPtr<T>::operator-> ()
+{
+	return m_ptr;
+}
+
+template <typename T>
+T* ndSharedPtr<T>::operator-> () const
 {
 	return m_ptr;
 }

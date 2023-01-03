@@ -31,7 +31,7 @@ static ndFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
 	return sign;
 }
 
-ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
+ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 {
 	if (count <= 3)
 	{

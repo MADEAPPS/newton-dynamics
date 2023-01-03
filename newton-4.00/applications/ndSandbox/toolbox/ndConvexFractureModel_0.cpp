@@ -46,7 +46,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 							ndAssert(pointCount < ndInt32(sizeof(pointCloud2d) / sizeof(pointCloud2d[0])));
 						}
 					}
-					pointCount = dConvexHull2d(pointCloud2d, pointCount);
+					pointCount = ndConvexHull2d(pointCloud2d, pointCount);
 
 					ndInt32 k0 = pointCount - 1;
 					for (ndInt32 k = 0; k < pointCount; ++k)
