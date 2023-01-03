@@ -243,20 +243,17 @@ namespace ndQuadruped_2
 			}
 
 			ndInt32 quaterPeriod = sector - 1;
-			ndInt32 base = m_sequence.GetCapacity() - quaterPeriod;
-			//ndFloat32 swingAmplitud = 0.1f;
 			for (ndInt32 i = 0; i < quaterPeriod; ++i)
 			{
 				ndFloat32 h = swingHeight * ndSin(ndPi * i / quaterPeriod);
-				m_sequence[i + base].m_x -= h;
-				m_support[i + base].m_contact[0] = false;
+				m_sequence[i].m_x -= h;
+				m_support[i].m_contact[0] = false;
 			}
 
-			//OffsetSequence(0, 0.00f);
-			m_sequencePhase[0] = 0.0f;
-			OffsetSequence(1, 0.50f);
-			OffsetSequence(2, 0.25f);
-			OffsetSequence(3, 0.75f);
+			OffsetSequence(0, 0.00f);
+			OffsetSequence(1, 0.25f);
+			OffsetSequence(2, 0.75f);
+			OffsetSequence(3, 0.50f);
 		}
 
 		~ndWalkController()
@@ -295,16 +292,22 @@ namespace ndQuadruped_2
 			m_timeAcc = 0.0f;
 		}
 
+		void UpdateEffector(ndInt32 index)
+		{
+			ndInt32 i = GetIndex(m_timeAcc + m_sequencePhase[index] * m_period);
+			ndVector p(m_sequence[i]);
+			m_effectorsPosit[index].m_swivel = p.m_w;
+			p.m_w = 0.0f;
+			m_effectorsPosit[index].m_posit = p;
+		}
+
 		virtual void ExecuteStep(ndFloat32 timestep)
 		{
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
-				ndInt32 index = GetIndex(m_timeAcc + m_sequencePhase[i] * m_period);
-				ndVector p(m_sequence[index]);
-				m_effectorsPosit[i].m_swivel = p.m_w;
-				p.m_w = 0.0f;
-				m_effectorsPosit[i].m_posit = p;
+				UpdateEffector(i);
 			}
+
 			m_timeAcc = ndFmod(m_timeAcc + timestep, m_period);
 		}
 
@@ -338,7 +341,7 @@ namespace ndQuadruped_2
 
 		void Init(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 		{
-			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 10.0f, 0.15f));
+			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 3.0f, 0.15f));
 			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
 			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
 			m_controller = m_standController;
