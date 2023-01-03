@@ -134,38 +134,14 @@ namespace ndQuadruped_2
 				m_contact[2] = true;
 				m_contact[3] = true;
 			}
+
+			bool operator[](ndInt32 index) const
+			{
+				return m_contact[index];
+			}
+
 			bool m_contact[4];
 		};
-
-		//class ndContactSequence
-		//{
-		//	public:
-		//	ndContactSequence()
-		//	{
-		//		Init();
-		//	}
-		//
-		//	ndContactSequence(ndInt32 index)
-		//	{
-		//		Init();
-		//		m_mask[index] = 0;
-		//	}
-		//
-		//	void Init()
-		//	{
-		//		m_mask[0] = 1;
-		//		m_mask[1] = 1;
-		//		m_mask[2] = 1;
-		//		m_mask[3] = 1;
-		//	}
-		//
-		//	ndInt32 operator[] (ndInt32 i) const
-		//	{
-		//		return m_mask[i];
-		//	}
-		//
-		//	ndInt32 m_mask[4];
-		//};
 
 		ndGaitController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 			:ndClassAlloc()
@@ -177,8 +153,14 @@ namespace ndQuadruped_2
 		{
 		}
 
+		virtual void OnChangeState()
+		{
+			ndAssert(0);
+		}
+
 		virtual ndSupportContacts GetSupportContacts() const
 		{
+			ndAssert(0);
 			return ndSupportContacts();
 		}
 
@@ -213,35 +195,6 @@ namespace ndQuadruped_2
 		}
 	};
 
-	class ndWalkController : public ndGaitController
-	{
-		public:
-
-		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
-			:ndGaitController(effectorsPosit)
-		{
-			//m_sequence.PushBack(ndContactSequence());
-			//m_sequence.PushBack(ndContactSequence(2));
-			//m_sequence.PushBack(ndContactSequence());
-			//m_sequence.PushBack(ndContactSequence(0));
-			//m_sequence.PushBack(ndContactSequence());
-			//m_sequence.PushBack(ndContactSequence(3));
-			//m_sequence.PushBack(ndContactSequence());
-			//m_sequence.PushBack(ndContactSequence(1));
-		}
-
-		~ndWalkController()
-		{
-		}
-
-		virtual void ExecuteStep(ndFloat32 timestep)
-		{
-			ndGaitController::ExecuteStep(timestep);
-		}
-
-		//ndFixSizeArray<ndContactSequence, 8> m_sequence;
-	};
-
 	class ndStandController : public ndGaitController
 	{
 		public:
@@ -265,6 +218,80 @@ namespace ndQuadruped_2
 		}
 	};
 
+	class ndWalkController : public ndGaitController
+	{
+		public:
+		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+			:ndGaitController(effectorsPosit)
+		{
+			m_period = 5.0f;
+			ndVector ref(effectorsPosit[0].m_posit);
+			ref.m_w = effectorsPosit[0].m_swivel;
+
+			ndInt32 sector = m_sequence.GetCapacity() / 4;
+			for (ndInt32 i = 0; i < m_sequence.GetCapacity(); i++)
+			{
+				m_sequence.PushBack(ref);
+				m_support.PushBack(ndSupportContacts());
+			}
+
+			ndInt32 period = sector - 1;
+			ndInt32 base = m_sequence.GetCapacity() - period;
+			ndFloat32 swingAmplitud = 0.1f;
+			for (ndInt32 i = 0; i < period; ++i)
+			{
+				ndFloat32 y = swingAmplitud * ndSin(ndPi * i / period);
+				m_sequence[i + base] -= y;
+				m_support[i + base].m_contact[0] = false;
+			}
+
+			OffsetSequence(1, 0.5f);
+			OffsetSequence(2, 0.25f);
+			OffsetSequence(3, 0.75f);
+		}
+
+		~ndWalkController()
+		{
+		}
+
+		virtual ndSupportContacts GetSupportContacts() const
+		{
+			ndInt32 index = ndInt32 (m_timeAcc * m_support.GetCount() / m_period);
+			ndAssert(index >= 0);
+			ndAssert(index < m_support.GetCount());
+			return m_support[index];
+		}
+		
+		void OffsetSequence(ndInt32 index, ndFloat32 phase)
+		{
+			m_sequencePhase[index] = phase;
+
+			ndInt32 offset = ndInt32 (phase * m_support.GetCount());
+			for (ndInt32 i = 0; i < m_support.GetCount(); ++i)
+			{
+				ndInt32 j = (i + offset) % m_support.GetCount();
+				m_support[i].m_contact[index] = m_support[j].m_contact[0];
+			}
+		}
+
+		virtual void OnChangeState()
+		{
+			m_timeAcc = 0.0f;
+		}
+
+		virtual void ExecuteStep(ndFloat32 timestep)
+		{
+			m_timeAcc = ndFmod(m_timeAcc + timestep, m_period);
+			ndGaitController::ExecuteStep(timestep);
+		}
+
+		ndVector m_sequencePhase;
+		ndFixSizeArray<ndVector, 64> m_sequence;
+		ndFixSizeArray<ndSupportContacts, 64> m_support;
+		ndFloat32 m_timeAcc;
+		ndFloat32 m_period;
+	};
+
 	class ndState
 	{
 		public:
@@ -280,10 +307,9 @@ namespace ndQuadruped_2
 			,m_walkController(nullptr)
 			,m_trotController(nullptr)
 			,m_standController(nullptr)
-			,m_state(m_stand)
+			,m_state(m_walk)
 			,m_state0(m_stand)
 			,m_posit()
-			,m_tick(0)
 		{
 		}
 
@@ -309,14 +335,12 @@ namespace ndQuadruped_2
 				{
 					case m_stand:
 					{
-						m_tick = 0;
 						m_controller = m_standController;
 						break;
 					}
 
 					case m_walk:
 					{
-						m_tick = 0;
 						m_controller = m_walkController;
 						break;
 					}
@@ -324,14 +348,13 @@ namespace ndQuadruped_2
 					case m_trot:
 					{
 						ndAssert(0);
-						m_tick = 0;
 						m_controller = m_trotController;
 						break;
 					}
 				}
+				m_controller->OnChangeState();
 			}
 
-			m_tick++;
 			m_posit.SetCount(0);
 			for (ndInt32 i = 0; i < m_controller->m_effectorsPosit.GetCount(); ++i)
 			{
@@ -346,7 +369,6 @@ namespace ndQuadruped_2
 		ControllerState m_state;
 		ControllerState m_state0;
 		ndFixSizeArray<ndEffectorPosit, 4> m_posit;
-		ndInt32 m_tick;
 	};
 
 	class ndQuadrupedModel : public ndModel
@@ -671,7 +693,7 @@ namespace ndQuadruped_2
 				const ndEffectorPosit& effectPosit = m_state.m_posit[i];
 				ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*) effectPosit.m_effector;
 				joint->DebugJoint(context);
-				if (support.m_contact[i])
+				if (support[i])
 				{
 					ndBodyKinematic* const body = joint->GetBody0();
 					contactPoints.PushBack(body->GetMatrix().TransformVector(joint->GetLocalMatrix0().m_posit));
