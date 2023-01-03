@@ -166,12 +166,7 @@ namespace ndQuadruped_2
 
 		virtual void ExecuteStep(ndFloat32)
 		{
-			for (ndInt32 i = 0; i < m_effectorsPosit.GetCount(); ++i)
-			{
-				const ndEffectorPosit& posit = m_effectorsPosit[i];
-				posit.m_effector->SetLocalTargetPosition(posit.m_posit);
-				posit.m_effector->SetSwivelAngle(posit.m_swivel);
-			}
+			ndAssert(0);
 		}
 
 		ndFixSizeArray<ndEffectorPosit, 4> m_effectorsPosit;
@@ -200,6 +195,7 @@ namespace ndQuadruped_2
 		public:
 		ndStandController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 			:ndGaitController(effectorsPosit)
+			,m_standPosit(effectorsPosit)
 		{
 		}
 
@@ -216,19 +212,26 @@ namespace ndQuadruped_2
 			return ndSupportContacts();
 		}
 
-		virtual void ExecuteStep(ndFloat32 timestep)
+		virtual void ExecuteStep(ndFloat32)
 		{
-			ndGaitController::ExecuteStep(timestep);
+			for (ndInt32 i = 0; i < m_effectorsPosit.GetCount(); ++i)
+			{
+				m_effectorsPosit[i].m_posit = m_standPosit[i].m_posit;
+				m_effectorsPosit[i].m_swivel = m_standPosit[i].m_swivel;
+				ndAssert(m_effectorsPosit[i].m_effector == m_standPosit[i].m_effector);
+			}
 		}
+
+		ndFixSizeArray<ndEffectorPosit, 4> m_standPosit;
 	};
 
 	class ndWalkController : public ndGaitController
 	{
 		public:
-		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
+		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit, ndFloat32 cyclePeriod, ndFloat32 swingHeight)
 			:ndGaitController(effectorsPosit)
+			,m_period(cyclePeriod)
 		{
-			m_period = 5.0f;
 			ndVector ref(effectorsPosit[0].m_posit);
 			ref.m_w = effectorsPosit[0].m_swivel;
 
@@ -239,17 +242,19 @@ namespace ndQuadruped_2
 				m_support.PushBack(ndSupportContacts());
 			}
 
-			ndInt32 period = sector - 1;
-			ndInt32 base = m_sequence.GetCapacity() - period;
-			ndFloat32 swingAmplitud = 0.1f;
-			for (ndInt32 i = 0; i < period; ++i)
+			ndInt32 quaterPeriod = sector - 1;
+			ndInt32 base = m_sequence.GetCapacity() - quaterPeriod;
+			//ndFloat32 swingAmplitud = 0.1f;
+			for (ndInt32 i = 0; i < quaterPeriod; ++i)
 			{
-				ndFloat32 y = swingAmplitud * ndSin(ndPi * i / period);
-				m_sequence[i + base] -= y;
+				ndFloat32 h = swingHeight * ndSin(ndPi * i / quaterPeriod);
+				m_sequence[i + base].m_x -= h;
 				m_support[i + base].m_contact[0] = false;
 			}
 
-			OffsetSequence(1, 0.5f);
+			//OffsetSequence(0, 0.00f);
+			m_sequencePhase[0] = 0.0f;
+			OffsetSequence(1, 0.50f);
 			OffsetSequence(2, 0.25f);
 			OffsetSequence(3, 0.75f);
 		}
@@ -258,11 +263,18 @@ namespace ndQuadruped_2
 		{
 		}
 
-		virtual ndSupportContacts GetSupportContacts() const
+		ndInt32 GetIndex(ndFloat32 time) const
 		{
-			ndInt32 index = ndInt32 (m_timeAcc * m_support.GetCount() / m_period);
+			time = ndFmod(time, m_period);
+			ndInt32 index = ndInt32(time * m_support.GetCount() / m_period);
 			ndAssert(index >= 0);
 			ndAssert(index < m_support.GetCount());
+			return index;
+		}
+
+		virtual ndSupportContacts GetSupportContacts() const
+		{
+			ndInt32 index = GetIndex(m_timeAcc);
 			return m_support[index];
 		}
 		
@@ -285,8 +297,15 @@ namespace ndQuadruped_2
 
 		virtual void ExecuteStep(ndFloat32 timestep)
 		{
+			for (ndInt32 i = 0; i < 4; ++i)
+			{
+				ndInt32 index = GetIndex(m_timeAcc + m_sequencePhase[i] * m_period);
+				ndVector p(m_sequence[index]);
+				m_effectorsPosit[i].m_swivel = p.m_w;
+				p.m_w = 0.0f;
+				m_effectorsPosit[i].m_posit = p;
+			}
 			m_timeAcc = ndFmod(m_timeAcc + timestep, m_period);
-			ndGaitController::ExecuteStep(timestep);
 		}
 
 		ndVector m_sequencePhase;
@@ -319,7 +338,7 @@ namespace ndQuadruped_2
 
 		void Init(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 		{
-			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit));
+			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 10.0f, 0.15f));
 			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
 			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
 			m_controller = m_standController;
@@ -362,7 +381,10 @@ namespace ndQuadruped_2
 			m_posit.SetCount(0);
 			for (ndInt32 i = 0; i < m_controller->m_effectorsPosit.GetCount(); ++i)
 			{
-				m_posit.PushBack(m_controller->m_effectorsPosit[i]);
+				const ndEffectorPosit& posit = m_controller->m_effectorsPosit[i];
+				m_posit.PushBack(posit);
+				posit.m_effector->SetLocalTargetPosition(posit.m_posit);
+				posit.m_effector->SetSwivelAngle(posit.m_swivel);
 			}
 		}
 
@@ -419,6 +441,7 @@ namespace ndQuadruped_2
 				{
 					m_quadruped->m_bodyArray[0]->SetSleepState(false);
 				}
+				m_quadruped->m_bodyArray[0]->SetSleepState(false);
 			}
 
 			ndQuadrupedModel* m_quadruped;
