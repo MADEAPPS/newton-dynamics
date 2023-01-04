@@ -320,8 +320,8 @@ namespace ndQuadruped_2
 		virtual void ExecuteStep(ndFloat32 timestep)
 		{
 			UpdateEffector(0);
-			UpdateEffector(1);
-			UpdateEffector(2);
+			//UpdateEffector(1);
+			//UpdateEffector(2);
 			UpdateEffector(3);
 			m_timeAcc = ndFmod(m_timeAcc + timestep, m_period);
 		}
