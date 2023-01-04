@@ -227,26 +227,43 @@ namespace ndQuadruped_2
 	class ndWalkController : public ndGaitController
 	{
 		public:
-		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit, ndFloat32 cyclePeriod, ndFloat32 swingHeight)
+		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit, ndFloat32 cyclePeriod, ndFloat32 stride, ndFloat32 swingHeight)
 			:ndGaitController(effectorsPosit)
 			,m_period(cyclePeriod)
 		{
 			ndVector ref(effectorsPosit[0].m_posit);
 			ref.m_w = effectorsPosit[0].m_swivel;
 
-			ndInt32 sector = m_sequence.GetCapacity() / 4;
+			ndInt32 quadrantSize = m_sequence.GetCapacity() / 4;
+			
+
 			for (ndInt32 i = 0; i < m_sequence.GetCapacity(); i++)
 			{
 				m_sequence.PushBack(ref);
 				m_support.PushBack(ndSupportContacts());
 			}
 
-			ndInt32 quaterPeriod = sector - 1;
-			for (ndInt32 i = 0; i < quaterPeriod; ++i)
+			ndFloat32 strideStep = stride / (3 * quadrantSize);
+
+			ndFloat32 stride0 = 0.5f * stride + strideStep;
+			for (ndInt32 i = quadrantSize - 1; i < m_sequence.GetCapacity(); ++i)
 			{
-				ndFloat32 h = swingHeight * ndSin(ndPi * i / quaterPeriod);
+				m_sequence[i].m_y = stride0;
+				stride0 -= strideStep;
+			}
+
+			ndInt32 swingPeriod = quadrantSize - 1;
+
+			ndFloat32 swingStride0 = -0.5f * stride;
+			ndFloat32 swingStrideStep = stride / swingPeriod;
+			for (ndInt32 i = 0; i < swingPeriod; ++i)
+			{
+				ndFloat32 h = swingHeight * ndSin((ndPi * i) / swingPeriod);
 				m_sequence[i].m_x -= h;
+				m_sequence[i].m_y = swingStride0;
 				m_support[i].m_contact[0] = false;
+
+				swingStride0 += swingStrideStep;
 			}
 
 			OffsetSequence(0, 0.00f);
@@ -340,7 +357,7 @@ namespace ndQuadruped_2
 
 		void Init(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 		{
-			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 3.0f, 0.15f));
+			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 3.0f, 0.4f, 0.15f));
 			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
 			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
 			m_controller = m_standController;
