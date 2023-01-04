@@ -42,28 +42,27 @@ namespace ndQuadruped_2
 		char m_boneName[32];
 		ndJointType m_type;
 		ndFloat32 m_mass;
-		ndFloat32 m_walkPhase;
 	};
 
 	static ndDefinition jointsDefinition[] =
 	{
 		{ "root_Bone010", ndDefinition::m_root, 40.0f},
 
-		{ "rb_thigh_Bone014", ndDefinition::m_spherical, 3.0f },
-		{ "rb_knee_Bone013", ndDefinition::m_hinge, 2.0f },
-		{ "rb_effector_Bone009", ndDefinition::m_effector , 0.0f, 0.0f },
+		{ "rb_thigh_Bone014", ndDefinition::m_spherical, 2.0f },
+		{ "rb_knee_Bone013", ndDefinition::m_hinge, 1.0f },
+		{ "rb_effector_Bone009", ndDefinition::m_effector , 0.0f},
 
-		{ "lb_thigh_Bone011", ndDefinition::m_spherical, 3.0f },
-		{ "lb_knee_Bone012", ndDefinition::m_hinge, 2.0f },
-		{ "lb_effector_Bone010", ndDefinition::m_effector , 0.0f, 0.5f },
+		{ "lb_thigh_Bone011", ndDefinition::m_spherical, 2.0f },
+		{ "lb_knee_Bone012", ndDefinition::m_hinge, 1.0f },
+		{ "lb_effector_Bone010", ndDefinition::m_effector , 0.0f},
 		
-		{ "fr_thigh_Bone003", ndDefinition::m_spherical, 3.0f },
-		{ "fr_knee_Bone004", ndDefinition::m_hinge, 2.0f },
-		{ "fr_effector_Bone005", ndDefinition::m_effector , 0.0f, 0.75f },
+		{ "fr_thigh_Bone003", ndDefinition::m_spherical, 2.0f },
+		{ "fr_knee_Bone004", ndDefinition::m_hinge, 1.0f },
+		{ "fr_effector_Bone005", ndDefinition::m_effector , 0.0f},
 		
-		{ "fl_thigh_Bone008", ndDefinition::m_spherical, 3.0f },
-		{ "fl_knee_Bone006", ndDefinition::m_hinge, 2.0f },
-		{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f, 0.25f },
+		{ "fl_thigh_Bone008", ndDefinition::m_spherical, 2.0f },
+		{ "fl_knee_Bone006", ndDefinition::m_hinge, 1.0f },
+		{ "fl_effector_Bone007", ndDefinition::m_effector , 0.0f},
 	};
 
 	class ndQuadrupedMaterial : public ndApplicationMaterial
