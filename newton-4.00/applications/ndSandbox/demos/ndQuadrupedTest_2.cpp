@@ -319,11 +319,10 @@ namespace ndQuadruped_2
 
 		virtual void ExecuteStep(ndFloat32 timestep)
 		{
-			for (ndInt32 i = 0; i < 4; ++i)
-			{
-				UpdateEffector(i);
-			}
-
+			UpdateEffector(0);
+			UpdateEffector(1);
+			UpdateEffector(2);
+			UpdateEffector(3);
 			m_timeAcc = ndFmod(m_timeAcc + timestep, m_period);
 		}
 
@@ -357,7 +356,8 @@ namespace ndQuadruped_2
 
 		void Init(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit)
 		{
-			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 3.0f, 0.4f, 0.15f));
+			//m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 3.0f, 0.0f, 0.15f));
+			m_walkController = ndSharedPtr<ndGaitController>(new ndWalkController(effectorsPosit, 3.0f, 0.3f, 0.15f));
 			m_trotController = ndSharedPtr<ndGaitController>(new ndTrotController(effectorsPosit));
 			m_standController = ndSharedPtr<ndGaitController>(new ndStandController(effectorsPosit));
 			m_controller = m_standController;
