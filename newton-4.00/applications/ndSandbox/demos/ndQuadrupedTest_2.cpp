@@ -533,6 +533,7 @@ namespace ndQuadruped_2
 						else if (definition.m_type == ndDefinition::m_spherical)
 						{
 							ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
+							m_bodyArray.PushBack(childBody);
 							const ndMatrix pivotMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * childBody->GetMatrix());
 							ndIkJointSpherical* const socket = new ndIkJointSpherical(pivotMatrix, childBody, parentBody);
 							//socket->SetConeLimit(120.0f * ndDegreeToRad);
