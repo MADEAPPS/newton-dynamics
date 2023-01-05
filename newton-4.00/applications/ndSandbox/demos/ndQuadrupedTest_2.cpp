@@ -163,7 +163,7 @@ namespace ndQuadruped_2
 			return ndSupportContacts();
 		}
 
-		virtual void ExecuteStep(ndFloat32)
+		virtual void ExecuteStep(const ndJacobian&, ndFloat32)
 		{
 			ndAssert(0);
 		}
@@ -183,9 +183,10 @@ namespace ndQuadruped_2
 		{
 		}
 
-		virtual void ExecuteStep(ndFloat32 timestep)
+		virtual void ExecuteStep(const ndJacobian& com, ndFloat32 timestep)
 		{
-			ndGaitController::ExecuteStep(timestep);
+			ndAssert(0);
+			ndGaitController::ExecuteStep(com, timestep);
 		}
 	};
 
@@ -211,7 +212,7 @@ namespace ndQuadruped_2
 			return ndSupportContacts();
 		}
 
-		virtual void ExecuteStep(ndFloat32)
+		virtual void ExecuteStep(const ndJacobian&, ndFloat32)
 		{
 			for (ndInt32 i = 0; i < m_effectorsPosit.GetCount(); ++i)
 			{
@@ -224,10 +225,10 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndEffectorPosit, 4> m_standPosit;
 	};
 
-	class ndWalkController : public ndGaitController
+	class ndWalkController_0 : public ndGaitController
 	{
 		public:
-		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit, ndFloat32 cyclePeriod, ndFloat32 stride, ndFloat32 swingHeight)
+		ndWalkController_0(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit, ndFloat32 cyclePeriod, ndFloat32 stride, ndFloat32 swingHeight)
 			:ndGaitController(effectorsPosit)
 			,m_period(cyclePeriod)
 		{
@@ -272,7 +273,7 @@ namespace ndQuadruped_2
 			OffsetSequence(3, 0.50f);
 		}
 
-		~ndWalkController()
+		~ndWalkController_0()
 		{
 		}
 
@@ -317,7 +318,7 @@ namespace ndQuadruped_2
 			m_effectorsPosit[index].m_posit = p;
 		}
 
-		virtual void ExecuteStep(ndFloat32 timestep)
+		virtual void ExecuteStep(const ndJacobian&, ndFloat32 timestep)
 		{
 			UpdateEffector(0);
 			//UpdateEffector(1);
@@ -331,6 +332,146 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndSupportContacts, 64> m_support;
 		ndFloat32 m_timeAcc;
 		ndFloat32 m_period;
+	};
+
+	class ndWalkController : public ndGaitController
+	{
+		public:
+		ndWalkController(const ndFixSizeArray<ndEffectorPosit, 4>& effectorsPosit, ndFloat32 cyclePeriod, ndFloat32 stride, ndFloat32 swingHeight)
+			:ndGaitController(effectorsPosit)
+			,m_refencePosit(effectorsPosit[0].m_posit)
+			,m_sequencePhase(ndVector::m_zero)
+			,m_sequence()
+			,m_support()
+			,m_stride(stride)
+			,m_period(cyclePeriod)
+			,m_timeAcc(0.0f)
+		{
+			ndInt32 quadrantSize = m_sequence.GetCapacity() / 4;
+			for (ndInt32 i = 0; i < m_sequence.GetCapacity(); i++)
+			{
+				m_sequence.PushBack(m_refencePosit.m_x);
+				m_support.PushBack(ndSupportContacts());
+			}
+
+			//ndFloat32 strideStep = stride / (3 * quadrantSize);
+			//ndFloat32 stride0 = 0.5f * stride + strideStep;
+			//for (ndInt32 i = quadrantSize - 1; i < m_sequence.GetCapacity(); ++i)
+			//{
+			//	m_sequence[i].m_y = stride0;
+			//	stride0 -= strideStep;
+			//}
+
+			ndInt32 swingPeriod = quadrantSize - 1;
+			for (ndInt32 i = 0; i < swingPeriod; ++i)
+			{
+				ndFloat32 h = swingHeight * ndSin((ndPi * i) / swingPeriod);
+				m_sequence[i] -= h;
+				m_support[i].m_contact[0] = false;
+			}
+
+			OffsetSequence(0, 0.00f);
+			OffsetSequence(1, 0.25f);
+			OffsetSequence(2, 0.75f);
+			OffsetSequence(3, 0.50f);
+		}
+
+		~ndWalkController()
+		{
+		}
+
+		ndInt32 GetIndex(ndFloat32 time) const
+		{
+			time = ndFmod(time, m_period);
+			ndInt32 index = ndInt32(time * m_support.GetCount() / m_period);
+			ndAssert(index >= 0);
+			ndAssert(index < m_support.GetCount());
+			return index;
+		}
+
+		virtual ndSupportContacts GetSupportContacts() const
+		{
+			ndInt32 index = GetIndex(m_timeAcc);
+			return m_support[index];
+		}
+
+		void OffsetSequence(ndInt32 index, ndFloat32 phase)
+		{
+			m_sequencePhase[index] = phase;
+
+			ndInt32 offset = ndInt32(phase * m_support.GetCount());
+			for (ndInt32 i = 0; i < m_support.GetCount(); ++i)
+			{
+				ndInt32 j = (i + offset) % m_support.GetCount();
+				m_support[i].m_contact[index] = m_support[j].m_contact[0];
+			}
+		}
+
+		virtual void OnChangeState()
+		{
+			m_timeAcc = 0.0f;
+		}
+
+		void UpdateEffector(ndInt32 index)
+		{
+			ndInt32 i = GetIndex(m_timeAcc + m_sequencePhase[index] * m_period);
+			ndFloat32 h = m_sequence[i];
+			m_effectorsPosit[index].m_posit.m_x = h;
+		}
+
+		virtual void ExecuteStep(const ndJacobian& com, ndFloat32 timestep)
+		{
+			UpdateEffector(0);
+			UpdateEffector(1);
+			UpdateEffector(2);
+			UpdateEffector(3);
+
+			//comMatrix.m_posit = CalculateCenterOfMass().m_linear;
+			ndSupportContacts contacts(GetSupportContacts());
+			ndInt32 code = contacts[0] * 1 + contacts[1] * 2 + contacts[2] * 4 + contacts[3] * 8;
+			switch (code)
+			{
+				case 7:
+				{
+					break;
+				}
+
+				case 11:
+				{
+					break;
+				}
+
+				case 13:
+				{
+					break;
+				}
+
+				case 14:
+				{
+					break;
+				}
+
+				case 15:
+				{
+					// all legs in contact
+					break;
+				}
+
+				default:
+					ndAssert(0);
+					break;
+			}
+
+			m_timeAcc = ndFmod(m_timeAcc + timestep, m_period);
+		}
+
+		ndVector m_refencePosit;
+		ndVector m_sequencePhase;
+		ndFixSizeArray<ndFloat32, 64> m_sequence;
+		ndFixSizeArray<ndSupportContacts, 64> m_support;
+		ndFloat32 m_stride;
+		ndFloat32 m_period;
+		ndFloat32 m_timeAcc;
 	};
 
 	class ndState
@@ -483,7 +624,8 @@ namespace ndQuadruped_2
 			// find the floor location 
 			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			matrix.m_posit.m_y = floor.m_y + 0.71f;
+			//matrix.m_posit.m_y = floor.m_y + 0.71f;
+			matrix.m_posit.m_y = floor.m_y + 1.0f;
 			rootEntity->ResetMatrix(matrix);
 			
 			// add the root body
@@ -714,21 +856,32 @@ namespace ndQuadruped_2
 			return m_bodyArray[0];
 		}
 
-		ndVector CalculateCenterOfMass() const
+		ndJacobian CalculateCenterOfMass() const
 		{
 			ndFloat32 toltalMass = 0.0f;
 			ndVector com(ndVector::m_zero);
+			ndVector momentum(ndVector::m_zero);
 			for (ndInt32 i = 0; i < m_bodyArray.GetCount(); ++i)
 			{
 				ndBodyDynamic* const body = m_bodyArray[i];
 				ndFloat32 mass = body->GetMassMatrix().m_w;
+
+				ndVector veloc(body->GetVelocity());
 				ndVector comMass(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
 				com += comMass.Scale(mass);
+				momentum += veloc.Scale(mass);
 				toltalMass += mass;
 			}
 			com = com.Scale(1.0f / toltalMass);
+			momentum = momentum.Scale(1.0f / toltalMass);
+			
 			com.m_w = 1.0f;
-			return com;
+			momentum.m_w = 0.0f;
+
+			ndJacobian ret;
+			ret.m_linear = com;
+			ret.m_angular = momentum;
+			return ret;
 		}
 
 		void Debug(ndConstraintDebugCallback& context) const
@@ -748,7 +901,7 @@ namespace ndQuadruped_2
 			}
 
 			ndMatrix comMatrix(m_localFrame * m_bodyArray[0]->GetMatrix());
-			comMatrix.m_posit = CalculateCenterOfMass();
+			comMatrix.m_posit = CalculateCenterOfMass().m_linear;
 			context.DrawFrame(comMatrix);
 
 			if (contactPoints.GetCount() >= 3)
@@ -797,7 +950,9 @@ namespace ndQuadruped_2
 		{
 			ndModel::Update(world, timestep);
 			ndAssert(*m_state.m_controller);
-			m_state.m_controller->ExecuteStep(timestep);
+
+			ndJacobian com (CalculateCenterOfMass());
+			m_state.m_controller->ExecuteStep(com, timestep);
 			m_state.Update();
 
 			ndSkeletonContainer* const skeleton = GetRoot()->GetSkeleton();
@@ -875,7 +1030,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	//AddBox(scene, posit, 4.0f, 0.3f, 0.4f, 0.7f);
 	
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndQuadrupedModel::ndQuadrupedUI* const quadrupedUI = new ndQuadrupedModel::ndQuadrupedUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
