@@ -387,8 +387,8 @@ namespace ndQuadruped_3
 			,m_output()
 			,m_walkCycle(0.75f)
 			,m_trotCycle(0.4f)
-			,m_effectorsInfo()
 			,m_bodyArray()
+			,m_effectorsInfo()
 			,m_effectorsJoints()
 		{
 			const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;

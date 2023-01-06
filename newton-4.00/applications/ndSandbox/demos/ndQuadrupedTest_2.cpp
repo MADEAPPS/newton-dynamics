@@ -244,7 +244,7 @@ namespace ndQuadruped_2
 				m_support.PushBack(ndSupportContacts());
 			}
 
-			ndFloat32 strideStep = stride / (3 * quadrantSize);
+			ndFloat32 strideStep = stride / (3.0f * ndFloat32(quadrantSize));
 
 			ndFloat32 stride0 = 0.5f * stride + strideStep;
 			for (ndInt32 i = quadrantSize - 1; i < m_sequence.GetCapacity(); ++i)
@@ -256,10 +256,10 @@ namespace ndQuadruped_2
 			ndInt32 swingPeriod = quadrantSize - 1;
 
 			ndFloat32 swingStride0 = -0.5f * stride;
-			ndFloat32 swingStrideStep = stride / swingPeriod;
+			ndFloat32 swingStrideStep = stride / ndFloat32(swingPeriod);
 			for (ndInt32 i = 0; i < swingPeriod; ++i)
 			{
-				ndFloat32 h = swingHeight * ndSin((ndPi * i) / swingPeriod);
+				ndFloat32 h = swingHeight * ndSin(ndPi * ndFloat32(i) / ndFloat32(swingPeriod));
 				m_sequence[i].m_x -= h;
 				m_sequence[i].m_y = swingStride0;
 				m_support[i].m_contact[0] = false;
@@ -280,7 +280,7 @@ namespace ndQuadruped_2
 		ndInt32 GetIndex(ndFloat32 time) const
 		{
 			time = ndFmod(time, m_period);
-			ndInt32 index = ndInt32(time * m_support.GetCount() / m_period);
+			ndInt32 index = ndInt32(time * ndFloat32(m_support.GetCount()) / ndFloat32(m_period));
 			ndAssert(index >= 0);
 			ndAssert(index < m_support.GetCount());
 			return index;
@@ -296,7 +296,7 @@ namespace ndQuadruped_2
 		{
 			m_sequencePhase[index] = phase;
 
-			ndInt32 offset = ndInt32 (phase * m_support.GetCount());
+			ndInt32 offset = ndInt32 (phase * ndFloat32(m_support.GetCount()));
 			for (ndInt32 i = 0; i < m_support.GetCount(); ++i)
 			{
 				ndInt32 j = (i + offset) % m_support.GetCount();
@@ -365,7 +365,7 @@ namespace ndQuadruped_2
 			ndInt32 swingPeriod = quadrantSize - 1;
 			for (ndInt32 i = 0; i < swingPeriod; ++i)
 			{
-				ndFloat32 h = swingHeight * ndSin((ndPi * i) / swingPeriod);
+				ndFloat32 h = swingHeight * ndSin(ndPi * ndFloat32(i) / ndFloat32(swingPeriod));
 				m_sequence[i] -= h;
 				m_support[i].m_contact[0] = false;
 			}
@@ -383,7 +383,7 @@ namespace ndQuadruped_2
 		ndInt32 GetIndex(ndFloat32 time) const
 		{
 			time = ndFmod(time, m_period);
-			ndInt32 index = ndInt32(time * m_support.GetCount() / m_period);
+			ndInt32 index = ndInt32(time * ndFloat32 (m_support.GetCount()) / ndFloat32(m_period));
 			ndAssert(index >= 0);
 			ndAssert(index < m_support.GetCount());
 			return index;
@@ -399,7 +399,7 @@ namespace ndQuadruped_2
 		{
 			m_sequencePhase[index] = phase;
 
-			ndInt32 offset = ndInt32(phase * m_support.GetCount());
+			ndInt32 offset = ndInt32(phase * ndFloat32(m_support.GetCount()));
 			for (ndInt32 i = 0; i < m_support.GetCount(); ++i)
 			{
 				ndInt32 j = (i + offset) % m_support.GetCount();
