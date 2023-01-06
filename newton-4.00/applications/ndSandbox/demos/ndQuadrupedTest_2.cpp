@@ -423,7 +423,7 @@ namespace ndQuadruped_2
 		{
 			//UpdateEffector(0);
 			//UpdateEffector(1);
-			//UpdateEffector(2);
+			UpdateEffector(2);
 			UpdateEffector(3);
 
 			//comMatrix.m_posit = CalculateCenterOfMass().m_linear;
