@@ -421,9 +421,9 @@ namespace ndQuadruped_2
 
 		virtual void ExecuteStep(const ndJacobian& com, ndFloat32 timestep)
 		{
-			UpdateEffector(0);
-			UpdateEffector(1);
-			UpdateEffector(2);
+			//UpdateEffector(0);
+			//UpdateEffector(1);
+			//UpdateEffector(2);
 			UpdateEffector(3);
 
 			//comMatrix.m_posit = CalculateCenterOfMass().m_linear;
@@ -624,8 +624,8 @@ namespace ndQuadruped_2
 			// find the floor location 
 			ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			//matrix.m_posit.m_y = floor.m_y + 0.71f;
-			matrix.m_posit.m_y = floor.m_y + 1.0f;
+			matrix.m_posit.m_y = floor.m_y + 0.71f;
+			//matrix.m_posit.m_y = floor.m_y + 1.0f;
 			rootEntity->ResetMatrix(matrix);
 			
 			// add the root body
@@ -975,7 +975,6 @@ namespace ndQuadruped_2
 
 		ndMatrix m_localFrame;
 		ndIkSolver m_invDynamicsSolver;
-		//ndBodyDynamic* m_rootBody;
 		ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 
