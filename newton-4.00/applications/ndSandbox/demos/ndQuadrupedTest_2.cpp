@@ -428,32 +428,32 @@ namespace ndQuadruped_2
 
 			//comMatrix.m_posit = CalculateCenterOfMass().m_linear;
 			ndSupportContacts contacts(GetSupportContacts());
-			ndInt32 code = contacts[0] * 1 + contacts[1] * 2 + contacts[2] * 4 + contacts[3] * 8;
+			ndInt32 code = !contacts[0] * 1 + !contacts[1] * 2 + !contacts[2] * 4 + !contacts[3] * 8;
 			switch (code)
 			{
-				case 7:
-				{
-					break;
-				}
-
-				case 11:
-				{
-					break;
-				}
-
-				case 13:
-				{
-					break;
-				}
-
-				case 14:
-				{
-					break;
-				}
-
-				case 15:
+				case 0:
 				{
 					// all legs in contact
+					break;
+				}
+
+				case 1:
+				{
+					break;
+				}
+
+				case 2:
+				{
+					break;
+				}
+
+				case 4:
+				{
+					break;
+				}
+
+				case 8:
+				{
 					break;
 				}
 
