@@ -984,8 +984,6 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 						delete m_scene;
 						m_scene = defaultScene;
 
-						//m_solverMode = ndStandardSolver;
-						//m_solver = new ndDynamicsUpdate(this);
 						m_solverMode = ndSimdSoaSolver;
 						m_solver = new ndDynamicsUpdateSoa(this);
 					}
@@ -1003,28 +1001,26 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			case ndSyclSolverGpu:
 			{
 				#ifdef _D_NEWTON_SYCL
-				ndMemFreeCallback freeMemory;
-				ndMemAllocCallback allocMemory;
-				ndMemory::GetMemoryAllocators(allocMemory, freeMemory);
-				ndSyclContext::SetMemoryAllocators(allocMemory, freeMemory);
+					ndMemFreeCallback freeMemory;
+					ndMemAllocCallback allocMemory;
+					ndMemory::GetMemoryAllocators(allocMemory, freeMemory);
+					ndSyclContext::SetMemoryAllocators(allocMemory, freeMemory);
 
-				ndWorldScene* const newScene = new ndWorldSceneSycl(*((ndWorldScene*)m_scene), false);
-				delete m_scene;
-				m_scene = newScene;
-				m_solverMode = solverMode;
-				m_solver = new ndDynamicsUpdateSycl(this);
-				if (!newScene->IsValid())
-				{
-					delete m_solver;
-					ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+					ndWorldScene* const newScene = new ndWorldSceneSycl(*((ndWorldScene*)m_scene), false);
 					delete m_scene;
-					m_scene = defaultScene;
+					m_scene = newScene;
+					m_solverMode = solverMode;
+					m_solver = new ndDynamicsUpdateSycl(this);
+					if (!newScene->IsValid())
+					{
+						delete m_solver;
+						ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+						delete m_scene;
+						m_scene = defaultScene;
 
-					//m_solverMode = ndStandardSolver;
-					//m_solver = new ndDynamicsUpdate(this);
-					m_solverMode = ndSimdSoaSolver;
-					m_solver = new ndDynamicsUpdateSoa(this);
-				}
+						m_solverMode = ndSimdSoaSolver;
+						m_solver = new ndDynamicsUpdateSoa(this);
+					}
 				#else
 					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
 					delete m_scene;
@@ -1055,8 +1051,6 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 						delete m_scene;
 						m_scene = defaultScene;
 
-						//m_solverMode = ndStandardSolver;
-						//m_solver = new ndDynamicsUpdate(this);
 						m_solverMode = ndSimdSoaSolver;
 						m_solver = new ndDynamicsUpdateSoa(this);
 					}

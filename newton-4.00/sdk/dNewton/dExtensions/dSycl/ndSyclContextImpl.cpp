@@ -29,9 +29,9 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device device)
 	:m_device(device)
 	,m_queue(device)
 {
-	std::string name(m_device.get_info<info::device::name>());
-	memset(m_deviceName, 0, sizeof(m_deviceName));
-	strncpy(m_deviceName, name.c_str(), name.size());
+	std::string deviceName(m_device.get_info<info::device::name>());
+	std::string platformName(m_device.get_platform().get_info<info::platform::name>());
+	sprintf(m_deviceName, "%s: %s", platformName.c_str(), deviceName.c_str());
 }
 
 ndSyclContextImpl::~ndSyclContextImpl()

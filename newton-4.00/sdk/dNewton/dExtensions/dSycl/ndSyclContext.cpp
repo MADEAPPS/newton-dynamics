@@ -99,7 +99,15 @@ void ndSyclContext::EnumDevices(bool selectCpu)
 		device bestDevice = devices[0];
 		for (int i = 0; i < devices.size(); ++i)
 		{
-			std::string paltfromeName(devices[i].get_platform().get_info<info::platform::name>());
+			std::string platformName(devices[i].get_platform().get_info<info::platform::name>());
+			for (int j = 0; j < platformName.size(); ++j)
+			{
+				platformName[j] = char(tolower(platformName[j]));
+			}
+			if (platformName.find("opencl") >= 0)
+			{
+				bestDevice = devices[i];
+			}
 		}
 
 		m_impl = new ndSyclContextImpl(bestDevice);
