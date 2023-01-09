@@ -68,6 +68,7 @@ const char* ndSyclContext::GetStringId() const
 
 void ndSyclContext::EnumDevices(bool selectCpu)
 {
+	std::vector<device> devices;
 	std::vector<platform> platforms(platform::get_platforms());
 	for (int i = 0; i < platforms.size(); ++i)
 	{
@@ -80,19 +81,28 @@ void ndSyclContext::EnumDevices(bool selectCpu)
 			{
 				if (dev.is_cpu())
 				{
-					m_impl = new ndSyclContextImpl(dev);
-					return;
+					devices.push_back(dev);
 				}
 			}
 			else
 			{
 				if (dev.is_gpu())
 				{
-					m_impl = new ndSyclContextImpl(dev);
-					return;
+					devices.push_back(dev);
 				}
 			}
 		}
+	}
+
+	if (devices.size())
+	{
+		device bestDevice = devices[0];
+		for (int i = 0; i < devices.size(); ++i)
+		{
+			std::string paltfromeName(devices[i].get_platform().get_info<info::platform::name>());
+		}
+
+		m_impl = new ndSyclContextImpl(bestDevice);
 	}
 }
 
