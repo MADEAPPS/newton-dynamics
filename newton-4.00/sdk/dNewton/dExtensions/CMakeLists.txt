@@ -16,10 +16,9 @@ endif()
 
 if (NEWTON_ENABLE_CUDA_SOLVER)
 	add_subdirectory(dCuda)
-	#add_subdirectory(dCudaOld)
 endif()
 
-if (NEWTON_ENABLE_OPENCL_SOLVER)
-	add_subdirectory(dOpencl)
+if (NEWTON_ENABLE_SYCL_SOLVER)
+	add_subdirectory(dSycl)
 endif()
 

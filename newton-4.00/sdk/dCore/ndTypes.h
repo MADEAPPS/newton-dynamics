@@ -172,10 +172,6 @@
 	#endif
 #endif
 
-#ifdef _DEBUG
-//#define __ENABLE_D_CONTAINERS_SANITY_CHECK 
-#endif
-
 #if defined(_MSC_VER)
 	#define	D_GCC_NEWTON_ALIGN_16 	 
 	#define	D_MSV_NEWTON_ALIGN_16	__declspec(align(16))
@@ -308,7 +304,6 @@ inline void operator delete[](void* ptr)	\
 {											\
 	ndMemory::Free(ptr);					\
 }
-
 
 #ifdef D_USE_THREAD_EMULATION
 	/// wrapper over standard atomic operations

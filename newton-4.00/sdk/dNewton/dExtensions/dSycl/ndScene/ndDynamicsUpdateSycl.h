@@ -19,48 +19,50 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_WORLD_DYNAMICS_UPDATE_OPENCL_H__
-#define __D_WORLD_DYNAMICS_UPDATE_OPENCL_H__
+#ifndef __D_WORLD_DYNAMICS_UPDATE_SYCL_H__
+#define __D_WORLD_DYNAMICS_UPDATE_SYCL_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-class ndOpenclSystem;
+class ndSyclContext;
 
-class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
+class ndDynamicsUpdateSycl : public ndDynamicsUpdate
 {
 	public:
-	ndDynamicsUpdateOpencl(ndWorld* const world, ndInt32 driverNumber);
-	virtual ~ndDynamicsUpdateOpencl();
+	ndDynamicsUpdateSycl(ndWorld* const world);
+	virtual ~ndDynamicsUpdateSycl();
 
 	virtual const char* GetStringId() const;
 
 	protected:
 	virtual void Update();
 
-	private:
-	void SortJoints();
-	void SortIslands();
-	void BuildIsland();
-	void InitWeights();
-	void InitBodyArray();
-	void InitSkeletons();
-	void CalculateForces();
-	void IntegrateBodies();
-	void UpdateSkeletons();
-	void FinishGpuUpdate();
-	void InitJacobianMatrix();
-	void UpdateForceFeedback();
-	void CalculateJointsForce();
-	void IntegrateBodiesVelocity();
-	void CalculateJointsAcceleration();
-	void IntegrateUnconstrainedBodies();
-
-	void DetermineSleepStates();
-	void GetJacobianDerivatives(ndConstraint* const joint);
-
-	ndOpenclSystem* m_opencl;
+	public:
+	//void SortJoints();
+	//void SortIslands();
+	//void BuildIsland();
+	//void InitWeights();
+	//void InitBodyArray();
+	//void InitSkeletons();
+	//void CalculateForces();
+	//void IntegrateBodies();
+	//void UpdateSkeletons();
+	//void FinishGpuUpdate();
+	//void InitJacobianMatrix();
+	//void UpdateForceFeedback();
+	//void CalculateJointsForce();
+	//void IntegrateBodiesVelocity();
+	//void CalculateJointsAcceleration();
+	//void IntegrateUnconstrainedBodies();
+	//
+	//void DeviceUpdate();
+	//void DetermineSleepStates();
+	//void GetJacobianDerivatives(ndConstraint* const joint);
+	
+	ndSyclContext* m_context;
 };
+
 
 
 #endif

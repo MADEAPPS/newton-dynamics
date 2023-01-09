@@ -19,50 +19,36 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_INTRINSICS_H__
-#define __ND_INTRINSICS_H__
+#ifndef __ND_SYCL_STDAFX_H__
+#define __ND_SYCL_STDAFX_H__
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+	#include <io.h>
+	#include <stdio.h>
+	#include <stdint.h>
+	#include <direct.h>
+	#include <malloc.h>
+	#include <stdarg.h>
+	#include <process.h>
 
-#define D_GRANULARITY	(1024 * 256)
-
-template <class T>
-inline T __device__ __host__ cuAbs(T A)
-{
-	return fabsf(A);
-}
-
-template <class T>
-inline T __device__ __host__ cuFloor(T A)
-{
-	return floorf(A);
-}
-
-template <class T>
-inline T __device__ __host__ cuMax(T A, T B)
-{
-	return fmaxf(A, B);
-}
-
-template <class T>
-inline T __device__ __host__ cuMin(T A, T B)
-{
-	return fminf(A, B);
-}
-
-template <class T>
-inline T __device__ __host__ cuSelect(bool test, T A, T B)
-{
-	return test ? A : B;
-}
-
-template <class T>
-inline void __device__ __host__ cuSwap(T& A, T& B)
-{
-	T tmp(A);
-	A = B;
-	B = tmp;
-}
-
+	#pragma warning (push, 3)
+	#include <windows.h>
+	#include <crtdbg.h>
+	#pragma warning (pop)
+#else
+	#include <sys/stat.h>
 #endif
+
+#include <chrono>
+#include <vector>
+
+//#define D_DISABLE_ASSERT
+
+#ifdef _D_SYCL_EXPORT_DLL
+	#define D_SYCL_API __declspec(dllexport)
+#else
+	#define D_SYCL_API __declspec(dllimport)
+#endif
+
+#endif 
+

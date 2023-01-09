@@ -19,10 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_CUDA_UTILS_H__
-#define __ND_CUDA_UTILS_H__
+#ifndef __ND_SYCL_UTILS_H__
+#define __ND_SYCL_UTILS_H__
 
-#include "ndCudaStdafx.h"
+#include "sycl/sycl.hpp"
+
 #ifdef D_DISABLE_ASSERT
 	#define ndAssert(x)
 #else 
@@ -37,27 +38,47 @@
 	#endif
 #endif
 
-
 #ifdef _MSC_VER 
 	#ifdef _DEBUG 
-		#define CUDA_TRACE
+		#define SYCL_TRACE
 	#endif
 #endif
 
-#ifdef CUDA_TRACE
-	void cudaExpandTraceMessage(const char* const fmt, ...);
-	#define cuTrace(x) cudaExpandTraceMessage x;
+#ifdef SYCL_TRACE
+	void ndSyclExpandTraceMessage(const char* const fmt, ...);
+	#define scylTrace(x) ndSyclExpandTraceMessage x;
 #else
-	#define cuTrace(x);
+	#define scylTrace(x);
 #endif
 
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
 
-void* CudaMalloc(size_t size);
-void CudaFree(void* const ptr);
-long long CudaGetTimeInMicroseconds();
-D_CUDA_API void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
+D_SYCL_API void* ndSyclMalloc(size_t size);
+D_SYCL_API void ndSyclFree(void* const ptr);
+D_SYCL_API long long ndSyclGetTimeInMicroseconds();
+D_SYCL_API void ndSyclSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
+
+#define D_SYCL_OPERATOR_NEW_AND_DELETE		\
+inline void *operator new (size_t size)		\
+{											\
+	return ndSyclMalloc(size);				\
+}											\
+											\
+inline void *operator new[](size_t size) 	\
+{											\
+	return ndSyclMalloc(size);				\
+}											\
+											\
+inline void operator delete (void* ptr)		\
+{											\
+	ndSyclFree(ptr);						\
+}											\
+											\
+inline void operator delete[](void* ptr)	\
+{											\
+	ndSyclFree(ptr);						\
+}
 
 
 #endif

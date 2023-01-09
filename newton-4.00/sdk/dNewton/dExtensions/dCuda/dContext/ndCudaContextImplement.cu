@@ -87,6 +87,16 @@ ndCudaContextImplement::~ndCudaContextImplement()
 	}
 }
 
+void* ndCudaContextImplement::operator new (size_t size)
+{
+	return CudaMalloc(size);
+}
+
+void ndCudaContextImplement::operator delete (void* ptr)
+{
+	CudaFree(ptr);
+}
+
 float ndCudaContextImplement::GetTimeInSeconds() const
 {
 	return float (m_timeInSeconds);

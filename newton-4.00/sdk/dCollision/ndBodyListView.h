@@ -98,7 +98,6 @@ inline void ndBodyListView::RemoveItem(ndNode* const node)
 
 inline bool ndBodyListView::IsListDirty() const
 {
-	ndAssert(0);
 	return m_listIsDirty ? true : false;
 }
 #endif

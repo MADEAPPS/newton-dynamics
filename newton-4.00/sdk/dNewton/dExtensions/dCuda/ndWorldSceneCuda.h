@@ -44,7 +44,7 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 	virtual void FindCollidingPairs();
 
 	//virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	//virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 
 	virtual void UpdateTransform();
 	void LoadBodyData();

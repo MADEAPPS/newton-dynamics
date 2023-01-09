@@ -52,8 +52,8 @@ class ndWorld: public ndClassAlloc
 		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
 		ndCudaSolver,
-		ndOpenclSolver1,
-		ndOpenclSolver2,
+		ndSyclSolverCpu,
+		ndSyclSolverGpu,
 	};
 
 	D_NEWTON_API ndWorld();
@@ -192,8 +192,8 @@ class ndWorld: public ndClassAlloc
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
-	friend class ndDynamicsUpdateOpencl;
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

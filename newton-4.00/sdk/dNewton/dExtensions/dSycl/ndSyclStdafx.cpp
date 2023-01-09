@@ -19,21 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __CU_PREFIX_SCAN_H__
-#define __CU_PREFIX_SCAN_H__
+#include "ndSyclStdafx.h"
 
-#include <cuda.h>
-#include <vector_types.h>
-#include <cuda_runtime.h>
-#include <ndNewtonStdafx.h>
-
-#include "cuIntrinsics.h"
-#include "ndCudaContext.h"
-
-#define D_PREFIX_SCAN_PASSES_BITS	4
-#define D_PREFIX_SCAN_PASSES		(1<<D_PREFIX_SCAN_PASSES_BITS)
-
-void CudaPrefixScan(ndCudaContext* const context, int blockSize);
-
-
+#if (defined(WIN32) || defined(_WIN32))
+	BOOL DllMain(HMODULE, DWORD, LPVOID )
+	{
+		return TRUE;
+	}
 #endif

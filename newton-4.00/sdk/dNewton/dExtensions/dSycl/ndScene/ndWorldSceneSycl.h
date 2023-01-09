@@ -19,51 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __CU_SORT_H__
-#define __CU_SORT_H__
-
-#include <cuda.h>
-#include <vector_types.h>
-#include <cuda_runtime.h>
 #include <ndNewtonStdafx.h>
+#include <ndDynamicsUpdate.h>
 
-class ndCudaContext;
+class ndSyclContext;
 
-// do not change this
-#define D_AABB_GRID_CELL_BITS			10
-
-class cuBodyAabbCell
+class ndWorldSceneSycl : public ndWorldScene
 {
 	public:
-	union
-	{
-		struct
-		{
-			union
-			{
-				struct
-				{
-					unsigned m_x : D_AABB_GRID_CELL_BITS;
-					unsigned m_y : D_AABB_GRID_CELL_BITS;
-					unsigned m_z : D_AABB_GRID_CELL_BITS;
-				};
-				unsigned m_key;
-			};
-			unsigned m_id;
-		};
-		long long m_value;
-	};
+	ndWorldSceneSycl(const ndWorldScene& src, bool selectCpu);
+	virtual ~ndWorldSceneSycl();
+
+	//virtual void Begin();
+	//virtual void End();
+	//virtual bool IsGPU() const;
+	virtual bool IsValid() const;
+	//virtual double GetGPUTime() const;
+	//
+	//virtual void ApplyExtForce();
+	//virtual void BalanceScene();
+	//virtual void InitBodyArray();
+	//virtual void UpdateBodyList();
+	//virtual void CalculateContacts();
+	//virtual void FindCollidingPairs();
+	//
+	////virtual void FindCollidingPairs(ndBodyKinematic* const body);
+	////virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	//
+	//virtual void UpdateTransform();
+	//void LoadBodyData();
+	//void GetBodyTransforms();
+	//
+	////ndCudaContext* GetContext();
+	////ndArray<ndCudaBodyProxy> m_bodyBufferCpu;
+	
+	private:
+	ndSyclContext* m_context;
+	friend class ndDynamicsUpdateSycl;
 };
-
-void CudaBodyAabbCellSortBuffer(ndCudaContext* const context);
-
-
-template <typename Predicate>
-__global__ void XXXXXXX(Predicate GetKey)
-{
-	unsigned val = 0;
-	val = GetKey(val);
-}
-
-
-#endif

@@ -19,36 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <ndNewtonStdafx.h>
-#include <ndDynamicsUpdate.h>
+#ifndef __ND_SYCL_CONTEXT_IMPL_H__
+#define __ND_SYCL_CONTEXT_IMPL_H__
 
-class ndCudaContext;
+#include <ndSyclStdafx.h>
 
-class ndWorldSceneCuda : public ndWorldScene
+class ndSyclContextImpl
 {
-	public:
-	ndWorldSceneCuda(const ndWorldScene& src);
-	virtual ~ndWorldSceneCuda();
+	public: 
+	D_SYCL_OPERATOR_NEW_AND_DELETE
 
-	virtual void Begin();
-	virtual void End();
-	virtual bool IsValid() const;
+	ndSyclContextImpl(sycl::device device);
+	~ndSyclContextImpl();
+	
+	const char* GetStringId() const;
 
-	virtual void InitBodyArray();
-	virtual void UpdateBodyList();
-	virtual void CalculateContacts();
-	virtual void FindCollidingPairs();
+	//D_SYCL_API void Begin();
+	//D_SYCL_API void End();
+	//D_SYCL_API double GetGPUTime() const;
+	//
+	//D_SYCL_API void ResizeBuffers(int size);
+	//D_SYCL_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
+	//
+	//D_SYCL_API void InitBodyArray();
+	//D_SYCL_API void UpdateTransform();
+	//D_SYCL_API void ValidateContextBuffers();
+	//
+	//D_SYCL_API ndCudaSpatialVector* GetTransformBuffer();
+	//
+	//D_SYCL_API void IntegrateBodies(float timestep);
+	//D_SYCL_API void IntegrateUnconstrainedBodies(float timestep);
 
-	virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	sycl::device m_device;
+	sycl::queue m_queue;
+	char m_deviceName[64];
 
-	virtual void UpdateTransform();
-	void LoadBodyData();
-	void GetBodyTransforms();
-
-	bool SanityCheckPrefix() const;
-	bool SanityCheckSortCells() const;
-
-	ndCudaContext* m_context;
-	friend class ndDynamicsUpdateCuda;
 };
+
+#endif

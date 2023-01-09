@@ -34,6 +34,9 @@ class ndCudaDevice
 	ndCudaDevice();
 	~ndCudaDevice();
 
+	void* operator new (size_t size);
+	void operator delete (void* ptr);
+
 	struct cudaDeviceProp m_prop;
 	double m_frequency;
 	unsigned m_valid;

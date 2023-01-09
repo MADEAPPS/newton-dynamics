@@ -967,7 +967,7 @@ namespace biped2
 		public:
 		ndBipedUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
 			:ndUIEntity(scene)
-			,m_biped(biped)
+			, m_biped(biped)
 		{
 		}
 
@@ -1049,7 +1049,7 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
 	//world->AddJoint(fixJoint);
-
+	
 	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
 	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
 	scene->Set2DDisplayRenderFunction(bipedUIPtr);
@@ -1092,7 +1092,7 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->m_bodyArray[0]->GetMatrix(), model->m_bodyArray[0], world->GetSentinelBody()));
 	world->AddModel(modelPtr);
 	//world->AddJoint(fixJoint);
-
+	
 	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
 	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
 	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);

@@ -17,7 +17,7 @@ option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
 option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver"  ON)
 option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
-option("NEWTON_ENABLE_OPENCL_SOLVER" "enable gpu solver" OFF)
+option("NEWTON_ENABLE_SYCL_SOLVER" "enable sycl solver" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
 option("NEWTON_NO_SIMD_INTRINSICS" "generate simd vector class" OFF)
 option("NEWTON_BUILD_NEWTON_JAVA" "build a sharp wrapper" OFF)
@@ -122,12 +122,6 @@ if(UNIX)
 			COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 	endif()
 
-	#if(NOT ANDROID OR NOT APPLE)
-	#	add_compile_options(-msse3)
-	#endif()
-
-	#add_compile_options(-fpermissive)
-
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 endif ()
@@ -160,7 +154,7 @@ if (MSVC)
 	endif()
 
 	message("Compiler Id: ${CMAKE_CXX_COMPILER_ID}") 
-	
+
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /Od /fp:fast")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2 /fp:fast")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /GS /Ox /Oi /Ot /Ob2 /Oy /fp:fast")

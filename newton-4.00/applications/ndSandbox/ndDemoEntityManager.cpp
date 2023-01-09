@@ -119,7 +119,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "rag doll", ndRagdollTest },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
-	{ "quadruped test three", ndQuadrupedTest_3 },
+	{ "quadruped test three", ndQuadrupedTest_3},
 	{ "biped test one", ndBipedTest_1 },
 	{ "biped test two", ndBipedTest_2 },
 	{ "train biped test two", ndBipedTest_2Trainer },
@@ -423,12 +423,11 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
-	//m_solverMode = ndWorld::ndOpenclSolver1;
-	//m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
+	  m_solverMode = ndWorld::ndSyclSolverCpu;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
-	m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
@@ -900,8 +899,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("sse", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
 			ImGui::RadioButton("cuda", &solverMode, ndWorld::ndCudaSolver);
-			ImGui::RadioButton("opencl1", &solverMode, ndWorld::ndOpenclSolver1);
-			ImGui::RadioButton("opencl2", &solverMode, ndWorld::ndOpenclSolver2);
+			ImGui::RadioButton("scylCpu", &solverMode, ndWorld::ndSyclSolverCpu);
+			ImGui::RadioButton("openGpu", &solverMode, ndWorld::ndSyclSolverGpu);
 
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();

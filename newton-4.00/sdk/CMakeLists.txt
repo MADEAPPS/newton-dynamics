@@ -92,18 +92,16 @@ else()
 			dNewton/dExtensions/dCuda/dContext/*.h) 
 	endif()
 
-	if (NEWTON_ENABLE_OPENCL_SOLVER)
-		add_definitions(-D_D_NEWTON_OPENCL)
-		include_directories(dNewton/dExtensions/dOpencl)
+	if (NEWTON_ENABLE_SYCL_SOLVER)
+		add_definitions(-D_D_NEWTON_SYCL)
+		include_directories(dNewton/dExtensions/dSycl)
+		include_directories(dNewton/dExtensions/dSycl/ndScene)
 
-		if(NEWTON_BUILD_SHARED_LIBS)
-			if (PTR_SIZE EQUAL 8)
-				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dNewton/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
-			else()
-				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dNewton/dExtensions/dOpencl/CL/lib/x86/OpenCL.lib")
-			endif()
-		endif()
-	endif(NEWTON_ENABLE_OPENCL_SOLVER)
+		file(GLOB CPP_SOURCE 
+			${CPP_SOURCE} 
+			dNewton/dExtensions/dSycl/ndScene/*.h
+			dNewton/dExtensions/dSycl/ndScene/*.cpp) 
+	endif()
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
@@ -124,8 +122,8 @@ else()
 			target_link_libraries (${projectName} ndSolverCuda)
 		endif()
 
-		if (NEWTON_ENABLE_OPENCL_SOLVER)
-			target_link_libraries (${projectName} ndSolverOpenCL)
+		if (NEWTON_ENABLE_SYCL_SOLVER)
+			target_link_libraries (${projectName} ndSolverSycl)
 		endif()
 
 		if(MSVC OR MINGW)

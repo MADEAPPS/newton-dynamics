@@ -41,6 +41,9 @@ class ndCudaContextImplement
 	ndCudaContextImplement(const ndCudaDevice* const device);
 	~ndCudaContextImplement();
 
+	void* operator new (size_t size);
+	void operator delete (void* ptr);
+
 	void Begin();
 	void End();
 	float GetTimeInSeconds() const;

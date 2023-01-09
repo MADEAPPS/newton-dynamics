@@ -241,3 +241,8 @@ void ndWorldSceneCuda::InitBodyArray()
 	ndWorldScene::InitBodyArray();
 	ndCudaContext::InitBodyArray();
 }
+
+void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
+{
+	ndAssert(0);
+}

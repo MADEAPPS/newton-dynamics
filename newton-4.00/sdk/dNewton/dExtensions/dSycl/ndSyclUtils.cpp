@@ -19,51 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-#include "ndCudaStdafx.h"
-#include "ndCudaUtils.h"
-#include <chrono>
+#include <ndSyclStdafx.h>
+#include "ndSyclUtils.h"
 
 static ndMemFreeCallback g_free = free;
 static ndMemAllocCallback g_alloc = malloc;
 
-void* CudaMalloc(size_t size)
-{
-	return g_alloc(size);
-}
-
-void CudaFree(void* const ptr)
-{
-	g_free(ptr);
-}
-
-void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free)
-{
-	g_alloc = alloc;
-	g_free = free;
-}
-
-void* operator new (size_t size)
-{
-	ndAssert(0);
-	return g_alloc(size);
-}
-
-void operator delete (void* ptr)
-{
-	ndAssert(0);
-	g_free(ptr);
-}
-
-long long CudaGetTimeInMicroseconds()
-{
-	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
-	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
-	long long  timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
-	return timeStamp;
-}
-
-#ifdef CUDA_TRACE
+#ifdef SYCL_TRACE
 void cudaExpandTraceMessage(const char* const fmt, ...)
 {
 	va_list v_args;
@@ -80,5 +42,44 @@ void cudaExpandTraceMessage(const char* const fmt, ...)
 		printf("%s\n", text);
 	#endif
 }
-
 #endif
+
+void* ndSyclMalloc(size_t size)
+{
+	return g_alloc(size);
+}
+
+void ndSyclFree(void* const ptr)
+{
+	g_free(ptr);
+}
+
+void ndSyclSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free)
+{
+	if (g_alloc != alloc)
+	{
+		ndAssert(g_free != free);
+		g_alloc = alloc;
+		g_free = free;
+	}
+}
+
+//void* operator new (size_t size)
+//{
+//	ndAssert(0);
+//	return g_alloc(size);
+//}
+//
+//void operator delete (void* ptr) noexcept
+//{
+//	ndAssert(0);
+//	g_free(ptr);
+//}
+
+long long ndSyclGetTimeInMicroseconds()
+{
+	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
+	long long  timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
+	return timeStamp;
+}

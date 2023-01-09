@@ -612,7 +612,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		hinge->SetLimitState(true);
 		hinge->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
 		ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
-		
+
 		world->AddBody(axleBody);
 		world->AddJoint(hingePtr);
 		return axleBody->GetAsBodyKinematic();

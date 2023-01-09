@@ -72,6 +72,10 @@ if (NEWTON_ENABLE_CUDA_SOLVER)
 	target_link_libraries (${projectName} ndSolverCuda)
 endif()
 
+if (NEWTON_ENABLE_SYCL_SOLVER)
+	target_link_libraries (${projectName} ndSolverSycl)
+endif()
+
 if(MSVC OR MINGW)
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YunewtonStdafx.h")
