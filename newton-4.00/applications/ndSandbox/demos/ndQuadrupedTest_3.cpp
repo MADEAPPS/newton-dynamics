@@ -719,16 +719,16 @@ namespace ndQuadruped_3
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadruped_3::ndQuadrupedModel);
 
-	class ndQuadrupedUI : public ndUIEntity
+	class ndModelUI : public ndUIEntity
 	{
 		public:
-		ndQuadrupedUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
+		ndModelUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
 			:ndUIEntity(scene)
-			,m_quadruped(quadruped)
+			,m_model(quadruped)
 		{
 		}
 
-		~ndQuadrupedUI()
+		~ndModelUI()
 		{
 		}
 
@@ -743,7 +743,7 @@ namespace ndQuadruped_3
 
 			bool change = false;
 			ImGui::Text("position x");
-			change = change | ImGui::SliderFloat("##x", &m_quadruped->m_param_x0, -1.0f, 1.0f);
+			change = change | ImGui::SliderFloat("##x", &m_model->m_param_x0, -1.0f, 1.0f);
 			//ImGui::Text("position y");
 			//change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
 			//ImGui::Text("position z");
@@ -751,11 +751,11 @@ namespace ndQuadruped_3
 
 			if (change)
 			{
-				m_quadruped->m_bodyArray[0]->SetSleepState(false);
+				m_model->m_bodyArray[0]->SetSleepState(false);
 			}
 		}
 
-		ndQuadrupedModel* m_quadruped;
+		ndQuadrupedModel* m_model;
 	};
 };
 
@@ -808,7 +808,7 @@ void ndQuadrupedTest_3(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	world->AddJoint(fixJoint);
 
-	ndQuadrupedUI* const quadrupedUI = new ndQuadrupedUI(scene, robot0);
+	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
 	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 

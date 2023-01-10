@@ -562,16 +562,16 @@ namespace ndQuadruped_1
 		public:
 		D_CLASS_REFLECTION(ndQuadruped_1::ndQuadrupedModel);
 
-		class ndQuadrupedUI : public ndUIEntity
+		class ndModelUI : public ndUIEntity
 		{
 			public:
-			ndQuadrupedUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
+			ndModelUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
 				:ndUIEntity(scene)
-				,m_quadruped(quadruped)
+				,m_model(quadruped)
 			{
 			}
 
-			~ndQuadrupedUI()
+			~ndModelUI()
 			{
 			}
 
@@ -584,7 +584,7 @@ namespace ndQuadruped_1
 				ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 				m_scene->Print(color, "Control panel");
 
-				ndState& control = m_quadruped->m_state;
+				ndState& control = m_model->m_state;
 				
 				//bool change = false;
 				ImGui::Text("position x");
@@ -599,12 +599,12 @@ namespace ndQuadruped_1
 				
 				if (change)
 				{
-					m_quadruped->m_bodyArray[0]->SetSleepState(false);
+					m_model->m_bodyArray[0]->SetSleepState(false);
 				}
-				m_quadruped->m_bodyArray[0]->SetSleepState(false);
+				m_model->m_bodyArray[0]->SetSleepState(false);
 			}
 
-			ndQuadrupedModel* m_quadruped;
+			ndQuadrupedModel* m_model;
 		};
 
 		ndQuadrupedModel(ndDemoEntityManager* const scene, ndDemoEntity* const robotMesh, const ndMatrix& location)
@@ -1031,7 +1031,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
 	//world->AddJoint(fixJoint);
 
-	ndQuadrupedModel::ndQuadrupedUI* const quadrupedUI = new ndQuadrupedModel::ndQuadrupedUI(scene, robot0);
+	ndQuadrupedModel::ndModelUI* const quadrupedUI = new ndQuadrupedModel::ndModelUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
 	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 	

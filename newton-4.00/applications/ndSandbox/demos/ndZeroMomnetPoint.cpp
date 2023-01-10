@@ -25,12 +25,12 @@
 #include "ndAnimationSequencePlayer.h"
 
 
-namespace ndQuadruped_2
+namespace ndZmp
 {
-	class ndQuadrupedModel : public ndModel
+	class ndZeroMomentModel : public ndModel
 	{
 		public:
-		D_CLASS_REFLECTION(ndQuadruped_2::ndQuadrupedModel);
+		D_CLASS_REFLECTION(ndZmp::ndZeroMomentModel);
 
 		class ndEffectorInfo
 		{
@@ -70,7 +70,7 @@ namespace ndQuadruped_2
 			ndParamMapper m_swivel_mapper;
 		};
 
-		ndQuadrupedModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
+		ndZeroMomentModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
 			:ndModel()
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
@@ -213,7 +213,7 @@ namespace ndQuadruped_2
 			}
 		}
 
-		ndQuadrupedModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		ndZeroMomentModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 			,m_invDynamicsSolver()
 			,m_rootBody(nullptr)
@@ -223,7 +223,7 @@ namespace ndQuadruped_2
 			ndAssert(0);
 		}
 
-		~ndQuadrupedModel()
+		~ndZeroMomentModel()
 		{
 		}
 
@@ -317,12 +317,12 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 	};
-	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndQuadrupedModel);
+	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndZeroMomentModel);
 
 	class ndModelUI : public ndUIEntity
 	{
 		public:
-		ndModelUI(ndDemoEntityManager* const scene, ndQuadrupedModel* const quadruped)
+		ndModelUI(ndDemoEntityManager* const scene, ndZeroMomentModel* const quadruped)
 			:ndUIEntity(scene)
 			,m_model(quadruped)
 		{
@@ -341,7 +341,7 @@ namespace ndQuadruped_2
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			m_scene->Print(color, "Control panel");
 
-			ndQuadrupedModel::ndEffectorInfo& info = m_model->m_effectorsInfo[0];
+			ndZeroMomentModel::ndEffectorInfo& info = m_model->m_effectorsInfo[0];
 
 			bool change = false;
 			ImGui::Text("position x");
@@ -368,22 +368,22 @@ namespace ndQuadruped_2
 			}
 		}
 
-		ndQuadrupedModel* m_model;
+		ndZeroMomentModel* m_model;
 	};
 };
 
-using namespace ndQuadruped_2;
-void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
+using namespace ndZmp;
+void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
-	//BuildFlatPlane(scene, true);
+	//BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFlatPlane(scene, true);
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
 	
-	ndQuadrupedModel* const robot0 = new ndQuadrupedModel(scene, matrix);
+	ndZeroMomentModel* const robot0 = new ndZeroMomentModel(scene, matrix);
 	scene->SetSelectedModel(robot0);
 	ndSharedPtr<ndModel> modelPtr(robot0);
 	world->AddModel(modelPtr);

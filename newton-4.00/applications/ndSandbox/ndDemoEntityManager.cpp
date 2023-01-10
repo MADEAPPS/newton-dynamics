@@ -55,16 +55,17 @@
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-#define DEFAULT_SCENE	18		// quadruped test 1
-//#define DEFAULT_SCENE	19		// quadruped test 2
-//#define DEFAULT_SCENE	20		// quadruped test 3
-//#define DEFAULT_SCENE	21		// biped test 1
-//#define DEFAULT_SCENE	22		// biped test 2
-//#define DEFAULT_SCENE	23		// train biped test 2
-//#define DEFAULT_SCENE	24		// simple voronoi fracture
-//#define DEFAULT_SCENE	25		// basic voronoi fracture
-//#define DEFAULT_SCENE	26		// linked voronoi fracture
-//#define DEFAULT_SCENE	27		// skin peel voronoi fracture
+#define DEFAULT_SCENE	18		// zero moment point
+//#define DEFAULT_SCENE	19		// quadruped test 1
+//#define DEFAULT_SCENE	20		// quadruped test 2
+//#define DEFAULT_SCENE	21		// quadruped test 3
+//#define DEFAULT_SCENE	22		// biped test 1
+//#define DEFAULT_SCENE	23		// biped test 2
+//#define DEFAULT_SCENE	24		// train biped test 2
+//#define DEFAULT_SCENE	25		// simple voronoi fracture
+//#define DEFAULT_SCENE	26		// basic voronoi fracture
+//#define DEFAULT_SCENE	27		// linked voronoi fracture
+//#define DEFAULT_SCENE	28		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -77,6 +78,7 @@ void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndZeroMomentPoint(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
@@ -117,6 +119,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
+	{ "zero moment point", ndZeroMomentPoint },
 	{ "quadruped test one", ndQuadrupedTest_1 },
 	{ "quadruped test two", ndQuadrupedTest_2 },
 	{ "quadruped test three", ndQuadrupedTest_3},
