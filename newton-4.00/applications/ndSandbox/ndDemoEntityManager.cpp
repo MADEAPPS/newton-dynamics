@@ -427,10 +427,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	  m_solverMode = ndWorld::ndSyclSolverCpu;
+	//m_solverMode = ndWorld::ndSyclSolverCpu;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
-	//m_solverMode = ndWorld::ndStandardSolver;
+	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
@@ -438,8 +438,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
-	//m_showJointDebugInfo = true;
-	m_showModelsDebugInfo = true;
+	m_showJointDebugInfo = true;
+	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
 	m_collisionDisplayMode = 3;		// solid wire frame
