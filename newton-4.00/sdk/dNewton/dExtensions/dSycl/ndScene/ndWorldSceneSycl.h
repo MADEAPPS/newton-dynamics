@@ -30,8 +30,8 @@ class ndWorldSceneSycl : public ndWorldScene
 	ndWorldSceneSycl(const ndWorldScene& src, bool selectCpu);
 	virtual ~ndWorldSceneSycl();
 
-	//virtual void Begin();
-	//virtual void End();
+	virtual void Begin();
+	virtual void End();
 	//virtual bool IsGPU() const;
 	virtual bool IsValid() const;
 	//virtual double GetGPUTime() const;

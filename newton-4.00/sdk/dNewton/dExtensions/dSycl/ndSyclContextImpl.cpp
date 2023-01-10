@@ -21,6 +21,7 @@
 
 #include <ndSyclStdafx.h>
 #include "ndSyclUtils.h"
+#include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
 using namespace sycl;
@@ -43,58 +44,67 @@ const char* ndSyclContextImpl::GetStringId() const
 	return m_deviceName;
 }
 
+
+void ndSyclContextImpl::Begin()
+{
+	StlVector<int> xxx;
+	for (int i = 0; i < 16; i++)
+	{
+		xxx.push_back(1);
+	}
+	xxx.push_back(1);
+	xxx.push_back(1);
+	xxx.push_back(1);
+}
+
 #if 0
-double ndCudaContext::GetGPUTime() const
+double ndSyclContextImpl::GetGPUTime() const
 {
 	return IsValid() ? m_implement->GetTimeInSeconds() : 0.0;
 }
 
-ndCudaSpatialVector* ndCudaContext::GetTransformBuffer()
+ndCudaSpatialVector* ndSyclContextImpl::GetTransformBuffer()
 {
 	return m_implement->GetTransformBuffer();
 }
 
-void ndCudaContext::Begin()
-{
-	m_implement->Begin();
-}
 
-void ndCudaContext::End()
+void ndSyclContextImpl::End()
 {
 	m_implement->End();
 }
 
-void ndCudaContext::ResizeBuffers(int size)
+void ndSyclContextImpl::ResizeBuffers(int size)
 {
 	m_implement->ResizeBuffers(size);
 }
 
-void ndCudaContext::LoadBodyData(const ndCudaBodyProxy* const src, int size)
+void ndSyclContextImpl::LoadBodyData(const ndCudaBodyProxy* const src, int size)
 {
 	m_implement->LoadBodyData(src, size);
 }
 
-void ndCudaContext::ValidateContextBuffers()
+void ndSyclContextImpl::ValidateContextBuffers()
 {
 	m_implement->ValidateContextBuffers();
 }
 
-void ndCudaContext::InitBodyArray()
+void ndSyclContextImpl::InitBodyArray()
 {
 	m_implement->InitBodyArray();
 }
 
-void ndCudaContext::IntegrateBodies(float timestep)
+void ndSyclContextImpl::IntegrateBodies(float timestep)
 {
 	m_implement->IntegrateBodies(timestep);
 }
 
-void ndCudaContext::IntegrateUnconstrainedBodies(float timestep)
+void ndSyclContextImpl::IntegrateUnconstrainedBodies(float timestep)
 {
 	m_implement->IntegrateUnconstrainedBodies(timestep);
 }
 
-void ndCudaContext::UpdateTransform()
+void ndSyclContextImpl::UpdateTransform()
 {
 	m_implement->UpdateTransform();
 }

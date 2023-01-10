@@ -51,6 +51,18 @@ bool ndWorldSceneSycl::IsValid() const
 	return m_context->IsValid();
 }
 
+void ndWorldSceneSycl::Begin()
+{
+	ndWorldScene::Begin();
+	m_context->Begin();
+}
+
+void ndWorldSceneSycl::End()
+{
+	//ndCudaContext::End();
+	ndWorldScene::End();
+}
+
 #if 0
 //ndCudaContext* ndWorldSceneSycl::GetContext()
 //{
@@ -70,20 +82,6 @@ double ndWorldSceneSycl::GetGPUTime() const
 	ndAssert(0);
 	return 0;
 	//return ndCudaContext::GetGPUTime();
-}
-
-void ndWorldSceneSycl::Begin()
-{
-	ndAssert(0);
-	//ndWorldScene::Begin();
-	//ndCudaContext::Begin();
-}
-
-void ndWorldSceneSycl::End()
-{
-	ndAssert(0);
-	//ndCudaContext::End();
-	//ndWorldScene::End();
 }
 
 void ndWorldSceneSycl::LoadBodyData()

@@ -38,7 +38,7 @@ class ndSyclContext
 	D_SYCL_API bool IsValid() const;
 	D_SYCL_API const char* GetStringId() const;
 
-	//D_SYCL_API void Begin();
+	D_SYCL_API void Begin();
 	//D_SYCL_API void End();
 	//D_SYCL_API double GetGPUTime() const;
 	//
@@ -53,9 +53,6 @@ class ndSyclContext
 	//
 	//D_SYCL_API void IntegrateBodies(float timestep);
 	//D_SYCL_API void IntegrateUnconstrainedBodies(float timestep);
-	//
-	//ndCudaDevice* m_device;
-	//ndCudaContextImplement* m_implement;
 
 	D_SYCL_API static void SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 

@@ -114,60 +114,61 @@ void ndSyclContext::EnumDevices(bool selectCpu)
 	}
 }
 
+void ndSyclContext::Begin()
+{
+	m_impl->Begin();
+}
+
 
 #if 0
-double ndCudaContext::GetGPUTime() const
+double ndSyclContext::GetGPUTime() const
 {
-	return IsValid() ? m_implement->GetTimeInSeconds() : 0.0;
+	return IsValid() ? m_impl->GetTimeInSeconds() : 0.0;
 }
 
-ndCudaSpatialVector* ndCudaContext::GetTransformBuffer()
+ndCudaSpatialVector* ndSyclContext::GetTransformBuffer()
 {
-	return m_implement->GetTransformBuffer();
+	return m_impl->GetTransformBuffer();
 }
 
-void ndCudaContext::Begin()
+
+void ndSyclContext::End()
 {
-	m_implement->Begin();
+	m_impl->End();
 }
 
-void ndCudaContext::End()
+void ndSyclContext::ResizeBuffers(int size)
 {
-	m_implement->End();
+	m_impl->ResizeBuffers(size);
 }
 
-void ndCudaContext::ResizeBuffers(int size)
+void ndSyclContext::LoadBodyData(const ndCudaBodyProxy* const src, int size)
 {
-	m_implement->ResizeBuffers(size);
+	m_impl->LoadBodyData(src, size);
 }
 
-void ndCudaContext::LoadBodyData(const ndCudaBodyProxy* const src, int size)
+void ndSyclContext::ValidateContextBuffers()
 {
-	m_implement->LoadBodyData(src, size);
+	m_impl->ValidateContextBuffers();
 }
 
-void ndCudaContext::ValidateContextBuffers()
+void ndSyclContext::InitBodyArray()
 {
-	m_implement->ValidateContextBuffers();
+	m_impl->InitBodyArray();
 }
 
-void ndCudaContext::InitBodyArray()
+void ndSyclContext::IntegrateBodies(float timestep)
 {
-	m_implement->InitBodyArray();
+	m_impl->IntegrateBodies(timestep);
 }
 
-void ndCudaContext::IntegrateBodies(float timestep)
+void ndSyclContext::IntegrateUnconstrainedBodies(float timestep)
 {
-	m_implement->IntegrateBodies(timestep);
+	m_impl->IntegrateUnconstrainedBodies(timestep);
 }
 
-void ndCudaContext::IntegrateUnconstrainedBodies(float timestep)
+void ndSyclContext::UpdateTransform()
 {
-	m_implement->IntegrateUnconstrainedBodies(timestep);
-}
-
-void ndCudaContext::UpdateTransform()
-{
-	m_implement->UpdateTransform();
+	m_impl->UpdateTransform();
 }
 #endif

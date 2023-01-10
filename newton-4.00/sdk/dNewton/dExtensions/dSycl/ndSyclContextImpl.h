@@ -34,21 +34,21 @@ class ndSyclContextImpl
 	
 	const char* GetStringId() const;
 
-	//D_SYCL_API void Begin();
-	//D_SYCL_API void End();
-	//D_SYCL_API double GetGPUTime() const;
+	void Begin();
+	//void End();
+	//double GetGPUTime() const;
 	//
-	//D_SYCL_API void ResizeBuffers(int size);
-	//D_SYCL_API void LoadBodyData(const ndCudaBodyProxy* const src, int size);
+	//void ResizeBuffers(int size);
+	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);
 	//
-	//D_SYCL_API void InitBodyArray();
-	//D_SYCL_API void UpdateTransform();
-	//D_SYCL_API void ValidateContextBuffers();
+	//void InitBodyArray();
+	//void UpdateTransform();
+	//void ValidateContextBuffers();
 	//
-	//D_SYCL_API ndCudaSpatialVector* GetTransformBuffer();
+	//ndCudaSpatialVector* GetTransformBuffer();
 	//
-	//D_SYCL_API void IntegrateBodies(float timestep);
-	//D_SYCL_API void IntegrateUnconstrainedBodies(float timestep);
+	//void IntegrateBodies(float timestep);
+	//void IntegrateUnconstrainedBodies(float timestep);
 
 	sycl::device m_device;
 	sycl::queue m_queue;
