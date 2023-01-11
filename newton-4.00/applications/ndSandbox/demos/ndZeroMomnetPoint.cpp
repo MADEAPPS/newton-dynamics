@@ -32,31 +32,46 @@ namespace ndZmp
 		public:
 		D_CLASS_REFLECTION(ndZmp::ndZeroMomentModel);
 
-		class ndEffectorPosit
+		class ndEffector
 		{
 			public:
-			ndEffectorPosit()
+			ndEffector()
 			{
 			}
 
-			ndEffectorPosit(ndIkSwivelPositionEffector* const effector)
+			ndEffector(ndIkSwivelPositionEffector* const effector)
 				:m_posit(effector->GetLocalTargetPosition())
-				, m_swivel(0.0f)
-				, m_effector(effector)
+				,m_swivel(0.0f)
+				,m_height(0.9f)
+				,m_joint(effector)
 			{
+				SetPosition();
+			}
+
+			void SetPosition()
+			{
+				ndFloat32 minRadio;
+				ndFloat32 maxRadio;
+
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*m_joint;
+				effector->GetWorkSpaceConstraints(minRadio, maxRadio);
+				ndVector posit(effector->GetLocalTargetPosition() & ndVector::m_triplexMask);
+				posit = posit.Normalize().Scale(maxRadio * m_height);
+				effector->SetLocalTargetPosition(posit);
 			}
 
 			ndVector m_posit;
 			ndFloat32 m_swivel;
-			ndIkSwivelPositionEffector* m_effector;
+			ndFloat32 m_height;
+			ndSharedPtr<ndJointBilateralConstraint> m_joint;
 		};
 
 		ndZeroMomentModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
 			:ndModel()
-			,m_positPosit()
+			,m_effector()
 			,m_invDynamicsSolver()
 			,m_bodies()
-			,m_effector()
+			,m_wheelBody(nullptr)
 		{
 			ndFloat32 mass = 10.0f;
 			ndFloat32 xSize = 0.25f;
@@ -66,7 +81,7 @@ namespace ndZmp
 			ndMatrix matrix(matrixLocation);
 			ndPhysicsWorld* const world = scene->GetWorld();
 			const ndVector floor(FindFloor(*world, matrixLocation.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-			matrix.m_posit.m_y = floor.m_y + 1.5f;
+			matrix.m_posit.m_y = floor.m_y + 1.0f;
 
 			// add hip body
 			ndBodyKinematic* const hipBody = AddBox(scene, ndGetIdentityMatrix(), mass, xSize, ySize, zSize, "smilli.tga");
@@ -82,10 +97,9 @@ namespace ndZmp
 
 		ndZeroMomentModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
 			:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
-			,m_positPosit()
+			,m_effector()
 			,m_invDynamicsSolver()
 			,m_bodies()
-			,m_effector()
 		{
 			ndAssert(0);
 		}
@@ -146,7 +160,7 @@ namespace ndZmp
 
 			ndFloat32 workSpace = 0.99f * 2.0f * limbLength;
 			effector->SetWorkSpaceConstraints(0.0f, workSpace);
-			m_effector = ndSharedPtr<ndJointBilateralConstraint>(effector);
+			//m_effector = ndSharedPtr<ndJointBilateralConstraint>(effector);
 
 			// Add wheel leg limb (calf)
 			ndFloat32 wheelRadios = 4.0f * limbRadio;
@@ -157,6 +171,9 @@ namespace ndZmp
 			ndJointSpherical* const wheelJoint = new ndJointSpherical(wheelMatrix, wheelBody, calfBody);
 			ndSharedPtr<ndJointBilateralConstraint> wheelJointPtr(wheelJoint);
 			world->AddJoint(wheelJointPtr);
+
+			m_effector = ndEffector(effector);
+			m_wheelBody = wheelBody;
 		}
 
 		//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -167,8 +184,7 @@ namespace ndZmp
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndJointBilateralConstraint* const effector = (ndJointBilateralConstraint*)*m_effector;
-			effector->DebugJoint(context);
+			m_effector.m_joint->DebugJoint(context);
 
 			//ndVector upVector(m_rootBody->GetMatrix().m_up);
 			////for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
@@ -207,51 +223,44 @@ namespace ndZmp
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
+			
+			ndSkeletonContainer* const skeleton = GetRoot()->GetSkeleton();
+			ndAssert(skeleton);
+		
+			
+			if (!m_invDynamicsSolver.IsSleeping(skeleton))
+			{
+				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
+				effectors.PushBack(*m_effector.m_joint);
 
-			//ndVector upVector(m_rootBody->GetMatrix().m_up);
-			//for (ndInt32 i = 0; i < m_effectorsInfo.GetCount(); ++i)
-			//{
-			//	ndEffectorInfo& info = m_effectorsInfo[i];
-			//	ndVector posit(info.m_basePosition);
-			//	posit.m_x += info.m_x_mapper.Interpolate(info.m_x);
-			//	posit.m_y += info.m_y_mapper.Interpolate(info.m_y);
-			//	posit.m_z += info.m_z_mapper.Interpolate(info.m_z);
-			//	info.m_effector->SetLocalTargetPosition(posit);
-			//	info.m_effector->SetSwivelAngle(info.m_swivel_mapper.Interpolate(info.m_swivel));
-			//
-			//	// calculate lookAt angle
-			//	ndMatrix lookAtMatrix0;
-			//	ndMatrix lookAtMatrix1;
-			//	info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-			//	const ndFloat32 lookAngle = info.m_lookAtJoint->CalculateAngle(upVector.Scale(-1.0f), lookAtMatrix0[1], lookAtMatrix0[0]);
-			//	info.m_lookAtJoint->SetOffsetAngle(lookAngle);
-			//}
-			//
-			//ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-			//ndAssert(skeleton);
-			//
-			////m_invDynamicsSolver.SetMaxIterations(4);
-			//if (m_effectorsJoints.GetCount() && !m_invDynamicsSolver.IsSleeping(skeleton))
-			//{
-			//	ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
-			//	for (ndInt32 i = 0; i < m_effectorsJoints.GetCount(); ++i)
-			//	{
-			//		effectors.PushBack(*m_effectorsJoints[i]);
-			//	}
-			//
-			//	m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
-			//	m_invDynamicsSolver.Solve();
-			//	m_invDynamicsSolver.SolverEnd();
-			//}
+				ndBodyKinematic::ndContactMap& contacts = m_wheelBody->GetContactMap();
+				bool hasContact = false;
+				ndBodyKinematic::ndContactMap::Iterator iter(contacts);
+				for (iter.Begin(); iter; iter++)
+				{
+					ndContact* const contact = iter.GetNode()->GetInfo();
+					hasContact = hasContact || contact->IsActive();
+				}
+
+				if (hasContact)
+				{
+					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+					m_invDynamicsSolver.Solve();
+					m_invDynamicsSolver.SolverEnd();
+				}
+				else
+				{
+					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+					m_invDynamicsSolver.Solve();
+					m_invDynamicsSolver.SolverEnd();
+				}
+			}
 		}
 
-		ndEffectorPosit m_positPosit;
+		ndEffector m_effector;
 		ndIkSolver m_invDynamicsSolver;
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
-		ndSharedPtr<ndJointBilateralConstraint> m_effector;
-		
-		//ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
-		//ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
+		ndBodyKinematic* m_wheelBody;
 	};
 	D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndZeroMomentModel);
 
@@ -277,30 +286,15 @@ namespace ndZmp
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			m_scene->Print(color, "Control panel");
 
-			//ndZeroMomentModel::ndEffectorInfo& info = m_model->m_effectorsInfo[0];
-			//bool change = false;
-			//ImGui::Text("position x");
-			//change = change | ImGui::SliderFloat("##x", &info.m_x, -1.0f, 1.0f);
-			//ImGui::Text("position y");
-			//change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
-			//ImGui::Text("position z");
-			//change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
-			//
-			//ImGui::Text("swivel");
-			//change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
-			//
-			//if (change)
-			//{
-			//	m_model->m_rootBody->SetSleepState(false);
-			//
-			//	for (ndInt32 i = 1; i < m_model->m_effectorsInfo.GetCount(); ++i)
-			//	{
-			//		m_model->m_effectorsInfo[i].m_x = info.m_x;
-			//		m_model->m_effectorsInfo[i].m_y = info.m_y;
-			//		m_model->m_effectorsInfo[i].m_z = info.m_z;
-			//		m_model->m_effectorsInfo[i].m_swivel = info.m_swivel;
-			//	}
-			//}
+			ndZeroMomentModel::ndEffector& info = m_model->m_effector;
+			bool change = false;
+			ImGui::Text("height");
+			change = change || ImGui::SliderFloat("##x", &info.m_height, 0.3f, 1.0f);
+			if (change)
+			{
+				m_model->GetRoot()->SetSleepState(false);
+				info.SetPosition();
+			}
 		}
 
 		ndZeroMomentModel* m_model;
@@ -330,9 +324,9 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
 	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 	
-	matrix.m_posit.m_x -= 4.0f;
+	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 1.5f;
-	matrix.m_posit.m_z += 0.25f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	matrix.m_posit.m_z += 4.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
