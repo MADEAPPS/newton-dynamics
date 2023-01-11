@@ -51,7 +51,6 @@ namespace ndZmp
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
-
 		ndZeroMomentModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
 			:ndModel()
 			,m_positPosit()
@@ -63,9 +62,6 @@ namespace ndZmp
 			ndFloat32 xSize = 0.25f;
 			ndFloat32 ySize = 0.50f;
 			ndFloat32 zSize = 0.40f;
-			ndFloat32 limbMass = 0.5f;
-			ndFloat32 limbLength = 0.4f;
-			ndFloat32 limbRadio = 0.05f;
 			
 			ndMatrix matrix(matrixLocation);
 			ndPhysicsWorld* const world = scene->GetWorld();
@@ -77,48 +73,11 @@ namespace ndZmp
 			hipBody->SetMatrix(matrix);
 			m_bodies.PushBack(hipBody->GetAsBodyDynamic());
 
-			// Add upper leg limb (thigh)
-			ndBodyKinematic* const leg = AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga");
-			ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix);
-			//legLocation.m_posit.m_z += zSize * 0.5f;
-			legLocation.m_posit.m_z += zSize * 0.0f;
-			legLocation.m_posit.m_y -= ySize * 0.5f;
-			legLocation.m_posit.m_y -= limbLength * 0.5f;
-			leg->SetMatrix(legLocation);
-			m_bodies.PushBack(leg->GetAsBodyDynamic());
+			ndMatrix limbLocation(matrix);
+			limbLocation.m_posit.m_z += zSize * 0.0f;
+			limbLocation.m_posit.m_y -= ySize * 0.5f;
 
-			ndMatrix legPivot(legLocation);
-			legPivot.m_posit.m_y += limbLength * 0.5f;
-			ndIkJointSpherical* const legJoint = new ndIkJointSpherical(legPivot, leg, hipBody);
-			ndSharedPtr<ndJointBilateralConstraint> ballPtr(legJoint);
-			world->AddJoint(ballPtr);
-
-			// Add lower leg limb (calf)
-			ndBodyKinematic* const calf = AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga");
-			ndMatrix calfLocation(legLocation);
-			calfLocation.m_posit.m_y -= limbLength;
-			calf->SetMatrix(calfLocation);
-			m_bodies.PushBack(calf->GetAsBodyDynamic());
-
-			ndMatrix calfPivot(ndYawMatrix (90.0f * ndDegreeToRad) * calfLocation);
-			calfPivot.m_posit.m_y += limbLength * 0.5f;
-			ndIkJointHinge* const calfJoint = new ndIkJointHinge(calfPivot, calf, leg);
-			calfJoint->SetLimitState(true);
-			calfJoint->SetLimits(0.0f * ndDegreeToRad, 150.0f * ndDegreeToRad);
-			ndSharedPtr<ndJointBilateralConstraint> calfPtr(calfJoint);
-			world->AddJoint(calfPtr);
-
-			// Add end effector
-			ndFloat32 regularizer = 0.001f;
-			ndVector effectorPivot(calfLocation.m_posit);
-			effectorPivot.m_y -= limbLength * 0.5f;
-			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorPivot, legPivot, calf, hipBody);
-			effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
-			effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
-
-			ndFloat32 workSpace = 0.99f * 2.0f * limbLength;
-			effector->SetWorkSpaceConstraints(0.0f, workSpace);
-			m_effector = ndSharedPtr<ndJointBilateralConstraint>(effector);
+			AddLimb(scene, limbLocation);
 		}
 
 		ndZeroMomentModel(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -138,6 +97,66 @@ namespace ndZmp
 		ndBodyDynamic* GetRoot() const
 		{
 			return m_bodies[0];
+		}
+
+		void AddLimb(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+		{
+			ndFloat32 limbMass = 0.5f;
+			ndFloat32 limbLength = 0.3f;
+			ndFloat32 limbRadio = 0.025f;
+
+			ndBodyKinematic* const hipBody = GetRoot();
+			ndPhysicsWorld* const world = scene->GetWorld();
+			
+			// Add upper leg limb (thigh)
+			ndBodyKinematic* const legBody = AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga");
+			ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * matrix);
+			legLocation.m_posit.m_y -= limbLength * 0.5f;
+			legBody->SetMatrix(legLocation);
+			m_bodies.PushBack(legBody->GetAsBodyDynamic());
+
+			ndMatrix legPivot(legLocation);
+			legPivot.m_posit.m_y += limbLength * 0.5f;
+			ndIkJointSpherical* const legJoint = new ndIkJointSpherical(legPivot, legBody, hipBody);
+			ndSharedPtr<ndJointBilateralConstraint> ballPtr(legJoint);
+			world->AddJoint(ballPtr);
+
+			// Add lower leg limb (calf)
+			ndBodyKinematic* const calfBody = AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "smilli.tga");
+			ndMatrix calfLocation(legLocation);
+			calfLocation.m_posit.m_y -= limbLength;
+			calfBody->SetMatrix(calfLocation);
+			m_bodies.PushBack(calfBody->GetAsBodyDynamic());
+
+			ndMatrix calfPivot(ndYawMatrix(90.0f * ndDegreeToRad) * calfLocation);
+			calfPivot.m_posit.m_y += limbLength * 0.5f;
+			ndIkJointHinge* const calfJoint = new ndIkJointHinge(calfPivot, calfBody, legBody);
+			calfJoint->SetLimitState(true);
+			calfJoint->SetLimits(0.0f * ndDegreeToRad, 150.0f * ndDegreeToRad);
+			ndSharedPtr<ndJointBilateralConstraint> calfPtr(calfJoint);
+			world->AddJoint(calfPtr);
+
+			// Add end effector
+			ndFloat32 regularizer = 0.001f;
+			ndVector effectorPivot(calfLocation.m_posit);
+			effectorPivot.m_y -= limbLength * 0.5f;
+			ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorPivot, legPivot, calfBody, hipBody);
+			effector->SetLinearSpringDamper(regularizer, 2000.0f, 50.0f);
+			effector->SetAngularSpringDamper(regularizer, 2000.0f, 50.0f);
+
+			ndFloat32 workSpace = 0.99f * 2.0f * limbLength;
+			effector->SetWorkSpaceConstraints(0.0f, workSpace);
+			m_effector = ndSharedPtr<ndJointBilateralConstraint>(effector);
+
+			// Add wheel leg limb (calf)
+			ndFloat32 wheelRadios = 4.0f * limbRadio;
+			ndBodyKinematic* const wheelBody = AddSphere(scene, ndGetIdentityMatrix(), 2.0f * limbMass, wheelRadios, "smilli.tga");
+			ndMatrix wheelMatrix(effector->GetLocalMatrix0() * calfLocation);
+			wheelBody->SetMatrix(wheelMatrix);
+
+			ndJointSpherical* const wheelJoint = new ndJointSpherical(wheelMatrix, wheelBody, calfBody);
+			ndSharedPtr<ndJointBilateralConstraint> wheelJointPtr(wheelJoint);
+			world->AddJoint(wheelJointPtr);
 		}
 
 		//void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
@@ -305,7 +324,7 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	world->AddModel(modelPtr);
 
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot0);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
