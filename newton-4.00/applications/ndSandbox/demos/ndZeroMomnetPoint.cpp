@@ -227,7 +227,8 @@ namespace ndZmp
 			ndSkeletonContainer* const skeleton = GetRoot()->GetSkeleton();
 			ndAssert(skeleton);
 		
-			
+static int xxx;
+xxx++;
 			if (!m_invDynamicsSolver.IsSleeping(skeleton))
 			{
 				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
@@ -244,9 +245,35 @@ namespace ndZmp
 
 				if (hasContact)
 				{
+
+					ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
+
 					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 					m_invDynamicsSolver.Solve();
 					m_invDynamicsSolver.SolverEnd();
+if (xxx >= 28)
+xxx *= 1;
+					ndVector forceAcc(ndVector::m_zero);
+					ndVector torqueAcc(ndVector::m_zero);
+					
+					for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+					{
+						ndBodyKinematic* const body = m_bodies[i];
+						ndVector com(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+						ndVector action(com - refPoint);
+						ndVector force(m_invDynamicsSolver.GetBodyForce(body));
+						ndVector torque(m_invDynamicsSolver.GetBodyTorque(body));
+						ndVector actionTorque(action.CrossProduct(force));
+						forceAcc += force;
+						torqueAcc += actionTorque - torque;
+					}
+
+					//if (forceAcc.m_y < ndFloat32(0.0f))
+					//{
+					//	ndFloat32 zmp_x = torqueAcc.m_z / forceAcc.m_y;
+					//	ndFloat32 zmp_z = -torqueAcc.m_x / forceAcc.m_y;
+					//	ndTrace(("Tz=%f  x=%f  z=%f\n", torqueAcc.m_z, zmp_x, zmp_z));
+					//}
 				}
 				else
 				{
