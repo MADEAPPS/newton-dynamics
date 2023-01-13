@@ -220,6 +220,47 @@ namespace ndZmp
 			ndModel::PostTransformUpdate(world, timestep);
 		}
 
+		ndVector CalculateZeroMomentPoint(const ndVector& reference) const
+		{
+			ndVector forceAcc(ndVector::m_zero);
+			ndVector torqueAcc(ndVector::m_zero);
+			const ndVector gravity(ndFloat32(0.0f), -DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
+
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				ndBodyKinematic* const body = m_bodies[i];
+				ndVector com(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+				ndVector action(com - reference);
+				ndVector force(gravity.Scale(body->GetMassMatrix().m_w));
+				ndVector torque(m_invDynamicsSolver.GetBodyTorque(body));
+
+				ndVector actionTorque(action.CrossProduct(force));
+				forceAcc += force;
+				torqueAcc += (actionTorque - torque);
+			}
+			ndVector zmp(torqueAcc.m_z / forceAcc.m_y, ndFloat32(0.0f), -torqueAcc.m_x / forceAcc.m_y, ndFloat32(1.0f));
+			zmp += reference;
+			return zmp;
+		}
+
+		bool TestBalance(const ndVector& zeroMomentPoint,  const ndVector& reference) const
+		{
+			ndVector zmp(zeroMomentPoint - reference);
+			ndVector torqueAcc (ndVector::m_zero);
+			const ndVector gravity(ndFloat32(0.0f), -DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				ndBodyKinematic* const body = m_bodies[i];
+				ndVector com(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+				ndVector action(zmp - (com - reference));
+				ndVector torque(m_invDynamicsSolver.GetBodyTorque(body));
+				ndVector force(gravity.Scale(body->GetMassMatrix().m_w));
+				torqueAcc += (torque + action.CrossProduct(force));
+			}
+
+			return true;
+		}
+
 		void Update(ndWorld* const world, ndFloat32 timestep)
 		{
 			ndModel::Update(world, timestep);
@@ -252,43 +293,18 @@ xxx++;
 					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 					m_invDynamicsSolver.Solve();
 					m_invDynamicsSolver.SolverEnd();
+
 if (xxx >= 28)
 xxx *= 1;
-					ndVector forceAcc(ndVector::m_zero);
-					ndVector torqueAcc(ndVector::m_zero);
-					ndVector gravity(ndFloat32(0.0f), -DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
-					
-					for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-					{
-						ndBodyKinematic* const body = m_bodies[i];
-						ndVector com(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-com = ndVector::m_zero;
-com.m_y = 1.0f;
 
-						ndVector action(com - refPoint);
-						ndVector force(gravity.Scale (body->GetMassMatrix().m_w));
-						ndVector torque(m_invDynamicsSolver.GetBodyTorque(body));
-
-						ndVector actionTorque(action.CrossProduct(force));
-						forceAcc += force;
-						torqueAcc += (actionTorque - torque);
-						break;
-					}
-
-					ndVector zmp(torqueAcc.m_z / forceAcc.m_y, ndFloat32(0.0f), -torqueAcc.m_x / forceAcc.m_y, ndFloat32(1.0f));
-
-					ndVector xxxx0(zmp.CrossProduct(forceAcc));
-					ndVector xxxx1(m_invDynamicsSolver.GetBodyTorque(m_bodies[0]));
-
-					zmp += refPoint;
-					ndTrace(("Tz=%f  x=%f  z=%f\n", torqueAcc.m_z, zmp.m_x, zmp.m_z));
+					ndVector zmp(CalculateZeroMomentPoint(refPoint));
+					ndAssert(TestBalance(zmp, refPoint));
+					//ndTrace(("x=%f  z=%f\n", zmp.m_x, zmp.m_z));
 				}
-				else
-				{
-					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
-					m_invDynamicsSolver.Solve();
-					m_invDynamicsSolver.SolverEnd();
-				}
+
+				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+				m_invDynamicsSolver.Solve();
+				m_invDynamicsSolver.SolverEnd();
 			}
 		}
 
