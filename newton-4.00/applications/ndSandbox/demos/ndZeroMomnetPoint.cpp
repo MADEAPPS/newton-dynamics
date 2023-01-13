@@ -263,12 +263,11 @@ xxx *= 1;
 						ndBodyKinematic* const body = m_bodies[i];
 						ndVector com(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
 com = ndVector::m_zero;
+com.m_y = 1.0f;
 
 						ndVector action(com - refPoint);
 						ndVector force(gravity.Scale (body->GetMassMatrix().m_w));
 						ndVector torque(m_invDynamicsSolver.GetBodyTorque(body));
-torque = ndVector::m_zero;
-torque.m_z = 1.0f;
 
 						ndVector actionTorque(action.CrossProduct(force));
 						forceAcc += force;
@@ -280,8 +279,6 @@ torque.m_z = 1.0f;
 
 					ndVector xxxx0(zmp.CrossProduct(forceAcc));
 					ndVector xxxx1(m_invDynamicsSolver.GetBodyTorque(m_bodies[0]));
-					xxxx1 = ndVector::m_zero;
-					xxxx1.m_z = 1.0f;
 
 					zmp += refPoint;
 					ndTrace(("Tz=%f  x=%f  z=%f\n", torqueAcc.m_z, zmp.m_x, zmp.m_z));
