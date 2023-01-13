@@ -33,6 +33,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
 
 	D_NEWTON_API ndVector GetGlobalPosition() const;
+	D_NEWTON_API ndMatrix GetReferenceFrame() const;
 
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
 	D_NEWTON_API void SetSwivelAngle(const ndFloat32 angle);

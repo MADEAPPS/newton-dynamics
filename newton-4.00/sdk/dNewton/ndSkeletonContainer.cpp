@@ -1569,7 +1569,7 @@ inline void ndSkeletonContainer::UpdateForcesImmediate(ndArray<ndBodyKinematic*>
 	}
 }
 
-void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
+void ndSkeletonContainer::SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, const ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
 {
 	ndFloat32* const f = ndAlloca(ndFloat32, m_rowCount);
 	ndFloat32* const b = ndAlloca(ndFloat32, m_auxiliaryRowCount);

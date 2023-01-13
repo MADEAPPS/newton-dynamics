@@ -318,9 +318,8 @@ void ndIkSolver::BuildMassMatrix()
 	
 		body->UpdateInvInertiaMatrix();
 		const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
-	
-		body->m_accel = zero;
-		body->m_alpha = zero;
+		//body->m_accel = zero;
+		//body->m_alpha = zero;
 		m_internalForces[i].m_linear = body->GetForce();
 		m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
 	}
@@ -390,6 +389,13 @@ void ndIkSolver::Solve()
 {
 	if (m_skeleton)
 	{
+		const ndVector zero(ndVector::m_zero);
+		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0; --i)
+		{
+			ndBodyKinematic* const body = m_bodies[i];
+			body->m_accel = zero;
+			body->m_alpha = zero;
+		}
 		m_skeleton->SolveImmediate(*this);
 
 		ndFixSizeArray<ndJacobian, 256> accelerations;
@@ -400,13 +406,16 @@ void ndIkSolver::Solve()
 		for (ndInt32 i = 1; i < m_bodies.GetCount(); ++i)
 		{
 			ndBodyKinematic* const body = m_bodies[i];
-			const ndInt32 index = body->m_index;
+			ndAssert(body->m_index == i);
+			//const ndInt32 index = body->m_index;
 			
 			const ndVector invMass(body->GetInvMass());
 			const ndMatrix& invInertia = body->GetInvInertiaMatrix();
 			
-			ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
-			ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
+			//ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
+			ndVector accel(invMass * (body->m_accel + m_internalForces[i].m_linear));
+			//ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
+			ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[i].m_angular));
 			
 			ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();
 			if (maxAccel2 > (m_maxAccel * m_maxAccel))

@@ -56,6 +56,7 @@ namespace ndZmp
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*m_joint;
 				effector->GetWorkSpaceConstraints(minRadio, maxRadio);
 				ndVector posit(effector->GetLocalTargetPosition() & ndVector::m_triplexMask);
+				//posit.m_y = (m_height - 0.5f) * 1.0;
 				posit = posit.Normalize().Scale(maxRadio * m_height);
 				effector->SetLocalTargetPosition(posit);
 			}
@@ -63,7 +64,7 @@ namespace ndZmp
 			ndVector m_posit;
 			ndFloat32 m_swivel;
 			ndFloat32 m_height;
-			ndSharedPtr<ndJointBilateralConstraint> m_joint;
+			ndSharedPtr<ndIkSwivelPositionEffector> m_joint;
 		};
 
 		ndZeroMomentModel(ndDemoEntityManager* const scene, const ndMatrix& matrixLocation)
@@ -160,13 +161,13 @@ namespace ndZmp
 
 			ndFloat32 workSpace = 0.99f * 2.0f * limbLength;
 			effector->SetWorkSpaceConstraints(0.0f, workSpace);
-			//m_effector = ndSharedPtr<ndJointBilateralConstraint>(effector);
 
 			// Add wheel leg limb (calf)
 			ndFloat32 wheelRadios = 4.0f * limbRadio;
 			ndBodyKinematic* const wheelBody = AddSphere(scene, ndGetIdentityMatrix(), 2.0f * limbMass, wheelRadios, "smilli.tga");
 			ndMatrix wheelMatrix(effector->GetLocalMatrix0() * calfLocation);
 			wheelBody->SetMatrix(wheelMatrix);
+			m_bodies.PushBack(wheelBody->GetAsBodyDynamic());
 
 			ndJointSpherical* const wheelJoint = new ndJointSpherical(wheelMatrix, wheelBody, calfBody);
 			ndSharedPtr<ndJointBilateralConstraint> wheelJointPtr(wheelJoint);
@@ -184,30 +185,8 @@ namespace ndZmp
 
 		void Debug(ndConstraintDebugCallback& context) const
 		{
-			m_effector.m_joint->DebugJoint(context);
-
-			//ndVector upVector(m_rootBody->GetMatrix().m_up);
-			////for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
-			//for (ndInt32 i = 0; i < 4; ++i)
-			//{
-			//	const ndEffectorInfo& info = m_effectorsInfo[i];
-			//
-			//	//ndMatrix lookAtMatrix0;
-			//	//ndMatrix lookAtMatrix1;
-			//	//ndJointBilateralConstraint* const lookAtJoint = info.m_lookAtJoint;
-			//	//lookAtJoint->DebugJoint(context);
-			//	//info.m_lookAtJoint->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-			//	//ndVector updir(lookAtMatrix1.m_posit + upVector.Scale(-1.0f));
-			//	//context.DrawLine(lookAtMatrix1.m_posit, updir, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
-			//
-			//	//ndMatrix swivelMatrix0;
-			//	//ndMatrix swivelMatrix1;
-			//	//info.m_effector->CalculateSwivelMatrices(swivelMatrix0, swivelMatrix1);
-			//	//
-			//	//ndVector posit1(swivelMatrix1.m_posit);
-			//	//posit1.m_y += 1.0f;
-			//	//context.DrawLine(swivelMatrix1.m_posit, posit1, ndVector(0.0f, 0.0f, 0.0f, 1.0f));
-			//}
+			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)*m_effector.m_joint;
+			joint->DebugJoint(context);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -239,6 +218,7 @@ namespace ndZmp
 				torqueAcc += (actionTorque - torque);
 			}
 			ndVector zmp(torqueAcc.m_z / forceAcc.m_y, ndFloat32(0.0f), -torqueAcc.m_x / forceAcc.m_y, ndFloat32(1.0f));
+			//zmp = zmp.Scale(0.1f);
 			zmp += reference;
 			return zmp;
 		}
@@ -257,7 +237,8 @@ namespace ndZmp
 				ndVector force(gravity.Scale(body->GetMassMatrix().m_w));
 				torqueAcc += (torque + action.CrossProduct(force));
 			}
-
+			bool ret = (ndAbs(torqueAcc.m_x) < 0.01f) && (ndAbs(torqueAcc.m_z) < 0.01f);
+			//return ret;
 			return true;
 		}
 
@@ -268,13 +249,8 @@ namespace ndZmp
 			ndSkeletonContainer* const skeleton = GetRoot()->GetSkeleton();
 			ndAssert(skeleton);
 		
-static int xxx;
-xxx++;
 			if (!m_invDynamicsSolver.IsSleeping(skeleton))
 			{
-				ndFixSizeArray<ndJointBilateralConstraint*, 8> effectors;
-				effectors.PushBack(*m_effector.m_joint);
-
 				ndBodyKinematic::ndContactMap& contacts = m_wheelBody->GetContactMap();
 				bool hasContact = false;
 				ndBodyKinematic::ndContactMap::Iterator iter(contacts);
@@ -284,28 +260,35 @@ xxx++;
 					hasContact = hasContact || contact->IsActive();
 				}
 
-				if (hasContact)
-				{
-
-					ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
-					refPoint = ndVector::m_zero;
-
-					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
-					m_invDynamicsSolver.Solve();
-					m_invDynamicsSolver.SolverEnd();
-
-if (xxx >= 28)
-xxx *= 1;
-
-					ndVector zmp(CalculateZeroMomentPoint(refPoint));
-					ndAssert(TestBalance(zmp, refPoint));
-					//ndTrace(("x=%f  z=%f\n", zmp.m_x, zmp.m_z));
-				}
+				ndFixSizeArray<ndJointBilateralConstraint*, 2> effectors;
+				ndIkSwivelPositionEffector* const joint = *m_effector.m_joint;
+				effectors.PushBack(joint);
 
 				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
+				if (hasContact)
+				{
+					const ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
+
+					m_invDynamicsSolver.Solve();
+					ndVector zmp(CalculateZeroMomentPoint(refPoint));
+					ndVector zmp__(joint->GetGlobalPosition());
+					ndAssert(TestBalance(zmp, refPoint));
+
+					const ndMatrix refFrame(joint->GetReferenceFrame());
+					ndVector localZmp = refFrame.UntransformVector(zmp);
+					joint->SetLocalTargetPosition(localZmp);
+
+					{
+						m_invDynamicsSolver.Solve();
+						ndVector zmp1(CalculateZeroMomentPoint(refPoint));
+						ndAssert(TestBalance(zmp1, refPoint));
+					}
+				}
+
+				ndVector zmp_____(joint->GetGlobalPosition());
 				m_invDynamicsSolver.Solve();
-				m_invDynamicsSolver.SolverEnd();
 			}
+			m_invDynamicsSolver.SolverEnd();
 		}
 
 		ndEffector m_effector;
@@ -359,19 +342,21 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	BuildFlatPlane(scene, true);
 	
-	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
+	//ndVector origin1(1.0f, 0.0f, 0.0f, 1.0f);
 	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(ndYawMatrix(-0.0f * ndDegreeToRad));
+	matrix.m_posit.m_x = 1.0f;
 	
-	ndZeroMomentModel* const robot0 = new ndZeroMomentModel(scene, matrix);
-	scene->SetSelectedModel(robot0);
-	ndSharedPtr<ndModel> modelPtr(robot0);
+	ndZeroMomentModel* const robot = new ndZeroMomentModel(scene, matrix);
+	scene->SetSelectedModel(robot);
+	ndSharedPtr<ndModel> modelPtr(robot);
 	world->AddModel(modelPtr);
 
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot0->GetRoot()->GetMatrix(), robot0->GetRoot(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane (robot->GetRoot()->GetMatrix().m_posit, ndVector (0.0f, 0.0f, 1.0f, 0.0f), robot->GetRoot(), world->GetSentinelBody()));
+	world->AddJoint(fixJoint);
 
-	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot0);
+	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
 	scene->Set2DDisplayRenderFunction(quadrupedUIPtr);
 	
