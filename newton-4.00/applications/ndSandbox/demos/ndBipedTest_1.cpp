@@ -533,16 +533,16 @@ namespace biped_1
 		ndFixSizeArray<ndSharedPtr<ndJointBilateralConstraint>, 8> m_effectorsJoints;
 	};
 
-	class ndBipedUI: public ndUIEntity
+	class ndModelUI: public ndUIEntity
 	{
 		public:
-		ndBipedUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
+		ndModelUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
 			:ndUIEntity(scene)
 			,m_biped(biped)
 		{
 		}
 
-		~ndBipedUI()
+		~ndModelUI()
 		{
 		}
 
@@ -620,7 +620,7 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(modelPtr);
 	world->AddJoint(fixJoint);
 
-	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
+	ndModelUI* const bipedUI = new ndModelUI(scene, model);
 	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
 	scene->Set2DDisplayRenderFunction(bipedUIPtr);
 	

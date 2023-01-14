@@ -962,16 +962,16 @@ namespace biped2
 		ndTraningStage m_trainingState;
 	};
 
-	class ndBipedUI : public ndUIEntity
+	class ndModelUI : public ndUIEntity
 	{
 		public:
-		ndBipedUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
+		ndModelUI(ndDemoEntityManager* const scene, ndHumanoidModel* const biped)
 			:ndUIEntity(scene)
 			, m_biped(biped)
 		{
 		}
 
-		~ndBipedUI()
+		~ndModelUI()
 		{
 		}
 
@@ -1050,7 +1050,7 @@ void ndBipedTest_2(ndDemoEntityManager* const scene)
 	world->AddModel(modelPtr);
 	//world->AddJoint(fixJoint);
 	
-	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
+	ndModelUI* const bipedUI = new ndModelUI(scene, model);
 	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
 	scene->Set2DDisplayRenderFunction(bipedUIPtr);
 
@@ -1095,7 +1095,7 @@ void ndBipedTest_2Trainer(ndDemoEntityManager* const scene)
 	
 	//scene->Set2DDisplayRenderFunction(ndHumanoidTraningModel::TrainingLoop, nullptr, model);
 	//scene->Set2DDisplayRenderFunction(ndHumanoidModel::ControlPanel, nullptr, model);
-	ndBipedUI* const bipedUI = new ndBipedUI(scene, model);
+	ndModelUI* const bipedUI = new ndModelUI(scene, model);
 	ndSharedPtr<ndUIEntity> bipedUIPtr(bipedUI);
 	scene->Set2DDisplayRenderFunction(bipedUIPtr);
 	

@@ -41,8 +41,10 @@ namespace ndZmp
 
 			ndEffector(ndIkSwivelPositionEffector* const effector)
 				:m_posit(effector->GetLocalTargetPosition())
-				,m_swivel(0.0f)
+				,m_yaw(0.0f)
+				,m_roll(0.0f)
 				,m_height(0.9f)
+				,m_swivel(0.0f)
 				,m_joint(effector)
 			{
 				SetPosition();
@@ -55,15 +57,22 @@ namespace ndZmp
 
 				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*m_joint;
 				effector->GetWorkSpaceConstraints(minRadio, maxRadio);
-				ndVector posit(effector->GetLocalTargetPosition() & ndVector::m_triplexMask);
-				//posit.m_y = (m_height - 0.5f) * 1.0;
-				posit = posit.Normalize().Scale(maxRadio * m_height);
+				//ndVector posit(effector->GetLocalTargetPosition() & ndVector::m_triplexMask);
+
+				const ndMatrix yaw(ndYawMatrix(m_yaw * ndDegreeToRad));
+				const ndMatrix roll(ndRollMatrix(m_roll * ndDegreeToRad));
+				ndVector posit(m_height * maxRadio, 0.0f, 0.0f, 1.0f);
+				posit = yaw.RotateVector(posit);
+				posit = roll.RotateVector(posit);
+				//posit = posit.Normalize().Scale(maxRadio * m_height);
 				effector->SetLocalTargetPosition(posit);
 			}
 
 			ndVector m_posit;
-			ndFloat32 m_swivel;
+			ndFloat32 m_yaw;
+			ndFloat32 m_roll;
 			ndFloat32 m_height;
+			ndFloat32 m_swivel;
 			ndSharedPtr<ndIkSwivelPositionEffector> m_joint;
 		};
 
@@ -203,6 +212,8 @@ namespace ndZmp
 		{
 			ndVector forceAcc(ndVector::m_zero);
 			ndVector torqueAcc(ndVector::m_zero);
+
+			ndVector force___(m_invDynamicsSolver.GetBodyForce(m_bodies[m_bodies.GetCount() - 1]));
 			const ndVector gravity(ndFloat32(0.0f), -DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
 
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
@@ -218,7 +229,7 @@ namespace ndZmp
 				torqueAcc += (actionTorque - torque);
 			}
 			ndVector zmp(torqueAcc.m_z / forceAcc.m_y, ndFloat32(0.0f), -torqueAcc.m_x / forceAcc.m_y, ndFloat32(1.0f));
-			//zmp = zmp.Scale(0.1f);
+			zmp = zmp.Scale(0.0f);
 			zmp += reference;
 			return zmp;
 		}
@@ -267,25 +278,26 @@ namespace ndZmp
 				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 				if (hasContact)
 				{
-					const ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
-
-					m_invDynamicsSolver.Solve();
-					ndVector zmp(CalculateZeroMomentPoint(refPoint));
-					ndVector zmp__(joint->GetGlobalPosition());
-					ndAssert(TestBalance(zmp, refPoint));
-
-					const ndMatrix refFrame(joint->GetReferenceFrame());
-					ndVector localZmp = refFrame.UntransformVector(zmp);
-					joint->SetLocalTargetPosition(localZmp);
-
-					{
-						m_invDynamicsSolver.Solve();
-						ndVector zmp1(CalculateZeroMomentPoint(refPoint));
-						ndAssert(TestBalance(zmp1, refPoint));
-					}
+					//const ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
+					//
+					//m_invDynamicsSolver.Solve();
+					//ndVector zmp(CalculateZeroMomentPoint(refPoint));
+					//ndAssert(TestBalance(zmp, refPoint));
+					//
+					//const ndMatrix refFrame(joint->GetReferenceFrame());
+					//ndVector localZmp = refFrame.UntransformVector(zmp);
+					//joint->SetLocalTargetPosition(localZmp);
+					//
+					//{
+					//	m_invDynamicsSolver.Solve();
+					//	ndVector zmp1(CalculateZeroMomentPoint(refPoint));
+					//	ndVector force(m_invDynamicsSolver.GetBodyForce(m_bodies[m_bodies.GetCount() - 1]));
+					//	ndVector torque(m_invDynamicsSolver.GetBodyTorque(m_bodies[m_bodies.GetCount() - 1]));
+					//	ndTrace(("%d: F(%f %f %f) T(%f %f %f)\n", xxx, force.m_x, force.m_y, force.m_z, torque.m_x, torque.m_y, torque.m_z));
+					//	ndAssert(TestBalance(zmp1, refPoint));
+					//}
 				}
 
-				ndVector zmp_____(joint->GetGlobalPosition());
 				m_invDynamicsSolver.Solve();
 			}
 			m_invDynamicsSolver.SolverEnd();
@@ -324,6 +336,14 @@ namespace ndZmp
 			bool change = false;
 			ImGui::Text("height");
 			change = change || ImGui::SliderFloat("##x", &info.m_height, 0.3f, 1.0f);
+			ImGui::Text("roll");
+			change = change | ImGui::SliderFloat("##z", &info.m_roll, -30.0f, 30.0f);
+			ImGui::Text("yaw");
+			change = change | ImGui::SliderFloat("##y", &info.m_yaw, -30.0f, 30.0f);
+
+			//ImGui::Text("swivel");
+			//change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+
 			if (change)
 			{
 				m_model->GetRoot()->SetSleepState(false);
@@ -352,9 +372,9 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> modelPtr(robot);
 	world->AddModel(modelPtr);
 
-	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane (robot->GetRoot()->GetMatrix().m_posit, ndVector (0.0f, 0.0f, 1.0f, 0.0f), robot->GetRoot(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane (robot->GetRoot()->GetMatrix().m_posit, ndVector (0.0f, 0.0f, 1.0f, 0.0f), robot->GetRoot(), world->GetSentinelBody()));
+	//world->AddJoint(fixJoint);
 
 	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
