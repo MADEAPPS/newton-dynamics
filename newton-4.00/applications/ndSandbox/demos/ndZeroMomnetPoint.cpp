@@ -40,8 +40,7 @@ namespace ndZmp
 			}
 
 			ndEffector(ndIkSwivelPositionEffector* const effector)
-				:m_posit(effector->GetLocalTargetPosition())
-				,m_yaw(0.0f)
+				:m_yaw(0.0f)
 				,m_roll(0.0f)
 				,m_height(0.9f)
 				,m_swivel(0.0f)
@@ -68,7 +67,6 @@ namespace ndZmp
 				effector->SetLocalTargetPosition(posit);
 			}
 
-			ndVector m_posit;
 			ndFloat32 m_yaw;
 			ndFloat32 m_roll;
 			ndFloat32 m_height;
@@ -212,8 +210,6 @@ namespace ndZmp
 		{
 			ndVector forceAcc(ndVector::m_zero);
 			ndVector torqueAcc(ndVector::m_zero);
-
-			ndVector force___(m_invDynamicsSolver.GetBodyForce(m_bodies[m_bodies.GetCount() - 1]));
 			const ndVector gravity(ndFloat32(0.0f), -DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f));
 
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
@@ -232,6 +228,17 @@ namespace ndZmp
 			zmp = zmp.Scale(0.0f);
 			zmp += reference;
 			return zmp;
+		}
+
+		ndVector CalculateNetTorque() const
+		{
+			ndVector torqueAcc(ndVector::m_zero);
+			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			{
+				ndBodyKinematic* const body = m_bodies[i];
+				torqueAcc += m_invDynamicsSolver.GetBodyTorque(body);
+			}
+			return torqueAcc;
 		}
 
 		bool TestBalance(const ndVector& zeroMomentPoint,  const ndVector& reference) const
@@ -278,9 +285,21 @@ namespace ndZmp
 				m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 				if (hasContact)
 				{
-					//const ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
-					//
+					ndVector torque0(CalculateNetTorque());
+					m_effector.m_roll = 25.5f;
+					m_effector.SetPosition();
+					m_invDynamicsSolver.Solve();
+					ndVector torque1(CalculateNetTorque());
+
+
+					m_effector.m_roll = -25.5f;
+					m_effector.SetPosition();
+					m_invDynamicsSolver.Solve();
+					ndVector torque2(CalculateNetTorque());
+					ndVector torque3(CalculateNetTorque());
+					
 					//m_invDynamicsSolver.Solve();
+					//const ndVector refPoint(m_wheelBody->GetMatrix().m_posit);
 					//ndVector zmp(CalculateZeroMomentPoint(refPoint));
 					//ndAssert(TestBalance(zmp, refPoint));
 					//
@@ -299,6 +318,7 @@ namespace ndZmp
 				}
 
 				m_invDynamicsSolver.Solve();
+				ndVector torque2(CalculateNetTorque());
 			}
 			m_invDynamicsSolver.SolverEnd();
 		}
