@@ -41,6 +41,7 @@ D_CORE_API void ndRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVec
 D_CORE_API bool ndRayBoxClip (ndVector& ray_p0, ndVector& ray_p1, const ndVector& boxP0, const ndVector& boxP1); 
 D_CORE_API ndFloat32 ndRayCastBox (const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut);
 D_CORE_API ndFloat32 ndRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius);
+D_CORE_API bool ndRayCastSphere(const ndMatrix& origin, ndFloat32 radius, const ndVector& p0, const ndVector& p1, ndFloat32& t0, ndFloat32& t1);
 
 inline ndInt32 ndOverlapTest (const ndVector& p0, const ndVector& p1, const ndVector& q0, const ndVector& q1)
 {

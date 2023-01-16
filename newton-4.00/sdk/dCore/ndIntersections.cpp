@@ -344,6 +344,65 @@ void ndRayToPolygonDistance(const ndBigVector& ray_p0, const ndBigVector& ray_p1
 	}
 }
 
+ndFloat32 ndRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut)
+{
+	ndInt32 index = 0;
+	ndFloat32 signDir = ndFloat32(0.0f);
+	ndFloat32 tmin = ndFloat32(0.0f);
+	ndFloat32 tmax = ndFloat32(1.0f);
+
+	for (ndInt32 i = 0; i < 3; ++i)
+	{
+		ndFloat32 dp = p1[i] - p0[i];
+		if (ndAbs(dp) < ndFloat32(1.0e-8f))
+		{
+			if (p0[i] <= boxP0[i] || p0[i] >= boxP1[i])
+			{
+				return ndFloat32(1.2f);
+			}
+		}
+		else
+		{
+			dp = ndFloat32(1.0f) / dp;
+			ndFloat32 t1 = (boxP0[i] - p0[i]) * dp;
+			ndFloat32 t2 = (boxP1[i] - p0[i]) * dp;
+
+			ndFloat32 sign = ndFloat32(-1.0f);
+			if (t1 > t2)
+			{
+				sign = 1;
+				ndSwap(t1, t2);
+			}
+			if (t1 > tmin)
+			{
+				signDir = sign;
+				index = i;
+				tmin = t1;
+			}
+			if (t2 < tmax)
+			{
+				tmax = t2;
+			}
+			if (tmin > tmax)
+			{
+				return ndFloat32(1.2f);
+			}
+		}
+	}
+
+	if (tmin > ndFloat32(0.0f))
+	{
+		ndAssert(tmin < 1.0f);
+		normalOut = ndVector(ndFloat32(0.0f));
+		normalOut[index] = signDir;
+	}
+	else
+	{
+		tmin = ndFloat32(1.2f);
+	}
+	return tmin;
+}
+
 ndFloat32 ndRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius)
 {
 	ndVector p0Origin (p0 - origin);
@@ -428,61 +487,29 @@ ndFloat32 ndRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVecto
 	return ndFloat32(1.2f);
 }
 
-ndFloat32 ndRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut)
+bool ndRayCastSphere(const ndMatrix& origin, ndFloat32 radius, const ndVector& p0, const ndVector& p1, ndFloat32& t0, ndFloat32& t1)
 {
-	ndInt32 index = 0;
-	ndFloat32 signDir = ndFloat32(0.0f);
-	ndFloat32 tmin = ndFloat32(0.0f);
-	ndFloat32 tmax = ndFloat32(1.0f);
+	const ndVector p0Src(origin.UntransformVector(p0) & ndVector::m_triplexMask);
+	const ndVector p0Dst(origin.UntransformVector(p1) & ndVector::m_triplexMask);
+	const ndVector dp(p0Dst - p0Src);
+	ndFloat32 a = dp.DotProduct(dp).GetScalar();
+	ndFloat32 b = ndFloat32(2.0f) * p0Src.DotProduct(dp).GetScalar();
+	ndFloat32 c = p0Src.DotProduct(p0Src).GetScalar() - radius * radius;
+	ndAssert(p0Src.DotProduct(p0Src).GetScalar() < (ndFloat32(100.0f) * radius * radius));
 
-	for (ndInt32 i = 0; i < 3; ++i)
+	ndFloat32 desc = b * b - ndFloat32(4.0f) * a * c;
+	bool ret = false;
+	if (desc >= 0.0f)
 	{
-		ndFloat32 dp = p1[i] - p0[i];
-		if (ndAbs(dp) < ndFloat32(1.0e-8f))
+		desc = ndSqrt(desc);
+		ndFloat32 den = ndFloat32(0.5f) / a;
+		t0 = (-b + desc) * den;
+		t1 = (-b - desc) * den;
+		if (t0 < t1)
 		{
-			if (p0[i] <= boxP0[i] || p0[i] >= boxP1[i])
-			{
-				return ndFloat32(1.2f);
-			}
+			ndSwap(t0, t1);
 		}
-		else
-		{
-			dp = ndFloat32(1.0f) / dp;
-			ndFloat32 t1 = (boxP0[i] - p0[i]) * dp;
-			ndFloat32 t2 = (boxP1[i] - p0[i]) * dp;
-
-			ndFloat32 sign = ndFloat32(-1.0f);
-			if (t1 > t2)
-			{
-				sign = 1;
-				ndSwap(t1, t2);
-			}
-			if (t1 > tmin)
-			{
-				signDir = sign;
-				index = i;
-				tmin = t1;
-			}
-			if (t2 < tmax)
-			{
-				tmax = t2;
-			}
-			if (tmin > tmax)
-			{
-				return ndFloat32(1.2f);
-			}
-		}
+		ret = true;
 	}
-
-	if (tmin > ndFloat32(0.0f))
-	{
-		ndAssert(tmin < 1.0f);
-		normalOut = ndVector(ndFloat32(0.0f));
-		normalOut[index] = signDir;
-	}
-	else
-	{
-		tmin = ndFloat32(1.2f);
-	}
-	return tmin;
+	return ret;
 }

@@ -196,6 +196,12 @@ namespace ndZmp
 		{
 			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)*m_effector.m_joint;
 			joint->DebugJoint(context);
+
+			ndJacobian com(CalculateCenterOmassAndMomentum());
+			ndMatrix matrix(GetRoot()->GetMatrix());
+			matrix.m_posit = com.m_linear;
+			matrix.m_posit.m_w = 1.0f;
+			context.DrawFrame(matrix);
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
