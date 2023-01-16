@@ -32,10 +32,10 @@ namespace ndZmp
 		public:
 		D_CLASS_REFLECTION(ndZmp::ndZeroMomentModel);
 
-		class ndRobotKinematics
+		class ndDynamicState
 		{
 			public:
-			ndRobotKinematics(const ndFixSizeArray<ndBodyDynamic*, 8>& bodyList)
+			ndDynamicState(const ndFixSizeArray<ndBodyDynamic*, 8>& bodyList)
 				:m_com(ndVector::m_zero)
 				,m_veloc(ndVector::m_zero)
 				,m_momemtum(ndVector::m_zero)
@@ -207,7 +207,8 @@ namespace ndZmp
 			ndMatrix wheelMatrix(effector->GetLocalMatrix0() * calfLocation);
 			wheelBody->SetMatrix(wheelMatrix);
 			wheelBody->GetNotifyCallback()->OnTransform(0, wheelMatrix);
-			m_bodies.PushBack(wheelBody->GetAsBodyDynamic());
+			wheelBody->SetMassMatrix(ndVector::m_zero);
+			//m_bodies.PushBack(wheelBody->GetAsBodyDynamic());
 
 			ndJointSpherical* const wheelJoint = new ndJointSpherical(wheelMatrix, wheelBody, calfBody);
 			ndSharedPtr<ndJointBilateralConstraint> wheelJointPtr(wheelJoint);
@@ -228,11 +229,15 @@ namespace ndZmp
 			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)*m_effector.m_joint;
 			joint->DebugJoint(context);
 
-			ndRobotKinematics kin(m_bodies);
+			ndDynamicState kin(m_bodies);
 			ndMatrix matrix(GetRoot()->GetMatrix());
 			matrix.m_posit = kin.m_com;
 			matrix.m_posit.m_w = 1.0f;
 			context.DrawFrame(matrix);
+
+			ndVector p1(matrix.m_posit);
+			p1.m_y -= 1.0f;
+			context.DrawLine(matrix.m_posit, p1, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
 		}
 
 		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
@@ -372,7 +377,7 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 				if (hasContact)
 				{
 					//ndJacobian com(CalculateCenterOmassAndMomentum());
-					ndRobotKinematics kin(m_bodies);
+					ndDynamicState kin(m_bodies);
 					m_effector.SetPosition();
 					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 					m_invDynamicsSolver.Solve();
@@ -459,7 +464,7 @@ void ndZeroMomentPoint(ndDemoEntityManager* const scene)
 
 	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(robot->GetRoot()->GetMatrix(), robot->GetRoot(), world->GetSentinelBody()));
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointPlane (robot->GetRoot()->GetMatrix().m_posit, ndVector (0.0f, 0.0f, 1.0f, 0.0f), robot->GetRoot(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 
 	ndModelUI* const quadrupedUI = new ndModelUI(scene, robot);
 	ndSharedPtr<ndUIEntity> quadrupedUIPtr(quadrupedUI);
