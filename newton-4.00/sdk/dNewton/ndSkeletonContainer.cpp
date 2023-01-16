@@ -30,8 +30,6 @@
 
 #define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * ndFloat32 (0.25f))
 
-//ndInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x0706050403020100ll;
-
 ndSkeletonContainer::ndNode::ndNode()
 	:m_body(nullptr)
 	,m_joint(nullptr)
@@ -105,7 +103,6 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 	{
 		for (ndInt32 i = 0; i < m_dof; ++i) 
 		{
-			//const ndInt32 k = m_sourceJacobianIndex[i];
 			const ndInt32 k = m_ordinal.m_sourceJacobianIndex[i];
 			const ndRightHandSide* const rhs = &rightHandSide[start + k];
 			const ndLeftHandSide* const row = &leftHandSide[start + k];
@@ -232,7 +229,6 @@ ndInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftH
 	CalculateInertiaMatrix(bodyMassArray);
 
 	ndInt32 boundedDof = 0;
-	//m_ordinals = m_ordinalInit;
 	m_ordinal = ndOrdinal();
 
 	if (m_joint) 
@@ -541,7 +537,6 @@ void ndSkeletonContainer::CheckSleepState()
 			}
 		}
 	}
-	//m_isResting = equilibrium ? true : false;
 	m_isResting = equilibrium;
 }
 
@@ -1490,23 +1485,15 @@ void ndSkeletonContainer::CalculateJointAccelImmediate(const ndJacobian* const i
 
 		const ndInt32 first = joint->m_rowStart;
 		const ndInt32 dof = joint->m_rowCount;
-		//const ndInt32 m0 = joint->GetBody0()->m_index;
-		//const ndInt32 m1 = joint->GetBody1()->m_index;
-		//const ndJacobian& y0 = internalForces[m0];
-		//const ndJacobian& y1 = internalForces[m1];
 
 		for (ndInt32 j = 0; j < dof; ++j)
 		{
 			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
-			//const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
-			//ndVector diag(
-			//	row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-			//	row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-			//a.m_joint[j] = -(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp - diag.AddHorizontal().GetScalar());
 			a.m_joint[j] = -rhs->m_coordenateAccel;
 		}
 	}
+
 	ndAssert((nodeCount - 1) == m_nodesOrder[nodeCount - 1]->m_index);
 	ndForcePair& a = accel[nodeCount - 1];
 	a.m_body = zero;

@@ -55,16 +55,11 @@ void ndIkSolver::SetMaxAccel(ndFloat32 maxAccel, ndFloat32 maxAlpha)
 	m_maxAccel = ndAbs(maxAccel);
 }
 
-//void ndIkSolver::SetMaxIterations(ndInt32 iterCount)
-//{
-//	m_maxIterations = dClamp(iterCount, 1, 16);
-//}
-
 void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
 	ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
-	for (ndInt32 i = ndInt32(joint->GetRowsCount() - 1); i >= 0; i--)
+	for (ndInt32 i = ndInt32(joint->GetRowsCount() - 1); i >= 0; --i)
 	{
 		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
 		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
@@ -94,7 +89,8 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 				skeleton0->AddCloseLoopJoint(contactJoint);
 			}
 		}
-		else if (contactJoint->IsSkeletonIntraCollision())
+		//else if (contactJoint->IsSkeletonIntraCollision())
+		else
 		{
 			if (skeleton0 && !skeleton1)
 			{
@@ -135,14 +131,18 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 	joint->m_rowCount = dof;
 	joint->m_rowStart = m_leftHandSide.GetCount();
 	const ndInt32 baseIndex = joint->m_rowStart;
+	ndAssert(baseIndex == m_leftHandSide.GetCount());
+	ndAssert(baseIndex == m_leftHandSide.GetCount());
 	for (ndInt32 i = 0; i < dof; ++i)
 	{
 		ndAssert(constraintParam.m_forceBounds[i].m_jointForce);
 
 		m_leftHandSide.PushBack(ndLeftHandSide());
 		m_rightHandSide.PushBack(ndRightHandSide());
-		ndLeftHandSide* const row = &m_leftHandSide[m_leftHandSide.GetCount()-1];
-		ndRightHandSide* const rhs = &m_rightHandSide[m_leftHandSide.GetCount() - 1];
+		//ndLeftHandSide* const row = &m_leftHandSide[m_leftHandSide.GetCount()-1];
+		//ndRightHandSide* const rhs = &m_rightHandSide[m_leftHandSide.GetCount() - 1];
+		ndLeftHandSide* const row = &m_leftHandSide[baseIndex + i];
+		ndRightHandSide* const rhs = &m_rightHandSide[baseIndex + i];
 
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = ndFloat32(0.0f);
@@ -161,6 +161,68 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 		const ndInt32 mask = frictionIndex >> 31;
 		rhs->m_normalForceIndex = frictionIndex;
 		rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
+	}
+}
+
+void ndIkSolver::UpdateJointAcceleration(ndConstraint* const joint)
+{
+	ndConstraintDescritor constraintParam;
+	ndAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
+	for (ndInt32 i = ndInt32(joint->GetRowsCount() - 1); i >= 0; --i)
+	{
+		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
+		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
+		constraintParam.m_forceBounds[i].m_jointForce = nullptr;
+		constraintParam.m_forceBounds[i].m_normalIndex = D_INDEPENDENT_ROW;
+	}
+	ndAssert(!joint->GetAsContact());
+	const ndInt32 dof = joint->m_rowCount;
+	joint->m_rowCount = ndInt32(joint->GetRowsCount());
+	constraintParam.m_rowsCount = 0;
+	constraintParam.m_timestep = m_timestep;
+	constraintParam.m_invTimestep = m_invTimestep;
+	joint->JacobianDerivative(constraintParam);
+	//const ndInt32 dof = constraintParam.m_rowsCount;
+	ndAssert(dof <= joint->m_rowCount);
+	ndAssert(dof == constraintParam.m_rowsCount);
+	joint->m_rowCount = dof;
+	
+	ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
+	ndAssert(bilareral);
+	ndAssert(bilareral->GetSolverModel() != m_jointkinematicAttachment);
+	ndAssert(bilareral->GetBody0()->GetSkeleton() == m_skeleton);
+	ndAssert(bilareral->GetBody1()->GetSkeleton() == m_skeleton);
+	
+	//joint->m_rowStart = m_leftHandSide.GetCount();
+	const ndInt32 baseIndex = joint->m_rowStart;
+	for (ndInt32 i = 0; i < dof; ++i)
+	{
+		ndAssert(constraintParam.m_forceBounds[i].m_jointForce);
+	
+	//	m_leftHandSide.PushBack(ndLeftHandSide());
+	//	m_rightHandSide.PushBack(ndRightHandSide());
+	//	ndLeftHandSide* const row = &m_leftHandSide[m_leftHandSide.GetCount() - 1];
+	//	ndRightHandSide* const rhs = &m_rightHandSide[m_leftHandSide.GetCount() - 1];
+		//ndLeftHandSide* const row = &m_leftHandSide[baseIndex + i];
+		ndRightHandSide* const rhs = &m_rightHandSide[baseIndex + i];
+
+	//	row->m_Jt = constraintParam.m_jacobian[i];
+	//	rhs->m_diagDamp = ndFloat32(0.0f);
+	//	rhs->m_diagonalRegularizer = ndMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
+	
+		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
+	//	rhs->m_restitution = constraintParam.m_restitution[i];
+	//	rhs->m_penetration = constraintParam.m_penetration[i];
+	//	rhs->m_penetrationStiffness = constraintParam.m_penetrationStiffness[i];
+	//	rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
+	//	rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
+	//	rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
+	//
+	//	ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
+	//	const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
+	//	const ndInt32 mask = frictionIndex >> 31;
+	//	rhs->m_normalForceIndex = frictionIndex;
+	//	rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
 	}
 }
 
@@ -283,7 +345,7 @@ void ndIkSolver::BuildMassMatrix()
 				const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
 				for (ndInt32 j = 0; j < loops; ++j)
 				{
-					duplicate = duplicate | (m_skeleton->m_loopingJoints[j] == contact);
+					duplicate = duplicate || (m_skeleton->m_loopingJoints[j] == contact);
 				}
 				if (!duplicate)
 				{
@@ -318,8 +380,6 @@ void ndIkSolver::BuildMassMatrix()
 	
 		body->UpdateInvInertiaMatrix();
 		const ndVector gyroTorque(body->m_omega.CrossProduct(body->CalculateAngularMomentum()));
-		//body->m_accel = zero;
-		//body->m_alpha = zero;
 		m_internalForces[i].m_linear = body->GetForce();
 		m_internalForces[i].m_angular = body->GetTorque() - gyroTorque;
 	}
@@ -412,9 +472,7 @@ void ndIkSolver::Solve()
 			const ndVector invMass(body->GetInvMass());
 			const ndMatrix& invInertia = body->GetInvInertiaMatrix();
 			
-			//ndVector accel(invMass * (body->m_accel + m_internalForces[index].m_linear));
 			ndVector accel(invMass * (body->m_accel + m_internalForces[i].m_linear));
-			//ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[index].m_angular));
 			ndVector alpha(invInertia.RotateVector(body->m_alpha + m_internalForces[i].m_angular));
 			
 			ndFloat32 maxAccel2 = accel.DotProduct(accel).GetScalar();

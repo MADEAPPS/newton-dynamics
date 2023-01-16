@@ -49,7 +49,7 @@ ndContact::ndContact()
 	,m_isDead(0)
 	,m_isAttached(0)
 	,m_isIntersetionTestOnly(0)
-	,m_skeletonIntraCollision(1)
+	//,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
 {
 	m_active = 0;

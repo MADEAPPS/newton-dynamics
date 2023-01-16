@@ -988,14 +988,14 @@ namespace biped2
 
 			bool change = false;
 			ImGui::Text("distance");
-			change = change | ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
+			change = change || ImGui::SliderFloat("##x", &info.m_x, -0.5f, 1.0f);
 			ImGui::Text("roll");
-			change = change | ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
+			change = change || ImGui::SliderFloat("##z", &info.m_z, -1.0f, 1.0f);
 			ImGui::Text("yaw");
-			change = change | ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
+			change = change || ImGui::SliderFloat("##y", &info.m_y, -1.0f, 1.0f);
 
 			ImGui::Text("swivel");
-			change = change | ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
+			change = change || ImGui::SliderFloat("##swivel", &info.m_swivel, -1.0f, 1.0f);
 
 			ndHumanoidModel::ndEffectorInfo& info1 = m_biped->m_effectors[1];
 			info1.m_x = info.m_x;
