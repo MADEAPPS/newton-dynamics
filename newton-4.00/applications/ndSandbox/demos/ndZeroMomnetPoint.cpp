@@ -32,6 +32,37 @@ namespace ndZmp
 		public:
 		D_CLASS_REFLECTION(ndZmp::ndZeroMomentModel);
 
+		class ndRobotKinematics
+		{
+			public:
+			ndRobotKinematics(const ndFixSizeArray<ndBodyDynamic*, 8>& bodyList)
+				:m_com(ndVector::m_zero)
+				,m_veloc(ndVector::m_zero)
+				,m_momemtum(ndVector::m_zero)
+			{
+				//ndJacobian com;
+				ndFloat32 mass = 0.0f;
+				ndVector com(ndVector::m_zero);
+				ndVector momemtum (ndVector::m_zero);
+				for (ndInt32 i = 0; i < bodyList.GetCount(); ++i)
+				{
+					ndBodyKinematic* const body = bodyList[i];
+					ndVector bodyCom(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
+					mass += body->GetMassMatrix().m_w;
+					com += bodyCom.Scale(body->GetMassMatrix().m_w);
+					momemtum = body->GetVelocity().Scale(body->GetMassMatrix().m_w);
+				}
+				ndFloat32 invMass = 1.0f / mass;
+				m_momemtum = momemtum;
+				m_com = com.Scale(invMass);
+				m_veloc = momemtum.Scale(invMass);
+			}
+
+			ndVector m_com;
+			ndVector m_veloc;
+			ndVector m_momemtum;
+		};
+
 		class ndEffector
 		{
 			public:
@@ -197,9 +228,9 @@ namespace ndZmp
 			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)*m_effector.m_joint;
 			joint->DebugJoint(context);
 
-			ndJacobian com(CalculateCenterOmassAndMomentum());
+			ndRobotKinematics kin(m_bodies);
 			ndMatrix matrix(GetRoot()->GetMatrix());
-			matrix.m_posit = com.m_linear;
+			matrix.m_posit = kin.m_com;
 			matrix.m_posit.m_w = 1.0f;
 			context.DrawFrame(matrix);
 		}
@@ -260,26 +291,6 @@ namespace ndZmp
 				torqueAcc += torque;
 			}
 			return torqueAcc;
-		}
-
-		ndJacobian CalculateCenterOmassAndMomentum() const
-		{
-			ndJacobian com;
-			ndFloat32 mass = 0.0f;
-			com.m_linear = ndVector::m_zero;
-			com.m_angular = ndVector::m_zero;
-			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-			{
-				ndBodyKinematic* const body = m_bodies[i];
-				ndVector bodyCom(body->GetMatrix().TransformVector(body->GetCentreOfMass()));
-				mass += body->GetMassMatrix().m_w;
-				com.m_linear += bodyCom.Scale(body->GetMassMatrix().m_w);
-				com.m_angular = body->GetVelocity().Scale(body->GetMassMatrix().m_w);
-			}
-			ndFloat32 invMass = 1.0f / mass;
-			com.m_linear = com.m_linear.Scale(invMass);
-			com.m_angular = com.m_angular.Scale(invMass);
-			return com;
 		}
 
 		void Update(ndWorld* const world, ndFloat32 timestep)
@@ -360,7 +371,8 @@ ndTrace(("%d: invTorque=%f %f\n", xxxx, torque0.m_z, torqueB___.m_z));
 #else
 				if (hasContact)
 				{
-					ndJacobian com(CalculateCenterOmassAndMomentum());
+					//ndJacobian com(CalculateCenterOmassAndMomentum());
+					ndRobotKinematics kin(m_bodies);
 					m_effector.SetPosition();
 					m_invDynamicsSolver.SolverBegin(skeleton, &effectors[0], effectors.GetCount(), world, timestep);
 					m_invDynamicsSolver.Solve();
