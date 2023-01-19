@@ -187,11 +187,10 @@ void ndIkSolver::UpdateJointAcceleration(ndConstraint* const joint)
 	ndAssert(dof == constraintParam.m_rowsCount);
 	joint->m_rowCount = dof;
 	
-	ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
-	ndAssert(bilareral);
-	ndAssert(bilareral->GetSolverModel() != m_jointkinematicAttachment);
-	ndAssert(bilareral->GetBody0()->GetSkeleton() == m_skeleton);
-	ndAssert(bilareral->GetBody1()->GetSkeleton() == m_skeleton);
+	ndAssert(joint->GetAsBilateral());
+	ndAssert(joint->GetAsBilateral()->GetSolverModel() != m_jointkinematicAttachment);
+	ndAssert(joint->GetAsBilateral()->GetBody0()->GetSkeleton() == m_skeleton);
+	ndAssert(joint->GetAsBilateral()->GetBody1()->GetSkeleton() == m_skeleton);
 	
 	//joint->m_rowStart = m_leftHandSide.GetCount();
 	const ndInt32 baseIndex = joint->m_rowStart;
