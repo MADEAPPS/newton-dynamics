@@ -243,35 +243,28 @@ void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const sc
 
 	threadPool.ParallelExecute(ndBuildHistogram);
 
-	ndInt32 bits = keyBitSize;
-	if (bits < 11)
+	ndAssert(keyBitSize < 11);
+	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
+		sum[i] = 0;
+	}
+	for (ndInt32 j = 0; j < threadCount; ++j)
+	{
+		ndUnsigned32* const scan = &scans[j * (1 << keyBitSize)];
 		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 		{
-			sum[i] = 0;
-		}
-		for (ndInt32 j = 0; j < threadCount; ++j)
-		{
-			ndUnsigned32* const scan = &scans[j * (1 << keyBitSize)];
-			for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-			{
-				ndUnsigned32 partialSum = scan[i];
-				scan[i] = sum[i];
-				sum[i] += partialSum;
-			}
-		}
-
-		ndUnsigned32 accSum = 0;
-		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-		{
-			ndUnsigned32 partialSum = sum[i];
-			sum[i] = accSum;
-			accSum += partialSum;
+			ndUnsigned32 partialSum = scan[i];
+			scan[i] = sum[i];
+			sum[i] += partialSum;
 		}
 	}
-	else
+
+	ndUnsigned32 accSum = 0;
+	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
-		ndAssert(0);
+		ndUnsigned32 partialSum = sum[i];
+		sum[i] = accSum;
+		accSum += partialSum;
 	}
 
 	if (prefixScanOut)
@@ -408,35 +401,28 @@ void ndCountingSort(ndThreadPool& threadPool, const T* const srcArray, T* const 
 
 	threadPool.ParallelExecute(ndBuildHistogram);
 
-	ndInt32 bits = keyBitSize;
-	if (bits < 11)
+	ndAssert(keyBitSize < 11);
+	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
+		sum[i] = 0;
+	}
+	for (ndInt32 j = 0; j < threadCount; ++j)
+	{
+		ndUnsigned32* const scan = &scans[j * (1 << keyBitSize)];
 		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 		{
-			sum[i] = 0;
-		}
-		for (ndInt32 j = 0; j < threadCount; ++j)
-		{
-			ndUnsigned32* const scan = &scans[j * (1 << keyBitSize)];
-			for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-			{
-				ndUnsigned32 partialSum = scan[i];
-				scan[i] = sum[i];
-				sum[i] += partialSum;
-			}
-		}
-
-		ndUnsigned32 accSum = 0;
-		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-		{
-			ndUnsigned32 partialSum = sum[i];
-			sum[i] = accSum;
-			accSum += partialSum;
+			ndUnsigned32 partialSum = scan[i];
+			scan[i] = sum[i];
+			sum[i] += partialSum;
 		}
 	}
-	else
+
+	ndUnsigned32 accSum = 0;
+	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
-		ndAssert(0);
+		ndUnsigned32 partialSum = sum[i];
+		sum[i] = accSum;
+		accSum += partialSum;
 	}
 
 	if (prefixScanOut)
