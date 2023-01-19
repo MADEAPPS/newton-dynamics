@@ -52,8 +52,8 @@ class ndSyclContextImpl
 
 	sycl::device m_device;
 	sycl::queue m_queue;
+	int m_computeUnits;
 	char m_deviceName[64];
-
 };
 
 #endif

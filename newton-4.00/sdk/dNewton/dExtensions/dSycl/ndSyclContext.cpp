@@ -26,10 +26,39 @@
 
 using namespace sycl;
 
+
+//void xxxxxx(ndThreadPool& pool)
+//{
+//	ndArray<int> xxxxx0;
+//	ndArray<int> xxxxx1;
+//
+//	class ndSortCompactKey
+//	{
+//		public:
+//		ndSortCompactKey(const void* const)
+//		{
+//		}
+//
+//		ndInt32 GetKey(const int body) const
+//		{
+//			return body & 0xff;
+//		}
+//	};
+//
+//	for (int i = 0; i < 1000; i++)
+//	{
+//		xxxxx0.PushBack(0xff & int(ndRandInt()));
+//	}
+//	ndCountingSort<int, ndSortCompactKey, 8>(pool, xxxxx0, xxxxx1, nullptr, nullptr);
+//	ndCountingSort<int, ndSortCompactKey, 8>(pool, xxxxx0, xxxxx1, nullptr, nullptr);
+//}
+
 ndSyclContext::ndSyclContext(bool selectCpu)
 	:m_impl(nullptr)
 {
 	EnumDevices(selectCpu);
+
+	//xxxxxx(*this);
 }
 
 ndSyclContext::~ndSyclContext()

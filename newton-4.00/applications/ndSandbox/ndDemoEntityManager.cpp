@@ -37,7 +37,7 @@
 	//#define REPLAY_RECORD
 #endif
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -55,7 +55,7 @@
 //#define DEFAULT_SCENE	15		// advanced industrial robot
 //#define DEFAULT_SCENE	16		// basic player
 //#define DEFAULT_SCENE	17		// rag doll
-#define DEFAULT_SCENE	18		// zero moment point
+//#define DEFAULT_SCENE	18		// zero moment point
 //#define DEFAULT_SCENE	19		// quadruped test 1
 //#define DEFAULT_SCENE	20		// quadruped test 2
 //#define DEFAULT_SCENE	21		// quadruped test 3
@@ -422,15 +422,15 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	m_hideVisualMeshes = true;
+	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
-	m_autoSleepMode = false;
+	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	//m_solverMode = ndWorld::ndSyclSolverCpu;
+	m_solverMode = ndWorld::ndSyclSolverCpu;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
-	m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
@@ -439,10 +439,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_showModelsDebugInfo = true;
+	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
