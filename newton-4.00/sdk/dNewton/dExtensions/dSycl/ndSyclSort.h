@@ -22,6 +22,8 @@
 #ifndef __ND_SORT_H__
 #define __ND_SORT_H__
 
+#include "ndSyclContextImpl.h"
+
 #if 0
 #include "ndCoreStdafx.h"
 #include "ndArray.h"
@@ -464,5 +466,96 @@ void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* 
 	array.Swap(scratchBuffer);
 }
 #endif
+
+using namespace sycl;
+
+class ScanItem
+{
+	public: 
+	ScanItem()
+		:m_value(0)
+	{
+	}
+
+	ScanItem(const ScanItem& item)
+		:m_value(0)
+	{
+	}
+
+	union
+	{
+		unsigned m_value;
+		atomic_ref<unsigned, memory_order::relaxed, memory_scope::work_item> m_atomicValue;
+	};
+
+	static buffer<ScanItem>& GetBuffer(unsigned capaciaty);
+};
+
+//template <class T, class ndEvaluateKey, int keyBitSize>
+template <class T, class ndEvaluateKey, int bitSize>
+void ndCountingSort(ndSyclContextImpl* const context, buffer<T>& src, buffer<T>& dst)
+{
+	int arraySize = src.size();
+	int workGroupSize = 1 << bitSize;
+	int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+	range<1> workGroupSizeRange(workGroupSize);
+	range<1> workGroupCountRange(workGroupCount);
+
+	buffer<ScanItem>& scansBuffer = ScanItem::GetBuffer(10000);
+
+	context->m_queue.submit([&](auto& handler)
+	{
+		accessor buff0(src, handler);
+		accessor buff1(dst, handler);
+		accessor scans(scansBuffer, handler);
+		ndEvaluateKey evaluator;
+
+		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](group<1> group)
+		{
+			id<1> groupId = group.get_group_id();
+			int base = groupId * workGroupSize;
+
+			group.parallel_for_work_item([&](h_item<1> item)
+			{
+				id<1> localId = item.get_local_id();
+				int index = base + localId;
+				scans[index].m_value = 0;
+			});
+			
+			if (groupId < (workGroupCount - 1))
+			{
+				group.parallel_for_work_item([&](h_item<1> item)
+				{
+					id<1> localId = item.get_local_id();
+					int srcIndex = base + localId;
+					int dstIndex = evaluator.GetCount(buff0[srcIndex]);
+					//scans[base + dstIndex].m_atomicValue.fetch_add(1);
+					//scans[base + dstIndex].m_atomicValue ++;
+					scans[base + dstIndex].m_value += 1;
+				});
+				
+				group.parallel_for_work_item([&](h_item<1> item)
+				{
+					id<1> localId = item.get_local_id();
+					int index = base + localId;
+					buff1[index] = scans[index].m_value;
+				});
+			}
+			else
+			{
+				//group.parallel_for_work_item([&](h_item<1> item)
+				//{
+				//	id<1> localId = item.get_local_id();
+				//	int index = base + localId;
+				//	if (base + localId < arraySize)
+				//	{
+				//		buff1[index] = index;
+				//	}
+				//});
+			}
+		});
+	});
+
+}
 
 #endif

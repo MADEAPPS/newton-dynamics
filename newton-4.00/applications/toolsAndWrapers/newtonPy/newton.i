@@ -21,14 +21,15 @@
 
 // File : example.i 
 %module newton
-#pragma SWIG nowarn=312		//Nested union not supported
-#pragma SWIG nowarn=325		//Nested struct not currently supported 
+#pragma SWIG nowarn=312		//nested union not supported
+#pragma SWIG nowarn=325		//nested struct not currently supported 
 #pragma SWIG nowarn=389		//operator[] ignored
-#pragma SWIG nowarn=401		//Nothing known about base class
+#pragma SWIG nowarn=401		//nothing known about base class
+
 
 %begin 
 %{
-	#pragma warning(disable:4127 4316 4456 4701 4706)
+	#pragma warning(disable:4127 4316 4365 4456 4701 4706)
 %}
 
 %{
@@ -115,7 +116,7 @@
 %include "../../../sdk/dCollision/ndBodyKinematic.h"
 %include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
 %include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
-%include "../../../sdk/dCollision/ndBodyKinematicSpecial.h"
+%include "../../../sdk/dCollision/ndBodyKinematicBase.h"
 
 %include "../../../sdk/dCollision/ndBodyNotify.h"
 %include "../../../sdk/dCollision/ndContactNotify.h"

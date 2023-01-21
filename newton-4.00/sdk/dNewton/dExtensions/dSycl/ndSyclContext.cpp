@@ -21,44 +21,42 @@
 
 #include <ndSyclStdafx.h>
 #include "ndSyclUtils.h"
+#include "ndSyclSort.h"
 #include "ndSyclContext.h"
+#include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
 using namespace sycl;
-
-
-//void xxxxxx(ndThreadPool& pool)
-//{
-//	ndArray<int> xxxxx0;
-//	ndArray<int> xxxxx1;
-//
-//	class ndSortCompactKey
-//	{
-//		public:
-//		ndSortCompactKey(const void* const)
-//		{
-//		}
-//
-//		ndInt32 GetKey(const int body) const
-//		{
-//			return body & 0xff;
-//		}
-//	};
-//
-//	for (int i = 0; i < 1000; i++)
-//	{
-//		xxxxx0.PushBack(0xff & int(ndRandInt()));
-//	}
-//	ndCountingSort<int, ndSortCompactKey, 8>(pool, xxxxx0, xxxxx1, nullptr, nullptr);
-//	ndCountingSort<int, ndSortCompactKey, 8>(pool, xxxxx0, xxxxx1, nullptr, nullptr);
-//}
 
 ndSyclContext::ndSyclContext(bool selectCpu)
 	:m_impl(nullptr)
 {
 	EnumDevices(selectCpu);
 
-	//xxxxxx(*this);
+	StlVector<int> buffer0;
+	StlVector<int> buffer1;
+	for (int i = 0; i < 1000; i++)
+	{
+		buffer0.push_back(rand() & 0xff);
+	}
+	buffer1.resize(buffer0.size());
+
+	buffer buf0(buffer0);
+	buffer buf1(buffer1);
+
+	class CountDigit
+	{
+		public:
+		int GetCount(const int& item) const
+		{
+			return item & 0xff;
+		}
+	};
+
+	ndCountingSort<int, CountDigit, 8>(m_impl, buf0, buf1);
+	m_impl->m_queue.wait();
+
+	buffer0.push_back(rand() & 0xff);
 }
 
 ndSyclContext::~ndSyclContext()

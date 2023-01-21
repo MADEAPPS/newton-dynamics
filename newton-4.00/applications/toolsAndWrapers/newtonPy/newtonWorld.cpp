@@ -62,7 +62,7 @@ class ndContactCallback : public ndContactNotify
 		};
 	};
 
-	ndContactCallback::ndContactCallback()
+	ndContactCallback()
 		:ndContactNotify()
 		//,m_materialMap()
 	{

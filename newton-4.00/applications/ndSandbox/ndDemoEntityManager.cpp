@@ -902,8 +902,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("sse", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
 			ImGui::RadioButton("cuda", &solverMode, ndWorld::ndCudaSolver);
-			ImGui::RadioButton("scylCpu", &solverMode, ndWorld::ndSyclSolverCpu);
-			ImGui::RadioButton("openGpu", &solverMode, ndWorld::ndSyclSolverGpu);
+			ImGui::RadioButton("syclCpu", &solverMode, ndWorld::ndSyclSolverCpu);
+			ImGui::RadioButton("syclGpu", &solverMode, ndWorld::ndSyclSolverGpu);
 
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();

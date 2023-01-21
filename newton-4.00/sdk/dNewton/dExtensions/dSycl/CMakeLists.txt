@@ -36,15 +36,15 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
 		COMMAND ${CMAKE_COMMAND}
 		ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
 
-	add_custom_command(
-		TARGET ${projectName} POST_BUILD
-		COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy $ENV{ONEAPI_ROOT}/compiler/latest/windows/bin/sycl6.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/sycl6.dll)
-
-	add_custom_command(
-		TARGET ${projectName} POST_BUILD
-		COMMAND ${CMAKE_COMMAND}
-		ARGS -E copy $ENV{ONEAPI_ROOT}/compiler/latest/windows/bin/sycl6d.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/sycl6d.dll)
+	#add_custom_command(
+	#	TARGET ${projectName} POST_BUILD
+	#	COMMAND ${CMAKE_COMMAND}
+	#	ARGS -E copy $ENV{ONEAPI_ROOT}/compiler/latest/windows/bin/sycl6.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/sycl6.dll)
+	#
+	#add_custom_command(
+	#	TARGET ${projectName} POST_BUILD
+	#	COMMAND ${CMAKE_COMMAND}
+	#	ARGS -E copy $ENV{ONEAPI_ROOT}/compiler/latest/windows/bin/sycl6d.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/sycl6d.dll)
 endif ()
 
 #if (NEWTON_BUILD_TEST)

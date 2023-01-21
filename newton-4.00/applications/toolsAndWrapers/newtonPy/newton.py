@@ -331,29 +331,29 @@ class ndConvexHullInfo(object):
 # Register ndConvexHullInfo in _newton:
 _newton.ndConvexHullInfo_swigregister(ndConvexHullInfo)
 
-class ndCoumpoundInfo(object):
+class ndCompoundInfo(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
-    m_noUsed = property(_newton.ndCoumpoundInfo_m_noUsed_get, _newton.ndCoumpoundInfo_m_noUsed_set)
+    m_noUsed = property(_newton.ndCompoundInfo_m_noUsed_get, _newton.ndCompoundInfo_m_noUsed_set)
 
     def __init__(self):
-        _newton.ndCoumpoundInfo_swiginit(self, _newton.new_ndCoumpoundInfo())
-    __swig_destroy__ = _newton.delete_ndCoumpoundInfo
+        _newton.ndCompoundInfo_swiginit(self, _newton.new_ndCompoundInfo())
+    __swig_destroy__ = _newton.delete_ndCompoundInfo
 
-# Register ndCoumpoundInfo in _newton:
-_newton.ndCoumpoundInfo_swigregister(ndCoumpoundInfo)
+# Register ndCompoundInfo in _newton:
+_newton.ndCompoundInfo_swigregister(ndCompoundInfo)
 
-class ndProceduralInfoInfo(object):
+class ndProceduralInfo(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
-    m_noUsed = property(_newton.ndProceduralInfoInfo_m_noUsed_get, _newton.ndProceduralInfoInfo_m_noUsed_set)
+    m_noUsed = property(_newton.ndProceduralInfo_m_noUsed_get, _newton.ndProceduralInfo_m_noUsed_set)
 
     def __init__(self):
-        _newton.ndProceduralInfoInfo_swiginit(self, _newton.new_ndProceduralInfoInfo())
-    __swig_destroy__ = _newton.delete_ndProceduralInfoInfo
+        _newton.ndProceduralInfo_swiginit(self, _newton.new_ndProceduralInfo())
+    __swig_destroy__ = _newton.delete_ndProceduralInfo
 
-# Register ndProceduralInfoInfo in _newton:
-_newton.ndProceduralInfoInfo_swigregister(ndProceduralInfoInfo)
+# Register ndProceduralInfo in _newton:
+_newton.ndProceduralInfo_swigregister(ndProceduralInfo)
 
 class ndCollisionBvhInfo(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -408,6 +408,7 @@ class ndShape(object):
     def __init__(self, *args, **kwargs):
         raise AttributeError("No constructor defined - class is abstract")
     __repr__ = _swig_repr
+    __swig_destroy__ = _newton.delete_ndShape
 
     def GetRefCount(self):
         return _newton.ndShape_GetRefCount(self)
@@ -657,61 +658,6 @@ class ndShapeStatic_bvh(object):
 # Register ndShapeStatic_bvh in _newton:
 _newton.ndShapeStatic_bvh_swigregister(ndShapeStatic_bvh)
 
-D_MAX_COLLIDING_FACES = _newton.D_MAX_COLLIDING_FACES
-D_MAX_COLLIDING_INDICES = _newton.D_MAX_COLLIDING_INDICES
-class ndPolygonMeshDesc(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, *args):
-        _newton.ndPolygonMeshDesc_swiginit(self, _newton.new_ndPolygonMeshDesc(*args))
-
-    def SortFaceArray(self):
-        return _newton.ndPolygonMeshDesc_SortFaceArray(self)
-
-    def GetSeparetionDistance(self):
-        return _newton.ndPolygonMeshDesc_GetSeparetionDistance(self)
-
-    def SetDistanceTravel(self, distanceInGlobalSpace):
-        return _newton.ndPolygonMeshDesc_SetDistanceTravel(self, distanceInGlobalSpace)
-
-    def GetFaceIndexCount(self, indexCount):
-        return _newton.ndPolygonMeshDesc_GetFaceIndexCount(self, indexCount)
-
-    def GetAdjacentFaceEdgeNormalArray(self, faceIndexArray, indexCount):
-        return _newton.ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray(self, faceIndexArray, indexCount)
-
-    def GetNormalIndex(self, faceIndexArray, indexCount):
-        return _newton.ndPolygonMeshDesc_GetNormalIndex(self, faceIndexArray, indexCount)
-
-    def GetFaceId(self, faceIndexArray, indexCount):
-        return _newton.ndPolygonMeshDesc_GetFaceId(self, faceIndexArray, indexCount)
-
-    def GetFaceSize(self, faceIndexArray, indexCount):
-        return _newton.ndPolygonMeshDesc_GetFaceSize(self, faceIndexArray, indexCount)
-    m_boxDistanceTravelInMeshSpace = property(_newton.ndPolygonMeshDesc_m_boxDistanceTravelInMeshSpace_get, _newton.ndPolygonMeshDesc_m_boxDistanceTravelInMeshSpace_set)
-    m_faceCount = property(_newton.ndPolygonMeshDesc_m_faceCount_get, _newton.ndPolygonMeshDesc_m_faceCount_set)
-    m_vertexStrideInBytes = property(_newton.ndPolygonMeshDesc_m_vertexStrideInBytes_get, _newton.ndPolygonMeshDesc_m_vertexStrideInBytes_set)
-    m_skinMargin = property(_newton.ndPolygonMeshDesc_m_skinMargin_get, _newton.ndPolygonMeshDesc_m_skinMargin_set)
-    m_convexInstance = property(_newton.ndPolygonMeshDesc_m_convexInstance_get, _newton.ndPolygonMeshDesc_m_convexInstance_set)
-    m_polySoupInstance = property(_newton.ndPolygonMeshDesc_m_polySoupInstance_get, _newton.ndPolygonMeshDesc_m_polySoupInstance_set)
-    m_vertex = property(_newton.ndPolygonMeshDesc_m_vertex_get, _newton.ndPolygonMeshDesc_m_vertex_set)
-    m_faceIndexCount = property(_newton.ndPolygonMeshDesc_m_faceIndexCount_get, _newton.ndPolygonMeshDesc_m_faceIndexCount_set)
-    m_faceVertexIndex = property(_newton.ndPolygonMeshDesc_m_faceVertexIndex_get, _newton.ndPolygonMeshDesc_m_faceVertexIndex_set)
-    m_meshData = property(_newton.ndPolygonMeshDesc_m_meshData_get, _newton.ndPolygonMeshDesc_m_meshData_set)
-    m_faceIndexStart = property(_newton.ndPolygonMeshDesc_m_faceIndexStart_get, _newton.ndPolygonMeshDesc_m_faceIndexStart_set)
-    m_hitDistance = property(_newton.ndPolygonMeshDesc_m_hitDistance_get, _newton.ndPolygonMeshDesc_m_hitDistance_set)
-    m_me = property(_newton.ndPolygonMeshDesc_m_me_get, _newton.ndPolygonMeshDesc_m_me_set)
-    m_globalFaceVertexIndex = property(_newton.ndPolygonMeshDesc_m_globalFaceVertexIndex_get, _newton.ndPolygonMeshDesc_m_globalFaceVertexIndex_set)
-    m_maxT = property(_newton.ndPolygonMeshDesc_m_maxT_get, _newton.ndPolygonMeshDesc_m_maxT_set)
-    m_globalIndexCount = property(_newton.ndPolygonMeshDesc_m_globalIndexCount_get, _newton.ndPolygonMeshDesc_m_globalIndexCount_set)
-    m_threadId = property(_newton.ndPolygonMeshDesc_m_threadId_get, _newton.ndPolygonMeshDesc_m_threadId_set)
-    m_doContinueCollisionTest = property(_newton.ndPolygonMeshDesc_m_doContinueCollisionTest_get, _newton.ndPolygonMeshDesc_m_doContinueCollisionTest_set)
-    __swig_destroy__ = _newton.delete_ndPolygonMeshDesc
-
-# Register ndPolygonMeshDesc in _newton:
-_newton.ndPolygonMeshDesc_swigregister(ndPolygonMeshDesc)
-
 class ndShapeStaticMesh(ndShape):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -844,6 +790,9 @@ class ndShapeInstance(object):
     @staticmethod
     def GetBoxPadding():
         return _newton.ndShapeInstance_GetBoxPadding()
+
+    def SavePLY(self, fileName):
+        return _newton.ndShapeInstance_SavePLY(self, fileName)
 
     def GetShape(self, *args):
         return _newton.ndShapeInstance_GetShape(self, *args)
@@ -1208,11 +1157,11 @@ class ndBodyKinematic(ndBody):
     def SetAlpha(self, alpha):
         return _newton.ndBodyKinematic_SetAlpha(self, alpha)
 
-    def GetJointList(self):
-        return _newton.ndBodyKinematic_GetJointList(self)
-
     def GetContactMap(self, *args):
         return _newton.ndBodyKinematic_GetContactMap(self, *args)
+
+    def GetJointList(self):
+        return _newton.ndBodyKinematic_GetJointList(self)
 
 # Register ndBodyKinematic in _newton:
 _newton.ndBodyKinematic_swigregister(ndBodyKinematic)
@@ -1298,25 +1247,25 @@ class ndBodyPlayerCapsule(object):
 # Register ndBodyPlayerCapsule in _newton:
 _newton.ndBodyPlayerCapsule_swigregister(ndBodyPlayerCapsule)
 
-class ndBodyKinematicSpecial(ndBodyKinematic):
+class ndBodyKinematicBase(ndBodyKinematic):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
     def __init__(self, *args):
-        _newton.ndBodyKinematicSpecial_swiginit(self, _newton.new_ndBodyKinematicSpecial(*args))
-    __swig_destroy__ = _newton.delete_ndBodyKinematicSpecial
+        _newton.ndBodyKinematicBase_swiginit(self, _newton.new_ndBodyKinematicBase(*args))
+    __swig_destroy__ = _newton.delete_ndBodyKinematicBase
 
     def SpecialUpdate(self, timestep):
-        return _newton.ndBodyKinematicSpecial_SpecialUpdate(self, timestep)
+        return _newton.ndBodyKinematicBase_SpecialUpdate(self, timestep)
 
     def GetAsBodyKinematicSpecial(self):
-        return _newton.ndBodyKinematicSpecial_GetAsBodyKinematicSpecial(self)
+        return _newton.ndBodyKinematicBase_GetAsBodyKinematicSpecial(self)
 
     def Save(self, desc):
-        return _newton.ndBodyKinematicSpecial_Save(self, desc)
+        return _newton.ndBodyKinematicBase_Save(self, desc)
 
-# Register ndBodyKinematicSpecial in _newton:
-_newton.ndBodyKinematicSpecial_swigregister(ndBodyKinematicSpecial)
+# Register ndBodyKinematicBase in _newton:
+_newton.ndBodyKinematicBase_swigregister(ndBodyKinematicBase)
 
 class ndBodyNotify(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -1335,17 +1284,17 @@ class ndBodyNotify(object):
     def GetGravity(self):
         return _newton.ndBodyNotify_GetGravity(self)
 
-    def SetGravity(self, defualtGravity):
-        return _newton.ndBodyNotify_SetGravity(self, defualtGravity)
+    def SetGravity(self, defaultGravity):
+        return _newton.ndBodyNotify_SetGravity(self, defaultGravity)
 
     def OnTransform(self, threadIndex, matrix):
         return _newton.ndBodyNotify_OnTransform(self, threadIndex, matrix)
 
-    def Save(self, desc):
-        return _newton.ndBodyNotify_Save(self, desc)
-
     def OnApplyExternalForce(self, threadIndex, timestep):
         return _newton.ndBodyNotify_OnApplyExternalForce(self, threadIndex, timestep)
+
+    def Save(self, desc):
+        return _newton.ndBodyNotify_Save(self, desc)
 
 # Register ndBodyNotify in _newton:
 _newton.ndBodyNotify_swigregister(ndBodyNotify)
@@ -1446,8 +1395,11 @@ class ndBodiesInAabbNotify(object):
         _newton.ndBodiesInAabbNotify_swiginit(self, _newton.new_ndBodiesInAabbNotify())
     __swig_destroy__ = _newton.delete_ndBodiesInAabbNotify
 
-    def OnOverlap(self, arg2):
-        return _newton.ndBodiesInAabbNotify_OnOverlap(self, arg2)
+    def Reset(self):
+        return _newton.ndBodiesInAabbNotify_Reset(self)
+
+    def OnOverlap(self, body):
+        return _newton.ndBodiesInAabbNotify_OnOverlap(self, body)
     m_bodyArray = property(_newton.ndBodiesInAabbNotify_m_bodyArray_get, _newton.ndBodiesInAabbNotify_m_bodyArray_set)
 
 # Register ndBodiesInAabbNotify in _newton:
