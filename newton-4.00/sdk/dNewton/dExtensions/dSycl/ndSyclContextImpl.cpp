@@ -28,21 +28,48 @@ using namespace sycl;
 
 #define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
 
-ndSyclContextImpl::ndSyclContextImpl(sycl::device device)
+ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	:m_device(device)
 	,m_queue(device)
 	,m_computeUnits(0)
 	,m_localMemorySize(0)
 	,m_maxWorkGroupSize(0)
 	,m_sortPrefixBuffer(range<1>(ND_SORT_SCAN_BUFFER_SIZE))
+	,m_cpuBuffer0()
+	,m_cpuBuffer1()
+	,m_cpuBuffer2()
+	,m_buf0(range<1>(1024))
+	,m_buf1(range<1>(1024))
 {
 	m_computeUnits = device.get_info<sycl::info::device::max_compute_units>();
 	m_localMemorySize = device.get_info<sycl::info::device::local_mem_size>();
 	m_maxWorkGroupSize = device.get_info<sycl::info::device::max_work_group_size>();
-
+	
 	std::string deviceName(m_device.get_info<info::device::name>());
 	std::string platformName(m_device.get_platform().get_info<info::platform::name>());
 	sprintf(m_deviceName, "%s: %s", platformName.c_str(), deviceName.c_str());
+
+	// debuging code
+	for (int i = 0; i < m_buf0.size(); i++)
+	{
+		//m_cpuBuffer0.push_back(rand() & 0xff);
+		m_cpuBuffer0.push_back(0);
+	}
+	m_cpuBuffer1.resize(m_cpuBuffer0.size());
+	m_cpuBuffer2.resize(m_sortPrefixBuffer.size());
+	
+	for (int i = 0; i < 100; i++)
+	{
+		m_cpuBuffer0[i] = rand() % 0x3;
+	}
+	
+	host_accessor m_buffer0(m_buf0);
+	host_accessor m_buffer1(m_buf1);
+	for (int i = 0; i < m_buf0.size(); ++i)
+	{
+		m_buffer0[i] = m_cpuBuffer0[i];
+		m_buffer1[i] = m_cpuBuffer1[i];
+	}
 }
 
 ndSyclContextImpl::~ndSyclContextImpl()
@@ -54,18 +81,6 @@ const char* ndSyclContextImpl::GetStringId() const
 	return m_deviceName;
 }
 
-
-void ndSyclContextImpl::Begin()
-{
-	StlVector<int> xxx;
-	for (int i = 0; i < 16; i++)
-	{
-		xxx.push_back(1);
-	}
-	xxx.push_back(1);
-	xxx.push_back(1);
-	xxx.push_back(1);
-}
 
 #if 0
 double ndSyclContextImpl::GetGPUTime() const
@@ -119,3 +134,26 @@ void ndSyclContextImpl::UpdateTransform()
 	m_implement->UpdateTransform();
 }
 #endif
+
+
+void ndSyclContextImpl::Begin()
+{
+	class CountDigit
+	{
+		public:
+		int GetCount(const int& item) const
+		{
+			return item & 0xff;
+		}
+	};
+	
+	CountingSort<int, CountDigit, 8>(m_buf0, m_buf1);
+	m_queue.wait();
+	
+	host_accessor result(m_sortPrefixBuffer);
+	for (int i = 0; i < result.size(); i++)
+	{
+		m_cpuBuffer2[i] = result[i];
+	}
+	ndAssert(0);
+}

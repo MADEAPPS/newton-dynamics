@@ -23,13 +23,14 @@
 #define __ND_SYCL_CONTEXT_IMPL_H__
 
 #include <ndSyclStdafx.h>
+#include "ndSyclSort.h"
 
 class ndSyclContextImpl
 {
 	public: 
 	D_SYCL_OPERATOR_NEW_AND_DELETE
 
-	ndSyclContextImpl(sycl::device device);
+	ndSyclContextImpl(sycl::device& device);
 	~ndSyclContextImpl();
 	
 	const char* GetStringId() const;
@@ -50,14 +51,31 @@ class ndSyclContextImpl
 	//void IntegrateBodies(float timestep);
 	//void IntegrateUnconstrainedBodies(float timestep);
 
+
+	template <class T, class ndEvaluateKey, int bitSize>
+	void CountingSort(sycl::buffer<T>& src, sycl::buffer<T>& dst);
+
 	sycl::device m_device;
 	sycl::queue m_queue;
 	int m_computeUnits;
 	int m_localMemorySize;
 	int m_maxWorkGroupSize;
 	char m_deviceName[64];
-
 	sycl::buffer<unsigned> m_sortPrefixBuffer;
+
+	// debuging code
+	StlVector<int> m_cpuBuffer0;
+	StlVector<int> m_cpuBuffer1;
+	StlVector<int> m_cpuBuffer2;
+
+	sycl::buffer<int> m_buf0;
+	sycl::buffer<int> m_buf1;
 };
+
+template <class T, class ndEvaluateKey, int bitSize>
+void ndSyclContextImpl::CountingSort(sycl::buffer<T>& src, sycl::buffer<T>& dst)
+{
+	ndCountingSort<T, ndEvaluateKey, bitSize>(m_queue, src, dst, m_sortPrefixBuffer);
+}
 
 #endif

@@ -21,7 +21,6 @@
 
 #include <ndSyclStdafx.h>
 #include "ndSyclUtils.h"
-#include "ndSyclSort.h"
 #include "ndSyclContext.h"
 #include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
@@ -32,36 +31,6 @@ ndSyclContext::ndSyclContext(bool selectCpu)
 	:m_impl(nullptr)
 {
 	EnumDevices(selectCpu);
-
-	StlVector<int> buffer0;
-	StlVector<int> buffer1;
-	for (int i = 0; i < 1000; i++)
-	{
-		buffer0.push_back(rand() & 0xff);
-	}
-	buffer1.resize(buffer0.size());
-
-	class CountDigit
-	{
-		public:
-		int GetCount(const int& item) const
-		{
-			return item & 0xff;
-		}
-	};
-
-	buffer buf0(buffer0);
-	buffer buf1(buffer1);
-	ndCountingSort<int, CountDigit, 8>(m_impl, buf0, buf1);
-	m_impl->m_queue.wait();
-
-	StlVector<int> buffer2;
-	host_accessor result(m_impl->m_sortPrefixBuffer);
-	for (int i = 0; i < result.size(); i++)
-	{
-		buffer2.push_back(result[i]);
-	}
-	//ndAssert(0);
 }
 
 ndSyclContext::~ndSyclContext()
@@ -146,10 +115,6 @@ void ndSyclContext::EnumDevices(bool selectCpu)
 	}
 }
 
-void ndSyclContext::Begin()
-{
-	m_impl->Begin();
-}
 
 
 #if 0
@@ -204,3 +169,9 @@ void ndSyclContext::UpdateTransform()
 	m_impl->UpdateTransform();
 }
 #endif
+
+
+void ndSyclContext::Begin()
+{
+	m_impl->Begin();
+}
