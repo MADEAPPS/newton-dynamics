@@ -26,17 +26,23 @@
 
 using namespace sycl;
 
+#define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
+
 ndSyclContextImpl::ndSyclContextImpl(sycl::device device)
 	:m_device(device)
 	,m_queue(device)
 	,m_computeUnits(0)
-	,m_sortPrefixBuffer(range<1>(64 * 1024))
+	,m_localMemorySize(0)
+	,m_maxWorkGroupSize(0)
+	,m_sortPrefixBuffer(range<1>(ND_SORT_SCAN_BUFFER_SIZE))
 {
+	m_computeUnits = device.get_info<sycl::info::device::max_compute_units>();
+	m_localMemorySize = device.get_info<sycl::info::device::local_mem_size>();
+	m_maxWorkGroupSize = device.get_info<sycl::info::device::max_work_group_size>();
+
 	std::string deviceName(m_device.get_info<info::device::name>());
 	std::string platformName(m_device.get_platform().get_info<info::platform::name>());
 	sprintf(m_deviceName, "%s: %s", platformName.c_str(), deviceName.c_str());
-
-	m_computeUnits = device.get_info<sycl::info::device::max_compute_units>();
 }
 
 ndSyclContextImpl::~ndSyclContextImpl()

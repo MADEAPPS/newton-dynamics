@@ -53,6 +53,8 @@ class ndSyclContextImpl
 	sycl::device m_device;
 	sycl::queue m_queue;
 	int m_computeUnits;
+	int m_localMemorySize;
+	int m_maxWorkGroupSize;
 	char m_deviceName[64];
 
 	sycl::buffer<unsigned> m_sortPrefixBuffer;

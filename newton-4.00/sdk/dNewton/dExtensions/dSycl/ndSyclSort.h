@@ -45,16 +45,20 @@ void ndCountingSort(ndSyclContextImpl* const context, buffer<T>& src, buffer<T>&
 		accessor scans(scansBuffer, handler);
 		ndEvaluateKey evaluator;
 
+		//sycl::stream out(1024, 256, handler);
 		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](group<1> group)
 		{
 			id<1> groupId = group.get_group_id();
 			int base = groupId * workGroupSize;
 
+			unsigned scanBuffer[256];
 			group.parallel_for_work_item([&](h_item<1> item)
 			{
 				id<1> localId = item.get_local_id();
 				int index = base + localId;
 				scans[index] = 0;
+				scanBuffer[localId] = 0;
+				//out << "index:" << item << "   " << buff0[item] << sycl::endl;
 			});
 			
 			if (groupId < (workGroupCount - 1))
@@ -85,19 +89,18 @@ void ndCountingSort(ndSyclContextImpl* const context, buffer<T>& src, buffer<T>&
 		});
 	});
 
-
-	context->m_queue.submit([&](auto& handler)
-	{
-		accessor buff1(dst, handler);
-		accessor buff0(scansBuffer, handler);
-
-		sycl::stream out(1024, 256, handler);
-		handler.parallel_for(arraySize, [=](id<1> item) 
-		{
-			out << "index:" << item << "   " << buff0[item] << sycl::endl;
-			buff1[item] = buff0[item];
-		});
-	});
+	//context->m_queue.submit([&](auto& handler)
+	//{
+	//	accessor buff1(dst, handler);
+	//	accessor buff0(scansBuffer, handler);
+	//
+	//	sycl::stream out(1024, 256, handler);
+	//	handler.parallel_for(arraySize, [=](id<1> item) 
+	//	{
+	//		out << "index:" << item << "   " << buff0[item] << sycl::endl;
+	//		buff1[item] = buff0[item];
+	//	});
+	//});
 }
 
 #endif
