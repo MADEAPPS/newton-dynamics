@@ -155,5 +155,5 @@ void ndSyclContextImpl::Begin()
 	{
 		m_cpuBuffer2[i] = result[i];
 	}
-	ndAssert(0);
+	//ndAssert(0);
 }
