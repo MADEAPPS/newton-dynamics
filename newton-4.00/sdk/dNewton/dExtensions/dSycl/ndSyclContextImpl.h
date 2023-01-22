@@ -54,6 +54,8 @@ class ndSyclContextImpl
 	sycl::queue m_queue;
 	int m_computeUnits;
 	char m_deviceName[64];
+
+	sycl::buffer<unsigned> m_sortPrefixBuffer;
 };
 
 #endif

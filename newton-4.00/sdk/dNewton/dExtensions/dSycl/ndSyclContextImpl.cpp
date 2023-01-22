@@ -30,6 +30,7 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device device)
 	:m_device(device)
 	,m_queue(device)
 	,m_computeUnits(0)
+	,m_sortPrefixBuffer(range<1>(64 * 1024))
 {
 	std::string deviceName(m_device.get_info<info::device::name>());
 	std::string platformName(m_device.get_platform().get_info<info::platform::name>());

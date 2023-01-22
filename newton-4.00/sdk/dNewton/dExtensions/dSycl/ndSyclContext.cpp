@@ -41,21 +41,24 @@ ndSyclContext::ndSyclContext(bool selectCpu)
 	}
 	buffer1.resize(buffer0.size());
 
-	buffer buf0(buffer0);
-	buffer buf1(buffer1);
-
-	class CountDigit
 	{
-		public:
-		int GetCount(const int& item) const
+		buffer buf0(buffer0);
+		buffer buf1(buffer1);
+
+		class CountDigit
 		{
-			return item & 0xff;
-		}
-	};
+			public:
+			int GetCount(const int& item) const
+			{
+				return item & 0xff;
+			}
+		};
 
-	ndCountingSort<int, CountDigit, 8>(m_impl, buf0, buf1);
-	m_impl->m_queue.wait();
+		ndCountingSort<int, CountDigit, 8>(m_impl, buf0, buf1);
+		m_impl->m_queue.wait();
+	}
 
+	//ndAssert(0);
 	buffer0.push_back(rand() & 0xff);
 }
 
