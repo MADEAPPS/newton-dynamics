@@ -161,14 +161,14 @@
 #ifdef D_DISABLE_ASSERT
 	#define ndAssert(x)
 #else 
-	#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
-		#define ndAssert(x) _ASSERTE(x)
-	#else
-		#ifdef _DEBUG
+	#ifdef _DEBUG
+		#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+			#define ndAssert(x) _ASSERTE(x)
+		#else
 			#define ndAssert(x) assert(x)
-		#else 
-			#define ndAssert(x)
 		#endif
+	#else 
+		#define ndAssert(x)
 	#endif
 #endif
 

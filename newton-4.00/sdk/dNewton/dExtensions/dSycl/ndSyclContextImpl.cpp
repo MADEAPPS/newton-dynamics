@@ -38,8 +38,8 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	,m_cpuBuffer0()
 	,m_cpuBuffer1()
 	,m_cpuBuffer2()
-	,m_buf0(range<1>(1024))
-	,m_buf1(range<1>(1024))
+	,m_buf0(range<1>(1000))
+	,m_buf1(range<1>(1000))
 {
 	m_computeUnits = device.get_info<sycl::info::device::max_compute_units>();
 	m_localMemorySize = device.get_info<sycl::info::device::local_mem_size>();
@@ -52,7 +52,6 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	// debuging code
 	for (int i = 0; i < m_buf0.size(); i++)
 	{
-		//m_cpuBuffer0.push_back(rand() & 0xff);
 		m_cpuBuffer0.push_back(0);
 	}
 	m_cpuBuffer1.resize(m_cpuBuffer0.size());
@@ -146,7 +145,11 @@ void ndSyclContextImpl::Begin()
 			return item & 0xff;
 		}
 	};
-	
+
+	StlVector<unsigned> xxxxxxxx;
+	xxxxxxxx.resize(64 * 1024);
+	ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
+
 	CountingSort<int, CountDigit, 8>(m_buf0, m_buf1);
 	m_queue.wait();
 	

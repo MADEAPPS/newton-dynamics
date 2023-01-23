@@ -22,11 +22,29 @@
 #ifndef __ND_SORT_H__
 #define __ND_SORT_H__
 
+#include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
 using namespace sycl;
 
+template <class T, class ndEvaluateKey, int expontentRadix>
+void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsigned>& scansBuffer);
+
+template <class T, class ndEvaluateKey, int expontentRadix>
+void ndCountingSort(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer);
+
+
+// impemention support
 #define D_COUNTING_SORT_LOCAL_BLOCK_SIZE	(1<<10)
+
+template <class T, class ndEvaluateKey, int expontentRadix>
+void SyclCountItems(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansBuffer);
+
+template <class T, class ndEvaluateKey, int expontentRadix>
+void SyclMergeBuckects(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer);
+
+template <class T, class ndEvaluateKey, int expontentRadix>
+void SyclAddPrefix(sycl::queue& queue, const buffer<T>& src, buffer<unsigned>& scansBuffer);
 
 /*
 template <typename BufferItem, typename SortKeyPredicate>
@@ -55,13 +73,13 @@ __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsi
 	}
 }
 */
-template <class T, class ndEvaluateKey, int bitSize>
-void __CountingSortCountItems__(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansBuffer)
+template <class T, class ndEvaluateKey, int expontentRadix>
+void SyclCountItems(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansBuffer)
 {
 	queue.submit([&](auto& handler)
 	{
 		int arraySize = src.size();
-		int workGroupSize = 1 << bitSize;
+		int workGroupSize = 1 << expontentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 		range<1> workGroupSizeRange(workGroupSize);
 		range<1> workGroupCountRange(workGroupCount);
@@ -140,13 +158,13 @@ __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsig
 	histogram[offset + threadId] = sum;
 }
 */
-template <class T, class ndEvaluateKey, int bitSize>
-void __CountingSortAddPrefix__(sycl::queue& queue, const buffer<T>& src, buffer<unsigned>& scansBuffer)
+template <class T, class ndEvaluateKey, int expontentRadix>
+void SyclAddPrefix(sycl::queue& queue, const buffer<T>& src, buffer<unsigned>& scansBuffer)
 {
 	queue.submit([&](auto& handler)
 	{
 		int arraySize = src.size();
-		int workGroupSize = 1 << bitSize;
+		int workGroupSize = 1 << expontentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 		accessor histogram(scansBuffer, handler);
 		handler.parallel_for(workGroupSize, [=](id<1> item)
@@ -164,7 +182,6 @@ void __CountingSortAddPrefix__(sycl::queue& queue, const buffer<T>& src, buffer<
 		});
 	});
 }
-
 
 /*
 template <typename BufferItem, typename SortKeyPredicate>
@@ -246,13 +263,13 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 	}
 }
 */
-template <class T, class ndEvaluateKey, int bitSize>
-void __CountingSortMergeBuckects__(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
+template <class T, class ndEvaluateKey, int expontentRadix>
+void SyclMergeBuckects(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
 {
 	queue.submit([&](auto& handler)
 	{
 		int arraySize = src.size();
-		int workGroupSize = 1 << bitSize;
+		int workGroupSize = 1 << expontentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 		range<1> workGroupSizeRange(workGroupSize);
 		range<1> workGroupCountRange(workGroupCount);
@@ -306,12 +323,59 @@ void __CountingSortMergeBuckects__(sycl::queue& queue, buffer<T>& src, buffer<T>
 	});
 }
 
-template <class T, class ndEvaluateKey, int bitSize>
+template <class T, class ndEvaluateKey, int expontentRadix>
 void ndCountingSort(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
 {
-	__CountingSortCountItems__<T, ndEvaluateKey, bitSize>(queue, src, scansBuffer);
-	__CountingSortAddPrefix__<T, ndEvaluateKey, bitSize>(queue, src, scansBuffer);
-	__CountingSortMergeBuckects__<T, ndEvaluateKey, bitSize>(queue, src, dst, scansBuffer);
+	SyclCountItems<T, ndEvaluateKey, expontentRadix>(queue, src, scansBuffer);
+	SyclAddPrefix<T, ndEvaluateKey, expontentRadix>(queue, src, scansBuffer);
+	SyclMergeBuckects<T, ndEvaluateKey, expontentRadix>(queue, src, dst, scansBuffer);
+}
+
+template <class T, class ndEvaluateKey, int expontentRadix>
+void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsigned>& scansBuffer)
+{
+	//ndAssert(0);
+	auto CountItems = [&]()
+	{
+		ndEvaluateKey evaluator;
+		int arraySize = src.size();
+		int workGroupSize = 1 << expontentRadix;
+		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+
+		auto CountItems = [&](int group, int item)
+		{
+			int base = group * workGroupSize;
+			int key = evaluator.GetCount(src[base + item]);
+			scansBuffer[base + key] ++;
+		};
+
+		for (int group = workGroupCount - 1; group >= 0; --group)
+		{
+			for (int item = workGroupSize - 1; item >= 0; --item)
+			{
+				int base = group * workGroupSize;
+				scansBuffer[base + item] = 0;;
+			}
+
+			int start = (group < (workGroupCount - 1)) ? workGroupSize - 1 : arraySize - group * workGroupSize - 1;
+			for (int item = start; item >= 0; --item)
+			{
+				CountItems(group, item);
+			}
+		}
+	};
+
+	auto AddPrefix = [&]()
+	{
+	};
+
+	auto MergeBuckects = [&]()
+	{
+	};
+
+	CountItems();
+	AddPrefix();
+	MergeBuckects();
 }
 
 #endif

@@ -28,6 +28,31 @@
 #include "ndThreadPool.h"
 
 template <class T, class dCompareKey>
+void ndSort(T* const array, ndInt32 elements, void* const context);
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(const T* const srcArray, T* const dstArray, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context);
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(ndThreadPool& threadPool, const T* const srcArray, T* const dstArray, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context);
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* const prefixScanOut, void* const context);
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, ndUnsigned32* const prefixScanOut, void* const context);
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSortInPlace(T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context);
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSortInPlace(ndThreadPool& threadPool, T* const array, T* const scratchBuffer, ndInt32 size, ndUnsigned32* const prefixScanOut, void* const context);
+
+
+// *****************************************************
+// Implementation 
+// *****************************************************
+template <class T, class dCompareKey>
 void ndSort(T* const array, ndInt32 elements, void* const context)
 {
 	//D_TRACKTIME();
