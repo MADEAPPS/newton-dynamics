@@ -356,7 +356,8 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsign
 			scansBuffer[base + key] ++;
 		};
 
-		for (int group = workGroupCount - 1; group >= 0; --group)
+		//for (int group = workGroupCount - 1; group >= 0; --group)
+		for (int group = 0; group >= 0; --group)
 		{
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
@@ -374,6 +375,36 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsign
 
 	auto AddPrefix = [&]()
 	{
+		int arraySize = src.size();
+		int workGroupSize = 1 << expontentRadix;
+		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+		workGroupCount = 1;
+
+		unsigned sumReg[256];
+		unsigned offsetReg[256];
+		for (int group = 0; group < workGroupCount; ++group)
+		{
+			for (int item = workGroupSize - 1; item >= 0; --item)
+			{
+				sumReg[item] = 0;
+				offsetReg[item] = 0;
+			}
+			for (int item = workGroupSize - 1; item >= 0; --item)
+			{
+				unsigned sum = sumReg[item];
+				unsigned offset = offsetReg[item];
+				unsigned count = scansBuffer[offset + item];
+				scansBuffer[offset + item] = sum;
+				sumReg[item] = sum + count;
+				offsetReg[item] = offset + workGroupSize;
+			}
+			for (int item = workGroupSize - 1; item >= 0; --item)
+			{
+				unsigned sum = sumReg[item];
+				unsigned offset = offsetReg[item];
+				scansBuffer[offset + item] = sum;
+			}
+		}
 	};
 
 	auto MergeBuckects = [&]()

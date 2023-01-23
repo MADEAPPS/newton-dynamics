@@ -28,6 +28,8 @@ using namespace sycl;
 
 #define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
 
+#define xxxxxxxxxx 25
+
 ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	:m_device(device)
 	,m_queue(device)
@@ -38,8 +40,8 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	,m_cpuBuffer0()
 	,m_cpuBuffer1()
 	,m_cpuBuffer2()
-	,m_buf0(range<1>(1000))
-	,m_buf1(range<1>(1000))
+	,m_buf0(range<1>(xxxxxxxxxx))
+	,m_buf1(range<1>(xxxxxxxxxx))
 {
 	m_computeUnits = device.get_info<sycl::info::device::max_compute_units>();
 	m_localMemorySize = device.get_info<sycl::info::device::local_mem_size>();
@@ -57,10 +59,18 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	m_cpuBuffer1.resize(m_cpuBuffer0.size());
 	m_cpuBuffer2.resize(m_sortPrefixBuffer.size());
 	
-	for (int i = 0; i < 100; i++)
-	{
-		m_cpuBuffer0[i] = rand() % 0x3;
-	}
+	//for (int i = 0; i < 100; i++)
+	//{
+	//	m_cpuBuffer0[i] = rand() % 0x3;
+	//}
+	m_cpuBuffer0[0] = 2;
+	m_cpuBuffer0[1] = 1;
+	m_cpuBuffer0[2] = 2;
+	m_cpuBuffer0[3] = 1;
+	m_cpuBuffer0[4] = 2;
+	m_cpuBuffer0[5] = 1;
+	m_cpuBuffer0[6] = 2;
+	m_cpuBuffer0[7] = 2;
 	
 	host_accessor m_buffer0(m_buf0);
 	host_accessor m_buffer1(m_buf1);
@@ -142,21 +152,23 @@ void ndSyclContextImpl::Begin()
 		public:
 		int GetCount(const int& item) const
 		{
-			return item & 0xff;
+			//return item & 0xff;
+			return item & 0x7;
 		}
 	};
 
 	StlVector<unsigned> xxxxxxxx;
 	xxxxxxxx.resize(64 * 1024);
-	ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
+	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
+	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 
-	CountingSort<int, CountDigit, 8>(m_buf0, m_buf1);
-	m_queue.wait();
-	
-	host_accessor result(m_sortPrefixBuffer);
-	for (int i = 0; i < result.size(); i++)
-	{
-		m_cpuBuffer2[i] = result[i];
-	}
+	//CountingSort<int, CountDigit, 8>(m_buf0, m_buf1);
+	//m_queue.wait();
+	//
+	//host_accessor result(m_sortPrefixBuffer);
+	//for (int i = 0; i < result.size(); i++)
+	//{
+	//	m_cpuBuffer2[i] = result[i];
+	//}
 	//ndAssert(0);
 }
