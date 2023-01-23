@@ -58,6 +58,7 @@ __global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsi
 template <class T, class ndEvaluateKey, int bitSize>
 void __CountingSortCountItems__(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansBuffer)
 {
+	ndAssert((1 << bitSize) <= D_COUNTING_SORT_LOCAL_BLOCK_SIZE);
 	queue.submit([&](auto& handler)
 	{
 		int arraySize = src.size();
@@ -66,8 +67,8 @@ void __CountingSortCountItems__(sycl::queue& queue, buffer<T>& src, buffer<unsig
 		range<1> workGroupSizeRange(workGroupSize);
 		range<1> workGroupCountRange(workGroupCount);
 
-		sycl::accessor buff0(src, handler);
-		sycl::accessor scans(scansBuffer, handler);
+		sycl::accessor srcAccessor(src, handler);
+		sycl::accessor scanAccessor(scansBuffer, handler);
 		ndEvaluateKey evaluator;
 
 		//sycl::stream out(1024, 256, handler);
@@ -76,13 +77,16 @@ void __CountingSortCountItems__(sycl::queue& queue, buffer<T>& src, buffer<unsig
 			id<1> groupId = group.get_group_id();
 			int base = groupId * workGroupSize;
 
-			//out << "groupid:" << groupId << "   base:" << base << sycl::endl;
-			//unsigned scanBuffer[256];
+			//out << "groupid:" << groupId << "   stride:" << workGroupSizeRange << sycl::endl;
+			unsigned scanBuffer[256];
 			group.parallel_for_work_item([&](h_item<1> item)
 			{
 				id<1> localId = item.get_local_id();
 				int index = base + localId;
-				scans[index] = 0;
+				scanAccessor[index] = 0;
+				scanBuffer[localId] = localId;
+				//if (groupId == 0 && localId > 25)
+				//out << "group:" << groupId << "  local:" << localId << "  value : " << scanBuffer[localId] << sycl::endl;
 			});
 
 			if (groupId < (workGroupCount - 1))
@@ -91,8 +95,8 @@ void __CountingSortCountItems__(sycl::queue& queue, buffer<T>& src, buffer<unsig
 				{
 					id<1> localId = item.get_local_id();
 					int srcIndex = base + localId;
-					int dstIndex = evaluator.GetCount(buff0[srcIndex]);
-					atomic_ref<unsigned, memory_order::relaxed, memory_scope::work_item> atomicIndex(scans[base + dstIndex]);
+					int dstIndex = evaluator.GetCount(srcAccessor[srcIndex]);
+					atomic_ref<unsigned, memory_order::relaxed, memory_scope::work_item> atomicIndex(scanAccessor[base + dstIndex]);
 					atomicIndex++;
 				});
 			}
@@ -104,23 +108,15 @@ void __CountingSortCountItems__(sycl::queue& queue, buffer<T>& src, buffer<unsig
 					int srcIndex = base + localId;
 					if (srcIndex < arraySize)
 					{
-						int dstIndex = evaluator.GetCount(buff0[srcIndex]);
-						atomic_ref<unsigned, memory_order::relaxed, memory_scope::work_item> atomicIndex(scans[base + dstIndex]);
+						int dstIndex = evaluator.GetCount(srcAccessor[srcIndex]);
+						atomic_ref<unsigned, memory_order::relaxed, memory_scope::work_item> atomicIndex(scanAccessor[base + dstIndex]);
 						atomicIndex++;
 					}
 				});
-
-				//group.parallel_for_work_item([&](h_item<1> item)
-				//{
-				//	id<1> localId = item.get_local_id();
-				//	//scanBuffer[localId] = 0;
-				//	out << "index:" << localId << "   " << scans[localId] << sycl::endl;
-				//});
 			}
 		});
 	});
 }
-
 
 /*
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
@@ -148,19 +144,19 @@ void __CountingSortAddPrefix__(sycl::queue& queue, const buffer<T>& src, buffer<
 		int arraySize = src.size();
 		int workGroupSize = 1 << bitSize;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
-		accessor histogram(scansBuffer, handler);
+		accessor scanAccessor(scansBuffer, handler);
 		handler.parallel_for(workGroupSize, [=](id<1> item)
 		{
 			unsigned sum = 0;
 			unsigned offset = 0;
 			for (int i = 0; i < workGroupCount; ++i)
 			{
-				const unsigned count = histogram[offset + item];
-				histogram[offset + item] = sum;
+				const unsigned count = scanAccessor[offset + item];
+				scanAccessor[offset + item] = sum;
 				sum += count;
 				offset += workGroupSize;
 			}
-			histogram[offset + item] = sum;
+			scanAccessor[offset + item] = sum;
 		});
 	});
 }
@@ -249,6 +245,7 @@ __global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* sr
 template <class T, class ndEvaluateKey, int bitSize>
 void __CountingSortMergeBuckects__(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
 {
+	ndAssert((1 << bitSize) <= D_COUNTING_SORT_LOCAL_BLOCK_SIZE);
 	queue.submit([&](auto& handler)
 	{
 		int arraySize = src.size();
@@ -257,35 +254,45 @@ void __CountingSortMergeBuckects__(sycl::queue& queue, buffer<T>& src, buffer<T>
 		range<1> workGroupSizeRange(workGroupSize);
 		range<1> workGroupCountRange(workGroupCount);
 
-		range<1> xxxxx(D_COUNTING_SORT_LOCAL_BLOCK_SIZE);
+		ndEvaluateKey evaluator;
+		sycl::accessor srcAccessor(src, handler);
+		sycl::accessor scanAccessor(scansBuffer, handler);
+
 		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](group<1> group)
 		{
 			// make local shared memory buffers
-			//sycl::local_accessor<unsigned, 1, sycl::access::mode::read_write, sycl::access::target::local> cacheSortedKey(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
-			
-			//sycl::local_accessor<unsigned> cacheSortedKey(xxxxx, handler);
-			//sycl::accessor<unsigned, 1, sycl::access::mode::read_write, sycl::access::target::local> cacheSortedKey(xxxxx, handler);
-			//sycl::local_accessor<unsigned, 1> cacheSortedKey(xxxxx, handler);
-			
+			T cachedCells[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
+			unsigned cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
+
 			id<1> groupId = group.get_group_id();
-			//int base = groupId * workGroupSize;
-			//
-			//group.parallel_for_work_item([&](h_item<1> item)
-			//{
-			//	//id<1> localId = item.get_local_id();
-			//	//int index = base + localId;
-			//	//scans[index] = 0;
-			//});
-		
+			int base = groupId * workGroupSize;
+
+			const unsigned srcOffset = groupId * workGroupSize;
+			const unsigned lastRoadOffset = workGroupCount * workGroupSize;
+			const unsigned prefixBase = D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2;
+
 			if (groupId < (workGroupCount - 1))
 			{
 				group.parallel_for_work_item([&](h_item<1> item)
 				{
-					//id<1> localId = item.get_local_id();
-					//int srcIndex = base + localId;
-					//int dstIndex = evaluator.GetCount(buff0[srcIndex]);
-					//atomic_ref<unsigned, memory_order::relaxed, memory_scope::work_item> atomicIndex(scans[base + dstIndex]);
-					//atomicIndex++;
+					unsigned localId = item.get_local_id();
+					unsigned index = base + localId;
+					cachedCells[localId] = srcAccessor[index];
+					unsigned key = evaluator.GetCount(srcAccessor[index]);
+					cacheSortedKey[localId] = (key << 16) | localId;
+					cacheKeyPrefix[localId] = 0;
+					cacheItemCount[localId] = 0;
+				});
+
+				group.parallel_for_work_item([&](h_item<1> item)
+				{
+					unsigned localId = item.get_local_id();
+					cacheBaseOffset[localId] = scanAccessor[srcOffset + localId];
+					cacheKeyPrefix[prefixBase + 1 + localId] = scanAccessor[lastRoadOffset + localId];
+					cacheItemCount[prefixBase + 1 + localId] = scanAccessor[srcOffset + workGroupSize + localId] - cacheBaseOffset[localId];
 				});
 			}
 			else
