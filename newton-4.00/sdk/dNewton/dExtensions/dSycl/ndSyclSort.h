@@ -46,33 +46,6 @@ void SyclMergeBuckects(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffe
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclAddPrefix(sycl::queue& queue, const buffer<T>& src, buffer<unsigned>& scansBuffer);
 
-/*
-template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountItemsInternal(const BufferItem* src, unsigned* histogram, unsigned size, SortKeyPredicate sortKey, unsigned prefixKeySize)
-{
-	__shared__  unsigned cacheBuffer[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-
-	const unsigned blockId = blockIdx.x;
-	const unsigned threadId = threadIdx.x;
-
-	cacheBuffer[threadId] = 0;
-	__syncthreads();
-
-	const unsigned index = threadId + blockDim.x * blockId;
-	if (index < size)
-	{
-		const unsigned key = sortKey(src[index]);
-		atomicAdd(&cacheBuffer[key], 1);
-	}
-	__syncthreads();
-
-	if (threadId < prefixKeySize)
-	{
-		const unsigned dstBase = prefixKeySize * blockId;
-		histogram[dstBase + threadId] = cacheBuffer[threadId];
-	}
-}
-*/
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclCountItems(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansBuffer)
 {
@@ -136,24 +109,6 @@ void SyclCountItems(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansB
 	});
 }
 
-/*
-__global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
-{
-	unsigned sum = 0;
-	unsigned offset = 0;
-	const unsigned keySize = blockDim.x;
-
-	const unsigned threadId = threadIdx.x;
-	for (int i = 0; i < blockCount; i++)
-	{
-		const unsigned count = histogram[offset + threadId];
-		histogram[offset + threadId] = sum;
-		sum += count;
-		offset += keySize;
-	}
-	histogram[offset + threadId] = sum;
-}
-*/
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclAddPrefix(sycl::queue& queue, const buffer<T>& src, buffer<unsigned>& scansBuffer)
 {
@@ -362,7 +317,7 @@ arraySize = 1 << exponentRadix;
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
 				int base = group * workGroupSize;
-				scansBuffer[base + item] = 0;;
+				scansBuffer[base + item] = 0;
 			}
 
 			int start = (group < (workGroupCount - 1)) ? workGroupSize - 1 : arraySize - group * workGroupSize - 1;
@@ -409,6 +364,123 @@ arraySize = 1 << exponentRadix;
 
 	auto MergeBuckects = [&]()
 	{
+		ndEvaluateKey evaluator;
+		int arraySize = src.size();
+		int workGroupSize = 1 << exponentRadix;
+arraySize = 1 << exponentRadix;
+		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+
+		for (int group = workGroupCount - 1; group >= 0; --group)
+		{
+			//T cachedCells[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
+			unsigned cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
+
+			//const unsigned blockId = blockIdx.x;
+			//const unsigned threadId = threadIdx.x;
+			//const unsigned blocks = (size + blockDim.x - 1) / blockDim.x;
+			//const unsigned index = threadId + blockDim.x * blockId;
+			//cacheSortedKey[threadId] = (prefixKeySize << 16) | threadId;
+			//if (index < size)
+			//{
+			//	cachedCells[threadId] = src[index];
+			//	const unsigned key = GetSortKey(src[index]);
+			//	cacheSortedKey[threadId] = (key << 16) | threadId;
+			//}
+
+			int base = group * workGroupSize;
+			int start = (group < (workGroupCount - 1)) ? workGroupSize - 1 : arraySize - group * workGroupSize - 1;
+			for (int item = workGroupSize - 1; item >= 0; --item)
+			{
+				cacheSortedKey[item] = (workGroupSize << 16) | item;
+				cacheKeyPrefix[item] = 0;
+				cacheItemCount[item] = 0;
+			}
+
+			//const unsigned srcOffset = blockId * prefixKeySize;
+			unsigned lastRoadOffset = group * workGroupSize;
+			unsigned prefixBase = D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2;
+
+			//if (threadId < prefixKeySize)
+			//{
+			//	cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
+			//	cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
+			//	cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + prefixKeySize + threadId] - cacheBaseOffset[threadId];
+			//}
+
+			for (int item = start; item >= 0; --item)
+			{
+				int index = base + item;
+				//cachedCells[item] = src[index];
+				unsigned key = evaluator.GetCount(src[index]);
+				cacheSortedKey[item] = (key << 16) | item;
+
+				cacheBaseOffset[item] = scansBuffer[base + item];
+				cacheKeyPrefix[prefixBase + 1 + item] = scansBuffer[lastRoadOffset + item];
+				cacheItemCount[prefixBase + 1 + item] = scansBuffer[base + prefixBase + item] - cacheBaseOffset[item];
+			}
+
+			// k is doubled every iteration
+			//for (k = 2; k <= n; k *= 2) 
+			//	// j is halved at every iteration, with truncation of fractional parts
+			//	for (j = k / 2; j > 0; j /= 2)
+			//		// in C-like languages this is "i ^ j"
+			//		for (i = 0; i < n; i++)
+			//			l = bitwiseXOR(i, j); 
+			//			if (l > i)
+			//				if ((bitwiseAND(i, k) == 0) AND(arr[i] > arr[l])
+			//				OR(bitwiseAND(i, k) != 0) AND(arr[i] < arr[l]))
+			//				swap the elements arr[i] and arr[l]
+
+			int xxxx = 0;
+			for (int k = 2; k <= workGroupSize; k *= 2)
+			{
+				for (int j = k / 2; j > 0; j /= 2)
+				{
+					xxxx++;
+					for (int item = 0; item < workGroupSize; ++item)
+					{
+						int threadId0 = item;
+						int threadId1 = threadId0 ^ j;
+						if (threadId1 > threadId0)
+						{
+							int a = cacheSortedKey[threadId0];
+							int b = cacheSortedKey[threadId1];
+							int mask0 = (-(threadId0 & k)) >> 31;
+							int mask1 = -(a > b);
+							int mask = mask0 ^ mask1;
+							cacheSortedKey[threadId0] = (b & mask) | (a & ~mask);
+							cacheSortedKey[threadId1] = (a & mask) | (b & ~mask);
+						}
+					}
+					//__syncthreads();
+				}
+			}
+			xxxx *= 1;
+			
+			//for (int i = 1; i < prefixKeySize; i = i << 1)
+			//{
+			//	const unsigned prefixSum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
+			//	const unsigned countSum = cacheItemCount[prefixBase + threadId] + cacheItemCount[prefixBase - i + threadId];
+			//	__syncthreads();
+			//	cacheKeyPrefix[prefixBase + threadId] = prefixSum;
+			//	cacheItemCount[prefixBase + threadId] = countSum;
+			//	__syncthreads();
+			//}
+			//
+			//if (index < size)
+			//{
+			//	const unsigned keyValue = cacheSortedKey[threadId];
+			//	const unsigned key = keyValue >> 16;
+			//	const unsigned threadIdBase = cacheItemCount[prefixBase + key];
+			//
+			//	const unsigned dstOffset0 = threadId - threadIdBase;
+			//	const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
+			//	dst[dstOffset0 + dstOffset1] = cachedCells[keyValue & 0xffff];
+			//}
+		}
 	};
 
 	CountItems();
