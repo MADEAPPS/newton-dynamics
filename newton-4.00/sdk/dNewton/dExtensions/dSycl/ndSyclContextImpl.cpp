@@ -165,9 +165,9 @@ void ndSyclContextImpl::Begin()
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 
-	//CountingSort<int, CountDigit, 8>(m_buf0, m_buf1);
-	//m_queue.wait();
-	//
+	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
+	m_queue.wait();
+	
 	//host_accessor result(m_sortPrefixBuffer);
 	//for (int i = 0; i < result.size(); i++)
 	//{
