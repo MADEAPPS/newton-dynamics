@@ -61,7 +61,7 @@ class ndSyclContextImpl
 	int m_localMemorySize;
 	int m_maxWorkGroupSize;
 	char m_deviceName[64];
-	sycl::buffer<unsigned> m_sortPrefixBuffer;
+	sycl::buffer<int> m_sortPrefixBuffer;
 
 	// debuging code
 	StlVector<int> m_cpuBuffer0;

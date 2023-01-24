@@ -24,7 +24,7 @@
 #include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
-using namespace sycl;
+//using namespace sycl;
 
 #define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
 
@@ -36,19 +36,19 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	,m_computeUnits(0)
 	,m_localMemorySize(0)
 	,m_maxWorkGroupSize(0)
-	,m_sortPrefixBuffer(range<1>(ND_SORT_SCAN_BUFFER_SIZE))
+	,m_sortPrefixBuffer(sycl::range<1>(ND_SORT_SCAN_BUFFER_SIZE))
 	,m_cpuBuffer0()
 	,m_cpuBuffer1()
 	,m_cpuBuffer2()
-	,m_buf0(range<1>(xxxxxxxxxx))
-	,m_buf1(range<1>(xxxxxxxxxx))
+	,m_buf0(sycl::range<1>(xxxxxxxxxx))
+	,m_buf1(sycl::range<1>(xxxxxxxxxx))
 {
 	m_computeUnits = device.get_info<sycl::info::device::max_compute_units>();
 	m_localMemorySize = device.get_info<sycl::info::device::local_mem_size>();
 	m_maxWorkGroupSize = device.get_info<sycl::info::device::max_work_group_size>();
 	
-	std::string deviceName(m_device.get_info<info::device::name>());
-	std::string platformName(m_device.get_platform().get_info<info::platform::name>());
+	std::string deviceName(m_device.get_info<sycl::info::device::name>());
+	std::string platformName(m_device.get_platform().get_info<sycl::info::platform::name>());
 	sprintf(m_deviceName, "%s: %s", platformName.c_str(), deviceName.c_str());
 
 	// debuging code
@@ -75,8 +75,8 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	m_cpuBuffer0[9] = 2;
 	m_cpuBuffer0[10] = 3;
 
-	host_accessor m_buffer0(m_buf0);
-	host_accessor m_buffer1(m_buf1);
+	sycl::host_accessor m_buffer0(m_buf0);
+	sycl::host_accessor m_buffer1(m_buf1);
 	for (int i = 0; i < m_buf0.size(); ++i)
 	{
 		m_buffer0[i] = m_cpuBuffer0[i];
@@ -160,7 +160,7 @@ void ndSyclContextImpl::Begin()
 		}
 	};
 
-	StlVector<unsigned> xxxxxxxx;
+	StlVector<int> xxxxxxxx;
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
@@ -168,10 +168,10 @@ void ndSyclContextImpl::Begin()
 	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
 	m_queue.wait();
 	
-	//host_accessor result(m_sortPrefixBuffer);
-	//for (int i = 0; i < result.size(); i++)
-	//{
-	//	m_cpuBuffer2[i] = result[i];
-	//}
-	//ndAssert(0);
+	sycl::host_accessor result(m_sortPrefixBuffer);
+	for (int i = 0; i < result.size(); i++)
+	{
+		m_cpuBuffer2[i] = result[i];
+	}
+	ndAssert(0);
 }
