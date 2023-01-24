@@ -69,9 +69,12 @@ ndSyclContextImpl::ndSyclContextImpl(sycl::device& device)
 	m_cpuBuffer0[3] = 1;
 	m_cpuBuffer0[4] = 2;
 	m_cpuBuffer0[5] = 1;
-	m_cpuBuffer0[6] = 2;
+	m_cpuBuffer0[6] = 3;
 	m_cpuBuffer0[7] = 2;
-	
+	m_cpuBuffer0[8] = 1;
+	m_cpuBuffer0[9] = 2;
+	m_cpuBuffer0[10] = 3;
+
 	host_accessor m_buffer0(m_buf0);
 	host_accessor m_buffer1(m_buf1);
 	for (int i = 0; i < m_buf0.size(); ++i)

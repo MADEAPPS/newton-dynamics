@@ -27,6 +27,8 @@
 
 using namespace sycl;
 
+#define D_COUNTING_SORT_LOCAL_BLOCK_SIZE	(1<<8)
+
 template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsigned>& scansBuffer);
 
@@ -34,9 +36,7 @@ template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer);
 
 
-// impemention support
-#define D_COUNTING_SORT_LOCAL_BLOCK_SIZE	(1<<10)
-
+// implementation support functions
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclCountItems(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansBuffer);
 
@@ -69,7 +69,7 @@ void SyclCountItems(sycl::queue& queue, buffer<T>& src, buffer<unsigned>& scansB
 			int base = groupId * workGroupSize;
 
 			//out << "groupid:" << groupId << "   stride:" << workGroupSizeRange << sycl::endl;
-			unsigned scanBuffer[256];
+			unsigned scanBuffer[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 			group.parallel_for_work_item([&](h_item<1> item)
 			{
 				id<1> localId = item.get_local_id();
@@ -134,86 +134,6 @@ void SyclAddPrefix(sycl::queue& queue, const buffer<T>& src, buffer<unsigned>& s
 	});
 }
 
-/*
-template <typename BufferItem, typename SortKeyPredicate>
-__global__ void ndCudaCountingSortCountShuffleItemsInternal(const BufferItem* src, BufferItem* dst, unsigned* histogram, unsigned size, SortKeyPredicate GetSortKey, unsigned prefixKeySize)
-{
-	__shared__  BufferItem cachedCells[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	__shared__  unsigned cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	__shared__  unsigned cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	__shared__  unsigned cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-	__shared__  unsigned cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-
-	const unsigned blockId = blockIdx.x;
-	const unsigned threadId = threadIdx.x;
-	const unsigned blocks = (size + blockDim.x - 1) / blockDim.x;
-
-	const unsigned index = threadId + blockDim.x * blockId;
-	cacheSortedKey[threadId] = (prefixKeySize << 16) | threadId;
-	if (index < size)
-	{
-		cachedCells[threadId] = src[index];
-		const unsigned key = GetSortKey(src[index]);
-		cacheSortedKey[threadId] = (key << 16) | threadId;
-	}
-
-	const unsigned srcOffset = blockId * prefixKeySize;
-	const unsigned lastRoadOffset = blocks * prefixKeySize;
-	const unsigned prefixBase = D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2;
-
-	cacheKeyPrefix[threadId] = 0;
-	cacheItemCount[threadId] = 0;
-	__syncthreads();
-
-	if (threadId < prefixKeySize)
-	{
-		cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
-		cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
-		cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + prefixKeySize + threadId] - cacheBaseOffset[threadId];
-	}
-
-	const int threadId0 = threadId;
-	for (int k = 2; k <= blockDim.x; k *= 2)
-	{
-		for (int j = k / 2; j > 0; j /= 2)
-		{
-			const int threadId1 = threadId0 ^ j;
-			if (threadId1 > threadId0)
-			{
-				const int a = cacheSortedKey[threadId0];
-				const int b = cacheSortedKey[threadId1];
-				const int mask0 = (-(threadId0 & k)) >> 31;
-				const int mask1 = -(a > b);
-				const int mask = mask0 ^ mask1;
-				cacheSortedKey[threadId0] = (b & mask) | (a & ~mask);
-				cacheSortedKey[threadId1] = (a & mask) | (b & ~mask);
-			}
-			__syncthreads();
-		}
-	}
-
-	for (int i = 1; i < prefixKeySize; i = i << 1)
-	{
-		const unsigned prefixSum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
-		const unsigned countSum = cacheItemCount[prefixBase + threadId] + cacheItemCount[prefixBase - i + threadId];
-		__syncthreads();
-		cacheKeyPrefix[prefixBase + threadId] = prefixSum;
-		cacheItemCount[prefixBase + threadId] = countSum;
-		__syncthreads();
-	}
-
-	if (index < size)
-	{
-		const unsigned keyValue = cacheSortedKey[threadId];
-		const unsigned key = keyValue >> 16;
-		const unsigned threadIdBase = cacheItemCount[prefixBase + key];
-
-		const unsigned dstOffset0 = threadId - threadIdBase;
-		const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
-		dst[dstOffset0 + dstOffset1] = cachedCells[keyValue & 0xffff];
-	}
-}
-*/
 template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclMergeBuckects(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
 {
@@ -286,14 +206,6 @@ void SyclMergeBuckects(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffe
 }
 
 template <class T, class ndEvaluateKey, int exponentRadix>
-void ndCountingSort(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
-{
-	SyclCountItems<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
-	SyclAddPrefix<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
-	SyclMergeBuckects<T, ndEvaluateKey, exponentRadix>(queue, src, dst, scansBuffer);
-}
-
-template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsigned>& scansBuffer)
 {
 	//ndAssert(0);
@@ -302,7 +214,7 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<unsign
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
 		int workGroupSize = 1 << exponentRadix;
-arraySize = 1 << exponentRadix;
+arraySize = 2 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
 		auto CountItems = [&](int group, int item)
@@ -332,26 +244,30 @@ arraySize = 1 << exponentRadix;
 	{
 		int arraySize = src.size();
 		int workGroupSize = 1 << exponentRadix;
-arraySize = 1 << exponentRadix;
-		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+arraySize = 2 << exponentRadix;
 
-		unsigned sumReg[256];
-		unsigned offsetReg[256];
-		for (int group = 0; group < workGroupCount; ++group)
+		for (int group = 0; group < 1; ++group)
 		{
+			unsigned sumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			unsigned offsetReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
 				sumReg[item] = 0;
 				offsetReg[item] = 0;
 			}
-			for (int item = workGroupSize - 1; item >= 0; --item)
+
+			int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+			for (int i = 0; i < workGroupCount; ++i)
 			{
-				unsigned sum = sumReg[item];
-				unsigned offset = offsetReg[item];
-				unsigned count = scansBuffer[offset + item];
-				scansBuffer[offset + item] = sum;
-				sumReg[item] = sum + count;
-				offsetReg[item] = offset + workGroupSize;
+				for (int item = workGroupSize - 1; item >= 0; --item)
+				{
+					unsigned sum = sumReg[item];
+					unsigned offset = offsetReg[item];
+					unsigned count = scansBuffer[offset + item];
+					scansBuffer[offset + item] = sum;
+					sumReg[item] = sum + count;
+					offsetReg[item] = offset + workGroupSize;
+				}
 			}
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
@@ -367,28 +283,15 @@ arraySize = 1 << exponentRadix;
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
 		int workGroupSize = 1 << exponentRadix;
-arraySize = 1 << exponentRadix;
+arraySize = 2 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
 		for (int group = workGroupCount - 1; group >= 0; --group)
 		{
-			//T cachedCells[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 			unsigned cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 			unsigned cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 			unsigned cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
 			unsigned cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-
-			//const unsigned blockId = blockIdx.x;
-			//const unsigned threadId = threadIdx.x;
-			//const unsigned blocks = (size + blockDim.x - 1) / blockDim.x;
-			//const unsigned index = threadId + blockDim.x * blockId;
-			//cacheSortedKey[threadId] = (prefixKeySize << 16) | threadId;
-			//if (index < size)
-			//{
-			//	cachedCells[threadId] = src[index];
-			//	const unsigned key = GetSortKey(src[index]);
-			//	cacheSortedKey[threadId] = (key << 16) | threadId;
-			//}
 
 			int base = group * workGroupSize;
 			int start = (group < (workGroupCount - 1)) ? workGroupSize - 1 : arraySize - group * workGroupSize - 1;
@@ -399,27 +302,18 @@ arraySize = 1 << exponentRadix;
 				cacheItemCount[item] = 0;
 			}
 
-			//const unsigned srcOffset = blockId * prefixKeySize;
-			unsigned lastRoadOffset = group * workGroupSize;
+			unsigned lastRoadOffset = workGroupCount * workGroupSize;
 			unsigned prefixBase = D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2;
-
-			//if (threadId < prefixKeySize)
-			//{
-			//	cacheBaseOffset[threadId] = histogram[srcOffset + threadId];
-			//	cacheKeyPrefix[prefixBase + 1 + threadId] = histogram[lastRoadOffset + threadId];
-			//	cacheItemCount[prefixBase + 1 + threadId] = histogram[srcOffset + prefixKeySize + threadId] - cacheBaseOffset[threadId];
-			//}
 
 			for (int item = start; item >= 0; --item)
 			{
 				int index = base + item;
-				//cachedCells[item] = src[index];
 				unsigned key = evaluator.GetCount(src[index]);
 				cacheSortedKey[item] = (key << 16) | item;
 
 				cacheBaseOffset[item] = scansBuffer[base + item];
 				cacheKeyPrefix[prefixBase + 1 + item] = scansBuffer[lastRoadOffset + item];
-				cacheItemCount[prefixBase + 1 + item] = scansBuffer[base + prefixBase + item] - cacheBaseOffset[item];
+				cacheItemCount[prefixBase + 1 + item] = scansBuffer[base + workGroupSize + item] - cacheBaseOffset[item];
 			}
 
 			// k is doubled every iteration
@@ -460,32 +354,48 @@ arraySize = 1 << exponentRadix;
 			}
 			xxxx *= 1;
 			
-			//for (int i = 1; i < prefixKeySize; i = i << 1)
-			//{
-			//	const unsigned prefixSum = cacheKeyPrefix[prefixBase + threadId] + cacheKeyPrefix[prefixBase - i + threadId];
-			//	const unsigned countSum = cacheItemCount[prefixBase + threadId] + cacheItemCount[prefixBase - i + threadId];
-			//	__syncthreads();
-			//	cacheKeyPrefix[prefixBase + threadId] = prefixSum;
-			//	cacheItemCount[prefixBase + threadId] = countSum;
-			//	__syncthreads();
-			//}
-			//
-			//if (index < size)
-			//{
-			//	const unsigned keyValue = cacheSortedKey[threadId];
-			//	const unsigned key = keyValue >> 16;
-			//	const unsigned threadIdBase = cacheItemCount[prefixBase + key];
-			//
-			//	const unsigned dstOffset0 = threadId - threadIdBase;
-			//	const unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
-			//	dst[dstOffset0 + dstOffset1] = cachedCells[keyValue & 0xffff];
-			//}
+			for (int i = 1; i < workGroupSize; i = i << 1)
+			{
+				unsigned countSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+				unsigned prefixSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+				for (int item = 0; item < workGroupSize; ++item)
+				{ 
+					prefixSumReg[item] = cacheKeyPrefix[prefixBase + item] + cacheKeyPrefix[prefixBase - i + item];
+					countSumReg[item] = cacheItemCount[prefixBase + item] + cacheItemCount[prefixBase - i + item];
+				}
+				//__syncthreads();
+				for (int item = 0; item < workGroupSize; ++item)
+				{ 
+					cacheKeyPrefix[prefixBase + item] = prefixSumReg[item];
+					cacheItemCount[prefixBase + item] = countSumReg[item];
+				}
+				//__syncthreads();
+			}
+			
+			for (int item = start; item >= 0; --item)
+			{
+				unsigned keyValue = cacheSortedKey[item];
+				unsigned key = keyValue >> 16;
+				unsigned threadIdBase = cacheItemCount[prefixBase + key];
+				
+				unsigned dstOffset0 = item - threadIdBase;
+				unsigned dstOffset1 = cacheKeyPrefix[prefixBase + key] + cacheBaseOffset[key];
+				dst[dstOffset0 + dstOffset1] = src[base + (keyValue & 0xffff)];
+			}
 		}
 	};
 
 	CountItems();
 	AddPrefix();
 	MergeBuckects();
+}
+
+template <class T, class ndEvaluateKey, int exponentRadix>
+void ndCountingSort(sycl::queue& queue, buffer<T>& src, buffer<T>& dst, buffer<unsigned>& scansBuffer)
+{
+	SyclCountItems<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
+	SyclAddPrefix<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
+	SyclMergeBuckects<T, ndEvaluateKey, exponentRadix>(queue, src, dst, scansBuffer);
 }
 
 #endif
