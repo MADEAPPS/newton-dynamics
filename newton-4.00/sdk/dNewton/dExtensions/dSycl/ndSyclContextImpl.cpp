@@ -165,21 +165,21 @@ void ndSyclContextImpl::Begin()
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
-#if 0
+#if 1
 	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
 	m_queue.wait();
 	
 	ndAssert(0);
-	sycl::host_accessor result0(m_buf0);
-	for (int i = 0; i < result0.size(); i++)
-	{
-		m_cpuBuffer2[i] = result0[i];
-	}
-
 	sycl::host_accessor result1(m_buf1);
 	for (int i = 0; i < result1.size(); i++)
 	{
 		m_cpuBuffer2[i] = result1[i];
+	}
+
+	sycl::host_accessor result0(m_buf0);
+	for (int i = 0; i < result0.size(); i++)
+	{
+		m_cpuBuffer2[i] = result0[i];
 	}
 
 	sycl::host_accessor result2(m_sortPrefixBuffer);

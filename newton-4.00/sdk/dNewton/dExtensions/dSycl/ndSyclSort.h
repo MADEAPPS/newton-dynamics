@@ -379,6 +379,7 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 {
 	queue.submit([&](sycl::handler& handler)
 	{
+#if 0
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
 		arraySize = 16;
@@ -495,8 +496,40 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 			{
 
 			}
-
 		});
+#else
+		sycl::accessor dstAccessor(dst, handler);
+		//handler.parallel_for(sycl::nd_range<1>{ 4, 4}, [=](sycl::nd_item<1> it)
+		//{
+		//	int i = it.get_global_id(0);
+		//	int j = it.get_local_id(0);
+		//	dstAccessor[i * 4 + j] = i * 4 + j + 1;
+		//});
+
+
+		//cgh.parallel_for<example_kernel>(
+		//	cl::sycl::nd_range<2>(range<2>{size >> 3, size >> 3},   // 8, 8
+		//						  range<2>{size >> 4, size >> 4}),  // 4, 4
+		//	[=](cl::sycl::nd_item<2> item) 
+		//{
+		//	// get the 2D x and y indices
+		//	const auto id_x = item.get_global_id(0);
+		//	const auto id_y = item.get_global_id(1);
+		//	// map the 2D x and y indices to a single linear,
+		//	// 1D (kernel space) index
+		//	const auto width =
+		//		item.get_group_range(0) * item.get_local_range(0);
+		//	// map the 2D x and y indices to a single linear,
+		//	// 1D (work-group) index
+		//	const auto index = id_x * width + id_y;
+		//	// compute A_ptr * B_ptr into C_scratch
+		//	C_scratch[index] = A_ptr[index] * B_ptr[index];
+		//	// wait for result to be written (sync local memory read_write)
+		//	item.barrier(cl::sycl::access::fence_space::local_space);
+		//	// output result computed in local memory
+		//	C_ptr[index] = C_scratch[index];
+		//});
+#endif
 	});
 }
 
