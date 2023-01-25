@@ -358,7 +358,7 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 	{
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
-		arraySize = 8;
+		arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 		sycl::range<1> workGroupSizeRange(workGroupSize);
@@ -368,12 +368,14 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 		sycl::accessor dstAccessor(dst, handler);
 		sycl::accessor scanAccessor(scansBuffer, handler);
 
+		sycl::local_accessor<int, 1> countSumReg(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> prefixSumReg(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
 		sycl::local_accessor<int, 1> cacheSortedKey(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
 		sycl::local_accessor<int, 1> cacheBaseOffset(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
 		sycl::local_accessor<int, 1> cacheKeyPrefix(D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1, handler);
 		sycl::local_accessor<int, 1> cacheItemCount(D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1, handler);
 
-		//sycl::stream out(1024, 256, handler);
+		sycl::stream out(4096, 256, handler);
 		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](sycl::group<1> group)
 		{
 			// make local shared memory buffers
@@ -411,20 +413,45 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 			
 			}
 
-			for (int i = 1; i < workGroupSize; i = i << 1)
+			group.parallel_for_work_item([&](sycl::h_item<1> item)
 			{
-				group.parallel_for_work_item([&](sycl::h_item<1> item)
+				int localId = item.get_local_id();
+				for (int i = 1; i < workGroupSize; i = i << 1)
 				{
-					int localId = item.get_local_id();
 					int countSum = cacheItemCount[prefixBase + localId] + cacheItemCount[prefixBase - i + localId];
 					int prefixSum = cacheKeyPrefix[prefixBase + localId] + cacheKeyPrefix[prefixBase - i + localId];
 					group.mem_fence();
-
 					cacheItemCount[prefixBase + localId] = countSum;
 					cacheKeyPrefix[prefixBase + localId] = prefixSum;
 					group.mem_fence();
-				});
-			}
+				}
+				out << "group:" << group.get_group_id() << "  item:" << item.get_local_id() << "  index:" << cacheItemCount[prefixBase + localId] << sycl::endl;
+			});
+
+			//for (int i = 1; i < workGroupSize; i = i << 1)
+			//{
+			//	group.parallel_for_work_item([&](sycl::h_item<1> item)
+			//	{
+			//		int localId = item.get_local_id();
+			//		countSumReg[localId] = cacheItemCount[prefixBase + localId] + cacheItemCount[prefixBase - i + localId];
+			//		prefixSumReg[localId] = cacheKeyPrefix[prefixBase + localId] + cacheKeyPrefix[prefixBase - i + localId];
+			//	});
+			//
+			//	group.parallel_for_work_item([&](sycl::h_item<1> item)
+			//	{
+			//		int localId = item.get_local_id();
+			//		cacheItemCount[prefixBase + localId] = countSumReg[localId];
+			//		cacheKeyPrefix[prefixBase + localId] = prefixSumReg[localId];
+			//	});
+			//}
+			//group.parallel_for_work_item([&](sycl::h_item<1> item)
+			//{
+			//	int localId = item.get_local_id();
+			//	//scanAccessor[base + localId] = cacheItemCount[prefixBase + localId];
+			//	out << "group:" << group.get_group_id() << "  item:" << item.get_local_id() << "  index:" << cacheItemCount[prefixBase + localId] << sycl::endl;
+			//	//out << group.get_group_id() << sycl::endl;
+			//	//out << "item:" << sycl::endl;
+			//});
 
 			//if (groupId < (workGroupCount - 1))
 			if (1)

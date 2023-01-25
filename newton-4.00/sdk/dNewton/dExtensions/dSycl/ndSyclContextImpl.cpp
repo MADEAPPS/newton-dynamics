@@ -160,6 +160,7 @@ void ndSyclContextImpl::Begin()
 		}
 	};
 
+#if 0
 	StlVector<int> xxxxxxxx;
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
@@ -186,4 +187,5 @@ void ndSyclContextImpl::Begin()
 	{
 		m_cpuBuffer2[i] = result2[i];
 	}
+#endif
 }
