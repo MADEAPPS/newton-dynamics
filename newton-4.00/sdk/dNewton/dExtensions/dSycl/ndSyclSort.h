@@ -53,6 +53,7 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 	{
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
+arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
@@ -82,7 +83,13 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 	auto AddPrefix = [&]()
 	{
 		int arraySize = src.size();
+arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
+		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+
+		const int prefixBase = workGroupSize / 2;
+		const int lastWorkGroup = workGroupSize * workGroupCount;
+		int localPrefixScan[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
 
 		for (int group = 0; group < 1; ++group)
 		{
@@ -92,9 +99,9 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 			{
 				sumReg[item] = 0;
 				offsetReg[item] = 0;
+				localPrefixScan[item] = 0;
 			}
 
-			int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 			for (int i = 0; i < workGroupCount; ++i)
 			{
 				for (int item = workGroupSize - 1; item >= 0; --item)
@@ -107,11 +114,32 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 					offsetReg[item] = offset + workGroupSize;
 				}
 			}
+
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
 				unsigned sum = sumReg[item];
 				unsigned offset = offsetReg[item];
 				scansBuffer[offset + item] = sum;
+				localPrefixScan[prefixBase + item + 1] = sumReg[item];
+			}
+
+			for (int i = 1; i < workGroupSize; i = i << 1)
+			{
+				int countSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+				for (int item = 0; item < workGroupSize; ++item)
+				{
+					countSumReg[item] = localPrefixScan[prefixBase + item] + localPrefixScan[prefixBase - i + item];
+				}
+
+				for (int item = 0; item < workGroupSize; ++item)
+				{
+					localPrefixScan[prefixBase + item] = countSumReg[item];
+				}
+			}
+
+			for (int item = workGroupSize - 1; item >= 0; --item)
+			{
+				scansBuffer[lastWorkGroup + workGroupSize + item] = localPrefixScan[prefixBase + item];
 			}
 		}
 	};
@@ -120,14 +148,15 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 	{
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
+arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 
 		for (int group = workGroupCount - 1; group >= 0; --group)
 		{
 			int cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
+			int cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 			int cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			int cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
 			int cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
 
 			int base = group * workGroupSize;
@@ -137,8 +166,8 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 			for (int item = workGroupSize - 1; item >= 0; --item)
 			{
 				cacheSortedKey[item] = (workGroupSize << 16) | item;
-				cacheKeyPrefix[item] = 0;
 				cacheItemCount[item] = 0;
+				cacheKeyPrefix[item] = scansBuffer[lastRoadOffset + workGroupSize + item];
 			}
 
 			for (int item = start; item >= 0; --item)
@@ -148,7 +177,6 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 				cacheSortedKey[item] = (radix << 16) | item;
 
 				cacheBaseOffset[item] = scansBuffer[base + item];
-				cacheKeyPrefix[prefixBase + 1 + item] = scansBuffer[lastRoadOffset + item];
 				cacheItemCount[prefixBase + 1 + item] = scansBuffer[base + workGroupSize + item] - cacheBaseOffset[item];
 			}
 
@@ -185,7 +213,6 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 							cacheSortedKey[threadId1] = (a & mask) | (b & ~mask);
 						}
 					}
-					//__syncthreads();
 				}
 			}
 			//xxxx *= 1;
@@ -193,19 +220,15 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 			for (int i = 1; i < workGroupSize; i = i << 1)
 			{
 				int countSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-				int prefixSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
 				for (int item = 0; item < workGroupSize; ++item)
 				{ 
-					prefixSumReg[item] = cacheKeyPrefix[prefixBase + item] + cacheKeyPrefix[prefixBase - i + item];
 					countSumReg[item] = cacheItemCount[prefixBase + item] + cacheItemCount[prefixBase - i + item];
 				}
-				//__syncthreads();
+
 				for (int item = 0; item < workGroupSize; ++item)
 				{ 
-					cacheKeyPrefix[prefixBase + item] = prefixSumReg[item];
 					cacheItemCount[prefixBase + item] = countSumReg[item];
 				}
-				//__syncthreads();
 			}
 			
 			for (int item = start; item >= 0; --item)
@@ -215,7 +238,7 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 				int keyLow = keyValue & 0xffff;
 				int cacheItem = cacheItemCount[prefixBase + keyHigh];
 				int dstOffset0 = item - cacheItem;
-				int dstOffset1 = cacheKeyPrefix[prefixBase + keyHigh] + cacheBaseOffset[keyHigh];
+				int dstOffset1 = cacheKeyPrefix[keyHigh] + cacheBaseOffset[keyHigh];
 				dst[dstOffset0 + dstOffset1] = src[base + keyLow];
 			}
 		}

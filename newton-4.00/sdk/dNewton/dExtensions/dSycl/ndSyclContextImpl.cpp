@@ -160,12 +160,12 @@ void ndSyclContextImpl::Begin()
 		}
 	};
 
-#if 0
+
 	StlVector<int> xxxxxxxx;
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
-
+#if 0
 	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
 	m_queue.wait();
 	
