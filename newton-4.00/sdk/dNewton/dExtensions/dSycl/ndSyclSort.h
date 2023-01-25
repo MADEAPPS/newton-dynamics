@@ -59,8 +59,8 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 		auto CountItems = [&](int group, int item)
 		{
 			int base = group * workGroupSize;
-			int key = evaluator.GetCount(src[base + item]);
-			scansBuffer[base + key] ++;
+			int radix = evaluator.GetRadix(src[base + item]);
+			scansBuffer[base + radix] ++;
 		};
 
 		for (int group = workGroupCount - 1; group >= 0; --group)
@@ -144,8 +144,8 @@ void ndCountingSort(const StlVector<T>& src, StlVector<T>& dst, StlVector<int>& 
 			for (int item = start; item >= 0; --item)
 			{
 				int index = base + item;
-				int key = evaluator.GetCount(src[index]);
-				cacheSortedKey[item] = (key << 16) | item;
+				int radix = evaluator.GetRadix(src[index]);
+				cacheSortedKey[item] = (radix << 16) | item;
 
 				cacheBaseOffset[item] = scansBuffer[base + item];
 				cacheKeyPrefix[prefixBase + 1 + item] = scansBuffer[lastRoadOffset + item];
@@ -230,8 +230,8 @@ template <class T, class ndEvaluateKey, int exponentRadix>
 void ndCountingSort(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>& dst, sycl::buffer<int>& scansBuffer)
 {
 	SyclCountItems<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
-	//SyclAddPrefix<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
-	//SyclMergeBuckects<T, ndEvaluateKey, exponentRadix>(queue, src, dst, scansBuffer);
+	SyclAddPrefix<T, ndEvaluateKey, exponentRadix>(queue, src, scansBuffer);
+	SyclMergeBuckects<T, ndEvaluateKey, exponentRadix>(queue, src, dst, scansBuffer);
 }
 
 template <class T, class ndEvaluateKey, int exponentRadix>
@@ -240,6 +240,7 @@ void SyclAddPrefix(sycl::queue& queue, const sycl::buffer<T>& src, sycl::buffer<
 	queue.submit([&](auto& handler)
 	{
 		int arraySize = src.size();
+		arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 		sycl::accessor scanAccessor(scansBuffer, handler);
@@ -260,156 +261,6 @@ void SyclAddPrefix(sycl::queue& queue, const sycl::buffer<T>& src, sycl::buffer<
 }
 
 template <class T, class ndEvaluateKey, int exponentRadix>
-void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>& dst, sycl::buffer<int>& scansBuffer)
-{
-	//ndEvaluateKey evaluator;
-	//int arraySize = src.size();
-	//int workGroupSize = 1 << exponentRadix;
-	//int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
-	//
-	//for (int group = workGroupCount - 1; group >= 0; --group)
-	//{
-	//	int cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	//	int cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	//	int cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-	//	int cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-	//
-	//	int base = group * workGroupSize;
-	//	int prefixBase = workGroupSize / 2;
-	//	int lastRoadOffset = workGroupCount * workGroupSize;
-	//	int start = (group < (workGroupCount - 1)) ? workGroupSize - 1 : arraySize - group * workGroupSize - 1;
-	//	for (int item = workGroupSize - 1; item >= 0; --item)
-	//	{
-	//		cacheSortedKey[item] = (workGroupSize << 16) | item;
-	//		cacheKeyPrefix[item] = 0;
-	//		cacheItemCount[item] = 0;
-	//	}
-	//
-	//	for (int item = start; item >= 0; --item)
-	//	{
-	//		int index = base + item;
-	//		int key = evaluator.GetCount(src[index]);
-	//		cacheSortedKey[item] = (key << 16) | item;
-	//
-	//		cacheBaseOffset[item] = scansBuffer[base + item];
-	//		cacheKeyPrefix[prefixBase + 1 + item] = scansBuffer[lastRoadOffset + item];
-	//		cacheItemCount[prefixBase + 1 + item] = scansBuffer[base + workGroupSize + item] - cacheBaseOffset[item];
-	//	}
-	//
-	//	for (int k = 2; k <= workGroupSize; k *= 2)
-	//	{
-	//		for (int j = k / 2; j > 0; j /= 2)
-	//		{
-	//			for (int item = 0; item < workGroupSize; ++item)
-	//			{
-	//				int threadId0 = item;
-	//				int threadId1 = threadId0 ^ j;
-	//				if (threadId1 > threadId0)
-	//				{
-	//					int a = cacheSortedKey[threadId0];
-	//					int b = cacheSortedKey[threadId1];
-	//					int mask0 = (-(threadId0 & k)) >> 31;
-	//					int mask1 = -(a > b);
-	//					int mask = mask0 ^ mask1;
-	//					cacheSortedKey[threadId0] = (b & mask) | (a & ~mask);
-	//					cacheSortedKey[threadId1] = (a & mask) | (b & ~mask);
-	//				}
-	//			}
-	//			//__syncthreads();
-	//		}
-	//	}
-	//
-	//	for (int i = 1; i < workGroupSize; i = i << 1)
-	//	{
-	//		int countSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	//		int prefixSumReg[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-	//		for (int item = 0; item < workGroupSize; ++item)
-	//		{
-	//			prefixSumReg[item] = cacheKeyPrefix[prefixBase + item] + cacheKeyPrefix[prefixBase - i + item];
-	//			countSumReg[item] = cacheItemCount[prefixBase + item] + cacheItemCount[prefixBase - i + item];
-	//		}
-	//		//__syncthreads();
-	//		for (int item = 0; item < workGroupSize; ++item)
-	//		{
-	//			cacheKeyPrefix[prefixBase + item] = prefixSumReg[item];
-	//			cacheItemCount[prefixBase + item] = countSumReg[item];
-	//		}
-	//		//__syncthreads();
-	//	}
-	//
-	//	for (int item = start; item >= 0; --item)
-	//	{
-	//		int keyValue = cacheSortedKey[item];
-	//		int keyHigh = keyValue >> 16;
-	//		int keyLow = keyValue & 0xffff;
-	//		int cacheItem = cacheItemCount[prefixBase + keyHigh];
-	//		int dstOffset0 = item - cacheItem;
-	//		int dstOffset1 = cacheKeyPrefix[prefixBase + keyHigh] + cacheBaseOffset[keyHigh];
-	//		dst[dstOffset0 + dstOffset1] = src[base + keyLow];
-	//	}
-	//}
-
-	queue.submit([&](sycl::handler& handler)
-	{
-		ndEvaluateKey evaluator;
-		int arraySize = src.size();
-		int workGroupSize = 1 << exponentRadix;
-		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
-		sycl::range<1> workGroupSizeRange(workGroupSize);
-		sycl::range<1> workGroupCountRange(workGroupCount);
-
-		sycl::accessor srcAccessor(src, handler);
-		sycl::accessor dstAccessor(dst, handler);
-		sycl::accessor scanAccessor(scansBuffer, handler);
-
-		//sycl::stream out(1024, 256, handler);
-		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](sycl::group<1> group)
-		{
-			// make local shared memory buffers
-			//ndEvaluateKey evaluator;
-			int cacheSortedKey[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			int cacheBaseOffset[D_COUNTING_SORT_LOCAL_BLOCK_SIZE];
-			int cacheKeyPrefix[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-			int cacheItemCount[D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1];
-
-			group.parallel_for_work_item([&](sycl::h_item<1> item)
-			{
-				int localId = item.get_local_id();
-				cacheSortedKey[localId] = (workGroupSize << 16) | localId;
-				cacheKeyPrefix[localId] = 0;
-				cacheItemCount[localId] = 0;
-			});
-
-			sycl::id<1> groupId = group.get_group_id();
-			if (groupId < (workGroupCount - 1))
-			{
-				//out << "groupid:" << groupId << "   base:" << base << sycl::endl;
-				group.parallel_for_work_item([&](sycl::h_item<1> item)
-				{
-					int base = groupId * workGroupSize;
-					int prefixBase = workGroupSize / 2;
-					int lastRoadOffset = workGroupCount * workGroupSize;
-
-					int localId = item.get_local_id();
-					int index = base + localId;
-					int key = evaluator.GetCount(srcAccessor[index]);
-					cacheSortedKey[localId] = (key << 16) | localId;
-				
-					cacheBaseOffset[localId] = scanAccessor[base + localId];
-					cacheKeyPrefix[prefixBase + 1 + localId] = scanAccessor[lastRoadOffset + localId];
-					cacheItemCount[prefixBase + 1 + localId] = scanAccessor[base + workGroupSize + localId] - cacheBaseOffset[localId];
-				});
-			}
-			else
-			{
-
-			}
-		});
-	});
-}
-
-
-template <class T, class ndEvaluateKey, int exponentRadix>
 void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>& scansBuffer)
 {
 	ndAssert((1 << exponentRadix) <= D_COUNTING_SORT_LOCAL_BLOCK_SIZE);
@@ -418,6 +269,7 @@ void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>&
 #if 1
 		ndEvaluateKey evaluator;
 		int arraySize = src.size();
+		arraySize = 16;
 		int workGroupSize = 1 << exponentRadix;
 		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
 		sycl::range<1> workGroupSizeRange(workGroupSize);
@@ -438,15 +290,16 @@ void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>&
 				counters[localId] = 0;
 			});
 
-			if (groupId < (workGroupCount - 1))
+			//if (groupId < (workGroupCount - 1))
+			if (1)
 			{
 				group.parallel_for_work_item([&](sycl::h_item<1> item)
 				{
 					sycl::id<1> localId = item.get_local_id();
 					int srcIndex = base + localId;
-					int scanIndex = evaluator.GetCount(srcAccessor[srcIndex]);
-					sycl::atomic_ref<int, sycl::memory_order::relaxed, sycl::memory_scope::work_item> atomicIndex(counters[scanIndex]);
-					atomicIndex++;
+					int radix = evaluator.GetRadix(srcAccessor[srcIndex]);
+					sycl::atomic_ref<int, sycl::memory_order::relaxed, sycl::memory_scope::work_item> atomicRadix(counters[radix]);
+					atomicRadix++;
 				});
 			}
 			else
@@ -457,9 +310,9 @@ void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>&
 					int srcIndex = base + localId;
 					if (srcIndex < arraySize)
 					{
-						int scanIndex = evaluator.GetCount(srcAccessor[srcIndex]);
-						sycl::atomic_ref<int, sycl::memory_order::relaxed, sycl::memory_scope::work_item> atomicIndex(counters[scanIndex]);
-						atomicIndex++;
+						int radix = evaluator.GetRadix(srcAccessor[srcIndex]);
+						sycl::atomic_ref<int, sycl::memory_order::relaxed, sycl::memory_scope::work_item> atomicRadix(counters[radix]);
+						atomicRadix++;
 					}
 				});
 			}
@@ -498,7 +351,103 @@ void SyclCountItems(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<int>&
 	});
 }
 
+template <class T, class ndEvaluateKey, int exponentRadix>
+void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>& dst, sycl::buffer<int>& scansBuffer)
+{
+	queue.submit([&](sycl::handler& handler)
+	{
+		ndEvaluateKey evaluator;
+		int arraySize = src.size();
+		arraySize = 8;
+		int workGroupSize = 1 << exponentRadix;
+		int workGroupCount = (arraySize + workGroupSize - 1) / workGroupSize;
+		sycl::range<1> workGroupSizeRange(workGroupSize);
+		sycl::range<1> workGroupCountRange(workGroupCount);
 
+		sycl::accessor srcAccessor(src, handler);
+		sycl::accessor dstAccessor(dst, handler);
+		sycl::accessor scanAccessor(scansBuffer, handler);
 
+		sycl::local_accessor<int, 1> cacheSortedKey(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> cacheBaseOffset(D_COUNTING_SORT_LOCAL_BLOCK_SIZE, handler);
+		sycl::local_accessor<int, 1> cacheKeyPrefix(D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1, handler);
+		sycl::local_accessor<int, 1> cacheItemCount(D_COUNTING_SORT_LOCAL_BLOCK_SIZE / 2 + D_COUNTING_SORT_LOCAL_BLOCK_SIZE + 1, handler);
+
+		//sycl::stream out(1024, 256, handler);
+		handler.parallel_for_work_group(workGroupCountRange, workGroupSizeRange, [=](sycl::group<1> group)
+		{
+			// make local shared memory buffers
+			group.parallel_for_work_item([&](sycl::h_item<1> item)
+			{
+				int localId = item.get_local_id();
+				cacheKeyPrefix[localId] = 0;
+				cacheItemCount[localId] = 0;
+				cacheSortedKey[localId] = (workGroupSize << 16) | localId;
+			});
+
+			sycl::id<1> groupId = group.get_group_id();
+			int base = groupId * workGroupSize;
+			int prefixBase = workGroupSize / 2;
+			int lastRoadOffset = workGroupCount * workGroupSize;
+
+			//if (groupId < (workGroupCount - 1))
+			if (1)
+			{
+				//out << "groupid:" << groupId << "   base:" << base << sycl::endl;
+				group.parallel_for_work_item([&](sycl::h_item<1> item)
+				{
+					int localId = item.get_local_id();
+					int index = base + localId;
+					int radix = evaluator.GetRadix(srcAccessor[index]);
+
+					cacheSortedKey[localId] = (radix << 16) | localId;
+					cacheBaseOffset[localId] = scanAccessor[base + localId];
+					cacheKeyPrefix[prefixBase + 1 + localId] = scanAccessor[lastRoadOffset + localId];
+					cacheItemCount[prefixBase + 1 + localId] = scanAccessor[base + workGroupSize + localId] - cacheBaseOffset[localId];
+				});
+			}
+			else
+			{
+			
+			}
+
+			for (int i = 1; i < workGroupSize; i = i << 1)
+			{
+				group.parallel_for_work_item([&](sycl::h_item<1> item)
+				{
+					int localId = item.get_local_id();
+					int countSum = cacheItemCount[prefixBase + localId] + cacheItemCount[prefixBase - i + localId];
+					int prefixSum = cacheKeyPrefix[prefixBase + localId] + cacheKeyPrefix[prefixBase - i + localId];
+					group.mem_fence();
+
+					cacheItemCount[prefixBase + localId] = countSum;
+					cacheKeyPrefix[prefixBase + localId] = prefixSum;
+					group.mem_fence();
+				});
+			}
+
+			//if (groupId < (workGroupCount - 1))
+			if (1)
+			{
+				group.parallel_for_work_item([&](sycl::h_item<1> item)
+				{
+					int localId = item.get_local_id();
+					int keyValue = cacheSortedKey[localId];
+					int keyHigh = keyValue >> 16;
+					int keyLow = keyValue & 0xffff;
+					int cacheItem = cacheItemCount[prefixBase + keyHigh];
+					int dstOffset0 = localId - cacheItem;
+					int dstOffset1 = cacheKeyPrefix[prefixBase + keyHigh] + cacheBaseOffset[keyHigh];
+					dstAccessor[dstOffset0 + dstOffset1] = srcAccessor[base + keyLow];
+				});
+			}
+			else
+			{
+
+			}
+
+		});
+	});
+}
 
 #endif

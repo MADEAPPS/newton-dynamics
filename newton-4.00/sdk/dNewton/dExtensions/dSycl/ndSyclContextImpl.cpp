@@ -153,7 +153,7 @@ void ndSyclContextImpl::Begin()
 	class CountDigit
 	{
 		public:
-		int GetCount(const int& item) const
+		int GetRadix(const int& item) const
 		{
 			//return item & 0xff;
 			return item & 0x7;
@@ -168,10 +168,22 @@ void ndSyclContextImpl::Begin()
 	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
 	m_queue.wait();
 	
-	sycl::host_accessor result(m_sortPrefixBuffer);
-	for (int i = 0; i < result.size(); i++)
-	{
-		m_cpuBuffer2[i] = result[i];
-	}
 	ndAssert(0);
+	sycl::host_accessor result0(m_buf0);
+	for (int i = 0; i < result0.size(); i++)
+	{
+		m_cpuBuffer2[i] = result0[i];
+	}
+
+	sycl::host_accessor result1(m_buf1);
+	for (int i = 0; i < result1.size(); i++)
+	{
+		m_cpuBuffer2[i] = result1[i];
+	}
+
+	sycl::host_accessor result2(m_sortPrefixBuffer);
+	for (int i = 0; i < result2.size(); i++)
+	{
+		m_cpuBuffer2[i] = result2[i];
+	}
 }
