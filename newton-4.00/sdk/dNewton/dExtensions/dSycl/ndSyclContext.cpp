@@ -25,7 +25,7 @@
 #include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
-using namespace sycl;
+void ndSyclSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 
 ndSyclContext::ndSyclContext(bool selectCpu)
 	:m_impl(nullptr)
@@ -69,15 +69,15 @@ const char* ndSyclContext::GetStringId() const
 
 void ndSyclContext::EnumDevices(bool selectCpu)
 {
-	std::vector<device> devices;
-	std::vector<platform> platforms(platform::get_platforms());
+	std::vector<sycl::device> devices;
+	std::vector<sycl::platform> platforms(sycl::platform::get_platforms());
 	for (int i = 0; i < platforms.size(); ++i)
 	{
-		platform& plat = platforms[i];
-		std::vector<device> devList(plat.get_devices());
+		sycl::platform& plat = platforms[i];
+		std::vector<sycl::device> devList(plat.get_devices());
 		for (int j = 0; j < devList.size(); ++j)
 		{
-			device& dev = devList[j];
+			sycl::device& dev = devList[j];
 			if (selectCpu)
 			{
 				if (dev.is_cpu())
@@ -97,10 +97,10 @@ void ndSyclContext::EnumDevices(bool selectCpu)
 
 	if (devices.size())
 	{
-		device bestDevice = devices[0];
+		sycl::device bestDevice = devices[0];
 		for (int i = 0; i < devices.size(); ++i)
 		{
-			std::string platformName(devices[i].get_platform().get_info<info::platform::name>());
+			std::string platformName(devices[i].get_platform().get_info<sycl::info::platform::name>());
 			for (int j = 0; j < platformName.size(); ++j)
 			{
 				platformName[j] = char(tolower(platformName[j]));

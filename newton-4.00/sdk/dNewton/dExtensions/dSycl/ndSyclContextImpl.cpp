@@ -24,8 +24,6 @@
 #include "ndStlContainers.h"
 #include "ndSyclContextImpl.h"
 
-//using namespace sycl;
-
 #define ND_SORT_SCAN_BUFFER_SIZE (256 * 256)
 
 #define xxxxxxxxxx 25
@@ -165,7 +163,7 @@ void ndSyclContextImpl::Begin()
 	xxxxxxxx.resize(64 * 1024);
 	//ndCountingSort<int, CountDigit, 8>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
 	ndCountingSort<int, CountDigit, 3>(m_cpuBuffer0, m_cpuBuffer1, xxxxxxxx);
-#if 1
+#if 0
 	CountingSort<int, CountDigit, 3>(m_buf0, m_buf1);
 	m_queue.wait();
 	
