@@ -507,23 +507,26 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 		//});
 
 		sycl::stream out(4096, 256, handler);
-		handler.parallel_for(sycl::nd_range<1>(sycl::range<1>{2}, sycl::range<1>{4}), [=](sycl::nd_item<1> item)
+
+		sycl::range<1> localSize(4);
+		sycl::range<1> globalSize(2);
+		handler.parallel_for(sycl::nd_range<1>(globalSize, localSize), [=](sycl::nd_item<1> item)
 		//handler.parallel_for(sycl::range<1>{4}, [=](sycl::id<1> item)
 		{
-			//const auto id_x = item.get_global_id(0);
-			const auto id_x = item.get_local_id(0);
-			const auto id_y = item.get_global_id(0);
-			//const auto width = item.get_group_range(0) * item.get_local_range(0);
-			//const auto width = item.get_group_range(0) * item.get_local_range(0);
-			const auto width = item.get_local_range(0);
-			//const auto width = item.get_group_range(0);
-			// map the 2D x and y indices to a single linear, 1D (work-group) index
-			//const auto index = id_x * width + id_y;
-			const auto index = id_y * width + id_x;
-			// wait for result to be written (sync local memory read_write)
-			//item.barrier(sycl::access::fence_space::local_space);
-			//dstAccessor[index] = index + 1;
-			out << index << sycl::endl;
+			////const auto id_x = item.get_global_id(0);
+			//const auto id_x = item.get_local_id(0);
+			//const auto id_y = item.get_global_id(0);
+			////const auto width = item.get_group_range(0) * item.get_local_range(0);
+			////const auto width = item.get_group_range(0) * item.get_local_range(0);
+			//const auto width = item.get_local_range(0);
+			////const auto width = item.get_group_range(0);
+			//// map the 2D x and y indices to a single linear, 1D (work-group) index
+			////const auto index = id_x * width + id_y;
+			//const auto index = id_y * width + id_x;
+			//// wait for result to be written (sync local memory read_write)
+			////item.barrier(sycl::access::fence_space::local_space);
+			////dstAccessor[index] = index + 1;
+			//out << index << sycl::endl;
 		});
 #endif
 	});
