@@ -506,31 +506,28 @@ void SyclMergeBuckects(sycl::queue& queue, sycl::buffer<T>& src, sycl::buffer<T>
 		//	dstAccessor[i * 4 + j] = i * 4 + j + 1;
 		//});
 
-
-		//cgh.parallel_for<example_kernel>(
-		//	cl::sycl::nd_range<2>(range<2>{size >> 3, size >> 3},   // 8, 8
-		//						  range<2>{size >> 4, size >> 4}),  // 4, 4
-		//	[=](cl::sycl::nd_item<2> item) 
-		//{
-		//	// get the 2D x and y indices
-		//	const auto id_x = item.get_global_id(0);
-		//	const auto id_y = item.get_global_id(1);
-		//	// map the 2D x and y indices to a single linear,
-		//	// 1D (kernel space) index
-		//	const auto width =
-		//		item.get_group_range(0) * item.get_local_range(0);
-		//	// map the 2D x and y indices to a single linear,
-		//	// 1D (work-group) index
-		//	const auto index = id_x * width + id_y;
-		//	// compute A_ptr * B_ptr into C_scratch
-		//	C_scratch[index] = A_ptr[index] * B_ptr[index];
-		//	// wait for result to be written (sync local memory read_write)
-		//	item.barrier(cl::sycl::access::fence_space::local_space);
-		//	// output result computed in local memory
-		//	C_ptr[index] = C_scratch[index];
-		//});
+		sycl::stream out(4096, 256, handler);
+		handler.parallel_for(sycl::nd_range<1>(sycl::range<1>{2}, sycl::range<1>{4}), [=](sycl::nd_item<1> item)
+		//handler.parallel_for(sycl::range<1>{4}, [=](sycl::id<1> item)
+		{
+			//const auto id_x = item.get_global_id(0);
+			const auto id_x = item.get_local_id(0);
+			const auto id_y = item.get_global_id(0);
+			//const auto width = item.get_group_range(0) * item.get_local_range(0);
+			//const auto width = item.get_group_range(0) * item.get_local_range(0);
+			const auto width = item.get_local_range(0);
+			//const auto width = item.get_group_range(0);
+			// map the 2D x and y indices to a single linear, 1D (work-group) index
+			//const auto index = id_x * width + id_y;
+			const auto index = id_y * width + id_x;
+			// wait for result to be written (sync local memory read_write)
+			//item.barrier(sycl::access::fence_space::local_space);
+			//dstAccessor[index] = index + 1;
+			out << index << sycl::endl;
+		});
 #endif
 	});
+
 }
 
 #endif
