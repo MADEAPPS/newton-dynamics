@@ -27,7 +27,7 @@
 #include "ndCudaCountingSort.cuh"
 #include "ndCudaContextImplement.h"
 
-
+#if 0
 __global__ void CudaIntegrateUnconstrainedBodiesInternal(ndCudaSceneInfo& info, float timestep)
 {
 	int index = threadIdx.x + blockDim.x * blockIdx.x;
@@ -87,3 +87,4 @@ void ndCudaContextImplement::IntegrateUnconstrainedBodies(float timestep)
 	ndCudaSceneInfo* const infoGpu = m_sceneInfoGpu;
 	CudaIntegrateUnconstrainedBodies <<<1, 1, 0, m_solverComputeStream >>> (*infoGpu, timestep);
 }
+#endif

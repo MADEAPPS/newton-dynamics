@@ -24,10 +24,13 @@
 
 #include "ndCudaStdafx.h"
 
-class ndCudaDevice;
-class ndCudaBodyProxy;
-class ndCudaSpatialVector;
+//class ndCudaDevice;
+//class ndCudaBodyProxy;
+//class ndCudaSpatialVector;
 class ndCudaContextImplement;
+
+typedef void* (*ndMemAllocCallback) (size_t size);
+typedef void (*ndMemFreeCallback) (void* const ptr);
 
 class ndCudaContext
 {
@@ -35,10 +38,14 @@ class ndCudaContext
 	D_CUDA_API ndCudaContext();
 	D_CUDA_API ~ndCudaContext();
 
+	D_CUDA_API void* operator new (size_t size);
+	D_CUDA_API void operator delete (void* ptr);
+
 	D_CUDA_API bool IsValid() const;
 	D_CUDA_API const char* GetStringId() const;
 
 	D_CUDA_API void Begin();
+#if 0
 	D_CUDA_API void End();
 	D_CUDA_API double GetGPUTime() const;
 
@@ -53,8 +60,11 @@ class ndCudaContext
 	
 	D_CUDA_API void IntegrateBodies(float timestep);
 	D_CUDA_API void IntegrateUnconstrainedBodies(float timestep);
+#endif
 
-	ndCudaDevice* m_device;
+	D_CUDA_API static void SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
+
+	//ndCudaDevice* m_device;
 	ndCudaContextImplement* m_implement;
 };
 

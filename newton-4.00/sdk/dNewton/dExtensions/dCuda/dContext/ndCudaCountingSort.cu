@@ -29,7 +29,7 @@
 #include "ndCudaIntrinsics.h"
 #include "ndCudaCountingSort.cuh"
 
-
+#if 0
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount)
 {
 	unsigned sum = 0;
@@ -46,3 +46,5 @@ __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsig
 	}
 	histogram[offset + threadId] = sum;
 }
+
+#endif

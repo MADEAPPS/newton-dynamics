@@ -65,12 +65,12 @@ ndCudaDevice::~ndCudaDevice()
 
 void* ndCudaDevice::operator new (size_t size)
 {											
-	return CudaMalloc(size);
+	return ndCudaMalloc(size);
 }											
 
 void ndCudaDevice::operator delete (void* ptr)
 {											
-	CudaFree(ptr);
+	ndCudaFree(ptr);
 }											
 
 

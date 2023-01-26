@@ -24,17 +24,29 @@
 #include "ndCudaContext.h"
 #include "ndCudaContextImplement.h"
 
+void CudaSetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
+
 ndCudaContext::ndCudaContext()
-	:m_device(new ndCudaDevice)
-	,m_implement(nullptr)
+	:m_implement(nullptr)
 {
-	int campbility = m_device->m_prop.major * 100 + m_device->m_prop.minor;
+	ndCudaDevice* const device = new ndCudaDevice;
+	int campbility = device->m_prop.major * 100 + device->m_prop.minor;
 	// go as far back as 5.2 Maxwell GeForce GTX 960 or better.
 	if (campbility >= 600)
-	//if ((cudaStatus == cudaSuccess) && (campbility >= 700))
 	{
 		cudaError_t cudaStatus = cudaSetDevice(0);
-		m_implement = (cudaStatus == cudaSuccess) ? new ndCudaContextImplement(m_device) : nullptr;
+		if (cudaStatus == cudaSuccess)
+		{
+			m_implement = new ndCudaContextImplement(device);
+		}
+		else
+		{
+			delete device;
+		}
+	}
+	else
+	{
+		delete device;
 	}
 }
 
@@ -44,8 +56,21 @@ ndCudaContext::~ndCudaContext()
 	{
 		delete m_implement;
 	}
+}
 
-	delete m_device;
+void* ndCudaContext::operator new (size_t size)
+{
+	return ndCudaMalloc(size);
+}
+
+void ndCudaContext::operator delete (void* ptr)
+{
+	ndCudaFree(ptr);
+}
+
+void ndCudaContext::SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free)
+{
+	CudaSetMemoryAllocators(alloc, free);
 }
 
 bool ndCudaContext::IsValid() const 
@@ -55,9 +80,11 @@ bool ndCudaContext::IsValid() const
 
 const char* ndCudaContext::GetStringId() const
 {
-	return IsValid() ? &m_device->m_prop.name[0] : "no cuda support";
+	ndAssert(m_implement);
+	return m_implement->GetStringId();
 }
 
+#if 0
 double ndCudaContext::GetGPUTime() const
 {
 	return IsValid() ? m_implement->GetTimeInSeconds() : 0.0;
@@ -66,11 +93,6 @@ double ndCudaContext::GetGPUTime() const
 ndCudaSpatialVector* ndCudaContext::GetTransformBuffer()
 {
 	return m_implement->GetTransformBuffer();
-}
-
-void ndCudaContext::Begin()
-{
-	m_implement->Begin();
 }
 
 void ndCudaContext::End()
@@ -111,4 +133,10 @@ void ndCudaContext::IntegrateUnconstrainedBodies(float timestep)
 void ndCudaContext::UpdateTransform()
 {
 	m_implement->UpdateTransform();
+}
+#endif
+
+void ndCudaContext::Begin()
+{
+	m_implement->Begin();
 }

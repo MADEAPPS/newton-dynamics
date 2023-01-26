@@ -27,12 +27,12 @@
 static ndMemFreeCallback g_free = free;
 static ndMemAllocCallback g_alloc = malloc;
 
-void* CudaMalloc(size_t size)
+void* ndCudaMalloc(size_t size)
 {
 	return g_alloc(size);
 }
 
-void CudaFree(void* const ptr)
+void ndCudaFree(void* const ptr)
 {
 	g_free(ptr);
 }

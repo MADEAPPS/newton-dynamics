@@ -24,8 +24,10 @@
 
 #include <cuda.h>
 
+#if 0
 class ndCudaSceneInfo;
 
 __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info);
+#endif
 
 #endif

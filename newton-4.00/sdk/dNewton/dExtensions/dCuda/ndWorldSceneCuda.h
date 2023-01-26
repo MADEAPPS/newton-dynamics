@@ -24,7 +24,10 @@
 #include <ndCudaBodyProxy.h>
 #include <ndDynamicsUpdate.h>
 
-class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
+class ndCudaContext;
+
+//class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
+class ndWorldSceneCuda : public ndWorldScene
 {
 	public:
 	ndWorldSceneCuda(const ndWorldScene& src);
@@ -32,27 +35,32 @@ class ndWorldSceneCuda : public ndWorldScene, public ndCudaContext
 
 	virtual void Begin();
 	virtual void End();
-	virtual bool IsGPU() const;
+
+	//virtual bool IsGPU() const;
 	virtual bool IsValid() const;
-	virtual double GetGPUTime() const;
+	//virtual double GetGPUTime() const;
+	//
+	//virtual void ApplyExtForce();
+	//virtual void BalanceScene();
+	//virtual void InitBodyArray();
+	//virtual void UpdateBodyList();
+	//virtual void CalculateContacts();
+	//virtual void FindCollidingPairs();
+	//
+	////virtual void FindCollidingPairs(ndBodyKinematic* const body);
+	//virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
+	//
+	//virtual void UpdateTransform();
+	//void LoadBodyData();
+	//void GetBodyTransforms();
+	//
+	//ndCudaContext* GetContext();
+	//
+	//ndArray<ndCudaBodyProxy> m_bodyBufferCpu;
+	//
+	//friend class ndDynamicsUpdateCuda;
 
-	virtual void ApplyExtForce();
-	virtual void BalanceScene();
-	virtual void InitBodyArray();
-	virtual void UpdateBodyList();
-	virtual void CalculateContacts();
-	virtual void FindCollidingPairs();
-
-	//virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
-
-	virtual void UpdateTransform();
-	void LoadBodyData();
-	void GetBodyTransforms();
-
-	ndCudaContext* GetContext();
-
-	ndArray<ndCudaBodyProxy> m_bodyBufferCpu;
-
+	private:
+	ndCudaContext* m_context;
 	friend class ndDynamicsUpdateCuda;
 };

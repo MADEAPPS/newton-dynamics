@@ -28,107 +28,78 @@
 #include "ndCudaContextImplement.h"
 #include "ndCudaContextImplementInternal.cuh"
 
-ndCudaContextImplement::ndCudaContextImplement(const ndCudaDevice* const device)
+ndCudaContextImplement::ndCudaContextImplement(ndCudaDevice* const device)
 	:m_device(device)
-	,m_sceneInfoGpu(nullptr)
-	,m_sceneInfoCpu(nullptr)
-	,m_histogram()
-	,m_bodyBuffer()
-	,m_sceneGraph()
-	,m_bodyAabbCell()
-	,m_bodyAabbCellScratch()
-	,m_transformBuffer0()
-	,m_transformBuffer1()
-	,m_transformBufferCpu()
-	,m_solverMemCpuStream(0)
-	,m_solverComputeStream(0)
-	,m_timeInSeconds(0.0f)
-	,m_frameCounter(0)
+	//,m_sceneInfoGpu(nullptr)
+	//,m_sceneInfoCpu(nullptr)
+	//,m_histogram()
+	//,m_bodyBuffer()
+	//,m_sceneGraph()
+	//,m_bodyAabbCell()
+	//,m_bodyAabbCellScratch()
+	//,m_transformBuffer0()
+	//,m_transformBuffer1()
+	//,m_transformBufferCpu()
+	//,m_solverMemCpuStream(0)
+	//,m_solverComputeStream(0)
+	//,m_timeInSeconds(0.0f)
+	//,m_frameCounter(0)
 {
-	cudaError_t cudaStatus;
-	cudaStatus = cudaStreamCreate(&m_solverMemCpuStream);
-	ndAssert(cudaStatus == cudaSuccess);
-
-	cudaStatus = cudaStreamCreate(&m_solverComputeStream);
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	cudaStatus = cudaMalloc((void**)&m_sceneInfoGpu, sizeof(ndCudaSceneInfo));
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu, sizeof(ndCudaSceneInfo));
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
-
-	*m_sceneInfoCpu = ndCudaSceneInfo();
+	//cudaError_t cudaStatus;
+	//cudaStatus = cudaStreamCreate(&m_solverMemCpuStream);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//cudaStatus = cudaStreamCreate(&m_solverComputeStream);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//cudaStatus = cudaMalloc((void**)&m_sceneInfoGpu, sizeof(ndCudaSceneInfo));
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//cudaStatus = cudaMallocHost((void**)&m_sceneInfoCpu, sizeof(ndCudaSceneInfo));
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	ndAssert(0);
+	//}
+	//
+	//*m_sceneInfoCpu = ndCudaSceneInfo();
 }
 
 ndCudaContextImplement::~ndCudaContextImplement()
 {
-	cudaError_t cudaStatus;
-	cudaStatus = cudaFreeHost(m_sceneInfoCpu);
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	cudaStatus = cudaFree(m_sceneInfoGpu);
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	cudaStatus = cudaStreamDestroy(m_solverComputeStream);
-	ndAssert(cudaStatus == cudaSuccess);
-
-	cudaStatus = cudaStreamDestroy(m_solverMemCpuStream);
-	ndAssert(cudaStatus == cudaSuccess);
-	
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
+	ndAssert(m_device);
+	//cudaError_t cudaStatus;
+	//cudaStatus = cudaFreeHost(m_sceneInfoCpu);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//cudaStatus = cudaFree(m_sceneInfoGpu);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//cudaStatus = cudaStreamDestroy(m_solverComputeStream);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//cudaStatus = cudaStreamDestroy(m_solverMemCpuStream);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	ndAssert(0);
+	//}
+	delete m_device;
 }
 
-void* ndCudaContextImplement::operator new (size_t size)
+const char* ndCudaContextImplement::GetStringId() const
 {
-	return CudaMalloc(size);
+	return m_device->m_prop.name;
 }
 
-void ndCudaContextImplement::operator delete (void* ptr)
-{
-	CudaFree(ptr);
-}
-
+#if 0
 float ndCudaContextImplement::GetTimeInSeconds() const
 {
 	return float (m_timeInSeconds);
 }
 
-void ndCudaContextImplement::Begin()
-{
-	cudaDeviceSynchronize();
-	// get the scene info from the update	
-	ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
-	ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
-
-	cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndCudaSceneInfo), cudaMemcpyDeviceToHost, m_solverMemCpuStream);
-	ndAssert(cudaStatus == cudaSuccess);
-	if (cudaStatus != cudaSuccess)
-	{
-		ndAssert(0);
-	}
-
-	m_timeInSeconds = double(cpuInfo->m_frameTimeInNanosecunds) * double (1.0e-9f);
-	//printf("cpu frame:%d ms:%lld\n", cpuInfo->m_frameCount, cpuInfo->m_frameTimeInNanosecunds/1000000);
-
-	const int frameCounter = m_frameCounter;
-	if (frameCounter)
-	{
-		ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu;
-		ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBuffer1 : m_transformBuffer0;
-		gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpuStream);
-	}
-
-	ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
-}
 
 void ndCudaContextImplement::End()
 {
@@ -351,4 +322,35 @@ void ndCudaContextImplement::InitBodyArray()
 	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetSrcBuffer, GetDstBuffer, GetItemsCount, GetSortKey_z, 256);
 	ndCudaCountingSort << <1, 1, 0, m_solverComputeStream >> > (*infoGpu, dommyType, GetDstBuffer, GetSrcBuffer, GetItemsCount, GetSortKey_w, 256);
 	ndCudaCalculateBodyPairsCount << <1, 1, 0, m_solverComputeStream >> > (*infoGpu);
+}
+
+#endif
+
+void ndCudaContextImplement::Begin()
+{
+	//ndAssert(0);
+	cudaDeviceSynchronize();
+	//// get the scene info from the update	
+	//ndCudaSceneInfo* const gpuInfo = m_sceneInfoGpu;
+	//ndCudaSceneInfo* const cpuInfo = m_sceneInfoCpu;
+	//
+	//cudaError_t cudaStatus = cudaMemcpyAsync(cpuInfo, gpuInfo, sizeof(ndCudaSceneInfo), cudaMemcpyDeviceToHost, m_solverMemCpuStream);
+	//ndAssert(cudaStatus == cudaSuccess);
+	//if (cudaStatus != cudaSuccess)
+	//{
+	//	ndAssert(0);
+	//}
+	//
+	//m_timeInSeconds = double(cpuInfo->m_frameTimeInNanosecunds) * double(1.0e-9f);
+	////printf("cpu frame:%d ms:%lld\n", cpuInfo->m_frameCount, cpuInfo->m_frameTimeInNanosecunds/1000000);
+	//
+	//const int frameCounter = m_frameCounter;
+	//if (frameCounter)
+	//{
+	//	ndCudaHostBuffer<ndCudaSpatialVector>& cpuBuffer = m_transformBufferCpu;
+	//	ndCudaDeviceBuffer<ndCudaSpatialVector>& gpuBuffer = (frameCounter & 1) ? m_transformBuffer1 : m_transformBuffer0;
+	//	gpuBuffer.WriteData(&cpuBuffer[0], cpuBuffer.GetCount() - 1, m_solverMemCpuStream);
+	//}
+	//
+	//ndCudaBeginFrame << < 1, 1, 0, m_solverComputeStream >> > (*gpuInfo);
 }

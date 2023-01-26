@@ -40,6 +40,7 @@
 //#include "ndCudaContext.h"
 
 
+
 #if 0
 template <typename Predicate>
 __global__ void CudaIntegrateBodies(Predicate IntegrateVelocity, cuSceneInfo& info, float timestep)
@@ -53,21 +54,8 @@ __global__ void CudaIntegrateBodies(Predicate IntegrateVelocity, cuSceneInfo& in
 }
 #endif
 
-ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
-	:ndDynamicsUpdate(world)
-	,m_context(((ndWorldSceneCuda*)world->GetScene())->GetContext())
-{
-}
 
-ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
-{
-}
-
-const char* ndDynamicsUpdateCuda::GetStringId() const
-{
-	ndAssert(m_context);
-	return m_context->GetStringId();
-}
+#if 0
 
 //void ndDynamicsUpdateCuda::Clear()
 //{
@@ -1513,4 +1501,27 @@ void ndDynamicsUpdateCuda::DeviceUpdate()
 	//CalculateForces();
 	IntegrateBodies();
 	//DetermineSleepStates();
+}
+
+#endif
+
+ndDynamicsUpdateCuda::ndDynamicsUpdateCuda(ndWorld* const world)
+	:ndDynamicsUpdate(world)
+{
+	ndWorldSceneCuda* const scene = (ndWorldSceneCuda*)world->GetScene();
+	m_context = scene->m_context;
+}
+
+ndDynamicsUpdateCuda::~ndDynamicsUpdateCuda()
+{
+}
+
+const char* ndDynamicsUpdateCuda::GetStringId() const
+{
+	ndAssert(m_context);
+	return m_context->GetStringId();
+}
+
+void ndDynamicsUpdateCuda::Update()
+{
 }

@@ -32,6 +32,7 @@
 
 #include <cuda.h>
 
+#if 0
 class ndCudaSceneInfo;
 
 __global__ void ndCudaMergeAabbInternal(ndCudaSceneInfo& info);
@@ -51,6 +52,6 @@ __global__ void ndCudaGenerateSceneGraph(ndCudaSceneInfo& info);
 __global__ void ndCudaCalculateBodyPairsCount(ndCudaSceneInfo& info);
 __global__ void ndCudaEndFrame(ndCudaSceneInfo& info, int frameCount);
 
-
+#endif
 
 #endif

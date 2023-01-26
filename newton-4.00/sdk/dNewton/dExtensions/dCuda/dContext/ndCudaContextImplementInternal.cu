@@ -28,6 +28,7 @@
 #include "ndCudaContextImplement.h"
 #include "ndCudaContextImplementInternal.cuh"
 
+#if 0
 #define D_CUDA_SCENE_GRID_SIZE		8.0f
 #define D_CUDA_SCENE_INV_GRID_SIZE	(1.0f/D_CUDA_SCENE_GRID_SIZE) 
 
@@ -417,3 +418,4 @@ __global__ void ndCudaInitTransforms(ndCudaSceneInfo& info)
 __global__ void ndCudaGenerateSceneGraph(ndCudaSceneInfo& info)
 {
 }
+#endif

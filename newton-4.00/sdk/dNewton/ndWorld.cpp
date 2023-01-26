@@ -1038,7 +1038,7 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 					ndMemFreeCallback freeMemory;
 					ndMemAllocCallback allocMemory;
 					ndMemory::GetMemoryAllocators(allocMemory, freeMemory);
-					CudaSetMemoryAllocators(allocMemory, freeMemory);
+					ndCudaContext::SetMemoryAllocators(allocMemory, freeMemory);
 					ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
 					delete m_scene;
 					m_scene = newScene;

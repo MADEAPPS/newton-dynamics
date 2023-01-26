@@ -59,7 +59,7 @@ void ndWorldSceneSycl::Begin()
 
 void ndWorldSceneSycl::End()
 {
-	//ndCudaContext::End();
+	//m_context->End();
 	ndWorldScene::End();
 }
 

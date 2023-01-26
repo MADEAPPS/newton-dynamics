@@ -39,26 +39,26 @@ class ndDynamicsUpdateCuda : public ndDynamicsUpdate
 	virtual void Update();
 
 	public:
-	void SortJoints();
-	void SortIslands();
-	void BuildIsland();
-	void InitWeights();
-	void InitBodyArray();
-	void InitSkeletons();
-	void CalculateForces();
-	void IntegrateBodies();
-	void UpdateSkeletons();
-	void FinishGpuUpdate();
-	void InitJacobianMatrix();
-	void UpdateForceFeedback();
-	void CalculateJointsForce();
-	void IntegrateBodiesVelocity();
-	void CalculateJointsAcceleration();
-	void IntegrateUnconstrainedBodies();
-
-	void DeviceUpdate();
-	void DetermineSleepStates();
-	void GetJacobianDerivatives(ndConstraint* const joint);
+	//void SortJoints();
+	//void SortIslands();
+	//void BuildIsland();
+	//void InitWeights();
+	//void InitBodyArray();
+	//void InitSkeletons();
+	//void CalculateForces();
+	//void IntegrateBodies();
+	//void UpdateSkeletons();
+	//void FinishGpuUpdate();
+	//void InitJacobianMatrix();
+	//void UpdateForceFeedback();
+	//void CalculateJointsForce();
+	//void IntegrateBodiesVelocity();
+	//void CalculateJointsAcceleration();
+	//void IntegrateUnconstrainedBodies();
+	//
+	//void DeviceUpdate();
+	//void DetermineSleepStates();
+	//void GetJacobianDerivatives(ndConstraint* const joint);
 
 	ndCudaContext* m_context;
 };

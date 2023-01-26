@@ -38,47 +38,51 @@ class ndCudaDevice;
 class ndCudaContextImplement
 {
 	public: 
-	ndCudaContextImplement(const ndCudaDevice* const device);
+	D_CUDA_OPERATOR_NEW_AND_DELETE;
+
+	ndCudaContextImplement(ndCudaDevice* const device);
 	~ndCudaContextImplement();
 
-	void* operator new (size_t size);
-	void operator delete (void* ptr);
+	const char* GetStringId() const;
 
 	void Begin();
-	void End();
-	float GetTimeInSeconds() const;
 
-	void ResizeBuffers(int size);
-	void LoadBodyData(const ndCudaBodyProxy* const src, int size);
-
-	void InitBodyArray();
-	void UpdateTransform();
-	void ValidateContextBuffers();
-	ndCudaSpatialVector* GetTransformBuffer();
-
-	void IntegrateBodies(float timestep);
-	void IntegrateUnconstrainedBodies(float timestep);
+	//void End();
+	//float GetTimeInSeconds() const;
+	//
+	//void ResizeBuffers(int size);
+	//void LoadBodyData(const ndCudaBodyProxy* const src, int size);
+	//
+	//void InitBodyArray();
+	//void UpdateTransform();
+	//void ValidateContextBuffers();
+	//ndCudaSpatialVector* GetTransformBuffer();
+	//
+	//void IntegrateBodies(float timestep);
+	//void IntegrateUnconstrainedBodies(float timestep);
 	
-	const ndCudaDevice* m_device;
-	ndCudaSceneInfo* m_sceneInfoGpu;
-	ndCudaSceneInfo* m_sceneInfoCpu;
-
-	// gpu buffers
-	ndCudaDeviceBuffer<unsigned> m_histogram;
-	ndCudaDeviceBuffer<ndCudaBodyProxy> m_bodyBuffer;
-	ndCudaDeviceBuffer<ndCudaSceneNode> m_sceneGraph;
-	ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
-	ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScratch;
-	ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBuffer0;
-	ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBuffer1;
-
-	// host buffers
-	ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu;
 	
-	cudaStream_t m_solverMemCpuStream;
-	cudaStream_t m_solverComputeStream;
-	double m_timeInSeconds;
-	unsigned m_frameCounter;
+	//ndCudaSceneInfo* m_sceneInfoGpu;
+	//ndCudaSceneInfo* m_sceneInfoCpu;
+	//
+	//// gpu buffers
+	//ndCudaDeviceBuffer<unsigned> m_histogram;
+	//ndCudaDeviceBuffer<ndCudaBodyProxy> m_bodyBuffer;
+	//ndCudaDeviceBuffer<ndCudaSceneNode> m_sceneGraph;
+	//ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCell;
+	//ndCudaDeviceBuffer<ndCudaBodyAabbCell> m_bodyAabbCellScratch;
+	//ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBuffer0;
+	//ndCudaDeviceBuffer<ndCudaSpatialVector> m_transformBuffer1;
+	//
+	//// host buffers
+	//ndCudaHostBuffer<ndCudaSpatialVector> m_transformBufferCpu;
+	//
+	//cudaStream_t m_solverMemCpuStream;
+	//cudaStream_t m_solverComputeStream;
+	//double m_timeInSeconds;
+	//unsigned m_frameCounter;
+
+	ndCudaDevice* m_device;
 };
 
 #endif

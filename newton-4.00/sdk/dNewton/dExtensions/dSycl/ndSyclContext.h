@@ -25,6 +25,8 @@
 #include <ndSyclStdafx.h>
 
 class ndSyclContextImpl;
+typedef void* (*ndMemAllocCallback) (size_t size);
+typedef void (*ndMemFreeCallback) (void* const ptr);
 
 class ndSyclContext
 {

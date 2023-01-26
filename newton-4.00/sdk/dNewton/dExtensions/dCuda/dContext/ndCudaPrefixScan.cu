@@ -28,6 +28,7 @@
 #include "ndCudaIntrinsics.h"
 #include "ndCudaPrefixScan.cuh"
 
+#if 0
 #define D_HILL_STEELE_PREFIX_SCAN_BLOCK_SIZE	1024
 
 __global__ void ndCudaHillisSteeleSanityCheck(ndCudaSceneInfo& info)
@@ -261,3 +262,4 @@ __global__ void ndCudaHillisSteelePrefixScan(ndCudaSceneInfo& info)
 	}
 }
 
+#endif

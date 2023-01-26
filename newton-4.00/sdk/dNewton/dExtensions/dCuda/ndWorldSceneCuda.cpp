@@ -35,24 +35,37 @@
 
 ndWorldSceneCuda::ndWorldSceneCuda(const ndWorldScene& src)
 	:ndWorldScene(src)
-	,ndCudaContext()
 {
+	m_context = new ndCudaContext();
 }
 
 ndWorldSceneCuda::~ndWorldSceneCuda()
 {
+	if (m_context)
+	{
+		delete m_context;
+	}
 }
 
-ndCudaContext* ndWorldSceneCuda::GetContext()
-{
-	return this;
-}
 
 bool ndWorldSceneCuda::IsValid() const
 {
-	return ndCudaContext::IsValid();
+	return m_context->IsValid();
 }
 
+void ndWorldSceneCuda::Begin()
+{
+	ndWorldScene::Begin();
+	m_context->Begin();
+}
+
+void ndWorldSceneCuda::End()
+{
+	//m_context->End();
+	ndWorldScene::End();
+}
+
+#if 0
 bool ndWorldSceneCuda::IsGPU() const
 {
 	return ndCudaContext::IsValid();
@@ -63,17 +76,6 @@ double ndWorldSceneCuda::GetGPUTime() const
 	return ndCudaContext::GetGPUTime();
 }
 
-void ndWorldSceneCuda::Begin()
-{
-	ndWorldScene::Begin();
-	ndCudaContext::Begin();
-}
-
-void ndWorldSceneCuda::End()
-{
-	ndCudaContext::End();
-	ndWorldScene::End();
-}
 
 void ndWorldSceneCuda::LoadBodyData()
 {
@@ -246,3 +248,4 @@ void ndWorldSceneCuda::CalculateContacts(ndInt32, ndContact* const)
 {
 	ndAssert(0);
 }
+#endif

@@ -30,7 +30,7 @@
 #include "ndCudaSceneInfo.h"
 #include "ndCudaIntrinsics.h"
 
-
+#if 0
 #define D_COUNTING_SORT_BLOCK_SIZE		(1<<10)
 
 __global__ void ndCudaCountingCellsPrefixScanInternal(unsigned* histogram, unsigned blockCount);
@@ -207,5 +207,6 @@ __global__ void ndCudaCountingSort(
 		#endif
 	}
 }
+#endif
 
 #endif
